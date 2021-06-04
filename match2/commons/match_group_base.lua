@@ -218,7 +218,7 @@ function p.luaBracket(frame, args, matchBuilder)
             match["bracketid"] = bracketid
 
             -- store match
-            matchJson = Match.store(match)
+            local matchJson = Match.store(match)
             table.insert(storedData, matchJson)
         else
             -- stores ids of missing matches
