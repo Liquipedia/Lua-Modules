@@ -14,28 +14,28 @@ local _frame
 
 function Matchlist.get(frame)
 	local args = getArgs(frame)
-	
+
 	local bracketid = args[1];
-	
+
 	local matches = _getMatches(bracketid)
-	
+
 	return Matchlist.luaGet(frame, args, matches)
 end
 
 -- draw the table
 function Matchlist.luaGet(frame, args, matches)
 	_frame = frame
-	
+
 	if not matches then
 		local bracketid = args[1]
 		matches = _getMatches(bracketid)
 	end
-	
+
 	--set main div, with customizable width and with attachable option (to e.g. grouptables)
 	local main = html.create("div"):addClass("brkts-main"):cssText(args.attached == 'true' and 'padding-left:0px;padding-right:0px' or '')
 	local width = string.gsub(args.width or 300, 'px', '')
 	width = (tonumber(width) or 300) .. 'px'
-	
+
 	--determine class for the tableWrapper (collaps options)
 	local main_class = 'brkts-matchlist wikitable wikitable-bordered matchlist'
 	if args.nocollapse ~= 'true' then
@@ -44,14 +44,14 @@ function Matchlist.luaGet(frame, args, matches)
 			main_class = main_class .. ' collapsed'
 		end
 	end
-	
+
 	--set tableWrapper with attachable option (to e.g. grouptables) and with collaps options
 	local tableWrapper = html.create("table")
 		:addClass(main_class)
 		:cssText(args.attached == 'true' and 'margin-bottom:-1px;margin-top:-2px' or '')
 		:css("width", width)
 	tableWrapper:node(tableBody)
-	
+
 	-- add matches
 	for index, match in ipairs(matches) do
 		local bracketdata = match.match2bracketdata or {}
@@ -59,7 +59,7 @@ function Matchlist.luaGet(frame, args, matches)
 			bracketdata = Json.parse(bracketdata)
 		end
 		match.extradata = Json.stringify(match.extradata or {})
-		
+
 		-- add title
 		if index == 1 then
 			local temp = _drawTitle(bracketdata.title or "Match List")
@@ -68,15 +68,15 @@ function Matchlist.luaGet(frame, args, matches)
 			end
 			tableWrapper:node(temp)
 		end
-		
+
 		-- add header
 		if index ~= 1 and not utils.misc.isEmpty(bracketdata.header) then
 			tableWrapper:node(_drawHeader(bracketdata.header))
 		end
-		
+	
 		tableWrapper:node(_drawMatch(match))
 	end
-	
+
 	return main:node(tableWrapper)
 end
 
@@ -92,7 +92,6 @@ end
 
 -- draw table row containing match from match data
 function _drawMatch(match)
-	
 	local winner = tonumber(match.winner)
 	if match.resulttype == 'draw' then
 		winner = 0
@@ -101,12 +100,12 @@ function _drawMatch(match)
 		name = "",
 		template = ""
 	}
-	
+
 	local opponent1data = match.match2opponents[1] or default_opponent
 	local opponent2data = match.match2opponents[2] or default_opponent
 	local opponent1key = DisplayHelper.getOpponentHighlightKey(opponent1data)
 	local opponent2key = DisplayHelper.getOpponentHighlightKey(opponent2data)
-	
+
 	local tbd1 =
 		match.opponent1template == 'tbd' or match.opponent1 == 'TBD' or
 		utils.string.startsWith(opponent1data.type, 'literal')
@@ -115,7 +114,7 @@ function _drawMatch(match)
 		utils.string.startsWith(opponent2data.type, 'literal')
 
 	local hasDetails = HasDetails(match)
-	
+
 	return html.create("tr")
 		:addClass("brtks-matchlist-row brkts-match-popup-wrapper")
 		:css("cursor", "pointer")
@@ -214,5 +213,5 @@ function _addDisplayType(args, displayType)
 	args.displaytype = displayType
 	return args
 end
-	
+
 return Matchlist
