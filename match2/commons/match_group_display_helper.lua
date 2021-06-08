@@ -1,3 +1,7 @@
+--
+-- @author QuadratClown for Liquipedia
+--
+
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
