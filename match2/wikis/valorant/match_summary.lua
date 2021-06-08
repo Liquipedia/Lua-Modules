@@ -97,11 +97,11 @@ function Score:setSecondRoundScore(side, score)
 end
 
 function Score:_getSideColor(side)
-	if side == 'atk' then
-		return '#c04845'
-	elseif side == 'def' then
-		return '#46b09c'
-	end
+    if side == 'atk' then
+        return '#c04845'
+    elseif side == 'def' then
+        return '#46b09c'
+    end
 end
 
 function Score:create()
@@ -258,10 +258,10 @@ function CustomMatchSummary._createMap(frame, game)
 end
 
 function CustomMatchSummary._getOppositeSide(side)
-	if side == 'atk' then
-		return 'def'
-	end
-	return 'atk'
+    if side == 'atk' then
+        return 'def'
+    end
+    return 'atk'
 end
 
 function CustomMatchSummary._createCheckMark(isWinner)
