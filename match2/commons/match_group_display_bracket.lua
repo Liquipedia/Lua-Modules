@@ -1,738 +1,745 @@
-local Bracket = {}
-
+local Array = require('Module:Array')
+local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local DisplayUtil = require('Module:DisplayUtil')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
-local MatchSummary = require('Module:MatchSummary')
-local OpponentDisplay = require('Module:OpponentDisplay')
+local LuaUtils = require('Module:LuaUtils')
+local MatchGroupUtil = require('Module:MatchGroup/Util')
+local String = require('Module:String')
 local Table = require('Module:Table')
-local WikiSpecific = require('Module:Brkts/WikiSpecific')
+local TypeUtil = require('Module:TypeUtil')
 
-local getArgs = require('Module:Arguments').getArgs
-local utils = require('Module:LuaUtils')
 local html = mw.html
 
-local ZERO_WIDTH_SPACE = '&#8203;'
-local COMPENSATABLE_SINGLES = 2
-local NIL_EXTRADATA = {0, 0, 0, 0}
-local INFINITE_HEIGHT = 10000
+local Bracket = {propTypes = {}, types = {}}
 
--- allowed values for configuring the bracket and their default values
-local BRACKET_CONFIG_FORMAT = {
-    emptyRoundTitles = 'boolean',
+-- Called by MatchGroup/Display
+function Bracket.luaGet(_, args)
+    return Bracket.BracketContainer({
+        bracketId = args[1],
+        config = Bracket.configFromArgs(args),
+    })
+end
+
+function Bracket.configFromArgs(args)
+    return {
+        headerHeight = tonumber(args.headerHeight),
+        headerMargin = tonumber(args.headerMargin),
+        hideRoundTitles = LuaUtils.misc.readBool(args.hideRoundTitles),
+        lineWidth = tonumber(args.lineWidth),
+        matchMargin = tonumber(args.matchMargin),
+        matchWidth = tonumber(args.matchWidth),
+        matchWidthMobile = tonumber(args.matchWidthMobile),
+        opponentHeight = tonumber(args.opponentHeight),
+        qualifiedHeader = args.qualifiedHeader,
+        roundHorizontalMargin = tonumber(args.roundHorizontalMargin),
+        scoreWidth = tonumber(args.scoreWidth),
+    }
+end
+
+Bracket.types.BracketConfig = TypeUtil.struct({
+    MatchSummaryContainer = 'function',
+    OpponentEntry = 'function',
     headerHeight = 'number',
-    hideMatchLine = 'boolean',
+    headerMargin = 'number',
     hideRoundTitles = 'boolean',
-    matchHeight = 'number',
+    lineWidth = 'number',
+    matchHasDetails = 'function',
+    matchMargin = 'number',
     matchWidth = 'number',
     matchWidthMobile = 'number',
-    qualifiedHeader = 'string',
+    opponentHeight = 'number',
+    qualifiedHeader = 'string?',
+    roundHorizontalMargin = 'number',
     scoreWidth = 'number',
-}
-
--- default bracket config
-local BRACKET_CONFIG_DEFAULT = {
-    emptyRoundTitles = false,
-    headerHeight = 25,
-    hideMatchLine = false,
-    hideRoundTitles = false,
-    matchHeight = 44,
-    matchWidth = 150,
-    matchWidthMobile = 90,
-    qualifiedHeader = nil,
-    scoreWidth = 20,
-}
-
-local _bracketConfig
-
-local _frame
-local _matches
-
-function Bracket.get(frame)
-    local args = getArgs(frame)
-    return Bracket.luaGet(frame, args)
-end
-
-function Bracket.luaGet(frame, args)
-    _frame = frame
-    
-    local bracketid = args[1]
-    local matches = DisplayHelper.getMatches(bracketid)
-    
-    if (args.matchHeight or '') == '' then
-        for id, match in utils.iter.spairs(matches) do
-            args.matchHeight = WikiSpecific.get_matchHeight(match.match2opponents[1] or {}, match.match2opponents[1] or {}, args.matchHeight)
-        end
-    end
-
-    local has3rd = false
-    for id, match in utils.iter.spairs(matches) do
-        if string.find(match.match2id or '', 'RxMTP') then
-            has3rd = true 
-            break
-        end
-    end
-
-    _bracketConfig = _getBracketConfig(args)
-
-    local matches, referencedIds = _mapMatches(matches, has3rd)
-    _matches = matches
-
-    out = html.create('div'):addClass('brkts-main')
-    firsthead = true
-    height = 0
-    for id, match in utils.iter.spairs(matches) do
-        if not referencedIds[match.id] then
-            local extradata, node = unpack(match:buildBracket(firsthead))
-            out:node(node)
-            height = height + math.max(extradata[1], extradata[1] / 2 + match.minDisplayHeight)
-            firsthead = false
-        end
-    end
-    
-    out:css('min-height', height .. 'px')
-
-    return out
-end
-
-function _getBracketConfig(args)
-    local globalConfig = Json.parse(tostring(mw.message.new('BracketConfig')))
-    local config = {}
-    for param, format in pairs(BRACKET_CONFIG_FORMAT) do
-        local val = utils.misc.emptyOr(args[param], globalConfig[param], BRACKET_CONFIG_DEFAULT[param])
-        if val ~= nil then
-            if format == 'number' then
-                config[param] = tonumber(val)
-            elseif format == 'boolean' then
-                config[param] = utils.misc.readBool(val)
-            elseif format == 'string' then
-                config[param] = tostring(val)
-            end
-        end
-    end
-    return config
-end
-
--- define class match for easier recursive drawing
-local BracketMatch = {}
-BracketMatch.__index = BracketMatch
-
-setmetatable(
-    BracketMatch,
-    {
-        __call = function(cls, ...)
-            return cls.new(...)
-        end
-    }
+})
+Bracket.types.BracketConfigOptions = TypeUtil.struct(
+    Table.mapValues(Bracket.types.BracketConfig.struct, TypeUtil.optional)
 )
 
-function BracketMatch.new(match, has3rd)
-    local self = setmetatable({}, BracketMatch)
-
-    -- set visual parameters
-    self.matchHeight = _bracketConfig.matchHeight / 2
-    self.lineHeight = self.matchHeight - 11
-    self.padding = self.matchHeight / 2
-    self.height = 2 * self.matchHeight + 2
-    self.stepHeight = self.padding + 1
-    self.headerHeight = _bracketConfig.headerHeight
-    self.headerLineHeight = self.headerHeight - 11
-    self.headerHeight2 = self.headerHeight + 10
-    self.matchWidth = _bracketConfig.matchWidth + 2
-    self.matchWidthMobile = _bracketConfig.matchWidthMobile + 2
-    self.scoreWidth = _bracketConfig.scoreWidth
-
-    -- set visual flags
-    self.hideRoundTitles = utils.misc.readBool(_bracketConfig.hideRoundTitles)
-    self.emptyRoundTitles = utils.misc.readBool(_bracketConfig.emptyRoundTitles)
-    self.hideMatchLine = utils.misc.readBool(_bracketConfig.hideMatchLine)
-
-    self.matchRaw = match
-    local bracketdata =
-        type(match.match2bracketdata) == 'table' and match.match2bracketdata or
-        Json.parse(match.match2bracketdata or '{}')
-    self.id = utils.misc.emptyOr(match.match2id)
-    self.bracketid = match.match2bracketid
-
-    -- TODO: solve this for more than 2 opponents
-    self.opponent1Raw = match.match2opponents[1] or {}
-    self.opponent2Raw = match.match2opponents[2] or {}
-    self.opponent1 = self.opponent1Raw.name or 'TBD'
-    self.opponent2 = self.opponent2Raw.name or 'TBD'
-    self.opponent1score = self.opponent1Raw.score or -1
-    self.opponent2score = self.opponent2Raw.score or -1
-    self.opponent1template = self.opponent1Raw.template or 'tbd'
-    self.opponent2template = self.opponent2Raw.template or 'tbd'
-    self.opponent1players = self.opponent1Raw.match2players or {}
-    self.opponent2players = self.opponent2Raw.match2players or {}
-    self.opponent1type = self.opponent1Raw.type or 'team'
-    self.opponent2type = self.opponent2Raw.type or 'team'
-    self.finished = utils.misc.readBool(match.finished or false)
-    self.games = match.match2games or {}
-    self.winner = tonumber(match.winner)
-    self.dateexact = utils.misc.readBool(match.dateexact)
-    --self.date = Helper:parseDateString( match.date, self.dateexact )
-
-    -- add participants data from games to opponents
-    -- TODO: solve this for more than 2 opponents
-    local opponentParticipants = {{}, {}}
-    for index, game in ipairs(self.games) do
-        local participants =
-            type(game.participants) == 'table' and game.participants or Json.parse(game.participants or '{}')
-        local gameparticipants = {{}, {}}
-        for key, val in pairs(participants) do
-            local opPl = utils.string.split(key, '_')
-            if not gameparticipants[opPl[1]] then gameparticipants[opPl[1]] = {} end
-            gameparticipants[opPl[1]]['p' .. opPl[2]] = val
-        end
-        local gameName = 'g' .. (index + 1)
-        opponentParticipants[1][gameName] = gameparticipants[1]
-        opponentParticipants[2][gameName] = gameparticipants[2]
-    end
-
-    self.opponent1Raw.participants = opponentParticipants[1]
-    self.opponent2Raw.participants = opponentParticipants[2]
-
-    -- parse bracketdata
-    self.referencedIds = {}
-    self.type = bracketdata.type or 'error'
-    self.header = utils.misc.emptyOr(bracketdata.header or nil)
-    self.skipround = bracketdata.skipround or 0
-    if (self.skipround == 'true') then
-        self.skipround = 1
-    else
-        self.skipround = tonumber(self.skipround) or 0
-    end
-    self.qualskip = bracketdata.qualskip or 0
-    if (self.qualskip == 'true') then
-        self.qualskip = 1
-    else
-        self.qualskip = tonumber(self.qualskip) or 0
-    end
-    self.qualwin = utils.misc.readBool(bracketdata.qualwin or 0)
-    self.quallose = utils.misc.readBool(bracketdata.quallose or 0)
-    self.upper = utils.misc.emptyOr(bracketdata.toupper or nil)
-    self.lower = utils.misc.emptyOr(bracketdata.tolower or nil)
-    self.qualwinLiteral = utils.misc.emptyOr(bracketdata.qualwinLiteral or '')
-    self.qualloseLiteral = utils.misc.emptyOr(bracketdata.qualloseLiteral or '')
-    self.bracketreset = utils.misc.emptyOr(bracketdata.bracketreset or nil)
-    self.thirdplace = utils.misc.emptyOr(bracketdata.thirdplace or nil)
-    self.opponent1Raw.displaytype = 'bracket'
-    self.opponent2Raw.displaytype = 'bracket'
-
-    -- set bracket specific visual parameters
-    self.minDisplayHeight = 0
-    if (self.thirdplace ~= nil) and has3rd then
-        self.minDisplayHeight = 3 * self.matchHeight + 3 * self.padding + self.headerHeight + self.headerHeight2
-    elseif (self.quallose) then
-        self.minDisplayHeight = 3 * self.matchHeight + self.headerHeight
-    end
-
-    -- store referenced ids
-    if (self.upper ~= nil) then
-        self.referencedIds[self.upper] = true
-    end
-    if (self.lower ~= nil) then
-        self.referencedIds[self.lower] = true
-    end
-    if (self.bracketreset ~= nil) then
-        self.referencedIds[self.bracketreset] = true
-    end
-    if (self.thirdplace ~= nil) then
-        self.referencedIds[self.thirdplace] = true
-    end
-    return self
+--[[
+Display component for a tournament bracket. The bracket is specified by ID. 
+The component fetches the match data from LPDB or page variables.
+]]
+Bracket.propTypes.BracketContainer = {
+    bracketId = 'string',
+    config = TypeUtil.optional(Bracket.types.BracketConfigOptions),
+}
+function Bracket.BracketContainer(props)
+    DisplayUtil.assertPropTypes(props, Bracket.propTypes.BracketContainer)
+    return Bracket.Bracket({
+        config = props.config,
+        matchesById = MatchGroupUtil.fetchMatchesTable(props.bracketId),
+    })
 end
 
-function BracketMatch:applyTree(matches)
-    self.lower = matches[self.lower or 'none']
-    self.upper = matches[self.upper or 'none']
-    self.bracketreset = matches[self.bracketreset or 'none']
-    self.thirdplace = matches[self.thirdplace or 'none']
-end
+--[[
+Display component for a tournament bracket. Match data is specified in the 
+input.
+]]
+Bracket.propTypes.Bracket = {
+    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+    config = TypeUtil.optional(Bracket.types.BracketConfigOptions),
+}
+function Bracket.Bracket(props)
+    DisplayUtil.assertPropTypes(props, Bracket.propTypes.Bracket)
 
-function BracketMatch:buildBracket(firsthead, isupper, single, ishead, depth, maxdepth, singledepth, headerchild)
-    local upper = _matches[self.upper]
-    local lower = _matches[self.lower]
+    local defaultConfig = DisplayHelper.getGlobalConfig()
+    local propsConfig = props.config or {}
 
-    isupper = utils.misc.emptyOr(isupper, true)
-    single = utils.misc.emptyOr(single, 0)
-    ishead = utils.misc.emptyOr(ishead, true)
-    depth = utils.misc.emptyOr(depth, 1)
-    maxdepth = utils.misc.emptyOr(maxdepth, nil)
-    singledepth = utils.misc.emptyOr(singledepth, 0)
-    headerchild = utils.misc.emptyOr(headerchild, false)
-
-    -- third place match and bracket reset for header matches
-    local thirdplace = nil
-    local bracketreset = nil
-    if (firsthead) then
-        thirdplace = _matches[self.thirdplace]
-        bracketreset = _matches[self.bracketreset]
-    end
-
-    -- adjust match data in case of bracket reset
-    local matchRaw = self.matchRaw
-    if bracketreset then
-        self.winner = bracketreset.winner
-        matchRaw.bracketreset = bracketreset.matchRaw
-    end
-
-    if (maxdepth == nil) then
-        maxdepth = self:getBracketDepth()
-    end
-
-    -- hide headers if hideRoundTitles flag is set
-    if (self.hideRoundTitles) then
-        self.header = nil
-    elseif (self.emptyRoundTitles and self.header ~= nil) then
-        self.header = ''
-    end
-
-    headerchild = self.header ~= nil or headerchild
-    local wassingle = single ~= 0
-    local isend = (upper == nil and lower == nil)
-    local isfull = (upper ~= nil and lower ~= nil)
-    local issingle = not isend and not isfull
-
-    singledepth =
-        wassingle and singledepth + single or
-        (isupper and math.max(0, singledepth - COMPENSATABLE_SINGLES) or 0)
-
-    local endSpacerDiv = html.create('div'):addClass('brkts-round-wrapper')
-    for i = 1, maxdepth - depth do
-        endSpacerDiv:node(html.create('div'):addClass('brkts-match-spacer'):css('height', self.matchHeight .. 'px'))
-    end
-    local endSpacer = {NIL_EXTRADATA, endSpacerDiv}
-    local nilSpacer = {NIL_EXTRADATA, nil}
-
-    local newdepth = depth + 1 + self.skipround
-
-    local vals1, s1 =
-        unpack(
-        upper ~= nil and
-            upper:buildBracket(
-                firsthead,
-                true,
-                (lower ~= nil and 1 or 0) - 1,
-                false,
-                newdepth,
-                maxdepth,
-                singledepth,
-                headerchild
-            ) or
-            nilSpacer
-    )
-    local height1, singleDepth1, endSingledepth1, midCorrection1 = unpack(vals1)
-    local vals2, s2 =
-        unpack(
-        lower ~= nil and
-            lower:buildBracket(
-                firsthead,
-                false,
-                (upper ~= nil and -1 or 0) + 1,
-                false,
-                newdepth,
-                maxdepth,
-                singledepth,
-                issingle and headerchild
-            ) or
-            (upper ~= nil and nilSpacer or endSpacer)
-    )
-    local height2, singleDepth2, endSingledepth2, midCorrection2 = unpack(vals2)
-
-    local ownHeight =
-        self.height + self.padding + (headerchild and self.headerHeight2 or 0) +
-        math.max(singledepth, self.qualwin and self.quallose and 1 or 0) * self.stepHeight
-    local endSingleDepth = isend and singledepth or (upper == nil and endSingledepth2 or 0)
-    local uppermid = height1 / 2 - midCorrection1
-    local upperinset = height1 - uppermid
-    local lowermid = height2 / 2 + midCorrection2
-
-    -- adjust mid position for two child matches/one child match/no child matches
-    local midCorrection = 0
-    if (isfull) then
-        midCorrection = (uppermid - lowermid) / 2
-    elseif (issingle) then
-        midCorrection = -self.stepHeight
-    elseif (isend) then
-        midCorrection =
-            (headerchild and self.headerHeight2 / 2 or 0) +
-            (singledepth - (self.qualwin and self.quallose and 1 or 0)) * self.stepHeight / 2
-    end
-
-    midCorrection = midCorrection + midCorrection1 + midCorrection2
-    maxHeight = math.max(ownHeight, height1 + height2)
-    lineheight = maxHeight / 2 + midCorrection - self.padding - upperinset
-    local marginTop = maxHeight / 2 
-        - self.height / 2 
-        - (headerchild and self.headerHeight + 8 or 0) 
-        + midCorrection
-
-    local op1, op2 = unpack(_createOpponentData(self, bracketreset))
-    local opponent1node, opponent1hash, tbd1 = unpack(op1)
-    local opponent2node, opponent2hash, tbd2 = unpack(op2)
-    
-    local hasDetails = WikiSpecific.matchHasDetails(self)
-
-    local extendUpperTop = self.matchHeight - INFINITE_HEIGHT
-
-    local headerText = self.header
-    if (not utils.misc.isEmpty(self.header) and (utils.table.includes({'$', '!'}, self.header:sub(1, 1)))) then
-        options = _getHeaderOptions(self.header)
-        headerText = options[1]
-        for i, option in ipairs(options) do
-            headerText = headerText .. tostring(html.create('div'):addClass('brkts-header-option'):node(option))
-        end
-    end
-
-    local header =
-        (self.header == nil) and '' or
-        html.create('div'):addClass(
-            'brkts-header-div brkts-header' ..
-                (isend and ' brkts-header-end' or (self.skipround > 0 and ' brkts-header-skip-' .. self.skipround or ''))
-        ):css('position', 'initial'):css('display', 'block'):node(self.emptyRoundTitles and '' or headerText .. ZERO_WIDTH_SPACE):cssText(
-            'height:' .. self.headerHeight .. 'px;line-height:' .. self.headerLineHeight .. 'px;'
-        )
-
-    local match =
-        html.create('div'):addClass(
-        'brkts-match brkts-match-popup-wrapper' .. (wassingle and ' brkts-match-single' or '')
-    ):node(
-        html.create('div'):addClass('brkts-teamscore' .. (not tbd1 and ' brkts-opponent-hover' or '')):node(
-            html.create('div'):addClass('brkts-team' .. (self.hideMatchLine and '' or ' brkts-team-upper')):node(
-                opponent1node
-            ):cssText('height:' .. self.matchHeight .. 'px;')
-        ):node(
-            html.create('div'):addClass('brkts-extend' .. ((isupper or wassingle) and ' brkts-extend-upper' or '')):cssText(
-                (isupper or wassingle) and ('top:' .. extendUpperTop .. 'px') or ''
-            )
-        ):attr('aria-label', opponent1hash)
-    ):node(
-        html.create('div'):addClass('brkts-teamscore' .. (not tbd2 and ' brkts-opponent-hover' or '')):node(
-            html.create('div'):addClass('brkts-team brkts-team-lower'):node(opponent2node):cssText(
-                'height:' .. self.matchHeight .. 'px;'
-            )
-        ):node(
-            html.create('div'):addClass('brkts-extend' .. ((isupper or wassingle) and ' brkts-extend-lower' or '')):cssText(
-                (isupper or wassingle) and ('top:' .. extendUpperTop .. 'px') or ''
-            )
-        ):attr('aria-label', opponent2hash)
-    ):node(
-        not hasDetails and '' or
-            html.create('div'):addClass('brkts-match-info'):node(html.create('div'):addClass('brkts-match-info-icon')):node(
-                html.create('div'):addClass('brkts-match-info-popup'):css('max-height', '80vh'):css('overflow', 'auto'):node(
-                    MatchSummary.luaGet(_frame, DisplayHelper.flattenArgs(matchRaw))
-                ):cssText('display:none')
-            )
-    )
-
-    local thirdplacematch = ''
-    local thirdPlaceHeaderNode
-    if thirdplace then
-        local headerOptionsTP = _getHeaderOptions('tp')
-        local headerTextTP = headerOptionsTP[1]     
-        for i, option in ipairs(headerOptionsTP) do
-            headerTextTP = headerTextTP .. tostring(html.create('div'):addClass('brkts-header-option'):node(option))
-        end
-
-        local thirdplaceheight = 2 * self.matchHeight + self.padding + self.headerHeight2
-
-        local op1TP, op2TP = unpack(_createOpponentData(thirdplace))
-        local opponent1nodeTP, opponent1hashTP, tbd1TP = unpack(op1TP)
-        local opponent2nodeTP, opponent2hashTP, tbd2TP = unpack(op2TP)
-
-        local hasDetailsTP = WikiSpecific.matchHasDetails(thirdplace)
-        
-        thirdPlaceHeaderNode = html.create('div')
-            :addClass('brkts-header brkts-header-div brkts-3rd-header')
-            :node(headerTextTP)
-            :cssText('height:' .. self.headerHeight .. 'px;')
-            :css('display', 'block')
-            :css('position', 'initial')
-            :css('margin-top', '28px')
-        thirdplacematch =
-            html.create('div'):addClass('brkts-match brkts-match-popup-wrapper brkts-3rd-place-wrapper')
-            --:css('margin-left', 'calc(var(--line-horizontal-length) - 2px)')
-            :css('margin-left', '8px')
-            :css('left', 'initial')
-            :css('display', 'block')
-            :node(
-            html.create('div'):addClass('brkts-teamscore' .. (not tbd1TP and ' brkts-opponent-hover' or '')):node(
-                html.create('div'):addClass('brkts-team' .. (self.hideMatchLine and '' or ' brkts-team-upper')):node(
-                    tostring(opponent1nodeTP) .. ZERO_WIDTH_SPACE
-                ):cssText('height' .. self.matchHeight .. 'px;')
-            ):node(
-                html.create('div'):addClass('brkts-extend' .. ((isupper or wassingle) and ' brkts-extend-upper' or '')):cssText(
-                    (isupper or wassingle) and ('top:' .. extendUpperTop .. 'px') or ''
-                )
-            ):attr('aria-label', opponent1hashTP)
-        ):node(
-            html.create('div'):addClass('brkts-teamscore' .. (not tbd2TP and ' brkts-opponent-hover' or '')):node(
-                html.create('div'):addClass('brkts-team brkts-team-lower'):node(tostring(opponent2nodeTP) .. ZERO_WIDTH_SPACE):cssText(
-                    'height' .. self.matchHeight .. 'px;'
-                )
-            ):node(
-                html.create('div'):addClass('brkts-extend' .. ((isupper or wassingle) and ' brkts-extend-lower' or '')):cssText(
-                    (isupper or wassingle) and ('top:' .. extendUpperTop .. 'px') or ''
-                )
-            ):attr('aria-label', opponent2hashTP)
-        ):node(
-            hasDetailsTP and
-                html.create('div'):addClass('brkts-match-info'):node(
-                    html.create('div'):addClass('brkts-match-info-icon')
-                ):node(
-                    html.create('div'):addClass('brkts-match-info-popup'):css('max-height', '80vh'):css('overflow', 'auto'):node(
-                        MatchSummary.luaGet(_frame, DisplayHelper.flattenArgs(thirdplace.matchRaw))
-                    ):cssText('display:none')
-                ) or
-                ''
-        )
-    end
-
-    local skiproundConnector =
-        self.skipround > 0 and
-        html.create('div'):addClass('brkts-line-container'):node(
-            html.create('div'):addClass('brkts-line-horizontal-long')
-        ):node(
-            html.create('div'):addClass('brkts-line-spacer brkts-line-spacer-upper'):cssText(
-                'height:' .. self.padding .. 'px'
-            )
-        ):node(
-            html.create('div'):addClass('brkts-line-spacer brkts-line-spacer-lower'):cssText(
-                'height:' .. self.padding .. 'px'
-            )
-        ):node(html.create('div'):addClass('brkts-line-horizontal-long')) or
-        ''
-    skiproundConnector = tostring(skiproundConnector):rep(self.skipround)
-    local qualskipConnector =
-        self.qualskip > 0 and
-        html.create('div'):addClass('brkts-line-container'):node(
-            html.create('div'):addClass('brkts-line-horizontal-long')
-        ) or
-        ''
-    qualskipConnector = tostring(qualskipConnector):rep(self.qualskip)
-
-    -- qualified header
-    local qualText = _bracketConfig.qualifiedHeader
-    if (firsthead and ishead and self.qualwin and utils.misc.isEmpty(qualText)) then
-        local qualOptions = _getHeaderOptions('q')
-        qualText = qualOptions[1]
-        for i, option in ipairs(qualOptions) do
-            qualText = qualText .. tostring(html.create('div'):addClass('brkts-header-option'):node(option))
-        end
-    end
-
-    -- literals for qualifiers
-    local getQualwinLiteral = function()
-        return OpponentDisplay.luaGet(
-            _frame,
-            {displaytype = 'bracket-qualified', type = 'literal', name = self.qualwinLiteral}
-        )
-    end
-    local getQualloseLiteral = function()
-        return OpponentDisplay.luaGet(
-            _frame,
-            {displaytype = 'bracket-qualified', type = 'literal', name = self.qualloseLiteral}
-        )
-    end
-
-    -- TODO
-    local getOpponent1QualifiedNode = function()
-        return OpponentDisplay.luaGet(_frame, _addDisplayTypeAndMatchHeight(DisplayHelper.flattenArgs(self.opponent1Raw), 'bracket-qualified'))
-    end
-    local getOpponent2QualifiedNode = function()
-        return OpponentDisplay.luaGet(_frame, _addDisplayTypeAndMatchHeight(DisplayHelper.flattenArgs(self.opponent2Raw), 'bracket-qualified'))
-    end
-
-    local qualwinContainer =
-        (ishead and self.qualwin) and
-        html.create('div'):addClass('brkts-header-wrapper'):css('display', 'block'):node(
-            firsthead and not self.hideRoundTitles and
-                html.create('div'):addClass('brkts-header-div brkts-header brkts-header-qual-skip-' .. self.qualskip):node(
-                    (self.emptyRoundTitles and '' or qualText) .. ZERO_WIDTH_SPACE
-                ):cssText('height:' .. self.headerHeight .. 'px;line-height:' .. self.headerLineHeight .. 'px;') or
-                ''
-        ):node(
-            html.create('div'):addClass('brkts-qualified-container'):node(
-                html.create('div'):addClass('brkts-line-container'):node(
-                    html.create('div'):addClass('brkts-line-horizontal-single')
-                )
-            ):node(qualskipConnector):node(
-                html.create('div'):addClass(
-                    'brkts-qualified' .. ((not tbd1 and not tbd2) and self.finished and ' brkts-opponent-hover' or '')
-                ):node(
-                    (self.winner == 1) and getOpponent1QualifiedNode() or
-                        (self.winner == 2 and getOpponent2QualifiedNode() or getQualwinLiteral())
-                ):cssText('height' .. self.matchHeight .. 'px'):attr(
-                    'aria-label',
-                    self.winner == 1 and opponent1hash or opponent2hash
-                )
-            ):cssText('margin-top:' .. _pxFix(maxHeight / 2 + midCorrection - self.padding - 8) .. 'px;')
-        ):node(
-            self.quallose and
-                html.create('div'):addClass('brkts-qualified-container'):node(
-                    html.create('div'):addClass('brkts-line brkts-line-qualified'):cssText(
-                        'height:' .. (self.matchHeight + 13) .. 'px;top:' .. (-self.padding - 8) .. 'px'
-                    )
-                ):node(
-                    html.create('div'):addClass('brkts-line-container'):node(
-                        html.create('div'):addClass('brkts-line-horizontal-single')
-                    )
-                ):node(qualskipConnector):node(
-                    html.create('div'):addClass(
-                        'brkts-qualified' ..
-                            ((not tbd1 and not tbd2) and self.finished and ' brkts-opponent-hover' or '')
-                    ):node(
-                        self.winner == 1 and getOpponent2QualifiedNode() or
-                            (self.winner == 2 and getOpponent1QualifiedNode() or getQualwinLiteral())
-                    ):cssText('margin-top:2px;height:' .. self.matchHeight .. 'px'):attr(
-                        'aria-label',
-                        self.winner == 1 and opponent2hash or opponent1hash
-                    )
-                ):cssText('position: absolute;') or
-                ''
-        ):cssText('height:' .. maxHeight .. 'px;') or
-        ''
-
-    local out =
-        html.create('div'):addClass('brkts-match-wrapper'):css('display', 'block'):node(isend and '' or skiproundConnector):node(
-        isend and '' or
-            html.create('div'):addClass('brkts-line-container'):node(
-                html.create('div'):addClass('brkts-line-horizontal')
-            ):node(
-                html.create('div'):addClass('brkts-line-spacer brkts-line-spacer-upper'):cssText(
-                    'height:' .. self.padding .. 'px'
-                )
-            ):node(
-                html.create('div'):addClass('brkts-line-spacer brkts-line-spacer-lower'):cssText(
-                    'height:' .. self.padding .. 'px'
-                )
-            ):node(html.create('div'):addClass('brkts-line-horizontal'))
-    ):node(match):node(
-        (ishead and not self.qualwin) and '' or
-            html.create('div'):addClass('brkts-line-container'):node(
-                html.create('div'):addClass(
-                    (wassingle or self.qualwin) and 'brkts-line-horizontal-single' or 'brkts-line-horizontal'
-                )
-            )
-    ):cssText('margin-top:' .. _pxFix(marginTop) .. 'px')
-
-    out =
-        html.create('div'):addClass('brkts-header-wrapper' .. (bracketreset ~= nil and ' brkts-br-wrapper' or '')):css('display', 'block'):node(
-        header
-    ):node(out):node(thirdPlaceHeaderNode):node(thirdplacematch):cssText('height:' .. maxHeight .. 'px;')
-
-    out =
-        html.create('div'):addClass('brkts-round-wrapper' .. (wassingle and ' brkts-round-wrapper-single' or '')):css('align-items', 'flex-start'):node(
-        html.create('div'):addClass('brkts-round'):node(s1):node(s2)
-    ):node(
-        not isfull and '' or
-            html.create('div'):addClass('brkts-line-container2'):node(
-                html.create('div'):addClass('brkts-line'):cssText(
-                    'height:' .. lineheight .. 'px;margin-top:' .. upperinset .. 'px;'
-                )
-            ):node(
-                html.create('div'):addClass('brkts-line'):cssText(
-                    'height:' .. lineheight .. 'px;margin-top:' .. (2 * self.padding) .. 'px;'
-                )
-            )
-    ):node(out):node(qualwinContainer)
-
-    if ishead then
-        out =
-            html.create('div'):addClass('brkts-bracket'):cssText(
-            '--match-height:' ..
-                self.matchHeight ..
-                    'px;--match-width:' ..
-                        self.matchWidth ..
-                            'px;--match-width-mobile:' ..
-                                self.matchWidthMobile .. 'px;--score-width:' .. self.scoreWidth .. 'px;'
-        ):node(out)
-    end
-
-    return {{maxHeight, singledepth, endSingleDepth, midCorrection}, out}
-end
-
-function BracketMatch:getBracketDepth()
-    local upper = _matches[self.upper or 'none']
-    local lower = _matches[self.lower or 'none']
-    local upperdepth = upper ~= nil and upper:getBracketDepth() or 0
-    local lowerdepth = lower ~= nil and lower:getBracketDepth() or 0
-
-    return 1 + self.skipround + math.max(upperdepth, lowerdepth)
-end
-
-function _pxFix(height)
-    return height + (height == math.floor(height) and 0 or 0.2)
-end
-
-function _mapMatches(lpdbMatches, has3rd)
-    local referencedIds = {}
-    local matches = {}
-    for i, matchData in ipairs(lpdbMatches) do
-        local match = BracketMatch(matchData, has3rd)
-        matches[match.id] = match
-        for id, val in pairs(match.referencedIds) do
-            referencedIds[id] = val
-        end
-    end
-    return matches, referencedIds
-end
-
-function _addDisplayTypeAndMatchHeight(args, displayType)
-    args.displaytype = displayType
-    args.matchHeight = _bracketConfig.matchHeight
-    return args
-end
-
-function _getHeaderOptions(headerCode)
-    local args = utils.string.split(headerCode:gsub('$', '!'), '!')
-    index = 1
-    if (utils.misc.isEmpty(args[1])) then
-        index = 2
-    end
-    local options =
-        utils.string.split(mw.message.new('brkts-header-' .. args[index]):params(args[index + 1] or ''):plain(), ',')
-    return options
-end
-
-function _createOpponentData(match, bracketReset)
-    local opponent1data = match.opponent1Raw
-    local opponent2data = match.opponent2Raw
-
-    -- append score templates of bracket reset
-    if bracketReset then
-        local bracketResetData1 = bracketReset.opponent1Raw
-        local bracketResetData2 = bracketReset.opponent2Raw
-        opponent1data.score2 = bracketResetData1.score
-        opponent2data.score2 = bracketResetData2.score
-        opponent1data.status2 = bracketResetData1.status
-        opponent2data.status2 = bracketResetData2.status
-        opponent1data.placement2 = bracketResetData1.placement
-        opponent2data.placement2 = bracketResetData2.placement
-    end
-
-    -- handle TBD
-    local tbd1 =
-        match.opponent1template == 'tbd' or match.opponent1 == 'TBD' or
-        utils.string.startsWith(opponent1data.type, 'literal')
-    local tbd2 =
-        match.opponent2template == 'tbd' or match.opponent2 == 'TBD' or
-        utils.string.startsWith(opponent2data.type, 'literal')
-
-    -- nodes for opponents
-    opponent1node = OpponentDisplay.luaGet(_frame, _addDisplayTypeAndMatchHeight(DisplayHelper.flattenArgs(opponent1data), 'bracket'))
-    opponent2node = OpponentDisplay.luaGet(_frame, _addDisplayTypeAndMatchHeight(DisplayHelper.flattenArgs(opponent2data), 'bracket'))
-
-    -- hash opponent name, template and players for making them uniquely identifyable
-    -- players are only hashed for non-team opponent types like solo/duo
-    opponent1hash = DisplayHelper.getOpponentHighlightKey(opponent1data)
-    opponent2hash = DisplayHelper.getOpponentHighlightKey(opponent2data)
-
-    return {
-        {opponent1node, opponent1hash, tbd1},
-        {opponent2node, opponent2hash, tbd2}
+    local config = {
+        MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
+        OpponentEntry = propsConfig.OpponentEntry or Bracket.DefaultOpponentEntry,
+        headerHeight = propsConfig.headerHeight or defaultConfig.headerHeight,
+        headerMargin = propsConfig.headerMargin or defaultConfig.headerMargin,
+        hideRoundTitles = propsConfig.hideRoundTitles or false,
+        lineWidth = propsConfig.lineWidth or defaultConfig.lineWidth,
+        matchHasDetails = propsConfig.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
+        matchMargin = propsConfig.matchMargin or math.floor(defaultConfig.opponentHeight / 4),
+        matchWidth = propsConfig.matchWidth or defaultConfig.matchWidth,
+        matchWidthMobile = propsConfig.matchWidthMobile or defaultConfig.matchWidthMobile,
+        opponentHeight = propsConfig.opponentHeight or defaultConfig.opponentHeight,
+        qualifiedHeader = propsConfig.qualifiedHeader or defaultConfig.qualifiedHeader,
+        roundHorizontalMargin = propsConfig.roundHorizontalMargin or defaultConfig.roundHorizontalMargin,
+        scoreWidth = propsConfig.scoreWidth or defaultConfig.scoreWidth,
     }
+
+    local layoutsByMatchId, headMatchIds = Bracket.computeBracketLayout(props.matchesById, config)
+
+    local bracketNode = html.create('div'):addClass('brkts-bracket')
+        :css('--match-width', config.matchWidth .. 'px')
+        :css('--match-width-mobile', config.matchWidthMobile .. 'px')
+        :css('--score-width', config.scoreWidth .. 'px')
+        :css('--round-horizontal-margin', config.roundHorizontalMargin .. 'px')
+
+    for _, matchId in ipairs(headMatchIds) do
+        local nodeProps = {
+            config = config,
+            layoutsByMatchId = layoutsByMatchId,
+            matchId = matchId,
+            matchesById = props.matchesById,
+        }
+        bracketNode
+            :node(Bracket.NodeHeader(nodeProps))
+            :node(Bracket.NodeBody(nodeProps))
+    end
+
+    return html.create('div'):addClass('brkts-main brkts-main-dev')
+        :node(bracketNode)
 end
 
-return Bracket
+Bracket.types.Layout = TypeUtil.struct({
+    height = 'number',
+    lowerMarginTop = 'number',
+    matchHeight = 'number',
+    matchMarginTop = 'number',
+    mid = 'number',
+    showHeader = 'boolean',
+})
+
+--[[
+Computes certain layout properties of nodes in the bracket tree.
+]]
+function Bracket.computeBracketLayout(matchesById, config)
+    -- Map match ids to their upper round matches
+    local upperMatchIds = {}
+    for matchId, match in pairs(matchesById) do
+        for _, x in ipairs(match.bracketData.lowerMatches) do
+            upperMatchIds[x.matchId] = matchId
+        end
+    end
+
+    -- Computes the layout of a match and everything to its left.
+    local computeNodeLayout = FnUtil.memoizeY(function(matchId, computeNodeLayout)
+        local match = matchesById[matchId]
+        local lowerLayouts = Array.map(
+            match.bracketData.lowerMatches,
+            function(x) return computeNodeLayout(x.matchId) end
+        )
+
+        -- Compute partial sums of heights of lower round matches
+        local heightSums = LuaUtils.math.partialSums(
+            Array.map(lowerLayouts, function(layout) return layout.height end)
+        )
+
+        -- Show a connector line without joints if there is a single lower round 
+        -- match advancing an opponent that is placed near the middle of this match.
+        local singleStraightLine
+        if #lowerLayouts == 1 then
+            local opponentIx = match.bracketData.lowerMatches[1].opponentIx
+            singleStraightLine = 
+                #match.opponents % 2 == 0 
+                    and (opponentIx == #match.opponents / 2 or opponentIx == #match.opponents / 2 + 1)
+                or #match.opponents % 2 == 1
+                    and opponentIx == math.floor(#match.opponents / 2) + 1
+        else
+            singleStraightLine = false
+        end
+
+        -- Don't show the header if it's disabled. Also don't show the header 
+        -- if it is the first match of a round and if a higher round match can
+        -- show it instead.
+        local isFirstChild = upperMatchIds[matchId] and matchId == matchesById[upperMatchIds[matchId]].bracketData.lowerMatches[1].matchId
+        local showHeader = match.bracketData.header
+            and not config.hideRoundTitles 
+            and not isFirstChild
+
+        local headerFullHeight = showHeader
+            and config.headerMargin + config.headerHeight + math.max(config.headerMargin - config.matchMargin, 0)
+            or 0
+        local matchHeight = #match.opponents * config.opponentHeight
+
+        -- Align the match with its lower round matches
+        local matchTop
+        if singleStraightLine then
+            -- Single straight line: Align the connecting line with the middle 
+            -- of the opponent it connects into.
+            local opponentIx = match.bracketData.lowerMatches[1].opponentIx
+
+            matchTop = lowerLayouts[1].mid 
+                - ((opponentIx - 1) + 0.5) * config.opponentHeight
+
+        elseif 0 < #lowerLayouts then 
+            if #lowerLayouts % 2 == 0 then
+                -- Even number of lower round matches: Align this match to the 
+                -- midpoint of the middle two lower round matches.
+                
+                local aMid = heightSums[#lowerLayouts / 2] + lowerLayouts[#lowerLayouts / 2].mid
+                local bMid = heightSums[#lowerLayouts / 2 + 1] + lowerLayouts[#lowerLayouts / 2 + 1].mid
+                matchTop = (aMid + bMid) / 2 - matchHeight / 2
+
+            else
+                -- Odd number of lower round matches: Align this match to the 
+                -- middle one.
+                local middleLowerLayout = lowerLayouts[math.floor(#lowerLayouts / 2) + 1]
+                matchTop = heightSums[math.floor(#lowerLayouts / 2) + 1] + middleLowerLayout.mid
+                    - matchHeight / 2
+            end
+        else
+            -- No lower matches
+            matchTop = 0
+        end
+
+        -- Vertical space between lower rounds and top of body
+        local lowerMarginTop = matchTop < 0 and -matchTop or 0
+        -- Vertical space between match and top of body
+        local matchMarginTop = 0 < matchTop and matchTop or 0
+
+        -- Ensure matchMarginTop is at least config.matchMargin
+        if matchMarginTop < config.matchMargin then
+            lowerMarginTop = lowerMarginTop + config.matchMargin - matchMarginTop
+            matchMarginTop = config.matchMargin
+        end
+
+        -- Distance between middle of match and top of round
+        local mid = headerFullHeight + matchMarginTop + matchHeight / 2
+
+        -- Height of this round, including the header but excluding the 3rd place match and qualifier rounds.
+        local height = headerFullHeight 
+            + math.max(
+                lowerMarginTop + heightSums[#heightSums], 
+                matchMarginTop + matchHeight + config.matchMargin
+            )
+        
+        return {
+            height = height,
+            lowerMarginTop = lowerMarginTop,
+            matchHeight = matchHeight,
+            matchMarginTop = matchMarginTop,
+            mid = mid,
+            showHeader = showHeader,
+        }
+    end)
+
+    local layoutsByMatchId = {}
+    for matchId, _ in pairs(matchesById) do
+        layoutsByMatchId[matchId] = computeNodeLayout(matchId)
+    end
+
+    -- Matches without upper matches
+    local headMatchIds = {}
+    for matchId, _ in pairs(matchesById) do
+        if not upperMatchIds[matchId] 
+            and not LuaUtils.string.endsWith(matchId, 'RxMTP') 
+            and not LuaUtils.string.endsWith(matchId, 'RxMBR') then
+            table.insert(headMatchIds, matchId)
+        end
+    end
+    table.sort(headMatchIds)
+
+    return layoutsByMatchId, headMatchIds
+end
+
+--[[
+Display component for the headers of a node in the bracket tree. Draws a row of 
+headers for the match, everything to the left of it, and for the qualification 
+spots.
+]]
+Bracket.propTypes.NodeHeader = {
+    config = Bracket.types.BracketConfig,
+    layoutsByMatchId = TypeUtil.table('string', Bracket.types.Layout),
+    matchId = 'string',
+    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+}
+function Bracket.NodeHeader(props)
+    DisplayUtil.assertPropTypes(props, Bracket.propTypes.NodeHeader)
+    local match = props.matchesById[props.matchId]
+    local layout = props.layoutsByMatchId[props.matchId]
+    local config = props.config
+    
+    if not layout.showHeader then
+        return nil
+    end
+
+    local headerNode = html.create('div'):addClass('brkts-round-header')
+        :css('margin', config.headerMargin .. 'px 0 ' .. math.max(0, config.headerMargin - config.matchMargin) .. 'px')
+
+    -- Traverse the bracket to find the other headers in the same row
+    local bracketDatas = {}
+    local matchId = props.matchId
+    while matchId do
+        local bracketData = props.matchesById[matchId].bracketData
+        table.insert(bracketDatas, 1, bracketData)
+        matchId = 0 < #bracketData.lowerMatches and bracketData.lowerMatches[1].matchId or nil
+    end
+
+    for ix, bracketData in ipairs(bracketDatas) do
+        headerNode:node(
+            Bracket.MatchHeader({
+                header = bracketData.header,
+                height = config.headerHeight,
+            })
+                :addClass(bracketData.bracketResetMatchId and 'brkts-br-wrapper' or nil)
+                :css('--skip-round', bracketData.skipRound)
+        )
+    end
+
+    if match.bracketData.qualWin then
+        headerNode:node(
+            Bracket.MatchHeader({
+                header = config.qualifiedHeader or '!q',
+                height = config.headerHeight,
+            })
+                :addClass('brkts-qualified-header')
+                :css('--qual-skip', match.bracketData.qualSkip)
+        )
+    end
+
+    return headerNode
+end
+
+--[[
+Display component for a header to a match.
+]]
+Bracket.propTypes.MatchHeader = {
+    height = 'number',
+    header = 'string',
+}
+function Bracket.MatchHeader(props)
+    DisplayUtil.assertPropTypes(props, Bracket.propTypes.MatchHeader)
+
+    local options = DisplayHelper.expandHeader(props.header)
+
+    local headerNode = html.create('div'):addClass('brkts-header brkts-header-div')
+        :css('height', props.height .. 'px')
+        :css('line-height', props.height - 11 .. 'px')
+        :node(options[1])
+
+    for _, option in ipairs(options) do
+        headerNode:node(
+            html.create('div'):addClass('brkts-header-option'):node(option)
+        )
+    end
+
+    return headerNode
+end
+
+--[[
+Display component for a node in the bracket tree, which consists of a match and 
+all the lower round matches leading up to it. Also includes qualification spots 
+and line connectors between lower round matches, the current match, and 
+qualification spots.
+]]
+Bracket.propTypes.NodeBody = {
+    config = Bracket.types.BracketConfig,
+    layoutsByMatchId = TypeUtil.table('string', Bracket.types.Layout),
+    matchId = 'string',
+    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+}
+function Bracket.NodeBody(props)
+    DisplayUtil.assertPropTypes(props, Bracket.propTypes.NodeBody)
+    local match = props.matchesById[props.matchId]
+    local layout = props.layoutsByMatchId[props.matchId]
+    local config = props.config
+
+    -- Matches from lower rounds
+    local lowerNode
+    if 0 < #match.bracketData.lowerMatches then
+        lowerNode = html.create('div'):addClass('brkts-round-lower')
+            :css('margin-top', layout.lowerMarginTop .. 'px')
+        for _, x in ipairs(match.bracketData.lowerMatches) do
+            local childProps = Table.merge(props, {matchId = x.matchId})
+            lowerNode
+                :node(Bracket.NodeHeader(childProps))
+                :node(Bracket.NodeBody(childProps))
+        end
+    end
+
+    -- Include results from bracketResetMatch
+    local bracketResetMatch = match.bracketData.bracketResetMatchId
+        and props.matchesById[match.bracketData.bracketResetMatchId]
+    if bracketResetMatch then
+        match = MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+    end
+
+    -- Current match
+    local matchNode = Bracket.Match({
+        MatchSummaryContainer = config.MatchSummaryContainer,
+        OpponentEntry = config.OpponentEntry,
+        match = match,
+        matchHasDetails = config.matchHasDetails,
+        opponentHeight = config.opponentHeight,
+    })
+        :css('margin-top', layout.matchMarginTop .. 'px')
+        :css('margin-bottom', config.matchMargin .. 'px')
+
+    -- Third place match
+    local thirdPlaceMatch = match.bracketData.thirdPlaceMatchId 
+        and props.matchesById[match.bracketData.thirdPlaceMatchId]
+    local thirdPlaceHeaderNode
+    local thirdPlaceMatchNode
+    if thirdPlaceMatch then
+        thirdPlaceHeaderNode = Bracket.MatchHeader({
+            header = '!tp',
+            height = config.headerHeight,
+        })
+            :css('margin-top', 20 + config.headerMargin .. 'px')
+            :css('margin-bottom', config.headerMargin .. 'px')
+        thirdPlaceMatchNode = Bracket.Match({
+            MatchSummaryContainer = config.MatchSummaryContainer,
+            OpponentEntry = config.OpponentEntry,
+            match = thirdPlaceMatch,
+            matchHasDetails = config.matchHasDetails,
+            opponentHeight = config.opponentHeight,
+        })
+    end
+
+    local centerNode = html.create('div'):addClass('brkts-round-center')
+        :addClass(bracketResetMatch and 'brkts-br-wrapper' or nil)
+        :node(matchNode)
+        :node(thirdPlaceHeaderNode)
+        :node(thirdPlaceMatchNode)
+
+    -- Qualifier entries
+    local qualWinNode
+    if match.bracketData.qualWin then
+        local opponent = match.winner 
+            and match.opponents[match.winner]
+            or MatchGroupUtil.createOpponent({
+                type = 'literal', 
+                name = match.bracketData.qualWinLiteral or '',
+            })
+        qualWinNode = Bracket.Qualified({
+            OpponentEntry = config.OpponentEntry,
+            height = config.opponentHeight,
+            opponent = opponent,
+        })
+            :css('margin-top', layout.matchMarginTop + layout.matchHeight / 2 - config.opponentHeight / 2 .. 'px')
+            :css('margin-bottom', config.matchMargin .. 'px')
+    end
+
+    local qualLoseNode
+    if match.bracketData.qualLose then
+        local opponent = Bracket.getRunnerUpOpponent(match)
+            or MatchGroupUtil.createOpponent({
+                type = 'literal', 
+                name = match.bracketData.qualLoseLiteral or '',
+            })
+        qualLoseNode = Bracket.Qualified({
+            OpponentEntry = config.OpponentEntry,
+            height = config.opponentHeight,
+            opponent = opponent,
+        })
+            :css('margin-top', config.matchMargin + 6 .. 'px')
+            :css('margin-bottom', config.matchMargin .. 'px')
+    end
+
+    local qualNode
+    if qualWinNode or qualLoseNode then
+        qualNode = html.create('div'):addClass('brkts-round-qual')
+            :node(qualWinNode)
+            :node(qualLoseNode)
+    end
+
+    return html.create('div'):addClass('brkts-round-body')
+        :node(lowerNode)
+        :node(lowerNode and Bracket.NodeLowerConnectors(props) or nil)
+        :node(centerNode)
+        :node(qualNode and Bracket.NodeQualConnectors(props) or nil)
+        :node(qualNode)
+end
+
+--[[
+Display component for a match in a bracket. Draws one row for each opponent, 
+and an icon for the match summary popup.
+]]
+Bracket.propTypes.Match = {
+    OpponentEntry = 'function',
+    MatchSummaryContainer = 'function',
+    match = MatchGroupUtil.types.Match,
+    matchHasDetails = 'function',
+    opponentHeight = 'number',
+}
+function Bracket.Match(props)
+    DisplayUtil.assertPropTypes(props, Bracket.propTypes.Match)
+    local matchNode = html.create('div'):addClass('brkts-match brkts-match-popup-wrapper')
+
+    for ix, opponent in ipairs(props.match.opponents) do
+        local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
+        local opponentEntryNode = props.OpponentEntry({
+            displayType = 'bracket',
+            height = props.opponentHeight,
+            opponent = opponent, 
+        })
+            :addClass('brkts-opponent-entry')
+            :addClass(canHighlight and 'brkts-opponent-hover' or nil)
+            :addClass(ix == #props.match.opponents and 'brkts-opponent-entry-last' or nil)
+            :css('height', props.opponentHeight .. 'px')
+            :attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(opponent) or nil)
+        matchNode:node(opponentEntryNode)
+    end
+
+    if props.matchHasDetails(props.match) then
+        local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+            bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
+            matchId = props.match.matchId,
+        })
+
+        local matchSummaryPopupNode = html.create('div'):addClass('brkts-match-info-popup')
+            :node(matchSummaryNode)
+
+        matchNode
+            :node(
+                html.create('div'):addClass('brkts-match-info-icon')
+                    :css('top', #props.match.opponents * props.opponentHeight / 2 - 6 - 1 .. 'px')
+            )
+            :node(matchSummaryPopupNode)
+    end
+
+    return matchNode
+end
+
+--[[
+Display component for a qualification spot.
+]]
+Bracket.propTypes.Qualified = {
+    OpponentEntry = 'function',
+    height = 'number',
+    opponent = MatchGroupUtil.types.Opponent,
+}
+function Bracket.Qualified(props)
+    DisplayUtil.assertPropTypes(props, Bracket.propTypes.Qualified)
+
+    local canHighlight = DisplayHelper.opponentIsHighlightable(props.opponent)
+    local opponentEntryNode = props.OpponentEntry({
+        displayType = 'bracket-qualified',
+        height = props.height,
+        opponent = props.opponent, 
+    })
+        :addClass('brkts-opponent-entry')
+        :addClass(canHighlight and 'brkts-opponent-hover' or nil)
+        :css('height', props.height .. 'px')
+        :attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(props.opponent) or nil)
+    
+    return html.create('div'):addClass('brkts-qualified')
+        :node(opponentEntryNode)
+end
+
+-- Connector lines between a match and its lower matches
+Bracket.propTypes.NodeLowerConnectors = Bracket.propTypes.NodeBody
+function Bracket.NodeLowerConnectors(props)
+    DisplayUtil.assertPropTypes(props, Bracket.propTypes.NodeLowerConnectors)
+    local match = props.matchesById[props.matchId]
+    local layout = props.layoutsByMatchId[props.matchId]
+    local config = props.config
+    local lowerMatches = match.bracketData.lowerMatches
+
+    local lowerLayouts = Array.map(
+        lowerMatches,
+        function(x) return props.layoutsByMatchId[x.matchId] end
+    )
+
+    -- Compute partial sums of heights of lower round matches
+    local heightSums = LuaUtils.math.partialSums(
+        Array.map(lowerLayouts, function(layout) return layout.height end)
+    )
+
+    -- Compute joints of connectors
+    local jointIxs = {}
+    local jointIxAbove = 0
+    for ix = math.ceil(#lowerMatches / 2), 1, -1 do
+        jointIxAbove = jointIxAbove + 1
+        jointIxs[lowerMatches[ix].opponentIx] = jointIxAbove
+    end
+    local jointIxBelow = 0
+    -- middle lower match is repeated if odd
+    for ix = math.floor(#lowerMatches / 2) + 1, #lowerMatches, 1 do
+        jointIxBelow = jointIxBelow + 1
+        jointIxs[lowerMatches[ix].opponentIx] = jointIxBelow
+    end
+    local jointCount = math.max(jointIxAbove, jointIxBelow)
+
+    --
+    local lowerConnectorsNode = mw.html.create('div')
+        :addClass('brkts-round-lower-connectors')
+        :css('--skip-round', match.bracketData.skipRound)
+
+    -- Draw connectors between lower round matches and this match
+    for ix, x in ipairs(lowerMatches) do
+        local lowerLayout = lowerLayouts[ix]
+        local leftTop = layout.lowerMarginTop + heightSums[ix] + lowerLayout.mid
+        local rightTop = layout.matchMarginTop + ((x.opponentIx - 1) + 0.5) * config.opponentHeight
+        local jointLeft = (config.roundHorizontalMargin - 2) * jointIxs[x.opponentIx] / (jointCount + 1)
+
+        local segment1Node = html.create('div'):addClass('brkts-line')
+            :css('height', config.lineWidth .. 'px')
+            :css('width', jointLeft + config.lineWidth / 2 .. 'px')
+            :css('left', '0')
+            :css('top', leftTop - config.lineWidth / 2 .. 'px')
+
+        local segment2Node = html.create('div'):addClass('brkts-line')
+            :css('height', math.abs(leftTop - rightTop) .. 'px')
+            :css('width', config.lineWidth .. 'px')
+            :css('top', math.min(leftTop, rightTop) .. 'px')
+            :css('left', jointLeft - config.lineWidth / 2 .. 'px')
+
+        local segment3Node = html.create('div'):addClass('brkts-line')
+            :css('height', config.lineWidth .. 'px')
+            :css('left', jointLeft - config.lineWidth / 2 .. 'px')
+            :css('right', '0')
+            :css('top', rightTop - config.lineWidth / 2 .. 'px')
+
+        lowerConnectorsNode
+            :node(segment1Node)
+            :node(segment2Node)
+            :node(segment3Node)
+    end
+
+    -- Draw line stubs for opponents not connected to a lower round match
+    for opponentIx, opponent in ipairs(match.opponents) do
+        local rightTop = layout.matchMarginTop + ((opponentIx - 1) + 0.5) * config.opponentHeight
+        if not jointIxs[opponentIx] then
+            local stubNode = html.create('div'):addClass('brkts-line')
+                :css('height', config.lineWidth .. 'px')
+                :css('left', 10 .. 'px')
+                :css('right', '0')
+                :css('top', rightTop - config.lineWidth / 2 .. 'px')
+            lowerConnectorsNode:node(stubNode)
+        end
+    end
+
+    return lowerConnectorsNode
+end
+
+-- Connector lines between a match and its qualified spots
+Bracket.propTypes.NodeQualConnectors = Bracket.propTypes.NodeBody
+function Bracket.NodeQualConnectors(props)
+    DisplayUtil.assertPropTypes(props, Bracket.propTypes.NodeQualConnectors)
+    local match = props.matchesById[props.matchId]
+    local layout = props.layoutsByMatchId[props.matchId]
+    local config = props.config
+
+    local qualConnectorsNode = mw.html.create('div')
+        :addClass('brkts-round-qual-connectors')
+        :css('--qual-skip', match.bracketData.qualSkip)
+
+    -- Qualified winner connector
+    local leftTop = layout.matchMarginTop + layout.matchHeight / 2
+    local lineNode = html.create('div'):addClass('brkts-line')
+        :css('height', config.lineWidth .. 'px')
+        :css('right', '0')
+        :css('left', '0')
+        :css('top', leftTop - config.lineWidth / 2 .. 'px')
+    qualConnectorsNode:node(lineNode)
+
+    -- Qualified loser connector
+    if match.bracketData.qualLose then
+        local rightTop = leftTop + config.opponentHeight / 2 + config.matchMargin + 6 + config.opponentHeight / 2
+        local jointRight = 11
+
+        local segment1Node = html.create('div'):addClass('brkts-line')
+            :css('width', config.lineWidth .. 'px')
+            :css('height', rightTop - leftTop .. 'px')
+            :css('right', jointRight - config.lineWidth / 2 .. 'px')
+            :css('top', leftTop .. 'px')
+
+        local segment2Node = html.create('div'):addClass('brkts-line')
+            :css('height', config.lineWidth .. 'px')
+            :css('right', '0')
+            :css('width', jointRight + config.lineWidth / 2 .. 'px')
+            :css('top', rightTop - config.lineWidth / 2 .. 'px')
+
+        qualConnectorsNode:node(segment1Node):node(segment2Node)
+    end
+
+    return qualConnectorsNode
+end
+
+function Bracket.getRunnerUpOpponent(match)
+    -- 2 opponents: the runner up is the one that is not the winner, assuming 
+    -- there is a winner
+    if #match.opponents == 2 then
+        return match.winner
+            and match.opponents[2 - match.winner]
+            or nil
+
+    -- >2 opponents: wait for the match to be finished, then look at the placement field
+    -- TODO remove match.finished requirement
+    else
+        return match.finished
+            and Array.find(match.opponents, function(match) return match.placement == 2 end)
+            or nil
+    end
+end
+
+--[[
+Display component for an opponent in a match. Shows the name and flag of the 
+opponent, and their score. 
+
+This is the default opponent entry component. Specific wikis may override this 
+by passing in a different props.OpponentEntry in the Bracket component.
+]]
+function Bracket.DefaultOpponentEntry(props)
+    local opponent = props.opponent
+
+    local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
+        or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
+        or {}
+    
+    if OpponentDisplay.BracketOpponentEntry then
+        return OpponentDisplay.BracketOpponentEntry({
+            displayType = props.displayType,
+            height = props.height,
+            opponent = opponent,
+        })
+    elseif OpponentDisplay.luaGet then
+        --temp fix so that opponent extradata is available if data is inherited from storage vars
+        opponent._rawRecord.extradata = Json.parseIfString(opponent._rawRecord.extradata) or opponent._rawRecord.extradata or {}
+        
+        local opponentEntryAny = OpponentDisplay.luaGet(
+            mw.getCurrentFrame(),
+            Table.mergeInto(DisplayHelper.flattenArgs(opponent._rawRecord), {
+                displaytype = props.displayType,
+                matchHeight = 2 * props.height,
+            })
+        )
+        return type(opponentEntryAny) == 'string'
+            and html.create('div'):wikitext(opponentEntryAny)
+            or opponentEntryAny
+    else
+        return html.create('div')
+    end
+end
+
+return Class.export(Bracket)
