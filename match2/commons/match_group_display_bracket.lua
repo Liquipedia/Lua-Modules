@@ -134,7 +134,7 @@ end
 
 BracketDisplay.types.Layout = TypeUtil.struct({
     height = 'number',
-    lowerMarginTop = 'number',
+    lowerNodeMarginTop = 'number',
     matchHeight = 'number',
     matchMarginTop = 'number',
     mid = 'number',
@@ -190,15 +190,15 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
         local matchHeight = #match.opponents * config.opponentHeight
 
         -- Compute offset with lower nodes
-        local matchTop = BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums)
+        local matchTop = BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums, config.opponentHeight)
         -- Vertical space between lower rounds and top of bracket node body
-        local lowerMarginTop = matchTop < 0 and -matchTop or 0
+        local lowerNodeMarginTop = matchTop < 0 and -matchTop or 0
         -- Vertical space between match and top of bracket node body
         local matchMarginTop = 0 < matchTop and matchTop or 0
 
         -- Ensure matchMarginTop is at least config.matchMargin
         if matchMarginTop < config.matchMargin then
-            lowerMarginTop = lowerMarginTop + config.matchMargin - matchMarginTop
+            lowerNodeMarginTop = lowerNodeMarginTop + config.matchMargin - matchMarginTop
             matchMarginTop = config.matchMargin
         end
 
@@ -209,13 +209,13 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
         -- place match and qualifier rounds.
         local height = headerFullHeight 
             + math.max(
-                lowerMarginTop + heightSums[#heightSums], 
+                lowerNodeMarginTop + heightSums[#heightSums], 
                 matchMarginTop + matchHeight + config.matchMargin
             )
         
         return {
             height = height,
-            lowerMarginTop = lowerMarginTop,
+            lowerNodeMarginTop = lowerNodeMarginTop,
             matchHeight = matchHeight,
             matchMarginTop = matchMarginTop,
             mid = mid,
@@ -243,7 +243,8 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
 end
 
 -- Computes the vertical offset of a match with its lower round matches
-function BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums)
+function BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums, opponentHeight)
+    local matchHeight = #match.opponents * opponentHeight
 
     -- Show a connector line without joints if there is a single lower round 
     -- match advancing an opponent that is placed near the middle of this match.
@@ -264,7 +265,7 @@ function BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums
         -- of the opponent it connects into.
         local opponentIx = match.bracketData.lowerMatches[1].opponentIx
         return lowerLayouts[1].mid 
-            - ((opponentIx - 1) + 0.5) * config.opponentHeight
+            - ((opponentIx - 1) + 0.5) * opponentHeight
 
     elseif 0 < #lowerLayouts then 
         if #lowerLayouts % 2 == 0 then
@@ -397,7 +398,7 @@ function BracketDisplay.NodeBody(props)
     local lowerNode
     if 0 < #match.bracketData.lowerMatches then
         lowerNode = html.create('div'):addClass('brkts-round-lower')
-            :css('margin-top', layout.lowerMarginTop .. 'px')
+            :css('margin-top', layout.lowerNodeMarginTop .. 'px')
         for _, lowerMatch in ipairs(match.bracketData.lowerMatches) do
             local childProps = Table.merge(props, {matchId = lowerMatch.matchId})
             lowerNode
@@ -625,7 +626,7 @@ function BracketDisplay.NodeLowerConnectors(props)
     -- Draw connectors between lower round matches and this match
     for ix, x in ipairs(lowerMatches) do
         local lowerLayout = lowerLayouts[ix]
-        local leftTop = layout.lowerMarginTop + heightSums[ix] + lowerLayout.mid
+        local leftTop = layout.lowerNodeMarginTop + heightSums[ix] + lowerLayout.mid
         local rightTop = layout.matchMarginTop + ((x.opponentIx - 1) + 0.5) * config.opponentHeight
         local jointLeft = (config.roundHorizontalMargin - 2) * jointIxs[x.opponentIx] / (jointCount + 1)
 
