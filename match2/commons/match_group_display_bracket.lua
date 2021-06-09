@@ -71,6 +71,11 @@ function Bracket.BracketContainer(props)
     })
 end
 
+BracketDisplay.propTypes.Bracket = {
+    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+    config = TypeUtil.optional(BracketDisplay.types.BracketConfigOptions),
+}
+
 --[[
 Display component for a tournament bracket. The bracket is specified by ID.
 The component fetches the match data from LPDB or page variables.
@@ -394,6 +399,14 @@ BracketDisplay.propTypes.NodeBody = {
 	layoutsByMatchId = TypeUtil.table('string', BracketDisplay.types.Layout),
 	matchId = 'string',
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+}
+
+
+BracketDisplay.propTypes.NodeBody = {
+    config = BracketDisplay.types.BracketConfig,
+    layoutsByMatchId = TypeUtil.table('string', BracketDisplay.types.Layout),
+    matchId = 'string',
+    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
 }
 
 --[[
