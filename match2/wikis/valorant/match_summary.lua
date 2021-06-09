@@ -1,7 +1,3 @@
----
--- @author Vogan for Liquipedia
---
-
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')

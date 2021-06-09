@@ -16,7 +16,6 @@ Display related functions go in Module:MatchGroup/Display/Helper.
 ]]
 local MatchGroupUtil = {types = {}}
 
-
 MatchGroupUtil.types.LowerMatch = TypeUtil.struct({
     matchId = 'string',
     opponentIx = 'number',

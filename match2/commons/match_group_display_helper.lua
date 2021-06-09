@@ -1,13 +1,9 @@
---
--- @author QuadratClown for Liquipedia
---
-
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
-local Json = require("Module:Json")
+local Json = require('Module:Json')
 local LuaUtils = require('Module:LuaUtils')
 local Table = require('Module:Table')
-local utils = require("Module:LuaUtils")
+local utils = require('Module:LuaUtils')
 
 local DisplayHelper = {}
 
@@ -19,15 +15,15 @@ local DisplayHelper = {}
 -- Deprecated
 function DisplayHelper.flattenArgs(args, prefix)
     local out = {}
-    prefix = prefix or ""
+    prefix = prefix or ''
     for key, val in pairs(args) do
         if tonumber(key) ~= nil then
-            if utils.string.endsWith(prefix, "s_") then
+            if utils.string.endsWith(prefix, 's_') then
                 prefix = prefix:sub(1, prefix:len() - 2)
             end
         end
-        if type(val) == "table" then
-            local newArgs = DisplayHelper.flattenArgs(val, prefix .. key .. "_")
+        if type(val) == 'table' then
+            local newArgs = DisplayHelper.flattenArgs(val, prefix .. key .. '_')
             for newKey, newVal in pairs(newArgs) do
                 out[newKey] = newVal
             end
@@ -42,16 +38,16 @@ end
 -- tries to get from var first, otherwise uses LPDB
 -- Deprecated
 function DisplayHelper.getMatches(bracketid)
-    local varData = utils.mw.varGet("match2bracket_" .. bracketid)
+    local varData = utils.mw.varGet('match2bracket_' .. bracketid)
     if varData ~= nil then
         return Json.parse(varData)
     else
         local res =
             mw.ext.LiquipediaDB.lpdb(
-            "match2",
+            'match2',
             {
-                conditions = "([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::" .. bracketid .. "]]",
-                order = "match2id ASC",
+                conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketid .. ']]',
+                order = 'match2id ASC',
                 limit = 5000
             }
         )
@@ -63,9 +59,9 @@ end
 -- Deprecated
 function DisplayHelper.getOpponentHighlightKey(opponent)
     return string.lower(
-        (opponent.name or "") ..
-        (opponent.template or "") ..
-        (opponent.type == "team" and "" or Json.stringify(opponent.match2players))
+        (opponent.name or '') ..
+        (opponent.template or '') ..
+        (opponent.type == 'team' and '' or Json.stringify(opponent.match2players))
     )
 end
 

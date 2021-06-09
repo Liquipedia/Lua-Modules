@@ -9,17 +9,17 @@ local TypeUtil = require('Module:TypeUtil')
 
 local html = mw.html
 
-local Matchlist = {propTypes = {}, types = {}}
+local MatchlistDisplay = {propTypes = {}, types = {}}
 
 -- Called by MatchGroup/Display
-function Matchlist.luaGet(_, args)
-    return Matchlist.MatchlistContainer({
+function MatchlistDisplay.luaGet(_, args)
+    return MatchlistDisplay.MatchlistContainer({
         bracketId = args[1],
-        config = Matchlist.configFromArgs(args),
+        config = MatchlistDisplay.configFromArgs(args),
     })
 end
 
-Matchlist.configFromArgs = function(args)
+MatchlistDisplay.configFromArgs = function(args)
     return {
         attached = LuaUtils.misc.readBool(args.attached),
         collapsed = LuaUtils.misc.readBool(args.collapsed),
@@ -28,7 +28,7 @@ Matchlist.configFromArgs = function(args)
     }
 end
 
-Matchlist.types.MatchlistConfig = TypeUtil.struct({
+MatchlistDisplay.types.MatchlistConfig = TypeUtil.struct({
     MatchSummaryContainer = 'function',
     Opponent = 'function',
     Score = 'function',
@@ -38,42 +38,44 @@ Matchlist.types.MatchlistConfig = TypeUtil.struct({
     matchHasDetails = 'function',
     width = 'number',
 })
-Matchlist.types.MatchlistConfigOptions = TypeUtil.struct(
-    Table.mapValues(Matchlist.types.MatchlistConfig.struct, TypeUtil.optional)
+MatchlistDisplay.types.MatchlistConfigOptions = TypeUtil.struct(
+    Table.mapValues(MatchlistDisplay.types.MatchlistConfig.struct, TypeUtil.optional)
 )
+
+MatchlistDisplay.propTypes.MatchlistContainer = {
+    bracketId = 'string',
+    config = TypeUtil.optional(MatchlistDisplay.types.MatchlistConfigOptions),
+}
 
 --[[
 Display component for a tournament matchlist. The matchlist is specified by ID. 
 The component fetches the match data from LPDB or page variables.
 ]]
-Matchlist.propTypes.MatchlistContainer = {
-    bracketId = 'string',
-    config = TypeUtil.optional(Matchlist.types.MatchlistConfigOptions),
-}
-function Matchlist.MatchlistContainer(props)
-    DisplayUtil.assertPropTypes(props, Matchlist.propTypes.MatchlistContainer)
-    return Matchlist.Matchlist({
+function MatchlistDisplay.MatchlistContainer(props)
+    DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.MatchlistContainer)
+    return MatchlistDisplay.Matchlist({
         config = props.config,
         matches = MatchGroupUtil.fetchMatches(props.bracketId),
     })
 end
 
+MatchlistDisplay.propTypes.Matchlist = {
+    config = TypeUtil.optional(MatchlistDisplay.types.MatchlistConfigOptions),
+    matches = TypeUtil.array(MatchGroupUtil.types.Match),
+}
+
 --[[
 Display component for a tournament matchlist. Match data is specified in the 
 input.
 ]] 
-Matchlist.propTypes.Matchlist = {
-    config = TypeUtil.optional(Matchlist.types.MatchlistConfigOptions),
-    matches = TypeUtil.array(MatchGroupUtil.types.Match),
-}
-function Matchlist.Matchlist(props)
-    DisplayUtil.assertPropTypes(props, Matchlist.propTypes.Matchlist)
+function MatchlistDisplay.Matchlist(props)
+    DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Matchlist)
 
     local propsConfig = props.config or {}
     local config = {
         MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-        Opponent = propsConfig.Opponent or Matchlist.DefaultOpponent,
-        Score = propsConfig.Score or Matchlist.DefaultScore,
+        Opponent = propsConfig.Opponent or MatchlistDisplay.DefaultOpponent,
+        Score = propsConfig.Score or MatchlistDisplay.DefaultScore,
         attached = propsConfig.attached or false,
         collapsed = propsConfig.collapsed or false,
         collapsible = LuaUtils.misc.emptyOr(propsConfig.collapsible, true),
@@ -90,21 +92,21 @@ function Matchlist.Matchlist(props)
     
     for index, match in ipairs(props.matches) do
         local titleNode = index == 1
-            and Matchlist.Title({title = match.bracketData.title or 'Match List'})
+            and MatchlistDisplay.Title({title = match.bracketData.title or 'Match List'})
             or nil
 
         local headerNode = match.bracketData.header
-            and Matchlist.Header({header = match.bracketData.header})
+            and MatchlistDisplay.Header({header = match.bracketData.header})
             or nil
         
-        local matchNode = Matchlist.Match({
+        local matchNode = MatchlistDisplay.Match({
             MatchSummaryContainer = config.MatchSummaryContainer,
             Opponent = config.Opponent,
             Score = config.Score,
             match = match, 
             matchHasDetails = config.matchHasDetails
         })
-        
+
         tableNode
             :node(titleNode)
             :node(headerNode)
@@ -116,19 +118,20 @@ function Matchlist.Matchlist(props)
         :node(tableNode)
 end
 
---[[
-Display component for a match in a matchlist. Consists of two opponents, two 
-scores, and a icon for the match summary popup.
-]]
-Matchlist.propTypes.Match = {
+MatchlistDisplay.propTypes.Match = {
     MatchSummaryContainer = 'function',
     Opponent = 'function',
     Score = 'function',
     match = MatchGroupUtil.types.Match,
     matchHasDetails = 'function',
 }
-function Matchlist.Match(props)
-    DisplayUtil.assertPropTypes(props, Matchlist.propTypes.Match)
+
+--[[
+Display component for a match in a matchlist. Consists of two opponents, two 
+scores, and a icon for the match summary popup.
+]]
+function MatchlistDisplay.Match(props)
+    DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Match)
     local match = props.match
     
     local renderOpponent = function(opponentIx)
@@ -201,38 +204,45 @@ function Matchlist.Match(props)
         :node(renderOpponent(2))
 end
 
+MatchlistDisplay.propTypes.Title = {
+    title = 'string',
+}
+
 --[[
 Display component for a title in a matchlist.
 ]]
-Matchlist.propTypes.Title = {
-    title = 'string',
-}
-function Matchlist.Title(props)
-    DisplayUtil.assertPropTypes(props, Matchlist.propTypes.Title)
-    return html.create('th')
+function MatchlistDisplay.Title(props)
+    DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Title)
+    local thNode = html.create('th')
         :addClass('brkts-matchlist-title')
         :attr('colspan', '5')
         :node(
             html.create('center')
                 :wikitext(props.title)
         )
+    return html.create('tr')
+        :node(thNode)
 end
+
+MatchlistDisplay.propTypes.Header = {
+    header = 'string',
+}
 
 --[[
 Display component for a header in a matchlist.
 ]]
-Matchlist.propTypes.Header = {
-    header = 'string',
-}
-function Matchlist.Header(props)
-    DisplayUtil.assertPropTypes(props, Matchlist.propTypes.Header)
-    return html.create('th')
+function MatchlistDisplay.Header(props)
+    DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Header)
+
+    local thNode = html.create('th')
         :addClass('brkts-matchlist-header')
         :attr('colspan', '5')
         :node(
             html.create('center')
                 :wikitext(props.header)
         )
+    return html.create('tr')
+        :node(thNode)
 end
 
 --[[
@@ -241,7 +251,7 @@ Display component for an opponent in a matchlist.
 This is the default implementation. Specific wikis may override this by passing 
 in a different props.Opponent in the Matchlist component.
 ]]
-function Matchlist.DefaultOpponent(props)
+function MatchlistDisplay.DefaultOpponent(props)
     local opponent = props.opponent
 
     --temp fix so that opponent extradata is available if data is inherited from storage vars
@@ -268,7 +278,7 @@ Display component for the score of an opponent in a matchlist.
 This is the default implementation. Specific wikis may override this by passing 
 in a different props.Score in the Matchlist component.
 ]]
-function Matchlist.DefaultScore(props)
+function MatchlistDisplay.DefaultScore(props)
     local opponent = props.opponent
 
     --temp fix so that opponent extradata is available if data is inherited from storage vars
@@ -288,4 +298,4 @@ function Matchlist.DefaultScore(props)
     )
 end
 
-return Class.export(Matchlist)
+return Class.export(MatchlistDisplay)

@@ -12,17 +12,17 @@ local TypeUtil = require('Module:TypeUtil')
 
 local html = mw.html
 
-local Bracket = {propTypes = {}, types = {}}
+local BracketDisplay = {propTypes = {}, types = {}}
 
 -- Called by MatchGroup/Display
-function Bracket.luaGet(_, args)
-    return Bracket.BracketContainer({
+function BracketDisplay.luaGet(_, args)
+    return BracketDisplay.BracketContainer({
         bracketId = args[1],
-        config = Bracket.configFromArgs(args),
+        config = BracketDisplay.configFromArgs(args),
     })
 end
 
-function Bracket.configFromArgs(args)
+function BracketDisplay.configFromArgs(args)
     return {
         headerHeight = tonumber(args.headerHeight),
         headerMargin = tonumber(args.headerMargin),
@@ -38,7 +38,7 @@ function Bracket.configFromArgs(args)
     }
 end
 
-Bracket.types.BracketConfig = TypeUtil.struct({
+BracketDisplay.types.BracketConfig = TypeUtil.struct({
     MatchSummaryContainer = 'function',
     OpponentEntry = 'function',
     headerHeight = 'number',
@@ -54,43 +54,44 @@ Bracket.types.BracketConfig = TypeUtil.struct({
     roundHorizontalMargin = 'number',
     scoreWidth = 'number',
 })
-Bracket.types.BracketConfigOptions = TypeUtil.struct(
-    Table.mapValues(Bracket.types.BracketConfig.struct, TypeUtil.optional)
+BracketDisplay.types.BracketConfigOptions = TypeUtil.struct(
+    Table.mapValues(BracketDisplay.types.BracketConfig.struct, TypeUtil.optional)
 )
+
+BracketDisplay.propTypes.BracketContainer = {
+    bracketId = 'string',
+    config = TypeUtil.optional(BracketDisplay.types.BracketConfigOptions),
+}
 
 --[[
 Display component for a tournament bracket. The bracket is specified by ID. 
 The component fetches the match data from LPDB or page variables.
 ]]
-Bracket.propTypes.BracketContainer = {
-    bracketId = 'string',
-    config = TypeUtil.optional(Bracket.types.BracketConfigOptions),
-}
-function Bracket.BracketContainer(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.BracketContainer)
-    return Bracket.Bracket({
+function BracketDisplay.BracketContainer(props)
+    DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.BracketContainer)
+    return BracketDisplay.Bracket({
         config = props.config,
         matchesById = MatchGroupUtil.fetchMatchesTable(props.bracketId),
     })
 end
 
+BracketDisplay.propTypes.Bracket = {
+    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+    config = TypeUtil.optional(BracketDisplay.types.BracketConfigOptions),
+}
+
 --[[
 Display component for a tournament bracket. Match data is specified in the 
 input.
 ]]
-Bracket.propTypes.Bracket = {
-    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
-    config = TypeUtil.optional(Bracket.types.BracketConfigOptions),
-}
-function Bracket.Bracket(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.Bracket)
+function BracketDisplay.Bracket(props)
+    DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.Bracket)
 
     local defaultConfig = DisplayHelper.getGlobalConfig()
     local propsConfig = props.config or {}
-
     local config = {
         MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-        OpponentEntry = propsConfig.OpponentEntry or Bracket.DefaultOpponentEntry,
+        OpponentEntry = propsConfig.OpponentEntry or BracketDisplay.DefaultOpponentEntry,
         headerHeight = propsConfig.headerHeight or defaultConfig.headerHeight,
         headerMargin = propsConfig.headerMargin or defaultConfig.headerMargin,
         hideRoundTitles = propsConfig.hideRoundTitles or false,
@@ -105,7 +106,7 @@ function Bracket.Bracket(props)
         scoreWidth = propsConfig.scoreWidth or defaultConfig.scoreWidth,
     }
 
-    local layoutsByMatchId, headMatchIds = Bracket.computeBracketLayout(props.matchesById, config)
+    local layoutsByMatchId, headMatchIds = BracketDisplay.computeBracketLayout(props.matchesById, config)
 
     local bracketNode = html.create('div'):addClass('brkts-bracket')
         :css('--match-width', config.matchWidth .. 'px')
@@ -113,6 +114,8 @@ function Bracket.Bracket(props)
         :css('--score-width', config.scoreWidth .. 'px')
         :css('--round-horizontal-margin', config.roundHorizontalMargin .. 'px')
 
+    -- Draw all top level subtrees of the bracket. These are subtrees rooted 
+    -- at matches that do not advance to higher rounds.
     for _, matchId in ipairs(headMatchIds) do
         local nodeProps = {
             config = config,
@@ -121,15 +124,15 @@ function Bracket.Bracket(props)
             matchesById = props.matchesById,
         }
         bracketNode
-            :node(Bracket.NodeHeader(nodeProps))
-            :node(Bracket.NodeBody(nodeProps))
+            :node(BracketDisplay.NodeHeader(nodeProps))
+            :node(BracketDisplay.NodeBody(nodeProps))
     end
 
     return html.create('div'):addClass('brkts-main brkts-main-dev')
         :node(bracketNode)
 end
 
-Bracket.types.Layout = TypeUtil.struct({
+BracketDisplay.types.Layout = TypeUtil.struct({
     height = 'number',
     lowerMarginTop = 'number',
     matchHeight = 'number',
@@ -139,23 +142,32 @@ Bracket.types.Layout = TypeUtil.struct({
 })
 
 --[[
-Computes certain layout properties of nodes in the bracket tree.
+Map match ids to their upper round matches
 ]]
-function Bracket.computeBracketLayout(matchesById, config)
-    -- Map match ids to their upper round matches
+function BracketDisplay.computeUpperMatchIds(matchesById)
     local upperMatchIds = {}
     for matchId, match in pairs(matchesById) do
-        for _, x in ipairs(match.bracketData.lowerMatches) do
-            upperMatchIds[x.matchId] = matchId
+        for _, lowerMatch in ipairs(match.bracketData.lowerMatches) do
+            upperMatchIds[lowerMatch.matchId] = matchId
         end
     end
+    return upperMatchIds
+end
+
+--[[
+Computes certain layout properties of nodes in the bracket tree.
+]]
+function BracketDisplay.computeBracketLayout(matchesById, config)
+    local upperMatchIds = BracketDisplay.computeUpperMatchIds(matchesById)
 
     -- Computes the layout of a match and everything to its left.
     local computeNodeLayout = FnUtil.memoizeY(function(matchId, computeNodeLayout)
         local match = matchesById[matchId]
+
+        -- Recurse on lower round matches
         local lowerLayouts = Array.map(
             match.bracketData.lowerMatches,
-            function(x) return computeNodeLayout(x.matchId) end
+            function(lowerMatch) return computeNodeLayout(lowerMatch.matchId) end
         )
 
         -- Compute partial sums of heights of lower round matches
@@ -163,24 +175,11 @@ function Bracket.computeBracketLayout(matchesById, config)
             Array.map(lowerLayouts, function(layout) return layout.height end)
         )
 
-        -- Show a connector line without joints if there is a single lower round 
-        -- match advancing an opponent that is placed near the middle of this match.
-        local singleStraightLine
-        if #lowerLayouts == 1 then
-            local opponentIx = match.bracketData.lowerMatches[1].opponentIx
-            singleStraightLine = 
-                #match.opponents % 2 == 0 
-                    and (opponentIx == #match.opponents / 2 or opponentIx == #match.opponents / 2 + 1)
-                or #match.opponents % 2 == 1
-                    and opponentIx == math.floor(#match.opponents / 2) + 1
-        else
-            singleStraightLine = false
-        end
-
         -- Don't show the header if it's disabled. Also don't show the header 
-        -- if it is the first match of a round and if a higher round match can
+        -- if it is the first match of a round because a higher round match can 
         -- show it instead.
-        local isFirstChild = upperMatchIds[matchId] and matchId == matchesById[upperMatchIds[matchId]].bracketData.lowerMatches[1].matchId
+        local isFirstChild = upperMatchIds[matchId] 
+            and matchId == matchesById[upperMatchIds[matchId]].bracketData.lowerMatches[1].matchId
         local showHeader = match.bracketData.header
             and not config.hideRoundTitles 
             and not isFirstChild
@@ -190,40 +189,11 @@ function Bracket.computeBracketLayout(matchesById, config)
             or 0
         local matchHeight = #match.opponents * config.opponentHeight
 
-        -- Align the match with its lower round matches
-        local matchTop
-        if singleStraightLine then
-            -- Single straight line: Align the connecting line with the middle 
-            -- of the opponent it connects into.
-            local opponentIx = match.bracketData.lowerMatches[1].opponentIx
-
-            matchTop = lowerLayouts[1].mid 
-                - ((opponentIx - 1) + 0.5) * config.opponentHeight
-
-        elseif 0 < #lowerLayouts then 
-            if #lowerLayouts % 2 == 0 then
-                -- Even number of lower round matches: Align this match to the 
-                -- midpoint of the middle two lower round matches.
-                
-                local aMid = heightSums[#lowerLayouts / 2] + lowerLayouts[#lowerLayouts / 2].mid
-                local bMid = heightSums[#lowerLayouts / 2 + 1] + lowerLayouts[#lowerLayouts / 2 + 1].mid
-                matchTop = (aMid + bMid) / 2 - matchHeight / 2
-
-            else
-                -- Odd number of lower round matches: Align this match to the 
-                -- middle one.
-                local middleLowerLayout = lowerLayouts[math.floor(#lowerLayouts / 2) + 1]
-                matchTop = heightSums[math.floor(#lowerLayouts / 2) + 1] + middleLowerLayout.mid
-                    - matchHeight / 2
-            end
-        else
-            -- No lower matches
-            matchTop = 0
-        end
-
-        -- Vertical space between lower rounds and top of body
+        -- Compute offset with lower nodes
+        local matchTop = BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums)
+        -- Vertical space between lower rounds and top of bracket node body
         local lowerMarginTop = matchTop < 0 and -matchTop or 0
-        -- Vertical space between match and top of body
+        -- Vertical space between match and top of bracket node body
         local matchMarginTop = 0 < matchTop and matchTop or 0
 
         -- Ensure matchMarginTop is at least config.matchMargin
@@ -232,10 +202,11 @@ function Bracket.computeBracketLayout(matchesById, config)
             matchMarginTop = config.matchMargin
         end
 
-        -- Distance between middle of match and top of round
+        -- Distance between middle of match and top of the bracket node header
         local mid = headerFullHeight + matchMarginTop + matchHeight / 2
 
-        -- Height of this round, including the header but excluding the 3rd place match and qualifier rounds.
+        -- Height of this node, including the header but excluding the 3rd 
+        -- place match and qualifier rounds.
         local height = headerFullHeight 
             + math.max(
                 lowerMarginTop + heightSums[#heightSums], 
@@ -271,19 +242,65 @@ function Bracket.computeBracketLayout(matchesById, config)
     return layoutsByMatchId, headMatchIds
 end
 
+-- Computes the vertical offset of a match with its lower round matches
+function BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums)
+
+    -- Show a connector line without joints if there is a single lower round 
+    -- match advancing an opponent that is placed near the middle of this match.
+    local showSingleStraightLine = false
+    if #lowerLayouts == 1 then
+        local opponentIx = match.bracketData.lowerMatches[1].opponentIx
+        if #match.opponents % 2 == 0 then
+            showSingleStraightLine = opponentIx == #match.opponents / 2 
+                or opponentIx == #match.opponents / 2 + 1
+        else
+            showSingleStraightLine = opponentIx == math.floor(#match.opponents / 2) + 1
+        end
+    end
+
+    -- Align the match with its lower round matches
+    if showSingleStraightLine then
+        -- Single straight line: Align the connecting line with the middle 
+        -- of the opponent it connects into.
+        local opponentIx = match.bracketData.lowerMatches[1].opponentIx
+        return lowerLayouts[1].mid 
+            - ((opponentIx - 1) + 0.5) * config.opponentHeight
+
+    elseif 0 < #lowerLayouts then 
+        if #lowerLayouts % 2 == 0 then
+            -- Even number of lower round matches: Align this match to the 
+            -- midpoint of the middle two lower round matches.
+            local aMid = heightSums[#lowerLayouts / 2] + lowerLayouts[#lowerLayouts / 2].mid
+            local bMid = heightSums[#lowerLayouts / 2 + 1] + lowerLayouts[#lowerLayouts / 2 + 1].mid
+            return (aMid + bMid) / 2 - matchHeight / 2
+
+        else
+            -- Odd number of lower round matches: Align this match to the 
+            -- middle one.
+            local middleLowerLayout = lowerLayouts[math.floor(#lowerLayouts / 2) + 1]
+            return heightSums[math.floor(#lowerLayouts / 2) + 1] + middleLowerLayout.mid
+                - matchHeight / 2
+        end
+    else
+        -- No lower matches
+        return 0
+    end
+end
+
+BracketDisplay.propTypes.NodeHeader = {
+    config = BracketDisplay.types.BracketConfig,
+    layoutsByMatchId = TypeUtil.table('string', BracketDisplay.types.Layout),
+    matchId = 'string',
+    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+}
+
 --[[
 Display component for the headers of a node in the bracket tree. Draws a row of 
 headers for the match, everything to the left of it, and for the qualification 
 spots.
 ]]
-Bracket.propTypes.NodeHeader = {
-    config = Bracket.types.BracketConfig,
-    layoutsByMatchId = TypeUtil.table('string', Bracket.types.Layout),
-    matchId = 'string',
-    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
-}
-function Bracket.NodeHeader(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.NodeHeader)
+function BracketDisplay.NodeHeader(props)
+    DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.NodeHeader)
     local match = props.matchesById[props.matchId]
     local layout = props.layoutsByMatchId[props.matchId]
     local config = props.config
@@ -306,7 +323,7 @@ function Bracket.NodeHeader(props)
 
     for ix, bracketData in ipairs(bracketDatas) do
         headerNode:node(
-            Bracket.MatchHeader({
+            BracketDisplay.MatchHeader({
                 header = bracketData.header,
                 height = config.headerHeight,
             })
@@ -317,7 +334,7 @@ function Bracket.NodeHeader(props)
 
     if match.bracketData.qualWin then
         headerNode:node(
-            Bracket.MatchHeader({
+            BracketDisplay.MatchHeader({
                 header = config.qualifiedHeader or '!q',
                 height = config.headerHeight,
             })
@@ -329,15 +346,16 @@ function Bracket.NodeHeader(props)
     return headerNode
 end
 
---[[
-Display component for a header to a match.
-]]
-Bracket.propTypes.MatchHeader = {
+BracketDisplay.propTypes.MatchHeader = {
     height = 'number',
     header = 'string',
 }
-function Bracket.MatchHeader(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.MatchHeader)
+
+--[[
+Display component for a header to a match.
+]]
+function BracketDisplay.MatchHeader(props)
+    DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.MatchHeader)
 
     local options = DisplayHelper.expandHeader(props.header)
 
@@ -355,20 +373,22 @@ function Bracket.MatchHeader(props)
     return headerNode
 end
 
+
+BracketDisplay.propTypes.NodeBody = {
+    config = BracketDisplay.types.BracketConfig,
+    layoutsByMatchId = TypeUtil.table('string', BracketDisplay.types.Layout),
+    matchId = 'string',
+    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+}
+
 --[[
 Display component for a node in the bracket tree, which consists of a match and 
 all the lower round matches leading up to it. Also includes qualification spots 
 and line connectors between lower round matches, the current match, and 
 qualification spots.
 ]]
-Bracket.propTypes.NodeBody = {
-    config = Bracket.types.BracketConfig,
-    layoutsByMatchId = TypeUtil.table('string', Bracket.types.Layout),
-    matchId = 'string',
-    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
-}
-function Bracket.NodeBody(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.NodeBody)
+function BracketDisplay.NodeBody(props)
+    DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.NodeBody)
     local match = props.matchesById[props.matchId]
     local layout = props.layoutsByMatchId[props.matchId]
     local config = props.config
@@ -378,11 +398,11 @@ function Bracket.NodeBody(props)
     if 0 < #match.bracketData.lowerMatches then
         lowerNode = html.create('div'):addClass('brkts-round-lower')
             :css('margin-top', layout.lowerMarginTop .. 'px')
-        for _, x in ipairs(match.bracketData.lowerMatches) do
-            local childProps = Table.merge(props, {matchId = x.matchId})
+        for _, lowerMatch in ipairs(match.bracketData.lowerMatches) do
+            local childProps = Table.merge(props, {matchId = lowerMatch.matchId})
             lowerNode
-                :node(Bracket.NodeHeader(childProps))
-                :node(Bracket.NodeBody(childProps))
+                :node(BracketDisplay.NodeHeader(childProps))
+                :node(BracketDisplay.NodeBody(childProps))
         end
     end
 
@@ -394,7 +414,7 @@ function Bracket.NodeBody(props)
     end
 
     -- Current match
-    local matchNode = Bracket.Match({
+    local matchNode = BracketDisplay.Match({
         MatchSummaryContainer = config.MatchSummaryContainer,
         OpponentEntry = config.OpponentEntry,
         match = match,
@@ -410,13 +430,13 @@ function Bracket.NodeBody(props)
     local thirdPlaceHeaderNode
     local thirdPlaceMatchNode
     if thirdPlaceMatch then
-        thirdPlaceHeaderNode = Bracket.MatchHeader({
+        thirdPlaceHeaderNode = BracketDisplay.MatchHeader({
             header = '!tp',
             height = config.headerHeight,
         })
             :css('margin-top', 20 + config.headerMargin .. 'px')
             :css('margin-bottom', config.headerMargin .. 'px')
-        thirdPlaceMatchNode = Bracket.Match({
+        thirdPlaceMatchNode = BracketDisplay.Match({
             MatchSummaryContainer = config.MatchSummaryContainer,
             OpponentEntry = config.OpponentEntry,
             match = thirdPlaceMatch,
@@ -440,7 +460,7 @@ function Bracket.NodeBody(props)
                 type = 'literal', 
                 name = match.bracketData.qualWinLiteral or '',
             })
-        qualWinNode = Bracket.Qualified({
+        qualWinNode = BracketDisplay.Qualified({
             OpponentEntry = config.OpponentEntry,
             height = config.opponentHeight,
             opponent = opponent,
@@ -451,12 +471,12 @@ function Bracket.NodeBody(props)
 
     local qualLoseNode
     if match.bracketData.qualLose then
-        local opponent = Bracket.getRunnerUpOpponent(match)
+        local opponent = BracketDisplay.getRunnerUpOpponent(match)
             or MatchGroupUtil.createOpponent({
                 type = 'literal', 
                 name = match.bracketData.qualLoseLiteral or '',
             })
-        qualLoseNode = Bracket.Qualified({
+        qualLoseNode = BracketDisplay.Qualified({
             OpponentEntry = config.OpponentEntry,
             height = config.opponentHeight,
             opponent = opponent,
@@ -474,25 +494,26 @@ function Bracket.NodeBody(props)
 
     return html.create('div'):addClass('brkts-round-body')
         :node(lowerNode)
-        :node(lowerNode and Bracket.NodeLowerConnectors(props) or nil)
+        :node(lowerNode and BracketDisplay.NodeLowerConnectors(props) or nil)
         :node(centerNode)
-        :node(qualNode and Bracket.NodeQualConnectors(props) or nil)
+        :node(qualNode and BracketDisplay.NodeQualConnectors(props) or nil)
         :node(qualNode)
 end
 
---[[
-Display component for a match in a bracket. Draws one row for each opponent, 
-and an icon for the match summary popup.
-]]
-Bracket.propTypes.Match = {
+BracketDisplay.propTypes.Match = {
     OpponentEntry = 'function',
     MatchSummaryContainer = 'function',
     match = MatchGroupUtil.types.Match,
     matchHasDetails = 'function',
     opponentHeight = 'number',
 }
-function Bracket.Match(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.Match)
+
+--[[
+Display component for a match in a bracket. Draws one row for each opponent, 
+and an icon for the match summary popup.
+]]
+function BracketDisplay.Match(props)
+    DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.Match)
     local matchNode = html.create('div'):addClass('brkts-match brkts-match-popup-wrapper')
 
     for ix, opponent in ipairs(props.match.opponents) do
@@ -522,7 +543,9 @@ function Bracket.Match(props)
         matchNode
             :node(
                 html.create('div'):addClass('brkts-match-info-icon')
-                    :css('top', #props.match.opponents * props.opponentHeight / 2 - 6 - 1 .. 'px')
+                    -- Vertically align the middle of the match with the middle 
+                    -- of the 12px icon. The -1 is for the top border of the match.
+                    :css('top', #props.match.opponents * props.opponentHeight / 2 - 12 / 2 - 1 .. 'px')
             )
             :node(matchSummaryPopupNode)
     end
@@ -530,16 +553,17 @@ function Bracket.Match(props)
     return matchNode
 end
 
---[[
-Display component for a qualification spot.
-]]
-Bracket.propTypes.Qualified = {
+BracketDisplay.propTypes.Qualified = {
     OpponentEntry = 'function',
     height = 'number',
     opponent = MatchGroupUtil.types.Opponent,
 }
-function Bracket.Qualified(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.Qualified)
+
+--[[
+Display component for a qualification spot.
+]]
+function BracketDisplay.Qualified(props)
+    DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.Qualified)
 
     local canHighlight = DisplayHelper.opponentIsHighlightable(props.opponent)
     local opponentEntryNode = props.OpponentEntry({
@@ -547,19 +571,23 @@ function Bracket.Qualified(props)
         height = props.height,
         opponent = props.opponent, 
     })
-        :addClass('brkts-opponent-entry')
+        :addClass('brkts-opponent-entry brkts-opponent-entry-last')
         :addClass(canHighlight and 'brkts-opponent-hover' or nil)
         :css('height', props.height .. 'px')
         :attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(props.opponent) or nil)
     
     return html.create('div'):addClass('brkts-qualified')
+        :css('height', 'unset')
+        :css('line-height', 'unset')
+        :css('overflow', 'unset')
+        :css('white-space', 'unset')
         :node(opponentEntryNode)
 end
 
 -- Connector lines between a match and its lower matches
-Bracket.propTypes.NodeLowerConnectors = Bracket.propTypes.NodeBody
-function Bracket.NodeLowerConnectors(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.NodeLowerConnectors)
+BracketDisplay.propTypes.NodeLowerConnectors = BracketDisplay.propTypes.NodeBody
+function BracketDisplay.NodeLowerConnectors(props)
+    DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.NodeLowerConnectors)
     local match = props.matchesById[props.matchId]
     local layout = props.layoutsByMatchId[props.matchId]
     local config = props.config
@@ -567,7 +595,7 @@ function Bracket.NodeLowerConnectors(props)
 
     local lowerLayouts = Array.map(
         lowerMatches,
-        function(x) return props.layoutsByMatchId[x.matchId] end
+        function(lowerMatch) return props.layoutsByMatchId[lowerMatch.matchId] end
     )
 
     -- Compute partial sums of heights of lower round matches
@@ -590,7 +618,6 @@ function Bracket.NodeLowerConnectors(props)
     end
     local jointCount = math.max(jointIxAbove, jointIxBelow)
 
-    --
     local lowerConnectorsNode = mw.html.create('div')
         :addClass('brkts-round-lower-connectors')
         :css('--skip-round', match.bracketData.skipRound)
@@ -642,10 +669,11 @@ function Bracket.NodeLowerConnectors(props)
     return lowerConnectorsNode
 end
 
+BracketDisplay.propTypes.NodeQualConnectors = BracketDisplay.propTypes.NodeBody
+
 -- Connector lines between a match and its qualified spots
-Bracket.propTypes.NodeQualConnectors = Bracket.propTypes.NodeBody
-function Bracket.NodeQualConnectors(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.NodeQualConnectors)
+function BracketDisplay.NodeQualConnectors(props)
+    DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.NodeQualConnectors)
     local match = props.matchesById[props.matchId]
     local layout = props.layoutsByMatchId[props.matchId]
     local config = props.config
@@ -686,12 +714,12 @@ function Bracket.NodeQualConnectors(props)
     return qualConnectorsNode
 end
 
-function Bracket.getRunnerUpOpponent(match)
+function BracketDisplay.getRunnerUpOpponent(match)
     -- 2 opponents: the runner up is the one that is not the winner, assuming 
     -- there is a winner
     if #match.opponents == 2 then
         return match.winner
-            and match.opponents[2 - match.winner]
+            and match.opponents[2 + 1 - match.winner]
             or nil
 
     -- >2 opponents: wait for the match to be finished, then look at the placement field
@@ -710,7 +738,7 @@ opponent, and their score.
 This is the default opponent entry component. Specific wikis may override this 
 by passing in a different props.OpponentEntry in the Bracket component.
 ]]
-function Bracket.DefaultOpponentEntry(props)
+function BracketDisplay.DefaultOpponentEntry(props)
     local opponent = props.opponent
 
     local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
@@ -742,4 +770,4 @@ function Bracket.DefaultOpponentEntry(props)
     end
 end
 
-return Class.export(Bracket)
+return Class.export(BracketDisplay)
