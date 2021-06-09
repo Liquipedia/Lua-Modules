@@ -1,7 +1,3 @@
---
--- @author QuadratClown for Liquipedia
---
-
 local Array = require('Module:Array')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
