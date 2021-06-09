@@ -401,6 +401,14 @@ BracketDisplay.propTypes.NodeBody = {
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
 }
 
+
+BracketDisplay.propTypes.NodeBody = {
+    config = BracketDisplay.types.BracketConfig,
+    layoutsByMatchId = TypeUtil.table('string', BracketDisplay.types.Layout),
+    matchId = 'string',
+    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+}
+
 --[[
 Display component for a node in the bracket tree, which consists of a match and
 all the lower round matches leading up to it. Also includes qualification spots
