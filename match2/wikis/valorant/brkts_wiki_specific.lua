@@ -263,11 +263,11 @@ function mapFunctions.getExtraData(map)
 	  ot = map.ot,
 	  otlength = map.otlength,
 	  comment = map.comment,
-      op1startside = map['op1_startside'],
-      half1score1 = map.half1score1,
-      half1score2 = map.half1score2,
-      half2score1 = map.half2score1,
-      half2score2 = map.half2score2,
+	  op1startside = map['op1_startside'],
+	  half1score1 = map.half1score1,
+	  half1score2 = map.half1score2,
+	  half2score1 = map.half2score1,
+	  half2score2 = map.half2score2,
 	})
   	return map
 end
@@ -323,27 +323,27 @@ function mapFunctions.getParticipantsData(map)
 		for p = 1, MAX_NUM_PLAYERS do
 	  		local participant = participants[o .. "_" .. p] or {}
 	  		local opstring = "opponent" .. o .. "_p" .. p
-            local stats = map[opstring .. "stats"]
+			local stats = map[opstring .. "stats"]
 
-            if stats ~= nil then
-                stats = json.parse(stats)
+			if stats ~= nil then
+				stats = json.parse(stats)
 
-                local kills = stats["kills"]
-                local deaths = stats["deaths"]
-                local assists = stats["assists"]
-                local agent = stats["agent"]
-                local averageCombatScore = stats["acs"]
+				local kills = stats["kills"]
+				local deaths = stats["deaths"]
+				local assists = stats["assists"]
+				local agent = stats["agent"]
+				local averageCombatScore = stats["acs"]
 
-                participant.kills = utils.misc.isEmpty(kills) and participant.kills or kills
-                participant.deaths = utils.misc.isEmpty(deaths) and participant.deaths or deaths
-                participant.assists = utils.misc.isEmpty(assists) and participant.assists or assists
-                participant.agent = utils.misc.isEmpty(agent) and participant.agent or agent
-                participant.acs = utils.misc.isEmpty(averageCombatScore) and participant.averagecombatscore or averageCombatScore
+				participant.kills = utils.misc.isEmpty(kills) and participant.kills or kills
+				participant.deaths = utils.misc.isEmpty(deaths) and participant.deaths or deaths
+				participant.assists = utils.misc.isEmpty(assists) and participant.assists or assists
+				participant.agent = utils.misc.isEmpty(agent) and participant.agent or agent
+				participant.acs = utils.misc.isEmpty(averageCombatScore) and participant.averagecombatscore or averageCombatScore
 
-                if not utils.table.isEmpty(participant) then
-                    participants[o .. "_" .. p] = participant
-                end
-            end
+				if not utils.table.isEmpty(participant) then
+					participants[o .. "_" .. p] = participant
+				end
+			end
 	  	end
 	end
   
@@ -372,27 +372,27 @@ function roundFunctions.getRoundData(round)
 		for p = 1, MAX_NUM_PLAYERS do
 	  		local participant = {}
 	  		local opstring = "opponent" .. o .. "_p" .. p
-            local stats = round[opstring .. "stats"]
+			local stats = round[opstring .. "stats"]
 
-            if stats ~= nil then
-                stats = json.parse(stats)
+			if stats ~= nil then
+				stats = json.parse(stats)
 
-                local kills = stats["kills"]
-                local score = stats["score"]
+				local kills = stats["kills"]
+				local score = stats["score"]
 				local weapon = stats["weapon"]
 				local buy = stats["buy"]
 				local bank = stats["bank"]
 
-                participant.kills = utils.misc.isEmpty(kills) and participant.kills or kills
-                participant.score = utils.misc.isEmpty(score) and participant.score or score
-                participant.weapon = utils.misc.isEmpty(weapon) and participant.weapon or weapon
-                participant.buy = utils.misc.isEmpty(buy) and participant.buy or buy
-                participant.bank = utils.misc.isEmpty(bank) and participant.bank or bank
+				participant.kills = utils.misc.isEmpty(kills) and participant.kills or kills
+				participant.score = utils.misc.isEmpty(score) and participant.score or score
+				participant.weapon = utils.misc.isEmpty(weapon) and participant.weapon or weapon
+				participant.buy = utils.misc.isEmpty(buy) and participant.buy or buy
+				participant.bank = utils.misc.isEmpty(bank) and participant.bank or bank
 
-                if not utils.table.isEmpty(participant) then
-                    participants[o .. "_" .. p] = participant
-                end
-            end
+				if not utils.table.isEmpty(participant) then
+					participants[o .. "_" .. p] = participant
+				end
+			end
 	  	end
 	end
 

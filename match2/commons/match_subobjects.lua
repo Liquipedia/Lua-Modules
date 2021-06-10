@@ -76,12 +76,12 @@ function p.luaGetMap(frame, args)
 end
 
 function p.getRound(frame)
-    local args = utils.frame.getArgs(frame)
-    return p.luaGetRound(frame, args)
+	local args = utils.frame.getArgs(frame)
+	return p.luaGetRound(frame, args)
 end
 
 function p.luaGetRound(frame, args)
-    return json.stringify(args)
+	return json.stringify(args)
 end
 
 function p.getPlayer(frame)
