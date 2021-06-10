@@ -102,7 +102,7 @@ end
 
 function storePlayers(args, staticid, opponentIndex)
 	local players = ""
-    local rawPlayers = {}
+	local rawPlayers = {}
 	for playerIndex = 1, 100 do
 	  -- read player
 	  local player = args["opponent" .. opponentIndex .. "_p" .. playerIndex]

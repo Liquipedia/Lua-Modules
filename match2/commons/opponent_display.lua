@@ -8,92 +8,92 @@ local getArgs = require("Module:Arguments").getArgs
 local utils = require("Module:LuaUtils")
 
 local OpponentDisplay = Class.new(
-    function(opponent)
-        opponent.root = mw.html.create('div')
-        opponent.root:addClass('brkts-opponent-wrapper')
-    end
+	function(opponent)
+		opponent.root = mw.html.create('div')
+		opponent.root:addClass('brkts-opponent-wrapper')
+	end
 )
 
 function OpponentDisplay:addScores(score, score2, placement, placement2)
-    if self.root == nil then
-        return
-    end
+	if self.root == nil then
+		return
+	end
 
-    local scoreTag = mw.html.create('div')
-    scoreTag:addClass('brkts-opponent-score')
-            :wikitext(score or '')
-    self.root:node(scoreTag)
+	local scoreTag = mw.html.create('div')
+	scoreTag:addClass('brkts-opponent-score')
+			:wikitext(score or '')
+	self.root:node(scoreTag)
 
-    if score2 ~= nil then
-        local scoreTag2 = mw.html.create('div')
-        scoreTag2   :addClass('brkts-opponent-score')
-                    :wikitext(score2 or '')
-        self.root:node(scoreTag2)
-    end
+	if score2 ~= nil then
+		local scoreTag2 = mw.html.create('div')
+		scoreTag2   :addClass('brkts-opponent-score')
+					:wikitext(score2 or '')
+		self.root:node(scoreTag2)
+	end
 
-    if tonumber((placement2 or placement) or 0) == 1 then
-        self.root:addClass('brkts-opponent-win')
-    end
+	if tonumber((placement2 or placement) or 0) == 1 then
+		self.root:addClass('brkts-opponent-win')
+	end
 end
 
 local BracketOpponentDisplay = Class.new(
-    OpponentDisplay,
-    function(bracket, frame, opponentType, name, flag)
-        if String.isEmpty(name) then
-            bracket.root = ''
-            return
-        end
+	OpponentDisplay,
+	function(bracket, frame, opponentType, name, flag)
+		if String.isEmpty(name) then
+			bracket.root = ''
+			return
+		end
 
-        bracket.content = mw.html.create('div')
-        bracket.content:addClass('brkts-opponent-template-container')
+		bracket.content = mw.html.create('div')
+		bracket.content:addClass('brkts-opponent-template-container')
 
-        if opponentType == 'team' then
-            bracket:createTeam(frame, name)
-        elseif opponentType == 'solo' then
-            bracket:createSolo(frame, name, flag)
-        elseif opponentType == 'literal' then
-            bracket:createLiteral(name)
-        end
+		if opponentType == 'team' then
+			bracket:createTeam(frame, name)
+		elseif opponentType == 'solo' then
+			bracket:createSolo(frame, name, flag)
+		elseif opponentType == 'literal' then
+			bracket:createLiteral(name)
+		end
 
-        bracket.root:node(bracket.content)
-    end
+		bracket.root:node(bracket.content)
+	end
 )
 
 function BracketOpponentDisplay:createTeam(frame, name)
-    local team = p._getTeam(frame, name)
+	local team = p._getTeam(frame, name)
 
-    local teamBracket = mw.html.create('div')
-    teamBracket :addClass('hidden-xs')
-                :wikitext(team.bracket)
+	local teamBracket = mw.html.create('div')
+	teamBracket :addClass('hidden-xs')
+				:wikitext(team.bracket)
 
-    local teamShort = mw.html.create('div')
-    teamShort   :addClass('visible-xs')
-                :wikitext(team.short)
-    self.content:node(teamBracket):node(teamShort)
+	local teamShort = mw.html.create('div')
+	teamShort   :addClass('visible-xs')
+				:wikitext(team.short)
+	self.content:node(teamBracket):node(teamShort)
 end
 
 function BracketOpponentDisplay:createSolo(frame, name, flag)
-    self.content:addClass('brkts-player-container')
-                :wikitext(Template.safeExpand(frame, "Player", {
-                    name,
-                    flag = flag
-                }))
+	self.content:addClass('brkts-player-container')
+				:wikitext(Template.safeExpand(frame, "Player", {
+					name,
+					flag = flag
+				}))
 end
 
 function BracketOpponentDisplay:createLiteral(name)
-    local literal = mw.html.create('i')
-    literal :addClass('brkts-opponent-literal')
-            :wikitext(name or '')
-            :css({
-                ['margin-left'] = '3px',
-                ['margin-top'] = '1px',
-                ['color'] = 'rgb(55, 55, 55)',
-                ['width'] = '100%',
-                ['display'] = 'inline-block',
-                ['overflow'] = 'hidden',
-                ['text-overflow'] = 'ellipsis',
-            })
-    self.content:node(literal)
+	local literal = mw.html.create('i')
+	literal :addClass('brkts-opponent-literal')
+			:wikitext(name or '')
+			:css({
+				['margin-left'] = '3px',
+				['margin-top'] = '1px',
+				['color'] = 'rgb(55, 55, 55)',
+				['width'] = '100%',
+				['display'] = 'inline-block',
+				['overflow'] = 'hidden',
+				['text-overflow'] = 'ellipsis',
+			})
+	self.content:node(literal)
 end
 
 function p.get(frame)
@@ -101,38 +101,38 @@ function p.get(frame)
 end
 
 function p.luaGet(frame, args)
-    local displayType = args.displaytype
+	local displayType = args.displaytype
 
-    if displayType == "bracket" then
-        local name = ''
+	if displayType == "bracket" then
+		local name = ''
 
-        if args.type == 'team' then
-            name = args.template
-        elseif args.type == 'solo' then
-            name = args.match2player1_name
-        else
-            name = args.name
-        end
+		if args.type == 'team' then
+			name = args.template
+		elseif args.type == 'solo' then
+			name = args.match2player1_name
+		else
+			name = args.name
+		end
 
-        if name == nil or name == '' then
-            return ''
-        end
+		if name == nil or name == '' then
+			return ''
+		end
 
-        local bracket = BracketOpponentDisplay(frame, args.type, name, args.match2player1_flag)
-        local score1, score2 = p._getScore(args)
-        bracket:addScores(score1, score2, args.placement, args.placement2)
-        return bracket.root
+		local bracket = BracketOpponentDisplay(frame, args.type, name, args.match2player1_flag)
+		local score1, score2 = p._getScore(args)
+		bracket:addScores(score1, score2, args.placement, args.placement2)
+		return bracket.root
 
-    elseif utils.string.startsWith(displayType, "matchlist") then
+	elseif utils.string.startsWith(displayType, "matchlist") then
 
-        return p._createMatchListOpponent(frame, displayType, args.template, p._getScore(args))
+		return p._createMatchListOpponent(frame, displayType, args.template, p._getScore(args))
 
-    else
-        local opponent = OpponentDisplay()
-        local score1, score2 = p._getScore(args)
-        opponent:addScores(score1, score2, args.placement, args.placement2)
-        return opponent.root
-    end
+	else
+		local opponent = OpponentDisplay()
+		local score1, score2 = p._getScore(args)
+		opponent:addScores(score1, score2, args.placement, args.placement2)
+		return opponent.root
+	end
 end
 
 function p._getTeam(frame, template)
@@ -175,29 +175,29 @@ function p._getScore(args)
 end
 
 function p._createMatchListOpponent(frame, displayType, name, score)
-    if displayType == 'matchlist-left' then
-        if String.isEmpty(name) then
-            return ''
-        end
+	if displayType == 'matchlist-left' then
+		if String.isEmpty(name) then
+			return ''
+		end
 
-        local team = p._getTeamMatchList(frame, name, 'left')
-        return mw.html.create('div')
-            :addClass('brkts-matchlist-opponent-template-container')
-            :css('display', 'inline')
-            :node(team)
-    elseif displayType == 'matchlist-right' then
-        if String.isEmpty(name) then
-            return ''
-        end
+		local team = p._getTeamMatchList(frame, name, 'left')
+		return mw.html.create('div')
+			:addClass('brkts-matchlist-opponent-template-container')
+			:css('display', 'inline')
+			:node(team)
+	elseif displayType == 'matchlist-right' then
+		if String.isEmpty(name) then
+			return ''
+		end
 
-        local team = p._getTeamMatchList(frame, name, 'right')
-        return mw.html.create('div')
-            :addClass('brkts-matchlist-opponent-template-container')
-            :css('display', 'inline')
-            :node(team)
-    elseif displayType == 'matchlist-left-score' or displayType == 'matchlist-right-score' then
-        return score
-    end
+		local team = p._getTeamMatchList(frame, name, 'right')
+		return mw.html.create('div')
+			:addClass('brkts-matchlist-opponent-template-container')
+			:css('display', 'inline')
+			:node(team)
+	elseif displayType == 'matchlist-left-score' or displayType == 'matchlist-right-score' then
+		return score
+	end
 end
 
 return p
