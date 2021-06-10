@@ -58,7 +58,7 @@ function BigMatch:header(match, opponent1, opponent2, tournament)
 	stream.finished = LuaUtils.misc.readBool(match.finished) and 'true' or ''
 	local divider = self:_createTeamSeparator(match.format, stream)
 
-	local teamsRow =  mw.html.create('div'):addClass('fb-match-page-header-teams row')
+	local teamsRow = mw.html.create('div'):addClass('fb-match-page-header-teams row')
 											:node(teamLeft)
 											:node(divider)
 											:node(teamRight)
