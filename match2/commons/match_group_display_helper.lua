@@ -76,7 +76,7 @@ function DisplayHelper.expandHeaderCode(headerCode)
 	return mw.text.split(response, ',')
 end
 
---[[ 
+--[[
 Expands a header code or comma demlimited string into an array of header texts
 of different lengths. Used for displaying different header texts depending on
 the screen width.
