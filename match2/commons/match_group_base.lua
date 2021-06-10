@@ -4,7 +4,9 @@ local getArgs = require("Module:Arguments").getArgs
 local json = require("Module:Json")
 local Match = require("Module:Match")
 local processMatch = require("Module:Brkts/WikiSpecific").processMatch
-local utils = require("Module:LuaUtils")
+local Logic = require("Module:Logic")
+local Variables = require("Module:Variables")
+local String = require("Module:StringUtils")
 local globalArgs
 local errorCat = ''
 
@@ -99,8 +101,8 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	end
 
 	-- store match data as variable to bypass LPDB on the same page
-	utils.mw.varDefine("match2bracket_" .. bracketid, p._convertDataForStorage(storedData))
-	utils.mw.varDefine("match2bracketindex", utils.mw.varGet("match2bracketindex", 0) + 1)
+	Variables.varDefine("match2bracket_" .. bracketid, p._convertDataForStorage(storedData))
+	Variables.varDefine("match2bracketindex", Variables.varDefault("match2bracketindex", 0) + 1)
 
 	if args.hide ~= "true" then
 		return errorCat .. tostring(MatchGroupDisplay.luaMatchlist(frame, {
@@ -139,6 +141,7 @@ function p.luaBracket(frame, args, matchBuilder)
 
 	-- check if the bracket is a duplicate
 	p._checkBracketDuplicate(bracketid)
+
 
 	-- get bracket data from template
 	local bracketData = p._getBracketData(templateid, bracketid)
@@ -203,6 +206,10 @@ function p.luaBracket(frame, args, matchBuilder)
 			local loserTo = match["loserto"]
 			if loserTo ~= nil then
 				local loserToMatch = ""
+				local loserToBracket = match["losertobracket"]
+				if loserToBracket ~= nil then
+					loserToBracket = loserToBracket .. "_"
+				end
 				bd["loserto"] = loserToMatch .. p._convertMatchIdentifier(loserTo)
 			end
 
@@ -230,8 +237,8 @@ function p.luaBracket(frame, args, matchBuilder)
 	end
 
 	-- store match data as variable to bypass LPDB on the same page
-	utils.mw.varDefine("match2bracket_" .. bracketid, p._convertDataForStorage(storedData))
-	utils.mw.varDefine("match2bracketindex", utils.mw.varGet("match2bracketindex", 0) + 1)
+	Variables.varDefine("match2bracket_" .. bracketid, p._convertDataForStorage(storedData))
+	Variables.varDefine("match2bracketindex", Variables.varDefault("match2bracketindex", 0) + 1)
 
 	if args.hide ~= "true" then
 		return errorCat .. tostring(MatchGroupDisplay.luaBracket(frame, {
@@ -304,7 +311,7 @@ function p._checkBracketDuplicate(bracketid)
 	end
 end
 
-function p.validateBracketID(bracketid)
+function p._validateBracketID(bracketid)
 	local subbed, count = string.gsub(bracketid, "[0-9a-zA-Z]", "")
 	if subbed == "" and count ~= 10 then
 		error("Bracketid has the wrong length (" .. count .. " given, 10 characters expected)")
