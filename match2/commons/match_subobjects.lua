@@ -96,7 +96,7 @@ function p.luaGetPlayer(frame, args)
 		displayname = args.displayname,
 		flag = args.flag,
 		extradata = args.extradata
-	  })
+	})
 end
 
 return p
