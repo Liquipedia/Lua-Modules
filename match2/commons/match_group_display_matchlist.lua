@@ -48,7 +48,7 @@ MatchlistDisplay.propTypes.MatchlistContainer = {
 }
 
 --[[
-Display component for a tournament matchlist. The matchlist is specified by ID. 
+Display component for a tournament matchlist. The matchlist is specified by ID.
 The component fetches the match data from LPDB or page variables.
 ]]
 function MatchlistDisplay.MatchlistContainer(props)
@@ -65,9 +65,9 @@ MatchlistDisplay.propTypes.Matchlist = {
 }
 
 --[[
-Display component for a tournament matchlist. Match data is specified in the 
+Display component for a tournament matchlist. Match data is specified in the
 input.
-]] 
+]]
 function MatchlistDisplay.Matchlist(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Matchlist)
 
@@ -89,7 +89,7 @@ function MatchlistDisplay.Matchlist(props)
 		:addClass(config.collapsed and 'collapsed' or nil)
 		:cssText(config.attached and 'margin-bottom:-1px;margin-top:-2px' or nil)
 		:css('width', config.width .. 'px')
-	
+
 	for index, match in ipairs(props.matches) do
 		local titleNode = index == 1
 			and MatchlistDisplay.Title({title = match.bracketData.title or 'Match List'})
@@ -98,12 +98,12 @@ function MatchlistDisplay.Matchlist(props)
 		local headerNode = match.bracketData.header
 			and MatchlistDisplay.Header({header = match.bracketData.header})
 			or nil
-		
+
 		local matchNode = MatchlistDisplay.Match({
 			MatchSummaryContainer = config.MatchSummaryContainer,
 			Opponent = config.Opponent,
 			Score = config.Score,
-			match = match, 
+			match = match,
 			matchHasDetails = config.matchHasDetails
 		})
 
@@ -112,7 +112,7 @@ function MatchlistDisplay.Matchlist(props)
 			:node(headerNode)
 			:node(matchNode)
 	end
-	
+
 	return html.create('div'):addClass('brkts-main')
 		:cssText(config.attached and 'padding-left:0px;padding-right:0px' or nil)
 		:node(tableNode)
@@ -127,13 +127,13 @@ MatchlistDisplay.propTypes.Match = {
 }
 
 --[[
-Display component for a match in a matchlist. Consists of two opponents, two 
+Display component for a match in a matchlist. Consists of two opponents, two
 scores, and a icon for the match summary popup.
 ]]
 function MatchlistDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Match)
 	local match = props.match
-	
+
 	local renderOpponent = function(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
 
@@ -246,9 +246,9 @@ function MatchlistDisplay.Header(props)
 end
 
 --[[
-Display component for an opponent in a matchlist. 
+Display component for an opponent in a matchlist.
 
-This is the default implementation. Specific wikis may override this by passing 
+This is the default implementation. Specific wikis may override this by passing
 in a different props.Opponent in the Matchlist component.
 ]]
 function MatchlistDisplay.DefaultOpponent(props)
@@ -259,7 +259,7 @@ function MatchlistDisplay.DefaultOpponent(props)
 	for _, playerRecord in ipairs(opponent._rawRecord.match2players) do
 		playerRecord.extradata = Json.parseIfString(playerRecord.extradata) or {}
 	end
-	
+
 	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
 		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
 		or {}
@@ -273,9 +273,9 @@ end
 
 
 --[[
-Display component for the score of an opponent in a matchlist. 
+Display component for the score of an opponent in a matchlist.
 
-This is the default implementation. Specific wikis may override this by passing 
+This is the default implementation. Specific wikis may override this by passing
 in a different props.Score in the Matchlist component.
 ]]
 function MatchlistDisplay.DefaultScore(props)
@@ -286,7 +286,7 @@ function MatchlistDisplay.DefaultScore(props)
 	for _, playerRecord in ipairs(opponent._rawRecord.match2players) do
 		playerRecord.extradata = Json.parseIfString(playerRecord.extradata) or {}
 	end
-	
+
 	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
 		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
 		or {}

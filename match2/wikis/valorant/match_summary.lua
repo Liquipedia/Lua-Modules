@@ -143,7 +143,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 		matchSummary:footer(footer)
 	end
-	
+
 	return matchSummary:create()
 end
 

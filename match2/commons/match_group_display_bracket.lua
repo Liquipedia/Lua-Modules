@@ -64,7 +64,7 @@ BracketDisplay.propTypes.BracketContainer = {
 }
 
 --[[
-Display component for a tournament bracket. The bracket is specified by ID. 
+Display component for a tournament bracket. The bracket is specified by ID.
 The component fetches the match data from LPDB or page variables.
 ]]
 function BracketDisplay.BracketContainer(props)
@@ -81,7 +81,7 @@ BracketDisplay.propTypes.Bracket = {
 }
 
 --[[
-Display component for a tournament bracket. Match data is specified in the 
+Display component for a tournament bracket. Match data is specified in the
 input.
 ]]
 function BracketDisplay.Bracket(props)
@@ -114,7 +114,7 @@ function BracketDisplay.Bracket(props)
 		:css('--score-width', config.scoreWidth .. 'px')
 		:css('--round-horizontal-margin', config.roundHorizontalMargin .. 'px')
 
-	-- Draw all top level subtrees of the bracket. These are subtrees rooted 
+	-- Draw all top level subtrees of the bracket. These are subtrees rooted
 	-- at matches that do not advance to higher rounds.
 	for _, matchId in ipairs(headMatchIds) do
 		local nodeProps = {
@@ -175,13 +175,13 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
 			Array.map(lowerLayouts, function(layout) return layout.height end)
 		)
 
-		-- Don't show the header if it's disabled. Also don't show the header 
-		-- if it is the first match of a round because a higher round match can 
+		-- Don't show the header if it's disabled. Also don't show the header
+		-- if it is the first match of a round because a higher round match can
 		-- show it instead.
-		local isFirstChild = upperMatchIds[matchId] 
+		local isFirstChild = upperMatchIds[matchId]
 			and matchId == matchesById[upperMatchIds[matchId]].bracketData.lowerMatches[1].matchId
 		local showHeader = match.bracketData.header
-			and not config.hideRoundTitles 
+			and not config.hideRoundTitles
 			and not isFirstChild
 
 		local headerFullHeight = showHeader
@@ -205,14 +205,14 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
 		-- Distance between middle of match and top of the bracket node header
 		local mid = headerFullHeight + matchMarginTop + matchHeight / 2
 
-		-- Height of this node, including the header but excluding the 3rd 
+		-- Height of this node, including the header but excluding the 3rd
 		-- place match and qualifier rounds.
-		local height = headerFullHeight 
+		local height = headerFullHeight
 			+ math.max(
-				lowerNodeMarginTop + heightSums[#heightSums], 
+				lowerNodeMarginTop + heightSums[#heightSums],
 				matchMarginTop + matchHeight + config.matchMargin
 			)
-		
+
 		return {
 			height = height,
 			lowerNodeMarginTop = lowerNodeMarginTop,
@@ -231,8 +231,8 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
 	-- Matches without upper matches
 	local headMatchIds = {}
 	for matchId, _ in pairs(matchesById) do
-		if not upperMatchIds[matchId] 
-			and not LuaUtils.string.endsWith(matchId, 'RxMTP') 
+		if not upperMatchIds[matchId]
+			and not LuaUtils.string.endsWith(matchId, 'RxMTP')
 			and not LuaUtils.string.endsWith(matchId, 'RxMBR') then
 			table.insert(headMatchIds, matchId)
 		end
@@ -246,13 +246,13 @@ end
 function BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums, opponentHeight)
 	local matchHeight = #match.opponents * opponentHeight
 
-	-- Show a connector line without joints if there is a single lower round 
+	-- Show a connector line without joints if there is a single lower round
 	-- match advancing an opponent that is placed near the middle of this match.
 	local showSingleStraightLine = false
 	if #lowerLayouts == 1 then
 		local opponentIx = match.bracketData.lowerMatches[1].opponentIx
 		if #match.opponents % 2 == 0 then
-			showSingleStraightLine = opponentIx == #match.opponents / 2 
+			showSingleStraightLine = opponentIx == #match.opponents / 2
 				or opponentIx == #match.opponents / 2 + 1
 		else
 			showSingleStraightLine = opponentIx == math.floor(#match.opponents / 2) + 1
@@ -261,22 +261,22 @@ function BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums
 
 	-- Align the match with its lower round matches
 	if showSingleStraightLine then
-		-- Single straight line: Align the connecting line with the middle 
+		-- Single straight line: Align the connecting line with the middle
 		-- of the opponent it connects into.
 		local opponentIx = match.bracketData.lowerMatches[1].opponentIx
-		return lowerLayouts[1].mid 
+		return lowerLayouts[1].mid
 			- ((opponentIx - 1) + 0.5) * opponentHeight
 
-	elseif 0 < #lowerLayouts then 
+	elseif 0 < #lowerLayouts then
 		if #lowerLayouts % 2 == 0 then
-			-- Even number of lower round matches: Align this match to the 
+			-- Even number of lower round matches: Align this match to the
 			-- midpoint of the middle two lower round matches.
 			local aMid = heightSums[#lowerLayouts / 2] + lowerLayouts[#lowerLayouts / 2].mid
 			local bMid = heightSums[#lowerLayouts / 2 + 1] + lowerLayouts[#lowerLayouts / 2 + 1].mid
 			return (aMid + bMid) / 2 - matchHeight / 2
 
 		else
-			-- Odd number of lower round matches: Align this match to the 
+			-- Odd number of lower round matches: Align this match to the
 			-- middle one.
 			local middleLowerLayout = lowerLayouts[math.floor(#lowerLayouts / 2) + 1]
 			return heightSums[math.floor(#lowerLayouts / 2) + 1] + middleLowerLayout.mid
@@ -296,8 +296,8 @@ BracketDisplay.propTypes.NodeHeader = {
 }
 
 --[[
-Display component for the headers of a node in the bracket tree. Draws a row of 
-headers for the match, everything to the left of it, and for the qualification 
+Display component for the headers of a node in the bracket tree. Draws a row of
+headers for the match, everything to the left of it, and for the qualification
 spots.
 ]]
 function BracketDisplay.NodeHeader(props)
@@ -305,7 +305,7 @@ function BracketDisplay.NodeHeader(props)
 	local match = props.matchesById[props.matchId]
 	local layout = props.layoutsByMatchId[props.matchId]
 	local config = props.config
-	
+
 	if not layout.showHeader then
 		return nil
 	end
@@ -383,9 +383,9 @@ BracketDisplay.propTypes.NodeBody = {
 }
 
 --[[
-Display component for a node in the bracket tree, which consists of a match and 
-all the lower round matches leading up to it. Also includes qualification spots 
-and line connectors between lower round matches, the current match, and 
+Display component for a node in the bracket tree, which consists of a match and
+all the lower round matches leading up to it. Also includes qualification spots
+and line connectors between lower round matches, the current match, and
 qualification spots.
 ]]
 function BracketDisplay.NodeBody(props)
@@ -426,7 +426,7 @@ function BracketDisplay.NodeBody(props)
 		:css('margin-bottom', config.matchMargin .. 'px')
 
 	-- Third place match
-	local thirdPlaceMatch = match.bracketData.thirdPlaceMatchId 
+	local thirdPlaceMatch = match.bracketData.thirdPlaceMatchId
 		and props.matchesById[match.bracketData.thirdPlaceMatchId]
 	local thirdPlaceHeaderNode
 	local thirdPlaceMatchNode
@@ -455,10 +455,10 @@ function BracketDisplay.NodeBody(props)
 	-- Qualifier entries
 	local qualWinNode
 	if match.bracketData.qualWin then
-		local opponent = match.winner 
+		local opponent = match.winner
 			and match.opponents[match.winner]
 			or MatchGroupUtil.createOpponent({
-				type = 'literal', 
+				type = 'literal',
 				name = match.bracketData.qualWinLiteral or '',
 			})
 		qualWinNode = BracketDisplay.Qualified({
@@ -474,7 +474,7 @@ function BracketDisplay.NodeBody(props)
 	if match.bracketData.qualLose then
 		local opponent = BracketDisplay.getRunnerUpOpponent(match)
 			or MatchGroupUtil.createOpponent({
-				type = 'literal', 
+				type = 'literal',
 				name = match.bracketData.qualLoseLiteral or '',
 			})
 		qualLoseNode = BracketDisplay.Qualified({
@@ -510,7 +510,7 @@ BracketDisplay.propTypes.Match = {
 }
 
 --[[
-Display component for a match in a bracket. Draws one row for each opponent, 
+Display component for a match in a bracket. Draws one row for each opponent,
 and an icon for the match summary popup.
 ]]
 function BracketDisplay.Match(props)
@@ -522,7 +522,7 @@ function BracketDisplay.Match(props)
 		local opponentEntryNode = props.OpponentEntry({
 			displayType = 'bracket',
 			height = props.opponentHeight,
-			opponent = opponent, 
+			opponent = opponent,
 		})
 			:addClass('brkts-opponent-entry')
 			:addClass(canHighlight and 'brkts-opponent-hover' or nil)
@@ -544,7 +544,7 @@ function BracketDisplay.Match(props)
 		matchNode
 			:node(
 				html.create('div'):addClass('brkts-match-info-icon')
-					-- Vertically align the middle of the match with the middle 
+					-- Vertically align the middle of the match with the middle
 					-- of the 12px icon. The -1 is for the top border of the match.
 					:css('top', #props.match.opponents * props.opponentHeight / 2 - 12 / 2 - 1 .. 'px')
 			)
@@ -570,13 +570,13 @@ function BracketDisplay.Qualified(props)
 	local opponentEntryNode = props.OpponentEntry({
 		displayType = 'bracket-qualified',
 		height = props.height,
-		opponent = props.opponent, 
+		opponent = props.opponent,
 	})
 		:addClass('brkts-opponent-entry brkts-opponent-entry-last')
 		:addClass(canHighlight and 'brkts-opponent-hover' or nil)
 		:css('height', props.height .. 'px')
 		:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(props.opponent) or nil)
-	
+
 	return html.create('div'):addClass('brkts-qualified')
 		:css('height', 'unset')
 		:css('line-height', 'unset')
@@ -716,7 +716,7 @@ function BracketDisplay.NodeQualConnectors(props)
 end
 
 function BracketDisplay.getRunnerUpOpponent(match)
-	-- 2 opponents: the runner up is the one that is not the winner, assuming 
+	-- 2 opponents: the runner up is the one that is not the winner, assuming
 	-- there is a winner
 	if #match.opponents == 2 then
 		return match.winner
@@ -733,10 +733,10 @@ function BracketDisplay.getRunnerUpOpponent(match)
 end
 
 --[[
-Display component for an opponent in a match. Shows the name and flag of the 
-opponent, and their score. 
+Display component for an opponent in a match. Shows the name and flag of the
+opponent, and their score.
 
-This is the default opponent entry component. Specific wikis may override this 
+This is the default opponent entry component. Specific wikis may override this
 by passing in a different props.OpponentEntry in the Bracket component.
 ]]
 function BracketDisplay.DefaultOpponentEntry(props)
@@ -745,7 +745,7 @@ function BracketDisplay.DefaultOpponentEntry(props)
 	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
 		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
 		or {}
-	
+
 	if OpponentDisplay.BracketOpponentEntry then
 		return OpponentDisplay.BracketOpponentEntry({
 			displayType = props.displayType,
@@ -755,7 +755,7 @@ function BracketDisplay.DefaultOpponentEntry(props)
 	elseif OpponentDisplay.luaGet then
 		--temp fix so that opponent extradata is available if data is inherited from storage vars
 		opponent._rawRecord.extradata = Json.parseIfString(opponent._rawRecord.extradata) or opponent._rawRecord.extradata or {}
-		
+
 		local opponentEntryAny = OpponentDisplay.luaGet(
 			mw.getCurrentFrame(),
 			Table.mergeInto(DisplayHelper.flattenArgs(opponent._rawRecord), {

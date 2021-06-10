@@ -22,7 +22,7 @@ function BigMatch.run(frame)
 
 	if type(match) ~= 'string' then
 		return ''
-	end 
+	end
 
 	match = LocalMatch.processMatch(frame, match)
 	local identifiers = BigMatch:_getId()
@@ -183,7 +183,7 @@ function BigMatch:_parseStatsItem(item)
 	local count = 0
 
 	while parsedItem['t' .. count + 1] ~= nil do
-		count = count + 1 
+		count = count + 1
 	end
 
 	return count

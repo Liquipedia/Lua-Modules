@@ -19,16 +19,16 @@ function p.luaGet(frame, args)
   	_args = args
 	local wrapper = htmlCreate("div")
   		:addClass("brkts-popup")
-  
+
   	-- parse nested tables
   	local matchExtradata = json.parse(_args.extradata or "{}")
   	local stream = json.parse(_args.stream or "{}")
   	stream.date = mw.getContentLanguage():formatDate('r', _args.date)
 	stream.finished = utils.misc.readBool(_args.finished) and "true" or ""
-  
+
   	-- parameter
   	local vods = {}
-  	
+
   	-- header
   	local header = htmlCreate("div")
   		:addClass("brkts-popup-header")
@@ -42,7 +42,7 @@ function p.luaGet(frame, args)
   			:addClass("brkts-popup-header-right")
   			:wikitext(displayOpponent(2)))
   	wrapper:node(header):node(breakNode())
-  	
+
   	-- body
   	local body = htmlCreate("div"):addClass("brkts-popup-body")
   	body = addFlexRow(body, {
@@ -58,9 +58,9 @@ function p.luaGet(frame, args)
 		local map = _args[game .. "map"]
 		if not utils.misc.isEmpty(map) then
 	  		local winner = _args[game .. "winner"]
-	  		
+
 			local extradata, err = json.parse(_args[game .. "extradata"])
-			
+
 	  		local centerNode = htmlCreate("div")
 		  			:addClass("brkts-popup-spaced")
 		  			:node(htmlCreate("div"):node("[[" .. map .. "]]"))
@@ -92,7 +92,7 @@ function p.luaGet(frame, args)
 					:css("margin","auto"))
 			end
 	  		body = addFlexRow(body, gameElements, "brkts-popup-body-game")
-	  		
+
 	  		-- add vods
 	  		local vod = _args[game .. "vod"]
 	  		if not utils.misc.isEmpty(vod) then
@@ -101,7 +101,7 @@ function p.luaGet(frame, args)
 	  	end
 	end
   	wrapper:node(body):node(breakNode())
-  
+
   	-- comment
   	if not utils.misc.isEmpty(matchExtradata.comment) then
 		local comment = htmlCreate("div")
@@ -111,7 +111,7 @@ function p.luaGet(frame, args)
 			:node(matchExtradata.comment)
 		wrapper:node(comment):node(breakNode())
 	end
-  
+
   	-- footer
   	local footerSet = false
   	local footer = htmlCreate("div")

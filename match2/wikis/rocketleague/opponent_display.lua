@@ -49,7 +49,7 @@ function p.luaGet(frame, args)
 	  	else
 	  		wrapper:node(htmlCreate("div"):addClass("brkts-team-template-container"))
 	  	end
-		
+
 		-- add scores
 		local score, score2 = getScore(args)
 		wrapper:node(htmlCreate("div")

@@ -27,14 +27,14 @@ function p.processMatch(frame, match)
   	if type(match) == "string" then
 		match = json.parse(match)
 	end
-  	
+
   	-- process match
   	match = matchFunctions.getDateStuff(match)
   	match = matchFunctions.getOpponents(match)
   	match = matchFunctions.getTournamentVars(match)
   	match = matchFunctions.getVodStuff(match)
   	match = matchFunctions.getExtraData(match)
-  
+
   	return match
 end
 
@@ -44,7 +44,7 @@ function p.processMap(frame, map)
   	if type(map) == "string" then
 		map = json.parse(map)
 	end
-  	
+
   	-- process map
   	map = mapFunctions.getExtraData(map)
   	map = mapFunctions.getScoresAndWinner(map)
@@ -60,12 +60,12 @@ function p.processOpponent(frame, opponent)
   	if type(opponent) == "string" then
 		opponent = json.parse(opponent)
 	end
-  
+
   	-- process opponent
   	if not utils.misc.isEmpty(opponent.template) then
 		opponent.name = opponent.name or opponentFunctions.getTeamName(opponent.template)
 	end
-  	
+
   	return opponent
 end
 
@@ -74,12 +74,12 @@ function p.processPlayer(frame, player)
   	_frame = frame
   	if type(player) == "string" then
 		player = json.parse(player)
-	end  	
+	end
   	return player
 end
 
 --
--- 
+--
 -- function to sort out winner/placements
 function placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
@@ -148,7 +148,7 @@ function matchFunctions.getVodStuff(match)
 	  	youtube = utils.misc.emptyOr(match.stream.youtube or match.youtube, utils.mw.varGet("youtube"))
   	})
   	match.vod = utils.misc.emptyOr(match.vod, utils.mw.varGet("vod"))
-  	
+
   	-- apply vodgames
   	for index = 1, MAX_NUM_VODGAMES do
 		local vodgame = match["vodgame" .. index]
@@ -200,14 +200,14 @@ function matchFunctions.getOpponents(args)
 				opponent.score = -1
 			end
 			opponents[opponentIndex] = opponent
-	  
+
 	  		-- get players from vars for teams
 	  		if opponent.type == "team" and not utils.misc.isEmpty(opponent.name) then
 	  			args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
 			end
 	  	end
 	end
-	
+
 	-- see if match should actually be finished if score is set
   	if isScoreSet and not utils.misc.readBool(args.finished) then
 		local currentUnixTime = os.time(os.date("!*t"))
@@ -218,7 +218,7 @@ function matchFunctions.getOpponents(args)
 	  		args.finished = true
 	  	end
 	end
-	
+
 	-- apply placements and winner if finshed
   	if utils.misc.readBool(args.finished) then
 		local placement = 1
@@ -317,7 +317,7 @@ function mapFunctions.getParticipantsData(map)
   	if type(participants) == "string" then
 		participants = json.parse(participants)
 	end
-  
+
   	-- fill in stats
   	for o = 1, MAX_NUM_OPPONENTS do
 		for p = 1, MAX_NUM_PLAYERS do
@@ -346,7 +346,7 @@ function mapFunctions.getParticipantsData(map)
 			end
 	  	end
 	end
-  
+
   	map.participants = participants
 
 	local rounds = {}

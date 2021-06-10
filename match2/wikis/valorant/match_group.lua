@@ -87,7 +87,7 @@ end
 
 function CustomMatchGroup._convertMatchIdentifier(identifier)
 	local roundPrefix, roundNumber, matchPrefix, matchNumber = string.match(identifier, "(R)([0-9]*)(M)([0-9]*)")
-	
+
 	if roundPrefix == nil then
 		-- This is a matchlist
 		return nil

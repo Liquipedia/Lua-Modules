@@ -185,13 +185,13 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 		local midIx = math.ceil(opponentCount / 2)
 		if nilIfEmpty(data.toupper) then
 			table.insert(lowerMatches, {
-				matchId = data.toupper, 
+				matchId = data.toupper,
 				opponentIx = midIx,
 			})
 		end
 		if nilIfEmpty(data.tolower) then
 			table.insert(lowerMatches, {
-				matchId = data.tolower, 
+				matchId = data.tolower,
 				opponentIx = math.min(midIx + 1, opponentCount),
 			})
 		end
