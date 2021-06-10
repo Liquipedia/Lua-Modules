@@ -4,7 +4,9 @@ local getArgs = require("Module:Arguments").getArgs
 local json = require("Module:Json")
 local Match = require("Module:Match")
 local processMatch = require("Module:Brkts/WikiSpecific").processMatch
-local utils = require("Module:LuaUtils")
+local Logic = require("Module:Logic")
+local Variables = require("Module:Variables")
+local String = require("Module:StringUtils")
 local args
 local errorCat = ''
 
@@ -23,7 +25,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 		error("argument 'id' is empty")
 	end
 
-	require('Module:DevFlags').matchGroupDev = utils.misc.readBool(args.dev)
+	require('Module:DevFlags').matchGroupDev = Logic.readBool(args.dev)
 
 	-- make sure bracket id is valid
 	validateBracketID(bracketid)
@@ -32,7 +34,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	bracketid = p.getBracketIdPrefix() .. bracketid
 
 	-- check if the bracket is a duplicate
-	checkBracketDuplicate(bracketid)
+	checkBracketDuplicate(bracketid)	
 
 	local storedData = {}
 	local currentMatchInWikicode = "M1"
@@ -83,7 +85,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 			bd["header"] = header
 		end
 
-		bd["bracketindex"] = utils.mw.varGet("match2bracketindex", 0)
+		bd["bracketindex"] = Variables.varDefault("match2bracketindex", 0)
 
 		match["bracketdata"] = json.stringify(bd)
 
@@ -99,8 +101,8 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	end
 
 	-- store match data as variable to bypass LPDB on the same page
-	utils.mw.varDefine("match2bracket_" .. bracketid, _convertDataForStorage(storedData))
-	utils.mw.varDefine("match2bracketindex", utils.mw.varGet("match2bracketindex", 0) + 1)
+	Variables.varDefine("match2bracket_" .. bracketid, _convertDataForStorage(storedData))
+	Variables.varDefine("match2bracketindex", Variables.varDefault("match2bracketindex", 0) + 1)
 	
 	if args.hide ~= "true" then
 		return errorCat .. tostring(MatchGroupDisplay.luaMatchlist(frame, {
@@ -129,7 +131,7 @@ function p.luaBracket(frame, args, matchBuilder)
 		error("argument 'id' is empty")
 	end
 
-	require('Module:DevFlags').matchGroupDev = utils.misc.readBool(args.dev)
+	require('Module:DevFlags').matchGroupDev = Logic.readBool(args.dev)
 
 	-- make sure bracket id is valid
 	validateBracketID(bracketid)
@@ -187,10 +189,10 @@ function p.luaBracket(frame, args, matchBuilder)
 			-- apply bracket data
 			bd["type"] = "bracket"
 			local header = args[matchid .. "header"]
-			if not utils.misc.isEmpty(header) then
+			if not Logic.isEmpty(header) then
 				bd["header"] = header
 			end
-			bd["bracketindex"] = utils.mw.varGet("match2bracketindex", 0)
+			bd["bracketindex"] = Variables.varDefault("match2bracketindex", 0)
 			local winnerTo = match["winnerto"]
 			if winnerTo ~= nil then
 				local winnerToMatch = ""
@@ -235,8 +237,8 @@ function p.luaBracket(frame, args, matchBuilder)
 	end
 
 	-- store match data as variable to bypass LPDB on the same page
-	utils.mw.varDefine("match2bracket_" .. bracketid, _convertDataForStorage(storedData))
-	utils.mw.varDefine("match2bracketindex", utils.mw.varGet("match2bracketindex", 0) + 1)
+	Variables.varDefine("match2bracket_" .. bracketid, _convertDataForStorage(storedData))
+	Variables.varDefine("match2bracketindex", Variables.varDefault("match2bracketindex", 0) + 1)
 
 	if args.hide ~= "true" then
 		return errorCat .. tostring(MatchGroupDisplay.luaBracket(frame, {
@@ -263,23 +265,23 @@ function getBracketData(templateid, bracketid)
 	local count = 0
 	for index, match in ipairs(matches) do
 		count = count + 1
-		local id = utils.string.split(match.match2id, "_")[2] or match.match2id
+		local id = String.split(match.match2id, "_")[2] or match.match2id
 		local bd = match.match2bracketdata
 		local upper = bd["toupper"]
 		if upper ~= nil and upper ~= "" then
-			bd["toupper"] = bracketid .. "_" .. (utils.string.split(upper, "_")[2] or upper)
+			bd["toupper"] = bracketid .. "_" .. (String.split(upper, "_")[2] or upper)
 		end
 		local lower = bd["tolower"]
 		if lower ~= nil and lower ~= "" then
-			bd["tolower"] = bracketid .. "_" .. (utils.string.split(lower, "_")[2] or lower)
+			bd["tolower"] = bracketid .. "_" .. (String.split(lower, "_")[2] or lower)
 		end
 		local thirdplace = bd["thirdplace"]
 		if thirdplace ~= nil and thirdplace ~= "" then
-			bd["thirdplace"] = bracketid .. "_" .. (utils.string.split(thirdplace, "_")[2] or thirdplace)
+			bd["thirdplace"] = bracketid .. "_" .. (String.split(thirdplace, "_")[2] or thirdplace)
 		end
 		local bracketreset = bd["bracketreset"]
 		if bracketreset ~= nil and bracketreset ~= "" then
-			bd["bracketreset"] = bracketid .. "_" .. (utils.string.split(bracketreset, "_")[2] or bracketreset)
+			bd["bracketreset"] = bracketid .. "_" .. (String.split(bracketreset, "_")[2] or bracketreset)
 		end
 		bracketData[id] = bd
 	end
