@@ -1,7 +1,6 @@
 local p = {}
 
 local getArgs = require("Module:Arguments").getArgs
-local json = require("Module:Json")
 local Template = require("Module:Template")
 local String = require("Module:StringUtils")
 local htmlCreate = mw.html.create
