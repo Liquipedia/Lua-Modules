@@ -1,5 +1,3 @@
-local Helper = require('Module:MatchGroup/Display/Helper')
-
 local MatchGroupDisplay = {}
 
 function MatchGroupDisplay.bracket(frame)
