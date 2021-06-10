@@ -24,7 +24,7 @@ end
 -- format that is required by Module:MatchGroup
 -- @returns the opponent after changes have been applied
 function WikiSpecificBase.processOpponent(frame, opponent)
-  	error("This function needs to be implemented on your wiki")
+error("This function needs to be implemented on your wiki")
 end
 
 -- called from Module:Match/Subobjects
@@ -32,7 +32,7 @@ end
 -- format that is required by Module:MatchGroup
 -- @returns the player after changes have been applied
 function WikiSpecificBase.processPlayer(frame, player)
-  	error("This function needs to be implemented on your wiki")
+error("This function needs to be implemented on your wiki")
 end
 
 -- called from MatchGroup/Display modules
