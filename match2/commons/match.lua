@@ -113,7 +113,7 @@ function p._storePlayers(args, staticid, opponentIndex)
 		local player = args["opponent" .. opponentIndex .. "_p" .. playerIndex]
 		if player == nil then break end
 		if type(player) == "string" then
-		player = json.parse(player)
+			player = json.parse(player)
 		end
 
 		table.insert(rawPlayers, player)
