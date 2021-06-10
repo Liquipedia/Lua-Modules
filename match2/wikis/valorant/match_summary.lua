@@ -1,7 +1,7 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
-local LuaUtils = require("Module:LuaUtils")
+local Logic = require("Module:Logic")
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local MatchSummary = require('Module:MatchSummary/Base')
 local Table = require('Module:Table')
@@ -30,7 +30,7 @@ function Agents:setRight()
 end
 
 function Agents:add(frame, agent)
-	if LuaUtils.misc.isEmpty(agent) then
+	if Logic.isEmpty(agent) then
 		return self
 	end
 
@@ -247,7 +247,7 @@ function CustomMatchSummary._createMap(frame, game)
 	end
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 
-	if not LuaUtils.misc.isEmpty(game.comment) then
+	if not Logic.isEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
 		local comment = mw.html.create('div')
 		comment :wikitext(game.comment)
