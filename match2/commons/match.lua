@@ -75,8 +75,7 @@ function p.store(args)
 	end
 
 	-- save match to lpdb
-	local res =
-		mw.ext.LiquipediaDB.lpdb_match2(
+	mw.ext.LiquipediaDB.lpdb_match2(
 		staticid,
 		parameters
 	)
