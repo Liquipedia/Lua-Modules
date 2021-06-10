@@ -46,7 +46,7 @@ function p.luaGetMap(frame, args)
 
 		local participants = args.participants or {}
 		if type(participants) == "string" then
-			  participants = json.parse(participants)
+			participants = json.parse(participants)
 		end
 		for key, item in pairs(participants) do
 			if not key:match("%d_%d") then
