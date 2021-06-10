@@ -173,7 +173,7 @@ function BigMatch:stats(match, playerLookUp)
 			end
 		end
 
-		tabs['content' .. index] = tostring(divTable:create())
+		tabs['content' .. ind] = tostring(divTable:create())
 
 		ind = ind + 1
 	end
