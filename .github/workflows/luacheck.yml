@@ -21,5 +21,4 @@ jobs:
 
     - name: test
       run: |
-        ls
         luacheck ./
