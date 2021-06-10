@@ -5,7 +5,7 @@ local String = require('Module:String')
 local Template = require('Module:Template')
 
 local getArgs = require("Module:Arguments").getArgs
-local utils = require("Module:LuaUtils")
+local String = require("Module:StringUtils")
 
 local OpponentDisplay = Class.new(
 	function(opponent)
@@ -123,7 +123,7 @@ function p.luaGet(frame, args)
 		bracket:addScores(score1, score2, args.placement, args.placement2)
 		return bracket.root
 
-	elseif utils.string.startsWith(displayType, "matchlist") then
+	elseif String.startsWith(displayType, "matchlist") then
 
 		return p._createMatchListOpponent(frame, displayType, args.template, p._getScore(args))
 
