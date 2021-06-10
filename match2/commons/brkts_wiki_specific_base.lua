@@ -1,5 +1,4 @@
 local FnUtil = require('Module:FnUtil')
-local Table = require("Module:Table")
 
 local WikiSpecificBase = {}
 
@@ -24,7 +23,7 @@ end
 -- format that is required by Module:MatchGroup
 -- @returns the opponent after changes have been applied
 function WikiSpecificBase.processOpponent(frame, opponent)
-error("This function needs to be implemented on your wiki")
+  	error("This function needs to be implemented on your wiki")
 end
 
 -- called from Module:Match/Subobjects
@@ -32,20 +31,7 @@ end
 -- format that is required by Module:MatchGroup
 -- @returns the player after changes have been applied
 function WikiSpecificBase.processPlayer(frame, player)
-error("This function needs to be implemented on your wiki")
-end
-
--- called from MatchGroup/Display modules
--- returns true if a MatchSummary shall be shown for this match
-function WikiSpecificBase.matchHasDetails(match)
-	return match.dateexact or Table.size(match.games) > 0
-end
-
--- called from MatchGroup/Display/Bracket module
--- on wikis this function can be used to automatically get the needed match height, based on the opponent types used in the bracket
--- @returns height
-function WikiSpecificBase.get_matchHeight(opponent1, opponent2, height)
-	return height
+  	error("This function needs to be implemented on your wiki")
 end
 
 --[[
