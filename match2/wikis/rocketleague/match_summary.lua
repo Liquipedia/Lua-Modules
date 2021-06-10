@@ -132,7 +132,7 @@ function p.getByMatchId(args)
 		footerSpacer:node(Template.safeExpand(mw.getCurrentFrame(), "vodlink", {
 			gamenum = index,
 			vod = vod,
-			source = url
+			source = '' -- todo: provide source
 		}))
 	end
 	if footerSet then
