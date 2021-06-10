@@ -736,7 +736,7 @@ function BracketDisplay.getRunnerUpOpponent(match)
 	-- TODO remove match.finished requirement
 	else
 		return match.finished
-			and Array.find(match.opponents, function(match) return match.placement == 2 end)
+			and Array.find(match.opponents, function(mtch) return mtch.placement == 2 end)
 			or nil
 	end
 end
