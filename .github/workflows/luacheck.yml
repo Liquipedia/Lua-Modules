@@ -7,10 +7,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@master
 
-    - name: Run stuff
+    - uses: leafo/gh-actions-lua@v8
+      with:
+        luaVersion: "5.1"
+
+    - uses: leafo/gh-actions-luarocks@v4
+
+    - name: setup 
       run: |
-          apt-get install luarocks
-          luarocks install luacheck
-          luacheck
+        luarocks install luacheck
+
+    - name: test
+      run: |
+        luacheck
