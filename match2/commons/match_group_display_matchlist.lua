@@ -2,7 +2,8 @@ local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local Json = require('Module:Json')
-local LuaUtils = require('Module:LuaUtils')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -21,9 +22,9 @@ end
 
 MatchlistDisplay.configFromArgs = function(args)
 	return {
-		attached = LuaUtils.misc.readBool(args.attached),
-		collapsed = LuaUtils.misc.readBool(args.collapsed),
-		collapsible = not LuaUtils.misc.readBool(args.nocollapse),
+		attached = Logic.readBool(args.attached),
+		collapsed = Logic.readBool(args.collapsed),
+		collapsible = not Logic.readBool(args.nocollapse),
 		width = tonumber(string.gsub(args.width or '', 'px', ''), nil),
 	}
 end
@@ -78,11 +79,10 @@ function MatchlistDisplay.Matchlist(props)
 		Score = propsConfig.Score or MatchlistDisplay.DefaultScore,
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
-		collapsible = LuaUtils.misc.emptyOr(propsConfig.collapsible, true),
+		collapsible = Logic.emptyOr(propsConfig.collapsible, true),
 		matchHasDetails = propsConfig.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
 		width = propsConfig.width or 300,
 	}
-
 	local tableNode = html.create('table')
 		:addClass('brkts-matchlist wikitable wikitable-bordered matchlist')
 		:addClass(config.collapsible and 'collapsible' or nil)
@@ -260,8 +260,8 @@ function MatchlistDisplay.DefaultOpponent(props)
 		playerRecord.extradata = Json.parseIfString(playerRecord.extradata) or {}
 	end
 	
-	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
-		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
+	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and Lua.requireIfExists('Module:OpponentDisplay/dev')
+		or Lua.requireIfExists('Module:OpponentDisplay')
 		or {}
 	return OpponentDisplay.luaGet(
 		mw.getCurrentFrame(),
@@ -287,8 +287,8 @@ function MatchlistDisplay.DefaultScore(props)
 		playerRecord.extradata = Json.parseIfString(playerRecord.extradata) or {}
 	end
 	
-	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
-		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
+	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and Lua.requireIfExists('Module:OpponentDisplay/dev')
+		or Lua.requireIfExists('Module:OpponentDisplay')
 		or {}
 	return OpponentDisplay.luaGet(
 		mw.getCurrentFrame(),
