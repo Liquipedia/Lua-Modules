@@ -9,7 +9,7 @@ std = {
 		"pairs",
 		"string",
 		"tostring",
-		"tonumber"
+		"tonumber",
 		"math",
 		"assert",
 	}
