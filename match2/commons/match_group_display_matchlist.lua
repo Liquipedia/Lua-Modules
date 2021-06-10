@@ -261,8 +261,8 @@ function MatchlistDisplay.DefaultOpponent(props)
 	end
 
 	local OpponentDisplay = require('Module:DevFlags').matchGroupDev
-		and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
-		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
+		and Lua.requireIfExists('Module:OpponentDisplay/dev')
+		or Lua.requireIfExists('Module:OpponentDisplay')
 		or {}
 	return OpponentDisplay.luaGet(
 		mw.getCurrentFrame(),
@@ -289,8 +289,8 @@ function MatchlistDisplay.DefaultScore(props)
 	end
 
 	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and
-		LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
-		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
+		Lua.requireIfExists('Module:OpponentDisplay/dev')
+		or Lua.requireIfExists('Module:OpponentDisplay')
 		or {}
 	return OpponentDisplay.luaGet(
 		mw.getCurrentFrame(),

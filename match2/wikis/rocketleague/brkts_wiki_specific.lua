@@ -1,5 +1,11 @@
 local p = require("Module:Brkts/WikiSpecific/Base")
 
+local Logic = require('Module:Logic')
+local String = require('Module:String')
+local Variables = require('Module:Variables')
+local Table = require('Module:Table')
+local TypeUtil = require('Module:TypeUtil')
+local Template = require('Module:Template')
 local json = require("Module:Json")
 local utils = require("Module:LuaUtils")
 local getIconName = require("Module:IconName").luaGet

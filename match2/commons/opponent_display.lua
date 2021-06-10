@@ -1,7 +1,6 @@
 local p = {}
 
 local Class = require('Module:Class')
-local String = require('Module:String')
 local Template = require('Module:Template')
 
 local getArgs = require("Module:Arguments").getArgs

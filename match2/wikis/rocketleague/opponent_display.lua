@@ -2,6 +2,7 @@ local p = {}
 
 local getArgs = require("Module:Arguments").getArgs
 local utils = require("Module:LuaUtils")
+local String = require('Module:String')
 local htmlCreate = mw.html.create
 
 function p.get(frame)
