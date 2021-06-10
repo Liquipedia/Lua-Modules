@@ -82,9 +82,10 @@ end
 local Comment = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
-		self.root   :addClass('brkts-popup-comment')
-					:css('white-space', 'normal')
-					:css('font-size', '85%')
+		self.root
+			:addClass('brkts-popup-comment')
+			:css('white-space', 'normal')
+			:css('font-size', '85%')
 	end
 )
 
@@ -126,8 +127,9 @@ MatchSummary.Break = Break
 
 function MatchSummary:init(width)
 	self.root = mw.html.create('div')
-	self.root   :addClass('brkts-popup')
-				:css('width', width)
+	self.root
+		:addClass('brkts-popup')
+		:css('width', width)
 	return self
 end
 
@@ -152,14 +154,16 @@ function MatchSummary:footer(footer)
 end
 
 function MatchSummary:create()
-	self.root   :node(self.headerElement)
-				:node(Break():create())
-				:node(self.bodyElement)
-				:node(Break():create())
+	self.root
+		:node(self.headerElement)
+		:node(Break():create())
+		:node(self.bodyElement)
+		:node(Break():create())
 
 	if self.commentElement ~= nil then
-		self.root   :node(self.commentElement)
-					:node(Break():create())
+		self.root
+			:node(self.commentElement)
+			:node(Break():create())
 	end
 
 	if self.footerElement ~= nil then
