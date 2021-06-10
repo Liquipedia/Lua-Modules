@@ -12,6 +12,7 @@ local DisplayHelper = {}
 -- expect flattened input
 -- a '_' (underscore) shows a key originates from a nested table
 -- e.g. { key1 = { key2 = val } } becomes { key1_key2 = val }
+-- Deprecated
 function DisplayHelper.flattenArgs(args, prefix)
     local out = {}
     prefix = prefix or ''
@@ -35,6 +36,7 @@ end
 
 -- returns matches that match the given bracketid from var or LPDB
 -- tries to get from var first, otherwise uses LPDB
+-- Deprecated
 function DisplayHelper.getMatches(bracketid)
     local varData = utils.mw.varGet('match2bracket_' .. bracketid)
     if varData ~= nil then
@@ -54,6 +56,7 @@ function DisplayHelper.getMatches(bracketid)
 end
 
 -- @returns the key used for highlighting the same opponents while hovering
+-- Deprecated
 function DisplayHelper.getOpponentHighlightKey(opponent)
     return string.lower(
         (opponent.name or '') ..
@@ -63,6 +66,7 @@ function DisplayHelper.getOpponentHighlightKey(opponent)
 end
 
 -- @returns the type of a MatchGroup
+-- Deprecated
 function DisplayHelper.getMatchGroupType(bracketid)
     local varData = utils.mw.varGet('match2bracket_' .. bracketid)
     if varData ~= nil then
@@ -92,7 +96,10 @@ function DisplayHelper.opponentIsHighlightable(opponent)
     end
 end
 
--- Builds a hash of the opponent that is used to visually highlight their progress in the bracket. 
+--[[
+Builds a hash of the opponent that is used to visually highlight their progress 
+in the bracket. 
+]]
 function DisplayHelper.makeOpponentHighlightKey2(opponent)
     if opponent.type == 'literal' then
         return opponent.name and string.lower(opponent.name) or ''
@@ -130,15 +137,26 @@ function DisplayHelper.expandHeader(header)
 end
 
 --[[
-Determines whether a MatchSummary popup shall be enabled for a match.
+Determines whether a match summary popup shall be enabled for a match.
 
-This is the default policy for Bracket and Matchlist. The matchHasDetails 
-property can be used to specifiy a different policy.
+This is the default policy for Bracket and Matchlist. Wikis may specify a 
+different policy by setting props.matchHasDetails in the Bracket and Matchlist 
+components.
 ]]
 function DisplayHelper.defaultMatchHasDetails(match)
     return match.dateIsExact or 0 < #match.games
 end
 
+--[[
+Display component showing the detailed summary of a match. The component will 
+appear as a popup from the Matchlist and Bracket components. This is a 
+container component, so it takes in the match ID and bracket ID as inputs, 
+which it uses to fetch the match data from LPDB and page variables.
+
+This is the default implementation. Specific wikis may override this by passing 
+in a different props.MatchSummaryContainer in the Bracket and Matchlist 
+components.
+]]
 DisplayHelper.DefaultMatchSummaryContainer = function(props)
     local DevFlags = require('Module:DevFlags')
     local MatchSummaryModule = DevFlags.matchGroupDev and LuaUtils.lua.requireIfExists('Module:MatchSummary/dev')
@@ -158,6 +176,10 @@ DisplayHelper.DefaultMatchSummaryContainer = function(props)
     end
 end
 
+--[[
+Retrieves the wiki specific global bracket config specified in 
+MediaWiki:BracketConfig.
+]]
 DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
     local defaultConfig = {
         headerHeight = 25,

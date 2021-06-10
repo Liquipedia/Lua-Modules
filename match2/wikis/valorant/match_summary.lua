@@ -1,13 +1,11 @@
-local MatchSummary = require('Module:MatchSummary/Base')
-local Json = require('Module:Json')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
-local Template = require('Module:Template')
+local Countdown = require('Module:Countdown')
 local LuaUtils = require("Module:LuaUtils")
+local MatchGroupUtil = require('Module:MatchGroup/Util')
+local MatchSummary = require('Module:MatchSummary/Base')
 local Table = require('Module:Table')
-
-local config = LuaUtils.lua.moduleExists("Module:Match/Config") and require("Module:Match/Config") or {}
-local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
+local Template = require('Module:Template')
 
 local Agents = Class.new(
     function(self)
@@ -99,11 +97,11 @@ function Score:setSecondRoundScore(side, score)
 end
 
 function Score:_getSideColor(side)
-	if side == 'atk' then
-		return '#c04845'
-	elseif side == 'def' then
-		return '#46b09c'
-	end
+    if side == 'atk' then
+        return '#c04845'
+    elseif side == 'def' then
+        return '#46b09c'
+    end
 end
 
 function Score:create()
@@ -113,25 +111,26 @@ end
 
 local CustomMatchSummary = {}
 
--- Suboptimal to have this be global, but alas
-local vods = {}
+function CustomMatchSummary.getByMatchId(args)
+    local match = MatchGroupUtil.fetchMatchesTable(args.bracketId)[args.matchId]
+    local frame = mw.getCurrentFrame()
 
-function CustomMatchSummary.get(frame)
-    return CustomMatchSummary.luaGet(frame, require('Module:Arguments').getArgs(frame))
-end
-
-function CustomMatchSummary.luaGet(frame, args)
     local matchSummary = MatchSummary:init('480px')
-    matchSummary:header(CustomMatchSummary._createHeader(frame, args))
-                :body(CustomMatchSummary._createBody(frame, args))
+    matchSummary:header(CustomMatchSummary._createHeader(frame, match))
+                :body(CustomMatchSummary._createBody(frame, match))
 
-  	local matchExtradata = Json.parse(args.extradata or "{}")
-
-    if not LuaUtils.misc.isEmpty(matchExtradata.comment) then
-        matchSummary:comment(MatchSummary.Comment():content(matchExtradata.comment))
+    if match.comment then
+        matchSummary:comment(MatchSummary.Comment():content(match.comment))
     end
 
-    if Table.size(vods) > 0 then
+    local vods = {}
+    for index, game in ipairs(match.games) do
+        if game.vod then
+            vods[index] = game.vod
+        end
+    end
+
+    if not Table.isEmpty(vods) then
         local footer = MatchSummary.Footer()
 
         for index, vod in pairs(vods) do
@@ -148,68 +147,56 @@ function CustomMatchSummary.luaGet(frame, args)
     return matchSummary:create()
 end
 
-function CustomMatchSummary._createHeader(frame, args)
+function CustomMatchSummary._createHeader(frame, match)
     local header = MatchSummary.Header()
-    header  :left(CustomMatchSummary._createLeftOpponent(frame, args))
-            :right(CustomMatchSummary._createRightOpponent(frame, args))
+    header  :left(CustomMatchSummary._createLeftOpponent(frame, match.opponents[1]))
+            :right(CustomMatchSummary._createRightOpponent(frame, match.opponents[2]))
 
     return header
 end
 
-function CustomMatchSummary._createBody(frame, args)
+function CustomMatchSummary._createBody(frame, match)
     local body = MatchSummary.Body()
 
     local streamElement = mw.html.create('center')
-    streamElement   :wikitext(CustomMatchSummary._createStreamCountdown(frame, args))
+    streamElement   :wikitext(CustomMatchSummary._createStreamCountdown(frame, match))
                     :css('display', 'block')
                     :css('margin', 'auto')
     body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(streamElement))
 
     local matchPageElement = mw.html.create('center')
-    matchPageElement   :wikitext('[[Match:ID_' .. args['match2id'] .. '|Match Page]]')
+    matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
                     :css('display', 'block')
                     :css('margin', 'auto')
     body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
 
-  	for index = 1, MAX_NUM_MAPS do
-		local game = "match2game" .. index .. '_'
-		local map = args[game .. "map"]
-		if not LuaUtils.misc.isEmpty(map) then
-            body:addRow(CustomMatchSummary._createMap(frame, args, game, map))
-        end
-
-        local vod = args[game .. "vod"]
-        if not LuaUtils.misc.isEmpty(vod) then
-            vods[index] = vod
+    for _, game in ipairs(match.games) do
+        if game.map then
+            body:addRow(CustomMatchSummary._createMap(frame, game))
         end
     end
 
     return body
 end
 
-function CustomMatchSummary._createMap(frame, args, game, map)
+function CustomMatchSummary._createMap(frame, game)
     local row = MatchSummary.Row()
 
-    local winner = args[game .. "winner"]
-    local extradata, err = Json.parse(args[game .. "extradata"])
-    local participants = args[game .. 'participants']
     local team1Agents, team2Agents
 
-    if participants ~= nil then
-        participants = Json.parse(participants)
-
+    if not Table.isEmpty(game.participants) then
         team1Agents = Agents():setLeft()
         team2Agents = Agents():setRight()
 
         for player = 1, 5 do
-            local playerStats = participants['1_' .. player]
+            local playerStats = game.participants['1_' .. player]
             if playerStats ~= nil then
                 team1Agents:add(frame, playerStats['agent'])
             end
         end
 
         for player = 1, 5 do
-            local playerStats = participants['2_' .. player]
+            local playerStats = game.participants['2_' .. player]
             if playerStats ~= nil then
                 team2Agents:add(frame, playerStats['agent'])
             end
@@ -219,12 +206,13 @@ function CustomMatchSummary._createMap(frame, args, game, map)
 
     local score1, score2
 
-    if extradata ~= nil then
+    local extradata = game.extradata
+    if not Table.isEmpty(extradata) then
         score1 = Score():setLeft()
         score2 = Score():setRight()
 
-        score1:setMapScore(args[game .. 'score1'])
-        score2:setMapScore(args[game .. 'score2'])
+        score1:setMapScore(game.opponents[1].score)
+        score2:setMapScore(game.opponents[2].score)
 
         score1:setFirstRoundScore(extradata.op1startside, extradata.half1score1)
         score1:setSecondRoundScore(
@@ -235,7 +223,7 @@ function CustomMatchSummary._createMap(frame, args, game, map)
         score2:setSecondRoundScore(extradata.op1startside, extradata.half2score2)
     end
 
-    row:addElement(CustomMatchSummary._createCheckMark(tonumber(winner) == 1))
+    row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
     if team1Agents ~= nil then
         row:addElement(team1Agents:create())
     end
@@ -243,11 +231,11 @@ function CustomMatchSummary._createMap(frame, args, game, map)
 
     local centerNode = mw.html.create('div')
     centerNode  :addClass('brkts-popup-spaced')
-                :wikitext('[[' .. map .. ']]')
+                :wikitext('[[' .. game.map .. ']]')
                 :css('width', '100px')
                 :css('text-align', 'center')
 
-    if args[game .. 'resulttype'] == 'np' then
+    if game.resultType == 'np' then
         centerNode:addClass('brkts-popup-spaced-map-skip')
     end
 
@@ -257,12 +245,12 @@ function CustomMatchSummary._createMap(frame, args, game, map)
     if team2Agents ~= nil then
         row:addElement(team2Agents:create())
     end
-    row:addElement(CustomMatchSummary._createCheckMark(tonumber(winner) == 2))
+    row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 
-    if not LuaUtils.misc.isEmpty(extradata.comment) then
+    if not LuaUtils.misc.isEmpty(game.comment) then
         row:addElement(MatchSummary.Break():create())
         local comment = mw.html.create('div')
-        comment :wikitext(extradata.comment)
+        comment :wikitext(game.comment)
                 :css('margin', 'auto')
         row:addElement(comment)
     end
@@ -272,10 +260,10 @@ function CustomMatchSummary._createMap(frame, args, game, map)
 end
 
 function CustomMatchSummary._getOppositeSide(side)
-	if side == 'atk' then
-		return 'def'
-	end
-	return 'atk'
+    if side == 'atk' then
+        return 'def'
+    end
+    return 'atk'
 end
 
 function CustomMatchSummary._createCheckMark(isWinner)
@@ -291,52 +279,53 @@ function CustomMatchSummary._createCheckMark(isWinner)
     return container
 end
 
-function CustomMatchSummary._createStreamCountdown(frame, args)
-  	local stream = Json.parse(args.stream or "{}")
-  	stream.date = mw.getContentLanguage():formatDate('r', args.date)
-	stream.finished = LuaUtils.misc.readBool(args.finished) and "true" or ""
+function CustomMatchSummary._createStreamCountdown(frame, match)
+    local stream = Table.merge(match.stream, {
+        date = mw.getContentLanguage():formatDate('r', match.date),
+        finished = match.finished and 'true' or nil,
+    })
 
-    return Template.safeExpand(frame, 'countdown', stream)
+    return Countdown._create(stream)
 end
 
-function CustomMatchSummary._createLeftOpponent(frame, args)
+function CustomMatchSummary._createLeftOpponent(frame, opponent)
     local container = mw.html.create('div')
     container   :addClass('brkts-popup-header-left')
                 :css('justify-content', 'flex-end')
                 :css('display', 'flex')
                 :css('width', '45%')
 
-    local prefix = 'match2opponent1_'
-    local opponent = CustomMatchSummary._renderOpponent(
-        prefix .. 'type',
+    local opponentNode = CustomMatchSummary._renderOpponent(
+        opponent.type,
         function()
-            return Template.safeExpand(frame, 'Team2Short', { args[prefix .. 'template'] or 'TBD' })
+            return Template.safeExpand(frame, 'Team2Short', { opponent.template or 'TBD' })
         end,
         function()
-            return Template.safeExpand(frame, 'Player2', { args[prefix .. 'match2player1_name'], flag = args[prefix .. 'match2player1_flag'] })
+            local player = opponent.players[1]
+            return Template.safeExpand(frame, 'Player2', { player.name, flag = player.flag })
         end
     )
 
-    container:node(opponent)
+    container:node(opponentNode)
     return container
 end
 
-function CustomMatchSummary._createRightOpponent(frame, args)
+function CustomMatchSummary._createRightOpponent(frame, opponent)
     local container = mw.html.create('div')
     container:addClass('brkts-popup-header-right')
 
-    local prefix = 'match2opponent2_'
-    local opponent = CustomMatchSummary._renderOpponent(
-        prefix .. 'type',
+    local opponentNode = CustomMatchSummary._renderOpponent(
+        opponent.type,
         function()
-            return Template.safeExpand(frame, 'TeamShort', { args[prefix .. 'template'] or 'TBD' })
+            return Template.safeExpand(frame, 'TeamShort', { opponent.template or 'TBD' })
         end,
         function()
-            return Template.safeExpand(frame, 'Player', { args[prefix .. 'match2player1_name'], flag = args[prefix .. 'match2player1_flag'] })
+            local player = opponent.players[1]
+            return Template.safeExpand(frame, 'Player', { player.name, flag = player.flag })
         end
     )
 
-    container:node(opponent)
+    container:node(opponentNode)
     return container
 end
 
