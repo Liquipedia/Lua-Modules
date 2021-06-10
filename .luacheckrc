@@ -4,5 +4,5 @@ std = {
 	}
 }
 exclude_files = {
-	"^\.install/"
+	".install"
 }
