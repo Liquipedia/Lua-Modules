@@ -1,0 +1,16 @@
+name: Code Style
+
+on: [ push, pull_request ]
+
+jobs:
+  test-lua:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Run stuff
+      run: |
+          apt-get install luarocks
+          luarocks install luacheck
+          luacheck
