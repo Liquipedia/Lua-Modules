@@ -2,7 +2,9 @@ local p = {}
 
 local getArgs = require("Module:Arguments").getArgs
 local json = require("Module:Json")
-local utils = require("Module:LuaUtils")
+local Logic = require("Module:Logic")
+local Lua = require("Module:Lua")
+local Table = require("Module:Table")
 local globalArgs
 
 local legacy = Lua.moduleExists("Module:Match/Legacy") and require("Module:Match/Legacy") or nil
@@ -20,7 +22,7 @@ function p.toEncodedJson(frame)
 	-- handle tbd and literals for opponents
 	for opponentIndex = 1, globalArgs["1"] or 2 do
 		local opponent = globalArgs["opponent" .. opponentIndex]
-		if utils.misc.isEmpty(opponent) then
+		if Logic.isEmpty(opponent) then
 			globalArgs["opponent" .. opponentIndex] = {
 				["type"] = "literal", template = "tbd", name = globalArgs["opponent" .. opponentIndex .. "literal"]
 			}
@@ -34,10 +36,14 @@ function p.toEncodedJson(frame)
 	globalArgs.bracketdata = json.stringify(bracketdata)
 
 	-- parse maps
+	local lastMap
+	local lastMapIndex
 	for mapIndex = 1, MAX_NUM_MAPS do
 		local map = globalArgs["map" .. mapIndex]
 		if type(map) == "string" then
 			map = json.parse(map)
+			lastMap = map
+			lastMapIndex = mapIndex
 			globalArgs["map" .. mapIndex] = map
 		else
 			break
@@ -73,7 +79,8 @@ function p.store(args)
 	end
 
 	-- save match to lpdb
-	mw.ext.LiquipediaDB.lpdb_match2(
+	local res =
+		mw.ext.LiquipediaDB.lpdb_match2(
 		staticid,
 		parameters
 	)
@@ -92,7 +99,7 @@ function p.templateFromMatchID(frame)
 end
 
 function p._storeLegacy(parameters, rawOpponents, rawGames)
-	local rawMatch = utils.table.shallowCopy(parameters)
+	local rawMatch = Table.deepCopy(parameters)
 	rawMatch.match2opponents = rawOpponents
 	rawMatch.match2games = rawGames
 	legacy.storeMatch(rawMatch)
@@ -102,14 +109,14 @@ function p._storePlayers(args, staticid, opponentIndex)
 	local players = ""
 	local rawPlayers = {}
 	for playerIndex = 1, 100 do
-	  -- read player
-	  local player = args["opponent" .. opponentIndex .. "_p" .. playerIndex]
-	  if player == nil then break end
-	  if type(player) == "string" then
+		-- read player
+		local player = args["opponent" .. opponentIndex .. "_p" .. playerIndex]
+		if player == nil then break end
+		if type(player) == "string" then
 		player = json.parse(player)
-	  end
+		end
 
-	  table.insert(rawPlayers, player)
+		table.insert(rawPlayers, player)
 
 		-- lpdb save operation
 		local res =
