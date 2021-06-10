@@ -1,8 +1,9 @@
 local p = {}
 
 local getArgs = require("Module:Arguments").getArgs
-local utils = require("Module:LuaUtils")
-local String = require('Module:String')
+local json = require("Module:Json")
+local Template = require("Module:Template")
+local String = require("Module:StringUtils")
 local htmlCreate = mw.html.create
 
 function p.get(frame)
@@ -30,7 +31,7 @@ function p.luaGet(frame, args)
 		elseif opponentType == "solo" then
 			local container = htmlCreate("div")
 				:addClass("brkts-opponent-template-container brkts-player-container")
-				:wikitext(utils.frame.protectedExpansion(frame, "Player", {
+				:wikitext(Template.safeExpand(frame, "Player", {
 					args.match2player1_name , flag = args.match2player1_flag }))
 			wrapper:node(container)
 		elseif opponentType == "literal" then
@@ -88,7 +89,7 @@ function p.luaGet(frame, args)
 			:addClass("brkts-opponent-score")
 			:wikitext(score))
 		if score2 ~= nil then
-				wrapper:node(htmlCreate("div")
+			wrapper:node(htmlCreate("div")
 				:addClass("brkts-opponent-score")
 				:wikitext(score2))
 		end
@@ -103,9 +104,9 @@ function p._getTeam(frame, template)
 	local teamExists = mw.ext.TeamTemplate.teamexists(template)
 	local team = {
 		bracket = teamExists and mw.ext.TeamTemplate.teambracket(template) or
-			utils.frame.protectedExpansion(frame, "TeamBracket", { template }),
+			Template.safeExpand(frame, "TeamBracket", { template }),
 		short = teamExists and mw.ext.TeamTemplate.teamshort(template) or
-			utils.frame.protectedExpansion(frame, "TeamShort", { template })
+			Template.safeExpand(frame, "TeamShort", { template })
 	}
 	return team
 end
@@ -114,10 +115,10 @@ function p._getTeamMatchList(frame, template, side)
 	local teamExists = mw.ext.TeamTemplate.teamexists(template)
 	if side == "left" then
 		return teamExists and mw.ext.TeamTemplate.team2short(template) or
-			utils.frame.protectedExpansion(frame, "Team2Short", { template })
+			Template.safeExpand(frame, "Team2Short", { template })
 	elseif side == "right" then
 		return teamExists and mw.ext.TeamTemplate.teamshort(template) or
-			utils.frame.protectedExpansion(frame, "TeamShort", { template })
+			Template.safeExpand(frame, "TeamShort", { template })
 	end
 end
 
