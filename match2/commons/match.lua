@@ -2,11 +2,13 @@ local p = {}
 
 local getArgs = require("Module:Arguments").getArgs
 local json = require("Module:Json")
-local utils = require("Module:LuaUtils")
+local Logic = require("Module:Logic")
+local Lua = require("Module:Lua")
+local Table = require("Module:Table")
 local args
 
-local legacy = utils.lua.moduleExists("Module:Match/Legacy") and require("Module:Match/Legacy") or nil
-local config = utils.lua.moduleExists("Module:Match/Config") and require("Module:Match/Config") or {}
+local legacy = Lua.moduleExists("Module:Match/Legacy") and require("Module:Match/Legacy") or nil
+local config = Lua.moduleExists("Module:Match/Config") and require("Module:Match/Config") or {}
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 
@@ -19,7 +21,7 @@ function p.toEncodedJson(frame)
 	-- handle tbd and literals for opponents
 	for opponentIndex = 1, args["1"] or 2 do
 		opponent = args["opponent" .. opponentIndex]
-		if utils.misc.isEmpty(opponent) then
+		if Logic.isEmpty(opponent) then
 			args["opponent" .. opponentIndex] = { ["type"] = "literal", template = "tbd", name = args["opponent" .. opponentIndex .. "literal"] }
 		end
 	end
@@ -94,7 +96,7 @@ function p.templateFromMatchID(frame)
 end
 
 function storeLegacy(parameters, rawOpponents, rawGames)
-	local rawMatch = utils.table.shallowCopy(parameters)
+	local rawMatch = Table.deepCopy(parameters)
 	rawMatch.match2opponents = rawOpponents
 	rawMatch.match2games = rawGames
 	legacy.storeMatch(rawMatch)
@@ -136,7 +138,7 @@ function storeOpponents(args, staticid, opponentPlayers)
 		end
 	
 		-- get nested players if exist
-		if not utils.misc.isEmpty(opponent.match2players) then
+		if not Logic.isEmpty(opponent.match2players) then
 			local players = opponent.match2players or {}
 			if type(players) == "string" then
 				players = json.parse(players)
@@ -203,12 +205,12 @@ function buildParameters(args)
 		winner = args["winner"],
 		walkover = args["walkover"],
 		resulttype = args["resulttype"],
-		finished = utils.misc.readBool(args["finished"]) and 1 or 0,
+		finished = Logic.readBool(args["finished"]) and 1 or 0,
 		mode = args["mode"],
 		type = args["type"],
 		game = args["game"],
 		date = args["date"],
-		dateexact = utils.misc.readBool(args["dateexact"]) and 1 or 0,
+		dateexact = Logic.readBool(args["dateexact"]) and 1 or 0,
 		stream = args["stream"],
 		bestof = args["bestof"],
 		links = args["links"],
