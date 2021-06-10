@@ -1,18 +1,21 @@
 local p = {}
 
 local json = require("Module:Json")
-local utils = require("Module:LuaUtils")
+local Table = require("Module:Table")
+local Logic = require("Module:Logic")
+local String = require("Module:StringUtils")
+local getArgs = require("Module:Arguments").getArgs
 local wikiSpec = require("Module:Brkts/WikiSpecific")
 
 local ALLOWED_OPPONENT_TYPES = { "literal", "team", "solo", "duo", "trio", "quad" }
 
 function p.getOpponent(frame)
-	local args = utils.frame.getArgs(frame)
+	local args = getArgs(frame)
 	return p.luaGetOpponent(frame, args)
 end
 
 function p.luaGetOpponent(frame, args)
-	if not utils.table.includes(ALLOWED_OPPONENT_TYPES, args.type) then
+	if not Table.includes(ALLOWED_OPPONENT_TYPES, args.type) then
 		error("Unknown opponent type " .. args.type)
 	end
 
@@ -30,13 +33,13 @@ function p.luaGetOpponent(frame, args)
 end
 
 function p.getMap(frame)
-	local args = utils.frame.getArgs(frame)
+	local args = getArgs(frame)
 	return p.luaGetMap(frame, args)
 end
 
 function p.luaGetMap(frame, args)
 	-- dont save map if 'map' is not filled in
-	if utils.misc.isEmpty(args.map) then
+	if Logic.isEmpty(args.map) then
 		return nil
 	else
 		args = wikiSpec.processMap(frame, args)
@@ -48,7 +51,7 @@ function p.luaGetMap(frame, args)
 		for key, item in pairs(participants) do
 			if not key:match("%d_%d") then
 				error("Key '" .. key .. "' in match2game.participants has invalid format: '<number>_<number>' expected")
-			elseif type(item) == "string" and utils.string.startsWith(item, "{") then
+			elseif type(item) == "string" and String.startsWith(item, "{") then
 				participants[key] = json.parse(item)
 			elseif type(item) ~= "table" then
 				error("Item '" .. tostring(item) .. "' in match2game.participants has invalid format: table expected")
@@ -77,7 +80,7 @@ function p.luaGetMap(frame, args)
 end
 
 function p.getRound(frame)
-	local args = utils.frame.getArgs(frame)
+	local args = getArgs(frame)
 	return p.luaGetRound(frame, args)
 end
 
@@ -86,7 +89,7 @@ function p.luaGetRound(frame, args)
 end
 
 function p.getPlayer(frame)
-	local args = utils.frame.getArgs(frame)
+	local args = getArgs(frame)
 	return p.luaGetPlayer(frame, args)
 end
 
