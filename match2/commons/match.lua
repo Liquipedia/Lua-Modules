@@ -36,14 +36,10 @@ function p.toEncodedJson(frame)
 	globalArgs.bracketdata = json.stringify(bracketdata)
 
 	-- parse maps
-	local lastMap
-	local lastMapIndex
 	for mapIndex = 1, MAX_NUM_MAPS do
 		local map = globalArgs["map" .. mapIndex]
 		if type(map) == "string" then
 			map = json.parse(map)
-			lastMap = map
-			lastMapIndex = mapIndex
 			globalArgs["map" .. mapIndex] = map
 		else
 			break
@@ -79,8 +75,7 @@ function p.store(args)
 	end
 
 	-- save match to lpdb
-	local res =
-		mw.ext.LiquipediaDB.lpdb_match2(
+	mw.ext.LiquipediaDB.lpdb_match2(
 		staticid,
 		parameters
 	)
