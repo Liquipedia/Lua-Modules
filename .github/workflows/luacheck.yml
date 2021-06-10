@@ -1,24 +1,24 @@
 name: Code Style
 
-on: [ push, pull_request, workflow_dispatch ]
+on: [pull_request, workflow_dispatch]
 
 jobs:
   test-lua:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@master
+      - uses: actions/checkout@master
 
-    - uses: leafo/gh-actions-lua@v8
-      with:
-        luaVersion: "5.1"
+      - uses: leafo/gh-actions-lua@v8
+        with:
+          luaVersion: "5.1"
 
-    - uses: leafo/gh-actions-luarocks@v4
+      - uses: leafo/gh-actions-luarocks@v4
 
-    - name: setup 
-      run: |
-        luarocks install luacheck
+      - name: setup
+        run: |
+          luarocks install luacheck
 
-    - name: test
-      run: |
-        luacheck ./
+      - name: test
+        run: |
+          luacheck ./
