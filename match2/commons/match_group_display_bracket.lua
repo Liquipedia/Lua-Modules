@@ -610,7 +610,7 @@ function BracketDisplay.NodeLowerConnectors(props)
 
 	-- Compute partial sums of heights of lower round matches
 	local heightSums = Math.partialSums(
-		Array.map(lowerLayouts, function(layout) return layout.height end)
+		Array.map(lowerLayouts, function(lyt) return lyt.height end)
 	)
 
 	-- Compute joints of connectors
