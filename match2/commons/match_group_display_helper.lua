@@ -1,7 +1,8 @@
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
-local LuaUtils = require('Module:LuaUtils')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = {}
@@ -17,7 +18,7 @@ function DisplayHelper.flattenArgs(args, prefix)
 	prefix = prefix or ''
 	for key, val in pairs(args) do
 		if tonumber(key) ~= nil then
-			if LuaUtils.string.endsWith(prefix, 's_') then
+			if String.endsWith(prefix, 's_') then
 				prefix = prefix:sub(1, prefix:len() - 2)
 			end
 		end
@@ -114,7 +115,7 @@ components.
 ]]
 DisplayHelper.DefaultMatchSummaryContainer = function(props)
 	local DevFlags = require('Module:DevFlags')
-	local MatchSummaryModule = DevFlags.matchGroupDev and LuaUtils.lua.requireIfExists('Module:MatchSummary/dev')
+	local MatchSummaryModule = DevFlags.matchGroupDev and Lua.requireIfExists('Module:MatchSummary/dev')
 		or require('Module:MatchSummary')
 
 	if MatchSummaryModule.getByMatchId then
