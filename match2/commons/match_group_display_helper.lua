@@ -3,7 +3,6 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local LuaUtils = require('Module:LuaUtils')
 local Table = require('Module:Table')
-local utils = require('Module:LuaUtils')
 
 local DisplayHelper = {}
 
@@ -18,7 +17,7 @@ function DisplayHelper.flattenArgs(args, prefix)
 	prefix = prefix or ''
 	for key, val in pairs(args) do
 		if tonumber(key) ~= nil then
-			if utils.string.endsWith(prefix, 's_') then
+			if LuaUtils.string.endsWith(prefix, 's_') then
 				prefix = prefix:sub(1, prefix:len() - 2)
 			end
 		end
@@ -34,55 +33,11 @@ function DisplayHelper.flattenArgs(args, prefix)
 	return out
 end
 
--- returns matches that match the given bracketid from var or LPDB
--- tries to get from var first, otherwise uses LPDB
--- Deprecated
-function DisplayHelper.getMatches(bracketid)
-	local varData = utils.mw.varGet('match2bracket_' .. bracketid)
-	if varData ~= nil then
-		return Json.parse(varData)
-	else
-		local res =
-			mw.ext.LiquipediaDB.lpdb(
-			'match2',
-			{
-				conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketid .. ']]',
-				order = 'match2id ASC',
-				limit = 5000
-			}
-		)
-		return res
-	end
-end
-
--- @returns the key used for highlighting the same opponents while hovering
--- Deprecated
-function DisplayHelper.getOpponentHighlightKey(opponent)
-	return string.lower(
-		(opponent.name or '') ..
-		(opponent.template or '') ..
-		(opponent.type == 'team' and '' or Json.stringify(opponent.match2players))
-	)
-end
-
--- @returns the type of a MatchGroup
--- Deprecated
-function DisplayHelper.getMatchGroupType(bracketid)
-	local varData = utils.mw.varGet('match2bracket_' .. bracketid)
-	if varData ~= nil then
-		return Json.parse(Json.parse(varData)[1].match2bracketdata)['type']
-	else
-		local res = mw.ext.LiquipediaDB.lpdb('match2', {
-			conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketid .. ']]',
-			limit = 1
-		})
-		
-		if type(res[1]) == 'table' and type(res[1].match2bracketdata) == 'table' then
-			return res[1].match2bracketdata['type']
-		else
-			error('No Data found for this ID')
-		end
-	end
+function DisplayHelper.opponentIsTBD(opponent)
+	return opponent.type == 'literal'
+		or opponent.type == 'team' and opponent.template == 'tbd'
+		or opponent.name == 'TBD'
+		or Array.any(opponent.players, function(player) return player.name == 'TBD' end)
 end
 
 -- Whether to allow highlighting an opponent via mouseover
@@ -162,17 +117,10 @@ DisplayHelper.DefaultMatchSummaryContainer = function(props)
 	local MatchSummaryModule = DevFlags.matchGroupDev and LuaUtils.lua.requireIfExists('Module:MatchSummary/dev')
 		or require('Module:MatchSummary')
 
-	if MatchSummaryModule.MatchSummaryContainer then
-		return MatchSummaryModule.MatchSummaryContainer(props)
-	elseif MatchSummaryModule.getByMatchId then
+	if MatchSummaryModule.getByMatchId then
 		return MatchSummaryModule.getByMatchId(props)
 	else
-		local MatchGroupUtil = require('Module:MatchGroup/Util')
-		local match = MatchGroupUtil.fetchMatchesTable(props.bracketId)[props.matchId]
-		return MatchSummaryModule.luaGet(
-			mw.getCurrentFrame(),
-			DisplayHelper.flattenArgs(match._rawRecord)
-		)
+		error('DefaultMatchSummaryContainer: Expected MatchSummary.getByMatchId to be a function')
 	end
 end
 
