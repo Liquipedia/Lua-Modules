@@ -63,7 +63,7 @@ function p.luaGet(frame, args)
 		if (tonumber((args.placement2 or args.placement) or 0) == 1) then
 			wrapper:addClass("brkts-opponent-win")
 		end
-	elseif utils.string.startsWith(displayType, "matchlist") then
+	elseif String.startsWith(displayType, "matchlist") then
 		if displayType == "matchlist-left" then
 			local team = p._getTeamMatchList(frame, args.template, "left")
 			return htmlCreate("div")
