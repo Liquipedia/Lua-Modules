@@ -1,4 +1,3 @@
-local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local LuaUtils = require("Module:LuaUtils")
@@ -143,7 +142,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 		matchSummary:footer(footer)
 	end
-	
+
 	return matchSummary:create()
 end
 

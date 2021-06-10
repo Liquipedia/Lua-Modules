@@ -8,11 +8,11 @@ local TypeUtil = require('Module:TypeUtil')
 
 local nilIfEmpty = String.nilIfEmpty
 
---[[ 
-Non-display utility functions for brackets, matchlists, matches, opponents, 
-games, and etc in the new bracket framework. 
+--[[
+Non-display utility functions for brackets, matchlists, matches, opponents,
+games, and etc in the new bracket framework.
 
-Display related functions go in Module:MatchGroup/Display/Helper. 
+Display related functions go in Module:MatchGroup/Display/Helper.
 ]]
 local MatchGroupUtil = {types = {}}
 
@@ -101,8 +101,8 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 })
 
 --[[
-Fetches all matches in a matchlist or bracket. Tries to read from page 
-variables before fetching from LPDB. Returns a list of records 
+Fetches all matches in a matchlist or bracket. Tries to read from page
+variables before fetching from LPDB. Returns a list of records
 ordered lexicographically by matchId.
 ]]
 function MatchGroupUtil.fetchMatchRecords(bracketId)
@@ -122,12 +122,12 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 end
 
 --[[
-Fetches all matches in a matchlist or bracket. Returns a list of structurally 
+Fetches all matches in a matchlist or bracket. Returns a list of structurally
 typed matches lexicographically ordered by matchId.
 ]]
 MatchGroupUtil.fetchMatches = FnUtil.memoize(function(bracketId)
 	return Array.map(
-		MatchGroupUtil.fetchMatchRecords(bracketId), 
+		MatchGroupUtil.fetchMatchRecords(bracketId),
 		require('Module:Brkts/WikiSpecific').matchFromRecord
 	)
 end)
@@ -143,13 +143,13 @@ MatchGroupUtil.fetchMatchesTable = FnUtil.memoize(function(bracketId)
 end)
 
 --[[
-Converts a match record to a structurally typed table with the appropriate data 
-types for field values. The match record is either a match created in the store 
-bracket codepath (WikiSpecific.processMatch), or a record fetched from LPDB 
-(MatchGroupUtil.fetchMatchRecords). The returned match struct is used in 
+Converts a match record to a structurally typed table with the appropriate data
+types for field values. The match record is either a match created in the store
+bracket codepath (WikiSpecific.processMatch), or a record fetched from LPDB
+(MatchGroupUtil.fetchMatchRecords). The returned match struct is used in
 various display components (Bracket, MatchSummary, etc)
 
-This is the implementation used on wikis by default. Wikis may specify a 
+This is the implementation used on wikis by default. Wikis may specify a
 different conversion by setting WikiSpecific.matchFromRecord. Refer
 to the starcraft2 wiki as an example.
 ]]
@@ -185,13 +185,13 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 		local midIx = math.ceil(opponentCount / 2)
 		if nilIfEmpty(data.toupper) then
 			table.insert(lowerMatches, {
-				matchId = data.toupper, 
+				matchId = data.toupper,
 				opponentIx = midIx,
 			})
 		end
 		if nilIfEmpty(data.tolower) then
 			table.insert(lowerMatches, {
-				matchId = data.tolower, 
+				matchId = data.tolower,
 				opponentIx = math.min(midIx + 1, opponentCount),
 			})
 		end

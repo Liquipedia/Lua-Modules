@@ -22,7 +22,7 @@ function BigMatch.run(frame)
 
 	if type(match) ~= 'string' then
 		return ''
-	end 
+	end
 
 	match = LocalMatch.processMatch(frame, match)
 	local identifiers = BigMatch:_getId()
@@ -144,28 +144,28 @@ function BigMatch:stats(frame, opponent1, opponent2)
 end
 
 function BigMatch:_createTeamSeparator(format, stream)
-	local countdown = mw.html.create('div')  :addClass('fb-match-page-header-live')
-										:wikitext(Countdown.create({date = stream.date, rawcountdown = true}))
+	local countdown = mw.html.create('div') :addClass('fb-match-page-header-live')
+						:wikitext(Countdown.create({date = stream.date, rawcountdown = true}))
 	local divider = mw.html.create('div')   :addClass('fb-match-page-header-divider')
-											:wikitext(':')
-	local format = mw.html.create('div'):addClass('fb-match-page-header-format')
-										:wikitext(format)
+						:wikitext(':')
+	local formatNode = mw.html.create('div'):addClass('fb-match-page-header-format')
+						:wikitext(format)
 	return mw.html.create('div'):addClass('fb-match-page-header-separator')
 								:node(countdown)
 								:node(divider)
-								:node(format)
+								:node(formatNode)
 end
 
 function BigMatch:_createTeamContainer(side, teamName, score, hasWon)
 	local link = '[[' .. teamName .. ']]'
 	local team = mw.html.create('div')  :addClass('fb-match-page-header-team')
 										:wikitext(mw.ext.TeamTemplate.teamicon(teamName) .. '<br/>' .. link)
-	local score = mw.html.create('div') :addClass('fb-match-page-header-score'):wikitext(score)
+	local scoreNode = mw.html.create('div') :addClass('fb-match-page-header-score'):wikitext(score)
 
 	local container = mw.html.create('div') :addClass('fb-match-page-header-team-container')
 											:addClass('col-sm-4 col-xs-6 col-sm-pull-4')
 	if side == 'left' then
-		container:node(team):node(score)
+		container:node(team):node(scoreNode)
 	else
 		container:node(score):node(team)
 	end
@@ -183,7 +183,7 @@ function BigMatch:_parseStatsItem(item)
 	local count = 0
 
 	while parsedItem['t' .. count + 1] ~= nil do
-		count = count + 1 
+		count = count + 1
 	end
 
 	return count

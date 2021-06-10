@@ -32,7 +32,7 @@ function MatchGroupDisplay.Display(frame)
 	local args = require('Module:Arguments').getArgs(frame)
 	args[1] = args.id or args[1] or ''
 	local MatchGroupType = Helper.getMatchGroupType(args[1])
-	
+
 	if MatchGroupType == 'matchlist' then
 		return MatchGroupDisplay.luaMatchlist(frame, args)
 	elseif MatchGroupType == 'bracket' then

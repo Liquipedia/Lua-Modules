@@ -76,7 +76,7 @@ function DisplayHelper.getMatchGroupType(bracketid)
 			conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketid .. ']]',
 			limit = 1
 		})
-		
+
 		if type(res[1]) == 'table' and type(res[1].match2bracketdata) == 'table' then
 			return res[1].match2bracketdata['type']
 		else
@@ -97,8 +97,8 @@ function DisplayHelper.opponentIsHighlightable(opponent)
 end
 
 --[[
-Builds a hash of the opponent that is used to visually highlight their progress 
-in the bracket. 
+Builds a hash of the opponent that is used to visually highlight their progress
+in the bracket.
 ]]
 function DisplayHelper.makeOpponentHighlightKey2(opponent)
 	if opponent.type == 'literal' then
@@ -110,7 +110,7 @@ function DisplayHelper.makeOpponentHighlightKey2(opponent)
 	end
 end
 
--- Expands a header code by making a RPC call. 
+-- Expands a header code by making a RPC call.
 function DisplayHelper.expandHeaderCode(headerCode)
 	headerCode = headerCode:gsub('$', '!')
 	local args = mw.text.split(headerCode, '!')
@@ -120,9 +120,9 @@ function DisplayHelper.expandHeaderCode(headerCode)
 	return mw.text.split(response, ',')
 end
 
---[[ 
-Expands a header code or comma demlimited string into an array of header texts 
-of different lengths. Used for displaying different header texts depending on 
+--[[
+Expands a header code or comma demlimited string into an array of header texts
+of different lengths. Used for displaying different header texts depending on
 the screen width.
 
 Examples:
@@ -132,15 +132,15 @@ DisplayHelper.expandHeader('Qualified,Qual.,Q') -- returns {'Qualified', 'Qual.'
 function DisplayHelper.expandHeader(header)
 	local isCode = Table.includes({'$', '!'}, header:sub(1, 1))
 	return isCode
-		and DisplayHelper.expandHeaderCode(header) 
+		and DisplayHelper.expandHeaderCode(header)
 		or mw.text.split(header, ',')
 end
 
 --[[
 Determines whether a match summary popup shall be enabled for a match.
 
-This is the default policy for Bracket and Matchlist. Wikis may specify a 
-different policy by setting props.matchHasDetails in the Bracket and Matchlist 
+This is the default policy for Bracket and Matchlist. Wikis may specify a
+different policy by setting props.matchHasDetails in the Bracket and Matchlist
 components.
 ]]
 function DisplayHelper.defaultMatchHasDetails(match)
@@ -148,13 +148,13 @@ function DisplayHelper.defaultMatchHasDetails(match)
 end
 
 --[[
-Display component showing the detailed summary of a match. The component will 
-appear as a popup from the Matchlist and Bracket components. This is a 
-container component, so it takes in the match ID and bracket ID as inputs, 
+Display component showing the detailed summary of a match. The component will
+appear as a popup from the Matchlist and Bracket components. This is a
+container component, so it takes in the match ID and bracket ID as inputs,
 which it uses to fetch the match data from LPDB and page variables.
 
-This is the default implementation. Specific wikis may override this by passing 
-in a different props.MatchSummaryContainer in the Bracket and Matchlist 
+This is the default implementation. Specific wikis may override this by passing
+in a different props.MatchSummaryContainer in the Bracket and Matchlist
 components.
 ]]
 DisplayHelper.DefaultMatchSummaryContainer = function(props)
@@ -177,7 +177,7 @@ DisplayHelper.DefaultMatchSummaryContainer = function(props)
 end
 
 --[[
-Retrieves the wiki specific global bracket config specified in 
+Retrieves the wiki specific global bracket config specified in
 MediaWiki:BracketConfig.
 ]]
 DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
