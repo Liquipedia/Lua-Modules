@@ -1,7 +1,6 @@
 local p = require("Module:Brkts/WikiSpecific/Base")
 
 local json = require("Module:Json")
-local Match = require("Module:Match")
 local utils = require("Module:LuaUtils")
 local getIconName = require("Module:IconName").luaGet
 local _frame
