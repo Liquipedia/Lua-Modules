@@ -8,3 +8,6 @@ exclude_files = {
 	".install",
 	".luarocks"
 }
+ignore = {
+	"unused argument"
+}
