@@ -1,4 +1,3 @@
-local Match = require("Module:Match")
 local Table = require("Module:Table")
 local WikiSpecificBase = require('Module:Brkts/WikiSpecific/Base')
 local getIconName = require("Module:IconName").luaGet

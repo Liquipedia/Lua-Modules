@@ -29,7 +29,8 @@ function p.luaGet(frame, args)
 		elseif opponentType == "solo" then
 			local container = htmlCreate("div")
 				:addClass("brkts-opponent-template-container brkts-player-container")
-				:wikitext(utils.frame.protectedExpansion(frame, "Player", { args.match2player1_name , flag = args.match2player1_flag }))
+				:wikitext(utils.frame.protectedExpansion(frame, "Player", {
+					args.match2player1_name , flag = args.match2player1_flag }))
 			wrapper:node(container)
 		elseif opponentType == "literal" then
 			local container = htmlCreate("div")
