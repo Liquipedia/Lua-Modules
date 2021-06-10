@@ -1,5 +1,4 @@
 local Countdown = require('Module:Countdown')
-local Json = require("Module:Json")
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -19,7 +18,7 @@ function p.getByMatchId(args)
 		date = mw.getContentLanguage():formatDate('r', match.date),
 		finished = match.finished and 'true' or nil,
 	})
-	
+
 	function renderOpponent(opponentIndex)
 		local opponent = match.opponents[opponentIndex]
 		if opponent.type == "team" or opponent.type == "literal" then
@@ -52,7 +51,7 @@ function p.getByMatchId(args)
 			:addClass("brkts-popup-header-right")
 			:wikitext(renderOpponent(2)))
 	wrapper:node(header):node(p._breakNode())
-	
+
 	-- body
 	local body = htmlCreate("div"):addClass("brkts-popup-body")
 	body = p._addFlexRow(body, {
@@ -62,7 +61,7 @@ function p.getByMatchId(args)
 		},
 		nil,
 		{ ["font-size"] = "85%" })
-	for index, game in ipairs(match.games) do
+	for _, game in ipairs(match.games) do
 		if game.map then
 			local centerNode = htmlCreate("div")
 					:addClass("brkts-popup-spaced")
@@ -147,11 +146,11 @@ function p._addFlexRow(wrapper, contentElements, class, style)
 	local node = htmlCreate("div"):addClass("brkts-popup-body-element")
 	if not Logic.isEmpty(class) then
 		node:addClass(class)
- 	end
+	end
 	for key, val in pairs(style or {}) do
 		node:css(key, val)
 	end
-	for index, element in ipairs(contentElements) do
+	for _, element in ipairs(contentElements) do
 		node:node(element)
 	end
 	return wrapper:node(node)
