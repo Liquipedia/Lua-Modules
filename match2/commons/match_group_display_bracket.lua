@@ -6,7 +6,6 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local LuaUtils = require('Module:LuaUtils')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local String = require('Module:String')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -322,7 +321,7 @@ function BracketDisplay.NodeHeader(props)
 		matchId = 0 < #bracketData.lowerMatches and bracketData.lowerMatches[1].matchId or nil
 	end
 
-	for ix, bracketData in ipairs(bracketDatas) do
+	for _, bracketData in ipairs(bracketDatas) do
 		headerNode:node(
 			BracketDisplay.MatchHeader({
 				header = bracketData.header,
@@ -601,7 +600,7 @@ function BracketDisplay.NodeLowerConnectors(props)
 
 	-- Compute partial sums of heights of lower round matches
 	local heightSums = LuaUtils.math.partialSums(
-		Array.map(lowerLayouts, function(layout) return layout.height end)
+		Array.map(lowerLayouts, function(lyt) return lyt.height end)
 	)
 
 	-- Compute joints of connectors
@@ -655,7 +654,7 @@ function BracketDisplay.NodeLowerConnectors(props)
 	end
 
 	-- Draw line stubs for opponents not connected to a lower round match
-	for opponentIx, opponent in ipairs(match.opponents) do
+	for opponentIx, _ in ipairs(match.opponents) do
 		local rightTop = layout.matchMarginTop + ((opponentIx - 1) + 0.5) * config.opponentHeight
 		if not jointIxs[opponentIx] then
 			local stubNode = html.create('div'):addClass('brkts-line')
@@ -727,7 +726,7 @@ function BracketDisplay.getRunnerUpOpponent(match)
 	-- TODO remove match.finished requirement
 	else
 		return match.finished
-			and Array.find(match.opponents, function(match) return match.placement == 2 end)
+			and Array.find(match.opponents, function(m) return m.placement == 2 end)
 			or nil
 	end
 end
@@ -742,7 +741,8 @@ by passing in a different props.OpponentEntry in the Bracket component.
 function BracketDisplay.DefaultOpponentEntry(props)
 	local opponent = props.opponent
 
-	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
+	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and
+		LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
 		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
 		or {}
 
@@ -754,7 +754,8 @@ function BracketDisplay.DefaultOpponentEntry(props)
 		})
 	elseif OpponentDisplay.luaGet then
 		--temp fix so that opponent extradata is available if data is inherited from storage vars
-		opponent._rawRecord.extradata = Json.parseIfString(opponent._rawRecord.extradata) or opponent._rawRecord.extradata or {}
+		opponent._rawRecord.extradata = Json.parseIfString(opponent._rawRecord.extradata) or
+			opponent._rawRecord.extradata or {}
 
 		local opponentEntryAny = OpponentDisplay.luaGet(
 			mw.getCurrentFrame(),

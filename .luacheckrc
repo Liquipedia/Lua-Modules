@@ -12,6 +12,7 @@ std = {
 		"tonumber",
 		"math",
 		"assert",
+		"os"
 	}
 }
 exclude_files = {

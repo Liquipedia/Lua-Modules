@@ -304,7 +304,7 @@ function p._checkBracketDuplicate(bracketid)
 	end
 end
 
-function p._validateBracketID(bracketid)
+function p.validateBracketID(bracketid)
 	local subbed, count = string.gsub(bracketid, "[0-9a-zA-Z]", "")
 	if subbed == "" and count ~= 10 then
 		error("Bracketid has the wrong length (" .. count .. " given, 10 characters expected)")

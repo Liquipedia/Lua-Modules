@@ -30,7 +30,7 @@ function CustomMatchGroup._getBracketData(args)
 	end
 
 	-- make sure bracket id is valid
-	validateBracketID(bracketId)
+	MatchGroup.validateBracketID(bracketId)
 
 	return bracketId
 end
@@ -68,7 +68,7 @@ function CustomMatchGroup._findMatchData(matches, matchId)
 	end
 
 	local parsedMatchId = CustomMatchGroup._convertMatchIdentifier(matchId)
-	local formattedMatchId = ''
+	local formattedMatchId
 
 	if parsedMatchId == nil then
 		formattedMatchId = 'ID_' .. matchId

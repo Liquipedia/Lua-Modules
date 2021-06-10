@@ -260,7 +260,8 @@ function MatchlistDisplay.DefaultOpponent(props)
 		playerRecord.extradata = Json.parseIfString(playerRecord.extradata) or {}
 	end
 
-	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
+	local OpponentDisplay = require('Module:DevFlags').matchGroupDev
+		and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
 		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
 		or {}
 	return OpponentDisplay.luaGet(
@@ -287,7 +288,8 @@ function MatchlistDisplay.DefaultScore(props)
 		playerRecord.extradata = Json.parseIfString(playerRecord.extradata) or {}
 	end
 
-	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
+	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and
+		LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
 		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
 		or {}
 	return OpponentDisplay.luaGet(
