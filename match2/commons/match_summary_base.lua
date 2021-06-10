@@ -1,58 +1,58 @@
 local Class = require('Module:Class')
 
 local Break = Class.new(
-    function(self)
-        self.root = mw.html.create('div'):addClass('brkts-popup-break')
-    end
+	function(self)
+		self.root = mw.html.create('div'):addClass('brkts-popup-break')
+	end
 )
 
 function Break:create()
-    return self.root
+	return self.root
 end
 
 local Header = Class.new(
-    function(self)
-        self.root = mw.html.create('div')
-        self.root:addClass('brkts-popup-header')
-    end
+	function(self)
+		self.root = mw.html.create('div')
+		self.root:addClass('brkts-popup-header')
+	end
 )
 
 function Header:left(content)
-    self.leftElement = content
-    return self
+	self.leftElement = content
+	return self
 end
 
 function Header:right(content)
-    self.rightElement = content
-    return self
+	self.rightElement = content
+	return self
 end
 
 function Header:create()
-    self.root:node(self.leftElement):node(self.rightElement)
-    return self.root
+	self.root:node(self.leftElement):node(self.rightElement)
+	return self.root
 end
 
 local Row = Class.new(
-    function(self)
-        self.root = mw.html.create('div')
-        self.root:addClass('brkts-popup-body-element')
-        self.elements = {}
-    end
+	function(self)
+		self.root = mw.html.create('div')
+		self.root:addClass('brkts-popup-body-element')
+		self.elements = {}
+	end
 )
 
 function Row:addClass(class)
-    self.root:addClass(class)
-    return self
+	self.root:addClass(class)
+	return self
 end
 
 function Row:css(name, value)
-    self.root:css(name, value)
-    return self
+	self.root:css(name, value)
+	return self
 end
 
 function Row:addElement(element)
-    table.insert(self.elements, element)
-    return self
+	table.insert(self.elements, element)
+	return self
 end
 
 function Row:create()
@@ -60,60 +60,60 @@ function Row:create()
 		self.root:node(element)
 	end
 
-    return self.root
+	return self.root
 end
 
 local Body = Class.new(
-    function(self)
-        self.root = mw.html.create('div')
-        self.root:addClass('brkts-popup-body')
-    end
+	function(self)
+		self.root = mw.html.create('div')
+		self.root:addClass('brkts-popup-body')
+	end
 )
 
 function Body:addRow(row)
-    self.root:node(row:create())
-    return self
+	self.root:node(row:create())
+	return self
 end
 
 function Body:create()
-    return self.root
+	return self.root
 end
 
 local Comment = Class.new(
-    function(self)
-        self.root = mw.html.create('div')
-        self.root   :addClass('brkts-popup-comment')
-                    :css('white-space', 'normal')
-                    :css('font-size', '85%')
-    end
+	function(self)
+		self.root = mw.html.create('div')
+		self.root   :addClass('brkts-popup-comment')
+					:css('white-space', 'normal')
+					:css('font-size', '85%')
+	end
 )
 
 function Comment:content(content)
-    self.root:node(content):node(Break():create())
-    return self
+	self.root:node(content):node(Break():create())
+	return self
 end
 
 function Comment:create()
-    return self.root
+	return self.root
 end
 
 local Footer = Class.new(
-    function(self)
-        self.root = mw.html.create('div')
-        self.root:addClass('brkts-popup-footer')
-        self.inner = mw.html.create('div')
-        self.inner:addClass('brkts-popup-spaced')
-    end
+	function(self)
+		self.root = mw.html.create('div')
+		self.root:addClass('brkts-popup-footer')
+		self.inner = mw.html.create('div')
+		self.inner:addClass('brkts-popup-spaced')
+	end
 )
 
 function Footer:addElement(element)
-    self.inner:node(element)
-    return self
+	self.inner:node(element)
+	return self
 end
 
 function Footer:create()
-    self.root:node(self.inner)
-    return self.root
+	self.root:node(self.inner)
+	return self.root
 end
 
 local MatchSummary = Class.new()
@@ -125,48 +125,48 @@ MatchSummary.Footer = Footer
 MatchSummary.Break = Break
 
 function MatchSummary:init(width)
-    self.root = mw.html.create('div')
-    self.root   :addClass('brkts-popup')
-                :css('width', width)
-    return self
+	self.root = mw.html.create('div')
+	self.root   :addClass('brkts-popup')
+				:css('width', width)
+	return self
 end
 
 function MatchSummary:header(header)
-    self.headerElement = header:create()
-    return self
+	self.headerElement = header:create()
+	return self
 end
 
 function MatchSummary:body(body)
-    self.bodyElement = body:create()
-    return self
+	self.bodyElement = body:create()
+	return self
 end
 
 function MatchSummary:comment(comment)
-    self.commentElement = comment:create()
-    return self
+	self.commentElement = comment:create()
+	return self
 end
 
 function MatchSummary:footer(footer)
-    self.footerElement = footer:create()
-    return self
+	self.footerElement = footer:create()
+	return self
 end
 
 function MatchSummary:create()
-    self.root   :node(self.headerElement)
-                :node(Break():create())
-                :node(self.bodyElement)
-                :node(Break():create())
+	self.root   :node(self.headerElement)
+				:node(Break():create())
+				:node(self.bodyElement)
+				:node(Break():create())
 
-    if self.commentElement ~= nil then
-        self.root   :node(self.commentElement)
-                    :node(Break():create())
-    end
+	if self.commentElement ~= nil then
+		self.root   :node(self.commentElement)
+					:node(Break():create())
+	end
 
-    if self.footerElement ~= nil then
-        self.root:node(self.footerElement)
-    end
+	if self.footerElement ~= nil then
+		self.root:node(self.footerElement)
+	end
 
-    return self.root
+	return self.root
 end
 
 return MatchSummary
