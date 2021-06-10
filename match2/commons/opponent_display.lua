@@ -26,8 +26,9 @@ function OpponentDisplay:addScores(score, score2, placement, placement2)
 
 	if score2 ~= nil then
 		local scoreTag2 = mw.html.create('div')
-		scoreTag2   :addClass('brkts-opponent-score')
-					:wikitext(score2 or '')
+		scoreTag2
+			:addClass('brkts-opponent-score')
+			:wikitext(score2 or '')
 		self.root:node(scoreTag2)
 	end
 
@@ -67,8 +68,9 @@ function BracketOpponentDisplay:createTeam(frame, name)
 				:wikitext(team.bracket)
 
 	local teamShort = mw.html.create('div')
-	teamShort   :addClass('visible-xs')
-				:wikitext(team.short)
+	teamShort
+		:addClass('visible-xs')
+		:wikitext(team.short)
 	self.content:node(teamBracket):node(teamShort)
 end
 
