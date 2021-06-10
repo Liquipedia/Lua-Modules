@@ -9,8 +9,9 @@ std = {
 		"pairs",
 		"string",
 		"tostring",
-		"tonumber",
-		"assert"
+		"tonumber"
+		"math",
+		"assert",
 	}
 }
 exclude_files = {
