@@ -3,6 +3,6 @@ std = {
 		"mw"
 	}
 }
-exclude-files = {
+exclude_files = {
 	"^\.install/"
 }
