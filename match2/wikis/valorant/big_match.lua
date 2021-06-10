@@ -79,9 +79,9 @@ end
 function BigMatch:overview(match)
 	local boxLeft = DivTable.create():setStriped(true)
 
-	local index = 1
-	while match['map' .. index] ~= nil do
-		local map = match['map' .. index]
+	local ind = 1
+	while match['map' .. ind] ~= nil do
+		local map = match['map' .. ind]
 		local didLeftWin = map.winner == 1
 		local extradata = Json.parse(map.extradata or '')
 		local scores = Json.parse(map.scores or '')
@@ -95,7 +95,7 @@ function BigMatch:overview(match)
 							:cell(mw.html.create('div'):wikitext((extradata.pick == '2') and 'Pick' or ''):addClass('map-pick'))
 		)
 
-		index = index + 1
+		ind = ind + 1
 	end
 	boxLeft = boxLeft:create()
 	boxLeft:addClass('fb-match-page-box fb-match-page-box-left fb-match-page-map-scores')
@@ -131,15 +131,15 @@ function BigMatch:stats(match, playerLookUp)
 	}
 	tabs['hide-showall'] = true
 
-	local index = 1
-	while match['map' .. index] ~= nil do
-		local map = match['map' .. index]
+	local ind = 1
+	while match['map' .. ind] ~= nil do
+		local map = match['map' .. ind]
 
 		if map.resulttype == 'np' then
 			break;
 		end
 
-		tabs['name' .. index] = 'Map ' .. index
+		tabs['name' .. ind] = 'Map ' .. ind
 
 		local divTable = DivTable.create()
 		divTable:row(
@@ -175,7 +175,7 @@ function BigMatch:stats(match, playerLookUp)
 
 		tabs['content' .. index] = tostring(divTable:create())
 
-		index = index + 1
+		ind = ind + 1
 	end
 
 	return Tabs.dynamic(tabs)
@@ -187,16 +187,16 @@ function BigMatch:economy(match, opponent1, opponent2)
 	}
 	tabs['hide-showall'] = true
 
-	local index = 1
+	local ind = 1
 
-	while match['map' .. index] ~= nil do
-		local map = match['map' .. index]
+	while match['map' .. ind] ~= nil do
+		local map = match['map' .. ind]
 
 		if map.resulttype == 'np' or map.rounds == nil then
 			break;
 		end
 
-		tabs['name' .. index] = 'Map ' .. index
+		tabs['name' .. ind] = 'Map ' .. ind
 
 		local data = {}
 		for index, round in ipairs(map.rounds) do
@@ -225,9 +225,9 @@ function BigMatch:economy(match, opponent1, opponent2)
 			},
 		})
 
-		tabs['content' .. index] = tostring(chart)
+		tabs['content' .. ind] = tostring(chart)
 
-		index = index + 1
+		ind = ind + 1
 	end
 
 	return Tabs.dynamic(tabs)
