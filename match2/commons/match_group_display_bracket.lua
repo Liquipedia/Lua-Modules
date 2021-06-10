@@ -4,10 +4,12 @@ local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
-local LuaUtils = require('Module:LuaUtils')
+local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Math = require('Module:Math')
 local TypeUtil = require('Module:TypeUtil')
 
 local html = mw.html
@@ -26,7 +28,7 @@ function BracketDisplay.configFromArgs(args)
 	return {
 		headerHeight = tonumber(args.headerHeight),
 		headerMargin = tonumber(args.headerMargin),
-		hideRoundTitles = LuaUtils.misc.readBool(args.hideRoundTitles),
+		hideRoundTitles = Logic.readBool(args.hideRoundTitles),
 		lineWidth = tonumber(args.lineWidth),
 		matchMargin = tonumber(args.matchMargin),
 		matchWidth = tonumber(args.matchWidth),
@@ -171,7 +173,7 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
 		)
 
 		-- Compute partial sums of heights of lower round matches
-		local heightSums = LuaUtils.math.partialSums(
+		local heightSums = Math.partialSums(
 			Array.map(lowerLayouts, function(layout) return layout.height end)
 		)
 
@@ -232,8 +234,8 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
 	local headMatchIds = {}
 	for matchId, _ in pairs(matchesById) do
 		if not upperMatchIds[matchId] 
-			and not LuaUtils.string.endsWith(matchId, 'RxMTP') 
-			and not LuaUtils.string.endsWith(matchId, 'RxMBR') then
+			and not String.endsWith(matchId, 'RxMTP') 
+			and not String.endsWith(matchId, 'RxMBR') then
 			table.insert(headMatchIds, matchId)
 		end
 	end
@@ -607,7 +609,7 @@ function BracketDisplay.NodeLowerConnectors(props)
 	)
 
 	-- Compute partial sums of heights of lower round matches
-	local heightSums = LuaUtils.math.partialSums(
+	local heightSums = Math.partialSums(
 		Array.map(lowerLayouts, function(layout) return layout.height end)
 	)
 
@@ -749,8 +751,8 @@ by passing in a different props.OpponentEntry in the Bracket component.
 function BracketDisplay.DefaultOpponentEntry(props)
 	local opponent = props.opponent
 
-	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and LuaUtils.lua.requireIfExists('Module:OpponentDisplay/dev')
-		or LuaUtils.lua.requireIfExists('Module:OpponentDisplay')
+	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and Lua.requireIfExists('Module:OpponentDisplay/dev')
+		or Lua.requireIfExists('Module:OpponentDisplay')
 		or {}
 	
 	if OpponentDisplay.BracketOpponentEntry then
