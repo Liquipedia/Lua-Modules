@@ -9,5 +9,5 @@ exclude_files = {
 	".luarocks"
 }
 ignore = {
-	212 -- unused argument
+	"212" -- unused argument
 }
