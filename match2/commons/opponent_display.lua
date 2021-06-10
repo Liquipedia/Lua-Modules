@@ -26,8 +26,9 @@ function OpponentDisplay:addScores(score, score2, placement, placement2)
 
 	if score2 ~= nil then
 		local scoreTag2 = mw.html.create('div')
-		scoreTag2   :addClass('brkts-opponent-score')
-					:wikitext(score2 or '')
+		scoreTag2
+			:addClass('brkts-opponent-score')
+			:wikitext(score2 or '')
 		self.root:node(scoreTag2)
 	end
 
@@ -67,8 +68,9 @@ function BracketOpponentDisplay:createTeam(frame, name)
 				:wikitext(team.bracket)
 
 	local teamShort = mw.html.create('div')
-	teamShort   :addClass('visible-xs')
-				:wikitext(team.short)
+	teamShort
+		:addClass('visible-xs')
+		:wikitext(team.short)
 	self.content:node(teamBracket):node(teamShort)
 end
 
@@ -136,17 +138,17 @@ function p.luaGet(frame, args)
 end
 
 function p._getTeam(frame, template)
-  	local teamExists = mw.ext.TeamTemplate.teamexists(template)
+	local teamExists = mw.ext.TeamTemplate.teamexists(template)
 	local team = {
 		bracket = teamExists and mw.ext.TeamTemplate.teambracket(template) or Template.safeExpand(frame, "TeamBracket", { template }),
-	  	short = teamExists and mw.ext.TeamTemplate.teamshort(template) or Template.safeExpand(frame, "TeamShort", { template })
+		short = teamExists and mw.ext.TeamTemplate.teamshort(template) or Template.safeExpand(frame, "TeamShort", { template })
 	}
 	return team
 end
 
 function p._getTeamMatchList(frame, template, side)
-  	local teamExists = mw.ext.TeamTemplate.teamexists(template)
-  	if side == "left" then
+	local teamExists = mw.ext.TeamTemplate.teamexists(template)
+	if side == "left" then
 		return teamExists and mw.ext.TeamTemplate.team2short(template) or Template.safeExpand(frame, "Team2Short", { template })
 	elseif side == "right" then
 		return teamExists and mw.ext.TeamTemplate.teamshort(template) or Template.safeExpand(frame, "TeamShort", { template })
@@ -154,14 +156,14 @@ function p._getTeamMatchList(frame, template, side)
 end
 
 function p._getScore(args)
-  	local score = ""
-  	if args.status == "S" then
+	local score = ""
+	if args.status == "S" then
 		score = args.score
 	elseif args.status ~= "" then
 		score = args.status
 	end
-  	local score2 = nil
-  	if args.score2 ~= nil and args.score2 ~= "null" then
+	local score2 = nil
+	if args.score2 ~= nil and args.score2 ~= "null" then
 		score2 = ""
 		if args.status2 == "S" then
 			score2 = args.score2
@@ -171,7 +173,7 @@ function p._getScore(args)
 	elseif args.score2 == "null" then
 		score2 = ""
 	end
-  	return score, score2
+	return score, score2
 end
 
 function p._createMatchListOpponent(frame, displayType, name, score)
