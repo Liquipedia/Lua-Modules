@@ -725,7 +725,7 @@ function BracketDisplay.NodeQualConnectors(props)
 end
 
 function BracketDisplay.getRunnerUpOpponent(match)
-	-- 2 opponents: the runner up is the one that is not the winner, assuming 
+	-- 2 opponents: the runner up is the one that is not the winner, assuming
 	-- there is a winner
 	if #match.opponents == 2 then
 		return match.winner
