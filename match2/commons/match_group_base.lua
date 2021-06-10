@@ -32,7 +32,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	bracketid = p.getBracketIdPrefix() .. bracketid
 
 	-- check if the bracket is a duplicate
-	checkBracketDuplicate(bracketid)    
+	checkBracketDuplicate(bracketid)
 
 	local storedData = {}
 	local currentMatchInWikicode = "M1"
