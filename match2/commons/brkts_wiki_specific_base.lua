@@ -1,4 +1,5 @@
 local FnUtil = require('Module:FnUtil')
+local Lua = require('Module:Lua')
 
 local WikiSpecificBase = {}
 
@@ -23,7 +24,7 @@ end
 -- format that is required by Module:MatchGroup
 -- @returns the opponent after changes have been applied
 function WikiSpecificBase.processOpponent(frame, opponent)
-  	error("This function needs to be implemented on your wiki")
+	error("This function needs to be implemented on your wiki")
 end
 
 -- called from Module:Match/Subobjects
@@ -31,7 +32,7 @@ end
 -- format that is required by Module:MatchGroup
 -- @returns the player after changes have been applied
 function WikiSpecificBase.processPlayer(frame, player)
-  	error("This function needs to be implemented on your wiki")
+	error("This function needs to be implemented on your wiki")
 end
 
 --[[
@@ -60,13 +61,12 @@ Called from MatchGroup/Display
 -- @returns module
 ]]
 WikiSpecificBase.getMatchGroupModule = function(matchGroupType)
-	local LuaUtils = require('Module:LuaUtils')
 	local DevFlags = require('Module:DevFlags')
 	if matchGroupType == 'matchlist' then
-		return DevFlags.matchGroupDev and LuaUtils.lua.requireIfExists('Module:MatchGroup/Display/Matchlist/dev')
+		return DevFlags.matchGroupDev and Lua.requireIfExists('Module:MatchGroup/Display/Matchlist/dev')
 			or require('Module:MatchGroup/Display/Matchlist')
 	else -- matchGroupType == 'bracket'
-		return DevFlags.matchGroupDev and LuaUtils.lua.requireIfExists('Module:MatchGroup/Display/Bracket/dev')
+		return DevFlags.matchGroupDev and Lua.requireIfExists('Module:MatchGroup/Display/Bracket/dev')
 			or require('Module:MatchGroup/Display/Bracket')
 	end
 end
