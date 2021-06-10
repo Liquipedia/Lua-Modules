@@ -323,12 +323,14 @@ function BracketDisplay.NodeHeader(props)
 	end
 
 	for ix, bracketData in ipairs(bracketDatas) do
+		local hasBracketResetMatch = bracketData.bracketResetMatchId
+			and props.matchesById[bracketData.bracketResetMatchId]
 		headerNode:node(
 			BracketDisplay.MatchHeader({
 				header = bracketData.header,
 				height = config.headerHeight,
 			})
-				:addClass(bracketData.bracketResetMatchId and 'brkts-br-wrapper' or nil)
+				:addClass(hasBracketResetMatch and 'brkts-br-wrapper' or nil)
 				:css('--skip-round', bracketData.skipRound)
 		)
 	end
@@ -363,12 +365,17 @@ function BracketDisplay.MatchHeader(props)
 	local headerNode = html.create('div'):addClass('brkts-header brkts-header-div')
 		:css('height', props.height .. 'px')
 		:css('line-height', props.height - 11 .. 'px')
-		:node(options[1])
+		:wikitext(options[1])
 
-	for _, option in ipairs(options) do
-		headerNode:node(
-			html.create('div'):addClass('brkts-header-option'):node(option)
-		)
+	-- Don't emit brkts-header-option if there is only one option. This is 
+	-- because the JavaScript module for changing headers supports only text, 
+	-- and will eat up tags like <abbr>.
+	if #options > 1 then
+		for _, option in ipairs(options) do
+			headerNode:node(
+				html.create('div'):addClass('brkts-header-option'):wikitext(option)
+			)
+		end
 	end
 
 	return headerNode
