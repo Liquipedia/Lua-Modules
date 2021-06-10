@@ -19,7 +19,7 @@ function p.getByMatchId(args)
 		finished = match.finished and 'true' or nil,
 	})
 
-	function renderOpponent(opponentIndex)
+	function p._renderOpponent(opponentIndex)
 		local opponent = match.opponents[opponentIndex]
 		if opponent.type == "team" or opponent.type == "literal" then
 			local template = opponentIndex == 1 and "Team2Short" or "TeamShort"
@@ -46,10 +46,10 @@ function p.getByMatchId(args)
 			:css("justify-content","flex-end")
 			:css("display","flex")
 			:css("width","45%")
-			:wikitext(renderOpponent(1)))
+			:wikitext(p._renderOpponent(1)))
 		:node(htmlCreate("div")
 			:addClass("brkts-popup-header-right")
-			:wikitext(renderOpponent(2)))
+			:wikitext(p._renderOpponent(2)))
 	wrapper:node(header):node(p._breakNode())
 
 	-- body
