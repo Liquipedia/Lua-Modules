@@ -111,12 +111,12 @@ function p._storePlayers(args, staticid, opponentIndex)
 
 	  table.insert(rawPlayers, player)
 
-	  -- lpdb save operation
-	  local res =
-	  mw.ext.LiquipediaDB.lpdb_match2player(staticid .. "_m2o_" .. opponentIndex .. "_m2p_" .. playerIndex, player)
+		-- lpdb save operation
+		local res =
+		mw.ext.LiquipediaDB.lpdb_match2player(staticid .. "_m2o_" .. opponentIndex .. "_m2p_" .. playerIndex, player)
 
-	  -- append player to string to allow setting the match2opponentid later
-	  players = players .. res
+		-- append player to string to allow setting the match2opponentid later
+		players = players .. res
 	end
 	return players, rawPlayers
 end
