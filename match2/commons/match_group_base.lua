@@ -5,7 +5,7 @@ local json = require("Module:Json")
 local Match = require("Module:Match")
 local processMatch = require("Module:Brkts/WikiSpecific").processMatch
 local utils = require("Module:LuaUtils")
-local args
+local globalArgs
 local errorCat = ''
 
 local MatchGroupDisplay = require('Module:MatchGroup/Display')
@@ -13,8 +13,8 @@ local MatchGroupDisplay = require('Module:MatchGroup/Display')
 local BRACKET_DATA_PARAMS = {"header", "tolower", "toupper", "qualwin", "quallose", "skipround"}
 
 function p.matchlist(frame)
-	args = getArgs(frame)
-	return p.luaMatchlist(frame, args)
+	globalArgs = getArgs(frame)
+	return p.luaMatchlist(frame, globalArgs)
 end
 
 function p.luaMatchlist(frame, args, matchBuilder)
@@ -26,13 +26,13 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	require('Module:DevFlags').matchGroupDev = utils.misc.readBool(args.dev)
 
 	-- make sure bracket id is valid
-	validateBracketID(bracketid)
+	p._validateBracketID(bracketid)
 
 	-- prefix id with namespace or pagename incase of user to hinder duplicates
 	bracketid = p.getBracketIdPrefix() .. bracketid
 
 	-- check if the bracket is a duplicate
-	checkBracketDuplicate(bracketid)    
+	p._checkBracketDuplicate(bracketid)
 
 	local storedData = {}
 	local currentMatchInWikicode = "M1"
@@ -99,9 +99,9 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	end
 
 	-- store match data as variable to bypass LPDB on the same page
-	utils.mw.varDefine("match2bracket_" .. bracketid, _convertDataForStorage(storedData))
+	utils.mw.varDefine("match2bracket_" .. bracketid, p._convertDataForStorage(storedData))
 	utils.mw.varDefine("match2bracketindex", utils.mw.varGet("match2bracketindex", 0) + 1)
-	
+
 	if args.hide ~= "true" then
 		return errorCat .. tostring(MatchGroupDisplay.luaMatchlist(frame, {
 			bracketid,
@@ -115,8 +115,8 @@ function p.luaMatchlist(frame, args, matchBuilder)
 end
 
 function p.bracket(frame)
-	args = getArgs(frame)
-	return p.luaBracket(frame, args)
+	globalArgs = getArgs(frame)
+	return p.luaBracket(frame, globalArgs)
 end
 
 function p.luaBracket(frame, args, matchBuilder)
@@ -132,36 +132,35 @@ function p.luaBracket(frame, args, matchBuilder)
 	require('Module:DevFlags').matchGroupDev = utils.misc.readBool(args.dev)
 
 	-- make sure bracket id is valid
-	validateBracketID(bracketid)
+	p._validateBracketID(bracketid)
 
 	-- prefix id with namespace or pagename incase of user to hinder duplicates
 	bracketid = p.getBracketIdPrefix() .. bracketid
 
 	-- check if the bracket is a duplicate
-	checkBracketDuplicate(bracketid)
-	
+	p._checkBracketDuplicate(bracketid)
 
 	-- get bracket data from template
-	local bracketData = getBracketData(templateid, bracketid)
+	local bracketData = p._getBracketData(templateid, bracketid)
 
 	local missing = ""
 	local storedData = {}
-	
+
 	--get keys of bracketData in ordered way
 	local keys = {}
 	local k = 0
-	for key, item in pairs(bracketData) do
+	for key, _ in pairs(bracketData) do
 		k = k + 1
 		keys[k] = key
 	end
 	table.sort(keys)
-	
+
 	--loop in ordered way through bracketData
 	--old loop (unordered) was set via: for dataid, bd in pairs(bracketData) do
 	for i = 1, k do
 		local dataid = keys[i]
 		local bd = bracketData[dataid]
-	
+
 		local matchid = dataid:gsub("0*([1-9])", "%1"):gsub("%-", "")
 
 		-- read match
@@ -171,7 +170,7 @@ function p.luaBracket(frame, args, matchBuilder)
 				match = json.parse(match)
 			end
 
-			validateMatchBracketData(matchid, bd)
+			p._validateMatchBracketData(matchid, bd)
 
 			match = processMatch(frame, match)
 			if matchBuilder ~= nil then
@@ -198,17 +197,13 @@ function p.luaBracket(frame, args, matchBuilder)
 				if winnerToBracket ~= nil then
 					winnerToMatch = winnerToBracket .. "_"
 				end
-				bd["winnerto"] = winnerToMatch .. _convertMatchIdentifier(winnerTo)
+				bd["winnerto"] = winnerToMatch .. p._convertMatchIdentifier(winnerTo)
 			end
 
 			local loserTo = match["loserto"]
 			if loserTo ~= nil then
 				local loserToMatch = ""
-				local loserToBracket = match["losertobracket"]
-				if loserToBracket ~= nil then
-					loserToBracket = loserToBracket .. "_"
-				end
-				bd["loserto"] = loserToMatch .. _convertMatchIdentifier(loserTo)
+				bd["loserto"] = loserToMatch .. p._convertMatchIdentifier(loserTo)
 			end
 
 			match["bracketdata"] = json.stringify(bd)
@@ -235,7 +230,7 @@ function p.luaBracket(frame, args, matchBuilder)
 	end
 
 	-- store match data as variable to bypass LPDB on the same page
-	utils.mw.varDefine("match2bracket_" .. bracketid, _convertDataForStorage(storedData))
+	utils.mw.varDefine("match2bracket_" .. bracketid, p._convertDataForStorage(storedData))
 	utils.mw.varDefine("match2bracketindex", utils.mw.varGet("match2bracketindex", 0) + 1)
 
 	if args.hide ~= "true" then
@@ -255,13 +250,13 @@ function p.luaBracket(frame, args, matchBuilder)
 end
 
 -- retrieve bracket data from bracket template
-function getBracketData(templateid, bracketid)
+function p._getBracketData(templateid, bracketid)
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
 
 	assert(type(matches) == "table")
 	local bracketData = {}
 	local count = 0
-	for index, match in ipairs(matches) do
+	for _, match in ipairs(matches) do
 		count = count + 1
 		local id = utils.string.split(match.match2id, "_")[2] or match.match2id
 		local bd = match.match2bracketdata
@@ -289,19 +284,19 @@ function getBracketData(templateid, bracketid)
 	return bracketData
 end
 
-function validateMatchBracketData(matchid, data)
+function p._validateMatchBracketData(matchid, data)
 	if data == nil then
 		error("bracketdata of match " .. matchid .. " is missing")
 	end
 
-	for index, param in ipairs(BRACKET_DATA_PARAMS) do
+	for _, param in ipairs(BRACKET_DATA_PARAMS) do
 		if data[param] == nil then
 			error("bracketdata of match " .. matchid .. " is missing parameter '" .. param .. "'")
 		end
 	end
 end
 
-function checkBracketDuplicate(bracketid)
+function p._checkBracketDuplicate(bracketid)
 	local status = mw.ext.Brackets.checkBracketDuplicate(bracketid)
 	if status ~= "ok" then
 		mw.addWarning("Bracketid '" .. bracketid .. "' is used more than once on this page.")
@@ -309,7 +304,7 @@ function checkBracketDuplicate(bracketid)
 	end
 end
 
-function validateBracketID(bracketid)
+function p._validateBracketID(bracketid)
 	local subbed, count = string.gsub(bracketid, "[0-9a-zA-Z]", "")
 	if subbed == "" and count ~= 10 then
 		error("Bracketid has the wrong length (" .. count .. " given, 10 characters expected)")
@@ -330,14 +325,14 @@ function p.getBracketIdPrefix()
 	return ""
 end
 
-function _convertMatchIdentifier(identifier)
+function p._convertMatchIdentifier(identifier)
 	local roundPrefix, roundNumber, matchPrefix, matchNumber = string.match(identifier, "(R)([0-9]*)(M)([0-9]*)")
 	return roundPrefix .. string.format("%02d", roundNumber) .. "-" .. matchPrefix .. string.format("%03d", matchNumber)
 end
 
-function _convertDataForStorage(data)
-	for i, match in ipairs(data) do
-		for j, game in ipairs(match.match2games) do
+function p._convertDataForStorage(data)
+	for _, match in ipairs(data) do
+		for _, game in ipairs(match.match2games) do
 			game.scores = json.parse(game.scores)
 		end
 	end

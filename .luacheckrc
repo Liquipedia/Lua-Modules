@@ -6,7 +6,11 @@ std = {
 		"type",
 		"table",
 		"ipairs",
-		"pairs"
+		"pairs",
+		"string",
+		"tostring",
+		"tonumber",
+		"assert"
 	}
 }
 exclude_files = {
