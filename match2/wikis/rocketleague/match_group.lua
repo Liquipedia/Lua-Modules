@@ -1,33 +1,43 @@
-local p = {}
+local Countdown = require('Module:Countdown')
+local Json = require("Module:Json")
+local MatchGroupUtil = require('Module:MatchGroup/Util')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
+local Logic = require("Module:Logic")
 
-local json = require("Module:Json")
-local utils = require("Module:LuaUtils")
 local htmlCreate = mw.html.create
 
-local _args
-local _frame
+local p = {}
 
-local config = utils.lua.moduleExists("Module:Match/Config") and require("Module:Match/Config") or {}
-local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
+function p.getByMatchId(args)
+	local match = MatchGroupUtil.fetchMatchesTable(args.bracketId)[args.matchId]
 
-function p.get(frame)
-	return p.luaGet(frame, utils.frame.getArgs(frame))
-end
-
-function p.luaGet(frame, args)
-	_frame = frame
-	_args = args
 	local wrapper = htmlCreate("div")
 		:addClass("brkts-popup")
 
-	-- parse nested tables
-	local matchExtradata = json.parse(_args.extradata or "{}")
-	local stream = json.parse(_args.stream or "{}")
-	stream.date = mw.getContentLanguage():formatDate('r', _args.date)
-	stream.finished = utils.misc.readBool(_args.finished) and "true" or ""
-
-	-- parameter
-	local vods = {}
+	local stream = Table.merge(match.stream, {
+		date = mw.getContentLanguage():formatDate('r', match.date),
+		finished = match.finished and 'true' or nil,
+	})
+	
+	function renderOpponent(opponentIndex)
+		local opponent = match.opponents[opponentIndex]
+		if opponent.type == "team" or opponent.type == "literal" then
+			local template = opponentIndex == 1 and "Team2Short" or "TeamShort"
+			return Template.safeExpand(
+				mw.getCurrentFrame(),
+				template,
+				{ opponent.template or "TBD" }
+			)
+		elseif opponent.type == "solo" then
+			local template = opponentIndex == 1 and "Player2" or "Player"
+			return Template.safeExpand(
+				mw.getCurrentFrame(),
+				template,
+				{ name = opponent.players[1].name, flag = opponent.players[1].flag }
+			)
+		end
+	end
 
 	-- header
 	local header = htmlCreate("div")
@@ -37,99 +47,93 @@ function p.luaGet(frame, args)
 			:css("justify-content","flex-end")
 			:css("display","flex")
 			:css("width","45%")
-			:wikitext(p._displayOpponent(1)))
+			:wikitext(renderOpponent(1)))
 		:node(htmlCreate("div")
 			:addClass("brkts-popup-header-right")
-			:wikitext(p._displayOpponent(2)))
+			:wikitext(renderOpponent(2)))
 	wrapper:node(header):node(p._breakNode())
-
+	
 	-- body
 	local body = htmlCreate("div"):addClass("brkts-popup-body")
 	body = p._addFlexRow(body, {
-			htmlCreate("center"):wikitext(
-				utils.frame.protectedExpansion(frame, "countdown", stream))
+			htmlCreate("center"):wikitext(Countdown._create(stream))
 				:css("display","block")
 				:css("margin","auto")
 		},
 		nil,
 		{ ["font-size"] = "85%" })
-	for index = 1, MAX_NUM_MAPS do
-		local game = "match2game" .. index .. "_"
-		local map = _args[game .. "map"]
-		if not utils.misc.isEmpty(map) then
-			local winner = _args[game .. "winner"]
-
-			local extradata, _ = json.parse(_args[game .. "extradata"])
-
+	for index, game in ipairs(match.games) do
+		if game.map then
 			local centerNode = htmlCreate("div")
 					:addClass("brkts-popup-spaced")
-					:node(htmlCreate("div"):node("[[" .. map .. "]]"))
-			if utils.misc.readBool(extradata.ot) then
+					:node(htmlCreate("div"):node("[[" .. game.map .. "]]"))
+			if Logic.readBool(game.extradata.ot) then
 				centerNode:node(htmlCreate("div"):node("- OT"))
-				if not utils.misc.isEmpty(extradata.otlength) then
-					centerNode:node(htmlCreate("div"):node("(" .. extradata.otlength .. ")"))
+				if not Logic.isEmpty(game.extradata.otlength) then
+					centerNode:node(htmlCreate("div"):node("(" .. game.extradata.otlength .. ")"))
 				end
 			end
 			local gameElements = {
 				htmlCreate("div")
 					:addClass("brkts-popup-spaced")
-					:node(tonumber(winner) == 1 and
-							"[[File:GreenCheck.png|14x14px|link=]]" or
-							"[[File:NoCheck.png|link=]]")
-					:node(htmlCreate("div"):node(_args[game .. "score1"] or "")),
+					:node(game.winner == 1 and
+						  "[[File:GreenCheck.png|14x14px|link=]]" or
+						  "[[File:NoCheck.png|link=]]")
+					:node(htmlCreate("div"):node(game.score or "")),
 				centerNode,
 				htmlCreate("div")
 					:addClass("brkts-popup-spaced")
-					:node(htmlCreate("div"):node(_args[game .. "score2"] or ""))
-					:node(tonumber(winner) == 2 and
-							"[[File:GreenCheck.png|14x14px|link=]]" or
-							"[[File:NoCheck.png|link=]]")
+					:node(htmlCreate("div"):node(game.score2 or ""))
+					:node(game.winner == 2 and
+						  "[[File:GreenCheck.png|14x14px|link=]]" or
+						  "[[File:NoCheck.png|link=]]")
 			}
-			if not utils.misc.isEmpty(extradata.comment) then
+			if game.comment then
 				table.insert(gameElements, p._breakNode())
 				table.insert(gameElements, htmlCreate("div")
-					:node(extradata.comment)
+					:node(game.comment)
 					:css("margin","auto"))
 			end
 			body = p._addFlexRow(body, gameElements, "brkts-popup-body-game")
-
-			-- add vods
-			local vod = _args[game .. "vod"]
-			if not utils.misc.isEmpty(vod) then
-				vods[index] = vod
-			end
 		end
 	end
 	wrapper:node(body):node(p._breakNode())
 
 	-- comment
-	if not utils.misc.isEmpty(matchExtradata.comment) then
+	if match.comment then
 		local comment = htmlCreate("div")
 			:addClass("brkts-popup-comment")
 			:css("white-space","normal")
 			:css("font-size","85%")
-			:node(matchExtradata.comment)
+			:node(match.comment)
 		wrapper:node(comment):node(p._breakNode())
 	end
 
 	-- footer
+	local vods = {}
+	for index, game in ipairs(match.games) do
+		if game.vod then
+			vods[index] = game.vod
+		end
+	end
+
 	local footerSet = false
 	local footer = htmlCreate("div")
 		:addClass("brkts-popup-footer")
 	local footerSpacer = htmlCreate("div")
 		:addClass("brkts-popup-spaced")
-	if not utils.misc.isEmpty(matchExtradata.octane) then
+	if not Logic.isEmpty(match.extradata.octane) then
 		footerSet = true
 		footerSpacer:node("[[File:Octane_gg.png|14x14px|link=http://octane.gg/match/" ..
-			matchExtradata.octane ..
+			match.extradata.octane ..
 			"|Octane matchpage]]")
 	end
 	for index, vod in pairs(vods) do
 		footerSet = true
-		footerSpacer:node(utils.frame.protectedExpansion(frame, "vodlink", {
+		footerSpacer:node(Template.safeExpand(mw.getCurrentFrame(), "vodlink", {
 			gamenum = index,
 			vod = vod,
-			source = '' -- todo: provide source
+			source = url
 		}))
 	end
 	if footerSet then
@@ -141,13 +145,13 @@ end
 
 function p._addFlexRow(wrapper, contentElements, class, style)
 	local node = htmlCreate("div"):addClass("brkts-popup-body-element")
-	if not utils.misc.isEmpty(class) then
+	if not Logic.isEmpty(class) then
 		node:addClass(class)
-	end
+ 	end
 	for key, val in pairs(style or {}) do
 		node:css(key, val)
 	end
-	for _, element in ipairs(contentElements) do
+	for index, element in ipairs(contentElements) do
 		node:node(element)
 	end
 	return wrapper:node(node)
@@ -156,20 +160,6 @@ end
 function p._breakNode()
 	return htmlCreate("div")
 		:addClass("brkts-popup-break")
-end
-
-function p._displayOpponent(opponentIndex)
-	local opponent = "match2opponent" .. opponentIndex .. "_"
-	local opponentType = _args[opponent .. "type"]
-	if opponentType == "team" or opponentType == "literal" or utils.misc.isEmpty(opponentType) then
-		local template = opponentIndex == 1 and "Team2Short" or "TeamShort"
-		return utils.frame.protectedExpansion(_frame, template, { _args[opponent .. "template"] or "TBD" })
-	elseif opponentType == "solo" then
-		local template = opponentIndex == 1 and "Player2" or "Player"
-		return utils.frame.protectedExpansion(
-			_frame, template, { _args[opponent .. "match2player1_name"], flag = _args[opponent .. "match2player1_flag"] })
-	end
-	return ""
 end
 
 return p
