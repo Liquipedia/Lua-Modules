@@ -1,5 +1,4 @@
 local Countdown = require('Module:Countdown')
-local Json = require("Module:Json")
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
