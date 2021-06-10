@@ -1,7 +1,8 @@
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
-local LuaUtils = require('Module:LuaUtils')
+local Logic = require('Module:Logic')
+local Variables = require('Module:Variables')
 local String = require('Module:String')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -106,7 +107,7 @@ variables before fetching from LPDB. Returns a list of records
 ordered lexicographically by matchId.
 ]]
 function MatchGroupUtil.fetchMatchRecords(bracketId)
-	local varData = LuaUtils.mw.varGet("match2bracket_" .. bracketId)
+	local varData = Variables.varDefault("match2bracket_" .. bracketId)
 	if varData then
 		return Json.parse(varData)
 	else
@@ -163,8 +164,8 @@ function MatchGroupUtil.matchFromRecord(record)
 		comment = nilIfEmpty(extradata.comment),
 		extradata = extradata,
 		date = record.date,
-		dateIsExact = LuaUtils.misc.readBool(record.dateexact),
-		finished = LuaUtils.misc.readBool(record.finished),
+		dateIsExact = Logic.readBool(record.dateexact),
+		finished = Logic.readBool(record.finished),
 		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
@@ -201,10 +202,10 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 			bracketSection = data.bracketsection,
 			header = nilIfEmpty(data.header),
 			lowerMatches = lowerMatches,
-			qualLose = LuaUtils.misc.readBool(data.quallose),
+			qualLose = Logic.readBool(data.quallose),
 			qualLoseLiteral = nilIfEmpty(data.qualLoseLiteral),
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,
-			qualWin = LuaUtils.misc.readBool(data.qualwin),
+			qualWin = Logic.readBool(data.qualwin),
 			qualWinLiteral = nilIfEmpty(data.qualWinLiteral),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
