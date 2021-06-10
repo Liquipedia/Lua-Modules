@@ -88,11 +88,11 @@ function BigMatch:overview(match)
 		local wasNotPlayed = map.resulttype == 'np'
 
 		boxLeft :row(
-			DivTable.Row()  :cell(mw.html.create('div'):wikitext((extradata.pick == '1') and 'Pick' or ''):addClass('map-pick')) 
+			DivTable.Row()  :cell(mw.html.create('div'):wikitext((extradata.pick == '1') and 'Pick' or ''):addClass('map-pick'))
 							:cell(mw.html.create('div'):wikitext(scores[1] or ''):addClass(didLeftWin and 'map-win' or 'map-lost'))
 							:cell(mw.html.create('div'):wikitext('[[' .. map.map .. ']]'):addClass(wasNotPlayed and 'not-played' or ''))
 							:cell(mw.html.create('div'):wikitext(scores[2] or ''):addClass((not didLeftWin) and 'map-win' or 'map-lost'))
-							:cell(mw.html.create('div'):wikitext((extradata.pick == '2') and 'Pick' or ''):addClass('map-pick')) 
+							:cell(mw.html.create('div'):wikitext((extradata.pick == '2') and 'Pick' or ''):addClass('map-pick'))
 		)
 
 		index = index + 1
