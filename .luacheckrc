@@ -2,7 +2,11 @@ std = {
 	read_globals = {
 		"mw",
 		"require",
-		"error"
+		"error",
+		"type",
+		"table",
+		"ipairs",
+		"pairs"
 	}
 }
 exclude_files = {
