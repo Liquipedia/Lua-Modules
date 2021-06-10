@@ -2,7 +2,11 @@ local Table = require("Module:Table")
 local WikiSpecificBase = require('Module:Brkts/WikiSpecific/Base')
 local getIconName = require("Module:IconName").luaGet
 local json = require("Module:Json")
-local utils = require("Module:LuaUtils")
+local Logic = require("Module:Logic")
+local TypeUtil = require("Module:TypeUtil")
+local String = require("Module:StringUtils")
+local Variables = require("Module:Variables")
+local Template = require("Module:Template")
 
 local _frame
 
@@ -61,7 +65,7 @@ function p.processOpponent(frame, opponent)
 	end
 
 	-- process opponent
-	if not utils.misc.isEmpty(opponent.template) then
+	if not Logic.isEmpty(opponent.template) then
 		opponent.name = opponent.name or opponentFunctions.getTeamName(opponent.template)
 	end
 
@@ -107,30 +111,30 @@ function matchFunctions.getDateStuff(match)
 	  -- parse date string with abbr
 	if not utils.misc.isEmpty(match.date) then
 		local matchString = match.date or ""
-		local timezone = utils.string.split(
-			utils.string.split(matchString, "data%-tz%=\"")[2] or "",
+		local timezone = String.split(
+			String.split(matchString, "data%-tz%=\"")[2] or "",
 			"\"")[1] or ""
-		local matchDate = utils.mw.explode(matchString, "<", 0):gsub("-", "")
+		local matchDate = String.explode(matchString, "<", 0):gsub("-", "")
 		match.date = matchDate .. timezone
-		match.dateexact = utils.string.contains(match.date, "%+") or utils.string.contains(match.date, "%-")
+		match.dateexact = String.contains(match.date, "%+") or String.contains(match.date, "%-")
 	else
 		match.date = lang:formatDate('c', (utils.mw.varGet("tournament_date", "") or "") .. " + " ..
 			utils.mw.varGet("num_missing_dates", "0") .. " second")
 		match.dateexact = false
-		utils.mw.varDefine("num_missing_dates", utils.mw.varGet("num_missing_dates", 0) + 1)
+		Variables.varDefine("num_missing_dates", Variables.varDefault("num_missing_dates", 0) + 1)
 	end
 	return match
 end
 
 function matchFunctions.getTournamentVars(match)
-	match.mode = utils.misc.emptyOr(match.mode, utils.mw.varGet("tournament_mode", "3v3"))
-	match.type = utils.misc.emptyOr(match.type, utils.mw.varGet("tournament_type"))
-	match.tournament = utils.misc.emptyOr(match.tournament, utils.mw.varGet("tournament_name"))
-	match.tickername = utils.misc.emptyOr(match.tickername, utils.mw.varGet("tournament_ticker_name"))
-	match.shortname = utils.misc.emptyOr(match.shortname, utils.mw.varGet("tournament_shortname"))
-	match.series = utils.misc.emptyOr(match.series, utils.mw.varGet("tournament_series"))
-	match.icon = utils.misc.emptyOr(match.icon, utils.mw.varGet("tournament_icon"))
-	match.liquipediatier = utils.misc.emptyOr(match.liquipediatier, utils.mw.varGet("tournament_tier"))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault("tournament_mode", "3v3"))
+	match.type = Logic.emptyOr(match.type, Variables.varDefault("tournament_type"))
+	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault("tournament_name"))
+	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault("tournament_ticker_name"))
+	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault("tournament_shortname"))
+	match.series = Logic.emptyOr(match.series, Variables.varDefault("tournament_series"))
+	match.icon = Logic.emptyOr(match.icon, Variables.varDefault("tournament_icon"))
+	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault("tournament_tier"))
 	return match
 end
 
@@ -152,8 +156,8 @@ function matchFunctions.getVodStuff(match)
 	-- apply vodgames
 	for index = 1, MAX_NUM_VODGAMES do
 		local vodgame = match["vodgame" .. index]
-		if not utils.misc.isEmpty(vodgame) then
-			local map = utils.misc.emptyOr(match["map" .. index], nil, {})
+		if not Logic.isEmpty(vodgame) then
+			local map = Logic.emptyOr(match["map" .. index], nil, {})
 			if type(map) == "string" then
 				map = json.parse(map)
 			end
@@ -168,13 +172,13 @@ function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
 	match.extradata = json.stringify({
-		matchsection = utils.mw.varGet("matchsection"),
+		matchsection = Variables.varDefault("matchsection"),
 		team1icon = getIconName(opponent1.template or ""),
 		team2icon = getIconName(opponent2.template or ""),
-		lastgame = utils.mw.varGet("last_game"),
+		lastgame = Variables.varDefault("last_game"),
 		comment = match.comment,
 		octane = match.octane,
-		liquipediatier2 = utils.mw.varGet("tournament_tier2"),
+		liquipediatier2 = Variables.varDefault("tournament_tier2"),
 		isconverted = 0
 	})
 	return match
@@ -192,10 +196,10 @@ function matchFunctions.getOpponents(args)
 				opponent = json.parse(opponent)
 			end
 			-- apply status
-			if utils.misc.isNumeric(opponent.score) then
+			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = "S"
 				isScoreSet = true
-			elseif utils.table.includes(ALLOWED_STATUSES, opponent.score) then
+			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
 				opponent.score = -1
 			end
@@ -246,9 +250,9 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 		if type(player) == "string" then
 			player = json.parse(player)
 		end
-		player.name = player.name or utils.mw.varGet(teamName .. "_p" .. playerIndex)
-		player.flag = player.flag or utils.mw.varGet(teamName .. "_p" .. playerIndex .. "flag")
-		if not utils.table.isEmpty(player) then
+		player.name = player.name or Variables.varDefault(teamName .. "_p" .. playerIndex)
+		player.flag = player.flag or Variables.varDefault(teamName .. "_p" .. playerIndex .. "flag")
+		if not Table.isEmpty(player) then
 			match["opponent" .. opponentIndex .. "_p" .. playerIndex] = player
 		end
 	end
@@ -283,7 +287,7 @@ function mapFunctions.getScoresAndWinner(map)
 			  if utils.misc.isNumeric(score) then
 				obj.status = "S"
 				obj.score = score
-			elseif utils.table.includes(ALLOWED_STATUSES, score) then
+			elseif Table.includes(ALLOWED_STATUSES, score) then
 				obj.status = score
 				obj.score = -1
 			end
@@ -338,11 +342,11 @@ function mapFunctions.getParticipantsData(map)
 				local agent = stats["agent"]
 				local averageCombatScore = stats["acs"]
 
-				participant.kills = utils.misc.isEmpty(kills) and participant.kills or kills
-				participant.deaths = utils.misc.isEmpty(deaths) and participant.deaths or deaths
-				participant.assists = utils.misc.isEmpty(assists) and participant.assists or assists
-				participant.agent = utils.misc.isEmpty(agent) and participant.agent or agent
-				participant.acs = utils.misc.isEmpty(averageCombatScore) and participant.averagecombatscore or averageCombatScore
+				participant.kills = Logic.isEmpty(kills) and participant.kills or kills
+				participant.deaths = Logic.isEmpty(deaths) and participant.deaths or deaths
+				participant.assists = Logic.isEmpty(assists) and participant.assists or assists
+				participant.agent = Logic.isEmpty(agent) and participant.agent or agent
+				participant.acs = Logic.isEmpty(averageCombatScore) and participant.averagecombatscore or averageCombatScore
 
 				if not utils.table.isEmpty(participant) then
 					participants[o .. "_" .. player] = participant
@@ -387,11 +391,11 @@ function roundFunctions.getRoundData(round)
 				local buy = stats["buy"]
 				local bank = stats["bank"]
 
-				participant.kills = utils.misc.isEmpty(kills) and participant.kills or kills
-				participant.score = utils.misc.isEmpty(score) and participant.score or score
-				participant.weapon = utils.misc.isEmpty(weapon) and participant.weapon or weapon
-				participant.buy = utils.misc.isEmpty(buy) and participant.buy or buy
-				participant.bank = utils.misc.isEmpty(bank) and participant.bank or bank
+				participant.kills = Logic.isEmpty(kills) and participant.kills or kills
+				participant.score = Logic.isEmpty(score) and participant.score or score
+				participant.weapon = Logic.isEmpty(weapon) and participant.weapon or weapon
+				participant.buy = Logic.isEmpty(buy) and participant.buy or buy
+				participant.bank = Logic.isEmpty(bank) and participant.bank or bank
 
 				if not utils.table.isEmpty(participant) then
 					participants[o .. "_" .. player] = participant
@@ -421,10 +425,10 @@ end
 --
 function opponentFunctions.getTeamName(template)
 	if template ~= nil then
-		local team = utils.frame.expandTemplate(_frame, "Team", { template })
+		local team = Template.expandTemplate(_frame, "Team", { template })
 		team = team:gsub("%&", "")
-		team = utils.string.split(team, "link=")[2]
-		team = utils.string.split(team, "]]")[1]
+		team = String.split(team, "link=")[2]
+		team = String.split(team, "]]")[1]
 		return team
 	else
 		return nil
