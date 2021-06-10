@@ -76,8 +76,7 @@ end
 --
 --
 -- function to sort out winner/placements
--- luacheck: push ignore
-function placementSortFunction(table, key1, key2)
+function p._placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
 	local op1norm = op1.status == "S"
@@ -95,7 +94,6 @@ function placementSortFunction(table, key1, key2)
 		else return true end
 	end
 end
--- luacheck: pop
 
 --
 -- match related functions
@@ -221,7 +219,7 @@ function matchFunctions.getVodStuff(match)
 	if utils.misc.readBool(args.finished) then
 		local placement = 1
 		-- luacheck: push ignore
-		for opponentIndex, opponent in utils.iter.spairs(opponents, placementSortFunction) do
+		for opponentIndex, opponent in utils.iter.spairs(opponents, p._placementSortFunction) do
 			if placement == 1 then
 				args.winner = opponentIndex
 			end
@@ -289,7 +287,7 @@ function matchFunctions.getVodStuff(match)
 		end
 	end
 	-- luacheck: push ignore
-	for scoreIndex, _ in utils.iter.spairs(indexedScores, placementSortFunction) do
+	for scoreIndex, _ in utils.iter.spairs(indexedScores, p._placementSortFunction) do
 		map.winner = scoreIndex
 		break
 	end
