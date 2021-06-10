@@ -142,7 +142,6 @@ function p.luaBracket(frame, args, matchBuilder)
 	-- check if the bracket is a duplicate
 	p._checkBracketDuplicate(bracketid)
 
-
 	-- get bracket data from template
 	local bracketData = p._getBracketData(templateid, bracketid)
 
