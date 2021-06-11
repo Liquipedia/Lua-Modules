@@ -89,7 +89,7 @@ function p._convert(mapping)
 		-- flatten nested tables like RxGx
 		local flatten = matchMapping["$flatten$"] or {}
 		local flattened = {}
-		for i, flattenIndex in ipairs(flatten) do
+		for _, flattenIndex in ipairs(flatten) do
 			local toFlatten = _args[flattenIndex] or {}
 			if type(toFlatten) == "string" then
 				toFlatten = json.parse(toFlatten)
@@ -108,9 +108,8 @@ function p._convert(mapping)
 			end
 		end
 		for realKey, val in pairs(matchMapping) do
-			if String.startsWith(realKey, "$$") then
-				-- skip reference
-			elseif type(val) == "table" then
+			local notSkipMe = not String.startsWith(realKey, "$$")
+			if notSkipMe and type(val) == "table" then
 				-- references
 				if val["$ref$"] ~= nil then
 					local subst = val["$1$"] or ""
@@ -135,10 +134,10 @@ function p._convert(mapping)
 						match[realKey] = nestedArgs
 					end
 				end
-			else
+			elseif notSkipMe then
 				local options = String.split(val, "|")
 				if Table.size(options) > 1 then
-					for i, option in ipairs(options) do
+					for _, option in ipairs(options) do
 						local set = _args[option] or flattened[option]
 						if Logic.readBool(set) then
 							match[realKey] = true
@@ -166,7 +165,6 @@ function p._getMapping(templateid, oldTemplateid)
 	else
 		return getDefaultMapping(templateid, _type)
 	end
-	return nil
 end
 
 return p
