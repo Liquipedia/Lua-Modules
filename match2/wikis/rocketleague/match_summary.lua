@@ -78,11 +78,11 @@ function p.getByMatchId(args)
 					:node(game.winner == 1 and
 						  "[[File:GreenCheck.png|14x14px|link=]]" or
 						  "[[File:NoCheck.png|link=]]")
-					:node(htmlCreate("div"):node(game.score or "")),
+					:node(htmlCreate("div"):node(game.scores[1] or "")),
 				centerNode,
 				htmlCreate("div")
 					:addClass("brkts-popup-spaced")
-					:node(htmlCreate("div"):node(game.score2 or ""))
+					:node(htmlCreate("div"):node(game.scores[1] or ""))
 					:node(game.winner == 2 and
 						  "[[File:GreenCheck.png|14x14px|link=]]" or
 						  "[[File:NoCheck.png|link=]]")
