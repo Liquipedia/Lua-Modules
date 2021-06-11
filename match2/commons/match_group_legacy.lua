@@ -2,7 +2,6 @@ local p = {}
 
 local getArgs = require("Module:Arguments").getArgs
 local json = require("Module:Json")
-local Match = require("Module:Match")
 local MatchGroup = require("Module:MatchGroup")
 local getOpponent = require("Module:Match/Subobjects").luaGetOpponent
 local getMap = require("Module:Match/Subobjects").luaGetMap
@@ -11,9 +10,6 @@ local Lua = require("Module:Lua")
 local Logic = require("Module:Logic")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
-local config = Lua.moduleExists("Module:Match/Config") and require("Module:Match/Config") or {}
-
-local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 
 local _type
 local _args
@@ -42,13 +38,13 @@ function p.get(frame)
 	if Logic.isEmpty(_type) then
 		error("argument 'type' is empty")
 	end
-	
+
 	local mapping = p._getMapping(templateid, oldTemplateid)
 
 	local newArgs = p._convert(mapping)
 	newArgs.id = bracketid
 	newArgs["1"] = templateid
-	
+
 	return MatchGroup.luaBracket(frame, newArgs)
 end
 
@@ -70,9 +66,9 @@ function p.getTemplate(frame)
 	if Logic.isEmpty(_type) then
 		error("argument 'type' is empty")
 	end
-	
+
 	local mapping = p._getMapping(templateid)
-	
+
 	local out = json.stringify(mapping, true)
 		:gsub("\"([^\n:\"]-)\":", "%1 = ")
 		:gsub("type =", "[\"type\"] =")
@@ -103,7 +99,7 @@ function p._convert(mapping)
 			end
 		end
 		matchMapping["$flatten$"] = nil
-		
+
 		-- do actual conversion
 		local match = {}
 		for key, val in pairs(flattened) do
@@ -124,8 +120,8 @@ function p._convert(mapping)
 							val[k] = v:gsub("%$1%$",subst)
 						end
 					end)
-				end	
-				
+				end
+
 				if val["$notEmpty$"] == nil or not Logic.isEmpty(_args[val["$notEmpty$"]] or flattened[val["$notEmpty$"]]) then
 					local nestedArgs = {}
 					for innerKey, innerVal in pairs(val) do
@@ -154,7 +150,7 @@ function p._convert(mapping)
 				end
 			end
 		end
-		
+
 		if not Logic.isEmpty(match) then
 			newArgs[index] = match
 		end
