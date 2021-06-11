@@ -113,7 +113,9 @@ function matchFunctions.getDateStuff(match)
 		local matchString = match.date or ""
 		local timezone = String.split(
 			String.split(matchString, "data%-tz%=\"")[2] or "",
-			"\"")[1] or ""
+			"\"")[1] or String.split(
+			String.split(matchString, "data%-tz%=\'")[2] or "",
+			"\'")[1] or ""
 		local matchDate = String.explode(matchString, "<", 0):gsub("-", "")
 		match.date = matchDate .. timezone
 		match.dateexact = String.contains(match.date, "%+") or String.contains(match.date, "%-")
