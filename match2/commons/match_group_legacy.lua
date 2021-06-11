@@ -79,8 +79,8 @@ function p.getTemplate(frame)
 		.. "return " .. out .. "\n"
 		.. "end\n\n"
 		.. "return p"
-
-	return "[[Module:MatchGroup/Legacy/" .. templateid .. "|Link to mapping]]" .. "<pre class=\"selectall\">" .. out .. "</pre>"
+	out = "[[Module:MatchGroup/Legacy/" .. templateid .. "|Link to mapping]]" .. "<pre class=\"selectall\">" .. out
+	return out .. "</pre>"
 end
 
 function p._convert(mapping)
