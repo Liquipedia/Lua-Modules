@@ -1,7 +1,5 @@
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
-local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local TypeUtil = require('Module:TypeUtil')
 

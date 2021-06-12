@@ -6,14 +6,14 @@ local Template = require('Module:Template')
 local getArgs = require("Module:Arguments").getArgs
 local String = require("Module:StringUtils")
 
-local OpponentDisplay = Class.new(
+local BaseOpponentDisplay = Class.new(
 	function(opponent)
 		opponent.root = mw.html.create('div')
 		opponent.root:addClass('brkts-opponent-wrapper')
 	end
 )
 
-function OpponentDisplay:addScores(score, score2, placement, placement2)
+function BaseOpponentDisplay:addScores(score, score2, placement, placement2)
 	if self.root == nil then
 		return
 	end
@@ -37,7 +37,7 @@ function OpponentDisplay:addScores(score, score2, placement, placement2)
 end
 
 local BracketOpponentDisplay = Class.new(
-	OpponentDisplay,
+	BaseOpponentDisplay,
 	function(bracket, frame, opponentType, name, flag)
 		if String.isEmpty(name) then
 			bracket.root = ''
@@ -129,7 +129,7 @@ function p.luaGet(frame, args)
 		return p._createMatchListOpponent(frame, displayType, args.template, p._getScore(args))
 
 	else
-		local opponent = OpponentDisplay()
+		local opponent = BaseOpponentDisplay()
 		local score1, score2 = p._getScore(args)
 		opponent:addScores(score1, score2, args.placement, args.placement2)
 		return opponent.root
@@ -207,12 +207,12 @@ function p._createMatchListOpponent(frame, displayType, name, score)
 	end
 end
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
+--local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local PlayerDisplay = require('Module:Player/Display/dev')
+local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
 local html = mw.html

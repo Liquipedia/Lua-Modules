@@ -3,19 +3,19 @@ local TypeUtil = require('Module:TypeUtil')
 local DisplayUtil = {propTypes = {}, types = {}}
 
 --[[
-Checks that the props to be used by a display component satisfy type 
-constraints. Throws if it does not. 
+Checks that the props to be used by a display component satisfy type
+constraints. Throws if it does not.
 
-For performance reasons, this only checks types of properties, and does not 
-check contents inside table properties. Specify options.maxDepth to override 
+For performance reasons, this only checks types of properties, and does not
+check contents inside table properties. Specify options.maxDepth to override
 this behavior.
 ]]
 DisplayUtil.assertPropTypes = function(props, propTypes, options)
     options = options or {}
 
     local errors = TypeUtil.checkValue(
-        props, 
-        TypeUtil.struct(propTypes), 
+        props,
+        TypeUtil.struct(propTypes),
         {maxDepth = options.maxDepth or 1, name = 'props'}
     )
     if #errors > 0 then
@@ -38,8 +38,8 @@ DisplayUtil.LuaError = function(props)
 end
 
 --[[
-Attempts to render a component written in the pure function style. If an error 
-is encountered when rendering the component, show the error and stack trace 
+Attempts to render a component written in the pure function style. If an error
+is encountered when rendering the component, show the error and stack trace
 instead of the component.
 ]]
 DisplayUtil.TryPureComponent = function(Component, props)
@@ -62,7 +62,7 @@ end
 DisplayUtil.types.OverflowModes = TypeUtil.literalUnion('ellipsis', 'wrap', 'hidden')
 
 --[[
-Specifies overflow behavior on a block element. mode can be 'ellipsis', 'wrap', 
+Specifies overflow behavior on a block element. mode can be 'ellipsis', 'wrap',
 or 'hidden'.
 ]]
 function DisplayUtil.applyOverflowStyles(node, mode)
