@@ -127,7 +127,6 @@ function p.bracket(frame)
 end
 
 function p.luaBracket(frame, args, matchBuilder)
-	local contest
 	local templateid = args["1"]
 	local bracketid = args["id"]
 	if templateid == nil or templateid == "" then
@@ -181,11 +180,6 @@ function p.luaBracket(frame, args, matchBuilder)
 		if match ~= nil then
 			if type(match) == "string" then
 				match = json.parse(match)
-			end
-
-			if contest then
-				match.contest = contest[matchid]
-				match.contestname = args.contestname
 			end
 
 			p._validateMatchBracketData(matchid, bd)
