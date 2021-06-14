@@ -86,13 +86,13 @@ function DisplayUtil.isMWHtmlNode(x)
         and getmetatable(x) == mwHtmlMetatable()
 end
 
---[[ 
+--[[
 Like Array.flatten, except that mediawiki html nodes are not considered arrays.
 ]]
 function DisplayUtil.flattenArray(elems)
     local flattened = {}
     for _, elem in ipairs(elems) do
-        if type(elem) == 'table' 
+        if type(elem) == 'table'
             and not DisplayUtil.isMWHtmlNode(elem) then
             Array.extendWith(flattened, elem)
         elseif elem then
