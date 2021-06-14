@@ -57,10 +57,10 @@ function p.store(args, shouldStoreInLpdb)
 	local staticid = bracketid .. "_" .. matchid
 
 	-- save opponents (and players) to lpdb
-	local opponents, rawOpponents = p._storeOpponents(args, staticid)
+	local opponents, rawOpponents = p._storeOpponents(args, staticid, nil, storeInLPDB)
 
 	-- save games to lpdb
-	local games, rawGames = p._storeGames(args, staticid)
+	local games, rawGames = p._storeGames(args, staticid, storeInLPDB)
 
 	-- build parameters
 	local parameters = p._buildParameters(args)
@@ -104,7 +104,7 @@ function p._storeLegacy(parameters, rawOpponents, rawGames)
 	legacy.storeMatch(rawMatch)
 end
 
-function p._storePlayers(args, staticid, opponentIndex)
+function p._storePlayers(args, staticid, opponentIndex, storeInLPDB)
 	local players = ""
 	local rawPlayers = {}
 	for playerIndex = 1, 100 do
@@ -135,7 +135,7 @@ function p._storePlayers(args, staticid, opponentIndex)
 	return players, rawPlayers
 end
 
-function p._storeOpponents(args, staticid, opponentPlayers)
+function p._storeOpponents(args, staticid, opponentPlayers, storeInLPDB)
 	local opponents = ""
 	local rawOpponents = {}
 
@@ -184,7 +184,7 @@ function p._storeOpponents(args, staticid, opponentPlayers)
 	return opponents, rawOpponents
 end
 
-function p._storeGames(args, staticid)
+function p._storeGames(args, staticid, storeInLPDB)
 	local games = ""
 	local rawGames = {}
 
