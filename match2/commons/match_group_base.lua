@@ -8,7 +8,7 @@ local Logic = require("Module:Logic")
 local Variables = require("Module:Variables")
 local String = require("Module:StringUtils")
 local globalArgs
-local errorCat = ''
+local category = ''
 
 local MatchGroupDisplay = require('Module:MatchGroup/Display')
 
@@ -23,6 +23,11 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	local bracketid = args["id"]
 	if bracketid == nil or bracketid == "" then
 		error("argument 'id' is empty")
+	end
+
+	local storeInLPDB = true
+	if args.store == 'false' then
+		storeInLPDB = false
 	end
 
 	require('Module:DevFlags').matchGroupDev = Logic.readBool(args.dev)
@@ -94,7 +99,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 		match["bracketid"] = bracketid
 
 		-- store match
-		local matchJson = Match.store(match)
+		local matchJson = Match.store(match, storeInLPDB)
 		table.insert(storedData, matchJson)
 
 		currentMatchInWikicode = nextMatchInWikicode
@@ -105,7 +110,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	Variables.varDefine("match2bracketindex", Variables.varDefault("match2bracketindex", 0) + 1)
 
 	if args.hide ~= "true" then
-		return errorCat .. tostring(MatchGroupDisplay.luaMatchlist(frame, {
+		return category .. tostring(MatchGroupDisplay.luaMatchlist(frame, {
 			bracketid,
 			attached = args.attached,
 			collapsed = args.collapsed,
@@ -113,7 +118,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 			width = args.width or args.matchWidth,
 		}))
 	end
-	return errorCat
+	return category
 end
 
 function p.bracket(frame)
@@ -122,6 +127,7 @@ function p.bracket(frame)
 end
 
 function p.luaBracket(frame, args, matchBuilder)
+	local contest
 	local templateid = args["1"]
 	local bracketid = args["id"]
 	if templateid == nil or templateid == "" then
@@ -129,6 +135,11 @@ function p.luaBracket(frame, args, matchBuilder)
 	end
 	if bracketid == nil or bracketid == "" then
 		error("argument 'id' is empty")
+	end
+
+	local storeInLPDB = true
+	if args.store == 'false' then
+		storeInLPDB = false
 	end
 
 	require('Module:DevFlags').matchGroupDev = Logic.readBool(args.dev)
@@ -170,6 +181,11 @@ function p.luaBracket(frame, args, matchBuilder)
 		if match ~= nil then
 			if type(match) == "string" then
 				match = json.parse(match)
+			end
+
+			if contest then
+				match.contest = contest[matchid]
+				match.contestname = args.contestname
 			end
 
 			p._validateMatchBracketData(matchid, bd)
@@ -219,7 +235,7 @@ function p.luaBracket(frame, args, matchBuilder)
 			match["bracketid"] = bracketid
 
 			-- store match
-			local matchJson = Match.store(match)
+			local matchJson = Match.store(match, storeInLPDB)
 			table.insert(storedData, matchJson)
 		else
 			-- stores ids of missing matches
@@ -240,7 +256,7 @@ function p.luaBracket(frame, args, matchBuilder)
 	Variables.varDefine("match2bracketindex", Variables.varDefault("match2bracketindex", 0) + 1)
 
 	if args.hide ~= "true" then
-		return errorCat .. tostring(MatchGroupDisplay.luaBracket(frame, {
+		return category .. tostring(MatchGroupDisplay.luaBracket(frame, {
 			bracketid,
 			emptyRoundTitles = args.emptyRoundTitles,
 			headerHeight = args.headerHeight,
@@ -252,7 +268,7 @@ function p.luaBracket(frame, args, matchBuilder)
 			qualifiedHeader = args.qualifiedHeader,
 		}))
 	end
-	return errorCat
+	return category
 end
 
 -- retrieve bracket data from bracket template
@@ -306,7 +322,7 @@ function p._checkBracketDuplicate(bracketid)
 	local status = mw.ext.Brackets.checkBracketDuplicate(bracketid)
 	if status ~= "ok" then
 		mw.addWarning("Bracketid '" .. bracketid .. "' is used more than once on this page.")
-		errorCat = '[[Category:Pages with duplicate Bracketid]]'
+		category = '[[Category:Pages with duplicate Bracketid]]'
 	end
 end
 
