@@ -2,6 +2,8 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local TypeUtil = require('Module:TypeUtil')
 
+local html = mw.html
+
 local DisplayUtil = {propTypes = {}, types = {}}
 
 --[[
@@ -98,6 +100,31 @@ function DisplayUtil.flattenArray(elems)
 		end
 	end
 	return flattened
+end
+
+-- Whether a value is a mediawiki html node.
+local mwHtmlMetatable = FnUtil.memoize(function()
+    return getmetatable(html.create('div'))
+end)
+function DisplayUtil.isMWHtmlNode(x)
+    return type(x) == 'table'
+        and getmetatable(x) == mwHtmlMetatable()
+end
+
+--[[ 
+Like Array.flatten, except that mediawiki html nodes are not considered arrays.
+]]
+function DisplayUtil.flattenArray(elems)
+    local flattened = {}
+    for _, elem in ipairs(elems) do
+        if type(elem) == 'table' 
+            and not DisplayUtil.isMWHtmlNode(elem) then
+            Array.extendWith(flattened, elem)
+        elseif elem then
+            table.insert(flattened, elem)
+        end
+    end
+    return flattened
 end
 
 return DisplayUtil
