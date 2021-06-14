@@ -70,13 +70,16 @@ MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
 MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
+	date = 'string',
 	header = 'string?',
 	length = 'number?',
 	map = 'string?',
 	mode = 'string?',
 	participants = 'table',
 	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
+	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
+	type = 'string?',
 	vod = 'string?',
 	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
 	winner = 'number?',
@@ -265,6 +268,7 @@ function MatchGroupUtil.gameFromRecord(record)
 	local extradata = Json.parseIfString(record.extradata) or {}
 	return {
 		comment = nilIfEmpty(extradata.comment),
+		date = record.date,
 		extradata = extradata,
 		header = nilIfEmpty(extradata.header),
 		length = tonumber(record.length),
@@ -272,7 +276,9 @@ function MatchGroupUtil.gameFromRecord(record)
 		mode = nilIfEmpty(record.mode),
 		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),
+		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
+		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
 		winner = tonumber(record.winner),

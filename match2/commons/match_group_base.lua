@@ -205,6 +205,10 @@ function p.luaBracket(frame, args, matchBuilder)
 			local loserTo = match["loserto"]
 			if loserTo ~= nil then
 				local loserToMatch = ""
+				local loserToBracket = match["losertobracket"]
+				if loserToBracket ~= nil then
+					loserToMatch = loserToBracket .. "_"
+				end
 				bd["loserto"] = loserToMatch .. p._convertMatchIdentifier(loserTo)
 			end
 
