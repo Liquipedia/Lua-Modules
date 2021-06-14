@@ -98,7 +98,7 @@ Displays an opponent as an inline element. Useful for describing opponents in
 prose.
 ]]
 function OpponentDisplay.InlineOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent)
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 
 	if opponent.type == 'team' then
@@ -133,7 +133,7 @@ Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
 function OpponentDisplay.BlockOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent)
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 
 	if opponent.type == 'team' then
