@@ -2,6 +2,8 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local TypeUtil = require('Module:TypeUtil')
 
+local html = mw.html
+
 local DisplayUtil = {propTypes = {}, types = {}}
 
 --[[
