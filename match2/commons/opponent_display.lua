@@ -211,7 +211,7 @@ end
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local PlayerDisplay = require('Module:Player/Display/dev')
+local PlayerDisplay = require('Module:Player/Display')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -225,7 +225,7 @@ OpponentDisplay.propTypes.InlineOpponent = {
 	flip = 'boolean?',
 	opponent = MatchGroupUtil.types.GameOpponent,
 	showFlag = 'boolean?',
-	showLink = 'boolean?',
+	showLink = 'boolean?', -- does not affect opponent.type == 'team'
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 }
 
@@ -234,10 +234,9 @@ Displays an opponent as an inline element. Useful for describing opponents in
 prose.
 ]]
 function OpponentDisplay.InlineOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent)
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 
-	-- TODO hide link
 	if opponent.type == 'team' then
 		return OpponentDisplay.InlineTeam({
 			flip = props.flip,
@@ -267,7 +266,7 @@ Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
 function OpponentDisplay.BlockOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent)
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 
 	if opponent.type == 'team' then

@@ -3,7 +3,7 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -66,17 +66,27 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	type = 'string',
 })
 
+MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
+	name = 'string?',
+	players = TypeUtil.optional(TypeUtil.array(MatchGroupUtil.types.Player)),
+	template = 'string?',
+	type = 'string',
+})
+
 MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
 MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
+	date = 'string',
 	header = 'string?',
 	length = 'number?',
 	map = 'string?',
 	mode = 'string?',
 	participants = 'table',
 	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
+	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
+	type = 'string?',
 	vod = 'string?',
 	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
 	winner = 'number?',
@@ -173,7 +183,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		opponents = opponents,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
-		type = nilIfEmpty(record.type),
+		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
 		winner = tonumber(record.winner),
@@ -265,6 +275,7 @@ function MatchGroupUtil.gameFromRecord(record)
 	local extradata = Json.parseIfString(record.extradata) or {}
 	return {
 		comment = nilIfEmpty(extradata.comment),
+		date = record.date,
 		extradata = extradata,
 		header = nilIfEmpty(extradata.header),
 		length = tonumber(record.length),
@@ -272,7 +283,9 @@ function MatchGroupUtil.gameFromRecord(record)
 		mode = nilIfEmpty(record.mode),
 		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),
+		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
+		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
 		winner = tonumber(record.winner),

@@ -74,9 +74,9 @@ function PlayerDisplay.InlinePlayer(props)
 	local text
 	if props.flip then
 		text = nameAndLink
-			.. (flag and '&nbsp;' .. flag or '')
+			.. (flag and ('&nbsp;' .. flag) or '')
 	else
-		text = (flag and flag .. '&nbsp;' or '')
+		text = (flag and (flag .. '&nbsp;') or '')
 			.. nameAndLink
 	end
 
