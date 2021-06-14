@@ -1,4 +1,8 @@
+local Array = require('Module:Array')
+local FnUtil = require('Module:FnUtil')
 local TypeUtil = require('Module:TypeUtil')
+
+local html = mw.html
 
 local DisplayUtil = {propTypes = {}, types = {}}
 
@@ -31,10 +35,10 @@ DisplayUtil.propTypes.LuaError = {
 -- Shows the message and stack trace of a lua error.
 DisplayUtil.LuaError = function(props)
     DisplayUtil.assertPropTypes(props, DisplayUtil.propTypes.LuaError)
-    return mw.html.create('div')
+    return html.create('div')
         :addClass('scribunto-error')
-        :node(mw.html.create('div'):wikitext(props.message))
-        :node(mw.html.create('div'):wikitext(props.backtrace))
+        :node(html.create('div'):wikitext(props.message))
+        :node(html.create('div'):wikitext(props.backtrace))
 end
 
 --[[
@@ -71,6 +75,31 @@ function DisplayUtil.applyOverflowStyles(node, mode)
         :css('overflow-wrap', mode == 'wrap' and 'break-word' or nil)
         :css('text-overflow', mode == 'ellipsis' and 'ellipsis' or nil)
         :css('white-space', (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'unset')
+end
+
+-- Whether a value is a mediawiki html node.
+local mwHtmlMetatable = FnUtil.memoize(function()
+    return getmetatable(html.create('div'))
+end)
+function DisplayUtil.isMWHtmlNode(x)
+    return type(x) == 'table'
+        and getmetatable(x) == mwHtmlMetatable()
+end
+
+--[[ 
+Like Array.flatten, except that mediawiki html nodes are not considered arrays.
+]]
+function DisplayUtil.flattenArray(elems)
+    local flattened = {}
+    for _, elem in ipairs(elems) do
+        if type(elem) == 'table' 
+            and not DisplayUtil.isMWHtmlNode(elem) then
+            Array.extendWith(flattened, elem)
+        elseif elem then
+            table.insert(flattened, elem)
+        end
+    end
+    return flattened
 end
 
 return DisplayUtil

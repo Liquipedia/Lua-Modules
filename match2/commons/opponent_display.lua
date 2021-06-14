@@ -357,7 +357,7 @@ function OpponentDisplay.BlockTeam(props)
 
 	local raw = mw.ext.TeamTemplate.raw(props.template)
 	if not raw then
-		return html.create('div').addClass('error')
+		return html.create('div'):addClass('error')
 			:wikitext('No team template exists for name ' .. props.template)
 	end
 
