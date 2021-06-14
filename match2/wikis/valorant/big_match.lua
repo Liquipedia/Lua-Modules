@@ -35,8 +35,6 @@ function BigMatch.run(frame)
 	match['matchid'] = identifiers[2]
 	Match.store(match)
 
-	mw.log('BigMatch')
-	mw.logObject(match)
 	return BigMatch:render(frame, match, tournament)
 end
 
