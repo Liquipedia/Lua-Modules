@@ -1,5 +1,3 @@
-local Helper = require('Module:MatchGroup/Display/Helper')
-
 local MatchGroupDisplay = {}
 
 function MatchGroupDisplay.bracket(frame)
@@ -9,9 +7,7 @@ end
 
 function MatchGroupDisplay.luaBracket(frame, args)
 	mw.log("drawing from lua")
-	local BracketDisplay = require('Module:DevFlags').matchGroupDev
-		and require('Module:Brkts/WikiSpecific').getMatchGroupModule('bracket')
-		or require('Module:MatchGroup/Display/Bracket')
+	local BracketDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('bracket')
 	return BracketDisplay.luaGet(frame, args)
 end
 
@@ -21,27 +17,12 @@ function MatchGroupDisplay.matchlist(frame)
 end
 
 function MatchGroupDisplay.luaMatchlist(frame, args, matches)
-	local MatchlistDisplay = require('Module:DevFlags').matchGroupDev
-		and require('Module:Brkts/WikiSpecific').getMatchGroupModule('matchlist')
-		or require('Module:MatchGroup/Display/Matchlist')
+	local MatchlistDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('matchlist')
 	return MatchlistDisplay.luaGet(frame, args, matches)
 end
 
 -- display MatchGroup (Bracket/MatchList) from ID
 function MatchGroupDisplay.Display(frame)
-	local args = require('Module:Arguments').getArgs(frame)
-	args[1] = args.id or args[1] or ''
-	local MatchGroupType = Helper.getMatchGroupType(args[1])
-
-	if MatchGroupType == 'matchlist' then
-		return MatchGroupDisplay.luaMatchlist(frame, args)
-	elseif MatchGroupType == 'bracket' then
-		return MatchGroupDisplay.luaBracket(frame, args)
-	end
-end
-
-function MatchGroupDisplay.DisplayDev(frame)
-	require('Module:DevFlags').matchGroupDev = true
 	local args = require('Module:Arguments').getArgs(frame)
 	args[1] = args.id or args[1] or ''
 	local bracketId = args[1]
@@ -55,6 +36,11 @@ function MatchGroupDisplay.DisplayDev(frame)
 
 	local MatchGroupModule = require('Module:Brkts/WikiSpecific').getMatchGroupModule(matchGroupType)
 	return MatchGroupModule.luaGet(frame, args)
+end
+
+function MatchGroupDisplay.DisplayDev(frame)
+	require('Module:DevFlags').matchGroupDev = true
+	return MatchGroupDisplay.Display(frame)
 end
 
 return MatchGroupDisplay
