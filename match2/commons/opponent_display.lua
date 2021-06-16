@@ -215,8 +215,6 @@ local PlayerDisplay = require('Module:Player/Display')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local html = mw.html
-
 local OpponentDisplay = Table.merge(p, {propTypes = {}, types = {}})
 
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket')
@@ -356,7 +354,7 @@ function OpponentDisplay.BlockTeam(props)
 
 	local raw = mw.ext.TeamTemplate.raw(props.template)
 	if not raw then
-		return html.create('div'):addClass('error')
+		return mw.html.create('div'):addClass('error')
 			:wikitext('No team template exists for name ' .. props.template)
 	end
 
@@ -364,14 +362,14 @@ function OpponentDisplay.BlockTeam(props)
 		or style == 'short' and raw.shortname
 		or style == 'bracket' and raw.bracketname
 
-	local nameNode = html.create('span'):addClass('name')
+	local nameNode = mw.html.create('span'):addClass('name')
 		:wikitext(props.showLink
 			and '[[' .. raw.page .. '|' .. displayName .. ']]'
 			or displayName
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
-	return html.create('div'):addClass('block-team')
+	return mw.html.create('div'):addClass('block-team')
 		:addClass(props.showLink == false and 'block-team-hide-link' or nil)
 		:addClass(props.flip and 'flipped' or nil)
 		:node(mw.ext.TeamTemplate.teamicon(props.template))
@@ -390,7 +388,7 @@ Displays the name of a literal opponent as a block element.
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
-	return DisplayUtil.applyOverflowStyles(html.create('div'), props.overflow or 'wrap')
+	return DisplayUtil.applyOverflowStyles(mw.html.create('div'), props.overflow or 'wrap')
 		:addClass('brkts-opponent-block-literal')
 		:addClass(props.flip and 'flipped' or nil)
 		:node(props.name)
@@ -442,9 +440,9 @@ function OpponentDisplay.BracketScore(props)
 		scoreText = '<b>' .. scoreText .. '</b>'
 	end
 
-	return html.create('div'):addClass('brkts-opponent-score-outer')
+	return mw.html.create('div'):addClass('brkts-opponent-score-outer')
 		:node(
-			html.create('div'):addClass('brkts-opponent-score-inner')
+			mw.html.create('div'):addClass('brkts-opponent-score-inner')
 				:wikitext(scoreText)
 		)
 end
