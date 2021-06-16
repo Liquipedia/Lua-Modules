@@ -122,7 +122,7 @@ function p._storePlayers(args, staticid, opponentIndex, storeInLPDB)
 				staticid .. "_m2o_" .. opponentIndex .. "_m2p_" .. playerIndex, player
 			)
 		else
-			res = playerIndex --maybe wrong, have to test
+			res = playerIndex
 		end
 
 		-- append player to string to allow setting the match2opponentid later
@@ -165,7 +165,7 @@ function p._storeOpponents(args, staticid, opponentPlayers, storeInLPDB)
 		if storeInLPDB then
 			res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. "_m2o_" .. opponentIndex, opponent, storeInLPDB)
 		else
-			res = opponentIndex --maybe wrong, have to test
+			res = opponentIndex
 		end
 
 		-- recover raw players
