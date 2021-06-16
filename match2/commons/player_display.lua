@@ -3,8 +3,6 @@ local DisplayUtil = require('Module:DisplayUtil')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local TypeUtil = require('Module:TypeUtil')
 
-local html = mw.html
-
 --[[
 Display components for players.
 ]]
@@ -26,7 +24,7 @@ function PlayerDisplay.BlockPlayer(props)
 	DisplayUtil.assertPropTypes(props, PlayerDisplay.propTypes.BlockPlayer)
 	local player = props.player
 
-	local nameNode = html.create('span'):addClass('name')
+	local nameNode = mw.html.create('span'):addClass('name')
 		:wikitext(props.showLink ~= false and player.pageName
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
 			or player.displayName
@@ -38,7 +36,7 @@ function PlayerDisplay.BlockPlayer(props)
 		flagNode = PlayerDisplay.Flag(player.flag)
 	end
 
-	return html.create('div'):addClass('block-player')
+	return mw.html.create('div'):addClass('block-player')
 		:addClass(props.flip and 'flipped' or nil)
 		:node(flagNode)
 		:node(nameNode)
@@ -80,7 +78,7 @@ function PlayerDisplay.InlinePlayer(props)
 			.. nameAndLink
 	end
 
-	return html.create('span'):addClass('inline-player')
+	return mw.html.create('span'):addClass('inline-player')
 		:addClass(props.flip and 'flipped' or nil)
 		:css('white-space', 'pre')
 		:wikitext(text)

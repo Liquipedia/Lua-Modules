@@ -2,8 +2,6 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local TypeUtil = require('Module:TypeUtil')
 
-local html = mw.html
-
 local DisplayUtil = {propTypes = {}, types = {}}
 
 --[[
@@ -35,10 +33,10 @@ DisplayUtil.propTypes.LuaError = {
 -- Shows the message and stack trace of a lua error.
 DisplayUtil.LuaError = function(props)
 	DisplayUtil.assertPropTypes(props, DisplayUtil.propTypes.LuaError)
-	return html.create('div')
+	return mw.html.create('div')
 		:addClass('scribunto-error')
-		:node(html.create('div'):wikitext(props.message))
-		:node(html.create('div'):wikitext(props.backtrace))
+		:node(mw.html.create('div'):wikitext(props.message))
+		:node(mw.html.create('div'):wikitext(props.backtrace))
 end
 
 --[[
@@ -79,7 +77,7 @@ end
 
 -- Whether a value is a mediawiki html node.
 local mwHtmlMetatable = FnUtil.memoize(function()
-	return getmetatable(html.create('div'))
+	return getmetatable(mw.html.create('div'))
 end)
 function DisplayUtil.isMwHtmlNode(x)
 	return type(x) == 'table'
