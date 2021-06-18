@@ -6,7 +6,7 @@ local Logic = require("Module:Logic")
 local Lua = require("Module:Lua")
 local Table = require("Module:Table")
 local globalArgs
-local storeInLPDB
+local storeInLpdb
 
 local legacy = Lua.moduleExists("Module:Match/Legacy") and require("Module:Match/Legacy") or nil
 local config = Lua.moduleExists("Module:Match/Config") and require("Module:Match/Config") or {}
@@ -50,8 +50,8 @@ function p.toEncodedJson(frame)
 	return json.stringify(globalArgs)
 end
 
-function p.store(args, storeInLpDB)
-	storeInLPDB = storeInLpDB
+function p.store(args, storeInLPDB)
+	storeInLpdb = storeInLPDB
 	local matchid = args["matchid"] or -1
 	local bracketid = args["bracketid"] or -1
 	local staticid = bracketid .. "_" .. matchid
@@ -72,12 +72,12 @@ function p.store(args, storeInLpDB)
 	mw.log(opponents)
 
 	-- save legacy match to lpdb
-	if args.disableLegacyStorage ~= true and legacy ~= nil and storeInLPDB then
+	if args.disableLegacyStorage ~= true and legacy ~= nil and storeInLpdb then
 		p._storeLegacy(parameters, rawOpponents, rawGames)
 	end
 
 	-- save match to lpdb
-	if storeInLPDB then
+	if storeInLpdb then
 		mw.ext.LiquipediaDB.lpdb_match2(
 			staticid,
 			parameters
@@ -119,13 +119,11 @@ function p._storePlayers(args, staticid, opponentIndex)
 
 		-- lpdb save operation
 		local res
-		if storeInLPDB then
+		if storeInLpdb then
 			res = mw.ext.LiquipediaDB.lpdb_match2player(
 				staticid .. "_m2o_" .. opponentIndex .. "_m2p_" .. playerIndex, player
 			)
 		else
-			--this is what is written into the res in the other case too
-			--just wanted to disable the storage, nothing else
 			res = playerIndex
 		end
 
@@ -159,14 +157,14 @@ function p._storeOpponents(args, staticid, opponentPlayers)
 		end
 
 		-- store players to lpdb
-		local players, rawPlayers = p._storePlayers(args, staticid, opponentIndex, storeInLPDB)
+		local players, rawPlayers = p._storePlayers(args, staticid, opponentIndex, storeInLpdb)
 
 		-- set parameters
 		opponent.match2players = players
 
 		-- lpdb save operation
 		local res
-		if storeInLPDB then
+		if storeInLpdb then
 			res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. "_m2o_" .. opponentIndex, opponent)
 		else
 			res = opponentIndex
@@ -208,7 +206,7 @@ function p._storeGames(args, staticid)
 
 		-- lpdb save operation
 		local res
-		if storeInLPDB then
+		if storeInLpdb then
 			res = mw.ext.LiquipediaDB.lpdb_match2game(staticid .. "_m2g_" .. gameIndex, game)
 		else
 			res = gameIndex
