@@ -6,6 +6,7 @@ local Logic = require("Module:Logic")
 local Lua = require("Module:Lua")
 local Table = require("Module:Table")
 local globalArgs
+local storeInLPDB
 
 local legacy = Lua.moduleExists("Module:Match/Legacy") and require("Module:Match/Legacy") or nil
 local config = Lua.moduleExists("Module:Match/Config") and require("Module:Match/Config") or {}
@@ -49,16 +50,17 @@ function p.toEncodedJson(frame)
 	return json.stringify(globalArgs)
 end
 
-function p.store(args, storeInLPDB)
+function p.store(args, storeInLpDB)
+	storeInLPDB = storeInLpDB
 	local matchid = args["matchid"] or -1
 	local bracketid = args["bracketid"] or -1
 	local staticid = bracketid .. "_" .. matchid
 
 	-- save opponents (and players) to lpdb
-	local opponents, rawOpponents = p._storeOpponents(args, staticid, nil, storeInLPDB)
+	local opponents, rawOpponents = p._storeOpponents(args, staticid)
 
 	-- save games to lpdb
-	local games, rawGames = p._storeGames(args, staticid, storeInLPDB)
+	local games, rawGames = p._storeGames(args, staticid)
 
 	-- build parameters
 	local parameters = p._buildParameters(args)
@@ -102,7 +104,7 @@ function p._storeLegacy(parameters, rawOpponents, rawGames)
 	legacy.storeMatch(rawMatch)
 end
 
-function p._storePlayers(args, staticid, opponentIndex, storeInLPDB)
+function p._storePlayers(args, staticid, opponentIndex)
 	local players = ""
 	local rawPlayers = {}
 	for playerIndex = 1, 100 do
@@ -131,7 +133,7 @@ function p._storePlayers(args, staticid, opponentIndex, storeInLPDB)
 	return players, rawPlayers
 end
 
-function p._storeOpponents(args, staticid, opponentPlayers, storeInLPDB)
+function p._storeOpponents(args, staticid, opponentPlayers)
 	local opponents = ""
 	local rawOpponents = {}
 
@@ -163,7 +165,7 @@ function p._storeOpponents(args, staticid, opponentPlayers, storeInLPDB)
 		-- lpdb save operation
 		local res
 		if storeInLPDB then
-			res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. "_m2o_" .. opponentIndex, opponent, storeInLPDB)
+			res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. "_m2o_" .. opponentIndex, opponent)
 		else
 			res = opponentIndex
 		end
@@ -178,7 +180,7 @@ function p._storeOpponents(args, staticid, opponentPlayers, storeInLPDB)
 	return opponents, rawOpponents
 end
 
-function p._storeGames(args, staticid, storeInLPDB)
+function p._storeGames(args, staticid)
 	local games = ""
 	local rawGames = {}
 
