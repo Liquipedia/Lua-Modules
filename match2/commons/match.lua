@@ -124,6 +124,8 @@ function p._storePlayers(args, staticid, opponentIndex)
 				staticid .. "_m2o_" .. opponentIndex .. "_m2p_" .. playerIndex, player
 			)
 		else
+			--this is what is written into the res in the other case too
+			--just wanted to disable the storage, nothing else
 			res = playerIndex
 		end
 
