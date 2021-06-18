@@ -207,6 +207,7 @@ function p._createMatchListOpponent(frame, displayType, name, score)
 	end
 end
 
+-- from OpponentDisplay/dev
 --local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
@@ -232,7 +233,7 @@ Displays an opponent as an inline element. Useful for describing opponents in
 prose.
 ]]
 function OpponentDisplay.InlineOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent, {maxDepth = 2})
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
 
 	if opponent.type == 'team' then
@@ -245,8 +246,11 @@ function OpponentDisplay.InlineOpponent(props)
 	elseif opponent.type == 'literal' then
 		return opponent.name or ''
 
-	else -- opponent.type == 'solo'
+	elseif opponent.type == 'solo' then
 		return OpponentDisplay.PlayerInlineOpponent(props)
+
+	else
+		error('Unrecognized opponent.type ' .. opponent.type)
 	end
 end
 
@@ -264,7 +268,7 @@ Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
 function OpponentDisplay.BlockOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
 
 	if opponent.type == 'team' then
@@ -281,7 +285,7 @@ function OpponentDisplay.BlockOpponent(props)
 			name = opponent.name or '',
 			overflow = props.overflow,
 		})
-	else -- opponent.type == 'solo'
+	elseif opponent.type == 'solo' then
 		return PlayerDisplay.BlockPlayer({
 			flip = props.flip,
 			overflow = props.overflow,
@@ -289,6 +293,8 @@ function OpponentDisplay.BlockOpponent(props)
 			showFlag = props.showFlag,
 			showLink = props.showLink,
 		})
+	else
+		error('Unrecognized opponent.type ' .. opponent.type)
 	end
 end
 
