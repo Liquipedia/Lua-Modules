@@ -124,6 +124,8 @@ function p._storePlayers(args, staticid, opponentIndex)
 				staticid .. "_m2o_" .. opponentIndex .. "_m2p_" .. playerIndex, player
 			)
 		else
+			-- the storage into Lpdb returned the playerIndex into res
+			-- so to be able to use res 4 lines further down we set it here accordingly
 			res = playerIndex
 		end
 
@@ -167,6 +169,8 @@ function p._storeOpponents(args, staticid, opponentPlayers)
 		if storeInLpdb then
 			res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. "_m2o_" .. opponentIndex, opponent)
 		else
+			-- the storage into Lpdb returned the opponentIndex into res
+			-- so to be able to use res 4 lines further down we set it here accordingly
 			res = opponentIndex
 		end
 
@@ -209,6 +213,8 @@ function p._storeGames(args, staticid)
 		if storeInLpdb then
 			res = mw.ext.LiquipediaDB.lpdb_match2game(staticid .. "_m2g_" .. gameIndex, game)
 		else
+			-- the storage into Lpdb returned the gameIndex into res
+			-- so to be able to use res 4 lines further down we set it here accordingly
 			res = gameIndex
 		end
 
