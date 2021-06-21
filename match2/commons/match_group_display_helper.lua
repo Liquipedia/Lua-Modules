@@ -7,33 +7,6 @@ local Table = require('Module:Table')
 
 local DisplayHelper = {}
 
--- flattens a table so that nested tables become keys of the root table
--- this is required for Module:MatchSummary and Module:OpponentDisplay, as they
--- expect flattened input
--- a '_' (underscore) shows a key originates from a nested table
--- e.g. { key1 = { key2 = val } } becomes { key1_key2 = val }
--- Deprecated
-function DisplayHelper.flattenArgs(args, prefix)
-	local out = {}
-	prefix = prefix or ''
-	for key, val in pairs(args) do
-		if tonumber(key) ~= nil then
-			if String.endsWith(prefix, 's_') then
-				prefix = prefix:sub(1, prefix:len() - 2)
-			end
-		end
-		if type(val) == 'table' then
-			local newArgs = DisplayHelper.flattenArgs(val, prefix .. key .. '_')
-			for newKey, newVal in pairs(newArgs) do
-				out[newKey] = newVal
-			end
-		else
-			out[prefix .. key] = tostring(val)
-		end
-	end
-	return out
-end
-
 function DisplayHelper.opponentIsTBD(opponent)
 	return opponent.type == 'literal'
 		or opponent.type == 'team' and opponent.template == 'tbd'
@@ -56,7 +29,7 @@ end
 Builds a hash of the opponent that is used to visually highlight their progress
 in the bracket.
 ]]
-function DisplayHelper.makeOpponentHighlightKey2(opponent)
+function DisplayHelper.makeOpponentHighlightKey(opponent)
 	if opponent.type == 'literal' then
 		return opponent.name and string.lower(opponent.name) or ''
 	elseif opponent.type == 'team' then
@@ -70,7 +43,7 @@ function DisplayHelper.addOpponentHighlight(node, opponent)
 	local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
 	return node
 		:addClass(canHighlight and 'brkts-opponent-hover' or nil)
-		:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(opponent) or nil)
+		:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey(opponent) or nil)
 end
 
 -- Expands a header code by making a RPC call.
