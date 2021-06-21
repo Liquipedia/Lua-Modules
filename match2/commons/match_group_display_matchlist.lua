@@ -1,10 +1,9 @@
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
+local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -135,7 +134,6 @@ function MatchlistDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Match)
 	local match = props.match
 
-	local padding = 5
 	local opponentWidth = math.floor(0.4 * props.width) - 1
 	local scoreWidth = 0.5 * (props.width - 5 - 2 * opponentWidth)
 
@@ -148,7 +146,6 @@ function MatchlistDisplay.Match(props)
 			side = opponentIx == 1 and 'left' or 'right',
 			width = opponentWidth,
 		})
-			:css('width', opponentWidth - 2 * padding .. 'px')
 		return DisplayHelper.addOpponentHighlight(opponentNode, opponent)
 	end
 
@@ -161,7 +158,6 @@ function MatchlistDisplay.Match(props)
 			side = opponentIx == 1 and 'left' or 'right',
 			width = scoreWidth,
 		})
-			:css('width', scoreWidth - 2 * padding .. 'px')
 		return DisplayHelper.addOpponentHighlight(scoreNode, opponent)
 	end
 
@@ -255,7 +251,7 @@ function MatchlistDisplay.Opponent(props)
 		showLink = false,
 		teamStyle = 'short',
 	})
-		:css('width', props.width - 2 * padding .. 'px')
+		:css('width', props.width - 2 * 5 .. 'px')
 	return html.create('td')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
 		:addClass(props.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or nil)
@@ -272,7 +268,7 @@ component.
 function MatchlistDisplay.Score(props)
 	local contentNode = html.create('div'):addClass('brkts-matchlist-score')
 		:node(OpponentDisplay.InlineScore(props.opponent))
-		:css('width', props.width - 2 * padding .. 'px')
+		:css('width', props.width - 2 * 5 .. 'px')
 	return html.create('td')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil)
 		:node(contentNode)
