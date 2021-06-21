@@ -6,6 +6,7 @@ local Logic = require("Module:Logic")
 local Lua = require("Module:Lua")
 local Table = require("Module:Table")
 local globalArgs
+local storeInLpdb
 
 local legacy = Lua.moduleExists("Module:Match/Legacy") and require("Module:Match/Legacy") or nil
 local config = Lua.moduleExists("Module:Match/Config") and require("Module:Match/Config") or {}
@@ -50,15 +51,16 @@ function p.toEncodedJson(frame)
 end
 
 function p.store(args, storeInLPDB)
+	storeInLpdb = storeInLPDB
 	local matchid = args["matchid"] or -1
 	local bracketid = args["bracketid"] or -1
 	local staticid = bracketid .. "_" .. matchid
 
 	-- save opponents (and players) to lpdb
-	local opponents, rawOpponents = p._storeOpponents(args, staticid, nil, storeInLPDB)
+	local opponents, rawOpponents = p._storeOpponents(args, staticid)
 
 	-- save games to lpdb
-	local games, rawGames = p._storeGames(args, staticid, storeInLPDB)
+	local games, rawGames = p._storeGames(args, staticid)
 
 	-- build parameters
 	local parameters = p._buildParameters(args)
@@ -70,12 +72,12 @@ function p.store(args, storeInLPDB)
 	mw.log(opponents)
 
 	-- save legacy match to lpdb
-	if args.disableLegacyStorage ~= true and legacy ~= nil and storeInLPDB then
+	if args.disableLegacyStorage ~= true and legacy ~= nil and storeInLpdb then
 		p._storeLegacy(parameters, rawOpponents, rawGames)
 	end
 
 	-- save match to lpdb
-	if storeInLPDB then
+	if storeInLpdb then
 		mw.ext.LiquipediaDB.lpdb_match2(
 			staticid,
 			parameters
@@ -102,7 +104,7 @@ function p._storeLegacy(parameters, rawOpponents, rawGames)
 	legacy.storeMatch(rawMatch)
 end
 
-function p._storePlayers(args, staticid, opponentIndex, storeInLPDB)
+function p._storePlayers(args, staticid, opponentIndex)
 	local players = ""
 	local rawPlayers = {}
 	for playerIndex = 1, 100 do
@@ -117,11 +119,13 @@ function p._storePlayers(args, staticid, opponentIndex, storeInLPDB)
 
 		-- lpdb save operation
 		local res
-		if storeInLPDB then
+		if storeInLpdb then
 			res = mw.ext.LiquipediaDB.lpdb_match2player(
 				staticid .. "_m2o_" .. opponentIndex .. "_m2p_" .. playerIndex, player
 			)
 		else
+			-- the storage into Lpdb returned the playerIndex into res
+			-- so to be able to use res 4 lines further down we set it here accordingly
 			res = playerIndex
 		end
 
@@ -131,7 +135,7 @@ function p._storePlayers(args, staticid, opponentIndex, storeInLPDB)
 	return players, rawPlayers
 end
 
-function p._storeOpponents(args, staticid, opponentPlayers, storeInLPDB)
+function p._storeOpponents(args, staticid, opponentPlayers)
 	local opponents = ""
 	local rawOpponents = {}
 
@@ -155,16 +159,18 @@ function p._storeOpponents(args, staticid, opponentPlayers, storeInLPDB)
 		end
 
 		-- store players to lpdb
-		local players, rawPlayers = p._storePlayers(args, staticid, opponentIndex, storeInLPDB)
+		local players, rawPlayers = p._storePlayers(args, staticid, opponentIndex, storeInLpdb)
 
 		-- set parameters
 		opponent.match2players = players
 
 		-- lpdb save operation
 		local res
-		if storeInLPDB then
-			res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. "_m2o_" .. opponentIndex, opponent, storeInLPDB)
+		if storeInLpdb then
+			res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. "_m2o_" .. opponentIndex, opponent)
 		else
+			-- the storage into Lpdb returned the opponentIndex into res
+			-- so to be able to use res 4 lines further down we set it here accordingly
 			res = opponentIndex
 		end
 
@@ -178,7 +184,7 @@ function p._storeOpponents(args, staticid, opponentPlayers, storeInLPDB)
 	return opponents, rawOpponents
 end
 
-function p._storeGames(args, staticid, storeInLPDB)
+function p._storeGames(args, staticid)
 	local games = ""
 	local rawGames = {}
 
@@ -204,9 +210,11 @@ function p._storeGames(args, staticid, storeInLPDB)
 
 		-- lpdb save operation
 		local res
-		if storeInLPDB then
+		if storeInLpdb then
 			res = mw.ext.LiquipediaDB.lpdb_match2game(staticid .. "_m2g_" .. gameIndex, game)
 		else
+			-- the storage into Lpdb returned the gameIndex into res
+			-- so to be able to use res 4 lines further down we set it here accordingly
 			res = gameIndex
 		end
 
