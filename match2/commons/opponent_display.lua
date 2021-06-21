@@ -369,7 +369,7 @@ function OpponentDisplay.BlockTeam(props)
 		or style == 'bracket' and raw.bracketname
 
 	local nameNode = mw.html.create('span'):addClass('name')
-		:wikitext(props.showLink
+		:wikitext(props.showLink ~= false
 			and '[[' .. raw.page .. '|' .. displayName .. ']]'
 			or displayName
 		)
