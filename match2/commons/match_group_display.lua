@@ -5,10 +5,44 @@ function MatchGroupDisplay.bracket(frame)
 	return MatchGroupDisplay.luaBracket(frame, args)
 end
 
-function MatchGroupDisplay.luaBracket(frame, args)
+function MatchGroupDisplay.customBracket(frame, args, matches)
+	if not args then
+		args = require('Module:Arguments').getArgs(frame)
+	end
+	if not matches or #matches == 0 then
+		args[1] = args.id or args[1] or ''
+
+		local MatchGroupUtil = require('Module:MatchGroup/Util')
+		matches = MatchGroupUtil.fetchMatches(args[1])
+		if #matches == 0 then
+			error('No Data found for bracketId=' .. args[1])
+		end
+	end
+
+	if (args.title or '') ~= '' then
+		matches[1].bracketData.title = args.title
+	end
+
+	for ind, match in ipairs(matches) do
+		local matchId = string.gsub(match.matchId, args[1] .. '_', '')
+		local round, matchInRound = string.match(matchId, '^R(%d+)%-M(%d+)$')
+		round = tonumber(round or '')
+		matchInRound = tonumber(matchInRound or '')
+		if round and matchInRound then
+			matchId = 'R' .. round .. 'M' .. matchInRound
+			if (args[matchId .. 'header'] or '') ~= '' then
+				matches[ind].bracketData.header = args[matchId .. 'header']
+			end
+		end
+	end
+
+	return MatchGroupDisplay.luaBracket(frame, args, matches)
+end
+
+function MatchGroupDisplay.luaBracket(frame, args, matches)
 	mw.log("drawing from lua")
 	local BracketDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('bracket')
-	return BracketDisplay.luaGet(frame, args)
+	return BracketDisplay.luaGet(frame, args, matches)
 end
 
 function MatchGroupDisplay.matchlist(frame)
