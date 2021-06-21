@@ -3,7 +3,12 @@ local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
+<<<<<<< HEAD
+=======
+local Json = require('Module:Json')
+>>>>>>> convert bracket entries
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Math = require('Module:Math')
 local OpponentDisplay = require('Module:OpponentDisplay')
