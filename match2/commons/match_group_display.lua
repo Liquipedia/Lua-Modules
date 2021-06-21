@@ -61,7 +61,10 @@ function MatchGroupDisplay.customMatchlistHeaderFromDate(frame)
 
 	for ind, _ in ipairs(matches) do
 		if (matches[ind].bracketData.header or '') == '' then
-			matches[ind].bracketData.header = countdown({ date = matches[ind].date, finished = tostring(matches[ind].finished or '')})
+			matches[ind].bracketData.header = countdown({
+				date = matches[ind].date,
+				finished = tostring(matches[ind].finished or '')
+			})
 		end
 	end
 
