@@ -1,4 +1,3 @@
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')

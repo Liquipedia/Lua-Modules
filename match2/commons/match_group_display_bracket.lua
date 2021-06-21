@@ -3,9 +3,7 @@ local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Math = require('Module:Math')
 local OpponentDisplay = require('Module:OpponentDisplay/dev')
@@ -613,7 +611,7 @@ function BracketDisplay.NodeLowerConnectors(props)
 
 	-- Compute partial sums of heights of lower round matches
 	local heightSums = Math.partialSums(
-		Array.map(lowerLayouts, function(layout) return layout.height end)
+		Array.map(lowerLayouts, function(layout_) return layout_.height end)
 	)
 
 	-- Compute joints of connectors
