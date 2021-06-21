@@ -77,34 +77,6 @@ function MatchGroupDisplay.customMatchlist(frame, args, matches)
 	return MatchGroupDisplay.luaMatchlist(frame, args, matches)
 end
 
-function MatchGroupDisplay.customMatchlistHeaderFromDate(frame)
-	local countdown = require('Module:Countdown')._create
-	local args = require('Module:Arguments').getArgs(frame)
-	args[1] = args.id or args[1] or ''
-	local bracketId = args[1]
-
-	local MatchGroupUtil = require('Module:MatchGroup/Util')
-	local matches = MatchGroupUtil.fetchMatches(bracketId)
-	if #matches == 0 then
-		error('No Data found for bracketId=' .. bracketId)
-	end
-
-	if (args.title or '') ~= '' then
-		matches[1].bracketData.title = args.title
-	end
-
-	for ind, _ in ipairs(matches) do
-		if (matches[ind].bracketData.header or '') == '' then
-			matches[ind].bracketData.header = countdown({
-				date = matches[ind].date,
-				finished = tostring(matches[ind].finished or '')
-			})
-		end
-	end
-
-	return MatchGroupDisplay.luaMatchlist(frame, args, matches)
-end
-
 function MatchGroupDisplay.luaMatchlist(frame, args, matches)
 	local MatchlistDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('matchlist')
 	return MatchlistDisplay.luaGet(frame, args, matches)
