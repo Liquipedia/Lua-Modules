@@ -1,4 +1,4 @@
-local Countdown = require('Module:Countdown')
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require("Module:Logic")
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local OpponentDisplay = require('Module:OpponentDisplay')
@@ -38,13 +38,7 @@ function p.getByMatchId(args)
 
 	-- body
 	local body = htmlCreate("div"):addClass("brkts-popup-body")
-	body = p._addFlexRow(body, {
-			htmlCreate("center"):wikitext(Countdown._create(stream))
-				:css("display","block")
-				:css("margin","auto")
-		},
-		nil,
-		{ ["font-size"] = "85%" })
+	body = p._addFlexRow(body, DisplayHelper.MatchCountdownBlock(match))
 	for _, game in ipairs(match.games) do
 		if game.map then
 			local centerNode = htmlCreate("div")

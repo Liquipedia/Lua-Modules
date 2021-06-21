@@ -82,6 +82,18 @@ function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact or 0 < #match.games
 end
 
+-- Display component showing the streams, date, and countdown of a match.
+function DisplayHelper.MatchCountdownBlock(match)
+	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
+
+	local stream = Table.merge(match.stream, {
+		date = mw.getContentLanguage():formatDate('r', match.date),
+		finished = match.finished,
+	})
+	return mw.html.create('div'):addClass('match-countdown-block')
+		:node(require('Module:Countdown')._create(stream))
+end
+
 --[[
 Display component showing the detailed summary of a match. The component will
 appear as a popup from the Matchlist and Bracket components. This is a
