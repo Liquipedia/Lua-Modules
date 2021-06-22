@@ -50,8 +50,8 @@ function p.toEncodedJson(frame)
 	return json.stringify(globalArgs)
 end
 
-function p.store(args, storeInLPDB)
-	storeInLpdb = storeInLPDB
+function p.store(args, shouldStoreInLpdb)
+	storeInLpdb = shouldStoreInLpdb
 	local matchid = args["matchid"] or -1
 	local bracketid = args["bracketid"] or -1
 	local staticid = bracketid .. "_" .. matchid
