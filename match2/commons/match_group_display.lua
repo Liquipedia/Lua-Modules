@@ -1,6 +1,6 @@
 local MatchGroupDisplay = {}
 local MatchGroupUtil
-local getArgs = require('Module:Arguments')
+local getArgs = require('Module:Arguments').getArgs
 
 function MatchGroupDisplay.bracket(frame)
 	local args = getArgs(frame)
