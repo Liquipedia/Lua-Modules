@@ -2,7 +2,6 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = {}
