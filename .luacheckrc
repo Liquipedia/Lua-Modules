@@ -15,6 +15,7 @@ std = {
 		"tonumber",
 		"tostring",
 		"type",
+		"unpack",
 		"xpcall",
 	}
 }
