@@ -2,7 +2,6 @@ local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require("Module:Logic")
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local OpponentDisplay = require('Module:OpponentDisplay')
-local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local htmlCreate = mw.html.create
@@ -14,11 +13,6 @@ function p.getByMatchId(args)
 
 	local wrapper = htmlCreate("div")
 		:addClass("brkts-popup")
-
-	local stream = Table.merge(match.stream, {
-		date = mw.getContentLanguage():formatDate('r', match.date),
-		finished = match.finished and 'true' or nil,
-	})
 
 	local function renderOpponent(opponentIndex)
 		return OpponentDisplay.BlockOpponent({
