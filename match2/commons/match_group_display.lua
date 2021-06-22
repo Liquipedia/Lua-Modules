@@ -23,9 +23,9 @@ function MatchGroupDisplay.customBracket(frame, args, matches)
 
 	for index, match in ipairs(matches) do
 		local round, matchInRound = MatchGroupDisplay._getMatchIndexFromMatchId(match.matchId, args[1])
-		
+
 		if round and matchInRound then
-			matchId = 'R' .. round .. 'M' .. matchInRound
+			local matchId = 'R' .. round .. 'M' .. matchInRound
 			if args[matchId .. 'header'] ~= '' and args[matchId .. 'header'] ~= nil then
 				matches[index].bracketData.header = args[matchId .. 'header']
 			end
