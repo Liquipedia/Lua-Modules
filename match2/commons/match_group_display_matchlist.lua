@@ -134,6 +134,8 @@ function MatchlistDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Match)
 	local match = props.match
 
+	-- Compute widths of the 2 opponent and 2 score columns. The small offsets
+	-- are due to border splitting from table-layout: auto.
 	local opponentWidth = math.floor(0.4 * props.width) - 1
 	local scoreWidth = 0.5 * (props.width - 5 - 2 * opponentWidth)
 
