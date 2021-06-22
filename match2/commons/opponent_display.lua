@@ -3,6 +3,7 @@ local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local PlayerDisplay = require('Module:Player/Display')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 
