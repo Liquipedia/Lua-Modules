@@ -98,7 +98,7 @@ function MatchGroupDisplay._getMatches(id)
 	if not MatchGroupUtil then
 		MatchGroupUtil = require('Module:MatchGroup/Util')
 	end
-	matches = MatchGroupUtil.fetchMatches(id)
+	local matches = MatchGroupUtil.fetchMatches(id)
 	if #matches == 0 then
 		error('No data found for bracketId=' .. id)
 	end
