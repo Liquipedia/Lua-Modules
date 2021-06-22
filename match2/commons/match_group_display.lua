@@ -108,7 +108,7 @@ end
 function MatchGroupDisplay._getMatchIndexFromMatchId(matchId, bracketId)
 	matchId = string.gsub(matchId, bracketId .. '_', '')
 	local round, matchInRound = string.match(matchId, '^R(%d+)%-M(%d+)$')
-	return tonumber(round or ''), tonumber(matchInRound or '')	
+	return tonumber(round or ''), tonumber(matchInRound or '')
 end
 
 return MatchGroupDisplay
