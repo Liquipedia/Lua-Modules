@@ -2,7 +2,7 @@ local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local PlayerDisplay = require('Module:Player/Display/dev')
+local PlayerDisplay = require('Module:Player/Display')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 
