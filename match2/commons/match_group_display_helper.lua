@@ -90,7 +90,7 @@ function DisplayHelper.MatchCountdownBlock(match)
 
 	local stream = Table.merge(match.stream, {
 		date = mw.getContentLanguage():formatDate('r', match.date),
-		finished = match.finished,
+		finished = match.finished and 'true' or nil,
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')
 		:node(require('Module:Countdown')._create(stream))

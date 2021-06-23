@@ -32,7 +32,7 @@ function p.getByMatchId(args)
 
 	-- body
 	local body = htmlCreate("div"):addClass("brkts-popup-body")
-	body = p._addFlexRow(body, DisplayHelper.MatchCountdownBlock(match))
+	body = p._addFlexRow(body, {DisplayHelper.MatchCountdownBlock(match)})
 	for _, game in ipairs(match.games) do
 		if game.map then
 			local centerNode = htmlCreate("div")
