@@ -100,29 +100,15 @@ function DisplayUtil.flattenArray(elems)
 	return flattened
 end
 
--- Whether a value is a mediawiki html node.
-local mwHtmlMetatable = FnUtil.memoize(function()
-	return getmetatable(html.create('div'))
-end)
-function DisplayUtil.isMwHtmlNode(x)
-	return type(x) == 'table'
-		and getmetatable(x) == mwHtmlMetatable()
-end
+--[===[
+Clears the link param in a wikicode link.
 
---[[
-Like Array.flatten, except that mediawiki html nodes are not considered arrays.
-]]
-function DisplayUtil.flattenArray(elems)
-	local flattened = {}
-	for _, elem in ipairs(elems) do
-		if type(elem) == 'table'
-			and not DisplayUtil.isMwHtmlNode(elem) then
-			Array.extendWith(flattened, elem)
-		elseif elem then
-			table.insert(flattened, elem)
-		end
-	end
-	return flattened
+Example:
+DisplayUtil.removeLinkFromWikiLink('[[File:ZergIcon.png|14px|link=Zerg]]')
+-- returns '[[File:ZergIcon.png|14px|link=]]''
+]===]
+function DisplayUtil.removeLinkFromWikiLink(text)
+	return (text:gsub('link=[^|%]]*', 'link='))
 end
 
 return DisplayUtil
