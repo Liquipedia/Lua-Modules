@@ -124,10 +124,6 @@ function p.luaGet(frame, args)
 		bracket:addScores(score1, score2, args.placement, args.placement2)
 		return bracket.root
 
-	elseif String.startsWith(displayType, "matchlist") then
-
-		return p._createMatchListOpponent(frame, displayType, args.template, p._getScore(args))
-
 	else
 		local opponent = BaseOpponentDisplay()
 		local score1, score2 = p._getScore(args)
@@ -147,17 +143,6 @@ function p._getTeam(frame, template)
 			or Template.safeExpand(frame, "TeamShort", { template })
 	}
 	return team
-end
-
-function p._getTeamMatchList(frame, template, side)
-	local teamExists = mw.ext.TeamTemplate.teamexists(template)
-	if side == "left" then
-		return teamExists
-			and mw.ext.TeamTemplate.team2short(template)
-			or Template.safeExpand(frame, "Team2Short", { template })
-	elseif side == "right" then
-		return teamExists and mw.ext.TeamTemplate.teamshort(template) or Template.safeExpand(frame, "TeamShort", { template })
-	end
 end
 
 function p._getScore(args)
@@ -181,33 +166,6 @@ function p._getScore(args)
 	return score, score2
 end
 
-function p._createMatchListOpponent(frame, displayType, name, score)
-	if displayType == 'matchlist-left' then
-		if String.isEmpty(name) then
-			return ''
-		end
-
-		local team = p._getTeamMatchList(frame, name, 'left')
-		return mw.html.create('div')
-			:addClass('brkts-matchlist-opponent-template-container')
-			:css('display', 'inline')
-			:node(team)
-	elseif displayType == 'matchlist-right' then
-		if String.isEmpty(name) then
-			return ''
-		end
-
-		local team = p._getTeamMatchList(frame, name, 'right')
-		return mw.html.create('div')
-			:addClass('brkts-matchlist-opponent-template-container')
-			:css('display', 'inline')
-			:node(team)
-	elseif displayType == 'matchlist-left-score' or displayType == 'matchlist-right-score' then
-		return score
-	end
-end
-
--- from OpponentDisplay/dev
 --local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
@@ -233,7 +191,7 @@ Displays an opponent as an inline element. Useful for describing opponents in
 prose.
 ]]
 function OpponentDisplay.InlineOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent, {maxDepth = 2})
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
 
 	if opponent.type == 'team' then
@@ -268,7 +226,7 @@ Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
 function OpponentDisplay.BlockOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
 
 	if opponent.type == 'team' then
