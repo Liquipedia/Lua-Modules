@@ -3,13 +3,12 @@ local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
+local Math = require('Module:Math')
+local OpponentDisplay = require('Module:OpponentDisplay')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Math = require('Module:Math')
 local TypeUtil = require('Module:TypeUtil')
 
 local html = mw.html
@@ -93,7 +92,7 @@ function BracketDisplay.Bracket(props)
 	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-		OpponentEntry = propsConfig.OpponentEntry or BracketDisplay.DefaultOpponentEntry,
+		OpponentEntry = propsConfig.OpponentEntry or BracketDisplay.OpponentEntry,
 		headerHeight = propsConfig.headerHeight or defaultConfig.headerHeight,
 		headerMargin = propsConfig.headerMargin or defaultConfig.headerMargin,
 		hideRoundTitles = propsConfig.hideRoundTitles or false,
@@ -130,7 +129,7 @@ function BracketDisplay.Bracket(props)
 			:node(BracketDisplay.NodeBody(nodeProps))
 	end
 
-	return html.create('div'):addClass('brkts-main brkts-main-dev')
+	return html.create('div'):addClass('brkts-main brkts-main-dev brkts-main-dev-2')
 		:node(bracketNode)
 end
 
@@ -383,7 +382,6 @@ function BracketDisplay.MatchHeader(props)
 	return headerNode
 end
 
-
 BracketDisplay.propTypes.NodeBody = {
 	config = BracketDisplay.types.BracketConfig,
 	layoutsByMatchId = TypeUtil.table('string', BracketDisplay.types.Layout),
@@ -527,17 +525,14 @@ function BracketDisplay.Match(props)
 	local matchNode = html.create('div'):addClass('brkts-match brkts-match-popup-wrapper')
 
 	for ix, opponent in ipairs(props.match.opponents) do
-		local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
 		local opponentEntryNode = props.OpponentEntry({
 			displayType = 'bracket',
 			height = props.opponentHeight,
 			opponent = opponent,
 		})
-			:addClass('brkts-opponent-entry')
-			:addClass(canHighlight and 'brkts-opponent-hover' or nil)
 			:addClass(ix == #props.match.opponents and 'brkts-opponent-entry-last' or nil)
 			:css('height', props.opponentHeight .. 'px')
-			:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(opponent) or nil)
+		DisplayHelper.addOpponentHighlight(opponentEntryNode, opponent)
 		matchNode:node(opponentEntryNode)
 	end
 
@@ -575,22 +570,16 @@ Display component for a qualification spot.
 function BracketDisplay.Qualified(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.Qualified)
 
-	local canHighlight = DisplayHelper.opponentIsHighlightable(props.opponent)
 	local opponentEntryNode = props.OpponentEntry({
 		displayType = 'bracket-qualified',
 		height = props.height,
 		opponent = props.opponent,
 	})
-		:addClass('brkts-opponent-entry brkts-opponent-entry-last')
-		:addClass(canHighlight and 'brkts-opponent-hover' or nil)
+		:addClass('brkts-opponent-entry-last')
 		:css('height', props.height .. 'px')
-		:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(props.opponent) or nil)
+	DisplayHelper.addOpponentHighlight(opponentEntryNode, props.opponent)
 
 	return html.create('div'):addClass('brkts-qualified')
-		:css('height', 'unset')
-		:css('line-height', 'unset')
-		:css('overflow', 'unset')
-		:css('white-space', 'unset')
 		:node(opponentEntryNode)
 end
 
@@ -610,7 +599,7 @@ function BracketDisplay.NodeLowerConnectors(props)
 
 	-- Compute partial sums of heights of lower round matches
 	local heightSums = Math.partialSums(
-		Array.map(lowerLayouts, function(lyt) return lyt.height end)
+		Array.map(lowerLayouts, function(l) return l.height end)
 	)
 
 	-- Compute joints of connectors
@@ -736,50 +725,24 @@ function BracketDisplay.getRunnerUpOpponent(match)
 	-- TODO remove match.finished requirement
 	else
 		return match.finished
-			and Array.find(match.opponents, function(mtch) return mtch.placement == 2 end)
+			and Array.find(match.opponents, function(opponent) return opponent.placement == 2 end)
 			or nil
 	end
 end
 
 --[[
-Display component for an opponent in a match. Shows the name and flag of the
-opponent, and their score.
+Display component for an opponent in a bracket match. Shows the name and flag
+of the opponent, as well as the opponent's scores.
 
 This is the default opponent entry component. Specific wikis may override this
 by passing in a different props.OpponentEntry in the Bracket component.
 ]]
-function BracketDisplay.DefaultOpponentEntry(props)
-	local opponent = props.opponent
-
-	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and
-		Lua.requireIfExists('Module:OpponentDisplay/dev')
-		or Lua.requireIfExists('Module:OpponentDisplay')
-		or {}
-
-	if OpponentDisplay.BracketOpponentEntry then
-		return OpponentDisplay.BracketOpponentEntry({
-			displayType = props.displayType,
-			height = props.height,
-			opponent = opponent,
-		})
-	elseif OpponentDisplay.luaGet then
-		--temp fix so that opponent extradata is available if data is inherited from storage vars
-		opponent._rawRecord.extradata = Json.parseIfString(opponent._rawRecord.extradata) or
-			opponent._rawRecord.extradata or {}
-
-		local opponentEntryAny = OpponentDisplay.luaGet(
-			mw.getCurrentFrame(),
-			Table.mergeInto(DisplayHelper.flattenArgs(opponent._rawRecord), {
-				displaytype = props.displayType,
-				matchHeight = 2 * props.height,
-			})
-		)
-		return type(opponentEntryAny) == 'string'
-			and html.create('div'):wikitext(opponentEntryAny)
-			or opponentEntryAny
-	else
-		return html.create('div')
+function BracketDisplay.OpponentEntry(props)
+	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent)
+	if props.displayType == 'bracket' then
+		opponentEntry:addScores(props.opponent)
 	end
+	return opponentEntry.root
 end
 
 return Class.export(BracketDisplay)
