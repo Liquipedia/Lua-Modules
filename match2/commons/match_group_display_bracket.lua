@@ -63,18 +63,6 @@ BracketDisplay.propTypes.BracketContainer = {
 	bracketId = 'string',
 	config = TypeUtil.optional(BracketDisplay.types.BracketConfigOptions),
 }
-function Bracket.BracketContainer(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.BracketContainer)
-    return Bracket.Bracket({
-        config = props.config,
-        matchesById = MatchGroupUtil.fetchMatchesTable(props.bracketId),
-    })
-end
-
-BracketDisplay.propTypes.Bracket = {
-    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
-    config = TypeUtil.optional(BracketDisplay.types.BracketConfigOptions),
-}
 
 --[[
 Display component for a tournament bracket. The bracket is specified by ID.
