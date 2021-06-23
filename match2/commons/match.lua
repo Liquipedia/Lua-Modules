@@ -57,7 +57,7 @@ function p.store(args, shouldStoreInLpdb)
 	local staticid = bracketid .. "_" .. matchid
 
 	-- save opponents (and players) to lpdb
-	local opponents, rawOpponents = p._storeOpponents(args, staticid)
+	local opponents, rawOpponents = p._storeOpponents(args, staticid, nil)
 
 	-- save games to lpdb
 	local games, rawGames = p._storeGames(args, staticid)
