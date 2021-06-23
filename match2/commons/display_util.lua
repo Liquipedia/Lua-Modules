@@ -77,7 +77,7 @@ end
 
 -- Whether a value is a mediawiki html node.
 local mwHtmlMetatable = FnUtil.memoize(function()
-	return getmetatable(html.create('div'))
+	return getmetatable(mw.html.create('div'))
 end)
 function DisplayUtil.isMwHtmlNode(x)
 	return type(x) == 'table'
