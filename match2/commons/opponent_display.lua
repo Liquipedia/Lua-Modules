@@ -207,6 +207,7 @@ function p._createMatchListOpponent(frame, displayType, name, score)
 	end
 end
 
+-- from OpponentDisplay/dev
 --local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
@@ -245,8 +246,11 @@ function OpponentDisplay.InlineOpponent(props)
 	elseif opponent.type == 'literal' then
 		return opponent.name or ''
 
-	else -- opponent.type == 'solo'
+	elseif opponent.type == 'solo' then
 		return OpponentDisplay.PlayerInlineOpponent(props)
+
+	else
+		error('Unrecognized opponent.type ' .. opponent.type)
 	end
 end
 
@@ -281,7 +285,7 @@ function OpponentDisplay.BlockOpponent(props)
 			name = opponent.name or '',
 			overflow = props.overflow,
 		})
-	else -- opponent.type == 'solo'
+	elseif opponent.type == 'solo' then
 		return PlayerDisplay.BlockPlayer({
 			flip = props.flip,
 			overflow = props.overflow,
@@ -289,6 +293,8 @@ function OpponentDisplay.BlockOpponent(props)
 			showFlag = props.showFlag,
 			showLink = props.showLink,
 		})
+	else
+		error('Unrecognized opponent.type ' .. opponent.type)
 	end
 end
 
@@ -363,7 +369,7 @@ function OpponentDisplay.BlockTeam(props)
 		or style == 'bracket' and raw.bracketname
 
 	local nameNode = mw.html.create('span'):addClass('name')
-		:wikitext(props.showLink
+		:wikitext(props.showLink ~= false
 			and '[[' .. raw.page .. '|' .. displayName .. ']]'
 			or displayName
 		)

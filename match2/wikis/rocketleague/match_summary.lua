@@ -1,8 +1,9 @@
 local Countdown = require('Module:Countdown')
+local Logic = require("Module:Logic")
 local MatchGroupUtil = require('Module:MatchGroup/Util')
+local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
-local Logic = require("Module:Logic")
 
 local htmlCreate = mw.html.create
 
@@ -19,37 +20,20 @@ function p.getByMatchId(args)
 		finished = match.finished and 'true' or nil,
 	})
 
-	function p._renderOpponent(opponentIndex)
-		local opponent = match.opponents[opponentIndex]
-		if opponent.type == "team" or opponent.type == "literal" then
-			local template = opponentIndex == 1 and "Team2Short" or "TeamShort"
-			return Template.safeExpand(
-				mw.getCurrentFrame(),
-				template,
-				{ opponent.template or "TBD" }
-			)
-		elseif opponent.type == "solo" then
-			local template = opponentIndex == 1 and "Player2" or "Player"
-			return Template.safeExpand(
-				mw.getCurrentFrame(),
-				template,
-				{ name = opponent.players[1].name, flag = opponent.players[1].flag }
-			)
-		end
+	local function renderOpponent(opponentIndex)
+		return OpponentDisplay.BlockOpponent({
+			flip = opponentIndex == 1,
+			opponent = match.opponents[opponentIndex],
+			overflow = 'wrap',
+			teamStyle = 'short',
+		})
+			:addClass('brkts-popup-header-opponent')
 	end
 
 	-- header
-	local header = htmlCreate("div")
-		:addClass("brkts-popup-header")
-		:node(htmlCreate("div")
-			:addClass("brkts-popup-header-left")
-			:css("justify-content","flex-end")
-			:css("display","flex")
-			:css("width","45%")
-			:wikitext(p._renderOpponent(1)))
-		:node(htmlCreate("div")
-			:addClass("brkts-popup-header-right")
-			:wikitext(p._renderOpponent(2)))
+	local header = htmlCreate('div'):addClass('brkts-popup-header-dev')
+		:node(renderOpponent(1))
+		:node(renderOpponent(2))
 	wrapper:node(header):node(p._breakNode())
 
 	-- body
@@ -82,7 +66,7 @@ function p.getByMatchId(args)
 				centerNode,
 				htmlCreate("div")
 					:addClass("brkts-popup-spaced")
-					:node(htmlCreate("div"):node(game.scores[1] or ""))
+					:node(htmlCreate("div"):node(game.scores[2] or ""))
 					:node(game.winner == 2 and
 						  "[[File:GreenCheck.png|14x14px|link=]]" or
 						  "[[File:NoCheck.png|link=]]")

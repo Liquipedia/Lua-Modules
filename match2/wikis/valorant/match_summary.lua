@@ -3,6 +3,7 @@ local Countdown = require('Module:Countdown')
 local Logic = require("Module:Logic")
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local MatchSummary = require('Module:MatchSummary/Base')
+local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
@@ -148,8 +149,8 @@ end
 
 function CustomMatchSummary._createHeader(frame, match)
 	local header = MatchSummary.Header()
-	header  :left(CustomMatchSummary._createLeftOpponent(frame, match.opponents[1]))
-			:right(CustomMatchSummary._createRightOpponent(frame, match.opponents[2]))
+	header  :left(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
+			:right(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
@@ -287,53 +288,13 @@ function CustomMatchSummary._createStreamCountdown(frame, match)
 	return Countdown._create(stream)
 end
 
-function CustomMatchSummary._createLeftOpponent(frame, opponent)
-	local container = mw.html.create('div')
-	container   :addClass('brkts-popup-header-left')
-				:css('justify-content', 'flex-end')
-				:css('display', 'flex')
-				:css('width', '45%')
-
-	local opponentNode = CustomMatchSummary._renderOpponent(
-		opponent.type,
-		function()
-			return Template.safeExpand(frame, 'Team2Short', { opponent.template or 'TBD' })
-		end,
-		function()
-			local player = opponent.players[1]
-			return Template.safeExpand(frame, 'Player2', { player.name, flag = player.flag })
-		end
-	)
-
-	container:node(opponentNode)
-	return container
-end
-
-function CustomMatchSummary._createRightOpponent(frame, opponent)
-	local container = mw.html.create('div')
-	container:addClass('brkts-popup-header-right')
-
-	local opponentNode = CustomMatchSummary._renderOpponent(
-		opponent.type,
-		function()
-			return Template.safeExpand(frame, 'TeamShort', { opponent.template or 'TBD' })
-		end,
-		function()
-			local player = opponent.players[1]
-			return Template.safeExpand(frame, 'Player', { player.name, flag = player.flag })
-		end
-	)
-
-	container:node(opponentNode)
-	return container
-end
-
-function CustomMatchSummary._renderOpponent(opponentType, renderTeam, renderPlayer)
-	if opponentType == 'solo' then
-		return renderPlayer()
-	end
-
-	return renderTeam()
+function CustomMatchSummary._createOpponent(opponent, side)
+	return OpponentDisplay.BlockOpponent({
+		flip = side == 'left',
+		opponent = opponent,
+		overflow = 'wrap',
+		teamStyle = 'short',
+	})
 end
 
 return CustomMatchSummary
