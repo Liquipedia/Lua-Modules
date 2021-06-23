@@ -66,6 +66,13 @@ function DisplayHelper.makeOpponentHighlightKey2(opponent)
 	end
 end
 
+function DisplayHelper.addOpponentHighlight(node, opponent)
+	local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
+	return node
+		:addClass(canHighlight and 'brkts-opponent-hover' or nil)
+		:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(opponent) or nil)
+end
+
 -- Expands a header code by making a RPC call.
 function DisplayHelper.expandHeaderCode(headerCode)
 	headerCode = headerCode:gsub('$', '!')

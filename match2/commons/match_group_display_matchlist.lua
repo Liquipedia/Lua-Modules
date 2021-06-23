@@ -1,10 +1,9 @@
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
+local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -75,8 +74,8 @@ function MatchlistDisplay.Matchlist(props)
 	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-		Opponent = propsConfig.Opponent or MatchlistDisplay.DefaultOpponent,
-		Score = propsConfig.Score or MatchlistDisplay.DefaultScore,
+		Opponent = propsConfig.Opponent or MatchlistDisplay.Opponent,
+		Score = propsConfig.Score or MatchlistDisplay.Score,
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
 		collapsible = Logic.emptyOr(propsConfig.collapsible, true),
@@ -104,7 +103,8 @@ function MatchlistDisplay.Matchlist(props)
 			Opponent = config.Opponent,
 			Score = config.Score,
 			match = match,
-			matchHasDetails = config.matchHasDetails
+			matchHasDetails = config.matchHasDetails,
+			width = config.width,
 		})
 
 		tableNode
@@ -113,8 +113,8 @@ function MatchlistDisplay.Matchlist(props)
 			:node(matchNode)
 	end
 
-	return html.create('div'):addClass('brkts-main')
-		:cssText(config.attached and 'padding-left:0px;padding-right:0px' or nil)
+	return html.create('div'):addClass('brkts-main brkts-main-dev-2')
+		:cssText(config.attached and 'padding-left:0px; padding-right:0px' or nil)
 		:node(tableNode)
 end
 
@@ -134,41 +134,33 @@ function MatchlistDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Match)
 	local match = props.match
 
+	-- Compute widths of the 2 opponent and 2 score columns. The small offsets
+	-- are due to border splitting from table-layout: auto.
+	local opponentWidth = math.floor(0.4 * props.width) - 1
+	local scoreWidth = 0.5 * (props.width - 5 - 2 * opponentWidth)
+
 	local renderOpponent = function(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
 
-		local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
 		local opponentNode = props.Opponent({
 			opponent = opponent,
+			resultType = match.resultType,
 			side = opponentIx == 1 and 'left' or 'right',
+			width = opponentWidth,
 		})
-		return html.create('td')
-			:addClass('brkts-matchlist-slot')
-			:addClass(canHighlight and 'brkts-opponent-hover' or nil)
-			:addClass(match.winner == opponentIx and 'brkts-matchlist-slot-winner' or nil)
-			:addClass(match.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or nil)
-			:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(opponent) or nil)
-			:attr('width', '40%')
-			:attr('align', opponentIx == 1 and 'right' or 'left')
-			:node(opponentNode)
+		return DisplayHelper.addOpponentHighlight(opponentNode, opponent)
 	end
 
 	local renderScore = function(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
 
-		local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
 		local scoreNode = props.Score({
 			opponent = opponent,
+			resultType = match.resultType,
 			side = opponentIx == 1 and 'left' or 'right',
+			width = scoreWidth,
 		})
-		return html.create('td')
-			:addClass('brkts-matchlist-slot')
-			:addClass(canHighlight and 'brkts-opponent-hover' or nil)
-			:addClass((match.winner == opponentIx or match.resultType == 'draw') and 'brkts-matchlist-slot-bold' or nil)
-			:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey2(opponent) or nil)
-			:attr('width', '10.8%')
-			:attr('align', 'center')
-			:node(scoreNode)
+		return DisplayHelper.addOpponentHighlight(scoreNode, opponent)
 	end
 
 	local matchSummaryPopupNode
@@ -249,56 +241,39 @@ end
 --[[
 Display component for an opponent in a matchlist.
 
-This is the default implementation. Specific wikis may override this by passing
-in a different props.Opponent in the Matchlist component.
+This is the default implementation used by the Matchlist component. Specific
+wikis may override this by passing a different props.Opponent to the Matchlist
+component.
 ]]
-function MatchlistDisplay.DefaultOpponent(props)
-	local opponent = props.opponent
-
-	--temp fix so that opponent extradata is available if data is inherited from storage vars
-	opponent._rawRecord.extradata = Json.parseIfString(opponent._rawRecord.extradata) or {}
-	for _, playerRecord in ipairs(opponent._rawRecord.match2players) do
-		playerRecord.extradata = Json.parseIfString(playerRecord.extradata) or {}
-	end
-
-	local OpponentDisplay = require('Module:DevFlags').matchGroupDev
-		and Lua.requireIfExists('Module:OpponentDisplay/dev')
-		or Lua.requireIfExists('Module:OpponentDisplay')
-		or {}
-	return OpponentDisplay.luaGet(
-		mw.getCurrentFrame(),
-		Table.mergeInto(DisplayHelper.flattenArgs(opponent._rawRecord), {
-			displaytype = props.side == 'left' and 'matchlist-left' or 'matchlist-right',
-		})
-	)
+function MatchlistDisplay.Opponent(props)
+	local contentNode = OpponentDisplay.BlockOpponent({
+		flip = props.side == 'left',
+		opponent = props.opponent,
+		overflow = 'ellipsis',
+		showLink = false,
+		teamStyle = 'short',
+	})
+		:css('width', props.width - 2 * 5 .. 'px')
+	return html.create('td')
+		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
+		:addClass(props.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or nil)
+		:node(contentNode)
 end
-
 
 --[[
 Display component for the score of an opponent in a matchlist.
 
-This is the default implementation. Specific wikis may override this by passing
-in a different props.Score in the Matchlist component.
+This is the default implementation used by the Matchlist component. Specific
+wikis may override this by passing a different props.Score to the Matchlist
+component.
 ]]
-function MatchlistDisplay.DefaultScore(props)
-	local opponent = props.opponent
-
-	--temp fix so that opponent extradata is available if data is inherited from storage vars
-	opponent._rawRecord.extradata = Json.parseIfString(opponent._rawRecord.extradata) or {}
-	for _, playerRecord in ipairs(opponent._rawRecord.match2players) do
-		playerRecord.extradata = Json.parseIfString(playerRecord.extradata) or {}
-	end
-
-	local OpponentDisplay = require('Module:DevFlags').matchGroupDev and
-		Lua.requireIfExists('Module:OpponentDisplay/dev')
-		or Lua.requireIfExists('Module:OpponentDisplay')
-		or {}
-	return OpponentDisplay.luaGet(
-		mw.getCurrentFrame(),
-		Table.mergeInto(DisplayHelper.flattenArgs(opponent._rawRecord), {
-			displaytype = props.side == 'left' and 'matchlist-left-score' or 'matchlist-right-score',
-		})
-	)
+function MatchlistDisplay.Score(props)
+	local contentNode = html.create('div'):addClass('brkts-matchlist-score')
+		:node(OpponentDisplay.InlineScore(props.opponent))
+		:css('width', props.width - 2 * 5 .. 'px')
+	return html.create('td')
+		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil)
+		:node(contentNode)
 end
 
 return Class.export(MatchlistDisplay)
