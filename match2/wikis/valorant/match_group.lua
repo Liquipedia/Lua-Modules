@@ -30,7 +30,7 @@ function CustomMatchGroup._getBracketData(args)
 	end
 
 	-- make sure bracket id is valid
-	MatchGroup.validateBracketID(bracketId)
+	MatchGroup._validateBracketID(bracketId)
 
 	return bracketId
 end

@@ -171,28 +171,29 @@ function MatchlistDisplay.Match(props)
 			:node(scoreNode)
 	end
 
-	local matchInfo
+	local matchSummaryPopupNode
 	if props.matchHasDetails(match) then
 		local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 			bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 			matchId = props.match.matchId,
 		})
 
-		local matchSummaryPopupNode = html.create('div')
+		matchSummaryPopupNode = html.create('div')
 			:addClass('brkts-match-info-popup')
 			:css('max-height', '80vh')
 			:css('overflow', 'auto')
 			:css('display', 'none')
 			:node(matchSummaryNode)
-
-		matchInfo = html.create('td')
-			:addClass('brkts-match-info brkts-empty-td')
-			:node(
-				html.create('div')
-					:addClass('brkts-match-info-icon')
-			)
-			:node(matchSummaryPopupNode)
 	end
+
+	local matchInfo = html.create('td')
+		:addClass('brkts-match-info brkts-empty-td')
+		:node(
+			matchSummaryPopupNode
+				and html.create('div'):addClass('brkts-match-info-icon')
+				or nil
+		)
+		:node(matchSummaryPopupNode)
 
 	return html.create('tr')
 		:addClass('brtks-matchlist-row brkts-match-popup-wrapper')

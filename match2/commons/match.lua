@@ -6,6 +6,7 @@ local Logic = require("Module:Logic")
 local Lua = require("Module:Lua")
 local Table = require("Module:Table")
 local globalArgs
+local storeInLpdb
 
 local legacy = Lua.moduleExists("Module:Match/Legacy") and require("Module:Match/Legacy") or nil
 local config = Lua.moduleExists("Module:Match/Config") and require("Module:Match/Config") or {}
@@ -49,13 +50,14 @@ function p.toEncodedJson(frame)
 	return json.stringify(globalArgs)
 end
 
-function p.store(args)
+function p.store(args, shouldStoreInLpdb)
+	storeInLpdb = shouldStoreInLpdb
 	local matchid = args["matchid"] or -1
 	local bracketid = args["bracketid"] or -1
 	local staticid = bracketid .. "_" .. matchid
 
 	-- save opponents (and players) to lpdb
-	local opponents, rawOpponents = p._storeOpponents(args, staticid)
+	local opponents, rawOpponents = p._storeOpponents(args, staticid, nil)
 
 	-- save games to lpdb
 	local games, rawGames = p._storeGames(args, staticid)
@@ -70,15 +72,17 @@ function p.store(args)
 	mw.log(opponents)
 
 	-- save legacy match to lpdb
-	if args.disableLegacyStorage ~= true and legacy ~= nil then
+	if args.disableLegacyStorage ~= true and legacy ~= nil and storeInLpdb then
 		p._storeLegacy(parameters, rawOpponents, rawGames)
 	end
 
 	-- save match to lpdb
-	mw.ext.LiquipediaDB.lpdb_match2(
-		staticid,
-		parameters
-	)
+	if storeInLpdb then
+		mw.ext.LiquipediaDB.lpdb_match2(
+			staticid,
+			parameters
+		)
+	end
 
 	-- return reconstructed json for previews
 	parameters.match2opponents = rawOpponents
@@ -114,8 +118,16 @@ function p._storePlayers(args, staticid, opponentIndex)
 		table.insert(rawPlayers, player)
 
 		-- lpdb save operation
-		local res =
-		mw.ext.LiquipediaDB.lpdb_match2player(staticid .. "_m2o_" .. opponentIndex .. "_m2p_" .. playerIndex, player)
+		local res
+		if storeInLpdb then
+			res = mw.ext.LiquipediaDB.lpdb_match2player(
+				staticid .. "_m2o_" .. opponentIndex .. "_m2p_" .. playerIndex, player
+			)
+		else
+			-- the storage into Lpdb returned the playerIndex into res
+			-- so to be able to use res 4 lines further down we set it here accordingly
+			res = playerIndex
+		end
 
 		-- append player to string to allow setting the match2opponentid later
 		players = players .. res
@@ -147,13 +159,20 @@ function p._storeOpponents(args, staticid, opponentPlayers)
 		end
 
 		-- store players to lpdb
-		local players, rawPlayers = p._storePlayers(args, staticid, opponentIndex)
+		local players, rawPlayers = p._storePlayers(args, staticid, opponentIndex, storeInLpdb)
 
 		-- set parameters
 		opponent.match2players = players
 
 		-- lpdb save operation
-		local res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. "_m2o_" .. opponentIndex, opponent)
+		local res
+		if storeInLpdb then
+			res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. "_m2o_" .. opponentIndex, opponent)
+		else
+			-- the storage into Lpdb returned the opponentIndex into res
+			-- so to be able to use res 4 lines further down we set it here accordingly
+			res = opponentIndex
+		end
 
 		-- recover raw players
 		opponent.match2players = rawPlayers
@@ -190,7 +209,14 @@ function p._storeGames(args, staticid)
 		table.insert(rawGames, game)
 
 		-- lpdb save operation
-		local res = mw.ext.LiquipediaDB.lpdb_match2game(staticid .. "_m2g_" .. gameIndex, game)
+		local res
+		if storeInLpdb then
+			res = mw.ext.LiquipediaDB.lpdb_match2game(staticid .. "_m2g_" .. gameIndex, game)
+		else
+			-- the storage into Lpdb returned the gameIndex into res
+			-- so to be able to use res 4 lines further down we set it here accordingly
+			res = gameIndex
+		end
 
 		-- append games to string to allow setting the match2id later
 		games = games .. res
