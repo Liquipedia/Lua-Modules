@@ -293,6 +293,7 @@ function OpponentDisplay.BlockOpponent(props)
 			showFlag = props.showFlag,
 			showLink = props.showLink,
 		})
+	else
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
 end
