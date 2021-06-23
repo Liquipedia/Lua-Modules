@@ -3,7 +3,7 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -62,6 +62,13 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	score2 = 'number?',
 	status = 'string?',
 	status2 = 'string?',
+	template = 'string?',
+	type = 'string',
+})
+
+MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
+	name = 'string?',
+	players = TypeUtil.optional(TypeUtil.array(MatchGroupUtil.types.Player)),
 	template = 'string?',
 	type = 'string',
 })
@@ -176,7 +183,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		opponents = opponents,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
-		type = nilIfEmpty(record.type),
+		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
 		winner = tonumber(record.winner),
