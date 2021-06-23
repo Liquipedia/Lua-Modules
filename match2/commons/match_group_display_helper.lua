@@ -93,6 +93,8 @@ function DisplayHelper.MatchCountdownBlock(match)
 		finished = match.finished and 'true' or nil,
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')
+		-- Workaround for .brkts-popup-body-element > * selector
+		:css('display', 'block')
 		:node(require('Module:Countdown')._create(stream))
 end
 
