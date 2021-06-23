@@ -6,7 +6,7 @@ local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Math = require('Module:Math')
-local OpponentDisplay = require('Module:OpponentDisplay/dev')
+local OpponentDisplay = require('Module:OpponentDisplay')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -62,18 +62,6 @@ BracketDisplay.types.BracketConfigOptions = TypeUtil.struct(
 BracketDisplay.propTypes.BracketContainer = {
 	bracketId = 'string',
 	config = TypeUtil.optional(BracketDisplay.types.BracketConfigOptions),
-}
-function Bracket.BracketContainer(props)
-    DisplayUtil.assertPropTypes(props, Bracket.propTypes.BracketContainer)
-    return Bracket.Bracket({
-        config = props.config,
-        matchesById = MatchGroupUtil.fetchMatchesTable(props.bracketId),
-    })
-end
-
-BracketDisplay.propTypes.Bracket = {
-    matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
-    config = TypeUtil.optional(BracketDisplay.types.BracketConfigOptions),
 }
 
 --[[
