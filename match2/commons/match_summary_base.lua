@@ -13,17 +13,17 @@ end
 local Header = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
-		self.root:addClass('brkts-popup-header')
+		self.root:addClass('brkts-popup-header-dev')
 	end
 )
 
 function Header:left(content)
-	self.leftElement = content
+	self.leftElement = content:addClass('brkts-popup-header-opponent')
 	return self
 end
 
 function Header:right(content)
-	self.rightElement = content
+	self.rightElement = content:addClass('brkts-popup-header-opponent')
 	return self
 end
 
