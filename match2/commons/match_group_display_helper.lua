@@ -1,7 +1,9 @@
 local Array = require('Module:Array')
+local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
+local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Table = require('Module:Table')
 
 local DisplayHelper = {}
@@ -80,6 +82,20 @@ components.
 ]]
 function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact or 0 < #match.games
+end
+
+-- Display component showing the streams, date, and countdown of a match.
+function DisplayHelper.MatchCountdownBlock(match)
+	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
+
+	local stream = Table.merge(match.stream, {
+		date = mw.getContentLanguage():formatDate('r', match.date),
+		finished = match.finished and 'true' or nil,
+	})
+	return mw.html.create('div'):addClass('match-countdown-block')
+		-- Workaround for .brkts-popup-body-element > * selector
+		:css('display', 'block')
+		:node(require('Module:Countdown')._create(stream))
 end
 
 --[[

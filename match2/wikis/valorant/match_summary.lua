@@ -1,5 +1,5 @@
 local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require("Module:Logic")
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local MatchSummary = require('Module:MatchSummary/Base')
@@ -159,10 +159,8 @@ function CustomMatchSummary._createBody(frame, match)
 	local body = MatchSummary.Body()
 
 	local streamElement = mw.html.create('center')
-	streamElement   :wikitext(CustomMatchSummary._createStreamCountdown(frame, match))
-					:css('display', 'block')
-					:css('margin', 'auto')
-	body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(streamElement))
+	streamElement:node(DisplayHelper.MatchCountdownBlock(match))
+	body:addRow(MatchSummary.Row():addElement(streamElement))
 
 	local matchPageElement = mw.html.create('center')
 	matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
@@ -277,15 +275,6 @@ function CustomMatchSummary._createCheckMark(isWinner)
 
 	container:node('[[File:NoCheck.png|link=]]')
 	return container
-end
-
-function CustomMatchSummary._createStreamCountdown(frame, match)
-	local stream = Table.merge(match.stream, {
-		date = mw.getContentLanguage():formatDate('r', match.date),
-		finished = match.finished and 'true' or nil,
-	})
-
-	return Countdown._create(stream)
 end
 
 function CustomMatchSummary._createOpponent(opponent, side)
