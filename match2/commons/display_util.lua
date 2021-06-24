@@ -108,7 +108,8 @@ DisplayUtil.removeLinkFromWikiLink('[[File:ZergIcon.png|14px|link=Zerg]]')
 -- returns '[[File:ZergIcon.png|14px|link=]]''
 ]===]
 function DisplayUtil.removeLinkFromWikiLink(text)
-	return (text:gsub('link=[^|%]]*', 'link='))
+	local textNoLink = text:gsub('link=[^|%]]*', 'link=')
+	return textNoLink
 end
 
 return DisplayUtil
