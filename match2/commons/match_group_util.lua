@@ -169,9 +169,8 @@ function MatchGroupUtil.matchFromRecord(record)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
 
 	return {
-		_rawRecord = record, --deprecated
 		bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata), #opponents),
-		comment = nilIfEmpty(extradata.comment),
+		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		date = record.date,
 		dateIsExact = Logic.readBool(record.dateexact),
@@ -233,7 +232,6 @@ end
 function MatchGroupUtil.opponentFromRecord(record)
 	local extradata = Json.parseIfString(record.extradata) or {}
 	return {
-		_rawRecord = record, --deprecated
 		extradata = extradata,
 		icon = nilIfEmpty(record.icon),
 		name = nilIfEmpty(record.name),
@@ -248,7 +246,6 @@ end
 
 function MatchGroupUtil.createOpponent(args)
 	return {
-		_rawRecord = args, --deprecated
 		extradata = args.extradata or {},
 		icon = args.icon,
 		name = args.name,
@@ -274,10 +271,10 @@ end
 function MatchGroupUtil.gameFromRecord(record)
 	local extradata = Json.parseIfString(record.extradata) or {}
 	return {
-		comment = nilIfEmpty(extradata.comment),
+		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
 		extradata = extradata,
-		header = nilIfEmpty(extradata.header),
+		header = nilIfEmpty(Table.extract(extradata, 'header')),
 		length = tonumber(record.length),
 		map = nilIfEmpty(record.map),
 		mode = nilIfEmpty(record.mode),
