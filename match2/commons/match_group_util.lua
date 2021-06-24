@@ -111,6 +111,13 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	winner = 'number?',
 })
 
+MatchGroupUtil.types.Team = TypeUtil.struct({
+	bracketName = 'string',
+	displayName = 'string',
+	pageName = 'string?',
+	shortName = 'string',
+})
+
 --[[
 Fetches all matches in a matchlist or bracket. Tries to read from page
 variables before fetching from LPDB. Returns a list of records
@@ -310,6 +317,23 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	end
 
 	return mergedMatch
+end
+
+--[[
+Fetches information about a team via mw.ext.TeamTemplate.
+]]
+function MatchGroupUtil.fetchTeam(template)
+	local rawTeam = mw.ext.TeamTemplate.raw(template)
+	if not rawTeam then
+		return nil
+	end
+
+	return {
+		bracketName = rawTeam.bracketname,
+		displayName = rawTeam.name,
+		pageName = rawTeam.page,
+		shortName = rawTeam.shortname,
+	}
 end
 
 return MatchGroupUtil

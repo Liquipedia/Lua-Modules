@@ -3,6 +3,7 @@ local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local PlayerDisplay = require('Module:Player/Display')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -31,14 +32,14 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 )
 
 function OpponentDisplay.BracketOpponentEntry:createTeam(template)
-	local bracketStyleNode = OpponentDisplay.BlockTeam({
+	local bracketStyleNode = OpponentDisplay.BlockTeamContainer({
 		overflow = 'ellipsis',
 		showLink = false,
 		style = 'bracket',
 		template = template,
 	})
 		:addClass('hidden-xs')
-	local shortStyleNode = OpponentDisplay.BlockTeam({
+	local shortStyleNode = OpponentDisplay.BlockTeamContainer({
 		overflow = 'hidden',
 		showLink = false,
 		style = 'short',
@@ -80,7 +81,8 @@ function OpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	end
 	self.root:node(score2Node)
 
-	if (opponent.placement2 or opponent.placement or 0) == 1 then
+	if (opponent.placement2 or opponent.placement or 0) == 1
+		or opponent.extradata.advances == 'true' then
 		self.root:addClass('brkts-opponent-win')
 	end
 end
@@ -102,7 +104,7 @@ function OpponentDisplay.InlineOpponent(props)
 	local opponent = props.opponent
 
 	if opponent.type == 'team' then
-		return OpponentDisplay.InlineTeam({
+		return OpponentDisplay.InlineTeamContainer({
 			flip = props.flip,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
@@ -137,7 +139,7 @@ function OpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 
 	if opponent.type == 'team' then
-		return OpponentDisplay.BlockTeam({
+		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
 			showLink = props.showLink,
@@ -163,17 +165,17 @@ function OpponentDisplay.BlockOpponent(props)
 	end
 end
 
-OpponentDisplay.propTypes.InlineTeam = {
+OpponentDisplay.propTypes.InlineTeamContainer = {
 	flip = 'boolean?',
 	style = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 	template = 'string',
 }
 
 --[[
-Displays a team as an inline element.
+Displays a team as an inline element. The team is specified by a template.
 ]]
-function OpponentDisplay.InlineTeam(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineTeam)
+function OpponentDisplay.InlineTeamContainer(props)
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineTeamContainer)
 
 	local teamExists = mw.ext.TeamTemplate.teamexists(props.template)
 	if props.style == 'standard' or not props.style then
@@ -207,7 +209,28 @@ function OpponentDisplay.InlineTeam(props)
 	end
 end
 
-OpponentDisplay.propTypes.BlockTeam = {
+OpponentDisplay.propTypes.InlineTeam = {
+	flip = 'boolean?',
+	style = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
+	team = MatchGroupUtil.types.Team,
+}
+
+--[[
+Displays a team as an inline element. The team is specified by a team struct.
+Only the default icon is supported.
+]]
+function OpponentDisplay.InlineTeam(props)
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineTeam)
+	return OpponentDisplay.InlineTeamContainer(Table.merge(props, {
+		template = 'default',
+	}))
+		:gsub('DefaultPage', props.team.pageName)
+		:gsub('DefaultName', props.team.displayName)
+		:gsub('DefaultShort', props.team.shortName)
+		:gsub('DefaultBracket', props.team.bracketName)
+end
+
+OpponentDisplay.propTypes.BlockTeamContainer = {
 	flip = 'boolean?',
 	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
 	showLink = 'boolean?',
@@ -217,25 +240,48 @@ OpponentDisplay.propTypes.BlockTeam = {
 
 --[[
 Displays a team as a block element. The width of the component is determined by
-its layout context, and not of the team name.
+its layout context, and not of the team name. The team is specified by template.
+]]
+function OpponentDisplay.BlockTeamContainer(props)
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockTeamContainer)
+
+	local team = MatchGroupUtil.fetchTeam(props.template)
+	if not team then
+		return mw.html.create('div'):addClass('error')
+			:wikitext('No team template exists for name ' .. props.template)
+	end
+
+	return OpponentDisplay.BlockTeam(Table.merge(props, {
+		icon = mw.ext.TeamTemplate.teamicon(props.template),
+		team = team,
+	}))
+end
+
+OpponentDisplay.propTypes.BlockTeam = {
+	flip = 'boolean?',
+	icon = 'any',
+	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
+	showLink = 'boolean?',
+	style = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
+	team = MatchGroupUtil.types.Team,
+}
+
+--[[
+Displays a team as a block element. The width of the component is determined by
+its layout context, and not of the team name. The team is specified by a team
+struct and icon wikitext.
 ]]
 function OpponentDisplay.BlockTeam(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockTeam)
 	local style = props.style or 'standard'
 
-	local raw = mw.ext.TeamTemplate.raw(props.template)
-	if not raw then
-		return mw.html.create('div'):addClass('error')
-			:wikitext('No team template exists for name ' .. props.template)
-	end
-
-	local displayName = style == 'standard' and raw.name
-		or style == 'short' and raw.shortname
-		or style == 'bracket' and raw.bracketname
+	local displayName = style == 'standard' and props.team.displayName
+		or style == 'short' and props.team.shortName
+		or style == 'bracket' and props.team.bracketName
 
 	local nameNode = mw.html.create('span'):addClass('name')
-		:wikitext(props.showLink ~= false
-			and '[[' .. raw.page .. '|' .. displayName .. ']]'
+		:wikitext(props.showLink ~= false and props.team.pageName
+			and '[[' .. props.team.pageName .. '|' .. displayName .. ']]'
 			or displayName
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
@@ -243,7 +289,7 @@ function OpponentDisplay.BlockTeam(props)
 	return mw.html.create('div'):addClass('block-team')
 		:addClass(props.showLink == false and 'block-team-hide-link' or nil)
 		:addClass(props.flip and 'flipped' or nil)
-		:node(mw.ext.TeamTemplate.teamicon(props.template))
+		:node(props.icon)
 		:node(nameNode)
 end
 
