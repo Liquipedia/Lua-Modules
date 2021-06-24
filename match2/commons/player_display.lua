@@ -87,8 +87,9 @@ end
 -- Note: require('Module:Flag')[flag] automatically includes a span with class="flag"
 function PlayerDisplay.Flag(flag)
 	flag = flag:lower()
-	return require('Module:Flag')[flag]
+	local text = require('Module:Flag')[flag]
 		or mw.getCurrentFrame():expandTemplate{ title = 'Flag/' .. flag }
+	return DisplayUtil.removeLinkFromWikiLink(text)
 end
 
 return Class.export(PlayerDisplay)

@@ -100,4 +100,16 @@ function DisplayUtil.flattenArray(elems)
 	return flattened
 end
 
+--[===[
+Clears the link param in a wikicode link.
+
+Example:
+DisplayUtil.removeLinkFromWikiLink('[[File:ZergIcon.png|14px|link=Zerg]]')
+-- returns '[[File:ZergIcon.png|14px|link=]]''
+]===]
+function DisplayUtil.removeLinkFromWikiLink(text)
+	local textNoLink = text:gsub('link=[^|%]]*', 'link=')
+	return textNoLink
+end
+
 return DisplayUtil
