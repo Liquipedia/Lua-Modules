@@ -11,16 +11,6 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	return InputModule.processMatch
 end)
 
--- useless functions that should be present for some default checks
--- would get called from Module:Match/Subobjects if we wouldn't circumvent that module completly
-function WikiSpecific.processMap(frame, map)
-	return map
-end
-
-function WikiSpecific.processOpponent(frame, opponent)
-	return opponent
-end
-
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 	return require('Module:MatchGroup/Util/Starcraft').matchFromRecord
 end)
@@ -38,6 +28,17 @@ function WikiSpecific.getMatchGroupModule(matchGroupType)
 	end
 end
 
+--Default Logo for Teams without Team Template
 WikiSpecific.defaultIcon = 'StarCraft 2 Default logo.png'
+
+-- useless functions that should be present for some default checks
+-- would get called from Module:Match/Subobjects if we wouldn't circumvent that module completly
+function WikiSpecific.processMap(frame, map)
+	return map
+end
+
+function WikiSpecific.processOpponent(frame, opponent)
+	return opponent
+end
 
 return WikiSpecific
