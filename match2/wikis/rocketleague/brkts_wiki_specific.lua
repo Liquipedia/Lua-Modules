@@ -117,8 +117,11 @@ function matchFunctions.getDateStuff(match)
 		match.date = matchDate .. timezone
 		match.dateexact = String.contains(match.date, "%+") or String.contains(match.date, "%-")
 	else
-		match.date = lang:formatDate('c',
-			(Variables.varDefault("tournament_date", "") or "") .. " + " .. Variables.varDefault("num_missing_dates", "0") .. " second")
+		match.date = lang:formatDate(
+			'c',
+			(Variables.varDefault("tournament_date", "") or "") 
+				.. " + " .. Variables.varDefault("num_missing_dates", "0") .. " second"
+		)
 		match.dateexact = false
 		Variables.varDefine("num_missing_dates", Variables.varDefault("num_missing_dates", 0) + 1)
 	end
