@@ -668,6 +668,7 @@ end
 
 function StarCraftMatchGroupInput.getTeamNameIcon(template)
 	local team
+	local icon
 	if template ~= nil and TeamTemplates._teamexists(template) then
 		team = mw.ext.TeamTemplate.raw(template)
 		icon = team.image
