@@ -30,7 +30,8 @@ function p.get(frame)
 		error("argument 'templateOld' is empty")
 	end
 
-	if Logic.isEmpty(_args.type) then
+	_type = _args.type
+	if Logic.isEmpty(_type) then
 		error("argument 'type' is empty")
 	end
 
@@ -56,7 +57,8 @@ function p.getTemplate(frame)
 		error("argument 'templateOld' is empty")
 	end
 
-	if Logic.isEmpty(_args.type) then
+	_type = _args.type
+	if Logic.isEmpty(_type) then
 		error("argument 'type' is empty")
 	end
 
