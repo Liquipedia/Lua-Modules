@@ -98,8 +98,14 @@ function DisplayHelper.MatchCountdownBlock(match)
 		:node(require('Module:Countdown')._create(stream))
 end
 
+--[[
+Displays the map name and link, and the status of the match if it had an 
+unusual status.
+]]
 function DisplayHelper.MapAndStatus(game)
-	local mapText = game.map and ('[[' .. game.map .. ']]') or 'Unknown'
+	local mapText = game.map 
+		and '[[' .. game.map .. ']]' 
+		or 'Unknown'
 	if game.resultType == 'np' or game.resultType == 'default' then
 		mapText = '<s>' .. mapText .. '</s>'
 	end
@@ -107,17 +113,17 @@ function DisplayHelper.MapAndStatus(game)
 	local statusText = nil
 	if game.resultType == 'default' then
 		if game.walkover == 'L' then
-			statusText = '&nbsp;<i>(w/o)</i>'
+			statusText = '<i>(w/o)</i>'
 		elseif game.walkover == 'FF' then
-			statusText = '&nbsp;<i>(ff)</i>'
+			statusText = '<i>(ff)</i>'
 		elseif game.walkover == 'DQ' then
-			statusText = '&nbsp;<i>(dq)</i>'
+			statusText = '<i>(dq)</i>'
 		else
-			statusText = '&nbsp;<i>(def.)</i>'
+			statusText = '<i>(def.)</i>'
 		end
 	end
 
-	return mapText .. (statusText or '')
+	return mapText .. (statusText and '&nbsp;' .. statusText or '')
 end
 
 --[[
