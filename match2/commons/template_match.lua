@@ -1,4 +1,4 @@
-local p = {}
+local TemplateMatch = {}
 
 local Class = require('Module:Class')
 local json = require('Module:Json')
@@ -10,14 +10,14 @@ local Match = require('Module:Match')
 local String = require('Module:StringUtils')
 
 -- store match to a var to later store them to LPDB
-function p.storeVar(args)
+function TemplateMatch.storeVar(args)
 	local matchNum = tonumber(Variables.varDefault('numTempMatch', 0)) + 1
 	Variables.varDefine('numTempMatch', matchNum)
 	Variables.varDefine('tempMatch' .. matchNum, json.stringify(args))
 end
 
 -- store matches from vars to LPDB
-function p.storeVarsToLPDB()
+function TemplateMatch.storeVarsToLPDB()
 	local matchNum = tonumber(Variables.varDefault('numTempMatch', 0))
 	utils.log("Storing " .. matchNum .. " template matches to LPDB")
 
@@ -31,8 +31,8 @@ function p.storeVarsToLPDB()
 			local data = json.parse(jsonEncodedData)
 			local bracketData = json.parse(data.bracketdata or '{}')
 			data.bracketdata = bracketData
-			referencedIds[p._getTrueID(bracketData.tolower)] = true
-			referencedIds[p._getTrueID(bracketData.toupper)] = true
+			referencedIds[TemplateMatch._getTrueID(bracketData.tolower)] = true
+			referencedIds[TemplateMatch._getTrueID(bracketData.toupper)] = true
 
 			matches[data.matchid] = data
 		end
@@ -50,7 +50,7 @@ function p.storeVarsToLPDB()
 	-- set bracket index for matches
 	local applied = 0
 	for _, id in Table.iter.spairs(rootMatches, function(tab, a, b) return tab[a] < tab[b] end) do
-		matches, applied = p._recursiveSetBracketIndex(matches, id, false, applied)
+		matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, id, false, applied)
 	end
 
 	-- set bracket section for matches
@@ -83,7 +83,7 @@ function p.storeVarsToLPDB()
 end
 
 local pagename = mw.title.getCurrentTitle().text
-function p._getTrueID(id)
+function TemplateMatch._getTrueID(id)
 	if id == nil then
 		return nil
 	else
@@ -92,11 +92,11 @@ function p._getTrueID(id)
 end
 
 -- recursively sets which bracket the match is in
-function p._recursiveSetBracketIndex(matches, id, headerchild, applied)
+function TemplateMatch._recursiveSetBracketIndex(matches, id, headerchild, applied)
 	if Logic.isEmpty(id) then
 		return matches, applied
 	end
-	id = p._getTrueID(id)
+	id = TemplateMatch._getTrueID(id)
 	local match = matches[id]
 	if not Logic.isEmpty(match.bracketdata.header) and headerchild ~= true then
 		applied = applied + 1
@@ -104,9 +104,9 @@ function p._recursiveSetBracketIndex(matches, id, headerchild, applied)
 	end
 	match.bracketdata.bracketindex = applied
 	matches[id] = match
-	matches, applied = p._recursiveSetBracketIndex(matches, match.bracketdata.toupper, headerchild, applied)
-	matches, applied = p._recursiveSetBracketIndex(matches, match.bracketdata.tolower, headerchild, applied)
+	matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, match.bracketdata.toupper, headerchild, applied)
+	matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, match.bracketdata.tolower, headerchild, applied)
 	return matches, applied
 end
 
-return Class.export(p)
+return Class.export(TemplateMatch)
