@@ -9,7 +9,7 @@ local Lua = require("Module:Lua")
 local Table = require("Module:Table")
 local String = require("Module:StringUtils")
 
-local _type = 'solo'
+local _type
 local _args
 
 function p.get(frame)
