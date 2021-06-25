@@ -262,15 +262,15 @@ end
 
 function p.storeSoloMapSMW(game, gameIndex, tournament, id)
 	game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
-	local object = 'Map ' .. game.opponent1 .. ' vs ' .. game.opponent2 .. ' at ' ..
+	local object = 'Map ' .. (game.opponent1 or 'TBD') .. ' vs ' .. (game.opponent2 or 'TBD') .. ' at ' ..
 		(game.date or '') .. 'in Match TBD Map ' .. gameIndex .. ' on ' .. (game.map or '')
 	local losernumber = 3 - (tonumber(game.winner or '') or 0)
 	mw.smw.subobject({
 		'legacymatch_' .. id .. object,
 		'has loser=' .. (game['opponent' .. losernumber] or ''),
 		'has winner=' .. (game['opponent' .. (game.winner or '')] or ''),
-		'has player left=' .. game.opponent1,
-		'has player right=' .. game.opponent2,
+		'has player left=' .. (game.opponent1 or ''),
+		'has player right=' .. (game.opponent2 or ''),
 		'has winning race=' .. (game.extradata.winnerrace or ''),
 		'has losing race=' .. (game.extradata.loserrace or ''),
 		'has tournament=' .. (tournament or ''),

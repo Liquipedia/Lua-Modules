@@ -20,8 +20,6 @@ function p.storeMatch(match2)
 			p.storeTeamMatchSMW(match, match2)
 		elseif (match2.match2opponents[1] or {}).type == 'solo' then
 			p.storeSoloMatchSMW(match, match2)
-		else
-			mw.logObject((match2.match2opponents[1] or {}).type)
 		end
 
 		return mw.ext.LiquipediaDB.lpdb_match(
@@ -214,14 +212,14 @@ end
 
 function p.storeSoloMapSMW(game, gameIndex, tournament, id)
 	game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
-	local object = 'Map ' .. game.opponent1 .. ' vs ' .. game.opponent2 .. ' at ' ..
+	local object = 'Map ' .. (game.opponent1 or 'TBD') .. ' vs ' .. (game.opponent2 or 'TBD') .. ' at ' ..
 		(game.date or '') .. 'in Match TBD Map ' .. gameIndex .. ' on ' .. (game.map or '')
 	mw.smw.subobject({
 		'legacymatch_' .. id .. object,
-		'has winning race=' .. game.extradata.winnerrace,
-		'has losing race=' .. game.extradata.loserrace,
-		'has tournament=' .. tournament,
-		'is played on=' .. game.map,
+		'has winning race=' .. (game.extradata.winnerrace or ''),
+		'has losing race=' .. (game.extradata.loserrace or ''),
+		'has tournament=' .. (tournament or ''),
+		'is played on=' .. (game.map or ''),
 	})
 end
 
