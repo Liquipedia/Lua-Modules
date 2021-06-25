@@ -158,8 +158,7 @@ end
 function CustomMatchSummary._createBody(frame, match)
 	local body = MatchSummary.Body()
 
-	local streamElement = mw.html.create('center')
-	streamElement:node(DisplayHelper.MatchCountdownBlock(match))
+	local streamElement = DisplayHelper.MatchCountdownBlock(match)
 	body:addRow(MatchSummary.Row():addElement(streamElement))
 
 	local matchPageElement = mw.html.create('center')
