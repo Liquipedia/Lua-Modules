@@ -28,11 +28,11 @@ function p.storeVarsToLPDB()
 	for m = 1, matchNum do
 		local jsonEncodedData = Variables.varDefault('tempMatch' .. m)
 		if jsonEncodedData ~= nil then
-			data = json.parse(jsonEncodedData)
+			local data = json.parse(jsonEncodedData)
 			local bracketData = json.parse(data.bracketdata or '{}')
 			data.bracketdata = bracketData
-			referencedIds[getTrueID(bracketData.tolower)] = true
-			referencedIds[getTrueID(bracketData.toupper)] = true
+			referencedIds[p._getTrueID(bracketData.tolower)] = true
+			referencedIds[p._getTrueID(bracketData.toupper)] = true
 
 			matches[data.matchid] = data
 		end
@@ -83,7 +83,7 @@ function p.storeVarsToLPDB()
 end
 
 pagename = mw.title.getCurrentTitle().text
-function getTrueID(id)
+function p._getTrueID(id)
 	if id == nil then
 		return nil
 	else
@@ -96,7 +96,7 @@ function recursiveSetBracketIndex(matches, id, headerchild, applied)
 	if Logic.isEmpty(id) then
 		return matches, applied
 	end
-	id = getTrueID(id)
+	id = p._getTrueID(id)
 	local match = matches[id]
 	if not Logic.isEmpty(match.bracketdata.header) and headerchild ~= true then
 		applied = applied + 1
