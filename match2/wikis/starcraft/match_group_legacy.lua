@@ -123,9 +123,8 @@ end
 
 function Legacy._convertSingle(realKey, val, match, mapping, flattened)
 	flattened = flattened or _args
-	local NoSkip = not String.startsWith(realKey, "$$")
-	if NoSkip and type(val) == "table" then
-		-- references
+	local noSkip = not String.startsWith(realKey, "$$")
+	if noSkip and type(val) == "table" then
 		if val["$ref$"] ~= nil then
 			local subst = val["$1$"] or ""
 			val = Table.deepCopy(mapping["$$" .. val["$ref$"]])
@@ -149,7 +148,7 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened)
 				match[realKey] = nestedArgs
 			end
 		end
-	elseif NoSkip then
+	elseif noSkip then
 		local options = String.split(val, "|")
 		if Table.size(options) > 1 then
 			for _, option in ipairs(options) do
