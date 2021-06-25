@@ -1,6 +1,5 @@
 # Lua-Modules
 ![Code Style](https://github.com/Liquipedia/LiquipediaMediaWikiMessages/workflows/Code%20Style/badge.svg)
-![License](https://img.shields.io/github/license/liquipedia/lua-modules)
 
 Used to keep versions of some important lua modules of the Liquipedia wiki that we want better version control for.
 
