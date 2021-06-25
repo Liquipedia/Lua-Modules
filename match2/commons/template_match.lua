@@ -40,7 +40,7 @@ function p.storeVarsToLPDB()
 
 	-- find root matches and set the root value there
 	local rootMatches = {}
-	for id, match in pairs(matches) do
+	for _, match in pairs(matches) do
 		if not referencedIds[match.matchid] and not String.startsWith(match.matchid, "Rx") then
 			match.bracketdata.root = "true"
 			table.insert(rootMatches, match.matchid)
@@ -50,7 +50,7 @@ function p.storeVarsToLPDB()
 	-- set bracket index for matches
 	local applied = 0
 	for _, id in Table.iter.spairs(rootMatches, function(tab, a, b) return tab[a] < tab[b] end) do
-		matches, applied = recursiveSetBracketIndex(matches, id, false, applied)
+		matches, applied = p._recursiveSetBracketIndex(matches, id, false, applied)
 	end
 
 	-- set bracket section for matches
@@ -82,7 +82,7 @@ function p.storeVarsToLPDB()
 	end
 end
 
-pagename = mw.title.getCurrentTitle().text
+local pagename = mw.title.getCurrentTitle().text
 function p._getTrueID(id)
 	if id == nil then
 		return nil
@@ -92,7 +92,7 @@ function p._getTrueID(id)
 end
 
 -- recursively sets which bracket the match is in
-function recursiveSetBracketIndex(matches, id, headerchild, applied)
+function p._recursiveSetBracketIndex(matches, id, headerchild, applied)
 	if Logic.isEmpty(id) then
 		return matches, applied
 	end
@@ -104,8 +104,8 @@ function recursiveSetBracketIndex(matches, id, headerchild, applied)
 	end
 	match.bracketdata.bracketindex = applied
 	matches[id] = match
-	matches, applied = recursiveSetBracketIndex(matches, match.bracketdata.toupper, headerchild, applied)
-	matches, applied = recursiveSetBracketIndex(matches, match.bracketdata.tolower, headerchild, applied)
+	matches, applied = p._recursiveSetBracketIndex(matches, match.bracketdata.toupper, headerchild, applied)
+	matches, applied = p._recursiveSetBracketIndex(matches, match.bracketdata.tolower, headerchild, applied)
 	return matches, applied
 end
 
