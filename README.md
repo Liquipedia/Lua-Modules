@@ -5,4 +5,4 @@
 Used to keep versions of some important lua modules of the Liquipedia wiki that we want better version control for.
 
 ## License
-This repository follows the license of the textual content of [Liquipedia](https://liquipedia.net), check out [LICENSE.md](the license file for more information).
+This repository follows the license of the textual content of [Liquipedia](https://liquipedia.net), check out [the license file for more information](LICENSE.md).
