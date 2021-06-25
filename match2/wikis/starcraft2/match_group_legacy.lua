@@ -30,13 +30,15 @@ function p.get(frame)
 		error("argument 'templateOld' is empty")
 	end
 
-	local mapping = p.getMapping(templateid, oldTemplateid)
+	if Logic.isEmpty(_args.type) then
+		error("argument 'type' is empty")
+	end
 
-	local newArgs = p.convert(mapping)
+	local mapping = p._getMapping(templateid, oldTemplateid)
+
+	local newArgs = p._convert(mapping)
 	newArgs.id = bracketid
 	newArgs["1"] = templateid
-
---mw.logObject(newArgs)
 
 	return MatchGroup.luaBracket(frame, newArgs)
 end
@@ -54,7 +56,11 @@ function p.getTemplate(frame)
 		error("argument 'templateOld' is empty")
 	end
 
-	local mapping = p.getMapping(templateid)
+	if Logic.isEmpty(_args.type) then
+		error("argument 'type' is empty")
+	end
+
+	local mapping = p._getMapping(templateid)
 
 	local out = json.stringify(mapping, true)
 		:gsub("\"([^\n:\"]-)\":", "%1 = ")
@@ -71,7 +77,7 @@ function p.getTemplate(frame)
 		"|Link to mapping]]" .. "<pre class=\"selectall\">" .. out  .. "</pre>"
 end
 
-function p.convert(mapping)
+function p._convert(mapping)
 	local newArgs = {}
 	for source, target in pairs(mapping) do
 		-- nested tables
@@ -158,7 +164,7 @@ function p._convertSingle(realKey, val, match, mapping, flattened)
 	return match
 end
 
-function p.getMapping(templateid, oldTemplateid)
+function p._getMapping(templateid, oldTemplateid)
 	if Lua.moduleExists("Module:MatchGroup/Legacy/" .. templateid) then
 		mw.log("Module:MatchGroup/Legacy/" .. templateid .. "exists")
 		return (require("Module:MatchGroup/Legacy/" .. templateid)[oldTemplateid] or function() return nil end)()
