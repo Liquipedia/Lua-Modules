@@ -98,6 +98,28 @@ function DisplayHelper.MatchCountdownBlock(match)
 		:node(require('Module:Countdown')._create(stream))
 end
 
+function DisplayHelper.MapAndStatus(game)
+	local mapText = game.map and ('[[' .. game.map .. ']]') or 'Unknown'
+	if game.resultType == 'np' or game.resultType == 'default' then
+		mapText = '<s>' .. mapText .. '</s>'
+	end
+
+	local statusText = nil
+	if game.resultType == 'default' then
+		if game.walkover == 'L' then
+			statusText = '&nbsp;<i>(w/o)</i>'
+		elseif game.walkover == 'FF' then
+			statusText = '&nbsp;<i>(ff)</i>'
+		elseif game.walkover == 'DQ' then
+			statusText = '&nbsp;<i>(dq)</i>'
+		else
+			statusText = '&nbsp;<i>(def.)</i>'
+		end
+	end
+
+	return mapText .. (statusText or '')
+end
+
 --[[
 Display component showing the detailed summary of a match. The component will
 appear as a popup from the Matchlist and Bracket components. This is a
