@@ -99,12 +99,12 @@ function DisplayHelper.MatchCountdownBlock(match)
 end
 
 --[[
-Displays the map name and link, and the status of the match if it had an 
+Displays the map name and link, and the status of the match if it had an
 unusual status.
 ]]
 function DisplayHelper.MapAndStatus(game)
-	local mapText = game.map 
-		and '[[' .. game.map .. ']]' 
+	local mapText = game.map
+		and '[[' .. game.map .. ']]'
 		or 'Unknown'
 	if game.resultType == 'np' or game.resultType == 'default' then
 		mapText = '<s>' .. mapText .. '</s>'
