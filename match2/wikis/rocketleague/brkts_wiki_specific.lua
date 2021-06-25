@@ -373,16 +373,4 @@ function matchFunctions.getVodStuff(match)
 	end
 end
 
-function opponentFunctions.getIconName(template)
-	if template ~= nil then
-		local icon = Template.expandTemplate(_frame, "Team", { template })
-		icon = icon:gsub("%&", "")
-		icon = String.split(icon, "File:")[2]
-		icon = String.split(icon, "|")[1]
-		return icon
-	else
-		return nil
-	end
-end
-
 return p
