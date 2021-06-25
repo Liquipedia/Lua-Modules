@@ -9,6 +9,7 @@ std = {
 		"mw",
 		"os",
 		"pairs",
+		"pcall",
 		"require",
 		"string",
 		"table",
