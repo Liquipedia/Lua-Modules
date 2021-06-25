@@ -1,4 +1,4 @@
-local p = {}
+local Legacy = {}
 
 local getArgs = require("Module:Arguments").getArgs
 local json = require("Module:Json")
@@ -12,7 +12,7 @@ local String = require("Module:StringUtils")
 local _type
 local _args
 
-function p.get(frame)
+function Legacy.get(frame)
 	_args = getArgs(frame)
 
 	local bracketid = _args["id"]
@@ -35,16 +35,16 @@ function p.get(frame)
 		error("argument 'type' is empty")
 	end
 
-	local mapping = p._getMapping(templateid, oldTemplateid)
+	local mapping = Legacy._getMapping(templateid, oldTemplateid)
 
-	local newArgs = p._convert(mapping)
+	local newArgs = Legacy._convert(mapping)
 	newArgs.id = bracketid
 	newArgs["1"] = templateid
 
 	return MatchGroup.luaBracket(frame, newArgs)
 end
 
-function p.getTemplate(frame)
+function Legacy.getTemplate(frame)
 	_args = getArgs(frame)
 
 	local templateid = _args["template"]
@@ -62,7 +62,7 @@ function p.getTemplate(frame)
 		error("argument 'type' is empty")
 	end
 
-	local mapping = p._getMapping(templateid)
+	local mapping = Legacy._getMapping(templateid)
 
 	local out = json.stringify(mapping, true)
 		:gsub("\"([^\n:\"]-)\":", "%1 = ")
@@ -79,7 +79,7 @@ function p.getTemplate(frame)
 		"|Link to mapping]]" .. "<pre class=\"selectall\">" .. out  .. "</pre>"
 end
 
-function p._convert(mapping)
+function Legacy._convert(mapping)
 	local newArgs = {}
 	for source, target in pairs(mapping) do
 		-- nested tables
@@ -107,7 +107,7 @@ function p._convert(mapping)
 				end
 			end
 			for realKey, val in pairs(target) do
-				nested = p._convertSingle(realKey, val, nested, mapping, flattened)
+				nested = Legacy._convertSingle(realKey, val, nested, mapping, flattened)
 			end
 
 			if not Logic.isEmpty(nested) then
@@ -115,13 +115,13 @@ function p._convert(mapping)
 			end
 		-- regular args
 		else
-			newArgs = p._convertSingle(source, target, newArgs, mapping)
+			newArgs = Legacy._convertSingle(source, target, newArgs, mapping)
 		end
 	end
 	return newArgs
 end
 
-function p._convertSingle(realKey, val, match, mapping, flattened)
+function Legacy._convertSingle(realKey, val, match, mapping, flattened)
 	flattened = flattened or _args
 	local NoSkip = not String.startsWith(realKey, "$$")
 	if NoSkip and type(val) == "table" then
@@ -166,7 +166,7 @@ function p._convertSingle(realKey, val, match, mapping, flattened)
 	return match
 end
 
-function p._getMapping(templateid, oldTemplateid)
+function Legacy._getMapping(templateid, oldTemplateid)
 	if Lua.moduleExists("Module:MatchGroup/Legacy/" .. templateid) then
 		mw.log("Module:MatchGroup/Legacy/" .. templateid .. "exists")
 		return (require("Module:MatchGroup/Legacy/" .. templateid)[oldTemplateid] or function() return nil end)()
@@ -176,4 +176,4 @@ function p._getMapping(templateid, oldTemplateid)
 	end
 end
 
-return p
+return Legacy
