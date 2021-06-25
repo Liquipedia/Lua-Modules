@@ -174,7 +174,7 @@ different conversion by setting WikiSpecific.matchFromRecord. Refer
 to the starcraft2 wiki as an example.
 ]]
 function MatchGroupUtil.matchFromRecord(record)
-	local extradata = Json.parseIfString(record.extradata) or {}
+	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
 
 	return {
@@ -239,7 +239,7 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 end
 
 function MatchGroupUtil.opponentFromRecord(record)
-	local extradata = Json.parseIfString(record.extradata) or {}
+	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
 		extradata = extradata,
 		icon = nilIfEmpty(record.icon),
@@ -268,7 +268,7 @@ function MatchGroupUtil.createOpponent(args)
 end
 
 function MatchGroupUtil.playerFromRecord(record)
-	local extradata = Json.parseIfString(record.extradata) or {}
+	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
 		displayName = record.displayname,
 		extradata = extradata,
@@ -278,7 +278,7 @@ function MatchGroupUtil.playerFromRecord(record)
 end
 
 function MatchGroupUtil.gameFromRecord(record)
-	local extradata = Json.parseIfString(record.extradata) or {}
+	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
@@ -345,6 +345,17 @@ function MatchGroupUtil.fetchTeam(template)
 		pageName = rawTeam.page,
 		shortName = rawTeam.shortname,
 	}
+end
+
+--[[
+Parse extradata as a JSON string if read from page variables. Otherwise create
+a copy if fetched from lpdb. The returned extradata table can then be mutated
+without altering the source.
+]]
+function MatchGroupUtil.parseOrCopyExtradata(recordExtradata)
+	return type(recordExtradata) == 'string' and Json.parse(recordExtradata)
+		or type(recordExtradata) == 'table' and Table.copy(recordExtradata)
+		or {}
 end
 
 return MatchGroupUtil

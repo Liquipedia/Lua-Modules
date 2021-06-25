@@ -78,23 +78,23 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 		-- Extract submatch headers from extradata
 		for _, submatch in pairs(match.submatches) do
-			submatch.header = match.extradata['subGroup' .. submatch.subgroup .. 'header']
+			submatch.header = Table.extract(match.extradata, 'subGroup' .. submatch.subgroup .. 'header')
 		end
 	end
 
 	-- Add vetoes
 	match.vetoes = {}
 	for vetoIx = 1, math.huge do
-		local map = match.extradata['veto' .. vetoIx]
-		local by = tonumber(match.extradata['veto' .. vetoIx .. 'by'])
+		local map = Table.extract(match.extradata, 'veto' .. vetoIx)
+		local by = tonumber(Table.extract(match.extradata, 'veto' .. vetoIx .. 'by'))
 		if not map then break end
 
 		table.insert(match.vetoes, {map = map, by = by})
 	end
 
 	-- Misc
-	match.headToHead = Logic.readBool(match.extradata.headtohead) -- TODO move this out of match
-	match.isFFA = Logic.readBool(match.extradata.ffa)
+	match.headToHead = Logic.readBool(Table.extract(match.extradata, 'headtohead'))
+	match.isFFA = Logic.readBool(Table.extract(match.extradata, 'ffa'))
 
 	return match
 end
@@ -104,22 +104,22 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 	local opponents = match.opponents
 
 	for _, opponent in ipairs(opponents) do
-		opponent.isArchon = Logic.readBool(opponent.extradata.isarchon)
-		opponent.score2 = tonumber(opponent.extradata.score2)
-		opponent.status2 = opponent.extradata.score2 and 'S' or nil
-		opponent.placement2 = tonumber(opponent.extradata.placement2)
+		opponent.isArchon = Logic.readBool(Table.extract(opponent.extradata, 'isarchon'))
+		opponent.score2 = tonumber(Table.extract(opponent.extradata, 'score2'))
+		opponent.status2 = opponent.score2 and 'S' or nil
+		opponent.placement2 = tonumber(Table.extract(opponent.extradata, 'placement2'))
 
 		for _, player in ipairs(opponent.players) do
-			player.race = player.extradata.faction or 'u'
+			player.race = Table.extract(player.extradata, 'faction') or 'u'
 			player.mainRace = player.race
 		end
 
 		if opponent.template == 'default' then
 			opponent.team = {
-				bracketName = opponent.extradata.bracket,
-				displayName = opponent.extradata.display,
+				bracketName = Table.extract(opponent.extradata, 'bracket'),
+				displayName = Table.extract(opponent.extradata, 'display'),
 				pageName = opponent.name,
-				shortName = opponent.extradata.short,
+				shortName = Table.extract(opponent.extradata, 'short'),
 			}
 		end
 	end
