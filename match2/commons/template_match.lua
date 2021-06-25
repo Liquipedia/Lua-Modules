@@ -74,7 +74,7 @@ function p.storeVarsToLPDB()
 	-- evaluate for later
 
 	-- store matches
-	for id, match in pairs(matches) do
+	for _, match in pairs(matches) do
 		-- bracketdata needs to be json encoded again
 		match.bracketdata = json.stringify(match.bracketdata)
 
