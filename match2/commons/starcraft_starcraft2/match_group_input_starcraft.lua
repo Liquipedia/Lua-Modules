@@ -668,14 +668,17 @@ end
 
 function StarCraftMatchGroupInput.getTeamNameIcon(template)
 	local team
+	local icon
 	if template ~= nil and TeamTemplates._teamexists(template) then
-		team = TeamTemplates._team(template)
-		team = team:gsub('%&', '')
-		team = String.split(team, 'link=')[2]
-		team = String.split(team, ']]')[1]
+		team = mw.ext.TeamTemplate.raw(template)
+		icon = team.image
+		if icon == '' then
+			icon = team.legacyimage
+		end
+		team = team.page
 	end
 
-	return team
+	return team, icon
 end
 
 function StarCraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
