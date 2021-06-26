@@ -21,9 +21,9 @@ end
 
 MatchlistDisplay.configFromArgs = function(args)
 	return {
-		attached = Logic.readBool(args.attached),
-		collapsed = Logic.readBool(args.collapsed),
-		collapsible = not Logic.readBool(args.nocollapse),
+		attached = Logic.readBoolOrNil(args.attached),
+		collapsed = Logic.readBoolOrNil(args.collapsed),
+		collapsible = not Logic.readBoolOrNil(args.nocollapse),
 		width = tonumber(string.gsub(args.width or '', 'px', ''), nil),
 	}
 end
@@ -78,7 +78,7 @@ function MatchlistDisplay.Matchlist(props)
 		Score = propsConfig.Score or MatchlistDisplay.Score,
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
-		collapsible = Logic.emptyOr(propsConfig.collapsible, true),
+		collapsible = Logic.nilOr(propsConfig.collapsible, true),
 		matchHasDetails = propsConfig.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
 		width = propsConfig.width or 300,
 	}
