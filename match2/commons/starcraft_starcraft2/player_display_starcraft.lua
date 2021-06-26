@@ -6,7 +6,6 @@ local PlayerDisplay = require('Module:Player/Display')
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
 local StarcraftPlayerUtil = require('Module:Player/Util/Starcraft')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
@@ -143,12 +142,9 @@ variables.
 ]]
 function StarcraftPlayerDisplay.InlinePlayerContainer(props)
 	DisplayUtil.assertPropTypes(props, StarcraftPlayerDisplay.propTypes.InlinePlayerContainer)
+	StarcraftPlayerUtil.syncPlayer(props.player, props.date, props.dontSave)
 
-	return StarcraftPlayerDisplay.InlinePlayer(
-		Table.merge(props, {
-			player = StarcraftPlayerUtil.syncPlayer(props.player, props.date, props.dontSave),
-		})
-	)
+	return StarcraftPlayerDisplay.InlinePlayer(props)
 end
 
 --[[
