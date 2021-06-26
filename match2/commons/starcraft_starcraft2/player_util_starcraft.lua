@@ -1,7 +1,7 @@
 local FnUtil = require('Module:FnUtil')
 local Localisation = require('Module:Localisation')
+local StarcraftTournamentUtil = require('Module:Tournament/Util/Starcraft')
 local String = require('Module:String')
-local Table = require('Module:Table')
 
 local nilIfEmpty = String.nilIfEmpty
 
@@ -47,9 +47,9 @@ function StarcraftPlayerUtil.extractFromLink(name)
 
 	local pageName, displayName = unpack(mw.text.split(name, '|', true))
 	if displayName and displayName ~= '' then
-		return pageName, displayName
+		return nilIfEmpty(pageName), displayName
 	end
-	return nil, name
+	return nil, nilIfEmpty(name)
 end
 
 -- Asks LPDB for the race and flag of a player.
@@ -57,7 +57,7 @@ function StarcraftPlayerUtil.fetchRaceAndFlag(pageName, date)
 	local resolvedPage = mw.ext.TeamLiquidIntegration.resolve_redirect(pageName)
 
 	local rows = mw.ext.LiquipediaDB.lpdb('player', {
-		conditions = '[[pagename::' .. string.gsub(resolvedPage, ' ', '_') .. ']]',
+		conditions = '[[pagename::' .. resolvedPage:gsub(' ', '_') .. ']]',
 		query = 'nationality, extradata',
 	})
 
@@ -65,7 +65,10 @@ function StarcraftPlayerUtil.fetchRaceAndFlag(pageName, date)
 	if type(row) == 'table' then
 		local historicalRace
 		if row.extradata.racehistorical == 'true' then
-			historicalRace = StarcraftPlayerUtil.fetchHistoricalRace(resolvedPage, date)
+			historicalRace = StarcraftPlayerUtil.fetchHistoricalRace(
+				resolvedPage,
+				date or StarcraftTournamentUtil.getContextualDateOrNow()
+			)
 		end
 
 		return {
@@ -77,11 +80,14 @@ end
 
 -- Asks LPDB for the main race of a player on a specified date.
 function StarcraftPlayerUtil.fetchHistoricalRace(resolvedPage, date)
-	local conditions = '[[pagename::' .. string.gsub(resolvedPage, ' ', '_') .. ']] ' ..
-		'AND [[type::playerrace]] AND [[extradata_startdate::<' .. date .. ']] ' ..
-		'AND [[extradata_enddate::>' .. date .. ']]'
+	local conditions = {
+		'[[pagename::' .. resolvedPage:gsub(' ', '_') .. ']]',
+		'[[type::playerrace]]',
+		'[[extradata_startdate::<' .. date .. ']]',
+		'[[extradata_enddate::>' .. date .. ']]',
+	}
 	local rows = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = conditions,
+		conditions = table.concat(conditions, ' AND '),
 		query = 'information',
 	})
 
@@ -94,12 +100,17 @@ end
 -- Asks LPDB for the team a player belonged to on a particular date. Returns a team template or nil.
 function StarcraftPlayerUtil.fetchTeam(pageName, date)
 	local resolvedPage = mw.ext.TeamLiquidIntegration.resolve_redirect(pageName)
+	date = date or StarcraftTournamentUtil.getContextualDateOrNow()
 
-	local conditions = '[[pagename::' .. string.gsub(resolvedPage, ' ', '_') .. ']] AND [[type::teamhistory]] AND ' ..
-		'([[extradata_joindate::<' .. date .. ']] OR [[extradata_joindate::' .. date .. ']]) AND ' ..
-		'[[extradata_joindate::>]] AND [[extradata_leavedate::>' .. date .. ']]'
+	local conditions = {
+		'[[pagename::' .. resolvedPage:gsub(' ', '_') .. ']]',
+		'[[type::teamhistory]]',
+		'([[extradata_joindate::<' .. date .. ']] OR [[extradata_joindate::' .. date .. ']])',
+		'[[extradata_joindate::>]]',
+		'[[extradata_leavedate::>' .. date .. ']]',
+	}
 	local rows = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = conditions,
+		conditions = table.concat(conditions, ' AND '),
 		query = 'information',
 	})
 
@@ -112,30 +123,31 @@ end
 --[[
 Fills in the flag, race, and pageName of a player if they are missing. Uses
 data previously stored in page variables, and failing that, queries LPDB. The
-results are saved to page variables for future use.
+results are saved to page variables for future use. This function mutates the
+player argument.
 
-Retrieves the flag and race of a player from first the arguments, then page variables, and finally lpdb.
-The returned race is a single character string, either 'p' 't' 'z' or 'r', or nil if unspecified.
+Retrieves the flag and race of a player from first the arguments, then page
+variables, and finally lpdb. The returned race is a single character string,
+either 'p' 't' 'z' or 'r', or nil if unspecified.
 
 player.displayName
 player.pageName
 player.race: Either 'p' 't' 'z' 'r' or 'u'. Will look up if nil.
 player.flag: A flag code like 'nl'. Will look up if nil.
-date: Needed if the player used a different race in the past.
+date: Needed if the player used a different race in the past. Defaults to the
+tournament end date or now.
 ]]
-function StarcraftPlayerUtil.syncPlayer(player_, date_, dontSave)
-	local player = Table.copy(player_)
-
+function StarcraftPlayerUtil.syncPlayer(player, date, dontSave)
 	if not player.pageName then
 		player.pageName = nilIfEmpty(mw.ext.VariablesLua.var(player.displayName .. '_page'))
 			or player.displayName
 	end
 
 	local lpdbPlayer = FnUtil.memoize(function()
-		local date = date_
-			or nilIfEmpty(mw.ext.VariablesLua.var('formatted_tournament_edate'))
-			or os.date('%F')
-		return StarcraftPlayerUtil.fetchRaceAndFlag(player.pageName, date)
+		return StarcraftPlayerUtil.fetchRaceAndFlag(
+			player.pageName,
+			date or StarcraftTournamentUtil.getContextualDateOrNow()
+		)
 	end)
 
 	if not player.flag then
