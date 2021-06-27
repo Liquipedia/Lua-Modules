@@ -67,7 +67,7 @@ end
 
 function OpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	local score1Node = OpponentDisplay.BracketScore({
-		isWinner = opponent.placement == 1,
+		isWinner = opponent.placement == 1 or opponent.advances,
 		scoreText = OpponentDisplay.InlineScore(opponent),
 	})
 	self.root:node(score1Node)
@@ -82,7 +82,7 @@ function OpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	self.root:node(score2Node)
 
 	if (opponent.placement2 or opponent.placement or 0) == 1
-		or opponent.extradata.advances == 'true' then
+		or opponent.advances then
 		self.root:addClass('brkts-opponent-win')
 	end
 end

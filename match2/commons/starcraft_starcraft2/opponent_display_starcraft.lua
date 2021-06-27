@@ -1,6 +1,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OpponentDisplay = require('Module:OpponentDisplay')
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
@@ -228,7 +229,7 @@ function StarcraftOpponentDisplay.BlockArchon(props)
 		:node(playersNode)
 end
 
-local CheckMark = '<i class="fa fa-check forest-green-text" aria-hidden="true"></i>'
+StarcraftOpponentDisplay.CheckMark = '<i class="fa fa-check forest-green-text" aria-hidden="true"></i>'
 
 function StarcraftOpponentDisplay.InlineScore(opponent)
 	if opponent.status == 'S' then
@@ -237,9 +238,11 @@ function StarcraftOpponentDisplay.InlineScore(opponent)
 			local title = 'Advantage of ' .. advantage .. ' game' .. (advantage > 1 and 's' or '')
 			return '<abbr title="' .. title .. '">' .. opponent.score .. '</abbr>'
 		end
-	elseif opponent.extradata.noscore == 'true' then
-		return opponent.extradata.advances =='true'
-			and CheckMark
+	end
+
+	if Logic.readBool(opponent.extradata.noscore) then
+		return (opponent.placement == 1 or opponent.advances)
+			and StarcraftOpponentDisplay.CheckMark
 			or ''
 	end
 

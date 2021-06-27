@@ -62,6 +62,8 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 })
 
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
+	advanceBg = 'string?',
+	advances = 'boolean?',
 	icon = 'string?',
 	name = 'string?',
 	placement = 'number?',
@@ -283,6 +285,8 @@ end
 function MatchGroupUtil.opponentFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
+		advanceBg = nilIfEmpty(Table.extract(extradata, 'bg')),
+		advances = Logic.readBoolOrNil(Table.extract(extradata, 'advances')),
 		extradata = extradata,
 		icon = nilIfEmpty(record.icon),
 		name = nilIfEmpty(record.name),
