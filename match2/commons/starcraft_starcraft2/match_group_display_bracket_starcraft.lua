@@ -25,19 +25,19 @@ function StarcraftBracketDisplay.BracketContainer(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.BracketContainer)
 	return StarcraftBracketDisplay.Bracket({
 		config = props.config,
-		matchesById = MatchGroupUtil.fetchMatchesTable(props.bracketId),
+		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
 	})
 end
 
 function StarcraftBracketDisplay.Bracket(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.Bracket)
 	return BracketDisplay.Bracket({
-		matchesById = props.matchesById,
+		bracket = props.bracket,
 		config = Table.merge(props.config, {
 			MatchSummaryContainer = require('Module:MatchSummary/Starcraft').MatchSummaryContainer,
 			OpponentEntry = StarcraftBracketDisplay.OpponentEntry,
 			matchHasDetails = StarcraftMatchGroupUtil.matchHasDetails,
-			opponentHeight = StarcraftBracketDisplay.computeBracketOpponentHeight(props.matchesById),
+			opponentHeight = StarcraftBracketDisplay.computeBracketOpponentHeight(props.bracket.matchesById),
 		})
 	})
 end

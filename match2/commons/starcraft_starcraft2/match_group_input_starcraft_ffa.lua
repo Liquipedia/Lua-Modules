@@ -173,7 +173,7 @@ function FFA.getExtraData(match)
 
 	--add the pbg stuff
 	for key, item in pairs(match.pbg) do
-		extradata[key] = item
+		extradata['pbg' .. key] = item
 	end
 	match.pbg = nil
 

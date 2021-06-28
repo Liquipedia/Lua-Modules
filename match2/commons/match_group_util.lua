@@ -23,7 +23,14 @@ MatchGroupUtil.types.LowerMatch = TypeUtil.struct({
 	matchId = 'string',
 	opponentIx = 'number',
 })
+MatchGroupUtil.types.AdvanceBg = TypeUtil.literalUnion('up', 'stayup', 'stay', 'staydown', 'down')
+MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
+	bg = MatchGroupUtil.types.AdvanceBg,
+	matchId = 'string?',
+	type = TypeUtil.literalUnion('advance', 'custom', 'qualify'),
+})
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
+	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
 	bracketSection = 'string',
 	header = 'string?',
@@ -79,7 +86,6 @@ MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
 MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
-	date = 'string',
 	header = 'string?',
 	length = 'number?',
 	map = 'string?',
@@ -120,6 +126,14 @@ MatchGroupUtil.types.Team = TypeUtil.struct({
 	shortName = 'string',
 })
 
+MatchGroupUtil.types.MatchGroup = TypeUtil.struct({
+	headMatchIds = TypeUtil.array('string'),
+	matches = TypeUtil.array(MatchGroupUtil.types.Match),
+	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+	type = TypeUtil.literalUnion('matchlist, bracket'),
+	upperMatchIds = TypeUtil.table('string', 'string'),
+})
+
 --[[
 Fetches all matches in a matchlist or bracket. Tries to read from page
 variables before fetching from LPDB. Returns a list of records
@@ -141,26 +155,39 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 	end
 end
 
+MatchGroupUtil.fetchMatchGroup = FnUtil.memoize(function(bracketId)
+	local matches = Array.map(
+		MatchGroupUtil.fetchMatchRecords(bracketId),
+		require('Module:Brkts/WikiSpecific').matchFromRecord
+	)
+
+	local matchesById = Table.map(matches, function(_, match) return match.matchId, match end)
+	local upperMatchIds, headMatchIds = MatchGroupUtil.computeUpperMatchIds(matchesById)
+	local matchGroup = {
+		headMatchIds = headMatchIds,
+		matches = matches,
+		matchesById = matchesById,
+		type = matches[1] and matches[1].bracketData.type or 'matchlist',
+		upperMatchIds = upperMatchIds,
+	}
+
+	MatchGroupUtil.populateAdvanceSpots(matchGroup)
+
+	return matchGroup
+end)
+
 --[[
 Fetches all matches in a matchlist or bracket. Returns a list of structurally
 typed matches lexicographically ordered by matchId.
 ]]
-MatchGroupUtil.fetchMatches = FnUtil.memoize(function(bracketId)
-	return Array.map(
-		MatchGroupUtil.fetchMatchRecords(bracketId),
-		require('Module:Brkts/WikiSpecific').matchFromRecord
-	)
-end)
+function MatchGroupUtil.fetchMatches(bracketId)
+	return MatchGroupUtil.fetchMatchGroup(bracketId).matches
+end
 
 -- Returns a table whose entries are (matchId, match)
-MatchGroupUtil.fetchMatchesTable = FnUtil.memoize(function(bracketId)
-	local matches = MatchGroupUtil.fetchMatches(bracketId)
-	local matchesById = {}
-	for _, match in pairs(matches) do
-		matchesById[match.matchId] = match
-	end
-	return matchesById
-end)
+function MatchGroupUtil.fetchMatchesTable(bracketId)
+	return MatchGroupUtil.fetchMatchGroup(bracketId).matchesById
+end
 
 --[[
 Converts a match record to a structurally typed table with the appropriate data
@@ -215,15 +242,30 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 			})
 		end
 
+		local advanceSpots = {}
+		if nilIfEmpty(data.winnerto) then
+			advanceSpots[1] = {bg = 'up', type = 'custom', matchId = data.winnerto}
+		end
+		if nilIfEmpty(data.loserto) then
+			advanceSpots[2] = {bg = 'stayup', type = 'custom', matchId = data.loserto}
+		end
+		if Logic.readBool(data.qualwin) then
+			advanceSpots[1] = Table.merge(advanceSpots[1], {bg = 'up', type = 'qualify'})
+		end
+		if Logic.readBool(data.quallose) then
+			advanceSpots[2] = Table.merge(advanceSpots[2], {bg = 'stayup', type = 'qualify'})
+		end
+
 		return {
+			advanceSpots = advanceSpots,
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
 			bracketSection = data.bracketsection,
 			header = nilIfEmpty(data.header),
 			lowerMatches = lowerMatches,
-			qualLose = Logic.readBool(data.quallose),
+			qualLose = advanceSpots[2] and advanceSpots[2].type == 'qualify',
 			qualLoseLiteral = nilIfEmpty(data.qualloseLiteral),
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,
-			qualWin = Logic.readBool(data.qualwin),
+			qualWin = advanceSpots[1] and advanceSpots[1].type == 'qualify',
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
@@ -281,7 +323,6 @@ function MatchGroupUtil.gameFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
-		date = record.date,
 		extradata = extradata,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
 		length = tonumber(record.length),
@@ -296,6 +337,65 @@ function MatchGroupUtil.gameFromRecord(record)
 		walkover = nilIfEmpty(record.walkover),
 		winner = tonumber(record.winner),
 	}
+end
+
+function MatchGroupUtil.computeUpperMatchIds(matchesById)
+	local upperMatchIds = {}
+	for matchId, match in pairs(matchesById) do
+		if match.bracketData.type == 'bracket' then
+			for _, lowerMatch in ipairs(match.bracketData.lowerMatches) do
+				upperMatchIds[lowerMatch.matchId] = matchId
+			end
+		end
+	end
+
+	-- Matches without upper matches
+	local headMatchIds = {}
+	for matchId, _ in pairs(matchesById) do
+		if not upperMatchIds[matchId]
+			and not String.endsWith(matchId, 'RxMTP')
+			and not String.endsWith(matchId, 'RxMBR') then
+			table.insert(headMatchIds, matchId)
+		end
+	end
+	table.sort(headMatchIds)
+
+	return upperMatchIds, headMatchIds
+end
+
+function MatchGroupUtil.populateAdvanceSpots(matchGroup)
+	if matchGroup.type ~= 'bracket' then
+		return
+	end
+
+	local finalMatchId = matchGroup.headMatchIds[#matchGroup.headMatchIds]
+	local thirdPlaceMatchId = matchGroup.matchesById[finalMatchId].bracketData.thirdPlaceMatchId
+	local thirdPlaceMatch = matchGroup.matchesById[thirdPlaceMatchId]
+
+	for _, match in ipairs(matchGroup.matches) do
+		local upperMatchId = matchGroup.upperMatchIds[match.matchId]
+		if upperMatchId then
+			match.bracketData.advanceSpots[1] = match.bracketData.advanceSpots[1]
+				or {bg = 'up', type = 'advance', matchId = upperMatchId}
+
+			if upperMatchId == finalMatchId and thirdPlaceMatch then
+				match.bracketData.advanceSpots[2] = match.bracketData.advanceSpots[2]
+					or {bg = 'stayup', type = 'advance', matchId = thirdPlaceMatchId}
+			end
+		end
+	end
+
+	for _, match in ipairs(matchGroup.matches) do
+		local pbgs = Array.mapIndexes(function(ix)
+			return Table.extract(match.extradata, 'pbg' .. ix)
+		end)
+		for i = 1, #pbgs do
+			match.bracketData.advanceSpots[i] = Table.merge(
+				match.bracketData.advanceSpots[i],
+				{bg = pbgs[i], type = 'custom'}
+			)
+		end
+	end
 end
 
 -- Merges a grand finals match with results of its bracket reset match.
