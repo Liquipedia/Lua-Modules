@@ -14,7 +14,6 @@ StarcraftMatchGroupUtil.types = {}
 
 StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion('p', 't', 'z', 'r', 'u')
 StarcraftMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
-	mainRace = StarcraftMatchGroupUtil.types.Race,
 	position = 'number?',
 	race = StarcraftMatchGroupUtil.types.Race,
 })
@@ -74,7 +73,10 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 	if match.opponentMode == 'team' then
 		-- Compute submatches
-		match.submatches = StarcraftMatchGroupUtil.groupBySubmatch(match.games)
+		match.submatches = Array.map(
+			StarcraftMatchGroupUtil.groupBySubmatch(match.games),
+			function(games) return StarcraftMatchGroupUtil.constructSubmatch(games, match) end
+		)
 
 		-- Extract submatch headers from extradata
 		for _, submatch in pairs(match.submatches) do
@@ -111,7 +113,6 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 
 		for _, player in ipairs(opponent.players) do
 			player.race = Table.extract(player.extradata, 'faction') or 'u'
-			player.mainRace = player.race
 		end
 
 		if opponent.template == 'default' then
@@ -143,14 +144,12 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 		local matchPlayer = matchOpponents[opponentIx].players[matchPlayerIx]
 		local player = matchPlayer
 			and Table.merge(matchPlayer, {
-				mainRace = matchPlayer.race,
 				matchPlayerIx = matchPlayerIx,
 				race = participant.faction,
 				position = tonumber(participant.position),
 			})
 			or {
 				displayName = 'TBD',
-				mainRace = 'u',
 				matchPlayerIx = matchPlayerIx,
 				race = 'u',
 			}
@@ -199,17 +198,15 @@ function StarcraftMatchGroupUtil.groupBySubmatch(matchGames)
 		end
 		table.insert(currentGames, game)
 	end
-
-	-- Construct submatch objects on grouped games
-	return Array.map(submatchGames, StarcraftMatchGroupUtil.constructSubmatch)
+	return submatchGames
 end
 
 --Constructs a submatch object whose properties are aggregated from that of its games.
-function StarcraftMatchGroupUtil.constructSubmatch(games)
+function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 	local opponents = Table.deepCopy(games[1].opponents)
 
 	-- If the same race was played in all games, display that instead of the
-	-- player's main race.
+	-- player's race listed in the match.
 	for opponentIx, opponent in pairs(opponents) do
 		-- Aggregate races among games for each player
 		local playerRaces = {}
@@ -224,7 +221,10 @@ function StarcraftMatchGroupUtil.constructSubmatch(games)
 
 		for playerIx, player in pairs(opponent.players) do
 			player.race = Table.uniqueKey(playerRaces[playerIx])
-				or player.mainRace
+			if not player.race then
+				local matchPlayer = match.opponents[opponentIx].players[player.matchPlayerIx]
+				player.race = matchPlayer and matchPlayer.race or 'u'
+			end
 		end
 	end
 
@@ -286,7 +286,7 @@ function StarcraftMatchGroupUtil.constructSubmatch(games)
 end
 
 -- Determine if a match has details that should be displayed via popup
-StarcraftMatchGroupUtil.matchHasDetails = function(match)
+function StarcraftMatchGroupUtil.matchHasDetails(match)
 	return match.dateIsExact
 		or match.vod
 		or not Table.isEmpty(match.links)
@@ -296,6 +296,24 @@ StarcraftMatchGroupUtil.matchHasDetails = function(match)
 			return game.map and game.map ~= 'TBD'
 				or game.winner
 		end)
+end
+
+--[[
+Determines if any players in an opponent are not playing their main race by
+comparing them to a reference opponent. Returns the races played if at least
+one player chose an offrace or nil if otherwise.
+]]
+function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
+	local gameRaces = {}
+	local hasOffrace = false
+	for playerIx, gamePlayer in ipairs(gameOpponent.players) do
+		local referencePlayer = referenceOpponent.players[playerIx]
+		table.insert(gameRaces, gamePlayer.race)
+		if gamePlayer.race ~= referencePlayer.race then
+			hasOffrace = true
+		end
+	end
+	return hasOffrace and gameRaces or nil
 end
 
 return StarcraftMatchGroupUtil
