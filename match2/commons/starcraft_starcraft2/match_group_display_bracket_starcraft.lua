@@ -71,8 +71,12 @@ function StarcraftBracketDisplay.OpponentEntry(props)
 		showRaceBackground = false
 	end
 
+	local isWinner = (opponent.placement2 or opponent.placement or 0) == 1
+		or opponent.advances
+
 	local leftNode = html.create('div'):addClass('brkts-opponent-entry-left')
 		:addClass(showRaceBackground and RaceColor[opponent.players[1].race] or nil)
+		:addClass(isWinner and 'brkts-opponent-win' or nil)
 
 	if opponent.type == 'team' then
 		local bracketNode = StarcraftOpponentDisplay.BlockTeamContainer({
@@ -126,11 +130,7 @@ function StarcraftBracketDisplay.OpponentEntry(props)
 		})
 	end
 
-	local isWinner = (opponent.placement2 or opponent.placement or 0) == 1
-		or opponent.advances
-
 	return html.create('div'):addClass('brkts-opponent-entry')
-		:addClass(isWinner and 'brkts-opponent-win' or nil)
 		:node(leftNode)
 		:node(scoreNode)
 		:node(score2Node)

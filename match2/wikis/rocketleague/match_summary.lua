@@ -9,7 +9,7 @@ local htmlCreate = mw.html.create
 local p = {}
 
 function p.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchesTable(args.bracketId)[args.matchId]
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local wrapper = htmlCreate("div")
 		:addClass("brkts-popup")
