@@ -1,13 +1,12 @@
 local p = require("Module:Brkts/WikiSpecific/Base")
 
 local Logic = require('Module:Logic')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Template = require('Module:Template')
 local json = require("Module:Json")
-local utils = require("Module:LuaUtils")
 local getIconName = require("Module:IconName").luaGet
 local _frame
 
@@ -64,6 +63,7 @@ function p.processOpponent(frame, opponent)
 	-- process opponent
 	if not Logic.isEmpty(opponent.template) then
 		opponent.name = opponent.name or opponentFunctions.getTeamName(opponent.template)
+		opponent.icon = opponent.icon or opponentFunctions.getIconName(opponent.template)
 	end
 
 	return opponent
@@ -117,8 +117,11 @@ function matchFunctions.getDateStuff(match)
 		match.date = matchDate .. timezone
 		match.dateexact = String.contains(match.date, "%+") or String.contains(match.date, "%-")
 	else
-		match.date = lang:formatDate('c',
-			(utils.mw.varGet("tournament_date", "") or "") .. " + " .. utils.mw.varGet("num_missing_dates", "0") .. " second")
+		match.date = lang:formatDate(
+			'c',
+			(Variables.varDefault("tournament_date", "") or "")
+				.. " + " .. Variables.varDefault("num_missing_dates", "0") .. " second"
+		)
 		match.dateexact = false
 		Variables.varDefine("num_missing_dates", Variables.varDefault("num_missing_dates", 0) + 1)
 	end
@@ -150,7 +153,7 @@ function matchFunctions.getVodStuff(match)
 		smashcast = Logic.emptyOr(match.stream.smashcast or match.smashcast, Variables.varDefault("smashcast")),
 		youtube = Logic.emptyOr(match.stream.youtube or match.youtube, Variables.varDefault("youtube"))
 	})
-	match.vod = utils.misc.emptyOr(match.vod, utils.mw.varGet("vod"))
+	match.vod = Logic.emptyOr(match.vod, Variables.varDefault("vod"))
 
 	-- apply vodgames
 	for index = 1, MAX_NUM_VODGAMES do
@@ -190,7 +193,7 @@ function matchFunctions.getVodStuff(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = args["opponent" .. opponentIndex]
-		if not utils.misc.isEmpty(opponent) then
+		if not Logic.isEmpty(opponent) then
 			if type(opponent) == "string" then
 				opponent = json.parse(opponent)
 			end
@@ -226,7 +229,7 @@ function matchFunctions.getVodStuff(match)
 	if Logic.readBool(args.finished) then
 		local placement = 1
 		-- luacheck: push ignore
-		for opponentIndex, opponent in utils.iter.spairs(opponents, p._placementSortFunction) do
+		for opponentIndex, opponent in Table.iter.spairs(opponents, p._placementSortFunction) do
 			if placement == 1 then
 				args.winner = opponentIndex
 			end
@@ -294,7 +297,7 @@ function matchFunctions.getVodStuff(match)
 		end
 	end
 	-- luacheck: push ignore
-	for scoreIndex, _ in utils.iter.spairs(indexedScores, p._placementSortFunction) do
+	for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
 		map.winner = scoreIndex
 		break
 	end
@@ -304,14 +307,14 @@ function matchFunctions.getVodStuff(match)
 	end
 
 	function mapFunctions.getTournamentVars(map)
-	map.mode = utils.misc.emptyOr(map.mode, utils.mw.varGet("tournament_mode", "3v3"))
-	map.type = utils.misc.emptyOr(map.type, utils.mw.varGet("tournament_type"))
-	map.tournament = utils.misc.emptyOr(map.tournament, utils.mw.varGet("tournament_name"))
-	map.tickername = utils.misc.emptyOr(map.tickername, utils.mw.varGet("tournament_ticker_name"))
-	map.shortname = utils.misc.emptyOr(map.shortname, utils.mw.varGet("tournament_shortname"))
-	map.series = utils.misc.emptyOr(map.series, utils.mw.varGet("tournament_series"))
-	map.icon = utils.misc.emptyOr(map.icon, utils.mw.varGet("tournament_icon"))
-	map.liquipediatier = utils.misc.emptyOr(map.liquipediatier, utils.mw.varGet("tournament_tier"))
+	map.mode = Logic.emptyOr(map.mode, Variables.varDefault("tournament_mode", "3v3"))
+	map.type = Logic.emptyOr(map.type, Variables.varDefault("tournament_type"))
+	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault("tournament_name"))
+	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault("tournament_ticker_name"))
+	map.shortname = Logic.emptyOr(map.shortname, Variables.varDefault("tournament_shortname"))
+	map.series = Logic.emptyOr(map.series, Variables.varDefault("tournament_series"))
+	map.icon = Logic.emptyOr(map.icon, Variables.varDefault("tournament_icon"))
+	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault("tournament_tier"))
 	return map
 	end
 
@@ -346,9 +349,9 @@ function matchFunctions.getVodStuff(match)
 			local opstring = "opponent" .. o .. "_p" .. player
 			local goals = map[opstring .. "goals"]
 			local car = map[opstring .. "car"]
-			participant.goals = utils.misc.isEmpty(goals) and participant.goals or goals
-			participant.car = utils.misc.isEmpty(car) and participant.car or car
-			if not utils.table.isEmpty(participant) then
+			participant.goals = Logic.isEmpty(goals) and participant.goals or goals
+			participant.car = Logic.isEmpty(car) and participant.car or car
+			if not Table.isEmpty(participant) then
 				participants[o .. "_" .. player] = participant
 			end
 		end
