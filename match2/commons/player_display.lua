@@ -84,12 +84,7 @@ function PlayerDisplay.InlinePlayer(props)
 		:wikitext(text)
 end
 
--- Note: require('Module:Flag')[flag] automatically includes a span with class="flag"
-function PlayerDisplay.Flag(flag)
-	flag = flag:lower()
-	local text = require('Module:Flag')[flag]
-		or mw.getCurrentFrame():expandTemplate{ title = 'Flag/' .. flag }
-	return DisplayUtil.removeLinkFromWikiLink(text)
-end
+-- Note: require('Module:Flags')_FlagNoLink automatically includes a span with class="flag"
+PlayerDisplay.Flag = require('Module:Flags')._FlagNoLink
 
 return Class.export(PlayerDisplay)
