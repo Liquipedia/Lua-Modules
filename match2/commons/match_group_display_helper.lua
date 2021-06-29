@@ -99,6 +99,34 @@ function DisplayHelper.MatchCountdownBlock(match)
 end
 
 --[[
+Displays the map name and link, and the status of the match if it had an
+unusual status.
+]]
+function DisplayHelper.MapAndStatus(game)
+	local mapText = game.map
+		and '[[' .. game.map .. ']]'
+		or 'Unknown'
+	if game.resultType == 'np' or game.resultType == 'default' then
+		mapText = '<s>' .. mapText .. '</s>'
+	end
+
+	local statusText = nil
+	if game.resultType == 'default' then
+		if game.walkover == 'L' then
+			statusText = '<i>(w/o)</i>'
+		elseif game.walkover == 'FF' then
+			statusText = '<i>(ff)</i>'
+		elseif game.walkover == 'DQ' then
+			statusText = '<i>(dq)</i>'
+		else
+			statusText = '<i>(def.)</i>'
+		end
+	end
+
+	return mapText .. (statusText and '&nbsp;' .. statusText or '')
+end
+
+--[[
 Display component showing the detailed summary of a match. The component will
 appear as a popup from the Matchlist and Bracket components. This is a
 container component, so it takes in the match ID and bracket ID as inputs,
