@@ -72,7 +72,7 @@ function DisplayUtil.applyOverflowStyles(node, mode)
 		:css('overflow', (mode == 'ellipsis' or mode == 'hidden') and 'hidden' or nil)
 		:css('overflow-wrap', mode == 'wrap' and 'break-word' or nil)
 		:css('text-overflow', mode == 'ellipsis' and 'ellipsis' or nil)
-		:css('white-space', (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'unset')
+		:css('white-space', (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'normal')
 end
 
 -- Whether a value is a mediawiki html node.
