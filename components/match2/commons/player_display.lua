@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
+local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -32,10 +33,11 @@ function PlayerDisplay.BlockPlayer(props)
 	DisplayUtil.assertPropTypes(props, PlayerDisplay.propTypes.BlockPlayer)
 	local player = props.player
 
+	local zeroWidthSpace = '&#8203;'
 	local nameNode = mw.html.create('span'):addClass('name')
 		:wikitext(props.showLink ~= false and player.pageName
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
-			or player.displayName
+			or Logic.emptyOr(player.displayName, zeroWidthSpace)
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 

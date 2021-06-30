@@ -16,6 +16,8 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 
+local zeroWidthSpace = '&#8203;'
+
 local OpponentDisplay = {propTypes = {}, types = {}}
 
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket')
@@ -234,7 +236,7 @@ function OpponentDisplay.InlineTeam(props)
 		template = 'default',
 	}))
 		:gsub('DefaultPage', props.team.pageName)
-		:gsub('DefaultName', props.team.displayName)
+		:gsub('DefaultName', Logic.emptyOr(props.team.displayName, zeroWidthSpace))
 		:gsub('DefaultShort', props.team.shortName)
 		:gsub('DefaultBracket', props.team.bracketName)
 end
@@ -317,7 +319,7 @@ function OpponentDisplay.BlockLiteral(props)
 	return DisplayUtil.applyOverflowStyles(mw.html.create('div'), props.overflow or 'wrap')
 		:addClass('brkts-opponent-block-literal')
 		:addClass(props.flip and 'flipped' or nil)
-		:node(Logic.emptyOr(props.name, '&nbsp;'))
+		:node(Logic.emptyOr(props.name, zeroWidthSpace))
 end
 
 --[[
