@@ -47,7 +47,7 @@ function StarcraftMatchlistDisplay.Opponent(props)
 		showLink = false,
 		teamStyle = 'short',
 	})
-		:css('width', props.width - 2 * 5 .. 'px')
+		:css('width', props.width - 2 * MatchlistDisplay.cellPadding - 1 .. 'px')
 	return html.create('td')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
 		:addClass(props.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or nil)
@@ -57,7 +57,7 @@ end
 function StarcraftMatchlistDisplay.Score(props)
 	local contentNode = html.create('div'):addClass('brkts-matchlist-score')
 		:node(StarcraftOpponentDisplay.InlineScore(props.opponent))
-		:css('width', props.width - 2 * 5 .. 'px')
+		:css('width', props.width - 2 * MatchlistDisplay.cellPadding - 1 .. 'px')
 	return html.create('td')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil)
 		:node(contentNode)
