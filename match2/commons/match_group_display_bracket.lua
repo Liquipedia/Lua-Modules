@@ -27,7 +27,7 @@ function BracketDisplay.configFromArgs(args)
 	return {
 		headerHeight = tonumber(args.headerHeight),
 		headerMargin = tonumber(args.headerMargin),
-		hideRoundTitles = Logic.readBool(args.hideRoundTitles),
+		hideRoundTitles = Logic.readBoolOrNil(args.hideRoundTitles),
 		lineWidth = tonumber(args.lineWidth),
 		matchMargin = tonumber(args.matchMargin),
 		matchWidth = tonumber(args.matchWidth),

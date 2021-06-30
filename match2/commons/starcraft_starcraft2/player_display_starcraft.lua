@@ -95,8 +95,8 @@ function StarcraftPlayerDisplay.TemplatePlayer()
 		and StarcraftPlayerUtil.hiddenSort(player.displayName, player.flag, player.race, args.hs)
 		or ''
 	return hiddenSort .. StarcraftPlayerDisplay.InlinePlayer({
-		dq = Logic.readBool(args.dq),
-		flip = Logic.readBool(args.flip),
+		dq = Logic.readBoolOrNil(args.dq),
+		flip = Logic.readBoolOrNil(args.flip),
 		player = player,
 		showRace = (args.showRace or 'true') == 'true',
 	})
@@ -114,13 +114,13 @@ function StarcraftPlayerDisplay.TemplateInlinePlayer()
 	}
 	return StarcraftPlayerDisplay.InlinePlayerContainer({
 		date = args.date,
-		dontSave = Logic.readBool(args.novar),
-		dq = Logic.readBool(args.dq),
-		flip = Logic.readBool(args.flip),
+		dontSave = Logic.readBoolOrNil(args.novar),
+		dq = Logic.readBoolOrNil(args.dq),
+		flip = Logic.readBoolOrNil(args.flip),
 		player = player,
-		showFlag = Logic.emptyOr(Logic.readBool(args.showFlag), true),
-		showLink = Logic.emptyOr(Logic.readBool(args.showLink), true),
-		showRace = Logic.emptyOr(Logic.readBool(args.showRace), true),
+		showFlag = Logic.readBoolOrNil(args.showFlag),
+		showLink = Logic.readBoolOrNil(args.showLink),
+		showRace = Logic.readBoolOrNil(args.showRace),
 	})
 end
 
