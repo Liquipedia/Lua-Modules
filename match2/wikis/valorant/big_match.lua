@@ -171,7 +171,7 @@ function BigMatch:stats(frame, match, playerLookUp, opponents)
 
 					row	:cell(
 							mw.html.create('div')	:addClass('fb-match-page-valorant-stats-player-name')
-													:wikitext(playerLookUp[index].name)
+													:wikitext('[[' .. playerLookUp[index].name .. ']]')
 						)
 						:cell(
 							mw.html.create('div')	:addClass('fb-match-page-valorant-stats-agent')
