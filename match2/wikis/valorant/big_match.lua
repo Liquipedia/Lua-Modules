@@ -49,7 +49,7 @@ function BigMatch:render(frame, match, tournament)
 
 	overall :node(self:header(match, opponent1, opponent2, tournament))
 			:node(self:overview(match))
-			:node(self:stats(frame, match, playerLookUp, opponent1, opponent2))
+			:node(self:stats(frame, match, playerLookUp, {opponent1, opponent2}))
 			:node(self:economy(match, opponent1, opponent2))
 
 	return overall
@@ -124,7 +124,7 @@ function BigMatch:overview(match)
 								:node(boxRight)
 end
 
-function BigMatch:stats(frame, match, playerLookUp, opponent1, opponent2)
+function BigMatch:stats(frame, match, playerLookUp, opponents)
 	local tabs = {
 		This = 1,
 	}
@@ -138,21 +138,27 @@ function BigMatch:stats(frame, match, playerLookUp, opponent1, opponent2)
 			break;
 		end
 
+		local extradata = Json.parse(map.extradata or {})
+
 		tabs['name' .. ind] = 'Map ' .. ind
 
-		local divTable = DivTable.create()
-		divTable:row(
-			DivTable.HeaderRow():cell(mw.html.create('div'):wikitext('Player'))
-				:cell(mw.html.create('div'):wikitext('Agent'))
-				:cell(mw.html.create('div'):wikitext('Kills'))
-				:cell(mw.html.create('div'):wikitext('Deaths'))
-				:cell(mw.html.create('div'):wikitext('Assists'))
-				:cell(mw.html.create('div'):wikitext('ACS'))
-		)
+		local container = mw.html.create('div'):addClass('fb-match-page-valorant-stats')
 
 		local participants = Json.parse(map.participants or '{}')
 		if not Table.isEmpty(participants) then
 			for i = 1, 2 do
+				container:node(self:_createTeamStatsBanner(opponents[i].name, extradata['op1startside'], i == 1))
+
+				local divTable = DivTable.create()
+				divTable:row(
+					DivTable.HeaderRow():cell(mw.html.create('div'):wikitext('Player'))
+						:cell(mw.html.create('div'):wikitext('Agent'))
+						:cell(mw.html.create('div'):wikitext('Kills'))
+						:cell(mw.html.create('div'):wikitext('Deaths'))
+						:cell(mw.html.create('div'):wikitext('Assists'))
+						:cell(mw.html.create('div'):wikitext('ACS'))
+				)
+
 				for j = 1, 5 do
 
 					local index = i .. '_' .. j
@@ -171,10 +177,12 @@ function BigMatch:stats(frame, match, playerLookUp, opponent1, opponent2)
 						:cell(mw.html.create('div'):wikitext(player['acs']))
 					divTable:row(row)
 				end
+
+				container:node(divTable:create():addClass('fb-match-page-valorant-stats-table'))
 			end
 		end
 
-		tabs['content' .. ind] = tostring(divTable:create():addClass('fb-match-page-valorant-stats'))
+		tabs['content' .. ind] = tostring(container)
 
 		ind = ind + 1
 	end
@@ -250,6 +258,25 @@ function BigMatch:_createTeamSeparator(format, stream)
 		:node(divider)
 		:node(format)
 end
+
+function BigMatch:_createTeamStatsBanner(teamName, side, isFirstTeam)
+	local banner = mw.html.create('div'):addClass('fb-match-page-valorant-stats-banner')
+	local team = mw.html.create('div'):addClass('fb-match-page-valorant-stats-banner-team'):wikitext(teamName)
+	local sideIndicator = mw.html.create('div')	:addClass('fb-match-page-valorant-stats-banner-side')
+												:wikitext('Start Side: ')
+	if side == 'atk' and isFirstTeam then
+		sideIndicator:wikitext('Attack')
+	elseif side == 'def' and isFirstTeam then
+		sideIndicator:wikitext('Defence')
+	elseif side == 'atk' and not isFirstTeam then
+		sideIndicator:wikitext('Defence')
+	elseif side == 'def' and not isFirstTeam then
+		sideIndicator:wikitext('Attack')
+	end
+
+	return banner:node(team):node(sideIndicator)
+end
+
 
 function BigMatch:_createTeamContainer(side, teamName, score, hasWon)
 	local link = '[[' .. teamName .. ']]'
