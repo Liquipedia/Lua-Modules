@@ -234,7 +234,10 @@ function BigMatch:economy(match, opponent1, opponent2)
 			},
 		})
 
-		tabs['content' .. ind] = tostring(chart)
+		local chartContainer = mw.html.create('div'):addClass('fb-match-page-economy-timeline')
+													:node(chart)
+
+		tabs['content' .. ind] = tostring(chartContainer)
 
 		ind = ind + 1
 	end
