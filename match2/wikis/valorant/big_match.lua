@@ -151,7 +151,10 @@ function BigMatch:stats(frame, match, playerLookUp, opponents)
 
 				local divTable = DivTable.create()
 				divTable:row(
-					DivTable.HeaderRow():cell(mw.html.create('div'):wikitext('Player'))
+					DivTable.HeaderRow():cell(
+							mw.html.create('div')	:wikitext('Player')
+													:addClass('fb-match-page-valorant-stats-player')
+						)
 						:cell(mw.html.create('div'):wikitext('Agent'))
 						:cell(mw.html.create('div'):wikitext('Kills'))
 						:cell(mw.html.create('div'):wikitext('Deaths'))
@@ -166,7 +169,10 @@ function BigMatch:stats(frame, match, playerLookUp, opponents)
 
 					local row = DivTable.Row()
 
-					row	:cell(mw.html.create('div'):wikitext(playerLookUp[index].name))
+					row	:cell(
+							mw.html.create('div')	:addClass('fb-match-page-valorant-stats-player-name')
+													:wikitext(playerLookUp[index].name)
+						)
 						:cell(
 							mw.html.create('div')	:addClass('fb-match-page-valorant-stats-agent')
 													:wikitext(Template.safeExpand(frame, 'AgentIcon/' .. player['agent']))
