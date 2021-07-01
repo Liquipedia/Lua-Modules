@@ -13,6 +13,7 @@ local Links = require('Module:Links')
 local Countdown = require('Module:Countdown')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
+local Template = require('Module:Template')
 
 local BigMatch = Class.new()
 
@@ -48,7 +49,7 @@ function BigMatch:render(frame, match, tournament)
 
 	overall :node(self:header(match, opponent1, opponent2, tournament))
 			:node(self:overview(match))
-			:node(self:stats(match, playerLookUp))
+			:node(self:stats(frame, match, playerLookUp, {opponent1, opponent2}))
 			:node(self:economy(match, opponent1, opponent2))
 
 	return overall
@@ -123,7 +124,7 @@ function BigMatch:overview(match)
 								:node(boxRight)
 end
 
-function BigMatch:stats(match, playerLookUp)
+function BigMatch:stats(frame, match, playerLookUp, opponents)
 	local tabs = {
 		This = 1,
 	}
@@ -137,22 +138,30 @@ function BigMatch:stats(match, playerLookUp)
 			break;
 		end
 
+		local extradata = Json.parse(map.extradata or {})
+
 		tabs['name' .. ind] = 'Map ' .. ind
 
-		local divTable = DivTable.create()
-		divTable:row(
-			DivTable.HeaderRow():cell(mw.html.create('div'):wikitext('Player'))
-				:cell(mw.html.create('div'):wikitext('Agent'))
-				:cell(mw.html.create('div'):wikitext('Kills'))
-				:cell(mw.html.create('div'):wikitext('Assists'))
-				:cell(mw.html.create('div'):wikitext('Deaths'))
-				:cell(mw.html.create('div'):wikitext('ACS'))
-		)
-
+		local container = mw.html.create('div'):addClass('fb-match-page-valorant-stats')
 
 		local participants = Json.parse(map.participants or '{}')
 		if not Table.isEmpty(participants) then
 			for i = 1, 2 do
+				container:node(self:_createTeamStatsBanner(opponents[i].name, extradata['op1startside'], i == 1))
+
+				local divTable = DivTable.create()
+				divTable:row(
+					DivTable.HeaderRow():cell(
+							mw.html.create('div')	:wikitext('Player')
+													:addClass('fb-match-page-valorant-stats-player')
+						)
+						:cell(mw.html.create('div'):wikitext('Agent'))
+						:cell(mw.html.create('div'):wikitext('Kills'))
+						:cell(mw.html.create('div'):wikitext('Deaths'))
+						:cell(mw.html.create('div'):wikitext('Assists'))
+						:cell(mw.html.create('div'):wikitext('ACS'))
+				)
+
 				for j = 1, 5 do
 
 					local index = i .. '_' .. j
@@ -160,18 +169,26 @@ function BigMatch:stats(match, playerLookUp)
 
 					local row = DivTable.Row()
 
-					row	:cell(mw.html.create('div'):wikitext(playerLookUp[index].name))
-						:cell(mw.html.create('div'):wikitext(player['agent']))
+					row	:cell(
+							mw.html.create('div')	:addClass('fb-match-page-valorant-stats-player-name')
+													:wikitext('[[' .. playerLookUp[index].name .. ']]')
+						)
+						:cell(
+							mw.html.create('div')	:addClass('fb-match-page-valorant-stats-agent')
+													:wikitext(Template.safeExpand(frame, 'AgentIcon/' .. player['agent']))
+						)
 						:cell(mw.html.create('div'):wikitext(player['kills']))
-						:cell(mw.html.create('div'):wikitext(player['assists']))
 						:cell(mw.html.create('div'):wikitext(player['deaths']))
+						:cell(mw.html.create('div'):wikitext(player['assists']))
 						:cell(mw.html.create('div'):wikitext(player['acs']))
 					divTable:row(row)
 				end
+
+				container:node(divTable:create():addClass('fb-match-page-valorant-stats-table'))
 			end
 		end
 
-		tabs['content' .. ind] = tostring(divTable:create())
+		tabs['content' .. ind] = tostring(container)
 
 		ind = ind + 1
 	end
@@ -223,7 +240,10 @@ function BigMatch:economy(match, opponent1, opponent2)
 			},
 		})
 
-		tabs['content' .. ind] = tostring(chart)
+		local chartContainer = mw.html.create('div'):addClass('fb-match-page-economy-timeline')
+													:node(chart)
+
+		tabs['content' .. ind] = tostring(chartContainer)
 
 		ind = ind + 1
 	end
@@ -247,6 +267,25 @@ function BigMatch:_createTeamSeparator(format, stream)
 		:node(divider)
 		:node(format)
 end
+
+function BigMatch:_createTeamStatsBanner(teamName, side, isFirstTeam)
+	local banner = mw.html.create('div'):addClass('fb-match-page-valorant-stats-banner')
+	local team = mw.html.create('div'):addClass('fb-match-page-valorant-stats-banner-team'):wikitext(teamName)
+	local sideIndicator = mw.html.create('div')	:addClass('fb-match-page-valorant-stats-banner-side')
+												:wikitext('Start Side: ')
+	if side == 'atk' and isFirstTeam then
+		sideIndicator:wikitext('Attack')
+	elseif side == 'def' and isFirstTeam then
+		sideIndicator:wikitext('Defence')
+	elseif side == 'atk' and not isFirstTeam then
+		sideIndicator:wikitext('Defence')
+	elseif side == 'def' and not isFirstTeam then
+		sideIndicator:wikitext('Attack')
+	end
+
+	return banner:node(team):node(sideIndicator)
+end
+
 
 function BigMatch:_createTeamContainer(side, teamName, score, hasWon)
 	local link = '[[' .. teamName .. ']]'
