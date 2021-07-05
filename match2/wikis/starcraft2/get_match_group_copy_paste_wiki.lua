@@ -6,8 +6,21 @@ WikiSpecific Code for MatchList and Bracket Code Generators
 
 local wikiCopyPaste = {}
 
---allowed opponent types on the wiki (archon and 2v2 both are of type "duo", but they need different code, hence them both being available here)
-local MODES = { ['1v1'] = '1v1', ['2v2'] = '2v2', ['3v3'] = '3v3', ['4v4'] = '4v4', ['archon'] = 'archon', ['team'] = 'team', ['literal'] = 'literal', ['1'] = '1v1', ['2'] = '3', ['3v3'] = '3v3', ['4'] = '4v4' }
+--allowed opponent types on the wiki (archon and 2v2 both are of type 
+--"duo", but they need different code, hence them both being available here)
+local MODES = {
+	['1v1'] = '1v1',
+	['2v2'] = '2v2',
+	['3v3'] = '3v3',
+	['4v4'] = '4v4',
+	['archon'] = 'archon',
+	['team'] = 'team',
+	['literal'] = 'literal',
+	['1'] = '1v1',
+	['2'] = '3',
+	['3'] = '3v3',
+	['4'] = '4v4'
+	}
 
 --default opponent type (used if the entered mode is not found in the above table)
 local DefaultMode = '1v1'
@@ -20,12 +33,13 @@ end
 --returns the Code for a Match, depending on the input
 function wikiCopyPaste.getMatchCode(bestof, mode, index,  opponents, args)
 	local score = args.score == 'true' and '|score=' or ''
-	local out = '{{Match' .. (index == 1 and bestof ~= 0 and ('|bestof=' .. bestof) or '') .. (bestof == 0 and '\n\t|winner=' or '') .. '\n\t|date=\n\t|twitch='
-	
+	local out = '{{Match' .. (index == 1 and bestof ~= 0 and ('|bestof=' .. bestof) or '') .. 
+		(bestof == 0 and '\n\t|winner=' or '') .. '\n\t|date=\n\t|twitch='
+
 	for i = 1, opponents do
 		out = out .. '\n\t|opponent' .. i .. '=' .. _getOpponent(mode, score)
 	end
-	
+
 	if bestof ~= 0 then
 		if mode == 'team' and tonumber(args.submatch or '') then
 			local submatchBo = tonumber(args.submatch)
@@ -47,14 +61,14 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index,  opponents, args)
 			end
 		end
 	end
-	
+
 	return out .. '\n\t}}'
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
 function _getOpponent(mode, score)
 	local out
-	
+
 	if mode == '1v1' then
 		out = '{{1v1Opponent|p1=' .. score .. '}}'
 	elseif mode == '2v2' then
@@ -70,15 +84,21 @@ function _getOpponent(mode, score)
 	elseif mode == 'literal' then
 		out = '{{Literal|}}'
 	end
-	
+
 	return out
 end
 
 --function that sets the text that starts the invoke of the MatchGroup Moduiles, contains madatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
 --on sc2 also used to link to the documentation pages about the new bracket/match system
 function wikiCopyPaste.getStart(template, id, modus, args)
-	local tooltip = args.tooltip == 'true' and ('\n' .. mw.text.nowiki('<!--') .. ' For more information on Bracket parameters see Liquipedia:Brackets ' .. mw.text.nowiki('-->') .. '\n' .. mw.text.nowiki('<!--') .. ' For Opponent Copy-Paste-Code see Liquipedia:Brackets/Opponents#Copy-Paste ' .. mw.text.nowiki('-->')) or ''
-	return '{{' .. (modus == 'bracket' and ('Bracket|Bracket/' .. template) or 'Matchlist') .. '|id=' .. id .. tooltip
+	local tooltip = args.tooltip == 'true' and ('\n' .. mw.text.nowiki('<!--') .. 
+		' For more information on Bracket parameters see Liquipedia:Brackets ' .. 
+		mw.text.nowiki('-->') .. '\n' .. mw.text.nowiki('<!--') .. 
+		' For Opponent Copy-Paste-Code see Liquipedia:Brackets/Opponents#Copy-Paste ' .. 
+		mw.text.nowiki('-->')) or ''
+	return '{{' .. (modus == 'bracket' and 
+		('Bracket|Bracket/' .. template) or 'Matchlist') .. 
+		'|id=' .. id .. tooltip
 end
 
 return wikiCopyPaste
