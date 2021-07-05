@@ -6,7 +6,7 @@ WikiSpecific Code for MatchList and Bracket Code Generators
 
 local wikiCopyPaste = {}
 
---allowed opponent types on the wiki (archon and 2v2 both are of type 
+--allowed opponent types on the wiki (archon and 2v2 both are of type
 --"duo", but they need different code, hence them both being available here)
 local MODES = {
 	['1v1'] = '1v1',
@@ -37,7 +37,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index,  opponents, args)
 		(bestof == 0 and '\n\t|winner=' or '') .. '\n\t|date=\n\t|twitch='
 
 	for i = 1, opponents do
-		out = out .. '\n\t|opponent' .. i .. '=' .. _getOpponent(mode, score)
+		out = out .. '\n\t|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score)
 	end
 
 	if bestof ~= 0 then
@@ -66,7 +66,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index,  opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function _getOpponent(mode, score)
+function wikiCopyPaste._getOpponent(mode, score)
 	local out
 
 	if mode == '1v1' then
@@ -88,16 +88,17 @@ function _getOpponent(mode, score)
 	return out
 end
 
---function that sets the text that starts the invoke of the MatchGroup Moduiles, contains madatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
+--function that sets the text that starts the invoke of the MatchGroup Moduiles,
+--contains madatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
 --on sc2 also used to link to the documentation pages about the new bracket/match system
 function wikiCopyPaste.getStart(template, id, modus, args)
-	local tooltip = args.tooltip == 'true' and ('\n' .. mw.text.nowiki('<!--') .. 
-		' For more information on Bracket parameters see Liquipedia:Brackets ' .. 
-		mw.text.nowiki('-->') .. '\n' .. mw.text.nowiki('<!--') .. 
-		' For Opponent Copy-Paste-Code see Liquipedia:Brackets/Opponents#Copy-Paste ' .. 
+	local tooltip = args.tooltip == 'true' and ('\n' .. mw.text.nowiki('<!--') ..
+		' For more information on Bracket parameters see Liquipedia:Brackets ' ..
+		mw.text.nowiki('-->') .. '\n' .. mw.text.nowiki('<!--') ..
+		' For Opponent Copy-Paste-Code see Liquipedia:Brackets/Opponents#Copy-Paste ' ..
 		mw.text.nowiki('-->')) or ''
-	return '{{' .. (modus == 'bracket' and 
-		('Bracket|Bracket/' .. template) or 'Matchlist') .. 
+	return '{{' .. (modus == 'bracket' and
+		('Bracket|Bracket/' .. template) or 'Matchlist') ..
 		'|id=' .. id .. tooltip
 end
 
