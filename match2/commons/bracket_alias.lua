@@ -63,7 +63,6 @@ return {
 	['8qual-64debracket'] = '64-4Q-U-32L16DSL8DSL4D-4Q',
 	['16qual-32debracket'] = '32-8Q-U-16L8D-8Q',
 
-	
 	--section WITHOUT appended "Bracket"
 	--SE
 	['2se'] = '2',
