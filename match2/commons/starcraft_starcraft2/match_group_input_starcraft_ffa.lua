@@ -38,7 +38,7 @@ function FFA.adjustData(match)
 	local OppNumber = 0
 	local noscore = match.noscore == 'true' or match.noscore == '1' or match.nopoints == 'true' or match.nopoints == '1'
 	match.noscore = noscore
-	
+
 	--process pbg entries and set them into match.ffa (will get merged into extradata later on)
 	match = FFA.get_pbg(match)
 
@@ -110,16 +110,16 @@ function FFA.adjustData(match)
 end
 
 function FFA.get_pbg(match)
-	local index = 1
 	local pbg = {}
 
-	local advancecount = (tonumber(match.advancecount or 0) or 0)
+	local advancecount = tonumber(match.advancecount or 0) or 0
 	if advancecount > 0 then
 		for index = 1, advancecount do
 			pbg[index] = 'up'
 		end
 	end
 
+	local index = 1
 	while FFA.bgClean(match['pbg' .. index]) ~= '' do
 		pbg[index] = FFA.bgClean(match['pbg' .. index])
 		match['pbg' .. index] = nil
