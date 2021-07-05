@@ -6,7 +6,7 @@ adjust this to fit the needs of your wiki^^
 
 ]]--
 
-local p = {}
+local wikiCopyPaste = {}
 
 --allowed opponent types on the wiki
 local MODES = { ['solo'] = 'solo', ['team'] = 'team' }
@@ -15,16 +15,16 @@ local MODES = { ['solo'] = 'solo', ['team'] = 'team' }
 local DefaultMode = 'team'
 
 --returns the cleaned opponent type
-function p.getMode(mode)
+function wikiCopyPaste.getMode(mode)
 	return MODES[string.lower(mode or '')] or DefaultMode
 end
 
 --subfunction used to generate the code for the Map template
 --sets up as many maps as specified via the bestoff param
-function p._getMaps(bestof)
+function wikiCopyPaste._getMaps(bestof)
 	local map = '{{Map|map=}}'
 	local out = ''
-	for i = 1, bestof do
+	for _ = 1, bestof do
 		out = out .. '\n    ' .. map
 	end
 
@@ -33,31 +33,31 @@ end
 
 --returns the Code for a Match, depending on the input
 --for more customization please change stuff here^^
-function p.getMatchCode(bestof, mode, index, opponents, args)
+function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local out = tostring(mw.message.new('BracketConfigMatchTemplate'))
 	if out == '⧼BracketConfigMatchTemplate⧽' then
 		out = '{{Match\n    '
 		for i = 1, opponents do
-			out = out .. '\n    |opponent' .. i .. '=' .. p._getOpponent(mode)
+			out = out .. '\n    |opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode)
 		end
 		out = out .. '\n    |finished=\n    |tournament=\n    }}'
 	else
 		out = string.gsub(out, '<nowiki>', '')
 		out = string.gsub(out, '</nowiki>', '')
 		for i = 1, opponents do
-			out = string.gsub(out, '|opponent' .. i .. '=' , '|opponent' .. i .. '=' .. p._getOpponent(mode))
+			out = string.gsub(out, '|opponent' .. i .. '=' , '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode))
 		end
 
 		out = string.gsub(out, '|map1=.*\n' , '<<maps>>')
 		out = string.gsub(out, '|map%d+=.*\n' , '')
-		out = string.gsub(out, '<<maps>>' , p._getMaps(bestof))
+		out = string.gsub(out, '<<maps>>' , wikiCopyPaste._getMaps(bestof))
 	end
 
 	return out
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function p._getOpponent(mode)
+function wikiCopyPaste._getOpponent(mode)
 	local out
 
 	if mode == 'solo' then
@@ -71,22 +71,26 @@ function p._getOpponent(mode)
 	return out
 end
 
---function that sets the text that starts the invoke of the MatchGroup Moduiles, contains madatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
+--function that sets the text that starts the invoke of the MatchGroup Moduiles,
+--contains madatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
 --on sc2 also used to link to the documentation pages about the new bracket/match system
-function p.getStart(template, id, modus, args)
+function wikiCopyPaste.getStart(template, id, modus, args)
 	local out = tostring(mw.message.new('BracketConfigBracketTemplate'))
 	if out == '⧼BracketConfigBracketTemplate⧽' then
-		out = '{{#invoke:MatchGroup|' .. (modus == 'bracket' and ('bracket|Bracket/' .. template) or 'matchlist') .. '|id=' .. id .. tooltip
+		out = '{{#invoke:MatchGroup|' .. 
+			(modus == 'bracket' and ('bracket|Bracket/' .. template) or 'matchlist') .. 
+			'|id=' .. id
 	else
 		out = string.gsub(out, '<nowiki>', '')
 		out = string.gsub(out, '</nowiki>', '')
 		out = string.gsub(out, '<<matches>>.*', '')
 		out = string.gsub(out, '<<bracketid>>', id)
 		out = string.gsub(out, '^{{#invoke:[mM]atchGroup|[bB]racket', 'Bracket')
-		out = string.gsub(out, 'Bracket|<<templatename>>', (modus == 'bracket' and ('Bracket|Bracket/' .. template) or 'matchlist'))
+		out = string.gsub(out, 'Bracket|<<templatename>>', 
+			(modus == 'bracket' and ('Bracket|Bracket/' .. template) or 'matchlist'))
 	end
 
 	return out
 end
 
-return p
+return wikiCopyPaste
