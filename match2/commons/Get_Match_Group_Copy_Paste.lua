@@ -4,7 +4,7 @@ bracket finder (and code generator) / matchlist code generator
 
 ]]--
 
-local p = {}
+local copyPaste = {}
 local getArgs = require('Module:Arguments').getArgs
 local Lua = require("Module:Lua")
 local BracketAlias = Lua.moduleExists("Module:BracketAlias") and mw.loadData('Module:BracketAlias') or {}
@@ -12,7 +12,7 @@ local WikiSpecific = require("Module:GetMatchGroupCopyPaste/wiki")
 
 local args
 
-function _generateID()
+function copyPaste._generateID()
 	local id = ''
 
 	for i = 1, 10 do
@@ -27,13 +27,13 @@ function _generateID()
 	end
 
 	if mw.ext.Brackets.checkBracketDuplicate(id) ~= 'ok' then
-		id = _generateID()
+		id = copyPaste._generateID()
 	end
 
 	return id
 end
 
-function _getBracketData(templateid)
+function copyPaste._getBracketData(templateid)
 	templateid = 'Bracket/' .. templateid
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
 
@@ -64,7 +64,7 @@ function _getBracketData(templateid)
 	return bracketData
 end
 
-function _getHeader(headerCode, customHeader, match)
+function copyPaste._getHeader(headerCode, customHeader, match)
 	local header = ''
 
 	if not headerCode then
@@ -84,7 +84,7 @@ function _getHeader(headerCode, customHeader, match)
 	return header
 end
 
-function p.bracket(frame)
+function copyPaste.bracket(frame)
 	if not args then
 		args = getArgs(frame)
 	end
@@ -99,9 +99,9 @@ function p.bracket(frame)
 	args.id = string.gsub(string.gsub(args.id, '^Bracket/', ''), '^bracket/', '')
 	local templateid = BracketAlias[string.lower(args.id)] or args.id
 
-	local out = '<pre class="selectall" width=50%>' .. WikiSpecific.getStart(templateid, _generateID(), 'bracket', args)
+	local out = '<pre class="selectall" width=50%>' .. WikiSpecific.getStart(templateid, copyPaste._generateID(), 'bracket', args)
 
-	local bracketData = _getBracketData(templateid)
+	local bracketData = copyPaste._getBracketData(templateid)
 
 	for index, match in ipairs(bracketData) do
 		if match.id == 'RxMTP' or match.id == 'RxMBR' then
@@ -120,9 +120,9 @@ function p.bracket(frame)
 			end
 		else
 			if empty then
-				out = out .. _getHeader(match.header, customHeader, match) .. '\n|' .. match.id .. '='
+				out = out .. copyPaste._getHeader(match.header, customHeader, match) .. '\n|' .. match.id .. '='
 			else
-				out = out .. _getHeader(match.header, customHeader, match).. '\n|' .. match.id .. '=' .. WikiSpecific.getMatchCode(bestof, mode, index, opponents, args)
+				out = out .. copyPaste._getHeader(match.header, customHeader, match).. '\n|' .. match.id .. '=' .. WikiSpecific.getMatchCode(bestof, mode, index, opponents, args)
 			end
 		end
 	end
@@ -130,7 +130,7 @@ function p.bracket(frame)
 	return out .. '\n}}</pre>'
 end
 
-function p.matchlist(frame)
+function copyPaste.matchlist(frame)
 	if not args then
 		args = getArgs(frame)
 	end
@@ -142,7 +142,7 @@ function p.matchlist(frame)
 	local opponents = tonumber(args.opponents or 2) or 2
 	local mode = WikiSpecific.getMode(args.mode)
 
-	local out = '<pre class="selectall" width=50%>' .. WikiSpecific.getStart(templateid, _generateID(), 'matchlist', args)
+	local out = '<pre class="selectall" width=50%>' .. WikiSpecific.getStart(templateid, copyPaste._generateID(), 'matchlist', args)
 
 	for index = 1, matches do
 		if customHeader then
@@ -155,4 +155,4 @@ function p.matchlist(frame)
 	return out .. '\n}}</pre>'
 end
 
-return p
+return copyPaste
