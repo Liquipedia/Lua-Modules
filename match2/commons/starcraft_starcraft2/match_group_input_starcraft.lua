@@ -161,37 +161,43 @@ function StarCraftMatchGroupInput.getLinks(match)
 end
 
 function StarCraftMatchGroupInput.getExtraData(match)
-	match.extradata = json.stringify({
-		noQuery = match.noQuery,
-		matchsection = Variables.varDefault('matchsection'),
-		comment = match.comment,
-		featured = match.featured,
-		veto1by = (match.vetoplayer1 or '') ~= '' and match.vetoplayer1 or match.vetoopponent1,
-		veto1 = match.veto1,
-		veto2by = (match.vetoplayer2 or '') ~= '' and match.vetoplayer2 or match.vetoopponent2,
-		veto2 = match.veto2,
-		veto3by = (match.vetoplayer3 or '') ~= '' and match.vetoplayer3 or match.vetoopponent3,
-		veto3 = match.veto3,
-		veto4by = (match.vetoplayer4 or '') ~= '' and match.vetoplayer4 or match.vetoopponent4,
-		veto4 = match.veto4,
-		veto5by = (match.vetoplayer5 or '') ~= '' and match.vetoplayer5 or match.vetoopponent5,
-		veto5 = match.veto5,
-		veto6by = (match.vetoplayer6 or '') ~= '' and match.vetoplayer6 or match.vetoopponent6,
-		veto6 = match.veto6,
-		contestname = (match.contestname or '') ~= '' and (match.contestname .. ' Bracket Contest') or nil,
-		subGroup1header = StarCraftMatchGroupInput.getSubGroupHeader(1, match),
-		subGroup2header = StarCraftMatchGroupInput.getSubGroupHeader(2, match),
-		subGroup3header = StarCraftMatchGroupInput.getSubGroupHeader(3, match),
-		subGroup4header = StarCraftMatchGroupInput.getSubGroupHeader(4, match),
-		subGroup5header = StarCraftMatchGroupInput.getSubGroupHeader(5, match),
-		subGroup6header = StarCraftMatchGroupInput.getSubGroupHeader(6, match),
-		subGroup7header = StarCraftMatchGroupInput.getSubGroupHeader(7, match),
-		subGroup8header = StarCraftMatchGroupInput.getSubGroupHeader(8, match),
-		subGroup9header = StarCraftMatchGroupInput.getSubGroupHeader(9, match),
-		headtohead = match.headtohead,
-		ffa = match.ffa == 'true' and 'true' or 'false',
-		noscore = match.noscore
-	})
+	local extradata
+	if match.ffa == 'true' then
+		extradata = FFA.getExtraData(match)
+	else
+		extradata = {
+			noQuery = match.noQuery,
+			matchsection = Variables.varDefault('matchsection'),
+			comment = match.comment,
+			featured = match.featured,
+			veto1by = (match.vetoplayer1 or '') ~= '' and match.vetoplayer1 or match.vetoopponent1,
+			veto1 = match.veto1,
+			veto2by = (match.vetoplayer2 or '') ~= '' and match.vetoplayer2 or match.vetoopponent2,
+			veto2 = match.veto2,
+			veto3by = (match.vetoplayer3 or '') ~= '' and match.vetoplayer3 or match.vetoopponent3,
+			veto3 = match.veto3,
+			veto4by = (match.vetoplayer4 or '') ~= '' and match.vetoplayer4 or match.vetoopponent4,
+			veto4 = match.veto4,
+			veto5by = (match.vetoplayer5 or '') ~= '' and match.vetoplayer5 or match.vetoopponent5,
+			veto5 = match.veto5,
+			veto6by = (match.vetoplayer6 or '') ~= '' and match.vetoplayer6 or match.vetoopponent6,
+			veto6 = match.veto6,
+			contestname = (match.contestname or '') ~= '' and (match.contestname .. ' Bracket Contest') or nil,
+			subGroup1header = StarCraftMatchGroupInput.getSubGroupHeader(1, match),
+			subGroup2header = StarCraftMatchGroupInput.getSubGroupHeader(2, match),
+			subGroup3header = StarCraftMatchGroupInput.getSubGroupHeader(3, match),
+			subGroup4header = StarCraftMatchGroupInput.getSubGroupHeader(4, match),
+			subGroup5header = StarCraftMatchGroupInput.getSubGroupHeader(5, match),
+			subGroup6header = StarCraftMatchGroupInput.getSubGroupHeader(6, match),
+			subGroup7header = StarCraftMatchGroupInput.getSubGroupHeader(7, match),
+			subGroup8header = StarCraftMatchGroupInput.getSubGroupHeader(8, match),
+			subGroup9header = StarCraftMatchGroupInput.getSubGroupHeader(9, match),
+			headtohead = match.headtohead,
+			ffa = 'false',
+		}
+	end
+
+	match.extradata = json.stringify(extradata)
 	return match
 end
 
