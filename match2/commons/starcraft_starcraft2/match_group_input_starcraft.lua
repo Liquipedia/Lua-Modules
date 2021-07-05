@@ -525,7 +525,7 @@ end
 
 function StarCraftMatchGroupInput.ProcessSoloOpponentInput(opp)
 	local name = (opp.name or '') ~= '' and opp.name or (opp.p1 or '') ~= '' and opp.p1
-		or (opp[1] or '') ~= '' and opp[1] or ''
+		or opp[1] or ''
 	local link = mw.ext.TeamLiquidIntegration.resolve_redirect((opp.link or '') ~= '' and opp.link
 		or Variables.varDefault(name .. '_page') or name)
 	local race = (opp.race or '') ~= '' and opp.race or Variables.varDefault(name .. '_race') or ''
@@ -550,8 +550,8 @@ function StarCraftMatchGroupInput.ProcessSoloOpponentInput(opp)
 end
 
 function StarCraftMatchGroupInput.ProcessDuoOpponentInput(opp)
-	opp.p1 = (opp.p1 or '') and opp.p1 or ''
-	opp.p2 = (opp.p2 or '') and opp.p2 or ''
+	opp.p1 = opp.p1 or ''
+	opp.p2 = opp.p2 or ''
 	opp.link1 = mw.ext.TeamLiquidIntegration.resolve_redirect((opp.p1link or '') ~= ''
 		and opp.p1link or Variables.varDefault(opp.p1 .. '_page') or opp.p1)
 	opp.link2 = mw.ext.TeamLiquidIntegration.resolve_redirect((opp.p2link or '') ~= ''
@@ -595,7 +595,7 @@ function StarCraftMatchGroupInput.ProcessOpponentInput(opp, playernumber)
 
 	local players = {}
 	for i = 1, playernumber do
-		local Pname = (opp['p' .. i] or '') ~= '' and opp['p' .. i] or ''
+		local Pname = opp['p' .. i] or ''
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect((opp['p' .. i .. 'link'] or '') ~= ''
 			and opp['p' .. i .. 'link'] or Variables.varDefault(Pname .. '_page') or Pname)
 		local race = (opp['p' .. i .. 'race'] or '') ~= '' and opp['p' .. i .. 'race'] or
@@ -710,6 +710,9 @@ function StarCraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 			or (opp.name or '') ~= '' and opp.name or opp[1] or ''
 	else
 		opp.template = string.lower((opp.template or '') ~= '' and opp.template or opp[1] or '')
+		if opp.template == '' then
+			opp.template = 'tbd'
+		end
 		opp.template = StarCraftMatchGroupInput.getTeamTemplate(opp.template, date)
 		name, icon = StarCraftMatchGroupInput.getTeamNameIcon(opp.template)
 	end
