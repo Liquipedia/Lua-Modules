@@ -15,7 +15,7 @@ local args
 function copyPaste._generateID()
 	local id = ''
 
-	for i = 1, 10 do
+	for _ = 1, 10 do
 		local rnd = math.random(62)
 		if rnd <= 10 then
 			id = id .. (rnd-1)
@@ -80,7 +80,8 @@ function copyPaste._getHeader(headerCode, customHeader, match)
 
 	header = mw.text.split(header, ',')[1]
 
-	header = '\n\n' .. mw.text.nowiki('<!--') .. ' ' .. header .. ' ' .. mw.text.nowiki('-->') .. (customHeader and ('\n|' .. match.id .. 'header=') or '')
+	header = '\n\n' .. mw.text.nowiki('<!--') .. ' ' .. header .. ' '
+		.. mw.text.nowiki('-->') .. (customHeader and ('\n|' .. match.id .. 'header=') or '')
 	return header
 end
 
@@ -99,7 +100,8 @@ function copyPaste.bracket(frame)
 	args.id = string.gsub(string.gsub(args.id, '^Bracket/', ''), '^bracket/', '')
 	local templateid = BracketAlias[string.lower(args.id)] or args.id
 
-	local out = '<pre class="selectall" width=50%>' .. WikiSpecific.getStart(templateid, copyPaste._generateID(), 'bracket', args)
+	local out = '<pre class="selectall" width=50%>' .. 
+		WikiSpecific.getStart(templateid, copyPaste._generateID(), 'bracket', args)
 
 	local bracketData = copyPaste._getBracketData(templateid)
 
@@ -108,9 +110,11 @@ function copyPaste.bracket(frame)
 			if args.extra == 'true' then
 				local header
 				if match.id == 'RxMTP' then
-					header = '\n\n' .. mw.text.nowiki('<!--') .. ' Third Place Match ' .. mw.text.nowiki('-->') .. '\n|' .. match.id .. 'header='
+					header = '\n\n' .. mw.text.nowiki('<!--') .. ' Third Place Match ' .. 
+						mw.text.nowiki('-->') .. '\n|' .. match.id .. 'header='
 				else
-					header = '\n\n' .. mw.text.nowiki('<!--') .. ' Bracket Reset ' .. mw.text.nowiki('-->') .. '\n|' .. match.id .. 'header='
+					header = '\n\n' .. mw.text.nowiki('<!--') .. ' Bracket Reset ' .. 
+						mw.text.nowiki('-->') .. '\n|' .. match.id .. 'header='
 				end
 				if empty then
 					out = out .. header .. '\n|' .. match.id .. '='
@@ -122,7 +126,8 @@ function copyPaste.bracket(frame)
 			if empty then
 				out = out .. copyPaste._getHeader(match.header, customHeader, match) .. '\n|' .. match.id .. '='
 			else
-				out = out .. copyPaste._getHeader(match.header, customHeader, match).. '\n|' .. match.id .. '=' .. WikiSpecific.getMatchCode(bestof, mode, index, opponents, args)
+				out = out .. copyPaste._getHeader(match.header, customHeader, match).. '\n|' .. match.id .. '=' .. 
+					WikiSpecific.getMatchCode(bestof, mode, index, opponents, args)
 			end
 		end
 	end
@@ -142,14 +147,16 @@ function copyPaste.matchlist(frame)
 	local opponents = tonumber(args.opponents or 2) or 2
 	local mode = WikiSpecific.getMode(args.mode)
 
-	local out = '<pre class="selectall" width=50%>' .. WikiSpecific.getStart(templateid, copyPaste._generateID(), 'matchlist', args)
+	local out = '<pre class="selectall" width=50%>' .. 
+		WikiSpecific.getStart(nil, copyPaste._generateID(), 'matchlist', args)
 
 	for index = 1, matches do
 		if customHeader then
 			out = out .. '\n|M' .. index .. 'header='
 		end
 
-		out = out .. '\n|M' .. index .. '=' .. (not empty and WikiSpecific.getMatchCode(bestof, mode, index, opponents, args) or '')
+		out = out .. '\n|M' .. index .. '=' .. 
+			(not empty and WikiSpecific.getMatchCode(bestof, mode, index, opponents, args) or '')
 	end
 
 	return out .. '\n}}</pre>'
