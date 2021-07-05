@@ -16,7 +16,7 @@ end
 function wikiCopyPaste._getMaps(bestof)
 	local map = '{{Map\n\t\t|map=\n\t\t|score1=|score2=\n\t\t|ot=|otlength=\n\t\t|vod=\n\t}}'
 	local out = ''
-	for i = 1, bestof do
+	for _ = 1, bestof do
 		out = out .. '\t' .. map .. '\n'
 	end
 
