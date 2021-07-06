@@ -39,7 +39,7 @@ function FFA.adjustData(match)
 	local noscore = match.noscore == 'true' or match.noscore == '1' or match.nopoints == 'true' or match.nopoints == '1'
 	match.noscore = noscore
 
-	--process pbg entries and set them into match.ffa (will get merged into extradata later on)
+	--process pbg entries and set them into match.pbg (will get merged into extradata later on)
 	match = FFA.get_pbg(match)
 
 	--parse opponents + determine match mode + set initial stuff
