@@ -62,8 +62,8 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 end
 
 -- Called from Template:Player and Template:Player2
-function StarcraftPlayerDisplay.TemplatePlayer()
-	local args = require('Module:Arguments').getArgs(mw.getCurrentFrame())
+function StarcraftPlayerDisplay.TemplatePlayer(frame)
+	local args = require('Module:Arguments').getArgs(frame)
 
 	local pageName
 	local displayName
@@ -90,20 +90,21 @@ function StarcraftPlayerDisplay.TemplatePlayer()
 		StarcraftPlayerUtil.saveToPageVars(player)
 	end
 
-	local hiddenSort = args.hs
-		and StarcraftPlayerUtil.hiddenSort(player.displayName, player.flag, player.race, args.hs)
+	local hiddenSortNode = args.hs
+		and StarcraftPlayerUtil.HiddenSort(player.displayName, player.flag, player.race, args.hs)
 		or ''
-	return hiddenSort .. StarcraftPlayerDisplay.InlinePlayer({
+	local playerNode = StarcraftPlayerDisplay.InlinePlayer({
 		dq = Logic.readBoolOrNil(args.dq),
 		flip = Logic.readBoolOrNil(args.flip),
 		player = player,
 		showRace = (args.showRace or 'true') == 'true',
 	})
+	return tostring(hiddenSortNode) .. tostring(playerNode)
 end
 
 -- Called from Template:InlinePlayer
-function StarcraftPlayerDisplay.TemplateInlinePlayer()
-	local args = require('Module:Arguments').getArgs(mw.getCurrentFrame())
+function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
+	local args = require('Module:Arguments').getArgs(frame)
 
 	local player = {
 		displayName = args[1],
@@ -191,11 +192,10 @@ function StarcraftPlayerDisplay.InlinePlayer(props)
 
 	return html.create('span'):addClass('starcraft-inline-player')
 		:addClass(props.flip and 'flipped' or nil)
-		:css('white-space', 'pre')
 		:wikitext(text)
 end
 
-function StarcraftPlayerDisplay.hiddenSort(name, flag, race, field)
+function StarcraftPlayerDisplay.HiddenSort(name, flag, race, field)
 	local text
 	if field == 'race' then
 		text = race
