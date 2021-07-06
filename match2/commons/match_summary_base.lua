@@ -27,8 +27,13 @@ function Header:right(content)
 	return self
 end
 
+function Header:score(content)
+	self.scoreElement = content:addClass('brkts-popup-header-score')
+	return self
+end
+
 function Header:create()
-	self.root:node(self.leftElement):node(self.rightElement)
+	self.root:node(self.leftElement):node(self.scoreElement or ''):node(self.rightElement)
 	return self.root
 end
 
