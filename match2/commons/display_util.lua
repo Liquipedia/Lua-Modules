@@ -8,17 +8,29 @@ local DisplayUtil = {propTypes = {}, types = {}}
 Checks that the props to be used by a display component satisfy type
 constraints. Throws if it does not.
 
-For performance reasons, this only checks types of properties, and does not
-check contents inside table properties. Specify options.maxDepth to override
-this behavior.
+For performance reasons, type checking is disabled unless the forceTypeCheck
+developer flag is enabled via {{#vardefine:forceTypeCheck|1}}. Certain other
+developer flags like matchGroupDev can also enable type checking.
+
+By default this only checks types of properties, and not their contents. If
+forceTypeCheck is enabled, then the contents of table properties are checked up
+to 4 deep. Specify options.maxDepth to increase the depth.
 ]]
 DisplayUtil.assertPropTypes = function(props, propTypes, options)
+	local DevFlags = require('Module:DevFlags')
+	if not (DevFlags.matchGroupDev or DevFlags.forceTypeCheck) then
+		return
+	end
+
 	options = options or {}
 
 	local errors = TypeUtil.checkValue(
 		props,
 		TypeUtil.struct(propTypes),
-		{maxDepth = options.maxDepth or 1, name = 'props'}
+		{
+			maxDepth = options.maxDepth or (DevFlags.forceTypeCheck and 5 or 1),
+			name = 'props',
+		}
 	)
 	if #errors > 0 then
 		error(table.concat(errors, '\n'), 2)
