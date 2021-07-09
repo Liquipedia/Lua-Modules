@@ -7,8 +7,8 @@ local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 local config = Lua.moduleExists('Module:Match/Config') and mw.loadData('Module:Match/Config') or {}
 local WikiSpecific = require('Module:DevFlags').matchGroupDev
-		and Lua.requireIfExists('Module:MatchGroup/Input/StarCraft/dev')
-		or require('Module:MatchGroup/Input/StarCraft')
+	and Lua.requireIfExists('Module:MatchGroup/Input/StarCraft/dev')
+	or require('Module:MatchGroup/Input/StarCraft')
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
@@ -23,11 +23,25 @@ local MODES2 = {
 	['team'] = 'team',
 	['literal'] = 'literal'
 	}
+local ALOWED_BG = {
+	['up'] = 'up',
+	['down'] = 'down',
+	['stayup'] = 'stayup',
+	['staydown'] = 'staydown',
+	['stay'] = 'stay',
+	['mid'] = 'mid',
+	['drop'] = 'down',
+	['proceed'] = 'up',
+	}
 
 function FFA.adjustData(match)
 	local OppNumber = 0
 	local noscore = match.noscore == 'true' or match.noscore == '1' or match.nopoints == 'true' or match.nopoints == '1'
 	match.noscore = noscore
+
+	--process pbg entries and set them into match.pbg (will get merged into extradata later on)
+	match = FFA.get_pbg(match)
+
 	--parse opponents + determine match mode + set initial stuff
 	match.mode = ''
 	match, OppNumber = FFA.OpponentInput(match, OppNumber, noscore)
@@ -93,6 +107,77 @@ function FFA.adjustData(match)
 	end
 
 	return match
+end
+
+function FFA.get_pbg(match)
+	local pbg = {}
+
+	local advancecount = tonumber(match.advancecount or 0) or 0
+	if advancecount > 0 then
+		for index = 1, advancecount do
+			pbg[index] = 'up'
+		end
+	end
+
+	local index = 1
+	while FFA.bgClean(match['pbg' .. index]) ~= '' do
+		pbg[index] = FFA.bgClean(match['pbg' .. index])
+		match['pbg' .. index] = nil
+		index = index + 1
+	end
+
+	match.pbg = pbg
+
+	return match
+end
+
+--helper function
+function FFA.bgClean(pbg)
+	local temp = pbg
+	pbg = string.lower(pbg or '')
+	if pbg == '' then
+		return ''
+	else
+		pbg = ALOWED_BG[pbg]
+
+		if not pbg then
+			error('Bad bg/pbg entry "' .. temp .. '"')
+		end
+
+		return pbg
+	end
+end
+
+--function to get extradata for storage
+function FFA.getExtraData(match)
+	local extradata = {
+		matchsection = Variables.varDefault('matchsection'),
+		comment = match.comment,
+		featured = match.featured,
+		veto1by = (match.vetoplayer1 or '') ~= '' and match.vetoplayer1 or match.vetoopponent1,
+		veto1 = match.veto1,
+		veto2by = (match.vetoplayer2 or '') ~= '' and match.vetoplayer2 or match.vetoopponent2,
+		veto2 = match.veto2,
+		veto3by = (match.vetoplayer3 or '') ~= '' and match.vetoplayer3 or match.vetoopponent3,
+		veto3 = match.veto3,
+		veto4by = (match.vetoplayer4 or '') ~= '' and match.vetoplayer4 or match.vetoopponent4,
+		veto4 = match.veto4,
+		veto5by = (match.vetoplayer5 or '') ~= '' and match.vetoplayer5 or match.vetoopponent5,
+		veto5 = match.veto5,
+		veto6by = (match.vetoplayer6 or '') ~= '' and match.vetoplayer6 or match.vetoopponent6,
+		veto6 = match.veto6,
+		ffa = 'true',
+		noscore = match.noscore,
+		showplacement = match.showplacement,
+	}
+
+	--add the pbg stuff
+	for key, item in pairs(match.pbg) do
+		extradata[key] = item
+	end
+	match.pbg = nil
+
+	return extradata
 end
 
 -- function to sort out placements
@@ -204,6 +289,8 @@ function FFA.MatchPlacements(match, OppNumber, noscore, IndScore)
 					match.finished = 'true'
 					match['opponent' .. scoreIndex].placement = tonumber(match['opponent' .. scoreIndex].placement or '') or counter
 					match['opponent' .. scoreIndex].extradata.advances = true
+					match['opponent' .. scoreIndex].extradata.bg = match['opponent' .. scoreIndex].extradata.bg
+						or match.pbg[match['opponent' .. scoreIndex].placement] or 'down'
 					temp.place = counter
 					temp.score = IndScore[scoreIndex]
 				else
@@ -216,6 +303,11 @@ function FFA.MatchPlacements(match, OppNumber, noscore, IndScore)
 					match['opponent' .. scoreIndex].placement = tonumber(match['opponent' .. scoreIndex].placement or '') or counter
 					temp.place = counter
 					temp.score = IndScore[scoreIndex]
+				end
+				match['opponent' .. scoreIndex].extradata.bg = match['opponent' .. scoreIndex].extradata.bg
+						or match.pbg[match['opponent' .. scoreIndex].placement] or 'down'
+				if match['opponent' .. scoreIndex].extradata.bg == 'up' then
+					match['opponent' .. scoreIndex].extradata.advances = true
 				end
 			else
 				break
@@ -252,6 +344,8 @@ function FFA.OpponentInput(match, OppNumber, noscore)
 			--parse the stringified opponent arguments to be a table again
 			match['opponent' .. opponentIndex] = json.parseIfString(match['opponent' .. opponentIndex])
 
+			local bg = FFA.bgClean(match['opponent' .. opponentIndex].bg)
+			match['opponent' .. opponentIndex].bg = nil
 			local advances = match['opponent' .. opponentIndex].advance or ''
 			if advances == '' then
 				advances = match['opponent' .. opponentIndex].win or ''
@@ -259,7 +353,7 @@ function FFA.OpponentInput(match, OppNumber, noscore)
 					advances = match['opponent' .. opponentIndex].advances or ''
 				end
 			end
-			advances = advances ~= 'false' and advances ~= '' and advances ~= '0' and 'true'
+			advances = advances ~= 'false' and advances ~= '' and advances ~= '0'
 
 			--opponent processing (first part)
 			--sort out extradata
@@ -268,7 +362,8 @@ function FFA.OpponentInput(match, OppNumber, noscore)
 				score2 = match['opponent' .. opponentIndex].score2,
 				isarchon = match['opponent' .. opponentIndex].isarchon,
 				advances = advances,
-				noscore = noscore
+				noscore = noscore,
+				bg = bg
 			}
 
 			--set initial opponent sumscore
