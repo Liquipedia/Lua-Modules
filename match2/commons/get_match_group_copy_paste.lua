@@ -12,6 +12,13 @@ local WikiSpecific = require("Module:GetMatchGroupCopyPaste/wiki")
 
 local args
 
+function copyPaste.generateID()
+	--initiate the rnd generator
+	math.randomseed(os.time())
+	math.random(); math.random(); math.random()
+	return copyPaste._generateID()
+end
+
 function copyPaste._generateID()
 	local id = ''
 
@@ -101,7 +108,7 @@ function copyPaste.bracket(frame)
 	local templateid = BracketAlias[string.lower(args.id)] or args.id
 
 	local out = '<pre class="selectall" width=50%>' ..
-		WikiSpecific.getStart(templateid, copyPaste._generateID(), 'bracket', args)
+		WikiSpecific.getStart(templateid, copyPaste.generateID(), 'bracket', args)
 
 	local bracketData = copyPaste._getBracketData(templateid)
 
@@ -148,7 +155,7 @@ function copyPaste.matchlist(frame)
 	local mode = WikiSpecific.getMode(args.mode)
 
 	local out = '<pre class="selectall" width=50%>' ..
-		WikiSpecific.getStart(nil, copyPaste._generateID(), 'matchlist', args)
+		WikiSpecific.getStart(nil, copyPaste.generateID(), 'matchlist', args)
 
 	for index = 1, matches do
 		if customHeader then
