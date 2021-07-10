@@ -421,7 +421,7 @@ function StarCraftMatchGroupInput.SubMatchStructure(match)
 			--adjust sub-match scores
 			if tonumber(match['map' .. i].winner) == 1 then
 				SubMatches[k].scores[1] = SubMatches[k].scores[1] + 1
-			elseif tonumber(match['map' .. i].winner) == 1 then
+			elseif tonumber(match['map' .. i].winner) == 2 then
 				SubMatches[k].scores[2] = SubMatches[k].scores[2] + 1
 			end
 			--stringify map
