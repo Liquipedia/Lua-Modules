@@ -92,7 +92,7 @@ function copyPaste._getHeader(headerCode, customHeader, match)
 	return header
 end
 
-function copyPaste.bracket(frame)
+function copyPaste.bracket(frame, args)
 	if not args then
 		args = getArgs(frame)
 	end
@@ -142,7 +142,7 @@ function copyPaste.bracket(frame)
 	return out .. '\n}}</pre>'
 end
 
-function copyPaste.matchlist(frame)
+function copyPaste.matchlist(frame, args)
 	if not args then
 		args = getArgs(frame)
 	end
