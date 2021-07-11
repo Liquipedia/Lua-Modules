@@ -10,8 +10,6 @@ local Lua = require("Module:Lua")
 local BracketAlias = Lua.moduleExists("Module:BracketAlias") and mw.loadData('Module:BracketAlias') or {}
 local WikiSpecific = require("Module:GetMatchGroupCopyPaste/wiki")
 
-local args
-
 function copyPaste.generateID()
 	--initiate the rnd generator
 	math.randomseed(os.time())
