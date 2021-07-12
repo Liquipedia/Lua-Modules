@@ -10,7 +10,11 @@ local Lua = require("Module:Lua")
 local BracketAlias = Lua.moduleExists("Module:BracketAlias") and mw.loadData('Module:BracketAlias') or {}
 local WikiSpecific = require("Module:GetMatchGroupCopyPaste/wiki")
 
-local args
+function copyPaste.generateID()
+	--initiate the rnd generator
+	math.randomseed(os.time())
+	return copyPaste._generateID()
+end
 
 function copyPaste._generateID()
 	local id = ''
@@ -85,7 +89,7 @@ function copyPaste._getHeader(headerCode, customHeader, match)
 	return header
 end
 
-function copyPaste.bracket(frame)
+function copyPaste.bracket(frame, args)
 	if not args then
 		args = getArgs(frame)
 	end
@@ -101,7 +105,7 @@ function copyPaste.bracket(frame)
 	local templateid = BracketAlias[string.lower(args.id)] or args.id
 
 	local out = '<pre class="selectall" width=50%>' ..
-		WikiSpecific.getStart(templateid, copyPaste._generateID(), 'bracket', args)
+		WikiSpecific.getStart(templateid, copyPaste.generateID(), 'bracket', args)
 
 	local bracketData = copyPaste._getBracketData(templateid)
 
@@ -135,7 +139,7 @@ function copyPaste.bracket(frame)
 	return out .. '\n}}</pre>'
 end
 
-function copyPaste.matchlist(frame)
+function copyPaste.matchlist(frame, args)
 	if not args then
 		args = getArgs(frame)
 	end
@@ -148,7 +152,7 @@ function copyPaste.matchlist(frame)
 	local mode = WikiSpecific.getMode(args.mode)
 
 	local out = '<pre class="selectall" width=50%>' ..
-		WikiSpecific.getStart(nil, copyPaste._generateID(), 'matchlist', args)
+		WikiSpecific.getStart(nil, copyPaste.generateID(), 'matchlist', args)
 
 	for index = 1, matches do
 		if customHeader then
