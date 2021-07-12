@@ -76,7 +76,7 @@ function StarCraftMatchGroupInput.getDateStuff(match)
 		match.date = lang:formatDate('c', match.date)
 		Variables.varDefine('matchDate', match.date)
 	else
-		local DateVar = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate') or ''
+		local DateVar = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate', '')
 		local missingDates = Variables.varDefault('num_missing_dates', 0) or 0
 		match.date = lang:formatDate('c', DateVar .. ' + ' .. missingDates .. ' second')
 		match.dateexact = false
