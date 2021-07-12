@@ -29,7 +29,7 @@ local ALOWED_BG = {
 	['stayup'] = 'stayup',
 	['staydown'] = 'staydown',
 	['stay'] = 'stay',
-	['mid'] = 'mid',
+	['mid'] = 'stay',
 	['drop'] = 'down',
 	['proceed'] = 'up',
 	}
