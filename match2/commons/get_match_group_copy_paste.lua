@@ -13,7 +13,6 @@ local WikiSpecific = require("Module:GetMatchGroupCopyPaste/wiki")
 function copyPaste.generateID()
 	--initiate the rnd generator
 	math.randomseed(os.time())
-	math.random(); math.random(); math.random()
 	return copyPaste._generateID()
 end
 
