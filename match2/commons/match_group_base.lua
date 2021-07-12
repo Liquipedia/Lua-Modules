@@ -68,7 +68,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 
 		local nextMatchIndex = matchIndex + 1
 		local nextMatchInWikicode = "M" .. nextMatchIndex
-		nextMatch = args[nextMatchInWikicode]
+		nextMatch = args[nextMatchInWikicode] or args[nextMatchIndex]
 		local hasNextMatch = nextMatch ~= nil
 		local nextMatchId = bracketid .. "_" .. string.format("%04d", nextMatchIndex)
 
@@ -85,7 +85,8 @@ function p.luaMatchlist(frame, args, matchBuilder)
 		bd["type"] = "matchlist"
 		bd["next"] = hasNextMatch and nextMatchId or nil
 		bd["title"] = matchIndex == 1 and args["title"] or nil
-		local header = args[currentMatchInWikicode .. "header"]
+		local header = args[currentMatchInWikicode .. "header"] or
+			args["header" .. currentMatchInWikicode] or args[currentMatchInWikicode .. "header"]
 		if header ~= nil and header ~= "" then
 			bd["header"] = header
 		end
