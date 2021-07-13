@@ -7,6 +7,7 @@ local getDefaultMapping = require("Module:MatchGroup/Legacy/Default").get
 local Logic = require("Module:Logic")
 local Lua = require("Module:Lua")
 local Table = require("Module:Table")
+local Variables = require("Module:Variables")
 local String = require("Module:StringUtils")
 
 local _type
@@ -40,6 +41,12 @@ function Legacy.get(frame)
 	local newArgs = Legacy._convert(mapping)
 	newArgs.id = bracketid
 	newArgs["1"] = templateid
+
+	local storage = _args.store
+	if storage == '' or storage == nil then
+		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false'
+	end
+	newArgs.store = storage
 
 	return MatchGroup.luaBracket(frame, newArgs)
 end
