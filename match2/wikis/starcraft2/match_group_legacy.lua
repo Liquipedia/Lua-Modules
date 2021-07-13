@@ -151,8 +151,9 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened)
 
 		if ISUSERSPACE then
 			--the following could be used to allow empty matches in the conversion
-			if String.startsWith(realKey, "opponent") and Logic.isEmpty(_args[val["$notEmpty$"]] or flattened[val["$notEmpty$"]]) then
-				_args[val["$notEmpty$"]] = '&nbsp;'
+			if String.startsWith(realKey, "opponent") and
+				Logic.isEmpty(_args[val["$notEmpty$"]] or flattened[val["$notEmpty$"]]) then
+					_args[val["$notEmpty$"]] = '&nbsp;'
 			end
 		end
 
