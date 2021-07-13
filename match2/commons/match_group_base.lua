@@ -39,7 +39,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	bracketid = p.getBracketIdPrefix() .. bracketid
 
 	-- check if the bracket is a duplicate
-	if storeInLPDB and args.noDuplicateCheck then
+	if storeInLPDB == false and Logic.readBool(args.noDuplicateCheck) then
 		p._checkBracketDuplicate(bracketid)
 	end
 
@@ -153,7 +153,7 @@ function p.luaBracket(frame, args, matchBuilder)
 	bracketid = p.getBracketIdPrefix() .. bracketid
 
 	-- check if the bracket is a duplicate
-	if storeInLPDB and args.noDuplicateCheck then
+	if storeInLPDB == false and Logic.readBool(args.noDuplicateCheck) then
 		p._checkBracketDuplicate(bracketid)
 	end
 
