@@ -10,11 +10,22 @@ local Table = require("Module:Table")
 local Variables = require("Module:Variables")
 local String = require("Module:StringUtils")
 
+local ISUSERSPACE = false
 local _type
 local _args
 
 function Legacy.get(frame)
 	_args = getArgs(frame)
+	local nameSpaceNumber = mw.title.getCurrentTitle().namespace
+
+	local storage = _args.store
+	if storage == '' or storage == nil then
+		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false' or nil
+	end
+	if (storage or '') ~= 'true' and nameSpaceNumber == 2 then
+		storage = 'false'
+		ISUSERSPACE = true
+	end
 
 	local bracketid = _args["id"]
 	if Logic.isEmpty(bracketid) then
@@ -42,10 +53,6 @@ function Legacy.get(frame)
 	newArgs.id = bracketid
 	newArgs["1"] = templateid
 
-	local storage = _args.store
-	if storage == '' or storage == nil then
-		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false'
-	end
 	newArgs.store = storage
 
 	return MatchGroup.luaBracket(frame, newArgs)
@@ -140,6 +147,13 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened)
 						val[k] = v:gsub("%$1%$",subst)
 					end
 				end)
+		end
+
+		if ISUSERSPACE then
+			--the following could be used to allow empty matches in the conversion
+			if String.startsWith(realKey, "opponent") and Logic.isEmpty(_args[val["$notEmpty$"]] or flattened[val["$notEmpty$"]]) then
+				_args[val["$notEmpty$"]] = '&nbsp;'
+			end
 		end
 
 		if val["$notEmpty$"] == nil or not Logic.isEmpty(_args[val["$notEmpty$"]] or flattened[val["$notEmpty$"]]) then
