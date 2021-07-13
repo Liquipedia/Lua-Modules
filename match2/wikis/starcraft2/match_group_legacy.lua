@@ -60,6 +60,7 @@ function Legacy.get(frame)
 	newArgs.noDuplicateCheck = _args.noDuplicateCheck
 
 	newArgs.store = storage
+	newArgs.noDuplicateCheck = _args.noDuplicateCheck
 
 	return MatchGroup.luaBracket(frame, newArgs)
 end
