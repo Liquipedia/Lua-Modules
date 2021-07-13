@@ -59,10 +59,6 @@ function Legacy.get(frame)
 	newArgs.store = storage
 	newArgs.noDuplicateCheck = _args.noDuplicateCheck
 
-	local storage = _args.store
-	if storage == '' or storage == nil then
-		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false'
-	end
 	newArgs.store = storage
 
 	return MatchGroup.luaBracket(frame, newArgs)
