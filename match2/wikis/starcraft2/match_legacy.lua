@@ -119,6 +119,9 @@ function p.convertParameters(match2)
 
 		if match.resulttype == 'default' then
 			match.resulttype = string.upper(match.walkover or '')
+			if match.resulttype == 'L' then
+				match.resulttype = 'unk'
+			end
 			match.walkover = match.winner
 		end
 		match.extradata.bestof = match.bestof
