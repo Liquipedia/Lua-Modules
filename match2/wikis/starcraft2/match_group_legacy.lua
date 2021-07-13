@@ -102,7 +102,7 @@ function Legacy._convert(mapping)
 			-- do actual conversion
 			local nested = {}
 			for key, val in pairs(flattened) do
-				if not String.startsWith(key, "map") then
+				if not String.startsWith(tostring(key), "map") then
 					nested[key] = val
 				end
 			end
