@@ -11,6 +11,7 @@ local Variables = require("Module:Variables")
 local String = require("Module:StringUtils")
 
 local _IS_USERSPACE = false
+local _USERSPACE_NUMBER = 2
 local _type
 local _args
 
@@ -22,7 +23,7 @@ function Legacy.get(frame)
 	if storage == '' or storage == nil then
 		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false' or nil
 	end
-	if (storage or '') ~= 'true' and nameSpaceNumber == 2 then
+	if (storage or '') ~= 'true' and nameSpaceNumber == _USERSPACE_NUMBER then
 		storage = 'false'
 		_IS_USERSPACE = true
 	end
