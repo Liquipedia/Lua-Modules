@@ -32,22 +32,22 @@ function Legacy.get(frame)
 
 	local bracketid = _args['id']
 	if Logic.isEmpty(bracketid) then
-		error('argument 'id' is empty')
+		error('argument \'id\' is empty')
 	end
 
 	local templateid = _args['template']
 	if Logic.isEmpty(templateid) then
-		error('argument 'template' is empty')
+		error('argument \'template\' is empty')
 	end
 
 	local oldTemplateid = _args['templateOld']
 	if Logic.isEmpty(oldTemplateid) then
-		error('argument 'templateOld' is empty')
+		error('argument \'templateOld\' is empty')
 	end
 
 	_type = _args.type
 	if Logic.isEmpty(_type) then
-		error('argument 'type' is empty')
+		error('argument \'type\' is empty')
 	end
 
 	local mapping = Legacy._getMapping(templateid, oldTemplateid)
@@ -67,17 +67,17 @@ function Legacy.getTemplate(frame)
 
 	local templateid = _args['template']
 	if Logic.isEmpty(templateid) then
-		error('argument 'template' is empty')
+		error('argument \'template\' is empty')
 	end
 
 	local oldTemplateid = _args['templateOld']
 	if Logic.isEmpty(oldTemplateid) then
-		error('argument 'templateOld' is empty')
+		error('argument \'templateOld\' is empty')
 	end
 
 	_type = _args.type
 	if Logic.isEmpty(_type) then
-		error('argument 'type' is empty')
+		error('argument \'type\' is empty')
 	end
 
 	local mapping = Legacy._getMapping(templateid)
