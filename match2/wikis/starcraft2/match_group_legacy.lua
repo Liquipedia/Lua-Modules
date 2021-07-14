@@ -10,7 +10,7 @@ local Table = require("Module:Table")
 local Variables = require("Module:Variables")
 local String = require("Module:StringUtils")
 
-local ISUSERSPACE = false
+local _IS_USERSPACE = false
 local _type
 local _args
 
@@ -24,7 +24,7 @@ function Legacy.get(frame)
 	end
 	if (storage or '') ~= 'true' and nameSpaceNumber == 2 then
 		storage = 'false'
-		ISUSERSPACE = true
+		_IS_USERSPACE = true
 	end
 
 	local bracketid = _args["id"]
@@ -149,7 +149,7 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened)
 				end)
 		end
 
-		if ISUSERSPACE then
+		if _IS_USERSPACE then
 			--the following could be used to allow empty matches in the conversion
 			if String.startsWith(realKey, "opponent") and
 				Logic.isEmpty(_args[val["$notEmpty$"]] or flattened[val["$notEmpty$"]]) then
