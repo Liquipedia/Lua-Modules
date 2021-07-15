@@ -44,7 +44,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	local storedData = {}
 	local currentMatchInWikicode = "M1"
 
-	local nextMatch = args[currentMatchInWikicode]
+	local nextMatch = args[currentMatchInWikicode] or args[1]
 
 	for matchIndex = 1, 5000 do
 		-- Reading from args is expensive, and on every iteration we always need the next match.
