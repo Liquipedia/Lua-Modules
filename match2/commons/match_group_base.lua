@@ -39,12 +39,14 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	bracketid = p.getBracketIdPrefix() .. bracketid
 
 	-- check if the bracket is a duplicate
-	p._checkBracketDuplicate(bracketid)
+	if storeInLPDB == false and Logic.readBool(args.noDuplicateCheck) then
+		p._checkBracketDuplicate(bracketid)
+	end
 
 	local storedData = {}
 	local currentMatchInWikicode = "M1"
 
-	local nextMatch = args[currentMatchInWikicode]
+	local nextMatch = args[currentMatchInWikicode] or args[1]
 
 	for matchIndex = 1, 5000 do
 		-- Reading from args is expensive, and on every iteration we always need the next match.
@@ -151,7 +153,9 @@ function p.luaBracket(frame, args, matchBuilder)
 	bracketid = p.getBracketIdPrefix() .. bracketid
 
 	-- check if the bracket is a duplicate
-	p._checkBracketDuplicate(bracketid)
+	if storeInLPDB == false and Logic.readBool(args.noDuplicateCheck) then
+		p._checkBracketDuplicate(bracketid)
+	end
 
 	-- get bracket data from template
 	local bracketData = p._getBracketData(templateid, bracketid)
