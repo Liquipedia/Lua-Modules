@@ -55,6 +55,9 @@ function Legacy.get(frame)
 
 	newArgs.store = storage
 	newArgs.noDuplicateCheck = _args.noDuplicateCheck
+	if Logic.isEmpty(newArgs.noDuplicateCheck) then
+		newArgs.noDuplicateCheck = storage
+	end
 
 	return MatchGroup.luaBracket(frame, newArgs)
 end
