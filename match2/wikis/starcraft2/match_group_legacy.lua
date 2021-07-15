@@ -55,6 +55,7 @@ function Legacy.get(frame)
 	newArgs["1"] = templateid
 
 	newArgs.store = storage
+	newArgs.noDuplicateCheck = _args.noDuplicateCheck
 
 	return MatchGroup.luaBracket(frame, newArgs)
 end
