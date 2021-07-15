@@ -336,6 +336,7 @@ function StarcraftMatchSummary.Footer(props)
 			.. '&Head_to_head_query%5Bopponent%5D='
 			.. match.opponents[2].players[1].pageName
 			.. '&wpRunQuery=Run+query'
+		link = string.gsub(link, ' ', '_')
 		headToHeadNode = '[[File:Match Info Stats.png|link=' .. link .. '|16px|Head-to-head statistics]]'
 	end
 
