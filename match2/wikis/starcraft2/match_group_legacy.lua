@@ -83,8 +83,8 @@ function Legacy.getTemplate(frame)
 	local mapping = Legacy._getMapping(templateid)
 
 	local out = json.stringify(mapping, true)
-		:gsub('\'([^\n:\']-)\':', '%1 = ')
-		:gsub('type =', '[\'type\'] =')
+		:gsub('"([^\n:"]-)":', '%1 = ')
+		:gsub('type =', '["type"] =')
 		:gsub(' = %[(.-)%]', ' = { %1 }')
 	out = '-- Custom mapping for \'' .. templateid .. '\' from \'' .. oldTemplateid .. '\'\n'
 		.. 'local p = {}\n\n'
