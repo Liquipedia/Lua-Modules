@@ -149,7 +149,8 @@ function MatchlistDisplay.Match(props)
 	-- are due to border splitting from table-layout: auto.
 	local minScoreWidth = 30
 	local scoreWidth = math.max(minScoreWidth, math.floor(0.1 * props.width))
-	local opponentWidth = 0.5 * (props.width - 2 - 2 * scoreWidth)
+	-- width of both opponent fields is total width -2 (border widths) - width of the score fields
+	local opponentWidth = 0.5 * (props.width - 2 - (2 * scoreWidth))
 
 	local renderOpponent = function(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
@@ -219,7 +220,7 @@ Display component for a title in a matchlist.
 function MatchlistDisplay.Title(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Title)
 	local titleNode = html.create('div')
-		:css('width', props.width - 2 * MatchlistDisplay.cellPadding - 2 .. 'px')
+		:css('width', (props.width - (2 * MatchlistDisplay.cellPadding) - 2) .. 'px')
 		:wikitext(props.title)
 
 	local thNode = html.create('th')
@@ -240,7 +241,7 @@ function MatchlistDisplay.Header(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Header)
 
 	local headerNode = html.create('div')
-		:css('width', props.width - 2 * MatchlistDisplay.cellPadding - 2 .. 'px')
+		:css('width', (props.width - (2 * MatchlistDisplay.cellPadding) - 2) .. 'px')
 		:wikitext(props.header)
 
 	local thNode = html.create('th')
@@ -268,7 +269,7 @@ function MatchlistDisplay.Opponent(props)
 		showLink = false,
 		teamStyle = 'short',
 	})
-		:css('width', props.width - 2 * MatchlistDisplay.cellPadding - 1 .. 'px')
+		:css('width', (props.width - (2 * MatchlistDisplay.cellPadding) - 1) .. 'px')
 	return html.create('td')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
 		:addClass(props.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or nil)
@@ -286,7 +287,7 @@ exactly props.width.
 function MatchlistDisplay.Score(props)
 	local contentNode = html.create('div'):addClass('brkts-matchlist-score')
 		:node(OpponentDisplay.InlineScore(props.opponent))
-		:css('width', props.width - 2 * MatchlistDisplay.cellPadding - 1 .. 'px')
+		:css('width', (props.width - (2 * MatchlistDisplay.cellPadding) - 1) .. 'px')
 	return html.create('td')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil)
 		:node(contentNode)
