@@ -135,18 +135,23 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 		["$flatten$"] = { "R" .. round.R .. "G" .. round.G .. "details" }
 	}
 
-	for mapIndex = 1, MAX_NUM_MAPS do
-		match["map" .. mapIndex] = {
-			["$ref$"] = "map",
-			["$1$"] = mapIndex
-		}
-	end
-
-	bracketData[id] = match
+	bracketData[id] = p.addMaps(match)
 	lastRound = round
 	roundData[round.R] = round
 
 	return bracketData, round.R, LowerHeader
 end
 
+--this can be used for custom mappings too
+function p.addMaps(match)
+	for mapIndex = 1, MAX_NUM_MAPS do
+		match["map" .. mapIndex] = {
+			["$ref$"] = "map",
+			["$1$"] = mapIndex
+		}
+	end
+	return match
+end
+
 return p
+
