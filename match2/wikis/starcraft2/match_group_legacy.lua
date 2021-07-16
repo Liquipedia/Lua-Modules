@@ -59,6 +59,9 @@ function Legacy.get(frame)
 	newArgs.store = storage
 	newArgs.noDuplicateCheck = _args.noDuplicateCheck
 
+	newArgs.store = storage
+	newArgs.noDuplicateCheck = _args.noDuplicateCheck
+
 	return MatchGroup.luaBracket(frame, newArgs)
 end
 
@@ -129,7 +132,16 @@ function Legacy._convert(mapping)
 			end
 
 			if not Logic.isEmpty(nested) then
-				newArgs[source] = nested
+				if source == 'RxMBR' then
+					--for 3rd place match only add the data if the according scores are set
+					local score1 = json.parseIfString(nested.opponent1 or {}).score or ''
+					local score2 = json.parseIfString(nested.opponent1 or {}).score or ''
+					if score1 ~= '' or score2 ~= '' then
+						newArgs[source] = nested
+					end
+				else
+					newArgs[source] = nested
+				end
 			end
 		-- regular args
 		else
