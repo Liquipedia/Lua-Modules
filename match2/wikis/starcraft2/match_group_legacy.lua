@@ -17,6 +17,8 @@ local _args
 
 function Legacy.get(frame)
 	_args = getArgs(frame)
+	mw.addWarning('You are editing a page that uses a Legacy Bracket. '
+		.. 'Please use the [[Liquipedia:Brackets|new Bracket System]] on new pages.')
 	local nameSpaceNumber = mw.title.getCurrentTitle().namespace
 
 	local storage = _args.store
