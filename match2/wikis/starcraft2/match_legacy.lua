@@ -7,6 +7,7 @@ local p = {}
 local json = require("Module:Json")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
+local _UNKNOWNREASON_DEFAULT_LOSS = 'L'
 
 local MODES = { ["solo"] = "1v1", ["team"] = "team" }
 
@@ -119,6 +120,10 @@ function p.convertParameters(match2)
 
 		if match.resulttype == 'default' then
 			match.resulttype = string.upper(match.walkover or '')
+			if match.resulttype == _UNKNOWNREASON_DEFAULT_LOSS then
+				--needs to be converted because in match1 storage it was marked this way
+				match.resulttype = 'unk'
+			end
 			match.walkover = match.winner
 		end
 		match.extradata.bestof = match.bestof
