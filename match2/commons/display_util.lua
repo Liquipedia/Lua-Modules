@@ -43,12 +43,18 @@ DisplayUtil.propTypes.LuaError = {
 }
 
 -- Shows the message and stack trace of a lua error.
-DisplayUtil.LuaError = function(props)
+function DisplayUtil.LuaError(props)
 	DisplayUtil.assertPropTypes(props, DisplayUtil.propTypes.LuaError)
+	local messageNode = mw.html.create('div')
+		:addClass('error')
+		:css('font-weight', 'bold')
+		:wikitext('Lua error: ' .. props.message)
+	local backtraceNode = mw.html.create('div')
+		:wikitext('Backtrace:<br>')
+		:wikitext(props.backtrace)
 	return mw.html.create('div')
-		:addClass('scribunto-error')
-		:node(mw.html.create('div'):wikitext(props.message))
-		:node(mw.html.create('div'):wikitext(props.backtrace))
+		:node(messageNode)
+		:node(backtraceNode)
 end
 
 --[[
@@ -56,21 +62,31 @@ Attempts to render a component written in the pure function style. If an error
 is encountered when rendering the component, show the error and stack trace
 instead of the component.
 ]]
-DisplayUtil.TryPureComponent = function(Component, props)
-	local node
+function DisplayUtil.TryPureComponent(Component, props)
+	local resultNode, errorNode = DisplayUtil.try(function() return Component(props) end)
+	return errorNode or resultNode
+end
+
+--[[
+Attempts to invoke a function. If successful, returns the result. If an error
+is encountered, render the error and stack trace, and return it in the 2nd return
+value.
+]]
+function DisplayUtil.try(f)
+	local result, errorNode
 	xpcall(function()
-		node = Component(props)
+		result = f()
 	end, function(message)
 		local backtrace = debug.traceback()
-		mw.log('Error occured when redering a component: (caught by DisplayUtil.TryPureComponent)')
+		mw.log('Error occured when invoking a function: (caught by DisplayUtil.try)')
 		mw.log(message)
 		mw.log(backtrace)
-		node = DisplayUtil.LuaError({
+		errorNode = DisplayUtil.LuaError({
 			message = message,
 			backtrace = backtrace,
 		})
 	end)
-	return node
+	return result, errorNode
 end
 
 DisplayUtil.types.OverflowModes = TypeUtil.literalUnion('ellipsis', 'wrap', 'hidden')
