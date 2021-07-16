@@ -4,12 +4,12 @@
 
 local p = {}
 
-local json = require("Module:Json")
-local String = require("Module:StringUtils")
-local Table = require("Module:Table")
+local json = require('Module:Json')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local _UNKNOWNREASON_DEFAULT_LOSS = 'L'
 
-local MODES = { ["solo"] = "1v1", ["team"] = "team" }
+local MODES = { ['solo'] = '1v1', ['team'] = 'team' }
 
 function p.storeMatch(match2)
 	local match, do_store = p.convertParameters(match2)
@@ -24,7 +24,7 @@ function p.storeMatch(match2)
 		end
 
 		return mw.ext.LiquipediaDB.lpdb_match(
-			"legacymatch_" .. match2.match2id,
+			'legacymatch_' .. match2.match2id,
 			match
 		)
 	else
@@ -33,11 +33,11 @@ function p.storeMatch(match2)
 end
 
 function p.storeGames(match, match2)
-	local games = ""
+	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 
-		if game.mode == "1v1" and game.extradata.isSubMatch == 'false' then
+		if game.mode == '1v1' and game.extradata.isSubMatch == 'false' then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
 			game.date = match.date
@@ -46,7 +46,7 @@ function p.storeGames(match, match2)
 			game.opponent2score = scores[2] or 0
 
 			-- participants holds additional playerdata per match, e.g. the faction (=race)
-			-- participants is stored as opponentID_playerID, so e.g. for opponent2, player1 it is "2_1"
+			-- participants is stored as opponentID_playerID, so e.g. for opponent2, player1 it is '2_1'
 			local playerdata = json.parseIfString(game.participants or '{}') or game.participants
 			for key, item in pairs(playerdata) do
 				local k = mw.text.split(key or '', '_')
@@ -62,7 +62,7 @@ function p.storeGames(match, match2)
 
 			game.extradata = json.stringify(game.extradata)
 			local res = mw.ext.LiquipediaDB.lpdb_game(
-				"legacygame_" .. match2.match2id .. gameIndex,
+				'legacygame_' .. match2.match2id .. gameIndex,
 				game
 			)
 
@@ -78,7 +78,7 @@ function p.convertParameters(match2)
 	local do_store = true
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
-		if String.startsWith(key, "match2") then
+		if String.startsWith(key, 'match2') then
 			match[key] = nil
 		end
 	end
@@ -93,7 +93,7 @@ function p.convertParameters(match2)
 	if opponent1.type == opponent2.type then
 		match.mode = MODES[opponent1.type]
 
-		if opponent1.type == "solo" then
+		if opponent1.type == 'solo' then
 			local player = opponent1match2players[1] or {}
 			match.opponent1 = player.name
 			match.opponent1score = (tonumber(opponent1.score or 0) or 0) >= 0 and opponent1.score or 0
@@ -108,7 +108,7 @@ function p.convertParameters(match2)
 			match.extradata.opponent2name = player.displayname
 			player.extradata = json.parseIfString(player.extradata or '{}') or player.extradata
 			match.extradata.opponent2race = player.extradata.faction
-		elseif opponent1.type == "team" then
+		elseif opponent1.type == 'team' then
 			match.opponent1 = (opponent1.name or '') ~= '' and opponent1.name or 'TBD'
 			match.opponent1score = (tonumber(opponent1.score or 0) or 0) >= 0 and opponent1.score or 0
 			match.opponent2 = (opponent2.name or '') ~= '' and opponent2.name or 'TBD'
