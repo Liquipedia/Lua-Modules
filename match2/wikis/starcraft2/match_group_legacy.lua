@@ -133,17 +133,19 @@ function Legacy._convert(mapping)
 				local score2 = json.parseIfString(nested.opponent2 or {}).score or ''
 
 				--handle advantages that were bassed the old way
-				local score1adv, score1sum = string.match(score1, '<abbr title="Winner\'s bracket advantage of (%d) game">(%d)</abbr>')
+				local score1adv, score1sum = string.match(score1,
+					'<abbr title="Winner\'s bracket advantage of (%d) game">(%d)</abbr>')
 				if score1adv then
 					nested.opponent1 = json.parseIfString(nested.opponent1 or {})
 					nested.opponent1.score = score1sum
 					nested.opponent1.advantage = score1adv
 					nested.opponent1 = json.stringify(nested.opponent1)
 				end
-				local score2adv, score2sum = string.match(score2, '<abbr title="Winner\'s bracket advantage of (%d) game">(%d)</abbr>')
+				local score2adv, score2sum = string.match(score2,
+					'<abbr title="Winner\'s bracket advantage of (%d) game">(%d)</abbr>')
 				if score2adv then
 					nested.opponent2 = json.parseIfString(nested.opponent2 or {})
-					nested.opponent2.score = score2adv
+					nested.opponent2.score = score2sum
 					nested.opponent2.advantage = score2adv
 					nested.opponent2 = json.stringify(nested.opponent2)
 				end
