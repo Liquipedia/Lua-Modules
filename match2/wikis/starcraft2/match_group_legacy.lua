@@ -127,7 +127,7 @@ function Legacy._convert(mapping)
 			for realKey, val in pairs(target) do
 				nested = Legacy._convertSingle(realKey, val, nested, mapping, flattened)
 			end
-			
+
 			if not Logic.isEmpty(nested) then
 				local score1 = json.parseIfString(nested.opponent1 or {}).score or ''
 				local score2 = json.parseIfString(nested.opponent2 or {}).score or ''
