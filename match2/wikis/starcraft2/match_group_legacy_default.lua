@@ -197,7 +197,7 @@ end
 --this is for custom mappings for 3rd place matches
 --it switches score2 into the place of score
 --and sets flatten to nil
-function p.match3rdMappingFromCustom(mapping)
+function p.matchResetMappingFromCustom(mapping)
 	local mapping3rd = mw.clone(mapping)
 	mapping3rd.opponent1.score = mapping.opponent1.score .. '2'
 	mapping3rd.opponent2.score = mapping.opponent2.score .. '2'
