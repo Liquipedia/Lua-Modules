@@ -153,5 +153,45 @@ function p.addMaps(match)
 	return match
 end
 
-return p
+--this is for custom mappings
+function p.matchMappingFromCustom(data)
+	--[[
+	data has the form {
+		opp1,
+		opp2,
+		details,
+		match,
+		header
+	}
+	]]--
+	local mapping = {
+		['$flatten$'] = { data.details },
+		['finished'] = data.opp1 .. 'win|' .. data.opp2 .. 'win',
+		['opponent1'] = {
+			['$notEmpty$'] = data.opp1,
+			['1'] = data.opp1,
+			['flag'] = data.opp1 .. 'flag',
+			['race'] = data.opp1 .. 'race',
+			['score'] = data.opp1 .. 'score',
+			['type'] = 'type',
+			['win'] = data.opp1 .. 'win',
+			},
+		['opponent2'] = {
+			['$notEmpty$'] = data.opp2,
+			['1'] = data.opp2,
+			['flag'] = data.opp2 .. 'flag',
+			['race'] = data.opp2 .. 'race',
+			['score'] = data.opp2 .. 'score',
+			['type'] = 'type',
+			['win'] = data.opp2 .. 'win',
+			},
+	}
+	if match and header then
+		mapping[match .. 'header'] = header
+	end
+	mapping = p.addMaps(mapping)
 
+	return mapping
+end
+
+return p
