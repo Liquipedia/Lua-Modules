@@ -194,7 +194,7 @@ function p.matchMappingFromCustom(data)
 	return mapping
 end
 
---this is for custom mappings for 3rd place matches
+--this is for custom mappings for Reset finals matches
 --it switches score2 into the place of score
 --and sets flatten to nil
 function p.matchResetMappingFromCustom(mapping)
