@@ -186,8 +186,8 @@ function p.matchMappingFromCustom(data)
 			['win'] = data.opp2 .. 'win',
 			},
 	}
-	if match and header then
-		mapping[match .. 'header'] = header
+	if data.match and data.header then
+		mapping[data.match .. 'header'] = data.header
 	end
 	mapping = p.addMaps(mapping)
 
