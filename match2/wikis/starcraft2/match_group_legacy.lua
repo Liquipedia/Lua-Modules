@@ -59,9 +59,6 @@ function Legacy.get(frame)
 	newArgs.store = storage
 	newArgs.noDuplicateCheck = _args.noDuplicateCheck
 
-	newArgs.store = storage
-	newArgs.noDuplicateCheck = _args.noDuplicateCheck
-
 	return MatchGroup.luaBracket(frame, newArgs)
 end
 
@@ -132,10 +129,15 @@ function Legacy._convert(mapping)
 			end
 
 			if not Logic.isEmpty(nested) then
+				local score1 = json.parseIfString(nested.opponent1 or {}).score or ''
+				local score2 = json.parseIfString(nested.opponent2 or {}).score or ''
+
+				--handle advantages that were bassed the old way
+				nested.opponent1 = Legacy.checkAdvantage(score1, nested.opponent1)
+				nested.opponent2 = Legacy.checkAdvantage(score2, nested.opponent2)
+
 				if source == 'RxMBR' then
 					--for 3rd place match only add the data if the according scores are set
-					local score1 = json.parseIfString(nested.opponent1 or {}).score or ''
-					local score2 = json.parseIfString(nested.opponent1 or {}).score or ''
 					if score1 ~= '' or score2 ~= '' then
 						newArgs[source] = nested
 					end
@@ -211,6 +213,18 @@ function Legacy._getMapping(templateid, oldTemplateid)
 	else
 		return getDefaultMapping(templateid, _type)
 	end
+end
+
+function Legacy.checkAdvantage(score, opponent)
+	local scoreAdvantage, scoreSum = string.match(score,
+					'<abbr title="Winner\'s bracket advantage of (%d) game">(%d)</abbr>')
+	if scoreAdvantage then
+		opponent = json.parseIfString(opponent or {})
+		opponent.score = scoreSum
+		opponent.advantage = scoreAdvantage
+		opponent = json.stringify(opponent)
+	end
+	return opponent
 end
 
 return Legacy
