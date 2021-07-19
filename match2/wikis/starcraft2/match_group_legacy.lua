@@ -132,23 +132,9 @@ function Legacy._convert(mapping)
 				local score1 = json.parseIfString(nested.opponent1 or {}).score or ''
 				local score2 = json.parseIfString(nested.opponent2 or {}).score or ''
 
-				--handle advantages that were passed the old way
-				local score1adv, score1sum = string.match(score1,
-					'<abbr title="Winner\'s bracket advantage of (%d) game">(%d)</abbr>')
-				if score1adv then
-					nested.opponent1 = json.parseIfString(nested.opponent1 or {})
-					nested.opponent1.score = score1sum
-					nested.opponent1.advantage = score1adv
-					nested.opponent1 = json.stringify(nested.opponent1)
-				end
-				local score2adv, score2sum = string.match(score2,
-					'<abbr title="Winner\'s bracket advantage of (%d) game">(%d)</abbr>')
-				if score2adv then
-					nested.opponent2 = json.parseIfString(nested.opponent2 or {})
-					nested.opponent2.score = score2sum
-					nested.opponent2.advantage = score2adv
-					nested.opponent2 = json.stringify(nested.opponent2)
-				end
+				--handle advantages that were bassed the old way
+				nested.opponent1 = Legacy.checkAdvantage(score1, nested.opponent1)
+				nested.opponent2 = Legacy.checkAdvantage(score2, nested.opponent2)
 
 				if source == 'RxMBR' then
 					--for 3rd place match only add the data if the according scores are set
@@ -227,6 +213,18 @@ function Legacy._getMapping(templateid, oldTemplateid)
 	else
 		return getDefaultMapping(templateid, _type)
 	end
+end
+
+function Legacy.checkAdvantage(score, opponent)
+	local scoreAdvantage, scoreSum = string.match(score,
+					'<abbr title="Winner\'s bracket advantage of (%d) game">(%d)</abbr>')
+	if scoreAdvantage then
+		opponent = json.parseIfString(opponent or {})
+		opponent.score = scoreSum
+		opponent.advantage = scoreAdvantage
+		opponent = json.stringify(opponent)
+	end
+	return opponent
 end
 
 return Legacy
