@@ -439,7 +439,7 @@ function BracketDisplay.NodeBody(props)
 	local thirdPlaceMatchNode
 	if thirdPlaceMatch then
 		thirdPlaceHeaderNode = BracketDisplay.MatchHeader({
-			header = '!tp',
+			header = thirdPlaceMatch.bracketData.header or '!tp',
 			height = config.headerHeight,
 		})
 			:css('margin-top', 20 + config.headerMargin .. 'px')
