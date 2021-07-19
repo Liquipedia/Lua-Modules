@@ -142,6 +142,12 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	return bracketData, round.R, LowerHeader
 end
 
+--[[
+custom mappings are used to overwrite the default mappings
+in the cases where the default mappings do not fit the
+parameter format of the old bracket
+]]--
+
 --this can be used for custom mappings too
 function p.addMaps(match)
 	for mapIndex = 1, MAX_NUM_MAPS do
