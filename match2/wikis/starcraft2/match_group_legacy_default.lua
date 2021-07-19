@@ -142,6 +142,12 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	return bracketData, round.R, LowerHeader
 end
 
+--[[
+custom mappings are used to overwrite the default mappings
+in the cases where the default mappings do not fit the
+parameter format of the old bracket
+]]--
+
 --this can be used for custom mappings too
 function p.addMaps(match)
 	for mapIndex = 1, MAX_NUM_MAPS do
@@ -153,5 +159,56 @@ function p.addMaps(match)
 	return match
 end
 
-return p
+--this is for custom mappings
+function p.matchMappingFromCustom(data)
+	--[[
+	data has the form {
+		opp1,
+		opp2,
+		details,
+		match,
+		header
+	}
+	]]--
+	local mapping = {
+		['$flatten$'] = { data.details },
+		['finished'] = data.opp1 .. 'win|' .. data.opp2 .. 'win',
+		['opponent1'] = {
+			['$notEmpty$'] = data.opp1,
+			['1'] = data.opp1,
+			['flag'] = data.opp1 .. 'flag',
+			['race'] = data.opp1 .. 'race',
+			['score'] = data.opp1 .. 'score',
+			['type'] = 'type',
+			['win'] = data.opp1 .. 'win',
+			},
+		['opponent2'] = {
+			['$notEmpty$'] = data.opp2,
+			['1'] = data.opp2,
+			['flag'] = data.opp2 .. 'flag',
+			['race'] = data.opp2 .. 'race',
+			['score'] = data.opp2 .. 'score',
+			['type'] = 'type',
+			['win'] = data.opp2 .. 'win',
+			},
+	}
+	if data.match and data.header then
+		mapping[data.match .. 'header'] = data.header
+	end
+	mapping = p.addMaps(mapping)
 
+	return mapping
+end
+
+--this is for custom mappings for Reset finals matches
+--it switches score2 into the place of score
+--and sets flatten to nil
+function p.matchResetMappingFromCustom(mapping)
+	local mapping3rd = mw.clone(mapping)
+	mapping3rd.opponent1.score = mapping.opponent1.score .. '2'
+	mapping3rd.opponent2.score = mapping.opponent2.score .. '2'
+	mapping3rd['$flatten$'] = nil
+	return mapping3rd
+end
+
+return p
