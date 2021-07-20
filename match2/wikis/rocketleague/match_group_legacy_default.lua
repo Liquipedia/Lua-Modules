@@ -3,7 +3,7 @@ local p = {}
 local String = require("Module:StringUtils")
 local Logic = require("Module:Logic")
 
-local MAX_NUM_MAPS = 1 --20 (changed for shorter logs)
+local MAX_NUM_MAPS = 20
 
 local roundData
 function p.get(templateid, bracketType)
