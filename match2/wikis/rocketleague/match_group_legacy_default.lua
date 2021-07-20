@@ -71,11 +71,9 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				template = "R" .. round.R .. "D" .. round.D .. "team",
 				score = "R" .. round.R .. "D" .. round.D .. "score",
 				["$notEmpty$"] = "R" .. round.R .. "D" .. round.D,
-				--match2players = {
-						name = "R" .. round.R .. "D" .. round.D,
-						displayname = "R" .. round.R .. "D" .. round.D,
-						flag = "R" .. round.R .. "D" .. round.D .. 'flag'
-				--	}
+				name = "R" .. round.R .. "D" .. round.D,
+				displayname = "R" .. round.R .. "D" .. round.D,
+				flag = "R" .. round.R .. "D" .. round.D .. 'flag'
 			}
 		end
 		finished1 = "R" .. round.R .. "D" .. round.D .. "win"
@@ -95,11 +93,9 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				template = "R" .. round.R .. "W" .. round.W .. "team",
 				score = "R" .. round.R .. "W" .. round.W .. "score" .. (reset and "2" or ""),
 				["$notEmpty$"] = "R" .. round.R .. "W" .. round.W,
-				--match2players = {
-						name = "R" .. round.R .. "W" .. round.W,
-						displayname = "R" .. round.R .. "W" .. round.W,
-						flag = "R" .. round.R .. "W" .. round.W .. 'flag'
-				--	}
+				name = "R" .. round.R .. "W" .. round.W,
+				displayname = "R" .. round.R .. "W" .. round.W,
+				flag = "R" .. round.R .. "W" .. round.W .. 'flag'
 			}
 		end
 		finished1 = "R" .. round.R .. "W" .. round.W .. "win"
@@ -122,11 +118,9 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				template = "R" .. round.R .. "D" .. round.D .. "team",
 				score = "R" .. round.R .. "D" .. round.D .. "score",
 				["$notEmpty$"] = "R" .. round.R .. "D" .. round.D,
-				--match2players = {
-						name = "R" .. round.R .. "D" .. round.D,
-						displayname = "R" .. round.R .. "D" .. round.D,
-						flag = "R" .. round.R .. "D" .. round.D .. 'flag'
-				--	}
+				name = "R" .. round.R .. "D" .. round.D,
+				displayname = "R" .. round.R .. "D" .. round.D,
+				flag = "R" .. round.R .. "D" .. round.D .. 'flag'
 			}
 		end
 		finished2 = "R" .. round.R .. "D" .. round.D .. "win"
@@ -146,11 +140,9 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				template = "R" .. round.R .. "W" .. round.W .. "team",
 				score = "R" .. round.R .. "W" .. round.W .. "score" .. (reset and "2" or ""),
 				["$notEmpty$"] = "R" .. round.R .. "W" .. round.W,
-				--match2players = {
-						name = "R" .. round.R .. "W" .. round.W,
-						displayname = "R" .. round.R .. "W" .. round.W,
-						flag = "R" .. round.R .. "W" .. round.W .. 'flag'
-				--	}
+				name = "R" .. round.R .. "W" .. round.W,
+				displayname = "R" .. round.R .. "W" .. round.W,
+				flag = "R" .. round.R .. "W" .. round.W .. 'flag'
 			}
 		end
 		finished2 = "R" .. round.R .. "W" .. round.W .. "win"
