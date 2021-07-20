@@ -179,4 +179,71 @@ function p._getMatchMapping(match, bracketData, bracketType)
 	return bracketData
 end
 
+--[[
+custom mappings are used to overwrite the default mappings
+in the cases where the default mappings do not fit the
+parameter format of the old bracket
+]]--
+
+--this can be used for custom mappings too
+function p.addMaps(match)
+	for mapIndex = 1, MAX_NUM_MAPS do
+		match["map" .. mapIndex] = {
+			["$ref$"] = "map",
+			["$1$"] = mapIndex
+		}
+	end
+	return match
+end
+
+--this is for custom mappings
+function p.matchMappingFromCustom(data, bracketType)
+	--[[
+	data has the form {
+		opp1, -- e.g. R1D1
+		opp2, -- e.g. R1D20
+		details, -- e.g. R1G5details
+	}
+	]]--
+	local mapping = {
+		["$flatten$"] = { data.details },
+		["finished"] = data.opp1 .. "win|" .. data.opp2 .. "win",
+		["opponent1"] = {
+			["type"] = "type",
+			["$notEmpty$"] = data.opp1 ..
+				(bracketType == "team" and "team" or ""),
+			template = data.opp1 .. "team",
+			score = data.opp1 .. "score",
+			name = bracketType ~= "team" and data.opp1 or nil,
+			displayname = bracketType ~= "team" and data.opp1 or nil,
+			flag = bracketType ~= "team" and data.opp1 or nil,
+			win = data.opp1 .. "win",
+			},
+		["opponent2"] = {
+			["$notEmpty$"] = data.opp2 ..
+				(bracketType == "team" and "team" or ""),
+			template = data.opp2 .. "team",
+			score = data.opp2 .. "score",
+			name = bracketType ~= "team" and data.opp2 or nil,
+			displayname = bracketType ~= "team" and data.opp2 or nil,
+			flag = bracketType ~= "team" and data.opp2 or nil,
+			win = data.opp2 .. "win",
+			},
+	}
+	mapping = p.addMaps(mapping)
+
+	return mapping
+end
+
+--this is for custom mappings for Reset finals matches
+--it switches score2 into the place of score
+--and sets flatten to nil
+function p.matchResetMappingFromCustom(mapping)
+	local mappingReset = mw.clone(mapping)
+	mappingReset.opponent1.score = mapping.opponent1.score .. "2"
+	mappingReset.opponent2.score = mapping.opponent2.score .. "2"
+	mappingReset["$flatten$"] = nil
+	return mappingReset
+end
+
 return p
