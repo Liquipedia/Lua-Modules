@@ -66,6 +66,12 @@ function p.processOpponent(frame, opponent)
 		opponent.icon = opponent.icon or opponentFunctions.getIconName(opponent.template)
 	end
 
+	--fix for legacy conversion
+	local players = opponent.players or opponent.match2players
+	if opponent.type == 'solo' and players == nil then
+		opponent = opponentFunctions.getSoloFromLegacy(opponent)
+	end
+
 	return opponent
 end
 
@@ -374,6 +380,29 @@ function matchFunctions.getVodStuff(match)
 	else
 		return nil
 	end
+end
+
+function opponentFunctions.getIconName(template)
+	if template ~= nil then
+		local icon = Template.expandTemplate(_frame, "Team", { template })
+		icon = icon:gsub("%&", "")
+		icon = String.split(icon, "File:")[2]
+		icon = String.split(icon, "|")[1]
+		return icon
+	else
+		return nil
+	end
+end
+
+--needed for legacy conversion to work for solo brackets
+function opponentFunctions.getSoloFromLegacy(opponent)
+	opponent.match2players = '[' .. json.stringify({
+		name = opponent.name,
+		displayname = opponent.displayname,
+		flag = opponent.flag
+	}) .. ']'
+	opponent.name = nil
+	return opponent
 end
 
 return p
