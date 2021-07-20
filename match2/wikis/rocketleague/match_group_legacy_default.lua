@@ -11,7 +11,7 @@ function p.get(templateid, bracketType)
 	assert(type(matches) == "table")
 	local bracketData = {}
 	roundData = roundData or {}
-	for index, match in ipairs(matches) do
+	for _, match in ipairs(matches) do
 		bracketData = p._getMatchMapping(match, bracketData, bracketType)
 	end
 	-- add reference for map mappings
@@ -35,7 +35,6 @@ function p._getMatchMapping(match, bracketData, bracketType)
 	local bd = match.match2bracketdata
 
 	local roundNum
-	local matchNum
 	local round
 	local reset = false
 	if id == "RxMTP" then
@@ -56,6 +55,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 	-- opponents
 	local opponent1
 	local finished1
+	local finished2
 	if Logic.isEmpty(bd.toupper) and not reset then
 		-- RxDx
 		if bracketType == "team" then
@@ -157,7 +157,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 		round.W = round.W + 1
 	end
 
-	local match = {
+	match = {
 		opponent1 = opponent1,
 		opponent2 = opponent2,
 		finished = finished1 .. "|" .. finished2,
