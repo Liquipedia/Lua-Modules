@@ -72,6 +72,20 @@ function p.processOpponent(frame, opponent)
 		opponent = opponentFunctions.getSoloFromLegacy(opponent)
 	end
 
+	--score2 & score3 support for every match
+	local score2 = tonumber(opponent.score2 or '')
+	local score3 = tonumber(opponent.score3 or '')
+	if score2 then
+		opponent.extradata = json.stringify({
+			score2 = score2,
+			score3 = score3,
+			set1win = Logic.readBool(opponent.set1win),
+			set2win = Logic.readBool(opponent.set2win),
+			set3win = Logic.readBool(opponent.set3win),
+			additionalScores = true
+		})
+	end
+
 	return opponent
 end
 
@@ -94,7 +108,13 @@ function p._placementSortFunction(table, key1, key2)
 	local op2norm = op2.status == "S"
 	if op1norm then
 		if op2norm then
-			return tonumber(op1.score) > tonumber(op2.score)
+			local op1setwins = p._getSetWins(op1)
+			local op2setwins = p._getSetWins(op2)
+			if op1setwins + op2setwins > 0 then
+				return op1setwins > op2setwins
+			else
+				return tonumber(op1.score) > tonumber(op2.score)
+			end
 		else return true end
 	else
 		if op2norm then return false
@@ -104,6 +124,15 @@ function p._placementSortFunction(table, key1, key2)
 		elseif op2.status == "DQ" then return true
 		else return true end
 	end
+end
+
+function p._getSetWins(opp)
+	local extradata = json.parseIfString(opp.extradata or '{}')
+	local set1win = extradata.set1win and 1 or 0
+	local set2win = extradata.set2win and 1 or 0
+	local set3win = extradata.set3win and 1 or 0
+	local sum = set1win + set2win + set3win
+	return sum
 end
 
 --
@@ -276,7 +305,8 @@ function matchFunctions.getVodStuff(match)
 	map.extradata = json.stringify({
 		ot = map.ot,
 		otlength = map.otlength,
-		comment = map.comment
+		comment = map.comment,
+		header = map.header,
 	})
 	return map
 	end
