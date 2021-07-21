@@ -263,6 +263,7 @@ function p.luaBracket(frame, args, matchBuilder)
 			hideRoundTitles = args.hideRoundTitles,
 			matchHeight = args.matchHeight,
 			matchWidth = args.matchWidth,
+			matchWidthMobile = args.matchWidthMobile,
 			opponentHeight = args.opponentHeight,
 			qualifiedHeader = args.qualifiedHeader,
 		}))
