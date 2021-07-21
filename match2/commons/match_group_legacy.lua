@@ -151,6 +151,16 @@ function p._convert(mapping)
 		end
 
 		if not Logic.isEmpty(match) then
+			if not match.opponent1 then
+				match.opponent1 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
+				mw.log('Missing Opponent entry')
+				--error('Missing Opponent entry')
+			end
+			if not match.opponent2 then
+				match.opponent2 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
+				mw.log('Missing Opponent entry')
+				--error('Missing Opponent entry')
+			end
 			newArgs[index] = match
 		end
 	end
