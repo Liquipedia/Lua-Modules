@@ -203,9 +203,9 @@ function matchFunctions.getVodStuff(match)
 		end
 	end
 	return match
-	end
+end
 
-	function matchFunctions.getExtraData(match)
+function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
 	match.extradata = json.stringify({
@@ -219,9 +219,9 @@ function matchFunctions.getVodStuff(match)
 		isconverted = 0
 	})
 	return match
-	end
+end
 
-	function matchFunctions.getOpponents(args)
+function matchFunctions.getOpponents(args)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
@@ -280,9 +280,9 @@ function matchFunctions.getVodStuff(match)
 		end
 	end
 	return args
-	end
+end
 
-	function matchFunctions.getPlayers(match, opponentIndex, teamName)
+function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = match["opponent" .. opponentIndex .. "_p" .. playerIndex] or {}
@@ -296,12 +296,12 @@ function matchFunctions.getVodStuff(match)
 		end
 	end
 	return match
-	end
+end
 
-	--
-	-- map related functions
-	--
-	function mapFunctions.getExtraData(map)
+--
+-- map related functions
+--
+function mapFunctions.getExtraData(map)
 	map.extradata = json.stringify({
 		ot = map.ot,
 		otlength = map.otlength,
@@ -309,9 +309,9 @@ function matchFunctions.getVodStuff(match)
 		header = map.header,
 	})
 	return map
-	end
+end
 
-	function mapFunctions.getScoresAndWinner(map)
+function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do
@@ -395,12 +395,12 @@ function matchFunctions.getVodStuff(match)
 
 	map.participants = participants
 	return map
-	end
+end
 
-	--
-	-- opponent related functions
-	--
-	function opponentFunctions.getTeamName(template)
+--
+-- opponent related functions
+--
+function opponentFunctions.getTeamName(template)
 	if template ~= nil then
 		local team = Template.expandTemplate(_frame, "Team", { template })
 		team = team:gsub("%&", "")
