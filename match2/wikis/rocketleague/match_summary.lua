@@ -59,6 +59,15 @@ function p.getByMatchId(args)
 						  "[[File:GreenCheck.png|14x14px|link=]]" or
 						  "[[File:NoCheck.png|link=]]")
 			}
+			local gameHeader = game.header or ''
+			if gameHeader ~= '' then
+				table.insert(gameElements, 1, p._breakNode())
+				table.insert(gameElements, 1, htmlCreate("div")
+					:node(gameHeader)
+					:css("font-weight","bold")
+					:css("font-size","85%")
+					:css("margin","auto"))
+			end
 			if game.comment then
 				table.insert(gameElements, p._breakNode())
 				table.insert(gameElements, htmlCreate("div")
@@ -112,6 +121,12 @@ function p.getByMatchId(args)
 		wrapper:node(footer)
 	end
 	return wrapper
+end
+
+function p._gameHeader(header)
+	return mw.html.create('div')
+		:addClass('brkts-popup-sc-game-header')
+		:wikitext(header)
 end
 
 function p._addFlexRow(wrapper, contentElements, class, style)
