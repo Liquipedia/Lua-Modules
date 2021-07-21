@@ -67,20 +67,47 @@ function OpponentDisplay.BracketOpponentEntry:createLiteral(name)
 end
 
 function OpponentDisplay.BracketOpponentEntry:addScores(opponent)
-	local score1Node = OpponentDisplay.BracketScore({
-		isWinner = opponent.placement == 1 or opponent.advances,
-		scoreText = OpponentDisplay.InlineScore(opponent),
-	})
-	self.root:node(score1Node)
-
-	local score2Node
-	if opponent.score2 then
-		score2Node = OpponentDisplay.BracketScore({
-			isWinner = opponent.placement2 == 1,
-			scoreText = OpponentDisplay.InlineScore2(opponent),
+	local extradata = opponent.extradata or {}
+	if not extradata.additionalScores then
+		local score1Node = OpponentDisplay.BracketScore({
+			isWinner = opponent.placement == 1 or opponent.advances,
+			scoreText = OpponentDisplay.InlineScore(opponent),
 		})
+		self.root:node(score1Node)
+
+		local score2Node
+		if opponent.score2 then
+			score2Node = OpponentDisplay.BracketScore({
+				isWinner = opponent.placement2 == 1,
+				scoreText = OpponentDisplay.InlineScore2(opponent),
+			})
+		end
+		self.root:node(score2Node)
+	else
+		local score1Node = OpponentDisplay.BracketScore({
+			isWinner = extradata.set1win,
+			scoreText = OpponentDisplay.InlineScore(opponent),
+		})
+		self.root:node(score1Node)
+
+		local score2Node
+		if opponent.extradata.score2 or opponent.score2 then
+			score2Node = OpponentDisplay.BracketScore({
+				isWinner = extradata.set2win,
+				scoreText = OpponentDisplay.InlineScore2(opponent),
+			})
+		end
+		self.root:node(score2Node)
+
+		local score3Node
+		if opponent.extradata.score3 then
+			score3Node = OpponentDisplay.BracketScore({
+				isWinner = extradata.set3win,
+				scoreText = OpponentDisplay.InlineScore3(opponent),
+			})
+		end
+		self.root:node(score3Node)
 	end
-	self.root:node(score2Node)
 
 	if (opponent.placement2 or opponent.placement or 0) == 1
 		or opponent.advances then
@@ -331,6 +358,7 @@ end
 Displays the second score or status of the opponent, as a string.
 ]]
 function OpponentDisplay.InlineScore2(opponent)
+	local score2 = opponent.extradata.score2
 	if opponent.status2 == 'S' then
 		if opponent.score2 == 0 and DisplayHelper.opponentIsTBD(opponent) then
 			return ''
@@ -338,7 +366,22 @@ function OpponentDisplay.InlineScore2(opponent)
 			return opponent.score2 ~= -1 and tostring(opponent.score2) or ''
 		end
 	else
-		return opponent.status2 or ''
+		return opponent.status2 or score2 or ''
+	end
+end
+--[[
+Displays the third score or status of the opponent, as a string.
+]]
+function OpponentDisplay.InlineScore3(opponent)
+	local score3 = opponent.extradata.score3
+	if opponent.status3 == 'S' then
+		if opponent.score3 == 0 and DisplayHelper.opponentIsTBD(opponent) then
+			return ''
+		else
+			return opponent.score3 ~= -1 and tostring(opponent.score3) or ''
+		end
+	else
+		return opponent.status3 or score3 or ''
 	end
 end
 
