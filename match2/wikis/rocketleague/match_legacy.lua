@@ -1,15 +1,13 @@
 local p = {}
 
-local getArgs = require("Module:Arguments").getArgs
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
 local Variables = require("Module:Variables")
-local args
 
 function p.storeMatch(match2)
-	local match = convertParameters(match2)
+	local match = p._convertParameters(match2)
 
 	match.games = p.storeGames(match, match2)
 
@@ -77,9 +75,9 @@ function p.storeGames(match, match2)
 	return games
 end
 
-function convertParameters(match2)
+function p._convertParameters(match2)
 	local match = Table.deepCopy(match2)
-	for key, val in pairs(match) do
+	for key, _ in pairs(match) do
 		if String.startsWith(key, "match2") then
 			match[key] = nil
 		end
@@ -96,7 +94,7 @@ function convertParameters(match2)
 		local opponent1players = {}
 		for i = 1,10 do
 			local player = opponent1match2players[i] or {}
-			table.insert(opponent1players, { 
+			table.insert(opponent1players, {
 					["p" .. i] = player.name or "",
 					["p" .. i .. "flag"] = player.flag or ""
 				})
