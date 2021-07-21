@@ -123,12 +123,6 @@ function p.getByMatchId(args)
 	return wrapper
 end
 
-function p._gameHeader(header)
-	return mw.html.create('div')
-		:addClass('brkts-popup-sc-game-header')
-		:wikitext(header)
-end
-
 function p._addFlexRow(wrapper, contentElements, class, style)
 	local node = htmlCreate("div"):addClass("brkts-popup-body-element")
 	if not Logic.isEmpty(class) then
