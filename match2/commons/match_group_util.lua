@@ -7,6 +7,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
+local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
+
 local nilIfEmpty = String.nilIfEmpty
 
 --[[
@@ -323,6 +325,15 @@ end
 Fetches information about a team via mw.ext.TeamTemplate.
 ]]
 function MatchGroupUtil.fetchTeam(template)
+	--exception for TBD opponents
+	if string.lower(template) == 'tbd' then
+		return {
+			bracketName = TBD_DISPLAY,
+			displayName = TBD_DISPLAY,
+			pageName = 'TBD',
+			shortName = TBD_DISPLAY,
+		}
+	end
 	local rawTeam = mw.ext.TeamTemplate.raw(template)
 	if not rawTeam then
 		return nil
