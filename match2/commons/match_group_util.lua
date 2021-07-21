@@ -325,6 +325,7 @@ end
 Fetches information about a team via mw.ext.TeamTemplate.
 ]]
 function MatchGroupUtil.fetchTeam(template)
+	--exception for TBD opponents
 	if string.lower(template) == 'tbd' then
 		return {
 			bracketName = TBD_DISPLAY,
