@@ -7,7 +7,6 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local json = require("Module:Json")
 local getIconName = require("Module:IconName").luaGet
-local _frame
 
 local ALLOWED_STATUSES = { "W", "FF", "DQ", "L" }
 local MAX_NUM_OPPONENTS = 2
@@ -21,7 +20,6 @@ local opponentFunctions = {}
 
 -- called from Module:MatchGroup
 function p.processMatch(frame, match)
-	_frame = frame
 	if type(match) == "string" then
 		match = json.parse(match)
 	end
@@ -38,7 +36,6 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processMap(frame, map)
-	_frame = frame
 	if type(map) == "string" then
 		map = json.parse(map)
 	end
@@ -54,7 +51,6 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processOpponent(frame, opponent)
-	_frame = frame
 	if type(opponent) == "string" then
 		opponent = json.parse(opponent)
 	end
@@ -91,7 +87,6 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processPlayer(frame, player)
-	_frame = frame
 	if type(player) == "string" then
 		player = json.parse(player)
 	end
