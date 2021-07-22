@@ -18,7 +18,7 @@ end
 -- Whether to allow highlighting an opponent via mouseover
 function DisplayHelper.opponentIsHighlightable(opponent)
 	if opponent.type == 'literal' then
-		return opponent.name and opponent.name ~= 'TBD' or false
+		return opponent.name and opponent.name ~= '' and opponent.name ~= 'TBD' or false
 	elseif opponent.type == 'team' then
 		return opponent.template and opponent.template ~= 'tbd' or false
 	else
