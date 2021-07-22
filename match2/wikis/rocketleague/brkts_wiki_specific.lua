@@ -5,7 +5,6 @@ local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
-local Template = require('Module:Template')
 local json = require("Module:Json")
 local getIconName = require("Module:IconName").luaGet
 local _frame
@@ -62,7 +61,7 @@ function p.processOpponent(frame, opponent)
 
 	-- process opponent
 	if not Logic.isEmpty(opponent.template) then
-		local name, icon = opponentFunctions.getTeamNameAndIcon(template)
+		local name, icon = opponentFunctions.getTeamNameAndIcon(opponent.template)
 		opponent.name = opponent.name or name
 		opponent.icon = opponent.icon or icon
 	end
