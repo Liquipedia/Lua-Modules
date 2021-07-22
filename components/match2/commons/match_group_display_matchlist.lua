@@ -8,14 +8,7 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
 
-local html = mw.html
-
 local MatchlistDisplay = {propTypes = {}, types = {}}
-
---[[
-Horiziontal and vertical padding used by most cells in the matchlist
-]]
-MatchlistDisplay.cellPadding = 5
 
 -- Called by MatchGroup/Display
 function MatchlistDisplay.luaGet(_, args)
@@ -89,8 +82,7 @@ function MatchlistDisplay.Matchlist(props)
 		width = propsConfig.width or 300,
 	}
 
-	local tableNode = html.create('table')
-		:addClass('brkts-matchlist wikitable wikitable-bordered matchlist')
+	local matchlistNode = mw.html.create('div'):addClass('brkts-matchlist')
 		:addClass(config.collapsible and 'collapsible' or nil)
 		:addClass(config.collapsed and 'collapsed' or nil)
 		:addClass(config.attached and 'brkts-matchlist-attached' or nil)
@@ -100,14 +92,12 @@ function MatchlistDisplay.Matchlist(props)
 		local titleNode = index == 1
 			and MatchlistDisplay.Title({
 				title = match.bracketData.title or 'Match List',
-				width = config.width,
 			})
 			or nil
 
 		local headerNode = match.bracketData.header
 			and MatchlistDisplay.Header({
 				header = match.bracketData.header,
-				width = config.width,
 			})
 			or nil
 
@@ -117,16 +107,12 @@ function MatchlistDisplay.Matchlist(props)
 			Score = config.Score,
 			match = match,
 			matchHasDetails = config.matchHasDetails,
-			width = config.width,
 		})
 
-		tableNode
-			:node(titleNode)
-			:node(headerNode)
-			:node(matchNode)
+		matchlistNode:node(titleNode):node(headerNode):node(matchNode)
 	end
 
-	return tableNode
+	return matchlistNode
 end
 
 MatchlistDisplay.propTypes.Match = {
@@ -145,39 +131,32 @@ function MatchlistDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Match)
 	local match = props.match
 
-	-- Compute widths of the 2 opponent and 2 score columns. The small offsets
-	-- are due to border splitting from table-layout: auto.
-	local minScoreWidth = 30
-	local scoreWidth = math.max(minScoreWidth, math.floor(0.1 * props.width))
-	-- width of both opponent fields is total width -2 (border widths) - width of the score fields
-	local opponentWidth = 0.5 * (props.width - 2 - (2 * scoreWidth))
-
-	local renderOpponent = function(opponentIx)
+	local function renderOpponent(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
 
 		local opponentNode = props.Opponent({
 			opponent = opponent,
 			resultType = match.resultType,
 			side = opponentIx == 1 and 'left' or 'right',
-			width = opponentWidth,
 		})
 		return DisplayHelper.addOpponentHighlight(opponentNode, opponent)
 	end
 
-	local renderScore = function(opponentIx)
+	local function renderScore(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
 
 		local scoreNode = props.Score({
 			opponent = opponent,
 			resultType = match.resultType,
 			side = opponentIx == 1 and 'left' or 'right',
-			width = scoreWidth,
 		})
 		return DisplayHelper.addOpponentHighlight(scoreNode, opponent)
 	end
 
+	local matchInfoIconNode
 	local matchSummaryNode
 	if props.matchHasDetails(match) then
+		matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')
 		matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 			bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 			matchId = props.match.matchId,
@@ -185,21 +164,14 @@ function MatchlistDisplay.Match(props)
 			:addClass('brkts-match-info-popup')
 	end
 
-	local matchInfo = html.create('td'):addClass('brkts-empty-td')
-		:node(
-			matchSummaryNode
-				and html.create('div'):addClass('brkts-match-info-icon')
-				or nil
-		)
-		:node(matchSummaryNode)
-
-	return html.create('tr'):addClass('brkts-matchlist-row brkts-match-popup-wrapper')
+	return mw.html.create('div'):addClass('brkts-matchlist-match')
 		:addClass(matchSummaryNode and 'brkts-match-has-details' or nil)
 		:node(renderOpponent(1))
 		:node(renderScore(1))
-		:node(matchInfo)
+		:node(matchInfoIconNode)
 		:node(renderScore(2))
 		:node(renderOpponent(2))
+		:node(matchSummaryNode)
 end
 
 MatchlistDisplay.propTypes.Title = {
@@ -211,15 +183,11 @@ Display component for a title in a matchlist.
 ]]
 function MatchlistDisplay.Title(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Title)
-	local titleNode = html.create('div')
-		:css('width', (props.width - (2 * MatchlistDisplay.cellPadding) - 2) .. 'px')
+	local titleNode = mw.html.create('div'):addClass('brkts-matchlist-title')
+		:css('grid-column', 'span 5')
 		:wikitext(props.title)
 
-	local thNode = html.create('th')
-		:addClass('brkts-matchlist-title')
-		:attr('colspan', '5')
-		:node(DisplayUtil.applyOverflowStyles(titleNode, 'wrap'))
-	return html.create('tr'):node(thNode)
+	return DisplayUtil.applyOverflowStyles(titleNode, 'wrap')
 end
 
 MatchlistDisplay.propTypes.Header = {
@@ -232,15 +200,11 @@ Display component for a header in a matchlist.
 function MatchlistDisplay.Header(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Header)
 
-	local headerNode = html.create('div')
-		:css('width', (props.width - (2 * MatchlistDisplay.cellPadding) - 2) .. 'px')
+	local headerNode = mw.html.create('div'):addClass('brkts-matchlist-header')
+		:css('grid-column', 'span 5')
 		:wikitext(props.header)
 
-	local thNode = html.create('th')
-		:addClass('brkts-matchlist-header')
-		:attr('colspan', '5')
-		:node(DisplayUtil.applyOverflowStyles(headerNode, 'wrap'))
-	return html.create('tr'):node(thNode)
+	return DisplayUtil.applyOverflowStyles(headerNode, 'wrap')
 end
 
 --[[
@@ -248,8 +212,7 @@ Display component for an opponent in a matchlist.
 
 This is the default implementation used by the Matchlist component. Specific
 wikis may override this by passing a different props.Opponent to the Matchlist
-component. Custom implementations should ensure that the rendered width is
-exactly props.width.
+component.
 ]]
 function MatchlistDisplay.Opponent(props)
 	local contentNode = OpponentDisplay.BlockOpponent({
@@ -259,8 +222,9 @@ function MatchlistDisplay.Opponent(props)
 		showLink = false,
 		teamStyle = 'short',
 	})
-		:css('width', (props.width - (2 * MatchlistDisplay.cellPadding) - 1) .. 'px')
-	return html.create('td')
+		:addClass('brkts-matchlist-cell-content')
+	return mw.html.create('div')
+		:addClass('brkts-matchlist-cell brkts-matchlist-opponent')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
 		:addClass(props.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or nil)
 		:node(contentNode)
@@ -271,14 +235,13 @@ Display component for the score of an opponent in a matchlist.
 
 This is the default implementation used by the Matchlist component. Specific
 wikis may override this by passing a different props.Score to the Matchlist
-component. Custom implementations should ensure that the rendered width is
-exactly props.width.
+component.
 ]]
 function MatchlistDisplay.Score(props)
-	local contentNode = html.create('div'):addClass('brkts-matchlist-score')
+	local contentNode = mw.html.create('div'):addClass('brkts-matchlist-cell-content')
 		:node(OpponentDisplay.InlineScore(props.opponent))
-		:css('width', (props.width - (2 * MatchlistDisplay.cellPadding) - 1) .. 'px')
-	return html.create('td')
+	return mw.html.create('div')
+		:addClass('brkts-matchlist-cell brkts-matchlist-score')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil)
 		:node(contentNode)
 end
