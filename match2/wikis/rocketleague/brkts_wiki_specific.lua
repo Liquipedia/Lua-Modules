@@ -62,8 +62,9 @@ function p.processOpponent(frame, opponent)
 
 	-- process opponent
 	if not Logic.isEmpty(opponent.template) then
-		opponent.name = opponent.name or opponentFunctions.getTeamName(opponent.template)
-		opponent.icon = opponent.icon or opponentFunctions.getIconName(opponent.template)
+		local name, icon = opponentFunctions.getTeamNameAndIcon(template)
+		opponent.name = opponent.name or name
+		opponent.icon = opponent.icon or icon
 	end
 
 	--fix for legacy conversion
@@ -408,28 +409,22 @@ end
 --
 -- opponent related functions
 --
-function opponentFunctions.getTeamName(template)
-	if template ~= nil then
-		local team = Template.expandTemplate(_frame, "Team", { template })
-		team = team:gsub("%&", "")
-		team = String.split(team, "link=")[2]
-		team = String.split(team, "]]")[1]
-		return team
-	else
-		return nil
-	end
-end
+function opponentFunctions.getTeamNameAndIcon(template)
+	local team
+	local icon
+	template = (template or ''):lower():gsub('_', ' ')
+	if template ~= '' and template ~= 'noteam' and
+		mw.ext.TeamTemplate.teamexists(template) then
 
-function opponentFunctions.getIconName(template)
-	if template ~= nil then
-		local icon = Template.expandTemplate(_frame, "Team", { template })
-		icon = icon:gsub("%&", "")
-		icon = String.split(icon, "File:")[2]
-		icon = String.split(icon, "|")[1]
-		return icon
-	else
-		return nil
+		team = mw.ext.TeamTemplate.raw(template)
+		icon = team.image
+		if icon == '' then
+			icon = team.legacyimage
+		end
+		team = team.page
 	end
+
+	return team, icon
 end
 
 --needed for legacy conversion to work for solo brackets
