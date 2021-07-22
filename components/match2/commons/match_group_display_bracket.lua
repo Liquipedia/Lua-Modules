@@ -130,7 +130,8 @@ function BracketDisplay.Bracket(props)
 			:node(BracketDisplay.NodeBody(nodeProps))
 	end
 
-	return html.create('div'):addClass('brkts-main brkts-main-dev brkts-main-dev-2 brkts-bracket-wrapper')
+	-- TODO remove brkts-main-dev-2
+	return html.create('div'):addClass('brkts-main-dev-2 brkts-bracket-wrapper')
 		:node(bracketNode)
 end
 
@@ -515,18 +516,16 @@ function BracketDisplay.Match(props)
 			bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 			matchId = props.match.matchId,
 		})
+			:addClass('brkts-match-info-popup')
 
-		local matchSummaryPopupNode = html.create('div'):addClass('brkts-match-info-popup')
-			:node(matchSummaryNode)
+		local matchInfoIconNode = html.create('div'):addClass('brkts-match-info-icon')
+			-- Vertically align the middle of the match with the middle
+			-- of the 12px icon. The -1 is for the top border of the match.
+			:css('top', #props.match.opponents * props.opponentHeight / 2 - 12 / 2 - 1 .. 'px')
 
 		matchNode
-			:node(
-				html.create('div'):addClass('brkts-match-info-icon')
-					-- Vertically align the middle of the match with the middle
-					-- of the 12px icon. The -1 is for the top border of the match.
-					:css('top', #props.match.opponents * props.opponentHeight / 2 - 12 / 2 - 1 .. 'px')
-			)
-			:node(matchSummaryPopupNode)
+			:node(matchInfoIconNode):node(matchSummaryNode)
+			:addClass('brkts-match-has-details')
 	end
 
 	return matchNode
