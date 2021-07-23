@@ -10,6 +10,7 @@ local Lua = require("Module:Lua")
 local Logic = require("Module:Logic")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
+local Variables = require("Module:Variables")
 
 local _type
 local _args
@@ -22,9 +23,15 @@ function p.get(frame)
 	_frame = frame
 	local nameSpaceNumber = mw.title.getCurrentTitle().namespace
 
-	if nameSpaceNumber == _NAMESPACE_USER then
-		_IS_USERSPACE = true
-	end
+
+ 	local storage = _args.store
+ 	if storage == '' or storage == nil then
+ 		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false' or nil
+ 	end
+ 	if (storage or '') ~= 'true' and nameSpaceNumber == _NAMESPACE_USER then
+ 		storage = 'false'
+ 		_IS_USERSPACE = true
+ 	end
 
 	local bracketid = _args["id"]
 	if Logic.isEmpty(bracketid) then
@@ -172,7 +179,7 @@ function p._convert(mapping)
 		end
 
 		if not Logic.isEmpty(match) then
-			if index ~= 'RxMBR' then
+			if index ~= "RxMBR" and index ~= "RxMTP" then
 				if not match.opponent1 then
 					match.opponent1 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
 					mw.log('Missing Opponent entry')
