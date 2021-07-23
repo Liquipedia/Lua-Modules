@@ -58,8 +58,8 @@ function p.processOpponent(frame, opponent)
 	-- process opponent
 	if not Logic.isEmpty(opponent.template) then
 		local name, icon = opponentFunctions.getTeamNameAndIcon(opponent.template)
-		opponent.name = opponent.name or name
-		opponent.icon = opponent.icon or icon
+		opponent.name = opponent.name or name or opponentFunctions.getTeamName(opponent.template)
+		opponent.icon = opponent.icon or icon or opponentFunctions.getIconName(opponent.template)
 	end
 
 	--fix for legacy conversion
@@ -419,6 +419,33 @@ function opponentFunctions.getTeamNameAndIcon(template)
 	end
 
 	return team, icon
+end
+
+--the following 2 functions are a fallback
+--they are only useful if the team template doesn't exist
+--in the teram template extension
+function opponentFunctions.getTeamName(template)
+	if template ~= nil then
+		local team = Template.expandTemplate(_frame, "Team", { template })
+		team = team:gsub("%&", "")
+		team = String.split(team, "link=")[2]
+		team = String.split(team, "]]")[1]
+		return team
+	else
+		return nil
+	end
+end
+
+function opponentFunctions.getIconName(template)
+	if template ~= nil then
+		local icon = Template.expandTemplate(_frame, "Team", { template })
+		icon = icon:gsub("%&", "")
+		icon = String.split(icon, "File:")[2]
+		icon = String.split(icon, "|")[1]
+		return icon
+	else
+		return nil
+	end
 end
 
 --needed for legacy conversion to work for solo brackets
