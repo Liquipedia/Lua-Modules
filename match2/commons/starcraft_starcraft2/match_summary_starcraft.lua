@@ -43,12 +43,10 @@ function StarcraftMatchSummary.MatchSummary(props)
 
 	-- Compute offraces
 	if match.opponentMode == 'uniform' then
-		for _, game in pairs(match.games) do
-			StarcraftMatchSummary.computeGameOffraces(game)
-		end
+		StarcraftMatchSummary.computeMatchOffraces(match)
 	else
 		for _, submatch in pairs(match.submatches) do
-			StarcraftMatchSummary.computeSubmatchOffraces(submatch)
+			StarcraftMatchSummary.computeMatchOffraces(submatch)
 		end
 	end
 
@@ -381,38 +379,20 @@ function StarcraftMatchSummary.OffraceIcons(races)
 	return racesNode
 end
 
--- Populate game.offraces if the played races differ from the players' main races
-function StarcraftMatchSummary.computeGameOffraces(game)
-	game.offraces = {}
-	for opponentIx, opponent in pairs(game.opponents) do
-		local gameRaces = {}
-		for _, player in ipairs(opponent.players) do
-			table.insert(gameRaces, player.race)
-			if player.race ~= player.mainRace then
-				game.offraces[opponentIx] = gameRaces
-			end
-		end
-	end
-	return game
-end
-
--- Populate game.offraces if the played races differ from the races listed in
--- the submatch
-function StarcraftMatchSummary.computeSubmatchOffraces(submatch)
-	for _, game in pairs(submatch.games) do
+--[[
+Populate game.offraces if the played races differ from the races listed in the
+match
+]]
+function StarcraftMatchSummary.computeMatchOffraces(match)
+	for _, game in ipairs(match.games) do
 		game.offraces = {}
 		for opponentIx, gameOpponent in pairs(game.opponents) do
-			local gameRaces = {}
-			for playerIx, gamePlayer in ipairs(gameOpponent.players) do
-				local submatchPlayer = submatch.opponents[opponentIx].players[playerIx]
-				table.insert(gameRaces, gamePlayer.race)
-				if gamePlayer.race ~= submatchPlayer.race then
-					game.offraces[opponentIx] = gameRaces
-				end
-			end
+			game.offraces[opponentIx] = StarcraftMatchGroupUtil.computeOffraces(
+				gameOpponent,
+				match.opponents[opponentIx]
+			)
 		end
 	end
-	return submatch
 end
 
 return StarcraftMatchSummary
