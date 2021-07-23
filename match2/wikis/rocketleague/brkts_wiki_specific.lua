@@ -62,9 +62,14 @@ function p.processOpponent(frame, opponent)
 
 	-- process opponent
 	if not Logic.isEmpty(opponent.template) then
-		local name, icon = opponentFunctions.getTeamNameAndIcon(opponent.template)
-		opponent.name = opponent.name or name or opponentFunctions.getTeamName(opponent.template)
-		opponent.icon = opponent.icon or icon or opponentFunctions.getIconName(opponent.template)
+		if string.lower(opponent.template) == 'bye' then
+			opponent.name = 'BYE'
+			opponent.type = 'literal'
+		else
+			local name, icon = opponentFunctions.getTeamNameAndIcon(opponent.template)
+			opponent.name = opponent.name or name or opponentFunctions.getTeamName(opponent.template)
+			opponent.icon = opponent.icon or icon or opponentFunctions.getIconName(opponent.template)
+		end
 	end
 
 	--fix for legacy conversion
