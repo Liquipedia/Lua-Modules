@@ -22,6 +22,12 @@ function p.get(frame)
 	_frame = frame
 	local nameSpaceNumber = mw.title.getCurrentTitle().namespace
 
+	local storage = _args.store
+	if storage == '' or storage == nil then
+		storage = Variables.varDefault('disable_SMW_storage') == 'true'
+			and 'false' or nil
+	end
+
 	if nameSpaceNumber == _NAMESPACE_USER then
 		_IS_USERSPACE = true
 	end
@@ -51,6 +57,9 @@ function p.get(frame)
 	local newArgs = p._convert(mapping)
 	newArgs.id = bracketid
 	newArgs["1"] = templateid
+
+	newArgs.store = storage
+	newArgs.noDuplicateCheck = _args.noDuplicateCheck
 
 	return MatchGroup.luaBracket(frame, newArgs)
 end
