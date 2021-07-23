@@ -212,6 +212,7 @@ function p.matchMappingFromCustom(data, bracketType)
 			win = data.opp1 .. "win",
 			},
 		["opponent2"] = {
+			["type"] = "type",
 			["$notEmpty$"] = data.opp2 ..
 				(bracketType == "team" and "team" or ""),
 			template = data.opp2 .. "team",
