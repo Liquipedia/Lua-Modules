@@ -10,6 +10,7 @@ local Lua = require("Module:Lua")
 local Logic = require("Module:Logic")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
+local Variables = require("Module:Variables")
 
 local _type
 local _args
