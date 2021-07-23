@@ -62,8 +62,9 @@ function p.processOpponent(frame, opponent)
 
 	-- process opponent
 	if not Logic.isEmpty(opponent.template) then
-		opponent.name = opponent.name or opponentFunctions.getTeamName(opponent.template)
-		opponent.icon = opponent.icon or opponentFunctions.getIconName(opponent.template)
+		local name, icon = opponentFunctions.getTeamNameAndIcon(opponent.template)
+		opponent.name = opponent.name or name or opponentFunctions.getTeamName(opponent.template)
+		opponent.icon = opponent.icon or icon or opponentFunctions.getIconName(opponent.template)
 	end
 
 	--fix for legacy conversion
@@ -408,6 +409,27 @@ end
 --
 -- opponent related functions
 --
+function opponentFunctions.getTeamNameAndIcon(template)
+	local team
+	local icon
+	template = (template or ''):lower():gsub('_', ' ')
+	if template ~= '' and template ~= 'noteam' and
+		mw.ext.TeamTemplate.teamexists(template) then
+
+		team = mw.ext.TeamTemplate.raw(template)
+		icon = team.image
+		if icon == '' then
+			icon = team.legacyimage
+		end
+		team = team.page
+	end
+
+	return team, icon
+end
+
+--the following 2 functions are a fallback
+--they are only useful if the team template doesn't exist
+--in the teram template extension
 function opponentFunctions.getTeamName(template)
 	if template ~= nil then
 		local team = Template.expandTemplate(_frame, "Team", { template })
