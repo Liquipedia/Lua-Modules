@@ -18,14 +18,16 @@ StarcraftMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.type
 	race = StarcraftMatchGroupUtil.types.Race,
 })
 StarcraftMatchGroupUtil.types.Opponent = TypeUtil.extendStruct(MatchGroupUtil.types.Opponent, {
-	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
 	isArchon = 'boolean',
+	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
 	team = TypeUtil.optional(MatchGroupUtil.types.Team),
 })
 StarcraftMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
-	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
 	isArchon = 'boolean',
 	isSpecialArchon = 'boolean',
+	placement = 'number?',
+	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
+	score = 'number?',
 })
 StarcraftMatchGroupUtil.types.Game = TypeUtil.extendStruct(MatchGroupUtil.types.Game, {
 	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
@@ -48,6 +50,7 @@ StarcraftMatchGroupUtil.types.Match = TypeUtil.extendStruct(MatchGroupUtil.types
 	games = TypeUtil.array(StarcraftMatchGroupUtil.types.Game),
 	headToHead = 'boolean',
 	isFFA = 'boolean',
+	noScore = 'boolean?',
 	opponentMode = TypeUtil.literalUnion('uniform', 'team'),
 	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
 	vetoes = TypeUtil.array(StarcraftMatchGroupUtil.types.MatchVeto),
@@ -97,6 +100,7 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	-- Misc
 	match.headToHead = Logic.readBool(Table.extract(match.extradata, 'headtohead'))
 	match.isFFA = Logic.readBool(Table.extract(match.extradata, 'ffa'))
+	match.noScore = Logic.readBoolOrNil(Table.extract(match.extradata, 'noscore'))
 
 	return match
 end
@@ -107,9 +111,9 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 
 	for _, opponent in ipairs(opponents) do
 		opponent.isArchon = Logic.readBool(Table.extract(opponent.extradata, 'isarchon'))
+		opponent.placement2 = tonumber(Table.extract(opponent.extradata, 'placement2'))
 		opponent.score2 = tonumber(Table.extract(opponent.extradata, 'score2'))
 		opponent.status2 = opponent.score2 and 'S' or nil
-		opponent.placement2 = tonumber(Table.extract(opponent.extradata, 'placement2'))
 
 		for _, player in ipairs(opponent.players) do
 			player.race = Table.extract(player.extradata, 'faction') or 'u'
@@ -125,7 +129,7 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 		end
 	end
 
-	if opponents[1] and opponents[2] and opponents[1].score2 and opponents[2].score2 then
+	if #opponents == 2 and opponents[1].score2 and opponents[2].score2 then
 		local d = opponents[1].score2 - opponents[2].score2
 		opponents[1].placement2 = d > 0 and 1 or 2
 		opponents[2].placement2 = d < 0 and 1 or 2
@@ -135,38 +139,57 @@ end
 -- Computes game.opponents by looking up matchOpponents.players on each
 -- participant.
 function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
-	local opponents = {}
+	local function playerFromParticipant(opponentIx, matchPlayerIx, participant)
+		local matchPlayer = matchOpponents[opponentIx].players[matchPlayerIx]
+		if matchPlayer then
+			return Table.merge(matchPlayer, {
+				matchPlayerIx = matchPlayerIx,
+				race = participant.faction,
+				position = tonumber(participant.position),
+			})
+		else
+			return {
+				displayName = 'TBD',
+				matchPlayerIx = matchPlayerIx,
+				race = 'u',
+			}
+		end
+	end
+
+	-- Convert participants list to players array
+	local opponentPlayers = {}
 	for key, participant in pairs(game.participants) do
 		local opponentIx, matchPlayerIx = key:match('(%d+)_(%d+)')
 		opponentIx = tonumber(opponentIx)
 		matchPlayerIx = tonumber(matchPlayerIx)
 
-		local matchPlayer = matchOpponents[opponentIx].players[matchPlayerIx]
-		local player = matchPlayer
-			and Table.merge(matchPlayer, {
-				matchPlayerIx = matchPlayerIx,
-				race = participant.faction,
-				position = tonumber(participant.position),
-			})
-			or {
-				displayName = 'TBD',
-				matchPlayerIx = matchPlayerIx,
-				race = 'u',
-			}
+		local player = playerFromParticipant(opponentIx, matchPlayerIx, participant)
 
-		if not opponents[opponentIx] then
-			opponents[opponentIx] = {
-				-- TODO add FFA support
-				isArchon = opponentIx == 1 and game.mode:match('^Archon') ~= nil
-					or opponentIx == 2 and game.mode:match('Archon$') ~= nil,
-				isSpecialArchon = opponentIx == 1 and game.mode:match('^%dS') ~= nil
-					or opponentIx == 2 and game.mode:match('%dS$') ~= nil,
-				players = {},
-			}
+		if not opponentPlayers[opponentIx] then
+			opponentPlayers[opponentIx] = {}
 		end
-		table.insert(opponents[opponentIx].players, player)
+		table.insert(opponentPlayers[opponentIx], player)
 	end
 
+	local modeParts = mw.text.split(game.mode or '', 'v')
+
+	-- Create game opponents
+	local opponents = {}
+	for opponentIx = 1, #modeParts do
+		local opponent = {
+			isArchon = modeParts[opponentIx] == 'Archon',
+			isSpecialArchon = modeParts[opponentIx]:match('^%dS$'),
+			placement = tonumber(Table.extract(game.extradata, 'placement' .. opponentIx)),
+			players = opponentPlayers[opponentIx] or {},
+			score = game.scores[opponentIx],
+		}
+		if opponent.placement and (opponent.placement < 1 or 99 <= opponent.placement) then
+			opponent.placement = nil
+		end
+		table.insert(opponents, opponent)
+	end
+
+	-- Sort players in game opponents
 	for _, opponent in pairs(opponents) do
 		if opponent.isSpecialArchon then
 			-- Team melee: Sort players by the order they were inputted

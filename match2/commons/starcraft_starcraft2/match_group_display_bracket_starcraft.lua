@@ -106,7 +106,7 @@ function StarcraftBracketDisplay.OpponentEntry(props)
 	local scoreNode
 	if props.displayType == 'bracket' then
 		scoreNode = OpponentDisplay.BracketScore({
-			isWinner = opponent.placement == 1,
+			isWinner = opponent.placement == 1 or opponent.advances,
 			scoreText = StarcraftOpponentDisplay.InlineScore(opponent),
 		})
 	end
@@ -127,7 +127,7 @@ function StarcraftBracketDisplay.OpponentEntry(props)
 	end
 
 	local isWinner = (opponent.placement2 or opponent.placement or 0) == 1
-		or opponent.extradata.advances == 'true'
+		or opponent.advances
 
 	return html.create('div'):addClass('brkts-opponent-entry')
 		:addClass(isWinner and 'brkts-opponent-win' or nil)
