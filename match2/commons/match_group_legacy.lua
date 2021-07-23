@@ -116,6 +116,12 @@ function p._convert(mapping)
 		end
 		for realKey, val in pairs(matchMapping) do
 			local notSkipMe = not String.startsWith(realKey, "$$")
+			if index == 'RxMBR' and String.startsWith(realKey, "opponent") then
+				local score2 = _args[val.score] or ''
+				if score2 == '' then
+					notSkipMe = false
+				end
+			end
 			if notSkipMe and type(val) == "table" then
 				-- references
 				if val["$ref$"] ~= nil then
@@ -166,15 +172,19 @@ function p._convert(mapping)
 		end
 
 		if not Logic.isEmpty(match) then
-			if not match.opponent1 then
-				match.opponent1 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
-				mw.log('Missing Opponent entry')
-				--error('Missing Opponent entry')
-			end
-			if not match.opponent2 then
-				match.opponent2 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
-				mw.log('Missing Opponent entry')
-				--error('Missing Opponent entry')
+			if index ~= 'RxMBR' then
+				if not match.opponent1 then
+					match.opponent1 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
+					mw.log('Missing Opponent entry')
+					--error('Missing Opponent entry')
+				end
+				if not match.opponent2 then
+					match.opponent2 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
+					mw.log('Missing Opponent entry')
+					--error('Missing Opponent entry')
+				end
+			elseif not match.opponent1 then
+				match = nil
 			end
 			newArgs[index] = match
 		end
