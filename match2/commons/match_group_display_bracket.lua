@@ -7,7 +7,6 @@ local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Math = require('Module:Math')
 local OpponentDisplay = require('Module:OpponentDisplay')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -71,13 +70,13 @@ The component fetches the match data from LPDB or page variables.
 function BracketDisplay.BracketContainer(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.BracketContainer)
 	return BracketDisplay.Bracket({
+		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
 		config = props.config,
-		matchesById = MatchGroupUtil.fetchMatchesTable(props.bracketId),
 	})
 end
 
 BracketDisplay.propTypes.Bracket = {
-	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+	bracket = MatchGroupUtil.types.MatchGroup,
 	config = TypeUtil.optional(BracketDisplay.types.BracketConfigOptions),
 }
 
@@ -107,7 +106,7 @@ function BracketDisplay.Bracket(props)
 		scoreWidth = propsConfig.scoreWidth or defaultConfig.scoreWidth,
 	}
 
-	local layoutsByMatchId, headMatchIds = BracketDisplay.computeBracketLayout(props.matchesById, config)
+	local layoutsByMatchId = BracketDisplay.computeBracketLayout(props.bracket, config)
 
 	local bracketNode = html.create('div'):addClass('brkts-bracket')
 		:css('--match-width', config.matchWidth .. 'px')
@@ -117,12 +116,12 @@ function BracketDisplay.Bracket(props)
 
 	-- Draw all top level subtrees of the bracket. These are subtrees rooted
 	-- at matches that do not advance to higher rounds.
-	for _, matchId in ipairs(headMatchIds) do
+	for _, matchId in ipairs(props.bracket.headMatchIds) do
 		local nodeProps = {
 			config = config,
 			layoutsByMatchId = layoutsByMatchId,
 			matchId = matchId,
-			matchesById = props.matchesById,
+			matchesById = props.bracket.matchesById,
 		}
 		bracketNode
 			:node(BracketDisplay.NodeHeader(nodeProps))
@@ -143,27 +142,12 @@ BracketDisplay.types.Layout = TypeUtil.struct({
 })
 
 --[[
-Map match ids to their upper round matches
-]]
-function BracketDisplay.computeUpperMatchIds(matchesById)
-	local upperMatchIds = {}
-	for matchId, match in pairs(matchesById) do
-		for _, lowerMatch in ipairs(match.bracketData.lowerMatches) do
-			upperMatchIds[lowerMatch.matchId] = matchId
-		end
-	end
-	return upperMatchIds
-end
-
---[[
 Computes certain layout properties of nodes in the bracket tree.
 ]]
-function BracketDisplay.computeBracketLayout(matchesById, config)
-	local upperMatchIds = BracketDisplay.computeUpperMatchIds(matchesById)
-
+function BracketDisplay.computeBracketLayout(bracket, config)
 	-- Computes the layout of a match and everything to its left.
 	local computeNodeLayout = FnUtil.memoizeY(function(matchId, computeNodeLayout)
-		local match = matchesById[matchId]
+		local match = bracket.matchesById[matchId]
 
 		-- Recurse on lower round matches
 		local lowerLayouts = Array.map(
@@ -179,8 +163,8 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
 		-- Don't show the header if it's disabled. Also don't show the header
 		-- if it is the first match of a round because a higher round match can
 		-- show it instead.
-		local isFirstChild = upperMatchIds[matchId]
-			and matchId == matchesById[upperMatchIds[matchId]].bracketData.lowerMatches[1].matchId
+		local isFirstChild = bracket.upperMatchIds[matchId]
+			and matchId == bracket.matchesById[bracket.upperMatchIds[matchId]].bracketData.lowerMatches[1].matchId
 		local showHeader = match.bracketData.header
 			and not config.hideRoundTitles
 			and not isFirstChild
@@ -224,23 +208,7 @@ function BracketDisplay.computeBracketLayout(matchesById, config)
 		}
 	end)
 
-	local layoutsByMatchId = {}
-	for matchId, _ in pairs(matchesById) do
-		layoutsByMatchId[matchId] = computeNodeLayout(matchId)
-	end
-
-	-- Matches without upper matches
-	local headMatchIds = {}
-	for matchId, _ in pairs(matchesById) do
-		if not upperMatchIds[matchId]
-			and not String.endsWith(matchId, 'RxMTP')
-			and not String.endsWith(matchId, 'RxMBR') then
-			table.insert(headMatchIds, matchId)
-		end
-	end
-	table.sort(headMatchIds)
-
-	return layoutsByMatchId, headMatchIds
+	return Table.mapValues(bracket.matchesById, function(match) return computeNodeLayout(match.matchId) end)
 end
 
 -- Computes the vertical offset of a match with its lower round matches
