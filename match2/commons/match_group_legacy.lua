@@ -172,7 +172,7 @@ function p._convert(mapping)
 		end
 
 		if not Logic.isEmpty(match) then
-			if index ~= 'RxMBR' then
+			if index ~= "RxMBR" and index ~= "RxMTP" then
 				if not match.opponent1 then
 					match.opponent1 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
 					mw.log('Missing Opponent entry')
