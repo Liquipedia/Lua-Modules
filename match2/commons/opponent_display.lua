@@ -83,7 +83,7 @@ function OpponentDisplay.BracketOpponentEntry:addScores(opponent)
 
 	if (opponent.placement2 or opponent.placement or 0) == 1
 		or opponent.advances then
-		self.root:addClass('brkts-opponent-win')
+		self.content:addClass('brkts-opponent-win')
 	end
 end
 

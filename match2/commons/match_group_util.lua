@@ -186,9 +186,23 @@ function MatchGroupUtil.fetchMatches(bracketId)
 	return MatchGroupUtil.fetchMatchGroup(bracketId).matches
 end
 
--- Returns a table whose entries are (matchId, match)
-function MatchGroupUtil.fetchMatchesTable(bracketId)
-	return MatchGroupUtil.fetchMatchGroup(bracketId).matchesById
+--[[
+Returns a match struct for use in a bracket display or match summary popup. The
+bracket display and match summary popup expects that the finals match also
+include results from the bracket reset match.
+]]
+function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId)
+	local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
+	local match = bracket.matchesById[matchId]
+
+	local bracketResetMatch = match
+		and match.bracketData.bracketResetMatchId
+		and bracket.matchesById[match.bracketData.bracketResetMatchId]
+	if bracketResetMatch then
+		return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+	else
+		return match
+	end
 end
 
 --[[

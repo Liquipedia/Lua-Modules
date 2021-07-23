@@ -26,7 +26,7 @@ StarcraftMatchSummary.propTypes.MatchSummaryContainer = {
 }
 
 function StarcraftMatchSummary.MatchSummaryContainer(props)
-	local match = MatchGroupUtil.fetchMatchesTable(props.bracketId)[props.matchId]
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	local MatchSummary = match.isFFA
 		and require('Module:MatchSummary/FFA/Starcraft').FFAMatchSummary
 		or StarcraftMatchSummary.MatchSummary
