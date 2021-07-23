@@ -14,10 +14,17 @@ local Table = require("Module:Table")
 local _type
 local _args
 local _frame
+local _IS_USERSPACE = false
+local _NAMESPACE_USER = 2
 
 function p.get(frame)
 	_args = getArgs(frame)
 	_frame = frame
+	local nameSpaceNumber = mw.title.getCurrentTitle().namespace
+
+	if nameSpaceNumber == _NAMESPACE_USER then
+		_IS_USERSPACE = true
+	end
 
 	local bracketid = _args["id"]
 	if Logic.isEmpty(bracketid) then
@@ -103,7 +110,7 @@ function p._convert(mapping)
 		-- do actual conversion
 		local match = {}
 		for key, val in pairs(flattened) do
-			if not String.startsWith(key, "map") then
+			if not String.startsWith(tostring(key), "map") then
 				match[key] = val
 			end
 		end
@@ -119,6 +126,14 @@ function p._convert(mapping)
 							val[k] = v:gsub("%$1%$",subst)
 						end
 					end)
+				end
+
+				if _IS_USERSPACE then
+					--the following allows empty matches in the conversion
+					if String.startsWith(realKey, "opponent") and
+						Logic.isEmpty(_args[val["$notEmpty$"]] or flattened[val["$notEmpty$"]]) then
+							_args[val["$notEmpty$"]] = 'tbd'
+					end
 				end
 
 				if val["$notEmpty$"] == nil or not Logic.isEmpty(_args[val["$notEmpty$"]] or flattened[val["$notEmpty$"]]) then
