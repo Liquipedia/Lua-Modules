@@ -24,14 +24,14 @@ function p.get(frame)
 	local nameSpaceNumber = mw.title.getCurrentTitle().namespace
 
 
- 	local storage = _args.store
- 	if storage == '' or storage == nil then
- 		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false' or nil
- 	end
- 	if (storage or '') ~= 'true' and nameSpaceNumber == _NAMESPACE_USER then
- 		storage = 'false'
- 		_IS_USERSPACE = true
- 	end
+	local storage = _args.store
+	if storage == '' or storage == nil then
+		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false' or nil
+	end
+	if (storage or '') ~= 'true' and nameSpaceNumber == _NAMESPACE_USER then
+		storage = 'false'
+		_IS_USERSPACE = true
+	end
 
 	local bracketid = _args["id"]
 	if Logic.isEmpty(bracketid) then
