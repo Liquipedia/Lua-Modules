@@ -25,6 +25,7 @@ function p.storeMatchSMW(match, match2)
 	local icon = Variables.varDefault("tournament_icon")
 	mw.smw.subobject({
 		"legacymatch_" .. match2.match2id,
+		"has mode=" .. (match2.mode or ""),
 		"is map number=1",
 		"has team left=" .. (match.opponent1 or ""),
 		"has team right=" .. (match.opponent2 or ""),
