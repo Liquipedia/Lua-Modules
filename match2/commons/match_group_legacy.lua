@@ -84,7 +84,7 @@ function Legacy.getTemplate(frame)
 		error('argument \'type\' is empty')
 	end
 
-	local mapping = p._getMapping(templateid)
+	local mapping = Legacy._getMapping(templateid)
 
 	local out = json.stringify(mapping, true)
 		:gsub('"([^\n:"]-)":', '%1 = ')
@@ -150,9 +150,6 @@ function Legacy._convert(mapping)
 			end
 
 			if not Logic.isEmpty(nested) then
-				local score1 = json.parseIfString(nested.opponent1 or {}).score or ''
-				local score2 = json.parseIfString(nested.opponent2 or {}).score or ''
-				
 				if source ~= 'RxMBR' and source ~= 'RxMTP' then
 					if not nested.opponent1 then
 						nested.opponent1 = '{\'type\':\'team\',\'template\':\'TBD\',\'icon\':\'Rllogo_std.png\',\'name\':\'TBD\'}'
@@ -182,7 +179,7 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 	if source == 'RxMBR' and String.startsWith(realKey, 'opponent') then
 		local score2 = _args[val.score] or ''
 		if score2 == '' then
-			notSkipMe = false
+			noSkip = false
 		end
 	end
 
