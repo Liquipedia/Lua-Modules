@@ -7,13 +7,16 @@ local MAX_NUM_MAPS = 20
 
 local roundData
 function p.get(templateid, bracketType)
+	local LowerHeader = {}
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
+
 	assert(type(matches) == "table")
 	local bracketData = {}
 	roundData = roundData or {}
 	for _, match in ipairs(matches) do
-		bracketData = p._getMatchMapping(match, bracketData, bracketType)
+		bracketData, lastround, LowerHeader = p._getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	end
+
 	-- add reference for map mappings
 	bracketData["$$map"] = {
 		["$notEmpty$"] = "map$1$",
@@ -25,11 +28,18 @@ function p.get(templateid, bracketType)
 		winner = "map$1$win"
 	}
 
+	for n=1,lastround do
+		bracketData["R" .. n .. "M1header"] = "R" .. n
+		if LowerHeader[n] then
+			bracketData["R" .. n .. "M" .. LowerHeader[n] .. "header"] = "L" .. n
+		end
+	end
+
 	return bracketData
 end
 
 local lastRound
-function p._getMatchMapping(match, bracketData, bracketType)
+function p._getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	local id = String.split(match.match2id, "_")[2] or match.match2id
 	id = id:gsub("0*([1-9])", "%1"):gsub("%-", "")
 	local bd = match.match2bracketdata
@@ -52,6 +62,10 @@ function p._getMatchMapping(match, bracketData, bracketType)
 	end
 	round.G = round.G + 1
 
+	if string.match(bd.header or '', '^!l') then
+		LowerHeader[roundNum] = round.G
+	end
+
 	-- opponents
 	local opponent1
 	local finished1
@@ -73,7 +87,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				["$notEmpty$"] = "R" .. round.R .. "D" .. round.D,
 				name = "R" .. round.R .. "D" .. round.D,
 				displayname = "R" .. round.R .. "D" .. round.D,
-				flag = "R" .. round.R .. "D" .. round.D .. 'flag'
+				flag = "R" .. round.R .. "D" .. round.D .. "flag"
 			}
 		end
 		finished1 = "R" .. round.R .. "D" .. round.D .. "win"
@@ -95,7 +109,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				["$notEmpty$"] = "R" .. round.R .. "W" .. round.W,
 				name = "R" .. round.R .. "W" .. round.W,
 				displayname = "R" .. round.R .. "W" .. round.W,
-				flag = "R" .. round.R .. "W" .. round.W .. 'flag'
+				flag = "R" .. round.R .. "W" .. round.W .. "flag"
 			}
 		end
 		finished1 = "R" .. round.R .. "W" .. round.W .. "win"
@@ -120,7 +134,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				["$notEmpty$"] = "R" .. round.R .. "D" .. round.D,
 				name = "R" .. round.R .. "D" .. round.D,
 				displayname = "R" .. round.R .. "D" .. round.D,
-				flag = "R" .. round.R .. "D" .. round.D .. 'flag'
+				flag = "R" .. round.R .. "D" .. round.D .. "flag"
 			}
 		end
 		finished2 = "R" .. round.R .. "D" .. round.D .. "win"
@@ -142,7 +156,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				["$notEmpty$"] = "R" .. round.R .. "W" .. round.W,
 				name = "R" .. round.R .. "W" .. round.W,
 				displayname = "R" .. round.R .. "W" .. round.W,
-				flag = "R" .. round.R .. "W" .. round.W .. 'flag'
+				flag = "R" .. round.R .. "W" .. round.W .. "flag"
 			}
 		end
 		finished2 = "R" .. round.R .. "W" .. round.W .. "win"
@@ -157,18 +171,11 @@ function p._getMatchMapping(match, bracketData, bracketType)
 		["$flatten$"] = { "R" .. round.R .. "G" .. round.G .. "details" }
 	}
 
-	for mapIndex = 1, MAX_NUM_MAPS do
-		match["map" .. mapIndex] = {
-			["$ref$"] = "map",
-			["$1$"] = mapIndex
-		}
-	end
-
-	bracketData[id] = match
+	bracketData[id] = p.addMaps(match)
 	lastRound = round
 	roundData[round.R] = round
 
-	return bracketData
+	return bracketData, round.R, LowerHeader
 end
 
 --[[
