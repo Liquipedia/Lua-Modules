@@ -6,6 +6,7 @@ local Logic = require("Module:Logic")
 local MAX_NUM_MAPS = 20
 
 local roundData
+local lastRound
 function p.get(templateid, bracketType)
 	local LowerHeader = {}
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
@@ -38,7 +39,6 @@ function p.get(templateid, bracketType)
 	return bracketData
 end
 
-local lastRound
 function p._getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	local id = String.split(match.match2id, "_")[2] or match.match2id
 	id = id:gsub("0*([1-9])", "%1"):gsub("%-", "")
