@@ -18,7 +18,7 @@ local _frame
 local _IS_USERSPACE = false
 local _NAMESPACE_USER = 2
 local _RESET_MATCH = 'RxMBR'
-local _THird_PLACE_MATCH = 'RxMTP'
+local _THIRD_PLACE_MATCH = 'RxMTP'
 
 function p.get(frame)
 	_args = getArgs(frame)
@@ -184,7 +184,7 @@ function p._convert(mapping)
 		end
 
 		if not Logic.isEmpty(match) then
-			if index ~= _RESET_MATCH and index ~= _THird_PLACE_MATCH then
+			if index ~= _RESET_MATCH and index ~= _THIRD_PLACE_MATCH then
 				if not match.opponent1 then
 					match.opponent1 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
 					mw.log('Missing Opponent entry')
