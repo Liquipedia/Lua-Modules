@@ -61,15 +61,10 @@ function p.processOpponent(frame, opponent)
 	end
 
 	-- process opponent
-	if not Logic.isEmpty(opponent.template) then
-		if string.lower(opponent.template) == 'bye' then
+	if not Logic.isEmpty(opponent.template) and
+		string.lower(opponent.template) == 'bye' then
 			opponent.name = 'BYE'
 			opponent.type = 'literal'
-		else
-			local name, icon = opponentFunctions.getTeamNameAndIcon(opponent.template)
-			opponent.name = opponent.name or name or opponentFunctions.getTeamName(opponent.template)
-			opponent.icon = opponent.icon or icon or opponentFunctions.getIconName(opponent.template)
-		end
 	end
 
 	--fix for legacy conversion
@@ -246,6 +241,16 @@ function matchFunctions.getOpponents(args)
 			if type(opponent) == "string" then
 				opponent = json.parse(opponent)
 			end
+
+			--retrieve name and icon for teams from team templates
+			if opponent.type == "team" and
+				not Logic.isEmpty(opponent.template, args.date) then
+					local name, icon, template = opponentFunctions.getTeamNameAndIcon(opponent.template, args.date)
+					opponent.template = template
+					opponent.name = opponent.name or name or opponentFunctions.getTeamName(opponent.template)
+					opponent.icon = opponent.icon or icon or opponentFunctions.getIconName(opponent.template)
+			end
+
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = "S"
@@ -414,12 +419,14 @@ end
 --
 -- opponent related functions
 --
-function opponentFunctions.getTeamNameAndIcon(template)
+function opponentFunctions.getTeamNameAndIcon(template, date)
 	local team
 	local icon
 	template = (template or ''):lower():gsub('_', ' ')
 	if template ~= '' and template ~= 'noteam' and
 		mw.ext.TeamTemplate.teamexists(template) then
+
+		template = opponentFunctions.getTeamTemplateFromHistorical(template, date) or template
 
 		team = mw.ext.TeamTemplate.raw(template)
 		icon = team.image
@@ -429,12 +436,42 @@ function opponentFunctions.getTeamNameAndIcon(template)
 		team = team.page
 	end
 
-	return team, icon
+	return team, icon, template
+end
+
+function opponentFunctions.getTeamTemplateFromHistorical(input, date)
+	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
+
+	local historicals = mw.ext.TeamTemplate.raw_historical(input)
+	if type(historicals) ~= 'table' then
+		return input
+	end
+
+	local templates = {}
+	local count = 0
+
+	for key, item in pairs(historicals) do
+		count = count + 1
+		templates[count] = { date = string.gsub(key, '-', ''), template = item }
+	end
+
+	table.sort(templates, opponentFunctions.TeamTemplateSortCat)
+	templates[count + 1] = { date = '39999999', template = '' }
+
+	for i = 1, count do
+		if date >= templates[i].date and date < templates[i+1].date then
+			return templates[i].template
+		end
+	end
+end
+
+function opponentFunctions.TeamTemplateSortCat(a,b)
+	return a.date < b.date
 end
 
 --the following 2 functions are a fallback
 --they are only useful if the team template doesn't exist
---in the teram template extension
+--in the team template extension
 function opponentFunctions.getTeamName(template)
 	if template ~= nil then
 		local team = Template.expandTemplate(_frame, "Team", { template })
