@@ -10,6 +10,7 @@ local Lua = require("Module:Lua")
 local Logic = require("Module:Logic")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
+local Variables = require("Module:Variables")
 
 local _type
 local _args
@@ -17,12 +18,18 @@ local _frame
 local _IS_USERSPACE = false
 local _NAMESPACE_USER = 2
 local _RESET_MATCH = 'RxMBR'
-local _THird_PLACE_MATCH = 'RxMTP'
+local _THIRD_PLACE_MATCH = 'RxMTP'
 
 function p.get(frame)
 	_args = getArgs(frame)
 	_frame = frame
 	local nameSpaceNumber = mw.title.getCurrentTitle().namespace
+
+	local storage = _args.store
+	if storage == '' or storage == nil then
+		storage = (Variables.varDefault('disable_SMW_storage') == 'true')
+			and 'false' or nil
+	end
 
 	if nameSpaceNumber == _NAMESPACE_USER then
 		_IS_USERSPACE = true
@@ -53,6 +60,9 @@ function p.get(frame)
 	local newArgs = p._convert(mapping)
 	newArgs.id = bracketid
 	newArgs["1"] = templateid
+
+	newArgs.store = storage
+	newArgs.noDuplicateCheck = _args.noDuplicateCheck
 
 	return MatchGroup.luaBracket(frame, newArgs)
 end
@@ -174,7 +184,7 @@ function p._convert(mapping)
 		end
 
 		if not Logic.isEmpty(match) then
-			if index ~= _RESET_MATCH and index ~= _THird_PLACE_MATCH then
+			if index ~= _RESET_MATCH and index ~= _THIRD_PLACE_MATCH then
 				if not match.opponent1 then
 					match.opponent1 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
 					mw.log('Missing Opponent entry')
