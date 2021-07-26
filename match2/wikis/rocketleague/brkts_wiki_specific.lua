@@ -452,7 +452,7 @@ function opponentFunctions.getTeamTemplateFromHistorical(input, date)
 
 	for key, item in pairs(historicals) do
 		count = count + 1
-		templates[count] = { date = string.gsub(key, '-', ''), template = item }
+		templates[count] = { date = key, template = item }
 	end
 
 	table.sort(templates, opponentFunctions.TeamTemplateSortCat)
