@@ -11,6 +11,8 @@ local Logic = require("Module:Logic")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
 local Variables = require("Module:Variables")
+local _RESET_MATCH = 'RxMBR'
+local _THird_PLACE_MATCH = 'RxMTP'
 
 local _type
 local _args
@@ -25,7 +27,7 @@ function p.get(frame)
 
 	local storage = _args.store
 	if storage == '' or storage == nil then
-		storage = Variables.varDefault('disable_SMW_storage') == 'true'
+		storage = (Variables.varDefault('disable_SMW_storage') == 'true')
 			and 'false' or nil
 	end
 
@@ -126,7 +128,7 @@ function p._convert(mapping)
 		end
 		for realKey, val in pairs(matchMapping) do
 			local notSkipMe = not String.startsWith(realKey, "$$")
-			if index == 'RxMBR' and String.startsWith(realKey, "opponent") then
+			if index == _RESET_MATCH and String.startsWith(realKey, "opponent") then
 				local score2 = _args[val.score] or ''
 				if score2 == '' then
 					notSkipMe = false
@@ -182,7 +184,7 @@ function p._convert(mapping)
 		end
 
 		if not Logic.isEmpty(match) then
-			if index ~= "RxMBR" and index ~= "RxMTP" then
+			if index ~= _RESET_MATCH and index ~= _THird_PLACE_MATCH then
 				if not match.opponent1 then
 					match.opponent1 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
 					mw.log('Missing Opponent entry')
