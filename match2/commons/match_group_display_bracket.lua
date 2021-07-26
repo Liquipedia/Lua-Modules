@@ -11,6 +11,7 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
 local html = mw.html
+local _NON_BREAKING_SPACE = '&nbsp;'
 
 local BracketDisplay = {propTypes = {}, types = {}}
 
@@ -332,6 +333,10 @@ function BracketDisplay.MatchHeader(props)
 	local options = DisplayHelper.expandHeader(props.header)
 
 	local headerNode = html.create('div'):addClass('brkts-header brkts-header-div')
+		:addClass(--do not display the header if it is "&nbsp;"
+			options[1] == _NON_BREAKING_SPACE
+			and 'brkts-header-nodisplay' or ''
+		)
 		:css('height', props.height .. 'px')
 		:css('line-height', props.height - 11 .. 'px')
 		:wikitext(options[1])
