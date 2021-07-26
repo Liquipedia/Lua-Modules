@@ -7,13 +7,17 @@ local MAX_NUM_MAPS = 20
 
 local roundData
 function p.get(templateid, bracketType)
+	local lowerHeader = {}
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
+
 	assert(type(matches) == "table")
 	local bracketData = {}
 	roundData = roundData or {}
+	local lastRound = 0
 	for _, match in ipairs(matches) do
-		bracketData = p._getMatchMapping(match, bracketData, bracketType)
+		bracketData, lastRound, lowerHeader = p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 	end
+
 	-- add reference for map mappings
 	bracketData["$$map"] = {
 		["$notEmpty$"] = "map$1$",
@@ -25,12 +29,23 @@ function p.get(templateid, bracketType)
 		winner = "map$1$win"
 	}
 
+	for n = 1, lastRound do
+		bracketData["R" .. n .. "M1header"] = "R" .. n
+		if lowerHeader[n] then
+			bracketData["R" .. n .. "M" .. lowerHeader[n] .. "header"] = "L" .. n
+		end
+	end
+
 	return bracketData
 end
 
-local lastRound
-function p._getMatchMapping(match, bracketData, bracketType)
+--the following variable gets mutaded by each p._getMatchMapping
+--it is needed as a basis for the next call
+local _lastRound
+function p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 	local id = String.split(match.match2id, "_")[2] or match.match2id
+	--remove 0's and dashes from the match param
+	--e.g. R01-M001 --> R1M1
 	id = id:gsub("0*([1-9])", "%1"):gsub("%-", "")
 	local bd = match.match2bracketdata
 
@@ -38,9 +53,9 @@ function p._getMatchMapping(match, bracketData, bracketType)
 	local round
 	local reset = false
 	if id == "RxMTP" then
-		round = lastRound
+		round = _lastRound
 	elseif id == "RxMBR" then
-		round = lastRound
+		round = _lastRound
 		round.G = round.G - 2
 		round.W = round.W - 2
 		round.D = round.D - 2
@@ -51,6 +66,11 @@ function p._getMatchMapping(match, bracketData, bracketType)
 		round = roundData[roundNum] or { R = roundNum, G = 0, D = 1, W = 1 }
 	end
 	round.G = round.G + 1
+
+	--if bd.header starts with '!l'
+	if string.match(bd.header or '', '^!l') then
+		lowerHeader[roundNum] = round.G
+	end
 
 	-- opponents
 	local opponent1
@@ -73,7 +93,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				["$notEmpty$"] = "R" .. round.R .. "D" .. round.D,
 				name = "R" .. round.R .. "D" .. round.D,
 				displayname = "R" .. round.R .. "D" .. round.D,
-				flag = "R" .. round.R .. "D" .. round.D .. 'flag'
+				flag = "R" .. round.R .. "D" .. round.D .. "flag"
 			}
 		end
 		finished1 = "R" .. round.R .. "D" .. round.D .. "win"
@@ -95,7 +115,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				["$notEmpty$"] = "R" .. round.R .. "W" .. round.W,
 				name = "R" .. round.R .. "W" .. round.W,
 				displayname = "R" .. round.R .. "W" .. round.W,
-				flag = "R" .. round.R .. "W" .. round.W .. 'flag'
+				flag = "R" .. round.R .. "W" .. round.W .. "flag"
 			}
 		end
 		finished1 = "R" .. round.R .. "W" .. round.W .. "win"
@@ -120,7 +140,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				["$notEmpty$"] = "R" .. round.R .. "D" .. round.D,
 				name = "R" .. round.R .. "D" .. round.D,
 				displayname = "R" .. round.R .. "D" .. round.D,
-				flag = "R" .. round.R .. "D" .. round.D .. 'flag'
+				flag = "R" .. round.R .. "D" .. round.D .. "flag"
 			}
 		end
 		finished2 = "R" .. round.R .. "D" .. round.D .. "win"
@@ -142,7 +162,7 @@ function p._getMatchMapping(match, bracketData, bracketType)
 				["$notEmpty$"] = "R" .. round.R .. "W" .. round.W,
 				name = "R" .. round.R .. "W" .. round.W,
 				displayname = "R" .. round.R .. "W" .. round.W,
-				flag = "R" .. round.R .. "W" .. round.W .. 'flag'
+				flag = "R" .. round.R .. "W" .. round.W .. "flag"
 			}
 		end
 		finished2 = "R" .. round.R .. "W" .. round.W .. "win"
@@ -157,18 +177,11 @@ function p._getMatchMapping(match, bracketData, bracketType)
 		["$flatten$"] = { "R" .. round.R .. "G" .. round.G .. "details" }
 	}
 
-	for mapIndex = 1, MAX_NUM_MAPS do
-		match["map" .. mapIndex] = {
-			["$ref$"] = "map",
-			["$1$"] = mapIndex
-		}
-	end
-
-	bracketData[id] = match
-	lastRound = round
+	bracketData[id] = p.addMaps(match)
+	_lastRound = round
 	roundData[round.R] = round
 
-	return bracketData
+	return bracketData, round.R, lowerHeader
 end
 
 --[[
