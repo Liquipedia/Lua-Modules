@@ -746,7 +746,7 @@ function StarCraftMatchGroupInput.getTeamTemplate(input, date)
 	end
 
 	table.sort(temp, StarCraftMatchGroupInput.TeamTemplateSortCat)
-	temp[k+1] = { date = '39999999', template = '' }
+	temp[k+1] = { date = '3999-99-99', template = '' }
 
 	for i = 1, k do
 		if date >= temp[i].date and date < temp[i+1].date then
