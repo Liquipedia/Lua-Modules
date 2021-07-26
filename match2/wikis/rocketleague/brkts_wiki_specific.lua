@@ -456,7 +456,7 @@ function opponentFunctions.getTeamTemplateFromHistorical(input, date)
 	end
 
 	table.sort(templates, opponentFunctions.TeamTemplateSortCat)
-	templates[count + 1] = { date = '39999999', template = '' }
+	templates[count + 1] = { date = '3999-99-99', template = '' }
 
 	for i = 1, count do
 		if date >= templates[i].date and date < templates[i+1].date then
