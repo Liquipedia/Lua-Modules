@@ -31,7 +31,8 @@ function p.get(frame)
 			and 'false' or nil
 	end
 
-	if nameSpaceNumber == _NAMESPACE_USER then
+	if (storage or '') ~= 'true' and nameSpaceNumber == _NAMESPACE_USER then
+		storage = 'false'
 		_IS_USERSPACE = true
 	end
 
