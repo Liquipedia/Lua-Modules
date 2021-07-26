@@ -39,7 +39,9 @@ function p.get(templateid, bracketType)
 	return bracketData
 end
 
-local lastRound
+--the following variable gets mutaded by each p._getMatchMapping
+--it is needed as a basis for the next call
+local _lastRound
 function p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 	local id = String.split(match.match2id, "_")[2] or match.match2id
 	--remove 0's and dashes from the match param
@@ -51,9 +53,9 @@ function p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 	local round
 	local reset = false
 	if id == "RxMTP" then
-		round = lastRound
+		round = _lastRound
 	elseif id == "RxMBR" then
-		round = lastRound
+		round = _lastRound
 		round.G = round.G - 2
 		round.W = round.W - 2
 		round.D = round.D - 2
@@ -176,7 +178,7 @@ function p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 	}
 
 	bracketData[id] = p.addMaps(match)
-	lastRound = round
+	_lastRound = round
 	roundData[round.R] = round
 
 	return bracketData, round.R, lowerHeader
