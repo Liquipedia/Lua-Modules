@@ -150,7 +150,7 @@ function Legacy._convert(mapping)
 			end
 
 			if not Logic.isEmpty(nested) then
-				if source ~= 'RxMBR' and source ~= 'RxMTP' then
+				if source ~= _RESET_MATCH and source ~= _THird_PLACE_MATCH then
 					if not nested.opponent1 then
 						nested.opponent1 = '{\'type\':\'team\',\'template\':\'TBD\',\'icon\':\'Rllogo_std.png\',\'name\':\'TBD\'}'
 						mw.log('Missing Opponent entry')
@@ -176,7 +176,7 @@ end
 function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 	flattened = flattened or _args
 	local noSkip = not String.startsWith(realKey, '$$')
-	if source == 'RxMBR' and String.startsWith(realKey, 'opponent') then
+	if source == _RESET_MATCH and String.startsWith(realKey, 'opponent') then
 		local score2 = _args[val.score] or ''
 		if score2 == '' then
 			noSkip = false
