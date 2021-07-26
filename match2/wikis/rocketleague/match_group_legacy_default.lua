@@ -7,7 +7,7 @@ local MAX_NUM_MAPS = 20
 
 local roundData
 function p.get(templateid, bracketType)
-	local LowerHeader = {}
+	local lowerHeader = {}
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
 
 	assert(type(matches) == "table")
@@ -15,7 +15,7 @@ function p.get(templateid, bracketType)
 	roundData = roundData or {}
 	local lastround = 0
 	for _, match in ipairs(matches) do
-		bracketData, lastround, LowerHeader = p._getMatchMapping(match, bracketData, bracketType, LowerHeader)
+		bracketData, lastround, lowerHeader = p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 	end
 
 	-- add reference for map mappings
@@ -31,8 +31,8 @@ function p.get(templateid, bracketType)
 
 	for n=1,lastround do
 		bracketData["R" .. n .. "M1header"] = "R" .. n
-		if LowerHeader[n] then
-			bracketData["R" .. n .. "M" .. LowerHeader[n] .. "header"] = "L" .. n
+		if lowerHeader[n] then
+			bracketData["R" .. n .. "M" .. lowerHeader[n] .. "header"] = "L" .. n
 		end
 	end
 
@@ -40,8 +40,10 @@ function p.get(templateid, bracketType)
 end
 
 local lastRound
-function p._getMatchMapping(match, bracketData, bracketType, LowerHeader)
+function p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 	local id = String.split(match.match2id, "_")[2] or match.match2id
+	--remove 0's and dashes from the match param
+	--e.g. R01-M001 --> R1M1
 	id = id:gsub("0*([1-9])", "%1"):gsub("%-", "")
 	local bd = match.match2bracketdata
 
@@ -63,8 +65,9 @@ function p._getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	end
 	round.G = round.G + 1
 
+	--if bd.header starts with '!l'
 	if string.match(bd.header or '', '^!l') then
-		LowerHeader[roundNum] = round.G
+		lowerHeader[roundNum] = round.G
 	end
 
 	-- opponents
@@ -176,7 +179,7 @@ function p._getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	lastRound = round
 	roundData[round.R] = round
 
-	return bracketData, round.R, LowerHeader
+	return bracketData, round.R, lowerHeader
 end
 
 --[[
