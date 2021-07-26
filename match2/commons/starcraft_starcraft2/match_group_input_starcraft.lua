@@ -730,6 +730,8 @@ function StarCraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 end
 
 function StarCraftMatchGroupInput.getTeamTemplate(input, date)
+	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
+
 	local historicals = mw.ext.TeamTemplate.raw_historical(input)
 	if type(historicals) ~= 'table' then
 		return input
