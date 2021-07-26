@@ -447,20 +447,20 @@ function opponentFunctions.getTeamTemplateFromHistorical(input, date)
 		return input
 	end
 
-	local temp = {}
-	local k = 0
+	local templates = {}
+	local count = 0
 
 	for key, item in pairs(historicals) do
-		k = k + 1
-		temp[k] = { date = string.gsub(key, '-', ''), template = item }
+		count = count + 1
+		templates[count] = { date = string.gsub(key, '-', ''), template = item }
 	end
 
-	table.sort(temp, opponentFunctions.TeamTemplateSortCat)
-	temp[k+1] = { date = '39999999', template = '' }
+	table.sort(templates, opponentFunctions.TeamTemplateSortCat)
+	templates[count+1] = { date = '39999999', template = '' }
 
-	for i = 1, k do
-		if date >= temp[i].date and date < temp[i+1].date then
-			return temp[i].template
+	for i = 1, count do
+		if date >= templates[i].date and date < templates[i+1].date then
+			return templates[i].template
 		end
 	end
 end
