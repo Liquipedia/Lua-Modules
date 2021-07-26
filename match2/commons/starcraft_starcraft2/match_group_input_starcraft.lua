@@ -737,20 +737,20 @@ function StarCraftMatchGroupInput.getTeamTemplate(input, date)
 		return input
 	end
 
-	local temp = {}
-	local k = 0
+	local templates = {}
+	local count = 0
 
 	for key, item in pairs(historicals) do
-		k = k + 1
-		temp[k] = { date = key, template = item }
+		count = count + 1
+		templates[count] = { date = key, template = item }
 	end
 
-	table.sort(temp, StarCraftMatchGroupInput.TeamTemplateSortCat)
-	temp[k+1] = { date = '3999-99-99', template = '' }
+	table.sort(templates, StarCraftMatchGroupInput.TeamTemplateSortCat)
+	templates[count + 1] = { date = '3999-99-99', template = '' }
 
-	for i = 1, k do
-		if date >= temp[i].date and date < temp[i+1].date then
-			return temp[i].template
+	for i = 1, count do
+		if date >= templates[i].date and date < templates[i+1].date then
+			return templates[i].template
 		end
 	end
 end
