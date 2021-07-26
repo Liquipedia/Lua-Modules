@@ -150,7 +150,7 @@ function Legacy._convert(mapping)
 			end
 
 			if not Logic.isEmpty(nested) then
-				if source ~= _RESET_MATCH and source ~= _THird_PLACE_MATCH then
+				if source ~= _RESET_MATCH and source ~= _THIRD_PLACE_MATCH then
 					if not nested.opponent1 then
 						nested.opponent1 = '{\'type\':\'team\',\'template\':\'TBD\',\'icon\':\'Rllogo_std.png\',\'name\':\'TBD\'}'
 						mw.log('Missing Opponent entry')
