@@ -11,14 +11,14 @@ local Logic = require("Module:Logic")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
 local Variables = require("Module:Variables")
-local _RESET_MATCH = 'RxMBR'
-local _THird_PLACE_MATCH = 'RxMTP'
 
 local _type
 local _args
 local _frame
 local _IS_USERSPACE = false
 local _NAMESPACE_USER = 2
+local _RESET_MATCH = 'RxMBR'
+local _THird_PLACE_MATCH = 'RxMTP'
 
 function p.get(frame)
 	_args = getArgs(frame)
