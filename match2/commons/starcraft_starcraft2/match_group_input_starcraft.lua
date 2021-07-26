@@ -742,7 +742,7 @@ function StarCraftMatchGroupInput.getTeamTemplate(input, date)
 
 	for key, item in pairs(historicals) do
 		k = k + 1
-		temp[k] = { date = string.gsub(key, '-', ''), template = item }
+		temp[k] = { date = key, template = item }
 	end
 
 	table.sort(temp, StarCraftMatchGroupInput.TeamTemplateSortCat)
