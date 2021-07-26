@@ -5,7 +5,7 @@ local json = require('Module:Json')
 local MatchGroup = require('Module:MatchGroup')
 local getOpponent = require('Module:Match/Subobjects').luaGetOpponent
 local getMap = require('Module:Match/Subobjects').luaGetMap
-local getDefaultMapping = require('Module:MatchGroup/Legacy/Default/dev').get
+local getDefaultMapping = require('Module:MatchGroup/Legacy/Default').get
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
@@ -16,6 +16,9 @@ local _IS_USERSPACE = false
 local _NAMESPACE_USER = 2
 local _RESET_MATCH = 'RxMBR'
 local _THIRD_PLACE_MATCH = 'RxMTP'
+local _args
+local _type
+local _frame
 
 function Legacy.get(frame)
 	_args = getArgs(frame)
@@ -102,34 +105,16 @@ end
 
 function Legacy._convert(mapping)
 	local newArgs = {}
-	for index, matchMapping in pairs(mapping) do
-		-- flatten nested tables like RxGx
-		local flatten = matchMapping["$flatten$"] or {}
-		local flattened = {}
-		for _, flattenIndex in ipairs(flatten) do
-			local toFlatten = _args[flattenIndex] or {}
-			if type(toFlatten) == "string" then
-				toFlatten = json.parse(toFlatten)
-			end
-			for key, val in pairs(toFlatten) do
-				flattened[key] = val
-			end
-		end
-		matchMapping["$flatten$"] = nil
-
-		-- do actual conversion
-		local match = {}
-		for key, val in pairs(flattened) do
-			if not String.startsWith(tostring(key), "map") then
-				match[key] = val
-			end
-		end
-		for realKey, val in pairs(matchMapping) do
-			local notSkipMe = not String.startsWith(realKey, "$$")
-			if index == _RESET_MATCH and String.startsWith(realKey, "opponent") then
-				local score2 = _args[val.score] or ''
-				if score2 == '' then
-					notSkipMe = false
+	for source, target in pairs(mapping) do
+		-- nested tables
+		if type(target) == 'table' then
+			-- flatten nested tables like RxGx
+			local flatten = target['$flatten$'] or {}
+			local flattened = {}
+			for _, flattensource in ipairs(flatten) do
+				local toFlatten = _args[flattensource] or {}
+				if type(toFlatten) == 'string' then
+					toFlatten = json.parse(toFlatten)
 				end
 				for key, val in pairs(toFlatten) do
 					flattened[key] = val
@@ -202,17 +187,27 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 			end
 		end
 
-		if not Logic.isEmpty(match) then
-			if index ~= _RESET_MATCH and index ~= _THIRD_PLACE_MATCH then
-				if not match.opponent1 then
-					match.opponent1 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
-					mw.log('Missing Opponent entry')
-					--error('Missing Opponent entry')
-				end
-				if not match.opponent2 then
-					match.opponent2 = "{\"type\":\"team\",\"template\":\"TBD\",\"icon\":\"Rllogo_std.png\",\"name\":\"TBD\"}"
-					mw.log('Missing Opponent entry')
-					--error('Missing Opponent entry')
+		if val['$notEmpty$'] == nil or not Logic.isEmpty(_args[val['$notEmpty$']] or flattened[val['$notEmpty$']]) then
+			local nestedArgs = {}
+			for innerKey, innerVal in pairs(val) do
+				nestedArgs[innerKey] = _args[innerVal] or flattened[innerVal]
+			end
+			if String.startsWith(realKey, 'opponent') then
+				match[realKey] = getOpponent(_frame, nestedArgs)
+			elseif String.startsWith(realKey, 'map') then
+				match[realKey] = getMap(_frame, nestedArgs)
+			else
+				match[realKey] = nestedArgs
+			end
+		end
+	elseif noSkip then
+		local options = String.split(val, '|')
+		if Table.size(options) > 1 then
+			for _, option in ipairs(options) do
+				local set = _args[option] or flattened[option]
+				if Logic.readBool(set) then
+					match[realKey] = true
+					break
 				end
 			end
 		else
