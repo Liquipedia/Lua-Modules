@@ -13,9 +13,9 @@ function p.get(templateid, bracketType)
 	assert(type(matches) == "table")
 	local bracketData = {}
 	roundData = roundData or {}
-	local lastround = 0
+	local lastRound = 0
 	for _, match in ipairs(matches) do
-		bracketData, lastround, lowerHeader = p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
+		bracketData, lastRound, lowerHeader = p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 	end
 
 	-- add reference for map mappings
@@ -29,7 +29,7 @@ function p.get(templateid, bracketType)
 		winner = "map$1$win"
 	}
 
-	for n=1,lastround do
+	for n = 1, lastRound do
 		bracketData["R" .. n .. "M1header"] = "R" .. n
 		if lowerHeader[n] then
 			bracketData["R" .. n .. "M" .. lowerHeader[n] .. "header"] = "L" .. n
