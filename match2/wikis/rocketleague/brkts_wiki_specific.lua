@@ -29,6 +29,7 @@ function p.processMatch(frame, match)
 
 	-- process match
 	match = matchFunctions.getDateStuff(match)
+	match = matchFunctions.getMaps(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
@@ -46,7 +47,7 @@ function p.processMap(frame, map)
 
 	-- process map
 	map = mapFunctions.getExtraData(map)
-	map = mapFunctions.getScoresAndWinner(map)
+	map = mapFunctions.readScores(map)
 	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getParticipantsData(map)
 
@@ -230,6 +231,24 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
+function matchFunctions.getMaps(args)
+	for mapIndex = 1, 1000 do
+		if Logic.isEmpty(args["map" .. mapIndex]) then
+			break
+		end
+		local map = args['map' .. mapIndex]
+		local extradata = json.parseIfString(map.extradata or '{}')
+		local finished = map.extradata.finished or args.finished
+		local scoreSum = 0
+		for _, score in pairs(map.scores or {}) do
+			scoreSum = scoreSum + tonumber(score)
+		end
+		finished = matchfunctions.isFinished(finished, args.date, args.dateexact, scoreSum > 0)
+		args["map" .. mapIndex] = mapFunctions.getScoresAndWinner(map, finished)
+	end
+	
+end
+
 function matchFunctions.getOpponents(args)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -269,15 +288,7 @@ function matchFunctions.getOpponents(args)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time(os.date("!*t"))
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
-		local threshold = args.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
-			args.finished = true
-		end
-	end
+	args.finished = matchfunctions.isFinished(args.finished, args.date, args.dateexact, isScoreSet)
 
 	-- apply placements and winner if finshed
 	if Logic.readBool(args.finished) then
@@ -299,6 +310,20 @@ function matchFunctions.getOpponents(args)
 		end
 	end
 	return args
+end
+
+function matchfunctions.isFinished(finished, date, dateexact, isScoreSet)
+	-- see if match should actually be finished if score is set
+	if isScoreSet and not Logic.readBool(finished) then
+		local currentUnixTime = os.time(os.date("!*t"))
+		local lang = mw.getContentLanguage()
+		local matchUnixTime = tonumber(lang:formatDate('U', date))
+		local threshold = dateexact and 30800 or 86400
+		if matchUnixTime + threshold < currentUnixTime then
+			finished = true
+		end
+	end
+	return finished
 end
 
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
@@ -326,42 +351,54 @@ function mapFunctions.getExtraData(map)
 		otlength = map.otlength,
 		comment = map.comment,
 		header = map.header,
+		finished = map.finished,
 	})
 	return map
 end
 
-function mapFunctions.getScoresAndWinner(map)
+function mapFunctions.getScoresAndWinner(map, finished)
+	local scoreInput = Table.deepCopy(map.scores)
 	map.scores = {}
 	local indexedScores = {}
+	for scoreIndex, score in ipairs(scoreInput) do
+		local obj = {}
+		if TypeUtil.isNumeric(score) then
+			obj.status = "S"
+			obj.score = score
+		elseif Table.includes(ALLOWED_STATUSES, score) then
+			obj.status = score
+			obj.score = -1
+		end
+		table.insert(map.scores, score)
+		indexedScores[scoreIndex] = obj
+	end
+	if finished then
+		-- luacheck: push ignore
+		for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
+			map.winner = scoreIndex
+			break
+		end
+		-- luacheck: pop
+	end
+
+	return map
+end
+
+function mapFunctions.readScores(map)
+	map.scores = {}
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do
 		-- read scores
 		local score = map["score" .. scoreIndex]
-		local obj = {}
 		if not Logic.isEmpty(score) then
-			if TypeUtil.isNumeric(score) then
-				obj.status = "S"
-				obj.score = score
-			elseif Table.includes(ALLOWED_STATUSES, score) then
-				obj.status = score
-				obj.score = -1
-			end
 			table.insert(map.scores, score)
-			indexedScores[scoreIndex] = obj
 		else
 			break
 		end
 	end
-	-- luacheck: push ignore
-	for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
-		map.winner = scoreIndex
-		break
-	end
-	-- luacheck: pop
-
 	return map
-	end
+end
 
-	function mapFunctions.getTournamentVars(map)
+function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault("tournament_mode", "3v3"))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault("tournament_type"))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault("tournament_name"))
@@ -371,9 +408,9 @@ function mapFunctions.getScoresAndWinner(map)
 	map.icon = Logic.emptyOr(map.icon, Variables.varDefault("tournament_icon"))
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault("tournament_tier"))
 	return map
-	end
+end
 
-	function mapFunctions.getParticipantsData(map)
+function mapFunctions.getParticipantsData(map)
 	local participants = map.participants or {}
 	if type(participants) == "string" then
 		participants = json.parse(participants)
