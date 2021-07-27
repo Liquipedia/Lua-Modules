@@ -351,8 +351,12 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
-	local finished = Logic.readBool(map.finished or true) or
-		not Logic.readBool(map.unfinished)
+	local finished = map.finished
+	if not Logic.isEmpty(finished) then
+		finished = Logic.readBool(map.finished)
+	else
+		finished = not Logic.readBool(map.unfinished)
+	end
 	if not finished then
 		-- luacheck: push ignore
 		for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
