@@ -227,6 +227,15 @@ function p.luaBracket(frame, args, matchBuilder)
 				bd["loserto"] = loserToMatch .. p._convertMatchIdentifier(loserTo)
 			end
 
+			--kick bd["thirdplace"] if no 3rd place match
+			if bd["thirdplace"] ~= "" and not args["RxMTP"] then
+				bd["thirdplace"] = ""
+			end
+			--kick bd["bracketreset"] if no reset match
+			if bd["bracketreset"] ~= "" and not args["RxMBR"] then
+				bd["bracketreset"] = ""
+			end
+
 			match["bracketdata"] = json.stringify(bd)
 
 			-- set matchid and bracketid
