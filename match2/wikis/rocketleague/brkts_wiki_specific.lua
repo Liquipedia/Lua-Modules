@@ -351,17 +351,21 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
-	-- luacheck: push ignore
-	for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
-		map.winner = scoreIndex
-		break
+	local finished = Logic.readBool(map.finished or true) or
+		not Logic.readBool(unfinished)
+	if not finished then
+		-- luacheck: push ignore
+		for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
+			map.winner = scoreIndex
+			break
+		end
+		-- luacheck: pop
 	end
-	-- luacheck: pop
 
 	return map
-	end
+end
 
-	function mapFunctions.getTournamentVars(map)
+function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault("tournament_mode", "3v3"))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault("tournament_type"))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault("tournament_name"))
@@ -371,9 +375,9 @@ function mapFunctions.getScoresAndWinner(map)
 	map.icon = Logic.emptyOr(map.icon, Variables.varDefault("tournament_icon"))
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault("tournament_tier"))
 	return map
-	end
+end
 
-	function mapFunctions.getParticipantsData(map)
+function mapFunctions.getParticipantsData(map)
 	local participants = map.participants or {}
 	if type(participants) == "string" then
 		participants = json.parse(participants)
