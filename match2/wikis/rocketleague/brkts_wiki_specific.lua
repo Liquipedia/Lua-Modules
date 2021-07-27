@@ -238,15 +238,15 @@ function matchFunctions.getMaps(args)
 		end
 		local map = args['map' .. mapIndex]
 		local extradata = json.parseIfString(map.extradata or '{}')
-		local finished = map.extradata.finished or args.finished
+		local finished = extradata.finished or args.finished
 		local scoreSum = 0
 		for _, score in pairs(map.scores or {}) do
 			scoreSum = scoreSum + tonumber(score)
 		end
-		finished = matchfunctions.isFinished(finished, args.date, args.dateexact, scoreSum > 0)
+		finished = matchFunctions.isFinished(finished, args.date, args.dateexact, scoreSum > 0)
 		args["map" .. mapIndex] = mapFunctions.getScoresAndWinner(map, finished)
 	end
-	
+	return args
 end
 
 function matchFunctions.getOpponents(args)
@@ -288,7 +288,7 @@ function matchFunctions.getOpponents(args)
 	end
 
 	-- see if match should actually be finished if score is set
-	args.finished = matchfunctions.isFinished(args.finished, args.date, args.dateexact, isScoreSet)
+	args.finished = matchFunctions.isFinished(args.finished, args.date, args.dateexact, isScoreSet)
 
 	-- apply placements and winner if finshed
 	if Logic.readBool(args.finished) then
@@ -312,7 +312,7 @@ function matchFunctions.getOpponents(args)
 	return args
 end
 
-function matchfunctions.isFinished(finished, date, dateexact, isScoreSet)
+function matchFunctions.isFinished(finished, date, dateexact, isScoreSet)
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(finished) then
 		local currentUnixTime = os.time(os.date("!*t"))
