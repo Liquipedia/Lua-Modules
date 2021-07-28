@@ -12,6 +12,8 @@ local category = ""
 
 local MatchGroupDisplay = require("Module:MatchGroup/Display")
 
+local PARENT = Variables.varDefault(tournament_parent, "")
+
 local BRACKET_DATA_PARAMS = {"header", "tolower", "toupper", "qualwin", "quallose", "skipround"}
 
 function p.matchlist(frame)
@@ -76,6 +78,9 @@ function p.luaMatchlist(frame, args, matchBuilder)
 
 		-- make bracket data
 		local bd = {}
+
+		--set parent page
+		bd[parent] = PARENT
 
 		-- overwrite custom values from match object
 		local overwrite_bd = json.parse(match["bracketdata"] or "{}")
@@ -200,6 +205,8 @@ function p.luaBracket(frame, args, matchBuilder)
 				match = matchBuilder(frame, match, bracketid .. "_" .. matchid)
 			end
 
+			--set parent page
+			bd[parent] = PARENT
 			-- overwrite custom values from match object
 			local overwrite_bd = json.parse(match["bracketdata"] or "{}")
 			for key, val in pairs(overwrite_bd) do
