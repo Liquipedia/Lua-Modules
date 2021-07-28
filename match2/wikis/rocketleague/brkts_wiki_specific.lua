@@ -351,22 +351,23 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
-	local finished = map.finished
-	if not Logic.isEmpty(finished) then
-		finished = Logic.readBool(map.finished)
+	local isFinished = map.finished
+	if not Logic.isEmpty(isFinished) then
+		isFinished = Logic.readBool(isFinished)
 	else
-		finished = not Logic.readBool(map.unfinished)
+		isFinished = not Logic.readBool(map.unfinished)
 	end
-	if finished then
-		-- luacheck: push ignore
-		for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
-			map.winner = scoreIndex
-			break
-		end
-		-- luacheck: pop
+	if isFinished then
+		map.winner = mapFunctions.getWinner(indexedScores)
 	end
 
 	return map
+end
+
+function mapFunctions.getWinner(indexedScores)
+	for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
+		return scoreIndex
+	end
 end
 
 function mapFunctions.getTournamentVars(map)
