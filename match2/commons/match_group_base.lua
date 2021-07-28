@@ -76,11 +76,11 @@ function p.luaMatchlist(frame, args, matchBuilder)
 		local hasNextMatch = nextMatch ~= nil
 		local nextMatchId = bracketid .. "_" .. string.format("%04d", nextMatchIndex)
 
+		--set parent page
+		match.parent = PARENT
+
 		-- make bracket data
 		local bd = {}
-
-		--set parent page
-		bd[parent] = PARENT
 
 		-- overwrite custom values from match object
 		local overwrite_bd = json.parse(match["bracketdata"] or "{}")
@@ -206,7 +206,8 @@ function p.luaBracket(frame, args, matchBuilder)
 			end
 
 			--set parent page
-			bd[parent] = PARENT
+			match.parent = PARENT
+
 			-- overwrite custom values from match object
 			local overwrite_bd = json.parse(match["bracketdata"] or "{}")
 			for key, val in pairs(overwrite_bd) do
