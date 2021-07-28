@@ -12,7 +12,7 @@ local category = ''
 
 local MatchGroupDisplay = require('Module:MatchGroup/Display')
 
-local PARENT = Variables.varDefault(tournament_parent, "")
+local PARENT = Variables.varDefault("tournament_parent", "")
 
 local BRACKET_DATA_PARAMS = {"header", "tolower", "toupper", "qualwin", "quallose", "skipround"}
 
