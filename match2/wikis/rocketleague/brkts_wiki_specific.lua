@@ -341,9 +341,11 @@ function mapFunctions.getScoresAndWinner(map)
 			if TypeUtil.isNumeric(score) then
 				obj.status = "S"
 				obj.score = score
+				obj.index = scoreIndex
 			elseif Table.includes(ALLOWED_STATUSES, score) then
 				obj.status = score
 				obj.score = -1
+				obj.index = scoreIndex
 			end
 			table.insert(map.scores, score)
 			indexedScores[scoreIndex] = obj
@@ -365,11 +367,31 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getWinner(indexedScores)
-	-- luacheck: push ignore
-	for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
-		return scoreIndex
+	table.sort(indexedScores, mapFunctions.mapWinnerSortFunction)
+	return indexedScores[1].index
+end
+
+function mapFunctions.mapWinnerSortFunction(op1, op2)
+	local op1norm = op1.status == "S"
+	local op2norm = op2.status == "S"
+	if op1norm then
+		if op2norm then
+			local op1setwins = p._getSetWins(op1)
+			local op2setwins = p._getSetWins(op2)
+			if op1setwins + op2setwins > 0 then
+				return op1setwins > op2setwins
+			else
+				return tonumber(op1.score) > tonumber(op2.score)
+			end
+		else return true end
+	else
+		if op2norm then return false
+		elseif op1.status == "W" then return true
+		elseif op1.status == "DQ" then return false
+		elseif op2.status == "W" then return false
+		elseif op2.status == "DQ" then return true
+		else return true end
 	end
-	-- luacheck: pop
 end
 
 function mapFunctions.getTournamentVars(map)
