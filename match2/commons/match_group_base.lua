@@ -218,7 +218,7 @@ function p.luaBracket(frame, args, matchBuilder)
 			bd["type"] = "bracket"
 
 			--get bracket part (upper, mid, lower)
-			origHeader = bd["header"]
+			local origHeader = bd["header"]
 			if not Logic.isEmpty(origHeader) then
 				bracketPart = p._getBracketPart(origHeader)
 				processingRound = currentRound
