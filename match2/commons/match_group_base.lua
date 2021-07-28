@@ -162,7 +162,6 @@ function p.luaBracket(frame, args, matchBuilder)
 
 	local missing = ""
 	local storedData = {}
-	local origHeader = ""
 	local processingRound = ""
 	local bracketPart = ""
 
