@@ -8,9 +8,9 @@ local Logic = require("Module:Logic")
 local Variables = require("Module:Variables")
 local String = require("Module:StringUtils")
 local globalArgs
-local category = ''
+local category = ""
 
-local MatchGroupDisplay = require('Module:MatchGroup/Display')
+local MatchGroupDisplay = require("Module:MatchGroup/Display")
 
 local BRACKET_DATA_PARAMS = {"header", "tolower", "toupper", "qualwin", "quallose", "skipround"}
 
@@ -26,11 +26,11 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	end
 
 	local storeInLPDB = true
-	if args.store == 'false' then
+	if args.store == "false" then
 		storeInLPDB = false
 	end
 
-	require('Module:DevFlags').matchGroupDev = Logic.readBool(args.dev)
+	require("Module:DevFlags").matchGroupDev = Logic.readBool(args.dev)
 
 	-- make sure bracket id is valid
 	p._validateBracketID(bracketid)
@@ -65,7 +65,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 		local matchId = string.format("%04d", matchIndex)
 
 		if matchBuilder ~= nil then
-			match = matchBuilder(frame, match, bracketid .. '_' .. matchId)
+			match = matchBuilder(frame, match, bracketid .. "_" .. matchId)
 		end
 
 		local nextMatchIndex = matchIndex + 1
@@ -140,11 +140,11 @@ function p.luaBracket(frame, args, matchBuilder)
 	end
 
 	local storeInLPDB = true
-	if args.store == 'false' then
+	if args.store == "false" then
 		storeInLPDB = false
 	end
 
-	require('Module:DevFlags').matchGroupDev = Logic.readBool(args.dev)
+	require("Module:DevFlags").matchGroupDev = Logic.readBool(args.dev)
 
 	-- make sure bracket id is valid
 	p._validateBracketID(bracketid)
@@ -162,6 +162,9 @@ function p.luaBracket(frame, args, matchBuilder)
 
 	local missing = ""
 	local storedData = {}
+	local origHeader = ""
+	local processingRound = ""
+	local bracketPart = ""
 
 	--get keys of bracketData in ordered way
 	local keys = {}
@@ -183,6 +186,10 @@ function p.luaBracket(frame, args, matchBuilder)
 		-- read match
 		local match = args[matchid]
 		if match ~= nil then
+			--get current round index
+			--for 3rd place and reset matches set them to the processingRound
+			local currentRound = p._getRoundNumber(matchid) or processingRound
+
 			if type(match) == "string" then
 				match = json.parse(match)
 			end
@@ -191,7 +198,7 @@ function p.luaBracket(frame, args, matchBuilder)
 
 			match = processMatch(frame, match)
 			if matchBuilder ~= nil then
-				match = matchBuilder(frame, match, bracketid .. '_' .. matchid)
+				match = matchBuilder(frame, match, bracketid .. "_" .. matchid)
 			end
 
 			-- overwrite custom values from match object
@@ -202,11 +209,28 @@ function p.luaBracket(frame, args, matchBuilder)
 
 			-- apply bracket data
 			bd["type"] = "bracket"
+
+			--get bracket part (upper, mid, lower)
+			origHeader = bd["header"]
+			if not Logic.isEmpty(origHeader) then
+				bracketPart = p._getBracketPart(origHeader)
+				processingRound = currentRound
+			elseif currentRound ~= processingRound then
+				processingRound = currentRound
+				bracketPart = "upper"
+			elseif matchid == "RxMTP" then
+				bracketPart = "lower"
+			end
+			bd.bracketpart = bracketPart
+
+			--set header if entered manually
 			local header = args[matchid .. "header"]
 			if not Logic.isEmpty(header) then
 				bd["header"] = header
 			end
+
 			bd["bracketindex"] = Variables.varDefault("match2bracketindex", 0)
+
 			local winnerTo = match["winnerto"]
 			if winnerTo ~= nil then
 				local winnerToMatch = ""
@@ -331,7 +355,7 @@ function p._checkBracketDuplicate(bracketid)
 	local status = mw.ext.Brackets.checkBracketDuplicate(bracketid)
 	if status ~= "ok" then
 		mw.addWarning("Bracketid '" .. bracketid .. "' is used more than once on this page.")
-		category = '[[Category:Pages with duplicate Bracketid]]'
+		category = "[[Category:Pages with duplicate Bracketid]]"
 	end
 end
 
@@ -368,6 +392,21 @@ function p._convertDataForStorage(data)
 		end
 	end
 	return json.stringify(data)
+end
+
+function p._getRoundNumber(id)
+	id = string.match(id, "%d+")
+	return id
+end
+
+function p._getBracketPart(origHeader)
+	if String.startsWith(origHeader, "!l") then
+		return "lower"
+	elseif String.startsWith(origHeader, "!m") then
+		return "mid"
+	end
+
+	return "upper"
 end
 
 return p
