@@ -365,9 +365,11 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getWinner(indexedScores)
+	-- luacheck: push ignore
 	for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
 		return scoreIndex
 	end
+	-- luacheck: pop
 end
 
 function mapFunctions.getTournamentVars(map)
