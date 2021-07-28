@@ -185,6 +185,7 @@ function p.luaBracket(frame, args, matchBuilder)
 		local dataid = keys[i]
 		local bd = bracketData[dataid]
 
+		--remove leading 0's and the dash so that it matches the args keys
 		local matchid = dataid:gsub("0*([1-9])", "%1"):gsub("%-", "")
 
 		-- read match
