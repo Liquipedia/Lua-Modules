@@ -359,7 +359,7 @@ function mapFunctions.getScoresAndWinner(map)
 	else
 		isFinished = not Logic.readBool(map.unfinished)
 	end
-	if isFinished then
+	if isFinished and not Logic.isEmpty(indexedScores) then
 		map.winner = mapFunctions.getWinner(indexedScores)
 	end
 
