@@ -376,13 +376,7 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 	local op2norm = op2.status == "S"
 	if op1norm then
 		if op2norm then
-			local op1setwins = p._getSetWins(op1)
-			local op2setwins = p._getSetWins(op2)
-			if op1setwins + op2setwins > 0 then
-				return op1setwins > op2setwins
-			else
-				return tonumber(op1.score) > tonumber(op2.score)
-			end
+			return tonumber(op1.score) > tonumber(op2.score)
 		else return true end
 	else
 		if op2norm then return false
