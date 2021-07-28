@@ -341,9 +341,11 @@ function mapFunctions.getScoresAndWinner(map)
 			if TypeUtil.isNumeric(score) then
 				obj.status = "S"
 				obj.score = score
+				obj.index = scoreIndex
 			elseif Table.includes(ALLOWED_STATUSES, score) then
 				obj.status = score
 				obj.score = -1
+				obj.index = scoreIndex
 			end
 			table.insert(map.scores, score)
 			indexedScores[scoreIndex] = obj
@@ -351,17 +353,42 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
-	-- luacheck: push ignore
-	for scoreIndex, _ in Table.iter.spairs(indexedScores, p._placementSortFunction) do
-		map.winner = scoreIndex
-		break
+	local isFinished = map.finished
+	if not Logic.isEmpty(isFinished) then
+		isFinished = Logic.readBool(isFinished)
+	else
+		isFinished = not Logic.readBool(map.unfinished)
 	end
-	-- luacheck: pop
+	if isFinished then
+		map.winner = mapFunctions.getWinner(indexedScores)
+	end
 
 	return map
-	end
+end
 
-	function mapFunctions.getTournamentVars(map)
+function mapFunctions.getWinner(indexedScores)
+	table.sort(indexedScores, mapFunctions.mapWinnerSortFunction)
+	return indexedScores[1].index
+end
+
+function mapFunctions.mapWinnerSortFunction(op1, op2)
+	local op1norm = op1.status == "S"
+	local op2norm = op2.status == "S"
+	if op1norm then
+		if op2norm then
+			return tonumber(op1.score) > tonumber(op2.score)
+		else return true end
+	else
+		if op2norm then return false
+		elseif op1.status == "W" then return true
+		elseif op1.status == "DQ" then return false
+		elseif op2.status == "W" then return false
+		elseif op2.status == "DQ" then return true
+		else return true end
+	end
+end
+
+function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault("tournament_mode", "3v3"))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault("tournament_type"))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault("tournament_name"))
@@ -371,9 +398,9 @@ function mapFunctions.getScoresAndWinner(map)
 	map.icon = Logic.emptyOr(map.icon, Variables.varDefault("tournament_icon"))
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault("tournament_tier"))
 	return map
-	end
+end
 
-	function mapFunctions.getParticipantsData(map)
+function mapFunctions.getParticipantsData(map)
 	local participants = map.participants or {}
 	if type(participants) == "string" then
 		participants = json.parse(participants)
