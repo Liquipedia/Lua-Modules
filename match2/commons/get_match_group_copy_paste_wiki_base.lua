@@ -24,8 +24,8 @@ end
 function wikiCopyPaste._getMaps(bestof)
 	local map = '{{Map|map=}}'
 	local out = ''
-	for _ = 1, bestof do
-		out = out .. '\n    ' .. map
+	for i = 1, bestof do
+		out = out .. '\n    |map' .. i .. '=' .. map
 	end
 
 	return out
