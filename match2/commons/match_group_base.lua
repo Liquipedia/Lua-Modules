@@ -12,6 +12,8 @@ local category = ''
 
 local MatchGroupDisplay = require('Module:MatchGroup/Display')
 
+local PARENT = Variables.varDefault("tournament_parent", "")
+
 local BRACKET_DATA_PARAMS = {"header", "tolower", "toupper", "qualwin", "quallose", "skipround"}
 
 function p.matchlist(frame)
@@ -73,6 +75,9 @@ function p.luaMatchlist(frame, args, matchBuilder)
 		nextMatch = args[nextMatchInWikicode] or args[nextMatchIndex]
 		local hasNextMatch = nextMatch ~= nil
 		local nextMatchId = bracketid .. "_" .. string.format("%04d", nextMatchIndex)
+
+		--set parent page
+		match.parent = PARENT
 
 		-- make bracket data
 		local bd = {}
@@ -193,6 +198,9 @@ function p.luaBracket(frame, args, matchBuilder)
 			if matchBuilder ~= nil then
 				match = matchBuilder(frame, match, bracketid .. '_' .. matchid)
 			end
+
+			--set parent page
+			match.parent = PARENT
 
 			-- overwrite custom values from match object
 			local overwrite_bd = json.parse(match["bracketdata"] or "{}")
