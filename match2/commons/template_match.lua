@@ -48,6 +48,8 @@ function TemplateMatch.storeVarsToLPDB()
 	end
 
 	-- set bracket index for matches
+	--applied is the maximum of all bracketIndex's
+	--it is needed to deterimne if bracketIndex == 2 means "mid" or "lower"
 	local applied = 0
 	for _, id in Table.iter.spairs(rootMatches, function(tab, a, b) return tab[a] < tab[b] end) do
 		matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, id, false, applied)
