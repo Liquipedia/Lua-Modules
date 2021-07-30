@@ -105,7 +105,11 @@ function TemplateMatch._recursiveSetBracketIndex(matches, id, headerchild, appli
 	match.bracketdata.bracketindex = applied
 	matches[id] = match
 	matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, match.bracketdata.toupper, headerchild, applied)
-	matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, match.bracketdata.tolower, headerchild, applied)
+	local lowerHeaderchild = headerchild
+	if match.bracketdata.toupper ~= nil and match.bracketdata.toupper ~= "" then
+		lowerHeaderchild = false
+	end
+	matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, match.bracketdata.tolower, lowerHeaderchild, applied)
 	return matches, applied
 end
 
