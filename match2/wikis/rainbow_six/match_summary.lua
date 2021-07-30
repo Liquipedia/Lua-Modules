@@ -1,0 +1,579 @@
+local Arguments = require('Module:Arguments')--not used anywhere
+local Class = require('Module:Class')
+local Color = mw.loadData('Module:Color')
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local Json = require("Module:Json")
+local Logic = require("Module:Logic")
+local MatchGroupUtil = require('Module:MatchGroup/Util')
+local MatchSummary = require('Module:MatchSummary/Base')
+local OperatorIcon = require('Module:OperatorIcon')
+local OpponentDisplay = require('Module:OpponentDisplay')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
+
+local OperatorBans = Class.new(
+	function(self)
+		self.root = mw.html.create('table'):css('margin-top', '-4px')
+		self.text = ''
+	end
+)
+
+function OperatorBans:setLeft()
+	self.root
+		--:css('float', 'left')
+		:addClass('bracket-popup-body-operator-bans-left')
+
+	return self
+end
+
+function OperatorBans:setRight()
+	self.root
+		--:css('float', 'right')
+		:addClass('bracket-popup-body-operator-bans-right')
+
+	return self
+end
+
+function OperatorBans:add(operator)
+	if Logic.isEmpty(operator) then
+		return self
+	end
+	self.root
+		:tag('tr')
+			:tag('td')
+				:css('padding', '0')
+				:tag('div')
+					:addClass('operator-bans')
+					:wikitext(OperatorIcon.getImage{operator,'50x50px'})
+	return self
+end
+
+function OperatorBans:create()
+	self.root:wikitext(self.text)
+	return self.root
+end
+
+local Score = Class.new(
+	function(self)
+		self.root = mw.html.create('div'):css('width','70px')
+		self.table = self.root:tag('table'):css('line-height', '20px')
+		self.top = mw.html.create('tr')
+		self.bottom = mw.html.create('tr')
+	end
+)
+
+function Score:setLeft()
+	--self.root
+		--:css('float', 'left')
+
+	return self
+end
+
+function Score:setRight()
+	self.root
+		:css('text-align', 'right')
+
+	return self
+end
+
+function Score:setMapScore(score)
+	local mapScore = mw.html.create('td')
+	mapScore
+		:attr('rowspan', '2')
+		:css('font-size', '16px')
+		:css('width', '25px')
+		:wikitext(score or '')
+
+	self.top:node(mapScore)
+
+	return self
+end
+
+function Score:setFirstRoundScore(side, score, isLeft)
+	local icon = '[[File:R6S Para Bellum '.. side ..' logo.png|14px|link=]]'
+	if not isLeft then -- For right side, swap order of score and icon
+		icon, score = score, icon
+	end
+
+	local roundScore = mw.html.create('td')
+	roundScore  :addClass('bracket-popup-body-match-sidewins')
+				:wikitext(icon)
+				:wikitext(score or '')
+				:css('padding','0 0 3px 3px')
+
+	self.top:node(roundScore)
+	return self
+end
+
+function Score:setSecondRoundScore(side, score, isLeft)
+	local icon = '[[File:R6S Para Bellum '.. side ..' logo.png|14px|link=]]'
+	if not isLeft then -- For right side, swap order of score and icon
+		icon, score = score, icon
+	end
+
+	local roundScore = mw.html.create('td')
+	roundScore  :addClass('bracket-popup-body-match-sidewins')
+				:wikitext(icon)
+				:wikitext(score or '')
+				:css('padding','0 0 3px 3px')
+
+	self.bottom:node(roundScore)
+	return self
+end
+
+function Score:setFirstOvertimeRoundScore(side, score, isLeft)
+	local icon = '[[File:R6S Para Bellum '.. side ..' logo ot rounds.png|11px|link=]]'
+	if not isLeft then -- For right side, swap order of score and icon
+		icon, score = score, icon
+	end
+
+	local roundScore = mw.html.create('td')
+	roundScore  :addClass('bracket-popup-body-match-sidewins-overtime')
+				:wikitext(icon)
+				:wikitext(score or '')
+				:css('padding','0 0 3px 3px')
+
+	self.top:node(roundScore)
+	return self
+end
+
+function Score:setSecondOvertimeRoundScore(side, score, isLeft)
+	local icon = '[[File:R6S Para Bellum '.. side ..' logo ot rounds.png|11px|link=]]'
+	if not isLeft then -- For right side, swap order of score and icon
+		icon, score = score, icon
+	end
+
+	local roundScore = mw.html.create('td')
+	roundScore  :addClass('bracket-popup-body-match-sidewins-overtime')
+				:wikitext(icon)
+				:wikitext(score or '')
+				:css('padding','0 0 3px 3px')
+
+	self.bottom:node(roundScore)
+	return self
+end
+
+function Score:addEmptyOvertime()
+	local roundScore = mw.html.create('td'):css('width','20px')
+	self.top:node(roundScore)
+	self.bottom:node(roundScore)
+	return self
+end
+
+function Score:create()
+	self.table:node(self.top):node(self.bottom)
+	return self.root
+end
+
+local MapVeto = Class.new(
+	function(self)
+		self.root = mw.html.create('div'):addClass('bracket-popup-body-match')
+		self.table = self.root:tag('table')
+			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
+			:css('width', '100%'):css('margin-top', '-2px')
+			:css('margin-bottom','-2px'):css('border-top','1px solid #DDD')
+		self:createHeader()
+	end
+)
+
+function MapVeto:createHeader()
+	self.table:tag('tr'):css('background-color','#EEE'):css('color','#000'):css('height','10px')
+		:tag('th'):css('width','33%'):done()
+		:tag('th'):css('width','34%'):css('padding','5px'):css('font-size','11px')
+		:css('text-align','center'):wikitext('Map Veto'):done()
+		:tag('th'):css('width','33%'):done()
+	return self
+end
+
+function MapVeto:vetoStart(firstVeto)
+	local textLeft = ''
+	local textCenter = ''
+	local textRight = ''
+	if firstVeto == 1 then
+		textLeft = "'''Start Map Veto'''"
+		textCenter = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
+	elseif firstVeto == 2 then
+		textCenter = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+		textRight = "'''Start Map Veto'''"
+	else return self end
+	self.table:tag('tr'):css('border-bottom','5px solid #DDD'):css('background-color','#f5f5f5')
+		:css('height','10px'):css('font-size','11px')
+		:tag('th'):css('text-align','center'):css('padding','5px'):wikitext(textLeft):done()
+		:tag('th'):css('text-align','center'):css('padding','5px'):wikitext(textCenter):done()
+		:tag('th'):css('text-align','center'):wikitext(textRight):done()
+	return self
+end
+
+function MapVeto:addDecider(map)
+	if Logic.isEmpty(map) then
+		map = 'TBD'
+	else
+		map = '[['..map..'/siege|'..map..']]'
+	end
+	self.table:tag('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
+			:css('height','10px'):css('font-size','11px')
+		:tag('td'):css('text-align','center'):css('font-weight','bold')
+			:tag('span'):css('color','#000'):css('background-color',Color['stay']):css('border','none')
+				:css('border-radius','0px'):css('letter-spacing','0.1em')
+				:css('font-family','\'Source Code Pro\',monospace')
+				:wikitext('DECIDER'):done()
+			:done()
+		:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map):done()
+		:tag('td'):css('text-align','center'):css('font-weight','bold')
+			:tag('span'):css('color','#000'):css('background-color',Color['stay']):css('border','none')
+				:css('border-radius','0px'):css('letter-spacing','0.1em')
+				:css('font-family','\'Source Code Pro\',monospace')
+				:wikitext('DECIDER'):done()
+			:done()
+	return self
+end
+
+function MapVeto:addRound(vetotype, map1, map2)
+	if Logic.isEmpty(map1) then
+		map1 = 'TBD'
+	else
+		map1 = '[['..map1..'/siege|'..map1..']]'
+	end
+	if Logic.isEmpty(map2) then
+		map2 = 'TBD'
+	else
+		map2 = '[['..map2..'/siege|'..map2..']]'
+	end
+	local background = ''
+	local vetoName = ''
+	if vetotype == 'ban' then
+		vetoName = 'BAN'
+		background = Color['down']
+	elseif vetotype == 'pick' then
+		vetoName = 'PICK'
+		background = Color['up']
+	elseif vetotype == 'defaultban' then
+		vetoName = 'DEFAULT BAN'
+		background = Color['dq']
+	end
+
+	self.table:tag('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
+			:css('height','10px'):css('font-size','11px')
+		:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map1):done()
+		:tag('td'):css('text-align','center'):css('font-weight','bold')
+			:tag('span'):css('color','#000'):css('background-color',background):css('border','none')
+				:css('border-radius','0px'):css('letter-spacing','0.1em')
+				:css('font-family','\'Source Code Pro\',monospace')
+				:wikitext(vetoName):done()
+			:done()
+		:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map2):done()
+	return self
+end
+
+function MapVeto:create()
+	return self.root
+end
+
+local MVP = Class.new(
+	function(self)
+		self.root = mw.html.create('div'):addClass('bracket-popup-body-mvp'):css('font-size','87%')
+			:css('font-weight','bold'):css('line-height','1.5em')
+		self.players = {}
+		self.points = nil
+	end
+)
+
+function MVP:addPlayer(player)
+	if not Logic.isEmpty(player) then
+		table.insert(self.players, player)
+	end
+	return self
+end
+
+function MVP:setPoints(points)
+	if Logic.isNumeric(points) then
+		self.points = points
+	end
+	return self
+end
+
+function MVP:create()
+	for index, player in ipairs(self.players) do
+		if index > 1 then
+			self.root:wikitext(', ')
+		end
+		self.root:wikitext('[['..player..']]')
+	end
+	if self.points and self.points ~= 1 then
+		self.root:wikitext(' ('.. self.points ..'pts)')
+	end
+	return self.root
+end
+
+local CustomMatchSummary = {}
+
+
+function CustomMatchSummary.getByMatchId(args)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	mw.logObject(match)
+	local frame = mw.getCurrentFrame()
+
+	local matchSummary = MatchSummary():init('330px')
+	matchSummary:header(CustomMatchSummary._createHeader(frame, match))
+				:body(CustomMatchSummary._createBody(frame, match))
+
+	if match.comment then
+		local comment = MatchSummary.Comment():content(match.comment)
+		comment.root:css('justify-content','center')
+		matchSummary:comment(comment)
+	end
+
+	local vods = {}
+	for index, game in ipairs(match.games) do
+		if game.vod then
+			vods[index] = game.vod
+		end
+	end
+
+	match.links.lrthread = match.lrthread
+	match.links.vod = match.vod
+	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
+		local footer = MatchSummary.Footer()
+
+		-- Game Vods
+		for index, vod in pairs(vods) do
+			footer:addElement(Template.safeExpand(frame, 'vodlink', {
+				gamenum = index,
+				vod = vod,
+				source = vod.url
+			}))
+		end
+
+		-- Match Vod + other links
+		local linkData = {
+			vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
+			preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
+			lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+			siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
+			opl = {icon = 'File:OPL Icon.png', text = 'OPL Match Page'},
+			esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
+			faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
+			lpl = {icon = 'File:LPL Play icon.png', text = 'Match page on LPL Play'},
+		}
+		local buildLink = function (linktype, link)
+			local icon, text = linkData[linktype].icon, linkData[linktype].text
+			return '[['..icon..'|link='..link..'|15px|'..text..']]'
+		end
+
+		for linktype, link in pairs(match.links) do
+			footer:addElement(buildLink(linktype,link))
+		end
+
+		matchSummary:footer(footer)
+	end
+
+	return matchSummary:create()
+end
+
+function CustomMatchSummary._createHeader(frame, match)
+	local header = MatchSummary.Header()
+	header  :left(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
+			:right(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
+
+	return header
+end
+
+function CustomMatchSummary._createBody(frame, match)
+	local body = MatchSummary.Body()
+
+	body:addRow(MatchSummary.Row():addElement(
+		DisplayHelper.MatchCountdownBlock(match)
+	))
+
+	--local matchPageElement = mw.html.create('center')
+	--matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+	--				:css('display', 'block')
+	--				:css('margin', 'auto')
+	--body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
+
+	-- Iterate each map
+	for _, game in ipairs(match.games) do
+		if game.map then
+			body:addRow(CustomMatchSummary._createMap(frame, game))
+		end
+	end
+
+	-- Add Match MVP(s)
+	if match.extradata.mvp then
+		local mvpData = Json.parse(match.extradata.mvp)
+		if not Table.isEmpty(mvpData) and mvpData.players then
+			local mvp = MVP()
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
+			end
+			mvp:setPoints(mvpData.points)
+
+			body:addRow(mvp)
+		end
+
+	end
+
+	-- Map Veto
+	if match.extradata.mapveto then
+		local vetoData = Json.parse(match.extradata.mapveto)
+		if vetoData then
+			local mapVeto = MapVeto()
+
+			for _,vetoRound in ipairs(vetoData) do
+				if vetoRound.vetostart then
+					mapVeto:vetoStart(tonumber(vetoRound.vetostart))
+				end
+				if vetoRound.type == 'decider' then
+					mapVeto:addDecider(vetoRound.decider)
+				else
+					mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
+				end
+			end
+
+			body:addRow(mapVeto)
+		end
+	end
+
+	return body
+end
+
+function CustomMatchSummary._createMap(frame, game)
+	local row = MatchSummary.Row()
+	local extradata = game.extradata or {}
+
+	-- Score
+	local team1Score = Score():setLeft()
+	local team2Score = Score():setRight()
+
+	-- Score Team 1
+	team1Score:setMapScore(game.scores[1])
+
+	-- Detailed scores
+	local team1Halfs = Json.parse(extradata.t1halfs) or {}
+	local team2Halfs = Json.parse(extradata.t2halfs) or {}
+	local firstSides = Json.parse(extradata.t1firstside) or {}
+
+	local firstSide = (firstSides[1] or ''):lower()
+	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
+
+	if not Logic.isEmpty(firstSide) then
+		-- Regular Time for Team 1
+		team1Score:setFirstRoundScore(firstSide, team1Halfs[firstSide], true)
+		team1Score:setSecondRoundScore(oppositeSide, team1Halfs[oppositeSide], true)
+
+		-- Overtime for both, if applicable
+		local firstSideOvertime = firstSides.ot
+		local oppositeSideOvertime = CustomMatchSummary._getOppositeSide(firstSideOvertime)
+
+		if not Logic.isEmpty(firstSideOvertime) then
+			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot'..firstSide], true)
+			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot'..oppositeSide], true)
+
+			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot'..oppositeSide], false)
+			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot'..firstSide], false)
+		else
+			team1Score:addEmptyOvertime()
+			team2Score:addEmptyOvertime()
+		end
+
+		-- Regular Time for Team 2
+		team2Score:setFirstRoundScore(oppositeSide, team2Halfs[oppositeSide], false)
+		team2Score:setSecondRoundScore(firstSide, team2Halfs[firstSide], false)
+	end
+
+	-- Score Team 2
+	team2Score:setMapScore(game.scores[2])
+
+	-- Operator bans
+	local operatorBans = {team1 = Json.parse(extradata.t1bans) or {}, team2 = Json.parse(extradata.t2bans) or {}}
+	local team1OperatorBans = OperatorBans():setLeft()
+	local team2OperatorBans = OperatorBans():setRight()
+
+	for _, operator in ipairs(operatorBans.team1) do
+		team1OperatorBans:add(operator)
+	end
+	for _, operator in ipairs(operatorBans.team2) do
+		team2OperatorBans:add(operator)
+	end
+
+	-- Add everything to view
+	if team1OperatorBans ~= nil then
+		row:addElement(team1OperatorBans:create())
+	end
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
+	row:addElement(team1Score:create())
+
+	local centerNode = mw.html.create('div')
+	centerNode  :addClass('brkts-popup-spaced')
+				:addClass('bracket-popup-body-match-map')
+				:wikitext('[[' .. game.map .. ']]')
+				:css('text-align', 'center')
+				:css('padding','5px 2px')
+				:css('flex-grow','1')
+
+	if game.resultType == 'np' then
+		centerNode:addClass('brkts-popup-spaced-map-skip')
+	end
+
+	row:addElement(centerNode)
+	row:addElement(team2Score:create())
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
+	if team2OperatorBans ~= nil then
+		row:addElement(team2OperatorBans:create())
+	end
+
+	-- Add Comment
+	if not Logic.isEmpty(game.comment) then
+		row:addElement(MatchSummary.Break():create())
+		local comment = mw.html.create('div')
+		comment :wikitext(game.comment)
+				:css('margin', 'auto')
+		row:addElement(comment)
+	end
+
+	row:addClass('brkts-popup-body-game'):css('font-size', '85%')
+
+	-- Winner/Loser backgrouns
+	if game.winner == 1 then
+		row:addClass('bracket-popup-body-gradient-left')
+	elseif game.winner == 2 then
+		row:addClass('bracket-popup-body-gradient-right')
+	elseif game.winner == 'draw' then
+		row:addClass('bracket-popup-body-gradient-draw')
+	else
+		row:addClass('bracket-popup-body-gradient-default')
+	end
+
+	return row
+end
+
+function CustomMatchSummary._getOppositeSide(side)
+	if side == 'atk' then
+		return 'def'
+	end
+	return 'atk'
+end
+
+function CustomMatchSummary._createCheckMark(isWinner)
+	local container = mw.html.create('div')
+	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
+
+	if isWinner then
+		container:node('[[File:GreenCheck.png|14x14px|link=]]')
+		return container
+	end
+
+	container:node('[[File:NoCheck.png|link=]]')
+	return container
+end
+
+function CustomMatchSummary._createOpponent(opponent, side)
+	return OpponentDisplay.BlockOpponent({
+		flip = side == 'left',
+		opponent = opponent,
+		overflow = 'wrap',
+		teamStyle = 'short',
+	})
+end
+
+return CustomMatchSummary
