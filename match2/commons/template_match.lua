@@ -67,6 +67,7 @@ function TemplateMatch.storeVarsToLPDB()
 		elseif bracketIndex == 3 then
 			match.bracketdata.bracketsection = "lower"
 		end
+		match.bracketdata.bracketindex = nil
 		matches[id] = match
 	end
 
