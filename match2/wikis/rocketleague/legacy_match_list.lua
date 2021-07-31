@@ -62,7 +62,7 @@ function LegacyMatchList.convertMatchMaps(frame)
 		end
 		local score
 		if args.walkover then
-			if tonumber(walkover) == index then
+			if tonumber(args.walkover) == index then
 				score = 'W'
 			elseif Table.includes(ALLOWED_STATUSES, args['games' .. index]) then
 				score = args['games' .. index]
@@ -96,14 +96,14 @@ function LegacyMatchList.convertMatchMaps(frame)
 	for index = 1, 15 do
 		if details['map' .. index] then
 			args['map' .. index] = MatchSubobjects.luaGetMap(frame, {
-				map = detail['map' .. index],
-				winner = detail['map' .. index .. 'win'],
-				score1 = detail['map' .. index .. 't1score'],
-				score2 = detail['map' .. index .. 't2score'],
-				ot = detail['ot' .. index],
-				otlength = detail['otlength' .. index],
-				vod = detail['vodgame' .. index],
-				comment = detail['map' .. index .. 'comment'],
+				map = details['map' .. index],
+				winner = details['map' .. index .. 'win'],
+				score1 = details['map' .. index .. 't1score'],
+				score2 = details['map' .. index .. 't2score'],
+				ot = details['ot' .. index],
+				otlength = details['otlength' .. index],
+				vod = details['vodgame' .. index],
+				comment = details['map' .. index .. 'comment'],
 				})
 			--atm we ignore the old mapXtYgoals parameters, because
 			--1) according to Lukasz they are not used nor disaplayed anymore anyways
@@ -111,14 +111,14 @@ function LegacyMatchList.convertMatchMaps(frame)
 			--tied to the participants and that info isn't available for the old stuff
 
 			--empty all the stuff we set into this map
-			detail['map' .. index] = nil
-			detail['map' .. index .. 'win'] = nil
-			detail['map' .. index .. 't1score'] = nil
-			detail['map' .. index .. 't2score'] = nil
-			detail['ot' .. index] = nil
-			detail['otlength' .. index] = nil
-			detail['vodgame' .. index] = nil
-			detail['map' .. index .. 'comment'] = nil
+			details['map' .. index] = nil
+			details['map' .. index .. 'win'] = nil
+			details['map' .. index .. 't1score'] = nil
+			details['map' .. index .. 't2score'] = nil
+			details['ot' .. index] = nil
+			details['otlength' .. index] = nil
+			details['vodgame' .. index] = nil
+			details['map' .. index .. 'comment'] = nil
 		else
 			break
 		end
@@ -138,9 +138,7 @@ end
 --follows later, is used for solo matches
 function LegacyMatchList.convertSwissMatchMaps(frame)
 	local args = getArgs(frame)
-	
-	
-	
+
 	return LegacyMatchList.toEncodedJson(args)
 end
 
