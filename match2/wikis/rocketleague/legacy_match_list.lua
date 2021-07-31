@@ -2,15 +2,11 @@ local LegacyMatchList = {}
 
 local getArgs = require('Module:Arguments').getArgs
 local json = require('Module:Json')
-local processMatch = require('Module:Brkts/WikiSpecific').processMatch
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 local Table = require('Module:Table')
-local String = require('Module:StringUtils')
 local MatchSubobjects = require('Module:Match/Subobjects')
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
-local MatchGroup
-
 
 function LegacyMatchList.convertMatchList(frame)
 	local args = getArgs(frame)
