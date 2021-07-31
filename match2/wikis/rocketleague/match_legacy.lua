@@ -23,6 +23,7 @@ function p.storeMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == "string" then streams = json.parse(streams) end
 	local icon = Variables.varDefault("tournament_icon")
+	local smwFormattedDate = mw.getContentLanguage():formatDate('c', match.date or "")
 	mw.smw.subobject({
 		"legacymatch_" .. match2.match2id,
 		"has mode=" .. (match2.mode or ""),
@@ -31,7 +32,7 @@ function p.storeMatchSMW(match, match2)
 		"has team right=" .. (match.opponent2 or ""),
 		"has teams=" .. (match.opponent1 or "") .. "," ..
 			(match.opponent2 or ""), "+sep=,",
-		"Has map date=" .. (match.date or ""),
+		"Has map date=" .. (smwFormattedDate or ""),
 		"Has tournament=" .. mw.title.getCurrentTitle().prefixedText,
 		"Has tournament tier=" .. (match.liquipediatier or ""),
 		"Has match stream=" .. (streams.stream or ""),
