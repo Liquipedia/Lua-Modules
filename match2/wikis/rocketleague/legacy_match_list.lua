@@ -106,6 +106,7 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 	--process opponents
 	for index = 1, 2 do
 		local player = args['player' .. index] or args['team' .. index] or 'TBD'
+		local playerLink = args['player' .. index .. 'link'] or player
 
 		local score
 		if args.walkover then
@@ -123,7 +124,7 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 			args['opponent' .. index] = MatchSubobjects.luaGetOpponent(frame, {
 					type = 'solo',
 					match2players = '[' .. json.stringify({
-						name = player,
+						name = playerLink,
 						displayname = player,
 						flag = args['p' .. index .. 'flag'],
 					}) .. ']',
