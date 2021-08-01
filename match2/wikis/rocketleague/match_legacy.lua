@@ -23,7 +23,7 @@ function p.storeMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == "string" then streams = json.parse(streams) end
 	local icon = Variables.varDefault("tournament_icon")
-	local smwFormattedDate = mw.getContentLanguage():formatDate('c', match.date or "")
+	local smwFormattedDate = mw.getContentLanguage():formatDate("c", match.date or "")
 	mw.smw.subobject({
 		"legacymatch_" .. match2.match2id,
 		"has mode=" .. (match2.mode or ""),
