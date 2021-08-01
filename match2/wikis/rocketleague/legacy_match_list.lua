@@ -98,7 +98,7 @@ function LegacyMatchList.convertMatchMaps(frame)
 	return LegacyMatchList.toEncodedJson(args)
 end
 
---THIS FUNCTION IS STILL NOT PROPERLY TESTED
+--THIS FUNCTION IS NOT READY FOR USAGE
 function LegacyMatchList.convertSwissMatchMaps(frame)
 	local args = getArgs(frame)
 	local details = json.parseIfString(args.details or '{}')
