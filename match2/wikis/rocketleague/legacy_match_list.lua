@@ -125,7 +125,7 @@ function LegacyMatchList.copyDetailsToArgs(args, details)
 end
 
 function LegacyMatchList.processMap(details, index)
-	local map = MatchSubobjects.luaGetMap(frame, {
+	local map = MatchSubobjects.luaGetMap(nil, {
 		map = details['map' .. index],
 		winner = details['map' .. index .. 'win'],
 		score1 = details['map' .. index .. 't1score'],
