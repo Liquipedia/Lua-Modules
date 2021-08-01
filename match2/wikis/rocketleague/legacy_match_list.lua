@@ -136,6 +136,8 @@ end
 function LegacyMatchList.convertSwissMatchMaps(frame)
 	local args = getArgs(frame)
 
+error('SwissMatchMaps conversion is not yet supported')
+
 	return LegacyMatchList.toEncodedJson(args)
 end
 
