@@ -14,14 +14,15 @@ function LegacyMatchList.convertMatchList(frame)
 	--switch matches (and headers) to the correct parameters for the new system
 	for index = 1, 64 do
 		if not Logic.isEmpty(args['match' .. index]) then
-			args['M' .. index] = args['match' .. index]
-			args['match' .. index] = nil
+			--parse match
+			local match = json.parse(args['match' .. index])
 			--header adjusting
-			local header = Variables.varDefault('M' .. index .. 'header', '')
-			if header ~= '' then
-				args['M' .. index .. 'header'] = header
-				Variables.varDefine('M' .. index .. 'header', '')
-			end
+			args['M' .. index .. 'header'] = match.header
+			match.header = nil
+			--stringify match again and asign new key
+			args['M' .. index] = json.stringify(match)
+			--kick old key
+			args['match' .. index] = nil
 		else
 			break
 		end
@@ -87,9 +88,6 @@ function LegacyMatchList.convertMatchMaps(frame)
 		args['team' .. index] = nil
 		args.walkover = nil
 	end
-
-	--pass header to MatchList conversion
-	Variables.varDefine('M' .. index .. 'header', args.header or '')
 
 	--process maps
 	for index = 1, 15 do
