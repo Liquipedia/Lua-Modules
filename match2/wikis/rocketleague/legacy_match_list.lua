@@ -92,42 +92,14 @@ function LegacyMatchList.convertMatchMaps(frame)
 	--process maps
 	for index = 1, 15 do
 		if details['map' .. index] then
-			args['map' .. index] = MatchSubobjects.luaGetMap(frame, {
-				map = details['map' .. index],
-				winner = details['map' .. index .. 'win'],
-				score1 = details['map' .. index .. 't1score'],
-				score2 = details['map' .. index .. 't2score'],
-				ot = details['ot' .. index],
-				otlength = details['otlength' .. index],
-				vod = details['vodgame' .. index],
-				comment = details['map' .. index .. 'comment'],
-				})
-			--atm we ignore the old mapXtYgoals parameters, because
-			--1) according to Lukasz they are not used nor disaplayed anymore anyways
-			--2) they are pretty hard to convert, due tot the new system wanting goal times
-			--tied to the participants and that info isn't available for the old stuff
-
-			--empty all the stuff we set into this map
-			details['map' .. index] = nil
-			details['map' .. index .. 'win'] = nil
-			details['map' .. index .. 't1score'] = nil
-			details['map' .. index .. 't2score'] = nil
-			details['ot' .. index] = nil
-			details['otlength' .. index] = nil
-			details['vodgame' .. index] = nil
-			details['map' .. index .. 'comment'] = nil
+			args['map' .. index], details = LegacyMatchList.processMap(details, index)
 		else
 			break
 		end
 	end
 
 	--process other stuff from details
-	for key, value in pairs(details) do
-		if Logic.isEmpty(args[key]) then
-			args[key] = value
-		end
-	end
-	args.details = nil
+	args = LegacyMatchList.copyDetailsToArgs(args, details)
 
 	return LegacyMatchList.toEncodedJson(args)
 end
@@ -139,6 +111,45 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 error('SwissMatchMaps conversion is not yet supported')
 
 	return LegacyMatchList.toEncodedJson(args)
+end
+
+--functions shared between convertMatchMaps and convertSwissMatchMaps
+function LegacyMatchList.copyDetailsToArgs(args, details)
+	for key, value in pairs(details) do
+		if Logic.isEmpty(args[key]) then
+			args[key] = value
+		end
+	end
+	args.details = nil
+	return args
+end
+
+function LegacyMatchList.processMap(details, index)
+	local map = MatchSubobjects.luaGetMap(frame, {
+		map = details['map' .. index],
+		winner = details['map' .. index .. 'win'],
+		score1 = details['map' .. index .. 't1score'],
+		score2 = details['map' .. index .. 't2score'],
+		ot = details['ot' .. index],
+		otlength = details['otlength' .. index],
+		vod = details['vodgame' .. index],
+		comment = details['map' .. index .. 'comment'],
+		})
+	--atm we ignore the old mapXtYgoals parameters, because
+	--1) according to Lukasz they are not used nor disaplayed anymore anyways
+	--2) they are pretty hard to convert, due tot the new system wanting goal times
+	--tied to the participants and that info isn't available for the old stuff
+
+	--empty all the stuff we set into this map
+	details['map' .. index] = nil
+	details['map' .. index .. 'win'] = nil
+	details['map' .. index .. 't1score'] = nil
+	details['map' .. index .. 't2score'] = nil
+	details['ot' .. index] = nil
+	details['otlength' .. index] = nil
+	details['vodgame' .. index] = nil
+	details['map' .. index .. 'comment'] = nil
+	return map, details
 end
 
 --the following function is basically copied from Module:Match
