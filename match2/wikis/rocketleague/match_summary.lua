@@ -21,13 +21,31 @@ function p.getByMatchId(args)
 			overflow = 'wrap',
 			teamStyle = 'short',
 		})
-			:addClass('brkts-popup-header-opponent')
+			:addClass(match.opponents[opponentIndex].type ~= 'solo'
+				and 'brkts-popup-header-opponent'
+				or 'brkts-popup-header-opponent-solo-with-team')
+	end
+	
+	local function renderSoloOpponentTeam(opponentIndex)
+		local opponent = match.opponents[opponentIndex]
+		if opponent.type == 'solo' then
+			local hasTeam1Display = match.opponents[1].template or ''
+			local hasTeam2Display = match.opponents[2].template or ''
+			if (hasTeam1Display ~= '') or (hasTeam2Display ~= '') then
+				local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
+				local display = teamExists
+					and mw.ext.TeamTemplate.teamicon(opponent.template, match.date)
+					or mw.ext.TeamTemplate.teamicon('tbd')
+				return mw.html.create('div'):wikitext(display)
+					:addClass('brkts-popup-header-opponent-solo-team')
+			end
+		end
 	end
 
 	-- header
 	local header = htmlCreate('div'):addClass('brkts-popup-header-dev')
-		:node(renderOpponent(1))
-		:node(renderOpponent(2))
+		:node(tostring(renderSoloOpponentTeam(1)) .. tostring(renderOpponent(1)))
+		:node(tostring(renderOpponent(2)) .. tostring(renderSoloOpponentTeam(2)))
 	wrapper:node(header):node(p._breakNode())
 
 	-- body
