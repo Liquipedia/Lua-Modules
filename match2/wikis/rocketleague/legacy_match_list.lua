@@ -34,6 +34,7 @@ function LegacyMatchList.convertMatchList(frame)
 	else
 		args.collapsed = 'true'
 	end
+	args.hide = nil
 
 	--title adjusting
 	if (not args.title) and args[1] then
