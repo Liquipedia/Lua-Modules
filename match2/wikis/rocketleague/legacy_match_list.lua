@@ -137,7 +137,7 @@ function LegacyMatchList.processMap(details, index)
 		})
 	--atm we ignore the old mapXtYgoals parameters, because
 	--1) according to Lukasz they are not used nor disaplayed anymore anyways
-	--2) they are pretty hard to convert, due tot the new system wanting goal times
+	--2) they are pretty hard to convert, due to the new system wanting goal times
 	--tied to the participants and that info isn't available for the old stuff
 
 	--empty all the stuff we set into this map
