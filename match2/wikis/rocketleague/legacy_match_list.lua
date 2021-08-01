@@ -88,6 +88,9 @@ function LegacyMatchList.convertMatchMaps(frame)
 		args.walkover = nil
 	end
 
+	--pass header to MatchList conversion
+	Variables.varDefine('M' .. index .. 'header', args.header or '')
+
 	--process maps
 	for index = 1, 15 do
 		if details['map' .. index] then
