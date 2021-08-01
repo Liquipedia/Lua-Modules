@@ -35,15 +35,17 @@ function p.getByMatchId(args)
 				or mw.ext.TeamTemplate.teamicon('tbd')
 			return mw.html.create('div'):wikitext(display)
 				:addClass('brkts-popup-header-opponent-solo-team')
+		else
+			return ''
 		end
 	end
 
 	-- header
 	local header = htmlCreate('div'):addClass('brkts-popup-header-dev')
-		:node(renderSoloOpponentTeam(1) or '')
+		:node(renderSoloOpponentTeam(1))
 		:node(renderOpponent(1))
 		:node(renderOpponent(2))
-		:node(renderSoloOpponentTeam(2) or '')
+		:node(renderSoloOpponentTeam(2))
 	wrapper:node(header):node(p._breakNode())
 
 	-- body
