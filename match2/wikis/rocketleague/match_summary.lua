@@ -29,16 +29,12 @@ function p.getByMatchId(args)
 	local function renderSoloOpponentTeam(opponentIndex)
 		local opponent = match.opponents[opponentIndex]
 		if opponent.type == 'solo' then
-			local hasTeam1Display = match.opponents[1].template or ''
-			local hasTeam2Display = match.opponents[2].template or ''
-			if (hasTeam1Display ~= '') or (hasTeam2Display ~= '') then
-				local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
-				local display = teamExists
-					and mw.ext.TeamTemplate.teamicon(opponent.template, match.date)
-					or mw.ext.TeamTemplate.teamicon('tbd')
-				return mw.html.create('div'):wikitext(display)
-					:addClass('brkts-popup-header-opponent-solo-team')
-			end
+			local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
+			local display = teamExists
+				and mw.ext.TeamTemplate.teamicon(opponent.template, match.date)
+				or mw.ext.TeamTemplate.teamicon('tbd')
+			return mw.html.create('div'):wikitext(display)
+				:addClass('brkts-popup-header-opponent-solo-team')
 		end
 	end
 
