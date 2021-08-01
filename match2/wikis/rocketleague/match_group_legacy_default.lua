@@ -92,7 +92,7 @@ function p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 				score = "R" .. round.R .. "D" .. round.D .. "score",
 				["$notEmpty$"] = "R" .. round.R .. "D" .. round.D,
 				name = "R" .. round.R .. "D" .. round.D,
-				displayname = "R" .. round.R .. "D" .. round.D,
+				displayname = "R" .. round.R .. "D" .. round.D .. "display",
 				flag = "R" .. round.R .. "D" .. round.D .. "flag"
 			}
 		end
@@ -114,7 +114,7 @@ function p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 				score = "R" .. round.R .. "W" .. round.W .. "score" .. (reset and "2" or ""),
 				["$notEmpty$"] = "R" .. round.R .. "W" .. round.W,
 				name = "R" .. round.R .. "W" .. round.W,
-				displayname = "R" .. round.R .. "W" .. round.W,
+				displayname = "R" .. round.R .. "W" .. round.W .. "display",
 				flag = "R" .. round.R .. "W" .. round.W .. "flag"
 			}
 		end
@@ -139,7 +139,7 @@ function p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 				score = "R" .. round.R .. "D" .. round.D .. "score",
 				["$notEmpty$"] = "R" .. round.R .. "D" .. round.D,
 				name = "R" .. round.R .. "D" .. round.D,
-				displayname = "R" .. round.R .. "D" .. round.D,
+				displayname = "R" .. round.R .. "D" .. round.D .. "display",
 				flag = "R" .. round.R .. "D" .. round.D .. "flag"
 			}
 		end
@@ -161,7 +161,7 @@ function p._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 				score = "R" .. round.R .. "W" .. round.W .. "score" .. (reset and "2" or ""),
 				["$notEmpty$"] = "R" .. round.R .. "W" .. round.W,
 				name = "R" .. round.R .. "W" .. round.W,
-				displayname = "R" .. round.R .. "W" .. round.W,
+				displayname = "R" .. round.R .. "W" .. round.W .. "display",
 				flag = "R" .. round.R .. "W" .. round.W .. "flag"
 			}
 		end
@@ -220,7 +220,7 @@ function p.matchMappingFromCustom(data, bracketType)
 			template = data.opp1 .. "team",
 			score = data.opp1 .. "score",
 			name = bracketType ~= "team" and data.opp1 or nil,
-			displayname = bracketType ~= "team" and data.opp1 or nil,
+			displayname = bracketType ~= "team" and (data.opp1 .. "display") or nil,
 			flag = bracketType ~= "team" and data.opp1 or nil,
 			win = data.opp1 .. "win",
 			},
@@ -231,7 +231,7 @@ function p.matchMappingFromCustom(data, bracketType)
 			template = data.opp2 .. "team",
 			score = data.opp2 .. "score",
 			name = bracketType ~= "team" and data.opp2 or nil,
-			displayname = bracketType ~= "team" and data.opp2 or nil,
+			displayname = bracketType ~= "team" and (data.opp2 .. "display") or nil,
 			flag = bracketType ~= "team" and data.opp2 or nil,
 			win = data.opp2 .. "win",
 			},
