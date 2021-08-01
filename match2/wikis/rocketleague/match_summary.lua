@@ -44,8 +44,10 @@ function p.getByMatchId(args)
 
 	-- header
 	local header = htmlCreate('div'):addClass('brkts-popup-header-dev')
-		:node(tostring(renderSoloOpponentTeam(1)) .. tostring(renderOpponent(1)))
-		:node(tostring(renderOpponent(2)) .. tostring(renderSoloOpponentTeam(2)))
+		:node(renderSoloOpponentTeam(1) or '')
+		:node(renderOpponent(1))
+		:node(renderOpponent(2))
+		:node(renderSoloOpponentTeam(2) or '')
 	wrapper:node(header):node(p._breakNode())
 
 	-- body
