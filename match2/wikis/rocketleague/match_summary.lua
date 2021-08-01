@@ -25,7 +25,7 @@ function p.getByMatchId(args)
 				and 'brkts-popup-header-opponent'
 				or 'brkts-popup-header-opponent-solo-with-team')
 	end
-	
+
 	local function renderSoloOpponentTeam(opponentIndex)
 		local opponent = match.opponents[opponentIndex]
 		if opponent.type == 'solo' then
