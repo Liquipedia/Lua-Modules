@@ -90,13 +90,7 @@ function LegacyMatchList.convertMatchMaps(frame)
 	end
 
 	--process maps
-	for index = 1, 15 do
-		if details['map' .. index] then
-			args['map' .. index], details = LegacyMatchList.processMap(details, index)
-		else
-			break
-		end
-	end
+	args, details = LegacyMatchList.processMaps(args, details)
 
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
@@ -104,11 +98,59 @@ function LegacyMatchList.convertMatchMaps(frame)
 	return LegacyMatchList.toEncodedJson(args)
 end
 
---follows later, is used for solo matches
+--THIS FUNCTION IS STILL NOT PROPERLY TESTED
 function LegacyMatchList.convertSwissMatchMaps(frame)
 	local args = getArgs(frame)
+	local details = json.parseIfString(args.details or '{}')
 
-error('SwissMatchMaps conversion is not yet supported')
+	--process opponents
+	for index = 1, 2 do
+		local player = args['player' .. index] or args['team' .. index] or 'TBD'
+
+		local score
+		if args.walkover then
+			if tonumber(args.walkover) == index then
+				score = 'W'
+			elseif Table.includes(ALLOWED_STATUSES, args['games' .. index]) then
+				score = args['games' .. index]
+			else
+				score = 'L'
+			end
+		else
+			score = args['games' .. index] or '0'
+		end
+		if player ~= 'TBD' then
+			args['opponent' .. index] = MatchSubobjects.luaGetOpponent(frame, {
+					type = 'solo',
+					match2players = '[' .. json.stringify({
+						name = player,
+						displayname = player,
+						flag = args['p' .. index .. 'flag'],
+					}) .. ']',
+					template = args['p' .. index .. 'team'],
+					score = score,
+				})
+		end
+		args['opponent' .. index .. 'literal'] = args['team' .. index .. 'literal']
+
+		--atm we ignore the old teamXstanding parameters, because
+		--they are not supported in the new system
+
+		--empty all the stuff we set into this opponent
+		args['player' .. index] = nil
+		args['team' .. index] = nil
+		args['p' .. index .. 'flag'] = nil
+		args['p' .. index .. 'team'] = nil
+		args['team' .. index .. 'literal'] = nil
+		args['games' .. index] = nil
+		args.walkover = nil
+	end
+
+	--process maps
+	args, details = LegacyMatchList.processMaps(args, details)
+
+	--process other stuff from details
+	args = LegacyMatchList.copyDetailsToArgs(args, details)
 
 	return LegacyMatchList.toEncodedJson(args)
 end
@@ -124,32 +166,38 @@ function LegacyMatchList.copyDetailsToArgs(args, details)
 	return args
 end
 
-function LegacyMatchList.processMap(details, index)
-	local map = MatchSubobjects.luaGetMap(nil, {
-		map = details['map' .. index],
-		winner = details['map' .. index .. 'win'],
-		score1 = details['map' .. index .. 't1score'],
-		score2 = details['map' .. index .. 't2score'],
-		ot = details['ot' .. index],
-		otlength = details['otlength' .. index],
-		vod = details['vodgame' .. index],
-		comment = details['map' .. index .. 'comment'],
-		})
-	--atm we ignore the old mapXtYgoals parameters, because
-	--1) according to Lukasz they are not used nor disaplayed anymore anyways
-	--2) they are pretty hard to convert, due to the new system wanting goal times
-	--tied to the participants and that info isn't available for the old stuff
+function LegacyMatchList.processMaps(args, details)
+	for index = 1, 15 do
+		if details['map' .. index] then
+			args['map' .. index] = MatchSubobjects.luaGetMap(nil, {
+				map = details['map' .. index],
+				winner = details['map' .. index .. 'win'],
+				score1 = details['map' .. index .. 't1score'],
+				score2 = details['map' .. index .. 't2score'],
+				ot = details['ot' .. index],
+				otlength = details['otlength' .. index],
+				vod = details['vodgame' .. index],
+				comment = details['map' .. index .. 'comment'],
+				})
+			--atm we ignore the old mapXtYgoals parameters, because
+			--1) according to Lukasz they are not used nor disaplayed anymore anyways
+			--2) they are pretty hard to convert, due to the new system wanting goal times
+			--tied to the participants and that info isn't available for the old stuff
 
-	--empty all the stuff we set into this map
-	details['map' .. index] = nil
-	details['map' .. index .. 'win'] = nil
-	details['map' .. index .. 't1score'] = nil
-	details['map' .. index .. 't2score'] = nil
-	details['ot' .. index] = nil
-	details['otlength' .. index] = nil
-	details['vodgame' .. index] = nil
-	details['map' .. index .. 'comment'] = nil
-	return map, details
+			--empty all the stuff we set into this map
+			details['map' .. index] = nil
+			details['map' .. index .. 'win'] = nil
+			details['map' .. index .. 't1score'] = nil
+			details['map' .. index .. 't2score'] = nil
+			details['ot' .. index] = nil
+			details['otlength' .. index] = nil
+			details['vodgame' .. index] = nil
+			details['map' .. index .. 'comment'] = nil
+		else
+			break
+		end
+	end
+	return args, details
 end
 
 --the following function is basically copied from Module:Match
