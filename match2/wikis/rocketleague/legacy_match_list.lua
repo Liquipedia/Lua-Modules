@@ -3,7 +3,6 @@ local LegacyMatchList = {}
 local getArgs = require('Module:Arguments').getArgs
 local json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Variables = require('Module:Variables')
 local Table = require('Module:Table')
 local MatchSubobjects = require('Module:Match/Subobjects')
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
