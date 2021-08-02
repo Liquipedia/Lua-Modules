@@ -226,6 +226,13 @@ function LegacyMatchList.processMaps(args, details)
 	return args, details
 end
 
+function LegacyMatchList.getMapScoreFromGoals(goals)
+	if Logic.isEmpty(goals) then return nil end
+
+	local indexedGoals = mw.text.split(goals, ',')
+	return #indexedGoals
+end
+
 function LegacyMatchList.handleLiteralsForOpponents(args)
 	for opponentIndex = 1, 2 do
 		local opponent = args['opponent' .. opponentIndex]
