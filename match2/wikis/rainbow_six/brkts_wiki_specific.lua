@@ -2,7 +2,6 @@
 -- TODO: Add more saving of maps resulttype and walkover
 -- TODO: Best of X
 
-local Match = require("Module:Match")--not used anywhere
 local Table = require("Module:Table")
 local WikiSpecificBase = require('Module:Brkts/WikiSpecific/Base')
 local getIconName = require("Module:IconName").luaGet
@@ -11,13 +10,12 @@ local Logic = require("Module:Logic")
 local TypeUtil = require("Module:TypeUtil")
 local String = require("Module:StringUtils")
 local Variables = require("Module:Variables")
-local Template = require("Module:Template")--not used anywhere
 local Team = require("Module:Team")
 
 local ALLOWED_STATUSES = { "W", "FF", "DQ", "L", "D" }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
-local MAX_NUM_VODGAMES = 20
+local MAX_NUM_VODGAMES = 9
 local MAX_NUM_MAPS = 9
 
 -- containers for process helper functions
@@ -28,7 +26,7 @@ local opponentFunctions = {}
 local p = Table.copy(WikiSpecificBase)
 
 -- called from Module:MatchGroup
-function p.processMatch(frame, match)
+function p.processMatch(_, match)
 	if type(match) == "string" then
 		match = Json.parse(match)
 	end
@@ -39,13 +37,14 @@ function p.processMatch(frame, match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
+	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getExtraData(match)
 
 	return match
 end
 
 -- called from Module:Match/Subobjects
-function p.processMap(frame, map)
+function p.processMap(_, map)
 	mw.logObject(map)
 	if type(map) == "string" then
 		map = Json.parse(map)
@@ -55,13 +54,12 @@ function p.processMap(frame, map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
-	map = mapFunctions.getParticipantsData(map)
 
 	return map
 end
 
 -- called from Module:Match/Subobjects
-function p.processOpponent(frame, opponent)
+function p.processOpponent(_, opponent)
 	if type(opponent) == "string" then
 		opponent = Json.parse(opponent)
 	end
@@ -75,7 +73,7 @@ function p.processOpponent(frame, opponent)
 end
 
 -- called from Module:Match/Subobjects
-function p.processPlayer(frame, player)
+function p.processPlayer(_, player)
 	if type(player) == "string" then
 		player = Json.parse(player)
 	end
@@ -211,13 +209,13 @@ function matchFunctions.getExtraData(match)
 		comment = match.comment,
 		mapveto = Json.stringify(matchFunctions.getMapVeto(match)),
 		mvp = Json.stringify(matchFunctions.getMVP(match)),
-		bestofx = matchFunctions.getBestOfX(match),
 		isconverted = 0
 	}
 	return match
 end
 
-function matchFunctions.getBestOfX(match)
+-- TODO: Needs improvment when it comes to upcoming games
+function matchFunctions.getBestOf(match)
 	local counter = 0
 	for i = 1, MAX_NUM_MAPS do
 		if match["map"..i] then
@@ -226,11 +224,10 @@ function matchFunctions.getBestOfX(match)
 			break
 		end
 	end
-	if counter == 0 then
-		return nil
-	else
-		return counter
+	if counter > 0 then
+		match.bestof = counter
 	end
+	return match
 end
 
 function matchFunctions.getMapVeto(match)
@@ -422,54 +419,12 @@ function mapFunctions.getTournamentVars(map)
 	return map
 end
 
-function mapFunctions.getParticipantsData(map)
-	local participants = map.participants or {}
-	if type(participants) == "string" then
-		participants = Json.parse(participants)
-	end
-
-	-- fill in stats
-	for o = 1, MAX_NUM_OPPONENTS do
-		--do not use p here!!! p is already defined on line 28!!!
-		for k = 1, MAX_NUM_PLAYERS do
-			local participant = participants[o .. "_" .. k] or {}
-			local opstring = "opponent" .. o .. "_p" .. k
-			local stats = map[opstring .. "stats"]
-
-			if stats ~= nil then
-				stats = Json.parse(stats)
-
-				local kills = stats["kills"]
-				local deaths = stats["deaths"]
-				local assists = stats["assists"]
-				local agent = stats["agent"]
-				local averageCombatScore = stats["acs"]
-
-				participant.kills = Logic.isEmpty(kills) and participant.kills or kills
-				participant.deaths = Logic.isEmpty(deaths) and participant.deaths or deaths
-				participant.assists = Logic.isEmpty(assists) and participant.assists or assists
-				participant.agent = Logic.isEmpty(agent) and participant.agent or agent
-				participant.acs = Logic.isEmpty(averageCombatScore) and participant.averagecombatscore or averageCombatScore
-
-				if not Table.isEmpty(participant) then
-					participants[o .. "_" .. k] = participant
-				end
-			end
-		end
-	end
-
-	map.participants = participants
-	return map
-end
-
 --
 -- opponent related functions
 --
 function opponentFunctions.getTeamName(template)
 	if template ~= nil then
-		return Team.name(_,template) -- TODO Needs to have date to get the correct teamtemplate
-		--"_" isn't nice in the "Team.name" call, just use nil instead
-		--the style check in the git repo will not like "_" there
+		return Team.name(nil,template) -- TODO Needs to have date to get the correct teamtemplate
 	else
 		return nil
 	end
