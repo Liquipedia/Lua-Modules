@@ -110,7 +110,7 @@ function p.getByMatchId(args)
 					:css("margin","auto")
 					:css("max-width", "60%"))
 			end
-			if game.extradata.t1goals or game.extradata.t2goals then
+			if game.extradata.t2goals then
 				if not hasCommentLineBreakNode then
 					table.insert(gameElements, p._breakNode())
 				end
