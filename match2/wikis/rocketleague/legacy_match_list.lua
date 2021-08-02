@@ -8,13 +8,15 @@ local Table = require('Module:Table')
 local MatchSubobjects = require('Module:Match/Subobjects')
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 
+local _MAX_NUMBER_OF_MATCHES = 64
+local _MAX_NUMBER_OF_MAPS = 15
+
 function LegacyMatchList.convertMatchList(frame)
 	local args = getArgs(frame)
 
 	--switch matches (and headers) to the correct parameters for the new system
-	for index = 1, 64 do
+	for index = 1, _MAX_NUMBER_OF_MATCHES do
 		if not Logic.isEmpty(args['match' .. index]) then
-			--parse match
 			local match = json.parse(args['match' .. index])
 			--header adjusting
 			args['M' .. index .. 'header'] = match.header
@@ -169,7 +171,7 @@ function LegacyMatchList.copyDetailsToArgs(args, details)
 end
 
 function LegacyMatchList.processMaps(args, details)
-	for index = 1, 15 do
+	for index = 1, _MAX_NUMBER_OF_MAPS do
 		if details['map' .. index] then
 			args['map' .. index] = MatchSubobjects.luaGetMap(nil, {
 				map = details['map' .. index],
@@ -182,7 +184,7 @@ function LegacyMatchList.processMaps(args, details)
 				comment = details['map' .. index .. 'comment'],
 				})
 			--atm we ignore the old mapXtYgoals parameters, because
-			--1) according to Lukasz they are not used nor disaplayed anymore anyways
+			--1) according to Lukasz they are not used nor displayed anymore anyways
 			--2) they are pretty hard to convert, due to the new system wanting goal times
 			--tied to the participants and that info isn't available for the old stuff
 
@@ -222,7 +224,7 @@ function LegacyMatchList.toEncodedJson(args)
 	args.bracketdata = json.stringify(bracketdata)
 
 	-- parse maps
-	for mapIndex = 1, 15 do
+	for mapIndex = 1, _MAX_NUMBER_OF_MAPS do
 		local map = args['map' .. mapIndex]
 		if type(map) == 'string' then
 			map = json.parse(map)
