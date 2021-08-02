@@ -527,7 +527,7 @@ end
 function opponentFunctions.getSoloFromLegacy(opponent)
 	opponent.match2players = '[' .. json.stringify({
 		name = opponent.name,
-		displayname = opponent.displayname,
+		displayname = opponent.displayname or opponent.name,
 		flag = opponent.flag
 	}) .. ']'
 	opponent.name = nil
