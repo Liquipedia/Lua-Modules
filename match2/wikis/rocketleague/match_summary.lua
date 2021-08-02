@@ -88,11 +88,40 @@ function p.getByMatchId(args)
 					:css("font-size","85%")
 					:css("margin","auto"))
 			end
-			if game.comment then
+			local hasCommentLineBreakNode = false
+			if game.extradata.t1goals then
 				table.insert(gameElements, p._breakNode())
+				hasCommentLineBreakNode = true
+				local goals = htmlCreate("div")
+					:wikitext("<abbr title=\"Team 1 Goaltimes\">" ..
+						game.extradata.t1goals .. "</abbr>")
+				table.insert(gameElements, htmlCreate("div")
+					:node(goals)
+					:css("max-width", "15%")
+					:css("maxfont-size", "11px;"))
+			end
+			if game.comment then
+				if not hasCommentLineBreakNode then
+					table.insert(gameElements, p._breakNode())
+				end
+				hasCommentLineBreakNode = true
 				table.insert(gameElements, htmlCreate("div")
 					:node(game.comment)
-					:css("margin","auto"))
+					:css("margin","auto")
+					:css("max-width", "60%"))
+			end
+			if game.extradata.t1goals or game.extradata.t2goals then
+				if not hasCommentLineBreakNode then
+					table.insert(gameElements, p._breakNode())
+				end
+				local goals = htmlCreate("div")
+					:cssText("float:right;margin-right:10px;")
+					:wikitext("<abbr title=\"Team 2 Goaltimes\">" ..
+						game.extradata.t2goals .. "</abbr>")
+				table.insert(gameElements, htmlCreate("div")
+					:node(goals)
+					:css("max-width", "15%")
+					:css("maxfont-size", "11px;"))
 			end
 			body = p._addFlexRow(body, gameElements, "brkts-popup-body-game")
 		end
