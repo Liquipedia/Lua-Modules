@@ -326,6 +326,9 @@ function mapFunctions.getExtraData(map)
 		otlength = map.otlength,
 		comment = map.comment,
 		header = map.header,
+		--the following is used to store "mapXtYgoals" from LegacyMatchLists
+		t1goals = map.t1goals,
+		t2goals = map.t2goals,
 	})
 	return map
 end
