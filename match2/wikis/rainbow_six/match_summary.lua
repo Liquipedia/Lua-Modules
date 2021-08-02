@@ -1,4 +1,3 @@
-local Arguments = require('Module:Arguments')--not used anywhere
 local Class = require('Module:Class')
 local Color = mw.loadData('Module:Color')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
@@ -10,6 +9,15 @@ local OperatorIcon = require('Module:OperatorIcon')
 local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
+
+local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local _NO_CHECK = '[[File:NoCheck.png|link=]]'
+local _ROUND_ICONS = {
+	atk = '[[File:R6S Para Bellum atk logo.png|14px|link=]]',
+	def = '[[File:R6S Para Bellum def logo.png|14px|link=]]',
+	otatk = '[[File:R6S Para Bellum atk logo ot rounds.png|11px|link=]]',
+	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
+}
 
 local OperatorBans = Class.new(
 	function(self)
@@ -90,7 +98,7 @@ function Score:setMapScore(score)
 end
 
 function Score:setFirstRoundScore(side, score, isLeft)
-	local icon = '[[File:R6S Para Bellum '.. side ..' logo.png|14px|link=]]'
+	local icon = _ROUND_ICONS[side]
 	if not isLeft then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
@@ -106,7 +114,7 @@ function Score:setFirstRoundScore(side, score, isLeft)
 end
 
 function Score:setSecondRoundScore(side, score, isLeft)
-	local icon = '[[File:R6S Para Bellum '.. side ..' logo.png|14px|link=]]'
+	local icon = _ROUND_ICONS[side]
 	if not isLeft then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
@@ -122,7 +130,7 @@ function Score:setSecondRoundScore(side, score, isLeft)
 end
 
 function Score:setFirstOvertimeRoundScore(side, score, isLeft)
-	local icon = '[[File:R6S Para Bellum '.. side ..' logo ot rounds.png|11px|link=]]'
+	local icon = _ROUND_ICONS['ot'..side]
 	if not isLeft then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
@@ -138,7 +146,7 @@ function Score:setFirstOvertimeRoundScore(side, score, isLeft)
 end
 
 function Score:setSecondOvertimeRoundScore(side, score, isLeft)
-	local icon = '[[File:R6S Para Bellum '.. side ..' logo ot rounds.png|11px|link=]]'
+	local icon = _ROUND_ICONS['ot'..side]
 	if not isLeft then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
@@ -186,9 +194,9 @@ function MapVeto:createHeader()
 end
 
 function MapVeto:vetoStart(firstVeto)
-	local textLeft = ''
-	local textCenter = ''
-	local textRight = ''
+	local textLeft
+	local textCenter
+	local textRight
 	if firstVeto == 1 then
 		textLeft = "'''Start Map Veto'''"
 		textCenter = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
@@ -198,9 +206,9 @@ function MapVeto:vetoStart(firstVeto)
 	else return self end
 	self.table:tag('tr'):css('border-bottom','5px solid #DDD'):css('background-color','#f5f5f5')
 		:css('height','10px'):css('font-size','11px')
-		:tag('th'):css('text-align','center'):css('padding','5px'):wikitext(textLeft):done()
+		:tag('th'):css('text-align','center'):css('padding','5px'):wikitext(textLeft or ''):done()
 		:tag('th'):css('text-align','center'):css('padding','5px'):wikitext(textCenter):done()
-		:tag('th'):css('text-align','center'):wikitext(textRight):done()
+		:tag('th'):css('text-align','center'):wikitext(textRight or ''):done()
 	return self
 end
 
@@ -559,11 +567,11 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if isWinner then
-		container:node('[[File:GreenCheck.png|14x14px|link=]]')
+		container:node(_GREEN_CHECK)
 		return container
 	end
 
-	container:node('[[File:NoCheck.png|link=]]')
+	container:node(_NO_CHECK)
 	return container
 end
 
