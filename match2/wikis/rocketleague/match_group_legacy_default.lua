@@ -26,7 +26,9 @@ function p.get(templateid, bracketType)
 		map = "map$1$",
 		score1 = "map$1$t1score",
 		score2 = "map$1$t2score",
-		winner = "map$1$win"
+		winner = "map$1$win",
+		t1goals = "map$1$t1goals",
+		t2goals = "map$1$t2goals",
 	}
 
 	for n = 1, lastRound do
