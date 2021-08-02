@@ -4,7 +4,6 @@
 
 local Table = require("Module:Table")
 local WikiSpecificBase = require('Module:Brkts/WikiSpecific/Base')
-local getIconName = require("Module:IconName").luaGet
 local Json = require("Module:Json")
 local Logic = require("Module:Logic")
 local TypeUtil = require("Module:TypeUtil")
@@ -203,8 +202,6 @@ function matchFunctions.getExtraData(match)
 	local opponent2 = match.opponent2 or {}
 	match.extradata = Json.stringify{
 		matchsection = Variables.varDefault("matchsection"),
-		team1icon = getIconName(opponent1.template or ""),
-		team2icon = getIconName(opponent2.template or ""),
 		lastgame = Variables.varDefault("last_game"),
 		comment = match.comment,
 		mapveto = Json.stringify(matchFunctions.getMapVeto(match)),
