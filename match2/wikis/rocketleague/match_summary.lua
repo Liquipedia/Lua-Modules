@@ -6,6 +6,8 @@ local Template = require('Module:Template')
 
 local htmlCreate = mw.html.create
 
+local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
+
 local p = {}
 
 function p.getByMatchId(args)
@@ -32,7 +34,7 @@ function p.getByMatchId(args)
 			local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
 			local display = teamExists
 				and mw.ext.TeamTemplate.teamicon(opponent.template, match.date)
-				or mw.ext.TeamTemplate.teamicon('tbd')
+				or _TBD_ICON
 			return mw.html.create('div'):wikitext(display)
 				:addClass('brkts-popup-header-opponent-solo-team')
 		else
