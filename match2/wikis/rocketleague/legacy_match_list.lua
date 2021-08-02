@@ -52,6 +52,9 @@ function LegacyMatchList.convertMatchMaps(frame)
 	local args = getArgs(frame)
 	local details = json.parseIfString(args.details or '{}')
 
+	--process maps
+	args, details = LegacyMatchList.processMaps(args, details)
+
 	--process opponents
 	for index = 1, 2 do
 		local template = args['team' .. index]
@@ -72,7 +75,7 @@ function LegacyMatchList.convertMatchMaps(frame)
 		else
 			score = args['games' .. index] or '-1'
 			if tonumber(score) == -1 then
-				score = Variables.varDefault('team' .. index .. 'wins', '0')
+				score = args['t' .. index .. 'wins']
 			end
 		end
 
@@ -90,21 +93,21 @@ function LegacyMatchList.convertMatchMaps(frame)
 		args['games' .. index] = nil
 		args['team' .. index] = nil
 		args.walkover = nil
+		args['t' .. index .. 'wins'] = nil
 	end
-
-	--process maps
-	args, details = LegacyMatchList.processMaps(args, details)
 
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
 
-	return LegacyMatchList.matchToEncodedJson(args)
+	return LegacyMatchList.handleLiteralsForOpponents(args)
 end
 
---THIS FUNCTION IS NOT READY FOR USAGE
 function LegacyMatchList.convertSwissMatchMaps(frame)
 	local args = getArgs(frame)
 	local details = json.parseIfString(args.details or '{}')
+
+	--process maps
+	args, details = LegacyMatchList.processMaps(args, details)
 
 	--process opponents
 	for index = 1, 2 do
@@ -121,7 +124,10 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 				score = 'L'
 			end
 		else
-			score = args['games' .. index] or '0'
+			score = args['games' .. index] or '-1'
+			if tonumber(score) == -1 then
+				score = args['t' .. index .. 'wins']
+			end
 		end
 		if player ~= 'TBD' then
 			args['opponent' .. index] = MatchSubobjects.luaGetOpponent(frame, {
@@ -138,6 +144,7 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 		args['opponent' .. index .. 'literal'] = args['team' .. index .. 'literal']
 
 		--atm we ignore the old teamXstanding parameters, because
+		--it is used on a single page ...
 		--they are not supported in the new system
 
 		--empty all the stuff we set into this opponent
@@ -147,16 +154,14 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 		args['p' .. index .. 'team'] = nil
 		args['team' .. index .. 'literal'] = nil
 		args['games' .. index] = nil
+		args['t' .. index .. 'wins'] = nil
 		args.walkover = nil
 	end
-
-	--process maps
-	args, details = LegacyMatchList.processMaps(args, details)
 
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
 
-	return LegacyMatchList.matchToEncodedJson(args)
+	return LegacyMatchList.handleLiteralsForOpponents(args)
 end
 
 --functions shared between convertMatchMaps and convertSwissMatchMaps
@@ -171,22 +176,36 @@ function LegacyMatchList.copyDetailsToArgs(args, details)
 end
 
 function LegacyMatchList.processMaps(args, details)
+	local t1wins = 0
+	local t2wins = 0
 	for index = 1, _MAX_NUMBER_OF_MAPS do
 		if details['map' .. index] then
-			args['map' .. index] = MatchSubobjects.luaGetMap(nil, {
+			local score1 = details['map' .. index .. 't1score'] or
+				LegacyMatchList.getMapScoreFromGoals(details['map' .. index .. 't1goals'])
+			local score2 = details['map' .. index .. 't2score'] or
+				LegacyMatchList.getMapScoreFromGoals(details['map' .. index .. 't2goals'])
+
+			local map = MatchSubobjects.luaGetMap(nil, {
 				map = details['map' .. index],
 				winner = details['map' .. index .. 'win'],
-				score1 = details['map' .. index .. 't1score'],
-				score2 = details['map' .. index .. 't2score'],
+				score1 = score1,
+				score2 = score2,
 				ot = details['ot' .. index],
 				otlength = details['otlength' .. index],
 				vod = details['vodgame' .. index],
 				comment = details['map' .. index .. 'comment'],
+				t1goals = details['map' .. index .. 't1goals'],
+				t2goals = details['map' .. index .. 't2goals'],
 				})
-			--atm we ignore the old mapXtYgoals parameters, because
-			--1) according to Lukasz they are not used nor displayed anymore anyways
-			--2) they are pretty hard to convert, due to the new system wanting goal times
-			--tied to the participants and that info isn't available for the old stuff
+			if type(map) == 'string' then
+				map = json.parse(map)
+				args['map' .. index] = map
+				if map.winner == '1' then
+					t1wins = t1wins + 1
+				elseif map.winner == '2' then
+					t2wins = t2wins + 1
+				end
+			end
 
 			--empty all the stuff we set into this map
 			details['map' .. index] = nil
@@ -197,32 +216,24 @@ function LegacyMatchList.processMaps(args, details)
 			details['otlength' .. index] = nil
 			details['vodgame' .. index] = nil
 			details['map' .. index .. 'comment'] = nil
+			details['map' .. index .. 't1goals'] = nil
+			details['map' .. index .. 't2goals'] = nil
 		else
 			break
 		end
 	end
+	args.t1wins = t1wins ~= 0 and t1wins or nil
+	args.t2wins = t2wins ~= 0 and t2wins or nil
 	return args, details
 end
 
-function LegacyMatchList.matchToEncodedJson(args)
-	--handle literals for opponents
+function LegacyMatchList.handleLiteralsForOpponents(args)
 	for opponentIndex = 1, 2 do
 		local opponent = args['opponent' .. opponentIndex]
 		if Logic.isEmpty(opponent) then
 			args['opponent' .. opponentIndex] = {
 				['type'] = 'literal', template = 'tbd', name = args['opponent' .. opponentIndex .. 'literal']
 			}
-		end
-	end
-
-	--parse maps
-	for mapIndex = 1, _MAX_NUMBER_OF_MAPS do
-		local map = args['map' .. mapIndex]
-		if type(map) == 'string' then
-			map = json.parse(map)
-			args['map' .. mapIndex] = map
-		else
-			break
 		end
 	end
 
