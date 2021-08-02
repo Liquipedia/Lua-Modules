@@ -6,6 +6,8 @@ local Template = require('Module:Template')
 
 local htmlCreate = mw.html.create
 
+local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
+
 local p = {}
 
 function p.getByMatchId(args)
@@ -21,13 +23,31 @@ function p.getByMatchId(args)
 			overflow = 'wrap',
 			teamStyle = 'short',
 		})
-			:addClass('brkts-popup-header-opponent')
+			:addClass(match.opponents[opponentIndex].type ~= 'solo'
+				and 'brkts-popup-header-opponent'
+				or 'brkts-popup-header-opponent-solo-with-team')
+	end
+
+	local function renderSoloOpponentTeam(opponentIndex)
+		local opponent = match.opponents[opponentIndex]
+		if opponent.type == 'solo' then
+			local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
+			local display = teamExists
+				and mw.ext.TeamTemplate.teamicon(opponent.template, match.date)
+				or _TBD_ICON
+			return mw.html.create('div'):wikitext(display)
+				:addClass('brkts-popup-header-opponent-solo-team')
+		else
+			return ''
+		end
 	end
 
 	-- header
 	local header = htmlCreate('div'):addClass('brkts-popup-header-dev')
+		:node(renderSoloOpponentTeam(1))
 		:node(renderOpponent(1))
 		:node(renderOpponent(2))
+		:node(renderSoloOpponentTeam(2))
 	wrapper:node(header):node(p._breakNode())
 
 	-- body
