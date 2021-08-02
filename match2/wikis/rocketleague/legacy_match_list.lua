@@ -98,7 +98,7 @@ function LegacyMatchList.convertMatchMaps(frame)
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
 
-	return LegacyMatchList.toEncodedJson(args)
+	return LegacyMatchList.matchToEncodedJson(args)
 end
 
 --THIS FUNCTION IS NOT READY FOR USAGE
@@ -156,7 +156,7 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
 
-	return LegacyMatchList.toEncodedJson(args)
+	return LegacyMatchList.matchToEncodedJson(args)
 end
 
 --functions shared between convertMatchMaps and convertSwissMatchMaps
@@ -204,10 +204,8 @@ function LegacyMatchList.processMaps(args, details)
 	return args, details
 end
 
---the following function is basically copied from Module:Match
---it is adjusted a bit to fit the conversion
-function LegacyMatchList.toEncodedJson(args)
-	-- handle tbd and literals for opponents
+function LegacyMatchList.matchToEncodedJson(args)
+	--handle literals for opponents
 	for opponentIndex = 1, 2 do
 		local opponent = args['opponent' .. opponentIndex]
 		if Logic.isEmpty(opponent) then
@@ -217,13 +215,7 @@ function LegacyMatchList.toEncodedJson(args)
 		end
 	end
 
-	-- handle literals for qualifiers
-	local bracketdata = json.parse(args.bracketdata or '{}')
-	bracketdata.qualwinLiteral = args.qualwinliteral
-	bracketdata.qualloseLiteral = args.qualloseliteral
-	args.bracketdata = json.stringify(bracketdata)
-
-	-- parse maps
+	--parse maps
 	for mapIndex = 1, _MAX_NUMBER_OF_MAPS do
 		local map = args['map' .. mapIndex]
 		if type(map) == 'string' then
