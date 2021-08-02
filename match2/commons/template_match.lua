@@ -19,7 +19,7 @@ end
 -- store matches from vars to LPDB
 function TemplateMatch.storeVarsToLPDB()
 	local matchNum = tonumber(Variables.varDefault('numTempMatch', 0))
-	utils.log("Storing " .. matchNum .. " template matches to LPDB")
+	utils.log('Storing ' .. matchNum .. ' template matches to LPDB')
 
 	-- parse all matches and find out which matches are referenced
 	-- also parse bracketdata
@@ -41,13 +41,15 @@ function TemplateMatch.storeVarsToLPDB()
 	-- find root matches and set the root value there
 	local rootMatches = {}
 	for _, match in pairs(matches) do
-		if not referencedIds[match.matchid] and not String.startsWith(match.matchid, "Rx") then
-			match.bracketdata.root = "true"
+		if not referencedIds[match.matchid] and not String.startsWith(match.matchid, 'Rx') then
+			match.bracketdata.root = 'true'
 			table.insert(rootMatches, match.matchid)
 		end
 	end
 
 	-- set bracket index for matches
+	--applied is the maximum of all bracketIndex's
+	--it is needed to deterimne if bracketIndex == 2 means "mid" or "lower"
 	local applied = 0
 	for _, id in Table.iter.spairs(rootMatches, function(tab, a, b) return tab[a] < tab[b] end) do
 		matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, id, false, applied)
@@ -57,16 +59,17 @@ function TemplateMatch.storeVarsToLPDB()
 	for id, match in pairs(matches) do
 		local bracketIndex = tonumber(match.bracketdata.bracketindex)
 		if bracketIndex == 1 then
-			match.bracketdata.bracketsection = "upper"
+			match.bracketdata.bracketsection = 'upper'
 		elseif bracketIndex == 2 then
 			if applied == 3 then
-				match.bracketdata.bracketsection = "mid"
+				match.bracketdata.bracketsection = 'mid'
 			else
-				match.bracketdata.bracketsection = "lower"
+				match.bracketdata.bracketsection = 'lower'
 			end
 		elseif bracketIndex == 3 then
-			match.bracketdata.bracketsection = "lower"
+			match.bracketdata.bracketsection = 'lower'
 		end
+		match.bracketdata.bracketindex = nil
 		matches[id] = match
 	end
 
@@ -87,7 +90,7 @@ function TemplateMatch._getTrueID(id)
 	if id == nil then
 		return nil
 	else
-		return id:gsub(pagename:gsub("([^%w])", "%%%1") .. "_", "")
+		return id:gsub(pagename:gsub('([^%w])', '%%%1') .. '_', '')
 	end
 end
 
@@ -105,7 +108,12 @@ function TemplateMatch._recursiveSetBracketIndex(matches, id, headerchild, appli
 	match.bracketdata.bracketindex = applied
 	matches[id] = match
 	matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, match.bracketdata.toupper, headerchild, applied)
-	matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, match.bracketdata.tolower, headerchild, applied)
+	local lowerHeaderchild = headerchild
+	if not String.isEmpty(match.bracketdata.toupper) then
+		lowerHeaderchild = false
+	end
+	matches, applied = TemplateMatch._recursiveSetBracketIndex(
+		matches, match.bracketdata.tolower, lowerHeaderchild, applied)
 	return matches, applied
 end
 
