@@ -95,6 +95,9 @@ function LegacyMatchList.convertMatchMaps(frame)
 		args['t' .. index .. 'wins'] = nil
 	end
 
+	--sort out date params
+	args = LegacyMatchList.dateStuff(args, details)
+
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
 
@@ -156,6 +159,9 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 		args['t' .. index .. 'wins'] = nil
 		args.walkover = nil
 	end
+
+	--sort out date params
+	args = LegacyMatchList.dateStuff(args, details)
 
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
@@ -231,6 +237,12 @@ function LegacyMatchList.getMapScoreFromGoals(goals)
 
 	local indexedGoals = mw.text.split(goals, ',')
 	return #indexedGoals
+end
+
+function LegacyMatchList.dateStuff(args, details)
+	args.header = args.header or args.date
+	args.date = details.date or args.date
+	return args
 end
 
 function LegacyMatchList.handleLiteralsForOpponents(args)
