@@ -68,6 +68,7 @@ function p.processOpponent(_, opponent)
 	-- process opponent
 	if not Logic.isEmpty(opponent.template) then
 		opponent.name = opponent.name or opponentFunctions.getTeamName(opponent.template)
+		opponent.icon = opponent.icon or opponentFunctions.getIconName(opponent.template)
 	end
 
 	return opponent
@@ -422,6 +423,14 @@ end
 function opponentFunctions.getTeamName(template)
 	if template ~= nil then
 		return Team.name(nil,template) -- TODO Needs to have date to get the correct teamtemplate
+	else
+		return nil
+	end
+end
+
+function opponentFunctions.getIconName(template)
+	if template ~= nil then
+		return Team.iconFile(nil,template) -- TODO Needs to have date to get the correct teamtemplate
 	else
 		return nil
 	end
