@@ -200,8 +200,6 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getExtraData(match)
-	local opponent1 = match.opponent1 or {}
-	local opponent2 = match.opponent2 or {}
 	match.extradata = Json.stringify{
 		matchsection = Variables.varDefault("matchsection"),
 		lastgame = Variables.varDefault("last_game"),
