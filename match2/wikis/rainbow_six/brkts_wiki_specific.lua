@@ -103,7 +103,7 @@ end
 
 --
 --
--- function to sort out winner/placements
+-- function to check for draws
 function p.placementCheckDraw(table)
 	local last
 	for _, scoreInfo in pairs(table) do
