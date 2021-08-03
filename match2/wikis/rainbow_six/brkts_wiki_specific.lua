@@ -1,6 +1,8 @@
--- TODO: Add more saving of matchs resulttype and walkover
--- TODO: Add more saving of maps resulttype and walkover
--- TODO: Best of X
+-- TODO: Add more matchs resulttype and walkover
+-- TODO: Add more maps resulttype and walkover
+-- TODO: Add Best of X handling for upcoming/ongoing matches
+-- TODO: Add automatic match score generation based on map winners
+-- TOCO: Add date handling to opponents
 
 local Table = require("Module:Table")
 local WikiSpecificBase = require('Module:Brkts/WikiSpecific/Base')
