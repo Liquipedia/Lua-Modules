@@ -128,7 +128,7 @@ function LegacyPlayerCrossTable._handleLiteralsForOpponents(match)
 			match['opponent' .. opponentIndex] = {
 				['type'] = 'literal',
 				template = 'tbd',
-				name = match['opponent' .. opponentIndex .. 'literal'],
+				name = 'TBD',
 			}
 		end
 	end
