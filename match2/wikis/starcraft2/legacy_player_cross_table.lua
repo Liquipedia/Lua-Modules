@@ -84,7 +84,7 @@ function LegacyPlayerCrossTable._getMatch2(opp1data, opp2data, details)
 
 	match = LegacyPlayerCrossTable._processDetails(match, details)
 
-	return LegacyPlayerCrossTable._handleLiteralsForOpponents(match)
+	return json.stringify(match)
 end
 
 function LegacyPlayerCrossTable._processDetails(match, details)
@@ -119,21 +119,6 @@ function LegacyPlayerCrossTable._copyDetailsToMatch(match, details)
 		end
 	end
 	return match
-end
-
-function LegacyPlayerCrossTable._handleLiteralsForOpponents(match)
-	for opponentIndex = 1, 2 do
-		local opponent = match['opponent' .. opponentIndex]
-		if Logic.isEmpty(opponent) then
-			match['opponent' .. opponentIndex] = {
-				['type'] = 'literal',
-				template = 'tbd',
-				name = 'TBD',
-			}
-		end
-	end
-
-	return json.stringify(match)
 end
 
 return LegacyPlayerCrossTable
