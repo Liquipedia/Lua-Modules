@@ -96,7 +96,7 @@ function LegacyMatchList.convertMatchMaps(frame)
 	end
 
 	--sort out date params
-	args = LegacyMatchList.dateStuff(args, details)
+	args = LegacyMatchList.setHeaderIfEmpty(args, details)
 
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
@@ -161,7 +161,7 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 	end
 
 	--sort out date params
-	args = LegacyMatchList.dateStuff(args, details)
+	args = LegacyMatchList.setHeaderIfEmpty(args, details)
 
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
@@ -239,7 +239,7 @@ function LegacyMatchList.getMapScoreFromGoals(goals)
 	return #indexedGoals
 end
 
-function LegacyMatchList.dateStuff(args, details)
+function LegacyMatchList.setHeaderIfEmpty(args, details)
 	args.header = args.header or args.date
 	args.date = details.date or args.date
 	return args
