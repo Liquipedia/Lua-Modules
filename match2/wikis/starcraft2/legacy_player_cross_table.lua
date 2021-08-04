@@ -109,7 +109,7 @@ function LegacyPlayerCrossTable._processDetails(match, details)
 
 	match = LegacyPlayerCrossTable._copyDetailsToMatch(match, details)
 
-	return match, details
+	return match
 end
 
 function LegacyPlayerCrossTable._copyDetailsToMatch(match, details)
