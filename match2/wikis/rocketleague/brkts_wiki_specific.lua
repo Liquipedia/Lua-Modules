@@ -11,6 +11,7 @@ local getIconName = require("Module:IconName").luaGet
 local _frame
 
 local ALLOWED_STATUSES = { "W", "FF", "DQ", "L" }
+local STATUS_TO_WALKOVER = { FF = "ff", DQ = "dq", L = "l" }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
@@ -262,6 +263,10 @@ function matchFunctions.getOpponents(args)
 				opponent.status = opponent.score
 				opponent.score = -1
 			end
+
+			--set Walkover from Opponent status
+			args.walkover = args.walkover or STATUS_TO_WALKOVER[opponent.status]
+
 			opponents[opponentIndex] = opponent
 
 			-- get players from vars for teams
@@ -269,6 +274,11 @@ function matchFunctions.getOpponents(args)
 				args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
 			end
 		end
+	end
+
+	--set resulttype to "default" if walkover is set
+	if args.walkover then
+		args.resulttype = "default"
 	end
 
 	-- see if match should actually be finished if score is set

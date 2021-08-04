@@ -132,6 +132,10 @@ function p._convertParameters(match2)
 			and opponent2.score or 0
 		match.opponent2flag = player.flag
 	end
+	if match2.walkover then
+		match.resulttype = match2.walkover
+		match.walkover = nil
+	end
 
 	return match
 end
