@@ -2,7 +2,6 @@
 -- TODO: Add more maps resulttype and walkover
 -- TODO: Add Best of X handling for upcoming/ongoing matches
 -- TODO: Add automatic match score generation based on map winners
--- TOCO: Add date handling to opponents
 
 local Table = require("Module:Table")
 local WikiSpecificBase = require('Module:Brkts/WikiSpecific/Base')
@@ -11,7 +10,6 @@ local Logic = require("Module:Logic")
 local TypeUtil = require("Module:TypeUtil")
 local String = require("Module:StringUtils")
 local Variables = require("Module:Variables")
-local Team = require("Module:Team")
 
 local ALLOWED_STATUSES = { "W", "FF", "DQ", "L", "D" }
 local MAX_NUM_OPPONENTS = 2
@@ -66,9 +64,10 @@ function p.processOpponent(_, opponent)
 	end
 
 	-- process opponent
-	if not Logic.isEmpty(opponent.template) then
-		opponent.name = opponent.name or opponentFunctions.getTeamName(opponent.template)
-		opponent.icon = opponent.icon or opponentFunctions.getIconName(opponent.template)
+	if not Logic.isEmpty(opponent.template) and
+		string.lower(opponent.template) == 'bye' then
+			opponent.name = 'BYE'
+			opponent.type = 'literal'
 	end
 
 	return opponent
@@ -133,13 +132,18 @@ function matchFunctions.getDateStuff(match)
 		local matchString = match.date or ""
 		local timezone = String.split(
 			String.split(matchString, "data%-tz%=\"")[2] or "",
-			"\"")[1] or ""
+			"\"")[1] or String.split(
+			String.split(matchString, "data%-tz%=\'")[2] or "",
+			"\'")[1] or ""
 		local matchDate = String.explode(matchString, "<", 0):gsub("-", "")
 		match.date = matchDate .. timezone
 		match.dateexact = String.contains(match.date, "%+") or String.contains(match.date, "%-")
 	else
-		match.date = lang:formatDate('c', (Variables.varDefault("tournament_date", "") or "") ..
-			" + " .. Variables.varDefault("num_missing_dates", "0") .. " second")
+		match.date = lang:formatDate(
+			'c',
+			(Variables.varDefault("tournament_date", "") or "")
+				.. " + " .. Variables.varDefault("num_missing_dates", "0") .. " second"
+		)
 		match.dateexact = false
 		Variables.varDefine("num_missing_dates", Variables.varDefault("num_missing_dates", 0) + 1)
 	end
@@ -279,6 +283,16 @@ function matchFunctions.getOpponents(args)
 			if type(opponent) == "string" then
 				opponent = Json.parse(opponent)
 			end
+
+			--retrieve name and icon for teams from team templates
+			if opponent.type == "team" and
+				not Logic.isEmpty(opponent.template, args.date) then
+					local name, icon, template = opponentFunctions.getTeamNameAndIcon(opponent.template, args.date)
+					opponent.template = template or opponent.template
+					opponent.name = opponent.name or name
+					opponent.icon = opponent.icon or icon
+			end
+
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = "S"
@@ -420,20 +434,24 @@ end
 --
 -- opponent related functions
 --
-function opponentFunctions.getTeamName(template)
-	if template ~= nil then
-		return Team.name(nil,template) -- TODO Needs to have date to get the correct teamtemplate
-	else
-		return nil
-	end
-end
+function opponentFunctions.getTeamNameAndIcon(template, date)
+	local team
+	local icon
+	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
+	template = (template or ''):lower():gsub('_', ' ')
+	if template ~= '' and template ~= 'noteam' and
+		mw.ext.TeamTemplate.teamexists(template) then
 
-function opponentFunctions.getIconName(template)
-	if template ~= nil then
-		return Team.iconFile(nil,template) -- TODO Needs to have date to get the correct teamtemplate
-	else
-		return nil
+		team = mw.ext.TeamTemplate.raw(template, date)
+		template = team.templateName
+		icon = team.image
+		if icon == '' then
+			icon = team.legacyimage
+		end
+		team = team.page
 	end
+
+	return team, icon, template
 end
 
 return p
