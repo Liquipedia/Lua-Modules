@@ -44,7 +44,6 @@ function LegacyPlayerCrossTable.playerCrossTableToMatch2(frame)
 						score = args[opp1 .. 'vs' .. opp2 .. 'resultvs'],
 					}
 					newArgs['M' .. counter] = LegacyPlayerCrossTable._getMatch2(
-						'1v1',
 						opp1data,
 						opp2data,
 						args[opp1 .. 'vs' .. opp2 .. 'details']
@@ -77,40 +76,32 @@ function LegacyPlayerCrossTable._getOppNumber(args)
 	return numberOfOpp
 end
 
-function LegacyPlayerCrossTable._getMatch2(modus, opp1data, opp2data, details)
+function LegacyPlayerCrossTable._getMatch2(opp1data, opp2data, details)
 	local match = {
 		opponent1 = json.stringify(opp1data),
 		opponent2 = json.stringify(opp2data),
 	}
 
-	match = LegacyPlayerCrossTable._processDetails(modus, match, details)
+	match = LegacyPlayerCrossTable._processDetails(match, details)
 
 	return LegacyPlayerCrossTable._handleLiteralsForOpponents(match)
 end
 
-function LegacyPlayerCrossTable._processDetails(modus, match, details)
+function LegacyPlayerCrossTable._processDetails(match, details)
 	details = json.parseIfString(details or '{}')
 	for index = 1, _MAX_NUMBER_OF_MAPS do
-		if modus == '1v1' then
-			match['map' .. index] = json.stringify({
-				map = details['map' .. index],
-				winner = details['map' .. index .. 'win'],
-				vod = details['vodgame' .. index],
-				race1 = details['map' .. index .. 'p1race'],
-				race2 = details['map' .. index .. 'p2race'],
-			})
-			details['map' .. index] = nil
-			details['map' .. index .. 'win'] = nil
-			details['vodgame' .. index] = nil
-			details['map' .. index .. 'p1race'] = nil
-			details['map' .. index .. 'p2race'] = nil
-		else
-		--here:needs adjusting for the team crosstable when the function is added
-			match['map' .. index] = json.stringify({
-				
-				
-			})
-		end
+		match['map' .. index] = json.stringify({
+			map = details['map' .. index],
+			winner = details['map' .. index .. 'win'],
+			vod = details['vodgame' .. index],
+			race1 = details['map' .. index .. 'p1race'],
+			race2 = details['map' .. index .. 'p2race'],
+		})
+		details['map' .. index] = nil
+		details['map' .. index .. 'win'] = nil
+		details['vodgame' .. index] = nil
+		details['map' .. index .. 'p1race'] = nil
+		details['map' .. index .. 'p2race'] = nil
 		if match['map' .. index] == '{}' then
 			break
 		end
@@ -137,7 +128,7 @@ function LegacyPlayerCrossTable._handleLiteralsForOpponents(match)
 			match['opponent' .. opponentIndex] = {
 				['type'] = 'literal',
 				template = 'tbd',
-				name = args['opponent' .. opponentIndex .. 'literal'],
+				name = match['opponent' .. opponentIndex .. 'literal'],
 			}
 		end
 	end
