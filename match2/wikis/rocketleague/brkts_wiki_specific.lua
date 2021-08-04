@@ -247,7 +247,10 @@ function matchFunctions.getOpponents(args)
 				not Logic.isEmpty(opponent.template, args.date) then
 					local name, icon, template = opponentFunctions.getTeamNameAndIcon(opponent.template, args.date)
 					opponent.template = template
-					opponent.name = opponent.name or name or opponentFunctions.getTeamName(opponent.template)
+					opponent.name = mw.ext.TeamLiquidIntegration.resolve_redirect(
+						opponent.name or name or
+						opponentFunctions.getTeamName(opponent.template)
+						or '')
 					opponent.icon = opponent.icon or icon or opponentFunctions.getIconName(opponent.template)
 			end
 
