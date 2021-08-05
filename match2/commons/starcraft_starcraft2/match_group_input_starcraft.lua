@@ -23,7 +23,7 @@ local MODES2 = {
 	['quad'] = '4',
 	['team'] = 'team',
 	['literal'] = 'literal',
-	}
+}
 
 --[[
 Module for converting input args of match group objects into LPDB records. This
