@@ -2,7 +2,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplates = require('Module:TeamTemplates')
 local Variables = require('Module:Variables')
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local json = require('Module:Json')
