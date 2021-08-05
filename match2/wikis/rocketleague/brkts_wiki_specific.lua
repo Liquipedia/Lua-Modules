@@ -463,53 +463,21 @@ end
 -- opponent related functions
 --
 function opponentFunctions.getTeamNameAndIcon(template, date)
-	local team
-	local icon
-	template = (template or ''):lower():gsub('_', ' ')
+	local icon, team
+	template = string.lower(template or ''):gsub('_', ' ')
 	if template ~= '' and template ~= 'noteam' and
 		mw.ext.TeamTemplate.teamexists(template) then
 
-		template = opponentFunctions.getTeamTemplateFromHistorical(template, date) or template
-
-		team = mw.ext.TeamTemplate.raw(template)
-		icon = team.image
+		local templateData = mw.ext.TeamTemplate.raw(template, date)
+		icon = templateData.image
 		if icon == '' then
-			icon = team.legacyimage
+			icon = templateData.legacyimage
 		end
-		team = team.page
+		team = templateData.page
+		template = templateData.templateName or template
 	end
 
 	return team, icon, template
-end
-
-function opponentFunctions.getTeamTemplateFromHistorical(input, date)
-	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
-
-	local historicals = mw.ext.TeamTemplate.raw_historical(input)
-	if type(historicals) ~= 'table' then
-		return input
-	end
-
-	local templates = {}
-	local count = 0
-
-	for key, item in pairs(historicals) do
-		count = count + 1
-		templates[count] = { date = key, template = item }
-	end
-
-	table.sort(templates, opponentFunctions.TeamTemplateSortCat)
-	templates[count + 1] = { date = '3999-99-99', template = '' }
-
-	for i = 1, count do
-		if date >= templates[i].date and date < templates[i+1].date then
-			return templates[i].template
-		end
-	end
-end
-
-function opponentFunctions.TeamTemplateSortCat(a,b)
-	return a.date < b.date
 end
 
 --the following 2 functions are a fallback
