@@ -2,7 +2,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplates = require('Module:TeamTemplates')
 local Variables = require('Module:Variables')
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local json = require('Module:Json')
@@ -24,7 +23,7 @@ local MODES2 = {
 	['quad'] = '4',
 	['team'] = 'team',
 	['literal'] = 'literal',
-	}
+}
 
 --[[
 Module for converting input args of match group objects into LPDB records. This
@@ -676,21 +675,6 @@ function StarCraftMatchGroupInput.getPlayers(teamName)
 	return players
 end
 
-function StarCraftMatchGroupInput.getTeamNameIcon(template)
-	local team
-	local icon
-	if template ~= nil and TeamTemplates._teamexists(template) then
-		team = mw.ext.TeamTemplate.raw(template)
-		icon = team.image
-		if icon == '' then
-			icon = team.legacyimage
-		end
-		team = team.page
-	end
-
-	return team, icon
-end
-
 function StarCraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 	local customTeam = Logic.readBool(opp.default) or Logic.readBool(opp.defaulticon) or Logic.readBool(opp.custom)
 	local name
@@ -713,8 +697,7 @@ function StarCraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 		if opp.template == '' then
 			opp.template = 'tbd'
 		end
-		opp.template = StarCraftMatchGroupInput.getTeamTemplate(opp.template, date)
-		name, icon = StarCraftMatchGroupInput.getTeamNameIcon(opp.template)
+		name, icon, opp.template = StarCraftMatchGroupInput.processTeamTemplateInput(opp.template, date)
 	end
 	name = mw.ext.TeamLiquidIntegration.resolve_redirect(name or '')
 	local players = StarCraftMatchGroupInput.getPlayers(name)
@@ -733,34 +716,22 @@ function StarCraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 	}
 end
 
-function StarCraftMatchGroupInput.getTeamTemplate(input, date)
-	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
+function StarCraftMatchGroupInput.processTeamTemplateInput(template, date)
+	local icon, name
+	template = string.lower(template or ''):gsub('_', ' ')
+	if template ~= '' and template ~= 'noteam' and
+		mw.ext.TeamTemplate.teamexists(template) then
 
-	local historicals = mw.ext.TeamTemplate.raw_historical(input)
-	if type(historicals) ~= 'table' then
-		return input
-	end
-
-	local templates = {}
-	local count = 0
-
-	for key, item in pairs(historicals) do
-		count = count + 1
-		templates[count] = { date = key, template = item }
-	end
-
-	table.sort(templates, StarCraftMatchGroupInput.TeamTemplateSortCat)
-	templates[count + 1] = { date = '3999-99-99', template = '' }
-
-	for i = 1, count do
-		if date >= templates[i].date and date < templates[i+1].date then
-			return templates[i].template
+		local templateData = mw.ext.TeamTemplate.raw(template, date)
+		icon = templateData.image
+		if icon == '' then
+			icon = templateData.legacyimage
 		end
+		name = templateData.page
+		template = templateData.templateName or template
 	end
-end
 
-function StarCraftMatchGroupInput.TeamTemplateSortCat(a,b)
-	return a.date < b.date
+	return name, icon, template
 end
 
 --[[
