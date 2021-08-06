@@ -474,7 +474,7 @@ function opponentFunctions.getTeamNameAndIcon(template, date)
 			icon = templateData.legacyimage
 		end
 		team = templateData.page
-		template = templateData.templateName or template
+		template = templateData.templatename or template
 	end
 
 	return team, icon, template

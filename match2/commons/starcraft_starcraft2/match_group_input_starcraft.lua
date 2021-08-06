@@ -728,7 +728,7 @@ function StarCraftMatchGroupInput.processTeamTemplateInput(template, date)
 			icon = templateData.legacyimage
 		end
 		name = templateData.page
-		template = templateData.templateName or template
+		template = templateData.templatename or template
 	end
 
 	return name, icon, template
