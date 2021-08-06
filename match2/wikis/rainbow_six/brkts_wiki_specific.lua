@@ -1,5 +1,4 @@
 -- TODO: Add more matchs resulttype and walkover
--- TODO: Add more maps resulttype and walkover
 -- TODO: Add Best of X handling for upcoming/ongoing matches
 -- TODO: Add automatic match score generation based on map winners
 
@@ -120,6 +119,36 @@ function p.placementCheckDraw(table)
 	end
 
 	return true
+end
+
+-- Check if any team has a none-standard status
+function p.placementCheckSpecialStatus(table)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
+end
+
+-- function to check for forfiets
+function p.placementCheckFF(table)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
+end
+
+-- function to check for DQ's
+function p.placementCheckDQ(table)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
+end
+
+-- function to check for W/L
+function p.placementCheckWL(table)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'L' end)
+end
+
+-- Get the winner when resulttype=default
+function p.getDefaultWinner(table)
+	for index, scoreInfo in pairs(table) do
+		if scoreInfo.status == 'W' then
+			return index
+		end
+	end
+	return -1
 end
 
 --
@@ -401,19 +430,39 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
+	map = mapFunctions.getResultTypeAndWinner(indexedScores)
+
+	return map
+end
+
+function mapFunctions.getResultTypeAndWinner(map, indexedScores)
 	if map.finished == 'skip' or map.finished == 'np' then
 		map.resulttype = 'np'
 	elseif Logic.readBool(map.finished) then
 		if p.placementCheckDraw(indexedScores) then
 			map.winner = 0
 			map.resulttype = 'draw'
-		else
-			-- luacheck: push ignore
-			for scoreIndex, _ in Table.iter.spairs(indexedScores, p.placementSortFunction) do
-				map.winner = scoreIndex
-				break
+		elseif p.placementCheckSpecialStatus(indexedScores) then
+			map.winner = p.getDefaultWinner(indexedScores)
+			map.resulttype = 'default'
+
+			if p.placementCheckFF(indexedScores) then
+				map.walkover = 'ff'
+			elseif p.placementCheckDQ(indexedScores) then
+				map.walkover = 'dq'
+			elseif p.placementCheckWL(indexedScores) then
+				map.walkover = 'l'
 			end
-			-- luacheck: pop
+		else
+			--R6 only has exactly 2 opponents, neither more or less
+			if #indexedScores ~= 2 then
+				error('Unexpected number of opponents when calculating map winner')
+			end
+			if indexedScores[1] > indexedScores[2] then
+				map.winner = 1
+			else
+				map.winner = 2
+			end
 		end
 	end
 	return map
