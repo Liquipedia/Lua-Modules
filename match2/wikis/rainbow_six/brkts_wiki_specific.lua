@@ -485,20 +485,19 @@ end
 -- opponent related functions
 --
 function opponentFunctions.getTeamNameAndIcon(template, date)
-	local team
-	local icon
+	local team, icon
 	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
 	template = (template or ''):lower():gsub('_', ' ')
 	if template ~= '' and template ~= 'noteam' and
 		mw.ext.TeamTemplate.teamexists(template) then
 
-		team = mw.ext.TeamTemplate.raw(template, date)
-		template = team.templatename
-		icon = team.image
+		local templateData = mw.ext.TeamTemplate.raw(template, date)
+		icon = templateData.image
 		if icon == '' then
-			icon = team.legacyimage
+			icon = templateData.legacyimage
 		end
-		team = team.page
+		team = templateData.page
+		template = templateData.templatename or template
 	end
 
 	return team, icon, template
