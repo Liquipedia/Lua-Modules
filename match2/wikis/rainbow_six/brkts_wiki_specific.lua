@@ -493,7 +493,7 @@ function opponentFunctions.getTeamNameAndIcon(template, date)
 		mw.ext.TeamTemplate.teamexists(template) then
 
 		team = mw.ext.TeamTemplate.raw(template, date)
-		template = team.templateName
+		template = team.templatename
 		icon = team.image
 		if icon == '' then
 			icon = team.legacyimage
