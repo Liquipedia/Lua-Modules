@@ -1,5 +1,3 @@
--- TODO: Add more matchs resulttype and walkover
-
 local Table = require("Module:Table")
 local WikiSpecificBase = require('Module:Brkts/WikiSpecific/Base')
 local Json = require("Module:Json")
@@ -121,6 +119,62 @@ function p.placementCheckDraw(table)
 
 	return true
 end
+
+function p.setPlacement(opponents, winner, placementwinner, placementLoser)
+	if opponents and #opponents == 2 then
+		local loser
+		if winner == 1 then
+			loser = 2
+		elseif winner == 2 then
+			loser = 1
+		elseif winner == 0 then
+			winner = 1
+			loser = 2
+		else
+			error('setPlacement: Unexpected winner')
+			return opponents
+		end
+		opponents[winner].placement = placementwinner
+		opponents[loser].placement = placementLoser
+	end
+	return opponents
+end
+
+function p.getResultTypeAndWinner(data, indexedScores)
+	if data.finished == 'skip' or data.finished == 'np' or data.finished == 'cancelled' or data.finished == 'canceled' then
+		data.resulttype = 'np'
+	elseif Logic.readBool(data.finished) then
+		if p.placementCheckDraw(indexedScores) then
+			data.winner = 0
+			data.resulttype = 'draw'
+			indexedScores = p.setPlacement(indexedScores, data.winner, 1, 1)
+		elseif p.placementCheckSpecialStatus(indexedScores) then
+			data.winner = p.getDefaultWinner(indexedScores)
+			data.resulttype = 'default'
+			if p.placementCheckFF(indexedScores) then
+				data.walkover = 'ff'
+			elseif p.placementCheckDQ(indexedScores) then
+				data.walkover = 'dq'
+			elseif p.placementCheckWL(indexedScores) then
+				data.walkover = 'l'
+			end
+			indexedScores = p.setPlacement(indexedScores, data.winner, 1, 2)
+		else
+			--R6 only has exactly 2 opponents, neither more or less
+			if #indexedScores ~= 2 then
+				error('Unexpected number of opponents when calculating map winner')
+			end
+			if indexedScores[1].score > indexedScores[2].score then
+				data.winner = 1
+			else
+				data.winner = 2
+			end
+			indexedScores = p.setPlacement(indexedScores, data.winner, 1, 2)
+		end
+	end
+	return data, indexedScores
+end
+
 
 -- Check if any team has a none-standard status
 function p.placementCheckSpecialStatus(table)
@@ -404,14 +458,9 @@ function matchFunctions.getOpponents(args)
 
 	-- apply placements and winner if finshed
 	if Logic.readBool(args.finished) then
-		local placement = 1
-		for opponentIndex, opponent in Table.iter.spairs(opponents, p.placementSortFunction) do
-			if placement == 1 then
-				args.winner = opponentIndex
-			end
-			opponent.placement = placement
+		args, opponents = p.getResultTypeAndWinner(args, opponents)
+		for opponentIndex, opponent in pairs(opponents) do
 			args["opponent" .. opponentIndex] = opponent
-			placement = placement + 1
 		end
 	-- only apply arg changes otherwise
 	else
@@ -490,41 +539,8 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
-	map = mapFunctions.getResultTypeAndWinner(map, indexedScores)
+	map = p.getResultTypeAndWinner(map, indexedScores)
 
-	return map
-end
-
-function mapFunctions.getResultTypeAndWinner(map, indexedScores)
-	if map.finished == 'skip' or map.finished == 'np' then
-		map.resulttype = 'np'
-	elseif Logic.readBool(map.finished) then
-		if p.placementCheckDraw(indexedScores) then
-			map.winner = 0
-			map.resulttype = 'draw'
-		elseif p.placementCheckSpecialStatus(indexedScores) then
-			map.winner = p.getDefaultWinner(indexedScores)
-			map.resulttype = 'default'
-
-			if p.placementCheckFF(indexedScores) then
-				map.walkover = 'ff'
-			elseif p.placementCheckDQ(indexedScores) then
-				map.walkover = 'dq'
-			elseif p.placementCheckWL(indexedScores) then
-				map.walkover = 'l'
-			end
-		else
-			--R6 only has exactly 2 opponents, neither more or less
-			if #indexedScores ~= 2 then
-				error('Unexpected number of opponents when calculating map winner')
-			end
-			if indexedScores[1].score > indexedScores[2].score then
-				map.winner = 1
-			else
-				map.winner = 2
-			end
-		end
-	end
 	return map
 end
 
