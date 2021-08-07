@@ -1,5 +1,4 @@
 -- TODO: Add more matchs resulttype and walkover
--- TODO: Add Best of X handling for upcoming/ongoing matches
 -- TODO: Add automatic match score generation based on map winners
 
 local Table = require("Module:Table")
@@ -15,6 +14,7 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 9
 local MAX_NUM_MAPS = 9
+local DUMMY_MAP_NAME = "null"
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -28,14 +28,24 @@ function p.processMatch(_, match)
 	if type(match) == "string" then
 		match = Json.parse(match)
 	end
-	mw.logObject(match)
+
+	-- Count number of maps, and check for empty maps to discard
+	local mapCount = 0
+	for i = 1, MAX_NUM_MAPS do
+		if match["map"..i] then
+			if mapFunctions.discardMap(match["map"..i]) then
+				match["map"..i] = nil
+			end
+			mapCount = mapCount + 1
+		end
+	end
+	match.bestof = mapCount
 
 	-- process match
 	match = matchFunctions.getDateStuff(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
-	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getExtraData(match)
 
 	return match
@@ -43,7 +53,6 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processMap(_, map)
-	mw.logObject(map)
 	if type(map) == "string" then
 		map = Json.parse(map)
 	end
@@ -245,22 +254,6 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
--- TODO: Needs improvment when it comes to upcoming games
-function matchFunctions.getBestOf(match)
-	local counter = 0
-	for i = 1, MAX_NUM_MAPS do
-		if match["map"..i] then
-			counter = counter +1
-		else
-			break
-		end
-	end
-	if counter > 0 then
-		match.bestof = counter
-	end
-	return match
-end
-
 function matchFunctions.getMapVeto(match)
 	if not match.mapveto then return nil end
 
@@ -390,6 +383,14 @@ end
 --
 -- map related functions
 --
+function mapFunctions.discardMap(map)
+	if map.map == DUMMY_MAP_NAME then
+		return true
+	else
+		return false
+	end
+end
+
 function mapFunctions.getExtraData(map)
 	map.extradata = Json.stringify{
 		comment = map.comment,
@@ -430,7 +431,7 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
-	map = mapFunctions.getResultTypeAndWinner(indexedScores)
+	map = mapFunctions.getResultTypeAndWinner(map, indexedScores)
 
 	return map
 end
@@ -458,7 +459,7 @@ function mapFunctions.getResultTypeAndWinner(map, indexedScores)
 			if #indexedScores ~= 2 then
 				error('Unexpected number of opponents when calculating map winner')
 			end
-			if indexedScores[1] > indexedScores[2] then
+			if indexedScores[1].score > indexedScores[2].score then
 				map.winner = 1
 			else
 				map.winner = 2
