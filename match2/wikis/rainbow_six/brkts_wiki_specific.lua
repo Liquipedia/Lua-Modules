@@ -1,5 +1,4 @@
 -- TODO: Add more matchs resulttype and walkover
--- TODO: Add automatic match score generation based on map winners
 
 local Table = require("Module:Table")
 local WikiSpecificBase = require('Module:Brkts/WikiSpecific/Base')
@@ -29,17 +28,10 @@ function p.processMatch(_, match)
 		match = Json.parse(match)
 	end
 
-	-- Count number of maps, and check for empty maps to discard
-	local mapCount = 0
-	for i = 1, MAX_NUM_MAPS do
-		if match["map"..i] then
-			if mapFunctions.discardMap(match["map"..i]) then
-				match["map"..i] = nil
-			end
-			mapCount = mapCount + 1
-		end
-	end
-	match.bestof = mapCount
+	-- Count number of maps, check for empty maps to remove, and automatically count score
+	match = matchFunctions.getBestOf(match)
+	match = matchFunctions.removeUnsetMaps(match)
+	match = matchFunctions.getScoreFromMapWinners(match)
 
 	-- process match
 	match = matchFunctions.getDateStuff(match)
@@ -160,9 +152,76 @@ function p.getDefaultWinner(table)
 	return -1
 end
 
+-- Parse, if needed, and returns an input
+function p.parseField(value)
+	if type(value) == "string" then
+		return Json.parse(value)
+	end
+	return value
+end
+
 --
 -- match related functions
 --
+function matchFunctions.getBestOf(match)
+	local mapCount = 0
+	for i = 1, MAX_NUM_MAPS do
+		if match["map"..i] then
+			mapCount = mapCount + 1
+		else
+			break
+		end
+	end
+	match.bestof = mapCount
+	return match
+end
+
+function matchFunctions.removeUnsetMaps(match)
+	for i = 1, MAX_NUM_MAPS do
+		if match["map"..i] then
+			if mapFunctions.discardMap(match["map"..i]) then
+				match["map"..i] = nil
+			end
+		else
+			break
+		end
+	end
+	return match
+end
+
+function matchFunctions.getScoreFromMapWinners(match)
+	-- For best of 1, display the results of the single map
+	local opponent1 = p.parseField(match.opponent1)
+	local opponent2 = p.parseField(match.opponent2)
+	local newScores = {}
+	if match.bestof == 1 then
+		if match.map1 then
+			newScores = match.map1.scores
+		end
+	else -- For best of >1, disply the map wins
+		for i = 1, MAX_NUM_MAPS do
+			if match["map"..i] then
+				local winner = match["map"..i].winner
+				-- Only two opponents in R6
+				if winner and winner > 0 and winner <= 2 then
+					newScores[winner] = (newScores[winner] or 0) + 1
+				end
+			else
+				break
+			end
+		end
+	end
+	if not opponent1.score and #newScores > 0 then
+		opponent1.score = newScores[1]
+	end
+	if not opponent2.score and #newScores > 0 then
+		opponent2.score = newScores[2]
+	end
+	match.opponent1 = opponent1
+	match.opponent2 = opponent2
+	return match
+end
+
 function matchFunctions.getDateStuff(match)
 	local lang = mw.getContentLanguage()
 	-- parse date string with abbr
