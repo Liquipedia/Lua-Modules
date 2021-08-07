@@ -11,7 +11,7 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 9
 local MAX_NUM_MAPS = 9
-local DUMMY_MAP_NAME = "null"
+local DUMMY_MAP_NAME = "null" -- Is set in Template:Map when |map= is empty.
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -81,28 +81,6 @@ end
 
 --
 --
--- function to sort out winner/placements
-function p.placementSortFunction(table, key1, key2)
-	local op1 = table[key1]
-	local op2 = table[key2]
-	local op1norm = op1.status == "S"
-	local op2norm = op2.status == "S"
-	if op1norm then
-		if op2norm then
-			return tonumber(op1.score) > tonumber(op2.score)
-		else return true end
-	else
-		if op2norm then return false
-		elseif op1.status == "W" then return true
-		elseif op1.status == "DQ" then return false
-		elseif op2.status == "W" then return false
-		elseif op2.status == "DQ" then return true
-		else return true end
-	end
-end
-
---
---
 -- function to check for draws
 function p.placementCheckDraw(table)
 	local last
@@ -120,22 +98,22 @@ function p.placementCheckDraw(table)
 	return true
 end
 
-function p.setPlacement(opponents, winner, placementwinner, placementLoser)
+function p.setPlacement(opponents, winnerIdx, placementwinner, placementLoser)
 	if opponents and #opponents == 2 then
-		local loser
-		if winner == 1 then
-			loser = 2
-		elseif winner == 2 then
-			loser = 1
-		elseif winner == 0 then
-			winner = 1
-			loser = 2
+		local loserIdx
+		if winnerIdx == 1 then
+			loserIdx = 2
+		elseif winnerIdx == 2 then
+			loserIdx = 1
+		elseif winnerIdx == 0 then
+			winnerIdx = 1
+			loserIdx = 2
 		else
 			error('setPlacement: Unexpected winner')
 			return opponents
 		end
-		opponents[winner].placement = placementwinner
-		opponents[loser].placement = placementLoser
+		opponents[winnerIdx].placement = placementwinner
+		opponents[loserIdx].placement = placementLoser
 	end
 	return opponents
 end
@@ -407,13 +385,13 @@ function matchFunctions.getMVP(match)
 	return {players=players, points=mvppoints}
 end
 
-function matchFunctions.getOpponents(args)
+function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
-		local opponent = args["opponent" .. opponentIndex]
+		local opponent = match["opponent" .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
 			if type(opponent) == "string" then
 				opponent = Json.parse(opponent)
@@ -421,8 +399,8 @@ function matchFunctions.getOpponents(args)
 
 			--retrieve name and icon for teams from team templates
 			if opponent.type == "team" and
-				not Logic.isEmpty(opponent.template, args.date) then
-					local name, icon, template = opponentFunctions.getTeamNameAndIcon(opponent.template, args.date)
+				not Logic.isEmpty(opponent.template, match.date) then
+					local name, icon, template = opponentFunctions.getTeamNameAndIcon(opponent.template, match.date)
 					opponent.template = template or opponent.template
 					opponent.name = opponent.name or name
 					opponent.icon = opponent.icon or icon
@@ -440,35 +418,32 @@ function matchFunctions.getOpponents(args)
 
 			-- get players from vars for teams
 			if opponent.type == "team" and not Logic.isEmpty(opponent.name) then
-				args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
+				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
 			end
 		end
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(args.finished) then
+	if isScoreSet and not Logic.readBool(match.finished) then
 		local currentUnixTime = os.time(os.date("!*t"))
 		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
-		local threshold = args.dateexact and 30800 or 86400
+		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
+		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then
-			args.finished = true
+			match.finished = true
 		end
 	end
 
 	-- apply placements and winner if finshed
-	if Logic.readBool(args.finished) then
-		args, opponents = p.getResultTypeAndWinner(args, opponents)
-		for opponentIndex, opponent in pairs(opponents) do
-			args["opponent" .. opponentIndex] = opponent
-		end
-	-- only apply arg changes otherwise
-	else
-		for opponentIndex, opponent in pairs(opponents) do
-			args["opponent" .. opponentIndex] = opponent
-		end
+	if Logic.readBool(match.finished) then
+		match, opponents = p.getResultTypeAndWinner(match, opponents)
 	end
-	return args
+
+	-- Update all opponents with new values
+	for opponentIndex, opponent in pairs(opponents) do
+		match["opponent" .. opponentIndex] = opponent
+	end
+	return match
 end
 
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
@@ -545,7 +520,7 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault("tournament_mode", "3v3"))
+	map.mode = Logic.emptyOr(map.mode, Variables.varDefault("tournament_mode", "team"))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault("tournament_type"))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault("tournament_name"))
 	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault("tournament_ticker_name"))
