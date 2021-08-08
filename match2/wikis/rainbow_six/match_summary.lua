@@ -222,9 +222,9 @@ function MapVeto:addDecider(map)
 	end
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
-	self:addColumnVetoType(row, 'bg-stay', 'DECIDER')
+	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
 	self:addColumnVetoMap(row, map)
-	self:addColumnVetoType(row, 'bg-stay', 'DECIDER')
+	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
 
 	self.table:node(row)
 	return self
@@ -245,13 +245,13 @@ function MapVeto:addRound(vetotype, map1, map2)
 	local vetoText = ''
 	if vetotype == 'ban' then
 		vetoText = 'BAN'
-		class = 'bg-down'
+		class = 'brkts-popup-mapveto-ban'
 	elseif vetotype == 'pick' then
 		vetoText = 'PICK'
-		class = 'bg-up'
+		class = 'brkts-popup-mapveto-pick'
 	elseif vetotype == 'defaultban' then
 		vetoText = 'DEFAULT BAN'
-		class = 'bg-lightblue'
+		class = 'brkts-popup-mapveto-defaultban'
 	end
 
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
