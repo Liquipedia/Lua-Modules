@@ -189,17 +189,14 @@ local MapVeto = Class.new(
 		self.root = mw.html.create('div'):addClass('bracket-popup-body-match'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
-			:css('width', '100%'):css('margin-top', '-2px')
-			:css('margin-bottom','-2px'):css('border-top','1px solid #DDD')
 		self:createHeader()
 	end
 )
 
 function MapVeto:createHeader()
-	self.table:tag('tr'):css('background-color','#EEE'):css('color','#000'):css('height','10px')
+	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
-		:tag('th'):css('width','34%'):css('padding','5px'):css('font-size','11px')
-		:css('text-align','center'):wikitext('Map Veto'):done()
+		:tag('th'):css('width','34%'):wikitext('Map Veto'):done()
 		:tag('th'):css('width','33%'):done()
 	return self
 end
@@ -215,10 +212,9 @@ function MapVeto:vetoStart(firstVeto)
 		textCenter = _ARROW_RIGHT
 		textRight = '\'\'\'Start Map Veto\'\'\''
 	else return self end
-	self.table:tag('tr'):css('border-bottom','5px solid #DDD'):css('background-color','#f5f5f5')
-		:css('height','10px'):css('font-size','11px'):css('text-align','center')
+	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
 		:tag('th'):wikitext(textLeft or ''):done()
-		:tag('th'):css('padding', '5px'):wikitext(textCenter):done()
+		:tag('th'):wikitext(textCenter):done()
 		:tag('th'):wikitext(textRight or ''):done()
 	return self
 end
@@ -229,8 +225,7 @@ function MapVeto:addDecider(map)
 	else
 		map = '[['..map..'/siege|'..map..']]'
 	end
-	local row = mw.html.create('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
-		:css('height','10px'):css('font-size','11px'):css('text-align','center'):done()
+	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
 	self:addColumnVetoType(row, 'bg-stay', 'DECIDER')
 	self:addColumnVetoMap(row, map)
@@ -264,8 +259,7 @@ function MapVeto:addRound(vetotype, map1, map2)
 		class = 'bg-lightblue'
 	end
 
-	local row = mw.html.create('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
-		:css('height','10px'):css('font-size','11px'):css('text-align','center'):done()
+	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
 	self:addColumnVetoMap(row, map1)
 	self:addColumnVetoType(row, class, vetoText)
@@ -279,16 +273,13 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
 			:addClass(styleClass)
-			:css('font-weight','bold')
-			:css('color','#000'):css('border','none')
-			:css('border-radius','0px'):css('letter-spacing','0.1em')
-			:css('font-family','\'Source Code Pro\',monospace')
+			:addClass('brkts-popup-mapveto-vetotype')
 			:wikitext(vetoText)
 	return self
 end
 
 function MapVeto:addColumnVetoMap(row,map)
-	row:tag('td'):css('padding', '5px'):wikitext(map):done()
+	row:tag('td'):wikitext(map):done()
 	return self
 end
 
@@ -298,8 +289,7 @@ end
 
 local MVP = Class.new(
 	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-comment'):css('font-size','87%')
-			:css('font-weight','bold'):css('line-height','1.5em'):css('background', '#eee8aa')
+		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
 		self.players = {}
 		self.points = nil
 	end
