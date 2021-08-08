@@ -1,5 +1,4 @@
 local Class = require('Module:Class')
-local Color = mw.loadData('Module:Color')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Json = require("Module:Json")
 local Logic = require("Module:Logic")
@@ -221,14 +220,14 @@ function MapVeto:addDecider(map)
 	self.table:tag('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
 			:css('height','10px'):css('font-size','11px')
 		:tag('td'):css('text-align','center'):css('font-weight','bold')
-			:tag('span'):css('color','#000'):css('background-color',Color['stay']):css('border','none')
+			:tag('span'):css('color','#000'):addClass('bg-stay'):css('border','none')
 				:css('border-radius','0px'):css('letter-spacing','0.1em')
 				:css('font-family','\'Source Code Pro\',monospace')
 				:wikitext('DECIDER'):done()
 			:done()
 		:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map):done()
 		:tag('td'):css('text-align','center'):css('font-weight','bold')
-			:tag('span'):css('color','#000'):css('background-color',Color['stay']):css('border','none')
+			:tag('span'):css('color','#000'):addClass('bg-stay'):css('border','none')
 				:css('border-radius','0px'):css('letter-spacing','0.1em')
 				:css('font-family','\'Source Code Pro\',monospace')
 				:wikitext('DECIDER'):done()
@@ -247,24 +246,24 @@ function MapVeto:addRound(vetotype, map1, map2)
 	else
 		map2 = '[['..map2..'/siege|'..map2..']]'
 	end
-	local background = ''
+	local class = ''
 	local vetoName = ''
 	if vetotype == 'ban' then
 		vetoName = 'BAN'
-		background = Color['down']
+		class = 'bg-down'
 	elseif vetotype == 'pick' then
 		vetoName = 'PICK'
-		background = Color['up']
+		class = 'bg-up'
 	elseif vetotype == 'defaultban' then
 		vetoName = 'DEFAULT BAN'
-		background = Color['dq']
+		class = 'bg-lightblue'
 	end
 
 	self.table:tag('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
 			:css('height','10px'):css('font-size','11px')
 		:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map1):done()
 		:tag('td'):css('text-align','center'):css('font-weight','bold')
-			:tag('span'):css('color','#000'):css('background-color',background):css('border','none')
+			:tag('span'):css('color','#000'):addClass(class):css('border','none')
 				:css('border-radius','0px'):css('letter-spacing','0.1em')
 				:css('font-family','\'Source Code Pro\',monospace')
 				:wikitext(vetoName):done()
