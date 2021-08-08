@@ -22,9 +22,7 @@ local p = Table.copy(WikiSpecificBase)
 
 -- called from Module:MatchGroup
 function p.processMatch(_, match)
-	if type(match) == "string" then
-		match = Json.parse(match)
-	end
+	match = Json.parseIfString(match)
 
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
@@ -43,9 +41,7 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processMap(_, map)
-	if type(map) == "string" then
-		map = Json.parse(map)
-	end
+	map = Json.parseIfString(map)
 
 	-- process map
 	map = mapFunctions.getExtraData(map)
@@ -57,9 +53,7 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processOpponent(_, opponent)
-	if type(opponent) == "string" then
-		opponent = Json.parse(opponent)
-	end
+	opponent = Json.parseIfString(opponent)
 
 	-- check for lazy bye's and convert them to literals
 	if type(opponent) == "table" and string.lower(opponent.template or '') == 'bye' then
@@ -72,9 +66,7 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processPlayer(_, player)
-	if type(player) == "string" then
-		player = Json.parse(player)
-	end
+	player = Json.parseIfString(player)
 	return player
 end
 
@@ -189,14 +181,6 @@ function p.getDefaultWinner(table)
 	return -1
 end
 
--- Parse, if needed, and returns an input
-function p.parseField(value)
-	if type(value) == "string" then
-		return Json.parse(value)
-	end
-	return value
-end
-
 --
 -- match related functions
 --
@@ -228,8 +212,8 @@ end
 
 function matchFunctions.getScoreFromMapWinners(match)
 	-- For best of 1, display the results of the single map
-	local opponent1 = p.parseField(match.opponent1)
-	local opponent2 = p.parseField(match.opponent2)
+	local opponent1 = Json.parseIfString(match.opponent1)
+	local opponent2 = Json.parseIfString(match.opponent2)
 	local newScores = {}
 	if match.bestof == 1 then
 		if match.map1 then
@@ -328,9 +312,7 @@ function matchFunctions.getVodStuff(match)
 		local vodgame = match["vodgame" .. index]
 		if not Logic.isEmpty(vodgame) then
 			local map = Logic.emptyOr(match["map" .. index], nil, {})
-			if type(map) == "string" then
-				map = Json.parse(map)
-			end
+			map = Json.parseIfString(map)
 			map.vod = map.vod or vodgame
 			match["map" .. index] = map
 		end
@@ -353,7 +335,7 @@ end
 function matchFunctions.getMapVeto(match)
 	if not match.mapveto then return nil end
 
-	match.mapveto = Json.parse(match.mapveto)
+	match.mapveto = Json.parseIfString(match.mapveto)
 
 	local vetotypes = mw.text.split(match.mapveto.types or '', ',')
 	local deciders = mw.text.split(match.mapveto.decider or '', ',')
@@ -398,9 +380,7 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match["opponent" .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			if type(opponent) == "string" then
-				opponent = Json.parse(opponent)
-			end
+			opponent = Json.parseIfString(opponent)
 
 			--retrieve name and icon for teams from team templates
 			if opponent.type == "team" and
@@ -455,9 +435,7 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = match["opponent" .. opponentIndex .. "_p" .. playerIndex] or {}
-		if type(player) == "string" then
-			player = Json.parse(player)
-		end
+		player = Json.parseIfString(player)
 		player.name = player.name or Variables.varDefault(teamName .. "_p" .. playerIndex)
 		player.flag = player.flag or Variables.varDefault(teamName .. "_p" .. playerIndex .. "flag")
 		player.displayname = player.displayname or Variables.varDefault(teamName .. "_p" .. playerIndex .. "dn")
