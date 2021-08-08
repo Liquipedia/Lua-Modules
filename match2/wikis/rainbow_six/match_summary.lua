@@ -1,7 +1,7 @@
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Json = require("Module:Json")
-local Logic = require("Module:Logic")
+local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local MatchSummary = require('Module:MatchSummary/Base')
 local OperatorIcon = require('Module:OperatorIcon')
@@ -32,7 +32,7 @@ local _LINK_DATA = {
 
 local OperatorBans = Class.new(
 	function(self)
-		self.root = mw.html.create('table'):css('margin-top', '-4px')
+		self.root = mw.html.create('table'):css('margin-top', '-4px'):css('overflow', 'hidden')
 		self.text = ''
 	end
 )
@@ -186,7 +186,7 @@ end
 
 local MapVeto = Class.new(
 	function(self)
-		self.root = mw.html.create('div'):addClass('bracket-popup-body-match')
+		self.root = mw.html.create('div'):addClass('bracket-popup-body-match'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
 			:css('width', '100%'):css('margin-top', '-2px')
@@ -209,17 +209,17 @@ function MapVeto:vetoStart(firstVeto)
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
-		textLeft = "'''Start Map Veto'''"
+		textLeft = '\'\'\'Start Map Veto\'\'\''
 		textCenter = _ARROW_LEFT
 	elseif firstVeto == 2 then
 		textCenter = _ARROW_RIGHT
-		textRight = "'''Start Map Veto'''"
+		textRight = '\'\'\'Start Map Veto\'\'\''
 	else return self end
 	self.table:tag('tr'):css('border-bottom','5px solid #DDD'):css('background-color','#f5f5f5')
-		:css('height','10px'):css('font-size','11px')
-		:tag('th'):css('text-align','center'):css('padding','5px'):wikitext(textLeft or ''):done()
-		:tag('th'):css('text-align','center'):css('padding','5px'):wikitext(textCenter):done()
-		:tag('th'):css('text-align','center'):wikitext(textRight or ''):done()
+		:css('height','10px'):css('font-size','11px'):css('text-align','center')
+		:tag('th'):wikitext(textLeft or ''):done()
+		:tag('th'):css('padding', '5px'):wikitext(textCenter):done()
+		:tag('th'):wikitext(textRight or ''):done()
 	return self
 end
 
@@ -230,7 +230,7 @@ function MapVeto:addDecider(map)
 		map = '[['..map..'/siege|'..map..']]'
 	end
 	local row = mw.html.create('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
-		:css('height','10px'):css('font-size','11px'):done()
+		:css('height','10px'):css('font-size','11px'):css('text-align','center'):done()
 
 	self:addColumnVetoType(row, 'bg-stay', 'DECIDER')
 	self:addColumnVetoMap(row, map)
@@ -265,7 +265,7 @@ function MapVeto:addRound(vetotype, map1, map2)
 	end
 
 	local row = mw.html.create('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
-		:css('height','10px'):css('font-size','11px'):done()
+		:css('height','10px'):css('font-size','11px'):css('text-align','center'):done()
 
 	self:addColumnVetoMap(row, map1)
 	self:addColumnVetoType(row, class, vetoText)
@@ -276,8 +276,11 @@ function MapVeto:addRound(vetotype, map1, map2)
 end
 
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
-	row:tag('td'):css('text-align','center'):css('font-weight','bold')
-		:tag('span'):css('color','#000'):addClass(styleClass):css('border','none')
+	row:tag('td')
+		:tag('span')
+			:addClass(styleClass)
+			:css('font-weight','bold')
+			:css('color','#000'):css('border','none')
 			:css('border-radius','0px'):css('letter-spacing','0.1em')
 			:css('font-family','\'Source Code Pro\',monospace')
 			:wikitext(vetoText)
@@ -285,7 +288,7 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 end
 
 function MapVeto:addColumnVetoMap(row,map)
-	row:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map):done()
+	row:tag('td'):css('padding', '5px'):wikitext(map):done()
 	return self
 end
 
@@ -295,8 +298,8 @@ end
 
 local MVP = Class.new(
 	function(self)
-		self.root = mw.html.create('div'):addClass('bracket-popup-body-mvp'):css('font-size','87%')
-			:css('font-weight','bold'):css('line-height','1.5em')
+		self.root = mw.html.create('div'):addClass('brkts-popup-comment'):css('font-size','87%')
+			:css('font-weight','bold'):css('line-height','1.5em'):css('background', '#eee8aa')
 		self.players = {}
 		self.points = nil
 	end
@@ -317,15 +320,17 @@ function MVP:setPoints(points)
 end
 
 function MVP:create()
+	local span = mw.html.create('span')
 	for index, player in ipairs(self.players) do
 		if index > 1 then
-			self.root:wikitext(', ')
+			span:wikitext(', ')
 		end
-		self.root:wikitext('[['..player..']]')
+		span:wikitext('[['..player..']]')
 	end
 	if self.points and self.points ~= 1 then
-		self.root:wikitext(' ('.. self.points ..'pts)')
+		span:wikitext(' ('.. self.points ..'pts)')
 	end
+	self.root:node(span)
 	return self.root
 end
 
@@ -338,13 +343,11 @@ function CustomMatchSummary.getByMatchId(args)
 	local frame = mw.getCurrentFrame()
 
 	local matchSummary = MatchSummary():init('330px')
-	matchSummary:header(CustomMatchSummary._createHeader(frame, match))
-				:body(CustomMatchSummary._createBody(frame, match))
+	matchSummary:header(CustomMatchSummary._createHeader(match))
+				:body(CustomMatchSummary._createBody(match))
 
 	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		comment.root:css('justify-content','center')
-		matchSummary:comment(comment)
+		matchSummary:comment(MatchSummary.Comment():content(mw.html.create('span'):wikitext(match.comment)))
 	end
 
 	local vods = {}
@@ -384,7 +387,7 @@ function CustomMatchSummary.getByMatchId(args)
 	return matchSummary:create()
 end
 
-function CustomMatchSummary._createHeader(frame, match)
+function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 	header  :left(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
 			:right(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
@@ -392,7 +395,7 @@ function CustomMatchSummary._createHeader(frame, match)
 	return header
 end
 
-function CustomMatchSummary._createBody(frame, match)
+function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
 	body:addRow(MatchSummary.Row():addElement(
@@ -408,7 +411,7 @@ function CustomMatchSummary._createBody(frame, match)
 	-- Iterate each map
 	for _, game in ipairs(match.games) do
 		if game.map then
-			body:addRow(CustomMatchSummary._createMap(frame, game))
+			body:addRow(CustomMatchSummary._createMap(game))
 		end
 	end
 
@@ -451,7 +454,7 @@ function CustomMatchSummary._createBody(frame, match)
 	return body
 end
 
-function CustomMatchSummary._createMap(frame, game)
+function CustomMatchSummary._createMap(game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
