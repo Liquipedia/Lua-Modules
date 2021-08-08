@@ -17,6 +17,18 @@ local _ROUND_ICONS = {
 	otatk = '[[File:R6S Para Bellum atk logo ot rounds.png|11px|link=]]',
 	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
 }
+local _ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
+local _ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+local _LINK_DATA = {
+	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
+	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
+	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
+	opl = {icon = 'File:OPL Icon.png', text = 'OPL Match Page'},
+	esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
+	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
+	lpl = {icon = 'File:LPL Play icon.png', text = 'Match page on LPL Play'},
+}
 
 local OperatorBans = Class.new(
 	function(self)
@@ -198,9 +210,9 @@ function MapVeto:vetoStart(firstVeto)
 	local textRight
 	if firstVeto == 1 then
 		textLeft = "'''Start Map Veto'''"
-		textCenter = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
+		textCenter = _ARROW_LEFT
 	elseif firstVeto == 2 then
-		textCenter = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+		textCenter = _ARROW_RIGHT
 		textRight = "'''Start Map Veto'''"
 	else return self end
 	self.table:tag('tr'):css('border-bottom','5px solid #DDD'):css('background-color','#f5f5f5')
@@ -217,21 +229,14 @@ function MapVeto:addDecider(map)
 	else
 		map = '[['..map..'/siege|'..map..']]'
 	end
-	self.table:tag('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
-			:css('height','10px'):css('font-size','11px')
-		:tag('td'):css('text-align','center'):css('font-weight','bold')
-			:tag('span'):css('color','#000'):addClass('bg-stay'):css('border','none')
-				:css('border-radius','0px'):css('letter-spacing','0.1em')
-				:css('font-family','\'Source Code Pro\',monospace')
-				:wikitext('DECIDER'):done()
-			:done()
-		:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map):done()
-		:tag('td'):css('text-align','center'):css('font-weight','bold')
-			:tag('span'):css('color','#000'):addClass('bg-stay'):css('border','none')
-				:css('border-radius','0px'):css('letter-spacing','0.1em')
-				:css('font-family','\'Source Code Pro\',monospace')
-				:wikitext('DECIDER'):done()
-			:done()
+	local row = mw.html.create('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
+		:css('height','10px'):css('font-size','11px'):done()
+
+	self:addColumnVetoType(row, 'bg-stay', 'DECIDER')
+	self:addColumnVetoMap(row, map)
+	self:addColumnVetoType(row, 'bg-stay', 'DECIDER')
+
+	self.table:node(row)
 	return self
 end
 
@@ -247,28 +252,40 @@ function MapVeto:addRound(vetotype, map1, map2)
 		map2 = '[['..map2..'/siege|'..map2..']]'
 	end
 	local class = ''
-	local vetoName = ''
+	local vetoText = ''
 	if vetotype == 'ban' then
-		vetoName = 'BAN'
+		vetoText = 'BAN'
 		class = 'bg-down'
 	elseif vetotype == 'pick' then
-		vetoName = 'PICK'
+		vetoText = 'PICK'
 		class = 'bg-up'
 	elseif vetotype == 'defaultban' then
-		vetoName = 'DEFAULT BAN'
+		vetoText = 'DEFAULT BAN'
 		class = 'bg-lightblue'
 	end
 
-	self.table:tag('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
-			:css('height','10px'):css('font-size','11px')
-		:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map1):done()
-		:tag('td'):css('text-align','center'):css('font-weight','bold')
-			:tag('span'):css('color','#000'):addClass(class):css('border','none')
-				:css('border-radius','0px'):css('letter-spacing','0.1em')
-				:css('font-family','\'Source Code Pro\',monospace')
-				:wikitext(vetoName):done()
-			:done()
-		:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map2):done()
+	local row = mw.html.create('tr'):css('border-top','1px dotted #DDD'):css('background-color','#FFF')
+		:css('height','10px'):css('font-size','11px'):done()
+
+	self:addColumnVetoMap(row, map1)
+	self:addColumnVetoType(row, class, vetoText)
+	self:addColumnVetoMap(row, map2)
+
+	self.table:node(row)
+	return self
+end
+
+function MapVeto:addColumnVetoType(row, styleClass, vetoText)
+	row:tag('td'):css('text-align','center'):css('font-weight','bold')
+		:tag('span'):css('color','#000'):addClass(styleClass):css('border','none')
+			:css('border-radius','0px'):css('letter-spacing','0.1em')
+			:css('font-family','\'Source Code Pro\',monospace')
+			:wikitext(vetoText)
+	return self
+end
+
+function MapVeto:addColumnVetoMap(row,map)
+	row:tag('td'):css('text-align','center'):css('padding','5px'):wikitext(map):done()
 	return self
 end
 
@@ -352,18 +369,8 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 
 		-- Match Vod + other links
-		local linkData = {
-			vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-			preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
-			lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
-			siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
-			opl = {icon = 'File:OPL Icon.png', text = 'OPL Match Page'},
-			esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
-			faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
-			lpl = {icon = 'File:LPL Play icon.png', text = 'Match page on LPL Play'},
-		}
 		local buildLink = function (linktype, link)
-			local icon, text = linkData[linktype].icon, linkData[linktype].text
+			local icon, text = _LINK_DATA[linktype].icon, _LINK_DATA[linktype].text
 			return '[['..icon..'|link='..link..'|15px|'..text..']]'
 		end
 
