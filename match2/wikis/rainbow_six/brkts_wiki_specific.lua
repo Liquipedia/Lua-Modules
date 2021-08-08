@@ -61,9 +61,8 @@ function p.processOpponent(_, opponent)
 		opponent = Json.parse(opponent)
 	end
 
-	-- process opponent
-	if not Logic.isEmpty(opponent.template) and
-		string.lower(opponent.template) == 'bye' then
+	-- check for lazy bye's and convert them to literals
+	if type(opponent) == "table" and string.lower(opponent.template or '') == 'bye' then
 			opponent.name = 'BYE'
 			opponent.type = 'literal'
 	end
