@@ -7,6 +7,7 @@ local String = require("Module:StringUtils")
 local Variables = require("Module:Variables")
 
 local ALLOWED_STATUSES = { "W", "FF", "DQ", "L", "D" }
+local ALLOWED_VETOES = { "decider", "pick", "ban", "defaultban" }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 9
@@ -344,7 +345,11 @@ function matchFunctions.getMapVeto(match)
 
 	local data = {}
 	for index, vetoType in ipairs(vetotypes) do
-		if vetoType:lower() == 'decider' then
+		vetoType = mw.text.trim(vetoType):lower()
+		if not Table.includes(ALLOWED_VETOES, vetoType) then
+			return nil -- Any invalid input will not store (ie hide) all vetoes.
+		end
+		if vetoType == 'decider' then
 			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
 			deciderIndex = deciderIndex + 1
 		else
