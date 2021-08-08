@@ -98,21 +98,27 @@ function p.placementCheckDraw(table)
 	return true
 end
 
-function p.setPlacement(opponents, winnerIdx, placementwinner, placementLoser)
+function p.setPlacement(opponents, winner, placementWinner, placementLoser)
 	if opponents and #opponents == 2 then
 		local loserIdx
-		if winnerIdx == 1 then
+		local winnerIdx
+		if winner == 1 then
+			winnerIdx = 1
 			loserIdx = 2
-		elseif winnerIdx == 2 then
+		elseif winner == 2 then
+			winnerIdx = 2
 			loserIdx = 1
-		elseif winnerIdx == 0 then
+		elseif winner == 0 then
+			-- Draw; idx of winner/loser doesn't matter
+			-- since loser and winner gets the same placement
+			placementLoser = placementWinner
 			winnerIdx = 1
 			loserIdx = 2
 		else
 			error('setPlacement: Unexpected winner')
 			return opponents
 		end
-		opponents[winnerIdx].placement = placementwinner
+		opponents[winnerIdx].placement = placementWinner
 		opponents[loserIdx].placement = placementLoser
 	end
 	return opponents
