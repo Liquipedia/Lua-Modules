@@ -32,23 +32,23 @@ local _LINK_DATA = {
 
 local OperatorBans = Class.new(
 	function(self)
-		self.root = mw.html.create('table'):css('margin-top', '-4px'):css('overflow', 'hidden')
+		self.root = mw.html.create('table')
 		self.text = ''
 	end
 )
 
 function OperatorBans:setLeft()
 	self.root
-		--:css('float', 'left')
-		:addClass('bracket-popup-body-operator-bans-left')
+		:addClass('brkts-popup-body-operator-bans')
+		:css('float', 'left')
 
 	return self
 end
 
 function OperatorBans:setRight()
 	self.root
-		--:css('float', 'right')
-		:addClass('bracket-popup-body-operator-bans-right')
+		:addClass('brkts-popup-body-operator-bans')
+		:css('float', 'right')
 
 	return self
 end
@@ -62,7 +62,6 @@ function OperatorBans:add(operator)
 			:tag('td')
 				:css('padding', '0')
 				:tag('div')
-					:addClass('operator-bans')
 					:wikitext(OperatorIcon.getImage{operator,'50x50px'})
 	return self
 end
@@ -83,7 +82,7 @@ local Score = Class.new(
 
 function Score:setLeft()
 	--self.root
-		--:css('float', 'left')
+		--:css('text-align', 'left')
 
 	return self
 end
@@ -115,10 +114,9 @@ function Score:setFirstRoundScore(side, score, isLeft)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('bracket-popup-body-match-sidewins')
+	roundScore  :addClass('brkts-popup-body-match-sidewins')
 				:wikitext(icon)
 				:wikitext(score or '')
-				:css('padding','0 0 3px 3px')
 
 	self.top:node(roundScore)
 	return self
@@ -131,10 +129,9 @@ function Score:setSecondRoundScore(side, score, isLeft)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('bracket-popup-body-match-sidewins')
+	roundScore  :addClass('brkts-popup-body-match-sidewins')
 				:wikitext(icon)
 				:wikitext(score or '')
-				:css('padding','0 0 3px 3px')
 
 	self.bottom:node(roundScore)
 	return self
@@ -147,10 +144,9 @@ function Score:setFirstOvertimeRoundScore(side, score, isLeft)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('bracket-popup-body-match-sidewins-overtime')
+	roundScore  :addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(icon)
 				:wikitext(score or '')
-				:css('padding','0 0 3px 3px')
 
 	self.top:node(roundScore)
 	return self
@@ -163,10 +159,9 @@ function Score:setSecondOvertimeRoundScore(side, score, isLeft)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('bracket-popup-body-match-sidewins-overtime')
+	roundScore  :addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(icon)
 				:wikitext(score or '')
-				:css('padding','0 0 3px 3px')
 
 	self.bottom:node(roundScore)
 	return self
@@ -186,7 +181,7 @@ end
 
 local MapVeto = Class.new(
 	function(self)
-		self.root = mw.html.create('div'):addClass('bracket-popup-body-match'):addClass('brkts-popup-mapveto')
+		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
 		self:createHeader()
@@ -512,7 +507,6 @@ function CustomMatchSummary._createMap(game)
 
 	local centerNode = mw.html.create('div')
 	centerNode  :addClass('brkts-popup-spaced')
-				:addClass('bracket-popup-body-match-map')
 				:wikitext('[[' .. game.map .. ']]')
 				:css('text-align', 'center')
 				:css('padding','5px 2px')
@@ -542,13 +536,13 @@ function CustomMatchSummary._createMap(game)
 
 	-- Winner/Loser backgrouns
 	if game.winner == 1 then
-		row:addClass('bracket-popup-body-gradient-left')
+		row:addClass('brkts-popup-body-gradient-left')
 	elseif game.winner == 2 then
-		row:addClass('bracket-popup-body-gradient-right')
+		row:addClass('brkts-popup-body-gradient-right')
 	elseif game.winner == 'draw' then
-		row:addClass('bracket-popup-body-gradient-draw')
+		row:addClass('brkts-popup-body-gradient-draw')
 	else
-		row:addClass('bracket-popup-body-gradient-default')
+		row:addClass('brkts-popup-body-gradient-default')
 	end
 
 	return row
