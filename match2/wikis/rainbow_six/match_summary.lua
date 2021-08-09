@@ -28,6 +28,8 @@ local _LINK_DATA = {
 	esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	lpl = {icon = 'File:LPL Play icon.png', text = 'Match page on LPL Play'},
+	r6esports = {icon = 'File:Copa Elite Six icon.png', text = 'R6 Esports LATAM Match Page'},
+	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
 -- Operator Bans Class

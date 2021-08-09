@@ -331,6 +331,8 @@ function matchFunctions.getVodStuff(match)
 	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
 	if match.faceit then links.faceit = 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit end
 	if match.lpl then links.lpl = 'https://letsplay.live/match/' .. match.lpl end
+	if match.r6esports then links.r6esports = 'https://www.r6esports.com.br/en/match/' .. match.r6esports end
+	if match.stats then links.stats = match.stats end
 	match.links = Json.stringify(links)
 
 	-- apply vodgames
