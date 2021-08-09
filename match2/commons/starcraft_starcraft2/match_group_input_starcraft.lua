@@ -228,12 +228,7 @@ function StarCraftMatchGroupInput.adjustData(match)
 		else
 			break
 		end
-		if (match['map' .. i].winner or '') ~= '' or (match['map' .. i].map or '') ~= '' then
-			match, subgroup = StarCraftMatchGroupInput.MapInput(match, i, subgroup)
-		else
-			match['map' .. i] = nil
-			break
-		end
+		match, subgroup = StarCraftMatchGroupInput.MapInput(match, i, subgroup)
 	end
 
 	--apply vodgames
