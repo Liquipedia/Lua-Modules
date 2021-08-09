@@ -532,7 +532,7 @@ function CustomMatchSummary._createMap(game)
 		row:addElement(comment)
 	end
 
-	row:addClass('brkts-popup-body-game'):css('font-size', '85%')
+	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
 
 	-- Winner/Loser backgrouns
 	if game.winner == 1 then

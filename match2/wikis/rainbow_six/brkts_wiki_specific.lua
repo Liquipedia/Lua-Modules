@@ -107,7 +107,7 @@ function p.setPlacement(opponents, winner, placementWinner, placementLoser)
 			winnerIdx = 1
 			loserIdx = 2
 		elseif winner == -1 then
-			-- No Winner (both loses). For example if both team's DQ.
+			-- No Winner (both loses). For example if both teams DQ.
 			-- idx's doesn't matter
 			placementWinner = placementLoser
 			winnerIdx = 1
