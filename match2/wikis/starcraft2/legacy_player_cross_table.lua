@@ -102,7 +102,7 @@ function LegacyPlayerCrossTable._processDetails(match, details)
 		details['vodgame' .. index] = nil
 		details['map' .. index .. 'p1race'] = nil
 		details['map' .. index .. 'p2race'] = nil
-		if match['map' .. index] == '{}' then
+		if match['map' .. index] == '[]' then
 			break
 		end
 	end
