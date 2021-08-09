@@ -57,7 +57,7 @@ function LegacyPlayerCrossTable.playerCrossTableToMatch2(frame)
 		end
 	end
 
-	newArgs.hide = 'true'
+	newArgs.hide = args.hide == 'false' and 'false' or 'true'
 	newArgs.id = args.id
 
 	return MatchList(frame, newArgs)
