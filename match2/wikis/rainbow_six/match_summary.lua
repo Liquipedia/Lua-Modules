@@ -30,6 +30,8 @@ local _LINK_DATA = {
 	lpl = {icon = 'File:LPL Play icon.png', text = 'Match page on LPL Play'},
 }
 
+-- Operator Bans Class
+
 local OperatorBans = Class.new(
 	function(self)
 		self.root = mw.html.create('table')
@@ -70,6 +72,8 @@ function OperatorBans:create()
 	self.root:wikitext(self.text)
 	return self.root
 end
+
+-- Score Class, both for the "big" score, and the halfs scores
 
 local Score = Class.new(
 	function(self)
@@ -179,6 +183,7 @@ function Score:create()
 	return self.root
 end
 
+-- Map Veto Class
 local MapVeto = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -241,8 +246,8 @@ function MapVeto:addRound(vetotype, map1, map2)
 	else
 		map2 = '[['..map2..'/siege|'..map2..']]'
 	end
-	local class = ''
-	local vetoText = ''
+	local class
+	local vetoText
 	if vetotype == 'ban' then
 		vetoText = 'BAN'
 		class = 'brkts-popup-mapveto-ban'
@@ -252,6 +257,8 @@ function MapVeto:addRound(vetotype, map1, map2)
 	elseif vetotype == 'defaultban' then
 		vetoText = 'DEFAULT BAN'
 		class = 'brkts-popup-mapveto-defaultban'
+	else
+		return self
 	end
 
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
@@ -282,6 +289,8 @@ function MapVeto:create()
 	return self.root
 end
 
+
+-- MVP Class
 local MVP = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
@@ -415,7 +424,7 @@ function CustomMatchSummary._createBody(match)
 
 	end
 
-	-- Map Veto
+	-- Add the Map Vetoes
 	if match.extradata.mapveto then
 		local vetoData = Json.parse(match.extradata.mapveto)
 		if vetoData then
@@ -561,10 +570,10 @@ function CustomMatchSummary._createCheckMark(isWinner)
 
 	if isWinner then
 		container:node(_GREEN_CHECK)
-		return container
+	else
+		container:node(_NO_CHECK)
 	end
 
-	container:node(_NO_CHECK)
 	return container
 end
 

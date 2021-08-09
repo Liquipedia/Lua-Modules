@@ -90,6 +90,11 @@ function p.placementCheckDraw(table)
 	return true
 end
 
+-- Set the field 'placement' for the two participants in the opponenets list.
+-- Set the placementWinner field to the winner, and placementLoser to the other team
+-- Special cases:
+-- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
+-- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will gt placementLoser
 function p.setPlacement(opponents, winner, placementWinner, placementLoser)
 	if opponents and #opponents == 2 then
 		local loserIdx
@@ -123,8 +128,11 @@ function p.setPlacement(opponents, winner, placementWinner, placementLoser)
 end
 
 function p.getResultTypeAndWinner(data, indexedScores)
+	-- Map or Match wasn't played, set not played
 	if data.finished == 'skip' or data.finished == 'np' or data.finished == 'cancelled' or data.finished == 'canceled' then
 		data.resulttype = 'np'
+	-- Map or Match is marked as finished.
+	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
 		if p.placementCheckDraw(indexedScores) then
 			data.winner = 0
@@ -204,6 +212,10 @@ function matchFunctions.getBestOf(match)
 	return match
 end
 
+-- Template:Map sets a default map name so we can count the number of maps.
+-- These maps however shouldn't be stored in lpdb, nor displayed
+-- The discardMap function will check if a map should be removed
+-- Remove all maps that should be removed.
 function matchFunctions.removeUnsetMaps(match)
 	for i = 1, MAX_NUM_MAPS do
 		if match['map'..i] then
@@ -217,6 +229,12 @@ function matchFunctions.removeUnsetMaps(match)
 	return match
 end
 
+-- Calculate the match scores based on the map results.
+-- If it's a Best of 1, we'll take the exact score of that map
+-- If it's not a Best of 1, we should count the map wins
+-- Only update a teams result if it's
+-- 1) Not manually added
+-- 2) At least one map has a winner
 function matchFunctions.getScoreFromMapWinners(match)
 	-- For best of 1, display the results of the single map
 	local opponent1 = Json.parseIfString(match.opponent1)
@@ -250,6 +268,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
+-- Parse dates
 function matchFunctions.getDateStuff(match)
 	local lang = mw.getContentLanguage()
 	-- parse date string with abbr
@@ -339,6 +358,7 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
+-- Parse the mapVeto input
 function matchFunctions.getMapVeto(match)
 	if not match.mapveto then return nil end
 
@@ -368,6 +388,7 @@ function matchFunctions.getMapVeto(match)
 	return data
 end
 
+-- Parse MVP input
 function matchFunctions.getMVP(match)
 	if not match.mvp then return nil end
 	local mvppoints = match.mvppoints or 1
@@ -442,6 +463,7 @@ function matchFunctions.getOpponents(match)
 	return match
 end
 
+-- Get Playerdata from Vars (get's set in TeamCards)
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
@@ -460,6 +482,9 @@ end
 --
 -- map related functions
 --
+
+-- Check if a map should be discarded due to being redundant
+-- DUMMY_MAP_NAME needs the match the default value in Template:Map
 function mapFunctions.discardMap(map)
 	if map.map == DUMMY_MAP_NAME then
 		return true
@@ -468,6 +493,7 @@ function mapFunctions.discardMap(map)
 	end
 end
 
+-- Parse extradata information, particularally info about halfs and operator bans
 function mapFunctions.getExtraData(map)
 	map.extradata = Json.stringify{
 		comment = map.comment,
@@ -481,6 +507,8 @@ function mapFunctions.getExtraData(map)
 	return map
 end
 
+-- Calculate Score and Winner of the map
+-- Use the half information if available
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
