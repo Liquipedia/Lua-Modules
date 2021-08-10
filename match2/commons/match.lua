@@ -248,6 +248,7 @@ function p._buildParameters(args)
 		series = args["series"],
 		icon = args["icon"],
 		liquipediatier = args["liquipediatier"],
+		liquipediatiertype = args["liquipediatiertype"],
 		publishertier = args["publishertier"],
 		status = args["status"],
 		patch = args["patch"],
