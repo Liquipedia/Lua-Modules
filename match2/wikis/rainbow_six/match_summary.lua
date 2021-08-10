@@ -87,8 +87,8 @@ local Score = Class.new(
 )
 
 function Score:setLeft()
-	--self.root
-		--:css('text-align', 'left')
+	self.root
+		:css('text-align', 'left')
 
 	return self
 end

@@ -171,7 +171,7 @@ function p.placementCheckSpecialStatus(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
 end
 
--- function to check for forfiets
+-- function to check for forfeits
 function p.placementCheckFF(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
 end
