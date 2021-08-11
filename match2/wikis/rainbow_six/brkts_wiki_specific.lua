@@ -240,14 +240,17 @@ function matchFunctions.getScoreFromMapWinners(match)
 	local opponent1 = Json.parseIfString(match.opponent1)
 	local opponent2 = Json.parseIfString(match.opponent2)
 	local newScores = {}
+	local foundScores = false
 	if match.bestof == 1 then
 		if match.map1 then
 			newScores = match.map1.scores
+			foundScores = true
 		end
 	else -- For best of >1, disply the map wins
 		for i = 1, MAX_NUM_MAPS do
-			if match['map'..i] then
-				local winner = match['map'..i].winner
+			if match['map'..i] and match['map'..i].winner then
+				local winner = tonumber(match['map'..i].winner)
+				foundScores = true
 				-- Only two opponents in R6
 				if winner and winner > 0 and winner <= 2 then
 					newScores[winner] = (newScores[winner] or 0) + 1
@@ -257,11 +260,11 @@ function matchFunctions.getScoreFromMapWinners(match)
 			end
 		end
 	end
-	if not opponent1.score and #newScores > 0 then
-		opponent1.score = newScores[1]
+	if not opponent1.score and foundScores then
+		opponent1.score = newScores[1] or 0
 	end
-	if not opponent2.score and #newScores > 0 then
-		opponent2.score = newScores[2]
+	if not opponent2.score and foundScores then
+		opponent2.score = newScores[2] or 0
 	end
 	match.opponent1 = opponent1
 	match.opponent2 = opponent2
