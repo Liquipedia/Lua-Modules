@@ -53,8 +53,8 @@ function p.storeGames(match, match2)
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		if extradata.t1bans and extradata.t2bans then
-			game.extradata.opponent1bans = table.concat(json.parse(extradata.t1bans), ",")
-			game.extradata.opponent2bans = table.concat(json.parse(extradata.t2bans), ",")
+			game.extradata.opponent1bans = table.concat(json.parse(extradata.t1bans), ", ")
+			game.extradata.opponent2bans = table.concat(json.parse(extradata.t2bans), ", ")
 		end
 		if extradata.t1firstside and extradata.t1halfs and extradata.t2halfs then
 			extradata.t1firstside = json.parse(extradata.t1firstside)
