@@ -317,11 +317,7 @@ end
 
 function MVP:create()
 	local span = mw.html.create('span')
-	if #self.players > 1 then
-		span:wikitext('MVPs: ')
-	else
-		span:wikitext('MVP: ')
-	end
+	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
 	for index, player in ipairs(self.players) do
 		if index > 1 then
 			span:wikitext(', ')
