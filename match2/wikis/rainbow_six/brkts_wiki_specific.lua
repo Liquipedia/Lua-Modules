@@ -56,6 +56,12 @@ end
 function p.processOpponent(_, opponent)
 	opponent = Json.parseIfString(opponent)
 
+	-- check for empty team and convert to literal
+	if type(opponent) == 'table' and opponent.type == 'team' and Logic.isEmpty(opponent.template) then
+		opponent.name = ''
+		opponent.type = 'literal'
+	end
+
 	-- check for lazy bye's and convert them to literals
 	if type(opponent) == 'table' and string.lower(opponent.template or '') == 'bye' then
 			opponent.name = 'BYE'
