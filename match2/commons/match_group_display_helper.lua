@@ -89,7 +89,7 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 
 	local stream = Table.merge(match.stream, {
-		date = mw.getContentLanguage():formatDate('r', match.date),
+		date = mw.getContentLanguage():formatDate('F d, Y - H:i', match.date),
 		finished = match.finished and 'true' or nil,
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')
