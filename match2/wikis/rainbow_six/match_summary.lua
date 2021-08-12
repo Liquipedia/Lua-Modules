@@ -339,7 +339,9 @@ function CustomMatchSummary.getByMatchId(args)
 	mw.logObject(match)
 	local frame = mw.getCurrentFrame()
 
-	local matchSummary = MatchSummary():init('330px')
+	local matchSummary = MatchSummary():init()
+	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
+
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
 
