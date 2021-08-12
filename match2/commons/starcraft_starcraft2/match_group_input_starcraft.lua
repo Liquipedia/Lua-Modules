@@ -988,6 +988,7 @@ function StarCraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 			map.extradata.opponent1 = PL[1]
 			map.extradata.opponent2 = PL[2]
 		end
+		map.patch = Variables.varDefault('tournament_patch', '')
 	end
 
 	map.mode = map_mode
