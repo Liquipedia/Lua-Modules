@@ -397,9 +397,11 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	body:addRow(MatchSummary.Row():addElement(
-		DisplayHelper.MatchCountdownBlock(match)
-	))
+	if match.dateIsExact then
+		body:addRow(MatchSummary.Row():addElement(
+			DisplayHelper.MatchCountdownBlock(match)
+		))
+	end
 
 	--local matchPageElement = mw.html.create('center')
 	--matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
