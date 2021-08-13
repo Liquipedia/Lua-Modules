@@ -196,6 +196,8 @@ function Infobox:links(links, variant)
     return self
 end
 
+--remove appended numbers
+--needed because the icons require e.g. 'esl' instead of 'esl2'
 function Infobox.getIconString(key)
 	return string.gsub(key, '%d$', '')
 end
