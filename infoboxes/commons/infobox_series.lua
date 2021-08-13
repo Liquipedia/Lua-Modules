@@ -7,6 +7,7 @@ local Cell = require('Module:Infobox/Cell')
 local Infobox = require('Module:Infobox')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
+local Flags = require('Module:Flags')._Flag
 local Namespace = require('Module:Namespace')
 local Locale = require('Module:Locale')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
@@ -171,8 +172,7 @@ function Series:_createLocation(country, city)
 		return ''
 	end
 
-	return Template.safeExpand(self.frame, 'Flag/' .. string.lower(country)) ..
-				'&nbsp;' .. (city or country)
+	return Flags(country) .. '&nbsp;' .. (city or country)
 end
 
 function Series:_setCountryCategories(country)
