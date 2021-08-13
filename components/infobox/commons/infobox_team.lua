@@ -120,7 +120,7 @@ function Team:_createLocation(location)
         return ''
     end
 
-    return Flags(country) ..
+    return Flags(location) ..
                 '&nbsp;' ..
                 '[[:Category:' .. location .. '|' .. location .. ']]'
 end
