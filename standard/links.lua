@@ -1,7 +1,3 @@
----
--- @author Vogan for Liquipedia
---
-
 local Class = require('Module:Class')
 
 local Links = {}
