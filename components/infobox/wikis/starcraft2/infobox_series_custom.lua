@@ -22,7 +22,7 @@ local Sc2Series = {}
 function Sc2Series.run(frame)
 	Series.addCustomCells = Sc2Series.addCustomCells
 	Series.createTier = Sc2Series.createTier
-	Series.setTournamentVars = Sc2Series.setTournamentVars
+	Series.addCustomVariables = Sc2Series.addCustomVariables
 	return Series:createInfobox(frame)
 end
 
@@ -106,7 +106,7 @@ function Sc2Series._getGameVersion(game, patch, args)
 	end
 end
 
-function Sc2Series.setTournamentVars(self, args)
+function Sc2Series.addCustomVariables(args)
 	if args.disable_smw == 'true' or args.disable_lpdb == 'true' or args.disable_storage == 'true' then
 		VarDefine('disable_SMW_storage', 'true')
 	else
