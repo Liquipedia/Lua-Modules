@@ -39,7 +39,7 @@ function Player:createInfobox(frame)
     else
         earnings = '$' .. Language:formatNum(earnings)
     end
-    local birthDisplay, deathDisplay, _BIRTHDAY, _DEATHDAY = Player:birthAndDeath(args)
+    local birthDisplay, deathDisplay, birthday, deathday = Player:birthAndDeath(args)
     local status = Player:getStatus(args)
 
     infobox :name(Player:name(args))
