@@ -105,7 +105,12 @@ function Player:createInfobox(frame)
         if args.death_date then
             infobox:categories('Deceased People')
         end
+        if args.retired then
+            infobox:categories('Retired Players')
+        end
         --more cats here
+        --maybe some finetuning via role
+        --e.g. 'Retired ' .. role.category (Players, Casters, Coaches, ...)
 
         local extradata = Player:getExtradata(args)
         links = Player:_getLinksLPDB(links)
