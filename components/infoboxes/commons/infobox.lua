@@ -118,7 +118,7 @@ function Infobox:_createChronologyRow(previous, next)
 
     local node = mw.html.create('div')
 
-    if doesPreviousExist then 
+    if doesPreviousExist then
         local previousWrapper = mw.html.create('div')
         previousWrapper :addClass('infobox-cell-2')
                         :addClass('infobox-text-left')
@@ -129,7 +129,7 @@ function Infobox:_createChronologyRow(previous, next)
                         :wikitext('[[File:Arrow sans left.svg|link=' .. previous .. ']]')
 
         previousWrapper :node(previousArrow)
-                        :wikitext('&nbsp;[[' .. previous .. ']]') 
+                        :wikitext('&nbsp;[[' .. previous .. ']]')
 
         node:node(previousWrapper)
     end
@@ -144,7 +144,7 @@ function Infobox:_createChronologyRow(previous, next)
                         :css('float', 'right')
                         :wikitext('[[File:Arrow sans right.svg|link=' .. next .. ']]')
 
-        nextWrapper :wikitext('[[' .. next .. ']]&nbsp;') 
+        nextWrapper :wikitext('[[' .. next .. ']]&nbsp;')
                     :node(nextArrow)
 
         node:node(nextWrapper)

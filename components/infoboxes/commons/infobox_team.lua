@@ -32,7 +32,7 @@ function Team:createInfobox(frame)
     Variables.varDefine('earnings', earnings)
     if earnings == 0 then
         earnings = nil
-    else 
+    else
         earnings = '$' .. Language:formatNum(earnings)
     end
 
@@ -40,7 +40,14 @@ function Team:createInfobox(frame)
             :image(args.image, args.default)
             :centeredCell(args.caption)
             :header('Team Information', true)
-            :fcell(Cell:new('Location'):options({}):content(Team:_createLocation(args.location), Team:_createLocation(args.location2)):make())
+            :fcell(Cell :new('Location')
+                        :options({})
+                        :content(
+                            Team:_createLocation(args.location),
+                            Team:_createLocation(args.location2)
+                        )
+                        :make()
+            )
             :cell('Region', Team:_createRegion(args.region))
             :cell('Coaches', args.coaches)
             :cell('Coach', args.coach)
