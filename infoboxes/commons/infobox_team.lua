@@ -62,7 +62,7 @@ function Team:createInfobox(frame)
 	local history = Team:getHistory(infobox, args)
 
 	infobox :header('Links', not Table.isEmpty(links))
-			:links(links)
+			:links(links, 'team')
 			:header('Achievements', achievements)
 			:centeredCell(achievements)
 			:header('History', history.created)
