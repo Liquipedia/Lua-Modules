@@ -100,7 +100,7 @@ function Player:createInfobox(frame)
         infobox:categories('Players')
 
         local extradata = Player:getExtradata(args)
-        local links = Player:getLinksLPDB(args)
+        links = Player:_getLinksLPDB(links)
 
         mw.ext.LiquipediaDB.lpdb_player('player' .. self.name, {
             id = args.id or mw.title.getCurrentTitle().prefixedText,
@@ -138,11 +138,6 @@ end
 
 --- Allows for overriding this functionality
 function Player:getExtradata(args)
-    return {}
-end
-
---- Allows for overriding this functionality
-function Player:getLinksLPDB(args)
     return {}
 end
 
@@ -200,7 +195,7 @@ function Player:_createLocation(country, location)
     if country == nil or country == '' then
         return ''
     end
-	local countryDisplay = Flags._CountryName(country)
+    local countryDisplay = Flags._CountryName(country)
 
     return Flags._Flag(country) .. '&nbsp;' ..
                 '[[:Category:' .. countryDisplay .. ' Players|' .. countryDisplay .. ']]'
@@ -211,9 +206,17 @@ function Player:_createTeam(team, link)
     if team == nil or team == '' then
         return ''
     end
-	link = link or team
+    link = link or team
 
     return '[[' .. link .. '|' .. team .. ']]'
+end
+
+--- Allows for overriding this functionality
+function Player:_getLinksLPDB(links)
+    for key, item in pairs(links) do
+        links[key] = Links.makeFullLink(key, item, _LINK_VARIANT)
+    end
+    return links
 end
 
 --- here todo
