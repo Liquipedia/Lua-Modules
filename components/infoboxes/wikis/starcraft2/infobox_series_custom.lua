@@ -1,8 +1,3 @@
----
--- @author Vogan for Liquipedia
--- @author hjpalpha (adjusting stuff for SC2)
---
-
 local Series = require('Module:Infobox/Series')
 local Autopatch = require('Module:Automated Patch')._main
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')._get
