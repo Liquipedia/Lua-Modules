@@ -32,6 +32,8 @@ local _LINK_DATA = {
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+
 -- Operator Bans Class
 
 local OperatorBans = Class.new(
@@ -397,9 +399,22 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	body:addRow(MatchSummary.Row():addElement(
-		DisplayHelper.MatchCountdownBlock(match)
-	))
+	if match.dateIsExact then
+		-- dateIsExact means we have both date and time. Show countdown
+		body:addRow(MatchSummary.Row():addElement(
+			DisplayHelper.MatchCountdownBlock(match)
+		))
+	elseif match.date ~= _EPOCH_TIME_EXTENDED then
+		-- if match is not epoch=0, we have a date, so display the date
+		-- TODO:Less code duplication, all html stuff is a copy from DisplayHelper.MatchCountdownBlock
+		body:addRow(MatchSummary.Row():addElement(
+			mw.html.create('div'):addClass('match-countdown-block')
+				:css('text-align', 'center')
+				-- Workaround for .brkts-popup-body-element > * selector
+				:css('display', 'block')
+				:wikitext(mw.getContentLanguage():formatDate('F d, Y'))
+		))
+	end
 
 	--local matchPageElement = mw.html.create('center')
 	--matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
