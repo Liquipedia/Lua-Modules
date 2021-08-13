@@ -11,6 +11,7 @@ std = {
 		"pairs",
 		"pcall",
 		"require",
+		"select",
 		"string",
 		"table",
 		"tonumber",
