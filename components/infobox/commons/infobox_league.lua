@@ -1,7 +1,3 @@
----
--- @author Vogan for Liquipedia
---
-
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
 local Infobox = require('Module:Infobox')
