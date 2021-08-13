@@ -8,7 +8,6 @@ local Infobox = require('Module:Infobox')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Math = require('Module:Math')
 local String = require('Module:String')
