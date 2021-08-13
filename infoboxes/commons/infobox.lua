@@ -192,7 +192,8 @@ function Infobox:links(links, variant)
 
     for key, value in pairs(links) do
         local iconString = Infobox.getIconString(key)
-        local link = '[' .. Links.makeFullLink(key, value, variant) .. ' <i class="lp-icon lp-' .. iconString .. '></i>]'
+        local link = '[' .. Links.makeFullLink(key, value, variant) ..
+			' <i class="lp-icon lp-' .. iconString .. '></i>]'
         infoboxLinks:wikitext(' ' .. link)
     end
 
