@@ -41,6 +41,7 @@ function Player:createInfobox(frame)
     end
     local birthDisplay, deathDisplay, birthday, deathday = Player:birthAndDeath(args)
     local status = Player:getStatus(args)
+    local role = Player:getRole(args)
 
     infobox :name(Player:name(args))
             :image(args.image, args.default)
@@ -50,7 +51,8 @@ function Player:createInfobox(frame)
             :cell('Romanized Name', args.romanized_name)
             :cell('Birth', birthDisplay)
             :cell('Died', deathDisplay)
-            :cell('Status', status)
+            :cell('Status', status.display)
+            :cell(role.title or 'Role', role.display)
             :fcell(Cell :new('Location')
                         :options({})
                         :content(
@@ -96,8 +98,14 @@ function Player:createInfobox(frame)
     infobox:bottom(Player.createBottomContent(infobox))
 
     if Player:shouldStoreData(args) then
-        local playerType = Player:getType(args)
         infobox:categories('Players')
+        if not args.teamlink and not args.team then
+            infobox:categories('Teamless Players')
+        end
+        if args.death_date then
+            infobox:categories('Deceased People')
+        end
+        --more cats here
 
         local extradata = Player:getExtradata(args)
         links = Player:_getLinksLPDB(links)
@@ -115,8 +123,8 @@ function Player:createInfobox(frame)
             image = args.image,
             region = args.region,
             team = args.teamlink or args.team,
-            status = status,
-            type = playerType,
+            status = status.store,
+            type = role.store,
             earnings = earnings,
             links = mw.ext.LiquipediaDB.lpdb_create_json(links),
             extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata),
@@ -127,13 +135,13 @@ function Player:createInfobox(frame)
 end
 
 --- Allows for overriding this functionality
-function Player:getType(args)
-    return args.role
+function Player:getRole(args)
+    return { display = args.role, store = args.role }
 end
 
 --- Allows for overriding this functionality
 function Player:getStatus(args)
-    return args.status
+    return { display = args.status, store = args.status }
 end
 
 --- Allows for overriding this functionality
@@ -150,7 +158,12 @@ end
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
 function Player:name(args)
-    return args.id
+	local team = args.teamlink or args.team
+	local icon = mw.ext.TeamTemplate.teamexists(team)
+		and mw.ext.TeamTemplate.teamicon(team) or ''
+	local name = args.id or mw.title.getCurrentTitle().text
+
+    return icon .. '&nbsp;' .. name
 end
 
 --- Allows for overriding this functionality
