@@ -216,23 +216,6 @@ function Infobox:centeredCell(content)
     return self
 end
 
-function Infobox:customCell(contents)
-    if type(contents) ~= 'table' or contents == {} then
-        return self
-    end
-
-    local div = mw.html.create('div')
-    local number = #contents
-    for _, content in ipairs(contents) do
-        local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number .. ' infobox-center')
-        infoboxCustomCell:wikitext(content)
-        div:node(infoboxCustomCell)
-    end
-
-    self.content:node(div)
-    return self
-end
-
 function Infobox:categories(...)
     local input = {...}
     for i = 1, #input do
