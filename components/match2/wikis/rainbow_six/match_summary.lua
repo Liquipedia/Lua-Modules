@@ -348,7 +348,7 @@ function CustomMatchSummary.getByMatchId(args)
 				:body(CustomMatchSummary._createBody(match))
 
 	if match.comment then
-		matchSummary:comment(MatchSummary.Comment():content(mw.html.create('span'):wikitext(match.comment)))
+		matchSummary:comment(MatchSummary.Comment():content(match.comment))
 	end
 
 	local vods = {}
