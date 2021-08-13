@@ -44,7 +44,7 @@ function StarCraft2Team.addCustomHeadersAndCells(team, infobox, args)
 			:centeredCell(soloAchievements)
 			:header('Player Breakdown', playerBreakDown.playernumber)
 			:cell('Number of players', playerBreakDown.playernumber)
-			:customCell(playerBreakDown.display)
+			:fcell(StarCraft2Team.playerBreakDownDisplay(playerBreakDown.display))
 			:header('History', args.created)
 			:cell('Created', args.created)
 			:cell('Disbanded', args.disbanded)
@@ -61,15 +61,34 @@ function StarCraft2Team.addCustomHeadersAndCells(team, infobox, args)
 	return infobox
 end
 
+function StarCraft2Team.playerBreakDownDisplay(contents)
+    if type(contents) ~= 'table' or contents == {} then
+        return nil
+    end
+
+    local div = mw.html.create('div')
+    local number = #contents
+    for _, content in ipairs(contents) do
+        local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number
+			.. ' infobox-center')
+        infoboxCustomCell:wikitext(content)
+        div:node(infoboxCustomCell)
+    end
+
+    return div
+end
+
 function StarCraft2Team.storeToLPDB(args)
 	local name = args.romanized_name or args.name or pagename
 	Variables.varDefine('team_name', name)
 	local links = Links.transform(args)
 	for key, item in pairs(links) do
-		if key ~= 'esl' then
-			links[key] = Links.makeFullLink(key, item)
-		else
+		if key == 'aligulac' then
+			links[key] = 'http://aligulac.com/teams/' .. item
+		elseif key == 'esl' then
 			links[key] = 'https://play.eslgaming.com/team/' .. item
+		else
+			links[key] = Links.makeFullLink(key, item)
 		end
 	end
 
