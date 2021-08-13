@@ -14,6 +14,8 @@ local MAX_NUM_VODGAMES = 9
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
+local _EPOCH_TIME = '1970-01-01 00:00:00'
+
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
@@ -292,7 +294,7 @@ function matchFunctions.getDateStuff(match)
 		match.date = matchDate .. timezone
 		match.dateexact = String.contains(match.date, '%+') or String.contains(match.date, '%-')
 	else
-		match.date = lang:formatDate('c', '1970-01-01 00:00:00')
+		match.date = lang:formatDate('c', _EPOCH_TIME)
 		match.dateexact = false
 	end
 	return match

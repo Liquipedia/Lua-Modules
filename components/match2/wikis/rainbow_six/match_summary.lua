@@ -32,6 +32,8 @@ local _LINK_DATA = {
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+
 -- Operator Bans Class
 
 local OperatorBans = Class.new(
@@ -402,7 +404,7 @@ function CustomMatchSummary._createBody(match)
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))
-	elseif match.date ~= '1970-01-01T00:00:00+00:00' then
+	elseif match.date ~= _EPOCH_TIME_EXTENDED then
 		-- if match is not epoch=0, we have a date, so display the date
 		-- TODO:Less code duplication, all html stuff is a copy from DisplayHelper.MatchCountdownBlock
 		body:addRow(MatchSummary.Row():addElement(
