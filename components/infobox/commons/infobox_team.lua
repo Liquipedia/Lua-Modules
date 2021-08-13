@@ -6,6 +6,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
+local Flags = require('Module:Flags')._Flag
 
 local getArgs = require('Module:Arguments').getArgs
 
@@ -63,7 +64,7 @@ function Team:createInfobox(frame)
 	local history = Team:getHistory(infobox, args)
 
     infobox :header('Links', not Table.isEmpty(links))
-            :links(links)
+            :links(links, 'team')
             :header('Achievements', achievements)
             :centeredCell(achievements)
             :header('History', history.created)
@@ -119,7 +120,7 @@ function Team:_createLocation(location)
         return ''
     end
 
-    return Template.safeExpand(self.frame, 'Flag/' .. string.lower(location)) ..
+    return Flags(country) ..
                 '&nbsp;' ..
                 '[[:Category:' .. location .. '|' .. location .. ']]'
 end
