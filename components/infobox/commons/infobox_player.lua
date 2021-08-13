@@ -103,10 +103,10 @@ function Player:createInfobox(frame)
         local links = Player:getLinksLPDB(args)
 
         mw.ext.LiquipediaDB.lpdb_player('player' .. self.name, {
-            id = id,
+            id = args.id or mw.title.getCurrentTitle().prefixedText,
             alternateid = args.ids,
             name = args.romanized_name or args.name,
-            localizedname = name,
+            localizedname = args.name,
             nationality = args.country or args.nationality,
             nationality2 = args.country2 or args.nationality2,
             nationality3 = args.country3 or args.nationality3,
