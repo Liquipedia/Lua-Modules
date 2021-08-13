@@ -7,6 +7,7 @@ local Namespace = require('Module:Namespace')
 local Locale = require('Module:Locale')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Links = require('Module:Links')
+local Flags = require('Module:Flags')._Flag
 
 local getArgs = require('Module:Arguments').getArgs
 
@@ -160,8 +161,7 @@ function Series:_createLocation(country, city)
         return ''
     end
 
-    return Template.safeExpand(self.frame, 'Flag/' .. string.lower(country)) ..
-                '&nbsp;' .. (city or country)
+    return Flags(country) .. '&nbsp;' .. (city or country)
 end
 
 function Series:_setCountryCategories(country)

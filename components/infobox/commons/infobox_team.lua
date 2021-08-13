@@ -6,11 +6,13 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
+local Flags = require('Module:Flags')._Flag
 
 local getArgs = require('Module:Arguments').getArgs
 
 local Team = Class.new()
 local Language = mw.language.new('en')
+local _LINK_VARIANT = 'team'
 
 function Team.run(frame)
     return Team:createInfobox(frame)
@@ -63,7 +65,7 @@ function Team:createInfobox(frame)
 	local history = Team:getHistory(infobox, args)
 
     infobox :header('Links', not Table.isEmpty(links))
-            :links(links)
+            :links(links, _LINK_VARIANT)
             :header('Achievements', achievements)
             :centeredCell(achievements)
             :header('History', history.created)
@@ -119,7 +121,7 @@ function Team:_createLocation(location)
         return ''
     end
 
-    return Template.safeExpand(self.frame, 'Flag/' .. string.lower(location)) ..
+    return Flags(location) ..
                 '&nbsp;' ..
                 '[[:Category:' .. location .. '|' .. location .. ']]'
 end

@@ -180,13 +180,14 @@ function Infobox:_createInfoboxButtons()
     return buttons
 end
 
-function Infobox:links(links)
+function Infobox:links(links, variant)
     local infoboxLinks = mw.html.create('div')
     infoboxLinks    :addClass('infobox-center')
                     :addClass('infobox-icons')
 
     for key, value in pairs(links) do
-        local link = '[' .. Links.makeFullLink(key, value) .. ' <i class="lp-icon lp-' .. key .. '></i>]'
+        local link = '[' .. Links.makeFullLink(key, value, variant) ..
+            ' <i class="lp-icon lp-' .. key .. '></i>]'
         infoboxLinks:wikitext(' ' .. link)
     end
 
