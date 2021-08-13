@@ -7,6 +7,7 @@ local Cell = require('Module:Infobox/Cell')
 local Infobox = require('Module:Infobox')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
+local Flags = require('Module:Flags')._Flag
 local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
@@ -123,8 +124,7 @@ function Team:_createLocation(location)
 		return ''
 	end
 
-	return Template.safeExpand(self.frame, 'Flag/' .. string.lower(location)) ..
-				'&nbsp;' ..
+	return Flags(location) .. '&nbsp;' ..
 				'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
