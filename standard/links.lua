@@ -101,7 +101,7 @@ function Links.transform(links)
         rules = links.rules,
         booyah = links.booyah,
         tlstream = links.tlstream,
-        stream = stream,
+        stream = links.stream,
         douyu = links.douyu,
         askfm = links.askfm,
         tlprofile = links.tlprofile,
@@ -129,7 +129,7 @@ function Links.makeFullLink(platform, id, variant)
     if id == nil or id == '' then
         return ''
     end
-    
+
     if _PREFIXES[variant] then
         local out = _PREFIXES[variant][platform]
         if out then
