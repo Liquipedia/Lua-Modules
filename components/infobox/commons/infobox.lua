@@ -185,13 +185,20 @@ function Infobox:links(links, variant)
                     :addClass('infobox-icons')
 
     for key, value in pairs(links) do
+        local iconString = Infobox.getIconString(key)
         local link = '[' .. Links.makeFullLink(key, value, variant) ..
-            ' <i class="lp-icon lp-' .. key .. '></i>]'
+            ' <i class="lp-icon lp-' .. iconString .. '></i>]'
         infoboxLinks:wikitext(' ' .. link)
     end
 
     self.content:node(mw.html.create('div'):node(infoboxLinks))
     return self
+end
+
+--remove appended numbers
+--needed because the link icons require e.g. 'esl' instead of 'esl2'
+function Infobox.getIconString(key)
+	return string.gsub(key, '%d$', '')
 end
 
 function Infobox:centeredCell(content)
