@@ -62,7 +62,7 @@ function Team:createInfobox(frame)
 
     local links = Links.transform(args)
     local achievements = Team:getAchievements(infobox, args)
-	local history = Team:getHistory(infobox, args)
+    local history = Team:getHistory(infobox, args)
 
     infobox :header('Links', not Table.isEmpty(links))
             :links(links, _LINK_VARIANT)
@@ -74,6 +74,7 @@ function Team:createInfobox(frame)
             :header('Recent Player Trades', args.trades)
             :centeredCell(args.trades)
             :centeredCell(args.footnotes)
+    Team:addCustomContent(infobox, args)
             :bottom(Team.createBottomContent(infobox))
 
     if Namespace.isMain() then
@@ -81,6 +82,11 @@ function Team:createInfobox(frame)
     end
 
     return infobox:build()
+end
+
+--- Allows for overriding this functionality
+function Team:addCustomContent(infobox, args)
+    return infobox
 end
 
 --- Allows for overriding this functionality
