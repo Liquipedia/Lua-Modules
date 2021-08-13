@@ -12,7 +12,7 @@ function Cell:new(description)
     self.root = mw.html.create('div')
     self.description = mw.html.create('div')
     self.description:addClass('infobox-cell-2')
-                    :addClass('infobox-description') 
+                    :addClass('infobox-description')
                     :wikitext(description .. ':')
     return self
 end
