@@ -89,6 +89,7 @@ function League:createInfobox(frame)
                             {key = 'date', value = self:_cleanDate(args.date)},
                             {key = 'tournament_date', value = self:_cleanDate(args.edate) or self:_cleanDate(args.date) or ''}
                         )
+						:make()
             )
             :fcell(Cell :new('Start Date')
                         :options({})
@@ -96,6 +97,7 @@ function League:createInfobox(frame)
                         :variables(
                             {key = 'sdate', value = self:_cleanDate(args.sdate)}
                         )
+						:make()
             )
             :fcell(Cell :new('End Date')
                         :options({})
@@ -103,11 +105,12 @@ function League:createInfobox(frame)
                         :variables(
                             {key = 'edate', value = self:_cleanDate(args.edate)}
                         )
+						:make()
             )
             :fcell(self:createTier(args):make())
     League:addCustomCells(infobox, args)
 
-    local links = Links.tranform(args)
+    local links = Links.transform(args)
 
     infobox :header('Links', not Table.isEmpty(links))
             :links(links)
@@ -199,7 +202,7 @@ function League:_createOrganizer(organizer, name, link, reference)
             output = output .. name .. ']]'
         end
 
-    elseif String.isEmpty(link) then
+    elseif not String.isEmpty(link) then
         if String.isEmpty(name) then
             output = '[' .. link .. ' ' .. organizer .. ']'
         else
@@ -207,9 +210,9 @@ function League:_createOrganizer(organizer, name, link, reference)
 
         end
     elseif String.isEmpty(name) then
-        output = '[' .. link .. ' ' .. organizer .. ']'
+        output = organizer
     else
-        output = '[' .. link .. ' ' .. name .. ']'
+        output = name
     end
 
     if not String.isEmpty(reference) then
@@ -220,7 +223,7 @@ function League:_createOrganizer(organizer, name, link, reference)
 end
 
 function League:_cleanDate(date)
-    if date == 'tba' then
+    if date == nil or date == 'tba' then
         return nil
     end
 
