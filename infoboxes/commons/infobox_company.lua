@@ -6,6 +6,7 @@ local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
 local Infobox = require('Module:Infobox')
 local Links = require('Module:Links')
+local Flags = require('Module:Flags')._Flag
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
@@ -94,8 +95,7 @@ function Company:_createLocation(frame, location)
         return ''
     end
 
-    return Template.safeExpand(frame, 'Flag/' .. string.lower(location)) ..
-                '&nbsp;' ..
+    return Flags(location) .. '&nbsp;' ..
                 '[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
