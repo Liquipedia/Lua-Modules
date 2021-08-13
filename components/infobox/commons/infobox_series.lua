@@ -56,7 +56,6 @@ function Series:createInfobox(frame)
             :links(links)
 
     if Namespace.isMain() then
-
         Series:addCustomVariables(args)
 
         local lpdbData = {
