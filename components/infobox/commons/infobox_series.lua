@@ -57,7 +57,7 @@ function Series:createInfobox(frame)
 
     if Namespace.isMain() then
 
-        Series:setTournamentVars(args)
+        Series:addCustomVariables(args)
 
         local lpdbData = {
             name = self.name,
