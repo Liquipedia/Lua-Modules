@@ -7,7 +7,6 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Template = require('Module:Template')
 local json = require("Module:Json")
-local getIconName = require("Module:IconName").luaGet
 local _frame
 
 local ALLOWED_STATUSES = { "W", "FF", "DQ", "L" }
@@ -205,8 +204,6 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getExtraData(match)
-	local opponent1 = match.opponent1 or {}
-	local opponent2 = match.opponent2 or {}
 	match.extradata = json.stringify({
 		matchsection = Variables.varDefault("matchsection"),
 		comment = match.comment,
