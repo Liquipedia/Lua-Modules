@@ -84,7 +84,7 @@ function Company:createInfobox(frame)
     return infobox:build()
 end
 
---- Allows for overriding this functionality 
+--- Allows for overriding this functionality
 function Company:addCustomCells(infobox, args)
     return infobox
 end
