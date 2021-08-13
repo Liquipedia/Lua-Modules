@@ -74,7 +74,7 @@ function Team:createInfobox(frame)
             :header('Recent Player Trades', args.trades)
             :centeredCell(args.trades)
             :centeredCell(args.footnotes)
-    Team:addCustomCells2(infobox, args)
+    Team:addCustomContent(infobox, args)
             :bottom(Team.createBottomContent(infobox))
 
     if Namespace.isMain() then
@@ -85,7 +85,7 @@ function Team:createInfobox(frame)
 end
 
 --- Allows for overriding this functionality
-function Team:addCustomCells2(infobox, args)
+function Team:addCustomContent(infobox, args)
     return infobox
 end
 
