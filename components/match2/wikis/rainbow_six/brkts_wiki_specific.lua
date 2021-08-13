@@ -15,6 +15,7 @@ local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -582,6 +583,18 @@ function opponentFunctions.getTeamNameAndIcon(template, date)
 	end
 
 	return team, icon, template
+end
+
+--
+-- Override functons
+--
+function p.matchHasDetails(match)
+	return match.dateIsExact
+		or match.date ~= _EPOCH_TIME_EXTENDED
+		or match.vod
+		or not Table.isEmpty(match.links)
+		or match.comment
+		or 0 < #match.games
 end
 
 return p
