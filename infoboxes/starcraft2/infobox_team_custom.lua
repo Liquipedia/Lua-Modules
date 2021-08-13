@@ -1,13 +1,12 @@
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 local Links = require('Module:Links')
-local getArgs = require('Module:Arguments').getArgs
 local Achievements = require('Module:Achievements in infoboxes')
 local RaceIcon = require('Module:RaceIcon').getSmallIcon
 local Matches = require('Module:Upcoming ongoing and recent matches team/new')
 
 local doStore = true
-local earnings = 0
+local earningsGlobal = 0
 local pagename = mw.title.getCurrentTitle().prefixedText
 
 local StarCraft2Team = {}
@@ -81,7 +80,7 @@ function StarCraft2Team.storeToLPDB(args)
 		logo = args.image or '',
 		createdate = args.created or '',
 		disbanddate = args.disbanded or '',
-		earnings = earnings,
+		earnings = earningsGlobal,
 		coach = args.coaches or '',
 		manager = args.manager or '',
 		sponsors = args.sponsor or '',
@@ -99,7 +98,7 @@ function StarCraft2Team.playerBreakDown(args)
 	if playernumber == 0 then
 		playernumber = zergnumber + terrannumbner + protossnumber + randomnumber
 	end
-	
+
 	if playernumber > 0 then
 		playerBreakDown.playernumber = playernumber
 		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
@@ -143,9 +142,9 @@ function StarCraft2Team.calculateEarnings(_, args)
 			doStore = false
 			Variables.varDefine('disable_SMW_storage', 'true')
 	else
-		earnings = StarCraft2Team.get_earnings_and_medals_data(pagename) or 0
-		Variables.varDefine('earnings', earnings)
-		return earnings
+		earningsGlobal = StarCraft2Team.get_earnings_and_medals_data(pagename) or 0
+		Variables.varDefine('earnings', earningsGlobal)
+		return earningsGlobal
 	end
 	return 0
 end
@@ -169,7 +168,6 @@ function StarCraft2Team.get_earnings_and_medals_data(team)
 		'[[extradata_participantteam::' .. team .. ']])))'
 	local count
 	local data = {} -- get LPDB results in here
-	local additional_data = {}
 	local offset = 0
 	repeat
 		local additional_data = mw.ext.LiquipediaDB.lpdb('placement', {
