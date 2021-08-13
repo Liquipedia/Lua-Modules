@@ -93,7 +93,7 @@ function Player:createInfobox(frame)
             :centeredCell(args.history)
             :centeredCell(args.footnotes)
     Player:addCustomContent(infobox, args)
-            :bottom(Player.createBottomContent(infobox))
+    infobox:bottom(Player.createBottomContent(infobox))
 
     if Player:storeInLPDBandVars(args) then
         local playerType = Player:getType(args)
