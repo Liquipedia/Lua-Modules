@@ -40,7 +40,7 @@ function League:createInfobox(frame)
                         :options({})
                         :content(
                             League:_createSeries(frame, args.series, args.abbrevation),
-                            League:_createSeries(frame, args.series, args.abbrevation)
+                            League:_createSeries(frame, args.series2, args.abbrevation2)
                         )
                         :make()
             )
@@ -166,10 +166,14 @@ function League:_createLocation(details)
 end
 
 function League:_createSeries(frame, series, abbreviation)
+	if String.isEmpty(series) then
+		return nil
+	end
+
     local output = ''
 
     if self:_exists('Template:LeagueIconSmall/' .. series:lower()) then
-        output = Template.safeExpand(frame, 'LeagueIconSmall' .. series:lower()) .. ' '
+        output = Template.safeExpand(frame, 'LeagueIconSmall/' .. series:lower()) .. ' '
     end
 
     if not self:_exists(series) then
