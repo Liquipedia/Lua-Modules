@@ -45,7 +45,7 @@ end
 function Sc2Series._getSeriesPrizepools(args)
 	local seriesTotalPrizeInput = Json.parseIfString(args.prizepooltot or '{}')
 	local series = seriesTotalPrizeInput.series or args.series or mw.title.getCurrentTitle().text
-	
+
 	--build args for the SeriesTotalPrize Module
 	local newArgs = {
 		series = series,
@@ -99,7 +99,7 @@ function Sc2Series._getGameVersion(game, patch, args)
 			if patch == epatch then
 				patch_display = patch_display .. '<br/>[[' .. patch .. ']]'
 			else
-				patch_display = patch_display .. '<br/>[[' .. patch .. ']] &ndash; [[' .. epatch .. ']]' 
+				patch_display = patch_display .. '<br/>[[' .. patch .. ']] &ndash; [[' .. epatch .. ']]'
 			end
 		end
 
@@ -141,7 +141,7 @@ function Sc2Series._setDateMatchVar(date, edate, sdate)
 	date = string.match(date or '', '%d%d%d%d%-%d%d%-%d%d')
 		or string.match(edate or '', '%d%d%d%d%-%d%d%-%d%d')
 		or string.match(sdate or '', '%d%d%d%d%-%d%d%-%d%d') or ''
-	
+
 	VarDefine('date', date)
 end
 
