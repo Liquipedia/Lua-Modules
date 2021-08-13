@@ -16,7 +16,7 @@ function StarCraft2Team.run(frame)
 	Team.calculateEarnings = StarCraft2Team.calculateEarnings
 	Team.getAchievements = StarCraft2Team.getAchievements
 	Team.getHistory = StarCraft2Team.getHistory
-	Team.addCustomHeadersAndCells = StarCraft2Team.addCustomHeadersAndCells
+	Team.addCustomContent = StarCraft2Team.addCustomContent
 	Team.createBottomContent = StarCraft2Team.createBottomContent
 	return Team:createInfobox(frame)
 end
@@ -34,7 +34,7 @@ function StarCraft2Team.createBottomContent(infobox)
 	end
 end
 
-function StarCraft2Team.addCustomHeadersAndCells(team, infobox, args)
+function StarCraft2Team.addCustomContent(team, infobox, args)
 	local achievements, soloAchievements = StarCraft2Team.getAutomatedAchievements(pagename)
 	local playerBreakDown = StarCraft2Team.playerBreakDown(args)
 
