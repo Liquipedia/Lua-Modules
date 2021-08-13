@@ -15,9 +15,6 @@ local getArgs = require('Module:Arguments').getArgs
 local Player = Class.new()
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
-local _BIRTHDAY
-local _DEATHDAY
-local _STATUS
 
 function Player.run(frame)
     return Player:createInfobox(frame)
@@ -206,7 +203,7 @@ function Player:_createLocation(country, location)
 	local countryDisplay = Flags._CountryName(country)
 
     return Flags._Flag(country) .. '&nbsp;' ..
-                '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
+                '[[:Category:' .. countryDisplay .. ' Players|' .. countryDisplay .. ']]'
                 .. (location ~= nil and (',&nbsp;' .. location) or '')
 end
 
