@@ -47,10 +47,14 @@ function League:createInfobox(frame)
             :fcell(Cell  :new('Organizer')
                         :options({})
                         :content(
-                            League:_createOrganizer(args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
-                            League:_createOrganizer(args.organizer2, args['organizer-name2'], args['organizer-link2'], args.organizerref2),
-                            League:_createOrganizer(args.organizer3, args['organizer-name3'], args['organizer-link3'], args.organizerref3),
-                            League:_createOrganizer(args.organizer4, args['organizer-name4'], args['organizer-link4'], args.organizerref4)
+                            League:_createOrganizer(
+								args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
+                            League:_createOrganizer(
+								args.organizer2, args['organizer-name2'], args['organizer-link2'], args.organizerref2),
+                            League:_createOrganizer(
+								args.organizer3, args['organizer-name3'], args['organizer-link3'], args.organizerref3),
+                            League:_createOrganizer(
+								args.organizer4, args['organizer-name4'], args['organizer-link4'], args.organizerref4)
                         )
                         :make()
             )
@@ -87,7 +91,8 @@ function League:createInfobox(frame)
                         :content(args.date)
                         :variables(
                             {key = 'date', value = self:_cleanDate(args.date)},
-                            {key = 'tournament_date', value = self:_cleanDate(args.edate) or self:_cleanDate(args.date) or ''}
+                            {key = 'tournament_date',
+								value = self:_cleanDate(args.edate) or self:_cleanDate(args.date) or ''}
                         )
 						:make()
             )
