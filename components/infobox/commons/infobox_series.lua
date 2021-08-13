@@ -57,6 +57,8 @@ function Series:createInfobox(frame)
 
     if Namespace.isMain() then
 
+        Series:setTournamentVars(args)
+
         local lpdbData = {
             name = self.name,
             image = args.image,
@@ -127,6 +129,10 @@ end
 --- Allows for overriding this functionality
 function Series:addCustomCells(infobox, args)
     return infobox
+end
+
+--- Allows for overriding this functionality
+function Series:setTournamentVars(args)
 end
 
 --- Allows for overriding this functionality
