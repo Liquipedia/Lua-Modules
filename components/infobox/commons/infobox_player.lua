@@ -95,7 +95,7 @@ function Player:createInfobox(frame)
     Player:addCustomContent(infobox, args)
     infobox:bottom(Player.createBottomContent(infobox))
 
-    if Player:storeInLPDBandVars(args) then
+    if Player:shouldStoreData(args) then
         local playerType = Player:getType(args)
         infobox:categories('Players')
 
@@ -143,7 +143,7 @@ end
 
 --- Allows for overriding this functionality
 --- Decides if we store in LPDB and Vars or not
-function Player:storeInLPDBandVars(args)
+function Player:shouldStoreData(args)
     return Namespace.isMain()
 end
 
@@ -206,7 +206,6 @@ function Player:_createTeam(team, link)
     return '[[' .. link .. '|' .. team .. ']]'
 end
 
---- Allows for overriding this functionality
 function Player:_getLinksLPDB(links)
     for key, item in pairs(links) do
         links[key] = Links.makeFullLink(key, item, _LINK_VARIANT)
