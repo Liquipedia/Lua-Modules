@@ -6,6 +6,7 @@ local MatchGroupUtil = require('Module:MatchGroup/Util')
 local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
+local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
 
 local html = mw.html
 
@@ -84,7 +85,7 @@ function MatchlistDisplay.Matchlist(props)
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
 		collapsible = Logic.nilOr(propsConfig.collapsible, true),
-		matchHasDetails = propsConfig.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
+		matchHasDetails = propsConfig.matchHasDetails or matchHasDetailsWikiSpecific or DisplayHelper.defaultMatchHasDetails,
 		width = propsConfig.width or 300,
 	}
 	local tableNode = html.create('table')
