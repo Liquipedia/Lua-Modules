@@ -132,7 +132,7 @@ function Series:addCustomCells(infobox, args)
 end
 
 --- Allows for overriding this functionality
-function Series:setTournamentVars(args)
+function Series:addCustomVariables(args)
 end
 
 --- Allows for overriding this functionality
