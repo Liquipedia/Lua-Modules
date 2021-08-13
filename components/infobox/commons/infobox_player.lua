@@ -159,11 +159,6 @@ function Player:addCustomContent(infobox, args)
 end
 
 --- Allows for overriding this functionality
-function Player:addCustomContent(infobox, args)
-    return infobox
-end
-
---- Allows for overriding this functionality
 function Player:getAchievements(infobox, args)
     return args.achievements
 end
