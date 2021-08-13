@@ -56,6 +56,7 @@ function Series:createInfobox(frame)
             :links(links)
 
     if Namespace.isMain() then
+        Series:addCustomVariables(args)
 
         local lpdbData = {
             name = self.name,
@@ -127,6 +128,10 @@ end
 --- Allows for overriding this functionality
 function Series:addCustomCells(infobox, args)
     return infobox
+end
+
+--- Allows for overriding this functionality
+function Series:addCustomVariables(args)
 end
 
 --- Allows for overriding this functionality
