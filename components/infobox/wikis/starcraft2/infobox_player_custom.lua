@@ -112,7 +112,7 @@ function StarCraft2Player._getRaceData(race)
 end
 
 function StarCraft2Player.createBottomContent(infobox)
-	if doStore then
+	if shouldStoreData then
 		return tostring(Matches._get_ongoing({})) ..
 			tostring(Matches._get_upcoming({})) ..
 			tostring(Matches._get_recent({}))
@@ -204,7 +204,7 @@ end
 
 function StarCraft2Player.calculateEarnings(_, args)
 	shouldStoreData = Player.shouldStoreData(args)
-	
+
 	if shouldStoreData then
 		local earningsTotal
 		earningsTotal, earningsGlobal = StarCraft2Player._get_earnings_and_medals_data(pagename)
@@ -357,15 +357,15 @@ function StarCraft2Player._military(military)
 		local display = military
 		military = string.lower(military)
 		local militaryCategory
-		if String.Contains('starting') or String.Contains('pending') then
+		if String.Contains(military, 'starting') or String.Contains(military, 'pending') then
 			militaryCategory = '[[Category:Players waiting for Military Duty]]'
-		elseif String.Contains('starting') or String.Contains('pending') then
+		elseif String.Contains(military, 'starting') or String.Contains(military, 'pending') then
 			militaryCategory = '[[Category:Players waiting for Military Duty]]'
-		elseif String.Contains('ending') or String.Contains('started') or String.Contains('ongoing') then
+		elseif String.Contains(military, 'ending') or String.Contains(military, 'started') or String.Contains(military, 'ongoing') then
 			militaryCategory = '[[Category:Players on Military Duty]]'
-		elseif String.Contains('fulfilled') then
+		elseif String.Contains(military, 'fulfilled') then
 			militaryCategory = '[[Category:Players expleted Military Duty]]'
-		elseif String.Contains('exempted') then
+		elseif String.Contains(military, 'exempted') then
 			militaryCategory = '[[Category:Players exempted from Military Duty]]'
 		else
 			militaryCategory = ''
@@ -493,7 +493,6 @@ function StarCraft2Player._get_matchup_data(player)
 					end
 					yearsActive = yearsActive .. years[i]
 					tempYear = years[i]
-					isNewLine = false
 				end
 
 				if i == currentYear then
