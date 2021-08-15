@@ -10,7 +10,7 @@ local Flags = require('Module:Flags')
 --local GetBirthAndDeath = require('Module:???')._get
 
 --the following 3 lines as a temp workaround until the Birth&Death stuff is implemented:
-function GetBirthAndDeath()
+local function GetBirthAndDeath()
     return '', nil, nil, nil
 end
 
@@ -48,7 +48,14 @@ function Player:createInfobox(frame)
     end
     local nameDisplay = Player:nameDisplay(args)
     local role = Player:getRole(args)
-    local birthDisplay, deathDisplay, birthday, deathday = GetBirthAndDeath(args.birth_date, args.birth_location, args.death_date, role.category, shouldStoreData)
+    local birthDisplay, deathDisplay, birthday, deathday
+        = GetBirthAndDeath(
+            args.birth_date,
+            args.birth_location,
+            args.death_date,
+            role.category,
+            shouldStoreData
+        )
     local status = Player:getStatus(args)
 
     infobox :name(nameDisplay)
