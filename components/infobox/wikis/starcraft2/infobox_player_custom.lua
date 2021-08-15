@@ -356,19 +356,18 @@ function StarCraft2Player._military(military)
 	if military and military ~= 'false' then
 		local display = military
 		military = string.lower(military)
-		local militaryCategory
+		local militaryCategory = ''
 		if String.Contains(military, 'starting') or String.Contains(military, 'pending') then
 			militaryCategory = '[[Category:Players waiting for Military Duty]]'
 		elseif String.Contains(military, 'starting') or String.Contains(military, 'pending') then
 			militaryCategory = '[[Category:Players waiting for Military Duty]]'
-		elseif String.Contains(military, 'ending') or String.Contains(military, 'started') or String.Contains(military, 'ongoing') then
-			militaryCategory = '[[Category:Players on Military Duty]]'
+		elseif String.Contains(military, 'ending') or String.Contains(military, 'started')
+			or String.Contains(military, 'ongoing') then
+				militaryCategory = '[[Category:Players on Military Duty]]'
 		elseif String.Contains(military, 'fulfilled') then
 			militaryCategory = '[[Category:Players expleted Military Duty]]'
 		elseif String.Contains(military, 'exempted') then
 			militaryCategory = '[[Category:Players exempted from Military Duty]]'
-		else
-			militaryCategory = ''
 		end
 
 		return display .. militaryCategory
