@@ -198,7 +198,11 @@ end
 --remove appended numbers
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
 function Infobox.getIconString(key)
-	return string.gsub(key, '%d$', '')
+    if key == 'matcherinolink' then
+        key = 'matcherino'
+    end
+
+    return string.gsub(key, '%d$', '')
 end
 
 function Infobox:centeredCell(content)
