@@ -1,4 +1,5 @@
-local Player = require('Module:Infobox/Player')
+--local Player = require('Module:Infobox/Player')
+local Player = require('Module:Hjpalpha/sandbox15')
 local Variables = require('Module:Variables')
 local Achievements = require('Module:Achievements in infoboxes')._player
 local RaceIcon = require('Module:RaceIcon').getBigIcon
