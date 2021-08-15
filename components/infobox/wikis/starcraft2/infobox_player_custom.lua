@@ -1,5 +1,4 @@
---local Player = require('Module:Infobox/Player')
-local Player = require('Module:Hjpalpha/sandbox15')
+local Player = require('Module:Infobox/Player')
 local Variables = require('Module:Variables')
 local Achievements = require('Module:Achievements in infoboxes')._player
 local RaceIcon = require('Module:RaceIcon').getBigIcon
@@ -98,7 +97,7 @@ function StarCraft2Player._getRaceData(race)
 
 	race = string.lower(race)
 	race = cleanRace[race] or race
-	display = raceCategory[race]
+	local display = raceCategory[race]
 	if not display and race ~= 'unknown' then
 		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
@@ -200,7 +199,7 @@ function StarCraft2Player.getRole(_, args)
 	local category = ROLES[role]
 	local store = category or cleanOther[role] or 'Player'
 
-    return { title = 'Race', display = raceData.display, store = args.role, category = category or 'Player'}
+    return { title = 'Race', display = raceData.display, store = store, category = category or 'Player'}
 end
 
 function StarCraft2Player.calculateEarnings(_, args)
@@ -218,7 +217,6 @@ end
 function StarCraft2Player._get_earnings_and_medals_data(player)
 	local count
 	local data = {} -- get LPDB results in here
-	local additional_data = {}
 	local offset = 0
 	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR ' ..
 		'([[mode::1v1]] AND ([[placement::1]] OR [[placement::2]] OR [[placement::3]]' ..
@@ -310,7 +308,7 @@ end
 
 function StarCraft2Player._Placements(value)
 	value = (value or '') ~= '' and value or '99'
-	local value = mw.text.split(value, '-')[1]
+	value = mw.text.split(value, '-')[1]
 	if value ~= '1' and value ~= '2' and value ~= '3' then
 		value = '99'
 	elseif value == '3' then
@@ -358,7 +356,7 @@ function StarCraft2Player._military(military)
 	if military and military ~= 'false' then
 		local display = military
 		military = string.lower(military)
-		local militaryCategory = ''
+		local militaryCategory
 		if String.Contains('starting') or String.Contains('pending') then
 			militaryCategory = '[[Category:Players waiting for Military Duty]]'
 		elseif String.Contains('starting') or String.Contains('pending') then
@@ -369,6 +367,8 @@ function StarCraft2Player._military(military)
 			militaryCategory = '[[Category:Players expleted Military Duty]]'
 		elseif String.Contains('exempted') then
 			militaryCategory = '[[Category:Players exempted from Military Duty]]'
+		else
+			militaryCategory = ''
 		end
 
 		return display .. militaryCategory
@@ -386,9 +386,9 @@ function StarCraft2Player.getStatus(args)
     return { store = status }
 end
 
-function StarCraft2Player.addCustomCells(Player, infobox, args)
+function StarCraft2Player.addCustomCells(_, infobox, args)
 	local rank1, rank2
-	local yearsActive
+	local yearsActive, activeCategory
 	if shouldStoreData and not status then
 		rank1, rank2 = StarCraft2Player._getRank(pagename)
 		yearsActive, activeCategory = StarCraft2Player._get_matchup_data(pagename)
@@ -416,12 +416,11 @@ function StarCraft2Player._get_matchup_data(player)
 	local conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]'
 
 	local data = {} -- get LPDB results in here
-	local additional_data = {}
 	local offset = 0
 	repeat
 		local additional_data = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = conditions,
-		query = 'match2opponents, date',
+			conditions = conditions,
+			query = 'match2opponents, date',
 			offset = offset,
 			limit = 5000
 		})
@@ -438,15 +437,15 @@ function StarCraft2Player._get_matchup_data(player)
 	local years = {}
 	local vs = {}
 	local races = { 'p', 't', 'z', 'r', 'total' }
-	for key1, item1 in pairs(races) do
+	for _, item1 in pairs(races) do
 		vs[item1] = {}
-		for key2, item2 in pairs(races) do
+		for _, item2 in pairs(races) do
 			vs[item1][item2] = { ['win'] = 0, ['loss'] = 0 }
 		end
 	end
 
 	if type(data[1]) == 'table' then
-		CleanRace = { ['t'] = 't', ['z'] = 'z', ['p'] = 'p'}
+		local CleanRace = { ['t'] = 't', ['z'] = 'z', ['p'] = 'p'}
 		for i=1, #data do
 			local plIndex = 1
 			local vsIndex = 2
@@ -475,7 +474,6 @@ function StarCraft2Player._get_matchup_data(player)
 			years[tonumber(string.sub(data[i].date, 1, 4))] = string.sub(data[i].date, 1, 4)
 		end
 
-		local currentYear = tonumber(os.date('%Y'))
 		if years[currentYear] ~= nil or years[currentYear - 1] ~= nil or years[currentYear - 2] ~= nil then
 			category = 'Active players'
 		else
@@ -484,7 +482,6 @@ function StarCraft2Player._get_matchup_data(player)
 
 		local tempYear = nil
 		local firstYear = true
-		local isNewLine = true
 
 		for i = 2010, currentYear do
 			if years[i] then
@@ -528,7 +525,7 @@ function StarCraft2Player._get_matchup_data(player)
 end
 
 --here
-function StarCraft2Player.getExtradata(args, role, status)
+function StarCraft2Player.getExtradata(args, role, _)
     return {}
 end
 
