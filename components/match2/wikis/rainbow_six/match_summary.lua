@@ -497,11 +497,11 @@ function CustomMatchSummary._createMap(game)
 		local oppositeSideOvertime = CustomMatchSummary._getOppositeSide(firstSideOvertime)
 
 		if not Logic.isEmpty(firstSideOvertime) then
-			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot'..firstSide], true)
-			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot'..oppositeSide], true)
+			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot'..firstSideOvertime], true)
+			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot'..oppositeSideOvertime], true)
 
-			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot'..oppositeSide], false)
-			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot'..firstSide], false)
+			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot'..oppositeSideOvertime], false)
+			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot'..firstSideOvertime], false)
 		else
 			team1Score:addEmptyOvertime()
 			team2Score:addEmptyOvertime()

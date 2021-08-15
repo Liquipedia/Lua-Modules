@@ -64,10 +64,10 @@ function p.storeGames(match, match2)
 			local team2 = {}
 			if extradata.t1firstside[1] == "atk" then
 				team1 = {"atk", extradata.t1halfs.atk, extradata.t1halfs.def}
-				team2 = {"def", extradata.t2halfs.def, extradata.t2halfs.atk}
+				team2 = {"def", extradata.t2halfs.atk, extradata.t2halfs.def}
 			elseif extradata.t1firstside[1] == "def" then
 				team2 = {"atk", extradata.t2halfs.atk, extradata.t2halfs.def}
-				team1 = {"def", extradata.t1halfs.def, extradata.t1halfs.atk}
+				team1 = {"def", extradata.t1halfs.atk, extradata.t1halfs.def}
 			end
 			if extradata.t1firstside.ot == "atk" then
 				table.insert(team1, "atk")
@@ -129,7 +129,7 @@ function p.convertParameters(match2)
 		match.extradata.mvp = match.extradata.mvp .. ";" .. mvp.points
 	end
 
-	match.extradata.bestofx = match2.bestof
+	match.extradata.bestofx = tostring(match2.bestof)
 
 	local veto = json.parse(extradata.mapveto)
 	if veto then
