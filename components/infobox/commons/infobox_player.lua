@@ -7,14 +7,19 @@ local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
---local Lua = require('Module:Lua')--needed for the next line only
---local AgeCalculation = (Lua.requireIfExists('Module:Infobox/Player/Age') or require('Module:Infobox player/age')).get
+--local GetBirthAndDeath = require('Module:???')._get
+
+--the following 3 lines as a temp workaround until the Birth&Death stuff is implemented:
+function GetBirthAndDeath()
+    return '', nil, nil, nil
+end
 
 local getArgs = require('Module:Arguments').getArgs
 
 local Player = Class.new()
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
+local shouldStoreData
 
 function Player.run(frame)
     return Player:createInfobox(frame)
@@ -25,6 +30,8 @@ function Player:createInfobox(frame)
     self.frame = frame
     self.pagename = mw.title.getCurrentTitle().text
     self.name = args.id or self.pagename
+
+    shouldStoreData = Player:shouldStoreData(args)
 
     if args.game == nil then
         return error('Please provide a game!')
@@ -39,11 +46,12 @@ function Player:createInfobox(frame)
     else
         earnings = '$' .. Language:formatNum(earnings)
     end
-    local birthDisplay, deathDisplay, birthday, deathday = Player:birthAndDeath(args)
-    local status = Player:getStatus(args)
+    local nameDisplay = Player:nameDisplay(args)
     local role = Player:getRole(args)
+    local birthDisplay, deathDisplay, birthday, deathday = GetBirthAndDeath(args.birth_date, args.birth_location, args.death_date, role.category, shouldStoreData)
+    local status = Player:getStatus(args)
 
-    infobox :name(Player:name(args))
+    infobox :name(nameDisplay)
             :image(args.image, args.default)
             :centeredCell(args.caption)
             :header('Player Information', true)
@@ -53,7 +61,7 @@ function Player:createInfobox(frame)
             :cell('Died', deathDisplay)
             :cell('Status', status.display)
             :cell(role.title or 'Role', role.display)
-            :fcell(Cell :new('Location')
+            :fcell(Cell :new('Country')
                         :options({})
                         :content(
                             Player:_createLocation(args.country or args.nationality, args.location),
@@ -86,33 +94,46 @@ function Player:createInfobox(frame)
 
     local links = Links.transform(args)
     local achievements = Player:getAchievements(infobox, args)
+    local history = Player:getHistory(infobox, args)
 
     infobox :header('Links', not Table.isEmpty(links))
             :links(links, _LINK_VARIANT)
             :header('Achievements', achievements)
             :centeredCell(achievements)
-            :header('History', args.history)
-            :centeredCell(args.history)
+            :header('History', history)
+            :centeredCell(history)
             :centeredCell(args.footnotes)
     Player:addCustomContent(infobox, args)
     infobox:bottom(Player.createBottomContent(infobox))
 
-    if Player:shouldStoreData(args) then
-        infobox:categories('Players')
+    if shouldStoreData then
+        infobox:categories(role.category)
         if not args.teamlink and not args.team then
-            infobox:categories('Teamless Players')
+            infobox:categories('Teamless ' .. role.category .. 's')
         end
         if args.death_date then
-            infobox:categories('Deceased People')
+            infobox:categories('Deceased ' .. role.category .. 's')
         end
-        if args.retired then
-            infobox:categories('Retired Players')
+        if
+            args.retired == 'yes' or args.retired == 'true'
+            or string.lower(status.store or '') == 'retired'
+            or string.match(args.retired or '', '%d%d%d%d%')--if retired has year set apply the retired category
+        then
+            infobox:categories('Retired ' .. role.category .. 's')
+        else
+            infobox:categories('Active ' .. role.category .. 's')
         end
-        --more cats here
-        --maybe some finetuning via role
-        --e.g. 'Retired ' .. role.category (Players, Casters, Coaches, ...)
+        if not args.id then
+            infobox:categories('InfoboxIncomplete.')
+        end
+        if not args.image then
+            infobox:categories(role.category .. 's with no profile picture')
+        end
+        if not birthDisplay then
+            infobox:categories(role.category .. 's with unknown birth date')
+        end
 
-        local extradata = Player:getExtradata(args)
+        local extradata = Player:getExtradata(args, role, status)
         links = Player:_getLinksLPDB(links)
 
         mw.ext.LiquipediaDB.lpdb_player('player' .. self.name, {
@@ -141,7 +162,7 @@ end
 
 --- Allows for overriding this functionality
 function Player:getRole(args)
-    return { display = args.role, store = args.role }
+    return { display = args.role, store = args.role, category = args.role or 'Player'}
 end
 
 --- Allows for overriding this functionality
@@ -150,7 +171,12 @@ function Player:getStatus(args)
 end
 
 --- Allows for overriding this functionality
-function Player:getExtradata(args)
+function Player:getHistory(infobox, args)
+    return args.history
+end
+
+--- Allows for overriding this functionality
+function Player:getExtradata(args, role, status)
     return {}
 end
 
@@ -162,11 +188,11 @@ end
 
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
-function Player:name(args)
-	local team = args.teamlink or args.team
-	local icon = mw.ext.TeamTemplate.teamexists(team)
-		and mw.ext.TeamTemplate.teamicon(team) or ''
-	local name = args.id or mw.title.getCurrentTitle().text
+function Player:nameDisplay(args)
+    local team = args.teamlink or args.team
+    local icon = mw.ext.TeamTemplate.teamexists(team)
+        and mw.ext.TeamTemplate.teamicon(team) or ''
+    local name = args.id or mw.title.getCurrentTitle().text
 
     return icon .. '&nbsp;' .. name
 end
@@ -206,12 +232,12 @@ end
 
 function Player:_createLocation(country, location)
     if country == nil or country == '' then
-        return ''
+        return nil
     end
     local countryDisplay = Flags._CountryName(country)
 
     return Flags._Flag(country) .. '&nbsp;' ..
-                '[[:Category:' .. countryDisplay .. ' Players|' .. countryDisplay .. ']]'
+                '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
                 .. (location ~= nil and (',&nbsp;' .. location) or '')
 end
 
@@ -229,11 +255,6 @@ function Player:_getLinksLPDB(links)
         links[key] = Links.makeFullLink(key, item, _LINK_VARIANT)
     end
     return links
-end
-
---- here todo
-function Player:_birthAndDeath(args)
-    return '', nil, nil, nil
 end
 
 return Player
