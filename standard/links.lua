@@ -59,6 +59,7 @@ local _PREFIXES = {
     rules = "",
     aligulac = "https://aligulac.com/results/events/",
     booyah = "https://booyah.live/",
+    loco = "https://loco.gg/streamers/",
     afreeca = "http://afreecatv.com/",
     askfm = "https://ask.fm/",
     team = {
@@ -100,6 +101,7 @@ function Links.transform(links)
         aligulac = links.aligulac,
         rules = links.rules,
         booyah = links.booyah,
+        loco = links.loco,
         tlstream = links.tlstream,
         stream = links.stream,
         douyu = links.douyu,
