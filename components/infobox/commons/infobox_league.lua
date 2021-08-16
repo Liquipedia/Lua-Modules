@@ -144,6 +144,11 @@ function League:addCustomCells(infobox, args)
 end
 
 --- Allows for overriding this functionality
+function League:addCustomContent(infobox, args)
+    return infobox
+end
+
+--- Allows for overriding this functionality
 function League:createBottomContent(infobox)
     return infobox
 end
