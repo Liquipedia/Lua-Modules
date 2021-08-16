@@ -241,7 +241,7 @@ function League:_createOrganizers(args)
 
     local index = 2
 
-    while args['organizer' .. index] do
+    while not String.isEmpty(args['organizer' .. index]) do
         table.insert(
             organizers,
             League:_createOrganizer(
