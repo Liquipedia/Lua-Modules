@@ -80,7 +80,6 @@ function p._getLocalisation(args, frame)
 	return localised
 end
 
---helper function
 function p._cleanCountry(country)
 	-- Remove whitespace
 	country = mw.text.trim(country)
