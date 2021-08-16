@@ -1,5 +1,6 @@
 local Localisation = {}
-local getArgs = require("Module:Arguments").getArgs
+local getArgs = require('Module:Arguments').getArgs
+local String = require('Module:StringUtils')
 
 function Localisation.getCountryName(frame)
 	local args = getArgs(frame)
@@ -10,10 +11,6 @@ function Localisation._getCountryName(args, frame)
 	local country = args[1]
 	local noentry = args[2] or ''
 	local data = mw.loadData('Module:Localisation/data/country')
-
-	if (country == nil) then
-		country = 'nocountry'
-	end
 
 	-- clean the entered country value
 	country = Localisation._cleanCountry(country)
@@ -47,10 +44,6 @@ function Localisation._getLocalisation(args, frame)
 	local noentry = args[2] or ''
 	local data = mw.loadData(dataModuleName)
 
-	if (country == nil) then
-		country = 'nocountry'
-	end
-
 	-- clean the entered country value
 	country = Localisation._cleanCountry(country)
 
@@ -73,6 +66,9 @@ function Localisation._getLocalisation(args, frame)
 end
 
 function Localisation._cleanCountry(country)
+	if String.isEmpty(country) then
+		country = 'nocountry'
+	end
 	-- Remove whitespace
 	country = mw.text.trim(country)
 	country = mw.text.unstripNoWiki(country)
