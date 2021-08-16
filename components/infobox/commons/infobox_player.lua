@@ -6,6 +6,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
+local Localisation = require('Module:Localisation').getLocalisation
 local Flags = require('Module:Flags')
 --local GetBirthAndDeath = require('Module:???')._get
 
@@ -71,9 +72,9 @@ function Player:createInfobox(frame)
             :fcell(Cell :new('Country')
                         :options({})
                         :content(
-                            Player:_createLocation(args.country or args.nationality, args.location),
-                            Player:_createLocation(args.country2 or args.nationality2, args.location2),
-                            Player:_createLocation(args.country3 or args.nationality3, args.location3)
+                            Player:_createLocation(args.country or args.nationality, args.location, role.category),
+                            Player:_createLocation(args.country2 or args.nationality2, args.location2, role.category),
+                            Player:_createLocation(args.country3 or args.nationality3, args.location3, role.category)
                         )
                         :make()
             )
@@ -237,14 +238,16 @@ function Player:_createRegion(region)
     return Template.safeExpand(self.frame, 'Region', {region})
 end
 
-function Player:_createLocation(country, location)
+function Player:_createLocation(country, location, role)
     if country == nil or country == '' then
         return nil
     end
     local countryDisplay = Flags._CountryName(country)
+    local demonym = Localisation(countryDisplay)
 
     return Flags._Flag(country) .. '&nbsp;' ..
-                '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
+                '[[:Category:' .. demonym .. ' ' .. role .. '|' .. countryDisplay .. ']]'
+                .. '[[Category:' .. demonym .. ' ' .. role .. ']]'
                 .. (location ~= nil and (',&nbsp;' .. location) or '')
 end
 
