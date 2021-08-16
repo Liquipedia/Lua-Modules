@@ -1,7 +1,6 @@
 local p = {}
 local getArgs = require("Module:Arguments").getArgs
 
--- Get country name
 function p.getCountryName(frame)
 	local args = getArgs(frame)
 	return p._getCountryName(args, frame)
