@@ -189,9 +189,9 @@ function Infobox:links(links, variant)
                     :addClass('infobox-icons')
 
     for key, value in pairs(links) do
-        local iconString = Infobox.getIconString(key)
+        key = Infobox.removeAppendedNumber(key)
         local link = '[' .. Links.makeFullLink(key, value, variant) ..
-            ' <i class="lp-icon lp-' .. iconString .. '></i>]'
+            ' <i class="lp-icon lp-' .. (_ICON_KEYS_TO_RENAME[key] or key) .. '></i>]'
         infoboxLinks:wikitext(' ' .. link)
     end
 
@@ -199,12 +199,9 @@ function Infobox:links(links, variant)
     return self
 end
 
---remove appended numbers
+--remove appended number
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
-function Infobox.getIconString(key)
-    key = string.gsub(key, '%d$', '')
-    key = _ICON_KEYS_TO_RENAME[key] or key
-
+function Infobox.removeAppendedNumber(key)
     return string.gsub(key, '%d$', '')
 end
 
