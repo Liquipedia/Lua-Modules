@@ -231,7 +231,7 @@ function League:_createOrganizer(organizer, name, link, reference)
 end
 
 function League:_cleanDate(date)
-    if date == nil or date == 'tba' then
+    if self:_isUnknownDate(date) then
         return nil
     end
 
@@ -243,6 +243,10 @@ end
 function League:_exists(page)
     return mw.title.new(page).exists
 
+end
+
+function League:_isUnknownDate(date)
+    return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
 end
 
 return League
