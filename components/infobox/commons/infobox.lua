@@ -201,13 +201,21 @@ function Infobox.getIconString(key)
 	return string.gsub(key, '%d$', '')
 end
 
-function Infobox:centeredCell(content)
-    if content == nil then
+function Infobox:centeredCell(...)
+    local firstItem = select(1, ...)
+    if firstItem == nil or firstItem == '' then
         return self
     end
 
     local infoboxCenteredCell = mw.html.create('div'):addClass('infobox-center')
-    infoboxCenteredCell:wikitext(content)
+    for i = 1, select('#', ...) do
+        local item = select(i, ...)
+        if item == nil then
+            break
+        end
+
+        infoboxCenteredCell:wikitext(item)
+    end
     self.content:node(mw.html.create('div'):node(infoboxCenteredCell))
     return self
 end
