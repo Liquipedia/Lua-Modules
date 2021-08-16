@@ -1,5 +1,5 @@
 local Class = require('Module:Class')
-local Localisation = Class.new()
+local Localisation = {}
 local String = require('Module:StringUtils')
 
 function Localisation.getCountryName(country, noentry)
@@ -65,4 +65,4 @@ function Localisation._cleanCountry(country)
 	return country
 end
 
-return Localisation.export()
+return Localisation.export(Localisation)
