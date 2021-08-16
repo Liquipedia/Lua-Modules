@@ -74,6 +74,8 @@ function League:createInfobox(frame)
                                     infobox:categories('Offline Tournaments')
                                 elseif value == 'online' then
                                     infobox:categories('Online Tournaments')
+                                else
+                                    infobox:categories('Unknown Type Tournaments')
                                 end
                             end
                         )
