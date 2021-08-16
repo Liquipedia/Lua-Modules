@@ -1,12 +1,12 @@
-local p = {}
+local Localisation = {}
 local getArgs = require("Module:Arguments").getArgs
 
-function p.getCountryName(frame)
+function Localisation.getCountryName(frame)
 	local args = getArgs(frame)
-	return p._getCountryName(args, frame)
+	return Localisation._getCountryName(args, frame)
 end
 
-function p._getCountryName(args, frame)
+function Localisation._getCountryName(args, frame)
 	local country = args[1]
 	local noentry = args[2] or ''
 	local data = mw.loadData('Module:Localisation/data/country')
@@ -15,17 +15,14 @@ function p._getCountryName(args, frame)
 		country = 'nocountry'
 	end
 
-	-- Remove whitespace
-	country = p._cleanCountry(country)
-
-	-- Uppercase
-	country = country:upper()
+	-- clean the entered country value
+	country = Localisation._cleanCountry(country)
 
 	-- First try to look it up
 	local countryname = data[country]
 
 	-- Return message if none is found
-	if (countryname == nil) then
+	if countryname == nil then
 		mw.log('No country found in Module:Localisation/data/country: ' .. country)
 		-- set category unless second argument is set
 		if noentry ~= '' then
@@ -39,12 +36,12 @@ function p._getCountryName(args, frame)
 	return countryname
 end
 
-function p.getLocalisation(frame)
+function Localisation.getLocalisation(frame)
 	local args = getArgs(frame)
-	return p._getCountryName(args, frame)
+	return Localisation._getCountryName(args, frame)
 end
 
-function p._getLocalisation(args, frame)
+function Localisation._getLocalisation(args, frame)
 	local dataModuleName = 'Module:Localisation/data/localised'
 	local country = args[1]
 	local noentry = args[2] or ''
@@ -55,16 +52,13 @@ function p._getLocalisation(args, frame)
 	end
 
 	-- clean the entered country value
-	country = p._cleanCountry(country)
-
-	-- Lowercase
-	country = country:lower()
+	country = Localisation._cleanCountry(country)
 
 	-- First try to look it up
 	local localised = data[country]
 
 	-- Return message if none is found
-	if (localised == nil) then
+	if localised == nil then
 		mw.log('No country found in ' .. dataModuleName .. ': ' .. country)
 		-- set category unless second argument is set
 		if noentry ~= '' then
@@ -78,11 +72,11 @@ function p._getLocalisation(args, frame)
 	return localised
 end
 
-function p._cleanCountry(country)
+function Localisation._cleanCountry(country)
 	-- Remove whitespace
 	country = mw.text.trim(country)
-
 	country = mw.text.unstripNoWiki(country)
+	country = string.upper(country)
 
 	return country
 end
