@@ -106,7 +106,7 @@ function Sc2Series._getGameVersion(game, patch, args)
 	end
 end
 
-function Sc2Series.addCustomVariables(args)
+function Sc2Series.addCustomVariables(_, args)
 	if args.disable_smw == 'true' or args.disable_lpdb == 'true' or args.disable_storage == 'true' then
 		VarDefine('disable_SMW_storage', 'true')
 	else
