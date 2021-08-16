@@ -2,12 +2,12 @@ local Class = require('Module:Class')
 local Localisation = {}
 local String = require('Module:StringUtils')
 
-function Localisation.getCountryName(args, frame)
+function Localisation.getCountryName(args, frame, noentry)
 	local country
 	local noentry
 	if type(args) == 'table' then
-		country = args[1]
-		noentry = args[2] or ''
+		country = args[1] or frame
+		noentry = args[2] or noentry or ''
 	else
 		country = args
 		noentry = frame or ''
