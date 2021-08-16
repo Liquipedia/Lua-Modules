@@ -59,7 +59,7 @@ function Player:createInfobox(frame)
     local status = Player:getStatus(args)
 
     infobox :name(nameDisplay)
-            :image(args.image, args.default)
+            :image(args.image, args.defaultImage)
             :centeredCell(args.caption)
             :header('Player Information', true)
             :cell('Name', args.name)
