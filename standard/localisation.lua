@@ -24,7 +24,7 @@ function p._getCountryName(args, frame)
 
 	-- First try to look it up
 	local countryname = data[country]
-	
+
 	-- Return message if none is found
 	if (countryname == nil) then
 		mw.log('No country found in Module:Localisation/data/country: ' .. country)
@@ -64,7 +64,7 @@ function p._getLocalisation(args, frame)
 
 	-- First try to look it up
 	local localised = data[country]
-	
+
 	-- Return message if none is found
 	if (localised == nil) then
 		mw.log('No country found in ' .. dataModuleName .. ': ' .. country)
