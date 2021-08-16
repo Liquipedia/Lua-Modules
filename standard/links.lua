@@ -136,7 +136,7 @@ function Links.transform(links)
         tlstream = links.tlstream,
         stream = links.stream,
         stream2 = links.stream2,
-        douyu = links.douyu,
+        douyu = links.douyu or links.douyutv,
         askfm = links.askfm,
         tlprofile = links.tlprofile,
         fanclub = links.fanclub,
