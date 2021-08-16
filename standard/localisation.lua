@@ -1,15 +1,9 @@
-local Localisation = {}
-local getArgs = require('Module:Arguments').getArgs
+local Class = require('Module:Class')
+local Localisation = Class.new()
 local String = require('Module:StringUtils')
 
-function Localisation.getCountryName(frame)
-	local args = getArgs(frame)
-	return Localisation._getCountryName(args, frame)
-end
-
-function Localisation._getCountryName(args, frame)
-	local country = args[1]
-	local noentry = args[2] or ''
+function Localisation.getCountryName(country, noentry)
+	noentry = noentry or ''
 	local data = mw.loadData('Module:Localisation/data/country')
 
 	-- clean the entered country value
@@ -25,7 +19,7 @@ function Localisation._getCountryName(args, frame)
 		if noentry ~= '' then
 			countryname = ''
 		else
-			countryname = (frame or mw.getCurrentFrame())
+			countryname = mw.getCurrentFrame()
 				:expandTemplate{title = 'Flag/invalidcountry', args = {country}}
 		end
 	end
@@ -33,15 +27,9 @@ function Localisation._getCountryName(args, frame)
 	return countryname
 end
 
-function Localisation.getLocalisation(frame)
-	local args = getArgs(frame)
-	return Localisation._getCountryName(args, frame)
-end
-
-function Localisation._getLocalisation(args, frame)
+function Localisation.getLocalisation(country, noentry)
+	noentry = noentry or ''
 	local dataModuleName = 'Module:Localisation/data/localised'
-	local country = args[1]
-	local noentry = args[2] or ''
 	local data = mw.loadData(dataModuleName)
 
 	-- clean the entered country value
@@ -77,4 +65,4 @@ function Localisation._cleanCountry(country)
 	return country
 end
 
-return Localisation
+return Localisation.export()
