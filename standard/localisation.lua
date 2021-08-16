@@ -4,7 +4,6 @@ local String = require('Module:StringUtils')
 
 function Localisation.getCountryName(args, frame, noentry)
 	local country
-	local noentry
 	if type(args) == 'table' then
 		country = args[1] or frame
 		noentry = args[2] or noentry or ''
