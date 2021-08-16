@@ -230,11 +230,11 @@ end
 
 --- Returns completed infobox
 function Infobox:build()
-    self.root:node(self.content)
-
     if self.chronologyContent ~= nil then
-        self.root:node(self.chronologyContent)
+        self.content:node(self.chronologyContent)
     end
+
+    self.root:node(self.content)
 
     if self.bottomContent ~= nil then
         self.root:node(self.bottomContent)
