@@ -7,6 +7,10 @@ end
 
 local Infobox = Class.new()
 
+local _ICON_KEYS_TO_RENAME = {
+    matcherinolink = 'matcherino'
+}
+
 --- Inits the Infobox instance
 function Infobox:create(frame, gameName)
     self.frame = frame
@@ -198,7 +202,10 @@ end
 --remove appended numbers
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
 function Infobox.getIconString(key)
-	return string.gsub(key, '%d$', '')
+    key = string.gsub(key, '%d$', '')
+    key = _ICON_KEYS_TO_RENAME[key] or key
+
+    return string.gsub(key, '%d$', '')
 end
 
 function Infobox:centeredCell(...)
