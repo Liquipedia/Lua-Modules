@@ -35,19 +35,21 @@ function RLLeague:addCustomContent(infobox, args)
 
 	infobox:header('Maps', true)
 
-	local maps = {self:_makeInternalLink(args.map1)}
+	local maps = {RLLeague:_makeInternalLink(args.map1)}
 	local index  = 2
 
 	while not String.isEmpty(args['map' .. index]) do
 		table.insert(maps, '&nbsp;• ' ..
-			self:_createNoWrappingSpan(
-				self:_makeInternalLink(args['map' .. index])
-			)
+			tostring(RLLeague:_createNoWrappingSpan(
+				RLLeague:_makeInternalLink(args['map' .. index])
+			))
 		)
 		index = index + 1
 	end
 
-	infobox:centeredCell(unpack(maps))
+	infobox	:centeredCell(unpack(maps))
+			:header('Teams', true)
+			:cell('Number of teams', args.team_number)
 
     return infobox
 end

@@ -115,7 +115,9 @@ function League:createInfobox(frame)
 
     infobox :header('Links', not Table.isEmpty(links))
             :links(links)
-            :centeredCell(args.footnotes)
+    League:addCustomContent(infobox, args)
+    infobox :centeredCell(args.footnotes)
+            :header('Chronology', true)
             :chronology({
                 previous = args.previous,
                 next = args.next,
