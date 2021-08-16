@@ -39,7 +39,6 @@ function p._getCountryName(args, frame)
 	return countryname
 end
 
--- Get localisation
 function p.getLocalisation(frame)
 	local args = getArgs(frame)
 	return p._getCountryName(args, frame)
