@@ -82,6 +82,11 @@ function League:createInfobox(frame)
                         :variables({key = 'tournament_type', value = args.type})
                         :make()
             )
+            :cell('Location', League:_createLocation({
+                region = args.region,
+                country = args.country,
+                location = args.city or args.location
+            }))
             :cell('Venue', args.venue)
             :fcell(self:createPrizepool(args):make())
             :fcell(Cell :new('Date')
@@ -165,7 +170,8 @@ function League:_createLocation(details)
 
     local countryName = Flags._CountryName(details.country)
     return Flags._Flag(details.country) .. '&nbsp;' ..
-        '[[:Category:' .. countryName .. ' Tournaments|' .. countryName .. ']]'
+        '[[:Category:' .. countryName .. ' Tournaments|' ..
+        (details.city or countryName) .. ']]'
 end
 
 function League:_createSeries(frame, series, abbreviation)
