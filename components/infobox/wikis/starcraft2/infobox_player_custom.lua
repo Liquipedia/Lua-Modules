@@ -14,7 +14,8 @@ local currentYear = tonumber(os.date('%Y'))
 local shouldStoreData
 local hasAchievements
 local raceData
-local status
+local statusStore
+local militaryStore
 
 local StarCraft2Player = {}
 
@@ -359,15 +360,17 @@ function StarCraft2Player._military(military)
 		local militaryCategory = ''
 		if String.Contains(military, 'starting') or String.Contains(military, 'pending') then
 			militaryCategory = '[[Category:Players waiting for Military Duty]]'
-		elseif String.Contains(military, 'starting') or String.Contains(military, 'pending') then
-			militaryCategory = '[[Category:Players waiting for Military Duty]]'
+			militaryStore = 'pending'
 		elseif String.Contains(military, 'ending') or String.Contains(military, 'started')
 			or String.Contains(military, 'ongoing') then
 				militaryCategory = '[[Category:Players on Military Duty]]'
+				militaryStore = 'ongoing'
 		elseif String.Contains(military, 'fulfilled') then
 			militaryCategory = '[[Category:Players expleted Military Duty]]'
+			militaryStore = 'fulfilled'
 		elseif String.Contains(military, 'exempted') then
 			militaryCategory = '[[Category:Players exempted from Military Duty]]'
+			militaryStore = 'exempted'
 		end
 
 		return display .. militaryCategory
@@ -376,19 +379,19 @@ end
 
 function StarCraft2Player.getStatus(args)
 	if args.death_date then
-		status = 'Deceased'
+		statusStore = 'Deceased'
 	elseif args.retired then
-		status = 'Retired'
+		statusStore = 'Retired'
 	elseif string.lower(args.role or 'player') ~= 'player' then
-		status = 'not player'
+		statusStore = 'not player'
 	end
-    return { store = status }
+    return { store = statusStore }
 end
 
 function StarCraft2Player.addCustomCells(_, infobox, args)
 	local rank1, rank2
 	local yearsActive, activeCategory
-	if shouldStoreData and not status then
+	if shouldStoreData and not statusStore then
 		rank1, rank2 = StarCraft2Player._getRank(pagename)
 		yearsActive, activeCategory = StarCraft2Player._get_matchup_data(pagename)
 		infobox:categories(activeCategory)
@@ -475,6 +478,7 @@ function StarCraft2Player._get_matchup_data(player)
 
 		if years[currentYear] ~= nil or years[currentYear - 1] ~= nil or years[currentYear - 2] ~= nil then
 			category = 'Active players'
+			Variables.varDefine('isActive', 'true')
 		else
 			category = 'Players with no matches in the last three years'
 		end
@@ -522,9 +526,28 @@ function StarCraft2Player._get_matchup_data(player)
 	return yearsActive, category
 end
 
---here
 function StarCraft2Player.getExtradata(args, role, _)
-    return {}
+	local extradata = {
+		race = raceData.race,
+		faction = raceData.faction,
+		faction2 = raceData.faction2,
+		lc_id = string.lower(pagename),
+		teamname = args.team,
+		role = role.store,
+		role2 = args.role2,
+		militaryservice = militaryStore,
+		activeplayer = (not statusStore) and Variables.varDefault('isActive', '') or '',
+	}
+	if Variables.varDefault('racecount') then
+		extradata.racehistorical = true
+		extradata.factionhistorical = true
+	end
+
+	for key, item in pairs(earningsGlobal or {}) do
+		extradata['earningsin' .. key] = item
+	end
+
+    return extradata
 end
 
 return StarCraft2Player
