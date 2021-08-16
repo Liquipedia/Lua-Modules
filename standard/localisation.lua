@@ -84,7 +84,6 @@ function p._cleanCountry(country)
 	-- Remove whitespace
 	country = mw.text.trim(country)
 
-	-- Unstrip nowiki strip markers
 	country = mw.text.unstripNoWiki(country)
 
 	return country
