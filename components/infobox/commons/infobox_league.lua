@@ -44,14 +44,7 @@ function League:createInfobox(frame)
             :fcell(Cell  :new('Organizer')
                         :options({})
                         :content(
-                            League:_createOrganizer(
-								args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
-                            League:_createOrganizer(
-								args.organizer2, args['organizer-name2'], args['organizer-link2'], args.organizerref2),
-                            League:_createOrganizer(
-								args.organizer3, args['organizer-name3'], args['organizer-link3'], args.organizerref3),
-                            League:_createOrganizer(
-								args.organizer4, args['organizer-name4'], args['organizer-link4'], args.organizerref4)
+                            unpack(League:_createOrganizers(args))
                         )
                         :make()
             )
@@ -238,6 +231,29 @@ function League:_createOrganizer(organizer, name, link, reference)
     end
 
     return output
+end
+
+function League:_createOrganizers(args)
+    local organizers = {
+        League:_createOrganizer(
+            args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
+    }
+
+    local index = 2
+
+    while args['organizer' .. index] do
+        table.insert(
+            organizers,
+            League:_createOrganizer(
+                args['organizer' .. index],
+                args['organizer-name' .. index],
+                args['organizer-link' .. index],
+                args['organizerref' .. index])
+        )
+        index = index + 1
+    end
+
+    return organizers
 end
 
 function League:_cleanDate(date)
