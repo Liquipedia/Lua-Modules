@@ -65,4 +65,4 @@ function Localisation._cleanCountry(country)
 	return country
 end
 
-return Localisation.export(Localisation)
+return Class.export(Localisation)
