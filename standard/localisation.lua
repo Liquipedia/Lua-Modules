@@ -2,8 +2,18 @@ local Class = require('Module:Class')
 local Localisation = {}
 local String = require('Module:StringUtils')
 
-function Localisation.getCountryName(country, noentry)
-	noentry = noentry or ''
+function Localisation.getCountryName(args, frame)
+	local country
+	local noentry
+	if type(args) == 'table' then
+		country = args[1]
+		noentry = args[2] or ''
+	else
+		country = args
+		noentry = frame or ''
+		frame = nil
+	end
+
 	local data = mw.loadData('Module:Localisation/data/country')
 
 	-- clean the entered country value
@@ -19,7 +29,7 @@ function Localisation.getCountryName(country, noentry)
 		if noentry ~= '' then
 			countryname = ''
 		else
-			countryname = mw.getCurrentFrame()
+			countryname = (frame or mw.getCurrentFrame())
 				:expandTemplate{title = 'Flag/invalidcountry', args = {country}}
 		end
 	end
