@@ -6,6 +6,7 @@ local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local String = require('Module:String')
 local Links = require('Module:Links')
+local Flags = require('Module:Flags')
 
 local getArgs = require('Module:Arguments').getArgs
 
@@ -163,9 +164,9 @@ function League:_createLocation(details)
         return nil
     end
 
-    return Template.safeExpand(self.frame, 'Flag/' .. string.lower(details.country)) ..
-                '&nbsp;' ..
-                '[[:Category:' .. details.country .. '|' .. details.country .. ']]'
+    local countryName = Flags._CountryName(details.country)
+    return Flags._Flag(details.country) .. '&nbsp;' ..
+        '[[:Category:' .. countryName .. ' Tournaments|' .. countryName .. ']]'
 end
 
 function League:_createSeries(frame, series, abbreviation)
