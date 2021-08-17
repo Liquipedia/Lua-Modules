@@ -12,7 +12,6 @@ local Localisation = require('Module:Localisation')
 local getArgs = require('Module:Arguments').getArgs
 
 local League = Class.new()
-local Language = mw.language.new('en')
 
 function League.run(frame)
     return League:createInfobox(frame)
