@@ -270,7 +270,7 @@ function StarCraft2Player._get_earnings_and_medals_data(player)
 				local place = StarCraft2Player._Placements(data[i].placement)
 				if place ~= '99' then
 					local tier = data[i].liquipediatier or 'undefined'
-					if not data[i].liquipediatiertype == 'Qualifier' then
+					if data[i].liquipediatiertype ~= 'Qualifier' then
 						if not Medals[place] then
 							Medals[place] = {}
 						end
