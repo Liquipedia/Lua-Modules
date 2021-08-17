@@ -119,6 +119,9 @@ function Player:createInfobox(frame)
         if not args.teamlink and not args.team then
             infobox:categories('Teamless ' .. role.category .. 's')
         end
+        if args.country2 or args.nationality2 then
+            infobox:categories('Dual Citizenship ' .. role.category .. 's')
+        end
         if args.death_date then
             infobox:categories('Deceased ' .. role.category .. 's')
         end
