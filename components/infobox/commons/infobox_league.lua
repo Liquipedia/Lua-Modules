@@ -161,6 +161,7 @@ function League:_definePageVariables(args)
 
     Variables.varDefine('tournament_mode', args.mode)
     Variables.varDefine('tournament_type', args.type)
+    Variables.varDefine('tournament_status', args.status)
 
     Variables.varDefine('tournament_region', args.region)
     Variables.varDefine('tournament_country', args.country)
