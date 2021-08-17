@@ -150,14 +150,14 @@ end
 
 function League:_definePageVariables(args)
     Variables.varDefine('tournament_name', args.name)
-    Variables.varDefine('tournament_short_name', args.shortname)
-    Variables.varDefine('tournament_ticker_name', args.tickername)
+    Variables.varDefine('tournament_shortname', args.shortname)
+    Variables.varDefine('tournament_tickername', args.tickername)
     Variables.varDefine('tournament_icon', args.icon)
     Variables.varDefine('tournament_series', args.series)
 
-    Variables.varDefine('tournament_liquipedia_tier', args.liquipediatier)
-    Variables.varDefine('tournament_liquipedia_tier_type', args.liquipediatiertype)
-    Variables.varDefine('tournament_liquipedia_tier_type2', args.liquipediatiertype2)
+    Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
+    Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)
+    Variables.varDefine('tournament_liquipediatiertype2', args.liquipediatiertype2)
 
     Variables.varDefine('tournament_mode', args.mode)
     Variables.varDefine('tournament_type', args.type)
@@ -170,7 +170,7 @@ function League:_definePageVariables(args)
     Variables.varDefine('tournament_game', args.game)
 
     Variables.varDefine('tournament_parent', args.parent)
-    Variables.varDefine('tournament_parent_name', args.parentname)
+    Variables.varDefine('tournament_parentname', args.parentname)
     Variables.varDefine('tournament_subpage', args.subpage)
 
     self:_defineCustomPageVariables(args)
