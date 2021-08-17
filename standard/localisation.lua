@@ -18,7 +18,7 @@ function Localisation.getCountryName(country, noentry)
 		if noentry ~= '' then
 			countryname = ''
 		else
-			countryname = (frame or mw.getCurrentFrame())
+			countryname = mw.getCurrentFrame()
 				:expandTemplate{title = 'Flag/invalidcountry', args = {country}}
 		end
 	end
