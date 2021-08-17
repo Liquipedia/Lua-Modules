@@ -34,7 +34,7 @@ function Company:createInfobox(frame)
             :centeredCell(args.caption)
             :header('Company Information', true)
             :fcell(Cell:new('Parent company'):options({makeLink = true}):content(args.parent, args.parent2):make())
-            :cell('Founded', args.foundeddate or agrs.founded)
+            :cell('Founded', args.foundeddate or args.founded)
             :cell('Defunct', args.defunctdate or args.disbanded)
             :cell('Location', Company:_createLocation(frame, args.location))
             :cell('Headquarters', args.headquarters)
@@ -59,7 +59,7 @@ function Company:createInfobox(frame)
         location = args.location,
         headquarterslocation = args.headquarters,
         parentcompany = args.parent,
-        foundeddate = ReferenceCleaner.clean(args.foundeddate or agrs.founded),
+        foundeddate = ReferenceCleaner.clean(args.foundeddate or args.founded),
         defunctdate = ReferenceCleaner.clean(args.defunctdate or args.disbanded),
         numberofemployees = ReferenceCleaner.cleanNumber(args.employees),
         links = mw.ext.LiquipediaDB.lpdb_create_json({
