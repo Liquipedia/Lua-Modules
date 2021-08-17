@@ -56,7 +56,6 @@ function Team:createInfobox(frame)
             :cell('Director', args.director)
             :cell('Manager', args.manager)
             :cell('Team Captain', args.captain)
-            :cell('Sponsor(s)', args.sponsor)
             :cell('Earnings', earnings)
     Team:addCustomCells(infobox, args)
 
