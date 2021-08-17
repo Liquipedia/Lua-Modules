@@ -149,10 +149,12 @@ function League:createBottomContent(infobox)
     return infobox
 end
 
+--- Allows for overriding this functionality
 function League:createTier(args)
     error('You need to define a tier function for this wiki!')
 end
 
+--- Allows for overriding this functionality
 function League:createPrizepool(args)
     error('You need to define a prizepool function for this wiki!')
 end
