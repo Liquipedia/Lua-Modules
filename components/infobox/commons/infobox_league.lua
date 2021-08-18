@@ -66,7 +66,6 @@ function League:createInfobox(frame)
                                 end
                             end
                         )
-                        :variables({key = 'tournament_type', value = args.type})
                         :make()
             )
             :cell('Location', League:_createLocation({
@@ -80,27 +79,16 @@ function League:createInfobox(frame)
             :fcell(Cell :new('Date')
                         :options({})
                         :content(args.date)
-                        :variables(
-                            {key = 'date', value = self:_cleanDate(args.date)},
-                            {key = 'tournament_date',
-								value = self:_cleanDate(args.edate) or self:_cleanDate(args.date) or ''}
-                        )
 						:make()
             )
             :fcell(Cell :new('Start Date')
                         :options({})
                         :content(args.sdate)
-                        :variables(
-                            {key = 'sdate', value = self:_cleanDate(args.sdate)}
-                        )
 						:make()
             )
             :fcell(Cell :new('End Date')
                         :options({})
                         :content(args.edate)
-                        :variables(
-                            {key = 'edate', value = self:_cleanDate(args.edate)}
-                        )
 						:make()
             )
             :fcell(self:createTier(args):make())
