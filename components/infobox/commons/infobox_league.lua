@@ -245,7 +245,7 @@ function League:_setLpdbData(args)
     }
 
     lpdbData = self:addToLpdb(lpdbData)
-    mw.ext.LiquipediaDB.lpdb_series('tournament_' .. self.name, lpdbData)
+    mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
 end
 
 ---
