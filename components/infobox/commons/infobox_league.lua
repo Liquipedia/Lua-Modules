@@ -145,7 +145,7 @@ function League:createPrizepool(args)
 end
 
 --- Allows for overriding this functionality
-function League:_defineCustomPageVariables(args)
+function League:defineCustomPageVariables(args)
 end
 
 function League:_definePageVariables(args)
@@ -176,7 +176,7 @@ function League:_definePageVariables(args)
     Variables.varDefine('tournament_enddate',
         self:_cleanDate(args.edate) or self:_cleanDate(args.date))
 
-    self:_defineCustomPageVariables(args)
+    self:defineCustomPageVariables(args)
 end
 
 ---
