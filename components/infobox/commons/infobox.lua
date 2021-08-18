@@ -105,9 +105,9 @@ function Infobox:chronology(links)
     while (previous ~= nil or next ~= nil) do
         self.chronologyContent:node(self:_createChronologyRow(previous, next))
 
+        index = index + 1
         previous = links['previous' .. index]
         next = links['next' .. index]
-        index = index + 1
     end
 
     return self
