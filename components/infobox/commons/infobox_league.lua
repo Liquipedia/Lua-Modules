@@ -128,8 +128,6 @@ function League:createInfobox(frame)
         self:_setLpdbData(args)
     end
 
-    self:_definePageVariables(args)
-
     return infobox:build()
 end
 
