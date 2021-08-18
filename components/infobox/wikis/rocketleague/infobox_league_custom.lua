@@ -37,10 +37,10 @@ function RLLeague:createPrizepool(args)
 	local localCurrency = args.localcurrency
 
 	if String.isEmpty(prizepool) then
-		content = '$' .. prizepoolInUsd .. ' ' .. Template.expand(mw.getCurrentFrame(), 'Abbr/USD')
+		content = '$' .. prizepoolInUsd .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
 	else
 		if not String.isEmpty(localCurrency) then
-			content = Template.expand(
+			content = Template.safeExpand(
 				mw.getCurrentFrame(),
 				'Local currency',
 				{localCurrency:lower(), prizepool = prizepool}
@@ -51,7 +51,7 @@ function RLLeague:createPrizepool(args)
 
 		if not String.isEmpty(prizepoolInUsd) then
 			content = content .. '<br>(≃ $' .. prizepoolInUsd .. ' ' ..
-				Template.expand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
+				Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
 		end
 	end
 
