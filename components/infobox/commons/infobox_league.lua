@@ -100,7 +100,7 @@ function League:createInfobox(frame)
             :links(links)
     League:addCustomContent(infobox, args)
     infobox :centeredCell(args.footnotes)
-            :header('Chronology', true)
+            :header('Chronology', self:_isChronologySet(args.previous, args.next))
             :chronology({
                 previous = args.previous,
                 next = args.next,
@@ -262,6 +262,12 @@ end
 
 function League:_isUnknownDate(date)
     return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
+end
+
+function League:_isChronologySet(previous, next)
+    -- We only need to check the first of these params, since it makes no sense
+    -- to set next2 and not next, etc.
+    return not (String.isEmpty(previous) and String.isEmpty(next))
 end
 
 return League
