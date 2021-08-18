@@ -1,6 +1,7 @@
 local Class = require('Module:Class')
 local Infobox = require('Module:Infobox')
 local Table = require('Module:Table')
+local Namespace = require('Module:Namespace')
 
 local getArgs = require('Module:Arguments').getArgs
 
@@ -33,14 +34,16 @@ function Patch:createInfobox(frame)
     local chronologyData = Patch:getChronologyData(args)
 
     infobox :header('Highlights', args.highlight1)
-            :fcell(Patch:_getHighlights(args))
+            :fcell(Patch:_createHighlightsCell(args))
             :header('Chronology', not Table.isEmpty(chronologyData))
             :chronology(chronologyData)
             :centeredCell(args.footnotes)
     Patch:addCustomContent(infobox, args)
     infobox:bottom(Patch.createBottomContent(infobox))
 
-    infobox:categories('Patches')
+    if Namespace.isMain() then
+        infobox:categories('Patches')
+    end
 
     return infobox:build()
 end
@@ -62,13 +65,10 @@ end
 
 --- Allows for overriding this functionality
 function Patch:getChronologyData(args)
-    return {
-                previous = args.previous,
-                next = args.next,
-            }
+    return { previous = args.previous, next = args.next }
 end
 
-function Patch:_getHighlights(args)
+function Patch:_createHighlightsCell(args)
     local div = mw.html.create('div')
     local highlights = mw.html.create('ul')
     if not (args.highlight1 or args.highlight) then
