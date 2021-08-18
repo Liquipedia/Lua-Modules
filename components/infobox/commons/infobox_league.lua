@@ -172,6 +172,10 @@ function League:_definePageVariables(args)
     Variables.varDefine('tournament_parentname', args.parentname)
     Variables.varDefine('tournament_subpage', args.subpage)
 
+    Variables.varDefine('tournament_startdate', self:_cleanDate(args.sdate))
+    Variables.varDefine('tournament_enddate',
+        self:_cleanDate(args.edate) or self:_cleanDate(args.date))
+
     self:_defineCustomPageVariables(args)
 end
 
