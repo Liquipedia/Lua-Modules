@@ -243,7 +243,7 @@ end
 
 --- Returns completed infobox
 function Infobox:build()
-    for _, chronologyRow in ipairs(self.chronologyContent) do
+    for _, chronologyRow in ipairs(self.chronologyContent or {}) do
         self.content:node(chronologyRow)
     end
 
