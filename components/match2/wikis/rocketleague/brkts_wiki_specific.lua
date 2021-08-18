@@ -293,16 +293,25 @@ function matchFunctions.getOpponents(args)
 	end
 
 	-- apply placements and winner if finshed
+	local tempWinner = tostring(args.winner or '')
 	if Logic.readBool(args.finished) then
 		local placement = 1
+		local lastScore
+		local lastPlacement = 1
 		-- luacheck: push ignore
 		for opponentIndex, opponent in Table.iter.spairs(opponents, p._placementSortFunction) do
 			if placement == 1 then
 				args.winner = opponentIndex
 			end
-			opponent.placement = placement
+			if opponent.status == "S" and opponent.score == lastScore then
+				opponent.placement = lastPlacement
+			else
+				opponent.placement = placement
+			end
 			args["opponent" .. opponentIndex] = opponent
 			placement = placement + 1
+			lastScore = opponent.score
+			lastPlacement = opponent.placement
 		end
 	-- luacheck: pop
 	-- only apply arg changes otherwise
@@ -310,6 +319,10 @@ function matchFunctions.getOpponents(args)
 		for opponentIndex, opponent in pairs(opponents) do
 			args["opponent" .. opponentIndex] = opponent
 		end
+	end
+	if tempWinner == 'draw' or tempWinner == '0' then
+		args.winner = 0
+		args.resulttype = 'draw'
 	end
 	return args
 end
