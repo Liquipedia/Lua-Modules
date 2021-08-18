@@ -193,7 +193,6 @@ function League:_setLpdbData(args)
         previous2 = args.previous2,
         next = args.next,
         next2 = args.next2,
-        game = args.game,
         patch = args.patch,
         endpatch = args.endpatch or args.epatch,
         type = args.type,
