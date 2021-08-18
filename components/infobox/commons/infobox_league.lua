@@ -8,6 +8,7 @@ local String = require('Module:String')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
+local Variables = require('Module:Variables')
 
 local getArgs = require('Module:Arguments').getArgs
 
@@ -113,6 +114,8 @@ function League:createInfobox(frame)
         infobox:categories('Tournaments')
     end
 
+    self:_definePageVariables(args)
+
     return infobox:build()
 end
 
@@ -139,6 +142,41 @@ end
 --- Allows for overriding this functionality
 function League:createPrizepool(args)
     error('You need to define a prizepool function for this wiki!')
+end
+
+--- Allows for overriding this functionality
+function League:defineCustomPageVariables(args)
+end
+
+function League:_definePageVariables(args)
+    Variables.varDefine('tournament_name', args.name)
+    Variables.varDefine('tournament_shortname', args.shortname)
+    Variables.varDefine('tournament_tickername', args.tickername)
+    Variables.varDefine('tournament_icon', args.icon)
+    Variables.varDefine('tournament_series', args.series)
+
+    Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
+    Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)
+
+    Variables.varDefine('tournament_type', args.type)
+    Variables.varDefine('tournament_status', args.status)
+
+    Variables.varDefine('tournament_region', args.region)
+    Variables.varDefine('tournament_country', args.country)
+    Variables.varDefine('tournament_location', args.location or args.city)
+    Variables.varDefine('tournament_venue', args.venue)
+
+    Variables.varDefine('tournament_game', args.game)
+
+    Variables.varDefine('tournament_parent', args.parent)
+    Variables.varDefine('tournament_parentname', args.parentname)
+    Variables.varDefine('tournament_subpage', args.subpage)
+
+    Variables.varDefine('tournament_startdate', self:_cleanDate(args.sdate))
+    Variables.varDefine('tournament_enddate',
+        self:_cleanDate(args.edate) or self:_cleanDate(args.date))
+
+    self:defineCustomPageVariables(args)
 end
 
 ---
