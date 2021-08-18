@@ -1,8 +1,9 @@
 local Class = require('Module:Class')
+local Cell = require('Module:Infobox/Cell')
 local Infobox = require('Module:Infobox')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Localisation = require('Module:Localisation').getLocalisation
+local Localisation = require('Module:Localisation')
 local Flags = require('Module:Flags')
 local Links = require('Module:Links')
 
@@ -32,8 +33,7 @@ function Scene:createInfobox(frame)
             :centeredCell(args.caption)
             :header('Scene Information', true)
             :cell('Region', Scene:createRegion(args))
-            :cell('National team', (args.nationalteam ~= nil) and ('[[' .. args.nationalteam .. ']]') or nil)
-            :cell('Key people', args['key people'])
+            :fcell(Cell:new('National team'):options({makeLink = true}):content(args.nationalteam):make())
             :cell('Events', args.events)
             :cell('Size', args.size)
     Scene:addCustomCells(infobox, args)
@@ -59,7 +59,7 @@ function Scene:nameDisplay(args)
     local name = args.name
     local country = Flags._CountryName(args.country or args.scene)
     if not name then
-        local localised = Localisation(country)
+        local localised = Localisation.getLocalisation(country)
         local flag = Flags._Flag(country)
         name = flag .. '&nbsp;' .. localised .. ((' ' .. args.gamenamedisplay) or '') .. ' scene'
     end
