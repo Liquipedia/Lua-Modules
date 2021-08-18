@@ -26,7 +26,7 @@ function Scene:createInfobox(frame)
     end
 
     local infobox = Infobox:create(frame, args.game)
-    local nameDisplay = Scene:nameDisplay(args)
+    local nameDisplay = Scene:createNameDisplay(args)
 
     infobox :name(nameDisplay)
             :image(args.image)
@@ -55,7 +55,7 @@ function Scene:createInfobox(frame)
 end
 
 --- Allows for overriding this functionality
-function Scene:nameDisplay(args)
+function Scene:createNameDisplay(args)
     local name = args.name
     local country = Flags._CountryName(args.country or args.scene)
     if not name then
