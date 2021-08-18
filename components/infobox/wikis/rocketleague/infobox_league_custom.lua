@@ -12,7 +12,7 @@ function RLLeague.run(frame)
     return League:createInfobox(frame)
 end
 
-function RLLeague.addCustomCells(company, infobox, args)
+function RLLeague:addCustomCells(league, infobox, args)
     return infobox
 end
 
