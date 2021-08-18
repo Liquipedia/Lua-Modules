@@ -67,6 +67,7 @@ function Patch:getChronologyData(args)
                 next = args.next,
             }
 end
+
 function Patch:_getHighlights(args)
     local div = mw.html.create('div')
     local highlights = mw.html.create('ul')
