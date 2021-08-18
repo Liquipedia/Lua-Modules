@@ -96,14 +96,14 @@ function Infobox:chronology(links)
         return self
     end
 
-    self.chronologyContent = mw.html.create('div')
-    self.chronologyContent:node(self:_createChronologyRow(links['previous'], links['next']))
+    self.chronologyContent = {}
+    self.chronologyContent[1] = self:_createChronologyRow(links['previous'], links['next'])
 
     local index = 2
     local previous = links['previous' .. index]
     local next = links['next' .. index]
     while (previous ~= nil or next ~= nil) do
-        self.chronologyContent:node(self:_createChronologyRow(previous, next))
+        self.chronologyContent[index] = self:_createChronologyRow(previous, next)
 
         index = index + 1
         previous = links['previous' .. index]
@@ -243,8 +243,10 @@ end
 
 --- Returns completed infobox
 function Infobox:build()
-    if self.chronologyContent ~= nil then
-        self.content:node(self.chronologyContent)
+    if not Table.isEmpty(self.chronologyContent) then
+        for _, chronologyRow in ipairs(self.chronologyContent) do
+            self.content:node(chronologyRow)
+        end
     end
 
     self.root:node(self.content)
