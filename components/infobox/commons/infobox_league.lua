@@ -50,9 +50,19 @@ function League:createInfobox(frame)
                         )
                         :make()
             )
-            :cell('Sponsor(s)', args.sponsor)
+            :fcell(Cell :new('Sponsor(s)')
+                        :options({})
+                        :content(
+                            args.sponsor or args.sponsor1,
+                            args.sponsor2,
+                            args.sponsor3,
+                            args.sponsor4,
+                            args.sponsor5
+                        )
+                        :make()
+            )
             :cell('Server', args.server)
-            :fcell(Cell  :new('Type')
+            :fcell(Cell :new('Type')
                         :options({})
                         :content(args.type)
                         :categories(
@@ -215,7 +225,7 @@ function League:_setLpdbData(args)
         status = args.status,
         format = args.format,
         sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
-            sponsor1 = args.sponsor1,
+            sponsor1 = args.sponsor or args.sponsor1,
             sponsor2 = args.sponsor2,
             sponsor3 = args.sponsor3,
             sponsor4 = args.sponsor4,
