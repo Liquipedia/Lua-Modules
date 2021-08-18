@@ -9,6 +9,7 @@ local Links = require('Module:Links')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
 local Variables = require('Module:Variables')
+local Locale = require('Module:Locale')
 
 local getArgs = require('Module:Arguments').getArgs
 
@@ -112,6 +113,7 @@ function League:createInfobox(frame)
 
     if Namespace.isMain() then
         infobox:categories('Tournaments')
+        self:_setLpdbData(args)
     end
 
     self:_definePageVariables(args)
@@ -177,6 +179,53 @@ function League:_definePageVariables(args)
         self:_cleanDate(args.edate) or self:_cleanDate(args.date))
 
     self:defineCustomPageVariables(args)
+end
+
+function League:_setLpdbData(args)
+    local lpdbData = {
+        name = self.name,
+        tickername = args.tickername,
+        shortname = args.shortname,
+        banner = args.banner,
+        icon = args.icon,
+        series = args.series,
+        previous = args.previous,
+        previous2 = args.previous2,
+        next = args.next,
+        next2 = args.next2,
+        game = args.game,
+        patch = args.patch,
+        endpatch = args.endpatch or args.epatch,
+        type = args.type,
+        organizers = mw.ext.LiquipediaDB.lpdb_create_json({
+            organizer1 = args.organizer or args.organizer1,
+            organizer2 = args.organizer2,
+            organizer3 = args.organizer3,
+            organizer4 = args.organizer4,
+            organizer5 = args.organizer5,
+        }),
+        sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
+            sponsor1 = args.sponsor1,
+            sponsor2 = args.sponsor2,
+            sponsor3 = args.sponsor3,
+            sponsor4 = args.sponsor4,
+            sponsor5 = args.sponsor5,
+        }),
+        links = mw.ext.LiquipediaDB.lpdb_create_json({
+            discord = Links.makeFullLink('discord', args.discord),
+            facebook = Links.makeFullLink('facebook', args.facebook),
+            instagram = Links.makeFullLink('instagram', args.instagram),
+            twitch = Links.makeFullLink('twitch', args.twitch),
+            twitter = Links.makeFullLink('twitter', args.twitter),
+            website = Links.makeFullLink('website', args.website),
+            weibo = Links.makeFullLink('weibo', args.weibo),
+            vk = Links.makeFullLink('vk', args.vk),
+            youtube = Links.makeFullLink('youtube', args.youtube),
+        }),
+    }
+
+    lpdbData = self:addToLpdb(lpdbData)
+    mw.ext.LiquipediaDB.lpdb_series('tournament_' .. self.name, lpdbData)
 end
 
 ---
