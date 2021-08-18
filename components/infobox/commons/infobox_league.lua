@@ -166,7 +166,7 @@ end
 --     location: the city or place
 -- }
 function League:_createLocation(details)
-    if String.isEmpty(details) then
+    if Table.isEmpty(details) then
         return nil
     end
 
