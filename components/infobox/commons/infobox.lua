@@ -107,6 +107,7 @@ function Infobox:chronology(links)
 
         previous = links['previous' .. index]
         next = links['next' .. index]
+        index = index + 1
     end
 
     return self
