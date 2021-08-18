@@ -81,6 +81,7 @@ function League:createInfobox(frame)
                 location = args.city or args.location
             }))
             :cell('Venue', args.venue)
+            :cell('Format', args.format)
             :fcell(self:createPrizepool(args):make())
             :fcell(Cell :new('Date')
                         :options({})
