@@ -2,6 +2,7 @@ local League = require('Module:Infobox/League')
 local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
 
 local RLLeague = {}
 
@@ -53,6 +54,8 @@ function RLLeague:createPrizepool(args)
 				Template.expand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
 		end
 	end
+
+	Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd)
 
 	return Cell	:new('Prize pool')
 				:options({})
