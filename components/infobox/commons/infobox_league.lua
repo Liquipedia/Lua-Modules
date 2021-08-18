@@ -111,12 +111,12 @@ function League:createInfobox(frame)
             })
             :bottom(League.createBottomContent(infobox))
 
+    self:_definePageVariables(args)
+
     if Namespace.isMain() then
         infobox:categories('Tournaments')
         self:_setLpdbData(args)
     end
-
-    self:_definePageVariables(args)
 
     return infobox:build()
 end
