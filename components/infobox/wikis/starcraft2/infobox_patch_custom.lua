@@ -8,7 +8,7 @@ function StarCraft2Patch.run(frame)
 end
 
 --- Allows for overriding this functionality
-function StarCraft2Patch.addCustomCells(patch, infobox, args)
+function StarCraft2Patch:addCustomCells(infobox, args)
     infobox :cell('SEA Release Date', args.searelease)
             :cell('NA Release Date', args.narelease)
             :cell('EU Release Date', args.eurelease)
