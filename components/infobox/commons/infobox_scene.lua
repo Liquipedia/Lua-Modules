@@ -61,7 +61,7 @@ function Scene:nameDisplay(args)
     if not name then
         local localised = Localisation(country)
         local flag = Flags._Flag(country)
-        name = flag .. '&nbsp;' .. localised .. (args.gamenamedisplay or '') .. 'scene'
+        name = flag .. '&nbsp;' .. localised .. ((' ' .. args.gamenamedisplay) or '') .. ' scene'
     end
 
     Variables.varDefine('country', country)
