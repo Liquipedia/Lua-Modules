@@ -2,10 +2,11 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Variables = require('Module:Variables')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TreeUtil = require('Module:TreeUtil')
 local TypeUtil = require('Module:TypeUtil')
+local Variables = require('Module:Variables')
 
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
 
@@ -173,7 +174,16 @@ MatchGroupUtil.fetchMatchGroup = FnUtil.memoize(function(bracketId)
 		upperMatchIds = upperMatchIds,
 	}
 
-	MatchGroupUtil.populateAdvanceSpots(matchGroup)
+	if matchGroup.type == 'bracket' then
+		local roundPropsByMatchId, rounds = MatchGroupUtil.computeRounds(matchesById, headMatchIds)
+
+		MatchGroupUtil.populateAdvanceSpots(matchGroup)
+
+		Table.mergeInto(matchGroup, {
+			coordsByMatchId = roundPropsByMatchId,
+			rounds = rounds,
+		})
+	end
 
 	return matchGroup
 end)
@@ -379,6 +389,60 @@ function MatchGroupUtil.computeUpperMatchIds(matchesById)
 	table.sort(headMatchIds)
 
 	return upperMatchIds, headMatchIds
+end
+
+function MatchGroupUtil.dfsFrom(matchesById, start)
+	return TreeUtil.dfs(
+		function(matchId)
+			return Array.map(
+				matchesById[matchId].bracketData.lowerMatches,
+				function(lowerMatch) return lowerMatch.matchId end
+			)
+		end,
+		start
+	)
+end
+
+function MatchGroupUtil.computeDepthsFrom(matchesById, startMatchId)
+	local depths = {}
+	local maxDepth = -1
+	local function visit(matchId, depth)
+		local bracketData = matchesById[matchId].bracketData
+		depths[matchId] = depth
+		maxDepth = math.max(maxDepth, depth + bracketData.skipRound)
+		for _, lowerMatch in ipairs(bracketData.lowerMatches) do
+			visit(lowerMatch.matchId, depth + 1 + bracketData.skipRound)
+		end
+	end
+	visit(startMatchId, 0)
+	return depths, maxDepth + 1
+end
+
+-- TODO store and read this from LPDB
+function MatchGroupUtil.computeRounds(matchesById, rootMatchIds)
+	local rounds = {}
+	local roundPropsByMatchId = {}
+	for rootIx, rootMatchId in ipairs(rootMatchIds) do
+		local depths, depthCount = MatchGroupUtil.computeDepthsFrom(matchesById, rootMatchId)
+		for _ = #rounds + 1, depthCount do
+			table.insert(rounds, {})
+		end
+
+		for matchId in MatchGroupUtil.dfsFrom(matchesById, rootMatchId) do
+			local roundIx = depthCount - depths[matchId]
+			table.insert(rounds[roundIx], matchId)
+
+			roundPropsByMatchId[matchId] = {
+				depth = depths[matchId],
+				depthCount = depthCount,
+				matchIxInRound = #rounds[roundIx],
+				rootIx = rootIx,
+				roundIx = roundIx,
+			}
+		end
+	end
+
+	return roundPropsByMatchId, rounds
 end
 
 function MatchGroupUtil.populateAdvanceSpots(matchGroup)
