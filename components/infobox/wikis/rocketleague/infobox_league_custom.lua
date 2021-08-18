@@ -1,4 +1,4 @@
-local League = require('Module:VoganRL/Infobox/League')
+local League = require('Module:Infobox/League')
 local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
 
