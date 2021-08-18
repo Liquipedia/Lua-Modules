@@ -1,6 +1,7 @@
 local League = require('Module:Infobox/League')
 local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
+local Template = require('Module:Template')
 
 local RLLeague = {}
 
@@ -23,9 +24,39 @@ function RLLeague:createTier(args)
 end
 
 function RLLeague:createPrizepool(args)
+	local cell = Cell:new('Prize pool'):options({})
+	if String.isEmpty(args.prizepool) and
+		String.isEmpty(args.prizepoolusd) then
+			return cell:content()
+	end
+
+	local content
+	local prizepool = args.prizepool
+	local prizepoolInUsd = args.prizepoolusd
+	local localCurrency = args.localcurrency
+
+	if String.isEmpty(prizepool) then
+		content = '$' .. prizepoolInUsd .. ' ' .. Template.expand(mw.getCurrentFrame(), 'Abbr/USD')
+	else
+		if not String.isEmpty(localCurrency) then
+			content = Template.expand(
+				mw.getCurrentFrame(),
+				'Local currency',
+				{localCurrency:lower(), prizepool = prizepool}
+			)
+		else
+			content = prizepool
+		end
+
+		if not String.isEmpty(prizepoolInUsd) then
+			content = content .. '<br>(≃ $' .. prizepoolInUsd .. ' ' ..
+				Template.expand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
+		end
+	end
+
 	return Cell	:new('Prize pool')
 				:options({})
-				:content('0')
+				:content(content)
 end
 
 function RLLeague:addCustomContent(infobox, args)
