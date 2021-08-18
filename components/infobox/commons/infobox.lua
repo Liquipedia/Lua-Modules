@@ -92,11 +92,11 @@ function Infobox:fcell(cell)
 end
 
 function Infobox:chronology(links)
+    self.chronologyContent = {}
     if links == nil or Table.size(links) == 0 then
         return self
     end
 
-    self.chronologyContent = {}
     self.chronologyContent[1] = self:_createChronologyRow(links['previous'], links['next'])
 
     local index = 2
@@ -243,10 +243,8 @@ end
 
 --- Returns completed infobox
 function Infobox:build()
-    if not Table.isEmpty(self.chronologyContent) then
-        for _, chronologyRow in ipairs(self.chronologyContent) do
-            self.content:node(chronologyRow)
-        end
+    for _, chronologyRow in ipairs(self.chronologyContent) do
+        self.content:node(chronologyRow)
     end
 
     self.root:node(self.content)
