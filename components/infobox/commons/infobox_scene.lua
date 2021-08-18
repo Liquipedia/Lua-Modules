@@ -34,13 +34,16 @@ function Scene:createInfobox(frame)
             :header('Scene Information', true)
             :cell('Region', Scene:createRegion(args))
             :fcell(Cell:new('National team'):options({makeLink = true}):content(args.nationalteam):make())
-            :fcell(Cell:new('Events'):options({makeLink = true}):content(
-                                                                            args.event or args.event1,
-                                                                            args.event2,
-                                                                            args.event3,
-                                                                            args.event4,
-                                                                            args.event5
-                                                                        ):make())
+            :fcell(Cell :new('Events')
+                        :options({makeLink = true})
+                        :content(
+                            args.event or args.event1,
+                            args.event2,
+                            args.event3,
+                            args.event4,
+                            args.event5
+                        ):make()
+            )
             :cell('Size', args.size)
     Scene:addCustomCells(infobox, args)
 
