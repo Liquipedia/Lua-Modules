@@ -210,7 +210,6 @@ function League:_setLpdbData(args)
         location2 = Locale.formatLocation({city = args.city2 or args.location2, country = args.country2}),
         venue = args.venue,
         prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
-        participantsnumber = args.team_number,
         liquipediatier = Variables.varDefault('tournament_liquipediatier'),
         liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
         status = args.status,
