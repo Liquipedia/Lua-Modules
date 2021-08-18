@@ -159,7 +159,6 @@ function League:_definePageVariables(args)
     Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)
     Variables.varDefine('tournament_liquipediatiertype2', args.liquipediatiertype2)
 
-    Variables.varDefine('tournament_mode', args.mode)
     Variables.varDefine('tournament_type', args.type)
     Variables.varDefine('tournament_status', args.status)
 
