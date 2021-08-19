@@ -7,7 +7,7 @@ local Strategy = Class.new(BasicInfobox)
 
 function Strategy.run(frame)
 	local strategy = Strategy(frame)
-	return strategy:createInfobox()
+	return strategy:createInfobox(frame)
 end
 
 function Strategy:createInfobox(frame)
