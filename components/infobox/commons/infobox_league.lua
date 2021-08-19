@@ -16,144 +16,144 @@ local getArgs = require('Module:Arguments').getArgs
 local League = Class.new()
 
 function League.run(frame)
-    return League:createInfobox(frame)
+	return League:createInfobox(frame)
 end
 
 function League:createInfobox(frame)
-    local args = getArgs(frame)
-    self.frame = frame
-    self.pagename = mw.title.getCurrentTitle().title
-    self.name = args.name or self.pagename
+	local args = getArgs(frame)
+	self.frame = frame
+	self.pagename = mw.title.getCurrentTitle().title
+	self.name = args.name or self.pagename
 
-    if args.wiki == nil then
-        return error('Please provide a wiki!')
-    end
+	if args.wiki == nil then
+		return error('Please provide a wiki!')
+	end
 
-    local infobox = Infobox:create(frame, args.wiki)
+	local infobox = Infobox:create(frame, args.wiki)
 
-    infobox :name(args.name)
-            :image(args.image, args.default)
-            :centeredCell(args.caption)
-            :header('League Information', true)
-            :fcell(Cell :new('Series')
-                        :options({})
-                        :content(
-                            League:_createSeries(frame, args.series, args.abbrevation),
-                            League:_createSeries(frame, args.series2, args.abbrevation2)
-                        )
-                        :make()
-            )
-            :fcell(Cell  :new('Organizer')
-                        :options({})
-                        :content(
-                            unpack(League:_createOrganizers(args))
-                        )
-                        :make()
-            )
-            :fcell(Cell :new('Sponsor(s)')
-                        :options({})
-                        :content(
-                            args.sponsor or args.sponsor1,
-                            args.sponsor2,
-                            args.sponsor3,
-                            args.sponsor4,
-                            args.sponsor5
-                        )
-                        :make()
-            )
-            :cell('Server', args.server)
-            :fcell(Cell :new('Type')
-                        :options({})
-                        :content(args.type)
-                        :categories(
-                            function(_, ...)
-                                local value = select(1, ...)
-                                value = tostring(value):lower()
-                                if value == 'offline' then
-                                    infobox:categories('Offline Tournaments')
-                                elseif value == 'online' then
-                                    infobox:categories('Online Tournaments')
-                                else
-                                    infobox:categories('Unknown Type Tournaments')
-                                end
-                            end
-                        )
-                        :make()
-            )
-            :cell('Location', League:_createLocation({
-                region = args.region,
-                country = args.country,
-                location = args.city or args.location
-            }))
-            :cell('Venue', args.venue)
-            :cell('Format', args.format)
-            :fcell(self:createPrizepool(args):make())
-            :fcell(Cell :new('Date')
-                        :options({})
-                        :content(args.date)
-						:make()
-            )
-            :fcell(Cell :new('Start Date')
-                        :options({})
-                        :content(args.sdate)
-						:make()
-            )
-            :fcell(Cell :new('End Date')
-                        :options({})
-                        :content(args.edate)
-						:make()
-            )
-            :fcell(self:createTier(args):make())
-    League:addCustomCells(infobox, args)
+	infobox :name(args.name)
+			:image(args.image, args.default)
+			:centeredCell(args.caption)
+			:header('League Information', true)
+			:fcell(Cell :new('Series')
+				:options({})
+				:content(
+					League:_createSeries(frame, args.series, args.abbrevation),
+					League:_createSeries(frame, args.series2, args.abbrevation2)
+				)
+				:make()
+			)
+			:fcell(Cell  :new('Organizer')
+				:options({})
+				:content(
+					unpack(League:_createOrganizers(args))
+				)
+				:make()
+			)
+			:fcell(Cell :new('Sponsor(s)')
+				:options({})
+				:content(
+					args.sponsor or args.sponsor1,
+					args.sponsor2,
+					args.sponsor3,
+					args.sponsor4,
+					args.sponsor5
+				)
+				:make()
+			)
+			:cell('Server', args.server)
+			:fcell(Cell :new('Type')
+				:options({})
+				:content(args.type)
+				:categories(
+					function(_, ...)
+					local value = select(1, ...)
+					value = tostring(value):lower()
+					if value == 'offline' then
+						infobox:categories('Offline Tournaments')
+					elseif value == 'online' then
+						infobox:categories('Online Tournaments')
+					else
+						infobox:categories('Unknown Type Tournaments')
+					end
+					end
+				)
+				:make()
+			)
+			:cell('Location', League:_createLocation({
+			region = args.region,
+			country = args.country,
+			location = args.city or args.location
+			}))
+			:cell('Venue', args.venue)
+			:cell('Format', args.format)
+			:fcell(self:createPrizepool(args):make())
+			:fcell(Cell :new('Date')
+				:options({})
+				:content(args.date)
+							:make()
+			)
+			:fcell(Cell :new('Start Date')
+				:options({})
+				:content(args.sdate)
+							:make()
+			)
+			:fcell(Cell :new('End Date')
+				:options({})
+				:content(args.edate)
+							:make()
+			)
+			:fcell(self:createTier(args):make())
+	League:addCustomCells(infobox, args)
 
-    local links = Links.transform(args)
+	local links = Links.transform(args)
 
-    infobox :header('Links', not Table.isEmpty(links))
-            :links(links)
-    League:addCustomContent(infobox, args)
-    infobox :centeredCell(args.footnotes)
-            :header('Chronology', self:_isChronologySet(args.previous, args.next))
-            :chronology({
-                previous = args.previous,
-                next = args.next,
-                previous2 = args.previous2,
-                next2 = args.next2,
-            })
-            :bottom(League.createBottomContent(infobox))
+	infobox :header('Links', not Table.isEmpty(links))
+			:links(links)
+	League:addCustomContent(infobox, args)
+	infobox :centeredCell(args.footnotes)
+			:header('Chronology', self:_isChronologySet(args.previous, args.next))
+			:chronology({
+				previous = args.previous,
+				next = args.next,
+				previous2 = args.previous2,
+				next2 = args.next2,
+			})
+			:bottom(League.createBottomContent(infobox))
 
-    self:_definePageVariables(args)
+	self:_definePageVariables(args)
 
-    if Namespace.isMain() then
-        infobox:categories('Tournaments')
-        self:_setLpdbData(args)
-    end
+	if Namespace.isMain() then
+		infobox:categories('Tournaments')
+		self:_setLpdbData(args)
+	end
 
-    return infobox:build()
+	return infobox:build()
 end
 
 --- Allows for overriding this functionality
 function League:addCustomCells(infobox, args)
-    return infobox
+	return infobox
 end
 
 --- Allows for overriding this functionality
 function League:addCustomContent(infobox, args)
-    return infobox
+	return infobox
 end
 
 --- Allows for overriding this functionality
 function League:createBottomContent(infobox)
-    return infobox
+	return infobox
 end
 
 --- Allows for overriding this functionality
 function League:createTier(args)
-    error('You need to define a tier function for this wiki!')
+	error('You need to define a tier function for this wiki!')
 end
 
 --- Allows for overriding this functionality
 function League:createPrizepool(args)
-    error('You need to define a prizepool function for this wiki!')
+	error('You need to define a prizepool function for this wiki!')
 end
 
 --- Allows for overriding this functionality
@@ -162,95 +162,95 @@ end
 
 --- Allows for overriding this functionality
 function League:addToLpdb(lpdbData, args)
-    return lpdbData
+	return lpdbData
 end
 
 function League:_definePageVariables(args)
-    Variables.varDefine('tournament_name', args.name)
-    Variables.varDefine('tournament_shortname', args.shortname)
-    Variables.varDefine('tournament_tickername', args.tickername)
-    Variables.varDefine('tournament_icon', args.icon)
-    Variables.varDefine('tournament_series', args.series)
+	Variables.varDefine('tournament_name', args.name)
+	Variables.varDefine('tournament_shortname', args.shortname)
+	Variables.varDefine('tournament_tickername', args.tickername)
+	Variables.varDefine('tournament_icon', args.icon)
+	Variables.varDefine('tournament_series', args.series)
 
-    Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
-    Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)
+	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
+	Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)
 
-    Variables.varDefine('tournament_type', args.type)
-    Variables.varDefine('tournament_status', args.status)
+	Variables.varDefine('tournament_type', args.type)
+	Variables.varDefine('tournament_status', args.status)
 
-    Variables.varDefine('tournament_region', args.region)
-    Variables.varDefine('tournament_country', args.country)
-    Variables.varDefine('tournament_location', args.location or args.city)
-    Variables.varDefine('tournament_venue', args.venue)
+	Variables.varDefine('tournament_region', args.region)
+	Variables.varDefine('tournament_country', args.country)
+	Variables.varDefine('tournament_location', args.location or args.city)
+	Variables.varDefine('tournament_venue', args.venue)
 
-    Variables.varDefine('tournament_game', args.game)
+	Variables.varDefine('tournament_game', args.game)
 
-    Variables.varDefine('tournament_parent', args.parent)
-    Variables.varDefine('tournament_parentname', args.parentname)
-    Variables.varDefine('tournament_subpage', args.subpage)
+	Variables.varDefine('tournament_parent', args.parent)
+	Variables.varDefine('tournament_parentname', args.parentname)
+	Variables.varDefine('tournament_subpage', args.subpage)
 
-    Variables.varDefine('tournament_startdate', self:_cleanDate(args.sdate))
-    Variables.varDefine('tournament_enddate',
-        self:_cleanDate(args.edate) or self:_cleanDate(args.date))
+	Variables.varDefine('tournament_startdate', self:_cleanDate(args.sdate))
+	Variables.varDefine('tournament_enddate',
+	self:_cleanDate(args.edate) or self:_cleanDate(args.date))
 
-    self:defineCustomPageVariables(args)
+	self:defineCustomPageVariables(args)
 end
 
 function League:_setLpdbData(args)
-    local lpdbData = {
-        name = self.name,
-        tickername = args.tickername,
-        shortname = args.shortname,
-        banner = args.banner,
-        icon = args.icon,
-        series = args.series,
-        previous = args.previous,
-        previous2 = args.previous2,
-        next = args.next,
-        next2 = args.next2,
-        patch = args.patch,
-        endpatch = args.endpatch or args.epatch,
-        type = args.type,
-        organizers = mw.ext.LiquipediaDB.lpdb_create_json({
-            organizer1 = args.organizer or args.organizer1,
-            organizer2 = args.organizer2,
-            organizer3 = args.organizer3,
-            organizer4 = args.organizer4,
-            organizer5 = args.organizer5,
-        }),
-        startdate = Variables.varDefault('tournament_startdate', '1970-01-01'),
-        enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
-        sortdate = Variables.varDefault('tournament_enddate', '1970-01-01'),
-        location = Locale.formatLocation({city = args.city or args.location, country = args.country}),
-        location2 = Locale.formatLocation({city = args.city2 or args.location2, country = args.country2}),
-        venue = args.venue,
-        prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
-        liquipediatier = Variables.varDefault('tournament_liquipediatier'),
-        liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-        status = args.status,
-        format = args.format,
-        sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
-            sponsor1 = args.sponsor or args.sponsor1,
-            sponsor2 = args.sponsor2,
-            sponsor3 = args.sponsor3,
-            sponsor4 = args.sponsor4,
-            sponsor5 = args.sponsor5,
-        }),
-        links = mw.ext.LiquipediaDB.lpdb_create_json({
-            discord = Links.makeFullLink('discord', args.discord),
-            facebook = Links.makeFullLink('facebook', args.facebook),
-            instagram = Links.makeFullLink('instagram', args.instagram),
-            twitch = Links.makeFullLink('twitch', args.twitch),
-            twitter = Links.makeFullLink('twitter', args.twitter),
-            website = Links.makeFullLink('website', args.website),
-            weibo = Links.makeFullLink('weibo', args.weibo),
-            vk = Links.makeFullLink('vk', args.vk),
-            youtube = Links.makeFullLink('youtube', args.youtube),
-        }),
-    }
+	local lpdbData = {
+		name = self.name,
+		tickername = args.tickername,
+		shortname = args.shortname,
+		banner = args.banner,
+		icon = args.icon,
+		series = args.series,
+		previous = args.previous,
+		previous2 = args.previous2,
+		next = args.next,
+		next2 = args.next2,
+		patch = args.patch,
+		endpatch = args.endpatch or args.epatch,
+		type = args.type,
+		organizers = mw.ext.LiquipediaDB.lpdb_create_json({
+			organizer1 = args.organizer or args.organizer1,
+			organizer2 = args.organizer2,
+			organizer3 = args.organizer3,
+			organizer4 = args.organizer4,
+			organizer5 = args.organizer5,
+		}),
+		startdate = Variables.varDefault('tournament_startdate', '1970-01-01'),
+		enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
+		sortdate = Variables.varDefault('tournament_enddate', '1970-01-01'),
+		location = Locale.formatLocation({city = args.city or args.location, country = args.country}),
+		location2 = Locale.formatLocation({city = args.city2 or args.location2, country = args.country2}),
+		venue = args.venue,
+		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
+		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
+		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
+		status = args.status,
+		format = args.format,
+		sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
+			sponsor1 = args.sponsor or args.sponsor1,
+			sponsor2 = args.sponsor2,
+			sponsor3 = args.sponsor3,
+			sponsor4 = args.sponsor4,
+			sponsor5 = args.sponsor5,
+		}),
+		links = mw.ext.LiquipediaDB.lpdb_create_json({
+			discord = Links.makeFullLink('discord', args.discord),
+			facebook = Links.makeFullLink('facebook', args.facebook),
+			instagram = Links.makeFullLink('instagram', args.instagram),
+			twitch = Links.makeFullLink('twitch', args.twitch),
+			twitter = Links.makeFullLink('twitter', args.twitter),
+			website = Links.makeFullLink('website', args.website),
+			weibo = Links.makeFullLink('weibo', args.weibo),
+			vk = Links.makeFullLink('vk', args.vk),
+			youtube = Links.makeFullLink('youtube', args.youtube),
+		}),
+	}
 
-    lpdbData = self:addToLpdb(lpdbData, args)
-    mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
+	lpdbData = self:addToLpdb(lpdbData, args)
+	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
 end
 
 ---
@@ -261,16 +261,16 @@ end
 --     location: the city or place
 -- }
 function League:_createLocation(details)
-    if Table.isEmpty(details) then
-        return nil
-    end
+	if Table.isEmpty(details) then
+		return nil
+	end
 
-    local nationality = Localisation.getLocalisation(details.country)
-    local countryName = Localisation.getCountryName(details.country)
+	local nationality = Localisation.getLocalisation(details.country)
+	local countryName = Localisation.getCountryName(details.country)
     return Flags._Flag(details.country) .. '&nbsp;' ..
-        '[[:Category:' .. nationality .. ' Tournaments|' ..
-        (details.location or countryName) .. ']]' ..
-        '[[Category:' .. nationality .. ' Tournaments]]'
+		'[[:Category:' .. nationality .. ' Tournaments|' ..
+		(details.location or countryName) .. ']]' ..
+		'[[Category:' .. nationality .. ' Tournaments]]'
 end
 
 function League:_createSeries(frame, series, abbreviation)
@@ -278,108 +278,107 @@ function League:_createSeries(frame, series, abbreviation)
 		return nil
 	end
 
-    local output = ''
+	local output = ''
 
-    if self:_exists('Template:LeagueIconSmall/' .. series:lower()) then
-        output = Template.safeExpand(frame, 'LeagueIconSmall/' .. series:lower()) .. ' '
-    end
+	if self:_exists('Template:LeagueIconSmall/' .. series:lower()) then
+		output = Template.safeExpand(frame, 'LeagueIconSmall/' .. series:lower()) .. ' '
+	end
 
-    if not self:_exists(series) then
-        if String.isEmpty(abbreviation) then
-            output = output .. series
-        else
-            output = output .. abbreviation
-        end
-    elseif String.isEmpty(abbreviation) then
-        output = output .. '[[' .. series .. '|' .. series .. ']]'
-    else
-        output = output .. '[[' .. series .. '|' .. abbreviation .. ']]'
-    end
+	if not self:_exists(series) then
+		if String.isEmpty(abbreviation) then
+			output = output .. series
+		else
+			output = output .. abbreviation
+		end
+	elseif String.isEmpty(abbreviation) then
+		output = output .. '[[' .. series .. '|' .. series .. ']]'
+	else
+		output = output .. '[[' .. series .. '|' .. abbreviation .. ']]'
+	end
 
-    return output
+	return output
 end
 
 function League:_createOrganizer(organizer, name, link, reference)
-    if String.isEmpty(organizer) then
-        return nil
-    end
+	if String.isEmpty(organizer) then
+		return nil
+	end
 
-    local output
+	local output
 
-    if self:_exists(organizer) then
-        output = '[[' .. organizer .. '|'
-        if String.isEmpty(name) then
-            output = output .. organizer .. ']]'
-        else
-            output = output .. name .. ']]'
-        end
+	if self:_exists(organizer) then
+		output = '[[' .. organizer .. '|'
+		if String.isEmpty(name) then
+			output = output .. organizer .. ']]'
+		else
+			output = output .. name .. ']]'
+		end
 
-    elseif not String.isEmpty(link) then
-        if String.isEmpty(name) then
-            output = '[' .. link .. ' ' .. organizer .. ']'
-        else
-            output = '[' .. link .. ' ' .. name .. ']'
+	elseif not String.isEmpty(link) then
+		if String.isEmpty(name) then
+			output = '[' .. link .. ' ' .. organizer .. ']'
+		else
+			output = '[' .. link .. ' ' .. name .. ']'
 
-        end
-    elseif String.isEmpty(name) then
-        output = organizer
-    else
-        output = name
-    end
+		end
+	elseif String.isEmpty(name) then
+		output = organizer
+	else
+		output = name
+	end
 
-    if not String.isEmpty(reference) then
-        output = output .. reference
-    end
+	if not String.isEmpty(reference) then
+		output = output .. reference
+	end
 
-    return output
+	return output
 end
 
 function League:_createOrganizers(args)
-    local organizers = {
-        League:_createOrganizer(
-            args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
-    }
+	local organizers = {
+		League:_createOrganizer(
+			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
+	}
 
-    local index = 2
+	local index = 2
 
-    while not String.isEmpty(args['organizer' .. index]) do
-        table.insert(
-            organizers,
-            League:_createOrganizer(
-                args['organizer' .. index],
-                args['organizer-name' .. index],
-                args['organizer-link' .. index],
-                args['organizerref' .. index])
-        )
-        index = index + 1
-    end
+	while not String.isEmpty(args['organizer' .. index]) do
+		table.insert(
+			organizers,
+			League:_createOrganizer(
+			args['organizer' .. index],
+			args['organizer-name' .. index],
+			args['organizer-link' .. index],
+			args['organizerref' .. index])
+		)
+		index = index + 1
+	end
 
-    return organizers
+	return organizers
 end
 
 function League:_cleanDate(date)
-    if self:_isUnknownDate(date) then
-        return nil
-    end
+	if self:_isUnknownDate(date) then
+		return nil
+	end
 
-    date = date:gsub('-??', '-01')
-    date = date:gsub('-XX', '-01')
-    return date
+	date = date:gsub('-??', '-01')
+	date = date:gsub('-XX', '-01')
+	return date
 end
 
 function League:_exists(page)
-    return mw.title.new(page).exists
-
+	return mw.title.new(page).exists
 end
 
 function League:_isUnknownDate(date)
-    return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
+	return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
 end
 
 function League:_isChronologySet(previous, next)
-    -- We only need to check the first of these params, since it makes no sense
-    -- to set next2 and not next, etc.
-    return not (String.isEmpty(previous) and String.isEmpty(next))
+	-- We only need to check the first of these params, since it makes no sense
+	-- to set next2 and not next, etc.
+	return not (String.isEmpty(previous) and String.isEmpty(next))
 end
 
 return League
