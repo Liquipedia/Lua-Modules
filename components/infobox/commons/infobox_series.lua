@@ -8,26 +8,17 @@ local Locale = require('Module:Locale')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
+local BasicInfobox = require('Module:Infobox/Basic')
 
-local getArgs = require('Module:Arguments').getArgs
-
-local Series = Class.new()
-
+local Series = Class.new(BasicInfobox)
 function Series.run(frame)
-    return Series:createInfobox(frame)
+	local series = Series(frame)
+	return series:createInfobox()
 end
 
 function Series:createInfobox(frame)
-    local args = getArgs(frame)
-    self.frame = frame
-    self.pagename = mw.title.getCurrentTitle().text
-    self.name = args.name or self.pagename
-
-    if args.wiki == nil then
-        return error('Please provide a wiki!')
-    end
-
-    local infobox = Infobox:create(frame, args.wiki)
+	local infobox = self.infobox
+	local args = self.args
 
     infobox :name(args.name)
             :image(args.image, args.default)
@@ -123,11 +114,6 @@ end
 --- Allows for overriding this functionality
 function Series:addToLpdb(lpdbData)
     return lpdbData
-end
-
---- Allows for overriding this functionality
-function Series:addCustomCells(infobox, args)
-    return infobox
 end
 
 --- Allows for overriding this functionality
