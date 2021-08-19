@@ -1,4 +1,5 @@
 local Patch = require('Module:Infobox/Patch')
+
 local StarCraft2Patch = {}
 
 function StarCraft2Patch.run(frame)
