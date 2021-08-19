@@ -12,13 +12,13 @@ local BasicInfobox = require('Module:Infobox/Basic')
 
 local Series = Class.new(BasicInfobox)
 function Series.run(frame)
-	local series = Series(frame)
-	return series:createInfobox()
+    local series = Series(frame)
+    return series:createInfobox()
 end
 
 function Series:createInfobox(frame)
-	local infobox = self.infobox
-	local args = self.args
+    local infobox = self.infobox
+    local args = self.args
 
     infobox :name(args.name)
             :image(args.image, args.default)
