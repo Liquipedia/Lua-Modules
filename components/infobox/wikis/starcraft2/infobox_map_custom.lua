@@ -57,7 +57,7 @@ function StarCraft2Map:getName(args)
 end
 
 function StarCraft2Map:tlpdMap(id, query)
-	if not args.id then return nil end
+	if not id then return nil end
     return Template.expandTemplate(mw.getCurrentFrame(), 'Tlpd map', { id, query })
 end
 
