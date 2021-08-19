@@ -18,11 +18,6 @@ local BasicInfobox = Class.new(
 )
 
 --- Allows for overriding this functionality
-function BasicInfobox:getDisplayName(args)
-	return args.name
-end
-
---- Allows for overriding this functionality
 function BasicInfobox:addCustomCells(infobox, args)
     return infobox
 end
@@ -35,16 +30,6 @@ end
 --- Allows for overriding this functionality
 function BasicInfobox:createBottomContent(infobox)
     return infobox
-end
-
---- Allows for overriding this functionality
-function BasicInfobox:addBaseDisplay(infobox, informationType, args)
-	infobox:name(BasicInfobox:getDisplayName(args))
-	infobox:image(args.image, args.defaultImage)
-	infobox:centeredCell(args.caption)
-	infobox:header(informationType .. ' Information', true)
-
-	return infobox
 end
 
 return BasicInfobox
