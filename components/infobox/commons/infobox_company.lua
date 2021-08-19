@@ -6,7 +6,6 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 local Math = require('Module:Math')
 local String = require('Module:String')
-local getArgs = require('Module:Arguments').getArgs
 local Language = mw.language.new('en')
 local BasicInfobox = require('Module:Infobox/Basic')
 
