@@ -8,10 +8,10 @@ local RLLeague = {}
 
 function RLLeague.run(frame)
 	local league = League(frame)
-	league.addCustomCells = RLLeague.addCustomCells
-	league.createTier = RLLeague.createTier
-	league.createPrizepool = RLLeague.createPrizepool
-	league.addCustomContent = RLLeague.addCustomContent
+	League.addCustomCells = RLLeague.addCustomCells
+	League.createTier = RLLeague.createTier
+	League.createPrizepool = RLLeague.createPrizepool
+	League.addCustomContent = RLLeague.addCustomContent
 
 	return league:createInfobox(frame)
 end
