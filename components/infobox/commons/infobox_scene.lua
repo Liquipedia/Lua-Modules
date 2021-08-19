@@ -11,13 +11,13 @@ local BasicInfobox = require('Module:Infobox/Basic')
 local Scene = Class.new(BasicInfobox)
 
 function Scene.run(frame)
-	local scene = Scene(frame)
-	return scene:createInfobox()
+    local scene = Scene(frame)
+    return scene:createInfobox()
 end
 
 function Scene:createInfobox(frame)
-	local infobox = self.infobox
-	local args = self.args
+    local infobox = self.infobox
+    local args = self.args
 
     local nameDisplay = Scene:createNameDisplay(args)
 
