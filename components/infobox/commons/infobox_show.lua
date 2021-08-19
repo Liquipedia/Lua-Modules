@@ -30,7 +30,7 @@ function Show:createInfobox(frame)
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
 	infobox:header('Show Information', true)
-	infobox:cell('Host', args.host)
+	infobox:fcell(Cell:new('Host'):options({makeLink = true}):content(args.host):make())
 	infobox:cell('Format', args.format)
 	infobox:cell('Airs', args.airs)
 	infobox:fcell(Cell:new('Location'):options({}):content(
