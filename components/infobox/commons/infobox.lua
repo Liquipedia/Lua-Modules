@@ -137,6 +137,10 @@ function Infobox:_createChronologyRow(previous, next)
                         :wikitext('&nbsp;[[' .. previous .. ']]')
 
         node:node(previousWrapper)
+    elseif doesNextExist then
+        local previousWrapper = mw.html.create('div'):addClass('infobox-cell-2')
+
+        node:node(previousWrapper)
     end
 
     if doesNextExist then
