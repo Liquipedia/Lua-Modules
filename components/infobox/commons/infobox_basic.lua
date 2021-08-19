@@ -6,7 +6,7 @@ local BasicInfobox = Class.new(
 	function(self, frame)
 		self.args = getArgs(frame)
 		self.pagename = mw.title.getCurrentTitle().title
-		self.name = args.name or self.pagename
+		self.name = self.args.name or self.pagename
 
 		if self.args.wiki == nil then
 			return error('Please provide a wiki!')
