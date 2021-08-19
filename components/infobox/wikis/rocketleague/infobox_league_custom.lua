@@ -21,9 +21,35 @@ function RLLeague:addCustomCells(league, infobox, args)
 end
 
 function RLLeague:createTier(args)
-	return Cell	:new('Tier')
-				:options({})
-				:content('Hello')
+	local cell =  Cell:new('Liquipedia Tier'):options({})
+
+	local content = ''
+
+	local tier = args.liquipediatier
+	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier)
+	local tier2 = args.liquipediatier2
+	local type = args.liquipediatiertype
+	local type2 = args.liquipediatiertype2
+
+	if not String.isEmpty(type) then
+		local typeDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. type)
+		content = content .. '[[' .. typeDisplay .. ' Tournaments|' .. type .. ']]'
+
+		if not String.isEmpty(type2) then
+			content = content .. ' ' .. type2
+		end
+
+		content = content .. ' ([[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']])'
+	elseif not String.isEmpty(tier) then
+		content = content .. '[[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']]'
+
+		if not String.isEmpty(tier2) then
+			local tier2Display = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier2)
+			content = content .. ' ([[' .. tier2Display .. ' Tournaments|' .. tier2Display .. ']])'
+		end
+	end
+
+	return cell:content(content)
 end
 
 function RLLeague:createPrizepool(args)
