@@ -23,7 +23,7 @@ function Strategy:createInfobox(frame)
 
 	local infobox = Infobox:create(frame, args.game)
 
-	infobox:name(args.name)
+	infobox:name(Strategy:getNameDisplay(args))
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
 	infobox:fcell(Cell:new('Creator'):options({makeLink = true})
@@ -37,6 +37,11 @@ function Strategy:createInfobox(frame)
 	end
 
 	return infobox:build()
+end
+
+--- Allows for overriding this functionality
+function Strategy:getNameDisplay(args)
+	return args.name
 end
 
 --- Allows for overriding this functionality
