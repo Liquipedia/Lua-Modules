@@ -2,7 +2,6 @@ local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
 local Namespace = require('Module:Namespace')
-local getArgs = require('Module:Arguments').getArgs
 
 local Map = Class.new(BasicInfobox)
 
