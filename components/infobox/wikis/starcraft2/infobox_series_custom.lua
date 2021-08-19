@@ -20,10 +20,11 @@ local _GAMES = {
 local Sc2Series = {}
 
 function Sc2Series.run(frame)
+	local series = Series(frame)
 	Series.addCustomCells = Sc2Series.addCustomCells
 	Series.createTier = Sc2Series.createTier
 	Series.addCustomVariables = Sc2Series.addCustomVariables
-	return Series.run(frame)
+	return series:createInfobox(frame)
 end
 
 function Sc2Series.addCustomCells(series, infobox, args)
