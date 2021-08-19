@@ -1,5 +1,6 @@
 local Map = require('Module:Infobox/Map')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
 local StarCraft2Map = {}
 
 function StarCraft2Map.run(frame)
@@ -45,6 +46,7 @@ function StarCraft2Map:getRushDistance(args)
     rushDistance = string.gsub(rushDistance, 's', '')
     rushDistance = string.gsub(rushDistance, 'seconds', '')
     rushDistance = string.gsub(rushDistance, ' ', '')
+    Variables.varDefine('rush_distance', rushDistance)
     return rushDistance .. ' seconds'
 end
 
