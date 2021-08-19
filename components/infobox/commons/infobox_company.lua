@@ -1,6 +1,5 @@
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
-local Infobox = require('Module:Infobox')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
 local ReferenceCleaner = require('Module:ReferenceCleaner')
@@ -9,25 +8,20 @@ local Math = require('Module:Math')
 local String = require('Module:String')
 local getArgs = require('Module:Arguments').getArgs
 local Language = mw.language.new('en')
+local BasicInfobox = require('Module:Infobox/Basic')
 
-local Company = Class.new()
+local Company = Class.new(BasicInfobox)
 
 local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
 function Company.run(frame)
-    return Company:createInfobox(frame)
+	local company = Company(frame)
+	return company:createInfobox()
 end
 
 function Company:createInfobox(frame)
-    local args = getArgs(frame)
-    self.pagename = args.pagename or mw.title.getCurrentTitle().text
-    self.name = args.name or self.pagename
-
-    if args.game == nil then
-        return error('Please provide a game!')
-    end
-
-    local infobox = Infobox:create(frame, args.game)
+	local infobox = self.infobox
+	local args = self.args
 
     infobox :name(args.name)
             :image(args.image)
@@ -78,11 +72,6 @@ function Company:createInfobox(frame)
     infobox:categories('Companies')
 
     return infobox:build()
-end
-
---- Allows for overriding this functionality
-function Company:addCustomCells(infobox, args)
-    return infobox
 end
 
 function Company:_createLocation(frame, location)
