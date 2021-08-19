@@ -3,9 +3,10 @@ local Patch = require('Module:Infobox/Patch')
 local StarCraft2Patch = {}
 
 function StarCraft2Patch.run(frame)
+	local patch = Patch(frame)
 	Patch.addCustomCells = StarCraft2Patch.addCustomCells
 	Patch.getChronologyData = StarCraft2Patch.getChronologyData
-	return Patch.run(frame)
+	return patch:createInfobox()
 end
 
 --- Allows for overriding this functionality
