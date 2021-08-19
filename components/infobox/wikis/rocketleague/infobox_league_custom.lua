@@ -18,6 +18,7 @@ end
 
 function RLLeague:addCustomCells(league, infobox, args)
 	infobox:cell('Mode', args.mode)
+	infobox:cell('Misc Mode:', args.miscmode)
 	return infobox
 end
 
