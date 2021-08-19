@@ -17,6 +17,7 @@ function RLLeague.run(frame)
 end
 
 function RLLeague:addCustomCells(league, infobox, args)
+	infobox:cell('Mode', args.mode)
 	return infobox
 end
 
