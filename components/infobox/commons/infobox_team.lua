@@ -15,13 +15,13 @@ local Language = mw.language.new('en')
 local _LINK_VARIANT = 'team'
 
 function Team.run(frame)
-	local team = Team(frame)
-	return team:createInfobox()
+    local team = Team(frame)
+    return team:createInfobox()
 end
 
 function Team:createInfobox(frame)
-	local infobox = self.infobox
-	local args = self.args
+    local infobox = self.infobox
+    local args = self.args
 
     local earnings = Team:calculateEarnings(args)
     Variables.varDefine('earnings', earnings)
