@@ -15,13 +15,13 @@ local Company = Class.new(BasicInfobox)
 local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
 function Company.run(frame)
-	local company = Company(frame)
-	return company:createInfobox()
+    local company = Company(frame)
+    return company:createInfobox()
 end
 
 function Company:createInfobox(frame)
-	local infobox = self.infobox
-	local args = self.args
+    local infobox = self.infobox
+    local args = self.args
 
     infobox :name(args.name)
             :image(args.image)
