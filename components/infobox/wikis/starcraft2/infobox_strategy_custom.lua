@@ -19,9 +19,7 @@ function StarCraft2Strategy:addCustomCells(infobox, args)
 
 	if Namespace.isMain() then
 		local categories = StarCraft2Strategy:_getCategories(args.race, args.matchups)
-		for _, item in pairs(categories) do
-			infobox:categories(item)
-		end
+		infobox:categories(unpack(categories))
 	end
 
 	return infobox
@@ -57,9 +55,9 @@ function StarCraft2Strategy:_getCategories(race, matchups)
 		'TvZ', 'TvP', 'TvT',
 		'PvZ', 'PvP', 'PvT',
 	}
-	for _, raceMU in ipairs(raceMatchups) do
-		if String.contains(matchups, raceMU) then
-			table.insert(categories, raceMU .. '_Builds')
+	for _, raceMatchupItem in ipairs(raceMatchups) do
+		if String.contains(matchups, raceMatchupItem) then
+			table.insert(categories, raceMatchupItem .. '_Builds')
 		end
 	end
 
