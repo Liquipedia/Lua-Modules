@@ -6,8 +6,6 @@ local Links = require('Module:Links')
 local Table = require('Module:Table')
 local Flags = require('Module:Flags')
 
-local getArgs = require('Module:Arguments').getArgs
-
 local Show = Class.new(BasicInfobox)
 
 function Show.run(frame)
