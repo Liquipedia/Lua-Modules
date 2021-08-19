@@ -51,7 +51,7 @@ function Show:_createHosts(args)
 	local hosts = {}
 	local host1 = args.host or args.host1
 	if host1 then
-		host1 = '[[' .. 
+		host1 = '[[' ..
 			(args.hostlink or args.host1link or host1)
 			.. '|' .. host1 .. ']]'
 		table.insert(hosts, host1)
