@@ -10,8 +10,6 @@ local BasicInfobox = require('Module:Infobox/Basic')
 
 local Scene = Class.new(BasicInfobox)
 
-local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
-
 function Scene.run(frame)
 	local scene = Scene(frame)
 	return scene:createInfobox()
