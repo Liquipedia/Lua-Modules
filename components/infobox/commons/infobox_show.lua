@@ -1,5 +1,5 @@
 local Class = require('Module:Class')
-local Infobox = require('Module:Infobox')
+local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
 local Cell = require('Module:Infobox/Cell')
 local Links = require('Module:Links')
@@ -8,23 +8,12 @@ local Flags = require('Module:Flags')
 
 local getArgs = require('Module:Arguments').getArgs
 
-local Show = Class.new()
+local Show = Class.new(BasicInfobox)
 
 function Show.run(frame)
-	return Show:createInfobox(frame)
-end
-
-function Show:createInfobox(frame)
-	local args = getArgs(frame)
-	self.frame = frame
-	self.pagename = mw.title.getCurrentTitle().text
-	self.name = args.name or self.pagename
-
-	if args.game == nil then
-		return error('Please provide a game!')
-	end
-
-	local infobox = Infobox:create(frame, args.game)
+	local show = Show(frame)
+	local args = show.args
+	local infobox = show.infobox
 
 	infobox:name(args.name)
 	infobox:image(args.image, args.defaultImage)
@@ -52,21 +41,6 @@ function Show:createInfobox(frame)
 	end
 
 	return infobox:build()
-end
-
---- Allows for overriding this functionality
-function Show:addCustomCells(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
-function Show:addCustomContent(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
-function Show:createBottomContent(infobox)
-	return infobox
 end
 
 function Show:_createLocation(country, city)
