@@ -28,7 +28,7 @@ function Map:createInfobox(frame)
             :centeredCell(args.caption)
             :header('Map Information', true)
             :fcell(Cell:new('Creator'):options({makeLink = true}):content(
-                args.creator or args['vreated-by']):make())
+                args.creator or args['created-by']):make())
     Map:addCustomCells(infobox, args)
     infobox:bottom(Map.createBottomContent(infobox))
 
