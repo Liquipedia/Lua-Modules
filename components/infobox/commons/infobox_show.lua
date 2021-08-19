@@ -32,6 +32,7 @@ function Show:createInfobox(frame)
 	infobox:header('Show Information', true)
 	infobox:cell('Host', args.host)
 	infobox:cell('Format', args.format)
+	infobox:cell('Airs', args.airs)
 	infobox:fcell(Cell:new('Location'):options({}):content(
 			Show:_createLocation(args.country, args.city),
 			Show:_createLocation(args.country2, args.city2)
@@ -41,6 +42,7 @@ function Show:createInfobox(frame)
 	local links = Links.transform(args)
 	infobox:header('Links', not Table.isEmpty(links))
 	infobox:links(links)
+	infobox:centeredCell(Show:_addSecondaryLinkDisplay(args))
 	Show:addCustomContent(infobox, args)
 	infobox:centeredCell(args.footnotes)
 	infobox:bottom(Show.createBottomContent(infobox))
@@ -76,6 +78,24 @@ function Show:_createLocation(country, city)
 
 	return Flags._Flag(country) .. '&nbsp;' ..
 		'[[:Category:' .. countryDisplay .. '|' .. (city or countryDisplay) .. ']]'
+end
+
+function Show:_addSecondaryLinkDisplay(args)
+	local secondaryLinks = {}
+	if args.topicid then
+		secondaryLinks[#secondaryLinks + 1] = '[https://tl.net/forum/viewmessage.php?topic_id='
+			.. args.topicid .. ' TL Thread]'
+	end
+	if args.itunes then
+		secondaryLinks[#secondaryLinks + 1] = '['
+			.. args.itunes .. ' iTunes] [[Category:Podcasts]]'
+	end
+	if args.videoarchive then
+		secondaryLinks[#secondaryLinks + 1] = '['
+			.. args.videoarchive .. ' Video Archive]'
+	end
+
+	return table.concat(secondaryLinks, '&nbsp;•&nbsp;')
 end
 
 return Show
