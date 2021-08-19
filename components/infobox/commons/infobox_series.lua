@@ -1,6 +1,5 @@
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
-local Infobox = require('Module:Infobox')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
