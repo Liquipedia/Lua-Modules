@@ -6,7 +6,7 @@ local Namespace = require('Module:Namespace')
 local Strategy = Class.new(BasicInfobox)
 
 function Strategy.run(frame)
-	local strategy = Map(frame)
+	local strategy = Strategy(frame)
 	return strategy:createInfobox()
 end
 
