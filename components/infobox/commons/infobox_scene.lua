@@ -1,6 +1,5 @@
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
-local Infobox = require('Module:Infobox')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Localisation = require('Module:Localisation')
