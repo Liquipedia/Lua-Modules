@@ -57,9 +57,7 @@ function RLLeague:createPrizepool(args)
 
 	Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd)
 
-	return Cell	:new('Prize pool')
-				:options({})
-				:content(content)
+	return cell:content(content)
 end
 
 function RLLeague:addCustomContent(infobox, args)
