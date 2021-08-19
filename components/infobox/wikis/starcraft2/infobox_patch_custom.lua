@@ -4,7 +4,7 @@ local StarCraft2Patch = {}
 function StarCraft2Patch.run(frame)
 	Patch.addCustomCells = StarCraft2Patch.addCustomCells
 	Patch.getChronologyData = StarCraft2Patch.getChronologyData
-	return Patch:createInfobox(frame)
+	return Patch.run(frame)
 end
 
 --- Allows for overriding this functionality
