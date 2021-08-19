@@ -42,11 +42,12 @@ function Map:_setLpdbData(args)
 		name = self.name,
 		type = 'map',
 		image = args.image,
+		extradata = { creator = args.creator }
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_datapoint('map_TEST_' .. lpdbData.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('map_' .. lpdbData.name, lpdbData)
 end
 
 return Map
