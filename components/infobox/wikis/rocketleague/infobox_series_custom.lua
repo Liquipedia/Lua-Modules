@@ -10,7 +10,7 @@ function RocketLeagueSeries.run(frame)
     Series.addCustomCells = RocketLeagueSeries.addCustomCells
     Series.addToLpdb = RocketLeagueSeries.addToLpdb
 
-    return Series:createInfobox(frame)
+    return Series.run(frame)
 end
 
 function RocketLeagueSeries.addToLpdb(series, lpdbData)
