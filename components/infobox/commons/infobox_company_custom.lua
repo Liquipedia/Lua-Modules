@@ -4,7 +4,7 @@ local CustomCompany = {}
 
 function CustomCompany.run(frame)
     Company.addCustomCells = CustomCompany.addCustomCells
-    return Company:createInfobox(frame)
+    return Company.run(frame)
 end
 
 function CustomCompany.addCustomCells(company, infobox, args)
