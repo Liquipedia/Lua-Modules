@@ -5,9 +5,10 @@ local RaceIcon = require('Module:RaceIcon')
 local StarCraft2Strategy = {}
 
 function StarCraft2Strategy.run(frame)
+	local strategy = Strategy(frame)
 	Strategy.getNameDisplay = StarCraft2Strategy.getNameDisplay
 	Strategy.addCustomCells = StarCraft2Strategy.addCustomCells
-	return Strategy.run(frame)
+	return strategy:createInfobox(frame)
 end
 
 function StarCraft2Strategy:addCustomCells(infobox, args)
