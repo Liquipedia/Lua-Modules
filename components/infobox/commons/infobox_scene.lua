@@ -6,26 +6,21 @@ local Variables = require('Module:Variables')
 local Localisation = require('Module:Localisation')
 local Flags = require('Module:Flags')
 local Links = require('Module:Links')
+local BasicInfobox = require('Module:Infobox/Basic')
 
-local getArgs = require('Module:Arguments').getArgs
+local Scene = Class.new(BasicInfobox)
 
-local Scene = Class.new()
+local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
 function Scene.run(frame)
-    return Scene:createInfobox(frame)
+	local scene = Scene(frame)
+	return scene:createInfobox()
 end
 
 function Scene:createInfobox(frame)
-    local args = getArgs(frame)
-    self.frame = frame
-    self.pagename = mw.title.getCurrentTitle().text
-    self.name = args.country or args.scene or self.pagename
+	local infobox = self.infobox
+	local args = self.args
 
-    if args.game == nil then
-        return error('Please provide a game!')
-    end
-
-    local infobox = Infobox:create(frame, args.game)
     local nameDisplay = Scene:createNameDisplay(args)
 
     infobox :name(nameDisplay)
@@ -79,23 +74,8 @@ function Scene:createNameDisplay(args)
 end
 
 --- Allows for overriding this functionality
-function Scene:addCustomContent(infobox, args)
-    return infobox
-end
-
---- Allows for overriding this functionality
 function Scene:getAchievements(infobox, args)
     return args.achievements
-end
-
---- Allows for overriding this functionality
-function Scene:addCustomCells(infobox, args)
-    return infobox
-end
-
---- Allows for overriding this functionality
-function Scene:createBottomContent(infobox)
-    return infobox
 end
 
 --- Allows for overriding this functionality
