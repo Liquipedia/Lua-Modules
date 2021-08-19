@@ -6,10 +6,11 @@ local String = require('Module:StringUtils')
 local StarCraft2Map = {}
 
 function StarCraft2Map.run(frame)
+	local map = Map(frame)
 	Map.getNameDisplay = StarCraft2Map.getNameDisplay
 	Map.addCustomCells = StarCraft2Map.addCustomCells
 	Map.addToLpdb = StarCraft2Map.addToLpdb
-	return Map.run(frame)
+	return map:createInfobox(frame)
 end
 
 function StarCraft2Map:addCustomCells(infobox, args)
