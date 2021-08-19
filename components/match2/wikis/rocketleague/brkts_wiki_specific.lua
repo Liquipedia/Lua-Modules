@@ -15,6 +15,7 @@ local STATUS_TO_WALKOVER = { FF = "ff", DQ = "dq", L = "l" }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
+local _RESULT_TYPE_DRAW = 'draw'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -293,7 +294,7 @@ function matchFunctions.getOpponents(args)
 	end
 
 	-- apply placements and winner if finshed
-	local tempWinner = tostring(args.winner or '')
+	local winner = tostring(args.winner or '')
 	if Logic.readBool(args.finished) then
 		local placement = 1
 		local lastScore
@@ -320,9 +321,9 @@ function matchFunctions.getOpponents(args)
 			args["opponent" .. opponentIndex] = opponent
 		end
 	end
-	if tempWinner == 'draw' or tempWinner == '0' then
+	if winner == _RESULT_TYPE_DRAW or winner == '0' then
 		args.winner = 0
-		args.resulttype = 'draw'
+		args.resulttype = _RESULT_TYPE_DRAW
 	end
 	return args
 end
