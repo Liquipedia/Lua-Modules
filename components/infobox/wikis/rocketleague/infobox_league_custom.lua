@@ -3,8 +3,12 @@ local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local RLLeague = {}
+
+local _SERIES_RLCS = 'Rocket League Championship Series'
+local _MODE_2v2 = '2v2'
 
 function RLLeague.run(frame)
 	local league = League(frame)
@@ -12,6 +16,7 @@ function RLLeague.run(frame)
 	League.createTier = RLLeague.createTier
 	League.createPrizepool = RLLeague.createPrizepool
 	League.addCustomContent = RLLeague.addCustomContent
+	League.defineCustomPageVariables = RLLeague.defineCustomPageVariables
 
 	return league:createInfobox(frame)
 end
@@ -119,6 +124,43 @@ function RLLeague:addCustomContent(infobox, args)
 			:cell('Number of teams', args.team_number)
 
     return infobox
+end
+
+function RLLeague:defineCustomPageVariables(infobox, args)
+	-- Legacy vars
+	Variables.varDefine('tournament_ticker_name', args.tickername)
+	Variables.varDefine('tournament_organizer', self:_concatArgs(args, 'organizer'))
+	Variables.varDefine('tournament_sponsors', self:_concatArgs(args, 'sponsor'))
+	Variables.varDefine('tournament_rlcs_premier', args.series == _SERIES_RLCS and 1 or 0)
+	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
+	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
+	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+	Variables.varDefine('tournament_rlcs_premier', args.series == _SERIES_RLCS and 1 or 0)
+
+	-- Legacy tier vars
+	Variables.varDefine('tournament_lptier', args.liquipediatier)
+	Variables.varDefine('tournament_tier', args.liquipediatiertype or args.liquipediatier)
+	Variables.varDefine('tournament_tier2', args.liquipediatier2)
+	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
+	Variables.varDefine('tournament_tiertype2', args.liquipediatiertype2)
+
+	-- Rocket League specific
+	Variables.varDefine('tournament_patch', args.patch)
+	Variables.varDefine('tournament_mode', args.mode)
+	Variables.varDefine('tournament_participant_number', 0)
+	Variables.varDefine('tournament_participants', '(')
+	Variables.varDefine('tournament_teamplayers', args.mode == _MODE_2v2 and 2 or 3)
+end
+
+function RLLeague:_concatArgs(args, base)
+	local foundArgs = {args[base] or args[base .. '1']}
+	local index = 2
+	while not String.isEmpty(args[base .. index]) do
+		table.insert(foundArgs, args[base .. index])
+		index = index + 1
+	end
+
+	return table.concat(foundArgs, ';')
 end
 
 function RLLeague:_createNoWrappingSpan(content)

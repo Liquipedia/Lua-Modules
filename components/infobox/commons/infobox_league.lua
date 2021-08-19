@@ -155,6 +155,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_region', args.region)
 	Variables.varDefine('tournament_country', args.country)
 	Variables.varDefine('tournament_location', args.location or args.city)
+	Variables.varDefine('tournament_location2', args.location2 or args.city2)
 	Variables.varDefine('tournament_venue', args.venue)
 
 	Variables.varDefine('tournament_game', args.game)
