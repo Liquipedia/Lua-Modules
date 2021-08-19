@@ -1,15 +1,16 @@
 local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
+local Namespace = require('Module:Namespace')
 local getArgs = require('Module:Arguments').getArgs
 
 local Map = Class.new(BasicInfobox)
 
 function Map.run(frame)
-	local Map = Map(frame)
+	local map = Map(frame)
 	local args = getArgs(frame)
-	local infobox = Map.infobox
-	infobox:name(BasicInfobox:getNameDisplay(args))
+	local infobox = map.infobox
+	infobox:name(Map:getNameDisplay(args))
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
 	infobox:header('Map Information', true)
@@ -20,7 +21,7 @@ function Map.run(frame)
 
 	if Namespace.isMain() then
 		infobox:categories('Maps')
-		self:_setLpdbData(args)
+		Map:_setLpdbData(args)
 	end
 
 	return infobox:build()
@@ -45,7 +46,7 @@ function Map:_setLpdbData(args)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_datapoint('map_' .. lpdbData.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('map_TEST_' .. lpdbData.name, lpdbData)
 end
 
 return Map
