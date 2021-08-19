@@ -4,16 +4,15 @@ local getArgs = require('Module:Arguments').getArgs
 
 local BasicInfobox = Class.new(
 	function(self, frame)
-		local args = getArgs(frame)
-		self.frame = frame
+		self.args = getArgs(frame)
 		self.pagename = mw.title.getCurrentTitle().title
 		self.name = args.name or self.pagename
 
-		if args.wiki == nil then
+		if self.args.wiki == nil then
 			return error('Please provide a wiki!')
 		end
 
-		self.infobox = Infobox:create(frame, args.wiki)
+		self.infobox = Infobox:create(frame, self.args.wiki)
 	end
 )
 
