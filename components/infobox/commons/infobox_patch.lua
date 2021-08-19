@@ -1,27 +1,19 @@
+local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Infobox = require('Module:Infobox')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 
-local getArgs = require('Module:Arguments').getArgs
-
-local Patch = Class.new()
+local Patch = Class.new(BasicInfobox)
 
 function Patch.run(frame)
-	return Patch:createInfobox(frame)
+	local patch = Patch(frame)
+	return patch:createInfobox()
 end
 
 function Patch:createInfobox(frame)
-	local args = getArgs(frame)
-	self.frame = frame
-	self.pagename = mw.title.getCurrentTitle().text
-	self.name = args.name or self.pagename
-
-	if args.game == nil then
-		return error('Please provide a game!')
-	end
-
-	local infobox = Infobox:create(frame, args.game)
+	local infobox = self.infobox
+	local args = self.args
+	infobox.highlights = Patch._highlights
 
 	infobox:name(args.name)
 	infobox:image(args.image, args.defaultImage)
@@ -49,21 +41,6 @@ function Patch:createInfobox(frame)
 end
 
 --- Allows for overriding this functionality
-function Patch:addCustomContent(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
-function Patch:addCustomCells(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
-function Patch:createBottomContent(infobox)
-	return infobox
-end
-
---- Allows for overriding this functionality
 function Patch:getChronologyData(args)
 	return { previous = args.previous, next = args.next }
 end
@@ -86,22 +63,21 @@ function Patch:_getHighlights(args)
 end
 
 --extend Infobox class
-function Infobox:highlights(data)
+function Patch:_highlights(data)
 	if Table.isEmpty(data) then
         return self
 	end
 
-	local outerDiv = mw.html.create('div')
-	local innerDiv = mw.html.create('div')
+	local div = mw.html.create('div')
 	local highlights = mw.html.create('ul')
 
 	for _, item in ipairs(data) do
 		highlights:tag('li'):wikitext(item):done()
 	end
 
-	outerDiv:node(innerDiv:node(highlights))
+	div:node(highlights)
 
-	self.content:node(outerDiv)
+	self.content:node(div)
 
 	return self
 end
