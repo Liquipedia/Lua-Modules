@@ -19,7 +19,11 @@ function Show.run(frame)
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
 	infobox:header('Show Information', true)
-	infobox:fcell(Cell:new('Host'):options({makeLink = true}):content(args.host):make())
+	infobox:fcell(Cell:new('Host(s)'):options({makeLink = true}):content(
+			args.host or args.host1,
+			args.host2,
+			args.host3
+		):make())
 	infobox:cell('Format', args.format)
 	infobox:cell('Airs', args.airs)
 	infobox:fcell(Cell:new('Location'):options({}):content(
