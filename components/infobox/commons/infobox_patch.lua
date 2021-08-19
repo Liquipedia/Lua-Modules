@@ -65,7 +65,7 @@ end
 --extend Infobox class
 function Patch:_highlights(data)
 	if Table.isEmpty(data) then
-        return self
+		return self
 	end
 
 	local div = mw.html.create('div')
