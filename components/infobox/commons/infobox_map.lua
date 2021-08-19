@@ -1,54 +1,51 @@
+local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
-local Infobox = require('Module:Infobox')
-
 local getArgs = require('Module:Arguments').getArgs
 
-local Map = Class.new()
+local Map = Class.new(BasicInfobox)
 
 function Map.run(frame)
-    return Map:createInfobox(frame)
-end
+	local Map = Map(frame)
+	local args = getArgs(frame)
+	local infobox = Map.infobox
+	infobox:name(BasicInfobox:getNameDisplay(args))
+	infobox:image(args.image, args.defaultImage)
+	infobox:centeredCell(args.caption)
+	infobox:header('Map Information', true)
+	infobox:fcell(Cell:new('Creator'):options({makeLink = true}):content(
+		args.creator or args['created-by']):make())
+	Map:addCustomCells(infobox, args)
+	infobox:bottom(Map.createBottomContent(infobox))
 
-function Map:createInfobox(frame)
-    local args = getArgs(frame)
-    self.frame = frame
-    self.pagename = mw.title.getCurrentTitle().text
-	local name = Map:getName(args)
-    self.name = name or self.pagename
+	if Namespace.isMain() then
+		infobox:categories('Maps')
+		self:_setLpdbData(args)
+	end
 
-    if args.game == nil then
-        return error('Please provide a game!')
-    end
-
-    local infobox = Infobox:create(frame, args.game)
-
-    infobox :name(name)
-            :image(args.image, args.defaultImage)
-            :centeredCell(args.caption)
-            :header('Map Information', true)
-            :fcell(Cell:new('Creator'):options({makeLink = true}):content(
-                args.creator or args['created-by']):make())
-    Map:addCustomCells(infobox, args)
-    infobox:bottom(Map.createBottomContent(infobox))
-
-    return infobox:build()
+	return infobox:build()
 end
 
 --- Allows for overriding this functionality
---- for e.g. #external_info:tlpd_map on sc/sc2
-function Map:getName(args)
-    return args.name
+function Map:getNameDisplay(args)
+	return args.name
 end
 
 --- Allows for overriding this functionality
-function Map:addCustomCells(infobox, args)
-    return infobox
+function Map:addToLpdb(lpdbData, args)
+	return lpdbData
 end
 
---- Allows for overriding this functionality
-function Map:createBottomContent(infobox)
-    return infobox
+function Map:_setLpdbData(args)
+	local lpdbData = {
+		name = self.name,
+		type = 'map',
+		image = args.image,
+	}
+
+	lpdbData = self:addToLpdb(lpdbData, args)
+	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
+	mw.ext.LiquipediaDB.lpdb_datapoint('map_' .. lpdbData.name, lpdbData)
 end
 
 return Map
