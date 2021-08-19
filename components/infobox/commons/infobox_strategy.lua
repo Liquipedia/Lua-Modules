@@ -2,13 +2,12 @@ local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
 local Namespace = require('Module:Namespace')
-local getArgs = require('Module:Arguments').getArgs
 
 local Strategy = Class.new(BasicInfobox)
 
 function Strategy.run(frame)
 	local strategy = Strategy(frame)
-	local args = getArgs(frame)
+	local args = strategy.args
 	local infobox = strategy.infobox
 	infobox:name(Strategy:getNameDisplay(args))
 	infobox:image(args.image, args.defaultImage)
