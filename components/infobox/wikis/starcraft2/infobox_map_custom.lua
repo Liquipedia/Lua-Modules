@@ -6,12 +6,13 @@ local StarCraft2Map = {}
 function StarCraft2Map.run(frame)
 	Map.getNameDisplay = StarCraft2Map.getNameDisplay
 	Map.addCustomCells = StarCraft2Map.addCustomCells
+	Map.addToLpdb = StarCraft2Map.addToLpdb
 	return Map.run(frame)
 end
 
 function StarCraft2Map:addCustomCells(infobox, args)
 	local id = args.id
-	infobox:cell('Tileset', args.tileset or StarCraft2Map:tlpdMap(id, 'tileset'))
+	infobox:cell('Tileset', args.tileset or StarCraft2Map:_tlpdMap(id, 'tileset'))
 	infobox:cell('Size', StarCraft2Map:_getSize(args, id))
 	infobox:cell('Spawn Positions', StarCraft2Map:_getSpawn(args, id))
 	infobox:cell('Versions', args.versions)
@@ -25,19 +26,39 @@ function StarCraft2Map:addCustomCells(infobox, args)
 	return infobox
 end
 
+function StarCraft2Map:getNameDisplay(args)
+	if not args.name then
+		return StarCraft2Map:_tlpdMap(args.id, 'name')
+	end
+
+	return args.name
+end
+
+function StarCraft2Map:addToLpdb(lpdbData, args)
+	lpdbData.name = StarCraft2Map:getNameDisplay(args)
+	lpdbData.extradata = {
+		creator = args.creator,
+		spawns = args.players,
+		height = args.height,
+		width = args.width,
+		rush = Variables.varDefault('rush_distance'),
+	}
+	return lpdbData
+end
+
 function StarCraft2Map:_getSize(args, id)
 	local width = args.width
-		or StarCraft2Map:tlpdMap(id, 'width')
+		or StarCraft2Map:_tlpdMap(id, 'width')
 	local height = args.height
-		or StarCraft2Map:tlpdMap(id, 'height')
+		or StarCraft2Map:_tlpdMap(id, 'height')
 	return width .. 'x' .. height
 end
 
 function StarCraft2Map:_getSpawn(args, id)
 	local players = args.players
-		or StarCraft2Map:tlpdMap(id, 'players')
+		or StarCraft2Map:_tlpdMap(id, 'players')
 	local positions = args.positions
-		or StarCraft2Map:tlpdMap(id, 'positions')
+		or StarCraft2Map:_tlpdMap(id, 'positions')
 	return players .. ' at ' .. positions
 end
 
@@ -50,15 +71,7 @@ function StarCraft2Map:_getRushDistance(args)
 	return rushDistance .. ' seconds'
 end
 
-function StarCraft2Map:getNameDisplay(args)
-	if not args.name then
-		return StarCraft2Map:tlpdMap(args.id, 'name')
-	end
-
-	return args.name
-end
-
-function StarCraft2Map:tlpdMap(id, query)
+function StarCraft2Map:_tlpdMap(id, query)
 	if not id then return nil end
 	return Template.safeExpand(mw.getCurrentFrame(), 'Tlpd map', { id, query })
 end
