@@ -26,6 +26,11 @@ function RLLeague:createTier(args)
 	local content = ''
 
 	local tier = args.liquipediatier
+
+	if String.isEmpty(tier) then
+		return cell:content()
+	end
+
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier)
 	local tier2 = args.liquipediatier2
 	local type = args.liquipediatiertype
@@ -40,7 +45,7 @@ function RLLeague:createTier(args)
 		end
 
 		content = content .. ' ([[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']])'
-	elseif not String.isEmpty(tier) then
+	else
 		content = content .. '[[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']]'
 
 		if not String.isEmpty(tier2) then
