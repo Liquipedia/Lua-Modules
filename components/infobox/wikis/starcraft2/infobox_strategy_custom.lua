@@ -32,7 +32,7 @@ function StarCraft2Strategy:getNameDisplay(args)
 end
 
 function StarCraft2Strategy:_getTLarticle(tlarticle)
-	if tlarticle then
+	if not String.isEmpty(tlarticle) then
 		return '[[File:TL Strategy presents.png|left|95px]] ' ..
 			'This article is a spotlighted, peer-reviewed guide by TL Strategy. ['
 			.. tlarticle .. ' Link]'
