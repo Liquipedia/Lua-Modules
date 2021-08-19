@@ -7,10 +7,11 @@ local RocketLeagueSeries = {}
 local _totalSeriesPrizepool = 0
 
 function RocketLeagueSeries.run(frame)
+    local series = Series(frame)
     Series.addCustomCells = RocketLeagueSeries.addCustomCells
     Series.addToLpdb = RocketLeagueSeries.addToLpdb
 
-    return Series.run(frame)
+    return series:createInfobox(frame)
 end
 
 function RocketLeagueSeries.addToLpdb(series, lpdbData)
