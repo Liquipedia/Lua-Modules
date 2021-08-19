@@ -1,4 +1,5 @@
 local Class = require('Module:Class')
+local Cell = require('Module:Cell')
 local Infobox = require('Module:Infobox')
 
 local getArgs = require('Module:Arguments').getArgs
