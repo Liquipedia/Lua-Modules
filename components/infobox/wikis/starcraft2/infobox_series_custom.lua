@@ -23,7 +23,7 @@ function Sc2Series.run(frame)
 	Series.addCustomCells = Sc2Series.addCustomCells
 	Series.createTier = Sc2Series.createTier
 	Series.addCustomVariables = Sc2Series.addCustomVariables
-	return Series:createInfobox(frame)
+	return Series.run(frame)
 end
 
 function Sc2Series.addCustomCells(series, infobox, args)
