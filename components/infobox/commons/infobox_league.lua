@@ -1,6 +1,6 @@
-local Class = require('Module:Class')
+local BasicInfobox = require('Module:Infobox/Basic')
 local Cell = require('Module:Infobox/Cell')
-local Infobox = require('Module:Infobox')
+local Class = require('Module:Class')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
@@ -11,139 +11,113 @@ local Localisation = require('Module:Localisation')
 local Variables = require('Module:Variables')
 local Locale = require('Module:Locale')
 
-local getArgs = require('Module:Arguments').getArgs
-
-local League = Class.new()
+local League = Class.new(BasicInfobox)
 
 function League.run(frame)
-	return League:createInfobox(frame)
+	local league = League(frame)
+	return league:createInfobox()
 end
 
-function League:createInfobox(frame)
-	local args = getArgs(frame)
-	self.frame = frame
-	self.pagename = mw.title.getCurrentTitle().title
-	self.name = args.name or self.pagename
-
-	if args.wiki == nil then
-		return error('Please provide a wiki!')
-	end
-
-	local infobox = Infobox:create(frame, args.wiki)
-
-	infobox :name(args.name)
-			:image(args.image, args.default)
-			:centeredCell(args.caption)
-			:header('League Information', true)
-			:fcell(Cell :new('Series')
-				:options({})
-				:content(
-					League:_createSeries(frame, args.series, args.abbrevation),
-					League:_createSeries(frame, args.series2, args.abbrevation2)
+function League:createInfobox()
+	local args = self.args
+	self.infobox:name(args.name)
+				:image(args.image, args.default)
+				:centeredCell(args.caption)
+				:header('League Information', true)
+				:fcell(Cell:new('Series')
+					:options({})
+					:content(
+						League:_createSeries(mw.getCurrentFrame(), args.series, args.abbrevation),
+						League:_createSeries(mw.getCurrentFrame(), args.series2, args.abbrevation2)
+					)
+					:make()
 				)
-				:make()
-			)
-			:fcell(Cell  :new('Organizer')
-				:options({})
-				:content(
-					unpack(League:_createOrganizers(args))
+				:fcell(Cell:new('Organizer')
+					:options({})
+					:content(
+						unpack(League:_createOrganizers(args))
+					)
+					:make()
 				)
-				:make()
-			)
-			:fcell(Cell :new('Sponsor(s)')
-				:options({})
-				:content(
-					args.sponsor or args.sponsor1,
-					args.sponsor2,
-					args.sponsor3,
-					args.sponsor4,
-					args.sponsor5
+				:fcell(Cell:new('Sponsor(s)')
+					:options({})
+					:content(
+						args.sponsor or args.sponsor1,
+						args.sponsor2,
+						args.sponsor3,
+						args.sponsor4,
+						args.sponsor5
+					)
+					:make()
 				)
-				:make()
-			)
-			:cell('Server', args.server)
-			:fcell(Cell :new('Type')
-				:options({})
-				:content(args.type)
-				:categories(
-					function(_, ...)
-					local value = select(1, ...)
-					value = tostring(value):lower()
-					if value == 'offline' then
-						infobox:categories('Offline Tournaments')
-					elseif value == 'online' then
-						infobox:categories('Online Tournaments')
-					else
-						infobox:categories('Unknown Type Tournaments')
-					end
-					end
+				:cell('Server', args.server)
+				:fcell(Cell:new('Type')
+					:options({})
+					:content(args.type)
+					:categories(
+						function(_, ...)
+						local value = select(1, ...)
+						value = tostring(value):lower()
+						if value == 'offline' then
+							self.infobox:categories('Offline Tournaments')
+						elseif value == 'online' then
+							self.infobox:categories('Online Tournaments')
+						else
+							self.infobox:categories('Unknown Type Tournaments')
+						end
+						end
+					)
+					:make()
 				)
-				:make()
-			)
-			:cell('Location', League:_createLocation({
-			region = args.region,
-			country = args.country,
-			location = args.city or args.location
-			}))
-			:cell('Venue', args.venue)
-			:cell('Format', args.format)
-			:fcell(self:createPrizepool(args):make())
-			:fcell(Cell :new('Date')
-				:options({})
-				:content(args.date)
-							:make()
-			)
-			:fcell(Cell :new('Start Date')
-				:options({})
-				:content(args.sdate)
-							:make()
-			)
-			:fcell(Cell :new('End Date')
-				:options({})
-				:content(args.edate)
-							:make()
-			)
-			:fcell(self:createTier(args):make())
-	League:addCustomCells(infobox, args)
+				:cell('Location', League:_createLocation({
+					region = args.region,
+					country = args.country,
+					location = args.city or args.location
+				}))
+				:cell('Venue', args.venue)
+				:cell('Format', args.format)
+				:fcell(self:createPrizepool(args):make())
+				:fcell(Cell:new('Date')
+					:options({})
+					:content(args.date)
+								:make()
+				)
+				:fcell(Cell:new('Start Date')
+					:options({})
+					:content(args.sdate)
+								:make()
+				)
+				:fcell(Cell:new('End Date')
+					:options({})
+					:content(args.edate)
+								:make()
+				)
+				:fcell(self:createTier(args):make())
+	League:addCustomCells(self.infobox, args)
 
 	local links = Links.transform(args)
 
-	infobox :header('Links', not Table.isEmpty(links))
-			:links(links)
-	League:addCustomContent(infobox, args)
-	infobox :centeredCell(args.footnotes)
-			:header('Chronology', self:_isChronologySet(args.previous, args.next))
-			:chronology({
-				previous = args.previous,
-				next = args.next,
-				previous2 = args.previous2,
-				next2 = args.next2,
-			})
-			:bottom(League.createBottomContent(infobox))
+	self.infobox:header('Links', not Table.isEmpty(links))
+				:links(links)
+	League:addCustomContent(self.infobox, args)
+	self.infobox:centeredCell(args.footnotes)
+				:header('Chronology', self:_isChronologySet(args.previous, args.next))
+				:chronology({
+					previous = args.previous,
+					next = args.next,
+					previous2 = args.previous2,
+					next2 = args.next2,
+				})
+				:bottom(League.createBottomContent(self.infobox))
 
 	self:_definePageVariables(args)
 
 	if Namespace.isMain() then
-		infobox:categories('Tournaments')
+		self.infobox:categories('Tournaments')
 		self:_setLpdbData(args)
 	end
 
-	return infobox:build()
-end
-
---- Allows for overriding this functionality
-function League:addCustomCells(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
-function League:addCustomContent(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
-function League:createBottomContent(infobox)
-	return infobox
+	return self.infobox:build()
 end
 
 --- Allows for overriding this functionality
