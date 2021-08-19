@@ -17,11 +17,13 @@ function Show.run(frame)
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
 	infobox:header('Show Information', true)
-	infobox:fcell(Cell:new('Host(s)'):options({makeLink = true}):content(
-			args.host or args.host1,
-			args.host2,
-			args.host3
-		):make())
+	infobox:fcell(Cell:new('Organizer')
+				:options({})
+				:content(
+					unpack(Show:_createHosts(args))
+				)
+				:make()
+			)
 	infobox:cell('Format', args.format)
 	infobox:cell('Airs', args.airs)
 	infobox:fcell(Cell:new('Location'):options({}):content(
@@ -43,6 +45,27 @@ function Show.run(frame)
 	end
 
 	return infobox:build()
+end
+
+function Show:_createHosts(args)
+	local hosts = {}
+	local host1 = args.host or args.host1
+	if host1 then
+		host1 = '[[' .. 
+			(args.hostlink or args.host1link or host1)
+			.. '|' .. host1 .. ']]'
+		table.insert(hosts, host1)
+		for index = 2, 99 do
+			if not args['host' .. index] then
+				break
+			else
+				local host = '[[' .. (args['host' .. index .. 'link'] or args['host' .. index])
+				host = host .. '|' .. args['host' .. index] .. ']]'
+				table.insert(hosts, host)
+			end
+		end
+	end
+	return hosts
 end
 
 function Show:_createLocation(country, city)
