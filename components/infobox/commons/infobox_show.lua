@@ -3,6 +3,7 @@ local Infobox = require('Module:Infobox')
 local Namespace = require('Module:Namespace')
 local Cell = require('Module:Infobox/Cell')
 local Links = require('Module:Links')
+local Table = require('Module:Table')
 local Flags = require('Module:Flags')
 
 local getArgs = require('Module:Arguments').getArgs
