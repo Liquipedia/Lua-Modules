@@ -6,9 +6,13 @@ local Namespace = require('Module:Namespace')
 local Strategy = Class.new(BasicInfobox)
 
 function Strategy.run(frame)
-	local strategy = Strategy(frame)
-	local args = strategy.args
-	local infobox = strategy.infobox
+	local strategy = Map(frame)
+	return strategy:createInfobox()
+end
+
+function Strategy:createInfobox(frame)
+	local infobox = self.infobox
+	local args = self.args
 	infobox:name(Strategy:getNameDisplay(args))
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
