@@ -18,7 +18,7 @@ function StarCraft2Team.run(frame)
 	Team.getHistory = StarCraft2Team.getHistory
 	Team.addCustomContent = StarCraft2Team.addCustomContent
 	Team.createBottomContent = StarCraft2Team.createBottomContent
-	return Team:createInfobox(frame)
+	return Team.run(frame)
 end
 
 function StarCraft2Team.addCustomCells(team, infobox, args)
