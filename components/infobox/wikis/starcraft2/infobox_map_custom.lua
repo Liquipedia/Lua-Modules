@@ -66,6 +66,9 @@ function StarCraft2Map:_getSpawn(args, id)
 end
 
 function StarCraft2Map:_getRushDistance(args)
+	if String.isEmpty(args.name) then
+		return nil
+	end
 	local rushDistance = args['rush_distance']
 	rushDistance = string.gsub(rushDistance, 's', '')
 	rushDistance = string.gsub(rushDistance, 'seconds', '')
