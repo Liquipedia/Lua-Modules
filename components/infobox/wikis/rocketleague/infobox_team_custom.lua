@@ -5,9 +5,10 @@ local Variables = require('Module:Variables')
 local RocketLeagueTeam = {}
 
 function RocketLeagueTeam.run(frame)
+    local team = Team(frame)
     Team.addCustomCells = RocketLeagueTeam.addCustomCells
     Team.calculateEarnings = RocketLeagueTeam.calculateEarnings
-    return Team.run(frame)
+    return team:createInfobox(frame)
 end
 
 function RocketLeagueTeam.addCustomCells(team, infobox, args)
