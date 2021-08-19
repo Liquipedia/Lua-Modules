@@ -7,8 +7,12 @@ local Map = Class.new(BasicInfobox)
 
 function Map.run(frame)
 	local map = Map(frame)
-	local infobox = map.infobox
-	local args = map.args
+	return map:createInfobox()
+end
+
+function Map:createInfobox(frame)
+	local infobox = self.infobox
+	local args = self.args
 	infobox:name(Map:getNameDisplay(args))
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
