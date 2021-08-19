@@ -1,6 +1,8 @@
 local Map = require('Module:Infobox/Map')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
+local String = require('Module:StringUtils')
+
 local StarCraft2Map = {}
 
 function StarCraft2Map.run(frame)
@@ -27,7 +29,7 @@ function StarCraft2Map:addCustomCells(infobox, args)
 end
 
 function StarCraft2Map:getNameDisplay(args)
-	if not args.name then
+	if String.isEmpty(args.name) then
 		return StarCraft2Map:_tlpdMap(args.id, 'name')
 	end
 
