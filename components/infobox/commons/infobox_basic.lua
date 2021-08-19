@@ -38,7 +38,7 @@ function BasicInfobox:createBottomContent(infobox)
 end
 
 --- Allows for overriding this functionality
-function BasicInfobox:addBaseSetup(infobox, informationType, args)
+function BasicInfobox:addBaseDisplay(infobox, informationType, args)
 	infobox:name(BasicInfobox:getDisplayName(args))
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
