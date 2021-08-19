@@ -7,15 +7,15 @@ local Variables = require('Module:Variables')
 local RLLeague = {}
 
 function RLLeague.run(frame)
-    League.addCustomCells = RLLeague.addCustomCells
-    League.createTier = RLLeague.createTier
-    League.createPrizepool = RLLeague.createPrizepool
+	League.addCustomCells = RLLeague.addCustomCells
+	League.createTier = RLLeague.createTier
+	League.createPrizepool = RLLeague.createPrizepool
 	League.addCustomContent = RLLeague.addCustomContent
-    return League:createInfobox(frame)
+	return League:createInfobox(frame)
 end
 
 function RLLeague:addCustomCells(league, infobox, args)
-    return infobox
+	return infobox
 end
 
 function RLLeague:createTier(args)
