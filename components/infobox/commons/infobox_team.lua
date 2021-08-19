@@ -7,28 +7,21 @@ local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
+local BasicInfobox = require('Module:Infobox/Basic')
 
-local getArgs = require('Module:Arguments').getArgs
+local Team = Class.new(BasicInfobox)
 
-local Team = Class.new()
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'team'
 
 function Team.run(frame)
-    return Team:createInfobox(frame)
+	local team = Team(frame)
+	return team:createInfobox()
 end
 
 function Team:createInfobox(frame)
-    local args = getArgs(frame)
-    self.frame = frame
-    self.pagename = mw.title.getCurrentTitle().text
-    self.name = args.name or self.pagename
-
-    if args.game == nil then
-        return error('Please provide a game!')
-    end
-
-    local infobox = Infobox:create(frame, args.game)
+	local infobox = self.infobox
+	local args = self.args
 
     local earnings = Team:calculateEarnings(args)
     Variables.varDefine('earnings', earnings)
@@ -84,11 +77,6 @@ function Team:createInfobox(frame)
 end
 
 --- Allows for overriding this functionality
-function Team:addCustomContent(infobox, args)
-    return infobox
-end
-
---- Allows for overriding this functionality
 function Team:getAchievements(infobox, args)
     return args.achievements
 end
@@ -106,11 +94,6 @@ end
 --- Allows for overriding this functionality
 function Team:calculateEarnings(args)
     return error('You have not implemented a custom earnings function for your wiki')
-end
-
---- Allows for overriding this functionality
-function Team:createBottomContent(infobox)
-    return infobox
 end
 
 function Team:_createRegion(region)
