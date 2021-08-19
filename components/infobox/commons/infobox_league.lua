@@ -160,6 +160,10 @@ end
 function League:defineCustomPageVariables(args)
 end
 
+--- Allows for overriding this functionality
+function League:addToLpdb(lpdbData, args)
+end
+
 function League:_definePageVariables(args)
     Variables.varDefine('tournament_name', args.name)
     Variables.varDefine('tournament_shortname', args.shortname)
@@ -244,7 +248,7 @@ function League:_setLpdbData(args)
         }),
     }
 
-    lpdbData = self:addToLpdb(lpdbData)
+    lpdbData = self:addToLpdb(lpdbData, args)
     mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
 end
 
