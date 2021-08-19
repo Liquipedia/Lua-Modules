@@ -1,28 +1,15 @@
+local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Infobox = require('Module:Infobox')
-local Namespace = require('Module:Namespace')
 local Cell = require('Module:Infobox/Cell')
-
+local Namespace = require('Module:Namespace')
 local getArgs = require('Module:Arguments').getArgs
 
-local Strategy = Class.new()
+local Strategy = Class.new(BasicInfobox)
 
 function Strategy.run(frame)
-	return Strategy:createInfobox(frame)
-end
-
-function Strategy:createInfobox(frame)
+	local strategy = Strategy(frame)
 	local args = getArgs(frame)
-	self.frame = frame
-	self.pagename = mw.title.getCurrentTitle().text
-	self.name = args.name or self.pagename
-
-	if args.game == nil then
-		return error('Please provide a game!')
-	end
-
-	local infobox = Infobox:create(frame, args.game)
-
+	local infobox = strategy.infobox
 	infobox:name(Strategy:getNameDisplay(args))
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
@@ -38,21 +25,6 @@ function Strategy:createInfobox(frame)
 	end
 
 	return infobox:build()
-end
-
---- Allows for overriding this functionality
-function Strategy:getNameDisplay(args)
-	return args.name
-end
-
---- Allows for overriding this functionality
-function Strategy:addCustomCells(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
-function Strategy:createBottomContent(infobox)
-	return infobox
 end
 
 return Strategy
