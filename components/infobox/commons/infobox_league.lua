@@ -162,6 +162,7 @@ end
 
 --- Allows for overriding this functionality
 function League:addToLpdb(lpdbData, args)
+    return lpdbData
 end
 
 function League:_definePageVariables(args)
