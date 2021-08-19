@@ -10,7 +10,7 @@ function Patch.run(frame)
 	return patch:createInfobox()
 end
 
-function Patch:createInfobox(frame)
+function Patch:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 	infobox.highlights = Patch._highlights
