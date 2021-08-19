@@ -12,13 +12,14 @@ local pagename = mw.title.getCurrentTitle().prefixedText
 local StarCraft2Team = {}
 
 function StarCraft2Team.run(frame)
+	local team = Team(frame)
 	Team.addCustomCells = StarCraft2Team.addCustomCells
 	Team.calculateEarnings = StarCraft2Team.calculateEarnings
 	Team.getAchievements = StarCraft2Team.getAchievements
 	Team.getHistory = StarCraft2Team.getHistory
 	Team.addCustomContent = StarCraft2Team.addCustomContent
 	Team.createBottomContent = StarCraft2Team.createBottomContent
-	return Team.run(frame)
+	return team:createInfobox(frame)
 end
 
 function StarCraft2Team.addCustomCells(team, infobox, args)
