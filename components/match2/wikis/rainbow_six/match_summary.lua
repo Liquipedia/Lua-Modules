@@ -348,7 +348,9 @@ function CustomMatchSummary.getByMatchId(args)
 				:body(CustomMatchSummary._createBody(match))
 
 	if match.comment then
-		matchSummary:comment(MatchSummary.Comment():content(match.comment))
+		local comment = MatchSummary.Comment():content(match.comment)
+		comment.root:css('display', 'block'):css('text-align', 'center')
+		matchSummary:comment(comment)
 	end
 
 	local vods = {}
