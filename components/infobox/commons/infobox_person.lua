@@ -108,7 +108,7 @@ function Player:createInfobox(frame)
 	infobox:centeredCell(history)
 	infobox:centeredCell(args.footnotes)
 	self:addCustomContent(infobox, args)
-	infobox:bottom(self:createBottomContent(infobox))
+	infobox:bottom(self:createBottomContent(infobox, args))
 
 	if shouldStoreData then
 		infobox:categories(role.category)
