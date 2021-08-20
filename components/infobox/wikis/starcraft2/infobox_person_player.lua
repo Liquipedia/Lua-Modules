@@ -145,7 +145,7 @@ function StarCraft2Player.getAchievements(args)
 end
 
 --kick the default history display
-function StarCraft2Player.getHistory() return nil end
+function StarCraft2Player:getHistory() return nil end
 
 function StarCraft2Player.addCustomContent(player, infobox, args)
 	local retired
