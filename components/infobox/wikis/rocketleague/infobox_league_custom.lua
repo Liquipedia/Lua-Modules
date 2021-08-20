@@ -96,7 +96,9 @@ function RLLeague:createPrizepool(args)
 		end
 	end
 
-	Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
+	if not String.isEmpty(prizepoolInUsd) then
+		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
+	end
 
 	return cell:content(content)
 end
