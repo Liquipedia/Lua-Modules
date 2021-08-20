@@ -1,6 +1,5 @@
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
-local Infobox = require('Module:Infobox')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
@@ -8,32 +7,24 @@ local Locale = require('Module:Locale')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
+local BasicInfobox = require('Module:Infobox/Basic')
 
-local getArgs = require('Module:Arguments').getArgs
-
-local Series = Class.new()
+local Series = Class.new(BasicInfobox)
 
 function Series.run(frame)
-    return Series:createInfobox(frame)
+    local series = Series(frame)
+    return series:createInfobox(frame)
 end
 
 function Series:createInfobox(frame)
-    local args = getArgs(frame)
-    self.frame = frame
-    self.pagename = mw.title.getCurrentTitle().text
-    self.name = args.name or self.pagename
-
-    if args.wiki == nil then
-        return error('Please provide a wiki!')
-    end
-
-    local infobox = Infobox:create(frame, args.wiki)
+    local infobox = self.infobox
+    local args = self.args
 
     infobox :name(args.name)
             :image(args.image, args.default)
             :centeredCell(args.caption)
             :header('Series Information', true)
-            :cell('Liquipedia Tier', Series:createTier(
+            :cell('Liquipedia Tier', self:createTier(
                 args.liquipediatier, (args.liquipediatiertype or args.tiertype)))
             :fcell(Cell:new('Organizer'):options({makeLink = true}):content(
                                                                         args.organizer,
@@ -44,19 +35,19 @@ function Series:createInfobox(frame)
                                                                         args.organizer6,
                                                                         args.organizer7
                                                                     ):make())
-            :fcell(Cell:new('Location'):options({}):content(Series:_createLocation(args.country, args.city)):make())
+            :fcell(Cell:new('Location'):options({}):content(self:_createLocation(args.country, args.city)):make())
             :cell('Date', args.date)
             :cell('Start Date', args.sdate or args.launched)
             :cell('End Date', args.edate or args.defunct)
             :cell('Sponsor(s)', args.sponsor)
-    Series:addCustomCells(infobox, args)
+    self:addCustomCells(infobox, args)
 
     local links = Links.transform(args)
     infobox :header('Links', not Table.isEmpty(links))
             :links(links)
 
     if Namespace.isMain() then
-        Series:addCustomVariables(args)
+        self:addCustomVariables(args)
 
         local lpdbData = {
             name = self.name,
@@ -109,11 +100,11 @@ function Series:createInfobox(frame)
 
         infobox:categories(
             'Tournament series',
-            Series:_setCountryCategories(args.country),
-            Series:_setCountryCategories(args.country2),
-            Series:_setCountryCategories(args.country3),
-            Series:_setCountryCategories(args.country4),
-            Series:_setCountryCategories(args.country5)
+            self:_setCountryCategories(args.country),
+            self:_setCountryCategories(args.country2),
+            self:_setCountryCategories(args.country3),
+            self:_setCountryCategories(args.country4),
+            self:_setCountryCategories(args.country5)
         )
     end
 
@@ -123,15 +114,6 @@ end
 --- Allows for overriding this functionality
 function Series:addToLpdb(lpdbData)
     return lpdbData
-end
-
---- Allows for overriding this functionality
-function Series:addCustomCells(infobox, args)
-    return infobox
-end
-
---- Allows for overriding this functionality
-function Series:addCustomVariables(args)
 end
 
 --- Allows for overriding this functionality
