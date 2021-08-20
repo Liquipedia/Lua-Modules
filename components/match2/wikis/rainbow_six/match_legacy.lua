@@ -64,26 +64,26 @@ function p.storeGames(match, match2)
 			local team1 = {}
 			local team2 = {}
 			if extradata.t1firstside[1] == "atk" then
-				team1 = {"atk", extradata.t1halfs.atk, extradata.t1halfs.def}
-				team2 = {"def", extradata.t2halfs.atk, extradata.t2halfs.def}
+				team1 = {"atk", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
+				team2 = {"def", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
 			elseif extradata.t1firstside[1] == "def" then
-				team2 = {"atk", extradata.t2halfs.atk, extradata.t2halfs.def}
-				team1 = {"def", extradata.t1halfs.atk, extradata.t1halfs.def}
+				team2 = {"atk", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
+				team1 = {"def", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
 			end
 			if extradata.t1firstside.ot == "atk" then
 				table.insert(team1, "atk")
-				table.insert(team1, extradata.t1halfs.otatk)
-				table.insert(team1, extradata.t1halfs.otdef)
+				table.insert(team1, extradata.t1halfs.otatk or 0)
+				table.insert(team1, extradata.t1halfs.otdef or 0)
 				table.insert(team2, "def")
-				table.insert(team2, extradata.t2halfs.otatk)
-				table.insert(team2, extradata.t2halfs.otdef)
+				table.insert(team2, extradata.t2halfs.otatk or 0)
+				table.insert(team2, extradata.t2halfs.otdef or 0)
 			elseif extradata.t1firstside.ot == "def" then
 				table.insert(team2, "atk")
-				table.insert(team2, extradata.t2halfs.otatk)
-				table.insert(team2, extradata.t2halfs.otdef)
+				table.insert(team2, extradata.t2halfs.otatk or 0)
+				table.insert(team2, extradata.t2halfs.otdef or 0)
 				table.insert(team1, "def")
-				table.insert(team1, extradata.t1halfs.otatk)
-				table.insert(team1, extradata.t1halfs.otdef)
+				table.insert(team1, extradata.t1halfs.otatk or 0)
+				table.insert(team1, extradata.t1halfs.otdef or 0)
 			end
 			game.extradata.opponent1scores = table.concat(team1, ", ")
 			game.extradata.opponent2scores = table.concat(team2, ", ")
