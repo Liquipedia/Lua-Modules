@@ -62,15 +62,6 @@ function Player:createInfobox(frame)
 	infobox:cell(role.title or 'Role', role.display)
 	infobox:fcell(Cell :new('Country')
 						:options({})
-						:content(
-							self:_createLocation(args.country or args.nationality, args.location, role.category),
-							self:_createLocation(args.country2 or args.nationality2, args.location2, role.category),
-							self:_createLocation(args.country3 or args.nationality3, args.location3, role.category)
-						)
-						:make()
-			)
-	infobox:fcell(Cell :new('Country')
-						:options({})
 						:content(unpack(self:_createLocations(args, role.category)))
 						:make()
 			)
@@ -111,7 +102,7 @@ function Player:createInfobox(frame)
 	infobox:bottom(self:createBottomContent(infobox, args))
 
 	if shouldStoreData then
-		infobox:categories(role.category)
+		infobox:categories(role.category .. 's')
 		if not args.teamlink and not args.team then
 			infobox:categories('Teamless ' .. role.category .. 's')
 		end
@@ -265,7 +256,7 @@ function Player:_createLocation(country, location, role)
 	local demonym = Localisation(countryDisplay)
 
 	return Flags._Flag(country) .. '&nbsp;' ..
-				'[[:Category:' .. demonym .. ' ' .. role .. '|' .. countryDisplay .. ']]'
+				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 				.. '[[Category:' .. demonym .. ' ' .. role .. ']]'
 				.. (location ~= nil and (',&nbsp;' .. location) or '')
 end
