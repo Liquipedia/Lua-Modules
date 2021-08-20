@@ -15,7 +15,7 @@ local _LINK_VARIANT = 'team'
 
 function Team.run(frame)
     local team = Team(frame)
-    return team:createInfobox()
+    return team:createInfobox(frame)
 end
 
 function Team:createInfobox(frame)
@@ -86,11 +86,6 @@ function Team:getHistory(infobox, args)
 end
 
 --- Allows for overriding this functionality
-function Team:addCustomCells(infobox, args)
-    return infobox
-end
-
---- Allows for overriding this functionality
 function Team:calculateEarnings(args)
     return error('You have not implemented a custom earnings function for your wiki')
 end
@@ -100,7 +95,7 @@ function Team:_createRegion(region)
         return ''
     end
 
-    return Template.safeExpand(self.frame, 'Region', {region})
+    return Template.safeExpand(mw.getCurrentFrame(), 'Region', {region})
 end
 
 function Team:_createLocation(location)
