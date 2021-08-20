@@ -4,7 +4,7 @@ local StarCraft2Show = {}
 
 function StarCraft2Show.run(frame)
 	local show = Show(frame)
-	Show.addCustomCells = StarCraft2Show.addCustomCells
+	show.addCustomCells = StarCraft2Show.addCustomCells
 	return show:createInfobox(frame)
 end
 
