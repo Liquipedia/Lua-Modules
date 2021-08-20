@@ -225,6 +225,7 @@ function League:_setLpdbData(args)
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
+	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
 end
 
