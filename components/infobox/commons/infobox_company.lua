@@ -1,33 +1,26 @@
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
-local Infobox = require('Module:Infobox')
+local InfoboxBasic = require('Module:Infobox/Basic')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 local Math = require('Module:Math')
 local String = require('Module:String')
-local getArgs = require('Module:Arguments').getArgs
 local Language = mw.language.new('en')
 
-local Company = Class.new()
+local Company = Class.new(InfoboxBasic)
 
 local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
 function Company.run(frame)
-    return Company:createInfobox(frame)
+	local company = Company(frame)
+	return company:createInfobox(frame)
 end
 
 function Company:createInfobox(frame)
-    local args = getArgs(frame)
-    self.pagename = args.pagename or mw.title.getCurrentTitle().text
-    self.name = args.name or self.pagename
-
-    if args.game == nil then
-        return error('Please provide a game!')
-    end
-
-    local infobox = Infobox:create(frame, args.game)
+    local infobox = self.infobox
+    local args = self.args
 
     infobox :name(args.name)
             :image(args.image)
@@ -36,11 +29,11 @@ function Company:createInfobox(frame)
             :fcell(Cell:new('Parent company'):options({makeLink = true}):content(args.parent, args.parent2):make())
             :cell('Founded', args.foundeddate)
             :cell('Defunct', args.defunctdate)
-            :cell('Location', Company:_createLocation(frame, args.location))
+            :cell('Location', self:_createLocation(frame, args.location))
             :cell('Headquarters', args.headquarters)
             :cell('Employees', args.employees)
             :cell('Traded as', args.tradedas)
-    Company:addCustomCells(infobox, args)
+    self:addCustomCells(infobox, args)
 
     if not String.isEmpty(args.companytype) and args.companytype == _COMPANY_TYPE_ORGANIZER then
         infobox:cell('Total prize money', self:_getOrganizerPrizepools())
@@ -78,11 +71,6 @@ function Company:createInfobox(frame)
     infobox:categories('Companies')
 
     return infobox:build()
-end
-
---- Allows for overriding this functionality
-function Company:addCustomCells(infobox, args)
-    return infobox
 end
 
 function Company:_createLocation(frame, location)
