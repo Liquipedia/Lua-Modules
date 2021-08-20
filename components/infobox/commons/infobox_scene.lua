@@ -1,38 +1,30 @@
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
-local Infobox = require('Module:Infobox')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Localisation = require('Module:Localisation')
 local Flags = require('Module:Flags')
 local Links = require('Module:Links')
+local BasicInfobox = require('Module:Infobox/Basic')
 
-local getArgs = require('Module:Arguments').getArgs
-
-local Scene = Class.new()
+local Scene = Class.new(BasicInfobox)
 
 function Scene.run(frame)
-    return Scene:createInfobox(frame)
+    local scene = Scene(frame)
+    return scene:createInfobox()
 end
 
 function Scene:createInfobox(frame)
-    local args = getArgs(frame)
-    self.frame = frame
-    self.pagename = mw.title.getCurrentTitle().text
-    self.name = args.country or args.scene or self.pagename
+    local infobox = self.infobox
+    local args = self.args
 
-    if args.game == nil then
-        return error('Please provide a game!')
-    end
-
-    local infobox = Infobox:create(frame, args.game)
-    local nameDisplay = Scene:createNameDisplay(args)
+    local nameDisplay = self:createNameDisplay(args)
 
     infobox :name(nameDisplay)
             :image(args.image)
             :centeredCell(args.caption)
             :header('Scene Information', true)
-            :cell('Region', Scene:createRegion(args))
+            :cell('Region', self:createRegion(args))
             :fcell(Cell:new('National team'):options({makeLink = true}):content(args.nationalteam):make())
             :fcell(Cell :new('Events')
                         :options({makeLink = true})
@@ -45,18 +37,18 @@ function Scene:createInfobox(frame)
                         ):make()
             )
             :cell('Size', args.size)
-    Scene:addCustomCells(infobox, args)
+    self:addCustomCells(infobox, args)
 
     local links = Links.transform(args)
-    local achievements = Scene:getAchievements(infobox, args)
+    local achievements = self:getAchievements(infobox, args)
 
     infobox :header('Links', not Table.isEmpty(links))
             :links(links)
             :header('Achievements', achievements)
             :centeredCell(achievements)
             :centeredCell(args.footnotes)
-    Scene:addCustomContent(infobox, args)
-    infobox:bottom(Scene.createBottomContent(infobox))
+    self:addCustomContent(infobox, args)
+    infobox:bottom(self:createBottomContent(infobox))
 
     infobox:categories('Scene')
 
@@ -79,23 +71,8 @@ function Scene:createNameDisplay(args)
 end
 
 --- Allows for overriding this functionality
-function Scene:addCustomContent(infobox, args)
-    return infobox
-end
-
---- Allows for overriding this functionality
 function Scene:getAchievements(infobox, args)
     return args.achievements
-end
-
---- Allows for overriding this functionality
-function Scene:addCustomCells(infobox, args)
-    return infobox
-end
-
---- Allows for overriding this functionality
-function Scene:createBottomContent(infobox)
-    return infobox
 end
 
 --- Allows for overriding this functionality
