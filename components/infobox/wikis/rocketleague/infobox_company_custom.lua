@@ -4,7 +4,7 @@ local RocketLeagueCompany = {}
 
 function RocketLeagueCompany.run(frame)
     local company = Company(frame)
-    Company.addCustomCells = RocketLeagueCompany.addCustomCells
+    company.addCustomCells = RocketLeagueCompany.addCustomCells
     return company:createInfobox(frame)
 end
 
