@@ -113,7 +113,7 @@ function StarCraft2Player._getRaceData(race)
 	}
 end
 
-function StarCraft2Player.createBottomContent(infobox)
+function StarCraft2Player:createBottomContent(infobox)
 	if shouldStoreData then
 		return tostring(Matches._get_ongoing({})) ..
 			tostring(Matches._get_upcoming({})) ..
