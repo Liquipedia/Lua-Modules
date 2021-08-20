@@ -414,7 +414,7 @@ function CustomMatchSummary._createBody(match)
 				:css('text-align', 'center')
 				-- Workaround for .brkts-popup-body-element > * selector
 				:css('display', 'block')
-				:wikitext(mw.getContentLanguage():formatDate('F d, Y'))
+				:wikitext(mw.getContentLanguage():formatDate('F d, Y', match.date))
 		))
 	end
 
