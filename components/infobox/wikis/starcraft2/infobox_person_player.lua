@@ -527,7 +527,7 @@ function StarCraft2Player._get_matchup_data(player)
 	return yearsActive, category
 end
 
-function StarCraft2Player.adjustLPDB(lpdbData, args, role, _)
+function StarCraft2Player:adjustLPDB(lpdbData, args, role, _)
 	local extradata = {
 		race = raceData.race,
 		faction = raceData.faction,
