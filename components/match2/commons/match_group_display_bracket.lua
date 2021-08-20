@@ -7,6 +7,7 @@ local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Math = require('Module:Math')
 local OpponentDisplay = require('Module:OpponentDisplay')
+local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
@@ -108,7 +109,8 @@ function BracketDisplay.Bracket(props)
 		scoreWidth = propsConfig.scoreWidth or defaultConfig.scoreWidth,
 	}
 
-	local layoutsByMatchId = BracketDisplay.computeBracketLayout(props.bracket, config)
+	local headerRowsByMatchId = BracketDisplay.computeHeaderRows(props.bracket, config)
+	local layoutsByMatchId = BracketDisplay.computeBracketLayout(props.bracket, config, headerRowsByMatchId)
 
 	local bracketNode = html.create('div'):addClass('brkts-bracket')
 		:css('--match-width', config.matchWidth .. 'px')
@@ -121,6 +123,7 @@ function BracketDisplay.Bracket(props)
 	for _, matchId in ipairs(props.bracket.headMatchIds) do
 		local nodeProps = {
 			config = config,
+			headerRowsByMatchId = headerRowsByMatchId,
 			layoutsByMatchId = layoutsByMatchId,
 			matchId = matchId,
 			matchesById = props.bracket.matchesById,
@@ -130,8 +133,7 @@ function BracketDisplay.Bracket(props)
 			:node(BracketDisplay.NodeBody(nodeProps))
 	end
 
-	-- TODO remove brkts-main-dev-2
-	return html.create('div'):addClass('brkts-main-dev-2 brkts-bracket-wrapper')
+	return html.create('div'):addClass('brkts-bracket-wrapper')
 		:node(bracketNode)
 end
 
@@ -141,13 +143,12 @@ BracketDisplay.types.Layout = TypeUtil.struct({
 	matchHeight = 'number',
 	matchMarginTop = 'number',
 	mid = 'number',
-	showHeader = 'boolean',
 })
 
 --[[
 Computes certain layout properties of nodes in the bracket tree.
 ]]
-function BracketDisplay.computeBracketLayout(bracket, config)
+function BracketDisplay.computeBracketLayout(bracket, config, headerRowsByMatchId)
 	-- Computes the layout of a match and everything to its left.
 	local computeNodeLayout = FnUtil.memoizeY(function(matchId, computeNodeLayout)
 		local match = bracket.matchesById[matchId]
@@ -163,16 +164,7 @@ function BracketDisplay.computeBracketLayout(bracket, config)
 			Array.map(lowerLayouts, function(layout) return layout.height end)
 		)
 
-		-- Don't show the header if it's disabled. Also don't show the header
-		-- if it is the first match of a round because a higher round match can
-		-- show it instead.
-		local isFirstChild = bracket.upperMatchIds[matchId]
-			and matchId == bracket.matchesById[bracket.upperMatchIds[matchId]].bracketData.lowerMatches[1].matchId
-		local showHeader = match.bracketData.header
-			and not config.hideRoundTitles
-			and not isFirstChild
-
-		local headerFullHeight = showHeader
+		local headerFullHeight = headerRowsByMatchId[matchId]
 			and config.headerMargin + config.headerHeight + math.max(config.headerMargin - config.matchMargin, 0)
 			or 0
 		local matchHeight = #match.opponents * config.opponentHeight
@@ -207,7 +199,6 @@ function BracketDisplay.computeBracketLayout(bracket, config)
 			matchHeight = matchHeight,
 			matchMarginTop = matchMarginTop,
 			mid = mid,
-			showHeader = showHeader,
 		}
 	end)
 
@@ -260,6 +251,75 @@ function BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums
 	end
 end
 
+function BracketDisplay.computeHeaderRows(bracket, config)
+	if config.hideRoundTitles then
+		return {}
+	end
+
+	-- Compute which matches have header rows
+	local headerRows = {}
+	for matchId, match in pairs(bracket.matchesById) do
+		-- Don't show the header if it's disabled. Also don't show the header
+		-- if it is the first match of a round because a higher round match can
+		-- show it instead.
+		local upperMatch = bracket.upperMatchIds[matchId]
+			and bracket.matchesById[bracket.upperMatchIds[matchId]]
+		local isFirstChild = upperMatch
+			and matchId == upperMatch.bracketData.lowerMatches[1].matchId
+		local showHeader = match.bracketData.header and not isFirstChild
+		if showHeader then
+			headerRows[matchId] = {}
+		end
+	end
+
+	-- Starting from a match, walks up the bracket tree to higher round
+	-- matches. When it gets to a root, it then traverses the roots in
+	-- reverse order until it gets to the first root.
+	local function getParent(matchId)
+		local coords = bracket.coordsByMatchId[matchId]
+		return bracket.upperMatchIds[matchId]
+			or coords.rootIx ~= 1 and bracket.rootMatchIds[coords.rootIx - 1]
+			or nil
+	end
+
+	-- Finds a match's closest ancestor that has a header row
+	local getHeaderRow = FnUtil.memoizeY(function(matchId, getHeaderRow)
+		return headerRows[matchId] or getHeaderRow(getParent(matchId))
+	end)
+
+	-- Determine the individual headers appearing in header rows
+	for matchId, match in pairs(bracket.matchesById) do
+		local bracketData = match.bracketData
+		local coords = bracket.coordsByMatchId[matchId]
+		if bracketData.header and not StringUtils.endsWith(matchId, 'RxMTP') then
+			local headerRow = getHeaderRow(matchId)
+			local brMatch = bracketData.bracketResetMatchId and bracket.matchesById[bracketData.bracketResetMatchId]
+			headerRow[coords.roundIx] = {
+				hasBrMatch = brMatch and true or false,
+				header = bracketData.header,
+				roundIx = coords.roundIx,
+			}
+		end
+		if bracketData.qualWin then
+			local headerRow = getHeaderRow(matchId)
+			headerRow[coords.roundIx + bracketData.qualSkip] = {
+				header = config.qualifiedHeader or '!q',
+				roundIx = coords.roundIx + bracketData.qualSkip,
+			}
+		end
+	end
+
+	-- Convert each header row from a table to a sorted array
+	return Table.mapValues(headerRows, function(headerRow)
+		local headerRowArray = {}
+		for _, cell in pairs(headerRow) do
+			table.insert(headerRowArray, cell)
+		end
+		table.sort(headerRowArray, function(a, b) return a.roundIx - b.roundIx end)
+		return headerRowArray
+	end)
+end
+
 BracketDisplay.propTypes.NodeHeader = {
 	config = BracketDisplay.types.BracketConfig,
 	layoutsByMatchId = TypeUtil.table('string', BracketDisplay.types.Layout),
@@ -274,48 +334,26 @@ spots.
 ]]
 function BracketDisplay.NodeHeader(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.NodeHeader)
-	local match = props.matchesById[props.matchId]
-	local layout = props.layoutsByMatchId[props.matchId]
+	local headerRow = props.headerRowsByMatchId[props.matchId]
 	local config = props.config
-
-	if not layout.showHeader then
+	if not headerRow then
 		return nil
 	end
 
 	local headerNode = html.create('div'):addClass('brkts-round-header')
 		:css('margin', config.headerMargin .. 'px 0 ' .. math.max(0, config.headerMargin - config.matchMargin) .. 'px')
 
-	-- Traverse the bracket to find the other headers in the same row
-	local bracketDatas = {}
-	local matchId = props.matchId
-	while matchId do
-		local bracketData = props.matchesById[matchId].bracketData
-		table.insert(bracketDatas, 1, bracketData)
-		matchId = 0 < #bracketData.lowerMatches and bracketData.lowerMatches[1].matchId or nil
-	end
-
-	for _, bracketData in ipairs(bracketDatas) do
-		local hasBracketResetMatch = bracketData.bracketResetMatchId
-			and props.matchesById[bracketData.bracketResetMatchId]
+	local cursorRoundIx = 1
+	for _, cell in ipairs(headerRow) do
 		headerNode:node(
 			BracketDisplay.MatchHeader({
-				header = bracketData.header,
+				header = cell.header,
 				height = config.headerHeight,
 			})
-				:addClass(hasBracketResetMatch and 'brkts-br-wrapper' or nil)
-				:css('--skip-round', bracketData.skipRound)
+				:addClass(cell.hasBrMatch and 'brkts-br-wrapper' or nil)
+				:css('--skip-round', cell.roundIx - cursorRoundIx)
 		)
-	end
-
-	if match.bracketData.qualWin then
-		headerNode:node(
-			BracketDisplay.MatchHeader({
-				header = config.qualifiedHeader or '!q',
-				height = config.headerHeight,
-			})
-				:addClass('brkts-qualified-header')
-				:css('--qual-skip', match.bracketData.qualSkip)
-		)
+		cursorRoundIx = cell.roundIx + 1
 	end
 
 	return headerNode
