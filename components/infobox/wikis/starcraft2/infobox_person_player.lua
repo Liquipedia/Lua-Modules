@@ -1,4 +1,4 @@
-local Player = require('Module:Infobox/Player')
+local Player = require('Module:Infobox/Person')
 local Variables = require('Module:Variables')
 local Achievements = require('Module:Achievements in infoboxes')._player
 local RaceIcon = require('Module:RaceIcon').getBigIcon
@@ -29,7 +29,7 @@ function StarCraft2Player.run(frame)
 	Player.addCustomContent = StarCraft2Player.addCustomContent
 	Player.createBottomContent = StarCraft2Player.createBottomContent
 	Player.shouldStoreData = StarCraft2Player.shouldStoreData
-	Player.getExtradata = StarCraft2Player.getExtradata
+	Player.adjustLPDB = StarCraft2Player.adjustLPDB
 	Player.getStatus = StarCraft2Player.getStatus
 	Player.getRole = StarCraft2Player.getRole
 	return player:createInfobox(frame)
@@ -38,9 +38,9 @@ end
 function StarCraft2Player.nameDisplay(_, args)
 	StarCraft2Player._getRaceData(args.race or 'unknown')
 	local raceIcon = RaceIcon({'alt_' .. raceData.race})
-    local name = args.id or pagename
+	local name = args.id or pagename
 
-    return raceIcon .. '&nbsp;' .. name
+	return raceIcon .. '&nbsp;' .. name
 end
 
 function StarCraft2Player._getRaceData(race)
@@ -130,7 +130,7 @@ function StarCraft2Player.shouldStoreData(args)
 		Variables.varDefine('disable_SMW_storage', 'true')
 		return false
 	end
-    return true
+	return true
 end
 
 function StarCraft2Player.getAchievements(args)
@@ -160,11 +160,11 @@ function StarCraft2Player.addCustomContent(player, infobox, args)
 			allkills = _ALLKILLICON .. allkills
 		end
 	end
-	infobox	:header('Achievements', (not hasAchievements) and allkills or nil)
-            :cell('All-kills', allkills)
-			:header('History', args.history)
-            :centeredCell(args.history)
-			:cell('Retired', retired)
+	infobox:header('Achievements', (not hasAchievements) and allkills or nil)
+	infobox:cell('All-kills', allkills)
+	infobox:header('History', args.history)
+	infobox:centeredCell(args.history)
+	infobox:cell('Retired', retired)
 
 	return infobox
 end
@@ -201,7 +201,7 @@ function StarCraft2Player.getRole(_, args)
 	local category = ROLES[role]
 	local store = category or cleanOther[role] or 'Player'
 
-    return { title = 'Race', display = raceData.display, store = store, category = category or 'Player'}
+	return { title = 'Race', display = raceData.display, store = store, category = category or 'Player'}
 end
 
 function StarCraft2Player.calculateEarnings(_, args)
@@ -386,7 +386,7 @@ function StarCraft2Player.getStatus(args)
 	elseif string.lower(args.role or 'player') ~= 'player' then
 		statusStore = 'not player'
 	end
-    return { store = statusStore }
+	return { store = statusStore }
 end
 
 function StarCraft2Player.addCustomCells(_, infobox, args)
@@ -527,7 +527,7 @@ function StarCraft2Player._get_matchup_data(player)
 	return yearsActive, category
 end
 
-function StarCraft2Player.getExtradata(args, role, _)
+function StarCraft2Player.adjustLPDB(lpdbData, args, role, _)
 	local extradata = {
 		race = raceData.race,
 		faction = raceData.faction,
@@ -548,7 +548,9 @@ function StarCraft2Player.getExtradata(args, role, _)
 		extradata['earningsin' .. key] = item
 	end
 
-    return extradata
+	lpdbData.extradata = extradata
+
+	return lpdbData
 end
 
 return StarCraft2Player
