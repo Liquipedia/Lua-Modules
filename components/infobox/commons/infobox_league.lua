@@ -27,8 +27,8 @@ function League:createInfobox()
 				:fcell(Cell:new('Series')
 					:options({})
 					:content(
-						League:_createSeries(mw.getCurrentFrame(), args.series, args.abbrevation),
-						League:_createSeries(mw.getCurrentFrame(), args.series2, args.abbrevation2)
+						self:_createSeries(mw.getCurrentFrame(), args.series, args.abbrevation),
+						self:_createSeries(mw.getCurrentFrame(), args.series2, args.abbrevation2)
 					)
 					:make()
 				)
@@ -93,13 +93,13 @@ function League:createInfobox()
 					:make()
 				)
 				:fcell(self:createTier(args):make())
-	League:addCustomCells(self.infobox, args)
+	self:addCustomCells(self.infobox, args)
 
 	local links = Links.transform(args)
 
 	self.infobox:header('Links', not Table.isEmpty(links))
 				:links(links)
-	League:addCustomContent(self.infobox, args)
+	self:addCustomContent(self.infobox, args)
 	self.infobox:centeredCell(args.footnotes)
 				:header('Chronology', self:_isChronologySet(args.previous, args.next))
 				:chronology({
@@ -108,7 +108,7 @@ function League:createInfobox()
 					previous2 = args.previous2,
 					next2 = args.next2,
 				})
-				:bottom(League.createBottomContent(self.infobox))
+				:bottom(self:createBottomContent(self.infobox))
 
 	self:_definePageVariables(args)
 
