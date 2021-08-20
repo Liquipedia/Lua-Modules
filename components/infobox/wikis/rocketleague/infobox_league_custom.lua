@@ -4,8 +4,9 @@ local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local Class = require('Module:Class')
 
-local RLLeague = {}
+local RLLeague = Class.new()
 
 local _SERIES_RLCS = 'Rocket League Championship Series'
 local _MODE_2v2 = '2v2'
@@ -21,7 +22,7 @@ function RLLeague.run(frame)
 	return league:createInfobox(frame)
 end
 
-function RLLeague:addCustomCells(league, infobox, args)
+function RLLeague:addCustomCells(infobox, args)
 	infobox:cell('Mode', args.mode)
 	infobox:cell('Misc Mode:', args.miscmode)
 	return infobox
@@ -95,7 +96,7 @@ function RLLeague:createPrizepool(args)
 		end
 	end
 
-	Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd)
+	Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
 
 	return cell:content(content)
 end
@@ -126,11 +127,11 @@ function RLLeague:addCustomContent(infobox, args)
     return infobox
 end
 
-function RLLeague:defineCustomPageVariables(infobox, args)
+function RLLeague:defineCustomPageVariables(args)
 	-- Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername)
-	Variables.varDefine('tournament_organizer', self:_concatArgs(args, 'organizer'))
-	Variables.varDefine('tournament_sponsors', self:_concatArgs(args, 'sponsor'))
+	Variables.varDefine('tournament_organizer', RLLeague:_concatArgs(args, 'organizer'))
+	Variables.varDefine('tournament_sponsors', RLLeague:_concatArgs(args, 'sponsor'))
 	Variables.varDefine('tournament_rlcs_premier', args.series == _SERIES_RLCS and 1 or 0)
 	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
 	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
