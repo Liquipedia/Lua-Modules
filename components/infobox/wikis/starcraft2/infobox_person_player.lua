@@ -182,7 +182,7 @@ function StarCraft2Player._getAllkills()
 	end
 end
 
-function StarCraft2Player.getRole(_, args)
+function StarCraft2Player:getRole(args)
 	local role = args.role or args.occupation or 'player'
 	role = string.lower(role)
 	local ROLES = {
