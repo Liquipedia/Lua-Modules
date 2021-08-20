@@ -9,13 +9,6 @@ function CustomCompany.run(frame)
 end
 
 function CustomCompany.addCustomCells(company, infobox, args)
-	infobox:cell('Organizer Type', args.organizertype)
-	infobox:cell('Industry', args.industry)
-	infobox:cell('Partners', args.partners)
-	infobox:cell('Members', args.members)
-	infobox:cell('Key People', args['key people'])
-	infobox:cell('Products', args.products)
-	infobox:cell('Events', args.events)
 	infobox:cell('Founder', args.founder)
 	return infobox
 end
