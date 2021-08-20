@@ -143,6 +143,13 @@ function RLLeague:defineCustomPageVariables(infobox, args)
 	Variables.varDefine('tournament_tier2', args.liquipediatier2)
 	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
 	Variables.varDefine('tournament_tiertype2', args.liquipediatiertype2)
+	Variables.varDefine('ltier', args.liquipediatier == 1 and 1 or
+		args.liquipediatier == 2 and 2 or
+		args.liquipediatier == 3 and 3 or 4
+	)
+
+	-- Legacy notability vars
+	Variables.varDefine('tournament_notability_mod', args.notabilitymod or 1)
 
 	-- Rocket League specific
 	Variables.varDefine('tournament_patch', args.patch)
