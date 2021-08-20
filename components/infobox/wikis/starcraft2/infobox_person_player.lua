@@ -121,7 +121,7 @@ function StarCraft2Player:createBottomContent(infobox)
 	end
 end
 
-function StarCraft2Player.shouldStoreData(args)
+function StarCraft2Player:shouldStoreData(args)
 	if
 		args.disable_smw == 'true' or args.disable_lpdb == 'true' or args.disable_storage == 'true'
 		or Variables.varDefault('disable_SMW_storage', 'false') == 'true'
