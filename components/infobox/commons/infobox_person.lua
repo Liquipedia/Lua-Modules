@@ -160,7 +160,7 @@ function Player:createInfobox(frame)
 			links = links,
 			extradata = {},
 		}
-		local lpdbData = self:adjustLPDB(lpdbData, args, role, status)
+		lpdbData = self:adjustLPDB(lpdbData, args, role, status)
 		lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
 		lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
 		local storageType = self:getStorageType(args, role, status)
