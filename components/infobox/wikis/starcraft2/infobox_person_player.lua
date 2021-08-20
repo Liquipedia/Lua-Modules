@@ -35,7 +35,7 @@ function StarCraft2Player.run(frame)
 	return player:createInfobox(frame)
 end
 
-function StarCraft2Player.nameDisplay(_, args)
+function StarCraft2Player:nameDisplay(args)
 	StarCraft2Player._getRaceData(args.race or 'unknown')
 	local raceIcon = RaceIcon({'alt_' .. raceData.race})
 	local name = args.id or pagename
