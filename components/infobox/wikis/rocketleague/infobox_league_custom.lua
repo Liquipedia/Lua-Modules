@@ -5,6 +5,7 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
+local TournamentNotability = require('Module:TournamentNotability')
 
 local RLLeague = Class.new()
 
@@ -18,6 +19,7 @@ function RLLeague.run(frame)
 	League.createPrizepool = RLLeague.createPrizepool
 	League.addCustomContent = RLLeague.addCustomContent
 	League.defineCustomPageVariables = RLLeague.defineCustomPageVariables
+	League.addToLpdb = RLLeague.addToLpdb
 
 	return league:createInfobox(frame)
 end
@@ -160,6 +162,26 @@ function RLLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_participant_number', 0)
 	Variables.varDefine('tournament_participants', '(')
 	Variables.varDefine('tournament_teamplayers', args.mode == _MODE_2v2 and 2 or 3)
+end
+
+function RLLeague:addToLpdb(lpdbData, args)
+	lpdbData['game'] = 'rocket league'
+	lpdbData['patch'] = args.patch
+	lpdbData['participantsnumber'] = args.team_number
+	lpdbData['extradata'] = {
+		region = args.region,
+		mode = args.mode,
+		notabilitymod = args.notabilitymod,
+		liquipediatier2 =
+			(not String.isEmpty(args.liquipediatiertype) and args.liquipediatier) or args.liquipediatier2,
+		liquipediatiertype2 = args.liquipediatiertype2,
+		participantsnumber =
+			not String.isEmpty(args.team_number) and args.team_number or args.player_number,
+		notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
+	}
+
+	lpdbData['extradata']['is rlcs'] = Variables.varDefault('tournament_rlcs_premier', 0)
+	return lpdbData
 end
 
 function RLLeague:_concatArgs(args, base)
