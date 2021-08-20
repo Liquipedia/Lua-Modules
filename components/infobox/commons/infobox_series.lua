@@ -9,12 +9,10 @@ local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
 local BasicInfobox = require('Module:Infobox/Basic')
 
-local getArgs = require('Module:Arguments').getArgs
-
 local Series = Class.new(BasicInfobox)
 
 function Series.run(frame)
-    local series = Team(frame)
+    local series = Series(frame)
     return series:createInfobox(frame)
 end
 
