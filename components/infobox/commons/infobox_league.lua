@@ -114,6 +114,9 @@ function League:createInfobox()
 
 	if Namespace.isMain() then
 		self.infobox:categories('Tournaments')
+		if not String.isEmpty(args.team_number) then
+			self.infobox:categories('Team Tournaments')
+		end
 		self:_setLpdbData(args)
 	end
 
