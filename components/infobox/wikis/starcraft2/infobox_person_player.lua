@@ -204,7 +204,7 @@ function StarCraft2Player:getRole(args)
 	return { title = 'Race', display = raceData.display, store = store, category = category or 'Player'}
 end
 
-function StarCraft2Player.calculateEarnings(_, args)
+function StarCraft2Player:calculateEarnings(args)
 	shouldStoreData = Player.shouldStoreData(args)
 
 	if shouldStoreData then
