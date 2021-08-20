@@ -14,12 +14,12 @@ local _MODE_2v2 = '2v2'
 
 function RLLeague.run(frame)
 	local league = League(frame)
-	League.addCustomCells = RLLeague.addCustomCells
-	League.createTier = RLLeague.createTier
-	League.createPrizepool = RLLeague.createPrizepool
-	League.addCustomContent = RLLeague.addCustomContent
-	League.defineCustomPageVariables = RLLeague.defineCustomPageVariables
-	League.addToLpdb = RLLeague.addToLpdb
+	league.addCustomCells = RLLeague.addCustomCells
+	league.createTier = RLLeague.createTier
+	league.createPrizepool = RLLeague.createPrizepool
+	league.addCustomContent = RLLeague.addCustomContent
+	league.defineCustomPageVariables = RLLeague.defineCustomPageVariables
+	league.addToLpdb = RLLeague.addToLpdb
 
 	return league:createInfobox(frame)
 end
