@@ -9,7 +9,7 @@ local Flags = require('Module:Flags')
 local Show = Class.new(BasicInfobox)
 
 function Show.run(frame)
-	local show = Patch(frame)
+	local show = Show(frame)
 	return show:createInfobox()
 end
 
