@@ -21,14 +21,15 @@ local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
 local shouldStoreData
 
-function Team.run(frame)
-	local team = Team(frame)
-	return team:createInfobox(frame)
+function Player.run(frame)
+	local player = Player(frame)
+	return player:createInfobox(frame)
 end
 
 function Player:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
+	shouldStoreData = Player:shouldStoreData(args)
 
 	local earnings = self:calculateEarnings(args)
 	Variables.varDefine('earnings', earnings)
@@ -238,7 +239,7 @@ function Player:_createLocations(args, role)
 			countryDisplayData[index] = Player:_createLocation(country, args['location' .. index], role)
 		end
 	end
-	
+
 	return countryDisplayData
 end
 
