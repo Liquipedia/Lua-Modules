@@ -117,6 +117,12 @@ function p.convertParameters(match2)
 		end
 	end
 
+	if match.walkover == "ff" or match.walkover == "dq" then
+		match.walkover = match.winner
+	elseif match.walkover == "l" then
+		match.walkover = nil
+	end
+
 	match.staticid = match2.match2id
 
 	-- Handle extradata fields
