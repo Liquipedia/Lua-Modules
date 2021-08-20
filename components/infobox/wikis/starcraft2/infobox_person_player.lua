@@ -133,7 +133,7 @@ function StarCraft2Player:shouldStoreData(args)
 	return true
 end
 
-function StarCraft2Player.getAchievements(args)
+function StarCraft2Player:getAchievements(infobox, args)
 	local player = args.id or pagename
 	local achievements = Achievements({}, player)
 	if achievements == '' then
