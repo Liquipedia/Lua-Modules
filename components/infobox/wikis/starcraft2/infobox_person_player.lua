@@ -21,17 +21,17 @@ local StarCraft2Player = {}
 
 function StarCraft2Player.run(frame)
 	local player = Player(frame)
-	Player.nameDisplay = StarCraft2Player.nameDisplay
-	Player.getHistory = StarCraft2Player.getHistory
-	Player.addCustomCells = StarCraft2Player.addCustomCells
-	Player.calculateEarnings = StarCraft2Player.calculateEarnings
-	Player.getAchievements = StarCraft2Player.getAchievements
-	Player.addCustomContent = StarCraft2Player.addCustomContent
-	Player.createBottomContent = StarCraft2Player.createBottomContent
-	Player.shouldStoreData = StarCraft2Player.shouldStoreData
-	Player.adjustLPDB = StarCraft2Player.adjustLPDB
-	Player.getStatus = StarCraft2Player.getStatus
-	Player.getRole = StarCraft2Player.getRole
+	player.nameDisplay = StarCraft2Player.nameDisplay
+	player.getHistory = StarCraft2Player.getHistory
+	player.addCustomCells = StarCraft2Player.addCustomCells
+	player.calculateEarnings = StarCraft2Player.calculateEarnings
+	player.getAchievements = StarCraft2Player.getAchievements
+	player.addCustomContent = StarCraft2Player.addCustomContent
+	player.createBottomContent = StarCraft2Player.createBottomContent
+	player.shouldStoreData = StarCraft2Player.shouldStoreData
+	player.adjustLPDB = StarCraft2Player.adjustLPDB
+	player.getStatus = StarCraft2Player.getStatus
+	player.getRole = StarCraft2Player.getRole
 	return player:createInfobox(frame)
 end
 
