@@ -56,15 +56,15 @@ function League:createInfobox()
 					:content(args.type)
 					:categories(
 						function(_, ...)
-						local value = select(1, ...)
-						value = tostring(value):lower()
-						if value == 'offline' then
-							self.infobox:categories('Offline Tournaments')
-						elseif value == 'online' then
-							self.infobox:categories('Online Tournaments')
-						else
-							self.infobox:categories('Unknown Type Tournaments')
-						end
+							local value = select(1, ...)
+							value = tostring(value):lower()
+							if value == 'offline' then
+								self.infobox:categories('Offline Tournaments')
+							elseif value == 'online' then
+								self.infobox:categories('Online Tournaments')
+							else
+								self.infobox:categories('Unknown Type Tournaments')
+							end
 						end
 					)
 					:make()
