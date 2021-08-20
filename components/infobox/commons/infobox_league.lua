@@ -80,17 +80,17 @@ function League:createInfobox()
 				:fcell(Cell:new('Date')
 					:options({})
 					:content(args.date)
-								:make()
+					:make()
 				)
 				:fcell(Cell:new('Start Date')
 					:options({})
 					:content(args.sdate)
-								:make()
+					:make()
 				)
 				:fcell(Cell:new('End Date')
 					:options({})
 					:content(args.edate)
-								:make()
+					:make()
 				)
 				:fcell(self:createTier(args):make())
 	League:addCustomCells(self.infobox, args)
@@ -155,6 +155,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_region', args.region)
 	Variables.varDefine('tournament_country', args.country)
 	Variables.varDefine('tournament_location', args.location or args.city)
+	Variables.varDefine('tournament_location2', args.location2 or args.city2)
 	Variables.varDefine('tournament_venue', args.venue)
 
 	Variables.varDefine('tournament_game', args.game)
@@ -175,7 +176,7 @@ function League:_setLpdbData(args)
 		name = self.name,
 		tickername = args.tickername,
 		shortname = args.shortname,
-		banner = args.banner,
+		banner = args.image,
 		icon = args.icon,
 		series = args.series,
 		previous = args.previous,
