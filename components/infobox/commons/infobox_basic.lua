@@ -28,7 +28,7 @@ end
 
 --- Allows for overriding this functionality
 function BasicInfobox:createBottomContent(infobox)
-    return infobox
+    return nil
 end
 
 return BasicInfobox
