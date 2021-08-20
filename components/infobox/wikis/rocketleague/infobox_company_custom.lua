@@ -8,7 +8,7 @@ function RocketLeagueCompany.run(frame)
     return company:createInfobox(frame)
 end
 
-function RocketLeagueCompany.addCustomCells(company, infobox, args)
+function RocketLeagueCompany:addCustomCells(infobox, args)
     infobox:cell('Epic Creator Code', args.creatorcode)
     return infobox
 end
