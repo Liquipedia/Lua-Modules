@@ -64,6 +64,8 @@ function RLLeague:createTier(args)
 		end
 	end
 
+	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
+
 	return cell:content(content)
 end
 
