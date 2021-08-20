@@ -235,7 +235,6 @@ function StarCraft2Player._getLPDBrecursive(cond, query, queryType)
 end
 
 function StarCraft2Player._getEarningsMedalsData(player)
-	local offset = 0
 	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR ' ..
 		'([[mode::1v1]] AND ([[placement::1]] OR [[placement::2]] OR [[placement::3]]' ..
 		' OR [[placement::4]] OR [[placement::3-4]]))) AND ' ..
@@ -417,7 +416,7 @@ end
 function StarCraft2Player._getMatchupData(player)
 	local category = ''
 	player = string.gsub(player, '_', ' ')
-	local conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]'
+	local cond = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]'
 	local query = 'match2opponents, date'
 
 	local data = StarCraft2Player._getLPDBrecursive(cond, query, 'match2')
