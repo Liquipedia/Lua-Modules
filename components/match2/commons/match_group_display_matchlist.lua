@@ -92,7 +92,8 @@ function MatchlistDisplay.Matchlist(props)
 		:addClass('brkts-matchlist wikitable wikitable-bordered matchlist')
 		:addClass(config.collapsible and 'collapsible' or nil)
 		:addClass(config.collapsed and 'collapsed' or nil)
-		:cssText(config.attached and 'margin-bottom:-1px;margin-top:-2px' or nil)
+		:addClass(config.attached and 'brkts-matchlist-attached' or nil)
+		:css('margin-top', config.attached and '-1px' or nil)
 		:css('width', config.width .. 'px')
 
 	for index, match in ipairs(props.matches) do
@@ -202,7 +203,7 @@ function MatchlistDisplay.Match(props)
 		:node(matchSummaryPopupNode)
 
 	return html.create('tr')
-		:addClass('brtks-matchlist-row brkts-match-popup-wrapper')
+		:addClass('brtks-matchlist-row brkts-matchlist-row brkts-match-popup-wrapper')
 		:css('cursor', 'pointer')
 		:node(renderOpponent(1))
 		:node(renderScore(1))

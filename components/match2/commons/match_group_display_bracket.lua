@@ -130,7 +130,7 @@ function BracketDisplay.Bracket(props)
 			:node(BracketDisplay.NodeBody(nodeProps))
 	end
 
-	return html.create('div'):addClass('brkts-main brkts-main-dev brkts-main-dev-2')
+	return html.create('div'):addClass('brkts-main brkts-main-dev brkts-main-dev-2 brkts-bracket-wrapper')
 		:node(bracketNode)
 end
 
