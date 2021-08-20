@@ -53,7 +53,7 @@ function Player:createInfobox(frame)
 	infobox:name(nameDisplay)
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
-	infobox:header('Player Information', true)
+	infobox:header(self:getInformationType(args) .. ' Information', true)
 	infobox:cell('Name', args.name)
 	infobox:cell('Romanized Name', args.romanized_name)
 	infobox:cell('Birth', birthDisplay)
@@ -140,10 +140,8 @@ function Player:createInfobox(frame)
 			infobox:categories(role.category .. 's with unknown birth date')
 		end
 
-		local extradata = self:getExtradata(args, role, status)
 		links = self:_getLinksLPDB(links)
-
-		mw.ext.LiquipediaDB.lpdb_player('player' .. self.name, {
+		local lpdbData = {
 			id = args.id or mw.title.getCurrentTitle().prefixedText,
 			alternateid = args.ids,
 			name = args.romanized_name or args.name,
@@ -159,12 +157,33 @@ function Player:createInfobox(frame)
 			status = status.store,
 			type = role.store,
 			earnings = earnings,
-			links = mw.ext.LiquipediaDB.lpdb_create_json(links),
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata),
-		})
+			links = links,
+			extradata = {},
+		}
+		local lpdbData = self:adjustLPDB(lpdbData, args, role, status)
+		lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
+		lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
+		local storageType = self:getStorageType(args, role, status)
+
+		mw.ext.LiquipediaDB.lpdb_player(storageType .. self.name, lpdbData)
 	end
 
 	return infobox:build()
+end
+
+--- Allows for overriding this functionality
+function Player:getStorageType(args, role, status)
+	return 'player'
+end
+
+--- Allows for overriding this functionality
+function Player:getInformationType(args)
+	return args.informationType or 'Player'
+end
+
+--- Allows for overriding this functionality
+function Player:adjustLPDB(lpdbData, args, role, status)
+	return lpdbData
 end
 
 --- Allows for overriding this functionality
@@ -180,11 +199,6 @@ end
 --- Allows for overriding this functionality
 function Player:getHistory(infobox, args)
 	return args.history
-end
-
---- Allows for overriding this functionality
-function Player:getExtradata(args, role, status)
-	return {}
 end
 
 --- Allows for overriding this functionality
@@ -211,7 +225,7 @@ end
 
 --- Allows for overriding this functionality
 function Player:calculateEarnings(args)
-	return error('You have not implemented a custom earnings function for your wiki')
+	return 0
 end
 
 function Player:_createRegion(region)
