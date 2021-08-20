@@ -2,6 +2,7 @@ local p = {}
 
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
+local DisplayHelper = require("Module:MatchGroup/Display/Helper")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
 local Variables = require("Module:Variables")
@@ -136,6 +137,18 @@ function p.convertParameters(match2)
 	end
 
 	match.extradata.bestofx = tostring(match2.bestof)
+	local bracketData = json.parse(match2.match2bracketdata)
+	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
+		local headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
+		if not headerName or headerName == "" then
+			headerName = Variables.varDefault("match_legacy_header_name")
+		else
+			Variables.varDefine("match_legacy_header_name", headerName)
+		end
+		if headerName and headerName ~= "" then
+			match.header = headerName
+		end
+	end
 
 	local veto = json.parse(extradata.mapveto)
 	if veto then
