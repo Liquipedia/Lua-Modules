@@ -217,7 +217,7 @@ function StarCraft2Player._getLPDBrecursive(cond, query, queryType)
 	local count
 	local offset = 0
 	repeat
-		local additionalData = mw.ext.LiquipediaDB.lpdb('placement', {
+		local additionalData = mw.ext.LiquipediaDB.lpdb(queryType, {
 			conditions = cond,
 			query = query,
 			offset = offset,
