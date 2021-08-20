@@ -9,6 +9,9 @@ function Cell:new(description)
     self.description:addClass('infobox-cell-2')
                     :addClass('infobox-description')
                     :wikitext(description .. ':')
+	self.contentDiv = nil
+	self.args = nil
+	self.setCategories = nil
     return self
 end
 
