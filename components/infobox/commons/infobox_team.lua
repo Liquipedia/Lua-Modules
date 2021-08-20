@@ -66,7 +66,7 @@ function Team:createInfobox(frame)
             :centeredCell(args.trades)
             :centeredCell(args.footnotes)
     self:addCustomContent(infobox, args)
-            :bottom(Team:createBottomContent(infobox))
+            :bottom(self:createBottomContent(infobox))
 
     if Namespace.isMain() then
         infobox:categories('Teams')
