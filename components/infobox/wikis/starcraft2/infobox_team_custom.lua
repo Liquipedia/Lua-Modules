@@ -27,7 +27,7 @@ function StarCraft2Team.addCustomCells(team, infobox, args)
 	return infobox
 end
 
-function StarCraft2Team.createBottomContent(infobox)
+function StarCraft2Team:createBottomContent()
 	if doStore then
 		return tostring(Matches._get_ongoing({})) ..
 			tostring(Matches._get_upcoming({})) ..
