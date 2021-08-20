@@ -6,8 +6,6 @@ local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
 local StarcraftOpponentDisplay = require('Module:OpponentDisplay/Starcraft')
 local Table = require('Module:Table')
 
-local html = mw.html
-
 local StarcraftMatchlistDisplay = {}
 
 function StarcraftMatchlistDisplay.luaGet(_, args)
@@ -47,18 +45,19 @@ function StarcraftMatchlistDisplay.Opponent(props)
 		showLink = false,
 		teamStyle = 'short',
 	})
-		:css('width', props.width - 2 * MatchlistDisplay.cellPadding - 1 .. 'px')
-	return html.create('td')
+		:addClass('brkts-matchlist-cell-content')
+	return mw.html.create('div')
+		:addClass('brkts-matchlist-cell brkts-matchlist-opponent')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
 		:addClass(props.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or nil)
 		:node(contentNode)
 end
 
 function StarcraftMatchlistDisplay.Score(props)
-	local contentNode = html.create('div'):addClass('brkts-matchlist-score')
+	local contentNode = mw.html.create('div'):addClass('brkts-matchlist-cell-content')
 		:node(StarcraftOpponentDisplay.InlineScore(props.opponent))
-		:css('width', props.width - 2 * MatchlistDisplay.cellPadding - 1 .. 'px')
-	return html.create('td')
+	return mw.html.create('div')
+		:addClass('brkts-matchlist-cell brkts-matchlist-score')
 		:addClass(props.opponent.placement == 1 and 'brkts-matchlist-slot-bold' or nil)
 		:node(contentNode)
 end
