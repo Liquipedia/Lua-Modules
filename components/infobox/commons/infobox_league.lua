@@ -176,7 +176,7 @@ function League:_setLpdbData(args)
 		name = self.name,
 		tickername = args.tickername,
 		shortname = args.shortname,
-		banner = args.banner,
+		banner = args.image,
 		icon = args.icon,
 		series = args.series,
 		previous = args.previous,
