@@ -3,10 +3,71 @@ local Variables = require('Module:Variables')
 local Achievements = require('Module:Achievements in infoboxes')._player
 local RaceIcon = require('Module:RaceIcon').getBigIcon
 local String = require('Module:StringUtils')
+local CleanRace = require('Module:CleanRace')
 local Matches = require('Module:Upcoming ongoing and recent matches player/new')
 
 local _EPT_SEASON = 2021
+
+local _DISCARD_PLACEMENT = '99'
 local _ALLKILLICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
+local _EARNING_MODES = { ['1v1'] = '1v1', ['team_individual'] = 'team' }
+
+--race stuff tables
+local _AVAILABLE_RACES = { 'p', 't', 'z', 'r', 'total' }
+local _FACTION1 = {
+	['p'] = 'Protoss', ['pt'] = 'Protoss', ['pz'] = 'Protoss',
+	['t'] = 'Terran', ['tp'] = 'Terran', ['tz'] = 'Terran',
+	['z'] = 'Zerg', ['zt'] = 'Zerg', ['zp'] = 'Zerg',
+	['r'] = 'Random', ['a'] = 'All'
+}
+local _FACTION2 = {
+	['pt'] = 'Terran', ['pz'] = 'Zerg',
+	['tp'] = 'Protoss', ['tz'] = 'Zerg',
+	['zt'] = 'Terran', ['zp'] = 'Protoss'
+}
+local _RACE_CATEGORY = {
+	['p'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]',
+	['pt'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
+		'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
+		'[[Category:Players with multiple races]]',
+	['pz'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
+		'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
+		'[[Category:Players with multiple races]]',
+	['t'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]]',
+	['tp'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
+		'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
+		'[[Category:Players with multiple races]]',
+	['tz'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
+		'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
+		'[[Category:Players with multiple races]]',
+	['z'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]',
+	['zt'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
+		'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
+		'[[Category:Players with multiple races]]',
+	['zp'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
+		'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
+		'[[Category:Players with multiple races]]',
+	['r'] = '[[:Category:Random Players|Random]][[Category:Random Players]]',
+	['a'] = '[[:Category:Protoss Players|Protoss]],&nbsp;' ..
+		'[[:Category:Terran Players|Terran]],&nbsp;[[:Category:Zerg Players|Zerg]]' ..
+		'[[Category:Protoss Players]][[Category:Terran Players]]' ..
+		'[[Category:Zerg Players]][[Category:Players with multiple races]]'
+}
+
+--role stuff tables
+local _ROLES = {
+	['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
+	['commentator'] = 'Commentator', ['caster'] = 'Commentator',
+	['expert'] = 'Analyst', ['host'] = 'Host', ['streamer'] = 'Streamer',
+	['interviewer'] = 'Interviewer', ['journalist'] = 'Journalist',
+	['manager'] = 'Manager', ['map maker'] = 'Map maker',
+	['observer'] = 'Observer', ['photographer'] = 'Photographer',
+	['tournament organizer'] = 'Organizer', ['organizer'] = 'Organizer',
+}
+local _CLEAN_OTHER_ROLES = {
+	['blizzard'] = 'Blizzard', ['coach'] = 'Coach', ['staff'] = 'false',
+	['content producer'] = 'Content producer', ['streamer'] = 'false',
+}
 
 local earningsGlobal = {}
 local pagename = mw.title.getCurrentTitle().prefixedText
@@ -38,68 +99,15 @@ end
 function StarCraft2Player:nameDisplay(args)
 	StarCraft2Player._getRaceData(args.race or 'unknown')
 	local raceIcon = RaceIcon({'alt_' .. raceData.race})
-	local name = args.id or pagename
+	local name = args.id or self.pagename
 
 	return raceIcon .. '&nbsp;' .. name
 end
 
 function StarCraft2Player._getRaceData(race)
-	local cleanRace = {
-		['protoss'] = 'p',
-		['terran'] = 't',
-		['zerg'] = 'z',
-		['random'] = 'r',
-		['all'] = 'a',
-		['tzp'] = 'a',
-		['tpz'] = 'a',
-		['ptz'] = 'a',
-		['pzt'] = 'a',
-		['ztp'] = 'a',
-		['zpt'] = 'a',
-	}
-	local FACTION1 = {
-		['p'] = 'Protoss', ['pt'] = 'Protoss', ['pz'] = 'Protoss',
-		['t'] = 'Terran', ['tp'] = 'Terran', ['tz'] = 'Terran',
-		['z'] = 'Zerg', ['zt'] = 'Zerg', ['zp'] = 'Zerg',
-		['r'] = 'Random', ['a'] = 'All'
-	}
-	local FACTION2 = {
-		['pt'] = 'Terran', ['pz'] = 'Zerg',
-		['tp'] = 'Protoss', ['tz'] = 'Zerg',
-		['zt'] = 'Terran', ['zp'] = 'Protoss'
-	}
-	local raceCategory = {
-		['p'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]',
-		['pt'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
-			'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
-			'[[Category:Players with multiple races]]',
-		['pz'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
-			'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
-			'[[Category:Players with multiple races]]',
-		['t'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]]',
-		['tp'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
-			'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
-			'[[Category:Players with multiple races]]',
-		['tz'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
-			'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
-			'[[Category:Players with multiple races]]',
-		['z'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]',
-		['zt'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
-			'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
-			'[[Category:Players with multiple races]]',
-		['zp'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
-			'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
-			'[[Category:Players with multiple races]]',
-		['r'] = '[[:Category:Random Players|Random]][[Category:Random Players]]',
-		['a'] = '[[:Category:Protoss Players|Protoss]],&nbsp;' ..
-			'[[:Category:Terran Players|Terran]],&nbsp;[[:Category:Zerg Players|Zerg]]' ..
-			'[[Category:Protoss Players]][[Category:Terran Players]]' ..
-			'[[Category:Zerg Players]][[Category:Players with multiple races]]'
-	}
-
 	race = string.lower(race)
-	race = cleanRace[race] or race
-	local display = raceCategory[race]
+	race = CleanRace[race] or race
+	local display = _RACE_CATEGORY[race]
 	if not display and race ~= 'unknown' then
 		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
@@ -107,8 +115,8 @@ function StarCraft2Player._getRaceData(race)
 
 	raceData = {
 		race = race,
-		faction = FACTION1[race] or '',
-		faction2 = FACTION2[race] or '',
+		faction = _FACTION1[race] or '',
+		faction2 = _FACTION2[race] or '',
 		display = display
 	}
 end
@@ -134,7 +142,7 @@ function StarCraft2Player:shouldStoreData(args)
 end
 
 function StarCraft2Player:getAchievements(infobox, args)
-	local player = args.id or pagename
+	local player = args.id or self.pagename
 	local achievements = Achievements({}, player)
 	if achievements == '' then
 		achievements = nil
@@ -145,9 +153,10 @@ function StarCraft2Player:getAchievements(infobox, args)
 end
 
 --kick the default history display
+--because we will add it a bit lower again
 function StarCraft2Player:getHistory() return nil end
 
-function StarCraft2Player.addCustomContent(player, infobox, args)
+function StarCraft2Player:addCustomContent(infobox, args)
 	local retired
 	--only display retired if it contains a year
 	if string.match(args.retired or '', '%d%d%d%d%') then
@@ -185,21 +194,8 @@ end
 function StarCraft2Player:getRole(args)
 	local role = args.role or args.occupation or 'player'
 	role = string.lower(role)
-	local ROLES = {
-		['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
-		['commentator'] = 'Commentator', ['caster'] = 'Commentator',
-		['expert'] = 'Analyst', ['host'] = 'Host', ['streamer'] = 'Streamer',
-		['interviewer'] = 'Interviewer', ['journalist'] = 'Journalist',
-		['manager'] = 'Manager', ['map maker'] = 'Map maker',
-		['observer'] = 'Observer', ['photographer'] = 'Photographer',
-		['tournament organizer'] = 'Organizer', ['organizer'] = 'Organizer',
-	}
-	local cleanOther = {
-		['blizzard'] = 'Blizzard', ['coach'] = 'Coach', ['staff'] = 'false',
-		['content producer'] = 'Content producer', ['streamer'] = 'false',
-	}
-	local category = ROLES[role]
-	local store = category or cleanOther[role] or 'Player'
+	local category = _ROLES[role]
+	local store = category or _CLEAN_OTHER_ROLES[role] or 'Player'
 
 	return { title = 'Race', display = raceData.display, store = store, category = category or 'Player'}
 end
@@ -209,38 +205,44 @@ function StarCraft2Player:calculateEarnings(args)
 
 	if shouldStoreData then
 		local earningsTotal
-		earningsTotal, earningsGlobal = StarCraft2Player._get_earnings_and_medals_data(pagename)
+		earningsTotal, earningsGlobal = StarCraft2Player._getEarningsMedalsData(self.pagename)
 		earningsTotal = math.floor( (earningsTotal or 0) * 100 + 0.5) / 100
 		return earningsTotal
 	end
 	return 0
 end
 
-function StarCraft2Player._get_earnings_and_medals_data(player)
-	local count
+function StarCraft2Player._getLPDBrecursive(cond, query, queryType)
 	local data = {} -- get LPDB results in here
+	local count
+	local offset = 0
+	repeat
+		local additionalData = mw.ext.LiquipediaDB.lpdb('placement', {
+			conditions = cond,
+			query = query,
+			offset = offset,
+			limit = 5000
+		})
+		count = #additionalData
+		-- Merging
+		for i, item in ipairs(additionalData) do
+			data[offset + i] = item
+		end
+		offset = offset + count
+	until count ~= 5000
+
+	return data
+end
+
+function StarCraft2Player._getEarningsMedalsData(player)
 	local offset = 0
 	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR ' ..
 		'([[mode::1v1]] AND ([[placement::1]] OR [[placement::2]] OR [[placement::3]]' ..
 		' OR [[placement::4]] OR [[placement::3-4]]))) AND ' ..
 		'[[participant::' .. player .. ']]'
-	repeat
-		local additional_data = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = cond,
-			query = 'liquipediatier, liquipediatiertype, placement, date, prizemoney, mode',
-			offset = offset,
-			limit = 5000
-		})
-		count = 0
-		-- Merging
-		for i, item in ipairs(additional_data) do
-			data[offset + i] = item
-			count = count + 1
-		end
-		offset = offset + count
-	until count ~= 5000
+	local query = 'liquipediatier, liquipediatiertype, placement, date, prizemoney, mode'
 
-	local EarningModes = { ['1v1'] = '1v1', ['team_individual'] = 'team' }
+	local data = StarCraft2Player._getLPDBrecursive(cond, query, 'placement')
 
 	local earnings = {}
 	local Medals = {}
@@ -251,7 +253,7 @@ function StarCraft2Player._get_earnings_and_medals_data(player)
 	if type(data[1]) == 'table' then
 		for i=1,#data do
 			--handle earnings
-			local mode = EarningModes[data[i].mode] or 'other'
+			local mode = _EARNING_MODES[data[i].mode] or 'other'
 			if not earnings[mode] then
 				earnings[mode] = {}
 			end
@@ -269,7 +271,7 @@ function StarCraft2Player._get_earnings_and_medals_data(player)
 			--handle medals
 			if data[i].mode == '1v1' then
 				local place = StarCraft2Player._Placements(data[i].placement)
-				if place ~= '99' then
+				if place ~= _DISCARD_PLACEMENT then
 					local tier = data[i].liquipediatier or 'undefined'
 					if data[i].liquipediatiertype ~= 'Qualifier' then
 						if not Medals[place] then
@@ -309,10 +311,10 @@ function StarCraft2Player._get_earnings_and_medals_data(player)
 end
 
 function StarCraft2Player._Placements(value)
-	value = (value or '') ~= '' and value or '99'
+	value = (value or '') ~= '' and value or _DISCARD_PLACEMENT
 	value = mw.text.split(value, '-')[1]
 	if value ~= '1' and value ~= '2' and value ~= '3' then
-		value = '99'
+		value = _DISCARD_PLACEMENT
 	elseif value == '3' then
 		value = 'sf'
 	end
@@ -389,12 +391,12 @@ function StarCraft2Player:getStatus(args)
 	return { store = statusStore }
 end
 
-function StarCraft2Player.addCustomCells(_, infobox, args)
+function StarCraft2Player:addCustomCells(infobox, args)
 	local rank1, rank2
 	local yearsActive, activeCategory
 	if shouldStoreData and not statusStore then
-		rank1, rank2 = StarCraft2Player._getRank(pagename)
-		yearsActive, activeCategory = StarCraft2Player._get_matchup_data(pagename)
+		rank1, rank2 = StarCraft2Player._getRank(self.pagename)
+		yearsActive, activeCategory = StarCraft2Player._getMatchupData(self.pagename)
 		infobox:categories(activeCategory)
 	end
 
@@ -403,52 +405,34 @@ function StarCraft2Player.addCustomCells(_, infobox, args)
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
-	infobox	:cell('Approx. Earnings ' .. currentYear, currentYearEarnings)
-			:cell(rank1.name or 'Rank', rank1.rank)
-			:cell(rank2.name or 'Rank', rank2.rank)
-			:cell('Military Service', StarCraft2Player._military(args.military))
-			:cell('Years active', yearsActive)
+	infobox:cell('Approx. Earnings ' .. currentYear, currentYearEarnings)
+	infobox:cell(rank1.name or 'Rank', rank1.rank)
+	infobox:cell(rank2.name or 'Rank', rank2.rank)
+	infobox:cell('Military Service', StarCraft2Player._military(args.military))
+	infobox:cell('Years active', yearsActive)
 
 	return infobox
 end
 
-function StarCraft2Player._get_matchup_data(player)
-	local count
+function StarCraft2Player._getMatchupData(player)
 	local category = ''
 	player = string.gsub(player, '_', ' ')
 	local conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]'
+	local query = 'match2opponents, date'
 
-	local data = {} -- get LPDB results in here
-	local offset = 0
-	repeat
-		local additional_data = mw.ext.LiquipediaDB.lpdb('match2', {
-			conditions = conditions,
-			query = 'match2opponents, date',
-			offset = offset,
-			limit = 5000
-		})
-		count = 0
-		-- Merging
-		for i, item in ipairs(additional_data) do
-			data[offset + i] = item
-			count = count + 1
-		end
-		offset = offset + count
-	until count ~= 5000
+	local data = StarCraft2Player._getLPDBrecursive(cond, query, 'match2')
 
 	local yearsActive = ''
 	local years = {}
 	local vs = {}
-	local races = { 'p', 't', 'z', 'r', 'total' }
-	for _, item1 in pairs(races) do
+	for _, item1 in pairs(_AVAILABLE_RACES) do
 		vs[item1] = {}
-		for _, item2 in pairs(races) do
+		for _, item2 in pairs(_AVAILABLE_RACES) do
 			vs[item1][item2] = { ['win'] = 0, ['loss'] = 0 }
 		end
 	end
 
 	if type(data[1]) == 'table' then
-		local CleanRace = { ['t'] = 't', ['z'] = 'z', ['p'] = 'p'}
 		for i=1, #data do
 			local plIndex = 1
 			local vsIndex = 2
@@ -532,7 +516,7 @@ function StarCraft2Player:adjustLPDB(lpdbData, args, role, _)
 		race = raceData.race,
 		faction = raceData.faction,
 		faction2 = raceData.faction2,
-		lc_id = string.lower(pagename),
+		lc_id = string.lower(self.pagename),
 		teamname = args.team,
 		role = role.store,
 		role2 = args.role2,
