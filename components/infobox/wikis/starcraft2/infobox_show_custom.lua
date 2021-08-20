@@ -3,8 +3,9 @@ local Namespace = require('Module:Namespace')
 local StarCraft2Show = {}
 
 function StarCraft2Show.run(frame)
+	local show = Show(frame)
 	Show.addCustomCells = StarCraft2Show.addCustomCells
-	return Show.run(frame)
+	return show:createInfobox(frame)
 end
 
 function StarCraft2Show:addCustomCells(infobox, args)
