@@ -20,6 +20,7 @@ local militaryStore
 local StarCraft2Player = {}
 
 function StarCraft2Player.run(frame)
+	local player = Player(frame)
 	Player.nameDisplay = StarCraft2Player.nameDisplay
 	Player.getHistory = StarCraft2Player.getHistory
 	Player.addCustomCells = StarCraft2Player.addCustomCells
@@ -31,7 +32,7 @@ function StarCraft2Player.run(frame)
 	Player.getExtradata = StarCraft2Player.getExtradata
 	Player.getStatus = StarCraft2Player.getStatus
 	Player.getRole = StarCraft2Player.getRole
-	return Player:createInfobox(frame)
+	return player:createInfobox(frame)
 end
 
 function StarCraft2Player.nameDisplay(_, args)
