@@ -49,23 +49,28 @@ function Player:createInfobox(frame)
 		)
 	local status = self:getStatus(args)
 
-	infobox :name(nameDisplay)
-			:image(args.image, args.defaultImage)
-			:centeredCell(args.caption)
-			:header('Player Information', true)
-			:cell('Name', args.name)
-			:cell('Romanized Name', args.romanized_name)
-			:cell('Birth', birthDisplay)
-			:cell('Died', deathDisplay)
-			:cell('Status', status.display)
-			:cell(role.title or 'Role', role.display)
-			:fcell(Cell :new('Country')
+	infobox:name(nameDisplay)
+	infobox:image(args.image, args.defaultImage)
+	infobox:centeredCell(args.caption)
+	infobox:header('Player Information', true)
+	infobox:cell('Name', args.name)
+	infobox:cell('Romanized Name', args.romanized_name)
+	infobox:cell('Birth', birthDisplay)
+	infobox:cell('Died', deathDisplay)
+	infobox:cell('Status', status.display)
+	infobox:cell(role.title or 'Role', role.display)
+	infobox:fcell(Cell :new('Country')
 						:options({})
 						:content(
 							self:_createLocation(args.country or args.nationality, args.location, role.category),
 							self:_createLocation(args.country2 or args.nationality2, args.location2, role.category),
 							self:_createLocation(args.country3 or args.nationality3, args.location3, role.category)
 						)
+						:make()
+			)
+	infobox:fcell(Cell :new('Country')
+						:options({})
+						:content(unpack(self:_createLocations(args, role.category)))
 						:make()
 			)
 			:cell('Region', self:_createRegion(args.region))
@@ -85,9 +90,9 @@ function Player:createInfobox(frame)
 						)
 						:make()
 			)
-			:cell('Alternate IDs', args.ids or args.alternateids)
-			:cell('Nicknames', args.nicknames)
-			:cell('Total Earnings', earnings)
+	infobox:cell('Alternate IDs', args.ids or args.alternateids)
+	infobox:cell('Nicknames', args.nicknames)
+	infobox:cell('Total Earnings', earnings)
 	self:addCustomCells(infobox, args)
 
 	local links = Links.transform(args)
@@ -95,12 +100,12 @@ function Player:createInfobox(frame)
 	local history = self:getHistory(infobox, args)
 
 	infobox :header('Links', not Table.isEmpty(links))
-			:links(links, _LINK_VARIANT)
-			:header('Achievements', achievements)
-			:centeredCell(achievements)
-			:header('History', history)
-			:centeredCell(history)
-			:centeredCell(args.footnotes)
+	infobox:links(links, _LINK_VARIANT)
+	infobox:header('Achievements', achievements)
+	infobox:centeredCell(achievements)
+	infobox:header('History', history)
+	infobox:centeredCell(history)
+	infobox:centeredCell(args.footnotes)
 	self:addCustomContent(infobox, args)
 	infobox:bottom(self:createBottomContent(infobox))
 
@@ -214,6 +219,27 @@ function Player:_createRegion(region)
 	end
 
 	return Template.safeExpand(self.frame, 'Region', {region})
+end
+
+function Player:_createLocations(args, role)
+	local countryDisplayData = {}
+	local country = args.country or args.country1 or args.nationality or args.nationality1
+	if country == nil or country == '' then
+		return countryDisplayData
+	end
+
+	countryDisplayData[1] = Player:_createLocation(country, args.location, role)
+
+	for index = 2, 99 do
+		country = args['country' .. index] or args['nationality' .. index]
+		if country == nil or country == '' then
+			break
+		else
+			countryDisplayData[index] = Player:_createLocation(country, args['location' .. index], role)
+		end
+	end
+	
+	return countryDisplayData
 end
 
 function Player:_createLocation(country, location, role)
