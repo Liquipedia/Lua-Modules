@@ -120,7 +120,7 @@ function BracketDisplay.Bracket(props)
 
 	-- Draw all top level subtrees of the bracket. These are subtrees rooted
 	-- at matches that do not advance to higher rounds.
-	for _, matchId in ipairs(props.bracket.headMatchIds) do
+	for _, matchId in ipairs(props.bracket.rootMatchIds) do
 		local nodeProps = {
 			config = config,
 			headerRowsByMatchId = headerRowsByMatchId,
@@ -128,9 +128,11 @@ function BracketDisplay.Bracket(props)
 			matchId = matchId,
 			matchesById = props.bracket.matchesById,
 		}
-		bracketNode
-			:node(BracketDisplay.NodeHeader(nodeProps))
-			:node(BracketDisplay.NodeBody(nodeProps))
+		if not StringUtils.endsWith(matchId, 'RxMTP') then
+			bracketNode
+				:node(BracketDisplay.NodeHeader(nodeProps))
+				:node(BracketDisplay.NodeBody(nodeProps))
+		end
 	end
 
 	return html.create('div'):addClass('brkts-bracket-wrapper')
@@ -258,15 +260,15 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 
 	-- Compute which matches have header rows
 	local headerRows = {}
-	for matchId, match in pairs(bracket.matchesById) do
+	for matchId, bracketData in pairs(bracket.bracketDatasById) do
 		-- Don't show the header if it's disabled. Also don't show the header
 		-- if it is the first match of a round because a higher round match can
 		-- show it instead.
-		local upperMatch = bracket.upperMatchIds[matchId]
-			and bracket.matchesById[bracket.upperMatchIds[matchId]]
-		local isFirstChild = upperMatch
-			and matchId == upperMatch.bracketData.lowerMatches[1].matchId
-		local showHeader = match.bracketData.header and not isFirstChild
+		local upperBracketData = bracket.upperMatchIds[matchId]
+			and bracket.bracketDatasById[bracket.upperMatchIds[matchId]]
+		local isFirstChild = upperBracketData
+			and matchId == upperBracketData.lowerMatches[1].matchId
+		local showHeader = bracketData.header and not isFirstChild
 		if showHeader then
 			headerRows[matchId] = {}
 		end
@@ -288,10 +290,9 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 	end)
 
 	-- Determine the individual headers appearing in header rows
-	for matchId, match in pairs(bracket.matchesById) do
-		local bracketData = match.bracketData
+	for matchId, bracketData in pairs(bracket.bracketDatasById) do
 		local coords = bracket.coordsByMatchId[matchId]
-		if bracketData.header and not StringUtils.endsWith(matchId, 'RxMTP') then
+		if bracketData.header then
 			local headerRow = getHeaderRow(matchId)
 			local brMatch = bracketData.bracketResetMatchId and bracket.matchesById[bracketData.bracketResetMatchId]
 			headerRow[coords.roundIx] = {
