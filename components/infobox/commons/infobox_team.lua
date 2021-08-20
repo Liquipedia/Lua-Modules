@@ -1,36 +1,28 @@
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
-local Infobox = require('Module:Infobox')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
+local BasicInfobox = require('Module:Infobox/Basic')
 
-local getArgs = require('Module:Arguments').getArgs
+local Team = Class.new(BasicInfobox)
 
-local Team = Class.new()
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'team'
 
 function Team.run(frame)
-    return Team:createInfobox(frame)
+    local team = Team(frame)
+    return team:createInfobox(frame)
 end
 
 function Team:createInfobox(frame)
-    local args = getArgs(frame)
-    self.frame = frame
-    self.pagename = mw.title.getCurrentTitle().text
-    self.name = args.name or self.pagename
+    local infobox = self.infobox
+    local args = self.args
 
-    if args.game == nil then
-        return error('Please provide a game!')
-    end
-
-    local infobox = Infobox:create(frame, args.game)
-
-    local earnings = Team:calculateEarnings(args)
+    local earnings = self:calculateEarnings(args)
     Variables.varDefine('earnings', earnings)
     if earnings == 0 then
         earnings = nil
@@ -45,23 +37,23 @@ function Team:createInfobox(frame)
             :fcell(Cell :new('Location')
                         :options({})
                         :content(
-                            Team:_createLocation(args.location),
-                            Team:_createLocation(args.location2)
+                            self:_createLocation(args.location),
+                            self:_createLocation(args.location2)
                         )
                         :make()
             )
-            :cell('Region', Team:_createRegion(args.region))
+            :cell('Region', self:_createRegion(args.region))
             :cell('Coaches', args.coaches)
             :cell('Coach', args.coach)
             :cell('Director', args.director)
             :cell('Manager', args.manager)
             :cell('Team Captain', args.captain)
             :cell('Earnings', earnings)
-    Team:addCustomCells(infobox, args)
+    self:addCustomCells(infobox, args)
 
     local links = Links.transform(args)
-    local achievements = Team:getAchievements(infobox, args)
-    local history = Team:getHistory(infobox, args)
+    local achievements = self:getAchievements(infobox, args)
+    local history = self:getHistory(infobox, args)
 
     infobox :header('Links', not Table.isEmpty(links))
             :links(links, _LINK_VARIANT)
@@ -73,7 +65,7 @@ function Team:createInfobox(frame)
             :header('Recent Player Trades', args.trades)
             :centeredCell(args.trades)
             :centeredCell(args.footnotes)
-    Team:addCustomContent(infobox, args)
+    self:addCustomContent(infobox, args)
             :bottom(Team.createBottomContent(infobox))
 
     if Namespace.isMain() then
@@ -81,11 +73,6 @@ function Team:createInfobox(frame)
     end
 
     return infobox:build()
-end
-
---- Allows for overriding this functionality
-function Team:addCustomContent(infobox, args)
-    return infobox
 end
 
 --- Allows for overriding this functionality
@@ -99,18 +86,8 @@ function Team:getHistory(infobox, args)
 end
 
 --- Allows for overriding this functionality
-function Team:addCustomCells(infobox, args)
-    return infobox
-end
-
---- Allows for overriding this functionality
 function Team:calculateEarnings(args)
     return error('You have not implemented a custom earnings function for your wiki')
-end
-
---- Allows for overriding this functionality
-function Team:createBottomContent(infobox)
-    return infobox
 end
 
 function Team:_createRegion(region)
@@ -118,7 +95,7 @@ function Team:_createRegion(region)
         return ''
     end
 
-    return Template.safeExpand(self.frame, 'Region', {region})
+    return Template.safeExpand(self.infobox.frame, 'Region', {region})
 end
 
 function Team:_createLocation(location)
