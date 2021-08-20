@@ -5,7 +5,7 @@ local getArgs = require('Module:Arguments').getArgs
 local BasicInfobox = Class.new(
 	function(self, frame)
 		self.args = getArgs(frame)
-		self.pagename = mw.title.getCurrentTitle().title
+		self.pagename = mw.title.getCurrentTitle().text
 		self.name = self.args.name or self.pagename
 
 		if self.args.wiki == nil then
