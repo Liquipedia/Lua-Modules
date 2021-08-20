@@ -378,7 +378,7 @@ function StarCraft2Player._military(military)
 	end
 end
 
-function StarCraft2Player.getStatus(args)
+function StarCraft2Player:getStatus(args)
 	if args.death_date then
 		statusStore = 'Deceased'
 	elseif args.retired then
