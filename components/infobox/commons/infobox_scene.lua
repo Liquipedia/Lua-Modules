@@ -48,7 +48,7 @@ function Scene:createInfobox(frame)
             :centeredCell(achievements)
             :centeredCell(args.footnotes)
     self:addCustomContent(infobox, args)
-    infobox:bottom(Scene.createBottomContent(infobox))
+    infobox:bottom(self:createBottomContent(infobox))
 
     infobox:categories('Scene')
 
