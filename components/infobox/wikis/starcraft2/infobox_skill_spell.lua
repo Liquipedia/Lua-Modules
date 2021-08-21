@@ -40,7 +40,7 @@ function StarCraft2Spell:getResearchCost(infobox, args)
 		return nil
 	end
 
-	local race = string.lower(args.race)
+	local race = string.lower(args.race or '')
 
 	local minerals = tonumber(args.min or 0) or 0
 	if minerals ~= 0 then
@@ -51,14 +51,14 @@ function StarCraft2Spell:getResearchCost(infobox, args)
 
 	local gas = tonumber(args.gas or 0) or 0
 	if gas ~= 0 then
-		gas = (_GAS[race or ''] or _GAS['default']) .. '&nbsp;' .. gas .. '&nbsp;'
+		gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas .. '&nbsp;'
 	else
 		gas = ''
 	end
 
 	local buildtime = tonumber(args.buildtime or 0) or 0
 	if buildtime ~= 0 then
-		buildtime = (_TIME[race or ''] or _TIME['default']) .. '&nbsp;' .. buildtime
+		buildtime = (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtime
 	else
 		buildtime = ''
 	end
