@@ -53,7 +53,7 @@ function Game:getMultiArgsForType(args, argType)
 		if String.isEmpty(args[argType .. index]) then
 			break
 		else
-			indexedArgType = (args[argType .. index .. 'link'] or args[argType .. index])
+			local indexedArgType = (args[argType .. index .. 'link'] or args[argType .. index])
 				.. '|' .. args[argType .. index]
 			table.insert(typeArgs, indexedArgType)
 		end
