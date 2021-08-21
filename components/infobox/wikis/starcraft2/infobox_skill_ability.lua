@@ -12,9 +12,11 @@ local _TIME = mw.loadData('Module:Buildtime')
 
 function StarCraft2Ability.run(frame)
 	local ability = Ability(frame)
-	ability.getNameDisplay = StarCraft2Ability.getNameDisplay
+	ability.getCategories = StarCraft2Ability.getCategories
+	ability.getDuration = StarCraft2Ability.getDuration
+	ability.getHotkeys = StarCraft2Ability.getHotkeys
+	ability.getCostDisplay = StarCraft2Ability.getCostDisplay
 	ability.addCustomCells = StarCraft2Ability.addCustomCells
-	ability.addToLpdb = StarCraft2Ability.addToLpdb
 
 	return ability:createInfobox(frame)
 end
@@ -118,23 +120,30 @@ function StarCraft2Ability:getHotkeys(infobox, args)
 end
 
 function StarCraft2Ability:getCostDisplay(infobox, args)
-	local minerals = tonumber(args.minerals or 0) or 0
+
+	local race = string.lower(args.race)
+
+	local minerals = tonumber(args.min or 0) or 0
 	minerals = _MINERALS .. '&nbsp;' .. minerals
+
 	local gas = tonumber(args.gas or 0) or 0
-	gas = (_GAS[args.race or ''] or _GAS['default']) .. '&nbsp;' .. gas
+	gas = (_GAS[race or ''] or _GAS['default']) .. '&nbsp;' .. gas
+
 	local buildtime = tonumber(args.buildtime or 0) or 0
 	if buildtime ~= 0 then
-		buildtime = '&nbsp;' .. (_TIME[args.race or ''] or _TIME['default']) .. '&nbsp;' .. buildtime
+		buildtime = '&nbsp;' .. (_TIME[race or ''] or _TIME['default']) .. '&nbsp;' .. buildtime
 	else
 		buildtime = ''
 	end
+
 	local supply = args.supply or args.control or args.psy or 0
 	supply = tonumber(supply) or 0
 	if supply == 0 then
 		supply = ''
 	else
-		supply = '&nbsp;' .. (_SUPPLY[args.race or ''] or _SUPPLY['default']) .. '&nbsp;' .. supply
+		supply = '&nbsp;' .. (_SUPPLY[race or ''] or _SUPPLY['default']) .. '&nbsp;' .. supply
 	end
+
 	return minerals .. '&nbsp;' .. gas .. buildtime .. supply
 end
 
