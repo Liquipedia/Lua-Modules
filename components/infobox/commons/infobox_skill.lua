@@ -89,7 +89,7 @@ function Skill:getMultiArgsForType(args, argType)
 	local argType1 = (args[argType .. 'link'] or args[argType])
 		.. '|' .. args[argType]
 
-	table.insert(typeArgs, argType1)
+	table.insert(typeArgs, '[[' .. argType1 .. ']]')
 
 	for index = 2, _LARGE_NUMBER do
 		if String.isEmpty(args[argType .. index]) then
@@ -97,7 +97,7 @@ function Skill:getMultiArgsForType(args, argType)
 		else
 			local indexedArgType = (args[argType .. index .. 'link'] or args[argType .. index])
 				.. '|' .. args[argType .. index]
-			table.insert(typeArgs, indexedArgType)
+			table.insert(typeArgs, '[[' .. indexedArgType .. ']]')
 		end
 	end
 
