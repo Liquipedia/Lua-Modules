@@ -44,7 +44,7 @@ function Infobox:image(fileName, default, size)
     local infoboxImage = mw.html.create('div'):addClass('infobox-image')
     size = tonumber(size or '')
     if size then
-        size = size .. 'px' 
+        size = size .. 'px'
         infoboxImage:addClass('infobox-fixed-size-image')
     else
         size = '600px'
