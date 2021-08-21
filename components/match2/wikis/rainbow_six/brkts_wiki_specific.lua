@@ -257,7 +257,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 		end
 	else -- For best of >1, disply the map wins
 		for i = 1, MAX_NUM_MAPS do
-			if match['map'..i] and match['map'..i].winner then
+			if match['map'..i] then
 				local winner = tonumber(match['map'..i].winner)
 				foundScores = true
 				-- Only two opponents in R6
