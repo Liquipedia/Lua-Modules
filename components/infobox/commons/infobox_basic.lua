@@ -1,6 +1,9 @@
 local Class = require('Module:Class')
 local Infobox = require('Module:Infobox')
+local String = require('Module:StringUtils')
 local getArgs = require('Module:Arguments').getArgs
+
+local _LARGE_NUMBER = 99
 
 local BasicInfobox = Class.new(
 	function(self, frame)
@@ -32,7 +35,7 @@ function BasicInfobox:createBottomContent(infobox)
 end
 
 --- Allows for using this for customCells
-function Skill:getMultiArgsForType(args, argType)
+function BasicInfobox:getMultiArgsForType(args, argType)
 	local typeArgs = {}
 	if String.isEmpty(args[argType]) then
 		return typeArgs
@@ -57,7 +60,7 @@ function Skill:getMultiArgsForType(args, argType)
 end
 
 --- Allows for using this for customCells
-function Skill:getMultiArgsForTypeNoLink(args, argType)
+function BasicInfobox:getMultiArgsForTypeNoLink(args, argType)
 	local typeArgs = {}
 	if String.isEmpty(args[argType]) then
 		return typeArgs
