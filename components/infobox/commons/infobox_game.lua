@@ -38,7 +38,7 @@ function Game:createInfobox(frame)
 end
 
 --- Allows for using this for customCells
-function Skill:getMultiArgsForTypeNoLink(args, argType)
+function Game:getMultiArgsForTypeNoLink(args, argType)
 	local typeArgs = {}
 	if String.isEmpty(args[argType]) then
 		return typeArgs
