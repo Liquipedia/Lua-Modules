@@ -76,7 +76,9 @@ function StarCraft2Spell:getResearchFrom(infobox, args)
 	if String.isEmpty(args.from) then
 		from = 'No research needed'
 	elseif not String.isEmpty(args.from2) then
-		from = from .. ', ' .. args.from2
+		from = '[[' .. from .. ']], [[' .. args.from2 .. ']]'
+	else
+		from = '[[' .. from .. ']]'
 	end
 
 	return from
