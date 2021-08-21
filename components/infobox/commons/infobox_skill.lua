@@ -42,7 +42,7 @@ function Skill:createInfobox(frame)
 
 	if Namespace.isMain() then
 		local categories = self:getCategories(infobox, args)
-		infobox:categories('Skills')
+		infobox:categories(categories)
 	end
 
 	return infobox:build()
@@ -74,7 +74,7 @@ function Skill:getHotkeys(infobox, args)
 			display = Hotkey.hotkey(args.hotkey)
 		end
 	end
-	
+
 	return description, display
 end
 
