@@ -39,7 +39,7 @@ end
 
 function Game:_getMultiArgsForType(args, argType)
 	local typeArgs = {}
-	if not args[argType] then
+	if String.isEmpty(args[argType]) then
 		return typeArgs
 	end
 
