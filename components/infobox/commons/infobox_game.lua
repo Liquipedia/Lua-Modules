@@ -22,11 +22,11 @@ function Game:createInfobox(frame)
 	infobox:centeredCell(args.caption)
 	infobox:header('Game Information', true)
 	infobox:fcell(Cell:new('Developer'):options({}):content(
-		unpack(self:getMultiArgsForType(args, 'developer'))):make())
+		unpack(self:getMultiArgsForTypeNoLink(args, 'developer'))):make())
 	infobox:fcell(Cell:new('Release Dates'):options({}):content(
-		unpack(self:getMultiArgsForType(args, 'releasedate'))):make())
+		unpack(self:getMultiArgsForTypeNoLink(args, 'releasedate'))):make())
 	infobox:fcell(Cell:new('Platforms'):options({}):content(
-		unpack(self:getMultiArgsForType(args, 'platform'))):make())
+		unpack(self:getMultiArgsForTypeNoLink(args, 'platform'))):make())
 	self:addCustomCells(infobox, args)
 	infobox:bottom(self:createBottomContent(infobox))
 
@@ -38,24 +38,19 @@ function Game:createInfobox(frame)
 end
 
 --- Allows for using this for customCells
-function Game:getMultiArgsForType(args, argType)
+function Skill:getMultiArgsForTypeNoLink(args, argType)
 	local typeArgs = {}
 	if String.isEmpty(args[argType]) then
 		return typeArgs
 	end
 
-	local argType1 = (args[argType .. 'link'] or args[argType])
-		.. '|' .. args[argType]
-
-	table.insert(typeArgs, argType1)
+	table.insert(typeArgs, args[argType])
 
 	for index = 2, _LARGE_NUMBER do
 		if String.isEmpty(args[argType .. index]) then
 			break
 		else
-			local indexedArgType = (args[argType .. index .. 'link'] or args[argType .. index])
-				.. '|' .. args[argType .. index]
-			table.insert(typeArgs, indexedArgType)
+			table.insert(typeArgs, args[argType .. index])
 		end
 	end
 
