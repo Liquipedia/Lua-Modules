@@ -9,8 +9,8 @@ local Game = Class.new(BasicInfobox)
 local _LARGE_NUMBER = 99
 
 function Game.run(frame)
-	local map = Game(frame)
-	return map:createInfobox(frame)
+	local game = Game(frame)
+	return game:createInfobox(frame)
 end
 
 function Game:createInfobox(frame)
