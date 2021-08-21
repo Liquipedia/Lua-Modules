@@ -15,7 +15,7 @@ function StarCraft2Ability.run(frame)
 	ability.getNameDisplay = StarCraft2Ability.getNameDisplay
 	ability.addCustomCells = StarCraft2Ability.addCustomCells
 	ability.addToLpdb = StarCraft2Ability.addToLpdb
-	
+
 	return ability:createInfobox(frame)
 end
 
