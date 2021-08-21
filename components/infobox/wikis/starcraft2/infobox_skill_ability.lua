@@ -108,9 +108,9 @@ function StarCraft2Ability:getHotkeys(infobox, args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkeys.hotkey(args.hotkey, args.hotkey2, 'slash')
 		else
-			display = Hotkey.hotkey(args.hotkey)
+			display = Hotkeys.hotkey(args.hotkey)
 		end
 	end
 
