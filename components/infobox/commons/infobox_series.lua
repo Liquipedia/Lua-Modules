@@ -5,6 +5,7 @@ local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Locale = require('Module:Locale')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local Localisation = require('Module:Localisation')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
 local BasicInfobox = require('Module:Infobox/Basic')
@@ -127,13 +128,13 @@ function Series:createTier(tier, tierType)
     local hasTierType = tierType ~= nil and tierType ~= ''
 
     if hasTierType then
-        local tierTypeDisplay = Template.safeExpand(self.frame, 'TierDisplay/' .. tierType)
+        local tierTypeDisplay = Template.safeExpand(self.infobox.frame, 'TierDisplay/' .. tierType)
         output = output .. '[[' .. tierTypeDisplay .. '_Tournaments|' .. tierTypeDisplay .. ']]'
         output = output .. '&nbsp;('
 
     end
 
-    local tierDisplay = Template.safeExpand(self.frame, 'TierDisplay/' .. tier)
+    local tierDisplay = Template.safeExpand(self.infobox.frame, 'TierDisplay/' .. tier)
     output = output .. '[[' .. tierDisplay .. '_Tournaments|' .. tierDisplay .. ']]'
 
     if hasTierType then
@@ -156,7 +157,7 @@ function Series:_setCountryCategories(country)
         return ''
     end
 
-    local countryAdjective = Template.safeExpand(self.frame, 'localisation', {country})
+    Localisation.getLocalisation(country)
     if countryAdjective == 'error' then
         return 'Unrecognised Country||' .. country
     end
