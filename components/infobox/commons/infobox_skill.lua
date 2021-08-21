@@ -18,7 +18,7 @@ function Skill:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
 
-	if (args.informationType) then
+	if String.isEmpty(args.informationType) then
 		error('You need to specify an informationType')
 	end
 
@@ -26,24 +26,24 @@ function Skill:createInfobox(frame)
 	local durationDescription, durationDisplay = self:getDuration(infobox, args)
 
 	infobox:name(args.name)
-	infobox:image(args.image, args.defaultImage)
+	infobox:image(args.image, args.defaultImage, args.imageSize)
 	infobox:centeredCell(args.caption)
-	infobox:header(args.informationType' Information', true)
+	infobox:header(args.informationType .. ' Information', true)
 	infobox:fcell(Cell:new('Caster(s)'):options({}):content(
 		unpack(self:getMultiArgsForType(args, 'caster'))):make())
 	infobox:cell('Cost', self:getCostDisplay(infobox, args))
 	infobox:cell(hotkeyDescription, hotkeyDisplay)
 	infobox:cell('Range', args.range)
 	infobox:cell('Radius', args.radius)
-	infobox:cell(durationDescription, durationDisplay)
 	infobox:cell('Cooldown', args.cooldown)
+	infobox:cell(durationDescription, durationDisplay)
 	self.infobox:centeredCell(args.footnotes)
 	self:addCustomCells(infobox, args)
 	infobox:bottom(self:createBottomContent(infobox))
 
 	if Namespace.isMain() then
 		local categories = self:getCategories(infobox, args)
-		infobox:categories(categories)
+		infobox:categories(unpack(categories))
 	end
 
 	return infobox:build()
