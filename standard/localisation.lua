@@ -26,7 +26,7 @@ function Localisation.getCountryName(country, noentry)
 	return countryname
 end
 
-function Localisation.getLocalisation(country, noentry)
+function Localisation.getLocalisation(country, noentry, simpleError)
 	noentry = noentry or ''
 	local dataModuleName = 'Module:Localisation/data/localised'
 	local data = mw.loadData(dataModuleName)
@@ -43,6 +43,8 @@ function Localisation.getLocalisation(country, noentry)
 		-- set category unless second argument is set
 		if noentry ~= '' then
 			localised = ''
+		elseif not String.isEmpty(simpleError) then
+			localised = 'error'
 		else
 			localised = 'Unknown country "[[lpcommons:' .. dataModuleName ..
 				'|' .. country .. ']][[Category:Pages with unknown countries]]'
