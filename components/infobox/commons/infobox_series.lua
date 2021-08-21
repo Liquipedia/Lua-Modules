@@ -158,11 +158,7 @@ function Series:_setCountryCategories(country)
     end
 
     local countryAdjective = Localisation.getLocalisation(country)
-    if
-        countryAdjective == 'Unknown country "[[lpcommons:' ..
-        dataModuleName .. '|' .. country ..
-        ']][[Category:Pages with unknown countries]]'
-    then
+    if countryAdjective == 'error' then
         return 'Unrecognised Country||' .. country
     end
 
