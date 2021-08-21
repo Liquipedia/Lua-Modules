@@ -23,6 +23,7 @@ function Skill:createInfobox(frame)
 	end
 
 	local hotkeyDescription, hotkeyDisplay = self:getHotkeys(infobox, args)
+	local durationDescription, durationDisplay = self:getDuration(infobox, args)
 
 	infobox:name(args.name)
 	infobox:image(args.image, args.defaultImage)
@@ -34,7 +35,7 @@ function Skill:createInfobox(frame)
 	infobox:cell(hotkeyDescription, hotkeyDisplay)
 	infobox:cell('Range', args.range)
 	infobox:cell('Radius', args.radius)
-	infobox:cell('Duration', self:getDurationDisplay(infobox, args))
+	infobox:cell(durationDescription, durationDisplay)
 	infobox:cell('Cooldown', args.cooldown)
 	self.infobox:centeredCell(args.footnotes)
 	self:addCustomCells(infobox, args)
@@ -54,13 +55,8 @@ function Skill:getCategories(infobox, args)
 end
 
 --- Allows for overriding this functionality
-function Skill:getDurationDisplay(infobox, args)
-	return args.duration
-end
-
---- Allows for overriding this functionality
-function Skill:getDurationDisplay(infobox, args)
-	return args.duration
+function Skill:getDuration(infobox, args)
+	return 'Duration', args.duration
 end
 
 --- Allows for overriding this functionality
