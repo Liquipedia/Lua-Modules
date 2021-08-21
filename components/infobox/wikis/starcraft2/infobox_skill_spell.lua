@@ -7,7 +7,6 @@ local StarCraft2Spell = {}
 
 local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
 local _GAS = mw.loadData('Module:Gas')
-local _SUPPLY = mw.loadData('Module:Supply')
 local _TIME = mw.loadData('Module:Buildtime')
 local _ENERGY = '[[File:EnergyIcon.gif|link=Energy]]'
 
