@@ -41,6 +41,7 @@ function StarCraft2Map:addToLpdb(lpdbData, args)
 	lpdbData.name = StarCraft2Map:getNameDisplay(args)
 	lpdbData.extradata = {
 		creator = args.creator,
+		creator2 = args.creator2,
 		spawns = args.players,
 		height = args.height,
 		width = args.width,
@@ -66,7 +67,7 @@ function StarCraft2Map:_getSpawn(args, id)
 end
 
 function StarCraft2Map:_getRushDistance(args)
-	if String.isEmpty(args.name) then
+	if String.isEmpty(args['rush_distance']) then
 		return nil
 	end
 	local rushDistance = args['rush_distance']
