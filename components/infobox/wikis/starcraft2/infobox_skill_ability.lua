@@ -22,7 +22,6 @@ function StarCraft2Ability.run(frame)
 end
 
 function StarCraft2Ability:addCustomCells(infobox, args)
-
 	local duration2Description, duration2Display = StarCraft2Ability:getDuration2(infobox, args)
 
 	infobox:cell(duration2Description, duration2Display)
