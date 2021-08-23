@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Infobox/Company/Custom
+--
+
 local Company = require('Module:Infobox/Company')
 
 local CustomCompany = {}
