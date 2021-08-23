@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=rocketleague
+-- page=Module:GetMatchGroupCopyPaste/wiki
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local wikiCopyPaste = require('Module:GetMatchGroupCopyPaste/wiki/Base')
 
 --allowed opponent types on the wiki
