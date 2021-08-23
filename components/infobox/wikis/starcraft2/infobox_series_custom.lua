@@ -1,3 +1,7 @@
+-- This file is for
+-- wiki=starcraft2
+-- page=Module:Infobox/Series/Custom
+
 local Series = require('Module:Infobox/Series')
 local Autopatch = require('Module:Automated Patch')._main
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')._get
