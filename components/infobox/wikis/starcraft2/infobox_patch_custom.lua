@@ -1,3 +1,7 @@
+-- This file is for
+-- wiki=starcraft2
+-- page=Module:Infobox/Patch/Custom
+
 local Patch = require('Module:Infobox/Patch')
 
 local StarCraft2Patch = {}
