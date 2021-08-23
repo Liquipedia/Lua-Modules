@@ -17,7 +17,7 @@ function Skill:createInfobox(frame)
 	local args = self.args
 
 	if String.isEmpty(args.informationType) then
-		error('You need to specify an informationType')
+		error('You need to specify an informationType, e.g. "Spell", "Ability, ...')
 	end
 
 	local hotkeyDescription, hotkeyDisplay = self:getHotkeys(infobox, args)
