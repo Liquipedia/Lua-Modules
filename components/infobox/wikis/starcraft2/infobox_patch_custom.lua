@@ -1,6 +1,8 @@
--- This file is for
+---
+-- @Liquipedia
 -- wiki=starcraft2
 -- page=Module:Infobox/Patch/Custom
+--
 
 local Patch = require('Module:Infobox/Patch')
 
