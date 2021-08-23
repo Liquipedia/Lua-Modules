@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Infobox/Company
+--
+
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
 local InfoboxBasic = require('Module:Infobox/Basic')
