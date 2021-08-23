@@ -1,3 +1,7 @@
+-- This file is for
+-- wiki=starcraft2
+-- page=Module:Infobox/Show/Custom
+
 local Show = require('Module:Infobox/Show')
 local Namespace = require('Module:Namespace')
 local StarCraft2Show = {}
