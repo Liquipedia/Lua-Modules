@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Infobox/Strategy/Custom
+--
+
 local Strategy = require('Module:Infobox/Strategy')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
