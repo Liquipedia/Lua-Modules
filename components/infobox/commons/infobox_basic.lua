@@ -1,9 +1,8 @@
 local Class = require('Module:Class')
 local Infobox = require('Module:Infobox')
 local String = require('Module:StringUtils')
+local Logic = require('Module:Logic')
 local getArgs = require('Module:Arguments').getArgs
-
-local _LARGE_NUMBER = 99
 
 local BasicInfobox = Class.new(
 	function(self, frame)
@@ -35,48 +34,34 @@ function BasicInfobox:createBottomContent(infobox)
 end
 
 --- Allows for using this for customCells
-function BasicInfobox:getMultiArgsForType(args, argType)
-	local typeArgs = {}
-	if String.isEmpty(args[argType]) then
-		return typeArgs
+function BasicInfobox:getAllArgsForBase(args, base, options)
+	local foundArgs = {}
+	if String.isEmpty(args[base]) then
+		return foundArgs
 	end
 
-	local argType1 = (args[argType .. 'link'] or args[argType])
-		.. '|' .. args[argType]
+	local makeLink = Logic.readBool(options.makeLink)
 
-	table.insert(typeArgs, '[[' .. argType1 .. ']]')
+	local base1 = args[base]
+	if makeLink then
+		base1 = '[[' .. (args[base .. 'link'] or base1)
+			.. '|' .. base1 .. ']]'
+	end
 
-	for index = 2, _LARGE_NUMBER do
-		if String.isEmpty(args[argType .. index]) then
-			break
-		else
-			local indexedArgType = (args[argType .. index .. 'link'] or args[argType .. index])
-				.. '|' .. args[argType .. index]
-			table.insert(typeArgs, '[[' .. indexedArgType .. ']]')
+	table.insert(foundArgs, base1)
+	local index = 2
+
+	while not String.isEmpty(args[argType .. index]) do
+		local indexedbase = args[base .. index]
+		if makeLink then
+			indexedbase = '[[' .. (args[base .. index .. 'link'] or indexedbase)
+				.. '|' .. indexedbase .. ']]'
 		end
+		table.insert(foundArgs, indexedbase)
+		index = index + 1
 	end
 
-	return typeArgs
-end
-
---- Allows for using this for customCells
-function BasicInfobox:getMultiArgsForTypeNoLink(args, argType)
-	local typeArgs = {}
-	if String.isEmpty(args[argType]) then
-		return typeArgs
-	end
-
-	table.insert(typeArgs, args[argType])
-
-	for index = 2, _LARGE_NUMBER do
-		if String.isEmpty(args[argType .. index]) then
-			break
-		else
-			table.insert(typeArgs, args[argType .. index])
-		end
-	end
-
-	return typeArgs
+	return foundArgs
 end
 
 return BasicInfobox
