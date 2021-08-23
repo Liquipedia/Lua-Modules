@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:BracketAlias
+--
+
 --[[
 Alias List for Brackets (for the Generator Special:RunQuery)
 please keep the keys (the entries inside the [] brackets) all lower case
