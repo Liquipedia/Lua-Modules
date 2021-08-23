@@ -16,21 +16,21 @@ local function GetBirthAndDeath()
 	return '', nil, nil, nil
 end
 
-local Player = Class.new(BasicInfobox)
+local Person = Class.new(BasicInfobox)
 
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
 local _SHOULD_STORE_DATA
 
-function Player.run(frame)
-	local player = Player(frame)
-	return player:createInfobox(frame)
+function Person.run(frame)
+	local person = Person(frame)
+	return person:createInfobox(frame)
 end
 
-function Player:createInfobox(frame)
+function Person:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
-	_SHOULD_STORE_DATA = Player:shouldStoreData(args)
+	_SHOULD_STORE_DATA = Person:shouldStoreData(args)
 
 	local earnings = self:calculateEarnings(args)
 	Variables.varDefine('earnings', earnings)
@@ -136,7 +136,7 @@ function Player:createInfobox(frame)
 end
 
 --- Allows for overriding this functionality
-function Player:getCategories(infobox, args, role, status)
+function Person:getCategories(infobox, args, role, status)
 	infobox:categories(role .. 's')
 	if not args.teamlink and not args.team then
 		infobox:categories('Teamless ' .. role .. 's')
@@ -170,44 +170,44 @@ function Player:getCategories(infobox, args, role, status)
 end
 
 --- Allows for overriding this functionality
-function Player:getStorageType(args, role, status)
+function Person:getStorageType(args, role, status)
 	return 'player'
 end
 
 --- Allows for overriding this functionality
-function Player:getInformationType(args)
+function Person:getInformationType(args)
 	return args.informationType or 'Player'
 end
 
 --- Allows for overriding this functionality
-function Player:adjustLPDB(lpdbData, args, role, status)
+function Person:adjustLPDB(lpdbData, args, role, status)
 	return lpdbData
 end
 
 --- Allows for overriding this functionality
-function Player:getRole(args)
+function Person:getRole(args)
 	return { display = args.role, store = args.role, category = args.role or 'Player'}
 end
 
 --- Allows for overriding this functionality
-function Player:getStatus(args)
+function Person:getStatus(args)
 	return { display = args.status, store = args.status }
 end
 
 --- Allows for overriding this functionality
-function Player:getHistory(infobox, args)
+function Person:getHistory(infobox, args)
 	return args.history
 end
 
 --- Allows for overriding this functionality
 --- Decides if we store in LPDB and Vars or not
-function Player:shouldStoreData(args)
+function Person:shouldStoreData(args)
 	return Namespace.isMain()
 end
 
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
-function Player:nameDisplay(args)
+function Person:nameDisplay(args)
 	local team = args.teamlink or args.team
 	local icon = mw.ext.TeamTemplate.teamexists(team)
 		and mw.ext.TeamTemplate.teamicon(team) or ''
@@ -217,16 +217,16 @@ function Player:nameDisplay(args)
 end
 
 --- Allows for overriding this functionality
-function Player:getAchievements(infobox, args)
+function Person:getAchievements(infobox, args)
 	return args.achievements
 end
 
 --- Allows for overriding this functionality
-function Player:calculateEarnings(args)
+function Person:calculateEarnings(args)
 	return 0
 end
 
-function Player:_createRegion(region)
+function Person:_createRegion(region)
 	if region == nil or region == '' then
 		return ''
 	end
@@ -234,19 +234,19 @@ function Player:_createRegion(region)
 	return Template.safeExpand(self.frame, 'Region', {region})
 end
 
-function Player:_createLocations(args, role)
+function Person:_createLocations(args, role)
 	local countryDisplayData = {}
 	local country = args.country or args.country1 or args.nationality or args.nationality1
 	if country == nil or country == '' then
 		return countryDisplayData
 	end
 
-	countryDisplayData[1] = Player:_createLocation(country, args.location, role)
+	countryDisplayData[1] = Person:_createLocation(country, args.location, role)
 
 	local index = 2
 	country = args['country2'] or args['nationality2']
 	while(not String.isEmpty(country)) do
-		countryDisplayData[index] = Player:_createLocation(country, args['location' .. index], role)
+		countryDisplayData[index] = Person:_createLocation(country, args['location' .. index], role)
 		index = index + 1
 		country = args['country' .. index] or args['nationality' .. index]
 	end
@@ -254,7 +254,7 @@ function Player:_createLocations(args, role)
 	return countryDisplayData
 end
 
-function Player:_createLocation(country, location, role)
+function Person:_createLocation(country, location, role)
 	if country == nil or country == '' then
 		return nil
 	end
@@ -267,7 +267,7 @@ function Player:_createLocation(country, location, role)
 				.. (location ~= nil and (',&nbsp;' .. location) or '')
 end
 
-function Player:_createTeam(team, link)
+function Person:_createTeam(team, link)
 	link = link or team
 	if link == nil or link == '' then
 		return ''
@@ -281,4 +281,4 @@ function Player:_createTeam(team, link)
 	return '[[' .. link .. '|' .. team .. ']]'
 end
 
-return Player
+return Person
