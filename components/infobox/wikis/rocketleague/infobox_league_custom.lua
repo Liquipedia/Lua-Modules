@@ -111,26 +111,24 @@ function RLLeague:createPrizepool(args)
 end
 
 function RLLeague:addCustomContent(infobox, args)
-	if String.isEmpty(args.map1) then
-		return infobox
+	if not String.isEmpty(args.map1) then
+		infobox:header('Maps', true)
+
+		local maps = {RLLeague:_makeInternalLink(args.map1)}
+		local index  = 2
+
+		while not String.isEmpty(args['map' .. index]) do
+			table.insert(maps, '&nbsp;• ' ..
+				tostring(RLLeague:_createNoWrappingSpan(
+					RLLeague:_makeInternalLink(args['map' .. index])
+				))
+			)
+			index = index + 1
+		end
+		infobox	:centeredCell(unpack(maps))
 	end
 
-	infobox:header('Maps', true)
-
-	local maps = {RLLeague:_makeInternalLink(args.map1)}
-	local index  = 2
-
-	while not String.isEmpty(args['map' .. index]) do
-		table.insert(maps, '&nbsp;• ' ..
-			tostring(RLLeague:_createNoWrappingSpan(
-				RLLeague:_makeInternalLink(args['map' .. index])
-			))
-		)
-		index = index + 1
-	end
-
-	infobox	:centeredCell(unpack(maps))
-			:header('Teams', true)
+	infobox	:header('Teams', not String.isEmpty(args.team_number))
 			:cell('Number of teams', args.team_number)
 
     return infobox
