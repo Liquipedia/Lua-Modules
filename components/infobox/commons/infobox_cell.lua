@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Infobox/Cell
+--
+
 local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 
