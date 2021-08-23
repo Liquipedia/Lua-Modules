@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Infobox/League/Custom
+--
+
 local League = require('Module:Infobox/League')
 
 local CustomLeague = {}
