@@ -72,7 +72,9 @@ function League:createInfobox()
 				:cell('Location', self:_createLocation({
 					region = args.region,
 					country = args.country,
-					location = args.city or args.location
+					country2 = args.country2,
+					location = args.city or args.location,
+					location2 = args.city or args.location2
 				}))
 				:cell('Venue', args.venue)
 				:cell('Format', args.format)
@@ -244,12 +246,39 @@ function League:_createLocation(details)
 		return nil
 	end
 
-	local nationality = Localisation.getLocalisation(details.country)
-	local countryName = Localisation.getCountryName(details.country)
-    return Flags._Flag(details.country) .. '&nbsp;' ..
-		'[[:Category:' .. nationality .. ' Tournaments|' ..
-		(details.location or countryName) .. ']]' ..
-		'[[Category:' .. nationality .. ' Tournaments]]'
+	if String.isEmpty(details.country) then
+		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/TBD')
+	end
+
+	local content
+	local nationality = Localisation.getLocalisation({displayNoError = true}, details.country)
+
+	if String.isEmpty(nationality) then
+			content = '[[Category:Unrecognised Country|' .. details.country .. ']]'
+	else
+		local countryName = Localisation.getCountryName(details.country)
+		content = Flags._Flag(details.country) .. '&nbsp;' ..
+			'[[:Category:' .. nationality .. ' Tournaments|' ..
+			(details.location or countryName) .. ']]' ..
+			'[[Category:' .. nationality .. ' Tournaments]]'
+	end
+
+	if not String.isEmpty(details.country2) then
+		content = content .. '<br>'
+		local nationality2 = Localisation.getLocalisation({displayNoError = true}, details.country2)
+
+		if String.isEmpty(nationality2) then
+			content = content .. '[[Category:Unrecognised Country|' .. details.country2 .. ']]'
+		else
+			local countryName2 = Localisation.getCountryName(details.country2)
+			content = content .. Flags._Flag(details.country2) .. '&nbsp;' ..
+				'[[:Category:' .. nationality2 .. ' Tournaments|' ..
+				(details.location2 or countryName2) .. ']]' ..
+				'[[Category:' .. nationality2 .. ' Tournaments]]'
+		end
+	end
+
+	return content
 end
 
 function League:_createSeries(frame, series, abbreviation)
