@@ -1,6 +1,8 @@
--- This file is for
+---
+-- @Liquipedia
 -- wiki=starcraft2
 -- page=Module:Infobox/Map/Custom
+--
 
 local Map = require('Module:Infobox/Map')
 local Template = require('Module:Template')
