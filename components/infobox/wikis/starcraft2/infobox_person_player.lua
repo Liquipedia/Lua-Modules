@@ -71,7 +71,7 @@ local _CLEAN_OTHER_ROLES = {
 
 local earningsGlobal = {}
 local pagename = mw.title.getCurrentTitle().prefixedText
-local currentYear = tonumber(os.date('%Y'))
+local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _SHOULD_STORE_DATA
 local hasAchievements
 local raceData
@@ -391,12 +391,12 @@ function CustomPlayer:addCustomCells(infobox, args)
 		infobox:categories(activeCategory)
 	end
 
-	local currentYearEarnings = earningsGlobal[tostring(currentYear)]
+	local currentYearEarnings = earningsGlobal[tostring(_CURRENT_YEAR)]
 	if currentYearEarnings then
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
-	infobox:cell('Approx. Earnings ' .. currentYear, currentYearEarnings)
+	infobox:cell('Approx. Earnings ' .. _CURRENT_YEAR, currentYearEarnings)
 	infobox:cell(rank1.name or 'Rank', rank1.rank)
 	infobox:cell(rank2.name or 'Rank', rank2.rank)
 	infobox:cell('Military Service', CustomPlayer._military(args.military))
@@ -428,14 +428,14 @@ function CustomPlayer._getMatchupData(player)
 			years[tonumber(string.sub(data[i].date, 1, 4))] = string.sub(data[i].date, 1, 4)
 		end
 
-		if years[currentYear] ~= nil or years[currentYear - 1] ~= nil or years[currentYear - 2] ~= nil then
+		if years[_CURRENT_YEAR] ~= nil or years[_CURRENT_YEAR - 1] ~= nil or years[_CURRENT_YEAR - 2] ~= nil then
 			category = 'Active players'
 			Variables.varDefine('isActive', 'true')
 		else
 			category = 'Players with no matches in the last three years'
 		end
 
-		local yearsActive = CustomPlayer._getYearsActive(years, currentYear)
+		local yearsActive = CustomPlayer._getYearsActive(years)
 
 		yearsActive = string.gsub(yearsActive, '<br>', '', 1)
 
@@ -449,9 +449,9 @@ function CustomPlayer._getYearsActive(years)
 	local tempYear = nil
 	local firstYear = true
 
-	for i = 2010, currentYear do
+	for i = 2010, _CURRENT_YEAR do
 		if years[i] then
-			if (not tempYear) and (i ~= currentYear) then
+			if (not tempYear) and (i ~= _CURRENT_YEAR) then
 				if firstYear then
 					firstYear = nil
 				else
@@ -460,7 +460,7 @@ function CustomPlayer._getYearsActive(years)
 				yearsActive = yearsActive .. years[i]
 				tempYear = years[i]
 			end
-			if i == currentYear then
+			if i == _CURRENT_YEAR then
 				if tempYear then
 					yearsActive = yearsActive .. '&nbsp;-&nbsp;<b>Present</b>'
 				else
