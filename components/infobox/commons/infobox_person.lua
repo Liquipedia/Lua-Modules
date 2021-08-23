@@ -8,6 +8,7 @@ local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Localisation = require('Module:Localisation').getLocalisation
 local Flags = require('Module:Flags')
+local String = require('Module:StringUtils')
 --local GetBirthAndDeath = require('Module:???')._get
 
 --the following 3 lines as a temp workaround until the Birth&Death stuff is implemented:
@@ -61,13 +62,11 @@ function Player:createInfobox(frame)
 	infobox:cell('Status', status.display)
 	infobox:cell(role.title or 'Role', role.display)
 	infobox:fcell(Cell	:new('Country')
-						:options({})
 						:content(unpack(self:_createLocations(args, role.category)))
 						:make()
 			)
 			:cell('Region', self:_createRegion(args.region))
 			:fcell(Cell	:new('Team')
-						:options({})
 						:content(
 							self:_createTeam(args.team, args.teamlink),
 							self:_createTeam(args.team2, args.teamlink2)
@@ -75,7 +74,6 @@ function Player:createInfobox(frame)
 						:make()
 			)
 			:fcell(Cell	:new('Clan')
-						:options({})
 						:content(
 							self:_createTeam(args.clan, args.clanlink),
 							self:_createTeam(args.clan2, args.clanlink2)
@@ -102,40 +100,14 @@ function Player:createInfobox(frame)
 	infobox:bottom(self:createBottomContent(infobox, args))
 
 	if shouldStoreData then
-		infobox:categories(role.category .. 's')
-		if not args.teamlink and not args.team then
-			infobox:categories('Teamless ' .. role.category .. 's')
-		end
-		if args.country2 or args.nationality2 then
-			infobox:categories('Dual Citizenship ' .. role.category .. 's')
-		end
-		if args.death_date then
-			infobox:categories('Deceased ' .. role.category .. 's')
-		end
-		if
-			args.retired == 'yes' or args.retired == 'true'
-			or string.lower(status.store or '') == 'retired'
-			or string.match(args.retired or '', '%d%d%d%d%')--if retired has year set apply the retired category
-		then
-			infobox:categories('Retired ' .. role.category .. 's')
-		else
-			infobox:categories('Active ' .. role.category .. 's')
-		end
-		if not args.id then
-			infobox:categories('InfoboxIncomplete.')
-		end
-		if not args.image then
-			infobox:categories(role.category .. 's with no profile picture')
-		end
-		if not birthDisplay then
-			infobox:categories(role.category .. 's with unknown birth date')
-		end
+		self:getCategories(infobox, args, role.category, status.store)
 
 		links = self:_getLinksLPDB(links)
 		local lpdbData = {
 			id = args.id or mw.title.getCurrentTitle().prefixedText,
 			alternateid = args.ids,
 			name = args.romanized_name or args.name,
+			romanizedname = args.romanized_name or args.name,
 			localizedname = args.name,
 			nationality = args.country or args.nationality,
 			nationality2 = args.country2 or args.nationality2,
@@ -160,6 +132,41 @@ function Player:createInfobox(frame)
 	end
 
 	return infobox:build()
+end
+
+--- Allows for overriding this functionality
+function Player:getCategories(infobox, args, role, status)
+	infobox:categories(role .. 's')
+	if not args.teamlink and not args.team then
+		infobox:categories('Teamless ' .. role .. 's')
+	end
+	if args.country2 or args.nationality2 then
+		infobox:categories('Dual Citizenship ' .. role .. 's')
+	end
+	if args.death_date then
+		infobox:categories('Deceased ' .. role .. 's')
+	end
+	if
+		args.retired == 'yes' or args.retired == 'true'
+		or string.lower(status or '') == 'retired'
+		or string.match(args.retired or '', '%d%d%d%d%')--if retired has year set apply the retired category
+	then
+		infobox:categories('Retired ' .. role .. 's')
+	else
+		infobox:categories('Active ' .. role .. 's')
+	end
+	if not args.id then
+		infobox:categories('InfoboxIncomplete.')
+	end
+	if not args.image then
+		infobox:categories(role .. 's with no profile picture')
+	end
+	if not birthDisplay then
+		infobox:categories(role .. 's with unknown birth date')
+	end
+	
+	
+	return 'player'
 end
 
 --- Allows for overriding this functionality
@@ -236,13 +243,12 @@ function Player:_createLocations(args, role)
 
 	countryDisplayData[1] = Player:_createLocation(country, args.location, role)
 
-	for index = 2, 99 do
+	local index = 2
+	local country = args['country2'] or args['nationality2']
+	while(not String.isEmpty(country)) do
+		countryDisplayData[index] = Player:_createLocation(country, args['location' .. index], role)
+		index = index + 1
 		country = args['country' .. index] or args['nationality' .. index]
-		if country == nil or country == '' then
-			break
-		else
-			countryDisplayData[index] = Player:_createLocation(country, args['location' .. index], role)
-		end
 	end
 
 	return countryDisplayData
