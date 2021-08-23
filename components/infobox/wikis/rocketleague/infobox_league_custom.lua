@@ -3,6 +3,8 @@
 -- wiki=rocketleague
 -- page=Module:Infobox/League/Custom
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local League = require('Module:Infobox/League')
 local Cell = require('Module:Infobox/Cell')
