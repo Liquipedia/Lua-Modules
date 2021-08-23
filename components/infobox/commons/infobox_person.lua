@@ -20,7 +20,7 @@ local Player = Class.new(BasicInfobox)
 
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
-local shouldStoreData
+local _SHOULD_STORE_DATA
 
 function Player.run(frame)
 	local player = Player(frame)
@@ -30,7 +30,7 @@ end
 function Player:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
-	shouldStoreData = Player:shouldStoreData(args)
+	_SHOULD_STORE_DATA = Player:shouldStoreData(args)
 
 	local earnings = self:calculateEarnings(args)
 	Variables.varDefine('earnings', earnings)
@@ -47,7 +47,7 @@ function Player:createInfobox(frame)
 			args.birth_location,
 			args.death_date,
 			role.category,
-			shouldStoreData
+			_SHOULD_STORE_DATA
 		)
 	local status = self:getStatus(args)
 
@@ -99,10 +99,10 @@ function Player:createInfobox(frame)
 	self:addCustomContent(infobox, args)
 	infobox:bottom(self:createBottomContent(infobox, args))
 
-	if shouldStoreData then
+	if _SHOULD_STORE_DATA then
 		self:getCategories(infobox, args, role.category, status.store)
 
-		links = self:_getLinksLPDB(links)
+		links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
 		local lpdbData = {
 			id = args.id or mw.title.getCurrentTitle().prefixedText,
 			alternateid = args.ids,
@@ -268,19 +268,17 @@ function Player:_createLocation(country, location, role)
 end
 
 function Player:_createTeam(team, link)
-	if team == nil or team == '' then
+	link = link or team
+	if link == nil or link == '' then
 		return ''
 	end
-	link = link or team
+
+	if mw.ext.TeamTemplate.teamexists(link) then
+		local data = mw.ext.TeamTemplate.raw(link)
+		return '[[' .. data.page .. '|' .. data.name .. ']]'
+	end
 
 	return '[[' .. link .. '|' .. team .. ']]'
-end
-
-function Player:_getLinksLPDB(links)
-	for key, item in pairs(links) do
-		links[key] = Links.makeFullLink(key, item, _LINK_VARIANT)
-	end
-	return links
 end
 
 return Player
