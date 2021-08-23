@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Infobox/Series/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Series = require('Module:Infobox/Series')
 local Autopatch = require('Module:Automated Patch')._main
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')._get
