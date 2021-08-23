@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Infobox/Series
+--
+
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
 local Template = require('Module:Template')
