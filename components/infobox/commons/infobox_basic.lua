@@ -40,6 +40,7 @@ function BasicInfobox:getAllArgsForBase(args, base, options)
 		return foundArgs
 	end
 
+	options = options or {}
 	local makeLink = Logic.readBool(options.makeLink)
 
 	local baseArg = args[base]
