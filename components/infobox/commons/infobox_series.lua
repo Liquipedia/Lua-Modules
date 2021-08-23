@@ -48,8 +48,6 @@ function Series:createInfobox(frame)
             :links(links)
 
     if Namespace.isMain() then
-        self:addCustomVariables(args)
-
         local lpdbData = {
             name = self.name,
             image = args.image,
