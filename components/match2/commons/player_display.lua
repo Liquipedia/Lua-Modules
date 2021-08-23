@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Player/Display
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
@@ -80,6 +88,7 @@ function PlayerDisplay.InlinePlayer(props)
 
 	return mw.html.create('span'):addClass('inline-player')
 		:addClass(props.flip and 'flipped' or nil)
+		:css('white-space', 'pre')
 		:wikitext(text)
 end
 
