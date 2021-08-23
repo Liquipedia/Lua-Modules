@@ -66,7 +66,7 @@ function Player:createInfobox(frame)
 						:make()
 			)
 			:cell('Region', self:_createRegion(args.region))
-			:fcell(Cell :new('Team')
+			:fcell(Cell	:new('Team')
 						:options({})
 						:content(
 							self:_createTeam(args.team, args.teamlink),
