@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Match/Legacy
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 --[[ToDo:
 * Remove temp smw support (after lpdb api is available)
 ]]--
@@ -37,7 +45,12 @@ function p.storeGames(match, match2)
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 
-		if game.mode == '1v1' and game.extradata.isSubMatch == 'false' then
+		if
+			game.mode == '1v1' and
+			game.extradata.isSubMatch == 'false' and
+			game.winner ~= 'skip' and
+			game.map ~= 'Definitions'
+		then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
 			game.date = match.date
