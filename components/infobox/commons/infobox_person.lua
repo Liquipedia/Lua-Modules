@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Infobox/Person
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
 local BasicInfobox = require('Module:Infobox/Basic')
