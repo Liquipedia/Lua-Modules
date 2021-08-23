@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=rocketleague
+-- page=Module:Match/Legacy
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local p = {}
 
 local json = require("Module:Json")
