@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:TemplateMatch
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local TemplateMatch = {}
 
 local Class = require('Module:Class')
