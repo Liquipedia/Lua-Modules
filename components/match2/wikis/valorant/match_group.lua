@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=valorant
+-- page=Module:MatchGroup
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local MatchGroup = require('Module:MatchGroup/Base')
 local Arguments = require('Module:Arguments')
 local Table = require('Module:Table')
@@ -68,7 +76,7 @@ function CustomMatchGroup._findMatchData(matches, matchId)
 	end
 
 	local parsedMatchId = CustomMatchGroup._convertMatchIdentifier(matchId)
-	local formattedMatchId
+	local formattedMatchId = ''
 
 	if parsedMatchId == nil then
 		formattedMatchId = 'ID_' .. matchId
