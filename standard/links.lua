@@ -154,4 +154,11 @@ function Links.makeFullLink(platform, id, variant)
     return _PREFIXES[platform] .. id
 end
 
+function Links.makeFullLinksForTableItems(links)
+	for key, item in pairs(links) do
+		links[key] = Links.makeFullLink(key, item, _LINK_VARIANT)
+	end
+	return links
+end
+
 return Class.export(Links, {frameOnly = true})
