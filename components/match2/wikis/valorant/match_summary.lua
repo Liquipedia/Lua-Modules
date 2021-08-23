@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=valorant
+-- page=Module:MatchSummary
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require("Module:Logic")
