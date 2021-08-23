@@ -36,13 +36,20 @@ function Infobox:name(name)
     return self
 end
 
-function Infobox:image(fileName, default)
+function Infobox:image(fileName, default, size)
     if (fileName == nil or fileName == '') and (default == nil or default == '') then
         return self
     end
 
     local infoboxImage = mw.html.create('div'):addClass('infobox-image')
-    local fullFileName = '[[File:' .. (fileName or default) .. '|center|600px]]'
+    size = tonumber(size or '')
+    if size then
+        size = size .. 'px'
+        infoboxImage:addClass('infobox-fixed-size-image')
+    else
+        size = '600px'
+    end
+    local fullFileName = '[[File:' .. (fileName or default) .. '|center|' .. size .. ']]'
     infoboxImage:wikitext(self.frame:preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
     self.content:node(mw.html.create('div'):node(infoboxImage))
     return self
