@@ -3,6 +3,8 @@
 -- wiki=commons
 -- page=Module:Infobox/Strategy
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
