@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:MatchGroup/Display
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local MatchGroupDisplay = {}
 local MatchGroupUtil
 local getArgs = require('Module:Arguments').getArgs
