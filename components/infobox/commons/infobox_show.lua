@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Infobox/Show
+--
+
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
