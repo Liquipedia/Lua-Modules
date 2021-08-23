@@ -154,7 +154,9 @@ end
 
 --kick the default history display
 --because we will add it a bit lower again
-function StarCraft2Player:getHistory() return nil end
+function StarCraft2Player:getHistory()
+	return nil
+end
 
 function StarCraft2Player:addCustomContent(infobox, args)
 	local retired
