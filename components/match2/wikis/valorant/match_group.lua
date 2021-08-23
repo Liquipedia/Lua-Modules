@@ -76,7 +76,7 @@ function CustomMatchGroup._findMatchData(matches, matchId)
 	end
 
 	local parsedMatchId = CustomMatchGroup._convertMatchIdentifier(matchId)
-	local formattedMatchId = ''
+	local formattedMatchId
 
 	if parsedMatchId == nil then
 		formattedMatchId = 'ID_' .. matchId
