@@ -7,8 +7,6 @@ local Hotkey = require('Module:Hotkey')
 
 local Skill = Class.new(BasicInfobox)
 
-local _LARGE_NUMBER = 99
-
 function Skill.run(frame)
 	local skill = Skill(frame)
 	return skill:createInfobox(frame)
@@ -30,7 +28,7 @@ function Skill:createInfobox(frame)
 	infobox:centeredCell(args.caption)
 	infobox:header(args.informationType .. ' Information', true)
 	infobox:fcell(Cell:new('Caster(s)'):options({}):content(
-		unpack(self:getMultiArgsForType(args, 'caster'))):make())
+		unpack(self:getAllArgsForBase(args, 'caster', { makeLink = true }))):make())
 	infobox:cell('Cost', self:getCostDisplay(infobox, args))
 	infobox:cell(hotkeyDescription, hotkeyDisplay)
 	infobox:cell('Range', args.range)
@@ -77,31 +75,6 @@ end
 --- Allows for overriding this functionality
 function Skill:getCostDisplay(infobox, args)
 	return args.cost
-end
-
---- Allows for using this for customCells
-function Skill:getMultiArgsForType(args, argType)
-	local typeArgs = {}
-	if String.isEmpty(args[argType]) then
-		return typeArgs
-	end
-
-	local argType1 = (args[argType .. 'link'] or args[argType])
-		.. '|' .. args[argType]
-
-	table.insert(typeArgs, '[[' .. argType1 .. ']]')
-
-	for index = 2, _LARGE_NUMBER do
-		if String.isEmpty(args[argType .. index]) then
-			break
-		else
-			local indexedArgType = (args[argType .. index .. 'link'] or args[argType .. index])
-				.. '|' .. args[argType .. index]
-			table.insert(typeArgs, '[[' .. indexedArgType .. ']]')
-		end
-	end
-
-	return typeArgs
 end
 
 return Skill
