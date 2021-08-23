@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchGroup/Display/Bracket/Starcraft
+--
+
 local BracketDisplay = require('Module:MatchGroup/Display/Bracket')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
