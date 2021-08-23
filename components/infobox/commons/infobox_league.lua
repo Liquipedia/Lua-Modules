@@ -376,7 +376,15 @@ function League:_cleanDate(date)
 end
 
 function League:_exists(page)
-	return mw.title.new(page).exists
+	local existingPage = mw.title.new(page)
+
+	-- In some cases we might have gotten an external link,
+	-- which will mean `existingPage` will equal nil
+	if existingPage == nil then
+		return false
+	end
+
+	return existingPage.exists
 end
 
 function League:_isUnknownDate(date)
