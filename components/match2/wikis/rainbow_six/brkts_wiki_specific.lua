@@ -257,7 +257,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 		end
 	else -- For best of >1, disply the map wins
 		for i = 1, MAX_NUM_MAPS do
-			if match['map'..i] and match['map'..i].winner then
+			if match['map'..i] then
 				local winner = tonumber(match['map'..i].winner)
 				foundScores = true
 				-- Only two opponents in R6
@@ -294,6 +294,7 @@ function matchFunctions.getDateStuff(match)
 		local matchDate = String.explode(matchString, '<', 0):gsub('-', '')
 		match.date = matchDate .. timezone
 		match.dateexact = String.contains(match.date, '%+') or String.contains(match.date, '%-')
+		match.hasDate = true
 	else
 		match.date = lang:formatDate('c', _EPOCH_TIME)
 		match.dateexact = false
@@ -450,7 +451,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) then
+	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
@@ -524,7 +525,7 @@ function mapFunctions.getScoresAndWinner(map)
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do
 		-- read scores
 		local score = map['score' .. scoreIndex]
-		if map['t'.. scoreIndex ..'atk'] then
+		if map['t'.. scoreIndex ..'atk'] or map['t'.. scoreIndex ..'def'] then
 			score =   (tonumber(map['t'.. scoreIndex ..'atk']) or 0)
 					+ (tonumber(map['t'.. scoreIndex ..'def']) or 0)
 					+ (tonumber(map['t'.. scoreIndex ..'otatk']) or 0)

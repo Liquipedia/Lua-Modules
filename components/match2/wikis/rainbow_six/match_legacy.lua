@@ -2,6 +2,7 @@ local p = {}
 
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
+local DisplayHelper = require("Module:MatchGroup/Display/Helper")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
 local Variables = require("Module:Variables")
@@ -63,26 +64,26 @@ function p.storeGames(match, match2)
 			local team1 = {}
 			local team2 = {}
 			if extradata.t1firstside[1] == "atk" then
-				team1 = {"atk", extradata.t1halfs.atk, extradata.t1halfs.def}
-				team2 = {"def", extradata.t2halfs.atk, extradata.t2halfs.def}
+				team1 = {"atk", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
+				team2 = {"def", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
 			elseif extradata.t1firstside[1] == "def" then
-				team2 = {"atk", extradata.t2halfs.atk, extradata.t2halfs.def}
-				team1 = {"def", extradata.t1halfs.atk, extradata.t1halfs.def}
+				team2 = {"atk", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
+				team1 = {"def", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
 			end
 			if extradata.t1firstside.ot == "atk" then
 				table.insert(team1, "atk")
-				table.insert(team1, extradata.t1halfs.otatk)
-				table.insert(team1, extradata.t1halfs.otdef)
+				table.insert(team1, extradata.t1halfs.otatk or 0)
+				table.insert(team1, extradata.t1halfs.otdef or 0)
 				table.insert(team2, "def")
-				table.insert(team2, extradata.t2halfs.otatk)
-				table.insert(team2, extradata.t2halfs.otdef)
+				table.insert(team2, extradata.t2halfs.otatk or 0)
+				table.insert(team2, extradata.t2halfs.otdef or 0)
 			elseif extradata.t1firstside.ot == "def" then
 				table.insert(team2, "atk")
-				table.insert(team2, extradata.t2halfs.otatk)
-				table.insert(team2, extradata.t2halfs.otdef)
+				table.insert(team2, extradata.t2halfs.otatk or 0)
+				table.insert(team2, extradata.t2halfs.otdef or 0)
 				table.insert(team1, "def")
-				table.insert(team1, extradata.t1halfs.otatk)
-				table.insert(team1, extradata.t1halfs.otdef)
+				table.insert(team1, extradata.t1halfs.otatk or 0)
+				table.insert(team1, extradata.t1halfs.otdef or 0)
 			end
 			game.extradata.opponent1scores = table.concat(team1, ", ")
 			game.extradata.opponent2scores = table.concat(team2, ", ")
@@ -117,6 +118,12 @@ function p.convertParameters(match2)
 		end
 	end
 
+	if match.walkover == "ff" or match.walkover == "dq" then
+		match.walkover = match.winner
+	elseif match.walkover == "l" then
+		match.walkover = nil
+	end
+
 	match.staticid = match2.match2id
 
 	-- Handle extradata fields
@@ -130,6 +137,18 @@ function p.convertParameters(match2)
 	end
 
 	match.extradata.bestofx = tostring(match2.bestof)
+	local bracketData = json.parse(match2.match2bracketdata)
+	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
+		local headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
+		if not headerName or headerName == "" then
+			headerName = Variables.varDefault("match_legacy_header_name")
+		else
+			Variables.varDefine("match_legacy_header_name", headerName)
+		end
+		if headerName and headerName ~= "" then
+			match.header = headerName
+		end
+	end
 
 	local veto = json.parse(extradata.mapveto)
 	if veto then
