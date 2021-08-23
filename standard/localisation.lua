@@ -35,7 +35,7 @@ function Localisation.getLocalisation(options, country)
 	if type(options) == 'string' then
 		local tempForSwitch = country
 		country = options
-		options = temp
+		options = tempForSwitch
 	end
 
 	--avoid indexing nil
