@@ -28,7 +28,7 @@ end
 
 function RLLeague:addCustomCells(infobox, args)
 	infobox:cell('Mode', args.mode)
-	infobox:cell('Game', self:_createGameCell(args.game))
+	infobox:cell('Game', RLLeague:_createGameCell(args.game))
 	infobox:cell('Misc Mode:', args.miscmode)
 	return infobox
 end
