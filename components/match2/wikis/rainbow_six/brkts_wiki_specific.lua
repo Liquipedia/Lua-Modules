@@ -294,10 +294,10 @@ function matchFunctions.getDateStuff(match)
 		local matchDate = String.explode(matchString, '<', 0):gsub('-', '')
 		match.date = matchDate .. timezone
 		match.dateexact = String.contains(match.date, '%+') or String.contains(match.date, '%-')
+		match.hasDate = true
 	else
 		match.date = lang:formatDate('c', _EPOCH_TIME)
 		match.dateexact = false
-		match.nodate = true
 	end
 	return match
 end
@@ -451,7 +451,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and not match.nodate then
+	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
