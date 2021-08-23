@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=rocketleague
+-- page=Module:Infobox/Series/Custom
+--
+
 local Series = require('Module:Infobox/Series')
 local Math = require('Module:Math')
 local Language = mw.language.new('en')
