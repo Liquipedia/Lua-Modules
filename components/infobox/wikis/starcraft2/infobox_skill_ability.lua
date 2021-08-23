@@ -3,6 +3,8 @@
 -- wiki=starcraft2
 -- page=Module:Infobox/Skill/Ability
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local Ability = require('Module:Infobox/Skill')
 local Hotkeys = require('Module:Hotkey')
