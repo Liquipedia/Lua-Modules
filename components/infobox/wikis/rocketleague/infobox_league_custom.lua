@@ -111,7 +111,7 @@ function RLLeague:createPrizepool(args)
 end
 
 function RLLeague:addCustomContent(infobox, args)
-	if String.isEmpty(args.map1) then
+	if not String.isEmpty(args.map1) then
 		infobox:header('Maps', true)
 
 		local maps = {RLLeague:_makeInternalLink(args.map1)}
