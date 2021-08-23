@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=brawlstars
+-- page=Module:Brkts/WikiSpecific
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local p = require("Module:Brkts/WikiSpecific/Base")
 
 local Logic = require('Module:Logic')
