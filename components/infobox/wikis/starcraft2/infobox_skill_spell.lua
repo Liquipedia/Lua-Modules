@@ -1,6 +1,8 @@
--- This file is for
+---
+-- @Liquipedia
 -- wiki=starcraft2
 -- page=Module:Infobox/Skill/Spell
+--
 
 local Spell = require('Module:Infobox/Skill')
 local Hotkeys = require('Module:Hotkey')
