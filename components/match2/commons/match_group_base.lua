@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:MatchGroup/Base
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local p = {}
 
 local getArgs = require('Module:Arguments').getArgs
