@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Localisation
+--
+
 local Class = require('Module:Class')
 local Localisation = {}
 local String = require('Module:StringUtils')
