@@ -11,6 +11,8 @@ local RLLeague = Class.new()
 
 local _SERIES_RLCS = 'Rocket League Championship Series'
 local _MODE_2v2 = '2v2'
+local _GAME_ROCKET_LEAGUE = 'rl'
+local _GAME_SARPBC = 'sarpbc'
 
 function RLLeague.run(frame)
 	local league = League(frame)
@@ -26,6 +28,7 @@ end
 
 function RLLeague:addCustomCells(infobox, args)
 	infobox:cell('Mode', args.mode)
+	infobox:cell('Game', RLLeague:_createGameCell(args.game))
 	infobox:cell('Misc Mode:', args.miscmode)
 	return infobox
 end
@@ -184,6 +187,17 @@ function RLLeague:addToLpdb(lpdbData, args)
 
 	lpdbData['extradata']['is rlcs'] = Variables.varDefault('tournament_rlcs_premier', 0)
 	return lpdbData
+end
+
+function RLLeague:_createGameCell(game)
+	if game == _GAME_ROCKET_LEAGUE then
+		return '[[Rocket League]][[Category:Rocket League Competitions]]'
+	elseif game == _GAME_SARPBC then
+		return '[[Supersonic Acrobatic Rocket-Powered Battle-Cars]]' ..
+			'[[Category:Supersonic Acrobatic Rocket-Powered Battle-Cars Competitions]]'
+	end
+
+	return nil
 end
 
 function RLLeague:_concatArgs(args, base)
