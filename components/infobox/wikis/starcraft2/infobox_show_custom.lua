@@ -3,6 +3,8 @@
 -- wiki=starcraft2
 -- page=Module:Infobox/Show/Custom
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local Show = require('Module:Infobox/Show')
 local Namespace = require('Module:Namespace')
