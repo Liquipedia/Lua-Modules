@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Links
+--
+
 local Class = require('Module:Class')
 
 local Links = {}
