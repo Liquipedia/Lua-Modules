@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Infobox/Person/Player
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Player = require('Module:Infobox/Person')
 local Variables = require('Module:Variables')
 local Achievements = require('Module:Achievements in infoboxes')._player
