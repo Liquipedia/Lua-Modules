@@ -1,6 +1,6 @@
 local Class = require('Module:Class')
 local Infobox = require('Module:Infobox')
-local String = require('Module:StringUtils')
+local String = require('Module:String')
 local Logic = require('Module:Logic')
 local getArgs = require('Module:Arguments').getArgs
 
