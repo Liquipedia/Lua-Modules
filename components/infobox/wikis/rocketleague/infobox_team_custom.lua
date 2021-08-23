@@ -3,6 +3,8 @@
 -- wiki=rocketleague
 -- page=Module:Infobox/Team/Custom
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local Team = require('Module:Infobox/Team')
 local Earnings = require('Module:Earnings')
