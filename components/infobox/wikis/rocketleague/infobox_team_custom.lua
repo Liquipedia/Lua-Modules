@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=rocketleague
+-- page=Module:Infobox/Team/Custom
+--
+
 local Team = require('Module:Infobox/Team')
 local Earnings = require('Module:Earnings')
 local Variables = require('Module:Variables')
