@@ -3,6 +3,8 @@
 -- wiki=commons
 -- page=Module:Infobox/League
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local BasicInfobox = require('Module:Infobox/Basic')
 local Cell = require('Module:Infobox/Cell')
