@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchGroup/Input/StarCraft/FFA
+--
+
 local FFA = {}
 
 local json = require('Module:Json')
