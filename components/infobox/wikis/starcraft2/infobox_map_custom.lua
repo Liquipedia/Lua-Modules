@@ -1,3 +1,7 @@
+-- This file is for
+-- wiki=starcraft2
+-- page=Module:Infobox/Map/Custom
+
 local Map = require('Module:Infobox/Map')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
