@@ -2,7 +2,6 @@ local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
 local Cell = require('Module:Infobox/Cell')
 local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 
 local Game = Class.new(BasicInfobox)
 
