@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchGroup/Util/Starcraft
+--
+
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
