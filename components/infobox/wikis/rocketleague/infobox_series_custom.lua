@@ -3,6 +3,8 @@
 -- wiki=rocketleague
 -- page=Module:Infobox/Series/Custom
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local Series = require('Module:Infobox/Series')
 local Math = require('Module:Math')
