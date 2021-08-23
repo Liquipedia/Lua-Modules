@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:OpponentDisplay/Starcraft
+--
+
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
