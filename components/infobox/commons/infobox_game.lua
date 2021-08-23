@@ -6,8 +6,6 @@ local String = require('Module:StringUtils')
 
 local Game = Class.new(BasicInfobox)
 
-local _LARGE_NUMBER = 99
-
 function Game.run(frame)
 	local game = Game(frame)
 	return game:createInfobox(frame)
@@ -22,11 +20,11 @@ function Game:createInfobox(frame)
 	infobox:centeredCell(args.caption)
 	infobox:header('Game Information', true)
 	infobox:fcell(Cell:new('Developer'):options({}):content(
-		unpack(self:getMultiArgsForTypeNoLink(args, 'developer'))):make())
+		unpack(self:getAllArgsForBase(args, 'developer'))):make())
 	infobox:fcell(Cell:new('Release Dates'):options({}):content(
-		unpack(self:getMultiArgsForTypeNoLink(args, 'releasedate'))):make())
+		unpack(self:getAllArgsForBase(args, 'releasedate'))):make())
 	infobox:fcell(Cell:new('Platforms'):options({}):content(
-		unpack(self:getMultiArgsForTypeNoLink(args, 'platform'))):make())
+		unpack(self:getAllArgsForBase(args, 'platform'))):make())
 	self:addCustomCells(infobox, args)
 	infobox:bottom(self:createBottomContent(infobox))
 
@@ -35,26 +33,6 @@ function Game:createInfobox(frame)
 	end
 
 	return infobox:build()
-end
-
---- Allows for using this for customCells
-function Game:getMultiArgsForTypeNoLink(args, argType)
-	local typeArgs = {}
-	if String.isEmpty(args[argType]) then
-		return typeArgs
-	end
-
-	table.insert(typeArgs, args[argType])
-
-	for index = 2, _LARGE_NUMBER do
-		if String.isEmpty(args[argType .. index]) then
-			break
-		else
-			table.insert(typeArgs, args[argType .. index])
-		end
-	end
-
-	return typeArgs
 end
 
 return Game
