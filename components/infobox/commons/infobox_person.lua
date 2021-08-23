@@ -74,7 +74,7 @@ function Player:createInfobox(frame)
 						)
 						:make()
 			)
-			:fcell(Cell :new('Clan')
+			:fcell(Cell	:new('Clan')
 						:options({})
 						:content(
 							self:_createTeam(args.clan, args.clanlink),
