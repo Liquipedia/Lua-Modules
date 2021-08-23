@@ -3,6 +3,8 @@
 -- wiki=commons
 -- page=Module:MatchGroup/Input/StarCraft
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
