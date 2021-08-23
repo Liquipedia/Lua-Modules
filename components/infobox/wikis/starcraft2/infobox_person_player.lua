@@ -191,6 +191,7 @@ function StarCraft2Player._getAllkills()
 			return allkillsData[1].information
 		end
 	end
+	return nil
 end
 
 function StarCraft2Player:getRole(args)
