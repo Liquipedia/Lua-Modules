@@ -42,13 +42,13 @@ function BasicInfobox:getAllArgsForBase(args, base, options)
 
 	local makeLink = Logic.readBool(options.makeLink)
 
-	local base1 = args[base]
+	local baseArg = args[base]
 	if makeLink then
-		base1 = '[[' .. (args[base .. 'link'] or base1)
-			.. '|' .. base1 .. ']]'
+		baseArg = '[[' .. (args[base .. 'link'] or baseArg)
+			.. '|' .. baseArg .. ']]'
 	end
 
-	table.insert(foundArgs, base1)
+	table.insert(foundArgs, baseArg)
 	local index = 2
 
 	while not String.isEmpty(args[base .. index]) do
