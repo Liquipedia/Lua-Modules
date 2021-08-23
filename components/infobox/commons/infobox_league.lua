@@ -35,7 +35,7 @@ function League:createInfobox()
 				:fcell(Cell:new('Organizer')
 					:options({})
 					:content(
-						unpack(League:_createOrganizers(args))
+						unpack(self:_createOrganizers(args))
 					)
 					:make()
 				)
@@ -69,7 +69,7 @@ function League:createInfobox()
 					)
 					:make()
 				)
-				:cell('Location', League:_createLocation({
+				:cell('Location', self:_createLocation({
 					region = args.region,
 					country = args.country,
 					location = args.city or args.location

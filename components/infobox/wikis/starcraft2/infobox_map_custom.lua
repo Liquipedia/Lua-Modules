@@ -7,9 +7,9 @@ local StarCraft2Map = {}
 
 function StarCraft2Map.run(frame)
 	local map = Map(frame)
-	Map.getNameDisplay = StarCraft2Map.getNameDisplay
-	Map.addCustomCells = StarCraft2Map.addCustomCells
-	Map.addToLpdb = StarCraft2Map.addToLpdb
+	map.getNameDisplay = StarCraft2Map.getNameDisplay
+	map.addCustomCells = StarCraft2Map.addCustomCells
+	map.addToLpdb = StarCraft2Map.addToLpdb
 	return map:createInfobox(frame)
 end
 
@@ -41,6 +41,7 @@ function StarCraft2Map:addToLpdb(lpdbData, args)
 	lpdbData.name = StarCraft2Map:getNameDisplay(args)
 	lpdbData.extradata = {
 		creator = args.creator,
+		creator2 = args.creator2,
 		spawns = args.players,
 		height = args.height,
 		width = args.width,
@@ -51,22 +52,22 @@ end
 
 function StarCraft2Map:_getSize(args, id)
 	local width = args.width
-		or StarCraft2Map:_tlpdMap(id, 'width')
+		or StarCraft2Map:_tlpdMap(id, 'width') or ''
 	local height = args.height
-		or StarCraft2Map:_tlpdMap(id, 'height')
+		or StarCraft2Map:_tlpdMap(id, 'height') or ''
 	return width .. 'x' .. height
 end
 
 function StarCraft2Map:_getSpawn(args, id)
 	local players = args.players
-		or StarCraft2Map:_tlpdMap(id, 'players')
+		or StarCraft2Map:_tlpdMap(id, 'players') or ''
 	local positions = args.positions
-		or StarCraft2Map:_tlpdMap(id, 'positions')
+		or StarCraft2Map:_tlpdMap(id, 'positions') or ''
 	return players .. ' at ' .. positions
 end
 
 function StarCraft2Map:_getRushDistance(args)
-	if String.isEmpty(args.name) then
+	if String.isEmpty(args['rush_distance']) then
 		return nil
 	end
 	local rushDistance = args['rush_distance']

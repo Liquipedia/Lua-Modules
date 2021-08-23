@@ -13,18 +13,18 @@ end
 function Map:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
-	infobox:name(Map:getNameDisplay(args))
+	infobox:name(self:getNameDisplay(args))
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
 	infobox:header('Map Information', true)
 	infobox:fcell(Cell:new('Creator'):options({makeLink = true}):content(
-		args.creator or args['created-by']):make())
-	Map:addCustomCells(infobox, args)
-	infobox:bottom(Map.createBottomContent(infobox))
+		args.creator or args['created-by'], args.creator2 or args['created-by2']):make())
+	self:addCustomCells(infobox, args)
+	infobox:bottom(self:createBottomContent(infobox))
 
 	if Namespace.isMain() then
 		infobox:categories('Maps')
-		Map:_setLpdbData(args)
+		self:_setLpdbData(args)
 	end
 
 	return infobox:build()

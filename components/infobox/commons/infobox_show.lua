@@ -10,8 +10,12 @@ local Show = Class.new(BasicInfobox)
 
 function Show.run(frame)
 	local show = Show(frame)
-	local args = show.args
-	local infobox = show.infobox
+	return show:createInfobox()
+end
+
+function Show:createInfobox()
+	local infobox = self.infobox
+	local args = self.args
 
 	infobox:name(args.name)
 	infobox:image(args.image, args.defaultImage)
@@ -20,25 +24,25 @@ function Show.run(frame)
 	infobox:fcell(Cell:new('Organizer')
 				:options({})
 				:content(
-					unpack(Show:_createHosts(args))
+					unpack(self:_createHosts(args))
 				)
 				:make()
 			)
 	infobox:cell('Format', args.format)
 	infobox:cell('Airs', args.airs)
 	infobox:fcell(Cell:new('Location'):options({}):content(
-			Show:_createLocation(args.country, args.city),
-			Show:_createLocation(args.country2, args.city2)
+			self:_createLocation(args.country, args.city),
+			self:_createLocation(args.country2, args.city2)
 		):make())
-	Show:addCustomCells(infobox, args)
+	self:addCustomCells(infobox, args)
 
 	local links = Links.transform(args)
 	infobox:header('Links', not Table.isEmpty(links))
 	infobox:links(links)
-	infobox:centeredCell(Show:_addSecondaryLinkDisplay(args))
-	Show:addCustomContent(infobox, args)
+	infobox:centeredCell(self:_addSecondaryLinkDisplay(args))
+	self:addCustomContent(infobox, args)
 	infobox:centeredCell(args.footnotes)
-	infobox:bottom(Show.createBottomContent(infobox))
+	infobox:bottom(self:createBottomContent(infobox))
 
 	if Namespace.isMain() then
 		infobox:categories('Shows')

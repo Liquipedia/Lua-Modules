@@ -6,8 +6,8 @@ local StarCraft2Strategy = {}
 
 function StarCraft2Strategy.run(frame)
 	local strategy = Strategy(frame)
-	Strategy.getNameDisplay = StarCraft2Strategy.getNameDisplay
-	Strategy.addCustomCells = StarCraft2Strategy.addCustomCells
+	strategy.getNameDisplay = StarCraft2Strategy.getNameDisplay
+	strategy.addCustomCells = StarCraft2Strategy.addCustomCells
 	return strategy:createInfobox(frame)
 end
 

@@ -13,15 +13,15 @@ end
 function Strategy:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
-	infobox:name(Strategy:getNameDisplay(args))
+	infobox:name(self:getNameDisplay(args))
 	infobox:image(args.image, args.defaultImage)
 	infobox:centeredCell(args.caption)
 	infobox:header('Strategy Information', true)
 	infobox:fcell(Cell:new('Creator'):options({makeLink = true})
 		:content(args.creator or args['created-by']):make())
-	Strategy:addCustomCells(infobox, args)
+	self:addCustomCells(infobox, args)
 	infobox:centeredCell(args.footnotes)
-	infobox:bottom(Strategy.createBottomContent(infobox))
+	infobox:bottom(self:createBottomContent(infobox))
 
 	if Namespace.isMain() then
 		infobox:categories('Strategies')

@@ -6,8 +6,8 @@ local RocketLeagueTeam = {}
 
 function RocketLeagueTeam.run(frame)
     local team = Team(frame)
-    Team.addCustomCells = RocketLeagueTeam.addCustomCells
-    Team.calculateEarnings = RocketLeagueTeam.calculateEarnings
+    team.addCustomCells = RocketLeagueTeam.addCustomCells
+    team.calculateEarnings = RocketLeagueTeam.calculateEarnings
     return team:createInfobox(frame)
 end
 

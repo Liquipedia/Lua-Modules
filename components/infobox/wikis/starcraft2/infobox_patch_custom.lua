@@ -4,8 +4,8 @@ local StarCraft2Patch = {}
 
 function StarCraft2Patch.run(frame)
 	local patch = Patch(frame)
-	Patch.addCustomCells = StarCraft2Patch.addCustomCells
-	Patch.getChronologyData = StarCraft2Patch.getChronologyData
+	patch.addCustomCells = StarCraft2Patch.addCustomCells
+	patch.getChronologyData = StarCraft2Patch.getChronologyData
 	return patch:createInfobox()
 end
 

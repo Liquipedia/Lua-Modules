@@ -13,7 +13,7 @@ end
 function Patch:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	infobox.highlights = Patch._highlights
+	infobox.highlights = self._highlights
 
 	infobox:name(args.name)
 	infobox:image(args.image, args.defaultImage)
@@ -21,17 +21,17 @@ function Patch:createInfobox()
 	infobox:header('Patch Information', true)
 	infobox:cell('Version', args.version)
 	infobox:cell('Release', args.release)
-	Patch:addCustomCells(infobox, args)
+	self:addCustomCells(infobox, args)
 
-	local chronologyData = Patch:getChronologyData(args)
+	local chronologyData = self:getChronologyData(args)
 
 	infobox:header('Highlights', args.highlight1)
-	infobox:highlights(Patch:_getHighlights(args))
+	infobox:highlights(self:_getHighlights(args))
 	infobox:header('Chronology', not Table.isEmpty(chronologyData))
 	infobox:chronology(chronologyData)
 	infobox:centeredCell(args.footnotes)
-	Patch:addCustomContent(infobox, args)
-	infobox:bottom(Patch.createBottomContent(infobox))
+	self:addCustomContent(infobox, args)
+	infobox:bottom(self:createBottomContent(infobox))
 
 	if Namespace.isMain() then
 		infobox:categories('Patches')
