@@ -91,7 +91,7 @@ function Player:createInfobox(frame)
 	local achievements = self:getAchievements(infobox, args)
 	local history = self:getHistory(infobox, args)
 
-	infobox :header('Links', not Table.isEmpty(links))
+	infobox:header('Links', not Table.isEmpty(links))
 	infobox:links(links, _LINK_VARIANT)
 	infobox:header('Achievements', achievements)
 	infobox:centeredCell(achievements)
