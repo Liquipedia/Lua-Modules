@@ -52,17 +52,17 @@ end
 
 function StarCraft2Map:_getSize(args, id)
 	local width = args.width
-		or StarCraft2Map:_tlpdMap(id, 'width')
+		or StarCraft2Map:_tlpdMap(id, 'width') or ''
 	local height = args.height
-		or StarCraft2Map:_tlpdMap(id, 'height')
+		or StarCraft2Map:_tlpdMap(id, 'height') or ''
 	return width .. 'x' .. height
 end
 
 function StarCraft2Map:_getSpawn(args, id)
 	local players = args.players
-		or StarCraft2Map:_tlpdMap(id, 'players')
+		or StarCraft2Map:_tlpdMap(id, 'players') or ''
 	local positions = args.positions
-		or StarCraft2Map:_tlpdMap(id, 'positions')
+		or StarCraft2Map:_tlpdMap(id, 'positions') or ''
 	return players .. ' at ' .. positions
 end
 
