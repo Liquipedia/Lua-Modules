@@ -407,6 +407,7 @@ end
 
 function CustomPlayer._getMatchupData(player)
 	local category = ''
+	local yearsActive
 	player = string.gsub(player, '_', ' ')
 	local cond = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]'
 	local query = 'match2opponents, date'
@@ -435,7 +436,7 @@ function CustomPlayer._getMatchupData(player)
 			category = 'Players with no matches in the last three years'
 		end
 
-		local yearsActive = CustomPlayer._getYearsActive(years)
+		yearsActive = CustomPlayer._getYearsActive(years)
 
 		yearsActive = string.gsub(yearsActive, '<br>', '', 1)
 
