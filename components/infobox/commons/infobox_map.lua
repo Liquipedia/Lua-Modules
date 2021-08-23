@@ -3,6 +3,8 @@
 -- wiki=commons
 -- page=Module:Infobox/Map
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
