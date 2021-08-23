@@ -435,7 +435,7 @@ function CustomPlayer._getMatchupData(player)
 			category = 'Players with no matches in the last three years'
 		end
 
-		yearsActive = CustomPlayer._getYearsActive(years, currentYear)
+		local yearsActive = CustomPlayer._getYearsActive(years, currentYear)
 
 		yearsActive = string.gsub(yearsActive, '<br>', '', 1)
 
@@ -444,7 +444,7 @@ function CustomPlayer._getMatchupData(player)
 	return yearsActive, category
 end
 
-function CustomPlayer._getYearsActive(years, currentYear)
+function CustomPlayer._getYearsActive(years)
 	local yearsActive = ''
 	local tempYear = nil
 	local firstYear = true
