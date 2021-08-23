@@ -157,7 +157,7 @@ function Series:_setCountryCategories(country)
         return ''
     end
 
-    local countryAdjective = Localisation.getLocalisation(country, nil, true)
+    local countryAdjective = Localisation.getLocalisation({ shouldReturnSimpleError = true }, country)
     if countryAdjective == 'error' then
         return 'Unrecognised Country||' .. country
     end
