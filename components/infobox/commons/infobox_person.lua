@@ -100,6 +100,7 @@ function Player:createInfobox(frame)
 	infobox:bottom(self:createBottomContent(infobox, args))
 
 	if _SHOULD_STORE_DATA then
+		args.birthDisplay = birthDisplay
 		self:getCategories(infobox, args, role.category, status.store)
 
 		links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
@@ -161,12 +162,11 @@ function Player:getCategories(infobox, args, role, status)
 	if not args.image then
 		infobox:categories(role .. 's with no profile picture')
 	end
-	if not birthDisplay then
+	if not args.birthDisplay then
 		infobox:categories(role .. 's with unknown birth date')
 	end
-	
-	
-	return 'player'
+
+	return infobox
 end
 
 --- Allows for overriding this functionality
@@ -244,7 +244,7 @@ function Player:_createLocations(args, role)
 	countryDisplayData[1] = Player:_createLocation(country, args.location, role)
 
 	local index = 2
-	local country = args['country2'] or args['nationality2']
+	country = args['country2'] or args['nationality2']
 	while(not String.isEmpty(country)) do
 		countryDisplayData[index] = Player:_createLocation(country, args['location' .. index], role)
 		index = index + 1
