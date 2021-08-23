@@ -3,6 +3,8 @@
 -- wiki=commons
 -- page=Module:MatchGroup/Input/StarCraft/FFA
 --
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local FFA = {}
 
