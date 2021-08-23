@@ -1,3 +1,9 @@
+---
+-- @Liquipedia
+-- wiki=rocketleague
+-- page=Module:Infobox/Company/Custom
+--
+
 local Company = require('Module:Infobox/Company')
 
 local RocketLeagueCompany = {}
