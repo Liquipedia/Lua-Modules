@@ -252,7 +252,7 @@ function StarCraft2Player._getEarningsMedalsData(player)
 	local earnings_total = 0
 
 	if type(data[1]) == 'table' then
-		for i=1,#data do
+		for i = 1, #data do
 			--handle earnings
 			local mode = _EARNING_MODES[data[i].mode] or 'other'
 			if not earnings[mode] then
