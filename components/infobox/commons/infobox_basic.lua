@@ -51,7 +51,7 @@ function BasicInfobox:getAllArgsForBase(args, base, options)
 	table.insert(foundArgs, base1)
 	local index = 2
 
-	while not String.isEmpty(args[argType .. index]) do
+	while not String.isEmpty(args[base .. index]) do
 		local indexedbase = args[base .. index]
 		if makeLink then
 			indexedbase = '[[' .. (args[base .. index .. 'link'] or indexedbase)
