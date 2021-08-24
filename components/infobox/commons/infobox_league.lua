@@ -122,7 +122,7 @@ function League:createInfobox()
 		if not String.isEmpty(args.team_number) then
 			self.infobox:categories('Team Tournaments')
 		end
-		self:_setLpdbData(args)
+		self:_setLpdbData(args, links)
 	end
 
 	return self.infobox:build()
@@ -199,7 +199,7 @@ function League:_definePageVariables(args)
 	self:defineCustomPageVariables(args)
 end
 
-function League:_setLpdbData(args)
+function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
 		tickername = args.tickername,
