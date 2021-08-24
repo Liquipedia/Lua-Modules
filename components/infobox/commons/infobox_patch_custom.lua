@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
+-- wiki=commons
 -- page=Module:Infobox/Patch/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
