@@ -13,9 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Test
-        run: ls
-
       - name: Deploy
         env:
           LP_USER: ${{ secrets.LP_USER }}
