@@ -573,12 +573,12 @@ function CustomMatchSummary._createMap(game)
 
 	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
 
-	-- Winner/Loser backgrouns
+	-- Winner/Loser backgrounds
 	if game.winner == 1 then
 		row:addClass('brkts-popup-body-gradient-left')
 	elseif game.winner == 2 then
 		row:addClass('brkts-popup-body-gradient-right')
-	elseif game.winner == 'draw' then
+	elseif game.resultType == 'draw' then
 		row:addClass('brkts-popup-body-gradient-draw')
 	else
 		row:addClass('brkts-popup-body-gradient-default')
