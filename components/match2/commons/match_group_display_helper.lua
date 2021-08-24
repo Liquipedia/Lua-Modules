@@ -15,6 +15,7 @@ local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Table = require('Module:Table')
 
 local DisplayHelper = {}
+local _NONBREAKING_SPACE
 
 function DisplayHelper.opponentIsTBD(opponent)
 	return opponent.type == 'literal'
@@ -122,13 +123,13 @@ function DisplayHelper.MapAndStatus(game)
 	local statusText = nil
 	if game.resultType == 'default' then
 		if game.walkover == 'L' then
-			statusText = '&nbsp;<i>(w/o)</i>'
+			statusText = _NONBREAKING_SPACE .. '<i>(w/o)</i>'
 		elseif game.walkover == 'FF' then
-			statusText = '&nbsp;<i>(ff)</i>'
+			statusText = _NONBREAKING_SPACE .. '<i>(ff)</i>'
 		elseif game.walkover == 'DQ' then
-			statusText = '&nbsp;<i>(dq)</i>'
+			statusText = _NONBREAKING_SPACE .. '<i>(dq)</i>'
 		else
-			statusText = '&nbsp;<i>(def.)</i>'
+			statusText = _NONBREAKING_SPACE .. '<i>(def.)</i>'
 		end
 	end
 
