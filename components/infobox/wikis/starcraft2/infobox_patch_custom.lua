@@ -14,10 +14,10 @@ function StarCraft2Patch.run(frame)
 	local patch = Patch(frame)
 	patch.addCustomCells = StarCraft2Patch.addCustomCells
 	patch.getChronologyData = StarCraft2Patch.getChronologyData
+	patch.storeToLPDB = StarCraft2Patch.storeToLPDB
 	return patch:createInfobox()
 end
 
---- Allows for overriding this functionality
 function StarCraft2Patch:addCustomCells(infobox, args)
 	infobox:cell('SEA Release Date', args.searelease)
 	infobox:cell('NA Release Date', args.narelease)
@@ -37,7 +37,6 @@ function StarCraft2Patch:storeToLPDB(infobox, args)
 	})
 end
 
---- Allows for overriding this functionality
 function StarCraft2Patch:getChronologyData(args)
 	local data = {}
 	if args.previous == nil and args.next == nil then
