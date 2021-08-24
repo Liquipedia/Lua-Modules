@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
+-- wiki=commons
 -- page=Module:GetMatchGroupCopyPaste
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
