@@ -1,0 +1,23 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Test
+        run: ls
+
+      - name: Deploy
+        env:
+          LP_USER: ${{ secrets.LP_USER }}
+          LP_PASSWORD: ${{ secrets.LP_PASSWORD }}
+        run: bash deploy.sh
