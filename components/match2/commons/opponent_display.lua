@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
+-- wiki=commons
 -- page=Module:OpponentDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
+local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local PlayerDisplay = require('Module:Player/Display')
 local Table = require('Module:Table')
@@ -316,7 +317,7 @@ function OpponentDisplay.BlockLiteral(props)
 	return DisplayUtil.applyOverflowStyles(mw.html.create('div'), props.overflow or 'wrap')
 		:addClass('brkts-opponent-block-literal')
 		:addClass(props.flip and 'flipped' or nil)
-		:node(props.name)
+		:node(Logic.emptyOr(props.name, '&nbsp;'))
 end
 
 --[[

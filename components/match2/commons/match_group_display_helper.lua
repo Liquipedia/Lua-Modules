@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
+-- wiki=commons
 -- page=Module:MatchGroup/Display/Helper
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,6 +15,7 @@ local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Table = require('Module:Table')
 
 local DisplayHelper = {}
+local _NONBREAKING_SPACE = '&nbsp;'
 
 function DisplayHelper.opponentIsTBD(opponent)
 	return opponent.type == 'literal'
@@ -101,6 +102,7 @@ function DisplayHelper.MatchCountdownBlock(match)
 		finished = match.finished and 'true' or nil,
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')
+		:css('text-align', 'center')
 		-- Workaround for .brkts-popup-body-element > * selector
 		:css('display', 'block')
 		:node(require('Module:Countdown')._create(stream))
@@ -112,7 +114,7 @@ unusual status.
 ]]
 function DisplayHelper.MapAndStatus(game)
 	local mapText = game.map
-		and '[[' .. game.map .. ']]'
+		and ('[[' .. game.map .. ']]')
 		or 'Unknown'
 	if game.resultType == 'np' or game.resultType == 'default' then
 		mapText = '<s>' .. mapText .. '</s>'
@@ -121,17 +123,17 @@ function DisplayHelper.MapAndStatus(game)
 	local statusText = nil
 	if game.resultType == 'default' then
 		if game.walkover == 'L' then
-			statusText = '<i>(w/o)</i>'
+			statusText = _NONBREAKING_SPACE .. '<i>(w/o)</i>'
 		elseif game.walkover == 'FF' then
-			statusText = '<i>(ff)</i>'
+			statusText = _NONBREAKING_SPACE .. '<i>(ff)</i>'
 		elseif game.walkover == 'DQ' then
-			statusText = '<i>(dq)</i>'
+			statusText = _NONBREAKING_SPACE .. '<i>(dq)</i>'
 		else
-			statusText = '<i>(def.)</i>'
+			statusText = _NONBREAKING_SPACE .. '<i>(def.)</i>'
 		end
 	end
 
-	return mapText .. (statusText and '&nbsp;' .. statusText or '')
+	return mapText .. (statusText or '')
 end
 
 --[[
