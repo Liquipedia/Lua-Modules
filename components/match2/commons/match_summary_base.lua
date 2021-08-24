@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
+-- wiki=commons
 -- page=Module:MatchSummary/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
