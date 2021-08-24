@@ -240,15 +240,7 @@ function League:_setLpdbData(args)
 			sponsor5 = args.sponsor5,
 		}),
 		links = mw.ext.LiquipediaDB.lpdb_create_json({
-			discord = Links.makeFullLink('discord', args.discord),
-			facebook = Links.makeFullLink('facebook', args.facebook),
-			instagram = Links.makeFullLink('instagram', args.instagram),
-			twitch = Links.makeFullLink('twitch', args.twitch),
-			twitter = Links.makeFullLink('twitter', args.twitter),
-			website = Links.makeFullLink('website', args.website),
-			weibo = Links.makeFullLink('weibo', args.weibo),
-			vk = Links.makeFullLink('vk', args.vk),
-			youtube = Links.makeFullLink('youtube', args.youtube),
+			Links.makeFullLinksForTableItems(links)
 		}),
 	}
 
