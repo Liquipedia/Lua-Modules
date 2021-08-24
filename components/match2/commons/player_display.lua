@@ -88,7 +88,6 @@ function PlayerDisplay.InlinePlayer(props)
 
 	return mw.html.create('span'):addClass('inline-player')
 		:addClass(props.flip and 'flipped' or nil)
-		:css('white-space', 'pre')
 		:wikitext(text)
 end
 
