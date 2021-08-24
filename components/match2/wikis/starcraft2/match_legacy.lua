@@ -45,12 +45,7 @@ function p.storeGames(match, match2)
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 
-		if
-			game.mode == '1v1' and
-			game.extradata.isSubMatch == 'false' and
-			game.winner ~= 'skip' and
-			game.map ~= 'Definitions'
-		then
+		if game.mode == '1v1' and game.extradata.isSubMatch == 'false' then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
 			game.date = match.date
