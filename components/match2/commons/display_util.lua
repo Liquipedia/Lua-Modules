@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
+-- wiki=commons
 -- page=Module:DisplayUtil
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
