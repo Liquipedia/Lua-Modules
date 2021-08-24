@@ -61,7 +61,7 @@ function League:createInfobox()
 				:cell('Server', args.server)
 				:fcell(Cell:new('Type')
 					:options({})
-					:content(args.type)
+					:content(args.type:sub(1,1):upper()..args.type:sub(2))
 					:categories(
 						function(_, ...)
 							local value = select(1, ...)
