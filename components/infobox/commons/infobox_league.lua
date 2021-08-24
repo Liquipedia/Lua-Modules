@@ -206,7 +206,7 @@ function League:_setLpdbData(args)
 			organizer4 = args.organizer4,
 			organizer5 = args.organizer5,
 		}),
-		startdate = Variables.varDefault('tournament_startdate', '1970-01-01'),
+		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', '1970-01-01'),
 		enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
 		sortdate = Variables.varDefault('tournament_enddate', '1970-01-01'),
 		location = Locale.formatLocation({city = args.city or args.location, country = args.country}),
