@@ -15,7 +15,7 @@ local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Table = require('Module:Table')
 
 local DisplayHelper = {}
-local _NONBREAKING_SPACE
+local _NONBREAKING_SPACE = '&nbsp;'
 
 function DisplayHelper.opponentIsTBD(opponent)
 	return opponent.type == 'literal'
