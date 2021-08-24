@@ -42,10 +42,10 @@ function Person:createInfobox(frame)
 
 	local earnings = self:calculateEarnings(args)
 	Variables.varDefine('earnings', earnings)
-	if earnings == 0 then
-		earnings = nil
-	else
+	if earnings and earnings ~= 0 then
 		earnings = '$' .. Language:formatNum(earnings)
+	else
+		earnings = nil
 	end
 	local nameDisplay = self:nameDisplay(args)
 	local role = self:getRole(args)
