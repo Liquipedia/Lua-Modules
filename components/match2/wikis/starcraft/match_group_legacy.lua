@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft
+-- page=Module:MatchGroup/Legacy
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Legacy = {}
 
 local getArgs = require("Module:Arguments").getArgs

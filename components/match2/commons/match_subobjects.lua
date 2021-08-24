@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Match/Subobjects
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local p = {}
 
 local json = require("Module:Json")

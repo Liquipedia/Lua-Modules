@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchExternalLinks/Starcraft
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')

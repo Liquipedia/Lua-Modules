@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:LegacyPlayerCrossTable
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local LegacyPlayerCrossTable = {}
 
 local getArgs = require('Module:Arguments').getArgs

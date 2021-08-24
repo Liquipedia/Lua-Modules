@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Infobox/Map/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Map = require('Module:Infobox/Map')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')

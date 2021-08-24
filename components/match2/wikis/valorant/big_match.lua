@@ -1,5 +1,9 @@
 ---
--- @author Vogan for Liquipedia
+-- @Liquipedia
+-- wiki=valorant
+-- page=Module:BigMatch
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Arguments = require("Module:Arguments")

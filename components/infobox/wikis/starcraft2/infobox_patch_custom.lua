@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Infobox/Patch/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Patch = require('Module:Infobox/Patch')
 
 local StarCraft2Patch = {}

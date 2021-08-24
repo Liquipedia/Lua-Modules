@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchGroup/Display/Bracket/Starcraft
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local BracketDisplay = require('Module:MatchGroup/Display/Bracket')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')

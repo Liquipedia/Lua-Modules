@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:MatchGroup
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local MatchGroupBase = require('Module:MatchGroup/Base')
 
 local MatchGroup = {}

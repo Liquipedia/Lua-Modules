@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft
+-- page=Module:GetMatchGroupCopyPaste/wiki
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 --[[
 
 WikiSpecific Code for MatchList and Bracket Code Generators

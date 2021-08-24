@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=rocketleague
+-- page=Module:MatchGroup/Legacy/Default
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local p = {}
 
 local String = require("Module:StringUtils")

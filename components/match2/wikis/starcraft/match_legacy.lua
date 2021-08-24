@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft
+-- page=Module:Match/Legacy
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 --[[ToDo:
 * Remove temp smw support for Teams (after lpdb api is available)
 ***** ADJUST THIS FOR BROODWAR WIKI!!! *****

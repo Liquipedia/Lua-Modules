@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchGroup/Util/Starcraft
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')

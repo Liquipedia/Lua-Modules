@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Match/Legacy
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 --[[ToDo:
 * Remove temp smw support (after lpdb api is available)
 ]]--

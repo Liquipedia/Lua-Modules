@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Infobox/Team/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 local Links = require('Module:Links')

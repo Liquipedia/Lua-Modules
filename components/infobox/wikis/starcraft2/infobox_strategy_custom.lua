@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:Infobox/Strategy/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Strategy = require('Module:Infobox/Strategy')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')

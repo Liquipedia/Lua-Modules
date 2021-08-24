@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=starcraft
+-- page=Module:MatchGroup/Legacy/Default
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local p = {}
 
 local Lua = require("Module:Lua")
