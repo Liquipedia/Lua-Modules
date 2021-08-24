@@ -7,7 +7,6 @@
 --
 
 local Patch = require('Module:Infobox/Patch')
-local Namespace = require('Module:Namespace')
 
 local StarCraft2Patch = {}
 
@@ -24,16 +23,13 @@ function StarCraft2Patch:addCustomCells(infobox, args)
 	infobox:cell('NA Release Date', args.narelease)
 	infobox:cell('EU Release Date', args.eurelease)
 	infobox:cell('KR Release Date', args.korrelease)
-	if Namespace.isMain then
-		StarCraft2Patch:_storeToDatapoint(args)
-	end
 	return infobox
 end
 
-function StarCraft2Patch:_storeToDatapoint(args)
+function StarCraft2Patch:storeToLPDB(infobox, args)
 	local date = args.narelease or args.eurelease
 	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. (args.name or mw.title.getCurrentTitle().text), {
+	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
 		name = args.name,
 		type = 'patch',
 		information = monthAndDay,
