@@ -265,9 +265,14 @@ function League:_createLocation(details)
 			content = '[[Category:Unrecognised Country|' .. details.country .. ']]'
 	else
 		local countryName = Localisation.getCountryName(details.country)
+		local displayText = details.location or countryName
+		if displayText == '' then
+			displayText = details.country
+		end
+
 		content = Flags._Flag(details.country) .. '&nbsp;' ..
 			'[[:Category:' .. nationality .. ' Tournaments|' ..
-			(details.location or countryName) .. ']]' ..
+			displayText .. ']]' ..
 			'[[Category:' .. nationality .. ' Tournaments]]'
 	end
 
@@ -279,9 +284,15 @@ function League:_createLocation(details)
 			content = content .. '[[Category:Unrecognised Country|' .. details.country2 .. ']]'
 		else
 			local countryName2 = Localisation.getCountryName(details.country2)
+
+			local displayText = details.location2 or countryName2
+			if displayText == '' then
+				displayText = details.country2
+			end
+
 			content = content .. Flags._Flag(details.country2) .. '&nbsp;' ..
 				'[[:Category:' .. nationality2 .. ' Tournaments|' ..
-				(details.location2 or countryName2) .. ']]' ..
+				displayText .. ']]' ..
 				'[[Category:' .. nationality2 .. ' Tournaments]]'
 		end
 	end
