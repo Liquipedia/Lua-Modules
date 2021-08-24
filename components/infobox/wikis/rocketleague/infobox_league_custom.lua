@@ -176,6 +176,10 @@ function RLLeague:defineCustomPageVariables(args)
 end
 
 function RLLeague:addToLpdb(lpdbData, args)
+	if not String.isEmpty(args.liquipediatiertype) then
+		lpdbData['liquipediatier'] = args.liquipediatiertype
+	end
+
 	lpdbData['game'] = 'rocket league'
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number
