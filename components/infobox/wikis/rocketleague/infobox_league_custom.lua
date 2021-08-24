@@ -177,7 +177,7 @@ end
 
 function RLLeague:addToLpdb(lpdbData, args)
 	if not String.isEmpty(args.liquipediatiertype) then
-		lpdbData['liquipediatier'] = args.liquipediatiertype or args.liquipediatier
+		lpdbData['liquipediatier'] = args.liquipediatiertype
 	end
 
 	lpdbData['game'] = 'rocket league'
