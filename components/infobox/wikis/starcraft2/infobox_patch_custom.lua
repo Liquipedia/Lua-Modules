@@ -51,7 +51,7 @@ function StarCraft2Patch:getChronologyData(args)
 			data.previous = 'Patch ' .. args.previous .. '|' .. args.previous
 		end
 		if args.next then
-			data.next = 'Patch ' .. args.previous .. '|' .. args.next
+			data.next = 'Patch ' .. args.next .. '|' .. args.next
 		end
 		if args.previoushbu then
 			data.previous2 = 'Balance Update ' .. args.previoushbu .. '|#' .. args.previoushbu
