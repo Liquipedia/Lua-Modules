@@ -12,6 +12,7 @@ local SeriesTotalPrize = require('Module:SeriesTotalPrize')._get
 local Tier = require('Module:Tier')
 local Json = require('Module:Json')
 local VarDefine = require('Module:Variables').varDefine
+local Namespace = require('Module:Namespace')
 
 local _GAME_WOL = 'wol'
 local _GAME_HOTS = 'hots'
@@ -31,7 +32,6 @@ function Sc2Series.run(frame)
 	local series = Series(frame)
 	series.addCustomCells = Sc2Series.addCustomCells
 	series.createTier = Sc2Series.createTier
-	series.addCustomVariables = Sc2Series.addCustomVariables
 	return series:createInfobox(frame)
 end
 
@@ -43,6 +43,9 @@ function Sc2Series.addCustomCells(series, infobox, args)
 		infobox:cell('Total prize money', Sc2Series._getSeriesPrizepools(args))
 	end
 	infobox:cell('Game version', Sc2Series._getGameVersion(string.lower(args.game or ''), args.patch or '', args))
+
+	Sc2Series._addCustomVariables(args)
+
 	return infobox
 end
 
@@ -115,8 +118,13 @@ function Sc2Series._getGameVersion(game, patch, args)
 	end
 end
 
-function Sc2Series.addCustomVariables(_, args)
-	if args.disable_smw == 'true' or args.disable_lpdb == 'true' or args.disable_storage == 'true' then
+function Sc2Series._addCustomVariables(args)
+	if
+		(not Namespace.isMain()) or
+		args.disable_smw == 'true' or
+		args.disable_lpdb == 'true' or
+		args.disable_storage == 'true'
+	then
 		VarDefine('disable_SMW_storage', 'true')
 	else
 		--needed for e.g. External Cups Lists
