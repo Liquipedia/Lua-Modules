@@ -202,7 +202,7 @@ function Infobox:links(links, variant)
     infoboxLinks    :addClass('infobox-center')
                     :addClass('infobox-icons')
 
-    for key, value in pairs(links) do
+    for key, value in Table.iter.spairs(links) do
         key = Infobox.removeAppendedNumber(key)
         local link = '[' .. Links.makeFullLink(key, value, variant) ..
             ' <i class="lp-icon lp-' .. (_ICON_KEYS_TO_RENAME[key] or key) .. '></i>]'
