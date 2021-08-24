@@ -144,6 +144,7 @@ function p.convertParameters(match2)
 		match.extradata.mvp = match.extradata.mvp .. ";" .. mvp.points
 	end
 
+	match.extradata.matchsection = extradata.matchsection
 	match.extradata.bestofx = tostring(match2.bestof)
 	local bracketData = json.parse(match2.match2bracketdata)
 	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
