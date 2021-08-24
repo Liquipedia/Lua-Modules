@@ -80,7 +80,7 @@ local _CLEAN_OTHER_ROLES = {
 local earningsGlobal = {}
 local pagename = mw.title.getCurrentTitle().prefixedText
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
-local _SHOULD_STORE_DATA
+local _SHOULD_QUERY_DATA
 local hasAchievements
 local raceData
 local statusStore
@@ -102,7 +102,7 @@ function CustomPlayer.run(frame)
 	player.getStatus = CustomPlayer.getStatus
 	player.getRole = CustomPlayer.getRole
 
-	_SHOULD_STORE_DATA = player:shouldStoreData(player.args)
+	_SHOULD_QUERY_DATA = player:shouldStoreData(player.args)
 
 	return player:createInfobox(frame)
 end
@@ -133,7 +133,7 @@ function CustomPlayer._getRaceData(race)
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if _SHOULD_STORE_DATA then
+	if _SHOULD_QUERY_DATA then
 		return tostring(Matches._get_ongoing({})) ..
 			tostring(Matches._get_upcoming({})) ..
 			tostring(Matches._get_recent({}))
@@ -174,7 +174,7 @@ function CustomPlayer:addCustomContent(infobox, args)
 		retired = args.retired
 	end
 	local allkills
-	if _SHOULD_STORE_DATA then
+	if _SHOULD_QUERY_DATA then
 		allkills = CustomPlayer._getAllkills()
 		if allkills then
 			allkills = _ALLKILLICON .. allkills
@@ -190,7 +190,7 @@ function CustomPlayer:addCustomContent(infobox, args)
 end
 
 function CustomPlayer._getAllkills()
-	if _SHOULD_STORE_DATA then
+	if _SHOULD_QUERY_DATA then
 		local allkillsData = mw.ext.LiquipediaDB.lpdb('datapoint', {
 			conditions = '[[pagename::' .. pagename .. ']] AND [[type::allkills]]',
 			query = 'information',
@@ -256,12 +256,12 @@ function CustomPlayer._getEarningsMedalsData(player)
 	local earnings_total = 0
 
 	if type(data[1]) == 'table' then
-		for i=1,#data do
+		for _, item in pairs(data) do
 			--handle earnings
-			earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, data[i])
+			earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, item)
 
 			--handle medals
-			medals = CustomPlayer._addPlacementToMedals(medals, data[i])
+			medals = CustomPlayer._addPlacementToMedals(medals, item)
 		end
 	end
 
@@ -393,7 +393,7 @@ end
 function CustomPlayer:addCustomCells(infobox, args)
 	local rank1, rank2
 	local yearsActive, activeCategory
-	if _SHOULD_STORE_DATA and not statusStore then
+	if _SHOULD_QUERY_DATA and not statusStore then
 		rank1, rank2 = CustomPlayer._getRank(self.pagename)
 		yearsActive, activeCategory = CustomPlayer._getMatchupData(self.pagename)
 		infobox:categories(activeCategory)
@@ -437,7 +437,7 @@ function CustomPlayer._getMatchupData(player)
 			years[tonumber(string.sub(data[i].date, 1, 4))] = string.sub(data[i].date, 1, 4)
 		end
 
-		if years[_CURRENT_YEAR] ~= nil or years[_CURRENT_YEAR - 1] ~= nil or years[_CURRENT_YEAR - 2] ~= nil then
+		if years[_CURRENT_YEAR] or years[_CURRENT_YEAR - 1] or years[_CURRENT_YEAR - 2] then
 			category = 'Active players'
 			Variables.varDefine('isActive', 'true')
 		else
