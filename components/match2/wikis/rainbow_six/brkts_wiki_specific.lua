@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=rainbowsix
+-- page=Module:Brkts/WikiSpecific
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Table = require('Module:Table')
 local WikiSpecificBase = require('Module:Brkts/WikiSpecific/Base')
 local Json = require('Module:Json')
