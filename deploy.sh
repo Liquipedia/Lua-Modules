@@ -1,9 +1,5 @@
 #!/bin/bash
 
-LP_USER=LiquipediaBot
-LP_PASSWORD=yOTZgI1DDAc7lvjSpFwP
-echo $LP_USER;
-
 wikiBaseUrl='https://liquipedia.net/'
 luaFiles=$(find . -type f -name '*.lua')
 pat='\-\-\-\
