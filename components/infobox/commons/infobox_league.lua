@@ -122,7 +122,7 @@ function League:createInfobox()
 		if not String.isEmpty(args.team_number) then
 			self.infobox:categories('Team Tournaments')
 		end
-		self:_setLpdbData(args)
+		self:_setLpdbData(args, links)
 	end
 
 	return self.infobox:build()
@@ -199,7 +199,7 @@ function League:_definePageVariables(args)
 	self:defineCustomPageVariables(args)
 end
 
-function League:_setLpdbData(args)
+function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
 		tickername = args.tickername,
@@ -239,17 +239,9 @@ function League:_setLpdbData(args)
 			sponsor4 = args.sponsor4,
 			sponsor5 = args.sponsor5,
 		}),
-		links = mw.ext.LiquipediaDB.lpdb_create_json({
-			discord = Links.makeFullLink('discord', args.discord),
-			facebook = Links.makeFullLink('facebook', args.facebook),
-			instagram = Links.makeFullLink('instagram', args.instagram),
-			twitch = Links.makeFullLink('twitch', args.twitch),
-			twitter = Links.makeFullLink('twitter', args.twitter),
-			website = Links.makeFullLink('website', args.website),
-			weibo = Links.makeFullLink('weibo', args.weibo),
-			vk = Links.makeFullLink('vk', args.vk),
-			youtube = Links.makeFullLink('youtube', args.youtube),
-		}),
+		links = mw.ext.LiquipediaDB.lpdb_create_json(
+			Links.makeFullLinksForTableItems(links)
+		),
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
