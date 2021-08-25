@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local CurrencyData = mw.loadData('Module:LocalCurrency/Data')
