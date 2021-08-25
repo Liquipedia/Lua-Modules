@@ -28,6 +28,11 @@ end
 
 function League:createInfobox()
 	local args = self.args
+
+	-- set Variables here already so they are available in functions
+	-- we call from here on, e.g. createPrizepool
+	self:_definePageVariables(args)
+
 	self.infobox:name(args.name)
 				:image(args.image, args.default)
 				:centeredCell(args.caption)
@@ -114,8 +119,6 @@ function League:createInfobox()
 				:header('Chronology', self:_isChronologySet(args.previous, args.next))
 				:chronology(self:getChronologyData(args))
 				:bottom(self:createBottomContent(self.infobox))
-
-	self:_definePageVariables(args)
 
 	if self:shouldStore(args) then
 		self.infobox:categories('Tournaments')
