@@ -23,6 +23,11 @@ function Cell:new(description)
 	return self
 end
 
+function Cell:addClass(class)
+	self.root:addClass(class)
+	return self
+end
+
 function Cell:options(args)
 	self.args = args
 	return self
