@@ -1,4 +1,3 @@
-  
 ---
 -- @Liquipedia
 -- wiki=commons
@@ -9,6 +8,7 @@
 
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
+local Variables = require('Module:Variables')
 local CurrencyData = mw.loadData('Module:LocalCurrency/Data')
 local LocalCurrency = {}
 
@@ -64,7 +64,7 @@ function LocalCurrency:_getDisplay(data, prizepool)
 	return display
 end
 
-function LocalCurreny:_setVars(data)
+function LocalCurrency:_setVars(data)
 	Variables.varDefine('localcurrencysymbol', data.symbol or '')
 	Variables.varDefine('localcurrencysymbolafter', data.symbolAfter or '')
 	Variables.varDefine('localcurrencycode', data.code or '')
