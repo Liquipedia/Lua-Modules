@@ -165,7 +165,7 @@ function matchFunctions.getDateStuff(match)
 	else
 		match.date = lang:formatDate(
 			'c',
-			(Variables.varDefault("tournament_date", "") or "")
+			(Variables.varDefault("tournament_enddate", "") or "")
 				.. " + " .. Variables.varDefault("num_missing_dates", "0") .. " second"
 		)
 		match.dateexact = false
