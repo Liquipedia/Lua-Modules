@@ -182,7 +182,7 @@ function RLLeague:addToLpdb(lpdbData, args)
 
 	lpdbData['game'] = 'rocket league'
 	lpdbData['patch'] = args.patch
-	lpdbData['participantsnumber'] = args.team_number
+	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
 		mode = args.mode,
