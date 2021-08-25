@@ -58,7 +58,7 @@ function League:createInfobox()
 					)
 					:make()
 				)
-				:cell('Server', args.server)
+				:cell('Server', self:getServer(args))
 				:fcell(Cell:new('Type')
 					:options({})
 					:content(args.type:sub(1,1):upper()..args.type:sub(2))
@@ -112,17 +112,12 @@ function League:createInfobox()
 	self:addCustomContent(self.infobox, args)
 	self.infobox:centeredCell(args.footnotes)
 				:header('Chronology', self:_isChronologySet(args.previous, args.next))
-				:chronology({
-					previous = args.previous,
-					next = args.next,
-					previous2 = args.previous2,
-					next2 = args.next2,
-				})
+				:chronology(self:getChronologyData(args))
 				:bottom(self:createBottomContent(self.infobox))
 
 	self:_definePageVariables(args)
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
 		self.infobox:categories('Tournaments')
 		if not String.isEmpty(args.team_number) then
 			self.infobox:categories('Team Tournaments')
@@ -131,6 +126,26 @@ function League:createInfobox()
 	end
 
 	return self.infobox:build()
+end
+
+--- Allows for overriding this functionality
+function League:getChronologyData(args)
+	return {
+		previous = args.previous,
+		next = args.next,
+		previous2 = args.previous2,
+		next2 = args.next2,
+	}
+end
+
+--- Allows for overriding this functionality
+function League:shouldStore(args)
+	return Namespace.isMain()
+end
+
+--- Allows for overriding this functionality
+function League:getServer(args)
+	return args.server
 end
 
 --- Allows for overriding this functionality
