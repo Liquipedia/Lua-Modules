@@ -14,7 +14,7 @@ function StarCraft2Patch.run(frame)
 	local patch = Patch(frame)
 	patch.addCustomCells = StarCraft2Patch.addCustomCells
 	patch.getChronologyData = StarCraft2Patch.getChronologyData
-	patch.storeToLPDB = StarCraft2Patch.storeToLPDB
+	patch.addToLpdb = StarCraft2Patch.addToLpdb
 	return patch:createInfobox()
 end
 
@@ -26,7 +26,7 @@ function StarCraft2Patch:addCustomCells(infobox, args)
 	return infobox
 end
 
-function StarCraft2Patch:storeToLPDB(infobox, args)
+function StarCraft2Patch:addToLpdb(infobox, args)
 	local date = args.narelease or args.eurelease
 	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
