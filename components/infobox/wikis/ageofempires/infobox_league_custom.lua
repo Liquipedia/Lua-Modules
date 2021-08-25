@@ -115,13 +115,26 @@ function CustomLeague:addCustomContent(infobox, args)
 	if not String.isEmpty(args.map1) then
 		infobox:header('Maps', true)
 
-		local maps = {CustomLeague:_makeInternalLink(args.map1)}
+		local map1mode = ''
+		if not String.isEmpty(args.map1mode) then
+			map1mode = Template.safeExpand(mw.getCurrentFrame(),
+									'MapMode',
+									{args.map1mode})
+		end
+
+		local maps = {CustomLeague:_makeInternalLink(args.map1 .. map1mode)}
 		local index  = 2
 
 		while not String.isEmpty(args['map' .. index]) do
+			local mapmode = ''
+			if not String.isEmpty(args['map' .. index .. 'mode']) then
+				mapmode = Template.safeExpand(mw.getCurrentFrame(),
+										'MapMode',
+										{args['map' .. index .. 'mode']})
+			end
 			table.insert(maps, '&nbsp;• ' ..
 				tostring(CustomLeague:_createNoWrappingSpan(
-					CustomLeague:_makeInternalLink(args['map' .. index])
+					CustomLeague:_makeInternalLink(args['map' .. index] .. mapmode)
 				))
 			)
 			index = index + 1
