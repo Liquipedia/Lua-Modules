@@ -13,7 +13,7 @@ local Links = {}
 local _PREFIXES = {
     afreeca = 'http://afreecatv.com/',
     aligulac = 'https://aligulac.com/results/events/',
-    aoezone = 'https://aoezone.net/,
+    aoezone = 'https://aoezone.net/',
     askfm = 'https://ask.fm/',
     battlefy = 'https://www.battlefy.com/',
     booyah = 'https://booyah.live/',
@@ -81,7 +81,7 @@ function Links.transform(links)
         aoezone3 = links.aoezone3,
         aoezone4 = links.aoezone4,
         aoezone5 = links.aoezone5,
-		askfm = links.askfm,
+        askfm = links.askfm,
         battlefy = links.battlefy,
         battlefy2 = links.battlefy2,
         battlefy3 = links.battlefy3,
