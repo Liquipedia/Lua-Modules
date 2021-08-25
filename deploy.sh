@@ -41,7 +41,8 @@ do
 
     # Edit page
     editToken=$(curl -s -b "cookie_${wiki}.ck" -c "cookie_${wiki}.ck" -d "format=json&action=query&meta=tokens" -H 'User-Agent: GitHub Autodeploy Bot/1.0.0 (fonttax@liquipedia.net)' -H 'Accept-Encoding: gzip' -X POST $wikiApiUrl | gunzip | jq .query.tokens.csrftoken -r)
-    echo $(curl -s -b "cookie_${wiki}.ck" -c "cookie_${wiki}.ck" --data-urlencode "title=${page}" --data-urlencode "text=${fileContents}" --data-urlencode "summary=Auto update from git - file \"${luaFile}\"" --data-urlencode "bot=true" --data-urlencode "recreate=true" --data-urlencode "token=${editToken}" -H 'User-Agent: GitHub Autodeploy Bot/1.0.0 (fonttax@liquipedia.net)' -H 'Accept-Encoding: gzip' -X POST "${wikiApiUrl}?format=json&action=edit" | gunzip | jq .edit.result)
+    result=$(curl -s -b "cookie_${wiki}.ck" -c "cookie_${wiki}.ck" --data-urlencode "title=${page}" --data-urlencode "text=${fileContents}" --data-urlencode "summary=Auto update from git - file \"${luaFile}\"" --data-urlencode "bot=true" --data-urlencode "recreate=true" --data-urlencode "token=${editToken}" -H 'User-Agent: GitHub Autodeploy Bot/1.0.0 (fonttax@liquipedia.net)' -H 'Accept-Encoding: gzip' -X POST "${wikiApiUrl}?format=json&action=edit" | gunzip | jq .edit.result)
+    echo "...${result}"
 
     echo '...done'
     # Don't get rate limited
