@@ -309,7 +309,7 @@ function CustomLeague:_createGameCell(args)
 		return nil
 	end
 
-	local content = ''
+	local content
 
 	local betaTag = not String.isEmpty(args.beta) and 'Beta&nbsp;' or ''
 
