@@ -32,6 +32,7 @@ function CustomLeague.run(frame)
 	league.addCustomContent = CustomLeague.addCustomContent
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
@@ -61,29 +62,35 @@ function CustomLeague:addCustomCells(infobox, args)
 			:make()
 	)
 
+	return infobox
+end
+
+function CustomLeague:getWikiCategories(args)
+	local categories = {}
+
 	if not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)) then
-		infobox:categories('Individual Tournaments')
+		table.insert(categories, 'Individual Tournaments')
 	end
 
 	if String.isEmpty(args.game) then
-		infobox:categories('Tournaments without game version')
+		table.insert(categories, 'Tournaments without game version')
 	end
 
 	if not Logic.readBool(args.cancelled) and
 		(not String.isEmpty(args.prizepool) and args.prizepool ~= 'Unknown') and
 		String.isEmpty(args.prizepoolusd) then
-		infobox:categories('Infobox league lacking prizepoolusd')
+		table.insert(categories, 'Infobox league lacking prizepoolusd')
 	end
 
 	if not String.isEmpty(args.prizepool) and String.isEmpty(args.localcurrency) then
-		infobox:categories('Infobox league lacking localcurrency')
+		table.insert(categories, 'Infobox league lacking localcurrency')
 	end
 
 	if not String.isEmpty(args.sort_date) then
-		infobox:categories('Tournaments with custom sort date')
+		table.insert(categories, 'Tournaments with custom sort date')
 	end
 
-	return infobox
+	return categories
 end
 
 function CustomLeague:createTier(args)
