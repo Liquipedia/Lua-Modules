@@ -75,7 +75,7 @@ end
 function CustomLeague:_createTierDisplay(args)
 	local tier = args.liquipediatier or ''
 	local tierType = args.liquipediatiertype or args.tiertype or ''
-	if tier == '' then
+	if String.isEmpty(tier) then
 		return nil
 	end
 
@@ -83,12 +83,11 @@ function CustomLeague:_createTierDisplay(args)
 	local hasInvalidTier = tierText == nil
 	tierText = tierText or tier
 
-	local hasTierType = tierType ~= ''
 	local hasInvalidTierType = false
 
 	local output = '[[' .. tierText .. ' Tournaments|'
 
-	if hasTierType then
+	if not String.isEmpty(tierType) then
 		tierType = Tier['types'][string.lower(tierType or '')] or tierType
 		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
 
@@ -101,17 +100,16 @@ function CustomLeague:_createTierDisplay(args)
 		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
 		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
 
-
 	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_tiertype', tierType)
 	return output
 end
 
 function CustomLeague:getChronologyData(args)
-	local nxt, previous = CustomLeague._computeChronology(args)
+	local next, previous = CustomLeague._computeChronology(args)
 	return {
 		previous = previous,
-		next = nxt,
+		next = next,
 		previous2 = args.previous2,
 		next2 = args.next2,
 		previous3 = args.previous3,
@@ -168,6 +166,7 @@ end
 
 function CustomLeague:getServer(args)
 	local server = args.server or ''
+	--remove possible whitespaces around '/'
 	server = string.gsub(server, '%s?/%s?=', '/')
 	local servers = mw.text.split(server, '/')
 
@@ -309,10 +308,14 @@ function CustomLeague:_displayPrizeValue(value, numDigits)
 	local factor = 10^numDigits
 	value = math.floor(value * factor + 0.5) / factor
 
+	--split value into
+	--left = first digit
+	--num = all remaining digits before a possible '.'
+	--right = the '.' and all digits after it (unless they are all 0 or do not exist)
 	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
 	if right:len() > 0 then
 		local decimal = string.sub('0' .. right, 3)
-		right = "." .. decimal .. string.rep('0', 2 - string.len(decimal))
+		right = '.' .. decimal .. string.rep('0', 2 - string.len(decimal))
 	end
 	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
 end
@@ -337,7 +340,7 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 	--remove white spaces and &nbsp;
 	value = value:gsub('%s', ''):gsub('&nbsp;', '')
 
-	--check if it has a "+" at the end
+	--check if it has a '+' at the end
 	local hasPlus = string.match(value, '%+$')
 	if hasPlus then
 		value = value:gsub('%+$', '')
