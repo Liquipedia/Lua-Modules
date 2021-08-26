@@ -38,6 +38,7 @@ end
 
 function CustomLeague:addCustomCells(infobox, args)
 	infobox:cell('Game', CustomLeague:_createGameCell(args))
+	infobox:cell('Teams', args.team_number .. (args.team_slots and ('/' .. args.team_slots) or ''))
 	return infobox
 end
 
