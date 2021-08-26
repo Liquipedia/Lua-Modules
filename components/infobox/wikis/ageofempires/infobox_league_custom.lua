@@ -14,6 +14,7 @@ local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
+local PrizePool = require('Module:Prize pool currency')
 
 local CustomLeague = Class.new()
 
@@ -35,7 +36,7 @@ function CustomLeague:addCustomCells(infobox, args)
 
 	infobox:cell('Game', CustomLeague:_makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or ''))
 
-	if infobox:shouldStore(args) then
+	if League:shouldStore(args) then
 		infobox:categories(GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. 'Competitions')
 	end
 
@@ -99,7 +100,7 @@ function CustomLeague:createPrizepool(args)
 		date = args.edate or args.date
 	end
 
-	local content = Template.safeExpand(mw.getCurrentFrame(), 'Prize pool currency', {
+	local content = PrizePool.get({
 			prizepool = args.prizepool,
 			prizepoolusd = args.prizepoolusd,
 			currency = args.localcurrency,
