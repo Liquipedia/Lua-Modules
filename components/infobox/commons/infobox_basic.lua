@@ -41,6 +41,11 @@ function BasicInfobox:createBottomContent(infobox)
     return nil
 end
 
+--- Allows for overriding this functionality
+function BasicInfobox:getWikiCategories(args)
+    return {}
+end
+
 --- Allows for using this for customCells
 function BasicInfobox:getAllArgsForBase(args, base, options)
 	local foundArgs = {}
