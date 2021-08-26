@@ -40,6 +40,15 @@ function CustomLeague:addCustomCells(infobox, args)
 	infobox:cell('Game', CustomLeague:_createGameCell(args))
 	infobox:cell('Teams', args.team_number .. (args.team_slots and ('/' .. args.team_slots) or ''))
 	infobox:cell('Players', args.player_number)
+	infobox:fcell(Cell	:new('[[File:ESL 2019 icon.png|40x40px|link=|ESL|alt=ESL]] Pro Tour Tier')
+						:content(CustomLeague:_createEslProTierCell(args.eslprotier))
+						:categories(
+							function(_, ...)
+								infobox:categories('ESL Pro Tour Tournaments')
+							end
+						)
+						:make()
+				)
 	return infobox
 end
 
@@ -228,6 +237,33 @@ function CustomLeague:_createGameCell(args)
 	end
 
 	return content
+end
+
+function CustomLeague:_createEslProTierCell(eslProTier)
+	if String.isEmpty(eslProTier) then
+		return nil
+	end
+
+	eslProTier = eslProTier:lower()
+
+	if eslProTier == 'national challenger' or eslProTier == 'national championship' then
+		return '[[File:ESL Pro Tour Challenger.png|40x40px|link=ESL National Championships|' ..
+			'National Championship]] National Champ.'
+	elseif eslProTier == 'international challenger' or eslProTier == 'challenger' then
+		return '[[File:ESL Pro Tour Challenger.png|40x40px|link=ESL Pro Tour|Challenger]] Challenger'
+	elseif eslProTier == 'regional challenger' then
+		return '[[File:ESL Pro Tour Challenger.png|40x40px|link=ESL/Pro Tour|Regional Challenger]] Regional Challenger'
+	elseif eslProTier == 'masters' then
+		return '[[File:ESL Pro Tour Masters.png|40x40px|link=ESL/Pro Tour|Masters]] Masters'
+	elseif eslProTier == 'regional masters' then
+		return '[[File:ESL Pro Tour Masters.png|40x40px|link=ESL/Pro Tour|Regional Masters]] Regional Masters'
+	elseif eslProTier == 'masters championship' then
+		return '[[File:ESL Pro Tour Masters Championship.png|40x40px|link=ESL Pro Tour|Masters Championship]] Masters Champ.'
+	elseif eslProTier == 'major championship' then
+		return '[[File:Valve csgo tournament icon.png|40x40px|link=Majors|Major Championship]] Major Championship'
+	end
+
+	return ''
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
