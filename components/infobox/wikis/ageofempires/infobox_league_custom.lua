@@ -15,6 +15,7 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
 local PrizePool = require('Module:Prize pool currency')
+local MapMode = require('Module:MapMode')
 
 local CustomLeague = Class.new()
 
@@ -118,9 +119,7 @@ function CustomLeague:addCustomContent(infobox, args)
 
 		local map1mode = ''
 		if not String.isEmpty(args.map1mode) then
-			map1mode = Template.safeExpand(mw.getCurrentFrame(),
-									'MapMode',
-									{args.map1mode})
+			map1mode = MapMode.get({args.map1mode})
 		end
 
 		local maps = {CustomLeague:_makeInternalLink(args.map1 .. map1mode)}
@@ -129,9 +128,7 @@ function CustomLeague:addCustomContent(infobox, args)
 		while not String.isEmpty(args['map' .. index]) do
 			local mapmode = ''
 			if not String.isEmpty(args['map' .. index .. 'mode']) then
-				mapmode = Template.safeExpand(mw.getCurrentFrame(),
-										'MapMode',
-										{args['map' .. index .. 'mode']})
+				mapmode = MapMode.get({args['map' .. index .. 'mode']})
 			end
 			table.insert(maps, '&nbsp;• ' ..
 				tostring(CustomLeague:_createNoWrappingSpan(
