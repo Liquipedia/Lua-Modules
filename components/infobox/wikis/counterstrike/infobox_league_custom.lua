@@ -185,13 +185,15 @@ function CustomLeague:addCustomContent(infobox, args)
 	if not String.isEmpty(args.map1) then
 		infobox:header('Maps', true)
 
-		local maps = {CustomLeague:_makeInternalLink(args.map1)}
+		local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
+		local maps = {CustomLeague:_makeInternalLink(args.map1 .. game .. '|' .. args.map1)}
 		local index  = 2
 
 		while not String.isEmpty(args['map' .. index]) do
+			local map = args['map' .. index]
 			table.insert(maps, '&nbsp;• ' ..
 				tostring(CustomLeague:_createNoWrappingSpan(
-					CustomLeague:_makeInternalLink(args['map' .. index])
+					CustomLeague:_makeInternalLink(map .. game .. '|' .. map)
 				))
 			)
 			index = index + 1
