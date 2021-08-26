@@ -78,7 +78,7 @@ function Team:createInfobox(frame)
 
     if Namespace.isMain() then
         infobox:categories('Teams')
-		infobox:categories(self:getWikiCategories(args))
+		infobox:categories(unpack(self:getWikiCategories(args)))
     end
 
     return infobox:build()
