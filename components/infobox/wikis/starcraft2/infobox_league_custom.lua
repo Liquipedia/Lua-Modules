@@ -144,11 +144,11 @@ function CustomLeague._computeChronology(args)
 		local previousPage = (args.previous or '') == '' and
 			title.basePageTitle:subPageTitle(tostring(number - 1)).fullText
 
-		if not next and self:exists(nextPage) then
+		if not next and CustomLeague:_exists(nextPage) then
 			next = nextPage .. '|#' .. tostring(number + 1)
 		end
 
-		if not previous and 1 < number and self:exists(previousPage) then
+		if not previous and 1 < number and CustomLeague:_exists(previousPage) then
 			previous = previousPage .. '|#' .. tostring(number - 1)
 		end
 
@@ -254,7 +254,7 @@ function CustomLeague:createPrizepool(args)
 
 		if not prizePoolUSD and localCurrency then
 			local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
-			prizePoolUSD =  CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
+			prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
 			if not prizePoolUSD then
 				error('Invalid local currency "' .. localCurrency .. '"')
 			end
@@ -327,7 +327,7 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 
 	--remove currency symbol
 	if currency then
-		_ = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
+		local throwAway = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
 		local symbol = Variables.varDefineMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
 		value = value:gsub(symbol, '')
 	else
@@ -389,7 +389,7 @@ function CustomLeague:addCustomContent(infobox, args)
 		infobox:centeredCell(unpack(maps))
 	end
 
-    return infobox
+	return infobox
 end
 
 function CustomLeague._playerBreakDownEvent(args)
@@ -460,20 +460,20 @@ function CustomLeague._playerRaceBreakDown(args)
 end
 
 function CustomLeague._playerBreakDownDisplay(contents)
-    if type(contents) ~= 'table' or contents == {} then
-        return nil
-    end
+	if type(contents) ~= 'table' or contents == {} then
+		return nil
+	end
 
-    local div = mw.html.create('div')
-    local number = #contents
-    for _, content in ipairs(contents) do
-        local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number
+	local div = mw.html.create('div')
+	local number = #contents
+	for _, content in ipairs(contents) do
+		local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number
 			.. ' infobox-center')
-        infoboxCustomCell:wikitext(content)
-        div:node(infoboxCustomCell)
-    end
+		infoboxCustomCell:wikitext(content)
+		div:node(infoboxCustomCell)
+	end
 
-    return div
+	return div
 end
 
 function CustomLeague:_makeBasedListFromArgs(args, base, options)
@@ -483,7 +483,7 @@ function CustomLeague:_makeBasedListFromArgs(args, base, options)
 		firstArg = mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)
 	end
 	local foundArgs = {CustomLeague:_makeInternalLink(firstArg)}
-	local index  = 2
+	local index = 2
 
 	while not String.isEmpty(args[base .. index]) do
 		local currentArg = args['map' .. index]
@@ -497,7 +497,7 @@ function CustomLeague:_makeBasedListFromArgs(args, base, options)
 		)
 		index = index + 1
 	end
-	
+
 	return foundArgs
 end
 
@@ -535,16 +535,17 @@ function CustomLeague:defineCustomPageVariables(args)
 	if seriesNumberLength > 0 then
 		seriesNumber = string.rep('0', 5 - seriesNumberLength) .. seriesNumber
 	end
-	Variables.varDefine('tournament_series_number', series_number)
+	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
 	local finished = args.finished
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
 	if finished ~= 'true' and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] AND [[participant::!Definitions]] AND [[placement::1]]',
+			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
+				.. 'AND [[participant::!Definitions]] AND [[placement::1]]',
 			query = 'date',
 			order = 'date asc',
-	  		limit = 1
+			limit = 1
 		})
 		if data ~= nil and data[1] ~= nil then
 			finished = 'true'
@@ -597,7 +598,7 @@ end
 
 --here
 --kick this if PR #286 goes through
-function CustomLeague:exists(page)
+function CustomLeague:_exists(page)
 	local existingPage = mw.title.new(page)
 
 	-- In some cases we might have gotten an external link,
