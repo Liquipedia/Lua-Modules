@@ -270,7 +270,8 @@ function CustomLeague:createPrizepool(args)
 			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText .. ' ' .. _ABBR_USD
 		end
 		if hasText then
-			display = display .. '[[Category:Pages with text set as prizepool in infobox league]]'
+			display = (display or args.prizepool or '') ..
+				'[[Category:Pages with text set as prizepool in infobox league]]'
 		end
 
 		Variables.varDefine('usd prize', prizePoolUSD or prizePool)
