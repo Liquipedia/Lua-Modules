@@ -317,11 +317,11 @@ function League:_createSeries(frame, series, abbreviation)
 
 	local output = ''
 
-	if self:_exists('Template:LeagueIconSmall/' .. series:lower()) then
+	if self:exists('Template:LeagueIconSmall/' .. series:lower()) then
 		output = Template.safeExpand(frame, 'LeagueIconSmall/' .. series:lower()) .. ' '
 	end
 
-	if not self:_exists(series) then
+	if not self:exists(series) then
 		if String.isEmpty(abbreviation) then
 			output = output .. series
 		else
@@ -343,7 +343,7 @@ function League:_createOrganizer(organizer, name, link, reference)
 
 	local output
 
-	if self:_exists(organizer) then
+	if self:exists(organizer) then
 		output = '[[' .. organizer .. '|'
 		if String.isEmpty(name) then
 			output = output .. organizer .. ']]'
@@ -404,7 +404,7 @@ function League:_cleanDate(date)
 	return date
 end
 
-function League:_exists(page)
+function League:exists(page)
 	local existingPage = mw.title.new(page)
 
 	-- In some cases we might have gotten an external link,
