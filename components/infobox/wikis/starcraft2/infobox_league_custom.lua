@@ -479,8 +479,7 @@ function CustomLeague._playerBreakDownDisplay(contents)
 	return div
 end
 
-function CustomLeague:_makeBasedListFromArgs(args, base, options)
-	options = options or {}
+function CustomLeague:_makeBasedListFromArgs(args, base)
 	local firstArg = args[base .. '1']
 	local foundArgs = {CustomLeague:_makeInternalLink(firstArg)}
 	local index = 2
