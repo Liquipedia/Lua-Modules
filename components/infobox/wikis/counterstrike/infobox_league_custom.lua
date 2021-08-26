@@ -323,7 +323,7 @@ function CustomLeague:_createGameCell(args)
 		content = '[[Counter-Strike Online|Online]][[Category:' .. betaTag .. 'CSO Competitions]]'
 	elseif args.game == _GAME_CS_GO then
 		content = '[[Counter-Strike: Global Offensive|Global Offensive]][[Category:' .. betaTag ..
-			'CSGO Competitions]]|[[Category:' .. betaTag .. 'Competitions]]'
+			'CSGO Competitions]]'
 	elseif args.game == _GAME_MOD then
 		content = args.modname
 	end
