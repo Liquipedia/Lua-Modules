@@ -152,11 +152,13 @@ function CustomLeague:createPrizepool(args)
 		content = '$' .. prizepoolInUsd .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
 	else
 		if not String.isEmpty(localCurrency) then
-			content = Template.safeExpand(
+			local converted = Template.safeExpand(
 				mw.getCurrentFrame(),
 				'Local currency',
 				{localCurrency:lower(), prizepool = prizepool}
 			)
+			Variables.varDefine('prizepoollocal', converted)
+			content = converted
 		else
 			content = prizepool
 		end
@@ -170,6 +172,8 @@ function CustomLeague:createPrizepool(args)
 	if not String.isEmpty(prizepoolInUsd) then
 		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
 	end
+
+
 
 	return cell:content(content)
 end
@@ -226,6 +230,10 @@ function CustomLeague:defineCustomPageVariables(args)
 	if not String.isEmpty(args.edate) and args.edate:lower() ~= _DATE_TBA then
 		Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
 	end
+
+	Variables.varDefine('raw_sdate', ReferenceCleaner.clean(args.sdate))
+	Variables.varDefine('raw_edate', ReferenceCleaner.clean(args.edate))
+
 	if not String.isEmpty(args.edate) and args.edate:lower() ~= _DATE_TBA then
 		Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.edate or args.date))
 	end
@@ -266,20 +274,20 @@ function CustomLeague:defineCustomPageVariables(args)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.liquipediatiertype) then
-		lpdbData['liquipediatier'] = args.liquipediatiertype
+	if Logic.readBool(args.charity) then
+		lpdbData['prizepool'] = 0
 	end
 
-	lpdbData['patch'] = args.patch
+	lpdbData['liquipediatier'] = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/smw/number', {args.liquipediatier})
+	lpdbData['publishertier'] = args.valvetier
+	lpdbData['maps'] = CustomLeague:_concatArgs(args, 'map')
+	lpdbData['game'] = args.game
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
-		region = args.region,
-		mode = args.mode,
-		liquipediatier2 =
-			(not String.isEmpty(args.liquipediatiertype) and args.liquipediatier) or args.liquipediatier2,
-		liquipediatiertype2 = args.liquipediatiertype2,
-		participantsnumber =
-			not String.isEmpty(args.team_number) and args.team_number or args.player_number,
+		prizepoollocal = Variables.varDefault('prizepoollocal', ''),
+		startdate_raw = Variables.varDefault('raw_sdate', ''),
+		enddate_raw = Variables.varDefault('raw_edate', '')
+
 	}
 
 	return lpdbData
