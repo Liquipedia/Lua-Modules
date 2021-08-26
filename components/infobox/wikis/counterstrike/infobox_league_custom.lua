@@ -40,15 +40,26 @@ function CustomLeague:addCustomCells(infobox, args)
 	infobox:cell('Game', CustomLeague:_createGameCell(args))
 	infobox:cell('Teams', args.team_number .. (args.team_slots and ('/' .. args.team_slots) or ''))
 	infobox:cell('Players', args.player_number)
-	infobox:fcell(Cell	:new('[[File:ESL 2019 icon.png|40x40px|link=|ESL|alt=ESL]] Pro Tour Tier')
-						:content(CustomLeague:_createEslProTierCell(args.eslprotier))
-						:categories(
-							function(_, ...)
-								infobox:categories('ESL Pro Tour Tournaments')
-							end
-						)
-						:make()
-				)
+	infobox:fcell(
+		Cell:new('[[File:ESL 2019 icon.png|40x40px|link=|ESL|alt=ESL]] Pro Tour Tier')
+			:content(CustomLeague:_createEslProTierCell(args.eslprotier))
+			:categories(
+				function(_, ...)
+					infobox:categories('ESL Pro Tour Tournaments')
+				end
+			)
+			:make()
+	)
+	infobox:fcell(
+		Cell:new(Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox'))
+			:content(CustomLeague:_createValveTierCell(args.valvetier))
+			:categories(
+				function(_, ...)
+					infobox:categories('Valve Sponsored Tournaments')
+				end
+			)
+			:make()
+	)
 	return infobox
 end
 
@@ -264,6 +275,30 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 	end
 
 	return ''
+end
+
+function CustomLeague:_createValveTierCell(valveTier)
+	if String.isEmpty(valveTier) then
+		return nil
+	end
+
+	valveTier = valveTier:lower()
+
+	if valveTier == 'major' then
+		Variables.varDefine('metadesc-valve', 'Major Championship')
+		return '[[Majors|Major Championship]]'
+	elseif valveTier == 'major qualifier' then
+		Variables.varDefine('metadesc-valve', 'Major Championship main qualifier')
+		return '[[Majors|Major Qualifier]]'
+	elseif valveTier == 'minor' then
+		Variables.varDefine('metadesc-valve', 'Regional Minor Championship')
+		return '[[Minors|Minor Championship]]'
+	elseif valveTier == 'rmr event' then
+		Variables.varDefine('metadesc-valve', 'Regional Major Rankings evnt')
+		return '[[Regional Major Rankings|RMR Event]]'
+	end
+
+	return valveTier
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
