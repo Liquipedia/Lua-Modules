@@ -24,6 +24,13 @@ local _GAME_CS_ONLINE = 'cso'
 local _GAME_CS_GO = 'csgo'
 local _GAME_MOD = 'mod'
 
+local _DATE_TBA = 'tba'
+
+local _TIER_VALVE_MAJOR = 'major'
+
+local _MODE_1v1 = '1v1'
+local _MODE_TEAM = 'team'
+
 function CustomLeague.run(frame)
 	local league = League(frame)
 	league.addCustomCells = CustomLeague.addCustomCells
@@ -205,12 +212,29 @@ end
 
 function CustomLeague:defineCustomPageVariables(args)
 	-- Legacy vars
+	Variables.varDefine('tournament_short_name', args.shortname)
 	Variables.varDefine('tournament_ticker_name', args.tickername)
+	Variables.varDefine('special_ticker_name', args.tickername_special)
 	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
 	Variables.varDefine('tournament_sponsors', CustomLeague:_concatArgs(args, 'sponsor'))
-	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
-	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
-	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+	if not String.isEmpty(args.date) and args.date:lower() ~= _DATE_TBA then
+		Variables.varDefine('date', ReferenceCleaner.clean(args.date))
+	end
+	if not String.isEmpty(args.sdate) and args.sdate:lower() ~= _DATE_TBA then
+		Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
+	end
+	if not String.isEmpty(args.edate) and args.edate:lower() ~= _DATE_TBA then
+		Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+	end
+	if not String.isEmpty(args.edate) and args.edate:lower() ~= _DATE_TBA then
+		Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.edate or args.date))
+	end
+	if not String.isEmpty(args.sdate) and args.sdate:lower() ~= _DATE_TBA then
+		Variables.varDefine('tournament_sdate', ReferenceCleaner.clean(args.sdate or args.date))
+	end
+	if not String.isEmpty(args.edate) and args.edate:lower() ~= _DATE_TBA then
+		Variables.varDefine('tournament_edate', Variables.varDefault('tournament_date', ''))
+	end
 
 	-- Legacy tier vars
 	Variables.varDefine('tournament_lptier', args.liquipediatier)
@@ -223,8 +247,22 @@ function CustomLeague:defineCustomPageVariables(args)
 		args.liquipediatier == 3 and 3 or 4
 	)
 
-	-- Legacy notability vars
-	Variables.varDefine('tournament_notability_mod', args.notabilitymod or 1)
+	Variables.varDefine('tournament_valve_major',
+		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR  and true or args.valvemajor)
+	Variables.varDefine('tournament_valve_tier',
+		mw.getContentLanguage():ucFirst(args.valvetier or ''):lower())
+	Variables.varDefine('tournament_cstrike_major', args.cstrikemajor)
+
+	Variables.varDefine('tournament_mode',
+		(not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)))
+		and _MODE_1v1 or _MODE_TEAM
+	)
+	Variables.varDefine('no team result', 
+		(args.series == 'ESEA Rank S' or
+		args.series == 'FACEIT Pro League' or
+		args.series == 'Danish Pro League' or
+		args.series == 'Swedish Pro League') and 'true' or 'false')
+
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
