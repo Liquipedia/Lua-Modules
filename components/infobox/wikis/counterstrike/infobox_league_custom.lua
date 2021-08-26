@@ -154,8 +154,20 @@ function CustomLeague:addCustomContent(infobox, args)
 		infobox	:centeredCell(unpack(maps))
 	end
 
-	infobox	:header('Teams', not String.isEmpty(args.team_number))
-			:cell('Number of teams', args.team_number)
+	if not String.isEmpty(args.team1) then
+		local teams = {CustomLeague:_makeInternalLink(args.team1)}
+		local index  = 2
+
+		while not String.isEmpty(args['team' .. index]) do
+			table.insert(teams, '&nbsp;• ' ..
+				tostring(CustomLeague:_createNoWrappingSpan(
+					CustomLeague:_makeInternalLink(args['team' .. index])
+				))
+			)
+			index = index + 1
+		end
+		infobox	:centeredCell(unpack(teams))
+	end
 
     return infobox
 end
