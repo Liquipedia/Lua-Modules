@@ -60,6 +60,29 @@ function CustomLeague:addCustomCells(infobox, args)
 			)
 			:make()
 	)
+
+	if not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)) then
+		infobox:categories('Individual Tournaments')
+	end
+
+	if String.isEmpty(args.game) then
+		infobox:categories('Tournaments without game version')
+	end
+
+	if not Logic.readBool(args.cancelled) and
+		(not String.isEmpty(args.prizepool) and args.prizepool ~= 'Unknown') and
+		String.isEmpty(args.prizepoolusd) then
+		infobox:categories('Infobox league lacking prizepoolusd')
+	end
+
+	if not String.isEmpty(args.prizepool) and String.isEmpty(args.localcurrency) then
+		infobox:categories('Infobox league lacking localcurrency')
+	end
+
+	if not String.isEmpty(args.sort_date) then
+		infobox:categories('Tournaments with custom sort date')
+	end
+
 	return infobox
 end
 
@@ -74,12 +97,13 @@ function CustomLeague:createTier(args)
 		return cell:content()
 	end
 
-	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/link', { tier })
+	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay', { tier })
+	local tierDisplayLink = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/link', { tier })
 	local valvetier = args.valvetier
 	local valvemajor = args.valvetier
 	local cstrikemajor = args.cstrikemajor
 
-	content = content .. tierDisplay
+	content = content .. tierDisplayLink
 
 	if String.isEmpty(valvetier) and Logic.readBool(valvemajor) then
 		cell:addClass('valvepremier-highlighted')
@@ -93,7 +117,7 @@ function CustomLeague:createTier(args)
 		content = content .. logo
 	end
 
-	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
+	content = content .. '[[Category:' .. tierDisplay.. ' Tournaments]]'
 
 	return cell:content(content)
 end
