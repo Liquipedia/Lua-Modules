@@ -50,7 +50,7 @@ function CustomLeague:addCustomCells(infobox, args)
 	infobox:cell('Players', args.player_number)
 	infobox:fcell(
 		Cell:new('[[File:ESL 2019 icon.png|40x40px|link=|ESL|alt=ESL]] Pro Tour Tier')
-			:content(CustomLeague:_createEslProTierCell(args.eslprotier))
+			:content(CustomLeague:_createEslProTourCell(args.eslprotier))
 			:categories(
 				function(_, ...)
 					infobox:categories('ESL Pro Tour Tournaments')
@@ -341,7 +341,7 @@ function CustomLeague:_createGameCell(args)
 	return content
 end
 
-function CustomLeague:_createEslProTierCell(eslProTier)
+function CustomLeague:_createEslProTourCell(eslProTier)
 	if String.isEmpty(eslProTier) then
 		return nil
 	end
