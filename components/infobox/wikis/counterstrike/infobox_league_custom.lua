@@ -121,7 +121,7 @@ function CustomLeague:createTier(args)
 
 	if String.isEmpty(valvetier) and Logic.readBool(valvemajor) then
 		cell:addClass('valvepremier-highlighted')
-		local logo = ' [[File:Valve_logo_black.svg|x12px|link=Valve_icon.png|x16px|' .. 
+		local logo = ' [[File:Valve_logo_black.svg|x12px|link=Valve_icon.png|x16px|' ..
 			'link=Counter-Strike Majors|Counter-Strike Major]]'
 		content = content .. logo
 	end
@@ -265,7 +265,7 @@ function CustomLeague:defineCustomPageVariables(args)
 		(not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)))
 		and _MODE_1v1 or _MODE_TEAM
 	)
-	Variables.varDefine('no team result', 
+	Variables.varDefine('no team result',
 		(args.series == 'ESEA Rank S' or
 		args.series == 'FACEIT Pro League' or
 		args.series == 'Danish Pro League' or
