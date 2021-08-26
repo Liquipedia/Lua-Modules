@@ -327,7 +327,7 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 
 	--remove currency symbol
 	if currency then
-		local throwAway = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
+		Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
 		local symbol = Variables.varDefineMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
 		value = value:gsub(symbol, '')
 	else
