@@ -220,7 +220,7 @@ function CustomLeague:_createGameCell(args)
 		return nil
 	end
 
-	local content
+	local content = ''
 
 	local betaTag = not String.isEmpty(args.beta) and 'Beta&nbsp;' or ''
 
@@ -235,7 +235,7 @@ function CustomLeague:_createGameCell(args)
 	elseif args.game == _GAME_CS_GO then
 		content = '[[Counter-Strike: Global Offensive|Global Offensive]][[Category:' .. betaTag ..
 			'CSGO Competitions]]|[[Category:{{#if:{{{beta|}}}|Beta&nbsp;}}Competitions]]'
-	else
+	elseif args.game == _GAME_MOD then
 		content = args.modname
 	end
 
