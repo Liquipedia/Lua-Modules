@@ -31,8 +31,8 @@ local _TIER_VALVE_MAJOR = 'major'
 local _MODE_1v1 = '1v1'
 local _MODE_TEAM = 'team'
 
-local _ICON_EPT_CHALLENGER = '[[File:ESL Pro Tour Challenger.png|40x40px|link='
-local _ICON_EPT_MASTERS = '[[File:ESL Pro Tour Masters.png|40x40px|link='
+local _ICON_EPT_CHALLENGER = '[[File:ESL Pro Tour Challenger.png|20x20px|link='
+local _ICON_EPT_MASTERS = '[[File:ESL Pro Tour Masters.png|20x20px|link='
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -52,7 +52,7 @@ function CustomLeague:addCustomCells(infobox, args)
 	infobox:cell('Teams', args.team_number .. (args.team_slots and ('/' .. args.team_slots) or ''))
 	infobox:cell('Players', args.player_number)
 	infobox:fcell(
-		Cell:new('[[File:ESL 2019 icon.png|40x40px|link=|ESL|alt=ESL]] Pro Tour Tier')
+		Cell:new('[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier')
 			:content(CustomLeague:_createEslProTierCell(args.eslprotier))
 			:categories(
 				function(_, ...)
