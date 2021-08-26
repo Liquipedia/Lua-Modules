@@ -31,6 +31,9 @@ local _TIER_VALVE_MAJOR = 'major'
 local _MODE_1v1 = '1v1'
 local _MODE_TEAM = 'team'
 
+local _ICON_EPT_CHALLENGER = '[[File:ESL Pro Tour Challenger.png|40x40px|link='
+local _ICON_EPT_MASTERS = '[[File:ESL Pro Tour Masters.png|40x40px|link='
+
 function CustomLeague.run(frame)
 	local league = League(frame)
 	league.addCustomCells = CustomLeague.addCustomCells
@@ -50,7 +53,7 @@ function CustomLeague:addCustomCells(infobox, args)
 	infobox:cell('Players', args.player_number)
 	infobox:fcell(
 		Cell:new('[[File:ESL 2019 icon.png|40x40px|link=|ESL|alt=ESL]] Pro Tour Tier')
-			:content(CustomLeague:_createEslProTourCell(args.eslprotier))
+			:content(CustomLeague:_createEslProTierCell(args.eslprotier))
 			:categories(
 				function(_, ...)
 					infobox:categories('ESL Pro Tour Tournaments')
@@ -341,7 +344,7 @@ function CustomLeague:_createGameCell(args)
 	return content
 end
 
-function CustomLeague:_createEslProTourCell(eslProTier)
+function CustomLeague:_createEslProTierCell(eslProTier)
 	if String.isEmpty(eslProTier) then
 		return nil
 	end
@@ -349,18 +352,18 @@ function CustomLeague:_createEslProTourCell(eslProTier)
 	eslProTier = eslProTier:lower()
 
 	if eslProTier == 'national challenger' or eslProTier == 'national championship' then
-		return '[[File:ESL Pro Tour Challenger.png|40x40px|link=ESL National Championships|' ..
+		return _ICON_EPT_CHALLENGER .. 'ESL National Championships|' ..
 			'National Championship]] National Champ.'
 	elseif eslProTier == 'international challenger' or eslProTier == 'challenger' then
-		return '[[File:ESL Pro Tour Challenger.png|40x40px|link=ESL Pro Tour|Challenger]] Challenger'
+		return _ICON_EPT_CHALLENGER .. 'ESL Pro Tour|Challenger]] Challenger'
 	elseif eslProTier == 'regional challenger' then
-		return '[[File:ESL Pro Tour Challenger.png|40x40px|link=ESL/Pro Tour|Regional Challenger]] Regional Challenger'
+		return _ICON_EPT_CHALLENGER .. 'ESL/Pro Tour|Regional Challenger]] Regional Challenger'
 	elseif eslProTier == 'masters' then
-		return '[[File:ESL Pro Tour Masters.png|40x40px|link=ESL/Pro Tour|Masters]] Masters'
+		return _ICON_EPT_MASTERS .. 'ESL/Pro Tour|Masters]] Masters'
 	elseif eslProTier == 'regional masters' then
-		return '[[File:ESL Pro Tour Masters.png|40x40px|link=ESL/Pro Tour|Regional Masters]] Regional Masters'
+		return _ICON_EPT_MASTERS .. 'ESL/Pro Tour|Regional Masters]] Regional Masters'
 	elseif eslProTier == 'masters championship' then
-		return '[[File:ESL Pro Tour Masters Championship.png|40x40px|link=ESL Pro Tour|Masters Championship]] Masters Champ.'
+		return _ICON_EPT_MASTERS .. 'ESL Pro Tour|Masters Championship]] Masters Champ.'
 	elseif eslProTier == 'major championship' then
 		return '[[File:Valve csgo tournament icon.png|40x40px|link=Majors|Major Championship]] Major Championship'
 	end
