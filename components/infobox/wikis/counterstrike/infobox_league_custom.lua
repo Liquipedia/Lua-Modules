@@ -17,6 +17,13 @@ local Logic = require('Module:Logic')
 
 local CustomLeague = Class.new()
 
+local _GAME_CS_16 = 'cs16'
+local _GAME_CS_CZ = 'cscz'
+local _GAME_CS_SOURCE = 'css'
+local _GAME_CS_ONLINE = 'cso'
+local _GAME_CS_GO = 'csgo'
+local _GAME_MOD = 'mod'
+
 function CustomLeague.run(frame)
 	local league = League(frame)
 	league.addCustomCells = CustomLeague.addCustomCells
@@ -30,6 +37,7 @@ function CustomLeague.run(frame)
 end
 
 function CustomLeague:addCustomCells(infobox, args)
+	infobox:cell('Game', CustomLeague:_createGameCell(args))
 	return infobox
 end
 
@@ -183,6 +191,41 @@ function CustomLeague:_concatArgs(args, base)
 	end
 
 	return table.concat(foundArgs, ';')
+end
+
+function CustomLeague:_createGameCell(args)
+	if String.isEmpty(args.game) and String.isEmpty(args.patch) then
+		return nil
+	end
+
+	local content
+
+	local betaTag = not String.isEmpty(args.beta) and 'Beta&nbsp;' or ''
+
+	if args.game == _GAME_CS_16 then
+		content = '[[Counter-Strike]][[Category:' .. betaTag .. 'CS1.6 Competitions]]'
+	elseif args.game == _GAME_CS_CZ then
+		content = '[[Counter-Strike: Condition Zero|Condition Zero]][[Category:' .. betaTag .. 'CSCZ Competitions]]'
+	elseif args.game == _GAME_CS_SOURCE then
+		content = '[[Counter-Strike: Source|Source]][[Category:' .. betaTag .. 'CSS Competitions]]'
+	elseif args.game == _GAME_CS_ONLINE then
+		content = '[[Counter-Strike Online|Online]][[Category:' .. betaTag .. 'CSO Competitions]]'
+	elseif args.game == _GAME_CS_GO then
+		content = '[[Counter-Strike: Global Offensive|Global Offensive]][[Category:' .. betaTag ..
+			'CSGO Competitions]]|[[Category:{{#if:{{{beta|}}}|Beta&nbsp;}}Competitions]]'
+	else
+		content = args.modname
+	end
+
+	content = content .. betaTag
+
+	if String.isEmpty(args.epatch) and not String.isEmpty(args.patch) then
+		content = content .. '[[' .. args.patch .. ']]'
+	elseif not String.isEmpty(args.epatch) then
+		content = content .. '<br> [[' .. args.patch .. ']]' .. '&ndash;' .. '[[' .. args.epatch .. ']]'
+	end
+
+	return content
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
