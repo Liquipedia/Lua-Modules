@@ -224,8 +224,8 @@ function CustomLeague._getGameVersion(game, patch, args)
 		end
 
 		--set patch variables
-		Variables.varDefine('patch', 'Patch ' .. patch)
-		Variables.varDefine('epatch', 'Patch ' .. epatch)
+		Variables.varDefine('patch', patch)
+		Variables.varDefine('epatch', epatch)
 
 		return gameversion .. patch_display
 	end
@@ -370,22 +370,22 @@ function CustomLeague:addCustomContent(infobox, args)
 	infobox:cell('Number of teams', args.team_number)
 	if not String.isEmpty(args.team1) then
 		infobox:header('Teams', true)
-		local teams = CustomLeague:_makeBasedListFromArgs(args, 'team', {redirect = false})
+		local teams = CustomLeague:_makeBasedListFromArgs(args, 'team')
 		infobox	:centeredCell(unpack(teams))
 	end
 
 	--maps
 	if not String.isEmpty(args.map1) then
 		infobox:header('Maps', true)
-		local maps = CustomLeague:_makeBasedListFromArgs(args, 'map', {redirect = true})
+		local maps = CustomLeague:_makeBasedListFromArgs(args, 'map')
 		infobox:centeredCell(unpack(maps))
 	elseif not String.isEmpty(args['2map1']) then
 		infobox:header(args['2maptitle'] or '2v2 Maps', true)
-		local maps = CustomLeague:_makeBasedListFromArgs(args, '2map', {redirect = true})
+		local maps = CustomLeague:_makeBasedListFromArgs(args, '2map')
 		infobox:centeredCell(unpack(maps))
 	elseif not String.isEmpty(args['3map1']) then
 		infobox:header(args['3maptitle'] or '3v3 Maps', true)
-		local maps = CustomLeague:_makeBasedListFromArgs(args, '3map', {redirect = true})
+		local maps = CustomLeague:_makeBasedListFromArgs(args, '3map')
 		infobox:centeredCell(unpack(maps))
 	end
 
@@ -479,17 +479,11 @@ end
 function CustomLeague:_makeBasedListFromArgs(args, base, options)
 	options = options or {}
 	local firstArg = args[base .. '1']
-	if options.redirecet then
-		firstArg = mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)
-	end
 	local foundArgs = {CustomLeague:_makeInternalLink(firstArg)}
 	local index = 2
 
 	while not String.isEmpty(args[base .. index]) do
 		local currentArg = args['map' .. index]
-		if options.redirecet then
-			currentArg = mw.ext.TeamLiquidIntegration.resolve_redirect(currentArg)
-		end
 		table.insert(foundArgs, '&nbsp;• ' ..
 			tostring(CustomLeague:_createNoWrappingSpan(
 				CustomLeague:_makeInternalLink(currentArg)
@@ -503,8 +497,7 @@ end
 
 function CustomLeague:defineCustomPageVariables(args)
 	--override vars that need custom handling on sc2
-	local game = args.game or ''
-	Variables.varDefine('tournament_game', (_GAMES[game] or {})[1] or game)
+	Variables.varDefine('tournament_game', string.lower(args.game or ''))
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	--Legacy vars
@@ -560,7 +553,7 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.series = mw.ext.TeamLiquidIntegration.resolve_redirect(lpdbData.series or '')
-	lpdbData.game = string.lower(Variables.varDefault('tournament_game', ''))
+	lpdbData.game = string.lower(args.game or '')
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefaultMulti('epatch', 'patch', '')
 	local status = args.status
@@ -575,10 +568,16 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:_concatArgs(args, base)
-	local foundArgs = {args[base] or args[base .. '1']}
+	local firstArg = args[base] or args[base .. '1']
+	if String.isEmpty(firstArg) then
+		return nil
+	end
+	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
 	local index = 2
 	while not String.isEmpty(args[base .. index]) do
-		table.insert(foundArgs, args[base .. index])
+		table.insert(foundArgs,
+			mw.ext.TeamLiquidIntegration.resolve_redirect(args[base .. index])
+		)
 		index = index + 1
 	end
 
