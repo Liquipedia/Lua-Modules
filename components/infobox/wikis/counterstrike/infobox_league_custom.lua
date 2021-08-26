@@ -326,6 +326,8 @@ function CustomLeague:_createGameCell(args)
 			'CSGO Competitions]]'
 	elseif args.game == _GAME_MOD then
 		content = args.modname
+	else
+		content = '[[Category:' .. betaTag .. 'Competitions]]'
 	end
 
 	content = content .. betaTag
