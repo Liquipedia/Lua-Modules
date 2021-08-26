@@ -125,7 +125,7 @@ function League:createInfobox()
 		if not String.isEmpty(args.team_number) then
 			self.infobox:categories('Team Tournaments')
 		end
-		self.infobox:categories(self:getWikiCategories(args))
+		self.infobox:categories(unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args, links)
 	end
 
