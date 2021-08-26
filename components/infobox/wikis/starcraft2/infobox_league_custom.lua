@@ -14,7 +14,6 @@ local Variables = require('Module:Variables')
 local Class = require('Module:Class')
 local Autopatch = require('Module:Automated Patch')._main
 local Tier = require('Module:Tier')
-local Json = require('Module:Json')
 local Namespace = require('Module:Namespace')
 local AllowedServers = require('Module:Server')
 local RaceIcon = require('Module:RaceIcon')
@@ -23,7 +22,6 @@ local CustomLeague = Class.new()
 
 local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local _TODAY = os.date('%Y-%m-%d', os.time())
-local _MAPS = {}
 
 local _GAME_WOL = 'wol'
 local _GAME_HOTS = 'hots'
@@ -60,7 +58,7 @@ end
 function CustomLeague:addCustomCells(infobox, args)
 	infobox:cell('Game Version',
 		CustomLeague._getGameVersion(string.lower(args.game or ''), args.patch or '', args))
-	
+
 	return infobox
 end
 
@@ -123,14 +121,14 @@ end
 
 -- Automatically fill in next/previous for touranaments that are part of a series
 function CustomLeague._computeChronology(args)
-	-- Criteria for automatic chronology are 
+	-- Criteria for automatic chronology are
 	-- - part of a series and numbered
 	-- - the subpage name matches the number
 	-- - prev or next are unspecified
 	-- - and not suppressed via auto_chronology=false
 	local title = mw.title.getCurrentTitle()
 	local number = tonumber(title.subpageText or '')
-	local automateChronology = 
+	local automateChronology =
 		(args.series or '') ~= ''
 		and number ~= nil
 		and tonumber(args.number or '') == number
@@ -174,9 +172,9 @@ function CustomLeague:getServer(args)
 	local servers = mw.text.split(server, '/')
 
 	local output = ''
-	for _, item in ipairs(servers or {}) do
+	for key, item in ipairs(servers or {}) do
 		item = string.lower(item)
-		if i ~= 1 then
+		if key ~= 1 then
 			output = output .. ' / '
 		end
 		output = output .. (AllowedServers[item] or ('[[Category:Server Unknown|' .. item .. ']]'))
@@ -262,19 +260,20 @@ function CustomLeague:createPrizepool(args)
 			end
 		end
 
+		local plusText = hasPlus and '+' or ''
 		if prizePoolUSD then
 			display = Template.safeExpand(
 				mw.getCurrentFrame(),
 				'Local currency',
 				{localCurrency:lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
-			) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. (hasPlus and '+' or '') .. ' ' .. _ABBR_USD .. ')'
+			) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
 		elseif prizePool then
-			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. (hasPlus and '+' or '') .. ' ' .. _ABBR_USD
+			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText .. ' ' .. _ABBR_USD
 		end
 		if hasText then
 			display = display .. '[[Category:Pages with text set as prizepool in infobox league]]'
 		end
-		
+
 		Variables.varDefine('usd prize', prizePoolUSD or prizePool)
 		Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
 		Variables.varDefine('local prize', prizePool)
@@ -305,7 +304,7 @@ function CustomLeague:_displayPrizeValue(value, numDigits)
 	if value == 0 or value == '0' then
 		return '-'
 	end
-	
+
 	numDigits = tonumber(numDigits or 0) or 0
 	local factor = 10^numDigits
 	value = math.floor(value * factor + 0.5) / factor
@@ -325,16 +324,18 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 
 	--remove currency abbreviations
 	value = value:gsub('<abbr.*abbr>', ''):gsub(',', '')
-	--remove white spaces
-	value = value:gsub('%s', '')
 
 	--remove currency symbol
 	if currency then
-		--get currencysymbols
-		--remove them from value
+		_ = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
+		local symbol = Variables.varDefineMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
+		value = value:gsub(symbol, '')
 	else
 		value = value:gsub('%$', '')
 	end
+
+	--remove white spaces and &nbsp;
+	value = value:gsub('%s', ''):gsub('&nbsp;', '')
 
 	--check if it has a "+" at the end
 	local hasPlus = string.match(value, '%+$')
@@ -397,7 +398,7 @@ function CustomLeague._playerBreakDownEvent(args)
 	local codeA = tonumber(args.code_a_number or 0) or 0
 	local premier = tonumber(args.premier_number or 0) or 0
 	local challenger = tonumber(args.challenger_number or 0) or 0
-	playerNumber = codeS + codeA + premier + challenger
+	local playerNumber = codeS + codeA + premier + challenger
 
 	if playerNumber > 0 then
 		playerBreakDown.playerNumber = playerNumber
@@ -406,7 +407,7 @@ function CustomLeague._playerBreakDownEvent(args)
 			playerBreakDown.display[#playerBreakDown.display + 1] = _SICON .. ' ' .. codeS
 		end
 		if codeA > 0 then
-			playerBreakDown.display[#playerBreakDown.display + 1] = _SICON .. ' ' .. codeA
+			playerBreakDown.display[#playerBreakDown.display + 1] = _AICON .. ' ' .. codeA
 		end
 		if premier > 0 then
 			playerBreakDown.display[#playerBreakDown.display + 1] = _PICON .. ' ' .. premier
@@ -477,7 +478,6 @@ end
 
 function CustomLeague:_makeBasedListFromArgs(args, base, options)
 	options = options or {}
-	local foundArgs
 	local firstArg = args[base .. '1']
 	if options.redirecet then
 		firstArg = mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)
