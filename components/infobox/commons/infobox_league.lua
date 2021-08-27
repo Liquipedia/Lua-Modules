@@ -40,8 +40,8 @@ function League:createInfobox()
 				:fcell(Cell:new('Series')
 					:options({})
 					:content(
-						self:_createSeries(mw.getCurrentFrame(), args.series, args.abbrevation),
-						self:_createSeries(mw.getCurrentFrame(), args.series2, args.abbrevation2)
+						self:_createSeries(mw.getCurrentFrame(), args.series, args.abbreviation),
+						self:_createSeries(mw.getCurrentFrame(), args.series2, args.abbreviation2)
 					)
 					:make()
 				)
