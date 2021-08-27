@@ -25,7 +25,7 @@ local MODES = {
 	['team'] = 'team',
 	['literal'] = 'literal',
 	['1'] = '1v1',
-	['2'] = '3',
+	['2'] = '2v2',
 	['3'] = '3v3',
 	['4'] = '4v4'
 	}
@@ -40,9 +40,14 @@ end
 
 --returns the Code for a Match, depending on the input
 function wikiCopyPaste.getMatchCode(bestof, mode, index,  opponents, args)
+	if bestof == 0 and args.score ~= 'false' then
+		args.score = 'true'
+	end
 	local score = args.score == 'true' and '|score=' or ''
-	local out = '{{Match' .. (index == 1 and bestof ~= 0 and ('|bestof=' .. bestof) or '') ..
-		(bestof == 0 and '\n\t|winner=' or '') .. '\n\t|date=\n\t|twitch='
+	local hasDate = args.hasDate == 'true' and '\n\t|date=\n\t|twitch=' or ''
+	local needsWinner = args.needsWinner == 'true' and '\n\t|winner=' or ''
+	local out = '{{Match' .. (index == 1 and ('|bestof=' .. (bestof ~= 0 and bestof or ''))) ..
+		needsWinner .. hasDate
 
 	for i = 1, opponents do
 		out = out .. '\n\t|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score)
