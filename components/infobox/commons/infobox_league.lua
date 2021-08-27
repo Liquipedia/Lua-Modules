@@ -385,8 +385,8 @@ function League:_createOrganizers(args)
 			organizers,
 			League:_createOrganizer(
 				args['organizer' .. index],
-				args['organizer-name' .. index],
-				args['organizer-link' .. index],
+				args['organizer' .. index .. '-name'],
+				args['organizer' .. index .. '-link'],
 				args['organizerref' .. index])
 		)
 		index = index + 1
