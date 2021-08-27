@@ -45,7 +45,7 @@ function League:createInfobox()
 					)
 					:make()
 				)
-				:fcell(Cell:new('Organizer')
+				:fcell(Cell:new('Organizer(s)')
 					:options({})
 					:content(
 						unpack(self:_createOrganizers(args))
@@ -87,7 +87,7 @@ function League:createInfobox()
 					country = args.country,
 					country2 = args.country2,
 					location = args.city or args.location,
-					location2 = args.city or args.location2
+					location2 = args.city2 or args.location2
 				}))
 				:cell('Venue', args.venue)
 				:cell('Format', args.format)
@@ -384,10 +384,10 @@ function League:_createOrganizers(args)
 		table.insert(
 			organizers,
 			League:_createOrganizer(
-			args['organizer' .. index],
-			args['organizer-name' .. index],
-			args['organizer-link' .. index],
-			args['organizerref' .. index])
+				args['organizer' .. index],
+				args['organizer' .. index .. '-name'],
+				args['organizer' .. index .. '-link'],
+				args['organizerref' .. index])
 		)
 		index = index + 1
 	end
