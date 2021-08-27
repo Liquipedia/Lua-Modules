@@ -368,7 +368,7 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 	elseif eslProTier == 'masters championship' then
 		return _ICON_EPT_MASTERS .. 'ESL Pro Tour|Masters Championship]] Masters Champ.'
 	elseif eslProTier == 'major championship' then
-		return '[[File:Valve csgo tournament icon.png|40x40px|link=Majors|Major Championship]] Major Championship'
+		return '[[File:Valve csgo tournament icon.png|20x20px|link=Majors|Major Championship]] Major Championship'
 	end
 
 	return ''
