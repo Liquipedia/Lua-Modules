@@ -45,7 +45,7 @@ function League:createInfobox()
 					)
 					:make()
 				)
-				:fcell(Cell:new('Organizer')
+				:fcell(Cell:new('Organizer(s)')
 					:options({})
 					:content(
 						unpack(self:_createOrganizers(args))
