@@ -384,10 +384,10 @@ function League:_createOrganizers(args)
 		table.insert(
 			organizers,
 			League:_createOrganizer(
-			args['organizer' .. index],
-			args['organizer-name' .. index],
-			args['organizer-link' .. index],
-			args['organizerref' .. index])
+				args['organizer' .. index],
+				args['organizer-name' .. index],
+				args['organizer-link' .. index],
+				args['organizerref' .. index])
 		)
 		index = index + 1
 	end
