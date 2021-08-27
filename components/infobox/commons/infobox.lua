@@ -36,10 +36,10 @@ end
 function Infobox:name(name)
     local pagename = name or mw.title.getCurrentTitle().text
     local infoboxHeader = mw.html.create('div'):addClass('infobox-header')
-    infoboxHeader:wikitext(pagename)
     infoboxHeader   :addClass('infobox-header')
                     :addClass('wiki-backgroundcolor-light')
                     :node(self:_createInfoboxButtons())
+	                :wikitext(pagename)
     self.content:node(mw.html.create('div'):node(infoboxHeader))
     return self
 end
