@@ -41,9 +41,11 @@ function NotabilityChecker.run(args)
         output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
 		' is \'\'\'OPEN FOR DISCUSSION\'\'\'\n'
     elseif weight < Config.NOTABILITY_THRESHOLD_MIN then
-        output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') .. ' is \'\'\'NOT NOTABLE\'\'\'\n'
+        output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
+		' is \'\'\'NOT NOTABLE\'\'\'\n'
     else
-        output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') .. ' is \'\'\'NOTABLE\'\'\'\n'
+        output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
+		' is \'\'\'NOTABLE\'\'\'\n'
     end
 
 	return output
