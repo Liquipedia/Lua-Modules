@@ -153,7 +153,7 @@ function CustomLeague:createPrizepool(args)
 	local localCurrency = args.localcurrency
 
 	if String.isEmpty(prizepool) then
-		content = '$' .. prizepoolInUsd .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
+		content = '$' .. (prizepoolInUsd or '0') .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
 	else
 		if not String.isEmpty(localCurrency) then
 			local converted = Template.safeExpand(
