@@ -49,7 +49,7 @@ end
 
 function CustomLeague:addCustomCells(infobox, args)
 	infobox:cell('Game', CustomLeague:_createGameCell(args))
-	infobox:cell('Teams', args.team_number .. (args.team_slots and ('/' .. args.team_slots) or ''))
+	infobox:cell('Teams', (args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or ''))
 	infobox:cell('Players', args.player_number)
 	infobox:fcell(
 		Cell:new('[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier')
