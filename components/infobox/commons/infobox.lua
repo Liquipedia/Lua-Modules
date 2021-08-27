@@ -39,7 +39,7 @@ function Infobox:name(name)
     infoboxHeader   :addClass('infobox-header')
                     :addClass('wiki-backgroundcolor-light')
                     :node(self:_createInfoboxButtons())
-	                :wikitext(pagename)
+                    :wikitext(pagename)
     self.content:node(mw.html.create('div'):node(infoboxHeader))
     return self
 end
