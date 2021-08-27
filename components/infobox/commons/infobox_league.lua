@@ -87,7 +87,7 @@ function League:createInfobox()
 					country = args.country,
 					country2 = args.country2,
 					location = args.city or args.location,
-					location2 = args.city or args.location2
+					location2 = args.city2 or args.location2
 				}))
 				:cell('Venue', args.venue)
 				:cell('Format', args.format)
