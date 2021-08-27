@@ -63,6 +63,7 @@ function CustomLeague:addCustomCells(infobox, args)
 	)
 	infobox:fcell(
 		Cell:new(Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox'))
+			:addClass('valvepremier-highlighted')
 			:content(CustomLeague:_createValveTierCell(args.valvetier))
 			:categories(
 				function(_, ...)
@@ -261,7 +262,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 
 	Variables.varDefine('tournament_valve_major',
-		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR  and true or args.valvemajor)
+		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR  and 'true' or args.valvemajor)
 	Variables.varDefine('tournament_valve_tier',
 		mw.getContentLanguage():ucfirst(args.valvetier or ''):lower())
 	Variables.varDefine('tournament_cstrike_major', args.cstrikemajor)
