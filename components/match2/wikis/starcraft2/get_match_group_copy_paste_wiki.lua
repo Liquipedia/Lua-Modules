@@ -46,7 +46,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index,  opponents, args)
 	local score = args.score == 'true' and '|score=' or ''
 	local hasDate = args.hasDate == 'true' and '\n\t|date=\n\t|twitch=' or ''
 	local needsWinner = args.needsWinner == 'true' and '\n\t|winner=' or ''
-	local out = '{{Match' .. (index == 1 and ('|bestof=' .. (bestof ~= 0 and bestof or ''))) ..
+	local out = '{{Match' .. (index == 1 and ('|bestof=' .. (bestof ~= 0 and bestof or '')) or '') ..
 		needsWinner .. hasDate
 
 	for i = 1, opponents do
