@@ -499,10 +499,6 @@ function CustomLeague:_makeBasedListFromArgs(args, base)
 end
 
 function CustomLeague:defineCustomPageVariables(args)
-	--override vars that need custom handling on sc2
-	Variables.varDefine('tournament_game', string.lower(args.game or ''))
-	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
-
 	--Legacy vars
 	local name = self.name
 	Variables.varDefine('tournament_ticker_name', args.tickername or name)
@@ -555,15 +551,12 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.series = mw.ext.TeamLiquidIntegration.resolve_redirect(lpdbData.series or '')
-	lpdbData.game = string.lower(args.game or '')
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefaultMulti('epatch', 'patch', '')
 	local status = args.status
 		or Variables.varDefault('cancelled tournament', '') == 'true' and 'cancelled'
 		or Variables.varDefault('tournament_finished', '') == 'true' and 'finished'
 	lpdbData.status = status
-	lpdbData.shortname = lpdbData.shortname or args.abbreviation
 	lpdbData.maps = CustomLeague:_concatArgs(args, 'map')
 	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', args.team_number or 0)
 
