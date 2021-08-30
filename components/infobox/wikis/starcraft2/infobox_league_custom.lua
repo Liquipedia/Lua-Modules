@@ -17,6 +17,7 @@ local Tier = require('Module:Tier')
 local Namespace = require('Module:Namespace')
 local AllowedServers = require('Module:Server')
 local RaceIcon = require('Module:RaceIcon')
+local PageLink = require('Module:Page')
 
 local CustomLeague = Class.new()
 
@@ -142,11 +143,11 @@ function CustomLeague._computeChronology(args)
 		local previousPage = (args.previous or '') == '' and
 			title.basePageTitle:subPageTitle(tostring(number - 1)).fullText
 
-		if not next and CustomLeague:_exists(nextPage) then
+		if not next and PageLink.exists(nextPage) then
 			next = nextPage .. '|#' .. tostring(number + 1)
 		end
 
-		if not previous and 1 < number and CustomLeague:_exists(previousPage) then
+		if not previous and 1 < number and PageLink.exists(previousPage) then
 			previous = previousPage .. '|#' .. tostring(number - 1)
 		end
 
@@ -596,20 +597,6 @@ end
 
 function CustomLeague:_makeInternalLink(content)
 	return '[[' .. content .. ']]'
-end
-
---here
---kick this if PR #286 goes through
-function CustomLeague:_exists(page)
-	local existingPage = mw.title.new(page)
-
-	-- In some cases we might have gotten an external link,
-	-- which will mean `existingPage` will equal nil
-	if existingPage == nil then
-		return false
-	end
-
-	return existingPage.exists
 end
 
 return CustomLeague
