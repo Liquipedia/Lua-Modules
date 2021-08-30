@@ -18,6 +18,7 @@ local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
 local Variables = require('Module:Variables')
 local Locale = require('Module:Locale')
+local Page = require('Module:Page')
 
 local League = Class.new(BasicInfobox)
 
@@ -173,10 +174,10 @@ end
 
 function League:_definePageVariables(args)
 	Variables.varDefine('tournament_name', args.name)
-	Variables.varDefine('tournament_shortname', args.shortname)
+	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
 	Variables.varDefine('tournament_tickername', args.tickername)
 	Variables.varDefine('tournament_icon', args.icon)
-	Variables.varDefine('tournament_series', args.series)
+	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
 	Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)
@@ -190,7 +191,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_location2', args.location2 or args.city2)
 	Variables.varDefine('tournament_venue', args.venue)
 
-	Variables.varDefine('tournament_game', args.game)
+	Variables.varDefine('tournament_game', string.lower(args.game or ''))
 
 	Variables.varDefine('tournament_parent', args.parent)
 	Variables.varDefine('tournament_parentname', args.parentname)
@@ -207,14 +208,15 @@ function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
 		tickername = args.tickername,
-		shortname = args.shortname,
+		shortname = args.shortname or args.abbreviation,
 		banner = args.image,
 		icon = args.icon,
-		series = args.series,
+		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		previous = args.previous,
 		previous2 = args.previous2,
 		next = args.next,
 		next2 = args.next2,
+		game = string.lower(args.game or ''),
 		patch = args.patch,
 		endpatch = args.endpatch or args.epatch,
 		type = args.type,
@@ -318,11 +320,11 @@ function League:_createSeries(frame, series, abbreviation)
 
 	local output = ''
 
-	if self:_exists('Template:LeagueIconSmall/' .. series:lower()) then
+	if PageLink.exists('Template:LeagueIconSmall/' .. series:lower()) then
 		output = Template.safeExpand(frame, 'LeagueIconSmall/' .. series:lower()) .. ' '
 	end
 
-	if not self:_exists(series) then
+	if not PageLink.exists(series) then
 		if String.isEmpty(abbreviation) then
 			output = output .. series
 		else
@@ -344,7 +346,7 @@ function League:_createOrganizer(organizer, name, link, reference)
 
 	local output
 
-	if self:_exists(organizer) then
+	if PageLink.exists(organizer) then
 		output = '[[' .. organizer .. '|'
 		if String.isEmpty(name) then
 			output = output .. organizer .. ']]'
@@ -403,18 +405,6 @@ function League:_cleanDate(date)
 	date = date:gsub('-??', '-01')
 	date = date:gsub('-XX', '-01')
 	return date
-end
-
-function League:_exists(page)
-	local existingPage = mw.title.new(page)
-
-	-- In some cases we might have gotten an external link,
-	-- which will mean `existingPage` will equal nil
-	if existingPage == nil then
-		return false
-	end
-
-	return existingPage.exists
 end
 
 function League:_isUnknownDate(date)
