@@ -320,11 +320,11 @@ function League:_createSeries(frame, series, abbreviation)
 
 	local output = ''
 
-	if PageLink.exists('Template:LeagueIconSmall/' .. series:lower()) then
+	if Page.exists('Template:LeagueIconSmall/' .. series:lower()) then
 		output = Template.safeExpand(frame, 'LeagueIconSmall/' .. series:lower()) .. ' '
 	end
 
-	if not PageLink.exists(series) then
+	if not Page.exists(series) then
 		if String.isEmpty(abbreviation) then
 			output = output .. series
 		else
@@ -346,7 +346,7 @@ function League:_createOrganizer(organizer, name, link, reference)
 
 	local output
 
-	if PageLink.exists(organizer) then
+	if Page.exists(organizer) then
 		output = '[[' .. organizer .. '|'
 		if String.isEmpty(name) then
 			output = output .. organizer .. ']]'
