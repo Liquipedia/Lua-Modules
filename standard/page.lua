@@ -23,31 +23,28 @@ function page.exists(link)
 	return existingPage.exists
 end
 
-function page.makeInternalLink(link, display)
-	if String.isEmpty(link) then
+function page.makeInternalLink(options, display, customLink)
+	-- if no options are passed along (e.g. if the module is invoked from wiki code)
+	-- we need to shift the vars around to account for that
+	if type(options) == 'string' then
+		customLink = display
+		display = options
+	end
+	if String.isEmpty(display) then
 		return nil
-	elseif String.isEmpty(display) then
-		display = link
+	elseif String.isEmpty(customLink) then
+		customLink = display
 	end
 
-	return '[[' .. link .. '|' .. display .. ']]'
+	if (options or {}).onlyIfExists == true and (not page.exists(customLink)) then
+		return nil
+	end
+
+	return '[[' .. customLink .. '|' .. display .. ']]'
 end
 
-function page.makeInternalLinkIfExists(link, display)
-	if String.isEmpty(link) then
-		return nil
-	elseif String.isEmpty(display) then
-		display = link
-	end
-	if not page.exists(link) then
-		return nil
-	end
-
-	return '[[' .. link .. '|' .. display .. ']]'
-end
-
-function page.makeExternalLink(link, display)
-	if String.isEmpty(link) then
+function page.makeExternalLink(display, link)
+	if String.isEmpty(display) or String.isEmpty(link) then
 		return nil
 	end
 	local output = '[' .. link
