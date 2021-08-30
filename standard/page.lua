@@ -11,8 +11,8 @@ local String = require('Module:StringUtils')
 
 local page = {}
 
-function page.exists(page)
-	local existingPage = mw.title.new(page)
+function page.exists(link)
+	local existingPage = mw.title.new(link)
 
 	-- In some cases we might have gotten an external link,
 	-- which will mean `existingPage` will equal nil
