@@ -374,7 +374,6 @@ function CustomLeague:addCustomContent(infobox, args)
 	end
 	infobox:cell('Number of teams', args.team_number)
 	if not String.isEmpty(args.team1) then
-		infobox:header('Teams', true)
 		local teams = CustomLeague:_makeBasedListFromArgs(args, 'team')
 		infobox	:centeredCell(unpack(teams))
 	end
@@ -483,14 +482,14 @@ end
 
 function CustomLeague:_makeBasedListFromArgs(args, base)
 	local firstArg = args[base .. '1']
-	local foundArgs = {CustomLeague:_makeInternalLink(firstArg)}
+	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
 	local index = 2
 
 	while not String.isEmpty(args[base .. index]) do
 		local currentArg = args['map' .. index]
 		table.insert(foundArgs, '&nbsp;• ' ..
 			tostring(CustomLeague:_createNoWrappingSpan(
-				CustomLeague:_makeInternalLink(currentArg)
+				PageLink.makeInternalLink({}, currentArg)
 			))
 		)
 		index = index + 1
@@ -593,10 +592,6 @@ function CustomLeague:_createNoWrappingSpan(content)
 	span:css('white-space', 'nowrap')
 		:node(content)
 	return span
-end
-
-function CustomLeague:_makeInternalLink(content)
-	return '[[' .. content .. ']]'
 end
 
 return CustomLeague
