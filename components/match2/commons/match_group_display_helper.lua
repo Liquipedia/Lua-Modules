@@ -96,9 +96,15 @@ end
 -- Display component showing the streams, date, and countdown of a match.
 function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
+	local dateFormatString
+	if match.dateIsExact == true then
+		dateFormatString = 'F j, Y - H:i'
+	else
+		dateFormatString = 'F j, Y'
+	end
 
 	local stream = Table.merge(match.stream, {
-		date = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date),
+		date = mw.getContentLanguage():formatDate(dateFormatString, match.date),
 		finished = match.finished and 'true' or nil,
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')
