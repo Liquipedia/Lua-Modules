@@ -33,30 +33,22 @@ end
 
 function CustomLeague:addCustomCells(infobox, args)
 	local sponsors = mw.text.split(args.sponsors, ',', true)
+
 	infobox:cell('Sponsor', table.concat(sponsors, '&nbsp;•'))
-
 	infobox:cell('Game', CustomLeague:_makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or ''))
-
-	if League:shouldStore(args) then
-		infobox:categories(GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. 'Competitions')
-	end
-
 	infobox:cell('Version', CustomLeague:_makeVersionLink(args))
-
 	infobox:cell('Patch', CustomLeague:_makePatchLink(args))
-
-	if not String.isEmpty(args.voobly) then
-		infobox:cell('Voobly & WololoKingdoms', args.voobly)
-	end
-
+	infobox:cell('Voobly & WololoKingdoms', args.voobly)
 	infobox:fcell(Cell:new('Game mode')
 					:options({})
 					:content(unpack(CustomLeague:_getGameModes(args)))
 					:make())
-
-
 	infobox:cell('Number of teams', args.team_number)
 	infobox:cell('Number of players', args.player_number)
+
+	if League:shouldStore(args) then
+		infobox:categories(GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. 'Competitions')
+	end
 
 	return infobox
 end
