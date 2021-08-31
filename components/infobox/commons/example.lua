@@ -23,30 +23,30 @@ end
 function Example:createInfobox()
 	local args = self.args
 
-	self.infobox:build(
-		{
-			Header(
-				{
-					name = args.name,
-					image = args.image or args.default,
-					caption = args.caption,
-					contentTitle = 'League Information'
-				}
-			),
-			Cell('Series', args.series),
-			Cell('Organizer', args.organizer),
-			Customizable(
-				'tier',
-				{
-					Cell('Liquipedia tier', args.liquipediatier),
-					Cell('Liquipedia tier type', args.liquipediatiertype)
-				}
-			),
-			Customizable('custom', {})
-		}
-	):overrideWith(self.overrideWidgets)
-
 	return self.infobox
+		:inject(self.overrideWidgets)
+		:build(
+			{
+				Header(
+					{
+						name = args.name,
+						image = args.image or args.default,
+						caption = args.caption,
+						contentTitle = 'League Information'
+					}
+				),
+				Cell('Series', args.series),
+				Cell('Organizer', args.organizer),
+				Customizable(
+					'tier',
+					{
+						Cell('Liquipedia tier', args.liquipediatier),
+						Cell('Liquipedia tier type', args.liquipediatiertype)
+					}
+				),
+				Customizable('custom', {})
+			}
+		)
 end
 
 function Example:overrideWidgets()
