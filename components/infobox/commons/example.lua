@@ -9,9 +9,6 @@
 local BasicInfobox = require('Module:Infobox/Basic')
 local Cell = require('Module:Infobox/Cell')
 local Class = require('Module:Class')
-local Table = require('Module:Table')
-local String = require('Module:String')
-local Links = require('Module:Links')
 
 local Example = Class.new(BasicInfobox)
 
