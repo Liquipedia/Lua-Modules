@@ -15,7 +15,7 @@ function Example:createInfobox()
 	local args = self.args
 
 	return self.infobox
-		:inject(self.overrideWidgets)
+		:widgetInjector(self.overrideWidgets)
 		:build(
 			{
 				Header(
