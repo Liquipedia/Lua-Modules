@@ -42,7 +42,11 @@ function Infobox:build(widgets)
 			return error('Infobox:build can only accept Widgets')
 		end
 
-		self.content:node(widget:make())
+		local contentItems = widget:make()
+		for _, node in pairs(contentItems) do
+			self.content:node(node)
+		end
+
 	end
 
     self.root:node(self.content)
