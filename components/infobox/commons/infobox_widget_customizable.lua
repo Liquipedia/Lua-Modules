@@ -26,6 +26,9 @@ function Customizable:setWidgetInjector(injector)
 end
 
 function Customizable:make()
+	if self.injector == nil then
+		return self.widgets
+	end
 	return self.injector:parse(self.id, self.widgets)
 end
 
