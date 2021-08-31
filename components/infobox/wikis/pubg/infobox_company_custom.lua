@@ -24,12 +24,7 @@ function CustomCompany:addCustomCells(infobox, args)
 					)
 					:make()
 				)
-  
-    return infobox
-end
 
-function CustomCompany._createSisterCompanies(infobox, args)
-    infobox:cell('Epic Creator Code', args.creatorcode)
     return infobox
 end
 
