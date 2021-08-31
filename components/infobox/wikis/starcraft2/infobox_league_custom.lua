@@ -519,7 +519,7 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', args.mode or '1v1')
-	Variables.varDefine('headtohead', args.headtohead)
+	Variables.varDefine('headtohead', args.headtohead or 'true')
 	Variables.varDefine('featured', args.featured or 'false')
 	--series number
 	local seriesNumber = args.number or ''
