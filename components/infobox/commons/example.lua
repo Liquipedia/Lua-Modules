@@ -1,5 +1,7 @@
 local BasicInfobox = require('Module:Infobox/Basic')
 local Cell = require('Module:Infobox/Cell')
+local Header = require('Module:Infobox/Header')
+local Customizable = require('Module:Infobox/Customizable')
 local Class = require('Module:Class')
 
 local Example = Class.new(BasicInfobox)
