@@ -12,7 +12,7 @@ local Widget = require('Module:Infobox/Widget')
 local Header = Class.new(
 	Widget,
 	function(self, input)
-		self.name = self:assertExistsAndCopy(input.name)
+		self.name = input.name
 		self.image = input.image
 		self.imageDefault = input.imageDefault
 		self.size = input.size
