@@ -18,9 +18,5 @@ function Injector:addCustomCells(widgets)
 	return {}
 end
 
-function Injector:addCustomCells(widgets)
-	return {}
-end
-
 return Injector
 
