@@ -77,7 +77,7 @@ function Cell:make()
 		return {}
 	end
 
-	self.root   :node(self.description)
+	self.root	:node(self.description)
 				:node(self.contentDiv)
 	return {
 		self.root
