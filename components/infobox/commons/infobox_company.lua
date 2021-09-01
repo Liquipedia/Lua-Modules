@@ -38,10 +38,7 @@ function Company:createInfobox()
     local args = self.args
 
 	local widgets = ({
-		Header({
-			name = args.name,
-			image = args.image
-		}),
+		Header({name = args.name, image = args.image}),
 		Center(args.caption),
 		Title('League Information'),
 		Cell({

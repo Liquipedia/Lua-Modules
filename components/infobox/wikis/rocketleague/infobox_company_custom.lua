@@ -6,19 +6,36 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Class = require('Module:Class')
 local Company = require('Module:Infobox/Company')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
 
-local RocketLeagueCompany = {}
+local CustomCompany = Class.new()
 
-function RocketLeagueCompany.run(frame)
+local CustomInjector = Class.new(Injector)
+
+local _args
+
+function CustomInjector:parse(id, widgets)
+	if id == 'custom' then
+		table.insert(widgets, Cell({
+			name = 'Epic Creator Code',
+			content = {_args.creatorcode}
+		}))
+	end
+	return widgets
+end
+
+function CustomCompany.run(frame)
     local company = Company(frame)
-    company.addCustomCells = RocketLeagueCompany.addCustomCells
+	company.createWidgetInjector = CustomCompany.createWidgetInjector
+	_args = company.args
     return company:createInfobox(frame)
 end
 
-function RocketLeagueCompany:addCustomCells(infobox, args)
-    infobox:cell('Epic Creator Code', args.creatorcode)
-    return infobox
+function CustomCompany:createWidgetInjector()
+	return CustomInjector()
 end
 
-return RocketLeagueCompany
+return CustomCompany
