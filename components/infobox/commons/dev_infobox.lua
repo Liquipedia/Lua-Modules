@@ -55,11 +55,14 @@ function Infobox:build(widgets)
 
 		if widget:is_a(Customizable) then
 			widget:setWidgetInjector(self.injector)
+			contentItems = {}
 			for _, child in pairs(widget:make() or {}) do
 				if child['is_a'] == nil or child:is_a(Widget) == false then
 					return error('Customizable can only contain Widgets as children')
 				end
-				contentItems = child:make()
+				for _, item in pairs(child:make() or {}) do
+					table.insert(contentItems, item)
+				end
 			end
 		else
 			contentItems = widget:make()
