@@ -70,16 +70,18 @@ end
 
 function Cell:make()
 	self:_new(self.name)
-	self:_class(unpack(self.classes))
+	self:_class(unpack(self.classes or {}))
 	self:_content(unpack(self.content))
 
 	if self.contentDiv == nil then
-		return ''
+		return {}
 	end
 
 	self.root   :node(self.description)
 				:node(self.contentDiv)
-	return self.root
+	return {
+		self.root
+	}
 end
 
 return Cell
