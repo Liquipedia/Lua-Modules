@@ -31,6 +31,9 @@ function Customizable:make()
 	if self.injector == nil then
 		return self.widgets
 	end
+	if self.id == ' custom' then
+		return self.injector:addCustomCells(self.widgets)
+	end
 	return self.injector:parse(self.id, self.widgets)
 end
 
