@@ -154,8 +154,6 @@ function CustomLeague:addCustomContent(infobox, args)
 end
 
 function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('game', GameLookup.getName({args.game}))
-
 	-- Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
@@ -163,6 +161,16 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
 	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
 	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+
+	Variables.varDefine('game', GameLookup.getName({args.game}))
+	Variables.varDefine('tournament_patch', args.patch)
+	Variables.varDefine('patch', args.patch)
+	Variables.varDefine('tournament_mode',
+		(not String.isEmpty(args.mode)) and args.mode or
+		(not String.isEmpty(args.team_number)) and 'team' or
+		'1v1'
+	)
+	Variables.varDefine('tournament_headtohead', args.headtohead)
 
 	-- Legacy tier vars
 	Variables.varDefine('tournament_lptier', args.liquipediatier)
