@@ -23,7 +23,7 @@ function Infobox:create(frame, gameName)
     self.root   :addClass('fo-nttax-infobox-wrapper')
                 :addClass('infobox-' .. gameName)
 
-	self.injector = nil
+    self.injector = nil
     return self
 end
 
