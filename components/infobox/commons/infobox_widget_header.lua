@@ -50,7 +50,7 @@ function Header:_image(fileName, default, size)
         size = '600px'
     end
     local fullFileName = '[[File:' .. (fileName or default) .. '|center|' .. size .. ']]'
-    infoboxImage:wikitext(self.frame:preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
+    infoboxImage:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
     return mw.html.create('div'):node(infoboxImage)
 end
 
