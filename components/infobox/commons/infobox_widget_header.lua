@@ -38,7 +38,7 @@ end
 
 function Header:_image(fileName, default, size)
     if (fileName == nil or fileName == '') and (default == nil or default == '') then
-        return self
+        return nil
     end
 
     local infoboxImage = mw.html.create('div'):addClass('infobox-image')
