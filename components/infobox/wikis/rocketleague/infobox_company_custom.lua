@@ -17,13 +17,11 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
-function CustomInjector:parse(id, widgets)
-	if id == 'custom' then
-		table.insert(widgets, Cell({
-			name = 'Epic Creator Code',
-			content = {_args.creatorcode}
-		}))
-	end
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell({
+		name = 'Epic Creator Code',
+		content = {_args.creatorcode}
+	}))
 	return widgets
 end
 
