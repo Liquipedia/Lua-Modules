@@ -36,7 +36,7 @@ function Links:make()
     end
 
 	return {
-		self.content:node(mw.html.create('div'):node(infoboxLinks))
+		mw.html.create('div'):node(infoboxLinks)
 	}
 end
 
