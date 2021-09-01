@@ -49,7 +49,7 @@ function Company:createInfobox()
 		Cell({name = 'Defunct', content = {args.defunctdate},}),
 		Cell({
 			name = 'Location',
-			content = {self:_createLocation(mw.getCurrentFrame(), args.location)},
+			content = {self:_createLocation(args.location)},
 		}),
 		Cell({name = 'Headquarters', content = {args.headquarters}}),
 		Cell({name = 'Employees', content = {args.employees}}),
@@ -100,7 +100,7 @@ function Company:createInfobox()
     return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
-function Company:_createLocation(frame, location)
+function Company:_createLocation(location)
     if location == nil then
         return ''
     end
