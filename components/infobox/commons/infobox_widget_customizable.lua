@@ -19,7 +19,7 @@ local Customizable = Class.new(
 )
 
 function Customizable:setWidgetInjector(injector)
-	if injector:is_a(Injector) == false then
+	if injector == nil or injector['is_a'] == nil or injector:is_a(Injector) == false then
 		return error('Valid Injector from Infobox/Widget/Injector needs to be provided')
 	end
 	self.injector = injector
