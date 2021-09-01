@@ -54,4 +54,31 @@ function Header:_image(fileName, default, size)
     return mw.html.create('div'):node(infoboxImage)
 end
 
+function Header:_createInfoboxButtons()
+    local rootFrame
+    local currentFrame = mw.getCurrentFrame()
+    while currentFrame ~= nil do
+        rootFrame = currentFrame
+        currentFrame = currentFrame:getParent()
+    end
+
+    local moduleTitle = rootFrame:getTitle()
+
+    local buttons = mw.html.create('span')
+    buttons:addClass('infobox-buttons')
+    buttons:node(
+        mw.text.nowiki('[') .. '[' .. mw.site.server ..
+        tostring(mw.uri.localUrl( mw.title.getCurrentTitle().prefixedText, 'action=edit&section=0' )) ..
+        ' e]' .. mw.text.nowiki(']')
+    )
+    buttons:node(
+        mw.text.nowiki('[') ..
+        '[[' .. moduleTitle ..
+        '/doc|h]]' .. mw.text.nowiki(']')
+    )
+
+    return buttons
+end
+
+
 return Header
