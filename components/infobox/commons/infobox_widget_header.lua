@@ -38,7 +38,7 @@ end
 
 function Header:_image(fileName, default, size)
     if (fileName == nil or fileName == '') and (default == nil or default == '') then
-        return self
+        return nil
     end
 
     local infoboxImage = mw.html.create('div'):addClass('infobox-image')
@@ -50,8 +50,34 @@ function Header:_image(fileName, default, size)
         size = '600px'
     end
     local fullFileName = '[[File:' .. (fileName or default) .. '|center|' .. size .. ']]'
-    infoboxImage:wikitext(self.frame:preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
+    infoboxImage:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
     return mw.html.create('div'):node(infoboxImage)
+end
+
+function Header:_createInfoboxButtons()
+    local rootFrame
+    local currentFrame = mw.getCurrentFrame()
+    while currentFrame ~= nil do
+        rootFrame = currentFrame
+        currentFrame = currentFrame:getParent()
+    end
+
+    local moduleTitle = rootFrame:getTitle()
+
+    local buttons = mw.html.create('span')
+    buttons:addClass('infobox-buttons')
+    buttons:node(
+        mw.text.nowiki('[') .. '[' .. mw.site.server ..
+        tostring(mw.uri.localUrl( mw.title.getCurrentTitle().prefixedText, 'action=edit&section=0' )) ..
+        ' e]' .. mw.text.nowiki(']')
+    )
+    buttons:node(
+        mw.text.nowiki('[') ..
+        '[[' .. moduleTitle ..
+        '/doc|h]]' .. mw.text.nowiki(']')
+    )
+
+    return buttons
 end
 
 return Header
