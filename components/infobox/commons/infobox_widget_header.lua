@@ -80,5 +80,4 @@ function Header:_createInfoboxButtons()
     return buttons
 end
 
-
 return Header
