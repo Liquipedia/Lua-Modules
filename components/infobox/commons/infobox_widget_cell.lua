@@ -73,6 +73,10 @@ function Cell:make()
 	self:_class(unpack(self.classes))
 	self:_content(unpack(self.content))
 
+	if self.contentDiv == nil then
+		return ''
+	end
+
 	self.root   :node(self.description)
 				:node(self.contentDiv)
 	return self.root
