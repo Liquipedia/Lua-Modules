@@ -16,6 +16,7 @@ local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
 local PrizePool = require('Module:Prize pool currency')
 local MapMode = require('Module:MapMode')
+local GameModeLookup = require('Module:GameModeLookup')
 
 local CustomLeague = Class.new()
 
@@ -246,15 +247,14 @@ function CustomLeague:_makePatchLink(args)
 end
 
 function CustomLeague:_getGameModes(args)
-	if String.isEmpty(args.gamemode) then return nil end
+	if String.isEmpty(args.gamemode) then
+		return CustomLeague:_makeInternalLink(GameModeLookup.getDefault({args.game or ''}))
+	end
 
 	local gameModes = mw.text.split(args.gamemode, ',', true)
 	table.foreach(gameModes,
 		function(index, mode)
-			gameModes[index] = CustomLeague:_makeInternalLink(
-								Template.safeExpand(mw.getCurrentFrame(),
-								'GamemodeLookup',
-								{mode}))
+			gameModes[index] = CustomLeague:_makeInternalLink(GameModeLookup.getName({mode}) or '')
 		end
 	)
 
