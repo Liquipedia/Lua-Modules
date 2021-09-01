@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Widget = require('Module:Infobox/Widget')
 local Customizable = require('Module:Infobox/Widget/Customizable')
 
 local Infobox = Class.new()
@@ -46,23 +47,30 @@ end
 --- Returns completed infobox
 function Infobox:build(widgets)
 	for _, widget in pairs(widgets) do
-		if widget['is_a'] == nil then
+		if widget == nil or widget['is_a'] == nil then
 			return error('Infobox:build can only accept Widgets')
 		end
 
+		local contentItems
+
 		if widget:is_a(Customizable) then
 			widget:setWidgetInjector(self.injector)
+			for _, child in pairs(widget:make() or {}) do
+				if child['is_a'] == nil or child:is_a(Widget) == false then
+					return error('Customizable can only contain Widgets as children')
+				end
+				contentItems = child:make()
+			end
+		else
+			contentItems = widget:make()
 		end
 
-		local contentItems = widget:make()
-		for _, node in pairs(contentItems) do
+		for _, node in pairs(contentItems or {}) do
 			self.content:node(node)
 		end
-
 	end
 
     self.root:node(self.content)
-
     self.root:node(self.adbox)
     return self.root
 end
