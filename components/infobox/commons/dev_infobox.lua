@@ -40,6 +40,7 @@ end
 
 function Infobox:widgetInjector(injector)
 	self.injector = injector
+	return self
 end
 
 --- Returns completed infobox
