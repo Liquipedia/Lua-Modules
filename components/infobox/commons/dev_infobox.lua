@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Customizable = require('Module:Infobox/Widget/Customizable')
 
 local Infobox = Class.new()
 
@@ -21,6 +22,8 @@ function Infobox:create(frame, gameName)
                                             :addClass('wiki-bordercolor-light')
     self.root   :addClass('fo-nttax-infobox-wrapper')
                 :addClass('infobox-' .. gameName)
+
+	self.injector = nil
     return self
 end
 
@@ -35,11 +38,19 @@ function Infobox:categories(...)
     return self
 end
 
+function Infobox:widgetInjector(injector)
+	self.injector = injector
+end
+
 --- Returns completed infobox
 function Infobox:build(widgets)
 	for _, widget in pairs(widgets) do
 		if widget['is_a'] == nil then
 			return error('Infobox:build can only accept Widgets')
+		end
+
+		if widget:is_a(Customizable) then
+			widget:setWidgetInjector(self.injector)
 		end
 
 		local contentItems = widget:make()
