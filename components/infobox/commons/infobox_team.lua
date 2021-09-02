@@ -25,7 +25,6 @@ local Builder = Widgets.Builder
 
 local Team = Class.new(BasicInfobox)
 
-local Language = mw.language.new('en')
 local _LINK_VARIANT = 'team'
 
 function Team.run(frame)
@@ -36,14 +35,6 @@ end
 function Team:createInfobox(frame)
     local infobox = self.infobox
     local args = self.args
-
-    local earnings = self:calculateEarnings(args)
-    Variables.varDefine('earnings', earnings)
-    if earnings == 0 then
-        earnings = nil
-    else
-        earnings = '$' .. Language:formatNum(earnings)
-    end
 
 	local widgets = {
 		Header{name = args.name, image = args.image},
