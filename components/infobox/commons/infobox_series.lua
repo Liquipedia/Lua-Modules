@@ -41,10 +41,15 @@ function Series:createInfobox(frame)
 		Header{name = args.name, image = args.image},
 		Center{content = {args.caption}},
 		Title{name = 'Series Information'},
-		Cell{
-			name = 'Liquipedia Tier',
-			content = {
-				self:createTier(args.liquipediatier, (args.liquipediatiertype or args.tiertype))
+		Customizable{
+			id = 'liquipediatier',
+			children = {
+				Cell{
+					name = 'Liquipedia Tier',
+					content = {
+						self:_createTier(args.liquipediatier, (args.liquipediatiertype or args.tiertype))
+					}
+				},
 			}
 		},
 		Cell{
@@ -167,8 +172,7 @@ function Series:addToLpdb(lpdbData)
     return lpdbData
 end
 
---- Allows for overriding this functionality
-function Series:createTier(tier, tierType)
+function Series:_createTier(tier, tierType)
     if tier == nil or tier == '' then
         return ''
     end

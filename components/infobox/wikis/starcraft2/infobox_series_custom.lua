@@ -84,6 +84,23 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+function CustomInjector:parse(id, widgets)
+	if id == 'tier' then
+		return {
+			Cell{
+				name = 'Liquipedia Tier',
+				contents = {
+					CustomSeries.createTier(
+						_series.args.liquipediatier, (_series.args.liquipediatiertype or _series.args.tiertype))
+				}
+
+			}
+		}
+	end
+
+	return widgets
+end
+
 function CustomSeries._getSeriesPrizepools(args)
 	local seriesTotalPrizeInput = Json.parseIfString(args.prizepooltot or '{}')
 	local series = seriesTotalPrizeInput.series or args.series or mw.title.getCurrentTitle().text
@@ -193,7 +210,7 @@ function CustomSeries._setDateMatchVar(date, edate, sdate)
 end
 
 --function for custom tier handling
-function CustomSeries.createTier(self, tier, tierType)
+function CustomSeries.createTier(tier, tierType)
 	if tier == nil or tier == '' then
 		return ''
 	end
