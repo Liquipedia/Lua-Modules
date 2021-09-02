@@ -38,30 +38,30 @@ function Company:createInfobox()
     local args = self.args
 
 	local widgets = ({
-		Header{{name = args.name, image = args.image}},
+		Header{name = args.name, image = args.image},
 		Center{content = {args.caption}},
 		Title{name = 'League Information'},
-		Cell{{
+		Cell{
 			name = 'Parent company',
 			content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
-		}},
-		Cell{{name = 'Founded', content = {args.foundeddate},}},
-		Cell{{name = 'Defunct', content = {args.defunctdate},}},
-		Cell{{
+		},
+		Cell{name = 'Founded', content = {args.foundeddate},},
+		Cell{name = 'Defunct', content = {args.defunctdate},},
+		Cell{
 			name = 'Location',
 			content = {self:_createLocation(args.location)},
-		}},
-		Cell{{name = 'Headquarters', content = {args.headquarters}}},
-		Cell{{name = 'Employees', content = {args.employees}}},
-		Cell{{name = 'Traded as', content = {args.tradedas}}},
+		},
+		Cell{name = 'Headquarters', content = {args.headquarters}},
+		Cell{name = 'Employees', content = {args.employees}},
+		Cell{name = 'Traded as', content = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
 	})
 
     if not String.isEmpty(args.companytype) and args.companytype == _COMPANY_TYPE_ORGANIZER then
-		table.insert(widgets, Cell({
+		table.insert(widgets, Cell{
 			name = 'Total prize money',
 			content = {self:_getOrganizerPrizepools()}
-		}))
+		})
 
         infobox:categories('Tournament organizers')
     end
