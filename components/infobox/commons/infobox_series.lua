@@ -18,6 +18,14 @@ local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
 local BasicInfobox = require('Module:Infobox/Basic')
 
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Customizable = Widgets.Customizable
+local Builder = Widgets.Builder
+
 local Series = Class.new(BasicInfobox)
 
 function Series.run(frame)
@@ -29,31 +37,67 @@ function Series:createInfobox(frame)
     local infobox = self.infobox
     local args = self.args
 
-    infobox :name(args.name)
-            :image(args.image, args.default)
-            :centeredCell(args.caption)
-            :header('Series Information', true)
-            :cell('Liquipedia Tier', self:createTier(
-                args.liquipediatier, (args.liquipediatiertype or args.tiertype)))
-            :fcell(Cell:new('Organizer'):options({makeLink = true}):content(
-                                                                        args.organizer,
-                                                                        args.organizer2,
-                                                                        args.organizer3,
-                                                                        args.organizer4,
-                                                                        args.organizer5,
-                                                                        args.organizer6,
-                                                                        args.organizer7
-                                                                    ):make())
-            :fcell(Cell:new('Location'):options({}):content(self:_createLocation(args.country, args.city)):make())
-            :cell('Date', args.date)
-            :cell('Start Date', args.sdate or args.launched)
-            :cell('End Date', args.edate or args.defunct)
-            :cell('Sponsor(s)', args.sponsor)
-    self:addCustomCells(infobox, args)
-
-    local links = Links.transform(args)
-    infobox :header('Links', not Table.isEmpty(links))
-            :links(links)
+	local widgets = {
+		Header{name = args.name, image = args.image},
+		Center{content = {args.caption}},
+		Title{name = 'Series Information'},
+		Cell{
+			name = 'Liquipedia Tier',
+			content = {
+				self:createTier(args.liquipediatier, (args.liquipediatiertype or args.tiertype))
+			}
+		},
+		Cell{
+			name = 'Organizer',
+			content = self:getAllArgsForBase(args, 'organizer'),
+			options = {
+				makeLink = true
+			}
+		},
+		Cell{
+			name = 'Location',
+			content = {
+				self:_createLocation(args.country, args.city)
+			}
+		},
+		Cell{
+			name = 'Date',
+			content = {
+				args.date
+			}
+		},
+		Cell{
+			name = 'Start Date',
+			content = {
+				args.sdate or args.launched
+			}
+		},
+		Cell{
+			name = 'Date',
+			content = {
+				args.edate or args.defunct
+			}
+		},
+		Cell{
+			name = 'Sponsor(s)',
+			content = self:getAllArgsForBase(args, 'sponsor')
+		},
+		Customizable{
+			id = 'custom',
+			children = {}
+		},
+		Builder{
+			builder = function()
+				local links = Links.transform(args)
+				if not Table.isEmpty(links) then
+					return {
+						Title{name = 'Links'},
+						Widgets.Links{content = links}
+					}
+				end
+			end
+		}
+	}
 
     if Namespace.isMain() then
         local lpdbData = {
@@ -115,7 +159,7 @@ function Series:createInfobox(frame)
         )
     end
 
-    return infobox:build()
+    return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 --- Allows for overriding this functionality
