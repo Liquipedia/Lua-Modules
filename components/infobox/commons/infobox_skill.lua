@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local InfoboxBasic = require('Module:Infobox/Basic/dev')
+local InfoboxBasic = require('Module:Infobox/Basic')
 local String = require('Module:String')
 local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
