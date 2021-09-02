@@ -22,7 +22,6 @@ local _team
 
 function CustomTeam.run(frame)
     local team = Team(frame)
-    team.calculateEarnings = CustomTeam.calculateEarnings
 	_team = team
     return team:createInfobox(frame)
 end
