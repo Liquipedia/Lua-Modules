@@ -48,10 +48,6 @@ function CustomInjector:addCustomCells(widgets)
 		content = {Ability:getResearchFrom()}
 	})
 	table.insert(widgets, Cell{
-		name = 'Research Cost',
-		content = {Ability:getResearchCost()}
-	})
-	table.insert(widgets, Cell{
 		name = 'Research Hotkey',
 		content = {Ability:getResearchHotkey()}
 	})
@@ -63,9 +59,9 @@ function Ability:createWidgetInjector()
 	return CustomInjector()
 end
 
-function StarCraft2Ability:getResearchFrom()
+function Ability:getResearchFrom()
 	local from = _args.from
-	if String.isEmpty(args.from) then
+	if String.isEmpty(_args.from) then
 		from = 'No research needed'
 	elseif not String.isEmpty(_args.from2) then
 		from = '[[' .. from .. ']], [[' .. _args.from2 .. ']]'
@@ -76,7 +72,7 @@ function StarCraft2Ability:getResearchFrom()
 	return from
 end
 
-function StarCraft2Ability:getResearchHotkey()
+function Ability:getResearchHotkey()
 	local display
 	if not String.isEmpty(_args.from) then
 		display = Hotkeys.hotkey(_args.rhotkey)
@@ -85,7 +81,7 @@ function StarCraft2Ability:getResearchHotkey()
 	return display
 end
 
-function StarCraft2Ability:getCategories()
+function Ability:getCategories()
 	local categories = { 'Abilities' }
 	local race = CleanRace[_args.race or '']
 	if race then
@@ -95,7 +91,7 @@ function StarCraft2Ability:getCategories()
 	return categories
 end
 
-function StarCraft2Ability:getDuration2()
+function Ability:getDuration2()
 	local display
 	local description = '[[Game Speed|Duration 2]]'
 
@@ -116,7 +112,7 @@ function StarCraft2Ability:getDuration2()
 	return description, display
 end
 
-function StarCraft2Ability:getDuration()
+function Ability:getDuration()
 	local display
 	local description = '[[Game Speed|Duration]]'
 
@@ -138,7 +134,7 @@ function StarCraft2Ability:getDuration()
 	return description, display
 end
 
-function StarCraft2Ability:getHotkeys()
+function Ability:getHotkeys()
 	local description = '[[Hotkeys per Race|Hotkey]]'
 	local display
 	if not String.isEmpty(_args.hotkey) then
@@ -152,7 +148,7 @@ function StarCraft2Ability:getHotkeys()
 	return description, display
 end
 
-function StarCraft2Ability:getCostDisplay()
+function Ability:getCostDisplay()
 	local race = string.lower(_args.race or '')
 
 	local minerals = tonumber(_args.min or 0) or 0
