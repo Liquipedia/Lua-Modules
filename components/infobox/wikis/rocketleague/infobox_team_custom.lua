@@ -9,25 +9,56 @@
 local Team = require('Module:Infobox/Team')
 local Earnings = require('Module:Earnings')
 local Variables = require('Module:Variables')
+local Class = require('Module:Class')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
 
-local RocketLeagueTeam = {}
+local CustomTeam = Class.new()
 
-function RocketLeagueTeam.run(frame)
+local CustomInjector = Class.new(Injector)
+local Language = mw.language.new('en')
+
+local _team
+
+function CustomTeam.run(frame)
     local team = Team(frame)
-    team.addCustomCells = RocketLeagueTeam.addCustomCells
-    team.calculateEarnings = RocketLeagueTeam.calculateEarnings
+    team.calculateEarnings = CustomTeam.calculateEarnings
+	_team = team
     return team:createInfobox(frame)
 end
 
-function RocketLeagueTeam.addCustomCells(team, infobox, args)
-    Variables.varDefine('rating', args.rating)
-    infobox :cell('[[Portal:Rating|LPRating]]', args.rating or 'Not enough data')
-    return infobox
-
+function CustomInjector:addCustomCells(widgets)
+    Variables.varDefine('rating', _team.args.rating)
+	table.insert(widgets, Cell({
+		name = '[[Portal:Rating|LPRating]]',
+		content = {_team.args.rating or 'Not enough data'}
+	}))
+	return widgets
 end
 
-function RocketLeagueTeam.calculateEarnings(team, args)
-    return Earnings.calculateForTeam({team = team.pagename or team.name})
+function CustomInjector:parse(id, widgets)
+	if id == 'earnings' then
+		local earnings = Earnings.calculateForTeam({team = _team.pagename or _team.name})
+		Variables.varDefine('earnings', earnings)
+		if earnings == 0 then
+			earnings = nil
+		else
+			earnings = '$' .. Language:formatNum(earnings)
+		end
+		return {
+			Cell{
+				name = 'Earnings',
+				content = {
+					earnings
+				}
+			}
+		}
+	end
+	return widgets
 end
 
-return RocketLeagueTeam
+function CustomTeam:createWidgetInjector()
+	return CustomInjector()
+end
+
+return CustomTeam
