@@ -44,6 +44,11 @@ function Infobox:widgetInjector(injector)
 	return self
 end
 
+function Infobox:bottom(wikitext)
+	self.bottomContent = wikitext
+	return self
+end
+
 --- Returns completed infobox
 function Infobox:build(widgets)
 	for _, widget in pairs(widgets) do
@@ -74,6 +79,9 @@ function Infobox:build(widgets)
 	end
 
     self.root:node(self.content)
+	if self.bottomContent ~= nil then
+		self.root:node(self.bottomContent)
+	end
     self.root:node(self.adbox)
     return self.root
 end
