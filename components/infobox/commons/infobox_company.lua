@@ -21,6 +21,7 @@ local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
+local Builder = Widgets.Builder
 
 local Language = mw.language.new('en')
 
@@ -55,23 +56,32 @@ function Company:createInfobox()
 		Cell{name = 'Employees', content = {args.employees}},
 		Cell{name = 'Traded as', content = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
+		Builder{
+			builder = function()
+				if not String.isEmpty(args.companytype) and args.companytype == _COMPANY_TYPE_ORGANIZER then
+					infobox:categories('Tournament organizers')
+					return {
+						Cell{
+							name = 'Total prize money',
+							content = {self:_getOrganizerPrizepools()}
+						}
+					}
+				end
+			end
+		},
+		Center{content = {args.footnotes}},
+		Builder{
+			builder = function()
+				local links = Links.transform(args)
+				if not Table.isEmpty(links) then
+					return {
+						Title{name = 'Links'},
+						Widgets.Links{content = links}
+					}
+				end
+			end
+		}
 	})
-
-    if not String.isEmpty(args.companytype) and args.companytype == _COMPANY_TYPE_ORGANIZER then
-		table.insert(widgets, Cell{
-			name = 'Total prize money',
-			content = {self:_getOrganizerPrizepools()}
-		})
-
-        infobox:categories('Tournament organizers')
-    end
-
-    local links = Links.transform(args)
-	table.insert(widgets, Center{content = {args.footnotes}})
-	if not Table.isEmpty(links) then
-		table.insert(widgets, Title{name = 'Links'})
-		table.insert(widgets, Widgets.Links{content = links})
-	end
 
     mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {
         name = self.name,
