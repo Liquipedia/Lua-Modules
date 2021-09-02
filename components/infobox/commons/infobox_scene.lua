@@ -21,6 +21,7 @@ local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
+local Builder = Widgets.Builder
 
 local Scene = Class.new(InfoboxBasic)
 
@@ -42,19 +43,29 @@ function Scene:createInfobox()
 		Cell{name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})},
 		Cell{name = 'Size', content = {args.size}},
 		Customizable{id = 'custom', children = {}},
+		Center{content = {args.footnotes}},
+		Builder{
+			builder = function()
+				local links = Links.transform(args)
+				if not Table.isEmpty(links) then
+					return {
+						Title{name = 'Links'},
+						Widgets.Links{content = links}
+					}
+				end
+			end
+		},
+		Builder{
+			builder = function()
+				if not String.isEmpty(args.achievements) then
+					return {
+						Title{name ='Achievements'},
+						Center{content = {args.achievements}}
+					}
+				end
+			end
+		}
 	})
-
-	local links = Links.transform(args)
-	table.insert(widgets, Center{content = {args.footnotes}})
-	if not Table.isEmpty(links) then
-		table.insert(widgets, Title{name = 'Links'})
-		table.insert(widgets, Widgets.Links{content = links})
-	end
-
-	if not String.isEmpty(args.achievements) then
-		table.insert(widgets, Title{name ='Achievements'})
-		table.insert(widgets, Center{content = {args.achievements}})
-	end
 
 	infobox:categories('Scene')
 
