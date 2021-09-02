@@ -38,7 +38,7 @@ function Company:createInfobox()
     local infobox = self.infobox
     local args = self.args
 
-	local widgets = ({
+	local widgets = {
 		Header{name = args.name, image = args.image},
 		Center{content = {args.caption}},
 		Title{name = 'League Information'},
@@ -81,7 +81,7 @@ function Company:createInfobox()
 				end
 			end
 		}
-	})
+	}
 
     mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {
         name = self.name,
