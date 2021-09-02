@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
+local Table = require('Module:Table')
 
 local Center = Class.new(
 	Widget,
@@ -23,6 +24,10 @@ function Center:make()
 end
 
 function Center:_create(content)
+	if Table.isEmpty(content) then
+		return nil
+	end
+
 	local centered = mw.html.create('div'):addClass('infobox-center')
 
 	for _, item in pairs(content) do
