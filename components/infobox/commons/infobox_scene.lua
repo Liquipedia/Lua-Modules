@@ -34,13 +34,13 @@ function Scene:createInfobox()
 	local args = self.args
 
 	local widgets = ({
-		Header{{name = self:createNameDisplay(args), image = args.image}},
+		Header{name = self:createNameDisplay(args), image = args.image},
 		Center{content = {args.caption}},
 		Title{name = 'Scene Information'},
-		Cell{{name = 'Region', content = {args.region}}},
-		Cell{{name = 'National team', content = {args.nationalteam}, options = {makeLink = true}}},
-		Cell{{name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})}},
-		Cell{{name = 'Size', content = {args.size}}},
+		Cell{name = 'Region', content = {args.region}},
+		Cell{name = 'National team', content = {args.nationalteam}, options = {makeLink = true}},
+		Cell{name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})},
+		Cell{name = 'Size', content = {args.size}},
 		Customizable{id = 'custom', children = {}},
 	})
 
