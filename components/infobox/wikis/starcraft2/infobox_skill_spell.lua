@@ -13,6 +13,7 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local CleanRace = require('Module:CleanRace2')
 local Hotkeys = require('Module:Hotkey')
 local String = require('Module:StringUtils')
+local PageLink = require('Module:Page')
 
 local Spell = Class.new()
 
@@ -29,19 +30,15 @@ function Spell.run(frame)
     local spell = Skill(frame)
 	spell.createWidgetInjector = Spell.createWidgetInjector
 	spell.getCategories = Spell.getCategories
-	spell.getDuration = Spell.getDuration
-	spell.getHotkeys = Spell.getHotkeys
-	spell.getCostDisplay = Spell.getCostDisplay
 	_args = spell.args
     return spell:createInfobox(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	local duration2Description, duration2Display = Spell:getDuration2()
 
 	table.insert(widgets, Cell{
-		name = duration2Description,
-		content = {duration2Display}
+		name = '[[Game Speed|Duration 2]]',
+		content = {Spell:getDuration2()}
 	})
 	table.insert(widgets, Cell{
 		name = 'Researched from',
@@ -59,6 +56,47 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Move Speed',
 		content = {_args.movespeed}
 	})
+
+	return widgets
+end
+
+function CustomInjector:parse(id, widgets)
+	if id == 'cost' then
+		return {
+			Cell{
+				name = 'Cost',
+				content = {Spell:getCostDisplay()}
+
+			}
+		}
+	end
+	if id == 'hotkey' then
+		return {
+			Cell{
+				name = '[[Hotkeys per Race|Hotkey]]',
+				content = {Spell:getHotkeys()}
+
+			}
+		}
+	end
+	if id == 'cooldown' then
+		return {
+			Cell{
+				name = PageLink.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown',
+				content = {_args.cooldown}
+
+			}
+		}
+	end
+	if id == 'duration' then
+		return {
+			Cell{
+				name = '[[Game Speed|Duration]]',
+				content = {Spell:getDuration()}
+
+			}
+		}
+	end
 
 	return widgets
 end
@@ -138,7 +176,6 @@ end
 
 function Spell:getDuration2()
 	local display
-	local description = '[[Game Speed|Duration 2]]'
 
 	if _args.channeled2 == 'true' then
 		display = 'Channeled&nbsp;' .. _args.duration2
@@ -154,7 +191,7 @@ function Spell:getDuration2()
 		display = display .. '&#32;([[' .. _args.caster2 .. ']])'
 	end
 
-	return description, display
+	return display
 end
 
 function Spell:getDuration()
@@ -176,7 +213,7 @@ function Spell:getDuration()
 		display = display .. '&#32;([[' .. _args.caster .. ']])'
 	end
 
-	return description, display
+	return display
 end
 
 function Spell:getHotkeys()
@@ -190,7 +227,7 @@ function Spell:getHotkeys()
 		end
 	end
 
-	return description, display
+	return display
 end
 
 function Spell:getCostDisplay()
