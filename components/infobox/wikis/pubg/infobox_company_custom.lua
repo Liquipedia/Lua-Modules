@@ -1,31 +1,39 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
+-- wiki=pubg
 -- page=Module:Infobox/Company/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Class = require('Module:Class')
 local Company = require('Module:Infobox/Company')
-local Cell = require('Module:Infobox/Cell')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
 
-local CustomCompany = {}
+local CustomCompany = Class.new()
+
+local CustomInjector = Class.new(Injector)
+
+local _args
+
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell({
+		name = CustomCompany._createSisterCompaniesDescription(_args),
+		content = {self:getAllArgsForBase(_args, 'sister', {})}
+	}))
+	return widgets
+end
 
 function CustomCompany.run(frame)
     local company = Company(frame)
-    company.addCustomCells = CustomCompany.addCustomCells
+	company.createWidgetInjector = CustomCompany.createWidgetInjector
+	_args = company.args
     return company:createInfobox(frame)
 end
 
-function CustomCompany:addCustomCells(infobox, args)
-    infobox:fcell(Cell:new(CustomCompany._createSisterCompaniesDescription(args))
-					:content(
-						unpack(self:getAllArgsForBase(args, 'sister', {}))
-					)
-					:make()
-				)
-
-    return infobox
+function CustomCompany:createWidgetInjector()
+	return CustomInjector()
 end
 
 function CustomCompany._createSisterCompaniesDescription(args)
