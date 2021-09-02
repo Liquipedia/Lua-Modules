@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
