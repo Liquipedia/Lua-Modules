@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
+local Hotkey = require('Module:Hotkey')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -21,10 +22,10 @@ local Map = Class.new(BasicInfobox)
 
 function Map.run(frame)
 	local map = Map(frame)
-	return map:createInfobox(frame)
+	return map:createInfobox()
 end
 
-function Map:createInfobox(frame)
+function Map:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
