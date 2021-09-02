@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local InfoboxBasic = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
-local Hotkey = require('Module:Hotkey')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -33,7 +32,9 @@ function Map:createInfobox()
 		Header{name = self:getNameDisplay(args), image = args.image},
 		Center{content = {args.caption}},
 		Title{name = 'Map Information'},
-		Cell{name = 'Creator', content = {args.creator or args['created-by'], args.creator2 or args['created-by2']}, options = { makeLink = true }},
+		Cell{name = 'Creator', content = {
+				args.creator or args['created-by'], args.creator2 or args['created-by2']}, options = { makeLink = true }
+		},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
 	}
