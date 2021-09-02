@@ -6,10 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
-local Hotkey = require('Module:Hotkey')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -22,10 +22,10 @@ local Map = Class.new(BasicInfobox)
 
 function Map.run(frame)
 	local map = Map(frame)
-	return map:createInfobox()
+	return map:createInfobox(frame)
 end
 
-function Map:createInfobox()
+function Map:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
 
@@ -45,7 +45,7 @@ function Map:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build()
 end
 
 --- Allows for overriding this functionality
