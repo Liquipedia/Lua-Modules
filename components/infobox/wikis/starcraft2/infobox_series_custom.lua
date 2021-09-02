@@ -13,6 +13,10 @@ local Tier = require('Module:Tier')
 local Json = require('Module:Json')
 local VarDefine = require('Module:Variables').varDefine
 local Namespace = require('Module:Namespace')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Builder = require('Module:Infobox/Widget/Builder')
+local Class = require('Module:Class')
 
 local _GAME_WOL = 'wol'
 local _GAME_HOTS = 'hots'
@@ -26,30 +30,61 @@ local _GAMES = {
 	[_GAME_MOD] = {'mod', 'mod'}
 }
 
-local Sc2Series = {}
+local CustomInjector = Class.new(Injector)
 
-function Sc2Series.run(frame)
+local CustomSeries = {}
+
+local _series
+
+function CustomSeries.run(frame)
 	local series = Series(frame)
-	series.addCustomCells = Sc2Series.addCustomCells
-	series.createTier = Sc2Series.createTier
+	series.createTier = CustomSeries.createTier
+	series.createWidgetInjector = CustomSeries.createWidgetInjector
+	_series = series
 	return series:createInfobox(frame)
 end
 
-function Sc2Series.addCustomCells(series, infobox, args)
-	infobox:cell('Server', args.server)
-	infobox:cell('Type', args.type)
-	infobox:cell('Format', args.format)
-	if args.prizepooltot ~= 'false' then
-		infobox:cell('Total prize money', Sc2Series._getSeriesPrizepools(args))
-	end
-	infobox:cell('Game version', Sc2Series._getGameVersion(string.lower(args.game or ''), args.patch or '', args))
-
-	Sc2Series._addCustomVariables(args)
-
-	return infobox
+function CustomSeries:createWidgetInjector()
+	return CustomInjector()
 end
 
-function Sc2Series._getSeriesPrizepools(args)
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell({
+		name = 'Server',
+		content = {_series.args.server}
+	}))
+	table.insert(widgets, Cell({
+		name = 'Type',
+		content = {_series.args.type}
+	}))
+	table.insert(widgets, Cell({
+		name = 'Format',
+		content = {_series.args.format}
+	}))
+	table.insert(widgets, Builder({
+		builder = function()
+			if _series.args.prizepooltot ~= 'false' then
+				return {
+					Cell{
+						name = 'Total prize money',
+						CustomSeries._getSeriesPrizepools(_series.args)
+					}
+				}
+			end
+		end
+	}))
+	table.insert(widgets, Cell{
+		name = 'Game version',
+		content = {
+			CustomSeries._getGameVersion(
+				string.lower(_series.args.game or ''), _series.args.patch or '', _series.args)
+		}
+	})
+	CustomSeries._addCustomVariables(_series.args)
+	return widgets
+end
+
+function CustomSeries._getSeriesPrizepools(args)
 	local seriesTotalPrizeInput = Json.parseIfString(args.prizepooltot or '{}')
 	local series = seriesTotalPrizeInput.series or args.series or mw.title.getCurrentTitle().text
 
@@ -64,7 +99,7 @@ function Sc2Series._getSeriesPrizepools(args)
 	return SeriesTotalPrize(newArgs)
 end
 
-function Sc2Series._getGameVersion(game, patch, args)
+function CustomSeries._getGameVersion(game, patch, args)
 	local shouldUseAutoPatch = args.autopatch or ''
 	local modName = args.modname or ''
 	local beta = args.beta or ''
@@ -118,7 +153,7 @@ function Sc2Series._getGameVersion(game, patch, args)
 	end
 end
 
-function Sc2Series._addCustomVariables(args)
+function CustomSeries._addCustomVariables(args)
 	if
 		(not Namespace.isMain()) or
 		args.disable_smw == 'true' or
@@ -145,11 +180,11 @@ function Sc2Series._addCustomVariables(args)
 		end
 		VarDefine('tournament_game', game or '')
 		VarDefine('tournament_type', args.type or '')
-		Sc2Series._setDateMatchVar(args.date, args.edate, args.sdate)
+		CustomSeries._setDateMatchVar(args.date, args.edate, args.sdate)
 	end
 end
 
-function Sc2Series._setDateMatchVar(date, edate, sdate)
+function CustomSeries._setDateMatchVar(date, edate, sdate)
 	date = string.match(date or '', '%d%d%d%d%-%d%d%-%d%d')
 		or string.match(edate or '', '%d%d%d%d%-%d%d%-%d%d')
 		or string.match(sdate or '', '%d%d%d%d%-%d%d%-%d%d') or ''
@@ -158,7 +193,7 @@ function Sc2Series._setDateMatchVar(date, edate, sdate)
 end
 
 --function for custom tier handling
-function Sc2Series.createTier(self, tier, tierType)
+function CustomSeries.createTier(self, tier, tierType)
 	if tier == nil or tier == '' then
 		return ''
 	end
@@ -188,4 +223,4 @@ function Sc2Series.createTier(self, tier, tierType)
 	return output
 end
 
-return Sc2Series
+return CustomSeries
