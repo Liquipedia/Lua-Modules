@@ -12,8 +12,8 @@ local Table = require('Module:Table')
 
 local Chronology = Class.new(
 	Widget,
-	function(self, links)
-		self.links = links
+	function(self, input)
+		self.links = input.content
 	end
 )
 
