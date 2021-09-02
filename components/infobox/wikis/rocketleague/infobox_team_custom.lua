@@ -21,13 +21,13 @@ local Language = mw.language.new('en')
 local _team
 
 function CustomTeam.run(frame)
-    local team = Team(frame)
+	local team = Team(frame)
 	_team = team
-    return team:createInfobox(frame)
+	return team:createInfobox(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
-    Variables.varDefine('rating', _team.args.rating)
+	Variables.varDefine('rating', _team.args.rating)
 	table.insert(widgets, Cell{
 		name = '[[Portal:Rating|LPRating]]',
 		content = {_team.args.rating or 'Not enough data'}
