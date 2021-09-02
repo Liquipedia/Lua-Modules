@@ -37,7 +37,7 @@ function Skill:createInfobox()
 	local hotkeyDescription, hotkeyDisplay = self:getHotkeys(args)
 	local durationDescription, durationDisplay = self:getDuration(args)
 
-	local widgets = ({
+	local widgets = {
 		Header{name = args.name, image = args.image, size = args.imageSize},
 		Center{content = {args.caption}},
 		Title{name = args.informationType .. ' Information'},
@@ -52,8 +52,8 @@ function Skill:createInfobox()
 		},
 		Cell{name = durationDescription, content = {durationDisplay}},
 		Customizable{id = 'custom', children = {}},
-	})
-	table.insert(widgets, Center{content = {args.footnotes}})
+		Center{content = {args.footnotes}},
+	}
 
 	if Namespace.isMain() then
 		local categories = self:getCategories(args)
