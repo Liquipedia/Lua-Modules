@@ -28,10 +28,10 @@ end
 
 function CustomInjector:addCustomCells(widgets)
     Variables.varDefine('rating', _team.args.rating)
-	table.insert(widgets, Cell({
+	table.insert(widgets, Cell{
 		name = '[[Portal:Rating|LPRating]]',
 		content = {_team.args.rating or 'Not enough data'}
-	}))
+	})
 	return widgets
 end
 
