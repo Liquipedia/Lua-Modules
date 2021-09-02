@@ -41,7 +41,7 @@ function BasicInfobox:addCustomContent(infobox, args)
 end
 
 --- Allows for overriding this functionality
-function BasicInfobox:createBottomContent(infobox)
+function BasicInfobox:createBottomContent()
     return nil
 end
 
