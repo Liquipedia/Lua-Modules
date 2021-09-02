@@ -196,7 +196,6 @@ end
 
 function Spell:getDuration()
 	local display
-	local description = '[[Game Speed|Duration]]'
 
 	if _args.channeled == 'true' then
 		display = 'Channeled&nbsp;'
@@ -217,7 +216,6 @@ function Spell:getDuration()
 end
 
 function Spell:getHotkeys()
-	local description = '[[Hotkeys per Race|Hotkey]]'
 	local display
 	if not String.isEmpty(_args.hotkey) then
 		if not String.isEmpty(_args.hotkey2) then
