@@ -11,7 +11,6 @@ local InfoboxBasic = require('Module:Infobox/Basic')
 local String = require('Module:String')
 local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
-local PageLink = require('Module:Page')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -34,23 +33,50 @@ function Skill:createInfobox()
 	if String.isEmpty(args.informationType) then
 		error('You need to specify an informationType, e.g. "Spell", "Ability, ...')
 	end
-	local hotkeyDescription, hotkeyDisplay = self:getHotkeys(args)
-	local durationDescription, durationDisplay = self:getDuration(args)
 
 	local widgets = {
 		Header{name = args.name, image = args.image, size = args.imageSize},
 		Center{content = {args.caption}},
 		Title{name = args.informationType .. ' Information'},
 		Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', { makeLink = true })},
-		Cell{name = 'Cost', content = {self:getCostDisplay(args)}},
-		Cell{name = hotkeyDescription, content = {hotkeyDisplay}},
+		Customizable{
+			id = 'cost',
+			children = {
+				Cell{
+					name = 'Cost',
+					content = {args.cost}
+				},
+			}
+		},
+		Customizable{
+			id = 'hotkey',
+			children = {
+				Cell{
+					name = 'Hotkey',
+					content = {self:_getHotkeys(args)}
+				},
+			}
+		},
 		Cell{name = 'Range', content = {args.range}},
 		Cell{name = 'Radius', content = {args.radius}},
-		Cell{
-			name = PageLink.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown',
-			content = {args.cooldown}
+		Customizable{
+			id = 'cooldown',
+			children = {
+				Cell{
+					name = 'Cooldown',
+					content = {args.cooldown}
+				},
+			}
 		},
-		Cell{name = durationDescription, content = {durationDisplay}},
+		Customizable{
+			id = 'duration',
+			children = {
+				Cell{
+					name = 'Duration',
+					content = {args.duration}
+				},
+			}
+		},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
 	}
@@ -68,14 +94,7 @@ function Skill:getCategories(args)
 	return {}
 end
 
---- Allows for overriding this functionality
-function Skill:getDuration(args)
-	return 'Duration', args.duration
-end
-
---- Allows for overriding this functionality
-function Skill:getHotkeys(args)
-	local description = 'Hotkey'
+function Skill:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
@@ -85,12 +104,7 @@ function Skill:getHotkeys(args)
 		end
 	end
 
-	return description, display
-end
-
---- Allows for overriding this functionality
-function Skill:getCostDisplay(args)
-	return args.cost
+	return display
 end
 
 return Skill
