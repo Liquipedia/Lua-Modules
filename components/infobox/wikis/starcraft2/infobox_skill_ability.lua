@@ -13,6 +13,7 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local CleanRace = require('Module:CleanRace2')
 local Hotkeys = require('Module:Hotkey')
 local String = require('Module:StringUtils')
+local PageLink = require('Module:Page')
 
 local Ability = Class.new()
 
@@ -29,19 +30,14 @@ function Ability.run(frame)
     local ability = Skill(frame)
 	ability.createWidgetInjector = Ability.createWidgetInjector
 	ability.getCategories = Ability.getCategories
-	ability.getDuration = Ability.getDuration
-	ability.getHotkeys = Ability.getHotkeys
-	ability.getCostDisplay = Ability.getCostDisplay
 	_args = ability.args
     return ability:createInfobox(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	local duration2Description, duration2Display = Ability:getDuration2()
-
 	table.insert(widgets, Cell{
-		name = duration2Description,
-		content = {duration2Display}
+		name = '[[Game Speed|Duration 2]]',
+		content = {Ability:getDuration2()}
 	})
 	table.insert(widgets, Cell{
 		name = 'Researched from',
@@ -57,6 +53,47 @@ end
 
 function Ability:createWidgetInjector()
 	return CustomInjector()
+end
+
+function CustomInjector:parse(id, widgets)
+	if id == 'cost' then
+		return {
+			Cell{
+				name = 'Cost',
+				content = {Ability:getCostDisplay()}
+
+			}
+		}
+	end
+	if id == 'hotkey' then
+		return {
+			Cell{
+				name = '[[Hotkeys per Race|Hotkey]]',
+				content = {Ability:getHotkeys()}
+
+			}
+		}
+	end
+	if id == 'cooldown' then
+		return {
+			Cell{
+				name = PageLink.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown',
+				content = {_args.cooldown}
+
+			}
+		}
+	end
+	if id == 'duration' then
+		return {
+			Cell{
+				name = '[[Game Speed|Duration]]',
+				content = {Ability:getDuration()}
+
+			}
+		}
+	end
+
+	return widgets
 end
 
 function Ability:getResearchFrom()
@@ -93,7 +130,6 @@ end
 
 function Ability:getDuration2()
 	local display
-	local description = '[[Game Speed|Duration 2]]'
 
 	if _args.channeled2 == 'true' then
 		display = 'Channeled&nbsp;' .. _args.duration2
@@ -109,12 +145,11 @@ function Ability:getDuration2()
 		display = display .. '&#32;([[' .. _args.caster2 .. ']])'
 	end
 
-	return description, display
+	return display
 end
 
 function Ability:getDuration()
 	local display
-	local description = '[[Game Speed|Duration]]'
 
 	if _args.channeled == 'true' then
 		display = 'Channeled&nbsp;'
@@ -131,11 +166,10 @@ function Ability:getDuration()
 		display = display .. '&#32;([[' .. _args.caster .. ']])'
 	end
 
-	return description, display
+	return display
 end
 
 function Ability:getHotkeys()
-	local description = '[[Hotkeys per Race|Hotkey]]'
 	local display
 	if not String.isEmpty(_args.hotkey) then
 		if not String.isEmpty(_args.hotkey2) then
@@ -145,7 +179,7 @@ function Ability:getHotkeys()
 		end
 	end
 
-	return description, display
+	return display
 end
 
 function Ability:getCostDisplay()
