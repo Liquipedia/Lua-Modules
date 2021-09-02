@@ -8,31 +8,38 @@
 
 local Series = require('Module:Infobox/Series')
 local Math = require('Module:Math')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Class = require('Module:Class')
 local Language = mw.language.new('en')
 
-local RocketLeagueSeries = {}
+local CustomSeries = {}
+
+local CustomInjector = Class.new(Injector)
+
+local _series
 
 local _totalSeriesPrizepool = 0
 
-function RocketLeagueSeries.run(frame)
+function CustomSeries.run(frame)
     local series = Series(frame)
-    series.addCustomCells = RocketLeagueSeries.addCustomCells
-    series.addToLpdb = RocketLeagueSeries.addToLpdb
+    series.addToLpdb = CustomSeries.addToLpdb
+	series.createWidgetInjector = CustomSeries.createWidgetInjector
+	_series = series
 
     return series:createInfobox(frame)
 end
 
-function RocketLeagueSeries.addToLpdb(series, lpdbData)
+function CustomSeries:createWidgetInjector()
+	return CustomInjector()
+end
+
+function CustomSeries.addToLpdb(series, lpdbData)
     lpdbData['prizepool'] = _totalSeriesPrizepool
     return lpdbData
 end
 
-function RocketLeagueSeries.addCustomCells(series, infobox, args)
-    infobox:cell('Total prize money', RocketLeagueSeries._getSeriesPrizepools(series))
-    return infobox
-end
-
-function RocketLeagueSeries._getSeriesPrizepools(series)
+function CustomSeries._getSeriesPrizepools(series)
     local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
         conditions = '[[series::' .. series.name .. ']]',
         query = 'sum::prizepool'
@@ -48,4 +55,12 @@ function RocketLeagueSeries._getSeriesPrizepools(series)
     return '$' .. Language:formatNum(Math._round(prizemoney))
 end
 
-return RocketLeagueSeries
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell({
+		name = 'Total prize money',
+		content = {CustomSeries._getSeriesPrizepools(_series.name)}
+	}))
+	return widgets
+end
+
+return CustomSeries
