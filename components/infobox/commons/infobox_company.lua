@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local InfoboxBasic = require('Module:Infobox/Basic/dev')
+local InfoboxBasic = require('Module:Infobox/Basic')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
 local ReferenceCleaner = require('Module:ReferenceCleaner')
