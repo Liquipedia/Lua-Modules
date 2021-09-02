@@ -46,7 +46,7 @@ do
 
     echo '...done'
     # Don't get rate limited
-    sleep 5
+    sleep 3
   fi
 done
 
