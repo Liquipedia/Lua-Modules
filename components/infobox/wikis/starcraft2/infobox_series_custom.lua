@@ -49,6 +49,13 @@ function CustomSeries:createWidgetInjector()
 end
 
 function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell{
+		name = 'Game version',
+		content = {
+			CustomSeries._getGameVersion(
+				string.lower(_series.args.game or ''), _series.args.patch or '', _series.args)
+		}
+	})
 	table.insert(widgets, Cell({
 		name = 'Server',
 		content = {_series.args.server}
@@ -73,13 +80,6 @@ function CustomInjector:addCustomCells(widgets)
 			end
 		end
 	}))
-	table.insert(widgets, Cell{
-		name = 'Game version',
-		content = {
-			CustomSeries._getGameVersion(
-				string.lower(_series.args.game or ''), _series.args.patch or '', _series.args)
-		}
-	})
 	CustomSeries._addCustomVariables(_series.args)
 	return widgets
 end
