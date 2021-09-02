@@ -38,23 +38,23 @@ function Company:createInfobox()
     local args = self.args
 
 	local widgets = ({
-		Header({name = args.name, image = args.image}),
-		Center(args.caption),
-		Title('League Information'),
-		Cell({
+		Header{{name = args.name, image = args.image}},
+		Center{content = {args.caption}},
+		Title{name = 'League Information'},
+		Cell{{
 			name = 'Parent company',
 			content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
-		}),
-		Cell({name = 'Founded', content = {args.foundeddate},}),
-		Cell({name = 'Defunct', content = {args.defunctdate},}),
-		Cell({
+		}},
+		Cell{{name = 'Founded', content = {args.foundeddate},}},
+		Cell{{name = 'Defunct', content = {args.defunctdate},}},
+		Cell{{
 			name = 'Location',
 			content = {self:_createLocation(args.location)},
-		}),
-		Cell({name = 'Headquarters', content = {args.headquarters}}),
-		Cell({name = 'Employees', content = {args.employees}}),
-		Cell({name = 'Traded as', content = {args.tradedas}}),
-		Customizable('custom', {}),
+		}},
+		Cell{{name = 'Headquarters', content = {args.headquarters}}},
+		Cell{{name = 'Employees', content = {args.employees}}},
+		Cell{{name = 'Traded as', content = {args.tradedas}}},
+		Customizable{id = 'custom', children = {}},
 	})
 
     if not String.isEmpty(args.companytype) and args.companytype == _COMPANY_TYPE_ORGANIZER then
@@ -67,10 +67,10 @@ function Company:createInfobox()
     end
 
     local links = Links.transform(args)
-	table.insert(widgets, Center(args.footnotes))
+	table.insert(widgets, Center{content = {args.footnotes}})
 	if not Table.isEmpty(links) then
-		table.insert(widgets, Title('Links'))
-		table.insert(widgets, Widgets.Links(links))
+		table.insert(widgets, Title{name = 'Links'})
+		table.insert(widgets, Widgets.Links{content = links})
 	end
 
     mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {
