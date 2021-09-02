@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
+-- wiki=pubg
 -- page=Module:Infobox/Company/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -19,8 +19,8 @@ local _args
 
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell({
-		name = 'Epic Creator Code',
-		content = {_args.creatorcode}
+		name = CustomCompany._createSisterCompaniesDescription(_args),
+		content = {self:getAllArgsForBase(_args, 'sister', {})}
 	}))
 	return widgets
 end
@@ -34,6 +34,13 @@ end
 
 function CustomCompany:createWidgetInjector()
 	return CustomInjector()
+end
+
+function CustomCompany._createSisterCompaniesDescription(args)
+    if args.sister2 then
+      return 'Sister Companies'
+    end
+    return 'Sister Company'
 end
 
 return CustomCompany

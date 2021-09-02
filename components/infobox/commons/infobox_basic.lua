@@ -26,6 +26,10 @@ local BasicInfobox = Class.new(
 	end
 )
 
+function BasicInfobox:createWidgetInjector()
+	return nil
+end
+
 --- Allows for overriding this functionality
 function BasicInfobox:addCustomCells(infobox, args)
     return infobox
