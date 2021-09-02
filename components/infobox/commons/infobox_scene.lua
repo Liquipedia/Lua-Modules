@@ -37,7 +37,7 @@ function Scene:createInfobox()
 		Header({name = self:createNameDisplay(args), image = args.image}),
 		Center(args.caption),
 		Title('Scene Information'),
-		Cell({name = 'Regin', content = {args.region}}),
+		Cell({name = 'Region', content = {args.region}}),
 		Cell({name = 'National team', content = {args.nationalteam}, options = {makeLink = true}}),
 		Cell({name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})}),
 		Cell({name = 'Size', content = {args.size}}),
