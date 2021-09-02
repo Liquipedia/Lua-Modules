@@ -11,8 +11,8 @@ local Widget = require('Module:Infobox/Widget')
 
 local Center = Class.new(
 	Widget,
-	function(self, ...)
-		self.content = {...}
+	function(self, input)
+		self.content = input.content
 	end
 )
 

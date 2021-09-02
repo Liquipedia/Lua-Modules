@@ -13,9 +13,9 @@ local Table = require('Module:Table')
 
 local Links = Class.new(
 	Widget,
-	function(self, links, variant)
-		self.links = links
-		self.variant = variant
+	function(self, input)
+		self.links = input.content
+		self.variant = input.variant
 	end
 )
 

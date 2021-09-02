@@ -12,9 +12,9 @@ local Injector = require('Module:Infobox/Widget/Injector')
 
 local Customizable = Class.new(
 	Widget,
-	function(self, id, widgets)
-		self.id = self:assertExistsAndCopy(id)
-		self.widgets = widgets
+	function(self, input)
+		self.id = self:assertExistsAndCopy(input.id)
+		self.children = input.children
 	end
 )
 
@@ -29,12 +29,12 @@ end
 
 function Customizable:make()
 	if self.injector == nil then
-		return self.widgets
+		return self.children
 	end
 	if self.id == ' custom' then
-		return self.injector:addCustomCells(self.widgets)
+		return self.injector:addCustomCells(self.children)
 	end
-	return self.injector:parse(self.id, self.widgets)
+	return self.injector:parse(self.id, self.children)
 end
 
 return Customizable
