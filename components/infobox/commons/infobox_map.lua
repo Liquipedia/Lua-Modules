@@ -6,36 +6,44 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Cell = require('Module:Infobox/Cell')
+local InfoboxBasic = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
+local Hotkey = require('Module:Hotkey')
 
-local Map = Class.new(BasicInfobox)
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Customizable = Widgets.Customizable
+
+local Map = Class.new(InfoboxBasic)
 
 function Map.run(frame)
 	local map = Map(frame)
-	return map:createInfobox(frame)
+	return map:createInfobox()
 end
 
-function Map:createInfobox(frame)
+function Map:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	infobox:name(self:getNameDisplay(args))
-	infobox:image(args.image, args.defaultImage)
-	infobox:centeredCell(args.caption)
-	infobox:header('Map Information', true)
-	infobox:fcell(Cell:new('Creator'):options({makeLink = true}):content(
-		args.creator or args['created-by'], args.creator2 or args['created-by2']):make())
-	self:addCustomCells(infobox, args)
-	infobox:bottom(self:createBottomContent(infobox))
+
+	local widgets = {
+		Header{name = self:getNameDisplay(args), image = args.image},
+		Center{content = {args.caption}},
+		Title{name = 'Map Information'},
+		Cell{name = 'Creator', content = {args.creator or args['created-by'], args.creator2 or args['created-by2']}, options = { makeLink = true }},
+		Customizable{id = 'custom', children = {}},
+		Center{content = {args.footnotes}},
+	}
 
 	if Namespace.isMain() then
 		infobox:categories('Maps')
 		self:_setLpdbData(args)
 	end
 
-	return infobox:build()
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 --- Allows for overriding this functionality
