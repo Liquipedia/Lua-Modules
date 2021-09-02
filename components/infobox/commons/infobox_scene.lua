@@ -34,26 +34,26 @@ function Scene:createInfobox()
 	local args = self.args
 
 	local widgets = ({
-		Header({name = self:createNameDisplay(args), image = args.image}),
-		Center(args.caption),
-		Title('Scene Information'),
-		Cell({name = 'Region', content = {args.region}}),
-		Cell({name = 'National team', content = {args.nationalteam}, options = {makeLink = true}}),
-		Cell({name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})}),
-		Cell({name = 'Size', content = {args.size}}),
-		Customizable('custom', {}),
+		Header{{name = self:createNameDisplay(args), image = args.image}},
+		Center{content = {args.caption}},
+		Title{name = 'Scene Information'},
+		Cell{{name = 'Region', content = {args.region}}},
+		Cell{{name = 'National team', content = {args.nationalteam}, options = {makeLink = true}}},
+		Cell{{name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})}},
+		Cell{{name = 'Size', content = {args.size}}},
+		Customizable{id = 'custom', children = {}},
 	})
 
 	local links = Links.transform(args)
-	table.insert(widgets, Center(args.footnotes))
+	table.insert(widgets, Center{content = {args.footnotes}})
 	if not Table.isEmpty(links) then
-		table.insert(widgets, Title('Links'))
-		table.insert(widgets, Widgets.Links(links))
+		table.insert(widgets, Title{name = 'Links'})
+		table.insert(widgets, Widgets.Links{content = links})
 	end
 
 	if not String.isEmpty(args.achievements) then
-		table.insert(widgets, Title('Achievements'))
-		table.insert(widgets, Center(args.achievements))
+		table.insert(widgets, Title{name ='Achievements'})
+		table.insert(widgets, Center{content = {args.achievements}})
 	end
 
 	infobox:categories('Scene')
