@@ -22,12 +22,12 @@ local _series
 local _totalSeriesPrizepool = 0
 
 function CustomSeries.run(frame)
-    local series = Series(frame)
-    series.addToLpdb = CustomSeries.addToLpdb
+	local series = Series(frame)
+	series.addToLpdb = CustomSeries.addToLpdb
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 	_series = series
 
-    return series:createInfobox(frame)
+	return series:createInfobox(frame)
 end
 
 function CustomSeries:createWidgetInjector()
@@ -35,24 +35,24 @@ function CustomSeries:createWidgetInjector()
 end
 
 function CustomSeries.addToLpdb(series, lpdbData)
-    lpdbData['prizepool'] = _totalSeriesPrizepool
-    return lpdbData
+	lpdbData['prizepool'] = _totalSeriesPrizepool
+	return lpdbData
 end
 
 function CustomSeries._getSeriesPrizepools(series)
-    local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
-        conditions = '[[series::' .. series.name .. ']]',
-        query = 'sum::prizepool'
-    })
+	local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = '[[series::' .. series.name .. ']]',
+		query = 'sum::prizepool'
+	})
 
-    prizemoney = tonumber(prizemoney[1]['sum_prizepool'])
+	prizemoney = tonumber(prizemoney[1]['sum_prizepool'])
 
-    if prizemoney == nil or prizemoney == 0 then
-        return nil
-    end
+	if prizemoney == nil or prizemoney == 0 then
+		return nil
+	end
 
-    _totalSeriesPrizepool = prizemoney
-    return '$' .. Language:formatNum(Math._round(prizemoney))
+	_totalSeriesPrizepool = prizemoney
+	return '$' .. Language:formatNum(Math._round(prizemoney))
 end
 
 function CustomInjector:addCustomCells(widgets)
