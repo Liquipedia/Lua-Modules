@@ -12,7 +12,7 @@ local Widget = require('Module:Infobox/Widget')
 local Title = Class.new(
 	Widget,
 	function(self, input)
-		self.content = self:assertExistsAndCopy(input)
+		self.content = self:assertExistsAndCopy(input.name)
 	end
 )
 
