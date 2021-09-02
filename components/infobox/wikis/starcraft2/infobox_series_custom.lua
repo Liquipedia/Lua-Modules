@@ -85,7 +85,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'tier' then
+	if id == 'liquipediatier' then
 		return {
 			Cell{
 				name = 'Liquipedia Tier',
