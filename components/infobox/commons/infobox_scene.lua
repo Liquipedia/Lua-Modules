@@ -34,7 +34,7 @@ function Scene:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
-	local widgets = ({
+	local widgets = {
 		Header{name = self:createNameDisplay(args), image = args.image},
 		Center{content = {args.caption}},
 		Title{name = 'Scene Information'},
@@ -65,7 +65,7 @@ function Scene:createInfobox()
 				end
 			end
 		}
-	})
+	}
 
 	infobox:categories('Scene')
 
