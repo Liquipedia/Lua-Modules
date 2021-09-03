@@ -247,7 +247,7 @@ function League:_setLpdbData(args, links)
 			sponsor5 = args.sponsor5,
 		}),
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
-			Links.makeFullLinksForTableItems(links)
+			Links.makeFullLinksForTableItems(links or {})
 		),
 	}
 
