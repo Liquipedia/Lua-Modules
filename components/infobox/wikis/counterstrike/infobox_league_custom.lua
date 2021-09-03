@@ -7,15 +7,18 @@
 --
 
 local League = require('Module:Infobox/League')
-local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Builder = require('Module:Infobox/Widget/Builder')
 
 local CustomLeague = Class.new()
+local CustomInjector = Class.new(Injector)
 
 local _GAME_CS_16 = 'cs16'
 local _GAME_CS_CZ = 'cscz'
@@ -34,12 +37,11 @@ local _MODE_TEAM = 'team'
 local _ICON_EPT_CHALLENGER = '[[File:ESL Pro Tour Challenger.png|20x20px|link='
 local _ICON_EPT_MASTERS = '[[File:ESL Pro Tour Masters.png|20x20px|link='
 
+local _league
+
 function CustomLeague.run(frame)
 	local league = League(frame)
-	league.addCustomCells = CustomLeague.addCustomCells
-	league.createTier = CustomLeague.createTier
-	league.createPrizepool = CustomLeague.createPrizepool
-	league.addCustomContent = CustomLeague.addCustomContent
+	_league = league
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
@@ -47,33 +49,41 @@ function CustomLeague.run(frame)
 	return league:createInfobox(frame)
 end
 
-function CustomLeague:addCustomCells(infobox, args)
-	infobox:cell('Game', CustomLeague:_createGameCell(args))
-	infobox:cell('Teams', (args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or ''))
-	infobox:cell('Players', args.player_number)
-	infobox:fcell(
-		Cell:new('[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier')
-			:content(CustomLeague:_createEslProTierCell(args.eslprotier))
-			:categories(
-				function(_, ...)
-					infobox:categories('ESL Pro Tour Tournaments')
-				end
-			)
-			:make()
-	)
-	infobox:fcell(
-		Cell:new(Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox'))
-			:addClass('valvepremier-highlighted')
-			:content(CustomLeague:_createValveTierCell(args.valvetier))
-			:categories(
-				function(_, ...)
-					infobox:categories('Valve Sponsored Tournaments')
-				end
-			)
-			:make()
-	)
+function CustomLeague:createWidgetInjector()
+	return CustomInjector()
+end
 
-	return infobox
+function CustomInjector:addCustomCells(widgets)
+	local args = _league.args
+	table.insert(widgets, Cell{
+		name = 'Game',
+		content = {CustomLeague:_createGameCell(args)}
+	})
+	table.insert(widgets, Cell{
+		name = 'Teams',
+		content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}
+	})
+	table.insert(widgets, Cell{
+		name = 'Players',
+		content = {args.player_number}
+	})
+	table.insert(widgets, Cell{
+		name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
+		content = {CustomLeague:_createEslProTierCell(args.eslprotier)}
+	})
+	table.insert(widgets, Cell{
+		name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox'),
+		content = {CustomLeague:_createValveTierCell(args.valvetier)},
+		classes = {'valvepremier-highlighted'}
+	})
+
+	return widgets
+end
+
+function CustomInjector:parse(id, widgets)
+	if id == 'earnings' then
+	end
+	return widgets
 end
 
 function CustomLeague:getWikiCategories(args)
@@ -99,6 +109,14 @@ function CustomLeague:getWikiCategories(args)
 
 	if not String.isEmpty(args.sort_date) then
 		table.insert(categories, 'Tournaments with custom sort date')
+	end
+
+	if not String.isEmpty(args.eslprotier) then
+		table.insert(categories, 'ESL Pro Tour Tournaments')
+	end
+
+	if not String.isEmpty(args.valvetier) then
+		table.insert(categories, 'Valve Sponsored Tournaments')
 	end
 
 	return categories
