@@ -184,7 +184,6 @@ Display component for a title in a matchlist.
 function MatchlistDisplay.Title(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Title)
 	local titleNode = mw.html.create('div'):addClass('brkts-matchlist-title')
-		:css('grid-column', 'span 5')
 		:wikitext(props.title)
 
 	return DisplayUtil.applyOverflowStyles(titleNode, 'wrap')
@@ -201,7 +200,6 @@ function MatchlistDisplay.Header(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Header)
 
 	local headerNode = mw.html.create('div'):addClass('brkts-matchlist-header')
-		:css('grid-column', 'span 5')
 		:wikitext(props.header)
 
 	return DisplayUtil.applyOverflowStyles(headerNode, 'wrap')
