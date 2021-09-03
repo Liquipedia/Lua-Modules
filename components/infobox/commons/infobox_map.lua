@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local InfoboxBasic = require('Module:Infobox/Basic')
+local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -17,7 +17,7 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
-local Map = Class.new(InfoboxBasic)
+local Map = Class.new(BasicInfobox)
 
 function Map.run(frame)
 	local map = Map(frame)
