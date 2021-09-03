@@ -15,7 +15,8 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Builder = require('Module:Infobox/Widget/Builder')
+local Title = require('Module:Infobox/Widget/Title')
+local Center = require('Module:Infobox/Widget/Center')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -81,7 +82,41 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'earnings' then
+	local args = _league.args
+	if id == 'customcontent' then
+		if not String.isEmpty(args.map1) then
+			local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
+			local maps = {CustomLeague:_makeInternalLink(args.map1 .. game .. '|' .. args.map1)}
+			local index  = 2
+
+			while not String.isEmpty(args['map' .. index]) do
+				local map = args['map' .. index]
+				table.insert(maps, '&nbsp;• ' ..
+					tostring(CustomLeague:_createNoWrappingSpan(
+						CustomLeague:_makeInternalLink(map .. game .. '|' .. map)
+					))
+				)
+				index = index + 1
+			end
+			table.insert(Title{name = 'Maps'})
+			table.insert(Center{content = maps})
+		end
+
+
+		if not String.isEmpty(args.team1) then
+			local teams = {CustomLeague:_makeInternalLink(args.team1)}
+			local index  = 2
+
+			while not String.isEmpty(args['team' .. index]) do
+				table.insert(teams, '&nbsp;• ' ..
+					tostring(CustomLeague:_createNoWrappingSpan(
+						CustomLeague:_makeInternalLink(args['team' .. index])
+					))
+				)
+				index = index + 1
+			end
+			table.insert(Center{content = teams})
+		end
 	end
 	return widgets
 end
@@ -198,44 +233,6 @@ function CustomLeague:createPrizepool(args)
 
 
 	return cell:content(content)
-end
-
-function CustomLeague:addCustomContent(infobox, args)
-	if not String.isEmpty(args.map1) then
-		infobox:header('Maps', true)
-
-		local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
-		local maps = {CustomLeague:_makeInternalLink(args.map1 .. game .. '|' .. args.map1)}
-		local index  = 2
-
-		while not String.isEmpty(args['map' .. index]) do
-			local map = args['map' .. index]
-			table.insert(maps, '&nbsp;• ' ..
-				tostring(CustomLeague:_createNoWrappingSpan(
-					CustomLeague:_makeInternalLink(map .. game .. '|' .. map)
-				))
-			)
-			index = index + 1
-		end
-		infobox	:centeredCell(unpack(maps))
-	end
-
-	if not String.isEmpty(args.team1) then
-		local teams = {CustomLeague:_makeInternalLink(args.team1)}
-		local index  = 2
-
-		while not String.isEmpty(args['team' .. index]) do
-			table.insert(teams, '&nbsp;• ' ..
-				tostring(CustomLeague:_createNoWrappingSpan(
-					CustomLeague:_makeInternalLink(args['team' .. index])
-				))
-			)
-			index = index + 1
-		end
-		infobox	:centeredCell(unpack(teams))
-	end
-
-    return infobox
 end
 
 function CustomLeague:defineCustomPageVariables(args)
