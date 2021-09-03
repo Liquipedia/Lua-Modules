@@ -43,6 +43,7 @@ local _league
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
+	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
