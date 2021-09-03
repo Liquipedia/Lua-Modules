@@ -6,40 +6,44 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Cell = require('Module:Infobox/Cell')
+local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Customizable = Widgets.Customizable
 
 local Game = Class.new(BasicInfobox)
 
 function Game.run(frame)
 	local game = Game(frame)
-	return game:createInfobox(frame)
+	return game:createInfobox()
 end
 
-function Game:createInfobox(frame)
+function Game:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
-	infobox:name(args.name)
-	infobox:image(args.image, args.defaultImage)
-	infobox:centeredCell(args.caption)
-	infobox:header('Game Information', true)
-	infobox:fcell(Cell:new('Developer'):options({}):content(
-		unpack(self:getAllArgsForBase(args, 'developer'))):make())
-	infobox:fcell(Cell:new('Release Dates'):options({}):content(
-		unpack(self:getAllArgsForBase(args, 'releasedate'))):make())
-	infobox:fcell(Cell:new('Platforms'):options({}):content(
-		unpack(self:getAllArgsForBase(args, 'platform'))):make())
-	self:addCustomCells(infobox, args)
-	infobox:bottom(self:createBottomContent(infobox))
+	local widgets = {
+		Header{name = args.name, image = args.image},
+		Center{content = {args.caption}},
+		Title{name = 'Game Information'},
+		Cell{name = 'Developer', content = {self:getAllArgsForBase(args, 'developer')}},
+		Cell{name = 'Release Dates', content = {self:getAllArgsForBase(args, 'releasedate')}},
+		Cell{name = 'Platforms', content = {self:getAllArgsForBase(args, 'platform')}},
+		Customizable{id = 'custom', children = {}},
+		Center{content = {args.footnotes}},
+	}
 
 	if Namespace.isMain() then
 		infobox:categories('Games')
 	end
 
-	return infobox:build()
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 return Game
