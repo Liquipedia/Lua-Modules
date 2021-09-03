@@ -69,8 +69,7 @@ function CustomInjector:parse(id, widgets)
 
 			}
 		}
-	end
-	if id == 'hotkey' then
+	elseif id == 'hotkey' then
 		return {
 			Cell{
 				name = '[[Hotkeys per Race|Hotkey]]',
@@ -78,8 +77,7 @@ function CustomInjector:parse(id, widgets)
 
 			}
 		}
-	end
-	if id == 'cooldown' then
+	elseif id == 'cooldown' then
 		return {
 			Cell{
 				name = PageLink.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown',
@@ -87,8 +85,7 @@ function CustomInjector:parse(id, widgets)
 
 			}
 		}
-	end
-	if id == 'duration' then
+	elseif id == 'duration' then
 		return {
 			Cell{
 				name = '[[Game Speed|Duration]]',
