@@ -20,7 +20,6 @@ local Builder = require('Module:Infobox/Widget/Builder')
 local Center = require('Module:Infobox/Widget/Center')
 
 local doStore = true
-local earningsGlobal = 0
 local pagename = mw.title.getCurrentTitle().prefixedText
 
 local CustomTeam = Class.new()
@@ -30,13 +29,17 @@ local Language = mw.language.new('en')
 
 local _team
 
+
+local _EARNINGS = 0
+local _ALLOWED_PLACES = { '1', '2', '3', '4', '3-4' }
+local _EARNINGS_MODES = { ['team'] = 'team' }
+
 function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
 	team.createBottomContent = CustomTeam.createBottomContent
-	if doStore then
-		CustomTeam.storeToLPDB(_team.args)
-	end
+	team.addToLpdb = CustomTeam.addToLpdb
+	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	return team:createInfobox(frame)
 end
 
@@ -50,7 +53,7 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		local earnings = CustomTeam.calculateForTeam(_team.args)
+		local earnings = CustomTeam.calculateEarnings(_team.args)
 		if earnings == 0 then
 			earnings = nil
 		else
@@ -63,21 +66,6 @@ function CustomInjector:parse(id, widgets)
 					earnings
 				}
 			}
-		}
-	elseif id == 'customcontent' then
-		return {
-			Builder{
-				builder = function()
-					local playerBreakDown = CustomTeam.playerBreakDown(_team.args)
-					if playerBreakDown.playernumber then
-						return {
-							Title{name = 'Player Breakdown'},
-							Cell{name = 'Number of players', content = {playerBreakDown.playernumber}}
-						}
-					end
-				end
-			}
-
 		}
 	elseif id == 'achievements' then
 		local achievements, soloAchievements = CustomTeam.getAutomatedAchievements(pagename)
@@ -101,6 +89,19 @@ function CustomInjector:parse(id, widgets)
 						}
 					end
 				end
+			},
+			--yes i know this doesn't seem suitable for this id, but i need this ABOVE the history display
+			Builder{
+				builder = function()
+					local playerBreakDown = CustomTeam.playerBreakDown(_team.args)
+					if playerBreakDown.playernumber then
+						return {
+							Title{name = 'Player Breakdown'},
+							Cell{name = 'Number of players', content = {playerBreakDown.playernumber}},
+							CustomTeam.playerBreakDownDisplay(playerBreakDown.display)
+						}
+					end
+				end
 			}
 		}
 	elseif id == 'history' then
@@ -110,18 +111,15 @@ function CustomInjector:parse(id, widgets)
 				content = CustomTeam.customHistory(_team.args, i)
 			})
 		end
+	elseif id == 'trades' then
+		--kick trades
+		return {}
 	end
 	return widgets
 end
 
 function CustomTeam:createWidgetInjector()
 	return CustomInjector()
-end
-
-
-function CustomTeam.addCustomCells(team, infobox, args)
-	infobox	:cell('Gaming Director', args['gaming director'])
-	return infobox
 end
 
 function CustomTeam:createBottomContent()
@@ -149,33 +147,9 @@ function CustomTeam.playerBreakDownDisplay(contents)
     return div
 end
 
-function CustomTeam.storeToLPDB(args)
-	local name = args.romanized_name or args.name or pagename
-	Variables.varDefine('team_name', name)
-	local links = Links.transform(args)
-	for key, item in pairs(links) do
-		if key == 'aligulac' then
-			links[key] = 'http://aligulac.com/teams/' .. item
-		elseif key == 'esl' then
-			links[key] = 'https://play.eslgaming.com/team/' .. item
-		else
-			links[key] = Links.makeFullLink(key, item)
-		end
-	end
-
-	mw.ext.LiquipediaDB.lpdb_team('team_' .. name, {
-		name = name,
-		location = args.location or '',
-		location2 = args.location2 or '',
-		logo = args.image or '',
-		createdate = args.created or '',
-		disbanddate = args.disbanded or '',
-		earnings = earningsGlobal,
-		coach = args.coaches or '',
-		manager = args.manager or '',
-		sponsors = args.sponsor or '',
-		links = mw.ext.LiquipediaDB.lpdb_create_json(links),
-		})
+function CustomTeam.addToLpdb(lpdbData)
+	lpdbData.earnings = _EARNINGS
+	return lpdbData
 end
 
 function CustomTeam.playerBreakDown(args)
@@ -232,141 +206,71 @@ function CustomTeam.calculateEarnings(args)
 			doStore = false
 			Variables.varDefine('disable_SMW_storage', 'true')
 	else
-		earningsGlobal = CustomTeam.get_earnings_and_medals_data(pagename) or 0
-		Variables.varDefine('earnings', earningsGlobal)
-		return earningsGlobal
+		_EARNINGS = CustomTeam.get_earnings_and_medals_data(pagename) or 0
+		Variables.varDefine('earnings', _EARNINGS)
+		return _EARNINGS
 	end
 	return 0
 end
 
-function CustomTeam.get_earnings_and_medals_data(team)
-	local AllowedPlaces = { '1', '2', '3', '4', '3-4' }
-	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR [[placement::' ..
-		table.concat(AllowedPlaces, ']] OR [[placement::') .. ']]) AND(' .. '[[participant::' ..
-		team .. ']] OR ([[mode::!team_individual]] AND ([[extradata_participantteamclean::' ..
-		string.lower(team) .. ']] OR [[extradata_participantteamclean::' .. team .. ']] OR ' ..
-		'[[extradata_participantteam::' .. team .. ']])))'
-	local count
+function CustomTeam._getLPDBrecursive(cond, query, queryType)
 	local data = {} -- get LPDB results in here
+	local count
 	local offset = 0
 	repeat
-		local additional_data = mw.ext.LiquipediaDB.lpdb('placement', {
+		local additionalData = mw.ext.LiquipediaDB.lpdb(queryType, {
 			conditions = cond,
-			query = 'liquipediatier, placement, date, prizemoney, mode',
+			query = query,
 			offset = offset,
 			limit = 5000
 		})
-		count = 0
+		count = #additionalData
 		-- Merging
-		for i, item in ipairs(additional_data) do
+		for i, item in ipairs(additionalData) do
 			data[offset + i] = item
-			count = count + 1
 		end
 		offset = offset + count
 	until count ~= 5000
 
-	local EarningModes = { ['team'] = 'team' }
+	return data
+end
+
+function CustomTeam.get_earnings_and_medals_data(team)
+	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR [[placement::' ..
+		table.concat(_ALLOWED_PLACES, ']] OR [[placement::')
+		.. ']]) AND(' .. '[[participant::' .. team .. ']] OR ' ..
+		'([[mode::!team_individual]] AND ([[extradata_participantteamclean::' ..
+		string.lower(team) .. ']] OR [[extradata_participantteamclean::' .. team .. ']] OR ' ..
+		'[[extradata_participantteam::' .. team .. ']])))'
+	local query = 'liquipediatier, placement, date, prizemoney, mode'
+
+	local data = CustomTeam._getLPDBrecursive(cond, query, 'placement')
 
 	local earnings = {}
-	local Medals = {}
-	local TeamMedals = {}
+	local medals = {}
+	local teamMedals = {}
 	local player_earnings = 0
 	earnings['total'] = {}
 	Medals['total'] = {}
 	TeamMedals['total'] = {}
 
 	if type(data[1]) == 'table' then
-		for i=1,#data do
+		for _, item in pairs(data) do
 			--handle earnings
-			if data[i].mode ~= 'team' then
-				player_earnings = player_earnings + data[i].prizemoney
-			end
-			local earningsMode = EarningModes[data[i].mode] or 'other'
-			if not earnings[earningsMode] then
-				earnings[earningsMode] = {}
-			end
-			if not earnings[earningsMode][string.sub(data[i].date, 1, 4)] then
-				earnings[earningsMode][string.sub(data[i].date, 1, 4)] = 0
-			end
-			if not earnings[earningsMode]['total'] then
-				earnings[earningsMode]['total'] = 0
-			end
-			if not earnings['total'][string.sub(data[i].date, 1, 4)] then
-				earnings['total'][string.sub(data[i].date, 1, 4)] = 0
-			end
-			earnings[earningsMode]['total'] = earnings[earningsMode]['total']
-				+ data[i].prizemoney
-			earnings[earningsMode][string.sub(data[i].date, 1, 4)] =
-				earnings[earningsMode][string.sub(data[i].date, 1, 4)] + data[i].prizemoney
-			earnings['total'][string.sub(data[i].date, 1, 4)] =
-				earnings['total'][string.sub(data[i].date, 1, 4)] + data[i].prizemoney
+			earnings, player_earnings = CustomTeam._addPlacementToEarnings(earnings, player_earnings, item)
 
 			--handle medals
 			if data[i].mode == '1v1' then
-				data[i].placement = CustomTeam._Placements(data[i].placement)
-				if data[i].placement ~= '99' then
-					if not data[i].liquipediatiertype == 'Qualifier' then
-						if not Medals[data[i].placement] then
-							Medals[data[i].placement] = {}
-						end
-						local tier = data[i].liquipediatier or 'undefined'
-						if not Medals[data[i].placement][tier] then
-							Medals[data[i].placement][tier] = 0
-						end
-						if not Medals[data[i].placement]['total'] then
-							Medals[data[i].placement]['total'] = 0
-						end
-						Medals[data[i].placement][tier] = Medals[data[i].placement][tier] + 1
-						Medals[data[i].placement]['total'] = Medals[data[i].placement]['total'] + 1
-						if not Medals['total'][tier] then
-							Medals['total'][tier] = 0
-						end
-						Medals['total'][tier] = Medals['total'][tier] + 1
-					end
-				end
+				medals = CustomTeam._addPlacementToMedals(medals, item)
 			elseif data[i].mode == 'team' then
-				data[i].placement = CustomTeam._Placements(data[i].placement)
-				if data[i].placement ~= '99' then
-					if not data[i].liquipediatiertype == 'Qualifier' then
-						if not TeamMedals[data[i].placement] then
-							TeamMedals[data[i].placement] = {}
-						end
-						local tier = data[i].liquipediatier or 'undefined'
-						if not TeamMedals[data[i].placement][tier] then
-							TeamMedals[data[i].placement][tier] = 0
-						end
-						if not TeamMedals[data[i].placement]['total'] then
-							TeamMedals[data[i].placement]['total'] = 0
-						end
-						TeamMedals[data[i].placement][tier] = TeamMedals[data[i].placement][tier] + 1
-						TeamMedals[data[i].placement]['total'] = TeamMedals[data[i].placement]['total'] + 1
-						if not TeamMedals['total'][tier] then
-							TeamMedals['total'][tier] = 0
-						end
-						TeamMedals['total'][tier] = TeamMedals['total'][tier] + 1
-					end
-				end
+				teamMedals = CustomTeam._addPlacementToMedals(teamMedals, item)
 			end
 		end
 	end
 
-	for key1, item1 in pairs(earnings) do
-		for key2, item2 in pairs(item1) do
-			Variables.varDefine(key1 .. '_' .. key2, item2)
-		end
-	end
-
-	for key1, item1 in pairs(Medals) do
-		for key2, item2 in pairs(item1) do
-			Variables.varDefine(key1 .. '_' .. key2, item2)
-		end
-	end
-
-	for key1, item1 in pairs(TeamMedals) do
-		for key2, item2 in pairs(item1) do
-			Variables.varDefine('team_' .. key1 .. '_' .. key2, item2)
-		end
-	end
+	CustomTeam._setVarsFromTable(earnings)
+	CustomTeam._setVarsFromTable(medals)
+	CustomTeam._setVarsFromTable(teamMedals, 'team_')
 
 	if earnings.team == nil then
 		earnings.team = {}
@@ -383,15 +287,56 @@ function CustomTeam.get_earnings_and_medals_data(team)
 	return math.floor((earnings.team.total or 0) * 100 + 0.5) / 100
 end
 
-function CustomTeam._Placements(value)
-	value = (value or '') ~= '' and value or '99'
-	local temp = mw.text.split(value, '-')[1]
-	if temp ~= '1' and temp ~= '2' and temp ~= '3' then
-		temp = '99'
-	elseif temp == '3' then
-		temp = 'sf'
+function CustomTeam._addPlacementToEarnings(earnings, player_earnings, data)
+	local mode = _EARNING_MODES[data.mode] or 'other'
+	if not earnings[mode] then
+		earnings[mode] = {}
 	end
-	return temp
+	local date = string.sub(data.date, 1, 4)
+	earnings[mode][date] = (earnings[mode][date] or 0) + data.prizemoney
+	earnings[mode]['total'] = (earnings[mode]['total'] or 0) + data.prizemoney
+	earnings['total'][date] = (earnings['total'][date] or 0) + data.prizemoney
+	if data.mode ~= 'team' then
+		player_earnings = player_earnings + data[i].prizemoney
+	end
+
+	return earnings, player_earnings
+end
+
+function CustomTeam._addPlacementToMedals(medals, data)
+	local place = CustomTeam._Placements(data.placement)
+	if place ~= _DISCARD_PLACEMENT then
+		if data.liquipediatiertype ~= 'Qualifier' then
+			local tier = data.liquipediatier or 'undefined'
+			if not medals[place] then
+				medals[place] = {}
+			end
+			medals[place][tier] = (medals[place][tier] or 0) + 1
+			medals[place]['total'] = (medals[place]['total'] or 0) + 1
+			medals['total'][tier] = (medals['total'][tier] or 0) + 1
+		end
+	end
+
+	return medals
+end
+
+function CustomTeam._setVarsFromTable(table, prefix)
+	for key1, item1 in pairs(table) do
+		for key2, item2 in pairs(item1) do
+			Variables.varDefine((prefix or '') .. key1 .. '_' .. key2, item2)
+		end
+	end
+end
+
+function CustomTeam._Placements(value)
+	value = (value or '') ~= '' and value or _DISCARD_PLACEMENT
+	value = mw.text.split(value, '-')[1]
+	if value ~= '1' and value ~= '2' and value ~= '3' then
+		value = _DISCARD_PLACEMENT
+	elseif value == '3' then
+		value = 'sf'
+	end
+	return value
 end
 
 return CustomTeam
