@@ -62,9 +62,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Earnings',
-				content = {
-					earnings
-				}
+				content = {earnings}
 			}
 		}
 	elseif id == 'achievements' then
@@ -75,7 +73,7 @@ function CustomInjector:parse(id, widgets)
 					if achievements then
 						return {
 							Title{name = 'Achievements'},
-							Center{content = achievements},
+							Center{content = {achievements}},
 						}
 					end
 				end
@@ -85,12 +83,13 @@ function CustomInjector:parse(id, widgets)
 					if soloAchievements then
 						return {
 							Title{name = 'Solo Achievements'},
-							Center{content = soloAchievements},
+							Center{content = {soloAchievements}},
 						}
 					end
 				end
 			},
-			--yes i know this doesn't seem suitable for this id, but i need this ABOVE the history display
+			--yes i know this doesn't seem suitable for this id,
+			--but i need this ABOVE the history display
 			Builder{
 				builder = function()
 					local playerBreakDown = CustomTeam.playerBreakDown(_team.args)
@@ -98,6 +97,7 @@ function CustomInjector:parse(id, widgets)
 						return {
 							Title{name = 'Player Breakdown'},
 							Cell{name = 'Number of players', content = {playerBreakDown.playernumber}},
+							--this needs testing after Builder/Customizable is fixed
 							CustomTeam.playerBreakDownDisplay(playerBreakDown.display)
 						}
 					end
@@ -107,13 +107,10 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'history' then
 		for i=1, 5 do
 			table.insert(widgets, Cell{
-				name = _team.args['history' .. i .. 'title'] or '',
-				content = CustomTeam.customHistory(_team.args, i)
+				name = _team.args['history' .. i .. 'title'] or '-',
+				content = {CustomTeam.customHistory(_team.args, i)}
 			})
 		end
-	elseif id == 'trades' then
-		--kick trades
-		return {}
 	end
 	return widgets
 end
@@ -149,6 +146,7 @@ end
 
 function CustomTeam.addToLpdb(lpdbData)
 	lpdbData.earnings = _EARNINGS
+	Variables.varDefine('team_name', name)
 	return lpdbData
 end
 
