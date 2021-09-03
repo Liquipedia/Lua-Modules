@@ -21,12 +21,12 @@ local _args
 local CustomInjector = Class.new(Injector)
 
 function CustomPatch.run(frame)
-    local customPatch = Patch(frame)
+	local customPatch = Patch(frame)
 	_args = customPatch.args
 	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
 	customPatch.getChronologyData = CustomPatch.getChronologyData
 	customPatch.addToLpdb = CustomPatch.addToLpdb
-    return customPatch:createInfobox(frame)
+	return customPatch:createInfobox(frame)
 end
 
 function CustomPatch:createWidgetInjector()
