@@ -7,7 +7,6 @@
 --
 
 local BasicInfobox = require('Module:Infobox/Basic')
-local Cell = require('Module:Infobox/Cell')
 local Class = require('Module:Class')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
@@ -20,6 +19,15 @@ local Variables = require('Module:Variables')
 local Locale = require('Module:Locale')
 local Page = require('Module:Page')
 
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Customizable = Widgets.Customizable
+local Builder = Widgets.Builder
+local Chronology = Widgets.Chronology
+
 local League = Class.new(BasicInfobox)
 
 function League.run(frame)
@@ -29,97 +37,105 @@ end
 
 function League:createInfobox()
 	local args = self.args
+	local frame = mw.getCurrentFrame()
+	local links
 
 	-- set Variables here already so they are available in functions
 	-- we call from here on, e.g. createPrizepool
 	self:_definePageVariables(args)
 
-	self.infobox:name(args.name)
-				:image(args.image, args.default)
-				:centeredCell(args.caption)
-				:header('League Information', true)
-				:fcell(Cell:new('Series')
-					:options({})
-					:content(
-						self:_createSeries(mw.getCurrentFrame(), args.series, args.abbreviation),
-						self:_createSeries(mw.getCurrentFrame(), args.series2, args.abbreviation2)
-					)
-					:make()
-				)
-				:fcell(Cell:new('Organizer(s)')
-					:options({})
-					:content(
-						unpack(self:_createOrganizers(args))
-					)
-					:make()
-				)
-				:fcell(Cell:new('Sponsor(s)')
-					:options({})
-					:content(
-						args.sponsor or args.sponsor1,
-						args.sponsor2,
-						args.sponsor3,
-						args.sponsor4,
-						args.sponsor5
-					)
-					:make()
-				)
-				:cell('Server', self:getServer(args))
-				:fcell(Cell:new('Type')
-					:options({})
-					:content(args.type:sub(1,1):upper()..args.type:sub(2))
-					:categories(
-						function(_, ...)
-							local value = select(1, ...)
-							value = tostring(value):lower()
-							if value == 'offline' then
-								self.infobox:categories('Offline Tournaments')
-							elseif value == 'online' then
-								self.infobox:categories('Online Tournaments')
-							else
-								self.infobox:categories('Unknown Type Tournaments')
-							end
-						end
-					)
-					:make()
-				)
-				:cell('Location', self:_createLocation({
+	local widgets = {
+		Header{name = args.name, image = args.image},
+		Center{content = {args.caption}},
+		Title{name = 'League Information'},
+		Cell{
+			name = 'Series',
+			content = {
+				self:_createSeries(frame, args.series, args.abbreviation),
+				self:_createSeries(frame, args.series2, args.abbreviation2)
+			}
+		},
+		Cell{name = 'Organizer(s)', content = self:_createOrganizers(args)},
+		Cell{name = 'Sponsor(s)', content = self:getAllArgsForBase(args, 'sponsor')},
+		Customizable{
+			id = 'server',
+			children = {
+				Cell{name = 'Server', content = {args.server}}
+			}
+		},
+		Builder{
+			builder = function()
+				local value = tostring(args.type):lower()
+				if value == 'offline' then
+					self.infobox:categories('Offline Tournaments')
+				elseif value == 'online' then
+					self.infobox:categories('Online Tournaments')
+				else
+					self.infobox:categories('Unknown Type Tournaments')
+				end
+
+				if not String.isEmpty(args.type) then
+					return {
+						Cell{
+							name = 'Type',
+							content = {
+								args.type:sub(1,1):upper()..args.type:sub(2)
+							}
+						}
+					}
+				end
+			end
+		},
+		Cell{
+			name = 'Location',
+			content = {
+				self:_createLocation({
 					region = args.region,
 					country = args.country,
 					country2 = args.country2,
 					location = args.city or args.location,
 					location2 = args.city2 or args.location2
-				}))
-				:cell('Venue', args.venue)
-				:cell('Format', args.format)
-				:fcell(self:createPrizepool(args):make())
-				:fcell(Cell:new('Date')
-					:options({})
-					:content(args.date)
-					:make()
-				)
-				:fcell(Cell:new('Start Date')
-					:options({})
-					:content(args.sdate)
-					:make()
-				)
-				:fcell(Cell:new('End Date')
-					:options({})
-					:content(args.edate)
-					:make()
-				)
-				:fcell(self:createTier(args):make())
-	self:addCustomCells(self.infobox, args)
+				})
+			}
+		},
+		Cell{name = 'Venue', content = {args.venue}},
+		Cell{name = 'Format', content = {args.format}},
+		Customizable{
+			id = 'prizepool',
+			children = {}
+		},
+		Cell{name = 'Date', content = {args.date}},
+		Cell{name = 'Start Date', content = {args.sdate}},
+		Cell{name = 'End Date', content = {args.edate}},
+		Customizable{id = 'liquipediatier', children = {}},
+		Customizable{id = 'custom', children = {}},
+		Builder{
+			builder = function()
+				links = Links.transform(args)
+				if not Table.isEmpty(links) then
+					return {
+						Title{name = 'Links'},
+						Widgets.Links{content = links}
+					}
+				end
+			end
+		},
+		Customizable{id = 'customcontent', children = {}},
+		Center{content = {args.footnotes}},
+		Builder{
+			builder = function()
+				if self:_isChronologySet(args.previous, args.next) then
+					return {
+						Chronology{
+							content = self:getChronologyData(args)
+						}
+					}
+				end
+			end
+		}
+	}
 
-	local links = Links.transform(args)
-
-	self.infobox:header('Links', not Table.isEmpty(links))
-				:links(links)
-	self:addCustomContent(self.infobox, args)
-	self.infobox:centeredCell(args.footnotes)
-				:header('Chronology', self:_isChronologySet(args.previous, args.next))
-				:chronology(self:getChronologyData(args))
-				:bottom(self:createBottomContent(self.infobox))
+	self.infobox:bottom(self:createBottomContent())
 
 	if self:shouldStore(args) then
 		self.infobox:categories('Tournaments')
@@ -130,7 +146,7 @@ function League:createInfobox()
 		self:_setLpdbData(args, links)
 	end
 
-	return self.infobox:build()
+    return self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 --- Allows for overriding this functionality
@@ -146,21 +162,6 @@ end
 --- Allows for overriding this functionality
 function League:shouldStore(args)
 	return Namespace.isMain()
-end
-
---- Allows for overriding this functionality
-function League:getServer(args)
-	return args.server
-end
-
---- Allows for overriding this functionality
-function League:createTier(args)
-	error('You need to define a tier function for this wiki!')
-end
-
---- Allows for overriding this functionality
-function League:createPrizepool(args)
-	error('You need to define a prizepool function for this wiki!')
 end
 
 --- Allows for overriding this functionality
