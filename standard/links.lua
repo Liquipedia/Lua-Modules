@@ -173,14 +173,14 @@ end
 
 function Links.makeFullLinksForTableItems(links, variant)
 	for key, item in pairs(links) do
-		links[key] = Links.makeFullLink(self:_removeAppendedNumber(key), item, variant)
+		links[key] = Links.makeFullLink(Links._removeAppendedNumber(key), item, variant)
 	end
 	return links
 end
 
 --remove appended number
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
-function Links:_removeAppendedNumber(key)
+function Links._removeAppendedNumber(key)
     return string.gsub(key, '%d$', '')
 end
 
