@@ -70,7 +70,7 @@ function Team:createInfobox(frame)
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
-				local links = Links.transform(args)
+				links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
