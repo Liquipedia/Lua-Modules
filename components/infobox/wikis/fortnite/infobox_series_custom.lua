@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
+-- wiki=fortnite
 -- page=Module:Infobox/Series/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
