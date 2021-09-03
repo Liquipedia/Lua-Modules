@@ -8,9 +8,6 @@
 
 local Class = require('Module:Class')
 local Patch = require('Module:Infobox/Patch')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local RaceIcon = require('Module:RaceIcon')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
