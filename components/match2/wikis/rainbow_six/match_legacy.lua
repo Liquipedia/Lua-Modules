@@ -46,6 +46,7 @@ function p.storeMatchSMW(match, match2)
 		"Has match youtube=" .. (streams.youtube or ""),
 		"Has tournament name=" .. Logic.emptyOr(match.tickername, match.name, ""),
 		"Has tournament icon=" .. (icon or ""),
+		"Has winner=" .. (match.winner or ""),
 		"Has team left score=" .. (match.opponent1score or "0"),
 		"Has team right score=" .. (match.opponent2score or "0"),
 		"Has exact time=" .. (Logic.readBool(match.dateexact) and "true" or "false"),
