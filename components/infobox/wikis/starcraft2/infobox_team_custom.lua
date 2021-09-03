@@ -204,7 +204,7 @@ function CustomTeam.calculateEarnings(args)
 			doStore = false
 			Variables.varDefine('disable_SMW_storage', 'true')
 	else
-		_EARNINGS = CustomTeam.get_earnings_and_medals_data(pagename) or 0
+		_EARNINGS = CustomTeam.getEarningsAndMedalsData(pagename) or 0
 		Variables.varDefine('earnings', _EARNINGS)
 		return _EARNINGS
 	end
@@ -233,7 +233,7 @@ function CustomTeam._getLPDBrecursive(cond, query, queryType)
 	return data
 end
 
-function CustomTeam.get_earnings_and_medals_data(team)
+function CustomTeam.getEarningsAndMedalsData(team)
 	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR [[placement::' ..
 		table.concat(_ALLOWED_PLACES, ']] OR [[placement::')
 		.. ']]) AND(' .. '[[participant::' .. team .. ']] OR ' ..
