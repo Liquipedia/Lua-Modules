@@ -6,45 +6,99 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Ability = require('Module:Infobox/Skill')
-local Hotkeys = require('Module:Hotkey')
+local Class = require('Module:Class')
+local Skill = require('Module:Infobox/Skill')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
 local CleanRace = require('Module:CleanRace2')
+local Hotkeys = require('Module:Hotkey')
 local String = require('Module:StringUtils')
+local PageLink = require('Module:Page')
 
-local StarCraft2Ability = {}
+local Ability = Class.new()
 
 local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
 local _GAS = mw.loadData('Module:Gas')
-local _SUPPLY = mw.loadData('Module:Supply')
 local _TIME = mw.loadData('Module:Buildtime')
+local _SUPPLY = mw.loadData('Module:Supply')
 
-function StarCraft2Ability.run(frame)
-	local ability = Ability(frame)
-	ability.getCategories = StarCraft2Ability.getCategories
-	ability.getDuration = StarCraft2Ability.getDuration
-	ability.getHotkeys = StarCraft2Ability.getHotkeys
-	ability.getCostDisplay = StarCraft2Ability.getCostDisplay
-	ability.addCustomCells = StarCraft2Ability.addCustomCells
+local CustomInjector = Class.new(Injector)
 
-	return ability:createInfobox(frame)
+local _args
+
+function Ability.run(frame)
+    local ability = Skill(frame)
+	ability.createWidgetInjector = Ability.createWidgetInjector
+	ability.getCategories = Ability.getCategories
+	_args = ability.args
+    return ability:createInfobox(frame)
 end
 
-function StarCraft2Ability:addCustomCells(infobox, args)
-	local duration2Description, duration2Display = StarCraft2Ability:getDuration2(infobox, args)
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell{
+		name = '[[Game Speed|Duration 2]]',
+		content = {Ability:getDuration2()}
+	})
+	table.insert(widgets, Cell{
+		name = 'Researched from',
+		content = {Ability:getResearchFrom()}
+	})
+	table.insert(widgets, Cell{
+		name = 'Research Hotkey',
+		content = {Ability:getResearchHotkey()}
+	})
 
-	infobox:cell(duration2Description, duration2Display)
-	infobox:cell('Researched from', StarCraft2Ability:getResearchFrom(infobox, args))
-	infobox:cell('Research Hotkey', StarCraft2Ability:getResearchHotkey(infobox, args))
-
-	return infobox
+	return widgets
 end
 
-function StarCraft2Ability:getResearchFrom(infobox, args)
-	local from = args.from
-	if String.isEmpty(args.from) then
+function Ability:createWidgetInjector()
+	return CustomInjector()
+end
+
+function CustomInjector:parse(id, widgets)
+	if id == 'cost' then
+		return {
+			Cell{
+				name = 'Cost',
+				content = {Ability:getCostDisplay()}
+
+			}
+		}
+	elseif id == 'hotkey' then
+		return {
+			Cell{
+				name = '[[Hotkeys per Race|Hotkey]]',
+				content = {Ability:getHotkeys()}
+
+			}
+		}
+	elseif id == 'cooldown' then
+		return {
+			Cell{
+				name = PageLink.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown',
+				content = {_args.cooldown}
+
+			}
+		}
+	elseif id == 'duration' then
+		return {
+			Cell{
+				name = '[[Game Speed|Duration]]',
+				content = {Ability:getDuration()}
+
+			}
+		}
+	end
+
+	return widgets
+end
+
+function Ability:getResearchFrom()
+	local from = _args.from
+	if String.isEmpty(_args.from) then
 		from = 'No research needed'
-	elseif not String.isEmpty(args.from2) then
-		from = '[[' .. from .. ']], [[' .. args.from2 .. ']]'
+	elseif not String.isEmpty(_args.from2) then
+		from = '[[' .. from .. ']], [[' .. _args.from2 .. ']]'
 	else
 		from = '[[' .. from .. ']]'
 	end
@@ -52,18 +106,18 @@ function StarCraft2Ability:getResearchFrom(infobox, args)
 	return from
 end
 
-function StarCraft2Ability:getResearchHotkey(infobox, args)
+function Ability:getResearchHotkey()
 	local display
-	if not String.isEmpty(args.from) then
-		display = Hotkeys.hotkey(args.rhotkey)
+	if not String.isEmpty(_args.from) then
+		display = Hotkeys.hotkey(_args.rhotkey)
 	end
 
 	return display
 end
 
-function StarCraft2Ability:getCategories(infobox, args)
+function Ability:getCategories()
 	local categories = { 'Abilities' }
-	local race = CleanRace[args.race or '']
+	local race = CleanRace[_args.race or '']
 	if race then
 		table.insert(categories, race .. ' Abilities')
 	end
@@ -71,81 +125,77 @@ function StarCraft2Ability:getCategories(infobox, args)
 	return categories
 end
 
-function StarCraft2Ability:getDuration2(infobox, args)
+function Ability:getDuration2()
 	local display
-	local description = '[[Game Speed|Duration 2]]'
 
-	if args.channeled2 == 'true' then
-		display = 'Channeled&nbsp;' .. args.duration2
+	if _args.channeled2 == 'true' then
+		display = 'Channeled&nbsp;' .. _args.duration2
 	end
-	if not String.isEmpty(args.duration2) then
-		display = (display or '') .. args.duration2
+	if not String.isEmpty(_args.duration2) then
+		display = (display or '') .. _args.duration2
 	end
 
 	if
 		(not String.isEmpty(display))
-		and (not String.isEmpty(args.caster2))
+		and (not String.isEmpty(_args.caster2))
 	then
-		display = display .. '&#32;([[' .. args.caster2 .. ']])'
+		display = display .. '&#32;([[' .. _args.caster2 .. ']])'
 	end
 
-	return description, display
+	return display
 end
 
-function StarCraft2Ability:getDuration(infobox, args)
+function Ability:getDuration()
 	local display
-	local description = '[[Game Speed|Duration]]'
 
-	if args.channeled == 'true' then
+	if _args.channeled == 'true' then
 		display = 'Channeled&nbsp;'
 	end
-	if not String.isEmpty(args.duration) then
-		display = (display or '') .. args.duration
+	if not String.isEmpty(_args.duration) then
+		display = (display or '') .. _args.duration
 	end
 
 	if
 		(not String.isEmpty(display))
-		and (not String.isEmpty(args.duration2))
-		and (not String.isEmpty(args.caster))
+		and (not String.isEmpty(_args.duration2))
+		and (not String.isEmpty(_args.caster))
 	then
-		display = display .. '&#32;([[' .. args.caster .. ']])'
+		display = display .. '&#32;([[' .. _args.caster .. ']])'
 	end
 
-	return description, display
+	return display
 end
 
-function StarCraft2Ability:getHotkeys(infobox, args)
-	local description = '[[Hotkeys per Race|Hotkey]]'
+function Ability:getHotkeys()
 	local display
-	if not String.isEmpty(args.hotkey) then
-		if not String.isEmpty(args.hotkey2) then
-			display = Hotkeys.hotkey(args.hotkey, args.hotkey2, 'slash')
+	if not String.isEmpty(_args.hotkey) then
+		if not String.isEmpty(_args.hotkey2) then
+			display = Hotkeys.hotkey(_args.hotkey, _args.hotkey2, 'slash')
 		else
-			display = Hotkeys.hotkey(args.hotkey)
+			display = Hotkeys.hotkey(_args.hotkey)
 		end
 	end
 
-	return description, display
+	return display
 end
 
-function StarCraft2Ability:getCostDisplay(infobox, args)
+function Ability:getCostDisplay()
+	local race = string.lower(_args.race or '')
 
-	local race = string.lower(args.race or '')
-
-	local minerals = tonumber(args.min or 0) or 0
+	local minerals = tonumber(_args.min or 0) or 0
 	minerals = _MINERALS .. '&nbsp;' .. minerals
 
-	local gas = tonumber(args.gas or 0) or 0
+	local gas = tonumber(_args.gas or 0) or 0
 	gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas
 
-	local buildtime = tonumber(args.buildtime or 0) or 0
+	local buildtime = tonumber(_args.buildtime or 0) or 0
 	if buildtime ~= 0 then
 		buildtime = '&nbsp;' .. (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtime
 	else
 		buildtime = ''
 	end
 
-	local supply = args.supply or args.control or args.psy or 0
+	local supply = _args.supply or _args.control or _args.psy or 0
 	supply = tonumber(supply) or 0
 	if supply == 0 then
 		supply = ''
@@ -156,4 +206,4 @@ function StarCraft2Ability:getCostDisplay(infobox, args)
 	return minerals .. '&nbsp;' .. gas .. buildtime .. supply
 end
 
-return StarCraft2Ability
+return Ability
