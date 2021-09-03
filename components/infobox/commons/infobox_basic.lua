@@ -60,9 +60,10 @@ function BasicInfobox:getAllArgsForBase(args, base, options)
 	options = options or {}
 	local makeLink = Logic.readBool(options.makeLink)
 
-	local baseArg = args[base]
+	local baseArg = args[base] or args[base .. '1']
 	if makeLink then
-		baseArg = '[[' .. (args[base .. 'link'] or baseArg)
+		local link = args[base .. 'link'] or args[base .. '1link'] or baseArg
+		baseArg = '[[' .. link
 			.. '|' .. baseArg .. ']]'
 	end
 
