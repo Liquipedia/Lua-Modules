@@ -9,10 +9,17 @@
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
-local Cell = require('Module:Infobox/Cell')
 local Links = require('Module:Links')
 local Table = require('Module:Table')
 local Flags = require('Module:Flags')
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Customizable = Widgets.Customizable
+local Builder = Widgets.Builder
 
 local Show = Class.new(BasicInfobox)
 
@@ -25,59 +32,40 @@ function Show:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
-	infobox:name(args.name)
-	infobox:image(args.image, args.defaultImage)
-	infobox:centeredCell(args.caption)
-	infobox:header('Show Information', true)
-	infobox:fcell(Cell:new('Organizer')
-				:options({})
-				:content(
-					unpack(self:_createHosts(args))
-				)
-				:make()
-			)
-	infobox:cell('Format', args.format)
-	infobox:cell('Airs', args.airs)
-	infobox:fcell(Cell:new('Location'):options({}):content(
-			self:_createLocation(args.country, args.city),
-			self:_createLocation(args.country2, args.city2)
-		):make())
-	self:addCustomCells(infobox, args)
-
-	local links = Links.transform(args)
-	infobox:header('Links', not Table.isEmpty(links))
-	infobox:links(links)
-	infobox:centeredCell(self:_addSecondaryLinkDisplay(args))
-	self:addCustomContent(infobox, args)
-	infobox:centeredCell(args.footnotes)
-	infobox:bottom(self:createBottomContent(infobox))
+	local widgets = {
+		Header{name = args.name, image = args.image},
+		Center{content = {args.caption}},
+		Title{name = 'Show Information'},
+		Cell{name = 'Host(s)', content = self:getAllArgsForBase(args, 'host', {makeLink = true})},
+		Cell{name = 'Format', content = {args.format}},
+		Cell{name = 'Airs', content = {args.airs}},
+		Cell{name = 'Location', content = {
+				self:_createLocation(args.country, args.city),
+				self:_createLocation(args.country2, args.city2)
+			}},
+		Customizable{id = 'custom', children = {}},
+		Builder{
+			builder = function()
+				local links = Links.transform(args)
+				local secondaryLinks = Show:_addSecondaryLinkDisplay(args)
+				if (not Table.isEmpty(links)) or (secondaryLinks ~= '') then
+					return {
+						Title{name = 'Links'},
+						Widgets.Links{content = links},
+						Center{content = {secondaryLinks}},
+					}
+				end
+			end
+		},
+		Customizable{id = 'customcontent', children = {}},
+		Center{content = {args.footnotes}},
+	}
 
 	if Namespace.isMain() then
 		infobox:categories('Shows')
 	end
 
-	return infobox:build()
-end
-
-function Show:_createHosts(args)
-	local hosts = {}
-	local host1 = args.host or args.host1
-	if host1 then
-		host1 = '[[' ..
-			(args.hostlink or args.host1link or host1)
-			.. '|' .. host1 .. ']]'
-		table.insert(hosts, host1)
-		for index = 2, 99 do
-			if not args['host' .. index] then
-				break
-			else
-				local host = '[[' .. (args['host' .. index .. 'link'] or args['host' .. index])
-				host = host .. '|' .. args['host' .. index] .. ']]'
-				table.insert(hosts, host)
-			end
-		end
-	end
-	return hosts
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 function Show:_createLocation(country, city)
@@ -99,7 +87,7 @@ function Show:_addSecondaryLinkDisplay(args)
 	end
 	if args.itunes then
 		secondaryLinks[#secondaryLinks + 1] = '['
-			.. args.itunes .. ' iTunes] [[Category:Podcasts]]'
+			.. args.itunes .. ' iTunes][[Category:Podcasts]]'
 	end
 	if args.videoarchive then
 		secondaryLinks[#secondaryLinks + 1] = '['
