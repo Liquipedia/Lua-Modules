@@ -15,9 +15,9 @@ local CustomGame = Class.new()
 local CustomInjector = Class.new(Injector)
 
 function CustomGame.run(frame)
-    local customGame = Game(frame)
+	local customGame = Game(frame)
 	customGame.createWidgetInjector = CustomGame.createWidgetInjector
-    return customGame:createInfobox(frame)
+	return customGame:createInfobox(frame)
 end
 
 function CustomGame:createWidgetInjector()
