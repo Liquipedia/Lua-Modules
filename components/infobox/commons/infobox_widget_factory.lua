@@ -1,10 +1,10 @@
 ---
- -- @Liquipedia
- -- wiki=commons
- -- page=Module:Infobox/Widget/Factory
- --
- -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
- --
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Infobox/Widget/Factory
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local Class = require('Module:Class')
 local Builder = require('Module:Infobox/Widget/Builder')
