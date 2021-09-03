@@ -7,31 +7,102 @@
 --
 
 local League = require('Module:Infobox/League')
-local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
 local TournamentNotability = require('Module:TournamentNotability')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Title = require('Module:Infobox/Widget/Title')
+local Center = require('Module:Infobox/Widget/Center')
 
 local CustomLeague = Class.new()
+local CustomInjector = Class.new(Injector)
 
 local _SERIES_RLCS = 'Rocket League Championship Series'
 local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
 
+local _league
+
 function CustomLeague.run(frame)
 	local league = League(frame)
-	league.addCustomCells = CustomLeague.addCustomCells
-	league.createTier = CustomLeague.createTier
-	league.createPrizepool = CustomLeague.createPrizepool
-	league.addCustomContent = CustomLeague.addCustomContent
+	_league = league
+	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 
 	return league:createInfobox(frame)
+end
+
+function CustomLeague:createWidgetInjector()
+	return CustomInjector()
+end
+
+function CustomInjector:addCustomCells(widgets)
+	local args = _league.args
+	table.insert(widgets, Cell{
+		name = 'Mode',
+		content = {args.mode}
+	})
+	table.insert(widgets, Cell{
+		name = 'Game',
+		content = {CustomLeague:_createGameCell(args.game)}
+	})
+	table.insert(widgets, Cell{
+		name = 'Misc Mode:',
+		content = {args.miscmode}
+	})
+
+	return widgets
+end
+
+function CustomInjector:parse(id, widgets)
+	local args = _league.args
+	if id == 'customcontent' then
+		if not String.isEmpty(args.map1) then
+			local maps = {CustomLeague:_makeInternalLink(args.map1)}
+			local index  = 2
+
+			while not String.isEmpty(args['map' .. index]) do
+				table.insert(maps, '&nbsp;• ' ..
+					tostring(CustomLeague:_createNoWrappingSpan(
+						CustomLeague:_makeInternalLink(args['map' .. index])
+					))
+				)
+				index = index + 1
+			end
+			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Center{content = maps})
+		end
+
+
+		if not String.isEmpty(args.team_number) then
+			table.insert(widgets, Title{name = 'Teams'})
+			table.insert(widgets, Cell{
+				name = 'Number of teams',
+				content = {args.team_number}
+			})
+		end
+	elseif id == 'prizepool' then
+		return {
+			Cell{
+				name = 'Prize pool',
+				content = {CustomLeague:_createPrizepool(args)}
+			},
+		}
+	elseif id == 'liquipediatier' then
+		return {
+			Cell{
+				name = 'Liquipedia Tier',
+				content = {CustomLeague:_createTier(args)}
+			},
+		}
+	end
+	return widgets
 end
 
 function CustomLeague:addCustomCells(infobox, args)
@@ -41,15 +112,13 @@ function CustomLeague:addCustomCells(infobox, args)
 	return infobox
 end
 
-function CustomLeague:createTier(args)
-	local cell =  Cell:new('Liquipedia Tier'):options({})
-
+function CustomLeague:_createTier(args)
 	local content = ''
 
 	local tier = args.liquipediatier
 
 	if String.isEmpty(tier) then
-		return cell:content()
+		return nil
 	end
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier)
@@ -77,14 +146,13 @@ function CustomLeague:createTier(args)
 
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
 
-	return cell:content(content)
+	return content
 end
 
-function CustomLeague:createPrizepool(args)
-	local cell = Cell:new('Prize pool'):options({})
+function CustomLeague:_createPrizepool(args)
 	if String.isEmpty(args.prizepool) and
 		String.isEmpty(args.prizepoolusd) then
-			return cell:content()
+			return nil
 	end
 
 	local content
@@ -115,31 +183,7 @@ function CustomLeague:createPrizepool(args)
 		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
 	end
 
-	return cell:content(content)
-end
-
-function CustomLeague:addCustomContent(infobox, args)
-	if not String.isEmpty(args.map1) then
-		infobox:header('Maps', true)
-
-		local maps = {CustomLeague:_makeInternalLink(args.map1)}
-		local index  = 2
-
-		while not String.isEmpty(args['map' .. index]) do
-			table.insert(maps, '&nbsp;• ' ..
-				tostring(CustomLeague:_createNoWrappingSpan(
-					CustomLeague:_makeInternalLink(args['map' .. index])
-				))
-			)
-			index = index + 1
-		end
-		infobox	:centeredCell(unpack(maps))
-	end
-
-	infobox	:header('Teams', not String.isEmpty(args.team_number))
-			:cell('Number of teams', args.team_number)
-
-    return infobox
+	return content
 end
 
 function CustomLeague:defineCustomPageVariables(args)
