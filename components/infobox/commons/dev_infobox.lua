@@ -53,13 +53,7 @@ function Infobox:build(widgets)
 		local contentItems = WidgetFactory.work(widget, self.injector)
 
 		for _, node in pairs(contentItems or {}) do
-			if type(node) == 'table' then
-				for _, innerNode in pairs(node or {}) do
-					self.content:node(innerNode)
-				end
-			else
-				self.content:node(node)
-			end
+			self.content:node(node)
 		end
 	end
 
