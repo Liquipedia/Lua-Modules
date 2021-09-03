@@ -173,7 +173,6 @@ end
 
 function Links.makeFullLinksForTableItems(links, variant)
 	for key, item in pairs(links) do
-		
 		links[key] = Links.makeFullLink(self:_removeAppendedNumber(key), item, variant)
 	end
 	return links
