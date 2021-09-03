@@ -16,7 +16,6 @@ local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
-local Builder = Widgets.Builder
 
 local Strategy = Class.new(BasicInfobox)
 
