@@ -68,15 +68,6 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Players',
 		content = {args.player_number}
 	})
-	table.insert(widgets, Cell{
-		name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
-		content = {CustomLeague:_createEslProTierCell(args.eslprotier)}
-	})
-	table.insert(widgets, Cell{
-		name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox'),
-		content = {CustomLeague:_createValveTierCell(args.valvetier)},
-		classes = {'valvepremier-highlighted'}
-	})
 
 	return widgets
 end
@@ -122,12 +113,20 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Prize pool',
 				content = {CustomLeague:_createPrizepool(args)}
-			}
-
+			},
 		}
 	elseif id == 'liquipediatier' then
 		return {
-			Cell(CustomLeague:_createTier(args))
+			Cell(CustomLeague:_createTier(args)),
+			Cell{
+				name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
+				content = {CustomLeague:_createEslProTierCell(args.eslprotier)}
+			},
+			Cell{
+				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox'),
+				content = {CustomLeague:_createValveTierCell(args.valvetier)},
+				classes = {'valvepremier-highlighted'}
+			},
 		}
 	end
 	return widgets
