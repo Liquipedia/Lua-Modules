@@ -6,79 +6,127 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Class = require('Module:Class')
 local Map = require('Module:Infobox/Map')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local String = require('Module:StringUtils')
 
-local StarCraft2Map = {}
+local CustomMap = Class.new()
 
-function StarCraft2Map.run(frame)
-	local map = Map(frame)
-	map.getNameDisplay = StarCraft2Map.getNameDisplay
-	map.addCustomCells = StarCraft2Map.addCustomCells
-	map.addToLpdb = StarCraft2Map.addToLpdb
-	return map:createInfobox(frame)
+local CustomInjector = Class.new(Injector)
+
+local _args
+
+function CustomMap.run(frame)
+    local customMap = Map(frame)
+	customMap.createWidgetInjector = CustomMap.createWidgetInjector
+	customMap.getCategories = CustomMap.getCategories
+	_args = customMap.args
+    return customMap:createInfobox(frame)
 end
 
-function StarCraft2Map:addCustomCells(infobox, args)
-	local id = args.id
-	infobox:cell('Tileset', args.tileset or StarCraft2Map:_tlpdMap(id, 'tileset'))
-	infobox:cell('Size', StarCraft2Map:_getSize(args, id))
-	infobox:cell('Spawn Positions', StarCraft2Map:_getSpawn(args, id))
-	infobox:cell('Versions', args.versions)
-	infobox:cell('Competition Span', args.span)
-	infobox:cell('Leagues Featured', args.leagues)
-	infobox:cell('[[Rush distance]]', StarCraft2Map:_getRushDistance(args))
-	infobox:cell('1v1 Ladder', args['1v1history'])
-	infobox:cell('2v2 Ladder', args['2v2history'])
-	infobox:cell('3v3 Ladder', args['3v3history'])
-	infobox:cell('4v4 Ladder', args['4v4history'])
-	return infobox
+function CustomInjector:addCustomCells(widgets)
+	local id = _args.id
+
+	table.insert(widgets, Cell{
+		name = 'Tileset',
+		content = {
+			_args.tileset or CustomMap:_tlpdMap(id, 'tileset')
+		}
+	})
+	table.insert(widgets, Cell{
+		name = 'Size',
+		content = {CustomMap:_getSize(id)}
+	})
+	table.insert(widgets, Cell{
+		name = 'Spawn Positions',
+		content = {CustomMap:_getSpawn(id)}
+	})
+	table.insert(widgets, Cell{
+		name = 'Versions',
+		content = {_args.versions}
+	})
+	table.insert(widgets, Cell{
+		name = 'Competition Span',
+		content = {_args.span}
+	})
+	table.insert(widgets, Cell{
+		name = 'Leagues Featured',
+		content = {_args.leagues}
+	})
+	table.insert(widgets, Cell{
+		name = '[[Rush distance]]',
+		content = {CustomMap:_getRushDistance()}
+	})
+	table.insert(widgets, Cell{
+		name = '1v1 Ladder',
+		content = {_args['1v1history']}
+	})
+	table.insert(widgets, Cell{
+		name = '2v2 Ladder',
+		content = {_args['2v2history']}
+	})
+	table.insert(widgets, Cell{
+		name = '3v3 Ladder',
+		content = {_args['3v3history']}
+	})
+	table.insert(widgets, Cell{
+		name = '4v4 Ladder',
+		content = {_args['4v4history']}
+	})
+
+	return widgets
 end
 
-function StarCraft2Map:getNameDisplay(args)
-	if String.isEmpty(args.name) then
-		return StarCraft2Map:_tlpdMap(args.id, 'name')
+function CustomMap:createWidgetInjector()
+	return CustomInjector()
+end
+
+function CustomMap:getNameDisplay()
+	if String.isEmpty(_args.name) then
+		return CustomMap:_tlpdMap(_args.id, 'name')
 	end
 
-	return args.name
+	return _args.name
 end
 
-function StarCraft2Map:addToLpdb(lpdbData, args)
-	lpdbData.name = StarCraft2Map:getNameDisplay(args)
+function CustomMap:addToLpdb(lpdbData)
+	lpdbData.name = CustomMap:getNameDisplay(_args)
 	lpdbData.extradata = {
-		creator = args.creator,
-		creator2 = args.creator2,
-		spawns = args.players,
-		height = args.height,
-		width = args.width,
+		creator = _args.creator,
+		creator2 = _args.creator2,
+		spawns = _args.players,
+		height = _args.height,
+		width = _args.width,
 		rush = Variables.varDefault('rush_distance'),
 	}
 	return lpdbData
 end
 
-function StarCraft2Map:_getSize(args, id)
-	local width = args.width
-		or StarCraft2Map:_tlpdMap(id, 'width') or ''
-	local height = args.height
-		or StarCraft2Map:_tlpdMap(id, 'height') or ''
+function CustomMap:_getSize(id)
+	local width = _args.width
+		or CustomMap:_tlpdMap(id, 'width') or ''
+	local height = _args.height
+		or CustomMap:_tlpdMap(id, 'height') or ''
 	return width .. 'x' .. height
 end
 
-function StarCraft2Map:_getSpawn(args, id)
-	local players = args.players
-		or StarCraft2Map:_tlpdMap(id, 'players') or ''
-	local positions = args.positions
-		or StarCraft2Map:_tlpdMap(id, 'positions') or ''
+function CustomMap:_getSpawn(id)
+	local players = _args.players
+		or CustomMap:_tlpdMap(id, 'players') or ''
+	local positions = _args.positions
+		or CustomMap:_tlpdMap(id, 'positions') or ''
 	return players .. ' at ' .. positions
 end
 
-function StarCraft2Map:_getRushDistance(args)
-	if String.isEmpty(args['rush_distance']) then
+function CustomMap:_getRushDistance()
+	if String.isEmpty(_args['rush_distance']) then
 		return nil
 	end
-	local rushDistance = args['rush_distance']
+	local rushDistance = _args['rush_distance']
 	rushDistance = string.gsub(rushDistance, 's', '')
 	rushDistance = string.gsub(rushDistance, 'seconds', '')
 	rushDistance = string.gsub(rushDistance, ' ', '')
@@ -86,9 +134,9 @@ function StarCraft2Map:_getRushDistance(args)
 	return rushDistance .. ' seconds'
 end
 
-function StarCraft2Map:_tlpdMap(id, query)
+function CustomMap:_tlpdMap(id, query)
 	if not id then return nil end
 	return Template.safeExpand(mw.getCurrentFrame(), 'Tlpd map', { id, query })
 end
 
-return StarCraft2Map
+return CustomMap
