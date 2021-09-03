@@ -100,10 +100,7 @@ function League:createInfobox()
 		},
 		Cell{name = 'Venue', content = {args.venue}},
 		Cell{name = 'Format', content = {args.format}},
-		Customizable{
-			id = 'prizepool',
-			children = {}
-		},
+		Customizable{id = 'prizepool', children = {}},
 		Cell{name = 'Date', content = {args.date}},
 		Cell{name = 'Start Date', content = {args.sdate}},
 		Cell{name = 'End Date', content = {args.edate}},
