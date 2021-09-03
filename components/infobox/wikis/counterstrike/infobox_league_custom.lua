@@ -89,8 +89,8 @@ function CustomInjector:parse(id, widgets)
 				)
 				index = index + 1
 			end
-			table.insert(Title{name = 'Maps'})
-			table.insert(Center{content = maps})
+			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Center{content = maps})
 		end
 
 
@@ -106,7 +106,7 @@ function CustomInjector:parse(id, widgets)
 				)
 				index = index + 1
 			end
-			table.insert(Center{content = teams})
+			table.insert(widgets, Center{content = teams})
 		end
 	elseif id == 'prizepool' then
 		return {
@@ -200,7 +200,7 @@ function CustomLeague:_createTier(args)
 	end
 
 	content = content .. '[[Category:' .. tierDisplay.. ' Tournaments]]'
-	cell.content = content
+	cell.content = {content}
 
 	return cell
 end
