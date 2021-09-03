@@ -295,7 +295,7 @@ function CustomTeam._addPlacementToEarnings(earnings, player_earnings, data)
 	earnings[mode]['total'] = (earnings[mode]['total'] or 0) + data.prizemoney
 	earnings['total'][date] = (earnings['total'][date] or 0) + data.prizemoney
 	if data.mode ~= 'team' then
-		player_earnings = player_earnings + data[i].prizemoney
+		player_earnings = player_earnings + data.prizemoney
 	end
 
 	return earnings, player_earnings
