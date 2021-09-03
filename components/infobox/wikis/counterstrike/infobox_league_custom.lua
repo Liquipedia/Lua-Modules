@@ -117,6 +117,18 @@ function CustomInjector:parse(id, widgets)
 			end
 			table.insert(Center{content = teams})
 		end
+	elseif id == 'prizepool' then
+		return {
+			Cell{
+				name = 'Prize pool',
+				content = {CustomLeague:_createPrizepool(args)}
+			}
+
+		}
+	elseif id == 'liquipediatier' then
+		return {
+			Cell(CustomLeague:_createTier(args))
+		}
 	end
 	return widgets
 end
@@ -157,15 +169,15 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
-function CustomLeague:createTier(args)
-	local cell =  Cell:new('Liquipedia Tier'):options({})
+function CustomLeague:_createTier(args)
+	local cell = {name ='Liquipedia Tier'}
 
 	local content = ''
 
 	local tier = args.liquipediatier
 
 	if String.isEmpty(tier) then
-		return cell:content()
+		return cell
 	end
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay', { tier })
@@ -177,7 +189,7 @@ function CustomLeague:createTier(args)
 	content = content .. tierDisplayLink
 
 	if String.isEmpty(valvetier) and Logic.readBool(valvemajor) then
-		cell:addClass('valvepremier-highlighted')
+		cell.classes = {'valvepremier-highlighted'}
 		local logo = ' [[File:Valve_logo_black.svg|x12px|link=Valve_icon.png|x16px|' ..
 			'link=Counter-Strike Majors|Counter-Strike Major]]'
 		content = content .. logo
@@ -189,15 +201,15 @@ function CustomLeague:createTier(args)
 	end
 
 	content = content .. '[[Category:' .. tierDisplay.. ' Tournaments]]'
+	cell.content = content
 
-	return cell:content(content)
+	return cell
 end
 
-function CustomLeague:createPrizepool(args)
-	local cell = Cell:new('Prize pool'):options({})
+function CustomLeague:_createPrizepool(args)
 	if String.isEmpty(args.prizepool) and
 		String.isEmpty(args.prizepoolusd) then
-			return cell:content()
+			return nil
 	end
 
 	local content
@@ -232,7 +244,7 @@ function CustomLeague:createPrizepool(args)
 
 
 
-	return cell:content(content)
+	return content
 end
 
 function CustomLeague:defineCustomPageVariables(args)
