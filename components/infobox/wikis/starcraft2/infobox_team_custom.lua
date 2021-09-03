@@ -8,7 +8,6 @@
 
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
-local Links = require('Module:Links')
 local Achievements = require('Module:Achievements in infoboxes')
 local RaceIcon = require('Module:RaceIcon').getSmallIcon
 local Matches = require('Module:Upcoming ongoing and recent matches team/new')
@@ -33,6 +32,7 @@ local _team
 local _EARNINGS = 0
 local _ALLOWED_PLACES = { '1', '2', '3', '4', '3-4' }
 local _EARNINGS_MODES = { ['team'] = 'team' }
+local _DISCARD_PLACEMENT = 99
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
@@ -146,7 +146,7 @@ end
 
 function CustomTeam.addToLpdb(lpdbData)
 	lpdbData.earnings = _EARNINGS
-	Variables.varDefine('team_name', name)
+	Variables.varDefine('team_name', lpdbData.name)
 	return lpdbData
 end
 
@@ -249,8 +249,8 @@ function CustomTeam.get_earnings_and_medals_data(team)
 	local teamMedals = {}
 	local player_earnings = 0
 	earnings['total'] = {}
-	Medals['total'] = {}
-	TeamMedals['total'] = {}
+	medals['total'] = {}
+	teamMedals['total'] = {}
 
 	if type(data[1]) == 'table' then
 		for _, item in pairs(data) do
@@ -258,9 +258,9 @@ function CustomTeam.get_earnings_and_medals_data(team)
 			earnings, player_earnings = CustomTeam._addPlacementToEarnings(earnings, player_earnings, item)
 
 			--handle medals
-			if data[i].mode == '1v1' then
+			if item.mode == '1v1' then
 				medals = CustomTeam._addPlacementToMedals(medals, item)
-			elseif data[i].mode == 'team' then
+			elseif item.mode == 'team' then
 				teamMedals = CustomTeam._addPlacementToMedals(teamMedals, item)
 			end
 		end
@@ -286,7 +286,7 @@ function CustomTeam.get_earnings_and_medals_data(team)
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, player_earnings, data)
-	local mode = _EARNING_MODES[data.mode] or 'other'
+	local mode = _EARNINGS_MODES[data.mode] or 'other'
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
