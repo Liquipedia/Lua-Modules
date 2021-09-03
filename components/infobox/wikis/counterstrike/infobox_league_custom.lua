@@ -58,12 +58,12 @@ end
 function CustomInjector:addCustomCells(widgets)
 	local args = _league.args
 	table.insert(widgets, Cell{
-		name = 'Game',
-		content = {CustomLeague:_createGameCell(args)}
-	})
-	table.insert(widgets, Cell{
 		name = 'Teams',
 		content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}
+	})
+	table.insert(widgets, Cell{
+		name = 'Game',
+		content = {CustomLeague:_createGameCell(args)}
 	})
 	table.insert(widgets, Cell{
 		name = 'Players',
