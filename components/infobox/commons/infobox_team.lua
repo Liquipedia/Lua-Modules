@@ -75,7 +75,6 @@ function Team:createInfobox()
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
-				links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
