@@ -56,7 +56,7 @@ function CustomInjector:parse(id, widgets)
 		if _EARNINGS == 0 then
 			_EARNINGS = nil
 		else
-			_EARNINGS = '$' .. Language:formatNum(earnings)
+			_EARNINGS = '$' .. Language:formatNum(_EARNINGS)
 		end
 		return {
 			Cell{
