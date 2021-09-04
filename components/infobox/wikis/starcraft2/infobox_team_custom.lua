@@ -53,15 +53,17 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
+		_EARNINGS = CustomTeam.calculateEarnings(_team.args)
+		local earningsDisplay
 		if _EARNINGS == 0 then
-			_EARNINGS = nil
+			earningsDisplay = nil
 		else
-			_EARNINGS = '$' .. Language:formatNum(_EARNINGS)
+			earningsDisplay = '$' .. Language:formatNum(_EARNINGS)
 		end
 		return {
 			Cell{
 				name = 'Earnings',
-				content = {_EARNINGS}
+				content = {earningsDisplay}
 			}
 		}
 	elseif id == 'achievements' then
@@ -126,7 +128,6 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData)
-	_EARNINGS = CustomTeam.calculateEarnings(_team.args)
 	lpdbData.earnings = _EARNINGS
 	Variables.varDefine('team_name', lpdbData.name)
 	return lpdbData
@@ -229,7 +230,7 @@ function CustomTeam.getEarningsAndMedalsData(team)
 	local earnings = {}
 	local medals = {}
 	local teamMedals = {}
-	local player_earnings = 0
+	local playerEarnings = 0
 	earnings['total'] = {}
 	medals['total'] = {}
 	teamMedals['total'] = {}
@@ -237,7 +238,7 @@ function CustomTeam.getEarningsAndMedalsData(team)
 	if type(data[1]) == 'table' then
 		for _, item in pairs(data) do
 			--handle earnings
-			earnings, player_earnings = CustomTeam._addPlacementToEarnings(earnings, player_earnings, item)
+			earnings, playerEarnings = CustomTeam._addPlacementToEarnings(earnings, playerEarnings, item)
 
 			--handle medals
 			if item.mode == '1v1' then
@@ -260,14 +261,14 @@ function CustomTeam.getEarningsAndMedalsData(team)
 		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
 				type = 'total_earnings_players_while_on_team',
 				name = pagename,
-				information = player_earnings,
+				information = playerEarnings,
 		})
 	end
 
 	return math.floor((earnings.team.total or 0) * 100 + 0.5) / 100
 end
 
-function CustomTeam._addPlacementToEarnings(earnings, player_earnings, data)
+function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 	local mode = _EARNINGS_MODES[data.mode] or 'other'
 	if not earnings[mode] then
 		earnings[mode] = {}
@@ -277,10 +278,10 @@ function CustomTeam._addPlacementToEarnings(earnings, player_earnings, data)
 	earnings[mode]['total'] = (earnings[mode]['total'] or 0) + data.prizemoney
 	earnings['total'][date] = (earnings['total'][date] or 0) + data.prizemoney
 	if data.mode ~= 'team' then
-		player_earnings = player_earnings + data.prizemoney
+		playerEarnings = playerEarnings + data.prizemoney
 	end
 
-	return earnings, player_earnings
+	return earnings, playerEarnings
 end
 
 function CustomTeam._addPlacementToMedals(medals, data)
