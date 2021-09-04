@@ -17,6 +17,7 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Builder = require('Module:Infobox/Widget/Builder')
 local Center = require('Module:Infobox/Widget/Center')
+local Breakdown = require('Module:Infobox/Widget/Breakdown')
 
 local doStore = true
 local pagename = mw.title.getCurrentTitle().prefixedText
@@ -97,8 +98,7 @@ function CustomInjector:parse(id, widgets)
 						return {
 							Title{name = 'Player Breakdown'},
 							Cell{name = 'Number of players', content = {playerBreakDown.playernumber}},
-							--this needs testing after Builder/Customizable is fixed
-							CustomTeam.playerBreakDownDisplay(playerBreakDown.display)
+							Breakdown{content = playerBreakDown.display}
 						}
 					end
 				end
@@ -125,23 +125,6 @@ function CustomTeam:createBottomContent()
 			tostring(Matches._get_upcoming({})) ..
 			tostring(Matches._get_recent({}))
 	end
-end
-
-function CustomTeam.playerBreakDownDisplay(contents)
-    if type(contents) ~= 'table' or contents == {} then
-        return nil
-    end
-
-    local div = mw.html.create('div')
-    local number = #contents
-    for _, content in ipairs(contents) do
-        local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number
-			.. ' infobox-center')
-        infoboxCustomCell:wikitext(content)
-        div:node(infoboxCustomCell)
-    end
-
-    return div
 end
 
 function CustomTeam.addToLpdb(lpdbData)
