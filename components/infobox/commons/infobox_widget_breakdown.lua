@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
-local Table = require('Module:Table')
 
 local Breakdown = Class.new(
 	Widget,
@@ -22,7 +21,6 @@ function Breakdown:make()
 end
 
 function Breakdown:_breakdown(contents)
-mw.logObject(contents)
 	if type(contents) ~= 'table' or contents == {} then
 		return nil
 	end
