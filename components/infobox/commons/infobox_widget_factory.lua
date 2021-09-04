@@ -38,7 +38,7 @@ function WidgetFactory.work(widget, injector)
 			else
 				childOutput = child:make() or {}
 			end
-			for _, item in pairs(child:make() or {}) do
+			for _, item in pairs(childOutput) do
 				table.insert(convertedWidgets, item)
 			end
 		end
