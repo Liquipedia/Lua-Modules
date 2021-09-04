@@ -33,14 +33,10 @@ function WidgetFactory.work(widget, injector)
 				return error('Customizable can only contain Widgets as children')
 			end
 			if child:is_a(Builder) then
-				local subChildren = child:make()
-
-				for _, subChild in pairs(subChildren or {}) do
-					local childOutput = WidgetFactory.work(subChild, injector)
-					-- Our child might contain a list of children, so we need to iterate
-					for _, item in pairs(childOutput) do
-						table.insert(convertedWidgets, item)
-					end
+				local childOutput = WidgetFactory.work(child, injector)
+				-- Our child might contain a list of children, so we need to iterate
+				for _, item in pairs(childOutput) do
+					table.insert(convertedWidgets, item)
 				end
 			else
 				for _, item in pairs(child:make() or {}) do
