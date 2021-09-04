@@ -7,7 +7,6 @@
 --
 
 local League = require('Module:Infobox/League')
-local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -17,52 +16,171 @@ local GameLookup = require('Module:GameLookup')
 local PrizePool = require('Module:Prize pool currency')
 local MapMode = require('Module:MapMode')
 local GameModeLookup = require('Module:GameModeLookup')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Title = require('Module:Infobox/Widget/Title')
+local Center = require('Module:Infobox/Widget/Center')
+local Page = require('Module:Page')
 
 local CustomLeague = Class.new()
+local CustomInjector = Class.new(Injector)
+
+local _league
 
 function CustomLeague.run(frame)
 	local league = League(frame)
+	_league = league
+	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.addCustomCells = CustomLeague.addCustomCells
-	league.createTier = CustomLeague.createTier
-	league.createPrizepool = CustomLeague.createPrizepool
-	league.addCustomContent = CustomLeague.addCustomContent
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
 
-function CustomLeague:addCustomCells(infobox, args)
-	local sponsors = mw.text.split(args.sponsors, ',', true)
-
-	infobox:cell('Sponsor', table.concat(sponsors, '&nbsp;•'))
-	infobox:cell('Game', CustomLeague:_makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or ''))
-	infobox:cell('Version', CustomLeague:_makeVersionLink(args))
-	infobox:cell('Patch', CustomLeague:_makePatchLink(args))
-	infobox:cell('Voobly & WololoKingdoms', args.voobly)
-	infobox:fcell(Cell:new('Game mode')
-					:options({})
-					:content(unpack(CustomLeague:_getGameModes(args)))
-					:make())
-	infobox:cell('Number of teams', args.team_number)
-	infobox:cell('Number of players', args.player_number)
-
-	if League:shouldStore(args) then
-		infobox:categories(GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. 'Competitions')
-	end
-
-	return infobox
+function CustomLeague:createWidgetInjector()
+	return CustomInjector()
 end
 
-function CustomLeague:createTier(args)
-	local cell =  Cell:new('Liquipedia Tier'):options({})
+function CustomInjector:addCustomCells(widgets)
+	local args = _league.args
+
+	table.insert(widgets, Cell{
+		name = 'Game',
+		content = {Page.makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or '')}
+	})
+
+	table.insert(widgets, Cell{
+		name = 'Version',
+		content = {CustomLeague:_makeVersionLink(args)}
+	})
+
+	table.insert(widgets, Cell{
+		name = 'Patch',
+		content = {CustomLeague:_makePatchLink(args)}
+	})
+
+	table.insert(widgets, Cell{
+		name = 'Voobly & WololoKingdoms',
+		content = {args.voobly}
+	})
+
+	table.insert(widgets, Cell{
+		name = 'Game mode',
+		content = CustomLeague:_getGameModes(args)
+	})
+
+	table.insert(widgets, Cell{
+		name = 'Number of teams',
+		content = {args.team_number}
+	})
+
+	table.insert(widgets, Cell{
+		name = 'Number of players',
+		content = {args.player_number}
+	})
+
+	return widgets
+end
+
+function CustomInjector:parse(id, widgets)
+	local args = _league.args
+
+	if id == 'customcontent' then
+		if not String.isEmpty(args.map1) then
+			local map1mode = ''
+			if not String.isEmpty(args.map1mode) then
+				map1mode = MapMode.get({args.map1mode})
+			end
+
+			local maps = {Page.makeInternalLink(args.map1, args.map1 .. map1mode)}
+			local index  = 2
+
+			while not String.isEmpty(args['map' .. index]) do
+				local mapmode = ''
+				if not String.isEmpty(args['map' .. index .. 'mode']) then
+					mapmode = MapMode.get({args['map' .. index .. 'mode']})
+				end
+				table.insert(maps, '&nbsp;• ' ..
+					tostring(CustomLeague:_createNoWrappingSpan(
+						Page.makeInternalLink(args['map' .. index], args['map' .. index] .. mapmode)
+					))
+				)
+				index = index + 1
+			end
+
+			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Center{content = maps})
+		end
+
+		if not String.isEmpty(args.team1) then
+			local teams = {Page.makeInternalLink(args.team1)}
+			local index  = 2
+
+			while not String.isEmpty(args['team' .. index]) do
+				table.insert(teams, '&nbsp;• ' ..
+					tostring(CustomLeague:_createNoWrappingSpan(
+						Page.makeInternalLink(args['team' .. index])
+					))
+				)
+				index = index + 1
+			end
+
+			table.insert(widgets, Title{name = 'Teams'})
+			table.insert(widgets, Center{content = teams})
+		end
+	elseif id == 'prizepool' then
+		return {
+			Cell{
+				name = 'Prize pool',
+				content = {CustomLeague:_createPrizepool(args)}
+			}
+		}
+	elseif id == 'liquipediatier' then
+		return {
+			Cell{
+				name = 'Tier',
+				content = {CustomLeague:_createTier(args)}
+			}
+		}
+	elseif id == 'organizer' then
+		local sponsors = mw.text.split(args.sponsors, ',', true)
+		table.insert(widgets, Cell{
+			name = 'Sponsor(s)',
+			content = table.concat(sponsors, '&nbsp;•')
+		})
+	end
+
+	return widgets
+end
+
+
+function CustomLeague:getWikiCategories(args)
+	local categories = {}
+
+	if not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)) then
+		table.insert(categories, 'Individual Tournaments')
+	end
+
+	if String.isEmpty(args.game) then
+		table.insert(categories, 'Tournaments without game version')
+	else
+		table.insert(categories, GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. 'Competitions')
+	end
+
+	return categories
+end
+
+function CustomLeague:_createTier(args)
+	local cell = {name = 'Liquipedia Tier'}
 
 	local content = ''
 
 	local tier = args.liquipediatier
 
 	if String.isEmpty(tier) then
-		return cell:content()
+		return cell
 	end
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(),
@@ -77,14 +195,14 @@ function CustomLeague:createTier(args)
 		content = content .. tierDisplay
 	end
 
-	return cell:content(content)
+	cell.content = {content}
+	return cell
 end
 
-function CustomLeague:createPrizepool(args)
-	local cell = Cell:new('Prize pool'):options({})
+function CustomLeague:_createPrizepool(args)
 	if String.isEmpty(args.prizepool) and
 		String.isEmpty(args.prizepoolusd) then
-			return cell:content()
+			return nil
 	end
 
 	local date
@@ -103,54 +221,7 @@ function CustomLeague:createPrizepool(args)
 		}
 	)
 
-	return cell:content(content)
-end
-
-function CustomLeague:addCustomContent(infobox, args)
-	if not String.isEmpty(args.map1) then
-		infobox:header('Maps', true)
-
-		local map1mode = ''
-		if not String.isEmpty(args.map1mode) then
-			map1mode = MapMode.get({args.map1mode})
-		end
-
-		local maps = {CustomLeague:_makeInternalLink(args.map1 .. map1mode)}
-		local index  = 2
-
-		while not String.isEmpty(args['map' .. index]) do
-			local mapmode = ''
-			if not String.isEmpty(args['map' .. index .. 'mode']) then
-				mapmode = MapMode.get({args['map' .. index .. 'mode']})
-			end
-			table.insert(maps, '&nbsp;• ' ..
-				tostring(CustomLeague:_createNoWrappingSpan(
-					CustomLeague:_makeInternalLink(args['map' .. index] .. mapmode)
-				))
-			)
-			index = index + 1
-		end
-		infobox	:centeredCell(unpack(maps))
-	end
-
-	if not String.isEmpty(args.team1) then
-		infobox:header('Teams', true)
-
-		local teams = {CustomLeague:_makeInternalLink(args.team1)}
-		local index  = 2
-
-		while not String.isEmpty(args['team' .. index]) do
-			table.insert(teams, '&nbsp;• ' ..
-				tostring(CustomLeague:_createNoWrappingSpan(
-					CustomLeague:_makeInternalLink(args['team' .. index])
-				))
-			)
-			index = index + 1
-		end
-		infobox	:centeredCell(unpack(teams))
-	end
-
-    return infobox
+	return content
 end
 
 function CustomLeague:defineCustomPageVariables(args)
@@ -223,16 +294,12 @@ function CustomLeague:_createNoWrappingSpan(content)
 	return span
 end
 
-function CustomLeague:_makeInternalLink(content)
-	return '[[' .. content .. ']]'
-end
-
 function CustomLeague:_makeVersionLink(args)
 	if String.isEmpty(args.version) then return nil end
 	local content = GameLookup.getName({args.game}) .. '/' .. args.version
 	content = content .. '|' .. args.version
 
-	return CustomLeague:_makeInternalLink(content)
+	return Page.makeInternalLink(content)
 end
 
 function CustomLeague:_makePatchLink(args)
@@ -240,14 +307,12 @@ function CustomLeague:_makePatchLink(args)
 
 	local content
 	local patch =  GameLookup.getName({args.game}) .. '/' .. args.version .. '/' .. args.patch
-	patch = patch .. '|' .. args.patch
-	content = CustomLeague:_makeInternalLink(patch)
+	content = Page.makeInternalLink(patch, args.patch)
 
 	if not String.isEmpty(args.epatch) then
 		content = content .. '&nbsp;&ndash;&nbsp;'
 		local epatch = GameLookup.getName({args.game}) .. '/' .. args.version .. '/' .. args.epatch
-		epatch = epatch .. '|' .. args.epatch
-		epatch = CustomLeague:_makeInternalLink(epatch)
+		epatch = Page.makeInternalLink(epatch, args.epatch)
 		content = content .. epatch
 	end
 
@@ -256,13 +321,13 @@ end
 
 function CustomLeague:_getGameModes(args)
 	if String.isEmpty(args.gamemode) then
-		return CustomLeague:_makeInternalLink(GameModeLookup.getDefault({args.game or ''}))
+		return Page.makeInternalLink(GameModeLookup.getDefault(args.game or ''))
 	end
 
 	local gameModes = mw.text.split(args.gamemode, ',', true)
 	table.foreach(gameModes,
 		function(index, mode)
-			gameModes[index] = CustomLeague:_makeInternalLink(GameModeLookup.getName({mode}) or '')
+			gameModes[index] = Page.makeInternalLink(GameModeLookup.getName(mode) or '')
 		end
 	)
 
