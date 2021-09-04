@@ -17,7 +17,6 @@ local Template = require('Module:Template')
 
 local CustomTeam = Class.new()
 
-local _EARNINGS
 local _CURRENT_YEAR = os.date('%Y')
 
 local CustomInjector = Class.new(Injector)
@@ -43,17 +42,18 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		Variables.varDefine('earnings', _EARNINGS)
-		if _EARNINGS == 0 then
-			_EARNINGS = nil
+		local earnings = Earnings.calculateForTeam({team = _team.pagename or _team.name})
+		Variables.varDefine('earnings', earnings)
+		if earnings == 0 then
+			earnings = nil
 		else
-			_EARNINGS = '$' .. Language:formatNum(_EARNINGS)
+			earnings = '$' .. Language:formatNum(earnings)
 		end
 		return {
 			Cell{
 				name = 'Earnings',
 				content = {
-					_EARNINGS
+					earnings
 				}
 			}
 		}
@@ -62,8 +62,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	_EARNINGS = Earnings.calculateForTeam({team = _team.pagename or _team.name})
-	lpdbData.earnings = _EARNINGS
+	lpdbData.earnings = Variables.varDefault('earnings')
 	if not String.isEmpty(args.teamcardimage) then
 		lpdbData.logo = 'File:' .. args.teamcardimage
 	elseif not String.isEmpty(args.image) then
