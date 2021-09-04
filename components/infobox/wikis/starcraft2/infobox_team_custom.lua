@@ -125,7 +125,7 @@ function CustomTeam:createBottomContent()
 	end
 end
 
-function CustomTeam.addToLpdb(lpdbData)
+function CustomTeam:addToLpdb(lpdbData)
 	_EARNINGS = CustomTeam.calculateEarnings(_team.args)
 	lpdbData.earnings = _EARNINGS
 	Variables.varDefine('team_name', lpdbData.name)
