@@ -11,7 +11,7 @@ local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
-local Flags = require('Module:Flags')._Flag
+local Flags = require('Module:Flags')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -28,10 +28,10 @@ local _LINK_VARIANT = 'team'
 
 function Team.run(frame)
 	local team = Team(frame)
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
-function Team:createInfobox(frame)
+function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
