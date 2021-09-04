@@ -35,6 +35,11 @@ function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
+	if Namespace.isMain() then
+		infobox:categories('Teams', unpack(self:getWikiCategories(args)))
+		self:_setLpdbData(args, links)
+	end
+
 	local widgets = {
 		Header{name = args.name, image = args.image},
 		Center{content = {args.caption}},
