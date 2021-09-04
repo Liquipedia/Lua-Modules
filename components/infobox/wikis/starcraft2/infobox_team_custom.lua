@@ -29,7 +29,6 @@ local Language = mw.language.new('en')
 
 local _team
 
-
 local _EARNINGS = 0
 local _ALLOWED_PLACES = { '1', '2', '3', '4', '3-4' }
 local _EARNINGS_MODES = { ['team'] = 'team' }
@@ -54,16 +53,15 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		local earnings = CustomTeam.calculateEarnings(_team.args)
-		if earnings == 0 then
-			earnings = nil
+		if _EARNINGS == 0 then
+			_EARNINGS = nil
 		else
-			earnings = '$' .. Language:formatNum(earnings)
+			_EARNINGS = '$' .. Language:formatNum(earnings)
 		end
 		return {
 			Cell{
 				name = 'Earnings',
-				content = {earnings}
+				content = {_EARNINGS}
 			}
 		}
 	elseif id == 'achievements' then
@@ -128,6 +126,7 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam.addToLpdb(lpdbData)
+	_EARNINGS = CustomTeam.calculateEarnings(_team.args)
 	lpdbData.earnings = _EARNINGS
 	Variables.varDefine('team_name', lpdbData.name)
 	return lpdbData
@@ -187,9 +186,9 @@ function CustomTeam.calculateEarnings(args)
 			doStore = false
 			Variables.varDefine('disable_SMW_storage', 'true')
 	else
-		_EARNINGS = CustomTeam.getEarningsAndMedalsData(pagename) or 0
-		Variables.varDefine('earnings', _EARNINGS)
-		return _EARNINGS
+		local earnings = CustomTeam.getEarningsAndMedalsData(pagename) or 0
+		Variables.varDefine('earnings', earnings)
+		return earnings
 	end
 	return 0
 end
