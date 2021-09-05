@@ -21,7 +21,7 @@ function DisplayHelper.opponentIsTBD(opponent)
 	return opponent.type == 'literal'
 		or opponent.type == 'team' and opponent.template == 'tbd'
 		or opponent.name == 'TBD'
-		or Array.any(opponent.players, function(player) return player.name == 'TBD' end)
+		or Array.any(opponent.players, function(player) return player.displayName == 'TBD' end)
 end
 
 -- Whether to allow highlighting an opponent via mouseover
@@ -32,6 +32,7 @@ function DisplayHelper.opponentIsHighlightable(opponent)
 		return opponent.template and opponent.template ~= 'tbd' or false
 	else
 		return 0 < #opponent.players
+			and Array.all(opponent.players, function(player) return player.pageName ~= '' and player.displayName ~= 'TBD' end)
 	end
 end
 
