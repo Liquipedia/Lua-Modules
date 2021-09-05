@@ -31,7 +31,6 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.addCustomCells = CustomLeague.addCustomCells
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
@@ -45,31 +44,6 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	local args = _league.args
-
-	table.insert(widgets, Cell{
-		name = 'Game',
-		content = {Page.makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or '')}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Version',
-		content = {CustomLeague:_makeVersionLink(args)}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Patch',
-		content = {CustomLeague:_makePatchLink(args)}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Voobly & WololoKingdoms',
-		content = {args.voobly}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Game mode',
-		content = CustomLeague:_getGameModes(args)
-	})
 
 	table.insert(widgets, Cell{
 		name = 'Number of teams',
@@ -87,7 +61,32 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = _league.args
 
-	if id == 'customcontent' then
+	if id == 'server' then
+		table.insert(widgets, Cell{
+			name = 'Game',
+			content = {Page.makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or '')}
+		})
+
+		table.insert(widgets, Cell{
+			name = 'Version',
+			content = {CustomLeague:_makeVersionLink(args)}
+		})
+
+		table.insert(widgets, Cell{
+			name = 'Patch',
+			content = {CustomLeague:_makePatchLink(args)}
+		})
+
+		table.insert(widgets, Cell{
+			name = 'Voobly & WololoKingdoms',
+			content = {args.voobly}
+		})
+
+		table.insert(widgets, Cell{
+			name = 'Game mode',
+			content = CustomLeague:_getGameModes(args)
+		})
+	elseif id == 'customcontent' then
 		if not String.isEmpty(args.map1) then
 			local map1mode = ''
 			if not String.isEmpty(args.map1mode) then
@@ -212,7 +211,7 @@ function CustomLeague:_createPrizepool(args)
 		date = args.edate or args.date
 	end
 
-	local content = PrizePool.get({
+	local content = PrizePool._get({
 			prizepool = args.prizepool,
 			prizepoolusd = args.prizepoolusd,
 			currency = args.localcurrency,
