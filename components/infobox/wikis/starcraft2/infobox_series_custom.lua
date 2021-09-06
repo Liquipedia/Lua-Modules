@@ -74,7 +74,7 @@ function CustomInjector:addCustomCells(widgets)
 				return {
 					Cell{
 						name = 'Total prize money',
-						CustomSeries._getSeriesPrizepools(_series.args)
+						content = {CustomSeries._getSeriesPrizepools(_series.args)}
 					}
 				}
 			end
