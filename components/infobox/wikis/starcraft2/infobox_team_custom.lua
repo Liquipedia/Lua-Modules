@@ -133,7 +133,6 @@ end
 
 function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.earnings = _earnings
-	Variables.varDefine('team_name', lpdbData.name)
 	return lpdbData
 end
 
