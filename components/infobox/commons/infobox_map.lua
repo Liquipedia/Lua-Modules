@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
@@ -45,7 +44,7 @@ function Map:createInfobox(frame)
 		self:_setLpdbData(args)
 	end
 
-	return infobox:build()
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 --- Allows for overriding this functionality
