@@ -132,7 +132,7 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData)
-	lpdbData.earnings = _earnings
+	lpdbData.earnings = _earnings or 0
 	return lpdbData
 end
 
