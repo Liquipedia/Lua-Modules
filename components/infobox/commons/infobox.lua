@@ -63,12 +63,12 @@ function Infobox:build(widgets)
 		end
 	end
 
-    self.root:node(self.content)
+	self.root:node(self.content)
 	if self.bottomContent ~= nil then
 		self.root:node(self.bottomContent)
 	end
-    self.root:node(self.adbox)
-    return self.root
+	self.root:node(self.adbox)
+	return self.root
 end
 
 return Infobox
