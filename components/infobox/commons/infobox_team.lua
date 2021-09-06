@@ -27,13 +27,13 @@ local Team = Class.new(BasicInfobox)
 local _LINK_VARIANT = 'team'
 
 function Team.run(frame)
-    local team = Team(frame)
-    return team:createInfobox(frame)
+	local team = Team(frame)
+	return team:createInfobox(frame)
 end
 
 function Team:createInfobox(frame)
-    local infobox = self.infobox
-    local args = self.args
+	local infobox = self.infobox
+	local args = self.args
 
 	local widgets = {
 		Header{name = args.name, image = args.image},
@@ -67,7 +67,7 @@ function Team:createInfobox(frame)
 				}
 			}
 		},
-		Customizable{id = 'custom'},
+		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
 				local links = Links.transform(args)
@@ -90,7 +90,7 @@ function Team:createInfobox(frame)
 			children = {
 				Builder{
 					builder = function()
-						if args.history or args.disbanded then
+						if args.created or args.disbanded then
 							return {
 								Title{name = 'History'},
 								Cell{name = 'Created', content = {args.created}},
@@ -110,35 +110,35 @@ function Team:createInfobox(frame)
 				end
 			end
 		},
-		Customizable{id = 'customcontent'},
+		Customizable{id = 'customcontent', children = {}},
 		Center{content = {args.footnotes}},
 	}
 	infobox:bottom(self:createBottomContent())
 
-    if Namespace.isMain() then
-        infobox:categories('Teams')
+	if Namespace.isMain() then
+		infobox:categories('Teams')
 		infobox:categories(unpack(self:getWikiCategories(args)))
-    end
+	end
 
-    return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 function Team:_createRegion(region)
-    if region == nil or region == '' then
-        return ''
-    end
+	if region == nil or region == '' then
+		return ''
+	end
 
-    return Template.safeExpand(self.infobox.frame, 'Region', {region})
+	return Template.safeExpand(self.infobox.frame, 'Region', {region})
 end
 
 function Team:_createLocation(location)
-    if location == nil or location == '' then
-        return ''
-    end
+	if location == nil or location == '' then
+		return ''
+	end
 
-    return Flags(location) ..
-                '&nbsp;' ..
-                '[[:Category:' .. location .. '|' .. location .. ']]'
+	return Flags(location) ..
+		'&nbsp;' ..
+		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
 return Team
