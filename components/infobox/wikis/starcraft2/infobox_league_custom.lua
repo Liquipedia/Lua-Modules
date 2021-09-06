@@ -7,19 +7,26 @@
 --
 
 local League = require('Module:Infobox/League')
-local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
-local Class = require('Module:Class')
 local Autopatch = require('Module:Automated Patch')._main
 local Tier = require('Module:Tier')
 local Namespace = require('Module:Namespace')
 local AllowedServers = require('Module:Server')
 local RaceIcon = require('Module:RaceIcon')
 local PageLink = require('Module:Page')
+local Class = require('Module:Class')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Title = require('Module:Infobox/Widget/Title')
+local Center = require('Module:Infobox/Widget/Center')
+local Breakdown = require('Module:Infobox/Widget/Breakdown')
 
 local CustomLeague = Class.new()
+local CustomInjector = Class.new(Injector)
+
+local _args
 
 local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local _TODAY = os.date('%Y-%m-%d', os.time())
@@ -42,40 +49,136 @@ local _CICON = '[[File:CIcon.png|text-bottom|Challenger League]]'
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-	league.addCustomCells = CustomLeague.addCustomCells
-	league.createTier = CustomLeague.createTier
-	league.createPrizepool = CustomLeague.createPrizepool
-	league.addCustomContent = CustomLeague.addCustomContent
+	_args = league.args
+
+	league.getChronologyData = CustomLeague.getChronologyData
+	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
-
-	league.getServer = CustomLeague.getServer
-	league.getChronologyData = CustomLeague.getChronologyData
 	league.shouldStore = CustomLeague.shouldStore
 
 	return league:createInfobox(frame)
 end
 
-function CustomLeague:addCustomCells(infobox, args)
-	infobox:cell('Game Version',
-		CustomLeague._getGameVersion(string.lower(args.game or ''), args.patch or '', args))
-
-	return infobox
+function CustomLeague:createWidgetInjector()
+	return CustomInjector()
 end
 
-function CustomLeague:createTier(args)
-	local tierDisplay = CustomLeague:_createTierDisplay(args)
-	local tierClass = ''
-	if args.featured == 'true' then
-		tierClass = 'sc2premier-highlighted'
+function CustomInjector:parse(id, widgets)
+	if id == 'server' then
+		return {			
+			Cell{name = 'Game version', content = {
+					CustomLeague._getGameVersion()
+				}},
+			Cell{name = 'Server', content = {CustomLeague:_getServer()}}
+			}
+	elseif id == 'prizepool' then
+		return {
+			Cell{
+				name = 'Prize pool',
+				content = {CustomLeague:_createPrizepool()},
+			},
+		}
+	elseif id == 'liquipediatier' then
+		return {
+			Cell{
+				name = 'Liquipedia tier',
+				content = {CustomLeague:_createTierDisplay()},
+				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
+			},
+		}
+	elseif id == 'customcontent' then
+		--player breakdown
+		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
+		local playerBreakDownEvent = CustomLeague._playerBreakDownEvent() or {}
+		local playerNumber = playerRaceBreakDown.playerNumber or playerBreakDownEvent.playerNumber or 0
+		Variables.varDefine('tournament_playerNumber', playerNumber)
+		if playerNumber > 0 then
+			table.insert(widgets, Title{name = 'Player breakdown'})
+			table.insert(widgets, Cell{name = 'Number of players', content = {playerNumber}})
+			table.insert(widgets, Breakdown{content = playerBreakDown.display})
+		end
+
+		--teams section
+		if _args.team_number or (not String.isEmpty(_args.team1)) then
+			Variables.varDefine('is_team_tournament', 1)
+			table.insert(widgets, Title{name = 'Teams'})
+		end
+		table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
+		if not String.isEmpty(_args.team1) then
+			local teams = CustomLeague:_makeBasedListFromArgs('team')
+			table.insert(widgets, Center{content = teams})
+		end
+
+		--maps
+		if not String.isEmpty(_args.map1) then
+			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('map')})
+		elseif not String.isEmpty(_args['2map1']) then
+			table.insert(widgets, Title{name = _args['2maptitle'] or '2v2 Maps'})
+			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('2map')})
+		elseif not String.isEmpty(_args['3map1']) then
+			table.insert(widgets, Title{name = _args['3maptitle'] or '3v3 Maps'})
+			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('3map')})
+		end
 	end
-	local cell = Cell:new('Liquipedia Tier'):addClass(tierClass):content(tierDisplay)
-	return cell
+	return widgets
 end
 
-function CustomLeague:_createTierDisplay(args)
-	local tier = args.liquipediatier or ''
-	local tierType = args.liquipediatiertype or args.tiertype or ''
+function CustomLeague:_createPrizepool()
+	if String.isEmpty(_args.prizepool) and
+		String.isEmpty(_args.prizepoolusd) then
+		return nil
+	end
+
+	local localCurrency = _args.localcurrency
+	local prizePoolUSD = _args.prizepoolusd
+	local prizePool = _args.prizepool
+
+	if localCurrency == 'text' then
+		return prizePool
+	else
+		local display, hasText, hasPlus
+		if prizePoolUSD then
+			prizePoolUSD, hasText, hasPlus = CustomLeague:_cleanPrizeValue(prizePoolUSD)
+		end
+
+		prizePool, hasText, hasPlus = CustomLeague:_cleanPrizeValue(prizePool, localCurrency, hasPlus, hasText)
+
+		if not prizePoolUSD and localCurrency then
+			local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
+			prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
+			if not prizePoolUSD then
+				error('Invalid local currency "' .. localCurrency .. '"')
+			end
+		end
+
+		local plusText = hasPlus and '+' or ''
+		if prizePoolUSD then
+			display = Template.safeExpand(
+				mw.getCurrentFrame(),
+				'Local currency',
+				{localCurrency:lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
+			) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
+		elseif prizePool then
+			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText .. ' ' .. _ABBR_USD
+		end
+		if hasText then
+			display = (display or _args.prizepool or '') ..
+				'[[Category:Pages with text set as prizepool in infobox league]]'
+		end
+
+		Variables.varDefine('usd prize', prizePoolUSD or prizePool)
+		Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
+		Variables.varDefine('local prize', prizePool)
+
+		return display
+	end
+end
+
+function CustomLeague:_createTierDisplay()
+	local tier = _args.liquipediatier or ''
+	local tierType = _args.liquipediatiertype or _args.tiertype or ''
 	if String.isEmpty(tier) then
 		return nil
 	end
@@ -106,87 +209,13 @@ function CustomLeague:_createTierDisplay(args)
 	return output
 end
 
-function CustomLeague:getChronologyData(args)
-	local next, previous = CustomLeague._computeChronology(args)
-	return {
-		previous = previous,
-		next = next,
-		previous2 = args.previous2,
-		next2 = args.next2,
-		previous3 = args.previous3,
-		next3 = args.next3,
-	}
-end
-
--- Automatically fill in next/previous for touranaments that are part of a series
-function CustomLeague._computeChronology(args)
-	-- Criteria for automatic chronology are
-	-- - part of a series and numbered
-	-- - the subpage name matches the number
-	-- - prev or next are unspecified
-	-- - and not suppressed via auto_chronology=false
-	local title = mw.title.getCurrentTitle()
-	local number = tonumber(title.subpageText or '')
-	local automateChronology =
-		(args.series or '') ~= ''
-		and number ~= nil
-		and tonumber(args.number or '') == number
-		and title.subpageText ~= title.text
-		and args.auto_chronology ~= 'false'
-		and ((args.next or '') == '' or (args.previous or '') == '')
-
-	if automateChronology then
-		local previous = (args.previous or '') ~= '' and args.previous
-		local next = (args.next or '') ~= '' and args.next
-		local nextPage = (args.next or '') == '' and
-			title.basePageTitle:subPageTitle(tostring(number + 1)).fullText
-		local previousPage = (args.previous or '') == '' and
-			title.basePageTitle:subPageTitle(tostring(number - 1)).fullText
-
-		if not next and PageLink.exists(nextPage) then
-			next = nextPage .. '|#' .. tostring(number + 1)
-		end
-
-		if not previous and 1 < number and PageLink.exists(previousPage) then
-			previous = previousPage .. '|#' .. tostring(number - 1)
-		end
-
-		return next, previous
-	else
-		return args.next, args.previous
-	end
-end
-
-function CustomLeague:shouldStore(args)
-	return Namespace.isMain() and
-		args.disable_smw ~= 'true' and
-		args.disable_lpdb ~= 'true' and
-		args.disable_storage ~= 'true' and
-		Variables.varDefault('disable_SMW_storage', 'false') ~= 'true'
-end
-
-function CustomLeague:getServer(args)
-	local server = args.server or ''
-	--remove possible whitespaces around '/'
-	server = string.gsub(server, '%s?/%s?=', '/')
-	local servers = mw.text.split(server, '/')
-
-	local output = ''
-	for key, item in ipairs(servers or {}) do
-		item = string.lower(item)
-		if key ~= 1 then
-			output = output .. ' / '
-		end
-		output = output .. (AllowedServers[item] or ('[[Category:Server Unknown|' .. item .. ']]'))
-	end
-	return output
-end
-
-function CustomLeague._getGameVersion(game, patch, args)
-	local shouldUseAutoPatch = args.autopatch or ''
-	local modName = args.modname or ''
-	local beta = args.beta or ''
-	local epatch = args.epatch or ''
+function CustomLeague._getGameVersion()
+	local game = string.lower(_args.game or '')
+	local patch = _args.patch or ''
+	local shouldUseAutoPatch = _args.autopatch or ''
+	local modName = _args.modname or ''
+	local beta = _args.beta or ''
+	local epatch = _args.epatch or ''
 	local sdate = Variables.varDefault('tournament_startdate', _TODAY)
 	local edate = Variables.varDefault('tournament_enddate', _TODAY)
 
@@ -231,56 +260,83 @@ function CustomLeague._getGameVersion(game, patch, args)
 	end
 end
 
-function CustomLeague:createPrizepool(args)
-	local cell = Cell:new('Prize pool')
-	if String.isEmpty(args.prizepool) and
-		String.isEmpty(args.prizepoolusd) then
-		return cell:content()
-	end
+function CustomLeague:getChronologyData()
+	local next, previous = CustomLeague._computeChronology()
+	return {
+		previous = previous,
+		next = next,
+		previous2 = _args.previous2,
+		next2 = _args.next2,
+		previous3 = _args.previous3,
+		next3 = _args.next3,
+	}
+end
 
-	local localCurrency = args.localcurrency
-	local prizePoolUSD = args.prizepoolusd
-	local prizePool = args.prizepool
+-- Automatically fill in next/previous for touranaments that are part of a series
+function CustomLeague._computeChronology()
+	-- Criteria for automatic chronology are
+	-- - part of a series and numbered
+	-- - the subpage name matches the number
+	-- - prev or next are unspecified
+	-- - and not suppressed via auto_chronology=false
+	local title = mw.title.getCurrentTitle()
+	local number = tonumber(title.subpageText or '')
+	local automateChronology =
+		(_args.series or '') ~= ''
+		and number ~= nil
+		and tonumber(_args.number or '') == number
+		and title.subpageText ~= title.text
+		and _args.auto_chronology ~= 'false'
+		and ((_args.next or '') == '' or (_args.previous or '') == '')
 
-	if localCurrency == 'text' then
-		return cell:content(args.prizepool)
+	if automateChronology then
+		local previous = (_args.previous or '') ~= '' and _args.previous
+		local next = (_args.next or '') ~= '' and _args.next
+		local nextPage = (_args.next or '') == '' and
+			title.basePageTitle:subPageTitle(tostring(number + 1)).fullText
+		local previousPage = (_args.previous or '') == '' and
+			title.basePageTitle:subPageTitle(tostring(number - 1)).fullText
+
+		if not next and PageLink.exists(nextPage) then
+			next = nextPage .. '|#' .. tostring(number + 1)
+		end
+
+		if not previous and 1 < number and PageLink.exists(previousPage) then
+			previous = previousPage .. '|#' .. tostring(number - 1)
+		end
+
+		return next, previous
 	else
-		local display, hasText, hasPlus
-		if prizePoolUSD then
-			prizePoolUSD, hasText, hasPlus = CustomLeague:_cleanPrizeValue(prizePoolUSD)
-		end
-
-		prizePool, hasText, hasPlus = CustomLeague:_cleanPrizeValue(prizePool, localCurrency, hasPlus, hasText)
-
-		if not prizePoolUSD and localCurrency then
-			local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
-			prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
-			if not prizePoolUSD then
-				error('Invalid local currency "' .. localCurrency .. '"')
-			end
-		end
-
-		local plusText = hasPlus and '+' or ''
-		if prizePoolUSD then
-			display = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{localCurrency:lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
-			) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
-		elseif prizePool then
-			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText .. ' ' .. _ABBR_USD
-		end
-		if hasText then
-			display = (display or args.prizepool or '') ..
-				'[[Category:Pages with text set as prizepool in infobox league]]'
-		end
-
-		Variables.varDefine('usd prize', prizePoolUSD or prizePool)
-		Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
-		Variables.varDefine('local prize', prizePool)
-
-		return cell:content(display)
+		return _args.next, _args.previous
 	end
+end
+
+function CustomLeague:shouldStore(args)
+	return Namespace.isMain() and
+		args.disable_smw ~= 'true' and
+		args.disable_lpdb ~= 'true' and
+		args.disable_storage ~= 'true' and
+		Variables.varDefault('disable_SMW_storage', 'false') ~= 'true'
+end
+
+function CustomLeague:_getServer()
+	if String.isEmpty(_args.server) then
+		return nil
+	end
+	local server = _args.server
+	--remove possible whitespaces around '/'
+	server = string.gsub(server, '%s?/%s?=', '/')
+	local servers = mw.text.split(server, '/')
+
+	local output = ''
+	for key, item in ipairs(servers or {}) do
+		item = string.lower(item)
+		if key ~= 1 then
+			output = output .. ' / '
+		end
+		output = output .. (AllowedServers[item] or ('[[Category:Server Unknown|' .. item .. ']]'))
+	end
+	return output
 end
 
 function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
@@ -356,52 +412,12 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 	return value, hasText or oldHasText, hasPlus or oldHasPlus
 end
 
-function CustomLeague:addCustomContent(infobox, args)
-	--player breakdown
-	local playerRaceBreakDown = CustomLeague._playerRaceBreakDown(args) or {}
-	local playerBreakDownEvent = CustomLeague._playerBreakDownEvent(args) or {}
-	local playerNumber = playerRaceBreakDown.playerNumber or playerBreakDownEvent.playerNumber
-	infobox:header('Player Breakdown', playerNumber)
-	infobox:cell('Number of players', playerNumber)
-	infobox:fcell(CustomLeague._playerBreakDownDisplay(playerRaceBreakDown.display))
-	infobox:fcell(CustomLeague._playerBreakDownDisplay(playerBreakDownEvent.display))
-	Variables.varDefine('tournament_playerNumber', playerNumber)
-
-	--teams section
-	if args.team_number or (not String.isEmpty(args.team1)) then
-		Variables.varDefine('is_team_tournament', 1)
-		infobox:header('Teams', true)
-	end
-	infobox:cell('Number of teams', args.team_number)
-	if not String.isEmpty(args.team1) then
-		local teams = CustomLeague:_makeBasedListFromArgs(args, 'team')
-		infobox	:centeredCell(unpack(teams))
-	end
-
-	--maps
-	if not String.isEmpty(args.map1) then
-		infobox:header('Maps', true)
-		local maps = CustomLeague:_makeBasedListFromArgs(args, 'map')
-		infobox:centeredCell(unpack(maps))
-	elseif not String.isEmpty(args['2map1']) then
-		infobox:header(args['2maptitle'] or '2v2 Maps', true)
-		local maps = CustomLeague:_makeBasedListFromArgs(args, '2map')
-		infobox:centeredCell(unpack(maps))
-	elseif not String.isEmpty(args['3map1']) then
-		infobox:header(args['3maptitle'] or '3v3 Maps', true)
-		local maps = CustomLeague:_makeBasedListFromArgs(args, '3map')
-		infobox:centeredCell(unpack(maps))
-	end
-
-	return infobox
-end
-
-function CustomLeague._playerBreakDownEvent(args)
+function CustomLeague._playerBreakDownEvent()
 	local playerBreakDown = {}
-	local codeS = tonumber(args.code_s_number or 0) or 0
-	local codeA = tonumber(args.code_a_number or 0) or 0
-	local premier = tonumber(args.premier_number or 0) or 0
-	local challenger = tonumber(args.challenger_number or 0) or 0
+	local codeS = tonumber(_args.code_s_number or 0) or 0
+	local codeA = tonumber(_args.code_a_number or 0) or 0
+	local premier = tonumber(_args.premier_number or 0) or 0
+	local challenger = tonumber(_args.challenger_number or 0) or 0
 	local playerNumber = codeS + codeA + premier + challenger
 
 	if playerNumber > 0 then
@@ -420,16 +436,16 @@ function CustomLeague._playerBreakDownEvent(args)
 			playerBreakDown.display[#playerBreakDown.display + 1] = _CICON .. ' ' .. challenger
 		end
 	end
-	return playerBreakDown
+	return playerBreakDown or {}
 end
 
-function CustomLeague._playerRaceBreakDown(args)
+function CustomLeague._playerRaceBreakDown()
 	local playerBreakDown = {}
-	local playerNumber = tonumber(args.player_number or 0) or 0
-	local zergNumber = tonumber(args.zerg_number or 0) or 0
-	local terranNumbner = tonumber(args.terran_number or 0) or 0
-	local protossNumber = tonumber(args.protoss_number or 0) or 0
-	local randomNumber = tonumber(args.random_number or 0) or 0
+	local playerNumber = tonumber(_args.player_number or 0) or 0
+	local zergNumber = tonumber(_args.zerg_number or 0) or 0
+	local terranNumbner = tonumber(_args.terran_number or 0) or 0
+	local protossNumber = tonumber(_args.protoss_number or 0) or 0
+	local randomNumber = tonumber(_args.random_number or 0) or 0
 	if playerNumber == 0 then
 		playerNumber = zergNumber + terranNumbner + protossNumber + randomNumber
 	end
@@ -460,33 +476,16 @@ function CustomLeague._playerRaceBreakDown(args)
 	Variables.varDefine('nbnotableT', terranNumbner)
 	Variables.varDefine('nbnotableZ', zergNumber)
 	Variables.varDefine('nbnotableR', randomNumber)
-	return playerBreakDown
+	return playerBreakDown or {}
 end
 
-function CustomLeague._playerBreakDownDisplay(contents)
-	if type(contents) ~= 'table' or contents == {} then
-		return nil
-	end
-
-	local div = mw.html.create('div')
-	local number = #contents
-	for _, content in ipairs(contents) do
-		local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number
-			.. ' infobox-center')
-		infoboxCustomCell:wikitext(content)
-		div:node(infoboxCustomCell)
-	end
-
-	return div
-end
-
-function CustomLeague:_makeBasedListFromArgs(args, base)
-	local firstArg = args[base .. '1']
+function CustomLeague:_makeBasedListFromArgs(base)
+	local firstArg = _args[base .. '1']
 	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
 	local index = 2
 
-	while not String.isEmpty(args[base .. index]) do
-		local currentArg = args['map' .. index]
+	while not String.isEmpty(_args[base .. index]) do
+		local currentArg = _args['map' .. index]
 		table.insert(foundArgs, '&nbsp;• ' ..
 			tostring(CustomLeague:_createNoWrappingSpan(
 				PageLink.makeInternalLink({}, currentArg)
@@ -498,11 +497,11 @@ function CustomLeague:_makeBasedListFromArgs(args, base)
 	return foundArgs
 end
 
-function CustomLeague:defineCustomPageVariables(args)
+function CustomLeague:defineCustomPageVariables()
 	--Legacy vars
 	local name = self.name
-	Variables.varDefine('tournament_ticker_name', args.tickername or name)
-	Variables.varDefine('tournament_abbreviation', args.abbreviation or '')
+	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
+	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -518,18 +517,18 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('formatted_tournament_edate', edate)
 
 	--SC2 specific vars
-	Variables.varDefine('tournament_mode', args.mode or '1v1')
-	Variables.varDefine('headtohead', args.headtohead or 'true')
-	Variables.varDefine('featured', args.featured or 'false')
+	Variables.varDefine('tournament_mode', _args.mode or '1v1')
+	Variables.varDefine('headtohead', _args.headtohead or 'true')
+	Variables.varDefine('featured', _args.featured or 'false')
 	--series number
-	local seriesNumber = args.number or ''
+	local seriesNumber = _args.number or ''
 	local seriesNumberLength = string.len(seriesNumber)
 	if seriesNumberLength > 0 then
 		seriesNumber = string.rep('0', 5 - seriesNumberLength) .. seriesNumber
 	end
 	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
-	local finished = args.finished
+	local finished = _args.finished
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
 	if finished ~= 'true' and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -549,30 +548,30 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('Month_Day', monthAndDay)
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)
+function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefaultMulti('epatch', 'patch', '')
-	local status = args.status
+	local status = _args.status
 		or Variables.varDefault('cancelled tournament', '') == 'true' and 'cancelled'
 		or Variables.varDefault('tournament_finished', '') == 'true' and 'finished'
 	lpdbData.status = status
-	lpdbData.maps = CustomLeague:_concatArgs(args, 'map')
-	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', args.team_number or 0)
+	lpdbData.maps = CustomLeague:_concatArgs('map')
+	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
 
 	return lpdbData
 end
 
-function CustomLeague:_concatArgs(args, base)
-	local firstArg = args[base] or args[base .. '1']
+function CustomLeague:_concatArgs(base)
+	local firstArg = _args[base] or _args[base .. '1']
 	if String.isEmpty(firstArg) then
 		return nil
 	end
 	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
 	local index = 2
-	while not String.isEmpty(args[base .. index]) do
+	while not String.isEmpty(_args[base .. index]) do
 		table.insert(foundArgs,
-			mw.ext.TeamLiquidIntegration.resolve_redirect(args[base .. index])
+			mw.ext.TeamLiquidIntegration.resolve_redirect(_args[base .. index])
 		)
 		index = index + 1
 	end
