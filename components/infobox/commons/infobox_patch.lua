@@ -6,10 +6,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Table = require('Module:Table')
+local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
+local Table = require('Module:Table')
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Chronology = Widgets.Chronology
+local Builder = Widgets.Builder
+local Customizable = Widgets.Customizable
+local Highlights = require('Module:Infobox/Widget/Highlights')
 
 local Patch = Class.new(BasicInfobox)
 
@@ -21,36 +31,55 @@ end
 function Patch:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	infobox.highlights = self._highlights
 
-	infobox:name(args.name)
-	infobox:image(args.image, args.defaultImage)
-	infobox:centeredCell(args.caption)
-	infobox:header('Patch Information', true)
-	infobox:cell('Version', args.version)
-	infobox:cell('Release', args.release)
-	self:addCustomCells(infobox, args)
-
-	local chronologyData = self:getChronologyData(args)
-
-	infobox:header('Highlights', args.highlight1)
-	infobox:highlights(self:_getHighlights(args))
-	infobox:header('Chronology', not Table.isEmpty(chronologyData))
-	infobox:chronology(chronologyData)
-	infobox:centeredCell(args.footnotes)
-	self:addCustomContent(infobox, args)
-	infobox:bottom(self:createBottomContent(infobox))
+	local widgets = {
+		Header{name = args.name, image = args.image},
+		Center{content = {args.caption}},
+		Title{name = 'Patch Information'},
+		Cell{name = 'Version', content = {args.version}},
+		Customizable{id = 'release', children = {
+				Cell{name = 'Release', content = {args.release}},
+			}
+		},
+		Customizable{id = 'custom', children = {}},
+		Builder{
+			builder = function()
+				local highlights = self:getAllArgsForBase(args, 'highlight')
+				if not Table.isEmpty(highlights) then
+					return {
+						Title{name = 'Highlights'},
+						Highlights{content = highlights}
+					}
+				end
+			end
+		},
+		Builder{
+			builder = function()
+				local chronologyData = self:getChronologyData(args)
+				if not Table.isEmpty(chronologyData) then
+					return {
+						Title{name = 'Chronology'},
+						Chronology{
+							content = chronologyData
+						}
+					}
+				end
+			end
+		},
+		Customizable{id = 'customcontent', children = {}},
+		Center{content = {args.footnotes}},
+	}
 
 	if Namespace.isMain() then
 		infobox:categories('Patches')
-		self:addToLpdb(infobox, args)
+		self:addToLpdb(args)
 	end
 
-	return infobox:build()
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 --- Allows for overriding this functionality
-function Patch:addToLpdb(infobox, args)
+function Patch:addToLpdb(args)
 	local date = args.release
 	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
@@ -64,43 +93,6 @@ end
 --- Allows for overriding this functionality
 function Patch:getChronologyData(args)
 	return { previous = args.previous, next = args.next }
-end
-
-function Patch:_getHighlights(args)
-	local highlights = {}
-
-	if args.highlight1 or args.highlight then
-		table.insert(highlights, args.highlight1 or args.highlight)
-	end
-
-	for index = 2, 99 do
-		if args['highlight' .. index] then
-			table.insert(highlights, args['highlight' .. index])
-		else
-			break
-		end
-	end
-	return highlights
-end
-
---extend Infobox class
-function Patch:_highlights(data)
-	if Table.isEmpty(data) then
-		return self
-	end
-
-	local div = mw.html.create('div')
-	local highlights = mw.html.create('ul')
-
-	for _, item in ipairs(data) do
-		highlights:tag('li'):wikitext(item):done()
-	end
-
-	div:node(highlights)
-
-	self.content:node(div)
-
-	return self
 end
 
 return Patch
