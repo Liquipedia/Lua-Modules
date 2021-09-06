@@ -20,11 +20,11 @@ function WidgetFactory.work(widget)
 	end
 
 	if widget:is_a(Customizable) then
-		for _, child in pairs(widget:make() or {}) do
+		for _, child in ipairs(widget:make() or {}) do
 			if child['is_a'] == nil or child:is_a(Widget) == false then
 				return error('Customizable can only contain Widgets as children')
 			end
-			for _, item in pairs(child:make() or {}) do
+			for _, item in ipairs(child:make() or {}) do
 				table.insert(convertedWidgets, item)
 			end
 		end

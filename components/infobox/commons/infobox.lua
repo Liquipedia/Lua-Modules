@@ -50,7 +50,7 @@ end
 
 --- Returns completed infobox
 function Infobox:build(widgets)
-	for _, widget in pairs(widgets) do
+	for _, widget in ipairs(widgets) do
 		if widget == nil or widget['is_a'] == nil then
 			return error('Infobox:build can only accept Widgets')
 		end
@@ -58,7 +58,7 @@ function Infobox:build(widgets)
 
 		local contentItems = WidgetFactory.work(widget, self.injector)
 
-		for _, node in pairs(contentItems or {}) do
+		for _, node in ipairs(contentItems or {}) do
 			self.content:node(node)
 		end
 	end

@@ -20,10 +20,10 @@ local Builder = Class.new(
 function Builder:make()
 	local children = self.builder()
 	local widgets = {}
-	for _, child in pairs(children or {}) do
+	for _, child in ipairs(children or {}) do
 		local childOutput = WidgetFactory.work(child, self.context.injector)
 		-- Our child might contain a list of children, so we need to iterate
-		for _, item in pairs(childOutput) do
+		for _, item in ipairs(childOutput) do
 			table.insert(widgets, item)
 		end
 	end
