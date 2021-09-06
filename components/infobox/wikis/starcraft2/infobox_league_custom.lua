@@ -65,10 +65,8 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'server' then
+	if id == 'game settings' then
 		return {
-			--yes i know this doesn't seem suitable for this id,
-			--but i need this ABOVE the server display
 			Cell{name = 'Game version', content = {
 					CustomLeague._getGameVersion()
 				}},
