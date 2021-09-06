@@ -65,7 +65,7 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'game settings' then
+	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {
 					CustomLeague._getGameVersion()
