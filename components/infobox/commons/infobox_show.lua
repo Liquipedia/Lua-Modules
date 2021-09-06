@@ -56,7 +56,7 @@ function Show:createInfobox()
 					table.insert(returnWidgets, Widgets.Links{content = links})
 				end
 				if secondaryLinks ~= '' then
-					table.insert(returnWidgets, Center{content = {secondaryLinks})
+					table.insert(returnWidgets, Center{content = {secondaryLinks}})
 				end
 				return returnWidgets
 			end
