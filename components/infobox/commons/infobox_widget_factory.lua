@@ -12,7 +12,7 @@ local Widget = require('Module:Infobox/Widget')
 
 local WidgetFactory = Class.new()
 
-function WidgetFactory.work(widget)
+function WidgetFactory.work(widget, injector)
 	local convertedWidgets = {}
 
 	if widget == nil then
@@ -24,6 +24,9 @@ function WidgetFactory.work(widget)
 			if child['is_a'] == nil or child:is_a(Widget) == false then
 				return error('Customizable can only contain Widgets as children')
 			end
+
+			child:setContext({injector = injector})
+
 			for _, item in ipairs(child:make() or {}) do
 				table.insert(convertedWidgets, item)
 			end
