@@ -63,7 +63,7 @@ function League:createInfobox()
 			}
 		},
 		Customizable{
-			id = 'server',
+			id = 'game settings',
 			children = {
 				Cell{name = 'Server', content = {args.server}}
 			}
