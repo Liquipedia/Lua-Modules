@@ -12,8 +12,12 @@ local Widget = require('Module:Infobox/Widget')
 
 local WidgetFactory = Class.new()
 
-function WidgetFactory.work(widget, injector)
+function WidgetFactory.work(widget)
 	local convertedWidgets = {}
+
+	if widget == nil then
+		return {}
+	end
 
 	if widget:is_a(Customizable) then
 		for _, child in pairs(widget:make() or {}) do
