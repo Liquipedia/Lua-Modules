@@ -32,7 +32,7 @@ local _team
 
 local _earnings = 0
 local _ALLOWED_PLACES = { '1', '2', '3', '4', '3-4' }
-local _earnings_MODES = { ['team'] = 'team' }
+local _EARNINGS_MODES = { ['team'] = 'team' }
 local _DISCARD_PLACEMENT = 99
 
 function CustomTeam.run(frame)
@@ -265,7 +265,7 @@ function CustomTeam.getEarningsAndMedalsData(team)
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
-	local mode = _earnings_MODES[data.mode] or 'other'
+	local mode = _EARNINGS_MODES[data.mode] or 'other'
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
