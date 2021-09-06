@@ -53,7 +53,7 @@ end
 --- Allows for using this for customCells
 function BasicInfobox:getAllArgsForBase(args, base, options)
 	local foundArgs = {}
-	if String.isEmpty(args[base]) then
+	if String.isEmpty(args[base]) and String.isEmpty(args[base .. '1']) then
 		return foundArgs
 	end
 
