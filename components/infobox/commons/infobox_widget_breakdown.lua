@@ -17,7 +17,7 @@ local Breakdown = Class.new(
 )
 
 function Breakdown:make()
-	return Breakdown:_breakdown(self.contents)
+	return {Breakdown:_breakdown(self.contents)}
 end
 
 function Breakdown:_breakdown(contents)
@@ -34,7 +34,7 @@ function Breakdown:_breakdown(contents)
 		div:node(infoboxCustomCell)
 	end
 
-	return {div}
+	return div
 end
 
 return Breakdown
