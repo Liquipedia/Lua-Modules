@@ -29,7 +29,7 @@ local Language = mw.language.new('en')
 
 local _team
 
-local _EARNINGS = 0
+local _earnings = 0
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
@@ -50,12 +50,12 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		_EARNINGS = CustomTeam.calculateEarnings(_team.args)
+		_earnings = CustomTeam.calculateEarnings(_team.args)
 		local earningsDisplay
-		if _EARNINGS == 0 then
+		if _earnings == 0 then
 			earningsDisplay = nil
 		else
-			earningsDisplay = '$' .. Language:formatNum(_EARNINGS)
+			earningsDisplay = '$' .. Language:formatNum(_earnings)
 		end
 		return {
 			Cell{
@@ -132,7 +132,7 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData)
-	lpdbData.earnings = _EARNINGS
+	lpdbData.earnings = _earnings
 	Variables.varDefine('team_name', lpdbData.name)
 	return lpdbData
 end
