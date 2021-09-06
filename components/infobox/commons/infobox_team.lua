@@ -121,8 +121,6 @@ function Team:createInfobox()
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	--need to inject and build before we store to lpdb so that we can
-	--pass the earnings determined for the display to the lpdb storage
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if Namespace.isMain() then
