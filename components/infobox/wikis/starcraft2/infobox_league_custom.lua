@@ -202,7 +202,7 @@ function CustomLeague:_createTierDisplay()
 	else
 		output = output .. tierText
 	end
-	
+
 	output = output .. ']]' .. '[[Category:' .. tierText .. ' '
 
 	if _args.team_number or _args.team1 then
