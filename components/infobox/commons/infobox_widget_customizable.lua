@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
-local Injector = require('Module:Infobox/Widget/Injector')
 
 local Customizable = Class.new(
 	Widget,
@@ -18,23 +17,14 @@ local Customizable = Class.new(
 	end
 )
 
-function Customizable:setWidgetInjector(injector)
-	if injector == nil then
-		return
-	elseif injector['is_a'] == nil or injector:is_a(Injector) == false then
-		return error('Valid Injector from Infobox/Widget/Injector needs to be provided')
-	end
-	self.injector = injector
-end
-
 function Customizable:make()
-	if self.injector == nil then
+	if self.context.injector == nil then
 		return self.children
 	end
 	if self.id == 'custom' then
-		return self.injector:addCustomCells(self.children)
+		return self.context.injector:addCustomCells(self.children)
 	end
-	return self.injector:parse(self.id, self.children)
+	return self.context.injector:parse(self.id, self.children)
 end
 
 return Customizable

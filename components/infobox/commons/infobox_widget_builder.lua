@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
+local WidgetFactory = require('Module:Infobox/Widget/Factory')
 
 local Builder = Class.new(
 	Widget,
@@ -20,8 +21,13 @@ function Builder:make()
 	local children = self.builder()
 	local widgets = {}
 	for _, child in pairs(children or {}) do
-		table.insert(widgets, child:make())
+		local childOutput = WidgetFactory.work(child, self.context.injector)
+		-- Our child might contain a list of children, so we need to iterate
+		for _, item in pairs(childOutput) do
+			table.insert(widgets, item)
+		end
 	end
+	return widgets
 end
 
 return Builder
