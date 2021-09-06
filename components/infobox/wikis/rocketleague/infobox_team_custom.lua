@@ -12,8 +12,13 @@ local Variables = require('Module:Variables')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
+local String = require('Module:String')
+local Template = require('Module:Template')
 
 local CustomTeam = Class.new()
+
+local _CURRENT_YEAR = os.date('%Y')
+local _START_YEAR = 2015
 
 local CustomInjector = Class.new(Injector)
 local Language = mw.language.new('en')
@@ -23,6 +28,7 @@ local _team
 function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
+	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	return team:createInfobox(frame)
 end
@@ -55,6 +61,24 @@ function CustomInjector:parse(id, widgets)
 		}
 	end
 	return widgets
+end
+
+function CustomTeam:addToLpdb(lpdbData, args)
+	lpdbData.earnings = Variables.varDefault('earnings')
+	if not String.isEmpty(args.teamcardimage) then
+		lpdbData.logo = 'File:' .. args.teamcardimage
+	elseif not String.isEmpty(args.image) then
+		lpdbData.logo = 'File:' .. args.image
+	end
+
+	lpdbData.extradata = { rating = Variables.varDefault('rating') }
+	for year = _START_YEAR, _CURRENT_YEAR do
+		local id = args.id or _team.pagename
+		local earningsInYear = Template.safeExpand(mw.getCurrentFrame(), 'Total earnings of', {year = year, id})
+		lpdbData.extradata['earningsin' .. year] = (earningsInYear or ''):gsub(',', ''):gsub('$', '')
+	end
+
+	return lpdbData
 end
 
 function CustomTeam:createWidgetInjector()
