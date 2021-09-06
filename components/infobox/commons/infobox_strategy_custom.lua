@@ -15,9 +15,9 @@ local CustomStrategy = Class.new()
 local CustomInjector = Class.new(Injector)
 
 function CustomStrategy.run(frame)
-    local customStrategy = Strategy(frame)
+	local customStrategy = Strategy(frame)
 	customStrategy.createWidgetInjector = CustomStrategy.createWidgetInjector
-    return customStrategy:createInfobox(frame)
+	return customStrategy:createInfobox(frame)
 end
 
 function CustomStrategy:createWidgetInjector()
