@@ -117,7 +117,8 @@ end
 
 function Ability:getCategories()
 	local categories = { 'Abilities' }
-	local race = CleanRace[_args.race or '']
+	local race = string.lower(_args.race or '')
+	race = CleanRace[race]
 	if race then
 		table.insert(categories, race .. ' Abilities')
 	end
