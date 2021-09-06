@@ -168,6 +168,13 @@ function Team:_setLpdbData(args, links)
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
+
+	if Namespace.isMain() then
+		if lpdbData['earnings'] == nil then
+			return error('You need to set the LPDB earnings storage in the custom module')
+		end
+	end
+
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
 end
