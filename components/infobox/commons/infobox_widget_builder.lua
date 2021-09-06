@@ -17,7 +17,11 @@ local Builder = Class.new(
 )
 
 function Builder:make()
-	return self.builder()
+	local children = self.builder()
+	local widgets = {}
+	for _, child in pairs(children or {}) do
+		table.insert(widgets, child:make())
+	end
 end
 
 return Builder
