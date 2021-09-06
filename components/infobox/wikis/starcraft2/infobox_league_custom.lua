@@ -66,7 +66,7 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'server' then
-		return {			
+		return {
 			Cell{name = 'Game version', content = {
 					CustomLeague._getGameVersion()
 				}},
