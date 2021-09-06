@@ -143,7 +143,7 @@ function League:createInfobox()
 		self:_setLpdbData(args, links)
 	end
 
-    return self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 --- Allows for overriding this functionality
