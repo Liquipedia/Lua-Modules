@@ -8,6 +8,7 @@
 
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
+local String = require('Module:StringUtils')
 local Achievements = require('Module:Achievements in infoboxes')
 local RaceIcon = require('Module:RaceIcon').getSmallIcon
 local Matches = require('Module:Upcoming ongoing and recent matches team/new')
