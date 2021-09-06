@@ -30,9 +30,9 @@ local Language = mw.language.new('en')
 
 local _team
 
-local _EARNINGS = 0
+local _earnings = 0
 local _ALLOWED_PLACES = { '1', '2', '3', '4', '3-4' }
-local _EARNINGS_MODES = { ['team'] = 'team' }
+local _earnings_MODES = { ['team'] = 'team' }
 local _DISCARD_PLACEMENT = 99
 
 function CustomTeam.run(frame)
@@ -54,12 +54,12 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		_EARNINGS = CustomTeam.calculateEarnings(_team.args)
+		_earnings = CustomTeam.calculateEarnings(_team.args)
 		local earningsDisplay
-		if _EARNINGS == 0 then
+		if _earnings == 0 then
 			earningsDisplay = nil
 		else
-			earningsDisplay = '$' .. Language:formatNum(_EARNINGS)
+			earningsDisplay = '$' .. Language:formatNum(_earnings)
 		end
 		return {
 			Cell{
@@ -90,8 +90,8 @@ function CustomInjector:parse(id, widgets)
 					end
 				end
 			},
-			--yes i know this doesn't seem suitable for this id,
-			--but i need this ABOVE the history display
+			--need this ABOVE the history display and below the
+			--achievements display, hence moved it here
 			Builder{
 				builder = function()
 					local playerBreakDown = CustomTeam.playerBreakDown(_team.args)
@@ -131,8 +131,7 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData)
-	lpdbData.earnings = _EARNINGS
-	Variables.varDefine('team_name', lpdbData.name)
+	lpdbData.earnings = _earnings or 0
 	return lpdbData
 end
 
@@ -266,7 +265,7 @@ function CustomTeam.getEarningsAndMedalsData(team)
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
-	local mode = _EARNINGS_MODES[data.mode] or 'other'
+	local mode = _earnings_MODES[data.mode] or 'other'
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
