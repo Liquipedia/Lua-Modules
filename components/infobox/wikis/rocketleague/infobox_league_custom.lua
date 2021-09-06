@@ -7,49 +7,118 @@
 --
 
 local League = require('Module:Infobox/League')
-local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
 local TournamentNotability = require('Module:TournamentNotability')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Title = require('Module:Infobox/Widget/Title')
+local Center = require('Module:Infobox/Widget/Center')
 
-local RLLeague = Class.new()
+local CustomLeague = Class.new()
+local CustomInjector = Class.new(Injector)
 
 local _SERIES_RLCS = 'Rocket League Championship Series'
 local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
 
-function RLLeague.run(frame)
+local _league
+
+function CustomLeague.run(frame)
 	local league = League(frame)
-	league.addCustomCells = RLLeague.addCustomCells
-	league.createTier = RLLeague.createTier
-	league.createPrizepool = RLLeague.createPrizepool
-	league.addCustomContent = RLLeague.addCustomContent
-	league.defineCustomPageVariables = RLLeague.defineCustomPageVariables
-	league.addToLpdb = RLLeague.addToLpdb
+	_league = league
+	league.createWidgetInjector = CustomLeague.createWidgetInjector
+	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	league.addToLpdb = CustomLeague.addToLpdb
 
 	return league:createInfobox(frame)
 end
 
-function RLLeague:addCustomCells(infobox, args)
+function CustomLeague:createWidgetInjector()
+	return CustomInjector()
+end
+
+function CustomInjector:addCustomCells(widgets)
+	local args = _league.args
+	table.insert(widgets, Cell{
+		name = 'Mode',
+		content = {args.mode}
+	})
+	table.insert(widgets, Cell{
+		name = 'Game',
+		content = {CustomLeague:_createGameCell(args.game)}
+	})
+	table.insert(widgets, Cell{
+		name = 'Misc Mode:',
+		content = {args.miscmode}
+	})
+
+	return widgets
+end
+
+function CustomInjector:parse(id, widgets)
+	local args = _league.args
+	if id == 'customcontent' then
+		if not String.isEmpty(args.map1) then
+			local maps = {CustomLeague:_makeInternalLink(args.map1)}
+			local index  = 2
+
+			while not String.isEmpty(args['map' .. index]) do
+				table.insert(maps, '&nbsp;• ' ..
+					tostring(CustomLeague:_createNoWrappingSpan(
+						CustomLeague:_makeInternalLink(args['map' .. index])
+					))
+				)
+				index = index + 1
+			end
+			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Center{content = maps})
+		end
+
+
+		if not String.isEmpty(args.team_number) then
+			table.insert(widgets, Title{name = 'Teams'})
+			table.insert(widgets, Cell{
+				name = 'Number of teams',
+				content = {args.team_number}
+			})
+		end
+	elseif id == 'prizepool' then
+		return {
+			Cell{
+				name = 'Prize pool',
+				content = {CustomLeague:_createPrizepool(args)}
+			},
+		}
+	elseif id == 'liquipediatier' then
+		return {
+			Cell{
+				name = 'Liquipedia Tier',
+				content = {CustomLeague:_createTier(args)}
+			},
+		}
+	end
+	return widgets
+end
+
+function CustomLeague:addCustomCells(infobox, args)
 	infobox:cell('Mode', args.mode)
-	infobox:cell('Game', RLLeague:_createGameCell(args.game))
+	infobox:cell('Game', CustomLeague:_createGameCell(args.game))
 	infobox:cell('Misc Mode:', args.miscmode)
 	return infobox
 end
 
-function RLLeague:createTier(args)
-	local cell =  Cell:new('Liquipedia Tier'):options({})
-
+function CustomLeague:_createTier(args)
 	local content = ''
 
 	local tier = args.liquipediatier
 
 	if String.isEmpty(tier) then
-		return cell:content()
+		return nil
 	end
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier)
@@ -77,14 +146,13 @@ function RLLeague:createTier(args)
 
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
 
-	return cell:content(content)
+	return content
 end
 
-function RLLeague:createPrizepool(args)
-	local cell = Cell:new('Prize pool'):options({})
+function CustomLeague:_createPrizepool(args)
 	if String.isEmpty(args.prizepool) and
 		String.isEmpty(args.prizepoolusd) then
-			return cell:content()
+			return nil
 	end
 
 	local content
@@ -115,38 +183,14 @@ function RLLeague:createPrizepool(args)
 		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
 	end
 
-	return cell:content(content)
+	return content
 end
 
-function RLLeague:addCustomContent(infobox, args)
-	if not String.isEmpty(args.map1) then
-		infobox:header('Maps', true)
-
-		local maps = {RLLeague:_makeInternalLink(args.map1)}
-		local index  = 2
-
-		while not String.isEmpty(args['map' .. index]) do
-			table.insert(maps, '&nbsp;• ' ..
-				tostring(RLLeague:_createNoWrappingSpan(
-					RLLeague:_makeInternalLink(args['map' .. index])
-				))
-			)
-			index = index + 1
-		end
-		infobox	:centeredCell(unpack(maps))
-	end
-
-	infobox	:header('Teams', not String.isEmpty(args.team_number))
-			:cell('Number of teams', args.team_number)
-
-    return infobox
-end
-
-function RLLeague:defineCustomPageVariables(args)
+function CustomLeague:defineCustomPageVariables(args)
 	-- Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername)
-	Variables.varDefine('tournament_organizer', RLLeague:_concatArgs(args, 'organizer'))
-	Variables.varDefine('tournament_sponsors', RLLeague:_concatArgs(args, 'sponsor'))
+	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
+	Variables.varDefine('tournament_sponsors', CustomLeague:_concatArgs(args, 'sponsor'))
 	Variables.varDefine('tournament_rlcs_premier', args.series == _SERIES_RLCS and 1 or 0)
 	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
 	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
@@ -175,7 +219,7 @@ function RLLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_teamplayers', args.mode == _MODE_2v2 and 2 or 3)
 end
 
-function RLLeague:addToLpdb(lpdbData, args)
+function CustomLeague:addToLpdb(lpdbData, args)
 	if not String.isEmpty(args.liquipediatiertype) then
 		lpdbData['liquipediatier'] = args.liquipediatiertype
 	end
@@ -199,7 +243,7 @@ function RLLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function RLLeague:_createGameCell(game)
+function CustomLeague:_createGameCell(game)
 	if game == _GAME_ROCKET_LEAGUE then
 		return '[[Rocket League]][[Category:Rocket League Competitions]]'
 	elseif game == _GAME_SARPBC then
@@ -210,7 +254,7 @@ function RLLeague:_createGameCell(game)
 	return nil
 end
 
-function RLLeague:_concatArgs(args, base)
+function CustomLeague:_concatArgs(args, base)
 	local foundArgs = {args[base] or args[base .. '1']}
 	local index = 2
 	while not String.isEmpty(args[base .. index]) do
@@ -221,15 +265,15 @@ function RLLeague:_concatArgs(args, base)
 	return table.concat(foundArgs, ';')
 end
 
-function RLLeague:_createNoWrappingSpan(content)
+function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 	span:css('white-space', 'nowrap')
 		:node(content)
 	return span
 end
 
-function RLLeague:_makeInternalLink(content)
+function CustomLeague:_makeInternalLink(content)
 	return '[[' .. content .. ']]'
 end
 
-return RLLeague
+return CustomLeague

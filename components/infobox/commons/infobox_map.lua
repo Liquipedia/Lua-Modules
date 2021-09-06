@@ -21,10 +21,10 @@ local Map = Class.new(BasicInfobox)
 
 function Map.run(frame)
 	local map = Map(frame)
-	return map:createInfobox()
+	return map:createInfobox(frame)
 end
 
-function Map:createInfobox()
+function Map:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
 

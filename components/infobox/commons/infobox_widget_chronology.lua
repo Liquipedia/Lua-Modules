@@ -18,9 +18,7 @@ local Chronology = Class.new(
 )
 
 function Chronology:make()
-	return {
-		Chronology:_chronology(self.links)
-	}
+	return Chronology:_chronology(self.links)
 end
 
 function Chronology:_chronology(links)
