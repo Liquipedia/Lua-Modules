@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Builder = require('Module:Infobox/Widget/Builder')
 local Customizable = require('Module:Infobox/Widget/Customizable')
-local Widget = require('Module:Infobox/Widget/Widget')
+local Widget = require('Module:Infobox/Widget')
 
 local WidgetFactory = Class.new()
 
