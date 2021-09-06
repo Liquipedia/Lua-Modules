@@ -158,7 +158,6 @@ function Team:_setLpdbData(args, links)
 		logo = args.image,
 		createdate = args.created,
 		disbanddate = args.disbanded,
-		--earnings = THIS NEEDS TO BE ADDED ON YOUR WIKI!!!,
 		coach = args.coaches,
 		manager = args.manager,
 		region = args.region,
@@ -169,10 +168,8 @@ function Team:_setLpdbData(args, links)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	if Namespace.isMain() then
-		if lpdbData['earnings'] == nil then
-			return error('You need to set the LPDB earnings storage in the custom module')
-		end
+	if lpdbData['earnings'] == nil then
+		return error('You need to set the LPDB earnings storage in the custom module')
 	end
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
