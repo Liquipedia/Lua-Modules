@@ -36,7 +36,11 @@ function Team:createInfobox(frame)
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDefault = args.default,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Team Information'},
 		Cell{
