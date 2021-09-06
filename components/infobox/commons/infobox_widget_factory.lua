@@ -16,7 +16,6 @@ function WidgetFactory.work(widget, injector)
 	local convertedWidgets = {}
 
 	if widget:is_a(Customizable) then
-		widget:setWidgetInjector(injector)
 		for _, child in pairs(widget:make() or {}) do
 			if child['is_a'] == nil or child:is_a(Widget) == false then
 				return error('Customizable can only contain Widgets as children')
