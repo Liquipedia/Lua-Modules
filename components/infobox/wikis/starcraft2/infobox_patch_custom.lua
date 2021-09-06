@@ -6,62 +6,90 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Class = require('Module:Class')
 local Patch = require('Module:Infobox/Patch')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
 
-local StarCraft2Patch = {}
+local CustomPatch = Class.new()
 
-function StarCraft2Patch.run(frame)
-	local patch = Patch(frame)
-	patch.addCustomCells = StarCraft2Patch.addCustomCells
-	patch.getChronologyData = StarCraft2Patch.getChronologyData
-	patch.addToLpdb = StarCraft2Patch.addToLpdb
-	return patch:createInfobox()
+local _args
+
+local CustomInjector = Class.new(Injector)
+
+function CustomPatch.run(frame)
+	local customPatch = Patch(frame)
+	_args = customPatch.args
+	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
+	customPatch.getChronologyData = CustomPatch.getChronologyData
+	customPatch.addToLpdb = CustomPatch.addToLpdb
+	return customPatch:createInfobox(frame)
 end
 
-function StarCraft2Patch:addCustomCells(infobox, args)
-	infobox:cell('SEA Release Date', args.searelease)
-	infobox:cell('NA Release Date', args.narelease)
-	infobox:cell('EU Release Date', args.eurelease)
-	infobox:cell('KR Release Date', args.korrelease)
-	return infobox
+function CustomPatch:createWidgetInjector()
+	return CustomInjector()
 end
 
-function StarCraft2Patch:addToLpdb(infobox, args)
-	local date = args.narelease or args.eurelease
+function CustomInjector:parse(id, widgets)
+	if id == 'release' then
+		return {
+			Cell{
+				name = 'SEA Release Date',
+				content = {_args.searelease}
+			},
+			Cell{
+				name = 'NA Release Date',
+				content = {_args.narelease}
+			},
+			Cell{
+				name = 'EU Release Date',
+				content = {_args.eurelease}
+			},
+			Cell{
+				name = 'KR Release Date',
+				content = {_args.korrelease}
+			},
+		}
+	end
+	return widgets
+end
+
+function CustomPatch:addToLpdb()
+	local date = _args.narelease or _args.eurelease
 	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-		name = args.name,
+		name = _args.name,
 		type = 'patch',
 		information = monthAndDay,
 		date = date,
 	})
 end
 
-function StarCraft2Patch:getChronologyData(args)
+function CustomPatch:getChronologyData()
 	local data = {}
-	if args.previous == nil and args.next == nil then
-		if args.previoushbu then
-			data.previous = 'Balance Update ' .. args.previoushbu .. '|#' .. args.previoushbu
+	if _args.previous == nil and _args.next == nil then
+		if _args.previoushbu then
+			data.previous = 'Balance Update ' .. _args.previoushbu .. '|#' .. _args.previoushbu
 		end
-		if args.nexthbu then
-			data.next = 'Balance Update ' .. args.nexthbu .. '|#' .. args.nexthbu
+		if _args.nexthbu then
+			data.next = 'Balance Update ' .. _args.nexthbu .. '|#' .. _args.nexthbu
 		end
 	else
-		if args.previous then
-			data.previous = 'Patch ' .. args.previous .. '|' .. args.previous
+		if _args.previous then
+			data.previous = 'Patch ' .. _args.previous .. '|' .. _args.previous
 		end
-		if args.next then
-			data.next = 'Patch ' .. args.next .. '|' .. args.next
+		if _args.next then
+			data.next = 'Patch ' .. _args.next .. '|' .. _args.next
 		end
-		if args.previoushbu then
-			data.previous2 = 'Balance Update ' .. args.previoushbu .. '|#' .. args.previoushbu
+		if _args.previoushbu then
+			data.previous2 = 'Balance Update ' .. _args.previoushbu .. '|#' .. _args.previoushbu
 		end
-		if args.nexthbu then
-			data.next2 = 'Balance Update ' .. args.nexthbu .. '|#' .. args.nexthbu
+		if _args.nexthbu then
+			data.next2 = 'Balance Update ' .. _args.nexthbu .. '|#' .. _args.nexthbu
 		end
 	end
 
 	return data
 end
 
-return StarCraft2Patch
+return CustomPatch

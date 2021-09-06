@@ -7,15 +7,19 @@
 --
 
 local League = require('Module:Infobox/League')
-local Cell = require('Module:Infobox/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Title = require('Module:Infobox/Widget/Title')
+local Center = require('Module:Infobox/Widget/Center')
 
 local CustomLeague = Class.new()
+local CustomInjector = Class.new(Injector)
 
 local _GAME_CS_16 = 'cs16'
 local _GAME_CS_CZ = 'cscz'
@@ -34,12 +38,12 @@ local _MODE_TEAM = 'team'
 local _ICON_EPT_CHALLENGER = '[[File:ESL Pro Tour Challenger.png|20x20px|link='
 local _ICON_EPT_MASTERS = '[[File:ESL Pro Tour Masters.png|20x20px|link='
 
+local _league
+
 function CustomLeague.run(frame)
 	local league = League(frame)
-	league.addCustomCells = CustomLeague.addCustomCells
-	league.createTier = CustomLeague.createTier
-	league.createPrizepool = CustomLeague.createPrizepool
-	league.addCustomContent = CustomLeague.addCustomContent
+	_league = league
+	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
@@ -47,33 +51,86 @@ function CustomLeague.run(frame)
 	return league:createInfobox(frame)
 end
 
-function CustomLeague:addCustomCells(infobox, args)
-	infobox:cell('Game', CustomLeague:_createGameCell(args))
-	infobox:cell('Teams', (args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or ''))
-	infobox:cell('Players', args.player_number)
-	infobox:fcell(
-		Cell:new('[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier')
-			:content(CustomLeague:_createEslProTierCell(args.eslprotier))
-			:categories(
-				function(_, ...)
-					infobox:categories('ESL Pro Tour Tournaments')
-				end
-			)
-			:make()
-	)
-	infobox:fcell(
-		Cell:new(Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox'))
-			:addClass('valvepremier-highlighted')
-			:content(CustomLeague:_createValveTierCell(args.valvetier))
-			:categories(
-				function(_, ...)
-					infobox:categories('Valve Sponsored Tournaments')
-				end
-			)
-			:make()
-	)
+function CustomLeague:createWidgetInjector()
+	return CustomInjector()
+end
 
-	return infobox
+function CustomInjector:addCustomCells(widgets)
+	local args = _league.args
+	table.insert(widgets, Cell{
+		name = 'Teams',
+		content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}
+	})
+	table.insert(widgets, Cell{
+		name = 'Game',
+		content = {CustomLeague:_createGameCell(args)}
+	})
+	table.insert(widgets, Cell{
+		name = 'Players',
+		content = {args.player_number}
+	})
+
+	return widgets
+end
+
+function CustomInjector:parse(id, widgets)
+	local args = _league.args
+	if id == 'customcontent' then
+		if not String.isEmpty(args.map1) then
+			local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
+			local maps = {CustomLeague:_makeInternalLink(args.map1 .. game .. '|' .. args.map1)}
+			local index  = 2
+
+			while not String.isEmpty(args['map' .. index]) do
+				local map = args['map' .. index]
+				table.insert(maps, '&nbsp;• ' ..
+					tostring(CustomLeague:_createNoWrappingSpan(
+						CustomLeague:_makeInternalLink(map .. game .. '|' .. map)
+					))
+				)
+				index = index + 1
+			end
+			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Center{content = maps})
+		end
+
+
+		if not String.isEmpty(args.team1) then
+			local teams = {CustomLeague:_makeInternalLink(args.team1)}
+			local index  = 2
+
+			while not String.isEmpty(args['team' .. index]) do
+				table.insert(teams, '&nbsp;• ' ..
+					tostring(CustomLeague:_createNoWrappingSpan(
+						CustomLeague:_makeInternalLink(args['team' .. index])
+					))
+				)
+				index = index + 1
+			end
+			table.insert(widgets, Center{content = teams})
+		end
+	elseif id == 'prizepool' then
+		return {
+			Cell{
+				name = 'Prize pool',
+				content = {CustomLeague:_createPrizepool(args)}
+			},
+		}
+	elseif id == 'liquipediatier' then
+		return {
+			Cell(CustomLeague:_createTier(args)),
+			Cell{
+				name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
+				content = {CustomLeague:_createEslProTierCell(args.eslprotier)}
+			},
+			Cell{
+				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox'),
+				content = {CustomLeague:_createValveTierCell(args.valvetier)},
+				classes = {'valvepremier-highlighted'}
+			},
+		}
+	end
+	return widgets
 end
 
 function CustomLeague:getWikiCategories(args)
@@ -101,18 +158,26 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'Tournaments with custom sort date')
 	end
 
+	if not String.isEmpty(args.eslprotier) then
+		table.insert(categories, 'ESL Pro Tour Tournaments')
+	end
+
+	if not String.isEmpty(args.valvetier) then
+		table.insert(categories, 'Valve Sponsored Tournaments')
+	end
+
 	return categories
 end
 
-function CustomLeague:createTier(args)
-	local cell =  Cell:new('Liquipedia Tier'):options({})
+function CustomLeague:_createTier(args)
+	local cell = {name ='Liquipedia Tier'}
 
 	local content = ''
 
 	local tier = args.liquipediatier
 
 	if String.isEmpty(tier) then
-		return cell:content()
+		return cell
 	end
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay', { tier })
@@ -124,7 +189,7 @@ function CustomLeague:createTier(args)
 	content = content .. tierDisplayLink
 
 	if String.isEmpty(valvetier) and Logic.readBool(valvemajor) then
-		cell:addClass('valvepremier-highlighted')
+		cell.classes = {'valvepremier-highlighted'}
 		local logo = ' [[File:Valve_logo_black.svg|x12px|link=Valve_icon.png|x16px|' ..
 			'link=Counter-Strike Majors|Counter-Strike Major]]'
 		content = content .. logo
@@ -136,15 +201,15 @@ function CustomLeague:createTier(args)
 	end
 
 	content = content .. '[[Category:' .. tierDisplay.. ' Tournaments]]'
+	cell.content = {content}
 
-	return cell:content(content)
+	return cell
 end
 
-function CustomLeague:createPrizepool(args)
-	local cell = Cell:new('Prize pool'):options({})
+function CustomLeague:_createPrizepool(args)
 	if String.isEmpty(args.prizepool) and
 		String.isEmpty(args.prizepoolusd) then
-			return cell:content()
+			return nil
 	end
 
 	local content
@@ -179,45 +244,7 @@ function CustomLeague:createPrizepool(args)
 
 
 
-	return cell:content(content)
-end
-
-function CustomLeague:addCustomContent(infobox, args)
-	if not String.isEmpty(args.map1) then
-		infobox:header('Maps', true)
-
-		local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
-		local maps = {CustomLeague:_makeInternalLink(args.map1 .. game .. '|' .. args.map1)}
-		local index  = 2
-
-		while not String.isEmpty(args['map' .. index]) do
-			local map = args['map' .. index]
-			table.insert(maps, '&nbsp;• ' ..
-				tostring(CustomLeague:_createNoWrappingSpan(
-					CustomLeague:_makeInternalLink(map .. game .. '|' .. map)
-				))
-			)
-			index = index + 1
-		end
-		infobox	:centeredCell(unpack(maps))
-	end
-
-	if not String.isEmpty(args.team1) then
-		local teams = {CustomLeague:_makeInternalLink(args.team1)}
-		local index  = 2
-
-		while not String.isEmpty(args['team' .. index]) do
-			table.insert(teams, '&nbsp;• ' ..
-				tostring(CustomLeague:_createNoWrappingSpan(
-					CustomLeague:_makeInternalLink(args['team' .. index])
-				))
-			)
-			index = index + 1
-		end
-		infobox	:centeredCell(unpack(teams))
-	end
-
-    return infobox
+	return content
 end
 
 function CustomLeague:defineCustomPageVariables(args)

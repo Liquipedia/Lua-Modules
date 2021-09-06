@@ -6,65 +6,125 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Spell = require('Module:Infobox/Skill')
-local Hotkeys = require('Module:Hotkey')
+local Class = require('Module:Class')
+local Skill = require('Module:Infobox/Skill')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
 local CleanRace = require('Module:CleanRace2')
+local Hotkeys = require('Module:Hotkey')
 local String = require('Module:StringUtils')
+local PageLink = require('Module:Page')
 
-local StarCraft2Spell = {}
+local Spell = Class.new()
 
 local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
 local _GAS = mw.loadData('Module:Gas')
 local _TIME = mw.loadData('Module:Buildtime')
 local _ENERGY = '[[File:EnergyIcon.gif|link=Energy]]'
 
-function StarCraft2Spell.run(frame)
-	local spell = Spell(frame)
-	spell.getCategories = StarCraft2Spell.getCategories
-	spell.getDuration = StarCraft2Spell.getDuration
-	spell.getHotkeys = StarCraft2Spell.getHotkeys
-	spell.getCostDisplay = StarCraft2Spell.getCostDisplay
-	spell.addCustomCells = StarCraft2Spell.addCustomCells
+local CustomInjector = Class.new(Injector)
 
-	return spell:createInfobox(frame)
+local _args
+
+function Spell.run(frame)
+    local spell = Skill(frame)
+	spell.createWidgetInjector = Spell.createWidgetInjector
+	spell.getCategories = Spell.getCategories
+	_args = spell.args
+    return spell:createInfobox(frame)
 end
 
-function StarCraft2Spell:addCustomCells(infobox, args)
+function CustomInjector:addCustomCells(widgets)
 
-	local duration2Description, duration2Display = StarCraft2Spell:getDuration2(infobox, args)
+	table.insert(widgets, Cell{
+		name = '[[Game Speed|Duration 2]]',
+		content = {Spell:getDuration2()}
+	})
+	table.insert(widgets, Cell{
+		name = 'Researched from',
+		content = {Spell:getResearchFrom()}
+	})
+	table.insert(widgets, Cell{
+		name = 'Research Cost',
+		content = {Spell:getResearchCost()}
+	})
+	table.insert(widgets, Cell{
+		name = 'Research Hotkey',
+		content = {Spell:getResearchHotkey()}
+	})
+	table.insert(widgets, Cell{
+		name = 'Move Speed',
+		content = {_args.movespeed}
+	})
 
-	infobox:cell(duration2Description, duration2Display)
-	infobox:cell('Researched from', StarCraft2Spell:getResearchFrom(infobox, args))
-	infobox:cell('Research Cost', StarCraft2Spell:getResearchCost(infobox, args))
-	infobox:cell('Research Hotkey', StarCraft2Spell:getResearchHotkey(infobox, args))
-	infobox:cell('Move Speed', args.movespeed)
-
-	return infobox
+	return widgets
 end
 
-function StarCraft2Spell:getResearchCost(infobox, args)
+function CustomInjector:parse(id, widgets)
+	if id == 'cost' then
+		return {
+			Cell{
+				name = 'Cost',
+				content = {Spell:getCostDisplay()}
+
+			}
+		}
+	elseif id == 'hotkey' then
+		return {
+			Cell{
+				name = '[[Hotkeys per Race|Hotkey]]',
+				content = {Spell:getHotkeys()}
+
+			}
+		}
+	elseif id == 'cooldown' then
+		return {
+			Cell{
+				name = PageLink.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown',
+				content = {_args.cooldown}
+
+			}
+		}
+	elseif id == 'duration' then
+		return {
+			Cell{
+				name = '[[Game Speed|Duration]]',
+				content = {Spell:getDuration()}
+
+			}
+		}
+	end
+
+	return widgets
+end
+
+function Spell:createWidgetInjector()
+	return CustomInjector()
+end
+
+function Spell:getResearchCost()
 	local display
-	if String.isEmpty(args.from) then
+	if String.isEmpty(_args.from) then
 		return nil
 	end
 
-	local race = string.lower(args.race or '')
+	local race = string.lower(_args.race or '')
 
-	local minerals = tonumber(args.min or 0) or 0
+	local minerals = tonumber(_args.min or 0) or 0
 	if minerals ~= 0 then
 		minerals = _MINERALS .. '&nbsp;' .. minerals .. '&nbsp;'
 	else
 		minerals = ''
 	end
 
-	local gas = tonumber(args.gas or 0) or 0
+	local gas = tonumber(_args.gas or 0) or 0
 	if gas ~= 0 then
 		gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas .. '&nbsp;'
 	else
 		gas = ''
 	end
 
-	local buildtime = tonumber(args.buildtime or 0) or 0
+	local buildtime = tonumber(_args.buildtime or 0) or 0
 	if buildtime ~= 0 then
 		buildtime = (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtime
 	else
@@ -79,12 +139,12 @@ function StarCraft2Spell:getResearchCost(infobox, args)
 	end
 end
 
-function StarCraft2Spell:getResearchFrom(infobox, args)
-	local from = args.from
-	if String.isEmpty(args.from) then
+function Spell:getResearchFrom()
+	local from = _args.from
+	if String.isEmpty(from) then
 		from = 'No research needed'
-	elseif not String.isEmpty(args.from2) then
-		from = '[[' .. from .. ']], [[' .. args.from2 .. ']]'
+	elseif not String.isEmpty(_args.from2) then
+		from = '[[' .. from .. ']], [[' .. _args.from2 .. ']]'
 	else
 		from = '[[' .. from .. ']]'
 	end
@@ -92,18 +152,18 @@ function StarCraft2Spell:getResearchFrom(infobox, args)
 	return from
 end
 
-function StarCraft2Spell:getResearchHotkey(infobox, args)
+function Spell:getResearchHotkey()
 	local display
-	if not String.isEmpty(args.from) then
-		display = Hotkeys.hotkey(args.rhotkey)
+	if not String.isEmpty(_args.from) then
+		display = Hotkeys.hotkey(_args.rhotkey)
 	end
 
 	return display
 end
 
-function StarCraft2Spell:getCategories(infobox, args)
+function Spell:getCategories()
 	local categories = { 'Spells' }
-	local race = CleanRace[args.race or '']
+	local race = CleanRace[_args.race or '']
 	if race then
 		table.insert(categories, race .. ' Spells')
 	end
@@ -111,67 +171,64 @@ function StarCraft2Spell:getCategories(infobox, args)
 	return categories
 end
 
-function StarCraft2Spell:getDuration2(infobox, args)
+function Spell:getDuration2()
 	local display
-	local description = '[[Game Speed|Duration 2]]'
 
-	if args.channeled2 == 'true' then
-		display = 'Channeled&nbsp;' .. args.duration2
+	if _args.channeled2 == 'true' then
+		display = 'Channeled&nbsp;' .. _args.duration2
 	end
-	if not String.isEmpty(args.duration2) then
-		display = (display or '') .. args.duration2
+	if not String.isEmpty(_args.duration2) then
+		display = (display or '') .. _args.duration2
 	end
 
 	if
 		(not String.isEmpty(display))
-		and (not String.isEmpty(args.caster2))
+		and (not String.isEmpty(_args.caster2))
 	then
-		display = display .. '&#32;([[' .. args.caster2 .. ']])'
+		display = display .. '&#32;([[' .. _args.caster2 .. ']])'
 	end
 
-	return description, display
+	return display
 end
 
-function StarCraft2Spell:getDuration(infobox, args)
+function Spell:getDuration()
 	local display
-	local description = '[[Game Speed|Duration]]'
 
-	if args.channeled == 'true' then
+	if _args.channeled == 'true' then
 		display = 'Channeled&nbsp;'
 	end
-	if not String.isEmpty(args.duration) then
-		display = (display or '') .. args.duration
+	if not String.isEmpty(_args.duration) then
+		display = (display or '') .. _args.duration
 	end
 
 	if
 		(not String.isEmpty(display))
-		and (not String.isEmpty(args.duration2))
-		and (not String.isEmpty(args.caster))
+		and (not String.isEmpty(_args.duration2))
+		and (not String.isEmpty(_args.caster))
 	then
-		display = display .. '&#32;([[' .. args.caster .. ']])'
+		display = display .. '&#32;([[' .. _args.caster .. ']])'
 	end
 
-	return description, display
+	return display
 end
 
-function StarCraft2Spell:getHotkeys(infobox, args)
-	local description = '[[Hotkeys per Race|Hotkey]]'
+function Spell:getHotkeys()
 	local display
-	if not String.isEmpty(args.hotkey) then
-		if not String.isEmpty(args.hotkey2) then
-			display = Hotkeys.hotkey(args.hotkey, args.hotkey2, 'slash')
+	if not String.isEmpty(_args.hotkey) then
+		if not String.isEmpty(_args.hotkey2) then
+			display = Hotkeys.hotkey(_args.hotkey, _args.hotkey2, 'slash')
 		else
-			display = Hotkeys.hotkey(args.hotkey)
+			display = Hotkeys.hotkey(_args.hotkey)
 		end
 	end
 
-	return description, display
+	return display
 end
 
-function StarCraft2Spell:getCostDisplay(infobox, args)
-	local energy = tonumber(args.energy or 0) or 0
+function Spell:getCostDisplay()
+	local energy = tonumber(_args.energy or 0) or 0
 	energy = _ENERGY .. '&nbsp;' .. energy
 	return energy
 end
 
-return StarCraft2Spell
+return Spell

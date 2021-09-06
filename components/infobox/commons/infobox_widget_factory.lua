@@ -7,32 +7,24 @@
 --
 
 local Class = require('Module:Class')
-local Builder = require('Module:Infobox/Widget/Builder')
 local Customizable = require('Module:Infobox/Widget/Customizable')
 local Widget = require('Module:Infobox/Widget')
 
 local WidgetFactory = Class.new()
 
-function WidgetFactory.work(widget, injector)
+function WidgetFactory.work(widget)
 	local convertedWidgets = {}
 
-	if widget:is_a(Builder) then
-		local children = widget:make()
+	if widget == nil then
+		return {}
+	end
 
-		for _, child in pairs(children or {}) do
-			local childOutput = WidgetFactory.work(child, injector)
-			-- Our child might contain a list of children, so we need to iterate
-			for _, item in pairs(childOutput) do
-				table.insert(convertedWidgets, item)
-			end
-		end
-	elseif widget:is_a(Customizable) then
-		widget:setWidgetInjector(injector)
-		for _, child in pairs(widget:make() or {}) do
+	if widget:is_a(Customizable) then
+		for _, child in ipairs(widget:make() or {}) do
 			if child['is_a'] == nil or child:is_a(Widget) == false then
 				return error('Customizable can only contain Widgets as children')
 			end
-			for _, item in pairs(child:make() or {}) do
+			for _, item in ipairs(child:make() or {}) do
 				table.insert(convertedWidgets, item)
 			end
 		end

@@ -15,5 +15,7 @@ Widgets.Title = require('Module:Infobox/Widget/Title')
 Widgets.Customizable = require('Module:Infobox/Widget/Customizable')
 Widgets.Links = require('Module:Infobox/Widget/Links')
 Widgets.Chronology = require('Module:Infobox/Widget/Chronology')
+Widgets.Builder = require('Module:Infobox/Widget/Builder')
+Widgets.Breakdown = require('Module:Infobox/Widget/Breakdown')
 
 return Widgets

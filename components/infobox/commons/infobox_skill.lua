@@ -6,21 +6,27 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Cell = require('Module:Infobox/Cell')
+local InfoboxBasic = require('Module:Infobox/Basic')
+local String = require('Module:String')
 local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 local Hotkey = require('Module:Hotkey')
 
-local Skill = Class.new(BasicInfobox)
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Customizable = Widgets.Customizable
+
+local Skill = Class.new(InfoboxBasic)
 
 function Skill.run(frame)
 	local skill = Skill(frame)
-	return skill:createInfobox(frame)
+	return skill:createInfobox()
 end
 
-function Skill:createInfobox(frame)
+function Skill:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
@@ -28,46 +34,67 @@ function Skill:createInfobox(frame)
 		error('You need to specify an informationType, e.g. "Spell", "Ability, ...')
 	end
 
-	local hotkeyDescription, hotkeyDisplay = self:getHotkeys(infobox, args)
-	local durationDescription, durationDisplay = self:getDuration(infobox, args)
-
-	infobox:name(args.name)
-	infobox:image(args.image, args.defaultImage, args.imageSize)
-	infobox:centeredCell(args.caption)
-	infobox:header(args.informationType .. ' Information', true)
-	infobox:fcell(Cell:new('Caster(s)'):options({}):content(
-		unpack(self:getAllArgsForBase(args, 'caster', { makeLink = true }))):make())
-	infobox:cell('Cost', self:getCostDisplay(infobox, args))
-	infobox:cell(hotkeyDescription, hotkeyDisplay)
-	infobox:cell('Range', args.range)
-	infobox:cell('Radius', args.radius)
-	infobox:cell('[[Cooldown]]', args.cooldown)
-	infobox:cell(durationDescription, durationDisplay)
-	self.infobox:centeredCell(args.footnotes)
-	self:addCustomCells(infobox, args)
-	infobox:bottom(self:createBottomContent(infobox))
+	local widgets = {
+		Header{name = args.name, image = args.image, size = args.imageSize},
+		Center{content = {args.caption}},
+		Title{name = args.informationType .. ' Information'},
+		Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', { makeLink = true })},
+		Customizable{
+			id = 'cost',
+			children = {
+				Cell{
+					name = 'Cost',
+					content = {args.cost}
+				},
+			}
+		},
+		Customizable{
+			id = 'hotkey',
+			children = {
+				Cell{
+					name = 'Hotkey',
+					content = {self:_getHotkeys(args)}
+				},
+			}
+		},
+		Cell{name = 'Range', content = {args.range}},
+		Cell{name = 'Radius', content = {args.radius}},
+		Customizable{
+			id = 'cooldown',
+			children = {
+				Cell{
+					name = 'Cooldown',
+					content = {args.cooldown}
+				},
+			}
+		},
+		Customizable{
+			id = 'duration',
+			children = {
+				Cell{
+					name = 'Duration',
+					content = {args.duration}
+				},
+			}
+		},
+		Customizable{id = 'custom', children = {}},
+		Center{content = {args.footnotes}},
+	}
 
 	if Namespace.isMain() then
-		local categories = self:getCategories(infobox, args)
+		local categories = self:getCategories(args)
 		infobox:categories(unpack(categories))
 	end
 
-	return infobox:build()
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 --- Allows for overriding this functionality
-function Skill:getCategories(infobox, args)
+function Skill:getCategories(args)
 	return {}
 end
 
---- Allows for overriding this functionality
-function Skill:getDuration(infobox, args)
-	return 'Duration', args.duration
-end
-
---- Allows for overriding this functionality
-function Skill:getHotkeys(infobox, args)
-	local description = 'Hotkey'
+function Skill:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
@@ -77,12 +104,7 @@ function Skill:getHotkeys(infobox, args)
 		end
 	end
 
-	return description, display
-end
-
---- Allows for overriding this functionality
-function Skill:getCostDisplay(infobox, args)
-	return args.cost
+	return display
 end
 
 return Skill

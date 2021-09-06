@@ -12,30 +12,119 @@ local Links = require('Module:Links')
 local Achievements = require('Module:Achievements in infoboxes')
 local RaceIcon = require('Module:RaceIcon').getSmallIcon
 local Matches = require('Module:Upcoming ongoing and recent matches team/new')
+local Class = require('Module:Class')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Title = require('Module:Infobox/Widget/Title')
+local Builder = require('Module:Infobox/Widget/Builder')
+local Center = require('Module:Infobox/Widget/Center')
 
 local doStore = true
 local earningsGlobal = 0
 local pagename = mw.title.getCurrentTitle().prefixedText
 
-local StarCraft2Team = {}
+local CustomTeam = Class.new()
 
-function StarCraft2Team.run(frame)
+local CustomInjector = Class.new(Injector)
+local Language = mw.language.new('en')
+
+local _team
+
+function CustomTeam.run(frame)
 	local team = Team(frame)
-	team.addCustomCells = StarCraft2Team.addCustomCells
-	team.calculateEarnings = StarCraft2Team.calculateEarnings
-	team.getAchievements = StarCraft2Team.getAchievements
-	team.getHistory = StarCraft2Team.getHistory
-	team.addCustomContent = StarCraft2Team.addCustomContent
-	team.createBottomContent = StarCraft2Team.createBottomContent
+	_team = team
+	team.createBottomContent = CustomTeam.createBottomContent
+	if doStore then
+		CustomTeam.storeToLPDB(_team.args)
+	end
 	return team:createInfobox(frame)
 end
 
-function StarCraft2Team.addCustomCells(team, infobox, args)
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell({
+		name = 'Gaming Director',
+		content = {_team.args['gaming director']}
+	}))
+	return widgets
+end
+
+function CustomInjector:parse(id, widgets)
+	if id == 'earnings' then
+		local earnings = CustomTeam.calculateForTeam(_team.args)
+		if earnings == 0 then
+			earnings = nil
+		else
+			earnings = '$' .. Language:formatNum(earnings)
+		end
+		return {
+			Cell{
+				name = 'Earnings',
+				content = {
+					earnings
+				}
+			}
+		}
+	elseif id == 'customcontent' then
+		return {
+			Builder{
+				builder = function()
+					local playerBreakDown = CustomTeam.playerBreakDown(_team.args)
+					if playerBreakDown.playernumber then
+						return {
+							Title{name = 'Player Breakdown'},
+							Cell{name = 'Number of players', content = {playerBreakDown.playernumber}}
+						}
+					end
+				end
+			}
+
+		}
+	elseif id == 'achievements' then
+		local achievements, soloAchievements = CustomTeam.getAutomatedAchievements(pagename)
+		return {
+			Builder{
+				builder = function()
+					if achievements then
+						return {
+							Title{name = 'Achievements'},
+							Center{content = achievements},
+						}
+					end
+				end
+			},
+			Builder{
+				builder = function()
+					if soloAchievements then
+						return {
+							Title{name = 'Solo Achievements'},
+							Center{content = soloAchievements},
+						}
+					end
+				end
+			}
+		}
+	elseif id == 'history' then
+		for i=1, 5 do
+			table.insert(widgets, Cell{
+				name = _team.args['history' .. i .. 'title'] or '',
+				content = CustomTeam.customHistory(_team.args, i)
+			})
+		end
+	end
+	return widgets
+end
+
+function CustomTeam:createWidgetInjector()
+	return CustomInjector()
+end
+
+
+function CustomTeam.addCustomCells(team, infobox, args)
 	infobox	:cell('Gaming Director', args['gaming director'])
 	return infobox
 end
 
-function StarCraft2Team:createBottomContent()
+function CustomTeam:createBottomContent()
 	if doStore then
 		return tostring(Matches._get_ongoing({})) ..
 			tostring(Matches._get_upcoming({})) ..
@@ -43,34 +132,7 @@ function StarCraft2Team:createBottomContent()
 	end
 end
 
-function StarCraft2Team.addCustomContent(team, infobox, args)
-	local achievements, soloAchievements = StarCraft2Team.getAutomatedAchievements(pagename)
-	local playerBreakDown = StarCraft2Team.playerBreakDown(args)
-
-	infobox	:header('Achievements', achievements)
-			:centeredCell(achievements)
-			:header('Solo Achievements', soloAchievements)
-			:centeredCell(soloAchievements)
-			:header('Player Breakdown', playerBreakDown.playernumber)
-			:cell('Number of players', playerBreakDown.playernumber)
-			:fcell(StarCraft2Team.playerBreakDownDisplay(playerBreakDown.display))
-			:header('History', args.created)
-			:cell('Created', args.created)
-			:cell('Disbanded', args.disbanded)
-			:cell(args.history1title or '', StarCraft2Team.customHistory(args, 1))
-			:cell(args.history2title or '', StarCraft2Team.customHistory(args, 2))
-			:cell(args.history3title or '', StarCraft2Team.customHistory(args, 3))
-			:cell(args.history4title or '', StarCraft2Team.customHistory(args, 4))
-			:cell(args.history5title or '', StarCraft2Team.customHistory(args, 5))
-
-	if doStore then
-		StarCraft2Team.storeToLPDB(args)
-	end
-
-	return infobox
-end
-
-function StarCraft2Team.playerBreakDownDisplay(contents)
+function CustomTeam.playerBreakDownDisplay(contents)
     if type(contents) ~= 'table' or contents == {} then
         return nil
     end
@@ -87,7 +149,7 @@ function StarCraft2Team.playerBreakDownDisplay(contents)
     return div
 end
 
-function StarCraft2Team.storeToLPDB(args)
+function CustomTeam.storeToLPDB(args)
 	local name = args.romanized_name or args.name or pagename
 	Variables.varDefine('team_name', name)
 	local links = Links.transform(args)
@@ -116,7 +178,7 @@ function StarCraft2Team.storeToLPDB(args)
 		})
 end
 
-function StarCraft2Team.playerBreakDown(args)
+function CustomTeam.playerBreakDown(args)
 	local playerBreakDown = {}
 	local playernumber = tonumber(args.player_number or 0) or 0
 	local zergnumber = tonumber(args.zerg_number or 0) or 0
@@ -148,7 +210,7 @@ function StarCraft2Team.playerBreakDown(args)
 	return playerBreakDown
 end
 
-function StarCraft2Team.getAutomatedAchievements(team)
+function CustomTeam.getAutomatedAchievements(team)
 	local achievements = Achievements.team({team=team})
 	local achievementsSolo = Achievements.team_solo({team=team})
 	if achievements == '' then achievements = nil end
@@ -157,37 +219,27 @@ function StarCraft2Team.getAutomatedAchievements(team)
 	return achievements, achievementsSolo
 end
 
-function StarCraft2Team.customHistory(args, number)
+function CustomTeam.customHistory(args, number)
 	if args['history' .. number .. 'title'] then
 		return args['history' .. number]
 	end
 end
 
-function StarCraft2Team.calculateEarnings(_, args)
+function CustomTeam.calculateEarnings(args)
 	if args.disable_smw == 'true' or args.disable_lpdb == 'true' or args.disable_storage == 'true'
 		or Variables.varDefault('disable_SMW_storage', 'false') == 'true'
 		or mw.title.getCurrentTitle().nsText ~= '' then
 			doStore = false
 			Variables.varDefine('disable_SMW_storage', 'true')
 	else
-		earningsGlobal = StarCraft2Team.get_earnings_and_medals_data(pagename) or 0
+		earningsGlobal = CustomTeam.get_earnings_and_medals_data(pagename) or 0
 		Variables.varDefine('earnings', earningsGlobal)
 		return earningsGlobal
 	end
 	return 0
 end
 
---kick the default achievements display
-function StarCraft2Team:getAchievements(infobox, args)
-	return nil
-end
-
---kick the default history display
-function StarCraft2Team:getHistory(infobox, args)
-	return {}
-end
-
-function StarCraft2Team.get_earnings_and_medals_data(team)
+function CustomTeam.get_earnings_and_medals_data(team)
 	local AllowedPlaces = { '1', '2', '3', '4', '3-4' }
 	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR [[placement::' ..
 		table.concat(AllowedPlaces, ']] OR [[placement::') .. ']]) AND(' .. '[[participant::' ..
@@ -251,7 +303,7 @@ function StarCraft2Team.get_earnings_and_medals_data(team)
 
 			--handle medals
 			if data[i].mode == '1v1' then
-				data[i].placement = StarCraft2Team._Placements(data[i].placement)
+				data[i].placement = CustomTeam._Placements(data[i].placement)
 				if data[i].placement ~= '99' then
 					if not data[i].liquipediatiertype == 'Qualifier' then
 						if not Medals[data[i].placement] then
@@ -273,7 +325,7 @@ function StarCraft2Team.get_earnings_and_medals_data(team)
 					end
 				end
 			elseif data[i].mode == 'team' then
-				data[i].placement = StarCraft2Team._Placements(data[i].placement)
+				data[i].placement = CustomTeam._Placements(data[i].placement)
 				if data[i].placement ~= '99' then
 					if not data[i].liquipediatiertype == 'Qualifier' then
 						if not TeamMedals[data[i].placement] then
@@ -331,7 +383,7 @@ function StarCraft2Team.get_earnings_and_medals_data(team)
 	return math.floor((earnings.team.total or 0) * 100 + 0.5) / 100
 end
 
-function StarCraft2Team._Placements(value)
+function CustomTeam._Placements(value)
 	value = (value or '') ~= '' and value or '99'
 	local temp = mw.text.split(value, '-')[1]
 	if temp ~= '1' and temp ~= '2' and temp ~= '3' then
@@ -342,4 +394,4 @@ function StarCraft2Team._Placements(value)
 	return temp
 end
 
-return StarCraft2Team
+return CustomTeam

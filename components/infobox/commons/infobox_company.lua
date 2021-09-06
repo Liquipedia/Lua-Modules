@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Cell = require('Module:Infobox/Cell')
 local InfoboxBasic = require('Module:Infobox/Basic')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')._Flag
@@ -15,6 +14,15 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 local Math = require('Module:Math')
 local String = require('Module:String')
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Customizable = Widgets.Customizable
+local Builder = Widgets.Builder
+
 local Language = mw.language.new('en')
 
 local Company = Class.new(InfoboxBasic)
@@ -26,33 +34,54 @@ function Company.run(frame)
 	return company:createInfobox(frame)
 end
 
-function Company:createInfobox(frame)
+function Company:createInfobox()
     local infobox = self.infobox
     local args = self.args
 
-    infobox :name(args.name)
-            :image(args.image)
-            :centeredCell(args.caption)
-            :header('Company Information', true)
-            :fcell(Cell:new('Parent company'):options({makeLink = true}):content(args.parent, args.parent2):make())
-            :cell('Founded', args.foundeddate)
-            :cell('Defunct', args.defunctdate)
-            :cell('Location', self:_createLocation(frame, args.location))
-            :cell('Headquarters', args.headquarters)
-            :cell('Employees', args.employees)
-            :cell('Traded as', args.tradedas)
-    self:addCustomCells(infobox, args)
-
-    if not String.isEmpty(args.companytype) and args.companytype == _COMPANY_TYPE_ORGANIZER then
-        infobox:cell('Total prize money', self:_getOrganizerPrizepools())
-        infobox:categories('Tournament organizers')
-    end
-
-    local links = Links.transform(args)
-
-    infobox :centeredCell(args.footnotes)
-            :header('Links', not Table.isEmpty(links))
-            :links(links)
+	local widgets = {
+		Header{name = args.name, image = args.image},
+		Center{content = {args.caption}},
+		Title{name = 'League Information'},
+		Cell{
+			name = 'Parent company',
+			content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
+		},
+		Cell{name = 'Founded', content = {args.foundeddate},},
+		Cell{name = 'Defunct', content = {args.defunctdate},},
+		Cell{
+			name = 'Location',
+			content = {self:_createLocation(args.location)},
+		},
+		Cell{name = 'Headquarters', content = {args.headquarters}},
+		Cell{name = 'Employees', content = {args.employees}},
+		Cell{name = 'Traded as', content = {args.tradedas}},
+		Customizable{id = 'custom', children = {}},
+		Builder{
+			builder = function()
+				if not String.isEmpty(args.companytype) and args.companytype == _COMPANY_TYPE_ORGANIZER then
+					infobox:categories('Tournament organizers')
+					return {
+						Cell{
+							name = 'Total prize money',
+							content = {self:_getOrganizerPrizepools()}
+						}
+					}
+				end
+			end
+		},
+		Center{content = {args.footnotes}},
+		Builder{
+			builder = function()
+				local links = Links.transform(args)
+				if not Table.isEmpty(links) then
+					return {
+						Title{name = 'Links'},
+						Widgets.Links{content = links}
+					}
+				end
+			end
+		}
+	}
 
     mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {
         name = self.name,
@@ -78,10 +107,10 @@ function Company:createInfobox(frame)
 
     infobox:categories('Companies')
 
-    return infobox:build()
+    return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
-function Company:_createLocation(frame, location)
+function Company:_createLocation(location)
     if location == nil then
         return ''
     end

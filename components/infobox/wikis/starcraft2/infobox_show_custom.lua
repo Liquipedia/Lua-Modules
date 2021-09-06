@@ -6,30 +6,51 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Class = require('Module:Class')
 local Show = require('Module:Infobox/Show')
 local Namespace = require('Module:Namespace')
-local StarCraft2Show = {}
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
 
-function StarCraft2Show.run(frame)
-	local show = Show(frame)
-	show.addCustomCells = StarCraft2Show.addCustomCells
-	return show:createInfobox(frame)
+local CustomShow = Class.new()
+
+local _show
+local _args
+
+local CustomInjector = Class.new(Injector)
+
+function CustomShow.run(frame)
+    local customShow = Show(frame)
+	_show = customShow
+	_args = customShow.args
+	customShow.createWidgetInjector = CustomShow.createWidgetInjector
+    return customShow:createInfobox(frame)
 end
 
-function StarCraft2Show:addCustomCells(infobox, args)
-	infobox:cell('No. of episodes', args['num_episodes'])
-	infobox:cell('Original Release', StarCraft2Show:_getReleasePeriod(args.sdate, args.edate))
+function CustomShow:createWidgetInjector()
+	return CustomInjector()
+end
 
-	if Namespace.isMain() and args.edate == nil then
-		infobox:categories('Active Shows')
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell{
+		name = 'No. of episodes',
+		content = {_args['num_episodes']}
+	})
+	table.insert(widgets, Cell{
+		name = 'Original Release',
+		content = {CustomShow:_getReleasePeriod(_args.sdate, _args.edate)}
+	})
+
+	if Namespace.isMain() and _args.edate == nil then
+		_show.infobox:categories('Active Shows')
 	end
 
-	return infobox
+	return widgets
 end
 
-function StarCraft2Show:_getReleasePeriod(sdate, edate)
+function CustomShow:_getReleasePeriod(sdate, edate)
 	if not sdate then return nil end
 	return sdate .. ' - ' .. (edate or '<b>Present</b>')
 end
 
-return StarCraft2Show
+return CustomShow
