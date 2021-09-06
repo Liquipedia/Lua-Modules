@@ -34,8 +34,7 @@ end
 function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	--we need those available in the lpdb storage,
-	--so we set them outside the widgets already
+	-- Need links in LPDB, so declare them outside of display code
 	local links = Links.transform(args)
 
 	local widgets = {
@@ -122,8 +121,6 @@ function Team:createInfobox()
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	--need to inject and build before we store to lpdb so that we can
-	--pass the earnings determined for the display to the lpdb storage
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if Namespace.isMain() then
@@ -161,7 +158,6 @@ function Team:_setLpdbData(args, links)
 		logo = args.image,
 		createdate = args.created,
 		disbanddate = args.disbanded,
-		--earnings = THIS NEEDS TO BE ADDED ON YOUR WIKI!!!,
 		coach = args.coaches,
 		manager = args.manager,
 		region = args.region,
@@ -171,6 +167,11 @@ function Team:_setLpdbData(args, links)
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
+
+	if lpdbData['earnings'] == nil then
+		return error('You need to set the LPDB earnings storage in the custom module')
+	end
+
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
 end
