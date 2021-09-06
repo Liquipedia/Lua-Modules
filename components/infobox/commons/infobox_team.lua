@@ -34,8 +34,7 @@ end
 function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	--we need those available in the lpdb storage,
-	--so we set them outside the widgets already
+	-- Need links in LPDB, so declare them outside of display code
 	local links = Links.transform(args)
 
 	local widgets = {
