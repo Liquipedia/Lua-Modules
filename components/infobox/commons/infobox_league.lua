@@ -56,7 +56,12 @@ function League:createInfobox()
 			}
 		},
 		Cell{name = 'Organizer(s)', content = self:_createOrganizers(args)},
-		Cell{name = 'Sponsor(s)', content = self:getAllArgsForBase(args, 'sponsor')},
+		Customizable{
+			id = 'sponsors',
+			children = {
+				Cell{name = 'Sponsor(s)', content = self:getAllArgsForBase(args, 'sponsor')},
+			}
+		},
 		Customizable{
 			id = 'server',
 			children = {
