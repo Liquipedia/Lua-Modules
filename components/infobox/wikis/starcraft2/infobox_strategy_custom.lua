@@ -37,11 +37,11 @@ local _RACE_MATCHUPS = {
 local CustomInjector = Class.new(Injector)
 
 function CustomStrategy.run(frame)
-    local customStrategy = Strategy(frame)
+	local customStrategy = Strategy(frame)
 	_strategy = customStrategy
 	_args = customStrategy.args
 	customStrategy.createWidgetInjector = CustomStrategy.createWidgetInjector
-    return customStrategy:createInfobox(frame)
+	return customStrategy:createInfobox(frame)
 end
 
 function CustomStrategy:createWidgetInjector()
