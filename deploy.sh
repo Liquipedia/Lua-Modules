@@ -1,5 +1,6 @@
 #!/bin/bash
 
+userAgent="GitHub Autodeploy Bot/1.0.0 ($LP_UA_EMAIL)"
 wikiBaseUrl='https://liquipedia.net/'
 luaFiles=$(find . -type f -name '*.lua')
 pat='\-\-\-\
@@ -29,19 +30,70 @@ do
     echo "...wiki = $wiki"
     echo "...page = $page"
     wikiApiUrl="${wikiBaseUrl}${wiki}/api.php"
+    ckf="cookie_${wiki}.ck"
 
     if [[ ${loggedin[${wiki}]} != 1 ]]
     then
       # Login
       echo "...logging in on \"${wiki}\""
-      loginToken=$(curl -s -b "cookie_${wiki}.ck" -c "cookie_${wiki}.ck" -d "format=json&action=query&meta=tokens&type=login" -H 'User-Agent: GitHub Autodeploy Bot/1.0.0 (fonttax@liquipedia.net)' -H 'Accept-Encoding: gzip' -X POST $wikiApiUrl | gunzip | jq .query.tokens.logintoken -r)
-      curl -s -b "cookie_${wiki}.ck" -c "cookie_${wiki}.ck" --data-urlencode "username=${LP_USER}" --data-urlencode "password=${LP_PASSWORD}" --data-urlencode "logintoken=${loginToken}" --data-urlencode "loginreturnurl=https://liquipedia.net" -H 'User-Agent: GitHub Autodeploy Bot/1.0.0 (fonttax@liquipedia.net)' -H 'Accept-Encoding: gzip' -X POST "${wikiApiUrl}?format=json&action=clientlogin" | gunzip > /dev/null
+      loginToken=$(
+        curl \
+          -s \
+          -b "$ckf" \
+          -c "$ckf" \
+          -d "format=json&action=query&meta=tokens&type=login" \
+          -H "User-Agent: ${userAgent}" \
+          -H 'Accept-Encoding: gzip' \
+          -X POST $wikiApiUrl \
+          | gunzip \
+          | jq .query.tokens.logintoken -r
+      )
+      curl \
+        -s \
+        -b "$ckf" \
+        -c "$ckf" \
+        --data-urlencode "username=${LP_USER}" \
+        --data-urlencode "password=${LP_PASSWORD}" \
+        --data-urlencode "logintoken=${loginToken}" \
+        --data-urlencode "loginreturnurl=https://liquipedia.net" \
+        -H "User-Agent: ${userAgent}" \
+        -H 'Accept-Encoding: gzip' \
+        -X POST "${wikiApiUrl}?format=json&action=clientlogin" \
+        | gunzip \
+        > /dev/null
       loggedin[$wiki]=1
     fi
 
     # Edit page
-    editToken=$(curl -s -b "cookie_${wiki}.ck" -c "cookie_${wiki}.ck" -d "format=json&action=query&meta=tokens" -H 'User-Agent: GitHub Autodeploy Bot/1.0.0 (fonttax@liquipedia.net)' -H 'Accept-Encoding: gzip' -X POST $wikiApiUrl | gunzip | jq .query.tokens.csrftoken -r)
-    result=$(curl -s -b "cookie_${wiki}.ck" -c "cookie_${wiki}.ck" --data-urlencode "title=${page}" --data-urlencode "text=${fileContents}" --data-urlencode "summary=Auto update from git - file \"${luaFile}\"" --data-urlencode "bot=true" --data-urlencode "recreate=true" --data-urlencode "token=${editToken}" -H 'User-Agent: GitHub Autodeploy Bot/1.0.0 (fonttax@liquipedia.net)' -H 'Accept-Encoding: gzip' -X POST "${wikiApiUrl}?format=json&action=edit" | gunzip | jq .edit.result -r)
+    editToken=$(
+      curl \
+        -s \
+        -b "$ckf" \
+        -c "$ckf" \
+        -d "format=json&action=query&meta=tokens" \
+        -H "User-Agent: ${userAgent}" \
+        -H 'Accept-Encoding: gzip' \
+        -X POST $wikiApiUrl \
+        | gunzip \
+        | jq .query.tokens.csrftoken -r
+    )
+    result=$(
+      curl \
+        -s \
+        -b "$ckf" \
+        -c "$ckf" \
+        --data-urlencode "title=${page}" \
+        --data-urlencode "text=${fileContents}" \
+        --data-urlencode "summary=Auto update from git - file \"${luaFile}\"" \
+        --data-urlencode "bot=true" \
+        --data-urlencode "recreate=true" \
+        --data-urlencode "token=${editToken}" \
+        -H "User-Agent: ${userAgent}" \
+        -H 'Accept-Encoding: gzip' \
+        -X POST "${wikiApiUrl}?format=json&action=edit" \
+        | gunzip \
+        | jq .edit.result -r
+    )
     echo "...${result}"
 
     echo '...done'
