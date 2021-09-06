@@ -62,6 +62,8 @@ do
         | gunzip \
         > /dev/null
       loggedin[$wiki]=1
+      # Don't get rate limited
+      sleep 4
     fi
 
     # Edit page
@@ -98,7 +100,7 @@ do
 
     echo '...done'
     # Don't get rate limited
-    sleep 3
+    sleep 4
   fi
 done
 
