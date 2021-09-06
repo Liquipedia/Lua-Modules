@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League/dev')
+local League = require('Module:Infobox/League')
 local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -202,8 +202,14 @@ function CustomLeague:_createTierDisplay()
 	else
 		output = output .. tierText
 	end
+	
+	output = output .. ']]' .. '[[Category:' .. tierText .. ' '
 
-	output = output .. ']]' ..
+	if _args.team_number or _args.team1 then
+		output = output .. 'Team Tournaments]][[Category:Team '
+	end
+
+	output = output .. 'Tournaments]]' ..
 		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
 		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
 
