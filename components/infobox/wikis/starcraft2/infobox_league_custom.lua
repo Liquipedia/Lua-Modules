@@ -22,6 +22,7 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Chronology = require('Module:Infobox/Widget/Chronology')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -87,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'chronology' and (not (String.isEmpty(_args.previous) and String.isEmpty(_args.next))) then
-		return {		
+		return {
 			Title{name = 'Chronology'},
 			Chronology{
 				content = {CustomLeague._getChronologyData()}
