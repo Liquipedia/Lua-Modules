@@ -23,6 +23,7 @@ local _team
 function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
+	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	return team:createInfobox(frame)
 end
 
