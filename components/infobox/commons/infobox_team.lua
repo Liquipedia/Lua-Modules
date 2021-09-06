@@ -82,6 +82,7 @@ function Team:createInfobox(frame)
 		Customizable{
 			id = 'achievements',
 			children = {
+				Title{name = 'Achievements'},
 				Center{content = {args.achievements}}
 			}
 		},
