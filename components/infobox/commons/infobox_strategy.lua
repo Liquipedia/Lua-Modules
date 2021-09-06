@@ -6,36 +6,49 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Cell = require('Module:Infobox/Cell')
+local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Customizable = Widgets.Customizable
 
 local Strategy = Class.new(BasicInfobox)
 
 function Strategy.run(frame)
 	local strategy = Strategy(frame)
-	return strategy:createInfobox(frame)
+	return strategy:createInfobox()
 end
 
-function Strategy:createInfobox(frame)
+function Strategy:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	infobox:name(self:getNameDisplay(args))
-	infobox:image(args.image, args.defaultImage)
-	infobox:centeredCell(args.caption)
-	infobox:header('Strategy Information', true)
-	infobox:fcell(Cell:new('Creator'):options({makeLink = true})
-		:content(args.creator or args['created-by']):make())
-	self:addCustomCells(infobox, args)
-	infobox:centeredCell(args.footnotes)
-	infobox:bottom(self:createBottomContent(infobox))
+
+	local widgets = {
+		Customizable{id = 'header', children = {
+				Header{name = args.name, image = args.image},
+			}
+		},
+		Center{content = {args.caption}},
+		Title{name = 'Strategy Information'},
+		Cell{
+			name = 'Creator(s)',
+			content = {args.creator or args['created-by']},
+			options = {makeLink = true}
+		},
+		Customizable{id = 'custom', children = {}},
+		Center{content = {args.footnotes}},
+	}
 
 	if Namespace.isMain() then
 		infobox:categories('Strategies')
 	end
 
-	return infobox:build()
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 return Strategy
