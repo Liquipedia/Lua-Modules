@@ -140,6 +140,8 @@ function League:createInfobox()
 
 	self.infobox:bottom(self:createBottomContent())
 
+	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+
 	if self:shouldStore(args) then
 		self.infobox:categories('Tournaments')
 		if not String.isEmpty(args.team_number) then
@@ -149,7 +151,7 @@ function League:createInfobox()
 		self:_setLpdbData(args, links)
 	end
 
-	return self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return builtInfobox
 end
 
 --- Allows for overriding this functionality
