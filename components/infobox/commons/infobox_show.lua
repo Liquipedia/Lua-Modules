@@ -48,13 +48,17 @@ function Show:createInfobox()
 			builder = function()
 				local links = Links.transform(args)
 				local secondaryLinks = Show:_addSecondaryLinkDisplay(args)
+				local returnWidgets = {}
 				if (not Table.isEmpty(links)) or (secondaryLinks ~= '') then
-					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links},
-						Center{content = {secondaryLinks}},
-					}
+					table.insert(returnWidgets, Title{name = 'Links'})
 				end
+				if not Table.isEmpty(links) then
+					table.insert(returnWidgets, Widgets.Links{content = links})
+				end
+				if secondaryLinks ~= '' then
+					table.insert(returnWidgets, Center{content = {secondaryLinks})
+				end
+				return returnWidgets
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},
