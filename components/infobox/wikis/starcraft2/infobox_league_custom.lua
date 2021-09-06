@@ -51,7 +51,6 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
-	league.getChronologyData = CustomLeague.getChronologyData
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
@@ -86,6 +85,13 @@ function CustomInjector:parse(id, widgets)
 				content = {CustomLeague:_createTierDisplay()},
 				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
 			},
+		}
+	elseif id == 'chronology' and (not (String.isEmpty(_args.previous) and String.isEmpty(_args.next))) then
+		return {		
+			Title{name = 'Chronology'},
+			Chronology{
+				content = {CustomLeague._getChronologyData()}
+			}
 		}
 	elseif id == 'customcontent' then
 		--player breakdown
@@ -267,7 +273,7 @@ function CustomLeague._getGameVersion()
 	end
 end
 
-function CustomLeague:getChronologyData()
+function CustomLeague._getChronologyData()
 	local next, previous = CustomLeague._computeChronology()
 	return {
 		previous = previous,
