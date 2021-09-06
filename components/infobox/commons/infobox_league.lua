@@ -128,6 +128,7 @@ function League:createInfobox()
 			builder = function()
 				if self:_isChronologySet(args.previous, args.next) then
 					return {
+						Title{name = 'Chronology'},
 						Chronology{
 							content = self:getChronologyData(args)
 						}
