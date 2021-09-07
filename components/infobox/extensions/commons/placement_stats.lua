@@ -17,7 +17,7 @@ local _PLACEMENTS = { '1', '2', '3', '>' }
 
 function placementStats.get(args)
 	args = args or {}
-	local mode = args.mode or 'team'
+	local mode = args.mode or ''
 	local participant = args.participant or mw.title.getCurrentTitle().prefixedText
 
 	local queryData = placementStats._getQueryData(mode, participant)
