@@ -8,7 +8,6 @@
 
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
-local Links = require('Module:Links')
 local Achievements = require('Module:Achievements in infoboxes')
 local RaceIcon = require('Module:RaceIcon').getSmallIcon
 local Matches = require('Module:Upcoming ongoing and recent matches team/new')
@@ -30,13 +29,14 @@ local Language = mw.language.new('en')
 
 local _team
 
+local _earnings = 0
+
 function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
 	team.createBottomContent = CustomTeam.createBottomContent
-	if doStore then
-		CustomTeam.storeToLPDB(_team.args)
-	end
+	team.addToLpdb = CustomTeam.addToLpdb
+	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	return team:createInfobox(frame)
 end
 
@@ -50,18 +50,17 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		local earnings = CustomTeam.calculateForTeam(_team.args)
-		if earnings == 0 then
-			earnings = nil
+		_earnings = CustomTeam.calculateEarnings(_team.args)
+		local earningsDisplay
+		if _earnings == 0 then
+			earningsDisplay = nil
 		else
-			earnings = '$' .. Language:formatNum(earnings)
+			earningsDisplay = '$' .. Language:formatNum(_earnings)
 		end
 		return {
 			Cell{
 				name = 'Earnings',
-				content = {
-					earnings
-				}
+				content = {earningsDisplay}
 			}
 		}
 	elseif id == 'customcontent' then
@@ -87,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 					if achievements then
 						return {
 							Title{name = 'Achievements'},
-							Center{content = achievements},
+							Center{content = {achievements}},
 						}
 					end
 				end
@@ -97,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 					if soloAchievements then
 						return {
 							Title{name = 'Solo Achievements'},
-							Center{content = soloAchievements},
+							Center{content = {soloAchievements}},
 						}
 					end
 				end
@@ -106,8 +105,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'history' then
 		for i=1, 5 do
 			table.insert(widgets, Cell{
-				name = _team.args['history' .. i .. 'title'] or '',
-				content = CustomTeam.customHistory(_team.args, i)
+				name = _team.args['history' .. i .. 'title'] or '-',
+				content = {CustomTeam.customHistory(_team.args, i)}
 			})
 		end
 	end
@@ -132,6 +131,11 @@ function CustomTeam:createBottomContent()
 	end
 end
 
+function CustomTeam:addToLpdb(lpdbData)
+	lpdbData.earnings = _earnings or 0
+	return lpdbData
+end
+
 function CustomTeam.playerBreakDownDisplay(contents)
     if type(contents) ~= 'table' or contents == {} then
         return nil
@@ -147,35 +151,6 @@ function CustomTeam.playerBreakDownDisplay(contents)
     end
 
     return div
-end
-
-function CustomTeam.storeToLPDB(args)
-	local name = args.romanized_name or args.name or pagename
-	Variables.varDefine('team_name', name)
-	local links = Links.transform(args)
-	for key, item in pairs(links) do
-		if key == 'aligulac' then
-			links[key] = 'http://aligulac.com/teams/' .. item
-		elseif key == 'esl' then
-			links[key] = 'https://play.eslgaming.com/team/' .. item
-		else
-			links[key] = Links.makeFullLink(key, item)
-		end
-	end
-
-	mw.ext.LiquipediaDB.lpdb_team('team_' .. name, {
-		name = name,
-		location = args.location or '',
-		location2 = args.location2 or '',
-		logo = args.image or '',
-		createdate = args.created or '',
-		disbanddate = args.disbanded or '',
-		earnings = earningsGlobal,
-		coach = args.coaches or '',
-		manager = args.manager or '',
-		sponsors = args.sponsor or '',
-		links = mw.ext.LiquipediaDB.lpdb_create_json(links),
-		})
 end
 
 function CustomTeam.playerBreakDown(args)

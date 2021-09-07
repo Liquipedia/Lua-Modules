@@ -11,7 +11,7 @@ local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
-local Flags = require('Module:Flags')._Flag
+local Flags = require('Module:Flags')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -28,12 +28,14 @@ local _LINK_VARIANT = 'team'
 
 function Team.run(frame)
 	local team = Team(frame)
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
-function Team:createInfobox(frame)
+function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
+	-- Need links in LPDB, so declare them outside of display code
+	local links = Links.transform(args)
 
 	local widgets = {
 		Header{
@@ -74,7 +76,6 @@ function Team:createInfobox(frame)
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
-				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
@@ -125,7 +126,13 @@ function Team:createInfobox(frame)
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+
+	if Namespace.isMain() then
+		self:_setLpdbData(args, links)
+	end
+
+	return builtInfobox
 end
 
 function Team:_createRegion(region)
@@ -141,9 +148,41 @@ function Team:_createLocation(location)
 		return ''
 	end
 
-	return Flags(location) ..
-		'&nbsp;' ..
-		'[[:Category:' .. location .. '|' .. location .. ']]'
+	return Flags._Flag(location) ..
+			'&nbsp;' ..
+			'[[:Category:' .. location .. '|' .. location .. ']]'
+end
+
+function Team:_setLpdbData(args, links)
+	local name = args.romanized_name or self.name
+
+	local lpdbData = {
+		name = name,
+		location = args.location,
+		location2 = args.location2,
+		logo = args.image,
+		createdate = args.created,
+		disbanddate = args.disbanded,
+		coach = args.coaches,
+		manager = args.manager,
+		region = args.region,
+		links = mw.ext.LiquipediaDB.lpdb_create_json(
+			Links.makeFullLinksForTableItems(links or {}, 'team')
+		),
+	}
+
+	lpdbData = self:addToLpdb(lpdbData, args)
+
+	if lpdbData['earnings'] == nil then
+		return error('You need to set the LPDB earnings storage in the custom module')
+	end
+
+	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
+	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
+end
+
+function Team:addToLpdb(lpdbData, args)
+	return lpdbData
 end
 
 return Team
