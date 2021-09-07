@@ -39,7 +39,7 @@ function wikiCopyPaste.getMode(mode)
 end
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index,  opponents, args)
+function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	if bestof == 0 and args.score ~= 'false' then
 		args.score = 'true'
 	end
