@@ -9,7 +9,6 @@
 --[[
 
 TODO:
-- is bestof for each game a thing?
 - add support for team matches -> need feedback from the wiki
 
 ]]--
@@ -374,21 +373,22 @@ function gameFunctions.getExtraData(game)
 end
 
 function gameFunctions.getScoresAndWinner(game)
-	game.score1 = tonumber(game.score1 or '')
-	game.score2 = tonumber(game.score2 or '')
-	game.scores = { game.score1, game.score2 }
-
-	--the following in case we have bestof for games/rounds
---[[
-	local firstTo = math.ceil( game.bestof / 2 )
-	if (game.score1 or 0) >= firstTo then
-		game.winner = 1
-	elseif (game.score2 or 0) >= firstTo then
-		game.winner = 2
-	end
-]]--
-	if game.winner then
+	if game.winner == 'draw' then
+		game.winner = 0
 		game.finished = true
+		game.scores = { 0, 0 }
+	else
+		game.winner = tonumber(game.winner or '')
+		if game.winner then
+			game.finished = true
+			if game.winner == 1 then
+				game.scores = { 1, 0 }
+			elseif game.winner == 2 then
+				game.scores = { 0, 1 }
+			elseif game.winner == 0 then
+				game.scores = { 0, 0 }
+			end
+		end
 	end
 
 	return game
