@@ -17,4 +17,5 @@ jobs:
         env:
           LP_USER: ${{ secrets.LP_USER }}
           LP_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          LP_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
         run: bash deploy.sh

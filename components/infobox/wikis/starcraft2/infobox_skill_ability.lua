@@ -27,11 +27,11 @@ local CustomInjector = Class.new(Injector)
 local _args
 
 function Ability.run(frame)
-    local ability = Skill(frame)
+	local ability = Skill(frame)
 	ability.createWidgetInjector = Ability.createWidgetInjector
 	ability.getCategories = Ability.getCategories
 	_args = ability.args
-    return ability:createInfobox(frame)
+	return ability:createInfobox(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)

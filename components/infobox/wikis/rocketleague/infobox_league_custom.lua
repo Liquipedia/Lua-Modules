@@ -65,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'customcontent' then
 		if not String.isEmpty(args.map1) then
 			local maps = {CustomLeague:_makeInternalLink(args.map1)}
-			local index  = 2
+			local index = 2
 
 			while not String.isEmpty(args['map' .. index]) do
 				table.insert(maps, '&nbsp;• ' ..

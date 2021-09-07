@@ -38,7 +38,11 @@ function Team:createInfobox()
 	local links = Links.transform(args)
 
 	local widgets = {
-		Header{name = args.name, image = args.image},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDefault = args.default,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Team Information'},
 		Cell{
@@ -83,6 +87,7 @@ function Team:createInfobox()
 		Customizable{
 			id = 'achievements',
 			children = {
+				Title{name = 'Achievements'},
 				Center{content = {args.achievements}}
 			}
 		},

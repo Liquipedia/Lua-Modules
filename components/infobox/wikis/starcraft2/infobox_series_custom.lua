@@ -17,6 +17,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Builder = require('Module:Infobox/Widget/Builder')
 local Class = require('Module:Class')
+local String = require('Module:StringUtils')
 
 local _GAME_WOL = 'wol'
 local _GAME_HOTS = 'hots'
@@ -38,7 +39,6 @@ local _series
 
 function CustomSeries.run(frame)
 	local series = Series(frame)
-	series.createTier = CustomSeries.createTier
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 	_series = series
 	return series:createInfobox(frame)
@@ -88,9 +88,9 @@ function CustomInjector:parse(id, widgets)
 	if id == 'liquipediatier' then
 		return {
 			Cell{
-				name = 'Liquipedia Tier',
-				contents = {
-					CustomSeries.createTier(
+				name = 'Liquipedia tier',
+				content = {
+					CustomSeries._createTier(
 						_series.args.liquipediatier, (_series.args.liquipediatiertype or _series.args.tiertype))
 				}
 
@@ -210,9 +210,9 @@ function CustomSeries._setDateMatchVar(date, edate, sdate)
 end
 
 --function for custom tier handling
-function CustomSeries.createTier(tier, tierType)
-	if tier == nil or tier == '' then
-		return ''
+function CustomSeries._createTier(tier, tierType)
+	if String.isEmpty(tier) then
+		return nil
 	end
 
 	local tierText = Tier['text'][tier]

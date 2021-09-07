@@ -79,7 +79,7 @@ function CustomInjector:parse(id, widgets)
 		if not String.isEmpty(args.map1) then
 			local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
 			local maps = {CustomLeague:_makeInternalLink(args.map1 .. game .. '|' .. args.map1)}
-			local index  = 2
+			local index = 2
 
 			while not String.isEmpty(args['map' .. index]) do
 				local map = args['map' .. index]
@@ -97,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 
 		if not String.isEmpty(args.team1) then
 			local teams = {CustomLeague:_makeInternalLink(args.team1)}
-			local index  = 2
+			local index = 2
 
 			while not String.isEmpty(args['team' .. index]) do
 				table.insert(teams, '&nbsp;• ' ..
@@ -289,7 +289,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 
 	Variables.varDefine('tournament_valve_major',
-		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR  and 'true' or args.valvemajor)
+		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR and 'true' or args.valvemajor)
 	Variables.varDefine('tournament_valve_tier',
 		mw.getContentLanguage():ucfirst(args.valvetier or ''):lower())
 	Variables.varDefine('tournament_cstrike_major', args.cstrikemajor)

@@ -26,10 +26,10 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomCompany.run(frame)
-    local company = Company(frame)
+	local company = Company(frame)
 	company.createWidgetInjector = CustomCompany.createWidgetInjector
 	_args = company.args
-    return company:createInfobox(frame)
+	return company:createInfobox(frame)
 end
 
 function CustomCompany:createWidgetInjector()
@@ -37,10 +37,10 @@ function CustomCompany:createWidgetInjector()
 end
 
 function CustomCompany._createSisterCompaniesDescription(args)
-    if args.sister2 then
-      return 'Sister Companies'
-    end
-    return 'Sister Company'
+	if args.sister2 then
+		return 'Sister Companies'
+	end
+	return 'Sister Company'
 end
 
 return CustomCompany

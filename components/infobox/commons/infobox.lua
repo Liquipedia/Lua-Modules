@@ -13,29 +13,29 @@ local Infobox = Class.new()
 
 --- Inits the Infobox instance
 function Infobox:create(frame, gameName)
-    self.frame = frame
-    self.root = mw.html.create('div')
-    self.adbox = mw.html.create('div')  :addClass('fo-nttax-infobox-adbox')
-                                        :addClass('wiki-bordercolor-light')
-                                        :node(self.frame:preprocess('<adbox />'))
-    self.content = mw.html.create('div')    :addClass('fo-nttax-infobox')
-                                            :addClass('wiki-bordercolor-light')
-    self.root   :addClass('fo-nttax-infobox-wrapper')
-                :addClass('infobox-' .. gameName)
+	self.frame = frame
+	self.root = mw.html.create('div')
+	self.adbox = mw.html.create('div')	:addClass('fo-nttax-infobox-adbox')
+										:addClass('wiki-bordercolor-light')
+										:node(self.frame:preprocess('<adbox />'))
+	self.content = mw.html.create('div')	:addClass('fo-nttax-infobox')
+											:addClass('wiki-bordercolor-light')
+	self.root	:addClass('fo-nttax-infobox-wrapper')
+				:addClass('infobox-' .. gameName)
 
-    self.injector = nil
-    return self
+	self.injector = nil
+	return self
 end
 
 function Infobox:categories(...)
-    local input = {...}
-    for i = 1, #input do
-        local category = input[i]
-        if category ~= nil and category ~= '' then
-            self.root:wikitext('[[Category:' .. category .. ']]')
-        end
-    end
-    return self
+	local input = {...}
+	for i = 1, #input do
+		local category = input[i]
+		if category ~= nil and category ~= '' then
+			self.root:wikitext('[[Category:' .. category .. ']]')
+		end
+	end
+	return self
 end
 
 function Infobox:widgetInjector(injector)

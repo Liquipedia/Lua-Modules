@@ -21,11 +21,11 @@ local CustomInjector = Class.new(Injector)
 local _args
 
 function CustomMap.run(frame)
-    local customMap = Map(frame)
+	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
 	customMap.getCategories = CustomMap.getCategories
 	_args = customMap.args
-    return customMap:createInfobox(frame)
+	return customMap:createInfobox(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
