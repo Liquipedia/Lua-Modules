@@ -36,11 +36,6 @@ function BasicInfobox:addCustomCells(infobox, args)
 end
 
 --- Allows for overriding this functionality
-function BasicInfobox:addCustomContent(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
 function BasicInfobox:createBottomContent()
 	return nil
 end
