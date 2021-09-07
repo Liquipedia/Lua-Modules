@@ -10,9 +10,7 @@
 
 TODO:
 - is bestof for each game a thing?
-- should default bestofs be set?
 - add support for team matches -> need feedback from the wiki
-- is it necessary to list additional decks on top of the banned and played (per game) ones?
 
 ]]--
 
@@ -257,7 +255,7 @@ function matchFunctions.getOpponents(args)
 		sumscores[game.winner] = (sumscores[game.winner] or 0) + 1
 	end
 
-	local bestof = args.bestof or Variables.varDefault('bestof', '')
+	local bestof = args.bestof or Variables.varDefault('bestof', 3)
 	bestof = tonumber(bestof) or 0
 	local firstTo = math.ceil(bestof / 2)
 
