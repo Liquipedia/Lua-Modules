@@ -11,6 +11,8 @@ local Class = require('Module:Class')
 local Links = {}
 
 local _PREFIXES = {
+	['5ewin'] = 'https://arena.5eplay.com/tournament/',
+	abiosgaming = 'https://abiosgaming.com/tournaments/',
 	afreeca = 'http://afreecatv.com/',
 	aligulac = 'https://aligulac.com/results/events/',
 	aoezone = 'https://aoezone.net/',
@@ -23,6 +25,8 @@ local _PREFIXES = {
 	discord = 'https://discord.gg/',
 	dlive = 'https://www.dlive.tv/',
 	douyu = 'http://www.douyu.com/',
+	esea = 'https://play.esea.net/events/',
+	['esea-d'] = 'https://play.esea.net/league/standings?divisionId=',
 	esl = '',
 	facebook = 'http://facebook.com/',
 	faceit = 'https://www.faceit.com/en/players/',
@@ -44,6 +48,7 @@ local _PREFIXES = {
 	rules = '',
 	site = '',
 	sk = 'http://sk-gaming.com/member/',
+	sostronk = 'https://www.sostronk.com/tournament/',
 	snapchat = 'https://www.snapchat.com/add/',
 	steam = 'https://steamcommunity.com/id/',
 	steamalternative = 'https://steamcommunity.com/profiles/',

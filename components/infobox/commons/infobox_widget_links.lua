@@ -30,8 +30,23 @@ local _PRIORITY_GROUPS = {
 		'website'
 	},
 	league = {
+		'5ewin',
+		'abiosgaming',
+		'aligulac',
+		'battlefy',
+		'challonge',
+		'cybergamer',
+		'esea',
+		'easa-d',
+		'esl',
+		'faceit',
+		'matcherino',
+		'matcherinolink',
+		'sostronk',
+		'toornament',
 		'bracket',
-		'rules'
+		'rules',
+		'rulebook',
 	},
 	social = {
 		'discord',
