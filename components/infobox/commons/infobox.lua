@@ -69,10 +69,10 @@ function Infobox:build(widgets)
 		self.root:node(self.bottomContent)
 	end
 
-	local firstInfobox = not Variables.varDefault('notFirstInfobox')
-	if firstInfobox then
+	local firstInfobox = Variables.varDefault('is_first_infobox', true)
+	if firstInfobox == true then
 		self.root:node(self.adbox)
-		Variables.varDefine('notFirstInfobox', 'true')
+		Variables.varDefine('is_first_infobox', 'false')
 	end
 
 	return self.root
