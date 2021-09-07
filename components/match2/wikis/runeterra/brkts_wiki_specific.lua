@@ -377,12 +377,17 @@ function gameFunctions.getScoresAndWinner(game)
 	game.score1 = tonumber(game.score1 or '')
 	game.score2 = tonumber(game.score2 or '')
 	game.scores = { game.score1, game.score2 }
+
+	--the following in case we have bestof for games/rounds
+--[[
 	local firstTo = math.ceil( game.bestof / 2 )
 	if (game.score1 or 0) >= firstTo then
 		game.winner = 1
-		game.finished = true
 	elseif (game.score2 or 0) >= firstTo then
 		game.winner = 2
+	end
+]]--
+	if game.winner then
 		game.finished = true
 	end
 
