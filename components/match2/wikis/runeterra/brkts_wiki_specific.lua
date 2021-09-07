@@ -415,6 +415,7 @@ function gameFunctions.getParticipantsData(game)
 		participants['2_1'].deck = game.p2deck or game.deck2
 	elseif game.mode == 'team' then
 		--do team participants processing here
+		error('team matches are nto yet supported')
 	end
 
 	game.participants = participants
