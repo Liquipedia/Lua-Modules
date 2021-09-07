@@ -10,6 +10,7 @@ pat='\-\-\-\
 \-\- page=([^
 ]*)\
 '
+gitCommitSubject=$(git log -1 --pretty='%h %s')
 
 declare -A loggedin
 
@@ -86,7 +87,7 @@ do
         -c "$ckf" \
         --data-urlencode "title=${page}" \
         --data-urlencode "text=${fileContents}" \
-        --data-urlencode "summary=Auto update from git - file \"${luaFile}\"" \
+        --data-urlencode "summary=Git: \"${gitCommitSubject}\"" \
         --data-urlencode "bot=true" \
         --data-urlencode "recreate=true" \
         --data-urlencode "token=${editToken}" \
