@@ -63,7 +63,7 @@ function League:createInfobox()
 			}
 		},
 		Customizable{
-			id = 'server',
+			id = 'gamesettings',
 			children = {
 				Cell{name = 'Server', content = {args.server}}
 			}
@@ -124,18 +124,26 @@ function League:createInfobox()
 		},
 		Customizable{id = 'customcontent', children = {}},
 		Center{content = {args.footnotes}},
-		Builder{
-			builder = function()
-				if self:_isChronologySet(args.previous, args.next) then
-					return {
-						Title{name = 'Chronology'},
-						Chronology{
-							content = self:getChronologyData(args)
-						}
-					}
-				end
-			end
-		}
+		Customizable{id = 'chronology', children = {
+				Builder{
+					builder = function()
+						if self:_isChronologySet(args.previous, args.next) then
+							return {
+								Title{name = 'Chronology'},
+								Chronology{
+									content = {
+										previous = args.previous,
+										next = args.next,
+										previous2 = args.previous2,
+										next2 = args.next2,
+									}
+								}
+							}
+						end
+					end
+				}
+			}
+		},
 	}
 
 	self.infobox:bottom(self:createBottomContent())
@@ -152,16 +160,6 @@ function League:createInfobox()
 	end
 
 	return builtInfobox
-end
-
---- Allows for overriding this functionality
-function League:getChronologyData(args)
-	return {
-		previous = args.previous,
-		next = args.next,
-		previous2 = args.previous2,
-		next2 = args.next2,
-	}
 end
 
 --- Allows for overriding this functionality
