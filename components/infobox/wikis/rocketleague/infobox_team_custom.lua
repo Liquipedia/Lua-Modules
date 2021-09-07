@@ -64,7 +64,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.earnings = Variables.varDefault('earnings') or 0
+	lpdbData.earnings = Variables.varDefault('earnings', 0)
 	if not String.isEmpty(args.teamcardimage) then
 		lpdbData.logo = 'File:' .. args.teamcardimage
 	elseif not String.isEmpty(args.image) then
