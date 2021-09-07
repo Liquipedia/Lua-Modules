@@ -40,6 +40,7 @@ local _PRIORITY_GROUPS = {
 		'easa-d',
 		'esl',
 		'faceit',
+		'gamersclub',
 		'matcherino',
 		'matcherinolink',
 		'sostronk',

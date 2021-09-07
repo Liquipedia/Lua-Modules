@@ -31,6 +31,7 @@ local _PREFIXES = {
 	facebook = 'http://facebook.com/',
 	faceit = 'https://www.faceit.com/en/players/',
 	fanclub = '',
+	gamersclub = 'https://csgo.gamersclub.gg/campeonatos/csgo/',
 	gplus = 'http://plus.google.com/-plus',
 	home = '',
 	huomaotv = 'http://www.huomao.com/',
