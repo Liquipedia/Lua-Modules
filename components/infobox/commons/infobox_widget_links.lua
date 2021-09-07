@@ -23,21 +23,83 @@ local _ICON_KEYS_TO_RENAME = {
 	matcherinolink = 'matcherino'
 }
 
+local _PRIORITY_GROUPS = {
+	core = {
+		'home',
+		'site',
+		'website'
+	},
+	league = {
+		'5ewin',
+		'abiosgaming',
+		'aligulac',
+		'battlefy',
+		'challonge',
+		'cybergamer',
+		'esea',
+		'easa-d',
+		'esl',
+		'faceit',
+		'gamersclub',
+		'matcherino',
+		'matcherinolink',
+		'sostronk',
+		'toornament',
+		'bracket',
+		'rules',
+		'rulebook',
+	},
+	social = {
+		'discord',
+		'facebook',
+		'instagram',
+		'reddit',
+		'snapchat',
+		'steam',
+		'steamalternative',
+		'telegram',
+		'tiktok',
+		'twitter',
+		'vk',
+		'weibo'
+	},
+	streams = {
+		'twitch',
+		'youtube',
+		'afreeca',
+		'dlive'
+	}
+}
+
 function Links:make()
 	local infoboxLinks = mw.html.create('div')
 	infoboxLinks	:addClass('infobox-center')
 					:addClass('infobox-icons')
 
+	for _, group in Table.iter.spairs(_PRIORITY_GROUPS) do
+		for _, key in ipairs(group) do
+			if self.links[self:_removeAppendedNumber(key)] ~= nil then
+				infoboxLinks:wikitext(' ' .. self:_makeLink(key, self.links[key]))
+
+				-- Remove links from the collection
+				self.links[key] = nil
+			end
+		end
+	end
+
 	for key, value in Table.iter.spairs(self.links) do
-		key = self:_removeAppendedNumber(key)
-		local link = '[' .. UtilLinks.makeFullLink(key, value, self.variant) ..
-			' <i class="lp-icon lp-' .. (_ICON_KEYS_TO_RENAME[key] or key) .. '></i>]'
-		infoboxLinks:wikitext(' ' .. link)
+		infoboxLinks:wikitext(' ' .. self:_makeLink(key, value))
 	end
 
 	return {
 		mw.html.create('div'):node(infoboxLinks)
 	}
+end
+
+function Links:_makeLink(key, value)
+	key = self:_removeAppendedNumber(key)
+	return '[' .. UtilLinks.makeFullLink(key, value, self.variant) ..
+		' <i class="lp-icon lp-' .. (_ICON_KEYS_TO_RENAME[key] or key) .. '></i>]'
 end
 
 --remove appended number
