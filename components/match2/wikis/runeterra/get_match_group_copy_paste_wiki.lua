@@ -45,7 +45,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	if bestof ~= 0 then
 		if mode == '1v1' then
 			for i = 1, bestof do
-				out = out .. '\n    |game' .. i .. '={{Game|deck1=|deck2=|score1=|score2=|winner=}}'
+				out = out .. '\n    |game' .. i .. '={{Game|deck1=|deck2=|winner=}}'
 			end
 		else
 			error('Opponent type "' .. mode .. '" is not yet supported')
