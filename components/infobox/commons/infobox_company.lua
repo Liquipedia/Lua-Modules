@@ -35,8 +35,8 @@ function Company.run(frame)
 end
 
 function Company:createInfobox()
-    local infobox = self.infobox
-    local args = self.args
+	local infobox = self.infobox
+	local args = self.args
 
 	local widgets = {
 		Header{name = args.name, image = args.image},
@@ -83,60 +83,60 @@ function Company:createInfobox()
 		}
 	}
 
-    mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {
-        name = self.name,
-        image = args.image,
-        location = args.location,
-        headquarterslocation = args.headquarters,
-        parentcompany = args.parent,
-        foundeddate = ReferenceCleaner.clean(args.foundeddate),
-        defunctdate = ReferenceCleaner.clean(args.defunctdate),
-        numberofemployees = ReferenceCleaner.cleanNumber(args.employees),
-        links = mw.ext.LiquipediaDB.lpdb_create_json({
-            discord = Links.makeFullLink('discord', args.discord),
-            facebook = Links.makeFullLink('facebook', args.facebook),
-            instagram = Links.makeFullLink('instagram', args.instagram),
-            twitch = Links.makeFullLink('twitch', args.twitch),
-            twitter = Links.makeFullLink('twitter', args.twitter),
-            website = Links.makeFullLink('website', args.website),
-            weibo = Links.makeFullLink('weibo', args.weibo),
-            vk = Links.makeFullLink('vk', args.vk),
-            youtube = Links.makeFullLink('youtube', args.youtube),
-        })
-    })
+	mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {
+		name = self.name,
+		image = args.image,
+		location = args.location,
+		headquarterslocation = args.headquarters,
+		parentcompany = args.parent,
+		foundeddate = ReferenceCleaner.clean(args.foundeddate),
+		defunctdate = ReferenceCleaner.clean(args.defunctdate),
+		numberofemployees = ReferenceCleaner.cleanNumber(args.employees),
+		links = mw.ext.LiquipediaDB.lpdb_create_json({
+			discord = Links.makeFullLink('discord', args.discord),
+			facebook = Links.makeFullLink('facebook', args.facebook),
+			instagram = Links.makeFullLink('instagram', args.instagram),
+			twitch = Links.makeFullLink('twitch', args.twitch),
+			twitter = Links.makeFullLink('twitter', args.twitter),
+			website = Links.makeFullLink('website', args.website),
+			weibo = Links.makeFullLink('weibo', args.weibo),
+			vk = Links.makeFullLink('vk', args.vk),
+			youtube = Links.makeFullLink('youtube', args.youtube),
+		})
+	})
 
-    infobox:categories('Companies')
+	infobox:categories('Companies')
 
-    return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 function Company:_createLocation(location)
-    if location == nil then
-        return ''
-    end
+	if location == nil then
+		return ''
+	end
 
-    return Flags(location) .. '&nbsp;' ..
-                '[[:Category:' .. location .. '|' .. location .. ']]'
+	return Flags(location) .. '&nbsp;' ..
+				'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
 function Company:_getOrganizerPrizepools()
-    local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
-        conditions =
-            '[[organizers_organizer1::' .. self.pagename .. ']] OR ' ..
-            '[[organizers_organizer2::' .. self.pagename .. ']] OR ' ..
-            '[[organizers_organizer3::' .. self.pagename .. ']] OR ' ..
-            '[[organizers_organizer4::' .. self.pagename .. ']] OR ' ..
-            '[[organizers_organizer5::' .. self.pagename .. ']]',
-        query = 'sum::prizepool'
-    })
+	local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions =
+			'[[organizers_organizer1::' .. self.pagename .. ']] OR ' ..
+			'[[organizers_organizer2::' .. self.pagename .. ']] OR ' ..
+			'[[organizers_organizer3::' .. self.pagename .. ']] OR ' ..
+			'[[organizers_organizer4::' .. self.pagename .. ']] OR ' ..
+			'[[organizers_organizer5::' .. self.pagename .. ']]',
+		query = 'sum::prizepool'
+	})
 
-    prizemoney = tonumber(prizemoney[1]['sum_prizepool'])
+	prizemoney = tonumber(prizemoney[1]['sum_prizepool'])
 
-    if prizemoney == nil or prizemoney == 0 then
-        return nil
-    end
+	if prizemoney == nil or prizemoney == 0 then
+		return nil
+	end
 
-    return '$' .. Language:formatNum(Math._round(prizemoney))
+	return '$' .. Language:formatNum(Math._round(prizemoney))
 end
 
 return Company
