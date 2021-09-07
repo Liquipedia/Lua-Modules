@@ -11,8 +11,8 @@ local Company = require('Module:Infobox/Company')
 local CustomCompany = {}
 
 function CustomCompany.run(frame)
-    local company = Company(frame)
-    return company:createInfobox(frame)
+	local company = Company(frame)
+	return company:createInfobox(frame)
 end
 
 return CustomCompany
