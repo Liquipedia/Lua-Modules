@@ -68,16 +68,16 @@ function p.getByMatchId(args)
 				htmlCreate("div")
 					:addClass("brkts-popup-spaced")
 					:node(game.winner == 1 and
-						  "[[File:GreenCheck.png|14x14px|link=]]" or
-						  "[[File:NoCheck.png|link=]]")
+						"[[File:GreenCheck.png|14x14px|link=]]" or
+						"[[File:NoCheck.png|link=]]")
 					:node(htmlCreate("div"):node(game.scores[1] or "")),
 				centerNode,
 				htmlCreate("div")
 					:addClass("brkts-popup-spaced")
 					:node(htmlCreate("div"):node(game.scores[2] or ""))
 					:node(game.winner == 2 and
-						  "[[File:GreenCheck.png|14x14px|link=]]" or
-						  "[[File:NoCheck.png|link=]]")
+						"[[File:GreenCheck.png|14x14px|link=]]" or
+						"[[File:NoCheck.png|link=]]")
 			}
 			local gameHeader = game.header or ''
 			if gameHeader ~= '' then
