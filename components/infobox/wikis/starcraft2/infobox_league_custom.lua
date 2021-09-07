@@ -87,7 +87,7 @@ function CustomInjector:parse(id, widgets)
 				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
 			},
 		}
-	elseif id == 'chronology' and (not (String.isEmpty(_args.previous) and String.isEmpty(_args.next))) then
+	elseif id == 'chronology' and not (String.isEmpty(_args.previous) and String.isEmpty(_args.next)) then
 		return {
 			Title{name = 'Chronology'},
 			Chronology{
