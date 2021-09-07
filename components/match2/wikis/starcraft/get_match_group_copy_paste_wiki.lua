@@ -39,7 +39,7 @@ function wikiCopyPaste.getMode(mode)
 end
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index,  opponents, args)
+function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local score = args.score == 'true' and '|score=' or ''
 	local out = '{{Match' .. (index == 1 and bestof ~= 0 and ('|bestof=' .. bestof) or '') ..
 		(bestof == 0 and '\n\t|winner=' or '') .. '\n\t|date=\n\t|twitch='
