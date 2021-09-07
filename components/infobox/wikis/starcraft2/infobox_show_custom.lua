@@ -20,11 +20,11 @@ local _args
 local CustomInjector = Class.new(Injector)
 
 function CustomShow.run(frame)
-    local customShow = Show(frame)
+	local customShow = Show(frame)
 	_show = customShow
 	_args = customShow.args
 	customShow.createWidgetInjector = CustomShow.createWidgetInjector
-    return customShow:createInfobox(frame)
+	return customShow:createInfobox(frame)
 end
 
 function CustomShow:createWidgetInjector()
