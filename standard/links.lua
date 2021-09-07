@@ -118,6 +118,8 @@ function Links.transform(links)
 		facebook = links.facebook,
 		facebook2 = links.facebook2,
 		fanclub = links.fanclub,
+		gamersclub = links.gamersclub,
+		gamersclub2 = links.gamersclub2,
 		home = links.website or links.web or links.site,
 		home2 = links.website2 or links.web2 or links.site2,
 		huyatv = links.huyatv,
