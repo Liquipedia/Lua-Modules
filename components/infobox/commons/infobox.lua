@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
+local Variables = require('Module:Variables')
 
 local Infobox = Class.new()
 
@@ -67,7 +68,13 @@ function Infobox:build(widgets)
 	if self.bottomContent ~= nil then
 		self.root:node(self.bottomContent)
 	end
-	self.root:node(self.adbox)
+
+	local firstInfobox = not Variables.varDefault('notFirstInfobox')
+	if firstInfobox then
+		self.root:node(self.adbox)
+		Variables.varDefine('notFirstInfobox', 'true')
+	end
+
 	return self.root
 end
 
