@@ -258,7 +258,7 @@ function matchFunctions.getOpponents(args)
 	end
 
 	local bestof = args.bestof or Variables.varDefault('bestof', '')
-	local bestof = tonumber(bestof) or 0
+	bestof = tonumber(bestof) or 0
 	local firstTo = math.ceil(bestof / 2)
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
