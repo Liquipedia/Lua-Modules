@@ -20,20 +20,20 @@ local Links = Class.new(
 )
 
 local _ICON_KEYS_TO_RENAME = {
-    matcherinolink = 'matcherino'
+	matcherinolink = 'matcherino'
 }
 
 function Links:make()
-    local infoboxLinks = mw.html.create('div')
-    infoboxLinks    :addClass('infobox-center')
-                    :addClass('infobox-icons')
+	local infoboxLinks = mw.html.create('div')
+	infoboxLinks	:addClass('infobox-center')
+					:addClass('infobox-icons')
 
-    for key, value in Table.iter.spairs(self.links) do
-        key = self:_removeAppendedNumber(key)
-        local link = '[' .. UtilLinks.makeFullLink(key, value, self.variant) ..
-            ' <i class="lp-icon lp-' .. (_ICON_KEYS_TO_RENAME[key] or key) .. '></i>]'
-        infoboxLinks:wikitext(' ' .. link)
-    end
+	for key, value in Table.iter.spairs(self.links) do
+		key = self:_removeAppendedNumber(key)
+		local link = '[' .. UtilLinks.makeFullLink(key, value, self.variant) ..
+			' <i class="lp-icon lp-' .. (_ICON_KEYS_TO_RENAME[key] or key) .. '></i>]'
+		infoboxLinks:wikitext(' ' .. link)
+	end
 
 	return {
 		mw.html.create('div'):node(infoboxLinks)
@@ -43,7 +43,7 @@ end
 --remove appended number
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
 function Links:_removeAppendedNumber(key)
-    return string.gsub(key, '%d$', '')
+	return string.gsub(key, '%d$', '')
 end
 
 return Links

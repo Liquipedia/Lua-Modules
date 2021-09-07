@@ -27,11 +27,11 @@ local CustomInjector = Class.new(Injector)
 local _args
 
 function Spell.run(frame)
-    local spell = Skill(frame)
+	local spell = Skill(frame)
 	spell.createWidgetInjector = Spell.createWidgetInjector
 	spell.getCategories = Spell.getCategories
 	_args = spell.args
-    return spell:createInfobox(frame)
+	return spell:createInfobox(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)

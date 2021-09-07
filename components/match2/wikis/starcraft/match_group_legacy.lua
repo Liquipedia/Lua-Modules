@@ -84,7 +84,7 @@ function Legacy.getTemplate(frame)
 		.. "return p"
 
 	return "[[Module:MatchGroup/Legacy/" .. templateid ..
-		"|Link to mapping]]" .. "<pre class=\"selectall\">" .. out  .. "</pre>"
+		"|Link to mapping]]" .. "<pre class=\"selectall\">" .. out .. "</pre>"
 end
 
 function Legacy._convert(mapping)

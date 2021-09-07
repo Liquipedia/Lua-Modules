@@ -32,22 +32,22 @@ end
 
 --- Allows for overriding this functionality
 function BasicInfobox:addCustomCells(infobox, args)
-    return infobox
+	return infobox
 end
 
 --- Allows for overriding this functionality
 function BasicInfobox:addCustomContent(infobox, args)
-    return infobox
+	return infobox
 end
 
 --- Allows for overriding this functionality
 function BasicInfobox:createBottomContent()
-    return nil
+	return nil
 end
 
 --- Allows for overriding this functionality
 function BasicInfobox:getWikiCategories(args)
-    return {}
+	return {}
 end
 
 --- Allows for using this for customCells

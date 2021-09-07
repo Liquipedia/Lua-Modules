@@ -11,7 +11,7 @@ local wikiCopyPaste = require('Module:GetMatchGroupCopyPaste/wiki/Base')
 --allowed opponent types on the wiki
 local MODES = { ['solo'] = 'solo', ['team'] = 'team' }
 
---default opponent type (used if the entered mode is not found  in the above table)
+--default opponent type (used if the entered mode is not found in the above table)
 local DefaultMode = 'team'
 
 --returns the cleaned opponent type
@@ -35,7 +35,7 @@ end
 
 --returns the Code for a Match, depending on the input
 --for more customization please change stuff here^^
-function wikiCopyPaste.getMatchCode(bestof, mode, index,  opponents, args)
+function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local out = tostring(mw.message.new('BracketConfigMatchTemplate'))
 	if out == '⧼BracketConfigMatchTemplate⧽' then
 		out = '{{Match\n\t'
