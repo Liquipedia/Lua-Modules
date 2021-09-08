@@ -102,9 +102,14 @@ function CustomStrategy:_getCategories(race, matchups)
 	race = string.lower(race or '')
 	race = CleanRace[race] or ''
 
-	table.insert(categories, race .. ' ' .. _args.informationType .. 's')
+	local informationType = _args.informationType
+	if informationType == 'Strategy' then
+		informationType = 'Build Order'
+	end
 
-	if _args.informationType == 'Build Order' then
+	table.insert(categories, race .. ' ' .. informationType .. 's')
+
+	if informationType == 'Build Order' then
 		for _, raceMatchupItem in ipairs(_RACE_MATCHUPS) do
 			if String.contains(matchups, raceMatchupItem) then
 				table.insert(categories, raceMatchupItem .. '_Builds')
