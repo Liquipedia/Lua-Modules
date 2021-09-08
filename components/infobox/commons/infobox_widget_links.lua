@@ -34,6 +34,7 @@ local _PRIORITY_GROUPS = {
 		'abiosgaming',
 		'aligulac',
 		'battlefy',
+		'challengermode',
 		'challonge',
 		'cybergamer',
 		'esea',
