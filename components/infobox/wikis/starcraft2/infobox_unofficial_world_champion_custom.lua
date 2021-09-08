@@ -6,8 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---local UnofficialWorldChampion = require('Module:Infobox/UnofficialWorldChampion')
-local UnofficialWorldChampion = require('Module:Hjpalpha/sandbox18')
+local UnofficialWorldChampion = require('Module:Infobox/UnofficialWorldChampion')
 local String = require('Module:StringUtils')
 local RaceIcon = require('Module:RaceIcon')
 local Class = require('Module:Class')
@@ -15,8 +14,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Builder = require('Module:Infobox/Widget/Builder')
---local Breakdown = require('Module:Infobox/Widget/Breakdown')
-local Breakdown = require('Module:Hjpalpha/sandbox2')
+local Breakdown = require('Module:Infobox/Widget/Breakdown')
 
 local CustomUnofficialWorldChampion = Class.new()
 
