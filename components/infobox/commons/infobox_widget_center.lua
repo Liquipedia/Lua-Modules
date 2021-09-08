@@ -30,7 +30,7 @@ function Center:_create(content, classes)
 	end
 
 	local centered = mw.html.create('div'):addClass('infobox-center')
-	for _, class in ipairs(classes) do
+	for _, class in ipairs(classes or {}) do
 		centered:addClass(class)
 	end
 
