@@ -13,26 +13,25 @@ local Breakdown = Class.new(
 	Widget,
 	function(self, input)
 		self.contents = input.content
-		self.options = input.options
+		self.classes = input.classes
 	end
 )
 
 function Breakdown:make()
-	return {Breakdown:_breakdown(self.contents, slef.options)}
+	return {Breakdown:_breakdown(self.contents, self.classes)}
 end
 
-function Breakdown:_breakdown(contents, options)
+function Breakdown:_breakdown(contents, classes)
 	if type(contents) ~= 'table' or contents == {} then
 		return nil
 	end
-	options = options or {}
 
 	local div = mw.html.create('div')
 	local number = #contents
 	for _, content in ipairs(contents) do
 		local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number)
-		if not options.isNotCentered then
-			infoboxCustomCell::addClass('infobox-center')
+		for _, class in pairs(classes or {}) do
+			infoboxCustomCell:addClass(class)
 		end
 		infoboxCustomCell:wikitext(content)
 		div:node(infoboxCustomCell)
