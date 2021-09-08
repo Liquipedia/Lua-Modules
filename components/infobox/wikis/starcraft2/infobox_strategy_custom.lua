@@ -59,7 +59,8 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Popularized by',
-		content = {_args.popularized}
+		content = {_args.popularized},
+		options = {makeLink = true}
 	})
 	table.insert(widgets, Cell{
 		name = 'Converted Form',
