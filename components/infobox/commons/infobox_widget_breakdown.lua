@@ -25,7 +25,6 @@ function Breakdown:_breakdown(contents, classes)
 	if type(contents) ~= 'table' or contents == {} then
 		return nil
 	end
-	options = options or {}
 
 	local div = mw.html.create('div')
 	local number = #contents
