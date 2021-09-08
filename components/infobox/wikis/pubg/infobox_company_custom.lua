@@ -20,7 +20,7 @@ local _args
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell({
 		name = CustomCompany._createSisterCompaniesDescription(_args),
-		content = {self:getAllArgsForBase(_args, 'sister', {})}
+		content = Company:getAllArgsForBase(_args, 'sister', {})
 	}))
 	return widgets
 end
