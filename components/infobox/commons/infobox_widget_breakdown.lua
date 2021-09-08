@@ -13,14 +13,15 @@ local Breakdown = Class.new(
 	Widget,
 	function(self, input)
 		self.contents = input.content
+		self.classes = input.classes
 	end
 )
 
 function Breakdown:make()
-	return {Breakdown:_breakdown(self.contents)}
+	return {Breakdown:_breakdown(self.contents, self.classes)}
 end
 
-function Breakdown:_breakdown(contents)
+function Breakdown:_breakdown(contents, classes)
 	if type(contents) ~= 'table' or contents == {} then
 		return nil
 	end
@@ -28,8 +29,10 @@ function Breakdown:_breakdown(contents)
 	local div = mw.html.create('div')
 	local number = #contents
 	for _, content in ipairs(contents) do
-		local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number
-			.. ' infobox-center')
+		local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number)
+		for _, class in pairs(classes or {}) do
+			infoboxCustomCell:addClass(class)
+		end
 		infoboxCustomCell:wikitext(content)
 		div:node(infoboxCustomCell)
 	end
