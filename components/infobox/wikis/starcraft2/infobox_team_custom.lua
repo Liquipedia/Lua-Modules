@@ -99,7 +99,7 @@ function CustomInjector:parse(id, widgets)
 						return {
 							Title{name = 'Player Breakdown'},
 							Cell{name = 'Number of players', content = {playerBreakDown.playernumber}},
-							Breakdown{content = playerBreakDown.display}
+							Breakdown{content = playerBreakDown.display, classes = {'infobox-center'}}
 						}
 					end
 				end
