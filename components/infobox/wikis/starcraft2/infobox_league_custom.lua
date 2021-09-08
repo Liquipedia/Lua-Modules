@@ -103,8 +103,8 @@ function CustomInjector:parse(id, widgets)
 		if playerNumber > 0 then
 			table.insert(widgets, Title{name = 'Player breakdown'})
 			table.insert(widgets, Cell{name = 'Number of players', content = {playerNumber}})
-			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display})
-			table.insert(widgets, Breakdown{content = playerBreakDownEvent.display})
+			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
+			table.insert(widgets, Breakdown{content = playerBreakDownEvent.display, classes = {'infobox-center'}})
 		end
 
 		--teams section
