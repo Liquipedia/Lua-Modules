@@ -14,21 +14,25 @@ local Center = Class.new(
 	Widget,
 	function(self, input)
 		self.content = input.content
+		self.classes = input.classes
 	end
 )
 
 function Center:make()
 	return {
-		Center:_create(self.content)
+		Center:_create(self.content, self.classes)
 	}
 end
 
-function Center:_create(content)
+function Center:_create(content, classes)
 	if Table.isEmpty(content) then
 		return nil
 	end
 
 	local centered = mw.html.create('div'):addClass('infobox-center')
+	for _, class in ipairs(classes) do
+		centered:addClass(class)
+	end
 
 	for _, item in pairs(content) do
 		centered:wikitext(item)
