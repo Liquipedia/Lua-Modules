@@ -28,6 +28,8 @@ function Campaign:createInfobox()
 		Header{name = self.name, image = args.image},
 		Center{content = {args.caption}},
 	}
+	
+	infobox:categories('Campaign')
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
