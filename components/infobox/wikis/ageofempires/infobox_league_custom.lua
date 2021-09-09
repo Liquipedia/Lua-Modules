@@ -42,26 +42,10 @@ function CustomLeague:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomInjector:addCustomCells(widgets)
-	local args = _league.args
-
-	table.insert(widgets, Cell{
-		name = 'Number of teams',
-		content = {args.team_number}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Number of players',
-		content = {args.player_number}
-	})
-
-	return widgets
-end
-
 function CustomInjector:parse(id, widgets)
 	local args = _league.args
 
-	if id == 'server' then
+	if id == 'gamesettings' then
 		table.insert(widgets, Cell{
 			name = 'Game',
 			content = {Page.makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or '')}
@@ -83,35 +67,23 @@ function CustomInjector:parse(id, widgets)
 		})
 
 		table.insert(widgets, Cell{
-			name = 'Game mode',
-			content = CustomLeague:_getGameModes(args)
+			name = 'Game Mode',
+			content = CustomLeague:_getGameModes(args, true)
 		})
 	elseif id == 'customcontent' then
-		if not String.isEmpty(args.map1) then
-			local map1mode = ''
-			if not String.isEmpty(args.map1mode) then
-				map1mode = MapMode.get({args.map1mode})
-			end
+		local playertitle = (not String.isEmpty(args.team_number)) and 'Teams' or 'Players'
 
-			local maps = {Page.makeInternalLink(args.map1, args.map1 .. map1mode)}
-			local index  = 2
+		table.insert(widgets, Title{name = playertitle})
 
-			while not String.isEmpty(args['map' .. index]) do
-				local mapmode = ''
-				if not String.isEmpty(args['map' .. index .. 'mode']) then
-					mapmode = MapMode.get({args['map' .. index .. 'mode']})
-				end
-				table.insert(maps, '&nbsp;• ' ..
-					tostring(CustomLeague:_createNoWrappingSpan(
-						Page.makeInternalLink(args['map' .. index], args['map' .. index] .. mapmode)
-					))
-				)
-				index = index + 1
-			end
+		table.insert(widgets, Cell{
+			name = 'Number of Teams',
+			content = {args.team_number}
+		})
 
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = maps})
-		end
+		table.insert(widgets, Cell{
+			name = 'Number of Players',
+			content = {args.player_number}
+		})
 
 		if not String.isEmpty(args.team1) then
 			local teams = {Page.makeInternalLink(args.team1)}
@@ -126,8 +98,33 @@ function CustomInjector:parse(id, widgets)
 				index = index + 1
 			end
 
-			table.insert(widgets, Title{name = 'Teams'})
 			table.insert(widgets, Center{content = teams})
+		end
+
+		if not String.isEmpty(args.map1) then
+			local map1mode = ''
+			if not String.isEmpty(args.map1mode) then
+				map1mode = MapMode.get({args.map1mode})
+			end
+
+			local maps = {Page.makeInternalLink(args.map1 .. map1mode, args.map1)}
+			local index  = 2
+
+			while not String.isEmpty(args['map' .. index]) do
+				local mapmode = ''
+				if not String.isEmpty(args['map' .. index .. 'mode']) then
+					mapmode = MapMode.get({args['map' .. index .. 'mode']})
+				end
+				table.insert(maps, '&nbsp;• ' ..
+					tostring(CustomLeague:_createNoWrappingSpan(
+						Page.makeInternalLink(args['map' .. index] .. mapmode, args['map' .. index])
+					))
+				)
+				index = index + 1
+			end
+
+			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Center{content = maps})
 		end
 	elseif id == 'prizepool' then
 		return {
@@ -139,15 +136,15 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'liquipediatier' then
 		return {
 			Cell{
-				name = 'Tier',
+				name = 'Liquipedia Tier',
 				content = {CustomLeague:_createTier(args)}
 			}
 		}
-	elseif id == 'organizer' then
+	elseif id == 'sponsors' then
 		local sponsors = mw.text.split(args.sponsors, ',', true)
 		table.insert(widgets, Cell{
 			name = 'Sponsor(s)',
-			content = table.concat(sponsors, '&nbsp;•')
+			content = {table.concat(sponsors, '&nbsp;• ')}
 		})
 	end
 
@@ -172,19 +169,17 @@ function CustomLeague:getWikiCategories(args)
 end
 
 function CustomLeague:_createTier(args)
-	local cell = {name = 'Liquipedia Tier'}
-
 	local content = ''
 
 	local tier = args.liquipediatier
 
 	if String.isEmpty(tier) then
-		return cell
+		return content
 	end
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(),
-										'TierDisplay/link',
-										{ tier, GameLookup.getName({args.game})})
+											'TierDisplay/link',
+											{tier, GameLookup.getName({args.game})})
 	local type = args.liquipediatiertype
 
 	if not String.isEmpty(type) then
@@ -194,8 +189,7 @@ function CustomLeague:_createTier(args)
 		content = content .. tierDisplay
 	end
 
-	cell.content = {content}
-	return cell
+	return content
 end
 
 function CustomLeague:_createPrizepool(args)
@@ -227,7 +221,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
-	Variables.varDefine('tournament_sponsors', CustomLeague:_concatArgs(args, 'sponsor'))
+	Variables.varDefine('tournament_sponsors', args.sponsors)
 	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
 	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
 	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
@@ -269,7 +263,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
-		mode = not String.empty(args.gamemode) and args.gamemode or 'rm',
+		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ',')
 	}
 
 	return lpdbData
@@ -296,9 +290,8 @@ end
 function CustomLeague:_makeVersionLink(args)
 	if String.isEmpty(args.version) then return nil end
 	local content = GameLookup.getName({args.game}) .. '/' .. args.version
-	content = content .. '|' .. args.version
 
-	return Page.makeInternalLink(content)
+	return Page.makeInternalLink(args.version, content)
 end
 
 function CustomLeague:_makePatchLink(args)
@@ -306,27 +299,36 @@ function CustomLeague:_makePatchLink(args)
 
 	local content
 	local patch =  GameLookup.getName({args.game}) .. '/' .. args.version .. '/' .. args.patch
-	content = Page.makeInternalLink(patch, args.patch)
+	content = Page.makeInternalLink(args.patch, patch)
 
 	if not String.isEmpty(args.epatch) then
 		content = content .. '&nbsp;&ndash;&nbsp;'
 		local epatch = GameLookup.getName({args.game}) .. '/' .. args.version .. '/' .. args.epatch
-		epatch = Page.makeInternalLink(epatch, args.epatch)
+		epatch = Page.makeInternalLink(args.epatch, epatch)
 		content = content .. epatch
 	end
 
 	return content
 end
 
-function CustomLeague:_getGameModes(args)
+function CustomLeague:_getGameModes(args, makeLink)
+	makeLink = makeLink or false
+
 	if String.isEmpty(args.gamemode) then
-		return Page.makeInternalLink(GameModeLookup.getDefault(args.game or ''))
+		local default = GameModeLookup.getDefault(args.game or '')
+		if makeLink then
+			default = Page.makeInternalLink(default)
+		end
+		return {default}
 	end
 
 	local gameModes = mw.text.split(args.gamemode, ',', true)
 	table.foreach(gameModes,
 		function(index, mode)
-			gameModes[index] = Page.makeInternalLink(GameModeLookup.getName(mode) or '')
+			gameModes[index] = GameModeLookup.getName(mode) or ''
+			if makeLink then
+				gameModes[index] = Page.makeInternalLink(gameModes[index])
+			end
 		end
 	)
 
