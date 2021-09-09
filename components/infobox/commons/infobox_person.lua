@@ -49,7 +49,7 @@ function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
-	if String.isEmpty(args.id)
+	if String.isEmpty(args.id) then
 		error('You need to specify an "id"')
 	end
 
