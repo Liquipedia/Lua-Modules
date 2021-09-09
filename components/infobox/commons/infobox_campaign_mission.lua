@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local String = require('Module:String')
 local Namespace = require('Module:Namespace')
 local BasicInfobox = require('Module:Infobox/Basic')
 
@@ -36,7 +35,10 @@ function Mission:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Mission Information'},
-		Breakdown{content = {'Mission Objective'}, classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-3'}},
+		Breakdown{
+			content = {'Mission Objective'},
+			classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-3'}
+		},
 		Breakdown{content = { args.objective }},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
