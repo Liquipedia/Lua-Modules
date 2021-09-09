@@ -35,7 +35,7 @@ local Person = Class.new(BasicInfobox)
 
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
-local _should_store_data
+local _shouldStoreData
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -45,7 +45,7 @@ end
 function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	_should_store_data = Person:shouldStoreData(args)
+	_shouldStoreData = Person:shouldStoreData(args)
 
 	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
@@ -58,7 +58,7 @@ function Person:createInfobox()
 			args.birth_location,
 			args.death_date,
 			personType.category,
-			_should_store_data
+			_shouldStoreData
 		)
 
 	local widgets = {
@@ -152,7 +152,7 @@ function Person:createInfobox()
 	infobox:bottom(self:createBottomContent())
 
 	local statusToStore
-	if _should_store_data then
+	if _shouldStoreData then
 		Variables.varDefine('earnings', earnings)
 		statusToStore = self:getStatusToStore(args)
 		infobox:categories(unpack(self:getCategories(
@@ -165,7 +165,7 @@ function Person:createInfobox()
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
-	if _should_store_data then
+	if _shouldStoreData then
 		self:_setLpdbData(
 			args,
 			links,
