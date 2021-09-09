@@ -60,8 +60,8 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'header' then
-	--fallback for non main space
-	_fullGameName = _fullGameName or _GAME_SWITCH[_args.game] or 'Wings of Liberty'
+		--fallback for non main space
+		_fullGameName = _fullGameName or _GAME_SWITCH[_args.game] or 'Wings of Liberty'
 
 		return {
 			Header{
