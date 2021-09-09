@@ -13,6 +13,7 @@ local Header = Class.new(
 	Widget,
 	function(self, input)
 		self.name = input.name
+		self.subHeader = input.subHeader
 		self.image = input.image
 		self.imageDefault = input.imageDefault
 		self.size = input.size
@@ -22,18 +23,31 @@ local Header = Class.new(
 function Header:make()
 	return {
 		Header:_name(self.name),
+		Header:_subHeader(self.subHeader),
 		Header:_image(self.image, self.imageDefault, self.size)
 	}
 end
 
 function Header:_name(name)
 	local pagename = name or mw.title.getCurrentTitle().text
-	local infoboxHeader = mw.html.create('div'):addClass('infobox-header')
+	local infoboxHeader = mw.html.create('div')
 	infoboxHeader	:addClass('infobox-header')
 					:addClass('wiki-backgroundcolor-light')
 					:node(self:_createInfoboxButtons())
 					:wikitext(pagename)
 	return mw.html.create('div'):node(infoboxHeader)
+end
+
+function Header:_subHeader(subHeader)
+	if not subHeader then
+		return nil
+	end
+	local infoboxSubHeader = mw.html.create('div')
+	infoboxSubHeader:addClass('infobox-header')
+					:addClass('wiki-backgroundcolor-light')
+					:addClass('infobox-header-2')
+					:wikitext(subHeader)
+	return mw.html.create('div'):node(infoboxSubHeader)
 end
 
 function Header:_image(fileName, default, size)
