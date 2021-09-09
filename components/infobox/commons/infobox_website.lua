@@ -7,9 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local Namespace = require('Module:Namespace')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Links = require('Module:Links')
+local Table = require('Module:Table')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -44,7 +44,7 @@ function Website:createInfobox()
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
-				links = Links.transform(args)
+				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
