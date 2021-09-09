@@ -48,7 +48,7 @@ end
 function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	_should_store_data = Person:shouldStoreData(args)
+	_shouldStoreData = Person:shouldStoreData(args)
 
 	if String.isEmpty(args.id) then
 		error('You need to specify an "id"')
