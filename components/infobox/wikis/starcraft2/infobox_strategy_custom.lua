@@ -14,20 +14,13 @@ local RaceIcon = require('Module:RaceIcon')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Header = require('Module:Infobox/Widget/Header')
+local CleanRace = mw.loadData('Module:CleanRace2')
 
 local CustomStrategy = Class.new()
 
 local _strategy
 local _args
 
-local _RACE_CATEGORIES = {
-	z = 'Zerg_Build_Orders',
-	zerg = 'Zerg_Build_Orders',
-	p = 'Protoss_Build_Orders',
-	protoss = 'Protoss_Build_Orders',
-	t = 'Terran_Build_Orders',
-	terran = 'Terran_Build_Orders',
-}
 local _RACE_MATCHUPS = {
 	'ZvZ', 'ZvP', 'ZvT',
 	'TvZ', 'TvP', 'TvT',
@@ -51,7 +44,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Matchups',
-		content = {_args.matchups}
+		content = {_args.matchups or 'All'}
 	})
 	table.insert(widgets, Cell{
 		name = 'Type',
@@ -107,10 +100,20 @@ end
 function CustomStrategy:_getCategories(race, matchups)
 	local categories = {}
 	race = string.lower(race or '')
-	table.insert(categories, _RACE_CATEGORIES[race] or 'Build Orders')
-	for _, raceMatchupItem in ipairs(_RACE_MATCHUPS) do
-		if String.contains(matchups, raceMatchupItem) then
-			table.insert(categories, raceMatchupItem .. '_Builds')
+	race = CleanRace[race] or ''
+
+	local informationType = _args.informationType
+	if informationType == 'Strategy' then
+		informationType = 'Build Order'
+	end
+
+	table.insert(categories, race .. ' ' .. informationType .. 's')
+
+	if informationType == 'Build Order' then
+		for _, raceMatchupItem in ipairs(_RACE_MATCHUPS) do
+			if String.contains(matchups, raceMatchupItem) then
+				table.insert(categories, raceMatchupItem .. '_Builds')
+			end
 		end
 	end
 

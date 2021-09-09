@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
+local String = require('Module:String')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -28,13 +29,17 @@ function Strategy:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
+	if String.isEmpty(args.informationType) then
+		error('You need to specify an informationType, e.g. "Strategy", "Technique, ...')
+	end
+
 	local widgets = {
 		Customizable{id = 'header', children = {
 				Header{name = args.name, image = args.image},
 			}
 		},
 		Center{content = {args.caption}},
-		Title{name = 'Strategy Information'},
+		Title{name = args.informationType .. ' Information'},
 		Cell{
 			name = 'Creator(s)',
 			content = {args.creator or args['created-by']},
