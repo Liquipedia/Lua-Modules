@@ -330,7 +330,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		table.insert(categories, 'Active ' .. personType .. 's')
 	end
 	if not args.id then
-		table.insert(categories, 'InfoboxIncomplete.')
+		table.insert(categories, 'InfoboxIncomplete')
 	end
 	if not args.image then
 		table.insert(categories, personType .. 's with no profile picture')
