@@ -23,7 +23,7 @@ function Title:make()
 	}
 end
 
-function Title:_create(infoDescription. level)
+function Title:_create(infoDescription, level)
 	level = tonumber(level or 2)
 	--only allow "3" as manual entry for the level
 	if level ~= 3 then
