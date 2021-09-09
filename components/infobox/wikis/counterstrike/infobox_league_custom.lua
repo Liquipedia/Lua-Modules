@@ -124,7 +124,7 @@ function CustomInjector:parse(id, widgets)
 				content = {CustomLeague:_createEslProTierCell(args.eslprotier)}
 			},
 			Cell{
-				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. 'Tier',
+				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
 				content = {CustomLeague:_createValveTierCell(args.valvetier)},
 				classes = {'valvepremier-highlighted'}
 			},
