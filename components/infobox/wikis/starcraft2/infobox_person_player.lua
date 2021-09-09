@@ -88,8 +88,8 @@ local _militaryStore
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Header = require('Module:Infobox/Widget/Header')
 local Title = require('Module:Infobox/Widget/Title')
+local Center = require('Module:Infobox/Widget/Center')
 
 local CustomPlayer = Class.new()
 
@@ -113,7 +113,7 @@ function CustomPlayer.run(frame)
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	
+
 	_SHOULD_QUERY_DATA = CustomPlayer:shouldStoreData()
 
 	return player:createInfobox(frame)
@@ -233,7 +233,6 @@ function CustomPlayer:shouldStoreData()
 end
 
 function CustomPlayer._getMatchupData(player)
-	local category = ''
 	local yearsActive
 	player = string.gsub(player, '_', ' ')
 	local cond = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]'
@@ -256,6 +255,7 @@ function CustomPlayer._getMatchupData(player)
 			years[tonumber(string.sub(data[i].date, 1, 4))] = string.sub(data[i].date, 1, 4)
 		end
 
+		local category
 		if years[_CURRENT_YEAR] or years[_CURRENT_YEAR - 1] or years[_CURRENT_YEAR - 2] then
 			category = 'Active players'
 			Variables.varDefine('isActive', 'true')
