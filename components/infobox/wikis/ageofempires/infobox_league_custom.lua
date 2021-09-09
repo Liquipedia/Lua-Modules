@@ -22,6 +22,9 @@ local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local Page = require('Module:Page')
 
+local Versions = mw.loadData('Module:Games/Versions')
+
+
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
@@ -47,23 +50,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		table.insert(widgets, Cell{
-			name = 'Game',
-			content = {Page.makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or '')}
-		})
-
-		table.insert(widgets, Cell{
-			name = 'Version',
-			content = {CustomLeague:_makeVersionLink(args)}
-		})
-
-		table.insert(widgets, Cell{
-			name = 'Patch',
-			content = {CustomLeague:_makePatchLink(args)}
-		})
-
-		table.insert(widgets, Cell{
-			name = 'Voobly & WololoKingdoms',
-			content = {args.voobly}
+			name = 'Game Version',
+			content = CustomLeague:_getGameVersion(args)
 		})
 
 		table.insert(widgets, Cell{
@@ -287,33 +275,48 @@ function CustomLeague:_createNoWrappingSpan(content)
 	return span
 end
 
-function CustomLeague:_makeVersionLink(args)
-	if String.isEmpty(args.version) then return nil end
-	local content = GameLookup.getName({args.game}) .. '/' .. args.version
+function CustomLeague:_getGameVersion(args)
+	local gameversion = {}
 
-	return Page.makeInternalLink(args.version, content)
+	if not String.isEmpty(args.game) then
+		table.insert(gameversion,
+			Page.makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or '')
+		)
+
+		if not String.isEmpty(args.version) then
+			table.insert(gameversion,
+				GameLookup.makeVersionLink({game = args.game, version = args.version}) or args.version
+			)
+		end
+
+		if not String.isEmpty(args.patch) then
+			table.insert(gameversion,
+				CustomLeague:_makePatchLink(args)
+			)
+		end
+
+		if not String.isEmpty(args.voobly) then
+			table.insert(gameversion, args.voobly)
+		end
+	end
+
+	return gameversion
 end
 
-function CustomLeague:_makePatchLink(args)
-	if String.isEmpty(args.patch) then return nil end
 
-	local content
-	local patch =  GameLookup.getName({args.game}) .. '/' .. args.version .. '/' .. args.patch
-	content = Page.makeInternalLink(args.patch, patch)
+function CustomLeague:_makePatchLink(args)
+	local content = GameLookup.makePatchLink({game = args.game, version = args.version, patch = args.patch})
 
 	if not String.isEmpty(args.epatch) then
 		content = content .. '&nbsp;&ndash;&nbsp;'
-		local epatch = GameLookup.getName({args.game}) .. '/' .. args.version .. '/' .. args.epatch
-		epatch = Page.makeInternalLink(args.epatch, epatch)
-		content = content .. epatch
-	end
+		local version = not String.isEmpty(args.eversion) and args.eversion or args.version
 
+		content = content .. GameLookup.makePatchLink({game = args.game, version = version, patch = args.epatch})
+	end
 	return content
 end
 
 function CustomLeague:_getGameModes(args, makeLink)
-	makeLink = makeLink or false
-
 	if String.isEmpty(args.gamemode) then
 		local default = GameModeLookup.getDefault(args.game or '')
 		if makeLink then
