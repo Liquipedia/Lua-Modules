@@ -13,20 +13,27 @@ local Title = Class.new(
 	Widget,
 	function(self, input)
 		self.content = self:assertExistsAndCopy(input.name)
+		self.level = input.level
 	end
 )
 
 function Title:make()
 	return {
-		Title:_create(self.content)
+		Title:_create(self.content, self.level)
 	}
 end
 
-function Title:_create(infoDescription)
+function Title:_create(infoDescription. level)
+	level = tonumber(level or 2)
+	--only allow "3" as manual entry for the level
+	if level ~= 3 then
+		level = 2
+	end
+
 	local header = mw.html.create('div')
 	header	:addClass('infobox-header')
 			:addClass('wiki-backgroundcolor-light')
-			:addClass('infobox-header-2')
+			:addClass('infobox-header-' .. level)
 			:wikitext(infoDescription)
 	return mw.html.create('div'):node(header)
 end
