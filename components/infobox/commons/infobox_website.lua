@@ -37,8 +37,6 @@ function Website:createInfobox()
 		Cell{name = 'Type', content = {args.type}},
 		Cell{name = 'Available language(s)', content = self:getAllArgsForBase(args, 'language')},
 		Cell{name = 'Content license', content = {args.content_license}},
-		Cell{name = 'Owner', content = {args.owner}},
-		Cell{name = 'Created by', content = {args.author}},
 		Cell{name = 'Launched', content = {args.date_of_launch}},
 		Cell{name = 'Current status', content = {args.current_status}},
 		Customizable{id = 'custom', children = {}},
