@@ -288,9 +288,7 @@ function League:_createLocation(details)
 		end
 
 		content = Flags._Flag(details.country) .. '&nbsp;' ..
-			'[[:Category:' .. nationality .. ' Tournaments|' ..
-			displayText .. ']]' ..
-			'[[Category:' .. nationality .. ' Tournaments]]'
+			displayText .. '[[Category:' .. nationality .. ' Tournaments]]'
 	end
 
 	if not String.isEmpty(details.country2) then
@@ -308,9 +306,7 @@ function League:_createLocation(details)
 			end
 
 			content = content .. Flags._Flag(details.country2) .. '&nbsp;' ..
-				'[[:Category:' .. nationality2 .. ' Tournaments|' ..
-				displayText .. ']]' ..
-				'[[Category:' .. nationality2 .. ' Tournaments]]'
+				displayText .. '[[Category:' .. nationality2 .. ' Tournaments]]'
 		end
 	end
 
