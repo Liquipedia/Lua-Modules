@@ -81,7 +81,7 @@ local _CLEAN_OTHER_ROLES = {
 
 local _earningsGlobal = {}
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
-local _SHOULD_QUERY_DATA
+local _shouldQueryData
 local _raceData
 local _statusStore
 local _militaryStore
@@ -112,7 +112,7 @@ function CustomPlayer.run(frame)
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
-	_SHOULD_QUERY_DATA = CustomPlayer:shouldStoreData()
+	_shouldQueryData = CustomPlayer:shouldStoreData()
 
 	return player:createInfobox(frame)
 end
@@ -125,7 +125,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'status' then return {}
 	elseif id == 'achievements' then
 		local achievementCells = {}
-		if _SHOULD_QUERY_DATA then
+		if _shouldQueryData then
 			local achievements = Achievements({}, _PAGENAME)
 			if not String.isEmpty(achievements) then
 				table.insert(achievementCells, Center{content = achievements})
@@ -159,7 +159,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	local rank1, rank2
 	local yearsActive
-	if _SHOULD_QUERY_DATA and not _statusStore then
+	if _shouldQueryData and not _statusStore then
 		rank1, rank2 = CustomPlayer._getRank(_PAGENAME)
 		yearsActive = CustomPlayer._getMatchupData(_PAGENAME)
 	end
@@ -211,7 +211,7 @@ function CustomPlayer._getRaceData(race)
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if _SHOULD_QUERY_DATA then
+	if _shouldQueryData then
 		return tostring(Matches._get_ongoing({})) ..
 			tostring(Matches._get_upcoming({})) ..
 			tostring(Matches._get_recent({}))
@@ -541,7 +541,7 @@ function CustomPlayer._military(military)
 end
 
 function CustomPlayer._getAllkills()
-	if _SHOULD_QUERY_DATA then
+	if _shouldQueryData then
 		local allkillsData = mw.ext.LiquipediaDB.lpdb('datapoint', {
 			conditions = '[[pagename::' .. _PAGENAME .. ']] AND [[type::allkills]]',
 			query = 'information',
