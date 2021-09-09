@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Links = require('Module:Links')
-local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -39,14 +38,14 @@ local _LINK_VARIANT = 'player'
 local _should_store_data
 
 function Person.run(frame)
-	local Person = Person(frame)
-	return Person:createInfobox()
+	local person = Person(frame)
+	return person:createInfobox()
 end
 
 function Person:createInfobox()
-	_should_store_data = Person:shouldStoreData(args)
 	local infobox = self.infobox
 	local args = self.args
+	_should_store_data = Person:shouldStoreData(args)
 
 	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
@@ -152,9 +151,10 @@ function Person:createInfobox()
 
 	infobox:bottom(self:createBottomContent())
 
+	local statusToStore
 	if _should_store_data then
 		Variables.varDefine('earnings', earnings)
-		local statusToStore = self:getStatusToStore(args)
+		statusToStore = self:getStatusToStore(args)
 		infobox:categories(unpack(self:getCategories(
 					args,
 					birthDisplay,
@@ -207,7 +207,7 @@ function Person:_setLpdbData(args, links, birthday, deathday, status, personType
 	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
 	local storageType = self:getStorageType(args, personType, status)
 
-	mw.ext.LiquipediaDB.lpdb_player(storageType .. self.name, lpdbData)	
+	mw.ext.LiquipediaDB.lpdb_player(storageType .. self.name, lpdbData)
 end
 
 --- Allows for overriding this functionality
