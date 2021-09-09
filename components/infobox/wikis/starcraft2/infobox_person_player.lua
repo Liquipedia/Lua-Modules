@@ -101,14 +101,12 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 
-	--mostly storage related custom functions
 	player.shouldStoreData = CustomPlayer.shouldStoreData
 	player.getStatusToStore = CustomPlayer.getStatusToStore
 	player.getStorageType = CustomPlayer.getStorageType
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.getPersonType = CustomPlayer.getPersonType
 
-	--mostly display related custom functions
 	player.nameDisplay = CustomPlayer.nameDisplay
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createBottomContent = CustomPlayer.createBottomContent
