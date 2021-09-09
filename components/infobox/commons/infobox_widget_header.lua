@@ -23,7 +23,6 @@ local Header = Class.new(
 function Header:make()
 	return {
 		Header:_name(self.name),
-		Header:_subHeader(self.subHeader),
 		Header:_image(self.image, self.imageDefault, self.size)
 	}
 end
