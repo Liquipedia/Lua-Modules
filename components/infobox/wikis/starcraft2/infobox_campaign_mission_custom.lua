@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Mission = require('Module:Infobox/Mission')
+local Mission = require('Module:Infobox/CampaignMission')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
