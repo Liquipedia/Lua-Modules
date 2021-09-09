@@ -45,6 +45,11 @@ end
 function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
+
+	if String.isEmpty(args.id)
+		error('You need to specify an "id"')
+	end
+
 	_shouldStoreData = Person:shouldStoreData(args)
 
 	--set those already here as they are needed in several functions below
@@ -328,9 +333,6 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		table.insert(categories, 'Retired ' .. personType .. 's')
 	else
 		table.insert(categories, 'Active ' .. personType .. 's')
-	end
-	if not args.id then
-		table.insert(categories, 'InfoboxIncomplete')
 	end
 	if not args.image then
 		table.insert(categories, personType .. 's with no profile picture')
