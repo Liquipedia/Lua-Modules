@@ -30,7 +30,7 @@ function Strategy:createInfobox()
 	local args = self.args
 
 	if String.isEmpty(args.informationType) then
-		error('You need to specify an informationType, e.g. "Strastegy", "Technique, ...')
+		error('You need to specify an informationType, e.g. "Strategy", "Technique, ...')
 	end
 
 	local widgets = {
