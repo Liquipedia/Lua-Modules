@@ -22,8 +22,6 @@ local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local Page = require('Module:Page')
 
-local Versions = mw.loadData('Module:Games/Versions')
-
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
