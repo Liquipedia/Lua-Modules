@@ -103,7 +103,6 @@ function CustomPlayer.run(frame)
 
 	player.shouldStoreData = CustomPlayer.shouldStoreData
 	player.getStatusToStore = CustomPlayer.getStatusToStore
-	player.getStorageType = CustomPlayer.getStorageType
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.getPersonType = CustomPlayer.getPersonType
 
