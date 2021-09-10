@@ -484,7 +484,8 @@ end
 
 -- Get Playerdata from Vars (get's set in TeamCards)
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	local count = 1 -- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
+	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
+	local count = 1
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = match['opponent' .. opponentIndex .. '_p' .. playerIndex] or {}
