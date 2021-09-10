@@ -74,22 +74,22 @@ function Person:createInfobox()
 		Cell{name = 'Romanized Name', content = {args.romanized_name}},
 		Cell{name = 'Birth', content = {birthDisplay}},
 		Cell{name = 'Died', content = {deathDisplay}},
+		Cell{
+			name = 'Nationality',
+			content = self:_createLocations(args, personType.category)
+		},
+		Cell{name = 'Region', content = {
+				self:_createRegion(args.region)
+			}
+		},
 		Customizable{id = 'status', children = {
 			Cell{name = 'Status', content = { args.status }
 				}
 			}
 		},
-		Customizable{id = 'roleorfaction', children = {
+		Customizable{id = 'role', children = {
 			Cell{name = 'Role', content = { args.role }
 				}
-			}
-		},
-		Cell{
-			name = 'Country',
-			content = self:_createLocations(args, personType.category)
-		},
-		Cell{name = 'Region', content = {
-				self:_createRegion(args.region)
 			}
 		},
 		Customizable{id = 'teams', children = {
