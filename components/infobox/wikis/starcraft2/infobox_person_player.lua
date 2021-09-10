@@ -118,7 +118,7 @@ function CustomPlayer.run(frame)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'roleorfaction' then
+	if id == 'role' then
 		return { Cell{name = 'Race', content = { _raceData.display }
 			}
 		}
