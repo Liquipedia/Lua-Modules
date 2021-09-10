@@ -23,9 +23,14 @@ local Header = Class.new(
 function Header:make()
 	local header = {
 		Header:_name(self.name),
-		Header:_subHeader(self.subHeader)
+		Header:_image(self.image, self.imageDefault, self.size)
 	}
-	table.insert(header, Header:_image(self.image, self.imageDefault, self.size))
+
+	local subHeader = Header:_subHeader(self.subHeader)
+	if subHeader then
+		table.insert(header, 2, subHeader)
+	end
+
 	return header
 end
 
