@@ -21,10 +21,17 @@ local Header = Class.new(
 )
 
 function Header:make()
-	return {
+	local header = {
 		Header:_name(self.name),
 		Header:_image(self.image, self.imageDefault, self.size)
 	}
+
+	local subHeader = Header:_subHeader(self.subHeader)
+	if subHeader then
+		table.insert(header, 2, subHeader)
+	end
+
+	return header
 end
 
 function Header:_name(name)
