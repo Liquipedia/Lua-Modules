@@ -27,32 +27,17 @@ local _FACTION2 = {
 	['zt'] = 'Terran', ['zp'] = 'Protoss'
 }
 local _RACE_CATEGORY = {
-	['p'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]',
-	['pt'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
-		'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['pz'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
-		'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['t'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]]',
-	['tp'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
-		'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['tz'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
-		'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['z'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]',
-	['zt'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
-		'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['zp'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
-		'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['r'] = '[[:Category:Random Players|Random]][[Category:Random Players]]',
-	['a'] = '[[:Category:Protoss Players|Protoss]],&nbsp;' ..
-		'[[:Category:Terran Players|Terran]],&nbsp;[[:Category:Zerg Players|Zerg]]' ..
-		'[[Category:Protoss Players]][[Category:Terran Players]]' ..
-		'[[Category:Zerg Players]][[Category:Players with multiple races]]'
+	['p'] = '[[Protoss]]',
+	['pt'] = '[[Protoss]],&nbsp;[[Terran]]',
+	['pz'] = '[[Protoss]],&nbsp;[[Zerg]]',
+	['t'] = '[[Terran]]',
+	['tp'] = '[[Terran]],&nbsp;[[Protoss]]',
+	['tz'] = '[[Terran]],&nbsp;[[Zerg]]',
+	['z'] = '[[Zerg]]',
+	['zt'] = '[[Zerg]],&nbsp;[[Terran]]',
+	['zp'] = '[[Zerg]],&nbsp;[[Protoss]]',
+	['r'] = '[[Random]]',
+	['a'] = '[[Protoss]],&nbsp;[[Terran]],&nbsp;[[Zerg]]',
 }
 
 --role stuff tables
@@ -201,19 +186,19 @@ function CustomMapMaker._military(military)
 		military = string.lower(military)
 		local militaryCategory = ''
 		if String.Contains(military, 'starting') or String.Contains(military, 'pending') then
-			militaryCategory = '[[Category:MapMakers waiting for Military Duty]]'
+			militaryCategory = '[[Category:Mapmakers waiting for Military Duty]]'
 			_militaryStore = 'pending'
 		elseif
 			String.Contains(military, 'ending') or String.Contains(military, 'started')
 			or String.Contains(military, 'ongoing')
 		then
-			militaryCategory = '[[Category:MapMakers on Military Duty]]'
+			militaryCategory = '[[Category:Mapmakers on Military Duty]]'
 			_militaryStore = 'ongoing'
 		elseif String.Contains(military, 'fulfilled') then
-			militaryCategory = '[[Category:MapMakers expleted Military Duty]]'
+			militaryCategory = '[[Category:Mapmakers expleted Military Duty]]'
 			_militaryStore = 'fulfilled'
 		elseif String.Contains(military, 'exempted') then
-			militaryCategory = '[[Category:MapMakers exempted from Military Duty]]'
+			militaryCategory = '[[Category:Mapmakers exempted from Military Duty]]'
 			_militaryStore = 'exempted'
 		end
 
@@ -242,9 +227,12 @@ function CustomMapMaker:getPersonType()
 	local role = _args.role or _args.occupation or 'map maker'
 	role = string.lower(role)
 	local category = _ROLES[role]
-	local store = category or _CLEAN_OTHER_ROLES[role] or 'Map Maker'
+	local store = category or _CLEAN_OTHER_ROLES[role] or 'Map maker'
+	if category == 'Map Maker' then
+		category = 'Mapmaker'
+	end
 
-	return { store = store, category = category or 'Map Maker' }
+	return { store = store, category = category or 'Mapmaker' }
 end
 
 return CustomMapMaker
