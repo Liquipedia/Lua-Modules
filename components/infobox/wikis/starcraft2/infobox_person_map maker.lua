@@ -75,7 +75,6 @@ function CustomMapMaker.run(frame)
 
 	mapMaker.shouldStoreData = CustomMapMaker.shouldStoreData
 	mapMaker.getStatusToStore = CustomMapMaker.getStatusToStore
-	mapMaker.getStorageType = CustomMapMaker.getStorageType
 	mapMaker.adjustLPDB = CustomMapMaker.adjustLPDB
 	mapMaker.getPersonType = CustomMapMaker.getPersonType
 
