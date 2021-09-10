@@ -70,7 +70,6 @@ local _CLEAN_OTHER_ROLES = {
 	['content producer'] = 'Content producer', ['streamer'] = 'false',
 }
 
-local _shouldQueryData
 local _raceData
 local _statusStore
 local _militaryStore
@@ -78,7 +77,6 @@ local _militaryStore
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
 
 local CustomMapMaker = Class.new()
 
@@ -98,8 +96,6 @@ function CustomMapMaker.run(frame)
 
 	mapMaker.nameDisplay = CustomMapMaker.nameDisplay
 	mapMaker.createWidgetInjector = CustomMapMaker.createWidgetInjector
-
-	_shouldQueryData = CustomMapMaker:shouldStoreData()
 
 	return mapMaker:createInfobox(frame)
 end
