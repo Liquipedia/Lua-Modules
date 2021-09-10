@@ -92,14 +92,12 @@ function Person:createInfobox()
 				self:_createRegion(args.region)
 			}
 		},
-		Cell{name = 'Team', content = {
-				self:_createTeam(args.team, args.teamlink),
-				self:_createTeam(args.team2, args.teamlink2)
-			}
-		},
-		Cell{name = 'Clan', content = {
-				self:_createTeam(args.clan, args.clanlink),
-				self:_createTeam(args.clan2, args.clanlink2)
+		Customizable{id = 'teams', children = {
+			Cell{name = 'Team', content = {
+						self:_createTeam(args.team, args.teamlink),
+						self:_createTeam(args.team2, args.teamlink2)
+					}
+				}
 			}
 		},
 		Cell{name = 'Alternate IDs', content = {args.ids or args.alternateids}},
