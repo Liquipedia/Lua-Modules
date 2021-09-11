@@ -182,6 +182,7 @@ function CustomSeries._addCustomVariables(args)
 		--needed for e.g. External Cups Lists
 		local name = args.name or mw.title.getCurrentTitle().text
 		VarDefine('tournament_icon', args.icon or '')
+		VarDefine('tournament_icon_darkmode', args.icondarkmode or '')
 		VarDefine('featured', args.featured or '')
 		VarDefine('headtohead', args.headtohead or '')
 		VarDefine('tournament_tier', args.liquipediatier or '')
