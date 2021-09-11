@@ -163,6 +163,7 @@ function Team:_setLpdbData(args, links)
 		location = args.location,
 		location2 = args.location2,
 		logo = args.image,
+		logodark = args.imagedarkmode,
 		createdate = args.created,
 		disbanddate = args.disbanded,
 		coach = args.coaches,
