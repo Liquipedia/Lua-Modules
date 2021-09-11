@@ -16,8 +16,8 @@ local Header = Class.new(
 		self.subHeader = input.subHeader
 		self.image = input.image
 		self.imageDefault = input.imageDefault
-		self.imageDark = input.imageDark,
-		self.imageDefaultDark = input.imageDefaultDark,
+		self.imageDark = input.imageDark
+		self.imageDefaultDark = input.imageDefaultDark
 		self.size = input.size
 	end
 )
