@@ -18,6 +18,7 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Builder = require('Module:Infobox/Widget/Builder')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
 
 local _GAME_WOL = 'wol'
 local _GAME_HOTS = 'hots'
