@@ -223,8 +223,8 @@ function League:_setLpdbData(args, links)
 		shortname = args.shortname or args.abbreviation,
 		banner = args.image,
 		bannerdark = args.imagedarkmode,
-		icon = Variables.varDefault('tournament_icon')
-		icondark = Variables.varDefault('tournament_icon_darkmode')
+		icon = Variables.varDefault('tournament_icon'),
+		icondark = Variables.varDefault('tournament_icon_darkmode'),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		previous = args.previous,
 		previous2 = args.previous2,
