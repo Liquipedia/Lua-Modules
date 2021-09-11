@@ -37,7 +37,7 @@ function Series:createInfobox(frame)
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image},
+		Header{name = args.name, image = args.image, imageDark = args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'Series Information'},
 		Customizable{
