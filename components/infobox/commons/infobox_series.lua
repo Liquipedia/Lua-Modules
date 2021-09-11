@@ -107,8 +107,10 @@ function Series:createInfobox(frame)
 		local lpdbData = {
 			name = self.name,
 			image = args.image,
+			imagedark = args.image,
 			abbreviation = args.abbreviation or args.acronym,
 			icon = args.icon,
+			icondark = args.icon,
 			game = args.game,
 			type = args.type,
 			location = Locale.formatLocation({city = args.city, country = args.country}),
