@@ -182,6 +182,7 @@ function matchFunctions.getTournamentVars(match)
 	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
 	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
 	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
+	match.icondark = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon_darkmode'))
 	match.liquipediatier = Logic.emptyOr(
 		match.liquipediatier,
 		Variables.varDefault('tournament_lptier'),
