@@ -77,7 +77,7 @@ function Series:createInfobox(frame)
 			}
 		},
 		Cell{
-			name = 'End Date',
+			name = 'Date',
 			content = {
 				args.edate or args.defunct
 			}
@@ -151,7 +151,6 @@ function Series:createInfobox(frame)
 				youtube = Links.makeFullLink('youtube', args.youtube),
 			}),
 		}
-		lpdbData = self:_getIconFromLeagueIconSmall(frame, lpdbData)
 
 		lpdbData = self:addToLpdb(lpdbData)
 		mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
@@ -198,31 +197,6 @@ function Series:_createTier(tier, tierType)
 	end
 
 	return output
-end
-
-function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
-	local icon = lpdbData.icon
-	local iconDark = lpdbData.icondark
-
-	if String.isEmpty(icon) then
-		local series = lpdbData.name:lower()
-		local iconSmallTemplate = Template.safeExpand(
-			frame,
-			'LeagueIconSmall/' .. series,
-			{ date = lpdbData.defunctfate }
-		)
-		end
-		--extract series icon from template:LeagueIconSmall
-		icon = mw.text.split(iconSmallTemplate, 'File:')
-		icon = mw.text.split(icon[2] or '', '|')
-		icon = icon[1]
-	end
-	--when Template:LeagueIconSmall has darkmodeicons retrieve that too
-
-	lpdbData.icon = icon
-	lpdbData.icondark = iconDark
-
-	return lpdbData
 end
 
 function Series:_createLocation(country, city)
