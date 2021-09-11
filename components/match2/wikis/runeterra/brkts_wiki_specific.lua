@@ -403,7 +403,7 @@ function gameFunctions.getTournamentVars(game)
 	game.shortname = Logic.emptyOr(game.shortname, Variables.varDefault('tournament_shortname'))
 	game.series = Logic.emptyOr(game.series, Variables.varDefault('tournament_series'))
 	game.icon = Logic.emptyOr(game.icon, Variables.varDefault('tournament_icon'))
-	game.icondark = Logic.emptyOr(match.icon, Variables.varDefault("tournament_icon_darkmode"))
+	game.icondark = Logic.emptyOr(game.icon, Variables.varDefault("tournament_icon_darkmode"))
 	game.liquipediatier = Logic.emptyOr(game.liquipediatier, Variables.varDefault('tournament_tier'))
 	return game
 end
