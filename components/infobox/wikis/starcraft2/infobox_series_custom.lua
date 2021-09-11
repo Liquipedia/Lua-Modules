@@ -181,8 +181,6 @@ function CustomSeries._addCustomVariables(args)
 	else
 		--needed for e.g. External Cups Lists
 		local name = args.name or mw.title.getCurrentTitle().text
-		VarDefine('tournament_icon', args.icon or '')
-		VarDefine('tournament_icon_darkmode', args.icondarkmode or '')
 		VarDefine('featured', args.featured or '')
 		VarDefine('headtohead', args.headtohead or '')
 		VarDefine('tournament_tier', args.liquipediatier or '')
@@ -200,6 +198,13 @@ function CustomSeries._addCustomVariables(args)
 		VarDefine('tournament_type', args.type or '')
 		CustomSeries._setDateMatchVar(args.date, args.edate, args.sdate)
 	end
+end
+
+--- Allows for overriding this functionality
+function Series:addToLpdb(lpdbData)
+	Variables.varDefine('tournament_icon', lpdbData.icon)
+	Variables.varDefine('tournament_icon_darkmode', lpdbData.icondark)
+	return lpdbData
 end
 
 function CustomSeries._setDateMatchVar(date, edate, sdate)
