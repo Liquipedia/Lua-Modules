@@ -86,6 +86,7 @@ function Company:createInfobox()
 	mw.ext.LiquipediaDB.lpdb_company('company_' .. self.name, {
 		name = self.name,
 		image = args.image,
+		imagedark = args.imagedarkmode,
 		location = args.location,
 		headquarterslocation = args.headquarters,
 		parentcompany = args.parent,
