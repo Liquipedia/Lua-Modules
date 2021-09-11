@@ -29,7 +29,7 @@ function Map:createInfobox(frame)
 	local args = self.args
 
 	local widgets = {
-		Header{name = self:getNameDisplay(args), image = args.image},
+		Header{name = self:getNameDisplay(args), image = args.image, imageDark = args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'Map Information'},
 		Cell{name = 'Creator', content = {
