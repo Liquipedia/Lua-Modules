@@ -181,6 +181,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
 	Variables.varDefine('tournament_tickername', args.tickername)
 	Variables.varDefine('tournament_icon', args.icon)
+	Variables.varDefine('tournament_icon_darkmode', args.imagedarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
