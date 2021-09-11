@@ -255,6 +255,7 @@ function p._buildParameters(args)
 		shortname = args["shortname"],
 		series = args["series"],
 		icon = args["icon"],
+		icondark = args["icondark"],
 		liquipediatier = args["liquipediatier"],
 		liquipediatiertype = args["liquipediatiertype"],
 		publishertier = args["publishertier"],
