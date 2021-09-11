@@ -67,7 +67,8 @@ function CustomInjector:parse(id, widgets)
 			Header{
 				name = _fullGameName,
 				subHeader = _args.name,
-				image = _args.image
+				image = _args.image,
+				imageDark = args.imagedarkmode
 			}
 		}
 	end
