@@ -93,7 +93,16 @@ function CustomInjector:parse(id, widgets)
 				map1mode = MapMode.get({args.map1mode})
 			end
 
-			local maps = {Page.makeInternalLink(args.map1 .. map1mode, args.map1)}
+			local map1 = mw.text.split(args.map1, '|', true)
+
+			local map1link
+			if not String.isEmpty(args.map1link) then
+				map1link = args.map1link
+			else
+				map1link = map1[2] or map1[1]
+			end
+
+			local maps = {Page.makeInternalLink(map1link .. map1mode, map1[1])}
 			local index  = 2
 
 			while not String.isEmpty(args['map' .. index]) do
@@ -101,9 +110,16 @@ function CustomInjector:parse(id, widgets)
 				if not String.isEmpty(args['map' .. index .. 'mode']) then
 					mapmode = MapMode.get({args['map' .. index .. 'mode']})
 				end
+				local map = mw.text.split(args['map' .. index], '|', true)
+				local maplink
+				if not String.isEmpty(args['map' .. index .. 'link']) then
+					maplink = args['map' .. index .. 'link']
+				else
+					maplink = map[2] or map[1]
+				end
 				table.insert(maps, '&nbsp;• ' ..
 					tostring(CustomLeague:_createNoWrappingSpan(
-						Page.makeInternalLink(args['map' .. index] .. mapmode, args['map' .. index])
+						Page.makeInternalLink(maplink .. mapmode, map[1])
 					))
 				)
 				index = index + 1
@@ -243,7 +259,13 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 
 	lpdbData['sponsors'] = args.sponsors
-	lpdbData['maps'] = CustomLeague:_concatArgs(args, 'map')
+
+	local maps = _league:getAllArgsForBase(args, 'map')
+	for index, value in ipairs(maps) do
+		maps[index] = mw.text.split(value, '|', true)[1]
+	end
+
+	lpdbData['maps'] = maps
 
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
