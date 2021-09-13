@@ -47,11 +47,12 @@ function HiddenDataBox.run(args)
 end
 
 function HiddenDataBox:cleanDate(primaryDate, secondaryDate)
-	local date
-	if (not String.isEmpty(primaryDate)) and primaryDate:lower() ~= 'tba' and primaryDate:lower() ~= 'tbd' then
-		date = ReferenceCleaner.clean(primaryDate)
-	elseif (not String.isEmpty(secondaryDate)) and secondaryDate:lower() ~= 'tba' and secondaryDate:lower() ~= 'tbd' then
+	local date = ReferenceCleaner.clean(primaryDate)
+	if date == '' then
 		date = ReferenceCleaner.clean(secondaryDate)
+		if date == '' then
+			return nil
+		end
 	end
 
 	return date
