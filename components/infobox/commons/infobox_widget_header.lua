@@ -87,7 +87,7 @@ function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 	else
 		size = '600px'
 	end
-	fileNameDark = fileNameDark or fileName or fileNameDark or default
+	fileNameDark = fileNameDark or fileName or defaultDark or default
 	fullFileName = '[[File:' .. fileNameDark .. '|center|' .. size .. ']]'
 	infoboxImageDark:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
 	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
