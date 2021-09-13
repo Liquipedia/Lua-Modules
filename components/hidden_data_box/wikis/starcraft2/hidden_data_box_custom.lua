@@ -24,7 +24,11 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate', ''))
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername', ''))
-	BasicHiddenDataBox:checkAndAssign('tournament_abbreviation', args.abbreviation or args.shortname, queryResult.shortname)
+	BasicHiddenDataBox:checkAndAssign(
+		'tournament_abbreviation',
+		args.abbreviation or args.shortname,
+		queryResult.shortname
+	)
 
 	Variables.varDefine('tournament_abbreviation', Variables.varDefault('tournament_liquipediatiertype', ''))
 	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
