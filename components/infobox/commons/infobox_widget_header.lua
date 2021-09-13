@@ -69,7 +69,17 @@ function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 		return nil
 	end
 
-	local infoboxImage = mw.html.create('div'):addClass('infobox-image lightmode')
+	local imageName = fileName or default
+	local infoboxImage = Header:_makeSizedImage(imageName, fileName, size, 'lightmode')
+
+	imageName = fileNameDark or fileName or defaultDark or default
+	local infoboxImage = Header:_makeSizedImage(imageName, fileNameDark or fileName, size, 'darkmode')
+
+	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
+end
+
+function Header:_makeSizedImage(imageName, fileName size, mode)
+	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
 	size = tonumber(size or '')
 	if size then
 		size = size .. 'px'
@@ -77,20 +87,8 @@ function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 	else
 		size = '600px'
 	end
-	local fullFileName = '[[File:' .. (fileName or default) .. '|center|' .. size .. ']]'
+	local fullFileName = '[[File:' .. imageName .. '|center|' .. size .. ']]'
 	infoboxImage:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
-
-	local infoboxImageDark = mw.html.create('div'):addClass('infobox-image darkmode')
-	if size then
-		size = size .. 'px'
-		infoboxImageDark:addClass('infobox-fixed-size-image')
-	else
-		size = '600px'
-	end
-	fileNameDark = fileNameDark or fileName or defaultDark or default
-	fullFileName = '[[File:' .. fileNameDark .. '|center|' .. size .. ']]'
-	infoboxImageDark:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
-	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
 end
 
 function Header:_createInfoboxButtons()
