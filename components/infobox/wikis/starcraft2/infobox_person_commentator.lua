@@ -112,7 +112,7 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'role' then
-		return { Cell{name = 'Race', content = { _raceData.display }
+		return { Cell{ name = 'Race', content = { _raceData.display }
 			}
 		}
 	elseif id == 'status' then return {}
