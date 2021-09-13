@@ -204,7 +204,7 @@ end
 --- Allows for overriding this functionality
 function Series:addToLpdb(lpdbData)
 	Variables.varDefine('tournament_icon', lpdbData.icon)
-	Variables.varDefine('tournament_icon_darkmode', lpdbData.icondark)
+	Variables.varDefine('tournament_icon_dark', lpdbData.icondark)
 	return lpdbData
 end
 
