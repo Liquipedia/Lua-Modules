@@ -337,7 +337,7 @@ function League:_createSeries(frame, series, abbreviation, isFirst, icon, iconDa
 			{ date = Variables.varDefault('tournament_enddate') }
 		) .. ' '
 		if isFirst then
-			League:_getIconFromSeries(output, icon, iconDark)
+			League:_setIconVariable(output, icon, iconDark)
 		end
 	end
 
@@ -356,7 +356,7 @@ function League:_createSeries(frame, series, abbreviation, isFirst, icon, iconDa
 	return output
 end
 
-function League:_getIconFromSeries(iconSmallTemplate, icon, iconDark)
+function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
 	if String.isEmpty(icon) then
 		--extract series icon from template:LeagueIconSmall
 		icon = mw.text.split(iconSmallTemplate, 'File:')
