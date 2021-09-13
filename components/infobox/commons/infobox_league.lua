@@ -222,7 +222,7 @@ function League:_setLpdbData(args, links)
 		tickername = args.tickername,
 		shortname = args.shortname or args.abbreviation,
 		banner = args.image,
-		bannerdark = args.imagedarkmode,
+		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = Variables.varDefault('tournament_icon'),
 		icondark = Variables.varDefault('tournament_icon_darkmode'),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
