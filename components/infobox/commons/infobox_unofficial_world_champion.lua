@@ -31,7 +31,7 @@ function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = 'Unofficial World Champion', image = args.image, imageDark = args.imagedarkmode},
+		Header{name = 'Unofficial World Champion', image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'Current Champion'},
 		Center{content = { args['current champion'] }, classes = { 'infobox-size-20', 'infobox-bold' }},
