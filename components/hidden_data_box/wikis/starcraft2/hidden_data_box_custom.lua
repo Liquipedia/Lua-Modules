@@ -9,14 +9,14 @@
 local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local BasicHDB = require('Module:HiddenDataBox')
-local CustomHDB = {}
+local CustomHiddenDataBox = {}
 
-function CustomHDB.run(args)
-	BasicHDB.addCustomVariables = CustomHDB.addCustomVariables
+function CustomHiddenDataBox.run(args)
+	BasicHDB.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	return BasicHDB.run(args)
 end
 
-function CustomHDB:addCustomVariables(args, queryResult)
+function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	--legacy variables
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
@@ -47,7 +47,7 @@ function CustomHDB:addCustomVariables(args, queryResult)
 
 	--if specified also store in lpdb (custom for sc2)
 	if args.storage == 'true' then
-		local prizepool = CustomHDB.cleanPrizePool(args.prizepool) or queryResult.prizepool
+		local prizepool = CustomHiddenDataBox.cleanPrizePool(args.prizepool) or queryResult.prizepool
 		local lpdbData = {
 			name = Variables.varDefault('tournament_name'),
 			tickername = Variables.varDefault('tournament_ticker_name'),
@@ -71,7 +71,7 @@ function CustomHDB:addCustomVariables(args, queryResult)
 	end
 end
 
-function CustomHDB.cleanPrizePool(value)
+function CustomHiddenDataBox.cleanPrizePool(value)
 	value = string.gsub(value or '', ',', '')
 	value = string.gsub(value or '', '$', '')
 	if value ~= '' then
@@ -79,4 +79,4 @@ function CustomHDB.cleanPrizePool(value)
 	end
 end
 
-return Class.export(CustomHDB)
+return Class.export(CustomHiddenDataBox)
