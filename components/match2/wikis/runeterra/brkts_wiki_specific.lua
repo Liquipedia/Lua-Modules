@@ -182,7 +182,7 @@ function matchFunctions.getTournamentVars(match)
 	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
 	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
 	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_darkmode'))
+	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
 	match.liquipediatier = Logic.emptyOr(
 		match.liquipediatier,
 		Variables.varDefault('tournament_lptier'),
@@ -403,7 +403,7 @@ function gameFunctions.getTournamentVars(game)
 	game.shortname = Logic.emptyOr(game.shortname, Variables.varDefault('tournament_shortname'))
 	game.series = Logic.emptyOr(game.series, Variables.varDefault('tournament_series'))
 	game.icon = Logic.emptyOr(game.icon, Variables.varDefault('tournament_icon'))
-	game.icondark = Logic.emptyOr(game.iconDark, Variables.varDefault("tournament_icon_darkmode"))
+	game.icondark = Logic.emptyOr(game.iconDark, Variables.varDefault("tournament_icon_dark"))
 	game.liquipediatier = Logic.emptyOr(game.liquipediatier, Variables.varDefault('tournament_tier'))
 	return game
 end
