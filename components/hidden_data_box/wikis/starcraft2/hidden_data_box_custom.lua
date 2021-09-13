@@ -67,7 +67,6 @@ function CustomHDB:addCustomVariables(args, queryResult)
 			location = queryResult.location,
 			prizepool = prizepool,
 		}
-		lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 		mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. Variables.varDefault('tournament_name'), lpdbData)
 	end
 end
