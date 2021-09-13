@@ -1,0 +1,79 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:HiddenDataBox/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Class = require('Module:Class')
+local Variables = require('Module:Variables')
+local BasicHDB = require('Module:HiddenDataBox')
+local CustomHDB = {}
+
+function CustomHDB.run(args)
+	BasicHDB.addCustomVariables = CustomHDB.addCustomVariables
+	return BasicHDB.run(args)
+end
+
+function CustomHDB:addCustomVariables(args, queryResult)
+	--legacy variables
+	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
+	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
+	Variables.varDefine('tournament_date', Variables.varDefault('tournament_enddate', ''))
+	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate', ''))
+	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate', ''))
+	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername', ''))
+	BasicHDB:checkAndAssign('tournament_abbreviation', args.abbreviation or args.shortname, queryResult.shortname)
+
+	Variables.varDefine('tournament_abbreviation', Variables.varDefault('tournament_liquipediatiertype', ''))
+	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
+
+	--custom stuff
+	Variables.varDefine('headtohead', args.headtohead)
+	if args.team_number then
+		Variables.varDefine('is_team_tournament', 1)
+		Variables.varDefine('participants_number', args.team_number)
+	else
+		Variables.varDefine('participants_number', args.participants or args.participantsnumber, queryResult.participantsnumber)
+		if args.teamevent == 'true' then
+			Variables.varDefine('is_team_tournament', 1)
+		end
+	end
+
+	--if specified also store in lpdb (custom for sc2)
+	if args.storage == 'true' then
+		local prizepool = CustomHDB.cleanPrizePool(args.prizepool) or queryResult.prizepool
+		local lpdbData = {
+			name = Variables.varDefault('tournament_name'),
+			tickername = Variables.varDefault('tournament_ticker_name'),
+			shortname = Variables.varDefault('tournament_shortname', Variables.varDefault('tournament_abbreviation')),
+			icon = Variables.varDefault('tournament_icon'),
+			icondark = Variables.varDefault('tournament_icon_dark'),
+			series = mw.ext.TeamLiquidIntegration.resolve_redirect(Variables.varDefault('tournament_series', '')),
+			game = string.lower(Variables.varDefault('tournament_game', '')),
+			type = Variables.varDefault('tournament_type'),
+			startdate = Variables.varDefault('tournament_startdate', '1970-01-01'),
+			enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
+			sortdate = Variables.varDefault('tournament_enddate', '1970-01-01'),
+			liquipediatier = Variables.varDefault('tournament_liquipediatier'),
+			liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
+			status = Variables.varDefault('tournament_status'),
+			participantsnumber = Variables.varDefault('participants_number'),
+			location = queryResult.location,
+			prizepool = prizepool,
+		}
+		lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
+		mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. Variables.varDefault('tournament_name'), lpdbData)
+	end
+end
+
+function CustomHDB.cleanPrizePool(value)
+	value = string.gsub(value or '', ',', '')
+	value = string.gsub(value or '', '$', '')
+	if value ~= '' then
+		return value
+	end
+end
+
+return Class.export(CustomHDB)
