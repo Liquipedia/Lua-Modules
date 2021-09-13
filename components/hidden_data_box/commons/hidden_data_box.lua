@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local String = require('Module:StringUtils')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local HiddenDataBox = {}
 
@@ -48,9 +49,9 @@ end
 function HiddenDataBox:cleanDate(primaryDate, secondaryDate)
 	local date
 	if (not String.isEmpty(primaryDate)) and primaryDate:lower() ~= 'tba' and primaryDate:lower() ~= 'tbd' then
-		date = primaryDate:gsub('%-??', '-01'):gsub('%-XX', '-01')
+		date = ReferenceCleaner.clean(primaryDate)
 	elseif (not String.isEmpty(secondaryDate)) and secondaryDate:lower() ~= 'tba' and secondaryDate:lower() ~= 'tbd' then
-		date = secondaryDate:gsub('%-??', '-01'):gsub('%-XX', '-01')
+		date = ReferenceCleaner.clean(secondaryDate)
 	end
 
 	return date
