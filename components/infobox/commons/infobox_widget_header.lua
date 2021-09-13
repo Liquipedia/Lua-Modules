@@ -89,6 +89,8 @@ function Header:_makeSizedImage(imageName, fileName, size, mode)
 	end
 	local fullFileName = '[[File:' .. imageName .. '|center|' .. size .. ']]'
 	infoboxImage:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
+
+	return infoboxImage
 end
 
 function Header:_createInfoboxButtons()
