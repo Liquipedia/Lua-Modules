@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Variables = require('Module:Variables')
 local BasicHDB = require('Module:HiddenDataBox')
 local CustomHDB = {}
 
