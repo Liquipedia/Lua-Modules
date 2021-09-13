@@ -87,47 +87,45 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = teams})
 		end
 
-		if not String.isEmpty(args.map1) then
-			local map1mode = ''
-			if not String.isEmpty(args.map1mode) then
-				map1mode = MapMode.get({args.map1mode})
+		local maps = {}
+		local index = 1
+
+		while not String.isEmpty(args['map' .. index]) do
+			-- map game mode from mapXmode
+			local mapmode = ''
+			if not String.isEmpty(args['map' .. index .. 'mode']) then
+				mapmode = MapMode.get({args['map' .. index .. 'mode']})
 			end
 
-			local map1 = mw.text.split(args.map1, '|', true)
-
-			local map1link
-			if not String.isEmpty(args.map1link) then
-				map1link = args.map1link
+			-- map from mapX, might be pagename|displayname
+			local map = mw.text.split(args['map' .. index], '|', true)
+			-- maplink from mapXlink or first part of map
+			local maplink
+			if not String.isEmpty(args['map' .. index .. 'link']) then
+				maplink = args['map' .. index .. 'link']
 			else
-				map1link = map1[2] or map1[1]
+				maplink = map[1]
 			end
 
-			local maps = {Page.makeInternalLink(map1link .. map1mode, map1[1])}
-			local index  = 2
+			--auto map page
+			if Page.exists(maplink .. ' (map)') then
+				maplink = maplink .. ' (map)'
+			end
 
-			while not String.isEmpty(args['map' .. index]) do
-				local mapmode = ''
-				if not String.isEmpty(args['map' .. index .. 'mode']) then
-					mapmode = MapMode.get({args['map' .. index .. 'mode']})
-				end
-				local map = mw.text.split(args['map' .. index], '|', true)
-				local maplink
-				if not String.isEmpty(args['map' .. index .. 'link']) then
-					maplink = args['map' .. index .. 'link']
-				else
-					maplink = map[2] or map[1]
-				end
+			if (index == 1) then
+				maps = {Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)}
+			else
 				table.insert(maps, '&nbsp;• ' ..
 					tostring(CustomLeague:_createNoWrappingSpan(
-						Page.makeInternalLink(maplink .. mapmode, map[1])
+						Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)
 					))
 				)
-				index = index + 1
 			end
-
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = maps})
+			index = index + 1
 		end
+
+		table.insert(widgets, Title{name = 'Maps'})
+		table.insert(widgets, Center{content = maps})
 	elseif id == 'prizepool' then
 		return {
 			Cell{
