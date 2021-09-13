@@ -16,6 +16,8 @@ local Header = Class.new(
 		self.subHeader = input.subHeader
 		self.image = input.image
 		self.imageDefault = input.imageDefault
+		self.imageDark = input.imageDark
+		self.imageDefaultDark = input.imageDefaultDark
 		self.size = input.size
 	end
 )
@@ -23,7 +25,13 @@ local Header = Class.new(
 function Header:make()
 	local header = {
 		Header:_name(self.name),
-		Header:_image(self.image, self.imageDefault, self.size)
+		Header:_image(
+			self.image,
+			self.imageDark,
+			self.imageDefault,
+			self.imageDefaultDark,
+			self.size
+		)
 	}
 
 	local subHeader = Header:_subHeader(self.subHeader)
@@ -56,12 +64,22 @@ function Header:_subHeader(subHeader)
 	return mw.html.create('div'):node(infoboxSubHeader)
 end
 
-function Header:_image(fileName, default, size)
+function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 	if (fileName == nil or fileName == '') and (default == nil or default == '') then
 		return nil
 	end
 
-	local infoboxImage = mw.html.create('div'):addClass('infobox-image')
+	local imageName = fileName or default
+	local infoboxImage = Header:_makeSizedImage(imageName, fileName, size, 'lightmode')
+
+	imageName = fileNameDark or fileName or defaultDark or default
+	local infoboxImageDark = Header:_makeSizedImage(imageName, fileNameDark or fileName, size, 'darkmode')
+
+	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
+end
+
+function Header:_makeSizedImage(imageName, fileName, size, mode)
+	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
 	size = tonumber(size or '')
 	if size then
 		size = size .. 'px'
@@ -69,9 +87,10 @@ function Header:_image(fileName, default, size)
 	else
 		size = '600px'
 	end
-	local fullFileName = '[[File:' .. (fileName or default) .. '|center|' .. size .. ']]'
+	local fullFileName = '[[File:' .. imageName .. '|center|' .. size .. ']]'
 	infoboxImage:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
-	return mw.html.create('div'):node(infoboxImage)
+
+	return infoboxImage
 end
 
 function Header:_createInfoboxButtons()

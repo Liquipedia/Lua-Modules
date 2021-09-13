@@ -35,7 +35,7 @@ function Scene:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = self:createNameDisplay(args), image = args.image},
+		Header{name = self:createNameDisplay(args), image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'Scene Information'},
 		Cell{name = 'Region', content = {args.region}},

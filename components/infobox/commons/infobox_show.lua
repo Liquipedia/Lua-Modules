@@ -33,7 +33,7 @@ function Show:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image},
+		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'Show Information'},
 		Cell{name = 'Host(s)', content = self:getAllArgsForBase(args, 'host', {makeLink = true})},
