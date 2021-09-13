@@ -78,7 +78,7 @@ function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
 end
 
-function Header:_makeSizedImage(imageName, fileName size, mode)
+function Header:_makeSizedImage(imageName, fileName, size, mode)
 	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
 	size = tonumber(size or '')
 	if size then
