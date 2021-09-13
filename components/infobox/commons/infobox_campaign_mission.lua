@@ -30,7 +30,7 @@ function Mission:createInfobox()
 
 	local widgets = {
 		Customizable{id = 'header', children = {
-				Header{name = args.name, image = args.image, imageDark = args.imagedarkmode},
+				Header{name = args.name, image = args.image, imageDark = args.icondark or args.icondarkmode},
 			}
 		},
 		Center{content = {args.caption}},
