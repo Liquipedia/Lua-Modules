@@ -35,7 +35,11 @@ function CustomHDB:addCustomVariables(args, queryResult)
 		Variables.varDefine('is_team_tournament', 1)
 		Variables.varDefine('participants_number', args.team_number)
 	else
-		Variables.varDefine('participants_number', args.participants or args.participantsnumber, queryResult.participantsnumber)
+		Variables.varDefine(
+			'participants_number',
+			args.participants or args.participantsnumber,
+			queryResult.participantsnumber
+		)
 		if args.teamevent == 'true' then
 			Variables.varDefine('is_team_tournament', 1)
 		end
