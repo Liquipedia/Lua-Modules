@@ -41,7 +41,7 @@ function Company:createInfobox()
 	local widgets = {
 		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
-		Title{name = 'League Information'},
+		Title{name = 'Company Information'},
 		Cell{
 			name = 'Parent company',
 			content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
