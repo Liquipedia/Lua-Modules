@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:HiddenDataBox/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local BasicHDB = require('Module:HiddenDataBox')
