@@ -45,7 +45,7 @@ function League:createInfobox()
 	self:_definePageVariables(args)
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedarkmode},
+		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'League Information'},
 		Cell{
@@ -181,7 +181,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
 	Variables.varDefine('tournament_tickername', args.tickername)
 	Variables.varDefine('tournament_icon', args.icon)
-	Variables.varDefine('tournament_icon_darkmode', args.icondarkmode)
+	Variables.varDefine('tournament_icon_dark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
@@ -215,9 +215,9 @@ function League:_setLpdbData(args, links)
 		tickername = args.tickername,
 		shortname = args.shortname or args.abbreviation,
 		banner = args.image,
-		bannerdark = args.imagedarkmode,
+		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = args.icon,
-		icondark = args.icondarkmode,
+		icondark = args.icondark or args.icondarkmode,
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		previous = args.previous,
 		previous2 = args.previous2,
