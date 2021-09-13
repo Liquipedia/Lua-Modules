@@ -7,16 +7,16 @@
 --
 
 local Class = require('Module:Class')
-local BasicHDB = require('Module:HiddenDataBox')
-local CustomHDB = {}
+local BasicHiddenDataBox = require('Module:HiddenDataBox')
+local CustomHiddenDataBox = {}
 
-function CustomHDB.run(args)
-	BasicHDB.addCustomVariables = CustomHDB.addCustomVariables
-	return BasicHDB.run(args)
+function CustomHiddenDataBox.run(args)
+	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
+	return BasicHiddenDataBox.run(args)
 end
 
-function CustomHDB:addCustomVariables(args, queryResult)
+function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	--add your wiki specific vars here
 end
 
-return Class.export(CustomHDB)
+return Class.export(CustomHiddenDataBox)
