@@ -111,7 +111,7 @@ function Series:createInfobox(frame)
 			imagedark = args.image,
 			abbreviation = args.abbreviation or args.acronym,
 			icon = args.icon,
-			icondark = args.icondarkmode,
+			icondark = args.icondark or args.icondarkmode,
 			game = args.game,
 			type = args.type,
 			location = Locale.formatLocation({city = args.city, country = args.country}),
