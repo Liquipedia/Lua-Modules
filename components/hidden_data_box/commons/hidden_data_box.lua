@@ -10,9 +10,9 @@ local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local String = require('Module:StringUtils')
 
-local HDB = {}
+local HiddenDataBox = {}
 
-function HDB.run(args)
+function HiddenDataBox.run(args)
 	local tournament = args.tournament or mw.title.getCurrentTitle().prefixedText
 	local parent = tournament:gsub('/.-$', ''):gsub(' ', '_')
 
@@ -23,29 +23,29 @@ function HDB.run(args)
 	})
 	queryResult = queryResult[1] or {}
 
-	local startDate = HDB:cleanDate(args.sdate, args.date)
-	local endDate = HDB:cleanDate(args.edate, args.date)
-	HDB:checkAndAssign('tournament_startdate', startDate, queryResult.startdate)
-	HDB:checkAndAssign('tournament_enddate', endDate, queryResult.enddate)
+	local startDate = HiddenDataBox:cleanDate(args.sdate, args.date)
+	local endDate = HiddenDataBox:cleanDate(args.edate, args.date)
+	HiddenDataBox:checkAndAssign('tournament_startdate', startDate, queryResult.startdate)
+	HiddenDataBox:checkAndAssign('tournament_enddate', endDate, queryResult.enddate)
 
-	HDB:checkAndAssign('tournament_name', args.name, queryResult.name)
-	HDB:checkAndAssign('tournament_series', args.series, queryResult.series)
-	HDB:checkAndAssign('tournament_shortname', args.shortname, queryResult.shortname)
-	HDB:checkAndAssign('tournament_tickername', args.tickername, queryResult.tickername)
-	HDB:checkAndAssign('tournament_icon', args.icon, queryResult.icon)
-	HDB:checkAndAssign('tournament_icondark', args.icondark or args.icondarkmode, queryResult.icondark)
-	HDB:checkAndAssign('tournament_liquipediatier', args.liquipediatier, queryResult.liquipediatier)
-	HDB:checkAndAssign('tournament_liquipediatiertype', args.liquipediatiertype, queryResult.liquipediatiertype)
-	HDB:checkAndAssign('tournament_type', args.type, queryResult.type)
-	HDB:checkAndAssign('tournament_status', args.status, queryResult.status)
-	HDB:checkAndAssign('tournament_game', args.game, queryResult.game)
-	HDB:checkAndAssign('tournament_parent', args.parent, parent)
-	HDB:checkAndAssign('tournament_parentname', args.parentname, queryResult.name)
+	HiddenDataBox:checkAndAssign('tournament_name', args.name, queryResult.name)
+	HiddenDataBox:checkAndAssign('tournament_series', args.series, queryResult.series)
+	HiddenDataBox:checkAndAssign('tournament_shortname', args.shortname, queryResult.shortname)
+	HiddenDataBox:checkAndAssign('tournament_tickername', args.tickername, queryResult.tickername)
+	HiddenDataBox:checkAndAssign('tournament_icon', args.icon, queryResult.icon)
+	HiddenDataBox:checkAndAssign('tournament_icondark', args.icondark or args.icondarkmode, queryResult.icondark)
+	HiddenDataBox:checkAndAssign('tournament_liquipediatier', args.liquipediatier, queryResult.liquipediatier)
+	HiddenDataBox:checkAndAssign('tournament_liquipediatiertype', args.liquipediatiertype, queryResult.liquipediatiertype)
+	HiddenDataBox:checkAndAssign('tournament_type', args.type, queryResult.type)
+	HiddenDataBox:checkAndAssign('tournament_status', args.status, queryResult.status)
+	HiddenDataBox:checkAndAssign('tournament_game', args.game, queryResult.game)
+	HiddenDataBox:checkAndAssign('tournament_parent', args.parent, parent)
+	HiddenDataBox:checkAndAssign('tournament_parentname', args.parentname, queryResult.name)
 
-	HDB:addCustomVariables(args, queryResult)
+	HiddenDataBox:addCustomVariables(args, queryResult)
 end
 
-function HDB:cleanDate(primaryDate, secondaryDate)
+function HiddenDataBox:cleanDate(primaryDate, secondaryDate)
 	local date
 	if (not String.isEmpty(primaryDate)) and primaryDate:lower() ~= 'tba' and primaryDate:lower() ~= 'tbd' then
 		date = primaryDate:gsub('%-??', '-01'):gsub('%-XX', '-01')
@@ -56,7 +56,7 @@ function HDB:cleanDate(primaryDate, secondaryDate)
 	return date
 end
 
-function HDB:checkAndAssign(variableName, valueFromArgs, valueFromQuery)
+function HiddenDataBox:checkAndAssign(variableName, valueFromArgs, valueFromQuery)
 	if not String.isEmpty(valueFromArgs) then
 		Variables.varDefine(variableName, valueFromArgs)
 	elseif String.isEmpty(Variables.varDefault(variableName)) then
@@ -65,6 +65,6 @@ function HDB:checkAndAssign(variableName, valueFromArgs, valueFromQuery)
 end
 
 --overridable so that wikis can add custom vars
-function HDB:addCustomVariables() end
+function HiddenDataBox:addCustomVariables() end
 
-return Class.export(HDB)
+return Class.export(HiddenDataBox)
