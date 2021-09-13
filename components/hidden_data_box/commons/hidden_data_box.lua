@@ -18,7 +18,7 @@ function HDB.run(args)
 
 	local queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[pagename::' .. parent .. ']]',
-	  	limit = 1,
+		limit = 1,
 		order = 'pagename asc',
 	})
 	queryResult = queryResult[1] or {}
