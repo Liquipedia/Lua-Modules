@@ -45,13 +45,20 @@ function League:createInfobox()
 	self:_definePageVariables(args)
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedarkmode},
+		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'League Information'},
 		Cell{
 			name = 'Series',
 			content = {
-				self:_createSeries(frame, args.series, args.abbreviation),
+				self:_createSeries(
+					frame,
+					args.series,
+					args.abbreviation,
+					true,
+					args.icon,
+					args.icondarkmode
+				),
 				self:_createSeries(frame, args.series2, args.abbreviation2)
 			}
 		},
@@ -181,7 +188,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
 	Variables.varDefine('tournament_tickername', args.tickername)
 	Variables.varDefine('tournament_icon', args.icon)
-	Variables.varDefine('tournament_icon_darkmode', args.icondarkmode)
+	Variables.varDefine('tournament_icon_dark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
@@ -215,9 +222,9 @@ function League:_setLpdbData(args, links)
 		tickername = args.tickername,
 		shortname = args.shortname or args.abbreviation,
 		banner = args.image,
-		bannerdark = args.imagedarkmode,
-		icon = args.icon,
-		icondark = args.icondarkmode,
+		bannerdark = args.imagedark or args.imagedarkmode,
+		icon = Variables.varDefault('tournament_icon'),
+		icondark = Variables.varDefault('tournament_icon_darkmode'),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		previous = args.previous,
 		previous2 = args.previous2,
@@ -316,7 +323,7 @@ function League:_createLocation(details)
 	return content
 end
 
-function League:_createSeries(frame, series, abbreviation)
+function League:_createSeries(frame, series, abbreviation, isFirst, icon, iconDark)
 	if String.isEmpty(series) then
 		return nil
 	end
@@ -324,7 +331,14 @@ function League:_createSeries(frame, series, abbreviation)
 	local output = ''
 
 	if Page.exists('Template:LeagueIconSmall/' .. series:lower()) then
-		output = Template.safeExpand(frame, 'LeagueIconSmall/' .. series:lower()) .. ' '
+		output = Template.safeExpand(
+			frame,
+			'LeagueIconSmall/' .. series:lower(),
+			{ date = Variables.varDefault('tournament_enddate') }
+		) .. ' '
+		if isFirst then
+			League:_setIconVariable(output, icon, iconDark)
+		end
 	end
 
 	if not Page.exists(series) then
@@ -340,6 +354,18 @@ function League:_createSeries(frame, series, abbreviation)
 	end
 
 	return output
+end
+
+function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
+	if String.isEmpty(icon) then
+		--extract series icon from template:LeagueIconSmall
+		icon = mw.text.split(iconSmallTemplate, 'File:')
+		icon = mw.text.split(icon[2] or '', '|')
+		icon = icon[1]
+
+		Variables.varDefine('tournament_icon', icon)
+	end
+	--when Template:LeagueIconSmall has darkmodeicons retrieve that too
 end
 
 function League:_createOrganizer(organizer, name, link, reference)

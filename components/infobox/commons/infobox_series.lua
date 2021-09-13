@@ -14,6 +14,7 @@ local Locale = require('Module:Locale')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Localisation = require('Module:Localisation')
 local Links = require('Module:Links')
+local String = require('Module:String')
 local Flags = require('Module:Flags')._Flag
 local BasicInfobox = require('Module:Infobox/Basic')
 
@@ -37,7 +38,7 @@ function Series:createInfobox(frame)
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedarkmode},
+		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'Series Information'},
 		Customizable{
@@ -77,7 +78,7 @@ function Series:createInfobox(frame)
 			}
 		},
 		Cell{
-			name = 'Date',
+			name = 'End Date',
 			content = {
 				args.edate or args.defunct
 			}
@@ -107,10 +108,10 @@ function Series:createInfobox(frame)
 		local lpdbData = {
 			name = self.name,
 			image = args.image,
-			imagedark = args.image,
+			imagedark = args.imagedark or args.imagedarkmode,
 			abbreviation = args.abbreviation or args.acronym,
 			icon = args.icon,
-			icondark = args.icon,
+			icondark = args.icondark or args.icondarkmode,
 			game = args.game,
 			type = args.type,
 			location = Locale.formatLocation({city = args.city, country = args.country}),
@@ -151,6 +152,7 @@ function Series:createInfobox(frame)
 				youtube = Links.makeFullLink('youtube', args.youtube),
 			}),
 		}
+		lpdbData = self:_getIconFromLeagueIconSmall(frame, lpdbData)
 
 		lpdbData = self:addToLpdb(lpdbData)
 		mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
@@ -197,6 +199,30 @@ function Series:_createTier(tier, tierType)
 	end
 
 	return output
+end
+
+function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
+	local icon = lpdbData.icon
+	local iconDark = lpdbData.icondark
+
+	if String.isEmpty(icon) then
+		local series = lpdbData.name:lower()
+		local iconSmallTemplate = Template.safeExpand(
+			frame,
+			'LeagueIconSmall/' .. series,
+			{ date = lpdbData.defunctfate }
+		)
+		--extract series icon from template:LeagueIconSmall
+		icon = mw.text.split(iconSmallTemplate, 'File:')
+		icon = mw.text.split(icon[2] or '', '|')
+		icon = icon[1]
+	end
+	--when Template:LeagueIconSmall has darkmodeicons retrieve that too
+
+	lpdbData.icon = icon
+	lpdbData.icondark = iconDark
+
+	return lpdbData
 end
 
 function Series:_createLocation(country, city)
