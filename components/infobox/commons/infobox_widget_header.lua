@@ -73,7 +73,7 @@ function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 	local infoboxImage = Header:_makeSizedImage(imageName, fileName, size, 'lightmode')
 
 	imageName = fileNameDark or fileName or defaultDark or default
-	local infoboxImage = Header:_makeSizedImage(imageName, fileNameDark or fileName, size, 'darkmode')
+	local infoboxImageDark = Header:_makeSizedImage(imageName, fileNameDark or fileName, size, 'darkmode')
 
 	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
 end
