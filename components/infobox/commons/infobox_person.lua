@@ -154,17 +154,14 @@ function Person:createInfobox()
 
 	infobox:bottom(self:createBottomContent())
 
-	local statusToStore
-	if _shouldStoreData then
-		Variables.varDefine('earnings', earnings)
-		statusToStore = self:getStatusToStore(args)
-		infobox:categories(unpack(self:getCategories(
-					args,
-					birthDisplay,
-					personType.category,
-					statusToStore
-				)))
-	end
+	Variables.varDefine('earnings', earnings)
+	local statusToStore = self:getStatusToStore(args)
+	infobox:categories(unpack(self:getCategories(
+				args,
+				birthDisplay,
+				personType.category,
+				statusToStore
+			)))
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
@@ -312,34 +309,37 @@ end
 
 --- Allows for overriding this functionality
 function Person:getCategories(args, birthDisplay, personType, status)
-	local categories = { personType .. 's' }
+	if _shouldStoreData then
+		local categories = { personType .. 's' }
 
-	if not args.teamlink and not args.team then
-		table.insert(categories, 'Teamless ' .. personType .. 's')
-	end
-	if args.country2 or args.nationality2 then
-		table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
-	end
-	if args.death_date then
-		table.insert(categories, 'Deceased ' .. personType .. 's')
-	end
-	if
-		args.retired == 'yes' or args.retired == 'true'
-		or string.lower(status or '') == 'retired'
-		or string.match(args.retired or '', '%d%d%d%d%')--if retired has year set apply the retired category
-	then
-		table.insert(categories, 'Retired ' .. personType .. 's')
-	else
-		table.insert(categories, 'Active ' .. personType .. 's')
-	end
-	if not args.image then
-		table.insert(categories, personType .. 's with no profile picture')
-	end
-	if not birthDisplay then
-		table.insert(categories, personType .. 's with unknown birth date')
-	end
+		if not args.teamlink and not args.team then
+			table.insert(categories, 'Teamless ' .. personType .. 's')
+		end
+		if args.country2 or args.nationality2 then
+			table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
+		end
+		if args.death_date then
+			table.insert(categories, 'Deceased ' .. personType .. 's')
+		end
+		if
+			args.retired == 'yes' or args.retired == 'true'
+			or string.lower(status or '') == 'retired'
+			or string.match(args.retired or '', '%d%d%d%d%')--if retired has year set apply the retired category
+		then
+			table.insert(categories, 'Retired ' .. personType .. 's')
+		else
+			table.insert(categories, 'Active ' .. personType .. 's')
+		end
+		if not args.image then
+			table.insert(categories, personType .. 's with no profile picture')
+		end
+		if not birthDisplay then
+			table.insert(categories, personType .. 's with unknown birth date')
+		end
 
-	return categories
+		return categories
+	end
+	return {}
 end
 
 return Person
