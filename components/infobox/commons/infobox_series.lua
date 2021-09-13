@@ -38,7 +38,7 @@ function Series:createInfobox(frame)
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedarkmode},
+		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'Series Information'},
 		Customizable{
@@ -108,7 +108,7 @@ function Series:createInfobox(frame)
 		local lpdbData = {
 			name = self.name,
 			image = args.image,
-			imagedark = args.image,
+			imagedark = args.imagedark or args.imagedarkmode,
 			abbreviation = args.abbreviation or args.acronym,
 			icon = args.icon,
 			icondark = args.icondark or args.icondarkmode,

@@ -33,7 +33,7 @@ function Patch:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedarkmode},
+		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'Patch Information'},
 		Cell{name = 'Version', content = {args.version}},

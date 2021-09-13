@@ -45,7 +45,7 @@ function League:createInfobox()
 	self:_definePageVariables(args)
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedarkmode},
+		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
 		Center{content = {args.caption}},
 		Title{name = 'League Information'},
 		Cell{
@@ -188,7 +188,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
 	Variables.varDefine('tournament_tickername', args.tickername)
 	Variables.varDefine('tournament_icon', args.icon)
-	Variables.varDefine('tournament_icon_darkmode', args.icondarkmode)
+	Variables.varDefine('tournament_icon_dark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
