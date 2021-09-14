@@ -111,11 +111,11 @@ function CustomCommentator.run(frame)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'role' then
+	if id == 'status' then
 		return { Cell{ name = 'Race', content = { _raceData.display }
 			}
 		}
-	elseif id == 'status' then return {}
+	elseif id == 'role' then return {}
 	elseif id == 'achievements' then return {}
 	elseif
 		id == 'history' and
