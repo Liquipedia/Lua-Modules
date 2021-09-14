@@ -30,7 +30,7 @@ function AgeCalculation.run(birth, birthLocation, death, shouldStore)
 	--determine the display returned from this function
 	local birthDisplay
 	if birthFields.display then
-		birthDisplay = birthFields.display .. age.birth
+		birthDisplay = birthFields.display .. age.birthDisplay
 		if birthLocation then
 			birthDisplay = birthDisplay .. '<br>' .. birthLocation
 		end
@@ -43,7 +43,7 @@ function AgeCalculation.run(birth, birthLocation, death, shouldStore)
 	end
 	local deathDisplay
 	if deathFields.display then
-		deathDisplay = deathFields.display .. age.death
+		deathDisplay = deathFields.display .. age.deathDisplay
 		if shouldStore and not deathFields.exact then
 			deathDisplay = deathDisplay .. '[[Category:Incomplete death dates]]'
 		end
@@ -63,11 +63,24 @@ end
 function AgeCalculation._processAge(birthFields, deathFields)
 	--set an empty age display field (we need different
 	--displays depending if the person is alive or not)
-	local age = { birth = '', death = '' }
+	local age = { birthDisplay = '', deathDisplay = '' }
 	if not birthFields.display then
 		return age
 	end
 
+	local calculatedAgeDisplay = AgeCalculation._getAgeDisplay(birthFields, deathFields)
+
+	--add the age display to the field according if the person is alive
+	if deathFields.display and calculatedAgeDisplay then
+		age.deathDisplay = ' (aged ' .. calculatedAgeDisplay .. ')'
+	elseif calculatedAgeDisplay then
+		age.birthDisplay = ' (age ' .. calculatedAgeDisplay .. ')'
+	end
+
+	return age
+end
+
+function AgeCalculation._getAgeDisplay(birthFields, deathFields)
 	--if the person is alive set the deathFileds to current date
 	--as we need to calculate against it
 	if not deathFields.display then
@@ -76,11 +89,11 @@ function AgeCalculation._processAge(birthFields, deathFields)
 		deathFields.day = _CURRENT_FIELD.day
 		deathFields.exact = true
 	end
-	local calculatedAgeDisplay
+
 	--if both birth and "death" date are exact we do have a singular age
 	--hence we determine that and use it for the display
 	if birthFields.exact and deathFields.exact then
-		calculatedAgeDisplay = AgeCalculation._calculateAge(birthFields, deathFields)
+		return AgeCalculation._calculateAge(birthFields, deathFields)
 	--if one or both are not exact but we know the years determine a min age and a max age
 	--and determine the age display from them
 	elseif deathFields.year and birthFields.year then
@@ -99,20 +112,13 @@ function AgeCalculation._processAge(birthFields, deathFields)
 		--if both min and max are the same the value is singular
 		--else we have a 1 year range to display
 		if minAge == maxAge then
-			calculatedAgeDisplay = minAge
+			return minAge
 		else
-			calculatedAgeDisplay = minAge .. '-' .. maxAge
+			return minAge .. '-' .. maxAge
 		end
 	end
 
-	--add the age display to the field according if the person is alive
-	if deathFields.display and calculatedAgeDisplay then
-		age.death = ' (aged ' .. calculatedAgeDisplay .. ')'
-	elseif calculatedAgeDisplay then
-		age.birth = ' (age ' .. calculatedAgeDisplay .. ')'
-	end
-
-	return age
+	return nil
 end
 
 function AgeCalculation._calculateAge(startDate, endDate)
