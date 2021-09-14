@@ -157,10 +157,8 @@ function AgeCalculation._processDateFields(date)
 	--if year is not set and month or day is not set return an empty table
 	if not date.year and not (date.month and date.day) then
 		return {}
-	end
-
 	--if year, month and day are set we have an exact date
-	if date.year and date.month and date.day then
+	elseif date.year and date.month and date.day then
 		return AgeCalculation._processExactDateFields(date)
 	--else we do not have an exact date
 	else
@@ -178,17 +176,7 @@ end
 
 function AgeCalculation._processPartialDateFields(date)
 	--determine the displayFormatString according to the known parts of the date
-	local displayFormatString
-	-- > if year and month are known
-	if date.year and date.month then
-		displayFormatString = 'F, Y'
-	-- > if day and month are known
-	elseif date.month and date.day then
-		displayFormatString = 'F j'
-	-- > if year is known, but not month (display only year)
-	else
-		displayFormatString = 'Y'
-	end
+	local displayFormatString = AgeCalculation._getDisplayFormatSrtring(date)
 
 	--set a minimum date for the given date partials
 	--(by filling unknown partials up with EPOCH time partials)
@@ -215,6 +203,19 @@ function AgeCalculation._processPartialDateFields(date)
 	date.display = _LANG:formatDate(displayFormatString, dateString)
 
 	return date
+end
+
+function AgeCalculation._getDisplayFormatSrtring(date)
+	-- if year and month are known
+	if date.year and date.month then
+		return 'F, Y'
+	-- if day and month are known
+	elseif date.month and date.day then
+		return 'F j'
+	-- if year is known, but not month (display only year)
+	else
+		return 'Y'
+	end
 end
 
 function AgeCalculation._makeDateString(date)
