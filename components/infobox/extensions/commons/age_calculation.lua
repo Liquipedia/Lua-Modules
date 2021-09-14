@@ -185,10 +185,9 @@ function AgeCalculation._processDateFields(date)
 	date.min = minDate
 	date.isoMin = _LANG:formatDate('c', table.concat(minDate, '-'))
 
-	--set a maximum date for the given date partials
-	--(by filling unknown partials up with current year
-	--and december plus the last day of the month, but
-	--ignoring leap years)
+	--set a maximum date for the given date partials (by filling
+	--unknown partials up with current year/december/the last day of the month,
+	--but ignoring leap years)
 	local maxDate = { date[1] or _CURRENT_YEAR, date[2] or 12 }
 	maxDate[3] = date[3] or _DEFAULT_DAYS_IN_MONTH[maxDate[2]]
 	date.max = maxDate
