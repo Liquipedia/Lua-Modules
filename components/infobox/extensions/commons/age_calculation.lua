@@ -82,7 +82,7 @@ function AgeCalculation._processAge(birthFields, deathFields)
 	if birthFields.exact and deathFields.exact then
 		calculatedAgeDisplay = AgeCalculation._calculateAge(birthFields, deathFields)
 	--if one or both are not exact but we know the years determine a min age and a max age
-	--and determine the display from them
+	--and determine the age display from them
 	elseif deathFields[1] and birthFields[1] then
 		--minimum age is calculated from the maximum birth date (or the real one if given)
 		--and the minimum death/current date (or the exact one if known)
