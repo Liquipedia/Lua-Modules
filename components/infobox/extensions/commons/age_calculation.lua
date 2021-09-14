@@ -77,7 +77,7 @@ function AgeCalculation._processAge(birthFields, deathFields)
 		deathFields.exact = true
 	end
 	local calculatedAgeDisplay
-	--if both birth and "death" date are exact we do not have a singular age
+	--if both birth and "death" date are exact we do have a singular age
 	--hence we determine that and use it for the display
 	if birthFields.exact and deathFields.exact then
 		calculatedAgeDisplay = AgeCalculation._calculateAge(birthFields, deathFields)
