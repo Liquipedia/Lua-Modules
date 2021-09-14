@@ -86,10 +86,16 @@ function AgeCalculation._processAge(birthFields, deathFields)
 	elseif deathFields.year and birthFields.year then
 		--minimum age is calculated from the maximum birth date (or the real one if given)
 		--and the minimum death/current date (or the exact one if known)
-		local minAge = AgeCalculation._calculateAge(birthFields.maxPossible or birthFields, deathFields.minPossible or deathFields)
+		local minAge = AgeCalculation._calculateAge(
+			birthFields.maxPossible or birthFields,
+			deathFields.minPossible or deathFields
+		)
 		--maximum age is calculated from the minimum birth date (or the real one if given)
 		--and the maximum death/current date (or the exact one if known)
-		local maxAge = AgeCalculation._calculateAge(birthFields.minPossible or birthFields, deathFields.maxPossible or deathFields)
+		local maxAge = AgeCalculation._calculateAge(
+			birthFields.minPossible or birthFields,
+			deathFields.maxPossible or deathFields
+		)
 		--if both min and max are the same the value is singular
 		--else we have a 1 year range to display
 		if minAge == maxAge then
