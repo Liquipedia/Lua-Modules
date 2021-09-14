@@ -156,7 +156,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	local rank1, rank2
+	local rank1, rank2 = {}, {}
 	local yearsActive
 	if _shouldQueryData and not _statusStore then
 		rank1, rank2 = CustomPlayer._getRank(_PAGENAME)
