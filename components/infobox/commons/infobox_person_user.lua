@@ -49,7 +49,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomInjector:addCustomCells()
+function CustomInjector:addCustomCells(widgets)
 	widgets = {
 		Cell{name = 'Languages', content = { _args.languages }},
 		Cell{name = 'Favorite players', content = CustomUser:_getArgsfromBaseDefault('fav-player', 'fav-players')},
