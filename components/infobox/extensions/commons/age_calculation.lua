@@ -84,8 +84,14 @@ function AgeCalculation._processAge(birthFields, deathFields)
 	--if one or both are not exact but we knwo the years determine a min age and a max age
 	--and determine the display from them
 	elseif deathFields[1] and birthFields[1] then
+		--minimum age is calculated from the maximum birth date (or the real one if given)
+		--and the minimum death/current date (or the exact one if known)
 		local minAge = AgeCalculation._calculateAge(birthFields.max or birthFields, deathFields.min or deathFields)
+		--maximum age is calculated from the minimum birth date (or the real one if given)
+		--and the maximum death/current date (or the exact one if known)
 		local maxAge = AgeCalculation._calculateAge(birthFields.min or birthFields, deathFields.max or deathFields)
+		--if both min and max are the same the value is singular
+		--else we have a 1 year range to display
 		if minAge == maxAge then
 			calculatedAgeDisplay = minAge
 		else
@@ -119,13 +125,41 @@ function AgeCalculation._calculateAge(startDate, endDate)
 	return age
 end
 
+--[[
+The _processDateFields function processes a dateField and
+returns values depending on the exactness of the dateField
+
+if the dateField is exact so the following is returned: {
+	1 = year, 2 = month, 3 = day,
+	exact = true,
+	iso = date as iso string
+	display = Date Display String,
+	store = Date String for storage (format Y-M-D)
+}
+else it returns (in case we have a valid date, i.e. one that has year or both day and month): {
+	1 = year, 2 = month, 3 = day, <-- some of those are empty
+	display = Date Display String,
+	min = { 1 = year, 2 = month, 3 = day } <-- minimum date possible with the known partials
+	isoMin = min as iso string
+	max = { 1 = year, 2 = month, 3 = day } <-- maximum date possible with the known partials (*)
+	isoMax = max as iso string
+}
+
+(*) ignoring leap years as they are irrelevant for the further calculations
+]]--
 function AgeCalculation._processDateFields(date)
+	--if year is not set and month or day is not set return an empty table
 	if not date[1] and not (date[2] and date[3]) then
 		return {}
 	end
 
 	local dateString
 	local displayFormatString
+	--if year, month and day are set:
+	-- > determine the display String
+	-- > set the date as exact
+	-- > determine the iso of this date
+	-- > determine the storage string (the Y-M-D)
 	if date[1] and date[2] and date[3] then
 		dateString = table.concat(date, '-')
 		date.iso = _LANG:formatDate('c', dateString)
@@ -133,24 +167,35 @@ function AgeCalculation._processDateFields(date)
 		date.display = _LANG:formatDate('F j, Y', dateString)
 		date.store = dateString
 		return date
+	--else set the displayFormatString according to the known parts of the date
+	-- > if year and month are known
 	elseif date[1] and date[2] then
 		displayFormatString = 'F, Y'
-	elseif date[1] then
-		displayFormatString = 'Y'
-	else
+	-- > if day and month are known
+	elseif date[2] and date[3] then
 		displayFormatString = 'F j'
+	-- > if year is known, but not month (display only year)
+	else
+		displayFormatString = 'Y'
 	end
 
+	--set a minimum date for the given date partials
+	--(by filling unknown partials up with EPOCH time partials)
 	local minDate = { date[1] or _EPOCH_FIELD[1], date[2] or _EPOCH_FIELD[2], date[3] or _EPOCH_FIELD[3] }
 	date.min = minDate
 	date.isoMin = _LANG:formatDate('c', table.concat(minDate, '-'))
 
+	--set a maximum date for the given date partials
+	--(by filling unknown partials up with current year
+	--and december plus the last day of the month, but
+	--ignoring leap years)
 	local maxDate = { date[1] or _CURRENT_YEAR, date[2] or 12 }
 	maxDate[3] = date[3] or _DEFAULT_DAYS_IN_MONTH[maxDate[2]]
 	date.max = maxDate
 	dateString = table.concat(maxDate, '-')
 	date.isoMax = _LANG:formatDate('c', dateString)
 
+	--set the display according to the above determined format string
 	date.display = _LANG:formatDate('c', displayFormatString)
 
 	return date
