@@ -239,7 +239,7 @@ end
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
 function Person:nameDisplay(args)
-	local team = args.teamlink or args.team
+	local team = args.teamlink or args.team or ''
 	local icon = mw.ext.TeamTemplate.teamexists(team)
 		and mw.ext.TeamTemplate.teamicon(team) or ''
 	local name = args.id or mw.title.getCurrentTitle().text
