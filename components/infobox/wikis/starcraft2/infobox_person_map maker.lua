@@ -26,7 +26,7 @@ local _FACTION2 = {
 	['tp'] = 'Protoss', ['tz'] = 'Zerg',
 	['zt'] = 'Terran', ['zp'] = 'Protoss'
 }
-local _RACE_CATEGORY = {
+local _RACE_DISPLAY = {
 	['p'] = '[[Protoss]]',
 	['pt'] = '[[Protoss]],&nbsp;[[Terran]]',
 	['pz'] = '[[Protoss]],&nbsp;[[Zerg]]',
@@ -85,11 +85,11 @@ function CustomMapMaker.run(frame)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'role' then
+	if id == 'status' then
 		return { Cell{name = 'Race', content = { _raceData.display }
 			}
 		}
-	elseif id == 'status' then return {}
+	elseif id == 'role' then return {}
 	elseif id == 'achievements' then
 		if not(String.isEmpty(_args.maps_ladder) or String.isEmpty(_args.maps_special)) then
 			return {
@@ -132,7 +132,7 @@ end
 function CustomMapMaker._getRaceData(race)
 	race = string.lower(race)
 	race = CleanRace[race] or race
-	local display = _RACE_CATEGORY[race]
+	local display = _RACE_DISPLAY[race]
 	if not display and race ~= 'unknown' then
 		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
