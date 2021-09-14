@@ -18,9 +18,9 @@ local _CURRENT_ISO = _LANG:formatDate('c')
 local _CURRENT_YEAR = tonumber(_LANG:formatDate('Y'))
 local _DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
 
-function AgeCalculation.run(birth, birthLocation, death, shouldStore)
-	local birthFields = AgeCalculation._parseDate(birth) -- This is now an array of a date
-	local deathFields = AgeCalculation._parseDate(death)
+function AgeCalculation.run(birthDate, birthLocation, deathDate, shouldStore)
+	local birthFields = AgeCalculation._parseDate(birthDate) -- This is now an array of a date
+	local deathFields = AgeCalculation._parseDate(deathDate)
 
 	--error for some cases that are not allowed
 	AgeCalculation._assertValidDates(birthFields, deathFields)
