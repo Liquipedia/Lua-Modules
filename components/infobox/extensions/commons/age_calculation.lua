@@ -201,14 +201,14 @@ function AgeCalculation._processDateFields(date)
 end
 
 function AgeCalculation._assertValidDates(firstDate, secondDate)
-	local isoMin = firstDate.iso or firstDate.isoMin
-	local isoMax = secondDate.iso or secondDate.isoMax
-	local isoMaxMin = secondDate.iso or secondDate.isoMax
-	if isoMin and isoMax and isoMin > isoMax then
+	local isoFirstMin = firstDate.iso or firstDate.isoMin
+	local isoSecondMax = secondDate.iso or secondDate.isoMax
+	local isoSecondMin = secondDate.iso or secondDate.isoMax
+	if isoFirstMin and isoSecondMax and isoFirstMin > isoSecondMax then
 		error('Death date can not be before birth date')
-	elseif isoMin and  (isoMin > _CURRENT_ISO or isoMin < _EPOCH) then
+	elseif isoFirstMin and  (isoFirstMin > _CURRENT_ISO or isoFirstMin < _EPOCH) then
 		error('Birth date can not be in the future')
-	elseif isoMaxMin and isoMaxMin > _CURRENT_ISO then
+	elseif isoSecondMin and isoSecondMin > _CURRENT_ISO then
 		error('Invalid death date (out of allowed date range)')
 	end
 end
