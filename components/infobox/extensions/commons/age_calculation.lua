@@ -12,7 +12,7 @@ local Class = require('Module:Class')
 local _LANG = mw.getContentLanguage()
 
 local _EPOCH = _LANG:formatDate('c', '1970-1-1')
-local _EPOCH_FIELD = { 1970, 1, 1 }
+local _EPOCH_FIELD = { year = 1970, month = 1, day = 1 }
 local _CURRENT_FIELD = os.date('*t', os.time())
 local _CURRENT_ISO = _LANG:formatDate('c')
 local _CURRENT_YEAR = tonumber(_LANG:formatDate('Y'))
@@ -37,8 +37,8 @@ function AgeCalculation.run(birth, birthLocation, death, personType, shouldStore
 		if shouldStore and not birthFields.exact then
 			birthDisplay = birthDisplay .. '[[Category:Incomplete birth dates]]'
 		end
-		if shouldStore and birthFields[1] then
-			birthDisplay = birthDisplay .. '[[Category:' .. birthFields[1] .. 'births]]'
+		if shouldStore and birthFields.year then
+			birthDisplay = birthDisplay .. '[[Category:' .. birthFields.year .. 'births]]'
 		end
 	end
 	local deathDisplay
@@ -54,9 +54,9 @@ end
 
 function AgeCalculation._parseDate(date)
 	local dateField = mw.text.split(date or '', '-')
-	for i = 1, 3 do
-		dateField[i] = tonumber(dateField[i])
-	end
+	dateField.year = tonumber(dateField[1])
+	dateField.month = tonumber(dateField[2])
+	dateField.day = tonumber(dateField[3])
 	return AgeCalculation._processDateFields(dateField)
 end
 
@@ -71,9 +71,9 @@ function AgeCalculation._processAge(birthFields, deathFields)
 	--if the person is alive set the deathFileds to current date
 	--as we need to calculate against it
 	if not deathFields.display then
-		deathFields[1] = _CURRENT_FIELD['year']
-		deathFields[2] = _CURRENT_FIELD['month']
-		deathFields[3] = _CURRENT_FIELD['day']
+		deathFields.year = _CURRENT_FIELD.year
+		deathFields.month = _CURRENT_FIELD.month
+		deathFields.day = _CURRENT_FIELD.day
 		deathFields.exact = true
 	end
 	local calculatedAgeDisplay
@@ -83,7 +83,7 @@ function AgeCalculation._processAge(birthFields, deathFields)
 		calculatedAgeDisplay = AgeCalculation._calculateAge(birthFields, deathFields)
 	--if one or both are not exact but we know the years determine a min age and a max age
 	--and determine the age display from them
-	elseif deathFields[1] and birthFields[1] then
+	elseif deathFields.year and birthFields.year then
 		--minimum age is calculated from the maximum birth date (or the real one if given)
 		--and the minimum death/current date (or the exact one if known)
 		local minAge = AgeCalculation._calculateAge(birthFields.max or birthFields, deathFields.min or deathFields)
@@ -111,13 +111,13 @@ end
 
 function AgeCalculation._calculateAge(startDate, endDate)
 	--age = death/current year - birth year
-	local age = endDate[1] - startDate[1]
+	local age = endDate.year - startDate.year
 	--unless ...
 	if
 		--death/current month < birth month
-		endDate[2] < startDate[2] or (
+		endDate.month < startDate.month or (
 			--or the months are the same but the day of death/current < day of birth
-			endDate[2] == startDate[2] and endDate[3] < startDate[3]
+			endDate.month == startDate.month and endDate.day < startDate.day
 		)
 	then
 		age = age - 1
@@ -149,7 +149,7 @@ else it returns (in case we have a valid date, i.e. one that has year or both da
 ]]--
 function AgeCalculation._processDateFields(date)
 	--if year is not set and month or day is not set return an empty table
-	if not date[1] and not (date[2] and date[3]) then
+	if not date.year and not (date.month and date.day) then
 		return {}
 	end
 
@@ -160,7 +160,7 @@ function AgeCalculation._processDateFields(date)
 	-- > set the date as exact
 	-- > determine the iso of this date
 	-- > determine the storage string (the Y-M-D)
-	if date[1] and date[2] and date[3] then
+	if date.year and date.month and date.day then
 		dateString = table.concat(date, '-')
 		date.iso = _LANG:formatDate('c', dateString)
 		date.exact = true
@@ -169,10 +169,10 @@ function AgeCalculation._processDateFields(date)
 		return date
 	--else set the displayFormatString according to the known parts of the date
 	-- > if year and month are known
-	elseif date[1] and date[2] then
+	elseif date.year and date.month then
 		displayFormatString = 'F, Y'
 	-- > if day and month are known
-	elseif date[2] and date[3] then
+	elseif date.month and date.day then
 		displayFormatString = 'F j'
 	-- > if year is known, but not month (display only year)
 	else
@@ -181,15 +181,15 @@ function AgeCalculation._processDateFields(date)
 
 	--set a minimum date for the given date partials
 	--(by filling unknown partials up with EPOCH time partials)
-	local minDate = { date[1] or _EPOCH_FIELD[1], date[2] or _EPOCH_FIELD[2], date[3] or _EPOCH_FIELD[3] }
+	local minDate = { date.year or _EPOCH_FIELD.year, date.month or _EPOCH_FIELD.month, date.day or _EPOCH_FIELD.day }
 	date.min = minDate
 	date.isoMin = _LANG:formatDate('c', table.concat(minDate, '-'))
 
 	--set a maximum date for the given date partials (by filling
 	--unknown partials up with current year/december/the last day of the month,
 	--but ignoring leap years)
-	local maxDate = { date[1] or _CURRENT_YEAR, date[2] or 12 }
-	maxDate[3] = date[3] or _DEFAULT_DAYS_IN_MONTH[maxDate[2]]
+	local maxDate = { date.year or _CURRENT_YEAR, date.month or 12 }
+	maxDate.day = date.day or _DEFAULT_DAYS_IN_MONTH[maxDate.month]
 	date.max = maxDate
 	dateString = table.concat(maxDate, '-')
 	date.isoMax = _LANG:formatDate('c', dateString)
