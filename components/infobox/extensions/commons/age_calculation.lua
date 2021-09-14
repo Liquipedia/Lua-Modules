@@ -16,21 +16,15 @@ local _EPOCH_FIELD = { 1970, 1, 1 }
 local _CURRENT_FIELD = os.date('*t', os.time())
 local _CURRENT_ISO = _LANG:formatDate('c')
 local _CURRENT_YEAR = tonumber(_LANG:formatDate('Y'))
-local _DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+local _DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
 
 function AgeCalculation.run(birth, birthLocation, death, personType, shouldStore)
-	--disect the dates into fields
-	local birthFields = mw.text.split(birth or '', '-')
-	local deathFields = mw.text.split(death or '', '-')
-	--strip them to numbers
-	for i = 1, 3 do
-		birthFields[i] = tonumber(birthFields[i] or '')
-		deathFields[i] = tonumber(deathFields[i] or '')
-	end
+	local birthFields = AgeCalculation._parseDate(birth) -- This is now an array of a date
+	local deathFields = AgeCalculation._parseDate(death)
 
 	birthFields = AgeCalculation._processDateFields(birthFields)
 	deathFields = AgeCalculation._processDateFields(deathFields)
-	AgeCalculation._sanityCeck(birthFields, deathFields)
+	AgeCalculation._assertValidDates(birthFields, deathFields)
 	local age = AgeCalculation._processAge(birthFields, deathFields)
 
 	local birthDisplay
@@ -55,6 +49,14 @@ function AgeCalculation.run(birth, birthLocation, death, personType, shouldStore
 	end
 
 	return birthDisplay, deathDisplay, birthFields.store, deathFields.store
+end
+
+function AgeCalculation_parseDate(date)
+	local dateField = mw.text.split(date or '', '-')
+	for i = 1, 3 do
+		dateField[i] = tonumber(dateField[i])
+	end
+	return dateField
 end
 
 function AgeCalculation._processAge(birthFields, deathFields)
@@ -129,7 +131,7 @@ function AgeCalculation._processDateFields(date)
 	date.isoMin = _LANG:formatDate('c', table.concat(minDate, '-'))
 
 	local maxDate = { date[1] or _CURRENT_YEAR, date[2] or 12 }
-	maxDate[3] = date[3] or _DAYS_IN_MONTH[maxDate[2]]
+	maxDate[3] = date[3] or _DEFAULT_DAYS_IN_MONTH[maxDate[2]]
 	date.max = maxDate
 	dateString = table.concat(maxDate, '-')
 	date.isoMax = _LANG:formatDate('c', dateString)
@@ -139,7 +141,7 @@ function AgeCalculation._processDateFields(date)
 	return date
 end
 
-function AgeCalculation._sanityCeck(firstDate, secondDate)
+function AgeCalculation._assertValidDates(firstDate, secondDate)
 	local isoMin = firstDate.iso or firstDate.isoMin
 	local isoMax = secondDate.iso or secondDate.isoMax
 	if isoMin and isoMax and isoMin > isoMax then
