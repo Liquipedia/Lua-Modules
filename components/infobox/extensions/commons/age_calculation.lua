@@ -207,9 +207,9 @@ function AgeCalculation._assertValidDates(firstDate, secondDate)
 	if isoFirstMin and isoSecondMax and isoFirstMin > isoSecondMax then
 		error('Death date can not be before birth date')
 	elseif isoFirstMin and  (isoFirstMin > _CURRENT_ISO or isoFirstMin < _EPOCH) then
-		error('Birth date can not be in the future')
+		error('Birth date out of allowed range')
 	elseif isoSecondMin and isoSecondMin > _CURRENT_ISO then
-		error('Invalid death date (out of allowed date range)')
+		error('Death date out of allowed range')
 	end
 end
 
