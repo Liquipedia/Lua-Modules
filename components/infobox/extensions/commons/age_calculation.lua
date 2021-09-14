@@ -129,7 +129,7 @@ end
 The _processDateFields function processes a dateField and
 returns values depending on the exactness of the dateField
 
-if the dateField is exact so the following is returned: {
+if the dateField is exact the following is returned: {
 	1 = year, 2 = month, 3 = day,
 	exact = true,
 	iso = date as iso string
