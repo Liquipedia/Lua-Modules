@@ -38,7 +38,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if
 		id == 'history' and
-		not ( String.isEmpty(_args.team_history) and String.isEmpty(_args.clan_history) )
+		not (String.isEmpty(_args.team_history) and String.isEmpty(_args.clan_history))
 	then
 		return {
 			Title{ name = 'History' },
