@@ -42,8 +42,8 @@ function CustomInjector:parse(id, widgets)
 	then
 		return {
 			Title{ name = 'History' },
-			Center{content = { _args.team_history }},
-			Center{content = { _args.clan_history }},
+			Center{content = {_args.team_history}},
+			Center{content = {_args.clan_history}},
 		}
 	end
 	return widgets
@@ -51,14 +51,14 @@ end
 
 function CustomInjector:addCustomCells()
 	local widgets = {
-		Cell{name = 'Languages', content = { _args.languages }},
+		Cell{name = 'Languages', content = {_args.languages}},
 		Cell{name = 'Favorite players', content = CustomUser:_getArgsfromBaseDefault('fav-player', 'fav-players')},
 		Cell{name = 'Favorite casters', content = CustomUser:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
-		Cell{name = 'Favorite teams', content = { _args['fav-teams'] }}
+		Cell{name = 'Favorite teams', content = {_args['fav-teams']}}
 	}
 	if not String.isEmpty(_args['fav-team-1']) then
-		table.insert(widgets, Title{ name = 'Favorite teams' })
-		table.insert(widgets, Center{content = { CustomUser:_getFavouriteTeams() }})
+		table.insert(widgets, Title{name = 'Favorite teams'})
+		table.insert(widgets, Center{content = {CustomUser:_getFavouriteTeams()}})
 	end
 
 	return widgets
