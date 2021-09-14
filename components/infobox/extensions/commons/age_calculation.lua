@@ -201,7 +201,7 @@ function AgeCalculation._processPartialDateFields(date)
 		month = date.month or 12
 	}
 	--ignoring leap years here as they are irrlevant for the further calculations
-	date.maxPossible.day = date.day or _DEFAULT_DAYS_IN_MONTH[maxDate.month]
+	date.maxPossible.day = date.day or _DEFAULT_DAYS_IN_MONTH[date.maxPossible.month]
 	local dateString = AgeCalculation._makeDateString(date.maxPossible)
 	date.isoMaxPossible = _LANG:formatDate('c', dateString)
 
