@@ -12,7 +12,6 @@ local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
-local Logic = require('Module:Logic')
 
 --race stuff tables
 local _FACTION1 = {
