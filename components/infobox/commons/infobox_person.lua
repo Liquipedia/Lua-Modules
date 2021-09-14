@@ -72,12 +72,12 @@ function Person:createInfobox()
 		Title{name = (args.informationType or 'Player') .. ' Information'},
 		Cell{name = 'Name', content = {args.name}},
 		Cell{name = 'Romanized Name', content = {args.romanized_name}},
-		Cell{name = 'Birth', content = {birthDisplay}},
-		Cell{name = 'Died', content = {deathDisplay}},
 		Cell{
 			name = 'Nationality',
 			content = self:_createLocations(args, personType.category)
 		},
+		Cell{name = 'Birth', content = {birthDisplay}},
+		Cell{name = 'Died', content = {deathDisplay}},
 		Cell{name = 'Region', content = {
 				self:_createRegion(args.region)
 			}
