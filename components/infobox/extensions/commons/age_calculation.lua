@@ -61,8 +61,8 @@ function AgeCalculation._parseDate(date)
 end
 
 function AgeCalculation._processAge(birthFields, deathFields)
-	--set an empty age display field
-	--(we need different displays depending if the person is alive or not
+	--set an empty age display field (we need different
+	--displays depending if the person is alive or not)
 	local age = { birth = '', death = '' }
 	if not birthFields.display then
 		return age
@@ -81,7 +81,7 @@ function AgeCalculation._processAge(birthFields, deathFields)
 	--hence we determine that and use it for the display
 	if birthFields.exact and deathFields.exact then
 		calculatedAgeDisplay = AgeCalculation._calculateAge(birthFields, deathFields)
-	--if one or both are not exact but we knwo the years determine a min age and a max age
+	--if one or both are not exact but we know the years determine a min age and a max age
 	--and determine the display from them
 	elseif deathFields[1] and birthFields[1] then
 		--minimum age is calculated from the maximum birth date (or the real one if given)
