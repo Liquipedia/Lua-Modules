@@ -86,10 +86,10 @@ function AgeCalculation._processAge(birthFields, deathFields)
 	elseif deathFields.year and birthFields.year then
 		--minimum age is calculated from the maximum birth date (or the real one if given)
 		--and the minimum death/current date (or the exact one if known)
-		local minAge = AgeCalculation._calculateAge(birthFields.max or birthFields, deathFields.min or deathFields)
+		local minAge = AgeCalculation._calculateAge(birthFields.maxPossible or birthFields, deathFields.minPossible or deathFields)
 		--maximum age is calculated from the minimum birth date (or the real one if given)
 		--and the maximum death/current date (or the exact one if known)
-		local maxAge = AgeCalculation._calculateAge(birthFields.min or birthFields, deathFields.max or deathFields)
+		local maxAge = AgeCalculation._calculateAge(birthFields.minPossible or birthFields, deathFields.maxPossible or deathFields)
 		--if both min and max are the same the value is singular
 		--else we have a 1 year range to display
 		if minAge == maxAge then
@@ -181,17 +181,15 @@ function AgeCalculation._processDateFields(date)
 
 	--set a minimum date for the given date partials
 	--(by filling unknown partials up with EPOCH time partials)
-	local minDate = { date.year or _EPOCH_FIELD.year, date.month or _EPOCH_FIELD.month, date.day or _EPOCH_FIELD.day }
-	date.min = minDate
-	date.isoMin = _LANG:formatDate('c', table.concat(minDate, '-'))
+	date.minPossible = { date.year or _EPOCH_FIELD.year, date.month or _EPOCH_FIELD.month, date.day or _EPOCH_FIELD.day }
+	date.isoMin = _LANG:formatDate('c', table.concat(date.minPossible, '-'))
 
 	--set a maximum date for the given date partials (by filling
 	--unknown partials up with current year/december/the last day of the month,
 	--but ignoring leap years)
-	local maxDate = { date.year or _CURRENT_YEAR, date.month or 12 }
-	maxDate.day = date.day or _DEFAULT_DAYS_IN_MONTH[maxDate.month]
-	date.max = maxDate
-	dateString = table.concat(maxDate, '-')
+	date.maxPossible = { date.year or _CURRENT_YEAR, date.month or 12 }
+	date.maxPossible.day = date.day or _DEFAULT_DAYS_IN_MONTH[maxDate.month]
+	dateString = table.concat(date.maxPossible, '-')
 	date.isoMax = _LANG:formatDate('c', dateString)
 
 	--set the display according to the above determined format string
