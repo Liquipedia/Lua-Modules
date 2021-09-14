@@ -1,4 +1,3 @@
-  
 ---
 -- @Liquipedia
 -- wiki=commons
@@ -33,7 +32,7 @@ function AgeCalculation.run(birth, birthLocation, death, personType, shouldStore
 	deathFields = AgeCalculation._processDateFields(deathFields)
 	AgeCalculation._sanityCeck(birthFields, deathFields)
 	local age = AgeCalculation._processAge(birthFields, deathFields)
-	
+
 	local birthDisplay
 	if birthFields.display then
 		birthDisplay = birthFields.display .. age.birth
@@ -47,7 +46,7 @@ function AgeCalculation.run(birth, birthLocation, death, personType, shouldStore
 			birthDisplay = birthDisplay .. '[[Category:' .. birthFields[1] .. 'births]]'
 		end
 	end
-	local deathDisplay 
+	local deathDisplay
 	if deathFields.display then
 		deathDisplay = deathFields.display .. age.death
 		if shouldStore and not deathFields.exact then
@@ -64,7 +63,6 @@ function AgeCalculation._processAge(birthFields, deathFields)
 		return age
 	end
 	if not deathFields.display then
-		key = 'death'
 		deathFields[1] = _CURRENT_FIELD['year']
 		deathFields[2] = _CURRENT_FIELD['month']
 		deathFields[3] = _CURRENT_FIELD['day']
@@ -126,7 +124,7 @@ function AgeCalculation._processDateFields(date)
 		displayFormatString = 'F j'
 	end
 
-	local minDate = { date[1] or 1970, date[2] or 1, date[3] or 1 }
+	local minDate = { date[1] or _EPOCH_FIELD[1], date[2] or _EPOCH_FIELD[2], date[3] or _EPOCH_FIELD[3] }
 	date.min = minDate
 	date.isoMin = _LANG:formatDate('c', table.concat(minDate, '-'))
 
