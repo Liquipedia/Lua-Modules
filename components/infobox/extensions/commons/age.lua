@@ -8,16 +8,25 @@ local _DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 
 local _MONTH_DECEMBER = 12
 local _CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y'))
 
+---
+-- Represents a date
+--
+-- Before accessing the `year`, `month` and `day` values, please verify
+-- whether `isExact` or `isEmpty` are set to false or true respectively.
+--
+-- `isExact`: Whether this is a complete date, consisting of YYYY-MM-DD
+-- `isEmpty`: Whether there is a date here at all.
+-- `time`: Time in seconds
 local Date = Class.new(
 	function(self, dateString)
 		if String.isEmpty(dateString) then
-			self.exact = false
-			self.empty = true
+			self.isExact = false
+			self.isEmpty = true
 			return
 		end
 
-		self.empty = false
-		self.exact = true
+		self.isEmpty = false
+		self.isExact = true
 		local fields = mw.text.split(dateString, '-')
 
 		self.year = tonumber(fields[1])
@@ -25,7 +34,7 @@ local Date = Class.new(
 		self.day = tonumber(fields[3])
 
 		if self.year == nil or self.month == nil or self.day == nil then
-			self.exact = false
+			self.isExact = false
 		else
 			self.time = os.time({
 				year = self.year,
@@ -69,18 +78,18 @@ local Age = Class.new(
 
 function Age:calculate()
 	local endDate
-	if self.deathDate.empty then
+	if self.deathDate.isEmpty then
 		endDate = os.time()
 	else
 		endDate = self.deathDate.time
 	end
 
-	if self.birthDate.exact and (self.deathDate.exact or self.deathDate.empty) then
+	if self.birthDate.isExact and (self.deathDate.exact or self.deathDate.isEmpty) then
 		return self:_secondsToAge(os.difftime(endDate, self.birthDate.time))
-	elseif self.birthDate.year and (self.deathDate.year or self.deathDate.empty) then
+	elseif self.birthDate.year and (self.deathDate.year or self.deathDate.isEmpty) then
 		local minEndDate
 		local maxEndDate
-		if self.deathDate.empty then
+		if self.deathDate.isEmpty then
 			minEndDate = os.time()
 			maxEndDate = os.time()
 		else
@@ -120,7 +129,7 @@ end
 
 function AgeCalculation._assertValidDates(birthDate, deathDate)
 	local earliestPossibleBirthDate = birthDate:getEarliestPossible()
-	if deathDate.exact then
+	if deathDate.isExact then
 		if earliestPossibleBirthDate > deathDate:getLatestPossible() then
 			return error('Death date can not be before birth date')
 		end
