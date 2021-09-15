@@ -72,6 +72,7 @@ function StarcraftBracketDisplay.OpponentEntry(props)
 	local opponent = props.opponent
 
 	local showRaceBackground = opponent.type == 'solo'
+		or opponent.extradata.hasRaceOrFlag
 		or opponent.type == 'duo' and opponent.isArchon
 
 	-- Temporary workaround for lpdb bug misplacing players in match2opponent
