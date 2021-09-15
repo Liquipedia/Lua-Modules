@@ -46,10 +46,6 @@ local Date = Class.new(
 	end
 )
 
-function Date:makeIso()
-	return mw.getContentLanguage():formatDate('c', self.time)
-end
-
 function Date:getEarliestPossible()
 	return os.time({
 		year = self.year or _EPOCH_DATE.year,
