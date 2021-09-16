@@ -399,7 +399,7 @@ function p._convertDataForStorage(data)
 end
 
 function p._addLoggedInWarning(text)
-	local div = mw.html.create('div'):addClass('shown-when-logged-in navigation-not-searchable ambox-wrapper')
+	local div = mw.html.create('div'):addClass('show-when-logged-in navigation-not-searchable ambox-wrapper')
 		:addClass('ambox wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red')
 	local tbl = mw.html.create('table')
 	tbl:tag('tr')
