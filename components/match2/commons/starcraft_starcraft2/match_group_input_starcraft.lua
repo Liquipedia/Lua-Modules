@@ -628,12 +628,27 @@ function StarCraftMatchGroupInput.ProcessOpponentInput(opp, playernumber)
 end
 
 function StarCraftMatchGroupInput.ProcessLiteralOpponentInput(opp)
+	local race = opp.race or ''
+	local flag = opp.flag or ''
+
+	local players = {}
+	if race ~= '' or flag ~= '' then
+		players[1] = {
+			displayname = opp[1],
+			name = '',
+			flag = cleanFlag(flag),
+			extradata = { faction = FACTIONS[string.lower(race)] or 'u' }
+		}
+		local extradata = json.parseIfString(opp.extradata or '{}')
+		extradata.hasRaceOrFlag = true
+	end
+
 	return {
 		type = opp['type'],
 		name = opp[1],
 		score = opp.score,
 		extradata = opp.extradata,
-		match2players = {}
+		match2players = players
 	}
 end
 

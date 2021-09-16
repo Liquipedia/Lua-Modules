@@ -88,6 +88,9 @@ function StarcraftOpponentDisplay.BlockOpponent(props)
 			team = opponent.team,
 			template = opponent.template or 'tbd',
 		})
+	elseif opponent.type == 'literal' and opponent.extradata.hasRaceOrFlag then
+		props.showRace = false
+		return StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 	elseif opponent.type == 'literal' then
 		return OpponentDisplay.BlockOpponent(props)
 	else -- opponent.type == 'solo' 'duo' 'trio' 'quad'
