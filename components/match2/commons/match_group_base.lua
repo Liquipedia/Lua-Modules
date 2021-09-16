@@ -60,6 +60,9 @@ function p.luaMatchlist(frame, args, matchBuilder)
 		)
 	end
 
+	local sectionHeader = args.section or Variables.varDefault('bracket_header') or ''
+	Variables.varDefine('bracket_header', sectionHeader)
+
 	local storedData = {}
 	local currentMatchInWikicode = 'M1'
 
@@ -114,6 +117,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 		end
 
 		bd['bracketindex'] = Variables.varDefault('match2bracketindex', 0)
+		bd['sectionheader'] = sectionHeader
 
 		match['bracketdata'] = json.stringify(bd)
 
@@ -180,6 +184,9 @@ function p.luaBracket(frame, args, matchBuilder)
 	if Logic.readBool(args.isLegacy) then
 		_loggedInWarning = _loggedInWarning .. p._addLoggedInWarning('This is a Legacy bracket use the new brackets instead!')
 	end
+
+	local sectionHeader = args.section or Variables.varDefault('bracket_header') or ''
+	Variables.varDefine('bracket_header', sectionHeader)
 
 	-- get bracket data from template
 	local bracketData = p._getBracketData(templateid, bracketid)
@@ -262,6 +269,8 @@ function p.luaBracket(frame, args, matchBuilder)
 			if bd['bracketreset'] ~= '' and not args['RxMBR'] then
 				bd['bracketreset'] = ''
 			end
+
+			bd['sectionheader'] = sectionHeader
 
 			match['bracketdata'] = json.stringify(bd)
 
