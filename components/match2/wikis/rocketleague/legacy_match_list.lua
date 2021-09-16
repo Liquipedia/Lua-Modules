@@ -50,6 +50,7 @@ function LegacyMatchList.convertMatchList(frame)
 		args.title = args[1]
 	end
 	args[1] = nil
+	args.isLegacy = true
 
 	--pass the adjusted arguments to the MatchGroup
 	return require('Module:MatchGroup').luaMatchlist(frame, args)
