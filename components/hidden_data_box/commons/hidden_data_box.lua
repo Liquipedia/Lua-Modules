@@ -14,8 +14,8 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local HiddenDataBox = {}
 
 function HiddenDataBox.run(args)
-	local tournament = args.tournament or mw.title.getCurrentTitle().prefixedText
-	local parent = tournament:gsub('/.-$', ''):gsub(' ', '_')
+	local parent = args.tournament or mw.title.getCurrentTitle().basePageTitle
+	parent = parent:gsub(' ', '_')
 
 	local queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[pagename::' .. parent .. ']]',
