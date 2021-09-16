@@ -1,5 +1,6 @@
 local Class = require('Module:Class')
 local String = require('Module:String')
+local Variables = require('Module:Variables')
 
 local AgeCalculation = {}
 
@@ -45,6 +46,28 @@ local Date = Class.new(
 
 	end
 )
+
+function Date:makeDisplay()
+	if self.isEmpty then
+		return ''
+	end
+
+	local timestamp = self:getEarliestPossible()
+
+	return os.date('%B %e, %Y', timestamp)
+end
+
+function Date:makeIso()
+	if self.isEmpty then
+		return ''
+	end
+
+	local year = self.year or _EPOCH_DATE.year
+	local month = self.month or _EPOCH_DATE.month
+	local day = self.day or _EPOCH_DATE.day
+
+	return year .. '-' .. month .. '-' .. day
+end
 
 function Date:getEarliestPossible()
 	return os.time({
@@ -108,6 +131,24 @@ function Age:calculate()
 	return nil
 end
 
+function Age:makeDisplay()
+	local age = self:calculate()
+	local result = {
+		death = nil,
+		birth = nil,
+	}
+
+	if age ~= nil then
+		if not self.deathDate.isEmpty then
+			result.death = self.deathDate:makeDisplay() .. ' (aged ' .. age .. ')'
+		end
+
+		result.birth = self.birthDate:makeDisplay() .. ' (age ' .. age .. ')'
+	end
+
+	return result
+end
+
 function Age:_secondsToAge(seconds)
 	return math.floor(seconds / 60 / 60 / 24 / 365.25)
 end
@@ -118,9 +159,15 @@ function AgeCalculation.run(args)
 
 	AgeCalculation._assertValidDates(birthDate, deathDate)
 
-	local age = Age(birthDate, deathDate)
+	local age = Age(birthDate, deathDate):makeDisplay()
 
-	return age:calculate()
+	Variables.varDefine('player_birthdate', birthDate:makeIso())
+	Variables.varDefine('player_deathdate', deathDate:makeIso())
+
+	return {
+		birth = age.birth,
+		death = age.death
+	}
 end
 
 function AgeCalculation._assertValidDates(birthDate, deathDate)
