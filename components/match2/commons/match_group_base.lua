@@ -55,7 +55,9 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	end
 
 	if Logic.readBool(args.isLegacy) then
-		_loggedInWarning = _loggedInWarning .. p._addLoggedInWarning('This is a Legacy matchlist use the new matchlists instead!')
+		_loggedInWarning = _loggedInWarning .. p._addLoggedInWarning(
+			'This is a Legacy matchlist use the new matchlists instead!'
+		)
 	end
 
 	local storedData = {}
