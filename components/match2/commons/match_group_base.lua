@@ -17,6 +17,7 @@ local Variables = require('Module:Variables')
 local String = require('Module:StringUtils')
 local globalArgs
 local category = ''
+local _loggedInWarning = ''
 
 local MatchGroupDisplay = require('Module:MatchGroup/Display')
 
@@ -51,6 +52,12 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	-- check if the bracket is a duplicate
 	if storeInLPDB or (not Logic.readBool(args.noDuplicateCheck)) then
 		p._checkBracketDuplicate(bracketid)
+	end
+
+	if Logic.readBool(args.isLegacy) then
+		_loggedInWarning = _loggedInWarning .. p._addLoggedInWarning(
+			'This is a Legacy matchlist use the new matchlists instead!'
+		)
 	end
 
 	local storedData = {}
@@ -126,7 +133,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	Variables.varDefine('match2bracketindex', Variables.varDefault('match2bracketindex', 0) + 1)
 
 	if args.hide ~= 'true' then
-		return category .. tostring(MatchGroupDisplay.luaMatchlist(frame, {
+		return _loggedInWarning .. category .. tostring(MatchGroupDisplay.luaMatchlist(frame, {
 			bracketid,
 			attached = args.attached,
 			collapsed = args.collapsed,
@@ -134,7 +141,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 			width = args.width or args.matchWidth,
 		}))
 	end
-	return category
+	return _loggedInWarning .. category
 end
 
 function p.bracket(frame)
@@ -168,6 +175,10 @@ function p.luaBracket(frame, args, matchBuilder)
 	-- check if the bracket is a duplicate
 	if storeInLPDB or (not Logic.readBool(args.noDuplicateCheck)) then
 		p._checkBracketDuplicate(bracketid)
+	end
+
+	if Logic.readBool(args.isLegacy) then
+		_loggedInWarning = _loggedInWarning .. p._addLoggedInWarning('This is a Legacy bracket use the new brackets instead!')
 	end
 
 	-- get bracket data from template
@@ -280,7 +291,7 @@ function p.luaBracket(frame, args, matchBuilder)
 	Variables.varDefine('match2bracketindex', Variables.varDefault('match2bracketindex', 0) + 1)
 
 	if args.hide ~= 'true' then
-		return category .. tostring(MatchGroupDisplay.luaBracket(frame, {
+		return _loggedInWarning .. category .. tostring(MatchGroupDisplay.luaBracket(frame, {
 			bracketid,
 			emptyRoundTitles = args.emptyRoundTitles,
 			headerHeight = args.headerHeight,
@@ -293,7 +304,7 @@ function p.luaBracket(frame, args, matchBuilder)
 			qualifiedHeader = args.qualifiedHeader,
 		}))
 	end
-	return category
+	return _loggedInWarning .. category
 end
 
 -- retrieve bracket data from bracket template
@@ -348,6 +359,7 @@ function p._checkBracketDuplicate(bracketid)
 	if status ~= 'ok' then
 		mw.addWarning('Bracketid \'' .. bracketid .. '\' is used more than once on this page.')
 		category = '[[Category:Pages with duplicate Bracketid]]'
+		_loggedInWarning = p._addLoggedInWarning('This Matchgroup uses the duplicate ID \'' .. bracketid .. '\'.')
 	end
 end
 
@@ -384,6 +396,16 @@ function p._convertDataForStorage(data)
 		end
 	end
 	return json.stringify(data)
+end
+
+function p._addLoggedInWarning(text)
+	local div = mw.html.create('div'):addClass('show-when-logged-in navigation-not-searchable ambox-wrapper')
+		:addClass('ambox wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red')
+	local tbl = mw.html.create('table')
+	tbl:tag('tr')
+		:tag('td'):addClass('ambox-image'):wikitext('[[File:Emblem-important.svg|40px|link=]]'):done()
+		:tag('td'):addClass('ambox-text'):wikitext(text)
+	return tostring(div:node(tbl))
 end
 
 return p
