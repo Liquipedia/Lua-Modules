@@ -19,13 +19,14 @@ local _CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y'))
 -- `isEmpty`: Whether there is a date here at all.
 -- `time`: Time in seconds
 local Date = Class.new(
-	function(self, dateString)
+	function(self, dateString, location)
 		if String.isEmpty(dateString) then
 			self.isExact = false
 			self.isEmpty = true
 			return
 		end
 
+		self.location = location
 		self.isEmpty = false
 		self.isExact = true
 		local fields = mw.text.split(dateString, '-')
@@ -56,7 +57,12 @@ function Date:makeDisplay()
 	local timestamp = self:getEarliestPossible()
 
 	if formatString then
-		return os.date(formatString, timestamp)
+		local formatted = os.date(formatString, timestamp)
+		if not String.isEmpty(self.location) then
+			formatted = formatted .. '<br>' .. self.location
+		end
+
+		return formatted
 	end
 
 	return ''
@@ -176,7 +182,9 @@ function Age:_secondsToAge(seconds)
 end
 
 function AgeCalculation.run(args)
-	local birthDate = BirthDate(args.birthdate)
+	local shouldStore = args.shouldstore
+	local birthLocation = args.birthlocation
+	local birthDate = BirthDate(args.birthdate, birthLocation)
 	local deathDate = DeathDate(args.deathdate)
 
 	AgeCalculation._assertValidDates(birthDate, deathDate)
@@ -185,6 +193,20 @@ function AgeCalculation.run(args)
 
 	Variables.varDefine('player_birthdate', birthDate:makeIso())
 	Variables.varDefine('player_deathdate', deathDate:makeIso())
+
+	if shouldStore then
+		if not birthDate.isExact then
+			age.birth = age.birth .. '[[Category:Incomplete birth dates]]'
+		end
+
+		if birthDate.year then
+			age.birth = age.birth .. '[[Category:' .. birthDate.year .. ' births]]'
+		end
+
+		if not deathDate.isExact then
+			age.death = age.death .. '[[Category:Incomplete death dates]]'
+		end
+	end
 
 	return {
 		birth = age.birth,
