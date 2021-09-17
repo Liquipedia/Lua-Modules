@@ -58,13 +58,13 @@ function Date:makeDisplay()
 end
 
 function Date:makeIso()
-	if self.isEmpty then
+	if self.isEmpty or not self.isExact then
 		return ''
 	end
 
-	local year = self.year or _EPOCH_DATE.year
-	local month = self.month or _EPOCH_DATE.month
-	local day = self.day or _EPOCH_DATE.day
+	local year = self.year
+	local month = self.month
+	local day = self.day
 
 	return year .. '-' .. month .. '-' .. day
 end
