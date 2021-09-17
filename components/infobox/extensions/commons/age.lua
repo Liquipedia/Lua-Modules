@@ -141,9 +141,10 @@ function Age:makeDisplay()
 	if age ~= nil then
 		if not self.deathDate.isEmpty then
 			result.death = self.deathDate:makeDisplay() .. ' (aged ' .. age .. ')'
+			result.birth = self.birthDate:makeDisplay()
+		else
+			result.birth = self.birthDate:makeDisplay() .. ' (age ' .. age .. ')'
 		end
-
-		result.birth = self.birthDate:makeDisplay() .. ' (age ' .. age .. ')'
 	end
 
 	return result
