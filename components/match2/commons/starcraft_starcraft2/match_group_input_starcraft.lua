@@ -95,9 +95,18 @@ end
 
 function StarCraftMatchGroupInput.checkFinished(match)
 	local lang = match.lang
-	if Logic.readBool(match.finished) or (not Logic.isEmpty(match.winner)) then
+
+	if match.finished == 'false' then
+		match.finished = false
+	elseif Logic.readBool(match.finished) then
 		match.finished = true
-	else
+	elseif not Logic.isEmpty(match.winner) then
+		match.finished = true
+	end
+
+	-- Match is automatically marked finished upon page edit after after a
+	-- certain amount of time (depending on whether the date is exact)
+	if match.finished ~= true then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
