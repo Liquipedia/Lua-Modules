@@ -52,9 +52,14 @@ function Date:makeDisplay()
 		return ''
 	end
 
+	local formatString = self:_getFormatString()
 	local timestamp = self:getEarliestPossible()
 
-	return os.date('%B %e, %Y', timestamp)
+	if formatString then
+		return os.date(formatString, timestamp)
+	end
+
+	return ''
 end
 
 function Date:makeIso()
@@ -67,6 +72,22 @@ function Date:makeIso()
 	local day = self.day
 
 	return year .. '-' .. month .. '-' .. day
+end
+
+function Date:_getFormatString()
+	if self.year then
+		if self.month and self.day then
+			return '%B %e, %Y'
+		elseif self.month then
+			return '%B, %Y'
+		else -- Ignore day if we do not know the month
+			return '%Y'
+		end
+	elseif self.month and self.day then
+		return '%B %e'
+	elseif self.month then
+		return '%B'
+	end
 end
 
 function Date:getEarliestPossible()
