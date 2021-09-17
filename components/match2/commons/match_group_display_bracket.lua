@@ -303,9 +303,10 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 		end
 		if bracketData.qualWin then
 			local headerRow = getHeaderRow(matchId)
-			headerRow[coords.roundIx + bracketData.qualSkip] = {
+			local roundIx = coords.roundIx + 1 + bracketData.qualSkip
+			headerRow[roundIx] = {
 				header = config.qualifiedHeader or '!q',
-				roundIx = coords.roundIx + bracketData.qualSkip,
+				roundIx = roundIx,
 			}
 		end
 	end
@@ -316,7 +317,7 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 		for _, cell in pairs(headerRow) do
 			table.insert(headerRowArray, cell)
 		end
-		table.sort(headerRowArray, function(a, b) return a.roundIx - b.roundIx end)
+		table.sort(headerRowArray, function(a, b) return a.roundIx < b.roundIx end)
 		return headerRowArray
 	end)
 end
@@ -564,7 +565,7 @@ function BracketDisplay.Match(props)
 
 		matchNode
 			:node(matchInfoIconNode):node(matchSummaryNode)
-			:addClass('brkts-match-has-details')
+			:addClass('brkts-match-has-details brkts-match-popup-wrapper')
 	end
 
 	return matchNode
