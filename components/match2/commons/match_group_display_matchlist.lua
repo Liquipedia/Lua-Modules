@@ -83,8 +83,8 @@ function MatchlistDisplay.Matchlist(props)
 	}
 
 	local matchlistNode = mw.html.create('div'):addClass('brkts-matchlist')
-		:addClass(config.collapsible and 'collapsible' or nil)
-		:addClass(config.collapsed and 'collapsed' or nil)
+		:addClass(config.collapsible and 'brkts-matchlist-collapsible' or nil)
+		:addClass(config.collapsed and 'brkts-matchlist-collapsed' or nil)
 		:addClass(config.attached and 'brkts-matchlist-attached' or nil)
 		:css('width', config.width .. 'px')
 
