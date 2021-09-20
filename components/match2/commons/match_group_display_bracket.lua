@@ -1,16 +1,26 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchGroup/Display/Bracket
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Math = require('Module:Math')
-local OpponentDisplay = require('Module:OpponentDisplay')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local html = mw.html
 local _NON_BREAKING_SPACE = '&nbsp;'

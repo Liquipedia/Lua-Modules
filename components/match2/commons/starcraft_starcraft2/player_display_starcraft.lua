@@ -10,12 +10,12 @@ local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PlayerDisplay = require('Module:Player/Display')
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
 local StarcraftPlayerUtil = require('Module:Player/Util/Starcraft')
 local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
 
+local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
 	getSmallIcon = function() end,
 }

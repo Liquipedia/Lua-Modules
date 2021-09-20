@@ -1,8 +1,10 @@
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require("Module:Logic")
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local OpponentDisplay = require('Module:OpponentDisplay')
 local Template = require('Module:Template')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local htmlCreate = mw.html.create
 

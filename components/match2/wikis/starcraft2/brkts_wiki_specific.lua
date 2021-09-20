@@ -13,9 +13,7 @@ local Table = require('Module:Table')
 local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
 
 WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
-	local InputModule = require('Module:DevFlags').matchGroupDev
-		and Lua.requireIfExists('Module:MatchGroup/Input/StarCraft/dev')
-		or require('Module:MatchGroup/Input/StarCraft')
+	local InputModule = Lua.import('Module:MatchGroup/Input/StarCraft', {requireDevIfEnabled = true})
 	return InputModule.processMatch
 end)
 
@@ -24,16 +22,9 @@ WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 end)
 
 function WikiSpecific.getMatchGroupModule(matchGroupType)
-	local DevFlags = require('Module:DevFlags')
-	if matchGroupType == 'matchlist' then
-		return DevFlags.matchGroupDev
-			and Lua.requireIfExists('Module:MatchGroup/Display/Matchlist/Starcraft/dev')
-			or require('Module:MatchGroup/Display/Matchlist/Starcraft')
-	else -- matchGroupType == 'bracket'
-		return DevFlags.matchGroupDev
-			and Lua.requireIfExists('Module:MatchGroup/Display/Bracket/Starcraft/dev')
-			or require('Module:MatchGroup/Display/Bracket/Starcraft')
-	end
+	return matchGroupType == 'matchlist'
+		and Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true})
+		or Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true})
 end
 
 --Default Logo for Teams without Team Template

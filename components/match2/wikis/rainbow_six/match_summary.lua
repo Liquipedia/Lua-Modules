@@ -10,12 +10,14 @@ local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local MatchSummary = require('Module:MatchSummary/Base')
 local OperatorIcon = require('Module:OperatorIcon')
-local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'

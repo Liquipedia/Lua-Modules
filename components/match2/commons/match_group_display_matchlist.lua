@@ -1,12 +1,22 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchGroup/Display/Matchlist
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
 

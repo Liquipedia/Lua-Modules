@@ -6,17 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BracketDisplay = require('Module:MatchGroup/Display/Bracket')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local OpponentDisplay = require('Module:OpponentDisplay')
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
-local StarcraftOpponentDisplay = require('Module:OpponentDisplay/Starcraft')
 local Table = require('Module:Table')
 
+local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local RaceColor = Lua.loadDataIfExists('Module:RaceColorClass') or {}
+local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 
 local html = mw.html
 

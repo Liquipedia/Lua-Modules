@@ -154,9 +154,7 @@ in a different props.MatchSummaryContainer in the Bracket and Matchlist
 components.
 ]]
 DisplayHelper.DefaultMatchSummaryContainer = function(props)
-	local DevFlags = require('Module:DevFlags')
-	local MatchSummaryModule = DevFlags.matchGroupDev and Lua.requireIfExists('Module:MatchSummary/dev')
-		or require('Module:MatchSummary')
+	local MatchSummaryModule = Lua.import('Module:MatchSummary', {requireDevIfEnabled = true})
 
 	if MatchSummaryModule.getByMatchId then
 		return MatchSummaryModule.getByMatchId(props)

@@ -9,11 +9,13 @@
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require("Module:Logic")
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local MatchSummary = require('Module:MatchSummary/Base')
-local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local Agents = Class.new(
 	function(self)
