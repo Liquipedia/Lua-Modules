@@ -98,6 +98,10 @@ function CustomStrategy:_getTLarticle(tlarticle)
 end
 
 function CustomStrategy:_getCategories(race, matchups)
+	if String.isEmpty(matchups) then
+		return {}
+	end
+
 	local categories = {}
 	race = string.lower(race or '')
 	race = CleanRace[race] or ''
