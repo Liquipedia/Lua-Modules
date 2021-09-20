@@ -162,10 +162,12 @@ function MatchlistDisplay.Match(props)
 			matchId = props.match.matchId,
 		})
 			:addClass('brkts-match-info-popup')
+	else
+		matchInfoIconNode = mw.html.create('div'):addClass('brkts-matchlist-placeholder-cell')
 	end
 
 	return mw.html.create('div'):addClass('brkts-matchlist-match')
-		:addClass(matchSummaryNode and 'brkts-match-has-details' or nil)
+		:addClass(matchSummaryNode and 'brkts-match-has-details brkts-match-popup-wrapper' or nil)
 		:node(renderOpponent(1))
 		:node(renderScore(1))
 		:node(matchInfoIconNode)
