@@ -20,7 +20,8 @@ local Links = Class.new(
 )
 
 local _ICON_KEYS_TO_RENAME = {
-	matcherinolink = 'matcherino'
+	['esea-d'] = 'esea',
+	matcherinolink = 'matcherino',
 }
 
 local _PRIORITY_GROUPS = {
