@@ -10,6 +10,7 @@ local MatchGroupBase = require('Module:MatchGroup/Base')
 
 local MatchGroup = {}
 
+-- Entry point used by Template:Bracket
 function MatchGroup.bracket(frame)
 	return MatchGroupBase.bracket(frame)
 end
@@ -18,6 +19,7 @@ function MatchGroup.luaBracket(frame, args)
 	return MatchGroupBase.luaBracket(frame, args)
 end
 
+-- Entry point used by Template:Matchlist
 function MatchGroup.matchlist(frame)
 	return MatchGroupBase.matchlist(frame)
 end
