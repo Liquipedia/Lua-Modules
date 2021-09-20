@@ -6,18 +6,18 @@ local StarcraftMatchSummary = require('Module:MatchSummary/Starcraft/dev')
 local StarcraftOpponentDisplay = require('Module:OpponentDisplay/Starcraft/dev')
 local Table = require('Module:Table')
 
-local StarcraftFFAMatchSummary = {propTypes = {}}
+local CustomFfaMatchSummary = {propTypes = {}}
 
 --[[
 FFAMatchSummary module specific to the starcraft/starcraft2 wikis.
 ]]
-function StarcraftFFAMatchSummary.FFAMatchSummary(props)
+function CustomFfaMatchSummary.FFAMatchSummary(props)
 	if props.match.opponentMode == 'team' then
 		error('Team matches are not supported in StarcraftFFAMatchSummary')
 	end
 
 	local function GamePlacement(cellProps)
-		return StarcraftFFAMatchSummary.GamePlacement({
+		return CustomFfaMatchSummary.GamePlacement({
 			opponent = cellProps.opponent,
 			matchOpponent = props.match.opponents[cellProps.opponentIx],
 		})
@@ -26,15 +26,15 @@ function StarcraftFFAMatchSummary.FFAMatchSummary(props)
 	return FFAMatchSummary.FFAMatchSummary({
 		match = props.match,
 		config = Table.merge(props.config, {
-			Footer = StarcraftFFAMatchSummary.Footer,
+			Footer = CustomFfaMatchSummary.Footer,
 			GamePlacement = GamePlacement,
-			Opponent = StarcraftFFAMatchSummary.Opponent,
-			rowHeight = StarcraftFFAMatchSummary.computeRowHeight(props.match),
+			Opponent = CustomFfaMatchSummary.Opponent,
+			rowHeight = CustomFfaMatchSummary.computeRowHeight(props.match),
 		})
 	})
 end
 
-function StarcraftFFAMatchSummary.Opponent(props)
+function CustomFfaMatchSummary.Opponent(props)
 	local contentNode = StarcraftOpponentDisplay.BlockOpponent({
 		opponent = props.opponent,
 		overflow = props.opponent.type == 'team' and 'hidden' or 'ellipsis',
@@ -47,7 +47,7 @@ function StarcraftFFAMatchSummary.Opponent(props)
 		:node(contentNode)
 end
 
-function StarcraftFFAMatchSummary.GamePlacement(props)
+function CustomFfaMatchSummary.GamePlacement(props)
 	local opponent = props.opponent
 	local offraces = StarcraftMatchGroupUtil.computeOffraces(opponent, props.matchOpponent)
 
@@ -58,7 +58,7 @@ function StarcraftFFAMatchSummary.GamePlacement(props)
 		:node(opponent.placement and tostring(opponent.placement) .. '.' or '')
 end
 
-function StarcraftFFAMatchSummary.Footer(props)
+function CustomFfaMatchSummary.Footer(props)
 	local links = StarcraftMatchExternalLinks.extractFromMatch(props.match)
 	if #links > 0 then
 		local linksNode = StarcraftMatchExternalLinks.MatchExternalLinks({links = links})
@@ -70,7 +70,7 @@ function StarcraftFFAMatchSummary.Footer(props)
 	end
 end
 
-function StarcraftFFAMatchSummary.computeRowHeight(match)
+function CustomFfaMatchSummary.computeRowHeight(match)
 	local maxHeight = 36
 	for _, opponent in ipairs(match.opponents) do
 		local padding = 5
@@ -81,4 +81,4 @@ function StarcraftFFAMatchSummary.computeRowHeight(match)
 	return maxHeight
 end
 
-return Class.export(StarcraftFFAMatchSummary)
+return Class.export(CustomFfaMatchSummary)
