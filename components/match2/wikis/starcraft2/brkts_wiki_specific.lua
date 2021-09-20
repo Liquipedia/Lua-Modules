@@ -13,7 +13,7 @@ local Table = require('Module:Table')
 local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
 
 WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
-	local InputModule = Lua.import('Module:MatchGroup/Input/StarCraft', {requireDevIfEnabled = true})
+	local InputModule = Lua.import('Module:MatchGroup/Input/Starcraft', {requireDevIfEnabled = true})
 	return InputModule.processMatch
 end)
 

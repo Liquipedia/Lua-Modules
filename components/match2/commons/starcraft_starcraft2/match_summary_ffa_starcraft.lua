@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchSummary/FFA/Starcraft
+-- page=Module:MatchSummary/Ffa/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -12,18 +12,18 @@ local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
 local Table = require('Module:Table')
 
-local FFAMatchSummary = Lua.import('Module:MatchSummary/FFA', {requireDevIfEnabled = true})
+local FfaMatchSummary = Lua.import('Module:MatchSummary/Ffa', {requireDevIfEnabled = true})
 local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 
 local CustomFfaMatchSummary = {propTypes = {}}
 
 --[[
-FFAMatchSummary module specific to the starcraft/starcraft2 wikis.
+FfaMatchSummary module specific to the starcraft/starcraft2 wikis.
 ]]
-function CustomFfaMatchSummary.FFAMatchSummary(props)
+function CustomFfaMatchSummary.FfaMatchSummary(props)
 	if props.match.opponentMode == 'team' then
-		error('Team matches are not supported in StarcraftFFAMatchSummary')
+		error('Team matches are not supported in StarcraftFfaMatchSummary')
 	end
 
 	local function GamePlacement(cellProps)
@@ -33,7 +33,7 @@ function CustomFfaMatchSummary.FFAMatchSummary(props)
 		})
 	end
 
-	return FFAMatchSummary.FFAMatchSummary({
+	return FfaMatchSummary.FfaMatchSummary({
 		match = props.match,
 		config = Table.merge(props.config, {
 			Footer = CustomFfaMatchSummary.Footer,
@@ -53,7 +53,7 @@ function CustomFfaMatchSummary.Opponent(props)
 		:addClass('ffa-match-summary-cell-content')
 	return mw.html.create('div')
 		:addClass('ffa-match-summary-cell ffa-match-summary-opponent')
-		:addClass(FFAMatchSummary.getOpponentBgClass(props.opponent, props.match))
+		:addClass(FfaMatchSummary.getOpponentBgClass(props.opponent, props.match))
 		:node(contentNode)
 end
 
@@ -63,7 +63,7 @@ function CustomFfaMatchSummary.GamePlacement(props)
 
 	return mw.html.create('div'):addClass('ffa-match-summary-cell')
 		:addClass('ffa-match-summary-game-placement')
-		:addClass(opponent.placement and FFAMatchSummary.getPlacementClass(opponent.placement))
+		:addClass(opponent.placement and FfaMatchSummary.getPlacementClass(opponent.placement))
 		:node(offraces and StarcraftMatchSummary.OffraceIcons(offraces) or nil)
 		:node(opponent.placement and tostring(opponent.placement) .. '.' or '')
 end

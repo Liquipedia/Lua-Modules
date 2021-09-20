@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchGroup/Input/StarCraft
+-- page=Module:MatchGroup/Input/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -34,39 +34,39 @@ local MODES2 = {
 	['literal'] = 'literal',
 }
 
-local getStarCraftFFAInputModule = FnUtil.memoize(function()
-	return Lua.import('Module:MatchGroup/Input/StarCraft/FFA', {requireDevIfEnabled = true})
+local getStarcraftFfaInputModule = FnUtil.memoize(function()
+	return Lua.import('Module:MatchGroup/Input/Starcraft/Ffa', {requireDevIfEnabled = true})
 end)
 
 --[[
 Module for converting input args of match group objects into LPDB records. This
-module is specific to the StarCraft and StarCraft2 wikis.
+module is specific to the Starcraft and Starcraft2 wikis.
 ]]
-local StarCraftMatchGroupInput = {}
+local StarcraftMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function StarCraftMatchGroupInput.processMatch(_, match)
+function StarcraftMatchGroupInput.processMatch(_, match)
 	if type(match) == 'string' then
 		match = json.parse(match)
 	end
 
 	-- process match
-	match = StarCraftMatchGroupInput.getDateStuff(match)
-	match = StarCraftMatchGroupInput.getTournamentVars(match)
+	match = StarcraftMatchGroupInput.getDateStuff(match)
+	match = StarcraftMatchGroupInput.getTournamentVars(match)
 	if match.ffa == 'true' then
-		match = getStarCraftFFAInputModule().adjustData(match)
+		match = getStarcraftFfaInputModule().adjustData(match)
 	else
-		match = StarCraftMatchGroupInput.adjustData(match)
+		match = StarcraftMatchGroupInput.adjustData(match)
 	end
-	match = StarCraftMatchGroupInput.checkFinished(match)
-	match = StarCraftMatchGroupInput.getVodStuff(match)
-	match = StarCraftMatchGroupInput.getLinks(match)
-	match = StarCraftMatchGroupInput.getExtraData(match)
+	match = StarcraftMatchGroupInput.checkFinished(match)
+	match = StarcraftMatchGroupInput.getVodStuff(match)
+	match = StarcraftMatchGroupInput.getLinks(match)
+	match = StarcraftMatchGroupInput.getExtraData(match)
 
 	return match
 end
 
-function StarCraftMatchGroupInput.getDateStuff(match)
+function StarcraftMatchGroupInput.getDateStuff(match)
 	local lang = mw.getContentLanguage()
 	match.lang = lang
 	-- parse date string with abbr
@@ -93,7 +93,7 @@ function StarCraftMatchGroupInput.getDateStuff(match)
 	return match
 end
 
-function StarCraftMatchGroupInput.checkFinished(match)
+function StarcraftMatchGroupInput.checkFinished(match)
 	local lang = match.lang
 
 	if match.finished == 'false' then
@@ -120,7 +120,7 @@ function StarCraftMatchGroupInput.checkFinished(match)
 	return match
 end
 
-function StarCraftMatchGroupInput.getTournamentVars(match)
+function StarcraftMatchGroupInput.getTournamentVars(match)
 	match.noQuery = Variables.varDefault('disable_SMW_storage', 'false')
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
 	match['type'] = Logic.emptyOr(match['type'], Variables.varDefault('tournament_type'))
@@ -141,7 +141,7 @@ function StarCraftMatchGroupInput.getTournamentVars(match)
 	return match
 end
 
-function StarCraftMatchGroupInput.getVodStuff(match)
+function StarcraftMatchGroupInput.getVodStuff(match)
 	match.stream = match.stream or {}
 	match.stream = json.stringify({
 		stream = Logic.emptyOr(match.stream, Variables.varDefault('stream')),
@@ -160,7 +160,7 @@ function StarCraftMatchGroupInput.getVodStuff(match)
 	return match
 end
 
-function StarCraftMatchGroupInput.getLinks(match)
+function StarcraftMatchGroupInput.getLinks(match)
 	match.links = json.stringify({
 		preview = match.preview,
 		preview2 = match.preview2,
@@ -173,22 +173,22 @@ function StarCraftMatchGroupInput.getLinks(match)
 	return match
 end
 
-function StarCraftMatchGroupInput.getExtraData(match)
+function StarcraftMatchGroupInput.getExtraData(match)
 	local extradata
 	if match.ffa == 'true' then
-		extradata = getStarCraftFFAInputModule().getExtraData(match)
+		extradata = getStarcraftFfaInputModule().getExtraData(match)
 	else
 		extradata = {
 			noQuery = match.noQuery,
 			matchsection = Variables.varDefault('matchsection'),
 			comment = match.comment,
 			featured = match.featured,
-			veto1 = StarCraftMatchGroupInput.getVetoMap(match.veto1),
-			veto2 = StarCraftMatchGroupInput.getVetoMap(match.veto2),
-			veto3 = StarCraftMatchGroupInput.getVetoMap(match.veto3),
-			veto4 = StarCraftMatchGroupInput.getVetoMap(match.veto4),
-			veto5 = StarCraftMatchGroupInput.getVetoMap(match.veto5),
-			veto6 = StarCraftMatchGroupInput.getVetoMap(match.veto6),
+			veto1 = StarcraftMatchGroupInput.getVetoMap(match.veto1),
+			veto2 = StarcraftMatchGroupInput.getVetoMap(match.veto2),
+			veto3 = StarcraftMatchGroupInput.getVetoMap(match.veto3),
+			veto4 = StarcraftMatchGroupInput.getVetoMap(match.veto4),
+			veto5 = StarcraftMatchGroupInput.getVetoMap(match.veto5),
+			veto6 = StarcraftMatchGroupInput.getVetoMap(match.veto6),
 			veto1by = (match.vetoplayer1 or '') ~= '' and match.vetoplayer1 or match.vetoopponent1,
 			veto2by = (match.vetoplayer2 or '') ~= '' and match.vetoplayer2 or match.vetoopponent2,
 			veto3by = (match.vetoplayer3 or '') ~= '' and match.vetoplayer3 or match.vetoopponent3,
@@ -196,15 +196,15 @@ function StarCraftMatchGroupInput.getExtraData(match)
 			veto5by = (match.vetoplayer5 or '') ~= '' and match.vetoplayer5 or match.vetoopponent5,
 			veto6by = (match.vetoplayer6 or '') ~= '' and match.vetoplayer6 or match.vetoopponent6,
 			contestname = (match.contestname or '') ~= '' and (match.contestname .. ' Bracket Contest') or nil,
-			subGroup1header = StarCraftMatchGroupInput.getSubGroupHeader(1, match),
-			subGroup2header = StarCraftMatchGroupInput.getSubGroupHeader(2, match),
-			subGroup3header = StarCraftMatchGroupInput.getSubGroupHeader(3, match),
-			subGroup4header = StarCraftMatchGroupInput.getSubGroupHeader(4, match),
-			subGroup5header = StarCraftMatchGroupInput.getSubGroupHeader(5, match),
-			subGroup6header = StarCraftMatchGroupInput.getSubGroupHeader(6, match),
-			subGroup7header = StarCraftMatchGroupInput.getSubGroupHeader(7, match),
-			subGroup8header = StarCraftMatchGroupInput.getSubGroupHeader(8, match),
-			subGroup9header = StarCraftMatchGroupInput.getSubGroupHeader(9, match),
+			subGroup1header = StarcraftMatchGroupInput.getSubGroupHeader(1, match),
+			subGroup2header = StarcraftMatchGroupInput.getSubGroupHeader(2, match),
+			subGroup3header = StarcraftMatchGroupInput.getSubGroupHeader(3, match),
+			subGroup4header = StarcraftMatchGroupInput.getSubGroupHeader(4, match),
+			subGroup5header = StarcraftMatchGroupInput.getSubGroupHeader(5, match),
+			subGroup6header = StarcraftMatchGroupInput.getSubGroupHeader(6, match),
+			subGroup7header = StarcraftMatchGroupInput.getSubGroupHeader(7, match),
+			subGroup8header = StarcraftMatchGroupInput.getSubGroupHeader(8, match),
+			subGroup9header = StarcraftMatchGroupInput.getSubGroupHeader(9, match),
 			headtohead = match.headtohead,
 			ffa = 'false',
 		}
@@ -214,11 +214,11 @@ function StarCraftMatchGroupInput.getExtraData(match)
 	return match
 end
 
-function StarCraftMatchGroupInput.getVetoMap(map)
+function StarcraftMatchGroupInput.getVetoMap(map)
 	return (map ~= nil) and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
 end
 
-function StarCraftMatchGroupInput.getSubGroupHeader(index, match)
+function StarcraftMatchGroupInput.getSubGroupHeader(index, match)
 	local out = match['subGroup' .. index .. 'header'] or ''
 	if out == '' then
 		out = match['subgroup' .. index .. 'header'] or ''
@@ -232,10 +232,10 @@ function StarCraftMatchGroupInput.getSubGroupHeader(index, match)
 	return out
 end
 
-function StarCraftMatchGroupInput.adjustData(match)
+function StarcraftMatchGroupInput.adjustData(match)
 	--parse opponents + set base sumscores + determine match mode
 	match.mode = ''
-	match = StarCraftMatchGroupInput.OpponentInput(match)
+	match = StarcraftMatchGroupInput.OpponentInput(match)
 
 	--main processing done here
 	local subgroup = 0
@@ -246,7 +246,7 @@ function StarCraftMatchGroupInput.adjustData(match)
 		else
 			break
 		end
-		match, subgroup = StarCraftMatchGroupInput.MapInput(match, i, subgroup)
+		match, subgroup = StarcraftMatchGroupInput.MapInput(match, i, subgroup)
 	end
 
 	--apply vodgames
@@ -258,7 +258,7 @@ function StarCraftMatchGroupInput.adjustData(match)
 	end
 
 	if string.find(match.mode, 'team') then
-		match = StarCraftMatchGroupInput.SubMatchStructure(match)
+		match = StarcraftMatchGroupInput.SubMatchStructure(match)
 	else
 		for i = 1, MAX_NUM_MAPS do
 			if match['map' .. i] then
@@ -271,11 +271,11 @@ function StarCraftMatchGroupInput.adjustData(match)
 		end
 	end
 
-	match = StarCraftMatchGroupInput.MatchWinnerProcessing(match)
+	match = StarcraftMatchGroupInput.MatchWinnerProcessing(match)
 
 	--Bracket Contest Handling
 	if match.contest and tostring(match.contest.finished) == '1' then
-		match = StarCraftMatchGroupInput.processContest(match)
+		match = StarcraftMatchGroupInput.processContest(match)
 	end
 
 	return match
@@ -288,7 +288,7 @@ Misc. MatchInput functions
 --> Sub-Match Structure
 
 ]]--
-function StarCraftMatchGroupInput.MatchWinnerProcessing(match)
+function StarcraftMatchGroupInput.MatchWinnerProcessing(match)
 	local bestof = tonumber(match.bestof or 99) or 99
 	local walkover = match.walkover or ''
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
@@ -387,7 +387,7 @@ function StarCraftMatchGroupInput.MatchWinnerProcessing(match)
 	return match
 end
 
-function StarCraftMatchGroupInput.SubMatchStructure(match)
+function StarcraftMatchGroupInput.SubMatchStructure(match)
 	local SubMatches = {}
 	local j = 0
 
@@ -463,7 +463,7 @@ end
 OpponentInput functions
 
 ]]--
-function StarCraftMatchGroupInput.OpponentInput(match)
+function StarcraftMatchGroupInput.OpponentInput(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		if not Logic.isEmpty(match['opponent' .. opponentIndex]) then
 			--parse the stringified opponent arguments to be a table again
@@ -490,22 +490,22 @@ function StarCraftMatchGroupInput.OpponentInput(match)
 			--process input depending on type
 			if match['opponent' .. opponentIndex]['type'] == 'solo' then
 				match['opponent' .. opponentIndex] =
-					StarCraftMatchGroupInput.ProcessSoloOpponentInput(match['opponent' .. opponentIndex])
+					StarcraftMatchGroupInput.ProcessSoloOpponentInput(match['opponent' .. opponentIndex])
 			elseif match['opponent' .. opponentIndex]['type'] == 'duo' then
 				match['opponent' .. opponentIndex] =
-					StarCraftMatchGroupInput.ProcessDuoOpponentInput(match['opponent' .. opponentIndex])
+					StarcraftMatchGroupInput.ProcessDuoOpponentInput(match['opponent' .. opponentIndex])
 			elseif match['opponent' .. opponentIndex]['type'] == 'trio' then
 				match['opponent' .. opponentIndex] =
-					StarCraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 3)
+					StarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 3)
 			elseif match['opponent' .. opponentIndex]['type'] == 'quad' then
 				match['opponent' .. opponentIndex] =
-					StarCraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 4)
+					StarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 4)
 			elseif match['opponent' .. opponentIndex]['type'] == 'team' then
 				match['opponent' .. opponentIndex] =
-					StarCraftMatchGroupInput.ProcessTeamOpponentInput(match['opponent' .. opponentIndex], match.date)
+					StarcraftMatchGroupInput.ProcessTeamOpponentInput(match['opponent' .. opponentIndex], match.date)
 			elseif match['opponent' .. opponentIndex]['type'] == 'literal' then
 				match['opponent' .. opponentIndex] =
-					StarCraftMatchGroupInput.ProcessLiteralOpponentInput(match['opponent' .. opponentIndex])
+					StarcraftMatchGroupInput.ProcessLiteralOpponentInput(match['opponent' .. opponentIndex])
 			else
 				error('Unsupported Opponent Type')
 			end
@@ -535,7 +535,7 @@ function StarCraftMatchGroupInput.OpponentInput(match)
 	return match
 end
 
-function StarCraftMatchGroupInput.ProcessSoloOpponentInput(opp)
+function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opp)
 	local name = (opp.name or '') ~= '' and opp.name or (opp.p1 or '') ~= '' and opp.p1
 		or opp[1] or ''
 	local link = mw.ext.TeamLiquidIntegration.resolve_redirect((opp.link or '') ~= '' and opp.link
@@ -561,7 +561,7 @@ function StarCraftMatchGroupInput.ProcessSoloOpponentInput(opp)
 	return opp2
 end
 
-function StarCraftMatchGroupInput.ProcessDuoOpponentInput(opp)
+function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opp)
 	opp.p1 = opp.p1 or ''
 	opp.p2 = opp.p2 or ''
 	opp.link1 = mw.ext.TeamLiquidIntegration.resolve_redirect((opp.p1link or '') ~= ''
@@ -602,7 +602,7 @@ function StarCraftMatchGroupInput.ProcessDuoOpponentInput(opp)
 	return opp2
 end
 
-function StarCraftMatchGroupInput.ProcessOpponentInput(opp, playernumber)
+function StarcraftMatchGroupInput.ProcessOpponentInput(opp, playernumber)
 	local name = ''
 
 	local players = {}
@@ -636,7 +636,7 @@ function StarCraftMatchGroupInput.ProcessOpponentInput(opp, playernumber)
 	return opp2
 end
 
-function StarCraftMatchGroupInput.ProcessLiteralOpponentInput(opp)
+function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opp)
 	local race = opp.race or ''
 	local flag = opp.flag or ''
 
@@ -661,7 +661,7 @@ function StarCraftMatchGroupInput.ProcessLiteralOpponentInput(opp)
 	}
 end
 
-function StarCraftMatchGroupInput.getPlayersLegacy(playerData)
+function StarcraftMatchGroupInput.getPlayersLegacy(playerData)
 	local players = {}
 	playerData = json.parseIfString(playerData) or {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
@@ -684,7 +684,7 @@ function StarCraftMatchGroupInput.getPlayersLegacy(playerData)
 	return players
 end
 
-function StarCraftMatchGroupInput.getPlayers(teamName)
+function StarcraftMatchGroupInput.getPlayers(teamName)
 	local players = {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		local name = Variables.varDefault(teamName .. '_p' .. playerIndex)
@@ -703,7 +703,7 @@ function StarCraftMatchGroupInput.getPlayers(teamName)
 	return players
 end
 
-function StarCraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
+function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 	local customTeam = Logic.readBool(opp.default) or Logic.readBool(opp.defaulticon) or Logic.readBool(opp.custom)
 	local name
 	local icon
@@ -725,12 +725,12 @@ function StarCraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 		if opp.template == '' then
 			opp.template = 'tbd'
 		end
-		name, icon, opp.template = StarCraftMatchGroupInput.processTeamTemplateInput(opp.template, date)
+		name, icon, opp.template = StarcraftMatchGroupInput.processTeamTemplateInput(opp.template, date)
 	end
 	name = mw.ext.TeamLiquidIntegration.resolve_redirect(name or '')
-	local players = StarCraftMatchGroupInput.getPlayers(name)
+	local players = StarcraftMatchGroupInput.getPlayers(name)
 	if Logic.isEmpty(players) then
-		players = StarCraftMatchGroupInput.getPlayersLegacy(opp.players)
+		players = StarcraftMatchGroupInput.getPlayersLegacy(opp.players)
 	end
 
 	return {
@@ -744,7 +744,7 @@ function StarCraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 	}
 end
 
-function StarCraftMatchGroupInput.processTeamTemplateInput(template, date)
+function StarcraftMatchGroupInput.processTeamTemplateInput(template, date)
 	local icon, name
 	template = string.lower(template or ''):gsub('_', ' ')
 	if template ~= '' and template ~= 'noteam' and
@@ -767,7 +767,7 @@ end
 MapInput functions
 
 ]]--
-function StarCraftMatchGroupInput.MapInput(match, i, subgroup)
+function StarcraftMatchGroupInput.MapInput(match, i, subgroup)
 	--redirect maps
 	if match['map' .. i].map ~= 'TBD' then
 		match['map' .. i].map = mw.ext.TeamLiquidIntegration.resolve_redirect(match['map' .. i].map or '')
@@ -789,11 +789,11 @@ function StarCraftMatchGroupInput.MapInput(match, i, subgroup)
 	match['map' .. i].date = match.date
 
 	--determine score, resulttype, walkover and winner
-	match['map' .. i] = StarCraftMatchGroupInput.MapWinnerProcessing(match['map' .. i])
+	match['map' .. i] = StarcraftMatchGroupInput.MapWinnerProcessing(match['map' .. i])
 
 	--get participants data for the map + get map mode + winnerrace and loserrace
 	--(w/l race stuff only for 1v1 maps)
-	match['map' .. i] = StarCraftMatchGroupInput.ProcessPlayerMapData(match['map' .. i], match, 2)
+	match['map' .. i] = StarcraftMatchGroupInput.ProcessPlayerMapData(match['map' .. i], match, 2)
 
 	--set sumscore to 0 if it isn't a number
 	if match.opponent1.sumscore == '' then
@@ -823,7 +823,7 @@ function StarCraftMatchGroupInput.MapInput(match, i, subgroup)
 	return match, subgroup
 end
 
-function StarCraftMatchGroupInput.MapWinnerProcessing(map)
+function StarcraftMatchGroupInput.MapWinnerProcessing(map)
 	map.scores = {}
 	local manual_scores = false
 	local indexedScores = {}
@@ -849,7 +849,7 @@ function StarCraftMatchGroupInput.MapWinnerProcessing(map)
 	end
 
 	if manual_scores then
-		for scoreIndex, _ in Table.iter.spairs(indexedScores, StarCraftMatchGroupInput.placementSortFunction) do
+		for scoreIndex, _ in Table.iter.spairs(indexedScores, StarcraftMatchGroupInput.placementSortFunction) do
 			if not tonumber(map.winner or '') then
 				map.winner = scoreIndex
 			else
@@ -884,7 +884,7 @@ function StarCraftMatchGroupInput.MapWinnerProcessing(map)
 	return map
 end
 
-function StarCraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
+function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 	local participants = {}
 	local map_mode = ''
 	local raceOP = {}
@@ -1032,7 +1032,7 @@ function StarCraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 end
 
 -- function to sort out winner/placements
-function StarCraftMatchGroupInput.placementSortFunction(table, key1, key2)
+function StarcraftMatchGroupInput.placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
 	local op1norm = op1.status == 'S'
@@ -1060,7 +1060,7 @@ end
 Bracket Contests function
 
 ]]--
-function StarCraftMatchGroupInput.processContest(match)
+function StarcraftMatchGroupInput.processContest(match)
 	local points = tonumber(Variables.varDefault('contestPoints', 0)) or 0
 	local score1 = {}
 	local score2 = {}
@@ -1109,4 +1109,4 @@ function StarCraftMatchGroupInput.processContest(match)
 	return match
 end
 
-return StarCraftMatchGroupInput
+return StarcraftMatchGroupInput
