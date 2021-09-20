@@ -44,10 +44,11 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 	DisplayUtil.assertPropTypes(props, StarcraftPlayerDisplay.propTypes.BlockPlayer)
 	local player = props.player
 
+	local zeroWidthSpace = '&#8203;'
 	local nameNode = html.create('span'):addClass('name')
 		:wikitext(props.showLink ~= false and player.pageName
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
-			or Logic.emptyOr(player.displayName, '&nbsp;')
+			or Logic.emptyOr(player.displayName, zeroWidthSpace)
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
