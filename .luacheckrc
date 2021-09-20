@@ -8,6 +8,7 @@ std = {
 		"math",
 		"mw",
 		"os",
+		"package",
 		"pairs",
 		"pcall",
 		"require",
