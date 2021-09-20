@@ -25,11 +25,13 @@ local PARENT = Variables.varDefault('tournament_parent', '')
 
 local BRACKET_DATA_PARAMS = {'header', 'tolower', 'toupper', 'qualwin', 'quallose', 'skipround'}
 
+-- Entry point used by Template:Matchlist
 function p.matchlist(frame)
 	globalArgs = getArgs(frame)
 	return p.luaMatchlist(frame, globalArgs)
 end
 
+-- Saves and displays a matchlist specified by input args.
 function p.luaMatchlist(frame, args, matchBuilder)
 	local bracketid = args['id']
 	if bracketid == nil or bracketid == '' then
@@ -144,11 +146,13 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	return _loggedInWarning .. category
 end
 
+-- Entry point used by Template:Bracket
 function p.bracket(frame)
 	globalArgs = getArgs(frame)
 	return p.luaBracket(frame, globalArgs)
 end
 
+-- Saves and displays a bracket specified by input args.
 function p.luaBracket(frame, args, matchBuilder)
 	local templateid = args['1']
 	local bracketid = args['id']

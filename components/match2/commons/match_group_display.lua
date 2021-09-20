@@ -10,11 +10,13 @@ local MatchGroupDisplay = {}
 local MatchGroupUtil
 local getArgs = require('Module:Arguments').getArgs
 
+-- Unused entry point
 function MatchGroupDisplay.bracket(frame)
 	local args = getArgs(frame)
 	return MatchGroupDisplay.luaBracket(frame, args)
 end
 
+-- Displays a bracket specified by id with custom headers
 function MatchGroupDisplay.customBracket(frame, args, matches)
 	if not args then
 		args = getArgs(frame)
@@ -49,11 +51,13 @@ function MatchGroupDisplay.luaBracket(frame, args, matches)
 	return BracketDisplay.luaGet(frame, args, matches)
 end
 
+-- Unused entry point
 function MatchGroupDisplay.matchlist(frame)
 	local args = getArgs(frame)
 	return MatchGroupDisplay.luaMatchlist(frame, args)
 end
 
+-- Displays a matchlist specified by id with custom headers
 function MatchGroupDisplay.customMatchlist(frame, args, matches)
 	if not args then
 		args = getArgs(frame)
@@ -82,7 +86,8 @@ function MatchGroupDisplay.luaMatchlist(frame, args, matches)
 	return MatchlistDisplay.luaGet(frame, args, matches)
 end
 
--- display MatchGroup (Bracket/MatchList) from ID
+-- Displays a match group (bracket or matchlist) specified by ID. The match group is read from LPDB.
+-- Entry point invoked directly from wikicode
 function MatchGroupDisplay.Display(frame)
 	local args = getArgs(frame)
 	args[1] = args.id or args[1] or ''
@@ -96,12 +101,12 @@ function MatchGroupDisplay.Display(frame)
 	return MatchGroupModule.luaGet(frame, args, matches)
 end
 
+-- Entry point invoked directly from wikicode
 function MatchGroupDisplay.DisplayDev(frame)
 	require('Module:DevFlags').matchGroupDev = true
 	return MatchGroupDisplay.Display(frame)
 end
 
---Helper functions for custom Bracket/Matchlist options
 function MatchGroupDisplay._getMatches(id)
 	if not MatchGroupUtil then
 		MatchGroupUtil = require('Module:MatchGroup/Util')
