@@ -6,15 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local json = require('Module:Json')
 local cleanFlag = require('Module:Flags')._CountryName
-local FFA
 local defaultIcon
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
@@ -33,6 +34,10 @@ local MODES2 = {
 	['literal'] = 'literal',
 }
 
+local getStarCraftFFAInputModule = FnUtil.memoize(function()
+	return Lua.import('Module:MatchGroup/Input/StarCraft/FFA', {requireDevIfEnabled = true})
+end)
+
 --[[
 Module for converting input args of match group objects into LPDB records. This
 module is specific to the StarCraft and StarCraft2 wikis.
@@ -49,12 +54,7 @@ function StarCraftMatchGroupInput.processMatch(_, match)
 	match = StarCraftMatchGroupInput.getDateStuff(match)
 	match = StarCraftMatchGroupInput.getTournamentVars(match)
 	if match.ffa == 'true' then
-		if not FFA then
-			FFA = require('Module:DevFlags').matchGroupDev
-				and Lua.requireIfExists('Module:MatchGroup/Input/StarCraft/FFA/dev')
-				or require('Module:MatchGroup/Input/StarCraft/FFA')
-		end
-		match = FFA.adjustData(match)
+		match = getStarCraftFFAInputModule().adjustData(match)
 	else
 		match = StarCraftMatchGroupInput.adjustData(match)
 	end
@@ -176,7 +176,7 @@ end
 function StarCraftMatchGroupInput.getExtraData(match)
 	local extradata
 	if match.ffa == 'true' then
-		extradata = FFA.getExtraData(match)
+		extradata = getStarCraftFFAInputModule().getExtraData(match)
 	else
 		extradata = {
 			noQuery = match.noQuery,

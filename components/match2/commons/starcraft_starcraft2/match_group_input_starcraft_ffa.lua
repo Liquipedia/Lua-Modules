@@ -6,17 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FFA = {}
-
 local json = require('Module:Json')
 local Variables = require('Module:Variables')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
-local config = Lua.moduleExists('Module:Match/Config') and mw.loadData('Module:Match/Config') or {}
-local WikiSpecific = require('Module:DevFlags').matchGroupDev
-	and Lua.requireIfExists('Module:MatchGroup/Input/StarCraft/dev')
-	or require('Module:MatchGroup/Input/StarCraft')
+
+local config = Lua.loadDataIfExists('Module:Match/Config') or {}
+local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/StarCraft', {requireDevIfEnabled = true})
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
@@ -41,6 +38,8 @@ local ALOWED_BG = {
 	['drop'] = 'down',
 	['proceed'] = 'up',
 	}
+
+local FFA = {}
 
 function FFA.adjustData(match)
 	local OppNumber = 0
@@ -382,22 +381,22 @@ function FFA.OpponentInput(match, OppNumber, noscore)
 			--process input depending on type
 			if match['opponent' .. opponentIndex]['type'] == 'solo' then
 				match['opponent' .. opponentIndex] =
-					WikiSpecific.ProcessSoloOpponentInput(match['opponent' .. opponentIndex])
+					StarcraftMatchGroupInput.ProcessSoloOpponentInput(match['opponent' .. opponentIndex])
 			elseif match['opponent' .. opponentIndex]['type'] == 'duo' then
 				match['opponent' .. opponentIndex] =
-					WikiSpecific.ProcessDuoOpponentInput(match['opponent' .. opponentIndex])
+					StarcraftMatchGroupInput.ProcessDuoOpponentInput(match['opponent' .. opponentIndex])
 			elseif match['opponent' .. opponentIndex]['type'] == 'trio' then
 				match['opponent' .. opponentIndex] =
-					WikiSpecific.ProcessOpponentInput(match['opponent' .. opponentIndex], 3)
+					StarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 3)
 			elseif match['opponent' .. opponentIndex]['type'] == 'quad' then
 				match['opponent' .. opponentIndex] =
-					WikiSpecific.ProcessOpponentInput(match['opponent' .. opponentIndex], 4)
+					StarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 4)
 			elseif match['opponent' .. opponentIndex]['type'] == 'team' then
 				match['opponent' .. opponentIndex] =
-					WikiSpecific.ProcessTeamOpponentInput(match['opponent' .. opponentIndex], match.date)
+					StarcraftMatchGroupInput.ProcessTeamOpponentInput(match['opponent' .. opponentIndex], match.date)
 			elseif match['opponent' .. opponentIndex]['type'] == 'literal' then
 				match['opponent' .. opponentIndex] =
-					WikiSpecific.ProcessLiteralOpponentInput(match['opponent' .. opponentIndex])
+					StarcraftMatchGroupInput.ProcessLiteralOpponentInput(match['opponent' .. opponentIndex])
 			else
 				error('Unsupported Opponent Type')
 			end
@@ -452,7 +451,7 @@ function FFA.MapInput(match, i, subgroup, noscore, OppNumber)
 	match['map' .. i].date = match.date
 
 	--get participants data for the map + get map mode
-	match['map' .. i] = WikiSpecific.ProcessPlayerMapData(match['map' .. i], match, OppNumber)
+	match['map' .. i] = StarcraftMatchGroupInput.ProcessPlayerMapData(match['map' .. i], match, OppNumber)
 
 	--determine scores, resulttype, walkover and winner
 	match['map' .. i] = FFA.MapScoreProcessing(match['map' .. i], OppNumber, noscore)

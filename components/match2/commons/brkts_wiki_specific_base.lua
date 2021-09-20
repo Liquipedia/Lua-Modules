@@ -69,14 +69,9 @@ Called from MatchGroup/Display
 -- @returns module
 ]]
 WikiSpecificBase.getMatchGroupModule = function(matchGroupType)
-	local DevFlags = require('Module:DevFlags')
-	if matchGroupType == 'matchlist' then
-		return DevFlags.matchGroupDev and Lua.requireIfExists('Module:MatchGroup/Display/Matchlist/dev')
-			or require('Module:MatchGroup/Display/Matchlist')
-	else -- matchGroupType == 'bracket'
-		return DevFlags.matchGroupDev and Lua.requireIfExists('Module:MatchGroup/Display/Bracket/dev')
-			or require('Module:MatchGroup/Display/Bracket')
-	end
+	return matchGroupType == 'matchlist'
+		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
+		or Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
 end
 
 return WikiSpecificBase

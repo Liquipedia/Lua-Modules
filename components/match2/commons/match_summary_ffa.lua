@@ -1,14 +1,24 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchSummary/FFA
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local OpponentDisplay = require('Module:OpponentDisplay/dev')
 local Ordinal = require('Module:Ordinal')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 --[[
 Module containing display components for match summaries of free-for-all matches.

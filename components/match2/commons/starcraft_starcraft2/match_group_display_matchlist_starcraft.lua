@@ -1,10 +1,20 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchGroup/Display/Matchlist/Starcraft
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local MatchlistDisplay = require('Module:MatchGroup/Display/Matchlist')
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
-local StarcraftOpponentDisplay = require('Module:OpponentDisplay/Starcraft')
 local Table = require('Module:Table')
+
+local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
+local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 
 local StarcraftMatchlistDisplay = {}
 

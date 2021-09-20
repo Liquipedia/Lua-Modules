@@ -1,10 +1,20 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchSummary/FFA/Starcraft
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Class = require('Module:Class')
-local FFAMatchSummary = require('Module:MatchSummary/FFA')
+local Lua = require('Module:Lua')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
-local StarcraftMatchSummary = require('Module:MatchSummary/Starcraft/dev')
-local StarcraftOpponentDisplay = require('Module:OpponentDisplay/Starcraft/dev')
 local Table = require('Module:Table')
+
+local FFAMatchSummary = Lua.import('Module:MatchSummary/FFA', {requireDevIfEnabled = true})
+local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
+local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 
 local CustomFfaMatchSummary = {propTypes = {}}
 

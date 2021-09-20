@@ -13,8 +13,8 @@ local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
-local StarcraftOpponentDisplay = require('Module:OpponentDisplay/Starcraft')
 
+local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
 	getTinyIcon = function() end,
 }
@@ -36,7 +36,7 @@ StarcraftMatchSummary.propTypes.MatchSummaryContainer = {
 function StarcraftMatchSummary.MatchSummaryContainer(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	local MatchSummary = match.isFFA
-		and require('Module:MatchSummary/FFA/Starcraft').FFAMatchSummary
+		and Lua.import('Module:MatchSummary/FFA/Starcraft', {requireDevIfEnabled = true}).FFAMatchSummary
 		or StarcraftMatchSummary.MatchSummary
 	return MatchSummary({match = match})
 end
