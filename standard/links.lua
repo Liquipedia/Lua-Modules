@@ -31,6 +31,7 @@ local _PREFIXES = {
 	esl = '',
 	facebook = 'http://facebook.com/',
 	faceit = 'https://www.faceit.com/en/players/',
+	['faceit-c'] = 'https://www.faceit.com/en/championship/',
 	fanclub = '',
 	gamersclub = 'https://csgo.gamersclub.gg/campeonatos/csgo/',
 	gplus = 'http://plus.google.com/-plus',
@@ -79,6 +80,10 @@ local _PREFIXES = {
 	},
 }
 
+local _SUFFIXES = {
+	['faceit-c'] = '/event',
+}
+
 function Links.transform(links)
 	return {
 		['5ewin'] = links['5ewin'],
@@ -115,7 +120,7 @@ function Links.transform(links)
 		dlive = links.dlive,
 		douyu = links.douyu,
 		esea = links.esea,
-		['esea-d']= links['esea-d'],
+		['esea-d'] = links['esea-d'],
 		esl = links.eslgaming or links.esl,
 		esl2 = links.eslgaming2 or links.esl2,
 		esl3 = links.eslgaming3 or links.esl3,
@@ -124,6 +129,8 @@ function Links.transform(links)
 		facebook = links.facebook,
 		facebook2 = links.facebook2,
 		faceit = links.faceit,
+		['faceit-c'] = links['faceit-c'],
+		['faceit-c2'] = links['faceit-c2'],
 		fanclub = links.fanclub,
 		gamersclub = links.gamersclub,
 		gamersclub2 = links.gamersclub2,
@@ -190,7 +197,7 @@ function Links.makeFullLink(platform, id, variant)
 		return ''
 	end
 
-	return _PREFIXES[platform] .. id
+	return _PREFIXES[platform] .. id .. (_SUFFIXES[platform] or '')
 end
 
 function Links.makeFullLinksForTableItems(links, variant)
