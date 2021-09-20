@@ -21,6 +21,8 @@ local Links = Class.new(
 
 local _ICON_KEYS_TO_RENAME = {
 	['esea-d'] = 'esea',
+	['faceit-c'] = 'faceit',
+	['faceit-c2'] = 'faceit',
 	matcherinolink = 'matcherino',
 }
 
