@@ -139,13 +139,13 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	Variables.varDefine('match2bracketindex', Variables.varDefault('match2bracketindex', 0) + 1)
 
 	if args.hide ~= 'true' then
-		return _loggedInWarning .. category .. tostring(MatchGroupDisplay.luaMatchlist(frame, {
+		return category .. tostring(MatchGroupDisplay.luaMatchlist(frame, {
 			bracketid,
 			attached = args.attached,
 			collapsed = args.collapsed,
 			nocollapse = args.nocollapse,
 			width = args.width or args.matchWidth,
-		}))
+		})) .. _loggedInWarning
 	end
 	return _loggedInWarning .. category
 end
