@@ -526,6 +526,8 @@ function BracketDisplay.NodeBody(props)
 	end
 
 	return html.create('div'):addClass('brkts-round-body')
+		:css('--skip-round', match.bracketData.skipRound)
+		:css('--qual-skip', match.bracketData.qualSkip)
 		:node(lowerNode)
 		:node(lowerNode and BracketDisplay.NodeLowerConnectors(props) or nil)
 		:node(centerNode)
@@ -640,9 +642,7 @@ function BracketDisplay.NodeLowerConnectors(props)
 	end
 	local jointCount = math.max(jointIxAbove, jointIxBelow)
 
-	local lowerConnectorsNode = mw.html.create('div')
-		:addClass('brkts-round-lower-connectors')
-		:css('--skip-round', match.bracketData.skipRound)
+	local lowerConnectorsNode = mw.html.create('div'):addClass('brkts-round-lower-connectors')
 
 	-- Draw connectors between lower round matches and this match
 	for ix, x in ipairs(lowerMatches) do
@@ -700,9 +700,7 @@ function BracketDisplay.NodeQualConnectors(props)
 	local layout = props.layoutsByMatchId[props.matchId]
 	local config = props.config
 
-	local qualConnectorsNode = mw.html.create('div')
-		:addClass('brkts-round-qual-connectors')
-		:css('--qual-skip', match.bracketData.qualSkip)
+	local qualConnectorsNode = mw.html.create('div'):addClass('brkts-round-qual-connectors')
 
 	-- Qualified winner connector
 	local leftTop = layout.matchMarginTop + layout.matchHeight / 2
