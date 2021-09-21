@@ -13,8 +13,7 @@ local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
 ---display an image in LeagueIconSmall fashion
---can directly expand the LeagueIconSmall/... template
---or try to use a passed icon (and iconDark) first
+--can try to retrieve the icon(s) from existing LeagueIconSmall templates
 function LeagueIcon.display(args)
 	local options = args.options or {}
 
