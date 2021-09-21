@@ -1,4 +1,3 @@
-   
 ---
 -- @Liquipedia
 -- wiki=commons
