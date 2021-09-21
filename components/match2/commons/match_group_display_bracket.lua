@@ -467,6 +467,7 @@ function BracketDisplay.NodeBody(props)
 			header = thirdPlaceMatch.bracketData.header or '!tp',
 			height = config.headerHeight,
 		})
+			:addClass('brkts-third-place-header')
 			:css('margin-top', 20 + config.headerMargin .. 'px')
 			:css('margin-bottom', config.headerMargin .. 'px')
 		thirdPlaceMatchNode = BracketDisplay.Match({
@@ -476,6 +477,7 @@ function BracketDisplay.NodeBody(props)
 			matchHasDetails = config.matchHasDetails,
 			opponentHeight = config.opponentHeight,
 		})
+			:addClass('brkts-third-place-match')
 	end
 
 	local centerNode = html.create('div'):addClass('brkts-round-center')
