@@ -6,6 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
+local StringUtils = require('Module:StringUtils')
+
 local Lua = {}
 
 function Lua.moduleExists(name)
@@ -41,15 +44,23 @@ function Lua.loadDataIfExists(name, default)
 	end
 end
 
--- options.requireDevIfEnabled:
--- Requires the development version of a module (with /dev appended to name) if
--- it exists and a certain development flag is enabled. Otherwise requires the
--- non-development module.
+--[[
+Imports a module by its name.
+
+options.requireDevIfEnabled:
+Requires the development version of a module (with /dev appended to name) if it
+exists and the dev feature flag is enabled. Otherwise requires the non-
+development module.
+]]
 function Lua.import(name, options)
 	options = options or {}
 	if options.requireDevIfEnabled then
+		if StringUtils.endsWith(name, '/dev') then
+			error('Lua.import: Module name should not end in \'/dev\'')
+		end
+
 		local devName = name .. '/dev'
-		if require('Module:DevFlags').matchGroupDev and Lua.moduleExists(devName) then
+		if require('Module:FeatureFlag').get('dev') and Lua.moduleExists(devName) then
 			return require(devName)
 		else
 			return require(name)
@@ -57,6 +68,40 @@ function Lua.import(name, options)
 	else
 		return require(name)
 	end
+end
+
+--[[
+Entry point of Template:Invoke. Invokes a function inside a module or a dev
+module depending on the dev feature flag. Can also set the dev feature flag
+inside the function scope by passing dev=1.
+
+The following 3 code snippets are equivalent, assuming that Module:Magpie/dev
+exists and that feature_dev is unset previously.
+
+{{Invoke|Magpie|theive|foo=3|dev=1}}
+
+{{#vardefine:feature_dev|1}}
+{{#invoke|Magpie/dev|theive|foo=3}}
+{{#vardefine:feature_dev|}}
+
+require('Module:FeatureFlag').set('dev', true)
+require('Module:Magpie/dev').theive({args = {foo = 3}})
+require('Module:FeatureFlag').set('dev', nil)
+
+]]
+function Lua.TemplateInvoke(frame)
+	local parentFrame = frame:getParent()
+	local moduleName = parentFrame.args[1]
+	local fnName = parentFrame.args[2]
+	if StringUtils.endsWith(moduleName, '/dev') then
+		error('Template:Invoke: Module name should not end in \'/dev\'')
+	end
+
+	local flags = {dev = Logic.readBoolOrNil(parentFrame.args.dev)}
+	return require('Module:FeatureFlag').with(flags, function()
+		local module = Lua.import('Module:' .. moduleName, {requireDevIfEnabled = true})
+		return module[fnName](parentFrame)
+	end)
 end
 
 return Lua
