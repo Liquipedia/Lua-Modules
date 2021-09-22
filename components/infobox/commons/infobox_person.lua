@@ -16,7 +16,7 @@ local Namespace = require('Module:Namespace')
 local Localisation = require('Module:Localisation').getLocalisation
 local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
-local GetBirthAndDeath = require('Module:AgeCalculation')
+local AgeCalculation = require('Module:AgeCalculation')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -52,7 +52,7 @@ function Person:createInfobox()
 	local personType = self:getPersonType(args)
 	local earnings = self:calculateEarnings(args)
 
-	local age = GetBirthAndDeath.run({
+	local age = AgeCalculation.run({
 			birthdate = args.birth_date,
 			birthlocation = args.birth_location,
 			deathdate = args.death_date,
