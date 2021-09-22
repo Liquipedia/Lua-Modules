@@ -36,7 +36,7 @@ local _building_attributes = {}
 function CustomBuilding.run(frame)
 	local building = Building(frame)
 	_args = building.args
-	building.getName = CustomBuilding.getName
+	building.nameDisplay = CustomBuilding.nameDisplay
 	building.setLpdbData = CustomBuilding.setLpdbData
 	building.createWidgetInjector = CustomBuilding.createWidgetInjector
 	return building:createInfobox(frame)
