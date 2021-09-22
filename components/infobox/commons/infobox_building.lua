@@ -53,7 +53,24 @@ function Building:createInfobox()
 				Cell{name = 'Hotkey', content = {self:_getHotkeys(args)}},
 			}
 		},
-		Cell{name = 'Requirements', content = {args.requires}},
+		Customizable{
+			id = 'defense',
+			children = {
+				Cell{name = 'Defense', content = {args.defense}},
+			}
+		},
+		Customizable{
+			id = 'attack',
+			children = {
+				Cell{name = 'Attack', content = {args.attack}},
+			}
+		},
+		Customizable{
+			id = 'requirements',
+			children = {
+				Cell{name = 'Requirements', content = {args.requires}},
+			}
+		},
 		Customizable{
 			id = 'builds',
 			children = {
@@ -64,18 +81,6 @@ function Building:createInfobox()
 			id = 'unlocks',
 			children = {
 				Cell{name = 'Unlocks', content = {args.unlocks}},
-			}
-		},
-		Customizable{
-			id = 'attack',
-			children = {
-				Cell{name = 'Attack', content = {args.attack}},
-			}
-		},
-		Customizable{
-			id = 'defense',
-			children = {
-				Cell{name = 'Defense', content = {args.defense}},
 			}
 		},
 		Customizable{id = 'custom', children = {}},
