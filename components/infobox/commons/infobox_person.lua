@@ -7,204 +7,218 @@
 --
 
 local Class = require('Module:Class')
-local Cell = require('Module:Infobox/Cell')
 local BasicInfobox = require('Module:Infobox/Basic')
+local Links = require('Module:Links')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
-local Links = require('Module:Links')
 local Localisation = require('Module:Localisation').getLocalisation
 local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
---local GetBirthAndDeath = require('Module:???')._get
+local AgeCalculation = require('Module:AgeCalculation')
 
---the following 3 lines as a temp workaround until the Birth&Death stuff is implemented:
-local function GetBirthAndDeath()
-	return '', nil, nil, nil
-end
+local Widgets = require('Module:Infobox/Widget/All')
+local Header = Widgets.Header
+local Title = Widgets.Title
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Builder = Widgets.Builder
+local Customizable = Widgets.Customizable
 
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
-local _SHOULD_STORE_DATA
+local _shouldStoreData
 
 function Person.run(frame)
 	local person = Person(frame)
-	return person:createInfobox(frame)
+	return person:createInfobox()
 end
 
-function Person:createInfobox(frame)
+function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	_SHOULD_STORE_DATA = Person:shouldStoreData(args)
 
-	local earnings = self:calculateEarnings(args)
-	Variables.varDefine('earnings', earnings)
-	if earnings and earnings ~= 0 then
-		earnings = '$' .. Language:formatNum(earnings)
-	else
-		earnings = nil
+	if String.isEmpty(args.id) then
+		error('You need to specify an "id"')
 	end
-	local nameDisplay = self:nameDisplay(args)
-	local role = self:getRole(args)
-	local birthDisplay, deathDisplay, birthday, deathday
-		= GetBirthAndDeath(
-			args.birth_date,
-			args.birth_location,
-			args.death_date,
-			role.category,
-			_SHOULD_STORE_DATA
-		)
-	local status = self:getStatus(args)
 
-	infobox:name(nameDisplay)
-	infobox:image(args.image, args.defaultImage)
-	infobox:centeredCell(args.caption)
-	infobox:header(self:getInformationType(args) .. ' Information', true)
-	infobox:cell('Name', args.name)
-	infobox:cell('Romanized Name', args.romanized_name)
-	infobox:cell('Birth', birthDisplay)
-	infobox:cell('Died', deathDisplay)
-	infobox:cell('Status', status.display)
-	infobox:cell(role.title or 'Role', role.display)
-	infobox:fcell(Cell	:new('Country')
-						:content(unpack(self:_createLocations(args, role.category)))
-						:make()
-			)
-			:cell('Region', self:_createRegion(args.region))
-			:fcell(Cell	:new('Team')
-						:content(
-							self:_createTeam(args.team, args.teamlink),
-							self:_createTeam(args.team2, args.teamlink2)
-						)
-						:make()
-			)
-			:fcell(Cell	:new('Clan')
-						:content(
-							self:_createTeam(args.clan, args.clanlink),
-							self:_createTeam(args.clan2, args.clanlink2)
-						)
-						:make()
-			)
-	infobox:cell('Alternate IDs', args.ids or args.alternateids)
-	infobox:cell('Nicknames', args.nicknames)
-	infobox:cell('Total Earnings', earnings)
-	self:addCustomCells(infobox, args)
+	_shouldStoreData = Person:shouldStoreData(args)
 
+	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
-	local achievements = self:getAchievements(infobox, args)
-	local history = self:getHistory(infobox, args)
+	local personType = self:getPersonType(args)
+	local earnings = self:calculateEarnings(args)
 
-	infobox:header('Links', not Table.isEmpty(links))
-	infobox:links(links, _LINK_VARIANT)
-	infobox:header('Achievements', achievements)
-	infobox:centeredCell(achievements)
-	infobox:header('History', history)
-	infobox:centeredCell(history)
-	infobox:centeredCell(args.footnotes)
-	self:addCustomContent(infobox, args)
-	infobox:bottom(self:createBottomContent(infobox, args))
+	local age = AgeCalculation.run({
+			birthdate = args.birth_date,
+			birthlocation = args.birth_location,
+			deathdate = args.death_date,
+			shouldstore = _shouldStoreData
+		})
 
-	if _SHOULD_STORE_DATA then
-		args.birthDisplay = birthDisplay
-		self:getCategories(infobox, args, role.category, status.store)
+	local widgets = {
+		Header{name = self:nameDisplay(args), image = args.image},
+		Center{content = {args.caption}},
+		Title{name = (args.informationType or 'Player') .. ' Information'},
+		Cell{name = 'Name', content = {args.name}},
+		Cell{name = 'Romanized Name', content = {args.romanized_name}},
+		Cell{
+			name = 'Nationality',
+			content = self:_createLocations(args, personType.category)
+		},
+		Cell{name = 'Birth', content = {age.birth}},
+		Cell{name = 'Died', content = {age.death}},
+		Cell{name = 'Region', content = {
+				self:_createRegion(args.region)
+			}
+		},
+		Customizable{id = 'status', children = {
+			Cell{name = 'Status', content = { args.status }
+				}
+			}
+		},
+		Customizable{id = 'role', children = {
+			Cell{name = 'Role', content = { args.role }
+				}
+			}
+		},
+		Customizable{id = 'teams', children = {
+			Cell{name = 'Team', content = {
+						self:_createTeam(args.team, args.teamlink),
+						self:_createTeam(args.team2, args.teamlink2)
+					}
+				}
+			}
+		},
+		Cell{name = 'Alternate IDs', content = {args.ids or args.alternateids}},
+		Cell{name = 'Nicknames', content = {args.nicknames}},
+		Builder{
+			builder = function()
+				if earnings and earnings ~= 0 then
+					return {
+						Cell{name = 'Total Earnings', content = {'$' .. Language:formatNum(earnings)}},
+					}
+				end
+			end
+		},
+		Customizable{id = 'custom', children = {}},
+		Builder{
+			builder = function()
+				if not Table.isEmpty(links) then
+					return {
+						Title{name = 'Links'},
+						Widgets.Links{content = links, variant = _LINK_VARIANT}
+					}
+				end
+			end
+		},
+		Customizable{id = 'achievements', children = {
+				Builder{
+					builder = function()
+						if not String.isEmpty(args.achievements) then
+							return {
+								Title{name = 'Achievements'},
+								Center{content = {args.achievements}}
+							}
+						end
+					end
+				},
+			}
+		},
+		Customizable{id = 'history', children = {
+				Builder{
+					builder = function()
+						if not String.isEmpty(args.history) then
+							return {
+								Title{name = 'History'},
+								Center{content = {args.history}}
+							}
+						end
+					end
+				},
+			}
+		},
+		Center{content = {args.footnotes}},
+		Customizable{id = 'customcontent', children = {}},
+	}
 
-		links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
-		local lpdbData = {
-			id = args.id or mw.title.getCurrentTitle().prefixedText,
-			alternateid = args.ids,
-			name = args.romanized_name or args.name,
-			romanizedname = args.romanized_name or args.name,
-			localizedname = args.name,
-			nationality = args.country or args.nationality,
-			nationality2 = args.country2 or args.nationality2,
-			nationality3 = args.country3 or args.nationality3,
-			birthdate = birthday,
-			deathdate = deathday,
-			image = args.image,
-			region = args.region,
-			team = args.teamlink or args.team,
-			status = status.store,
-			type = role.store,
-			earnings = earnings,
-			links = links,
-			extradata = {},
-		}
-		lpdbData = self:adjustLPDB(lpdbData, args, role, status)
-		lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
-		lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
-		local storageType = self:getStorageType(args, role, status)
+	infobox:bottom(self:createBottomContent())
 
-		mw.ext.LiquipediaDB.lpdb_player(storageType .. self.name, lpdbData)
+	Variables.varDefine('earnings', earnings)
+	local statusToStore = self:getStatusToStore(args)
+	infobox:categories(unpack(self:getCategories(
+				args,
+				age.birth,
+				personType.category,
+				statusToStore
+			)))
+
+	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+
+	if _shouldStoreData then
+		self:_setLpdbData(
+			args,
+			links,
+			statusToStore,
+			personType.store,
+			earnings
+		)
 	end
 
-	return infobox:build()
+	return builtInfobox
+end
+
+function Person:_setLpdbData(args, links, status, personType, earnings)
+	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
+	local lpdbData = {
+		id = args.id or mw.title.getCurrentTitle().prefixedText,
+		alternateid = args.ids,
+		name = args.romanized_name or args.name,
+		romanizedname = args.romanized_name or args.name,
+		localizedname = args.name,
+		nationality = args.country or args.nationality,
+		nationality2 = args.country2 or args.nationality2,
+		nationality3 = args.country3 or args.nationality3,
+		birthdate = Variables.varDefault('player_birthdate'),
+		deathdate = Variables.varDefault('player_deathhdate'),
+		image = args.image,
+		region = args.region,
+		team = args.teamlink or args.team,
+		status = status,
+		type = personType,
+		earnings = earnings,
+		links = links,
+		extradata = {},
+	}
+	lpdbData = self:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
+	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
+	local storageType = self:getStorageType(args, personType, status)
+
+	mw.ext.LiquipediaDB.lpdb_player(storageType .. self.name, lpdbData)
 end
 
 --- Allows for overriding this functionality
-function Person:getCategories(infobox, args, role, status)
-	infobox:categories(role .. 's')
-	if not args.teamlink and not args.team then
-		infobox:categories('Teamless ' .. role .. 's')
-	end
-	if args.country2 or args.nationality2 then
-		infobox:categories('Dual Citizenship ' .. role .. 's')
-	end
-	if args.death_date then
-		infobox:categories('Deceased ' .. role .. 's')
-	end
-	if
-		args.retired == 'yes' or args.retired == 'true'
-		or string.lower(status or '') == 'retired'
-		or string.match(args.retired or '', '%d%d%d%d%')--if retired has year set apply the retired category
-	then
-		infobox:categories('Retired ' .. role .. 's')
-	else
-		infobox:categories('Active ' .. role .. 's')
-	end
-	if not args.id then
-		infobox:categories('InfoboxIncomplete.')
-	end
-	if not args.image then
-		infobox:categories(role .. 's with no profile picture')
-	end
-	if not args.birthDisplay then
-		infobox:categories(role .. 's with unknown birth date')
-	end
-
-	return infobox
+function Person:getStorageType(args, personType, status)
+	return string.lower(personType)
 end
 
 --- Allows for overriding this functionality
-function Person:getStorageType(args, role, status)
-	return 'player'
-end
-
---- Allows for overriding this functionality
-function Person:getInformationType(args)
-	return args.informationType or 'Player'
-end
-
---- Allows for overriding this functionality
-function Person:adjustLPDB(lpdbData, args, role, status)
+function Person:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
 --- Allows for overriding this functionality
-function Person:getRole(args)
-	return { display = args.role, store = args.role, category = args.role or 'Player'}
+function Person:getPersonType(args)
+	return { store = 'Player', category = 'Player'}
 end
 
 --- Allows for overriding this functionality
-function Person:getStatus(args)
-	return { display = args.status, store = args.status }
-end
-
---- Allows for overriding this functionality
-function Person:getHistory(infobox, args)
-	return args.history
+function Person:getStatusToStore(args)
+	return args.status
 end
 
 --- Allows for overriding this functionality
@@ -216,17 +230,12 @@ end
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
 function Person:nameDisplay(args)
-	local team = args.teamlink or args.team
+	local team = args.teamlink or args.team or ''
 	local icon = mw.ext.TeamTemplate.teamexists(team)
 		and mw.ext.TeamTemplate.teamicon(team) or ''
 	local name = args.id or mw.title.getCurrentTitle().text
 
 	return icon .. '&nbsp;' .. name
-end
-
---- Allows for overriding this functionality
-function Person:getAchievements(infobox, args)
-	return args.achievements
 end
 
 --- Allows for overriding this functionality
@@ -242,19 +251,19 @@ function Person:_createRegion(region)
 	return Template.safeExpand(self.frame, 'Region', {region})
 end
 
-function Person:_createLocations(args, role)
+function Person:_createLocations(args, personType)
 	local countryDisplayData = {}
 	local country = args.country or args.country1 or args.nationality or args.nationality1
 	if country == nil or country == '' then
 		return countryDisplayData
 	end
 
-	countryDisplayData[1] = Person:_createLocation(country, args.location, role)
+	countryDisplayData[1] = Person:_createLocation(country, args.location, personType)
 
 	local index = 2
 	country = args['country2'] or args['nationality2']
 	while(not String.isEmpty(country)) do
-		countryDisplayData[index] = Person:_createLocation(country, args['location' .. index], role)
+		countryDisplayData[index] = Person:_createLocation(country, args['location' .. index], personType)
 		index = index + 1
 		country = args['country' .. index] or args['nationality' .. index]
 	end
@@ -262,7 +271,7 @@ function Person:_createLocations(args, role)
 	return countryDisplayData
 end
 
-function Person:_createLocation(country, location, role)
+function Person:_createLocation(country, location, personType)
 	if country == nil or country == '' then
 		return nil
 	end
@@ -271,7 +280,7 @@ function Person:_createLocation(country, location, role)
 
 	return Flags._Flag(country) .. '&nbsp;' ..
 				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
-				.. '[[Category:' .. demonym .. ' ' .. role .. ']]'
+				.. '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
 				.. (location ~= nil and (',&nbsp;' .. location) or '')
 end
 
@@ -287,6 +296,41 @@ function Person:_createTeam(team, link)
 	end
 
 	return '[[' .. link .. '|' .. team .. ']]'
+end
+
+--- Allows for overriding this functionality
+function Person:getCategories(args, birthDisplay, personType, status)
+	if _shouldStoreData then
+		local categories = { personType .. 's' }
+
+		if not args.teamlink and not args.team then
+			table.insert(categories, 'Teamless ' .. personType .. 's')
+		end
+		if args.country2 or args.nationality2 then
+			table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
+		end
+		if args.death_date then
+			table.insert(categories, 'Deceased ' .. personType .. 's')
+		end
+		if
+			args.retired == 'yes' or args.retired == 'true'
+			or string.lower(status or '') == 'retired'
+			or string.match(args.retired or '', '%d%d%d%d%')--if retired has year set apply the retired category
+		then
+			table.insert(categories, 'Retired ' .. personType .. 's')
+		else
+			table.insert(categories, 'Active ' .. personType .. 's')
+		end
+		if not args.image then
+			table.insert(categories, personType .. 's with no profile picture')
+		end
+		if not String.isEmpty(birthDisplay) then
+			table.insert(categories, personType .. 's with unknown birth date')
+		end
+
+		return categories
+	end
+	return {}
 end
 
 return Person
