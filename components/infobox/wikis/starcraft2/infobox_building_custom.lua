@@ -7,7 +7,6 @@
 --
 
 local Building = require('Module:Infobox/Building')
-local Variables = require('Module:Variables')
 local String = require('Module:StringUtils')
 local RaceIcon = require('Module:RaceIcon')
 local CleanRace = require('Module:CleanRace')
@@ -17,10 +16,7 @@ local Class = require('Module:Class')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Builder = require('Module:Infobox/Widget/Builder')
 local Center = require('Module:Infobox/Widget/Center')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
 
 local CustomBuilding = Class.new()
 
@@ -59,7 +55,7 @@ function CustomInjector:addCustomCells(widgets)
 			' \'\'See [[Game Speed]].\'\'</small>'
 		}})
 	end
-	
+
 	return widgets
 end
 
