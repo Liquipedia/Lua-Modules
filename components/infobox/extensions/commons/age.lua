@@ -172,6 +172,9 @@ function Age:makeDisplay()
 		else
 			result.birth = self.birthDate:makeDisplay() .. ' (age ' .. age .. ')'
 		end
+	else
+		result.death = self.deathDate:makeDisplay()
+		result.birth = self.birthDate:makeDisplay()
 	end
 
 	return result
