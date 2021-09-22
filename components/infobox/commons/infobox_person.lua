@@ -151,7 +151,7 @@ function Person:createInfobox()
 	local statusToStore = self:getStatusToStore(args)
 	infobox:categories(unpack(self:getCategories(
 				args,
-				birthDisplay,
+				age.birth,
 				personType.category,
 				statusToStore
 			)))
@@ -162,8 +162,6 @@ function Person:createInfobox()
 		self:_setLpdbData(
 			args,
 			links,
-			birthday,
-			deathday,
 			statusToStore,
 			personType.store,
 			earnings
@@ -173,7 +171,7 @@ function Person:createInfobox()
 	return builtInfobox
 end
 
-function Person:_setLpdbData(args, links, birthday, deathday, status, personType, earnings)
+function Person:_setLpdbData(args, links, status, personType, earnings)
 	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
 	local lpdbData = {
 		id = args.id or mw.title.getCurrentTitle().prefixedText,
@@ -326,7 +324,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		if not args.image then
 			table.insert(categories, personType .. 's with no profile picture')
 		end
-		if not birthDisplay then
+		if not String.isEmpty(birthDisplay) then
 			table.insert(categories, personType .. 's with unknown birth date')
 		end
 
