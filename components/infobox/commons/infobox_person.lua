@@ -16,7 +16,7 @@ local Namespace = require('Module:Namespace')
 local Localisation = require('Module:Localisation').getLocalisation
 local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
---local GetBirthAndDeath = require('Module:???')._get
+local GetBirthAndDeath = require('Module:AgeCalculation')
 
 --the following 3 lines as a temp workaround until the Birth&Death stuff is implemented:
 local function GetBirthAndDeath()
@@ -57,13 +57,11 @@ function Person:createInfobox()
 	local personType = self:getPersonType(args)
 	local earnings = self:calculateEarnings(args)
 
-	local birthDisplay, deathDisplay, birthday, deathday
-		= GetBirthAndDeath(
-			args.birth_date,
-			args.birth_location,
-			args.death_date,
-			personType.category,
-			_shouldStoreData
+	local age = GetBirthAndDeath.run(
+			birthdate = args.birth_date,
+			birthlocation = args.birth_location,
+			deathdate = args.death_date,
+			shouldstore = _shouldStoreData
 		)
 
 	local widgets = {
@@ -76,8 +74,8 @@ function Person:createInfobox()
 			name = 'Nationality',
 			content = self:_createLocations(args, personType.category)
 		},
-		Cell{name = 'Birth', content = {birthDisplay}},
-		Cell{name = 'Died', content = {deathDisplay}},
+		Cell{name = 'Birth', content = {age.birth}},
+		Cell{name = 'Died', content = {age.death}},
 		Cell{name = 'Region', content = {
 				self:_createRegion(args.region)
 			}
@@ -191,8 +189,8 @@ function Person:_setLpdbData(args, links, birthday, deathday, status, personType
 		nationality = args.country or args.nationality,
 		nationality2 = args.country2 or args.nationality2,
 		nationality3 = args.country3 or args.nationality3,
-		birthdate = birthday,
-		deathdate = deathday,
+		birthdate = Variables.varDefault('player_birthdate'),
+		deathdate = Variables.varDefault('player_deathhdate'),
 		image = args.image,
 		region = args.region,
 		team = args.teamlink or args.team,
