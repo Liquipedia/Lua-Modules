@@ -18,11 +18,6 @@ local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
 local GetBirthAndDeath = require('Module:AgeCalculation')
 
---the following 3 lines as a temp workaround until the Birth&Death stuff is implemented:
-local function GetBirthAndDeath()
-	return '', nil, nil, nil
-end
-
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
