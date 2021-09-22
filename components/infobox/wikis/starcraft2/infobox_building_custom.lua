@@ -60,31 +60,28 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomInjector:parse(id, widgets)
---[[
-	attack
-]]--
 	if id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {CustomBuilding:_getCostDisplay()}},
+		}
+	elseif id == 'requirements' then
+		return {
+			Cell{name = 'Requirements', content = {CustomBuilding:_convertToList(_args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
 			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {CustomBuilding:_getHotkeys()}}
 		}
 	elseif id == 'builds' then
-		table.insert(
-			widgets,
-			Cell{name = 'Morphs into', content = {_args.morphs}}
-		)
-		table.insert(
-			widgets,
-			Cell{name = '[[Add-on]]s', content = {_args.addons}}
-		)
-		return widgets
+		return {
+			Cell{name = 'Builds', content = {CustomBuilding:_convertToList(_args.builds)}},
+			Cell{name = 'Morphs into', content = {CustomBuilding:_convertToList(_args.morphs)}},
+			Cell{name = '[[Add-on]]s', content = {CustomBuilding:_convertToList(_args.addons)}},
+		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocked Tech', content = {_args.unlocks}},
-			Cell{name = 'Upgrades available', content = {_args.upgrades}},
+			Cell{name = 'Unlocked Tech', content = {CustomBuilding:_convertToList(_args.unlocks)}},
+			Cell{name = 'Upgrades available', content = {CustomBuilding:_convertToList(_args.upgrades)}},
 		}
 	elseif id == 'defense' then
 		return {
@@ -109,6 +106,19 @@ function CustomBuilding:createWidgetInjector()
 	return CustomInjector()
 end
 
+function CustomBuilding:_convertToList(strg)
+	if String.isEmpty(strg) then
+		return nil
+	end
+	strg = strg:gsub('*', '', 1)
+	local strgArray = mw.text.split(strg, '*')
+	local list = mw.html.create('ul')
+	for _, item in ipairs(strgArray) do
+		list:tag('li'):wikitext(item)
+	end
+	return tostring(list)
+end
+
 function CustomBuilding:_defenseDisplay()
 	local display = _HP .. ' ' .. (_args.hp or 0)
 	if _args.shield then
@@ -131,8 +141,8 @@ function CustomBuilding:_defenseDisplay()
 end
 
 function CustomBuilding:nameDisplay(args)
-	local raceIcon = CustomBuilding._getRace(_args.race or 'unknown')
-	local name = _args.id or self.pagename
+	local raceIcon = CustomBuilding._getRace(args.race or 'unknown')
+	local name = args.name or self.pagename
 
 	return raceIcon .. '&nbsp;' .. name
 end
@@ -173,7 +183,7 @@ function CustomBuilding:_getHotkeys()
 	local display
 	if not String.isEmpty(_args.hotkey) then
 		if not String.isEmpty(_args.hotkey2) then
-			display = Hotkeys.hotkey(_args.hotkey, _args.hotkey2, 'slash')
+			display = Hotkeys.hotkey2(_args.hotkey, _args.hotkey2, 'arrow')
 		else
 			display = Hotkeys.hotkey(_args.hotkey)
 		end
