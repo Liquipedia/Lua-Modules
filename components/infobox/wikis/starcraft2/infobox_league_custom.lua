@@ -372,7 +372,7 @@ function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
 end
 
 function CustomLeague:_displayPrizeValue(value, numDigits)
-	if value == 0 or value == '0' then
+	if String.isEmpty(value) or value == 0 or value == '0' then
 		return '-'
 	end
 
