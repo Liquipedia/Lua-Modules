@@ -52,12 +52,12 @@ function Person:createInfobox()
 	local personType = self:getPersonType(args)
 	local earnings = self:calculateEarnings(args)
 
-	local age = GetBirthAndDeath.run(
+	local age = GetBirthAndDeath.run({
 			birthdate = args.birth_date,
 			birthlocation = args.birth_location,
 			deathdate = args.death_date,
 			shouldstore = _shouldStoreData
-		)
+		})
 
 	local widgets = {
 		Header{name = self:nameDisplay(args), image = args.image},
