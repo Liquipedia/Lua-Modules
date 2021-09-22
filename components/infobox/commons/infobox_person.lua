@@ -26,14 +26,6 @@ local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
-local Widgets = require('Module:Infobox/Widget/All')
-local Header = Widgets.Header
-local Title = Widgets.Title
-local Cell = Widgets.Cell
-local Center = Widgets.Center
-local Builder = Widgets.Builder
-local Customizable = Widgets.Customizable
-
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.language.new('en')
@@ -48,12 +40,6 @@ end
 function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-
-	if String.isEmpty(args.id) then
-		error('You need to specify an "id"')
-	end
-
-	_shouldStoreData = Person:shouldStoreData(args)
 
 	if String.isEmpty(args.id) then
 		error('You need to specify an "id"')
