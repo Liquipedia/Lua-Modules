@@ -20,7 +20,7 @@ local String = require('Module:StringUtils')
 function LeagueIcon.display(args)
 	local options = args.options or {}
 
-	local size = tonumber(args.size or '') or 50
+	local size = tonumber(args.size or '') or 25
 	local iconDark = args.iconDark
 	local icon = args.icon
 	if not Logic.readBool(options.noTemplate) and not (icon and iconDark) then
@@ -122,7 +122,7 @@ function LeagueIcon.generate(args)
 	end
 	local iconDark = args.iconDark or icon
 
-	local imageOptions = '|link=' .. link .. '|' .. name .. '|50x50px]]'
+	local imageOptions = '|link=' .. link .. '|' .. name .. '|25x25px]]'
 
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki('<span><!--\n' ..
 		'--><span class="league-icon-small-image lightmode">' ..
