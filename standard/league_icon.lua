@@ -125,7 +125,7 @@ function LeagueIcon.generate(args)
 	local imageOptions = '|link={{{1|{{{link|' .. link .. '}}}}}}|{{{name|{{{1|{{{link|' .. name .. '}}}}}}}}}|50x50px]]'
 
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(
-		'--><span class="league-icon-small-image lightmode">' ..
+		'<span class="league-icon-small-image lightmode">' ..
 		'[[File:' .. icon .. imageOptions .. '</span><!--\n' ..
 		'--><span class="league-icon-small-image darkmode">' ..
 		'[[File:' .. iconDark .. imageOptions .. '</span><!--\n' ..
