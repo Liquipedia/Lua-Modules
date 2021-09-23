@@ -372,7 +372,7 @@ function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
 end
 
 function CustomLeague:_displayPrizeValue(value, numDigits)
-	if value == 0 or value == '0' then
+	if String.isEmpty(value) or value == 0 or value == '0' then
 		return '-'
 	end
 
@@ -403,7 +403,7 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 	--remove currency symbol
 	if currency then
 		Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
-		local symbol = Variables.varDefineMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
+		local symbol = Variables.varDefaultMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
 		value = value:gsub(symbol, '')
 	else
 		value = value:gsub('%$', '')
