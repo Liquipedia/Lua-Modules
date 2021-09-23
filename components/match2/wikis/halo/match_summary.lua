@@ -12,12 +12,18 @@ local MatchGroupUtil = require('Module:MatchGroup/Util')
 local OpponentDisplay = require('Module:OpponentDisplay')
 local Template = require('Module:Template')
 local MapModes = require('Module:MapModes')
+local Table = require('Module:Table')
+local Json = require('Module:Json')
 
 local htmlCreate = mw.html.create
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
 local p = {}
+
+local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
+local _RED_CROSS = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
+local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 function p.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
@@ -45,7 +51,7 @@ function p.getByMatchId(args)
 			local display = teamExists
 				and mw.ext.TeamTemplate.teamicon(opponent.template, match.date)
 				or _TBD_ICON
-			return mw.html.create('div'):wikitext(display)
+			return htmlCreate('div'):wikitext(display)
 				:addClass('brkts-popup-header-opponent-solo-team')
 		else
 			return ''
@@ -80,18 +86,15 @@ function p.getByMatchId(args)
 			local gameElements = {
 				htmlCreate('div')
 					:addClass('brkts-popup-spaced')
-					:node(game.winner == 1 and
-						  '[[File:GreenCheck.png|14x14px|link=]]' or
-						  '[[File:NoCheck.png|link=]]')
+					:node(game.winner == 1 and _GREEN_CHECK or _NO_CHECK)
 					:node(htmlCreate('div'):node(game.scores[1] or '')),
 				centerNode,
 				htmlCreate('div')
 					:addClass('brkts-popup-spaced')
 					:node(htmlCreate('div'):node(game.scores[2] or ''))
-					:node(game.winner == 2 and
-						  '[[File:GreenCheck.png|14x14px|link=]]' or
-						  '[[File:NoCheck.png|link=]]')
+					:node(game.winner == 2 and _GREEN_CHECK or _NO_CHECK)
 			}
+
 			local gameHeader = game.header or ''
 			if gameHeader ~= '' then
 				table.insert(gameElements, 1, p._breakNode())
@@ -99,7 +102,7 @@ function p.getByMatchId(args)
 					:node(gameHeader)
 					:css('font-weight','bold')
 					:css('font-size','85%')
-					:css('margin","auto'))
+					:css('margin','auto'))
 			end
 			if game.comment then
 				table.insert(gameElements, p._breakNode())
@@ -111,6 +114,25 @@ function p.getByMatchId(args)
 			body = p._addFlexRow(body, gameElements, 'brkts-popup-body-game')
 		end
 	end
+
+	-- Vetoes
+	local vetoData = (match.extradata or {}).mapveto
+	vetoData = Json.parseIfString(vetoData or '{}')
+	if not Table.isEmpty(vetoData) then
+		for index, vetoMap in ipairs(vetoData) do
+			local vetoElements = p._getVetoDisplay(vetoMap.map, vetoMap.by)
+			if index == 1 then
+				table.insert(vetoElements, 1, p._breakNode())
+				table.insert(vetoElements, 1, htmlCreate('div')
+					:css('font-size','85%')
+					:css('margin','auto')
+					:wikitext('Vetoes')
+				)
+			end
+			body = p._addFlexRow(body, vetoElements, 'brkts-popup-body-game')
+		end
+	end
+
 	wrapper:node(body):node(p._breakNode())
 
 	-- comment
@@ -149,6 +171,21 @@ function p.getByMatchId(args)
 		wrapper:node(footer)
 	end
 	return wrapper
+end
+
+function p._getVetoDisplay(vetoMap, vetoOpponent)
+	local vetoElements = {
+		htmlCreate('div')
+			:addClass('brkts-popup-spaced')
+			:node(vetoOpponent == 1 and _RED_CROSS or _NO_CHECK),
+		htmlCreate('div')
+			:addClass('brkts-popup-spaced')
+			:node(htmlCreate('div'):node('[[' .. vetoMap .. ']]')),
+		htmlCreate('div')
+			:addClass('brkts-popup-spaced')
+			:node(vetoOpponent == 2 and _RED_CROSS or _NO_CHECK)
+	}
+	return vetoElements
 end
 
 function p._addFlexRow(wrapper, contentElements, class, style)
