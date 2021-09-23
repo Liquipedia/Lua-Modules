@@ -358,7 +358,7 @@ end
 
 -- Parse the mapVeto input
 function matchFunctions.getMapVeto(match)
-	if not match.vetoes then return nil end
+	if not match.vetoes then return {} end
 
 	local vetoes = mw.text.split(match.vetoes or '', ',')
 	match.vetoes = nil
@@ -369,10 +369,10 @@ function matchFunctions.getMapVeto(match)
 	local vetoData = {}
 
 	while not String.isEmpty(currentVetoMap) do
-		local by = mw.text.trim(vetoesBy[index])
+		local by = tonumber(mw.text.trim(vetoesBy[index]) or '')
 		vetoData[index] = { map = currentVetoMap, by = by }
 		index = index + 1
-		currentVetoMap = mw.text.trim(vetoes[index])
+		currentVetoMap = mw.text.trim(vetoes[index] or '')
 	end
 
 	return vetoData
@@ -380,7 +380,7 @@ end
 
 -- Parse MVP input
 function matchFunctions.getMVP(match)
-	if not match.mvp then return nil end
+	if not match.mvp then return {} end
 	local mvppoints = match.mvppoints or 1
 
 	-- Split the input
