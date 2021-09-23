@@ -158,6 +158,12 @@ function p.getByMatchId(args)
 		:addClass('brkts-popup-footer')
 	local footerSpacer = htmlCreate('div')
 		:addClass('brkts-popup-spaced')
+	if match.vod then
+		footerSet = true
+		footerSpacer:node(Template.safeExpand(mw.getCurrentFrame(), 'vodlink', {
+			vod = match.vod,
+		}))
+	end
 	for index, vod in pairs(vods) do
 		footerSet = true
 		footerSpacer:node(Template.safeExpand(mw.getCurrentFrame(), 'vodlink', {
