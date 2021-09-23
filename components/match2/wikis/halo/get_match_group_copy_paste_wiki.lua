@@ -45,7 +45,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	if bestof ~= 0 then
 		for i = 1, bestof do
-			out = out .. '\n\t|map' .. i .. '={{Map|map=|winner='
+			out = out .. '\n\t|map' .. i .. '={{Map|map=|mode='
 				.. '\n\t\t|score1=|score2='
 				.. '\n\t\t|winner=\n\t}}'
 		end
