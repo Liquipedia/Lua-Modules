@@ -128,7 +128,9 @@ function p.getResultTypeAndWinner(data, indexedScores)
 			end
 			indexedScores = p.setPlacement(indexedScores, data.winner, 'default')
 		else
+			local winner
 			indexedScores, winner = p.setPlacement(indexedScores, data.winner, nil, data.finished)
+			data.winner = data.winner or winner
 		end
 	end
 	return data, indexedScores
@@ -418,12 +420,11 @@ function matchFunctions.getOpponents(match)
 		end
 	end
 
-	
 	-- see if match should actually be finished if bestof limit was reached
 	if isScoreSet and not Logic.readBool(match.finished) then
 		local firstTo = math.ceil(match.bestof/2)
 		for _, item in pairs(opponents) do
-			if tonumber(opponents.score or 0) >= firstTo then
+			if tonumber(item.score or 0) >= firstTo then
 				match.finished = true
 				break
 			end
