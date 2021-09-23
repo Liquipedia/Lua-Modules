@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchGroup/Input/StarCraft/FFA
+-- page=Module:MatchGroup/Input/Starcraft/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,7 +13,7 @@ local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
-local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/StarCraft', {requireDevIfEnabled = true})
+local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft', {requireDevIfEnabled = true})
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
@@ -27,8 +27,8 @@ local MODES2 = {
 	['quad'] = '4',
 	['team'] = 'team',
 	['literal'] = 'literal'
-	}
-local ALOWED_BG = {
+}
+local ALLOWED_BG = {
 	['up'] = 'up',
 	['down'] = 'down',
 	['stayup'] = 'stayup',
@@ -37,21 +37,21 @@ local ALOWED_BG = {
 	['mid'] = 'stay',
 	['drop'] = 'down',
 	['proceed'] = 'up',
-	}
+}
 
-local FFA = {}
+local StarcraftFfaInput = {}
 
-function FFA.adjustData(match)
+function StarcraftFfaInput.adjustData(match)
 	local OppNumber = 0
 	local noscore = match.noscore == 'true' or match.noscore == '1' or match.nopoints == 'true' or match.nopoints == '1'
 	match.noscore = noscore
 
 	--process pbg entries and set them into match.pbg (will get merged into extradata later on)
-	match = FFA.get_pbg(match)
+	match = StarcraftFfaInput.getPbg(match)
 
 	--parse opponents + determine match mode + set initial stuff
 	match.mode = ''
-	match, OppNumber = FFA.OpponentInput(match, OppNumber, noscore)
+	match, OppNumber = StarcraftFfaInput.OpponentInput(match, OppNumber, noscore)
 
 	--indicate it is an FFA match
 	match.mode = match.mode .. '_ffa'
@@ -69,7 +69,7 @@ function FFA.adjustData(match)
 				(match['map' .. i].points1 or '') ~= '' or (match['map' .. i].opponent1points or '') ~= '' or
 				(match['map' .. i].score1 or '') ~= '' or (match['map' .. i].opponent1score or '') ~= '' or
 				(match['map' .. i].map or '') ~= '') then
-			match, subgroup = FFA.MapInput(match, i, subgroup, noscore, OppNumber)
+			match, subgroup = StarcraftFfaInput.MapInput(match, i, subgroup, noscore, OppNumber)
 		else
 			match['map' .. i] = nil
 			break
@@ -94,7 +94,7 @@ function FFA.adjustData(match)
 		end
 	end
 
-	match = FFA.MatchWinnerProcessing(match, OppNumber, noscore)
+	match = StarcraftFfaInput.MatchWinnerProcessing(match, OppNumber, noscore)
 
 	for opponentIndex = 1, OppNumber do
 		--stringify player data
@@ -110,13 +110,13 @@ function FFA.adjustData(match)
 
 	--Bracket Contest Handling
 	if match.contest and tostring(match.contest.finished) == '1' then
-		match = FFA.processContest(match, OppNumber)
+		match = StarcraftFfaInput.processContest(match, OppNumber)
 	end
 
 	return match
 end
 
-function FFA.get_pbg(match)
+function StarcraftFfaInput.getPbg(match)
 	local pbg = {}
 
 	local advancecount = tonumber(match.advancecount or 0) or 0
@@ -127,8 +127,8 @@ function FFA.get_pbg(match)
 	end
 
 	local index = 1
-	while FFA.bgClean(match['pbg' .. index]) ~= '' do
-		pbg[index] = FFA.bgClean(match['pbg' .. index])
+	while StarcraftFfaInput.bgClean(match['pbg' .. index]) ~= '' do
+		pbg[index] = StarcraftFfaInput.bgClean(match['pbg' .. index])
 		match['pbg' .. index] = nil
 		index = index + 1
 	end
@@ -139,13 +139,13 @@ function FFA.get_pbg(match)
 end
 
 --helper function
-function FFA.bgClean(pbg)
+function StarcraftFfaInput.bgClean(pbg)
 	local temp = pbg
 	pbg = string.lower(pbg or '')
 	if pbg == '' then
 		return ''
 	else
-		pbg = ALOWED_BG[pbg]
+		pbg = ALLOWED_BG[pbg]
 
 		if not pbg then
 			error('Bad bg/pbg entry "' .. temp .. '"')
@@ -156,7 +156,7 @@ function FFA.bgClean(pbg)
 end
 
 --function to get extradata for storage
-function FFA.getExtraData(match)
+function StarcraftFfaInput.getExtraData(match)
 	local extradata = {
 		matchsection = Variables.varDefault('matchsection'),
 		comment = match.comment,
@@ -188,7 +188,7 @@ function FFA.getExtraData(match)
 end
 
 -- function to sort out placements
-function FFA.placementSortFunction(table, key1, key2)
+function StarcraftFfaInput.placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
 	return tonumber(op1) > tonumber(op2)
@@ -199,7 +199,7 @@ end
 Match Winner, Walkover, Placement, Resulttype, Status functions
 
 ]]--
-function FFA.MatchWinnerProcessing(match, OppNumber, noscore)
+function StarcraftFfaInput.MatchWinnerProcessing(match, OppNumber, noscore)
 	local bestof = tonumber(match.firstto or '') or tonumber(match.bestof or '') or 9999
 	match.bestof = bestof
 	local walkover = match.walkover or ''
@@ -276,19 +276,19 @@ function FFA.MatchWinnerProcessing(match, OppNumber, noscore)
 		end
 	end
 
-	match = FFA.MatchPlacements(match, OppNumber, noscore, IndScore)
+	match = StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 
 	return match
 end
 
 --determine placements and winner (if not already set)
-function FFA.MatchPlacements(match, OppNumber, noscore, IndScore)
+function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 	local counter = 0
 	local temp = {}
 	match.finished = (match.finished or '') ~= '' and match.finished ~= 'false' and match.finished ~= '0' and 'true' or nil
 
 	if not noscore then
-		for scoreIndex, score in Table.iter.spairs(IndScore, FFA.placementSortFunction) do
+		for scoreIndex, score in Table.iter.spairs(IndScore, StarcraftFfaInput.placementSortFunction) do
 			counter = counter + 1
 			if counter == 1 and (match.winner or '') == '' then
 				if match.finished or score >= match.bestof then
@@ -344,14 +344,14 @@ end
 OpponentInput functions
 
 ]]--
-function FFA.OpponentInput(match, OppNumber, noscore)
+function StarcraftFfaInput.OpponentInput(match, OppNumber, noscore)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		if not Logic.isEmpty(match['opponent' .. opponentIndex]) then
 			OppNumber = opponentIndex
 			--parse the stringified opponent arguments to be a table again
 			match['opponent' .. opponentIndex] = json.parseIfString(match['opponent' .. opponentIndex])
 
-			local bg = FFA.bgClean(match['opponent' .. opponentIndex].bg)
+			local bg = StarcraftFfaInput.bgClean(match['opponent' .. opponentIndex].bg)
 			match['opponent' .. opponentIndex].bg = nil
 			local advances = match['opponent' .. opponentIndex].advance or ''
 			if advances == '' then
@@ -429,7 +429,7 @@ end
 MapInput functions
 
 ]]--
-function FFA.MapInput(match, i, subgroup, noscore, OppNumber)
+function StarcraftFfaInput.MapInput(match, i, subgroup, noscore, OppNumber)
 	--redirect maps
 	if match['map' .. i].map ~= 'TBD' then
 		match['map' .. i].map = mw.ext.TeamLiquidIntegration.resolve_redirect(match['map' .. i].map or '')
@@ -454,7 +454,7 @@ function FFA.MapInput(match, i, subgroup, noscore, OppNumber)
 	match['map' .. i] = StarcraftMatchGroupInput.ProcessPlayerMapData(match['map' .. i], match, OppNumber)
 
 	--determine scores, resulttype, walkover and winner
-	match['map' .. i] = FFA.MapScoreProcessing(match['map' .. i], OppNumber, noscore)
+	match['map' .. i] = StarcraftFfaInput.MapScoreProcessing(match['map' .. i], OppNumber, noscore)
 
 	--adjust sumscores if scores/points are used
 	if not noscore then
@@ -474,7 +474,7 @@ function FFA.MapInput(match, i, subgroup, noscore, OppNumber)
 end
 
 
-function FFA.MapScoreProcessing(map, OppNumber, noscore)
+function StarcraftFfaInput.MapScoreProcessing(map, OppNumber, noscore)
 	map.extradata = json.parseIfString(map.extradata)
 	map.scores = {}
 	local indexedScores = {}
@@ -518,7 +518,7 @@ function FFA.MapScoreProcessing(map, OppNumber, noscore)
 		if hasScoreSet then
 			local counter = 0
 			local temp = {}
-			for scoreIndex, score in Table.iter.spairs(indexedScores, FFA.placementSortFunction) do
+			for scoreIndex, score in Table.iter.spairs(indexedScores, StarcraftFfaInput.placementSortFunction) do
 				counter = counter + 1
 				if counter == 1 and (map.winner or '') == '' then
 					map.winner = scoreIndex
@@ -570,7 +570,7 @@ end
 Bracket Contests function
 
 ]]--
-function FFA.processContest(match, OppNumber)
+function StarcraftFfaInput.processContest(match, OppNumber)
 	local points = tonumber(Variables.varDefault('contestPoints', 0)) or 0
 	local score1 = {}
 	local score2 = {}
@@ -628,4 +628,4 @@ function FFA.processContest(match, OppNumber)
 	return match
 end
 
-return FFA
+return StarcraftFfaInput

@@ -57,7 +57,7 @@ StarcraftMatchGroupUtil.types.Submatch = TypeUtil.struct({
 StarcraftMatchGroupUtil.types.Match = TypeUtil.extendStruct(MatchGroupUtil.types.Match, {
 	games = TypeUtil.array(StarcraftMatchGroupUtil.types.Game),
 	headToHead = 'boolean',
-	isFFA = 'boolean',
+	isFfa = 'boolean',
 	noScore = 'boolean?',
 	opponentMode = TypeUtil.literalUnion('uniform', 'team'),
 	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
@@ -107,7 +107,7 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 	-- Misc
 	match.headToHead = Logic.readBool(Table.extract(match.extradata, 'headtohead'))
-	match.isFFA = Logic.readBool(Table.extract(match.extradata, 'ffa'))
+	match.isFfa = Logic.readBool(Table.extract(match.extradata, 'ffa'))
 	match.noScore = Logic.readBoolOrNil(Table.extract(match.extradata, 'noscore'))
 
 	return match

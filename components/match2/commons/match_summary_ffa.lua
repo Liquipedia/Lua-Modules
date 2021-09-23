@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchSummary/FFA
+-- page=Module:MatchSummary/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -23,9 +23,9 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnable
 --[[
 Module containing display components for match summaries of free-for-all matches.
 ]]
-local FFAMatchSummary = {propTypes = {}, types = {}}
+local FfaMatchSummary = {propTypes = {}, types = {}}
 
-FFAMatchSummary.types.Config = TypeUtil.struct({
+FfaMatchSummary.types.Config = TypeUtil.struct({
 	Footer = 'function',
 	GamePlacement = 'function',
 	GameScore = 'function',
@@ -39,12 +39,12 @@ FFAMatchSummary.types.Config = TypeUtil.struct({
 	showPlacement = 'boolean',
 	showScore = 'boolean',
 })
-FFAMatchSummary.types.ConfigOptions = TypeUtil.struct(
-	Table.mapValues(FFAMatchSummary.types.Config.struct, TypeUtil.optional)
+FfaMatchSummary.types.ConfigOptions = TypeUtil.struct(
+	Table.mapValues(FfaMatchSummary.types.Config.struct, TypeUtil.optional)
 )
 
-FFAMatchSummary.propTypes.FFAMatchSummary = {
-	config = TypeUtil.optional(FFAMatchSummary.types.ConfigOptions),
+FfaMatchSummary.propTypes.FfaMatchSummary = {
+	config = TypeUtil.optional(FfaMatchSummary.types.ConfigOptions),
 	match = MatchGroupUtil.types.Match,
 }
 
@@ -55,11 +55,11 @@ columns.
 
 Many aspects of this component can be customized via composition. To do so,
 wrap this component within another component, while passing custom options to
-props.config. See StarcraftFFAMatchSummary as an example of how to customize
+props.config. See StarcraftFfaMatchSummary as an example of how to customize
 this component.
 ]]
-function FFAMatchSummary.FFAMatchSummary(props)
-	DisplayUtil.assertPropTypes(props, FFAMatchSummary.propTypes.FFAMatchSummary)
+function FfaMatchSummary.FfaMatchSummary(props)
+	DisplayUtil.assertPropTypes(props, FfaMatchSummary.propTypes.FfaMatchSummary)
 	local match = props.match
 
 	local propsConfig = props.config or {}
@@ -70,13 +70,13 @@ function FFAMatchSummary.FFAMatchSummary(props)
 		showScore or #match.games > 1
 	)
 	local config = {
-		Footer = propsConfig.Footer or FFAMatchSummary.Footer,
-		GamePlacement = propsConfig.GamePlacement or FFAMatchSummary.GamePlacement,
-		GameScore = propsConfig.GameScore or FFAMatchSummary.GameScore,
-		GameScoreHeader = propsConfig.GameScoreHeader or FFAMatchSummary.GameScoreHeader,
-		Opponent = propsConfig.Opponent or FFAMatchSummary.Opponent,
-		TotalScore = propsConfig.TotalScore or FFAMatchSummary.TotalScore,
-		TotalScoreHeader = propsConfig.TotalScoreHeader or FFAMatchSummary.TotalScoreHeader,
+		Footer = propsConfig.Footer or FfaMatchSummary.Footer,
+		GamePlacement = propsConfig.GamePlacement or FfaMatchSummary.GamePlacement,
+		GameScore = propsConfig.GameScore or FfaMatchSummary.GameScore,
+		GameScoreHeader = propsConfig.GameScoreHeader or FfaMatchSummary.GameScoreHeader,
+		Opponent = propsConfig.Opponent or FfaMatchSummary.Opponent,
+		TotalScore = propsConfig.TotalScore or FfaMatchSummary.TotalScore,
+		TotalScoreHeader = propsConfig.TotalScoreHeader or FfaMatchSummary.TotalScoreHeader,
 		gameHeaderAbbr = propsConfig.gameHeaderAbbr or 'R',
 		gameHeaderTitle = propsConfig.gameHeaderTitle or 'Round ',
 		rowHeight = propsConfig.rowHeight or 36,
@@ -94,12 +94,12 @@ function FFAMatchSummary.FFAMatchSummary(props)
 	end)
 	local sortedOpponentIxs = Array.map(sortedOpponents, function(opponent) return opponentIxs[opponent] end)
 
-	local gridLeftNode = FFAMatchSummary.GridLeft({
+	local gridLeftNode = FfaMatchSummary.GridLeft({
 		config = config,
 		match = props.match,
 		opponentIxs = sortedOpponentIxs,
 	})
-	local gridRightNode = FFAMatchSummary.GridRight({
+	local gridRightNode = FfaMatchSummary.GridRight({
 		config = config,
 		match = props.match,
 		opponentIxs = sortedOpponentIxs,
@@ -124,18 +124,18 @@ function FFAMatchSummary.FFAMatchSummary(props)
 
 	return mw.html.create('div'):addClass('ffa-match-summary')
 		:css('width', width .. 'px')
-		:node(FFAMatchSummary.Header({match = match}))
+		:node(FfaMatchSummary.Header({match = match}))
 		:node(gridNode)
-		:node(FFAMatchSummary.Maps({match = match, config = config}))
-		:node(match.comment and FFAMatchSummary.Comment({comment = match.comment}) or nil)
+		:node(FfaMatchSummary.Maps({match = match, config = config}))
+		:node(match.comment and FfaMatchSummary.Comment({comment = match.comment}) or nil)
 		:node(config.Footer({match = match}))
 end
 
-FFAMatchSummary.propTypes.Header = {
+FfaMatchSummary.propTypes.Header = {
 	match = MatchGroupUtil.types.Match,
 }
 
-function FFAMatchSummary.Header(props)
+function FfaMatchSummary.Header(props)
 	local countdownNode = props.match.dateIsExact
 		and DisplayHelper.MatchCountdownBlock(props.match)
 			:addClass('brkts-popup-countdown')
@@ -145,8 +145,8 @@ function FFAMatchSummary.Header(props)
 		:node(countdownNode)
 end
 
-FFAMatchSummary.propTypes.GridLeftRight = {
-	config = FFAMatchSummary.types.Config,
+FfaMatchSummary.propTypes.GridLeftRight = {
+	config = FfaMatchSummary.types.Config,
 	match = MatchGroupUtil.types.Match,
 	opponentIxs = TypeUtil.array('number'),
 }
@@ -154,7 +154,7 @@ FFAMatchSummary.propTypes.GridLeftRight = {
 --[[
 Left half of the grid, containing match placement, opponent, and total score columns.
 ]]
-function FFAMatchSummary.GridLeft(props)
+function FfaMatchSummary.GridLeft(props)
 	local config = props.config
 	local match = props.match
 
@@ -173,12 +173,12 @@ function FFAMatchSummary.GridLeft(props)
 
 	local function Header()
 		local placementNode = config.showPlacement
-			and FFAMatchSummary.AbbrCell('#', 'Placement')
+			and FfaMatchSummary.AbbrCell('#', 'Placement')
 				:addClass('ffa-match-summary-placement')
 				:css('grid-area', 'header / placement')
 			or nil
 
-		local opponentNode = FFAMatchSummary.OpponentHeader({opponents = match.opponents})
+		local opponentNode = FfaMatchSummary.OpponentHeader({opponents = match.opponents})
 			:css('grid-area', 'header / opponent')
 
 		local scoreNode = showTotalScore
@@ -194,7 +194,7 @@ function FFAMatchSummary.GridLeft(props)
 		local bodyNode = mw.html.create('div'):addClass('ffa-match-summary-grid-body')
 
 		if config.showPlacement then
-			for _, cellNode in ipairs(FFAMatchSummary.PlacementCells(props)) do
+			for _, cellNode in ipairs(FfaMatchSummary.PlacementCells(props)) do
 				bodyNode:node(cellNode)
 			end
 		end
@@ -233,7 +233,7 @@ function FFAMatchSummary.GridLeft(props)
 		:node(Body())
 end
 
-function FFAMatchSummary.PlacementCells(props)
+function FfaMatchSummary.PlacementCells(props)
 	local match = props.match
 
 	-- Placement cell spanning ties
@@ -241,7 +241,7 @@ function FFAMatchSummary.PlacementCells(props)
 		local placement = match.opponents[group[1]].placement
 
 		local bgClass = #match.bracketData.advanceSpots == 0 and placement
-			and FFAMatchSummary.getPlacementClass(placement)
+			and FfaMatchSummary.getPlacementClass(placement)
 			or nil
 
 		local zeroWidthSpace = '&#8203;'
@@ -250,7 +250,7 @@ function FFAMatchSummary.PlacementCells(props)
 			Ordinal._ordinal(rowIx),
 			#group > 1 and zeroWidthSpace .. enDash .. zeroWidthSpace .. Ordinal._ordinal(rowIx + #group - 1) or '',
 		}
-		return FFAMatchSummary.AbbrCell(table.concat(parts))
+		return FfaMatchSummary.AbbrCell(table.concat(parts))
 			:addClass('ffa-match-summary-placement')
 			:addClass(bgClass)
 			:css('grid-area', 'body ' .. rowIx .. ' / placement / span ' .. #group .. ' / span 1')
@@ -275,7 +275,7 @@ function FFAMatchSummary.PlacementCells(props)
 		for rowIx_ = 1, match.opponents do
 			local spot = match.bracketData.advanceSpots[rowIx_]
 			local bgCell = mw.html.create('div')
-				:addClass(FFAMatchSummary.getAdvanceClass(spot and spot.bg or 'down'))
+				:addClass(FfaMatchSummary.getAdvanceClass(spot and spot.bg or 'down'))
 				:css('grid-area', 'body ' .. rowIx .. ' / placement')
 			table.insert(cells, bgCell)
 		end
@@ -287,7 +287,7 @@ end
 --[[
 Right half of the grid, containing placement and score columns for each game.
 ]]
-function FFAMatchSummary.GridRight(props)
+function FfaMatchSummary.GridRight(props)
 	local config = props.config
 	local match = props.match
 
@@ -310,14 +310,14 @@ function FFAMatchSummary.GridRight(props)
 		for gameIx, _ in ipairs(match.games) do
 			local gameNode
 			if config.showScore then
-				gameNode = FFAMatchSummary.AbbrCell(config.gameHeaderTitle .. gameIx)
+				gameNode = FfaMatchSummary.AbbrCell(config.gameHeaderTitle .. gameIx)
 					:addClass('ffa-match-summary-game-title')
 					:css('grid-area', 'header 1 / placement ' .. gameIx .. ' / span 1 / span 2')
 			else
 				if #match.games == 1 then
-					gameNode = FFAMatchSummary.AbbrCell('#', 'Placement')
+					gameNode = FfaMatchSummary.AbbrCell('#', 'Placement')
 				else
-					gameNode = FFAMatchSummary.AbbrCell(config.gameHeaderAbbr .. gameIx, config.gameHeaderTitle .. gameIx)
+					gameNode = FfaMatchSummary.AbbrCell(config.gameHeaderAbbr .. gameIx, config.gameHeaderTitle .. gameIx)
 				end
 				gameNode:addClass('ffa-match-summary-game-placement')
 					:css('grid-area', 'header / placement ' .. gameIx)
@@ -328,7 +328,7 @@ function FFAMatchSummary.GridRight(props)
 		-- Second row
 		if config.showScore then
 			for gameIx, _ in ipairs(match.games) do
-				local placementNode = FFAMatchSummary.AbbrCell('P', 'Placement')
+				local placementNode = FfaMatchSummary.AbbrCell('P', 'Placement')
 					:addClass('ffa-match-summary-game-placement')
 					:css('grid-area', 'header 2 / placement ' .. gameIx)
 
@@ -378,16 +378,16 @@ function FFAMatchSummary.GridRight(props)
 		:node(Body())
 end
 
-FFAMatchSummary.propTypes.Maps = {
-	config = FFAMatchSummary.types.Config,
+FfaMatchSummary.propTypes.Maps = {
+	config = FfaMatchSummary.types.Config,
 	match = MatchGroupUtil.types.Match,
 }
 
 --[[
 Maps played, and map comments. Collapses the map display if all games are played on the same map.
 ]]
-function FFAMatchSummary.Maps(props)
-	DisplayUtil.assertPropTypes(props, FFAMatchSummary.propTypes.Maps)
+function FfaMatchSummary.Maps(props)
+	DisplayUtil.assertPropTypes(props, FfaMatchSummary.propTypes.Maps)
 	local match = props.match
 
 	local maps = Table.map(match.games, function(ix, game) return game.map or '', true end)
@@ -422,23 +422,23 @@ end
 --[[
 Match comment.
 ]]
-function FFAMatchSummary.Comment(props)
+function FfaMatchSummary.Comment(props)
 	local commentNode = mw.html.create('div'):addClass('ffa-match-summary-comment')
 		:wikitext(props.comment)
 	return DisplayUtil.applyOverflowStyles(commentNode, 'wrap')
 end
 
-function FFAMatchSummary.abbrNode(text, abbrTitle)
+function FfaMatchSummary.abbrNode(text, abbrTitle)
 	return mw.html.create('abbr'):attr('title', abbrTitle):wikitext(text)
 end
 
 --[[
 A cell with horizontally and vertically centered text and optionally an abbreviation.
 ]]
-function FFAMatchSummary.AbbrCell(text, abbrTitle)
+function FfaMatchSummary.AbbrCell(text, abbrTitle)
 	local contentNode = mw.html.create('div'):addClass('ffa-match-summary-cell-content')
 	if abbrTitle then
-		contentNode:node(FFAMatchSummary.abbrNode(text, abbrTitle))
+		contentNode:node(FfaMatchSummary.abbrNode(text, abbrTitle))
 	else
 		contentNode:wikitext(text)
 	end
@@ -449,9 +449,9 @@ end
 --[[
 Header cell for the opponent column.
 
-This is the default implementation used by FFAMatchSummary.
+This is the default implementation used by FfaMatchSummary.
 ]]
-function FFAMatchSummary.OpponentHeader(props)
+function FfaMatchSummary.OpponentHeader(props)
 	local opponentTypes = Table.map(props.opponents, function(_, opponent) return opponent.type, true end)
 	local uniqueOpponentType = Table.uniqueKey(opponentTypes)
 	local opponentHeaderText =
@@ -459,38 +459,38 @@ function FFAMatchSummary.OpponentHeader(props)
 			or uniqueOpponentType == 'solo' and 'Players'
 			or 'Opponents'
 
-	return FFAMatchSummary.AbbrCell(opponentHeaderText)
+	return FfaMatchSummary.AbbrCell(opponentHeaderText)
 		:addClass('ffa-match-summary-opponent')
 end
 
 --[[
 Header cell for the total score column.
 
-This is the default implementation used by FFAMatchSummary.
+This is the default implementation used by FfaMatchSummary.
 ]]
-function FFAMatchSummary.TotalScoreHeader()
-	return FFAMatchSummary.AbbrCell('∑', 'Total Score')
+function FfaMatchSummary.TotalScoreHeader()
+	return FfaMatchSummary.AbbrCell('∑', 'Total Score')
 		:addClass('ffa-match-summary-total-score')
 end
 
 --[[
 Header cell for the score column of a game.
 
-This is the default implementation used by FFAMatchSummary.
+This is the default implementation used by FfaMatchSummary.
 ]]
-function FFAMatchSummary.GameScoreHeader()
-	return FFAMatchSummary.AbbrCell('S', 'Score')
+function FfaMatchSummary.GameScoreHeader()
+	return FfaMatchSummary.AbbrCell('S', 'Score')
 		:addClass('ffa-match-summary-game-score')
 end
 
-function FFAMatchSummary.getOpponentBgClass(opponent, match)
+function FfaMatchSummary.getOpponentBgClass(opponent, match)
 	if #match.bracketData.advanceSpots > 0 then
 		return opponent.advanceBg
-			and FFAMatchSummary.getAdvanceClass(opponent.advanceBg)
+			and FfaMatchSummary.getAdvanceClass(opponent.advanceBg)
 			or nil
 	else
 		return opponent.placement
-			and FFAMatchSummary.getPlacementClass(opponent.placement)
+			and FfaMatchSummary.getPlacementClass(opponent.placement)
 			or nil
 	end
 end
@@ -498,9 +498,9 @@ end
 --[[
 Table cell showing an opponent. Appears in the opponent column.
 
-This is the default implementation used by FFAMatchSummary.
+This is the default implementation used by FfaMatchSummary.
 ]]
-function FFAMatchSummary.Opponent(props)
+function FfaMatchSummary.Opponent(props)
 	local contentNode = OpponentDisplay.BlockOpponent({
 		opponent = props.opponent,
 		overflow = props.opponent.type == 'team' and 'hidden' or 'ellipsis',
@@ -508,48 +508,48 @@ function FFAMatchSummary.Opponent(props)
 	})
 	return mw.html.create('div')
 		:addClass('ffa-match-summary-cell ffa-match-summary-opponent')
-		:addClass(FFAMatchSummary.getOpponentBgClass(props.opponent, props.match))
+		:addClass(FfaMatchSummary.getOpponentBgClass(props.opponent, props.match))
 		:node(contentNode)
 end
 
 --[[
 Table cell showing the total, match-level score of an opponent.
 
-This is the default implementation used by FFAMatchSummary.
+This is the default implementation used by FfaMatchSummary.
 ]]
-function FFAMatchSummary.TotalScore(props)
-	return FFAMatchSummary.AbbrCell(OpponentDisplay.InlineScore(props.opponent))
+function FfaMatchSummary.TotalScore(props)
+	return FfaMatchSummary.AbbrCell(OpponentDisplay.InlineScore(props.opponent))
 		:addClass('ffa-match-summary-total-score')
 end
 
 --[[
 Table cell showing the placement of a game-level opponent in a game of a match.
 
-This is the default implementation used by FFAMatchSummary.
+This is the default implementation used by FfaMatchSummary.
 ]]
-function FFAMatchSummary.GamePlacement(props)
+function FfaMatchSummary.GamePlacement(props)
 	local opponent = props.opponent
-	return FFAMatchSummary.AbbrCell(opponent.placement or '')
+	return FfaMatchSummary.AbbrCell(opponent.placement or '')
 		:addClass('ffa-match-summary-game-placement')
-		:addClass(opponent.placement and FFAMatchSummary.getPlacementClass(opponent.placement))
+		:addClass(opponent.placement and FfaMatchSummary.getPlacementClass(opponent.placement))
 end
 
 --[[
 Table cell showing the score of a game-level opponent in a game of a match.
 
-This is the default implementation used by FFAMatchSummary.
+This is the default implementation used by FfaMatchSummary.
 ]]
-function FFAMatchSummary.GameScore(props)
-	return FFAMatchSummary.AbbrCell(props.opponent.score)
+function FfaMatchSummary.GameScore(props)
+	return FfaMatchSummary.AbbrCell(props.opponent.score)
 		:addClass('ffa-match-summary-game-score')
 end
 
 --[[
 Content appearing at the bottom of a match summary popup.
 
-This is the default implementation used by FFAMatchSummary, which does nothing.
+This is the default implementation used by FfaMatchSummary, which does nothing.
 ]]
-function FFAMatchSummary.Footer(props)
+function FfaMatchSummary.Footer(props)
 	return mw.html.create('div'):addClass('ffa-match-summary-footer')
 end
 
@@ -564,10 +564,10 @@ local placementClasses = {
 Converts a placement to a css class that sets its background.
 
 Example:
-FFAMatchSummary.getPlacementClass(2)
+FfaMatchSummary.getPlacementClass(2)
 -- returns 'background-color-second-place'
 ]]
-function FFAMatchSummary.getPlacementClass(placement)
+function FfaMatchSummary.getPlacementClass(placement)
 	return placementClasses[placement]
 end
 
@@ -575,11 +575,11 @@ end
 Converts an advance specification to a css class that sets its background.
 
 Example:
-FFAMatchSummary.getAdvanceClass('stayup')
+FfaMatchSummary.getAdvanceClass('stayup')
 -- returns 'bg-stayup'
 ]]
-function FFAMatchSummary.getAdvanceClass(advanceBg)
+function FfaMatchSummary.getAdvanceClass(advanceBg)
 	return 'bg-' .. advanceBg
 end
 
-return Class.export(FFAMatchSummary)
+return Class.export(FfaMatchSummary)
