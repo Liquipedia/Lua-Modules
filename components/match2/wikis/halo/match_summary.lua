@@ -101,11 +101,8 @@ function p.getByMatchId(args)
 					:css('font-size','85%')
 					:css('margin","auto'))
 			end
-			local hasCommentLineBreakNode
 			if game.comment then
-				if not hasCommentLineBreakNode then
-					table.insert(gameElements, p._breakNode())
-				end
+				table.insert(gameElements, p._breakNode())
 				table.insert(gameElements, htmlCreate('div')
 					:node(game.comment)
 					:css('margin','auto')
