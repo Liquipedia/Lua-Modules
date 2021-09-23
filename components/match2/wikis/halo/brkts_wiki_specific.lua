@@ -107,7 +107,16 @@ end
 
 function p.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
-	if data.finished == 'skip' or data.finished == 'np' or data.finished == 'cancelled' or data.finished == 'canceled' then
+	if
+		data.finished == 'skip' or
+		data.finished == 'np' or
+		data.finished == 'cancelled' or
+		data.finished == 'canceled' or
+		data.winner == 'skip' or
+		data.winner == 'np' or
+		data.winner == 'cancelled' or
+		data.winner == 'canceled'
+	then
 		data.resulttype = 'np'
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
@@ -133,6 +142,7 @@ function p.getResultTypeAndWinner(data, indexedScores)
 			data.winner = data.winner or winner
 		end
 	end
+
 	return data, indexedScores
 end
 
@@ -507,6 +517,7 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
+
 	map = p.getResultTypeAndWinner(map, indexedScores)
 
 	return map
