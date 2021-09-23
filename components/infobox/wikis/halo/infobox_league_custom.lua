@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=halo
--- page=Module:Infobox/League/halo
+-- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
