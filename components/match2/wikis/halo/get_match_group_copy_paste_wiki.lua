@@ -14,8 +14,7 @@ WikiSpecific Code for MatchList and Bracket Code Generators
 
 local wikiCopyPaste = require('Module:GetMatchGroupCopyPaste/wiki/Base')
 
---allowed opponent types on the wiki (archon and 2v2 both are of type
---"duo", but they need different code, hence them both being available here)
+--allowed opponent types on the wiki
 local MODES = {
 	['solo'] = 'solo',
 	['team'] = 'team',
