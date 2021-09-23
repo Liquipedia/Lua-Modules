@@ -98,45 +98,40 @@ function CustomLeague:_createPrizepool()
 	local prizePoolUSD = _args.prizepoolusd
 	local prizePool = _args.prizepool
 
-	if localCurrency == 'text' then
-		return prizePool
-	else
-		local display, hasPlus
-		if prizePoolUSD then
-			prizePoolUSD, hasPlus = CustomLeague:_cleanPrizeValue(prizePoolUSD)
-		end
+	prizePool = CustomLeague:_cleanPrizeValue(prizePool, localCurrency)
+	prizePoolUSD = CustomLeague:_cleanPrizeValue(prizePoolUSD)
 
-		prizePool, hasPlus = CustomLeague:_cleanPrizeValue(prizePool, localCurrency, hasPlus)
-
-		if localCurrency and not prizePoolUSD then
-			local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
-			prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
-			if not prizePoolUSD then
-				error('Invalid local currency "' .. localCurrency .. '"')
-			end
-		end
-
-		local plusText = hasPlus and '+' or ''
-		if prizePoolUSD and prizePool then
-			display = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
-			) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
-		elseif prizePoolUSD then
-			display = '$' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD
-		elseif prizePool then
-			display = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
-			)
-		end
-
-		Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
-
-		return display
+	if String.isEmpty(prizePool) and String.isEmpty(prizePoolUSD) then
+		return nil
 	end
+
+	if localCurrency and prizePool and not prizePoolUSD then
+		local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
+		prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
+		if not prizePoolUSD then
+			error('Invalid local currency "' .. localCurrency .. '"')
+		end
+	end
+
+	if prizePoolUSD and prizePool then
+		display = Template.safeExpand(
+			mw.getCurrentFrame(),
+			'Local currency',
+			{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2)}
+		) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. ' ' .. _ABBR_USD .. ')'
+	elseif prizePoolUSD then
+		display = '$' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. ' ' .. _ABBR_USD
+	elseif prizePool then
+		display = Template.safeExpand(
+			mw.getCurrentFrame(),
+			'Local currency',
+			{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2)}
+		)
+	end
+	
+	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
+
+	return display
 end
 
 function CustomLeague:_createTierDisplay()
@@ -217,9 +212,9 @@ function CustomLeague:_displayPrizeValue(value, numDigits)
 	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
 end
 
-function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus)
+function CustomLeague:_cleanPrizeValue(value, currency)
 	if String.isEmpty(value) then
-		return nil, nil, nil
+		return nil
 	end
 
 	--remove currency abbreviations
@@ -231,18 +226,11 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus)
 		Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
 		local symbol = Variables.varDefaultMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
 		value = value:gsub(symbol, '')
-	else
+	else --remove $ symbol
 		value = value:gsub('%$', '')
 	end
 
-	--check if it has a '+' at the end
-	local hasPlus = string.match(value, '%+$')
-	if hasPlus then
-		value = value:gsub('%+$', '')
-		hasPlus = true
-	end
-
-	return value, hasPlus or oldHasPlus
+	return value
 end
 
 function CustomLeague:_makeBasedListFromArgs(base)
