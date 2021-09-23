@@ -112,7 +112,7 @@ function CustomLeague:_createPrizepool()
 			error('Invalid local currency "' .. localCurrency .. '"')
 		end
 	end
-	
+
 	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
 
 	if prizePoolUSD and prizePool then
