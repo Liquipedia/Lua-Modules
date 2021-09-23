@@ -13,6 +13,9 @@ local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
 ---display an image in the fashion of LeagueIconSmall templates
+--i.e. it displays the icon in dark/ligh mode (depending on reader mode)
+--in a span with customizable link, hooverDisplay
+--
 --can try to retrieve the icon(s) from existing LeagueIconSmall templates
 function LeagueIcon.display(args)
 	local options = args.options or {}
