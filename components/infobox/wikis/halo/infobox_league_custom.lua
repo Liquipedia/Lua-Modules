@@ -112,26 +112,24 @@ function CustomLeague:_createPrizepool()
 			error('Invalid local currency "' .. localCurrency .. '"')
 		end
 	end
+	
+	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
 
 	if prizePoolUSD and prizePool then
-		display = Template.safeExpand(
+		return Template.safeExpand(
 			mw.getCurrentFrame(),
 			'Local currency',
 			{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2)}
 		) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. ' ' .. _ABBR_USD .. ')'
 	elseif prizePoolUSD then
-		display = '$' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. ' ' .. _ABBR_USD
+		return '$' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. ' ' .. _ABBR_USD
 	elseif prizePool then
-		display = Template.safeExpand(
+		return Template.safeExpand(
 			mw.getCurrentFrame(),
 			'Local currency',
 			{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2)}
 		)
 	end
-	
-	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
-
-	return display
 end
 
 function CustomLeague:_createTierDisplay()
