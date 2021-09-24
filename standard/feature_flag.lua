@@ -67,24 +67,28 @@ end
 Runs a function inside a scope where the specified flags are set.
 ]]
 function FeatureFlag.with(flags, f)
+	if Table.isEmpty(flags) then
+		return f()
+	end
+
 	-- Remember previous flags
 	local oldFlags = Table.map(flags, function(flag, value)
 		return flag, mw.ext.VariablesLua.var('feature_' .. flag)
 	end)
 
 	-- Set new flags
-	for flag, value in ipairs(flags) do
+	for flag, value in pairs(flags) do
 		FeatureFlag.set(flag, value)
 	end
 
 	return Logic.try(f)
-		.finally(function()
+		:finally(function()
 			-- Restore previous flags
-			for flag, oldValue in ipairs(oldFlags) do
+			for flag, oldValue in pairs(oldFlags) do
 				mw.ext.VariablesLua.vardefine('feature_' .. flag, oldValue)
 			end
 		end)
-		.get()
+		:get()
 end
 
 function FeatureFlag.getConfig(flag)

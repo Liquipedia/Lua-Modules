@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local MatchGroup = require('Module:MatchGroup/Base')
 local Arguments = require('Module:Arguments')
+local FeatureFlag = require('Module:FeatureFlag')
+local Logic = require('Module:Logic')
+local MatchGroup = require('Module:MatchGroup/Base')
 local Table = require('Module:Table')
 
 local CustomMatchGroup = {}
@@ -15,20 +17,26 @@ local CustomMatchGroup = {}
 local _matches = {}
 local _bracketId = ''
 
+-- Entry point used by Template:Matchlist in valorant wiki
 function CustomMatchGroup.matchlist(frame)
 	local args = Arguments.getArgs(frame)
 	_bracketId = CustomMatchGroup._getBracketData(args)
 	_matches = CustomMatchGroup._getMatches(_bracketId)
 
-	return MatchGroup.luaMatchlist(frame, args, CustomMatchGroup._matchBuilder)
+	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
+		return MatchGroup.luaMatchlist(frame, args, CustomMatchGroup._matchBuilder)
+	end)
 end
 
+-- Entry point used by Template:Bracket in valorant wiki
 function CustomMatchGroup.bracket(frame)
 	local args = Arguments.getArgs(frame)
 	_bracketId = CustomMatchGroup._getBracketData(args)
 	_matches = CustomMatchGroup._getMatches(_bracketId)
 
-	return MatchGroup.luaBracket(frame, args, CustomMatchGroup._matchBuilder)
+	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
+		return MatchGroup.luaBracket(frame, args, CustomMatchGroup._matchBuilder)
+	end)
 end
 
 function CustomMatchGroup._getBracketData(args)

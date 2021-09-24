@@ -119,7 +119,6 @@ function League:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
---store maps
 function League:defineCustomPageVariables()
 	if _args.player_number then
 		Variables.varDefine('tournament_mode', 'solo')
