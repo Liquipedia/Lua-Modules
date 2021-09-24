@@ -412,6 +412,9 @@ function matchFunctions.getOpponents(match)
 					opponent.name = opponent.name or name
 					opponent.icon = opponent.icon or icon
 			end
+			if not String.isEmpty(opponent.name) then
+				opponent.name = mw.ext.TeamLiquidIntegration.resolve_redirect(opponent.name)
+			end
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
