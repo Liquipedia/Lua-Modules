@@ -214,7 +214,7 @@ function AgeCalculation.run(args)
 			age.birth = age.birth .. '[[Category:' .. birthDate.year .. ' births]]'
 		end
 
-		if not deathDate.isExact then
+		if age.death and not deathDate.isExact then
 			age.death = age.death .. '[[Category:Incomplete death dates]]'
 		end
 	end
