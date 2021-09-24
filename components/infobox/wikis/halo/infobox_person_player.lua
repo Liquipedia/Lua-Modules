@@ -12,6 +12,7 @@ local Class = require('Module:Class')
 local Earnings = require('Module:Earnings')
 local GameAppearances = require('Module:GetGameAppearances')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+local Role = require('Module:Role')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -19,6 +20,8 @@ local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
+local _role
+local _role2
 local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 
 local CustomPlayer = Class.new()
@@ -32,6 +35,7 @@ function CustomPlayer.run(frame)
 	_args = player.args
 
 	player.calculateEarnings = CustomPlayer.calculateEarnings
+	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	return player:createInfobox(frame)
@@ -56,6 +60,12 @@ function CustomInjector:parse(id, widgets)
 				Center{content = {automatedHistory}},
 			}
 		end
+	elseif id == 'role' then
+		_role = Role.run({role = _args.role})
+		_role2 = Role.run({role = _args.role2})
+		return {
+			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
+		}
 	end
 	return widgets
 end
@@ -75,6 +85,14 @@ end
 
 function CustomPlayer:calculateEarnings()
 	return Earnings.calc_player({ args = { player = _pagename }})
+end
+
+function CustomPlayer:adjustLPDB(lpdbData)
+	lpdb.extradata = {
+		isPlayer = _role.isPlayer or 'true',
+		role = _role.role,
+		role2 = _role2.role
+	}
 end
 
 return CustomPlayer
