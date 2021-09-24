@@ -189,7 +189,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
 	Variables.varDefine('tournament_tickername', args.tickername)
 	Variables.varDefine('tournament_icon', args.icon)
-	Variables.varDefine('tournament_icon_dark', args.icondark or args.icondarkmode)
+	Variables.varDefine('tournament_icondark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
@@ -225,7 +225,7 @@ function League:_setLpdbData(args, links)
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icon_darkmode'),
+		icondark = Variables.varDefault('tournament_icondark'),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		previous = args.previous,
 		previous2 = args.previous2,
@@ -360,7 +360,7 @@ end
 function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
 	icon, iconDark = LeagueIcon.getIconFromTemplate(icon, iconDark, nil, nil, nil, iconSmallTemplate)
 	Variables.varDefine('tournament_icon', icon)
-	Variables.varDefine('tournament_icon_dark', iconDark)
+	Variables.varDefine('tournament_icondark', iconDark)
 end
 
 function League:_createOrganizer(organizer, name, link, reference)
