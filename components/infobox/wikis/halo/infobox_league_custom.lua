@@ -35,6 +35,7 @@ function CustomLeague.run(frame)
 
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
+	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 
 	return league:createInfobox(frame)
 end
@@ -65,7 +66,6 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'customcontent' then
-		--player breakdown
 		if _args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
 			table.insert(widgets, Cell{name = 'Number of players', content = {_args.player_number}})
@@ -117,6 +117,12 @@ function League:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {maps = Json.stringify(maps)}
 
 	return lpdbData
+end
+
+function League:defineCustomPageVariables()
+	if _args.player_number then
+		Variables.varDefine('tournament_mode', 'solo')
+	end
 end
 
 function CustomLeague:_concatArgs(base)
