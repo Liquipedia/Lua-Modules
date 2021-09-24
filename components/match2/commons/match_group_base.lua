@@ -6,16 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = {}
-
-local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Match = require('Module:Match')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local MatchGroupDisplay = require('Module:MatchGroup/Display')
-local getArgs = require('Module:Arguments').getArgs
 local json = require('Module:Json')
+
+local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
 
 local category = ''
 local _loggedInWarning = ''
@@ -24,13 +22,7 @@ local PARENT = Variables.varDefault('tournament_parent', '')
 
 local BRACKET_DATA_PARAMS = {'header', 'tolower', 'toupper', 'qualwin', 'quallose', 'skipround'}
 
--- Entry point used by Template:Matchlist
-function p.matchlist(frame)
-	local args = getArgs(frame)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		return p.luaMatchlist(frame, args)
-	end)
-end
+local p = {}
 
 -- Saves and displays a matchlist specified by input args.
 function p.luaMatchlist(frame, args, matchBuilder)
@@ -147,14 +139,6 @@ function p.luaMatchlist(frame, args, matchBuilder)
 		})) .. _loggedInWarning
 	end
 	return _loggedInWarning .. category
-end
-
--- Entry point used by Template:Bracket
-function p.bracket(frame)
-	local args = getArgs(frame)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		return p.luaBracket(frame, args)
-	end)
 end
 
 -- Saves and displays a bracket specified by input args.
