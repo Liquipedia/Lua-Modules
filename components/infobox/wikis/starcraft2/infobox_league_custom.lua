@@ -499,7 +499,7 @@ function CustomLeague:_makeBasedListFromArgs(base)
 	local index = 2
 
 	while not String.isEmpty(_args[base .. index]) do
-		local currentArg = _args['map' .. index]
+		local currentArg = _args[base .. index]
 		table.insert(foundArgs, '&nbsp;• ' ..
 			tostring(CustomLeague:_createNoWrappingSpan(
 				PageLink.makeInternalLink({}, currentArg)
