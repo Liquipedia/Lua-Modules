@@ -18,6 +18,7 @@ local Localisation = require('Module:Localisation')
 local Variables = require('Module:Variables')
 local Locale = require('Module:Locale')
 local Page = require('Module:Page')
+local LeagueIcon = require('Module:LeagueIcon')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -188,7 +189,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
 	Variables.varDefine('tournament_tickername', args.tickername)
 	Variables.varDefine('tournament_icon', args.icon)
-	Variables.varDefine('tournament_icon_dark', args.icondark or args.icondarkmode)
+	Variables.varDefine('tournament_icondark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
@@ -224,7 +225,7 @@ function League:_setLpdbData(args, links)
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icon_darkmode'),
+		icondark = Variables.varDefault('tournament_icondark'),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		previous = args.previous,
 		previous2 = args.previous2,
@@ -357,15 +358,9 @@ function League:_createSeries(frame, series, abbreviation, isFirst, icon, iconDa
 end
 
 function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
-	if String.isEmpty(icon) then
-		--extract series icon from template:LeagueIconSmall
-		icon = mw.text.split(iconSmallTemplate, 'File:')
-		icon = mw.text.split(icon[2] or '', '|')
-		icon = icon[1]
-
-		Variables.varDefine('tournament_icon', icon)
-	end
-	--when Template:LeagueIconSmall has darkmodeicons retrieve that too
+	icon, iconDark = LeagueIcon.getIconFromTemplate(icon, iconDark, nil, nil, nil, iconSmallTemplate)
+	Variables.varDefine('tournament_icon', icon)
+	Variables.varDefine('tournament_icondark', iconDark)
 end
 
 function League:_createOrganizer(organizer, name, link, reference)
