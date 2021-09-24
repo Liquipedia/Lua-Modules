@@ -57,14 +57,15 @@ function LeagueIcon._make(icon, iconDark, link, name, size)
 end
 
 --retrieve icon and iconDark from LeagueIconSmall templates
-function LeagueIcon.getIconFromTemplate(icon, iconDark, series, abbreviation, date)
-	local leagueIconSmallTemplate = LeagueIcon._getTemplate(series, abbreviation, date)
+function LeagueIcon.getIconFromTemplate(icon, iconDark, series, abbreviation, date, leagueIconSmallTemplate)
+	leagueIconSmallTemplate = leagueIconSmallTemplate or LeagueIcon._getTemplate(series, abbreviation, date)
 
 	--if LeagueIconSmall template exists retrieve the icons from it
 	if leagueIconSmallTemplate then
+		leagueIconSmallTemplate = mw.text.split(leagueIconSmallTemplate, 'File:')
+
 		if String.isEmpty(icon) then
 			--extract series icon from template:LeagueIconSmall
-			leagueIconSmallTemplate = mw.text.split(leagueIconSmallTemplate, 'File:')
 			icon = mw.text.split(leagueIconSmallTemplate[2] or '', '|')
 			icon = icon[1]
 		end
