@@ -113,8 +113,27 @@ function League:addToLpdb(lpdbData, args)
 		index = index + 1
 	end
 
-	lpdbData.maps = Json.stringify(maps)
+	lpdbData.maps = CustomLeague:_concatArgs('map')
+	lpdbData.extradata = {maps = Json.stringify(maps)}
+
 	return lpdbData
+end
+
+function CustomLeague:_concatArgs(base)
+	local firstArg = _args[base] or _args[base .. '1']
+	if String.isEmpty(firstArg) then
+		return nil
+	end
+	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
+	local index = 2
+	while not String.isEmpty(_args[base .. index]) do
+		table.insert(foundArgs,
+			mw.ext.TeamLiquidIntegration.resolve_redirect(_args[base .. index])
+		)
+		index = index + 1
+	end
+
+	return table.concat(foundArgs, ';')
 end
 
 function CustomLeague:_createPrizepool()
