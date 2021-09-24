@@ -12,6 +12,8 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
 local PageLink = require('Module:Page')
+local MapModes = require('Module:MapModes')
+local Json = require('Module:Json')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -31,6 +33,7 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
+	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 
 	return league:createInfobox(frame)
@@ -82,10 +85,36 @@ function CustomInjector:parse(id, widgets)
 		--maps
 		if not String.isEmpty(_args.map1) then
 			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('map')})
+			table.insert(widgets, Center{content = CustomLeague:_makeMapList()})
 		end
 	end
 	return widgets
+end
+
+--store maps
+function League:addToLpdb(lpdbData, args)
+	local maps = {}
+	local index = 1
+	while not String.isEmpty(args['map' .. index]) do
+		local modes = {}
+		if not String.isEmpty(args['map' .. index .. 'modes']) then
+			local tempModesList = mw.text.split(args['map' .. index .. 'modes'], ',')
+			for _, item in ipairs(tempModesList) do
+				local currentMode = MapModes.clean({mode = item or ''})
+				if not String.isEmpty(currentMode) then
+					table.insert(modes, currentMode)
+				end
+			end
+		end
+		table.insert(maps, {
+			map = args['map' .. index],
+			modes = modes
+		})
+		index = index + 1
+	end
+
+	lpdbData.maps = Json.stringify(maps)
+	return lpdbData
 end
 
 function CustomLeague:_createPrizepool()
@@ -231,13 +260,53 @@ function CustomLeague:_cleanPrizeValue(value, currency)
 	return value
 end
 
+function CustomLeague:_makeMapList()
+	local date = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', os.date('%Y-%m-%d'))
+	local map1 = PageLink.makeInternalLink({}, _args['map1'])
+	local map1Modes = CustomLeague:_getMapModes(_args['map1modes'], date)
+
+	local foundMaps = {
+		tostring(CustomLeague:_createNoWrappingSpan(map1Modes .. map1))
+	}
+	local index = 2
+	while not String.isEmpty(_args['map' .. index]) do
+		local currentMap = PageLink.makeInternalLink({}, _args['map' .. index])
+		local currentModes = CustomLeague:_getMapModes(_args['map' .. index .. 'modes'], date)
+
+		table.insert(
+			foundMaps,
+			'&nbsp;• ' .. tostring(CustomLeague:_createNoWrappingSpan(currentModes .. currentMap))
+		)
+		index = index + 1
+	end
+	return foundMaps
+end
+
+function CustomLeague:_getMapModes(modesString, date)
+	if String.isEmpty(modesString) then
+		return ''
+	end
+	local display = ''
+	local tempModesList = mw.text.split(modesString, ',')
+	for _, item in ipairs(tempModesList) do
+		local mode = MapModes.clean(item)
+		if not String.isEmpty(mode) then
+			if display ~= '' then
+				display = display .. '&nbsp;'
+			end
+			display = display .. MapModes.get({mode = mode, date = date, size = 15})
+		end
+	end
+	return display .. '&nbsp;'
+end
+
 function CustomLeague:_makeBasedListFromArgs(base)
 	local firstArg = _args[base .. '1']
 	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
 	local index = 2
 
 	while not String.isEmpty(_args[base .. index]) do
-		local currentArg = _args['map' .. index]
+		local currentArg = _args[base .. index]
 		table.insert(foundArgs, '&nbsp;• ' ..
 			tostring(CustomLeague:_createNoWrappingSpan(
 				PageLink.makeInternalLink({}, currentArg)
@@ -247,23 +316,6 @@ function CustomLeague:_makeBasedListFromArgs(base)
 	end
 
 	return foundArgs
-end
-
-function CustomLeague:_concatArgs(base)
-	local firstArg = _args[base] or _args[base .. '1']
-	if String.isEmpty(firstArg) then
-		return nil
-	end
-	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
-	local index = 2
-	while not String.isEmpty(_args[base .. index]) do
-		table.insert(foundArgs,
-			mw.ext.TeamLiquidIntegration.resolve_redirect(_args[base .. index])
-		)
-		index = index + 1
-	end
-
-	return table.concat(foundArgs, ';')
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
