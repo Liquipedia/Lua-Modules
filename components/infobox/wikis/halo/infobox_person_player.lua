@@ -88,11 +88,12 @@ function CustomPlayer:calculateEarnings()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdb.extradata = {
+	lpdbData.extradata = {
 		isPlayer = _role.isPlayer or 'true',
 		role = _role.role,
 		role2 = _role2.role
 	}
+	return lpdbData
 end
 
 return CustomPlayer
