@@ -24,7 +24,16 @@ function LeagueIcon.display(args)
 	local iconDark = args.iconDark
 	local icon = args.icon
 	if not Logic.readBool(options.noTemplate) and not (icon and iconDark) then
-		icon, iconDark = LeagueIcon.getIconFromTemplate(icon, iconDark, args.series, args.abbreviation, args.date)
+		local stringOfExpandedTemplate = LeagueIcon.getTemplate({
+			series = args.series,
+			abbreviation = args.abbreviation,
+			date = args.date
+		})
+		icon, iconDark = LeagueIcon.getIconFromTemplate({
+			icon = icon,
+			iconDark = iconDark,
+			stringOfExpandedTemplate = stringOfExpandedTemplate
+		})
 	end
 
 	--if icon is not given and can not be retrieved return empty string
@@ -57,21 +66,29 @@ function LeagueIcon._make(icon, iconDark, link, name, size)
 end
 
 --retrieve icon and iconDark from LeagueIconSmall templates
-function LeagueIcon.getIconFromTemplate(icon, iconDark, series, abbreviation, date)
-	local leagueIconSmallTemplate = LeagueIcon._getTemplate(series, abbreviation, date)
+--entry params:
+--icon = icon for light mode
+--iconDark = icon for dark mode
+--stringOfExpandedTemplate = expanded LeagueIconSmall template as string
+function LeagueIcon.getIconFromTemplate(args)
+	args = args or {}
+	local icon = args.icon
+	local iconDark = args.iconDark
+	local stringOfExpandedTemplate = args.stringOfExpandedTemplate
 
 	--if LeagueIconSmall template exists retrieve the icons from it
-	if leagueIconSmallTemplate then
+	if stringOfExpandedTemplate then
+		stringOfExpandedTemplate = mw.text.split(stringOfExpandedTemplate, 'File:')
+
 		if String.isEmpty(icon) then
 			--extract series icon from template:LeagueIconSmall
-			leagueIconSmallTemplate = mw.text.split(leagueIconSmallTemplate, 'File:')
-			icon = mw.text.split(leagueIconSmallTemplate[2] or '', '|')
+			icon = mw.text.split(stringOfExpandedTemplate[2] or '', '|')
 			icon = icon[1]
 		end
 
 		--when Template:LeagueIconSmall has a darkmode icon retrieve that from the template too
 		if String.isEmpty(iconDark) then
-			iconDark = mw.text.split(leagueIconSmallTemplate[3] or '', '|')
+			iconDark = mw.text.split(stringOfExpandedTemplate[3] or '', '|')
 			iconDark = iconDark[1]
 		end
 	else
@@ -81,11 +98,15 @@ function LeagueIcon.getIconFromTemplate(icon, iconDark, series, abbreviation, da
 	return icon, iconDark
 end
 
-function LeagueIcon._getTemplate(series, abbreviation, date)
+function LeagueIcon.getTemplate(args)
+	args = args or {}
+	local series = args.series
+	local abbreviation = args.abbreviation
+	local date = args.date
 	local frame = mw.getCurrentFrame()
-	local leagueIconSmallTemplate = 'false'
+	local stringOfExpandedTemplate = 'false'
 	if not String.isEmpty(series) then
-		leagueIconSmallTemplate = Template.safeExpand(
+		stringOfExpandedTemplate = Template.safeExpand(
 			frame,
 			'LeagueIconSmall/' .. string.lower(series),
 			{ date = date },
@@ -93,18 +114,18 @@ function LeagueIcon._getTemplate(series, abbreviation, date)
 		)
 	end
 	--if LeagueIconSmall template doesn't exist for the series try the abbreviation
-	if leagueIconSmallTemplate == 'false' and not String.isEmpty(abbreviation) then
-		leagueIconSmallTemplate = Template.safeExpand(
+	if stringOfExpandedTemplate == 'false' and not String.isEmpty(abbreviation) then
+		stringOfExpandedTemplate = Template.safeExpand(
 			frame,
 			'LeagueIconSmall/' .. string.lower(abbreviation),
 			{ date = date },
 			'false'
 		)
 	end
-	if leagueIconSmallTemplate == 'false' then
+	if stringOfExpandedTemplate == 'false' then
 		return nil
 	end
-	return leagueIconSmallTemplate
+	return stringOfExpandedTemplate
 end
 
 --generate copy paste code for new LeagueIconSmall templates
