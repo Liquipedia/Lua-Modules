@@ -53,7 +53,7 @@ function LeagueIcon._make(icon, iconDark, link, name, size)
 	local darkSpan = mw.html.create('span')
 		:addClass('league-icon-small-image darkmode')
 		:wikitext('[[File:' .. icon .. imageOptions)
-	return mw.html.create('span'):node(lightSpan):node(darkSpan)
+	return tostring(lightSpan) .. tostring(darkSpan)
 end
 
 --retrieve icon and iconDark from LeagueIconSmall templates
@@ -122,14 +122,14 @@ function LeagueIcon.generate(args)
 	end
 	local iconDark = args.iconDark or icon
 
-	local imageOptions = '|link=' .. link .. '|' .. name .. '|50x50px]]'
+	local imageOptions = '|link={{{1|{{{link|' .. link .. '}}}}}}|{{{name|{{{1|{{{link|' .. name .. '}}}}}}}}}|50x50px]]'
 
-	return '<pre class="selectall" width=50%>' .. mw.text.nowiki('<span><!--\n' ..
-		'--><span class="league-icon-small-image lightmode">' ..
+	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(
+		'<span class="league-icon-small-image lightmode">' ..
 		'[[File:' .. icon .. imageOptions .. '</span><!--\n' ..
 		'--><span class="league-icon-small-image darkmode">' ..
 		'[[File:' .. iconDark .. imageOptions .. '</span><!--\n' ..
-		'--></span><noinclude>[[Category:Small League Icon Templates]]</noinclude>') .. '</pre>'
+		'--><noinclude>[[Category:Small League Icon Templates]]</noinclude>') .. '</pre>'
 end
 
 --generate copy paste code for new historical LeagueIconSmall templates
