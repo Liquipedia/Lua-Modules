@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -16,17 +17,16 @@ local DisplayUtil = {propTypes = {}, types = {}}
 Checks that the props to be used by a display component satisfy type
 constraints. Throws if it does not.
 
-For performance reasons, type checking is disabled unless the forceTypeCheck
-developer flag is enabled via {{#vardefine:forceTypeCheck|1}}. Certain other
-developer flags like matchGroupDev can also enable type checking.
+For performance reasons, type checking is disabled unless the dev or force_type_check
+feature flags are enabled. (Via {{#vardefine:feature_force_type_check|1}} for
+instance.)
 
 By default this only checks types of properties, and not their contents. If
-forceTypeCheck is enabled, then the contents of table properties are checked up
-to 4 deep. Specify options.maxDepth to increase the depth.
+the force_type_check feature is enabled, then the contents of table properties
+are checked up to 4 deep. Specify options.maxDepth to increase the depth.
 ]]
 DisplayUtil.assertPropTypes = function(props, propTypes, options)
-	local DevFlags = require('Module:DevFlags')
-	if not (DevFlags.matchGroupDev or DevFlags.forceTypeCheck) then
+	if not (FeatureFlag.get('dev') or FeatureFlag.get('force_type_check')) then
 		return
 	end
 
@@ -36,7 +36,7 @@ DisplayUtil.assertPropTypes = function(props, propTypes, options)
 		props,
 		TypeUtil.struct(propTypes),
 		{
-			maxDepth = options.maxDepth or (DevFlags.forceTypeCheck and 5 or 1),
+			maxDepth = options.maxDepth or (FeatureFlag.get('force_type_check') and 5 or 1),
 			name = 'props',
 		}
 	)

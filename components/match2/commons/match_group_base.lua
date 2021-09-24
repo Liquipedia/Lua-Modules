@@ -8,18 +8,17 @@
 
 local p = {}
 
+local FeatureFlag = require('Module:FeatureFlag')
+local Logic = require('Module:Logic')
+local Match = require('Module:Match')
+local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
+local MatchGroupDisplay = require('Module:MatchGroup/Display')
 local getArgs = require('Module:Arguments').getArgs
 local json = require('Module:Json')
-local Match = require('Module:Match')
-local processMatch = require('Module:Brkts/WikiSpecific').processMatch
-local Logic = require('Module:Logic')
-local Variables = require('Module:Variables')
-local String = require('Module:StringUtils')
-local globalArgs
+
 local category = ''
 local _loggedInWarning = ''
-
-local MatchGroupDisplay = require('Module:MatchGroup/Display')
 
 local PARENT = Variables.varDefault('tournament_parent', '')
 
@@ -27,8 +26,10 @@ local BRACKET_DATA_PARAMS = {'header', 'tolower', 'toupper', 'qualwin', 'quallos
 
 -- Entry point used by Template:Matchlist
 function p.matchlist(frame)
-	globalArgs = getArgs(frame)
-	return p.luaMatchlist(frame, globalArgs)
+	local args = getArgs(frame)
+	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
+		return p.luaMatchlist(frame, args)
+	end)
 end
 
 -- Saves and displays a matchlist specified by input args.
@@ -42,8 +43,6 @@ function p.luaMatchlist(frame, args, matchBuilder)
 	if args.store == 'false' then
 		storeInLPDB = false
 	end
-
-	require('Module:DevFlags').matchGroupDev = Logic.readBool(args.dev)
 
 	-- make sure bracket id is valid
 	p._validateBracketID(bracketid)
@@ -83,7 +82,7 @@ function p.luaMatchlist(frame, args, matchBuilder)
 			match = json.parse(match)
 		end
 
-		match = processMatch(frame, match)
+		match = require('Module:Brkts/WikiSpecific').processMatch(frame, match)
 		local matchId = string.format('%04d', matchIndex)
 
 		if matchBuilder ~= nil then
@@ -152,8 +151,10 @@ end
 
 -- Entry point used by Template:Bracket
 function p.bracket(frame)
-	globalArgs = getArgs(frame)
-	return p.luaBracket(frame, globalArgs)
+	local args = getArgs(frame)
+	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
+		return p.luaBracket(frame, args)
+	end)
 end
 
 -- Saves and displays a bracket specified by input args.
@@ -171,8 +172,6 @@ function p.luaBracket(frame, args, matchBuilder)
 	if args.store == 'false' then
 		storeInLPDB = false
 	end
-
-	require('Module:DevFlags').matchGroupDev = Logic.readBool(args.dev)
 
 	-- make sure bracket id is valid
 	p._validateBracketID(bracketid)
@@ -224,7 +223,7 @@ function p.luaBracket(frame, args, matchBuilder)
 
 			p._validateMatchBracketData(matchid, bd)
 
-			match = processMatch(frame, match)
+			match = require('Module:Brkts/WikiSpecific').processMatch(frame, match)
 			if matchBuilder ~= nil then
 				match = matchBuilder(frame, match, bracketid .. '_' .. matchid)
 			end

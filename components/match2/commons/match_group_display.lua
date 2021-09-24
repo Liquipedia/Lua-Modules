@@ -6,9 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local MatchGroupDisplay = {}
-local MatchGroupUtil
+local FeatureFlag = require('Module:FeatureFlag')
 local getArgs = require('Module:Arguments').getArgs
+
+local MatchGroupUtil
+
+local MatchGroupDisplay = {}
 
 -- Unused entry point
 function MatchGroupDisplay.bracket(frame)
@@ -103,8 +106,9 @@ end
 
 -- Entry point invoked directly from wikicode
 function MatchGroupDisplay.DisplayDev(frame)
-	require('Module:DevFlags').matchGroupDev = true
-	return MatchGroupDisplay.Display(frame)
+	return FeatureFlag.with({dev = true}, function()
+		return MatchGroupDisplay.Display(frame)
+	end)
 end
 
 function MatchGroupDisplay._getMatches(id)
