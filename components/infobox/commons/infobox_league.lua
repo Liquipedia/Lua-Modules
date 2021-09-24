@@ -357,25 +357,9 @@ function League:_createSeries(frame, series, abbreviation, isFirst, icon, iconDa
 end
 
 function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
-	if String.isEmpty(icon) then
-		--extract series icon from template:LeagueIconSmall
-		icon = mw.text.split(iconSmallTemplate, 'File:')
-		icon = mw.text.split(icon[2] or '', '|')
-		icon = icon[1]
-
-		Variables.varDefine('tournament_icon', icon)
-	end
-	if String.isEmpty(iconDark) then
-		--extract series iconDark from template:LeagueIconSmall
-		iconDark = mw.text.split(iconSmallTemplate, 'File:')
-		iconDark = mw.text.split(iconDark[3] or '', '|')
-		iconDark = iconDark[1]
-		if String.isEmpty(iconDark) then
-			iconDark = icon
-		end
-
-		Variables.varDefine('tournament_icon_dark', iconDark)
-	end
+	icon, iconDark = LeagueIcon.getIconFromTemplate(icon, iconDark, nil, nil, nil, iconSmallTemplate)
+	Variables.varDefine('tournament_icon', icon)
+	Variables.varDefine('tournament_icon_dark', iconDark)
 end
 
 function League:_createOrganizer(organizer, name, link, reference)
