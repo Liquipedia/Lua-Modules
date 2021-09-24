@@ -365,7 +365,17 @@ function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
 
 		Variables.varDefine('tournament_icon', icon)
 	end
-	--when Template:LeagueIconSmall has darkmodeicons retrieve that too
+	if String.isEmpty(iconDark) then
+		--extract series iconDark from template:LeagueIconSmall
+		iconDark = mw.text.split(iconSmallTemplate, 'File:')
+		iconDark = mw.text.split(iconDark[3] or '', '|')
+		iconDark = iconDark[1]
+		if String.isEmpty(iconDark) then
+			iconDark = icon
+		end
+
+		Variables.varDefine('tournament_icon_dark', iconDark)
+	end
 end
 
 function League:_createOrganizer(organizer, name, link, reference)
