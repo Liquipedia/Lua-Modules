@@ -57,6 +57,12 @@ function LeagueIcon._make(icon, iconDark, link, name, size)
 end
 
 --retrieve icon and iconDark from LeagueIconSmall templates
+--entry params
+--icon = icon for light mode
+--iconDark = icon for dark mode
+--series = series for which LeagueIconSmall is to be expanded
+--abbreviation = abbreviation for which LeagueIconSmall is to be expanded (if the series one doesn't exist)
+--leagueIconSmallTemplate = expanded LeagueIconSmall template as string (in case it was expanded before already)
 function LeagueIcon.getIconFromTemplate(icon, iconDark, series, abbreviation, date, leagueIconSmallTemplate)
 	leagueIconSmallTemplate = leagueIconSmallTemplate or LeagueIcon._getTemplate(series, abbreviation, date)
 
