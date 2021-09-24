@@ -24,8 +24,16 @@ function LeagueIcon.display(args)
 	local iconDark = args.iconDark
 	local icon = args.icon
 	if not Logic.readBool(options.noTemplate) and not (icon and iconDark) then
-		local stringOfExpandedTemplate = LeagueIcon.getTemplate({series = args.series, abbreviation = args.abbreviation, date = args.date})
-		icon, iconDark = LeagueIcon.getIconFromTemplate({icon = icon, iconDark = iconDark, stringOfExpandedTemplate = stringOfExpandedTemplate})
+		local stringOfExpandedTemplate = LeagueIcon.getTemplate({
+			series = args.series,
+			abbreviation = args.abbreviation,
+			date = args.date
+		})
+		icon, iconDark = LeagueIcon.getIconFromTemplate({
+			icon = icon,
+			iconDark = iconDark,
+			stringOfExpandedTemplate = stringOfExpandedTemplate
+		})
 	end
 
 	--if icon is not given and can not be retrieved return empty string
