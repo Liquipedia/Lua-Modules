@@ -18,6 +18,7 @@ local Localisation = require('Module:Localisation')
 local Variables = require('Module:Variables')
 local Locale = require('Module:Locale')
 local Page = require('Module:Page')
+local LeagueIcon = require('Module:LeagueIcon')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
