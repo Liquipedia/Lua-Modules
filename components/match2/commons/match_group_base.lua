@@ -6,10 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Match = require('Module:Match')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local json = require('Module:Json')
 
@@ -402,6 +404,20 @@ function p._addLoggedInWarning(text)
 		:tag('td'):addClass('ambox-image'):wikitext('[[File:Emblem-important.svg|40px|link=]]'):done()
 		:tag('td'):addClass('ambox-text'):wikitext(text)
 	return tostring(div:node(tbl))
+end
+
+function p.enableInstrumentation()
+	if FeatureFlag.get('perf') then
+		local config = Lua.loadDataIfExists('Module:MatchGroup/Config')
+		local locations = Table.getByPathOrNil(config, {'perf', 'locations'}) or {}
+		require('Module:Performance/Util').startInstrumentation(locations)
+	end
+end
+
+function p.disableInstrumentation()
+	if FeatureFlag.get('perf') then
+		require('Module:Performance/Util').stopAndSave()
+	end
 end
 
 return p
