@@ -164,11 +164,20 @@ function CustomLeague:_createPrizepool()
 		return nil
 	end
 
-	if localCurrency and prizePool and not prizePoolUSD then
+	if localCurrency then
 		local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
-		prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
-		if not prizePoolUSD then
-			error('Invalid local currency "' .. localCurrency .. '"')
+		local exchangeRate = CustomLeague:_currencyConversion(
+			1,
+			localCurrency:upper(),
+			exchangeDate
+		)
+		--set currency rate var for usage in prize pools
+		Variables.varDefine('tournament_currency_rate', exchangeRate or '')
+		if prizePool and not prizePoolUSD then
+			if not exchangeRate then
+				error('Invalid local currency "' .. localCurrency .. '"')
+			end
+			prizePoolUSD = exchangeRate * prizePool
 		end
 	end
 
