@@ -89,7 +89,7 @@ end
 
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata = {
-		isPlayer = _role.isPlayer or 'true',
+		isplayer = _role.isPlayer or 'true',
 		role = _role.role,
 		role2 = _role2.role
 	}
