@@ -152,15 +152,15 @@ variables before fetching from LPDB. Returns a list of records
 ordered lexicographically by matchId.
 ]]
 function MatchGroupUtil.fetchMatchRecords(bracketId)
-	local varData = Variables.varDefault("match2bracket_" .. bracketId)
+	local varData = Variables.varDefault('match2bracket_' .. bracketId)
 	if varData then
 		return Json.parse(varData)
 	else
 		return mw.ext.LiquipediaDB.lpdb(
-			"match2",
+			'match2',
 			{
-				conditions = "([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::" .. bracketId .. "]]",
-				order = "match2id ASC",
+				conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketId .. ']]',
+				order = 'match2id ASC',
 				limit = 5000,
 			}
 		)

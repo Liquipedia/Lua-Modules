@@ -42,9 +42,9 @@ function CustomMatchGroup.bracket(frame)
 end
 
 function CustomMatchGroup._getBracketData(args)
-	local bracketId = args["id"]
-	if bracketId == nil or bracketId == "" then
-		error("argument 'id' is empty")
+	local bracketId = args['id']
+	if bracketId == nil or bracketId == '' then
+		error('argument id is empty')
 	end
 
 	-- make sure bracket id is valid
@@ -107,14 +107,14 @@ function CustomMatchGroup._findMatchData(matches, matchId)
 end
 
 function CustomMatchGroup._convertMatchIdentifier(identifier)
-	local roundPrefix, roundNumber, matchPrefix, matchNumber = string.match(identifier, "(R)([0-9]*)(M)([0-9]*)")
+	local roundPrefix, roundNumber, matchPrefix, matchNumber = string.match(identifier, '(R)([0-9]*)(M)([0-9]*)')
 
 	if roundPrefix == nil then
 		-- This is a matchlist
 		return nil
 	end
 
-	return roundPrefix .. string.format("%02d", roundNumber) .. "-" .. matchPrefix .. string.format("%03d", matchNumber)
+	return roundPrefix .. string.format('%02d', roundNumber) .. '-' .. matchPrefix .. string.format('%03d', matchNumber)
 end
 
 return CustomMatchGroup
