@@ -114,7 +114,12 @@ function League:addToLpdb(lpdbData, args)
 	end
 
 	lpdbData.maps = CustomLeague:_concatArgs('map')
-	lpdbData.extradata = {maps = Json.stringify(maps)}
+
+	lpdbData.participantsnumber = args.player_number or args.team_number
+	lpdbData.extradata = {
+		maps = Json.stringify(maps),
+		individual = not String.isEmpty(args.player_number),
+	}
 
 	return lpdbData
 end
