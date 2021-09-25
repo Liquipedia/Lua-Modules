@@ -184,6 +184,7 @@ function CustomLeague:_createPrizepool()
 	end
 
 	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
+	Variables.varDefine('tournament_prizepoollocal', prizePool)
 
 	if prizePoolUSD and prizePool then
 		return Template.safeExpand(
