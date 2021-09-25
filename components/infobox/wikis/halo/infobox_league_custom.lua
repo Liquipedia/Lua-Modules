@@ -165,14 +165,16 @@ function CustomLeague:_createPrizepool()
 	end
 
 	if localCurrency then
+		localCurrency = localCurrency:upper()
 		local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
 		local exchangeRate = CustomLeague:_currencyConversion(
 			1,
-			localCurrency:upper(),
+			localCurrency,
 			exchangeDate
 		)
-		--set currency rate var for usage in prize pools
+		--set currency vars for usage in prize pools
 		Variables.varDefine('tournament_currency_rate', exchangeRate or '')
+		Variables.varDefine('tournament_currency', localCurrency)
 		if prizePool and not prizePoolUSD then
 			if not exchangeRate then
 				error('Invalid local currency "' .. localCurrency .. '"')
