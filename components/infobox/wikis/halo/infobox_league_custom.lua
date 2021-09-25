@@ -63,6 +63,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Liquipedia tier',
 				content = {CustomLeague:_createTierDisplay()},
+				classes = {_args['hcs-sponsored'] == 'true' and 'valvepremier-highlighted' or ''},
 			},
 		}
 	elseif id == 'customcontent' then
@@ -115,6 +116,7 @@ function League:addToLpdb(lpdbData, args)
 
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 
+	lpdbData.publishertier = args['hcs-sponsored']
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
 		maps = Json.stringify(maps),
@@ -165,7 +167,7 @@ function CustomLeague:_createPrizepool()
 	end
 
 	if localCurrency then
-		localCurrency = localCurrency:upper()
+		localCurrency = string.upper(localCurrency)
 		local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
 		local exchangeRate = CustomLeague:_currencyConversion(
 			1,
