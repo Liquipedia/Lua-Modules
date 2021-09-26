@@ -72,8 +72,11 @@ function Person:createInfobox()
 		},
 		Cell{name = 'Birth', content = {age.birth}},
 		Cell{name = 'Died', content = {age.death}},
-		Cell{name = 'Region', content = {
-				self:_createRegion(args.region, args.country)
+		Customizable{id = 'region', children = {
+			Cell{name = 'Region', content = {
+						self:_createRegion(args.region, args.country)
+					}
+				}
 			}
 		},
 		Customizable{id = 'status', children = {
