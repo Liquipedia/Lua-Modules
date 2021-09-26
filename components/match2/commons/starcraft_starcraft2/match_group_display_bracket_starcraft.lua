@@ -16,6 +16,7 @@ local Table = require('Module:Table')
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local RaceColor = Lua.loadDataIfExists('Module:RaceColorClass') or {}
+local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 
 local html = mw.html
@@ -42,7 +43,7 @@ function StarcraftBracketDisplay.Bracket(props)
 	return BracketDisplay.Bracket({
 		bracket = props.bracket,
 		config = Table.merge(props.config, {
-			MatchSummaryContainer = require('Module:MatchSummary/Starcraft').MatchSummaryContainer,
+			MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
 			OpponentEntry = StarcraftBracketDisplay.OpponentEntry,
 			matchHasDetails = StarcraftMatchGroupUtil.matchHasDetails,
 			opponentHeight = StarcraftBracketDisplay.computeBracketOpponentHeight(props.bracket.matchesById),

@@ -80,6 +80,8 @@ Displays a matchlist or bracket specified by ID.
 ]]
 function MatchGroupDisplay.MatchGroupById(args)
 	local bracketId = args.id or args[1]
+	args.id = bracketId
+	args[1] = bracketId
 
 	local matches = MatchGroupUtil.fetchMatches(bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
@@ -131,7 +133,7 @@ function MatchGroupDisplay.TemplateShowBracket(frame)
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
 		local MatchGroupDisplay_ = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
 		MatchGroupBase.enableInstrumentation()
-		local result = MatchGroupDisplay_.MatchGroupByID(args)
+		local result = MatchGroupDisplay_.MatchGroupById(args)
 		MatchGroupBase.disableInstrumentation()
 		return result
 	end)
