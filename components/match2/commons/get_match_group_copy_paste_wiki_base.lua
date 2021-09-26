@@ -94,7 +94,7 @@ function wikiCopyPaste.getStart(template, id, modus, args)
 		out = string.gsub(out, '<<matches>>.*', '')
 		out = string.gsub(out, '<<bracketid>>', id)
 		out = string.gsub(out, '^{{#invoke:[mM]atchGroup|[bB]racket', 'Bracket')
-		out = string.gsub(out, 'Bracket|<<templatename>>',
+		out = string.gsub(out, '[Bb]racket|<<templatename>>',
 			(modus == 'bracket' and ('Bracket|Bracket/' .. template) or 'matchlist'))
 	end
 
