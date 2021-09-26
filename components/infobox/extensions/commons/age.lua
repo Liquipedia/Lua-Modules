@@ -181,8 +181,12 @@ function Age:makeDisplay()
 			result.birth = self.birthDate:makeDisplay() .. ' (age ' .. age .. ')'
 		end
 	else
-		result.death = self.deathDate:makeDisplay()
-		result.birth = self.birthDate:makeDisplay()
+		if not self.deathDate.isEmpty then
+			result.death = self.deathDate:makeDisplay()
+		end
+		if not self.birthDate.isEmpty then
+			result.birth = self.birthDate:makeDisplay()
+		end
 	end
 
 	return result
@@ -206,7 +210,7 @@ function AgeCalculation.run(args)
 	Variables.varDefine('player_deathdate', deathDate:makeIso())
 
 	if shouldStore then
-		if not birthDate.isExact then
+		if age.birth and not birthDate.isExact then
 			age.birth = age.birth .. '[[Category:Incomplete birth dates]]'
 		end
 
