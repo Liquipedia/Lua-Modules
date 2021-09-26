@@ -17,16 +17,15 @@ local DisplayUtil = {propTypes = {}, types = {}}
 Checks that the props to be used by a display component satisfy type
 constraints. Throws if it does not.
 
-For performance reasons, type checking is disabled unless the dev or force_type_check
-feature flags are enabled. (Via {{#vardefine:feature_force_type_check|1}} for
-instance.)
+For performance reasons, type checking is disabled unless the force_type_check
+feature flag is enabled via {{#vardefine:feature_force_type_check|1}}.
 
-By default this only checks types of properties, and not their contents. If
-the force_type_check feature is enabled, then the contents of table properties
-are checked up to 4 deep. Specify options.maxDepth to increase the depth.
+By default this only checks the contents of table properties up to 1 deep. 
+Specify options.maxDepth to increase the depth.
 ]]
 DisplayUtil.assertPropTypes = function(props, propTypes, options)
-	if not (FeatureFlag.get('dev') or FeatureFlag.get('force_type_check')) then
+	local typeCheckFeature = FeatureFlag.get('force_type_check')
+	if not typeCheckFeature then
 		return
 	end
 
@@ -36,7 +35,7 @@ DisplayUtil.assertPropTypes = function(props, propTypes, options)
 		props,
 		TypeUtil.struct(propTypes),
 		{
-			maxDepth = options.maxDepth or (FeatureFlag.get('force_type_check') and 5 or 1),
+			maxDepth = options.maxDepth or 2,
 			name = 'props',
 		}
 	)
