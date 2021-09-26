@@ -578,7 +578,7 @@ Splits a matchId like h5HXaqbSVP_R02-M002 into the bracket ID h5HXaqbSVP and
 the base match ID R02-M002.
 ]]
 function MatchGroupUtil.splitMatchId(matchId)
-	return matchId:match('^(.-)_?(R%w+%-?M%w+)$')
+	return matchId:match('^(.-)_([%w-]+)$')
 end
 
 --[[
