@@ -299,6 +299,7 @@ function matchFunctions.getTournamentVars(match)
 	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault("tournament_icon_dark"))
 	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_tier'))
 	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_tier_type'))
+	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return match
 end
 
