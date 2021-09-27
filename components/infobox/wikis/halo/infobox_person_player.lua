@@ -13,6 +13,7 @@ local Earnings = require('Module:Earnings')
 local GameAppearances = require('Module:GetGameAppearances')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Role = require('Module:Role')
+local Region = require('Module:Region')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -60,6 +61,7 @@ function CustomInjector:parse(id, widgets)
 				Center{content = {automatedHistory}},
 			}
 		end
+	elseif id == 'region' then return {}
 	elseif id == 'role' then
 		_role = Role.run({role = _args.role})
 		_role2 = Role.run({role = _args.role2})
@@ -93,6 +95,12 @@ function CustomPlayer:adjustLPDB(lpdbData)
 		role = _role.role,
 		role2 = _role2.role
 	}
+
+	local region = Region.run({region = _args.region, country = _args.country})
+	if type(region) == 'table' then
+		lpdbData.region = region.region
+	end
+
 	return lpdbData
 end
 
