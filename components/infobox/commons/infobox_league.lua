@@ -358,7 +358,11 @@ function League:_createSeries(frame, series, abbreviation, isFirst, icon, iconDa
 end
 
 function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
-	icon, iconDark = LeagueIcon.getIconFromTemplate(icon, iconDark, nil, nil, nil, iconSmallTemplate)
+	icon, iconDark = LeagueIcon.getIconFromTemplate({
+		icon = icon,
+		iconDark = iconDark,
+		stringOfExpandedTemplate = iconSmallTemplate
+	})
 	Variables.varDefine('tournament_icon', icon)
 	Variables.varDefine('tournament_icondark', iconDark)
 end
