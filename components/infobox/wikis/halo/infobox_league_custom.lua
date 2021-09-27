@@ -133,6 +133,9 @@ function League:defineCustomPageVariables()
 		Variables.varDefine('tournament_mode', 'solo')
 	end
 	Variables.varDefine('tournament_game', _game or _args.game)
+
+	--Legacy Vars:
+	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
 function CustomLeague:_concatArgs(base)
