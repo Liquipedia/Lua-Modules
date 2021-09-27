@@ -73,7 +73,7 @@ function Date:makeDisplay()
 		return formatted
 	end
 
-	return ''
+	return nil
 end
 
 function Date:makeIso()
@@ -181,12 +181,8 @@ function Age:makeDisplay()
 			result.birth = self.birthDate:makeDisplay() .. ' (age ' .. age .. ')'
 		end
 	else
-		if not self.deathDate.isEmpty then
-			result.death = self.deathDate:makeDisplay()
-		end
-		if not self.birthDate.isEmpty then
-			result.birth = self.birthDate:makeDisplay()
-		end
+		result.death = self.deathDate:makeDisplay()
+		result.birth = self.birthDate:makeDisplay()
 	end
 
 	return result
