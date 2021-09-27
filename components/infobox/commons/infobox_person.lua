@@ -9,13 +9,13 @@
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Links = require('Module:Links')
-local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Localisation = require('Module:Localisation').getLocalisation
 local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
+local Region = require('Module:Region')
 local AgeCalculation = require('Module:AgeCalculation')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -31,6 +31,7 @@ local Person = Class.new(BasicInfobox)
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
 local _shouldStoreData
+local _region
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -71,8 +72,11 @@ function Person:createInfobox()
 		},
 		Cell{name = 'Birth', content = {age.birth}},
 		Cell{name = 'Died', content = {age.death}},
-		Cell{name = 'Region', content = {
-				self:_createRegion(args.region)
+		Customizable{id = 'region', children = {
+			Cell{name = 'Region', content = {
+						self:_createRegion(args.region, args.country)
+					}
+				}
 			}
 		},
 		Customizable{id = 'status', children = {
@@ -185,7 +189,7 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		birthdate = Variables.varDefault('player_birthdate'),
 		deathdate = Variables.varDefault('player_deathhdate'),
 		image = args.image,
-		region = args.region,
+		region = _region,
 		team = args.teamlink or args.team,
 		status = status,
 		type = personType,
@@ -243,12 +247,12 @@ function Person:calculateEarnings(args)
 	return 0
 end
 
-function Person:_createRegion(region)
-	if region == nil or region == '' then
-		return ''
+function Person:_createRegion(region, country)
+	region = Region.run({region = region, country = country})
+	if type(region) == 'table' then
+		_region = region.region
+		return region.display
 	end
-
-	return Template.safeExpand(self.frame, 'Region', {region})
 end
 
 function Person:_createLocations(args, personType)
