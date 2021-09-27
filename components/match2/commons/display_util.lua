@@ -20,7 +20,7 @@ constraints. Throws if it does not.
 For performance reasons, type checking is disabled unless the force_type_check
 feature flag is enabled via {{#vardefine:feature_force_type_check|1}}.
 
-By default this only checks the contents of table properties up to 1 deep. 
+By default this only checks the contents of table properties up to 1 deep.
 Specify options.maxDepth to increase the depth.
 ]]
 DisplayUtil.assertPropTypes = function(props, propTypes, options)
