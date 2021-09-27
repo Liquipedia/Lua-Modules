@@ -134,6 +134,8 @@ function League:defineCustomPageVariables()
 	end
 	Variables.varDefine('tournament_game', _game or _args.game)
 
+	Variables.varDefine('tournament_publishertier', _args['hcs-sponsored'])
+
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
