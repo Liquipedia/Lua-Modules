@@ -24,6 +24,7 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _game
 
 local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local _TODAY = os.date('%Y-%m-%d', os.time())
@@ -116,6 +117,7 @@ function League:addToLpdb(lpdbData, args)
 
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 
+	lpdbData.game = _game or args.game
 	lpdbData.publishertier = args['hcs-sponsored']
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
@@ -130,6 +132,10 @@ function League:defineCustomPageVariables()
 	if _args.player_number then
 		Variables.varDefine('tournament_mode', 'solo')
 	end
+	Variables.varDefine('tournament_game', _game or _args.game)
+
+	--Legacy Vars:
+	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
 function CustomLeague:_concatArgs(base)
@@ -240,7 +246,8 @@ end
 
 function CustomLeague._getGameVersion()
 	local game = string.lower(_args.game or '')
-	return _GAME[game]
+	_game = _GAME[game]
+	return _game
 end
 
 function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
