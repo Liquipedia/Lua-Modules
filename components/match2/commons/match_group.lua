@@ -21,7 +21,10 @@ end
 function MatchGroup.luaBracket(frame, args)
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
 		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		return MatchGroupBase.luaBracket(frame, args)
+		MatchGroupBase.enableInstrumentation()
+		local display = MatchGroupBase.luaBracket(frame, args)
+		MatchGroupBase.disableInstrumentation()
+		return display
 	end)
 end
 
@@ -33,7 +36,10 @@ end
 function MatchGroup.luaMatchlist(frame, args)
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
 		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		return MatchGroupBase.luaMatchlist(frame, args)
+		MatchGroupBase.enableInstrumentation()
+		local display = MatchGroupBase.luaMatchlist(frame, args)
+		MatchGroupBase.disableInstrumentation()
+		return display
 	end)
 end
 

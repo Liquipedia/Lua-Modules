@@ -7,6 +7,7 @@
 --
 
 local FeatureFlag = require('Module:FeatureFlag')
+local Lua = require('Module:Lua')
 local getArgs = require('Module:Arguments').getArgs
 
 local MatchGroupUtil
@@ -92,6 +93,9 @@ end
 -- Displays a match group (bracket or matchlist) specified by ID. The match group is read from LPDB.
 -- Entry point invoked directly from wikicode
 function MatchGroupDisplay.Display(frame)
+	local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
+	MatchGroupBase.enableInstrumentation()
+
 	local args = getArgs(frame)
 	args[1] = args.id or args[1] or ''
 	local bracketId = args[1]
@@ -101,7 +105,9 @@ function MatchGroupDisplay.Display(frame)
 	local matchGroupType = matches[1].bracketData.type
 
 	local MatchGroupModule = require('Module:Brkts/WikiSpecific').getMatchGroupModule(matchGroupType)
-	return MatchGroupModule.luaGet(frame, args, matches)
+	local display = MatchGroupModule.luaGet(frame, args, matches)
+	MatchGroupBase.disableInstrumentation()
+	return display
 end
 
 -- Entry point invoked directly from wikicode
