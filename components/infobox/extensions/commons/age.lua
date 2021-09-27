@@ -58,7 +58,7 @@ local Date = Class.new(
 
 function Date:makeDisplay()
 	if self.isEmpty then
-		return ''
+		return nil
 	end
 
 	local formatString = self:_getFormatString()
@@ -73,7 +73,7 @@ function Date:makeDisplay()
 		return formatted
 	end
 
-	return ''
+	return nil
 end
 
 function Date:makeIso()
@@ -206,7 +206,7 @@ function AgeCalculation.run(args)
 	Variables.varDefine('player_deathdate', deathDate:makeIso())
 
 	if shouldStore then
-		if not birthDate.isExact then
+		if age.birth and not birthDate.isExact then
 			age.birth = age.birth .. '[[Category:Incomplete birth dates]]'
 		end
 
