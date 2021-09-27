@@ -58,7 +58,7 @@ local Date = Class.new(
 
 function Date:makeDisplay()
 	if self.isEmpty then
-		return ''
+		return nil
 	end
 
 	local formatString = self:_getFormatString()
