@@ -24,8 +24,8 @@ function CustomMatchGroup.matchlist(frame)
 	_matches = CustomMatchGroup._getMatches(_bracketId)
 
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		return MatchGroupBase.luaMatchlist(frame, args, CustomMatchGroup._matchBuilder)
+		local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
+		return MatchGroupDisplay.MatchlistBySpec(args, CustomMatchGroup._matchBuilder)
 	end)
 end
 
@@ -36,8 +36,8 @@ function CustomMatchGroup.bracket(frame)
 	_matches = CustomMatchGroup._getMatches(_bracketId)
 
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		return MatchGroupBase.luaBracket(frame, args, CustomMatchGroup._matchBuilder)
+		local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
+		return MatchGroupDisplay.BracketBySpec(args, CustomMatchGroup._matchBuilder)
 	end)
 end
 
@@ -50,7 +50,10 @@ function CustomMatchGroup._getBracketData(args)
 	-- make sure bracket id is valid
 	FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
 		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		MatchGroupBase._validateBracketID(bracketId)
+		local _, message = MatchGroupBase.validateBaseBracketId(bracketId)
+		if message then
+			error(message)
+		end
 	end)
 
 	return bracketId

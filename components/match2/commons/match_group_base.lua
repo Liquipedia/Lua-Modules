@@ -15,104 +15,81 @@ local Match = require('Module:Match')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-
-local category = ''
-local _loggedInWarning = ''
-
 local MatchGroupBase = {}
 
--- Saves and displays a matchlist specified by input args.
-function MatchGroupBase.luaMatchlist(frame, args, matchBuilder)
-	local bracketid = args['id']
-	if bracketid == nil or bracketid == '' then
-		error('argument \'id\' is empty')
-	end
+function MatchGroupBase.readOptions(args, matchGroupType)
+	local options = {
+		bracketId = MatchGroupBase.readBracketId(args.id),
+		show = not Logic.readBool(args.hide),
+		saveToLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true),
+		matchGroupType = matchGroupType,
+	}
 
-	local storeInLPDB = true
-	if args.store == 'false' then
-		storeInLPDB = false
-	end
+	local warnings = {}
 
-	-- make sure bracket id is valid
-	MatchGroupBase._validateBracketID(bracketid)
-
-	-- prefix id with namespace or pagename incase of user to hinder duplicates
-	bracketid = MatchGroupBase.getBracketIdPrefix() .. bracketid
-
-	-- check if the bracket is a duplicate
-	if storeInLPDB or (not Logic.readBool(args.noDuplicateCheck)) then
-		MatchGroupBase._checkBracketDuplicate(bracketid)
+	if options.saveToLpdb or not Logic.readBool(args.noDuplicateCheck) then
+		local warning = MatchGroupBase._checkBracketDuplicate(options.bracketId)
+		if warning then
+			table.insert(warnings, warning)
+		end
 	end
 
 	if Logic.readBool(args.isLegacy) then
-		_loggedInWarning = _loggedInWarning .. MatchGroupDisplay.WarningBox(
-			'This is a Legacy matchlist use the new matchlists instead!'
-		)
+		if matchGroupType == 'matchlist' then
+			table.insert(warnings, 'This is a legacy matchlist! Please use the new matchlist instead.')
+		else
+			table.insert(warnings, 'This is a legacy bracket! Please use the new bracket instead.')
+		end
 	end
 
-	local matches = MatchGroupInput.readMatchlist(bracketid, args, matchBuilder)
-	MatchGroupBase.saveMatchGroup(bracketid, matches, storeInLPDB)
-
-	if args.hide ~= 'true' then
-		return tostring(MatchGroupDisplay.luaMatchlist(frame, {
-			bracketid,
-			attached = args.attached,
-			collapsed = args.collapsed,
-			nocollapse = args.nocollapse,
-			width = args.width or args.matchWidth,
-		})) .. _loggedInWarning .. category
-	end
-	return _loggedInWarning .. category
+	return options, warnings
 end
 
--- Saves and displays a bracket specified by input args.
-function MatchGroupBase.luaBracket(frame, args, matchBuilder)
-	local bracketid = args['id']
-	if bracketid == nil or bracketid == '' then
-		error('argument \'id\' is empty')
+function MatchGroupBase.readBracketId(baseBracketId)
+	assert(baseBracketId, 'Argument \'id\' is empty')
+
+	local _, message = MatchGroupBase.validateBaseBracketId(baseBracketId)
+	if message then
+		error(message)
 	end
 
-	local storeInLPDB = true
-	if args.store == 'false' then
-		storeInLPDB = false
+	return MatchGroupBase.getBracketIdPrefix() .. baseBracketId
+end
+
+function MatchGroupBase.validateBaseBracketId(baseBracketId)
+	local subbed, count = baseBracketId:gsub('[0-9a-zA-Z]', '')
+	if subbed ~= '' then
+		return false, 'Bracket ID contains invalid characters (' .. subbed .. ')'
+	elseif count ~= 10 then
+		return false, 'Bracket ID has the wrong length (' .. count .. ' given, 10 characters expected)'
 	end
+	return true
+end
 
-	-- make sure bracket id is valid
-	MatchGroupBase._validateBracketID(bracketid)
+--[[
+Non-mainspace match groups are used for testing. Their IDs are prefixed with
+the namespace so that they don't collide with mainspace IDs.
+]]
+function MatchGroupBase.getBracketIdPrefix()
+	local namespace = mw.title.getCurrentTitle().nsText
 
-	-- prefix id with namespace or pagename incase of user to hinder duplicates
-	bracketid = MatchGroupBase.getBracketIdPrefix() .. bracketid
-
-	-- check if the bracket is a duplicate
-	if storeInLPDB or (not Logic.readBool(args.noDuplicateCheck)) then
-		MatchGroupBase._checkBracketDuplicate(bracketid)
+	if namespace == 'User' then
+		return namespace .. '_' .. mw.title.getCurrentTitle().rootText .. '_'
+	elseif namespace ~= '' then
+		return namespace .. '_'
+	else
+		return ''
 	end
+end
 
-	if Logic.readBool(args.isLegacy) then
-		_loggedInWarning = _loggedInWarning
-			.. MatchGroupDisplay.WarningBox('This is a Legacy bracket use the new brackets instead!')
+function MatchGroupBase._checkBracketDuplicate(bracketId)
+	local status = mw.ext.Brackets.checkBracketDuplicate(bracketId)
+	if status ~= 'ok' then
+		local warning = 'This match group uses the duplicate ID \'' .. bracketId .. '\'.'
+		local category = '[[Category:Pages with duplicate Bracketid]]'
+		mw.addWarning(warning)
+		return warning .. category
 	end
-
-	local matches = MatchGroupInput.readBracket(bracketid, args, matchBuilder)
-	MatchGroupBase.saveMatchGroup(bracketid, matches, storeInLPDB)
-
-	if args.hide ~= 'true' then
-		return _loggedInWarning .. category .. tostring(MatchGroupDisplay.luaBracket(frame, {
-			bracketid,
-			emptyRoundTitles = args.emptyRoundTitles,
-			headerHeight = args.headerHeight,
-			hideMatchLine = args.hideMatchLine,
-			hideRoundTitles = args.hideRoundTitles,
-			matchHeight = args.matchHeight,
-			matchWidth = args.matchWidth,
-			matchWidthMobile = args.matchWidthMobile,
-			opponentHeight = args.opponentHeight,
-			qualifiedHeader = args.qualifiedHeader,
-		}))
-	end
-	return _loggedInWarning .. category
 end
 
 function MatchGroupBase.saveMatchGroup(bracketId, matches, storeInLpdb)
@@ -123,36 +100,6 @@ function MatchGroupBase.saveMatchGroup(bracketId, matches, storeInLpdb)
 	-- store match data as variable to bypass LPDB on the same page
 	Variables.varDefine('match2bracket_' .. bracketId, MatchGroupBase._convertDataForStorage(storedData))
 	Variables.varDefine('match2bracketindex', Variables.varDefault('match2bracketindex', 0) + 1)
-end
-
-function MatchGroupBase._checkBracketDuplicate(bracketid)
-	local status = mw.ext.Brackets.checkBracketDuplicate(bracketid)
-	if status ~= 'ok' then
-		mw.addWarning('Bracketid \'' .. bracketid .. '\' is used more than once on this page.')
-		category = '[[Category:Pages with duplicate Bracketid]]'
-		_loggedInWarning = MatchGroupDisplay.WarningBox('This Matchgroup uses the duplicate ID \'' .. bracketid .. '\'.')
-	end
-end
-
-function MatchGroupBase._validateBracketID(bracketid)
-	local subbed, count = string.gsub(bracketid, '[0-9a-zA-Z]', '')
-	if subbed == '' and count ~= 10 then
-		error('Bracketid has the wrong length (' .. count .. ' given, 10 characters expected)')
-	elseif subbed ~= '' then
-		error('Bracketid contains invalid characters (' .. subbed .. ')')
-	end
-end
-
-function MatchGroupBase.getBracketIdPrefix()
-	local namespace = mw.title.getCurrentTitle().nsText
-	if namespace ~= '' then
-		local prefix = namespace
-		if namespace == 'User' then
-			prefix = prefix .. '_' .. mw.title.getCurrentTitle().rootText
-		end
-		return prefix .. '_'
-	end
-	return ''
 end
 
 function MatchGroupBase._convertDataForStorage(data)
@@ -176,6 +123,18 @@ function MatchGroupBase.disableInstrumentation()
 	if FeatureFlag.get('perf') then
 		require('Module:Performance/Util').stopAndSave()
 	end
+end
+
+-- Deprecated
+function MatchGroupBase.luaMatchlist(_, args, matchBuilder)
+	local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
+	return MatchGroupDisplay.MatchlistBySpec(args, matchBuilder)
+end
+
+-- Deprecated
+function MatchGroupBase.luaBracket(_, args, matchBuilder)
+	local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
+	return MatchGroupDisplay.BracketBySpec(args, matchBuilder)
 end
 
 return MatchGroupBase

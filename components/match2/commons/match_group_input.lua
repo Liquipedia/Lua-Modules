@@ -259,4 +259,36 @@ function MatchGroupInput._convertMatchIdentifier(identifier)
 	return roundPrefix .. string.format('%02d', roundNumber) .. '-' .. matchPrefix .. string.format('%03d', matchNumber)
 end
 
+function MatchGroupInput.applyOverrideArgs(matches, args)
+	local bracketId = args.id or args[1]
+	local matchGroupType = matches[1].bracketData.type
+
+	if args.title then
+		matches[1].bracketData.title = args.title
+	end
+
+	if matchGroupType == 'matchlist' then
+		for index, _ in ipairs(matches) do
+			local overrideHeader = args['M' .. index .. 'header']
+			if overrideHeader then
+				matches[index].bracketData.header = overrideHeader
+			end
+		end
+	else
+		for index, match in ipairs(matches) do
+			local round, matchInRound = match.matchId:gsub(bracketId .. '_', ''):match('^R(%d+)%-M(%d+)$')
+			round = tonumber(round or '')
+			matchInRound = tonumber(matchInRound or '')
+
+			if round and matchInRound then
+				local matchPrefix = 'R' .. round .. 'M' .. matchInRound
+				local overrideHeader = args[matchPrefix .. 'header']
+				if overrideHeader then
+					matches[index].bracketData.header = overrideHeader
+				end
+			end
+		end
+	end
+end
+
 return MatchGroupInput

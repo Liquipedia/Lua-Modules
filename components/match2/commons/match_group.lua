@@ -6,41 +6,32 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local FeatureFlag = require('Module:FeatureFlag')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
 
 local MatchGroup = {}
 
 -- Entry point used by Template:Bracket
+-- Deprecated
 function MatchGroup.bracket(frame)
-	return MatchGroup.luaBracket(frame, Arguments.getArgs(frame))
+	return MatchGroupDisplay.TemplateBracket(frame)
 end
 
-function MatchGroup.luaBracket(frame, args)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		MatchGroupBase.enableInstrumentation()
-		local display = MatchGroupBase.luaBracket(frame, args)
-		MatchGroupBase.disableInstrumentation()
-		return display
-	end)
+-- Deprecated
+function MatchGroup.luaBracket(_, args)
+	return MatchGroupDisplay.TemplateBracket(args)
 end
 
 -- Entry point used by Template:Matchlist
+-- Deprecated
 function MatchGroup.matchlist(frame)
-	return MatchGroup.luaMatchlist(frame, Arguments.getArgs(frame))
+	return MatchGroupDisplay.TemplateMatchlist(frame)
 end
 
-function MatchGroup.luaMatchlist(frame, args)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		MatchGroupBase.enableInstrumentation()
-		local display = MatchGroupBase.luaMatchlist(frame, args)
-		MatchGroupBase.disableInstrumentation()
-		return display
-	end)
+-- Deprecated
+function MatchGroup.luaMatchlist(_, args)
+	return MatchGroupDisplay.TemplateMatchlist(args)
 end
 
 return MatchGroup
