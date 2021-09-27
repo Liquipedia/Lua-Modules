@@ -90,6 +90,7 @@ function CustomInjector:parse(id, widgets)
 			}
 		}
 	elseif id == 'role' then return {}
+	elseif id == 'region' then return {}
 	elseif id == 'achievements' then
 		if not(String.isEmpty(_args.maps_ladder) or String.isEmpty(_args.maps_special)) then
 			return {

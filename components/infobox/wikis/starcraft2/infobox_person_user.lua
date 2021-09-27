@@ -73,6 +73,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Race', content = {_raceData.display}}
 		}
 	elseif id == 'role' then return {}
+	elseif id == 'region' then return {}
 	elseif id == 'achievements' then return {}
 	elseif
 		id == 'history' and
