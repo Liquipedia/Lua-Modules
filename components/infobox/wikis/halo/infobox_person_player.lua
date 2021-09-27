@@ -96,7 +96,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 		role2 = _role2.role
 	}
 
-	local region = Region.run({region = region, country = country})
+	local region = Region.run({region = _args.region, country = _args.country})
 	if type(region) == 'table' then
 		lpdbData.region = region.region
 	end
