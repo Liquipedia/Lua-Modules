@@ -9,13 +9,13 @@
 local Arguments = require('Module:Arguments')
 local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
-local MatchGroup = require('Module:MatchGroup/Base')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-
-local CustomMatchGroup = {}
 
 local _matches = {}
 local _bracketId = ''
+
+local CustomMatchGroup = {}
 
 -- Entry point used by Template:Matchlist in valorant wiki
 function CustomMatchGroup.matchlist(frame)
@@ -24,7 +24,8 @@ function CustomMatchGroup.matchlist(frame)
 	_matches = CustomMatchGroup._getMatches(_bracketId)
 
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		return MatchGroup.luaMatchlist(frame, args, CustomMatchGroup._matchBuilder)
+		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
+		return MatchGroupBase.luaMatchlist(frame, args, CustomMatchGroup._matchBuilder)
 	end)
 end
 
@@ -35,7 +36,8 @@ function CustomMatchGroup.bracket(frame)
 	_matches = CustomMatchGroup._getMatches(_bracketId)
 
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		return MatchGroup.luaBracket(frame, args, CustomMatchGroup._matchBuilder)
+		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
+		return MatchGroupBase.luaBracket(frame, args, CustomMatchGroup._matchBuilder)
 	end)
 end
 
@@ -46,7 +48,10 @@ function CustomMatchGroup._getBracketData(args)
 	end
 
 	-- make sure bracket id is valid
-	MatchGroup._validateBracketID(bracketId)
+	FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
+		local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
+		MatchGroupBase._validateBracketID(bracketId)
+	end)
 
 	return bracketId
 end
