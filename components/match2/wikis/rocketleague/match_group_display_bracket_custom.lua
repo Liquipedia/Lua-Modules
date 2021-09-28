@@ -16,13 +16,6 @@ local CustomOpponentDisplay = Lua.import('Module:OpponentDisplay/Custom', {requi
 
 local CustomBracketDisplay = {propTypes = {}}
 
-function CustomBracketDisplay.luaGet(_, args)
-	return CustomBracketDisplay.BracketContainer({
-		bracketId = args[1],
-		config = BracketDisplay.configFromArgs(args),
-	})
-end
-
 function CustomBracketDisplay.BracketContainer(props)
 	return BracketDisplay.Bracket({
 		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),

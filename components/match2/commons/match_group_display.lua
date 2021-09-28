@@ -28,14 +28,12 @@ function MatchGroupDisplay.MatchlistBySpec(args)
 
 	local matchlistNode
 	if options.show then
-		local MatchlistDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('matchlist')
-		matchlistNode = MatchlistDisplay.luaGet(mw.getCurrentFrame(), {
-			options.bracketId,
-			attached = args.attached,
-			collapsed = args.collapsed,
-			nocollapse = args.nocollapse,
-			width = args.width or args.matchWidth,
-		}, matches)
+		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
+		local MatchlistContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('matchlist')
+		matchlistNode = MatchlistContainer({
+			bracketId = options.bracketId,
+			config = MatchlistDisplay.configFromArgs(args),
+		})
 	end
 
 	local parts = Array.extend(
@@ -55,19 +53,12 @@ function MatchGroupDisplay.BracketBySpec(args)
 
 	local bracketNode
 	if options.show then
-		local BracketDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('bracket')
-		bracketNode = BracketDisplay.luaGet(mw.getCurrentFrame(), {
-			options.bracketId,
-			emptyRoundTitles = args.emptyRoundTitles,
-			headerHeight = args.headerHeight,
-			hideMatchLine = args.hideMatchLine,
-			hideRoundTitles = args.hideRoundTitles,
-			matchHeight = args.matchHeight,
-			matchWidth = args.matchWidth,
-			matchWidthMobile = args.matchWidthMobile,
-			opponentHeight = args.opponentHeight,
-			qualifiedHeader = args.qualifiedHeader,
-		}, matches)
+		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
+		local BracketContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('bracket')
+		bracketNode = BracketContainer({
+			bracketId = options.bracketId,
+			config = BracketDisplay.configFromArgs(args),
+		})
 	end
 
 	local parts = Array.extend(
@@ -83,17 +74,27 @@ Displays a matchlist or bracket specified by ID.
 ]]
 function MatchGroupDisplay.MatchGroupById(args)
 	local bracketId = args.id or args[1]
-	args.id = bracketId
-	args[1] = bracketId
 
 	local matches = MatchGroupUtil.fetchMatches(bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
 	local matchGroupType = matches[1].bracketData.type
 
+	local config
+	if matchGroupType == 'matchlist' then
+		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
+		config = MatchlistDisplay.configFromArgs(args)
+	else
+		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
+		config = BracketDisplay.configFromArgs(args)
+	end
+
 	MatchGroupInput.applyOverrideArgs(matches, args)
 
-	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupModule(matchGroupType)
-	return MatchGroupContainer.luaGet(mw.getCurrentFrame(), args, matches)
+	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer(matchGroupType)
+	return MatchGroupContainer({
+		bracketId = bracketId,
+		config = config,
+	})
 end
 
 function MatchGroupDisplay.WarningBox(text)
@@ -151,9 +152,8 @@ function MatchGroupDisplay.bracket(frame)
 end
 
 -- Deprecated
-function MatchGroupDisplay.luaBracket(frame, args, matches)
-	local BracketDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('bracket')
-	return tostring(BracketDisplay.luaGet(frame, args, matches)) .. MatchGroupDisplay.deprecatedCategory
+function MatchGroupDisplay.luaBracket(_, args)
+	return tostring(MatchGroupDisplay.MatchGroupById(args)) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Unused entry point
@@ -163,9 +163,8 @@ function MatchGroupDisplay.matchlist(frame)
 end
 
 -- Deprecated
-function MatchGroupDisplay.luaMatchlist(frame, args, matches)
-	local MatchlistDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('matchlist')
-	return tostring(MatchlistDisplay.luaGet(frame, args, matches)) .. MatchGroupDisplay.deprecatedCategory
+function MatchGroupDisplay.luaMatchlist(_, args)
+	return tostring(MatchGroupDisplay.MatchGroupById(args)) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Entry point from Template:ShowBracket and direct #invoke

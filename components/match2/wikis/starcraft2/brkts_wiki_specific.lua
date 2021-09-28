@@ -21,10 +21,10 @@ WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 	return require('Module:MatchGroup/Util/Starcraft').matchFromRecord
 end)
 
-function WikiSpecific.getMatchGroupModule(matchGroupType)
+function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true})
-		or Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true})
+		and Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
+		or Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
 end
 
 --Default Logo for Teams without Team Template

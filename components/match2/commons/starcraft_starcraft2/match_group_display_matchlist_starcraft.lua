@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
@@ -19,23 +18,7 @@ local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', 
 
 local StarcraftMatchlistDisplay = {}
 
-function StarcraftMatchlistDisplay.luaGet(_, args)
-	return StarcraftMatchlistDisplay.MatchlistContainer({
-		bracketId = args[1],
-		config = MatchlistDisplay.configFromArgs(args),
-	})
-end
-
 function StarcraftMatchlistDisplay.MatchlistContainer(props)
-	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.MatchlistContainer)
-	return StarcraftMatchlistDisplay.Matchlist({
-		config = props.config,
-		matches = MatchGroupUtil.fetchMatches(props.bracketId),
-	})
-end
-
-function StarcraftMatchlistDisplay.Matchlist(props)
-	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Matchlist)
 	return MatchlistDisplay.Matchlist({
 		config = Table.merge(props.config, {
 			MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
@@ -43,7 +26,7 @@ function StarcraftMatchlistDisplay.Matchlist(props)
 			Score = StarcraftMatchlistDisplay.Score,
 			matchHasDetails = StarcraftMatchGroupUtil.matchHasDetails,
 		}),
-		matches = props.matches,
+		matches = MatchGroupUtil.fetchMatches(props.bracketId),
 	})
 end
 
