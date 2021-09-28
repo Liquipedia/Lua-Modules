@@ -26,7 +26,7 @@ function region.run(args)
 	if onlyRegion then
 		return regionReturn.region or ''
 	elseif regionReturn ~= {} then
-		display = ''
+		local display = ''
 		if regionReturn.flag then
 			display = Flag._Flag(regionReturn.flag)
 			if display then
