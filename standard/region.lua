@@ -6,55 +6,59 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local region = {}
+local Region = {}
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
 local String = require('Module:String')
+local Table = require('Module:Table')
 local Lua = require('Module:Lua')
 local regionData = mw.loadData('Module:Region/Data')
 local countryToRegionData = Lua.loadDataIfExists('Module:Region/CountryData', {})
 
-function region.run(args)
+function Region.run(args)
 	args = args or {}
-	local regionEntry = args.region
-	local onlyRegion = args.onlyRegion == 'true'
-	local onlyDisplay = args.onlyDisplay == 'true'
+	local region = args.region
+	local shouldOnlyReturnRegionName = args.onlyRegion == 'true'
+	local shouldOnlyReturnDisplay = args.onlyDisplay == 'true'
 
-	if String.isEmpty(regionEntry) then
-		local country = Flag._CountryName(args.country)
-		regionEntry = countryToRegionData[string.lower(country)]
-		if String.isEmpty(regionEntry) then
+	--determine region from country if region is empty
+	if String.isEmpty(region) then
+		local country = Flag._CountryName(args.country) or ''
+		region = countryToRegionData[string.lower(country)]
+		if String.isEmpty(region) then
 			return ''
 		end
 	end
 
-	regionEntry = string.lower(regionEntry)
-	regionEntry = regionData.aliases[regionEntry] or regionEntry
-	local regionReturn = regionData[regionEntry] or {}
-	if onlyRegion then
-		return regionReturn.region or ''
-	elseif regionReturn ~= {} then
+	--resolve aliases for the region
+	region = string.lower(region)
+	region = regionData.aliases[region] or region
+
+	local regionValues = regionData[region] or {}
+	if shouldOnlyReturnRegionName then
+		return regionValues.region or ''
+	elseif regionValues ~= {} then
 		local display = ''
-		if regionReturn.flag then
-			display = Flag._Flag(regionReturn.flag)
+		if regionValues.flag then
+			display = Flag._Flag(regionValues.flag)
 			if display then
 				display = display .. '&nbsp;'
 			else
 				display = ''
 			end
-		elseif regionReturn.file then
-			display = '[[File:' .. regionReturn.file .. ']]&nbsp;'
+		elseif regionValues.file then
+			display = '[[File:' .. regionValues.file .. ']]&nbsp;'
 		end
-		if onlyDisplay then
-			return display .. regionReturn.region
+		if shouldOnlyReturnDisplay then
+			return display .. regionValues.region
 		else
 			return {
-				display = display .. regionReturn.region,
-				region = regionReturn.region
+				display = display .. regionValues.region,
+				region = regionValues.region
 			}
 		end
 	end
-	return regionReturn
+	return regionValues
 end
 
-return Class.export(region, {frameOnly = true})
+return Class.export(Region, {frameOnly = true})
