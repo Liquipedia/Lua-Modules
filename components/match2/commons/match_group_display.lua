@@ -142,31 +142,36 @@ end
 -- Unused entry point
 -- Deprecated
 function MatchGroupDisplay.bracket(frame)
-	return MatchGroupDisplay.TemplateBracket(frame)
+	return tostring(MatchGroupDisplay.TemplateBracket(frame))
+		.. '[[Category:Pages using deprecated functions of Module MatchGroup/Display]]'
 end
 
 -- Deprecated
 function MatchGroupDisplay.luaBracket(frame, args, matches)
 	local BracketDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('bracket')
-	return BracketDisplay.luaGet(frame, args, matches)
+	return tostring(BracketDisplay.luaGet(frame, args, matches))
+		.. '[[Category:Pages using deprecated functions of Module MatchGroup/Display]]'
 end
 
 -- Unused entry point
 -- Deprecated
 function MatchGroupDisplay.matchlist(frame)
-	return MatchGroupDisplay.TemplateMatchlist(frame)
+	return tostring(MatchGroupDisplay.TemplateMatchlist(frame))
+		.. '[[Category:Pages using deprecated functions of Module MatchGroup/Display]]'
 end
 
 -- Deprecated
 function MatchGroupDisplay.luaMatchlist(frame, args, matches)
 	local MatchlistDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('matchlist')
-	return MatchlistDisplay.luaGet(frame, args, matches)
+	return tostring(MatchlistDisplay.luaGet(frame, args, matches))
+		.. '[[Category:Pages using deprecated functions of Module MatchGroup/Display]]'
 end
 
 -- Entry point from Template:ShowBracket and direct #invoke
 -- Deprecated
 function MatchGroupDisplay.Display(frame)
-	return MatchGroupDisplay.TemplateShowBracket(frame)
+	return tostring(MatchGroupDisplay.TemplateShowBracket(frame))
+		.. '[[Category:Pages using deprecated functions of Module MatchGroup/Display]]'
 end
 
 -- Entry point from direct #invoke
@@ -174,7 +179,8 @@ end
 function MatchGroupDisplay.DisplayDev(frame)
 	local args = Arguments.getArgs(frame)
 	args.dev = true
-	return MatchGroupDisplay.TemplateShowBracket(args)
+	return tostring(MatchGroupDisplay.TemplateShowBracket(frame))
+		.. '[[Category:Pages using deprecated functions of Module MatchGroup/Display]]'
 end
 
 return MatchGroupDisplay
