@@ -186,10 +186,12 @@ function Links.makeFullLink(platform, id, variant)
 		return ''
 	end
 
-	local prefix = ''
+	local prefix
 	if _PREFIXES[variant] then
 		prefix = _PREFIXES[variant][platform]
-	else
+	end
+
+	if not prefix then
 		prefix = _PREFIXES[platform]
 	end
 
