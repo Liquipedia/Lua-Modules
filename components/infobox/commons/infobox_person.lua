@@ -328,7 +328,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		if not args.image then
 			table.insert(categories, personType .. 's with no profile picture')
 		end
-		if not String.isEmpty(birthDisplay) then
+		if String.isEmpty(birthDisplay) then
 			table.insert(categories, personType .. 's with unknown birth date')
 		end
 
