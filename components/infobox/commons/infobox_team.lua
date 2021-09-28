@@ -7,11 +7,11 @@
 --
 
 local Class = require('Module:Class')
-local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
+local Region = require('Module:Region')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -25,6 +25,8 @@ local Builder = Widgets.Builder
 local Team = Class.new(BasicInfobox)
 
 local _LINK_VARIANT = 'team'
+local _region
+local _location = {}
 
 function Team.run(frame)
 	local team = Team(frame)
@@ -54,10 +56,13 @@ function Team:createInfobox()
 				self:_createLocation(args.location2)
 			}
 		},
-		Cell{
-			name = 'Region',
-			content = {
-				self:_createRegion(args.region)
+		Customizable{
+			id = 'region',
+			children = {
+				Cell{
+					name = 'Region',
+					content = {self:_createRegion(args.region)}
+				}
 			}
 		},
 		Cell{name = 'Coaches', content = {args.coaches}},
@@ -138,17 +143,20 @@ function Team:createInfobox()
 end
 
 function Team:_createRegion(region)
-	if region == nil or region == '' then
-		return ''
+	region = Region.run({region = region, country = _location[1]})
+	if type(region) == 'table' then
+		_region = region.region
+		return region.display
 	end
-
-	return Template.safeExpand(self.infobox.frame, 'Region', {region})
 end
 
 function Team:_createLocation(location)
 	if location == nil or location == '' then
 		return ''
 	end
+
+	location = Flags._CountryName(location) or location
+	table.insert(_location, location)
 
 	return Flags._Flag(location) ..
 			'&nbsp;' ..
@@ -160,15 +168,15 @@ function Team:_setLpdbData(args, links)
 
 	local lpdbData = {
 		name = name,
-		location = args.location,
-		location2 = args.location2,
+		location = _location[1],
+		location2 = _location[2],
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
 		createdate = args.created,
 		disbanddate = args.disbanded,
 		coach = args.coaches,
 		manager = args.manager,
-		region = args.region,
+		region = _region,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
