@@ -17,18 +17,19 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Center = require('Module:Infobox/Widget/Center')
+local Title = require('Module:Infobox/Widget/Title')
 
 local CustomUnit = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local _GAS = mw.loadData('Module:Gas')
-local _TIME = mw.loadData('Module:Buildtime')
-local _SUPPLY = mw.loadData('Module:Supply')
-local _HP = '[[File:Icon_Hitpoints.png|link=]]'
-local _SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
-local _ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
+local _ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
+local _ICON_GAS = mw.loadData('Module:Gas')
+local _ICON_TIME = mw.loadData('Module:Buildtime')
+local _ICON_SUPPLY = mw.loadData('Module:Supply')
+local _ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
+local _ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
+local _ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 
 local _args
 local _race
@@ -44,6 +45,8 @@ end
 
 function CustomInjector:addCustomCells()
 	local widgets = {
+		Title{name = 'Unit stats'},
+		Cell{name = 'Defense', content = {CustomUnit:_defenseDisplay()}},
 		Cell{name = 'Attributes', content = {_args.attributes}},
 		Cell{name = 'Energy', content = {_args.energy}},
 		Cell{name = 'Sight', content = {_args.sight}},
@@ -93,15 +96,15 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Type', content = {display}}
 		}
-	elseif id == 'defense' then
-		return {
-			Cell{name = 'Defense', content = {CustomUnit:_defenseDisplay()}}
-		}
+	elseif id == 'defense' then return {}
 	elseif id == 'attack' then
 		local attacks = {}
 		local index = 1
 		while not String.isEmpty(_args['attack' .. index .. '_target']) do
-			table.insert(attacks, CustomUnit:_getAttack(index))
+			for _, item in ipairs(CustomUnit:_getAttack(index)) do
+				table.insert(attacks, item)
+			end
+			index = index + 1
 		end
 		return attacks
 	end
@@ -126,11 +129,11 @@ function CustomUnit:_convertToList(strg)
 end
 
 function CustomUnit:_defenseDisplay()
-	local display = _HP .. ' ' .. (_args.hp or 0)
+	local display = _ICON_HP .. ' ' .. (_args.hp or 0)
 	if _args.shield then
-		display = display .. ' ' .. _SHIELDS .. ' ' .. _args.shield
+		display = display .. ' ' .. _ICON_SHIELDS .. ' ' .. _args.shield
 	end
-	display = display .. ' ' .. _ARMOR .. ' ' .. (_args.armor or 1)
+	display = display .. ' ' .. _ICON_ARMOR .. ' ' .. (_args.armor or 1)
 
 	return display
 end
@@ -159,21 +162,21 @@ end
 
 function CustomUnit:_getCostDisplay()
 	local minerals = _args.min or 0
-	minerals = _MINERALS .. '&nbsp;' .. minerals
+	minerals = _ICON_MINERALS .. '&nbsp;' .. minerals
 
 	local gas = _args.gas or 0
-	gas = (_GAS[_race] or _GAS['default']) .. '&nbsp;' .. gas
+	gas = (_ICON_GAS[_race] or _ICON_GAS['default']) .. '&nbsp;' .. gas
 
 	local buildtime = _args.buildtime
-	if not String.isEMpty(buildtime) then
-		buildtime = '&nbsp;' .. (_TIME[_race] or _TIME['default']) .. '&nbsp;' .. buildtime
+	if not String.isEmpty(buildtime) then
+		buildtime = '&nbsp;' .. (_ICON_TIME[_race] or _ICON_TIME['default']) .. '&nbsp;' .. buildtime
 	else
 		buildtime = ''
 	end
 
 	local supply = _args.supply
-	if not String.isEMpty(supply) then
-		supply = '&nbsp;' .. (_SUPPLY[_race] or _SUPPLY['default']) .. '&nbsp;' .. supply
+	if not String.isEmpty(supply) then
+		supply = '&nbsp;' .. (_ICON_SUPPLY[_race] or _ICON_SUPPLY['default']) .. '&nbsp;' .. supply
 	else
 		supply = ''
 	end
@@ -197,10 +200,11 @@ end
 function CustomUnit:setLpdbData(args)
 	local lpdbData = {
 		name = args.name,
-		type = 'Unit information ' .. _race,
+		type = 'Unit',
 		information = args.game,
 		image = args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			race = _race,
 			size = args.size,
 			type = args.type,
 			builtfrom = args.builtfrom,
@@ -230,71 +234,34 @@ function CustomUnit:setLpdbData(args)
 end
 
 function CustomUnit:_getAttack(index)
-	local attackName = 'Attack ' .. index
-	if not String.isEmpty(_args['attack' .. index .. '_name']) then
-		attackName = attackName .. '<br>(' .. _args['attack' .. index .. '_name'] .. ')'
-	end
-
-	local attackContent = mw.html.create('table'):addClass('bg-transparent')
-				:css('text-align', 'left')
-				:css('background-color', 'transparent')--needed because table class is stronger than bg class
-				:attr('cellpadding', 0)
-				:attr('cellspacing', 0)
-	attackContent	:tag('tr'):attr('valign', 'top')
-					:tag('td'):wikitext('Targets:'):done()
-					:tag('td'):wikitext('&nbsp;'):done()
-					:tag('td'):wikitext(_args['attack' .. index .. '_target']):done():done()
-	if not String.isEmpty(_args['attack' .. index .. '_damage']) then
-		attackContent	:tag('tr'):attr('valign', 'top')
-						:tag('td'):wikitext('Damage:'):done()
-						:tag('td'):wikitext('&nbsp;'):done()
-						:tag('td'):wikitext(_args['attack' .. index .. '_damage']):done():done()
-	end
-	if not String.isEmpty(_args['attack' .. index .. '_dps']) then
-		attackContent	:tag('tr'):attr('valign', 'top')
-						:tag('td'):wikitext('[[Damage Per Second|DPS]]:'):done()
-						:tag('td'):wikitext('&nbsp;'):done()
-						:tag('td'):wikitext(_args['attack' .. index .. '_dps']):done():done()
-	end
-	if not String.isEmpty(_args['attack' .. index .. '_cooldown']) then
-		attackContent	:tag('tr'):attr('valign', 'top')
-						:tag('td'):wikitext('[[Cooldown]]:'):done()
-						:tag('td'):wikitext('&nbsp;'):done()
-						:tag('td'):wikitext(_args['attack' .. index .. '_cooldown']):done():done()
-	end
-	if not String.isEmpty(_args['attack' .. index .. '_bonus']) then
-		attackContent	:tag('tr'):attr('valign', 'top')
-						:tag('td'):wikitext('Bonus:'):done()
-						:tag('td'):wikitext('&nbsp;'):done()
-						:tag('td'):wikitext(_args['attack' .. index .. '_bonus']):done():done()
-	end
-	if not String.isEmpty(_args['attack' .. index .. '_bonus_dps']) then
-		attackContent	:tag('tr'):attr('valign', 'top')
-						:tag('td'):wikitext('Bonus DPS:'):done()
-						:tag('td'):wikitext('&nbsp;'):done()
-						:tag('td'):wikitext(_args['attack' .. index .. '_bonus_dps']):done():done()
-	end
-	if not String.isEmpty(_args['attack' .. index .. '_range']) then
-		attackContent	:tag('tr'):attr('valign', 'top')
-						:tag('td'):wikitext('[[Range]]:'):done()
-						:tag('td'):wikitext('&nbsp;'):done()
-						:tag('td'):wikitext(
-							_args['attack' .. index .. '_range'] ..
-							(_args['attack' .. index .. '_range_note'] or '')
-						):done():done()
-	end
+	local widgets = {
+		Title{name = 'Attack ' .. index},
+		Cell{name = 'Name', content = {_args['attack' .. index .. '_name']}},
+		Cell{name = 'Targets', content = {_args['attack' .. index .. '_target']}},
+		Cell{name = 'Damage', content = {_args['attack' .. index .. '_damage']}},
+		Cell{name = '[[Damage Per Second|DPS]]', content = {_args['attack' .. index .. '_dps']}},
+		Cell{name = '[[Cooldown]]', content = {_args['attack' .. index .. '_cooldown']}},
+		Cell{name = 'Bonus', content = {_args['attack' .. index .. '_bonus']}},
+		Cell{name = 'Bonus DPS', content = {_args['attack' .. index .. '_bonus_dps']}},
+		Cell{name = '[[Range]]', content = {
+				_args['attack' .. index .. '_range'] ..
+				(_args['attack' .. index .. '_range_note'] or '')
+			}
+		}
+	}
 
 	CustomUnit:_storeAttack(index)
-	return Cell{name = attackName, content = {tostring(attackContent)}}
+	return widgets
 end
 
 function CustomUnit:_storeAttack(index)
 	local lpdbData = {
 		name = _args['attack' .. index .. '_name'] or ('Attack ' .. index),
-		type = 'Unit attack' .. index .. ' information ' .. _race,
+		type = 'Unit attack ' .. index,
 		information = _args.game,
 		image = _args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			race = _race,
 			damage = _args['attack' .. index .. '_damage'],
 			dps = _args['attack' .. index .. '_dps'],
 			cooldown = _args['attack' .. index .. '_cooldown'],
