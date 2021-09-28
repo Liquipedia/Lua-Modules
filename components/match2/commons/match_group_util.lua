@@ -573,4 +573,34 @@ function MatchGroupUtil.parseOrCopyExtradata(recordExtradata)
 		or {}
 end
 
+--[[
+Splits a matchId like h5HXaqbSVP_R02-M002 into the bracket ID h5HXaqbSVP and
+the base match ID R02-M002.
+]]
+function MatchGroupUtil.splitMatchId(matchId)
+	return matchId:match('^(.-)_?(R%w+%-?M%w+)$')
+end
+
+--[[
+Converts R01-M003 to R1M3
+]]
+function MatchGroupUtil.matchIdToKey(matchId)
+	if matchId == 'RxMBR' or matchId == 'RxMTP' then
+		return matchId
+	end
+	local round, matchInRound = matchId:match('^R(%d+)%-M(%d+)$')
+	return 'R' .. tonumber(round) .. 'M' .. tonumber(matchInRound)
+end
+
+--[[
+Converts R1M3 to R01-M003
+]]
+function MatchGroupUtil.matchIdFromKey(matchKey)
+	if matchKey == 'RxMBR' or matchKey == 'RxMTP' then
+		return matchKey
+	end
+	local round, matchInRound = matchKey:match('^R(%d+)M(%d+)$')
+	return 'R' .. string.format('%02d', round) .. '-M' .. string.format('%03d', matchInRound)
+end
+
 return MatchGroupUtil
