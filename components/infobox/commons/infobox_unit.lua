@@ -48,7 +48,12 @@ function Unit:createInfobox()
 		},
 		Cell{name = 'Description', content = {args.description}},
 		Cell{name = 'Built from', content = {args.builtfrom}},
-		Cell{name = 'Requirements', content = {args.requires}},
+		Customizable{
+			id = 'requirements',
+			children = {
+				Cell{name = 'Requirements', content = {args.requires}},
+			}
+		},
 		Customizable{
 			id = 'cost',
 			children = {
