@@ -27,6 +27,7 @@ local Team = Class.new(BasicInfobox)
 
 local _LINK_VARIANT = 'team'
 local _region
+local _location = {}
 
 function Team.run(frame)
 	local team = Team(frame)
@@ -61,7 +62,7 @@ function Team:createInfobox()
 			children = {
 				Cell{
 					name = 'Region',
-					content = {self:_createRegion(args.region, args.location)}
+					content = {self:_createRegion(args.region)}
 				}
 			}
 		},
@@ -142,8 +143,8 @@ function Team:createInfobox()
 	return builtInfobox
 end
 
-function Team:_createRegion(region, country)
-	region = Region.run({region = region, country = country})
+function Team:_createRegion(region)
+	region = Region.run({region = region, country = _location[1]})
 	if type(region) == 'table' then
 		_region = region.region
 		return region.display
@@ -155,6 +156,9 @@ function Team:_createLocation(location)
 		return ''
 	end
 
+	location = Flags._CountryName(location) or location
+	table.insert(_location, location)
+
 	return Flags._Flag(location) ..
 			'&nbsp;' ..
 			'[[:Category:' .. location .. '|' .. location .. ']]'
@@ -165,8 +169,8 @@ function Team:_setLpdbData(args, links)
 
 	local lpdbData = {
 		name = name,
-		location = args.location,
-		location2 = args.location2,
+		location = _location[1],
+		location2 = _location[2],
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
 		createdate = args.created,
