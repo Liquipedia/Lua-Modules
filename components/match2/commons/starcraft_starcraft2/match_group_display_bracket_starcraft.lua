@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
@@ -23,30 +22,15 @@ local html = mw.html
 
 local StarcraftBracketDisplay = {propTypes = {}}
 
-function StarcraftBracketDisplay.luaGet(_, args)
-	return StarcraftBracketDisplay.BracketContainer({
-		bracketId = args[1],
-		config = BracketDisplay.configFromArgs(args),
-	})
-end
-
 function StarcraftBracketDisplay.BracketContainer(props)
-	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.BracketContainer)
-	return StarcraftBracketDisplay.Bracket({
-		config = props.config,
-		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
-	})
-end
-
-function StarcraftBracketDisplay.Bracket(props)
-	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.Bracket)
+	local bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId)
 	return BracketDisplay.Bracket({
-		bracket = props.bracket,
+		bracket = bracket,
 		config = Table.merge(props.config, {
 			MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
 			OpponentEntry = StarcraftBracketDisplay.OpponentEntry,
 			matchHasDetails = StarcraftMatchGroupUtil.matchHasDetails,
-			opponentHeight = StarcraftBracketDisplay.computeBracketOpponentHeight(props.bracket.matchesById),
+			opponentHeight = StarcraftBracketDisplay.computeBracketOpponentHeight(bracket.matchesById),
 		})
 	})
 end

@@ -20,14 +20,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnable
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
 
--- Called by MatchGroup/Display
-function MatchlistDisplay.luaGet(_, args)
-	return MatchlistDisplay.MatchlistContainer({
-		bracketId = args[1],
-		config = MatchlistDisplay.configFromArgs(args),
-	})
-end
-
 MatchlistDisplay.configFromArgs = function(args)
 	return {
 		attached = Logic.readBoolOrNil(args.attached),
