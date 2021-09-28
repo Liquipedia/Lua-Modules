@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Region
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local region = {}
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
