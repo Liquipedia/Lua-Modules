@@ -10,7 +10,6 @@ local Region = {}
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
 local String = require('Module:String')
-local Table = require('Module:Table')
 local Lua = require('Module:Lua')
 local regionData = mw.loadData('Module:Region/Data')
 local countryToRegionData = Lua.loadDataIfExists('Module:Region/CountryData', {})
