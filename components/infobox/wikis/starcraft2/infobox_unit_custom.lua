@@ -32,7 +32,6 @@ local _ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 
 local _args
 local _race
-local _unit_attributes = {}
 
 function CustomUnit.run(frame)
 	local unit = Unit(frame)
@@ -43,8 +42,8 @@ function CustomUnit.run(frame)
 	return unit:createInfobox(frame)
 end
 
-function CustomInjector:addCustomCells(widgets)
-	widgets = {
+function CustomInjector:addCustomCells()
+	local widgets = {
 		Cell{name = 'Attributes', content = {_args.attributes}},
 		Cell{name = 'Energy', content = {_args.energy}},
 		Cell{name = 'Sight', content = {_args.sight}},
@@ -85,7 +84,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {CustomUnit:_getHotkeys()}}
 		}
 	elseif id == 'type' and (not String.isEmpty(_args.size) or not String.isEmpty(_args.type)) then
-		local display = args.size
+		local display = _args.size
 		if not display then
 			display = _args.type
 		elseif _args.type then
@@ -293,8 +292,8 @@ function CustomUnit:_storeAttack(index)
 	local lpdbData = {
 		name = _args['attack' .. index .. '_name'] or ('Attack ' .. index),
 		type = 'Unit attack' .. index .. ' information ' .. _race,
-		information = args.game,
-		image = args.image,
+		information = _args.game,
+		image = _args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			damage = _args['attack' .. index .. '_damage'],
 			dps = _args['attack' .. index .. '_dps'],
@@ -306,7 +305,7 @@ function CustomUnit:_storeAttack(index)
 		}),
 	}
 	mw.ext.LiquipediaDB.lpdb_datapoint(
-		(args.name or '') .. 'attack' .. index,
+		(_args.name or '') .. 'attack' .. index,
 		lpdbData
 	)
 end
