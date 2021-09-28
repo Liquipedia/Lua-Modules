@@ -207,7 +207,7 @@ function CustomBuilding:setLpdbData(args)
 			shield = args.shield,
 			armor = args.armor or 1,
 			attributes = table.concat(_building_attributes, ', '),
-			hotkey = args.hotkey .. (args.hotkey2 ~= nil and (', ' .. args.hotkey2) or ''),
+			hotkey = (args.hotkey or '') .. (args.hotkey2 ~= nil and (', ' .. args.hotkey2) or ''),
 			energy = args.energy,
 			size = args.size,
 			sight = args.sight,
