@@ -71,17 +71,19 @@ function Lua.import(name, options)
 end
 
 --[[
-Entry point of Template:Invoke. Invokes a function inside a module or a dev
-module depending on the dev feature flag. Can also set the dev feature flag
-inside the function scope by passing dev=1.
+This function intended to be #invoke'd from wikicode.
+
+Invokes a function inside a module or a dev module depending on the dev feature
+flag. Can also set the dev feature flag inside the function scope by passing
+dev=1.
 
 The following 3 code snippets are equivalent, assuming that Module:Magpie/dev
 exists and that feature_dev is unset previously.
 
-{{Invoke|Magpie|theive|foo=3|dev=1}}
+{{#invoke:Lua|invoke|module=Magpie|fn=theive|foo=3|dev=1}}
 
 {{#vardefine:feature_dev|1}}
-{{#invoke|Magpie/dev|theive|foo=3}}
+{{#invoke:Magpie/dev|theive|foo=3}}
 {{#vardefine:feature_dev|}}
 
 require('Module:FeatureFlag').set('dev', true)
@@ -89,18 +91,19 @@ require('Module:Magpie/dev').theive({args = {foo = 3}})
 require('Module:FeatureFlag').set('dev', nil)
 
 ]]
-function Lua.TemplateInvoke(frame)
-	local parentFrame = frame:getParent()
-	local moduleName = parentFrame.args[1]
-	local fnName = parentFrame.args[2]
+function Lua.invoke(frame)
+	local moduleName = frame.args.module
+	local fnName = frame.args.fn
 	if StringUtils.endsWith(moduleName, '/dev') then
-		error('Template:Invoke: Module name should not end in \'/dev\'')
+		error('Lua.invoke: Module name should not end in \'/dev\'')
 	end
+	assert(moduleName, 'Lua.invoke: args.fn is missing')
+	assert(fnName, 'Lua.invoke: args.fn is missing')
 
-	local flags = {dev = Logic.readBoolOrNil(parentFrame.args.dev)}
+	local flags = {dev = Logic.readBoolOrNil(frame.args.dev)}
 	return require('Module:FeatureFlag').with(flags, function()
 		local module = Lua.import('Module:' .. moduleName, {requireDevIfEnabled = true})
-		return module[fnName](parentFrame)
+		return module[fnName](frame)
 	end)
 end
 
