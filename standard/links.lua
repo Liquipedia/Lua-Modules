@@ -186,18 +186,18 @@ function Links.makeFullLink(platform, id, variant)
 		return ''
 	end
 
+	local prefix = ''
 	if _PREFIXES[variant] then
-		local out = _PREFIXES[variant][platform]
-		if out then
-			return out
-		end
+		prefix = _PREFIXES[variant][platform]
+	else
+		prefix = _PREFIXES[platform]
 	end
 
-	if _PREFIXES[platform] == nil then
+	if prefix == nil then
 		return ''
 	end
 
-	return _PREFIXES[platform] .. id .. (_SUFFIXES[platform] or '')
+	return prefix .. id .. (_SUFFIXES[platform] or '')
 end
 
 function Links.makeFullLinksForTableItems(links, variant)
