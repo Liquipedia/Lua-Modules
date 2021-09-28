@@ -319,7 +319,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		if
 			args.retired == 'yes' or args.retired == 'true'
 			or string.lower(status or '') == 'retired'
-			or string.match(args.retired or '', '%d%d%d%d%')--if retired has year set apply the retired category
+			or string.match(args.retired or '', '%d%d%d%d')--if retired has year set apply the retired category
 		then
 			table.insert(categories, 'Retired ' .. personType .. 's')
 		else
