@@ -102,7 +102,7 @@ function CustomInjector:parse(id, widgets)
 		return {}
 	elseif
 		id == 'history' and
-		string.match(_args.retired or '', '%d%d%d%d%')
+		string.match(_args.retired or '', '%d%d%d%d')
 	then
 		table.insert(widgets, Cell{
 				name = 'Retired',
