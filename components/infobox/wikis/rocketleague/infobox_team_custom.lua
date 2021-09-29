@@ -77,7 +77,7 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		local earningsInYear = Template.safeExpand(mw.getCurrentFrame(), 'Total earnings of', {year = year, id})
 		lpdbData.extradata['earningsin' .. year] = (earningsInYear or ''):gsub(',', ''):gsub('$', '')
 	end
-	
+
 	lpdbData.region = args.region
 
 	return lpdbData
