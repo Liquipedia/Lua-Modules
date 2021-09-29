@@ -155,7 +155,7 @@ function Team:_createLocation(location)
 		return ''
 	end
 
-	return Flags._Flag(location) ..
+	return Flags.flag(location) ..
 			'&nbsp;' ..
 			'[[:Category:' .. location .. '|' .. location .. ']]'
 end
