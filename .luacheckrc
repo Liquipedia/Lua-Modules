@@ -13,6 +13,7 @@ std = {
 		"pcall",
 		"require",
 		"select",
+		"setmetatable",
 		"string",
 		"table",
 		"tonumber",
