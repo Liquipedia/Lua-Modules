@@ -58,8 +58,8 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Morphs into', content = {_args.morphs}},
 		Cell{name = 'Cargo size', content = {_args.cargo_size}},
 		Cell{name = 'Cargo capacity', content = {_args.cargo_capacity}},
-		Cell{name = 'Strong against', content = {CustomUnit:_convertToList(_args.strong)}},
-		Cell{name = 'Weak against', content = {CustomUnit:_convertToList(_args.weak)}},
+		Cell{name = 'Strong against', content = {String.convertWikiListToHtmlList(_args.strong)}},
+		Cell{name = 'Weak against', content = {String.convertWikiListToHtmlList(_args.weak)}},
 	}
 
 	if _args.game ~= 'lotv' and _args.buildtime then
@@ -80,7 +80,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Requirements', content = {CustomUnit:_convertToList(_args.requires)}},
+			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(_args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
@@ -113,19 +113,6 @@ end
 
 function CustomUnit:createWidgetInjector()
 	return CustomInjector()
-end
-
-function CustomUnit:_convertToList(strg)
-	if String.isEmpty(strg) then
-		return nil
-	end
-	strg = strg:gsub('*', '', 1)
-	local strgArray = mw.text.split(strg, '*')
-	local list = mw.html.create('ul')
-	for _, item in ipairs(strgArray) do
-		list:tag('li'):wikitext(item)
-	end
-	return tostring(list)
 end
 
 function CustomUnit:_defenseDisplay()
