@@ -17,32 +17,32 @@ local Locale = {}
 
 function Locale.getISOCountry(country)
 
-    if country == nil or country == '' then
-        return ''
-    end
+	if country == nil or country == '' then
+		return ''
+	end
 
-    local data = mw.loadData('Module:Locale/data/countries')
+	local data = mw.loadData('Module:Locale/data/countries')
 
-    local isoCountry = data[country:lower()]
+	local isoCountry = data[country:lower()]
 
-    if isoCountry ~= nil then
-        return isoCountry
-    end
+	if isoCountry ~= nil then
+		return isoCountry
+	end
 
-    mw.log('No country found in Module:Locale/data/countries: ' .. country)
-    return ''
+	mw.log('No country found in Module:Locale/data/countries: ' .. country)
+	return ''
 
 end
 
 function Locale.formatLocation(args)
-    local formattedLocation = ''
+	local formattedLocation = ''
 
-    if args.city ~= nil and args.city ~= '' then
-        formattedLocation = args.city .. ',&nbsp;'
-    end
+	if args.city ~= nil and args.city ~= '' then
+		formattedLocation = args.city .. ',&nbsp;'
+	end
 
-    formattedLocation = formattedLocation .. (args.country or '')
-    return formattedLocation
+	formattedLocation = formattedLocation .. (args.country or '')
+	return formattedLocation
 end
 
 
