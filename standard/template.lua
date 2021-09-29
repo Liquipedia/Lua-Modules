@@ -13,7 +13,7 @@
 local Template = {}
 
 function Template.safeExpand(frame, title, args, defaultTemplate)
-	local start = os.clock()
+	--local start = os.clock()
 	local result, value = pcall(frame.expandTemplate, frame, {title = title, args = args})
 	if result then
 		--mw.log('Module:Template title=' .. title)
