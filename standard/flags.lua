@@ -31,7 +31,8 @@ function Flags._Flag(name)
 
 	if flagData then
 		if flagData.flag ~= 'File:Space filler flag.png' then
-			return '<span class="flag">[[' .. flagData.flag .. '|' .. flagData.name .. '|link=Category:' .. flagData.name .. ']]</span>'
+			return '<span class="flag">[[' .. flagData.flag ..
+				'|' .. flagData.name .. '|link=Category:' .. flagData.name .. ']]</span>'
 		else
 			return '<span class="flag">[[' .. flagData.flag .. '|link=]]</span>'
 		end
@@ -114,7 +115,7 @@ function Flags._safeExpand(frame, templateTitle, templateArgs)
 	local result, value = pcall(frame.expandTemplate, frame, {title = templateTitle, args = templateArgs})
 	if result then
 		return value
-	else 
+	else
 		return '[[Template:' .. templateTitle .. ']]'
 	end
 end
