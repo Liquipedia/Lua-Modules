@@ -22,7 +22,7 @@ local MatchGroupDisplay = {}
 Reads a matchlist input spec, saves it to LPDB, and displays the matchlist.
 ]]
 function MatchGroupDisplay.MatchlistBySpec(args, matchBuilder)
-	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
+	local options, warnings = MatchGroupBase.readOptions(args, 'matchlist')
 	local matches = MatchGroupInput.readMatchlist(options.bracketId, args, matchBuilder)
 	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
 
@@ -40,7 +40,7 @@ function MatchGroupDisplay.MatchlistBySpec(args, matchBuilder)
 
 	local parts = Array.extend(
 		{matchlistNode},
-		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox)
+		Array.map(warnings, MatchGroupDisplay.WarningBox)
 	)
 	return table.concat(Array.map(parts, tostring))
 end
@@ -49,8 +49,8 @@ end
 Reads a bracket input spec, saves it to LPDB, and displays the bracket.
 ]]
 function MatchGroupDisplay.BracketBySpec(args, matchBuilder)
-	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
-	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, matchBuilder)
+	local options, warnings = MatchGroupBase.readOptions(args, 'bracket')
+	local matches = MatchGroupInput.readBracket(options.bracketId, args, matchBuilder)
 	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
 
 	local bracketNode
@@ -71,8 +71,7 @@ function MatchGroupDisplay.BracketBySpec(args, matchBuilder)
 	end
 
 	local parts = Array.extend(
-		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox),
-		Array.map(bracketWarnings, MatchGroupDisplay.WarningBox),
+		Array.map(warnings, MatchGroupDisplay.WarningBox),
 		{bracketNode}
 	)
 	return table.concat(Array.map(parts, tostring))
@@ -85,7 +84,6 @@ function MatchGroupDisplay.MatchGroupById(args)
 	local bracketId = args.id or args[1]
 	args.id = bracketId
 	args[1] = bracketId
-	assert(bracketId, 'Missing bracket ID')
 
 	local matches = MatchGroupUtil.fetchMatches(bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
