@@ -94,7 +94,7 @@ function PlayerDisplay.InlinePlayer(props)
 		:wikitext(text)
 end
 
--- Note: require('Module:Flags')_FlagNoLink automatically includes a span with class="flag"
-PlayerDisplay.Flag = require('Module:Flags')._FlagNoLink
+-- Note: require('Module:Flags')flagNoLink automatically includes a span with class="flag"
+PlayerDisplay.Flag = require('Module:Flags').flagNoLink
 
 return Class.export(PlayerDisplay)
