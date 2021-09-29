@@ -35,7 +35,7 @@ function Region.run(args)
 	region = string.lower(region)
 	region = regionData.aliases[region] or region
 
-	local regionValues = regionData[region] or {region = args.region .. noEntryFoundCategory}
+	local regionValues = regionData[region] or {}
 	if shouldOnlyReturnRegionName then
 		return regionValues.region
 	else
@@ -50,12 +50,13 @@ function Region.run(args)
 		elseif regionValues.file then
 			display = '[[File:' .. regionValues.file .. ']]&nbsp;'
 		end
+		display = display .. (regionValues.region or (args.region .. noEntryFoundCategory))
 		if shouldOnlyReturnDisplay then
-			return display .. regionValues.region
+			return display
 		else
 			return {
-				display = display .. regionValues.region,
-				region = regionValues.region
+				display = display,
+				region = regionValues.region or args.region
 			}
 		end
 	end
