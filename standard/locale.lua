@@ -23,7 +23,7 @@ function Locale.getISOCountry(country)
 
     local data = mw.loadData('Module:Locale/data/countries')
 
-    local isoCountry = data[country:lower()] 
+    local isoCountry = data[country:lower()]
 
     if isoCountry ~= nil then
         return isoCountry
