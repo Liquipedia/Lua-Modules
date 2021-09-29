@@ -93,7 +93,7 @@ function CustomTeam:addToLpdb(lpdbData, args)
 end
 
 function CustomTeam:_getStandardLocationValue(location)
-	return Flags._CountryName(location) or location
+	return Flags.countryName(location) or location
 end
 
 function CustomTeam:createWidgetInjector()
