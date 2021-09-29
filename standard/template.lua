@@ -6,23 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----
--- @author Vogan for Liquipedia
---
-
 local Template = {}
 
 function Template.safeExpand(frame, title, args, defaultTemplate)
-	--local start = os.clock()
 	local result, value = pcall(frame.expandTemplate, frame, {title = title, args = args})
 	if result then
-		--mw.log('Module:Template title=' .. title)
-		--mw.log('Module:Template:safeExpand_end: ' .. (os.clock() - start))
 		return value
 	else
-		--mw.log('Module:Template title=' .. title)
-		--mw.log('Module:Template:safeExpand_end_failed: ' .. (os.clock() - start))
-		return defaultTemplate or '[[Template:' .. title .. ']]'
+		local templateName = '[[Template:' .. (title or '') .. ']]'
+		return defaultTemplate or templateName
 	end
 end
 
