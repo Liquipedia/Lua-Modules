@@ -7,22 +7,34 @@
 --
 
 local FlagData = mw.loadData('Module:Flags/MasterData')
+local Template = require('Module:Template')
 
 local Flags = {}
 
--- Template functions
+-- Template functions (legacy)
 function Flags.Flag(frame)
-	return Flags._Flag(frame.args[1])
+	return Flags.flag(frame.args[1])
 end
 function Flags.FlagNoLink(frame)
-	return Flags._FlagNoLink(frame.args[1])
+	return Flags.flagNoLink(frame.args[1])
 end
 function Flags.CountryName(frame)
-	return Flags._CountryName(frame.args[1])
+	return Flags.countryName(frame.args[1])
+end
+
+--legacy functions
+function Flags._Flag(name)
+	return Flags.flag(name)
+end
+function Flags._FlagNoLink(name)
+	return Flags.flagNoLink(name)
+end
+function Flags._CountryName(name)
+	return Flags.countryName(name)
 end
 
 -- Returns a flag with a link to the category page
-function Flags._Flag(name)
+function Flags.flag(name)
 	if (not name) or name == '' then
 		return ''
 	end
@@ -38,12 +50,12 @@ function Flags._Flag(name)
 		end
 	else
 		mw.log('Unknown flag: ', name)
-		return Flags._safeExpand(mw.getCurrentFrame(), 'Flag/' .. name) .. '[[Category:Pages with unknown flags]]'
+		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. name) .. '[[Category:Pages with unknown flags]]'
 	end
 end
 
 -- Returns a flag with no link
-function Flags._FlagNoLink(name)
+function Flags.flagNoLink(name)
 	if (not name) or name == '' then
 		return ''
 	end
@@ -54,12 +66,12 @@ function Flags._FlagNoLink(name)
 		return '<span class="flag">[[' .. flagData.flag .. '|' .. flagData.name .. '|link=]]</span>'
 	else
 		mw.log('Unknown flag: ', name)
-		return Flags._safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. name) .. '[[Category:Pages with unknown flags]]'
+		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. name) .. '[[Category:Pages with unknown flags]]'
 	end
 end
 
 -- Returns a flag with no link
-function Flags._CountryName(name)
+function Flags.countryName(name)
 	if (not name) or name == '' then
 		return ''
 	end
@@ -70,7 +82,7 @@ function Flags._CountryName(name)
 		return flagData.name
 	else
 		mw.log('Unknown flag: ', name)
-		return mw.text.trim(mw.text.split(Flags._safeExpand(mw.getCurrentFrame(), 'Flag/' .. name), '|', true)[2] or '')
+		return mw.text.trim(mw.text.split(Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. name), '|', true)[2] or '')
 	end
 end
 
@@ -108,16 +120,6 @@ function Flags._getFlagData(name)
 	end
 
 	return flagData
-end
-
--- Fallback to templates when no flag is found
-function Flags._safeExpand(frame, templateTitle, templateArgs)
-	local result, value = pcall(frame.expandTemplate, frame, {title = templateTitle, args = templateArgs})
-	if result then
-		return value
-	else
-		return '[[Template:' .. templateTitle .. ']]'
-	end
 end
 
 return Flags
