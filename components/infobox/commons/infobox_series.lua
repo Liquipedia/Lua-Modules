@@ -15,7 +15,7 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Localisation = require('Module:Localisation')
 local Links = require('Module:Links')
 local String = require('Module:String')
-local Flags = require('Module:Flags')._Flag
+local Flags = require('Module:Flags').flag
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
