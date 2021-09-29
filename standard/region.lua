@@ -60,7 +60,6 @@ function Region.run(args)
 			}
 		end
 	end
-	return regionValues
 end
 
 return Class.export(Region, {frameOnly = true})
