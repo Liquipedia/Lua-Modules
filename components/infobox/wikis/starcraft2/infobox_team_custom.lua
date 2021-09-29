@@ -114,7 +114,6 @@ function CustomInjector:parse(id, widgets)
 			})
 			index = index + 1
 		end
-	elseif id == 'region' then return {}
 	end
 	return widgets
 end
