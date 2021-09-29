@@ -298,7 +298,7 @@ function League:_createLocation(details)
 			displayText = details.country
 		end
 
-		content = Flags._Flag(details.country) .. '&nbsp;' ..
+		content = Flags.flag(details.country) .. '&nbsp;' ..
 			displayText .. '[[Category:' .. nationality .. ' Tournaments]]'
 	end
 
@@ -316,7 +316,7 @@ function League:_createLocation(details)
 				displayText = details.country2
 			end
 
-			content = content .. Flags._Flag(details.country2) .. '&nbsp;' ..
+			content = content .. Flags.flag(details.country2) .. '&nbsp;' ..
 				displayText .. '[[Category:' .. nationality2 .. ' Tournaments]]'
 		end
 	end
