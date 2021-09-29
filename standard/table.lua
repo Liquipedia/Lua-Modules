@@ -12,7 +12,7 @@
 -- A number of these functions take inspiration from Penlight: https://github.com/lunarmodules/Penlight
 --
 
-local Class = require('Module:Class')
+--local Class = require('Module:Class')
 
 local Table = {}
 
@@ -61,9 +61,12 @@ function Table.isEmpty(tbl)
 	if tbl == nil then
 		return true
 	end
+	-- luacheck: push ignore
+	--it is intended that the loop is executed at most once
 	for _, _ in pairs(tbl) do
 		return false
 	end
+	-- luacheck: pop
 	return true
 end
 
@@ -82,10 +85,10 @@ function Table.deepCopy(tbl)
 end
 
 --[[
-Copies entries from the second table into the first table, overriding existing 
+Copies entries from the second table into the first table, overriding existing
 entries. The first table is mutated in the process.
 
-Can be called with more than two tables. The additional tables are merged into 
+Can be called with more than two tables. The additional tables are merged into
 the first table in succession.
 ]]
 function Table.mergeInto(target, ...)
@@ -101,7 +104,7 @@ function Table.mergeInto(target, ...)
 end
 
 --[[
-Creates a table with entries merged from the input tables, with entries from 
+Creates a table with entries merged from the input tables, with entries from
 the later tables given precedence. Input tables are not mutated.
 ]]
 function Table.merge(...)
@@ -109,7 +112,7 @@ function Table.merge(...)
 end
 
 --[[
-Applies a function to each entry in a table and places the results as entries 
+Applies a function to each entry in a table and places the results as entries
 in a new table.
 
 Example:
@@ -126,7 +129,7 @@ function Table.map(xTable, f)
 end
 
 --[[
-Applies a function to each value in a table and places the results in a new 
+Applies a function to each value in a table and places the results in a new
 table under the same keys.
 
 Example:
@@ -229,7 +232,7 @@ function Table.iter.spairs(tbl, order)
 	for k in pairs(tbl) do keys[#keys+1] = k end
 
 	-- if order function given, sort by it by passing the table and keys a, b,
-	-- otherwise just sort the keys 
+	-- otherwise just sort the keys
 	if order then
 		table.sort(keys, function(a,b) return order(tbl, a, b) end)
 	else
@@ -247,7 +250,7 @@ function Table.iter.spairs(tbl, order)
 end
 
 function Table.iter.forEach(tbl, lambda)
-	for index, item in ipairs(tbl) do
+	for _, item in ipairs(tbl) do
 		lambda(item)
 	end
 end
