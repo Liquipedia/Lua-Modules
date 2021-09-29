@@ -1032,7 +1032,7 @@ local data = {
 		flag = 'File:xk_hd.png'
 	},
 
-	-- ISO 3166-1 alpha-2 Exceptional Reservations 
+	-- ISO 3166-1 alpha-2 Exceptional Reservations
 	['europeanunion'] = {
 		name = "Europe",
 		flag = "File:eu_hd.png"
@@ -1046,7 +1046,7 @@ local data = {
 		flag = "File:ussr_hd.png"
 	},
 
-	-- ISO 3166-1 alpha-2 Traditional Reservations 
+	-- ISO 3166-1 alpha-2 Traditional Reservations
 	['yugoslavia'] = {
 		name = "Yugoslavia",
 		flag = "File:yu_hd.png"
@@ -1148,8 +1148,8 @@ local data = {
 -- This table includes:
 --   ISO 3166-1 alpha-2
 --   ISO 3166-1 alpha-2 User-assigned Code Elements
---   ISO 3166-1 alpha-2 Exceptional Reservations 
---   ISO 3166-1 alpha-2 Traditional Reservations 
+--   ISO 3166-1 alpha-2 Exceptional Reservations
+--   ISO 3166-1 alpha-2 Traditional Reservations
 local twoLetter = {
 	['ad'] = 'andorra',
 	['ae'] = 'unitedarabemirates',
@@ -1405,12 +1405,12 @@ local twoLetter = {
 	--   ISO 3166-1 alpha-2 User-assigned Code Elements
 	['xk'] = 'kosovo',
 
-	--   ISO 3166-1 alpha-2 Exceptional Reservations 
+	--   ISO 3166-1 alpha-2 Exceptional Reservations
 	['eu'] = 'europeanunion',
 	['uk'] = 'unitedkingdom',
 	['un'] = 'unitednations',
 
-	--   ISO 3166-1 alpha-2 Traditional Reservations 
+	--   ISO 3166-1 alpha-2 Traditional Reservations
 	['yu'] = 'yugoslavia',
 }
 
