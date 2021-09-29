@@ -279,10 +279,10 @@ function Person:_createLocation(country, location, personType)
 	if country == nil or country == '' then
 		return nil
 	end
-	local countryDisplay = Flags._CountryName(country)
+	local countryDisplay = Flags.countryName(country)
 	local demonym = Localisation(countryDisplay)
 
-	return Flags._Flag(country) .. '&nbsp;' ..
+	return Flags.flag(country) .. '&nbsp;' ..
 				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 				.. '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
 				.. (location ~= nil and (',&nbsp;' .. location) or '')
