@@ -13,24 +13,24 @@ function String.startsWith(str, start)
 end
 
 function String.endsWith(str, ending)
-	return ending == "" or str:sub(-#ending) == ending
+	return ending == '' or str:sub(-#ending) == ending
 end
 
 function String.split(inputstr, sep)
 	if inputstr ~= nil then
 		if sep == nil then
-			sep = "%s"
+			sep = '%s'
 		end
-		inputstr = inputstr:gsub(sep, "&")
+		inputstr = inputstr:gsub(sep, '&')
 		local t = {}
 		local i = 1
-		for str in string.gmatch(inputstr, "([^&]+)") do
+		for str in string.gmatch(inputstr, '([^&]+)') do
 			t[i] = str
 			i = i + 1
 		end
 		return t
 	else
-		return {""}
+		return {''}
 	end
 end
 
@@ -40,7 +40,7 @@ function String.contains(str, match)
 end
 
 function String.trim(str)
-	return (str:gsub("^%s*(.-)%s*$", "%1"))
+	return (str:gsub('^%s*(.-)%s*$', '%1'))
 end
 
 function String.nilIfEmpty(str)
@@ -53,7 +53,7 @@ end
 
 -- index counts up from 0
 function String.explode(str, delimiter, index)
-	return String.split(str, delimiter)[index + 1] or ""
+	return String.split(str, delimiter)[index + 1] or ''
 end
 
 --transforms a wiki code list
