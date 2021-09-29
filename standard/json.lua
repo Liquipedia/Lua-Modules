@@ -20,7 +20,7 @@ function json.stringify(obj, pretty)
 end
 
 function json.parse(obj)
-	local parse = function(obj) return mw.text.jsonDecode(obj, mw.text.JSON_TRY_FIXING) end
+	local parse = function(object) return mw.text.jsonDecode(object, mw.text.JSON_TRY_FIXING) end
 	local status, res = pcall(parse, obj);
 	if status then
 		return res, false
@@ -28,7 +28,7 @@ function json.parse(obj)
 		mw.log('Error: could not parse Json:')
 		mw.logObject(obj)
 		return {}, true
-	end	
+	end
 end
 
 function json.parseIfString(obj)
