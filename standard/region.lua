@@ -14,6 +14,8 @@ local Lua = require('Module:Lua')
 local regionData = mw.loadData('Module:Region/Data')
 local countryToRegionData = Lua.loadDataIfExists('Module:Region/CountryData', {})
 
+local noEntryFoundCategory = '[[Category:Pages using unsupported region values]]'
+
 function Region.run(args)
 	args = args or {}
 	local region = args.region
@@ -33,10 +35,10 @@ function Region.run(args)
 	region = string.lower(region)
 	region = regionData.aliases[region] or region
 
-	local regionValues = regionData[region] or {}
+	local regionValues = regionData[region] or {region = args.region .. noEntryFoundCategory}
 	if shouldOnlyReturnRegionName then
-		return regionValues.region or ''
-	elseif regionValues ~= {} then
+		return regionValues.region
+	else
 		local display = ''
 		if regionValues.flag then
 			display = Flag._Flag(regionValues.flag)
