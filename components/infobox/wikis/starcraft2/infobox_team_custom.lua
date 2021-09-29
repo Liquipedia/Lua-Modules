@@ -114,8 +114,8 @@ function CustomInjector:parse(id, widgets)
 			})
 			index = index + 1
 		end
+	elseif id == 'history' then return {}
 	end
-	elseif id == 'history' then return {} end
 	return widgets
 end
 
