@@ -8,10 +8,10 @@
 
 local json = {}
 
-local getArgs = require('Module:Arguments').getArgs
+local Arguments = require('Module:Arguments')
 
 function json.fromArgs(frame)
-	local args = getArgs(frame)
+	local args = Arguments.getArgs(frame)
 	return json.stringify(args)
 end
 
