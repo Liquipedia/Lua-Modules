@@ -2,6 +2,9 @@
 
 <!--
  Explain the **motivation** for making this change. What problems are you solving with this pull request? How are you improving the current situation?
+
+ Please also consider the diff size. If you have changed more than 100 lines, chances are your pull request will be almost impossible to review. Are there any ways to
+ split up your pull request further? Does the collection of changes semantically make sense?
 -->
 
 ## How did you test this change?
