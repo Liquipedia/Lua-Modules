@@ -9,6 +9,7 @@
 local Team = require('Module:Infobox/Team')
 local Earnings = require('Module:Earnings')
 local Variables = require('Module:Variables')
+local Flags = require('Module:Flags')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
