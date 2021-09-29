@@ -66,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Requirements', content = {CustomBuilding:_convertToList(_args.requires)}},
+			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(_args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
@@ -74,14 +74,14 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = {CustomBuilding:_convertToList(_args.builds)}},
-			Cell{name = 'Morphs into', content = {CustomBuilding:_convertToList(_args.morphs)}},
-			Cell{name = '[[Add-on]]s', content = {CustomBuilding:_convertToList(_args.addons)}},
+			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(_args.builds)}},
+			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(_args.morphs)}},
+			Cell{name = '[[Add-on]]s', content = {String.convertWikiListToHtmlList(_args.addons)}},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocked Tech', content = {CustomBuilding:_convertToList(_args.unlocks)}},
-			Cell{name = 'Upgrades available', content = {CustomBuilding:_convertToList(_args.upgrades)}},
+			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(_args.unlocks)}},
+			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(_args.upgrades)}},
 		}
 	elseif id == 'defense' then
 		return {
@@ -104,19 +104,6 @@ end
 
 function CustomBuilding:createWidgetInjector()
 	return CustomInjector()
-end
-
-function CustomBuilding:_convertToList(strg)
-	if String.isEmpty(strg) then
-		return nil
-	end
-	strg = strg:gsub('*', '', 1)
-	local strgArray = mw.text.split(strg, '*')
-	local list = mw.html.create('ul')
-	for _, item in ipairs(strgArray) do
-		list:tag('li'):wikitext(item)
-	end
-	return tostring(list)
 end
 
 function CustomBuilding:_defenseDisplay()
