@@ -6,14 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----
--- @author Vogan for Liquipedia
---
 local Class = require('Module:Class')
 
-local p = {}
+local ReferenceCleaner = {}
 
-function p.clean(dateWithRef)
+function ReferenceCleaner.clean(dateWithRef)
 	if dateWithRef == nil then
 		return ''
 	end
@@ -28,7 +25,7 @@ function p.clean(dateWithRef)
 	return ''
 end
 
-function p.cleanNumber(numberWithRef)
+function ReferenceCleaner.cleanNumber(numberWithRef)
 	if numberWithRef == nil then
 		return ''
 	end
@@ -41,4 +38,4 @@ function p.cleanNumber(numberWithRef)
 	return ''
 end
 
-return Class.export(p, {frameOnly = true})
+return Class.export(ReferenceCleaner, {frameOnly = true})
