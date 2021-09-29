@@ -54,10 +54,15 @@ function Team:createInfobox()
 				self:_createLocation(args.location2)
 			}
 		},
-		Cell{
-			name = 'Region',
-			content = {
-				self:_createRegion(args.region)
+		Customizable{
+			id = 'region',
+			children = {
+				Cell{
+					name = 'Region',
+					content = {
+						self:_createRegion(args.region)
+					}
+				},
 			}
 		},
 		Cell{name = 'Coaches', content = {args.coaches}},
