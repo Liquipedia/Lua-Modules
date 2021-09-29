@@ -115,6 +115,7 @@ function CustomInjector:parse(id, widgets)
 			index = index + 1
 		end
 	end
+	elseif id == 'history' then return {} end
 	return widgets
 end
 
@@ -132,6 +133,7 @@ end
 
 function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.earnings = _earnings or 0
+	lpdbData.region = nil
 	return lpdbData
 end
 
