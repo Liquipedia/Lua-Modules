@@ -67,7 +67,7 @@ function Team:_createRegion(region, location)
 	if type(region) == 'table' then
 		_region = region.region
 		return region.display
-	end	
+	end
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
@@ -84,7 +84,7 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		local earningsInYear = Template.safeExpand(mw.getCurrentFrame(), 'Total earnings of', {year = year, id})
 		lpdbData.extradata['earningsin' .. year] = (earningsInYear or ''):gsub(',', ''):gsub('$', '')
 	end
-	
+
 	lpdbData.location = CustomTeam:_getStandardLocationValue(_team.args.location)
 	lpdbData.location2 = CustomTeam:_getStandardLocationValue(_team.args.location2)
 	lpdbData.region = _region
