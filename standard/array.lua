@@ -93,7 +93,7 @@ function Array.flatten(tbl)
 	local out_tbl = {}
 	for _, x in ipairs(tbl) do
 		if type(x) == 'table' then
-			for i, y in ipairs(x) do
+			for _, y in ipairs(x) do
 				table.insert(out_tbl, y)
 			end
 		else
