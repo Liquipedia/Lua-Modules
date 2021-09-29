@@ -505,8 +505,8 @@ local data = {
 		name = 'Saint Kitts and Nevis',
 		flag = 'File:kn_hd.png'
 	},
-	["northkorea"] = {
-		name = "North Korea",
+	['northkorea'] = {
+		name = 'North Korea',
 		flag = 'File:kp_hd.png'
 	},
 	['southkorea'] = {
@@ -525,8 +525,8 @@ local data = {
 		name = 'Kazakhstan',
 		flag = 'File:kz_hd.png'
 	},
-	["laos"] = {
-		name = "Laos",
+	['laos'] = {
+		name = 'Laos',
 		flag = 'File:la_hd.png'
 	},
 	['lebanon'] = {
@@ -1034,114 +1034,114 @@ local data = {
 
 	-- ISO 3166-1 alpha-2 Exceptional Reservations
 	['europeanunion'] = {
-		name = "Europe",
-		flag = "File:eu_hd.png"
+		name = 'Europe',
+		flag = 'File:eu_hd.png'
 	},
 	['unitednations'] = {
-		name = "United Nations",
-		flag = "File:un_hd.png"
+		name = 'United Nations',
+		flag = 'File:un_hd.png'
 	},
 	['ussr'] = {
-		name = "USSR",
-		flag = "File:ussr_hd.png"
+		name = 'USSR',
+		flag = 'File:ussr_hd.png'
 	},
 
 	-- ISO 3166-1 alpha-2 Traditional Reservations
 	['yugoslavia'] = {
-		name = "Yugoslavia",
-		flag = "File:yu_hd.png"
+		name = 'Yugoslavia',
+		flag = 'File:yu_hd.png'
 	},
 
 	-- ISO 3166-2:GB
 	['england'] = {
-		name = "England",
-		flag = "File:gb-eng hd.png"
+		name = 'England',
+		flag = 'File:gb-eng hd.png'
 	},
 	['northernireland'] = {
-		name = "Northern Ireland",
-		flag = "File:gb-nir hd.png"
+		name = 'Northern Ireland',
+		flag = 'File:gb-nir hd.png'
 	},
 	['scotland'] = {
-		name = "Scotland",
-		flag = "File:gb-sct hd.png"
+		name = 'Scotland',
+		flag = 'File:gb-sct hd.png'
 	},
 	['wales'] = {
-		name = "Wales",
-		flag = "File:gb-wls hd.png"
+		name = 'Wales',
+		flag = 'File:gb-wls hd.png'
 	},
 
 	-- Other
 	['africa'] = {
-		name = "Africa",
-		flag = "File:african union hd.png"
+		name = 'Africa',
+		flag = 'File:african union hd.png'
 	},
 	['americas'] = {
-		name = "Americas",
-		flag = "File:UsCa hd.png"
+		name = 'Americas',
+		flag = 'File:UsCa hd.png'
 	},
 	['asia'] = {
-		name = "Asia",
-		flag = "File:Asia flag hd.png"
+		name = 'Asia',
+		flag = 'File:Asia flag hd.png'
 	},
 	['benelux'] = {
-		name = "Benelux",
-		flag = "File:benelux hd.png"
+		name = 'Benelux',
+		flag = 'File:benelux hd.png'
 	},
 	['centralamerica'] = {
-		name = "Central America",
-		flag = "File:cais flag hd.png"
+		name = 'Central America',
+		flag = 'File:cais flag hd.png'
 	},
 	['commonwealthofindependentstates'] = {
-		name = "CIS",
-		flag = "File:Cis hd.png"
+		name = 'CIS',
+		flag = 'File:Cis hd.png'
 	},
 	['eastasia'] = {
-		name = "East Asia",
-		flag = "File:East asia flag hd.png"
+		name = 'East Asia',
+		flag = 'File:East asia flag hd.png'
 	},
 	['iberia'] = {
-		name = "Iberia",
-		flag = "File:EsPt hd.png"
+		name = 'Iberia',
+		flag = 'File:EsPt hd.png'
 	},
 	['northamerica'] = {
-		name = "North America",
-		flag = "File:UsCa hd.png"
+		name = 'North America',
+		flag = 'File:UsCa hd.png'
 	},
 	['middleeast'] = {
-		name = "Middle East",
-		flag = "File:Middle east flag hd.png"
+		name = 'Middle East',
+		flag = 'File:Middle east flag hd.png'
 	},
 	['nordiccountries'] = {
-		name = "Nordic Countries",
-		flag = "File:Nordic hd.png"
+		name = 'Nordic Countries',
+		flag = 'File:Nordic hd.png'
 	},
 	['northafrica'] = {
-		name = "North Africa",
-		flag = "File:Space filler flag.png"
+		name = 'North Africa',
+		flag = 'File:Space filler flag.png'
 	},
 	['oceania'] = {
-		name = "Oceania",
-		flag = "File:anz hd.png"
+		name = 'Oceania',
+		flag = 'File:anz hd.png'
 	},
 	['southamerica'] = {
-		name = "South America",
-		flag = "File:Unasur hd.png"
+		name = 'South America',
+		flag = 'File:Unasur hd.png'
 	},
 	['southasia'] = {
-		name = "South Asia",
-		flag = "File:south asia flag hd.png"
+		name = 'South Asia',
+		flag = 'File:south asia flag hd.png'
 	},
 	['southeastasia'] = {
-		name = "Southeast Asia",
-		flag = "File:asean hd.png"
+		name = 'Southeast Asia',
+		flag = 'File:asean hd.png'
 	},
 	['world'] = {
-		name = "World",
-		flag = "File:World hd.png"
+		name = 'World',
+		flag = 'File:World hd.png'
 	},
 	['filler'] = {
-		name = "",
-		flag = "File:Space filler flag.png"
+		name = '',
+		flag = 'File:Space filler flag.png'
 	}
 }
 
@@ -1272,7 +1272,7 @@ local twoLetter = {
 	['ki'] = 'kiribati',
 	['km'] = 'comoros',
 	['kn'] = 'saintkittsandnevis',
-	['kp'] = "northkorea",
+	['kp'] = 'northkorea',
 	['kr'] = 'southkorea',
 	['kw'] = 'kuwait',
 	['ky'] = 'caymanislands',
@@ -1544,7 +1544,7 @@ local threeLetter = {
 	['kna'] = 'saintkittsandnevis',
 	['kor'] = 'southkorea',
 	['kwt'] = 'kuwait',
-	['lao'] = "laos",
+	['lao'] = 'laos',
 	['lbn'] = 'lebanon',
 	['lbr'] = 'liberia',
 	['lby'] = 'libya',
@@ -1601,7 +1601,7 @@ local threeLetter = {
 	['png'] = 'papuanewguinea',
 	['pol'] = 'poland',
 	['pri'] = 'puertorico',
-	['prk'] = "northkorea",
+	['prk'] = 'northkorea',
 	['prt'] = 'portugal',
 	['pry'] = 'paraguay',
 	['pse'] = 'palestine',
@@ -1682,8 +1682,8 @@ local threeLetter = {
 	['int'] = 'world',
 	['sam'] = 'southamerica',
 	['sca'] = 'scandinavia',
-	['sea'] = "southeastasia",
-	['uae'] = "unitedarabemirates",
+	['sea'] = 'southeastasia',
+	['uae'] = 'unitedarabemirates',
 
 	['tbd'] = 'filler',
 }
@@ -1700,7 +1700,7 @@ local aliases = {
 	-- Accents/special characters
 	['aland'] = 'ålandislands',
 	['Ålandislands'] = 'ålandislands',
-	['curacao'] = "curaçao",
+	['curacao'] = 'curaçao',
 	['ivorycoast'] = "côted'ivoire",
 
 	-- Other
