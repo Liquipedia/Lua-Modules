@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 				}
 			}
 		}
-	elseif id == 'region'
+	elseif id == 'region' then
 		return {
 			Cell{name = 'Region', content = {self:_createRegion(_team.args.region, _team.args.location)}}
 		}
