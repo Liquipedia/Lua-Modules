@@ -62,7 +62,7 @@ function Legacy.get(frame)
 
 	local newArgs = Legacy._convert(mapping)
 	newArgs.id = bracketid
-	newArgs['1'] = templateid
+	newArgs[1] = templateid
 
 	newArgs.store = storage
 	newArgs.noDuplicateCheck = _args.noDuplicateCheck
