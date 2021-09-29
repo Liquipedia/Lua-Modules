@@ -26,6 +26,7 @@ function Region.run(args)
 	if String.isEmpty(region) then
 		local country = Flag._CountryName(args.country) or ''
 		region = countryToRegionData[string.lower(country)]
+		args.region = region
 		if String.isEmpty(region) then
 			return ''
 		end
