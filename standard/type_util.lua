@@ -11,11 +11,11 @@ local Table = require('Module:Table')
 
 local TypeUtil = {}
 
-TypeUtil.literal = function(value)
+function TypeUtil.literal (value)
 	return {op = 'literal', value = value}
 end
 
-TypeUtil.optional = function(typeSpec)
+function TypeUtil.optional (typeSpec)
 	if type(typeSpec) == 'string' then
 		return require('Module:StringUtils').endsWith(typeSpec, '?')
 			and typeSpec
@@ -25,17 +25,17 @@ TypeUtil.optional = function(typeSpec)
 	end
 end
 
-TypeUtil.union = function(...)
+function TypeUtil.union (...)
 	return {op = 'union', types = Array.copy(arg)}
 end
 
-TypeUtil.literalUnion = function(...)
+function TypeUtil.literalUnion (...)
 	return TypeUtil.union(unpack(
 		Array.map(arg, TypeUtil.literal)
 	))
 end
 
-TypeUtil.extendLiteralUnion = function(union, ...)
+function TypeUtil.extendLiteralUnion (union, ...)
 	return {
 		op = 'union',
 		types = Array.extend(union.types, Array.map(arg, TypeUtil.literal)),
@@ -46,21 +46,21 @@ end
 Non-strict structural type for tables. Tables may have additional entries not
 in the structural type.
 ]]
-TypeUtil.struct = function(struct)
+function TypeUtil.struct (struct)
 	return {op = 'struct', struct = struct}
 end
 
 --[[
 Adds additional fields to a structural type.
 ]]
-TypeUtil.extendStruct = function(type, struct)
+function TypeUtil.extendStruct (type, struct)
 	return {op = 'struct', struct = Table.merge(type.struct, struct)}
 end
 
 --[[
 Table type.
 ]]
-TypeUtil.table = function(keyType, valueType)
+function TypeUtil.table (keyType, valueType)
 	if keyType or valueType then
 		return {op = 'table', keyType = keyType or 'any', valueType = valueType or 'any'}
 	else
@@ -72,7 +72,7 @@ end
 Type for tables that are arrays. Not strict - arrays may have additional fields
 besides numeric indexes, and may have gaps in indexes.
 ]]
-TypeUtil.array = function(elemType)
+function TypeUtil.array (elemType)
 	if elemType then
 		return {op = 'array', elemType = elemType}
 	else
@@ -84,7 +84,7 @@ end
 Whether a value satisfies a type, ignoring table contents. Table contents are
 checked in TypeUtil.getTypeErrors.
 ]]
-TypeUtil.valueIsTypeNoTable = function(value, typeSpec)
+function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 	if type(typeSpec) == 'string' then
 		if typeSpec == 'string'
 			or typeSpec == 'number'
@@ -117,7 +117,7 @@ TypeUtil.valueIsTypeNoTable = function(value, typeSpec)
 	return true
 end
 
-TypeUtil._getTypeErrors = function(value, typeSpec, nameParts, options, getTypeErrors)
+function TypeUtil._getTypeErrors (value, typeSpec, nameParts, options, getTypeErrors)
 	if not TypeUtil.valueIsTypeNoTable(value, typeSpec) then
 		return {
 			{value = value, type = typeSpec, where = nameParts}
@@ -171,7 +171,7 @@ TypeUtil._getTypeErrors = function(value, typeSpec, nameParts, options, getTypeE
 	return {}
 end
 
-TypeUtil.getTypeErrors = function(value, typeSpec, options_)
+function TypeUtil.getTypeErrors (value, typeSpec, options_)
 	options_ = options_ or {}
 	local options = {
 		maxDepth = options_.maxDepth or math.huge,
@@ -196,7 +196,7 @@ TypeUtil.getTypeErrors = function(value, typeSpec, options_)
 end
 
 -- Checks, at runtime, whether a value satisfies a type.
-TypeUtil.checkValue = function(value, typeSpec, options)
+function TypeUtil.checkValue (value, typeSpec, options)
 	return Array.map(
 		TypeUtil.getTypeErrors(value, typeSpec, options),
 		TypeUtil.typeErrorToString
@@ -204,14 +204,14 @@ TypeUtil.checkValue = function(value, typeSpec, options)
 end
 
 -- Checks, at runtime, whether a value satisfies a type, and throws if not.
-TypeUtil.assertValue = function(value, typeSpec, options)
+function TypeUtil.assertValue (value, typeSpec, options)
 	local errors = TypeUtil.checkValue(value, typeSpec, options)
 	if #errors > 0 then
 		error(array.concat(errors, '\n'))
 	end
 end
 
-TypeUtil.typeErrorToString = function(typeError)
+function TypeUtil.typeErrorToString (typeError)
 	local whereDescription = TypeUtil.whereToDescription(typeError.where)
 	return 'Unexpected value'
 		.. (whereDescription and ' in ' .. whereDescription or '')
@@ -221,7 +221,7 @@ TypeUtil.typeErrorToString = function(typeError)
 		.. TypeUtil.typeToDescription(typeError.type)
 end
 
-TypeUtil.whereToDescription = function(nameParts)
+function TypeUtil.whereToDescription (nameParts)
 	local s
 	for _, namePart in ipairs(nameParts) do
 		if namePart.type == 'base' then
@@ -241,7 +241,7 @@ TypeUtil.whereToDescription = function(nameParts)
 	return s
 end
 
-TypeUtil.reprValue = function(value)
+function TypeUtil.reprValue (value)
 	if type(value) == 'string' then
 		return '\'' .. TypeUtil.escapeSingleQuote(value) .. '\''
 	else
@@ -249,7 +249,7 @@ TypeUtil.reprValue = function(value)
 	end
 end
 
-TypeUtil.typeToDescription = function(typeSpec)
+function TypeUtil.typeToDescription (typeSpec)
 	if type(typeSpec) == 'string' then
 		return typeSpec
 	elseif type(typeSpec) == 'table' then
@@ -271,7 +271,7 @@ TypeUtil.typeToDescription = function(typeSpec)
 	end
 end
 
-TypeUtil.escapeSingleQuote = function(str)
+function TypeUtil.escapeSingleQuote(str)
 	return str:gsub('\'', '\\\'')
 end
 
