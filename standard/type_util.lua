@@ -211,7 +211,7 @@ end
 function TypeUtil.assertValue (value, typeSpec, options)
 	local errors = TypeUtil.checkValue(value, typeSpec, options)
 	if #errors > 0 then
-		error(array.concat(errors, '\n'))
+		error(table.concat(errors, '\n'))
 	end
 end
 
