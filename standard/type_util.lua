@@ -108,7 +108,7 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 		elseif typeSpec.op == 'union' then
 			return Array.any(
 				typeSpec.types,
-				function(typeSpec) return TypeUtil.valueIsTypeNoTable(value, typeSpec) end
+				function(t) return TypeUtil.valueIsTypeNoTable(value, t) end
 			)
 		elseif typeSpec.op == 'table' or typeSpec.op == 'struct' or typeSpec.op == 'array' then
 			return type(value) == 'table'
