@@ -117,6 +117,7 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 	return true
 end
 
+-- TODO: Provide documentation for these params
 function TypeUtil._getTypeErrors (value, typeSpec, nameParts, options, getTypeErrors)
 	if not TypeUtil.valueIsTypeNoTable(value, typeSpec) then
 		return {
@@ -171,38 +172,26 @@ function TypeUtil._getTypeErrors (value, typeSpec, nameParts, options, getTypeEr
 	return {}
 end
 
--- Convenience wrapper for recursion
--- TODO: Clean this up, this function should not be needed
-function TypeUtil._getTypeErrorsRecursive(options, value, typeSpec, nameParts, depth)
+-- TODO: Provide documentation
+function TypeUtil.getTypeErrors (value, typeSpec, depth, maxDepth, nameParts)
 	return TypeUtil._getTypeErrors(
 		value,
 		typeSpec,
 		nameParts,
-		{recurseOnTable = depth < options.maxDepth},
+		{recurseOnTable = depth < maxDepth},
 		function(v, t, namePart)
-			return TypeUtil._getTypeErrorsRecursive(options, v, t, Array.append(nameParts, namePart), depth + 1)
+			return TypeUtil.getTypeErrors(v, t, Array.append(nameParts, namePart), depth + 1)
 		end
 	)
 end
 
--- This is the root level of this function
-function TypeUtil.getTypeErrors (value, typeSpec, options_)
-	options_ = options_ or {}
-	local options = {
-		maxDepth = options_.maxDepth or math.huge,
-		name = options_.name,
-	}
-
+-- Checks, at runtime, whether a value satisfies a type.
+function TypeUtil.checkValue (value, typeSpec, options)
 	local nameParts = {
 		options.name and {type = 'base', name = options.name} or nil
 	}
-	return TypeUtil._getTypeErrorsRecursive(options, value, typeSpec, nameParts, 0)
-end
-
--- Checks, at runtime, whether a value satisfies a type.
-function TypeUtil.checkValue (value, typeSpec, options)
 	return Array.map(
-		TypeUtil.getTypeErrors(value, typeSpec, options),
+		TypeUtil.getTypeErrors(value, typeSpec, 0, options.maxDepth or math.huge, nameParts),
 		TypeUtil.typeErrorToString
 	)
 end
