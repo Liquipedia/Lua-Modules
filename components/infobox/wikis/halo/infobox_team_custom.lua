@@ -56,13 +56,13 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'region' then
 		return {
-			Cell{name = 'Region', content = {self:_createRegion(_team.args.region, _team.args.location)}}
+			Cell{name = 'Region', content = {CustomTeam:_createRegion(_team.args.region, _team.args.location)}}
 		}
 	end
 	return widgets
 end
 
-function Team:_createRegion(region, location)
+function CustomTeam:_createRegion(region, location)
 	region = Region.run({region = region, country = CustomTeam:_getStandardLocationValue(location)})
 	if type(region) == 'table' then
 		_region = region.region
