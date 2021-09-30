@@ -108,7 +108,7 @@ TypeUtil.valueIsTypeNoTable = function(value, typeSpec)
 		elseif typeSpec.op == 'union' then
 			return Array.any(
 				typeSpec.types,
-				function(typeSpec) return TypeUtil.valueIsTypeNoTable(value, typeSpec) end
+				function(typeSpec_) return TypeUtil.valueIsTypeNoTable(value, typeSpec_) end
 			)
 		elseif typeSpec.op == 'table' or typeSpec.op == 'struct' or typeSpec.op == 'array' then
 			return type(value) == 'table'
@@ -177,7 +177,7 @@ TypeUtil.getTypeErrors = function(value, typeSpec, options_)
 		maxDepth = options_.maxDepth or math.huge,
 		name = options_.name,
 	}
-	function getTypeErrors(value, typeSpec, nameParts, depth)
+	local function getTypeErrors(value, typeSpec, nameParts, depth)
 		return TypeUtil._getTypeErrors(
 			value,
 			typeSpec,
@@ -207,7 +207,7 @@ end
 TypeUtil.assertValue = function(value, typeSpec, options)
 	local errors = TypeUtil.checkValue(value, typeSpec, options)
 	if #errors > 0 then
-		error(array.concat(errors, '\n'))
+		error(table.concat(errors, '\n'))
 	end
 end
 
