@@ -6,12 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----
--- @author Vogan for Liquipedia
---
--- A number of these functions take inspiration from Penlight: https://github.com/lunarmodules/Penlight
---
-
 local Class = require('Module:Class')
 
 local Variables = {}
@@ -36,7 +30,7 @@ function Variables.varDefaultMulti(...)
 		end
 	end
 
-	--if even the last var didn't bring anything return the last argument
+	-- If even the last var didn't bring anything return the last argument
 	return varargs[varargs.n]
 end
 
