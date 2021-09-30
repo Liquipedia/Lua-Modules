@@ -119,7 +119,7 @@ alpha3 - returns the lowercase ISO 3166-1 alpha-3 flag code
 
 default is alpha2
 ]]--
-function Flags.countryCode(flagName, format)
+function Flags.CountryCode(flagName, format)
 	if String.isEmpty(flagName) then
 		return ''
 	end
