@@ -16,6 +16,14 @@ local Class = require('Module:Class')
 
 local Flags = {}
 
+--Legacy Entry points .. to be removed after switching them
+function Flags.Flag(flagName)
+	return tostring(Flags.Icon(flagName)) .. '[[Category:Pages using old Flags entry points]]'
+end
+function Flags.FlagNoLink(flagName)
+	return tostring(Flags.Icon({flag = flagName, noLink = true})) .. '[[Category:Pages using old Flags entry points]]'
+end
+
 -- Returns a flag
 --[[
 supported args are:
