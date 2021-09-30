@@ -1,5 +1,6 @@
 std = {
 	read_globals = {
+		"arg",
 		"assert",
 		"debug",
 		"error",

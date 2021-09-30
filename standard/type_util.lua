@@ -26,19 +26,19 @@ TypeUtil.optional = function(typeSpec)
 end
 
 TypeUtil.union = function(...)
-	return {op = 'union', types = Array.copy(...)}
+	return {op = 'union', types = Array.copy(arg)}
 end
 
 TypeUtil.literalUnion = function(...)
 	return TypeUtil.union(unpack(
-		Array.map(..., TypeUtil.literal)
+		Array.map(arg, TypeUtil.literal)
 	))
 end
 
 TypeUtil.extendLiteralUnion = function(union, ...)
 	return {
 		op = 'union',
-		types = Array.extend(union.types, Array.map(..., TypeUtil.literal)),
+		types = Array.extend(union.types, Array.map(arg, TypeUtil.literal)),
 	}
 end
 
@@ -108,7 +108,7 @@ TypeUtil.valueIsTypeNoTable = function(value, typeSpec)
 		elseif typeSpec.op == 'union' then
 			return Array.any(
 				typeSpec.types,
-				function(typeSpec_) return TypeUtil.valueIsTypeNoTable(value, typeSpec_) end
+				function(typeSpec) return TypeUtil.valueIsTypeNoTable(value, typeSpec) end
 			)
 		elseif typeSpec.op == 'table' or typeSpec.op == 'struct' or typeSpec.op == 'array' then
 			return type(value) == 'table'
@@ -177,8 +177,7 @@ TypeUtil.getTypeErrors = function(value, typeSpec, options_)
 		maxDepth = options_.maxDepth or math.huge,
 		name = options_.name,
 	}
-	-- luacheck: ignore
-	local function getTypeErrors(value, typeSpec, nameParts, depth)
+	function getTypeErrors(value, typeSpec, nameParts, depth)
 		return TypeUtil._getTypeErrors(
 			value,
 			typeSpec,
@@ -208,7 +207,7 @@ end
 TypeUtil.assertValue = function(value, typeSpec, options)
 	local errors = TypeUtil.checkValue(value, typeSpec, options)
 	if #errors > 0 then
-		error(table.concat(errors, '\n'))
+		error(array.concat(errors, '\n'))
 	end
 end
 
