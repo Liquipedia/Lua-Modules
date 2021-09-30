@@ -12,33 +12,9 @@ local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local FnUtil = require('Module:FnUtil')
+local Class = require('Module:Class')
 
 local Flags = {}
-
--- Template functions (legacy)
-function Flags.Flag(frame)
-	return Flags._Flag(frame.args[1])
-end
-function Flags.FlagNoLink(frame)
-	return Flags._FlagNoLink(frame.args[1])
-end
-
---legacy functions
-function Flags._Flag(name)
-	return Flags.Icon(name)
-end
-function Flags._FlagNoLink(name)
-	return Flags.Icon({flag = name, noLink = true})
-end
-function Flags._CountryName(name)
-	return Flags.CountryName(name)
-end
-function Flags.flag(name)
-	return Flags.Icon(name)
-end
-function Flags.flagNoLink(name)
-	return Flags.Icon({flag = name, noLink = true})
-end
 
 -- Returns a flag
 --[[
@@ -87,16 +63,7 @@ function Flags.Icon(args, flagName)
 end
 
 -- Converts a country name, flag code, or alias to a standardized country name
--- AFTER THE SWITCH TO USING 'Module:Class' switch the following 7 lines to
--->>	function Flags.CountryName(flagName)
-function Flags.CountryName(frame)
-	local flagName
-	if type(frame) ~= 'string' then
-		flagName = frame.args[1]
-	else
-		flagName = frame
-	end
-
+function Flags.CountryName(flagName)
 	if String.isEmpty(flagName) then
 		return ''
 	end
@@ -168,4 +135,4 @@ function Flags._convertToKey(flagName)
 		or (MasterData.data[flagName] and flagName)
 end
 
-return Flags
+return Class.export(Flags)
