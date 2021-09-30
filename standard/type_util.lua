@@ -171,28 +171,32 @@ function TypeUtil._getTypeErrors (value, typeSpec, nameParts, options, getTypeEr
 	return {}
 end
 
+-- Convenience wrapper for recursion
+-- TODO: Clean this up, this function should not be needed
+function TypeUtil._getTypeErrorsRecursive(options, value, typeSpec, nameParts, depth)
+	return TypeUtil._getTypeErrors(
+		value,
+		typeSpec,
+		nameParts,
+		{recurseOnTable = depth < options.maxDepth},
+		function(v, t, namePart)
+			return TypeUtil._getTypeErrorsRecursive(options, v, t, Array.append(nameParts, namePart), depth + 1)
+		end
+	)
+end
+
+-- This is the root level of this function
 function TypeUtil.getTypeErrors (value, typeSpec, options_)
 	options_ = options_ or {}
 	local options = {
 		maxDepth = options_.maxDepth or math.huge,
 		name = options_.name,
 	}
-	function getTypeErrors(value, typeSpec, nameParts, depth)
-		return TypeUtil._getTypeErrors(
-			value,
-			typeSpec,
-			nameParts,
-			{recurseOnTable = depth < options.maxDepth},
-			function(value, typeSpec, namePart)
-				return getTypeErrors(value, typeSpec, Array.append(nameParts, namePart), depth + 1)
-			end
-		)
-	end
 
 	local nameParts = {
 		options.name and {type = 'base', name = options.name} or nil
 	}
-	return getTypeErrors(value, typeSpec, nameParts, 0)
+	return TypeUtil._getTypeErrorsRecursive(options, value, typeSpec, nameParts, 0)
 end
 
 -- Checks, at runtime, whether a value satisfies a type.
