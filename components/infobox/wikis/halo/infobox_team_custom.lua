@@ -9,16 +9,20 @@
 local Team = require('Module:Infobox/Team')
 local Earnings = require('Module:Earnings')
 local Variables = require('Module:Variables')
+local Flags = require('Module:Flags')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
+local Region = require('Module:Region')
 
 local CustomTeam = Class.new()
 
 local _CURRENT_YEAR = os.date('%Y')
 local _START_YEAR = 2015
+
+local _region
 
 local CustomInjector = Class.new(Injector)
 local Language = mw.language.new('en')
@@ -50,8 +54,20 @@ function CustomInjector:parse(id, widgets)
 				}
 			}
 		}
+	elseif id == 'region' then
+		return {
+			Cell{name = 'Region', content = {self:_createRegion(_team.args.region, _team.args.location)}}
+		}
 	end
 	return widgets
+end
+
+function Team:_createRegion(region, location)
+	region = Region.run({region = region, country = CustomTeam:_getStandardLocationValue(location)})
+	if type(region) == 'table' then
+		_region = region.region
+		return region.display
+	end
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
@@ -69,7 +85,15 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.extradata['earningsin' .. year] = (earningsInYear or ''):gsub(',', ''):gsub('$', '')
 	end
 
+	lpdbData.location = CustomTeam:_getStandardLocationValue(_team.args.location)
+	lpdbData.location2 = CustomTeam:_getStandardLocationValue(_team.args.location2)
+	lpdbData.region = _region
+
 	return lpdbData
+end
+
+function CustomTeam:_getStandardLocationValue(location)
+	return Flags.countryName(location) or location
 end
 
 function CustomTeam:createWidgetInjector()
