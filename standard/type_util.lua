@@ -180,18 +180,22 @@ function TypeUtil.getTypeErrors (value, typeSpec, depth, maxDepth, nameParts)
 		nameParts,
 		{recurseOnTable = depth < maxDepth},
 		function(v, t, namePart)
-			return TypeUtil.getTypeErrors(v, t, Array.append(nameParts, namePart), depth + 1)
+			return TypeUtil.getTypeErrors(v, t, depth + 1, maxDepth, Array.append(nameParts, namePart))
 		end
 	)
 end
 
 -- Checks, at runtime, whether a value satisfies a type.
 function TypeUtil.checkValue (value, typeSpec, options)
+	options = options or {}
 	local nameParts = {
 		options.name and {type = 'base', name = options.name} or nil
 	}
+
+	local maxDepth = options.maxDepth or math.huge
+
 	return Array.map(
-		TypeUtil.getTypeErrors(value, typeSpec, 0, options.maxDepth or math.huge, nameParts),
+		TypeUtil.getTypeErrors(value, typeSpec, 0, maxDepth, nameParts),
 		TypeUtil.typeErrorToString
 	)
 end
