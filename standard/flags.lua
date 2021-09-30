@@ -149,7 +149,7 @@ end)
 --[[
 Converts a country name, flag code, or alias to a canonical key. The key is a
 lower case no-space representation of the country name, and is used for other
-functions in this module. Returns nil if the input is unrecognized. 
+functions in this module. Returns nil if the input is unrecognized.
 
 Examples:
 Flags.readKey('tn') -- returns 'tunisia'
