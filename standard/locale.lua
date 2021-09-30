@@ -6,23 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----
--- @author Vogan
--- @author Rapture
---
-
 local Class = require('Module:Class')
 
 local Locale = {}
 
 function Locale.getISOCountry(country)
-
 	if country == nil or country == '' then
 		return ''
 	end
 
 	local data = mw.loadData('Module:Locale/data/countries')
-
 	local isoCountry = data[country:lower()]
 
 	if isoCountry ~= nil then
@@ -31,7 +24,6 @@ function Locale.getISOCountry(country)
 
 	mw.log('No country found in Module:Locale/data/countries: ' .. country)
 	return ''
-
 end
 
 function Locale.formatLocation(args)
