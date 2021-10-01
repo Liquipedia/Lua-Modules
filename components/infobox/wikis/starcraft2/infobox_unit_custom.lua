@@ -161,7 +161,7 @@ function CustomUnit:_getCostDisplay()
 		buildtime = ''
 	end
 
-	local supply = _args.supply
+	local supply = _args.supply or _args.psy or _args.control
 	if not String.isEmpty(supply) then
 		supply = '&nbsp;' .. (_ICON_SUPPLY[_race] or _ICON_SUPPLY['default']) .. '&nbsp;' .. supply
 	else
@@ -221,9 +221,12 @@ function CustomUnit:setLpdbData(args)
 end
 
 function CustomUnit:_getAttack(index)
+	local attackHeader = 'Attack ' .. index
+	if not String.isEmpty(_args['attack' .. index .. '_name']) then
+		attackHeader = attackHeader .. ': ' .. _args['attack' .. index .. '_name']
+	end
 	local widgets = {
-		Title{name = 'Attack ' .. index},
-		Cell{name = 'Name', content = {_args['attack' .. index .. '_name']}},
+		Title{name = attackHeader},
 		Cell{name = 'Targets', content = {_args['attack' .. index .. '_target']}},
 		Cell{name = 'Damage', content = {_args['attack' .. index .. '_damage']}},
 		Cell{name = '[[Damage Per Second|DPS]]', content = {_args['attack' .. index .. '_dps']}},
