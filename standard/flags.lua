@@ -43,7 +43,7 @@ end
 -- Returns a flag
 --[[
 supported args are:
-flag	- name, flag code, or alias of the Flag
+flag	- country name, flag code, or alias of the Flag
 noLink	- boolean that decides if the flag should link or not
 		--> set this to true for the flag to not link
 		--> else the flag will link to the according category
