@@ -166,9 +166,17 @@ function Legacy._convertParameters(match2)
 			player.extradata = json.parseIfString(player.extradata or '{}') or player.extradata
 			match.extradata.opponent2race = player.extradata.faction
 		elseif opponent1.type == 'team' then
-			match.opponent1 = Template.safeExpand(mw.getCurrentFrame(), 'TeamPage', {(opponent1.name or '') ~= '' and opponent1.name or 'TBD'})
+			match.opponent1 = Template.safeExpand(
+				mw.getCurrentFrame(),
+				'TeamPage',
+				{(opponent1.name or '') ~= '' and opponent1.name or 'TBD'}
+			)
 			match.opponent1score = (tonumber(opponent1.score or 0) or 0) >= 0 and opponent1.score or 0
-			match.opponent2 = Template.safeExpand(mw.getCurrentFrame(), 'TeamPage', {(opponent2.name or '') ~= '' and opponent2.name or 'TBD'})
+			match.opponent2 = Template.safeExpand(
+				mw.getCurrentFrame(),
+				'TeamPage',
+				{(opponent2.name or '') ~= '' and opponent2.name or 'TBD'}
+			)
 			match.opponent2score = (tonumber(opponent2.score or 0) or 0) >= 0 and opponent2.score or 0
 			match.mode = 'team'
 		else
