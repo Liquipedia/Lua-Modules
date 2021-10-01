@@ -161,7 +161,7 @@ function CustomUnit:_getCostDisplay()
 		buildtime = ''
 	end
 
-	local supply = _args.supply or args.psy or args.control
+	local supply = _args.supply or _args.psy or _args.control
 	if not String.isEmpty(supply) then
 		supply = '&nbsp;' .. (_ICON_SUPPLY[_race] or _ICON_SUPPLY['default']) .. '&nbsp;' .. supply
 	else
