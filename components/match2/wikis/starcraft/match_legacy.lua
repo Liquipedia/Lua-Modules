@@ -11,28 +11,29 @@
 ***** ADJUST THIS FOR BROODWAR WIKI!!! *****
 ]]--
 
-local p = {}
+local Legacy = {}
 
-local json = require("Module:Json")
-local String = require("Module:StringUtils")
-local Table = require("Module:Table")
+local json = require('Module:Json')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
 
-local MODES = { ["solo"] = "1v1", ["team"] = "team" }
+local _MODES = { ['solo'] = '1v1', ['team'] = 'team' }
 
-function p.storeMatch(match2)
-	local match, do_store = p.convertParameters(match2)
+function Legacy.storeMatch(match2)
+	local match, do_store = Legacy._convertParameters(match2)
 
 	if do_store then
-		match.games = p.storeGames(match, match2)
+		match.games = Legacy._storeGames(match, match2)
 
 		if (match2.match2opponents[1] or {}).type == 'team' then
-			p.storeTeamMatchSMW(match, match2)
+			Legacy._storeTeamMatchSMW(match, match2)
 		elseif (match2.match2opponents[1] or {}).type == 'solo' then
-			p.storeSoloMatchSMW(match, match2)
+			Legacy._storeSoloMatchSMW(match, match2)
 		end
 
 		return mw.ext.LiquipediaDB.lpdb_match(
-			"legacymatch_" .. match2.match2id,
+			'legacymatch_' .. match2.match2id,
 			match
 		)
 	else
@@ -40,12 +41,12 @@ function p.storeMatch(match2)
 	end
 end
 
-function p.storeGames(match, match2)
-	local games = ""
+function Legacy._storeGames(match, match2)
+	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 
-		if game.mode == "1v1" and game.extradata.isSubMatch == 'false' then
+		if game.mode == '1v1' and game.extradata.isSubMatch == 'false' then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
 			game.date = match.date
@@ -72,22 +73,19 @@ function p.storeGames(match, match2)
 
 			game.extradata = json.stringify(game.extradata)
 			local res = mw.ext.LiquipediaDB.lpdb_game(
-				"legacygame_" .. match2.match2id .. gameIndex,
+				'legacygame_' .. match2.match2id .. gameIndex,
 				game
 			)
 
-			p.storeSoloMapSMW(game, gameIndex, match.tournament or '', match2.match2id)
+			Legacy._storeSoloMapSMW(game, gameIndex, match.tournament or '', match2.match2id)
 
 			games = games .. res
-		elseif	game.mode == "1v1" then
+		elseif	game.mode == '1v1' then
 			local submatch = {}
 
 			submatch.opponent1 = game.extradata.opponent1
 			submatch.opponent2 = game.extradata.opponent2
-			mw.logObject(game.scores)
 			local scores = json.parseIfString(game.scores or '{}') or {}
-			mw.log(game.extradata.opponent1 .. ' vs ' .. game.extradata.opponent2)
-			mw.logObject(scores)
 			submatch.opponent1score = scores[1] or 0
 			submatch.opponent2score = scores[2] or 0
 			submatch.extradata = {}
@@ -125,7 +123,7 @@ function p.storeGames(match, match2)
 			submatch.extradata = json.stringify(submatch.extradata)
 
 			mw.ext.LiquipediaDB.lpdb_match(
-			"legacymatch_" .. match2.match2id .. gameIndex,
+			'legacymatch_' .. match2.match2id .. gameIndex,
 			submatch
 		)
 		end
@@ -133,11 +131,11 @@ function p.storeGames(match, match2)
 	return games
 end
 
-function p.convertParameters(match2)
+function Legacy._convertParameters(match2)
 	local do_store = true
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
-		if String.startsWith(key, "match2") then
+		if String.startsWith(key, 'match2') then
 			match[key] = nil
 		end
 	end
@@ -150,9 +148,9 @@ function p.convertParameters(match2)
 	local opponent2match2players = opponent2.match2players or {}
 
 	if opponent1.type == opponent2.type then
-		match.mode = MODES[opponent1.type]
+		match.mode = _MODES[opponent1.type]
 
-		if opponent1.type == "solo" then
+		if opponent1.type == 'solo' then
 			local player = opponent1match2players[1] or {}
 			match.opponent1 = player.name
 			match.opponent1score = (tonumber(opponent1.score or 0) or 0) >= 0 and opponent1.score or 0
@@ -167,10 +165,10 @@ function p.convertParameters(match2)
 			match.extradata.opponent2name = player.displayname
 			player.extradata = json.parseIfString(player.extradata or '{}') or player.extradata
 			match.extradata.opponent2race = player.extradata.faction
-		elseif opponent1.type == "team" then
-			match.opponent1 = p._expand_template('TeamPage', {(opponent1.name or '') ~= '' and opponent1.name or 'TBD'})
+		elseif opponent1.type == 'team' then
+			match.opponent1 = Template.safeExpand(mw.getCurrentFrame(), 'TeamPage', {(opponent1.name or '') ~= '' and opponent1.name or 'TBD'})
 			match.opponent1score = (tonumber(opponent1.score or 0) or 0) >= 0 and opponent1.score or 0
-			match.opponent2 = p._expand_template('TeamPage', {(opponent2.name or '') ~= '' and opponent2.name or 'TBD'})
+			match.opponent2 = Template.safeExpand(mw.getCurrentFrame(), 'TeamPage', {(opponent2.name or '') ~= '' and opponent2.name or 'TBD'})
 			match.opponent2score = (tonumber(opponent2.score or 0) or 0) >= 0 and opponent2.score or 0
 			match.mode = 'team'
 		else
@@ -191,7 +189,7 @@ function p.convertParameters(match2)
 	return match, do_store
 end
 
-function p.storeTeamMatchSMW(match, match2)
+function Legacy._storeTeamMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == 'string' then streams = json.parse(streams) end
 	local extradata = match.extradata or {}
@@ -232,7 +230,7 @@ function p.storeTeamMatchSMW(match, match2)
 	})
 end
 
-function p.storeSoloMatchSMW(match, match2)
+function Legacy._storeSoloMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == 'string' then streams = json.parse(streams) end
 	local extradata = match.extradata or {}
@@ -270,7 +268,7 @@ function p.storeSoloMatchSMW(match, match2)
 	})
 end
 
-function p.storeSoloMapSMW(game, gameIndex, tournament, id)
+function Legacy._storeSoloMapSMW(game, gameIndex, tournament, id)
 	game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 	local object = 'Map ' .. (game.opponent1 or 'TBD') .. ' vs ' .. (game.opponent2 or 'TBD') .. ' at ' ..
 		(game.date or '') .. 'in Match TBD Map ' .. gameIndex .. ' on ' .. (game.map or '')
@@ -288,10 +286,4 @@ function p.storeSoloMapSMW(game, gameIndex, tournament, id)
 	})
 end
 
-function p._expand_template(title, args)
-	local frame = mw.getCurrentFrame()
-	local r, text = pcall(frame.expandTemplate, frame, { title = title, args = args })
-	return (r and text or nil)
-end
-
-return p
+return Legacy
