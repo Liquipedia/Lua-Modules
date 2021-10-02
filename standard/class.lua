@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:
+-- page=Module:Class
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,11 +10,8 @@
 -- @author Vogan for Liquipedia
 --
 
----
--- @author Vogan for Liquipedia
---
+local Arguments = require('Module:Arguments')
 
-local getArgs = require('Module:Arguments').getArgs
 local Class = {}
 
 Class.PRIVATE_FUNCTION_SPECIFIER = '_'
@@ -84,7 +81,7 @@ function Class.export(class, options)
 		-- We only want to export functions, and only functions which are public (no underscore)
 		if (
 			type(f) == 'function' and
-			(not string.find(name, Class.PRIVATE_FUNCTION_SPECIFIER))
+				(not string.find(name, Class.PRIVATE_FUNCTION_SPECIFIER))
 		) then
 			class[name] = Class._wrapFunction(class[name], options)
 		end
@@ -92,55 +89,72 @@ function Class.export(class, options)
 	return class
 end
 
+local Table = {}
+
+-- Duplicate Table.isNotEmpty() here to avoid circular dependencies with Table
+function Table.isNotEmpty(tbl)
+	-- luacheck: push ignore (Loop can be executed at most once)
+	for _ in pairs(tbl) do
+		return true
+	end
+	-- luacheck: pop
+	return false
+end
+
 ---
 -- Wrap the given function with an argument parses so that both wikicode and lua
 -- arguments are accepted
 --
 function Class._wrapFunction(f, options)
+	local alwaysRewriteArgs = options.trim
+		or options.removeBlanks
+		or options.valueFunc ~= nil
+
 	return function(...)
 		-- We cannot call getArgs with a spread operator when these are just lua
 		-- args, so we need to wrap it
 		local input = {...}
 
-		local isFrame = #input == 1 and
-			type(input[1]) == 'table' and
-			type(input[1]['args']) == 'table'
+		local frame = input[1]
+		local shouldRewriteArgs = alwaysRewriteArgs
+			or (
+				#input == 1
+					and type(frame) == 'table'
+					and type(frame.args) == 'table'
+			)
 
-		if isFrame then
-			-- If this is a frame we just want to pass the spread operator
-			input = input[1]
-		end
-
-		local arguments = getArgs(input, options)
-
-		-- getArgs adds a metatable to the table. This breaks unpack. So we remove it.
-		-- We also add all named params to a special table, since unpack removes them.
-		local newArgs = {}
-		local namedArgs = {}
-		for key, value in pairs(arguments) do
-			if tonumber(key) ~= nil then
-				newArgs[key] = value
+		if shouldRewriteArgs then
+			local namedArgs, indexedArgs = Class._frameToArgs(frame, options)
+			if namedArgs then
+				return f(namedArgs, unpack(indexedArgs))
 			else
-				namedArgs[key] = value
+				return f(unpack(indexedArgs))
 			end
-		end
-
-		if Class._size(namedArgs) > 0 then
-			return f(namedArgs, unpack(newArgs))
 		else
-			return f(unpack(newArgs))
+			return f(...)
 		end
 	end
 end
 
--- We need to duplicate the Table.size() function here because the Table
--- module is dependent on this module
-function Class._size(tbl)
-	local i = 0
-	for _ in pairs(tbl) do
-		i = i + 1
+--[[
+Translates a frame object into arguments expected by a lua function.
+]]
+function Class._frameToArgs(frame, options)
+	local args = Arguments.getArgs(frame, options)
+
+	-- getArgs adds a metatable to the table. This breaks unpack. So we remove it.
+	-- We also add all named params to a special table, since unpack removes them.
+	local indexedArgs = {}
+	local namedArgs = {}
+	for key, value in pairs(args) do
+		if type(key) == 'number' then
+			indexedArgs[key] = value
+		else
+			namedArgs[key] = value
+		end
 	end
-	return i
+
+	return (Table.isNotEmpty(namedArgs) and namedArgs or nil), indexedArgs
 end
 
 return Class
