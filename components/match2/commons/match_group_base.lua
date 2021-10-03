@@ -100,17 +100,8 @@ function MatchGroupBase.saveMatchGroup(bracketId, matches, storeInLpdb)
 	end)
 
 	-- store match data as variable to bypass LPDB on the same page
-	Variables.varDefine('match2bracket_' .. bracketId, MatchGroupBase._convertDataForStorage(storedData))
+	Variables.varDefine('match2bracket_' .. bracketId, Json.stringify(storedData))
 	Variables.varDefine('match2bracketindex', Variables.varDefault('match2bracketindex', 0) + 1)
-end
-
-function MatchGroupBase._convertDataForStorage(data)
-	for _, match in ipairs(data) do
-		for _, game in ipairs(match.match2games) do
-			game.scores = Json.parse(game.scores)
-		end
-	end
-	return Json.stringify(data)
 end
 
 function MatchGroupBase.enableInstrumentation()

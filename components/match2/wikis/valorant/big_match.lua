@@ -10,7 +10,6 @@ local Arguments = require("Module:Arguments")
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DivTable = require('Module:DivTable')
-local Json = require('Module:Json')
 local Links = require('Module:Links')
 local Logic = require('Module:Logic')
 local Match = require("Module:Match")
@@ -63,7 +62,7 @@ function BigMatch:header(match, opponent1, opponent2, tournament)
 	local teamLeft = self:_createTeamContainer('left', opponent1.name, opponent1.score, false)
 	local teamRight = self:_createTeamContainer('right', opponent2.name, opponent2.score, false)
 
-	local stream = Json.parse(match.stream or '{}')
+	local stream = Table.copy(match.stream)
 	stream.date = mw.getContentLanguage():formatDate('r', match.date)
 	stream.finished = Logic.readBool(match.finished) and 'true' or ''
 	local divider = self:_createTeamSeparator(match.format, stream)
@@ -86,8 +85,8 @@ function BigMatch:overview(match)
 	while match['map' .. ind] ~= nil do
 		local map = match['map' .. ind]
 		local didLeftWin = map.winner == 1
-		local extradata = Json.parse(map.extradata or '')
-		local scores = Json.parse(map.scores or '')
+		local extradata = map.extradata
+		local scores = map.scores
 		local wasNotPlayed = map.resulttype == 'np'
 
 		boxLeft :row(
@@ -105,7 +104,7 @@ function BigMatch:overview(match)
 
 	local boxRight = DivTable.create():setStriped(true)
 
-	local stream = Json.parse(match.stream or "{}")
+	local stream = match.stream
 	local link = ''
 	for key, value in pairs(stream) do
 		link = link .. '[' .. Links.makeFullLink(key, value) .. ' <i class="lp-icon lp-' .. key .. '></i>] '
@@ -142,13 +141,13 @@ function BigMatch:stats(frame, match, playerLookUp, opponents)
 			break;
 		end
 
-		local extradata = Json.parse(map.extradata or {})
+		local extradata = map.extradata
 
 		tabs['name' .. ind] = 'Map ' .. ind
 
 		local container = mw.html.create('div'):addClass('fb-match-page-valorant-stats')
 
-		local participants = Json.parse(map.participants or '{}')
+		local participants = map.participants
 		if not Table.isEmpty(participants) then
 			for i = 1, 2 do
 				container:node(self:_createTeamStatsBanner(opponents[i].name, extradata['op1startside'], i == 1))

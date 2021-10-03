@@ -88,9 +88,6 @@ function TemplateMatch.storeVarsToLPDB()
 
 	-- store matches
 	for _, match in pairs(matches) do
-		-- bracketdata needs to be json encoded again
-		match.bracketdata = json.stringify(match.bracketdata)
-
 		Match.store(match, true)
 	end
 end

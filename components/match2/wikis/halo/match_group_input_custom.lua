@@ -31,8 +31,6 @@ local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(_, match)
-	match = Json.parseIfString(match)
-
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
@@ -49,9 +47,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(_, map)
-	map = Json.parseIfString(map)
-
-	-- process map
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -61,8 +56,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processOpponent(_, opponent)
-	opponent = Json.parseIfString(opponent)
-
 	-- check for empty opponent and convert to literal
 	if type(opponent) == 'table' and opponent.type == 'team' and Logic.isEmpty(opponent.template) then
 		opponent.name = ''
@@ -80,7 +73,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processPlayer(_, player)
-	player = Json.parseIfString(player)
 	return player
 end
 
@@ -237,7 +229,6 @@ function matchFunctions.getScoreFromMapWinners(match)
 		if String.isEmpty(match['opponent' .. index]) then
 			break
 		end
-		match['opponent' .. index] = Json.parseIfString(match['opponent' .. index])
 		opponentNumber = index
 	end
 	local newScores = {}
@@ -303,7 +294,7 @@ end
 
 function matchFunctions.getVodStuff(match)
 	match.stream = match.stream or {}
-	match.stream = Json.stringify{
+	match.stream = {
 		stream = Logic.emptyOr(match.stream.stream, Variables.varDefault('stream')),
 		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
 		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
@@ -319,7 +310,8 @@ function matchFunctions.getVodStuff(match)
 
 	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
 
-	local links = {}
+	match.links = {}
+	local links = match.links
 	if match.preview then links.preview = match.preview end
 	if match.siegegg then links.siegegg = 'https://siege.gg/matches/' .. match.siegegg end
 	if match.opl then links.opl = 'https://www.opleague.eu/match/' .. match.opl end
@@ -328,14 +320,12 @@ function matchFunctions.getVodStuff(match)
 	if match.lpl then links.lpl = 'https://letsplay.live/match/' .. match.lpl end
 	if match.r6esports then links.r6esports = 'https://www.r6esports.com.br/en/match/' .. match.r6esports end
 	if match.stats then links.stats = match.stats end
-	match.links = Json.stringify(links)
 
 	-- apply vodgames
 	for index = 1, MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]
 		if not Logic.isEmpty(vodgame) then
-			local map = Logic.emptyOr(match['map' .. index], nil, {})
-			map = Json.parseIfString(map)
+			local map = match['map' .. index] or {}
 			map.vod = map.vod or vodgame
 			match['map' .. index] = map
 		end
@@ -344,12 +334,12 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getExtraData(match)
-	match.extradata = Json.stringify{
+	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
 		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
-		mapveto = Json.stringify(matchFunctions.getMapVeto(match)),
-		mvp = Json.stringify(matchFunctions.getMVP(match)),
+		mapveto = matchFunctions.getMapVeto(match),
+		mvp = matchFunctions.getMVP(match),
 		isconverted = 0
 	}
 	return match
@@ -401,8 +391,6 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			opponent = Json.parseIfString(opponent)
-
 			--retrieve name and icon for teams from team templates
 			if opponent.type == 'team' and
 				not Logic.isEmpty(opponent.template, match.date) then
@@ -472,8 +460,7 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	local count = 1
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
-		local player = match['opponent' .. opponentIndex .. '_p' .. playerIndex] or {}
-		player = Json.parseIfString(player)
+		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
@@ -491,7 +478,7 @@ end
 
 -- Parse extradata information
 function mapFunctions.getExtraData(map)
-	map.extradata = Json.stringify{
+	map.extradata = {
 		comment = map.comment,
 	}
 	return map
