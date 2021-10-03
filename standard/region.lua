@@ -24,7 +24,7 @@ function Region.run(args)
 
 	--determine region from country if region is empty
 	if String.isEmpty(region) then
-		local country = Flag.countryName(args.country) or ''
+		local country = Flag.CountryName(args.country) or ''
 		region = countryToRegionData[string.lower(country)]
 		args.region = region
 		if String.isEmpty(region) then
@@ -42,7 +42,7 @@ function Region.run(args)
 	else
 		local display = ''
 		if regionValues.flag then
-			display = Flag.flag(regionValues.flag)
+			display = Flags.Icon({flag = regionValues.flag, shouldLink = true})
 			if display then
 				display = display .. '&nbsp;'
 			else
