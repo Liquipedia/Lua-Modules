@@ -98,6 +98,6 @@ end
 -- Note: require('Module:Flags').Icon automatically includes a span with class="flag"
 function PlayerDisplay.Flag(name)
 	return Flags.Icon({flag = name, shouldLink = false})
-end 
+end
 
 return Class.export(PlayerDisplay)
