@@ -32,8 +32,6 @@ local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(_, match)
-	match = Json.parseIfString(match)
-
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.removeUnsetMaps(match)
@@ -51,9 +49,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(_, map)
-	map = Json.parseIfString(map)
-
-	-- process map
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -63,8 +58,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processOpponent(_, opponent)
-	opponent = Json.parseIfString(opponent)
-
 	-- check for empty team and convert to literal
 	if type(opponent) == 'table' and opponent.type == 'team' and Logic.isEmpty(opponent.template) then
 		opponent.name = ''
@@ -82,7 +75,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processPlayer(_, player)
-	player = Json.parseIfString(player)
 	return player
 end
 
@@ -252,8 +244,8 @@ end
 -- 2) At least one map has a winner
 function matchFunctions.getScoreFromMapWinners(match)
 	-- For best of 1, display the results of the single map
-	local opponent1 = Json.parseIfString(match.opponent1)
-	local opponent2 = Json.parseIfString(match.opponent2)
+	local opponent1 = match.opponent1
+	local opponent2 = match.opponent2
 	local newScores = {}
 	local foundScores = false
 	if match.bestof == 1 then
@@ -324,7 +316,7 @@ end
 
 function matchFunctions.getVodStuff(match)
 	match.stream = match.stream or {}
-	match.stream = Json.stringify{
+	match.stream = {
 		stream = Logic.emptyOr(match.stream.stream, Variables.varDefault('stream')),
 		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
 		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
@@ -340,7 +332,8 @@ function matchFunctions.getVodStuff(match)
 
 	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
 
-	local links = {}
+	match.links = {}
+	local links = match.links
 	if match.preview then links.preview = match.preview end
 	if match.siegegg then links.siegegg = 'https://siege.gg/matches/' .. match.siegegg end
 	if match.opl then links.opl = 'https://www.opleague.eu/match/' .. match.opl end
@@ -349,14 +342,12 @@ function matchFunctions.getVodStuff(match)
 	if match.lpl then links.lpl = 'https://letsplay.live/match/' .. match.lpl end
 	if match.r6esports then links.r6esports = 'https://www.r6esports.com.br/en/match/' .. match.r6esports end
 	if match.stats then links.stats = match.stats end
-	match.links = Json.stringify(links)
 
 	-- apply vodgames
 	for index = 1, MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]
 		if not Logic.isEmpty(vodgame) then
-			local map = Logic.emptyOr(match['map' .. index], nil, {})
-			map = Json.parseIfString(map)
+			local map = match['map' .. index] or {}
 			map.vod = map.vod or vodgame
 			match['map' .. index] = map
 		end
@@ -365,12 +356,12 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getExtraData(match)
-	match.extradata = Json.stringify{
+	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
 		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
-		mapveto = Json.stringify(matchFunctions.getMapVeto(match)),
-		mvp = Json.stringify(matchFunctions.getMVP(match)),
+		mapveto = matchFunctions.getMapVeto(match),
+		mvp = matchFunctions.getMVP(match),
 		isconverted = 0
 	}
 	return match
@@ -430,7 +421,6 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			opponent = Json.parseIfString(opponent)
 
 			--retrieve name and icon for teams from team templates
 			if opponent.type == 'team' and
@@ -516,13 +506,13 @@ end
 
 -- Parse extradata information, particularally info about halfs and operator bans
 function mapFunctions.getExtraData(map)
-	map.extradata = Json.stringify{
+	map.extradata = {
 		comment = map.comment,
-		t1firstside = Json.stringify{map.t1firstside, ot = map.t1firstsideot},
-		t1halfs = Json.stringify{atk = map.t1atk, def = map.t1def, otatk = map.t1otatk, otdef = map.t1otdef},
-		t2halfs = Json.stringify{atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
-		t1bans = Json.stringify{map.t1ban1, map.t1ban2},
-		t2bans = Json.stringify{map.t2ban1, map.t2ban2},
+		t1firstside = {map.t1firstside, ot = map.t1firstsideot},
+		t1halfs = {atk = map.t1atk, def = map.t1def, otatk = map.t1otatk, otdef = map.t1otdef},
+		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
+		t1bans = {map.t1ban1, map.t1ban2},
+		t2bans = {map.t2ban1, map.t2ban2},
 		pick = map.pick
 	}
 	return map

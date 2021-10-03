@@ -82,7 +82,7 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 		-- RxDx
 		opponent1 = {
 		["type"] = "type",
-		["1"] = "R" .. round.R .. "D" .. round.D,
+		"R" .. round.R .. "D" .. round.D,
 		flag = "R" .. round.R .. "D" .. round.D .. "flag",
 		race = "R" .. round.R .. "D" .. round.D .. "race",
 		score = "R" .. round.R .. "D" .. round.D .. "score",
@@ -94,7 +94,7 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 		-- RxWx
 		opponent1 = {
 		["type"] = "type",
-		["1"] = "R" .. round.R .. "W" .. round.W,
+		"R" .. round.R .. "W" .. round.W,
 		flag = "R" .. round.R .. "W" .. round.W .. "flag",
 		race = "R" .. round.R .. "W" .. round.W .. "race",
 		score = "R" .. round.R .. "W" .. round.W .. "score" .. (reset and "2" or ""),
@@ -110,7 +110,7 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 		-- RxDx
 		opponent2 = {
 		["type"] = "type",
-		["1"] = "R" .. round.R .. "D" .. round.D,
+		"R" .. round.R .. "D" .. round.D,
 		flag = "R" .. round.R .. "D" .. round.D .. "flag",
 		race = "R" .. round.R .. "D" .. round.D .. "race",
 		score = "R" .. round.R .. "D" .. round.D .. "score",
@@ -122,7 +122,7 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 		-- RxWx
 		opponent2 = {
 		["type"] = "type",
-		["1"] = "R" .. round.R .. "W" .. round.W,
+		"R" .. round.R .. "W" .. round.W,
 		flag = "R" .. round.R .. "W" .. round.W .. "flag",
 		race = "R" .. round.R .. "W" .. round.W .. "race",
 		score = "R" .. round.R .. "W" .. round.W .. "score" .. (reset and "2" or ""),
@@ -132,8 +132,8 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 		round.W = round.W + 1
 	end
 
-	opponent1["$notEmpty$"] = opponent1["1"]
-	opponent2["$notEmpty$"] = opponent2["1"]
+	opponent1["$notEmpty$"] = opponent1[1]
+	opponent2["$notEmpty$"] = opponent2[1]
 
 	match = {
 		opponent1 = opponent1,
@@ -183,7 +183,7 @@ function p.matchMappingFromCustom(data)
 		['finished'] = data.opp1 .. 'win|' .. data.opp2 .. 'win',
 		['opponent1'] = {
 			['$notEmpty$'] = data.opp1,
-			['1'] = data.opp1,
+			data.opp1,
 			['flag'] = data.opp1 .. 'flag',
 			['race'] = data.opp1 .. 'race',
 			['score'] = data.opp1 .. 'score',
@@ -192,7 +192,7 @@ function p.matchMappingFromCustom(data)
 			},
 		['opponent2'] = {
 			['$notEmpty$'] = data.opp2,
-			['1'] = data.opp2,
+			data.opp2,
 			['flag'] = data.opp2 .. 'flag',
 			['race'] = data.opp2 .. 'race',
 			['score'] = data.opp2 .. 'score',

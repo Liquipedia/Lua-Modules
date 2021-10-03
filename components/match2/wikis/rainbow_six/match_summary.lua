@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
@@ -443,7 +442,7 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add Match MVP(s)
 	if match.extradata.mvp then
-		local mvpData = Json.parse(match.extradata.mvp)
+		local mvpData = match.extradata.mvp
 		if not Table.isEmpty(mvpData) and mvpData.players then
 			local mvp = MVP()
 			for _, player in ipairs(mvpData.players) do
@@ -458,7 +457,7 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add the Map Vetoes
 	if match.extradata.mapveto then
-		local vetoData = Json.parse(match.extradata.mapveto)
+		local vetoData = match.extradata.mapveto
 		if vetoData then
 			local mapVeto = MapVeto()
 
@@ -492,9 +491,9 @@ function CustomMatchSummary._createMap(game)
 	team1Score:setMapScore(game.scores[1])
 
 	-- Detailed scores
-	local team1Halfs = Json.parse(extradata.t1halfs) or {}
-	local team2Halfs = Json.parse(extradata.t2halfs) or {}
-	local firstSides = Json.parse(extradata.t1firstside) or {}
+	local team1Halfs = extradata.t1halfs or {}
+	local team2Halfs = extradata.t2halfs or {}
+	local firstSides = extradata.t1firstside or {}
 
 	local firstSide = (firstSides[1] or ''):lower()
 	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
@@ -528,7 +527,7 @@ function CustomMatchSummary._createMap(game)
 	team2Score:setMapScore(game.scores[2])
 
 	-- Operator bans
-	local operatorBans = {team1 = Json.parse(extradata.t1bans) or {}, team2 = Json.parse(extradata.t2bans) or {}}
+	local operatorBans = {team1 = extradata.t1bans or {}, team2 = extradata.t2bans or {}}
 	local team1OperatorBans = OperatorBans():setLeft()
 	local team2OperatorBans = OperatorBans():setRight()
 

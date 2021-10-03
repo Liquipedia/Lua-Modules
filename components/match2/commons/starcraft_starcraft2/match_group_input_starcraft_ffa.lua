@@ -6,16 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local json = require('Module:Json')
-local Variables = require('Module:Variables')
-local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
-local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft', {requireDevIfEnabled = true})
 
-local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local ALLOWED_STATUSES2 = { ['W'] = 'W', ['FF'] = 'FF', ['L'] = 'L', ['DQ'] = 'DQ', ['-'] = 'L' }
 local MAX_NUM_OPPONENTS = 8
@@ -58,14 +55,9 @@ function StarcraftFfaInput.adjustData(match)
 
 	--main processing done here
 	local subgroup = 0
-	for i = 1, MAX_NUM_MAPS do
-		if match['map' .. i] then
-			--parse the stringified map arguments to be a table again
-			match['map' .. i] = json.parseIfString(match['map' .. i])
-		else
-			break
-		end
-		if 	((match['map' .. i].opponent1placement or '') ~= '' or (match['map' .. i].placement1 or '') ~= '' or
+	for mapKey, _ in Table.iter.pairsByPrefix(match, 'map') do
+		local i = tonumber(mapKey:match('(%d+)$'))
+		if ((match['map' .. i].opponent1placement or '') ~= '' or (match['map' .. i].placement1 or '') ~= '' or
 				(match['map' .. i].points1 or '') ~= '' or (match['map' .. i].opponent1points or '') ~= '' or
 				(match['map' .. i].score1 or '') ~= '' or (match['map' .. i].opponent1score or '') ~= '' or
 				(match['map' .. i].map or '') ~= '') then
@@ -84,29 +76,7 @@ function StarcraftFfaInput.adjustData(match)
 		end
 	end
 
-	for i = 1, MAX_NUM_MAPS do
-		if match['map' .. i] then
-			--stringify maps
-			match['map' .. i].participants = json.stringify(match['map' .. i].participants)
-			match['map' .. i] = json.stringify(match['map' .. i])
-		else
-			break
-		end
-	end
-
 	match = StarcraftFfaInput.MatchWinnerProcessing(match, OppNumber, noscore)
-
-	for opponentIndex = 1, OppNumber do
-		--stringify player data
-		for key, item in ipairs(match['opponent' .. opponentIndex].match2players) do
-			match['opponent' .. opponentIndex].match2players[key].extradata = json.stringify(item.extradata)
-		end
-		match['opponent' .. opponentIndex].match2players = json.stringify(match['opponent' .. opponentIndex].match2players)
-		--stringify opponent extradata
-		match['opponent' .. opponentIndex].extradata = json.stringify(match['opponent' .. opponentIndex].extradata)
-		--stringify opponents
-		match['opponent' .. opponentIndex] = json.stringify(match['opponent' .. opponentIndex])
-	end
 
 	--Bracket Contest Handling
 	if match.contest and tostring(match.contest.finished) == '1' then
@@ -348,8 +318,6 @@ function StarcraftFfaInput.OpponentInput(match, OppNumber, noscore)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		if not Logic.isEmpty(match['opponent' .. opponentIndex]) then
 			OppNumber = opponentIndex
-			--parse the stringified opponent arguments to be a table again
-			match['opponent' .. opponentIndex] = json.parseIfString(match['opponent' .. opponentIndex])
 
 			local bg = StarcraftFfaInput.bgClean(match['opponent' .. opponentIndex].bg)
 			match['opponent' .. opponentIndex].bg = nil
@@ -475,7 +443,6 @@ end
 
 
 function StarcraftFfaInput.MapScoreProcessing(map, OppNumber, noscore)
-	map.extradata = json.parseIfString(map.extradata)
 	map.scores = {}
 	local indexedScores = {}
 	local hasScoreSet = false
@@ -555,8 +522,6 @@ function StarcraftFfaInput.MapScoreProcessing(map, OppNumber, noscore)
 		end
 	end
 
-	map.extradata = json.stringify(map.extradata)
-
 	return map
 end
 
@@ -577,8 +542,6 @@ function StarcraftFfaInput.processContest(match, OppNumber)
 	local Rscore1 = {}
 	local Rscore2 = {}
 	for opponentIndex = 1, OppNumber do
-		match['opponent' .. opponentIndex] = json.parseIfString(match['opponent' .. opponentIndex])
-		match['opponent' .. opponentIndex].extradata = json.parseIfString(match['opponent' .. opponentIndex].extradata)
 		local Opp = match['opponent' .. opponentIndex]
 		local ResultOpp = match.contest.opponents[opponentIndex]
 		ResultOpp.extradata = ResultOpp.extradata or {}
@@ -614,11 +577,6 @@ function StarcraftFfaInput.processContest(match, OppNumber)
 		elseif tostring(match.winner) == tostring(match.contest.winner) then
 			points = points + match.contest.points.win
 		end
-	end
-
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		match['opponent' .. opponentIndex].extradata = json.stringify(match['opponent' .. opponentIndex].extradata)
-		match['opponent' .. opponentIndex] = json.stringify(match['opponent' .. opponentIndex])
 	end
 
 	match.contest = nil

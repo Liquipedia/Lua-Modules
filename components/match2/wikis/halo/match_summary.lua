@@ -8,12 +8,11 @@
 
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
+local MapModes = require('Module:MapModes')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local OpponentDisplay = require('Module:OpponentDisplay')
-local Template = require('Module:Template')
-local MapModes = require('Module:MapModes')
 local Table = require('Module:Table')
-local Json = require('Module:Json')
+local Template = require('Module:Template')
 
 local htmlCreate = mw.html.create
 
@@ -117,7 +116,6 @@ function p.getByMatchId(args)
 
 	-- Vetoes
 	local vetoData = (match.extradata or {}).mapveto
-	vetoData = Json.parseIfString(vetoData or '{}')
 	if not Table.isEmpty(vetoData) then
 		for index, vetoMap in ipairs(vetoData) do
 			local vetoElements = p._getVetoDisplay(vetoMap.map, vetoMap.by)

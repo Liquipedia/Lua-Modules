@@ -6,13 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 local Template = require('Module:Template')
-local json = require('Module:Json')
+local TypeUtil = require('Module:TypeUtil')
+local Variables = require('Module:Variables')
 local _frame
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
@@ -20,7 +20,6 @@ local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
-local MAX_NUM_MAPS = 7
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -32,11 +31,6 @@ local CustomMatchGroupInput = {}
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(frame, match)
 	_frame = frame
-	if type(match) == 'string' then
-		match = json.parse(match)
-	end
-
-	-- process match
 	match = matchFunctions.getDateStuff(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
@@ -49,11 +43,6 @@ end
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(frame, map)
 	_frame = frame
-	if type(map) == 'string' then
-		map = json.parse(map)
-	end
-
-	-- process map
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -65,11 +54,6 @@ end
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processOpponent(frame, opponent)
 	_frame = frame
-	if type(opponent) == 'string' then
-		opponent = json.parse(opponent)
-	end
-
-	-- process opponent
 	if not Logic.isEmpty(opponent.template) and
 		string.lower(opponent.template) == 'bye' then
 			opponent.name = 'BYE'
@@ -88,9 +72,6 @@ end
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processPlayer(frame, player)
 	_frame = frame
-	if type(player) == 'string' then
-		player = json.parse(player)
-	end
 	return player
 end
 
@@ -123,7 +104,7 @@ function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
 end
 
 function CustomMatchGroupInput._getSetWins(opp)
-	local extradata = json.parseIfString(opp.extradata or '{}')
+	local extradata = opp.extradata or {}
 	local set1win = extradata.set1win and 1 or 0
 	local set2win = extradata.set2win and 1 or 0
 	local set3win = extradata.set3win and 1 or 0
@@ -182,7 +163,7 @@ end
 
 function matchFunctions.getVodStuff(match)
 	match.stream = match.stream or {}
-	match.stream = json.stringify({
+	match.stream = {
 		stream = Logic.emptyOr(match.stream.stream, Variables.varDefault('stream')),
 		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
 		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
@@ -194,17 +175,14 @@ function matchFunctions.getVodStuff(match)
 		youtube = Logic.emptyOr(match.stream.youtube or match.youtube, Variables.varDefault('youtube')),
 		trovo = Logic.emptyOr(match.stream.trovo or match.trovo, Variables.varDefault('trovo')),
 		facebook = Logic.emptyOr(match.stream.facebook or match.facebook, Variables.varDefault('facebook')),
-	})
+	}
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	-- apply vodgames
 	for index = 1, MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]
 		if not Logic.isEmpty(vodgame) then
-			local map = Logic.emptyOr(match['map' .. index], nil, {})
-			if type(map) == 'string' then
-				map = json.parse(map)
-			end
+			local map = match['map' .. index] or {}
 			map.vod = map.vod or vodgame
 			match['map' .. index] = map
 		end
@@ -213,7 +191,7 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getExtraData(match)
-	match.extradata = json.stringify({
+	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
 		comment = match.comment,
 		ban1 = match.ban1,
@@ -228,7 +206,7 @@ function matchFunctions.getExtraData(match)
 		ban4opponent = match.ban4opponent,
 		ban5opponent = match.ban5opponent,
 		ban6opponent = match.ban6opponent,
-	})
+	}
 	return match
 end
 
@@ -238,14 +216,9 @@ function matchFunctions.getOpponents(args)
 	local isScoreSet = false
 
 	local sumscores = {}
-	for mapIndex = 1, MAX_NUM_MAPS do
-		if not args['map' .. mapIndex] then
-			break
-		end
-		local map = json.parseIfString(args['map' .. mapIndex])
+	for _, map in Table.iter.pairsByPrefix(args, 'map') do
 		sumscores[map.winner] = (sumscores[map.winner] or 0) + 1
 	end
-mw.logObject(sumscores)
 
 	local bestof = tonumber(args.bestof or 5) or 5
 	local firstTo = math.ceil(bestof / 2)
@@ -254,10 +227,6 @@ mw.logObject(sumscores)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			if type(opponent) == 'string' then
-				opponent = json.parse(opponent)
-			end
-
 			--retrieve name and icon for teams from team templates
 			if opponent.type == 'team' and
 				not Logic.isEmpty(opponent.template, args.date) then
@@ -337,10 +306,7 @@ end
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
-		local player = match['opponent' .. opponentIndex .. '_p' .. playerIndex] or {}
-		if type(player) == 'string' then
-			player = json.parse(player)
-		end
+		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 		if not Table.isEmpty(player) then
@@ -355,11 +321,11 @@ end
 --
 function mapFunctions.getExtraData(map)
 	local bestof = tonumber(map.bestof or 3) or 3
-	map.extradata = json.stringify({
+	map.extradata = {
 		bestof = bestof,
 		comment = map.comment,
 		header = map.header,
-	})
+	}
 	map.bestof = bestof
 	return map
 end
@@ -395,10 +361,6 @@ end
 
 function mapFunctions.getParticipantsData(map)
 	local participants = map.participants or {}
-	if type(participants) == 'string' then
-		participants = json.parse(participants)
-	end
-
 	map.participants = participants
 	return map
 end
@@ -453,11 +415,12 @@ end
 
 --maybe needed for legacy conversion to work for solo brackets
 function opponentFunctions.getSoloFromLegacy(opponent)
-	opponent.match2players = '[' .. json.stringify({
+	local player = {
 		name = opponent.name,
 		displayname = opponent.displayname or opponent.name,
 		flag = opponent.flag
-	}) .. ']'
+	}
+	opponent.match2players = {player}
 	opponent.name = nil
 	return opponent
 end
