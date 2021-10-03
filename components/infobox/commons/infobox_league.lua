@@ -298,7 +298,7 @@ function League:_createLocation(details)
 			displayText = details.country
 		end
 
-		content = Flags.flag(details.country) .. '&nbsp;' ..
+		content = Flags.Icon({flag = details.country, shouldLink = true}) .. '&nbsp;' ..
 			displayText .. '[[Category:' .. nationality .. ' Tournaments]]'
 	end
 
@@ -316,7 +316,7 @@ function League:_createLocation(details)
 				displayText = details.country2
 			end
 
-			content = content .. Flags.flag(details.country2) .. '&nbsp;' ..
+			content = content .. Flags.Icon({flag = details.country2, shouldLink = true}) .. '&nbsp;' ..
 				displayText .. '[[Category:' .. nationality2 .. ' Tournaments]]'
 		end
 	end
