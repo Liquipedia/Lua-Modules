@@ -42,7 +42,7 @@ function Region.run(args)
 	else
 		local display = ''
 		if regionValues.flag then
-			display = Flags.Icon({flag = regionValues.flag, shouldLink = true})
+			display = Flag.Icon({flag = regionValues.flag, shouldLink = true})
 			if display then
 				display = display .. '&nbsp;'
 			else
