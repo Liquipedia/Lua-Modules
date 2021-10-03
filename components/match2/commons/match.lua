@@ -6,7 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local getArgs = require('Module:Arguments').getArgs
+local Arguments = require('Module:Arguments')
+local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -15,7 +16,6 @@ local Table = require('Module:Table')
 local legacy = Lua.moduleExists('Module:Match/Legacy') and require('Module:Match/Legacy') or nil
 local config = Lua.moduleExists('Module:Match/Config') and require('Module:Match/Config') or {}
 
-local globalArgs
 local storeInLpdb
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
@@ -23,12 +23,20 @@ local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local Match = {}
 
 function Match.storeFromArgs(frame)
-	Match.store(getArgs(frame))
+	Match.store(Arguments.getArgs(frame))
 end
 
 function Match.toEncodedJson(frame)
-	globalArgs = getArgs(frame)
+	local args = Arguments.getArgs(frame)
+	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
+		local Match_ = Lua.import('Module:Match', {requireDevIfEnabled = true})
+		return Match_.withPerformanceSetup(function()
+			return Match_._toEncodedJson(args)
+		end)
+	end)
+end
 
+function Match._toEncodedJson(globalArgs)
 	-- handle tbd and literals for opponents
 	for opponentIndex = 1, globalArgs[1] or 2 do
 		local opponent = globalArgs['opponent' .. opponentIndex]
@@ -100,7 +108,7 @@ function Match.store(args, shouldStoreInLpdb)
 end
 
 function Match.templateFromMatchID(frame)
-	local args = getArgs(frame)
+	local args = Arguments.getArgs(frame)
 	local matchid = args[1] or 'match id is empty'
 	local out = matchid:gsub('0*([1-9])', '%1'):gsub('%-', '')
 	return out
@@ -266,6 +274,16 @@ function Match._buildParameters(args)
 		winner = args.winner,
 	}
 	return parameters
+end
+
+function Match.withPerformanceSetup(f)
+	if FeatureFlag.get('perf') then
+		local matchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
+		local perfConfig = Table.getByPathOrNil(matchGroupConfig, {'subobjectPerf'}) or {}
+		return require('Module:Performance/Util').withSetup(perfConfig, f)
+	else
+		return f()
+	end
 end
 
 return Match
