@@ -77,9 +77,9 @@ function Show:_createLocation(country, city)
 		return ''
 	end
 
-	local countryDisplay = Flags.countryName(country)
+	local countryDisplay = Flags.CountryName(country)
 
-	return Flags.flag(country) .. '&nbsp;' ..
+	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
 		'[[:Category:' .. countryDisplay .. '|' .. (city or countryDisplay) .. ']]'
 end
 
