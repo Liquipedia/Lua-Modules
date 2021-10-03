@@ -24,7 +24,7 @@ Reads a matchlist input spec, saves it to LPDB, and displays the matchlist.
 function MatchGroupDisplay.MatchlistBySpec(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
 	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
-	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
+	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options)
 
 	local matchlistNode
 	if options.show then
@@ -49,7 +49,7 @@ Reads a bracket input spec, saves it to LPDB, and displays the bracket.
 function MatchGroupDisplay.BracketBySpec(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
 	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args)
-	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
+	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options)
 
 	local bracketNode
 	if options.show then

@@ -19,16 +19,20 @@ local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 local MatchGroupBase = {}
 
 function MatchGroupBase.readOptions(args, matchGroupType)
+	local store = Logic.readBoolOrNil(args.store)
 	local options = {
 		bracketId = MatchGroupBase.readBracketId(args.id),
-		show = not Logic.readBool(args.hide),
-		saveToLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true),
 		matchGroupType = matchGroupType,
+		storeMatch1 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch1), store, true),
+		storeMatch2 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch2), store, true),
+		storeSmw = Logic.nilOr(Logic.readBoolOrNil(args.storeSmw), store, true),
+		show = not Logic.readBool(args.hide),
 	}
+	options.store = Logic.nilOr(store, options.storeMatch2 or options.storeMatch1 or options.storeSmw)
 
 	local warnings = {}
 
-	if options.saveToLpdb or not Logic.readBool(args.noDuplicateCheck) then
+	if options.store or not Logic.readBool(args.noDuplicateCheck) then
 		local warning = MatchGroupBase._checkBracketDuplicate(options.bracketId)
 		if warning then
 			table.insert(warnings, warning)
@@ -93,14 +97,24 @@ function MatchGroupBase._checkBracketDuplicate(bracketId)
 	end
 end
 
-function MatchGroupBase.saveMatchGroup(bracketId, matches, storeInLpdb)
-	local storedData = Array.map(matches, function(match)
-		return Match.store(match, storeInLpdb)
-	end)
+function MatchGroupBase.saveMatchGroup(bracketId, matches, options)
+	local recordsInMatches = Array.map(matches, Match.splitRecordsByType)
 
-	-- store match data as variable to bypass LPDB on the same page
-	Variables.varDefine('match2bracket_' .. bracketId, Json.stringify(storedData))
-	Variables.varDefine('match2bracketindex', Variables.varDefault('match2bracketindex', 0) + 1)
+	-- Store matches in a page variable to bypass LPDB on the same page
+	if options.show then
+		local matchRecords = Array.map(recordsInMatches, function(records)
+			Match.populateEdges(records)
+			return records.matchRecord
+		end)
+		Variables.varDefine('match2bracket_' .. bracketId, Json.stringify(matchRecords))
+		Variables.varDefine('match2bracketindex', Variables.varDefault('match2bracketindex', 0) + 1)
+	end
+
+	if options.store then
+		for _, records in ipairs(recordsInMatches) do
+			Match.store(records, options)
+		end
+	end
 end
 
 function MatchGroupBase.enableInstrumentation()
