@@ -75,10 +75,10 @@ end
 --- Allows for overriding this functionality
 function Scene:createNameDisplay(args)
 	local name = args.name
-	local country = Flags.countryName(args.country or args.scene)
+	local country = Flags.CountryName(args.country or args.scene)
 	if not name then
 		local localised = Localisation.getLocalisation(country)
-		local flag = Flags.flag(country)
+		local flag = Flags.Icon({flag = country, shouldLink = true})
 		name = flag .. '&nbsp;' .. localised .. ((' ' .. args.gamenamedisplay) or '') .. ' scene'
 	end
 
