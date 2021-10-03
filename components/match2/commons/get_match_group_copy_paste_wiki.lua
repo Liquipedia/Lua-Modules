@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = require('Module:GetMatchGroupCopyPaste/wiki/Base')
+local Table = require('Module:Table')
+
+local GetMatchGroupCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
 
 --overwrite stuff you want to overwrite here^^
 
-return p
+return GetMatchGroupCopyPaste
