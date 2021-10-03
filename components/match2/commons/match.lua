@@ -7,15 +7,13 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Table = require('Module:Table')
-
-local legacy = Lua.moduleExists('Module:Match/Legacy') and require('Module:Match/Legacy') or nil
-
-local storeInLpdb
 
 local Match = {}
 
@@ -39,7 +37,7 @@ function Match._toEncodedJson(matchArgs)
 		local opponent = matchArgs['opponent' .. opponentIndex]
 		if Logic.isEmpty(opponent) then
 			matchArgs['opponent' .. opponentIndex] = {
-				['type'] = 'literal', template = 'tbd', name = matchArgs['opponent' .. opponentIndex .. 'literal']
+				type = 'literal', template = 'tbd', name = matchArgs['opponent' .. opponentIndex .. 'literal']
 			}
 		end
 	end
@@ -60,180 +58,130 @@ function Match._toEncodedJson(matchArgs)
 	return Json.stringify(matchArgs)
 end
 
+function Match.store(match, options)
+	options = options or {}
+	options = {
+		storeMatch1 = Logic.nilOr(options.storeMatch1, true),
+		storeMatch2 = Logic.nilOr(options.storeMatch2, true),
+		storeSmw = Logic.nilOr(options.storeSmw, true),
+	}
+	local records = match.matchRecord
+		and match
+		or Match.splitRecordsByType(match)
+	Match.encodeRecords(records)
+
+	-- Legacy match and SMW
+	local LegacyMatch = (options.storeMatch1 or options.storeSmw) and Lua.requireIfExists('Module:Match/Legacy')
+	if LegacyMatch then
+		local records_ = Table.deepCopy(records)
+		Match.populateEdges(records_)
+		LegacyMatch.storeMatch(records_.matchRecord, options)
+	end
+
+	-- Match2
+	if options.storeMatch2 then
+		Match._storeMatch2(records)
+	end
+end
+
+function Match.splitRecordsByType(match)
+	local gameRecords = {}
+	for _, gameRecord in Table.iter.pairsByPrefix(match, 'map') do
+		table.insert(gameRecords, gameRecord)
+	end
+
+	local opponentRecords = {}
+	local playerRecords = {}
+	for opponentKey, opponentRecord in Table.iter.pairsByPrefix(match, 'opponent') do
+		table.insert(opponentRecords, opponentRecord)
+		table.insert(playerRecords, opponentRecord.match2players or {})
+		for _, playerRecord in Table.iter.pairsByPrefix(match, opponentKey .. '_p') do
+			table.insert(playerRecords[#playerRecords], playerRecord)
+		end
+	end
+
+	return {
+		gameRecords = gameRecords,
+		matchRecord = Match.toMatchRecord(match),
+		opponentRecords = opponentRecords,
+		playerRecords = playerRecords,
+	}
+end
+
 local function stringifyNonEmpty(tbl)
 	return not Table.isEmpty(table)
 		and Json.stringify(tbl)
 		or nil
 end
 
-function Match.store(args, shouldStoreInLpdb)
-	storeInLpdb = shouldStoreInLpdb
-	local matchid = args.matchid or -1
-	local bracketid = args.bracketid or -1
-	local staticid = bracketid .. '_' .. matchid
+function Match.encodeRecords(records)
+	local matchRecord = records.matchRecord
+	matchRecord.match2bracketdata = stringifyNonEmpty(matchRecord.match2bracketdata)
+	matchRecord.stream = stringifyNonEmpty(matchRecord.stream)
+	matchRecord.links = stringifyNonEmpty(matchRecord.links)
+	matchRecord.extradata = stringifyNonEmpty(matchRecord.extradata)
 
-	-- save opponents (and players) to lpdb
-	local opponents, rawOpponents = Match._storeOpponents(args, staticid, nil)
-
-	-- save games to lpdb
-	local games, rawGames = Match._storeGames(args, staticid)
-
-	-- build parameters
-	local parameters = Match._buildParameters(args)
-	parameters.match2id = staticid
-	parameters.match2bracketid = bracketid
-	parameters.match2opponents = opponents
-	parameters.match2games = games
-	parameters.extradata = stringifyNonEmpty(parameters.extradata)
-	parameters.links = stringifyNonEmpty(parameters.links)
-	parameters.match2bracketdata = stringifyNonEmpty(parameters.match2bracketdata)
-	parameters.stream = stringifyNonEmpty(parameters.stream)
-
-	-- save legacy match to lpdb
-	if args.disableLegacyStorage ~= true and legacy ~= nil and storeInLpdb then
-		Match._storeLegacy(parameters, rawOpponents, rawGames)
+	for opponentIndex, opponentRecord in ipairs(records.opponentRecords) do
+		opponentRecord.extradata = stringifyNonEmpty(opponentRecord.extradata)
+		for _, playerRecord in ipairs(records.playerRecords[opponentIndex]) do
+			playerRecord.extradata = stringifyNonEmpty(playerRecord.extradata)
+		end
 	end
+	for _, gameRecord in ipairs(records.gameRecords) do
+		gameRecord.extradata = stringifyNonEmpty(gameRecord.extradata)
+		gameRecord.participants = stringifyNonEmpty(gameRecord.participants)
+		gameRecord.scores = stringifyNonEmpty(gameRecord.scores)
+	end
+end
 
-	-- save match to lpdb
-	if storeInLpdb then
-		mw.ext.LiquipediaDB.lpdb_match2(
-			staticid,
-			parameters
+function Match.populateEdges(records)
+	local matchRecord = records.matchRecord
+	matchRecord.match2opponents = records.opponentRecords
+	matchRecord.match2games = records.gameRecords
+
+	for opponentIndex, opponentRecord in ipairs(records.opponentRecords) do
+		opponentRecord.match2players = records.playerRecords[opponentIndex]
+	end
+end
+
+function Match._storeMatch2(records)
+	local matchRecord = records.matchRecord
+
+	local opponentIndexes = Array.map(records.opponentRecords, function(opponentRecord, opponentIndex)
+		local playerIndexes = Array.map(records.playerRecords[opponentIndex], function(player, playerIndex)
+			return mw.ext.LiquipediaDB.lpdb_match2player(
+				matchRecord.match2id .. '_m2o_' .. opponentIndex .. '_m2p_' .. playerIndex,
+				player
+			)
+		end)
+
+		opponentRecord.match2players = table.concat(playerIndexes)
+		return mw.ext.LiquipediaDB.lpdb_match2opponent(
+			matchRecord.match2id .. '_m2o_' .. opponentIndex,
+			opponentRecord
 		)
-	end
+	end)
 
-	-- return reconstructed json for previews
-	parameters.match2opponents = rawOpponents
-	parameters.match2games = rawGames
-	return parameters
+	local gameIndexes = Array.map(records.gameRecords, function(gameRecord, gameIndex)
+		return mw.ext.LiquipediaDB.lpdb_match2game(
+			matchRecord.match2id .. '_m2g_' .. gameIndex,
+			gameRecord
+		)
+	end)
+
+	matchRecord.match2games = table.concat(gameIndexes)
+	matchRecord.match2opponents = table.concat(opponentIndexes)
+	mw.ext.LiquipediaDB.lpdb_match2(matchRecord.match2id, matchRecord)
 end
 
 function Match.templateFromMatchID(frame)
 	local args = Arguments.getArgs(frame)
-	local matchid = args[1] or 'match id is empty'
-	local out = matchid:gsub('0*([1-9])', '%1'):gsub('%-', '')
-	return out
+	local matchId = args[1] or 'match id is empty'
+	return MatchGroupUtil.matchIdToKey(matchId)
 end
 
-function Match._storeLegacy(parameters, rawOpponents, rawGames)
-	local rawMatch = Table.deepCopy(parameters)
-	rawMatch.match2opponents = rawOpponents
-	rawMatch.match2games = rawGames
-	legacy.storeMatch(rawMatch)
-end
-
-function Match._storePlayers(args, staticid, opponentIndex)
-	local players = ''
-	local rawPlayers = {}
-	for playerIndex = 1, 100 do
-		-- read player
-		local player = args['opponent' .. opponentIndex .. '_p' .. playerIndex]
-		if player == nil then break end
-
-		player.extradata = stringifyNonEmpty(player.extradata)
-
-		table.insert(rawPlayers, player)
-
-		-- lpdb save operation
-		local res
-		if storeInLpdb then
-			res = mw.ext.LiquipediaDB.lpdb_match2player(
-				staticid .. '_m2o_' .. opponentIndex .. '_m2p_' .. playerIndex, player
-			)
-		else
-			-- the storage into Lpdb returned the playerIndex into res
-			-- so to be able to use res 4 lines further down we set it here accordingly
-			res = playerIndex
-		end
-
-		-- append player to string to allow setting the match2opponentid later
-		players = players .. res
-	end
-	return players, rawPlayers
-end
-
-function Match._storeOpponents(args, staticid, opponentPlayers)
-	local opponents = ''
-	local rawOpponents = {}
-
-	for opponentIndex = 1, 100 do
-		-- read opponent
-		local opponent = args['opponent' .. opponentIndex]
-		if opponent == nil then	break end
-
-		opponent.extradata = stringifyNonEmpty(opponent.extradata)
-
-		-- get nested players if exist
-		if not Logic.isEmpty(opponent.match2players) then
-			local players = opponent.match2players or {}
-			for playerIndex, player in ipairs(players) do
-				args['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
-			end
-		end
-
-		-- store players to lpdb
-		local players, rawPlayers = Match._storePlayers(args, staticid, opponentIndex, storeInLpdb)
-
-		-- set parameters
-		opponent.match2players = players
-
-		-- lpdb save operation
-		local res
-		if storeInLpdb then
-			res = mw.ext.LiquipediaDB.lpdb_match2opponent(staticid .. '_m2o_' .. opponentIndex, opponent)
-		else
-			-- the storage into Lpdb returned the opponentIndex into res
-			-- so to be able to use res 4 lines further down we set it here accordingly
-			res = opponentIndex
-		end
-
-		-- recover raw players
-		opponent.match2players = rawPlayers
-		table.insert(rawOpponents, opponent)
-
-		-- append opponents to string to allow setting the match2opponentid later
-		opponents = opponents .. res
-	end
-	return opponents, rawOpponents
-end
-
-function Match._storeGames(args, staticid)
-	local games = ''
-	local rawGames = {}
-
-	for gameIndex = 1, 100 do
-		-- read game
-		local game = args['game' .. gameIndex] or args['map' .. gameIndex]
-		if game == nil then
-			break
-		end
-
-		-- stringify Json stuff
-
-		game.extradata = stringifyNonEmpty(game.extradata)
-		game.participants = stringifyNonEmpty(game.participants)
-		game.scores = stringifyNonEmpty(game.scores)
-
-		table.insert(rawGames, game)
-
-		-- lpdb save operation
-		local res
-		if storeInLpdb then
-			res = mw.ext.LiquipediaDB.lpdb_match2game(staticid .. '_m2g_' .. gameIndex, game)
-		else
-			-- the storage into Lpdb returned the gameIndex into res
-			-- so to be able to use res 4 lines further down we set it here accordingly
-			res = gameIndex
-		end
-
-		-- append games to string to allow setting the match2id later
-		games = games .. res
-	end
-	return games, rawGames
-end
-
-function Match._buildParameters(args)
-	local parameters = {
+function Match.toMatchRecord(args)
+	return {
 		bestof = args.bestof,
 		date = args.date,
 		dateexact = Logic.readBool(args.dateexact) and 1 or 0,
@@ -247,6 +195,8 @@ function Match._buildParameters(args)
 		liquipediatiertype = args.liquipediatiertype,
 		lrthread = args.lrthread,
 		match2bracketdata = args.bracketdata or args.match2bracketdata,
+		match2bracketid = args.bracketid,
+		match2id = args.bracketid .. '_' .. args.matchid,
 		mode = args.mode,
 		parent = args.parent,
 		parentname = args.parentname,
@@ -264,7 +214,6 @@ function Match._buildParameters(args)
 		walkover = args.walkover,
 		winner = args.winner,
 	}
-	return parameters
 end
 
 function Match.withPerformanceSetup(f)
