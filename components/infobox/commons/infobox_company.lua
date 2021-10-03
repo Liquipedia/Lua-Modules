@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local InfoboxBasic = require('Module:Infobox/Basic')
 local Links = require('Module:Links')
-local Flags = require('Module:Flags').flag
+local Flags = require('Module:Flags')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 local Math = require('Module:Math')
@@ -116,7 +116,7 @@ function Company:_createLocation(location)
 		return ''
 	end
 
-	return Flags(location) .. '&nbsp;' ..
+	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
 				'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
