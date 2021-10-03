@@ -39,6 +39,9 @@ end
 function Flags.flagNoLink(name)
 	return Flags.Icon({flag = name, shouldLink = false})
 end
+function Flags.countryName(name)
+	return Flags.CountryName(name)
+end
 
 -- Returns a flag
 --[[
