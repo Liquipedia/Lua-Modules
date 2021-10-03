@@ -14,11 +14,8 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local legacy = Lua.moduleExists('Module:Match/Legacy') and require('Module:Match/Legacy') or nil
-local config = Lua.moduleExists('Module:Match/Config') and require('Module:Match/Config') or {}
 
 local storeInLpdb
-
-local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 
 local Match = {}
 
@@ -36,35 +33,37 @@ function Match.toEncodedJson(frame)
 	end)
 end
 
-function Match._toEncodedJson(globalArgs)
+function Match._toEncodedJson(matchArgs)
 	-- handle tbd and literals for opponents
-	for opponentIndex = 1, globalArgs[1] or 2 do
-		local opponent = globalArgs['opponent' .. opponentIndex]
+	for opponentIndex = 1, matchArgs[1] or 2 do
+		local opponent = matchArgs['opponent' .. opponentIndex]
 		if Logic.isEmpty(opponent) then
-			globalArgs['opponent' .. opponentIndex] = {
-				['type'] = 'literal', template = 'tbd', name = globalArgs['opponent' .. opponentIndex .. 'literal']
+			matchArgs['opponent' .. opponentIndex] = {
+				['type'] = 'literal', template = 'tbd', name = matchArgs['opponent' .. opponentIndex .. 'literal']
 			}
 		end
 	end
 
 	-- handle literals for qualifiers
-	local bracketdata = Json.parse(globalArgs.bracketdata or '{}')
-	bracketdata.qualwinLiteral = globalArgs.qualwinliteral
-	bracketdata.qualloseLiteral = globalArgs.qualloseliteral
-	globalArgs.bracketdata = Json.stringify(bracketdata)
+	matchArgs.bracketdata = {
+		qualwinLiteral = matchArgs.qualwinliteral,
+		qualloseLiteral = matchArgs.qualloseliteral,
+	}
 
-	-- parse maps
-	for mapIndex = 1, MAX_NUM_MAPS do
-		local map = globalArgs['map' .. mapIndex]
-		if type(map) == 'string' then
-			map = Json.parse(map)
-			globalArgs['map' .. mapIndex] = map
-		else
-			break
-		end
+	for key, map in Table.iter.pairsByPrefix(matchArgs, 'map') do
+		matchArgs[key] = Json.parseIfString(map)
+	end
+	for key, opponent in Table.iter.pairsByPrefix(matchArgs, 'opponent') do
+		matchArgs[key] = Json.parseIfString(opponent)
 	end
 
-	return Json.stringify(globalArgs)
+	return Json.stringify(matchArgs)
+end
+
+local function stringifyNonEmpty(tbl)
+	return not Table.isEmpty(table)
+		and Json.stringify(tbl)
+		or nil
 end
 
 function Match.store(args, shouldStoreInLpdb)
@@ -85,8 +84,10 @@ function Match.store(args, shouldStoreInLpdb)
 	parameters.match2bracketid = bracketid
 	parameters.match2opponents = opponents
 	parameters.match2games = games
-
-	mw.log(opponents)
+	parameters.extradata = stringifyNonEmpty(parameters.extradata)
+	parameters.links = stringifyNonEmpty(parameters.links)
+	parameters.match2bracketdata = stringifyNonEmpty(parameters.match2bracketdata)
+	parameters.stream = stringifyNonEmpty(parameters.stream)
 
 	-- save legacy match to lpdb
 	if args.disableLegacyStorage ~= true and legacy ~= nil and storeInLpdb then
@@ -128,9 +129,8 @@ function Match._storePlayers(args, staticid, opponentIndex)
 		-- read player
 		local player = args['opponent' .. opponentIndex .. '_p' .. playerIndex]
 		if player == nil then break end
-		if type(player) == 'string' then
-			player = Json.parse(player)
-		end
+
+		player.extradata = stringifyNonEmpty(player.extradata)
 
 		table.insert(rawPlayers, player)
 
@@ -160,16 +160,12 @@ function Match._storeOpponents(args, staticid, opponentPlayers)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if opponent == nil then	break end
-		if type(opponent) == 'string' then
-			opponent = Json.parse(opponent)
-		end
+
+		opponent.extradata = stringifyNonEmpty(opponent.extradata)
 
 		-- get nested players if exist
 		if not Logic.isEmpty(opponent.match2players) then
 			local players = opponent.match2players or {}
-			if type(players) == 'string' then
-				players = Json.parse(players)
-			end
 			for playerIndex, player in ipairs(players) do
 				args['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
 			end
@@ -211,17 +207,12 @@ function Match._storeGames(args, staticid)
 		if game == nil then
 			break
 		end
-		if type(game) == 'string' then
-			game = Json.parse(game)
-		end
 
 		-- stringify Json stuff
-		if game.scores ~= nil and type(game.scores) == 'table' then
-			game.scores = Json.stringify(game.scores)
-		end
-		if game.participants ~= nil and type(game.participants) == 'table' then
-			game.participants = Json.stringify(game.participants)
-		end
+
+		game.extradata = stringifyNonEmpty(game.extradata)
+		game.participants = stringifyNonEmpty(game.participants)
+		game.scores = stringifyNonEmpty(game.scores)
 
 		table.insert(rawGames, game)
 

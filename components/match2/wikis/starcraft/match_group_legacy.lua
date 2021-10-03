@@ -148,13 +148,7 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened)
 			for innerKey, innerVal in pairs(val) do
 				nestedArgs[innerKey] = _args[innerVal] or flattened[innerVal]
 			end
-			if String.startsWith(realKey, "opponent") then
-				match[realKey] = json.stringify(nestedArgs)
-			elseif String.startsWith(realKey, "map") then
-				match[realKey] = nestedArgs
-			else
-				match[realKey] = nestedArgs
-			end
+			match[realKey] = nestedArgs
 		end
 	elseif noSkip then
 		local options = String.split(val, "|")

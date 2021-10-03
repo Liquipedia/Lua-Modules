@@ -7,6 +7,7 @@
 --
 
 local FnUtil = require('Module:FnUtil')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -14,7 +15,6 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
-local json = require('Module:Json')
 local cleanFlag = require('Module:Flags').CountryName
 local defaultIcon
 
@@ -46,11 +46,6 @@ local StarcraftMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function StarcraftMatchGroupInput.processMatch(_, match)
-	if type(match) == 'string' then
-		match = json.parse(match)
-	end
-
-	-- process match
 	match = StarcraftMatchGroupInput.getDateStuff(match)
 	match = StarcraftMatchGroupInput.getTournamentVars(match)
 	if match.ffa == 'true' then
@@ -143,7 +138,7 @@ end
 
 function StarcraftMatchGroupInput.getVodStuff(match)
 	match.stream = match.stream or {}
-	match.stream = json.stringify({
+	match.stream = {
 		stream = Logic.emptyOr(match.stream, Variables.varDefault('stream')),
 		twitch = Logic.emptyOr(match.twitch, Variables.varDefault('twitch')),
 		twitch2 = Logic.emptyOr(match.twitch2, Variables.varDefault('twitch2')),
@@ -154,14 +149,14 @@ function StarcraftMatchGroupInput.getVodStuff(match)
 		smashcast = Logic.emptyOr(match.smashcast, Variables.varDefault('smashcast')),
 		youtube = Logic.emptyOr(match.youtube, Variables.varDefault('youtube')),
 		trovo = Logic.emptyOr(match.trovo, Variables.varDefault('trovo'))
-	})
+	}
 	match.vod = Logic.emptyOr(match.vod)
 
 	return match
 end
 
 function StarcraftMatchGroupInput.getLinks(match)
-	match.links = json.stringify({
+	match.links = {
 		preview = match.preview,
 		preview2 = match.preview2,
 		interview = match.interview,
@@ -169,16 +164,15 @@ function StarcraftMatchGroupInput.getLinks(match)
 		review = match.review,
 		recap = match.recap,
 		lrthread = match.lrthread,
-	})
+	}
 	return match
 end
 
 function StarcraftMatchGroupInput.getExtraData(match)
-	local extradata
 	if match.ffa == 'true' then
-		extradata = getStarcraftFfaInputModule().getExtraData(match)
+		match.extradata = getStarcraftFfaInputModule().getExtraData(match)
 	else
-		extradata = {
+		match.extradata = {
 			noQuery = match.noQuery,
 			matchsection = Variables.varDefault('matchsection'),
 			comment = match.comment,
@@ -210,7 +204,6 @@ function StarcraftMatchGroupInput.getExtraData(match)
 		}
 	end
 
-	match.extradata = json.stringify(extradata)
 	return match
 end
 
@@ -239,13 +232,8 @@ function StarcraftMatchGroupInput.adjustData(match)
 
 	--main processing done here
 	local subgroup = 0
-	for i = 1, MAX_NUM_MAPS do
-		if match['map' .. i] then
-			--parse the stringified map arguments to be a table again
-			match['map' .. i] = json.parseIfString(match['map' .. i])
-		else
-			break
-		end
+	for mapKey, _ in Table.iter.pairsByPrefix(match, 'map') do
+		local i = tonumber(mapKey:match('(%d+)$'))
 		match, subgroup = StarcraftMatchGroupInput.MapInput(match, i, subgroup)
 	end
 
@@ -259,16 +247,6 @@ function StarcraftMatchGroupInput.adjustData(match)
 
 	if string.find(match.mode, 'team') then
 		match = StarcraftMatchGroupInput.SubMatchStructure(match)
-	else
-		for i = 1, MAX_NUM_MAPS do
-			if match['map' .. i] then
-				--stringify maps if not team match (for team matches it is done via the above function)
-				match['map' .. i].participants = json.stringify(match['map' .. i].participants)
-				match['map' .. i] = json.stringify(match['map' .. i])
-			else
-				break
-			end
-		end
 	end
 
 	match = StarcraftMatchGroupInput.MatchWinnerProcessing(match)
@@ -374,19 +352,6 @@ function StarcraftMatchGroupInput.MatchWinnerProcessing(match)
 		else
 			match['opponent' .. opponentIndex].placement = 2
 		end
-
-		--stringify player data
-		for key, _ in ipairs(match['opponent' .. opponentIndex].match2players) do
-			match['opponent' .. opponentIndex].match2players[key].extradata =
-				json.stringify(match['opponent' .. opponentIndex].match2players[key].extradata)
-		end
-		match['opponent' .. opponentIndex].match2players = json.stringify(match['opponent' .. opponentIndex].match2players)
-
-		--stringify opponent extradata
-		match['opponent' .. opponentIndex].extradata = json.stringify(match['opponent' .. opponentIndex].extradata)
-
-		--stringify opponents
-		match['opponent' .. opponentIndex] = json.stringify(match['opponent' .. opponentIndex])
 	end
 
 	return match
@@ -416,11 +381,11 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 				game = match['map' .. i].game,
 				liquipediatier = match['map' .. i].liquipediatier,
 				liquipediatiertype = match['map' .. i].liquipediatiertype,
-				participants = json.stringify(participants),
+				participants = participants,
 				mode = match['map' .. i].mode,
 				resulttype = 'submatch',
 				subgroup = k,
-				extradata = json.stringify({
+				extradata = {
 					header = (match['subGroup' .. k .. 'header'] or '') ~= '' and match['subGroup' .. k .. 'header'] or
 						(match['subgroup' .. k .. 'header'] or '') ~= '' and match['subgroup' .. k .. 'header'] or
 						match['submatch' .. k .. 'header'],
@@ -430,7 +395,7 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 					isSubMatch = 'true',
 					opponent1 = opp['1'],
 					opponent2 = opp['2']
-				}),
+				},
 				['type'] = match['type'],
 				scores = { 0, 0 },
 				winner = 0
@@ -441,9 +406,6 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 			elseif tonumber(match['map' .. i].winner) == 2 then
 				SubMatches[k].scores[2] = SubMatches[k].scores[2] + 1
 			end
-			--stringify map
-			match['map' .. i].participants = json.stringify(match['map' .. i].participants)
-			match['map' .. i] = json.stringify(match['map' .. i])
 		else
 			break
 		end
@@ -471,8 +433,6 @@ OpponentInput functions
 function StarcraftMatchGroupInput.OpponentInput(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		if not Logic.isEmpty(match['opponent' .. opponentIndex]) then
-			--parse the stringified opponent arguments to be a table again
-			match['opponent' .. opponentIndex] = json.parseIfString(match['opponent' .. opponentIndex])
 
 			--fix legacy winner
 			if (match['opponent' .. opponentIndex].win or '') ~= '' then
@@ -653,7 +613,7 @@ function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opp)
 			flag = cleanFlag(flag),
 			extradata = { faction = FACTIONS[string.lower(race)] or 'u' }
 		}
-		local extradata = json.parseIfString(opp.extradata or '{}')
+		local extradata = opp.extradata or {}
 		extradata.hasRaceOrFlag = true
 	end
 
@@ -668,7 +628,7 @@ end
 
 function StarcraftMatchGroupInput.getPlayersLegacy(playerData)
 	local players = {}
-	playerData = json.parseIfString(playerData) or {}
+	playerData = Json.parseIfString(playerData) or {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		local name = mw.ext.TeamLiquidIntegration.resolve_redirect((playerData['p' .. playerIndex .. 'link'] or '') ~= ''
 			and playerData['p' .. playerIndex .. 'link'] or playerData['p' .. playerIndex] or '')
@@ -1032,7 +992,6 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 	map.mode = map_mode
 
 	map.participants = participants
-	map.extradata = json.stringify(map.extradata)
 	return map
 end
 
@@ -1072,8 +1031,6 @@ function StarcraftMatchGroupInput.processContest(match)
 	local Rscore1 = {}
 	local Rscore2 = {}
 	for opponentIndex = 1, 2 do
-		match['opponent' .. opponentIndex] = json.parseIfString(match['opponent' .. opponentIndex])
-		match['opponent' .. opponentIndex].extradata = json.parseIfString(match['opponent' .. opponentIndex].extradata)
 		local Opp = match['opponent' .. opponentIndex]
 		local ResultOpp = match.contest.opponents[opponentIndex]
 		ResultOpp.extradata = ResultOpp.extradata or {}
@@ -1100,11 +1057,6 @@ function StarcraftMatchGroupInput.processContest(match)
 		points = points + match.contest.points.diff
 	elseif tostring(match.winner) == tostring(match.contest.winner) then
 		points = points + match.contest.points.win
-	end
-
-	for opponentIndex = 1, 2 do
-		match['opponent' .. opponentIndex].extradata = json.stringify(match['opponent' .. opponentIndex].extradata)
-		match['opponent' .. opponentIndex] = json.stringify(match['opponent' .. opponentIndex])
 	end
 
 	match.contest = nil

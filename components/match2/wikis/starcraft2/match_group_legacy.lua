@@ -189,13 +189,7 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened)
 			for innerKey, innerVal in pairs(val) do
 				nestedArgs[innerKey] = _args[innerVal] or flattened[innerVal]
 			end
-			if String.startsWith(realKey, 'opponent') then
-				match[realKey] = json.stringify(nestedArgs)
-			elseif String.startsWith(realKey, 'map') then
-				match[realKey] = nestedArgs
-			else
-				match[realKey] = nestedArgs
-			end
+			match[realKey] = nestedArgs
 		end
 	elseif noSkip then
 		local options = String.split(val, '|')
@@ -228,10 +222,9 @@ function Legacy.checkAdvantage(score, opponent)
 	local scoreAdvantage, scoreSum = string.match(score,
 					'<abbr title="Winner\'s bracket advantage of (%d) game">(%d)</abbr>')
 	if scoreAdvantage then
-		opponent = json.parseIfString(opponent or {})
+		opponent = opponent or {}
 		opponent.score = scoreSum
 		opponent.advantage = scoreAdvantage
-		opponent = json.stringify(opponent)
 	end
 	return opponent
 end

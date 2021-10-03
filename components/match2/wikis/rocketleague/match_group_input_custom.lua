@@ -8,13 +8,13 @@
 
 local p = require('Module:Brkts/WikiSpecific/Base')
 
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 local Template = require('Module:Template')
-local json = require('Module:Json')
+local TypeUtil = require('Module:TypeUtil')
+local Variables = require('Module:Variables')
 local getIconName = require('Module:IconName').luaGet
 local _frame
 
@@ -33,11 +33,6 @@ local opponentFunctions = {}
 -- called from Module:MatchGroup
 function p.processMatch(frame, match)
 	_frame = frame
-	if type(match) == 'string' then
-		match = json.parse(match)
-	end
-
-	-- process match
 	match = matchFunctions.getDateStuff(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
@@ -50,11 +45,6 @@ end
 -- called from Module:Match/Subobjects
 function p.processMap(frame, map)
 	_frame = frame
-	if type(map) == 'string' then
-		map = json.parse(map)
-	end
-
-	-- process map
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -66,11 +56,6 @@ end
 -- called from Module:Match/Subobjects
 function p.processOpponent(frame, opponent)
 	_frame = frame
-	if type(opponent) == 'string' then
-		opponent = json.parse(opponent)
-	end
-
-	-- process opponent
 	if not Logic.isEmpty(opponent.template) and
 		string.lower(opponent.template) == 'bye' then
 			opponent.name = 'BYE'
@@ -87,14 +72,14 @@ function p.processOpponent(frame, opponent)
 	local score2 = tonumber(opponent.score2 or '')
 	local score3 = tonumber(opponent.score3 or '')
 	if score2 then
-		opponent.extradata = json.stringify({
+		opponent.extradata = {
 			score2 = score2,
 			score3 = score3,
 			set1win = Logic.readBool(opponent.set1win),
 			set2win = Logic.readBool(opponent.set2win),
 			set3win = Logic.readBool(opponent.set3win),
 			additionalScores = true
-		})
+		}
 	end
 
 	return opponent
@@ -103,9 +88,6 @@ end
 -- called from Module:Match/Subobjects
 function p.processPlayer(frame, player)
 	_frame = frame
-	if type(player) == 'string' then
-		player = json.parse(player)
-	end
 	return player
 end
 
@@ -138,7 +120,7 @@ function p._placementSortFunction(table, key1, key2)
 end
 
 function p._getSetWins(opp)
-	local extradata = json.parseIfString(opp.extradata or '{}')
+	local extradata = opp.extradata or {}
 	local set1win = extradata.set1win and 1 or 0
 	local set2win = extradata.set2win and 1 or 0
 	local set3win = extradata.set3win and 1 or 0
@@ -197,7 +179,7 @@ end
 
 function matchFunctions.getVodStuff(match)
 	match.stream = match.stream or {}
-	match.stream = json.stringify({
+	match.stream = {
 		stream = Logic.emptyOr(match.stream.stream, Variables.varDefault('stream')),
 		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
 		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
@@ -207,17 +189,14 @@ function matchFunctions.getVodStuff(match)
 		douyu = Logic.emptyOr(match.stream.douyu or match.douyu, Variables.varDefault('douyu')),
 		smashcast = Logic.emptyOr(match.stream.smashcast or match.smashcast, Variables.varDefault('smashcast')),
 		youtube = Logic.emptyOr(match.stream.youtube or match.youtube, Variables.varDefault('youtube'))
-	})
+	}
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	-- apply vodgames
 	for index = 1, MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]
 		if not Logic.isEmpty(vodgame) then
-			local map = Logic.emptyOr(match['map' .. index], nil, {})
-			if type(map) == 'string' then
-				map = json.parse(map)
-			end
+			local map = match['map' .. index] or {}
 			map.vod = map.vod or vodgame
 			match['map' .. index] = map
 		end
@@ -228,7 +207,7 @@ end
 function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
-	match.extradata = json.stringify({
+	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
@@ -237,7 +216,7 @@ function matchFunctions.getExtraData(match)
 		octane = match.octane,
 		liquipediatier2 = Variables.varDefault('tournament_tier2'),
 		isconverted = 0
-	})
+	}
 	return match
 end
 
@@ -249,10 +228,6 @@ function matchFunctions.getOpponents(args)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			if type(opponent) == 'string' then
-				opponent = json.parse(opponent)
-			end
-
 			--retrieve name and icon for teams from team templates
 			if opponent.type == 'team' and
 				not Logic.isEmpty(opponent.template, args.date) then
@@ -340,10 +315,7 @@ end
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
-		local player = match['opponent' .. opponentIndex .. '_p' .. playerIndex] or {}
-		if type(player) == 'string' then
-			player = json.parse(player)
-		end
+		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 		if not Table.isEmpty(player) then
@@ -357,7 +329,7 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	map.extradata = json.stringify({
+	map.extradata = {
 		ot = map.ot,
 		otlength = map.otlength,
 		comment = map.comment,
@@ -365,7 +337,7 @@ function mapFunctions.getExtraData(map)
 		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
-	})
+	}
 	return map
 end
 
@@ -442,9 +414,6 @@ end
 
 function mapFunctions.getParticipantsData(map)
 	local participants = map.participants or {}
-	if type(participants) == 'string' then
-		participants = json.parse(participants)
-	end
 
 	-- fill in goals from goal progression
 	local scorers = {}
@@ -533,11 +502,12 @@ end
 
 --needed for legacy conversion to work for solo brackets
 function opponentFunctions.getSoloFromLegacy(opponent)
-	opponent.match2players = '[' .. json.stringify({
+	local player = {
 		name = opponent.name,
 		displayname = opponent.displayname or opponent.name,
 		flag = opponent.flag
-	}) .. ']'
+	}
+	opponent.match2players = {player}
 	opponent.name = nil
 	return opponent
 end
