@@ -382,7 +382,7 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 				game = match['map' .. i].game,
 				liquipediatier = match['map' .. i].liquipediatier,
 				liquipediatiertype = match['map' .. i].liquipediatiertype,
-				participants = participants,
+				participants = Table.deepCopy(participants),
 				mode = match['map' .. i].mode,
 				resulttype = 'submatch',
 				subgroup = k,

@@ -88,7 +88,7 @@ function TemplateMatch.storeVarsToLPDB()
 
 	-- store matches
 	for _, match in pairs(matches) do
-		Match.store(match, true)
+		Match.store(match)
 	end
 end
 
