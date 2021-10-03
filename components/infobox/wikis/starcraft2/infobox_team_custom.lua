@@ -141,7 +141,7 @@ function CustomTeam:addToLpdb(lpdbData)
 end
 
 function CustomTeam._getStandardLocationValue(location)
-	return Flags.countryName(location) or location
+	return Flags.CountryName(location) or location
 end
 
 function CustomTeam.playerBreakDown(args)
