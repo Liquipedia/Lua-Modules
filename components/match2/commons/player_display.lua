@@ -11,6 +11,7 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local TypeUtil = require('Module:TypeUtil')
+local Flags = require('Module:Flags')
 
 --[[
 Display components for players.
@@ -95,6 +96,8 @@ function PlayerDisplay.InlinePlayer(props)
 end
 
 -- Note: require('Module:Flags').Icon automatically includes a span with class="flag"
-PlayerDisplay.Flag = require('Module:Flags').Icon({flag = name, shouldLink = false})
+function PlayerDisplay.Flag(name)
+	return Flags.Icon({flag = name, shouldLink = false})
+end 
 
 return Class.export(PlayerDisplay)
