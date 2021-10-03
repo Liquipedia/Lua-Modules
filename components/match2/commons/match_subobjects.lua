@@ -6,11 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
+local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local getArgs = require('Module:Arguments').getArgs
 local wikiSpec = require('Module:Brkts/WikiSpecific')
 
 local ALLOWED_OPPONENT_TYPES = { 'literal', 'team', 'solo', 'duo', 'trio', 'quad' }
@@ -18,8 +20,13 @@ local ALLOWED_OPPONENT_TYPES = { 'literal', 'team', 'solo', 'duo', 'trio', 'quad
 local MatchSubobjects = {}
 
 function MatchSubobjects.getOpponent(frame)
-	local args = getArgs(frame)
-	return MatchSubobjects.luaGetOpponent(frame, args)
+	local args = Arguments.getArgs(frame)
+	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
+		local MatchSubobjects_ = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
+		return MatchSubobjects_.withPerformanceSetup(function()
+			return MatchSubobjects_.luaGetOpponent(frame, args)
+		end)
+	end)
 end
 
 function MatchSubobjects.luaGetOpponent(frame, args)
@@ -41,8 +48,13 @@ function MatchSubobjects.luaGetOpponent(frame, args)
 end
 
 function MatchSubobjects.getMap(frame)
-	local args = getArgs(frame)
-	return MatchSubobjects.luaGetMap(frame, args)
+	local args = Arguments.getArgs(frame)
+	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
+		local MatchSubobjects_ = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
+		return MatchSubobjects_.withPerformanceSetup(function()
+			return MatchSubobjects_.luaGetMap(frame, args)
+		end)
+	end)
 end
 
 function MatchSubobjects.luaGetMap(frame, args)
@@ -88,7 +100,7 @@ function MatchSubobjects.luaGetMap(frame, args)
 end
 
 function MatchSubobjects.getRound(frame)
-	local args = getArgs(frame)
+	local args = Arguments.getArgs(frame)
 	return MatchSubobjects.luaGetRound(frame, args)
 end
 
@@ -97,8 +109,13 @@ function MatchSubobjects.luaGetRound(frame, args)
 end
 
 function MatchSubobjects.getPlayer(frame)
-	local args = getArgs(frame)
-	return MatchSubobjects.luaGetPlayer(frame, args)
+	local args = Arguments.getArgs(frame)
+	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
+		local MatchSubobjects_ = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
+		return MatchSubobjects_.withPerformanceSetup(function()
+			return MatchSubobjects_.luaGetPlayer(frame, args)
+		end)
+	end)
 end
 
 function MatchSubobjects.luaGetPlayer(frame, args)
@@ -109,6 +126,16 @@ function MatchSubobjects.luaGetPlayer(frame, args)
 		flag = args.flag,
 		name = args.name,
 	})
+end
+
+function MatchSubobjects.withPerformanceSetup(f)
+	if FeatureFlag.get('perf') then
+		local config = Lua.loadDataIfExists('Module:MatchGroup/Config')
+		local perfConfig = Table.getByPathOrNil(config, {'subobjectPerf'}) or {}
+		return require('Module:Performance/Util').withSetup(perfConfig, f)
+	else
+		return f()
+	end
 end
 
 return MatchSubobjects

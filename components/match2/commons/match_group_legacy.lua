@@ -11,14 +11,14 @@ local Legacy = {}
 local getArgs = require('Module:Arguments').getArgs
 local json = require('Module:Json')
 local MatchGroup = require('Module:MatchGroup')
-local getOpponent = require('Module:Match/Subobjects').luaGetOpponent
-local getMap = require('Module:Match/Subobjects').luaGetMap
 local getDefaultMapping = require('Module:MatchGroup/Legacy/Default').get
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+
+local MatchSubobjects = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
 
 local _IS_USERSPACE = false
 local _NAMESPACE_USER = 2
@@ -202,9 +202,9 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 				nestedArgs[innerKey] = _args[innerVal] or flattened[innerVal]
 			end
 			if String.startsWith(realKey, 'opponent') then
-				match[realKey] = getOpponent(_frame, nestedArgs)
+				match[realKey] = MatchSubobjects.luaGetOpponent(_frame, nestedArgs)
 			elseif String.startsWith(realKey, 'map') then
-				match[realKey] = getMap(_frame, nestedArgs)
+				match[realKey] = MatchSubobjects.luaGetMap(_frame, nestedArgs)
 			else
 				match[realKey] = nestedArgs
 			end

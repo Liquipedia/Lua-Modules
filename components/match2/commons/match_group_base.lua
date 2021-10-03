@@ -11,9 +11,10 @@ local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Match = require('Module:Match')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+
+local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 
 local MatchGroupBase = {}
 
@@ -115,8 +116,8 @@ end
 function MatchGroupBase.enableInstrumentation()
 	if FeatureFlag.get('perf') then
 		local config = Lua.loadDataIfExists('Module:MatchGroup/Config')
-		local locations = Table.getByPathOrNil(config, {'perf', 'locations'}) or {}
-		require('Module:Performance/Util').startInstrumentation(locations)
+		local perfConfig = Table.getByPathOrNil(config, {'perf'}) or {}
+		require('Module:Performance/Util').startInstrumentation(perfConfig)
 	end
 end
 
