@@ -64,7 +64,7 @@ function Flags.Icon(args, flagName)
 	if String.isEmpty(flagName) then
 		return ''
 	end
-	shouldLink = Logic.readBoolOrNil(shouldLink) ~= false
+	shouldLink = Logic.readBool(shouldLink)
 
 	local flagKey = Flags._convertToKey(flagName)
 
