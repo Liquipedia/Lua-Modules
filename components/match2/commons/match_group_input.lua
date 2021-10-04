@@ -225,4 +225,14 @@ function MatchGroupInput.fetchStandaloneMatch(matchId)
 	end)
 end
 
+local getContentLanguage = FnUtil.memoize(mw.getContentLanguage)
+
+function MatchGroupInput.readDate(dateString)
+	local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
+	local matchDate = String.explode(dateString, '<', 0):gsub('-', '')
+	local dateIsExact = String.contains(matchDate .. timezoneOffset, '[%+%-]')
+	local date = getContentLanguage():formatDate('c', matchDate .. timezoneOffset)
+	return date, dateIsExact
+end
+
 return MatchGroupInput
