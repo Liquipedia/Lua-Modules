@@ -183,6 +183,7 @@ function StarcraftMatchGroupInput.getExtraData(match)
 			matchsection = Variables.varDefault('matchsection'),
 			comment = match.comment,
 			featured = match.featured,
+			casters = match.casters,
 			veto1 = StarcraftMatchGroupInput.getVetoMap(match.veto1),
 			veto2 = StarcraftMatchGroupInput.getVetoMap(match.veto2),
 			veto3 = StarcraftMatchGroupInput.getVetoMap(match.veto3),

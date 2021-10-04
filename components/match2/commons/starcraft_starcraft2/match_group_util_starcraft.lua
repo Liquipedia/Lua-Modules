@@ -109,6 +109,7 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	match.headToHead = Logic.readBool(Table.extract(match.extradata, 'headtohead'))
 	match.isFfa = Logic.readBool(Table.extract(match.extradata, 'ffa'))
 	match.noScore = Logic.readBoolOrNil(Table.extract(match.extradata, 'noscore'))
+	match.casters = String.nilIfEmpty(Table.extract(match.extradata, 'casters'))
 
 	return match
 end
@@ -322,6 +323,7 @@ function StarcraftMatchGroupUtil.matchHasDetails(match)
 		or match.vod
 		or not Table.isEmpty(match.links)
 		or match.comment
+		or match.casters
 		or 0 < #match.vetoes
 		or Array.any(match.games, function(game)
 			return game.map and game.map ~= 'TBD'

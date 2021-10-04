@@ -144,6 +144,14 @@ function StarcraftMatchSummary.Body(props)
 		body:node(vetoNode:addClass('brkts-popup-body-element'))
 	end
 
+	-- Match casters
+	if match.casters then
+		body:node(
+			html.create('div'):addClass('brkts-popup-sc-game-comment')
+				:node('Caster(s): ' .. match.casters)
+		)
+	end
+
 	-- Match comment
 	if match.comment then
 		body:node(
