@@ -22,6 +22,7 @@ function Flags.Flag(flagName)
 end
 function Flags.FlagNoLink(flagName)
 	return tostring(Flags.Icon({flag = flagName, noLink = true})) .. '[[Category:Pages using old Flags entry points]]'
+
 end
 
 -- Returns a flag
