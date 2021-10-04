@@ -15,7 +15,7 @@ local Variables = require('Module:Variables')
 
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local json = require('Module:Json')
-local cleanFlag = require('Module:Flags')._CountryName
+local cleanFlag = require('Module:Flags').CountryName
 local defaultIcon
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
