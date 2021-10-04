@@ -25,7 +25,7 @@ end
 
 --legacy functions
 function Flags._Flag(name)
-	return Flags.Icon(name)
+	return Flags.Icon({flag = name, shouldLink = true})
 end
 function Flags._FlagNoLink(name)
 	return Flags.Icon({flag = name, shouldLink = false})
@@ -34,7 +34,7 @@ function Flags._CountryName(name)
 	return Flags.CountryName(name)
 end
 function Flags.flag(name)
-	return Flags.Icon(name)
+	return Flags.Icon({flag = name, shouldLink = true})
 end
 function Flags.flagNoLink(name)
 	return Flags.Icon({flag = name, shouldLink = false})
@@ -94,7 +94,7 @@ end
 -->>	function Flags.CountryName(flagName)
 function Flags.CountryName(frame)
 	local flagName
-	if type(frame) ~= 'string' then
+	if type(frame) == 'table' then
 		flagName = frame.args[1]
 	else
 		flagName = frame
