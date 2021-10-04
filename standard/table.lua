@@ -249,6 +249,34 @@ function Table.iter.spairs(tbl, order)
 	end
 end
 
+--[[
+Iterates over table entries whose keys are prefixed numbers. The entries are
+visited in order, starting from 1. The iteration stops upon a skipped number.
+
+Example:
+local args = {
+	p1 = {},
+	p2 = {},
+	p3 = {},
+	foo = {},
+	p10 = {},
+}
+for key, player in Table.iter.pairsByPrefix(args, 'p') do
+	mw.log(key)
+end
+
+will print out 'p1 p2 p3'
+]]
+function Table.iter.pairsByPrefix(tbl, prefix)
+	local i = 1
+	return function()
+		local key = prefix .. i
+		local value = tbl[key]
+		i = i + 1
+		return value and key, value or nil
+	end
+end
+
 function Table.iter.forEach(tbl, lambda)
 	for _, item in ipairs(tbl) do
 		lambda(item)
