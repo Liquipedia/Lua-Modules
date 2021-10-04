@@ -27,17 +27,17 @@ end
 -- Returns a flag
 --[[
 supported args are:
-flag	- name, flag code, or alias of the Flag
-noLink	- boolean that decides if the flag should link or not
-		--> set this to true for the flag to not link
-		--> else the flag will link to the according category
+flag		- country name, flag code, or alias of the Flag
+shouldLink	- boolean that decides if the flag should link or not
+		--> set this to true for the flag to link to the according category
+		--> else the flag will not link
 ]]--
 function Flags.Icon(args, flagName)
-	local noLink
+	local shouldLink
 	if type(args) == 'string' then
 		flagName = args
 	elseif type(args) == 'table' then
-		noLink = args.noLink
+		shouldLink = args.shouldLink
 		if String.isEmpty(flagName) then
 			flagName = args.flag
 		end
@@ -45,7 +45,7 @@ function Flags.Icon(args, flagName)
 	if String.isEmpty(flagName) then
 		return ''
 	end
-	noLink = Logic.readBool(noLink)
+	shouldLink = Logic.readBoolOrNil(shouldLink) ~= false
 
 	local flagKey = Flags._convertToKey(flagName)
 
@@ -53,7 +53,7 @@ function Flags.Icon(args, flagName)
 		local flagData = MasterData.data[flagKey]
 		if flagData.flag ~= 'File:Space filler flag.png' then
 			local link = ''
-			if flagData.name and not noLink then
+			if flagData.name and shouldLink then
 				link = 'Category:' .. flagData.name
 			end
 			return '<span class="flag">[[' .. flagData.flag ..
@@ -61,12 +61,12 @@ function Flags.Icon(args, flagName)
 		else
 			return '<span class="flag">[[' .. flagData.flag .. '|link=]]</span>'
 		end
-	elseif noLink then
-		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName) .. '[[Category:Pages with unknown flags]]'
-	else
+	elseif shouldLink then
 		mw.log('Unknown flag: ', flagName)
 		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName) .. '[[Category:Pages with unknown flags]]'
+	else
+		mw.log('Unknown flag: ', flagName)
+		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName) .. '[[Category:Pages with unknown flags]]'
 	end
 end
 
