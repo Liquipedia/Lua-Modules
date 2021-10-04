@@ -15,23 +15,23 @@ local MatchGroup = {}
 -- Entry point used by Template:Bracket
 -- Deprecated
 function MatchGroup.bracket(frame)
-	return MatchGroupDisplay.TemplateBracket(frame)
+	return MatchGroupDisplay.TemplateBracket(frame) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Deprecated
 function MatchGroup.luaBracket(_, args)
-	return MatchGroupDisplay.TemplateBracket(args)
+	return MatchGroupDisplay.TemplateBracket(args) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Entry point used by Template:Matchlist
 -- Deprecated
 function MatchGroup.matchlist(frame)
-	return MatchGroupDisplay.TemplateMatchlist(frame)
+	return MatchGroupDisplay.TemplateMatchlist(frame) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Deprecated
 function MatchGroup.luaMatchlist(_, args)
-	return MatchGroupDisplay.TemplateMatchlist(args)
+	return MatchGroupDisplay.TemplateMatchlist(args) .. MatchGroupDisplay.deprecatedCategory
 end
 
 return MatchGroup

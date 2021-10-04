@@ -22,7 +22,6 @@ function Flags.Flag(flagName)
 end
 function Flags.FlagNoLink(flagName)
 	return tostring(Flags.Icon({flag = flagName, shouldLink = false})) .. '[[Category:Pages using old Flags entry points]]'
-
 end
 
 -- Returns a flag
@@ -46,7 +45,7 @@ function Flags.Icon(args, flagName)
 	if String.isEmpty(flagName) then
 		return ''
 	end
-	shouldLink = Logic.readBoolOrNil(shouldLink) ~= false
+	shouldLink = Logic.readBool(shouldLink)
 
 	local flagKey = Flags._convertToKey(flagName)
 

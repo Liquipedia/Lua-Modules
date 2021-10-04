@@ -15,7 +15,7 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Localisation = require('Module:Localisation')
 local Links = require('Module:Links')
 local String = require('Module:String')
-local Flags = require('Module:Flags')._Flag
+local Flags = require('Module:Flags')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -230,7 +230,7 @@ function Series:_createLocation(country, city)
 		return ''
 	end
 
-	return Flags(country) .. '&nbsp;' .. (city or country)
+	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
 end
 
 function Series:_setCountryCategories(country)

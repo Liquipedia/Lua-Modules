@@ -83,11 +83,17 @@ function Links:make()
 
 	for _, group in Table.iter.spairs(_PRIORITY_GROUPS) do
 		for _, key in ipairs(group) do
-			if self.links[self:_removeAppendedNumber(key)] ~= nil then
+			if self.links[key] ~= nil then
 				infoboxLinks:wikitext(' ' .. self:_makeLink(key, self.links[key]))
-
-				-- Remove links from the collection
+				-- Remove link from the collection
 				self.links[key] = nil
+
+				local index = 2
+				while self.links[key .. index] ~= nil do
+					infoboxLinks:wikitext(' ' .. self:_makeLink(key, self.links[key .. index]))
+					-- Remove link from the collection
+					self.links[key .. index] = nil
+				end
 			end
 		end
 	end

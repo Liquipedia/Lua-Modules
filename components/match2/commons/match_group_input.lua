@@ -7,7 +7,10 @@
 --
 
 local Array = require('Module:Array')
+local FeatureFlag = require('Module:FeatureFlag')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -15,7 +18,7 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInput = {}
 
-function MatchGroupInput.readMatchlist(bracketId, args, matchBuilder)
+function MatchGroupInput.readMatchlist(bracketId, args)
 	local sectionHeader = args.section or Variables.varDefault('bracket_header') or ''
 	Variables.varDefine('bracket_header', sectionHeader)
 	local tournamentParent = Variables.varDefault('tournament_parent', '')
@@ -29,12 +32,9 @@ function MatchGroupInput.readMatchlist(bracketId, args, matchBuilder)
 		end
 
 		matchArgs = Json.parseIfString(matchArgs)
+		matchArgs.bracketid = bracketId
+		matchArgs.matchid = matchId
 		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
-		if matchBuilder then
-			match = matchBuilder(mw.getCurrentFrame(), match, bracketId .. '_' .. matchId)
-		end
-		match.bracketid = bracketId
-		match.matchid = matchId
 		match.parent = tournamentParent
 
 		-- Add more fields to bracket data
@@ -55,7 +55,8 @@ function MatchGroupInput.readMatchlist(bracketId, args, matchBuilder)
 	return Array.mapIndexes(readMatch)
 end
 
-function MatchGroupInput.readBracket(bracketId, args, matchBuilder)
+function MatchGroupInput.readBracket(bracketId, args)
+	local warnings = {}
 	local templateId = args[1]
 	assert(templateId, 'argument \'1\' (templateId) is empty')
 
@@ -63,7 +64,18 @@ function MatchGroupInput.readBracket(bracketId, args, matchBuilder)
 	Variables.varDefine('bracket_header', sectionHeader)
 	local tournamentParent = Variables.varDefault('tournament_parent', '')
 
-	local bracketDatasById = MatchGroupInput._fetchBracketDatas(templateId, bracketId)
+	local bracketDatasById = Logic.try(function()
+		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
+	end)
+		:catch(function(message)
+			if FeatureFlag.get('prompt_purge_bracket_template') and String.endsWith(message, 'does not exist') then
+				table.insert(warnings, message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
+				return {}
+			else
+				error(message)
+			end
+		end)
+		:get()
 
 	local missingMatchKeys = {}
 	local function readMatch(matchId)
@@ -78,12 +90,9 @@ function MatchGroupInput.readBracket(bracketId, args, matchBuilder)
 		end
 
 		matchArgs = Json.parseIfString(matchArgs) or {}
+		matchArgs.bracketid = bracketId
+		matchArgs.matchid = matchId
 		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
-		if matchBuilder then
-			match = matchBuilder(mw.getCurrentFrame(), match, bracketId .. '_' .. matchKey)
-		end
-		match.bracketid = bracketId
-		match.matchid = matchId
 		match.parent = tournamentParent
 
 		-- Add more fields to bracket data
@@ -122,7 +131,6 @@ function MatchGroupInput.readBracket(bracketId, args, matchBuilder)
 	table.sort(matchIds)
 	local matches = Array.map(matchIds, readMatch)
 
-	local warnings = {}
 	if #missingMatchKeys ~= 0 then
 		table.insert(warnings, 'Missing matches: ' .. table.concat(missingMatchKeys, ', '))
 	end
@@ -134,7 +142,7 @@ end
 function MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateId)
 	assert(type(matches) == 'table')
-	assert(#matches ~= 0, 'Bracket ' .. templateId .. ' does not exist')
+	assert(#matches ~= 0, 'Template ' .. templateId .. ' does not exist')
 
 	local function replaceBracketId(matchId)
 		local _, baseMatchId = MatchGroupUtil.splitMatchId(matchId)
@@ -193,6 +201,30 @@ function MatchGroupInput.applyOverrideArgs(matches, args)
 			match.bracketData.header = args[matchKey .. 'header'] or match.bracketData.header
 		end
 	end
+end
+
+--[[
+Fetches the LPDB records of a match group containing standalone matches.
+Standalone matches are specified from individual match pages in the Match
+namespace.
+]]
+MatchGroupInput.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
+	return mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = '[[namespace::130]] AND [[match2bracketid::'.. bracketId .. ']]'
+	})
+end)
+
+--[[
+Fetches the LPDB record of a standalone match.
+
+matchId is a full match ID, such as MATCH_wec2CbLWRx_0001
+]]
+function MatchGroupInput.fetchStandaloneMatch(matchId)
+	local bracketId, _ = MatchGroupUtil.splitMatchId(matchId)
+	local matches = MatchGroupInput.fetchStandaloneMatchGroup(bracketId)
+	return Array.find(matches, function(match)
+		return match.match2id == matchId
+	end)
 end
 
 return MatchGroupInput

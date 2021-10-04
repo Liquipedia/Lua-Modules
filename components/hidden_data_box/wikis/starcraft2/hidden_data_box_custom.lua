@@ -35,6 +35,11 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 
 	--custom stuff
 	Variables.varDefine('headtohead', args.headtohead)
+	BasicHiddenDataBox:checkAndAssign(
+		'featured',
+		args.featured,
+		(queryResult.extradata or {}).featured
+	)
 	if args.team_number then
 		Variables.varDefine('is_team_tournament', 1)
 		Variables.varDefine('participants_number', args.team_number)

@@ -21,9 +21,9 @@ local MatchGroupDisplay = {}
 --[[
 Reads a matchlist input spec, saves it to LPDB, and displays the matchlist.
 ]]
-function MatchGroupDisplay.MatchlistBySpec(args, matchBuilder)
+function MatchGroupDisplay.MatchlistBySpec(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
-	local matches = MatchGroupInput.readMatchlist(options.bracketId, args, matchBuilder)
+	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
 	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
 
 	local matchlistNode
@@ -48,9 +48,9 @@ end
 --[[
 Reads a bracket input spec, saves it to LPDB, and displays the bracket.
 ]]
-function MatchGroupDisplay.BracketBySpec(args, matchBuilder)
+function MatchGroupDisplay.BracketBySpec(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
-	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, matchBuilder)
+	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args)
 	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
 
 	local bracketNode
@@ -85,7 +85,6 @@ function MatchGroupDisplay.MatchGroupById(args)
 	local bracketId = args.id or args[1]
 	args.id = bracketId
 	args[1] = bracketId
-	assert(bracketId, 'Missing bracket ID')
 
 	local matches = MatchGroupUtil.fetchMatches(bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
@@ -143,34 +142,36 @@ function MatchGroupDisplay.TemplateShowBracket(frame)
 	end)
 end
 
+MatchGroupDisplay.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
+
 -- Unused entry point
 -- Deprecated
 function MatchGroupDisplay.bracket(frame)
-	return MatchGroupDisplay.TemplateBracket(frame)
+	return MatchGroupDisplay.TemplateBracket(frame) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Deprecated
 function MatchGroupDisplay.luaBracket(frame, args, matches)
 	local BracketDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('bracket')
-	return BracketDisplay.luaGet(frame, args, matches)
+	return tostring(BracketDisplay.luaGet(frame, args, matches)) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Unused entry point
 -- Deprecated
 function MatchGroupDisplay.matchlist(frame)
-	return MatchGroupDisplay.TemplateMatchlist(frame)
+	return MatchGroupDisplay.TemplateMatchlist(frame) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Deprecated
 function MatchGroupDisplay.luaMatchlist(frame, args, matches)
 	local MatchlistDisplay = require('Module:Brkts/WikiSpecific').getMatchGroupModule('matchlist')
-	return MatchlistDisplay.luaGet(frame, args, matches)
+	return tostring(MatchlistDisplay.luaGet(frame, args, matches)) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Entry point from Template:ShowBracket and direct #invoke
 -- Deprecated
 function MatchGroupDisplay.Display(frame)
-	return MatchGroupDisplay.TemplateShowBracket(frame)
+	return tostring(MatchGroupDisplay.TemplateShowBracket(frame)) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Entry point from direct #invoke
@@ -178,7 +179,7 @@ end
 function MatchGroupDisplay.DisplayDev(frame)
 	local args = Arguments.getArgs(frame)
 	args.dev = true
-	return MatchGroupDisplay.TemplateShowBracket(args)
+	return tostring(MatchGroupDisplay.TemplateShowBracket(args)) .. MatchGroupDisplay.deprecatedCategory
 end
 
 return MatchGroupDisplay
