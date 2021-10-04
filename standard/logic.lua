@@ -38,6 +38,14 @@ function Logic.isEmpty(val)
 	end
 end
 
+function Logic.isNotEmpty(val)
+	if type(val) == 'table' then
+		return require('Module:Table').isNotEmpty(val)
+	else
+		return val ~= nil and val ~= ''
+	end
+end
+
 function Logic.readBool(val)
 	return val == 'true' or val == true or val == '1' or val == 1
 end
