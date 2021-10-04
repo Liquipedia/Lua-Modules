@@ -105,7 +105,9 @@ function p.storeGames(match, match2)
 			submatch.winner = game.winner or ''
 			submatch.walkover = game.walkover or ''
 			submatch.finished = match2.finished or '0'
-			submatch.resulttype = game.resulttype
+			if game.resulttype ~= 'submatch' then
+				submatch.resulttype = game.resulttype
+			end
 			submatch.mode = '1v1'
 			submatch.date = game.date
 			submatch.dateexact = match2.dateexact or ''

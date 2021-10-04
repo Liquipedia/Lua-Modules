@@ -128,13 +128,13 @@ end
 -- Deprecated
 function MatchGroupBase.luaMatchlist(_, args, matchBuilder)
 	local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
-	return MatchGroupDisplay.MatchlistBySpec(args, matchBuilder)
+	return MatchGroupDisplay.MatchlistBySpec(args, matchBuilder) .. MatchGroupDisplay.deprecatedCategory
 end
 
 -- Deprecated
 function MatchGroupBase.luaBracket(_, args, matchBuilder)
 	local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
-	return MatchGroupDisplay.BracketBySpec(args, matchBuilder)
+	return MatchGroupDisplay.BracketBySpec(args, matchBuilder) .. MatchGroupDisplay.deprecatedCategory
 end
 
 return MatchGroupBase
