@@ -21,9 +21,9 @@ local MatchGroupDisplay = {}
 --[[
 Reads a matchlist input spec, saves it to LPDB, and displays the matchlist.
 ]]
-function MatchGroupDisplay.MatchlistBySpec(args, matchBuilder)
-	local options, warnings = MatchGroupBase.readOptions(args, 'matchlist')
-	local matches = MatchGroupInput.readMatchlist(options.bracketId, args, matchBuilder)
+function MatchGroupDisplay.MatchlistBySpec(args)
+	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
+	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
 	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
 
 	local matchlistNode
@@ -40,7 +40,7 @@ function MatchGroupDisplay.MatchlistBySpec(args, matchBuilder)
 
 	local parts = Array.extend(
 		{matchlistNode},
-		Array.map(warnings, MatchGroupDisplay.WarningBox)
+		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox)
 	)
 	return table.concat(Array.map(parts, tostring))
 end
@@ -48,9 +48,9 @@ end
 --[[
 Reads a bracket input spec, saves it to LPDB, and displays the bracket.
 ]]
-function MatchGroupDisplay.BracketBySpec(args, matchBuilder)
-	local options, warnings = MatchGroupBase.readOptions(args, 'bracket')
-	local matches = MatchGroupInput.readBracket(options.bracketId, args, matchBuilder)
+function MatchGroupDisplay.BracketBySpec(args)
+	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
+	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args)
 	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
 
 	local bracketNode
@@ -71,7 +71,8 @@ function MatchGroupDisplay.BracketBySpec(args, matchBuilder)
 	end
 
 	local parts = Array.extend(
-		Array.map(warnings, MatchGroupDisplay.WarningBox),
+		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox),
+		Array.map(bracketWarnings, MatchGroupDisplay.WarningBox),
 		{bracketNode}
 	)
 	return table.concat(Array.map(parts, tostring))

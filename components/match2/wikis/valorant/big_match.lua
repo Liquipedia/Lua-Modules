@@ -7,17 +7,17 @@
 --
 
 local Arguments = require("Module:Arguments")
-local Match = require("Module:Match")
-local LocalMatch = require("Module:Brkts/WikiSpecific")
 local Class = require('Module:Class')
+local Countdown = require('Module:Countdown')
 local DivTable = require('Module:DivTable')
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Links = require('Module:Links')
-local Countdown = require('Module:Countdown')
+local Logic = require('Module:Logic')
+local Match = require("Module:Match")
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local Template = require('Module:Template')
+local ValorantMatchGroupInput = require('Module:MatchGroup/Input/Custom')
 
 local BigMatch = Class.new()
 
@@ -34,7 +34,7 @@ function BigMatch.run(frame)
 		return ''
 	end
 
-	match = LocalMatch.processMatch(frame, match)
+	match = ValorantMatchGroupInput.processMatch(frame, match, {isStandalone = true})
 	local identifiers = BigMatch:_getId()
 	match['bracketid'] = "MATCH_" .. identifiers[1]
 	match['matchid'] = identifiers[2]
