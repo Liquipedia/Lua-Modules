@@ -13,12 +13,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-
-local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local cleanFlag = require('Module:Flags').CountryName
-local defaultIcon
 
-local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+
 local FACTIONS = mw.loadData('Module:Races')
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local ALLOWED_STATUSES2 = { ['W'] = 'W', ['FF'] = 'FF', ['L'] = 'L', ['DQ'] = 'DQ', ['-'] = 'L' }
@@ -61,21 +59,15 @@ function StarcraftMatchGroupInput.processMatch(_, match)
 	return match
 end
 
+
 function StarcraftMatchGroupInput.getDateStuff(match)
 	local lang = mw.getContentLanguage()
 	match.lang = lang
 	-- parse date string with abbr
-	if not Logic.isEmpty(match.date) then
-		local matchString = match.date or ''
-		local timezone = String.split(
-			String.split(matchString, 'data%-tz%=\"')[2] or '',
-			'\"')[1] or String.split(
-			String.split(matchString, 'data%-tz%=\'')[2] or '',
-			'\'')[1] or ''
-		local matchDate = String.explode(matchString, '<', 0):gsub('-', '')
-		match.date = matchDate .. timezone
-		match.dateexact = match.dateexact == 'true' or String.contains(match.date, '%+') or String.contains(match.date, '%-')
-		match.date = lang:formatDate('c', match.date)
+	if Logic.isNotEmpty(match.date) then
+		local dateIsExact
+		match.date, dateIsExact = MatchGroupInput.readDate(match.date)
+		match.dateexact = match.dateexact == 'true' or dateIsExact
 		Variables.varDefine('matchDate', match.date)
 	else
 		local DateVar = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate', '')
@@ -95,7 +87,7 @@ function StarcraftMatchGroupInput.checkFinished(match)
 		match.finished = false
 	elseif Logic.readBool(match.finished) then
 		match.finished = true
-	elseif not Logic.isEmpty(match.winner) then
+	elseif Logic.isNotEmpty(match.winner) then
 		match.finished = true
 	end
 
@@ -118,7 +110,7 @@ end
 function StarcraftMatchGroupInput.getTournamentVars(match)
 	match.noQuery = Variables.varDefault('disable_SMW_storage', 'false')
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
-	match['type'] = Logic.emptyOr(match['type'], Variables.varDefault('tournament_type'))
+	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
 	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
 	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_tickername'))
 	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
@@ -137,7 +129,6 @@ function StarcraftMatchGroupInput.getTournamentVars(match)
 end
 
 function StarcraftMatchGroupInput.getVodStuff(match)
-	match.stream = match.stream or {}
 	match.stream = {
 		stream = Logic.emptyOr(match.stream, Variables.varDefault('stream')),
 		twitch = Logic.emptyOr(match.twitch, Variables.varDefault('twitch')),
@@ -157,13 +148,13 @@ end
 
 function StarcraftMatchGroupInput.getLinks(match)
 	match.links = {
-		preview = match.preview,
-		preview2 = match.preview2,
 		interview = match.interview,
 		interview2 = match.interview2,
-		review = match.review,
-		recap = match.recap,
 		lrthread = match.lrthread,
+		preview = match.preview,
+		preview2 = match.preview2,
+		recap = match.recap,
+		review = match.review,
 	}
 	return match
 end
@@ -234,19 +225,18 @@ function StarcraftMatchGroupInput.adjustData(match)
 	--main processing done here
 	local subgroup = 0
 	for mapKey, _ in Table.iter.pairsByPrefix(match, 'map') do
-		local i = tonumber(mapKey:match('(%d+)$'))
-		match, subgroup = StarcraftMatchGroupInput.MapInput(match, i, subgroup)
+		match, subgroup = StarcraftMatchGroupInput.MapInput(match, mapKey, subgroup)
 	end
 
 	--apply vodgames
 	for index = 1, MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]
-		if (not Logic.isEmpty(vodgame)) and (not Logic.isEmpty(match['map' .. index])) then
+		if Logic.isNotEmpty(vodgame) and Logic.isNotEmpty(match['map' .. index]) then
 			match['map' .. index].vod = match['map' .. index].vod or vodgame
 		end
 	end
 
-	if string.find(match.mode, 'team') then
+	if match.mode:find('team') then
 		match = StarcraftMatchGroupInput.SubMatchStructure(match)
 	end
 
@@ -268,78 +258,76 @@ Misc. MatchInput functions
 
 ]]--
 function StarcraftMatchGroupInput.MatchWinnerProcessing(match)
-	local bestof = tonumber(match.bestof or 99) or 99
+	local bestof = tonumber(match.bestof) or 99
 	local walkover = match.walkover or ''
 	local numberofOpponents = 0
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		if not Logic.isEmpty(match['opponent' .. opponentIndex]) then
-			numberofOpponents = numberofOpponents + 1
-			--determine opponent scores, status and placement
-			--determine MATCH winner, resulttype and walkover
-			--the following ignores the possibility of > 2 opponents
-			if walkover ~= '' then
-				if Logic.isNumeric(walkover) then
-					walkover = tonumber(walkover)
-					if walkover == opponentIndex then
-						match.winner = opponentIndex
-						match.walkover = 'L'
-						match['opponent' .. opponentIndex].status = 'W'
-					elseif walkover == 0 then
-						match.winner = 0
-						match.walkover = 'L'
-						match['opponent' .. opponentIndex].status = 'L'
-					else
-						local upper = string.upper(match['opponent' .. opponentIndex].score or '')
-						match['opponent' .. opponentIndex].status = ALLOWED_STATUSES2[upper] or 'L'
-					end
-				elseif Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
-					if tonumber(match.winner or 0) == opponentIndex then
-						match['opponent' .. opponentIndex].status = 'W'
-					else
-						match['opponent' .. opponentIndex].status = ALLOWED_STATUSES2[string.upper(walkover)] or 'L'
-					end
-				else
-					local upper = string.upper(match['opponent' .. opponentIndex].score or '')
-					match['opponent' .. opponentIndex].status = ALLOWED_STATUSES2[upper] or 'L'
-					match.walkover = 'L'
-				end
-				match['opponent' .. opponentIndex].score = -1
-				match.finished = 'true'
-				match.resulttype = 'default'
-			elseif Logic.readBool(match.cancelled) then
-				match.resulttype = 'np'
-				match.finished = 'true'
-				match['opponent' .. opponentIndex].score = -1
-			elseif ALLOWED_STATUSES2[string.upper(match['opponent' .. opponentIndex].score or '')] then
-				if string.upper(match['opponent' .. opponentIndex].score) == 'W' then
+	for opponentKey, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+		local opponentIndex = tonumber(opponentKey:match('(%d+)$'))
+		numberofOpponents = numberofOpponents + 1
+		--determine opponent scores, status and placement
+		--determine MATCH winner, resulttype and walkover
+		--the following ignores the possibility of > 2 opponents
+		if walkover ~= '' then
+			if Logic.isNumeric(walkover) then
+				walkover = tonumber(walkover)
+				if walkover == opponentIndex then
 					match.winner = opponentIndex
-					match.resulttype = 'default'
-					match.finished = 'true'
-					match['opponent' .. opponentIndex].score = -1
-					match['opponent' .. opponentIndex].status = 'W'
+					match.walkover = 'L'
+					opponent.status = 'W'
+				elseif walkover == 0 then
+					match.winner = 0
+					match.walkover = 'L'
+					opponent.status = 'L'
 				else
-					match.resulttype = 'default'
-					match.finished = 'true'
-					match.walkover = ALLOWED_STATUSES2[string.upper(match['opponent' .. opponentIndex].score)]
-					local upper = string.upper(match['opponent' .. opponentIndex].score)
-					match['opponent' .. opponentIndex].status = ALLOWED_STATUSES2[upper]
-					match['opponent' .. opponentIndex].score = -1
+					local upper = string.upper(opponent.score or '')
+					opponent.status = ALLOWED_STATUSES2[upper] or 'L'
+				end
+			elseif Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
+				if tonumber(match.winner or 0) == opponentIndex then
+					opponent.status = 'W'
+				else
+					opponent.status = ALLOWED_STATUSES2[string.upper(walkover)] or 'L'
 				end
 			else
-				match['opponent' .. opponentIndex].status = 'S'
-				match['opponent' .. opponentIndex].score = tonumber(match['opponent' .. opponentIndex].score or '') or
-					tonumber(match['opponent' .. opponentIndex].sumscore) or -1
-				if match['opponent' .. opponentIndex].score > bestof / 2 then
-					match.finished = Logic.nilOr(match.finished, 'true')
-					match.winner = tonumber(match.winner or '') or opponentIndex
-				end
+				local upper = string.upper(opponent.score or '')
+				opponent.status = ALLOWED_STATUSES2[upper] or 'L'
+				match.walkover = 'L'
+			end
+			opponent.score = -1
+			match.finished = 'true'
+			match.resulttype = 'default'
+		elseif Logic.readBool(match.cancelled) then
+			match.resulttype = 'np'
+			match.finished = 'true'
+			opponent.score = -1
+		elseif ALLOWED_STATUSES2[string.upper(opponent.score or '')] then
+			if string.upper(opponent.score) == 'W' then
+				match.winner = opponentIndex
+				match.resulttype = 'default'
+				match.finished = 'true'
+				opponent.score = -1
+				opponent.status = 'W'
+			else
+				match.resulttype = 'default'
+				match.finished = 'true'
+				match.walkover = ALLOWED_STATUSES2[string.upper(opponent.score)]
+				local upper = string.upper(opponent.score)
+				opponent.status = ALLOWED_STATUSES2[upper]
+				opponent.score = -1
 			end
 		else
-			break
+			opponent.status = 'S'
+			opponent.score = tonumber(opponent.score or '') or
+				tonumber(opponent.sumscore) or -1
+			if opponent.score > bestof / 2 then
+				match.finished = Logic.nilOr(match.finished, 'true')
+				match.winner = tonumber(match.winner or '') or opponentIndex
+			end
 		end
 	end
 
 	for opponentIndex = 1, numberofOpponents do
+		local opponent = match['opponent' .. opponentIndex]
 		if match.winner == 'draw' or tonumber(match.winner) == 0 or
 				(match.opponent1.score == bestof / 2 and match.opponent1.score == match.opponent2.score) then
 			match.finished = 'true'
@@ -348,10 +336,10 @@ function StarcraftMatchGroupInput.MatchWinnerProcessing(match)
 		end
 		if tostring(match.winner) == tostring(opponentIndex) or
 				match.resulttype == 'draw' or
-				match['opponent' .. opponentIndex].score == bestof / 2 then
-			match['opponent' .. opponentIndex].placement = 1
+				opponent.score == bestof / 2 then
+			opponent.placement = 1
 		else
-			match['opponent' .. opponentIndex].placement = 2
+			opponent.placement = 2
 		end
 	end
 
@@ -362,53 +350,49 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 	local SubMatches = {}
 	local j = 0
 
-	for i = 1, MAX_NUM_MAPS do
-		if not Logic.isEmpty(match['map' .. i]) then
-			j = i
-			local participants = match['map' .. i].participants or {}
-			local opp = {}
+	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+		j = j + 1
+		local participants = map.participants or {}
+		local opp = {}
 
-			if match['map' .. i].mode == '1v1' then
-				for key, item in pairs(participants) do
-					local temp = String.split(key, '_')
-					opp[temp[1]] = item.player
-				end
+		if map.mode == '1v1' then
+			for key, item in pairs(participants) do
+				local temp = String.split(key, '_')
+				opp[temp[1]] = item.player
 			end
+		end
 
-			local k = match['map' .. i].subgroup
-			--create a new sub-match if necessary
-			SubMatches[k] = SubMatches[k] or {
-				date = match['map' .. i].date,
-				game = match['map' .. i].game,
-				liquipediatier = match['map' .. i].liquipediatier,
-				liquipediatiertype = match['map' .. i].liquipediatiertype,
-				participants = Table.deepCopy(participants),
-				mode = match['map' .. i].mode,
-				resulttype = 'submatch',
-				subgroup = k,
-				extradata = {
-					header = (match['subGroup' .. k .. 'header'] or '') ~= '' and match['subGroup' .. k .. 'header'] or
-						(match['subgroup' .. k .. 'header'] or '') ~= '' and match['subgroup' .. k .. 'header'] or
-						match['submatch' .. k .. 'header'],
-					noQuery = match.noQuery,
-					matchsection = Variables.varDefault('matchsection'),
-					featured = match.featured,
-					isSubMatch = 'true',
-					opponent1 = opp['1'],
-					opponent2 = opp['2']
-				},
-				['type'] = match['type'],
-				scores = { 0, 0 },
-				winner = 0
-			}
-			--adjust sub-match scores
-			if tonumber(match['map' .. i].winner) == 1 then
-				SubMatches[k].scores[1] = SubMatches[k].scores[1] + 1
-			elseif tonumber(match['map' .. i].winner) == 2 then
-				SubMatches[k].scores[2] = SubMatches[k].scores[2] + 1
-			end
-		else
-			break
+		local k = map.subgroup
+		--create a new sub-match if necessary
+		SubMatches[k] = SubMatches[k] or {
+			date = map.date,
+			game = map.game,
+			liquipediatier = map.liquipediatier,
+			liquipediatiertype = map.liquipediatiertype,
+			participants = Table.deepCopy(participants),
+			mode = map.mode,
+			resulttype = 'submatch',
+			subgroup = k,
+			extradata = {
+				header = (match['subGroup' .. k .. 'header'] or '') ~= '' and match['subGroup' .. k .. 'header'] or
+					(match['subgroup' .. k .. 'header'] or '') ~= '' and match['subgroup' .. k .. 'header'] or
+					match['submatch' .. k .. 'header'],
+				noQuery = match.noQuery,
+				matchsection = Variables.varDefault('matchsection'),
+				featured = match.featured,
+				isSubMatch = 'true',
+				opponent1 = opp['1'],
+				opponent2 = opp['2'],
+			},
+			type = match.type,
+			scores = { 0, 0 },
+			winner = 0,
+		}
+		--adjust sub-match scores
+		if tonumber(map.winner) == 1 then
+			SubMatches[k].scores[1] = SubMatches[k].scores[1] + 1
+		elseif tonumber(map.winner) == 2 then
+			SubMatches[k].scores[2] = SubMatches[k].scores[2] + 1
 		end
 	end
 
@@ -432,70 +416,60 @@ OpponentInput functions
 
 ]]--
 function StarcraftMatchGroupInput.OpponentInput(match)
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		if not Logic.isEmpty(match['opponent' .. opponentIndex]) then
-
-			--fix legacy winner
-			if (match['opponent' .. opponentIndex].win or '') ~= '' then
-				if (match.winner or '') == '' then
-					match.winner = tostring(opponentIndex)
-				else
-					match.winner = '0'
-				end
-				match['opponent' .. opponentIndex].win = nil
-			end
-
-			--opponent processing (first part)
-			--sort out extradata
-			match['opponent' .. opponentIndex].extradata = {
-				advantage = match['opponent' .. opponentIndex].advantage,
-				score2 = match['opponent' .. opponentIndex].score2,
-				isarchon = match['opponent' .. opponentIndex].isarchon
-			}
-
-			--process input depending on type
-			if match['opponent' .. opponentIndex]['type'] == 'solo' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessSoloOpponentInput(match['opponent' .. opponentIndex])
-			elseif match['opponent' .. opponentIndex]['type'] == 'duo' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessDuoOpponentInput(match['opponent' .. opponentIndex])
-			elseif match['opponent' .. opponentIndex]['type'] == 'trio' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 3)
-			elseif match['opponent' .. opponentIndex]['type'] == 'quad' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 4)
-			elseif match['opponent' .. opponentIndex]['type'] == 'team' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessTeamOpponentInput(match['opponent' .. opponentIndex], match.date)
-			elseif match['opponent' .. opponentIndex]['type'] == 'literal' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessLiteralOpponentInput(match['opponent' .. opponentIndex])
+	for opponentKey, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+		local opponentIndex = tonumber(opponentKey:match('(%d+)$'))
+		--fix legacy winner
+		if (opponent.win or '') ~= '' then
+			if (match.winner or '') == '' then
+				match.winner = tostring(opponentIndex)
 			else
-				error('Unsupported Opponent Type')
+				match.winner = '0'
 			end
-
-			--mark match as noQuery if it contains BYE/TBD/TBA/'' or Literal opponents
-			local pltemp = string.lower(match['opponent' .. opponentIndex].name or '')
-			if pltemp == '' or pltemp == 'tbd' or pltemp == 'tba' or pltemp == 'bye' or
-					match['opponent' .. opponentIndex]['type'] == 'literal' then
-				match.noQuery = 'true'
-			end
-
-			--set initial opponent sumscore
-			match['opponent' .. opponentIndex].sumscore =
-				tonumber(match['opponent' .. opponentIndex].extradata.advantage or '') or ''
-
-			local mode = MODES2[match['opponent' .. opponentIndex]['type']]
-			if mode == '2' and match['opponent' .. opponentIndex].extradata.isarchon == 'true' then
-				mode = 'Archon'
-			end
-
-			match.mode = match.mode .. (opponentIndex ~= 1 and '_' or '') .. mode
-		else
-			break
+			opponent.win = nil
 		end
+
+		--opponent processing (first part)
+		--sort out extradata
+		opponent.extradata = {
+			advantage = opponent.advantage,
+			isarchon = opponent.isarchon,
+			score2 = opponent.score2,
+		}
+
+		--process input depending on type
+		if opponent.type == 'solo' then
+			opponent = StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
+		elseif opponent.type == 'duo' then
+			opponent = StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
+		elseif opponent.type == 'trio' then
+			opponent = StarcraftMatchGroupInput.ProcessOpponentInput(opponent, 3)
+		elseif opponent.type == 'quad' then
+			opponent = StarcraftMatchGroupInput.ProcessOpponentInput(opponent, 4)
+		elseif opponent.type == 'team' then
+			opponent = StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, match.date)
+		elseif opponent.type == 'literal' then
+			opponent = StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
+		else
+			error('Unsupported Opponent Type')
+		end
+		match[opponentKey] = opponent
+
+		--mark match as noQuery if it contains BYE/TBD/TBA/'' or Literal opponents
+		local pltemp = string.lower(opponent.name or '')
+		if pltemp == '' or pltemp == 'tbd' or pltemp == 'tba' or pltemp == 'bye'
+			or opponent.type == 'literal' then
+			match.noQuery = 'true'
+		end
+
+		--set initial opponent sumscore
+		opponent.sumscore = tonumber(opponent.extradata.advantage) or ''
+
+		local mode = MODES2[opponent.type]
+		if mode == '2' and opponent.extradata.isarchon == 'true' then
+			mode = 'Archon'
+		end
+
+		match.mode = match.mode .. (opponentIndex ~= 1 and '_' or '') .. mode
 	end
 
 	return match
@@ -511,20 +485,18 @@ function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opp)
 	local flag = (opp.flag or '') ~= '' and opp.flag or Variables.varDefault(name .. '_flag')
 	players[1] = {
 		displayname = name,
-		name = link,
+		extradata = { faction = FACTIONS[string.lower(race)] or 'u' },
 		flag = cleanFlag(flag),
-		extradata = { faction = FACTIONS[string.lower(race)] or 'u' }
+		name = link,
 	}
 
-	local opp2 = {
-		type = opp['type'],
+	return {
+		extradata = opp.extradata,
+		match2players = players,
 		name = link,
 		score = opp.score,
-		extradata = opp.extradata,
-		match2players = players
+		type = opp.type,
 	}
-
-	return opp2
 end
 
 function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opp)
@@ -550,22 +522,20 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opp)
 			Variables.varDefault(opp['p' .. i] .. '_flag')
 		players[i] = {
 			displayname = opp['p' .. i],
-			name = opp['link' .. i],
+			extradata = { faction = FACTIONS[string.lower(opp['p' .. i .. 'race'])] or 'u' },
 			flag = cleanFlag(flag),
-			extradata = { faction = FACTIONS[string.lower(opp['p' .. i .. 'race'])] or 'u' }
+			name = opp['link' .. i],
 		}
 	end
 	local name = opp.link1 .. ' / ' .. opp.link2
 
-	local opp2 = {
-		type = opp['type'],
+	return {
+		extradata = opp.extradata,
+		match2players = players,
 		name = name,
 		score = opp.score,
-		extradata = opp.extradata,
-		match2players = players
+		type = opp.type,
 	}
-
-	return opp2
 end
 
 function StarcraftMatchGroupInput.ProcessOpponentInput(opp, playernumber)
@@ -585,21 +555,19 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opp, playernumber)
 
 		players[i] = {
 			displayname = Pname,
-			name = link,
+			extradata = { faction = FACTIONS[string.lower(race)] or 'u' },
 			flag = cleanFlag(flag),
-			extradata = { faction = FACTIONS[string.lower(race)] or 'u' }
+			name = link,
 		}
 	end
 
-	local opp2 = {
-		type = opp['type'],
+	return {
+		extradata = opp.extradata,
+		match2players = players,
 		name = name,
 		score = opp.score,
-		extradata = opp.extradata,
-		match2players = players
+		type = opp.type,
 	}
-
-	return opp2
 end
 
 function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opp)
@@ -619,7 +587,7 @@ function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opp)
 	end
 
 	return {
-		type = opp['type'],
+		type = opp.type,
 		name = opp[1],
 		score = opp.score,
 		extradata = opp.extradata,
@@ -654,7 +622,7 @@ function StarcraftMatchGroupInput.getPlayers(teamName)
 	local players = {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		local name = Variables.varDefault(teamName .. '_p' .. playerIndex)
-		if not Logic.isEmpty(name) then
+		if Logic.isNotEmpty(name) then
 			local flag = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 			players[playerIndex] = {
 				name = name,
@@ -675,9 +643,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 	local icon
 
 	if customTeam then
-		if not defaultIcon then
-			defaultIcon = require('Module:Brkts/WikiSpecific').defaultIcon
-		end
+		local defaultIcon = require('Module:Brkts/WikiSpecific').defaultIcon
 		opp.template = 'default'
 		icon = defaultIcon
 		name = (opp.link or '') ~= '' and opp.link or (opp.name or '') ~= '' and opp.name or opp[1] or ''
@@ -700,13 +666,13 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 	end
 
 	return {
+		extradata = opp.extradata,
 		icon = icon,
-		template = opp.template,
-		['type'] = opp['type'],
+		match2players = players,
 		name = name,
 		score = opp.score,
-		extradata = opp.extradata,
-		match2players = players
+		template = opp.template,
+		type = opp.type,
 	}
 end
 
@@ -733,33 +699,35 @@ end
 MapInput functions
 
 ]]--
-function StarcraftMatchGroupInput.MapInput(match, i, subgroup)
+function StarcraftMatchGroupInput.MapInput(match, mapKey, subgroup)
+	local map = match[mapKey]
+
 	--redirect maps
-	if match['map' .. i].map ~= 'TBD' then
-		match['map' .. i].map = mw.ext.TeamLiquidIntegration.resolve_redirect(match['map' .. i].map or '')
+	if map.map ~= 'TBD' then
+		map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map or '')
 	end
 
 	--set initial extradata for maps
-	match['map' .. i].extradata = {
-		comment = match['map' .. i].comment or '',
-		header = match['map' .. i].header or '',
+	map.extradata = {
+		comment = map.comment or '',
+		header = map.header or '',
+		isSubMatch = 'false',
 		noQuery = match.noQuery,
-		isSubMatch = 'false'
 	}
 
 	--inherit stuff from match data
-	match['map' .. i]['type'] = match['type']
-	match['map' .. i].liquipediatier = match.liquipediatier
-	match['map' .. i].liquipediatiertype = match.liquipediatiertype
-	match['map' .. i].game = match.game
-	match['map' .. i].date = match.date
+	map.type = match.type
+	map.liquipediatier = match.liquipediatier
+	map.liquipediatiertype = match.liquipediatiertype
+	map.game = match.game
+	map.date = match.date
 
 	--determine score, resulttype, walkover and winner
-	match['map' .. i] = StarcraftMatchGroupInput.MapWinnerProcessing(match['map' .. i])
+	map = StarcraftMatchGroupInput.MapWinnerProcessing(map)
 
 	--get participants data for the map + get map mode + winnerrace and loserrace
 	--(w/l race stuff only for 1v1 maps)
-	match['map' .. i] = StarcraftMatchGroupInput.ProcessPlayerMapData(match['map' .. i], match, 2)
+	map = StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, 2)
 
 	--set sumscore to 0 if it isn't a number
 	if match.opponent1.sumscore == '' then
@@ -770,22 +738,23 @@ function StarcraftMatchGroupInput.MapInput(match, i, subgroup)
 	end
 
 	--adjust sumscore for winner opponent
-	if (tonumber(match['map' .. i].winner or 0) or 0) > 0 then
-		match['opponent' .. match['map' .. i].winner].sumscore =
-			match['opponent' .. match['map' .. i].winner].sumscore + 1
+	if (tonumber(map.winner) or 0) > 0 then
+		match['opponent' .. map.winner].sumscore =
+			match['opponent' .. map.winner].sumscore + 1
 	end
 
 	--handle subgroup stuff if team match
-	if string.find(match.mode, 'team') then
-		match['map' .. i].subgroup = tonumber(match['map' .. i].subgroup or '')
-		if match['map' .. i].subgroup then
-			subgroup = match['map' .. i].subgroup
+	if match.mode:find('team') then
+		map.subgroup = tonumber(map.subgroup or '')
+		if map.subgroup then
+			subgroup = map.subgroup
 		else
 			subgroup = subgroup + 1
-			match['map' .. i].subgroup = subgroup
+			map.subgroup = subgroup
 		end
 	end
 
+	match[mapKey] = map
 	return match, subgroup
 end
 
@@ -797,7 +766,7 @@ function StarcraftMatchGroupInput.MapWinnerProcessing(map)
 		-- read scores
 		local score = map['score' .. scoreIndex]
 		local obj = {}
-		if not Logic.isEmpty(score) then
+		if Logic.isNotEmpty(score) then
 			manual_scores = true
 			score = ALLOWED_STATUSES2[score] or score
 			if Logic.isNumeric(score) then
@@ -857,9 +826,10 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 	local PL = {}
 
 	for i = 1, OppNumber do
+		local opponent = match['opponent' .. i]
 		local number = 0
-		if match['opponent' .. i]['type'] == 'team' then
-			local players = match['opponent' .. i].match2players
+		if opponent.type == 'team' then
+			local players = opponent.match2players
 			if players == {} then
 				break
 			end
@@ -868,30 +838,31 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 
 			local PlayerData = {}
 			for j = 1, 4 do
-				if not Logic.isEmpty(map['t' .. i .. 'p' .. j]) then
-					if map['t' .. i .. 'p' .. j] ~= 'TBD' and map['t' .. i .. 'p' .. j] ~= 'TBA' then
-						map['t' .. i .. 'p' .. j] = mw.ext.TeamLiquidIntegration.resolve_redirect(map['t' .. i .. 'p' .. j])
+				local playerPrefix = 't' .. i .. 'p' .. j
+				local pageName = map[playerPrefix]
+				if Logic.isEmpty(pageName) then
+					break
+				end
+				if pageName ~= 'TBD' and pageName ~= 'TBA' then
+					pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(pageName)
 
-						if map['opponent' .. i .. 'archon'] == 'true' then
-							PlayerData[map['t' .. i .. 'p' .. j]] = {
-								faction = FACTIONS[string.lower((map['t' .. i .. 'race'] or '') ~= '' and map['t' .. i .. 'race'] or
-									(map['opponent' .. i .. 'race'] or '') ~= '' and map['opponent' .. i .. 'race'] or
-									(map['t' .. i .. 'p' .. j .. 'race'] or '') ~= '' and map['t' .. i .. 'p' .. j .. 'race']
-									or 'u')] or 'u',
-								position = j
-							}
-						else
-							PlayerData[map['t' .. i .. 'p' .. j]] = {
-								faction = FACTIONS[string.lower((map['t' .. i .. 'p' .. j .. 'race'] or '') ~= '' and
-									map['t' .. i .. 'p' .. j .. 'race'] or 'u')] or 'u',
-								position = j
-							}
-						end
+					if map['opponent' .. i .. 'archon'] == 'true' then
+						PlayerData[pageName] = {
+							faction = FACTIONS[string.lower((map['t' .. i .. 'race'] or '') ~= '' and map['t' .. i .. 'race'] or
+								(map['opponent' .. i .. 'race'] or '') ~= '' and map['opponent' .. i .. 'race'] or
+								(map[playerPrefix .. 'race'] or '') ~= '' and map[playerPrefix .. 'race']
+								or 'u')] or 'u',
+							position = j
+						}
 					else
-						tbds = tbds + 1
+						PlayerData[pageName] = {
+							faction = FACTIONS[string.lower((map[playerPrefix .. 'race'] or '') ~= '' and
+								map[playerPrefix .. 'race'] or 'u')] or 'u',
+							position = j
+						}
 					end
 				else
-					break
+					tbds = tbds + 1
 				end
 			end
 
@@ -928,11 +899,11 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 			elseif number == 4 and map['opponent' .. i .. 'quadSpecial'] == 'true' then
 				number = '4S'
 			end
-		elseif match['opponent' .. i]['type'] == 'literal' then
+		elseif opponent.type == 'literal' then
 			number = 'Literal'
-		elseif match['opponent' .. i]['type'] == 'duo' and match['opponent' .. i].extradata.isarchon == 'true' then
+		elseif opponent.type == 'duo' and opponent.extradata.isarchon == 'true' then
 			number = 'Archon'
-			local players = match['opponent' .. i].match2players
+			local players = opponent.match2players
 			if players == {} then
 				break
 			else
@@ -951,8 +922,8 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 				}
 			end
 		else
-			number = tonumber(MODES2[match['opponent' .. i]['type']])
-			local players = match['opponent' .. i].match2players
+			number = tonumber(MODES2[opponent.type])
+			local players = opponent.match2players
 			if players == {} then
 				break
 			else
