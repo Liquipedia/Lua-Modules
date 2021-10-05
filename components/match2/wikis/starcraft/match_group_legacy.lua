@@ -10,12 +10,13 @@ local Legacy = {}
 
 local getArgs = require("Module:Arguments").getArgs
 local json = require("Module:Json")
-local MatchGroup = require("Module:MatchGroup")
 local getDefaultMapping = require("Module:MatchGroup/Legacy/Default").get
 local Logic = require("Module:Logic")
 local Lua = require("Module:Lua")
 local Table = require("Module:Table")
 local String = require("Module:StringUtils")
+
+local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
 
 local _type
 local _args
@@ -49,7 +50,7 @@ function Legacy.get(frame)
 	newArgs.id = bracketid
 	newArgs[1] = templateid
 
-	return MatchGroup.luaBracket(frame, newArgs)
+	return MatchGroupDisplay.TemplateBracket(newArgs)
 end
 
 function Legacy.getTemplate(frame)

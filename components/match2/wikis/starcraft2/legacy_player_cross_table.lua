@@ -8,11 +8,13 @@
 
 local LegacyPlayerCrossTable = {}
 
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
 local getArgs = require('Module:Arguments').getArgs
 local json = require('Module:Json')
-local Variables = require('Module:Variables')
-local Logic = require('Module:Logic')
-local MatchList = require('Module:MatchGroup').luaMatchlist
+
+local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
 
 local _MAX_NUMBER_OF_OPPONENTS = 10
 local _MAX_NUMBER_OF_MAPS = 99
@@ -69,7 +71,7 @@ function LegacyPlayerCrossTable.playerCrossTableToMatch2(frame)
 	newArgs.id = args.id
 	newArgs.isLegacy = true
 
-	return MatchList(frame, newArgs)
+	return MatchGroupDisplay.TemplateMatchlist(newArgs)
 end
 
 --sub functions
