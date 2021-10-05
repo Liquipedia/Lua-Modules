@@ -284,16 +284,8 @@ function League:_createLocation(args)
 	while not String.isEmpty(current) do
 		local nationality = Localisation.getLocalisation({displayNoError = true}, current)
 
-		content = Flags.Icon({flag = details.country, shouldLink = true}) .. '&nbsp;' ..
-			displayText .. '[[Category:' .. nationality .. ' Tournaments]]'
-	end
-
-	if not String.isEmpty(details.country2) then
-		content = content .. '<br>'
-		local nationality2 = Localisation.getLocalisation({displayNoError = true}, details.country2)
-
-		if String.isEmpty(nationality2) then
-			content = content .. '[[Category:Unrecognised Country|' .. details.country2 .. ']]'
+		if String.isEmpty(nationality) then
+				content = content .. '[[Category:Unrecognised Country|' .. current .. ']]<br>'
 		else
 			local countryName = Localisation.getCountryName(current)
 			local displayText = currentLocation or countryName
@@ -301,15 +293,14 @@ function League:_createLocation(args)
 				displayText = current
 			end
 
-			content = content .. Flags.Icon({flag = details.country2, shouldLink = true}) .. '&nbsp;' ..
-				displayText .. '[[Category:' .. nationality2 .. ' Tournaments]]'
+			content = content .. Flags.Icon{current, shouldLink = true} .. '&nbsp;' ..
+					displayText .. '[[Category:' .. nationality .. ' Tournaments]]<br>'
 		end
 
 		index = index + 1
 		current = args['country' .. index]
 		currentLocation = args['city' .. index] or args['location' .. index]
-	end
-
+		end
 	return content
 end
 
