@@ -70,6 +70,10 @@ function Table.isEmpty(tbl)
 	return true
 end
 
+function Table.isNotEmpty(tbl)
+	return not Table.isEmpty(tbl)
+end
+
 function Table.copy(tbl)
 	local result = {}
 

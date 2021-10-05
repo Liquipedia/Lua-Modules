@@ -51,6 +51,10 @@ function String.isEmpty(str)
 	return str == nil or str == ''
 end
 
+function String.isNotEmpty(str)
+	return str ~= nil and str ~= ''
+end
+
 -- index counts up from 0
 function String.explode(str, delimiter, index)
 	return String.split(str, delimiter)[index + 1] or ''
