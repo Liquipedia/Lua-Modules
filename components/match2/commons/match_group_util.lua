@@ -29,9 +29,9 @@ Display related functions go in Module:MatchGroup/Display/Helper.
 ]]
 local MatchGroupUtil = {types = {}}
 
-MatchGroupUtil.types.LowerMatch = TypeUtil.struct({
-	matchId = 'string',
-	opponentIx = 'number',
+MatchGroupUtil.types.LowerEdge = TypeUtil.struct({
+	lowerMatchIndex = 'number',
+	opponentIndex = 'number',
 })
 MatchGroupUtil.types.AdvanceBg = TypeUtil.literalUnion('up', 'stayup', 'stay', 'staydown', 'down')
 MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
@@ -44,7 +44,8 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	bracketResetMatchId = 'string?',
 	bracketSection = 'string',
 	header = 'string?',
-	lowerMatches = TypeUtil.array(MatchGroupUtil.types.LowerMatch),
+	lowerMatchIds = TypeUtil.array('string'),
+	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
 	qualLose = 'boolean?',
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
@@ -273,18 +274,21 @@ end
 
 function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 	if data.type == 'bracket' then
-		local lowerMatches = {}
-		local midIx = math.ceil(opponentCount / 2)
+		local lowerEdges = {}
+		local lowerMatchIds = {}
+		local midIx = math.floor(opponentCount / 2)
 		if nilIfEmpty(data.toupper) then
-			table.insert(lowerMatches, {
-				matchId = data.toupper,
-				opponentIx = midIx,
+			table.insert(lowerMatchIds, data.toupper)
+			table.insert(lowerEdges, {
+				opponentIndex = midIx,
+				lowerMatchIndex = #lowerMatchIds,
 			})
 		end
 		if nilIfEmpty(data.tolower) then
-			table.insert(lowerMatches, {
-				matchId = data.tolower,
-				opponentIx = math.min(midIx + 1, opponentCount),
+			table.insert(lowerMatchIds, data.tolower)
+			table.insert(lowerEdges, {
+				opponentIndex = math.min(midIx + 1, opponentCount),
+				lowerMatchIndex = #lowerMatchIds,
 			})
 		end
 
@@ -307,7 +311,8 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
 			bracketSection = data.bracketsection,
 			header = nilIfEmpty(data.header),
-			lowerMatches = lowerMatches,
+			lowerEdges = lowerEdges,
+			lowerMatchIds = lowerMatchIds,
 			qualLose = advanceSpots[2] and advanceSpots[2].type == 'qualify',
 			qualLoseLiteral = nilIfEmpty(data.qualloseLiteral),
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,
@@ -392,8 +397,8 @@ function MatchGroupUtil.computeUpperMatchIds(matchesById)
 	local upperMatchIds = {}
 	for matchId, match in pairs(matchesById) do
 		if match.bracketData.type == 'bracket' then
-			for _, lowerMatch in ipairs(match.bracketData.lowerMatches) do
-				upperMatchIds[lowerMatch.matchId] = matchId
+			for _, lowerMatchId in ipairs(match.bracketData.lowerMatchIds) do
+				upperMatchIds[lowerMatchId] = matchId
 			end
 		end
 	end
@@ -418,10 +423,7 @@ end
 function MatchGroupUtil.dfsFrom(bracketDatasById, start)
 	return TreeUtil.dfs(
 		function(matchId)
-			return Array.map(
-				bracketDatasById[matchId].lowerMatches,
-				function(lowerMatch) return lowerMatch.matchId end
-			)
+			return bracketDatasById[matchId].lowerMatchIds
 		end,
 		start
 	)
@@ -434,8 +436,8 @@ function MatchGroupUtil.computeDepthsFrom(bracketDatasById, startMatchId)
 		local bracketData = bracketDatasById[matchId]
 		depths[matchId] = depth
 		maxDepth = math.max(maxDepth, depth + bracketData.skipRound)
-		for _, lowerMatch in ipairs(bracketData.lowerMatches) do
-			visit(lowerMatch.matchId, depth + 1 + bracketData.skipRound)
+		for _, lowerMatchId in ipairs(bracketData.lowerMatchIds) do
+			visit(lowerMatchId, depth + 1 + bracketData.skipRound)
 		end
 	end
 	visit(startMatchId, 0)
@@ -497,8 +499,8 @@ function MatchGroupUtil.populateAdvanceSpots(bracket)
 	local firstBracketData = bracket.bracketDatasById[bracket.rootMatchIds[1]]
 	local thirdPlaceMatchId = firstBracketData.thirdPlaceMatchId
 	if thirdPlaceMatchId and bracket.matchesById[thirdPlaceMatchId] then
-		for _, lowerMatch in ipairs(firstBracketData.lowerMatches) do
-			local bracketData = bracket.bracketDatasById[lowerMatch.matchId]
+		for _, lowerMatchId in ipairs(firstBracketData.lowerMatchIds) do
+			local bracketData = bracket.bracketDatasById[lowerMatchId]
 			bracketData.advanceSpots[2] = bracketData.advanceSpots[2]
 				or {bg = 'stayup', type = 'advance', matchId = thirdPlaceMatchId}
 		end
