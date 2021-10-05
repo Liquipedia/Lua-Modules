@@ -27,14 +27,6 @@ local _NON_BREAKING_SPACE = '&nbsp;'
 
 local BracketDisplay = {propTypes = {}, types = {}}
 
--- Called by MatchGroup/Display
-function BracketDisplay.luaGet(_, args)
-	return BracketDisplay.BracketContainer({
-		bracketId = args[1],
-		config = BracketDisplay.configFromArgs(args),
-	})
-end
-
 function BracketDisplay.configFromArgs(args)
 	return {
 		headerHeight = tonumber(args.headerHeight),

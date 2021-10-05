@@ -32,10 +32,10 @@ WikiSpecific.processPlayer = FnUtil.lazilyDefineFunction(function()
 	return InputModule.processPlayer
 end)
 
-function WikiSpecific.getMatchGroupModule(matchGroupType)
+function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
-		or Lua.import('Module:MatchGroup/Display/Bracket/Custom', {requireDevIfEnabled = true})
+		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
+		or Lua.import('Module:MatchGroup/Display/Bracket/Custom', {requireDevIfEnabled = true}).BracketContainer
 end
 
 return WikiSpecific
