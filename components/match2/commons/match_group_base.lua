@@ -20,9 +20,10 @@ local MatchGroupBase = {}
 function MatchGroupBase.readOptions(args, matchGroupType)
 	local options = {
 		bracketId = MatchGroupBase.readBracketId(args.id),
-		show = not Logic.readBool(args.hide),
-		saveToLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true),
 		matchGroupType = matchGroupType,
+		saveToLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true),
+		shouldWarnMissing = Logic.nilOr(Logic.readBoolOrNil(args.warnMissing), true),
+		show = not Logic.readBool(args.hide),
 	}
 
 	local warnings = {}
