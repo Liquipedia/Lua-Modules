@@ -12,35 +12,16 @@ local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local FnUtil = require('Module:FnUtil')
+local Class = require('Module:Class')
 
 local Flags = {}
 
--- Template functions (legacy)
-function Flags.Flag(frame)
-	return Flags._Flag(frame.args[1])
+--Legacy Entry points .. to be removed after switching them
+function Flags.Flag(flagName)
+	return tostring(Flags.Icon({flag = flagName, shouldLink = true})) .. '[[Category:Pages using old Flags entry points]]'
 end
-function Flags.FlagNoLink(frame)
-	return Flags._FlagNoLink(frame.args[1])
-end
-
---legacy functions
-function Flags._Flag(name)
-	return Flags.Icon({flag = name, shouldLink = true})
-end
-function Flags._FlagNoLink(name)
-	return Flags.Icon({flag = name, shouldLink = false})
-end
-function Flags._CountryName(name)
-	return Flags.CountryName(name)
-end
-function Flags.flag(name)
-	return Flags.Icon({flag = name, shouldLink = true})
-end
-function Flags.flagNoLink(name)
-	return Flags.Icon({flag = name, shouldLink = false})
-end
-function Flags.countryName(name)
-	return Flags.CountryName(name)
+function Flags.FlagNoLink(flagName)
+	return tostring(Flags.Icon({flag = flagName, shouldLink = false})) .. '[[Category:Pages using old Flags entry points]]'
 end
 
 -- Returns a flag
@@ -90,16 +71,7 @@ function Flags.Icon(args, flagName)
 end
 
 -- Converts a country name, flag code, or alias to a standardized country name
--- AFTER THE SWITCH TO USING 'Module:Class' switch the following 7 lines to
--->>	function Flags.CountryName(flagName)
-function Flags.CountryName(frame)
-	local flagName
-	if type(frame) == 'table' then
-		flagName = frame.args[1]
-	else
-		flagName = frame
-	end
-
+function Flags.CountryName(flagName)
 	if String.isEmpty(flagName) then
 		return ''
 	end
@@ -171,4 +143,4 @@ function Flags._convertToKey(flagName)
 		or (MasterData.data[flagName] and flagName)
 end
 
-return Flags
+return Class.export(Flags)
