@@ -69,18 +69,14 @@ end
 
 function CustomUser:_getFavouriteHeroes()
 	local foundArgs = User:getAllArgsForBase(_args, 'fav-hero-')
-mw.logObject(foundArgs)
 	
 	local heroes = {}
 	for _, item in ipairs(foundArgs) do
-mw.logObject(item)
 		local hero = Template.safeExpand(mw.getCurrentFrame(), 'HeroBracket/' .. item:lower(), nil, '')
-mw.logObject(hero)
 		if not String.isEmpty(hero) then
 			table.insert(heroes, hero)
 		end
 	end
-mw.logObject(heroes)
 	return heroes
 end
 
