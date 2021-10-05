@@ -69,7 +69,7 @@ end
 
 function CustomUser:_getFavouriteHeroes()
 	local foundArgs = User:getAllArgsForBase(_args, 'fav-hero-')
-	
+
 	local heroes = {}
 	for _, item in ipairs(foundArgs) do
 		local hero = Template.safeExpand(mw.getCurrentFrame(), 'HeroBracket/' .. item:lower(), nil, '')
