@@ -85,6 +85,7 @@ function MatchGroupDisplay.MatchGroupById(args)
 	local bracketId = args.id or args[1]
 	args.id = bracketId
 	args[1] = bracketId
+	assert(bracketId, 'Missing bracket ID')
 
 	local matches = MatchGroupUtil.fetchMatches(bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
