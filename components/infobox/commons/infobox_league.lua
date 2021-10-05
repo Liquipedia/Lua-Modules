@@ -293,7 +293,7 @@ function League:_createLocation(args)
 				displayText = current
 			end
 
-			content = content .. Flags.Icon{current, shouldLink = true} .. '&nbsp;' ..
+			content = content .. Flags.Icon{flag = current, shouldLink = true} .. '&nbsp;' ..
 					displayText .. '[[Category:' .. nationality .. ' Tournaments]]<br>'
 		end
 
