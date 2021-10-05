@@ -234,7 +234,7 @@ function CustomUnit:_getAttack(index)
 		Cell{name = 'Bonus', content = {_args['attack' .. index .. '_bonus']}},
 		Cell{name = 'Bonus DPS', content = {_args['attack' .. index .. '_bonus_dps']}},
 		Cell{name = '[[Range]]', content = {
-				_args['attack' .. index .. '_range'] ..
+				(_args['attack' .. index .. '_range'] or '')..
 				(_args['attack' .. index .. '_range_note'] or '')
 			}
 		}
