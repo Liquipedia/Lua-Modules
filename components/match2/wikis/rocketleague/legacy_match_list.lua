@@ -14,6 +14,7 @@ local Table = require('Module:Table')
 local getArgs = require('Module:Arguments').getArgs
 local json = require('Module:Json')
 
+local MatchGroupDisplay = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
 local MatchSubobjects = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
@@ -55,7 +56,7 @@ function LegacyMatchList.convertMatchList(frame)
 	args.isLegacy = true
 
 	--pass the adjusted arguments to the MatchGroup
-	return require('Module:MatchGroup').luaMatchlist(frame, args)
+	return MatchGroupDisplay.TemplateMatchlist(args)
 end
 
 function LegacyMatchList.convertMatchMaps(frame)
