@@ -102,13 +102,7 @@ function League:createInfobox()
 		Cell{
 			name = 'Location',
 			content = {
-				self:_createLocation({
-					region = args.region,
-					country = args.country,
-					country2 = args.country2,
-					location = args.city or args.location,
-					location2 = args.city2 or args.location2
-				})
+				self:_createLocation(args)
 			}
 		},
 		Cell{name = 'Venue', content = {args.venue}},
@@ -277,50 +271,36 @@ end
 --     country: the country
 --     location: the city or place
 -- }
-function League:_createLocation(details)
-	if Table.isEmpty(details) then
-		return nil
-	end
-
-	if String.isEmpty(details.country) then
+function League:_createLocation(args)
+	if String.isEmpty(args.country) then
 		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/TBD')
 	end
 
-	local content
-	local nationality = Localisation.getLocalisation({displayNoError = true}, details.country)
+	local index = 1
+	local content = ''
+	local current = args['country']
+	local currentLocation = args['city'] or args['location']
 
-	if String.isEmpty(nationality) then
-			content = '[[Category:Unrecognised Country|' .. details.country .. ']]'
-	else
-		local countryName = Localisation.getCountryName(details.country)
-		local displayText = details.location or countryName
-		if displayText == '' then
-			displayText = details.country
-		end
+	while not String.isEmpty(current) do
+		local nationality = Localisation.getLocalisation({displayNoError = true}, current)
 
-		content = Flags.Icon({flag = details.country, shouldLink = true}) .. '&nbsp;' ..
-			displayText .. '[[Category:' .. nationality .. ' Tournaments]]'
-	end
-
-	if not String.isEmpty(details.country2) then
-		content = content .. '<br>'
-		local nationality2 = Localisation.getLocalisation({displayNoError = true}, details.country2)
-
-		if String.isEmpty(nationality2) then
-			content = content .. '[[Category:Unrecognised Country|' .. details.country2 .. ']]'
+		if String.isEmpty(nationality) then
+				content = content .. '[[Category:Unrecognised Country|' .. current .. ']]<br>'
 		else
-			local countryName2 = Localisation.getCountryName(details.country2)
-
-			local displayText = details.location2 or countryName2
+			local countryName = Localisation.getCountryName(current)
+			local displayText = currentLocation or countryName
 			if displayText == '' then
-				displayText = details.country2
+				displayText = current
 			end
 
-			content = content .. Flags.Icon({flag = details.country2, shouldLink = true}) .. '&nbsp;' ..
-				displayText .. '[[Category:' .. nationality2 .. ' Tournaments]]'
+			content = content .. Flags.Icon{flag = current, shouldLink = true} .. '&nbsp;' ..
+					displayText .. '[[Category:' .. nationality .. ' Tournaments]]<br>'
 		end
-	end
 
+		index = index + 1
+		current = args['country' .. index]
+		currentLocation = args['city' .. index] or args['location' .. index]
+		end
 	return content
 end
 
