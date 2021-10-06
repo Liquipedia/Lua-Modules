@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=halo
--- page=Module:Brkts/WikiSpecific
+-- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
