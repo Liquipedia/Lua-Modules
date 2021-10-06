@@ -84,8 +84,49 @@ function Table.copy(tbl)
 	return result
 end
 
-function Table.deepCopy(tbl)
-	return mw.clone(tbl)
+--[[
+Recursively copies a table.
+
+Specifically: for each entry, the value is deep copied and the key is not.
+Entries provided by the __pairs metamethod are copied. Metatables are not
+copied (unless enabled by options.copyMetatable).
+
+options.copyMetatable
+If enabled, deep copies the metatable of tables. Disabled by default.
+
+options.reuseRef
+If a table reference exists at two locations in the input, then this option
+will allow the locations to share a reference in the output. Enabled by
+default.
+]]
+function Table.deepCopy(tbl_, options)
+	options = options or {}
+	assert(type(tbl_) == 'table', 'Table.deepCopy: Input must be a table')
+
+	local function deepCopy(tbl)
+		local result = {}
+
+		for key, value in pairs(tbl) do
+			result[key] = type(value) == 'table'
+				and deepCopy(value)
+				or value
+		end
+
+		if options.copyMetatable then
+			local metatable = getmetatable(tbl)
+			if type(metatable) == 'table' then
+				setmetatable(result, deepCopy(metatable))
+			end
+		end
+
+		return result
+	end
+
+	if options.reuseRef ~= false then
+		deepCopy = require('Module:FnUtil').memoize(deepCopy)
+	end
+
+	return deepCopy(tbl_)
 end
 
 --[[
