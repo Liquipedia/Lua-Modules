@@ -93,6 +93,7 @@ function Links:make()
 					infoboxLinks:wikitext(' ' .. self:_makeLink(key, self.links[key .. index]))
 					-- Remove link from the collection
 					self.links[key .. index] = nil
+					index = index + 1
 				end
 			end
 		end
