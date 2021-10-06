@@ -11,6 +11,7 @@ local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -55,7 +56,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 	return Array.mapIndexes(readMatch)
 end
 
-function MatchGroupInput.readBracket(bracketId, args)
+function MatchGroupInput.readBracket(bracketId, args, options)
 	local warnings = {}
 	local templateId = args[1]
 	assert(templateId, 'argument \'1\' (templateId) is empty')
@@ -89,7 +90,8 @@ function MatchGroupInput.readBracket(bracketId, args)
 			table.insert(missingMatchKeys, matchKey)
 		end
 
-		matchArgs = Json.parseIfString(matchArgs) or {}
+		matchArgs = Json.parseIfString(matchArgs)
+			or Json.parse(Lua.import('Module:Match', {requireDevIfEnabled = true}).toEncodedJson({}))
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
 		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
@@ -131,7 +133,7 @@ function MatchGroupInput.readBracket(bracketId, args)
 	table.sort(matchIds)
 	local matches = Array.map(matchIds, readMatch)
 
-	if #missingMatchKeys ~= 0 then
+	if #missingMatchKeys ~= 0 and options.shouldWarnMissing then
 		table.insert(warnings, 'Missing matches: ' .. table.concat(missingMatchKeys, ', '))
 	end
 

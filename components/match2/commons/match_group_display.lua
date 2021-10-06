@@ -48,7 +48,7 @@ Reads a bracket input spec, saves it to LPDB, and displays the bracket.
 ]]
 function MatchGroupDisplay.BracketBySpec(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
-	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args)
+	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, options)
 	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
 
 	local bracketNode
