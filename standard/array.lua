@@ -318,7 +318,7 @@ function Array.mapIndexes(f)
 	return arr
 end
 
-function Array.fromTableKeys(tbl)
+function Array.extractKeys(tbl)
 	local keys = {}
 	for key, _ in pairs(tbl) do
 		table.insert(keys, key)
@@ -326,7 +326,7 @@ function Array.fromTableKeys(tbl)
 	return keys
 end
 
-function Array.fromTableValues(tbl)
+function Array.extractValues(tbl)
 	local values = {}
 	for _, value in pairs(tbl) do
 		table.insert(values, value)

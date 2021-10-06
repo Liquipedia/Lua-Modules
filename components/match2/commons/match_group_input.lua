@@ -127,7 +127,7 @@ function MatchGroupInput.readBracket(bracketId, args)
 		return match
 	end
 
-	local matchIds = Array.fromTableKeys(bracketDatasById)
+	local matchIds = Array.extractKeys(bracketDatasById)
 	table.sort(matchIds)
 	local matches = Array.map(matchIds, readMatch)
 
