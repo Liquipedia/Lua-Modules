@@ -12,8 +12,9 @@ local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchGroupUtil = require('Module:MatchGroup/Util')
 local Table = require('Module:Table')
+
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 local Match = {}
 

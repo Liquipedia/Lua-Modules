@@ -9,9 +9,11 @@
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
-local MatchGroupUtil = require('Module:MatchGroup/Util')
+local Lua = require('Module:Lua')
 local TypeUtil = require('Module:TypeUtil')
 local Flags = require('Module:Flags')
+
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 --[[
 Display components for players.
