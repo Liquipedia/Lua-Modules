@@ -51,6 +51,7 @@ end
 
 function CustomInjector:addCustomCells()
 	local widgets = {
+		Cell{name = 'Gender', content = {_args.gender}},
 		Cell{name = 'Languages', content = {_args.languages}},
 		Cell{name = 'Favorite players', content = CustomUser:_getArgsfromBaseDefault('fav-player', 'fav-players')},
 		Cell{name = 'Favorite casters', content = CustomUser:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
@@ -65,7 +66,7 @@ function CustomInjector:addCustomCells()
 end
 
 function CustomUser:_getFavouriteTeams()
-	local foundArgs = User:getAllArgsForBase(_args, 'fav-team-1')
+	local foundArgs = User:getAllArgsForBase(_args, 'fav-team-')
 
 	local display = ''
 	for _, item in ipairs(foundArgs) do

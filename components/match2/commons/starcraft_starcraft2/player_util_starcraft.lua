@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Player/Util/Starcraft
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local FnUtil = require('Module:FnUtil')
 local Localisation = require('Module:Localisation')
 local StarcraftTournamentUtil = require('Module:Tournament/Util/Starcraft')
@@ -177,7 +185,7 @@ function StarcraftPlayerUtil.saveToPageVars(player)
 		mw.ext.VariablesLua.vardefine(player.displayName .. '_page', player.pageName)
 	end
 	if player.flag then
-		mw.ext.VariablesLua.vardefine(player.displayName .. '_flag', Localisation.getCountryName{player.flag, 'false'})
+		mw.ext.VariablesLua.vardefine(player.displayName .. '_flag', Localisation.getCountryName(player.flag, 'false'))
 	end
 	if player.race then
 		mw.ext.VariablesLua.vardefine(player.displayName .. '_race', player.race)

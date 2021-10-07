@@ -8,6 +8,7 @@
 
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
+local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
 local Achievements = require('Module:Achievements in infoboxes')
 local RaceIcon = require('Module:RaceIcon').getSmallIcon
@@ -114,7 +115,7 @@ function CustomInjector:parse(id, widgets)
 			})
 			index = index + 1
 		end
-	elseif id == 'region' then return {}
+	elseif id == 'history' then return {}
 	end
 	return widgets
 end
@@ -133,7 +134,14 @@ end
 
 function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.earnings = _earnings or 0
+	lpdbData.region = nil
+	lpdbData.location = CustomTeam._getStandardLocationValue(_team.args.location)
+	lpdbData.location2 = CustomTeam._getStandardLocationValue(_team.args.location2)
 	return lpdbData
+end
+
+function CustomTeam._getStandardLocationValue(location)
+	return Flags.CountryName(location) or location
 end
 
 function CustomTeam.playerBreakDown(args)

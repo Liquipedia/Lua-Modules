@@ -6,14 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
+local TypeUtil = require('Module:TypeUtil')
+local Variables = require('Module:Variables')
 local getIconName = require('Module:IconName').luaGet
 local json = require('Module:Json')
-local Logic = require('Module:Logic')
-local TypeUtil = require('Module:TypeUtil')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Template = require('Module:Template')
+
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
 local _frame
 
@@ -32,7 +35,8 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(frame, match)
+function CustomMatchGroupInput.processMatch(frame, match, options)
+	options = options or {}
 	_frame = frame
 	if type(match) == 'string' then
 		match = json.parse(match)
@@ -44,6 +48,9 @@ function CustomMatchGroupInput.processMatch(frame, match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
 	match = matchFunctions.getExtraData(match)
+	if not options.isStandalone then
+		match = matchFunctions.mergeWithStandalone(match)
+	end
 
 	return match
 end
@@ -266,6 +273,24 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
 		end
 	end
+	return match
+end
+
+function matchFunctions.mergeWithStandalone(match)
+	local standaloneMatchId = 'MATCH_' .. match.bracketid .. '_' .. match.matchid
+	local standaloneMatch = MatchGroupInput.fetchStandaloneMatch(standaloneMatchId)
+	if not standaloneMatch then
+		return match
+	end
+
+	match.opponent1 = standaloneMatch.match2opponents[1]
+	match.opponent2 = standaloneMatch.match2opponents[2]
+
+	local match2games = standaloneMatch.match2games
+	for i = 1, #match2games do
+		match['map' .. i] = match2games[i]
+	end
+
 	return match
 end
 

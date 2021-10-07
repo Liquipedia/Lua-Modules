@@ -15,7 +15,7 @@ local Variables = require('Module:Variables')
 
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local json = require('Module:Json')
-local cleanFlag = require('Module:Flags')._CountryName
+local cleanFlag = require('Module:Flags').CountryName
 local defaultIcon
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
@@ -183,6 +183,7 @@ function StarcraftMatchGroupInput.getExtraData(match)
 			matchsection = Variables.varDefault('matchsection'),
 			comment = match.comment,
 			featured = match.featured,
+			casters = match.casters,
 			veto1 = StarcraftMatchGroupInput.getVetoMap(match.veto1),
 			veto2 = StarcraftMatchGroupInput.getVetoMap(match.veto2),
 			veto3 = StarcraftMatchGroupInput.getVetoMap(match.veto3),
@@ -291,8 +292,10 @@ Misc. MatchInput functions
 function StarcraftMatchGroupInput.MatchWinnerProcessing(match)
 	local bestof = tonumber(match.bestof or 99) or 99
 	local walkover = match.walkover or ''
+	local numberofOpponents = 0
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		if not Logic.isEmpty(match['opponent' .. opponentIndex]) then
+			numberofOpponents = numberofOpponents + 1
 			--determine opponent scores, status and placement
 			--determine MATCH winner, resulttype and walkover
 			--the following ignores the possibility of > 2 opponents
@@ -348,40 +351,43 @@ function StarcraftMatchGroupInput.MatchWinnerProcessing(match)
 				match['opponent' .. opponentIndex].status = 'S'
 				match['opponent' .. opponentIndex].score = tonumber(match['opponent' .. opponentIndex].score or '') or
 					tonumber(match['opponent' .. opponentIndex].sumscore) or -1
-
 				if match['opponent' .. opponentIndex].score > bestof / 2 then
 					match.finished = 'true'
 					match.winner = tonumber(match.winner or '') or opponentIndex
-				elseif match.winner == 'draw' or tonumber(match.winner) == 0 or
-						(match.opponent1 == bestof / 2 and match.opponent1 == match.opponent2) then
-					match.finished = 'true'
-					match.winner = 0
-					match.resulttype = 'draw'
 				end
 			end
-			if tostring(match.winner) == tostring(opponentIndex) or
-					match.resulttype == 'draw' or
-					match['opponent' .. opponentIndex].score == bestof / 2 then
-				match['opponent' .. opponentIndex].placement = 1
-			else
-				match['opponent' .. opponentIndex].placement = 2
-			end
-
-			--stringify player data
-			for key, _ in ipairs(match['opponent' .. opponentIndex].match2players) do
-				match['opponent' .. opponentIndex].match2players[key].extradata =
-					json.stringify(match['opponent' .. opponentIndex].match2players[key].extradata)
-			end
-			match['opponent' .. opponentIndex].match2players = json.stringify(match['opponent' .. opponentIndex].match2players)
-
-			--stringify opponent extradata
-			match['opponent' .. opponentIndex].extradata = json.stringify(match['opponent' .. opponentIndex].extradata)
-
-			--stringify opponents
-			match['opponent' .. opponentIndex] = json.stringify(match['opponent' .. opponentIndex])
 		else
 			break
 		end
+	end
+
+	for opponentIndex = 1, numberofOpponents do
+		if match.winner == 'draw' or tonumber(match.winner) == 0 or
+				(match.opponent1.score == bestof / 2 and match.opponent1.score == match.opponent2.score) then
+			match.finished = 'true'
+			match.winner = 0
+			match.resulttype = 'draw'
+		end
+		if tostring(match.winner) == tostring(opponentIndex) or
+				match.resulttype == 'draw' or
+				match['opponent' .. opponentIndex].score == bestof / 2 then
+			match['opponent' .. opponentIndex].placement = 1
+		else
+			match['opponent' .. opponentIndex].placement = 2
+		end
+
+		--stringify player data
+		for key, _ in ipairs(match['opponent' .. opponentIndex].match2players) do
+			match['opponent' .. opponentIndex].match2players[key].extradata =
+				json.stringify(match['opponent' .. opponentIndex].match2players[key].extradata)
+		end
+		match['opponent' .. opponentIndex].match2players = json.stringify(match['opponent' .. opponentIndex].match2players)
+
+		--stringify opponent extradata
+		match['opponent' .. opponentIndex].extradata = json.stringify(match['opponent' .. opponentIndex].extradata)
+
+		--stringify opponents
+		match['opponent' .. opponentIndex] = json.stringify(match['opponent' .. opponentIndex])
 	end
 
 	return match

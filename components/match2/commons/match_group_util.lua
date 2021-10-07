@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TreeUtil = require('Module:TreeUtil')
@@ -156,7 +157,7 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 	if varData then
 		return Json.parse(varData)
 	else
-		return mw.ext.LiquipediaDB.lpdb(
+		local matchRecords = mw.ext.LiquipediaDB.lpdb(
 			'match2',
 			{
 				conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketId .. ']]',
@@ -164,6 +165,10 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 				limit = 5000,
 			}
 		)
+		for _, matchRecord in ipairs(matchRecords) do
+			MatchGroupWorkaround.applyPlayerBugWorkaround(matchRecord)
+		end
+		return matchRecords
 	end
 end
 
@@ -578,7 +583,7 @@ Splits a matchId like h5HXaqbSVP_R02-M002 into the bracket ID h5HXaqbSVP and
 the base match ID R02-M002.
 ]]
 function MatchGroupUtil.splitMatchId(matchId)
-	return matchId:match('^(.-)_?(R%w+%-?M%w+)$')
+	return matchId:match('^(.-)_([%w-]+)$')
 end
 
 --[[

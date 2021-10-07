@@ -103,7 +103,7 @@ function CustomInjector:addCustomCells()
 end
 
 function CustomUser:_getFavouriteTeams()
-	local foundArgs = User:getAllArgsForBase(_args, 'fav-team-1')
+	local foundArgs = User:getAllArgsForBase(_args, 'fav-team-')
 
 	local display = ''
 	for _, item in ipairs(foundArgs) do

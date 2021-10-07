@@ -58,20 +58,22 @@ WikiSpecificBase.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 end)
 
 --[[
-Returns the module for the matchlist or bracket display modules. The returned
-module must have a luaGet method.
+Returns the matchlist or bracket display component. The display component must
+be a container, i.e. it takes in a bracket ID rather than a list of matches in
+a match group object. See the default implementation (pointed to below) for
+details.
 
 To customize matchlists and brackets for a wiki, override this to return
-display modules with the wiki-specific customizations.
+a display component with the wiki-specific customizations.
 
 Called from MatchGroup/Display
 
 -- @returns module
 ]]
-WikiSpecificBase.getMatchGroupModule = function(matchGroupType)
+function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
 	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
-		or Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
+		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
+		or Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
 end
 
 return WikiSpecificBase

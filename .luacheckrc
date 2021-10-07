@@ -1,5 +1,6 @@
 std = {
 	read_globals = {
+		"arg",
 		"assert",
 		"debug",
 		"error",
@@ -13,6 +14,7 @@ std = {
 		"pcall",
 		"require",
 		"select",
+		"setmetatable",
 		"string",
 		"table",
 		"tonumber",
