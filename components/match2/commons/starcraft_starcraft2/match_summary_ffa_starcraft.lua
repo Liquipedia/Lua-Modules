@@ -9,10 +9,10 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
-local StarcraftMatchGroupUtil = require('Module:MatchGroup/Util/Starcraft')
 local Table = require('Module:Table')
 
 local FfaMatchSummary = Lua.import('Module:MatchSummary/Ffa', {requireDevIfEnabled = true})
+local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 

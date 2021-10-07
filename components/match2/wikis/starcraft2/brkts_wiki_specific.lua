@@ -12,13 +12,14 @@ local Table = require('Module:Table')
 
 local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
 
+WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
+	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+	return StarcraftMatchGroupUtil.matchFromRecord
+end)
+
 WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Starcraft', {requireDevIfEnabled = true})
 	return InputModule.processMatch
-end)
-
-WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	return require('Module:MatchGroup/Util/Starcraft').matchFromRecord
 end)
 
 function WikiSpecific.getMatchGroupContainer(matchGroupType)

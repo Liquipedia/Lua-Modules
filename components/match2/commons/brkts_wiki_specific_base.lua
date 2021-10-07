@@ -54,7 +54,7 @@ Called from MatchGroup/Util
 -- @returns match
 ]]
 WikiSpecificBase.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	return require('Module:MatchGroup/Util').matchFromRecord
+	return Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true}).matchFromRecord
 end)
 
 --[[
