@@ -348,6 +348,34 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 	end
 end
 
+function MatchGroupUtil.bracketDataToRecord(bracketData)
+	local coordinates = bracketData.coordinates
+	local bracketsection = coordinates
+		and MatchGroupUtil.sectionIndexToString(coordinates.sectionIndex, coordinates.sectionCount)
+	return {
+		bracketreset = bracketData.bracketResetMatchId,
+		coordinates = coordinates and MatchGroupUtil.indexTableToRecord(coordinates),
+		header = bracketData.header,
+		lowerEdges = bracketData.lowerEdges and Array.map(bracketData.lowerEdges, MatchGroupUtil.indexTableToRecord),
+		lowerMatchIds = bracketData.lowerMatchIds,
+		qualWinLiteral = bracketData.qualwinLiteral,
+		quallose = bracketData.qualLose and 'true' or nil,
+		qualloseLiteral = bracketData.qualLoseLiteral,
+		qualskip = bracketData.qualSkip ~= 0 and bracketData.qualSkip or nil,
+		qualwin = bracketData.qualWin and 'true' or nil,
+		skipround = bracketData.skipRound ~= 0 and bracketData.skipRound or nil,
+		thirdplace = bracketData.thirdPlaceMatchId,
+		type = bracketData.type,
+		upperMatchId = bracketData.upperMatchId,
+
+		-- Deprecated
+		bracketsection = bracketsection,
+		--rootIndex = coordinates.rootIndex,
+		--tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds],
+		--toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1],
+	}
+end
+
 function MatchGroupUtil.opponentFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
@@ -550,6 +578,28 @@ function MatchGroupUtil.indexTableFromRecord(record)
 			return key, value
 		end
 	end)
+end
+
+-- Convert 1-based indexes to 0-based
+function MatchGroupUtil.indexTableToRecord(coordinates)
+	return Table.map(coordinates, function(key, value)
+		if key:match('Index') or StringUtils.endsWith(key, 'Ix') then
+			return key, value - 1
+		else
+			return key, value
+		end
+	end)
+end
+
+-- Deprecated
+function MatchGroupUtil.sectionIndexToString(sectionIndex, sectionCount)
+	if sectionIndex == 1 then
+		return 'upper'
+	elseif sectionIndex == sectionCount then
+		return 'lower'
+	else
+		return 'mid'
+	end
 end
 
 --[[
