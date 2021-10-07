@@ -7,7 +7,6 @@
 --
 
 local Series = require('Module:Infobox/Series')
-local Math = require('Module:Math')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Class = require('Module:Class')
@@ -52,7 +51,7 @@ function CustomSeries._getSeriesPrizepools(series)
 	end
 
 	_totalSeriesPrizepool = prizemoney
-	return '$' .. Language:formatNum(Math._round(prizemoney))
+	return '$' .. Language:formatNum(math.floor(prizemoney + 0.5))
 end
 
 function CustomInjector:addCustomCells(widgets)

@@ -14,7 +14,7 @@ local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
-local Math = require('Module:Math')
+local MathUtil = require('Module:MathUtil')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -164,7 +164,7 @@ function BracketDisplay.computeBracketLayout(bracket, config, headerRowsByMatchI
 		)
 
 		-- Compute partial sums of heights of lower round matches
-		local heightSums = Math.partialSums(
+		local heightSums = MathUtil.partialSums(
 			Array.map(lowerLayouts, function(layout) return layout.height end)
 		)
 
@@ -617,7 +617,7 @@ function BracketDisplay.NodeLowerConnectors(props)
 	)
 
 	-- Compute partial sums of heights of lower round matches
-	local heightSums = Math.partialSums(
+	local heightSums = MathUtil.partialSums(
 		Array.map(lowerLayouts, function(l) return l.height end)
 	)
 

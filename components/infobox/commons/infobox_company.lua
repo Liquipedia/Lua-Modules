@@ -12,7 +12,6 @@ local Links = require('Module:Links')
 local Flags = require('Module:Flags')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
-local Math = require('Module:Math')
 local String = require('Module:String')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -137,7 +136,7 @@ function Company:_getOrganizerPrizepools()
 		return nil
 	end
 
-	return '$' .. Language:formatNum(Math._round(prizemoney))
+	return '$' .. Language:formatNum(math.floor(prizemoney + 0.5))
 end
 
 return Company
