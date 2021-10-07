@@ -119,13 +119,27 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 				.. MatchGroupUtil.matchIdFromKey(match.loserto)
 		end
 
-		-- Kick bracketData.thirdplace if no 3rd place match
-		if bracketData.thirdplace ~= '' and not args.RxMTP then
-			bracketData.thirdplace = ''
+		-- Remove bracketData.thirdplace if no 3rd place match
+		if not args.RxMTP then
+			bracketData.thirdplace = nil
 		end
-		-- Kick bracketData.bracketreset if no reset match
-		if bracketData.bracketreset ~= '' and not args.RxMBR then
-			bracketData.bracketreset = ''
+		bracketData.thirdplace = bracketData.thirdplace or ''
+
+		-- Remove bracketData.bracketreset if no reset match
+		if not args.RxMBR then
+			bracketData.bracketreset = nil
+		end
+		bracketData.bracketreset = bracketData.bracketreset or ''
+
+		if not bracketData.lowerEdges then
+			local opponentCount = 0
+			for _, _ in Table.iter.pairsByPrefix(match, 'opponent') do
+				opponentCount = opponentCount + 1
+			end
+			bracketData.lowerEdges = Array.map(
+				MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, opponentCount),
+				MatchGroupUtil.indexTableToRecord
+			)
 		end
 
 		return match
@@ -153,27 +167,41 @@ function MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 		return (bracketId or '') .. '_' .. baseMatchId
 	end
 
+	-- Convert 0 based array to 1 based array
+	local function shiftArrayIndex(elems)
+		return Array.extend(elems[0], elems)
+	end
+
 	return Table.map(matches, function(_, match)
 		local bracketData = match.match2bracketdata
-		if String.nilIfEmpty(bracketData.toupper) then
-			bracketData.toupper = replaceBracketId(bracketData.toupper)
-		end
-		if String.nilIfEmpty(bracketData.tolower) then
-			bracketData.tolower = replaceBracketId(bracketData.tolower)
-		end
-		if String.nilIfEmpty(bracketData.thirdplace) then
-			bracketData.thirdplace = replaceBracketId(bracketData.thirdplace)
-		end
-		if String.nilIfEmpty(bracketData.bracketreset) then
-			bracketData.bracketreset = replaceBracketId(bracketData.bracketreset)
-		end
+
+		-- Convert 0 based array to 1 based array
+		bracketData.lowerEdges = bracketData.lowerEdges and shiftArrayIndex(bracketData.lowerEdges)
+		bracketData.lowerMatchIds = bracketData.lowerMatchIds and shiftArrayIndex(bracketData.lowerMatchIds)
+
+		-- Rewrite bracket name of match IDs
+		bracketData.bracketreset = String.nilIfEmpty(bracketData.bracketreset) and replaceBracketId(bracketData.bracketreset)
+		bracketData.lowerMatchIds = bracketData.lowerMatchIds and Array.map(bracketData.lowerMatchIds, replaceBracketId)
+		bracketData.thirdplace = String.nilIfEmpty(bracketData.thirdplace) and replaceBracketId(bracketData.thirdplace)
+		bracketData.tolower = String.nilIfEmpty(bracketData.tolower) and replaceBracketId(bracketData.tolower)
+		bracketData.toupper = String.nilIfEmpty(bracketData.toupper) and replaceBracketId(bracketData.toupper)
+		bracketData.upperMatchId = bracketData.upperMatchId and replaceBracketId(bracketData.upperMatchId)
+
+		-- Remove/convert deprecated fields
+		bracketData.lowerMatchIds = bracketData.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(bracketData)
+		bracketData.tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds] or ''
+		bracketData.toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1] or ''
+		bracketData.rootIndex = nil
+
+		-- Don't store advanceSpots
+		bracketData.advanceSpots = nil
 
 		local _, baseMatchId = MatchGroupUtil.splitMatchId(match.match2id)
 		return baseMatchId, bracketData
 	end)
 end
 
-local BRACKET_DATA_PARAMS = {'header', 'tolower', 'toupper', 'qualwin', 'quallose', 'skipround'}
+local BRACKET_DATA_PARAMS = {'type'}
 
 function MatchGroupInput._validateBracketData(bracketData, matchKey)
 	if bracketData == nil then
