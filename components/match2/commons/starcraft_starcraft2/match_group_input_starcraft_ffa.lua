@@ -8,6 +8,7 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -267,8 +268,9 @@ function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 					match.finished = 'true'
 					opponent.placement = tonumber(opponent.placement or '') or counter
 					opponent.extradata.advances = true
-					opponent.extradata.bg = opponent.extradata.bg
-						or match.pbg[opponent.placement] or 'down'
+					opponent.extradata.bg = StringUtils.nilIfEmpty(opponent.extradata.bg)
+						or match.pbg[opponent.placement]
+						or 'down'
 					temp.place = counter
 					temp.score = IndScore[scoreIndex]
 				else
@@ -282,8 +284,9 @@ function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 					temp.place = counter
 					temp.score = IndScore[scoreIndex]
 				end
-				opponent.extradata.bg = opponent.extradata.bg
-					or match.pbg[opponent.placement] or 'down'
+				opponent.extradata.bg = StringUtils.nilIfEmpty(opponent.extradata.bg)
+					or match.pbg[opponent.placement]
+					or 'down'
 				if opponent.extradata.bg == 'up' then
 					opponent.extradata.advances = true
 				end
@@ -306,6 +309,15 @@ function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 			if opponent.placement == 1 then
 				match.winner = oppIndex
 			end
+		end
+	end
+
+	if match.finished then
+		for oppIndex = 1, OppNumber do
+			local opponent = match['opponent' .. oppIndex]
+			opponent.extradata.bg = StringUtils.nilIfEmpty(opponent.extradata.bg)
+				or match.pbg[opponent.placement]
+				or 'down'
 		end
 	end
 
