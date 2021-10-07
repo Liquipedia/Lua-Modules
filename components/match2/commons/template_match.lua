@@ -9,13 +9,15 @@
 local TemplateMatch = {}
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 local json = require('Module:Json')
 local utils = require('Module:LuaUtils')--only needed for utils.log
-local Variables = require('Module:Variables')
-local Table = require('Module:Table')
-local Logic = require('Module:Logic')
-local Match = require('Module:Match')
-local String = require('Module:StringUtils')
+
+local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 
 -- store match to a var to later store them to LPDB
 function TemplateMatch.storeVar(args)
