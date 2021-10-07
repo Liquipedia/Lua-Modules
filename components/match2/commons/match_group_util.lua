@@ -10,10 +10,10 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TreeUtil = require('Module:TreeUtil')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
@@ -42,20 +42,31 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
-	bracketSection = 'string',
 	header = 'string?',
-	lowerMatchIds = TypeUtil.array('string'),
 	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
+	lowerMatchIds = TypeUtil.array('string'),
 	qualLose = 'boolean?',
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
 	qualWin = 'boolean?',
 	qualWinLiteral = 'string?',
-	rootIndex = 'number?',
 	skipRound = 'number?',
 	thirdPlaceMatchId = 'string?',
 	title = 'string?',
 	type = TypeUtil.literal('bracket'),
+	upperMatchId = 'string?',
+})
+MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
+	depth = 'number',
+	depthCount = 'number',
+	matchIndexInRound = 'number',
+	rootIndex = 'number',
+	roundCount = 'number',
+	roundIndex = 'number',
+	sectionCount = 'number',
+	sectionIndex = 'number',
+	semanticDepth = 'number',
+	semanticRoundIndex = 'number',
 })
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
@@ -141,11 +152,12 @@ MatchGroupUtil.types.Team = TypeUtil.struct({
 })
 
 MatchGroupUtil.types.MatchGroup = TypeUtil.struct({
-	rootMatchIds = TypeUtil.array('string'),
+	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
+	coordinatesByMatchId = TypeUtil.table('string', MatchGroupUtil.types.MatchCoordinates),
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+	rootMatchIds = TypeUtil.array('string'),
 	type = TypeUtil.literalUnion('matchlist, bracket'),
-	upperMatchIds = TypeUtil.table('string', 'string'),
 })
 
 --[[
@@ -180,34 +192,64 @@ MatchGroupUtil.fetchMatchGroup = FnUtil.memoize(function(bracketId)
 	)
 
 	local matchesById = Table.map(matches, function(_, match) return match.matchId, match end)
-	local upperMatchIds, rootMatchIds = MatchGroupUtil.computeUpperMatchIds(matchesById)
-	local headMatchIds = Array.filter(
-		rootMatchIds,
-		function(matchId) return not StringUtils.endsWith(matchId, 'RxMTP')
-	end)
+	local bracketDatasById = Table.mapValues(matchesById, function(match) return match.bracketData end)
+
+	MatchGroupUtil.populateMissingUpperMatchIds(bracketDatasById)
+
 	local matchGroup = {
-		bracketDatasById = Table.mapValues(matchesById, function(match) return match.bracketData end),
+		bracketDatasById = bracketDatasById,
+		coordinatesByMatchId = Table.mapValues(matchesById, function(match) return match.bracketData.coordinates end),
 		matches = matches,
 		matchesById = matchesById,
-		rootMatchIds = rootMatchIds,
+		rootMatchIds = MatchGroupUtil.computeRootMatchIds(matchesById),
 		type = matches[1] and matches[1].bracketData.type or 'matchlist',
-		upperMatchIds = upperMatchIds,
-		headMatchIds = headMatchIds, --deprecated
 	}
 
 	if matchGroup.type == 'bracket' then
-		local roundPropsByMatchId, rounds = MatchGroupUtil.computeRounds(matchGroup.bracketDatasById, rootMatchIds)
+		-- If coordinates is not populated (because the bracket template
+		-- has not been purged), then compute a partial set of coordinates
+		-- for use in displaying the bracket.
+		if Table.isEmpty(matchGroup.coordinatesByMatchId) then
+			MatchGroupUtil.populateMissingComputed(matchGroup)
+		end
 
 		MatchGroupUtil.populateAdvanceSpots(matchGroup)
-
-		Table.mergeInto(matchGroup, {
-			coordsByMatchId = roundPropsByMatchId,
-			rounds = rounds,
-		})
 	end
 
 	return matchGroup
 end)
+
+--[[
+Populate bracketData.upperMatchId, an field present on recently purged bracket
+templates but missing from this bracket.
+]]
+function MatchGroupUtil.populateMissingUpperMatchIds(bracketDatasById)
+	local _, bracketData1 = next(bracketDatasById)
+	if bracketData1.type ~= 'bracket' or bracketData1.coordinates ~= nil then return end
+
+	local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
+	local upperMatchIds = MatchGroupCoordinates.computeUpperMatchIds(bracketDatasById)
+
+	for matchId, bracketData in pairs(bracketDatasById) do
+		bracketData.upperMatchId = upperMatchIds[matchId]
+	end
+end
+
+--[[
+Populate fields that are present on recently purged bracket templates but
+missing from this bracket.
+]]
+function MatchGroupUtil.populateMissingComputed(matchGroup)
+	if matchGroup.matches[1].bracketData.coordinates ~= nil then return end
+
+	local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
+	local bracketCoordinates = MatchGroupCoordinates.computeCoordinates(matchGroup)
+
+	matchGroup.coordinatesByMatchId = bracketCoordinates.coordinatesByMatchId
+	for matchId, bracketData in pairs(matchGroup.bracketDatasById) do
+		bracketData.coordinates = bracketCoordinates.coordinatesByMatchId[matchId]
+	end
+end
 
 --[[
 Fetches all matches in a matchlist or bracket. Returns a list of structurally
@@ -250,9 +292,14 @@ to the starcraft2 wiki as an example.
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
+	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
+	if bracketData.type == 'bracket' then
+		bracketData.lowerEdges = bracketData.lowerEdges
+			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
+	end
 
 	return {
-		bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata), #opponents),
+		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		date = record.date,
@@ -272,56 +319,25 @@ function MatchGroupUtil.matchFromRecord(record)
 	}
 end
 
-function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
+function MatchGroupUtil.bracketDataFromRecord(data)
 	if data.type == 'bracket' then
-		local lowerEdges = {}
-		local lowerMatchIds = {}
-		local midIx = math.floor(opponentCount / 2)
-		if nilIfEmpty(data.toupper) then
-			table.insert(lowerMatchIds, data.toupper)
-			table.insert(lowerEdges, {
-				opponentIndex = midIx,
-				lowerMatchIndex = #lowerMatchIds,
-			})
-		end
-		if nilIfEmpty(data.tolower) then
-			table.insert(lowerMatchIds, data.tolower)
-			table.insert(lowerEdges, {
-				opponentIndex = math.min(midIx + 1, opponentCount),
-				lowerMatchIndex = #lowerMatchIds,
-			})
-		end
-
-		local advanceSpots = {}
-		if nilIfEmpty(data.winnerto) then
-			advanceSpots[1] = {bg = 'up', type = 'custom', matchId = data.winnerto}
-		end
-		if nilIfEmpty(data.loserto) then
-			advanceSpots[2] = {bg = 'stayup', type = 'custom', matchId = data.loserto}
-		end
-		if Logic.readBool(data.qualwin) then
-			advanceSpots[1] = Table.merge(advanceSpots[1], {bg = 'up', type = 'qualify'})
-		end
-		if Logic.readBool(data.quallose) then
-			advanceSpots[2] = Table.merge(advanceSpots[2], {bg = 'stayup', type = 'qualify'})
-		end
-
+		local advanceSpots = data.advanceSpots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {
 			advanceSpots = advanceSpots,
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
-			bracketSection = data.bracketsection,
+			coordinates = data.coordinates and MatchGroupUtil.indexTableFromRecord(data.coordinates),
 			header = nilIfEmpty(data.header),
-			lowerEdges = lowerEdges,
-			lowerMatchIds = lowerMatchIds,
+			lowerEdges = data.lowerEdges and Array.map(data.lowerEdges, MatchGroupUtil.indexTableFromRecord),
+			lowerMatchIds = data.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(data),
 			qualLose = advanceSpots[2] and advanceSpots[2].type == 'qualify',
 			qualLoseLiteral = nilIfEmpty(data.qualloseLiteral),
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,
 			qualWin = advanceSpots[1] and advanceSpots[1].type == 'qualify',
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
-			rootIndex = tonumber(data.rootindex),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
+			upperMatchId = nilIfEmpty(data.upperMatchId),
 		}
 	else
 		return {
@@ -393,106 +409,88 @@ function MatchGroupUtil.gameFromRecord(record)
 	}
 end
 
-function MatchGroupUtil.computeUpperMatchIds(matchesById)
-	local upperMatchIds = {}
-	for matchId, match in pairs(matchesById) do
-		if match.bracketData.type == 'bracket' then
-			for _, lowerMatchId in ipairs(match.bracketData.lowerMatchIds) do
-				upperMatchIds[lowerMatchId] = matchId
-			end
-		end
-	end
-
+function MatchGroupUtil.computeRootMatchIds(matchesById)
 	-- Matches without upper matches
 	local rootMatchIds = {}
-	for matchId, _ in pairs(matchesById) do
-		if not upperMatchIds[matchId]
+	for matchId, match in pairs(matchesById) do
+		if not match.bracketData.upperMatchId
 			and not StringUtils.endsWith(matchId, 'RxMBR') then
 			table.insert(rootMatchIds, matchId)
 		end
 	end
 
-	-- Use custom ordering specified by rootIndex if present
 	Array.sortInPlaceBy(rootMatchIds, function(matchId)
-		return {matchesById[matchId].bracketData.rootIndex or -1, matchId}
+		return {Table.getByPathOrNil(matchesById, {matchId, 'bracketData', 'coordinates','rootIndex'}) or -1, matchId}
 	end)
 
-	return upperMatchIds, rootMatchIds
+	return rootMatchIds
 end
 
-function MatchGroupUtil.dfsFrom(bracketDatasById, start)
-	return TreeUtil.dfs(
-		function(matchId)
-			return bracketDatasById[matchId].lowerMatchIds
-		end,
-		start
-	)
+function MatchGroupUtil.computeLowerMatchIdsFromLegacy(data)
+	local lowerMatchIds = {}
+	if nilIfEmpty(data.toupper) then
+		table.insert(lowerMatchIds, data.toupper)
+	end
+	if nilIfEmpty(data.tolower) then
+		table.insert(lowerMatchIds, data.tolower)
+	end
+	return lowerMatchIds
 end
 
-function MatchGroupUtil.computeDepthsFrom(bracketDatasById, startMatchId)
-	local depths = {}
-	local maxDepth = -1
-	local function visit(matchId, depth)
-		local bracketData = bracketDatasById[matchId]
-		depths[matchId] = depth
-		maxDepth = math.max(maxDepth, depth + bracketData.skipRound)
-		for _, lowerMatchId in ipairs(bracketData.lowerMatchIds) do
-			visit(lowerMatchId, depth + 1 + bracketData.skipRound)
+function MatchGroupUtil.autoAssignLowerEdges(lowerMatchCount, opponentCount)
+	opponentCount = opponentCount or 2
+
+	local lowerEdges = {}
+	if lowerMatchCount <= opponentCount then
+		local skip = math.ceil((opponentCount - lowerMatchCount) / 2)
+		for lowerMatchIndex = 1, lowerMatchCount do
+			table.insert(lowerEdges, {
+				lowerMatchIndex = lowerMatchIndex,
+				opponentIndex = lowerMatchIndex + skip,
+			})
+		end
+	else
+		for lowerMatchIndex = 1, lowerMatchCount do
+			table.insert(lowerEdges, {
+				lowerMatchIndex = lowerMatchIndex,
+				opponentIndex = math.min(lowerMatchIndex, opponentCount),
+			})
 		end
 	end
-	visit(startMatchId, 0)
-	return depths, maxDepth + 1
+	return lowerEdges
 end
 
--- TODO store and read this from LPDB
-function MatchGroupUtil.computeRounds(bracketDatasById, rootMatchIds)
-	local rounds = {}
-	local roundPropsByMatchId = {}
-	for _, rootMatchId in ipairs(rootMatchIds) do
-		local depths, depthCount = MatchGroupUtil.computeDepthsFrom(bracketDatasById, rootMatchId)
-		for _ = #rounds + 1, depthCount do
-			table.insert(rounds, {})
-		end
+--[[
+Computes just the advance spots that can be determined from a match bracket
+data. More are found in populateAdvanceSpots.
+]]
+function MatchGroupUtil.computeAdvanceSpots(data)
+	local advanceSpots = {}
 
-		for matchId, depth in pairs(depths) do
-			roundPropsByMatchId[matchId] = {
-				depth = depth,
-				depthCount = depthCount,
-			}
-		end
+	if data.upperMatchId then
+		advanceSpots[1] = {bg = 'up', type = 'advance', matchId = data.upperMatchId}
 	end
 
-	for rootIx, rootMatchId in ipairs(rootMatchIds) do
-		for matchId in MatchGroupUtil.dfsFrom(bracketDatasById, rootMatchId) do
-			local roundProps = roundPropsByMatchId[matchId]
-
-			-- All roots are left aligned, except the third place match which is right aligned
-			local roundIx = StringUtils.endsWith(matchId, 'RxMTP')
-				and #rounds
-				or roundProps.depthCount - roundProps.depth
-
-			table.insert(rounds[roundIx], matchId)
-			roundProps.matchIxInRound = #rounds[roundIx]
-			roundProps.rootIx = rootIx
-			roundProps.roundIx = roundIx
-		end
+	if nilIfEmpty(data.winnerto) then
+		advanceSpots[1] = {bg = 'up', type = 'custom', matchId = data.winnerto}
+	end
+	if nilIfEmpty(data.loserto) then
+		advanceSpots[2] = {bg = 'stayup', type = 'custom', matchId = data.loserto}
 	end
 
-	return roundPropsByMatchId, rounds
+	if Logic.readBool(data.qualwin) then
+		advanceSpots[1] = Table.merge(advanceSpots[1], {bg = 'up', type = 'qualify'})
+	end
+	if Logic.readBool(data.quallose) then
+		advanceSpots[2] = Table.merge(advanceSpots[2], {bg = 'stayup', type = 'qualify'})
+	end
+
+	return advanceSpots
 end
 
 function MatchGroupUtil.populateAdvanceSpots(bracket)
 	if bracket.type ~= 'bracket' then
 		return
-	end
-
-	-- Winner advances to upper match
-	for _, match in ipairs(bracket.matches) do
-		local upperMatchId = bracket.upperMatchIds[match.matchId]
-		if upperMatchId then
-			match.bracketData.advanceSpots[1] = match.bracketData.advanceSpots[1]
-				or {bg = 'up', type = 'advance', matchId = upperMatchId}
-		end
 	end
 
 	-- Loser of semifinals play in third place match
@@ -541,6 +539,17 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	end
 
 	return mergedMatch
+end
+
+-- Convert 0-based indexes to 1-based
+function MatchGroupUtil.indexTableFromRecord(record)
+	return Table.map(record, function(key, value)
+		if key:match('Index') then
+			return key, value + 1
+		else
+			return key, value
+		end
+	end)
 end
 
 --[[

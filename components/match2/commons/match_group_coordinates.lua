@@ -250,34 +250,4 @@ function MatchGroupCoordinates.computeCoordinates(bracket)
 	}
 end
 
---[[
-Same as MatchGroupCoordinates.computeCoordinates, but only for the fields
-necessary to display the bracket.
-]]
-function MatchGroupCoordinates.computeCoordinatesRestricted(bracket)
-	local sections, sectionIxs = MatchGroupCoordinates.computeSections(bracket)
-	local rounds, roundPropsByMatchId = MatchGroupCoordinates.computeRounds(bracket)
-
-	local coordinatesByMatchId = {}
-	for rootIndex, rootMatchId in ipairs(bracket.rootMatchIds) do
-		for matchId in MatchGroupCoordinates.dfsFrom(bracket.bracketDatasById, rootMatchId) do
-			coordinatesByMatchId[matchId] = Table.merge(
-				roundPropsByMatchId[matchId],
-				{
-					rootIndex = rootIndex,
-					roundCount = #rounds,
-					sectionCount = #sections,
-					sectionIndex = sectionIxs[matchId],
-				}
-			)
-		end
-	end
-
-	return {
-		coordinatesByMatchId = coordinatesByMatchId,
-		rounds = rounds,
-		sections = sections,
-	}
-end
-
 return MatchGroupCoordinates
