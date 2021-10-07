@@ -116,6 +116,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		data.winner == 'canceled'
 	then
 		data.resulttype = 'np'
+		data.finished = true
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
@@ -139,6 +140,11 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			indexedScores, winner = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, nil, data.finished)
 			data.winner = data.winner or winner
 		end
+	end
+
+	--set it as finished if we have a winner
+	if not String.isEmpty(data.winner) then
+		data.finished = true
 	end
 
 	return data, indexedScores
@@ -455,7 +461,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- apply placements and winner if finshed
-	if Logic.readBool(match.finished) then
+	if not String.isEmpty(match.winner) or Logic.readBool(match.finished) then
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
