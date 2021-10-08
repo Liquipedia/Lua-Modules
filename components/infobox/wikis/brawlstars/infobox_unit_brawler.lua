@@ -81,7 +81,7 @@ function CustomUnit:nameDisplay()
 end
 
 function CustomUnit:setLpdbData(args)
-	safeExpand(mw.getCurrentFrame(), HeroData, {name = _brawlerName, image = _args.image}, self.pagename)
+	Template.safeExpand(mw.getCurrentFrame(), HeroData, {name = _brawlerName, image = _args.image}, self.pagename)
 end
 
 function CustomUnit:getWikiCategories(args)
