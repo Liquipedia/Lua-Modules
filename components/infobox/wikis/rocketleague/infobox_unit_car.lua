@@ -13,7 +13,6 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
-local _brawlerName
 local _args
 
 local CustomUnit = Class.new()
