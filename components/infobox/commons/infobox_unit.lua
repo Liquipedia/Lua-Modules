@@ -38,7 +38,12 @@ function Unit:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 		},
-		Center{content = {args.caption}},
+		Customizable{
+			id = 'caption',
+			children = {
+				Center{content = {args.caption}},
+			}
+		},
 		Title{name = (args.informationType or 'Unit') .. ' Information'},
 		Customizable{
 			id = 'type',
