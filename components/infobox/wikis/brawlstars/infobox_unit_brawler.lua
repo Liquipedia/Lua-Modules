@@ -76,19 +76,19 @@ function CustomUnit:createWidgetInjector()
 end
 
 function CustomUnit:nameDisplay()
-	_brawlerName = Template.safeExpand(mw.getCurrentFrame(), brawlername, {self.pagename}, self.pagename)
+	_brawlerName = Template.safeExpand(mw.getCurrentFrame(), 'brawlername', {self.pagename}, self.pagename)
 
 	return _brawlerName
 end
 
 function CustomUnit:setLpdbData(args)
-	Template.safeExpand(mw.getCurrentFrame(), HeroData, {name = _brawlerName, image = _args.image}, self.pagename)
+	Template.safeExpand(mw.getCurrentFrame(), 'HeroData', {name = _brawlerName, image = _args.image}, self.pagename)
 end
 
 function CustomUnit:getWikiCategories(args)
 	local categories = {}
 	if Namespace.isMain() then
-		categories = {Brawlers}
+		categories = {'Brawlers'}
 		if not String.isEmpty(args.attacktype) then
 			table.insert(categories, args.attacktype .. ' brawlers')
 		end
