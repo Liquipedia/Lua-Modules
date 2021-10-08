@@ -44,6 +44,7 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Primary Weapon', content = {_args.attack}},
 		Cell{name = 'Super Ability', content = {_args.super}},
 		Title{name = 'Gadgets & Star Powers'},
+		Cell{name = 'Gadgets', content = {_args.gadget}},
 		Cell{name = 'Star Powers', content = {_args.star}},
 	}
 
