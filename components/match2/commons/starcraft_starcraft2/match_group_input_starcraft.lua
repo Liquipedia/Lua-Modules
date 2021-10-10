@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -224,8 +225,14 @@ function StarcraftMatchGroupInput.adjustData(match)
 
 	--main processing done here
 	local subgroup = 0
+	local maps = Array.mapIndexes(function(mapIx)
+		local map
+		map, subgroup = StarcraftMatchGroupInput.readMap(match, mapIx, subgroup)
+		return map
+	end)
 	for mapKey, _ in Table.iter.pairsByPrefix(match, 'map') do
-		match, subgroup = StarcraftMatchGroupInput.MapInput(match, mapKey, subgroup)
+		local mapIx = tonumber(mapKey:match('(%d+)$'))
+		match[mapKey] = maps[mapIx]
 	end
 
 	--apply vodgames
@@ -705,8 +712,12 @@ end
 MapInput functions
 
 ]]--
-function StarcraftMatchGroupInput.MapInput(match, mapKey, subgroup)
-	local map = match[mapKey]
+function StarcraftMatchGroupInput.readMap(match, mapIx, subgroup)
+	local map = match['map' .. mapIx]
+	if not map
+		or not (match.map or map.winner or map.t1p1 or map.t2p1) then
+		return nil
+	end
 
 	--redirect maps
 	if map.map ~= 'TBD' then
@@ -760,8 +771,7 @@ function StarcraftMatchGroupInput.MapInput(match, mapKey, subgroup)
 		end
 	end
 
-	match[mapKey] = map
-	return match, subgroup
+	return map, subgroup
 end
 
 function StarcraftMatchGroupInput.MapWinnerProcessing(map)
