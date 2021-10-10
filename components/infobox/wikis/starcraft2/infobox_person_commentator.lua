@@ -323,7 +323,7 @@ function CustomCommentator:adjustLPDB(lpdbData, _, personType)
 		faction2 = _raceData.faction2,
 		lc_id = string.lower(self.pagename),
 		teamname = _args.team,
-		role = _args.role,
+		role = personType.store,
 		role2 = _args.role2,
 		militaryservice = _militaryStore,
 	}
