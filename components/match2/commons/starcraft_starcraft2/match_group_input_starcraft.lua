@@ -389,10 +389,16 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 			winner = 0,
 		}
 		--adjust sub-match scores
-		if tonumber(map.winner) == 1 then
-			SubMatches[k].scores[1] = SubMatches[k].scores[1] + 1
-		elseif tonumber(map.winner) == 2 then
-			SubMatches[k].scores[2] = SubMatches[k].scores[2] + 1
+		if map.map and String.startsWith(map.map, 'Submatch') then
+			for opponentIx, score in ipairs(SubMatches[k].scores) do
+				SubMatches[k].scores[opponentIx] = score + map.scores[opponentIx]
+			end
+		else
+			if tonumber(map.winner) == 1 then
+				SubMatches[k].scores[1] = SubMatches[k].scores[1] + 1
+			elseif tonumber(map.winner) == 2 then
+				SubMatches[k].scores[2] = SubMatches[k].scores[2] + 1
+			end
 		end
 	end
 

@@ -9,7 +9,7 @@
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:String')
+local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -111,7 +111,7 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	match.headToHead = Logic.readBool(Table.extract(match.extradata, 'headtohead'))
 	match.isFfa = Logic.readBool(Table.extract(match.extradata, 'ffa'))
 	match.noScore = Logic.readBoolOrNil(Table.extract(match.extradata, 'noscore'))
-	match.casters = String.nilIfEmpty(Table.extract(match.extradata, 'casters'))
+	match.casters = StringUtils.nilIfEmpty(Table.extract(match.extradata, 'casters'))
 
 	return match
 end
@@ -236,6 +236,7 @@ function StarcraftMatchGroupUtil.groupBySubmatch(matchGames)
 end
 
 --Constructs a submatch object whose properties are aggregated from that of its games.
+-- TODO read this from LPDB
 function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 	local opponents = Table.deepCopy(games[1].opponents)
 
@@ -268,7 +269,11 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 		scores[opponentIx] = 0
 	end
 	for _, game in pairs(games) do
-		if game.winner then
+		if game.map and StringUtils.startsWith(game.map, 'Submatch') then
+			for opponentIx, score in pairs(scores) do
+				scores[opponentIx] = score + (game.scores[opponentIx] or 0)
+			end
+		elseif game.winner then
 			scores[game.winner] = (scores[game.winner] or 0) + 1
 		end
 	end
@@ -302,7 +307,7 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 	local uniqueResult = Table.uniqueKey(resultTypes)
 	if uniqueResult == 'default' then
 		resultType = 'default'
-		walkover = String.nilIfEmpty(Table.uniqueKey(walkovers)) or 'L'
+		walkover = StringUtils.nilIfEmpty(Table.uniqueKey(walkovers)) or 'L'
 	elseif uniqueResult == 'np' then
 		resultType = 'np'
 	end
