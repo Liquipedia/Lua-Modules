@@ -65,7 +65,7 @@ function CustomUnit:setLpdbData(args)
 		}),
 	}
 
-	-- Wikicode was: was car_{{#explode:{{PAGENAME}}|/|1}}
+	-- Wikicode was: car_{{#explode:{{PAGENAME}}|/|1}}
 	local objectName = mw.title.getCurrentTitle().text
 	objectName = string.gsub(objectName, '.-/^', '')
 	objectName = string.gsub(objectName, '/.*$', '')
