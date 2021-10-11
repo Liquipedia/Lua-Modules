@@ -352,7 +352,7 @@ function StarcraftMatchGroupInput.MatchWinnerProcessing(match)
 				match['opponent' .. opponentIndex].score = tonumber(match['opponent' .. opponentIndex].score or '') or
 					tonumber(match['opponent' .. opponentIndex].sumscore) or -1
 				if match['opponent' .. opponentIndex].score > bestof / 2 then
-					match.finished = 'true'
+					match.finished = Logic.nilOr(match.finished, 'true')
 					match.winner = tonumber(match.winner or '') or opponentIndex
 				end
 			end
