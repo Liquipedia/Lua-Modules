@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+
 --[[
 
 WikiSpecific Code for MatchList and Bracket Code Generators
@@ -28,7 +30,7 @@ local MODES = {
 	['2'] = '2v2',
 	['3'] = '3v3',
 	['4'] = '4v4'
-	}
+}
 
 --default opponent type (used if the entered mode is not found in the above table)
 local DefaultMode = '1v1'
@@ -40,42 +42,50 @@ end
 
 --returns the Code for a Match, depending on the input
 function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	local indent = '    '
+
 	if bestof == 0 and args.score ~= 'false' then
 		args.score = 'true'
 	end
-	local score = args.score == 'true' and '|score=' or ''
-	local hasDate = args.hasDate == 'true' and '\n\t|date=\n\t|twitch=' or ''
-	local needsWinner = args.needsWinner == 'true' and '\n\t|winner=' or ''
-	local out = '{{Match' .. (index == 1 and ('|bestof=' .. (bestof ~= 0 and bestof or '')) or '') ..
-		needsWinner .. hasDate
+
+	local score = args.score == 'true' and '|score=' or nil
+	local lines = Array.extend(
+		'{{Match',
+		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
+		score and indent .. score,
+		args.needsWinner == 'true' and indent .. '|winner=' or nil,
+		args.hasDate == 'true' and {indent .. '|date=', indent .. '|twitch='} or {}
+	)
 
 	for i = 1, opponents do
-		out = out .. '\n\t|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score)
+		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score or ''))
 	end
 
 	if bestof ~= 0 then
 		if mode == 'team' and tonumber(args.submatch or '') then
 			local submatchBo = tonumber(args.submatch)
 			for i = 1, bestof do
-				local submatchNumber = math.floor((i-1)/submatchBo) + 1
-				out = out .. '\n\t|map' .. i .. '={{Map|map=|winner=|t1p1=|t2p1=|subgroup=' .. submatchNumber .. '}}'
+				local submatchNumber = math.floor((i - 1) / submatchBo) + 1
+				table.insert(lines, indent .. '|map' .. i .. '={{Map|map=|winner=|t1p1=|t2p1=|subgroup=' .. submatchNumber .. '}}')
 			end
 		elseif mode == 'team' and args.submatch == 'true' then
 			for i = 1, bestof do
-				out = out .. '\n\t|map' .. i .. '={{Map|map=|winner=|t1p1=|t2p1=|subgroup=}}'
+				table.insert(lines, indent .. '|map' .. i .. '={{Map|map=|winner=|t1p1=|t2p1=|subgroup=}}')
 			end
 		elseif mode == 'team' then
 			for i = 1, bestof do
-				out = out .. '\n\t|map' .. i .. '={{Map|map=|winner=|t1p1=|t2p1=}}'
+				table.insert(lines, indent .. '|map' .. i .. '={{Map|map=|winner=|t1p1=|t2p1=}}')
 			end
 		else
 			for i = 1, bestof do
-				out = out .. '\n\t|map' .. i .. '={{Map|map=|winner=}}'
+				table.insert(lines, indent .. '|map' .. i .. '={{Map|map=|winner=}}')
 			end
 		end
 	end
 
-	return out .. '\n\t}}'
+	table.insert(lines, '}}')
+
+	return table.concat(lines, '\n')
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent

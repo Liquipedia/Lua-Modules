@@ -92,8 +92,9 @@ function copyPaste._getHeader(headerCode, customHeader, match)
 
 	header = mw.text.split(header, ',')[1]
 
-	header = '\n\n' .. mw.text.nowiki('<!--') .. ' ' .. header .. ' '
-		.. mw.text.nowiki('-->') .. (customHeader and ('\n|' .. match.id .. 'header=') or '')
+	header = '\n\n' .. '<!-- ' .. header .. ' -->'
+		.. (customHeader and ('\n|' .. match.id .. 'header=') or '')
+
 	return header
 end
 
@@ -112,8 +113,7 @@ function copyPaste.bracket(frame, args)
 	args.id = string.gsub(string.gsub(args.id, '^Bracket/', ''), '^bracket/', '')
 	local templateid = BracketAlias[string.lower(args.id)] or args.id
 
-	local out = '<pre class="selectall" width=50%>' ..
-		WikiSpecific.getStart(templateid, copyPaste.generateID(), 'bracket', args)
+	local out = WikiSpecific.getStart(templateid, copyPaste.generateID(), 'bracket', args)
 
 	local bracketData = copyPaste._getBracketData(templateid)
 
@@ -122,11 +122,9 @@ function copyPaste.bracket(frame, args)
 			if args.extra == 'true' then
 				local header
 				if match.id == 'RxMTP' then
-					header = '\n\n' .. mw.text.nowiki('<!--') .. ' Third Place Match ' ..
-						mw.text.nowiki('-->') .. '\n|' .. match.id .. 'header='
+					header = '\n\n' .. '<!-- Third Place Match -->' .. '\n|' .. match.id .. 'header='
 				else
-					header = '\n\n' .. mw.text.nowiki('<!--') .. ' Bracket Reset ' ..
-						mw.text.nowiki('-->') .. '\n|' .. match.id .. 'header='
+					header = '\n\n' .. '<!-- Bracket Reset -->' .. '\n|' .. match.id .. 'header='
 				end
 				if empty then
 					out = out .. header .. '\n|' .. match.id .. '='
@@ -144,7 +142,8 @@ function copyPaste.bracket(frame, args)
 		end
 	end
 
-	return out .. '\n}}</pre>'
+	out = out .. '\n}}'
+	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
 function copyPaste.matchlist(frame, args)
@@ -159,8 +158,7 @@ function copyPaste.matchlist(frame, args)
 	local opponents = tonumber(args.opponents or 2) or 2
 	local mode = WikiSpecific.getMode(args.mode)
 
-	local out = '<pre class="selectall" width=50%>' ..
-		WikiSpecific.getStart(nil, copyPaste.generateID(), 'matchlist', args)
+	local out = WikiSpecific.getStart(nil, copyPaste.generateID(), 'matchlist', args)
 
 	for index = 1, matches do
 		if customHeader then
@@ -171,7 +169,8 @@ function copyPaste.matchlist(frame, args)
 			(not empty and WikiSpecific.getMatchCode(bestof, mode, index, opponents, args) or '')
 	end
 
-	return out .. '\n}}</pre>'
+	out = out .. '\n}}'
+	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
 return copyPaste
