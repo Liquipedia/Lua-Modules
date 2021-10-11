@@ -14,12 +14,16 @@ local Namespace = Class.new(function(self, prefix)
 	self.prefix = prefix
 end)
 
-function Namespace.get(self, key)
+function Namespace:get(key)
 	return StringUtils.nilIfEmpty(mw.ext.VariablesLua.var(self.prefix .. key))
 end
 
-function Namespace.set(self, key, value)
+function Namespace:set(key, value)
 	mw.ext.VariablesLua.vardefine(self.prefix .. key, StringUtils.nilIfEmpty(value))
+end
+
+function Namespace:delete(key)
+	self:set(key, nil)
 end
 
 local CachedTable = Class.new(function(self, table)
@@ -27,16 +31,20 @@ local CachedTable = Class.new(function(self, table)
 	self.table = table
 end)
 
-function CachedTable.get(self, key)
+function CachedTable:get(key)
 	if not self.results[key] then
 		self.results[key] = self.table:get(key)
 	end
 	return self.results[key]
 end
 
-function CachedTable.set(self, key, value)
+function CachedTable:set(key, value)
 	self.results[key] = nil
 	self.table:set(key, value)
+end
+
+function CachedTable:delete(key)
+	self:set(key, nil)
 end
 
 local PageVariableNamespace = {}
