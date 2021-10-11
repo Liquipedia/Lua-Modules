@@ -106,6 +106,7 @@ end
 -- arguments are accepted
 --
 function Class._wrapFunction(f, options)
+	options = options or {}
 	local alwaysRewriteArgs = options.trim
 		or options.removeBlanks
 		or options.valueFunc ~= nil
