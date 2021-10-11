@@ -70,7 +70,7 @@ function Person:createInfobox()
 			name = 'Nationality',
 			content = self:_createLocations(args, personType.category)
 		},
-		Cell{name = 'Birth', content = {age.birth}},
+		Cell{name = 'Born', content = {age.birth}},
 		Cell{name = 'Died', content = {age.death}},
 		Customizable{id = 'region', children = {
 			Cell{name = 'Region', content = {
