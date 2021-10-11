@@ -65,11 +65,11 @@ function CustomUnit:setLpdbData(args)
 		}),
 	}
 
+	-- Wikicode was: was car_{{#explode:{{PAGENAME}}|/|1}}
 	local objectName = mw.title.getCurrentTitle().text
 	objectName = string.gsub(objectName, '.-/^', '')
 	objectName = string.gsub(objectName, '/.*$', '')
 	objectName = 'car_' .. objectName
-	--was car_{{#explode:{{PAGENAME}}|/|1}}
 
 	mw.ext.LiquipediaDB.lpdb_datapoint(objectName, lpdbData)
 end
