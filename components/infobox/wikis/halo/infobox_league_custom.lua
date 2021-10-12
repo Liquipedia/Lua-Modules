@@ -119,6 +119,7 @@ function League:addToLpdb(lpdbData, args)
 
 	lpdbData.game = _game or args.game
 	lpdbData.publishertier = args['hcs-sponsored']
+	lpdbData.liquipediatiertype = nil
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
 		maps = Json.stringify(maps),
@@ -135,6 +136,8 @@ function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', _game or _args.game)
 
 	Variables.varDefine('tournament_publishertier', _args['hcs-sponsored'])
+
+	Variables.varDefine('tournament_liquipediatiertype', '')
 
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
@@ -215,7 +218,6 @@ end
 
 function CustomLeague:_createTierDisplay()
 	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
 	if String.isEmpty(tier) then
 		return nil
 	end
@@ -224,25 +226,13 @@ function CustomLeague:_createTierDisplay()
 	local hasInvalidTier = tierText == nil
 	tierText = tierText or tier
 
-	local hasInvalidTierType = false
-
 	local output = '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
 		.. '[[Category:' .. tierText .. ' Tournaments]]'
 
-	if not String.isEmpty(tierType) then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
-		tierType = '[[' .. tierType .. ' Tournaments|' .. tierType .. ']]'
-			.. '[[Category:' .. tierType .. ' Tournaments]]'
-		output = tierType .. '&nbsp;(' .. output .. ')'
-	end
-
 	output = output ..
-		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
+		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '')
 
 	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_tiertype', tierType)
 	return output
 end
 
