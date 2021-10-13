@@ -32,7 +32,7 @@ function p.storeMatchSMW(match, match2)
 	if type(streams) == "string" then streams = json.parse(streams) end
 	local icon = Variables.varDefault("tournament_icon")
 	local smwFormattedDate = mw.getContentLanguage():formatDate("c", match.date or "")
-	match.extradata = json.parseIfString(match.extradata)
+	local extradata = json.parseIfString(match.extradata) or {}
 	mw.smw.subobject({
 		"legacymatch_" .. match2.match2id,
 		"has mode=" .. (match2.mode or ""),
@@ -55,7 +55,7 @@ function p.storeMatchSMW(match, match2)
 		"Has exact time=" .. (Logic.readBool(match.dateexact) and "true" or "false"),
 		"Is finished=" .. (Logic.readBool(match.finished) and "true" or "false"),
 		"Has winner=" .. (match.winner or ""),
-		"Is featured match=" .. ((match.extradata or {}).isfeatured and "true" or "false"),
+		"Is featured match=" .. (extradata.isfeatured and "true" or "false"),
 		"Has calendar icon=" .. (not Logic.isEmpty(icon) and "File:" .. icon or ""),
 		"Has calendar description=" .. " - " .. Logic.emptyOr(match.opponent1, "TBD")
 			.. " vs " .. Logic.emptyOr(match.opponent2, "TBD") .. " on "
