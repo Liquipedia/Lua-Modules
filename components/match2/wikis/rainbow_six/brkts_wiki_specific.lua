@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbow_six
+-- wiki=rainbowsix
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

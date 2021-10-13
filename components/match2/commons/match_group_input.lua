@@ -24,22 +24,23 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 	Variables.varDefine('bracket_header', sectionHeader)
 	local tournamentParent = Variables.varDefault('tournament_parent', '')
 
-	local function readMatch(matchIndex)
+	local matches = {}
+	for matchKey, matchArgs in Table.iter.pairsByPrefix(args, 'M') do
+		local matchIndex = tonumber(matchKey:match('(%d+)$'))
 		local matchId = string.format('%04d', matchIndex)
 
-		local matchArgs = args['M' .. matchIndex]
-		if not matchArgs then
-			return
-		end
+		matchArgs = Json.parse(matchArgs)
 
-		matchArgs = Json.parseIfString(matchArgs)
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
 		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
 		match.parent = tournamentParent
 
+		table.insert(matches, match)
+
 		-- Add more fields to bracket data
-		local bracketData = Json.parse(match.bracketdata or '{}')
+		match.bracketdata = match.bracketdata or {}
+		local bracketData = match.bracketdata
 		bracketData.type = 'matchlist'
 		local nextMatchId = bracketId .. '_' .. string.format('%04d', matchIndex + 1)
 		bracketData.next = args['M' .. (matchIndex + 1)] and nextMatchId or nil
@@ -47,13 +48,9 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
 		bracketData.bracketindex = Variables.varDefault('match2bracketindex', 0)
 		bracketData.sectionheader = sectionHeader
-
-		match.bracketdata = Json.stringify(bracketData)
-
-		return match
 	end
 
-	return Array.mapIndexes(readMatch)
+	return matches
 end
 
 function MatchGroupInput.readBracket(bracketId, args, options)
@@ -92,6 +89,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs = Json.parseIfString(matchArgs)
 			or Json.parse(Lua.import('Module:Match', {requireDevIfEnabled = true}).toEncodedJson({}))
+
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
 		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
@@ -101,7 +99,8 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		local bracketData = bracketDatasById[matchId]
 		MatchGroupInput._validateBracketData(bracketData, matchKey)
 
-		Table.mergeInto(bracketData, Json.parse(match.bracketdata or '{}'))
+		match.bracketdata = Table.mergeInto(bracketData, match.bracketdata or {})
+
 		bracketData.type = 'bracket'
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
 		bracketData.bracketindex = Variables.varDefault('match2bracketindex', 0)
@@ -125,7 +124,6 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 			bracketData.bracketreset = ''
 		end
 
-		match.bracketdata = Json.stringify(bracketData)
 		return match
 	end
 

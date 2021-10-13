@@ -11,7 +11,6 @@ local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local wikiSpec = require('Module:Brkts/WikiSpecific')
 
@@ -65,14 +64,9 @@ function MatchSubobjects.luaGetMap(frame, args)
 		args = wikiSpec.processMap(frame, args)
 
 		local participants = args.participants or {}
-		if type(participants) == 'string' then
-			participants = Json.parse(participants)
-		end
 		for key, item in pairs(participants) do
 			if not key:match('%d_%d') then
 				error('Key \'' .. key .. '\' in match2game.participants has invalid format: \'<number>_<number>\' expected')
-			elseif type(item) == 'string' and String.startsWith(item, '{') then
-				participants[key] = Json.parse(item)
 			elseif type(item) ~= 'table' then
 				error('Item \'' .. tostring(item) .. '\' in match2game.participants has invalid format: table expected')
 			end
