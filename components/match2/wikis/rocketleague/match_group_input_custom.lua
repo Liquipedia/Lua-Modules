@@ -248,6 +248,9 @@ function matchFunctions.isFeatured(match)
 end
 
 function matchFunctions.currentEarnings(name)
+	if String.isEmpty(name) then
+		return 0
+	end
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
 		conditions = '[[name::' .. name .. ']]',
 		query = 'extradata'
