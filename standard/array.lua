@@ -318,6 +318,17 @@ function Array.mapIndexes(f)
 	return arr
 end
 
+--[[
+Returns the array {from, from + 1, from + 2, ..., to}.
+]]
+function Array.range(from, to)
+	local elems = {}
+	for elem = from, to do
+		table.insert(elems, elem)
+	end
+	return elems
+end
+
 function Array.extractKeys(tbl)
 	local keys = {}
 	for key, _ in pairs(tbl) do
