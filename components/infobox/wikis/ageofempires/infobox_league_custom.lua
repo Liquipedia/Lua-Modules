@@ -99,17 +99,17 @@ function CustomInjector:parse(id, widgets)
 
 			-- map from mapX, might be pagename|displayname
 			local map = mw.text.split(args['map' .. index], '|', true)
-			-- maplink from mapXlink or first part of map
+			-- maplink from mapXlink or first part of map or autolink
 			local maplink
 			if not String.isEmpty(args['map' .. index .. 'link']) then
 				maplink = args['map' .. index .. 'link']
 			else
 				maplink = map[1]
-			end
-
-			--auto map page
-			if Page.exists(maplink .. ' (map)') then
-				maplink = maplink .. ' (map)'
+				-- only check for a map page when map has only one part,
+				-- so no precise link is given
+				if map[2] == nil and Page.exists(maplink .. ' (map)') then
+					maplink = maplink .. ' (map)'
+				end
 			end
 
 			if (index == 1) then
@@ -269,6 +269,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
+		deadline = args.deadline or '',
 		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ',')
 	}
 
