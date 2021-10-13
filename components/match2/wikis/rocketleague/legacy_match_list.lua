@@ -145,11 +145,13 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 		if player ~= 'TBD' then
 			args['opponent' .. index] = MatchSubobjects.luaGetOpponent(frame, {
 					type = 'solo',
-					match2players = '[' .. json.stringify({
-						name = playerLink,
-						displayname = player,
-						flag = args['p' .. index .. 'flag'],
-					}) .. ']',
+					match2players = {
+						{
+							name = playerLink,
+							displayname = player,
+							flag = args['p' .. index .. 'flag'],
+						},
+					},
 					template = args['p' .. index .. 'team'],
 					score = score,
 				})

@@ -226,7 +226,7 @@ function matchFunctions.getOpponents(args)
 	local isScoreSet = false
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
-		local opponent = args['opponent' .. opponentIndex]
+		local opponent = Json.parseIfString(args['opponent' .. opponentIndex])
 		if not Logic.isEmpty(opponent) then
 			--retrieve name and icon for teams from team templates
 			if opponent.type == 'team' and

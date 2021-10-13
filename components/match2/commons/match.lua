@@ -129,6 +129,7 @@ function Match._storePlayers(args, staticid, opponentIndex)
 		-- read player
 		local player = args['opponent' .. opponentIndex .. '_p' .. playerIndex]
 		if player == nil then break end
+		player = Json.parseIfString(player)
 
 		player.extradata = stringifyNonEmpty(player.extradata)
 
@@ -160,12 +161,12 @@ function Match._storeOpponents(args, staticid, opponentPlayers)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if opponent == nil then	break end
-
+		opponent = Json.parseIfString(opponent)
 		opponent.extradata = stringifyNonEmpty(opponent.extradata)
 
 		-- get nested players if exist
 		if not Logic.isEmpty(opponent.match2players) then
-			local players = opponent.match2players or {}
+			local players = Json.parseIfString(opponent.match2players) or {}
 			for playerIndex, player in ipairs(players) do
 				args['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
 			end
@@ -204,6 +205,8 @@ function Match._storeGames(args, staticid)
 	for gameIndex = 1, 100 do
 		-- read game
 		local game = args['game' .. gameIndex] or args['map' .. gameIndex]
+		game = Json.parseIfString(game)
+		if game == 'null' then game = nil end
 		if game == nil then
 			break
 		end
