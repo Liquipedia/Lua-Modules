@@ -24,6 +24,8 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
 local _RESULT_TYPE_DRAW = 'draw'
+local _EARNINGSLIMIT_FOR_FEATURED = 10000
+local _CURRENT_YEAR = os.date('%Y')
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -215,9 +217,48 @@ function matchFunctions.getExtraData(match)
 		comment = match.comment,
 		octane = match.octane,
 		liquipediatier2 = Variables.varDefault('tournament_tier2'),
-		isconverted = 0
+		isconverted = 0,
+		isfeatured = matchFunctions.isFeatured(match)
 	}
 	return match
+end
+
+function matchFunctions.isFeatured(match)
+	local opponent1 = match.opponent1
+	local opponent2 = match.opponent2
+	if opponent1.type ~= 'team' or opponent2.type ~= 'team' then
+		return false
+	end
+
+	if
+		tonumber(match.liquipediatier or '') == 1
+		or tonumber(match.liquipediatier or '') == 2
+		or not String.isEmpty(Variables.varDefault('tournament_valve_tier'))
+		or not String.isEmpty(Variables.varDefault('match_featured_override'))
+	then
+		return true
+	end
+
+	if matchFunctions.currentEarnings(opponent1.name) >= _EARNINGSLIMIT_FOR_FEATURED then
+		return true
+	elseif matchFunctions.currentEarnings(opponent2.name) >= _EARNINGSLIMIT_FOR_FEATURED then
+		return true
+	end
+	return false
+end
+
+function matchFunctions.currentEarnings(name)
+	local data = mw.ext.LiquipediaDB.lpdb('team', {
+		conditions = '[[name::' .. name .. ']]',
+		query = 'extradata'
+	})
+
+	if type(data[1]) == 'table' then
+		local currentEarnings = (data[1].extradata or {})['earningsin' .. _CURRENT_YEAR]
+		return tonumber(currentEarnings or 0) or 0
+	end
+
+	return 0
 end
 
 function matchFunctions.getOpponents(args)
