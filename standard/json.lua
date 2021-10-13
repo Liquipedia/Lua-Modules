@@ -32,7 +32,11 @@ function json.parse(obj)
 end
 
 function json.parseIfString(obj)
-	return type(obj) == 'string' and json.parse(obj) or obj
+	if type(obj) == 'string' then
+		return json.parse(obj)
+	else
+		return obj
+	end
 end
 
 return json
