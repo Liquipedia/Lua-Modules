@@ -21,12 +21,14 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local Page = require('Module:Page')
+local DateClean = require('Module:DateTime')._clean
 
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _league
+local categories = {}
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -141,11 +143,13 @@ function CustomInjector:parse(id, widgets)
 			}
 		}
 	elseif id == 'sponsors' then
-		local sponsors = mw.text.split(args.sponsors, ',', true)
-		table.insert(widgets, Cell{
-			name = 'Sponsor(s)',
-			content = {table.concat(sponsors, '&nbsp;• ')}
-		})
+		if not String.isEmpty(args.sponsors) then
+			local sponsors = mw.text.split(args.sponsors, ',', true)
+			table.insert(widgets, Cell{
+				name = 'Sponsor(s)',
+				content = {table.concat(sponsors, '&nbsp;• ')}
+			})
+		end
 	end
 
 	return widgets
@@ -153,8 +157,6 @@ end
 
 
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
 	if not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)) then
 		table.insert(categories, 'Individual Tournaments')
 	end
@@ -162,7 +164,15 @@ function CustomLeague:getWikiCategories(args)
 	if String.isEmpty(args.game) then
 		table.insert(categories, 'Tournaments without game version')
 	else
-		table.insert(categories, GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. 'Competitions')
+		table.insert(categories, GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. ' Competitions')
+	end
+
+	table.insert(categories,
+		Template.safeExpand(mw.getCurrentFrame(),'TierDisplay', {args.liquipediatier}) .. ' Tournaments')
+
+	if not String.isEmpty(args.liquipediatiertype) then
+		table.insert(categories,
+			Template.safeExpand(mw.getCurrentFrame(),'TierDisplay', {args.liquipediatiertype}) .. ' Tournaments')
 	end
 
 	return categories
@@ -269,7 +279,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
-		deadline = args.deadline or '',
+		deadline = DateClean(args.deadline or ''),
 		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ',')
 	}
 
@@ -348,6 +358,9 @@ function CustomLeague:_getGameModes(args, makeLink)
 	table.foreach(gameModes,
 		function(index, mode)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
+
+			table.insert(categories, gameModes[index] .. ' Tournaments')
+
 			if makeLink then
 				gameModes[index] = Page.makeInternalLink(gameModes[index])
 			end
