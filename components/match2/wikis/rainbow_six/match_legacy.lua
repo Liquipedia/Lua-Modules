@@ -59,17 +59,17 @@ function p.storeGames(match, match2)
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
 		-- Extradata
-		local extradata = json.parse(game2.extradata)
+		local extradata = json.parseIfString(game2.extradata)
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		if extradata.t1bans and extradata.t2bans then
-			game.extradata.opponent1bans = table.concat(json.parse(extradata.t1bans), ", ")
-			game.extradata.opponent2bans = table.concat(json.parse(extradata.t2bans), ", ")
+			game.extradata.opponent1bans = table.concat(json.parseIfString(extradata.t1bans), ", ")
+			game.extradata.opponent2bans = table.concat(json.parseIfString(extradata.t2bans), ", ")
 		end
 		if extradata.t1firstside and extradata.t1halfs and extradata.t2halfs then
-			extradata.t1firstside = json.parse(extradata.t1firstside)
-			extradata.t1halfs = json.parse(extradata.t1halfs)
-			extradata.t2halfs = json.parse(extradata.t2halfs)
+			extradata.t1firstside = json.parseIfString(extradata.t1firstside)
+			extradata.t1halfs = json.parseIfString(extradata.t1halfs)
+			extradata.t2halfs = json.parseIfString(extradata.t2halfs)
 			local team1 = {}
 			local team2 = {}
 			if extradata.t1firstside[1] == "atk" then
@@ -137,9 +137,9 @@ function p.convertParameters(match2)
 
 	-- Handle extradata fields
 	match.extradata = {}
-	local extradata = json.parse(match2.extradata)
+	local extradata = json.parseIfString(match2.extradata)
 
-	local mvp = json.parse(extradata.mvp)
+	local mvp = json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		match.extradata.mvp = table.concat(mvp.players, ",")
 		match.extradata.mvp = match.extradata.mvp .. ";" .. mvp.points
@@ -147,7 +147,7 @@ function p.convertParameters(match2)
 
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.bestofx = tostring(match2.bestof)
-	local bracketData = json.parse(match2.match2bracketdata)
+	local bracketData = json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
 		local headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
 		if not headerName or headerName == "" then
@@ -160,7 +160,7 @@ function p.convertParameters(match2)
 		end
 	end
 
-	local veto = json.parse(extradata.mapveto)
+	local veto = json.parseIfString(extradata.mapveto)
 	if veto then
 		for k, round in ipairs(veto) do
 			if k == 1 then
