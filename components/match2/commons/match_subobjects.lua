@@ -23,7 +23,7 @@ function MatchSubobjects.getOpponent(frame)
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
 		local MatchSubobjects_ = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
 		return MatchSubobjects_.withPerformanceSetup(function()
-			return MatchSubobjects_.luaGetOpponent(frame, args)
+			return Json.stringify(MatchSubobjects_.luaGetOpponent(frame, args))
 		end)
 	end)
 end
@@ -34,7 +34,7 @@ function MatchSubobjects.luaGetOpponent(frame, args)
 	end
 
 	args = wikiSpec.processOpponent(frame, args)
-	return Json.stringify({
+	return {
 		extradata = args.extradata,
 		icon = args.icon,
 		match2players = args.players or args.match2players,
@@ -43,7 +43,7 @@ function MatchSubobjects.luaGetOpponent(frame, args)
 		template = args.template,
 		type = args.type,
 		-- other variables such as placement and status are set from Module:MatchGroup
-	})
+	}
 end
 
 function MatchSubobjects.getMap(frame)
@@ -51,7 +51,7 @@ function MatchSubobjects.getMap(frame)
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
 		local MatchSubobjects_ = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
 		return MatchSubobjects_.withPerformanceSetup(function()
-			return MatchSubobjects_.luaGetMap(frame, args)
+			return Json.stringify(MatchSubobjects_.luaGetMap(frame, args))
 		end)
 	end)
 end
@@ -73,7 +73,7 @@ function MatchSubobjects.luaGetMap(frame, args)
 		end
 		args.participants = participants
 
-		return Json.stringify({
+		return {
 			date = args.date,
 			extradata = args.extradata,
 			game = args.game,
@@ -89,17 +89,17 @@ function MatchSubobjects.luaGetMap(frame, args)
 			vod = args.vod,
 			walkover = args.walkover,
 			winner = args.winner,
-		})
+		}
 	end
 end
 
 function MatchSubobjects.getRound(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchSubobjects.luaGetRound(frame, args)
+	return Json.stringify(MatchSubobjects.luaGetRound(frame, args))
 end
 
 function MatchSubobjects.luaGetRound(frame, args)
-	return Json.stringify(args)
+	return args
 end
 
 function MatchSubobjects.getPlayer(frame)
@@ -107,19 +107,19 @@ function MatchSubobjects.getPlayer(frame)
 	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
 		local MatchSubobjects_ = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
 		return MatchSubobjects_.withPerformanceSetup(function()
-			return MatchSubobjects_.luaGetPlayer(frame, args)
+			return Json.stringify(MatchSubobjects_.luaGetPlayer(frame, args))
 		end)
 	end)
 end
 
 function MatchSubobjects.luaGetPlayer(frame, args)
 	args = wikiSpec.processPlayer(frame, args)
-	return Json.stringify({
+	return {
 		displayname = args.displayname,
 		extradata = args.extradata,
 		flag = args.flag,
 		name = args.name,
-	})
+	}
 end
 
 function MatchSubobjects.withPerformanceSetup(f)

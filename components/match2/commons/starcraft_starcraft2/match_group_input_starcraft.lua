@@ -434,6 +434,7 @@ OpponentInput functions
 function StarcraftMatchGroupInput.OpponentInput(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		if not Logic.isEmpty(match['opponent' .. opponentIndex]) then
+			match['opponent' .. opponentIndex] = Json.parseIfString(match['opponent' .. opponentIndex])
 
 			--fix legacy winner
 			if (match['opponent' .. opponentIndex].win or '') ~= '' then
@@ -734,6 +735,7 @@ MapInput functions
 
 ]]--
 function StarcraftMatchGroupInput.MapInput(match, i, subgroup)
+	match['map' .. i] = Json.parseIfString(match['map' .. i])
 	--redirect maps
 	if match['map' .. i].map ~= 'TBD' then
 		match['map' .. i].map = mw.ext.TeamLiquidIntegration.resolve_redirect(match['map' .. i].map or '')
