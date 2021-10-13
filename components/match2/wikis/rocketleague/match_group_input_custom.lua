@@ -24,7 +24,7 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
 local _RESULT_TYPE_DRAW = 'draw'
-local _EARNINGSLIMIT_FOR_FEATURED = 10000
+local _EARNINGS_LIMIT_FOR_FEATURED = 10000
 local _CURRENT_YEAR = os.date('%Y')
 
 -- containers for process helper functions
@@ -239,9 +239,9 @@ function matchFunctions.isFeatured(match)
 		return true
 	end
 
-	if matchFunctions.currentEarnings(opponent1.name) >= _EARNINGSLIMIT_FOR_FEATURED then
+	if matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
 		return true
-	elseif matchFunctions.currentEarnings(opponent2.name) >= _EARNINGSLIMIT_FOR_FEATURED then
+	elseif matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
 		return true
 	end
 	return false
