@@ -161,7 +161,7 @@ function CustomMatchSummary.getByMatchId(args)
 		:addClass('brkts-popup-spaced')
 	if not Logic.isEmpty(match.extradata.octane) then
 		footerSet = true
-		footerSpacer:node('[[File:Octane_gg.png|14x14px|link=http://octane.gg/match/' ..
+		footerSpacer:node('[[File:Octane_gg.png|14x14px|link=http://octane.gg/matches/' ..
 			match.extradata.octane ..
 			'|Octane matchpage]]')
 	end
