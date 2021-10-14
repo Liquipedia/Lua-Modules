@@ -112,7 +112,9 @@ function LegacyMatchList.convertMatchMaps(frame)
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
 
-	return LegacyMatchList.handleLiteralsForOpponents(args)
+	args = LegacyMatchList.handleLiteralsForOpponents(args)
+
+	return json.stringify(args)
 end
 
 function LegacyMatchList.convertSwissMatchMaps(frame)
@@ -179,7 +181,9 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 	--process other stuff from details
 	args = LegacyMatchList.copyDetailsToArgs(args, details)
 
-	return LegacyMatchList.handleLiteralsForOpponents(args)
+	args = LegacyMatchList.handleLiteralsForOpponents(args)
+
+	return json.stringify(args)
 end
 
 --functions shared between convertMatchMaps and convertSwissMatchMaps
@@ -214,15 +218,12 @@ function LegacyMatchList.processMaps(args, details)
 				comment = details['map' .. index .. 'comment'],
 				t1goals = details['map' .. index .. 't1goals'],
 				t2goals = details['map' .. index .. 't2goals'],
-				})
-			if type(map) == 'string' then
-				map = json.parse(map)
-				args['map' .. index] = map
-				if map.winner == '1' then
-					t1wins = t1wins + 1
-				elseif map.winner == '2' then
-					t2wins = t2wins + 1
-				end
+			})
+			args['map' .. index] = map
+			if map.winner == '1' then
+				t1wins = t1wins + 1
+			elseif map.winner == '2' then
+				t2wins = t2wins + 1
 			end
 
 			--empty all the stuff we set into this map
@@ -267,8 +268,7 @@ function LegacyMatchList.handleLiteralsForOpponents(args)
 			}
 		end
 	end
-
-	return json.stringify(args)
+	return args
 end
 
 return LegacyMatchList
