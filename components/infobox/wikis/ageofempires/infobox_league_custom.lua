@@ -89,43 +89,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = teams})
 		end
 
-		local maps = {}
-		local index = 1
-
-		while not String.isEmpty(args['map' .. index]) do
-			-- map game mode from mapXmode
-			local mapmode = ''
-			if not String.isEmpty(args['map' .. index .. 'mode']) then
-				mapmode = MapMode.get({args['map' .. index .. 'mode']})
-			end
-
-			-- map from mapX, might be pagename|displayname
-			local map = mw.text.split(args['map' .. index], '|', true)
-			-- maplink from mapXlink or first part of map or autolink
-			local maplink
-			if not String.isEmpty(args['map' .. index .. 'link']) then
-				maplink = args['map' .. index .. 'link']
-			else
-				maplink = map[1]
-				-- only check for a map page when map has only one part,
-				-- so no precise link is given
-				if map[2] == nil and Page.exists(maplink .. ' (map)') then
-					maplink = maplink .. ' (map)'
-				end
-			end
-
-			if (index == 1) then
-				maps = {Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)}
-			else
-				table.insert(maps, '&nbsp;• ' ..
-					tostring(CustomLeague:_createNoWrappingSpan(
-						Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)
-					))
-				)
-			end
-			index = index + 1
-		end
-
+		local maps = CustomLeague:_getMaps(args)
 		table.insert(widgets, Title{name = 'Maps'})
 		table.insert(widgets, Center{content = maps})
 	elseif id == 'prizepool' then
@@ -371,6 +335,47 @@ function CustomLeague:_getGameModes(args, makeLink)
 	)
 
 	return gameModes
+end
+
+function CustomLeague:_getMaps(args)
+	local maps = {}
+	local index = 1
+
+	while not String.isEmpty(args['map' .. index]) do
+		-- map game mode from mapXmode
+		local mapmode = ''
+		if not String.isEmpty(args['map' .. index .. 'mode']) then
+			mapmode = MapMode.get({args['map' .. index .. 'mode']})
+		end
+
+		-- map from mapX, might be pagename|displayname
+		local map = mw.text.split(args['map' .. index], '|', true)
+		-- maplink from mapXlink or first part of map or autolink
+		local maplink
+		if not String.isEmpty(args['map' .. index .. 'link']) then
+			maplink = args['map' .. index .. 'link']
+		else
+			maplink = map[1]
+			-- only check for a map page when map has only one part,
+			-- so no precise link is given
+			if map[2] == nil and Page.exists(maplink .. ' (map)') then
+				maplink = maplink .. ' (map)'
+			end
+		end
+
+		if index == 1 then
+			maps = {Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)}
+		else
+			table.insert(maps, '&nbsp;• ' ..
+				tostring(CustomLeague:_createNoWrappingSpan(
+					Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)
+				))
+			)
+		end
+		index = index + 1
+	end
+
+	return maps
 end
 
 return CustomLeague
