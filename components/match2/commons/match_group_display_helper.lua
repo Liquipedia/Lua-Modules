@@ -17,11 +17,21 @@ local Table = require('Module:Table')
 local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
 
+function DisplayHelper.opponentTypeIsParty(opponentType)
+	return opponentType == 'solo'
+		or opponentType == 'duo'
+		or opponentType == 'trio'
+		or opponentType == 'quad'
+end
+
 function DisplayHelper.opponentIsTBD(opponent)
 	return opponent.type == 'literal'
 		or opponent.type == 'team' and opponent.template == 'tbd'
 		or opponent.name == 'TBD'
-		or Array.any(opponent.players, function(player) return player.displayName == 'TBD' end)
+
+		-- solo/duo/trio/quad opponents are TBD if any of its players are marked TBD
+		or (DisplayHelper.opponentTypeIsParty(opponent.type)
+			and Array.any(opponent.players, function(player) return player.displayName == 'TBD' end))
 end
 
 -- Whether to allow highlighting an opponent via mouseover
