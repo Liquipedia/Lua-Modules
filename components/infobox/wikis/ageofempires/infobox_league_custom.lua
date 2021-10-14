@@ -210,15 +210,22 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 
+	-- clean liquipediatiers
+	local liquipediatier = Tier['number'][args.liquipediatier] or args.liquipediatier
+	local liquipediatiertype = Tier['text'][args.liquipediatiertype] or args.liquipediatiertype
+
+	Variables.varDefine('tournament_liquipediatier', liquipediatier)
+	Variables.varDefine('tournament_liquipediatiertype', liquipediatiertype)
+
 	-- Legacy tier vars
-	Variables.varDefine('tournament_lptier', args.liquipediatier)
-	Variables.varDefine('tournament_tier', args.liquipediatiertype or args.liquipediatier)
+	Variables.varDefine('tournament_lptier', liquipediatier)
+	Variables.varDefine('tournament_tier', liquipediatiertype or liquipediatier)
 	Variables.varDefine('tournament_tier2', args.liquipediatier2)
-	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
+	Variables.varDefine('tournament_tiertype', liquipediatiertype)
 	Variables.varDefine('tournament_tiertype2', args.liquipediatiertype2)
-	Variables.varDefine('ltier', args.liquipediatier == 1 and 1 or
-		args.liquipediatier == 2 and 2 or
-		args.liquipediatier == 3 and 3 or 4
+	Variables.varDefine('ltier', liquipediatier == 1 and 1 or
+		liquipediatier == 2 and 2 or
+		liquipediatier == 3 and 3 or 4
 	)
 
 	-- Legacy notability vars
@@ -237,7 +244,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		maps[index] = mw.text.split(value, '|', true)[1]
 	end
 
-	lpdbData['maps'] = maps
+	lpdbData['maps'] = table.concat(maps, ';')
 
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
