@@ -8,7 +8,6 @@
 
 local League = require('Module:Infobox/League')
 local String = require('Module:String')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
@@ -22,6 +21,7 @@ local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local Page = require('Module:Page')
 local DateClean = require('Module:DateTime')._clean
+local Tier = require('Module:Tier')
 
 
 local CustomLeague = Class.new()
@@ -132,11 +132,11 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	table.insert(categories,
-		Template.safeExpand(mw.getCurrentFrame(),'TierDisplay', {args.liquipediatier}) .. ' Tournaments')
+		(Tier['text'][tonumber(args.liquipediatier)] or args.liquipediatier or 'No Tier') .. ' Tournaments')
 
 	if not String.isEmpty(args.liquipediatiertype) then
 		table.insert(categories,
-			Template.safeExpand(mw.getCurrentFrame(),'TierDisplay', {args.liquipediatiertype}) .. ' Tournaments')
+			(Tier['text'][tonumber(args.liquipediatiertype)] or args.liquipediatiertype) .. ' Tournaments')
 	end
 
 	return categories
@@ -145,19 +145,16 @@ end
 function CustomLeague:_createTier(args)
 	local content = ''
 
-	local tier = args.liquipediatier
-
-	if String.isEmpty(tier) then
+	if String.isEmpty(args.liquipediatier) then
 		return content
 	end
 
-	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(),
-											'TierDisplay/link',
-											{tier, GameLookup.getName({args.game})})
-	local type = args.liquipediatiertype
+	local tier = Tier['text'][args.liquipediatier] or args.liquipediatier
+	local tierDisplay = Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. ' Tournaments')
 
+	local type = Tier['text'][args.liquipediatiertype] or args.liquipediatiertype
 	if not String.isEmpty(type) then
-		local typeDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/link', type)
+		local typeDisplay = Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. ' Tournaments')
 		content = content .. typeDisplay .. ' (' .. tierDisplay .. ')'
 	else
 		content = content .. tierDisplay
