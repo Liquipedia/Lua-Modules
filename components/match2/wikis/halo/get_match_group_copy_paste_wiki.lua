@@ -73,9 +73,9 @@ function wikiCopyPaste._getOpponent(mode, score)
 	local out
 
 	if mode == 'solo' then
-		out = '{{SoloOpponent||flag=' .. score .. '}}'
+		out = '{{SoloOpponent||flag=' .. (score or '') .. '}}'
 	elseif mode == 'team' then
-		out = '{{TeamOpponent|' .. score .. '}}'
+		out = '{{TeamOpponent|' .. (score or '') .. '}}'
 	elseif mode == 'literal' then
 		out = '{{Literal|}}'
 	end
