@@ -345,4 +345,18 @@ function Array.extractValues(tbl)
 	return values
 end
 
+--[[
+Applies a function to each element in an array.
+
+Example:
+
+Array.forEach({4, 6, 8}, mw.log)
+-- Prints 4 1 6 2 8 3
+]]
+function Array.forEach(elems, f)
+	for i, elem in ipairs(elems) do
+		f(elem, i)
+	end
+end
+
 return Array
