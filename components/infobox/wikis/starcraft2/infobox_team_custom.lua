@@ -32,9 +32,11 @@ local Language = mw.language.new('en')
 local _team
 
 local _earnings = 0
+local _earnings_by_players_while_on_team = 0
 local _ALLOWED_PLACES = { '1', '2', '3', '4', '3-4' }
 local _EARNINGS_MODES = { ['team'] = 'team' }
 local _DISCARD_PLACEMENT = 99
+local _PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
@@ -62,11 +64,15 @@ function CustomInjector:parse(id, widgets)
 		else
 			earningsDisplay = '$' .. Language:formatNum(_earnings)
 		end
+		local earningsFromPlayersDisplay
+		if _earnings_by_players_while_on_team == 0 then
+			earningsFromPlayersDisplay = nil
+		else
+			earningsFromPlayersDisplay = '$' .. Language:formatNum(_earnings_by_players_while_on_team)
+		end
 		return {
-			Cell{
-				name = 'Earnings',
-				content = {earningsDisplay}
-			}
+			Cell{name = 'Earnings', content = {earningsDisplay}},
+			Cell{name = _PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
 		}
 	elseif id == 'achievements' then
 		local achievements, soloAchievements = CustomTeam.getAutomatedAchievements(pagename)
@@ -269,6 +275,7 @@ function CustomTeam.getEarningsAndMedalsData(team)
 				information = playerEarnings,
 		})
 	end
+	_earnings_by_players_while_on_team = math.floor((playerEarnings or 0) * 100 + 0.5) / 100
 
 	return math.floor((earnings.team.total or 0) * 100 + 0.5) / 100
 end
