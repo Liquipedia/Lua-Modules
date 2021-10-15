@@ -12,11 +12,14 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+
+local globalVars = PageVariableNamespace()
 
 local MatchGroupInput = {}
 
@@ -202,6 +205,25 @@ function MatchGroupInput.applyOverrideArgs(matches, args)
 			match.bracketData.header = args[matchKey .. 'header'] or match.bracketData.header
 		end
 	end
+end
+
+local getContentLanguage = FnUtil.memoize(mw.getContentLanguage)
+
+function MatchGroupInput.readDate(dateString)
+	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
+	local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
+	local matchDate = String.explode(dateString, '<', 0):gsub('-', '')
+	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
+	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
+	return {date = date, dateexact = isDateExact}
+end
+
+function MatchGroupInput.getInexactDate(suggestedDate)
+	suggestedDate = suggestedDate or globalVars:get('tournament_date')
+	local missingDateCount = globalVars:get('num_missing_dates') or 0
+	globalVars:set('num_missing_dates', missingDateCount + 1)
+	local inexactDateString = (suggestedDate or '') .. ' + ' .. missingDateCount .. ' second'
+	return getContentLanguage():formatDate('c', inexactDateString)
 end
 
 --[[

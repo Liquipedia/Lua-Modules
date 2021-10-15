@@ -8,11 +8,15 @@
 
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
+
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+
 local _frame
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
@@ -31,7 +35,10 @@ local CustomMatchGroupInput = {}
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(frame, match)
 	_frame = frame
-	match = matchFunctions.getDateStuff(match)
+	Table.mergeInto(
+		match,
+		matchFunctions.readDate(match)
+	)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
@@ -115,29 +122,11 @@ end
 --
 -- match related functions
 --
-function matchFunctions.getDateStuff(match)
-	local lang = mw.getContentLanguage()
-	-- parse date string with abbr
-	if not Logic.isEmpty(match.date) then
-		local matchString = match.date or ''
-		local timezone = String.split(
-			String.split(matchString, 'data%-tz%=\"')[2] or '',
-			'\"')[1] or String.split(
-			String.split(matchString, 'data%-tz%=\'')[2] or '',
-			'\'')[1] or ''
-		local matchDate = String.explode(matchString, '<', 0):gsub('-', '')
-		match.date = matchDate .. timezone
-		match.dateexact = String.contains(match.date, '%+') or String.contains(match.date, '%-')
-	else
-		match.date = lang:formatDate(
-			'c',
-			(Variables.varDefault('tournament_date', '') or '')
-				.. ' + ' .. Variables.varDefault('num_missing_dates', '0') .. ' second'
-		)
-		match.dateexact = false
-		Variables.varDefine('num_missing_dates', Variables.varDefault('num_missing_dates', 0) + 1)
-	end
-	return match
+
+function matchFunctions.readDate(matchArgs)
+	return matchArgs.date
+		and MatchGroupInput.readDate(matchArgs.date)
+		or {date = MatchGroupInput.getInexactDate(), dateexact = false}
 end
 
 function matchFunctions.getTournamentVars(match)

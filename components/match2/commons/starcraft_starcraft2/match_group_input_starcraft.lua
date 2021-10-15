@@ -15,7 +15,9 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local cleanFlag = require('Module:Flags').CountryName
+
 local defaultIcon
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
@@ -46,7 +48,10 @@ local StarcraftMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function StarcraftMatchGroupInput.processMatch(_, match)
-	match = StarcraftMatchGroupInput.getDateStuff(match)
+	Table.mergeInto(
+		match,
+		StarcraftMatchGroupInput.readDate(match)
+	)
 	match = StarcraftMatchGroupInput.getTournamentVars(match)
 	if match.ffa == 'true' then
 		match = getStarcraftFfaInputModule().adjustData(match)
@@ -61,36 +66,22 @@ function StarcraftMatchGroupInput.processMatch(_, match)
 	return match
 end
 
-function StarcraftMatchGroupInput.getDateStuff(match)
-	local lang = mw.getContentLanguage()
-	match.lang = lang
-	-- parse date string with abbr
-	if not Logic.isEmpty(match.date) then
-		local matchString = match.date or ''
-		local timezone = String.split(
-			String.split(matchString, 'data%-tz%=\"')[2] or '',
-			'\"')[1] or String.split(
-			String.split(matchString, 'data%-tz%=\'')[2] or '',
-			'\'')[1] or ''
-		local matchDate = String.explode(matchString, '<', 0):gsub('-', '')
-		match.date = matchDate .. timezone
-		match.dateexact = match.dateexact == 'true' or String.contains(match.date, '%+') or String.contains(match.date, '%-')
-		match.date = lang:formatDate('c', match.date)
-		Variables.varDefine('matchDate', match.date)
+function StarcraftMatchGroupInput.readDate(matchArgs)
+	if matchArgs.date then
+		local dateProps = MatchGroupInput.readDate(matchArgs.date)
+		dateProps.dateexact = Logic.readBool(matchArgs.dateexact) or dateProps.dateexact
+		Variables.varDefine('matchDate', dateProps.date)
+		return dateProps
 	else
-		local DateVar = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate', '')
-		local missingDates = Variables.varDefault('num_missing_dates', 0) or 0
-		match.date = lang:formatDate('c', DateVar .. ' + ' .. missingDates .. ' second')
-		match.dateexact = false
-		Variables.varDefine('num_missing_dates', Variables.varDefault('num_missing_dates', 0) + 1)
+		local suggestedDate = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate')
+		return {
+			date = MatchGroupInput.getInexactDate(suggestedDate),
+			dateexact = false,
+		}
 	end
-
-	return match
 end
 
 function StarcraftMatchGroupInput.checkFinished(match)
-	local lang = match.lang
-
 	if match.finished == 'false' then
 		match.finished = false
 	elseif Logic.readBool(match.finished) then
@@ -103,14 +94,12 @@ function StarcraftMatchGroupInput.checkFinished(match)
 	-- certain amount of time (depending on whether the date is exact)
 	if match.finished ~= true then
 		local currentUnixTime = os.time(os.date('!*t'))
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
+		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then
 			match.finished = true
 		end
 	end
-
-	match.lang = nil
 
 	return match
 end
