@@ -8,10 +8,12 @@
 
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
-local MatchGroupUtil = require('Module:MatchGroup/Util')
+local Lua = require('Module:Lua')
 local String = require('Module:String')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
+
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 --[[
 Utility functions for match group related things specific to the starcraft and starcraft2 wikis.
