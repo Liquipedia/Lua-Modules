@@ -27,6 +27,7 @@ function json.parse(obj)
 	else
 		mw.log('Error: could not parse Json:')
 		mw.logObject(obj)
+		mw.log(debug.traceback())
 		return {}, true
 	end
 end
