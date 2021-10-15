@@ -6,12 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
-local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
+
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
@@ -38,7 +40,10 @@ function CustomMatchGroupInput.processMatch(_, match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 
 	-- process match
-	match = matchFunctions.getDateStuff(match)
+	Table.mergeInto(
+		match,
+		matchFunctions.readDate(match)
+	)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
@@ -278,26 +283,17 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
--- Parse dates
-function matchFunctions.getDateStuff(match)
-	local lang = mw.getContentLanguage()
-	-- parse date string with abbr
-	if not Logic.isEmpty(match.date) then
-		local matchString = match.date or ''
-		local timezone = String.split(
-			String.split(matchString, 'data%-tz%=\"')[2] or '',
-			'\"')[1] or String.split(
-			String.split(matchString, 'data%-tz%=\'')[2] or '',
-			'\'')[1] or ''
-		local matchDate = String.explode(matchString, '<', 0):gsub('-', '')
-		match.date = matchDate .. timezone
-		match.dateexact = String.contains(match.date, '%+') or String.contains(match.date, '%-')
-		match.hasDate = true
+function matchFunctions.readDate(matchArgs)
+	if matchArgs.date then
+		local dateProps = MatchGroupInput.readDate(matchArgs.date)
+		dateProps.hasDate = true
+		return dateProps
 	else
-		match.date = lang:formatDate('c', _EPOCH_TIME)
-		match.dateexact = false
+		return {
+			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
+			dateexact = false,
+		}
 	end
-	return match
 end
 
 function matchFunctions.getTournamentVars(match)
