@@ -9,7 +9,8 @@
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local StarcraftPlayerUtil = require('Module:Player/Util/Starcraft')
+local PlayerExt = require('Module:Player/Ext')
+local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -76,7 +77,7 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	local pageName
 	local displayName
 	if not args.noclean then
-		pageName, displayName = StarcraftPlayerUtil.extractFromLink(args[1])
+		pageName, displayName = PlayerExt.extractFromLink(args[1])
 		if args.link == 'true' then
 			pageName = displayName
 		elseif args.link then
@@ -95,11 +96,11 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	}
 
 	if not args.novar then
-		StarcraftPlayerUtil.saveToPageVars(player)
+		StarcraftPlayerExt.saveToPageVars(player)
 	end
 
 	local hiddenSortNode = args.hs
-		and StarcraftPlayerUtil.HiddenSort(player.displayName, player.flag, player.race, args.hs)
+		and StarcraftPlayerDisplay.HiddenSort(player.displayName, player.flag, player.race, args.hs)
 		or ''
 	local playerNode = StarcraftPlayerDisplay.InlinePlayer({
 		dq = Logic.readBoolOrNil(args.dq),
@@ -118,7 +119,7 @@ function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 		displayName = args[1],
 		flag = args.flag,
 		pageName = args.link,
-		race = StarcraftPlayerUtil.readRace(args.race),
+		race = StarcraftPlayerExt.readRace(args.race),
 	}
 	return StarcraftPlayerDisplay.InlinePlayerContainer({
 		date = args.date,
@@ -151,7 +152,7 @@ variables.
 ]]
 function StarcraftPlayerDisplay.InlinePlayerContainer(props)
 	DisplayUtil.assertPropTypes(props, StarcraftPlayerDisplay.propTypes.InlinePlayerContainer)
-	StarcraftPlayerUtil.syncPlayer(props.player, {
+	StarcraftPlayerExt.syncPlayer(props.player, {
 		date = props.date,
 		savePageVar = props.savePageVar,
 	})
