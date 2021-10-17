@@ -214,6 +214,7 @@ function CustomSeries._setDateMatchVar(date, edate, sdate)
 		or string.match(sdate or '', '%d%d%d%d%-%d%d%-%d%d') or ''
 
 	VarDefine('date', date)
+	VarDefine('tournament_enddate', date)
 end
 
 --function for custom tier handling
