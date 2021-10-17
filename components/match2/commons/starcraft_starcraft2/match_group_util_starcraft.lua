@@ -7,9 +7,10 @@
 --
 
 local Array = require('Module:Array')
+local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -349,6 +350,18 @@ function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent
 		end
 	end
 	return hasOffrace and gameRaces or nil
+end
+
+function StarcraftMatchGroupUtil.playerFromRecord(record)
+	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+	return {
+		displayName = record.displayname,
+		extradata = extradata,
+		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
+		pageIsResolved = true,
+		pageName = record.name,
+		race = Table.extract(record.extradata, 'faction') or 'u',
+	}
 end
 
 return StarcraftMatchGroupUtil
