@@ -255,8 +255,8 @@ function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 		if
 			date.day and (
 				date.day == 0 or 
-				(date.month == 2 and date.day > _MAXIMUM_DAYS_IN_FEBRUARY)) or
-				(date.month ~= 2 and date.day > _DEFAULT_DAYS_IN_MONTH[date.month]))
+				(date.month == 2 and date.day > _MAXIMUM_DAYS_IN_FEBRUARY) or
+				(date.month ~= 2 and date.day > _DEFAULT_DAYS_IN_MONTH[date.month])
 			)
 		then
 			error(dateType .. ' day out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
