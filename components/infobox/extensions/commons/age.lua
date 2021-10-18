@@ -251,7 +251,7 @@ function AgeCalculation._checkMonthAndDayRange(date, dateType)
 		if date.month > 12 or date.month == 0 then
 			error(dateType .. ' month out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
 		end
-		if 
+		if
 			date.day and
 			(date.day == 0 or date.day > _DEFAULT_DAYS_IN_MONTH[date.month])
 		then
