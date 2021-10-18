@@ -6,10 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----
--- @author Vogan for Liquipedia
---
-
 local Table = require('Module:Table')
 
 --
@@ -185,6 +181,14 @@ function Array.lexicalCompare(tblX, tblY)
 	return #tblX < #tblY
 end
 
+function Array.lexicalCompareIfTable(y1, y2)
+	if type(y1) == 'table' and type(y2) == 'table' then
+		return Array.lexicalCompare(y1, y2)
+	else
+		return y1 < y2
+	end
+end
+
 --[[
 Sorts an array by transforming its elements via a function and comparing the
 transformed elements.
@@ -221,14 +225,7 @@ end
 Like Array.sortBy, except that it sorts in place. Mutates the first argument.
 ]]
 function Array.sortInPlaceBy(tbl, f, compare)
-	compare = compare or function(y1, y2)
-		if type(y1) == 'table' and type(y2) == 'table' then
-			return Array.lexicalCompare(y1, y2)
-		else
-			return y1 < y2
-		end
-	end
-
+	compare = compare or Array.lexicalCompareIfTable
 	table.sort(tbl, function(x1, x2) return compare(f(x1), f(x2)) end)
 end
 
@@ -357,6 +354,83 @@ function Array.forEach(elems, f)
 	for i, elem in ipairs(elems) do
 		f(elem, i)
 	end
+end
+
+--[[
+Reduces an array using the specified binary operation. Computes
+operator(... operator(operator(operator(initialValue, array[1]), array[2]), array[3]), ... array[#array])
+
+If initialValue is not provided then the operator(initialValue, array[1]) step is skipped, and
+operator(array[1], array[2]) becomes the first step.
+
+Example:
+
+local function pow(x, y) return x ^ y end
+Array.reduce({2, 3, 5}, pow)
+-- Returns 32768
+]]
+function Array.reduce(array, operator, initialValue)
+	local aggregate
+	if initialValue ~= nil then
+		aggregate = initialValue
+	else
+		aggregate = array[1]
+	end
+
+	for i = initialValue ~= nil and 1 or 2, #array do
+		aggregate = operator(aggregate, array[i])
+	end
+	return aggregate
+end
+
+--[[
+Computes the maximum element in an array according to a scoring function. Returns
+nil if the array is empty.
+]]
+function Array.maxBy(array, f, compare)
+	compare = compare or Array.lexicalCompareIfTable
+
+	local max, maxScore
+	for _, item in ipairs(array) do
+		local score = f(item)
+		if max == nil or compare(maxScore, score) then
+			max = item
+			maxScore = score
+		end
+	end
+	return max
+end
+
+--[[
+Computes the maximum element in an array. Returns nil if the array is empty.
+]]
+function Array.max(array, compare)
+	return Array.maxBy(array, function(x) return x end, compare)
+end
+
+--[[
+Computes the minimum element in an array according to a scoring function. Returns
+nil if the array is empty.
+]]
+function Array.minBy(array, f, compare)
+	compare = compare or Array.lexicalCompareIfTable
+
+	local min, minScore
+	for _, item in ipairs(array) do
+		local score = f(item)
+		if min == nil or compare(score, minScore) then
+			min = item
+			minScore = score
+		end
+	end
+	return min
+end
+
+--[[
+Computes the minimum element in an array. Returns nil if the array is empty.
+]]
+function Array.min(array, compare)
+	return Array.minBy(array, function(x) return x end, compare)
 end
 
 return Array
