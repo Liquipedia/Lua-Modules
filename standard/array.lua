@@ -61,12 +61,12 @@ Example:
 Array.map({1, 2, 3}, function(x) return 2 * x end)
 -- returns {2, 4, 6}
 ]]
-function Array.map(tbl, f)
-	local out_tbl = {}
-	for _, x in ipairs(tbl) do
-		table.insert(out_tbl, f(x))
+function Array.map(elems, f)
+	local outElems = {}
+	for index, elem in ipairs(elems) do
+		table.insert(outElems, f(elem, index))
 	end
-	return out_tbl
+	return outElems
 end
 
 --[[
