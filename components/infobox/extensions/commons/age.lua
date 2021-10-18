@@ -233,13 +233,13 @@ function AgeCalculation._assertValidDates(birthDate, deathDate)
 		end
 
 		if deathDate:getEarliestPossible() > os.time() then
-			return error('Death date out of allowed range')
+			return error('Death date out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
 		end
 	end
 
 	if earliestPossibleBirthDate > os.time() or
 		earliestPossibleBirthDate < os.time(_EPOCH_DATE) then
-			return error('Birth date out of allowed range')
+			return error('Birth date out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
 	end
 end
 
