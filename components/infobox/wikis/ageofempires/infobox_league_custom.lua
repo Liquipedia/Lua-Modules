@@ -89,9 +89,11 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = teams})
 		end
 
-		local maps = CustomLeague:_getMaps(args)
-		table.insert(widgets, Title{name = 'Maps'})
-		table.insert(widgets, Center{content = maps})
+		if not String.isEmpty(args.map1) then
+			local maps, _ = CustomLeague:_getMaps(args)
+			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Center{content = maps})
+		end
 	elseif id == 'prizepool' then
 		return {
 			Cell{
@@ -239,12 +241,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData['sponsors'] = args.sponsors
 
-	local maps = _league:getAllArgsForBase(args, 'map')
-	for index, value in ipairs(maps) do
-		maps[index] = mw.text.split(value, '|', true)[1]
-	end
-
-	lpdbData['maps'] = table.concat(maps, ';')
+	local _, mappages = CustomLeague:_getMaps(args)
+	lpdbData['maps'] = table.concat(mappages, ';')
 
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
@@ -343,6 +341,7 @@ end
 
 function CustomLeague:_getMaps(args)
 	local maps = {}
+	local mappages = {}
 	local index = 1
 
 	while not String.isEmpty(args['map' .. index]) do
@@ -376,10 +375,11 @@ function CustomLeague:_getMaps(args)
 				))
 			)
 		end
+		table.insert(mappages, maplink)
 		index = index + 1
 	end
 
-	return maps
+	return maps, mappages
 end
 
 return CustomLeague
