@@ -13,7 +13,8 @@ local Variables = require('Module:Variables')
 local AgeCalculation = {}
 
 local _EPOCH_DATE = { year = 1970, month = 1, day = 1 }
-local _DEFAULT_DAYS_IN_MONTH = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+local _DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+local _MAXIMUM_DAYS_IN_FEBRUARY = 29
 local _MONTH_DECEMBER = 12
 local _CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y'))
 
@@ -252,8 +253,11 @@ function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 			error(dateType .. ' month out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
 		end
 		if
-			date.day and
-			(date.day == 0 or date.day > _DEFAULT_DAYS_IN_MONTH[date.month])
+			date.day and (
+				date.day == 0 or 
+				(date.month == 2 and date.day > _MAXIMUM_DAYS_IN_FEBRUARY)) or
+				(date.month ~= 2 and date.day > _DEFAULT_DAYS_IN_MONTH[date.month]))
+			)
 		then
 			error(dateType .. ' day out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
 		end
