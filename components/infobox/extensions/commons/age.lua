@@ -254,7 +254,7 @@ function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 		end
 		if
 			date.day and (
-				date.day == 0 or 
+				date.day == 0 or
 				(date.month == 2 and date.day > _MAXIMUM_DAYS_IN_FEBRUARY) or
 				(date.month ~= 2 and date.day > _DEFAULT_DAYS_IN_MONTH[date.month])
 			)
