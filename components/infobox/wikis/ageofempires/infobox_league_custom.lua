@@ -133,12 +133,17 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. ' Competitions')
 	end
 
-	table.insert(categories,
-		(Tier['text'][tonumber(args.liquipediatier)] or args.liquipediatier or 'No Tier') .. ' Tournaments')
+	local tier = Variables.varDefault('tournament_liquipediatier', '')
+	local tiertype = Variables.varDefault('tournament_liquipediatiertype', '')
 
-	if not String.isEmpty(args.liquipediatiertype) then
-		table.insert(categories,
-			(Tier['text'][tonumber(args.liquipediatiertype)] or args.liquipediatiertype) .. ' Tournaments')
+	if String.isEmpty(tier) then
+		table.insert(categories, 'Pages with unsupported Tier')
+	else
+		table.insert(categories, Tier['text'][tier]  .. ' Tournaments')
+	end
+
+	if not String.isEmpty(tiertype) then
+		table.insert(categories, tiertype .. ' Tournaments')
 	end
 
 	return categories
@@ -147,14 +152,10 @@ end
 function CustomLeague:_createTier(args)
 	local content = ''
 
-	if String.isEmpty(args.liquipediatier) then
-		return content
-	end
-
-	local tier = Tier['text'][args.liquipediatier] or args.liquipediatier
+	local tier = Tier['text'][Variables.varDefault('tournament_liquipediatier', '')]
 	local tierDisplay = Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. ' Tournaments')
 
-	local type = Tier['text'][args.liquipediatiertype] or args.liquipediatiertype
+	local type = Variables.varDefault('tournament_liquipediatiertype', '')
 	if not String.isEmpty(type) then
 		local typeDisplay = Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. ' Tournaments')
 		content = content .. typeDisplay .. ' (' .. tierDisplay .. ')'
@@ -212,9 +213,19 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 
-	-- clean liquipediatiers
-	local liquipediatier = Tier['number'][args.liquipediatier] or args.liquipediatier
-	local liquipediatiertype = Tier['text'][args.liquipediatiertype] or args.liquipediatiertype
+	-- clean liquipediatiers:
+	-- tier should be a number defining a tier
+	local liquipediatier = args.liquipediatier
+	if not tonumber(liquipediatier) then
+		liquipediatier = Tier['number'][liquipediatier]
+	end
+
+	-- type should be the textual representation of the numbers
+	local liquipediatiertype = args.liquipediatiertype
+	if not tonumber(liquipediatiertype) then
+		liquipediatiertype = Tier['number'][liquipediatiertype]
+	end
+	liquipediatiertype = Tier['text'][liquipediatiertype]
 
 	Variables.varDefine('tournament_liquipediatier', liquipediatier)
 	Variables.varDefine('tournament_liquipediatiertype', liquipediatiertype)
@@ -320,6 +331,7 @@ function CustomLeague:_getGameModes(args, makeLink)
 		if makeLink then
 			default = Page.makeInternalLink(default)
 		end
+		table.insert(categories, default .. ' Tournaments')
 		return {default}
 	end
 
