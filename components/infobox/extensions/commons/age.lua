@@ -242,11 +242,11 @@ function AgeCalculation._assertValidDates(birthDate, deathDate)
 			error('Birth date out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
 	end
 
-	AgeCalculation._checkMonthAndDayRange(birthDate, 'Birth')
-	AgeCalculation._checkMonthAndDayRange(deathDate, 'Death')
+	AgeCalculation._showErrorForDateIfNeeded(birthDate, 'Birth')
+	AgeCalculation._showErrorForDateIfNeeded(deathDate, 'Death')
 end
 
-function AgeCalculation._checkMonthAndDayRange(date, dateType)
+function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 	if date.month then
 		if date.month > 12 or date.month == 0 then
 			error(dateType .. ' month out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
