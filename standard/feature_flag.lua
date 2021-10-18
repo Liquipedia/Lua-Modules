@@ -37,11 +37,20 @@ configured default value which is only available in lua.
 ]]
 local FeatureFlag = {}
 
+local cachedFlags = {}
+
 --[[
 Retrieves the boolean value of a feature flag. If the flag has not been
 previously set, this returns the configured default value of the flag.
 ]]
 function FeatureFlag.get(flag)
+	if cachedFlags[flag] == nil then
+		cachedFlags[flag] = FeatureFlag._get(flag)
+	end
+	return cachedFlags[flag]
+end
+
+function FeatureFlag._get(flag)
 	local config = FeatureFlag.getConfig(flag)
 	return Logic.nilOr(
 		Logic.readBoolOrNil(mw.ext.VariablesLua.var('feature_' .. flag)),
@@ -61,6 +70,7 @@ function FeatureFlag.set(flag, value)
 	else
 		mw.ext.VariablesLua.vardefine('feature_' .. flag, '')
 	end
+	cachedFlags[flag] = nil
 end
 
 --[[
@@ -86,6 +96,7 @@ function FeatureFlag.with(flags, f)
 			-- Restore previous flags
 			for flag, oldValue in pairs(oldFlags) do
 				mw.ext.VariablesLua.vardefine('feature_' .. flag, oldValue)
+				cachedFlags[flag] = nil
 			end
 		end)
 		:get()
