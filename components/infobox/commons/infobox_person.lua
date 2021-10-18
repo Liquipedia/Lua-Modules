@@ -60,7 +60,7 @@ function Person:createInfobox()
 			shouldstore = _shouldStoreData
 		})
 	if not ageCalculationSuccess then
-		age = {birth = Person._errorMessage(age)}
+		age = Person._ageCalcuilationErrorMessage(age)
 	end
 
 	local widgets = {
@@ -340,14 +340,21 @@ function Person:getCategories(args, birthDisplay, personType, status)
 	return {}
 end
 
-function Person._errorMessage(text)
+function Person._ageCalcuilationErrorMessage(text)
 	-- Return formatted message text for an error.
 	local strongStart = '<strong class="error">Error: '
 	local strongEnd = '</strong>'
+	text = string.gsub(text or '', 'Module:AgeCalculation/test:%d+: ', '')
 	if mw.title.getCurrentTitle():inNamespaces(0) then
 		strongEnd = strongEnd .. '[[Category:Age error]]'
 	end
-	return strongStart .. mw.text.nowiki(text) .. strongEnd
+	text = strongStart .. mw.text.nowiki(text) .. strongEnd
+
+	if string.match(text, '[Dd]eath') then
+		return {death = text}
+	else
+		return {birth = text}
+	end
 end
 
 return Person
