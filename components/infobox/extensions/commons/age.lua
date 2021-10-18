@@ -13,7 +13,7 @@ local Variables = require('Module:Variables')
 local AgeCalculation = {}
 
 local _EPOCH_DATE = { year = 1970, month = 1, day = 1 }
-local _DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+local _DEFAULT_DAYS_IN_MONTH = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
 local _MONTH_DECEMBER = 12
 local _CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y'))
 
@@ -229,17 +229,34 @@ function AgeCalculation._assertValidDates(birthDate, deathDate)
 	local earliestPossibleBirthDate = birthDate:getEarliestPossible()
 	if deathDate.isExact then
 		if earliestPossibleBirthDate > deathDate:getLatestPossible() then
-			return error('Death date can not be before birth date')
+			error('Death date can not be before birth date')
 		end
 
 		if deathDate:getEarliestPossible() > os.time() then
-			return error('Death date out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
+			error('Death date out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
 		end
 	end
 
 	if earliestPossibleBirthDate > os.time() or
 		earliestPossibleBirthDate < os.time(_EPOCH_DATE) then
-			return error('Birth date out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
+			error('Birth date out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
+	end
+
+	AgeCalculation._checkMonthAndDayRange(birthDate, 'Birth')
+	AgeCalculation._checkMonthAndDayRange(deathDate, 'Death')
+end
+
+function AgeCalculation._checkMonthAndDayRange(date, dateType)
+	if date.month then
+		if date.month > 12 or date.month == 0 then
+			error(dateType .. ' month out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
+		end
+		if 
+			date.day and
+			(date.day == 0 or date.day > _DEFAULT_DAYS_IN_MONTH[date.month])
+		then
+			error(dateType .. ' day out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')
+		end
 	end
 end
 
