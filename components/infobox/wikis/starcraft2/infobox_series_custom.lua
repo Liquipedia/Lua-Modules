@@ -212,9 +212,12 @@ function CustomSeries._setDateMatchVar(date, edate, sdate)
 	date = string.match(date or '', '%d%d%d%d%-%d%d%-%d%d')
 		or string.match(edate or '', '%d%d%d%d%-%d%d%-%d%d')
 		or string.match(sdate or '', '%d%d%d%d%-%d%d%-%d%d') or ''
+	local sdate = string.match(date or '', '%d%d%d%d%-%d%d%-%d%d')
+		or string.match(sdate or '', '%d%d%d%d%-%d%d%-%d%d') or ''
 
 	VarDefine('date', date)
 	VarDefine('tournament_enddate', date)
+	VarDefine('tournament_startdate', sdate)
 end
 
 --function for custom tier handling
