@@ -26,19 +26,21 @@ function p.get(args)
 		mw.log('No team name provided')
 		return nil
 	end
+
 	local rankingName = args['ranking']
 	local teamName = string.lower(args['team'])
 	local query = {
 		limit = 1,
-		conditions = '[[type::'..rankingName..']] AND [[name::'..teamName..']]',
+		conditions = '[[type::' .. rankingName .. ']] AND [[name::' .. teamName .. ']]',
 		query = 'information, extradata',
 		order = 'date desc',
 	}
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', query)
 	local teamData = data[1]
-	if (not teamData) or (place == '-1') then
+	if not teamData or place == '-1' then
 		return nil
 	end
+
 	local place = teamData.information
 	local points = teamData.extradata.totalpoints
 	return points..' (Rank #'..place..')'
