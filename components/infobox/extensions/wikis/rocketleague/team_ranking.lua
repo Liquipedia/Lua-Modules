@@ -19,8 +19,7 @@ local Class = require('Module:Class')
 -- @treturn string|nil rankingString the string representation of the team's ranking or nil if the team doesn't have RLCS Points
 function p.get(args)
 	if not args['ranking'] then
-		mw.log('No ranking name provided')
-		return nil
+		error('Please provide a ranking name!')
 	end
 	if not args['team'] then
 		mw.log('No team name provided')
