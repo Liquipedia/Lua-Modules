@@ -60,7 +60,7 @@ function Person:createInfobox()
 			shouldstore = _shouldStoreData
 		})
 	if not ageCalculationSuccess then
-		age = Person._ageCalcuilationErrorMessage(age)
+		age = Person._createAgeCalculationErrorMessage(age)
 	end
 
 	local widgets = {
@@ -340,7 +340,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 	return {}
 end
 
-function Person._ageCalcuilationErrorMessage(text)
+function Person._createAgeCalculationErrorMessage(text)
 	-- Return formatted message text for an error.
 	local strongStart = '<strong class="error">Error: '
 	local strongEnd = '</strong>'
