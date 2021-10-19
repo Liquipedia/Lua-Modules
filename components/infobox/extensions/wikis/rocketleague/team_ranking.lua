@@ -9,7 +9,7 @@
 ---- This Module retrieves a team's ranking using the LPDB Objects created in https://liquipedia.net/rocketleague/Module:AutoPointsTable
 ---- This Module is created to show the rankings of teams and their RLCS Circuit Points in the team infobox
 
-local p = {}
+local TeamRanking = {}
 
 local Class = require('Module:Class')
 
