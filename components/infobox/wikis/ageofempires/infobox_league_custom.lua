@@ -123,6 +123,8 @@ end
 
 
 function CustomLeague:getWikiCategories(args)
+	table.insert(categories, 'Tournaments')
+
 	if not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)) then
 		table.insert(categories, 'Individual Tournaments')
 	end
@@ -196,14 +198,15 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
 	Variables.varDefine('tournament_sponsors', args.sponsors)
-	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
-	Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.date))
+	Variables.varDefine('date', ReferenceCleaner.clean(args.edate))
+	Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.edate))
 	Variables.varDefine('tournament_sdate', ReferenceCleaner.clean(args.sdate))
 	Variables.varDefine('tournament_edate', ReferenceCleaner.clean(args.edate))
 	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
 	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
 
 	Variables.varDefine('game', GameLookup.getName({args.game}))
+	Variables.varDefine('tournament_game', GameLookup.getName({args.game}))
 	Variables.varDefine('tournament_patch', args.patch)
 	Variables.varDefine('patch', args.patch)
 	Variables.varDefine('tournament_mode',
@@ -328,10 +331,10 @@ end
 function CustomLeague:_getGameModes(args, makeLink)
 	if String.isEmpty(args.gamemode) then
 		local default = GameModeLookup.getDefault(args.game or '')
+		table.insert(categories, default .. ' Tournaments')
 		if makeLink then
 			default = Page.makeInternalLink(default)
 		end
-		table.insert(categories, default .. ' Tournaments')
 		return {default}
 	end
 
