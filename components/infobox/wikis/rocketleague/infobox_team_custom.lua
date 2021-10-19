@@ -41,12 +41,10 @@ function CustomInjector:addCustomCells(widgets)
 		content = {_team.args.rating or 'Not enough data'}
 	})
 	local rlcsRanking = TeamRanking.get({ranking = 'RLCS_2021_22_Ranking', team = _team.args.name})
-	if rlcsRanking then
-		table.insert(widgets, Cell{
-			name = '[[RankingTableRLCS|RLCS Points]]',
-			content = {rlcsRanking}
-		})
-	end
+	table.insert(widgets, Cell{
+		name = '[[RankingTableRLCS|RLCS Points]]',
+		content = {rlcsRanking}
+	})
 	return widgets
 end
 
