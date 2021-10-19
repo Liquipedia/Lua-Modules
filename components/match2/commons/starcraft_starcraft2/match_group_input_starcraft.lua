@@ -73,7 +73,7 @@ function StarcraftMatchGroupInput.readDate(matchArgs)
 		Variables.varDefine('matchDate', dateProps.date)
 		return dateProps
 	else
-		local suggestedDate = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate')
+		local suggestedDate = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate', '1970-01-01')
 		return {
 			date = MatchGroupInput.getInexactDate(suggestedDate),
 			dateexact = false,
