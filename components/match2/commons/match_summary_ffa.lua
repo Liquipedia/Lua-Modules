@@ -12,7 +12,7 @@ local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Ordinal = require('Module:Ordinal')
+local Placement = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -237,20 +237,15 @@ function FfaMatchSummary.PlacementCells(props)
 	local match = props.match
 
 	-- Placement cell spanning ties
-	local function Placement(rowIx, group)
+	local function Cell(rowIx, group)
 		local placement = match.opponents[group[1]].placement
 
 		local bgClass = #match.bracketData.advanceSpots == 0 and placement
-			and FfaMatchSummary.getPlacementClass(placement)
+			and Placement.getBgClass(placement)
 			or nil
 
-		local zeroWidthSpace = '&#8203;'
-		local enDash = '–'
-		local parts = {
-			Ordinal._ordinal(rowIx),
-			#group > 1 and zeroWidthSpace .. enDash .. zeroWidthSpace .. Ordinal._ordinal(rowIx + #group - 1) or '',
-		}
-		return FfaMatchSummary.AbbrCell(table.concat(parts))
+		local label = Placement.RangeLabel({rowIx, rowIx + #group - 1})
+		return FfaMatchSummary.AbbrCell(label)
 			:addClass('ffa-match-summary-placement')
 			:addClass(bgClass)
 			:css('grid-area', 'body ' .. rowIx .. ' / placement / span ' .. #group .. ' / span 1')
@@ -266,7 +261,7 @@ function FfaMatchSummary.PlacementCells(props)
 	local cells = {}
 	local rowIx = 1
 	for _, group in ipairs(groups) do
-		table.insert(cells, Placement(rowIx, group))
+		table.insert(cells, Cell(rowIx, group))
 		rowIx = rowIx + #group
 	end
 
@@ -490,7 +485,7 @@ function FfaMatchSummary.getOpponentBgClass(opponent, match)
 			or nil
 	else
 		return opponent.placement
-			and FfaMatchSummary.getPlacementClass(opponent.placement)
+			and Placement.getBgClass(opponent.placement)
 			or nil
 	end
 end
@@ -531,7 +526,7 @@ function FfaMatchSummary.GamePlacement(props)
 	local opponent = props.opponent
 	return FfaMatchSummary.AbbrCell(opponent.placement or '')
 		:addClass('ffa-match-summary-game-placement')
-		:addClass(opponent.placement and FfaMatchSummary.getPlacementClass(opponent.placement))
+		:addClass(opponent.placement and Placement.getBgClass(opponent.placement))
 end
 
 --[[
@@ -551,24 +546,6 @@ This is the default implementation used by FfaMatchSummary, which does nothing.
 ]]
 function FfaMatchSummary.Footer(props)
 	return mw.html.create('div'):addClass('ffa-match-summary-footer')
-end
-
-local placementClasses = {
-	'background-color-first-place',
-	'background-color-second-place',
-	'background-color-third-place',
-	'background-color-fourth-place',
-}
-
---[[
-Converts a placement to a css class that sets its background.
-
-Example:
-FfaMatchSummary.getPlacementClass(2)
--- returns 'background-color-second-place'
-]]
-function FfaMatchSummary.getPlacementClass(placement)
-	return placementClasses[placement]
 end
 
 --[[
