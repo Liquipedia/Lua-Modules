@@ -154,12 +154,18 @@ end
 function CustomLeague:_createTier(args)
 	local content = ''
 
-	local tier = Tier['text'][Variables.varDefault('tournament_liquipediatier', '')]
-	local tierDisplay = Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. ' Tournaments')
+	local tierVar = Variables.varDefault('tournament_liquipediatier', '')
+	local tier = Tier['text'][tierVar]
+	local tierDisplay = tonumber(tierVar) == 9 -- 9 equals showmatch
+		and Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. 'es')
+		or Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. ' Tournaments')
 
 	local type = Variables.varDefault('tournament_liquipediatiertype', '')
 	if not String.isEmpty(type) then
-		local typeDisplay = Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. ' Tournaments')
+		local typeNumber = Tier['number'][type]
+		local typeDisplay = tonumber(typeNumber) == 9 -- 9 equals showmatch
+			and Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. 'es')
+			or Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. ' Tournaments')
 		content = content .. typeDisplay .. ' (' .. tierDisplay .. ')'
 	else
 		content = content .. tierDisplay
