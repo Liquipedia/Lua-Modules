@@ -45,9 +45,5 @@ function p.get(args)
 	return points..' (Rank #'..place..')'
 end
 
---- arguments provided to this module's get function
--- @tfield string ranking the name of the ranking as stored in LPDB
--- @tfield string name the name of the team to get the ranking for
--- @table argsType
 
 return Class.export(TeamRanking)
