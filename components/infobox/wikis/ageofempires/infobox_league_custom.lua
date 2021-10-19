@@ -30,6 +30,8 @@ local CustomInjector = Class.new(Injector)
 local _league
 local categories = {}
 
+local _TIER_SHOW_MATCH = 9
+
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
@@ -152,12 +154,18 @@ end
 function CustomLeague:_createTier(args)
 	local content = ''
 
-	local tier = Tier['text'][Variables.varDefault('tournament_liquipediatier', '')]
-	local tierDisplay = Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. ' Tournaments')
+	local tierVar = Variables.varDefault('tournament_liquipediatier', '')
+	local tier = Tier['text'][tierVar]
+	local tierDisplay = tonumber(tierVar) == _TIER_SHOW_MATCH
+		and Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. 'es')
+		or Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. ' Tournaments')
 
 	local type = Variables.varDefault('tournament_liquipediatiertype', '')
 	if not String.isEmpty(type) then
-		local typeDisplay = Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. ' Tournaments')
+		local typeNumber = Tier['number'][type]
+		local typeDisplay = tonumber(typeNumber) == _TIER_SHOW_MATCH
+			and Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. 'es')
+			or Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. ' Tournaments')
 		content = content .. typeDisplay .. ' (' .. tierDisplay .. ')'
 	else
 		content = content .. tierDisplay
@@ -196,14 +204,15 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
 	Variables.varDefine('tournament_sponsors', args.sponsors)
-	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
-	Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.date))
+	Variables.varDefine('date', ReferenceCleaner.clean(args.edate))
+	Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.edate))
 	Variables.varDefine('tournament_sdate', ReferenceCleaner.clean(args.sdate))
 	Variables.varDefine('tournament_edate', ReferenceCleaner.clean(args.edate))
 	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
 	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
 
 	Variables.varDefine('game', GameLookup.getName({args.game}))
+	Variables.varDefine('tournament_game', GameLookup.getName({args.game}))
 	Variables.varDefine('tournament_patch', args.patch)
 	Variables.varDefine('patch', args.patch)
 	Variables.varDefine('tournament_mode',
@@ -328,10 +337,10 @@ end
 function CustomLeague:_getGameModes(args, makeLink)
 	if String.isEmpty(args.gamemode) then
 		local default = GameModeLookup.getDefault(args.game or '')
+		table.insert(categories, default .. ' Tournaments')
 		if makeLink then
 			default = Page.makeInternalLink(default)
 		end
-		table.insert(categories, default .. ' Tournaments')
 		return {default}
 	end
 
