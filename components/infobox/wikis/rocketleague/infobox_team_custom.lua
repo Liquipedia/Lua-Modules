@@ -14,6 +14,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local String = require('Module:String')
 local Template = require('Module:Template')
+local TeamRanking = require('Module:TeamRanking')
 
 local CustomTeam = Class.new()
 
@@ -39,6 +40,13 @@ function CustomInjector:addCustomCells(widgets)
 		name = '[[Portal:Rating|LPRating]]',
 		content = {_team.args.rating or 'Not enough data'}
 	})
+	local rlcsRanking = TeamRanking.get({ranking = 'RLCS_2021_22_Ranking', team = _team.args.name})
+	if rlcsRanking then
+		table.insert(widgets, Cell{
+			name = '[[RankingTableRLCS|RLCS Points]]',
+			content = {rlcsRanking}
+		})
+	end
 	return widgets
 end
 
