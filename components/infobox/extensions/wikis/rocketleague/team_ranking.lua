@@ -50,4 +50,4 @@ end
 -- @tfield string name the name of the team to get the ranking for
 -- @table argsType
 
-return Class.export(p)
+return Class.export(TeamRanking)
