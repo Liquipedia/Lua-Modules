@@ -30,6 +30,8 @@ local CustomInjector = Class.new(Injector)
 local _league
 local categories = {}
 
+local _TIER_SHOW_MATCH = 9
+
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
@@ -123,8 +125,6 @@ end
 
 
 function CustomLeague:getWikiCategories(args)
-	table.insert(categories, 'Tournaments')
-
 	if not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)) then
 		table.insert(categories, 'Individual Tournaments')
 	end
@@ -156,14 +156,14 @@ function CustomLeague:_createTier(args)
 
 	local tierVar = Variables.varDefault('tournament_liquipediatier', '')
 	local tier = Tier['text'][tierVar]
-	local tierDisplay = tonumber(tierVar) == 9 -- 9 equals showmatch
+	local tierDisplay = tonumber(tierVar) == _TIER_SHOW_MATCH
 		and Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. 'es')
 		or Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. ' Tournaments')
 
 	local type = Variables.varDefault('tournament_liquipediatiertype', '')
 	if not String.isEmpty(type) then
 		local typeNumber = Tier['number'][type]
-		local typeDisplay = tonumber(typeNumber) == 9 -- 9 equals showmatch
+		local typeDisplay = tonumber(typeNumber) == _TIER_SHOW_MATCH
 			and Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. 'es')
 			or Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. ' Tournaments')
 		content = content .. typeDisplay .. ' (' .. tierDisplay .. ')'
