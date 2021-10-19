@@ -22,7 +22,7 @@ function p.get(args)
 		error('Please provide a ranking name!')
 	end
 	if not args['team'] then
-		mw.log('No team name provided')
+		error('Please provide a team name!')
 		return nil
 	end
 
