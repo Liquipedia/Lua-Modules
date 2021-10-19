@@ -53,12 +53,15 @@ function Person:createInfobox()
 	local personType = self:getPersonType(args)
 	local earnings = self:calculateEarnings(args)
 
-	local age = AgeCalculation.run({
+	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
 			birthdate = args.birth_date,
 			birthlocation = args.birth_location,
 			deathdate = args.death_date,
 			shouldstore = _shouldStoreData
 		})
+	if not ageCalculationSuccess then
+		age = Person._createAgeCalculationErrorMessage(age)
+	end
 
 	local widgets = {
 		Header{name = self:nameDisplay(args), image = args.image, imageDefault = args.default},
@@ -335,6 +338,23 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		return categories
 	end
 	return {}
+end
+
+function Person._createAgeCalculationErrorMessage(text)
+	-- Return formatted message text for an error.
+	local strongStart = '<strong class="error">Error: '
+	local strongEnd = '</strong>'
+	text = string.gsub(text or '', 'Module:AgeCalculation/test:%d+: ', '')
+	if mw.title.getCurrentTitle():inNamespaces(0) then
+		strongEnd = strongEnd .. '[[Category:Age error]]'
+	end
+	text = strongStart .. mw.text.nowiki(text) .. strongEnd
+
+	if string.match(text, '[Dd]eath') then
+		return {death = text}
+	else
+		return {birth = text}
+	end
 end
 
 return Person

@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Placement = require('Module:Placement')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
 local Table = require('Module:Table')
 
@@ -63,7 +64,7 @@ function CustomFfaMatchSummary.GamePlacement(props)
 
 	return mw.html.create('div'):addClass('ffa-match-summary-cell')
 		:addClass('ffa-match-summary-game-placement')
-		:addClass(opponent.placement and FfaMatchSummary.getPlacementClass(opponent.placement))
+		:addClass(opponent.placement and Placement.getBgClass(opponent.placement))
 		:node(offraces and StarcraftMatchSummary.OffraceIcons(offraces) or nil)
 		:node(opponent.placement and tostring(opponent.placement) .. '.' or '')
 end

@@ -8,7 +8,6 @@
 
 local League = require('Module:Infobox/League')
 local String = require('Module:String')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
@@ -21,12 +20,17 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local Page = require('Module:Page')
+local DateClean = require('Module:DateTime')._clean
+local Tier = require('Module:Tier')
 
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _league
+local categories = {}
+
+local _TIER_SHOW_MATCH = 9
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -88,27 +92,7 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		if not String.isEmpty(args.map1) then
-			local map1mode = ''
-			if not String.isEmpty(args.map1mode) then
-				map1mode = MapMode.get({args.map1mode})
-			end
-
-			local maps = {Page.makeInternalLink(args.map1 .. map1mode, args.map1)}
-			local index  = 2
-
-			while not String.isEmpty(args['map' .. index]) do
-				local mapmode = ''
-				if not String.isEmpty(args['map' .. index .. 'mode']) then
-					mapmode = MapMode.get({args['map' .. index .. 'mode']})
-				end
-				table.insert(maps, '&nbsp;• ' ..
-					tostring(CustomLeague:_createNoWrappingSpan(
-						Page.makeInternalLink(args['map' .. index] .. mapmode, args['map' .. index])
-					))
-				)
-				index = index + 1
-			end
-
+			local maps, _ = CustomLeague:_getMaps(args)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = maps})
 		end
@@ -127,11 +111,13 @@ function CustomInjector:parse(id, widgets)
 			}
 		}
 	elseif id == 'sponsors' then
-		local sponsors = mw.text.split(args.sponsors, ',', true)
-		table.insert(widgets, Cell{
-			name = 'Sponsor(s)',
-			content = {table.concat(sponsors, '&nbsp;• ')}
-		})
+		if not String.isEmpty(args.sponsors) then
+			local sponsors = mw.text.split(args.sponsors, ',', true)
+			table.insert(widgets, Cell{
+				name = 'Sponsor(s)',
+				content = {table.concat(sponsors, '&nbsp;• ')}
+			})
+		end
 	end
 
 	return widgets
@@ -139,8 +125,6 @@ end
 
 
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
 	if not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)) then
 		table.insert(categories, 'Individual Tournaments')
 	end
@@ -148,7 +132,20 @@ function CustomLeague:getWikiCategories(args)
 	if String.isEmpty(args.game) then
 		table.insert(categories, 'Tournaments without game version')
 	else
-		table.insert(categories, GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. 'Competitions')
+		table.insert(categories, GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. ' Competitions')
+	end
+
+	local tier = Variables.varDefault('tournament_liquipediatier', '')
+	local tiertype = Variables.varDefault('tournament_liquipediatiertype', '')
+
+	if String.isEmpty(tier) then
+		table.insert(categories, 'Pages with unsupported Tier')
+	else
+		table.insert(categories, Tier['text'][tier]  .. ' Tournaments')
+	end
+
+	if not String.isEmpty(tiertype) then
+		table.insert(categories, tiertype .. ' Tournaments')
 	end
 
 	return categories
@@ -157,19 +154,18 @@ end
 function CustomLeague:_createTier(args)
 	local content = ''
 
-	local tier = args.liquipediatier
+	local tierVar = Variables.varDefault('tournament_liquipediatier', '')
+	local tier = Tier['text'][tierVar]
+	local tierDisplay = tonumber(tierVar) == _TIER_SHOW_MATCH
+		and Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. 'es')
+		or Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. ' Tournaments')
 
-	if String.isEmpty(tier) then
-		return content
-	end
-
-	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(),
-											'TierDisplay/link',
-											{tier, GameLookup.getName({args.game})})
-	local type = args.liquipediatiertype
-
+	local type = Variables.varDefault('tournament_liquipediatiertype', '')
 	if not String.isEmpty(type) then
-		local typeDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/link', type)
+		local typeNumber = Tier['number'][type]
+		local typeDisplay = tonumber(typeNumber) == _TIER_SHOW_MATCH
+			and Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. 'es')
+			or Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. ' Tournaments')
 		content = content .. typeDisplay .. ' (' .. tierDisplay .. ')'
 	else
 		content = content .. tierDisplay
@@ -208,11 +204,15 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
 	Variables.varDefine('tournament_sponsors', args.sponsors)
-	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
+	Variables.varDefine('date', ReferenceCleaner.clean(args.edate))
+	Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.edate))
+	Variables.varDefine('tournament_sdate', ReferenceCleaner.clean(args.sdate))
+	Variables.varDefine('tournament_edate', ReferenceCleaner.clean(args.edate))
 	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
 	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
 
 	Variables.varDefine('game', GameLookup.getName({args.game}))
+	Variables.varDefine('tournament_game', GameLookup.getName({args.game}))
 	Variables.varDefine('tournament_patch', args.patch)
 	Variables.varDefine('patch', args.patch)
 	Variables.varDefine('tournament_mode',
@@ -222,15 +222,32 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 
+	-- clean liquipediatiers:
+	-- tier should be a number defining a tier
+	local liquipediatier = args.liquipediatier
+	if not tonumber(liquipediatier) then
+		liquipediatier = Tier['number'][liquipediatier]
+	end
+
+	-- type should be the textual representation of the numbers
+	local liquipediatiertype = args.liquipediatiertype
+	if not tonumber(liquipediatiertype) then
+		liquipediatiertype = Tier['number'][liquipediatiertype]
+	end
+	liquipediatiertype = Tier['text'][liquipediatiertype]
+
+	Variables.varDefine('tournament_liquipediatier', liquipediatier)
+	Variables.varDefine('tournament_liquipediatiertype', liquipediatiertype)
+
 	-- Legacy tier vars
-	Variables.varDefine('tournament_lptier', args.liquipediatier)
-	Variables.varDefine('tournament_tier', args.liquipediatiertype or args.liquipediatier)
+	Variables.varDefine('tournament_lptier', liquipediatier)
+	Variables.varDefine('tournament_tier', liquipediatiertype or liquipediatier)
 	Variables.varDefine('tournament_tier2', args.liquipediatier2)
-	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
+	Variables.varDefine('tournament_tiertype', liquipediatiertype)
 	Variables.varDefine('tournament_tiertype2', args.liquipediatiertype2)
-	Variables.varDefine('ltier', args.liquipediatier == 1 and 1 or
-		args.liquipediatier == 2 and 2 or
-		args.liquipediatier == 3 and 3 or 4
+	Variables.varDefine('ltier', liquipediatier == 1 and 1 or
+		liquipediatier == 2 and 2 or
+		liquipediatier == 3 and 3 or 4
 	)
 
 	-- Legacy notability vars
@@ -243,12 +260,15 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 
 	lpdbData['sponsors'] = args.sponsors
-	lpdbData['maps'] = CustomLeague:_concatArgs(args, 'map')
+
+	local _, mappages = CustomLeague:_getMaps(args)
+	lpdbData['maps'] = table.concat(mappages, ';')
 
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
+		deadline = DateClean(args.deadline or ''),
 		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ',')
 	}
 
@@ -317,6 +337,7 @@ end
 function CustomLeague:_getGameModes(args, makeLink)
 	if String.isEmpty(args.gamemode) then
 		local default = GameModeLookup.getDefault(args.game or '')
+		table.insert(categories, default .. ' Tournaments')
 		if makeLink then
 			default = Page.makeInternalLink(default)
 		end
@@ -327,6 +348,9 @@ function CustomLeague:_getGameModes(args, makeLink)
 	table.foreach(gameModes,
 		function(index, mode)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
+
+			table.insert(categories, gameModes[index] .. ' Tournaments')
+
 			if makeLink then
 				gameModes[index] = Page.makeInternalLink(gameModes[index])
 			end
@@ -334,6 +358,49 @@ function CustomLeague:_getGameModes(args, makeLink)
 	)
 
 	return gameModes
+end
+
+function CustomLeague:_getMaps(args)
+	local maps = {}
+	local mappages = {}
+	local index = 1
+
+	while not String.isEmpty(args['map' .. index]) do
+		-- map game mode from mapXmode
+		local mapmode = ''
+		if not String.isEmpty(args['map' .. index .. 'mode']) then
+			mapmode = MapMode.get({args['map' .. index .. 'mode']})
+		end
+
+		-- map from mapX, might be pagename|displayname
+		local map = mw.text.split(args['map' .. index], '|', true)
+		-- maplink from mapXlink or first part of map or autolink
+		local maplink
+		if not String.isEmpty(args['map' .. index .. 'link']) then
+			maplink = args['map' .. index .. 'link']
+		else
+			maplink = map[1]
+			-- only check for a map page when map has only one part,
+			-- so no precise link is given
+			if map[2] == nil and Page.exists(maplink .. ' (map)') then
+				maplink = maplink .. ' (map)'
+			end
+		end
+
+		if index == 1 then
+			maps = {Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)}
+		else
+			table.insert(maps, '&nbsp;• ' ..
+				tostring(CustomLeague:_createNoWrappingSpan(
+					Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)
+				))
+			)
+		end
+		table.insert(mappages, maplink)
+		index = index + 1
+	end
+
+	return maps, mappages
 end
 
 return CustomLeague
