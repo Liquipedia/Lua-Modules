@@ -36,11 +36,13 @@ function TeamRanking.get(args)
 	}
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', query)
 	local teamData = data[1]
-	if not teamData or place == '-1' then
+	if not teamData then
 		return nil
 	end
-
 	local place = teamData.information
+	if place == '-1' then
+		return nil
+	end
 	local points = teamData.extradata.totalpoints
 	return points..' (Rank #'..place..')'
 end
