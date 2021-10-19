@@ -40,7 +40,7 @@ function CustomInjector:addCustomCells(widgets)
 		name = '[[Portal:Rating|LPRating]]',
 		content = {_team.args.rating or 'Not enough data'}
 	})
-	local rlcsRanking = TeamRanking.get({ranking = 'RLCS_2021_22_Ranking', team = _team.args.name})
+	local rlcsRanking = TeamRanking.get({ranking = Variables.varDefault('ranking_name', ''), team = _team.args.name})
 	table.insert(widgets, Cell{
 		name = '[[RankingTableRLCS|RLCS Points]]',
 		content = {rlcsRanking}
