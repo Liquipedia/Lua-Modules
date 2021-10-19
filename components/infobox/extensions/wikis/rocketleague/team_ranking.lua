@@ -15,7 +15,7 @@ local Class = require('Module:Class')
 
 --- Entry point
 -- returns a string representation which contains the current RLCS Points and rank of a team in terms of RLCS Points
--- @tparam argsType args
+-- @tparam table args
 -- @treturn string|nil rankingString the string representation of the team's ranking or nil if the team doesn't have RLCS Points
 function p.get(args)
 	if not args['ranking'] then
