@@ -61,6 +61,7 @@ function CustomInjector:wrapErrorMessage(text)
 	local outText = strongStart .. mw.text.nowiki(errorText) .. strongEnd
 	return outText
 end
+
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
 		local earnings = Earnings.calculateForTeam({team = _team.pagename or _team.name})
