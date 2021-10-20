@@ -24,7 +24,6 @@ function TeamRanking.run(args)
 	end
 	if not args['team'] then
 		error('Please provide a team name')
-		return nil
 	end
 
 	local rankingName = args['ranking']
