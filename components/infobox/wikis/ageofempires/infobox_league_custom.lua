@@ -264,6 +264,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	local _, mappages = CustomLeague:_getMaps(args)
 	lpdbData['maps'] = table.concat(mappages, ';')
 
+	lpdbData['game'] = GameLookup.getName({args.game})
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
