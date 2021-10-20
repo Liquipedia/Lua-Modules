@@ -6,7 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----- This Module retrieves a team's ranking using the LPDB Objects created in https://liquipedia.net/rocketleague/Module:AutoPointsTable
+---- This Module retrieves a team's ranking using the LPDB Objects
+---- created in https://liquipedia.net/rocketleague/Module:AutoPointsTable
 ---- This Module is created to show the rankings of teams and their RLCS Circuit Points in the team infobox
 
 local TeamRanking = {}
