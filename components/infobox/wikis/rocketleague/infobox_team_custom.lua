@@ -45,7 +45,7 @@ function CustomInjector:addCustomCells(widgets)
 		team = _team.args.name
 	})
 	if not rankingSuccess then
-		rlcsRanking = CustomInjector.wrapErrorMessage(rlcsRanking)
+		rlcsRanking = CustomInjector:wrapErrorMessage(rlcsRanking)
 	end
 	table.insert(widgets, Cell{
 		name = '[[RankingTableRLCS|RLCS Points]]',
