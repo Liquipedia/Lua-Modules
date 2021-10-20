@@ -229,13 +229,9 @@ function League:_setLpdbData(args, links)
 		patch = args.patch,
 		endpatch = args.endpatch or args.epatch,
 		type = args.type,
-		organizers = mw.ext.LiquipediaDB.lpdb_create_json({
-			organizer1 = args.organizer or args.organizer1,
-			organizer2 = args.organizer2,
-			organizer3 = args.organizer3,
-			organizer4 = args.organizer4,
-			organizer5 = args.organizer5,
-		}),
+		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
+			League:_getNamedTableofAllArgsForBase(args, 'organizer')
+		),
 		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', '1970-01-01'),
 		enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
 		sortdate = Variables.varDefault('tournament_enddate', '1970-01-01'),
@@ -247,13 +243,9 @@ function League:_setLpdbData(args, links)
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
 		status = args.status,
 		format = args.format,
-		sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
-			sponsor1 = args.sponsor or args.sponsor1,
-			sponsor2 = args.sponsor2,
-			sponsor3 = args.sponsor3,
-			sponsor4 = args.sponsor4,
-			sponsor5 = args.sponsor5,
-		}),
+		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
+			League:_getNamedTableofAllArgsForBase(args, 'sponsor')
+		),
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {})
 		),
@@ -262,6 +254,15 @@ function League:_setLpdbData(args, links)
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
+end
+
+function League:_getNamedTableofAllArgsForBase(args, base)
+	local basedArgs = self:getAllArgsForBase(args, base)
+	local namedArgs = {}
+	for key, item in pairs(basedArgs) do
+		namedArgs[base .. key] = item
+	end
+	return namedArgs
 end
 
 ---
