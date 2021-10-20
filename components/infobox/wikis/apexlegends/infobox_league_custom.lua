@@ -152,14 +152,15 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	local tierDisplay = '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
 		.. '[[Category:' .. tierText .. ' Tournaments]]'
 
-	--clean tierType
+
 	if not String.isEmpty(tierType) then
 		tierType = Tier['types'][string.lower(tierType or '')] or tierType
 		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
-		tierType = '[[' .. tierType .. ' Tournaments|' .. tierType .. ']]'
+		local tierTypeDIsplay
+		tierTypeDIsplay = '[[' .. tierType .. ' Tournaments|' .. tierType .. ']]'
 			.. '[[Category:' .. tierType .. ' Tournaments]]'
-		if not hasTypeSetAsTier or tierType ~= tierDisplay  then
-			tierDisplay = tierType .. '&nbsp;(' .. tierDisplay .. ')'
+		if not hasTypeSetAsTier or tierType ~= tierTypeDIsplay  then
+			tierDisplay = tierTypeDIsplay .. '&nbsp;(' .. tierDisplay .. ')'
 		end
 	end
 
