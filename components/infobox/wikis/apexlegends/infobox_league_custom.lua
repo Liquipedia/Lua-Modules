@@ -198,7 +198,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_tickername', _args.tickername or name)
 
 	--Legacy vars
-	local name = self.name
 	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
 
