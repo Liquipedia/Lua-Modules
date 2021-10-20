@@ -45,7 +45,7 @@ function TeamRanking.run(args)
 		return nil
 	end
 	local points = teamData.extradata.totalpoints
-	return points..' (Rank #'..place..')'
+	return points .. ' (Rank #' .. place .. ')'
 end
 
 
