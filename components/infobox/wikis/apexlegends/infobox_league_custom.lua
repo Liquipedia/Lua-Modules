@@ -20,7 +20,6 @@ local Center = require('Module:Infobox/Widget/Center')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local _GAME_MODE = mw.loadData('Module:GameMode')
-local _GAME_PERSPECTIVE = mw.loadData('Module:GamePerspective')--needed??????
 local _EA_ICON = '[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
 	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
 local _TODAY = os.date('%Y-%m-%d', os.time())
@@ -258,15 +257,7 @@ function CustomLeague._getGameMode()
 		return nil
 	end
 	gameMode = string.lower(gameMode)
-	gameMode = _GAME_MODE[gameMode] or _GAME_MODE['default']
-
-	local perspective = string.lower(_args.perspective or '')
-	perspective = _GAME_PERSPECTIVE[perspective]
-	if perspective then
-		gameMode = gameMode .. '&nbsp;' .. perspective
-	end
-
-	return gameMode
+	return _GAME_MODE[gameMode] or _GAME_MODE['default']
 end
 
 function CustomLeague._getPlatform()
