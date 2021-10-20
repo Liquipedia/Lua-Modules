@@ -8,10 +8,8 @@
 
 local League = require('Module:Infobox/League')
 local String = require('Module:String')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
-local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -23,7 +21,8 @@ local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local _GAME_MODE = mw.loadData('Module:GameMode')
 local _GAME_PERSPECTIVE = mw.loadData('Module:GamePerspective')--needed??????
-local _EA_ICON = '[[File:EA icon.png|x15px|middle|link=Electronic Arts|Tournament sponsored by Electronirc Arts & Respawn.]]'
+local _EA_ICON = '[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
+	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
 local CustomLeague = Class.new()
@@ -195,6 +194,7 @@ end
 
 function CustomLeague:defineCustomPageVariables()
 	--overwrite vars set by the commons module
+	local name = self.name
 	Variables.varDefine('tournament_tickername', _args.tickername or name)
 
 	--Legacy vars
@@ -225,7 +225,7 @@ function CustomLeague:defineCustomPageVariables()
 			eaMajor = 'true'
 		else
 			local algsTier = string.lower(_args.algstier or '')
-			if algsTier == major then
+			if algsTier == 'major' then
 				eaMajor = 'true'
 			else
 				eaMajor = ''
