@@ -131,7 +131,7 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	local tierText = Tier.text[tier]
 	local hasInvalidTier = tierText == nil
 	local hasTypeSetAsTier
-	--the following converts a tiers that should be types to tiertypes
+	--the following converts a tier that should be types to tiertypes
 	if hasInvalidTier then
 		local tempTypeForCheck = Tier.numberToType[tier] or tier
 		tempTypeForCheck = Tier.types[string.lower(tempTypeForCheck)]
