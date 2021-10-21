@@ -12,6 +12,7 @@ local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
+local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -24,7 +25,7 @@ Reads a matchlist input spec, saves it to LPDB, and displays the matchlist.
 function MatchGroupDisplay.MatchlistBySpec(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
 	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
-	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
+	Match.storeMatchGroup(matches, options)
 
 	local matchlistNode
 	if options.show then
@@ -49,7 +50,7 @@ Reads a bracket input spec, saves it to LPDB, and displays the bracket.
 function MatchGroupDisplay.BracketBySpec(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
 	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, options)
-	MatchGroupBase.saveMatchGroup(options.bracketId, matches, options.saveToLpdb)
+	Match.storeMatchGroup(matches, options)
 
 	local bracketNode
 	if options.show then

@@ -6,30 +6,30 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
-
-local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 
 local MatchGroupBase = {}
 
 function MatchGroupBase.readOptions(args, matchGroupType)
+	local store = Logic.readBoolOrNil(args.store)
+	local show = not Logic.readBool(args.hide)
 	local options = {
 		bracketId = MatchGroupBase.readBracketId(args.id),
 		matchGroupType = matchGroupType,
-		saveToLpdb = Logic.nilOr(Logic.readBoolOrNil(args.store), true),
 		shouldWarnMissing = Logic.nilOr(Logic.readBoolOrNil(args.warnMissing), true),
-		show = not Logic.readBool(args.hide),
+		show = show,
+		storeMatch1 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch1), store, true),
+		storeMatch2 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch2), store, true),
+		storePageVar = Logic.nilOr(Logic.readBoolOrNil(args.storePageVar), show),
+		storeSmw = Logic.nilOr(Logic.readBoolOrNil(args.storeSmw), store, true),
 	}
 
 	local warnings = {}
 
-	if options.saveToLpdb or not Logic.readBool(args.noDuplicateCheck) then
+	if options.storeMatch2 or not Logic.readBool(args.noDuplicateCheck) then
 		local warning = MatchGroupBase._checkBracketDuplicate(options.bracketId)
 		if warning then
 			table.insert(warnings, warning)
@@ -92,16 +92,6 @@ function MatchGroupBase._checkBracketDuplicate(bracketId)
 		mw.addWarning(warning)
 		return warning .. category
 	end
-end
-
-function MatchGroupBase.saveMatchGroup(bracketId, matches, storeInLpdb)
-	local storedData = Array.map(matches, function(match)
-		return Match.store(match, storeInLpdb)
-	end)
-
-	-- store match data as variable to bypass LPDB on the same page
-	Variables.varDefine('match2bracket_' .. bracketId, Json.stringify(storedData))
-	Variables.varDefine('match2bracketindex', Variables.varDefault('match2bracketindex', 0) + 1)
 end
 
 function MatchGroupBase.enableInstrumentation()
