@@ -42,7 +42,7 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	local rankingSuccess, rlcsRanking = pcall(TeamRanking.run, {
 		ranking = Variables.varDefault('ranking_name', ''),
-		team = _team.args.name
+		team = _team.pagename
 	})
 	if not rankingSuccess then
 		rlcsRanking = CustomInjector:wrapErrorMessage(rlcsRanking)
