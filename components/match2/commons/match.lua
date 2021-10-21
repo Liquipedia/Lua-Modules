@@ -216,26 +216,26 @@ function Match.copyRecords(matchRecord)
 	})
 end
 
-local function stringifyIfNotEmpty(tbl)
-	return Table.isNotEmpty(tbl) and Json.stringify(tbl) or nil
+local function stringifyIfTable(tbl)
+	return type(tbl) == 'table' and Json.stringify(tbl) or nil
 end
 
 function Match.encodeJson(matchRecord)
-	matchRecord.match2bracketdata = stringifyIfNotEmpty(matchRecord.match2bracketdata)
-	matchRecord.stream = stringifyIfNotEmpty(matchRecord.stream)
-	matchRecord.links = stringifyIfNotEmpty(matchRecord.links)
-	matchRecord.extradata = stringifyIfNotEmpty(matchRecord.extradata)
+	matchRecord.match2bracketdata = stringifyIfTable(matchRecord.match2bracketdata)
+	matchRecord.stream = stringifyIfTable(matchRecord.stream)
+	matchRecord.links = stringifyIfTable(matchRecord.links)
+	matchRecord.extradata = stringifyIfTable(matchRecord.extradata)
 
 	for _, opponentRecord in ipairs(matchRecord.match2opponents) do
-		opponentRecord.extradata = stringifyIfNotEmpty(opponentRecord.extradata)
+		opponentRecord.extradata = stringifyIfTable(opponentRecord.extradata)
 		for _, playerRecord in ipairs(opponentRecord.match2players) do
-			playerRecord.extradata = stringifyIfNotEmpty(playerRecord.extradata)
+			playerRecord.extradata = stringifyIfTable(playerRecord.extradata)
 		end
 	end
 	for _, gameRecord in ipairs(matchRecord.match2games) do
-		gameRecord.extradata = stringifyIfNotEmpty(gameRecord.extradata)
-		gameRecord.participants = stringifyIfNotEmpty(gameRecord.participants)
-		gameRecord.scores = stringifyIfNotEmpty(gameRecord.scores)
+		gameRecord.extradata = stringifyIfTable(gameRecord.extradata)
+		gameRecord.participants = stringifyIfTable(gameRecord.participants)
+		gameRecord.scores = stringifyIfTable(gameRecord.scores)
 	end
 end
 
