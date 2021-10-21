@@ -252,6 +252,11 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	-- Legacy notability vars
 	Variables.varDefine('tournament_notability_mod', args.notabilitymod or 1)
+
+	-- Variables for extradata to be added again in
+	-- Module:Prize pool, Module:Prize pool team, Module:TeamCard and Module:TeamCard2
+	Variables.varDefine('tournament_deadline', DateClean(args.deadline or ''))
+	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
