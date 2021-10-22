@@ -164,6 +164,10 @@ function Match.splitRecordsByType(match)
 
 	local playerRecordList = {}
 	for opponentIndex, opponentRecord in ipairs(opponentRecordList) do
+		if type(opponentRecord) ~= 'table' then
+			break
+		end
+
 		table.insert(playerRecordList, opponentRecord.match2players or opponentRecord.players or {})
 		opponentRecord.match2players = nil
 		opponentRecord.players = nil
