@@ -16,6 +16,8 @@ local MatchGroupUtil = require('Module:MatchGroup/Util')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 
+local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
+
 local globalVars = PageVariableNamespace()
 
 local Match = {}
@@ -26,12 +28,7 @@ end
 
 function Match.toEncodedJson(frame)
 	local args = Arguments.getArgs(frame)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local Match_ = Lua.import('Module:Match', {requireDevIfEnabled = true})
-		return Match_.withPerformanceSetup(function()
-			return Match_._toEncodedJson(args)
-		end)
-	end)
+	return Match._toEncodedJson(args)
 end
 
 function Match._toEncodedJson(matchArgs)
@@ -405,14 +402,11 @@ function Match.templateFromMatchID(frame)
 	return MatchGroupUtil.matchIdToKey(matchId)
 end
 
-function Match.withPerformanceSetup(f)
-	if FeatureFlag.get('perf') then
-		local matchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
-		local perfConfig = Table.getByPathOrNil(matchGroupConfig, {'subobjectPerf'}) or {}
-		return require('Module:Performance/Util').withSetup(perfConfig, f)
-	else
-		return f()
-	end
+if FeatureFlag.get('perf') then
+	Match.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'subobjectPerf'})
+	require('Module:Performance/Util').setupEntryPoints(Match, {'toEncodedJson'})
 end
+
+Lua.autoInvokeEntryPoints(Match, 'Module:Match', {'toEncodedJson'})
 
 return Match

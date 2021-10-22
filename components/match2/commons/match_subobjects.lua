@@ -20,12 +20,7 @@ local MatchSubobjects = {}
 
 function MatchSubobjects.getOpponent(frame)
 	local args = Arguments.getArgs(frame)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchSubobjects_ = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
-		return MatchSubobjects_.withPerformanceSetup(function()
-			return Json.stringify(MatchSubobjects_.luaGetOpponent(frame, args))
-		end)
-	end)
+	return Json.stringify(MatchSubobjects.luaGetOpponent(frame, args))
 end
 
 function MatchSubobjects.luaGetOpponent(frame, args)
@@ -40,12 +35,7 @@ end
 
 function MatchSubobjects.getMap(frame)
 	local args = Arguments.getArgs(frame)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchSubobjects_ = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
-		return MatchSubobjects_.withPerformanceSetup(function()
-			return Json.stringify(MatchSubobjects_.luaGetMap(frame, args))
-		end)
-	end)
+	return Json.stringify(MatchSubobjects.luaGetMap(frame, args))
 end
 
 function MatchSubobjects.luaGetMap(frame, args)
@@ -79,26 +69,21 @@ end
 
 function MatchSubobjects.getPlayer(frame)
 	local args = Arguments.getArgs(frame)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchSubobjects_ = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
-		return MatchSubobjects_.withPerformanceSetup(function()
-			return Json.stringify(MatchSubobjects_.luaGetPlayer(frame, args))
-		end)
-	end)
+	return Json.stringify(MatchSubobjects.luaGetPlayer(frame, args))
 end
 
 function MatchSubobjects.luaGetPlayer(frame, args)
 	return wikiSpec.processPlayer(frame, args)
 end
 
-function MatchSubobjects.withPerformanceSetup(f)
-	if FeatureFlag.get('perf') then
-		local config = Lua.loadDataIfExists('Module:MatchGroup/Config')
-		local perfConfig = Table.getByPathOrNil(config, {'subobjectPerf'}) or {}
-		return require('Module:Performance/Util').withSetup(perfConfig, f)
-	else
-		return f()
-	end
+local _ENTRY_POINT_NAMES = {'getOpponent', 'getMap', 'getPlayer', 'getRound'}
+
+if FeatureFlag.get('perf') then
+	local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
+	MatchSubobjects.perfConfig = Match.perfConfig
+	require('Module:Performance/Util').setupEntryPoints(MatchSubobjects, _ENTRY_POINT_NAMES)
 end
+
+Lua.autoInvokeEntryPoints(MatchSubobjects, 'Module:Match/Subobjects', _ENTRY_POINT_NAMES)
 
 return MatchSubobjects

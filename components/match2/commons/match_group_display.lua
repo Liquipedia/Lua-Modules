@@ -9,11 +9,12 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
+local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
@@ -111,44 +112,32 @@ function MatchGroupDisplay.WarningBox(text)
 	return div:node(tbl)
 end
 
+
 -- Entry point of Template:Matchlist
 function MatchGroupDisplay.TemplateMatchlist(frame)
 	local args = Arguments.getArgs(frame)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchGroupDisplay_ = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
-		local MatchGroupBase_ = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		MatchGroupBase_.enableInstrumentation()
-		local result = MatchGroupDisplay_.MatchlistBySpec(args)
-		MatchGroupBase_.disableInstrumentation()
-		return result
-	end)
+	return MatchGroupDisplay.MatchlistBySpec(args)
 end
 
 -- Entry point of Template:Bracket
 function MatchGroupDisplay.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchGroupDisplay_ = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
-		local MatchGroupBase_ = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		MatchGroupBase_.enableInstrumentation()
-		local result = MatchGroupDisplay_.BracketBySpec(args)
-		MatchGroupBase_.disableInstrumentation()
-		return result
-	end)
+	return MatchGroupDisplay.BracketBySpec(args)
 end
 
--- Entry point of Template:ShowBracket
+-- Entry point of Template:ShowBracket, Template:DisplayMatchGroup
 function MatchGroupDisplay.TemplateShowBracket(frame)
 	local args = Arguments.getArgs(frame)
-	return FeatureFlag.with({dev = Logic.readBoolOrNil(args.dev)}, function()
-		local MatchGroupDisplay_ = Lua.import('Module:MatchGroup/Display', {requireDevIfEnabled = true})
-		local MatchGroupBase_ = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-		MatchGroupBase_.enableInstrumentation()
-		local result = MatchGroupDisplay_.MatchGroupById(args)
-		MatchGroupBase_.disableInstrumentation()
-		return result
-	end)
+	return MatchGroupDisplay.MatchGroupById(args)
 end
+
+if FeatureFlag.get('perf') then
+	MatchGroupDisplay.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'perf'})
+	require('Module:Performance/Util').setupEntryPoints(MatchGroupDisplay)
+end
+
+Lua.autoInvokeEntryPoints(MatchGroupDisplay, 'Module:MatchGroup/Display')
+
 
 MatchGroupDisplay.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
 
