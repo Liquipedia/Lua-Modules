@@ -150,7 +150,6 @@ function Match.splitRecordsByType(match)
 		return {}
 	end
 
-
 	local gameRecordList = Match._moveRecordsFromMatchToList(
 		match,
 		match.match2games or match.games or {},
