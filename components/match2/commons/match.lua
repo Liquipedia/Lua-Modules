@@ -146,31 +146,38 @@ Groups subobjects by type (game, opponent, player), and removes direct
 references between a match record and its subobject records.
 ]]
 function Match.splitRecordsByType(match)
-	local gameRecordList = match.match2games or match.games or {}
-	match.match2games = nil
-	match.games = nil
-	for key, gameRecord in Table.iter.pairsByPrefix(match, 'map') do
-		match[key] = nil
-		table.insert(gameRecordList, gameRecord)
+	if match == nil or type(match) ~= 'table' then
+		return {}
 	end
 
-	local opponentRecordList = match.match2opponents or match.opponents or {}
+	local gameRecordList = Match._moveRecordsFromMatchToList(
+		match,
+		match.match2games or match.games or {},
+		'map'
+	)
+	match.match2games = nil
+	match.games = nil
+
+	local opponentRecordList = Match._moveRecordsFromMatchToList(
+		match,
+		match.match2opponents or match.opponents or {},
+		'opponent'
+	)
 	match.match2opponents = nil
 	match.opponents = nil
-	for key, opponentRecord in Table.iter.pairsByPrefix(match, 'opponent') do
-		match[key] = nil
-		table.insert(opponentRecordList, opponentRecord)
-	end
 
 	local playerRecordList = {}
 	for opponentIndex, opponentRecord in ipairs(opponentRecordList) do
+		if type(opponentRecord) ~= 'table' then
+			break
+		end
+
 		table.insert(playerRecordList, opponentRecord.match2players or opponentRecord.players or {})
 		opponentRecord.match2players = nil
 		opponentRecord.players = nil
-		for key, playerRecord in Table.iter.pairsByPrefix(match, 'opponent' .. opponentIndex .. '_p') do
-			match[key] = nil
-			table.insert(playerRecordList[#playerRecordList], playerRecord)
-		end
+
+		playerRecordList[#playerRecordList] = Match._moveRecordsFromMatchToList(
+			match, {}, 'opponent' .. opponentIndex .. '_p')
 	end
 
 	return {
@@ -179,6 +186,19 @@ function Match.splitRecordsByType(match)
 		opponentRecords = opponentRecordList,
 		playerRecords = playerRecordList,
 	}
+end
+
+--[[
+	Moves the records found by iterating through `match` by `typePrefix`
+	to `list`. Sets the original location (so in `match`) to `nil`.
+]]
+function Match._moveRecordsFromMatchToList(match, list, typePrefix)
+	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
+		match[key] = nil
+		table.insert(list, item)
+	end
+
+	return list
 end
 
 --[[
