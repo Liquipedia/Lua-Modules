@@ -146,7 +146,7 @@ Groups subobjects by type (game, opponent, player), and removes direct
 references between a match record and its subobject records.
 ]]
 function Match.splitRecordsByType(match)
-	if match == nil then
+	if match == nil or type(match) ~= 'table' then
 		return {}
 	end
 
