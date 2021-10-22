@@ -184,6 +184,10 @@ function Match.splitRecordsByType(match)
 	}
 end
 
+--[[
+	Moves the records found by iterating through `match` by `typePrefix`
+	to `list`. Sets the original location (so in `match`) to `nil`.
+]]
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
 	if match == nil or list == nil then
 		return nil
