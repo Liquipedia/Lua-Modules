@@ -172,12 +172,13 @@ function Match.splitRecordsByType(match)
 			break
 		end
 
-		table.insert(playerRecordList,
+		table.insert(
+			playerRecordList,
 			Match._moveRecordsFromMatchToList(
-					match,
-					opponentRecord.match2players or opponentRecord.players or {},
-					'opponent' .. opponentIndex .. '_p'
-				)
+				match,
+				opponentRecord.match2players or opponentRecord.players or {},
+				'opponent' .. opponentIndex .. '_p'
+			)
 		)
 
 		opponentRecord.match2players = nil
