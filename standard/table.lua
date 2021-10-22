@@ -213,6 +213,30 @@ function Table.any(tbl, predicate)
 	return false
 end
 
+--[[
+Groups entries of a table according to a grouping function.
+
+Example:
+local function parity(_, x) return x % 2 end
+Table.groupBy({a = 3, b = 4, c = 5}, parity)
+-- Returns
+{
+	0 = {b = 4},
+	1 = {a = 3, c = 5},
+}
+]]
+function Table.groupBy(tbl, f)
+	local groups = {}
+	for key, value in pairs(tbl) do
+		local groupKey = f(key, value)
+		if not groups[groupKey] then
+			groups[groupKey] = {}
+		end
+		groups[groupKey][key] = value
+	end
+	return groups
+end
+
 -- Removes a key from a table and returns its value.
 function Table.extract(tbl, key)
 	local value = tbl[key]
@@ -248,7 +272,7 @@ function Table.setByPath(tbl, path, value)
 end
 
 --[[
-Returns the unique key in an table. Returns nil if the table is empty or has
+Returns the unique key in a table. Returns nil if the table is empty or has
 multiple keys.
 ]]
 function Table.uniqueKey(tbl)
@@ -258,6 +282,18 @@ function Table.uniqueKey(tbl)
 		key0 = key
 	end
 	return key0
+end
+
+--[[
+Returns the entries of a table as an array of key value pairs. The ordering of
+the array is not specified.
+]]
+function Table.entries(tbl)
+	local entries = {}
+	for key, value in pairs(tbl) do
+		table.insert(entries, {key, value})
+	end
+	return entries
 end
 
 -- Polyfill of lua 5.2 table.pack
