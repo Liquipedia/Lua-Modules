@@ -190,7 +190,7 @@ end
 ]]
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
 	if match == nil or list == nil then
-		return nil
+		return {}
 	end
 
 	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
