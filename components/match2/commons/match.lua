@@ -181,6 +181,10 @@ function Match.splitRecordsByType(match)
 end
 
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
+	if match == nil or list == nil then
+		return nil
+	end
+
 	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
 		match[key] = nil
 		table.insert(list, item)
