@@ -14,7 +14,7 @@ local suite = ScribuntoUnit:new()
 function suite:testSplitRecordsByType()
 	local result = Match.splitRecordsByType(MatchTestConfig.EXAMPLE_MATCH)
 	self:assertDeepEquals(MatchTestConfig.EXPECTED_OUTPUT_AFTER_SPLIT, result)
-	self:assertEquals(nil, Match.splitRecordsByType(nil))
+	self:assertEquals({}, Match.splitRecordsByType(nil))
 end
 
 return suite
