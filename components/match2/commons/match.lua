@@ -146,6 +146,11 @@ Groups subobjects by type (game, opponent, player), and removes direct
 references between a match record and its subobject records.
 ]]
 function Match.splitRecordsByType(match)
+	if match == nil then
+		return {}
+	end
+
+
 	local gameRecordList = Match._moveRecordsFromMatchToList(
 		match,
 		match.match2games or match.games or {},
