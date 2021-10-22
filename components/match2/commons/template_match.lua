@@ -41,6 +41,7 @@ function TemplateMatch.storeVarsToLPDB()
 			local data = json.parse(jsonEncodedData)
 			local bracketData = json.parse(data.bracketdata or '{}')
 			data.bracketdata = bracketData
+			data.opponent1 = json.parseIfString(data.opponent1)
 			referencedIds[TemplateMatch._getTrueID(bracketData.tolower)] = true
 			referencedIds[TemplateMatch._getTrueID(bracketData.toupper)] = true
 
