@@ -34,10 +34,11 @@ function MatchSubobjects.luaGetOpponent(frame, args)
 	end
 
 	args = wikiSpec.processOpponent(frame, args)
+	args.match2players = args.players or Json.parseIfString(args.match2players)
 	return {
 		extradata = args.extradata,
 		icon = args.icon,
-		match2players = args.players or args.match2players,
+		match2players = args.match2players,
 		name = args.name,
 		score = args.score,
 		template = args.template,
