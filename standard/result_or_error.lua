@@ -6,12 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Error = require('Module:Error')
 
 --[[
 A structurally typed, immutable class that represents either a result or an
 error. Used for representing the outcome of a function that can throw.
+
+ResultOrError expects functions that return one value. Additional return values
+are ignored.
 
 Usage:
 
@@ -45,7 +48,11 @@ end
 
 function ResultOrError:finally(f)
 	local ret = self:map(f, f)
-	return ret.error and ret or self
+	if ret.error then
+		return ret
+	else
+		return self
+	end
 end
 
 function ResultOrError:isResult()
@@ -59,42 +66,35 @@ end
 --[[
 Result case
 ]]
-local Result = Class.new(ResultOrError, function(self, result)
+ResultOrError.Result = Class.new(ResultOrError, function(self, result)
 	self.result = result
 end)
 
-function Result:map(f, _)
+function ResultOrError.Result:map(f, _)
 	return f
 		and ResultOrError.try(function() return f(self.result) end)
 		or self
 end
 
-function Result:get()
+function ResultOrError.Result:get()
 	return self.result
 end
 
 --[[
-Error case.
-
-The stacks argument is the stack traces for the error, so that if an error
-handler throws, then the stack trace of the error handler error can be a
-continuation of the stack trace of the error that was handled (and so on).
-This allows error handlers to rethrow the original error without losing the
-stack trace, and is needed to implement :finally().
+Error case. The error is an Error instance.
 ]]
-local Error = Class.new(ResultOrError, function(self, error, stacks)
+ResultOrError.Error = Class.new(ResultOrError, function(self, error)
 	self.error = error
-	self.stacks = stacks
 end)
 
-function Error:map(_, onError)
+function ResultOrError.Error:map(_, onError)
 	return onError
-		and ResultOrError.try(function() return onError(self.error) end, self.stacks)
+		and ResultOrError.try(function() return onError(self.error) end, self.error)
 		or ResultOrError.Result()
 end
 
-function Error:get()
-	error(table.concat(Array.extend(self.error, self.stacks), '\n'))
+function ResultOrError.Error:get()
+	error(self.error)
 end
 
 --[[
@@ -102,12 +102,11 @@ Invokes a function and places its outcome (result or caught error) in a
 ResultOrError. If the result is a ResultOrError, then it is flattened, so that
 a nested ResultOrError is avoided.
 
-Additional stack traces can be attached using the lowerStacks parameter. This
-can be used when rethrowing an error to include the stack trace of the existing
-error. Errors rethrown in ResultOrError:map() or ResultOrError:catch() will
-automatically include both stack traces.
+originalError is used when ResultOrError.try is invoking an error handler. It
+allows errors thrown in ResultOrError:map() or ResultOrError:catch() to include
+stack traces from both the thrown error and the error being handled.
 ]]
-function ResultOrError.try(f, lowerStacks)
+function ResultOrError.try(f, originalError)
 	local resultOrError
 	xpcall(
 		function()
@@ -117,10 +116,27 @@ function ResultOrError.try(f, lowerStacks)
 				and result:is_a(ResultOrError)
 			resultOrError = isResultOrError
 				and result
-				or Result(result)
+				or ResultOrError.Result(result)
 		end,
-		function(error)
-			resultOrError = Error(error, Array.extend(debug.traceback(), lowerStacks))
+		function(any)
+			local error = Error.isError(any) and any or Error(any)
+
+			-- Error handler threw a different error than the original error
+			if originalError and error ~= originalError then
+				if type(error.originalErrors) ~= 'table' then
+					error.originalErrors = {}
+				end
+				table.insert(error.originalErrors, originalError)
+
+			-- Not an error handler, or error handler rethrow
+			elseif not error.noStack then
+				if type(error.stacks) ~= 'table' then
+					error.stacks = {}
+				end
+				table.insert(error.stacks, 1, debug.traceback())
+			end
+
+			resultOrError = ResultOrError.Error(error)
 		end
 	)
 	return resultOrError
@@ -141,7 +157,7 @@ function ResultOrError.all(resultOrErrors)
 			return resultOrError
 		end
 	end
-	return Result(results)
+	return ResultOrError.Result(results)
 end
 
 --[[
@@ -158,10 +174,12 @@ function ResultOrError.any(resultOrErrors)
 			table.insert(errors, resultOrError.error)
 		end
 	end
-	return Error(table.concat(errors, '\n'))
+	local error = {
+		childErrors = errors,
+		message = table.concat(errors, '\n'),
+		stacks = {debug.traceback()},
+	}
+	return ResultOrError.Error(error)
 end
-
-ResultOrError.Result = Result
-ResultOrError.Error = Error
 
 return ResultOrError

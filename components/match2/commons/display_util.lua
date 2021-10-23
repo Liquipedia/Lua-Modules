@@ -7,8 +7,11 @@
 --
 
 local Array = require('Module:Array')
+local ErrorDisplay = require('Module:Error/Display')
+local ErrorExt = require('Module:Error/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
+local Logic = require('Module:Logic')
 local TypeUtil = require('Module:TypeUtil')
 
 local DisplayUtil = {propTypes = {}, types = {}}
@@ -44,56 +47,21 @@ DisplayUtil.assertPropTypes = function(props, propTypes, options)
 	end
 end
 
-DisplayUtil.propTypes.LuaError = {
-	message = 'string',
-	backtrace = 'string',
-}
-
--- Shows the message and stack trace of a lua error.
-function DisplayUtil.LuaError(props)
-	DisplayUtil.assertPropTypes(props, DisplayUtil.propTypes.LuaError)
-	local messageNode = mw.html.create('div')
-		:addClass('error')
-		:css('font-weight', 'bold')
-		:wikitext('Lua error: ' .. props.message)
-	local backtraceNode = mw.html.create('div')
-		:wikitext('Backtrace:<br>')
-		:wikitext(props.backtrace)
-	return mw.html.create('div')
-		:node(messageNode)
-		:node(backtraceNode)
-end
-
 --[[
 Attempts to render a component written in the pure function style. If an error
 is encountered when rendering the component, show the error and stack trace
 instead of the component.
 ]]
 function DisplayUtil.TryPureComponent(Component, props)
-	local resultNode, errorNode = DisplayUtil.try(function() return Component(props) end)
-	return errorNode or resultNode
-end
-
---[[
-Attempts to invoke a function. If successful, returns the result. If an error
-is encountered, render the error and stack trace, and return it in the 2nd return
-value.
-]]
-function DisplayUtil.try(f)
-	local result, errorNode
-	xpcall(function()
-		result = f()
-	end, function(message)
-		local backtrace = debug.traceback()
-		mw.log('Error occured when invoking a function: (caught by DisplayUtil.try)')
-		mw.log(message)
-		mw.log(backtrace)
-		errorNode = DisplayUtil.LuaError({
-			message = message,
-			backtrace = backtrace,
-		})
+	return Logic.try(function()
+		return Component(props)
 	end)
-	return result, errorNode
+		:catch(function(error)
+			error.header = 'Error occured when invoking a function: (caught by DisplayUtil.try)'
+			ErrorExt.log(error)
+			return ErrorDisplay.ErrorDetails(error)
+		end)
+		:get()
 end
 
 DisplayUtil.types.OverflowModes = TypeUtil.literalUnion('ellipsis', 'wrap', 'hidden')

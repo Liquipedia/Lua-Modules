@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Error = require('Module:Error')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
@@ -69,12 +70,13 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	local bracketDatasById = Logic.try(function()
 		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	end)
-		:catch(function(message)
-			if FeatureFlag.get('prompt_purge_bracket_template') and String.endsWith(message, 'does not exist') then
-				table.insert(warnings, message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
+		:catch(function(err)
+			assert(Error.isError(err))
+			if FeatureFlag.get('prompt_purge_bracket_template') and String.endsWith(err.message, 'does not exist') then
+				table.insert(warnings, err.message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
 				return {}
 			else
-				error(message)
+				error(err)
 			end
 		end)
 		:get()
