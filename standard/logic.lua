@@ -80,6 +80,54 @@ function Logic.try(f)
 	return require('Module:ResultOrError').try(f)
 end
 
+--[[
+Returns the result of a function if successful. Otherwise it returns the result
+of the second function.
+
+If the first function fails, its error is logged to the console and stashed
+away for display.
+
+Parameters:
+
+f() -> any
+Parameterless function, and returns at most a single value. Additional return
+values beyond the first are ignored.
+
+other(error: Error) -> any
+The thrown Error instance is its sole parameter. Additional return values
+beyond the first are ignored.
+
+makeError(error: Error) -> Error
+optional function that allows customizing the Error instance being logged and stashed.
+
+]]
+function Logic.tryOrElseLog(f, other, makeError)
+	return Logic.try(f)
+		:catch(function(error)
+			error.header = 'Error occured while calling a function: (caught by Logic.tryOrElseLog)'
+			if makeError then
+				error = makeError(error)
+			end
+
+			require('Module:Error/Ext').logAndStash(error)
+
+			if other then
+				return other(error)
+			end
+		end)
+		:get()
+end
+
+--[[
+Returns the result of a function if successful. Otherwise it returns nil.
+
+If the first function fails, its error is logged to the console and stashed
+away for display.
+]]
+function Logic.tryOrLog(f, makeError)
+	return Logic.tryOrElseLog(f, nil, makeError)
+end
+
 function Logic.isNumeric(val)
 	return tonumber(val) ~= nil
 end

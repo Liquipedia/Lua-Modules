@@ -11,6 +11,11 @@ local Table = require('Module:Table')
 
 local ErrorExt = {}
 
+function ErrorExt.logAndStash(error)
+	require('Module:Error/Stash').add(error)
+	ErrorExt.log(error)
+end
+
 function ErrorExt.log(error)
 	mw.log(ErrorExt.makeFullDetails(error))
 	mw.log()
