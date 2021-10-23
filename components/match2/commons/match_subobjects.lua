@@ -9,6 +9,7 @@
 local Arguments = require('Module:Arguments')
 local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
+local ErrorStash = require('Module:Error/Stash')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -20,6 +21,7 @@ local MatchSubobjects = {}
 
 function MatchSubobjects.getOpponent(frame)
 	local args = Arguments.getArgs(frame)
+	ErrorStash.deferDisplay()
 	return Json.stringify(MatchSubobjects.luaGetOpponent(frame, args))
 end
 
@@ -35,6 +37,7 @@ end
 
 function MatchSubobjects.getMap(frame)
 	local args = Arguments.getArgs(frame)
+	ErrorStash.deferDisplay()
 	return Json.stringify(MatchSubobjects.luaGetMap(frame, args))
 end
 
@@ -60,6 +63,7 @@ end
 
 function MatchSubobjects.getRound(frame)
 	local args = Arguments.getArgs(frame)
+	ErrorStash.deferDisplay()
 	return Json.stringify(MatchSubobjects.luaGetRound(frame, args))
 end
 
@@ -69,6 +73,7 @@ end
 
 function MatchSubobjects.getPlayer(frame)
 	local args = Arguments.getArgs(frame)
+	ErrorStash.deferDisplay()
 	return Json.stringify(MatchSubobjects.luaGetPlayer(frame, args))
 end
 

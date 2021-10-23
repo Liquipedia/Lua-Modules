@@ -8,6 +8,9 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local Error = require('Module:Error')
+local ErrorStash = require('Module:Error/Stash')
+local ErrorExt = require('Module:Error/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -27,6 +30,7 @@ function Match.storeFromArgs(frame)
 end
 
 function Match.toEncodedJson(frame)
+	ErrorStash.deferDisplay()
 	local args = Arguments.getArgs(frame)
 	return Match._toEncodedJson(args)
 end
@@ -69,42 +73,56 @@ function Match.storeMatchGroup(matchRecords, options)
 	}
 	local LegacyMatch = (options.storeMatch1 or options.storeSmw) and Lua.requireIfExists('Module:Match/Legacy')
 
-	matchRecords = Array.map(matchRecords, function(matchRecord)
+	local preparedMatchRecords, errors_ = ErrorExt.mapTry(matchRecords, function(matchRecord)
 		local records = Match.splitRecordsByType(matchRecord)
 		Match._prepareRecordsForStore(records)
 		Match.populateSubobjectReferences(records)
 		return records.matchRecord
 	end)
+	if #errors_ > 0 then
+		local error = Match.summarizeErrors(errors_, 'Error preparing matches for storage.')
+		ErrorExt.logAndStash(error)
+	end
 
 	-- Store matches in a page variable to bypass LPDB on the same page
 	if options.storePageVar then
 		assert(options.bracketId, 'Match.storeMatchGroup: Expect options.bracketId to specified')
-		globalVars:set('match2bracket_' .. options.bracketId, Json.stringify(matchRecords))
+		globalVars:set('match2bracket_' .. options.bracketId, Json.stringify(preparedMatchRecords))
 		globalVars:set('match2bracketindex', (globalVars:get('match2bracketindex') or 0) + 1)
 	end
 
 	local matchRecordsCopy
 	if LegacyMatch or options.storeMatch2 then
-		matchRecordsCopy = Array.map(matchRecords, Match.copyRecords)
+		matchRecordsCopy = Array.map(preparedMatchRecords, Match.copyRecords)
 		Array.forEach(matchRecordsCopy, Match.encodeJson)
 	end
 
 	if options.storeMatch2 then
-		local recordsList
-		if LegacyMatch then
-			recordsList = Array.map(matchRecordsCopy, Match.splitRecordsByType)
-			Array.forEach(recordsList, Match.populateSubobjectReferences)
-		end
-		Array.forEach(matchRecordsCopy, Match._storeMatch2InLpdb)
-		if LegacyMatch then
-			Array.forEach(recordsList, Match.populateSubobjectReferences)
+		local _, errors = ErrorExt.mapTry(matchRecordsCopy, function(matchRecord)
+			local records
+			if LegacyMatch then
+				records = Match.splitRecordsByType(matchRecord)
+				Match.populateSubobjectReferences(records)
+			end
+			Match._storeMatch2InLpdb(matchRecord)
+			if LegacyMatch then
+				Match.populateSubobjectReferences(records)
+			end
+		end)
+		if #errors > 0 then
+			local error = Match.summarizeErrors(errors, 'Error storing match2 records.')
+			ErrorExt.logAndStash(error)
 		end
 	end
 
 	if LegacyMatch then
-		Array.forEach(matchRecordsCopy, function(matchRecord)
+		local _, errors = ErrorExt.mapTry(matchRecordsCopy, function(matchRecord)
 			LegacyMatch.storeMatch(matchRecord, options)
 		end)
+		if #errors > 0 then
+			local error = Match.summarizeErrors(errors, 'Error storing legacy match or SMW records.')
+			ErrorExt.logAndStash(error)
+		end
 	end
 end
 
@@ -143,10 +161,6 @@ Groups subobjects by type (game, opponent, player), and removes direct
 references between a match record and its subobject records.
 ]]
 function Match.splitRecordsByType(match)
-	if match == nil or type(match) ~= 'table' then
-		return {}
-	end
-
 	local gameRecordList = Match._moveRecordsFromMatchToList(
 		match,
 		match.match2games or match.games or {},
@@ -165,10 +179,6 @@ function Match.splitRecordsByType(match)
 
 	local playerRecordList = {}
 	for opponentIndex, opponentRecord in ipairs(opponentRecordList) do
-		if type(opponentRecord) ~= 'table' then
-			break
-		end
-
 		table.insert(
 			playerRecordList,
 			Match._moveRecordsFromMatchToList(
@@ -177,7 +187,6 @@ function Match.splitRecordsByType(match)
 				'opponent' .. opponentIndex .. '_p'
 			)
 		)
-
 		opponentRecord.match2players = nil
 		opponentRecord.players = nil
 	end
@@ -393,6 +402,34 @@ function Match.clampFields(record, allowedKeys)
 			record[key] = nil
 		end
 	end
+end
+
+function Match.summarizeErrors(errors, messagePart)
+	local function getMatchId(error)
+		if type(error.elem) == 'string' then
+			return error.elem
+		elseif type(error.elem) == 'table' then
+			return error.elem.match2id or error.elem.matchid
+		else
+			return 'unknown'
+		end
+	end
+
+	local matchIds = Array.map(errors, getMatchId)
+	local matchIdCutoff = 5
+	local message = table.concat({
+		messagePart,
+		' Match IDs: ',
+		table.concat(Array.sub(matchIds, 1, matchIdCutoff), ', '),
+		#matchIds > matchIdCutoff and (', ... (' .. #matchIds .. ' total)') or '',
+	})
+
+	return Error{
+		childErrors = errors,
+		matchIds = matchIds,
+		message = message,
+		stacks = {debug.traceback()},
+	}
 end
 
 -- Entry point from Template:TemplateMatch

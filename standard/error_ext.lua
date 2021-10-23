@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
 local ErrorExt = {}
@@ -69,6 +70,25 @@ function ErrorExt.makeFullStackTrace(error)
 		end)
 	)
 	return table.concat(parts, '\n')
+end
+
+--[[
+Variant of Array.map that wraps an error handler around each element
+transformation. At the end, the successfully transformed elements are separated
+from the errors, and both are returned.
+]]
+function ErrorExt.mapTry(elems, f)
+	local errors = {}
+	local results = Array.map(elems, function(elem, index)
+		return Logic.try(function() return f(elem, index) end)
+			:catch(function(error)
+				error.elem = elem
+				error.index = index
+				table.insert(errors, error)
+			end)
+			:get()
+	end)
+	return results, errors
 end
 
 return ErrorExt

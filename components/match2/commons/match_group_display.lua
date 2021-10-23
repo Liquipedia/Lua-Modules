@@ -8,7 +8,10 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local DisplayUtil = require('Module:DisplayUtil')
+local ErrorDisplay = require('Module:Error/Display')
 local FeatureFlag = require('Module:FeatureFlag')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local WarningBox = require('Module:WarningBox')
@@ -40,9 +43,10 @@ function MatchGroupDisplay.MatchlistBySpec(args)
 		})
 	end
 
-	local parts = Array.extend(
-		{matchlistNode},
-		Array.map(optionsWarnings, WarningBox.display)
+	local parts = DisplayUtil.extendArray(
+		matchlistNode,
+		Array.map(optionsWarnings, WarningBox.display),
+		ErrorDisplay.StashedErrors({}).nodes
 	)
 	return table.concat(Array.map(parts, tostring))
 end
@@ -65,10 +69,11 @@ function MatchGroupDisplay.BracketBySpec(args)
 		})
 	end
 
-	local parts = Array.extend(
+	local parts = DisplayUtil.extendArray(
 		Array.map(optionsWarnings, WarningBox.display),
 		Array.map(bracketWarnings, WarningBox.display),
-		{bracketNode}
+		ErrorDisplay.StashedErrors({}).nodes,
+		bracketNode
 	)
 	return table.concat(Array.map(parts, tostring))
 end
@@ -95,13 +100,18 @@ function MatchGroupDisplay.MatchGroupById(args)
 		config = BracketDisplay.configFromArgs(args)
 	end
 
-	MatchGroupInput.applyOverrideArgs(matches, args)
+	Logic.tryOrLog(function()
+		MatchGroupInput.applyOverrideArgs(matches, args)
+	end)
 
 	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
-	return MatchGroupContainer({
-		bracketId = bracketId,
-		config = config,
-	})
+	local matchGroupNode = MatchGroupContainer({bracketId = bracketId, config = config})
+	local parts = DisplayUtil.extendArray(
+		matchGroupType == 'matchlist' and matchGroupNode or nil,
+		ErrorDisplay.StashedErrors({}).nodes,
+		matchGroupType == 'bracket' and matchGroupNode or nil
+	)
+	return table.concat(Array.map(parts, tostring))
 end
 
 --[[
@@ -124,11 +134,14 @@ function MatchGroupDisplay.MatchByMatchId(args)
 	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
 	local config = SingleMatchDisplay.configFromArgs(args)
 
-	local MatchGroupContainer = WikiSpecific.getMatchContainer('singleMatch')
-	return MatchGroupContainer({
-		matchId = fullMatchId,
-		config = config,
-	})
+	local MatchContainer = WikiSpecific.getMatchContainer('singleMatch')
+	local matchNode = MatchContainer({matchId = fullMatchId, config = config})
+	local parts = DisplayUtil.extendArray(
+		matchNode,
+		ErrorDisplay.StashedErrors({}).nodes
+	)
+	return table.concat(Array.map(parts, tostring))
+
 end
 
 

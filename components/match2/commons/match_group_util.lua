@@ -204,6 +204,7 @@ function MatchGroupUtil.makeMatchGroup(matchRecords)
 	}
 
 	if matchGroup.type == 'bracket' then
+		MatchGroupUtil.removeIncompleteEdges(matchGroup.bracketDatasById)
 		local roundPropsByMatchId, rounds = MatchGroupUtil.computeRounds(matchGroup.bracketDatasById, rootMatchIds)
 
 		MatchGroupUtil.populateAdvanceSpots(matchGroup)
@@ -434,6 +435,14 @@ function MatchGroupUtil.dfsFrom(bracketDatasById, start)
 		end,
 		start
 	)
+end
+
+function MatchGroupUtil.removeIncompleteEdges(bracketDatasById)
+	for _, bracketData in pairs(bracketDatasById) do
+		bracketData.lowerMatches = Array.filter(bracketData.lowerMatches, function(lowerMatch)
+			return bracketDatasById[lowerMatch.matchId] ~= nil
+		end)
+	end
 end
 
 function MatchGroupUtil.computeDepthsFrom(bracketDatasById, startMatchId)

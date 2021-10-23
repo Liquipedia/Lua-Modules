@@ -98,13 +98,11 @@ Display component for a match in a singleMatch. Consists of the match summary.
 function SingleMatchDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, SingleMatchDisplay.propTypes.Match)
 
-	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+	return DisplayUtil.tryOrLog(props.MatchSummaryContainer, {
 		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.match.matchId,
 		config = {showScore = true},
 	})
-
-	return matchSummaryNode
 end
 
 return Class.export(SingleMatchDisplay)

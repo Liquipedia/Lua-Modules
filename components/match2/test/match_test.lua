@@ -16,8 +16,6 @@ function suite:testSplitRecordsByType()
 		MatchTestConfig.EXPECTED_OUTPUT_AFTER_SPLIT, Match.splitRecordsByType(MatchTestConfig.EXAMPLE_MATCH))
 	self:assertDeepEquals(
 		MatchTestConfig.EXPECTED_OUTPUT_AFTER_SPLIT_SC2, Match.splitRecordsByType(MatchTestConfig.EXAMPLE_MATCH_SC2))
-	self:assertDeepEquals({}, Match.splitRecordsByType(nil))
-	self:assertDeepEquals({}, Match.splitRecordsByType('something'))
 end
 
 return suite

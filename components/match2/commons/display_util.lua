@@ -6,12 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local ErrorDisplay = require('Module:Error/Display')
-local ErrorExt = require('Module:Error/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
 local DisplayUtil = {propTypes = {}, types = {}}
@@ -47,23 +45,6 @@ DisplayUtil.assertPropTypes = function(props, propTypes, options)
 	end
 end
 
---[[
-Attempts to render a component written in the pure function style. If an error
-is encountered when rendering the component, show the error and stack trace
-instead of the component.
-]]
-function DisplayUtil.TryPureComponent(Component, props)
-	return Logic.try(function()
-		return Component(props)
-	end)
-		:catch(function(error)
-			error.header = 'Error occured when invoking a function: (caught by DisplayUtil.try)'
-			ErrorExt.log(error)
-			return ErrorDisplay.ErrorDetails(error)
-		end)
-		:get()
-end
-
 DisplayUtil.types.OverflowModes = TypeUtil.literalUnion('ellipsis', 'wrap', 'hidden')
 
 --[[
@@ -78,6 +59,34 @@ function DisplayUtil.applyOverflowStyles(node, mode)
 		:css('white-space', (mode == 'ellipsis' or mode == 'hidden') and 'pre' or 'normal')
 end
 
+--[[
+Attempts to render a display component in the pure function style. If it fails,
+then renders the Other component with the error instance.
+
+The error is logged and stashed for display. The props of the original display
+component is attached to the error.
+]]
+function DisplayUtil.tryOrElseLog(Component, props, Other)
+	return Logic.tryOrElseLog(
+		function() return Component(props) end,
+		Other,
+		function(error)
+			error.header = 'Error occured in display component: (caught by DisplayUtil.tryOrElseLog)'
+			error.props = props
+			return error
+		end
+	)
+end
+
+--[[
+Attempts to render a display component in the pure function style. Returns nil
+upon failure.
+
+The error is logged and stashed for display. The props of the display component
+is attached to the error.
+]]
+DisplayUtil.tryOrLog = DisplayUtil.tryOrElseLog
+
 -- Whether a value is a mediawiki html node.
 local mwHtmlMetatable = FnUtil.memoize(function()
 	return getmetatable(mw.html.create('div'))
@@ -88,19 +97,36 @@ function DisplayUtil.isMwHtmlNode(x)
 end
 
 --[[
+Like Array.extendWith, except that mediawiki html nodes are not considered arrays.
+]]
+function DisplayUtil.extendWithArray(outs, ...)
+	local inputs = Table.pack(...)
+	for i = 1, inputs.n do
+		local elem = inputs[i]
+		if type(elem) == 'table'
+			and not DisplayUtil.isMwHtmlNode(elem) then
+			for _, innerElem in ipairs(elem) do
+				table.insert(outs, innerElem)
+			end
+		elseif elem ~= nil then
+			table.insert(outs, elem)
+		end
+	end
+	return outs
+end
+
+--[[
+Like Array.extend, except that mediawiki html nodes are not considered arrays.
+]]
+function DisplayUtil.extendArray(...)
+	return DisplayUtil.extendWithArray({}, ...)
+end
+
+--[[
 Like Array.flatten, except that mediawiki html nodes are not considered arrays.
 ]]
 function DisplayUtil.flattenArray(elems)
-	local flattened = {}
-	for _, elem in ipairs(elems) do
-		if type(elem) == 'table'
-			and not DisplayUtil.isMwHtmlNode(elem) then
-			Array.extendWith(flattened, elem)
-		elseif elem then
-			table.insert(flattened, elem)
-		end
-	end
-	return flattened
+	return DisplayUtil.extendArray(unpack(elems))
 end
 
 --[===[

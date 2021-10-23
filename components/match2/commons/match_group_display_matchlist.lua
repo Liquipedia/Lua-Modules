@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
+local ErrorDisplay = require('Module:Error/Display')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -136,33 +137,37 @@ function MatchlistDisplay.Match(props)
 	local function renderOpponent(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
 
-		local opponentNode = props.Opponent({
+		local opponentNode = DisplayUtil.tryOrLog(props.Opponent, {
 			opponent = opponent,
 			resultType = match.resultType,
 			side = opponentIx == 1 and 'left' or 'right',
 		})
+			or mw.html.create('div'):addClass('brkts-matchlist-cell')
 		return DisplayHelper.addOpponentHighlight(opponentNode, opponent)
 	end
 
 	local function renderScore(opponentIx)
 		local opponent = match.opponents[opponentIx] or MatchGroupUtil.createOpponent({})
 
-		local scoreNode = props.Score({
+		local scoreNode = DisplayUtil.tryOrLog(props.Score, {
 			opponent = opponent,
 			resultType = match.resultType,
 			side = opponentIx == 1 and 'left' or 'right',
 		})
+			or mw.html.create('div'):addClass('brkts-matchlist-cell')
 		return DisplayHelper.addOpponentHighlight(scoreNode, opponent)
 	end
 
 	local matchInfoIconNode
 	local matchSummaryNode
 	if props.matchHasDetails(match) then
+		local bracketId, _ = MatchGroupUtil.splitMatchId(match.matchId)
 		matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')
-		matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-			bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
-			matchId = props.match.matchId,
-		})
+		matchSummaryNode = DisplayUtil.tryOrElseLog(
+			props.MatchSummaryContainer,
+			{bracketId = bracketId, matchId = match.matchId},
+			ErrorDisplay.ErrorDetails
+		)
 			:addClass('brkts-match-info-popup')
 	else
 		matchInfoIconNode = mw.html.create('div'):addClass('brkts-matchlist-placeholder-cell')

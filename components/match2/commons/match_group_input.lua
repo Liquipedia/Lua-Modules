@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Error = require('Module:Error')
+local ErrorExt = require('Module:Error/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
@@ -18,6 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 local globalVars = PageVariableNamespace()
@@ -29,19 +31,16 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 	Variables.varDefine('bracket_header', sectionHeader)
 	local tournamentParent = Variables.varDefault('tournament_parent', '')
 
-	local matches = {}
-	for matchKey, matchArgs in Table.iter.pairsByPrefix(args, 'M') do
+	local function readMatch(matchKey)
 		local matchIndex = tonumber(matchKey:match('(%d+)$'))
 		local matchId = string.format('%04d', matchIndex)
 
-		matchArgs = Json.parse(matchArgs)
+		local matchArgs = Json.parse(args[matchKey])
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
 		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
 		match.parent = tournamentParent
-
-		table.insert(matches, match)
 
 		-- Add more fields to bracket data
 		match.bracketdata = match.bracketdata or {}
@@ -53,6 +52,18 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
 		bracketData.bracketindex = Variables.varDefault('match2bracketindex', 0)
 		bracketData.sectionheader = sectionHeader
+
+		return match
+	end
+
+	local matchKeys = {}
+	for matchKey, _ in Table.iter.pairsByPrefix(args, 'M') do
+		table.insert(matchKeys, matchKey)
+	end
+	local matches, errors = ErrorExt.mapTry(matchKeys, readMatch)
+	if #errors > 0 then
+		local summary = Match.summarizeErrors(errors, 'Error reading match inputs')
+		ErrorExt.logAndStash(summary)
 	end
 
 	return matches
@@ -135,7 +146,11 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 	local matchIds = Array.extractKeys(bracketDatasById)
 	table.sort(matchIds)
-	local matches = Array.map(matchIds, readMatch)
+	local matches, errors = ErrorExt.mapTry(matchIds, readMatch)
+	if #errors > 0 then
+		local summary = Match.summarizeErrors(errors, 'Error reading match inputs')
+		ErrorExt.logAndStash(summary)
+	end
 
 	if #missingMatchKeys ~= 0 and options.shouldWarnMissing then
 		table.insert(warnings, 'Missing matches: ' .. table.concat(missingMatchKeys, ', '))

@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
+local ErrorDisplay = require('Module:Error/Display')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -111,7 +112,9 @@ function BracketDisplay.Bracket(props)
 		scoreWidth = propsConfig.scoreWidth or defaultConfig.scoreWidth,
 	}
 
-	local headerRowsByMatchId = BracketDisplay.computeHeaderRows(props.bracket, config)
+	local headerRowsByMatchId = Logic.tryOrLog(function()
+		return BracketDisplay.computeHeaderRows(props.bracket, config)
+	end) or {}
 	local layoutsByMatchId = BracketDisplay.computeBracketLayout(props.bracket, config, headerRowsByMatchId)
 
 	local bracketNode = html.create('div'):addClass('brkts-bracket')
@@ -435,7 +438,9 @@ function BracketDisplay.NodeBody(props)
 	local bracketResetMatch = match.bracketData.bracketResetMatchId
 		and props.matchesById[match.bracketData.bracketResetMatchId]
 	if bracketResetMatch then
-		match = MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+		Logic.tryOrLog(function()
+			match = MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+		end)
 	end
 
 	-- Current match
@@ -450,67 +455,75 @@ function BracketDisplay.NodeBody(props)
 		:css('margin-bottom', config.matchMargin .. 'px')
 
 	-- Third place match
-	local thirdPlaceMatch = match.bracketData.thirdPlaceMatchId
-		and props.matchesById[match.bracketData.thirdPlaceMatchId]
-	local thirdPlaceHeaderNode
-	local thirdPlaceMatchNode
-	if thirdPlaceMatch then
-		thirdPlaceHeaderNode = BracketDisplay.MatchHeader({
-			header = thirdPlaceMatch.bracketData.header or '!tp',
-			height = config.headerHeight,
-		})
-			:addClass('brkts-third-place-header')
-			:css('margin-top', 20 + config.headerMargin .. 'px')
-			:css('margin-bottom', config.headerMargin .. 'px')
-		thirdPlaceMatchNode = BracketDisplay.Match({
-			MatchSummaryContainer = config.MatchSummaryContainer,
-			OpponentEntry = config.OpponentEntry,
-			match = thirdPlaceMatch,
-			matchHasDetails = config.matchHasDetails,
-			opponentHeight = config.opponentHeight,
-		})
-			:addClass('brkts-third-place-match')
-	end
+	local thirdPlaceNode = Logic.tryOrLog(function()
+		local thirdPlaceMatch = match.bracketData.thirdPlaceMatchId
+			and props.matchesById[match.bracketData.thirdPlaceMatchId]
+		if thirdPlaceMatch then
+			local tpHeaderNode = BracketDisplay.MatchHeader({
+				header = thirdPlaceMatch.bracketData.header or '!tp',
+				height = config.headerHeight,
+			})
+				:addClass('brkts-third-place-header')
+				:css('margin-top', 20 + config.headerMargin .. 'px')
+				:css('margin-bottom', config.headerMargin .. 'px')
+
+			local tpMatchNode = BracketDisplay.Match({
+				MatchSummaryContainer = config.MatchSummaryContainer,
+				OpponentEntry = config.OpponentEntry,
+				match = thirdPlaceMatch,
+				matchHasDetails = config.matchHasDetails,
+				opponentHeight = config.opponentHeight,
+			})
+				:addClass('brkts-third-place-match')
+
+			return mw.html.create('span'):node(tpHeaderNode):node(tpMatchNode)
+		end
+	end)
 
 	local centerNode = html.create('div'):addClass('brkts-round-center')
 		:addClass(bracketResetMatch and 'brkts-br-wrapper' or nil)
 		:node(matchNode)
-		:node(thirdPlaceHeaderNode)
-		:node(thirdPlaceMatchNode)
+	if thirdPlaceNode then
+		for _, node in ipairs(thirdPlaceNode.nodes) do
+			centerNode:node(node)
+		end
+	end
 
 	-- Qualifier entries
-	local qualWinNode
-	if match.bracketData.qualWin then
-		local opponent = match.winner
-			and match.opponents[match.winner]
-			or MatchGroupUtil.createOpponent({
-				type = 'literal',
-				name = match.bracketData.qualWinLiteral or '',
+	local qualWinNode = Logic.tryOrLog(function()
+		if match.bracketData.qualWin then
+			local opponent = match.winner
+				and match.opponents[match.winner]
+				or MatchGroupUtil.createOpponent({
+					type = 'literal',
+					name = match.bracketData.qualWinLiteral or '',
+				})
+			return BracketDisplay.Qualified({
+				OpponentEntry = config.OpponentEntry,
+				height = config.opponentHeight,
+				opponent = opponent,
 			})
-		qualWinNode = BracketDisplay.Qualified({
-			OpponentEntry = config.OpponentEntry,
-			height = config.opponentHeight,
-			opponent = opponent,
-		})
-			:css('margin-top', layout.matchMarginTop + layout.matchHeight / 2 - config.opponentHeight / 2 .. 'px')
-			:css('margin-bottom', config.matchMargin .. 'px')
-	end
+				:css('margin-top', layout.matchMarginTop + layout.matchHeight / 2 - config.opponentHeight / 2 .. 'px')
+				:css('margin-bottom', config.matchMargin .. 'px')
+		end
+	end)
 
-	local qualLoseNode
-	if match.bracketData.qualLose then
-		local opponent = BracketDisplay.getRunnerUpOpponent(match)
-			or MatchGroupUtil.createOpponent({
-				type = 'literal',
-				name = match.bracketData.qualLoseLiteral or '',
+	local qualLoseNode = Logic.tryOrLog(function()
+		if match.bracketData.qualLose then
+			local opponent = BracketDisplay.getRunnerUpOpponent(match)
+				or MatchGroupUtil.createOpponent({
+					type = 'literal',
+					name = match.bracketData.qualLoseLiteral or '',
+				})
+			return BracketDisplay.Qualified({
+				OpponentEntry = config.OpponentEntry,
+				height = config.opponentHeight,
+				opponent = opponent,
 			})
-		qualLoseNode = BracketDisplay.Qualified({
-			OpponentEntry = config.OpponentEntry,
-			height = config.opponentHeight,
-			opponent = opponent,
-		})
-			:css('margin-top', config.matchMargin + 6 .. 'px')
-			:css('margin-bottom', config.matchMargin .. 'px')
-	end
+				:css('margin-top', config.matchMargin + 6 .. 'px')
+				:css('margin-bottom', config.matchMargin .. 'px')
+		end
+	end)
 
 	local qualNode
 	if qualWinNode or qualLoseNode then
@@ -519,13 +532,22 @@ function BracketDisplay.NodeBody(props)
 			:node(qualLoseNode)
 	end
 
+	local lowerConnectorsNode = lowerNode and (
+		DisplayUtil.tryOrLog(BracketDisplay.NodeLowerConnectors, props)
+			or mw.html.create('div'):addClass('brkts-round-lower-connectors')
+	)
+	local qualConnectorsNode = qualNode and (
+		DisplayUtil.tryOrLog(BracketDisplay.NodeQualConnectors, props)
+			or mw.html.create('div'):addClass('brkts-round-qual-connectors')
+	)
+
 	return html.create('div'):addClass('brkts-round-body')
 		:css('--skip-round', match.bracketData.skipRound)
 		:css('--qual-skip', match.bracketData.qualSkip)
 		:node(lowerNode)
-		:node(lowerNode and BracketDisplay.NodeLowerConnectors(props) or nil)
+		:node(lowerConnectorsNode)
 		:node(centerNode)
-		:node(qualNode and BracketDisplay.NodeQualConnectors(props) or nil)
+		:node(qualConnectorsNode)
 		:node(qualNode)
 end
 
@@ -546,11 +568,15 @@ function BracketDisplay.Match(props)
 	local matchNode = html.create('div'):addClass('brkts-match brkts-match-popup-wrapper')
 
 	for ix, opponent in ipairs(props.match.opponents) do
-		local opponentEntryNode = props.OpponentEntry({
-			displayType = 'bracket',
-			height = props.opponentHeight,
-			opponent = opponent,
-		})
+		local opponentEntryNode = DisplayUtil.tryOrElseLog(
+			props.OpponentEntry,
+			{
+				displayType = 'bracket',
+				height = props.opponentHeight,
+				opponent = opponent,
+			},
+			function() return mw.html.create('div'):addClass('brkts-opponent-entry') end
+		)
 			:addClass(ix == #props.match.opponents and 'brkts-opponent-entry-last' or nil)
 			:css('height', props.opponentHeight .. 'px')
 		DisplayHelper.addOpponentHighlight(opponentEntryNode, opponent)
@@ -558,10 +584,12 @@ function BracketDisplay.Match(props)
 	end
 
 	if props.matchHasDetails(props.match) then
-		local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-			bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
-			matchId = props.match.matchId,
-		})
+		local bracketId, _ = MatchGroupUtil.splitMatchId(props.match.matchId)
+		local matchSummaryNode = DisplayUtil.tryOrElseLog(
+			props.MatchSummaryContainer,
+			{bracketId = bracketId, matchId = props.match.matchId},
+			ErrorDisplay.ErrorDetails
+		)
 			:addClass('brkts-match-info-popup')
 
 		local matchInfoIconNode = html.create('div'):addClass('brkts-match-info-icon')
@@ -589,11 +617,15 @@ Display component for a qualification spot.
 function BracketDisplay.Qualified(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.Qualified)
 
-	local opponentEntryNode = props.OpponentEntry({
-		displayType = 'bracket-qualified',
-		height = props.height,
-		opponent = props.opponent,
-	})
+	local opponentEntryNode = DisplayUtil.tryOrElseLog(
+		props.OpponentEntry,
+		{
+			displayType = 'bracket-qualified',
+			height = props.height,
+			opponent = props.opponent,
+		},
+		function() return mw.html.create('div'):addClass('brkts-opponent-entry') end
+	)
 		:addClass('brkts-opponent-entry-last')
 		:css('height', props.height .. 'px')
 	DisplayHelper.addOpponentHighlight(opponentEntryNode, props.opponent)
