@@ -6,6 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local ErrorDisplay = require('Module:Error/Display')
+local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local StringUtils = require('Module:StringUtils')
 
@@ -60,7 +63,7 @@ function Lua.import(name, options)
 		end
 
 		local devName = name .. '/dev'
-		if require('Module:FeatureFlag').get('dev') and Lua.moduleExists(devName) then
+		if FeatureFlag.get('dev') and Lua.moduleExists(devName) then
 			return require(devName)
 		else
 			return require(name)
@@ -108,11 +111,37 @@ function Lua.invoke(frame)
 	frame.args.module = nil
 	frame.args.fn = nil
 
-	local flags = {dev = Logic.readBoolOrNil(frame.args.dev)}
-	return require('Module:FeatureFlag').with(flags, function()
-		local module = Lua.import('Module:' .. moduleName, {requireDevIfEnabled = true})
-		return module[fnName](frame)
+	return Lua._prepareAndInvoke(frame, 'Module:' .. moduleName, fnName)
+end
+
+function Lua._prepareAndInvoke(frame, baseModuleName, fnName)
+	local dev
+	if type(frame.args) == 'table' then
+		dev = frame.args.dev
+	else
+		dev = frame.dev
+	end
+
+	local flags = {dev = Logic.readBoolOrNil(dev)}
+	return FeatureFlag.with(flags, function()
+		local module = Lua.import(baseModuleName, {requireDevIfEnabled = true})
+		if not module[fnName] then
+			error('Lua.invoke: No such function'
+				.. ' (module=' .. baseModuleName .. ', fn=' .. fnName .. ', dev=' .. FeatureFlag.get('dev') .. ')')
+		end
+		local fn = module['_autoInvoke_inner_' .. fnName] or module[fnName]
+		return Lua._callAndDisplayErrors(fn, frame)
 	end)
+end
+
+function Lua._callAndDisplayErrors(fn, frame)
+	local parts = {
+		Logic.tryOrLog(function() return fn(frame) end) or '',
+	}
+	for _, node in ipairs(ErrorDisplay.StashedErrors({}).nodes) do
+		table.insert(parts, node)
+	end
+	return table.concat(Array.map(parts, tostring))
 end
 
 --[[
@@ -122,10 +151,10 @@ point can be #invoked directly, without needing Lua.invoke.
 Usage:
 
 function JayModule.TemplateJay(frame) ... end
-JayModule.TemplateJay = Lua.wrapAutoInvoke(JayModule, 'Module:JayModule', 'TemplateJay')
+Lua.setupAutoInvoke(JayModule, 'Module:JayModule', 'TemplateJay')
 
 ]]
-function Lua.wrapAutoInvoke(module, baseModuleName, fnName)
+function Lua.setupAutoInvoke(module, baseModuleName, fnName)
 	assert(
 		not StringUtils.endsWith(baseModuleName, '/dev'),
 		'Lua.wrapAutoInvoke: Module name should not end in \'/dev\''
@@ -135,22 +164,9 @@ function Lua.wrapAutoInvoke(module, baseModuleName, fnName)
 		'Lua.wrapAutoInvoke: Module name must begin with \'Module:\''
 	)
 
-	local moduleFn = module[fnName]
-
-	return function(frame)
-		local dev
-		if type(frame.args) == 'table' then
-			dev = frame.args.dev
-		else
-			dev = frame.dev
-		end
-
-		local flags = {dev = Logic.readBoolOrNil(dev)}
-		return require('Module:FeatureFlag').with(flags, function()
-			local variantModule = Lua.import(baseModuleName, {requireDevIfEnabled = true})
-			local fn = module == variantModule and moduleFn or variantModule[fnName]
-			return fn(frame)
-		end)
+	module['_autoInvoke_inner_' .. fnName] = module[fnName]
+	module[fnName] = function(frame)
+		return Lua._prepareAndInvoke(frame, baseModuleName, fnName)
 	end
 end
 
@@ -176,7 +192,7 @@ function Lua.autoInvokeEntryPoints(module, baseModuleName, fnNames)
 	fnNames = fnNames or Lua.getDefaultEntryPoints(module)
 
 	for _, fnName in ipairs(fnNames) do
-		module[fnName] = Lua.wrapAutoInvoke(module, baseModuleName, fnName)
+		Lua.setupAutoInvoke(module, baseModuleName, fnName)
 	end
 end
 
