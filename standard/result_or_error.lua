@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Error = require('Module:Error')
+local FeatureFlag = require('Module:FeatureFlag')
 
 --[[
 A structurally typed, immutable class that represents either a result or an
@@ -180,6 +181,64 @@ function ResultOrError.any(resultOrErrors)
 		stacks = {debug.traceback()},
 	}
 	return ResultOrError.Error(error)
+end
+
+--[[
+A simple linear congruential generator with 16-bit state and 8-bit output.
+
+State is stored on page variables. Use {{#vardefine:seed|...}} to reset and
+seed.
+]]
+local function lcg8()
+	local PageVariableNamespace = require('Module:PageVariableNamespace')
+	local globalVars = PageVariableNamespace()
+	local pageVars = PageVariableNamespace('ResultOrError')
+
+	local function iter(state)
+		return (25385 * state + 1) % 0x10000
+	end
+
+	return function()
+		local seedVar = globalVars:get('seed')
+		local seed
+		if seedVar then
+			seed = tonumber(seedVar) % 0x10000
+			globalVars:delete('seed')
+		end
+
+		local state = seed and iter(seed)
+			or tonumber(pageVars:get('state'))
+			or iter(0)
+		state = iter(state)
+		pageVars:set('state', state)
+		return math.floor(state / 0x100)
+	end
+end
+
+--[[
+Inject random errors into ResultOrError.try, so that each call has a probabilty
+of failing.
+
+ResultOrError.try invoked from error handlers are unaffected.
+]]
+function ResultOrError.setupRandomErrors(failRate)
+	local random = lcg8()
+	local try = ResultOrError.try
+	ResultOrError.try = function(f, originalError)
+		return try(
+			function()
+				if originalError == nil and random() / 0x100 < failRate then
+					error('Simulated error (failRate=' .. failRate .. ')')
+				end
+				return f()
+			end,
+			originalError
+		)
+	end
+end
+
+if FeatureFlag.get('random_errors') then
+	ResultOrError.setupRandomErrors(0.1)
 end
 
 return ResultOrError
