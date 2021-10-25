@@ -35,16 +35,7 @@ function MatchSubobjects.luaGetOpponent(frame, args)
 
 	args = wikiSpec.processOpponent(frame, args)
 	args.match2players = args.players or Json.parseIfString(args.match2players)
-	return {
-		extradata = args.extradata,
-		icon = args.icon,
-		match2players = args.match2players,
-		name = args.name,
-		score = args.score,
-		template = args.template,
-		type = args.type,
-		-- other variables such as placement and status are set from Module:MatchGroup
-	}
+	return args
 end
 
 function MatchSubobjects.getMap(frame)
@@ -64,33 +55,16 @@ function MatchSubobjects.luaGetMap(frame, args)
 	else
 		args = wikiSpec.processMap(frame, args)
 
-		local participants = args.participants or {}
-		for key, item in pairs(participants) do
+		args.participants = args.participants or {}
+		for key, item in pairs(args.participants) do
 			if not key:match('%d_%d') then
 				error('Key \'' .. key .. '\' in match2game.participants has invalid format: \'<number>_<number>\' expected')
 			elseif type(item) ~= 'table' then
 				error('Item \'' .. tostring(item) .. '\' in match2game.participants has invalid format: table expected')
 			end
 		end
-		args.participants = participants
 
-		return {
-			date = args.date,
-			extradata = args.extradata,
-			game = args.game,
-			length = args.length,
-			map = args.map,
-			mode = args.mode,
-			participants = args.participants,
-			resulttype = args.resulttype,
-			rounds = args.rounds,
-			scores = args.scores,
-			subgroup = args.subgroup,
-			type = args.type,
-			vod = args.vod,
-			walkover = args.walkover,
-			winner = args.winner,
-		}
+		return args
 	end
 end
 
@@ -114,13 +88,7 @@ function MatchSubobjects.getPlayer(frame)
 end
 
 function MatchSubobjects.luaGetPlayer(frame, args)
-	args = wikiSpec.processPlayer(frame, args)
-	return {
-		displayname = args.displayname,
-		extradata = args.extradata,
-		flag = args.flag,
-		name = args.name,
-	}
+	return wikiSpec.processPlayer(frame, args)
 end
 
 function MatchSubobjects.withPerformanceSetup(f)
