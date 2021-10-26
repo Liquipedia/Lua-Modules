@@ -61,7 +61,7 @@ function LeagueIcon._make(icon, iconDark, link, name, size)
 		:wikitext('[[File:' .. icon .. imageOptions)
 	local darkSpan = mw.html.create('span')
 		:addClass('league-icon-small-image darkmode')
-		:wikitext('[[File:' .. icon .. imageOptions)
+		:wikitext('[[File:' .. iconDark .. imageOptions)
 	return tostring(lightSpan) .. tostring(darkSpan)
 end
 
