@@ -131,7 +131,7 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	local tierText = Tier.text[tier]
 	local hasInvalidTier = tierText == nil
 	local hasTypeSetAsTier
-	--the following converts a tier that should be types to tiertypes
+	--the following converts a tier that should be a tiertype
 	if hasInvalidTier then
 		local tempTypeForCheck = Tier.numberToType[tier] or tier
 		tempTypeForCheck = Tier.types[string.lower(tempTypeForCheck)]
@@ -194,10 +194,9 @@ end
 function CustomLeague:defineCustomPageVariables()
 	--overwrite vars set by the commons module
 	local name = self.name
-	Variables.varDefine('tournament_tickername', _args.tickername or name)
 
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
+	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
 
 	--Legacy date vars
@@ -234,7 +233,6 @@ function CustomLeague:defineCustomPageVariables()
 end
 
 function CustomLeague:addToLpdb(lpdbData)
-	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.participantsnumber = _args.team_number
 	lpdbData.publishertier = _args.pctier
 	lpdbData.extradata = {
