@@ -20,7 +20,7 @@ local Center = require('Module:Infobox/Widget/Center')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local _GAME_MODE = mw.loadData('Module:GameMode')
-local _EA_ICON = '[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
+local _EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
 	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
@@ -107,6 +107,9 @@ function CustomLeague:_createPrizepool()
 	local date
 	if not String.isEmpty(_args.currency_rate) then
 		date = _args.currency_date
+	end
+	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
+		return nil
 	end
 
 	return PrizePoolCurrency._get({
