@@ -530,6 +530,9 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('formatted_tournament_date', sdate)
 	Variables.varDefine('formatted_tournament_edate', edate)
 
+	--override var to standardize its entries
+	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game)] or {})[1] or _GAMES[_GAME_WOL][1])
+
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
