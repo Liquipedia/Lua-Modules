@@ -239,6 +239,21 @@ function CustomLeague:addToLpdb(lpdbData)
 		['is ea major'] = Variables.varDefault('tournament_ea_major', '')
 	}
 
+	--retrieve sponsors from _args.sponsors if sponsorX, X=1,...,3, is empty
+	if
+		String.isEmpty(_args.sponsor1) and
+		String.isEmpty(_args.sponsor2) and
+		String.isEmpty(_args.sponsor3) and
+		not String.isEmpty(_args.sponsor)
+	then
+		lpdbData.sponsors = {}
+		local sponsors = mw.text.split(_args.sponsor, '<br>', true)
+		for key, item in pairs(sponsors) do
+			lpdbData.sponsors['sponsor' .. key] = item
+		end
+		lpdbData.sponsors = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.sponsors)
+	end
+
 	return lpdbData
 end
 
