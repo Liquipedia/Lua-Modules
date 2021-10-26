@@ -192,9 +192,6 @@ function CustomLeague:_makeBasedListFromArgs(base)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	--overwrite vars set by the commons module
-	local name = self.name
-
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
