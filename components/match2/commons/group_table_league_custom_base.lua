@@ -40,7 +40,7 @@ end
 
 function Custom.parseOpponentInput.team(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
-		Team.page(_, (opponentArg or '') ~= '' and opponentArg or 'tbd')
+		Team.page(nil, (opponentArg or '') ~= '' and opponentArg or 'tbd')
 	)
 
 	local opponentListEntry = {
