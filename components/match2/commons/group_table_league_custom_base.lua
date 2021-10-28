@@ -1,5 +1,6 @@
 local String = require('Module:String')
 local Variables = require('Module:Variables')
+local Team = require('Module:Team')
 local LinkIcons = require('Module:MatchExternalLinks/Starcraft')
 
 local Custom = {
@@ -23,7 +24,7 @@ function Custom.parseOpponentInput.solo(param, opponentIndex, opponentArg, args,
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
 	)
 
-	opponentListEntry = {
+	local opponentListEntry = {
 		opponent = opponent,
 		opponentArg = opponentArg,
 		flag = args[param .. opponentIndex .. 'flag'] or Variables.varDefault(opponentArg .. '_flag', ''),
@@ -39,10 +40,10 @@ end
 
 function Custom.parseOpponentInput.team(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
-		TeamTemplates._teampage((opponentArg or '') ~= '' and opponentArg or 'tbd')
+		Team.page(_, (opponentArg or '') ~= '' and opponentArg or 'tbd')
 	)
 
-	opponentListEntry = {
+	local opponentListEntry = {
 		opponent = opponent,
 		opponentArg = opponentArg,
 	}
@@ -87,7 +88,8 @@ function Custom.lpdbConditions(args, opponents, mode, baseConditions, dateCondit
 				if key > 1 or key2 > 2 then
 					oppConditions = oppConditions .. ' OR '
 				end
-				oppConditions = oppConditions .. '[[opponent::' .. opponents[key] .. ']] AND [[opponent::' .. opponents[key2] .. ']]'
+				oppConditions = oppConditions ..
+					'[[opponent::' .. opponents[key] .. ']] AND [[opponent::' .. opponents[key2] .. ']]'
 			end
 		end
 		oppConditions = oppConditions .. ') '
