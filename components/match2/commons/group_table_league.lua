@@ -6,7 +6,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
-local Custom = require('Module:Hjpalpha/sandbox20')
+local Custom = require('Module:GroupTableLeague/Custom')
 
 local _aliasList = {}
 local _lpdbBaseConditions
