@@ -532,7 +532,7 @@ function GroupTableLeague.get(frame, args, data)
 					for _, alias in pairs(opponentAlias or {}) do
 						if mw.text.trim(alias) ~= '' then
 							local aliasName = mw.ext.TeamLiquidIntegration.resolve_redirect(alias)
-							_aliasList[aliasName] = opponentlist[opponentIndex].opponent
+							_aliasList[aliasName] = opponentList[opponentIndex].opponent
 							opponents[#opponents + 1] = aliasName
 						end
 					end
@@ -570,7 +570,10 @@ function GroupTableLeague.get(frame, args, data)
 					rounds[roundIndex].temp.games.loss[opponentIndex] = item
 
 				-- dqX
-				elseif (param == 'dq' or param == 'q') and opponentIndex and item == 'true' then -- TODO: param == 'q' is a temporary fix, resolve it correctly
+				elseif
+					(param == 'dq' or param == 'q')
+					and opponentIndex and item == 'true'
+				then -- TODO: param == 'q' is a temporary fix, resolve it correctly
 					rounds[roundIndex].params.disqualified[opponentIndex] = true
 				end
 
@@ -644,7 +647,7 @@ function GroupTableLeague.get(frame, args, data)
 				end
 			end
 		end
-		
+
 		if not(rounds[1]) or (rounds[#rounds].date < lastDate and not(isMidTournament)) then
 			if rounds[0] then
 				rounds[0].date = todayDate
@@ -674,7 +677,7 @@ function GroupTableLeague.get(frame, args, data)
 			end
 		end
 
-		local output = GroupTableLeague._createHeader(frame, args, #rounds, isMidTournament)
+		local output, header = GroupTableLeague._createHeader(frame, args, #rounds, isMidTournament)
 
 		--store (s)date as match date to be passed to the matches entered after this group table
 		local storeToVarDate = args.sdate or ''
@@ -773,7 +776,7 @@ function GroupTableLeague.get(frame, args, data)
 					(Logic.readBool(item.finished) or item.finished == 't') and
 					(score1 > 0 or score2 > 0 or (not String.isEmpty(item.winner)) or (not String.isEmpty(item.resulttype)))
 				then
-					results = GroupTableLeague._calculateResults(results, index1, index2, item, args.walkover_win, customPoints)
+					results, args = GroupTableLeague._calculateResults(results, index1, index2, item, args.walkover_win, customPoints, args)
 				end
 			end
 
@@ -944,7 +947,7 @@ function GroupTableLeague._createHeader(frame, args, numberOfRounds, isMidTourna
 		title:css('margin-left', '-70px')
 			:css('vertical-align', 'middle')
 	end
-	
+
 	local headerIconsWrapper = Custom.getHeaderIcons(args)
 
 	local dropDownWrapper = GroupTableLeague._createDropDown(
@@ -987,7 +990,7 @@ function GroupTableLeague._createHeader(frame, args, numberOfRounds, isMidTourna
 			})
 	end
 
-	return output
+	return output, header
 end
 
 function GroupTableLeague._createDropDown(args, isMidTournament, numberOfRounds)
@@ -1031,7 +1034,7 @@ function GroupTableLeague._createDropDown(args, isMidTournament, numberOfRounds)
 	return dropDownWrapper
 end
 
-function GroupTableLeague._calculateResults(results, index1, index2, item, gamesByWalkoverWin, customPoints)
+function GroupTableLeague._calculateResults(results, index1, index2, item, gamesByWalkoverWin, customPoints, args)
 	-- add game win/loss
 	if item.resulttype ~= '' and item.resulttype ~= 'draw' then
 		if item.winner == '1' then
@@ -1072,17 +1075,23 @@ function GroupTableLeague._calculateResults(results, index1, index2, item, games
 
 	-- add points based on series score
 	for _, item_p in pairs(customPoints) do
-		if (tostring(item.match2opponents[1].score) == item_p.score1 and tostring(item.match2opponents[2].score) == item_p.score2) then
+		if
+			tostring(item.match2opponents[1].score) == item_p.score1
+			and tostring(item.match2opponents[2].score) == item_p.score2
+		then
 			results[index1].customPoints = results[index1].customPoints + tonumber(item_p.points)
 		end
-		if (tostring(item.match2opponents[2].score) == item_p.score1 and tostring(item.match2opponents[1].score) == item_p.score2) then
+		if
+			tostring(item.match2opponents[2].score) == item_p.score1
+			and tostring(item.match2opponents[1].score) == item_p.score2
+		then
 			results[index2].customPoints = results[index2].customPoints + tonumber(item_p.points)
 		end
 	end
 
-	return results
+	return results, args
 end
-	
+
 function GroupTableLeague._updateResults(results, rounds, args, numberOfOpponents, roundNumber)
 	for i=1,numberOfOpponents do
 		local opponentIndex = results[i].index
