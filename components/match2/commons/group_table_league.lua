@@ -57,7 +57,7 @@ function GroupTableLeague.lpdbBaseConditions(args, tournaments, ids)
 	local dateConditions = {}
 
 	if not String.isEmpty(ids) then
-		local ids = mw.text.split(ids, ',')
+		ids = mw.text.split(ids, ',')
 		for key, item in pairs(ids) do
 			ids[key] = mw.text.trim(item)
 		end
@@ -148,12 +148,12 @@ function StatefulScore.h2hSeries(results, startIndex, endIndex, lpdbConditions)
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
 			-- opponent1 vs opponent2 / opponent2 vs opponent1
-			local opp1Cond = GroupTableLeague._getH2HOppCond(results, opponent1Index)
-			local opp2Cond = GroupTableLeague._getH2HOppCond(results, opponent2Index)
+			local opp1 = GroupTableLeague._getH2HOppCond(results, opponent1Index)
+			local opp2 = GroupTableLeague._getH2HOppCond(results, opponent2Index)
 			local match = mw.ext.LiquipediaDB.lpdb('match2', {
 				limit = 1000,
 				order = 'date asc',
-				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1Cond, opp2Cond)
+				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1, opp2)
 			})
 			for _, item in ipairs(match) do
 				if Table.includes(opp1, item.match2opponents[1].name) then
@@ -185,12 +185,12 @@ function StatefulScore.h2hGames(results, startIndex, endIndex, lpdbConditions)
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
 			-- opponent1 vs opponent2 / opponent2 vs opponent1
-			local opp1Cond = GroupTableLeague._getH2HOppCond(results, opponent1Index)
-			local opp2Cond = GroupTableLeague._getH2HOppCond(results, opponent2Index)
+			local opp1 = GroupTableLeague._getH2HOppCond(results, opponent1Index)
+			local opp2 = GroupTableLeague._getH2HOppCond(results, opponent2Index)
 			local match = mw.ext.LiquipediaDB.lpdb('match2', {
 				limit = 1000,
 				order = 'date asc',
-				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1Cond, opp2Cond)
+				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1, opp2)
 			})
 			for _, item in ipairs(match) do
 				if item.match2opponents[1].score ~= -1 and item.match2opponents[2].score ~= -1 then
@@ -222,12 +222,12 @@ function StatefulScore.h2hGamesDiff(results, startIndex, endIndex, lpdbCondition
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
 			-- opponent1 vs opponent2 / opponent2 vs opponent1
-			local opp1Cond = GroupTableLeague._getH2HOppCond(results, opponent1Index)
-			local opp2Cond = GroupTableLeague._getH2HOppCond(results, opponent2Index)
+			local opp1 = GroupTableLeague._getH2HOppCond(results, opponent1Index)
+			local opp2 = GroupTableLeague._getH2HOppCond(results, opponent2Index)
 			local match = mw.ext.LiquipediaDB.lpdb('match2', {
 				limit = 1000,
 				order = 'date asc',
-				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1Cond, opp2Cond)
+				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1, opp2)
 			})
 			for _, item in ipairs(match) do
 				if item.match2opponents[1].score ~= -1 and item.match2opponents[2].score ~= -1 then
@@ -259,12 +259,12 @@ function StatefulScore.h2hGamesWon(results, startIndex, endIndex, lpdbConditions
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
 			-- opponent1 vs opponent2 / opponent2 vs opponent1
-			local opp1Cond = GroupTableLeague._getH2HOppCond(results, opponent1Index)
-			local opp2Cond = GroupTableLeague._getH2HOppCond(results, opponent2Index)
+			local opp1 = GroupTableLeague._getH2HOppCond(results, opponent1Index)
+			local opp2 = GroupTableLeague._getH2HOppCond(results, opponent2Index)
 			local match = mw.ext.LiquipediaDB.lpdb('match2', {
 				limit = 1000,
 				order = 'date asc',
-				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1Cond, opp2Cond)
+				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1, opp2)
 			})
 			for _, item in ipairs(match) do
 				if item.match2opponents[1].score ~= -1 and item.match2opponents[2].score ~= -1 then
@@ -292,12 +292,12 @@ function StatefulScore.h2hGamesLoss(results, startIndex, endIndex, lpdbCondition
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
 			-- opponent1 vs opponent2 / opponent2 vs opponent1
-			local opp1Cond = GroupTableLeague._getH2HOppCond(results, opponent1Index)
-			local opp2Cond = GroupTableLeague._getH2HOppCond(results, opponent2Index)
+			local opp1 = GroupTableLeague._getH2HOppCond(results, opponent1Index)
+			local opp2 = GroupTableLeague._getH2HOppCond(results, opponent2Index)
 			local match = mw.ext.LiquipediaDB.lpdb('match2', {
 				limit = 1000,
 				order = 'date asc',
-				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1Cond, opp2Cond)
+				conditions = lpdbConditions .. GroupTableLeague._mergeOpponentConditions(opp1, opp2)
 			})
 			for _, item in ipairs(match) do
 				if item.match2opponents[1].score ~= -1 and item.match2opponents[2].score ~= -1 then
@@ -1150,10 +1150,10 @@ function GroupTableLeague._getH2HOppCond(results, index)
 	return opp
 end
 
-function GroupTableLeague._mergeOpponentConditions(opp1Cond, opp2Cond)
+function GroupTableLeague._mergeOpponentConditions(opp1, opp2)
 	return ' AND ([[opponent::' ..
-		table.concat(opp1Cond, ']] OR [[opponent::') .. ']]) AND ([[opponent::' ..
-		table.concat(opp2Cond, ']] OR [[opponent::') .. ']])'
+		table.concat(opp1, ']] OR [[opponent::') .. ']]) AND ([[opponent::' ..
+		table.concat(opp2, ']] OR [[opponent::') .. ']])'
 end
 
 return GroupTableLeague
