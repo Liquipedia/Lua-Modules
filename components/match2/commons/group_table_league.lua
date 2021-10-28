@@ -429,8 +429,13 @@ function GroupTableLeague._resolveTies(args, opponentList, results, date)
 						table.insert(tiedRankings, results[i])
 					end
 				end
-				table.sort(tiedRankings, function(item1, item2) return
-					item1.tiebreaker > item2.tiebreaker or (item1.tiebreaker == item2.tiebreaker and string.lower(item1.opponent) < string.lower(item2.opponent)) end)
+				table.sort(tiedRankings,
+					function(item1, item2) return
+						item1.tiebreaker > item2.tiebreaker or
+						(item1.tiebreaker == item2.tiebreaker and
+							string.lower(item1.opponent) < string.lower(item2.opponent))
+					end
+				)
 				for i = startIndex, endIndex do
 					results[i] = tiedRankings[ i - startIndex + 1 ]
 				end
@@ -516,7 +521,13 @@ function GroupTableLeague.get(frame, args, data)
 				-- opponentX
 				if param == 'opponent' or Table.includes(typeParams, param) then
 					local opponentAlias
-					opponentList[opponentIndex], opponentAlias, opponents = Custom.parseOpponentInput[tableType](param, opponentIndex, item, args, opponents)
+					opponentList[opponentIndex], opponentAlias, opponents = Custom.parseOpponentInput[tableType](
+						param,
+						opponentIndex,
+						item,
+						args,
+						opponents
+					)
 					opponentList[opponentList[opponentIndex].opponent] = opponentIndex
 					for _, alias in pairs(opponentAlias or {}) do
 						if mw.text.trim(alias) ~= '' then
