@@ -387,6 +387,7 @@ function mapFunctions.getScoresAndWinner(map)
 		local obj = {}
 		if not Logic.isEmpty(score) then
 			if TypeUtil.isNumeric(score) then
+				score = tonumber(score)
 				obj.status = 'S'
 				obj.score = score
 				obj.index = scoreIndex
