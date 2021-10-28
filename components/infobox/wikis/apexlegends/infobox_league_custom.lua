@@ -152,8 +152,7 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	tierDisplay = tierDisplay ..
 		(_args['ea-sponsored'] == 'true' and _EA_ICON or '') ..
 		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '') ..
-		(hasTypeSetAsTier and '[[Category:Pages with Tiertype set as Tier]]' or '')
+		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
 
 	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_tiertype', tierType)
