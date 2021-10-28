@@ -2,7 +2,6 @@ local TeamTemplates = require('Module:TeamTemplates')
 local Player = require('Module:Player')
 local String = require('Module:String')
 local Variables = require('Module:Variables')
-local LinkIcons = require('Module:MatchExternalLinks/Starcraft')
 local BigRaceIcon = require('Module:RaceIcon')._getBigIcon
 
 local Custom = require('Module:GroupTableLeague/Custom/Base')
@@ -88,7 +87,7 @@ function Custom.parseOpponentInput.solo(param, opponentIndex, opponentArg, args,
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
 	)
 
-	opponentListEntry = {
+	local opponentListEntry = {
 		opponent = opponent,
 		opponentArg = opponentArg,
 		flag = args[param .. opponentIndex .. 'flag'] or Variables.varDefault(opponentArg .. '_flag', ''),
@@ -108,7 +107,7 @@ function Custom.parseOpponentInput.team(param, opponentIndex, opponentArg, args,
 		TeamTemplates._teampage((opponentArg or '') ~= '' and opponentArg or 'tbd')
 	)
 
-	opponentListEntry = {
+	local opponentListEntry = {
 		opponent = opponent,
 		opponentArg = opponentArg,
 	}
@@ -125,7 +124,7 @@ function Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args
 		args[param .. opponentIndex .. 'p1link'] or
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
 	)
-	opponentListEntry = {
+	local opponentListEntry = {
 		opponent1 = opponent,
 		opponent1Arg = opponentArg,
 		flag1 = args[param .. opponentIndex .. 'p1flag'] or Variables.varDefault(opponentArg .. '_flag', ''),
@@ -193,7 +192,7 @@ function Custom.parseOpponentInput.archon(param, opponentIndex, opponentArg, arg
 		args[param .. opponentIndex .. 'p2link'] or
 		Variables.varDefault(opponent2Arg .. '_page', opponent2Arg)
 	)
-	opponentListEntry = {
+	local opponentListEntry = {
 		opponent1 = opponent,
 		opponent1Arg = opponentArg,
 		flag1 = args[param .. opponentIndex .. 'p1flag'] or Variables.varDefault(opponentArg .. '_flag', ''),
