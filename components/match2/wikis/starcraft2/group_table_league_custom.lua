@@ -206,7 +206,7 @@ function Custom.parseOpponentInput.archon(param, opponentIndex, opponentArg, arg
 		note = args[param .. opponentIndex .. 'note'] or args[param .. opponentIndex .. 'note'] or '',
 	}
 
-	Custom._getStorageNames(opponentListEntry, numberOfPlayers)
+	Custom._getStorageNames(opponentListEntry, 2)
 
 	local aliasList = mw.text.gsplit(args[param .. opponentIndex .. 'alias'] or '', ',')
 	for _, item in pairs(_storageNames) do
@@ -264,7 +264,8 @@ function Custom.lpdbConditions(args, opponents, mode, baseConditions, dateCondit
 				if key > 1 or key2 > 2 then
 					oppConditions = oppConditions .. ' OR '
 				end
-				oppConditions = oppConditions .. '[[opponent::' .. opponents[key] .. ']] AND [[opponent::' .. opponents[key2] .. ']]'
+				oppConditions = oppConditions ..
+					'[[opponent::' .. opponents[key] .. ']] AND [[opponent::' .. opponents[key2] .. ']]'
 			end
 		end
 		oppConditions = oppConditions .. ') '
