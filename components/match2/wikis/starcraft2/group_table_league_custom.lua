@@ -6,6 +6,8 @@ local BigRaceIcon = require('Module:RaceIcon')._getBigIcon
 
 local Custom = require('Module:GroupTableLeague/Custom/Base')
 
+local _storageNames = {}
+
 --functions to get the display
 function Custom.display.solo(opp)
 	return Player._player({
@@ -140,8 +142,10 @@ function Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args
 		)
 		opponentListEntry['opponent' .. i] = opponent
 		opponentListEntry['opponent' .. i .. 'Arg'] = opponentArg
-		opponentListEntry['flag' .. i] = args[param .. opponentIndex .. 'p' .. i .. 'flag'] or Variables.varDefault(opponentArg .. '_flag', '')
-		opponentListEntry['race' .. i] = args[param .. opponentIndex .. 'p' .. i .. 'race'] or Variables.varDefault(opponentArg .. '_race', '')
+		opponentListEntry['flag' .. i] = args[param .. opponentIndex .. 'p' .. i .. 'flag']
+			or Variables.varDefault(opponentArg .. '_flag', '')
+		opponentListEntry['race' .. i] = args[param .. opponentIndex .. 'p' .. i .. 'race']
+			or Variables.varDefault(opponentArg .. '_race', '')
 	end
 
 	Custom._getStorageNames(opponentListEntry, numberOfPlayers)
@@ -156,7 +160,6 @@ function Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args
 	return opponentListEntry, aliasList, opponents
 end
 
-local _storageNames = {}
 function Custom._getStorageNames(opponentListEntry, numberOfPlayers)
 	local opponents = {}
 	for i = 1, numberOfPlayers do
