@@ -7,6 +7,7 @@ std = {
 		"getmetatable",
 		"ipairs",
 		"math",
+		"next",
 		"mw",
 		"os",
 		"package",
