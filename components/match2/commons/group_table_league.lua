@@ -776,7 +776,15 @@ function GroupTableLeague.get(frame, args, data)
 					(Logic.readBool(item.finished) or item.finished == 't') and
 					(score1 > 0 or score2 > 0 or (not String.isEmpty(item.winner)) or (not String.isEmpty(item.resulttype)))
 				then
-					results, args = GroupTableLeague._calculateResults(results, index1, index2, item, args.walkover_win, customPoints, args)
+					results, args = GroupTableLeague._calculateResults(
+						results,
+						index1,
+						index2,
+						item,
+						args.walkover_win,
+						customPoints,
+						args
+					)
 				end
 			end
 
