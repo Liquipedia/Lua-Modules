@@ -116,6 +116,7 @@ function StarcraftPlayerUtil.fetchTeam(pageName, date)
 		'([[extradata_joindate::<' .. date .. ']] OR [[extradata_joindate::' .. date .. ']])',
 		'[[extradata_joindate::>]]',
 		'[[extradata_leavedate::>' .. date .. ']]',
+		'[[extradata_position::player]]',
 	}
 	local rows = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = table.concat(conditions, ' AND '),
