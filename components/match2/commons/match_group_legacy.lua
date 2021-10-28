@@ -8,15 +8,16 @@
 
 local Legacy = {}
 
-local getArgs = require('Module:Arguments').getArgs
-local json = require('Module:Json')
-local MatchGroup = require('Module:MatchGroup')
-local getDefaultMapping = require('Module:MatchGroup/Legacy/Default').get
-local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local MatchGroup = require('Module:MatchGroup')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+local WikiSpecific = require('Module:Brkts/WikiSpecific')
+local getArgs = require('Module:Arguments').getArgs
+local getDefaultMapping = require('Module:MatchGroup/Legacy/Default').get
+local json = require('Module:Json')
 
 local MatchSubobjects = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
 
@@ -146,11 +147,11 @@ function Legacy._convert(mapping)
 			if not Logic.isEmpty(nested) then
 				if source ~= _RESET_MATCH and source ~= _THIRD_PLACE_MATCH then
 					if not nested.opponent1 then
-						nested.opponent1 = '{\'type\':\'team\',\'template\':\'TBD\',\'icon\':\'Rllogo_std.png\',\'name\':\'TBD\'}'
+						nested.opponent1 = {type = 'team', template = 'TBD', icon = WikiSpecific.defaultIcon, name = 'TBD'}
 						mw.log('Missing Opponent entry')
 					end
 					if not nested.opponent2 then
-						nested.opponent2 = '{\'type\':\'team\',\'template\':\'TBD\',\'icon\':\'Rllogo_std.png\',\'name\':\'TBD\'}'
+						nested.opponent2 = {type = 'team', template = 'TBD', icon = WikiSpecific.defaultIcon, name = 'TBD'}
 						mw.log('Missing Opponent entry')
 					end
 				elseif not nested.opponent1 then
