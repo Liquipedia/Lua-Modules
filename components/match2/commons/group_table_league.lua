@@ -1,3 +1,17 @@
+--[[
+	GroupTableLeague for the new match2 system
+	- supports both opponent-types depending on wiki custom implementation
+	- by default it supports team and player matches
+	- switches between opponent types via "|type=solo/team/duo/..."
+	- supports queries from non main space name spaces via |ns=
+		--> ns needs the number of the name space the data should be queried from, e.g.
+				0 = Main (this is the default)
+				2 = User
+				4 = Liquipedia
+				134 = Portal
+				136 = Data
+]]
+
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Countdown = require('Module:Countdown')
@@ -6,22 +20,31 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
-local Custom = require('Module:GroupTableLeague/Custom')
+local Custom = require('Module:Hjpalpha/sandbox20')
 
 local _aliasList = {}
+
+local _RANKING_CHANGE_ARROW_UP = '&#x25B2;'
+local _RANKING_CHANGE_ARROW_DOWN = '&#x25BC;'
+local _EMPTY_MATCH = {
+	date = '',
+	finished = 0,
+	match2opponents = {
+		[1] = {
+			name = 'Definitions',
+			score = 0,
+			status = 'S',
+		},
+		[2] = {
+			name = 'Definitions',
+			score = 0,
+			status = 'S',
+		}
+	}
+}
+
 local _lpdbBaseConditions
 
---[[
-	GroupTableLeague for the new Bracket/Match System
-	- supports both team and 1v1 matches (via switch |type=team )
-	- supports queries from non main space name spaces via |ns=
-		--> it needs the number of the name space the data should be queried from
-				0 = Main (this is the default)
-				2 = User
-				4 = Liquipedia
-				134 = Portal
-				136 = Data
-]]
 local GroupTableLeague = {}
 
 function GroupTableLeague._formatDate(date, format)
@@ -43,6 +66,7 @@ function GroupTableLeague._getLpdbResults(args, tournaments, opponents, mode, id
 	local lpdbConditions, lpdbBaseConditions = Custom.lpdbConditions(args, opponents, mode, baseConditions, dateConditions)
 	_lpdbBaseConditions = lpdbBaseConditions
 
+mw.logObject(lpdbConditions)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		limit = 1000,
 		order = 'date asc',
@@ -109,41 +133,46 @@ function Score.dq(opponent)
 end
 
 function Score.points(opponent)
-	return opponent.tiebreaker*30 + opponent.points
+	return opponent.tiebreaker * 30 + opponent.points
 end
 
 function Score.diff(opponent)
-	return opponent.tiebreaker*30 + opponent.diff
+	return opponent.tiebreaker * 30 + opponent.diff
 end
 
 function Score.series(opponent)
-	return opponent.tiebreaker*30 + opponent.series.won - 0.1 * opponent.series.loss
+	return opponent.tiebreaker * 30 + opponent.series.won - 0.1 * opponent.series.loss
 end
 
 function Score.gamesWon(opponent)
-	return opponent.tiebreaker*30 + opponent.games.won
+	return opponent.tiebreaker * 30 + opponent.games.won
 end
 
 function Score.gamesLoss(opponent)
-	return opponent.tiebreaker*30 - 0.1 * opponent.games.loss
+	return opponent.tiebreaker * 30 - 0.1 * opponent.games.loss
 end
 
 function Score.seriesPercent(opponent)
-	-- TODO
+	local percentage = 0
+	local playedSerieses = opponent.series.won + opponent.series.loss
+	if playedSerieses > 0 then
+		percentage = 10 * opponent.series.won / playedSerieses
+	end
+	return opponent.tiebreaker * 30 + percentage
 end
 
 function Score.seriesDiff(opponent)
-	-- TODO
+	return opponent.tiebreaker * 30 + opponent.series.won - opponent.series.loss
 end
 
 function Score.tempTies(opponent)
-	return opponent.tiebreaker*30 + (opponent.temp.tiebreaker or 0)
+	return opponent.tiebreaker * 30 + (opponent.temp.tiebreaker or 0)
 end
 
 local StatefulScore = {}
 function StatefulScore.h2hSeries(results, startIndex, endIndex, lpdbConditions)
 	for i = startIndex, endIndex do
-		results[i].tiebreaker = results[i].tiebreaker*30
+		results[i].tiebreaker = results[i].tiebreaker * 30
 	end
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
@@ -180,7 +209,7 @@ end
 
 function StatefulScore.h2hGames(results, startIndex, endIndex, lpdbConditions)
 	for i = startIndex, endIndex do
-		results[i].tiebreaker = results[i].tiebreaker*30
+		results[i].tiebreaker = results[i].tiebreaker * 30
 	end
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
@@ -217,7 +246,7 @@ end
 
 function StatefulScore.h2hGamesDiff(results, startIndex, endIndex, lpdbConditions)
 	for i = startIndex, endIndex do
-		results[i].tiebreaker = results[i].tiebreaker*30
+		results[i].tiebreaker = results[i].tiebreaker * 30
 	end
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
@@ -254,7 +283,7 @@ end
 
 function StatefulScore.h2hGamesWon(results, startIndex, endIndex, lpdbConditions)
 	for i = startIndex, endIndex do
-		results[i].tiebreaker = results[i].tiebreaker*30
+		results[i].tiebreaker = results[i].tiebreaker * 30
 	end
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
@@ -287,7 +316,7 @@ end
 
 function StatefulScore.h2hGamesLoss(results, startIndex, endIndex, lpdbConditions)
 	for i = startIndex, endIndex do
-		results[i].tiebreaker = results[i].tiebreaker*30
+		results[i].tiebreaker = results[i].tiebreaker * 30
 	end
 	for opponent1Index = startIndex, endIndex-1 do
 		for opponent2Index = opponent1Index+1, endIndex do
@@ -457,7 +486,7 @@ function GroupTableLeague._resolveTies(args, opponentList, results, date)
 	end
 end
 
-function GroupTableLeague.get(frame, args, data)
+function GroupTableLeague.create(frame, args, data)
 	local divWrapper
 	local opponentList = {}
 	local results = {}
@@ -571,9 +600,9 @@ function GroupTableLeague.get(frame, args, data)
 
 				-- dqX
 				elseif
-					(param == 'dq' or param == 'q')
+					param == 'dq'
 					and opponentIndex and item == 'true'
-				then -- TODO: param == 'q' is a temporary fix, resolve it correctly
+				then
 					rounds[roundIndex].params.disqualified[opponentIndex] = true
 				end
 
@@ -609,22 +638,7 @@ function GroupTableLeague.get(frame, args, data)
 
 	--if no data is set and no data is found we set an empty match to avoid errors
 	if not data[1] then
-		data[1] = {
-			date = '',
-			finished = 0,
-			match2opponents = {
-				[1] = {
-					name = 'Definitions',
-					score = 0,
-					status = 'S',
-				},
-				[2] = {
-					name = 'Definitions',
-					score = 0,
-					status = 'S',
-				}
-			}
-		}
+		data[1] = _EMPTY_MATCH
 	end
 
 	if type(data) == 'table' then
@@ -708,35 +722,7 @@ function GroupTableLeague.get(frame, args, data)
 
 		local oppdate = args.edate or args.date or Variables.varDefault('tournament_enddate', todayDate)
 
-		for key = 0, #opponentList do
-			results[key] = {
-				index = key,
-				opponent = opponentList[key].opponent or opponentList[key],
-				opponentArg = opponentList[key].opponentArg or opponentList[key],
-				opponentDisplay = Custom.display[tableType](opponentList[key], oppdate) or '',
-				note = opponentList[key].note or '',
-				ranking = 0,
-				rankingChange = 0,
-				tiebreaker = 0, -- score used to determine ranking between opponents
-				points = 0,
-				customPoints = 0,
-				diff = 0,
-				series = {
-					won = 0,
-					tied = 0,
-					loss = 0,
-				},
-				games = {
-					won = 0,
-					loss = 0,
-				},
-				temp = {
-					tiebreaker = 0,
-					points = 0,
-					diff = 0
-				}
-			}
-		end
+		results = GroupTableLeague._initializeResults(opponentList, tableType, oppdate)
 
 		-- calculations
 		if not next(data) then
@@ -746,15 +732,15 @@ function GroupTableLeague.get(frame, args, data)
 		for key, item in ipairs(data) do
 			local index1
 			if _aliasList[item.match2opponents[1].name] then
-				index1 = opponentList[ _aliasList[item.match2opponents[1].name] ]
+				index1 = opponentList[_aliasList[item.match2opponents[1].name]]
 			else
-				index1 = opponentList[ item.match2opponents[1].name ]
+				index1 = opponentList[item.match2opponents[1].name]
 			end
 			local index2
 			if _aliasList[item.match2opponents[2].name] then
-				index2 = opponentList[ _aliasList[item.match2opponents[2].name] ]
+				index2 = opponentList[_aliasList[item.match2opponents[2].name]]
 			else
-				index2 = opponentList[ item.match2opponents[2].name ]
+				index2 = opponentList[item.match2opponents[2].name]
 			end
 			local update = false
 
@@ -832,6 +818,40 @@ function GroupTableLeague.get(frame, args, data)
 	return divWrapper
 end
 
+function GroupTableLeague._initializeResults(opponentList, tableType, oppdate)
+	local results = {}
+	for key = 0, #opponentList do
+		results[key] = {
+			index = key,
+			opponent = opponentList[key].opponent or opponentList[key],
+			opponentArg = opponentList[key].opponentArg or opponentList[key],
+			opponentDisplay = Custom.display[tableType](opponentList[key], oppdate) or '',
+			note = opponentList[key].note or '',
+			ranking = 0,
+			rankingChange = 0,
+			tiebreaker = 0, -- score used to determine ranking between opponents
+			points = 0,
+			customPoints = 0,
+			diff = 0,
+			series = {
+				won = 0,
+				tied = 0,
+				loss = 0,
+			},
+			games = {
+				won = 0,
+				loss = 0,
+			},
+			temp = {
+				tiebreaker = 0,
+				points = 0,
+				diff = 0
+			}
+		}
+	end
+	return results
+end
+
 function GroupTableLeague._printResults(args, output, results, rounds, roundNumber, isMidTournament)
 	for key, item in ipairs(results) do
 		local row = output:tag('tr')
@@ -865,9 +885,11 @@ function GroupTableLeague._printResults(args, output, results, rounds, roundNumb
 		if rankingChange == 0 then
 			rankingChange = ''
 		elseif rankingChange > 0 then
-			rankingChange = '<span style="color:green; float:right; font-size:90%;">&#x25B2;' .. rankingChange .. '</span>'
+			rankingChange = '<span class="ranking-change-up">' ..
+				_RANKING_CHANGE_ARROW_UP .. rankingChange .. '</span>'
 		else
-			rankingChange = '<span style="color:red; float:right; font-size:90%;">&#x25BC;' .. -rankingChange .. '</span>'
+			rankingChange = '<span class="ranking-change-down">' ..
+				_RANKING_CHANGE_ARROW_DOWN .. -rankingChange .. '</span>'
 		end
 
 		row:tag('td')
@@ -976,11 +998,7 @@ function GroupTableLeague._createHeader(frame, args, numberOfRounds, isMidTourna
 		dateheader = output:tag('tr')
 		dateheader:tag('td')
 			:attr('colspan', args.colspan or '7')
-			:css('background-color', '#f2f2f2')--needs to be converted to use css class
-			:css('font-size', '85%')
-			:css('line-height', '90%')
-			:css('height', '13px')
-			:css('text-align', 'center')
+			:addClass('grouptable-start-date')
 			:wikitext(Countdown._create{
 				date = GroupTableLeague._formatDate(args.date, 'F j, Y - H:i'),
 				finished = args.finished,
