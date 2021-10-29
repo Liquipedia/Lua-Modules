@@ -425,9 +425,9 @@ function League:_isChronologySet(previous, next)
 	return not (String.isEmpty(previous) and String.isEmpty(next))
 end
 
--- Given the format `pagename|displayname`, returns pagename
+-- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise
 function League:_getPageNameFromChronology(item)
-	if item == nil or not string.find(item, '|') then
+	if item == nil then
 		return ''
 	end
 
