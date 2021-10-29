@@ -489,7 +489,6 @@ end
 function GroupTableLeague.create(frame, args, data)
 	local divWrapper
 	local opponentList = {}
-	local results = {}
 	local tournaments = {}
 	local customPoints = {}
 	local rounds = {}
@@ -722,7 +721,7 @@ function GroupTableLeague.create(frame, args, data)
 
 		local oppdate = args.edate or args.date or Variables.varDefault('tournament_enddate', todayDate)
 
-		results = GroupTableLeague._initializeResults(opponentList, tableType, oppdate)
+		local results = GroupTableLeague._initializeResults(opponentList, tableType, oppdate)
 
 		-- calculations
 		if not next(data) then
