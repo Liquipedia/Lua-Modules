@@ -1,15 +1,53 @@
+---
+-- @Liquipedia
+-- wiki=starcraft2
+-- page=Module:GroupTableLeague/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local TeamTemplates = require('Module:TeamTemplates')
 local Player = require('Module:Player')
 local String = require('Module:String')
 local Variables = require('Module:Variables')
+local Class = require('Module:Class')
 local BigRaceIcon = require('Module:RaceIcon')._getBigIcon
+--local GroupTableLeague = require('Module:GroupTableLeague')
+local GroupTableLeague = require('Module:Hjpalpha/sandbox19')
 
-local Custom = require('Module:GroupTableLeague/Custom/Base')
+local CustomGroupTableLeague = {
+	display = {},
+	parseOpponentInput = {}
+}
 
 local _storageNames = {}
 
+function CustomGroupTableLeague.create(args)
+
+	GroupTableLeague.display.solo = CustomGroupTableLeague.display.solo
+	GroupTableLeague.display.team = CustomGroupTableLeague.display.team
+	GroupTableLeague.display.duo = CustomGroupTableLeague.display.duo
+	GroupTableLeague.display.trio = CustomGroupTableLeague.display.trio
+	GroupTableLeague.display.quad = CustomGroupTableLeague.display.quad
+	GroupTableLeague.display.archon = CustomGroupTableLeague.display.archon
+	GroupTableLeague.display.other = CustomGroupTableLeague.display.other
+
+	GroupTableLeague.parseOpponentInput.solo = CustomGroupTableLeague.parseOpponentInput.solo
+	GroupTableLeague.parseOpponentInput.team = CustomGroupTableLeague.parseOpponentInput.team
+	GroupTableLeague.parseOpponentInput.duo = CustomGroupTableLeague.parseOpponentInput.duo
+	GroupTableLeague.parseOpponentInput.trio = CustomGroupTableLeague.parseOpponentInput.trio
+	GroupTableLeague.parseOpponentInput.quad = CustomGroupTableLeague.parseOpponentInput.quad
+	GroupTableLeague.parseOpponentInput.archon = CustomGroupTableLeague.parseOpponentInput.archon
+	GroupTableLeague.parseOpponentInput.other = CustomGroupTableLeague.parseOpponentInput.other
+
+	GroupTableLeague.convertType = CustomGroupTableLeague.convertType
+	GroupTableLeague.lpdbConditions = CustomGroupTableLeague.lpdbConditions
+
+	return GroupTableLeague.create(args)
+end
+
 --functions to get the display
-function Custom.display.solo(opp)
+function CustomGroupTableLeague.display.solo(opp)
 	return Player._player({
 		opp.opponentArg or opp.opponent,
 		link = opp.opponent,
@@ -19,11 +57,11 @@ function Custom.display.solo(opp)
 	})
 end
 
-function Custom.display.team(opp, date)
+function CustomGroupTableLeague.display.team(opp, date)
 	return TeamTemplates._team(opp.opponent, date)
 end
 
-function Custom.display.other(opp, numberOfPlayers)
+function CustomGroupTableLeague.display.other(opp, numberOfPlayers)
 	local output = {}
 	for i = 1, numberOfPlayers do
 		table.insert(output, Player._player({
@@ -37,7 +75,7 @@ function Custom.display.other(opp, numberOfPlayers)
 	return table.concat(output, '<br>')
 end
 
-function Custom.display.archon(opp)
+function CustomGroupTableLeague.display.archon(opp)
 	local player1 = {
 		opp.opponent1Arg or opp.opponent1,
 		link = opp.opponent1,
@@ -70,20 +108,20 @@ function Custom.display.archon(opp)
 	return tostring(output)
 end
 
-function Custom.display.duo(opp)
-	return Custom.display.other(opp, 2)
+function CustomGroupTableLeague.display.duo(opp)
+	return CustomGroupTableLeague.display.other(opp, 2)
 end
 
-function Custom.display.trio(opp)
-	return Custom.display.other(opp, 3)
+function CustomGroupTableLeague.display.trio(opp)
+	return CustomGroupTableLeague.display.other(opp, 3)
 end
 
-function Custom.display.quad(opp)
-	return Custom.display.other(opp, 4)
+function CustomGroupTableLeague.display.quad(opp)
+	return CustomGroupTableLeague.display.other(opp, 4)
 end
 
 --functions to parse opponent input
-function Custom.parseOpponentInput.solo(param, opponentIndex, opponentArg, args, opponents)
+function CustomGroupTableLeague.parseOpponentInput.solo(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args[param .. opponentIndex .. 'link'] or
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
@@ -104,7 +142,7 @@ function Custom.parseOpponentInput.solo(param, opponentIndex, opponentArg, args,
 	return opponentListEntry, aliasList, opponents
 end
 
-function Custom.parseOpponentInput.team(param, opponentIndex, opponentArg, args, opponents)
+function CustomGroupTableLeague.parseOpponentInput.team(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		TeamTemplates._teampage((opponentArg or '') ~= '' and opponentArg or 'tbd')
 	)
@@ -121,19 +159,19 @@ function Custom.parseOpponentInput.team(param, opponentIndex, opponentArg, args,
 	return opponentListEntry, aliasList, opponents
 end
 
-function Custom.parseOpponentInput.duo(param, opponentIndex, opponentArg, args, opponents)
-	return Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 2)
+function CustomGroupTableLeague.parseOpponentInput.duo(param, opponentIndex, opponentArg, args, opponents)
+	return CustomGroupTableLeague.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 2)
 end
 
-function Custom.parseOpponentInput.trio(param, opponentIndex, opponentArg, args, opponents)
-	return Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 3)
+function CustomGroupTableLeague.parseOpponentInput.trio(param, opponentIndex, opponentArg, args, opponents)
+	return CustomGroupTableLeague.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 3)
 end
 
-function Custom.parseOpponentInput.quad(param, opponentIndex, opponentArg, args, opponents)
-	return Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 4)
+function CustomGroupTableLeague.parseOpponentInput.quad(param, opponentIndex, opponentArg, args, opponents)
+	return CustomGroupTableLeague.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 4)
 end
 
-function Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, numberOfPlayers)
+function CustomGroupTableLeague.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, numberOfPlayers)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args[param .. opponentIndex .. 'p1link'] or
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
@@ -160,7 +198,7 @@ function Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args
 			or Variables.varDefault(opponentArg .. '_race', '')
 	end
 
-	Custom._getStorageNames(opponentListEntry, numberOfPlayers)
+	CustomGroupTableLeague._getStorageNames(opponentListEntry, numberOfPlayers)
 
 	local aliasList = mw.text.split(args[param .. opponentIndex .. 'alias'] or '', ',')
 	for _, item in pairs(_storageNames) do
@@ -173,7 +211,7 @@ function Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args
 	return opponentListEntry, aliasList, opponents
 end
 
-function Custom.parseOpponentInput.archon(param, opponentIndex, opponentArg, args, opponents)
+function CustomGroupTableLeague.parseOpponentInput.archon(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args[param .. opponentIndex .. 'p1link'] or
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
@@ -194,7 +232,7 @@ function Custom.parseOpponentInput.archon(param, opponentIndex, opponentArg, arg
 		note = args[param .. opponentIndex .. 'note'] or args[param .. opponentIndex .. 'note'] or '',
 	}
 
-	Custom._getStorageNames(opponentListEntry, 2)
+	CustomGroupTableLeague._getStorageNames(opponentListEntry, 2)
 
 	local aliasList = mw.text.split(args[param .. opponentIndex .. 'alias'] or '', ',')
 	for _, item in pairs(_storageNames) do
@@ -207,28 +245,28 @@ function Custom.parseOpponentInput.archon(param, opponentIndex, opponentArg, arg
 	return opponentListEntry, aliasList, opponents
 end
 
-function Custom._getStorageNames(opponentListEntry, numberOfPlayers)
+function CustomGroupTableLeague._getStorageNames(opponentListEntry, numberOfPlayers)
 	local opponents = {}
 	for i = 1, numberOfPlayers do
 		table.insert(opponents, opponentListEntry['opponent' .. i])
 	end
 
-	Custom._permutation(opponents, numberOfPlayers, Custom._permutationCallback)
+	CustomGroupTableLeague._permutation(opponents, numberOfPlayers, CustomGroupTableLeague._permutationCallback)
 end
 
-function Custom._permutation(array, numberOfElements)
+function CustomGroupTableLeague._permutation(array, numberOfElements)
 	if numberOfElements == 0 then
-		Custom._permutationCallback(array)
+		CustomGroupTableLeague._permutationCallback(array)
 	else
 		for i = 1, numberOfElements do
 			array[i], array[numberOfElements] = array[numberOfElements], array[i]
-			Custom._permutation(array, numberOfElements - 1)
+			CustomGroupTableLeague._permutation(array, numberOfElements - 1)
 			array[i], array[numberOfElements] = array[numberOfElements], array[i]
 		end
 	end
 end
 
-function Custom._permutationCallback(array)
+function CustomGroupTableLeague._permutationCallback(array)
 	table.insert(_storageNames, table.concat(array or {}, ' / '))
 end
 
@@ -260,12 +298,12 @@ local _TYPE_TO_PARAMS = {
 	['quad'] = {'quad'},
 	['team'] = {'team', 't'},
 }
-function Custom.convertType(tableType)
+function CustomGroupTableLeague.convertType(tableType)
 	tableType = _ALLOWED_TYPES[string.lower(tableType or _DEFAULT_TYPE)] or _DEFAULT_TYPE
 	return tableType, _TYPE_TO_MODE[tableType], _TYPE_TO_PARAMS[tableType]
 end
 
-function Custom.lpdbConditions(args, opponents, mode, baseConditions, dateConditions)
+function CustomGroupTableLeague.lpdbConditions(args, opponents, mode, baseConditions, dateConditions)
 	baseConditions = baseConditions .. ' AND [[mode::' .. mode .. ']]'
 	local lpdbConditions = baseConditions
 
@@ -296,4 +334,4 @@ function Custom.lpdbConditions(args, opponents, mode, baseConditions, dateCondit
 	return lpdbConditions, baseConditions
 end
 
-return Custom
+return Class.export(CustomGroupTableLeague)
