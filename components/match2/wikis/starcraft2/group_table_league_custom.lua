@@ -45,9 +45,9 @@ function Custom.display.archon(opp)
 		novar = 'true'
 	}
 	local player2 = {
-		opp.opponent1Arg or opp.opponent1,
-		link = opp.opponent1,
-		flag = opp.flag1,
+		opp.opponent2Arg or opp.opponent2,
+		link = opp.opponent2,
+		flag = opp.flag2,
 		novar = 'true'
 	}
 	local output = mw.html.create('table'):css('text-align', 'left')
@@ -121,6 +121,18 @@ function Custom.parseOpponentInput.team(param, opponentIndex, opponentArg, args,
 	return opponentListEntry, aliasList, opponents
 end
 
+function Custom.parseOpponentInput.duo(param, opponentIndex, opponentArg, args, opponents)
+	return Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 2)
+end
+
+function Custom.parseOpponentInput.trio(param, opponentIndex, opponentArg, args, opponents)
+	return Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 3)
+end
+
+function Custom.parseOpponentInput.quad(param, opponentIndex, opponentArg, args, opponents)
+	return Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 4)
+end
+
 function Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, numberOfPlayers)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args[param .. opponentIndex .. 'p1link'] or
@@ -155,34 +167,10 @@ function Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args
 		table.insert(aliasList, item)
 		table.insert(opponents, item)
 	end
+	opponentListEntry.opponent = _storageNames[1]
 	_storageNames = {}
 
 	return opponentListEntry, aliasList, opponents
-end
-
-function Custom._getStorageNames(opponentListEntry, numberOfPlayers)
-	local opponents = {}
-	for i = 1, numberOfPlayers do
-		table.insert(opponents, opponentListEntry['opponent' .. i])
-	end
-
-	Custom._permutation(opponents, numberOfPlayers, Custom._permutationCallback)
-end
-
-function Custom._permutation(a, n, cb)
-	if n == 0 then
-		cb(a)
-	else
-		for i = 1, n do
-			a[i], a[n] = a[n], a[i]
-			Custom._permutation(a, n - 1, cb)
-			a[i], a[n] = a[n], a[i]
-		end
-	end
-end
-
-function Custom._permutationCallback(a)
-	table.insert(_storageNames, table.concat(a or {}, ' / '))
 end
 
 function Custom.parseOpponentInput.archon(param, opponentIndex, opponentArg, args, opponents)
@@ -213,9 +201,35 @@ function Custom.parseOpponentInput.archon(param, opponentIndex, opponentArg, arg
 		table.insert(aliasList, item)
 		table.insert(opponents, item)
 	end
+	opponentListEntry.opponent = _storageNames[1]
 	_storageNames = {}
 
 	return opponentListEntry, aliasList, opponents
+end
+
+function Custom._getStorageNames(opponentListEntry, numberOfPlayers)
+	local opponents = {}
+	for i = 1, numberOfPlayers do
+		table.insert(opponents, opponentListEntry['opponent' .. i])
+	end
+
+	Custom._permutation(opponents, numberOfPlayers, Custom._permutationCallback)
+end
+
+function Custom._permutation(array, numberOfElements)
+	if numberOfElements == 0 then
+		Custom._permutationCallback(array)
+	else
+		for i = 1, numberOfElements do
+			array[i], array[numberOfElements] = array[numberOfElements], array[i]
+			Custom._permutation(array, numberOfElements - 1)
+			array[i], array[numberOfElements] = array[numberOfElements], array[i]
+		end
+	end
+end
+
+function Custom._permutationCallback(array)
+	table.insert(_storageNames, table.concat(array or {}, ' / '))
 end
 
 --function to determine the following from args.type
