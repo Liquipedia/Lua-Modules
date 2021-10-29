@@ -496,7 +496,7 @@ function GroupTableLeague.create(args, data)
 	local opponentList, tournaments, customPoints, rounds, opponents, countWinPoints
 		= GroupTableLeague._parseArgs(args, typeParams, tableType)
 
-	args, countWinPoints = GroupTableLeague._parseParametersFromArgs(args, countWinPoints)
+	args = GroupTableLeague._parseParametersFromArgs(args, countWinPoints)
 
 	if not data then
 		data = GroupTableLeague._getLpdbResults(args, tournaments, opponents, mode, args.id or '')
@@ -759,7 +759,7 @@ function GroupTableLeague._parseParametersFromArgs(args, countWinPoints)
 	args.roundtitle = args.roundtitle or 'Round'
 	args.roundwidth = tonumber(args.roundwidth) or 90
 
-	return args, countWinPoints
+	return args
 end
 
 function GroupTableLeague._applyDataToResults(data, opponentList, args, rounds, results, output, roundNumber, customPoints)
