@@ -50,7 +50,7 @@ function Custom.parseOpponentInput.team(param, opponentIndex, opponentArg, args,
 
 	opponents[#opponents + 1] = opponent
 
-	local aliasList = mw.text.gsplit(args[param .. opponentIndex .. 'alias'] or '', ',')
+	local aliasList = mw.text.split(args[param .. opponentIndex .. 'alias'] or '', ',')
 
 	return opponentListEntry, aliasList, opponents
 end
