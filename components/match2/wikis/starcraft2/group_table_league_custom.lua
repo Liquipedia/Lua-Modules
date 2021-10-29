@@ -116,7 +116,7 @@ function Custom.parseOpponentInput.team(param, opponentIndex, opponentArg, args,
 
 	opponents[#opponents + 1] = opponent
 
-	local aliasList = mw.text.gsplit(args[param .. opponentIndex .. 'alias'] or '', ',')
+	local aliasList = mw.text.split(args[param .. opponentIndex .. 'alias'] or '', ',')
 
 	return opponentListEntry, aliasList, opponents
 end
@@ -150,7 +150,7 @@ function Custom.parseOpponentInput.other(param, opponentIndex, opponentArg, args
 
 	Custom._getStorageNames(opponentListEntry, numberOfPlayers)
 
-	local aliasList = mw.text.gsplit(args[param .. opponentIndex .. 'alias'] or '', ',')
+	local aliasList = mw.text.split(args[param .. opponentIndex .. 'alias'] or '', ',')
 	for _, item in pairs(_storageNames) do
 		table.insert(aliasList, item)
 		table.insert(opponents, item)
@@ -208,7 +208,7 @@ function Custom.parseOpponentInput.archon(param, opponentIndex, opponentArg, arg
 
 	Custom._getStorageNames(opponentListEntry, 2)
 
-	local aliasList = mw.text.gsplit(args[param .. opponentIndex .. 'alias'] or '', ',')
+	local aliasList = mw.text.split(args[param .. opponentIndex .. 'alias'] or '', ',')
 	for _, item in pairs(_storageNames) do
 		table.insert(aliasList, item)
 		table.insert(opponents, item)
@@ -272,7 +272,7 @@ function Custom.lpdbConditions(args, opponents, mode, baseConditions, dateCondit
 	end
 
 	if not String.isEmpty(dateConditions) then
-		lpdbConditions = lpdbConditions .. dateConditions
+		lpdbConditions = lpdbConditions .. ' AND ' .. dateConditions
 	end
 
 	if not String.isEmpty(oppConditions) then
