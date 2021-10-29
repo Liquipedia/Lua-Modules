@@ -51,7 +51,7 @@ function Custom.display.archon(opp)
 		novar = 'true'
 	}
 	local output = mw.html.create('table'):css('text-align', 'left')
-		:tag('tr'):css('background', 'transparent')--should be converted to class
+		:tag('tr'):addClass('archon-table-bg')
 			:tag('td')
 				:css('border', '0px')
 				:css('padding', '0px')
@@ -62,7 +62,7 @@ function Custom.display.archon(opp)
 				:css('border', '0px')
 				:css('padding', '0px')
 				:wikitext(Player._player(player1)):done():done()
-		:tag('tr'):css('background', 'transparent')--should be converted to class
+		:tag('tr'):addClass('archon-table-bg')
 			:tag('td')
 				:css('border', '0px')
 				:css('padding', '0px')
