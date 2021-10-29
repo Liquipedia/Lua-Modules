@@ -30,6 +30,7 @@ local Variables = require('Module:Variables')
 local Lua = require('Module:Lua')
 local Template = require('Module:Template')
 local Team = require('Module:Team')
+local Player = require('Module:Player')
 local LinkIcons = require('Module:MatchExternalLinks/Starcraft')
 
 local _aliasList = {}
@@ -510,11 +511,15 @@ end
 function GroupTableLeague._initializeResults(opponentList, tableType, oppdate)
 	local results = {}
 	for key = 0, #opponentList do
+		local display = ''
+		if key ~= 0 then
+			display = GroupTableLeague.display[tableType](opponentList[key], oppdate) or ''
+		end
 		results[key] = {
 			index = key,
 			opponent = opponentList[key].opponent or opponentList[key],
 			opponentArg = opponentList[key].opponentArg or opponentList[key],
-			opponentDisplay = GroupTableLeague.display[tableType](opponentList[key], oppdate) or '',
+			opponentDisplay = display,
 			note = opponentList[key].note or '',
 			ranking = 0,
 			rankingChange = 0,
@@ -1342,7 +1347,7 @@ function GroupTableLeague.lpdbConditions(args, opponents, mode, baseConditions, 
 	end
 
 	if not String.isEmpty(dateConditions) then
-		lpdbConditions = lpdbConditions .. dateConditions
+		lpdbConditions = lpdbConditions .. ' AND ' .. dateConditions
 	end
 
 	if not String.isEmpty(oppConditions) then
