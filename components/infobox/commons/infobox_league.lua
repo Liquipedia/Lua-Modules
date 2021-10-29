@@ -221,10 +221,10 @@ function League:_setLpdbData(args, links)
 		icon = Variables.varDefault('tournament_icon'),
 		icondark = Variables.varDefault('tournament_icondark'),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
-		previous = mw.ext.TeamLiquidIntegration.resolve_redirect(args.previous or ''),
-		previous2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.previous2 or ''),
-		next = mw.ext.TeamLiquidIntegration.resolve_redirect(args.next or ''),
-		next2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.next2 or ''),
+		previous = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous)),
+		previous2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous2)),
+		next = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next)),
+		next2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next2)),
 		game = string.lower(args.game or ''),
 		patch = args.patch,
 		endpatch = args.endpatch or args.epatch,
@@ -423,6 +423,15 @@ function League:_isChronologySet(previous, next)
 	-- We only need to check the first of these params, since it makes no sense
 	-- to set next2 and not next, etc.
 	return not (String.isEmpty(previous) and String.isEmpty(next))
+end
+
+-- Given the format `pagename|displayname`, returns pagename
+function League:_getPageNameFromChronology(item)
+	if item == nil or not string.find(item, '|') then
+		return ''
+	end
+
+	return mw.text.split(item, '|')[1]
 end
 
 return League
