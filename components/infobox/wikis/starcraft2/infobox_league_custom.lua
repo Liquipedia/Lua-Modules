@@ -577,8 +577,8 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.status = status
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
-	lpdbData.next = CustomLeague:_getPageNameFromChronology(_next)
-	lpdbData.previous = CustomLeague:_getPageNameFromChronology(_previous)
+	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
+	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
 
 	return lpdbData
 end
