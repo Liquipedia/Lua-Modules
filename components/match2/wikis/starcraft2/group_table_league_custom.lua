@@ -7,7 +7,7 @@
 --
 
 local TeamTemplates = require('Module:TeamTemplates')
-local Player = require('Module:Player')
+local Player = require('Module:Player/Display/Starcraft')
 local String = require('Module:String')
 local Variables = require('Module:Variables')
 local Class = require('Module:Class')
@@ -16,7 +16,7 @@ local GroupTableLeague = require('Module:GroupTableLeague')
 
 local CustomGroupTableLeague = {
 	display = {},
-	parseOpponentInput = {}
+	readOpponent = {}
 }
 
 local _storageNames = {}
@@ -31,13 +31,13 @@ function CustomGroupTableLeague.create(args)
 	GroupTableLeague.display.archon = CustomGroupTableLeague.display.archon
 	GroupTableLeague.display.other = CustomGroupTableLeague.display.other
 
-	GroupTableLeague.parseOpponentInput.solo = CustomGroupTableLeague.parseOpponentInput.solo
-	GroupTableLeague.parseOpponentInput.team = CustomGroupTableLeague.parseOpponentInput.team
-	GroupTableLeague.parseOpponentInput.duo = CustomGroupTableLeague.parseOpponentInput.duo
-	GroupTableLeague.parseOpponentInput.trio = CustomGroupTableLeague.parseOpponentInput.trio
-	GroupTableLeague.parseOpponentInput.quad = CustomGroupTableLeague.parseOpponentInput.quad
-	GroupTableLeague.parseOpponentInput.archon = CustomGroupTableLeague.parseOpponentInput.archon
-	GroupTableLeague.parseOpponentInput.other = CustomGroupTableLeague.parseOpponentInput.other
+	GroupTableLeague.readOpponent.solo = CustomGroupTableLeague.readOpponent.solo
+	GroupTableLeague.readOpponent.team = CustomGroupTableLeague.readOpponent.team
+	GroupTableLeague.readOpponent.duo = CustomGroupTableLeague.readOpponent.duo
+	GroupTableLeague.readOpponent.trio = CustomGroupTableLeague.readOpponent.trio
+	GroupTableLeague.readOpponent.quad = CustomGroupTableLeague.readOpponent.quad
+	GroupTableLeague.readOpponent.archon = CustomGroupTableLeague.readOpponent.archon
+	GroupTableLeague.readOpponent.other = CustomGroupTableLeague.readOpponent.other
 
 	GroupTableLeague.convertType = CustomGroupTableLeague.convertType
 	GroupTableLeague.lpdbConditions = CustomGroupTableLeague.lpdbConditions
@@ -47,13 +47,16 @@ end
 
 --functions to get the display
 function CustomGroupTableLeague.display.solo(opp)
-	return Player._player({
-		opp.opponentArg or opp.opponent,
-		link = opp.opponent,
+	local player = {
+		displayName = opp.opponentArg or opp.opponent,
+		pageName = opp.opponent,
 		flag = opp.flag,
 		race = opp.race,
-		novar = 'true'
-	})
+	}
+	return tostring(Player.InlinePlayerContainer({
+		dontSave = true,
+		player = player,
+	}))
 end
 
 function CustomGroupTableLeague.display.team(opp, date)
@@ -63,30 +66,41 @@ end
 function CustomGroupTableLeague.display.other(opp, numberOfPlayers)
 	local output = {}
 	for i = 1, numberOfPlayers do
-		table.insert(output, Player._player({
-			opp['opponent' .. i .. 'Arg'] or opp['opponent' .. i],
-			link = opp['opponent' .. i],
+		local player = {
+			displayName = opp['opponent' .. i .. 'Arg'] or opp['opponent' .. i],
+			pageName = opp['opponent' .. i],
 			flag = opp['flag' .. i],
 			race = opp['race' .. i],
-			novar = 'true'
-		}))
+		}
+		table.insert(output, tostring(Player.InlinePlayerContainer({
+			dontSave = true,
+			player = player,
+		})))
 	end
 	return table.concat(output, '<br>')
 end
 
 function CustomGroupTableLeague.display.archon(opp)
 	local player1 = {
-		opp.opponent1Arg or opp.opponent1,
-		link = opp.opponent1,
+		displayName = opp.opponent1Arg or opp.opponent1,
+		pageName = opp.opponent1,
 		flag = opp.flag1,
-		novar = 'true'
 	}
+	player1 = tostring(Player.InlinePlayerContainer({
+		dontSave = true,
+		player = player1,
+		showRace = false
+	}))
 	local player2 = {
-		opp.opponent2Arg or opp.opponent2,
-		link = opp.opponent2,
+		displayName = opp.opponent2Arg or opp.opponent2,
+		pageName = opp.opponent2,
 		flag = opp.flag2,
-		novar = 'true'
 	}
+	player2 = tostring(Player.InlinePlayerContainer({
+		dontSave = true,
+		player = player2,
+		showRace = false
+	}))
 	local output = mw.html.create('table'):css('text-align', 'left')
 		:tag('tr'):addClass('archon-table-bg')
 			:tag('td')
@@ -98,12 +112,12 @@ function CustomGroupTableLeague.display.archon(opp)
 			:tag('td')
 				:css('border', '0px')
 				:css('padding', '0px')
-				:wikitext(Player._player(player1)):done():done()
+				:wikitext(player1):done():done()
 		:tag('tr'):addClass('archon-table-bg')
 			:tag('td')
 				:css('border', '0px')
 				:css('padding', '0px')
-				:wikitext(Player._player(player2)):done():done():done()
+				:wikitext(player2):done():done():done()
 	return tostring(output)
 end
 
@@ -120,7 +134,7 @@ function CustomGroupTableLeague.display.quad(opp)
 end
 
 --functions to parse opponent input
-function CustomGroupTableLeague.parseOpponentInput.solo(param, opponentIndex, opponentArg, args, opponents)
+function CustomGroupTableLeague.readOpponent.solo(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args[param .. opponentIndex .. 'link'] or
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
@@ -141,7 +155,7 @@ function CustomGroupTableLeague.parseOpponentInput.solo(param, opponentIndex, op
 	return opponentListEntry, aliasList, opponents
 end
 
-function CustomGroupTableLeague.parseOpponentInput.team(param, opponentIndex, opponentArg, args, opponents)
+function CustomGroupTableLeague.readOpponent.team(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		TeamTemplates._teampage((opponentArg or '') ~= '' and opponentArg or 'tbd')
 	)
@@ -158,19 +172,19 @@ function CustomGroupTableLeague.parseOpponentInput.team(param, opponentIndex, op
 	return opponentListEntry, aliasList, opponents
 end
 
-function CustomGroupTableLeague.parseOpponentInput.duo(param, opponentIndex, opponentArg, args, opponents)
-	return CustomGroupTableLeague.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 2)
+function CustomGroupTableLeague.readOpponent.duo(param, opponentIndex, opponentArg, args, opponents)
+	return CustomGroupTableLeague.readOpponent.other(param, opponentIndex, opponentArg, args, opponents, 2)
 end
 
-function CustomGroupTableLeague.parseOpponentInput.trio(param, opponentIndex, opponentArg, args, opponents)
-	return CustomGroupTableLeague.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 3)
+function CustomGroupTableLeague.readOpponent.trio(param, opponentIndex, opponentArg, args, opponents)
+	return CustomGroupTableLeague.readOpponent.other(param, opponentIndex, opponentArg, args, opponents, 3)
 end
 
-function CustomGroupTableLeague.parseOpponentInput.quad(param, opponentIndex, opponentArg, args, opponents)
-	return CustomGroupTableLeague.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 4)
+function CustomGroupTableLeague.readOpponent.quad(param, opponentIndex, opponentArg, args, opponents)
+	return CustomGroupTableLeague.readOpponent.other(param, opponentIndex, opponentArg, args, opponents, 4)
 end
 
-function CustomGroupTableLeague.parseOpponentInput.other(
+function CustomGroupTableLeague.readOpponent.other(
 		param,
 		opponentIndex,
 		opponentArg,
@@ -217,7 +231,7 @@ function CustomGroupTableLeague.parseOpponentInput.other(
 	return opponentListEntry, aliasList, opponents
 end
 
-function CustomGroupTableLeague.parseOpponentInput.archon(param, opponentIndex, opponentArg, args, opponents)
+function CustomGroupTableLeague.readOpponent.archon(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args[param .. opponentIndex .. 'p1link'] or
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
