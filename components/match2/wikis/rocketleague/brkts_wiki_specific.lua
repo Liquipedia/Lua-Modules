@@ -38,4 +38,6 @@ function WikiSpecific.getMatchGroupContainer(matchGroupType)
 		or Lua.import('Module:MatchGroup/Display/Bracket/Custom', {requireDevIfEnabled = true}).BracketContainer
 end
 
+WikiSpecific.defaultIcon = 'Rllogo_std.png'
+
 return WikiSpecific
