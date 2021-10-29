@@ -1,6 +1,7 @@
 local String = require('Module:String')
 local Variables = require('Module:Variables')
 local Team = require('Module:Team')
+local Player = require('Module:Player')
 local LinkIcons = require('Module:MatchExternalLinks/Starcraft')
 
 local Custom = {
