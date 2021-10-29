@@ -427,7 +427,7 @@ end
 
 -- Given the format `pagename|displayname`, returns pagename
 function League:_getPageNameFromChronology(item)
-	if item == nil or not string.find(item, '|') then
+	if item == nil then
 		return ''
 	end
 
