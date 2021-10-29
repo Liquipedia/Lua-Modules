@@ -611,9 +611,6 @@ function CustomLeague:_getPageNameFromChronology(item)
 	if String.isEmpty(item) then
 		return ''
 	end
-	if not string.find(item, '|') then
-		return item
-	end
 
 	return mw.text.split(item, '|')[1]
 end
