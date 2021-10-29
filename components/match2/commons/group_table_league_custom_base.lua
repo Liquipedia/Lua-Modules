@@ -10,11 +10,16 @@ local Custom = {
 
 --functions to get the display
 function Custom.display.solo(opp)
-	error('You need to specify "Custom.display" vis "Module:Module:GroupTableLeague/Custom"')
+	return Player._player({
+		opp.opponentArg or opp.opponent,
+		link = opp.opponent,
+		flag = opp.flag,
+		novar = 'true'
+	})
 end
 
 function Custom.display.team(opp, date)
-	error('You need to specify "Custom.display" vis "Module:Module:GroupTableLeague/Custom"')
+	return Team.team(nil, opp.opponentArg, date)
 end
 
 --functions to parse opponent input
