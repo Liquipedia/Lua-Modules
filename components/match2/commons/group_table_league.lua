@@ -557,7 +557,7 @@ function GroupTableLeague.create(args, data)
 			end
 		end
 
-		local output, header = GroupTableLeague._createHeader(frame, args, #rounds, isMidTournament)
+		local output, header = GroupTableLeague._createHeader(args, #rounds, isMidTournament)
 
 		--store (s)date as match date to be passed to the matches entered after this group table
 		local storeToVarDate = args.sdate or ''
@@ -970,7 +970,7 @@ function GroupTableLeague._printResults(args, output, results, rounds, roundNumb
 	end
 end
 
-function GroupTableLeague._createHeader(frame, args, numberOfRounds, isMidTournament)
+function GroupTableLeague._createHeader(args, numberOfRounds, isMidTournament)
 	local class = 'wikitable wikitable-bordered grouptable'
 	if Logic.readBool(args.hide) then
 		class = class .. ' collapsible collapsed'
@@ -989,7 +989,7 @@ function GroupTableLeague._createHeader(frame, args, numberOfRounds, isMidTourna
 	local titleText = ''
 	if args.location then
 		titleText = '<span style="padding-right:3px;">' ..
-			Template.safeExpand(frame, 'Played in', {args.location}, '')
+			Template.safeExpand(mw.getCurrentFrame(), 'Played in', {args.location}, '')
 			.. '</span>'
 	end
 	titleText = titleText .. (args.title or mw.title.getCurrentTitle().text)
