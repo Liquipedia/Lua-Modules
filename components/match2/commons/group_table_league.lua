@@ -56,7 +56,7 @@ local _EMPTY_MATCH = {
 local _lpdbBaseConditions
 
 local GroupTableLeague = {
-	parseOpponentInput = {},
+	readOpponent = {},
 	display = {},
 }
 local StatefulScore = {}
@@ -251,7 +251,7 @@ function GroupTableLeague._parseArgs(args, typeParams, tableType)
 				-- opponentX
 				if param == 'opponent' or Table.includes(typeParams, param) then
 					local opponentAlias
-					opponentList[opponentIndex], opponentAlias, opponents = GroupTableLeague.parseOpponentInput[tableType](
+					opponentList[opponentIndex], opponentAlias, opponents = GroupTableLeague.readOpponent[tableType](
 						param,
 						opponentIndex,
 						item,
@@ -1274,7 +1274,7 @@ function GroupTableLeague.display.team(opp, date)
 end
 
 --functions to parse opponent input
-function GroupTableLeague.parseOpponentInput.solo(param, opponentIndex, opponentArg, args, opponents)
+function GroupTableLeague.readOpponent.solo(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args[param .. opponentIndex .. 'link'] or
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
@@ -1294,7 +1294,7 @@ function GroupTableLeague.parseOpponentInput.solo(param, opponentIndex, opponent
 	return opponentListEntry, aliasList, opponents
 end
 
-function GroupTableLeague.parseOpponentInput.team(param, opponentIndex, opponentArg, args, opponents)
+function GroupTableLeague.readOpponent.team(param, opponentIndex, opponentArg, args, opponents)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		Team.page(nil, (opponentArg or '') ~= '' and opponentArg or 'tbd')
 	)
