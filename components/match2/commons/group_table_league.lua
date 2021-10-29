@@ -19,8 +19,10 @@ local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
 local Template = require('Module:Template')
-local Custom = require('Module:Hjpalpha/sandbox20')
+local Custom = Lua.requireIfExists('Module:GroupTableLeague/Custom',
+	require('Module:GroupTableLeague/Custom/Base'))
 
 local _aliasList = {}
 
