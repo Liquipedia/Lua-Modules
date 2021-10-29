@@ -608,8 +608,11 @@ function CustomLeague:_createNoWrappingSpan(content)
 end
 
 function CustomLeague:_getPageNameFromChronology(item)
-	if item == nil or not string.find(item, '|') then
+	if String.isEmpty(item) then
 		return ''
+	end
+	if not string.find(item, '|') then
+		return item
 	end
 
 	return mw.text.split(item, '|')[1]
