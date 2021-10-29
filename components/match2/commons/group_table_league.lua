@@ -641,7 +641,8 @@ function GroupTableLeague._parseArgs(args, typeParams, tableType)
 
 			-- paramX associated with opponentX
 			if key:match('^r?o?u?n?d?%d-([^%d]*%d*)$') then
-				local roundIndex, param, opponentIndex = key:match('^r?o?u?n?d?(%d-)([^%d]*)(%d*)$')
+				key = string.gsub(key, '^round', 'r')
+				local roundIndex, param, opponentIndex = key:match('^r?(%d-)([^%d]*)(%d*)$')
 
 				if roundIndex == '' then
 					roundIndex = 0
@@ -692,7 +693,7 @@ function GroupTableLeague._parseArgs(args, typeParams, tableType)
 					end
 
 				-- rNdateX
-				elseif param == 'edate' or param == 'date' or param == 'ate' then
+				elseif param == 'edate' or param == 'date' then
 					rounds[roundIndex].date = tonumber(GroupTableLeague._formatDate(item, 'U'))
 
 				-- rNbgX
