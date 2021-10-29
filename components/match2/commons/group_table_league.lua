@@ -604,7 +604,8 @@ function GroupTableLeague.create(args, data)
 			results,
 			output,
 			roundNumber,
-			customPoints
+			customPoints,
+			isMidTournament
 		)
 
 		divWrapper = mw.html.create('div')
@@ -770,7 +771,8 @@ function GroupTableLeague._applyDataToResults(
 		results,
 		output,
 		roundNumber,
-		customPoints
+		customPoints,
+		isMidTournament
 	)
 	for key, item in ipairs(data) do
 		--get opponentList index for each oppoenent
