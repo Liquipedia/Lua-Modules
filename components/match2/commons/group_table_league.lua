@@ -12,7 +12,7 @@
 				136 = Data
 ]]
 
-local Arguments = require('Module:Arguments')
+local Class = require('Module:Class')
 local Array = require('Module:Array')
 local Countdown = require('Module:Countdown')
 local Logic = require('Module:Logic')
@@ -487,20 +487,144 @@ function GroupTableLeague._resolveTies(args, opponentList, results, date)
 	end
 end
 
-function GroupTableLeague.create(frame, args, data)
+function GroupTableLeague.create(args, data)
 	local divWrapper
+	local roundNumber = 1
+
+	local tableType, mode, typeParams = Custom.convertType(args['type'])
+
+	local opponentList, tournaments, customPoints, rounds, opponents, countWinPoints
+		= GroupTableLeague._parseArgs(args, typeParams, tableType)
+
+	args, countWinPoints = GroupTableLeague._parseParametersFromArgs(args, countWinPoints)
+
+	if not data then
+		data = GroupTableLeague._getLpdbResults(args, tournaments, opponents, mode, args.id or '')
+	end
+
+	--if no data is set and no data is found we set an empty match to avoid errors
+	if not data[1] then
+		data[1] = _EMPTY_MATCH
+	end
+
+	if type(data) == 'table' then
+		-- final date
+		table.sort(rounds, function(item1, item2) return item1.date < item2.date end)
+		local isMidTournament = false
+		local todayDate = tonumber(mw.language.getContentLanguage():formatDate('U', os.date()))
+		local lastDate = todayDate
+		if next(data) then
+			lastDate = tonumber(GroupTableLeague._formatDate(data[#data].date, 'U'))
+			for key, item in ipairs(rounds) do
+				if item.date > todayDate then
+					if isMidTournament then
+						rounds[key] = nil
+					else
+						isMidTournament = true
+					end
+				elseif item.date > lastDate then
+					rounds[key] = nil
+				end
+			end
+		end
+
+		if not(rounds[1]) or (rounds[#rounds].date < lastDate and not(isMidTournament)) then
+			if rounds[0] then
+				rounds[0].date = todayDate
+				rounds[(#rounds or 0) + 1] = rounds[0]
+			else
+				rounds[(#rounds or 0) + 1] = {
+					date = todayDate,
+					temp = {
+						series = {
+							won = {},
+							tied = {},
+							loss = {},
+						},
+						games = {
+							won = {},
+							loss = {},
+						},
+						points = {},
+						tiebreaker = {},
+						diff = {}
+					},
+					params = {
+						disqualified = {},
+						bg = {}
+					}
+				}
+			end
+		end
+
+		local output, header = GroupTableLeague._createHeader(frame, args, #rounds, isMidTournament)
+
+		--store (s)date as match date to be passed to the matches entered after this group table
+		local storeToVarDate = args.sdate or ''
+		if storeToVarDate == '' then
+			storeToVarDate = args.date or ''
+		end
+		if storeToVarDate ~= '' then
+			storeToVarDate = GroupTableLeague._formatDate(storeToVarDate, 'Y-m-d H:i:s')
+			Variables.varDefine('matchDate', storeToVarDate)
+		end
+
+		-- get list of unique opponents if no set opponents
+		if not next(opponentList) then
+			local k = 0
+			for _, item in ipairs(data) do
+				if not opponentList[item.match2opponents[1].name] then
+					k = k + 1
+					opponentList[k] = {opponent = item.match2opponents[1].name, opponentArg = item.match2opponents[1].name}
+				end
+				if not opponentList[item.match2opponents[2].name] then
+					k = k + 1
+					opponentList[k] = {opponent = item.match2opponents[2].name, opponentArg = item.match2opponents[2].name}
+				end
+			end
+		end
+		-- additional opponent 'discard' for discarded results
+		opponentList[0] = ''
+
+		local oppdate = args.edate or args.date or Variables.varDefault('tournament_enddate', todayDate)
+
+		local results = GroupTableLeague._initializeResults(opponentList, tableType, oppdate)
+
+		-- calculations
+		if not next(data) then
+			GroupTableLeague._resolveTies(args, opponentList, results, todayDate)
+			GroupTableLeague._printResults(args, header, results, rounds, roundNumber)
+		end
+		local numberOfRounds
+		output, numberOfRounds = GroupTableLeague._applyDataToResults(
+			data,
+			opponentList,
+			args,
+			rounds,
+			results,
+			output,
+			roundNumber,
+			customPoints
+		)
+
+		divWrapper = mw.html.create('div')
+			:addClass('table-responsive toggle-area toggle-area-' .. numberOfRounds)
+			:attr('data-toggle-area', numberOfRounds)
+			:node(output)
+	else
+		error(data)
+	end
+
+	return divWrapper
+end
+
+function GroupTableLeague._parseArgs(args, typeParams, tableType)
 	local opponentList = {}
 	local tournaments = {}
 	local customPoints = {}
 	local rounds = {}
-	local roundNumber = 1
 	local opponents = {}
 	local countWinPoints = 1
-
-	if not args then
-		args = Arguments.getArgs(frame)
-	end
-	local tableType, mode, typeParams = Custom.convertType(args['type'])
 
 	-- parse parameters tournamentX and opponentX and X-X_p
 	for key, item in pairs(args) do
@@ -618,7 +742,10 @@ function GroupTableLeague.create(frame, args, data)
 		opponents = {}
 	end
 
-	-- parse parameters
+	return opponentList, tournaments, customPoints, rounds, opponents, countWinPoints
+end
+
+function GroupTableLeague._parseParametersFromArgs(args, countWinPoints)
 	countWinPoints = (args.countWinPoints == '1' or args.countWinPoints == 'true') and 1 or countWinPoints
 	args.win_p = tonumber(args.win_p) or countWinPoints * 3
 	args.tie_p = tonumber(args.tie_p) or countWinPoints * 1
@@ -632,190 +759,86 @@ function GroupTableLeague.create(frame, args, data)
 	args.roundtitle = args.roundtitle or 'Round'
 	args.roundwidth = tonumber(args.roundwidth) or 90
 
-	if not data then
-		data = GroupTableLeague._getLpdbResults(args, tournaments, opponents, mode, args.id or '')
-	end
+	return args, countWinPoints
+end
 
-	--if no data is set and no data is found we set an empty match to avoid errors
-	if not data[1] then
-		data[1] = _EMPTY_MATCH
-	end
-
-	if type(data) == 'table' then
-		-- final date
-		table.sort(rounds, function(item1, item2) return item1.date < item2.date end)
-		local isMidTournament = false
-		local todayDate = tonumber(mw.language.getContentLanguage():formatDate('U', os.date()))
-		local lastDate = todayDate
-		if next(data) then
-			lastDate = tonumber(GroupTableLeague._formatDate(data[#data].date, 'U'))
-			for key, item in ipairs(rounds) do
-				if item.date > todayDate then
-					if isMidTournament then
-						rounds[key] = nil
-					else
-						isMidTournament = true
-					end
-				elseif item.date > lastDate then
-					rounds[key] = nil
-				end
-			end
+function GroupTableLeague._applyDataToResults(data, opponentList, args, rounds, results, output, roundNumber, customPoints)
+	for key, item in ipairs(data) do
+		--get opponentList index for each oppoenent
+		local index1
+		if _aliasList[item.match2opponents[1].name] then
+			index1 = opponentList[_aliasList[item.match2opponents[1].name]]
+		else
+			index1 = opponentList[item.match2opponents[1].name]
+		end
+		local index2
+		if _aliasList[item.match2opponents[2].name] then
+			index2 = opponentList[_aliasList[item.match2opponents[2].name]]
+		else
+			index2 = opponentList[item.match2opponents[2].name]
 		end
 
-		if not(rounds[1]) or (rounds[#rounds].date < lastDate and not(isMidTournament)) then
-			if rounds[0] then
-				rounds[0].date = todayDate
-				rounds[(#rounds or 0) + 1] = rounds[0]
-			else
-				rounds[(#rounds or 0) + 1] = {
-					date = todayDate,
-					temp = {
-						series = {
-							won = {},
-							tied = {},
-							loss = {},
-						},
-						games = {
-							won = {},
-							loss = {},
-						},
-						points = {},
-						tiebreaker = {},
-						diff = {}
-					},
-					params = {
-						disqualified = {},
-						bg = {}
-					}
-				}
-			end
-		end
-
-		local output, header = GroupTableLeague._createHeader(frame, args, #rounds, isMidTournament)
-
-		--store (s)date as match date to be passed to the matches entered after this group table
-		local storeToVarDate = args.sdate or ''
-		if storeToVarDate == '' then
-			storeToVarDate = args.date or ''
-		end
-		if storeToVarDate ~= '' then
-			storeToVarDate = GroupTableLeague._formatDate(storeToVarDate, 'Y-m-d H:i:s')
-			Variables.varDefine('matchDate', storeToVarDate)
-		end
-
-		-- get list of unique opponents if no set opponents
-		if not next(opponentList) then
-			local k = 0
-			for _, item in ipairs(data) do
-				if not opponentList[item.match2opponents[1].name] then
-					k = k + 1
-					opponentList[k] = {opponent = item.match2opponents[1].name, opponentArg = item.match2opponents[1].name}
-				end
-				if not opponentList[item.match2opponents[2].name] then
-					k = k + 1
-					opponentList[k] = {opponent = item.match2opponents[2].name, opponentArg = item.match2opponents[2].name}
-				end
-			end
-		end
-		-- additional opponent 'discard' for discarded results
-		opponentList[0] = ''
-
-		local oppdate = args.edate or args.date or Variables.varDefault('tournament_enddate', todayDate)
-
-		local results = GroupTableLeague._initializeResults(opponentList, tableType, oppdate)
-
-		-- calculations
-		if not next(data) then
-			GroupTableLeague._resolveTies(args, opponentList, results, todayDate)
-			GroupTableLeague._printResults(args, header, results, rounds, roundNumber)
-		end
-		for key, item in ipairs(data) do
-			local index1
-			if _aliasList[item.match2opponents[1].name] then
-				index1 = opponentList[_aliasList[item.match2opponents[1].name]]
-			else
-				index1 = opponentList[item.match2opponents[1].name]
-			end
-			local index2
-			if _aliasList[item.match2opponents[2].name] then
-				index2 = opponentList[_aliasList[item.match2opponents[2].name]]
-			else
-				index2 = opponentList[item.match2opponents[2].name]
-			end
-			local update = false
-
+		local update = false
 			if (args.exclusive ~= 'false' and index1 and index2) then
-				update = true
-			elseif (args.exclusive == 'false' and (index1 or index2)) then
-				update = true
-				if not index1 then
-					index1 = 0 --discard results
-				elseif not index2 then
-					index2 = 0 --discard results
-				end
-			end
-
-			if (update == true) then
-				local score1 = tonumber(item.match2opponents[1].score)
-				local score2 = tonumber(item.match2opponents[2].score)
-				if
-					(Logic.readBool(item.finished) or item.finished == 't') and
-					(score1 > 0 or score2 > 0 or (not String.isEmpty(item.winner)) or (not String.isEmpty(item.resulttype)))
-				then
-					results, args = GroupTableLeague._calculateResults(
-						results,
-						index1,
-						index2,
-						item,
-						args.walkover_win,
-						customPoints,
-						args
-					)
-				end
-			end
-
-			--add a catch to fix an error (ugly af!)
-			local roundIsEmpty
-			if not rounds[roundNumber] then
-				roundIsEmpty = true
-				rounds[roundNumber] = rounds[roundNumber - 1]
-				rounds[roundNumber].date = 9999999999
-			end
-
-			if key == #data or tonumber(GroupTableLeague._formatDate(data[key+1].date, 'U')) > rounds[roundNumber].date then
-				results = GroupTableLeague._updateResults(results, rounds, args, #opponentList, roundNumber)
-
-				-- tiebreakers
-				GroupTableLeague._resolveTies(args, opponentList, results, rounds[roundNumber].date)
-
-				-- update rankings
-				results = GroupTableLeague._updateRankings(results)
-
-				if roundIsEmpty then
-					rounds[roundNumber] = nil
-				end
-
-				if roundNumber == #rounds then
-					GroupTableLeague._printResults(args, output, results, rounds, roundNumber, isMidTournament)
-				else
-					GroupTableLeague._printResults(args, output, results, rounds, roundNumber)
-				end
-				roundNumber = roundNumber + 1
-				if roundNumber > #rounds or roundIsEmpty then
-					break;
-				end
+			update = true
+		elseif (args.exclusive == 'false' and (index1 or index2)) then
+			update = true
+			if not index1 then
+				index1 = 0 --discard results
+			elseif not index2 then
+				index2 = 0 --discard results
 			end
 		end
 
-		divWrapper = mw.html.create('div')
-			:addClass('table-responsive toggle-area toggle-area-' .. #rounds)
-			:attr('data-toggle-area', #rounds)
-			:node(output)
-	else
-		error(data)
+		if (update == true) then
+			local score1 = tonumber(item.match2opponents[1].score)
+			local score2 = tonumber(item.match2opponents[2].score)
+			if
+				(Logic.readBool(item.finished) or item.finished == 't') and
+				(score1 > 0 or score2 > 0 or (not String.isEmpty(item.winner)) or (not String.isEmpty(item.resulttype)))
+			then
+				results, args = GroupTableLeague._calculateResults(
+					results,
+					index1,
+					index2,
+					item,
+					args.walkover_win,
+					customPoints,
+					args
+				)
+			end
+		end
+
+		--add a catch to fix an error (ugly af!)
+		local roundIsEmpty
+		if not rounds[roundNumber] then
+			roundIsEmpty = true
+			rounds[roundNumber] = rounds[roundNumber - 1]
+			rounds[roundNumber].date = 9999999999
+		end
+
+		if key == #data or tonumber(GroupTableLeague._formatDate(data[key+1].date, 'U')) > rounds[roundNumber].date then
+			results = GroupTableLeague._updateResults(results, rounds, args, #opponentList, roundNumber)
+
+			GroupTableLeague._resolveTies(args, opponentList, results, rounds[roundNumber].date)
+
+			results = GroupTableLeague._updateRankings(results)
+				if roundIsEmpty then
+				rounds[roundNumber] = nil
+			end
+				if roundNumber == #rounds then
+				GroupTableLeague._printResults(args, output, results, rounds, roundNumber, isMidTournament)
+			else
+				GroupTableLeague._printResults(args, output, results, rounds, roundNumber)
+			end
+			roundNumber = roundNumber + 1
+			if roundNumber > #rounds or roundIsEmpty then
+				break;
+			end
+		end
 	end
 
-	return divWrapper
+	return output, #rounds
 end
 
 function GroupTableLeague._initializeResults(opponentList, tableType, oppdate)
@@ -1202,4 +1225,4 @@ function GroupTableLeague._mergeOpponentConditions(opp1, opp2)
 		table.concat(opp2, ']] OR [[opponent::') .. ']])'
 end
 
-return GroupTableLeague
+return Class.export(GroupTableLeague)
