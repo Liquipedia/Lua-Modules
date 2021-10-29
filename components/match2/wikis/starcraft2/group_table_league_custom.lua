@@ -12,8 +12,7 @@ local String = require('Module:String')
 local Variables = require('Module:Variables')
 local Class = require('Module:Class')
 local BigRaceIcon = require('Module:RaceIcon')._getBigIcon
---local GroupTableLeague = require('Module:GroupTableLeague')
-local GroupTableLeague = require('Module:Hjpalpha/sandbox19')
+local GroupTableLeague = require('Module:GroupTableLeague')
 
 local CustomGroupTableLeague = {
 	display = {},
@@ -171,7 +170,14 @@ function CustomGroupTableLeague.parseOpponentInput.quad(param, opponentIndex, op
 	return CustomGroupTableLeague.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, 4)
 end
 
-function CustomGroupTableLeague.parseOpponentInput.other(param, opponentIndex, opponentArg, args, opponents, numberOfPlayers)
+function CustomGroupTableLeague.parseOpponentInput.other(
+		param,
+		opponentIndex,
+		opponentArg,
+		args,
+		opponents,
+		numberOfPlayers
+	)
 	local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args[param .. opponentIndex .. 'p1link'] or
 		Variables.varDefault(opponentArg .. '_page', opponentArg)
