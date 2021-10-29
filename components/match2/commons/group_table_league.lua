@@ -66,7 +66,6 @@ function GroupTableLeague._getLpdbResults(args, tournaments, opponents, mode, id
 	local lpdbConditions, lpdbBaseConditions = Custom.lpdbConditions(args, opponents, mode, baseConditions, dateConditions)
 	_lpdbBaseConditions = lpdbBaseConditions
 
-mw.logObject(lpdbConditions)
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		limit = 1000,
 		order = 'date asc',
@@ -1186,7 +1185,7 @@ function GroupTableLeague._getH2HOppCond(results, index)
 	local opp = {oppEntry}
 	--aliases
 	if _aliasList[results[index].opponent] then
-		for aliasEntry, cleanEntry in pairs(_aliasList[oppEntry]) do
+		for aliasEntry, cleanEntry in pairs(_aliasList) do
 			if cleanEntry == oppEntry then
 				table.insert(opp, aliasEntry)
 			end
