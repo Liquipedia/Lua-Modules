@@ -762,7 +762,16 @@ function GroupTableLeague._parseParametersFromArgs(args, countWinPoints)
 	return args
 end
 
-function GroupTableLeague._applyDataToResults(data, opponentList, args, rounds, results, output, roundNumber, customPoints)
+function GroupTableLeague._applyDataToResults(
+		data,
+		opponentList,
+		args,
+		rounds,
+		results,
+		output,
+		roundNumber,
+		customPoints
+	)
 	for key, item in ipairs(data) do
 		--get opponentList index for each oppoenent
 		local index1
