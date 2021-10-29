@@ -27,7 +27,6 @@ local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Lua = require('Module:Lua')
 local Template = require('Module:Template')
 local Team = require('Module:Team')
 local Player = require('Module:Player')
@@ -356,7 +355,13 @@ end
 
 function GroupTableLeague._getLpdbResults(args, tournaments, opponents, mode, id)
 	local baseConditions, dateConditions = GroupTableLeague._lpdbBaseConditions(args, tournaments, id)
-	local lpdbConditions, lpdbBaseConditions = GroupTableLeague.lpdbConditions(args, opponents, mode, baseConditions, dateConditions)
+	local lpdbConditions, lpdbBaseConditions = GroupTableLeague.lpdbConditions(
+		args,
+		opponents,
+		mode,
+		baseConditions,
+		dateConditions
+	)
 	_lpdbBaseConditions = lpdbBaseConditions
 
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
