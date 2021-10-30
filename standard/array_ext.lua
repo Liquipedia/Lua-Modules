@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
+
 --[[
 Namespace of array functions that aren't as commonly used as ones in
 Module:Array
@@ -48,6 +50,34 @@ function ArrayExt.uniqueElement(elems)
 		uniqueElem = elem
 	end
 	return uniqueElem
+end
+
+--[[
+Groups adjacent elements of an array based on applying a transformation to the
+elements. The function returns an array of groups.
+
+The optional equals parameter specifies the equality relation of the
+transformed elements.
+
+Example:
+ArrayExt.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
+-- returns {{2}, {3, 5, 7}, {14, 16}}
+]]
+function ArrayExt.groupAdjacentBy(array, f, equals)
+	equals = equals or Logic.deepEquals
+
+	local groups = {}
+	local currentKey
+	for index, elem in ipairs(array) do
+		local key = f(elem)
+		if index == 1 or not equals(key, currentKey) then
+			currentKey = key
+			table.insert(groups, {})
+		end
+		table.insert(groups[#groups], elem)
+	end
+
+	return groups
 end
 
 return ArrayExt
