@@ -30,4 +30,24 @@ function ArrayExt.findIndex(array, pred)
 	return 0
 end
 
+--[[
+Returns the unique element in an array. Returns nil if there is more than one
+distinct element, or if the array is empty.
+
+Example:
+
+ArrayExt.uniqueElement({4, 4, 4})
+-- Returns 4
+]]
+function ArrayExt.uniqueElement(elems)
+	local uniqueElem
+	for i, elem in ipairs(elems) do
+		if i ~= 1 and elem ~= uniqueElem then
+			return nil
+		end
+		uniqueElem = elem
+	end
+	return uniqueElem
+end
+
 return ArrayExt
