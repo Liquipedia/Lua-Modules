@@ -6,14 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----
--- @author Vogan for Liquipedia
---
--- A number of these functions take inspiration from Penlight: https://github.com/lunarmodules/Penlight
---
-
---local Class = require('Module:Class')
-
 local Table = {}
 
 function Table.randomize(tbl)
@@ -127,6 +119,31 @@ function Table.deepCopy(tbl_, options)
 	end
 
 	return deepCopy(tbl_)
+end
+
+--[[
+Determines whether two tables are equal, by comparing their entries. Table
+values are compared recursively.
+]]
+function Table.deepEquals(xTable, yTable)
+	local Logic = require('Module:Logic')
+
+	assert(type(xTable) == 'table', 'Table.deepEquals: First argument must be a table')
+	assert(type(yTable) == 'table', 'Table.deepEquals: Second argument must be a table')
+
+	for key, value in pairs(xTable) do
+		if not Logic.deepEquals(value, yTable[key]) then
+			return false
+		end
+	end
+
+	for key, _ in pairs(yTable) do
+		if xTable[key] == nil then
+			return false
+		end
+	end
+
+	return true
 end
 
 --[[

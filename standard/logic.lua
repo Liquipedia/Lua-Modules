@@ -84,4 +84,17 @@ function Logic.isNumeric(val)
 	return tonumber(val) ~= nil
 end
 
+--[[
+Determines whether two values are equal. Table values are compared recursively.
+]]
+function Logic.deepEquals(x, y)
+	if x == y then
+		return true
+	elseif type(x) == 'table' and type(y) == 'table' then
+		return require('Module:Table').deepEquals(x, y)
+	else
+		return false
+	end
+end
+
 return Logic
