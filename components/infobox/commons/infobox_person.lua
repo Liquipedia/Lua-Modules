@@ -47,6 +47,9 @@ function Person:createInfobox()
 	end
 
 	_shouldStoreData = Person:shouldStoreData(args)
+	-- set custom variables here already so they are available
+	-- in functions we call from here on
+	self:defineCustomPageVariables(args)
 
 	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
@@ -209,6 +212,10 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 	local storageType = self:getStorageType(args, personType, status)
 
 	mw.ext.LiquipediaDB.lpdb_player(storageType .. self.name, lpdbData)
+end
+
+--- Allows for overriding this functionality
+function Person:defineCustomPageVariables(args)
 end
 
 --- Allows for overriding this functionality
