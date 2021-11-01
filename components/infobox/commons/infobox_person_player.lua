@@ -57,15 +57,11 @@ local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local Earnings = require('Module:Earnings')
-local GameAppearances = require('Module:GetGameAppearances')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Page = require('Module:Page')
 local YearsActive = require('Module:YearsActive')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
 
 local _BANNED = mw.loadData('Module:Banned')
 
