@@ -8,6 +8,7 @@ std = {
 		"ipairs",
 		"math",
 		"mw",
+		"next",
 		"os",
 		"package",
 		"pairs",

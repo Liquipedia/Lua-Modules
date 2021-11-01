@@ -204,7 +204,8 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_parentname', args.parentname)
 	Variables.varDefine('tournament_subpage', args.subpage)
 
-	Variables.varDefine('tournament_startdate', self:_cleanDate(args.sdate))
+	Variables.varDefine('tournament_startdate',
+	self:_cleanDate(args.sdate) or self:_cleanDate(args.date))
 	Variables.varDefine('tournament_enddate',
 	self:_cleanDate(args.edate) or self:_cleanDate(args.date))
 
@@ -221,39 +222,31 @@ function League:_setLpdbData(args, links)
 		icon = Variables.varDefault('tournament_icon'),
 		icondark = Variables.varDefault('tournament_icondark'),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
-		previous = args.previous,
-		previous2 = args.previous2,
-		next = args.next,
-		next2 = args.next2,
+		previous = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous)),
+		previous2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous2)),
+		next = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next)),
+		next2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next2)),
 		game = string.lower(args.game or ''),
 		patch = args.patch,
 		endpatch = args.endpatch or args.epatch,
 		type = args.type,
-		organizers = mw.ext.LiquipediaDB.lpdb_create_json({
-			organizer1 = args.organizer or args.organizer1,
-			organizer2 = args.organizer2,
-			organizer3 = args.organizer3,
-			organizer4 = args.organizer4,
-			organizer5 = args.organizer5,
-		}),
+		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
+			League:_getNamedTableofAllArgsForBase(args, 'organizer')
+		),
 		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', '1970-01-01'),
 		enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
 		sortdate = Variables.varDefault('tournament_enddate', '1970-01-01'),
-		location = Locale.formatLocation({city = args.city or args.location, country = args.country}),
-		location2 = Locale.formatLocation({city = args.city2 or args.location2, country = args.country2}),
+		location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
+		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 		venue = args.venue,
 		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
 		status = args.status,
 		format = args.format,
-		sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
-			sponsor1 = args.sponsor or args.sponsor1,
-			sponsor2 = args.sponsor2,
-			sponsor3 = args.sponsor3,
-			sponsor4 = args.sponsor4,
-			sponsor5 = args.sponsor5,
-		}),
+		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
+			League:_getNamedTableofAllArgsForBase(args, 'sponsor')
+		),
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {})
 		),
@@ -262,6 +255,15 @@ function League:_setLpdbData(args, links)
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
+end
+
+function League:_getNamedTableofAllArgsForBase(args, base)
+	local basedArgs = self:getAllArgsForBase(args, base)
+	local namedArgs = {}
+	for key, item in pairs(basedArgs) do
+		namedArgs[base .. key] = item
+	end
+	return namedArgs
 end
 
 ---
@@ -423,6 +425,15 @@ function League:_isChronologySet(previous, next)
 	-- We only need to check the first of these params, since it makes no sense
 	-- to set next2 and not next, etc.
 	return not (String.isEmpty(previous) and String.isEmpty(next))
+end
+
+-- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise
+function League:_getPageNameFromChronology(item)
+	if item == nil then
+		return ''
+	end
+
+	return mw.text.split(item, '|')[1]
 end
 
 return League

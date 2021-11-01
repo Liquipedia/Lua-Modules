@@ -6,10 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local MatchGroupBase = {}
 
@@ -91,20 +89,6 @@ function MatchGroupBase._checkBracketDuplicate(bracketId)
 		local category = '[[Category:Pages with duplicate Bracketid]]'
 		mw.addWarning(warning)
 		return warning .. category
-	end
-end
-
-function MatchGroupBase.enableInstrumentation()
-	if FeatureFlag.get('perf') then
-		local config = Lua.loadDataIfExists('Module:MatchGroup/Config')
-		local perfConfig = Table.getByPathOrNil(config, {'perf'}) or {}
-		require('Module:Performance/Util').startInstrumentation(perfConfig)
-	end
-end
-
-function MatchGroupBase.disableInstrumentation()
-	if FeatureFlag.get('perf') then
-		require('Module:Performance/Util').stopAndSave()
 	end
 end
 

@@ -28,6 +28,8 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _next
+local _previous
 
 local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local _TODAY = os.date('%Y-%m-%d', os.time())
@@ -275,10 +277,10 @@ function CustomLeague._getGameVersion()
 end
 
 function CustomLeague._getChronologyData()
-	local next, previous = CustomLeague._computeChronology()
+	_next, _previous = CustomLeague._computeChronology()
 	return {
-		previous = previous,
-		next = next,
+		previous = _previous,
+		next = _next,
 		previous2 = _args.previous2,
 		next2 = _args.next2,
 		previous3 = _args.previous3,
@@ -530,6 +532,9 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('formatted_tournament_date', sdate)
 	Variables.varDefine('formatted_tournament_edate', edate)
 
+	--override var to standardize its entries
+	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game)] or {})[1] or _GAMES[_GAME_WOL][1])
+
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
@@ -572,6 +577,8 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.status = status
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
+	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
+	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
 
 	return lpdbData
 end
@@ -598,6 +605,14 @@ function CustomLeague:_createNoWrappingSpan(content)
 	span:css('white-space', 'nowrap')
 		:node(content)
 	return span
+end
+
+function CustomLeague:_getPageNameFromChronology(item)
+	if String.isEmpty(item) then
+		return ''
+	end
+
+	return mw.text.split(item, '|')[1]
 end
 
 return CustomLeague

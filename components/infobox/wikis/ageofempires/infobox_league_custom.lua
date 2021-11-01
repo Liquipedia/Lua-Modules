@@ -204,12 +204,23 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
 	Variables.varDefine('tournament_sponsors', args.sponsors)
-	Variables.varDefine('date', ReferenceCleaner.clean(args.edate))
-	Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.edate))
-	Variables.varDefine('tournament_sdate', ReferenceCleaner.clean(args.sdate))
-	Variables.varDefine('tournament_edate', ReferenceCleaner.clean(args.edate))
-	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
-	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+
+
+	local dateclean = ReferenceCleaner.clean(args.date)
+	local edateclean = ReferenceCleaner.clean(args.edate)
+	local sdateclean = ReferenceCleaner.clean(args.sdate)
+	local date = (not String.isEmpty(args.date)) and dateclean
+					or edateclean
+	local startdate = (not String.isEmpty(args.sdate)) and sdateclean
+					or dateclean
+	local enddate = (not String.isEmpty(args.edate)) and edateclean
+					or dateclean
+	Variables.varDefine('tournament_date', date)
+	Variables.varDefine('tournament_sdate', startdate)
+	Variables.varDefine('tournament_edate', enddate)
+	Variables.varDefine('date', date)
+	Variables.varDefine('sdate', startdate)
+	Variables.varDefine('edate', enddate)
 
 	Variables.varDefine('game', GameLookup.getName({args.game}))
 	Variables.varDefine('tournament_game', GameLookup.getName({args.game}))
