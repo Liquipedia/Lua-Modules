@@ -30,7 +30,7 @@ local _PREFIXES = {
 	['esea-d'] = 'https://play.esea.net/league/standings?divisionId=',
 	esl = '',
 	facebook = 'http://facebook.com/',
-	['facebook-gaming'] = 'fb.gg/',
+	['facebook-gaming'] = 'https://fb.gg/',
 	faceit = 'https://www.faceit.com/en/players/',
 	['faceit-c'] = 'https://www.faceit.com/en/championship/',
 	fanclub = '',
