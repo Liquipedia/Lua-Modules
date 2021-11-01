@@ -205,12 +205,16 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
 	Variables.varDefine('tournament_sponsors', args.sponsors)
 
-	local date = (not String.isEmpty(args.date)) and ReferenceCleaner.clean(args.date)
-					or ReferenceCleaner.clean(args.edate)
-	local startdate = (not String.isEmpty(args.sdate)) and ReferenceCleaner.clean(args.sdate)
-					or ReferenceCleaner.clean(args.date)
-	local enddate = (not String.isEmpty(args.edate)) and ReferenceCleaner.clean(args.edate)
-					or ReferenceCleaner.clean(args.date)
+
+	local dateclean = ReferenceCleaner.clean(args.date)
+	local edateclean = ReferenceCleaner.clean(args.edate)
+	local sdateclean = ReferenceCleaner.clean(args.sdate)
+	local date = (not String.isEmpty(args.date)) and dateclean
+					or edateclean
+	local startdate = (not String.isEmpty(args.sdate)) and sdateclean
+					or dateclean
+	local enddate = (not String.isEmpty(args.edate)) and edateclean
+					or dateclean
 	Variables.varDefine('tournament_date', date)
 	Variables.varDefine('tournament_sdate', startdate)
 	Variables.varDefine('tournament_edate', enddate)
