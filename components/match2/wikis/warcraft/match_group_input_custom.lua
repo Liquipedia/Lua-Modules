@@ -22,6 +22,7 @@ local defaultIcon
 
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local FACTIONS = mw.loadData('Module:Races')
+local HEROES = mw.loadData('Module:Heroes')
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local ALLOWED_STATUSES2 = { ['W'] = 'W', ['FF'] = 'FF', ['L'] = 'L', ['DQ'] = 'DQ', ['-'] = 'L' }
 local MAX_NUM_OPPONENTS = 2
@@ -37,7 +38,7 @@ local MODES2 = {
 }
 
 local getWarcraftFfaInputModule = FnUtil.memoize(function()
-	return Lua.import('Module:MatchGroup/Input/Warcraft/Ffa', {requireDevIfEnabled = true})
+	return Lua.import('Module:MatchGroup/Input/Ffa', {requireDevIfEnabled = true})
 end)
 
 --[[
@@ -191,30 +192,6 @@ function WarcraftMatchGroupInput.getExtraData(match)
 			subGroup9header = WarcraftMatchGroupInput.getSubGroupHeader(9, match),
 			headtohead = match.headtohead,
 			ffa = 'false',
-			player1hero1 = WarcraftMatchGroupInput.getHeroes(match.player1hero1),
-			player1hero2 = WarcraftMatchGroupInput.getHeroes(match.player1hero2),
-			player1hero3 = WarcraftMatchGroupInput.getHeroes(match.player1hero3),
-			player2hero1 = WarcraftMatchGroupInput.getHeroes(match.player2hero1),
-			player2hero2 = WarcraftMatchGroupInput.getHeroes(match.player2hero2),
-			player2hero3 = WarcraftMatchGroupInput.getHeroes(match.player2hero3),
-			player3hero1 = WarcraftMatchGroupInput.getHeroes(match.player3hero1),
-			player3hero2 = WarcraftMatchGroupInput.getHeroes(match.player3hero2),
-			player3hero3 = WarcraftMatchGroupInput.getHeroes(match.player3hero3),
-			player4hero1 = WarcraftMatchGroupInput.getHeroes(match.player4hero1),
-			player4hero2 = WarcraftMatchGroupInput.getHeroes(match.player4hero2),
-			player4hero3 = WarcraftMatchGroupInput.getHeroes(match.player4hero3),
-			player5hero1 = WarcraftMatchGroupInput.getHeroes(match.player5hero1),
-			player5hero2 = WarcraftMatchGroupInput.getHeroes(match.player5hero2),
-			player5hero3 = WarcraftMatchGroupInput.getHeroes(match.player5hero3),
-			player6hero1 = WarcraftMatchGroupInput.getHeroes(match.player6hero1),
-			player6hero2 = WarcraftMatchGroupInput.getHeroes(match.player6hero2),
-			player6hero3 = WarcraftMatchGroupInput.getHeroes(match.player6hero3),
-			player7hero1 = WarcraftMatchGroupInput.getHeroes(match.player7hero1),
-			player7hero2 = WarcraftMatchGroupInput.getHeroes(match.player7hero2),
-			player7hero3 = WarcraftMatchGroupInput.getHeroes(match.player7hero3),
-			player8hero1 = WarcraftMatchGroupInput.getHeroes(match.player8hero1),
-			player8hero2 = WarcraftMatchGroupInput.getHeroes(match.player8hero2),
-			player8hero3 = WarcraftMatchGroupInput.getHeroes(match.player8hero3),
 		}
 	end
 
@@ -226,8 +203,14 @@ function WarcraftMatchGroupInput.getVetoMap(map)
 end
 
 function WarcraftMatchGroupInput.getHeroes(hero)
-	-- Hero short names? TODO
-	return (hero ~= nil) and mw.ext.TeamLiquidIntegration.resolve_redirect(hero) or nil
+	if String.isEmpty(hero) then
+		return nil
+	end
+	local cleanHero = HEROES[string.lower(hero)]
+	if not cleanHero then
+		error('Unsupported hero entry "' .. hero .. '"')
+	end
+	return cleanHero
 end
 
 function WarcraftMatchGroupInput.getSubGroupHeader(index, match)
@@ -477,7 +460,7 @@ function WarcraftMatchGroupInput.OpponentInput(match)
 					WarcraftMatchGroupInput.ProcessSoloOpponentInput(match['opponent' .. opponentIndex])
 			elseif match['opponent' .. opponentIndex]['type'] == 'duo' then
 				match['opponent' .. opponentIndex] =
-					WarcraftMatchGroupInput.ProcessDuoOpponentInput(match['opponent' .. opponentIndex])
+					WarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 2)
 			elseif match['opponent' .. opponentIndex]['type'] == 'trio' then
 				match['opponent' .. opponentIndex] =
 					WarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 3)
@@ -534,42 +517,6 @@ function WarcraftMatchGroupInput.ProcessSoloOpponentInput(opp)
 	local opp2 = {
 		type = opp['type'],
 		name = link,
-		score = opp.score,
-		extradata = opp.extradata,
-		match2players = players
-	}
-
-	return opp2
-end
-
-function WarcraftMatchGroupInput.ProcessDuoOpponentInput(opp)
-	opp.p1 = opp.p1 or ''
-	opp.p2 = opp.p2 or ''
-	opp.link1 = mw.ext.TeamLiquidIntegration.resolve_redirect((opp.p1link or '') ~= ''
-		and opp.p1link or Variables.varDefault(opp.p1 .. '_page') or opp.p1)
-	opp.link2 = mw.ext.TeamLiquidIntegration.resolve_redirect((opp.p2link or '') ~= ''
-		and opp.p2link or Variables.varDefault(opp.p2 .. '_page') or opp.p2)
-	opp.p1race = FACTIONS[string.lower((opp.p1race or '') ~= '' and
-		opp.p1race or Variables.varDefault(opp.p1 .. '_race') or '')] or 'u'
-	opp.p2race = FACTIONS[string.lower((opp.p2race or '') ~= '' and
-		opp.p2race or Variables.varDefault(opp.p2 .. '_race') or '')] or 'u'
-
-	local players = {}
-	for i = 1, 2 do
-		local flag = (opp['p' .. i .. 'flag'] or '') ~= '' and opp['p' .. i .. 'flag'] or
-			Variables.varDefault(opp['p' .. i] .. '_flag')
-		players[i] = {
-			displayname = opp['p' .. i],
-			name = opp['link' .. i],
-			flag = cleanFlag(flag),
-			extradata = { faction = FACTIONS[string.lower(opp['p' .. i .. 'race'])] or 'u' }
-		}
-	end
-	local name = opp.link1 .. ' / ' .. opp.link2
-
-	local opp2 = {
-		type = opp['type'],
-		name = name,
 		score = opp.score,
 		extradata = opp.extradata,
 		match2players = players
@@ -866,6 +813,7 @@ function WarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 	local map_mode = ''
 	local raceOP = {}
 	local PL = {}
+	local heroes = {}
 
 	for i = 1, OppNumber do
 		local number = 0
@@ -937,11 +885,14 @@ function WarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 			else
 				local faction = string.lower((map['t' .. i .. 'p1race'] or '') ~= '' and map['t' .. i .. 'p1race'] or
 					(map['race' .. i] or '') ~= '' and map['race' .. i] or 'u')
+				local hero = string.lower(map['t' .. i .. 'plheroes'] or '') ~= '' and map['t' .. i .. 'plheroes']
 				participants[i .. '_1'] = {
 					faction = FACTIONS[faction] or players[1].extradata.faction or 'u',
-					player = players[1].name
+					player = players[1].name,
+					hero = HEROES[hero]
 				}
 				raceOP[i] = participants[i .. '_1'].faction
+				heroes[i] = hero[i].hero
 				PL[i] = players[1].name
 				for j = 2, number do
 					faction = string.lower((map['t' .. i .. 'p' .. j .. 'race'] or '') ~= '' and
@@ -953,6 +904,7 @@ function WarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 				end
 			end
 		end
+		
 		map_mode = map_mode .. (i ~= 1 and 'v' or '') .. number
 
 		if map_mode == '1v1' and OppNumber == 2 then
@@ -965,6 +917,8 @@ function WarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 			end
 			map.extradata.opponent1 = PL[1]
 			map.extradata.opponent2 = PL[2]
+			map.extradata.heroes1 = heroes[1]
+			map.extradata.heroes2 = heroes[2] --TODO Set heroes for other map modes?
 		end
 		map.patch = Variables.varDefault('tournament_patch', '')
 	end
@@ -997,53 +951,6 @@ function WarcraftMatchGroupInput.placementSortFunction(table, key1, key2)
 		elseif op2.status == 'L' then return true
 		else return true end
 	end
-end
-
---[[
-
-Bracket Contests function
-
-]]--
-function WarcraftMatchGroupInput.processContest(match)
-	local points = tonumber(Variables.varDefault('contestPoints', 0)) or 0
-	local score1 = {}
-	local score2 = {}
-	local Rscore1 = {}
-	local Rscore2 = {}
-	for opponentIndex = 1, 2 do
-		local Opp = match['opponent' .. opponentIndex]
-		local ResultOpp = match.contest.opponents[opponentIndex]
-		ResultOpp.extradata = ResultOpp.extradata or {}
-		if ResultOpp.name ~= Opp.name then
-			break
-		end
-		score1[opponentIndex] = tonumber(Opp.score or 0) or 0
-		score2[opponentIndex] = tonumber(Opp.extradata.score2 or 0) or 0
-		Rscore1[opponentIndex] = tonumber(ResultOpp.score or 0) or 0
-		Rscore2[opponentIndex] = tonumber(ResultOpp.extradata.score2 or 0) or 0
-
-		if score1[opponentIndex] == Rscore1[opponentIndex] and score2[opponentIndex] == Rscore2[opponentIndex] then
-			match['opponent' .. opponentIndex].extradata.contest =
-				'<i class="fa fa-check forest-green-text" aria-hidden="true"></i>'
-		else
-			match['opponent' .. opponentIndex].extradata.contest = '&nbsp;'
-		end
-	end
-
-	if match.opponent1.extradata.contest ~= '&nbsp;' and match.opponent1.extradata.contest ~= '&nbsp;' then
-		points = points + match.contest.points.score
-	elseif score1[1] - score1[2] + Rscore1[2] - Rscore1[1] == 0 and
-			score2[1] - score2[2] + Rscore2[2] - Rscore2[1] == 0 then
-		points = points + match.contest.points.diff
-	elseif tostring(match.winner) == tostring(match.contest.winner) then
-		points = points + match.contest.points.win
-	end
-
-	match.contest = nil
-
-	Variables.varDefine('contestPoints', points)
-
-	return match
 end
 
 return WarcraftMatchGroupInput

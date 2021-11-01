@@ -49,19 +49,10 @@ function WarcraftMatchSummary.MatchSummary(props)
 	DisplayUtil.assertPropTypes(props, WarcraftMatchSummary.propTypes.MatchSummary)
 	local match = props.match
 
-	-- Compute offraces
-	if match.opponentMode == 'uniform' then
-		WarcraftMatchSummary.computeMatchOffraces(match)
-	else
-		for _, submatch in pairs(match.submatches) do
-			WarcraftMatchSummary.computeMatchOffraces(submatch)
-		end
-	end
-
 	return html.create('div')
 		:addClass('brkts-popup')
-		:addClass('brkts-popup-wc')
-		:addClass(match.opponentMode == 'uniform' and 'brkts-popup-wc-uniform-match' or 'brkts-popup-wc-team-match')
+		:addClass('brkts-popup-sc')
+		:addClass(match.opponentMode == 'uniform' and 'brkts-popup-sc-uniform-match' or 'brkts-popup-sc-team-match')
 		:node(WarcraftMatchSummary.Header({match = match}))
 		:node(WarcraftMatchSummary.Body({match = match}))
 		:node(WarcraftMatchSummary.Footer({match = match, showHeadToHead = match.headToHead}))
@@ -104,7 +95,7 @@ function WarcraftMatchSummary.Body(props)
 
 	local body = html.create('div')
 		:addClass('brkts-popup-body')
-		:addClass('brkts-popup-wc-body')
+		:addClass('brkts-popup-sc-body')
 
 	-- Stream, date, and countdown
 	if match.dateIsExact then
@@ -147,7 +138,7 @@ function WarcraftMatchSummary.Body(props)
 	-- Match casters
 	if match.casters then
 		body:node(
-			html.create('div'):addClass('brkts-popup-wc-game-comment')
+			html.create('div'):addClass('brkts-popup-sc-game-comment')
 				:node('Caster(s): ' .. match.casters)
 		)
 	end
@@ -155,7 +146,7 @@ function WarcraftMatchSummary.Body(props)
 	-- Match comment
 	if match.comment then
 		body:node(
-			html.create('div'):addClass('brkts-popup-wc-game-comment')
+			html.create('div'):addClass('brkts-popup-sc-game-comment')
 				:node(match.comment)
 		)
 	end
@@ -166,7 +157,7 @@ end
 function WarcraftMatchSummary.Game(game)
 	DisplayUtil.assertPropTypes(game, WarcraftMatchGroupUtil.types.Game.struct)
 
-	local centerNode = html.create('div'):addClass('brkts-popup-wc-game-center')
+	local centerNode = html.create('div'):addClass('brkts-popup-sc-game-center')
 		:wikitext(DisplayHelper.MapAndStatus(game))
 
 	local winnerIcon = function(opponentIx)
@@ -174,38 +165,29 @@ function WarcraftMatchSummary.Game(game)
 			or game.winner == opponentIx and WarcraftMatchSummary.ColoredIcon('GreenCheck')
 			or WarcraftMatchSummary.ColoredIcon('NoCheck')
 	end
-
-	local showOffraceIcons = game.offraces ~= nil and (game.offraces[1] ~= nil or game.offraces[2] ~= nil)
-	local offraceIcons = function(opponentIx)
-		local offraces = game.offraces ~= nil and game.offraces[opponentIx] or nil
-		local opponent = game.opponents ~= nil and game.opponents[opponentIx] or nil
-
-		if offraces and opponent then
-			return WarcraftMatchSummary.OffraceIcons(offraces)
-		elseif showOffraceIcons then
-			return WarcraftMatchSummary.OffraceIcons({})
-		else
-			return nil
-		end
+	
+	local heroIcons = function(opponentIx)
+		return game.heroIcons
 	end
 
 	local bodyNode = html.create('div')
-		:addClass('brkts-popup-wc-game-body')
+		-- :addClass('brkts-popup-wc-game-body')
+		-- hardcore this css and then create above class
 		:node(winnerIcon(1))
-		:node(offraceIcons(1))
+		:node(heroIcons(1))
 		:node(centerNode)
-		:node(offraceIcons(2))
 		:node(winnerIcon(2))
+		:node(heroIcons(2))
 
 	local commentNode
 	if game.comment then
 		commentNode = html.create('div')
-			:addClass('brkts-popup-wc-game-comment')
+			:addClass('brkts-popup-sc-game-comment')
 			:wikitext(game.comment)
 	end
 
 	local gameNode = html.create('div')
-		:addClass('brkts-popup-wc-game')
+		:addClass('brkts-popup-sc-game')
 		:node(game.header and WarcraftMatchSummary.GameHeader({header = game.header}) or nil)
 		:node(bodyNode)
 		:node(commentNode)
@@ -223,7 +205,7 @@ function WarcraftMatchSummary.TeamSubmatch(props)
 	local submatch = props.submatch
 
 	local centerNode = html.create('div')
-		:addClass('brkts-popup-wc-submatch-center')
+		:addClass('brkts-popup-sc-submatch-center')
 	for _, game in ipairs(submatch.games) do
 		if game.map or game.winner then
 			centerNode:node(WarcraftMatchSummary.Game(game))
@@ -238,7 +220,7 @@ function WarcraftMatchSummary.TeamSubmatch(props)
 				flip = opponentIx == 1,
 			})
 			or html.create('div'):wikitext('&nbsp;')
-		return node:addClass('brkts-popup-wc-submatch-opponent')
+		return node:addClass('brkts-popup-sc-submatch-opponent')
 	end
 
 	-- Render scores
@@ -252,13 +234,13 @@ function WarcraftMatchSummary.TeamSubmatch(props)
 			text = score and tostring(score) or ''
 		end
 		return html.create('div')
-			:addClass('brkts-popup-wc-submatch-score')
+			:addClass('brkts-popup-sc-submatch-score')
 			:wikitext(text)
 	end
 
 	local renderSide = function(opponentIx)
 		local sideNode = html.create('div')
-			:addClass('brkts-popup-wc-submatch-side')
+			:addClass('brkts-popup-sc-submatch-side')
 			:addClass(opponentIx == 1 and 'brkts-popup-left' or 'brkts-popup-right')
 			:addClass(opponentIx == submatch.winner and 'bg-win' or nil)
 			:addClass(submatch.resultType == 'draw' and 'bg-draw' or nil)
@@ -270,8 +252,8 @@ function WarcraftMatchSummary.TeamSubmatch(props)
 	end
 
 	local bodyNode = html.create('div')
-		:addClass('brkts-popup-wc-submatch-body')
-		:addClass(props.showScore and 'brkts-popup-wc-submatch-has-score' or nil)
+		:addClass('brkts-popup-sc-submatch-body')
+		:addClass(props.showScore and 'brkts-popup-sc-submatch-has-score' or nil)
 		:node(renderSide(1))
 		:node(centerNode)
 		:node(renderSide(2))
@@ -279,12 +261,12 @@ function WarcraftMatchSummary.TeamSubmatch(props)
 	local headerNode
 	if submatch.header then
 		headerNode = html.create('div')
-			:addClass('brkts-popup-wc-submatch-header')
+			:addClass('brkts-popup-sc-submatch-header')
 			:wikitext(submatch.header)
 	end
 
 	local submatchNode = html.create('div')
-		:addClass('brkts-popup-wc-submatch')
+		:addClass('brkts-popup-sc-submatch')
 		:node(headerNode)
 		:node(bodyNode)
 
@@ -298,14 +280,14 @@ WarcraftMatchSummary.propTypes.GameHeader = {
 function WarcraftMatchSummary.GameHeader(props)
 	DisplayUtil.assertPropTypes(props, WarcraftMatchSummary.propTypes.GameHeader)
 	return html.create('div')
-		:addClass('brkts-popup-wc-game-header')
+		:addClass('brkts-popup-sc-game-header')
 		:wikitext(props.header)
 end
 
 function WarcraftMatchSummary.Veto(veto)
 	DisplayUtil.assertPropTypes(veto, WarcraftMatchGroupUtil.types.MatchVeto.struct)
 
-	local centerNode = html.create('div'):addClass('brkts-popup-wc-veto-center')
+	local centerNode = html.create('div'):addClass('brkts-popup-sc-veto-center')
 		:node('[[' .. veto.map .. ']]')
 
 	local statusIcon = function(opponentIx)
@@ -315,7 +297,7 @@ function WarcraftMatchSummary.Veto(veto)
 	end
 
 	return html.create('div')
-		:addClass('brkts-popup-wc-veto-body')
+		:addClass('brkts-popup-sc-veto-body')
 		:node(statusIcon(1))
 		:node(centerNode)
 		:node(statusIcon(2))
@@ -332,32 +314,14 @@ function WarcraftMatchSummary.Footer(props)
 
 	local links = WarcraftMatchExternalLinks.extractFromMatch(match)
 
-	local headToHeadNode
-	if props.showHeadToHead
-		and match.mode == '1_1'
-		and match.opponents[1].players[1]
-		and match.opponents[1].players[1].pageName
-		and match.opponents[2].players[1]
-		and match.opponents[2].players[1].pageName
-	then
-		local link = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history'))
-			.. '?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D='
-			.. match.opponents[1].players[1].pageName
-			.. '&Head_to_head_query%5Bopponent%5D='
-			.. match.opponents[2].players[1].pageName
-			.. '&wpRunQuery=Run+query'
-		link = string.gsub(link, ' ', '_')
-		headToHeadNode = '[[File:Match Info Stats.png|link=' .. link .. '|16px|Head-to-head statistics]]'
-	end
-
 	local hasFooter = (0 < #links) or headToHeadNode
 	if hasFooter then
 		local linksNode = WarcraftMatchExternalLinks.MatchExternalLinks({links = links})
 			:node(headToHeadNode)
-			:addClass('brkts-popup-wc-footer-links')
+			:addClass('brkts-popup-sc-footer-links')
 		return html.create('div')
 			:addClass('brkts-popup-footer')
-			:addClass('brkts-popup-wc-footer')
+			:addClass('brkts-popup-sc-footer')
 			:node(linksNode)
 	else
 		return nil
@@ -377,33 +341,6 @@ function WarcraftMatchSummary.ColoredIcon(icon)
 		return '[[File:NoCheck.png|link=]]'
 	else
 		return nil
-	end
-end
-
--- Renders off-races as Nx2 grid of tiny icons
-function WarcraftMatchSummary.OffraceIcons(races)
-	local racesNode = html.create('div')
-		:addClass('brkts-popup-wc-game-offrace-icons')
-	for _, race in ipairs(races) do
-		racesNode:node(RaceIcon.getTinyIcon({race}))
-	end
-
-	return racesNode
-end
-
---[[
-Populate game.offraces if the played races differ from the races listed in the
-match
-]]
-function WarcraftMatchSummary.computeMatchOffraces(match)
-	for _, game in ipairs(match.games) do
-		game.offraces = {}
-		for opponentIx, gameOpponent in pairs(game.opponents) do
-			game.offraces[opponentIx] = WarcraftMatchGroupUtil.computeOffraces(
-				gameOpponent,
-				match.opponents[opponentIx]
-			)
-		end
 	end
 end
 
