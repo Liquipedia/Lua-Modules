@@ -6,57 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---[[
-TODO:
-* Categories
-* Variables
-* LPDB adjusting
-* 
-
-]]--
-
---[[
-RL has additionally:
-* {{#vardefine:id|{{{id|{{PAGENAME}}}}}}}
-* Epic Creator Code
-* Starting Game
-* Solo MMR
-* history handling
-* region handling???
-* 
-
-]]--
-
---[[
-CS has additionally:
-* {{#vardefine:id|{{{id|{{PAGENAME}}}}}}}
-* Role handling
-* Games
-* Prize Money
-* history handling
-* region handling???
-* adjust earnings stuff (CS still uses the smw shit)
-
-]]--
-
---[[
-TODO as prep:
-- push https://liquipedia.net/rocketleague/Module:YearsActive to commons and use class.export for it
-- create region data modules???
-
-]]--
-
---[[
-Remarks:
-- We agreed to kick clans
-- removed "Signature Hero" stuff from RL (templates it uses do not exist, seems to be a copy paste left over)
-
-]]--
-
 local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
+local Namespace = require('Module:Namespace')
 local Earnings = require('Module:Earnings')
+local Variables = require('Module:Variables')
 local Page = require('Module:Page')
 local YearsActive = require('Module:YearsActive')
 
@@ -72,6 +27,199 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _roles
+
+local _ROLES = {
+	coach = {
+		storage = 'Coach',
+		typeVar = 'is_talent',
+		display = '[[:Category:Coaches|Coach]]',
+		roleVar = 'Coach',
+		category = {'Coaches'},
+	},
+	['assistant coach'] = {
+		storage = 'Assistant Coach',
+		typeVar = 'is_coach',
+		display = '[[:Category:Coaches|Assistant Coach]]',
+		roleVar = 'Analyst',
+		category = {'Coaches', 'Assistant Coaches'},
+	},
+	analyst = {
+		storage = 'Analyst',
+		typeVar = 'is_coach',
+		display = '[[:Category:Analysts|Analyst]]',
+		roleVar = 'Analyst',
+		category = {'Analysts'},
+	},
+	manager = {
+		storage = 'Manager',
+		typeVar = 'is_management',
+		display = '[[:Category:Managers|Manager]]',
+		roleVar = 'Manager',
+		category = {'Managers'},
+	},
+	journalist = {
+		storage = 'Journalist',
+		typeVar = nil,
+		display = '[[:Category:Journalists|Journalist]]',
+		roleVar = 'Journalist',
+		category = {'Journalists'},
+	},
+	commentator = {
+		storage = 'Caster',
+		typeVar = 'is_talent',
+		display = '[[:Category:Casters|Commentator]]',
+		roleVar = 'Commentator',
+		category = {'Casters'},
+	},
+	caster = {
+		storage = 'Caster',
+		typeVar = 'is_talent',
+		display = '[[:Category:Casters|Commentator]]',
+		roleVar = 'Commentator',
+		category = {'Casters'},
+	},
+	interviewer = {
+		storage = 'Interviewer',
+		typeVar = 'is_talent',
+		display = '[[:Category:Production Staff|Interviewer]]',
+		roleVar = 'Interviewer',
+		category = {'Interviewers', 'Production Staff'},
+	},
+	director = {
+		storage = 'Interviewer',
+		typeVar = 'is_talent',
+		display = '[[:Category:Production Staff|Director]]',
+		roleVar = 'Director',
+		category = {'Directors', 'Production Staff'},
+	},
+	producer = {
+		storage = 'Producer',
+		typeVar = 'is_talent',
+		display = '[[:Category:Production Staff|Producer]]',
+		roleVar = 'Producer',
+		category = {'Producers', 'Production Staff'},
+	},
+	expert = {
+		storage = 'Expert',
+		typeVar = 'is_talent',
+		display = '[[:Category:Experts|Expert]]',
+		roleVar = 'Expert',
+		category = {'Experts'},
+	},
+	host = {
+		storage = 'Host',
+		typeVar = 'is_talent',
+		display = '[[:Category:Hosts|Host]]',
+		roleVar = 'Host',
+		category = {'Hosts'},
+	},
+	observer = {
+		storage = 'Observer',
+		typeVar = 'is_talent',
+		display = '[[:Category:Observers|Observer]]',
+		roleVar = 'Observer',
+		category = {'Observers'},
+	},
+	['broadcast analyst'] = {
+		storage = 'Broadcast Analyst',
+		typeVar = 'is_talent',
+		display = '[[:Category:Broadcast Analysts|Broadcast Analyst]]',
+		roleVar = 'Broadcast Analyst',
+		category = {'Broadcast Analysts'},
+	},
+	executive = {
+		storage = 'Executive',
+		typeVar = 'is_talent',
+		display = '[[:Category:Organizational Staff|Executive]]',
+		roleVar = 'Executive',
+		category = {'Organizational Staff'},
+	},
+	['director of esport'] = {
+		storage = 'Director of Esport',
+		typeVar = 'is_talent',
+		display = '[[:Category:Organizational Staff|Director of Esport]]',
+		roleVar = 'Director of Esport',
+		category = {'Organizational Staff'},
+	},
+	awp = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:AWPers|AWPer]]',
+		roleVar = 'AWPer',
+		category = {'AWPers', 'Players'},
+	},
+	awper = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:AWPers|AWPer]]',
+		roleVar = 'AWPer',
+		category = {'AWPers', 'Players'},
+	},
+	igl = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:In-game leaders|In-game leader]]',
+		roleVar = 'In-game leader',
+		category = {'In-game leaders', 'Players'},
+	},
+	lurk = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:Riflers|Rifler]] ([[:Category:Lurkers|lurker]])',
+		roleVar = 'lurker',
+		category = {'Riflers', 'Lurkers', 'Players'},
+	},
+	lurker = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:Riflers|Rifler]] ([[:Category:Lurkers|lurker]])',
+		roleVar = 'lurker',
+		category = {'Riflers', 'Lurkers', 'Players'},
+	},
+	support = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:Riflers|Rifler]] ([[:Category:Support players|support]])',
+		roleVar = 'support',
+		category = {'Riflers', 'Support players', 'Players'},
+	},
+	entry = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:Riflers|Rifler]] ([[:Category:Entry fraggers|entry fragger]])',
+		roleVar = 'entry fragger',
+		category = {'Riflers', 'Entry fraggers', 'Players'},
+	},
+	entryfragger = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:Riflers|Rifler]] ([[:Category:Entry fraggers|entry fragger]])',
+		roleVar = 'entry fragger',
+		category = {'Riflers', 'Entry fraggers', 'Players'},
+	},
+	rifle = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:Riflers|Rifler]]',
+		roleVar = 'Rifler',
+		category = {'Riflers', 'Players'},
+	},
+	rifler = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = '[[:Category:Riflers|Rifler]]',
+		roleVar = 'Rifler',
+		category = {'Riflers', 'Players'},
+	},
+	player = {
+		storage = 'Player',
+		typeVar = 'is_player',
+		display = nil,
+		roleVar = 'Executive',
+		category = {'Players'},
+	},
+}
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
@@ -82,6 +230,7 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getCategories = CustomPlayer.getCategories
+	player.getPersonType = CustomPlayer.getPersonType
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	return player:createInfobox(frame)
@@ -95,6 +244,9 @@ function CustomInjector:parse(id, widgets)
 			status = Page.makeInternalLink({onlyIfExists = true}, _args.status)
 		end
 		local banned = _BANNED[string.lower(_args.banned or '')]
+		if not banned and not String.isEmpty(_args.banned) then
+			banned = '[[Banned Players/Other|Multiple Bans]]'
+		end
 		local banned2 = _BANNED[string.lower(_args.banned2 or '')]
 		local banned3 = _BANNED[string.lower(_args.banned3 or '')]
 		table.insert(statusContents, status)
@@ -122,6 +274,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Years Active (Analyst)', content = {_args.years_active_analyst}},
 			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
 		}
+	elseif id == 'role' then
+		return {
+			Cell{name = 'Role(s)', content = roles.display},
+		}
 	--elseif id == 'history' then
 		--this differs hugely across wikis
 	end
@@ -147,14 +303,18 @@ function CustomPlayer:adjustLPDB(lpdbData)
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
-	--aaa
+	Variables.varDefine('id', args.id or _pagename)
 end
 
 function CustomPlayer:getCategories(args, birthDisplay, personType, status)
-	if _shouldStoreData then --this needs to be defined
+	if Namespace.isMain() then
 		local categories = { personType .. 's' }
 
-		if not args.teamlink and not args.team then
+		for _, category in pairs(_roles.categories) do
+			table.insert(categories, category)
+		end
+
+		if string.lower(args.status) == 'active' and not args.teamlink and not args.team then
 			table.insert(categories, 'Teamless ' .. personType .. 's')
 		end
 		if args.country2 or args.nationality2 then
@@ -182,6 +342,42 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 		return categories
 	end
 	return {}
+end
+
+function CustomPlayer:getPersonType()
+	local role = string.lower(_args.role or '')
+	local role2 = string.lower(_args.role2 or '')
+
+	local roleData = _ROLES[role] or _ROLES['player']
+	local role2Data = _ROLES[role2] or {}
+
+	local categories = {}
+	for _, item in pairs(roleData.category or {}) do
+		table.insert(categories, item)
+	end
+	for _, item in pairs(role2Data.category or {}) do
+		table.insert(categories, item)
+	end
+
+	if roleData.typeVar then
+		Variables.varDefine(roleData.typeVar, 'true')
+	end
+	if role2Data.typeVar then
+		Variables.varDefine(role2Data.typeVar, 'true')
+	end
+
+	Variables.varDefine('role', roleData.roleVar or '')
+	Variables.varDefine('role', role2Data.roleVar or '')
+
+	_roles = {
+		display = {
+			roleData.display,
+			role2Data.display,
+		},
+		categories = categories
+	}
+
+	return {storage = roleData.storage, category = roleData.storage}
 end
 
 return CustomPlayer
