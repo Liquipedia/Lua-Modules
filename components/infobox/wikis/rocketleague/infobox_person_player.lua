@@ -32,37 +32,6 @@ local _args
 
 local _START_YEAR = '2015'
 local _CURRENT_YEAR = mw.getContentLanguage():formatDate('Y')
-local _ROLE_CATEGORIES = {
-	coach = {'Coaches'},
-	['assistant coach'] = {'Coaches'},
-	caster = {'Casters'},
-	host = {'Hosts'},
-	player = {'Players'},
-
-	['caster/content creator'] = {'Casters'},
-	['content creator/caster'] = {'Casters'},
-
-	['player/content creator'] = {'Players'},
-	['content creator/player'] = {'Players'},
-
-	['coach/manager'] = {'Coaches'},
-	['manager/coach'] = {'Coaches'},
-
-	['player/manager'] = {'Players'},
-	['manager/player'] = {'Players'},
-
-	['coach/caster'] = {'Casters', 'Coaches'},
-	['caster/coach'] = {'Casters', 'Coaches'},
-
-	['host/caster'] = {'Hosts', 'Casters'},
-	['caster/host'] = {'Hosts', 'Casters'},
-
-	['caster/player'] = {'Casters', 'Players'},
-	['player/caster'] = {'Casters', 'Players'},
-
-	['player/coach'] = {'Coaches', 'Players'},
-	['coach/player'] = {'Coaches', 'Players'},
-}
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
@@ -73,6 +42,7 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getCategories = CustomPlayer.getCategories
+	player.getPersonType = CustomPlayer.getPersonType --for RL kick this
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	return player:createInfobox(frame)
@@ -185,8 +155,17 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 		local role = string.lower(args.role or '')
 		local categories = {}
 
-		for _, category in pairs(_ROLE_CATEGORIES[role] or {'Players'}) do
-			table.insert(categories, category)
+		if string.match(role, 'coach') then
+			table.insert(categories, 'Coaches')
+		end
+		if string.match(role, 'caster') then
+			table.insert(categories, 'Casters')
+		end
+		if string.match(role, 'host') then
+			table.insert(categories, 'Hosts')
+		end
+		if string.match(role, 'player') then
+			table.insert(categories, 'Players')
 		end
 
 		if
