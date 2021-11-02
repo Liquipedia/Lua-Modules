@@ -167,7 +167,7 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:makeAbbr(title, text)
-	if String.isEmpty(title) or String.isEmpty() then
+	if String.isEmpty(title) or String.isEmpty(text) then
 		return nil
 	end
 	return '<abbr title="' .. title .. '>' .. text .. '</abbr>'
