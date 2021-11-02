@@ -17,6 +17,8 @@ local YearsActive = require('Module:YearsActive')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
+local Title = require('Module:Infobox/Widget/Title')
+local Center = require('Module:Infobox/Widget/Center')
 
 local _BANNED = mw.loadData('Module:Banned')
 
@@ -235,13 +237,13 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.status = lpdbData.status or 'Unknown'
 
-	lpdb.extradata = {
-		role = args.role,
+	lpdbData.extradata = {
+		role = _args.role,
 		birthmonthandday = Variables.varDefault('birth_monthandday'),
 	}
 
 	for year = _START_YEAR, _CURRENT_YEAR do
-		lpdb.extradata['earningsin' .. year] = Earnings.calc_player({args = {
+		lpdbData.extradata['earningsin' .. year] = Earnings.calc_player({args = {
 			player = _args.earnings or _pagename,
 			year = year
 		}})
