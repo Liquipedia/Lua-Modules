@@ -85,6 +85,9 @@ function CustomInjector:parse(id, widgets)
 			status = Page.makeInternalLink({onlyIfExists = true}, _args.status)
 		end
 		local banned = _BANNED[string.lower(_args.banned or '')]
+		if not banned and not String.isEmpty(_args.banned) then
+			banned = '[[Banned Players/Other|Multiple Bans]]'
+		end
 		local banned2 = _BANNED[string.lower(_args.banned2 or '')]
 		local banned3 = _BANNED[string.lower(_args.banned3 or '')]
 		table.insert(statusContents, status)
