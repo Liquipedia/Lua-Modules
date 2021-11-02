@@ -255,7 +255,15 @@ function Person:nameDisplay(args)
 		and mw.ext.TeamTemplate.teamicon(team2) or ''
 	local name = args.id or mw.title.getCurrentTitle().text
 
-	return icon .. '&nbsp;' .. name .. ' ' .. icon2
+	local display = name
+	if not String.isEmpty(icon) then
+		display = icon .. '&nbsp;' .. name
+	end
+	if not String.isEmpty(icon2) then
+		display = display .. ' ' .. icon2
+	end
+
+	return display
 end
 
 --- Allows for overriding this functionality
