@@ -47,6 +47,9 @@ function Person:createInfobox()
 	end
 
 	_shouldStoreData = Person:shouldStoreData(args)
+	-- set custom variables here already so they are available
+	-- in functions we call from here on
+	self:defineCustomPageVariables(args)
 
 	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
@@ -95,7 +98,10 @@ function Person:createInfobox()
 		Customizable{id = 'teams', children = {
 			Cell{name = 'Team', content = {
 						self:_createTeam(args.team, args.teamlink),
-						self:_createTeam(args.team2, args.teamlink2)
+						self:_createTeam(args.team2, args.teamlink2),
+						self:_createTeam(args.team3, args.teamlink3),
+						self:_createTeam(args.team4, args.teamlink4),
+						self:_createTeam(args.team5, args.teamlink5)
 					}
 				}
 			}
@@ -209,6 +215,10 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 end
 
 --- Allows for overriding this functionality
+function Person:defineCustomPageVariables(args)
+end
+
+--- Allows for overriding this functionality
 function Person:getStorageType(args, personType, status)
 	return string.lower(personType)
 end
@@ -237,12 +247,23 @@ end
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
 function Person:nameDisplay(args)
-	local team = args.teamlink or args.team or ''
+	local team = string.lower(args.teamicon or args.ttlink or args.teamlink or args.team or '')
 	local icon = mw.ext.TeamTemplate.teamexists(team)
 		and mw.ext.TeamTemplate.teamicon(team) or ''
+	local team2 = string.lower(args.team2icon or args.ttlink2 or args.team2link or args.team2 or '')
+	local icon2 = mw.ext.TeamTemplate.teamexists(team2)
+		and mw.ext.TeamTemplate.teamicon(team2) or ''
 	local name = args.id or mw.title.getCurrentTitle().text
 
-	return icon .. '&nbsp;' .. name
+	local display = name
+	if not String.isEmpty(icon) then
+		display = icon .. '&nbsp;' .. name
+	end
+	if not String.isEmpty(icon2) then
+		display = display .. ' ' .. icon2
+	end
+
+	return display
 end
 
 --- Allows for overriding this functionality
