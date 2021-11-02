@@ -91,11 +91,9 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.logo = 'File:' .. args.image
 	end
 
-	local isSchoolTierTeam = string.lower(args.regionsubtier or '') == 'school'
-
 	lpdbData.extradata = {
 		rating = Variables.varDefault('rating'),
-		isschooltierteam = isSchoolTierTeam
+		tier = string.lower(args.regionsubtier or '')
 	}
 	for year = _START_YEAR, _CURRENT_YEAR do
 		local id = args.id or _team.pagename
