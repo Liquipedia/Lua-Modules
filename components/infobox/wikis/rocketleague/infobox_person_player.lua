@@ -73,7 +73,6 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getCategories = CustomPlayer.getCategories
-	player.getPersonType = CustomPlayer.getPersonType --for RL kick this
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	return player:createInfobox(frame)
