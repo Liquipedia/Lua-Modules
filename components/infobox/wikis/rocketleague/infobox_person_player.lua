@@ -223,7 +223,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, 'Players without a status')
 		end
 
-		if String.lower(args.game or '') == 'sarpbc' then
+		if string.lower(args.game or '') == 'sarpbc' then
 			table.insert(categories, 'SARPBC Players')
 		end
 
