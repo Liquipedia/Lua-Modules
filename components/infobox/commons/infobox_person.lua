@@ -315,7 +315,7 @@ end
 function Person:_createTeam(team, link)
 	link = link or team
 	if link == nil or link == '' then
-		return ''
+		return nil
 	end
 
 	if mw.ext.TeamTemplate.teamexists(link) then
