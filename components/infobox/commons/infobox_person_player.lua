@@ -32,27 +32,27 @@ local _roles
 local _ROLES = {
 	coach = {
 		storage = 'Coach',
-		typeVar = 'is_talent',
+		typeVar = 'is_coach',
 		display = '[[:Category:Coaches|Coach]]',
 		roleVar = 'Coach',
 		category = {'Coaches'},
 	},
 	['assistant coach'] = {
-		storage = 'Assistant Coach',
+		storage = 'Coach',
 		typeVar = 'is_coach',
 		display = '[[:Category:Coaches|Assistant Coach]]',
 		roleVar = 'Analyst',
 		category = {'Coaches', 'Assistant Coaches'},
 	},
 	analyst = {
-		storage = 'Analyst',
+		storage = 'Coach',
 		typeVar = 'is_coach',
 		display = '[[:Category:Analysts|Analyst]]',
 		roleVar = 'Analyst',
 		category = {'Analysts'},
 	},
 	manager = {
-		storage = 'Manager',
+		storage = 'People',
 		typeVar = 'is_management',
 		display = '[[:Category:Managers|Manager]]',
 		roleVar = 'Manager',
@@ -66,21 +66,21 @@ local _ROLES = {
 		category = {'Journalists'},
 	},
 	commentator = {
-		storage = 'Caster',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Casters|Commentator]]',
 		roleVar = 'Commentator',
 		category = {'Casters'},
 	},
 	caster = {
-		storage = 'Caster',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Casters|Commentator]]',
 		roleVar = 'Commentator',
 		category = {'Casters'},
 	},
 	interviewer = {
-		storage = 'Interviewer',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Production Staff|Interviewer]]',
 		roleVar = 'Interviewer',
@@ -94,49 +94,49 @@ local _ROLES = {
 		category = {'Directors', 'Production Staff'},
 	},
 	producer = {
-		storage = 'Producer',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Production Staff|Producer]]',
 		roleVar = 'Producer',
 		category = {'Producers', 'Production Staff'},
 	},
 	expert = {
-		storage = 'Expert',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Experts|Expert]]',
 		roleVar = 'Expert',
 		category = {'Experts'},
 	},
 	host = {
-		storage = 'Host',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Hosts|Host]]',
 		roleVar = 'Host',
 		category = {'Hosts'},
 	},
 	observer = {
-		storage = 'Observer',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Observers|Observer]]',
 		roleVar = 'Observer',
 		category = {'Observers'},
 	},
 	['broadcast analyst'] = {
-		storage = 'Broadcast Analyst',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Broadcast Analysts|Broadcast Analyst]]',
 		roleVar = 'Broadcast Analyst',
 		category = {'Broadcast Analysts'},
 	},
 	executive = {
-		storage = 'Executive',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Organizational Staff|Executive]]',
 		roleVar = 'Executive',
 		category = {'Organizational Staff'},
 	},
 	['director of esport'] = {
-		storage = 'Director of Esport',
+		storage = 'Talent',
 		typeVar = 'is_talent',
 		display = '[[:Category:Organizational Staff|Director of Esport]]',
 		roleVar = 'Director of Esport',
@@ -276,7 +276,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Role(s)', content = roles.display},
+			Cell{name = 'Role(s)', content = _roles.display},
 		}
 	--elseif id == 'history' then
 		--this differs hugely across wikis
@@ -291,15 +291,6 @@ end
 
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
-end
-
-function CustomPlayer:calculateEarnings()
-	return Earnings.calc_player({ args = { player = _pagename }})
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-
-	return lpdbData
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
@@ -317,12 +308,15 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 		if string.lower(args.status) == 'active' and not args.teamlink and not args.team then
 			table.insert(categories, 'Teamless ' .. personType .. 's')
 		end
+
 		if args.country2 or args.nationality2 then
 			table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
 		end
+
 		if args.death_date then
 			table.insert(categories, 'Deceased ' .. personType .. 's')
 		end
+
 		if
 			args.retired == 'yes' or args.retired == 'true'
 			or string.lower(status or '') == 'retired'
@@ -332,11 +326,19 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 		else
 			table.insert(categories, 'Active ' .. personType .. 's')
 		end
-		if not args.image then
+
+		if not args.image or args.image == 'PlayerImagePlaceholder.png' then
 			table.insert(categories, personType .. 's with no profile picture')
 		end
+
 		if String.isEmpty(birthDisplay) then
 			table.insert(categories, personType .. 's with unknown birth date')
+		end
+
+		if String.isEmpty(args.status) or args.status == '&nbsp;' then
+			table.insert(categories, 'Players without a status')
+		elseif string.lower(args.status or '') == 'retired' then
+			table.insert(categories, 'Retired Players')
 		end
 
 		return categories
@@ -378,6 +380,19 @@ function CustomPlayer:getPersonType()
 	}
 
 	return {storage = roleData.storage, category = roleData.storage}
+end
+
+function CustomPlayer:calculateEarnings()
+	return Earnings.calc_player({ args = { player = _pagename }})
+end
+
+function CustomPlayer:adjustLPDB(lpdbData)
+	lpdbData.extradata = {
+		role = string.lower(_args.role or ''),
+		role2 = string.lower(_args.role2 or ''),
+	}
+
+	return lpdbData
 end
 
 return CustomPlayer
