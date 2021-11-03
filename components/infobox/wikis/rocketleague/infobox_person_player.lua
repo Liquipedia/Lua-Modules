@@ -14,6 +14,7 @@ local Namespace = require('Module:Namespace')
 local Variables = require('Module:Variables')
 local Page = require('Module:Page')
 local YearsActive = require('Module:YearsActive')
+local Matches = require('Module:Matches_Player')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -240,6 +241,12 @@ function CustomPlayer:defineCustomPageVariables(args)
 	local birthMonthAndDay = string.match(_args.birth_date, '%-%d%d?%-%d%d?$')
 	birthMonthAndDay = string.gsub(birthMonthAndDay, '^%-', '')
 	Variables.varDefine('birth_monthandday', birthMonthAndDay)
+end
+
+function CustomPlayer:createBottomContent(infobox)
+	if Namespace.isMain() then
+		return tostring(Matches.get({args = {noClass = true}}))
+	end
 end
 
 return CustomPlayer
