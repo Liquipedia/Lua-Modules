@@ -131,8 +131,8 @@ function Table.deepEquals(xTable, yTable)
 	assert(type(xTable) == 'table', 'Table.deepEquals: First argument must be a table')
 	assert(type(yTable) == 'table', 'Table.deepEquals: Second argument must be a table')
 
-	for xKey, xValue in pairs(xTable) do
-		if not Logic.deepEquals(xValue, yTable[xKey]) then
+	for key, value in pairs(xTable) do
+		if not Logic.deepEquals(value, yTable[key]) then
 			return false
 		end
 	end
