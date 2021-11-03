@@ -91,7 +91,10 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.logo = 'File:' .. args.image
 	end
 
-	lpdbData.extradata = { rating = Variables.varDefault('rating') }
+	lpdbData.extradata = {
+		rating = Variables.varDefault('rating'),
+		tier = string.lower(args.tier or '')
+	}
 	for year = _START_YEAR, _CURRENT_YEAR do
 		local id = args.id or _team.pagename
 		local earningsInYear = Template.safeExpand(mw.getCurrentFrame(), 'Total earnings of', {year = year, id})
