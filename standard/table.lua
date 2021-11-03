@@ -137,8 +137,8 @@ function Table.deepEquals(xTable, yTable)
 		end
 	end
 
-	for yKey, _ in pairs(yTable) do
-		if xTable[yKey] == nil then
+	for key, _ in pairs(yTable) do
+		if xTable[key] == nil then
 			return false
 		end
 	end
