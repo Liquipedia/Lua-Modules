@@ -42,6 +42,7 @@ function CustomPlayer.run(frame)
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
+	player.createBottomContent = CustomPlayer.createBottomContent
 	player.getCategories = CustomPlayer.getCategories
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
