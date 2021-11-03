@@ -15,7 +15,7 @@ Module:Array
 local ArrayExt = {}
 
 --[[
-Finds the index of the element in an array satisfying a predicate. Returs 0
+Finds the index of the element in an array satisfying a predicate. Returns 0
 if no element satisfies the predicate.
 
 Example:
