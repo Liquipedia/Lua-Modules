@@ -58,6 +58,9 @@ function p.storeGames(match, match2)
 			game.opponent1score = scores[1] or 0
 			game.opponent2score = scores[2] or 0
 
+			game.extradata.winnerrace = game.extradata.winnerfaction
+			game.extradata.loserrace = game.extradata.loserfaction
+
 			-- participants holds additional playerdata per match, e.g. the faction (=race)
 			-- participants is stored as opponentID_playerID, so e.g. for opponent2, player1 it is '2_1'
 			local playerdata = json.parseIfString(game.participants or '{}') or game.participants
