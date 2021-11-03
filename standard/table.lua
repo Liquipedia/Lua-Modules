@@ -174,6 +174,35 @@ function Table.merge(...)
 end
 
 --[[
+Recursively merges entries from the second table into the first table,
+overriding existing entries. The first table is mutated in the process.
+
+Can be called with more than two tables. The additional tables are merged into
+the first table in succession.
+
+Example:
+Table.deepMergeInto({a = {x = 3, y = 4}}, {a = {y = 5}})
+
+-- Returns {a = {x = 3, y = 5}}
+]]
+function Table.deepMergeInto(target, ...)
+	local tbls = Table.pack(...)
+
+	for i = 1, tbls.n do
+		if type(tbls[i]) == 'table' then
+			for key, value in pairs(tbls[i]) do
+				if type(target[key]) == 'table' and type(value) == 'table' then
+					Table.deepMergeInto(target[key], value)
+				else
+					target[key] = value
+				end
+			end
+		end
+	end
+	return target
+end
+
+--[[
 Applies a function to each entry in a table and places the results as entries
 in a new table.
 
