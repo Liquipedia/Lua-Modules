@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 		local statusContents = {}
 		local status
 		if not String.isEmpty(_args.status) then
-			status = Page.makeInternalLink({onlyIfExists = true}, _args.status)
+			status = Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status
 		end
 		local banned = _BANNED[string.lower(_args.banned or '')]
 		if not banned and not String.isEmpty(_args.banned) then
