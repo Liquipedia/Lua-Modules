@@ -90,11 +90,11 @@ function LegacyMatchList.convertMatchMaps(frame)
 		end
 
 		if template ~= 'tbd' then
-			args['opponent' .. index] = MatchSubobjects.luaGetOpponent(frame, {
-					type = 'team',
-					template = template,
-					score = score,
-				})
+			args['opponent' .. index] = {
+				score = score,
+				template = template,
+				type = 'team',
+			}
 		end
 		args['opponent' .. index .. 'literal'] = args['team' .. index .. 'literal']
 
@@ -145,18 +145,14 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 			end
 		end
 		if player ~= 'TBD' then
-			args['opponent' .. index] = MatchSubobjects.luaGetOpponent(frame, {
-					type = 'solo',
-					match2players = {
-						{
-							name = playerLink,
-							displayname = player,
-							flag = args['p' .. index .. 'flag'],
-						},
-					},
-					template = args['p' .. index .. 'team'],
-					score = score,
-				})
+			args['opponent' .. index] = {
+				flag = args['p' .. index .. 'flag'],
+				link = playerLink,
+				name = player,
+				score = score,
+				template = args['p' .. index .. 'team'],
+				type = 'solo',
+			}
 		end
 		args['opponent' .. index .. 'literal'] = args['team' .. index .. 'literal']
 

@@ -12,6 +12,7 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -302,6 +303,30 @@ function MatchGroupInput.fetchStandaloneMatch(matchId)
 	return Array.find(matches, function(match)
 		return match.match2id == matchId
 	end)
+end
+
+--[[
+Merges an opponent struct into a match2 opponent record.
+]]
+function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
+	if opponent.type == Opponent.team then
+		record.template = record.template or opponent.template
+
+	elseif Opponent.typeIsParty(opponent.type) then
+		record.match2players = record.match2players
+			or Array.map(opponent.players, function(player)
+				return {
+					displayname = player.displayName,
+					flag = player.flag,
+					name = player.pageName,
+				}
+			end)
+	end
+
+	record.name = Opponent.toName(opponent)
+	record.type = opponent.type
+
+	return record
 end
 
 return MatchGroupInput

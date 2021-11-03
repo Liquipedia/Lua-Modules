@@ -27,6 +27,7 @@ function Match.storeFromArgs(frame)
 end
 
 function Match.toEncodedJson(frame)
+	FeatureFlag.set('combined_opponent_input', true)
 	local args = Arguments.getArgs(frame)
 	return Match._toEncodedJson(args)
 end

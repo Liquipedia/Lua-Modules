@@ -9,6 +9,7 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
@@ -61,21 +62,17 @@ function CustomMatchGroupInput.processMap(_, map)
 	return map
 end
 
--- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processOpponent(_, opponent)
-	-- check for empty team and convert to literal
-	if type(opponent) == 'table' and opponent.type == 'team' and Logic.isEmpty(opponent.template) then
-		opponent.name = ''
-		opponent.type = 'literal'
+function CustomMatchGroupInput.processOpponent(record, date)
+	local opponent = Opponent.readOpponentArgs(record)
+		or Opponent.blank()
+
+	-- Convert byes to literals
+	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	-- check for lazy bye's and convert them to literals
-	if type(opponent) == 'table' and string.lower(opponent.template or '') == 'bye' then
-			opponent.name = 'BYE'
-			opponent.type = 'literal'
-	end
-
-	return opponent
+	Opponent.resolve(opponent, date)
+	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 -- called from Module:Match/Subobjects
@@ -418,14 +415,11 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
+			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
-			--retrieve name and icon for teams from team templates
-			if opponent.type == 'team' and
-				not Logic.isEmpty(opponent.template, match.date) then
-					local name, icon, template = opponentFunctions.getTeamNameAndIcon(opponent.template, match.date)
-					opponent.template = template or opponent.template
-					opponent.name = opponent.name or name
-					opponent.icon = opponent.icon or icon
+			-- Retrieve icon for team
+			if opponent.type == Opponent.team then
+				opponent.icon = opponentFunctions.getIcon(opponent.template)
 			end
 
 			-- apply status
@@ -566,23 +560,9 @@ end
 --
 -- opponent related functions
 --
-function opponentFunctions.getTeamNameAndIcon(template, date)
-	local team, icon
-	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
-	template = (template or ''):lower():gsub('_', ' ')
-	if template ~= '' and template ~= 'noteam' and
-		mw.ext.TeamTemplate.teamexists(template) then
-
-		local templateData = mw.ext.TeamTemplate.raw(template, date)
-		icon = templateData.image
-		if icon == '' then
-			icon = templateData.legacyimage
-		end
-		team = templateData.page
-		template = templateData.templatename or template
-	end
-
-	return team, icon, template
+function opponentFunctions.getIcon(template)
+	local raw = mw.ext.TeamTemplate.raw(template)
+	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
 end
 
 return CustomMatchGroupInput

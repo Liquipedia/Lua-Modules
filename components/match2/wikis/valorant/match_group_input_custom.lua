@@ -9,16 +9,14 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local getIconName = require('Module:IconName').luaGet
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-
-local _frame
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local MAX_NUM_OPPONENTS = 2
@@ -30,14 +28,12 @@ local MAX_NUM_ROUNDS = 24
 local matchFunctions = {}
 local mapFunctions = {}
 local roundFunctions = {}
-local opponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(frame, match, options)
 	options = options or {}
-	_frame = frame
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -55,7 +51,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(frame, map)
-	_frame = frame
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -64,19 +59,16 @@ function CustomMatchGroupInput.processMap(frame, map)
 	return map
 end
 
--- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processOpponent(frame, opponent)
-	_frame = frame
-	if not Logic.isEmpty(opponent.template) then
-		opponent.name = opponent.name or opponentFunctions.getTeamName(opponent.template)
-	end
+function CustomMatchGroupInput.processOpponent(record, date)
+	local opponent = Opponent.readOpponentArgs(record)
+		or Opponent.blank()
 
-	return opponent
+	Opponent.resolve(opponent, date)
+	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processPlayer(frame, player)
-	_frame = frame
 	return player
 end
 
@@ -174,6 +166,8 @@ function matchFunctions.getOpponents(args)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
+			CustomMatchGroupInput.processOpponent(opponent, args.date)
+
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = 'S'
@@ -427,21 +421,6 @@ function roundFunctions.getRoundData(round)
 
 	round.participants = participants
 	return round
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getTeamName(template)
-	if template ~= nil then
-		local team = Template.expandTemplate(_frame, 'Team', { template })
-		team = team:gsub('%&', '')
-		team = String.split(team, 'link=')[2]
-		team = String.split(team, ']]')[1]
-		return team
-	else
-		return nil
-	end
 end
 
 return CustomMatchGroupInput
