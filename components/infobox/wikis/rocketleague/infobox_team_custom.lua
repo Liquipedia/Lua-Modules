@@ -93,7 +93,7 @@ function CustomTeam:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata = {
 		rating = Variables.varDefault('rating'),
-		tier = string.lower(args.regionsubtier or '')
+		tier = string.lower(args.tier or '')
 	}
 	for year = _START_YEAR, _CURRENT_YEAR do
 		local id = args.id or _team.pagename
