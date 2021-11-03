@@ -23,8 +23,6 @@ local CustomItem = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-
-local _pagename = mw.title.getCurrentTitle().text
 local _frame
 local _categories = {}
 
@@ -331,13 +329,13 @@ function CustomItem._getCostDisplay()
 	local display = tostring(outerDiv)
 
 	if not String.isEmpty(_args.recipecost) then
-		local innerDiv = mw.html.create('div')
+		innerDiv = mw.html.create('div')
 			:css('display', 'inline-block')
 			:css('padding', '0px 3px')
 			:css('border-radius', '4px')
 			:addClass('placement-darkgrey')
 			:wikitext('(' .. _args.recipecost .. ')')
-		local outerDiv = mw.html.create('div')
+		outerDiv = mw.html.create('div')
 			:css('padding-top', '3px')
 			:wikitext(Template.safeExpand(
 					_frame,
