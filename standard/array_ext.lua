@@ -33,8 +33,8 @@ function ArrayExt.findIndex(array, pred)
 end
 
 --[[
-Returns the unique element in an array. Returns nil if there is more than one
-distinct element, or if the array is empty.
+Returns the unique element (not elements!) in an array if there is one. Returns nil
+if there is more than one distinct element, or if the array is empty.
 
 Example:
 
