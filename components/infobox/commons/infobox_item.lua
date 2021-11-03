@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local String = require('Module:String')
 local Namespace = require('Module:Namespace')
 local BasicInfobox = require('Module:Infobox/Basic')
 
@@ -42,7 +41,7 @@ function Item:createInfobox()
 					size = args.size
 				},
 			}
-		},	
+		},
 		Customizable{
 			id = 'caption',
 			children = {
