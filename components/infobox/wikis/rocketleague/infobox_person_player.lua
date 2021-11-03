@@ -99,6 +99,10 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = '[[Oceania Draft League|Oceania Draft League]] History'})
 			table.insert(widgets, Center{content = {_args.history_odl}})
 		end
+	elseif id == 'role' then
+		return {
+			Cell{name = 'Current Role', content = {_args.role}},
+		}
 	end
 	return widgets
 end
