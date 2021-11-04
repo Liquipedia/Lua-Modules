@@ -31,12 +31,17 @@ function Unit:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{
-			name = self:nameDisplay(args),
-			image = args.image,
-			imageDefault = args.default,
-			imageDark = args.imagedark or args.imagedarkmode,
-			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+		Customizable{
+			id = 'header',
+			children = {
+				Header{
+					name = self:nameDisplay(args),
+					image = args.image,
+					imageDefault = args.default,
+					imageDark = args.imagedark or args.imagedarkmode,
+					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+				},
+			}
 		},
 		Customizable{
 			id = 'caption',
