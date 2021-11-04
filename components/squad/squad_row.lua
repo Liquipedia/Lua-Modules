@@ -7,6 +7,8 @@ local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=' ..
 	'https://liquipedia.net/rocketleague/Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
 
+local _COLOR_BACKGROUND_COACH = '#e5e5e5'
+
 local SquadRow = Class.new(
 	function(self, frame, role)
 		self.frame = frame
@@ -18,13 +20,13 @@ local SquadRow = Class.new(
 			self.content:addClass('sub')
 		elseif role == 'coach' then
 			self.content:addClass('coach')
-			self.content:css('background-color', '#e5e5e5')
+			self.content:css('background-color', _COLOR_BACKGROUND_COACH)
 		elseif role == 'coach/manager' then
 			self.content:addClass('coach/manager')
-			self.content:css('background-color', '#e5e5e5')
+			self.content:css('background-color', _COLOR_BACKGROUND_COACH)
 		elseif role == 'coach/substitute' then
 			self.content:addClass('coach/substitute')
-			self.content:css('background-color', '#e5e5e5')
+			self.content:css('background-color', _COLOR_BACKGROUND_COACH)
 		end
 	end)
 
