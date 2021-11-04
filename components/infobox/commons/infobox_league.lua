@@ -63,7 +63,22 @@ function League:createInfobox()
 				self:_createSeries(frame, args.series2, args.abbreviation2)
 			}
 		},
-		Cell{name = 'Organizer(s)', content = self:_createOrganizers(args)},
+		Builder{
+			builder = function()
+				local organizers = self:_createOrganizers(args)
+				mw.log('hello')
+				mw.logObject(organizers)
+				mw.log(Table.size(organizers))
+				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
+
+				return {
+					Cell{
+						name = title,
+						content = organizers
+					}
+				}
+			end
+		},
 		Customizable{
 			id = 'sponsors',
 			children = {
