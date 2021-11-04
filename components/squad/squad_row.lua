@@ -2,6 +2,7 @@ local Class = require('Module:Class')
 local DivTable = require('Module:DivTable')
 local Template = require('Module:Template')
 local String = require('Module:String')
+local Player = require('Module:Player')
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=https://liquipedia.net/rocketleague/Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
@@ -15,8 +16,7 @@ local SquadRow = Class.new(
 function SquadRow:id(args)
 	local cell = mw.html.create('div')
 	cell:addClass('ID')
-	cell:wikitext('\'\'\'' ..
-		Template.safeExpand(self.frame, 'Player', {args.player, flag = args.flag, link = args.link}) .. '\'\'\'')
+	cell:wikitext('\'\'\'' .. Player._player(args) .. '\'\'\'')
 
 	if not String.isEmpty(args.captain) then
 		cell:wikitext(_ICON_CAPTAIN)
