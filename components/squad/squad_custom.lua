@@ -24,17 +24,9 @@ function CustomSquad.run(frame)
 			role = player.role,
 		})
 
-		row:name({
-			name = player.name
-		})
-
-		row:role({
-			role = player.role
-		})
-
-		row:joinDate({
-			joindate = player.joindate
-		})
+		row	:name({name = player.name})
+			:role({role = player.role})
+			:joinDate({joindate = player.joindate})
 
 		squad:row(row:create())
 
