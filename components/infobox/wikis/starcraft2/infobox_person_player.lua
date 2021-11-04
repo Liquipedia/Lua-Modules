@@ -13,6 +13,7 @@ local Variables = require('Module:Variables')
 local Achievements = require('Module:Achievements in infoboxes')._player
 local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
+local Math = require('Module:Math')
 local Matches = require('Module:Upcoming ongoing and recent matches player/new')
 
 local _EPT_SEASON = 2021
@@ -166,7 +167,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _earningsGlobal[tostring(_CURRENT_YEAR)]
 	if currentYearEarnings then
-		currentYearEarnings = math.floor( (currentYearEarnings) * 100 + 0.5) / 100
+		currentYearEarnings = Math.round{currentYearEarnings, 2}
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
@@ -376,7 +377,7 @@ end
 function CustomPlayer:calculateEarnings()
 	local earningsTotal
 	earningsTotal, _earningsGlobal = CustomPlayer._getEarningsMedalsData(self.pagename)
-	earningsTotal = math.floor( (earningsTotal or 0) * 100 + 0.5) / 100
+	earningsTotal = Math.round{earningsTotal, 2}
 	return earningsTotal
 end
 
