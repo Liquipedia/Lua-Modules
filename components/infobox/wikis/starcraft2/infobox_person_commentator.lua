@@ -138,7 +138,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _earningsGlobal[tostring(_CURRENT_YEAR)]
 	if currentYearEarnings then
-		currentYearEarnings = math.floor( (currentYearEarnings) * 100 + 0.5) / 100
+		currentYearEarnings = Math.round{currentYearEarnings, 2}
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
@@ -345,7 +345,7 @@ end
 function CustomCommentator:calculateEarnings()
 	local earningsTotal
 	earningsTotal, _earningsGlobal = CustomCommentator._getEarningsMedalsData(self.pagename)
-	earningsTotal = math.floor( (earningsTotal or 0) * 100 + 0.5) / 100
+	earningsTotal = Math.round{earningsTotal, 2}
 	return earningsTotal
 end
 
