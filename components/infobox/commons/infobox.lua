@@ -24,7 +24,7 @@ function Infobox:create(frame, gameName, forceDarkMode)
 	self.root	:addClass('fo-nttax-infobox-wrapper')
 				:addClass('infobox-' .. gameName)
 	if forceDarkMode then
-		self.root	:addClass('infobox-darkmodeforced')
+		self.root:addClass('infobox-darkmodeforced')
 	end
 
 	self.injector = nil
