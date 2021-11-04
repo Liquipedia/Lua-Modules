@@ -748,7 +748,7 @@ function StarcraftMatchGroupInput.MapInput(match, i, subgroup)
 	--determine score, resulttype, walkover and winner
 	match['map' .. i] = StarcraftMatchGroupInput.MapWinnerProcessing(match['map' .. i])
 
-	--get participants data for the map + get map mode + winnerrace and loserrace
+	--get participants data for the map + get map mode + winnerfaction and loserfaction
 	--(w/l race stuff only for 1v1 maps)
 	match['map' .. i] = StarcraftMatchGroupInput.ProcessPlayerMapData(match['map' .. i], match, 2)
 
@@ -969,11 +969,11 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 
 		if map_mode == '1v1' and OppNumber == 2 then
 			if tonumber(map.winner or 0) == 1 then
-				map.extradata.winnerrace = raceOP[1]
-				map.extradata.loserrace = raceOP[2]
+				map.extradata.winnerfaction = raceOP[1]
+				map.extradata.loserfaction = raceOP[2]
 			elseif tonumber(map.winner or 0) == 2 then
-				map.extradata.winnerrace = raceOP[2]
-				map.extradata.loserrace = raceOP[1]
+				map.extradata.winnerfaction = raceOP[2]
+				map.extradata.loserfaction = raceOP[1]
 			end
 			map.extradata.opponent1 = PL[1]
 			map.extradata.opponent2 = PL[2]
