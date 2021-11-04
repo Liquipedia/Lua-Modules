@@ -8,11 +8,7 @@ local CustomSquad = {}
 
 function CustomSquad.run(frame)
 	local squad = Squad()
-	squad:init(frame):title()
-
-	local status = Logic.readBool(squad.args.active or 'true') == true
-		and Squad.TYPE_ACTIVE or Squad.TYPE_FORMER
-	squad:header(status)
+	squad:init(frame):title():header()
 
 	local args = squad.args
 
@@ -32,7 +28,7 @@ function CustomSquad.run(frame)
 			:role({role = player.role})
 			:date(player.joindate)
 
-		if status == Squad.TYPE_FORMER then
+		if squad.type == Squad.TYPE_FORMER then
 			row:date(player.leavedate)
 		end
 

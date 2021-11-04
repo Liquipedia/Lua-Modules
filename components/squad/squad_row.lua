@@ -75,6 +75,18 @@ function SquadRow:date(dateValue)
 	return self
 end
 
+function SquadRow:newteam(args)
+	local cell = mw.html.create('td')
+	cell:addClass('NewTeam')
+
+	if not String.isEmpty(dateValue) then
+		cell:wikitext('\'\'' .. dateValue .. '\'\'')
+	end
+	self.content:node(cell)
+	return self
+
+end
+
 function SquadRow:create()
 	return self.content
 end

@@ -23,9 +23,11 @@ function Squad:init(frame)
 	self.content:addClass('wikitable wikitable-striped roster-card')
 
 	if not String.isEmpty(self.args.team) then
-		-- TODO find out what it is
-		Variables.varDefine('RosterTeam', 'true')
+		self.args.isLoan = true
 	end
+
+	self.type = Logic.readBool(self.args.active or 'true') == true
+		and Squad.TYPE_ACTIVE or Squad.TYPE_FORMER
 
 	return self
 end
@@ -52,7 +54,7 @@ function Squad:title()
 	return self
 end
 
-function Squad:header(type)
+function Squad:header()
 	local makeHeader = function(wikiText)
 		local headerCell = mw.html.create('th')
 
@@ -69,8 +71,7 @@ function Squad:header(type)
 					:node(makeHeader('Name'))
 					:node(makeHeader())
 					:node(makeHeader('Join Date'))
-	if type == Squad.TYPE_FORMER then
-		Variables.varDefine('RosterFormer', 'true')
+	if self.type == Squad.TYPE_FORMER then
 		headerRow	:node(makeHeader('Leave Date'))
 					:node(makeHeader('New Team'))
 	end
