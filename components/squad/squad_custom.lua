@@ -24,10 +24,10 @@ function CustomSquad.run(frame)
 
 		row	:name({name = player.name})
 			:role({role = player.role})
-			:date(player.joindate)
+			:date(player.joindate, 'Join Date:&nbsp;')
 
 		if squad.type == Squad.TYPE_FORMER then
-			row:date(player.leavedate)
+			row:date(player.leavedate, 'Leave Date:&nbsp;')
 			row:newteam({
 				newteam = player.newteam,
 				newteamrole = player.newteamrole,

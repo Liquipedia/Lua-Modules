@@ -48,7 +48,9 @@ end
 function SquadRow:name(args)
 	local cell = mw.html.create('td')
 	cell:addClass('Name')
+	cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('('))
 	cell:wikitext(args.name)
+	cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext(')'))
 	self.content:node(cell)
 	return self
 end
@@ -58,6 +60,7 @@ function SquadRow:role(args)
 	cell:addClass('Position')
 
 	if not String.isEmpty(args.role) then
+		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position'))
 		cell:wikitext('\'\'(' .. args.role .. ')\'\'')
 	end
 
@@ -65,9 +68,11 @@ function SquadRow:role(args)
 	return self
 end
 
-function SquadRow:date(dateValue)
+function SquadRow:date(dateValue, mobileTitle)
 	local cell = mw.html.create('td')
 	cell:addClass('Date')
+
+	cell:node(mw.html.create('div'):addClass('MobileStuffDate'):wikitext(mobileTitle))
 
 	if not String.isEmpty(dateValue) then
 		cell:node(mw.html.create('div'):addClass('Date'):wikitext('\'\'' .. dateValue .. '\'\''))
