@@ -1,7 +1,6 @@
 local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
 local String = require('Module:String')
-local Variables = require('Module:Variables')
 local Logic = require('Module:Logic')
 
 local Squad = Class.new()
@@ -87,14 +86,6 @@ end
 
 function Squad:create()
 	self.root:node(self.content)
-
-	if not (String.isEmpty(self.args.former) and String.isEmpty(self.args.inactive)) then
-		if Logic.readBool(self.args.inactive) == true then
-			Variables.varDefine('RosterInactive', 'true')
-		end
-
-		Variables.varDefine('number_in_roster', 0)
-	end
 
 	return self.root
 end
