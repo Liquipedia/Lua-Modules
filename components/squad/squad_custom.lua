@@ -11,8 +11,8 @@ function CustomSquad.run(frame)
 	local args = squad.args
 
 	local index = 1
-	while args['p' .. index] ~= nil do
-		local player = Json.parseIfString(args['p' .. index])
+	while args['p' .. index] ~= nil or args[index] do
+		local player = Json.parseIfString(args['p' .. index] or args[index])
 		local row = SquadRow(frame, player.role)
 		row:id({
 			player.id,
