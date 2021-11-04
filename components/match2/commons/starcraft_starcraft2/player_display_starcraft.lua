@@ -123,10 +123,10 @@ function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 	}
 	return StarcraftPlayerDisplay.InlinePlayerContainer({
 		date = args.date,
-		dontSave = Logic.readBoolOrNil(args.novar),
 		dq = Logic.readBoolOrNil(args.dq),
 		flip = Logic.readBoolOrNil(args.flip),
 		player = player,
+		savePageVar = not Logic.readBool(args.novar),
 		showFlag = Logic.readBoolOrNil(args.showFlag),
 		showLink = Logic.readBoolOrNil(args.showLink),
 		showRace = Logic.readBoolOrNil(args.showRace),
@@ -135,10 +135,10 @@ end
 
 StarcraftPlayerDisplay.propTypes.InlinePlayerContainer = {
 	date = 'string?',
-	dontSave = 'boolean?',
 	dq = 'boolean?',
 	flip = 'boolean?',
 	player = 'table',
+	savePageVar = 'boolean?',
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
 	showRace = 'boolean?',
@@ -152,7 +152,10 @@ variables.
 ]]
 function StarcraftPlayerDisplay.InlinePlayerContainer(props)
 	DisplayUtil.assertPropTypes(props, StarcraftPlayerDisplay.propTypes.InlinePlayerContainer)
-	StarcraftPlayerUtil.syncPlayer(props.player, props.date, props.dontSave)
+	StarcraftPlayerUtil.syncPlayer(props.player, {
+		date = props.date,
+		savePageVar = props.savePageVar,
+	})
 
 	return StarcraftPlayerDisplay.InlinePlayer(props)
 end
