@@ -13,6 +13,7 @@ local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
+local Math = require('Module:Math')
 local Matches = require('Module:Upcoming ongoing and recent matches player/new')
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
