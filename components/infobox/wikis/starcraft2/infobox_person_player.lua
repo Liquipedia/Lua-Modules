@@ -129,7 +129,7 @@ function CustomInjector:parse(id, widgets)
 		if _shouldQueryData then
 			local achievements = Achievements({}, _PAGENAME)
 			if not String.isEmpty(achievements) then
-				table.insert(achievementCells, Center{content = achievements})
+				table.insert(achievementCells, Center{content = {achievements}})
 			end
 
 			local allkills = CustomPlayer._getAllkills()
