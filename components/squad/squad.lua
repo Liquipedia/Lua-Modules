@@ -1,10 +1,12 @@
 local Class = require('Module:Class')
-local DivTable = require('Module:DivTable')
+local Arguments = require('Module:Arguments')
+local String = require('Module:String')
 
 local Squad = Class.new()
 
 function Squad:init(frame)
 	self.frame = frame
+	self.args = Arguments.getArgs(frame)
 	self.root = mw.html.create('div')
 	self.root	:addClass('table-responsive')
 				-- TODO: is this needed?
@@ -12,39 +14,62 @@ function Squad:init(frame)
 				-- TODO: is this needed?
 				:css('padding-bottom', '0px')
 
-	self.content = DivTable.create():setStriped(true)
+	self.content = mw.html.create('table')
+	self.content:addClass('wikitable wikitable-striped roster-card')
+
+	return self
+end
+
+function Squad:title()
+	local titleText = String.isEmpty(self.args.title) and 'Active Squad' or self.args.title
+
+	local titleContainer = mw.html.create('tr')
+
+	local titleRow = mw.html.create('th')
+	titleRow:addClass('large-only')
+			:attr('colspan', '1')
+			:wikitext(titleText)
+
+	local titleRow2 = mw.html.create('th')
+	titleRow2:addClass('large-only')
+			:attr('colspan', '10')
+			:css('border-bottom', '1px solid #bbbbbb')
+			:wikitext(titleText)
+
+	titleContainer:node(titleRow):node(titleRow2)
+	self.content:node(titleContainer)
 
 	return self
 end
 
 function Squad:header()
 	local makeHeader = function(wikiText)
-		local div = mw.html.create('div')
+		local headerCell = mw.html.create('th')
 
 		if wikiText == nil then
-			return div
+			return headerCell
 		end
 
-		return div:wikitext(wikiText):css('text-align', 'center')
+		return headerCell:wikitext(wikiText):addClass('divCell')
 	end
 
-	local headerRow = DivTable.HeaderRow()
-	headerRow	:cell(makeHeader('ID'))
-				:cell(makeHeader('Name'))
-				:cell(makeHeader())
-				:cell(makeHeader('Join Date'))
-	self.content:row(headerRow)
+	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
+	headerRow	:node(makeHeader('ID'))
+				:node(makeHeader('Name'))
+				:node(makeHeader())
+				:node(makeHeader('Join Date'))
+	self.content:node(headerRow)
 
 	return self
 end
 
 function Squad:row(row)
-	self.content:row(row)
+	self.content:node(row)
 	return self
 end
 
 function Squad:create()
-	self.root:node(self.content:create())
+	self.root:node(self.content)
 	return self.root
 end
 

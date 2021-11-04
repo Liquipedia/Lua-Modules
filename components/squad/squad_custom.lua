@@ -1,23 +1,22 @@
 local Squad = require('Module:VoganRL/Squad')
 local SquadRow = require('Module:VoganRL/Squad/Row')
 local Json = require('Module:Json')
-local Arguments = require('Module:Arguments')
 
 
 local CustomSquad = {}
 
 function CustomSquad.run(frame)
-	local args = Arguments.getArgs(frame)
-
 	local squad = Squad()
-	squad:init(frame):header()
+	squad:init(frame):title():header()
+
+	local args = squad.args
 
 	local index = 1
 	while args['p' .. index] ~= nil do
 		local player = Json.parseIfString(args['p' .. index])
 		local row = SquadRow(frame)
 		row:id({
-			player = player.id,
+			player.id,
 			flag = player.flag,
 			link = player.link,
 			captain = player.captain,
