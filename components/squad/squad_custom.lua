@@ -1,13 +1,18 @@
 local Squad = require('Module:VoganRL/Squad')
 local SquadRow = require('Module:VoganRL/Squad/Row')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 
 
 local CustomSquad = {}
 
 function CustomSquad.run(frame)
 	local squad = Squad()
-	squad:init(frame):title():header()
+	squad:init(frame):title()
+
+	local status = Logic.readBool(squad.args.active or 'true') == true
+		and Squad.TYPE_ACTIVE or Squad.TYPE_FORMER
+	squad:header(status)
 
 	local args = squad.args
 

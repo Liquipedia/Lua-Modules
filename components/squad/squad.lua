@@ -6,6 +6,9 @@ local Logic = require('Module:Logic')
 
 local Squad = Class.new()
 
+Squad.TYPE_ACTIVE = 0
+Squad.TYPE_FORMER = 1
+
 function Squad:init(frame)
 	self.frame = frame
 	self.args = Arguments.getArgs(frame)
@@ -49,7 +52,7 @@ function Squad:title()
 	return self
 end
 
-function Squad:header()
+function Squad:header(type)
 	local makeHeader = function(wikiText)
 		local headerCell = mw.html.create('th')
 
@@ -61,10 +64,16 @@ function Squad:header()
 	end
 
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-	headerRow	:node(makeHeader('ID'))
-				:node(makeHeader('Name'))
-				:node(makeHeader())
-				:node(makeHeader('Join Date'))
+
+		headerRow	:node(makeHeader('ID'))
+					:node(makeHeader('Name'))
+					:node(makeHeader())
+					:node(makeHeader('Join Date'))
+	if type == Squad.TYPE_FORMER then
+		Variables.varDefine('RosterFormer', 'true')
+		headerRow	:node(makeHeader('Leave Date'))
+					:node(makeHeader('New Team'))
+	end
 	self.content:node(headerRow)
 
 	return self
@@ -80,7 +89,7 @@ function Squad:create()
 
 	if not (String.isEmpty(self.args.former) and String.isEmpty(self.args.inactive)) then
 		if Logic.readBool(self.args.inactive) == true then
-			Variables.varDefine('RosterInactive', true)
+			Variables.varDefine('RosterInactive', 'true')
 		end
 
 		Variables.varDefine('number_in_roster', 0)
