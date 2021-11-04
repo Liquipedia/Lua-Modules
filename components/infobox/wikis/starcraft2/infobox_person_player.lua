@@ -166,6 +166,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _earningsGlobal[tostring(_CURRENT_YEAR)]
 	if currentYearEarnings then
+		currentYearEarnings = math.floor( (currentYearEarnings) * 100 + 0.5) / 100
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
