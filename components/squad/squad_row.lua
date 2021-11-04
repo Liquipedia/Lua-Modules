@@ -7,9 +7,24 @@ local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=' ..
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
 
 local SquadRow = Class.new(
-	function(self, frame)
+	function(self, frame, role)
 		self.frame = frame
 		self.content = mw.html.create('tr'):addClass('Player')
+
+		role = string.lower(role or '')
+
+		if role == 'sub' then
+			self.content:addClass('sub')
+		elseif role == 'coach' then
+			self.content:addClass('coach')
+			self.content:css('background-color', '#e5e5e5')
+		elseif role == 'coach/manager' then
+			self.content:addClass('coach/manager')
+			self.content:css('background-color', '#e5e5e5')
+		elseif role == 'coach/substitute' then
+			self.content:addClass('coach/substitute')
+			self.content:css('background-color', '#e5e5e5')
+		end
 	end)
 
 function SquadRow:id(args)
@@ -40,7 +55,11 @@ end
 function SquadRow:role(args)
 	local cell = mw.html.create('td')
 	cell:addClass('Position')
-	cell:wikitext(args.role)
+
+	if not String.isEmpty(args.role) then
+		cell:wikitext('\'\'(' .. args.role .. ')\'\'')
+	end
+
 	self.content:node(cell)
 	return self
 end
@@ -48,7 +67,10 @@ end
 function SquadRow:joinDate(args)
 	local cell = mw.html.create('td')
 	cell:addClass('Date')
-	cell:wikitext(args.joindate)
+
+	if not String.isEmpty(args.joindate) then
+		cell:wikitext('\'\'' .. args.joindate .. '\'\'')
+	end
 	self.content:node(cell)
 	return self
 end
