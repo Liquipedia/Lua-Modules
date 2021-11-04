@@ -114,24 +114,24 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'caption' then
 		table.insert(widgets, Center{content = {_args.quote}})
 	elseif id == 'type' then
+		local breakDownContents = {}
 		local region = _args.region
 		if not String.isEmpty(region) then
 			region = '<b>Region</b><br>' .. Template.safeExpand(_frame, 'Region icon', {region}, '')
+			table.insert(breakDownContents, region)
 		end
 		local primaryRole = _args.primaryrole
 		if not String.isEmpty(primaryRole) then
 			primaryRole = '<b>Primary Role</b><br>' .. Template.safeExpand(_frame, 'Class icon', {primaryRole}, '')
+			table.insert(breakDownContents, primaryRole)
 		end
 		local secondaryRole = _args.secondaryrole
 		if not String.isEmpty(secondaryRole) then
 			secondaryRole = '<b>Secondary Role</b><br>' .. Template.safeExpand(_frame, 'Class icon', {secondaryRole}, '')
+			table.insert(breakDownContents, secondaryRole)
 		end
 		return {
-			Breakdown{classes = {'infobox-center'}, content = {
-				region or '',
-				primaryRole or '',
-				secondaryRole or '',
-			}},
+			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
 			Cell{name = 'Real Name', content = {_args.realname}},
 		}
 	elseif id == 'cost' then
