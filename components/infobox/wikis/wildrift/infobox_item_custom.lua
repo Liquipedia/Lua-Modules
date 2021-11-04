@@ -87,7 +87,7 @@ function CustomInjector:parse(id, widgets)
 				}})
 			end
 			table.insert(widgets, Cell{name = 'Health', content = {
-				CustomItem._positiveConcatedArgsForBase('health')
+				CustomItem._positiveConcatedArgsForBase('hp')
 			}})
 			table.insert(widgets, Cell{name = 'Max Health', content = {
 				CustomItem._positiveConcatedArgsForBase('maxhealth')
