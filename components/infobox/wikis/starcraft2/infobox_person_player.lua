@@ -140,7 +140,7 @@ function CustomInjector:parse(id, widgets)
 					})
 			end
 
-			if achievementCells ~= {} then
+			if next(achievementCells) then
 				table.insert(achievementCells, 1, Title{name = 'Achievements'})
 			end
 		end
