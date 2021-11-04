@@ -1,8 +1,6 @@
 local Squad = require('Module:VoganRL/Squad')
 local SquadRow = require('Module:VoganRL/Squad/Row')
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-
 
 local CustomSquad = {}
 
@@ -30,6 +28,12 @@ function CustomSquad.run(frame)
 
 		if squad.type == Squad.TYPE_FORMER then
 			row:date(player.leavedate)
+			row:newteam({
+				newteam = player.newteam,
+				newteamrole = player.newteamrole,
+				newteamdate = player.newteamdate,
+				leavedate = player.leavedate
+			})
 		end
 
 		squad:row(row:create())

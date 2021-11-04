@@ -1,6 +1,7 @@
 local Class = require('Module:Class')
 local String = require('Module:String')
 local Player = require('Module:Player')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=' ..
 	'https://liquipedia.net/rocketleague/Category:Captains|alt=Captain]]'
@@ -69,7 +70,7 @@ function SquadRow:date(dateValue)
 	cell:addClass('Date')
 
 	if not String.isEmpty(dateValue) then
-		cell:wikitext('\'\'' .. dateValue .. '\'\'')
+		cell:node(mw.html.create('div'):addClass('Date'):wikitext('\'\'' .. dateValue .. '\'\''))
 	end
 	self.content:node(cell)
 	return self
@@ -79,9 +80,25 @@ function SquadRow:newteam(args)
 	local cell = mw.html.create('td')
 	cell:addClass('NewTeam')
 
-	if not String.isEmpty(dateValue) then
-		cell:wikitext('\'\'' .. dateValue .. '\'\'')
+
+	if not String.isEmpty(args.newteam) then
+		local mobileStuffDiv = mw.html.create('div'):addClass('MobileStuff')
+		mobileStuffDiv	:node(mw.html.create('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'))
+						:wikitext('&nbsp;')
+		cell:node(mobileStuffDiv)
+
+
+		local newteam = args.newteam:lower()
+		if mw.ext.TeamTemplate.teamexists(newteam) then
+			cell:wikitext(mw.ext.TeamTemplate.team(args.newteam:lower(),
+				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
+		end
+
+		if not String.isEmpty(args.newteamrole) then
+			cell:wikitext('&nbsp;\'\'<small>(' .. args.newteamrole .. ')</small>\'\'')
+		end
 	end
+
 	self.content:node(cell)
 	return self
 
