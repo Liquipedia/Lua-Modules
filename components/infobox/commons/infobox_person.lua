@@ -211,7 +211,7 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
 	local storageType = self:getStorageType(args, personType, status)
 
-	mw.ext.LiquipediaDB.lpdb_player(storageType .. (args.id or self.name), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. (args.id or self.name), lpdbData)
 end
 
 --- Allows for overriding this functionality
