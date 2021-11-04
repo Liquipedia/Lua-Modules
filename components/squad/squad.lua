@@ -1,6 +1,8 @@
 local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
 local String = require('Module:String')
+local Variables = require('Module:Variables')
+local Logic = require('Module:Logic')
 
 local Squad = Class.new()
 
@@ -16,6 +18,11 @@ function Squad:init(frame)
 
 	self.content = mw.html.create('table')
 	self.content:addClass('wikitable wikitable-striped roster-card')
+
+	if not String.isEmpty(self.args.team) then
+		-- TODO find out what it is
+		Variables.varDefine('RosterTeam', 'true')
+	end
 
 	return self
 end
@@ -70,6 +77,15 @@ end
 
 function Squad:create()
 	self.root:node(self.content)
+
+	if not (String.isEmpty(self.args.former) and String.isEmpty(self.args.inactive)) then
+		if Logic.readBool(self.args.inactive) == true then
+			Variables.varDefine('RosterInactive', true)
+		end
+
+		Variables.varDefine('number_in_roster', 0)
+	end
+
 	return self.root
 end
 
