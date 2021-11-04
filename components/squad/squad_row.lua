@@ -64,12 +64,12 @@ function SquadRow:role(args)
 	return self
 end
 
-function SquadRow:joinDate(args)
+function SquadRow:date(dateValue)
 	local cell = mw.html.create('td')
 	cell:addClass('Date')
 
-	if not String.isEmpty(args.joindate) then
-		cell:wikitext('\'\'' .. args.joindate .. '\'\'')
+	if not String.isEmpty(dateValue) then
+		cell:wikitext('\'\'' .. dateValue .. '\'\'')
 	end
 	self.content:node(cell)
 	return self

@@ -30,7 +30,11 @@ function CustomSquad.run(frame)
 
 		row	:name({name = player.name})
 			:role({role = player.role})
-			:joinDate({joindate = player.joindate})
+			:date(player.joindate)
+
+		if status == Squad.TYPE_FORMER then
+			row:date(player.leavedate)
+		end
 
 		squad:row(row:create())
 
