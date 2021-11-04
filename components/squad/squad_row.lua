@@ -1,10 +1,10 @@
 local Class = require('Module:Class')
 local DivTable = require('Module:DivTable')
-local Template = require('Module:Template')
 local String = require('Module:String')
 local Player = require('Module:Player')
 
-local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=https://liquipedia.net/rocketleague/Category:Captains|alt=Captain]]'
+local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=' ..
+	'https://liquipedia.net/rocketleague/Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
 
 local SquadRow = Class.new(
