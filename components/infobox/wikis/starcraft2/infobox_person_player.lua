@@ -133,14 +133,14 @@ function CustomInjector:parse(id, widgets)
 			end
 
 			local allkills = CustomPlayer._getAllkills()
-			if not String.isEmpty(allkills) then
+			if not String.isEmpty(allkills) and allkills ~= '0' then
 				table.insert(achievementCells, Cell{
 						name = 'All-kills',
 						content = {_ALLKILLICON .. allkills}
 					})
 			end
 
-			if achievementCells ~= {} then
+			if next(achievementCells) then
 				table.insert(achievementCells, 1, Title{name = 'Achievements'})
 			end
 		end
