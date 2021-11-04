@@ -66,9 +66,6 @@ function League:createInfobox()
 		Builder{
 			builder = function()
 				local organizers = self:_createOrganizers(args)
-				mw.log('hello')
-				mw.logObject(organizers)
-				mw.log(Table.size(organizers))
 				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
 
 				return {
