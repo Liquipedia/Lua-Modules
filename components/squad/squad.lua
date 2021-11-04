@@ -18,11 +18,21 @@ function Squad:init(frame)
 end
 
 function Squad:header()
+	local makeHeader = function(wikiText)
+		local div = mw.html.create('div')
+
+		if wikiText == nil then
+			return div
+		end
+
+		return div:wikitext(wikiText):css('text-align', 'center')
+	end
+
 	local headerRow = DivTable.HeaderRow()
-	headerRow	:cell(mw.html.create('div'):wikitext('ID'))
-				:cell(mw.html.create('div'):wikitext('Name'))
-				:cell(mw.html.create('div'))
-				:cell(mw.html.create('div'):wikitext('Join Date'))
+	headerRow	:cell(makeHeader('ID'))
+				:cell(makeHeader('Name'))
+				:cell(makeHeader())
+				:cell(makeHeader('Join Date'))
 	self.content:row(headerRow)
 
 	return self
