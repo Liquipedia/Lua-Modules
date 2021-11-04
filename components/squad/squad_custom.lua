@@ -14,15 +14,14 @@ function CustomSquad.run(frame)
 	while args['p' .. index] ~= nil or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
 		local row = SquadRow(frame, player.role)
-		row:id({
-			player.id,
-			flag = player.flag,
-			link = player.link,
-			captain = player.captain,
-			role = player.role,
-		})
-
-		row	:name({name = player.name})
+		row	:id({
+				player.id,
+				flag = player.flag,
+				link = player.link,
+				captain = player.captain,
+				role = player.role,
+			})
+			:name({name = player.name})
 			:role({role = player.role})
 			:date(player.joindate, 'Join Date:&nbsp;')
 
