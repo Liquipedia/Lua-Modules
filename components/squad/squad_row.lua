@@ -3,8 +3,7 @@ local String = require('Module:String')
 local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 
-local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=' ..
-	'https://liquipedia.net/rocketleague/Category:Captains|alt=Captain]]'
+local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
 
 local _COLOR_BACKGROUND_COACH = '#e5e5e5'
