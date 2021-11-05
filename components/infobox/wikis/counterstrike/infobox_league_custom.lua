@@ -17,7 +17,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
-local MetadataGenerator = require('Module:Metadata_generator')
+local MetadataGenerator = require('Module:MetadataGenerator')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -44,6 +44,7 @@ local _league
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
+	_league.args['publisherdescription'] = 'metadesc-valve'
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
@@ -132,7 +133,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	end
 
-	mw.getCurrentFrame():extensionTag{name = 'metadescl', MetadataGenerator.tournament(mw.getCurrentFrame())}
+	mw.getCurrentFrame():extensionTag{name = 'metadescl', MetadataGenerator.tournament(_league.args)}
 
 	return widgets
 end
