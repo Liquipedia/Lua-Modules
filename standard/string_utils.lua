@@ -87,7 +87,7 @@ end
 -- Returns `I'm 40 years old`
 --
 -- Inspiration: http://lua-users.org/wiki/StringInterpolation
-function String.interpolation(s, tbl)
+function String.interpolate(s, tbl)
 	return (
 		s:gsub('($%b{})',
 			function(w)
