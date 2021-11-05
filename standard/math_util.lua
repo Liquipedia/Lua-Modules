@@ -52,4 +52,19 @@ function MathUtil.partialSums(set)
 	return sums
 end
 
+--[[
+Returns the dot product of two vectors.
+
+Example:
+MathUtil.dotProduct({3, 2, 4}, {5, 6, 7})
+-- Returns 55
+]]
+function MathUtil.dotProduct(xs, ys)
+	local sum = 0
+	for i = 1, math.min(#xs, #ys) do
+		sum = sum + xs[i] * ys[i]
+	end
+	return sum
+end
+
 return MathUtil
