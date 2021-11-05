@@ -30,7 +30,7 @@ function MetadataGenerator.tournament(args)
 	end
 
 	local ttype = (tier == 'qualifier' or tier == 'showmatch') and tier or 'tournament'
-	local riot = Variables.varDefault('metadesc-riot')
+	local publisher = Variables.varDefault(args.publisherDescription)
 	local date, tense = MetadataGenerator.getDate(args.edate or args.date, args.sdate)
 
 	local teams = args.team_number
@@ -48,19 +48,26 @@ function MetadataGenerator.tournament(args)
 	)
 	local charity = args.charity == 'true' and true
 	local dateVerb = (tense == 'past' and 'took place ') or (tense == 'future' and 'will take place ') or 'takes place '
-	local dateVerbRiot = (tense == 'past' and ' which took place ') or (tense == 'future' and ' which will take place ') or ' taking place '
+	local dateVerbPublisher =
+		(tense == 'past' and ' which took place ') or
+		(tense == 'future' and ' which will take place ') or
+		' taking place '
 
-	output = name .. ' is a' .. (type and ('n ' .. type:lower() .. ' ') or '') .. locality .. (game and (game .. ' ') or '') .. (charity and 'charity ' or '') .. ttype .. (organizers[1] and (' organized by ' .. organizers[1]) or '')
+	output = name .. ' is a' .. (type and ('n ' .. type:lower() .. ' ') or '') .. locality ..
+		(game and (game .. ' ') or '') .. (charity and 'charity ' or '') .. ttype ..
+		(organizers[1] and (' organized by ' .. organizers[1]) or '')
 
 	if organizers[2] then
-		output = output .. (organizers[3] and ', ' or ' and ') .. organizers[2] .. (organizers[3] and (', and ' .. organizers[3]) or '') .. '. '
+		output = output .. (organizers[3] and ', ' or ' and ') ..
+			organizers[2] .. (organizers[3] and (', and ' .. organizers[3]) or '') .. '. '
 	else
 		output = output .. '. '
 	end
 
 	output = output .. 'This ' .. (ttype ~= tier and (tier .. ' ') or '') .. ttype .. ' '
-	if riot then
-		output = output .. 'is a ' .. riot .. ((date and dateVerbRiot) or ((teams or players or prizepool) and ' featuring '))
+	if publisher then
+		output = output .. 'is a ' .. publisher .. ((date and dateVerbPublisher) or
+			((teams or players or prizepool) and ' featuring '))
 	elseif date then
 		output = output .. dateVerb
 	elseif teams or players or prizepool then
@@ -72,10 +79,13 @@ function MetadataGenerator.tournament(args)
 	end
 
 	if teams or players then
-		output = output .. ((teams and (teams .. ' teams')) or (players and (players .. ' players'))) .. (prizepool and ' ' or '')
+		output = output .. ((teams and (teams .. ' teams')) or
+			(players and (players .. ' players'))) ..
+			(prizepool and ' ' or '')
 	end
 	if prizepool then
-		output = output .. ((teams or players) and 'competing over ' or '') .. 'a total ' .. (charity and 'charity ' or '') .. 'prize pool of ' .. prizepool
+		output = output .. ((teams or players) and 'competing over ' or '') ..
+			'a total ' .. (charity and 'charity ' or '') .. 'prize pool of ' .. prizepool
 	end
 
 	output = output .. '.'
