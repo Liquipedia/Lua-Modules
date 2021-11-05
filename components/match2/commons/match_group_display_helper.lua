@@ -109,7 +109,7 @@ end
 -- Display component showing the streams, date, and countdown of a match.
 function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
-	local dateString = ''
+	local dateString
 	if match.dateIsExact == true then
 		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. ' ' .. _UTC
 	else
