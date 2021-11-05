@@ -1,9 +1,18 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MetadataGenerator
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local String = require('Module:String')
 local Localisation = require('Module:Localisation')
 local Template = require('Module:Template')
 local Games = require('Module:Games')
 local Variables = require('Module:Variables')
 local StringUtils = require('Module:StringUtils')
+local Class = require('Module:Class')
 
 local MetadataGenerator = {}
 
@@ -27,13 +36,15 @@ function MetadataGenerator.tournament(args)
 	local tier = args.liquipediatier and Template.safeExpand(frame, 'TierDisplay', {args.liquipediatier}) or nil
 
 	if tier then
-		tier = tonumber(Template.safeExpand(frame, 'TierDisplay/number', {args.liquipediatier})) > 4 and tier:lower() or tier
+		tier = (tonumber(
+			Template.safeExpand(frame, 'TierDisplay/number', {args.liquipediatier})
+		) or 0) > 4 and tier:lower() or tier
 	else
 		tier = 'Unknown Tier'
 	end
 
 	local tierType = (tier == 'qualifier' or tier == 'showmatch') and tier or 'tournament'
-	local publisher = Variables.varDefault(args.publisherDescription)
+	local publisher = Variables.varDefault(args.publisherdescription, '')
 	local date, tense = MetadataGenerator.getDate(args.edate or args.date, args.sdate)
 
 	local teams = args.team_number
@@ -59,7 +70,7 @@ function MetadataGenerator.tournament(args)
 	output = StringUtils.interpolation('${name} is a${type}${locality}${game}${charity}${tierType}${organizer}', {
 		name = name,
 		type = type and ('n ' .. type:lower() .. ' ') or '',
-		locality = locality,
+		locality = locality and (locality .. ' ') or '',
 		game = game and (game .. ' ') or '',
 		charity = charity and 'charity ' or '',
 		tierType = tierType,
@@ -73,11 +84,11 @@ function MetadataGenerator.tournament(args)
 		output = output .. '. '
 	end
 
-	output = output .. StringUtils.interpolation('$This ${tier}${tierType} ', {
+	output = output .. StringUtils.interpolation('This ${tier}${tierType} ', {
 		tier = tierType ~= tier and (tier .. ' ') or '',
 		tierType = tierType
 	})
-	if publisher then
+	if not String.isEmpty(publisher) then
 		output = output .. StringUtils.interpolation('is a ${publisher}${tense}', {
 			publisher = publisher,
 			tense = ((date and dateVerbPublisher) or ((teams or players or prizepool) and ' featuring '))
@@ -154,4 +165,4 @@ function MetadataGenerator.getDate(date, sdate)
 	end
 end
 
-return MetadataGenerator
+return Class.export(MetadataGenerator)
