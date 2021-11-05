@@ -166,7 +166,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			if #indexedScores ~= 2 then
 				error('Unexpected number of opponents when calculating map winner')
 			end
-			if indexedScores[1].score > indexedScores[2].score then
+			if tonumber(indexedScores[1].score) > tonumber(indexedScores[2].score) then
 				data.winner = 1
 			else
 				data.winner = 2
