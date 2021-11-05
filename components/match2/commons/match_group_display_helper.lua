@@ -12,6 +12,7 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
@@ -116,7 +117,7 @@ function DisplayHelper.MatchCountdownBlock(match)
 	end
 
 	local stream = Table.merge(match.stream, {
-		date = mw.getContentLanguage():formatDate(dateFormatString, match.date),
+		date = mw.getContentLanguage():formatDate(dateFormatString, match.date) .. ' ' .. Template.expandTemplate(mw.getCurrentFrame(), 'abbr/UTC'),
 		finished = match.finished and 'true' or nil,
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')
