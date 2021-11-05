@@ -1,6 +1,7 @@
 local String = require('Module:String')
 local Localisation = require('Module:Localisation')
 local Template = require('Module:Template')
+local Games = require('Module:Games')
 
 local MetadataGenerator = {}
 
@@ -24,9 +25,12 @@ function MetadataGenerator.tournament(args)
 	local ttype = (tier == 'qualifier' or tier == 'showmatch') and tier or 'tournament'
 	local riot = mw.ext.VariablesLua.var('metadesc-riot') ~= '' and mw.ext.VariablesLua.var('metadesc-riot')
 	local date, tense = MetadataGenerator.getDate(args.edate or args.date, args.sdate)
+
 	local teams = args.team_number
 	local players = args.player_number
-	local game = args.game and args.game ~= 'csgo' and require('Module:Games').abbr[args.game]
+
+	local game = (not String.isEmpty(args.game) and args.game ~= 'csgo') and Games.abbr[args.game]
+
 	local prizepoolusd = args.prizepoolusd and ('$' .. args.prizepoolusd .. ' USD') or nil
 	local prizepool = prizepoolusd or (args.prizepool and args.localcurrency and (mw.ext.VariablesLua.var('localcurrencysymbol') .. args.prizepool .. mw.ext.VariablesLua.var('localcurrencysymbolafter') .. ' ' .. mw.ext.VariablesLua.var('localcurrencycode')))
 	local charity = args.charity == 'true' and true
