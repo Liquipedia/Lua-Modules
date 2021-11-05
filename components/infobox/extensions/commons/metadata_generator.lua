@@ -1,4 +1,5 @@
 local String = require('Module:String')
+local Localisation = require('Module:Localisation')
 
 local MetadataGenerator = {}
 
@@ -9,7 +10,7 @@ function MetadataGenerator.tournament(args)
 	local name = not String.isEmpty(args.name) and (args.name):gsub('&nbsp;', ' ') or mw.title.getCurrentTitle()
 
 	local type = args.type
-	local locality = args.country and frame:expandTemplate({title = 'Localisation', args = {args.country}}) or nil
+	local locality = Localisation.getLocalisation({displayNoError = true}, args.country)
 	local organizers = {args['organizer-name'] or args.organizer, args['organizer2-name'] or args.organizer2, args['organizer3-name'] or args.organizer3}
 	local tier = args.liquipediatier and frame:expandTemplate({title = 'TierDisplay', args = {args.liquipediatier}}) or nil
 
@@ -29,7 +30,7 @@ function MetadataGenerator.tournament(args)
 	local dateVerb = (tense == 'past' and 'took place ') or (tense == 'future' and 'will take place ') or 'takes place '
 	local dateVerbRiot = (tense == 'past' and ' which took place ') or (tense == 'future' and ' which will take place ') or ' taking place '
 
-	output = name .. ' is a' .. (type and ('n ' .. type:lower() .. ' ') or '') .. (locality and (locality .. ' ') or '') .. (game and (game .. ' ') or '') .. (charity and 'charity ' or '') .. ttype .. (organizers[1] and (' organized by ' .. organizers[1]) or '')
+	output = name .. ' is a' .. (type and ('n ' .. type:lower() .. ' ') or '') .. locality .. (game and (game .. ' ') or '') .. (charity and 'charity ' or '') .. ttype .. (organizers[1] and (' organized by ' .. organizers[1]) or '')
 
 	if organizers[2] then
 		output = output .. (organizers[3] and ', ' or ' and ') .. organizers[2] .. (organizers[3] and (', and ' .. organizers[3]) or '') .. '. '
