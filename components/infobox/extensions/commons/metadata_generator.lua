@@ -13,7 +13,13 @@ function MetadataGenerator.tournament(args)
 
 	local type = args.type
 	local locality = Localisation.getLocalisation({displayNoError = true}, args.country)
-	local organizers = {args['organizer-name'] or args.organizer, args['organizer2-name'] or args.organizer2, args['organizer3-name'] or args.organizer3}
+
+	local organizers = {
+		args['organizer-name'] or args.organizer,
+		args['organizer2-name'] or args.organizer2,
+		args['organizer3-name'] or args.organizer3
+	}
+
 	local tier = args.liquipediatier and Template.safeExpand(frame, 'TierDisplay', {args.liquipediatier}) or nil
 
 	if tier then
@@ -103,11 +109,14 @@ function MetadataGenerator.getDate(date, sdate)
 	if startU == endU then
 		return os.date("!on %b " .. (noStartDay and "??" or "%d") .. " %Y", endU), tense
 	elseif os.date("!%m, %Y", startU) == os.date("!%m %Y", endU) then
-		return os.date("!from %b " .. (noStartDay and "??" or "%d"), startU) .. ' to ' .. os.date("!" .. (noEndDay and "??" or "%d") .. " %Y", endU), tense
+		return os.date("!from %b " .. (noStartDay and "??" or "%d"), startU) .. ' to ' ..
+			os.date("!" .. (noEndDay and "??" or "%d") .. " %Y", endU), tense
 	elseif os.date("!%Y", startU) == os.date("!%Y", endU) then
-		return os.date("!from %b " .. (noStartDay and "??" or "%d"), startU) .. ' to ' .. os.date("!%b " .. (noEndDay and "??" or "%d") .. " %Y", endU), tense
+		return os.date("!from %b " .. (noStartDay and "??" or "%d"), startU) .. ' to ' ..
+			os.date("!%b " .. (noEndDay and "??" or "%d") .. " %Y", endU), tense
 	else
-		return os.date("!from %b " .. (noStartDay and "??" or "%d") .. " %Y", startU) .. ' to ' .. os.date("!%b " .. (noEndDay and "??" or "%d") .. " %Y", endU), tense
+		return os.date("!from %b " .. (noStartDay and "??" or "%d") .. " %Y", startU) .. ' to ' ..
+			os.date("!%b " .. (noEndDay and "??" or "%d") .. " %Y", endU), tense
 	end
 end
 
