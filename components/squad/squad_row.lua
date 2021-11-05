@@ -65,7 +65,7 @@ function SquadRow:role(args)
 	cell:addClass('Position')
 
 	if not String.isEmpty(args.role) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position'))
+		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
 		cell:wikitext('\'\'(' .. args.role .. ')\'\'')
 	end
 
