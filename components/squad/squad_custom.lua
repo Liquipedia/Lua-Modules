@@ -33,6 +33,8 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			})
+		elseif squad.type == Squad.TYPE_INACTIVE then
+			row:date(player.inactivedate, 'Inactive Date:&nbsp;')
 		end
 
 		squad:row(row:create())

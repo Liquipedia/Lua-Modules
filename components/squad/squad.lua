@@ -1,12 +1,12 @@
 local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
 local String = require('Module:String')
-local Logic = require('Module:Logic')
 
 local Squad = Class.new()
 
 Squad.TYPE_ACTIVE = 0
-Squad.TYPE_FORMER = 1
+Squad.TYPE_INACTIVE = 1
+Squad.TYPE_FORMER = 2
 
 function Squad:init(frame)
 	self.frame = frame
@@ -25,8 +25,15 @@ function Squad:init(frame)
 		self.args.isLoan = true
 	end
 
-	self.type = Logic.readBool(self.args.active or 'true') == true
-		and Squad.TYPE_ACTIVE or Squad.TYPE_FORMER
+	local status = (self.args.status or 'active'):lower()
+
+	if status == 'inactive' then
+		self.type = Squad.TYPE_INACTIVE
+	elseif status == 'former' then
+		self.type = Squad.TYPE_FORMER
+	else
+		self.type = Squad.TYPE_ACTIVE
+	end
 
 	return self
 end
@@ -73,7 +80,10 @@ function Squad:header()
 	if self.type == Squad.TYPE_FORMER then
 		headerRow	:node(makeHeader('Leave Date'))
 					:node(makeHeader('New Team'))
+	elseif self.type == Squad.TYPE_INACTIVE then
+		headerRow:node(makeHeader('Inactive Date'))
 	end
+
 	self.content:node(headerRow)
 
 	return self
