@@ -20,6 +20,7 @@ function CustomSquad.run(frame)
 				link = player.link,
 				captain = player.captain,
 				role = player.role,
+				team = player.team,
 			})
 			:name({name = player.name})
 			:role({role = player.role})

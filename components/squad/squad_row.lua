@@ -42,6 +42,10 @@ function SquadRow:id(args)
 		cell:wikitext(_ICON_SUBSTITUTE)
 	end
 
+	if mw.ext.TeamTemplate.teamexists(string.lower(args.team or '')) then
+		cell:wikitext(mw.ext.TeamTemplate.teampart(args.team:lower()))
+	end
+
 	self.content:node(cell)
 	return self
 end
