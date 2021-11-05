@@ -39,7 +39,16 @@ function Squad:init(frame)
 end
 
 function Squad:title()
-	local titleText = String.isEmpty(self.args.title) and 'Active Squad' or self.args.title
+	local defaultTitle
+	if self.type == Squad.TYPE_FORMER then
+		defaultTitle = 'Former Squad'
+	elseif self.type == Squad.TYPE_INACTIVE then
+		defaultTitle = 'Inactive Squad'
+	else
+		defaultTitle = 'Active Squad'
+	end
+
+	local titleText = String.isEmpty(self.args.title) and defaultTitle or self.args.title
 
 	local titleContainer = mw.html.create('tr')
 
