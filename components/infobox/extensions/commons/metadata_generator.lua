@@ -1,5 +1,6 @@
 local String = require('Module:String')
 local Localisation = require('Module:Localisation')
+local Template = require('Module:Template')
 
 local MetadataGenerator = {}
 
@@ -12,10 +13,12 @@ function MetadataGenerator.tournament(args)
 	local type = args.type
 	local locality = Localisation.getLocalisation({displayNoError = true}, args.country)
 	local organizers = {args['organizer-name'] or args.organizer, args['organizer2-name'] or args.organizer2, args['organizer3-name'] or args.organizer3}
-	local tier = args.liquipediatier and frame:expandTemplate({title = 'TierDisplay', args = {args.liquipediatier}}) or nil
+	local tier = args.liquipediatier and Template.safeExpand(frame, 'TierDisplay', {args.liquipediatier}) or nil
 
 	if tier then
-		tier = tonumber(frame:expandTemplate({title = 'TierDisplay/number', args = {args.liquipediatier}})) > 4 and tier:lower() or tier else tier = 'Unknown Tier'
+		tier = tonumber(Template.safeExpand(frame, 'TierDisplay/number', {args.liquipediatier})) > 4 and tier:lower() or tier
+	else
+		tier = 'Unknown Tier'
 	end
 
 	local ttype = (tier == 'qualifier' or tier == 'showmatch') and tier or 'tournament'
