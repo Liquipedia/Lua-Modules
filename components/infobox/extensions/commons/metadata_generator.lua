@@ -17,6 +17,10 @@ local Class = require('Module:Class')
 local MetadataGenerator = {}
 
 function MetadataGenerator.tournament(args)
+	if String.isEmpty(args.publisherdescription) then
+		error('You must provide the publisherdescription param!')
+	end
+
 	local output
 	local frame = mw.getCurrentFrame()
 
