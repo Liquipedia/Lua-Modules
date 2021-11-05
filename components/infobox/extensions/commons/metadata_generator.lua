@@ -18,7 +18,9 @@ function MetadataGenerator.tournament(args)
 	local organizers = {
 		args['organizer-name'] or args.organizer,
 		args['organizer2-name'] or args.organizer2,
-		args['organizer3-name'] or args.organizer3
+		args['organizer3-name'] or args.organizer3,
+		args['organizer4-name'] or args.organizer4,
+		args['organizer5-name'] or args.organizer5
 	}
 
 	local tier = args.liquipediatier and Template.safeExpand(frame, 'TierDisplay', {args.liquipediatier}) or nil
@@ -29,7 +31,7 @@ function MetadataGenerator.tournament(args)
 		tier = 'Unknown Tier'
 	end
 
-	local ttype = (tier == 'qualifier' or tier == 'showmatch') and tier or 'tournament'
+	local tierType = (tier == 'qualifier' or tier == 'showmatch') and tier or 'tournament'
 	local publisher = Variables.varDefault(args.publisherDescription)
 	local date, tense = MetadataGenerator.getDate(args.edate or args.date, args.sdate)
 
@@ -54,7 +56,7 @@ function MetadataGenerator.tournament(args)
 		' taking place '
 
 	output = name .. ' is a' .. (type and ('n ' .. type:lower() .. ' ') or '') .. locality ..
-		(game and (game .. ' ') or '') .. (charity and 'charity ' or '') .. ttype ..
+		(game and (game .. ' ') or '') .. (charity and 'charity ' or '') .. tierType ..
 		(organizers[1] and (' organized by ' .. organizers[1]) or '')
 
 	if organizers[2] then
@@ -64,7 +66,7 @@ function MetadataGenerator.tournament(args)
 		output = output .. '. '
 	end
 
-	output = output .. 'This ' .. (ttype ~= tier and (tier .. ' ') or '') .. ttype .. ' '
+	output = output .. 'This ' .. (tierType ~= tier and (tier .. ' ') or '') .. tierType .. ' '
 	if publisher then
 		output = output .. 'is a ' .. publisher .. ((date and dateVerbPublisher) or
 			((teams or players or prizepool) and ' featuring '))
