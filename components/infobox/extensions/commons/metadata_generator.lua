@@ -71,7 +71,7 @@ function MetadataGenerator.tournament(args)
 end
 
 function MetadataGenerator.getDate(date, sdate)
-	if not date then
+	if String.isEmpty(date) then
 		return nil
 	end
 
