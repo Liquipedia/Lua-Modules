@@ -3,6 +3,7 @@ local Localisation = require('Module:Localisation')
 local Template = require('Module:Template')
 local Games = require('Module:Games')
 local Variables = require('Module:Variables')
+local StringUtils = require('Module:StringUtils')
 
 local MetadataGenerator = {}
 
@@ -55,9 +56,15 @@ function MetadataGenerator.tournament(args)
 		(tense == 'future' and ' which will take place ') or
 		' taking place '
 
-	output = name .. ' is a' .. (type and ('n ' .. type:lower() .. ' ') or '') .. locality ..
-		(game and (game .. ' ') or '') .. (charity and 'charity ' or '') .. tierType ..
-		(organizers[1] and (' organized by ' .. organizers[1]) or '')
+	output = StringUtils.interpolation('${name} is a${type}${locality}${game}${charity}${tierType}${organizer}', {
+		name = name,
+		type = type and ('n ' .. type:lower() .. ' ') or '',
+		locality = locality,
+		game = game and (game .. ' ') or '',
+		charity = charity and 'charity ' or '',
+		tierType = tierType,
+		organizer = organizers[1] and (' organized by ' .. organizers[1]) or ''
+	})
 
 	if organizers[2] then
 		output = output .. (organizers[3] and ', ' or ' and ') ..
@@ -66,10 +73,15 @@ function MetadataGenerator.tournament(args)
 		output = output .. '. '
 	end
 
-	output = output .. 'This ' .. (tierType ~= tier and (tier .. ' ') or '') .. tierType .. ' '
+	output = output .. StringUtils.interpolation('$This ${tier}${tierType} ', {
+		tier = tierType ~= tier and (tier .. ' ') or '',
+		tierType = tierType
+	})
 	if publisher then
-		output = output .. 'is a ' .. publisher .. ((date and dateVerbPublisher) or
-			((teams or players or prizepool) and ' featuring '))
+		output = output .. StringUtils.interpolation('is a ${publisher}${tense}', {
+			publisher = publisher,
+			tense = ((date and dateVerbPublisher) or ((teams or players or prizepool) and ' featuring '))
+		})
 	elseif date then
 		output = output .. dateVerb
 	elseif teams or players or prizepool then
@@ -86,8 +98,11 @@ function MetadataGenerator.tournament(args)
 			(prizepool and ' ' or '')
 	end
 	if prizepool then
-		output = output .. ((teams or players) and 'competing over ' or '') ..
-			'a total ' .. (charity and 'charity ' or '') .. 'prize pool of ' .. prizepool
+		output = output .. StringUtils.interpolation('${competing}a total ${charity}prize pool of ${prizepool}', {
+			competing = (teams or players) and 'competing over ' or '',
+			charity = charity and 'charity ' or '',
+			prizepool = prizepool
+		})
 	end
 
 	output = output .. '.'
