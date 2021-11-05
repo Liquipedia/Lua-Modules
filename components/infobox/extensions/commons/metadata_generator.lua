@@ -71,7 +71,7 @@ function MetadataGenerator.tournament(args)
 		(tense == 'future' and ' which will take place ') or
 		' taking place '
 
-	output = StringUtils.interpolation('${name} is a${type}${locality}${game}${charity}${tierType}${organizer}', {
+	output = StringUtils.interpolate('${name} is a${type}${locality}${game}${charity}${tierType}${organizer}', {
 		name = name,
 		type = type and ('n ' .. type:lower() .. ' ') or '',
 		locality = locality and (locality .. ' ') or '',
@@ -88,12 +88,12 @@ function MetadataGenerator.tournament(args)
 		output = output .. '. '
 	end
 
-	output = output .. StringUtils.interpolation('This ${tier}${tierType} ', {
+	output = output .. StringUtils.interpolate('This ${tier}${tierType} ', {
 		tier = tierType ~= tier and (tier .. ' ') or '',
 		tierType = tierType
 	})
 	if not String.isEmpty(publisher) then
-		output = output .. StringUtils.interpolation('is a ${publisher}${tense}', {
+		output = output .. StringUtils.interpolate('is a ${publisher}${tense}', {
 			publisher = publisher,
 			tense = ((date and dateVerbPublisher) or ((teams or players or prizepool) and ' featuring '))
 		})
@@ -113,7 +113,7 @@ function MetadataGenerator.tournament(args)
 			(prizepool and ' ' or '')
 	end
 	if prizepool then
-		output = output .. StringUtils.interpolation('${competing}a total ${charity}prize pool of ${prizepool}', {
+		output = output .. StringUtils.interpolate('${competing}a total ${charity}prize pool of ${prizepool}', {
 			competing = (teams or players) and 'competing over ' or '',
 			charity = charity and 'charity ' or '',
 			prizepool = prizepool
