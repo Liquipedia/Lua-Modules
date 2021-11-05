@@ -117,7 +117,8 @@ function DisplayHelper.MatchCountdownBlock(match)
 	end
 
 	local stream = Table.merge(match.stream, {
-		date = mw.getContentLanguage():formatDate(dateFormatString, match.date) .. ' ' .. Template.expandTemplate(mw.getCurrentFrame(), 'abbr/UTC'),
+		date = mw.getContentLanguage():formatDate(dateFormatString, match.date) .. ' ' .. 
+			Template.expandTemplate(mw.getCurrentFrame(), 'abbr/UTC'),
 		finished = match.finished and 'true' or nil,
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')
