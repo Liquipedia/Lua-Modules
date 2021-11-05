@@ -81,4 +81,20 @@ function String.convertWikiListToHtmlList(str, delimiter)
 	return tostring(list)
 end
 
+-- Create a string with string interpolation
+--
+-- String.interpolation('I\'m ${age} years old', {age = 40})
+-- Returns `I'm 40 years old`
+--
+-- Inspiration: http://lua-users.org/wiki/StringInterpolation
+function String.interpolation(s, tbl)
+	return (
+		s:gsub('($%b{})',
+			function(w)
+				return tbl[w:sub(3, -2)] or w
+			end
+		)
+	)
+end
+
 return String
