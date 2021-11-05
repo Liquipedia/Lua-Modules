@@ -185,7 +185,7 @@ function p.convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == "team" then
 			match[prefix] = opponent.name
-			match[prefix.."score"] = tonumber(opponent.score or 0) >= 0 and opponent.score or 0
+			match[prefix.."score"] = tonumber(opponent.score) or 0 >= 0 and opponent.score or 0
 			local opponentplayers = {}
 			for i = 1,10 do
 				local player = opponentmatch2players[i] or {}
@@ -197,7 +197,7 @@ function p.convertParameters(match2)
 		elseif opponent.type == "solo" then
 			local player = opponentmatch2players[1] or {}
 			match[prefix] = player.name
-			match[prefix.."score"] = tonumber(opponent.score or 0) >= 0 and opponent.score or 0
+			match[prefix.."score"] = tonumber(opponent.score) or 0 >= 0 and opponent.score or 0
 			match[prefix.."flag"] = player.flag
 		elseif opponent.type == "literal" then
 			match[prefix] = 'TBD'
