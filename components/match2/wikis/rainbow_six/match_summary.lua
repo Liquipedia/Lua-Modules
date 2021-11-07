@@ -90,23 +90,23 @@ end
 
 local Score = Class.new(
 	function(self)
-		self.root = mw.html.create('div'):css('width','70px')
-		self.table = self.root:tag('table'):css('line-height', '20px')
+		self.root = mw.html.create('div'):css('width','70px'):css('text-align', 'center')
+		self.table = self.root:tag('table'):css('line-height', '29px')
 		self.top = mw.html.create('tr')
 		self.bottom = mw.html.create('tr')
 	end
 )
 
 function Score:setLeft()
-	self.root
-		:css('text-align', 'left')
+	self.table
+		:css('float', 'left')
 
 	return self
 end
 
 function Score:setRight()
-	self.root
-		:css('text-align', 'right')
+	self.table
+		:css('float', 'right')
 
 	return self
 end
@@ -542,7 +542,7 @@ function CustomMatchSummary._createMap(game)
 	if team1OperatorBans ~= nil then
 		row:addElement(team1OperatorBans:create())
 	end
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1, true))
 	row:addElement(team1Score:create())
 
 	local centerNode = mw.html.create('div')
@@ -558,7 +558,7 @@ function CustomMatchSummary._createMap(game)
 
 	row:addElement(centerNode)
 	row:addElement(team2Score:create())
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2, false))
 	if team2OperatorBans ~= nil then
 		row:addElement(team2OperatorBans:create())
 	end
@@ -595,7 +595,7 @@ function CustomMatchSummary._getOppositeSide(side)
 	return 'atk'
 end
 
-function CustomMatchSummary._createCheckMark(isWinner)
+function CustomMatchSummary._createCheckMark(isWinner, isLeft)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
@@ -603,6 +603,12 @@ function CustomMatchSummary._createCheckMark(isWinner)
 		container:node(_GREEN_CHECK)
 	else
 		container:node(_NO_CHECK)
+	end
+	
+	if isLeft then
+		container:css('margin-left', '3%')
+	else
+		container:css('margin-right', '3%')
 	end
 
 	return container
