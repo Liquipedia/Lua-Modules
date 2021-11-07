@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -230,4 +229,4 @@ function StarcraftPlayerDisplay.Race(race)
 	)
 end
 
-return Class.export(StarcraftPlayerDisplay)
+return StarcraftPlayerDisplay

@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -131,4 +130,4 @@ function StarcraftBracketDisplay.OpponentEntry(props)
 		:node(contestNode)
 end
 
-return Class.export(StarcraftBracketDisplay)
+return StarcraftBracketDisplay

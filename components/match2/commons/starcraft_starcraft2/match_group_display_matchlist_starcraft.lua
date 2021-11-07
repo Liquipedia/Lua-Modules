@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -56,4 +55,4 @@ function StarcraftMatchlistDisplay.Score(props)
 		:node(contentNode)
 end
 
-return Class.export(StarcraftMatchlistDisplay)
+return StarcraftMatchlistDisplay
