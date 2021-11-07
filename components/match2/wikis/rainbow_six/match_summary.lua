@@ -604,7 +604,7 @@ function CustomMatchSummary._createCheckMark(isWinner, isLeft)
 	else
 		container:node(_NO_CHECK)
 	end
-	
+
 	if isLeft then
 		container:css('margin-left', '3%')
 	else
