@@ -137,6 +137,7 @@ function Team:createInfobox()
 
 	if Namespace.isMain() then
 		self:_setLpdbData(args, links)
+		self:defineCustomPageVariables(args)
 	end
 
 	return builtInfobox
@@ -187,6 +188,10 @@ function Team:_setLpdbData(args, links)
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
+end
+
+--- Allows for overriding this functionality
+function League:defineCustomPageVariables(args)
 end
 
 function Team:addToLpdb(lpdbData, args)
