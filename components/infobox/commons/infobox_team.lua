@@ -94,8 +94,16 @@ function Team:createInfobox()
 		Customizable{
 			id = 'achievements',
 			children = {
-				Title{name = 'Achievements'},
-				Center{content = {args.achievements}}
+				Builder{
+					builder = function()
+						if args.achievements then
+							return {
+								Title{name = 'Achievements'},
+								Center{content = {args.achievements}}
+							}
+						end
+					end
+				}
 			}
 		},
 		Customizable{
