@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -145,4 +144,4 @@ function StarcraftMatchExternalLinks.TemplateMatchExternalLink(frame)
 	return StarcraftMatchExternalLinks.ExternalLink(args)
 end
 
-return Class.export(StarcraftMatchExternalLinks)
+return StarcraftMatchExternalLinks
