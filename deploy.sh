@@ -47,7 +47,7 @@ do
           -H 'Accept-Encoding: gzip' \
           -X POST "$wikiApiUrl" \
           | gunzip \
-          | jq .query.tokens.logintoken -r
+          | jq ".query.tokens.logintoken" -r
       )
       curl \
         -s \
@@ -78,7 +78,7 @@ do
         -H 'Accept-Encoding: gzip' \
         -X POST "$wikiApiUrl" \
         | gunzip \
-        | jq .query.tokens.csrftoken -r
+        | jq ".query.tokens.csrftoken" -r
     )
     result=$(
       curl \
@@ -95,7 +95,7 @@ do
         -H 'Accept-Encoding: gzip' \
         -X POST "${wikiApiUrl}?format=json&action=edit" \
         | gunzip \
-        | jq .edit.result -r
+        | jq ".edit.result" -r
     )
     echo "...${result}"
 
