@@ -17,7 +17,7 @@ declare -A loggedin
 for luaFile in $luaFiles
 do
   echo "== Checking $luaFile =="
-  fileContents=$(cat $luaFile)
+  fileContents=$(cat "$luaFile")
 
   [[ $fileContents =~ $pat ]]
 
@@ -45,7 +45,7 @@ do
           -d "format=json&action=query&meta=tokens&type=login" \
           -H "User-Agent: ${userAgent}" \
           -H 'Accept-Encoding: gzip' \
-          -X POST $wikiApiUrl \
+          -X POST "$wikiApiUrl" \
           | gunzip \
           | jq .query.tokens.logintoken -r
       )
@@ -76,7 +76,7 @@ do
         -d "format=json&action=query&meta=tokens" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -X POST $wikiApiUrl \
+        -X POST "$wikiApiUrl" \
         | gunzip \
         | jq .query.tokens.csrftoken -r
     )
