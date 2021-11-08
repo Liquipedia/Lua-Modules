@@ -239,8 +239,8 @@ function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('id', args.id or _pagename)
 
 	--retrieve birth month + day for storage in smw
-	local birthMonthAndDay = string.match(_args.birth_date, '%-%d%d?%-%d%d?$')
-	birthMonthAndDay = string.gsub(birthMonthAndDay, '^%-', '')
+	local birthMonthAndDay = string.match(args.birth_date or '', '%-%d%d?%-%d%d?$')
+	birthMonthAndDay = string.gsub(birthMonthAndDay or '', '^%-', '')
 	Variables.varDefine('birth_monthandday', birthMonthAndDay)
 end
 
