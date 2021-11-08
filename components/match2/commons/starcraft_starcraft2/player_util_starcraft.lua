@@ -14,6 +14,7 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local StarcraftTournamentUtil = require('Module:Tournament/Util/Starcraft')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Logic = require('Module:Logic')
 
 local globalVars = PageVariableNamespace({cached = true})
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
@@ -78,7 +79,7 @@ StarcraftPlayerUtil.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 
 	local record = rows[1]
 	if record then
-		local raceHistory = record.extradata.racehistorical == 'true'
+		local raceHistory = Logic.readBool(record.extradata.racehistorical)
 			and StarcraftPlayerUtil.fetchRaceHistory(resolvedPageName)
 			or nil
 
