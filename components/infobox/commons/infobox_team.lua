@@ -191,7 +191,7 @@ function Team:_setLpdbData(args, links)
 end
 
 --- Allows for overriding this functionality
-function League:defineCustomPageVariables(args)
+function Team:defineCustomPageVariables(args)
 end
 
 function Team:addToLpdb(lpdbData, args)
