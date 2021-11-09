@@ -320,12 +320,16 @@ function matchFunctions.getOpponents(args)
 		local placement = 1
 		local lastScore
 		local lastPlacement = 1
+		local lastStatus
 		-- luacheck: push ignore
 		for opponentIndex, opponent in Table.iter.spairs(opponents, p._placementSortFunction) do
 			if placement == 1 then
 				args.winner = opponentIndex
 			end
-			if opponent.status == 'S' and opponent.score == lastScore then
+			if
+				opponent.status == 'S' and opponent.score == lastScore or
+				opponent.status ~= 'S' and opponent.status == lastStatus
+			then
 				opponent.placement = lastPlacement
 			else
 				opponent.placement = placement
@@ -334,6 +338,7 @@ function matchFunctions.getOpponents(args)
 			placement = placement + 1
 			lastScore = opponent.score
 			lastPlacement = opponent.placement
+			lastStatus = opponent.status
 		end
 	-- luacheck: pop
 	-- only apply arg changes otherwise
