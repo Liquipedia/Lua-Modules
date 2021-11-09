@@ -172,7 +172,6 @@ function CustomLeague:_createLiquipediaTierDisplay()
 		(hasTypeSetAsTier and '[[Category:Pages with Tiertype set as Tier]]' or '')
 
 	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_liquipediatier', tier)
 	Variables.varDefine('tournament_tiertype', tierType)
 	Variables.varDefine('tournament_liquipediatiertype', tierType)
 	return tierDisplay
