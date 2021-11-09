@@ -356,8 +356,8 @@ function matchFunctions.getOpponents(args)
 		winner == '0' or (
 			Logic.readBool(args.finished) and
 			#opponents == 2 and
-			opponents[1].status == 'S' and
-			opponents[2].status == 'S' and
+			opponents[1].status == _STATUS_SCORE and
+			opponents[2].status == _STATUS_SCORE and
 			opponents[1].score == opponents[2].score
 		)
 	then
@@ -366,7 +366,7 @@ function matchFunctions.getOpponents(args)
 	elseif
 		Logic.readBool(args.finished) and
 		#opponents == 2 and
-		opponents[1].status ~= 'S' and
+		opponents[1].status ~= _STATUS_SCORE and
 		opponents[1].status == opponents[2].status
 	then
 		args.winner = 0
