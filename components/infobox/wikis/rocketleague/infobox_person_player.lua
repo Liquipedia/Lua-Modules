@@ -52,21 +52,7 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
-		local statusContents = {}
-		local status
-		if not String.isEmpty(_args.status) then
-			status = Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status
-		end
-		local banned = _BANNED[string.lower(_args.banned or '')]
-		if not banned and not String.isEmpty(_args.banned) then
-			banned = '[[Banned Players/Other|Multiple Bans]]'
-		end
-		local banned2 = _BANNED[string.lower(_args.banned2 or '')]
-		local banned3 = _BANNED[string.lower(_args.banned3 or '')]
-		table.insert(statusContents, status)
-		table.insert(statusContents, banned)
-		table.insert(statusContents, banned2)
-		table.insert(statusContents, banned3)
+		local statusContents = CustomPlayer._getStatusContents()
 
 		local yearsActive = _args.years_active
 		if String.isEmpty(yearsActive) then
@@ -252,6 +238,31 @@ function CustomPlayer:createBottomContent(infobox)
 	if Namespace.isMain() then
 		return tostring(Matches.get({args = {noClass = true}}))
 	end
+end
+
+function CustomPlayer._getStatusContents()
+	local statusContents = {}
+	local status
+	if not String.isEmpty(_args.status) then
+		status = Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status
+	end
+	table.insert(statusContents, status)
+
+	local banned = _BANNED[string.lower(_args.banned or '')]
+	if not banned and not String.isEmpty(_args.banned) then
+		banned = '[[Banned Players/Other|Multiple Bans]]'
+		table.insert(statusContents, banned)
+	end
+
+	local index = 2
+	banned = _BANNED[string.lower(_args['banned' .. index] or '')]
+	while banned do
+		table.insert(statusContents, banned)
+		index = index + 1
+		banned = _BANNED[string.lower(_args['banned' .. index] or '')]
+	end
+
+	return statusContents
 end
 
 return CustomPlayer
