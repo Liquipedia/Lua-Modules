@@ -15,6 +15,8 @@ local Variables = require('Module:Variables')
 local Page = require('Module:Page')
 local YearsActive = require('Module:YearsActive')
 local Matches = require('Module:Matches_Player')
+local Flags = require('Module:Flags')
+local Localisation = require('Module:Localisation')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -90,6 +92,11 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Current Role', content = {_args.role}},
+		}
+	elseif id == 'nationality' then
+		return {
+			Cell{name = 'Location', content = {_args.location}},
+			Cell{name = 'Nationality', content = CustomPlayer._createLocations()}
 		}
 	end
 	return widgets
@@ -264,5 +271,38 @@ function CustomPlayer._getStatusContents()
 
 	return statusContents
 end
+
+function CustomPlayer._createLocations()
+	local countryDisplayData = {}
+	local country = _args.country or _args.country1
+	if String.isEmpty(country) then
+		return countryDisplayData
+	end
+
+	countryDisplayData[1] = CustomPlayer:_createLocation(country)
+
+	local index = 2
+	country = _args['country2']
+	while (not String.isEmpty(country)) do
+		countryDisplayData[index] = CustomPlayer:_createLocation(country)
+		index = index + 1
+		country = _args['country' .. index]
+	end
+
+	return countryDisplayData
+end
+
+function CustomPlayer:_createLocation(country)
+	if String.isEmpty(country) then
+		return nil
+	end
+	local countryDisplay = Flags.CountryName(country)
+	local demonym = Localisation.getLocalisation(countryDisplay)
+
+	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
+				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
+				.. '[[Category:' .. demonym .. ' Players]]'
+end
+
 
 return CustomPlayer
