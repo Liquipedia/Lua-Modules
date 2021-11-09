@@ -221,7 +221,6 @@ function CustomLeague:_createTierDisplay()
 		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
 
 	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_liquipediatier', tier)
 	Variables.varDefine('tournament_tiertype', tierType)
 	Variables.varDefine('tournament_liquipediatiertype', tierType)
 	return output
