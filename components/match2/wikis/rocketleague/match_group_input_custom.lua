@@ -363,6 +363,13 @@ function matchFunctions.getOpponents(args)
 	then
 		args.winner = 0
 		args.resulttype = _RESULT_TYPE_DRAW
+	elseif
+		Logic.readBool(args.finished) and
+		#opponents == 2 and
+		opponents[1].status ~= 'S' and
+		opponents[1].status == opponents[2].status
+	then
+		args.winner = 0
 	end
 	return args
 end
