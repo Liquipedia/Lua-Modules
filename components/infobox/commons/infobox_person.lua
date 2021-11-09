@@ -191,7 +191,7 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		alternateid = args.ids,
 		name = args.romanized_name or args.name,
 		romanizedname = args.romanized_name or args.name,
-		localizedname = args.name,
+		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
 		nationality = args.country or args.nationality,
 		nationality2 = args.country2 or args.nationality2,
 		nationality3 = args.country3 or args.nationality3,
