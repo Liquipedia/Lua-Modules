@@ -125,9 +125,9 @@ function p._placementSortFunction(table, key1, key2)
 	else
 		if op2norm then return false
 		elseif op1.status == _STATUS_DEFAULT_WIN then return true
-		elseif op1.status == 'DQ' then return false
+		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
 		elseif op2.status == _STATUS_DEFAULT_WIN then return false
-		elseif op2.status == 'DQ' then return true
+		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
 end
@@ -439,9 +439,9 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 	else
 		if op2norm then return false
 		elseif op1.status == _STATUS_DEFAULT_WIN then return true
-		elseif op1.status == 'DQ' then return false
+		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
 		elseif op2.status == _STATUS_DEFAULT_WIN then return false
-		elseif op2.status == 'DQ' then return true
+		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
 end
