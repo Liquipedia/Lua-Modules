@@ -23,6 +23,7 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
+local _STATUS_SCORE = 'S'
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
@@ -108,8 +109,8 @@ end
 function p._placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
-	local op1norm = op1.status == 'S'
-	local op2norm = op2.status == 'S'
+	local op1norm = op1.status == _STATUS_SCORE
+	local op2norm = op2.status == _STATUS_SCORE
 	if op1norm then
 		if op2norm then
 			local op1setwins = p._getSetWins(op1)
@@ -279,7 +280,7 @@ function matchFunctions.getOpponents(args)
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
-				opponent.status = 'S'
+				opponent.status = _STATUS_SCORE
 				isScoreSet = true
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
@@ -323,15 +324,15 @@ function matchFunctions.getOpponents(args)
 		local lastStatus
 		-- luacheck: push ignore
 		for opponentIndex, opponent in Table.iter.spairs(opponents, p._placementSortFunction) do
-			if opponent.status ~= 'S' and opponent.status ~= 'W' and placement == 1 then
+			if opponent.status ~= _STATUS_SCORE and opponent.status ~= 'W' and placement == 1 then
 				placement = 2
 			end
 			if placement == 1 then
 				args.winner = opponentIndex
 			end
-			if opponent.status == 'S' and opponent.score == lastScore then
+			if opponent.status == _STATUS_SCORE and opponent.score == lastScore then
 				opponent.placement = lastPlacement
-			elseif opponent.status ~= 'S' and opponent.status == lastStatus then
+			elseif opponent.status ~= _STATUS_SCORE and opponent.status == lastStatus then
 				opponent.placement = lastPlacement
 			else
 				opponent.placement = placement
@@ -395,7 +396,7 @@ function mapFunctions.getScoresAndWinner(map)
 		if not Logic.isEmpty(score) then
 			if TypeUtil.isNumeric(score) then
 				score = tonumber(score)
-				obj.status = 'S'
+				obj.status = _STATUS_SCORE
 				obj.score = score
 				obj.index = scoreIndex
 			elseif Table.includes(ALLOWED_STATUSES, score) then
@@ -428,8 +429,8 @@ function mapFunctions.getWinner(indexedScores)
 end
 
 function mapFunctions.mapWinnerSortFunction(op1, op2)
-	local op1norm = op1.status == 'S'
-	local op2norm = op2.status == 'S'
+	local op1norm = op1.status == _STATUS_SCORE
+	local op2norm = op2.status == _STATUS_SCORE
 	if op1norm then
 		if op2norm then
 			return tonumber(op1.score) > tonumber(op2.score)
