@@ -18,6 +18,9 @@ local Template = require('Module:Template')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
+local _POSITION_LEFT = 1
+local _POSITION_RIGHT = 2
+
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _ROUND_ICONS = {
@@ -90,23 +93,23 @@ end
 
 local Score = Class.new(
 	function(self)
-		self.root = mw.html.create('div'):css('width','70px')
-		self.table = self.root:tag('table'):css('line-height', '20px')
+		self.root = mw.html.create('div'):css('width','70px'):css('text-align', 'center')
+		self.table = self.root:tag('table'):css('line-height', '29px')
 		self.top = mw.html.create('tr')
 		self.bottom = mw.html.create('tr')
 	end
 )
 
 function Score:setLeft()
-	self.root
-		:css('text-align', 'left')
+	self.table
+		:css('float', 'left')
 
 	return self
 end
 
 function Score:setRight()
-	self.root
-		:css('text-align', 'right')
+	self.table
+		:css('float', 'right')
 
 	return self
 end
@@ -124,9 +127,9 @@ function Score:setMapScore(score)
 	return self
 end
 
-function Score:setFirstRoundScore(side, score, isLeft)
+function Score:setFirstRoundScore(side, score, position)
 	local icon = _ROUND_ICONS[side]
-	if not isLeft then -- For right side, swap order of score and icon
+	if position == _POSITION_RIGHT then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
 
@@ -139,9 +142,9 @@ function Score:setFirstRoundScore(side, score, isLeft)
 	return self
 end
 
-function Score:setSecondRoundScore(side, score, isLeft)
+function Score:setSecondRoundScore(side, score, position)
 	local icon = _ROUND_ICONS[side]
-	if not isLeft then -- For right side, swap order of score and icon
+	if position == _POSITION_RIGHT then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
 
@@ -154,9 +157,9 @@ function Score:setSecondRoundScore(side, score, isLeft)
 	return self
 end
 
-function Score:setFirstOvertimeRoundScore(side, score, isLeft)
+function Score:setFirstOvertimeRoundScore(side, score, position)
 	local icon = _ROUND_ICONS['ot'..side]
-	if not isLeft then -- For right side, swap order of score and icon
+	if position == _POSITION_RIGHT then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
 
@@ -169,9 +172,9 @@ function Score:setFirstOvertimeRoundScore(side, score, isLeft)
 	return self
 end
 
-function Score:setSecondOvertimeRoundScore(side, score, isLeft)
+function Score:setSecondOvertimeRoundScore(side, score, position)
 	local icon = _ROUND_ICONS['ot'..side]
-	if not isLeft then -- For right side, swap order of score and icon
+	if position == _POSITION_RIGHT then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
 
@@ -347,7 +350,7 @@ local CustomMatchSummary = {}
 
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-	mw.logObject(match)
+
 	local frame = mw.getCurrentFrame()
 
 	local matchSummary = MatchSummary():init()
@@ -500,27 +503,27 @@ function CustomMatchSummary._createMap(game)
 
 	if not Logic.isEmpty(firstSide) then
 		-- Regular Time for Team 1
-		team1Score:setFirstRoundScore(firstSide, team1Halfs[firstSide], true)
-		team1Score:setSecondRoundScore(oppositeSide, team1Halfs[oppositeSide], true)
+		team1Score:setFirstRoundScore(firstSide, team1Halfs[firstSide], _POSITION_LEFT)
+		team1Score:setSecondRoundScore(oppositeSide, team1Halfs[oppositeSide], _POSITION_LEFT)
 
 		-- Overtime for both, if applicable
 		local firstSideOvertime = firstSides.ot
 		local oppositeSideOvertime = CustomMatchSummary._getOppositeSide(firstSideOvertime)
 
 		if not Logic.isEmpty(firstSideOvertime) then
-			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot'..firstSideOvertime], true)
-			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot'..oppositeSideOvertime], true)
+			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot'..firstSideOvertime], _POSITION_LEFT)
+			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot'..oppositeSideOvertime], _POSITION_LEFT)
 
-			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot'..oppositeSideOvertime], false)
-			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot'..firstSideOvertime], false)
+			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot'..oppositeSideOvertime], _POSITION_RIGHT)
+			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot'..firstSideOvertime], _POSITION_RIGHT)
 		else
 			team1Score:addEmptyOvertime()
 			team2Score:addEmptyOvertime()
 		end
 
 		-- Regular Time for Team 2
-		team2Score:setFirstRoundScore(oppositeSide, team2Halfs[oppositeSide], false)
-		team2Score:setSecondRoundScore(firstSide, team2Halfs[firstSide], false)
+		team2Score:setFirstRoundScore(oppositeSide, team2Halfs[oppositeSide], _POSITION_RIGHT)
+		team2Score:setSecondRoundScore(firstSide, team2Halfs[firstSide], _POSITION_RIGHT)
 	end
 
 	-- Score Team 2
@@ -542,7 +545,7 @@ function CustomMatchSummary._createMap(game)
 	if team1OperatorBans ~= nil then
 		row:addElement(team1OperatorBans:create())
 	end
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1, _POSITION_LEFT))
 	row:addElement(team1Score:create())
 
 	local centerNode = mw.html.create('div')
@@ -558,7 +561,7 @@ function CustomMatchSummary._createMap(game)
 
 	row:addElement(centerNode)
 	row:addElement(team2Score:create())
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2, _POSITION_RIGHT))
 	if team2OperatorBans ~= nil then
 		row:addElement(team2OperatorBans:create())
 	end
@@ -595,7 +598,7 @@ function CustomMatchSummary._getOppositeSide(side)
 	return 'atk'
 end
 
-function CustomMatchSummary._createCheckMark(isWinner)
+function CustomMatchSummary._createCheckMark(isWinner, position)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
@@ -603,6 +606,12 @@ function CustomMatchSummary._createCheckMark(isWinner)
 		container:node(_GREEN_CHECK)
 	else
 		container:node(_NO_CHECK)
+	end
+
+	if position == _POSITION_LEFT then
+		container:css('margin-left', '3%')
+	elseif position == _POSITION_RIGHT then
+		container:css('margin-right', '3%')
 	end
 
 	return container
