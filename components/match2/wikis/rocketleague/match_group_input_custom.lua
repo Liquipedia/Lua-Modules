@@ -351,7 +351,16 @@ function matchFunctions.getOpponents(args)
 			args['opponent' .. opponentIndex] = opponent
 		end
 	end
-	if winner == _RESULT_TYPE_DRAW or winner == '0' then
+	if
+		winner == _RESULT_TYPE_DRAW or
+		winner == '0' or (
+			Logic.readBool(args.finished) and
+			#opponents == 2 and
+			opponents[1].status == 'S' and
+			opponents[2].status == 'S' and
+			opponents[1].score == opponents[2].score
+		)
+	then
 		args.winner = 0
 		args.resulttype = _RESULT_TYPE_DRAW
 	end
