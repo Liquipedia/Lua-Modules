@@ -24,6 +24,7 @@ local Center = require('Module:Infobox/Widget/Center')
 local _BANNED = mw.loadData('Module:Banned')
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
+local _base_page_name = mw.title.getCurrentTitle().baseText
 
 local CustomPlayer = Class.new()
 
@@ -69,7 +70,7 @@ function CustomInjector:parse(id, widgets)
 
 		local yearsActive = _args.years_active
 		if String.isEmpty(yearsActive) then
-			yearsActive = YearsActive.get({player=mw.title.getCurrentTitle().baseText})
+			yearsActive = YearsActive.get({player = _base_page_name})
 		else
 			yearsActive = Page.makeInternalLink({onlyIfExists = true}, yearsActive)
 		end
@@ -157,6 +158,9 @@ end
 
 function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	if Namespace.isMain() then
+		if personType == 'Coach' then
+			personType = 'Coache'
+		end
 		local role = string.lower(args.role or '')
 		local categories = {}
 
@@ -169,16 +173,20 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 		if string.match(role, 'host') then
 			table.insert(categories, 'Hosts')
 		end
+
 		if string.match(role, 'player') then
 			table.insert(categories, 'Players')
-		end
 
-		if
-			role == 'player' and
-			string.lower(args.status) == 'active' and
-			not args.teamlink and not args.team
-		then
-			table.insert(categories, 'Teamless ' .. personType .. 's')
+			if
+				string.lower(args.status) == 'active' and
+				not args.teamlink and not args.team
+			then
+				table.insert(categories, 'Teamless Players')
+			end
+
+			if String.isEmpty(args.status) then
+				table.insert(categories, 'Players without a status')
+			end
 		end
 
 		if args.country2 or args.nationality2 then
@@ -191,7 +199,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 		if
 			args.retired == 'yes' or args.retired == 'true'
 			or string.lower(status or '') == 'retired'
-			or string.match(args.retired or '', '%d%d%d%d')--if retired has year set apply the retired category
+			or string.match(args.retired or '', '%d%d%d%d')--if `|retired` has year set
 		then
 			table.insert(categories, 'Retired ' .. personType .. 's')
 		end
@@ -202,10 +210,6 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 
 		if String.isEmpty(birthDisplay) then
 			table.insert(categories, personType .. 's with unknown birth date')
-		end
-
-		if role == 'player' and String.isEmpty(args.status) then
-			table.insert(categories, 'Players without a status')
 		end
 
 		if string.lower(args.game or '') == 'sarpbc' then
