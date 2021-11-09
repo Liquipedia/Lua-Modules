@@ -21,9 +21,10 @@ local getIconName = require('Module:IconName').luaGet
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
-local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
-local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
 local _STATUS_SCORE = 'S'
+local _STATUS_DEFAULT_WIN = 'W'
+local ALLOWED_STATUSES = { _STATUS_DEFAULT_WIN, 'FF', 'DQ', 'L' }
+local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
@@ -123,9 +124,9 @@ function p._placementSortFunction(table, key1, key2)
 		else return true end
 	else
 		if op2norm then return false
-		elseif op1.status == 'W' then return true
+		elseif op1.status == _STATUS_DEFAULT_WIN then return true
 		elseif op1.status == 'DQ' then return false
-		elseif op2.status == 'W' then return false
+		elseif op2.status == _STATUS_DEFAULT_WIN then return false
 		elseif op2.status == 'DQ' then return true
 		else return true end
 	end
@@ -324,7 +325,7 @@ function matchFunctions.getOpponents(args)
 		local lastStatus
 		-- luacheck: push ignore
 		for opponentIndex, opponent in Table.iter.spairs(opponents, p._placementSortFunction) do
-			if opponent.status ~= _STATUS_SCORE and opponent.status ~= 'W' and placement == 1 then
+			if opponent.status ~= _STATUS_SCORE and opponent.status ~= _STATUS_DEFAULT_WIN and placement == 1 then
 				placement = 2
 			end
 			if placement == 1 then
@@ -437,9 +438,9 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 		else return true end
 	else
 		if op2norm then return false
-		elseif op1.status == 'W' then return true
+		elseif op1.status == _STATUS_DEFAULT_WIN then return true
 		elseif op1.status == 'DQ' then return false
-		elseif op2.status == 'W' then return false
+		elseif op2.status == _STATUS_DEFAULT_WIN then return false
 		elseif op2.status == 'DQ' then return true
 		else return true end
 	end
