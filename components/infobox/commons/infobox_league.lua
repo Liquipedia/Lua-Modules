@@ -199,7 +199,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
-	Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)
+	Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype or args.tiertype)
 
 	Variables.varDefine('tournament_type', args.type)
 	Variables.varDefine('tournament_status', args.status)
