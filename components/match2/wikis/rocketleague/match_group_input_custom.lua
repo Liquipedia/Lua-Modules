@@ -305,8 +305,9 @@ function matchFunctions.getOpponents(args)
 		args.resulttype = 'default'
 	end
 
+	local autofinished = String.isEmpty(args.autofinished) and args.autofinished or true
 	-- see if match should actually be finished if score is set
-	if isScoreSet and Logic.readBoolOrNil(args.finished) == nil then
+	if isScoreSet and not Logic.readBool(args.finished) and Logic.readBool(autofinished) then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
