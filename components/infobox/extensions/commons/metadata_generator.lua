@@ -30,7 +30,7 @@ function MetadataGenerator.tournament(args)
 
 	local name = not String.isEmpty(args.name) and (args.name):gsub('&nbsp;', ' ') or mw.title.getCurrentTitle()
 
-	local type = args.type
+	local type = args.type or ''
 	local locality = Localisation.getLocalisation({displayNoError = true}, args.country)
 
 	local organizers = {
