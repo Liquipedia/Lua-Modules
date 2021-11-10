@@ -404,8 +404,29 @@ end
 
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
-	header  :left(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
-			:right(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
+	header  :left(
+				mw.html.create(nil)
+				:node(CustomMatchSummary._createOpponent(match.opponents[1], 'left')
+					:css('width', 'calc(50% - 25px)')
+				)
+				:node(CustomMatchSummary._createScore(match.opponents[1])
+					:css('border-right', '1px solid #aaa')
+					:css('text-align', 'left')
+					:css('width','25px')
+				)
+			)
+			:right(
+				mw.html.create(nil)
+				:node(CustomMatchSummary._createScore(match.opponents[2])
+					:css('border-left', '1px solid #aaa')
+					:css('text-align', 'right')
+					:css('width','25px')
+				)
+				:node(CustomMatchSummary._createOpponent(match.opponents[2], 'right')
+					:css('width', 'calc(50% - 25px)')
+				)
+			)
+	header.root:css('justify-content', 'center')
 
 	return header
 end
@@ -618,12 +639,19 @@ function CustomMatchSummary._createCheckMark(isWinner, position)
 end
 
 function CustomMatchSummary._createOpponent(opponent, side)
-	return OpponentDisplay.BlockOpponent({
+	return OpponentDisplay.BlockOpponent{
 		flip = side == 'left',
 		opponent = opponent,
 		overflow = 'wrap',
 		teamStyle = 'short',
-	})
+	}
+end
+
+function CustomMatchSummary._createScore(opponent)
+	return OpponentDisplay.BlockScore{
+		isWinner = opponent.placement == 1 or opponent.advances,
+		scoreText = OpponentDisplay.InlineScore(opponent),
+	}
 end
 
 return CustomMatchSummary
