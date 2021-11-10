@@ -21,6 +21,10 @@ function MetadataGenerator.tournament(args)
 		error('You must provide the publisherdescription param!')
 	end
 
+	if String.isEmpty(args.primarygame) then
+		error('You must provide the primarygame param!')
+	end
+
 	local output
 	local frame = mw.getCurrentFrame()
 
@@ -33,8 +37,6 @@ function MetadataGenerator.tournament(args)
 		args['organizer-name'] or args.organizer,
 		args['organizer2-name'] or args.organizer2,
 		args['organizer3-name'] or args.organizer3,
-		args['organizer4-name'] or args.organizer4,
-		args['organizer5-name'] or args.organizer5
 	}
 
 	local tier = args.liquipediatier and Template.safeExpand(frame, 'TierDisplay', {args.liquipediatier}) or nil
@@ -54,7 +56,7 @@ function MetadataGenerator.tournament(args)
 	local teams = args.team_number
 	local players = args.player_number
 
-	local game = (not String.isEmpty(args.game) and args.game ~= 'csgo') and Games.abbr[args.game]
+	local game = (not String.isEmpty(args.game) and args.game ~= args.primarygame) and Games.abbr[args.game]
 
 	local prizepoolusd = args.prizepoolusd and ('$' .. args.prizepoolusd .. ' USD') or nil
 	local prizepool = prizepoolusd or (
@@ -64,7 +66,7 @@ function MetadataGenerator.tournament(args)
 			Variables.varDefault('localcurrencycode', '')
 		)
 	)
-	local charity = args.charity == 'true' and true
+	local charity = args.charity == 'true'
 	local dateVerb = (tense == 'past' and 'took place ') or (tense == 'future' and 'will take place ') or 'takes place '
 	local dateVerbPublisher =
 		(tense == 'past' and ' which took place ') or
