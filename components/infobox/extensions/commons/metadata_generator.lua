@@ -76,7 +76,7 @@ function MetadataGenerator.tournament(args)
 
 	output = StringUtils.interpolate('${name} is ${a}${type}${locality}${game}${charity}${tierType}${organizer}', {
 		name = name,
-		a = AnOrA._main(type or locality or game or (charity and 'charity' or nil) or tierType) .. ' '
+		a = AnOrA._main(type or locality or game or (charity and 'charity' or nil) or tierType) .. ' ',
 		type = type and (type:lower() .. ' ') or '',
 		locality = locality and (locality .. ' ') or '',
 		game = game and (game .. ' ') or '',
