@@ -222,6 +222,7 @@ function CustomLeague:_createTierDisplay()
 
 	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_tiertype', tierType)
+	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
 	Variables.varDefine('tournament_liquipediatiertype', tierType)
 	return output
 end
