@@ -13,6 +13,7 @@ local Games = require('Module:Games')
 local Variables = require('Module:Variables')
 local StringUtils = require('Module:StringUtils')
 local Class = require('Module:Class')
+local AnOrA = require('Module:A or an')
 
 local MetadataGenerator = {}
 
@@ -30,7 +31,7 @@ function MetadataGenerator.tournament(args)
 
 	local name = not String.isEmpty(args.name) and (args.name):gsub('&nbsp;', ' ') or mw.title.getCurrentTitle()
 
-	local type = args.type or ''
+	local type = args.type
 	local locality = Localisation.getLocalisation({displayNoError = true}, args.country)
 
 	local organizers = {
@@ -73,9 +74,10 @@ function MetadataGenerator.tournament(args)
 		(tense == 'future' and ' which will take place ') or
 		' taking place '
 
-	output = StringUtils.interpolate('${name} is a${type}${locality}${game}${charity}${tierType}${organizer}', {
+	output = StringUtils.interpolate('${name} is ${a}${type}${locality}${game}${charity}${tierType}${organizer}', {
 		name = name,
-		type = type and ('n ' .. type:lower() .. ' ') or '',
+		a = AnOrA._main(type or locality or game or (charity and 'charity' or nil) or tierType) .. ' ',
+		type = type and (type:lower() .. ' ') or '',
 		locality = locality and (locality .. ' ') or '',
 		game = game and (game .. ' ') or '',
 		charity = charity and 'charity ' or '',
