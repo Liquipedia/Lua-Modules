@@ -37,7 +37,7 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		local earnings = Earnings.team({_team.args.id or _team.pagename])
+		local earnings = Earnings.team({_team.args.id or _team.pagename})
 		Variables.varDefine('earnings', earnings:gsub(',', ''))
 		if earnings == 0 then
 			earnings = nil
