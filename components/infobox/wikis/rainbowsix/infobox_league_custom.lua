@@ -36,12 +36,12 @@ local CustomInjector = Class.new(Injector)
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-	_args = league.args
+    _args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
+    league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
@@ -51,7 +51,7 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:addCustomCells(widgets)
-	local args = _league.args
+	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Teams',
 		content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}
@@ -69,7 +69,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomInjector:parse(id, widgets)
-	local args = _league.args
+	local args = _args
 	if id == 'customcontent' then
 		if not String.isEmpty(args.map1) then
 			local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
@@ -147,7 +147,7 @@ function League:addToLpdb(lpdbData, args)
 		prizepoollocal = Variables.varDefault('prizepoollocal', ''),
 		startdate_raw = Variables.varDefault('raw_sdate', ''),
 		enddate_raw = Variables.varDefault('raw_edate', ''),
-        individual = not String.isEmpty(args.player_number),
+		individual = not String.isEmpty(args.player_number),
 	}
 
 	return lpdbData
@@ -173,7 +173,7 @@ end
 
 function CustomLeague:_createLiquipediaTierDisplay()
 	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
+	local tierType = _args.liquipediatiertype or ''
 	if String.isEmpty(tier) then
 		return nil
 	end
@@ -286,7 +286,7 @@ function CustomLeague:_createGameCell(args)
 	if String.isEmpty(args.epatch) and not String.isEmpty(args.patch) then
 		content = content .. '[[' .. args.patch .. ']]'
 	elseif not String.isEmpty(args.epatch) then
-		content = content .. '<br> [[' .. args.patch .. ']]' .. '&ndash;' .. '[[' .. args.epatch .. ']]'
+		content = content .. '<br> [[' .. args.patch .. ']] ' .. '&ndash;' .. ' [[' .. args.epatch .. ']]'
 	end
 
 	return content
