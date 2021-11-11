@@ -613,8 +613,8 @@ local data = {
 		name = 'Mongolia',
 		flag = 'File:mn_hd.png'
 	},
-	['macao'] = {
-		name = 'Macao',
+	['macau'] = {
+		name = 'Macau',
 		flag = 'File:mo_hd.png'
 	},
 	['northernmarianaislands'] = {
@@ -1734,6 +1734,7 @@ local aliases = {
 	['slovakrepublic'] = 'slovakia',
 	['chinesetaipei'] = 'taiwan',
 	['tristan'] = 'tristandacunha',
+	['macao'] = 'macau',
 	['usca'] = 'northamerica',
 	['unasur'] = 'southamerica',
 	['unitedstatesofamerica'] = 'unitedstates',
