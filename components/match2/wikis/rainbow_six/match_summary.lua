@@ -10,12 +10,12 @@ local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchSummary = require('Module:MatchSummary/Base')
 local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local _POSITION_LEFT = 1
@@ -404,24 +404,11 @@ end
 
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
-	header  
-		:left(mw.html.create('div'):addClass('brkts-popup-header-opponent'):css('display', 'flex'):css('justify-content', 'flex-end')
-			:node(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
-			:node(CustomMatchSummary._createScore(match.opponents[1])
-				:css('border-right', '1px solid #aaa')
-				:css('text-align', 'left')
-				:css('width','24px')
-			)
-		)
-		:right(mw.html.create('div'):addClass('brkts-popup-header-opponent'):css('display', 'flex'):css('justify-content', 'flex-start')
-			:node(CustomMatchSummary._createScore(match.opponents[2])
-				:css('border-left', '1px solid #aaa')
-				:css('text-align', 'right')
-				:css('width','24px')
-			)
-			:node(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
-		)
-	header.root:css('justify-content', 'center')
+
+	header:leftOpponent(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
+	      :leftScore(CustomMatchSummary._createScore(match.opponents[1]))
+	      :rightScore(CustomMatchSummary._createScore(match.opponents[2]))
+	      :rightOpponent(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
