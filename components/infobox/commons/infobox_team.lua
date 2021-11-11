@@ -169,13 +169,17 @@ function Team:_createLocation(location)
 			'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
+function Team:_getStandardLocationValue(location)
+	return Flags.CountryName(location) or location
+end
+
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 
 	local lpdbData = {
 		name = name,
-		location = args.location,
-		location2 = args.location2,
+		location = _getStandardLocationValue(args.location),
+		location2 = _getStandardLocationValue(args.location2),
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
 		createdate = args.created,
