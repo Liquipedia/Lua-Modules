@@ -457,9 +457,12 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or playersData['p' .. playerIndex] or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag'] or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn'] or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
+		player.name = player.name or playersData['p' .. playerIndex]
+			or Variables.varDefault(teamName .. '_p' .. playerIndex)
+		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
 		if String.isNotEmpty(player.name) then
 			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
@@ -494,16 +497,16 @@ function mapFunctions.getParticipants(map, opponents)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
 			championData['team' .. opponentIndex .. 'champion' .. playerIndex] =
-				map['team' .. opponentIndex .. 'champion' .. playerIndex] or 
-				map['t' .. opponentIndex .. 'c' .. playerIndex] or 
-				map['team' .. opponentIndex .. 'hero' .. playerIndex] or 
+				map['team' .. opponentIndex .. 'champion' .. playerIndex] or
+				map['t' .. opponentIndex .. 'c' .. playerIndex] or
+				map['team' .. opponentIndex .. 'hero' .. playerIndex] or
 				map['t' .. opponentIndex .. 'h' .. playerIndex]
 
 			championData['team' .. opponentIndex .. 'kda' .. playerIndex] =
-				map['team' .. opponentIndex .. 'kda' .. playerIndex] or 
+				map['team' .. opponentIndex .. 'kda' .. playerIndex] or
 				map['t' .. opponentIndex .. 'kda' .. playerIndex]
 
-			local player = map['team' .. opponentIndex .. 'player' .. playerIndex] or 
+			local player = map['team' .. opponentIndex .. 'player' .. playerIndex] or
 				map['t' .. opponentIndex .. 'p' .. playerIndex]
 			if String.isNotEmpty(player) then
 				participants = mapFunctions.attachToParticipant(
