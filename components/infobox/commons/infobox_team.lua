@@ -178,8 +178,8 @@ function Team:_setLpdbData(args, links)
 
 	local lpdbData = {
 		name = name,
-		location = _getStandardLocationValue(args.location),
-		location2 = _getStandardLocationValue(args.location2),
+		location = self:_getStandardLocationValue(args.location),
+		location2 = self:_getStandardLocationValue(args.location2),
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
 		createdate = args.created,
