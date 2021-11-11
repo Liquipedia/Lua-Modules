@@ -35,7 +35,7 @@ function Header:leftScore(content)
 	self.leftScore = content
 		:css('border-right', '1px solid #aaa')
 		:css('text-align', 'left')
-		:css('width','24px')
+		:css('width','28px')
 	return self
 end
 
@@ -43,7 +43,7 @@ function Header:rightScore(content)
 	self.rightScore = content
 		:css('border-left', '1px solid #aaa')
 		:css('text-align', 'right')
-		:css('width','24px')
+		:css('width','28px')
 	return self
 end
 
