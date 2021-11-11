@@ -159,8 +159,11 @@ end
 
 function CustomMatchSummary._createHeader(frame, match)
 	local header = MatchSummary.Header()
-	header  :left(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
-			:right(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
+
+	header:leftOpponent(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
+	      :leftScore(CustomMatchSummary._createScore(match.opponents[1]))
+	      :rightScore(CustomMatchSummary._createScore(match.opponents[2]))
+	      :rightOpponent(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
@@ -293,6 +296,13 @@ function CustomMatchSummary._createOpponent(opponent, side)
 		overflow = 'wrap',
 		teamStyle = 'short',
 	})
+end
+
+function CustomMatchSummary._createScore(opponent)
+	return OpponentDisplay.BlockScore{
+		isWinner = opponent.placement == 1 or opponent.advances,
+		scoreText = OpponentDisplay.InlineScore(opponent),
+	}
 end
 
 return CustomMatchSummary
