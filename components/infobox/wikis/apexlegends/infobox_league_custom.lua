@@ -278,9 +278,9 @@ end
 function CustomLeague._getPlatform()
 	local platform = string.lower(_args.platform or 'pc')
 	if platform == 'pc' then
-		return '[[PC]][[Category:PC Competitions]]'
-	elseif platform == 'mobile' then
-		return '[[Mobile]][[Category:Mobile Competitions]]'
+		return '[[PC Competitions|PC]][[Category:PC Competitions]]'
+	elseif platform == 'console' then
+		return '[[Console Competitions|Console]][[Category:Console Competitions]]'
 	end
 end
 
