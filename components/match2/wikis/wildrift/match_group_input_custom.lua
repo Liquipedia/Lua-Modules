@@ -20,7 +20,6 @@ local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 5
 local MAX_NUM_VODGAMES = 9
-local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
@@ -59,6 +58,7 @@ function matchFunctions.adjustMapData(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		opponents[opponentIndex] = match['opponent' .. opponentIndex]
 	end
+	local mapIndex = 1
 	while match['map'..mapIndex] do
 		match['map'..mapIndex] = mapFunctions.getParticipants(match['map'..mapIndex], opponents)
 		mapIndex = mapIndex + 1
@@ -277,7 +277,13 @@ function matchFunctions.readDate(matchArgs)
 		dateProps.hasDate = true
 		return dateProps
 	else
-		local suggestedDate = Variables.varDefaultMulti('matchDate', 'Match_date', 'tournament_enddate', 'tournament_startdate', _EPOCH_TIME)
+		local suggestedDate = Variables.varDefaultMulti(
+			'matchDate',
+			'Match_date',
+			'tournament_enddate',
+			'tournament_startdate',
+			_EPOCH_TIME
+		)
 		return {
 			date = MatchGroupInput.getInexactDate(suggestedDate),
 			dateexact = false,
@@ -295,7 +301,10 @@ function matchFunctions.getTournamentVars(match)
 	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
 	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault("tournament_icondark"))
 	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
-	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_liquipediatiertype'))
+	match.liquipediatiertype = Logic.emptyOr(
+		match.liquipediatiertype,
+		Variables.varDefault('tournament_liquipediatiertype')
+	)
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return match
 end
@@ -329,10 +338,10 @@ function matchFunctions.getVodStuff(match)
 	if match.reddit then links.reddit = match.reddit end
 	if match.bestgg then links.bestgg = match.bestgg end
 	if match.matchhistory then links.matchhistory = match.matchhistory end
-	local index = 1
-	while String.isNotEmpty(match['matchhistory' .. index]) do
-		links['matchhistory' .. index] = match['matchhistory' .. index]
-		index = index + 1
+	local historyIndex = 1
+	while String.isNotEmpty(match['matchhistory' .. historyIndex]) do
+		links['matchhistory' .. historyIndex] = match['matchhistory' .. historyIndex]
+		historyIndex = historyIndex + 1
 	end
 	if match.interview then links.interview = match.interview end
 	if match.review then links.review = match.review end
@@ -440,17 +449,17 @@ function matchFunctions.getOpponents(match)
 end
 
 -- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayersOfTeam(match, opponentIndex, teamName, playersInput)
+function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	playersInput = Json.parseIfString(playersInput) or {}
+	playersData = Json.parseIfString(playersData) or {}
 	local players = {}
 	local count = 1
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or playersInput['p' .. playerIndex] or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or playersInput['p' .. playerIndex .. 'flag'] or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or playersInput['p' .. playerIndex .. 'dn'] or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
+		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
+		player.name = player.name or playersData['p' .. playerIndex] or Variables.varDefault(teamName .. '_p' .. playerIndex)
+		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag'] or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn'] or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
 		if String.isNotEmpty(player.name) then
 			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
@@ -461,7 +470,7 @@ function matchFunctions.getPlayersOfTeam(match, opponentIndex, teamName, players
 			count = count + 1
 		end
 	end
-	match['opponent' .. opponentIndex].match2players = players
+	match['opponent' .. oppIndex].match2players = players
 	return match
 end
 
