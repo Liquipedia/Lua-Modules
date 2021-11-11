@@ -10,7 +10,6 @@ local League = require('Module:Infobox/League')
 local String = require('Module:String')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
-local PageLink = require('Module:Page')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -24,6 +23,8 @@ local _TODAY = os.date('%Y-%m-%d', os.time())
 local _GAME_SIEGE = 'siege'
 local _GAME_VEGAS2 = 'vegas2'
 
+local _args
+
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
@@ -35,12 +36,12 @@ local CustomInjector = Class.new(Injector)
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-    _args = league.args
-	
+    	_args = league.args
+
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
-    league.getWikiCategories = CustomLeague.getWikiCategories
+    	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
