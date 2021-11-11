@@ -36,12 +36,12 @@ local CustomInjector = Class.new(Injector)
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-    	_args = league.args
+	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
-    	league.getWikiCategories = CustomLeague.getWikiCategories
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
