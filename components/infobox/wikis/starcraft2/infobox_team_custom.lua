@@ -140,13 +140,7 @@ end
 function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.earnings = _earnings or 0
 	lpdbData.region = nil
-	lpdbData.location = CustomTeam._getStandardLocationValue(_team.args.location)
-	lpdbData.location2 = CustomTeam._getStandardLocationValue(_team.args.location2)
 	return lpdbData
-end
-
-function CustomTeam._getStandardLocationValue(location)
-	return Flags.CountryName(location) or location
 end
 
 function CustomTeam.playerBreakDown(args)
