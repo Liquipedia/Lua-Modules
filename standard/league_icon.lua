@@ -38,7 +38,7 @@ function LeagueIcon.display(args)
 		})
 	end
 
-	--if icon is not given and can not be retrieved return empty string
+	--if icon is not given and can not be retrieved return _FILLER icon
 	if String.isEmpty(icon) then
 		return _FILLER
 	end
