@@ -295,9 +295,8 @@ function HiddenInfoboxLeague._getPrizePool()
 			end
 			return prizePoolUSD
 		end
-		return prizePool
+		return prizePool or 0
 	end
-	return 0
 end
 
 function HiddenInfoboxLeague._cleanPrizeValue(value)
