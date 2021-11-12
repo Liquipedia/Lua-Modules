@@ -57,6 +57,11 @@ function LeagueIcon.display(args)
 end
 
 function LeagueIcon._make(icon, iconDark, link, name, size)
+	--remove "File:" prefix from icons due to legacy reasons
+	--this should be removed once all wikis use the standardized infobox league
+	icon = string.gsub(icon, '^File:', '')
+	iconDark = string.gsub(iconDark, '^File:', '')
+
 	local imageOptions = '|link=' .. link .. '|' .. (name or link) .. '|' .. size .. 'x' .. size .. 'px]]'
 	local lightSpan = mw.html.create('span')
 		:addClass('league-icon-small-image lightmode')
