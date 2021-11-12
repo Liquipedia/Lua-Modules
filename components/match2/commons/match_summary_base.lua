@@ -32,18 +32,12 @@ function Header:leftOpponent(content)
 end
 
 function Header:leftScore(content)
-	self.leftScore = content
-		:css('border-right', '1px solid #aaa')
-		:css('text-align', 'left')
-		:css('width','28px')
+	self.leftScore = content:addClass('brkts-popup-header-opponent-score-left')
 	return self
 end
 
 function Header:rightScore(content)
-	self.rightScore = content
-		:css('border-left', '1px solid #aaa')
-		:css('text-align', 'right')
-		:css('width','28px')
+	self.rightScore = content:addClass('brkts-popup-header-opponent-score-right')
 	return self
 end
 
@@ -53,12 +47,10 @@ function Header:rightOpponent(content)
 end
 
 function Header:create()
-	self.root:tag('div')
-		:addClass('brkts-popup-header-opponent'):css('display', 'flex'):css('justify-content', 'flex-end')
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
 		:node(self.leftElement)
 		:node(self.leftScore or '')
-	self.root:tag('div')
-		:addClass('brkts-popup-header-opponent'):css('display', 'flex'):css('justify-content', 'flex-start')
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
 		:node(self.rightScore or '')
 		:node(self.rightElement)
 	return self.root
