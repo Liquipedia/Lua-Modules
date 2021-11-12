@@ -63,6 +63,8 @@ function matchFunctions.adjustMapData(match)
 		match['map'..mapIndex] = mapFunctions.getParticipants(match['map'..mapIndex], opponents)
 		mapIndex = mapIndex + 1
 	end
+
+	return match
 end
 
 -- called from Module:Match/Subobjects
