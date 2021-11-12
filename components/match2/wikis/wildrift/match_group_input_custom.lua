@@ -69,6 +69,9 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(_, map)
+	if map.map == 'default' then
+		map.map = nil
+	end
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
 
@@ -563,6 +566,8 @@ function mapFunctions.getScoresAndWinner(map)
 		if not Logic.isEmpty(score) then
 			if TypeUtil.isNumeric(score) then
 				obj.status = 'S'
+				score = tonumber(score)
+				map['score' .. scoreIndex] = score
 				obj.score = score
 			elseif Table.includes(ALLOWED_STATUSES, score) then
 				obj.status = score
