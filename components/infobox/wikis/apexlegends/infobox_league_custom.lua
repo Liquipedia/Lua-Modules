@@ -129,23 +129,8 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	end
 
 	--clean tier from unallowed values
-	--convert from text (old entries) to numbers
-	tier = Tier.number[string.lower(tier)] or tier
 	local tierText = Tier.text[tier]
 	local hasInvalidTier = tierText == nil
-	local hasTypeSetAsTier
-	--the following converts a tier that should be a tiertype
-	if hasInvalidTier then
-		local tempTypeForCheck = Tier.numberToType[tier] or tier
-		tempTypeForCheck = Tier.types[string.lower(tempTypeForCheck)]
-		if tempTypeForCheck then
-			hasTypeSetAsTier = true
-			hasInvalidTier = nil
-			if String.isEmpty(tierType) then
-				tierType = tempTypeForCheck
-			end
-		end
-	end
 	tierText = tierText or tier
 
 	local hasInvalidTierType = false
@@ -155,21 +140,19 @@ function CustomLeague:_createLiquipediaTierDisplay()
 
 
 	if not String.isEmpty(tierType) then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
-		local tierTypeDIsplay
-		tierTypeDIsplay = '[[' .. tierType .. ' Tournaments|' .. tierType .. ']]'
+		local tierTypeDisplay
+		tierTypeDisplay = Tier['types'][string.lower(tierType)]
+		hasInvalidTierType = tierTypeDisplay == nil
+		tierTypeDisplay = tierTypeDisplay or tierType
+		tierTypeDisplay = '[[' .. tierType .. ' Tournaments|' .. tierType .. ']]'
 			.. '[[Category:' .. tierType .. ' Tournaments]]'
-		if not hasTypeSetAsTier or tierType ~= tierTypeDIsplay  then
-			tierDisplay = tierTypeDIsplay .. '&nbsp;(' .. tierDisplay .. ')'
-		end
+		tierDisplay = tierTypeDisplay .. '&nbsp;(' .. tierDisplay .. ')'
 	end
 
 	tierDisplay = tierDisplay ..
 		(_args['ea-sponsored'] == 'true' and _EA_ICON or '') ..
 		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '') ..
-		(hasTypeSetAsTier and '[[Category:Pages with Tiertype set as Tier]]' or '')
+		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
 
 	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_tiertype', tierType)
