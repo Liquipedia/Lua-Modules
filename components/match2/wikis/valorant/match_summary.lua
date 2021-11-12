@@ -10,11 +10,11 @@ local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require("Module:Logic")
 local Lua = require('Module:Lua')
-local MatchSummary = require('Module:MatchSummary/Base')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local Agents = Class.new(
@@ -290,12 +290,12 @@ function CustomMatchSummary._createCheckMark(isWinner)
 end
 
 function CustomMatchSummary._createOpponent(opponent, side)
-	return OpponentDisplay.BlockOpponent({
+	return OpponentDisplay.BlockOpponent{
 		flip = side == 'left',
 		opponent = opponent,
 		overflow = 'wrap',
 		teamStyle = 'short',
-	})
+	}
 end
 
 function CustomMatchSummary._createScore(opponent)
