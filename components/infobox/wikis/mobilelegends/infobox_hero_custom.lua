@@ -16,7 +16,6 @@ local Class = require('Module:Class')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Center = require('Module:Infobox/Widget/Center')
 local Title = require('Module:Infobox/Widget/Title')
 local Header = require('Module:Infobox/Widget/Header')
 local Breakdown = require('Module:Infobox/Widget/Breakdown')
@@ -28,7 +27,6 @@ local CustomInjector = Class.new(Injector)
 local _args
 
 local _pagename = mw.title.getCurrentTitle().text
-local _frame
 
 local _BATTLE_POINTS_ICON = '[[File:Mobile_Legends_BP_icon.png|x16px|Battle Points|link=Battle Points]]'
 local _DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Diamonds|x16px|link=Diamonds]]'
@@ -36,7 +34,6 @@ local _DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Diamonds|x16px|li
 function CustomHero.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
-	_frame = frame
 	_args.informationType = 'Hero'
 
 	unit.getWikiCategories = CustomHero.getWikiCategories
