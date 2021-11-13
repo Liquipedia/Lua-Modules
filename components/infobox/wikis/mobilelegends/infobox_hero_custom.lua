@@ -9,7 +9,7 @@
 local Unit = require('Module:Infobox/Unit')
 local String = require('Module:StringUtils')
 local Namespace = require('Module:Namespace')
-local Template = require('Module:Template')
+local ClassIcon = require('Module:ClassIcon')
 local Math = require('Module:Math')
 local HeroWL = require('Module:HeroWL')
 local Class = require('Module:Class')
@@ -57,12 +57,12 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Faction(s)', content = {_args.factions}},
 	}
 
-	if not (
-		String.isEmpty(_args.hp) and
-		String.isEmpty(_args.hplvl) and
-		String.isEmpty(_args.hpreg) and
-		String.isEmpty(_args.hpreglvl)
-	) then
+	if
+		String.isNotEmpty(_args.hp) or
+		String.isNotEmpty(_args.hplvl) or
+		String.isNotEmpty(_args.hpreg) or
+		String.isNotEmpty(_args.hpreglvl)
+	then
 		table.insert(widgets, Title{name = 'Base Statistics'})
 	end
 
@@ -110,18 +110,18 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'type' then
 		local breakDownContents = {}
 		local lane = _args.lane
-		if not String.isEmpty(lane) then
-			lane = '<b>Lane</b><br>' .. Template.safeExpand(_frame, 'Class icon', {lane}, '')
+		if String.isNotEmpty(lane) then
+			lane = '<b>Lane</b><br>' .. ClassIcon.display({}, lane)
 			table.insert(breakDownContents, lane)
 		end
 		local primaryRole = _args.primaryrole
-		if not String.isEmpty(primaryRole) then
-			primaryRole = '<b>Primary Role</b><br>' .. Template.safeExpand(_frame, 'Class icon', {primaryRole}, '')
+		if String.isNotEmpty(primaryRole) then
+			primaryRole = '<b>Primary Role</b><br>' .. ClassIcon.display({}, primaryRole)
 			table.insert(breakDownContents, primaryRole)
 		end
 		local secondaryRole = _args.secondaryrole
-		if not String.isEmpty(secondaryRole) then
-			secondaryRole = '<b>Secondary Role</b><br>' .. Template.safeExpand(_frame, 'Class icon', {secondaryRole}, '')
+		if String.isNotEmpty(secondaryRole) then
+			secondaryRole = '<b>Secondary Role</b><br>' .. ClassIcon.display({}, secondaryRole)
 			table.insert(breakDownContents, secondaryRole)
 		end
 		return {
@@ -129,18 +129,15 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Real Name', content = {_args.realname}},
 		}
 	elseif id == 'cost' then
-		local cost = ''
-		if not String.isEmpty(_args.costbp) then
-			cost = cost .. _args.costbp .. ' ' .. _BATTLE_POINTS_ICON
+		local costs = {}
+		if String.isNotEmpty(_args.costbp) then
+			table.insert(costs, _args.costbp .. ' ' .. _BATTLE_POINTS_ICON)
 		end
-		if not String.isEmpty(_args.costdia) then
-			if cost ~= '' then
-				cost = cost .. '&emsp;&ensp;'
-			end
-			cost = cost .. _args.costdia .. ' ' .. _DIAMONDS_ICON
+		if String.isNotEmpty(_args.costdia) then
+			table.insert(costs, _args.costdia .. ' ' .. _DIAMONDS_ICON)
 		end
 		return {
-			Cell{name = 'Price', content = {cost}},
+			Cell{name = 'Price', content = {table.concat(costs, '&emsp;&ensp;')}},
 		}
 	end
 
@@ -155,10 +152,10 @@ function CustomHero.getWikiCategories()
 	local categories = {}
 	if Namespace.isMain() then
 		categories = {'Heroes'}
-		if not String.isEmpty(_args.attacktype) then
+		if String.isNotEmpty(_args.attacktype) then
 			table.insert(categories, _args.attacktype .. ' Heroes')
 		end
-		if not String.isEmpty(_args.primaryrole) then
+		if String.isNotEmpty(_args.primaryrole) then
 			table.insert(categories, _args.primaryrole .. ' Heroes')
 		end
 	end
