@@ -24,11 +24,20 @@ end)
 
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	if matchGroupType == 'matchlist' then
-		return Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
+		return Lua.import(
+			'Module:MatchGroup/Display/Matchlist/Starcraft',
+			{requireDevIfEnabled = true}
+		).MatchlistContainer
 	elseif matchGroupType == 'singleMatch' then
-		return Lua.import('Module:MatchGroup/Display/SingleMatch/Starcraft', {requireDevIfEnabled = true}).SingleMatchContainer
+		return Lua.import(
+			'Module:MatchGroup/Display/SingleMatch/Starcraft',
+			{requireDevIfEnabled = true}
+		).SingleMatchContainer
 	else
-		return Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
+		return Lua.import(
+			'Module:MatchGroup/Display/Bracket/Starcraft',
+			{requireDevIfEnabled = true}
+		).BracketContainer
 	end
 end
 
