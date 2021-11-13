@@ -89,9 +89,19 @@ function StarcraftMatchSummary.Header(props)
 
 	local header = html.create('div'):addClass('brkts-popup-header-dev')
 		:node(renderOpponent(1))
+		:node(StarcraftMatchSummary._createScore(match.opponents[1], 'left'))
+		:node(StarcraftMatchSummary._createScore(match.opponents[2], 'right'))
 		:node(renderOpponent(2))
 
 	return header
+end
+
+function StarcraftMatchSummary._createScore(opponent, side)
+	return StarcraftOpponentDisplay.BlockScore{
+		isWinner = opponent.placement == 1 or opponent.advances,
+		scoreText = StarcraftOpponentDisplay.InlineScore(opponent),
+		side = side
+	}
 end
 
 StarcraftMatchSummary.propTypes.Body = {
