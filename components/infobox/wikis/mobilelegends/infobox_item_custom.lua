@@ -10,6 +10,7 @@ local Item = require('Module:Infobox/Item')
 local String = require('Module:StringUtils')
 local Namespace = require('Module:Namespace')
 local Template = require('Module:Template')
+local Table = require('Module:Table')
 local Class = require('Module:Class')
 
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -35,6 +36,8 @@ local _CATEGORY_DISPLAY = {
 	enchantment = 'Enchantment [[Category:Enchantments]]',
 }
 
+local _DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION = '_positiveConcatedArgsForBase'
+
 function CustomItem.run(frame)
 	local item = Item(frame)
 	_args = item.args
@@ -50,7 +53,7 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'header' then
-		if not String.isEmpty(_args.itemcost) then
+		if String.isNotEmpty(_args.itemcost) then
 			table.insert(
 				widgets,
 				Breakdown{
@@ -64,112 +67,62 @@ function CustomInjector:parse(id, widgets)
 				}
 			)
 		end
-		if not String.isEmpty(_args.itemname) then
+		if String.isNotEmpty(_args.itemname) then
 			local iconImage = Template.safeExpand(_frame, 'ItemIcon', {string.lower(_args.itemname)}, '')
-			if not String.isEmpty(_args.itemtext) then
+			if String.isNotEmpty(_args.itemtext) then
 				iconImage = iconImage .. '<br><i>' .. _args.itemtext .. '</i>'
 			end
 			table.insert(widgets, Center{content = {iconImage}})
 		end
 		return widgets
 	elseif id == 'attributes' then
-		if CustomItem._hasAttributes() then
-			if not (String.isEmpty(_args.str) and
-				String.isEmpty(_args.agi) and
-				String.isEmpty(_args.int))
-			then
-				table.insert(widgets, Breakdown{classes = {'infobox-center'}, content = {
-					CustomItem._attributeIcons('str'),
-					CustomItem._attributeIcons('agi'),
-					CustomItem._attributeIcons('int'),
-				}})
-			end
-			table.insert(widgets, Cell{name = 'Health', content = {
-				CustomItem._positiveConcatedArgsForBase('hp')
+		widgets = {}
+		if
+			String.isNotEmpty(_args.str) or
+			String.isNotEmpty(_args.agi) or
+			String.isNotEmpty(_args.int)
+		then
+			table.insert(widgets, Breakdown{classes = {'infobox-center'}, content = {
+				CustomItem._attributeIcons('str'),
+				CustomItem._attributeIcons('agi'),
+				CustomItem._attributeIcons('int'),
 			}})
-			table.insert(widgets, Cell{name = 'Max Health', content = {
-				CustomItem._positiveConcatedArgsForBase('maxhealth')
-			}})
-			table.insert(widgets, Cell{name = 'Health Regen', content = {
-				CustomItem._positiveConcatedArgsForBase('hpregen')
-			}})
-			table.insert(widgets, Cell{name = 'Health Regen / Lifesteal Amp', content = {
-				CustomItem._positivePercentDisplay('hpregenamp')
-			}})
-			table.insert(widgets, Cell{name = 'Mana', content = {
-				CustomItem._positiveConcatedArgsForBase('mana')
-			}})
-			table.insert(widgets, Cell{name = 'Mana Regen', content = {
-				CustomItem._positiveConcatedArgsForBase('manaregen')
-			}})
-			table.insert(widgets, Cell{name = 'Mana Cost / Mana Loss Reduction', content = {
-				CustomItem._manaLossDisplay()
-			}})
-			table.insert(widgets, Cell{name = 'Mana Regen Amplification', content = {
-				CustomItem._positivePercentDisplay('manaregenamp')
-			}})
-			table.insert(widgets, Cell{name = 'Lifesteal', content = {
-				CustomItem._positiveConcatedArgsForBase('lifesteal')
-			}})
-			table.insert(widgets, Cell{name = 'Spell Lifesteal', content = {
-				CustomItem._positiveConcatedArgsForBase('spellsteal')
-			}})
-			table.insert(widgets, Cell{name = 'Spell Lifesteal Amplification', content = {
-				CustomItem._positiveConcatedArgsForBase('spellstealamp')
-			}})
-			table.insert(widgets, Cell{name = 'Armor', content = {
-				CustomItem._positiveConcatedArgsForBase('armor')
-			}})
-			table.insert(widgets, Cell{name = 'Evasion', content = {
-				CustomItem._positivePercentDisplay('evasion')
-			}})
-			table.insert(widgets, Cell{name = 'Magic Resistance', content = {
-				CustomItem._positiveConcatedArgsForBase('magicresist')
-			}})
-			table.insert(widgets, Cell{name = 'Status Resistance', content = {
-				CustomItem._positivePercentDisplay('statusresist')
-			}})
-			table.insert(widgets, Cell{name = 'Attack Speed', content = {
-				CustomItem._positiveConcatedArgsForBase('attackspeed')
-			}})
-			table.insert(widgets, Cell{name = 'Magic Power', content = {
-				CustomItem._positiveConcatedArgsForBase('mp')
-			}})
-			table.insert(widgets, Cell{name = 'Attack Damage', content = {
-				CustomItem._positiveConcatedArgsForBase('ad')
-			}})
-			table.insert(widgets, Cell{name = 'Physical Attack', content = {
-				CustomItem._positiveConcatedArgsForBase('physatk')
-			}})
-			table.insert(widgets, Cell{name = 'Physical Penetration', content = {
-				CustomItem._positiveConcatedArgsForBase('physpen')
-			}})
-			table.insert(widgets, Cell{name = 'Magical Penetration', content = {
-				CustomItem._positiveConcatedArgsForBase('magicpen')
-			}})
-			table.insert(widgets, Cell{name = 'Cooldown Reduction', content = {
-				CustomItem._positiveConcatedArgsForBase('cdreduction')
-			}})
-			table.insert(widgets, Cell{name = 'Critical Chance', content = {
-				CustomItem._positiveConcatedArgsForBase('critchance')
-			}})
-			table.insert(widgets, Cell{name = 'Attack Range', content = {
-				CustomItem._positiveConcatedArgsForBase('attackrange')
-			}})
-			table.insert(widgets, Cell{name = 'Cast Range', content = {
-				CustomItem._positiveConcatedArgsForBase('castrange')
-			}})
-			table.insert(widgets, Cell{name = 'Movement Speed', content = {
-				CustomItem._movementSpeedDisplay()
-			}})
-			table.insert(widgets, Cell{name = 'Limitations', content = {
-				_args.limits
-			}})
-		else return {} end
+		end
+
+		local attributeCells = {
+			{name = 'Health', parameter = 'hp'},
+			{name = 'Max Health', parameter = 'maxhealth'},
+			{name = 'Health Regen', parameter = 'hpregen'},
+			{name = 'Mana', parameter = 'mana'},
+			{name = 'Mana Regen', parameter = 'manaregen'},
+			{name = 'Lifesteal', parameter = 'lifesteal'},
+			{name = 'Physical Lifesteal', parameter = 'physsteal'},
+			{name = 'Magical Lifesteal', parameter = 'magicsteal'},
+			{name = 'Armor', parameter = 'armor'},
+			{name = 'Evasion', parameter = 'evasion', funct = '_positivePercentDisplay'},
+			{name = 'Magic Resistance', parameter = 'magicresist'},
+			{name = 'Status Resistance', parameter = 'statusresist', funct = '_positivePercentDisplay'},
+			{name = 'Attack Speed', parameter = 'attackspeed'},
+			{name = 'Cooldown Reduction', parameter = 'cdreduction'},
+			{name = 'Magic Power', parameter = 'mp'},
+			{name = 'Attack Damage', parameter = 'ad'},
+			{name = 'Physical Attack', parameter = 'physatk'},
+			{name = 'Physical Penetration', parameter = 'physpen'},
+			{name = 'Magical Penetration', parameter = 'magicpen'},
+			{name = 'Cooldown Reduction', parameter = 'critchance'},
+			{name = 'Critical Chance', parameter = 'critreduction'},
+			{name = 'Movement Speed', funct = '_movementSpeedDisplay'},	
+		}
+		widgets = CustomItem._getAttributeCells(attributeCells, widgets)
+		if not Table.isEmpty(widgets) then
+			table.insert(widgets, 1, Title{name = 'Attributes'})
+		end
+		return widgets
 	elseif id == 'ability' then
-		if not (String.isEmpty(_args.use) and
-			String.isEmpty(_args.active) and
-			String.isEmpty(_args.passive))
+		if
+			String.isNotEmpty(_args.use) or
+			String.isNotEmpty(_args.active) or
+			String.isNotEmpty(_args.passive)
 		then
 			table.insert(widgets, Cell{name = 'Use', content = {
 				_args.use
@@ -183,9 +136,10 @@ function CustomInjector:parse(id, widgets)
 			}})
 		else return {} end
 	elseif id == 'availability' then
-		if not (String.isEmpty(_args.category) and
-			String.isEmpty(_args.shop) and
-			String.isEmpty(_args.drop))
+		if
+			String.isNotEmpty(_args.category) or
+			String.isNotEmpty(_args.shop) or
+			String.isNotEmpty(_args.drop)
 		then
 			return {
 				Title{name = 'Item Tier'},
@@ -195,14 +149,15 @@ function CustomInjector:parse(id, widgets)
 			}
 		else return {} end
 	elseif id == 'maps' then
-		if not (String.isEmpty(_args.sr) and
-			String.isEmpty(_args.ha))
+		if
+			String.isNotEmpty(_args.sr) or
+			String.isNotEmpty(_args.ha)
 		then
 			table.insert(widgets, Cell{name = '[[Summoner\'s Rift]]', content = {_args.sr}})
 			table.insert(widgets, Cell{name = '[[Howling Abyss]]', content = {_args.ha}})
 		else return {} end
 	elseif id == 'recipe' then
-		if not String.isEmpty(_args.recipe) then
+		if String.isNotEmpty(_args.recipe) then
 			table.insert(widgets, Center{content = {_args.recipe}})
 		else return {} end
 	elseif id == 'info' then return {}
@@ -217,50 +172,37 @@ end
 
 function CustomItem.getWikiCategories()
 	if Namespace.isMain() then
-		if not String.isEmpty(_args.str) then
-			table.insert(_categories, 'Strength Items')
+		if
+			String.isNotEmpty(_args.str) or
+			String.isNotEmpty(_args.agi) or
+			String.isNotEmpty(_args.int)
+		then
 			table.insert(_categories, 'Attribute Items')
 		end
-		if not String.isEmpty(_args.agi) then
-			table.insert(_categories, 'Agility Items')
-			table.insert(_categories, 'Attribute Items')
-		end
-		if not String.isEmpty(_args.int) then
-			table.insert(_categories, 'Intelligence Items')
-			table.insert(_categories, 'Attribute Items')
-		end
-		if not String.isEmpty(_args.hp) then
-			table.insert(_categories, 'Health Items')
-		end
-		if not String.isEmpty(_args.mana) then
-			table.insert(_categories, 'Mana Pool Items')
-		end
-		if not String.isEmpty(_args.hpregen) then
-			table.insert(_categories, 'Health Regeneration Items')
-		end
-		if not String.isEmpty(_args.manaregen) then
-			table.insert(_categories, 'Mana Regeneration Items')
-		end
-		if not String.isEmpty(_args.armor) then
-			table.insert(_categories, 'Armor Bonus Items')
-		end
-		if not String.isEmpty(_args.evasion) then
-			table.insert(_categories, 'Evasion Items')
-		end
-		if not String.isEmpty(_args.magicresist) then
-			table.insert(_categories, 'Magic Resistance Items')
-		end
-		if not String.isEmpty(_args.damage) then
-			table.insert(_categories, 'Damage Items')
-		end
-		if not String.isEmpty(_args.active) then
-			table.insert(_categories, 'Items with Active Abilities')
-		end
-		if not String.isEmpty(_args.passive) then
-			table.insert(_categories, 'Items with Passive Abilities')
-		end
+
 		if not (String.isEmpty(_args.movespeed) and String.isEmpty(_args.movespeedmult)) then
 			table.insert(_categories, 'Movement Speed Items')
+		end
+
+		local possibleCategories = {
+			['Strength Items'] = 'str',
+			['Agility Items'] = 'agi',
+			['Intelligence Items'] = 'int',
+			['Health Items'] = 'hp',
+			['Mana Pool Items'] = 'mana',
+			['Health Regeneration Items'] = 'hpregen',
+			['Mana Regeneration Items'] = 'manaregen',
+			['Armor Bonus Items'] = 'armor',
+			['Evasion Items'] = 'evasion',
+			['Magic Resistance Items'] = 'magicresist',
+			['Damage Items'] = 'damage',
+			['Items with Active Abilities'] = 'active',
+			['Items with Passive Abilities'] = 'passive',
+		}
+		for category, requiredArg in pairs(possibleCategories) do
+			if String.isNotEmpty(_args[requiredArg]) then
+				table.insert(_categories, category)
+			end
 		end
 
 		return _categories
@@ -290,7 +232,7 @@ function CustomItem._getCostDisplay()
 		)
 	local display = tostring(outerDiv)
 
-	if not String.isEmpty(_args.recipecost) then
+	if String.isNotEmpty(_args.recipecost) then
 		innerDiv = mw.html.create('div')
 			:css('display', 'inline-block')
 			:css('padding', '0px 3px')
@@ -312,38 +254,6 @@ function CustomItem._getCostDisplay()
 	return {display}
 end
 
-function CustomItem._hasAttributes()
-	return not (
-		String.isEmpty(_args.str) and
-		String.isEmpty(_args.agi) and
-		String.isEmpty(_args.int) and
-		String.isEmpty(_args.hp) and
-		String.isEmpty(_args.mana) and
-		String.isEmpty(_args.hpregen) and
-		String.isEmpty(_args.hpregenamp) and
-		String.isEmpty(_args.manaregen) and
-		String.isEmpty(_args.armor) and
-		String.isEmpty(_args.evasion) and
-		String.isEmpty(_args.magicresist) and
-		String.isEmpty(_args.statusresist) and
-		String.isEmpty(_args.debuffamp) and
-		String.isEmpty(_args.spellamp) and
-		String.isEmpty(_args.attackrange) and
-		String.isEmpty(_args.attackspeed) and
-		String.isEmpty(_args.movespeed) and
-		String.isEmpty(_args.movespeedmult) and
-		String.isEmpty(_args.lifesteal) and
-		String.isEmpty(_args.spellsteal) and
-		String.isEmpty(_args.maxhealth) and
-		String.isEmpty(_args.critchance) and
-		String.isEmpty(_args.cdreduction) and
-		String.isEmpty(_args.physatk) and
-		String.isEmpty(_args.magicpen) and
-		String.isEmpty(_args.physpen) and
-		String.isEmpty(_args.mp)
-	)
-end
-
 function CustomItem._attributeIcons(attributeType)
 	_args[attributeType] = _args[attributeType] or 0
 	local attributes = Item:getAllArgsForBase(_args, attributeType)
@@ -352,22 +262,21 @@ function CustomItem._attributeIcons(attributeType)
 end
 
 function CustomItem._positiveConcatedArgsForBase(base)
-	if not String.isEmpty(_args[base]) then
+	if String.isNotEmpty(_args[base]) then
 		local foundArgs = Item:getAllArgsForBase(_args, base)
 		return '+ ' .. table.concat(foundArgs, '&nbsp;/&nbsp;')
 	end
 end
 
 function CustomItem._negativeConcatedArgsForBase(base)
-	if not String.isEmpty(_args[base]) then
+	if String.isNotEmpty(_args[base]) then
 		local foundArgs = Item:getAllArgsForBase(_args, base)
 		return '- ' .. table.concat(foundArgs, '&nbsp;/&nbsp;')
 	end
 end
 
 function CustomItem._positivePercentDisplay(base)
-mw.logObject(base)
-	if not String.isEmpty(_args[base]) then
+	if String.isNotEmpty(_args[base]) then
 		local number = tonumber(_args[base])
 		number = number * 100
 		return '+ ' .. number .. '%'
@@ -376,10 +285,10 @@ end
 
 function CustomItem._manaLossDisplay()
 	local display = ''
-	if not String.isEmpty(_args['mana loss']) then
+	if String.isNotEmpty(_args['mana loss']) then
 		display = (tonumber(_args['mana loss']) + 100) .. '%'
 	end
-	if not String.isEmpty(_args.manaloss) then
+	if String.isNotEmpty(_args.manaloss) then
 		display = display .. (tonumber(_args.manaloss) + 100) .. '%'
 	end
 	if display ~= '' then
@@ -389,10 +298,10 @@ end
 
 function CustomItem._movementSpeedDisplay()
 	local display = ''
-	if not String.isEmpty(_args.movespeed) then
+	if String.isNotEmpty(_args.movespeed) then
 		display = _args.movespeed
 	end
-	if not String.isEmpty(_args.movespeedmult) then
+	if String.isNotEmpty(_args.movespeedmult) then
 		display = display .. (tonumber(_args.movespeedmult) + 100) .. '%'
 	end
 	if display ~= '' then
@@ -413,12 +322,23 @@ function CustomItem._shopDisplay()
 	local contents = {}
 	local index = 1
 	_args.shop1 = _args.shop1 or _args.shop
-	while not String.isEmpty(_args['shop' .. index]) do
+	while String.isNotEmpty(_args['shop' .. index]) do
 		local shop = Template.safeExpand(_frame, 'Shop', {_args['shop' .. index]})
 		table.insert(contents, shop)
 		index = index + 1
 	end
 	return contents
+end
+
+function CustomItem._getAttributeCells(attributeCells, widgets)
+	for _, attribute in ipairs(attributeCells) do
+		local funct = attribute.funct or _DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
+		table.insert(widgets, Cell{name = attribute.name, content = {
+			CustomItem[funct](attribute.parameter)
+		}})
+	end
+
+	return widgets
 end
 
 return CustomItem
