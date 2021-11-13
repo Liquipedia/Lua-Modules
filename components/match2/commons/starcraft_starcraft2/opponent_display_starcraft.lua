@@ -260,7 +260,7 @@ function StarcraftOpponentDisplay.BlockScore(props)
 
 	return html.create('div')
 		:wikitext(scoreText)
-		:addClass('brkts-popup-header-opponent-score-' .. (props.side or 'left') .. '-sc')
+		:addClass('brkts-popup-header-opponent-score-' .. (props.side or 'left'))
 end
 
 function StarcraftOpponentDisplay.InlineScore(opponent)
