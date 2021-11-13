@@ -23,9 +23,13 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 end)
 
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
-		or Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
+	if matchGroupType == 'matchlist' then
+		return Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
+	elseif matchGroupType == 'singleMatch' then
+		return Lua.import('Module:MatchGroup/Display/SingleMatch/Starcraft', {requireDevIfEnabled = true}).SingleMatchContainer
+	else
+		return Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
+	end
 end
 
 --Default Logo for Teams without Team Template
