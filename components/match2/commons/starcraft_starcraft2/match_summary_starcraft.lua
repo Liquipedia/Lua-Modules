@@ -84,14 +84,23 @@ function StarcraftMatchSummary.Header(props)
 			showFlag = false,
 			showLink = opponent.type == 'team',
 		})
-			:addClass('brkts-popup-header-opponent')
 	end
 
-	local header = html.create('div'):addClass('brkts-popup-header-dev')
+	local headerLeft = html.create('div')
+		:addClass('brkts-popup-header-opponent')
+		:addClass('brkts-popup-header-opponent-left')
+		:css('width', '50%')
 		:node(renderOpponent(1))
 		:node(StarcraftMatchSummary._createScore(match.opponents[1], 'left'))
+	local headerRight = html.create('div')
+		:addClass('brkts-popup-header-opponent')
+		:addClass('brkts-popup-header-opponent-right')
+		:css('width', '50%')
 		:node(StarcraftMatchSummary._createScore(match.opponents[2], 'right'))
 		:node(renderOpponent(2))
+	local header = html.create('div'):addClass('brkts-popup-header-dev')
+		:node(headerLeft)
+		:node(headerRight)
 
 	return header
 end
