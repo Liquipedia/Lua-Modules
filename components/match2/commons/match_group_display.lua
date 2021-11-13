@@ -118,7 +118,12 @@ function MatchGroupDisplay.MatchByMatchId(args)
 		assert(args.matchid, 'Missing match ID')
 		local matchIdLength = string.len(args.matchid)
 		args.matchid = string.rep('0', 4 - matchIdLength) .. args.matchid
-		matches = Table.filter(matches, function(match) local _, matchid = MatchGroupUtil.splitMatchId(match.matchId) return matchid == args.matchid end)
+
+		matches = Table.filter(matches, function(match)
+			local _, matchid = MatchGroupUtil.splitMatchId(match.matchId) 
+			return matchid == args.matchid end
+		)
+
 		assert(#matches == 1, 'Match matchId=' .. args.matchid .. ' not found')
 	end
 
