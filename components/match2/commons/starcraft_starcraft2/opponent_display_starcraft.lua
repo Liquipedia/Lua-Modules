@@ -241,6 +241,28 @@ end
 
 StarcraftOpponentDisplay.CheckMark = '<i class="fa fa-check forest-green-text" aria-hidden="true"></i>'
 
+StarcraftOpponentDisplay.propTypes.BlockScore = {
+	isWinner = 'boolean?',
+	scoreText = 'any',
+	side = 'string',
+}
+
+--[[
+Displays a score within the context of a block element.
+]]
+function StarcraftOpponentDisplay.BlockScore(props)
+	DisplayUtil.assertPropTypes(props, StarcraftOpponentDisplay.propTypes.BlockScore)
+
+	local scoreText = props.scoreText
+	if props.isWinner then
+		scoreText = '<b>' .. scoreText .. '</b>'
+	end
+
+	return html.create('div')
+		:wikitext(scoreText)
+		:addClass('brkts-popup-header-opponent-score-' .. (props.side or 'left') .. '-sc')
+end
+
 function StarcraftOpponentDisplay.InlineScore(opponent)
 	if opponent.status == 'S' then
 		local advantage = tonumber(opponent.extradata.advantage) or 0
