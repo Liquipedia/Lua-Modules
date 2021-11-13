@@ -91,12 +91,20 @@ function StarcraftMatchSummary.Header(props)
 		:addClass('brkts-popup-header-opponent-left')
 		:css('width', '50%')
 		:node(renderOpponent(1))
-		:node(StarcraftMatchSummary._createScore(match.opponents[1], 'left'))
+		:node(StarcraftMatchSummary._createScore(
+			match.opponents[1],
+			'left',
+			match.showScore
+		))
 	local headerRight = html.create('div')
 		:addClass('brkts-popup-header-opponent')
 		:addClass('brkts-popup-header-opponent-right')
 		:css('width', '50%')
-		:node(StarcraftMatchSummary._createScore(match.opponents[2], 'right'))
+		:node(StarcraftMatchSummary._createScore(
+			match.opponents[2],
+			'right',
+			match.showScore
+		))
 		:node(renderOpponent(2))
 	local header = html.create('div'):addClass('brkts-popup-header-dev')
 		:node(headerLeft)
@@ -105,13 +113,13 @@ function StarcraftMatchSummary.Header(props)
 	return header
 end
 
-function StarcraftMatchSummary._createScore(opponent, side)
+function StarcraftMatchSummary._createScore(opponent, side, showScore)
 	return StarcraftOpponentDisplay.BlockScore{
 		isWinner = opponent.placement == 1 or opponent.advances,
-		scoreText = StarcraftOpponentDisplay.InlineScore(opponent),
+		scoreText = showScore and StarcraftOpponentDisplay.InlineScore(opponent) or '',
 		side = side
 	}
-end
+end 
 
 StarcraftMatchSummary.propTypes.Body = {
 	match = StarcraftMatchGroupUtil.types.Match,
