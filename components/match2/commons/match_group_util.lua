@@ -61,12 +61,8 @@ MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	title = 'string?',
 	type = TypeUtil.literal('matchlist'),
 })
-MatchGroupUtil.types.SinglematchBracketData = TypeUtil.struct({
-	type = TypeUtil.literal('singlematch'),
-})
 MatchGroupUtil.types.BracketData = TypeUtil.union(
 	MatchGroupUtil.types.MatchlistBracketData,
-	MatchGroupUtil.types.SinglematchBracketData,
 	MatchGroupUtil.types.BracketBracketData
 )
 
@@ -147,7 +143,7 @@ MatchGroupUtil.types.MatchGroup = TypeUtil.struct({
 	rootMatchIds = TypeUtil.array('string'),
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
-	type = TypeUtil.literalUnion('matchlist', 'bracket', 'singlematch'),
+	type = TypeUtil.literalUnion('matchlist', 'bracket'),
 	upperMatchIds = TypeUtil.table('string', 'string'),
 })
 
@@ -331,15 +327,11 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
 		}
-	elseif data.type == 'matchlist' then
+	else
 		return {
 			header = nilIfEmpty(data.header),
 			title = nilIfEmpty(data.title),
 			type = 'matchlist',
-		}
-	elseif data.type == 'singlematch' then
-		return {
-			type = 'singlematch',
 		}
 	end
 end

@@ -72,32 +72,7 @@ function MatchGroupDisplay.BracketBySpec(args)
 end
 
 --[[
-Reads a singlematch input spec, saves it to LPDB, and displays the singlematch.
-]]
-function MatchGroupDisplay.SinglematchBySpec(args)
-	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'singlematch')
-	local matches = MatchGroupInput.readSinglematch(options.bracketId, args)
-	Match.storeMatchGroup(matches, options)
-
-	local matchNode
-	if options.show then
-		local SinglematchDisplay = Lua.import('Module:MatchGroup/Display/Singlematch', {requireDevIfEnabled = true})
-		local SinglematchContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('singlematch')
-		matchNode = SinglematchContainer({
-			bracketId = options.bracketId,
-			config = SinglematchDisplay.configFromArgs(args),
-		})
-	end
-
-	local parts = Array.extend(
-		{matchNode},
-		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox)
-	)
-	return table.concat(Array.map(parts, tostring))
-end
-
---[[
-Displays a singlematch, a matchlist or bracket specified by ID.
+Displays a matchlist or bracket specified by ID.
 ]]
 function MatchGroupDisplay.MatchGroupById(args)
 	local bracketId = args.id or args[1]
@@ -113,9 +88,6 @@ function MatchGroupDisplay.MatchGroupById(args)
 	if matchGroupType == 'matchlist' then
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
 		config = MatchlistDisplay.configFromArgs(args)
-	elseif matchGroupType == 'singlematch' then
-		local SinglematchDisplay = Lua.import('Module:MatchGroup/Display/Singlematch', {requireDevIfEnabled = true})
-		config = SinglematchDisplay.configFromArgs(args)
 	else
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
 		config = BracketDisplay.configFromArgs(args)
@@ -129,6 +101,34 @@ function MatchGroupDisplay.MatchGroupById(args)
 		config = config,
 	})
 end
+
+--[[
+Displays a singleMatch specified by a bracket ID and matchID.
+]]
+function MatchGroupDisplay.MatchByMatchId(args)
+	local bracketId = args.id or args[1]
+	args.id = bracketId
+	args[1] = bracketId
+	assert(bracketId, 'Missing bracket ID')
+	assert(args.matchid, 'Missing match ID')
+
+	local matches = MatchGroupUtil.fetchMatches(bracketId)
+	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
+	Table.filter(matches, function(match) return MatchGroupUtil.splitMatchId(match.matchId) == args.matchid end)
+	assert(#matches ~= 0, 'Match matchId=' .. args.matchid .. ' not found')
+
+	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
+	local config = SingleMatchDisplay.configFromArgs(args)
+
+	MatchGroupInput.applyOverrideArgs(matches, args)
+
+	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('singleMatch')
+	return MatchGroupContainer({
+		bracketId = bracketId,
+		config = config,
+	})
+end
+
 
 function MatchGroupDisplay.WarningBox(text)
 	local div = mw.html.create('div'):addClass('show-when-logged-in navigation-not-searchable ambox-wrapper')
@@ -153,10 +153,10 @@ function MatchGroupDisplay.TemplateBracket(frame)
 	return MatchGroupDisplay.BracketBySpec(args)
 end
 
--- Entry point of Template:Singlematch
-function MatchGroupDisplay.TemplateSinglematch(frame)
+-- Entry point of Template:SingleMatch
+function MatchGroupDisplay.TemplateShowSingleMatch(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchGroupDisplay.SinglematchBySpec(args)
+	return MatchGroupDisplay.MatchByMatchId(args)
 end
 
 -- Entry point of Template:ShowBracket, Template:DisplayMatchGroup

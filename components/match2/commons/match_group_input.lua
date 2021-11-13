@@ -23,34 +23,6 @@ local globalVars = PageVariableNamespace()
 
 local MatchGroupInput = {}
 
-function MatchGroupInput.readSinglematch(bracketId, args)
-	local sectionHeader = args.section or Variables.varDefault('bracket_header') or ''
-	Variables.varDefine('bracket_header', sectionHeader)
-	local tournamentParent = Variables.varDefault('tournament_parent', '')
-
-	local matches = {}
-	local matchArgs = args[1]
-	if matchArgs then
-		matchArgs = Json.parse(matchArgs)
-
-		matchArgs.bracketid = bracketId
-		matchArgs.matchid = 1
-		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
-		match.parent = tournamentParent
-
-		table.insert(matches, match)
-
-		-- Add more fields to bracket data
-		match.bracketdata = match.bracketdata or {}
-		local bracketData = match.bracketdata
-		bracketData.type = 'singlematch'
-		bracketData.bracketindex = Variables.varDefault('match2bracketindex', 0)
-		bracketData.sectionheader = sectionHeader
-	end
-
-	return matches
-end
-
 function MatchGroupInput.readMatchlist(bracketId, args)
 	local sectionHeader = args.section or Variables.varDefault('bracket_header') or ''
 	Variables.varDefine('bracket_header', sectionHeader)
@@ -226,7 +198,7 @@ function MatchGroupInput.applyOverrideArgs(matches, args)
 		for index, match in ipairs(matches) do
 			match.bracketData.header = args['M' .. index .. 'header'] or match.bracketData.header
 		end
-	elseif matchGroupType == 'bracket' then
+	else
 		for _, match in ipairs(matches) do
 			local _, baseMatchId = MatchGroupUtil.splitMatchId(match.matchId)
 			local matchKey = MatchGroupUtil.matchIdToKey(baseMatchId)

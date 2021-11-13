@@ -73,8 +73,8 @@ Called from MatchGroup/Display
 function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
 	if matchGroupType == 'matchlist' then
 		return Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
-	elseif matchGroupType == 'singlematch' then
-		return Lua.import('Module:MatchGroup/Display/Singlematch', {requireDevIfEnabled = true}).SinglematchContainer
+	elseif matchGroupType == 'singleMatch' then
+		return Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true}).SingleMatchContainer
 	else
 		return Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
 	end
