@@ -129,42 +129,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Cell{name = 'Status Resistance', content = {
 				CustomItem._positivePercentDisplay('statusresist')
 			}})
-			table.insert(widgets, Cell{name = 'Debuff Duration', content = {
-				CustomItem._positiveConcatedArgsForBase('debuffamp')
-			}})
-			table.insert(widgets, Cell{name = 'Spell Amplification', content = {
-				CustomItem._positivePercentDisplay('spellamp')
-			}})
-			table.insert(widgets, Cell{name = 'Bonus GPM', content = {
-				CustomItem._positiveConcatedArgsForBase('bonusgpm')
-			}})
-			table.insert(widgets, Cell{name = 'Turn Rate Speed', content = {
-				CustomItem._positiveConcatedArgsForBase('turnrate')
-			}})
-			table.insert(widgets, Cell{name = 'Projectile Speed', content = {
-				CustomItem._positiveConcatedArgsForBase('projectilespeed')
-			}})
-			table.insert(widgets, Cell{name = 'Attack Damage', content = {
-				CustomItem._negativeConcatedArgsForBase('damagedown')
-			}})
-			table.insert(widgets, Cell{name = 'Armor', content = {
-				CustomItem._negativeConcatedArgsForBase('armordown')
-			}})
-			table.insert(widgets, Cell{name = 'Attack Speed', content = {
-				CustomItem._negativeConcatedArgsForBase('attackspeeddown')
-			}})
-			table.insert(widgets, Cell{name = 'Max Mana', content = {
-				CustomItem._negativeConcatedArgsForBase('maxmanadown')
-			}})
-			table.insert(widgets, Cell{name = 'Base Attack Time', content = {
-				CustomItem._negativeConcatedArgsForBase('batdown')
-			}})
-			table.insert(widgets, Cell{name = 'Base Damage', content = {
-				CustomItem._positiveConcatedArgsForBase('basedamage')
-			}})
-			table.insert(widgets, Cell{name = 'Damage', content = {
-				CustomItem._positiveConcatedArgsForBase('damage')
-			}})
 			table.insert(widgets, Cell{name = 'Attack Speed', content = {
 				CustomItem._positiveConcatedArgsForBase('attackspeed')
 			}})
@@ -186,9 +150,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Cell{name = 'Cooldown Reduction', content = {
 				CustomItem._positiveConcatedArgsForBase('cdreduction')
 			}})
-			table.insert(widgets, Cell{name = 'Ability Haste', content = {
-				CustomItem._positiveConcatedArgsForBase('haste')
-			}})
 			table.insert(widgets, Cell{name = 'Critical Chance', content = {
 				CustomItem._positiveConcatedArgsForBase('critchance')
 			}})
@@ -197,12 +158,6 @@ function CustomInjector:parse(id, widgets)
 			}})
 			table.insert(widgets, Cell{name = 'Cast Range', content = {
 				CustomItem._positiveConcatedArgsForBase('castrange')
-			}})
-			table.insert(widgets, Cell{name = 'Day Vision', content = {
-				CustomItem._positiveConcatedArgsForBase('dayvision')
-			}})
-			table.insert(widgets, Cell{name = 'Night Vision', content = {
-				CustomItem._positiveConcatedArgsForBase('nightvision')
 			}})
 			table.insert(widgets, Cell{name = 'Movement Speed', content = {
 				CustomItem._movementSpeedDisplay()
@@ -373,25 +328,13 @@ function CustomItem._hasAttributes()
 		String.isEmpty(_args.statusresist) and
 		String.isEmpty(_args.debuffamp) and
 		String.isEmpty(_args.spellamp) and
-		String.isEmpty(_args.basedamage) and
-		String.isEmpty(_args.ad) and
 		String.isEmpty(_args.attackrange) and
 		String.isEmpty(_args.attackspeed) and
 		String.isEmpty(_args.movespeed) and
 		String.isEmpty(_args.movespeedmult) and
 		String.isEmpty(_args.lifesteal) and
 		String.isEmpty(_args.spellsteal) and
-		String.isEmpty(_args.turnrate) and
-		String.isEmpty(_args.projectilespeed) and
-		String.isEmpty(_args.dayvision) and
-		String.isEmpty(_args.nightvision) and
 		String.isEmpty(_args.maxhealth) and
-		String.isEmpty(_args.bonusgpm) and
-		String.isEmpty(_args.damagedown) and
-		String.isEmpty(_args.armordown) and
-		String.isEmpty(_args.attackspeeddown) and
-		String.isEmpty(_args.maxmanadown) and
-		String.isEmpty(_args.batdown) and
 		String.isEmpty(_args.critchance) and
 		String.isEmpty(_args.cdreduction) and
 		String.isEmpty(_args.physatk) and
