@@ -72,7 +72,32 @@ function MatchGroupDisplay.BracketBySpec(args)
 end
 
 --[[
-Displays a matchlist or bracket specified by ID.
+Reads a singlematch input spec, saves it to LPDB, and displays the singlematch.
+]]
+function MatchGroupDisplay.SinglematchBySpec(args)
+	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'singlematch')
+	local matches = MatchGroupInput.readSinglematch(options.bracketId, args)
+	Match.storeMatchGroup(matches, options)
+
+	local matchNode
+	if options.show then
+		local SinglematchDisplay = Lua.import('Module:MatchGroup/Display/Singlematch', {requireDevIfEnabled = true})
+		local SinglematchContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('singlematch')
+		matchNode = SinglematchContainer({
+			bracketId = options.bracketId,
+			config = SinglematchDisplay.configFromArgs(args),
+		})
+	end
+
+	local parts = Array.extend(
+		{matchNode},
+		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox)
+	)
+	return table.concat(Array.map(parts, tostring))
+end
+
+--[[
+Displays a singlematch, a matchlist or bracket specified by ID.
 ]]
 function MatchGroupDisplay.MatchGroupById(args)
 	local bracketId = args.id or args[1]
@@ -88,6 +113,9 @@ function MatchGroupDisplay.MatchGroupById(args)
 	if matchGroupType == 'matchlist' then
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
 		config = MatchlistDisplay.configFromArgs(args)
+	elseif matchGroupType == 'singlematch' then
+		local SinglematchDisplay = Lua.import('Module:MatchGroup/Display/Singlematch', {requireDevIfEnabled = true})
+		config = SinglematchDisplay.configFromArgs(args)
 	else
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
 		config = BracketDisplay.configFromArgs(args)
@@ -123,6 +151,12 @@ end
 function MatchGroupDisplay.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroupDisplay.BracketBySpec(args)
+end
+
+-- Entry point of Template:Singlematch
+function MatchGroupDisplay.TemplateSinglematch(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchGroupDisplay.SinglematchBySpec(args)
 end
 
 -- Entry point of Template:ShowBracket, Template:DisplayMatchGroup
