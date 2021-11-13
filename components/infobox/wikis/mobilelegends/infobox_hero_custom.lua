@@ -105,8 +105,6 @@ function CustomInjector:parse(id, widgets)
 				imageDefaultDark = _args.defaultdark or _args.defaultdarkmode,
 			},
 		}
-	elseif id == 'caption' then
-		table.insert(widgets, Center{content = {_args.quote}})
 	elseif id == 'type' then
 		local breakDownContents = {}
 		local lane = _args.lane
