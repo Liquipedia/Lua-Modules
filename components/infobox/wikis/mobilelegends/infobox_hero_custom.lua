@@ -30,8 +30,8 @@ local _args
 local _pagename = mw.title.getCurrentTitle().text
 local _frame
 
-local _BATTLE_POINTS_ICON = '[[File:Mobile_Legends_BP_icon.png|x16px|Blue Essence|link=Battle Points]]'
-local _DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Riot Points|x16px|link=Diamond]]'
+local _BATTLE_POINTS_ICON = '[[File:Mobile_Legends_BP_icon.png|x16px|Battle Points|link=Battle Points]]'
+local _DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Diamonds|x16px|link=Diamonds]]'
 
 function CustomHero.run(frame)
 	local unit = Unit(frame)
