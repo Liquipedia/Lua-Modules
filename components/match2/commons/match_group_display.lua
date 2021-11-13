@@ -111,6 +111,8 @@ function MatchGroupDisplay.MatchByMatchId(args)
 	args[1] = bracketId
 	assert(bracketId, 'Missing bracket ID')
 	assert(args.matchid, 'Missing match ID')
+	local matchIdLength = string.len(args.matchid)
+	args.matchid = string.rep('0', 4 - matchIdLength) .. args.matchid
 
 	local matches = MatchGroupUtil.fetchMatches(bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
