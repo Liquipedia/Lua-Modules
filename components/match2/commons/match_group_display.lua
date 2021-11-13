@@ -120,7 +120,7 @@ function MatchGroupDisplay.MatchByMatchId(args)
 		args.matchid = string.rep('0', 4 - matchIdLength) .. args.matchid
 
 		matches = Table.filter(matches, function(match)
-			local _, matchid = MatchGroupUtil.splitMatchId(match.matchId) 
+			local _, matchid = MatchGroupUtil.splitMatchId(match.matchId)
 			return matchid == args.matchid end
 		)
 
