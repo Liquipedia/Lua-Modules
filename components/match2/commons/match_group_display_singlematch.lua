@@ -12,7 +12,6 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
-local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
@@ -26,7 +25,6 @@ end
 
 SingleMatchDisplay.types.SingleMatchConfig = TypeUtil.struct({
 	MatchSummaryContainer = 'function',
-	matchHasDetails = 'function',
 	width = 'number',
 })
 SingleMatchDisplay.types.SingleMatchConfigOptions = TypeUtil.struct(
@@ -46,13 +44,13 @@ function SingleMatchDisplay.SingleMatchContainer(props)
 	DisplayUtil.assertPropTypes(props, SingleMatchDisplay.propTypes.SingleMatchContainer)
 	return SingleMatchDisplay.SingleMatch({
 		config = props.config,
-		matches = MatchGroupUtil.fetchMatches(props.bracketId),
+		match = props.match,
 	})
 end
 
 SingleMatchDisplay.propTypes.SingleMatch = {
 	config = TypeUtil.optional(SingleMatchDisplay.types.SingleMatchConfigOptions),
-	matches = TypeUtil.array(MatchGroupUtil.types.Match),
+	match = MatchGroupUtil.types.Match,
 }
 
 --[[
@@ -64,7 +62,6 @@ function SingleMatchDisplay.SingleMatch(props)
 	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-		matchHasDetails = propsConfig.matchHasDetails or matchHasDetailsWikiSpecific or DisplayHelper.defaultMatchHasDetails,
 		width = propsConfig.width or 400,
 	}
 
@@ -74,15 +71,14 @@ function SingleMatchDisplay.SingleMatch(props)
 		:css('max-height', 'unset')
 		:css('width', config.width .. 'px')
 
-	if #props.matches == 0 then
+	if not props.match then
 		-- No match, simply return
 		return ''
 	end
 
 	local matchNode = SingleMatchDisplay.Match{
 		MatchSummaryContainer = config.MatchSummaryContainer,
-		match = props.matches[1],
-		matchHasDetails = config.matchHasDetails,
+		match = props.match,
 	}
 
 	singleMatchNode:node(matchNode:css('width', config.width .. 'px'))
@@ -93,7 +89,6 @@ end
 SingleMatchDisplay.propTypes.Match = {
 	MatchSummaryContainer = 'function',
 	match = MatchGroupUtil.types.Match,
-	matchHasDetails = 'function',
 }
 
 --[[

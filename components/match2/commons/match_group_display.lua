@@ -112,25 +112,22 @@ function MatchGroupDisplay.MatchByMatchId(args)
 	assert(bracketId, 'Missing bracket ID')
 
 	local matches = MatchGroupUtil.fetchMatches(bracketId)
-	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
+	assert(#matches > 0, 'No data found for bracketId=' .. bracketId)
 
 	if (#matches > 1) then
 		assert(args.matchid, 'Missing match ID')
 		local matchIdLength = string.len(args.matchid)
 		args.matchid = string.rep('0', 4 - matchIdLength) .. args.matchid
-
-		matches = Table.filter(matches, function(match) return MatchGroupUtil.splitMatchId(match.matchId) == args.matchid end)
-		assert(#matches ~= 0, 'Match matchId=' .. args.matchid .. ' not found')
+		matches = Table.filter(matches, function(match) local _, matchid = MatchGroupUtil.splitMatchId(match.matchId) return matchid == args.matchid end)
+		assert(#matches == 1, 'Match matchId=' .. args.matchid .. ' not found')
 	end
 
 	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
 	local config = SingleMatchDisplay.configFromArgs(args)
 
-	MatchGroupInput.applyOverrideArgs(matches, args)
-
 	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('singleMatch')
 	return MatchGroupContainer({
-		bracketId = bracketId,
+		match = matches[1],
 		config = config,
 	})
 end
