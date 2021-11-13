@@ -119,7 +119,7 @@ function StarcraftMatchSummary._createScore(opponent, side, showScore)
 		scoreText = showScore and StarcraftOpponentDisplay.InlineScore(opponent) or '',
 		side = side
 	}
-end 
+end
 
 StarcraftMatchSummary.propTypes.Body = {
 	match = StarcraftMatchGroupUtil.types.Match,
