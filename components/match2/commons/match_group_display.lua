@@ -161,7 +161,7 @@ function MatchGroupDisplay.TemplateBracket(frame)
 	return MatchGroupDisplay.BracketBySpec(args)
 end
 
--- Entry point of Template:SingleMatch
+-- Entry point of Template:ShowSingleMatch
 function MatchGroupDisplay.TemplateShowSingleMatch(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroupDisplay.MatchByMatchId(args)
