@@ -22,7 +22,6 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	return InputModule.processMatch
 end)
 
-
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return matchGroupType == 'matchlist'
 		and Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
