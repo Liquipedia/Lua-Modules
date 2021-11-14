@@ -11,18 +11,22 @@ local Table = require('Module:Table')
 
 local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
 local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 local StarcraftSingleMatchDisplay = {propTypes = {}}
 
 function StarcraftSingleMatchDisplay.SingleMatchContainer(props)
-	local match = props.match
-	match.showScore = true
-	return SingleMatchDisplay.SingleMatch({
-		match = match,
-		config = Table.merge(props.config, {
-			MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
-		})
-	})
+	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
+
+	return match
+		and SingleMatchDisplay.SingleMatch{
+			match = match,
+			config = Table.merge(props.config, {
+				MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
+			})
+		}
+		or ''
 end
 
 return StarcraftSingleMatchDisplay
