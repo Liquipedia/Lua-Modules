@@ -81,7 +81,7 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Health Regen', parameter = 'hpregen'},
 			{name = 'Mana', parameter = 'mana'},
 			{name = 'Mana Regen', parameter = 'manaregen'},
-			{name = 'Mana Loss', funct = '_manaLossDisplay'},
+			{name = 'Evasion', parameter = 'manaloss', funct = '_positivePercentDisplay'},
 			{name = 'Lifesteal', parameter = 'lifesteal'},
 			{name = 'Physical Lifesteal', parameter = 'physsteal'},
 			{name = 'Magical Lifesteal', parameter = 'magicsteal'},
@@ -281,20 +281,6 @@ function CustomItem._getAttributeCells(attributeCells)
 	end
 
 	return widgets
-end
-
-function CustomItem._manaLossDisplay()
-	local manaLoss = _args['mana loss'] or _args.manaloss
-	if String.isEmpty(manaLoss) then
-		return nil
-	end
-
-	manaLoss = tonumber(manaLoss)
-	if String.isEmpty(manaLoss) then
-		error('"manaloss" has to be numerical')
-	end
-
-	return '+ ' .. (manaLoss + 100) .. '%'
 end
 
 return CustomItem
