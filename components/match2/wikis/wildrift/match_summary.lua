@@ -42,9 +42,9 @@ local ChampionBan = Class.new(
 
 function ChampionBan:createHeader()
 	self.table:tag('tr')
-		:tag('th'):css('width','40%'):wikitext(''):done()
-		:tag('th'):css('width','20%'):wikitext('Bans'):done()
-		:tag('th'):css('width','40%'):wikitext(''):done()
+		:tag('th'):css('width','36%'):wikitext(''):done()
+		:tag('th'):css('width','28%'):wikitext('Bans'):done()
+		:tag('th'):css('width','36%'):wikitext(''):done()
 	return self
 end
 
