@@ -614,7 +614,13 @@ function MatchGroupUtil.matchIdFromKey(matchKey)
 		return matchKey
 	end
 	local round, matchInRound = matchKey:match('^R(%d+)M(%d+)$')
-	return 'R' .. string.format('%02d', round) .. '-M' .. string.format('%03d', matchInRound)
+	if round and matchInRound then
+		-- Bracket format
+		return 'R' .. string.format('%02d', round) .. '-M' .. string.format('%03d', matchInRound)
+	else
+		-- Matchlist format
+		return string.format('%04d', matchKey)
+	end
 end
 
 return MatchGroupUtil
