@@ -269,7 +269,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:wikitext(CustomMatchSummary._createAbbreviation{
-			title = String.isEmpty(game.length) and ('Game ' .. gameIndex .. 'Picks') or 'Match Length',
+			title = String.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length',
 			text = game.length or ('Game ' .. gameIndex),
 		})
 	)
