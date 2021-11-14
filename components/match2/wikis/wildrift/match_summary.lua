@@ -228,7 +228,7 @@ function CustomMatchSummary._createBody(match)
 			championBan:banRow(banData, gameIndex, banData.numberOfBans)
 		end
 
-		body:addRow(ChampionBan)
+		body:addRow(championBan)
 	end
 
 	return body
