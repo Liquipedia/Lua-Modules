@@ -9,7 +9,7 @@
 local Item = require('Module:Infobox/Item')
 local String = require('Module:StringUtils')
 local Namespace = require('Module:Namespace')
-local Template = require('Module:Template')
+local Icon = require('Module:Icon')
 local Table = require('Module:Table')
 local ItemIcon = require('Module:ItemIcon')
 local Class = require('Module:Class')
@@ -83,6 +83,7 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Health Regen', parameter = 'hpregen'},
 			{name = 'Mana', parameter = 'mana'},
 			{name = 'Mana Regen', parameter = 'manaregen'},
+			{name = 'Mana Loss', funct = '_manaLossDisplay'},
 			{name = 'Lifesteal', parameter = 'lifesteal'},
 			{name = 'Physical Lifesteal', parameter = 'physsteal'},
 			{name = 'Magical Lifesteal', parameter = 'magicsteal'},
@@ -207,26 +208,14 @@ function CustomItem._getCostDisplay()
 
 	local innerDiv = CustomItem._costInnerDiv(table.concat(costs, '&nbsp;/&nbsp;'))
 	local outerDiv = mw.html.create('div')
-		:wikitext(Template.safeExpand(
-				_frame,
-				'icons',
-				{'gold', size = '21px'},
-				''
-			) .. ' ' .. tostring(innerDiv)
-		)
+		:wikitext(Icon.display({}, 'gold', '21') .. ' ' .. tostring(innerDiv))
 	local display = tostring(outerDiv)
 
 	if String.isNotEmpty(_args.recipecost) then
 		innerDiv = CustomItem._costInnerDiv('(' .. _args.recipecost .. ')')
 		outerDiv = mw.html.create('div')
 			:css('padding-top', '3px')
-			:wikitext(Template.safeExpand(
-					_frame,
-					'icons',
-					{'recipe', size = '21px'},
-					''
-				) .. ' ' .. tostring(innerDiv)
-			)
+			:wikitext(Icon.display({}, 'recipe', '21') .. ' ' .. tostring(innerDiv))
 		display = display .. tostring(outerDiv)
 	end
 
@@ -252,6 +241,9 @@ end
 function CustomItem._positivePercentDisplay(base)
 	if String.isNotEmpty(_args[base]) then
 		local number = tonumber(_args[base])
+		if number == nil then
+			error('"' .. base .. '" has to be numerical')
+		end
 		number = number * 100
 		return '+ ' .. number .. '%'
 	end
@@ -292,6 +284,20 @@ function CustomItem._getAttributeCells(attributeCells)
 	end
 
 	return widgets
+end
+
+function CustomItem._manaLossDisplay()
+	local manaLoss = _args['mana loss'] or _args.manaloss
+	if String.isEmpty(manaLoss) then
+		return nil
+	end
+	
+	manaLoss = tonumber(manaLoss)
+	if String.isEmpty(manaLoss) then
+		error('"manaloss" has to be numerical')
+	end
+	manaLoss = (manaLoss + 100)
+	return '+ ' .. manaloss .. '%'
 end
 
 return CustomItem
