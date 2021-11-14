@@ -100,8 +100,6 @@ end
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
-	local frame = mw.getCurrentFrame()
-
 	local matchSummary = MatchSummary():init('420px')
 	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
@@ -181,9 +179,9 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	local mvp = match.extradata.mvp
-	if mvp then
-		local mvpData = mw.text.split(mvp or '', ',')
+	local mvpInput = match.extradata.mvp
+	if mvpInput then
+		local mvpData = mw.text.split(mvpInput or '', ',')
 		if String.isNotEmpty(mvpData[1]) then
 			local mvp = MVP()
 			for _, player in ipairs(mvpData) do
@@ -224,10 +222,10 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add the Champion Bans
 	if not Table.isEmpty(showGameBans) then
-		local ChampionBan = ChampionBan()
+		local championBan = ChampionBan()
 
 		for gameIndex, banData in ipairs(showGameBans) do
-			ChampionBan:banRow(banData, gameIndex, banData.numberOfBans)
+			championBan:banRow(banData, gameIndex, banData.numberOfBans)
 		end
 
 		body:addRow(ChampionBan)
