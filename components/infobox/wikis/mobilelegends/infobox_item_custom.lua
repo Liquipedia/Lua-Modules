@@ -81,7 +81,7 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Health Regen', parameter = 'hpregen'},
 			{name = 'Mana', parameter = 'mana'},
 			{name = 'Mana Regen', parameter = 'manaregen'},
-			{name = 'Evasion', parameter = 'manaloss', funct = '_positivePercentDisplay'},
+			{name = 'Mana Loss', parameter = 'manaloss', funct = '_positivePercentDisplay'},
 			{name = 'Lifesteal', parameter = 'lifesteal'},
 			{name = 'Physical Lifesteal', parameter = 'physsteal'},
 			{name = 'Magical Lifesteal', parameter = 'magicsteal'},
