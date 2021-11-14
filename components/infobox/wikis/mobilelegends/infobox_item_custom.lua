@@ -133,7 +133,6 @@ function CustomInjector:parse(id, widgets)
 			return {
 				Title{name = 'Item Tier'},
 				Cell{name = 'Category', content = {CustomItem._categoryDisplay()}},
-				Cell{name = 'Bought From', content = CustomItem._shopDisplay()},
 				Cell{name = 'Dropped From', content = {_args.drop}},
 			}
 		else return {} end
@@ -243,24 +242,10 @@ function CustomItem._costInnerDiv(text)
 		:wikitext(text)
 end
 
-function CustomItem._attributeIcons(attributeType)
-	_args[attributeType] = _args[attributeType] or 0
-	local attributes = Item:getAllArgsForBase(_args, attributeType)
-	return Template.safeExpand(_frame, 'AttributeIcon', {attributeType}, '')
-		.. '<br><b>+ ' .. table.concat(attributes, '/ ') .. '</b>'
-end
-
 function CustomItem._positiveConcatedArgsForBase(base)
 	if String.isNotEmpty(_args[base]) then
 		local foundArgs = Item:getAllArgsForBase(_args, base)
 		return '+ ' .. table.concat(foundArgs, '&nbsp;/&nbsp;')
-	end
-end
-
-function CustomItem._negativeConcatedArgsForBase(base)
-	if String.isNotEmpty(_args[base]) then
-		local foundArgs = Item:getAllArgsForBase(_args, base)
-		return '- ' .. table.concat(foundArgs, '&nbsp;/&nbsp;')
 	end
 end
 
@@ -269,19 +254,6 @@ function CustomItem._positivePercentDisplay(base)
 		local number = tonumber(_args[base])
 		number = number * 100
 		return '+ ' .. number .. '%'
-	end
-end
-
-function CustomItem._manaLossDisplay()
-	local display = ''
-	if String.isNotEmpty(_args['mana loss']) then
-		display = (tonumber(_args['mana loss']) + 100) .. '%'
-	end
-	if String.isNotEmpty(_args.manaloss) then
-		display = display .. (tonumber(_args.manaloss) + 100) .. '%'
-	end
-	if display ~= '' then
-		return '+ ' .. display
 	end
 end
 
@@ -305,18 +277,6 @@ function CustomItem._categoryDisplay()
 	else
 		table.insert(_categories, 'Unknown Type')
 	end
-end
-
-function CustomItem._shopDisplay()
-	local contents = {}
-	local index = 1
-	_args.shop1 = _args.shop1 or _args.shop
-	while String.isNotEmpty(_args['shop' .. index]) do
-		local shop = Template.safeExpand(_frame, 'Shop', {_args['shop' .. index]})
-		table.insert(contents, shop)
-		index = index + 1
-	end
-	return contents
 end
 
 function CustomItem._getAttributeCells(attributeCells)
