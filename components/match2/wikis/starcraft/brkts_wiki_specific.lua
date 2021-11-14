@@ -22,22 +22,17 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	return InputModule.processMatch
 end)
 
+
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	if matchGroupType == 'matchlist' then
-		return Lua.import(
-			'Module:MatchGroup/Display/Matchlist/Starcraft',
-			{requireDevIfEnabled = true}
-		).MatchlistContainer
-	elseif matchGroupType == 'singleMatch' then
-		return Lua.import(
-			'Module:MatchGroup/Display/SingleMatch/Starcraft',
-			{requireDevIfEnabled = true}
-		).SingleMatchContainer
-	else
-		return Lua.import(
-			'Module:MatchGroup/Display/Bracket/Starcraft',
-			{requireDevIfEnabled = true}
-		).BracketContainer
+	return matchGroupType == 'matchlist'
+		and Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
+		or Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
+end
+
+function WikiSpecific.getMatchContainer(displayMode)
+	if displayMode == 'singleMatch' then
+		-- Single match, displayed flat on a page (no popup)
+		return Lua.import('Module:MatchGroup/Display/SingleMatch/Starcraft', {requireDevIfEnabled = true}).SingleMatchContainer
 	end
 end
 
