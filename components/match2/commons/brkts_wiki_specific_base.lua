@@ -71,12 +71,27 @@ Called from MatchGroup/Display
 -- @returns module
 ]]
 function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
-	if matchGroupType == 'matchlist' then
-		return Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
-	elseif matchGroupType == 'singleMatch' then
-		return Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true}).SingleMatchContainer
-	else
-		return Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
+	return matchGroupType == 'matchlist'
+		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
+		or Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
+end
+
+--[[
+Returns a display component for single match. The display component must
+be a container, i.e. it takes in a match ID rather than a matches.
+See the default implementation (pointed to below) for details.
+
+To customize single match display for a wiki, override this to return
+a display component with the wiki-specific customizations.
+
+Called from MatchGroup/Display
+
+-- @returns module
+]]
+function WikiSpecificBase.getMatchContainer(displayMode)
+    if displayMode == 'singleMatch' then
+        -- Single match, displayed flat on a page (no popup)
+        return Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true}).SingleMatchContainer
 	end
 end
 

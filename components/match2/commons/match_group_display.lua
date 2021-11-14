@@ -122,7 +122,7 @@ function MatchGroupDisplay.MatchByMatchId(args)
 	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
 	local config = SingleMatchDisplay.configFromArgs(args)
 
-	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('singleMatch')
+	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchContainer('singleMatch')
 	return MatchGroupContainer({
 		matchId = fullMatchId,
 		config = config,
