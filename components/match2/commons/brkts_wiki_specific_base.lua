@@ -89,9 +89,9 @@ Called from MatchGroup/Display
 -- @returns module
 ]]
 function WikiSpecificBase.getMatchContainer(displayMode)
-    if displayMode == 'singleMatch' then
-        -- Single match, displayed flat on a page (no popup)
-        return Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true}).SingleMatchContainer
+	if displayMode == 'singleMatch' then
+		-- Single match, displayed flat on a page (no popup)
+		return Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true}).SingleMatchContainer
 	end
 end
 
