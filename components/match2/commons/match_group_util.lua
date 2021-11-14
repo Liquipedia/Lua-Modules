@@ -383,7 +383,7 @@ function MatchGroupUtil.gameFromRecord(record)
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
-		length = tonumber(record.length),
+		length = record.length,
 		map = nilIfEmpty(record.map),
 		mode = nilIfEmpty(record.mode),
 		participants = Json.parseIfString(record.participants) or {},
