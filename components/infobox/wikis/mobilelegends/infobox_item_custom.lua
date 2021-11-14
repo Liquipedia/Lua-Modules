@@ -41,7 +41,6 @@ local _DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION = '_positiveConcatedArgsForBase'
 function CustomItem.run(frame)
 	local item = Item(frame)
 	_args = item.args
-	_frame = frame
 
 	item.nameDisplay = CustomItem.nameDisplay
 	item.getWikiCategories = CustomItem.getWikiCategories
