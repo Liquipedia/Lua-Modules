@@ -11,6 +11,7 @@ local String = require('Module:StringUtils')
 local Namespace = require('Module:Namespace')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
+local ItemIcon = require('Module:ItemIcon')
 local Class = require('Module:Class')
 
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -68,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 			)
 		end
 		if String.isNotEmpty(_args.itemname) then
-			local iconImage = Template.safeExpand(_frame, 'ItemIcon', {string.lower(_args.itemname)}, '')
+			local iconImage = ItemIcon.display({}, _args.itemname)
 			if String.isNotEmpty(_args.itemtext) then
 				iconImage = iconImage .. '<br><i>' .. _args.itemtext .. '</i>'
 			end
@@ -76,19 +77,6 @@ function CustomInjector:parse(id, widgets)
 		end
 		return widgets
 	elseif id == 'attributes' then
-		widgets = {}
-		if
-			String.isNotEmpty(_args.str) or
-			String.isNotEmpty(_args.agi) or
-			String.isNotEmpty(_args.int)
-		then
-			table.insert(widgets, Breakdown{classes = {'infobox-center'}, content = {
-				CustomItem._attributeIcons('str'),
-				CustomItem._attributeIcons('agi'),
-				CustomItem._attributeIcons('int'),
-			}})
-		end
-
 		local attributeCells = {
 			{name = 'Health', parameter = 'hp'},
 			{name = 'Max Health', parameter = 'maxhealth'},
@@ -113,28 +101,29 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Critical Chance', parameter = 'critreduction'},
 			{name = 'Movement Speed', funct = '_movementSpeedDisplay'},
 		}
-		widgets = CustomItem._getAttributeCells(attributeCells, widgets)
+		widgets = CustomItem._getAttributeCells(attributeCells)
 		if not Table.isEmpty(widgets) then
 			table.insert(widgets, 1, Title{name = 'Attributes'})
 		end
 		return widgets
 	elseif id == 'ability' then
 		if
-			String.isNotEmpty(_args.use) or
-			String.isNotEmpty(_args.active) or
-			String.isNotEmpty(_args.passive)
+			String.isEmpty(_args.use) and
+			String.isEmpty(_args.active) and
+			String.isEmpty(_args.passive)
 		then
-			table.insert(widgets, Cell{name = 'Use', content = {
-				_args.use
-			}})
-			table.insert(widgets, Cell{name = 'Active', content = {
-				_args.active
-			}})
-			table.insert(widgets, Cell{name = 'Passive', content = {
-				_args.passive,
-				_args.passive2
-			}})
-		else return {} end
+			return {}
+		end
+		table.insert(widgets, Cell{name = 'Use', content = {
+			_args.use
+		}})
+		table.insert(widgets, Cell{name = 'Active', content = {
+			_args.active
+		}})
+		table.insert(widgets, Cell{name = 'Passive', content = {
+			_args.passive,
+			_args.passive2
+		}})
 	elseif id == 'availability' then
 		if
 			String.isNotEmpty(_args.category) or
@@ -149,17 +138,18 @@ function CustomInjector:parse(id, widgets)
 			}
 		else return {} end
 	elseif id == 'maps' then
-		if
-			String.isNotEmpty(_args.sr) or
-			String.isNotEmpty(_args.ha)
-		then
+		if String.isEmpty(_args.sr) and String.isEmpty(_args.ha) then
+			return {}
+		else
 			table.insert(widgets, Cell{name = '[[Summoner\'s Rift]]', content = {_args.sr}})
 			table.insert(widgets, Cell{name = '[[Howling Abyss]]', content = {_args.ha}})
-		else return {} end
+		end
 	elseif id == 'recipe' then
-		if String.isNotEmpty(_args.recipe) then
+		if String.isEmpty(_args.recipe) then
+			return {}
+		else
 			table.insert(widgets, Center{content = {_args.recipe}})
-		else return {} end
+		end
 	elseif id == 'info' then return {}
 	end
 
@@ -180,7 +170,7 @@ function CustomItem.getWikiCategories()
 			table.insert(_categories, 'Attribute Items')
 		end
 
-		if not (String.isEmpty(_args.movespeed) and String.isEmpty(_args.movespeedmult)) then
+		if String.isNotEmpty(_args.movespeed) or String.isNotEmpty(_args.movespeedmult) then
 			table.insert(_categories, 'Movement Speed Items')
 		end
 
@@ -216,12 +206,7 @@ end
 function CustomItem._getCostDisplay()
 	local costs = Item:getAllArgsForBase(_args, 'itemcost')
 
-	local innerDiv = mw.html.create('div')
-		:css('display', 'inline-block')
-		:css('padding', '0px 3px')
-		:css('border-radius', '4px')
-		:addClass('placement-darkgrey')
-		:wikitext(table.concat(costs, '&nbsp;/&nbsp;'))
+	local innerDiv = CustomItem._costInnerDiv(table.concat(costs, '&nbsp;/&nbsp;'))
 	local outerDiv = mw.html.create('div')
 		:wikitext(Template.safeExpand(
 				_frame,
@@ -233,12 +218,7 @@ function CustomItem._getCostDisplay()
 	local display = tostring(outerDiv)
 
 	if String.isNotEmpty(_args.recipecost) then
-		innerDiv = mw.html.create('div')
-			:css('display', 'inline-block')
-			:css('padding', '0px 3px')
-			:css('border-radius', '4px')
-			:addClass('placement-darkgrey')
-			:wikitext('(' .. _args.recipecost .. ')')
+		innerDiv = CustomItem._costInnerDiv('(' .. _args.recipecost .. ')')
 		outerDiv = mw.html.create('div')
 			:css('padding-top', '3px')
 			:wikitext(Template.safeExpand(
@@ -252,6 +232,15 @@ function CustomItem._getCostDisplay()
 	end
 
 	return {display}
+end
+
+function CustomItem._costInnerDiv(text)
+	return mw.html.create('div')
+		:css('display', 'inline-block')
+		:css('padding', '0px 3px')
+		:css('border-radius', '4px')
+		:addClass('placement-darkgrey')
+		:wikitext(text)
 end
 
 function CustomItem._attributeIcons(attributeType)
@@ -330,12 +319,16 @@ function CustomItem._shopDisplay()
 	return contents
 end
 
-function CustomItem._getAttributeCells(attributeCells, widgets)
+function CustomItem._getAttributeCells(attributeCells)
+	local widgets = {}
 	for _, attribute in ipairs(attributeCells) do
 		local funct = attribute.funct or _DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
-		table.insert(widgets, Cell{name = attribute.name, content = {
-			CustomItem[funct](attribute.parameter)
-		}})
+		local content = CustomItem[funct](attribute.parameter)
+		if String.isNotEmpty(content) then
+			table.insert(widgets, Cell{name = attribute.name, content = {
+				CustomItem[funct](attribute.parameter)
+			}})
+		end
 	end
 
 	return widgets
