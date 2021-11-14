@@ -101,6 +101,7 @@ function SingleMatchDisplay.Match(props)
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.match.matchId,
+		config = {showScore = true},
 	})
 
 	return matchSummaryNode
