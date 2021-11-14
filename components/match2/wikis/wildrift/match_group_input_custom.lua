@@ -13,6 +13,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
+local ChampionNames = mw.loadData('Module:ChampionNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
@@ -501,11 +502,12 @@ function mapFunctions.getParticipants(map, opponents)
 	local championData = {}
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
-			championData['team' .. opponentIndex .. 'champion' .. playerIndex] =
-				map['team' .. opponentIndex .. 'champion' .. playerIndex] or
+			local champ = map['team' .. opponentIndex .. 'champion' .. playerIndex] or
 				map['t' .. opponentIndex .. 'c' .. playerIndex] or
 				map['team' .. opponentIndex .. 'hero' .. playerIndex] or
 				map['t' .. opponentIndex .. 'h' .. playerIndex]
+			championData['team' .. opponentIndex .. 'champion' .. playerIndex] =
+				ChampionNames[champ] or champ
 
 			championData['team' .. opponentIndex .. 'kda' .. playerIndex] =
 				map['team' .. opponentIndex .. 'kda' .. playerIndex] or
