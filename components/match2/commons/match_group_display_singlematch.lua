@@ -43,8 +43,9 @@ The component fetches the match data from LPDB or page variables.
 function SingleMatchDisplay.SingleMatchContainer(props)
 	DisplayUtil.assertPropTypes(props, SingleMatchDisplay.propTypes.SingleMatchContainer)
 
-	local bracketId, matchId = MatchGroupUtil.splitMatchId(props.matchId)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId)
+	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
+
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
 	return match
 		and SingleMatchDisplay.SingleMatch({
 			config = props.config,

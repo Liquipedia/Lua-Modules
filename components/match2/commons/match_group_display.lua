@@ -124,7 +124,7 @@ function MatchGroupDisplay.MatchByMatchId(args)
 
 	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('singleMatch')
 	return MatchGroupContainer({
-		match = fullMatchId,
+		matchId = fullMatchId,
 		config = config,
 	})
 end
