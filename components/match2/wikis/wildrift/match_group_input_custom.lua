@@ -530,7 +530,7 @@ function mapFunctions.getParticipants(map, opponents)
 		local currentBan = map['team' .. opponentIndex .. 'ban' .. banIndex]
 			or map['t' .. opponentIndex .. 'b' .. banIndex]
 		while currentBan do
-			championData['team' .. opponentIndex .. 'champion' .. banIndex] = currentBan
+			championData['team' .. opponentIndex .. 'ban' .. banIndex] = currentBan
 			banIndex = banIndex + 1
 			currentBan = map['team' .. opponentIndex .. 'ban' .. banIndex]
 				or map['t' .. opponentIndex .. 'b' .. banIndex]
