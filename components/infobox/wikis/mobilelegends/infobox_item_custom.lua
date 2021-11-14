@@ -25,7 +25,6 @@ local CustomItem = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _frame
 local _categories = {}
 
 local _CATEGORY_DISPLAY = {
@@ -250,14 +249,13 @@ function CustomItem._positivePercentDisplay(base)
 end
 
 function CustomItem._movementSpeedDisplay()
-	local display = ''
+	local display
 	if String.isNotEmpty(_args.movespeed) then
 		display = _args.movespeed
+	elseif String.isNotEmpty(tonumber(_args.movespeedmult or '')) then
+		display = (tonumber(_args.movespeedmult) + 100) .. '%'
 	end
-	if String.isNotEmpty(_args.movespeedmult) then
-		display = display .. (tonumber(_args.movespeedmult) + 100) .. '%'
-	end
-	if display ~= '' then
+	if String.isNotEmpty(display) then
 		return '+ ' .. display
 	end
 end
@@ -291,13 +289,13 @@ function CustomItem._manaLossDisplay()
 	if String.isEmpty(manaLoss) then
 		return nil
 	end
-	
+
 	manaLoss = tonumber(manaLoss)
 	if String.isEmpty(manaLoss) then
 		error('"manaloss" has to be numerical')
 	end
-	manaLoss = (manaLoss + 100)
-	return '+ ' .. manaloss .. '%'
+
+	return '+ ' .. (manaLoss + 100) .. '%'
 end
 
 return CustomItem
