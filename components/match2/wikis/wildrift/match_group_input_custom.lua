@@ -120,7 +120,6 @@ function CustomMatchGroupInput.placementCheckDraw(table)
 end
 
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
-mw.logObject(indexedScores)
 	-- Map or Match wasn't played, set not played
 	if
 		data.finished == 'skip' or
