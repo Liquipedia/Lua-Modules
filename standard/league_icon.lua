@@ -12,6 +12,8 @@ local Template = require('Module:Template')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
+local _FILLER = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
+
 ---display an image in the fashion of LeagueIconSmall templates
 --i.e. it displays the icon in dark/light mode (depending on reader mode)
 --in a span with customizable link, hooverDisplay
@@ -36,9 +38,9 @@ function LeagueIcon.display(args)
 		})
 	end
 
-	--if icon is not given and can not be retrieved return empty string
+	--if icon is not given and can not be retrieved return filler icon
 	if String.isEmpty(icon) then
-		return ''
+		return _FILLER
 	end
 
 	if String.isEmpty(iconDark) then
