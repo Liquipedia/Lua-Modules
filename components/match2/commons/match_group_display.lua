@@ -17,6 +17,7 @@ local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled
 local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local MatchGroupDisplay = {}
 
@@ -31,7 +32,7 @@ function MatchGroupDisplay.MatchlistBySpec(args)
 	local matchlistNode
 	if options.show then
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
-		local MatchlistContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('matchlist')
+		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist')
 		matchlistNode = MatchlistContainer({
 			bracketId = options.bracketId,
 			config = MatchlistDisplay.configFromArgs(args),
@@ -56,7 +57,7 @@ function MatchGroupDisplay.BracketBySpec(args)
 	local bracketNode
 	if options.show then
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
-		local BracketContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('bracket')
+		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket')
 		bracketNode = BracketContainer({
 			bracketId = options.bracketId,
 			config = BracketDisplay.configFromArgs(args),
@@ -95,7 +96,7 @@ function MatchGroupDisplay.MatchGroupById(args)
 
 	MatchGroupInput.applyOverrideArgs(matches, args)
 
-	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer(matchGroupType)
+	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return MatchGroupContainer({
 		bracketId = bracketId,
 		config = config,
@@ -122,7 +123,7 @@ function MatchGroupDisplay.MatchByMatchId(args)
 	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
 	local config = SingleMatchDisplay.configFromArgs(args)
 
-	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchContainer('singleMatch')
+	local MatchGroupContainer = WikiSpecific.getMatchContainer('singleMatch')
 	return MatchGroupContainer({
 		matchId = fullMatchId,
 		config = config,
