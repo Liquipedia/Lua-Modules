@@ -397,6 +397,7 @@ function matchFunctions.getOpponents(match)
 			-- apply status
 			opponent.score = string.upper(opponent.score or '')
 			if Logic.isNumeric(opponent.score) then
+				opponent.score = tonumber(opponent.score)
 				opponent.status = 'S'
 				isScoreSet = true
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
