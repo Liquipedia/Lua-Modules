@@ -66,7 +66,7 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	match.extradata = mw.ext.LiquipediaDB.lpdb_create_Json(match.extradata)
+	match.extradata = mw.ext.LiquipediaDB.lpdb_create_json(match.extradata)
 
 	-- Handle Opponents
 	local handleOpponent = function (index)
@@ -83,7 +83,7 @@ function MatchLegacy._convertParameters(match2)
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
 				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
 			end
-			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_Json(opponentplayers)
+			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
 		elseif opponent.type == 'solo' then
 			local player = opponentmatch2players[1] or {}
 			match[prefix] = player.name
@@ -119,7 +119,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.team1side = extradata.team1side
 		game.extradata.team2side = extradata.team2side
 
-		game.extradata = mw.ext.LiquipediaDB.lpdb_create_Json(game.extradata)
+		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
 
 		-- Other stuff
 		game.opponent1 = match.opponent1
