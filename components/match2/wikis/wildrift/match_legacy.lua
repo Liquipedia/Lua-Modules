@@ -140,7 +140,6 @@ function MatchLegacy.storeGames(match, match2)
 end
 
 function MatchLegacy.storeMatchSMW(match, match2)
-	local icon = Variables.varDefault('tournament_icon', '')
 	local data = {
 		'legacymatch_' .. match2.match2id,
 		'is map number=1',
