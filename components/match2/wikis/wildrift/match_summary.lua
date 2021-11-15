@@ -42,9 +42,9 @@ local ChampionBan = Class.new(
 
 function ChampionBan:createHeader()
 	self.table:tag('tr')
-		:tag('th'):css('width','36%'):wikitext(''):done()
-		:tag('th'):css('width','28%'):wikitext('Bans'):done()
-		:tag('th'):css('width','36%'):wikitext(''):done()
+		:tag('th'):css('width','40%'):wikitext(''):done()
+		:tag('th'):css('width','20%'):wikitext('Bans'):done()
+		:tag('th'):css('width','40%'):wikitext(''):done()
 	return self
 end
 
@@ -330,28 +330,36 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 	opponentChampionsData.color = nil
 
 	for index = 1, numberOfChampions do
-		table.insert(opponentChampionsDisplay, ChampionIcon._getImage{
+		local champDisplay = mw.html.create('div')
+		:addClass('brkts-popup-side-color-' .. color)
+		:css('padding-left', '1px')--remove after css cache is gone
+		:css('padding-right', '1px')--remove after css cache is gone
+		:css('padding-top', '2px')--remove after css cache is gone
+		:css('padding-bottom', '2px')--remove after css cache is gone
+		:css('float', flip and 'right' or 'left')
+		:node(ChampionIcon._getImage{
 			champ = opponentChampionsData[index],
-			size = '25px',
+			class = 'brkts-champion-icon',
 		})
-	end
-
-	if flip then
-		opponentChampionsDisplay = Array.reverse(opponentChampionsDisplay)
+		if index == 1 then
+			champDisplay:css('padding-' .. (flip and 'right' or 'left'), '2px')
+		elseif index == numberOfChampions then
+			champDisplay:css('padding-' .. (flip and 'left' or 'right'), '2px')
+		end
+		table.insert(opponentChampionsDisplay, champDisplay)
 	end
 
 	local display = mw.html.create('div')
 	if isBan then
 		display:addClass('brkts-popup-side-shade-out')
+		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
+	end
+
+	for _, item in ipairs(opponentChampionsDisplay) do
+		display:node(item)
 	end
 
 	return display
-		:node(
-			mw.html.create('div')
-				:addClass('brkts-popup-side-color-' .. color)
-				:css('padding', '2px')
-				:wikitext(table.concat(opponentChampionsDisplay, ' '))
-		)
 end
 
 return CustomMatchSummary
