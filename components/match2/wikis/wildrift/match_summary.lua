@@ -15,7 +15,6 @@ local Lua = require('Module:Lua')
 local ChampionIcon = require('Module:ChampionIcon')
 local Table = require('Module:Table')
 local ExternalLinks = require('Module:ExternalLinks')
-local Array = require('Module:Array')
 local String = require('Module:StringUtils')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
