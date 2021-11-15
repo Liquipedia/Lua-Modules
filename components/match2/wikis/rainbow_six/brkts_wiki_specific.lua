@@ -12,7 +12,7 @@ local Table = require('Module:Table')
 
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
-local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
+local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
 
 WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
