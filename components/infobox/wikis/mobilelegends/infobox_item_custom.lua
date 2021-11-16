@@ -124,16 +124,16 @@ function CustomInjector:parse(id, widgets)
 		}})
 	elseif id == 'availability' then
 		if
-			String.isNotEmpty(_args.category) or
-			String.isNotEmpty(_args.shop) or
-			String.isNotEmpty(_args.drop)
+			String.isEmpty(_args.category) and
+			String.isEmpty(_args.drop)
 		then
-			return {
-				Title{name = 'Item Tier'},
-				Cell{name = 'Category', content = {CustomItem._categoryDisplay()}},
-				Cell{name = 'Dropped From', content = {_args.drop}},
-			}
-		else return {} end
+			return {}
+		end
+		return {
+			Title{name = 'Item Tier'},
+			Cell{name = 'Category', content = {CustomItem._categoryDisplay()}},
+			Cell{name = 'Dropped From', content = {_args.drop}},
+		}
 	elseif id == 'maps' then
 		if String.isEmpty(_args.sr) and String.isEmpty(_args.ha) then
 			return {}
