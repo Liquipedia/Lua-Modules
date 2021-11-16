@@ -187,7 +187,7 @@ function Team:getStandardLocationValue(location)
 		)
 	end
 
-	return nationalityToStore
+	return locationToStore
 end
 
 function Team:_addWarnings()
