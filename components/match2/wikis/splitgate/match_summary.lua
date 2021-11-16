@@ -110,23 +110,6 @@ function p.getByMatchId(args)
 		end
 	end
 
-	-- Vetoes
-	local vetoData = (match.extradata or {}).mapveto
-	if not Table.isEmpty(vetoData) then
-		for index, vetoMap in ipairs(vetoData) do
-			local vetoElements = p._getVetoDisplay(vetoMap.map, vetoMap.by)
-			if index == 1 then
-				table.insert(vetoElements, 1, p._breakNode())
-				table.insert(vetoElements, 1, htmlCreate('div')
-					:css('font-size','85%')
-					:css('margin','auto')
-					:wikitext('Vetoes')
-				)
-			end
-			body = p._addFlexRow(body, vetoElements, 'brkts-popup-body-game')
-		end
-	end
-
 	wrapper:node(body):node(p._breakNode())
 
 	-- comment
