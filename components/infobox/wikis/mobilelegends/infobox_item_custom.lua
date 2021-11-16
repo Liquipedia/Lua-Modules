@@ -44,7 +44,6 @@ function CustomItem.run(frame)
 
 	item.nameDisplay = CustomItem.nameDisplay
 	item.getWikiCategories = CustomItem.getWikiCategories
-	--item.setLpdbData = CustomItem.setLpdbData--to be added later
 	item.createWidgetInjector = CustomItem.createWidgetInjector
 
 	return item:createInfobox(frame)
