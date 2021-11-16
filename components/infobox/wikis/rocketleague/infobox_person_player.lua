@@ -25,8 +25,9 @@ local Center = require('Module:Infobox/Widget/Center')
 
 local _BANNED = mw.loadData('Module:Banned')
 
-local _pagename = mw.title.getCurrentTitle().prefixedText
-local _base_page_name = mw.title.getCurrentTitle().baseText
+local _title = mw.title.getCurrentTitle()
+local _pagename = _title.prefixedText
+local _base_page_name = _title.baseText
 
 local CustomPlayer = Class.new()
 
