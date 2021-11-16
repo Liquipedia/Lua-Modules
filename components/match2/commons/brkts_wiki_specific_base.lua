@@ -71,13 +71,9 @@ Called from MatchGroup/Display
 -- @returns module
 ]]
 function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
-	if matchGroupType == 'matchlist' then
-		return Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
-	elseif matchGroupType == 'singleMatch' then
-		return Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true}).SingleMatchContainer
-	else
-		return Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
-	end
+	return matchGroupType == 'matchlist'
+		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
+		or Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
 end
 
 --[[
