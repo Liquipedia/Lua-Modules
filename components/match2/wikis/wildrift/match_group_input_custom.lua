@@ -11,7 +11,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local ChampionNames = mw.loadData('Module:ChampionNames')
 
@@ -396,7 +395,9 @@ function matchFunctions.getOpponents(match)
 			end
 
 			-- apply status
-			if TypeUtil.isNumeric(opponent.score) then
+			opponent.score = string.upper(opponent.score or '')
+			if Logic.isNumeric(opponent.score) then
+				opponent.score = tonumber(opponent.score)
 				opponent.status = 'S'
 				isScoreSet = true
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
@@ -418,6 +419,20 @@ function matchFunctions.getOpponents(match)
 
 			opponents[opponentIndex] = opponent
 		end
+	end
+
+	--apply walkover input
+	match.walkover = string.upper(match.walkover or '')
+	if Logic.isNumeric(match.walkover) then
+		local winnerIndex = tonumber(match.walkover)
+		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, 'L')
+		opponents[winnerIndex].status = 'W'
+		match.finished = true
+	elseif Logic.isNumeric(match.winner) and Table.includes(ALLOWED_STATUSES, match.walkover) then
+		local winnerIndex = tonumber(match.winner)
+		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, match.walkover)
+		opponents[winnerIndex].status = 'W'
+		match.finished = true
 	end
 
 	-- see if match should actually be finished if bestof limit was reached
@@ -443,7 +458,12 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- apply placements and winner if finshed
-	if not String.isEmpty(match.winner) or Logic.readBool(match.finished) then
+	if
+		not String.isEmpty(match.winner) or
+		Logic.readBool(match.finished) or
+		CustomMatchGroupInput.placementCheckSpecialStatus(opponents)
+	then
+		match.finished = true
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
@@ -452,6 +472,13 @@ function matchFunctions.getOpponents(match)
 		match['opponent' .. opponentIndex] = opponent
 	end
 	return match
+end
+
+function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
+	for index, _ in pairs(opponents) do
+		opponents[index].score = -1
+		opponents[index].status = walkoverType
+	end
 end
 
 -- Get Playerdata from Vars (get's set in TeamCards)
@@ -566,7 +593,7 @@ function mapFunctions.getScoresAndWinner(map)
 		local score = map['score' .. scoreIndex] or map['t' .. scoreIndex .. 'score']
 		local obj = {}
 		if not Logic.isEmpty(score) then
-			if TypeUtil.isNumeric(score) then
+			if Logic.isNumeric(score) then
 				obj.status = 'S'
 				score = tonumber(score)
 				map['score' .. scoreIndex] = score
