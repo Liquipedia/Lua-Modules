@@ -28,6 +28,16 @@ function WikiSpecific.getMatchGroupContainer(matchGroupType)
 		or Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
 end
 
+function WikiSpecific.getMatchContainer(displayMode)
+	if displayMode == 'singleMatch' then
+		-- Single match, displayed flat on a page (no popup)
+		return Lua.import(
+			'Module:MatchGroup/Display/SingleMatch/Starcraft',
+			{requireDevIfEnabled = true}
+		).SingleMatchContainer
+	end
+end
+
 --Default Logo for Teams without Team Template
 WikiSpecific.defaultIcon = 'StarCraft default allmode.png'
 
