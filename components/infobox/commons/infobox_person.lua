@@ -214,6 +214,7 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. (args.id or self.name), lpdbData)
 end
 
+-- Allows this function to be used in /Custom
 function Person:getStandardLocationValue(location)
 	return Flags.CountryName(location)
 end
