@@ -238,7 +238,7 @@ end
 function Person:_addWarnings()
 	local warningsDisplay = ''
 	for _, warning in pairs(_warnings) do
-		warningsDisplay = warningsDisplay .. WarningBox.display(warning)
+		warningsDisplay = warningsDisplay .. tostring(WarningBox.display(warning))
 	end
 	return warningsDisplay
 end
