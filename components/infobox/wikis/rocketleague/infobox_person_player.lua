@@ -152,9 +152,6 @@ end
 
 function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	if Namespace.isMain() then
-		if personType == 'Coach' then
-			personType = 'Coache'
-		end
 		local role = string.lower(args.role or '')
 		local categories = {}
 
@@ -183,11 +180,16 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 			end
 		end
 
+		local personTypePostFix = 's'
+		if personType == 'Coach' then
+			personTypePostFix = 'es'
+		end
+
 		if args.country2 or args.nationality2 then
-			table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
+			table.insert(categories, 'Dual Citizenship ' .. personType .. personTypePostFix)
 		end
 		if args.death_date then
-			table.insert(categories, 'Deceased ' .. personType .. 's')
+			table.insert(categories, 'Deceased ' .. personType .. personTypePostFix)
 		end
 
 		if
@@ -195,15 +197,15 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 			or string.lower(status or '') == 'retired'
 			or string.match(args.retired or '', '%d%d%d%d')--if `|retired` has year set
 		then
-			table.insert(categories, 'Retired ' .. personType .. 's')
+			table.insert(categories, 'Retired ' .. personType .. personTypePostFix)
 		end
 
 		if not args.image then
-			table.insert(categories, personType .. 's with no profile picture')
+			table.insert(categories, personType .. personTypePostFix .. ' with no profile picture')
 		end
 
 		if String.isEmpty(birthDisplay) then
-			table.insert(categories, personType .. 's with unknown birth date')
+			table.insert(categories, personType .. personTypePostFix .. ' with unknown birth date')
 		end
 
 		if string.lower(args.game or '') == 'sarpbc' then
