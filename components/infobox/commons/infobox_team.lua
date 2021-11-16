@@ -12,6 +12,7 @@ local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
+local WarningBox = require('Module:WarningBox')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -25,6 +26,8 @@ local Builder = Widgets.Builder
 local Team = Class.new(BasicInfobox)
 
 local _LINK_VARIANT = 'team'
+
+local _warnings = {}
 
 function Team.run(frame)
 	local team = Team(frame)
@@ -148,7 +151,7 @@ function Team:createInfobox()
 		self:defineCustomPageVariables(args)
 	end
 
-	return builtInfobox
+	return tostring(builtInfobox) .. self:_addWarnings()
 end
 
 function Team:_createRegion(region)
@@ -169,8 +172,21 @@ function Team:_createLocation(location)
 			'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
-function Team:_getStandardLocationValue(location)
-	return Flags.CountryName(location) or location
+function Team:getStandardLocationValue(location)
+	if String.isEmpty(location) then
+		return nil
+	end
+
+	local locationToStore = Flags.CountryName(location)
+
+	if String.isEmpty(locationToStore) then
+		table.insert(
+			_warnings,
+			'"' .. location .. '" is not supported as a value for locations'
+		)
+	end
+
+	return nationalityToStore
 end
 
 function Team:_setLpdbData(args, links)
@@ -178,8 +194,8 @@ function Team:_setLpdbData(args, links)
 
 	local lpdbData = {
 		name = name,
-		location = self:_getStandardLocationValue(args.location),
-		location2 = self:_getStandardLocationValue(args.location2),
+		location = self:getStandardLocationValue(args.location),
+		location2 = self:getStandardLocationValue(args.location2),
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
 		createdate = args.created,
