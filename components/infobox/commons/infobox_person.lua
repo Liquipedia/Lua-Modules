@@ -192,9 +192,9 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		name = args.romanized_name or args.name,
 		romanizedname = args.romanized_name or args.name,
 		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
-		nationality = args.country or args.nationality,
-		nationality2 = args.country2 or args.nationality2,
-		nationality3 = args.country3 or args.nationality3,
+		nationality = Person:getStandardLocationValue(args.country or args.nationality),
+		nationality2 = Person:getStandardLocationValue(args.country2 or args.nationality2),
+		nationality3 = Person:getStandardLocationValue(args.country3 or args.nationality3),
 		birthdate = Variables.varDefault('player_birthdate'),
 		deathdate = Variables.varDefault('player_deathhdate'),
 		image = args.image,
@@ -212,6 +212,10 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 	local storageType = self:getStorageType(args, personType, status)
 
 	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. (args.id or self.name), lpdbData)
+end
+
+function Person:getStandardLocationValue(location)
+	return Flags.CountryName(location)
 end
 
 --- Allows for overriding this functionality
