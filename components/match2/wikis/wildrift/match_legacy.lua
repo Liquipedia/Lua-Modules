@@ -36,7 +36,7 @@ function MatchLegacy._convertParameters(match2)
 	end
 	match.links = nil
 
-	if match.walkover then
+	if String.isNotEmpty(match.walkover) then
 		match.resulttype = match.walkover
 		match.walkover = match.winner
 	end
