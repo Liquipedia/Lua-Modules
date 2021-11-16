@@ -12,6 +12,7 @@ local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
+local String = require('Module:StringUtils')
 local WarningBox = require('Module:WarningBox')
 local BasicInfobox = require('Module:Infobox/Basic')
 
