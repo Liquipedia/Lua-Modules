@@ -189,6 +189,14 @@ function Team:getStandardLocationValue(location)
 	return nationalityToStore
 end
 
+function Team:_addWarnings()
+	local warningsDisplay = ''
+	for _, warning in pairs(_warnings) do
+		warningsDisplay = warningsDisplay .. tostring(WarningBox.display(warning))
+	end
+	return warningsDisplay
+end
+
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 
