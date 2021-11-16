@@ -22,26 +22,37 @@ local Header = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
 		self.root:addClass('brkts-popup-header-dev')
+		self.root:css('justify-content', 'center')
 	end
 )
 
-function Header:left(content)
-	self.leftElement = content:addClass('brkts-popup-header-opponent')
+function Header:leftOpponent(content)
+	self.leftElement = content
 	return self
 end
 
-function Header:right(content)
-	self.rightElement = content:addClass('brkts-popup-header-opponent')
+function Header:leftScore(content)
+	self.leftScore = content:addClass('brkts-popup-header-opponent-score-left')
 	return self
 end
 
-function Header:score(content)
-	self.scoreElement = content:addClass('brkts-popup-header-score')
+function Header:rightScore(content)
+	self.rightScore = content:addClass('brkts-popup-header-opponent-score-right')
+	return self
+end
+
+function Header:rightOpponent(content)
+	self.rightElement = content
 	return self
 end
 
 function Header:create()
-	self.root:node(self.leftElement):node(self.scoreElement or ''):node(self.rightElement)
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
+		:node(self.leftElement)
+		:node(self.leftScore or '')
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
+		:node(self.rightScore or '')
+		:node(self.rightElement)
 	return self.root
 end
 
