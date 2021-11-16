@@ -143,7 +143,7 @@ MatchGroupUtil.types.MatchGroup = TypeUtil.struct({
 	rootMatchIds = TypeUtil.array('string'),
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
-	type = TypeUtil.literalUnion('matchlist, bracket'),
+	type = TypeUtil.literalUnion('matchlist', 'bracket'),
 	upperMatchIds = TypeUtil.table('string', 'string'),
 })
 
@@ -614,7 +614,13 @@ function MatchGroupUtil.matchIdFromKey(matchKey)
 		return matchKey
 	end
 	local round, matchInRound = matchKey:match('^R(%d+)M(%d+)$')
-	return 'R' .. string.format('%02d', round) .. '-M' .. string.format('%03d', matchInRound)
+	if round and matchInRound then
+		-- Bracket format
+		return 'R' .. string.format('%02d', round) .. '-M' .. string.format('%03d', matchInRound)
+	else
+		-- Matchlist format
+		return string.format('%04d', matchKey)
+	end
 end
 
 return MatchGroupUtil
