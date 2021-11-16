@@ -57,7 +57,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	if bestof ~= 0 then
 		for i = 1, bestof do
 			Array.appendWith(lines,
-				indent .. '|map' .. i .. '={{Map|map=|mode=',
+				indent .. '|map' .. i .. '={{Map',
 				indent .. indent .. '|team1side=|team2side=|length=|winner=',
 				indent .. indent .. '<!-- Champion/Hero picks -->',
 				indent .. indent .. '|t1c1=|t1c2=|t1c3=|t1c4=|t1c5=',
