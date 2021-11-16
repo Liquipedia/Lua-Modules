@@ -152,7 +152,7 @@ function Team:createInfobox()
 		self:defineCustomPageVariables(args)
 	end
 
-	return tostring(builtInfobox) .. self:_addWarnings()
+	return tostring(builtInfobox) .. WarningBox.displayMultiFromTable(_warnings)
 end
 
 function Team:_createRegion(region)
@@ -185,17 +185,10 @@ function Team:getStandardLocationValue(location)
 			_warnings,
 			'"' .. location .. '" is not supported as a value for locations'
 		)
+		locationToStore = nil
 	end
 
 	return locationToStore
-end
-
-function Team:_addWarnings()
-	local warningsDisplay = ''
-	for _, warning in pairs(_warnings) do
-		warningsDisplay = warningsDisplay .. tostring(WarningBox.display(warning))
-	end
-	return warningsDisplay
 end
 
 function Team:_setLpdbData(args, links)
