@@ -13,6 +13,7 @@ local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
+local Math = require('Module:Math')
 local Matches = require('Module:Upcoming ongoing and recent matches player/new')
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
@@ -138,6 +139,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _earningsGlobal[tostring(_CURRENT_YEAR)]
 	if currentYearEarnings then
+		currentYearEarnings = Math.round{currentYearEarnings, 2}
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
@@ -291,27 +293,30 @@ end
 function CustomCommentator._addScoresToVS(vs, opponents, commentator)
 	local plIndex = 1
 	local vsIndex = 2
-	if opponents[2].name == commentator then
-		plIndex = 2
-		vsIndex = 1
+	--catch matches vs empty opponents
+	if opponents[1] and opponents[2] then
+		if opponents[2].name == commentator then
+			plIndex = 2
+			vsIndex = 1
+		end
+		local plOpp = opponents[plIndex]
+		local vsOpp = opponents[vsIndex]
+
+		local prace = CleanRace[plOpp.match2players[1].extradata.faction] or 'r'
+		local orace = CleanRace[vsOpp.match2players[1].extradata.faction] or 'r'
+
+		vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
+		vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+		vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score or 0) or 0)
+		vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+		vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score or 0) or 0)
+		vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+
+		vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
+		vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
 	end
-	local plOpp = opponents[plIndex]
-	local vsOpp = opponents[vsIndex]
-
-	local prace = CleanRace[plOpp.match2players[1].extradata.faction] or 'r'
-	local orace = CleanRace[vsOpp.match2players[1].extradata.faction] or 'r'
-
-	vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
-	vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-	vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score or 0) or 0)
-	vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-	vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score or 0) or 0)
-	vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
-
-	vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
-	vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
 
 	return vs
 end
@@ -344,7 +349,7 @@ end
 function CustomCommentator:calculateEarnings()
 	local earningsTotal
 	earningsTotal, _earningsGlobal = CustomCommentator._getEarningsMedalsData(self.pagename)
-	earningsTotal = math.floor( (earningsTotal or 0) * 100 + 0.5) / 100
+	earningsTotal = Math.round{earningsTotal, 2}
 	return earningsTotal
 end
 

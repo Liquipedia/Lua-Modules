@@ -21,7 +21,9 @@ local getIconName = require('Module:IconName').luaGet
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
-local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
+local _STATUS_HAS_SCORE = 'S'
+local _STATUS_DEFAULT_WIN = 'W'
+local ALLOWED_STATUSES = { _STATUS_DEFAULT_WIN, 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
@@ -108,8 +110,8 @@ end
 function p._placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
-	local op1norm = op1.status == 'S'
-	local op2norm = op2.status == 'S'
+	local op1norm = op1.status == _STATUS_HAS_SCORE
+	local op2norm = op2.status == _STATUS_HAS_SCORE
 	if op1norm then
 		if op2norm then
 			local op1setwins = p._getSetWins(op1)
@@ -122,10 +124,10 @@ function p._placementSortFunction(table, key1, key2)
 		else return true end
 	else
 		if op2norm then return false
-		elseif op1.status == 'W' then return true
-		elseif op1.status == 'DQ' then return false
-		elseif op2.status == 'W' then return false
-		elseif op2.status == 'DQ' then return true
+		elseif op1.status == _STATUS_DEFAULT_WIN then return true
+		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
+		elseif op2.status == _STATUS_DEFAULT_WIN then return false
+		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
 end
@@ -279,7 +281,7 @@ function matchFunctions.getOpponents(args)
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
-				opponent.status = 'S'
+				opponent.status = _STATUS_HAS_SCORE
 				isScoreSet = true
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
@@ -303,8 +305,9 @@ function matchFunctions.getOpponents(args)
 		args.resulttype = 'default'
 	end
 
+	local autofinished = String.isNotEmpty(args.autofinished) and args.autofinished or true
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(args.finished) then
+	if isScoreSet and Logic.readBool(autofinished) and not Logic.readBool(args.finished) then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
@@ -320,12 +323,18 @@ function matchFunctions.getOpponents(args)
 		local placement = 1
 		local lastScore
 		local lastPlacement = 1
+		local lastStatus
 		-- luacheck: push ignore
 		for opponentIndex, opponent in Table.iter.spairs(opponents, p._placementSortFunction) do
+			if opponent.status ~= _STATUS_HAS_SCORE and opponent.status ~= _STATUS_DEFAULT_WIN and placement == 1 then
+				placement = 2
+			end
 			if placement == 1 then
 				args.winner = opponentIndex
 			end
-			if opponent.status == 'S' and opponent.score == lastScore then
+			if opponent.status == _STATUS_HAS_SCORE and opponent.score == lastScore then
+				opponent.placement = lastPlacement
+			elseif opponent.status ~= _STATUS_HAS_SCORE and opponent.status == lastStatus then
 				opponent.placement = lastPlacement
 			else
 				opponent.placement = placement
@@ -334,6 +343,7 @@ function matchFunctions.getOpponents(args)
 			placement = placement + 1
 			lastScore = opponent.score
 			lastPlacement = opponent.placement
+			lastStatus = opponent.status
 		end
 	-- luacheck: pop
 	-- only apply arg changes otherwise
@@ -342,9 +352,25 @@ function matchFunctions.getOpponents(args)
 			args['opponent' .. opponentIndex] = opponent
 		end
 	end
-	if winner == _RESULT_TYPE_DRAW or winner == '0' then
+	if
+		winner == _RESULT_TYPE_DRAW or
+		winner == '0' or (
+			Logic.readBool(args.finished) and
+			#opponents == 2 and
+			opponents[1].status == _STATUS_HAS_SCORE and
+			opponents[2].status == _STATUS_HAS_SCORE and
+			opponents[1].score == opponents[2].score
+		)
+	then
 		args.winner = 0
 		args.resulttype = _RESULT_TYPE_DRAW
+	elseif
+		Logic.readBool(args.finished) and
+		#opponents == 2 and
+		opponents[1].status ~= _STATUS_HAS_SCORE and
+		opponents[1].status == opponents[2].status
+	then
+		args.winner = 0
 	end
 	return args
 end
@@ -387,7 +413,8 @@ function mapFunctions.getScoresAndWinner(map)
 		local obj = {}
 		if not Logic.isEmpty(score) then
 			if TypeUtil.isNumeric(score) then
-				obj.status = 'S'
+				score = tonumber(score)
+				obj.status = _STATUS_HAS_SCORE
 				obj.score = score
 				obj.index = scoreIndex
 			elseif Table.includes(ALLOWED_STATUSES, score) then
@@ -420,18 +447,18 @@ function mapFunctions.getWinner(indexedScores)
 end
 
 function mapFunctions.mapWinnerSortFunction(op1, op2)
-	local op1norm = op1.status == 'S'
-	local op2norm = op2.status == 'S'
+	local op1norm = op1.status == _STATUS_HAS_SCORE
+	local op2norm = op2.status == _STATUS_HAS_SCORE
 	if op1norm then
 		if op2norm then
 			return tonumber(op1.score) > tonumber(op2.score)
 		else return true end
 	else
 		if op2norm then return false
-		elseif op1.status == 'W' then return true
-		elseif op1.status == 'DQ' then return false
-		elseif op2.status == 'W' then return false
-		elseif op2.status == 'DQ' then return true
+		elseif op1.status == _STATUS_DEFAULT_WIN then return true
+		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
+		elseif op2.status == _STATUS_DEFAULT_WIN then return false
+		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
 end

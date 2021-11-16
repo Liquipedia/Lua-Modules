@@ -94,17 +94,104 @@ require('Module:FeatureFlag').set('dev', nil)
 function Lua.invoke(frame)
 	local moduleName = frame.args.module
 	local fnName = frame.args.fn
-	if StringUtils.endsWith(moduleName, '/dev') then
-		error('Lua.invoke: Module name should not end in \'/dev\'')
-	end
-	assert(moduleName, 'Lua.invoke: args.fn is missing')
+	assert(moduleName, 'Lua.invoke: args.module is missing')
 	assert(fnName, 'Lua.invoke: args.fn is missing')
+	assert(
+		not StringUtils.endsWith(moduleName, '/dev'),
+		'Lua.invoke: Module name should not end in \'/dev\''
+	)
+	assert(
+		not StringUtils.startsWith(moduleName, 'Module:'),
+		'Lua.invoke: Module name should not begin with \'Module:\''
+	)
+
+	frame.args.module = nil
+	frame.args.fn = nil
 
 	local flags = {dev = Logic.readBoolOrNil(frame.args.dev)}
 	return require('Module:FeatureFlag').with(flags, function()
 		local module = Lua.import('Module:' .. moduleName, {requireDevIfEnabled = true})
 		return module[fnName](frame)
 	end)
+end
+
+--[[
+Incorporates Lua.invoke functionality into an entry point. The resulting entry
+point can be #invoked directly, without needing Lua.invoke.
+
+Usage:
+
+function JayModule.TemplateJay(frame) ... end
+JayModule.TemplateJay = Lua.wrapAutoInvoke(JayModule, 'Module:JayModule', 'TemplateJay')
+
+]]
+function Lua.wrapAutoInvoke(module, baseModuleName, fnName)
+	assert(
+		not StringUtils.endsWith(baseModuleName, '/dev'),
+		'Lua.wrapAutoInvoke: Module name should not end in \'/dev\''
+	)
+	assert(
+		StringUtils.startsWith(baseModuleName, 'Module:'),
+		'Lua.wrapAutoInvoke: Module name must begin with \'Module:\''
+	)
+
+	local moduleFn = module[fnName]
+
+	return function(frame)
+		local dev
+		if type(frame.args) == 'table' then
+			dev = frame.args.dev
+		else
+			dev = frame.dev
+		end
+
+		local flags = {dev = Logic.readBoolOrNil(dev)}
+		return require('Module:FeatureFlag').with(flags, function()
+			local variantModule = Lua.import(baseModuleName, {requireDevIfEnabled = true})
+			local fn = module == variantModule and moduleFn or variantModule[fnName]
+			return fn(frame)
+		end)
+	end
+end
+
+--[[
+Incorporates Lua.invoke functionality into entry points of a module. The entry
+points can then be invoked directly, without needing Lua.invoke.
+
+This is intended for widely #invoked entry points where it is difficult to
+migrate existing wikicode calls to Lua.invoke. Avoid applying on entry points
+#invoked by a single template.
+
+Functions whose names begin with 'Template' are assumed to be the entry points.
+Specify fnNames to override this.
+
+Usage:
+local Jay = {}
+function Jay.TemplateJay(frame) ... end
+
+Lua.autoInvokeEntryPoints(JayModule, 'Module:JayModule')
+
+]]
+function Lua.autoInvokeEntryPoints(module, baseModuleName, fnNames)
+	fnNames = fnNames or Lua.getDefaultEntryPoints(module)
+
+	for _, fnName in ipairs(fnNames) do
+		module[fnName] = Lua.wrapAutoInvoke(module, baseModuleName, fnName)
+	end
+end
+
+--[[
+Returns the functions whose names begin with 'Template'. Functions that start
+with 'Template' are presumably entry points.
+]]
+function Lua.getDefaultEntryPoints(module)
+	local fnNames = {}
+	for fnName, fn in pairs(module) do
+		if type(fn) == 'function' and StringUtils.startsWith(fnName, 'Template') then
+			table.insert(fnNames, fnName)
+		end
+	end
+	return fnNames
 end
 
 return Lua

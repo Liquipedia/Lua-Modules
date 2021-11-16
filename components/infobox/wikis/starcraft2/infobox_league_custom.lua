@@ -28,6 +28,8 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _next
+local _previous
 
 local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local _TODAY = os.date('%Y-%m-%d', os.time())
@@ -220,6 +222,8 @@ function CustomLeague:_createTierDisplay()
 
 	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_tiertype', tierType)
+	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
+	Variables.varDefine('tournament_liquipediatiertype', tierType)
 	return output
 end
 
@@ -275,10 +279,10 @@ function CustomLeague._getGameVersion()
 end
 
 function CustomLeague._getChronologyData()
-	local next, previous = CustomLeague._computeChronology()
+	_next, _previous = CustomLeague._computeChronology()
 	return {
-		previous = previous,
-		next = next,
+		previous = _previous,
+		next = _next,
 		previous2 = _args.previous2,
 		next2 = _args.next2,
 		previous3 = _args.previous3,
@@ -575,6 +579,8 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.status = status
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
+	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
+	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
 
 	return lpdbData
 end
@@ -601,6 +607,14 @@ function CustomLeague:_createNoWrappingSpan(content)
 	span:css('white-space', 'nowrap')
 		:node(content)
 	return span
+end
+
+function CustomLeague:_getPageNameFromChronology(item)
+	if String.isEmpty(item) then
+		return ''
+	end
+
+	return mw.text.split(item, '|')[1]
 end
 
 return CustomLeague

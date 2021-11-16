@@ -173,8 +173,17 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 end
 
 MatchGroupUtil.fetchMatchGroup = FnUtil.memoize(function(bracketId)
+	local matchRecords = MatchGroupUtil.fetchMatchRecords(bracketId)
+	return MatchGroupUtil.makeMatchGroup(matchRecords)
+end)
+
+--[[
+Creates a match group structure from its match records. Returns a value of type
+MatchGroupUtil.types.MatchGroup.
+]]
+function MatchGroupUtil.makeMatchGroup(matchRecords)
 	local matches = Array.map(
-		MatchGroupUtil.fetchMatchRecords(bracketId),
+		matchRecords,
 		require('Module:Brkts/WikiSpecific').matchFromRecord
 	)
 
@@ -206,7 +215,7 @@ MatchGroupUtil.fetchMatchGroup = FnUtil.memoize(function(bracketId)
 	end
 
 	return matchGroup
-end)
+end
 
 --[[
 Fetches all matches in a matchlist or bracket. Returns a list of structurally
@@ -374,7 +383,7 @@ function MatchGroupUtil.gameFromRecord(record)
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
-		length = tonumber(record.length),
+		length = record.length,
 		map = nilIfEmpty(record.map),
 		mode = nilIfEmpty(record.mode),
 		participants = Json.parseIfString(record.participants) or {},

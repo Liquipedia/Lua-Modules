@@ -22,7 +22,7 @@ local BasicInfobox = Class.new(
 			return error('Please provide a wiki!')
 		end
 
-		self.infobox = Infobox:create(frame, self.args.wiki)
+		self.infobox = Infobox:create(frame, self.args.wiki, Logic.readBool(self.args.darkmodeforced))
 	end
 )
 

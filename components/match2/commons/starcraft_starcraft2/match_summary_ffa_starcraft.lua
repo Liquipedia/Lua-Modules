@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Placement = require('Module:Placement')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
@@ -92,4 +91,4 @@ function CustomFfaMatchSummary.computeRowHeight(match)
 	return maxHeight
 end
 
-return Class.export(CustomFfaMatchSummary)
+return CustomFfaMatchSummary

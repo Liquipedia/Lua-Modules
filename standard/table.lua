@@ -6,14 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----
--- @author Vogan for Liquipedia
---
--- A number of these functions take inspiration from Penlight: https://github.com/lunarmodules/Penlight
---
-
---local Class = require('Module:Class')
-
 local Table = {}
 
 function Table.randomize(tbl)
@@ -130,6 +122,31 @@ function Table.deepCopy(tbl_, options)
 end
 
 --[[
+Determines whether two tables are equal, by comparing their entries. Table
+values are compared recursively.
+]]
+function Table.deepEquals(xTable, yTable)
+	local Logic = require('Module:Logic')
+
+	assert(type(xTable) == 'table', 'Table.deepEquals: First argument must be a table')
+	assert(type(yTable) == 'table', 'Table.deepEquals: Second argument must be a table')
+
+	for key, value in pairs(xTable) do
+		if not Logic.deepEquals(value, yTable[key]) then
+			return false
+		end
+	end
+
+	for key, _ in pairs(yTable) do
+		if xTable[key] == nil then
+			return false
+		end
+	end
+
+	return true
+end
+
+--[[
 Copies entries from the second table into the first table, overriding existing
 entries. The first table is mutated in the process.
 
@@ -154,6 +171,35 @@ the later tables given precedence. Input tables are not mutated.
 ]]
 function Table.merge(...)
 	return Table.mergeInto({}, ...)
+end
+
+--[[
+Recursively merges entries from the second table into the first table,
+overriding existing entries. The first table is mutated in the process.
+
+Can be called with more than two tables. The additional tables are merged into
+the first table in succession. All tables except the last table may be mutated.
+
+Example:
+Table.deepMergeInto({a = {x = 3, y = 4}}, {a = {y = 5}})
+
+-- Returns {a = {x = 3, y = 5}}
+]]
+function Table.deepMergeInto(target, ...)
+	local tbls = Table.pack(...)
+
+	for i = 1, tbls.n do
+		if type(tbls[i]) == 'table' then
+			for key, value in pairs(tbls[i]) do
+				if type(target[key]) == 'table' and type(value) == 'table' then
+					Table.deepMergeInto(target[key], value)
+				else
+					target[key] = value
+				end
+			end
+		end
+	end
+	return target
 end
 
 --[[

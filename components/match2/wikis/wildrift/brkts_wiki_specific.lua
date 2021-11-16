@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=wildrift
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,9 +10,7 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-
-local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
+local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
 
 WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
@@ -34,13 +32,12 @@ WikiSpecific.processPlayer = FnUtil.lazilyDefineFunction(function()
 	return InputModule.processPlayer
 end)
 
-function WikiSpecific.matchHasDetails(match)
-	return match.dateIsExact
-		or match.date ~= _EPOCH_TIME_EXTENDED
-		or match.vod
-		or not Table.isEmpty(match.links)
-		or match.comment
-		or 0 < #match.games
+function WikiSpecific.getMatchGroupContainer(matchGroupType)
+	return matchGroupType == 'matchlist'
+		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
+		or Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
 end
+
+WikiSpecific.defaultIcon = 'Wild_Rift_Teamcard.png'
 
 return WikiSpecific

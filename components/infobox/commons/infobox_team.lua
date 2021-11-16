@@ -94,8 +94,16 @@ function Team:createInfobox()
 		Customizable{
 			id = 'achievements',
 			children = {
-				Title{name = 'Achievements'},
-				Center{content = {args.achievements}}
+				Builder{
+					builder = function()
+						if args.achievements then
+							return {
+								Title{name = 'Achievements'},
+								Center{content = {args.achievements}}
+							}
+						end
+					end
+				}
 			}
 		},
 		Customizable{
@@ -137,6 +145,7 @@ function Team:createInfobox()
 
 	if Namespace.isMain() then
 		self:_setLpdbData(args, links)
+		self:defineCustomPageVariables(args)
 	end
 
 	return builtInfobox
@@ -187,6 +196,10 @@ function Team:_setLpdbData(args, links)
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
+end
+
+--- Allows for overriding this functionality
+function Team:defineCustomPageVariables(args)
 end
 
 function Team:addToLpdb(lpdbData, args)

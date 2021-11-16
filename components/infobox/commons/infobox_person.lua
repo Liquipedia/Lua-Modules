@@ -47,6 +47,9 @@ function Person:createInfobox()
 	end
 
 	_shouldStoreData = Person:shouldStoreData(args)
+	-- set custom variables here already so they are available
+	-- in functions we call from here on
+	self:defineCustomPageVariables(args)
 
 	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
@@ -69,9 +72,9 @@ function Person:createInfobox()
 		Title{name = (args.informationType or 'Player') .. ' Information'},
 		Cell{name = 'Name', content = {args.name}},
 		Cell{name = 'Romanized Name', content = {args.romanized_name}},
-		Cell{
-			name = 'Nationality',
-			content = self:_createLocations(args, personType.category)
+		Customizable{id = 'nationality', children = {
+				Cell{name = 'Nationality', content = self:_createLocations(args, personType.category)}
+			}
 		},
 		Cell{name = 'Born', content = {age.birth}},
 		Cell{name = 'Died', content = {age.death}},
@@ -95,7 +98,10 @@ function Person:createInfobox()
 		Customizable{id = 'teams', children = {
 			Cell{name = 'Team', content = {
 						self:_createTeam(args.team, args.teamlink),
-						self:_createTeam(args.team2, args.teamlink2)
+						self:_createTeam(args.team2, args.teamlink2),
+						self:_createTeam(args.team3, args.teamlink3),
+						self:_createTeam(args.team4, args.teamlink4),
+						self:_createTeam(args.team5, args.teamlink5)
 					}
 				}
 			}
@@ -185,7 +191,7 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		alternateid = args.ids,
 		name = args.romanized_name or args.name,
 		romanizedname = args.romanized_name or args.name,
-		localizedname = args.name,
+		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
 		nationality = args.country or args.nationality,
 		nationality2 = args.country2 or args.nationality2,
 		nationality3 = args.country3 or args.nationality3,
@@ -205,7 +211,11 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
 	local storageType = self:getStorageType(args, personType, status)
 
-	mw.ext.LiquipediaDB.lpdb_player(storageType .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. (args.id or self.name), lpdbData)
+end
+
+--- Allows for overriding this functionality
+function Person:defineCustomPageVariables(args)
 end
 
 --- Allows for overriding this functionality
@@ -237,12 +247,23 @@ end
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
 function Person:nameDisplay(args)
-	local team = args.teamlink or args.team or ''
+	local team = string.lower(args.teamicon or args.ttlink or args.teamlink or args.team or '')
 	local icon = mw.ext.TeamTemplate.teamexists(team)
 		and mw.ext.TeamTemplate.teamicon(team) or ''
+	local team2 = string.lower(args.team2icon or args.ttlink2 or args.team2link or args.team2 or '')
+	local icon2 = mw.ext.TeamTemplate.teamexists(team2)
+		and mw.ext.TeamTemplate.teamicon(team2) or ''
 	local name = args.id or mw.title.getCurrentTitle().text
 
-	return icon .. '&nbsp;' .. name
+	local display = name
+	if not String.isEmpty(icon) then
+		display = icon .. '&nbsp;' .. name
+	end
+	if not String.isEmpty(icon2) then
+		display = display .. ' ' .. icon2
+	end
+
+	return display
 end
 
 --- Allows for overriding this functionality
@@ -294,7 +315,7 @@ end
 function Person:_createTeam(team, link)
 	link = link or team
 	if link == nil or link == '' then
-		return ''
+		return nil
 	end
 
 	if mw.ext.TeamTemplate.teamexists(link) then

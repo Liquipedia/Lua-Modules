@@ -13,7 +13,7 @@ local Variables = require('Module:Variables')
 local Infobox = Class.new()
 
 --- Inits the Infobox instance
-function Infobox:create(frame, gameName)
+function Infobox:create(frame, gameName, forceDarkMode)
 	self.frame = frame
 	self.root = mw.html.create('div')
 	self.adbox = mw.html.create('div')	:addClass('fo-nttax-infobox-adbox')
@@ -23,6 +23,9 @@ function Infobox:create(frame, gameName)
 											:addClass('wiki-bordercolor-light')
 	self.root	:addClass('fo-nttax-infobox-wrapper')
 				:addClass('infobox-' .. gameName)
+	if forceDarkMode then
+		self.root:addClass('infobox-darkmodeforced')
+	end
 
 	self.injector = nil
 	return self

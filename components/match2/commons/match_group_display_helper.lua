@@ -17,6 +17,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 
 local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
+local _UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 
 function DisplayHelper.opponentTypeIsParty(opponentType)
 	return opponentType == 'solo'
@@ -108,15 +109,15 @@ end
 -- Display component showing the streams, date, and countdown of a match.
 function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
-	local dateFormatString
+	local dateString
 	if match.dateIsExact == true then
-		dateFormatString = 'F j, Y - H:i'
+		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. _UTC
 	else
-		dateFormatString = 'F j, Y'
+		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end
 
 	local stream = Table.merge(match.stream, {
-		date = mw.getContentLanguage():formatDate(dateFormatString, match.date),
+		date = dateString,
 		finished = match.finished and 'true' or nil,
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')

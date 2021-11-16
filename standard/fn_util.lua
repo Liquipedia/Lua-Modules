@@ -67,4 +67,7 @@ function FnUtil.lazilyDefineFunction(getf_)
 	end
 end
 
+-- The identity function
+function FnUtil.identity(x) return x end
+
 return FnUtil
