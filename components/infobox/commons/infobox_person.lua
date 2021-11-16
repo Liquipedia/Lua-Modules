@@ -183,7 +183,7 @@ function Person:createInfobox()
 		)
 	end
 
-	return tostring(builtInfobox) .. self:_addWarnings()
+	return tostring(builtInfobox) .. WarningBox.displayMultiFromTable(_warnings)
 end
 
 function Person:_setLpdbData(args, links, status, personType, earnings)
@@ -230,17 +230,10 @@ function Person:getStandardNationalityValue(nationality)
 			_warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
+		nationalityToStore = nil
 	end
 
 	return nationalityToStore
-end
-
-function Person:_addWarnings()
-	local warningsDisplay = ''
-	for _, warning in pairs(_warnings) do
-		warningsDisplay = warningsDisplay .. tostring(WarningBox.display(warning))
-	end
-	return warningsDisplay
 end
 
 --- Allows for overriding this functionality
