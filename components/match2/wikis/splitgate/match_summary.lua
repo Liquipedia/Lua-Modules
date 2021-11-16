@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -110,7 +109,7 @@ function p.getByMatchId(args)
 			body = p._addFlexRow(body, gameElements, 'brkts-popup-body-game')
 		end
 	end
-	
+
 	-- Vetoes
 	local vetoData = (match.extradata or {}).mapveto
 	if not Table.isEmpty(vetoData) then
@@ -129,7 +128,7 @@ function p.getByMatchId(args)
 	end
 
 	wrapper:node(body):node(p._breakNode())
-	
+
 	-- comment
 	if match.comment then
 		local comment = htmlCreate('div')
