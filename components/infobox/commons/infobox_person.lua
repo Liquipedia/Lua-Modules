@@ -228,7 +228,7 @@ function Person:getStandardNationalityValue(nationality)
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
 			_warnings,
-			nationality .. ' is not supported as a value for nationalities'
+			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
 	end
 
