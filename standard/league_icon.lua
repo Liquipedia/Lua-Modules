@@ -12,6 +12,8 @@ local Template = require('Module:Template')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
+local _FILLER = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
+
 ---display an image in the fashion of LeagueIconSmall templates
 --i.e. it displays the icon in dark/light mode (depending on reader mode)
 --in a span with customizable link, hooverDisplay
@@ -36,9 +38,9 @@ function LeagueIcon.display(args)
 		})
 	end
 
-	--if icon is not given and can not be retrieved return empty string
+	--if icon is not given and can not be retrieved return filler icon
 	if String.isEmpty(icon) then
-		return ''
+		return _FILLER
 	end
 
 	if String.isEmpty(iconDark) then
@@ -55,6 +57,11 @@ function LeagueIcon.display(args)
 end
 
 function LeagueIcon._make(icon, iconDark, link, name, size)
+	--remove "File:" prefix from icons due to legacy reasons
+	--this should be removed once all wikis use the standardized infobox league
+	icon = string.gsub(icon, '^File:', '')
+	iconDark = string.gsub(iconDark, '^File:', '')
+
 	local imageOptions = '|link=' .. link .. '|' .. (name or link) .. '|' .. size .. 'x' .. size .. 'px]]'
 	local lightSpan = mw.html.create('span')
 		:addClass('league-icon-small-image lightmode')

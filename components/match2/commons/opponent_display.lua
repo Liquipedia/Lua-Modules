@@ -324,6 +324,25 @@ function OpponentDisplay.BlockLiteral(props)
 		:node(Logic.emptyOr(props.name, zeroWidthSpace))
 end
 
+OpponentDisplay.propTypes.BlockScore = {
+	isWinner = 'boolean?',
+	scoreText = 'any',
+}
+
+--[[
+Displays a score within the context of a block element.
+]]
+function OpponentDisplay.BlockScore(props)
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockScore)
+
+	local scoreText = props.scoreText
+	if props.isWinner then
+		scoreText = '<b>' .. scoreText .. '</b>'
+	end
+
+	return mw.html.create('div'):wikitext(scoreText)
+end
+
 --[[
 Displays the first score or status of the opponent, as a string.
 ]]

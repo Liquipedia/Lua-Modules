@@ -17,6 +17,7 @@ local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled
 local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local MatchGroupDisplay = {}
 
@@ -31,7 +32,7 @@ function MatchGroupDisplay.MatchlistBySpec(args)
 	local matchlistNode
 	if options.show then
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
-		local MatchlistContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('matchlist')
+		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist')
 		matchlistNode = MatchlistContainer({
 			bracketId = options.bracketId,
 			config = MatchlistDisplay.configFromArgs(args),
@@ -56,7 +57,7 @@ function MatchGroupDisplay.BracketBySpec(args)
 	local bracketNode
 	if options.show then
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
-		local BracketContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('bracket')
+		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket')
 		bracketNode = BracketContainer({
 			bracketId = options.bracketId,
 			config = BracketDisplay.configFromArgs(args),
@@ -95,7 +96,7 @@ function MatchGroupDisplay.MatchGroupById(args)
 
 	MatchGroupInput.applyOverrideArgs(matches, args)
 
-	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer(matchGroupType)
+	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return MatchGroupContainer({
 		bracketId = bracketId,
 		config = config,
@@ -106,33 +107,25 @@ end
 Displays a singleMatch specified by a bracket ID and matchID.
 ]]
 function MatchGroupDisplay.MatchByMatchId(args)
-	local bracketId = args.id or args[1]
-	args.id = bracketId
-	args[1] = bracketId
+	local bracketId = args.id
+	local matchId = args.matchid
 	assert(bracketId, 'Missing bracket ID')
+	assert(matchId, 'Missing match ID')
 
-	local matches = MatchGroupUtil.fetchMatches(bracketId)
-	assert(#matches > 0, 'No data found for bracketId=' .. bracketId)
+	matchId = MatchGroupUtil.matchIdFromKey(matchId)
 
-	if (#matches > 1) then
-		assert(args.matchid, 'Missing match ID')
-		local matchIdLength = string.len(args.matchid)
-		args.matchid = string.rep('0', 4 - matchIdLength) .. args.matchid
+	local matchGroup = MatchGroupUtil.fetchMatchGroup(bracketId)
+	local fullMatchId = bracketId .. '_' .. matchId
+	local match = matchGroup.matchesById[fullMatchId]
 
-		matches = Table.filter(matches, function(match)
-			local _, matchid = MatchGroupUtil.splitMatchId(match.matchId)
-			return matchid == args.matchid end
-		)
-
-		assert(#matches == 1, 'Match matchId=' .. args.matchid .. ' not found')
-	end
+	assert(match, 'Match bracketId= ' .. bracketId .. ' matchId=' .. matchId .. ' not found')
 
 	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
 	local config = SingleMatchDisplay.configFromArgs(args)
 
-	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('singleMatch')
+	local MatchGroupContainer = WikiSpecific.getMatchContainer('singleMatch')
 	return MatchGroupContainer({
-		match = matches[1],
+		matchId = fullMatchId,
 		config = config,
 	})
 end

@@ -32,20 +32,26 @@ SingleMatchDisplay.types.SingleMatchConfigOptions = TypeUtil.struct(
 )
 
 SingleMatchDisplay.propTypes.SingleMatchContainer = {
-	bracketId = 'string',
+	matchId = 'string',
 	config = TypeUtil.optional(SingleMatchDisplay.types.SingleMatchConfigOptions),
 }
 
 --[[
-Display component for a singleMatch. The singleMatch is specified by ID.
+Display component for a singleMatch. The singleMatch is specified by matchID.
 The component fetches the match data from LPDB or page variables.
 ]]
 function SingleMatchDisplay.SingleMatchContainer(props)
 	DisplayUtil.assertPropTypes(props, SingleMatchDisplay.propTypes.SingleMatchContainer)
-	return SingleMatchDisplay.SingleMatch({
-		config = props.config,
-		match = props.match,
-	})
+
+	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
+
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
+	return match
+		and SingleMatchDisplay.SingleMatch({
+			config = props.config,
+			match = match,
+		})
+		or ''
 end
 
 SingleMatchDisplay.propTypes.SingleMatch = {
@@ -71,11 +77,6 @@ function SingleMatchDisplay.SingleMatch(props)
 		:css('max-height', 'unset')
 		:css('width', config.width .. 'px')
 
-	if not props.match then
-		-- No match, simply return
-		return ''
-	end
-
 	local matchNode = SingleMatchDisplay.Match{
 		MatchSummaryContainer = config.MatchSummaryContainer,
 		match = props.match,
@@ -100,6 +101,7 @@ function SingleMatchDisplay.Match(props)
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.match.matchId,
+		config = {showScore = true},
 	})
 
 	return matchSummaryNode
