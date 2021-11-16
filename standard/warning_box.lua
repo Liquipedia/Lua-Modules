@@ -20,4 +20,12 @@ function WarningBox.display(text)
 	return div:node(tbl)
 end
 
+function WarningBox.displayMultiFromTable(tbl)
+	local display = ''
+	for _, text in pairs(tbl) do
+		display = display .. tostring(WarningBox.display(text))
+	end
+	return display
+end
+
 return Class.export(WarningBox)
