@@ -64,7 +64,7 @@ function CustomMatchSummary.getByMatchId(args)
 		:node(renderOpponent(1))
 		:node(renderOpponent(2))
 		:node(renderSoloOpponentTeam(2))
-	wrapper:node(header):node(p._breakNode())
+	wrapper:node(header):node(CustomMatchSummary._breakNode())
 
 	-- body
 	local body = htmlCreate('div'):addClass('brkts-popup-body')
