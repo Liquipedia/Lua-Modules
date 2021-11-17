@@ -36,15 +36,18 @@ StarcraftMatchSummary.propTypes.MatchSummaryContainer = {
 
 function StarcraftMatchSummary.MatchSummaryContainer(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
+	local config = {
+		showScore = props.config or false
+	}
 	local MatchSummary = match.isFfa
 		and Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary
 		or StarcraftMatchSummary.MatchSummary
-	return MatchSummary({match = match, config = props.config})
+	return MatchSummary({match = match, config = config})
 end
 
 StarcraftMatchSummary.propTypes.MatchSummary = {
 	match = StarcraftMatchGroupUtil.types.Match,
-	config = 'table?'
+	config = 'table'
 }
 
 function StarcraftMatchSummary.MatchSummary(props)
@@ -71,14 +74,14 @@ end
 
 StarcraftMatchSummary.propTypes.Header = {
 	match = StarcraftMatchGroupUtil.types.Match,
-	config = 'table?'
+	config = 'table'
 }
 
 function StarcraftMatchSummary.Header(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.Header)
 	local match = props.match
 
-	local showScore = (props.config or {}).showScore or false
+	local showScore = props.config.showScore
 
 	local renderOpponent = function(opponentIx)
 		local opponent = match.opponents[opponentIx]
