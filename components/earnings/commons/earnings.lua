@@ -41,7 +41,7 @@ function Earnings.calculateForPlayer(args)
 
 	local condition = '([[participant::' .. player .. ']]'
 	for playerIndex = 1, playerNumber do
-		condition = condition .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]' 
+		condition = condition .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
 	end
 	condition = condition .. ')'
 
@@ -108,13 +108,13 @@ end
 
 function Earnings._buildConditions(conditions, year, mode)
 	conditions = '[[date::!' .. _DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
-	if String.isNotEmpty(args.year) then
-		conditions = conditions .. ' AND ([[date::>' .. args.year .. '-01-01]] OR [[date::' .. args.year .. '-01-01]])'
-			.. 'AND ([[date::<' .. args.year .. '-12-31]] OR [[date::' .. args.year .. '-12-31]])'
+	if String.isNotEmpty(year) then
+		conditions = conditions .. ' AND ([[date::>' .. year .. '-01-01]] OR [[date::' .. year .. '-01-01]])'
+			.. 'AND ([[date::<' .. year .. '-12-31]] OR [[date::' .. year .. '-12-31]])'
 	end
 
-	if String.isNotEmpty(args.mode) then
-		conditions = conditions .. ' AND [[mode::' .. args.mode .. ']]'
+	if String.isNotEmpty(mode) then
+		conditions = conditions .. ' AND [[mode::' .. mode .. ']]'
 	end
 
 	return conditions
