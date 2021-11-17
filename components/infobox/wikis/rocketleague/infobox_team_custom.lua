@@ -21,7 +21,6 @@ local _CURRENT_YEAR = os.date('%Y')
 local _START_YEAR = 2015
 
 local CustomInjector = Class.new(Injector)
-local Language = mw.language.new('en')
 
 local _team
 
