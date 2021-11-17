@@ -20,7 +20,7 @@ function WarningBox.display(text)
 	return div:node(tbl)
 end
 
-function WarningBox.displayMultiFromTable(tbl)
+function WarningBox.displayAll(tbl)
 	local display = ''
 	for _, text in pairs(tbl) do
 		display = display .. tostring(WarningBox.display(text))
