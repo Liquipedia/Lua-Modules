@@ -78,7 +78,7 @@ function StarcraftMatchSummary.Header(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.Header)
 	local match = props.match
 
-	local showScore = (props.config or {}).showScore
+	local showScore = (props.config or {}).showScore or false
 
 	local renderOpponent = function(opponentIx)
 		local opponent = match.opponents[opponentIx]
