@@ -19,7 +19,8 @@ local WikiSpecificBase = {}
 -- @returns the match after changes have been applied
 WikiSpecificBase.processMatch = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
-	return InputModule.processMatch
+	return InputModule and InputModule.processMatch
+		or error('Function "processMatch" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
 
 -- called from Module:Match/Subobjects
@@ -30,7 +31,8 @@ end)
 -- @returns the map after changes have been applied
 WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
-	return InputModule.processMap
+	return InputModule and InputModule.processMap
+		or error('Function "processMap" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
 
 -- called from Module:Match/Subobjects
@@ -41,7 +43,8 @@ end)
 -- @returns the opponent after changes have been applied
 WikiSpecificBase.processOpponent = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
-	return InputModule.processOpponent
+	return InputModule and InputModule.processOpponent
+		or error('Function "processOpponent" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
 
 -- called from Module:Match/Subobjects
@@ -52,7 +55,8 @@ end)
 -- @returns the player after changes have been applied
 WikiSpecificBase.processPlayer = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
-	return InputModule.processPlayer
+	return InputModule and InputModule.processPlayer
+		or error('Function "processPlayer" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
 
 --[[
