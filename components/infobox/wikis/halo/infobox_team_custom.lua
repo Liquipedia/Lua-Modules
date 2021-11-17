@@ -7,7 +7,6 @@
 --
 
 local Team = require('Module:Infobox/Team')
-local Earnings = require('Module:Earnings')
 local Variables = require('Module:Variables')
 local Flags = require('Module:Flags')
 local Class = require('Module:Class')
@@ -38,23 +37,7 @@ function CustomTeam.run(frame)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'earnings' then
-		local earnings = Earnings.calculateForTeam({team = _team.pagename or _team.name})
-		Variables.varDefine('earnings', earnings)
-		if earnings == 0 then
-			earnings = nil
-		else
-			earnings = '$' .. Language:formatNum(earnings)
-		end
-		return {
-			Cell{
-				name = 'Earnings',
-				content = {
-					earnings
-				}
-			}
-		}
-	elseif id == 'region' then
+	if id == 'region' then
 		return {
 			Cell{name = 'Region', content = {CustomTeam:_createRegion(_team.args.region, _team.args.location)}}
 		}
@@ -71,7 +54,6 @@ function CustomTeam:_createRegion(region, location)
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.earnings = Variables.varDefault('earnings', 0)
 	if not String.isEmpty(args.teamcardimage) then
 		lpdbData.logo = 'File:' .. args.teamcardimage
 	elseif not String.isEmpty(args.image) then
