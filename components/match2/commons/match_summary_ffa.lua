@@ -254,7 +254,7 @@ function FfaMatchSummary.PlacementCells(props)
 	-- Group placements to determine ties
 	local groups = Array.groupBy(
 		props.opponentIxs,
-		function(ix) return match.opponents[ix].placement or 'unique' .. ix end
+		function(ix) return match.opponents[ix].placement or ('unique' .. ix) end
 	)
 
 	-- Loop through placement groups and draw cells
