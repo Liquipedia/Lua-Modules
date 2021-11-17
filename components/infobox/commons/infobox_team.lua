@@ -8,6 +8,8 @@
 
 local Class = require('Module:Class')
 local Template = require('Module:Template')
+local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
 local Earnings = require('Module:Earnings/Custom')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
