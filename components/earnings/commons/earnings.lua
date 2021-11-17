@@ -41,7 +41,7 @@ function Earnings.calculateForPlayer(args)
 
 	local condition = '([[participant::' .. player .. ']]'
 	for playerIndex = 1, playerNumber do
-		condition = condition .. ' OR [[players_p2::' .. player .. ']]' 
+		condition = condition .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]' 
 	end
 	condition = condition .. ')'
 
