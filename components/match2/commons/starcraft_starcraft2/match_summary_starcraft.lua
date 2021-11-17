@@ -87,24 +87,25 @@ function StarcraftMatchSummary.Header(props)
 			opponent = opponent,
 			overflow = 'wrap',
 			showFlag = false,
-			showLink = opponent.type == 'team',
+			showLink = opponent.type == 'team' or showScore,
 		})
 		local showScore = (props.config or {}).showScore
 		local side = (flip and 'left' or 'right')
 
 		local display = html.create('div')
-			:addClass('brkts-popup-header-opponent')
-			:addClass('brkts-popup-header-opponent-' .. side)
 
 		if showScore then
-			table.insert(opponentDisplay, StarcraftOpponentDisplay.BlockScore{
+			display:addClass('brkts-popup-header-opponent-' .. side)
+				:css('width', '50%')
+
+			local scoreDisplay = StarcraftOpponentDisplay.BlockScore{
 				isWinner = opponent.placement == 1 or opponent.advances,
 				scoreText = StarcraftOpponentDisplay.InlineScore(opponent),
-				side = side,
-			})
-		end
-		if showScore then
-			display:css('width', '50%')
+			}
+			scoreDisplay:addClass('brkts-popup-header-opponent-score-' .. side)
+			table.insert(opponentDisplay, scoreDisplay)
+		else
+			display:addClass('brkts-popup-header-opponent')
 		end
 		if not flip then
 			opponentDisplay = Array.reverse(opponentDisplay)
