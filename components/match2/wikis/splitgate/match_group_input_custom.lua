@@ -11,7 +11,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
@@ -34,7 +33,7 @@ local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(_, match)
-	-- Count number of maps, check for empty maps to remove, and automatically count score
+	-- Count number of maps, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 
@@ -407,7 +406,7 @@ function matchFunctions.getOpponents(match)
 			end
 
 			-- apply status
-			if TypeUtil.isNumeric(opponent.score) then
+			if Logic.isNumeric(opponent.score) then
 				opponent.status = 'S'
 				isScoreSet = true
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
@@ -428,6 +427,16 @@ function matchFunctions.getOpponents(match)
 		local firstTo = math.ceil(match.bestof/2)
 		for _, item in pairs(opponents) do
 			if tonumber(item.score or 0) >= firstTo then
+				match.finished = true
+				break
+			end
+		end
+	end
+	
+	-- check if match should actually be finished due to a non score status
+	if not Logic.readBool(match.finished) then
+		for _, item in pairs(opponents) do
+			if String.isNotEmpty(opponenet.status) and opponent.status ~= 'S' then
 				match.finished = true
 				break
 			end
@@ -496,7 +505,7 @@ function mapFunctions.getScoresAndWinner(map)
 		local score = map['score' .. scoreIndex] or map['t' .. scoreIndex .. 'score']
 		local obj = {}
 		if not Logic.isEmpty(score) then
-			if TypeUtil.isNumeric(score) then
+			if Logic.isNumeric(score) then
 				obj.status = 'S'
 				obj.score = score
 			elseif Table.includes(ALLOWED_STATUSES, score) then
