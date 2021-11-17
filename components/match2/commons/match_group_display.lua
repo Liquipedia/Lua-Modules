@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+local WarningBox = require('Module:WarningBox')
 
 local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
@@ -41,7 +42,7 @@ function MatchGroupDisplay.MatchlistBySpec(args)
 
 	local parts = Array.extend(
 		{matchlistNode},
-		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox)
+		Array.map(optionsWarnings, WarningBox.display)
 	)
 	return table.concat(Array.map(parts, tostring))
 end
@@ -65,8 +66,8 @@ function MatchGroupDisplay.BracketBySpec(args)
 	end
 
 	local parts = Array.extend(
-		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox),
-		Array.map(bracketWarnings, MatchGroupDisplay.WarningBox),
+		Array.map(optionsWarnings, WarningBox.display),
+		Array.map(bracketWarnings, WarningBox.display),
 		{bracketNode}
 	)
 	return table.concat(Array.map(parts, tostring))
@@ -128,17 +129,6 @@ function MatchGroupDisplay.MatchByMatchId(args)
 		matchId = fullMatchId,
 		config = config,
 	})
-end
-
-
-function MatchGroupDisplay.WarningBox(text)
-	local div = mw.html.create('div'):addClass('show-when-logged-in navigation-not-searchable ambox-wrapper')
-		:addClass('ambox wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red')
-	local tbl = mw.html.create('table')
-	tbl:tag('tr')
-		:tag('td'):addClass('ambox-image'):wikitext('[[File:Emblem-important.svg|40px|link=]]'):done()
-		:tag('td'):addClass('ambox-text'):wikitext(text)
-	return div:node(tbl)
 end
 
 
