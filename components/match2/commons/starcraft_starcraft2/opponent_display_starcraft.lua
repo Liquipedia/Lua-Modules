@@ -244,7 +244,6 @@ StarcraftOpponentDisplay.CheckMark = '<i class="fa fa-check forest-green-text" a
 StarcraftOpponentDisplay.propTypes.BlockScore = {
 	isWinner = 'boolean?',
 	scoreText = 'any',
-	side = 'string?',
 }
 
 --[[
@@ -258,12 +257,8 @@ function StarcraftOpponentDisplay.BlockScore(props)
 		scoreText = '<b>' .. scoreText .. '</b>'
 	end
 
-	local scoreDiv = html.create('div')
+	return html.create('div')
 		:wikitext(scoreText)
-	if props.side then
-		scoreDiv:addClass('brkts-popup-header-opponent-score-' .. props.side)
-	end
-	return scoreDiv
 end
 
 function StarcraftOpponentDisplay.InlineScore(opponent)
