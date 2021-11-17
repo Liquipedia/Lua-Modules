@@ -152,7 +152,7 @@ function Team:createInfobox()
 		self:defineCustomPageVariables(args)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayMultiFromTable(_warnings)
+	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
 function Team:_createRegion(region)
