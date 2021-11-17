@@ -183,7 +183,7 @@ function Person:createInfobox()
 		)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayMultiFromTable(_warnings)
+	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
 function Person:_setLpdbData(args, links, status, personType, earnings)
