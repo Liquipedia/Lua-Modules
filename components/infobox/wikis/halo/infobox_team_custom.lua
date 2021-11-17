@@ -7,7 +7,6 @@
 --
 
 local Team = require('Module:Infobox/Team')
-local Variables = require('Module:Variables')
 local Flags = require('Module:Flags')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -24,7 +23,6 @@ local _START_YEAR = 2015
 local _region
 
 local CustomInjector = Class.new(Injector)
-local Language = mw.language.new('en')
 
 local _team
 
