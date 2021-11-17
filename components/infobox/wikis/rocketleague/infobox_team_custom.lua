@@ -7,7 +7,6 @@
 --
 
 local Team = require('Module:Infobox/Team')
-local Earnings = require('Module:Earnings')
 local Variables = require('Module:Variables')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -62,29 +61,7 @@ function CustomInjector:wrapErrorMessage(text)
 	return outText
 end
 
-function CustomInjector:parse(id, widgets)
-	if id == 'earnings' then
-		local earnings = Earnings.calculateForTeam({team = _team.pagename or _team.name})
-		Variables.varDefine('earnings', earnings)
-		if earnings == 0 then
-			earnings = nil
-		else
-			earnings = '$' .. Language:formatNum(earnings)
-		end
-		return {
-			Cell{
-				name = 'Earnings',
-				content = {
-					earnings
-				}
-			}
-		}
-	end
-	return widgets
-end
-
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.earnings = Variables.varDefault('earnings', 0)
 	if not String.isEmpty(args.teamcardimage) then
 		lpdbData.logo = 'File:' .. args.teamcardimage
 	elseif not String.isEmpty(args.image) then
