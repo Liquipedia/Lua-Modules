@@ -169,7 +169,7 @@ function Team:_createLocation(location)
 		return ''
 	end
 
-	local locationDisplay = Flags.CountryName(location)
+	local locationDisplay = self:getStandardLocationValue(location)
 	if String.isNotEmpty(locationDisplay) then
 		locationDisplay = '[[:Category:' .. locationDisplay
 			.. '|' .. locationDisplay .. ']]'
