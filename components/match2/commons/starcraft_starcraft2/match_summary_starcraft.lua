@@ -78,6 +78,8 @@ function StarcraftMatchSummary.Header(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.Header)
 	local match = props.match
 
+	local showScore = (props.config or {}).showScore
+
 	local renderOpponent = function(opponentIx)
 		local opponent = match.opponents[opponentIx]
 		local flip = opponentIx == 1
@@ -89,7 +91,6 @@ function StarcraftMatchSummary.Header(props)
 			showFlag = false,
 			showLink = opponent.type == 'team' or showScore,
 		})
-		local showScore = (props.config or {}).showScore
 		local side = (flip and 'left' or 'right')
 
 		local display = html.create('div')
