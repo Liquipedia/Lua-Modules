@@ -432,11 +432,11 @@ function matchFunctions.getOpponents(match)
 			end
 		end
 	end
-	
+
 	-- check if match should actually be finished due to a non score status
 	if not Logic.readBool(match.finished) then
-		for _, item in pairs(opponents) do
-			if String.isNotEmpty(opponenet.status) and opponent.status ~= 'S' then
+		for _, opponent in pairs(opponents) do
+			if String.isNotEmpty(opponent.status) and opponent.status ~= 'S' then
 				match.finished = true
 				break
 			end
