@@ -27,16 +27,16 @@ function CustomEarnings.divisionFactor(mode)
 end
 
 -- Legacy entry points
-function p.calc_player(input)
+function CustomEarnings.calc_player(input)
     local args = input.args
 
-    return p.calculateForTeam(args)
+    return CustomEarnings.calculateForTeam(args)
 end 
 
-function p.calc_team(input)
+function CustomEarnings.calc_team(input)
     local args = input.args
 
-    return p.calculateForTeam(args)
+    return CustomEarnings.calculateForTeam(args)
 end
 
 return Class.export(CustomEarnings)
