@@ -12,13 +12,9 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local String = require('Module:String')
-local Template = require('Module:Template')
 local Region = require('Module:Region')
 
 local CustomTeam = Class.new()
-
-local _CURRENT_YEAR = os.date('%Y')
-local _START_YEAR = 2015
 
 local _region
 
