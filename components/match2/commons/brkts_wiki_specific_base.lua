@@ -14,34 +14,50 @@ local WikiSpecificBase = {}
 -- called from Module:MatchGroup
 -- called after processMap/processOpponent/processPlayer
 -- used to alter match related parameters, e.g. automatically setting the winner
+-- @parameter frame - the frame object
+-- @parameter match - a match
 -- @returns the match after changes have been applied
-function WikiSpecificBase.processMatch(frame, match)
-	error("This function needs to be implemented on your wiki")
-end
+WikiSpecificBase.processMatch = FnUtil.lazilyDefineFunction(function()
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	return InputModule and InputModule.processMatch
+		or error('Function "processMatch" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
+end)
 
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
+-- @parameter frame - the frame object
+-- @parameter map - a map
 -- @returns the map after changes have been applied
-function WikiSpecificBase.processMap(frame, map)
-	error("This function needs to be implemented on your wiki")
-end
+WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	return InputModule and InputModule.processMap
+		or error('Function "processMap" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
+end)
 
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
+-- @parameter frame - the frame object
+-- @parameter opponent - a opponent
 -- @returns the opponent after changes have been applied
-function WikiSpecificBase.processOpponent(frame, opponent)
-	error("This function needs to be implemented on your wiki")
-end
+WikiSpecificBase.processOpponent = FnUtil.lazilyDefineFunction(function()
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	return InputModule and InputModule.processOpponent
+		or error('Function "processOpponent" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
+end)
 
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
+-- @parameter frame - the frame object
+-- @parameter player - a player
 -- @returns the player after changes have been applied
-function WikiSpecificBase.processPlayer(frame, player)
-	error("This function needs to be implemented on your wiki")
-end
+WikiSpecificBase.processPlayer = FnUtil.lazilyDefineFunction(function()
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	return InputModule and InputModule.processPlayer
+		or error('Function "processPlayer" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
+end)
 
 --[[
 Converts a match record to a structurally typed table with the appropriate data
