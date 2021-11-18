@@ -24,7 +24,7 @@ local _LAST_DAY_OF_YEAR = '-12-31'
 -- @noRedirect - (optional) player redirects get not resolved before query
 -- @prefix - (optional) the prefix under which the players are stored in the placements
 -- @playerNumber - (optional) the number for how many params the query should look in LPDB
--- @startYear - (optional) query yearly earning starting with that year and return the values in a lua table
+-- @perYear - (optional) query all earnings per year and return the values in a lua table
 function Earnings.calculateForPlayer(args)
 	args = args or {}
 	local player = args.player
@@ -49,7 +49,7 @@ function Earnings.calculateForPlayer(args)
 	end
 	playerConditions = playerConditions .. ')'
 
-	return Earnings._calculate(playerConditions, args.year, args.mode, args.startYear, Earnings.divisionFactor)
+	return Earnings._calculate(playerConditions, args.year, args.mode, args.perYear, Earnings.divisionFactor)
 end
 
 ---
@@ -58,7 +58,7 @@ end
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
 -- @noRedirect - (optional) player redirects get not resolved before query
--- @startYear - (optional) query yearly earning starting with that year and return the values in a lua table
+-- @perYear - (optional) query all earnings per year and return the values in a lua table
 function Earnings.calculateForTeam(args)
 	args = args or {}
 	local team = args.team
@@ -72,7 +72,7 @@ function Earnings.calculateForTeam(args)
 
 	local teamConditions = '([[participant::' .. team .. ']] OR [[extradata_participantteam::' .. team .. ']])'
 
-	return Earnings._calculate(teamConditions, args.year, args.mode, args.startYear, Earnings._divisionFactorOne)
+	return Earnings._calculate(teamConditions, args.year, args.mode, args.perYear, Earnings._divisionFactorOne)
 end
 
 ---
@@ -80,10 +80,12 @@ end
 -- @participantCondition - the condition to find the player/team
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
-function Earnings._calculate(conditions, year, mode, startYear, divisionFactor)
-	conditions = Earnings._buildConditions(conditions, year, mode, startYear)
+-- @perYear - (optional) query all earnings per year and return the values in a lua table
+-- @divisionFactor - divisionFactor function
+function Earnings._calculate(conditions, year, mode, perYear, divisionFactor)
+	conditions = Earnings._buildConditions(conditions, year, mode)
 
-	if String.isNotEmpty(startYear) then
+	if Logic.readBool(perYear) then
 		return Earnings._calculatePerYear(conditions, divisionFactor)
 	end
 
@@ -138,13 +140,9 @@ function Earnings._calculatePerYear(conditions, divisionFactor)
 	return totalEarnings
 end
 
-function Earnings._buildConditions(conditions, year, mode, startYear)
+function Earnings._buildConditions(conditions, year, mode)
 	conditions = '[[date::!' .. _DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
-	if String.isNotEmpty(startYear) then
-		conditions = conditions .. ' AND (' ..
-			'[[date::>' .. startYear .. _FIRST_DAY_OF_YEAR .. ']] ' ..
-			'OR [[date::' .. startYear .. _FIRST_DAY_OF_YEAR .. ']])'
-	elseif String.isNotEmpty(year) then
+	if String.isNotEmpty(year) then
 		conditions = conditions .. ' AND (' ..
 			'[[date::>' .. year .. _FIRST_DAY_OF_YEAR .. ']] ' ..
 			'OR [[date::' .. year .. _FIRST_DAY_OF_YEAR .. ']]' ..
