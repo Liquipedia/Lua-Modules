@@ -85,7 +85,7 @@ function Team:createInfobox()
 					builder = function()
 						_default_earnings_function_used = true
 						_total_earnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
-						Variables.varDefine('earnings', _total_earnings)
+						Variables.varDefine('earnings', _total_earnings) -- needed for SMW
 						local totalEarnings
 						if _total_earnings > 0 then
 							totalEarnings = '$' .. Language:formatNum(_total_earnings)
