@@ -277,7 +277,7 @@ end
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
 	_earnings = Earnings.calculateForPlayer{
-		team = args.earnings or self.pagename or self.id,
+		team = args.earnings or self.pagename,
 		perYear = true
 	}
 	return _earnings.total
