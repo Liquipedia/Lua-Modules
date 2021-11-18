@@ -116,7 +116,7 @@ end
 function Earnings.calculatePerYear(conditions, divisionFactor)
 	local totalEarningsByYear = {}
 	local earningsData = {}
-	local totalEarnings 0
+	local totalEarnings = 0
 
 	local offset = 0
 	local count = 5000
@@ -139,7 +139,7 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 
 	for year, earningsOfYear in pairs(earningsData) do
 		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear, 2)
-		totalEarnings = totalEarnings + earningsData
+		totalEarnings = totalEarnings + earningsOfYear
 	end
 
 	totalEarnings = MathUtils._round(totalEarnings, 2)
