@@ -185,7 +185,7 @@ function Earnings.divisionFactorPlayer(mode)
 end
 
 -- customizable in /Custom
-function Earnings.divisionFactorTeam()
+function Earnings.divisionFactorTeam(mode)
 	return 1
 end
 
