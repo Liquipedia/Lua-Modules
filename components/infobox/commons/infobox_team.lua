@@ -32,6 +32,7 @@ local _LINK_VARIANT = 'team'
 local Language = mw.language.new('en')
 local _default_earnings_function_used = false
 local _earnings = {}
+local _total_earnings
 
 function Team.run(frame)
 	local team = Team(frame)
@@ -83,13 +84,11 @@ function Team:createInfobox()
 				Builder{
 					builder = function()
 						_default_earnings_function_used = true
+						_total_earnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
+						Variables.varDefine('earnings', _total_earnings)
 						local totalEarnings
-						totalEarnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
-						Variables.varDefine('earnings', totalEarnings)
-						if totalEarnings == 0 then
-							totalEarnings = nil
-						else
-							totalEarnings = '$' .. Language:formatNum(totalEarnings)
+						if _total_earnings > 0 then
+							totalEarnings = '$' .. Language:formatNum(_total_earnings)
 						end
 						return {
 							Cell{name = 'Earnings', content = {totalEarnings}}
@@ -189,7 +188,7 @@ end
 
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
-	local earnings = Variables.varDefault('earnings')
+	local earnings = _total_earnings
 	if String.isEmpty(earnings) and not _default_earnings_function_used then
 		error('Since your wiki uses a customized earnings function you ' ..
 			'have to set the LPDB earnings storage in the custom module')
