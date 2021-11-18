@@ -159,7 +159,7 @@ function Earnings._buildConditions(conditions, year, mode)
 end
 
 -- overwritable in /Custom
-local _DEFAULT_NUMBER_OF_PLAYERS_IN_TEAM = 5
+Earnings.defaultNumberOfPlayersInTeam = 5
 
 -- overwritable in /Custom
 function Earnings.divisionFactor(mode)
@@ -173,7 +173,7 @@ function Earnings.divisionFactor(mode)
 		return 1
 	end
 
-	return _DEFAULT_NUMBER_OF_PLAYERS_IN_TEAM
+	return Earnings.defaultNumberOfPlayersInTeam
 end
 
 function Earnings._divisionFactorOne()
