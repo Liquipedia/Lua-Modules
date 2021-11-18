@@ -17,6 +17,7 @@ local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
 local Region = require('Module:Region')
 local AgeCalculation = require('Module:AgeCalculation')
+local Earnings = require('Module:Earnings')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -32,6 +33,7 @@ local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
+local _earnings
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -206,6 +208,12 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		links = links,
 		extradata = {},
 	}
+
+	_earnings.total = nil
+	for year, earningsOfYear in pairs(_earnings) do
+		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+	end
+
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
 	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
@@ -268,7 +276,11 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	return 0
+	_earnings = Earnings.calculateForPlayer{
+		team = _args.earnings or self.pagename or self.id,
+		perYear = true
+	}
+	return _earnings.total
 end
 
 function Person:_createRegion(region, country)
