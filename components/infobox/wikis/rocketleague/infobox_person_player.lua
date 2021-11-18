@@ -9,7 +9,6 @@
 local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
-local Earnings = require('Module:Earnings')
 local Namespace = require('Module:Namespace')
 local Variables = require('Module:Variables')
 local Page = require('Module:Page')
@@ -43,7 +42,6 @@ function CustomPlayer.run(frame)
 	_args = player.args
 	player.args.informationType = player.args.informationType or 'Player'
 
-	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.createBottomContent = CustomPlayer.createBottomContent
@@ -144,12 +142,6 @@ function CustomPlayer:makeAbbr(title, text)
 	return '<abbr title="' .. title .. '>' .. text .. '</abbr>'
 end
 
-function CustomPlayer:calculateEarnings()
-	return Earnings.calc_player({ args = {
-		player = _args.earnings or _pagename,
-	}})
-end
-
 function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	if Namespace.isMain() then
 		local role = string.lower(args.role or '')
@@ -220,17 +212,8 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.status = lpdbData.status or 'Unknown'
 
-	lpdbData.extradata = {
-		role = _args.role,
-		birthmonthandday = Variables.varDefault('birth_monthandday'),
-	}
-
-	for year = _START_YEAR, _CURRENT_YEAR do
-		lpdbData.extradata['earningsin' .. year] = Earnings.calc_player({args = {
-			player = _args.earnings or _pagename,
-			year = year
-		}})
-	end
+	lpdbData.extradata.role = _args.role
+	lpdbData.extradata.birthmonthandday = Variables.varDefault('birth_monthandday')
 
 	return lpdbData
 end
