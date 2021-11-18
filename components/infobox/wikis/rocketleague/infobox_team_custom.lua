@@ -67,7 +67,7 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.logo = 'File:' .. args.image
 	end
 
-	lpdbData.extradata.rating = Variables.varDefault('rating'),
+	lpdbData.extradata.rating = Variables.varDefault('rating')
 	lpdbData.extradata.tier = string.lower(args.tier or '')
 
 	return lpdbData
