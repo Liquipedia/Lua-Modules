@@ -125,7 +125,7 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{
 			name = 'Liquipedia tier',
 			content = {CustomLeague:_createLiquipediaTierDisplay()},
-			classes = {String.isEmpty(_args['ubisoft-sponsored']) and '' or 'valvepremier-highlighted'}
+			classes = {String.isEmpty(_args['ubisoftmajor']) and '' or 'valvepremier-highlighted'}
 		})
 		table.insert(widgets, Cell{
 			name = 'Ubisoft tier',
@@ -216,12 +216,11 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	end
 
 	tierDisplay = tierDisplay ..
-		(_args['ubisoft-sponsored'] == 'true' and _UBISOFT_ICON or '') ..
+		(_args['ubisoftmajor'] == 'true' and _UBISOFT_ICON or '') ..
 		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
 		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '') ..
 		(hasTypeSetAsTier and '[[Category:Pages with Tiertype set as Tier]]' or '')
 
-	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_tiertype', tierType)
 	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
 	Variables.varDefine('tournament_liquipediatiertype', tierType)
@@ -243,22 +242,14 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
 
-	--Apexs specific vars
-	Variables.varDefine('tournament_gamemode', string.lower(_args.mode or ''))
-	Variables.varDefine('tournament_series2', _args.series2 or '')
-	Variables.varDefine('tournament_publisher', _args['ubisoft-sponsored'] or '')
-	Variables.varDefine('tournament_ubisoft_tier', _args.ubisofttier or '')
 end
 
 function CustomLeague.getWikiCategories(args)
 	local categories = {}
-	if not String.isEmpty(args.ubisofttier) then
-		table.insert(categories, 'Ubisoft Tournaments')
-	end
 	if not String.isEmpty(args.player_number) or not String.isEmpty(args.participants_number) then
 		table.insert(categories, 'Individual Tournaments')
 	end
-	if not String.isEmpty(args.ubisofttier) or args['ubisoft-sponsored'] == 'true' then
+	if not String.isEmpty(args.ubisofttier) or args['ubisoftmajor'] == 'true' then
 		table.insert(categories, 'Ubisoft Tournaments')
 	end
 	return categories
