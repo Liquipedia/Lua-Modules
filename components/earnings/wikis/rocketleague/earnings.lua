@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 
 local CustomEarnings = require('Module:Earnings/Base')
 
-Earnings.defaultNumberOfPlayersInTeam = 3
+CustomEarnings.defaultNumberOfPlayersInTeam = 3
 
 -- Legacy entry points
 function CustomEarnings.calc_player(input)
