@@ -13,8 +13,8 @@ local Logic = require('Module:Logic')
 local Class = require('Module:Class')
 
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
-local _START_OF_YEAR = '-01-01'
-local _END_OF_YEAR = '-12-31'
+local _FIRST_DAY_OF_YEAR = '-01-01'
+local _LAST_DAY_OF_YEAR = '-12-31'
 
 ---
 -- Entry point for players and individuals
@@ -127,7 +127,7 @@ function Earnings._calculatePerYear(conditions, divisionFactor)
 		end
 		count = #lpdbQueryData
 		offset = offset + 5000
-	end	
+	end
 
 	for year, earningsOfYear in pairs(totalEarningsOfYear) do
 		totalEarnings[tonumber(year)] = MathUtils._round(earningsOfYear, 2)
@@ -141,10 +141,16 @@ end
 function Earnings._buildConditions(conditions, year, mode, startYear)
 	conditions = '[[date::!' .. _DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
 	if String.isNotEmpty(startYear) then
-		conditions = conditions .. ' AND ([[date::>' .. startYear .. _START_OF_YEAR .. ']] OR [[date::' .. startYear .. _START_OF_YEAR .. ']])'
+		conditions = conditions .. ' AND (' ..
+			'[[date::>' .. startYear .. _FIRST_DAY_OF_YEAR .. ']] ' ..
+			'OR [[date::' .. startYear .. _FIRST_DAY_OF_YEAR .. ']])'
 	elseif String.isNotEmpty(year) then
-		conditions = conditions .. ' AND ([[date::>' .. year .. _START_OF_YEAR .. ']] OR [[date::' .. year .. _START_OF_YEAR .. ']])'
-			.. 'AND ([[date::<' .. year .. _END_OF_YEAR .. ']] OR [[date::' .. year .. _END_OF_YEAR .. ']])'
+		conditions = conditions .. ' AND (' ..
+			'[[date::>' .. year .. _FIRST_DAY_OF_YEAR .. ']] ' ..
+			'OR [[date::' .. year .. _FIRST_DAY_OF_YEAR .. ']]' ..
+			') AND (' ..
+			'[[date::<' .. year .. _LAST_DAY_OF_YEAR .. ']] ' ..
+			'OR [[date::' .. year .. _LAST_DAY_OF_YEAR .. ']])'
 	end
 
 	if String.isNotEmpty(mode) then
