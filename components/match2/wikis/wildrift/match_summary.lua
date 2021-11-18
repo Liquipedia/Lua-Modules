@@ -68,34 +68,6 @@ function ChampionBan:create()
 	return self.root
 end
 
--- MVP Class
-local MVP = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
-		self.players = {}
-	end
-)
-
-function MVP:addPlayer(player)
-	if not Logic.isEmpty(player) then
-		table.insert(self.players, player)
-	end
-	return self
-end
-
-function MVP:create()
-	local span = mw.html.create('span')
-	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
-	for index, player in ipairs(self.players) do
-		if index > 1 then
-			span:wikitext(', ')
-		end
-		span:wikitext('[['..player..']]')
-	end
-	self.root:node(span)
-	return self.root
-end
-
 
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
@@ -174,7 +146,7 @@ function CustomMatchSummary._createBody(match)
 	if mvpInput then
 		local mvpData = mw.text.split(mvpInput or '', ',')
 		if String.isNotEmpty(mvpData[1]) then
-			local mvp = MVP()
+			local mvp = MatchSummary.Mvp()
 			for _, player in ipairs(mvpData) do
 				if String.isNotEmpty(player) then
 					mvp:addPlayer(player)
