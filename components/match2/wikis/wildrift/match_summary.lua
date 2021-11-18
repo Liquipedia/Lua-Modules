@@ -323,10 +323,6 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 	for index = 1, numberOfChampions do
 		local champDisplay = mw.html.create('div')
 		:addClass('brkts-popup-side-color-' .. color)
-		:css('padding-left', '1px')--remove after css cache is gone
-		:css('padding-right', '1px')--remove after css cache is gone
-		:css('padding-top', '2px')--remove after css cache is gone
-		:css('padding-bottom', '2px')--remove after css cache is gone
 		:css('float', flip and 'right' or 'left')
 		:node(ChampionIcon._getImage{
 			champ = opponentChampionsData[index],
