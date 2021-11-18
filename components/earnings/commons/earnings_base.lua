@@ -82,11 +82,14 @@ end
 -- @mode - (optional) the mode to calculate earnings for
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 -- @divisionFactor - divisionFactor function
-function Earnings._calculate(conditions, year, mode, perYear, divisionFactor)
+---
+-- customizable in case query has to be changed
+-- (e.g. SC2 due to not having a fixed number of players per team)
+function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 	conditions = Earnings._buildConditions(conditions, year, mode)
 
 	if Logic.readBool(perYear) then
-		return Earnings._calculatePerYear(conditions, divisionFactor)
+		return Earnings.calculatePerYear(conditions, divisionFactor)
 	end
 
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -107,7 +110,10 @@ function Earnings._calculate(conditions, year, mode, perYear, divisionFactor)
 	return MathUtils._round(totalEarnings, 2)
 end
 
-function Earnings._calculatePerYear(conditions, divisionFactor)
+---
+-- customizable in case query has to be changed
+-- (e.g. SC2 due to not having a fixed number of players per team)
+function Earnings.calculatePerYear(conditions, divisionFactor)
 	local totalEarningsOfYear = {}
 	local totalEarnings = {}
 	totalEarnings.total = 0
@@ -158,10 +164,12 @@ function Earnings._buildConditions(conditions, year, mode)
 	return conditions
 end
 
--- overwritable in /Custom
+-- customizable in /Custom
 Earnings.defaultNumberOfPlayersInTeam = 5
 
--- overwritable in /Custom
+---
+-- customizable in case it has to be changed
+-- (e.g. SC2 due to not having a fixed number of players per team)
 function Earnings.divisionFactor(mode)
 	if mode == '4v4' then
 		return 4
