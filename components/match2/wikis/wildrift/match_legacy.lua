@@ -77,7 +77,7 @@ function MatchLegacy._convertParameters(match2)
 			match[prefix] = opponent.name
 			match[prefix..'score'] = (tonumber(opponent.score) or 0) >= 0 and opponent.score or 0
 			local opponentplayers = {}
-			for i = 1,10 do
+			for i = 1, 10 do
 				local player = opponentmatch2players[i] or {}
 				opponentplayers['p' .. i] = player.name or ''
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
