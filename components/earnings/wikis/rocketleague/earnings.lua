@@ -31,7 +31,7 @@ function CustomEarnings.calc_player(input)
     local args = input.args
 
     return CustomEarnings.calculateForTeam(args)
-end 
+end
 
 function CustomEarnings.calc_team(input)
     local args = input.args
