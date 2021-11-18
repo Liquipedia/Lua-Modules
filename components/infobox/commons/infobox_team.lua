@@ -89,7 +89,7 @@ function Team:createInfobox()
 						if totalEarnings == 0 then
 							totalEarnings = nil
 						else
-							totalEarnings = '$' .. Language:formatNum(earnings)
+							totalEarnings = '$' .. Language:formatNum(totalEarnings)
 						end
 						return {
 							Cell{name = 'Earnings', content = {totalEarnings}}
