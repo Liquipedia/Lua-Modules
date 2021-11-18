@@ -9,7 +9,6 @@
 local Team = require('Module:Infobox/Team')
 local Earnings = require('Module:Earnings of')
 local Variables = require('Module:Variables')
-local Flags = require('Module:Flags')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -83,15 +82,9 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.extradata['earningsin' .. year] = Earnings.team({id, year = year}):gsub(',', '')
 	end
 
-	lpdbData.location = CustomTeam:_getStandardLocationValue(_team.args.location)
-	lpdbData.location2 = CustomTeam:_getStandardLocationValue(_team.args.location2)
 	lpdbData.region = Variables.varDefault('region', '')
 
 	return lpdbData
-end
-
-function CustomTeam:_getStandardLocationValue(location)
-	return Flags.CountryName(location) or location
 end
 
 function CustomTeam:createWidgetInjector()
