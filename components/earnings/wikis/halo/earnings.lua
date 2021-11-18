@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
 local CustomEarnings = Lua.import('Module:Earnings/Base', {requireDevIfEnabled = true})
 
