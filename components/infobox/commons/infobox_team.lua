@@ -84,7 +84,7 @@ function Team:createInfobox()
 					builder = function()
 						_default_earnings_function_used = true
 						_earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
-						earnings = _earnings.total
+						local earnings = _earnings.total
 						Variables.varDefine('earnings', earnings)
 						if earnings == 0 then
 							earnings = nil
