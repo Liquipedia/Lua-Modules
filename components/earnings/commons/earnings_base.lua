@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Earnings
+-- page=Module:Earnings/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
