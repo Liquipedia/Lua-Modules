@@ -24,7 +24,7 @@ local _LAST_DAY_OF_YEAR = '-12-31'
 -- @noRedirect - (optional) player redirects get not resolved before query
 -- @prefix - (optional) the prefix under which the players are stored in the placements
 -- @playerNumber - (optional) the number for how many params the query should look in LPDB
--- @startYear - (optional) query yearly earning starting with that year and return the values in a table
+-- @startYear - (optional) query yearly earning starting with that year and return the values in a lua table
 function Earnings.calculateForPlayer(args)
 	args = args or {}
 	local player = args.player
@@ -58,7 +58,7 @@ end
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
 -- @noRedirect - (optional) player redirects get not resolved before query
--- @startYear - (optional) query yearly earning starting with that year and return the values in a table
+-- @startYear - (optional) query yearly earning starting with that year and return the values in a lua table
 function Earnings.calculateForTeam(args)
 	args = args or {}
 	local team = args.team
