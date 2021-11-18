@@ -73,14 +73,12 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init('420px')
-	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
 
 	if match.comment then
 		local comment = MatchSummary.Comment():content(match.comment)
-		comment.root:css('display', 'block'):css('text-align', 'center')
 		matchSummary:comment(comment)
 	end
 
