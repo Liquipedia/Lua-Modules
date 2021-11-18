@@ -49,7 +49,7 @@ function Earnings.calculateForPlayer(args)
 	end
 	playerConditions = playerConditions .. ')'
 
-	return Earnings._calculate(playerConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorPlayer)
+	return Earnings.calculate(playerConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorPlayer)
 end
 
 ---
@@ -72,7 +72,7 @@ function Earnings.calculateForTeam(args)
 
 	local teamConditions = '([[participant::' .. team .. ']] OR [[extradata_participantteam::' .. team .. ']])'
 
-	return Earnings._calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
+	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
 end
 
 ---
