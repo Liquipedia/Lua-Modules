@@ -8,7 +8,7 @@
 
 local Class = require('Module:Class')
 
-local CustomEarnings = require('Module:Earnings/Base')
+local CustomEarnings = Lua.import('Module:Earnings/Base', {requireDevIfEnabled = true})
 
 -- overwrite functions if needed
 -- e.g. divisionFactor if there are other modes
