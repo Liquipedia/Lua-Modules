@@ -49,7 +49,7 @@ function Earnings.calculateForPlayer(args)
 	end
 	playerConditions = playerConditions .. ')'
 
-	return Earnings._calculate(playerConditions, args.year, args.mode, args.perYear, Earnings.divisionFactor)
+	return Earnings._calculate(playerConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorPlayer)
 end
 
 ---
@@ -72,7 +72,7 @@ function Earnings.calculateForTeam(args)
 
 	local teamConditions = '([[participant::' .. team .. ']] OR [[extradata_participantteam::' .. team .. ']])'
 
-	return Earnings._calculate(teamConditions, args.year, args.mode, args.perYear, Earnings._divisionFactorOne)
+	return Earnings._calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
 end
 
 ---
@@ -170,7 +170,7 @@ Earnings.defaultNumberOfPlayersInTeam = 5
 ---
 -- customizable in case it has to be changed
 -- (e.g. SC2 due to not having a fixed number of players per team)
-function Earnings.divisionFactor(mode)
+function Earnings.divisionFactorPlayer(mode)
 	if mode == '4v4' then
 		return 4
 	elseif mode == '3v3' then
@@ -184,7 +184,8 @@ function Earnings.divisionFactor(mode)
 	return Earnings.defaultNumberOfPlayersInTeam
 end
 
-function Earnings._divisionFactorOne()
+-- customizable in /Custom
+function Earnings.divisionFactorTeam()
 	return 1
 end
 
