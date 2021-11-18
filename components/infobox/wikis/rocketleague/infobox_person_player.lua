@@ -34,9 +34,6 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
-local _START_YEAR = '2015'
-local _CURRENT_YEAR = mw.getContentLanguage():formatDate('Y')
-
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
