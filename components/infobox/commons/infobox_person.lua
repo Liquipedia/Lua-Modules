@@ -209,7 +209,6 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		extradata = {},
 	}
 
-	_earnings.total = nil
 	for year, earningsOfYear in pairs(_earnings) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
@@ -276,11 +275,12 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	_earnings = Earnings.calculateForPlayer{
+	local totalEarnings
+	totalEarnings, _earnings = Earnings.calculateForPlayer{
 		team = args.earnings or self.pagename,
 		perYear = true
 	}
-	return _earnings.total
+	return totalEarnings
 end
 
 function Person:_createRegion(region, country)
