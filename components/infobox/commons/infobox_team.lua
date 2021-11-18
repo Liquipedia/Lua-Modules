@@ -83,16 +83,16 @@ function Team:createInfobox()
 				Builder{
 					builder = function()
 						_default_earnings_function_used = true
-						_earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
-						local earnings = _earnings.total
-						Variables.varDefine('earnings', earnings)
-						if earnings == 0 then
-							earnings = nil
+						local totalEarnings
+						totalEarnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
+						Variables.varDefine('earnings', totalEarnings)
+						if totalEarnings == 0 then
+							totalEarnings = nil
 						else
-							earnings = '$' .. Language:formatNum(earnings)
+							totalEarnings = '$' .. Language:formatNum(earnings)
 						end
 						return {
-							Cell{name = 'Earnings', content = {earnings}}
+							Cell{name = 'Earnings', content = {totalEarnings}}
 						}
 					end
 				}
@@ -189,7 +189,7 @@ end
 
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
-	local earnings = _earnings.total
+	local earnings = Variables.varDefault('earnings')
 	if String.isEmpty(earnings) and not _default_earnings_function_used then
 		error('Since your wiki uses a customized earnings function you ' ..
 			'have to set the LPDB earnings storage in the custom module')
@@ -213,7 +213,6 @@ function Team:_setLpdbData(args, links)
 		extradata = {}
 	}
 
-	_earnings.total = nil
 	for year, earningsOfYear in pairs(_earnings) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
