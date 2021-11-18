@@ -8,9 +8,6 @@
 
 local Class = require('Module:Class')
 local Template = require('Module:Template')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Earnings = require('Module:Earnings/Custom')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
@@ -28,9 +25,6 @@ local Builder = Widgets.Builder
 local Team = Class.new(BasicInfobox)
 
 local _LINK_VARIANT = 'team'
-
-local Language = mw.language.new('en')
-local _default_earnings_function_used = false
 
 function Team.run(frame)
 	local team = Team(frame)
@@ -81,17 +75,7 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						_default_earnings_function_used = true
-						local earnings = Earnings.calculateForTeam({team = self.pagename or self.name})
-						Variables.varDefine('earnings', earnings)
-						if earnings == 0 then
-							earnings = nil
-						else
-							earnings = '$' .. Language:formatNum(earnings)
-						end
-						return {
-							Cell{name = 'Earnings', content = {earnings}}
-						}
+						return error('You have not implemented a custom earnings function for your wiki')
 					end
 				}
 			}
@@ -187,11 +171,6 @@ end
 
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
-	local earnings = Variables.varDefault('earnings')
-	if String.isEmpty(earnings) and not _default_earnings_function_used then
-		error('Since your wiki uses a customized earnings function you ' ..
-			'have to set the LPDB earnings storage in the custom module')
-	end
 
 	local lpdbData = {
 		name = name,
@@ -199,7 +178,6 @@ function Team:_setLpdbData(args, links)
 		location2 = args.location2,
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
-		earnings = earnings,
 		createdate = args.created,
 		disbanddate = args.disbanded,
 		coach = args.coaches,
@@ -211,6 +189,10 @@ function Team:_setLpdbData(args, links)
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
+
+	if lpdbData['earnings'] == nil then
+		return error('You need to set the LPDB earnings storage in the custom module')
+	end
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
