@@ -13,8 +13,6 @@ local Logic = require('Module:Logic')
 local Class = require('Module:Class')
 
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
-local _FIRST_DAY_OF_YEAR = '-01-01'
-local _LAST_DAY_OF_YEAR = '-12-31'
 
 ---
 -- Entry point for players and individuals
