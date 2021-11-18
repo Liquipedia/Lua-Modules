@@ -210,12 +210,13 @@ function Team:_setLpdbData(args, links)
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
+		extradata = {}
 	}
-	lpdbData.extradata = {}
+
+	_earnings.total = nil
 	for year, earningsOfYear in pairs(_earnings) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
-	lpdbData.extradata.earningsintotal = nil
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
