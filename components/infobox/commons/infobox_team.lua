@@ -215,6 +215,7 @@ function Team:_setLpdbData(args, links)
 	for year, earningsOfYear in pairs(_earnings) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
+	lpdbData.extradata.earningsintotal = nil
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
