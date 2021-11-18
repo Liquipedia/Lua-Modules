@@ -87,6 +87,33 @@ function Row:create()
 	return self.root
 end
 
+local Mvp = Class.new(
+	function(self)
+		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
+		self.players = {}
+	end
+)
+
+function Mvp:addPlayer(player)
+	if not Logic.isEmpty(player) then
+		table.insert(self.players, player)
+	end
+	return self
+end
+
+function Mvp:create()
+	local span = mw.html.create('span')
+	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
+	for index, player in ipairs(self.players) do
+		if index > 1 then
+			span:wikitext(', ')
+		end
+		span:wikitext('[['..player..']]')
+	end
+	self.root:node(span)
+	return self.root
+end
+
 local Body = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -148,6 +175,7 @@ MatchSummary.Comment = Comment
 MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Break = Break
+MatchSummary.Mvp = Mvp
 
 function MatchSummary:init(width)
 	self.root = mw.html.create('div')
