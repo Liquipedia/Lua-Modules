@@ -112,7 +112,7 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'liquipediatier' then
-	    local ubisoftTier = _args.ubisofttier
+	    local ubisoftTier = ubisofttier
 		if not String.isEmpty(ubisoftTier) then
 			widgets = {
 				Cell{
@@ -125,7 +125,7 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{
 			name = 'Liquipedia tier',
 			content = {CustomLeague:_createLiquipediaTierDisplay()},
-			classes = {String.isEmpty(_args['ubisoftmajor']) and '' or 'valvepremier-highlighted'}
+			classes = {String.isEmpty(['ubisoftmajor']) and '' or 'valvepremier-highlighted'}
 		})
 		table.insert(widgets, Cell{
 			name = 'Ubisoft tier',
@@ -140,11 +140,9 @@ end
 function League:addToLpdb(lpdbData, args)
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 
-	lpdbData.game = _game or args.game
 	lpdbData.publishertier = args.ubisofttier
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
-		prizepoollocal = Variables.varDefault('prizepoollocal', ''),
 		startdate_raw = Variables.varDefault('raw_sdate', ''),
 		enddate_raw = Variables.varDefault('raw_edate', ''),
 		individual = not String.isEmpty(args.player_number),
@@ -155,12 +153,13 @@ end
 
 function CustomLeague:_createPrizepool()
 	local date
-	if not String.isEmpty(_args.currency_rate) then
-		date = _args.currency_date
-	end
 	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
 		return nil
 	end
+	if not String.isEmpty(_args.currency_rate) then
+		date = _args.currency_date
+	end
+
 
 	return PrizePoolCurrency._get({
 		prizepool = _args.prizepool,
@@ -180,7 +179,6 @@ function CustomLeague:_createLiquipediaTierDisplay()
 
 	--clean tier from unallowed values
 	--convert from text (old entries) to numbers
-	tier = Tier.number[string.lower(tier)] or tier
 	local tierText = Tier.text[tier]
 	local hasInvalidTier = tierText == nil
 	local hasTypeSetAsTier
@@ -223,7 +221,6 @@ function CustomLeague:_createLiquipediaTierDisplay()
 
 	Variables.varDefine('tournament_tiertype', tierType)
 	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
-	Variables.varDefine('tournament_liquipediatiertype', tierType)
 	return tierDisplay
 end
 
@@ -269,7 +266,7 @@ function CustomLeague:_createGameCell(args)
 	elseif args.game == _GAME_VEGAS2 then
 		content = '[[Vegas 2]][[Category:' .. betaTag .. 'Vegas 2 Competitions]]'
 	else
-		content = '[[Category:' .. betaTag .. 'Competitions]]'
+		content = '[[Category:Tournaments without game version]]'
 	end
 
 	content = content .. betaTag
