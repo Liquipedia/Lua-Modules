@@ -102,7 +102,7 @@ function Mvp:addPlayer(player)
 	return self
 end
 
-function MVP:setPoints(points)
+function Mvp:setPoints(points)
 	if Logic.isNumeric(points) then
 		self.points = points
 	end
