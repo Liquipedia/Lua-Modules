@@ -9,10 +9,12 @@
 local Earnings = {}
 local MathUtils = require('Module:Math')
 local String = require('Module:StringUtils')
-local Logic = require('Module:StringUtils')
+local Logic = require('Module:Logic')
 local Class = require('Module:Class')
 
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
+local _START_OF_YEAR = '-01-01'
+local _END_OF_YEAR = '-12-31'
 
 ---
 -- Entry point for players and individuals
@@ -22,7 +24,9 @@ local _DEFAULT_DATE = '1970-01-01 00:00:00'
 -- @noRedirect - (optional) player redirects get not resolved before query
 -- @prefix - (optional) the prefix under which the players are stored in the placements
 -- @playerNumber - (optional) the number for how many params the query should look in LPDB
+-- @startYear - (optional) query yearly earning starting with that year and return the values in a table
 function Earnings.calculateForPlayer(args)
+	args = args or {}
 	local player = args.player
 
 	if String.isEmpty(player) then
@@ -39,15 +43,13 @@ function Earnings.calculateForPlayer(args)
 		error('"playerNumber" has to be >= 1')
 	end
 
-	local condition = '([[participant::' .. player .. ']]'
+	local playerConditions = '([[participant::' .. player .. ']]'
 	for playerIndex = 1, playerNumber do
-		condition = condition .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
+		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
 	end
-	condition = condition .. ')'
+	playerConditions = playerConditions .. ')'
 
-	local money = Earnings._calculateIndividualEarnings(condition, args.year, args.mode)
-
-	return MathUtils._round(money)
+	return Earnings._calculate(playerConditions, args.year, args.mode, args.startYear, Earnings.divisionFactor)
 end
 
 ---
@@ -56,8 +58,11 @@ end
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
 -- @noRedirect - (optional) player redirects get not resolved before query
+-- @startYear - (optional) query yearly earning starting with that year and return the values in a table
 function Earnings.calculateForTeam(args)
+	args = args or {}
 	local team = args.team
+
 	if String.isEmpty(team) then
 		return 0
 	end
@@ -65,19 +70,9 @@ function Earnings.calculateForTeam(args)
 		team = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
 	end
 
-	local conditions = '([[participant::' .. team .. ']] OR [[extradata_participantteam::' .. team .. ']])'
-	conditions = Earnings._buildConditions(conditions, args.year, args.mode)
+	local teamConditions = '([[participant::' .. team .. ']] OR [[extradata_participantteam::' .. team .. ']])'
 
-	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = conditions,
-		query = 'sum::prizemoney',
-		groupby = 'mode asc'
-	})
-
-	if type(lpdbQueryData[1]) == 'table' then
-		MathUtils._round(lpdbQueryData[1].sum_prizemoney)
-	end
-	return 0
+	return Earnings._calculate(teamConditions, args.year, args.mode, args.startYear, Earnings._divisionFactorOne)
 end
 
 ---
@@ -85,8 +80,12 @@ end
 -- @participantCondition - the condition to find the player/team
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
-function Earnings._calculateIndividualEarnings(participantCondition, year, mode)
-	local conditions = Earnings._buildConditions(participantCondition, year, mode)
+function Earnings._calculate(conditions, year, mode, startYear, divisionFactor)
+	conditions = Earnings._buildConditions(conditions, year, mode, startYear)
+
+	if String.isNotEmpty(startYear) then
+		return Earnings._calculatePerYear(conditions, divisionFactor)
+	end
 
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
@@ -99,18 +98,53 @@ function Earnings._calculateIndividualEarnings(participantCondition, year, mode)
 	for _, item in ipairs(lpdbQueryData) do
 		if item['sum_prizemoney'] ~= nil then
 			local prizeMoney = item['sum_prizemoney']
-			totalEarnings = totalEarnings + (prizeMoney / Earnings.divisionFactor(item['mode']))
+			totalEarnings = totalEarnings + (prizeMoney / divisionFactor(item['mode']))
 		end
 	end
+
+	return MathUtils._round(totalEarnings, 2)
+end
+
+function Earnings._calculatePerYear(conditions, divisionFactor)
+	local totalEarningsOfYear = {}
+	local totalEarnings = {}
+	totalEarnings.total = 0
+
+	local offset = 0
+	local count = 5000
+	while count == 5000 do
+		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
+			conditions = conditions,
+			query = 'prizemoney, mode, date',
+			limit = 5000,
+			offset = offset
+		})
+		for _, item in pairs(lpdbQueryData) do
+			local prizeMoney = tonumber(item.prizemoney) or 0
+			local year = string.sub(item.date, 1, 4)
+			prizeMoney = prizeMoney / divisionFactor(item['mode'])
+			totalEarningsOfYear[year] = (totalEarningsOfYear[year] or 0) + prizeMoney
+		end
+		count = #lpdbQueryData
+		offset = offset + 5000
+	end	
+
+	for year, earningsOfYear in pairs(totalEarningsOfYear) do
+		totalEarnings[tonumber(year)] = MathUtils._round(earningsOfYear, 2)
+		totalEarnings.total = totalEarnings.total + earningsOfYear
+	end
+	totalEarnings.total = MathUtils._round(totalEarnings.total, 2)
 
 	return totalEarnings
 end
 
-function Earnings._buildConditions(conditions, year, mode)
+function Earnings._buildConditions(conditions, year, mode, startYear)
 	conditions = '[[date::!' .. _DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
-	if String.isNotEmpty(year) then
-		conditions = conditions .. ' AND ([[date::>' .. year .. '-01-01]] OR [[date::' .. year .. '-01-01]])'
-			.. 'AND ([[date::<' .. year .. '-12-31]] OR [[date::' .. year .. '-12-31]])'
+	if String.isNotEmpty(startYear) then
+		conditions = conditions .. ' AND ([[date::>' .. startYear .. _START_OF_YEAR .. ']] OR [[date::' .. startYear .. _START_OF_YEAR .. ']])'
+	elseif String.isNotEmpty(year) then
+		conditions = conditions .. ' AND ([[date::>' .. year .. _START_OF_YEAR .. ']] OR [[date::' .. year .. _START_OF_YEAR .. ']])'
+			.. 'AND ([[date::<' .. year .. _END_OF_YEAR .. ']] OR [[date::' .. year .. _END_OF_YEAR .. ']])'
 	end
 
 	if String.isNotEmpty(mode) then
@@ -136,6 +170,10 @@ function Earnings.divisionFactor(mode)
 	end
 
 	return _DEFAULT_NUMBER_OF_PLAYERS_IN_TEAM
+end
+
+function Earnings._divisionFactorOne()
+	return 1
 end
 
 return Class.export(Earnings)
