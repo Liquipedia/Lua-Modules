@@ -149,12 +149,7 @@ end
 function Earnings._buildConditions(conditions, year, mode)
 	conditions = '[[date::!' .. _DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
 	if String.isNotEmpty(year) then
-		conditions = conditions .. ' AND (' ..
-			'[[date::>' .. year .. _FIRST_DAY_OF_YEAR .. ']] ' ..
-			'OR [[date::' .. year .. _FIRST_DAY_OF_YEAR .. ']]' ..
-			') AND (' ..
-			'[[date::<' .. year .. _LAST_DAY_OF_YEAR .. ']] ' ..
-			'OR [[date::' .. year .. _LAST_DAY_OF_YEAR .. ']])'
+		conditions = conditions .. ' AND ([[date_year::'.. year ..']])'
 	end
 
 	if String.isNotEmpty(mode) then
