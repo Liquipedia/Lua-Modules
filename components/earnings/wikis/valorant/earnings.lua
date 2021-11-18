@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=halo
+-- wiki=valorant
 -- page=Module:Earnings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
