@@ -114,9 +114,9 @@ end
 -- customizable in case query has to be changed
 -- (e.g. SC2 due to not having a fixed number of players per team)
 function Earnings.calculatePerYear(conditions, divisionFactor)
-	local totalEarningsOfYear = {}
-	local totalEarnings = {}
-	totalEarnings.total = 0
+	local totalEarningsByYear = {}
+	local earningsData = {}
+	local totalEarnings 0
 
 	local offset = 0
 	local count = 5000
@@ -131,19 +131,20 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 			local prizeMoney = tonumber(item.prizemoney) or 0
 			local year = string.sub(item.date, 1, 4)
 			prizeMoney = prizeMoney / divisionFactor(item['mode'])
-			totalEarningsOfYear[year] = (totalEarningsOfYear[year] or 0) + prizeMoney
+			earningsData[year] = (earningsData[year] or 0) + prizeMoney
 		end
 		count = #lpdbQueryData
 		offset = offset + 5000
 	end
 
-	for year, earningsOfYear in pairs(totalEarningsOfYear) do
-		totalEarnings[tonumber(year)] = MathUtils._round(earningsOfYear, 2)
-		totalEarnings.total = totalEarnings.total + earningsOfYear
+	for year, earningsOfYear in pairs(earningsData) do
+		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear, 2)
+		totalEarnings = totalEarnings + earningsData
 	end
-	totalEarnings.total = MathUtils._round(totalEarnings.total, 2)
 
-	return totalEarnings
+	totalEarnings = MathUtils._round(totalEarnings, 2)
+
+	return totalEarnings, totalEarningsByYear
 end
 
 function Earnings._buildConditions(conditions, year, mode)
