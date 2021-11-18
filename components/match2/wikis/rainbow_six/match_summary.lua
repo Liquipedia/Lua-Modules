@@ -401,7 +401,6 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add Match MVP(s)
 	if match.extradata.mvp then
-		
 		local mvpData = match.extradata.mvp
 		if not Table.isEmpty(mvpData) and mvpData.players then
 			local mvp = MatchSummary.Mvp()
