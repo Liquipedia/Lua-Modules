@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
 -- wiki=rocketleague
--- page=Module:Earnings/Custom
+-- page=Module:Earnings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Class = require('Module:Class')
 
-local CustomEarnings = require('Module:Earnings')
+local CustomEarnings = require('Module:Earnings/Base')
 
 local _DEFAULT_NUMBER_OF_PLAYERS_IN_TEAM = 3
 
@@ -24,6 +24,19 @@ function CustomEarnings.divisionFactor(mode)
     end
 
     return _DEFAULT_NUMBER_OF_PLAYERS_IN_TEAM
+end
+
+-- Legacy entry points
+function p.calc_player(input)
+    local args = input.args
+
+    return p.calculateForTeam(args)
+end 
+
+function p.calc_team(input)
+    local args = input.args
+
+    return p.calculateForTeam(args)
 end
 
 return Class.export(CustomEarnings)
