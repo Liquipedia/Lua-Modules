@@ -102,6 +102,13 @@ function Mvp:addPlayer(player)
 	return self
 end
 
+function MVP:setPoints(points)
+	if Logic.isNumeric(points) then
+		self.points = points
+	end
+	return self
+end
+
 function Mvp:create()
 	local span = mw.html.create('span')
 	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
@@ -110,6 +117,9 @@ function Mvp:create()
 			span:wikitext(', ')
 		end
 		span:wikitext('[['..player..']]')
+	end
+	if self.points and self.points ~= 1 then
+		span:wikitext(' ('.. self.points ..'pts)')
 	end
 	self.root:node(span)
 	return self.root
