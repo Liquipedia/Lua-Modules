@@ -101,7 +101,6 @@ function StarcraftMatchSummary.Header(props)
 		if showScore then
 			display:addClass('brkts-popup-header-opponent-' .. side)
 				:addClass('brkts-popup-sc-header-opponent-with-score')
-				:css('width', '50%')--temp needed until css is refreshed in cache
 
 			local scoreDisplay = StarcraftOpponentDisplay.BlockScore{
 				isWinner = opponent.placement == 1 or opponent.advances,
