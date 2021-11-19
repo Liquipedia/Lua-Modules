@@ -12,6 +12,7 @@ local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
+local Localisation = require('Module:Localisation')
 local String = require('Module:StringUtils')
 local WarningBox = require('Module:WarningBox')
 local BasicInfobox = require('Module:Infobox/Basic')
@@ -168,9 +169,18 @@ function Team:_createLocation(location)
 		return ''
 	end
 
+	local locationDisplay = self:getStandardLocationValue(location)
+	local demonym
+	if String.isNotEmpty(locationDisplay) then
+		demonym = Localisation.getLocalisation(locationDisplay)
+		locationDisplay = '[[:Category:' .. locationDisplay
+			.. '|' .. locationDisplay .. ']]'
+	end
+
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
-			'[[:Category:' .. location .. '|' .. location .. ']]'
+			(String.isNotEmpty(demonym) and '[[Category:' .. demonym .. ' Teams]]' or '') ..
+			(locationDisplay or '')
 end
 
 function Team:getStandardLocationValue(location)
