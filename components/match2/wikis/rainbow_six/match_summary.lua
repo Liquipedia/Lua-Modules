@@ -307,45 +307,6 @@ function MapVeto:create()
 end
 
 
--- MVP Class
-local MVP = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
-		self.players = {}
-		self.points = nil
-	end
-)
-
-function MVP:addPlayer(player)
-	if not Logic.isEmpty(player) then
-		table.insert(self.players, player)
-	end
-	return self
-end
-
-function MVP:setPoints(points)
-	if Logic.isNumeric(points) then
-		self.points = points
-	end
-	return self
-end
-
-function MVP:create()
-	local span = mw.html.create('span')
-	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
-	for index, player in ipairs(self.players) do
-		if index > 1 then
-			span:wikitext(', ')
-		end
-		span:wikitext('[['..player..']]')
-	end
-	if self.points and self.points ~= 1 then
-		span:wikitext(' ('.. self.points ..'pts)')
-	end
-	self.root:node(span)
-	return self.root
-end
-
 local CustomMatchSummary = {}
 
 
@@ -442,7 +403,7 @@ function CustomMatchSummary._createBody(match)
 	if match.extradata.mvp then
 		local mvpData = match.extradata.mvp
 		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MVP()
+			local mvp = MatchSummary.Mvp()
 			for _, player in ipairs(mvpData.players) do
 				mvp:addPlayer(player)
 			end
