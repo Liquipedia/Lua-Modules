@@ -16,6 +16,7 @@ local ChampionIcon = require('Module:ChampionIcon')
 local Table = require('Module:Table')
 local ExternalLinks = require('Module:ExternalLinks')
 local String = require('Module:StringUtils')
+local Array = require('Module:Array')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
@@ -299,11 +300,15 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 			class = 'brkts-champion-icon',
 		})
 		if index == 1 then
-			champDisplay:css('padding-' .. (flip and 'right' or 'left'), '2px')
+			champDisplay:css('padding-left', '2px')
 		elseif index == numberOfChampions then
-			champDisplay:css('padding-' .. (flip and 'left' or 'right'), '2px')
+			champDisplay:css('padding-right', '2px')
 		end
 		table.insert(opponentChampionsDisplay, champDisplay)
+	end
+
+	if flip then
+		opponentChampionsDisplay = Array.reverse(opponentChampionsDisplay)
 	end
 
 	local display = mw.html.create('div')
