@@ -13,9 +13,7 @@ local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
 
---
--- Override functons
---
+-- Override trigger for MatchSummary popups
 function WikiSpecific.matchHasDetails(match)
 	return match.dateIsExact
 		or match.date ~= _EPOCH_TIME_EXTENDED
