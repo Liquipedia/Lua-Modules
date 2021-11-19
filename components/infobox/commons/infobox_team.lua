@@ -210,10 +210,6 @@ end
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 	local earnings = _total_earnings
-	if String.isEmpty(earnings) and not _default_earnings_function_used then
-		error('Since your wiki uses a customized earnings function you ' ..
-			'have to set the LPDB earnings storage in the custom module')
-	end
 
 	local lpdbData = {
 		name = name,
@@ -238,6 +234,11 @@ function Team:_setLpdbData(args, links)
 	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
+
+	if String.isEmpty(lpdbData.earnings) and not _default_earnings_function_used then
+		error('Since your wiki uses a customized earnings function you ' ..
+			'have to set the LPDB earnings storage in the custom module')
+	end
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
