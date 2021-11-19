@@ -25,7 +25,7 @@ function StarcraftMatchlistDisplay.MatchlistContainer(props)
 			Score = StarcraftMatchlistDisplay.Score,
 			matchHasDetails = StarcraftMatchGroupUtil.matchHasDetails,
 		}),
-		matches = MatchGroupUtil.fetchMatches(props.bracketId),
+		matches = MatchGroupUtil.fetchMatchlist(props.bracketId).matches,
 	})
 end
 

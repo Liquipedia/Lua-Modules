@@ -18,7 +18,7 @@ local CustomBracketDisplay = {propTypes = {}}
 
 function CustomBracketDisplay.BracketContainer(props)
 	return BracketDisplay.Bracket({
-		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
+		bracket = MatchGroupUtil.fetchBracket(props.bracketId),
 		config = Table.merge(props.config, {
 			OpponentEntry = CustomBracketDisplay.OpponentEntry,
 		})

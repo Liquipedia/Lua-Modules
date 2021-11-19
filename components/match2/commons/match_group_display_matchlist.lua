@@ -56,7 +56,7 @@ function MatchlistDisplay.MatchlistContainer(props)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.MatchlistContainer)
 	return MatchlistDisplay.Matchlist({
 		config = props.config,
-		matches = MatchGroupUtil.fetchMatches(props.bracketId),
+		matches = MatchGroupUtil.fetchMatchlist(props.bracketId).matches,
 	})
 end
 
