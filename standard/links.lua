@@ -80,7 +80,7 @@ local _PREFIXES = {
 		aligulac = 'http://aligulac.com/players/',
 		esl = 'https://play.eslgaming.com/player/',
 		challonge = 'http://challonge.com/users/',
-		faceit = 'https://www.faceit.com/players/'
+		faceit = 'https://www.faceit.com/players/',
 	},
 }
 
