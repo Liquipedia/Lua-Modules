@@ -170,11 +170,12 @@ function Team:_createLocation(location)
 	end
 
 	local locationDisplay = self:getStandardLocationValue(location)
+	local demonym
 	if String.isNotEmpty(locationDisplay) then
+		demonym = Localisation.getLocalisation(locationDisplay)
 		locationDisplay = '[[:Category:' .. locationDisplay
 			.. '|' .. locationDisplay .. ']]'
 	end
-	local demonym = Localisation.getLocalisation(locationDisplay)
 
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
