@@ -21,6 +21,7 @@ local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 9
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
+local ERROR_NUM = -99
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 
@@ -161,8 +162,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			end
 		end
 	else
-		local temporaryScore = -99
-		local temporaryPlace = -99
+		local tempMatchScore = ERROR_NUM
+		local tempTeamPlacement = ERROR_NUM
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score or '') or ''
@@ -172,12 +173,12 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 					winner = scoreIndex
 				end
 			end
-			if temporaryScore == score then
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or temporaryPlace
+			if tempMatchScore == score then
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or tempTeamPlacement
 			else
 				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
-				temporaryPlace = counter
-				temporaryScore = score
+				tempTeamPlacement = counter
+				tempMatchScore = score
 			end
 		end
 	end
@@ -186,8 +187,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or -99) or -99
-	local value2 = tonumber(table[key2].score or -99) or -99
+	local value1 = tonumber(table[key1].score or ERROR_NUM) or ERROR_NUM
+	local value2 = tonumber(table[key2].score or ERROR_NUM) or ERROR_NUM
 	return value1 > value2
 end
 
@@ -315,12 +316,7 @@ function matchFunctions.getVodStuff(match)
 	match.links = {}
 	local links = match.links
 	if match.preview then links.preview = match.preview end
-	if match.siegegg then links.siegegg = 'https://siege.gg/matches/' .. match.siegegg end
-	if match.opl then links.opl = 'https://www.opleague.eu/match/' .. match.opl end
 	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
-	if match.faceit then links.faceit = 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit end
-	if match.lpl then links.lpl = 'https://letsplay.live/match/' .. match.lpl end
-	if match.r6esports then links.r6esports = 'https://www.r6esports.com.br/en/match/' .. match.r6esports end
 	if match.stats then links.stats = match.stats end
 
 	-- apply vodgames
@@ -337,8 +333,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		matchsection = Variables.varDefault('matchsection'),
-		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
 		mapveto = matchFunctions.getMapVeto(match),
 		mvp = matchFunctions.getMVP(match),
