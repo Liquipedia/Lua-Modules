@@ -17,7 +17,7 @@ CustomEarnings.defaultNumberOfPlayersInTeam = 3
 function CustomEarnings.calc_player(input)
     local args = input.args
 
-    return CustomEarnings.calculateForTeam(args)
+    return CustomEarnings.calculateForPlayer(args)
 end
 
 function CustomEarnings.calc_team(input)

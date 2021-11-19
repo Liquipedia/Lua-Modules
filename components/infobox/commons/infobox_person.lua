@@ -17,6 +17,7 @@ local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
 local Region = require('Module:Region')
 local AgeCalculation = require('Module:AgeCalculation')
+local WarningBox = require('Module:WarningBox')
 local Earnings = require('Module:Earnings')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -33,6 +34,7 @@ local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
+local _warnings = {}
 local _earnings
 local _total_earnings
 
@@ -184,20 +186,21 @@ function Person:createInfobox()
 		)
 	end
 
-	return builtInfobox
+	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
 function Person:_setLpdbData(args, links, status, personType, earnings)
 	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
+
 	local lpdbData = {
 		id = args.id or mw.title.getCurrentTitle().prefixedText,
 		alternateid = args.ids,
 		name = args.romanized_name or args.name,
 		romanizedname = args.romanized_name or args.name,
 		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
-		nationality = args.country or args.nationality,
-		nationality2 = args.country2 or args.nationality2,
-		nationality3 = args.country3 or args.nationality3,
+		nationality = Person:getStandardNationalityValue(args.country or args.nationality),
+		nationality2 = Person:getStandardNationalityValue(args.country2 or args.nationality2),
+		nationality3 = Person:getStandardNationalityValue(args.country3 or args.nationality3),
 		birthdate = Variables.varDefault('player_birthdate'),
 		deathdate = Variables.varDefault('player_deathhdate'),
 		image = args.image,
@@ -220,6 +223,25 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 	local storageType = self:getStorageType(args, personType, status)
 
 	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. (args.id or self.name), lpdbData)
+end
+
+-- Allows this function to be used in /Custom
+function Person:getStandardNationalityValue(nationality)
+	if String.isEmpty(nationality) then
+		return nil
+	end
+
+	local nationalityToStore = Flags.CountryName(nationality)
+
+	if String.isEmpty(nationalityToStore) then
+		table.insert(
+			_warnings,
+			'"' .. nationality .. '" is not supported as a value for nationalities'
+		)
+		nationalityToStore = nil
+	end
+
+	return nationalityToStore
 end
 
 --- Allows for overriding this functionality
