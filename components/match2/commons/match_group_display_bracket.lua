@@ -75,7 +75,7 @@ The component fetches the match data from LPDB or page variables.
 function BracketDisplay.BracketContainer(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.BracketContainer)
 	return BracketDisplay.Bracket({
-		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
+		bracket = MatchGroupUtil.fetchBracket(props.bracketId),
 		config = props.config,
 	})
 end

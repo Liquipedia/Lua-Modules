@@ -22,7 +22,7 @@ local html = mw.html
 local StarcraftBracketDisplay = {propTypes = {}}
 
 function StarcraftBracketDisplay.BracketContainer(props)
-	local bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId)
+	local bracket = MatchGroupUtil.fetchBracket(props.bracketId)
 	return BracketDisplay.Bracket({
 		bracket = bracket,
 		config = Table.merge(props.config, {
