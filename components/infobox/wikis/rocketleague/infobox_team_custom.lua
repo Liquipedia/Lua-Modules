@@ -16,6 +16,9 @@ local TeamRanking = require('Module:TeamRanking')
 
 local CustomTeam = Class.new()
 
+local _CURRENT_YEAR = os.date('%Y')
+local _START_YEAR = 2015
+
 local CustomInjector = Class.new(Injector)
 
 local _team
@@ -56,6 +59,10 @@ function CustomInjector:wrapErrorMessage(text)
 	return outText
 end
 
+function CustomInjector:parse(_, widgets)
+	return widgets
+end
+
 function CustomTeam:addToLpdb(lpdbData, args)
 	if not String.isEmpty(args.teamcardimage) then
 		lpdbData.logo = 'File:' .. args.teamcardimage
@@ -65,6 +72,9 @@ function CustomTeam:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.rating = Variables.varDefault('rating')
 	lpdbData.extradata.tier = string.lower(args.tier or '')
+	for year = _START_YEAR, _CURRENT_YEAR do
+		lpdbData.extradata['earningsin' .. year] = '$' .. (lpdbData.extradata['earningsin' .. year] or 0)
+	end
 
 	return lpdbData
 end
