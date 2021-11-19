@@ -35,7 +35,7 @@ local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
 local _warnings = {}
-local _earnings
+local _earnings = {}
 local _total_earnings
 
 function Person.run(frame)
@@ -165,7 +165,6 @@ function Person:createInfobox()
 
 	infobox:bottom(self:createBottomContent())
 
-	Variables.varDefine('earnings', earnings)
 	local statusToStore = self:getStatusToStore(args)
 	infobox:categories(unpack(self:getCategories(
 				args,
@@ -299,7 +298,7 @@ end
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
 	_total_earnings, _earnings = Earnings.calculateForPlayer{
-		team = args.earnings or self.pagename,
+		player = args.earnings or self.pagename,
 		perYear = true
 	}
 	return _total_earnings
