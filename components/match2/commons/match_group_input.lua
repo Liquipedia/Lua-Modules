@@ -215,19 +215,17 @@ function MatchGroupInput._validateBracketData(bracketData, matchKey)
 	end
 end
 
-function MatchGroupInput.applyOverrideArgs(matches, args)
-	local matchGroupType = matches[1].bracketData.type
-
-	if args.title then
-		matches[1].bracketData.title = args.title
+function MatchGroupInput.applyOverrideArgs(matchGroup, args)
+	if args.title and matchGroup.matches[1] then
+		matchGroup.matches[1].bracketData.title = args.title
 	end
 
-	if matchGroupType == 'matchlist' then
-		for index, match in ipairs(matches) do
+	if matchGroup.type == 'matchlist' then
+		for index, match in ipairs(matchGroup.matches) do
 			match.bracketData.header = args['M' .. index .. 'header'] or match.bracketData.header
 		end
 	else
-		for _, match in ipairs(matches) do
+		for _, match in ipairs(matchGroup.matches) do
 			local _, baseMatchId = MatchGroupUtil.splitMatchId(match.matchId)
 			local matchKey = MatchGroupUtil.matchIdToKey(baseMatchId)
 			match.bracketData.header = args[matchKey .. 'header'] or match.bracketData.header

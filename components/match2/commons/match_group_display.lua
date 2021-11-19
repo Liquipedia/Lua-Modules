@@ -78,16 +78,13 @@ Displays a matchlist or bracket specified by ID.
 ]]
 function MatchGroupDisplay.MatchGroupById(args)
 	local bracketId = args.id or args[1]
-	args.id = bracketId
-	args[1] = bracketId
 	assert(bracketId, 'Missing bracket ID')
 
-	local matches = MatchGroupUtil.fetchMatches(bracketId)
-	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
-	local matchGroupType = matches[1].bracketData.type
+	local matchGroup = MatchGroupUtil.fetchMatchGroup(bracketId, args.format)
+	assert(#matchGroup.matches ~= 0, 'No data found for bracketId=' .. bracketId)
 
 	local config
-	if matchGroupType == 'matchlist' then
+	if matchGroup.type == 'matchlist' then
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
 		config = MatchlistDisplay.configFromArgs(args)
 	else
@@ -95,9 +92,9 @@ function MatchGroupDisplay.MatchGroupById(args)
 		config = BracketDisplay.configFromArgs(args)
 	end
 
-	MatchGroupInput.applyOverrideArgs(matches, args)
+	MatchGroupInput.applyOverrideArgs(matchGroup, args)
 
-	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
+	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroup.type)
 	return MatchGroupContainer({
 		bracketId = bracketId,
 		config = config,

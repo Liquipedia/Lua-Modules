@@ -181,7 +181,7 @@ Fetches all matches in a matchlist or bracket. Tries to read from page
 variables before fetching from LPDB. Returns a list of records
 ordered lexicographically by matchId.
 ]]
-function MatchGroupUtil.fetchMatchRecords(bracketId)
+MatchGroupUtil.fetchMatchRecords = FnUtil.memoize(function(bracketId)
 	local varData = Variables.varDefault('match2bracket_' .. bracketId)
 	if varData then
 		return Json.parse(varData)
@@ -199,11 +199,27 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 		end
 		return matchRecords
 	end
+end)
+
+function MatchGroupUtil.fetchMatchGroup(matchGroupId, type)
+	local matchRecords = MatchGroupUtil.fetchMatchRecords(matchGroupId)
+	type = type
+		or matchRecords[1] and matchRecords[1].match2bracketdata.type
+		or 'matchlist'
+
+	return type == 'bracket'
+		and MatchGroupUtil.fetchBracket(matchGroupId)
+		or MatchGroupUtil.fetchMatchlist(matchGroupId)
 end
 
-MatchGroupUtil.fetchMatchGroup = FnUtil.memoize(function(bracketId)
+MatchGroupUtil.fetchMatchlist = FnUtil.memoize(function(matchlistId)
+	local matchRecords = MatchGroupUtil.fetchMatchRecords(matchlistId)
+	return MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
+end)
+
+MatchGroupUtil.fetchBracket = FnUtil.memoize(function(bracketId)
 	local matchRecords = MatchGroupUtil.fetchMatchRecords(bracketId)
-	return MatchGroupUtil.makeMatchGroup(matchRecords)
+	return MatchGroupUtil.makeBracketFromRecords(matchRecords)
 end)
 
 --[[
@@ -222,6 +238,7 @@ function MatchGroupUtil.makeMatchGroup(matchRecords)
 end
 
 function MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
+	matchRecords = MatchGroupUtil.coerceMatchRecordsToType(matchRecords, 'matchlist')
 	local matches = Array.map(matchRecords, WikiSpecific.matchFromRecord)
 
 	return {
@@ -232,6 +249,7 @@ function MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
 end
 
 function MatchGroupUtil.makeBracketFromRecords(matchRecords)
+	matchRecords = MatchGroupUtil.coerceMatchRecordsToType(matchRecords, 'bracket')
 	local matches = Array.map(matchRecords, WikiSpecific.matchFromRecord)
 
 	local matchesById = Table.map(matches, function(_, match) return match.matchId, match end)
@@ -263,6 +281,33 @@ function MatchGroupUtil.makeBracketFromRecords(matchRecords)
 	MatchGroupUtil.populateAdvanceSpots(bracket)
 
 	return bracket
+end
+
+--[[
+Converts bracket match records to/from matchlist match records. The two types
+of match records are basically identical, so all this does is rename header
+fields.
+]]
+function MatchGroupUtil.coerceMatchRecordsToType(matchRecords, type)
+	return Array.map(matchRecords, function(matchRecord, index)
+		if matchRecord.match2bracketdata.type ~= type then
+			local bracketData = matchRecord.match2bracketdata
+
+			local header
+			if index == 1 and type == 'bracket' then
+				header = bracketData.header or bracketData.title or 'Matches'
+			end
+
+			return Table.merge(matchRecord, {
+				match2bracketdata = Table.merge(bracketData, {
+					type = type,
+					header = header,
+				}),
+			})
+		else
+			return matchRecord
+		end
+	end)
 end
 
 --[[
@@ -310,14 +355,6 @@ function MatchGroupUtil.backfillCoordinates(matchGroup)
 	for matchId, bracketData in pairs(matchGroup.bracketDatasById) do
 		bracketData.coordinates = bracketCoordinates.coordinatesByMatchId[matchId]
 	end
-end
-
---[[
-Fetches all matches in a matchlist or bracket. Returns a list of structurally
-typed matches lexicographically ordered by matchId.
-]]
-function MatchGroupUtil.fetchMatches(bracketId)
-	return MatchGroupUtil.fetchMatchGroup(bracketId).matches
 end
 
 --[[
@@ -694,30 +731,46 @@ function MatchGroupUtil.splitMatchId(matchId)
 end
 
 --[[
-Converts R01-M003 to R1M3
+Converts R01-M003 to R1M3 (for match in bracket), and 0005 to M5 (for match in
+matchlist)
 ]]
 function MatchGroupUtil.matchIdToKey(matchId)
+	-- Matchlist format
+	if tonumber(matchId) then
+		return 'M' .. tonumber(matchId)
+	end
+
+	-- Bracket format
 	if matchId == 'RxMBR' or matchId == 'RxMTP' then
 		return matchId
 	end
 	local round, matchInRound = matchId:match('^R(%d+)%-M(%d+)$')
-	return 'R' .. tonumber(round) .. 'M' .. tonumber(matchInRound)
+	if round and matchInRound then
+		return 'R' .. tonumber(round) .. 'M' .. tonumber(matchInRound)
+	end
 end
 
 --[[
-Converts R1M3 to R01-M003
+Converts R1M3 to R01-M003 (for match in bracket), and M5 or 5 to 0005 (for
+match in matchlist)
 ]]
 function MatchGroupUtil.matchIdFromKey(matchKey)
+	-- Matchlist format
+	if type(matchKey) == 'number' then
+		return string.format('%04d', matchKey)
+	end
+	local matchIndex = matchKey:match('^M?(%d+)$')
+	if matchIndex then
+		return string.format('%04d', matchIndex)
+	end
+
+	-- Bracket format
 	if matchKey == 'RxMBR' or matchKey == 'RxMTP' then
 		return matchKey
 	end
 	local round, matchInRound = matchKey:match('^R(%d+)M(%d+)$')
 	if round and matchInRound then
-		-- Bracket format
 		return 'R' .. string.format('%02d', round) .. '-M' .. string.format('%03d', matchInRound)
-	else
-		-- Matchlist format
-		return string.format('%04d', matchKey)
 	end
 end
 
