@@ -34,6 +34,9 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+local _START_YEAR = '2015'
+local _CURRENT_YEAR = mw.getContentLanguage():formatDate('Y')
+
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
@@ -211,6 +214,9 @@ function CustomPlayer:adjustLPDB(lpdbData)
 
 	lpdbData.extradata.role = _args.role
 	lpdbData.extradata.birthmonthandday = Variables.varDefault('birth_monthandday')
+	for year = _START_YEAR, _CURRENT_YEAR do
+		lpdbData.extradata['earningsin' .. year] = '$' .. (lpdbData.extradata['earningsin' .. year] or 0)
+	end
 
 	return lpdbData
 end
