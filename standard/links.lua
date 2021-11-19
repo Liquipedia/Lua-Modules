@@ -31,7 +31,7 @@ local _PREFIXES = {
 	esl = '',
 	facebook = 'http://facebook.com/',
 	['facebook-gaming'] = 'https://fb.gg/',
-	faceit = 'https://www.faceit.com/en/players/',
+	faceit = '',
 	['faceit-c'] = 'https://www.faceit.com/en/championship/',
 	fanclub = '',
 	gamersclub = 'https://csgo.gamersclub.gg/campeonatos/csgo/',
@@ -74,11 +74,13 @@ local _PREFIXES = {
 	team = {
 		aligulac = 'http://aligulac.com/teams/',
 		esl = 'https://play.eslgaming.com/team/',
+		faceit = 'https://www.faceit.com/teams/',
 	},
 	player = {
 		aligulac = 'http://aligulac.com/players/',
 		esl = 'https://play.eslgaming.com/player/',
-		challonge = 'http://challonge.com/users/'
+		challonge = 'http://challonge.com/users/',
+		faceit = 'https://www.faceit.com/players/'
 	},
 }
 
