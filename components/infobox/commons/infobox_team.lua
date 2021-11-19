@@ -180,7 +180,7 @@ function Team:_createLocation(location)
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
 			(String.isNotEmpty(demonym) and '[[Category:' .. demonym .. ' Teams]]' or '') ..
-			locationDisplay
+			(locationDisplay or '')
 end
 
 function Team:getStandardLocationValue(location)
