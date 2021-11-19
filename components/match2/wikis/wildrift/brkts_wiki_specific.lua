@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=halo
+-- wiki=wildrift
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -24,5 +24,7 @@ function WikiSpecific.matchHasDetails(match)
 		or match.comment
 		or 0 < #match.games
 end
+
+WikiSpecific.defaultIcon = 'Wild_Rift_Teamcard.png'
 
 return WikiSpecific

@@ -11,12 +11,14 @@ local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+local WarningBox = require('Module:WarningBox')
 
 local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
 local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local MatchGroupDisplay = {}
 
@@ -31,7 +33,7 @@ function MatchGroupDisplay.MatchlistBySpec(args)
 	local matchlistNode
 	if options.show then
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
-		local MatchlistContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('matchlist')
+		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist')
 		matchlistNode = MatchlistContainer({
 			bracketId = options.bracketId,
 			config = MatchlistDisplay.configFromArgs(args),
@@ -40,7 +42,7 @@ function MatchGroupDisplay.MatchlistBySpec(args)
 
 	local parts = Array.extend(
 		{matchlistNode},
-		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox)
+		Array.map(optionsWarnings, WarningBox.display)
 	)
 	return table.concat(Array.map(parts, tostring))
 end
@@ -56,7 +58,7 @@ function MatchGroupDisplay.BracketBySpec(args)
 	local bracketNode
 	if options.show then
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
-		local BracketContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer('bracket')
+		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket')
 		bracketNode = BracketContainer({
 			bracketId = options.bracketId,
 			config = BracketDisplay.configFromArgs(args),
@@ -64,8 +66,8 @@ function MatchGroupDisplay.BracketBySpec(args)
 	end
 
 	local parts = Array.extend(
-		Array.map(optionsWarnings, MatchGroupDisplay.WarningBox),
-		Array.map(bracketWarnings, MatchGroupDisplay.WarningBox),
+		Array.map(optionsWarnings, WarningBox.display),
+		Array.map(bracketWarnings, WarningBox.display),
 		{bracketNode}
 	)
 	return table.concat(Array.map(parts, tostring))
@@ -95,21 +97,38 @@ function MatchGroupDisplay.MatchGroupById(args)
 
 	MatchGroupInput.applyOverrideArgs(matches, args)
 
-	local MatchGroupContainer = require('Module:Brkts/WikiSpecific').getMatchGroupContainer(matchGroupType)
+	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return MatchGroupContainer({
 		bracketId = bracketId,
 		config = config,
 	})
 end
 
-function MatchGroupDisplay.WarningBox(text)
-	local div = mw.html.create('div'):addClass('show-when-logged-in navigation-not-searchable ambox-wrapper')
-		:addClass('ambox wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red')
-	local tbl = mw.html.create('table')
-	tbl:tag('tr')
-		:tag('td'):addClass('ambox-image'):wikitext('[[File:Emblem-important.svg|40px|link=]]'):done()
-		:tag('td'):addClass('ambox-text'):wikitext(text)
-	return div:node(tbl)
+--[[
+Displays a singleMatch specified by a bracket ID and matchID.
+]]
+function MatchGroupDisplay.MatchByMatchId(args)
+	local bracketId = args.id
+	local matchId = args.matchid
+	assert(bracketId, 'Missing bracket ID')
+	assert(matchId, 'Missing match ID')
+
+	matchId = MatchGroupUtil.matchIdFromKey(matchId)
+
+	local matchGroup = MatchGroupUtil.fetchMatchGroup(bracketId)
+	local fullMatchId = bracketId .. '_' .. matchId
+	local match = matchGroup.matchesById[fullMatchId]
+
+	assert(match, 'Match bracketId= ' .. bracketId .. ' matchId=' .. matchId .. ' not found')
+
+	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
+	local config = SingleMatchDisplay.configFromArgs(args)
+
+	local MatchGroupContainer = WikiSpecific.getMatchContainer('singleMatch')
+	return MatchGroupContainer({
+		matchId = fullMatchId,
+		config = config,
+	})
 end
 
 
@@ -123,6 +142,12 @@ end
 function MatchGroupDisplay.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroupDisplay.BracketBySpec(args)
+end
+
+-- Entry point of Template:ShowSingleMatch
+function MatchGroupDisplay.TemplateShowSingleMatch(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchGroupDisplay.MatchByMatchId(args)
 end
 
 -- Entry point of Template:ShowBracket, Template:DisplayMatchGroup

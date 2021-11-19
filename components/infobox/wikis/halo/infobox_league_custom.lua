@@ -45,6 +45,13 @@ function CustomLeague:createWidgetInjector()
 	return CustomInjector()
 end
 
+function CustomInjector:addCustomCells(widgets)
+	return {
+		Cell{name = 'Number of teams', content = {_args.team_number}},
+		Cell{name = 'Number of players', content = {_args.player_number}},
+	}
+end
+
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
@@ -68,22 +75,6 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'customcontent' then
-		if _args.player_number then
-			table.insert(widgets, Title{name = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {_args.player_number}})
-		end
-
-		--teams section
-		if _args.team_number or (not String.isEmpty(_args.team1)) then
-			Variables.varDefine('is_team_tournament', 1)
-			table.insert(widgets, Title{name = 'Teams'})
-		end
-		table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
-		if not String.isEmpty(_args.team1) then
-			local teams = CustomLeague:_makeBasedListFromArgs('team')
-			table.insert(widgets, Center{content = teams})
-		end
-
 		--maps
 		if not String.isEmpty(_args.map1) then
 			table.insert(widgets, Title{name = 'Maps'})

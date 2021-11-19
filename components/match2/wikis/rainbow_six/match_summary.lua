@@ -10,12 +10,12 @@ local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchSummary = require('Module:MatchSummary/Base')
 local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local _POSITION_LEFT = 1
@@ -44,6 +44,7 @@ local _LINK_DATA = {
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
+local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Operator Bans Class
@@ -306,45 +307,6 @@ function MapVeto:create()
 end
 
 
--- MVP Class
-local MVP = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
-		self.players = {}
-		self.points = nil
-	end
-)
-
-function MVP:addPlayer(player)
-	if not Logic.isEmpty(player) then
-		table.insert(self.players, player)
-	end
-	return self
-end
-
-function MVP:setPoints(points)
-	if Logic.isNumeric(points) then
-		self.points = points
-	end
-	return self
-end
-
-function MVP:create()
-	local span = mw.html.create('span')
-	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
-	for index, player in ipairs(self.players) do
-		if index > 1 then
-			span:wikitext(', ')
-		end
-		span:wikitext('[['..player..']]')
-	end
-	if self.points and self.points ~= 1 then
-		span:wikitext(' ('.. self.points ..'pts)')
-	end
-	self.root:node(span)
-	return self.root
-end
-
 local CustomMatchSummary = {}
 
 
@@ -404,8 +366,11 @@ end
 
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
-	header  :left(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
-			:right(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
+
+	header:leftOpponent(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
+	      :leftScore(CustomMatchSummary._createScore(match.opponents[1]))
+	      :rightScore(CustomMatchSummary._createScore(match.opponents[2]))
+	      :rightOpponent(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
@@ -413,20 +378,11 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact then
+	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
 		-- dateIsExact means we have both date and time. Show countdown
+		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
-		))
-	elseif match.date ~= _EPOCH_TIME_EXTENDED then
-		-- if match is not epoch=0, we have a date, so display the date
-		-- TODO:Less code duplication, all html stuff is a copy from DisplayHelper.MatchCountdownBlock
-		body:addRow(MatchSummary.Row():addElement(
-			mw.html.create('div'):addClass('match-countdown-block')
-				:css('text-align', 'center')
-				-- Workaround for .brkts-popup-body-element > * selector
-				:css('display', 'block')
-				:wikitext(mw.getContentLanguage():formatDate('F d, Y', match.date))
 		))
 	end
 
@@ -447,7 +403,7 @@ function CustomMatchSummary._createBody(match)
 	if match.extradata.mvp then
 		local mvpData = match.extradata.mvp
 		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MVP()
+			local mvp = MatchSummary.Mvp()
 			for _, player in ipairs(mvpData.players) do
 				mvp:addPlayer(player)
 			end
@@ -618,12 +574,19 @@ function CustomMatchSummary._createCheckMark(isWinner, position)
 end
 
 function CustomMatchSummary._createOpponent(opponent, side)
-	return OpponentDisplay.BlockOpponent({
+	return OpponentDisplay.BlockOpponent{
 		flip = side == 'left',
 		opponent = opponent,
 		overflow = 'wrap',
 		teamStyle = 'short',
-	})
+	}
+end
+
+function CustomMatchSummary._createScore(opponent)
+	return OpponentDisplay.BlockScore{
+		isWinner = opponent.placement == 1 or opponent.advances,
+		scoreText = OpponentDisplay.InlineScore(opponent),
+	}
 end
 
 return CustomMatchSummary
