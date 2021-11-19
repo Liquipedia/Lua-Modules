@@ -45,7 +45,7 @@ function Earnings.calculateForPlayer(args)
 
 	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
 	if playerPositionLimit <=0 then
-		error('"maxPlayers" has to be >= 1')
+		error('"playerPositionLimit" has to be >= 1')
 	end
 
 	local playerConditions = '([[participant::' .. player .. ']]'
