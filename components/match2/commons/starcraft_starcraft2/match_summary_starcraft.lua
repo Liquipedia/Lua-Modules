@@ -31,18 +31,23 @@ local StarcraftMatchSummary = {propTypes = {}}
 StarcraftMatchSummary.propTypes.MatchSummaryContainer = {
 	bracketId = 'string',
 	matchId = 'string',
+	config = 'table?',
 }
 
 function StarcraftMatchSummary.MatchSummaryContainer(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
+	local config = {
+		showScore = props.config or false
+	}
 	local MatchSummary = match.isFfa
 		and Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary
 		or StarcraftMatchSummary.MatchSummary
-	return MatchSummary({match = match})
+	return MatchSummary({match = match, config = config})
 end
 
 StarcraftMatchSummary.propTypes.MatchSummary = {
 	match = StarcraftMatchGroupUtil.types.Match,
+	config = 'table'
 }
 
 function StarcraftMatchSummary.MatchSummary(props)
@@ -62,31 +67,58 @@ function StarcraftMatchSummary.MatchSummary(props)
 		:addClass('brkts-popup')
 		:addClass('brkts-popup-sc')
 		:addClass(match.opponentMode == 'uniform' and 'brkts-popup-sc-uniform-match' or 'brkts-popup-sc-team-match')
-		:node(StarcraftMatchSummary.Header({match = match}))
+		:node(StarcraftMatchSummary.Header({match = match, config = props.config}))
 		:node(StarcraftMatchSummary.Body({match = match}))
 		:node(StarcraftMatchSummary.Footer({match = match, showHeadToHead = match.headToHead}))
 end
 
 StarcraftMatchSummary.propTypes.Header = {
 	match = StarcraftMatchGroupUtil.types.Match,
+	config = 'table'
 }
 
 function StarcraftMatchSummary.Header(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.Header)
 	local match = props.match
 
+	local showScore = props.config.showScore
+
 	local renderOpponent = function(opponentIx)
 		local opponent = match.opponents[opponentIx]
-		return StarcraftOpponentDisplay.BlockOpponent({
-			flip = opponentIx == 1,
+		local flip = opponentIx == 1
+		local opponentDisplay = {}
+		table.insert(opponentDisplay, StarcraftOpponentDisplay.BlockOpponent{
+			flip = flip,
 			opponent = opponent,
 			overflow = 'wrap',
 			showFlag = false,
-			showLink = opponent.type == 'team',
+			showLink = opponent.type == 'team' or showScore,
 		})
-			:addClass('brkts-popup-header-opponent')
-	end
+		local side = (flip and 'left' or 'right')
 
+		local display = html.create('div')
+
+		if showScore then
+			display:addClass('brkts-popup-header-opponent-' .. side)
+				:addClass('brkts-popup-sc-header-opponent-with-score')
+				:css('width', '50%')--temp needed until css is refreshed in cache
+
+			local scoreDisplay = StarcraftOpponentDisplay.BlockScore{
+				isWinner = opponent.placement == 1 or opponent.advances,
+				scoreText = StarcraftOpponentDisplay.InlineScore(opponent),
+			}
+			scoreDisplay:addClass('brkts-popup-header-opponent-score-' .. side)
+			table.insert(opponentDisplay, scoreDisplay)
+		else
+			display:addClass('brkts-popup-header-opponent')
+		end
+		if not flip then
+			opponentDisplay = Array.reverse(opponentDisplay)
+		end
+		Array.extendWith(display.nodes, opponentDisplay)
+
+		return display
+	end
 	local header = html.create('div'):addClass('brkts-popup-header-dev')
 		:node(renderOpponent(1))
 		:node(renderOpponent(2))
