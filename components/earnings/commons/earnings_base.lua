@@ -13,6 +13,10 @@ local Logic = require('Module:Logic')
 local Class = require('Module:Class')
 
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
+local _MAX_QUERY_LIMIT = 5000
+
+-- customizable in /Custom
+Earnings.defaultNumberOfPlayersInTeam = 5
 
 ---
 -- Entry point for players and individuals
@@ -117,12 +121,12 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 	local totalEarnings = 0
 
 	local offset = 0
-	local count = 5000
-	while count == 5000 do
+	local count = _MAX_QUERY_LIMIT
+	while count == _MAX_QUERY_LIMIT do
 		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions,
 			query = 'prizemoney, mode, date',
-			limit = 5000,
+			limit = _MAX_QUERY_LIMIT,
 			offset = offset
 		})
 		for _, item in pairs(lpdbQueryData) do
@@ -132,7 +136,7 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 			earningsData[year] = (earningsData[year] or 0) + prizeMoney
 		end
 		count = #lpdbQueryData
-		offset = offset + 5000
+		offset = offset + _MAX_QUERY_LIMIT
 	end
 
 	for year, earningsOfYear in pairs(earningsData) do
@@ -157,9 +161,6 @@ function Earnings._buildConditions(conditions, year, mode)
 
 	return conditions
 end
-
--- customizable in /Custom
-Earnings.defaultNumberOfPlayersInTeam = 5
 
 ---
 -- customizable in case it has to be changed
