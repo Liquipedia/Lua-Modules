@@ -28,7 +28,7 @@ Earnings.defaultNumberOfStoredPlayersPerMatch = 10
 -- @mode - (optional) the mode to calculate earnings for
 -- @noRedirect - (optional) player redirects get not resolved before query
 -- @prefix - (optional) the prefix under which the players are stored in the placements
--- @maxPlayers - (optional) the number for how many params the query should look in LPDB
+-- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 function Earnings.calculateForPlayer(args)
 	args = args or {}
@@ -43,13 +43,13 @@ function Earnings.calculateForPlayer(args)
 
 	local prefix = args.prefix or 'p'
 
-	local maxPlayers = tonumber(args.maxPlayers) or Earnings.defaultNumberOfStoredPlayersPerMatch
-	if maxPlayers <=0 then
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
+	if playerPositionLimit <=0 then
 		error('"maxPlayers" has to be >= 1')
 	end
 
 	local playerConditions = '([[participant::' .. player .. ']]'
-	for playerIndex = 1, maxPlayers do
+	for playerIndex = 1, playerPositionLimit do
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
 	end
 	playerConditions = playerConditions .. ')'
