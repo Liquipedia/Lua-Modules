@@ -85,8 +85,11 @@ end
 function wikiCopyPaste.getStart(template, id, modus, args)
 	local out = tostring(mw.message.new('BracketConfigBracketTemplate'))
 	if out == '⧼BracketConfigBracketTemplate⧽' then
-		out = '{{#invoke:MatchGroup|' ..
-			(modus == 'bracket' and ('bracket|Bracket/' .. template) or 'matchlist') ..
+		out = '{{' .. (
+			(modus == 'bracket' and
+				('Bracket|Bracket/' .. template)
+			) or (modus == 'singlematch' and 'SingleMatch')
+			or 'Matchlist') ..
 			'|id=' .. id
 	else
 		out = string.gsub(out, '<nowiki>', '')
@@ -95,7 +98,12 @@ function wikiCopyPaste.getStart(template, id, modus, args)
 		out = string.gsub(out, '<<bracketid>>', id)
 		out = string.gsub(out, '^{{#invoke:[mM]atchGroup|[bB]racket', 'Bracket')
 		out = string.gsub(out, '[Bb]racket|<<templatename>>',
-			(modus == 'bracket' and ('Bracket|Bracket/' .. template) or 'matchlist'))
+			(
+				modus == 'bracket' and ('Bracket|Bracket/' .. template)
+				or modus == 'singlematch' and 'SingleMatch'
+				or 'Matchlist'
+			)
+		)
 	end
 
 	return out
