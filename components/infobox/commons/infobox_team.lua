@@ -8,13 +8,14 @@
 
 local Class = require('Module:Class')
 local Template = require('Module:Template')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Earnings = require('Module:Earnings')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
+local String = require('Module:StringUtils')
+local WarningBox = require('Module:WarningBox')
+local Variables = require('Module:Variables')
+local Earnings = require('Module:Earnings')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -33,6 +34,8 @@ local Language = mw.language.new('en')
 local _default_earnings_function_used = false
 local _earnings = {}
 local _total_earnings
+
+local _warnings = {}
 
 function Team.run(frame)
 	local team = Team(frame)
@@ -165,7 +168,7 @@ function Team:createInfobox()
 		self:defineCustomPageVariables(args)
 	end
 
-	return builtInfobox
+	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
 function Team:_createRegion(region)
@@ -184,6 +187,24 @@ function Team:_createLocation(location)
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
 			'[[:Category:' .. location .. '|' .. location .. ']]'
+end
+
+function Team:getStandardLocationValue(location)
+	if String.isEmpty(location) then
+		return nil
+	end
+
+	local locationToStore = Flags.CountryName(location)
+
+	if String.isEmpty(locationToStore) then
+		table.insert(
+			_warnings,
+			'"' .. location .. '" is not supported as a value for locations'
+		)
+		locationToStore = nil
+	end
+
+	return locationToStore
 end
 
 function Team:_setLpdbData(args, links)

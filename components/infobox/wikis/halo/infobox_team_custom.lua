@@ -7,7 +7,6 @@
 --
 
 local Team = require('Module:Infobox/Team')
-local Flags = require('Module:Flags')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -40,7 +39,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomTeam:_createRegion(region, location)
-	region = Region.run({region = region, country = CustomTeam:_getStandardLocationValue(location)})
+	region = Region.run({region = region, country = Team:getStandardLocationValue(location)})
 	if type(region) == 'table' then
 		_region = region.region
 		return region.display
@@ -54,15 +53,9 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.logo = 'File:' .. args.image
 	end
 
-	lpdbData.location = CustomTeam:_getStandardLocationValue(_team.args.location)
-	lpdbData.location2 = CustomTeam:_getStandardLocationValue(_team.args.location2)
 	lpdbData.region = _region
 
 	return lpdbData
-end
-
-function CustomTeam:_getStandardLocationValue(location)
-	return Flags.CountryName(location) or location
 end
 
 function CustomTeam:createWidgetInjector()

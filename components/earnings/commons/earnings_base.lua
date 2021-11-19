@@ -13,8 +13,13 @@ local Logic = require('Module:Logic')
 local Class = require('Module:Class')
 
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
-local _FIRST_DAY_OF_YEAR = '-01-01'
-local _LAST_DAY_OF_YEAR = '-12-31'
+local _MAX_QUERY_LIMIT = 5000
+
+-- customizable in /Custom
+Earnings.defaultNumberOfPlayersInTeam = 5
+
+-- customizable in /Custom
+Earnings.defaultNumberOfStoredPlayersPerMatch = 10
 
 ---
 -- Entry point for players and individuals
@@ -23,8 +28,8 @@ local _LAST_DAY_OF_YEAR = '-12-31'
 -- @mode - (optional) the mode to calculate earnings for
 -- @noRedirect - (optional) player redirects get not resolved before query
 -- @prefix - (optional) the prefix under which the players are stored in the placements
--- @playerNumber - (optional) the number for how many params the query should look in LPDB
--- @startYear - (optional) query yearly earning starting with that year and return the values in a lua table
+-- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
+-- @perYear - (optional) query all earnings per year and return the values in a lua table
 function Earnings.calculateForPlayer(args)
 	args = args or {}
 	local player = args.player
@@ -38,18 +43,18 @@ function Earnings.calculateForPlayer(args)
 
 	local prefix = args.prefix or 'p'
 
-	local playerNumber = tonumber(args.playerNumber) or 10
-	if playerNumber <=0 then
-		error('"playerNumber" has to be >= 1')
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
+	if playerPositionLimit <=0 then
+		error('"playerPositionLimit" has to be >= 1')
 	end
 
 	local playerConditions = '([[participant::' .. player .. ']]'
-	for playerIndex = 1, playerNumber do
+	for playerIndex = 1, playerPositionLimit do
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
 	end
 	playerConditions = playerConditions .. ')'
 
-	return Earnings._calculate(playerConditions, args.year, args.mode, args.startYear, Earnings.divisionFactor)
+	return Earnings.calculate(playerConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorPlayer)
 end
 
 ---
@@ -58,7 +63,7 @@ end
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
 -- @noRedirect - (optional) player redirects get not resolved before query
--- @startYear - (optional) query yearly earning starting with that year and return the values in a lua table
+-- @perYear - (optional) query all earnings per year and return the values in a lua table
 function Earnings.calculateForTeam(args)
 	args = args or {}
 	local team = args.team
@@ -72,7 +77,7 @@ function Earnings.calculateForTeam(args)
 
 	local teamConditions = '([[participant::' .. team .. ']] OR [[extradata_participantteam::' .. team .. ']])'
 
-	return Earnings._calculate(teamConditions, args.year, args.mode, args.startYear, Earnings._divisionFactorOne)
+	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
 end
 
 ---
@@ -80,11 +85,16 @@ end
 -- @participantCondition - the condition to find the player/team
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
-function Earnings._calculate(conditions, year, mode, startYear, divisionFactor)
-	conditions = Earnings._buildConditions(conditions, year, mode, startYear)
+-- @perYear - (optional) query all earnings per year and return the values in a lua table
+-- @divisionFactor - divisionFactor function
+---
+-- customizable in case query has to be changed
+-- (e.g. SC2 due to not having a fixed number of players per team)
+function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
+	conditions = Earnings._buildConditions(conditions, year, mode)
 
-	if String.isNotEmpty(startYear) then
-		return Earnings._calculatePerYear(conditions, divisionFactor)
+	if Logic.readBool(perYear) then
+		return Earnings.calculatePerYear(conditions, divisionFactor)
 	end
 
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -105,52 +115,47 @@ function Earnings._calculate(conditions, year, mode, startYear, divisionFactor)
 	return MathUtils._round(totalEarnings, 2)
 end
 
-function Earnings._calculatePerYear(conditions, divisionFactor)
-	local totalEarningsOfYear = {}
-	local totalEarnings = {}
-	totalEarnings.total = 0
+---
+-- customizable in case query has to be changed
+-- (e.g. SC2 due to not having a fixed number of players per team)
+function Earnings.calculatePerYear(conditions, divisionFactor)
+	local totalEarningsByYear = {}
+	local earningsData = {}
+	local totalEarnings = 0
 
 	local offset = 0
-	local count = 5000
-	while count == 5000 do
+	local count = _MAX_QUERY_LIMIT
+	while count == _MAX_QUERY_LIMIT do
 		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions,
 			query = 'prizemoney, mode, date',
-			limit = 5000,
+			limit = _MAX_QUERY_LIMIT,
 			offset = offset
 		})
 		for _, item in pairs(lpdbQueryData) do
 			local prizeMoney = tonumber(item.prizemoney) or 0
 			local year = string.sub(item.date, 1, 4)
 			prizeMoney = prizeMoney / divisionFactor(item['mode'])
-			totalEarningsOfYear[year] = (totalEarningsOfYear[year] or 0) + prizeMoney
+			earningsData[year] = (earningsData[year] or 0) + prizeMoney
 		end
 		count = #lpdbQueryData
-		offset = offset + 5000
+		offset = offset + _MAX_QUERY_LIMIT
 	end
 
-	for year, earningsOfYear in pairs(totalEarningsOfYear) do
-		totalEarnings[tonumber(year)] = MathUtils._round(earningsOfYear, 2)
-		totalEarnings.total = totalEarnings.total + earningsOfYear
+	for year, earningsOfYear in pairs(earningsData) do
+		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear, 2)
+		totalEarnings = totalEarnings + earningsOfYear
 	end
-	totalEarnings.total = MathUtils._round(totalEarnings.total, 2)
 
-	return totalEarnings
+	totalEarnings = MathUtils._round(totalEarnings, 2)
+
+	return totalEarnings, totalEarningsByYear
 end
 
-function Earnings._buildConditions(conditions, year, mode, startYear)
+function Earnings._buildConditions(conditions, year, mode)
 	conditions = '[[date::!' .. _DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
-	if String.isNotEmpty(startYear) then
-		conditions = conditions .. ' AND (' ..
-			'[[date::>' .. startYear .. _FIRST_DAY_OF_YEAR .. ']] ' ..
-			'OR [[date::' .. startYear .. _FIRST_DAY_OF_YEAR .. ']])'
-	elseif String.isNotEmpty(year) then
-		conditions = conditions .. ' AND (' ..
-			'[[date::>' .. year .. _FIRST_DAY_OF_YEAR .. ']] ' ..
-			'OR [[date::' .. year .. _FIRST_DAY_OF_YEAR .. ']]' ..
-			') AND (' ..
-			'[[date::<' .. year .. _LAST_DAY_OF_YEAR .. ']] ' ..
-			'OR [[date::' .. year .. _LAST_DAY_OF_YEAR .. ']])'
+	if String.isNotEmpty(year) then
+		conditions = conditions .. ' AND ([[date_year::'.. year ..']])'
 	end
 
 	if String.isNotEmpty(mode) then
@@ -160,11 +165,10 @@ function Earnings._buildConditions(conditions, year, mode, startYear)
 	return conditions
 end
 
--- overwritable in /Custom
-local _DEFAULT_NUMBER_OF_PLAYERS_IN_TEAM = 5
-
--- overwritable in /Custom
-function Earnings.divisionFactor(mode)
+---
+-- customizable in case it has to be changed
+-- (e.g. SC2 due to not having a fixed number of players per team)
+function Earnings.divisionFactorPlayer(mode)
 	if mode == '4v4' then
 		return 4
 	elseif mode == '3v3' then
@@ -175,10 +179,11 @@ function Earnings.divisionFactor(mode)
 		return 1
 	end
 
-	return _DEFAULT_NUMBER_OF_PLAYERS_IN_TEAM
+	return Earnings.defaultNumberOfPlayersInTeam
 end
 
-function Earnings._divisionFactorOne()
+-- customizable in /Custom
+function Earnings.divisionFactorTeam(mode)
 	return 1
 end
 
