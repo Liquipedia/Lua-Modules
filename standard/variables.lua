@@ -14,6 +14,11 @@ function Variables.varDefine(name, val)
 	return mw.ext.VariablesLua.vardefine(name, val)
 end
 
+function Variables.varDefineEcho(name, val)
+	mw.ext.VariablesLua.vardefine(name, val)
+	return val
+end
+
 function Variables.varDefault(name, default)
 	local val = mw.ext.VariablesLua.var(name)
 	return (val ~= '' and val ~= nil) and val or default
