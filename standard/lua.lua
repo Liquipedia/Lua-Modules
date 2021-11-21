@@ -129,8 +129,12 @@ function Lua._prepareAndInvoke(frame, baseModuleName, fnName)
 			error('Lua.invoke: No such function'
 				.. ' (module=' .. baseModuleName .. ', fn=' .. fnName .. ', dev=' .. FeatureFlag.get('dev') .. ')')
 		end
-		local fn = module['_autoInvoke_inner_' .. fnName] or module[fnName]
-		return Lua._callAndDisplayErrors(fn, frame)
+
+		local context = {module = module, baseModuleName = baseModuleName}
+		return Lua.withPerfSetup(context, function()
+			local fn = module['_autoInvoke_inner_' .. fnName] or module[fnName]
+			return Lua._callAndDisplayErrors(fn, frame)
+		end)
 	end)
 end
 
@@ -142,6 +146,19 @@ function Lua._callAndDisplayErrors(fn, frame)
 		table.insert(parts, node)
 	end
 	return table.concat(Array.map(parts, tostring))
+end
+
+function Lua.withPerfSetup(context, f)
+	if FeatureFlag.get('perf') then
+		require('Module:Performance/Util').startFromInvoke(context)
+	end
+	local function post(...)
+		if FeatureFlag.get('perf') then
+			require('Module:Performance/Util').stopAndSave()
+		end
+		return ...
+	end
+	return post(f())
 end
 
 --[[

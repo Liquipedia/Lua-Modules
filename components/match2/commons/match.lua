@@ -441,7 +441,6 @@ end
 
 if FeatureFlag.get('perf') then
 	Match.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'subobjectPerf'})
-	require('Module:Performance/Util').setupEntryPoints(Match, {'toEncodedJson'})
 end
 
 Lua.autoInvokeEntryPoints(Match, 'Module:Match', {'toEncodedJson'})
