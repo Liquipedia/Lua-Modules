@@ -180,8 +180,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			end
 		end
 	else
-		local lastScore = ERROR_NUM
-		local lastPlacement = ERROR_NUM
+		local lastScore = -99
+		local lastPlacement = -99
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score or '') or ''
@@ -205,8 +205,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or ERROR_NUM) or ERROR_NUM
-	local value2 = tonumber(table[key2].score or ERROR_NUM) or ERROR_NUM
+	local value1 = tonumber(table[key1].score or -99) or -99
+	local value2 = tonumber(table[key2].score or -99) or -99
 	return value1 > value2
 end
 
