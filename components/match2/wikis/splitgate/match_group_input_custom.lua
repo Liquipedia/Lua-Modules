@@ -162,8 +162,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			end
 		end
 	else
-		local lastScore = NO_SCORE
-		local lastPlacement = NO_SCORE
+		local lastScore = _NO_SCORE
+		local lastPlacement = _NO_SCORE
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score or '') or ''
@@ -187,8 +187,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or NO_SCORE) or NO_SCORE
-	local value2 = tonumber(table[key2].score or NO_SCORE) or NO_SCORE
+	local value1 = tonumber(table[key1].score or _NO_SCORE) or _NO_SCORE
+	local value2 = tonumber(table[key2].score or _NO_SCORE) or _NO_SCORE
 	return value1 > value2
 end
 
@@ -226,7 +226,7 @@ end
 -- match related functions
 --
 function matchFunctions.getBestOf(match)
-	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof', DEFAULT_BESTOF))
+	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof', _DEFAULT_BESTOF))
 	Variables.varDefine('bestof', match.bestof)
 	return match
 end
@@ -237,7 +237,7 @@ end
 -- 2) At least one map has a winner
 function matchFunctions.getScoreFromMapWinners(match)
 	local opponentNumber = 0
-	for index = 1, MAX_NUM_OPPONENTS do
+	for index = 1, _MAX_NUM_OPPONENTS do
 		if String.isEmpty(match['opponent' .. index]) then
 			break
 		end
@@ -246,7 +246,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	local newScores = {}
 	local foundScores = false
 
-	for i = 1, MAX_NUM_MAPS do
+	for i = 1, _MAX_NUM_MAPS do
 		if match['map'..i] then
 			local winner = tonumber(match['map'..i].winner)
 			foundScores = true
@@ -320,7 +320,7 @@ function matchFunctions.getVodStuff(match)
 	if match.stats then links.stats = match.stats end
 
 	-- apply vodgames
-	for index = 1, MAX_NUM_VODGAMES do
+	for index = 1, _MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]
 		if not Logic.isEmpty(vodgame) then
 			local map = match['map' .. index] or {}
@@ -383,7 +383,7 @@ function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
@@ -403,7 +403,7 @@ function matchFunctions.getOpponents(match)
 			if Logic.isNumeric(opponent.score) then
 				opponent.status = 'S'
 				isScoreSet = true
-			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
+			elseif Table.includes(_ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
 				opponent.score = -1
 			end
@@ -464,7 +464,7 @@ end
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
 	local count = 1
-	for playerIndex = 1, MAX_NUM_PLAYERS do
+	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
@@ -494,7 +494,7 @@ end
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
-	for scoreIndex = 1, MAX_NUM_OPPONENTS do
+	for scoreIndex = 1, _MAX_NUM_OPPONENTS do
 		-- read scores
 		local score = map['score' .. scoreIndex] or map['t' .. scoreIndex .. 'score']
 		local obj = {}
@@ -502,7 +502,7 @@ function mapFunctions.getScoresAndWinner(map)
 			if Logic.isNumeric(score) then
 				obj.status = 'S'
 				obj.score = score
-			elseif Table.includes(ALLOWED_STATUSES, score) then
+			elseif Table.includes(_ALLOWED_STATUSES, score) then
 				obj.status = score
 				obj.score = -1
 			end
