@@ -483,6 +483,7 @@ end
 function mapFunctions.getExtraData(map)
 	map.extradata = {
 		comment = map.comment,
+		header = map.header,
 	}
 	return map
 end
