@@ -33,7 +33,7 @@ local _LINK_VARIANT = 'team'
 local Language = mw.language.new('en')
 local _defaultEarningsFunctionUsed = false
 local _earnings = {}
-local _total_earnings
+local _totalEarnings
 
 local _warnings = {}
 
@@ -87,11 +87,11 @@ function Team:createInfobox()
 				Builder{
 					builder = function()
 						_defaultEarningsFunctionUsed = true
-						_total_earnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
-						Variables.varDefine('earnings', _total_earnings) -- needed for SMW
+						_totalEarnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
+						Variables.varDefine('earnings', _totalEarnings) -- needed for SMW
 						local totalEarnings
-						if _total_earnings > 0 then
-							totalEarnings = '$' .. Language:formatNum(_total_earnings)
+						if _totalEarnings > 0 then
+							totalEarnings = '$' .. Language:formatNum(_totalEarnings)
 						end
 						return {
 							Cell{name = 'Earnings', content = {totalEarnings}}
@@ -209,7 +209,7 @@ end
 
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
-	local earnings = _total_earnings
+	local earnings = _totalEarnings
 
 	local lpdbData = {
 		name = name,
