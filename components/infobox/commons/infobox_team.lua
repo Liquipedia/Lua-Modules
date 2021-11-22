@@ -31,7 +31,7 @@ local Team = Class.new(BasicInfobox)
 local _LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
-local _default_earnings_function_used = false
+local _defaultEarningsFunctionUsed = false
 local _earnings = {}
 local _total_earnings
 
@@ -86,7 +86,7 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						_default_earnings_function_used = true
+						_defaultEarningsFunctionUsed = true
 						_total_earnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
 						Variables.varDefine('earnings', _total_earnings) -- needed for SMW
 						local totalEarnings
@@ -235,7 +235,7 @@ function Team:_setLpdbData(args, links)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	if String.isEmpty(lpdbData.earnings) and not _default_earnings_function_used then
+	if String.isEmpty(lpdbData.earnings) and not _defaultEarningsFunctionUsed then
 		error('Since your wiki uses a customized earnings function you ' ..
 			'have to set the LPDB earnings storage in the custom module')
 	end
