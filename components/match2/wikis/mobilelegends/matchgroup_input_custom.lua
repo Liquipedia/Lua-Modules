@@ -180,8 +180,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			end
 		end
 	else
-		local temporaryScore = -99
-		local temporaryPlace = -99
+		local lastScore = ERROR_NUM
+		local lastPlacement = ERROR_NUM
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score or '') or ''
@@ -191,12 +191,12 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 					winner = scoreIndex
 				end
 			end
-			if temporaryScore == score then
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or temporaryPlace
+			if lastScore == score then
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or lastPlacement
 			else
 				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
-				temporaryPlace = counter
-				temporaryScore = score
+				lastPlacement = counter
+				lastScore = score
 			end
 		end
 	end
@@ -205,8 +205,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or -99) or -99
-	local value2 = tonumber(table[key2].score or -99) or -99
+	local value1 = tonumber(table[key1].score or ERROR_NUM) or ERROR_NUM
+	local value2 = tonumber(table[key2].score or ERROR_NUM) or ERROR_NUM
 	return value1 > value2
 end
 
@@ -339,9 +339,7 @@ function matchFunctions.getVodStuff(match)
 
 	match.links = {}
 	local links = match.links
-	if match.preview then links.preview = match.preview end
 	if match.reddit then links.reddit = match.reddit end
-	if match.bestgg then links.bestgg = match.bestgg end
 	if match.matchhistory then links.matchhistory = match.matchhistory end
 	local historyIndex = 1
 	while String.isNotEmpty(match['matchhistory' .. historyIndex]) do
