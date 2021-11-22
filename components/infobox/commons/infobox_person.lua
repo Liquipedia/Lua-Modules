@@ -36,7 +36,7 @@ local _shouldStoreData
 local _region
 local _warnings = {}
 local _earnings = {}
-local _total_earnings
+local _totalEarnings
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -207,7 +207,7 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		team = args.teamlink or args.team,
 		status = status,
 		type = personType,
-		earnings = _total_earnings,
+		earnings = _totalEarnings,
 		links = links,
 		extradata = {},
 	}
@@ -297,11 +297,11 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	_total_earnings, _earnings = Earnings.calculateForPlayer{
+	_totalEarnings, _earnings = Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
 		perYear = true
 	}
-	return _total_earnings
+	return _totalEarnings
 end
 
 function Person:_createRegion(region, country)
