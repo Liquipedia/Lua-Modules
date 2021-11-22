@@ -15,13 +15,13 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
-local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
-local MAX_NUM_OPPONENTS = 8
-local MAX_NUM_PLAYERS = 10
-local MAX_NUM_VODGAMES = 9
-local MAX_NUM_MAPS = 9
-local DEFAULT_BESTOF = 3
-local ERROR_NUM = -99
+local _ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
+local _MAX_NUM_OPPONENTS = 8
+local _MAX_NUM_PLAYERS = 10
+local _MAX_NUM_VODGAMES = 9
+local _MAX_NUM_MAPS = 9
+local _DEFAULT_BESTOF = 3
+local _NO_SCORE = -99
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 
@@ -162,8 +162,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			end
 		end
 	else
-		local tempMatchScore = ERROR_NUM
-		local tempTeamPlacement = ERROR_NUM
+		local lastScore = NO_SCORE
+		local lastPlacement = NO_SCORE
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score or '') or ''
@@ -173,12 +173,12 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 					winner = scoreIndex
 				end
 			end
-			if tempMatchScore == score then
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or tempTeamPlacement
+			if lastScore == score then
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or lastPlacement
 			else
 				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
-				tempTeamPlacement = counter
-				tempMatchScore = score
+				lastPlacement = counter
+				lastScore = score
 			end
 		end
 	end
@@ -187,8 +187,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or ERROR_NUM) or ERROR_NUM
-	local value2 = tonumber(table[key2].score or ERROR_NUM) or ERROR_NUM
+	local value1 = tonumber(table[key1].score or NO_SCORE) or NO_SCORE
+	local value2 = tonumber(table[key2].score or NO_SCORE) or NO_SCORE
 	return value1 > value2
 end
 
@@ -420,7 +420,7 @@ function matchFunctions.getOpponents(match)
 	if isScoreSet and not Logic.readBool(match.finished) then
 		local firstTo = math.ceil(match.bestof/2)
 		for _, item in pairs(opponents) do
-			if tonumber(item.score or 0) >= firstTo then
+			if (tonumber(item.score or 0) or 0) >= firstTo then
 				match.finished = true
 				break
 			end
