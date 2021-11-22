@@ -15,8 +15,7 @@ function Variables.varDefine(name, val)
 end
 
 function Variables.varDefineEcho(name, val)
-	mw.ext.VariablesLua.vardefine(name, val)
-	return val
+	return mw.ext.VariablesLua.vardefineecho(name, val)
 end
 
 function Variables.varDefault(name, default)
