@@ -3,6 +3,7 @@ local String = require('Module:String')
 local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Template = require('Module:Template')
+local Table = require('Module:Table')
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
@@ -30,6 +31,12 @@ local SquadRow = Class.new(
 			self.content:css('background-color', _COLOR_BACKGROUND_COACH)
 		end
 	end)
+
+SquadRow.specialTeamsTemplateMapping = {
+	retired = 'Team/retired',
+	inactive = 'Team/inactive',
+}
+
 
 function SquadRow:id(args)
 	local cell = mw.html.create('td')
@@ -105,8 +112,8 @@ function SquadRow:newteam(args)
 			cell:wikitext(mw.ext.TeamTemplate.team(args.newteam:lower(),
 				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
 		elseif self.options.useTemplatesForSpecialTeams then
-			if newteam == 'retired' or newteam == 'inactive' then
-				cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), 'Team/' .. newteam))
+			if Table.includes(SquadRow.specialTeamsTemplateMapping, newteam) then
+				cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), SquadRow.specialTeamsTemplateMapping[newteam]))
 			end
 		end
 
