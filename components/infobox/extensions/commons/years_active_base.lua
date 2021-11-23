@@ -21,12 +21,6 @@ ActiveYears.startYear = 1970
 ActiveYears.defaultNumberOfStoredPlayersPerMatch = 10
 ActiveYears.additionalConditions = ''
 
--- legacy entry point
-function ActiveYears.get(input)
-	local args = input.args
-	return ActiveYears.display(args)
-end
-
 ---
 -- Entry point
 -- @player - the player/individual for whom the active years shall be determined
