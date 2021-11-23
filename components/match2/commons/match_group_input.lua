@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TournamentUtil = require('Module:Tournament/Util')
 local Variables = require('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -28,33 +29,30 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 	Variables.varDefine('bracket_header', sectionHeader)
 	local tournamentParent = Variables.varDefault('tournament_parent', '')
 
-	local matches = {}
-	for matchKey, matchArgs in Table.iter.pairsByPrefix(args, 'M') do
-		local matchIndex = tonumber(matchKey:match('(%d+)$'))
-		local matchId = string.format('%04d', matchIndex)
+	local matchKeys = TournamentUtil.mapInterleavedPrefix(args, {'M'}, FnUtil.identity)
 
-		matchArgs = Json.parse(matchArgs)
+	return Array.map(matchKeys, function(matchKey, matchIndex)
+		local matchId = MatchGroupUtil.matchIdFromKey(matchIndex)
+		local matchArgs = Json.parse(args[matchKey])
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
 		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
 		match.parent = tournamentParent
 
-		table.insert(matches, match)
-
 		-- Add more fields to bracket data
 		match.bracketdata = match.bracketdata or {}
 		local bracketData = match.bracketdata
 		bracketData.type = 'matchlist'
-		local nextMatchId = bracketId .. '_' .. string.format('%04d', matchIndex + 1)
-		bracketData.next = args['M' .. (matchIndex + 1)] and nextMatchId or nil
 		bracketData.title = matchIndex == 1 and args.title or nil
 		bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
+		local nextMatchId = bracketId .. '_' .. MatchGroupUtil.matchIdFromKey(matchIndex + 1)
+		bracketData.next = matchIndex ~= #matchKeys and nextMatchId or nil
 		bracketData.bracketindex = tonumber(Variables.varDefault('match2bracketindex')) or 0
 		bracketData.sectionheader = sectionHeader
-	end
 
-	return matches
+		return match
+	end)
 end
 
 function MatchGroupInput.readBracket(bracketId, args, options)
