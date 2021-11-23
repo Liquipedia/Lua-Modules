@@ -106,7 +106,7 @@ function SquadRow:newteam(args)
 				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
 		elseif self.options.useTemplatesForSpecialTeams then
 			if newteam == 'retired' or newteam == 'inactive' then
-				cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), newteam))
+				cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), 'Team/' .. newteam))
 			end
 		end
 
