@@ -59,7 +59,7 @@ function SquadRow:id(args)
 	self.content:node(cell)
 
 	self.lpdbData['id'] = args[1]
-	self.lpdbData['nationality'] = Flags.CountryName(args[1])
+	self.lpdbData['nationality'] = Flags.CountryName(args.flag)
 	self.lpdbData['link'] = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or args[1])
 
 
