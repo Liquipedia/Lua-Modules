@@ -39,7 +39,13 @@ function Earnings.calculateForPlayer(args)
 	end
 	if not Logic.readBool(args.noRedirect) then
 		player = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
+	else
+		player = player:gsub('_', ' ')
 	end
+
+	-- since TeamCards on some wikis store players with underscores and some with spaces
+	-- we need to check for both options
+	local playerAsPageName = player:gsub(' ', '_')
 
 	local prefix = args.prefix or 'p'
 
@@ -48,9 +54,10 @@ function Earnings.calculateForPlayer(args)
 		error('"playerPositionLimit" has to be >= 1')
 	end
 
-	local playerConditions = '([[participant::' .. player .. ']]'
+	local playerConditions = '([[participant::' .. player .. ']] OR [[participant::' .. playerAsPageName .. ']]'
 	for playerIndex = 1, playerPositionLimit do
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
+		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]'
 	end
 	playerConditions = playerConditions .. ')'
 
