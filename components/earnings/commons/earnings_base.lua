@@ -33,6 +33,7 @@ Earnings.defaultNumberOfStoredPlayersPerMatch = 10
 function Earnings.calculateForPlayer(args)
 	args = args or {}
 	local player = args.player
+	local playerAsPageName
 
 	if String.isEmpty(player) then
 		return 0
@@ -41,6 +42,11 @@ function Earnings.calculateForPlayer(args)
 		player = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
 	end
 
+	-- since TeamCards on some wikis store players with underscores and some with spaces
+	-- we need to check for both options
+	playerAsPageName = player:gsub(' ', '_')
+	player = player:gsub('_', ' ')
+
 	local prefix = args.prefix or 'p'
 
 	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
@@ -48,9 +54,10 @@ function Earnings.calculateForPlayer(args)
 		error('"playerPositionLimit" has to be >= 1')
 	end
 
-	local playerConditions = '([[participant::' .. player .. ']]'
+	local playerConditions = '([[participant::' .. player .. ']] OR [[participant::' .. playerAsPageName .. ']]'
 	for playerIndex = 1, playerPositionLimit do
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
+		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]'
 	end
 	playerConditions = playerConditions .. ')'
 
