@@ -87,7 +87,7 @@ function Weapon:createInfobox()
     infobox:categories(unpack(self:getWikiCategories(args)))
 
     local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-	
+
 	if Namespace.isMain() then
         self:setLpdbData(args)
     end
