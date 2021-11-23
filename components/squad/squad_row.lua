@@ -2,6 +2,7 @@ local Class = require('Module:Class')
 local String = require('Module:String')
 local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local Template = require('Module:Template')
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
@@ -9,9 +10,10 @@ local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=S
 local _COLOR_BACKGROUND_COACH = '#e5e5e5'
 
 local SquadRow = Class.new(
-	function(self, frame, role)
+	function(self, frame, role, options)
 		self.frame = frame
 		self.content = mw.html.create('tr'):addClass('Player')
+		self.options = options or {}
 
 		role = string.lower(role or '')
 
@@ -102,16 +104,21 @@ function SquadRow:newteam(args)
 		if mw.ext.TeamTemplate.teamexists(newteam) then
 			cell:wikitext(mw.ext.TeamTemplate.team(args.newteam:lower(),
 				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
+		elseif self.options.useTemplatesForSpecialTeams then
+			if newteam == 'retired' or newteam == 'inactive' then
+				cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), newteam))
+			end
 		end
+
 
 		if not String.isEmpty(args.newteamrole) then
 			cell:wikitext('&nbsp;\'\'<small>(' .. args.newteamrole .. ')</small>\'\'')
 		end
+
 	end
 
 	self.content:node(cell)
 	return self
-
 end
 
 function SquadRow:create()
