@@ -59,7 +59,7 @@ function SquadRow:id(args)
 	self.content:node(cell)
 
 	self.lpdbData['id'] = args[1]
-	self.lpdbData['nationality'] = Flags.countryName(args[1])
+	self.lpdbData['nationality'] = Flags.CountryName(args[1])
 	self.lpdbData['link'] = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or args[1])
 
 
@@ -95,7 +95,7 @@ function SquadRow:role(args)
 	return self
 end
 
-function SquadRow:date(dateValue, cellTitle)
+function SquadRow:date(dateValue, cellTitle, lpdbColumn)
 	local cell = mw.html.create('td')
 	cell:addClass('Date')
 
@@ -106,7 +106,7 @@ function SquadRow:date(dateValue, cellTitle)
 	end
 	self.content:node(cell)
 
-	self.lpdbData[cellTitle:gsub(' ', ''):lower()] = ReferenceCleaner.clean(dateValue)
+	self.lpdbData[lpdbColumn] = ReferenceCleaner.clean(dateValue)
 
 	return self
 end
