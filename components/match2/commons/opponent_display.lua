@@ -6,10 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
@@ -102,7 +104,7 @@ end
 
 OpponentDisplay.propTypes.InlineOpponent = {
 	flip = 'boolean?',
-	opponent = MatchGroupUtil.types.GameOpponent,
+	opponent = Opponent.types.Opponent,
 	showFlag = 'boolean?',
 	showLink = 'boolean?', -- does not affect opponent.type == 'team'
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
@@ -123,20 +125,18 @@ function OpponentDisplay.InlineOpponent(props)
 			template = opponent.template or 'tbd',
 		})
 
-	elseif opponent.type == 'literal' then
+	elseif Opponent.typeIsParty(opponent.type) then
+		return OpponentDisplay.PartyAsInline(props)
+
+	else -- opponent.type == 'literal'
 		return opponent.name or ''
 
-	elseif opponent.type == 'solo' then
-		return OpponentDisplay.PlayerInlineOpponent(props)
-
-	else
-		error('Unrecognized opponent.type ' .. opponent.type)
 	end
 end
 
 OpponentDisplay.propTypes.BlockOpponent = {
 	flip = 'boolean?',
-	opponent = MatchGroupUtil.types.GameOpponent,
+	opponent = Opponent.types.Opponent,
 	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
@@ -159,22 +159,17 @@ function OpponentDisplay.BlockOpponent(props)
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
-	elseif opponent.type == 'literal' then
+
+	elseif Opponent.typeIsParty(opponent.type) then
+		return OpponentDisplay.PartyAsBlock(props)
+
+	else -- opponent.type == 'literal'
 		return OpponentDisplay.BlockLiteral({
 			flip = props.flip,
 			name = opponent.name or '',
 			overflow = props.overflow,
 		})
-	elseif opponent.type == 'solo' then
-		return PlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
-			player = opponent.players[1],
-			showFlag = props.showFlag,
-			showLink = props.showLink,
-		})
-	else
-		error('Unrecognized opponent.type ' .. opponent.type)
+
 	end
 end
 
@@ -304,6 +299,73 @@ function OpponentDisplay.BlockTeam(props)
 		:addClass(props.flip and 'flipped' or nil)
 		:node(props.icon)
 		:node(nameNode)
+end
+
+OpponentDisplay.propTypes.PartyAsInline = {
+	flip = 'boolean?',
+	opponent = Opponent.types.Opponent,
+	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
+	showFlag = 'boolean?',
+	showLink = 'boolean?',
+}
+
+--[[
+Displays a party opponent (solo, duo, trio, or quad) as an inline element.
+]]
+function OpponentDisplay.PartyAsInline(props)
+	local opponent = props.opponent
+
+	local playerTexts = Array.map(opponent.players, function(player)
+		local node = PlayerDisplay.InlinePlayer({
+			flip = props.flip,
+			player = player,
+			showFlag = props.showFlag,
+			showLink = props.showLink,
+		})
+		return tostring(node)
+	end)
+	if props.flip then
+		playerTexts = Array.reverse(playerTexts)
+	end
+
+	local playersNode = table.concat(playerTexts, ' / ')
+
+	return mw.html.create('span')
+		:node(playersNode)
+end
+
+OpponentDisplay.propTypes.PartyAsBlock = {
+	flip = 'boolean?',
+	opponent = Opponent.types.Opponent,
+	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
+	showFlag = 'boolean?',
+	showLink = 'boolean?',
+}
+
+--[[
+Displays a party opponent (solo, duo, trio, or quad) as a block element.
+]]
+function OpponentDisplay.PartyAsBlock(props)
+	local opponent = props.opponent
+
+	local playerNodes = Array.map(opponent.players, function(player)
+		return PlayerDisplay.BlockPlayer({
+			flip = props.flip,
+			overflow = props.overflow,
+			player = player,
+			showFlag = props.showFlag,
+			showLink = props.showLink,
+		})
+			:addClass(props.playerClass)
+	end)
+
+	if #opponent.players == 1 then
+		return playerNodes[1]
+	else
+		local playersNode = mw.html.create('div')
+		Array.extendWith(playersNode.nodes, playerNodes)
+		return playersNode
+	end
 end
 
 OpponentDisplay.propTypes.BlockLiteral = {
