@@ -254,6 +254,71 @@ function MatchGroupCoordinates.computeCoordinates(bracket)
 end
 
 --[[
+Compute the number of opponents from each round onward in a bracket.
+]]
+function MatchGroupCoordinates.computeOpponentCounts(bracket)
+	local countsBySectionByRound = MatchGroupCoordinates.computeRawCounts(bracket)
+
+	-- Only sum up positive counts
+	return Array.map(countsBySectionByRound, function(countsBySection)
+		local sum = 0
+		for _, count in ipairs(countsBySection) do
+			if count >= 0 then
+				sum = sum + count
+			end
+		end
+		return sum
+	end)
+end
+
+--[[
+Computes the number of opponents from each round onward for each section in a
+bracket. Lower bracket counts may be negative. This indicates either that an
+opponent from the upper bracket dropped down to a earlier round, or that some
+opponents leave the tournament directly from the upper bracket.
+
+The third place match is not counted.
+]]
+function MatchGroupCoordinates.computeRawCounts(bracket)
+	if #bracket.sections > 2 then
+		-- Triple elimination brackets are not supported
+		return {}
+	end
+
+	local reverseRounds = Array.reverse(bracket.rounds)
+
+	local countsBySection = Array.map(Array.range(1, #bracket.sections), function(sectionIx) return 0 end)
+	local countsByReverseRound = {}
+	for _, round in ipairs(reverseRounds) do
+		for _, matchId in ipairs(round) do
+			local coordinates = bracket.coordinatesByMatchId[matchId]
+			local bracketData = bracket.bracketDatasById[matchId]
+
+			local sectionIndex = coordinates.sectionIndex
+			local count = 1
+			if not bracketData.upperMatchId then
+				count = count + 1
+				if String.endsWith(matchId, 'RxMTP') then
+					count = 0
+				end
+			elseif coordinates.semanticDepth == 1 then
+				-- UB or LB final into grand final
+				count = sectionIndex == 1 and 0 or 2
+			end
+			countsBySection[sectionIndex] = countsBySection[sectionIndex] + count
+
+			-- Loser of match drops down
+			if sectionIndex + 1 <= #bracket.sections and coordinates.semanticDepth ~= 0 then
+				countsBySection[sectionIndex + 1] = countsBySection[sectionIndex + 1] - 1
+			end
+		end
+		table.insert(countsByReverseRound, Table.copy(countsBySection))
+	end
+
+	return Array.reverse(countsByReverseRound)
+end
+
+--[[
 Returns a list of sections. Each section contains the matchIds for the matches
 in that section of a bracket. The bracket must have coordinates data
 previously computed.
