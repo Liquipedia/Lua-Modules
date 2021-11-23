@@ -148,7 +148,12 @@ function SquadRow:newteam(args)
 	return self
 end
 
+function SquadRow:addToLpdb(lpdbData)
+	return lpdbData
+end
+
 function SquadRow:create(id)
+	self.lpdbData = self:addToLpdb(self.lpdbData)
 	mw.ext.LiquipediaDB.lpdb_squadplayer(id, self.lpdbData)
 	return self.content
 end
