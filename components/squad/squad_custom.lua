@@ -1,6 +1,8 @@
 local Squad = require('Module:VoganRL/Squad')
 local SquadRow = require('Module:VoganRL/Squad/Row')
 local Json = require('Module:Json')
+local Variables = require('Module:Variables')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local CustomSquad = {}
 
@@ -38,7 +40,10 @@ function CustomSquad.run(frame)
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;')
 		end
 
-		squad:row(row:create())
+		squad:row(row:create(
+			Variables.varDefault('squad_name',
+			mw.title.getCurrentTitle().prefixedText) .. '_player_'  .. ReferenceCleaner.clean(player.joindate)
+		))
 
 		index = index + 1
 	end

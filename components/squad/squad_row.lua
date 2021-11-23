@@ -29,6 +29,8 @@ local SquadRow = Class.new(
 			self.content:addClass('coach/substitute')
 			self.content:css('background-color', _COLOR_BACKGROUND_COACH)
 		end
+
+		self.lpdbData = {}
 	end)
 
 SquadRow.specialTeamsTemplateMapping = {
@@ -55,6 +57,12 @@ function SquadRow:id(args)
 	end
 
 	self.content:node(cell)
+
+	self.lpdbData['id'] = args[1]
+	self.lpdbData['nationality'] = Flags.countryName(args[1])
+	self.lpdbData['link'] = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or args[1])
+
+
 	return self
 end
 
@@ -65,6 +73,9 @@ function SquadRow:name(args)
 	cell:wikitext(args.name)
 	cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext(')'))
 	self.content:node(cell)
+
+	self.lpdbData['name'] = args.name
+
 	return self
 end
 
@@ -78,19 +89,25 @@ function SquadRow:role(args)
 	end
 
 	self.content:node(cell)
+
+	self.lpdbData['role'] = args.role
+
 	return self
 end
 
-function SquadRow:date(dateValue, mobileTitle)
+function SquadRow:date(dateValue, cellTitle)
 	local cell = mw.html.create('td')
 	cell:addClass('Date')
 
-	cell:node(mw.html.create('div'):addClass('MobileStuffDate'):wikitext(mobileTitle))
+	cell:node(mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle))
 
 	if not String.isEmpty(dateValue) then
 		cell:node(mw.html.create('div'):addClass('Date'):wikitext('\'\'' .. dateValue .. '\'\''))
 	end
 	self.content:node(cell)
+
+	self.lpdbData[cellTitle:gsub(' ', ''):lower()] = ReferenceCleaner.clean(dateValue)
+
 	return self
 end
 
@@ -110,6 +127,8 @@ function SquadRow:newteam(args)
 		if mw.ext.TeamTemplate.teamexists(newTeam) then
 			cell:wikitext(mw.ext.TeamTemplate.team(args.newteam:lower(),
 				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
+
+			self.lpdbData['newteam'] = mw.ext.TeamTemplate.teampage(newteam)
 		elseif self.options.useTemplatesForSpecialTeams then
 			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
 			if newTeamTemplate then
@@ -125,10 +144,12 @@ function SquadRow:newteam(args)
 	end
 
 	self.content:node(cell)
+
 	return self
 end
 
-function SquadRow:create()
+function SquadRow:create(id)
+	mw.ext.LiquipediaDB.lpdb_squadplayer(id, self.lpdbData)
 	return self.content
 end
 
