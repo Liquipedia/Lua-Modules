@@ -102,7 +102,8 @@ end
 
 function NotabilityChecker._calculatePlayerNotability(player)
 	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
-	local conditions = '[[players_p' .. tostring(1) .. '::' .. player .. ']]'
+	local conditions = '[[players_p' .. tostring(1) .. '::' .. player .. ']]' ..
+		' OR [[participant::' .. player .. ']]'
 	for i = 2, 10 do
 		conditions = conditions .. ' OR [[players_p' .. tostring(i) .. '::' .. player .. ']]'
 	end
