@@ -107,7 +107,7 @@ function NotabilityChecker._calculatePlayerNotability(player)
 
 	local conditions = '[[players_p' .. tostring(1) .. '::' .. player .. ']]' ..
 		' OR [[participant::' .. player .. ']]'
-	for i = 2, 20 do
+	for i = 2, Config.MAX_NUMBER_OF_PARTICIPANTS do
 		conditions = conditions .. ' OR [[players_p' .. tostring(i) .. '::' .. player .. ']]'
 	end
 
