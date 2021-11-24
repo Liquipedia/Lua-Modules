@@ -16,7 +16,6 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TournamentUtil = require('Module:Tournament/Util')
-local Variables = require('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
@@ -25,9 +24,7 @@ local globalVars = PageVariableNamespace()
 local MatchGroupInput = {}
 
 function MatchGroupInput.readMatchlist(bracketId, args)
-	local sectionHeader = args.section or String.nilIfEmpty(Variables.varDefault('bracket_header'))
-	Variables.varDefine('bracket_header', sectionHeader)
-	local tournamentParent = Variables.varDefault('tournament_parent', '')
+	local context = MatchGroupInput.readContext(args)
 
 	local matchKeys = TournamentUtil.mapInterleavedPrefix(args, {'M'}, FnUtil.identity)
 
@@ -38,18 +35,22 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
 		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
-		match.parent = tournamentParent
+		match.parent = context.tournamentParent
 
 		-- Add more fields to bracket data
 		match.bracketdata = match.bracketdata or {}
 		local bracketData = match.bracketdata
+
 		bracketData.type = 'matchlist'
 		bracketData.title = matchIndex == 1 and args.title or nil
 		bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
 		local nextMatchId = bracketId .. '_' .. MatchGroupUtil.matchIdFromKey(matchIndex + 1)
 		bracketData.next = matchIndex ~= #matchKeys and nextMatchId or nil
-		bracketData.bracketindex = tonumber(Variables.varDefault('match2bracketindex')) or 0
-		bracketData.sectionheader = sectionHeader
+
+		bracketData.bracketindex = context.bracketIndex
+		bracketData.groupRoundIndex = tonumber(match.round) or context.groupRoundIndex
+		bracketData.pageSection = context.pageSection
+		bracketData.sectionheader = context.stage
 
 		return match
 	end)
@@ -60,9 +61,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	local templateId = args[1]
 	assert(templateId, 'argument \'1\' (templateId) is empty')
 
-	local sectionHeader = args.section or String.nilIfEmpty(Variables.varDefault('bracket_header'))
-	Variables.varDefine('bracket_header', sectionHeader)
-	local tournamentParent = Variables.varDefault('tournament_parent', '')
+	local context = MatchGroupInput.readContext(args)
 
 	local bracketDatasById = Logic.try(function()
 		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
@@ -95,7 +94,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
 		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
-		match.parent = tournamentParent
+		match.parent = context.tournamentParent
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
@@ -105,8 +104,11 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		bracketData.type = 'bracket'
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
-		bracketData.bracketindex = tonumber(Variables.varDefault('match2bracketindex')) or 0
-		bracketData.sectionheader = sectionHeader
+
+		bracketData.bracketindex = context.bracketIndex
+		bracketData.groupRoundIndex = tonumber(match.round) or context.groupRoundIndex
+		bracketData.pageSection = context.pageSection
+		bracketData.sectionheader = context.stage
 
 		if match.winnerto then
 			bracketData.winnerto = (match.winnertobracket and match.winnertobracket .. '_' or '')
@@ -244,6 +246,38 @@ function MatchGroupInput.getInexactDate(suggestedDate)
 	globalVars:set('num_missing_dates', missingDateCount + 1)
 	local inexactDateString = (suggestedDate or '') .. ' + ' .. missingDateCount .. ' second'
 	return getContentLanguage():formatDate('c', inexactDateString)
+end
+
+--[[
+Parses the match group context. The match group context describes where a match
+group is relative to the tournament page.
+]]
+function MatchGroupInput.readContext(args)
+	local context = {
+		bracketIndex = tonumber(globalVars:get('match2bracketindex')) or 0,
+		groupRoundIndex = MatchGroupInput.readGroupRoundIndex(args),
+		pageSection = args.matchsection or globalVars:get('matchsection'),
+		stage = args.section or globalVars:get('bracket_header'),
+		tournamentParent = globalVars:get('tournament_parent'),
+	}
+
+	globalVars:set('bracket_header', context.stage)
+	globalVars:set('matchsection', context.pageSection)
+
+	return context
+end
+
+function MatchGroupInput.readGroupRoundIndex(args)
+	if args.round then
+		return tonumber(args.round)
+	end
+
+	local pageSection = args.matchsection or globalVars:get('matchsection')
+	-- Usually 'Round N' but can also be 'Day N', 'Week N', etc.
+	local roundIndex = pageSection and pageSection:match(' (%d+)$')
+	if roundIndex then
+		return tonumber(roundIndex)
+	end
 end
 
 --[[
