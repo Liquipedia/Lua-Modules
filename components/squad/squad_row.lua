@@ -3,7 +3,6 @@ local String = require('Module:String')
 local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Template = require('Module:Template')
-local Table = require('Module:Table')
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
