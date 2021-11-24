@@ -107,13 +107,14 @@ function SquadRow:newteam(args)
 		cell:node(mobileStuffDiv)
 
 
-		local newteam = args.newteam:lower()
-		if mw.ext.TeamTemplate.teamexists(newteam) then
+		local newTeam = args.newteam:lower()
+		if mw.ext.TeamTemplate.teamexists(newTeam) then
 			cell:wikitext(mw.ext.TeamTemplate.team(args.newteam:lower(),
 				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
 		elseif self.options.useTemplatesForSpecialTeams then
-			if Table.includes(SquadRow.specialTeamsTemplateMapping, newteam) then
-				cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), SquadRow.specialTeamsTemplateMapping[newteam]))
+			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
+			if newTeamTemplate then
+				cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
 			end
 		end
 
