@@ -3,6 +3,7 @@ local String = require('Module:String')
 local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Template = require('Module:Template')
+local Flags = require('Module:Flags')
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
@@ -125,10 +126,10 @@ function SquadRow:newteam(args)
 
 		local newTeam = args.newteam:lower()
 		if mw.ext.TeamTemplate.teamexists(newTeam) then
-			cell:wikitext(mw.ext.TeamTemplate.team(args.newteam:lower(),
+			cell:wikitext(mw.ext.TeamTemplate.team(newTeam,
 				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
 
-			self.lpdbData['newteam'] = mw.ext.TeamTemplate.teampage(newteam)
+			self.lpdbData['newteam'] = mw.ext.TeamTemplate.teampage(newTeam)
 		elseif self.options.useTemplatesForSpecialTeams then
 			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
 			if newTeamTemplate then
