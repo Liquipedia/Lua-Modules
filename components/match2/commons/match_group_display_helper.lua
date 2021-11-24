@@ -103,7 +103,11 @@ different policy by setting props.matchHasDetails in the Bracket and Matchlist
 components.
 ]]
 function DisplayHelper.defaultMatchHasDetails(match)
-	return match.dateIsExact or 0 < #match.games
+	return match.dateIsExact
+		or match.vod
+		or not Table.isEmpty(match.links)
+		or match.comment
+		or 0 < #match.games
 end
 
 -- Display component showing the streams, date, and countdown of a match.
