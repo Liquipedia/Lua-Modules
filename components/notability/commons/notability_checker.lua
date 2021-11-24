@@ -216,7 +216,7 @@ function NotabilityChecker._parseTier(placement)
 	local isWikiThatUsesLiquipediaTier2 = placement.liquipediatier == placement.liquipediatiertype
 
 	if not isWikiThatUsesLiquipediaTier2 then
-		return tonumber(placement.liquipediatier), placement.liquipediatiertype
+		return tonumber(placement.liquipediatier), placement.liquipediatiertype:lower()
 	end
 
 	local liquipediaTier2 = placement.extradata['liquipediatier2']
