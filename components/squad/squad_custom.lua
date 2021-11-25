@@ -1,5 +1,13 @@
-local Squad = require('Module:VoganRL/Squad')
-local SquadRow = require('Module:VoganRL/Squad/Row')
+---
+-- @Liquipedia
+-- wiki=rocketleague
+-- page=Module:Squad/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Squad = require('Module:Squad')
+local SquadRow = require('Module:Squad/Row')
 local Json = require('Module:Json')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
