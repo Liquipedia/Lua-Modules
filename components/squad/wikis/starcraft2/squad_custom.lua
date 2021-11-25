@@ -12,7 +12,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:String')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
---local CleanRace = require('Module:CleanRace')
+local CleanRace = require('Module:CleanRace')
 
 local Table = require('Module:Table')
 
@@ -56,13 +56,13 @@ function CustomSquad.run(frame)
 	while args['p' .. index] or args[index] do
 
 		local player = Json.parseIfString(args['p' .. index] or args[index])
-		--player.race = string.lower(player.race)
-		--player.race = CleanRace[player.race] or player.race
+		player.race = string.lower(player.race)
+		player.race = CleanRace[player.race] or player.race
 		local row = SquadRow(frame, player.role, {useTemplatesForSpecialTeams = true})
 		row	:id({
 				player.id,
 				flag = player.flag,
-				--race = player.race,
+				race = player.race,
 				link = player.link,
 				captain = player.captain,
 				role = player.role,
