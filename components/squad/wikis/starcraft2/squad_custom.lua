@@ -14,8 +14,6 @@ local String = require('Module:String')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local CleanRace = require('Module:CleanRace')
 
-local Table = require('Module:Table')
-
 SquadRow.specialTeamsTemplateMapping = {
 	retirement = 'Team/retired',
 	retired = 'Team/retired',
