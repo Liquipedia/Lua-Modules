@@ -380,20 +380,7 @@ end
 
 function MatchGroupUtil.bracketDataFromRecord(data)
 	if data.type == 'bracket' then
-		local advanceSpots = {}
-		if nilIfEmpty(data.winnerto) then
-			advanceSpots[1] = {bg = 'up', type = 'custom', matchId = data.winnerto}
-		end
-		if nilIfEmpty(data.loserto) then
-			advanceSpots[2] = {bg = 'stayup', type = 'custom', matchId = data.loserto}
-		end
-		if Logic.readBool(data.qualwin) then
-			advanceSpots[1] = Table.merge(advanceSpots[1], {bg = 'up', type = 'qualify'})
-		end
-		if Logic.readBool(data.quallose) then
-			advanceSpots[2] = Table.merge(advanceSpots[2], {bg = 'stayup', type = 'qualify'})
-		end
-
+		local advanceSpots = data.advanceSpots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {
 			advanceSpots = advanceSpots,
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
@@ -521,17 +508,37 @@ function MatchGroupUtil.autoAssignLowerEdges(lowerMatchCount, opponentCount)
 	return lowerEdges
 end
 
-function MatchGroupUtil.populateAdvanceSpots(bracket)
-	if bracket.type ~= 'bracket' then
-		return
+--[[
+Computes just the advance spots that can be determined from a match bracket
+data. More are found in populateAdvanceSpots.
+]]
+function MatchGroupUtil.computeAdvanceSpots(data)
+	local advanceSpots = {}
+
+	if data.upperMatchId then
+		advanceSpots[1] = {bg = 'up', type = 'advance', matchId = data.upperMatchId}
 	end
 
-	-- Winner advances to upper match
-	for _, match in ipairs(bracket.matches) do
-		if match.bracketData.upperMatchId then
-			match.bracketData.advanceSpots[1] = match.bracketData.advanceSpots[1]
-				or {bg = 'up', type = 'advance', matchId = match.bracketData.upperMatchId}
-		end
+	if nilIfEmpty(data.winnerto) then
+		advanceSpots[1] = {bg = 'up', type = 'custom', matchId = data.winnerto}
+	end
+	if nilIfEmpty(data.loserto) then
+		advanceSpots[2] = {bg = 'stayup', type = 'custom', matchId = data.loserto}
+	end
+
+	if Logic.readBool(data.qualwin) then
+		advanceSpots[1] = Table.merge(advanceSpots[1], {bg = 'up', type = 'qualify'})
+	end
+	if Logic.readBool(data.quallose) then
+		advanceSpots[2] = Table.merge(advanceSpots[2], {bg = 'stayup', type = 'qualify'})
+	end
+
+	return advanceSpots
+end
+
+function MatchGroupUtil.populateAdvanceSpots(bracket)
+	if #bracket.matches == 0 then
+		return
 	end
 
 	-- Loser of semifinals play in third place match
