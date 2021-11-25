@@ -18,6 +18,7 @@ local TreeUtil = require('Module:TreeUtil')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
+local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
@@ -235,17 +236,20 @@ function MatchGroupUtil.makeBracketFromRecords(matchRecords)
 	local matchesById = Table.map(matches, function(_, match) return match.matchId, match end)
 	local bracketDatasById = Table.mapValues(matchesById, function(match) return match.bracketData end)
 
-	local upperMatchIds, rootMatchIds = MatchGroupUtil.computeUpperMatchIds(matchesById)
+	local firstCoordinates = matches[1] and matches[1].bracketData.coordinates
+	if not firstCoordinates then
+		MatchGroupUtil.backfillUpperMatchIds(bracketDatasById)
+	end
+
 	local bracket = {
 		bracketDatasById = bracketDatasById,
 		matches = matches,
 		matchesById = matchesById,
-		rootMatchIds = rootMatchIds,
+		rootMatchIds = MatchGroupUtil.computeRootMatchIds(bracketDatasById),
 		type = 'bracket',
-		upperMatchIds = upperMatchIds,
 	}
 
-	local roundPropsByMatchId, rounds = MatchGroupUtil.computeRounds(bracket.bracketDatasById, rootMatchIds)
+	local roundPropsByMatchId, rounds = MatchGroupUtil.computeRounds(bracket.bracketDatasById, bracket.rootMatchIds)
 	Table.mergeInto(bracket, {
 		coordsByMatchId = roundPropsByMatchId,
 		rounds = rounds,
@@ -254,6 +258,40 @@ function MatchGroupUtil.makeBracketFromRecords(matchRecords)
 	MatchGroupUtil.populateAdvanceSpots(bracket)
 
 	return bracket
+end
+
+--[[
+Returns an array of all the IDs of root matches. The matches are sorted in
+display order.
+]]
+function MatchGroupUtil.computeRootMatchIds(bracketDatasById)
+	-- Matches without upper matches
+	local rootMatchIds = {}
+	for matchId, bracketData in pairs(bracketDatasById) do
+		if not bracketData.upperMatchId
+			and not StringUtils.endsWith(matchId, 'RxMBR') then
+			table.insert(rootMatchIds, matchId)
+		end
+	end
+
+	Array.sortInPlaceBy(rootMatchIds, function(matchId)
+		local coordinates = bracketDatasById[matchId].coordinates
+		return coordinates and {coordinates.rootIndex} or {-1, matchId}
+	end)
+
+	return rootMatchIds
+end
+
+--[[
+Populate bracketData.upperMatchId if it is missing. This can happen if the
+bracket template is missing data.
+]]
+function MatchGroupUtil.backfillUpperMatchIds(bracketDatasById)
+	local upperMatchIds = MatchGroupCoordinates.computeUpperMatchIds(bracketDatasById)
+
+	for matchId, bracketData in pairs(bracketDatasById) do
+		bracketData.upperMatchId = upperMatchIds[matchId]
+	end
 end
 
 --[[
@@ -369,6 +407,7 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
+			upperMatchId = nilIfEmpty(data.upperMatchId),
 		}
 	else
 		return {
@@ -440,33 +479,6 @@ function MatchGroupUtil.gameFromRecord(record)
 	}
 end
 
-function MatchGroupUtil.computeUpperMatchIds(matchesById)
-	local upperMatchIds = {}
-	for matchId, match in pairs(matchesById) do
-		if match.bracketData.type == 'bracket' then
-			for _, lowerMatchId in ipairs(match.bracketData.lowerMatchIds) do
-				upperMatchIds[lowerMatchId] = matchId
-			end
-		end
-	end
-
-	-- Matches without upper matches
-	local rootMatchIds = {}
-	for matchId, _ in pairs(matchesById) do
-		if not upperMatchIds[matchId]
-			and not StringUtils.endsWith(matchId, 'RxMBR') then
-			table.insert(rootMatchIds, matchId)
-		end
-	end
-
-	-- Use custom ordering specified by rootIndex if present
-	Array.sortInPlaceBy(rootMatchIds, function(matchId)
-		return {matchesById[matchId].bracketData.rootIndex or -1, matchId}
-	end)
-
-	return upperMatchIds, rootMatchIds
-end
-
 function MatchGroupUtil.dfsFrom(bracketDatasById, start)
 	return TreeUtil.dfs(
 		function(matchId)
@@ -535,10 +547,9 @@ function MatchGroupUtil.populateAdvanceSpots(bracket)
 
 	-- Winner advances to upper match
 	for _, match in ipairs(bracket.matches) do
-		local upperMatchId = bracket.upperMatchIds[match.matchId]
-		if upperMatchId then
+		if match.bracketData.upperMatchId then
 			match.bracketData.advanceSpots[1] = match.bracketData.advanceSpots[1]
-				or {bg = 'up', type = 'advance', matchId = upperMatchId}
+				or {bg = 'up', type = 'advance', matchId = match.bracketData.upperMatchId}
 		end
 	end
 
