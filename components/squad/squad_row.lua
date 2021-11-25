@@ -3,6 +3,7 @@ local String = require('Module:String')
 local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Template = require('Module:Template')
+local Flags = require('Module:Flags')
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
@@ -29,6 +30,8 @@ local SquadRow = Class.new(
 			self.content:addClass('coach/substitute')
 			self.content:css('background-color', _COLOR_BACKGROUND_COACH)
 		end
+
+		self.lpdbData = {}
 	end)
 
 SquadRow.specialTeamsTemplateMapping = {
@@ -55,6 +58,12 @@ function SquadRow:id(args)
 	end
 
 	self.content:node(cell)
+
+	self.lpdbData['id'] = args[1]
+	self.lpdbData['nationality'] = Flags.CountryName(args.flag)
+	self.lpdbData['link'] = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or args[1])
+
+
 	return self
 end
 
@@ -65,6 +74,9 @@ function SquadRow:name(args)
 	cell:wikitext(args.name)
 	cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext(')'))
 	self.content:node(cell)
+
+	self.lpdbData['name'] = args.name
+
 	return self
 end
 
@@ -78,19 +90,25 @@ function SquadRow:role(args)
 	end
 
 	self.content:node(cell)
+
+	self.lpdbData['role'] = args.role
+
 	return self
 end
 
-function SquadRow:date(dateValue, mobileTitle)
+function SquadRow:date(dateValue, cellTitle, lpdbColumn)
 	local cell = mw.html.create('td')
 	cell:addClass('Date')
 
-	cell:node(mw.html.create('div'):addClass('MobileStuffDate'):wikitext(mobileTitle))
+	cell:node(mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle))
 
 	if not String.isEmpty(dateValue) then
 		cell:node(mw.html.create('div'):addClass('Date'):wikitext('\'\'' .. dateValue .. '\'\''))
 	end
 	self.content:node(cell)
+
+	self.lpdbData[lpdbColumn] = ReferenceCleaner.clean(dateValue)
+
 	return self
 end
 
@@ -108,8 +126,10 @@ function SquadRow:newteam(args)
 
 		local newTeam = args.newteam:lower()
 		if mw.ext.TeamTemplate.teamexists(newTeam) then
-			cell:wikitext(mw.ext.TeamTemplate.team(args.newteam:lower(),
+			cell:wikitext(mw.ext.TeamTemplate.team(newTeam,
 				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
+
+			self.lpdbData['newteam'] = mw.ext.TeamTemplate.teampage(newTeam)
 		elseif self.options.useTemplatesForSpecialTeams then
 			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
 			if newTeamTemplate then
@@ -125,10 +145,17 @@ function SquadRow:newteam(args)
 	end
 
 	self.content:node(cell)
+
 	return self
 end
 
-function SquadRow:create()
+function SquadRow:addToLpdb(lpdbData)
+	return lpdbData
+end
+
+function SquadRow:create(id)
+	self.lpdbData = self:addToLpdb(self.lpdbData)
+	mw.ext.LiquipediaDB.lpdb_squadplayer(id, self.lpdbData)
 	return self.content
 end
 
