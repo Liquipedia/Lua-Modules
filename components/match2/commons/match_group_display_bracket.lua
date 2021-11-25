@@ -263,8 +263,8 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 		-- Don't show the header if it's disabled. Also don't show the header
 		-- if it is the first match of a round because a higher round match can
 		-- show it instead.
-		local upperBracketData = bracket.upperMatchIds[matchId]
-			and bracket.bracketDatasById[bracket.upperMatchIds[matchId]]
+		local upperBracketData = bracketData.upperMatchId
+			and bracket.bracketDatasById[bracketData.upperMatchId]
 		local isFirstChild = upperBracketData
 			and matchId == upperBracketData.lowerMatchIds[1]
 		local showHeader = bracketData.header and not isFirstChild
@@ -277,8 +277,9 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 	-- matches. When it gets to a root, it then traverses the roots in
 	-- reverse order until it gets to the first root.
 	local function getParent(matchId)
+		local bracketData = bracket.bracketDatasById[matchId]
 		local coords = bracket.coordsByMatchId[matchId]
-		return bracket.upperMatchIds[matchId]
+		return bracketData.upperMatchId
 			or coords.rootIx ~= 1 and bracket.rootMatchIds[coords.rootIx - 1]
 			or nil
 	end
