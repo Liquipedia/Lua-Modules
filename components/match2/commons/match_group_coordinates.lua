@@ -253,4 +253,40 @@ function MatchGroupCoordinates.computeCoordinates(bracket)
 	}
 end
 
+--[[
+Returns a list of sections. Each section contains the matchIds for the matches
+in that section of a bracket. The bracket must have coordinates data
+previously computed.
+
+The list is identical to the one returned by
+MatchGroupCoordinates.computeSections.
+]]
+function MatchGroupCoordinates.getSectionsFromCoordinates(bracket)
+	return MatchGroupCoordinates.groupMatchIdsByField(bracket, 'sectionIndex')
+end
+
+--[[
+Returns a list of rounds. Each round contains the matchIds for the matches in
+that round of a bracket. The bracket must have coordinates data previously
+computed.
+
+The list is identical to the one returned by
+MatchGroupCoordinates.computeRounds.
+]]
+function MatchGroupCoordinates.getRoundsFromCoordinates(bracket)
+	return MatchGroupCoordinates.groupMatchIdsByField(bracket, 'roundIndex')
+end
+
+function MatchGroupCoordinates.groupMatchIdsByField(bracket, fieldName)
+	local countFieldName = fieldName:gsub('Index$', 'Count')
+	local count = Table.getByPathOrNil(bracket.matches, {1, 'bracketData', 'coordinates', countFieldName}) or 0
+
+	local byField = Array.map(Array.range(1, count), function() return {} end)
+	for matchId in MatchGroupCoordinates.dfs(bracket) do
+		local coordinates = bracket.coordinatesByMatchId[matchId]
+		table.insert(byField[coordinates[fieldName]], matchId)
+	end
+	return byField
+end
+
 return MatchGroupCoordinates
