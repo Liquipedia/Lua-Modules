@@ -253,4 +253,42 @@ function MatchGroupCoordinates.computeCoordinates(bracket)
 	}
 end
 
+--[[
+Returns a list of sections. Each section contains the matchIds for the matches
+in that section of a bracket. The bracket must have coordinates data
+previously computed.
+
+The list is identical to the one returned by
+MatchGroupCoordinates.computeSections.
+]]
+function MatchGroupCoordinates.getSectionsFromCoordinates(bracket)
+	local sectionCount = Table.getByPathOrNil(bracket.matches, {1, 'bracketData', 'coordinates', 'sectionCount'}) or 0
+
+	local sections = Array.map(Array.range(1, sectionCount), function() return {} end)
+	for matchId in MatchGroupCoordinates.dfs(bracket) do
+		local coordinates = bracket.coordinatesByMatchId[matchId]
+		table.insert(sections[coordinates.sectionIndex], matchId)
+	end
+	return sections
+end
+
+--[[
+Returns a list of rounds. Each round contains the matchIds for the matches in
+that round of a bracket. The bracket must have coordinates data previously
+computed.
+
+The list is identical to the one returned by
+MatchGroupCoordinates.computeRounds.
+]]
+function MatchGroupCoordinates.getRoundsFromCoordinates(bracket)
+	local roundCount = Table.getByPathOrNil(bracket.matches, {1, 'bracketData', 'coordinates', 'roundCount'}) or 0
+
+	local rounds = Array.map(Array.range(1, roundCount), function() return {} end)
+	for matchId in MatchGroupCoordinates.dfs(bracket) do
+		local coordinates = bracket.coordinatesByMatchId[matchId]
+		table.insert(rounds[coordinates.roundIndex], matchId)
+	end
+	return rounds
+end
+
 return MatchGroupCoordinates

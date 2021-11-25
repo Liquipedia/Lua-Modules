@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TreeUtil = require('Module:TreeUtil')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
@@ -243,17 +242,21 @@ function MatchGroupUtil.makeBracketFromRecords(matchRecords)
 
 	local bracket = {
 		bracketDatasById = bracketDatasById,
+		coordinatesByMatchId = Table.mapValues(matchesById, function(match) return match.bracketData.coordinates end),
 		matches = matches,
 		matchesById = matchesById,
 		rootMatchIds = MatchGroupUtil.computeRootMatchIds(bracketDatasById),
 		type = 'bracket',
 	}
 
-	local roundPropsByMatchId, rounds = MatchGroupUtil.computeRounds(bracket.bracketDatasById, bracket.rootMatchIds)
-	Table.mergeInto(bracket, {
-		coordsByMatchId = roundPropsByMatchId,
-		rounds = rounds,
-	})
+	if firstCoordinates then
+		Table.mergeInto(bracket, {
+			rounds = MatchGroupCoordinates.getRoundsFromCoordinates(bracket),
+			sections = MatchGroupCoordinates.getSectionsFromCoordinates(bracket),
+		})
+	else
+		MatchGroupUtil.backfillCoordinates(bracket)
+	end
 
 	MatchGroupUtil.populateAdvanceSpots(bracket)
 
@@ -291,6 +294,19 @@ function MatchGroupUtil.backfillUpperMatchIds(bracketDatasById)
 
 	for matchId, bracketData in pairs(bracketDatasById) do
 		bracketData.upperMatchId = upperMatchIds[matchId]
+	end
+end
+
+--[[
+Populate bracketData.coordinates if it is missing. This can happen if the
+bracket template has not been recently purged.
+]]
+function MatchGroupUtil.backfillCoordinates(matchGroup)
+	local bracketCoordinates = MatchGroupCoordinates.computeCoordinates(matchGroup)
+
+	Table.mergeInto(matchGroup, bracketCoordinates)
+	for matchId, bracketData in pairs(matchGroup.bracketDatasById) do
+		bracketData.coordinates = bracketCoordinates.coordinatesByMatchId[matchId]
 	end
 end
 
@@ -395,6 +411,7 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 			advanceSpots = advanceSpots,
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
 			bracketSection = data.bracketsection,
+			coordinates = data.coordinates and MatchGroupUtil.indexTableFromRecord(data.coordinates),
 			header = nilIfEmpty(data.header),
 			lowerEdges = lowerEdges,
 			lowerMatchIds = lowerMatchIds,
@@ -477,67 +494,6 @@ function MatchGroupUtil.gameFromRecord(record)
 		walkover = nilIfEmpty(record.walkover),
 		winner = tonumber(record.winner),
 	}
-end
-
-function MatchGroupUtil.dfsFrom(bracketDatasById, start)
-	return TreeUtil.dfs(
-		function(matchId)
-			return bracketDatasById[matchId].lowerMatchIds
-		end,
-		start
-	)
-end
-
-function MatchGroupUtil.computeDepthsFrom(bracketDatasById, startMatchId)
-	local depths = {}
-	local maxDepth = -1
-	local function visit(matchId, depth)
-		local bracketData = bracketDatasById[matchId]
-		depths[matchId] = depth
-		maxDepth = math.max(maxDepth, depth + bracketData.skipRound)
-		for _, lowerMatchId in ipairs(bracketData.lowerMatchIds) do
-			visit(lowerMatchId, depth + 1 + bracketData.skipRound)
-		end
-	end
-	visit(startMatchId, 0)
-	return depths, maxDepth + 1
-end
-
--- TODO store and read this from LPDB
-function MatchGroupUtil.computeRounds(bracketDatasById, rootMatchIds)
-	local rounds = {}
-	local roundPropsByMatchId = {}
-	for _, rootMatchId in ipairs(rootMatchIds) do
-		local depths, depthCount = MatchGroupUtil.computeDepthsFrom(bracketDatasById, rootMatchId)
-		for _ = #rounds + 1, depthCount do
-			table.insert(rounds, {})
-		end
-
-		for matchId, depth in pairs(depths) do
-			roundPropsByMatchId[matchId] = {
-				depth = depth,
-				depthCount = depthCount,
-			}
-		end
-	end
-
-	for rootIx, rootMatchId in ipairs(rootMatchIds) do
-		for matchId in MatchGroupUtil.dfsFrom(bracketDatasById, rootMatchId) do
-			local roundProps = roundPropsByMatchId[matchId]
-
-			-- All roots are left aligned, except the third place match which is right aligned
-			local roundIx = StringUtils.endsWith(matchId, 'RxMTP')
-				and #rounds
-				or roundProps.depthCount - roundProps.depth
-
-			table.insert(rounds[roundIx], matchId)
-			roundProps.matchIxInRound = #rounds[roundIx]
-			roundProps.rootIx = rootIx
-			roundProps.roundIx = roundIx
-		end
-	end
-
-	return roundPropsByMatchId, rounds
 end
 
 function MatchGroupUtil.populateAdvanceSpots(bracket)
@@ -636,6 +592,17 @@ function MatchGroupUtil.parseOrCopyExtradata(recordExtradata)
 	return type(recordExtradata) == 'string' and Json.parse(recordExtradata)
 		or type(recordExtradata) == 'table' and Table.copy(recordExtradata)
 		or {}
+end
+
+-- Convert 0-based indexes to 1-based
+function MatchGroupUtil.indexTableFromRecord(record)
+	return Table.map(record, function(key, value)
+		if key:match('Index') and type(value) == 'number' then
+			return key, value + 1
+		else
+			return key, value
+		end
+	end)
 end
 
 --[[
