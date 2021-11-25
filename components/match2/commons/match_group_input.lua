@@ -50,7 +50,8 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		bracketData.bracketindex = context.bracketIndex
 		bracketData.groupRoundIndex = tonumber(match.round) or context.groupRoundIndex
 		bracketData.pageSection = context.pageSection
-		bracketData.sectionheader = context.stage
+		bracketData.sectionheader = context.stage --Deprecated
+		bracketData.stage = context.stage
 
 		return match
 	end)
@@ -108,7 +109,8 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.bracketindex = context.bracketIndex
 		bracketData.groupRoundIndex = tonumber(match.round) or context.groupRoundIndex
 		bracketData.pageSection = context.pageSection
-		bracketData.sectionheader = context.stage
+		bracketData.sectionheader = context.stage --Deprecated
+		bracketData.stage = context.stage
 
 		if match.winnerto then
 			bracketData.winnerto = (match.winnertobracket and match.winnertobracket .. '_' or '')
@@ -257,7 +259,7 @@ function MatchGroupInput.readContext(args)
 		bracketIndex = tonumber(globalVars:get('match2bracketindex')) or 0,
 		groupRoundIndex = MatchGroupInput.readGroupRoundIndex(args),
 		pageSection = args.matchsection or globalVars:get('matchsection'),
-		stage = args.section or globalVars:get('bracket_header'),
+		stage = args.stage or args.section or globalVars:get('bracket_header'), -- args.section is deprecated
 		tournamentParent = globalVars:get('tournament_parent'),
 	}
 
