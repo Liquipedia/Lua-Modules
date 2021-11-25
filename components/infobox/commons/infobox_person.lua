@@ -35,7 +35,7 @@ local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
 local _warnings = {}
-local _earnings = {}
+local _earningsPerYear = {}
 local _totalEarnings
 
 function Person.run(frame)
@@ -212,7 +212,7 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		extradata = {},
 	}
 
-	for year, earningsOfYear in pairs(_earnings) do
+	for year, earningsOfYear in pairs(_earningsPerYear) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
 
@@ -297,7 +297,7 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	_totalEarnings, _earnings = Earnings.calculateForPlayer{
+	_totalEarnings, _earningsPerYear = Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
 		perYear = true
 	}
