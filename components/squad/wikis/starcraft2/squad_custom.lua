@@ -54,6 +54,7 @@ function CustomSquad.run(frame)
 	while args['p' .. index] or args[index] do
 
 		local player = Json.parseIfString(args['p' .. index] or args[index])
+		player.id = player.id or player[1]
 		player.race = string.lower(player.race)
 		player.race = CleanRace[player.race] or player.race
 		local row = SquadRow(frame, player.role, {useTemplatesForSpecialTeams = true})
