@@ -49,6 +49,10 @@ SquadRow.specialTeamsTemplateMapping = {
 
 
 function SquadRow:id(args)
+	if String.isEmpty(args[1]) then
+		return error('Something is off with your input!')
+	end
+
 	local cell = mw.html.create('td')
 	cell:addClass('ID')
 	cell:wikitext('\'\'\'' .. Player._player(args) .. '\'\'\'')
