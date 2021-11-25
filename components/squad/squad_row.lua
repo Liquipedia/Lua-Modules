@@ -94,10 +94,11 @@ end
 
 function SquadRow:role(args)
 	local cell = mw.html.create('td')
+	-- The CSS class has this name, not a typo.
 	cell:addClass('Position')
 
 	if not String.isEmpty(args.role) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
+		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'))
 		cell:wikitext('\'\'(' .. args.role .. ')\'\'')
 	end
 
