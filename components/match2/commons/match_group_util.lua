@@ -351,9 +351,14 @@ to the starcraft2 wiki as an example.
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
+	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
+	if bracketData.type == 'bracket' then
+		bracketData.lowerEdges = bracketData.lowerEdges
+			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
+	end
 
 	return {
-		bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata), #opponents),
+		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		date = record.date,
@@ -373,26 +378,8 @@ function MatchGroupUtil.matchFromRecord(record)
 	}
 end
 
-function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
+function MatchGroupUtil.bracketDataFromRecord(data)
 	if data.type == 'bracket' then
-		local lowerEdges = {}
-		local lowerMatchIds = {}
-		local midIx = math.floor(opponentCount / 2)
-		if nilIfEmpty(data.toupper) then
-			table.insert(lowerMatchIds, data.toupper)
-			table.insert(lowerEdges, {
-				opponentIndex = midIx,
-				lowerMatchIndex = #lowerMatchIds,
-			})
-		end
-		if nilIfEmpty(data.tolower) then
-			table.insert(lowerMatchIds, data.tolower)
-			table.insert(lowerEdges, {
-				opponentIndex = math.min(midIx + 1, opponentCount),
-				lowerMatchIndex = #lowerMatchIds,
-			})
-		end
-
 		local advanceSpots = {}
 		if nilIfEmpty(data.winnerto) then
 			advanceSpots[1] = {bg = 'up', type = 'custom', matchId = data.winnerto}
@@ -413,8 +400,8 @@ function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
 			bracketSection = data.bracketsection,
 			coordinates = data.coordinates and MatchGroupUtil.indexTableFromRecord(data.coordinates),
 			header = nilIfEmpty(data.header),
-			lowerEdges = lowerEdges,
-			lowerMatchIds = lowerMatchIds,
+			lowerEdges = data.lowerEdges and Array.map(data.lowerEdges, MatchGroupUtil.indexTableFromRecord),
+			lowerMatchIds = data.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(data),
 			qualLose = advanceSpots[2] and advanceSpots[2].type == 'qualify',
 			qualLoseLiteral = nilIfEmpty(data.qualloseLiteral),
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,
@@ -494,6 +481,44 @@ function MatchGroupUtil.gameFromRecord(record)
 		walkover = nilIfEmpty(record.walkover),
 		winner = tonumber(record.winner),
 	}
+end
+
+function MatchGroupUtil.computeLowerMatchIdsFromLegacy(data)
+	local lowerMatchIds = {}
+	if nilIfEmpty(data.toupper) then
+		table.insert(lowerMatchIds, data.toupper)
+	end
+	if nilIfEmpty(data.tolower) then
+		table.insert(lowerMatchIds, data.tolower)
+	end
+	return lowerMatchIds
+end
+
+--[[
+Auto compute lower edges, which encode the connector lines between lower
+matches and this match.
+]]
+function MatchGroupUtil.autoAssignLowerEdges(lowerMatchCount, opponentCount)
+	local lowerEdges = {}
+	if lowerMatchCount <= opponentCount then
+		-- More opponents than lower matches: connect lower matches to opponents near the middle.
+		local skip = math.ceil((opponentCount - lowerMatchCount) / 2)
+		for lowerMatchIndex = 1, lowerMatchCount do
+			table.insert(lowerEdges, {
+				lowerMatchIndex = lowerMatchIndex,
+				opponentIndex = lowerMatchIndex + skip,
+			})
+		end
+	else
+		-- More lower matches than opponents: The excess lower matches are all connected to the final opponent.
+		for lowerMatchIndex = 1, lowerMatchCount do
+			table.insert(lowerEdges, {
+				lowerMatchIndex = lowerMatchIndex,
+				opponentIndex = math.min(lowerMatchIndex, opponentCount),
+			})
+		end
+	end
+	return lowerEdges
 end
 
 function MatchGroupUtil.populateAdvanceSpots(bracket)
