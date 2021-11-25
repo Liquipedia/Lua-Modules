@@ -18,6 +18,7 @@ local String = require('Module:StringUtils')
 local Region = require('Module:Region')
 local AgeCalculation = require('Module:AgeCalculation')
 local WarningBox = require('Module:WarningBox')
+local Earnings = require('Module:Earnings')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -34,6 +35,8 @@ local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
 local _warnings = {}
+local _earningsPerYear = {}
+local _totalEarnings
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -162,7 +165,6 @@ function Person:createInfobox()
 
 	infobox:bottom(self:createBottomContent())
 
-	Variables.varDefine('earnings', earnings)
 	local statusToStore = self:getStatusToStore(args)
 	infobox:categories(unpack(self:getCategories(
 				args,
@@ -205,10 +207,15 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		team = args.teamlink or args.team,
 		status = status,
 		type = personType,
-		earnings = earnings,
+		earnings = _totalEarnings,
 		links = links,
 		extradata = {},
 	}
+
+	for year, earningsOfYear in pairs(_earningsPerYear) do
+		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+	end
+
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
 	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
@@ -290,7 +297,11 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	return 0
+	_totalEarnings, _earningsPerYear = Earnings.calculateForPlayer{
+		player = args.earnings or self.pagename,
+		perYear = true
+	}
+	return _totalEarnings
 end
 
 function Person:_createRegion(region, country)
