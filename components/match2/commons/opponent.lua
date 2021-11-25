@@ -32,6 +32,13 @@ StarcraftMatchSummary
 ]]
 local Opponent = {types = {}}
 
+Opponent.team = 'team'
+Opponent.solo = 'solo'
+Opponent.duo = 'duo'
+Opponent.trio = 'trio'
+Opponent.quad = 'quad'
+Opponent.literal = 'literal'
+
 Opponent.partyTypes = {Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad}
 Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal})
 
