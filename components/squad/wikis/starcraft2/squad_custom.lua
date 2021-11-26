@@ -6,8 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Squad = require('Module:VoganRL/Squad')
-local SquadRow = require('Module:VoganRL/Squad/Row')
+local Squad = require('Module:Squad')
+local SquadRow = require('Module:Squad/Row')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:String')
