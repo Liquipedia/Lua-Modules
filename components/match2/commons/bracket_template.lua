@@ -66,15 +66,15 @@ function BracketTemplate.readBracket(argsList)
 		templateId = mw.title.getCurrentTitle().text,
 	}
 
-	-- Populate in bracketData.upperMatchId and rootMatchIds
-	local upperMatchIds = MatchGroupCoordinates.computeUpperMatchIds(bracket.bracketDatasById)
+	-- Populate in bracketData.parentMatchId and rootMatchIds
+	local parentMatchIds = MatchGroupCoordinates.computeParentMatchIds(bracket.bracketDatasById)
 	for _, bracketData in ipairs(bracketDatas) do
-		local upperMatchId = upperMatchIds[bracketData.matchId]
-		if not upperMatchId
+		local parentMatchId = parentMatchIds[bracketData.matchId]
+		if not parentMatchId
 			and not String.endsWith(bracketData.matchId, 'RxMBR') then
 			table.insert(bracket.rootMatchIds, bracketData.matchId)
 		end
-		bracketData.upperMatchId = upperMatchId
+		bracketData.parentMatchId = parentMatchId
 	end
 
 	-- Populate bracketData.coordinates
@@ -95,10 +95,10 @@ function BracketTemplate.readBracketData(args)
 	args.type = 'bracket'
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(args)
 	bracketData.bracketResetMatchId = bracketData.bracketResetMatchId and joinPageName(bracketData.bracketResetMatchId)
-	bracketData.lowerMatchIds = Array.map(bracketData.lowerMatchIds, joinPageName)
+	bracketData.childMatchIds = Array.map(bracketData.childMatchIds, joinPageName)
 	bracketData.matchId = joinPageName(args.matchid)
 	bracketData.thirdPlaceMatchId = bracketData.thirdPlaceMatchId and joinPageName(bracketData.thirdPlaceMatchId)
-	bracketData.upperMatchId = bracketData.upperMatchId and joinPageName(bracketData.upperMatchId)
+	bracketData.parentMatchId = bracketData.parentMatchId and joinPageName(bracketData.parentMatchId)
 	return bracketData
 end
 

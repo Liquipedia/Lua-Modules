@@ -18,7 +18,7 @@ local MatchGroupCoordinates = {}
 function MatchGroupCoordinates.dfsFrom(bracketDatasById, start)
 	return TreeUtil.dfs(
 		function(matchId)
-			return bracketDatasById[matchId].lowerMatchIds
+			return bracketDatasById[matchId].childMatchIds
 		end,
 		start
 	)
@@ -30,14 +30,14 @@ function MatchGroupCoordinates.dfs(bracket)
 	end, ipairs(bracket.rootMatchIds))
 end
 
-function MatchGroupCoordinates.computeUpperMatchIds(bracketDatasById)
-	local upperMatchIds = {}
+function MatchGroupCoordinates.computeParentMatchIds(bracketDatasById)
+	local parentMatchIds = {}
 	for matchId, bracketData in pairs(bracketDatasById) do
-		for _, lowerMatchId in ipairs(bracketData.lowerMatchIds) do
-			upperMatchIds[lowerMatchId] = matchId
+		for _, childMatchId in ipairs(bracketData.childMatchIds) do
+			parentMatchIds[childMatchId] = matchId
 		end
 	end
-	return upperMatchIds
+	return parentMatchIds
 end
 
 function MatchGroupCoordinates.computeSections(bracket)
@@ -45,9 +45,9 @@ function MatchGroupCoordinates.computeSections(bracket)
 	local sections = {}
 	for matchId in MatchGroupCoordinates.dfs(bracket) do
 		local bracketData = bracket.bracketDatasById[matchId]
-		local upperMatch = bracketData.upperMatchId and bracket.bracketDatasById[bracketData.upperMatchId]
+		local parentMatch = bracketData.parentMatchId and bracket.bracketDatasById[bracketData.parentMatchId]
 		local isNewSection = bracketData.header ~= nil
-			and (not upperMatch or matchId ~= upperMatch.lowerMatchIds[1])
+			and (not parentMatch or matchId ~= parentMatch.childMatchIds[1])
 			and not String.endsWith(matchId, 'RxMTP')
 		if isNewSection then
 			table.insert(sections, {})
@@ -65,8 +65,8 @@ function MatchGroupCoordinates.computeDepthsFrom(bracketDatasById, startMatchId)
 		local bracketData = bracketDatasById[matchId]
 		depths[matchId] = depth
 		maxDepth = math.max(maxDepth, depth + bracketData.skipRound)
-		for _, lowerMatchId in ipairs(bracketData.lowerMatchIds) do
-			visit(lowerMatchId, depth + 1 + bracketData.skipRound)
+		for _, childMatchId in ipairs(bracketData.childMatchIds) do
+			visit(childMatchId, depth + 1 + bracketData.skipRound)
 		end
 	end
 	visit(startMatchId, 0)
@@ -76,15 +76,15 @@ end
 function MatchGroupCoordinates.computeSemanticDepths(bracket, sectionIxs)
 	local depths = {}
 	local function visit(matchId, depth)
-		local lowerMatchIds = bracket.bracketDatasById[matchId].lowerMatchIds
-		local lastLowerId = #lowerMatchIds and lowerMatchIds[#lowerMatchIds]
-		local isGrandFinal = lastLowerId and sectionIxs[lastLowerId] ~= sectionIxs[matchId]
+		local childMatchIds = bracket.bracketDatasById[matchId].childMatchIds
+		local lastChildId = #childMatchIds and childMatchIds[#childMatchIds]
+		local isGrandFinal = lastChildId and sectionIxs[lastChildId] ~= sectionIxs[matchId]
 		if isGrandFinal then
 			depth = depth - 1
 		end
 		depths[matchId] = depth
-		for _, lowerMatchId in ipairs(lowerMatchIds) do
-			visit(lowerMatchId, depth + 1)
+		for _, childMatchId in ipairs(childMatchIds) do
+			visit(childMatchId, depth + 1)
 		end
 	end
 
@@ -296,7 +296,7 @@ function MatchGroupCoordinates.computeRawCounts(bracket)
 
 			local sectionIndex = coordinates.sectionIndex
 			local count = 1
-			if not bracketData.upperMatchId then
+			if not bracketData.parentMatchId then
 				count = count + 1
 				if String.endsWith(matchId, 'RxMTP') then
 					count = 0

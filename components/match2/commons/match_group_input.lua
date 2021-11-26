@@ -129,13 +129,13 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 			bracketData.bracketreset = nil
 		end
 
-		if not bracketData.lowerEdges then
+		if not bracketData.childEdges then
 			local opponentCount = 0
 			for _, _ in Table.iter.pairsByPrefix(match, 'opponent') do
 				opponentCount = opponentCount + 1
 			end
-			bracketData.lowerEdges = Array.map(
-				MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, opponentCount),
+			bracketData.childEdges = Array.map(
+				MatchGroupUtil.autoAssignChildEdges(#bracketData.childMatchIds, opponentCount),
 				MatchGroupUtil.indexTableToRecord
 			)
 		end
@@ -175,21 +175,21 @@ function MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 
 		-- Convert 0 based array to 1 based array
 		bracketData.advanceSpots = bracketData.advanceSpots and shiftArrayIndex(bracketData.advanceSpots)
-		bracketData.lowerEdges = bracketData.lowerEdges and shiftArrayIndex(bracketData.lowerEdges)
-		bracketData.lowerMatchIds = bracketData.lowerMatchIds and shiftArrayIndex(bracketData.lowerMatchIds)
+		bracketData.childEdges = bracketData.childEdges and shiftArrayIndex(bracketData.childEdges)
+		bracketData.childMatchIds = bracketData.childMatchIds and shiftArrayIndex(bracketData.childMatchIds)
 
 		-- Rewrite bracket name of match IDs
 		bracketData.bracketreset = String.nilIfEmpty(bracketData.bracketreset) and replaceBracketId(bracketData.bracketreset)
-		bracketData.lowerMatchIds = bracketData.lowerMatchIds and Array.map(bracketData.lowerMatchIds, replaceBracketId)
+		bracketData.childMatchIds = bracketData.childMatchIds and Array.map(bracketData.childMatchIds, replaceBracketId)
 		bracketData.thirdplace = String.nilIfEmpty(bracketData.thirdplace) and replaceBracketId(bracketData.thirdplace)
 		bracketData.tolower = String.nilIfEmpty(bracketData.tolower) and replaceBracketId(bracketData.tolower)
 		bracketData.toupper = String.nilIfEmpty(bracketData.toupper) and replaceBracketId(bracketData.toupper)
-		bracketData.upperMatchId = bracketData.upperMatchId and replaceBracketId(bracketData.upperMatchId)
+		bracketData.parentMatchId = bracketData.parentMatchId and replaceBracketId(bracketData.parentMatchId)
 
 		-- Remove/convert deprecated fields
-		bracketData.lowerMatchIds = bracketData.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(bracketData)
-		bracketData.tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds]
-		bracketData.toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1]
+		bracketData.childMatchIds = bracketData.childMatchIds or MatchGroupUtil.computeChildMatchIdsFromLegacy(bracketData)
+		bracketData.tolower = bracketData.childMatchIds[#bracketData.childMatchIds]
+		bracketData.toupper = bracketData.childMatchIds[#bracketData.childMatchIds - 1]
 		bracketData.rootIndex = nil
 
 		local _, baseMatchId = MatchGroupUtil.splitMatchId(match.match2id)

@@ -32,8 +32,8 @@ Display related functions go in Module:MatchGroup/Display/Helper.
 ]]
 local MatchGroupUtil = {types = {}}
 
-MatchGroupUtil.types.LowerEdge = TypeUtil.struct({
-	lowerMatchIndex = 'number',
+MatchGroupUtil.types.ChildEdge = TypeUtil.struct({
+	childMatchIndex = 'number',
 	opponentIndex = 'number',
 })
 MatchGroupUtil.types.AdvanceBg = TypeUtil.literalUnion('up', 'stayup', 'stay', 'staydown', 'down')
@@ -46,8 +46,8 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
 	header = 'string?',
-	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
-	lowerMatchIds = TypeUtil.array('string'),
+	childEdges = TypeUtil.array(MatchGroupUtil.types.ChildEdge),
+	childMatchIds = TypeUtil.array('string'),
 	qualLose = 'boolean?',
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
@@ -57,7 +57,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	thirdPlaceMatchId = 'string?',
 	title = 'string?',
 	type = TypeUtil.literal('bracket'),
-	upperMatchId = 'string?',
+	parentMatchId = 'string?',
 })
 MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 	depth = 'number',
@@ -255,7 +255,7 @@ function MatchGroupUtil.makeBracketFromRecords(matchRecords)
 
 	local firstCoordinates = matches[1] and matches[1].bracketData.coordinates
 	if not firstCoordinates then
-		MatchGroupUtil.backfillUpperMatchIds(bracketDatasById)
+		MatchGroupUtil.backfillParentMatchIds(bracketDatasById)
 	end
 
 	local bracket = {
@@ -313,10 +313,10 @@ Returns an array of all the IDs of root matches. The matches are sorted in
 display order.
 ]]
 function MatchGroupUtil.computeRootMatchIds(bracketDatasById)
-	-- Matches without upper matches
+	-- Matches without parent matches
 	local rootMatchIds = {}
 	for matchId, bracketData in pairs(bracketDatasById) do
-		if not bracketData.upperMatchId
+		if not bracketData.parentMatchId
 			and not StringUtils.endsWith(matchId, 'RxMBR') then
 			table.insert(rootMatchIds, matchId)
 		end
@@ -331,14 +331,14 @@ function MatchGroupUtil.computeRootMatchIds(bracketDatasById)
 end
 
 --[[
-Populate bracketData.upperMatchId if it is missing. This can happen if the
+Populate bracketData.parentMatchId if it is missing. This can happen if the
 bracket template is missing data.
 ]]
-function MatchGroupUtil.backfillUpperMatchIds(bracketDatasById)
-	local upperMatchIds = MatchGroupCoordinates.computeUpperMatchIds(bracketDatasById)
+function MatchGroupUtil.backfillParentMatchIds(bracketDatasById)
+	local parentMatchIds = MatchGroupCoordinates.computeParentMatchIds(bracketDatasById)
 
 	for matchId, bracketData in pairs(bracketDatasById) do
-		bracketData.upperMatchId = upperMatchIds[matchId]
+		bracketData.parentMatchId = parentMatchIds[matchId]
 	end
 end
 
@@ -390,8 +390,8 @@ function MatchGroupUtil.matchFromRecord(record)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
 	if bracketData.type == 'bracket' then
-		bracketData.lowerEdges = bracketData.lowerEdges
-			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
+		bracketData.childEdges = bracketData.childEdges
+			or MatchGroupUtil.autoAssignChildEdges(#bracketData.childMatchIds, #opponents)
 	end
 
 	return {
@@ -423,8 +423,8 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
 			coordinates = data.coordinates and MatchGroupUtil.indexTableFromRecord(data.coordinates),
 			header = nilIfEmpty(data.header),
-			lowerEdges = data.lowerEdges and Array.map(data.lowerEdges, MatchGroupUtil.indexTableFromRecord),
-			lowerMatchIds = data.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(data),
+			childEdges = data.childEdges and Array.map(data.childEdges, MatchGroupUtil.indexTableFromRecord),
+			childMatchIds = data.childMatchIds or MatchGroupUtil.computeChildMatchIdsFromLegacy(data),
 			qualLose = advanceSpots[2] and advanceSpots[2].type == 'qualify',
 			qualLoseLiteral = nilIfEmpty(data.qualloseLiteral),
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,
@@ -433,7 +433,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
-			upperMatchId = nilIfEmpty(data.upperMatchId),
+			parentMatchId = nilIfEmpty(data.parentMatchId),
 		}
 	else
 		return {
@@ -450,8 +450,8 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 		bracketreset = bracketData.bracketResetMatchId,
 		coordinates = coordinates and MatchGroupUtil.indexTableToRecord(coordinates),
 		header = bracketData.header,
-		lowerEdges = bracketData.lowerEdges and Array.map(bracketData.lowerEdges, MatchGroupUtil.indexTableToRecord),
-		lowerMatchIds = bracketData.lowerMatchIds,
+		childEdges = bracketData.childEdges and Array.map(bracketData.childEdges, MatchGroupUtil.indexTableToRecord),
+		childMatchIds = bracketData.childMatchIds,
 		qualWinLiteral = bracketData.qualwinLiteral,
 		quallose = bracketData.qualLose and 'true' or nil,
 		qualloseLiteral = bracketData.qualLoseLiteral,
@@ -460,13 +460,13 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 		skipround = bracketData.skipRound ~= 0 and bracketData.skipRound or nil,
 		thirdplace = bracketData.thirdPlaceMatchId,
 		type = bracketData.type,
-		upperMatchId = bracketData.upperMatchId,
+		parentMatchId = bracketData.parentMatchId,
 
 		-- Deprecated
 		bracketsection = coordinates
 			and MatchGroupUtil.sectionIndexToString(coordinates.sectionIndex, coordinates.sectionCount),
-		tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds],
-		toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1],
+		tolower = bracketData.childMatchIds[#bracketData.childMatchIds],
+		toupper = bracketData.childMatchIds[#bracketData.childMatchIds - 1],
 	}
 end
 
@@ -531,42 +531,42 @@ function MatchGroupUtil.gameFromRecord(record)
 	}
 end
 
-function MatchGroupUtil.computeLowerMatchIdsFromLegacy(data)
-	local lowerMatchIds = {}
+function MatchGroupUtil.computeChildMatchIdsFromLegacy(data)
+	local childMatchIds = {}
 	if nilIfEmpty(data.toupper) then
-		table.insert(lowerMatchIds, data.toupper)
+		table.insert(childMatchIds, data.toupper)
 	end
 	if nilIfEmpty(data.tolower) then
-		table.insert(lowerMatchIds, data.tolower)
+		table.insert(childMatchIds, data.tolower)
 	end
-	return lowerMatchIds
+	return childMatchIds
 end
 
 --[[
-Auto compute lower edges, which encode the connector lines between lower
+Auto compute child edges, which encode the connector lines between child
 matches and this match.
 ]]
-function MatchGroupUtil.autoAssignLowerEdges(lowerMatchCount, opponentCount)
-	local lowerEdges = {}
-	if lowerMatchCount <= opponentCount then
-		-- More opponents than lower matches: connect lower matches to opponents near the middle.
-		local skip = math.ceil((opponentCount - lowerMatchCount) / 2)
-		for lowerMatchIndex = 1, lowerMatchCount do
-			table.insert(lowerEdges, {
-				lowerMatchIndex = lowerMatchIndex,
-				opponentIndex = lowerMatchIndex + skip,
+function MatchGroupUtil.autoAssignChildEdges(childMatchCount, opponentCount)
+	local childEdges = {}
+	if childMatchCount <= opponentCount then
+		-- More opponents than child matches: connect child matches to opponents near the middle.
+		local skip = math.ceil((opponentCount - childMatchCount) / 2)
+		for childMatchIndex = 1, childMatchCount do
+			table.insert(childEdges, {
+				childMatchIndex = childMatchIndex,
+				opponentIndex = childMatchIndex + skip,
 			})
 		end
 	else
-		-- More lower matches than opponents: The excess lower matches are all connected to the final opponent.
-		for lowerMatchIndex = 1, lowerMatchCount do
-			table.insert(lowerEdges, {
-				lowerMatchIndex = lowerMatchIndex,
-				opponentIndex = math.min(lowerMatchIndex, opponentCount),
+		-- More child matches than opponents: The excess child matches are all connected to the final opponent.
+		for childMatchIndex = 1, childMatchCount do
+			table.insert(childEdges, {
+				childMatchIndex = childMatchIndex,
+				opponentIndex = math.min(childMatchIndex, opponentCount),
 			})
 		end
 	end
-	return lowerEdges
+	return childEdges
 end
 
 --[[
@@ -576,8 +576,8 @@ data. More are found in populateAdvanceSpots.
 function MatchGroupUtil.computeAdvanceSpots(data)
 	local advanceSpots = {}
 
-	if data.upperMatchId then
-		advanceSpots[1] = {bg = 'up', type = 'advance', matchId = data.upperMatchId}
+	if data.parentMatchId then
+		advanceSpots[1] = {bg = 'up', type = 'advance', matchId = data.parentMatchId}
 	end
 
 	if nilIfEmpty(data.winnerto) then
@@ -606,8 +606,8 @@ function MatchGroupUtil.populateAdvanceSpots(bracket)
 	local firstBracketData = bracket.bracketDatasById[bracket.rootMatchIds[1]]
 	local thirdPlaceMatchId = firstBracketData.thirdPlaceMatchId
 	if thirdPlaceMatchId and bracket.matchesById[thirdPlaceMatchId] then
-		for _, lowerMatchId in ipairs(firstBracketData.lowerMatchIds) do
-			local bracketData = bracket.bracketDatasById[lowerMatchId]
+		for _, childMatchId in ipairs(firstBracketData.childMatchIds) do
+			local bracketData = bracket.bracketDatasById[childMatchId]
 			bracketData.advanceSpots[2] = bracketData.advanceSpots[2]
 				or {bg = 'stayup', type = 'advance', matchId = thirdPlaceMatchId}
 		end
