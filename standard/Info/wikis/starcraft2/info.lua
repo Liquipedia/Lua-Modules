@@ -11,4 +11,5 @@ return {
 	wikiName = 'starcraft2',
 	name = 'StarCraft II',
 	defaultTeamLogo = 'StarCraft_2_Default_logo.png',
+	defaultTeamLogoDark = 'StarCraft_2_Default_logo.png',
 }
