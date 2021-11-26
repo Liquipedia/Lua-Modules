@@ -220,10 +220,6 @@ function CustomLeague:defineCustomPageVariables(args)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.liquipediatiertype) then
-		lpdbData['liquipediatier'] = args.liquipediatiertype
-	end
-
 	lpdbData['game'] = 'rocket league'
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
@@ -231,8 +227,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		region = args.region,
 		mode = args.mode,
 		notabilitymod = args.notabilitymod,
-		liquipediatier2 =
-			(not String.isEmpty(args.liquipediatiertype) and args.liquipediatier) or args.liquipediatier2,
 		liquipediatiertype2 = args.liquipediatiertype2,
 		participantsnumber =
 			not String.isEmpty(args.team_number) and args.team_number or args.player_number,
