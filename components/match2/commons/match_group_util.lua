@@ -42,20 +42,31 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
-	bracketSection = 'string',
 	header = 'string?',
-	lowerMatchIds = TypeUtil.array('string'),
 	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
+	lowerMatchIds = TypeUtil.array('string'),
 	qualLose = 'boolean?',
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
 	qualWin = 'boolean?',
 	qualWinLiteral = 'string?',
-	rootIndex = 'number?',
 	skipRound = 'number?',
 	thirdPlaceMatchId = 'string?',
 	title = 'string?',
 	type = TypeUtil.literal('bracket'),
+	upperMatchId = 'string?',
+})
+MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
+	depth = 'number',
+	depthCount = 'number',
+	matchIndexInRound = 'number',
+	rootIndex = 'number',
+	roundCount = 'number',
+	roundIndex = 'number',
+	sectionCount = 'number',
+	sectionIndex = 'number',
+	semanticDepth = 'number',
+	semanticRoundIndex = 'number',
 })
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
@@ -140,13 +151,27 @@ MatchGroupUtil.types.Team = TypeUtil.struct({
 	shortName = 'string',
 })
 
-MatchGroupUtil.types.MatchGroup = TypeUtil.struct({
-	rootMatchIds = TypeUtil.array('string'),
+MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
-	type = TypeUtil.literalUnion('matchlist', 'bracket'),
-	upperMatchIds = TypeUtil.table('string', 'string'),
+	type = TypeUtil.literal('matchlist'),
 })
+
+MatchGroupUtil.types.Bracket = TypeUtil.struct({
+	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
+	coordinatesByMatchId = TypeUtil.table('string', MatchGroupUtil.types.MatchCoordinates),
+	matches = TypeUtil.array(MatchGroupUtil.types.Match),
+	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+	rootMatchIds = TypeUtil.array('string'),
+	rounds = TypeUtil.array(TypeUtil.array('string')),
+	sections = TypeUtil.array(TypeUtil.array('string')),
+	type = TypeUtil.literal('bracket'),
+})
+
+MatchGroupUtil.types.MatchGroup = TypeUtil.union(
+	MatchGroupUtil.types.Matchlist,
+	MatchGroupUtil.types.Bracket
+)
 
 --[[
 Fetches all matches in a matchlist or bracket. Tries to read from page
