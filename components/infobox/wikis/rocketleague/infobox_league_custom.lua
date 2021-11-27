@@ -200,7 +200,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Legacy tier vars
 	Variables.varDefine('tournament_lptier', args.liquipediatier)
 	Variables.varDefine('tournament_tier', args.liquipediatiertype or args.liquipediatier)
-	Variables.varDefine('tournament_tier2', args.liquipediatier2)
 	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
 	Variables.varDefine('tournament_tiertype2', args.liquipediatiertype2)
 	Variables.varDefine('ltier', args.liquipediatier == 1 and 1 or
