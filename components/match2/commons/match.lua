@@ -8,6 +8,7 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -304,6 +305,7 @@ function Match._prepareRecordsForStore(records)
 		end
 	end
 	for _, gameRecord in ipairs(records.gameRecords) do
+		gameRecord.date = Date.formatTimestamp('Y-m-d', gameRecord.date or '') -- TODO: HH:MM:SS
 		Match.clampFields(gameRecord, Match.gameFields)
 	end
 end
@@ -311,6 +313,9 @@ end
 function Match._prepareMatchRecordForStore(match)
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
 	match.finished = Logic.readBool(match.finished) and 1 or 0
+	match.date = Date.formatTimestamp('Y-m-d', match.date or '') -- TODO: HH:MM:SS
+	match.extradata.dateisestimate = Logic.readBool(match.dateisestimate) and 1 or 0
+	match.extradata.timezone = match.timezone
 	match.match2bracketdata = match.match2bracketdata or match.bracketdata
 	match.match2bracketid = match.match2bracketid or match.bracketid
 	match.match2id = match.match2id or match.bracketid .. '_' .. match.matchid

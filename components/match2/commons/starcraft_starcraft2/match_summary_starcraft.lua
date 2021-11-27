@@ -138,7 +138,7 @@ function StarcraftMatchSummary.Body(props)
 		:addClass('brkts-popup-sc-body')
 
 	-- Stream, date, and countdown
-	if match.dateIsExact then
+	if match.dateexact then
 		local countdownNode = DisplayHelper.MatchCountdownBlock(match)
 			:addClass('brkts-popup-body-element')
 			:addClass('brkts-popup-countdown')

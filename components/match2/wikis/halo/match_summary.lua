@@ -7,6 +7,7 @@
 --
 
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local Date = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
@@ -73,7 +74,8 @@ function p.getByMatchId(args)
 	for _, game in ipairs(match.games) do
 		if game.map then
 			local mapDisplay = '[[' .. game.map .. ']]'
-			local modeIcon = MapModes.get({ mode = game.mode, date = match.date, size = 15})
+			local date = Date.formatTimestamp('Y-m-d', match.date or '')
+			local modeIcon = MapModes.get({ mode = game.mode, date = date, size = 15})
 			if modeIcon ~= '' then
 				modeIcon = modeIcon .. '&nbsp;'
 			end

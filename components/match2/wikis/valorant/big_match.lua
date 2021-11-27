@@ -9,6 +9,7 @@
 local Arguments = require("Module:Arguments")
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
+local Date = require('Module:Date/Ext')
 local DivTable = require('Module:DivTable')
 local Links = require('Module:Links')
 local Logic = require('Module:Logic')
@@ -63,7 +64,7 @@ function BigMatch:header(match, opponent1, opponent2, tournament)
 	local teamRight = self:_createTeamContainer('right', opponent2.name, opponent2.score, false)
 
 	local stream = Table.copy(match.stream)
-	stream.date = mw.getContentLanguage():formatDate('r', match.date)
+	stream.date = Date.formatTimestamp('r', match.date)
 	stream.finished = Logic.readBool(match.finished) and 'true' or ''
 	local divider = self:_createTeamSeparator(match.format, stream)
 
@@ -319,7 +320,7 @@ function BigMatch:_getId()
 end
 
 function BigMatch:_formatDate(date)
-	return mw.getContentLanguage():formatDate('r', date)
+	return Date.formatTimestamp('r', date)
 end
 
 function BigMatch:_createPlayerLookUp(opponent1Players, opponent2Players)

@@ -8,6 +8,7 @@
 
 local MatchLegacy = {}
 
+local Date = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
@@ -140,12 +141,13 @@ function MatchLegacy.storeGames(match, match2)
 end
 
 function MatchLegacy.storeMatchSMW(match, match2)
+	local date = Date.formatTimestamp('c', match.date or '')
 	local data = {
 		'legacymatch_' .. match2.match2id,
 		'is map number=1',
 		'has team left=' .. (match.opponent1 or ''),
 		'has team right=' .. (match.opponent2 or ''),
-		'Has map date=' .. (match.date or ''),
+		'Has map date=' .. (date or ''),
 		'Has tournament=' .. mw.title.getCurrentTitle().prefixedText,
 		'Has tournament tier=' .. (match.liquipediatier or ''),
 		'Has tournament name=' .. Logic.emptyOr(
@@ -163,7 +165,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has teams=' .. (match.opponent2 or ''),
 		'Has teams name=' .. (match.opponent1 or ''),
 		'Has teams name=' .. (match.opponent2 or ''),
-		'Has calendar description=- ' .. match.opponent1 .. ' vs ' .. match.opponent2 .. ' on ' .. match.date,
+		'Has calendar description=- ' .. match.opponent1 .. ' vs ' .. match.opponent2 .. ' on ' .. date, -- TODO
 	}
 
 	local streams = match.stream or {}
@@ -204,6 +206,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		end
 	end
 
+	-- TODO
 	if match.dateexact then
 		--shift date about 1 hour
 		local calendarEndDate = string.gsub(match.date, '+00:00', '-01:00')

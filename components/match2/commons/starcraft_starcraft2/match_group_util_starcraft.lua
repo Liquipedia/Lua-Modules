@@ -322,7 +322,7 @@ end
 
 -- Determine if a match has details that should be displayed via popup
 function StarcraftMatchGroupUtil.matchHasDetails(match)
-	return match.dateIsExact
+	return match.dateexact
 		or match.vod
 		or not Table.isEmpty(match.links)
 		or match.comment

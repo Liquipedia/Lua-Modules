@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DisplayUtil = require('Module:DisplayUtil')
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
@@ -101,7 +102,7 @@ different policy by setting props.matchHasDetails in the Bracket and Matchlist
 components.
 ]]
 function DisplayHelper.defaultMatchHasDetails(match)
-	return match.dateIsExact
+	return not match.dateisestimate
 		or match.vod
 		or not Table.isEmpty(match.links)
 		or match.comment
@@ -112,10 +113,12 @@ end
 function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
-	if match.dateIsExact == true then
-		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. _UTC
+	if match.dateexact then
+		dateString = Date.formatTimestamp('F j, Y - H:i', match.date) .. _UTC --TODO TZ
+	elseif not match.dateisestimate then
+		dateString = Date.formatTimestamp('F j, Y', match.date)
 	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
+		return ''
 	end
 
 	local stream = Table.merge(match.stream, {

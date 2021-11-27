@@ -8,6 +8,7 @@
 
 local p = {}
 
+local Date = require('Module:Date/Ext')
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
 local DisplayHelper = require("Module:MatchGroup/Display/Helper")
@@ -32,12 +33,13 @@ function p.storeMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == "string" then streams = json.parse(streams) end
 	local icon = Variables.varDefault("tournament_icon")
+	local date = Date.formatTimestamp('c', match.date or '')
 	mw.smw.subobject({
 		"legacymatch_" .. match2.match2id,
 		"is map number=1",
 		"has team left=" .. (match.opponent1 or ""),
 		"has team right=" .. (match.opponent2 or ""),
-		"Has map date=" .. (match.date or ""),
+		"Has map date=" .. (date or ""),
 		"Has tournament=" .. mw.title.getCurrentTitle().prefixedText,
 		"Has tournament tier=" .. (match.liquipediatier or ""),
 		"Has match stream=" .. (streams.stream or ""),
@@ -103,7 +105,7 @@ function p.storeGames(match, match2)
 		game.opponent2 = match.opponent2
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
-		game.date = match.date
+		game.date = Date.formatTimestamp('c', match.date or '')
 		local scores = game2.scores or {}
 		if type(scores) == "string" then
 			scores = json.parse(scores)

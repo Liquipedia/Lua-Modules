@@ -13,6 +13,7 @@
 
 local Legacy = {}
 
+local Date = require('Module:Date/Ext')
 local json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -205,6 +206,7 @@ function Legacy._storeTeamMatchSMW(match, match2)
 	if type(streams) == 'string' then streams = json.parse(streams) end
 	local extradata = match.extradata or {}
 	if type(extradata) == 'string' then extradata = json.parse(extradata) end
+	local date = Date.formatTimestamp('c', match.date or '')
 	mw.smw.subobject({
 		'legacymatch_' .. match2.match2id,
 		'has match vod=' .. (match.vod or ''),
@@ -215,7 +217,7 @@ function Legacy._storeTeamMatchSMW(match, match2)
 		--apparently needed for sorting ...
 		'has player left page=' .. (match.opponent1 or ''),
 		'has player right page=' .. (match.opponent2 or ''),
-		'has match date=' .. (match.date or ''),
+		'has match date=' .. (date or ''),
 		'has tournament=' .. (match.tournament or ''),
 		'has tournament tier=' .. (match.liquipediatier or ''),
 		'is finished=' .. (match.finished == '1' and 'true' or ''),
@@ -246,6 +248,7 @@ function Legacy._storeSoloMatchSMW(match, match2)
 	if type(streams) == 'string' then streams = json.parse(streams) end
 	local extradata = match.extradata or {}
 	if type(extradata) == 'string' then extradata = json.parse(extradata) end
+	local date = Date.formatTimestamp('c', match.date or '')
 	mw.smw.subobject({
 		'legacymatch_' .. match2.match2id,
 		'has match vod=' .. (match.vod or ''),
@@ -257,7 +260,7 @@ function Legacy._storeSoloMatchSMW(match, match2)
 		'has player right flag=' .. match.opponent2flag,
 		'has player left race=' .. extradata.opponent1race,
 		'has player right race=' .. extradata.opponent2race,
-		'has match date=' .. (match.date or ''),
+		'has match date=' .. (date or ''),
 		'has tournament=' .. (match.tournament or ''),
 		'has tournament tier=' .. (match.liquipediatier or ''),
 		'is finished=' .. (match.finished == '1' and 'true' or ''),

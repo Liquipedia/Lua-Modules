@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Date = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -22,8 +23,6 @@ local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 9
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -269,14 +268,11 @@ end
 
 function matchFunctions.readDate(matchArgs)
 	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
-		dateProps.hasDate = true
-		return dateProps
+		return MatchGroupInput.readDate(matchArgs.date)
 	else
-		return {
-			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
-			dateexact = false,
-		}
+		-- TODO
+		local suggestedDate = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate', Date.timestampZero)
+		return MatchGroupInput.getInexactDate(suggestedDate)
 	end
 end
 
@@ -435,12 +431,10 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
+	if isScoreSet and not Logic.readBool(match.finished) and not match.dateisestimate then
 		local currentUnixTime = os.time(os.date('!*t'))
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if match.date + threshold < currentUnixTime then
 			match.finished = true
 		end
 	end
@@ -534,7 +528,6 @@ end
 --
 function opponentFunctions.getTeamNameAndIcon(template, date)
 	local team, icon
-	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
 	template = (template or ''):lower():gsub('_', ' ')
 	if template ~= '' and template ~= 'noteam' and
 		mw.ext.TeamTemplate.teamexists(template) then

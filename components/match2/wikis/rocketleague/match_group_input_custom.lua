@@ -147,10 +147,7 @@ end
 function matchFunctions.readDate(matchArgs)
 	return matchArgs.date
 		and MatchGroupInput.readDate(matchArgs.date)
-		or {
-			date = MatchGroupInput.getInexactDate(globalVars:get('tournament_enddate')),
-			dateexact = false,
-		}
+		or MatchGroupInput.getInexactDate(globalVars:get('tournament_enddate'))
 end
 
 function matchFunctions.getTournamentVars(match)
@@ -309,10 +306,8 @@ function matchFunctions.getOpponents(args)
 	-- see if match should actually be finished if score is set
 	if isScoreSet and Logic.readBool(autofinished) and not Logic.readBool(args.finished) then
 		local currentUnixTime = os.time(os.date('!*t'))
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
 		local threshold = args.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if args.date + threshold < currentUnixTime then
 			args.finished = true
 		end
 	end

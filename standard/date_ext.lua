@@ -21,6 +21,9 @@ DateExt.minTimestamp = -62167219200
 -- 9999-12-31 23:59:59
 DateExt.maxTimestamp = 253402300799
 
+-- 1970-01-01 00:00:00
+DateExt.timestampZero = 0
+
 --[[
 Parses a date string into a timestamp, returning the number of seconds since
 UNIX epoch. The timezone offset is incorporated into the timestamp, and the
@@ -32,10 +35,10 @@ Throws if the input string is non-empty and not a valid date.
 Example:
 
 DateExt.readTimestamp('2021-10-17 17:40 <abbr data-tz="-4:00">EDT</abbr>')
--- Returns 1634506800
+-- Returns 1634506800, -4:00, EDT
 
 DateExt.readTimestamp('2021-10-17 21:40')
--- Returns 1634506800
+-- Returns 1634506800, nil, nil
 ]]
 function DateExt.readTimestamp(dateString)
 	if String.isEmpty(dateString) then
@@ -48,7 +51,7 @@ function DateExt.readTimestamp(dateString)
 	local tzTemplateOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
 	local datePart = (mw.text.split(dateString, '<', true)[1]):gsub('-', '')
 	local timestampString = mw.getContentLanguage():formatDate('U', datePart .. (tzTemplateOffset or ''))
-	return tonumber(timestampString)
+	return tonumber(timestampString), tzTemplateOffset, 'TODO'
 end
 
 --[[

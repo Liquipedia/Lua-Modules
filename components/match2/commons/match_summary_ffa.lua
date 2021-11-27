@@ -136,7 +136,7 @@ FfaMatchSummary.propTypes.Header = {
 }
 
 function FfaMatchSummary.Header(props)
-	local countdownNode = props.match.dateIsExact
+	local countdownNode = props.match.dateexact
 		and DisplayHelper.MatchCountdownBlock(props.match)
 			:addClass('brkts-popup-countdown')
 		or nil
