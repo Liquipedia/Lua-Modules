@@ -46,25 +46,11 @@ function DisplayHelper.opponentIsHighlightable(opponent)
 	end
 end
 
---[[
-Builds a hash of the opponent that is used to visually highlight their progress
-in the bracket.
-]]
-function DisplayHelper.makeOpponentHighlightKey(opponent)
-	if opponent.type == 'literal' then
-		return opponent.name and string.lower(opponent.name) or ''
-	elseif opponent.type == 'team' then
-		return opponent.template or ''
-	else
-		return table.concat(Array.map(opponent.players or {}, function(player) return player.pageName or '' end), ',')
-	end
-end
-
 function DisplayHelper.addOpponentHighlight(node, opponent)
 	local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
 	return node
 		:addClass(canHighlight and 'brkts-opponent-hover' or nil)
-		:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey(opponent) or nil)
+		:attr('aria-label', canHighlight and Opponent.toName(opponent) or nil)
 end
 
 -- Expands a header code by making a RPC call.
