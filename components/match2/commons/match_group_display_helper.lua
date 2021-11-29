@@ -14,12 +14,12 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
-local _UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 
 --[[
 Deprecated. Use Opponent.typeIsParty
@@ -114,7 +114,8 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateexact then
-		dateString = Date.formatTimestamp('F j, Y - H:i', match.date) .. _UTC --TODO TZ
+		dateString = Date.formatTimestamp('F j, Y - H:i', match.date) ..
+			Template.safeExpand(mw.getCurrentFrame(), 'Abbr/'.. match.timezone or 'UTC', {}, 'Abbr/UTC')
 	elseif not match.dateisestimate then
 		dateString = Date.formatTimestamp('F j, Y', match.date)
 	else
