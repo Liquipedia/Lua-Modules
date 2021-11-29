@@ -11,13 +11,14 @@ local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DivTable = require('Module:DivTable')
 local Json = require("Module:Json")
+local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Logic = require('Module:Logic')
 local Match = require("Module:Match")
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local Template = require('Module:Template')
-local ValorantMatchGroupInput = require('Module:MatchGroup/Input/Custom')
+local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 
 local BigMatch = Class.new()
 
@@ -26,6 +27,14 @@ function BigMatch.run(frame)
 	local self = BigMatch()
 
 	local match = Json.parseIfString(args[1])
+	assert(type(match) == 'table')
+
+	match = CustomMatchGroupInput.MatchInput.readMatch(match, {isStandalone = true})
+
+	local identifiers = self:_getId()
+	match['bracketid'] = "MATCH_" .. identifiers[1]
+	match['matchid'] = identifiers[2]
+	Match.store(match)
 
 	local tournamentData = self:_fetchTournamentInfo(args.tournamentlink or '')
 
@@ -34,13 +43,6 @@ function BigMatch.run(frame)
 		name = args.tournament or tournamentData.name,
 		link = args.tournamentlink or tournamentData.pagename,
 	}
-
-	match = ValorantMatchGroupInput.processMatch(frame, match, {isStandalone = true})
-
-	local identifiers = self:_getId()
-	match['bracketid'] = "MATCH_" .. identifiers[1]
-	match['matchid'] = identifiers[2]
-	Match.store(match)
 
 	return self:render(frame, match, tournament)
 end
@@ -115,27 +117,28 @@ function BigMatch:overview(match)
 		link = link .. '[' .. Links.makeFullLink(key, value) .. ' <i class="lp-icon lp-' .. key .. '></i>] '
 	end
 
-	boxRight:row(
-				DivTable.Row():cell(mw.html.create('div'):wikitext(link))
-			)
-			:row(
-				DivTable.Row():cell(mw.html.create('div'):wikitext(
-					Countdown.create{
-						rawdatetime = true,
-						finished = match.finished,
-						date = match.date .. '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
-					}
-				))
-			)
-			:row(
-				DivTable.Row():cell(mw.html.create('div'):wikitext(match.patch and "Patch " .. match.patch))
-			)
+	boxRight
+		:row(
+			DivTable.Row():cell(mw.html.create('div'):wikitext(link))
+		)
+		:row(
+			DivTable.Row():cell(mw.html.create('div'):wikitext(
+				Countdown.create{
+					rawdatetime = true,
+					finished = match.finished,
+					date = match.date .. '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+				}
+			))
+		)
+		:row(
+			DivTable.Row():cell(mw.html.create('div'):wikitext(match.patch and "Patch " .. match.patch))
+		)
 	boxRight = boxRight:create()
 	boxRight:addClass('fb-match-page-box')
 
 	return mw.html.create('div'):addClass('fb-match-page-overview')
-								:node(boxLeft)
-								:node(boxRight)
+		:node(boxLeft)
+		:node(boxRight)
 end
 
 function BigMatch:stats(frame, match, playerLookUp, opponents)
