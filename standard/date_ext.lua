@@ -49,9 +49,10 @@ function DateExt.readTimestamp(dateString)
 
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 	local tzTemplateOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
+	local tzAbbrName = dateString:match('[\"\']>(%w+)</abbr>')
 	local datePart = (mw.text.split(dateString, '<', true)[1]):gsub('-', '')
 	local timestampString = mw.getContentLanguage():formatDate('U', datePart .. (tzTemplateOffset or ''))
-	return tonumber(timestampString), tzTemplateOffset, 'TODO'
+	return tonumber(timestampString), tzTemplateOffset, tzAbbrName
 end
 
 --[[

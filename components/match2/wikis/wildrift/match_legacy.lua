@@ -165,7 +165,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has teams=' .. (match.opponent2 or ''),
 		'Has teams name=' .. (match.opponent1 or ''),
 		'Has teams name=' .. (match.opponent2 or ''),
-		'Has calendar description=- ' .. match.opponent1 .. ' vs ' .. match.opponent2 .. ' on ' .. date, -- TODO
+		'Has calendar description=- ' .. match.opponent1 .. ' vs ' .. match.opponent2 .. ' on ' .. date,
 	}
 
 	local streams = match.stream or {}
@@ -206,10 +206,9 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		end
 	end
 
-	-- TODO
 	if match.dateexact then
-		--shift date about 1 hour
-		local calendarEndDate = string.gsub(match.date, '+00:00', '-01:00')
+		--shift date 1 hour into the future
+		local calendarEndDate = Date.formatTimestamp('c', match.date + 3600)
 		table.insert(
 			data,
 			'Has calendar end date=' .. calendarEndDate
