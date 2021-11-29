@@ -414,7 +414,7 @@ function matchFunctions.getOpponents(match)
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
 				opponent.match2players[1].name = opponent.name
 			else
-				error('Unsupported Oppnent Type "' .. (opponent.type or '') .. '"')
+				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
 
 			opponents[opponentIndex] = opponent
