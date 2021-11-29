@@ -116,15 +116,14 @@ function CustomLeague:_createTier(args)
 	local content = ''
 
 	local tier = args.liquipediatier
+	local type = args.liquipediatiertype
+	local type2 = args.liquipediatiertype2
 
 	if String.isEmpty(tier) then
 		return nil
 	end
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier)
-	local tier2 = args.liquipediatier2
-	local type = args.liquipediatiertype
-	local type2 = args.liquipediatiertype2
 
 	if not String.isEmpty(type) then
 		local typeDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. type)
@@ -137,11 +136,6 @@ function CustomLeague:_createTier(args)
 		content = content .. ' ([[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']])'
 	else
 		content = content .. '[[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']]'
-
-		if not String.isEmpty(tier2) then
-			local tier2Display = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier2)
-			content = content .. ' ([[' .. tier2Display .. ' Tournaments|' .. tier2Display .. ']])'
-		end
 	end
 
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
