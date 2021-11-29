@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2019,
-	wikiName = apexlegends',
+	wikiName = 'apexlegends',
 	name = 'Apex Legends',
 	defaultTeamLogo = 'Apex_Legends_lightmode.png',
 	defaultTeamLogoDark = 'Apex_Legends_darkmode.png',

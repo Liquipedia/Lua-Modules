@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2017,
-	wikiName = pubg',
+	wikiName = 'pubg',
 	name = 'PUBG',
 	defaultTeamLogo = 'PUBG_Default_logo.png',
 	defaultTeamLogoDark = 'PUBG_Default_logo.png',

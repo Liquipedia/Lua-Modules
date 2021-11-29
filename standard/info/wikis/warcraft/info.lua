@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2002,
-	wikiName = warcraft',
+	wikiName = 'warcraft',
 	name = 'Warcraft',
 	defaultTeamLogo = 'Warcraft_III_logo.png',
 	defaultTeamLogoDark = 'Warcraft_III_logo.png',

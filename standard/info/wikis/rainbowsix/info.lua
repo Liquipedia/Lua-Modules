@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2015,
-	wikiName = rainbowsix',
+	wikiName = 'rainbowsix',
 	name = 'Rainbow Six ',
 	defaultTeamLogo = 'Rainbow Six Siege Logo lightmode.png',
 	defaultTeamLogoDark = 'Rainbow Six Siege Logo darkmode.png',

@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2015,
-	wikiName = mobilelegends',
+	wikiName = 'mobilelegends',
 	name = 'Mobile Legends',
 	defaultTeamLogo = 'Mobile Legends allmode.png',
 	defaultTeamLogoDark = 'Mobile Legends allmode.png',

@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2009,
-	wikiName = leagueoflegends',
+	wikiName = 'leagueoflegends',
 	name = 'League of Legends',
 	defaultTeamLogo = 'League of Legends allmode.png',
 	defaultTeamLogoDark = 'League of Legends allmode.png',

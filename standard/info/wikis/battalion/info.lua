@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2019,
-	wikiName = battalion',
+	wikiName = 'battalion',
 	name = 'Battalion 1944',
 	defaultTeamLogo = 'Battalion generic logo.png',
 	defaultTeamLogoDark = 'Battalion generic logo.png',

@@ -8,7 +8,7 @@
 
 return {
 	startYear = 1996,
-	wikiName = pokemon',
+	wikiName = 'pokemon',
 	name = 'Pokémon',
 	defaultTeamLogo = 'Pokemon logo std.png',
 	defaultTeamLogoDark = 'Pokemon logo std.png',

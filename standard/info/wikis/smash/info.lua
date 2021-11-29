@@ -8,7 +8,7 @@
 
 return {
 	startYear = 1999,
-	wikiName = smash',
+	wikiName = 'smash',
 	name = 'Smash',
 	defaultTeamLogo = 'Smashlogo_std.png',
 	defaultTeamLogoDark = 'Smashlogo_std.png',

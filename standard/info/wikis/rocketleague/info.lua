@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2015,
-	wikiName = rocketleague',
+	wikiName = 'rocketleague',
 	name = 'Rocket League',
 	defaultTeamLogo = 'Rocket_League.png',
 	defaultTeamLogoDark = 'Rocket_League.png',

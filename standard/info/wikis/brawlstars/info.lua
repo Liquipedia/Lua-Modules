@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2018,
-	wikiName = brawlstars',
+	wikiName = 'brawlstars',
 	name = 'Brawl Stars',
 	defaultTeamLogo = 'Brawl_Stars_Default_allmode.png',
 	defaultTeamLogoDark = 'Brawl_Stars_Default_allmode.png',

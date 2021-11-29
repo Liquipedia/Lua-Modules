@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2019,
-	wikiName = teamfighttactics',
+	wikiName = 'teamfighttactics',
 	name = 'Teamfight Tactics',
 	defaultTeamLogo = 'Teamfight Tactics Default.png',
 	defaultTeamLogoDark = 'Teamfight Tactics Default.png',

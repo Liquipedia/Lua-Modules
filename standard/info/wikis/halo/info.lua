@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2003,
-	wikiName = halo',
+	wikiName = 'halo',
 	name = 'Halo',
 	defaultTeamLogo = 'Halo allmode.png',
 	defaultTeamLogoDark = 'Halo allmode.png',

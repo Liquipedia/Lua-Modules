@@ -8,7 +8,7 @@
 
 return {
 	startYear = 1998,
-	wikiName = starcraft',
+	wikiName = 'starcraft',
 	name = 'Brood War',
 	defaultTeamLogo = 'StarCraft_default_allmode.png',
 	defaultTeamLogoDark = 'StarCraft_default_allmode.png',

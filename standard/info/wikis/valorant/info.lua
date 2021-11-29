@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2020,
-	wikiName = valorant',
+	wikiName = 'valorant',
 	name = 'VALORANT',
 	defaultTeamLogo = 'VALORANT allmode.png',
 	defaultTeamLogoDark = 'VALORANT allmode.png',

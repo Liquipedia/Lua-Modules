@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2015,
-	wikiName = overwatch',
+	wikiName = 'overwatch',
 	name = 'Overwatch',
 	defaultTeamLogo = 'Overwatch_logo.png',
 	defaultTeamLogoDark = 'Overwatch_logo.png',

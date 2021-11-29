@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2019,
-	wikiName = splitgate',
+	wikiName = 'splitgate',
 	name = 'Splitgate',
 	defaultTeamLogo = 'Splitgate allmode.png (2019) Change date (2021-06-01) Splitgate 2021 lightmode.png',
 	defaultTeamLogoDark = 'Splitgate allmode.png (2019) Change date (2021-06-01) Splitgate 2021 darkmode.png',
