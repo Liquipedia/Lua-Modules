@@ -29,7 +29,7 @@ function BigMatch.run(frame)
 	local match = Json.parseIfString(args[1])
 	assert(type(match) == 'table')
 
-	match = CustomMatchGroupInput.MatchInput.readMatch(match, {isStandalone = true})
+	match = CustomMatchGroupInput.processMatch(frame, match, {isStandalone = true})
 
 	local identifiers = self:_getId()
 	match['bracketid'] = "MATCH_" .. identifiers[1]
@@ -78,8 +78,10 @@ function BigMatch:header(match, opponent1, opponent2, tournament)
 											:node(teamLeft)
 											:node(divider)
 											:node(teamRight)
-	local tournamentRow = mw.html.create('div') :addClass('fb-match-page-header-tournament')
-												:wikitext('[[' .. tournament.link .. '|' .. tournament.name .. ']]')
+	local tournamentRow = mw.html.create('div'):addClass('fb-match-page-header-tournament')
+	if tournament.link and tournament.name then
+		tournamentRow:wikitext('[[' .. tournament.link .. '|' .. tournament.name .. ']]')
+	end
 	return mw.html.create('div'):addClass("fb-match-page-header")
 								:node(tournamentRow)
 								:node(teamsRow)
