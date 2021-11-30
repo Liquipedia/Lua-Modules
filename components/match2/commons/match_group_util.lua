@@ -10,12 +10,15 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TreeUtil = require('Module:TreeUtil')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
+
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
 
@@ -208,39 +211,51 @@ Creates a match group structure from its match records. Returns a value of type
 MatchGroupUtil.types.MatchGroup.
 ]]
 function MatchGroupUtil.makeMatchGroup(matchRecords)
-	local matches = Array.map(
-		matchRecords,
-		require('Module:Brkts/WikiSpecific').matchFromRecord
-	)
+	local type = matchRecords[1] and matchRecords[1].match2bracketdata.type or 'matchlist'
+	if type == 'matchlist' then
+		return MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
+	elseif type == 'bracket' then
+		return MatchGroupUtil.makeBracketFromRecords(matchRecords)
+	else
+		error('Invalid match2bracketdata.type: ' .. type .. '. Expected matchlist or bracket.')
+	end
+end
+
+function MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
+	local matches = Array.map(matchRecords, WikiSpecific.matchFromRecord)
+
+	return {
+		matches = matches,
+		matchesById = Table.map(matches, function(_, match) return match.matchId, match end),
+		type = 'matchlist',
+	}
+end
+
+function MatchGroupUtil.makeBracketFromRecords(matchRecords)
+	local matches = Array.map(matchRecords, WikiSpecific.matchFromRecord)
 
 	local matchesById = Table.map(matches, function(_, match) return match.matchId, match end)
+	local bracketDatasById = Table.mapValues(matchesById, function(match) return match.bracketData end)
+
 	local upperMatchIds, rootMatchIds = MatchGroupUtil.computeUpperMatchIds(matchesById)
-	local headMatchIds = Array.filter(
-		rootMatchIds,
-		function(matchId) return not StringUtils.endsWith(matchId, 'RxMTP')
-	end)
-	local matchGroup = {
-		bracketDatasById = Table.mapValues(matchesById, function(match) return match.bracketData end),
+	local bracket = {
+		bracketDatasById = bracketDatasById,
 		matches = matches,
 		matchesById = matchesById,
 		rootMatchIds = rootMatchIds,
-		type = matches[1] and matches[1].bracketData.type or 'matchlist',
+		type = 'bracket',
 		upperMatchIds = upperMatchIds,
-		headMatchIds = headMatchIds, --deprecated
 	}
 
-	if matchGroup.type == 'bracket' then
-		local roundPropsByMatchId, rounds = MatchGroupUtil.computeRounds(matchGroup.bracketDatasById, rootMatchIds)
+	local roundPropsByMatchId, rounds = MatchGroupUtil.computeRounds(bracket.bracketDatasById, rootMatchIds)
+	Table.mergeInto(bracket, {
+		coordsByMatchId = roundPropsByMatchId,
+		rounds = rounds,
+	})
 
-		MatchGroupUtil.populateAdvanceSpots(matchGroup)
+	MatchGroupUtil.populateAdvanceSpots(bracket)
 
-		Table.mergeInto(matchGroup, {
-			coordsByMatchId = roundPropsByMatchId,
-			rounds = rounds,
-		})
-	end
-
-	return matchGroup
+	return bracket
 end
 
 --[[
