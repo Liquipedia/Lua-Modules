@@ -10,50 +10,60 @@ local Arguments = require("Module:Arguments")
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DivTable = require('Module:DivTable')
+local Json = require("Module:Json")
+local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Logic = require('Module:Logic')
 local Match = require("Module:Match")
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local Template = require('Module:Template')
-local ValorantMatchGroupInput = require('Module:MatchGroup/Input/Custom')
+local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 
 local BigMatch = Class.new()
 
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
+	local bigMatch = BigMatch()
 
-	local match = args[1]
-	local tournament = {
-		name = args.tournament,
-		link = args.tournamentlink
-	}
+	local match = Json.parseIfString(args[1])
+	assert(type(match) == 'table')
 
-	if type(match) ~= 'string' then
-		return ''
-	end
+	match = CustomMatchGroupInput.processMatch(frame, match, {isStandalone = true})
 
-	match = ValorantMatchGroupInput.processMatch(frame, match, {isStandalone = true})
-	local identifiers = BigMatch:_getId()
+	local identifiers = bigMatch:_getId()
 	match['bracketid'] = "MATCH_" .. identifiers[1]
 	match['matchid'] = identifiers[2]
 	Match.store(match)
 
-	return BigMatch:render(frame, match, tournament)
+	local tournamentData = bigMatch:_fetchTournamentInfo(args.tournamentlink or '')
+
+	match.patch = match.patch or tournamentData.patch
+	local tournament = {
+		name = args.tournament or tournamentData.name,
+		link = args.tournamentlink or tournamentData.pagename,
+	}
+
+	return bigMatch:render(frame, match, tournament)
 end
 
 function BigMatch:render(frame, match, tournament)
 	local overall = mw.html.create('div'):addClass('fb-match-page-overall')
 
-	local opponent1 = match['opponent1']
-	local opponent2 = match['opponent2']
+	local opponent1 = match.match2opponents[1]
+	local opponent2 = match.match2opponents[2]
 
 	local playerLookUp = self:_createPlayerLookUp(opponent1.match2players, opponent2.match2players)
 
+	local tabs = {This = 1, ['hide-showall'] = true}
+	tabs.name1 = 'Player Stats'
+	tabs.content1 = self:stats(frame, match, playerLookUp, {opponent1, opponent2})
+	tabs.name2 = 'Economy'
+	tabs.content2 = self:economy(match, opponent1, opponent2)
+
 	overall :node(self:header(match, opponent1, opponent2, tournament))
 			:node(self:overview(match))
-			:node(self:stats(frame, match, playerLookUp, {opponent1, opponent2}))
-			:node(self:economy(match, opponent1, opponent2))
+			:node(Tabs.dynamic(tabs))
 
 	return overall
 end
@@ -62,17 +72,16 @@ function BigMatch:header(match, opponent1, opponent2, tournament)
 	local teamLeft = self:_createTeamContainer('left', opponent1.name, opponent1.score, false)
 	local teamRight = self:_createTeamContainer('right', opponent2.name, opponent2.score, false)
 
-	local stream = Table.copy(match.stream)
-	stream.date = mw.getContentLanguage():formatDate('r', match.date)
-	stream.finished = Logic.readBool(match.finished) and 'true' or ''
-	local divider = self:_createTeamSeparator(match.format, stream)
+	local divider = self:_createTeamSeparator(match.format, match)
 
 	local teamsRow = mw.html.create('div'):addClass('fb-match-page-header-teams row')
 											:node(teamLeft)
 											:node(divider)
 											:node(teamRight)
-	local tournamentRow = mw.html.create('div') :addClass('fb-match-page-header-tournament')
-												:wikitext('[[' .. tournament.link .. '|' .. tournament.name .. ']]')
+	local tournamentRow = mw.html.create('div'):addClass('fb-match-page-header-tournament')
+	if tournament.link and tournament.name then
+		tournamentRow:wikitext('[[' .. tournament.link .. '|' .. tournament.name .. ']]')
+	end
 	return mw.html.create('div'):addClass("fb-match-page-header")
 								:node(tournamentRow)
 								:node(teamsRow)
@@ -82,8 +91,8 @@ function BigMatch:overview(match)
 	local boxLeft = DivTable.create():setStriped(true)
 
 	local ind = 1
-	while match['map' .. ind] ~= nil do
-		local map = match['map' .. ind]
+	while match.match2games[ind] ~= nil do
+		local map = match.match2games[ind]
 		local didLeftWin = map.winner == 1
 		local extradata = map.extradata
 		local scores = map.scores
@@ -110,21 +119,28 @@ function BigMatch:overview(match)
 		link = link .. '[' .. Links.makeFullLink(key, value) .. ' <i class="lp-icon lp-' .. key .. '></i>] '
 	end
 
-	boxRight:row(
-				DivTable.Row():cell(mw.html.create('div'):wikitext(link))
-			)
-			:row(
-				DivTable.Row():cell(mw.html.create('div'):wikitext(match.date))
-			)
-			:row(
-				DivTable.Row():cell(mw.html.create('div'):wikitext(match.patch or 'Placeholder patch'))
-			)
+	boxRight
+		:row(
+			DivTable.Row():cell(mw.html.create('div'):wikitext(link))
+		)
+		:row(
+			DivTable.Row():cell(mw.html.create('div'):wikitext(
+				Countdown.create{
+					rawdatetime = true,
+					finished = match.finished,
+					date = match.date .. '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+				}
+			))
+		)
+		:row(
+			DivTable.Row():cell(mw.html.create('div'):wikitext(match.patch and "Patch " .. match.patch))
+		)
 	boxRight = boxRight:create()
 	boxRight:addClass('fb-match-page-box')
 
 	return mw.html.create('div'):addClass('fb-match-page-overview')
-								:node(boxLeft)
-								:node(boxRight)
+		:node(boxLeft)
+		:node(boxRight)
 end
 
 function BigMatch:stats(frame, match, playerLookUp, opponents)
@@ -134,8 +150,8 @@ function BigMatch:stats(frame, match, playerLookUp, opponents)
 	tabs['hide-showall'] = true
 
 	local ind = 1
-	while match['map' .. ind] ~= nil do
-		local map = match['map' .. ind]
+	while match.match2games[ind] ~= nil do
+		local map = match.match2games[ind]
 
 		if map.resulttype == 'np' then
 			break;
@@ -207,8 +223,8 @@ function BigMatch:economy(match, opponent1, opponent2)
 
 	local ind = 1
 
-	while match['map' .. ind] ~= nil do
-		local map = match['map' .. ind]
+	while match.match2games[ind] ~= nil do
+		local map = match.match2games[ind]
 
 		if map.resulttype == 'np' or map.rounds == nil then
 			break;
@@ -254,10 +270,15 @@ function BigMatch:economy(match, opponent1, opponent2)
 	return Tabs.dynamic(tabs)
 end
 
-function BigMatch:_createTeamSeparator(format, stream)
+function BigMatch:_createTeamSeparator(format, match)
 	local countdown = mw.html.create('div')
 		:addClass('fb-match-page-header-live')
-		:wikitext(Countdown.create({date = stream.date, rawcountdown = true}))
+		:css('font-weight', 'bold')
+		:wikitext(Countdown.create{
+			date = match.date .. '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>',
+			finished = Logic.readBool(match.finished) and 'true' or '',
+			rawcountdown = true,
+		})
 	local divider = mw.html.create('div')
 		:addClass('fb-match-page-header-divider')
 		:wikitext(':')
@@ -318,10 +339,6 @@ function BigMatch:_getId()
 	return {fullBracketId, matchId}
 end
 
-function BigMatch:_formatDate(date)
-	return mw.getContentLanguage():formatDate('r', date)
-end
-
 function BigMatch:_createPlayerLookUp(opponent1Players, opponent2Players)
 	local playerLookUp = {}
 
@@ -334,6 +351,13 @@ function BigMatch:_createPlayerLookUp(opponent1Players, opponent2Players)
 	end
 
 	return playerLookUp
+end
+
+function BigMatch:_fetchTournamentInfo(page)
+	return mw.ext.LiquipediaDB.lpdb('tournament', {
+		query = 'pagename, name, patch',
+		conditions = '[[pagename::'.. page .. ']]',
+	})[1] or {}
 end
 
 return BigMatch
