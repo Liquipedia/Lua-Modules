@@ -83,7 +83,7 @@ function CustomMatchSummary.getByMatchId(args)
 			if not linkData then
 				mw.log('linkType "' .. linkType .. '" is not supported by Module:MatchSummary')
 			else
-				return '[['..linkData.icon..'|link='..link..'|15px|'..linkData.text..']]'
+				return '[[' .. linkData.icon .. '|link=' .. link .. '|15px|' .. linkData.text .. ']]'
 			end
 		end
 
@@ -97,19 +97,6 @@ function CustomMatchSummary.getByMatchId(args)
 	return matchSummary:create()
 end
 
-function CustomMatchSummary._addFlexRow(wrapper, contentElements, class, style)
-	local node = htmlCreate('div'):addClass('brkts-popup-body-element')
-	if not Logic.isEmpty(class) then
-		node:addClass(class)
-	end
-	for key, val in pairs(style or {}) do
-		node:css(key, val)
-	end
-	for _, element in ipairs(contentElements) do
-		node:node(element)
-	end
-	return wrapper:node(node)
-end
 
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
@@ -124,7 +111,7 @@ end
 
 function CustomMatchSummary._createScore(opponent)
 	return OpponentDisplay.BlockScore{
-		isWinner = opponent.placement == 1 or opponent.advances,
+		isWinner = opponent.placement == 1,
 		scoreText = OpponentDisplay.InlineScore(opponent),
 	}
 end
@@ -170,7 +157,7 @@ function CustomMatchSummary._createMapRow(game)
 	-- Add Header
 	if Logic.isNotEmpty(game.header) then
 		local mapHeader = mw.html.create('div')
-		mapHeader :wikitext(game.header)
+			:wikitext(game.header)
 			:css('font-weight','bold')
 			:css('font-size','85%')
 			:css('margin','auto')
@@ -179,9 +166,9 @@ function CustomMatchSummary._createMapRow(game)
 	end
 
 	local centerNode = mw.html.create('div')
-	centerNode  :addClass('brkts-popup-spaced')
-				:wikitext('[[' .. game.map .. ']]')
-				:css('text-align', 'center')
+		:addClass('brkts-popup-spaced')
+		:wikitext('[[' .. game.map .. ']]')
+		:css('text-align', 'center')
 
 	if game.resultType == 'np' then
 		centerNode:addClass('brkts-popup-spaced-map-skip')
@@ -209,8 +196,8 @@ function CustomMatchSummary._createMapRow(game)
 	if Logic.isNotEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
 		local comment = mw.html.create('div')
-		comment :wikitext(game.comment)
-				:css('margin', 'auto')
+			:wikitext(game.comment)
+			:css('margin', 'auto')
 				--:css('max-width', '60%')
 		row:addElement(comment)
 	end
