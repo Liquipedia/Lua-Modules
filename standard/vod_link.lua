@@ -13,17 +13,13 @@ local String = require('Module:StringUtils')
 local VodLink = {}
 
 function VodLink.display(args)
-	if type(args) ~= 'table' then
-		return ''
-	end
+	args = args or {}
 
 	if Logic.readBool(args.novod) then
 		return mw.html.create('span')
 			:addClass('plainlinks')
 			:attr('title', 'Help Liquipedia find this VOD')
 			:wikitext('[[File:NoVod.png|link=]]')
-	elseif String.isEmpty(args.vod) then
-		return ''
 	end
 
 	local title
