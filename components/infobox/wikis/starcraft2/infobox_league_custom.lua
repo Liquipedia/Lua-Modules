@@ -521,19 +521,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
 
-	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('infobox_date', edate)
-	Variables.varDefine('infobox_sdate', sdate)
-	Variables.varDefine('infobox_edate', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('formatted_tournament_date', sdate)
-	Variables.varDefine('formatted_tournament_edate', edate)
-
 	--override var to standardize its entries
 	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game)] or {})[1] or _GAMES[_GAME_WOL][1])
 
@@ -565,7 +552,7 @@ function CustomLeague:defineCustomPageVariables()
 	end
 	Variables.varDefine('tournament_finished', finished or 'false')
 	--month and day
-	local monthAndDay = string.match(edate, '%d%d-%d%d') or ''
+	local monthAndDay = string.match(Variables.varDefault('tournament_enddate', ''), '%d%d-%d%d') or ''
 	Variables.varDefine('Month_Day', monthAndDay)
 end
 
