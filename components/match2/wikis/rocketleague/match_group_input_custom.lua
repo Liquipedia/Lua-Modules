@@ -211,7 +211,6 @@ function matchFunctions.getExtraData(match)
 		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
 		octane = match.octane,
-		liquipediatier2 = Variables.varDefault('tournament_tier2'),
 		isconverted = 0,
 		isfeatured = matchFunctions.isFeatured(match)
 	}
