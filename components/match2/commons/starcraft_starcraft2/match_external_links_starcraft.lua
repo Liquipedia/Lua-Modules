@@ -131,7 +131,7 @@ function StarcraftMatchExternalLinks.MatchExternalLinks(props)
 		}
 	end)
 
-	local list = mw.html.create('span')
+	local list = mw.html.create('span'):addClass('starcraft-match-external-links')
 	for _, link in ipairs(links) do
 		list:node(StarcraftMatchExternalLinks.ExternalLink(link))
 	end
