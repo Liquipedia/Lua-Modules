@@ -46,7 +46,7 @@ function CustomMatchSummary.getByMatchId(args)
 	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
+		:body(CustomMatchSummary._createBody(match))
 
 	-- comment
 	if match.comment then
@@ -116,6 +116,15 @@ function CustomMatchSummary._createScore(opponent)
 	}
 end
 
+function CustomMatchSummary._createOpponent(opponent, side)
+	return OpponentDisplay.BlockOpponent{
+		flip = side == 'left',
+		opponent = opponent,
+		overflow = 'wrap',
+		teamStyle = 'short',
+	}
+end
+
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
@@ -135,15 +144,6 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	return body
-end
-
-function CustomMatchSummary._createOpponent(opponent, side)
-	return OpponentDisplay.BlockOpponent{
-		flip = side == 'left',
-		opponent = opponent,
-		overflow = 'wrap',
-		teamStyle = 'short',
-	}
 end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
@@ -189,7 +189,6 @@ function CustomMatchSummary._createMapRow(game)
 		:addElement(rightNode)
 
 	row:addClass('brkts-popup-body-game')
-		--:css('font-size', '85%')
 		:css('overflow', 'hidden')
 
 	-- Add Comment
@@ -198,7 +197,6 @@ function CustomMatchSummary._createMapRow(game)
 		local comment = mw.html.create('div')
 			:wikitext(game.comment)
 			:css('margin', 'auto')
-				--:css('max-width', '60%')
 		row:addElement(comment)
 	end
 
