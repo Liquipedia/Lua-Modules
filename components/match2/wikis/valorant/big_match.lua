@@ -24,19 +24,19 @@ local BigMatch = Class.new()
 
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
-	local self = BigMatch()
+	local bigMatch = BigMatch()
 
 	local match = Json.parseIfString(args[1])
 	assert(type(match) == 'table')
 
 	match = CustomMatchGroupInput.processMatch(frame, match, {isStandalone = true})
 
-	local identifiers = self:_getId()
+	local identifiers = bigMatch:_getId()
 	match['bracketid'] = "MATCH_" .. identifiers[1]
 	match['matchid'] = identifiers[2]
 	Match.store(match)
 
-	local tournamentData = self:_fetchTournamentInfo(args.tournamentlink or '')
+	local tournamentData = bigMatch:_fetchTournamentInfo(args.tournamentlink or '')
 
 	match.patch = match.patch or tournamentData.patch
 	local tournament = {
@@ -44,7 +44,7 @@ function BigMatch.run(frame)
 		link = args.tournamentlink or tournamentData.pagename,
 	}
 
-	return self:render(frame, match, tournament)
+	return bigMatch:render(frame, match, tournament)
 end
 
 function BigMatch:render(frame, match, tournament)
