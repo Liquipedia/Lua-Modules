@@ -12,6 +12,10 @@ local Logic = require('Module:Logic')
 local VodLink = {}
 
 function VodLink.display(args)
+	if type(args) ~= 'table' or Logic.isEmpty(args) then
+		return ''
+	end
+
 	if Logic.readBool(args.novod) then
 		return mw.html.create('span')
 			:addClass('plainlinks')
