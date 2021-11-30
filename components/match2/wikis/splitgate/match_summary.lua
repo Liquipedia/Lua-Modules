@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -21,7 +20,6 @@ local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local htmlCreate = mw.html.create
-local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
 local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local _RED_CROSS = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
@@ -43,38 +41,12 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local frame = mw.getCurrentFrame()
-	
+
 	local matchSummary = MatchSummary():init()
 	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
-	
-	--[[local function renderOpponent(opponentIndex)
-		return OpponentDisplay.BlockOpponent({
-			flip = opponentIndex == 1,
-			opponent = match.opponents[opponentIndex],
-			overflow = 'wrap',
-			teamStyle = 'short',
-		})
-			:addClass(match.opponents[opponentIndex].type ~= 'solo'
-				and 'brkts-popup-header-opponent'
-				or 'brkts-popup-header-opponent-solo-with-team')
-	end
-
-	local function renderSoloOpponentTeam(opponentIndex)
-		local opponent = match.opponents[opponentIndex]
-		if opponent.type == 'solo' then
-			local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
-			local display = teamExists
-				and mw.ext.TeamTemplate.teamicon(opponent.template, match.date)
-				or _TBD_ICON
-			return htmlCreate('div'):wikitext(display)
-				:addClass('brkts-popup-header-opponent-solo-team')
-		else
-			return ''
-		end
-	end--]]
 
 	-- comment
 	if match.comment then
@@ -205,7 +177,7 @@ function CustomMatchSummary._createMapRow(game)
 		row:addElement(mapHeader)
 		row:addElement(MatchSummary.Break():create())
 	end
-	
+
 	local centerNode = mw.html.create('div')
 	centerNode  :addClass('brkts-popup-spaced')
 				:wikitext('[[' .. game.map .. ']]')
