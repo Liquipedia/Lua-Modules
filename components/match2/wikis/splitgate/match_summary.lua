@@ -6,33 +6,51 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+
+local _EPOCH_TIME = '1970-01-01 00:00:00'
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local htmlCreate = mw.html.create
-
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
-
-local CustomMatchSummary = {}
 
 local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local _RED_CROSS = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
+local _ICONS = {
+	check = _GREEN_CHECK,
+	cross = _RED_CROSS
+}
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
+local _LINK_DATA = {
+	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
+	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
+	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
+}
+
+local CustomMatchSummary = {}
 
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
-	local wrapper = htmlCreate('div')
-		:addClass('brkts-popup')
-		:css('flex-wrap', 'unset') -- temporary workaround to fix height
+	local frame = mw.getCurrentFrame()
+	
+	local matchSummary = MatchSummary():init()
+	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
-	local function renderOpponent(opponentIndex)
+	matchSummary:header(CustomMatchSummary._createHeader(match))
+				:body(CustomMatchSummary._createBody(match))
+	
+	--[[local function renderOpponent(opponentIndex)
 		return OpponentDisplay.BlockOpponent({
 			flip = opponentIndex == 1,
 			opponent = match.opponents[opponentIndex],
@@ -56,87 +74,13 @@ function CustomMatchSummary.getByMatchId(args)
 		else
 			return ''
 		end
-	end
-
-	-- header
-	local header = htmlCreate('div'):addClass('brkts-popup-header-dev')
-		:node(renderSoloOpponentTeam(1))
-		:node(renderOpponent(1))
-		:node(renderOpponent(2))
-		:node(renderSoloOpponentTeam(2))
-	wrapper:node(header):node(CustomMatchSummary._breakNode())
-
-	-- body
-	local body = htmlCreate('div'):addClass('brkts-popup-body')
-	body = CustomMatchSummary._addFlexRow(body, {DisplayHelper.MatchCountdownBlock(match)})
-	for _, game in ipairs(match.games) do
-		if game.map then
-			local mapDisplay = '[[' .. game.map .. ']]'
-			if game.resultType == 'np' then
-				mapDisplay = '<s>' .. mapDisplay .. '</s>'
-			end
-			local centerNode = htmlCreate('div')
-					:addClass('brkts-popup-spaced')
-					:node(htmlCreate('div'):node(mapDisplay))
-			local gameElements = {
-				htmlCreate('div')
-					:addClass('brkts-popup-spaced')
-					:node(game.winner == 1 and _GREEN_CHECK or _NO_CHECK)
-					:node(htmlCreate('div'):node(game.scores[1] or '')),
-				centerNode,
-				htmlCreate('div')
-					:addClass('brkts-popup-spaced')
-					:node(htmlCreate('div'):node(game.scores[2] or ''))
-					:node(game.winner == 2 and _GREEN_CHECK or _NO_CHECK)
-			}
-
-			local gameHeader = game.header or ''
-			if gameHeader ~= '' then
-				table.insert(gameElements, 1, CustomMatchSummary._breakNode())
-				table.insert(gameElements, 1, htmlCreate('div')
-					:node(gameHeader)
-					:css('font-weight','bold')
-					:css('font-size','85%')
-					:css('margin','auto'))
-			end
-			if game.comment then
-				table.insert(gameElements, CustomMatchSummary._breakNode())
-				table.insert(gameElements, htmlCreate('div')
-					:node(game.comment)
-					:css('margin','auto')
-					:css('max-width', '60%'))
-			end
-			body = CustomMatchSummary._addFlexRow(body, gameElements, 'brkts-popup-body-game')
-		end
-	end
-
-	-- Vetoes
-	local vetoData = (match.extradata or {}).mapveto
-	if not Table.isEmpty(vetoData) then
-		for index, vetoMap in ipairs(vetoData) do
-			local vetoElements = CustomMatchSummary._getVetoDisplay(vetoMap.map, vetoMap.by)
-			if index == 1 then
-				table.insert(vetoElements, 1, CustomMatchSummary._breakNode())
-				table.insert(vetoElements, 1, htmlCreate('div')
-					:css('font-size','85%')
-					:css('margin','auto')
-					:wikitext('Vetoes')
-				)
-			end
-			body = CustomMatchSummary._addFlexRow(body, vetoElements, 'brkts-popup-body-game')
-		end
-	end
-
-	wrapper:node(body):node(CustomMatchSummary._breakNode())
+	end--]]
 
 	-- comment
 	if match.comment then
-		local comment = htmlCreate('div')
-			:addClass('brkts-popup-comment')
-			:css('white-space','normal')
-			:css('font-size','85%')
-			:node(match.comment)
-		wrapper:node(comment):node(CustomMatchSummary._breakNode())
+		local comment = MatchSummary.Comment():content(match.comment)
+		comment.root:css('display', 'block'):css('text-align', 'center')
+		matchSummary:comment(comment)
 	end
 
 	-- footer
@@ -147,45 +91,38 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
-	local footerSet = false
-	local footer = htmlCreate('div')
-		:addClass('brkts-popup-footer')
-	local footerSpacer = htmlCreate('div')
-		:addClass('brkts-popup-spaced')
-	if match.vod then
-		footerSet = true
-		footerSpacer:node(Template.safeExpand(mw.getCurrentFrame(), 'vodlink', {
-			vod = match.vod,
-		}))
-	end
-	for index, vod in pairs(vods) do
-		footerSet = true
-		footerSpacer:node(Template.safeExpand(mw.getCurrentFrame(), 'vodlink', {
-			gamenum = index,
-			vod = vod,
-			source = '' -- todo: provide source
-		}))
-	end
-	if footerSet then
-		footer:node(footerSpacer)
-		wrapper:node(footer)
-	end
-	return wrapper
-end
+	match.links.lrthread = match.lrthread
+	match.links.vod = match.vod
+	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
+		local footer = MatchSummary.Footer()
 
-function CustomMatchSummary._getVetoDisplay(vetoMap, vetoOpponent)
-	local vetoElements = {
-		htmlCreate('div')
-			:addClass('brkts-popup-spaced')
-			:node(vetoOpponent == 1 and _RED_CROSS or _NO_CHECK),
-		htmlCreate('div')
-			:addClass('brkts-popup-spaced')
-			:node(htmlCreate('div'):node('[[' .. vetoMap .. ']]')),
-		htmlCreate('div')
-			:addClass('brkts-popup-spaced')
-			:node(vetoOpponent == 2 and _RED_CROSS or _NO_CHECK)
-	}
-	return vetoElements
+		-- Game Vods
+		for index, vod in pairs(vods) do
+			footer:addElement(Template.safeExpand(frame, 'vodlink', {
+				gamenum = index,
+				vod = vod,
+				source = vod.url
+			}))
+		end
+
+		-- Match Vod + other links
+		local buildLink = function (linkType, link)
+			local linkData = _LINK_DATA[linkType]
+			if not linkData then
+				mw.log('linkType "' .. linkType .. '" is not supported by Module:MatchSummary')
+			else
+				return '[['..linkData.icon..'|link='..link..'|15px|'..linkData.text..']]'
+			end
+		end
+
+		for linkType, link in pairs(match.links) do
+			footer:addElement(buildLink(linkType,link))
+		end
+
+		matchSummary:footer(footer)
+	end
+
+	return matchSummary:create()
 end
 
 function CustomMatchSummary._addFlexRow(wrapper, contentElements, class, style)
@@ -202,9 +139,124 @@ function CustomMatchSummary._addFlexRow(wrapper, contentElements, class, style)
 	return wrapper:node(node)
 end
 
-function CustomMatchSummary._breakNode()
-	return htmlCreate('div')
-		:addClass('brkts-popup-break')
+function CustomMatchSummary._createHeader(match)
+	local header = MatchSummary.Header()
+
+	header:leftOpponent(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
+	      :leftScore(CustomMatchSummary._createScore(match.opponents[1]))
+	      :rightScore(CustomMatchSummary._createScore(match.opponents[2]))
+	      :rightOpponent(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
+
+	return header
+end
+
+function CustomMatchSummary._createScore(opponent)
+	return OpponentDisplay.BlockScore{
+		isWinner = opponent.placement == 1 or opponent.advances,
+		scoreText = OpponentDisplay.InlineScore(opponent),
+	}
+end
+
+function CustomMatchSummary._createBody(match)
+	local body = MatchSummary.Body()
+
+	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+		-- dateIsExact means we have both date and time. Show countdown
+		-- if match is not epoch=0, we have a date, so display the date
+		body:addRow(MatchSummary.Row():addElement(
+			DisplayHelper.MatchCountdownBlock(match)
+		))
+	end
+
+	-- Iterate each map
+	for _, game in ipairs(match.games) do
+		if game.map then
+			body:addRow(CustomMatchSummary._createMapRow(game))
+		end
+	end
+
+	return body
+end
+
+function CustomMatchSummary._createOpponent(opponent, side)
+	return OpponentDisplay.BlockOpponent{
+		flip = side == 'left',
+		opponent = opponent,
+		overflow = 'wrap',
+		teamStyle = 'short',
+	}
+end
+
+function CustomMatchSummary._gameScore(game, opponentIndex)
+	local score = game.scores[opponentIndex] or ''
+	return htmlCreate('div'):wikitext(score)
+end
+
+function CustomMatchSummary._createMapRow(game)
+	local row = MatchSummary.Row()
+
+	-- Add Header
+	if Logic.isNotEmpty(game.header) then
+		local mapHeader = mw.html.create('div')
+		mapHeader :wikitext(game.header)
+			:css('font-weight','bold')
+			:css('font-size','85%')
+			:css('margin','auto')
+		row:addElement(mapHeader)
+		row:addElement(MatchSummary.Break():create())
+	end
+	
+	local centerNode = mw.html.create('div')
+	centerNode  :addClass('brkts-popup-spaced')
+				:wikitext('[[' .. game.map .. ']]')
+				:css('text-align', 'center')
+
+	if game.resultType == 'np' then
+		centerNode:addClass('brkts-popup-spaced-map-skip')
+	end
+
+	local leftNode = htmlCreate('div')
+		:addClass('brkts-popup-spaced')
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
+		:node(CustomMatchSummary._gameScore(game, 1))
+
+	local rightNode = htmlCreate('div')
+		:addClass('brkts-popup-spaced')
+		:node(CustomMatchSummary._gameScore(game, 2))
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
+
+	row:addElement(leftNode)
+		:addElement(centerNode)
+		:addElement(rightNode)
+
+	row:addClass('brkts-popup-body-game')
+		--:css('font-size', '85%')
+		:css('overflow', 'hidden')
+
+	-- Add Comment
+	if Logic.isNotEmpty(game.comment) then
+		row:addElement(MatchSummary.Break():create())
+		local comment = mw.html.create('div')
+		comment :wikitext(game.comment)
+				:css('margin', 'auto')
+				--:css('max-width', '60%')
+		row:addElement(comment)
+	end
+
+	return row
+end
+
+function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
+	local container = htmlCreate('div')
+	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
+
+	if showIcon then
+		container:node(_ICONS[iconType])
+	else
+		container:node(_NO_CHECK)
+	end
+
+	return container
 end
 
 return CustomMatchSummary
