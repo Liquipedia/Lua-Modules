@@ -8,11 +8,12 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
 
 local VodLink = {}
 
 function VodLink.display(args)
-	if type(args) ~= 'table' or Logic.isEmpty(args) then
+	if type(args) ~= 'table' then
 		return ''
 	end
 
@@ -21,6 +22,8 @@ function VodLink.display(args)
 			:addClass('plainlinks')
 			:attr('title', 'Help Liquipedia find this VOD')
 			:wikitext('[[File:NoVod.png|link=]]')
+	elseif String.isEmpty(args.vod) then
+		return ''
 	end
 
 	local title
