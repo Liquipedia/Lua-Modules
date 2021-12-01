@@ -65,49 +65,55 @@ function p.storeGames(match, match2)
 		local extradata = json.parseIfString(game2.extradata)
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
-		if extradata.t1bans and extradata.t2bans then
-			game.extradata.opponent1bans = table.concat(json.parseIfString(extradata.t1bans), ", ")
-			game.extradata.opponent2bans = table.concat(json.parseIfString(extradata.t2bans), ", ")
-		end
-		if extradata.t1firstside and extradata.t1halfs and extradata.t2halfs then
-			extradata.t1firstside = json.parseIfString(extradata.t1firstside)
-			extradata.t1halfs = json.parseIfString(extradata.t1halfs)
-			extradata.t2halfs = json.parseIfString(extradata.t2halfs)
-			local team1 = {}
-			local team2 = {}
-			if extradata.t1firstside[1] == "atk" then
-				team1 = {"atk", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
-				team2 = {"def", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
-			elseif extradata.t1firstside[1] == "def" then
-				team2 = {"atk", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
-				team1 = {"def", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
+		if extradata then
+			if extradata.t1bans and extradata.t2bans then
+				game.extradata.opponent1bans = table.concat(json.parseIfString(extradata.t1bans), ", ")
+				game.extradata.opponent2bans = table.concat(json.parseIfString(extradata.t2bans), ", ")
 			end
-			if extradata.t1firstside.ot == "atk" then
-				table.insert(team1, "atk")
-				table.insert(team1, extradata.t1halfs.otatk or 0)
-				table.insert(team1, extradata.t1halfs.otdef or 0)
-				table.insert(team2, "def")
-				table.insert(team2, extradata.t2halfs.otatk or 0)
-				table.insert(team2, extradata.t2halfs.otdef or 0)
-			elseif extradata.t1firstside.ot == "def" then
-				table.insert(team2, "atk")
-				table.insert(team2, extradata.t2halfs.otatk or 0)
-				table.insert(team2, extradata.t2halfs.otdef or 0)
-				table.insert(team1, "def")
-				table.insert(team1, extradata.t1halfs.otatk or 0)
-				table.insert(team1, extradata.t1halfs.otdef or 0)
+			if extradata.t1firstside and extradata.t1halfs and extradata.t2halfs then
+				extradata.t1firstside = json.parseIfString(extradata.t1firstside)
+				extradata.t1halfs = json.parseIfString(extradata.t1halfs)
+				extradata.t2halfs = json.parseIfString(extradata.t2halfs)
+				local team1 = {}
+				local team2 = {}
+				if extradata.t1firstside[1] == "atk" then
+					team1 = {"atk", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
+					team2 = {"def", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
+				elseif extradata.t1firstside[1] == "def" then
+					team2 = {"atk", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
+					team1 = {"def", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
+				end
+				if extradata.t1firstside.ot == "atk" then
+					table.insert(team1, "atk")
+					table.insert(team1, extradata.t1halfs.otatk or 0)
+					table.insert(team1, extradata.t1halfs.otdef or 0)
+					table.insert(team2, "def")
+					table.insert(team2, extradata.t2halfs.otatk or 0)
+					table.insert(team2, extradata.t2halfs.otdef or 0)
+				elseif extradata.t1firstside.ot == "def" then
+					table.insert(team2, "atk")
+					table.insert(team2, extradata.t2halfs.otatk or 0)
+					table.insert(team2, extradata.t2halfs.otdef or 0)
+					table.insert(team1, "def")
+					table.insert(team1, extradata.t1halfs.otatk or 0)
+					table.insert(team1, extradata.t1halfs.otdef or 0)
+				end
+				game.extradata.opponent1scores = table.concat(team1, ", ")
+				game.extradata.opponent2scores = table.concat(team2, ", ")
 			end
-			game.extradata.opponent1scores = table.concat(team1, ", ")
-			game.extradata.opponent2scores = table.concat(team2, ", ")
 		end
-		for team = 1, 2 do
-			for player = 1, 5 do
-				local data = game2.participants[team..'_'..player]
-				if data then
-					game.extradata['t'..team..'p'..player] = match2.match2opponents[team].match2players[player].name
-					game.extradata['t'..team..'kda'..player] = (data.kills or '') ..'/'..(data.deaths or '')..'/'..(data.assists or '')
-					game.extradata['t'..team..'acs'..player] = data.acs
-					game.extradata['t'..team..'a'..player] = data.agent
+		if game2.participants then
+			for team = 1, 2 do
+				for player = 1, 5 do
+					local data = game2.participants[team..'_'..player]
+					if data then
+						game.extradata['t'..team..'p'..player] = match2.match2opponents[team].match2players[player].name
+						if data.kills and data.deaths and data.assists then
+							game.extradata['t'..team..'kda'..player] = data.kills..'/'..data.deaths..'/'..data.assists
+						end
+						game.extradata['t'..team..'acs'..player] = data.acs
+						game.extradata['t'..team..'a'..player] = data.agent
+					end
 				end
 			end
 		end
