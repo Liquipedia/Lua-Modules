@@ -244,7 +244,6 @@ function matchFunctions.mergeWithStandalone(match)
 
 	match.opponent1 = standaloneMatch.match2opponents[1]
 	match.opponent2 = standaloneMatch.match2opponents[2]
-	-- Needs lot more converting here...
 
 	local match2games = standaloneMatch.match2games
 	for i = 1, #match2games do
