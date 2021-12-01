@@ -68,13 +68,13 @@ function NavBar.NavBar(args, headerText)
 		)
 	end
 
-	local listObjects = {
+	local shortcutObjects = {
 		{long = 'view', short = 'v', text = 'View this template', link = title.fullText},
 		{long = 'talk', short = 'd', text = 'Discuss this template', link = talkpage},
 	}
 	if not Logic.readBool(args.noedit) then
 		table.insert(
-			listObjects,
+			shortcutObjects,
 			{
 				long = 'edit',
 				short = 'e',
@@ -85,12 +85,11 @@ function NavBar.NavBar(args, headerText)
 		)
 	end
 
-	--if you have a better name for "list" please suggest it
-	local list = mw.html.create('ul')
+	local shortcuts = mw.html.create('ul')
 		:addClass('hlist')
 
-	for _, item in ipairs(listObjects) do
-		list:tag('li')
+	for _, item in ipairs(shortcutObjects) do
+		shortcuts:tag('li')
 			:addClass('nv-' .. item.long)
 			:wikitext(item.externalLink and '[' or '[[')
 			:wikitext(item.link .. '|')
@@ -103,7 +102,7 @@ function NavBar.NavBar(args, headerText)
 			:done()
 	end
 
-	navBarDiv:node(list)
+	navBarDiv:node(shortcuts)
 
 	if showBrackets then
 		navBarDiv:node(mw.html.create('span')
