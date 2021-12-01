@@ -100,6 +100,17 @@ function p.storeGames(match, match2)
 			game.extradata.opponent1scores = table.concat(team1, ", ")
 			game.extradata.opponent2scores = table.concat(team2, ", ")
 		end
+		for team = 1, 2 do
+			for player = 1, 5 do
+				local data = game2.participants[team..'_'..player]
+				if data then
+					game.extradata['t'..team..'p'..player] = match2.match2opponents[team].match2players[player].name
+					game.extradata['t'..team..'kda'..player] = (data.kills or '') ..'/'..(data.deaths or '')..'/'..(data.assists or '')
+					game.extradata['t'..team..'acs'..player] = data.acs
+					game.extradata['t'..team..'a'..player] = data.agent
+				end
+			end
+		end
 		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
 		-- Other stuff
 		game.opponent1 = match.opponent1
@@ -146,6 +157,8 @@ function p.convertParameters(match2)
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.female = Variables.varDefault("female")
 	match.extradata.bestofx = tostring(match2.bestof)
+	match.extradata.maps = '' -- TODO
+	match.extradata.vodgame1 = '' -- TODO (and the rest of vodgames)
 	local bracketData = json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
 		local headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
