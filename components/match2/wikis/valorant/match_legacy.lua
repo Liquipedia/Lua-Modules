@@ -158,7 +158,7 @@ function p.convertParameters(match2)
 
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.female = Variables.varDefault("female")
-	match.extradata.bestofx = tostring(match2.bestof)
+	match.extradata.bestofx = tostring(match2.bestof or '')
 	match.extradata.maps = table.concat(p._getAllInGames(match2, 'map'), ',')
 	for index, vod in ipairs(p._getAllInGames(match2, 'vod'), ',') do
 		match.extradata['vodgame'..index] = vod
