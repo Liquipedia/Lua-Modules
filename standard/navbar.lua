@@ -14,6 +14,10 @@ function NavBar._navbar(args, headerText)
 	return NavBar.NavBar(args, headerText)
 end
 
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local String = require('Module:String')
+
 local _BRACKETS_LEFT = '&#91;'
 local _BRACKETS_RIGHT = '&#93;'
 
@@ -32,8 +36,8 @@ function NavBar.NavBar(args, headerText)
 		:addClass('noprint')
 		:addClass('plainlinks')
 		:addClass('navbox-navbar')
-    	:css('padding', '0')
-      	:css('font-size', 'xx-small')
+		:css('padding', '0')
+		:css('font-size', 'xx-small')
 	if isCollapsible then
 		navBarDiv:css('float', 'left'):css('text-align', 'left')
 	else
