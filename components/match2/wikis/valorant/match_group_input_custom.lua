@@ -245,10 +245,23 @@ function matchFunctions.mergeWithStandalone(match)
 	match.opponent1 = standaloneMatch.match2opponents[1]
 	match.opponent2 = standaloneMatch.match2opponents[2]
 
-	local match2games = standaloneMatch.match2games
-	for i = 1, #match2games do
-		match['map' .. i] = match2games[i]
+	for index, game in ipairs(standaloneMatch.match2games) do
+		game.participants = Json.parseIfString(game.participants)
+		game.extradata = Json.parseIfString(game.extradata)
+		match['map' .. index] = game
 	end
+
+	for key, _ in pairs(standaloneMatch) do
+		if String.startsWith(key, "match2") then
+			standaloneMatch[key] = nil
+		end
+	end
+
+	for key, value in pairs(standaloneMatch) do
+		match[key] = value
+	end
+
+	mw.logObject(match)
 
 	return match
 end
