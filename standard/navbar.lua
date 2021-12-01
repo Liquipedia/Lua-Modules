@@ -53,11 +53,7 @@ function NavBar.NavBar(args, headerText)
 		)
 	end
 
-	local titleText = args.titleArg or (':' .. mw.getCurrentFrame():getParent():getTitle())
-	local title = mw.title.new(mw.text.trim(titleText), 'Template');
-	if not title then
-		error('Invalid title ' .. titleText)
-	end
+	local templateTitle = NavBar._getTitle(args.titleArg)
 	local talkpage = title.talkPageTitle and title.talkPageTitle.fullText or ''
 
 	if showBrackets then
@@ -69,7 +65,7 @@ function NavBar.NavBar(args, headerText)
 	end
 
 	local shortcutObjects = {
-		{long = 'view', short = 'v', text = 'View this template', link = title.fullText},
+		{long = 'view', short = 'v', text = 'View this template', link = templateTitle.fullText},
 		{long = 'talk', short = 'd', text = 'Discuss this template', link = talkpage},
 	}
 	if not Logic.readBool(args.noedit) then
@@ -79,7 +75,7 @@ function NavBar.NavBar(args, headerText)
 				long = 'edit',
 				short = 'e',
 				text = 'Edit this template',
-				link = title:fullUrl('action=edit'),
+				link = templateTitle:fullUrl('action=edit'),
 				externalLink = true
 			}
 		)
@@ -124,6 +120,27 @@ function NavBar.NavBar(args, headerText)
 	end
 
 	return navBarDiv
+end
+
+function NavBar._getTitle(titleArg)
+	--if no template title is given via the arguments try to get it
+	if not titleArg then
+		local rootFrame
+		local currentFrame = mw.getCurrentFrame()
+		while currentFrame ~= nil do
+			rootFrame = currentFrame
+			currentFrame = currentFrame:getParent()
+		end
+
+		titleArg = ':' .. rootFrame:getTitle()
+	end
+
+	local title = mw.title.new(mw.text.trim(titleArg), 'Template')
+	if not title then
+		error('Invalid title ' .. titleArg)
+	end
+
+	return title
 end
 
 return Class.export(NavBar)
