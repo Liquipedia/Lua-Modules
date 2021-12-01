@@ -9,7 +9,7 @@
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
+local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
@@ -167,11 +167,10 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 	for index, vod in pairs(vods) do
 		footerSet = true
-		footerSpacer:node(Template.safeExpand(mw.getCurrentFrame(), 'vodlink', {
+		footerSpacer:node(VodLink.display{
 			gamenum = index,
 			vod = vod,
-			source = '' -- todo: provide source
-		}))
+		})
 	end
 	if footerSet then
 		footer:node(footerSpacer)

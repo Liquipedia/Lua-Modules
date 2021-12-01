@@ -12,7 +12,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
+local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
@@ -310,8 +310,6 @@ local CustomMatchSummary = {}
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
-	local frame = mw.getCurrentFrame()
-
 	local matchSummary = MatchSummary():init()
 	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
@@ -338,11 +336,11 @@ function CustomMatchSummary.getByMatchId(args)
 
 		-- Game Vods
 		for index, vod in pairs(vods) do
-			footer:addElement(Template.safeExpand(frame, 'vodlink', {
+			footer:addElement(VodLink.display{
 				gamenum = index,
 				vod = vod,
 				source = vod.url
-			}))
+			})
 		end
 
 		-- Match Vod + other links
