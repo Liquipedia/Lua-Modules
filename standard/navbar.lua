@@ -54,7 +54,7 @@ function NavBar.NavBar(args, headerText)
 	end
 
 	local templateTitle = NavBar._getTitle(args.titleArg)
-	local talkpage = title.talkPageTitle and title.talkPageTitle.fullText or ''
+	local talkpage = templateTitle.talkPageTitle and templateTitle.talkPageTitle.fullText or ''
 
 	if showBrackets then
 		navBarDiv:node(mw.html.create('span')
