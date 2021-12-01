@@ -261,8 +261,6 @@ function matchFunctions.mergeWithStandalone(match)
 		match[key] = value
 	end
 
-	mw.logObject(match)
-
 	return match
 end
 
