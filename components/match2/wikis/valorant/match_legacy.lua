@@ -66,10 +66,6 @@ function p.storeGames(match, match2)
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		if extradata then
-			if extradata.t1bans and extradata.t2bans then
-				game.extradata.opponent1bans = table.concat(json.parseIfString(extradata.t1bans), ", ")
-				game.extradata.opponent2bans = table.concat(json.parseIfString(extradata.t2bans), ", ")
-			end
 			if extradata.t1firstside and extradata.t1halfs and extradata.t2halfs then
 				extradata.t1firstside = json.parseIfString(extradata.t1firstside)
 				extradata.t1halfs = json.parseIfString(extradata.t1halfs)
@@ -163,8 +159,11 @@ function p.convertParameters(match2)
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.female = Variables.varDefault("female")
 	match.extradata.bestofx = tostring(match2.bestof)
-	match.extradata.maps = '' -- TODO
-	match.extradata.vodgame1 = '' -- TODO (and the rest of vodgames)
+	match.extradata.maps = table.concat(p._getAllInGames(match2, 'map'), ',')
+	for index, vod in ipairs(p._getAllInGames(match2, 'vod'), ',') do
+		match.extradata['vodgame'..index] = vod
+	end
+
 	local bracketData = json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
 		local headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
@@ -226,6 +225,14 @@ function p.convertParameters(match2)
 	handleOpponent(2)
 
 	return match
+end
+
+function p._getAllInGames(match2, field)
+	local ret = {}
+	for _, game2 in ipairs(match2.match2games or {}) do
+		table.insert(ret, game2[field])
+	end
+	return ret
 end
 
 return p
