@@ -1,6 +1,5 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local String = require('Module:String')
 
 local NavBar = {}
 
