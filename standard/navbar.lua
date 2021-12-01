@@ -17,11 +17,14 @@ local _BRACKETS_LEFT = '&#91;'
 local _BRACKETS_RIGHT = '&#93;'
 
 function NavBar.NavBar(args, headerText)
-
 	local showBrackets = Logic.readBool(args.brackets)
 	local isCollapsible = Logic.readBool(args.collapsible)
 	local isPlain = Logic.readBool(args.plain)
-	local isMini = Logic.readBool(args.mini) or isCollapsible and (not isPlain)
+	local isMini = Logic.readBool(args.mini)
+	if (not isPlain) and isCollapsible then
+		isMini = true
+	end
+
 	local fontStyle = args.fontstyle
 	if isCollapsible and args.fontcolor then
 		fontStyle = 'color:' .. args.fontcolor .. ';'
