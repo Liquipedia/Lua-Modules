@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=valorant
 -- page=Module:Match/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -37,6 +37,8 @@ function p.storeMatchSMW(match, match2)
 		"is map number=1",
 		"has team left=" .. (match.opponent1 or ""),
 		"has team right=" .. (match.opponent2 or ""),
+		"has teams=" .. (match.opponent1 or "")..','..(match.opponent2 or ""),
+		"has teams page=" .. (match.opponent1 or "")..','..(match.opponent2 or ""),
 		"Has map date=" .. (match.date or ""),
 		"Has tournament=" .. mw.title.getCurrentTitle().prefixedText,
 		"Has tournament tier=" .. (match.liquipediatier or ""),
@@ -50,6 +52,7 @@ function p.storeMatchSMW(match, match2)
 		"Has team left score=" .. (match.opponent1score or "0"),
 		"Has team right score=" .. (match.opponent2score or "0"),
 		"Has exact time=" .. (Logic.readBool(match.dateexact) and "true" or "false"),
+		"Is featured match=" .. (Logic.readBool(match.extradata.featured) and "true" or "false"),
 		"Is finished=" .. (Logic.readBool(match.finished) and "true" or "false"),
 	 })
 end
