@@ -14,10 +14,6 @@ function NavBar._navbar(args, headerText)
 	return NavBar.NavBar(args, headerText)
 end
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local String = require('Module:String')
-
 local _BRACKETS_LEFT = '&#91;'
 local _BRACKETS_RIGHT = '&#93;'
 
