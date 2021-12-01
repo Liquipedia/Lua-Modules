@@ -34,7 +34,8 @@ function BigMatch.run(frame)
 	local identifiers = bigMatch:_getId()
 	match['bracketid'] = "MATCH_" .. identifiers[1]
 	match['matchid'] = identifiers[2]
-	Match.store(match)
+	-- Don't store match1 as BigMatch records are not complete
+	Match.store(match, {storeMatch1 = false, storeSmw = false})
 
 	local tournamentData = bigMatch:_fetchTournamentInfo(args.tournamentlink or '')
 
