@@ -130,6 +130,7 @@ function p.convertParameters(match2)
 		end
 	end
 
+	match.resulttype = match.walkover
 	if match.walkover == "ff" or match.walkover == "dq" then
 		match.walkover = match.winner
 	elseif match.walkover == "l" then
@@ -142,13 +143,8 @@ function p.convertParameters(match2)
 	match.extradata = {}
 	local extradata = json.parseIfString(match2.extradata)
 
-	local mvp = json.parseIfString(extradata.mvp)
-	if mvp and mvp.players then
-		match.extradata.mvp = table.concat(mvp.players, ",")
-		match.extradata.mvp = match.extradata.mvp .. ";" .. mvp.points
-	end
-
 	match.extradata.matchsection = extradata.matchsection
+	match.extradata.female = Variables.varDefault("female")
 	match.extradata.bestofx = tostring(match2.bestof)
 	local bracketData = json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
@@ -190,7 +186,7 @@ function p.convertParameters(match2)
 			match[prefix] = opponent.name
 			match[prefix.."score"] = tonumber(opponent.score) or 0 >= 0 and opponent.score or 0
 			local opponentplayers = {}
-			for i = 1,10 do
+			for i = 1, 5 do
 				local player = opponentmatch2players[i] or {}
 				opponentplayers["p" .. i] = player.name or ""
 				opponentplayers["p" .. i .. "flag"] = player.flag or ""
