@@ -1,122 +1,128 @@
-local p = {}
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local String = require('Module:String')
 
-local getArgs
+local NavBar = {}
 
-function p._navbar(args)
-	local titleArg = 1
+--legacy entry points
+function NavBar.navbar(args, headerText)
+	headerText = headerText or args[1]
+	return NavBar.NavBar(args, headerText)
+end
+function NavBar._navbar(args, headerText)
+	headerText = headerText or args[1]
+	return NavBar.NavBar(args, headerText)
+end
 
-	if args.collapsible then
-		titleArg = 2
-		if not args.plain then
-			args.mini = 1
-		end
-		if args.fontcolor then
-			args.fontstyle = 'color:' .. args.fontcolor .. ';'
-		end
-		args.style = 'float:left; text-align:left'
+local _BRACKETS_LEFT = '&#91;'
+local _BRACKETS_RIGHT = '&#93;'
+
+function NavBar.NavBar(args, headerText)
+
+	local showBrackets = Logic.readBool(args.brackets)
+	local isCollapsible = Logic.readBool(args.collapsible)
+	local isPlain = Logic.readBool(args.plain)
+	local isMini = Logic.readBool(args.mini) or isCollapsible and (not isPlain)
+	local fontStyle = args.fontstyle
+	if isCollapsible and args.fontcolor then
+		fontStyle = 'color:' .. args.fontcolor .. ';'
 	end
 
-	local titleText = args[titleArg] or (':' .. mw.getCurrentFrame():getParent():getTitle())
-	local title = mw.title.new(mw.text.trim(titleText), 'Template');
-
-	if not title then
-		error('Invalid title ' .. titleText)
-	end
-
-	local talkpage = title.talkPageTitle and title.talkPageTitle.fullText or '';
-
-	local div = mw.html.create():tag('div')
-	div
+	local navBarDiv = mw.html.create('div')
 		:addClass('noprint')
 		:addClass('plainlinks')
 		:addClass('navbox-navbar')
-  		--:css('background', 'none')
     	:css('padding', '0')
       	:css('font-size', 'xx-small')
-		:cssText(args.style)
-
-	if args.mini then div:addClass('mini') end
-
-	if not (args.mini or args.plain) then
-		div
-			:tag('span')
-				:css('word-spacing', 0)
-				:cssText(args.fontstyle)
-				:wikitext(args.text or 'This box:')
-				:wikitext(' ')
+	if isCollapsible then
+		navBarDiv:css('float', 'left'):css('text-align', 'left')
+	else
+		navBarDiv:cssText(args.style)
+	end
+	if isMini then
+		navBarDiv:addClass('mini')
+	end
+	if not isMini and not isPlain then
+		navBarDiv:node(mw.html.create('span')
+			:css('word-spacing', 0)
+			:cssText(fontStyle)
+			:wikitext(args.text or 'This box:')
+			:wikitext(' ')
+		)
 	end
 
-	if args.brackets then
-		div
-			:tag('span')
-				:css('margin-right', '-0.125em')
-				:cssText(args.fontstyle)
-				:wikitext('&#91; ')
+	local titleText = args.titleArg or (':' .. mw.getCurrentFrame():getParent():getTitle())
+	local title = mw.title.new(mw.text.trim(titleText), 'Template');
+	if not title then
+		error('Invalid title ' .. titleText)
+	end
+	local talkpage = title.talkPageTitle and title.talkPageTitle.fullText or ''
+
+	if showBrackets then
+		navBarDiv:node(mw.html.create('span')
+			:css('margin-right', '-0.125em')
+			:cssText(fontStyle)
+			:wikitext(_BRACKETS_LEFT .. ' ')
+		)
 	end
 
-	local ul = div:tag('ul');
+	local listObjects = {
+		{long = 'view', short = 'v', text = 'View this template', link = title.fullText},
+		{long = 'talk', short = 'd', text = 'Discuss this template', link = talkpage},
+	}
+	if not Logic.readBool(args.noedit) then
+		table.insert(
+			listObjects,
+			{
+				long = 'edit',
+				short = 'e',
+				text = 'Edit this template',
+				link = title:fullUrl('action=edit'),
+				externalLink = true
+			}
+		)
+	end
 
-	ul
-  		:addClass('hlist')
-		:tag('li')
-			:addClass('nv-view')
-			:wikitext('[[' .. title.fullText .. '|')
-			:tag(args.mini and 'abbr' or 'span')
-				:attr('title', 'View this template')
-				:cssText(args.fontstyle)
-				:wikitext(args.mini and 'v' or 'view')
+	--if you have a better name for "list" please suggest it
+	local list = mw.html.create('ul')
+		:addClass('hlist')
+
+	for _, item in ipairs(listObjects) do
+		list:tag('li')
+			:addClass('nv-' .. item.long)
+			:wikitext(item.externalLink and '[' or '[[')
+			:wikitext(item.link .. '|')
+			:tag(isMini and 'abbr' or 'span')
+				:attr('title', item.text)
+				:cssText(fontStyle)
+				:wikitext(isMini and item.short or item.long)
 				:done()
-			:wikitext(']]')
+			:wikitext(item.externalLink and ']' or ']]')
 			:done()
-		:tag('li')
-			:addClass('nv-talk')
-			:wikitext('[[' .. talkpage .. '|')
-			:tag(args.mini and 'abbr' or 'span')
-				:attr('title', 'Discuss this template')
-				:cssText(args.fontstyle)
-				:wikitext(args.mini and 'd' or 'talk')
-				:done()
-			:wikitext(']]');
-
-	if not args.noedit then
-		ul
-			:tag('li')
-				:addClass('nv-edit')
-				:wikitext('[' .. title:fullUrl('action=edit') .. ' ')
-				:tag(args.mini and 'abbr' or 'span')
-					:attr('title', 'Edit this template')
-					:cssText(args.fontstyle)
-					:wikitext(args.mini and 'e' or 'edit')
-					:done()
-				:wikitext(']');
 	end
 
-	if args.brackets then
-		div
-			:tag('span')
-				:css('margin-left', '-0.125em')
-				:cssText(args.fontstyle)
-				:wikitext(' &#93;')
+	navBarDiv:node(list)
+
+	if showBrackets then
+		navBarDiv:node(mw.html.create('span')
+			:css('margin-left', '-0.125em')
+			:cssText(fontStyle)
+			:wikitext(' ' .. _BRACKETS_RIGHT)
+		)
 	end
 
-	if args.collapsible then
-		div
-			:done()
-		:tag('div')
+	navBarDiv = tostring(navBarDiv)
+
+	if isCollapsible then
+		navBarDiv = navBarDiv .. tostring(mw.html.create('div')
 			:css('font-size', '114%')
-			:css('margin', args.mini and '0 4em' or '0 7em')
-			:cssText(args.fontstyle)
-			:wikitext(args[1])
+			:css('margin', isMini and '0 4em' or '0 7em')
+			:cssText(fontStyle)
+			:wikitext(headerText)
+		)
 	end
 
-	return tostring(div:done())
+	return navBarDiv
 end
 
-function p.navbar(frame)
-	if not getArgs then
-		getArgs = require('Module:Arguments').getArgs
-	end
-	return p._navbar(getArgs(frame))
-end
-
-return p
+return Class.export(NavBar)
