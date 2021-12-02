@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:RecentMatches
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local String = require('Module:StringUtils')
