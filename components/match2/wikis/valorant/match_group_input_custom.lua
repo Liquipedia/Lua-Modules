@@ -248,10 +248,8 @@ function matchFunctions.mergeWithStandalone(match)
 
 	-- Update Maps from the Standalone Match
 	for index, game in ipairs(standaloneMatch.match2games) do
-		-- JSON encoded fields has to be parsed first
 		game.participants = Json.parseIfString(game.participants)
 		game.extradata = Json.parseIfString(game.extradata)
-		-- Save the map into current match object
 		match['map' .. index] = game
 	end
 
