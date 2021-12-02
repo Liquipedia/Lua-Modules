@@ -12,12 +12,18 @@ local String = require('Module:StringUtils')
 local Lua = require("Module:Lua")
 local LeagueIcon = require("Module:LeagueIcon")
 local VodLink = require("Module:VodLink")
+local Table = require("Module:Table")
 
 local OpponentDisplay, Opponent
 
 local _CURRENT_DATE_STAMP = mw.getContentLanguage():formatDate('c')
 local _ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 local _SCORE_STATUS = 'S'
+local _INVALID_OPPONENTS = {
+	'tbd',
+	'tba',
+	'bye',
+}
 
 local RecentMatches = {}
 
@@ -88,12 +94,8 @@ function RecentMatches._checkForInelligableOpponent(opponent)
 	local name = string.lower(opponent.name or '')
 	local template = string.lower(opponent.template or '')
 
-	return name == 'bye'
-		or name == 'tba'
-		or name == 'tbd'
-		or template == 'bye'
-		or template == 'tba'
-		or template == 'tbd'
+	return Table.includes(_INVALID_OPPONENTS, name)
+		or Table.includes(_INVALID_OPPONENTS, template)
 		or (String.isEmpty(name) and String.isEmpty(template))
 end
 
