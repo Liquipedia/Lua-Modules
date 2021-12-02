@@ -8,6 +8,7 @@
 local Class = require('Module:Class')
 local Namespace = require('Module:Namespace')
 local BasicInfobox = require('Module:Infobox/Basic')
+local Flags = require('Module:Flags')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -37,46 +38,35 @@ function Weapon:createInfobox()
         },
         Center{content = {args.caption}},
         Title{name = (args.informationType or 'Weapon') .. ' Information'},
-        Customizable{
-            id = 'class',
+		Cell{
+			name = 'Class',
+			content = self:getAllArgsForBase(args, 'class', {makeLink = true}),
+		},
+		Cell{
+			name = 'Origin',
+			content = {self:_createLocation(args.origin)},
+		},
+		Cell{name = 'Price', content = {args.price}},
+		Cell{name = 'Kill Award', content = {args.killaward}},
+		Cell{name = 'Base Damage', content = {args.damage}},
+		Cell{name = 'Magazine Size', content = {args.magsize}},
+		Cell{name = 'Ammo Capacity', content = {args.ammocap}},
+		Cell{name = 'Reload Speed', content = {args.reloadspeed}},
+		Cell{name = 'Rate of Fire', content = {args.rateoffire}},
+		Cell{name = 'Firing Mode', content = {args.firemode}},
+		Customizable{
+			id = 'side',
+			children = {
+				Cell{name = 'Side', content = {args.side}},
+			}
+		},
+		Customizable{
+            id = 'user',
             children = {
-                Cell{name = 'Class', content = {args.class}},
-            }
-        },
-        Customizable{
-            id = 'damage',
-            children = {
-                Cell{name = 'Base Damage', content = {args.damage}},
-            }
-        },
-        Customizable{
-            id = 'magazine',
-            children = {
-                Cell{name = 'Magazine Size', content = {args.magazine}},
-            }
-        },
-        Customizable{
-            id = 'ammo',
-            children = {
-                Cell{name = 'Ammo Capacity', content = {args.ammo}},
-            }
-        },
-        Customizable{
-            id = 'rof',
-            children = {
-                Cell{name = 'Rate of Fire', content = {args.rof}},
-            }
-        },
-        Customizable{
-            id = 'reload',
-            children = {
-                Cell{name = 'Reload Speed', content = {args.reload}},
-            }
-        },
-        Customizable{
-            id = 'mode',
-            children = {
-                Cell{name = 'Firing Mode', content = {args.mode}},
+				Cell{
+					name = 'User(s)',
+					content = self:getAllArgsForBase(args, 'user', {makeLink = true}),
+				}
             }
         },
         Customizable{id = 'custom', children = {}},
@@ -93,6 +83,15 @@ function Weapon:createInfobox()
     end
 
     return builtInfobox
+end
+
+function Weapon:_createLocation(location)
+	if location == nil then
+		return ''
+	end
+
+	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
+				'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
 function Weapon:getWikiCategories(args)
