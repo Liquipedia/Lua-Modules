@@ -155,6 +155,7 @@ function RecentMatches._lowerRow(data)
 		:css('font-size', '11px')
 		:node(Countdown._create{
 			rawdatetime = 'true',
+			finished = 'true',
 			date = date .. _ABBR_UTC,
 			separator = '&#8203;',
 		})
