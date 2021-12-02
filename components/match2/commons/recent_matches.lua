@@ -72,7 +72,8 @@ end
 function RecentMatches._row(data)
 	MatchGroupWorkaround.applyPlayerBugWorkaround(data)
 	local winner = tonumber(data.winner or 0) or 0
-	local tableClass = RecentMatches.getTableClass(winner, data.publishertier or '')
+	data.winner = winner
+	local tableClass = RecentMatches.getTableClass(data)
 
 	local opponentLeft = data.match2opponents[1]
 	local opponentRight = data.match2opponents[2]
@@ -131,18 +132,18 @@ function RecentMatches._checkForInelligableOpponent(opponent)
 end
 
 -- overridable functions
-function RecentMatches.getTableClass(winner, publishertier)
+function RecentMatches.getTableClass(data)
 	local tableClass = 'wikitable wikitable-striped infobox_matches_content recent-matches-'
 
-	if winner == 1 then
+	if data.winner == 1 then
 		tableClass = tableClass .. 'left'
-	elseif winner == 2 then
+	elseif data.winner == 2 then
 		tableClass = tableClass .. 'right'
 	else
 		tableClass = tableClass .. 'draw'
 	end
 
-	if String.isNotEmpty(publishertier) then
+	if String.isNotEmpty(data.publishertier) then
 		tableClass = tableClass .. '-publishertier'
 	end
 
