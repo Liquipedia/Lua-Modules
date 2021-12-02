@@ -19,6 +19,7 @@ local OpponentDisplay, Opponent
 local _CURRENT_DATE_STAMP = mw.getContentLanguage():formatDate('c')
 local _ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 local _SCORE_STATUS = 'S'
+local _DEFAULT_ICON = 'InfoboxIcon_Tournament.png'
 local _INVALID_OPPONENTS = {
 	'tbd',
 	'tba',
@@ -167,7 +168,7 @@ function RecentMatches._lowerRow(data)
 	end
 
 	--tournament icon and link
-	local icon = String.isNotEmpty(data.icon) and data.icon or 'InfoboxIcon_Tournament.png'
+	local icon = String.isNotEmpty(data.icon) and data.icon or _DEFAULT_ICON
 	local iconDark = String.isNotEmpty(data.icondark) and data.icondark or icon
 	local displayName = String.isNotEmpty(data.tickername) and data.tickername or data.tournament
 	local link = String.isNotEmpty(data.parent) and data.parent or data.pagename
@@ -184,7 +185,6 @@ function RecentMatches._lowerRow(data)
 				iconDark = iconDark,
 				link = link,
 				name = data.tournament,
-				--size = '25px',
 				options = {noTemplate = true},
 			})
 		)
