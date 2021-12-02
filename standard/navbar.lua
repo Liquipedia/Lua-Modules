@@ -1,3 +1,6 @@
+--original source copied from Wikipedia on 2017-12-20.
+--modified (code style + using Class Module) on 2021-12-?? for liquipedia
+
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 
