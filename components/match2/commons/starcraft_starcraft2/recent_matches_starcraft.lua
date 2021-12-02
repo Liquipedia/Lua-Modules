@@ -22,7 +22,6 @@ end
 
 function StarcraftRecentMatches.buildConditions(args)
 	local featured = args.featured == 'true'
-	local limit = tonumber(args.limit or 20) or 20
 
 	local conditions = '[[dateexact::1]] AND [[finished::1]] AND [[date::<' .. _CURRENT_DATE_STAMP .. ']]'
 	if featured then
@@ -55,7 +54,7 @@ function StarcraftRecentMatches.scoreDisplay(opponentLeft, opponentRight, winner
 		local upperScoreDisplay = mw.html.create('div')
 			:css('line-height', '1.1')
 			:wikitext(upperScore)
-		
+
 		scoreDisplay = mw.html.create('div')
 			:node(upperScoreDisplay)
 			:node(lowerScoreDisplay)
