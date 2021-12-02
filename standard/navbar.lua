@@ -4,21 +4,27 @@ local Logic = require('Module:Logic')
 local NavBar = {}
 
 --legacy entry points
-function NavBar.navbar(args, headerText)
-	headerText = headerText or args[1]
-	return NavBar.NavBar(args, headerText)
+function NavBar.navbar(args, args1, arg2)
+	return NavBar.NavBar(args, args1, arg2)
 end
-function NavBar._navbar(args, headerText)
-	headerText = headerText or args[1]
-	return NavBar.NavBar(args, headerText)
+function NavBar._navbar(args, args1, arg2)
+	return NavBar.NavBar(args, args1, arg2)
 end
 
 local _BRACKETS_LEFT = '&#91;'
 local _BRACKETS_RIGHT = '&#93;'
 
-function NavBar.NavBar(args, headerText)
+function NavBar.NavBar(args, arg1, arg2)
 	local showBrackets = Logic.readBool(args.brackets)
 	local isCollapsible = Logic.readBool(args.collapsible)
+	local headerText, title
+	if isCollapsible then
+		headerText = args.headerText or arg1
+		title = args.title or arg2
+	else
+		title = args.title or arg1
+	end
+
 	local isPlain = Logic.readBool(args.plain)
 	local isMini = Logic.readBool(args.mini)
 	if (not isPlain) and isCollapsible then
@@ -53,7 +59,7 @@ function NavBar.NavBar(args, headerText)
 		)
 	end
 
-	local templateTitle = NavBar._getTitle(args.titleArg)
+	local templateTitle = NavBar._getTitle(title)
 	local talkpage = templateTitle.talkPageTitle and templateTitle.talkPageTitle.fullText or ''
 
 	if showBrackets then
