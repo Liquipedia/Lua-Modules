@@ -82,8 +82,6 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.extradata['earningsin' .. year] = Earnings.team({id, year = year}):gsub(',', '')
 	end
 
-	lpdbData.region = Variables.varDefault('region', '')
-
 	return lpdbData
 end
 
