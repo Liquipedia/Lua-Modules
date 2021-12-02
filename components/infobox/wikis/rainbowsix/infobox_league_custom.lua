@@ -15,6 +15,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
+local PageLink = require('Module:Page')
 
 local _UBISOFT_ICON = '&nbsp;[[File:Ubisoft 2017 lightmode.png|x15px|middle|link=Ubisoft|'
 	.. 'Ubisoft Tournaments.]]'
@@ -73,14 +74,14 @@ function CustomInjector:parse(id, widgets)
 	if id == 'customcontent' then
 		if not String.isEmpty(args.map1) then
 			local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
-			local maps = {CustomLeague:_makeInternalLink(args.map1 .. game .. '|' .. args.map1)}
+			local maps = PageLink.makeInternalLink({}, args.map1, args.map1 .. game)
 			local index = 2
 
 			while not String.isEmpty(args['map' .. index]) do
 				local map = args['map' .. index]
 				table.insert(maps, '&nbsp;• ' ..
 					tostring(CustomLeague:_createNoWrappingSpan(
-						CustomLeague:_makeInternalLink(map .. game .. '|' .. map)
+						PageLink.makeInternalLink({}, args.map1, args.map1 .. game)
 					))
 				)
 				index = index + 1
@@ -91,13 +92,13 @@ function CustomInjector:parse(id, widgets)
 
 
 		if not String.isEmpty(args.team1) then
-			local teams = {CustomLeague:_makeInternalLink(args.team1)}
+			local teams = PageLink.makeInternalLink({}, args.team1)
 			local index = 2
 
 			while not String.isEmpty(args['team' .. index]) do
 				table.insert(teams, '&nbsp;• ' ..
 					tostring(CustomLeague:_createNoWrappingSpan(
-						CustomLeague:_makeInternalLink(args['team' .. index])
+						PageLink.makeInternalLink({}, args.team1)
 					))
 				)
 				index = index + 1
@@ -143,8 +144,6 @@ function League:addToLpdb(lpdbData, args)
 	lpdbData.publishertier = args.ubisofttier
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
-		startdate_raw = Variables.varDefault('raw_sdate', ''),
-		enddate_raw = Variables.varDefault('raw_edate', ''),
 		individual = not String.isEmpty(args.player_number),
 	}
 
