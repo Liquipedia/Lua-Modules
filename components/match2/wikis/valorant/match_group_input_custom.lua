@@ -242,23 +242,31 @@ function matchFunctions.mergeWithStandalone(match)
 		return match
 	end
 
+	-- Update Opponents from the Stanlone Match
 	match.opponent1 = standaloneMatch.match2opponents[1]
 	match.opponent2 = standaloneMatch.match2opponents[2]
 
+	-- Update Maps from the Standalone Match
 	for index, game in ipairs(standaloneMatch.match2games) do
+		-- JSON encoded fields has to be parsed first
 		game.participants = Json.parseIfString(game.participants)
 		game.extradata = Json.parseIfString(game.extradata)
+		-- Save the map into current match object
 		match['map' .. index] = game
 	end
 
+	-- Remove special keys (maps/games, opponents, bracketdata etc)
 	for key, _ in pairs(standaloneMatch) do
 		if String.startsWith(key, "match2") then
 			standaloneMatch[key] = nil
 		end
 	end
 
+	-- Copy all match level records which have value
 	for key, value in pairs(standaloneMatch) do
-		match[key] = value
+		if String.isNotEmpty(value) then
+			match[key] = value
+		end
 	end
 
 	return match
