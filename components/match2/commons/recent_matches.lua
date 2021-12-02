@@ -25,8 +25,9 @@ function RecentMatches.run(args)
 	OpponentDisplay, Opponent = RecentMatches.requireOpponentModules()
 	args = args or {}
 	local conditions = RecentMatches.buildConditions(args)
+	local limit = tonumber(args.limit or 20) or 20
 
-	local data = RecentMatches._getData(conditions)
+	local data = RecentMatches._getData(conditions, limit)
 
 	if not data then
 		return mw.html.create('div')
@@ -51,7 +52,6 @@ end
 
 function RecentMatches.buildConditions(args)
 	local featured = args.featured == 'true'
-	local limit = tonumber(args.limit or 20) or 20
 
 	local conditions = '[[dateexact::1]] AND [[finished::1]] AND [[date::<' .. _CURRENT_DATE_STAMP .. ']]'
 	if featured then
@@ -90,7 +90,7 @@ function RecentMatches._displayOpponentScore(score, isWinner)
 		.. (isWinner and '</b>' or '')
 end
 
-function RecentMatches._getData(conditions)
+function RecentMatches._getData(conditions, limit)
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = conditions,
 		order = 'date desc, liquipediatier asc, tournament asc',
