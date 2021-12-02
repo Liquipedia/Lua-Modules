@@ -239,14 +239,7 @@ function RecentMatches.buildQuery(args)
 end
 
 function RecentMatches.buildConditions(args)
-	local featured = args.featured == 'true'
-
-	local conditions = '[[dateexact::1]] AND [[finished::1]] AND [[date::<' .. _CURRENT_DATE_STAMP .. ']]'
-	if featured then
-		conditions = conditions .. ' AND [[publishertier::>]]'
-	end
-
-	return conditions
+	return '[[dateexact::1]] AND [[finished::1]] AND [[date::<' .. _CURRENT_DATE_STAMP .. ']]'
 end
 
 function RecentMatches.versus(opponentLeft, opponentRight, winner, _)
