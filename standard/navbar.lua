@@ -18,6 +18,7 @@ local _BRACKETS_LEFT = '&#91;'
 local _BRACKETS_RIGHT = '&#93;'
 
 function NavBar.NavBar(args, arg1, arg2)
+	args = args or {}
 	local showBrackets = Logic.readBool(args.brackets)
 	local isCollapsible = Logic.readBool(args.collapsible)
 	local headerText, title
