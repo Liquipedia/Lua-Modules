@@ -19,10 +19,10 @@ function NavBar.NavBar(args, arg1, arg2)
 	local isCollapsible = Logic.readBool(args.collapsible)
 	local headerText, title
 	if isCollapsible then
-		headerText = args.headerText or arg1
-		title = args.title or arg2
+		headerText = args.headerText or arg1 or args[1]
+		title = args.title or arg2 or args[2]
 	else
-		title = args.title or arg1
+		title = args.title or arg1 or args[1]
 	end
 
 	local isPlain = Logic.readBool(args.plain)
