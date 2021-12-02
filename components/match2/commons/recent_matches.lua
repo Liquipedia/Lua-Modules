@@ -44,46 +44,6 @@ function RecentMatches.run(args)
 	return display
 end
 
--- overridable functions
-function RecentMatches.requireOpponentModules()
-	return Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true}),
-		Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-end
-
-function RecentMatches.buildConditions(args)
-	local featured = args.featured == 'true'
-
-	local conditions = '[[dateexact::1]] AND [[finished::1]] AND [[date::<' .. _CURRENT_DATE_STAMP .. ']]'
-	if featured then
-		conditions = conditions .. ' AND [[publishertier::>]]'
-	end
-
-	return conditions
-end
-
-function RecentMatches.scoreDisplay(opponentLeft, opponentRight, winner)
-	local leftScore = RecentMatches.getOpponentScore(opponentLeft)
-	local rightScore = RecentMatches.getOpponentScore(opponentRight)
-
-	local scoreDisplay = RecentMatches._displayOpponentScore(leftScore, winner == 1)
-		.. ':'
-		.. RecentMatches._displayOpponentScore(rightScore, winner == 2)
-
-	return scoreDisplay
-end
-
-function RecentMatches.getOpponentScore(opponent)
-	local score
-	if opponent.status == _SCORE_STATUS then
-		score = opponent.score
-	else
-		score = opponent.status or ''
-	end
-
-	return score
-end
-
--- helper functions
 function RecentMatches._displayOpponentScore(score, isWinner)
 	return (isWinner and '<b>' or '')
 		.. score
@@ -240,6 +200,45 @@ function RecentMatches._lowerRow(data)
 	return mw.html.create('span')
 		:node(countdownDisplay)
 		:node(tournamentDisplay)
+end
+
+-- overridable functions
+function RecentMatches.requireOpponentModules()
+	return Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true}),
+		Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+end
+
+function RecentMatches.buildConditions(args)
+	local featured = args.featured == 'true'
+
+	local conditions = '[[dateexact::1]] AND [[finished::1]] AND [[date::<' .. _CURRENT_DATE_STAMP .. ']]'
+	if featured then
+		conditions = conditions .. ' AND [[publishertier::>]]'
+	end
+
+	return conditions
+end
+
+function RecentMatches.scoreDisplay(opponentLeft, opponentRight, winner)
+	local leftScore = RecentMatches.getOpponentScore(opponentLeft)
+	local rightScore = RecentMatches.getOpponentScore(opponentRight)
+
+	local scoreDisplay = RecentMatches._displayOpponentScore(leftScore, winner == 1)
+		.. ':'
+		.. RecentMatches._displayOpponentScore(rightScore, winner == 2)
+
+	return scoreDisplay
+end
+
+function RecentMatches.getOpponentScore(opponent)
+	local score
+	if opponent.status == _SCORE_STATUS then
+		score = opponent.score
+	else
+		score = opponent.status or ''
+	end
+
+	return score
 end
 
 return Class.export(RecentMatches)
