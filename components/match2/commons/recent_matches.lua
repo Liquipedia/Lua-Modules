@@ -13,6 +13,7 @@ local Lua = require("Module:Lua")
 local LeagueIcon = require("Module:LeagueIcon")
 local VodLink = require("Module:VodLink")
 local Table = require("Module:Table")
+local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 
 local OpponentDisplay, Opponent
 
@@ -20,11 +21,6 @@ local _CURRENT_DATE_STAMP = mw.getContentLanguage():formatDate('c')
 local _ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 local _SCORE_STATUS = 'S'
 local _DEFAULT_ICON = 'InfoboxIcon_Tournament.png'
-local _INVALID_OPPONENTS = {
-	'tbd',
-	'tba',
-	'bye',
-}
 
 local RecentMatches = {}
 
@@ -74,6 +70,7 @@ function RecentMatches._getData(conditions, limit, query, order)
 end
 
 function RecentMatches._row(data)
+	MatchGroupWorkaround.applyPlayerBugWorkaround(data)
 	local winner = tonumber(data.winner or 0) or 0
 	local tableClass = RecentMatches.getTableClass(winner, data.publishertier or '')
 
@@ -81,8 +78,8 @@ function RecentMatches._row(data)
 	local opponentRight = data.match2opponents[2]
 
 	if
-		RecentMatches.checkForInelligableOpponent(opponentLeft) or
-		RecentMatches.checkForInelligableOpponent(opponentRight)
+		RecentMatches._checkForInelligableOpponent(opponentLeft) or
+		RecentMatches._checkForInelligableOpponent(opponentRight)
 	then
 		return ''
 	end
@@ -124,6 +121,15 @@ function RecentMatches._row(data)
 	return output
 end
 
+function RecentMatches._checkForInelligableOpponent(opponent)
+	local name = string.lower(opponent.name or '')
+	local template = string.lower(opponent.template or '')
+
+	return Table.includes(RecentMatches.invalidOpponents(), name)
+		or Table.includes(RecentMatches.invalidOpponents(), template)
+		or (String.isEmpty(name) and String.isEmpty(template))
+end
+
 -- overridable functions
 function RecentMatches.getTableClass(winner, publishertier)
 	local tableClass = 'wikitable wikitable-striped infobox_matches_content recent-matches-'
@@ -143,13 +149,12 @@ function RecentMatches.getTableClass(winner, publishertier)
 	return tableClass
 end
 
-function RecentMatches.checkForInelligableOpponent(opponent)
-	local name = string.lower(opponent.name or '')
-	local template = string.lower(opponent.template or '')
-
-	return Table.includes(_INVALID_OPPONENTS, name)
-		or Table.includes(_INVALID_OPPONENTS, template)
-		or (String.isEmpty(name) and String.isEmpty(template))
+function RecentMatches.invalidOpponents()
+	return {
+		'tbd',
+		'tba',
+		'bye',
+	}
 end
 
 function RecentMatches.tournamentDisplay(data)
