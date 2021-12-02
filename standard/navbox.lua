@@ -100,7 +100,7 @@ function NavBox._renderBody()
 	end
 
 	body:cssText(_args.innerstyle)
-	
+
 	body = NavBox._titleRow(body)
 	body = NavBox._aboveBelowRow(body, 'above')
 
@@ -127,7 +127,7 @@ function NavBox._renderBody()
 			key
 		)
 	end
-	
+
 	--[[Option 2: Only take continues listIndexes (change to the current implementation)
 	local listIndex = 1
 	local list = agrs['list' .. listIndex]
@@ -220,8 +220,14 @@ function NavBox._renderNavBar(titleCell)
 		titleCell:wikitext(NavBar.NavBar(
 			{
 				mini = 1,
-				fontstyle = (_args.basestyle or '') .. ';' .. (_args.titlestyle or '') .. ';border:none;-moz-box-shadow:none;-webkit-box-shadow:none;box-shadow:none;',
-				style = 'float:left; text-align:left'
+				fontstyle = (_args.basestyle or '') .. ';'
+					.. (_args.titlestyle or '') .. ';'
+					.. 'border:none;'
+					.. '-moz-box-shadow:none;'
+					.. '-webkit-box-shadow:none;'
+					.. 'box-shadow:none;',
+				style = 'float:left;'
+					.. 'text-align:left'
 			},
 			_args.name
 		))
@@ -243,7 +249,7 @@ function NavBox._aboveBelowRow(body, rowType)
 			:tag('td')
 				:addClass('navbox-abovebelow')
 				:addClass('wiki-backgroundcolor-light')
-				:addClass(_args[rowType .. class])
+				:addClass(_args[rowType .. 'class'])
 				:cssText(_args.basestyle)
 				:cssText(_args[rowType .. 'style'])
 				:attr('colspan', NavBox._getAboveBelowColspan())
@@ -253,7 +259,7 @@ function NavBox._aboveBelowRow(body, rowType)
 	return body
 end
 
-function NavBox._getAboveBelowColspan(body, rowType)
+function NavBox._getAboveBelowColspan()
 	local colSpan = 2
 	if _args.imageleft then
 		colSpan = colSpan + 1
@@ -261,6 +267,7 @@ function NavBox._getAboveBelowColspan(body, rowType)
 	if _args.image then
 		colSpan = colSpan + 1
 	end
+	return colSpan
 end
 
 function NavBox._processItem(item, noWrapItems)
@@ -306,7 +313,7 @@ function NavBox._listRow(body, listText, listIndex, numberOfLists, isFirstList, 
 	end
 
 	if String.isNotEmpty(_args['group' .. listIndex]) then
-		local groupCell = row:tag('th')
+		row:tag('th')
 			:attr('scope', 'row')
 			:addClass('navbox-group')
 			:addClass('wiki-backgroundcolor-light')
@@ -427,8 +434,8 @@ function NavBox._addTrackingCategories(wrapper)
 
 	local subpage = title.subpageText
 	if
-		subpage == 'doc' or 
-		subpage == 'sandbox' or 
+		subpage == 'doc' or
+		subpage == 'sandbox' or
 		subpage == 'testcases'
 	then
 		return wrapper
