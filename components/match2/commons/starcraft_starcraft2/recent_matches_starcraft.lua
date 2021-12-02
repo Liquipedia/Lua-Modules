@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require("Module:Lua")
+local Logic = require("Module:Logic")
 
 local StarcraftRecentMatches = Lua.import('Module:RecentMatches', {requireDevIfEnabled = true})
 
@@ -21,7 +22,7 @@ function StarcraftRecentMatches.requireOpponentModules()
 end
 
 function StarcraftRecentMatches.buildConditions(args)
-	local featured = args.featured == 'true'
+	local featured = Logic.readBool(args.featured)
 
 	local conditions = '[[dateexact::1]] AND [[finished::1]] AND [[date::<' .. _CURRENT_DATE_STAMP .. ']]'
 	if featured then
