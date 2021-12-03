@@ -36,7 +36,6 @@ end
 
 function CustomMatches.versus(opponentLeft, opponentRight, winner, bestof, finished, status)
 	local versus
-	local hasScore2
 
 	if status == _STATUS_UPCOMING then
 		versus = 'vs.'
@@ -47,14 +46,14 @@ function CustomMatches.versus(opponentLeft, opponentRight, winner, bestof, finis
 		versus = CustomMatches.displayOpponentScore(leftScore, finished and winner == 1)
 			.. ':'
 			.. CustomMatches.displayOpponentScore(rightScore, finished and winner == 2)
-		
+
 		local hasScore2 = (leftScore2 + rightScore2) > 0
 
 		if hasScore2 then
 			local lowerScoreDisplay = mw.html.create('div')
 				:css('font-size', '80%')
 				:css('padding-bottom', '1px')
-				:wikitext('(' .. scoreDisplay .. ')')
+				:wikitext('(' .. versus .. ')')
 
 			local upperScore = CustomMatches.displayOpponentScore(leftScore2, winner == 1)
 				.. ':'
@@ -64,13 +63,13 @@ function CustomMatches.versus(opponentLeft, opponentRight, winner, bestof, finis
 				:css('line-height', '1.1')
 				:wikitext(upperScore)
 
-			scoreDisplay = mw.html.create('div')
+			versus = mw.html.create('div')
 				:node(upperScoreDisplay)
 				:node(lowerScoreDisplay)
 		end
 	end
 
-	local bestof = tonumber(bestof or '')
+	bestof = tonumber(bestof or '')
 	if status ~= _STATUS_RECENT and bestof and not hasScore2 then
 		local bestofDisplay = mw.html.create('abbr')
 			:attr('title', 'Best of ' .. bestof)
