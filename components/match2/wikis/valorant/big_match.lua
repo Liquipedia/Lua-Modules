@@ -37,7 +37,12 @@ function BigMatch.run(frame)
 	-- Don't store match1 as BigMatch records are not complete
 	Match.store(match, {storeMatch1 = false, storeSmw = false})
 
-	local tournamentData = bigMatch:_fetchTournamentInfo(args.tournamentlink or '')
+	-- Attempty to automatically retrieve tournament link from the bracket
+	if Logic.isEmpty(args.tournamentlink) then
+		args.tournamentlink = bigMatch:_fetchTournamentLinkFromMatch(identifiers)
+	end
+
+	local tournamentData = bigMatch:_fetchTournamentInfo(args.tournamentlink)
 
 	match.patch = match.patch or tournamentData.patch
 	local tournament = {
@@ -355,10 +360,21 @@ function BigMatch:_createPlayerLookUp(opponent1Players, opponent2Players)
 end
 
 function BigMatch:_fetchTournamentInfo(page)
+	if not page then return {} end
+
 	return mw.ext.LiquipediaDB.lpdb('tournament', {
 		query = 'pagename, name, patch',
 		conditions = '[[pagename::'.. page .. ']]',
 	})[1] or {}
 end
+
+function BigMatch:_fetchTournamentLinkFromMatch(identifiers)
+	local data = mw.ext.LiquipediaDB.lpdb('match2', {
+		query = 'parent, pagename',
+		conditions = '[[match2id::'.. table.concat(identifiers,'_') .. ']]',
+	})[1] or {}
+	return Logic.emptyOr(data.parent, data.pagename)
+end
+
 
 return BigMatch
