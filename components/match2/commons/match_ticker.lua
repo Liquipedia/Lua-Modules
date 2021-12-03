@@ -112,7 +112,7 @@ function Matches.header(args, displayMode, status)
 		headerText = string.gsub(status, '^%l', string.upper)
 		headerText = headerText .. ' matches'
 	end
-	
+
 	return mw.html.create('div')
 		:addClass('infobox-header wiki-backgroundcolor-light')
 		:wikitext(headerText)
@@ -124,7 +124,7 @@ function Matches.innerWrapper(args, displayMode)
 	if displayMode == _DISPLAY_MODE_TOURNAMENT and not Logic.readBool(args.noWrapper) then
 		innerWrapper:addClass('fo-nttax-infobox wiki-bordercolor-light')
 	end
-	
+
 	return innerWrapper
 end
 
@@ -365,7 +365,6 @@ function Matches._checkForInelligableMatches(opponent1, opponent2, status)
 	return Matches._checkForTbdMatches(opponent1, opponent2)
 		or Matches._checkForInelligableOpponent(opponent1, status)
 		or Matches._checkForInelligableOpponent(opponent2, status)
-		or (isTbdMatch and _lastMatchWasTbdVsTbd)
 end
 
 function Matches._checkForInelligableOpponent(opponent, status)
@@ -450,7 +449,7 @@ function Matches.versus(opponentLeft, opponentRight, winner, bestof, finished, s
 			.. Matches.displayOpponentScore(rightScore, finished and winner == 2)
 	end
 
-	local bestof = tonumber(bestof or '')
+	bestof = tonumber(bestof or '')
 	if bestof and status ~= _STATUS_RECENT then
 		local bestofDisplay = mw.html.create('abbr')
 			:attr('title', 'Best of ' .. bestof)
