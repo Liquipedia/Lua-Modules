@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Logic = require('Module:Logic')
 local Match = require("Module:Match")
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local Template = require('Module:Template')
@@ -38,7 +39,7 @@ function BigMatch.run(frame)
 	Match.store(match, {storeMatch1 = false, storeSmw = false})
 
 	-- Attempty to automatically retrieve tournament link from the bracket
-	if Logic.isEmpty(args.tournamentlink) then
+	if String.isEmpty(args.tournamentlink) then
 		args.tournamentlink = bigMatch:_fetchTournamentLinkFromMatch(identifiers)
 	end
 
@@ -360,7 +361,9 @@ function BigMatch:_createPlayerLookUp(opponent1Players, opponent2Players)
 end
 
 function BigMatch:_fetchTournamentInfo(page)
-	if not page then return {} end
+	if not page then
+		return {}
+	end
 
 	return mw.ext.LiquipediaDB.lpdb('tournament', {
 		query = 'pagename, name, patch',
@@ -371,7 +374,7 @@ end
 function BigMatch:_fetchTournamentLinkFromMatch(identifiers)
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
 		query = 'parent, pagename',
-		conditions = '[[match2id::'.. table.concat(identifiers,'_') .. ']]',
+		conditions = '[[match2id::'.. table.concat(identifiers, '_') .. ']]',
 	})[1] or {}
 	return Logic.emptyOr(data.parent, data.pagename)
 end
