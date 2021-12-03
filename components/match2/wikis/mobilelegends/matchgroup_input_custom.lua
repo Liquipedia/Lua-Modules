@@ -16,12 +16,12 @@ local ChampionNames = mw.loadData('Module:HeroNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
-local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
-local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 5
-local MAX_NUM_VODGAMES = 9
-local DEFAULT_BESTOF = 3
-local ERROR_NUM = -99
+local _ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
+local _MAX_NUM_OPPONENTS = 2
+local _MAX_NUM_PLAYERS = 5
+local _MAX_NUM_VODGAMES = 9
+local _DEFAULT_BESTOF = 3
+local _NO_SCORE = -99
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 
@@ -56,7 +56,7 @@ end
 
 function matchFunctions.adjustMapData(match)
 	local opponents = {}
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
 		opponents[opponentIndex] = match['opponent' .. opponentIndex]
 	end
 	local mapIndex = 1
@@ -181,8 +181,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			end
 		end
 	else
-		local lastScore = ERROR_NUM
-		local lastPlacement = ERROR_NUM
+		local lastScore = _NO_SCORE
+		local lastPlacement = _NO_SCORE
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score or '') or ''
@@ -206,8 +206,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or ERROR_NUM) or ERROR_NUM
-	local value2 = tonumber(table[key2].score or ERROR_NUM) or ERROR_NUM
+	local value1 = tonumber(table[key1].score or _NO_SCORE) or _NO_SCORE
+	local value2 = tonumber(table[key2].score or _NO_SCORE) or _NO_SCORE
 	return value1 > value2
 end
 
@@ -245,7 +245,7 @@ end
 -- match related functions
 --
 function matchFunctions.getBestOf(match)
-	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof', DEFAULT_BESTOF))
+	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof', _DEFAULT_BESTOF))
 	Variables.varDefine('bestof', match.bestof)
 	return match
 end
@@ -262,13 +262,13 @@ function matchFunctions.getScoreFromMapWinners(match)
 	while match['map'..mapIndex] do
 		local winner = tonumber(match['map'..mapIndex].winner)
 		foundScores = true
-		if winner and winner > 0 and winner <= MAX_NUM_OPPONENTS then
+		if winner and winner > 0 and winner <= _MAX_NUM_OPPONENTS then
 			newScores[winner] = (newScores[winner] or 0) + 1
 		end
 		mapIndex = mapIndex + 1
 	end
 
-	for index = 1, MAX_NUM_OPPONENTS do
+	for index = 1, _MAX_NUM_OPPONENTS do
 		if not match['opponent' .. index].score and foundScores then
 			match['opponent' .. index].score = newScores[index] or 0
 		end
@@ -352,7 +352,7 @@ function matchFunctions.getVodStuff(match)
 	if match.recap then links.recap = match.recap end
 
 	-- apply vodgames
-	for index = 1, MAX_NUM_VODGAMES do
+	for index = 1, _MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]
 		if not Logic.isEmpty(vodgame) then
 			local map = match['map' .. index] or {}
@@ -377,7 +377,7 @@ function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
@@ -399,7 +399,7 @@ function matchFunctions.getOpponents(match)
 				opponent.score = tonumber(opponent.score)
 				opponent.status = 'S'
 				isScoreSet = true
-			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
+			elseif Table.includes(_ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
 				opponent.score = -1
 			end
@@ -427,7 +427,7 @@ function matchFunctions.getOpponents(match)
 		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, 'L')
 		opponents[winnerIndex].status = 'W'
 		match.finished = true
-	elseif Logic.isNumeric(match.winner) and Table.includes(ALLOWED_STATUSES, match.walkover) then
+	elseif Logic.isNumeric(match.winner) and Table.includes(_ALLOWED_STATUSES, match.walkover) then
 		local winnerIndex = tonumber(match.winner)
 		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, match.walkover)
 		opponents[winnerIndex].status = 'W'
@@ -486,7 +486,7 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 	playersData = Json.parseIfString(playersData) or {}
 	local players = {}
 	local count = 1
-	for playerIndex = 1, MAX_NUM_PLAYERS do
+	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or playersData['p' .. playerIndex]
@@ -526,8 +526,8 @@ end
 function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local championData = {}
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		for playerIndex = 1, MAX_NUM_PLAYERS do
+	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
+		for playerIndex = 1, _MAX_NUM_PLAYERS do
 			local champ = map['team' .. opponentIndex .. 'champion' .. playerIndex] or
 				map['t' .. opponentIndex .. 'c' .. playerIndex] or
 				map['team' .. opponentIndex .. 'hero' .. playerIndex] or
@@ -587,7 +587,7 @@ end
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
-	for scoreIndex = 1, MAX_NUM_OPPONENTS do
+	for scoreIndex = 1, _MAX_NUM_OPPONENTS do
 		-- read scores
 		local score = map['score' .. scoreIndex] or map['t' .. scoreIndex .. 'score']
 		local obj = {}
@@ -597,7 +597,7 @@ function mapFunctions.getScoresAndWinner(map)
 				score = tonumber(score)
 				map['score' .. scoreIndex] = score
 				obj.score = score
-			elseif Table.includes(ALLOWED_STATUSES, score) then
+			elseif Table.includes(_ALLOWED_STATUSES, score) then
 				obj.status = score
 				obj.score = -1
 			end
