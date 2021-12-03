@@ -36,6 +36,7 @@ end
 
 function CustomMatches.versus(opponentLeft, opponentRight, winner, bestof, finished, status)
 	local versus
+	local hasScore2
 
 	if status == _STATUS_UPCOMING then
 		versus = 'vs.'
@@ -47,7 +48,7 @@ function CustomMatches.versus(opponentLeft, opponentRight, winner, bestof, finis
 			.. ':'
 			.. CustomMatches.displayOpponentScore(rightScore, finished and winner == 2)
 
-		local hasScore2 = (leftScore2 + rightScore2) > 0
+		hasScore2 = (leftScore2 + rightScore2) > 0
 
 		if hasScore2 then
 			local lowerScoreDisplay = mw.html.create('div')
