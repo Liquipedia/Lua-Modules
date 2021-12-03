@@ -388,9 +388,6 @@ function Matches._checkForTbdMatches(opponent1, opponent2)
 end
 
 function Matches._opponentIsTbd(opponent)
-	local name = string.lower(opponent.name or '')
-	local template = string.lower(opponent.template or '')
-
 	return string.lower(opponent.name or '') == Matches.tbdIdentifier()
 		or string.lower(opponent.template or '') == Matches.tbdIdentifier()
 end
