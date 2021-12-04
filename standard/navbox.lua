@@ -4,6 +4,7 @@
 local NavBar = require('Module:Navbar')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
+local Namespace = require('Module:Namespace')
 
 local NavBox = {}
 
@@ -431,10 +432,9 @@ end
 ---
 -- Tracking categories
 --
-local _TEMPLATE_NAMESPACE_NUMBER = 10
 function NavBox._addTrackingCategories(wrapper)
 	local title = mw.title.getCurrentTitle()
-	if title.namespace ~= _TEMPLATE_NAMESPACE_NUMBER then
+	if title.namespace ~= Namespace.idFromName('Template') then
 		return wrapper
 	end
 
