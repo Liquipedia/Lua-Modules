@@ -19,12 +19,11 @@ function NavBox._navbox(args, border)
 end
 
 function NavBox.NavBox(args, border)
-	args = args or {}
-	_border = args.border or border
+	_args = args or {}
+	_border = _args.border or border
 	if _border == 'child' then
 		_border = 'subgroup'
 	end
-	_args = args
 
 	local body = NavBox._renderBody()
 
@@ -214,7 +213,7 @@ function NavBox._renderNavBar(titleCell)
 		and _args.navbar ~= 'plain'
 		and (
 			String.isNotEmpty(_args.name) or
-			NavBox._checkAgainstNavboxTemplate()
+			NavBox._isNotNavboxTemplate()
 		)
 	then
 		titleCell:wikitext(NavBar.NavBar(
@@ -236,7 +235,9 @@ function NavBox._renderNavBar(titleCell)
 	return titleCell
 end
 
-function NavBox._checkAgainstNavboxTemplate()
+-- checks if the template being used to display the navbox
+-- is the (main) Navbox template or its sandbox
+function NavBox._isNotNavboxTemplate()
 	return mw.getCurrentFrame():getParent():getTitle():gsub('/sandbox$', '') ~= 'Template:Navbox'
 end
 
@@ -277,8 +278,12 @@ function NavBox._processItem(item, noWrapItems)
 
 	if noWrapItems == 'yes' then
 		local lines = {}
+		-- splits the list (as wiki text) given in the
+		-- list parameter (= item in this case) into lines
 		for line in (item .. '\n'):gmatch('([^\n]*)\n') do
+			-- splits the line into its prefix (`*` or `#`) and its content
 			local prefix, content = line:match('^([*:;#]+)%s*(.*)')
+			-- if the prefix is non empty and the content doesn't start with a nowrap span then ...
 			if prefix and not content:match('^<span class="nowrap">') then
 				line = prefix .. '<span class="nowrap">' .. content .. '</span>'
 			end
@@ -287,6 +292,7 @@ function NavBox._processItem(item, noWrapItems)
 		item = table.concat(lines, '\n')
 	end
 
+	-- if the item starts with a `*` or `#` (i.e. is a list) then ...
 	if item:match('^[*:;#]') then
 		return '\n' .. item ..'\n'
 	end
