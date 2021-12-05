@@ -284,8 +284,6 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		local suggestedDate = Variables.varDefaultMulti(
-			'matchDate',
-			'Match_date',
 			'tournament_enddate',
 			'tournament_startdate',
 			_EPOCH_TIME
@@ -322,10 +320,6 @@ function matchFunctions.getVodStuff(match)
 		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
 		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
 		nimo = Logic.emptyOr(match.stream.nimo or match.nimo, Variables.varDefault('nimo')),
-		trovo = Logic.emptyOr(match.stream.trovo or match.trovo, Variables.varDefault('trovo')),
-		huya = Logic.emptyOr(match.stream.huya or match.huya, Variables.varDefault('huya')),
-		text = Logic.emptyOr(match.stream.text or match.text, Variables.varDefault('text')),
-		separator = Logic.emptyOr(match.stream.separator or match.twitch2, Variables.varDefault('separator')),
 		afreeca = Logic.emptyOr(match.stream.afreeca or match.afreeca, Variables.varDefault('afreeca')),
 		afreecatv = Logic.emptyOr(match.stream.afreecatv or match.afreecatv, Variables.varDefault('afreecatv')),
 		dailymotion = Logic.emptyOr(match.stream.dailymotion or match.dailymotion, Variables.varDefault('dailymotion')),
@@ -351,15 +345,6 @@ function matchFunctions.getVodStuff(match)
 	if match.review then links.review = match.review end
 	if match.recap then links.recap = match.recap end
 
-	-- apply vodgames
-	for index = 1, _MAX_NUM_VODGAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
 	return match
 end
 
