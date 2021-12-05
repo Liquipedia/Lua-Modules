@@ -94,9 +94,8 @@ function StarcraftMatchGroupInput.checkFinished(match)
 	-- certain amount of time (depending on whether the date is exact)
 	if match.finished ~= true then
 		local currentUnixTime = os.time(os.date('!*t'))
-		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if match.date + threshold < currentUnixTime then
 			match.finished = true
 		end
 	end

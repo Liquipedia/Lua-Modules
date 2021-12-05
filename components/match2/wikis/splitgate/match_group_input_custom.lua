@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Date = require('Module:Date')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -22,8 +23,6 @@ local _MAX_NUM_VODGAMES = 9
 local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -274,7 +273,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
+			date = Date.timestampZero,
 			dateexact = false,
 		}
 	end
@@ -440,10 +439,8 @@ function matchFunctions.getOpponents(match)
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
 		local currentUnixTime = os.time(os.date('!*t'))
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if match.date + threshold < currentUnixTime then
 			match.finished = true
 		end
 	end
@@ -536,7 +533,6 @@ end
 --
 function opponentFunctions.getTeamNameAndIcon(template, date)
 	local team, icon
-	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
 	template = (template or ''):lower():gsub('_', ' ')
 	if template ~= '' and template ~= 'noteam' and
 		mw.ext.TeamTemplate.teamexists(template) then

@@ -449,10 +449,8 @@ function matchFunctions.getOpponents(match)
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
 		local currentUnixTime = os.time(os.date('!*t'))
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if match.date + threshold < currentUnixTime then
 			match.finished = true
 		end
 	end
@@ -632,7 +630,6 @@ end
 --
 function opponentFunctions.getTeamNameAndIcon(template, date)
 	local team, icon
-	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
 	template = (template or ''):lower():gsub('_', ' ')
 	if template ~= '' and template ~= 'noteam' and
 		mw.ext.TeamTemplate.teamexists(template) then
