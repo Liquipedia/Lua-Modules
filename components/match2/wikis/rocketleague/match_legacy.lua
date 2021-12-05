@@ -60,7 +60,7 @@ function p.storeMatchSMW(match, match2)
 		"Has calendar icon=" .. (not Logic.isEmpty(icon) and "File:" .. icon or ""),
 		"Has calendar description=" .. " - " .. Logic.emptyOr(match.opponent1, "TBD")
 			.. " vs " .. Logic.emptyOr(match.opponent2, "TBD") .. " on "
-			.. Logic.emptyOr(match.date, "TBD")
+			.. Logic.emptyOr(smwFormattedDate, "TBD")
 	 })
 end
 
@@ -72,7 +72,7 @@ function p.storeGames(match, match2)
 		game.opponent2 = match.opponent2
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
-		game.date = match.date
+		game.date = Date.formatTimestamp("c", match.date or 0)
 		local scores = game.scores or {}
 		if type(scores) == "string" then
 			scores = json.parse(scores)

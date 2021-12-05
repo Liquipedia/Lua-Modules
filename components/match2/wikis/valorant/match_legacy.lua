@@ -8,6 +8,7 @@
 
 local p = {}
 
+local Date = require("Module:Date/Ext")
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
 local DisplayHelper = require("Module:MatchGroup/Display/Helper")
@@ -39,7 +40,7 @@ function p.storeMatchSMW(match, match2)
 		"has team right=" .. (match.opponent2 or ""),
 		"has teams=" .. (match.opponent1 or "")..','..(match.opponent2 or ""),
 		"has teams page=" .. (match.opponent1 or "")..','..(match.opponent2 or ""),
-		"Has map date=" .. (match.date or ""),
+		"Has map date=" .. (Date.formatTimestamp("c", match.date or 0)),
 		"Has tournament=" .. mw.title.getCurrentTitle().prefixedText,
 		"Has tournament tier=" .. (match.liquipediatier or ""),
 		"Has match stream=" .. (streams.stream or ""),
@@ -119,7 +120,7 @@ function p.storeGames(match, match2)
 		game.opponent2 = match.opponent2
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
-		game.date = match.date
+		game.date = Date.formatTimestamp("c", match.date or 0)
 		local scores = game2.scores or {}
 		if type(scores) == "string" then
 			scores = json.parse(scores)

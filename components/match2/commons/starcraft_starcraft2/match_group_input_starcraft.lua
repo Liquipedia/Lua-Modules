@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -70,7 +71,7 @@ function StarcraftMatchGroupInput.readDate(matchArgs)
 	if matchArgs.date then
 		local dateProps = MatchGroupInput.readDate(matchArgs.date)
 		dateProps.dateexact = Logic.readBool(matchArgs.dateexact) or dateProps.dateexact
-		Variables.varDefine('matchDate', dateProps.date)
+		Variables.varDefine('matchDate', Date.formatTimestamp('c', dateProps.date))
 		return dateProps
 	else
 		local suggestedDate = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate', '1970-01-01')

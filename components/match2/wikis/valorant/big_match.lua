@@ -9,6 +9,7 @@
 local Arguments = require("Module:Arguments")
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
+local Date = require('Module:Date/Ext')
 local DivTable = require('Module:DivTable')
 local Json = require("Module:Json")
 local Lua = require('Module:Lua')
@@ -135,7 +136,8 @@ function BigMatch:overview(match)
 				Countdown.create{
 					rawdatetime = true,
 					finished = match.finished,
-					date = match.date .. '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+					date = Date.formatTimestamp("c", match.date or 0) ..
+						'<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 				}
 			))
 		)
@@ -282,7 +284,8 @@ function BigMatch:_createTeamSeparator(format, match)
 		:addClass('fb-match-page-header-live')
 		:css('font-weight', 'bold')
 		:wikitext(Countdown.create{
-			date = match.date .. '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>',
+			date = Date.formatTimestamp("c", match.date or 0) ..
+				'<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>',
 			finished = Logic.readBool(match.finished) and 'true' or '',
 			rawcountdown = true,
 		})
