@@ -270,7 +270,12 @@ function matchFunctions.readDate(matchArgs)
 	if matchArgs.date then
 		return MatchGroupInput.readDate(matchArgs.date)
 	else
-		local suggestedDate = Variables.varDefaultMulti('tournament_date', 'tournament_sdate', 'tournament_edate', Date.timestampZero)
+		local suggestedDate = Variables.varDefaultMulti(
+			'tournament_date',
+			'tournament_sdate',
+			'tournament_edate',
+			Date.timestampZero
+		)
 		return MatchGroupInput.getInexactDate(suggestedDate)
 	end
 end

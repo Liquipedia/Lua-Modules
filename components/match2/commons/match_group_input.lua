@@ -210,7 +210,9 @@ end
 
 function MatchGroupInput.readDate(dateString)
 	local date, _, timezoneName = Date.readTimestamp(dateString)
-	return {date = date, dateexact = String.isNotEmpty(timezoneName), dateisestimate = false, timezone = timezoneName or 'UTC'}
+	local dateExact = String.isNotEmpty(timezoneName)
+	timezoneName = timezoneName or 'UTC'
+	return {date = date, dateexact = dateExact, dateisestimate = false, timezone = timezoneName}
 end
 
 function MatchGroupInput.getInexactDate(suggestedDate)
