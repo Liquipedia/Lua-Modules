@@ -305,7 +305,7 @@ function Match._prepareRecordsForStore(records)
 		end
 	end
 	for _, gameRecord in ipairs(records.gameRecords) do
-		gameRecord.date = Date.formatTimestamp('Y-m-d  H:i:s', gameRecord.date or '')
+		gameRecord.date = Date.formatTimestamp('Y-m-d H:i:s', gameRecord.date or 0)
 		Match.clampFields(gameRecord, Match.gameFields)
 	end
 end
@@ -313,7 +313,7 @@ end
 function Match._prepareMatchRecordForStore(match)
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
 	match.finished = Logic.readBool(match.finished) and 1 or 0
-	match.date = Date.formatTimestamp('Y-m-d  H:i:s', match.date or '')
+	match.date = Date.formatTimestamp('Y-m-d H:i:s', match.date or 0)
 	match.extradata.dateisestimate = Logic.readBool(match.dateisestimate) and 1 or 0
 	match.extradata.timezone = match.timezone
 	match.match2bracketdata = match.match2bracketdata or match.bracketdata
