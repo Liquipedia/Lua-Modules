@@ -114,7 +114,7 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateexact then
-		dateString = Date.formatTimestamp('F j, Y - H:i', match.date) ..
+		dateString = Date.formatTimestamp('F j, Y - H:i', match.date) .. ' ' ..
 			Template.safeExpand(mw.getCurrentFrame(), 'Abbr/'.. match.timezone or 'UTC', {}, 'Abbr/UTC')
 	elseif not match.dateisestimate then
 		dateString = Date.formatTimestamp('F j, Y', match.date)
