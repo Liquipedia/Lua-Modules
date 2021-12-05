@@ -149,7 +149,7 @@ function CustomMatchSummary._createMapRow(game)
 
 	-- Add Header
 	if Logic.isNotEmpty(game.header) then
-		local mapHeader = mw.html.create('div')
+		local mapHeader = htmlCreate('div')
 			:wikitext(game.header)
 			:css('font-weight','bold')
 			:css('font-size','85%')
@@ -158,7 +158,7 @@ function CustomMatchSummary._createMapRow(game)
 		row:addElement(MatchSummary.Break():create())
 	end
 
-	local centerNode = mw.html.create('div')
+	local centerNode = htmlCreate('div')
 		:addClass('brkts-popup-spaced')
 		:wikitext('[[' .. game.map .. ']]')
 		:css('text-align', 'center')
@@ -187,7 +187,7 @@ function CustomMatchSummary._createMapRow(game)
 	-- Add Comment
 	if Logic.isNotEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
-		local comment = mw.html.create('div')
+		local comment = htmlCreate('div')
 			:wikitext(game.comment)
 			:css('margin', 'auto')
 		row:addElement(comment)
