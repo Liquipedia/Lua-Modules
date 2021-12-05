@@ -25,14 +25,12 @@ local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14p
 local _RED_CROSS = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
 local _ICONS = {
 	check = _GREEN_CHECK,
-	cross = _RED_CROSS
 }
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
 	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
-	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
 }
 
 local CustomMatchSummary = {}
@@ -40,10 +38,7 @@ local CustomMatchSummary = {}
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
-	local frame = mw.getCurrentFrame()
-
 	local matchSummary = MatchSummary():init()
-	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 		:body(CustomMatchSummary._createBody(match))
@@ -51,7 +46,6 @@ function CustomMatchSummary.getByMatchId(args)
 	-- comment
 	if match.comment then
 		local comment = MatchSummary.Comment():content(match.comment)
-		comment.root:css('display', 'block'):css('text-align', 'center')
 		matchSummary:comment(comment)
 	end
 
