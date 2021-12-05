@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Date = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -21,8 +22,6 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 5
 local MAX_NUM_VODGAMES = 9
 local DEFAULT_BESTOF = 3
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -287,7 +286,7 @@ function matchFunctions.readDate(matchArgs)
 			'Match_date',
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME
+			Date.timestampZero
 		)
 		return MatchGroupInput.getInexactDate(suggestedDate)
 	end

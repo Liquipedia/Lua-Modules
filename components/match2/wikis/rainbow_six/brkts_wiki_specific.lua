@@ -6,16 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Date = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
 
 function WikiSpecific.matchHasDetails(match)
 	return match.dateIsExact
-		or match.date ~= _EPOCH_TIME_EXTENDED
+		or match.date ~= Date.timestampZero
 		or match.vod
 		or not Table.isEmpty(match.links)
 		or match.comment
