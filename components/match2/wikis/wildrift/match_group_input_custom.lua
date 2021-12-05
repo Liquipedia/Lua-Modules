@@ -289,10 +289,7 @@ function matchFunctions.readDate(matchArgs)
 			'tournament_startdate',
 			_EPOCH_TIME
 		)
-		return {
-			date = MatchGroupInput.getInexactDate(suggestedDate),
-			dateexact = false,
-		}
+		return MatchGroupInput.getInexactDate(suggestedDate)
 	end
 end
 

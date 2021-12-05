@@ -108,7 +108,7 @@ end
 function matchFunctions.readDate(matchArgs)
 	return matchArgs.date
 		and MatchGroupInput.readDate(matchArgs.date)
-		or {date = MatchGroupInput.getInexactDate(), dateexact = false}
+		or MatchGroupInput.getInexactDate()
 end
 
 function matchFunctions.getTournamentVars(match)
