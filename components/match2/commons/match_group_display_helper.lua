@@ -100,8 +100,13 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateexact then
-		dateString = Date.formatTimestamp('F j, Y - H:i', match.date) .. ' ' ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Abbr/'.. match.timezone or 'UTC', {}, 'Abbr/UTC')
+		local tzString = Template.safeExpand(mw.getCurrentFrame(), 'Abbr/'.. (match.timezone or 'UTC'), {}, 'Abbr/UTC')
+
+		-- Adjust the UTC of match.date to the match's timezone
+		local timestampTzOffset, _, _ = Date.readTimestamp('1970-01-01 00:00' ..  tzString) -- Get timezone offset
+		local tzAdjustedDate = match.date - timestampTzOffset
+
+		dateString = Date.formatTimestamp('F j, Y - H:i', tzAdjustedDate) .. ' ' .. tzString
 	elseif not match.dateisestimate then
 		dateString = Date.formatTimestamp('F j, Y', match.date)
 	else
