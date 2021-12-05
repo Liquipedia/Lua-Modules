@@ -22,6 +22,10 @@ local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requ
 
 local BigMatch = Class.new()
 
+local _ROUNDS_PER_HALF = 12
+local _COLOR_FIRST_TEAM = '#B12A2A'
+local _COLOR_SECOND_TEAM = '#1E7D7D'
+
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
 	local bigMatch = BigMatch()
@@ -233,9 +237,15 @@ function BigMatch:economy(match, opponent1, opponent2)
 
 		tabs['name' .. ind] = 'Map ' .. ind
 
-		local data = {}
-		for index, round in ipairs(map.rounds) do
-			table.insert(data, {
+		local function processRound(index, storage)
+			local round = map.rounds[index]
+
+			-- Chart Ext and API Ext don't agree on name yet
+			if round.winby == 'detonate' then
+				round.winby = 'explosion'
+			end
+
+			table.insert(storage, {
 				name = 'Round ' .. index,
 				winby = round.winby,
 				buy = round.buy,
@@ -244,24 +254,49 @@ function BigMatch:economy(match, opponent1, opponent2)
 			})
 		end
 
-		local chart = mw.ext.Charts.economytimeline({
-			size = {
-				height = 600,
-				width = 800
-			},
-			colors = {'#B12A2A', '#1E7D7D'},
-			groups = {opponent1.name, opponent2.name},
-			data = data,
-			markareas = {
-				{ name = 'Eco', from = 0, to = 6000 },
-				{ name = 'Semi-Eco', from = 6000, to = 14000 },
-				{ name = 'Semi-Buy', from = 14000, to = 20000 },
-				{ name = 'Full-Buy', from = 20000, to = 40000 },
-			},
-		})
+		local function createChart(data, colors)
+			return mw.ext.Charts.economytimeline({
+				size = {
+					height = 600,
+					width = 800
+				},
+				colors = colors,
+				groups = {opponent1.name, opponent2.name},
+				data = data,
+				markareas = {
+					{ name = 'Eco', from = 0, to = 6000 },
+					{ name = 'Semi-Eco', from = 6000, to = 14000 },
+					{ name = 'Semi-Buy', from = 14000, to = 20000 },
+					{ name = 'Full-Buy', from = 20000, to = 40000 },
+				},
+			})
+		end
+
+		local function processHalf(startIndex, endIndex, colors)
+			local data = {}
+			for index = startIndex, endIndex do
+				processRound(index, data)
+			end
+			return #data > 0 and createChart(data, colors) or ''
+		end
+
+		local chart = ''
+		-- First half
+		chart = chart .. processHalf(1,
+									math.min(#map.rounds, _ROUNDS_PER_HALF),
+									{_COLOR_FIRST_TEAM, _COLOR_SECOND_TEAM})
+		-- Second half
+		chart = chart .. processHalf(_ROUNDS_PER_HALF+1,
+									math.min(#map.rounds, 2*_ROUNDS_PER_HALF),
+									{_COLOR_SECOND_TEAM, _COLOR_FIRST_TEAM})
+		-- OT
+		chart = chart .. processHalf(2*_ROUNDS_PER_HALF+1,
+									#map.rounds,
+									{_COLOR_FIRST_TEAM, _COLOR_SECOND_TEAM})
 
 		local chartContainer = mw.html.create('div'):addClass('fb-match-page-economy-timeline')
-													:node(chart)
+			:css('flex-direction', 'column'):css('align-items', 'center')
+			:node(chart)
 
 		tabs['content' .. ind] = tostring(chartContainer)
 
