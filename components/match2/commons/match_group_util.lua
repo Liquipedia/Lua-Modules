@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -132,8 +133,9 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
 	comment = 'string?',
-	date = 'string',
+	date = 'number',
 	dateIsExact = 'boolean',
+	dateIsEstimate = 'boolean',
 	finished = 'boolean',
 	games = TypeUtil.array(MatchGroupUtil.types.Game),
 	links = 'table',
@@ -142,6 +144,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
 	resultType = 'string?',
 	stream = 'table',
+	timezone = 'string',
 	type = 'string?',
 	vod = 'string?',
 	walkover = 'string?',
@@ -342,8 +345,9 @@ function MatchGroupUtil.matchFromRecord(record)
 		bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata), #opponents),
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
-		date = record.date,
+		date = Date.readTimestamp(record.date),
 		dateIsExact = Logic.readBool(record.dateexact),
+		dateIsEstimate = Logic.readBool(Table.extract(extradata, 'dateisestimate')),
 		finished = Logic.readBool(record.finished),
 		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
 		links = Json.parseIfString(record.links) or {},
@@ -352,6 +356,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		opponents = opponents,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
+		timezone = nilIfEmpty(Table.extract(extradata, 'timezone')),
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),

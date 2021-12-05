@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
@@ -207,23 +208,21 @@ function MatchGroupInput.applyOverrideArgs(matches, args)
 	end
 end
 
-local getContentLanguage = FnUtil.memoize(mw.getContentLanguage)
-
 function MatchGroupInput.readDate(dateString)
-	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
-	local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
-	local matchDate = String.explode(dateString, '<', 0):gsub('-', '')
-	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
-	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
-	return {date = date, dateexact = isDateExact}
+	local date, _, timezoneName = Date.readTimestamp(dateString)
+	local dateExact = String.isNotEmpty(timezoneName)
+	timezoneName = timezoneName or 'UTC'
+	return {date = date, dateexact = dateExact, dateisestimate = false, timezone = timezoneName}
 end
 
 function MatchGroupInput.getInexactDate(suggestedDate)
 	suggestedDate = suggestedDate or globalVars:get('tournament_date')
+	local date = Date.readTimestamp(suggestedDate)
+	-- Add a second for each match missing date, so matches are displayed in order when queried.
 	local missingDateCount = globalVars:get('num_missing_dates') or 0
 	globalVars:set('num_missing_dates', missingDateCount + 1)
-	local inexactDateString = (suggestedDate or '') .. ' + ' .. missingDateCount .. ' second'
-	return getContentLanguage():formatDate('c', inexactDateString)
+	date = date + missingDateCount
+	return {date = date, dateexact = false, dateisestimate = true, timezone = 'UTC'}
 end
 
 --[[

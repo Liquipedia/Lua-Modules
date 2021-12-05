@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
@@ -99,9 +100,9 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateIsExact == true then
-		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. _UTC
+		dateString = Date.formatTimestamp('F j, Y - H:i', match.date) .. _UTC
 	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
+		dateString = Date.formatTimestamp('F j, Y', match.date)
 	end
 
 	local stream = Table.merge(match.stream, {
