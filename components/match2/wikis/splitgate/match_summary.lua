@@ -10,7 +10,7 @@ local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
+local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
@@ -70,11 +70,11 @@ function CustomMatchSummary.getByMatchId(args)
 
 		-- Game Vods
 		for index, vod in pairs(vods) do
-			footer:addElement(Template.safeExpand(frame, 'vodlink', {
+			footer:addElement(VodLink.display{
 				gamenum = index,
 				vod = vod,
 				source = vod.url
-			}))
+			})
 		end
 
 		-- Match Vod + other links
