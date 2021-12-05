@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -291,7 +292,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata), #opponents),
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
-		date = record.date,
+		date = Date.readTimestamp(record.date),
 		dateexact = Logic.readBool(record.dateexact),
 		dateisestimate = Logic.readBool(Table.extract(extradata, 'dateisestimate')),
 		finished = Logic.readBool(record.finished),
