@@ -22,7 +22,6 @@ local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local htmlCreate = mw.html.create
 
 local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local _RED_CROSS = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
 local _ICONS = {
 	check = _GREEN_CHECK,
 }
