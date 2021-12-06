@@ -153,8 +153,8 @@ function CustomTeam.listSubTeams()
 	end
 	local subTeams = Team:getAllArgsForBase(_team.args, 'subteam')
 	local subTeamsToStore = {}
-	for key, item in pairs(subTeams) do
-		subTeamsToStore['subteam' .. key] = mw.ext.TeamLiquidIntegration.resolve_redirect(item)
+	for index, subTeam in pairs(subTeams) do
+		subTeamsToStore['subteam' .. index] = mw.ext.TeamLiquidIntegration.resolve_redirect(subTeam)
 	end
 	return Json.stringify(subTeamsToStore)
 end
