@@ -423,6 +423,9 @@ function NavBox._striped(wikiText)
 			return index % 2 == 1 and first or second
 		end
 	end
+	-- replace `[` with `%[` and `]` with `%]`
+	-- needed so that the string can be used as a regular expresion,
+	-- where `[` and `]` need to be escaped
 	local regex = orphanCategory:gsub('([%[%]])', '%%%1')
 	wikiText = wikiText:gsub(regex, '')
 	wikiText = wikiText:gsub(_REGEX_MARKER, changer)
