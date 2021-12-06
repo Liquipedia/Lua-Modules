@@ -148,7 +148,7 @@ end
 -- this data can be used in results queries to include
 -- results of accademy teams of the current team
 function CustomTeam.listSubTeams()
-	if String.isEmpty(_team.args.team2) then
+	if String.isEmpty(_team.args.subteam) and String.isEmpty(_team.args.subteam1) then
 		return nil
 	end
 	local subTeams = Team:getAllArgsForBase(_team.args, 'subteam')
