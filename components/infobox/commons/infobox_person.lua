@@ -36,6 +36,7 @@ local _shouldStoreData
 local _region
 local _warnings = {}
 local _earningsPerYear = {}
+local _totalEarnings
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -58,7 +59,7 @@ function Person:createInfobox()
 	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
 	local personType = self:getPersonType(args)
-	local earnings = self:calculateEarnings(args)
+	_totalEarnings, _earningsPerYear = self:calculateEarnings(args)
 
 	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
 			birthdate = args.birth_date,
@@ -114,9 +115,9 @@ function Person:createInfobox()
 		Cell{name = 'Nicknames', content = {args.nicknames}},
 		Builder{
 			builder = function()
-				if earnings and earnings ~= 0 then
+				if _totalEarnings and _totalEarnings ~= 0 then
 					return {
-						Cell{name = 'Total Earnings', content = {'$' .. Language:formatNum(earnings)}},
+						Cell{name = 'Total Earnings', content = {'$' .. Language:formatNum(_totalEarnings)}},
 					}
 				end
 			end
@@ -179,15 +180,14 @@ function Person:createInfobox()
 			args,
 			links,
 			statusToStore,
-			personType.store,
-			earnings
+			personType.store
 		)
 	end
 
 	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
-function Person:_setLpdbData(args, links, status, personType, earnings)
+function Person:_setLpdbData(args, links, status, personType)
 	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
 
 	local lpdbData = {
@@ -206,7 +206,7 @@ function Person:_setLpdbData(args, links, status, personType, earnings)
 		team = args.teamlink or args.team,
 		status = status,
 		type = personType,
-		earnings = earnings,
+		earnings = _totalEarnings,
 		links = links,
 		extradata = {},
 	}
@@ -296,12 +296,10 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	local totalEarnings
-	totalEarnings, _earningsPerYear = Earnings.calculateForPlayer{
+	return Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
 		perYear = true
 	}
-	return totalEarnings
 end
 
 function Person:_createRegion(region, country)
