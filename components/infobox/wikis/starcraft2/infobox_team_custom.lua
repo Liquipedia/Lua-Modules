@@ -156,7 +156,7 @@ function CustomTeam.listSubTeams()
 	for key, item in pairs(subTeams) do
 		subTeamsToStore['subteam' .. key] = mw.ext.TeamLiquidIntegration.resolve_redirect(item)
 	end
-	return Json.stringify(subTeams)
+	return Json.stringify(subTeamsToStore)
 end
 
 function CustomTeam.playerBreakDown(args)
