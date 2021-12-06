@@ -281,12 +281,13 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['maps'] = table.concat(mappages, ';')
 
 	lpdbData['game'] = GameLookup.getName({args.game})
-	lpdbData['patch'] = args.patch
+	lpdbData['patch'] = args.patch or args.voobly
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
 		deadline = DateClean(args.deadline or ''),
-		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ',')
+		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ','),
+		version = args.version
 	}
 
 	return lpdbData
