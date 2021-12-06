@@ -152,6 +152,9 @@ function CustomTeam.listSubTeams()
 		return nil
 	end
 	local subTeams = Team:getAllArgsForBase(_team.args, 'subteam')
+	for key, item in pairs(subTeams) do
+		subTeams[key] = mw.ext.TeamLiquidIntegration.resolve_redirect(item)
+	end
 	return Json.stringify(subTeams)
 end
 
