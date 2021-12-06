@@ -337,10 +337,6 @@ function CustomCommentator:adjustLPDB(lpdbData, _, personType)
 		extradata.factionhistorical = true
 	end
 
-	for key, item in pairs(_earningsGlobal or {}) do
-		extradata['earningsin' .. key] = item
-	end
-
 	lpdbData.extradata = extradata
 
 	return lpdbData
@@ -350,7 +346,7 @@ function CustomCommentator:calculateEarnings()
 	local earningsTotal
 	earningsTotal, _earningsGlobal = CustomCommentator._getEarningsMedalsData(self.pagename)
 	earningsTotal = Math.round{earningsTotal, 2}
-	return earningsTotal
+	return earningsTotal, _earningsGlobal
 end
 
 function CustomCommentator._getLPDBrecursive(cond, query, queryType)
