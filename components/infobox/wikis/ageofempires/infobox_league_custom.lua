@@ -224,8 +224,9 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	Variables.varDefine('game', GameLookup.getName({args.game}))
 	Variables.varDefine('tournament_game', GameLookup.getName({args.game}))
-	Variables.varDefine('tournament_patch', args.patch)
-	Variables.varDefine('patch', args.patch)
+	Variables.varDefine('tournament_patch', args.patch or args.voobly)
+	Variables.varDefine('patch', args.patch or args.voobly)
+	Variables.varDefine('tournament_gameversion', args.version)
 	Variables.varDefine('tournament_mode',
 		(not String.isEmpty(args.mode)) and args.mode or
 		(not String.isEmpty(args.team_number)) and 'team' or
