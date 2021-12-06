@@ -240,7 +240,7 @@ function BigMatch:economy(match, opponent1, opponent2)
 		local function processRound(index, storage)
 			local round = map.rounds[index]
 
-			-- Chart Ext and API Ext don't agree on name yet
+			-- TODO: Chart Ext and API Ext don't agree on name yet
 			if round.winby == 'detonate' then
 				round.winby = 'explosion'
 			end
