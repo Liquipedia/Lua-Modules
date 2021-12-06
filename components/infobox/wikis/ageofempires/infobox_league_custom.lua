@@ -232,7 +232,6 @@ function CustomLeague:defineCustomPageVariables(args)
 		'1v1'
 	)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
-	Variables.varDefine('headtohead', args.headtohead)
 
 	-- clean liquipediatiers:
 	-- tier should be a number defining a tier
