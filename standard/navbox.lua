@@ -301,8 +301,7 @@ function NavBox._processItem(item, noWrapItems)
 	return item
 end
 
-local _ODD_EVEN_MARKER = '\127_ODDEVEN_\127'
-local _RESTART_MARKER = '\127_ODDEVEN0_\127'
+local _LAST = 0
 
 function NavBox._listRow(body, listText, listIndex, numberOfLists, isFirstList, index)
 	local row = body:tag('tr')
@@ -351,10 +350,17 @@ function NavBox._listRow(body, listText, listIndex, numberOfLists, isFirstList, 
 		rowStyle = _args.evenstyle
 	end
 
-	local oddEven = _ODD_EVEN_MARKER
+	local oddEven
 	if listText:sub(1, 12) == '</div><table' then
 		-- Assume list text is for a subgroup navbox so no automatic striping for this row.
-		oddEven = listText:find('<th[^>]*"navbox%-title"') and _RESTART_MARKER or 'odd'
+		_LAST = 0
+		oddEven = '${second}'
+	elseif  _LAST == 1 then
+		_LAST = 2
+		oddEven = '${second}'
+	elseif _LAST == 0 or _LAST == 2 then
+		_LAST = 1
+		oddEven = '${first}'
 	end
 
 	listCell
@@ -384,8 +390,6 @@ function NavBox._listRow(body, listText, listIndex, numberOfLists, isFirstList, 
 	return body
 end
 
-local _REGEX_MARKER = '\127_ODDEVEN(%d?)_\127'
-
 function NavBox._striped(wikiText)
 	-- Return wikiText with markers replaced for odd/even striping.
 	-- Child (subgroup) navboxes are flagged with a category that is removed
@@ -405,30 +409,12 @@ function NavBox._striped(wikiText)
 			second = first
 		end
 	end
-	local changer
-	if first == second then
-		changer = first
-	else
-		local index = 0
-		changer = function (code)
-			if code == '0' then
-				-- Current occurrence is for a group before a nested table.
-				-- Set it to first as a valid although pointless class.
-				-- The next occurrence will be the first row after a title
-				-- in a subgroup and will also be first.
-				index = 0
-				return first
-			end
-			index = index + 1
-			return index % 2 == 1 and first or second
-		end
-	end
 	-- replace `[` with `%[` and `]` with `%]`
 	-- needed so that the string can be used as a regular expresion,
 	-- where `[` and `]` need to be escaped
 	local regex = orphanCategory:gsub('([%[%]])', '%%%1')
 	wikiText = wikiText:gsub(regex, '')
-	wikiText = wikiText:gsub(_REGEX_MARKER, changer)
+	wikiText = String.interpolate(wikiText, {first = first, second = second})
 	return wikiText
 end
 
