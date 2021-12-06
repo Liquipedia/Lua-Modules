@@ -7,6 +7,7 @@
 --
 
 local Team = require('Module:Infobox/Team')
+local Json = require('Module:Json')
 local Variables = require('Module:Variables')
 local String = require('Module:StringUtils')
 local Achievements = require('Module:Achievements in infoboxes')
@@ -139,7 +140,19 @@ end
 function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.earnings = _earnings or 0
 	lpdbData.region = nil
+	lpdbData.extradata.subteams = CustomTeam.listSubTeams()
 	return lpdbData
+end
+
+-- gets a list of sub/accademy teams of the team
+-- this data can be used in results queries to include
+-- results of accademy teams of the current team
+function CustomTeam.listSubTeams()
+	if String.isEmpty(_team.args.team2) then
+		return nil
+	end
+	local subTeams = Team:getAllArgsForBase(_team.args, 'subteam')
+	return Json.stringify(subTeams)
 end
 
 function CustomTeam.playerBreakDown(args)
