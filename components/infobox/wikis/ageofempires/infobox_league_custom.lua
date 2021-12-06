@@ -252,10 +252,8 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	-- Legacy tier vars
 	Variables.varDefine('tournament_lptier', liquipediatier)
-	Variables.varDefine('tournament_tier', liquipediatiertype or liquipediatier)
-	Variables.varDefine('tournament_tier2', args.liquipediatier2)
+	Variables.varDefine('tournament_tier', liquipediatier)
 	Variables.varDefine('tournament_tiertype', liquipediatiertype)
-	Variables.varDefine('tournament_tiertype2', args.liquipediatiertype2)
 	Variables.varDefine('ltier', liquipediatier == 1 and 1 or
 		liquipediatier == 2 and 2 or
 		liquipediatier == 3 and 3 or 4
@@ -268,6 +266,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Module:Prize pool, Module:Prize pool team, Module:TeamCard and Module:TeamCard2
 	Variables.varDefine('tournament_deadline', DateClean(args.deadline or ''))
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
+
+	-- headtohead
+	Variables.varDefine('tournament_headtohead', args.headtohead)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
