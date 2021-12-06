@@ -184,7 +184,6 @@ function Matches._buildConditions(args, status, displayMode, participant)
 	elseif status == _STATUS_ONGOING then
 		table.insert(conditions, '[[finished::0]]')
 		table.insert(conditions, '[[date::<' .. _CURRENT_DATE_STAMP .. ']]')
-		table.insert(conditions, '[[date::<' .. _CURRENT_DATE_STAMP .. ']]')
 		table.insert(conditions, '[[date::>' .. Matches.ongoingTimeEndStamp() .. ']]')
 	else
 		table.insert(conditions, '[[finished::0]]')
