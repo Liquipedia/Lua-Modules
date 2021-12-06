@@ -52,7 +52,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		table.insert(widgets, Cell{
-			name = 'Game Version',
+			name = 'Game & Version',
 			content = CustomLeague:_getGameVersion(args)
 		})
 
@@ -314,8 +314,12 @@ function CustomLeague:_getGameVersion(args)
 	local gameversion = {}
 
 	if not String.isEmpty(args.game) then
+		local gameName = GameLookup.getName({args.game})
+		if String.isEmpty(gameName) then
+			error('Unknown or unsupported game: ' .. args.game)
+		end
 		table.insert(gameversion,
-			Page.makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or '')
+			Page.makeInternalLink(gameName) .. (args.beta and ' Beta' or '')
 		)
 
 		if not String.isEmpty(args.version) then
@@ -366,7 +370,10 @@ function CustomLeague:_getGameModes(args, makeLink)
 		function(index, mode)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
 
-			table.insert(categories, gameModes[index] .. ' Tournaments')
+			table.insert(categories, not String.isEmpty(gameModes[index])
+				and gameModes[index] ..  ' Tournaments'
+				or 'Pages with unknown game mode'
+			)
 
 			if makeLink then
 				gameModes[index] = Page.makeInternalLink(gameModes[index])
