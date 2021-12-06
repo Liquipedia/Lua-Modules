@@ -232,6 +232,7 @@ function CustomLeague:defineCustomPageVariables(args)
 		'1v1'
 	)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
+	Variables.varDefine('headtohead', args.headtohead)
 
 	-- clean liquipediatiers:
 	-- tier should be a number defining a tier
@@ -266,9 +267,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Module:Prize pool, Module:Prize pool team, Module:TeamCard and Module:TeamCard2
 	Variables.varDefine('tournament_deadline', DateClean(args.deadline or ''))
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
-
-	-- headtohead
-	Variables.varDefine('tournament_headtohead', args.headtohead)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
