@@ -11,10 +11,12 @@ local p = {}
 local Date = require("Module:Date/Ext")
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
-local DisplayHelper = require("Module:MatchGroup/Display/Helper")
+local Lua = require("Module:Lua")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
 local Variables = require("Module:Variables")
+
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
 function p.storeMatch(match2)
 	local match = p.convertParameters(match2)

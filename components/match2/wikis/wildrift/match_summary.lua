@@ -10,7 +10,6 @@ local CustomMatchSummary = {}
 
 local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ChampionIcon = require('Module:ChampionIcon')
@@ -19,6 +18,7 @@ local ExternalLinks = require('Module:ExternalLinks')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})

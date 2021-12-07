@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
@@ -19,6 +18,7 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
@@ -278,9 +278,9 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 	-- reverse order until it gets to the first root.
 	local function getParent(matchId)
 		local bracketData = bracket.bracketDatasById[matchId]
-		local coords = bracket.coordsByMatchId[matchId]
+		local coords = bracket.coordinatesByMatchId[matchId]
 		return bracketData.upperMatchId
-			or coords.rootIx ~= 1 and bracket.rootMatchIds[coords.rootIx - 1]
+			or coords.rootIndex ~= 1 and bracket.rootMatchIds[coords.rootIndex - 1]
 			or nil
 	end
 
@@ -291,19 +291,19 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 
 	-- Determine the individual headers appearing in header rows
 	for matchId, bracketData in pairs(bracket.bracketDatasById) do
-		local coords = bracket.coordsByMatchId[matchId]
+		local coords = bracket.coordinatesByMatchId[matchId]
 		if bracketData.header then
 			local headerRow = getHeaderRow(matchId)
 			local brMatch = bracketData.bracketResetMatchId and bracket.matchesById[bracketData.bracketResetMatchId]
-			headerRow[coords.roundIx] = {
+			headerRow[coords.roundIndex] = {
 				hasBrMatch = brMatch and true or false,
 				header = bracketData.header,
-				roundIx = coords.roundIx,
+				roundIx = coords.roundIndex,
 			}
 		end
 		if bracketData.qualWin then
 			local headerRow = getHeaderRow(matchId)
-			local roundIx = coords.roundIx + 1 + bracketData.qualSkip
+			local roundIx = coords.roundIndex + 1 + bracketData.qualSkip
 			headerRow[roundIx] = {
 				header = config.qualifiedHeader or '!q',
 				roundIx = roundIx,

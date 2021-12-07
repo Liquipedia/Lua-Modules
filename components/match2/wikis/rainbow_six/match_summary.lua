@@ -8,13 +8,13 @@
 
 local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
@@ -42,6 +42,7 @@ local _LINK_DATA = {
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	lpl = {icon = 'File:LPL Play icon.png', text = 'Match page on LPL Play'},
 	r6esports = {icon = 'File:Copa Elite Six icon.png', text = 'R6 Esports LATAM Match Page'},
+	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
