@@ -275,7 +275,7 @@ function BigMatch:economy(match, opponent1, opponent2)
 	return Tabs.dynamic(tabs)
 end
 
-function BigMatch:_processHalf(map, startRound, endRound, groupColors)
+function BigMatch:_processHalf(map, startRound, endRound)
 	local roundData = {}
 	for round = startRound, endRound do
 		table.insert(roundData, self:_processRound(map, round))
