@@ -286,7 +286,7 @@ function matchFunctions.readDate(matchArgs)
 			'Match_date',
 			'tournament_enddate',
 			'tournament_startdate',
-			Date.timestampZero
+			Date.epochZero
 		)
 		return MatchGroupInput.getInexactDate(suggestedDate)
 	end

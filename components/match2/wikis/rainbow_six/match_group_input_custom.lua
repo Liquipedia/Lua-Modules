@@ -289,7 +289,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = Date.timestampZero,
+			date = Date.epochZero,
 			dateexact = false,
 		}
 	end

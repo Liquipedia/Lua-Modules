@@ -14,7 +14,7 @@ local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {re
 
 function WikiSpecific.matchHasDetails(match)
 	return match.dateIsExact
-		or match.date ~= Date.timestampZero
+		or match.date ~= Date.epochZero
 		or match.vod
 		or not Table.isEmpty(match.links)
 		or match.comment

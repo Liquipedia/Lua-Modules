@@ -22,7 +22,7 @@ DateExt.minTimestamp = -62167219200
 DateExt.maxTimestamp = 253402300799
 
 -- 1970-01-01 00:00:00
-DateExt.timestampZero = 0
+DateExt.epochZero = 0
 
 --[[
 Parses a date string into a timestamp, returning the number of seconds since
