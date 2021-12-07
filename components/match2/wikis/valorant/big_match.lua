@@ -286,11 +286,6 @@ end
 function BigMatch:_processRound(map, roundIndex)
 	local round = map.rounds[roundIndex]
 
-	-- TODO: Chart Ext and API Ext don't agree on name yet
-	if round.winby == 'detonate' then
-		round.winby = 'explosion'
-	end
-
 	return {
 		name = 'Round ' .. roundIndex,
 		winby = round.winby,
