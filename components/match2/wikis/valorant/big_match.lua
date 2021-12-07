@@ -23,6 +23,11 @@ local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requ
 
 local BigMatch = Class.new()
 
+local _ROUND_ONE = 1
+local _ROUNDS_PER_HALF = 12
+local _COLOR_FIRST_TEAM = '#B12A2A'
+local _COLOR_SECOND_TEAM = '#1E7D7D'
+
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
 	local bigMatch = BigMatch()
@@ -239,35 +244,28 @@ function BigMatch:economy(match, opponent1, opponent2)
 
 		tabs['name' .. ind] = 'Map ' .. ind
 
-		local data = {}
-		for index, round in ipairs(map.rounds) do
-			table.insert(data, {
-				name = 'Round ' .. index,
-				winby = round.winby,
-				buy = round.buy,
-				bank = round.bank,
-				kills = round.kills,
-			})
+		local chart = ''
+		local data
+		-- First half
+		data = self:_processHalf(map, _ROUND_ONE, math.min(#map.rounds, _ROUNDS_PER_HALF))
+		if #data > 0 then
+			chart = chart .. self:_createChart(data, {opponent1, opponent2},{_COLOR_FIRST_TEAM, _COLOR_SECOND_TEAM})
 		end
 
-		local chart = mw.ext.Charts.economytimeline({
-			size = {
-				height = 600,
-				width = 800
-			},
-			colors = {'#B12A2A', '#1E7D7D'},
-			groups = {opponent1.name, opponent2.name},
-			data = data,
-			markareas = {
-				{ name = 'Eco', from = 0, to = 6000 },
-				{ name = 'Semi-Eco', from = 6000, to = 14000 },
-				{ name = 'Semi-Buy', from = 14000, to = 20000 },
-				{ name = 'Full-Buy', from = 20000, to = 40000 },
-			},
-		})
+		-- Second half
+		data = self:_processHalf(map, _ROUND_ONE+_ROUNDS_PER_HALF, math.min(#map.rounds, _ROUNDS_PER_HALF*2))
+		if #data > 0 then
+			chart = chart .. self:_createChart(data, {opponent1, opponent2},{_COLOR_SECOND_TEAM, _COLOR_FIRST_TEAM})
+		end
+
+		-- OT
+		data = self:_processHalf(map, _ROUND_ONE+_ROUNDS_PER_HALF*2, #map.rounds)
+		if #data > 0 then
+			chart = chart .. self:_createChart(data, {opponent1, opponent2},{_COLOR_FIRST_TEAM, _COLOR_SECOND_TEAM})
+		end
 
 		local chartContainer = mw.html.create('div'):addClass('fb-match-page-economy-timeline')
-													:node(chart)
+			:node(chart)
 
 		tabs['content' .. ind] = tostring(chartContainer)
 
@@ -275,6 +273,49 @@ function BigMatch:economy(match, opponent1, opponent2)
 	end
 
 	return Tabs.dynamic(tabs)
+end
+
+function BigMatch:_processHalf(map, startRound, endRound, groupColors)
+	local roundData = {}
+	for round = startRound, endRound do
+		Table.insert(roundData, self:_processRound(map, round))
+	end
+	return roundData
+end
+
+function BigMatch:_processRound(map, roundIndex)
+	local round = map.rounds[roundIndex]
+
+	-- TODO: Chart Ext and API Ext don't agree on name yet
+	if round.winby == 'detonate' then
+		round.winby = 'explosion'
+	end
+
+	return {
+		name = 'Round ' .. roundIndex,
+		winby = round.winby,
+		buy = round.buy,
+		bank = round.bank,
+		kills = round.kills,
+	}
+end
+
+function BigMatch:_createChart(data, opponents, colors)
+	return mw.ext.Charts.economytimeline({
+		size = {
+			height = 600,
+			width = 800
+		},
+		colors = colors,
+		groups = {opponents[1].name, opponents[2].name},
+		data = data,
+		markareas = {
+			{ name = 'Eco', from = 0, to = 6000 },
+			{ name = 'Semi-Eco', from = 6000, to = 14000 },
+			{ name = 'Semi-Buy', from = 14000, to = 20000 },
+			{ name = 'Full-Buy', from = 20000, to = 40000 },
+		},
+	})
 end
 
 function BigMatch:_createTeamSeparator(format, match)
