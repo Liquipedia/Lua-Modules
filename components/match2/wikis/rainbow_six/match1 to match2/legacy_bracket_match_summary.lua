@@ -39,7 +39,8 @@ function LegacyBracketMatchSummary.convert(args)
 		args['map' .. index .. 'score1'] = mw.text.trim(score1 or '')
 		args['map' .. index .. 'score2'] = mw.text.trim(score2 or '')
 		args['map' .. index .. 'score'] = nil
-		args['map' .. index .. 'finished'] = (args[prefix ..'win'] == 'skip' and 'skip') or (not String.isEmpty(args[prefix ..'win']) and 'true') or 'false'
+		args['map' .. index .. 'finished'] = (args[prefix ..'win'] == 'skip' and 'skip') or
+											 (not String.isEmpty(args[prefix ..'win']) and 'true') or 'false'
 		args['map' .. index .. 'win'] = nil
 		index = index + 1
 	end

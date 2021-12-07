@@ -7,15 +7,17 @@
 --
 
 --[[
-	This file is used in the process to convert Legacy match1 MatchLists and SingleMatches into match2.
+	This module is used in the process to convert Legacy match1 MatchLists and SingleMatches into match2.
 	It's mostly a wrapper around the matches, handling headers, width, etc.
-	It also invokes match2 with the match and map information gathered from Module:MatchMaps/Legacy and Module:LegacyBracketMatchSummary
+	It also invokes match2 with the match and map information gathered from
+		Module:MatchMaps/Legacy and Module:LegacyBracketMatchSummary.
 	It is invoked by Template:LegacyMatchListStart, Template:MatchListEnd & Template:LegacySingleMatch.
 ]]
 
 local Arguments = require('Module:Arguments')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local MatchGroupDisplay = require('Module:MatchGroup/Display')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Template = require('Module:Template')
 
@@ -93,7 +95,7 @@ function MatchMapsLegacyStore.close()
 	processMatches.isLegacy = true
 
 	-- store match
-	local matchhtml = require('Module:MatchGroup/Display').MatchlistBySpec(processMatches)
+	local matchhtml = MatchGroupDisplay.MatchlistBySpec(processMatches)
 
 	--local warnings = Json.parseIfString(matchlistVars:get('warnings')) or {}
 
@@ -128,11 +130,13 @@ function MatchMapsLegacyStore.closeSingle(frame)
 	processMatches.hide = true
 
 	-- store match
-	require('Module:MatchGroup/Display').MatchlistBySpec(processMatches)
+	MatchGroupDisplay.MatchlistBySpec(processMatches)
 
 	local MatchGroupBase = require('Module:MatchGroup/Base')
 	-- display match
-	local matchhtml = require('Module:MatchGroup/Display').MatchByMatchId({id = MatchGroupBase.readBracketId(processMatches.id), matchid = '1', width = matchlistVars:get('width')})
+	local matchhtml = MatchGroupDisplay.MatchByMatchId(
+		{id = MatchGroupBase.readBracketId(processMatches.id), matchid = '1', width = matchlistVars:get('width')}
+	)
 
 	--local warnings = Json.parseIfString(matchlistVars:get('warnings')) or {}
 
