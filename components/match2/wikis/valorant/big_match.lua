@@ -278,7 +278,7 @@ end
 function BigMatch:_processHalf(map, startRound, endRound, groupColors)
 	local roundData = {}
 	for round = startRound, endRound do
-		Table.insert(roundData, self:_processRound(map, round))
+		table.insert(roundData, self:_processRound(map, round))
 	end
 	return roundData
 end
