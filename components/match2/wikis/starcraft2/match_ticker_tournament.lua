@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
@@ -29,7 +28,7 @@ function TournamentMatchTicker.run(args)
 
 	local lpdbConditions = MatchTicker.LpdbConditions()
 	lpdbConditions:addDefaultConditions(args)
-	
+
 	if Logic.readBool(args.featured) then
 		lpdbConditions:addCondition('[[extradata_featured::true]]')
 	end
@@ -83,7 +82,7 @@ end
 local _CURRENT_TIME_STAMP = os.date('!%Y-%m-%d %H:%M', os.time(os.date("!*t")))
 function TournamentMatchTicker._match(matchData)
 	local winner = tonumber(matchData.winner or 0) or 0
- 
+
 	local upperRow = MatchTicker.UpperRow()
 
 	upperRow:addOpponent(matchData.match2opponents[1], 'left')
