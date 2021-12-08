@@ -292,14 +292,13 @@ function Versus:bestOf(bestOf)
 	return self
 end
 
-local _WINNER_LEFT = 1
-local _WINNER_RIGHT = 2
 function Versus:score(matchData)
-	local leftScore, leftScore2, hasScore2 = MatchTicker.getOpponentScore(
+	local leftScore, leftScore2, hasScore2, rightScore, rightScore2
+	leftScore, leftScore2, hasScore2 = MatchTicker.getOpponentScore(
 		matchData.match2opponents[1],
 		matchData.winner == _WINNER_LEFT
 	)
-	local rightScore, rightScore2, hasScore2 = MatchTicker.getOpponentScore(
+	rightScore, rightScore2, hasScore2 = MatchTicker.getOpponentScore(
 		matchData.match2opponents[2],
 		matchData.winner == _WINNER_RIGHT,
 		hasScore2
@@ -460,7 +459,7 @@ function Wrapper:create()
 	for _, element in ipairs(self.elements or {}) do
 		innerWrapper:node(element)
 	end
-	
+
 	return self.root:node(innerWrapper)
 end
 
@@ -507,7 +506,6 @@ local _DEFAULT_TBD_IDENTIFIER = 'tbd'
 -- overridable value
 MatchTicker.tbdIdentifier = _DEFAULT_TBD_IDENTIFIER
 function MatchTicker.opponentIsTbdOrEmpty(opponent)
-	local tbdIdentifier = MatchTicker.tbdIdentifier
 	local firstPlayer = (opponent.players or {})[1] or {}
 
 	local listToCheck = {
