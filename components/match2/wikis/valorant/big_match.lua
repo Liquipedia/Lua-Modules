@@ -275,21 +275,16 @@ function BigMatch:economy(match, opponent1, opponent2)
 	return Tabs.dynamic(tabs)
 end
 
-function BigMatch:_processHalf(map, startRound, endRound, groupColors)
+function BigMatch:_processHalf(map, startRound, endRound)
 	local roundData = {}
 	for round = startRound, endRound do
-		Table.insert(roundData, self:_processRound(map, round))
+		table.insert(roundData, self:_processRound(map, round))
 	end
 	return roundData
 end
 
 function BigMatch:_processRound(map, roundIndex)
 	local round = map.rounds[roundIndex]
-
-	-- TODO: Chart Ext and API Ext don't agree on name yet
-	if round.winby == 'detonate' then
-		round.winby = 'explosion'
-	end
 
 	return {
 		name = 'Round ' .. roundIndex,
