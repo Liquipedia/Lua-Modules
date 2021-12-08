@@ -11,7 +11,7 @@ local Table = require('Module:Table')
 
 --[[
 
-WikiSpecific Code for MatchList and Bracket Code Generators
+WikiSpecific Code for MatchList, Bracket, and SingleMatch Code Generators
 
 ]]--
 
@@ -21,6 +21,7 @@ local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Bas
 local MODES = {
 	['solo'] = 'solo',
 	['team'] = 'team',
+	['literal'] = 'literal',
 }
 
 --default opponent type (used if the entered mode is not found in the above table)
