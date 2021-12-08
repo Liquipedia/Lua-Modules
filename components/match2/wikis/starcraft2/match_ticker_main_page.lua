@@ -8,9 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
-local Variables = require('Module:Variables')
 local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 local MatchTicker = Lua.import('Module:MatchTicker', {requireDevIfEnabled = true})
 MatchTicker.OpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
@@ -23,7 +21,7 @@ function MainPageMatchTicker.run(args)
 
 	local lpdbConditions = MatchTicker.LpdbConditions()
 	lpdbConditions:addDefaultConditions(args)
-	
+
 	if Logic.readBool(args.featured) then
 		lpdbConditions:addCondition('[[extradata_featured::true]]')
 	end
@@ -72,7 +70,7 @@ local _WINNER_LEFT = 1
 local _WINNER_RIGHT = 2
 function MainPageMatchTicker._match(matchData, args)
 	local winner = tonumber(matchData.winner or 0) or 0
- 
+
 	local upperRow = MatchTicker.UpperRow()
 
 	upperRow:addOpponent(matchData.match2opponents[1], 'left')
@@ -86,7 +84,6 @@ function MainPageMatchTicker._match(matchData, args)
 	end
 	upperRow:versus(versus:create())
 
-	
 	local countDownArgs = {}
 	if Logic.readBool(matchData.finished) then
 		if winner == _WINNER_LEFT then
