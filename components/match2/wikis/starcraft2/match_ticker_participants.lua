@@ -31,32 +31,28 @@ function ParticipantMatchTicker.run(args)
 		args.team = mw.ext.TeamLiquidIntegration.resolve_redirect(args.team)
 	end
 
-	local game = Variables.varDefault('tournament_game', '')
-	--_wrapper:addClass('fo-nttax-infobox-_wrapper infobox-' .. game)
-	--_wrapper:addInnerWrapperClass('fo-nttax-infobox wiki-bordercolor-light')
-
 	args.recent = false
 	args.upcoming = false
 	args.ongoing = true
-	ParticipantMatchTicker.get(args, 'Ongoing Matches', _wrapper, _LIMIT_ONGOING)
+	ParticipantMatchTicker.get(args, 'Ongoing Matches', _LIMIT_ONGOING)
 
 	args.upcoming = true
 	args.ongoing = false
-	ParticipantMatchTicker.get(args, 'Upcoming Matches', _wrapper, _LIMIT_UPCOMING)
+	ParticipantMatchTicker.get(args, 'Upcoming Matches', _LIMIT_UPCOMING)
 
 	args.recent = true
 	args.upcoming = false
 	-- we want to include non exact dates for the recent matches
 	args.notExact = true
-	ParticipantMatchTicker.get(args, 'Recent Matches', _wrapper, _LIMIT_RRECENT, true)
+	ParticipantMatchTicker.get(args, 'Recent Matches', _LIMIT_RRECENT, true)
 
 	return _wrapper:create()
 end
 
-function ParticipantMatchTicker.get(args, headerText, _wrapper, limitInput)
+function ParticipantMatchTicker.get(args, headerText, limitInput)
 	local lpdbConditions = MatchTicker.LpdbConditions()
 	lpdbConditions:addDefaultConditions(args)
-	
+
 	if Logic.readBool(args.featured) then
 		lpdbConditions:addCondition('[[extradata_featured::true]]')
 	end
@@ -108,7 +104,7 @@ function ParticipantMatchTicker._match(matchData, participant, args)
 	matchData = ParticipantMatchTicker._orderOpponents(matchData, participant)
 
 	local winner = tonumber(matchData.winner or 0) or 0
- 
+
 	local upperRow = MatchTicker.UpperRow()
 
 	upperRow:addOpponent(matchData.match2opponents[1], 'left', true)
@@ -122,7 +118,6 @@ function ParticipantMatchTicker._match(matchData, participant, args)
 	end
 	upperRow:versus(versus:create())
 
-	
 	local countDownArgs = {}
 	if Logic.readBool(matchData.finished) then
 		if winner == _WINNER_LEFT then
