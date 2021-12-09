@@ -235,7 +235,7 @@ function HiddenInfoboxLeague._definePageVariables()
 	end
 	Variables.varDefine('tournament_finished', finished or 'false')
 	--month and day
-	local monthAndDay = string.match(edate, '%d%d-%d%d') or ''
+	local monthAndDay = string.match(edate or '', '%d%d-%d%d') or ''
 	Variables.varDefine('Month_Day', monthAndDay)
 	--breakdown vars
 	local playerNumber = HiddenInfoboxLeague._playerRaceBreakDown()
