@@ -326,7 +326,7 @@ function CustomLeague._computeChronology()
 			previous = previousPage .. '|#' .. tostring(number - 1)
 		end
 
-		return next, previous
+		return next or nil, previous or nil
 	else
 		return _args.next, _args.previous
 	end
