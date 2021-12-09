@@ -67,7 +67,32 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
+	if id == 'type' then
+		local value = tostring(_args.type):lower()
+		
+		local category
+		if value == 'offline' then
+			category = 'Offline Tournaments'
+		elseif value == 'online' then
+			category = 'Online Tournaments'
+		elseif value:match('online') and value:match('offline') then
+			category = 'Online/Offline Tournaments'
+		elseif value == 'weekly online' then
+			category = 'Weekly Online Tournaments'
+		else
+			category = 'Unknown Type Tournaments'
+		end
+		if not String.isEmpty(_args.type) then
+			return {
+				Cell{
+					name = 'Type',
+					content = {
+						_args.type:sub(1,1):upper() .. _args.type:sub(2) .. '[[Category:' .. category .. ']]'
+					}
+				}
+			}
+		end
+	elseif id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {
 					CustomLeague._getGameVersion()
