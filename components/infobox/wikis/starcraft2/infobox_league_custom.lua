@@ -7,7 +7,7 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Autopatch = require('Module:Automated Patch')._main
@@ -89,13 +89,16 @@ function CustomInjector:parse(id, widgets)
 				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
 			},
 		}
-	elseif id == 'chronology' and not (String.isEmpty(_args.previous) and String.isEmpty(_args.next)) then
-		return {
-			Title{name = 'Chronology'},
-			Chronology{
-				content = {CustomLeague._getChronologyData()}
+	elseif id == 'chronology' then
+		local content = CustomLeague._getChronologyData()
+		if String.isNotEmpty(content.previous) or String.isNotEmpty(content.next) then
+			return {
+				Title{name = 'Chronology'},
+				Chronology{
+					content = content
+				}
 			}
-		}
+		end
 	elseif id == 'customcontent' then
 		--player breakdown
 		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
