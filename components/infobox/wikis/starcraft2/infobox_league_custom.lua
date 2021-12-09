@@ -342,8 +342,6 @@ function CustomLeague:_getServer()
 		return nil
 	end
 	local server = _args.server
-	--remove possible whitespaces around '/'
-	server = string.gsub(server, '%s?/%s?=', '/')
 	local servers = mw.text.split(server, '/')
 
 	local output = ''
@@ -352,7 +350,8 @@ function CustomLeague:_getServer()
 		if key ~= 1 then
 			output = output .. ' / '
 		end
-		output = output .. (AllowedServers[item] or ('[[Category:Server Unknown|' .. item .. ']]'))
+		item = mw.text.trim(item)
+		output = output .. (AllowedServers[string.lower(item)] or ('[[Category:Server Unknown|' .. item .. ']]'))
 	end
 	return output
 end
