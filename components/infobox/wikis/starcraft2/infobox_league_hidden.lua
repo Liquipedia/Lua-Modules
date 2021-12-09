@@ -190,7 +190,7 @@ function HiddenInfoboxLeague._definePageVariables()
 	Variables.varDefine('tournament_location2', _args.location2 or _args.city2)
 	Variables.varDefine('tournament_venue', _args.venue)
 
-	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game)] or {})[1] or _GAMES[_GAME_WOL][1])
+	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game or '')] or {})[1] or _GAMES[_GAME_WOL][1])
 
 	Variables.varDefine('tournament_parent', _args.parent)
 	Variables.varDefine('tournament_parentname', _args.parentname)
@@ -235,7 +235,7 @@ function HiddenInfoboxLeague._definePageVariables()
 	end
 	Variables.varDefine('tournament_finished', finished or 'false')
 	--month and day
-	local monthAndDay = string.match(edate, '%d%d-%d%d') or ''
+	local monthAndDay = string.match(edate or '', '%d%d-%d%d') or ''
 	Variables.varDefine('Month_Day', monthAndDay)
 	--breakdown vars
 	local playerNumber = HiddenInfoboxLeague._playerRaceBreakDown()
