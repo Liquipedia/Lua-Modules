@@ -171,7 +171,7 @@ function CustomLeague:_createPrizepool()
 			display = Template.safeExpand(
 				mw.getCurrentFrame(),
 				'Local currency',
-				{localCurrency:lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
+				{(localCurrency or ''):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
 			) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
 		elseif prizePool then
 			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText .. ' ' .. _ABBR_USD
