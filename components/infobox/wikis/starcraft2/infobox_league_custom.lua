@@ -406,8 +406,10 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 	--remove currency abbreviations
 	value = value:gsub('<abbr.*abbr>', ''):gsub(',', '')
 
-	--remove currency symbol
+	--remove currency symbol and text
 	if currency then
+		value = value:gsub(currency:lower(), '')
+		value = value:gsub(currency:upper(), '')
 		Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
 		local symbol = Variables.varDefaultMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
 		value = value:gsub(symbol, '')
