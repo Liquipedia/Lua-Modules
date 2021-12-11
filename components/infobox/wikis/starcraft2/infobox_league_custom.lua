@@ -415,6 +415,7 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 		value = value:gsub(symbol, '')
 	else
 		value = value:gsub('%$', '')
+		value = value:gsub('USD', '')
 	end
 
 	--remove white spaces and &nbsp;
