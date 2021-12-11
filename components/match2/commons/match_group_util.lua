@@ -386,7 +386,6 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 		return {
 			advanceSpots = advanceSpots,
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
-			bracketSection = data.bracketsection,
 			coordinates = data.coordinates and MatchGroupUtil.indexTableFromRecord(data.coordinates),
 			header = nilIfEmpty(data.header),
 			lowerEdges = data.lowerEdges and Array.map(data.lowerEdges, MatchGroupUtil.indexTableFromRecord),
@@ -396,7 +395,6 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,
 			qualWin = advanceSpots[1] and advanceSpots[1].type == 'qualify',
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
-			rootIndex = tonumber(data.rootindex),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
