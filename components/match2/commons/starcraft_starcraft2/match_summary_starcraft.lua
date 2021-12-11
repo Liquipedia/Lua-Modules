@@ -36,23 +36,25 @@ StarcraftMatchSummary.propTypes.MatchSummaryContainer = {
 
 function StarcraftMatchSummary.MatchSummaryContainer(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
-	local config = {
-		showScore = props.config or false
-	}
 	local MatchSummary = match.isFfa
 		and Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary
 		or StarcraftMatchSummary.MatchSummary
-	return MatchSummary({match = match, config = config})
+	return MatchSummary({match = match, config = props.config})
 end
 
 StarcraftMatchSummary.propTypes.MatchSummary = {
 	match = StarcraftMatchGroupUtil.types.Match,
-	config = 'table'
+	config = 'table',
 }
 
 function StarcraftMatchSummary.MatchSummary(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.MatchSummary)
 	local match = props.match
+
+	local propsConfig = props.config or {}
+	local config = {
+		showScore = propsConfig.showScore or false,
+	}
 
 	-- Compute offraces
 	if match.opponentMode == 'uniform' then
@@ -67,7 +69,7 @@ function StarcraftMatchSummary.MatchSummary(props)
 		:addClass('brkts-popup')
 		:addClass('brkts-popup-sc')
 		:addClass(match.opponentMode == 'uniform' and 'brkts-popup-sc-uniform-match' or 'brkts-popup-sc-team-match')
-		:node(StarcraftMatchSummary.Header({match = match, config = props.config}))
+		:node(StarcraftMatchSummary.Header({match = match, config = config}))
 		:node(StarcraftMatchSummary.Body({match = match}))
 		:node(StarcraftMatchSummary.Footer({match = match, showHeadToHead = match.headToHead}))
 end
