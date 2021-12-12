@@ -68,7 +68,7 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'type' then
-		local value = tostring(_args.type):lower()
+		local value = tostring(_args.type or ''):lower()
 		local category
 		if value == 'offline' then
 			category = 'Offline Tournaments'
