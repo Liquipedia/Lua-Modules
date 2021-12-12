@@ -86,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 				Cell{
 					name = 'Type',
 					content = {
-						_args.type:sub(1,1):upper() .. _args.type:sub(2) .. '[[Category:' .. category .. ']]'
+						mw.language.getContentLanguage():ucfirst(_args.type) .. '[[Category:' .. category .. ']]'
 					}
 				}
 			}
