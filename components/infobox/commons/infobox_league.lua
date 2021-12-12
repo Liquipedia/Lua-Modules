@@ -96,6 +96,8 @@ function League:createInfobox()
 							self.infobox:categories('Offline Tournaments')
 						elseif value == 'online' then
 							self.infobox:categories('Online Tournaments')
+						elseif value:match('online') and value:match('offline') then
+							self.infobox:categories('Online/Offline Tournaments')
 						else
 							self.infobox:categories('Unknown Type Tournaments')
 						end
@@ -105,7 +107,7 @@ function League:createInfobox()
 								Cell{
 									name = 'Type',
 									content = {
-										args.type:sub(1,1):upper()..args.type:sub(2)
+										mw.language.getContentLanguage():ucfirst(args.type)
 									}
 								}
 							}
