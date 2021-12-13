@@ -67,7 +67,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			'}}',
 			''
 		})
-		return table.concat(lines, '\n')
+		return table.concat(opponentLines, '\n')
 	else
 		out = out:gsub('<nowiki>', '')
 		out = out:gsub('</nowiki>', '')
