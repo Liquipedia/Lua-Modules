@@ -6,11 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local wikiCopyPaste = {}
+local Table = require('Module:Table')
 
-local MODES = {
-	['Team'] = 'team',
-}
+local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
 
 local VETOES = {
 	[0] = '',
@@ -25,17 +23,9 @@ local VETOES = {
 	[9] = 'pick,pick,pick,pick,decider',
 }
 
---default opponent type (used if the entered mode is not found in the above table)
-local DefaultMode = 'team'
-
---returns the cleaned opponent type
-function wikiCopyPaste.getMode(mode)
-	return MODES[string.lower(mode or '')] or DefaultMode
-end
-
 --returns the Code for a Match, depending on the input
 function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local score = args.score == 'true' and '|score=' or ''
+	local showScore = args.score == 'true'
 	local mapDetails = args.detailedMap == 'true'
 	local mapDetailsOT = args.detailedMapOT == 'true'
 	local mapVeto = args.mapVeto == 'true'
@@ -47,7 +37,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 
 	for i = 1, opponents do
-		out = out .. '\n\t|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score)
+		out = out .. '\n\t|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, showScore)
 	end
 
 	if mapVeto and VETOES[bestof] then
@@ -90,32 +80,16 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, score)
-	local out
+function wikiCopyPaste._getOpponent(mode, showScore)
+	local score = showScore and '|score=' or ''
 
-	if mode == '1v1' then
-		out = '{{PlayerOpponent|p1=' .. score .. '}}'
+	if mode == 'solo' then
+		return '{{PlayerOpponent||flag=|team=' .. score .. '}}'
 	elseif mode == 'team' then
-		out = '{{TeamOpponent|' .. score .. '}}'
+		return '{{TeamOpponent|' .. score .. '}}'
 	elseif mode == 'literal' then
-		out = '{{LiteralOpponent|}}'
+		return '{{LiteralOpponent|}}'
 	end
-
-	return out
-end
-
---function that sets the text that starts the invoke of the MatchGroup Moduiles,
---contains madatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
---on sc2 also used to link to the documentation pages about the new bracket/match system
-function wikiCopyPaste.getStart(template, id, modus, args)
-	local tooltip = args.tooltip == 'true' and ('\n' .. mw.text.nowiki('<!--') ..
-		' For more information on Bracket parameters see Liquipedia:Brackets ' ..
-		mw.text.nowiki('-->') .. '\n' .. mw.text.nowiki('<!--') ..
-		' For Opponent Copy-Paste-Code see Liquipedia:Brackets/Opponents#Copy-Paste ' ..
-		mw.text.nowiki('-->')) or ''
-	return '{{' .. (modus == 'bracket' and
-		('Bracket|Bracket/' .. template) or 'Matchlist') ..
-		'|id=' .. id .. tooltip
 end
 
 return wikiCopyPaste
