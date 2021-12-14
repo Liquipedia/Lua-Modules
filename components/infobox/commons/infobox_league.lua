@@ -429,8 +429,8 @@ function League:_cleanDate(date)
 		return nil
 	end
 
-	date = date:gsub('-??', '-01')
-	date = date:gsub('-XX', '-01')
+	date = date:gsub('%-%?%?', '-01')
+	date = date:gsub('%-XX', '-01')
 	return date
 end
 
