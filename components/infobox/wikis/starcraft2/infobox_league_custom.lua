@@ -7,7 +7,7 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Autopatch = require('Module:Automated Patch')._main
@@ -113,13 +113,16 @@ function CustomInjector:parse(id, widgets)
 				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
 			},
 		}
-	elseif id == 'chronology' and not (String.isEmpty(_args.previous) and String.isEmpty(_args.next)) then
-		return {
-			Title{name = 'Chronology'},
-			Chronology{
-				content = {CustomLeague._getChronologyData()}
+	elseif id == 'chronology' then
+		local content = CustomLeague._getChronologyData()
+		if String.isNotEmpty(content.previous) or String.isNotEmpty(content.next) then
+			return {
+				Title{name = 'Chronology'},
+				Chronology{
+					content = content
+				}
 			}
-		}
+		end
 	elseif id == 'customcontent' then
 		--player breakdown
 		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
@@ -192,7 +195,7 @@ function CustomLeague:_createPrizepool()
 			display = Template.safeExpand(
 				mw.getCurrentFrame(),
 				'Local currency',
-				{localCurrency:lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
+				{(localCurrency or ''):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
 			) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
 		elseif prizePool then
 			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText .. ' ' .. _ABBR_USD
@@ -347,7 +350,7 @@ function CustomLeague._computeChronology()
 			previous = previousPage .. '|#' .. tostring(number - 1)
 		end
 
-		return next, previous
+		return next or nil, previous or nil
 	else
 		return _args.next, _args.previous
 	end
@@ -366,8 +369,6 @@ function CustomLeague:_getServer()
 		return nil
 	end
 	local server = _args.server
-	--remove possible whitespaces around '/'
-	server = string.gsub(server, '%s?/%s?=', '/')
 	local servers = mw.text.split(server, '/')
 
 	local output = ''
@@ -376,7 +377,8 @@ function CustomLeague:_getServer()
 		if key ~= 1 then
 			output = output .. ' / '
 		end
-		output = output .. (AllowedServers[item] or ('[[Category:Server Unknown|' .. item .. ']]'))
+		item = mw.text.trim(item)
+		output = output .. (AllowedServers[string.lower(item)] or ('[[Category:Server Unknown|' .. item .. ']]'))
 	end
 	return output
 end
