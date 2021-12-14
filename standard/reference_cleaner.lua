@@ -15,8 +15,8 @@ function ReferenceCleaner.clean(dateWithRef)
 		return ''
 	end
 
-	dateWithRef = dateWithRef:gsub('-??', '-01')
-	dateWithRef = dateWithRef:gsub('-XX', '-01')
+	dateWithRef = dateWithRef:gsub('%-%?%?', '-01')
+	dateWithRef = dateWithRef:gsub('%-XX', '-01')
 	local correctDate = string.match(dateWithRef, '(%d+-%d+-%d+)')
 	if correctDate then
 		return correctDate
