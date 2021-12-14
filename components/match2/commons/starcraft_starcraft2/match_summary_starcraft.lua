@@ -170,9 +170,7 @@ function StarcraftMatchSummary.Body(props)
 	for ix, veto in ipairs(match.vetoes) do
 		local vetoNode = StarcraftMatchSummary.Veto(veto)
 		if ix == 1 then
-			vetoNode = html.create('div')
-				:node(StarcraftMatchSummary.GameHeader({header = 'Vetoes'}))
-				:node(vetoNode)
+			body:node(StarcraftMatchSummary.VetoHeader{header = 'Vetoes'})
 		end
 		body:node(vetoNode:addClass('brkts-popup-body-element'))
 	end
@@ -180,7 +178,7 @@ function StarcraftMatchSummary.Body(props)
 	-- Match casters
 	if match.casters then
 		body:node(
-			html.create('div'):addClass('brkts-popup-sc-game-comment')
+			html.create('div'):addClass('brkts-popup-body-element brkts-popup-sc-game-comment')
 				:node('Caster(s): ' .. match.casters)
 		)
 	end
@@ -336,6 +334,17 @@ function StarcraftMatchSummary.GameHeader(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.GameHeader)
 	return html.create('div')
 		:addClass('brkts-popup-sc-game-header')
+		:wikitext(props.header)
+end
+
+StarcraftMatchSummary.propTypes.VetoHeader = {
+	header = 'string',
+}
+
+function StarcraftMatchSummary.VetoHeader(props)
+	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.VetoHeader)
+	return html.create('div')
+		:addClass('brkts-popup-body-element brkts-popup-sc-game-header brkts-popup-sc-veto-center')
 		:wikitext(props.header)
 end
 
