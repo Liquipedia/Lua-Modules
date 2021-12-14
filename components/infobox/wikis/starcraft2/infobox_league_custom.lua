@@ -424,23 +424,13 @@ end
 
 function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 	if String.isEmpty(value) then
-		return nil, nil, nil
+		return nil, oldHasText, nil
 	end
 
-	--remove currency abbreviations
-	value = value:gsub('<abbr.*abbr>', ''):gsub(',', '')
-
-	--remove currency symbol
-	if currency then
-		Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
-		local symbol = Variables.varDefaultMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
-		value = value:gsub(symbol, '')
-	else
-		value = value:gsub('%$', '')
-	end
-
-	--remove white spaces and &nbsp;
-	value = value:gsub('%s', ''):gsub('&nbsp;', '')
+	--remove white spaces, '&nbsp;' and ','
+	value = string.gsub(value, '%s', '')
+	value = string.gsub(value, '&nbsp;', '')
+	value = string.gsub(value, ',', '')
 
 	--check if it has a '+' at the end
 	local hasPlus = string.match(value, '%+$')
