@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Class
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
