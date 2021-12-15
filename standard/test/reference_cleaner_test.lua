@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Class
+-- page=Module:ReferenceCleaner/testcases
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
