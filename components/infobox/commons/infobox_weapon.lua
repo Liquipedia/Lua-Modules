@@ -87,11 +87,11 @@ end
 
 function Weapon:_createLocation(location)
 	if location == nil then
-	return ''
-end
+		return ''
+	end
 
-return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
-	'[[:Category:' .. location .. '|' .. location .. ']]'
+	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
+		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
 function Weapon:getWikiCategories(args)
