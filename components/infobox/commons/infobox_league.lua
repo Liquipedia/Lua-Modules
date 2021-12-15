@@ -429,6 +429,8 @@ function League:_cleanDate(date)
 		return nil
 	end
 
+	-- due to '-' and '?' being part of the 'magic' characters for patterns
+	-- we have to escape them with '%'
 	date = date:gsub('%-%?%?', '-01')
 	date = date:gsub('%-XX', '-01')
 	return date
