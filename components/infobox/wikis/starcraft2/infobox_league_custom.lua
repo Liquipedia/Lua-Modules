@@ -580,7 +580,7 @@ function CustomLeague:addToLpdb(lpdbData)
 		or Variables.varDefault('cancelled tournament', '') == 'true' and 'cancelled'
 		or Variables.varDefault('tournament_finished', '') == 'true' and 'finished'
 	lpdbData.status = status
-	lpdbData.maps = CustomLeague:_concatArgs('map')
+	lpdbData.maps = CustomLeague:_concatArgs('map', {split = '|'})
 	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
@@ -588,18 +588,30 @@ function CustomLeague:addToLpdb(lpdbData)
 	return lpdbData
 end
 
-function CustomLeague:_concatArgs(base)
+function CustomLeague:_concatArgs(base, options)
+	options = options or {}
+
 	local firstArg = _args[base] or _args[base .. '1']
 	if String.isEmpty(firstArg) then
 		return nil
 	end
+
+	if String.isNotEmpty(options.split) then
+		firstArg = mw.text.split(firstArg, options.split)[1]
+	end
+
 	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
 	local index = 2
-	while not String.isEmpty(_args[base .. index]) do
+	local currentFoundArg = _args[base .. index]
+	while not String.isEmpty(currentFoundArg) do
+		if String.isNotEmpty(options.split) then
+			currentFoundArg = mw.text.split(currentFoundArg, options.split)[1]
+		end
 		table.insert(foundArgs,
-			mw.ext.TeamLiquidIntegration.resolve_redirect(_args[base .. index])
+			mw.ext.TeamLiquidIntegration.resolve_redirect(currentFoundArg)
 		)
 		index = index + 1
+		currentFoundArg = _args[base .. index]
 	end
 
 	return table.concat(foundArgs, ';')
