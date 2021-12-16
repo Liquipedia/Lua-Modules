@@ -30,53 +30,56 @@ function Weapon:createInfobox()
 	local args = self.args
 
 	local widgets = {
-	Header{
-		name = self:nameDisplay(args),
-		image = args.image,
-		imageDefault = args.default,
-		imageDark = args.imagedark or args.imagedarkmode,
-		imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-		subHeader = self:subHeader(args),
-	},
-	Center{content = {args.caption}},
-	Title{name = (args.informationType or 'Weapon') .. ' Information'},
-	Cell{
-		name = 'Class',
-		content = self:getAllArgsForBase(args, 'class', {makeLink = true}),
-	},
-	Cell{
-		name = 'Origin',
-		content = {self:_createLocation(args.origin)},
-	},
-	Cell{name = 'Price', content = {args.price}},
-	Cell{name = 'Kill Award', content = {args.killaward}},
-	Cell{name = 'Base Damage', content = {args.damage}},
-	Cell{name = 'Magazine Size', content = {args.magsize}},
-	Cell{name = 'Ammo Capacity', content = {args.ammocap}},
-	Cell{name = 'Reload Speed', content = {args.reloadspeed}},
-	Cell{name = 'Rate of Fire', content = {args.rateoffire}},
-	Cell{name = 'Firing Mode', content = {args.firemode}},
-	Customizable{
-		id = 'side',
-		children = {
-			Cell{name = 'Side', content = {args.side}},
-		}
-	},
-	Customizable{id = 'type', children = {
-		Builder{
-			builder = function()
-				local users = self:getAllArgsForBase(args, 'user', {makeLink = true})
-				return {
-					Cell{
-						name = #users > 1 and 'Users' or 'User',
-						content = users,
-					}
+		Header{
+			name = self:nameDisplay(args),
+			image = args.image,
+			imageDefault = args.default,
+			imageDark = args.imagedark or args.imagedarkmode,
+			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			subHeader = self:subHeader(args),
+		},
+		Center{content = {args.caption}},
+		Title{name = (args.informationType or 'Weapon') .. ' Information'},
+		Cell{
+			name = 'Class',
+			content = self:getAllArgsForBase(args, 'class', {makeLink = true}),
+		},
+		Cell{
+			name = 'Origin',
+			content = {self:_createLocation(args.origin)},
+		},
+		Cell{name = 'Price', content = {args.price}},
+		Cell{name = 'Kill Award', content = {args.killaward}},
+		Cell{name = 'Base Damage', content = {args.damage}},
+		Cell{name = 'Magazine Size', content = {args.magsize}},
+		Cell{name = 'Ammo Capacity', content = {args.ammocap}},
+		Cell{name = 'Reload Speed', content = {args.reloadspeed}},
+		Cell{name = 'Rate of Fire', content = {args.rateoffire}},
+		Cell{name = 'Firing Mode', content = {args.firemode}},
+		Customizable{
+			id = 'side',
+			children = {
+				Cell{name = 'Side', content = {args.side}},
+			}
+		},
+		Customizable{
+			id = 'type',
+			children = {
+				Builder{
+					builder = function()
+						local users = self:getAllArgsForBase(args, 'user', {makeLink = true})
+						return {
+							Cell{
+								name = #users > 1 and 'Users' or 'User',
+								content = users,
+							}
+						}
+					end
 				}
-			end
-		}
-	}},
-	Customizable{id = 'custom', children = {}},
-	Center{content = {args.footnotes}},
+			}
+		},
+		Customizable{id = 'custom', children = {}},
+		Center{content = {args.footnotes}},
 	}
 
 	infobox:categories('Weapons')
@@ -92,7 +95,7 @@ function Weapon:createInfobox()
 end
 
 function Weapon:subHeader(args)
-    return nil
+	return nil
 end
 
 function Weapon:_createLocation(location)
