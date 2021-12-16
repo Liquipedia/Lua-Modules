@@ -39,6 +39,7 @@ function Weapon:createInfobox()
 		imageDefault = args.default,
 		imageDark = args.imagedark or args.imagedarkmode,
 		imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+		subHeader = self:subHeader(args),
 	},
 	Center{content = {args.caption}},
 	Title{name = (args.informationType or 'Weapon') .. ' Information'},
@@ -91,6 +92,10 @@ function Weapon:createInfobox()
 	end
 
 	return builtInfobox
+end
+
+function Weapon:subHeader(args)
+    return nil
 end
 
 function Weapon:_createLocation(location)
