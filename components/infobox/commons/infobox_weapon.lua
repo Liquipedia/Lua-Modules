@@ -32,11 +32,11 @@ function Weapon:createInfobox()
 	local widgets = {
 		Header{
 			name = self:nameDisplay(args),
+			subHeader = self:subHeader(args),
 			image = args.image,
 			imageDefault = args.default,
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-			subHeader = self:subHeader(args),
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Weapon') .. ' Information'},
@@ -63,7 +63,7 @@ function Weapon:createInfobox()
 			}
 		},
 		Customizable{
-			id = 'type',
+			id = 'user',
 			children = {
 				Builder{
 					builder = function()
@@ -78,6 +78,7 @@ function Weapon:createInfobox()
 				}
 			}
 		},
+		Cell{name = 'Game Appearence(s)', content = {args.games}},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
 	}
