@@ -9,9 +9,6 @@ local Class = require('Module:Class')
 local Namespace = require('Module:Namespace')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Flags = require('Module:Flags')
-local String = require('Module:String')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
