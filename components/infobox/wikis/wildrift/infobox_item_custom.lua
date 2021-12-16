@@ -29,7 +29,7 @@ local _categories = {}
 local _CATEGORY_DISPLAY = {
 	finished = 'Upgraded [[Category:Upgraded Items]]',
 	upgraded = 'Upgraded [[Category:Upgraded Items]]',
-	['top-tier'] = 'Top-Tier [[Category:Top-Tier Items',
+	['top-tier'] = 'Top-Tier [[Category:Top-Tier Items]]',
 	advanced = 'Mid-Tier [[Category:Mid-Tier Items]]',
 	['mid-tier'] = 'Mid-Tier [[Category:Mid-Tier Items]]',
 	['mid tier'] = 'Mid-Tier [[Category:Mid-Tier Items]]',
@@ -234,7 +234,7 @@ function CustomInjector:parse(id, widgets)
 			}
 		else return {} end
 	elseif id == 'maps' then
-		if not (String.isEmpty(_args.sr) and
+		if not (String.isEmpty(_args.wr) and
 			String.isEmpty(_args.ha))
 		then
 			table.insert(widgets, Cell{name = '[[Wild Rift (Map)|Wild Rift]]', content = {_args.wr}})
