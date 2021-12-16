@@ -19,6 +19,7 @@ local Variables = require('Module:Variables')
 local Locale = require('Module:Locale')
 local Page = require('Module:Page')
 local LeagueIcon = require('Module:LeagueIcon')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -428,12 +429,7 @@ function League:_cleanDate(date)
 	if self:_isUnknownDate(date) then
 		return nil
 	end
-
-	-- due to '-' and '?' being part of the 'magic' characters for patterns
-	-- we have to escape them with '%'
-	date = date:gsub('%-%?%?', '-01')
-	date = date:gsub('%-XX', '-01')
-	return date
+	return ReferenceCleaner.clean(date)
 end
 
 function League:_isUnknownDate(date)
