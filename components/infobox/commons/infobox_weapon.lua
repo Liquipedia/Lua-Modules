@@ -9,12 +9,16 @@ local Class = require('Module:Class')
 local Namespace = require('Module:Namespace')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Flags = require('Module:Flags')
+local String = require('Module:String')
+local Page = require('Module:Page')
+local Table = require('Module:Table')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
+local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
 local Weapon = Class.new(BasicInfobox)
@@ -60,15 +64,19 @@ function Weapon:createInfobox()
 			Cell{name = 'Side', content = {args.side}},
 		}
 	},
-	Customizable{
-		id = 'user',
-		children = {
-			Cell{
-				name = 'User(s)',
-				content = self:getAllArgsForBase(args, 'user', {makeLink = true}),
-			}
+	Customizable{id = 'type', children = {
+		Builder{
+			builder = function()
+				local users = self:getAllArgsForBase(args, 'user', {makeLink = true})
+				return {
+					Cell{
+						name = #users > 1 and 'Users' or 'User',
+						content = users,
+					}
+				}
+			end
 		}
-	},
+	}},
 	Customizable{id = 'custom', children = {}},
 	Center{content = {args.footnotes}},
 	}
