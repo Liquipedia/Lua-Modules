@@ -36,6 +36,7 @@ local Lpdb = Class.new(
 			'parent',
 			'finished',
 			'bestof',
+			'match2id',
 			--'icondark',
 			--readd this once it is fixed in lpdb
 		}
