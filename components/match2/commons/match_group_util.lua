@@ -355,7 +355,7 @@ function MatchGroupUtil.matchFromRecord(record)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
 	if bracketData.type == 'bracket' then
-		bracketData.lowerEdges = bracketData.lowerEdges
+		bracketData.lowerEdges = bracketData.loweredges
 			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
 	end
 
@@ -382,13 +382,13 @@ end
 
 function MatchGroupUtil.bracketDataFromRecord(data)
 	if data.type == 'bracket' then
-		local advanceSpots = data.advanceSpots or MatchGroupUtil.computeAdvanceSpots(data)
+		local advanceSpots = data.advancespots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {
 			advanceSpots = advanceSpots,
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
 			coordinates = data.coordinates and MatchGroupUtil.indexTableFromRecord(data.coordinates),
 			header = nilIfEmpty(data.header),
-			lowerEdges = data.lowerEdges and Array.map(data.lowerEdges, MatchGroupUtil.indexTableFromRecord),
+			lowerEdges = data.loweredges and Array.map(data.loweredges, MatchGroupUtil.indexTableFromRecord),
 			lowerMatchIds = data.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(data),
 			qualLose = advanceSpots[2] and advanceSpots[2].type == 'qualify',
 			qualLoseLiteral = nilIfEmpty(data.qualloseLiteral),
