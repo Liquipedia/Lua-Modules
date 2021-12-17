@@ -48,7 +48,7 @@ function MatchesTable.run(args)
 
 	if type(data[1]) == 'table' then
 		for _, match in ipairs(data) do
-			output:node(MatchesTable._row(match)) 
+			output:node(MatchesTable._row(match))
 		end
 	end
 
@@ -146,7 +146,7 @@ function MatchesTable._row(match)
 			:css('font-style', 'italic')
 		dateDisplay = 'To be announced'
 	else
-		dateDisplay = mw.language.new('en'):formatDate('F j, Y', match.date)	
+		dateDisplay = mw.language.new('en'):formatDate('F j, Y', match.date)
 	end
 
 	dateCell
@@ -239,7 +239,7 @@ function MatchesTable.score(match)
 	if
 		Logic.readBool(match.finished) or (
 			Logic.readBool(match.dateexact) and
-			os.time() >= MatchesTable._parseDateTime(item.date)
+			os.time() >= MatchesTable._parseDateTime(match.date)
 		)
 	then
 		scoreDisplay = MatchesTable.scoreDisplay(match)
@@ -321,6 +321,6 @@ function MatchesTable._bestof(value)
 	return mw.html.create('abbr')
 		:attr('title', 'Best of ' .. value)
 		:wikitext('Bo' .. value)
-end	
+end
 
 return Class.export(MatchesTable)
