@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchesScheduleTable
+-- page=Module:MatchesTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -115,7 +115,7 @@ function MatchesTable._header()
 end
 
 function MatchesTable._row(match)
-  --toDo: resolve default headers --> wikimessages
+	--toDo: resolve default headers --> wikimessages
 	local matchHeader = match.match2bracketdata.header
 	if String.isEmpty(matchHeader) then
 		matchHeader = _matchHeader or match.match2bracketdata.sectionheader or ''
