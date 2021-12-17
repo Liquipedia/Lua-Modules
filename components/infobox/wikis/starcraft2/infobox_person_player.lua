@@ -352,17 +352,17 @@ function CustomPlayer._addScoresToVS(vs, opponents, player)
 end
 
 function CustomPlayer:adjustLPDB(lpdbData, _, personType)
-	local extradata = {
-		race = _raceData.race,
-		faction = _raceData.faction,
-		faction2 = _raceData.faction2,
-		lc_id = string.lower(self.pagename),
-		teamname = _args.team,
-		role = _args.role,
-		role2 = _args.role2,
-		militaryservice = _militaryStore,
-		activeplayer = (not _statusStore) and Variables.varDefault('isActive', '') or '',
-	}
+	local extradata = lpdbData.extradata
+	extradata.race = _raceData.race
+	extradata.faction = _raceData.faction
+	extradata.faction2 = _raceData.faction2
+	extradata.lc_id = string.lower(self.pagename)
+	extradata.teamname = _args.team
+	extradata.role = _args.role
+	extradata.role2 = _args.role2
+	extradata.militaryservice = _militaryStore
+	extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive', '') or ''
+
 	if Variables.varDefault('racecount') then
 		extradata.racehistorical = true
 		extradata.factionhistorical = true
