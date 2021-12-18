@@ -520,19 +520,19 @@ function CustomPlayer._military(military)
 		local display = military
 		military = string.lower(military)
 		local militaryCategory = ''
-		if String.Contains(military, 'starting') or String.Contains(military, 'pending') then
+		if String.contains(military, 'starting') or String.contains(military, 'pending') then
 			militaryCategory = '[[Category:Players waiting for Military Duty]]'
 			_militaryStore = 'pending'
 		elseif
-			String.Contains(military, 'ending') or String.Contains(military, 'started')
-			or String.Contains(military, 'ongoing')
+			String.contains(military, 'ending') or String.contains(military, 'started')
+			or String.contains(military, 'ongoing')
 		then
 			militaryCategory = '[[Category:Players on Military Duty]]'
 			_militaryStore = 'ongoing'
-		elseif String.Contains(military, 'fulfilled') then
+		elseif String.contains(military, 'fulfilled') then
 			militaryCategory = '[[Category:Players expleted Military Duty]]'
 			_militaryStore = 'fulfilled'
-		elseif String.Contains(military, 'exempted') then
+		elseif String.contains(military, 'exempted') then
 			militaryCategory = '[[Category:Players exempted from Military Duty]]'
 			_militaryStore = 'exempted'
 		end
