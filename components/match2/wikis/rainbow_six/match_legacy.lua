@@ -31,8 +31,8 @@ function p.storeMatch(match2)
 end
 
 function p.storeMatchSMW(match, match2)
-	local streams = match.stream or {}
-	if type(streams) == "string" then streams = json.parse(streams) end
+	local streams = json.parseIfString(match.stream or {})
+	local links = json.parseIfString(match.links or {})
 	local icon = Variables.varDefault("tournament_icon")
 	mw.smw.subobject({
 		"legacymatch_" .. match2.match2id,
@@ -46,6 +46,9 @@ function p.storeMatchSMW(match, match2)
 		"Has match twitch=" .. (streams.twitch or ""),
 		"Has match twitch2=" .. (streams.twitch2 or ""),
 		"Has match youtube=" .. (streams.youtube or ""),
+		"Has match vod=" .. (match.vod or ""),
+		"Has siegegg=" .. (links.siegegg or ""),
+		"Has r6esports=" .. (links.r6esports or ""),
 		"Has tournament name=" .. Logic.emptyOr(match.tickername, match.name, ""),
 		"Has tournament icon=" .. (icon or ""),
 		"Has winner=" .. (match.winner or ""),
