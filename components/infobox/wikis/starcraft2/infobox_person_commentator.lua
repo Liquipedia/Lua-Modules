@@ -145,7 +145,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	return {
 		Cell{
-			name = 'Approx. Earnings ' .. _CURRENT_YEAR,
+			name = 'Approx. Winnings ' .. _CURRENT_YEAR,
 			content = { currentYearEarnings }
 		},
 		Cell{name = 'Military Service', content = { CustomCommentator._military(_args.military) }},
