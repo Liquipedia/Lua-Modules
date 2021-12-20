@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 			earningsFromPlayersDisplay = '$' .. Language:formatNum(_earnings_by_players_while_on_team)
 		end
 		return {
-			Cell{name = 'Earnings', content = {earningsDisplay}},
+			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
 			Cell{name = _PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
 		}
 	elseif id == 'achievements' then
