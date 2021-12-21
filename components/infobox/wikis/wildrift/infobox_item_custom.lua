@@ -301,9 +301,10 @@ function CustomItem.getWikiCategories()
 		if not (String.isEmpty(_args.movespeed) and String.isEmpty(_args.movespeedmult)) then
 			table.insert(_categories, 'Movement Speed Items')
 		end
-
-		return _categories
 	end
+	
+	return _categories
+	
 end
 
 function CustomItem.nameDisplay()
