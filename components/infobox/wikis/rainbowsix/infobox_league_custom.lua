@@ -113,7 +113,7 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'liquipediatier' then
-	    local ubisoftTier = ubisofttier
+		local ubisoftTier = ubisofttier
 		if not String.isEmpty(ubisoftTier) then
 			widgets = {
 				Cell{
@@ -227,7 +227,12 @@ function CustomLeague:defineCustomPageVariables()
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-
+	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or '')
+	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
+	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
+	Variables.varDefine('tournament_mode', _args.mode or '')
+	Variables.varDefine('tournament_currency', _args.currency or '')
+	
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
 	local edate = Variables.varDefault('tournament_enddate', '')
