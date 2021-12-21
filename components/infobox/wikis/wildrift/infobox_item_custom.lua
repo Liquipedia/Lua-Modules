@@ -302,9 +302,9 @@ function CustomItem.getWikiCategories()
 			table.insert(_categories, 'Movement Speed Items')
 		end
 	end
-	
+
 	return _categories
-	
+
 end
 
 function CustomItem.nameDisplay()
