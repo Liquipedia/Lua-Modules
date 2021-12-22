@@ -222,7 +222,7 @@ function MatchesTable._row(match)
 	return row
 end
 
-function MatchesTable._applyCustomAbbreviations(header)
+function MatchesTable._applyCustomAbbreviations(matchHeader)
 	for long, short in pairs(_ABBREVIATIONS) do
 		matchHeader = matchHeader:gsub(long, short)
 	end
