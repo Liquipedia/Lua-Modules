@@ -172,15 +172,6 @@ function p.getByMatchId(args)
 			vod = vod,
 		})
 	end
-	local buildLink = function (linktype, link)
-			local icon, text = _LINK_DATA[linktype].icon, _LINK_DATA[linktype].text
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-
-		for linktype, link in pairs(match.links) do
-			footer:addElement(buildLink(linktype,link))
-		end
-	end
 	if footerSet then
 		footer:node(footerSpacer)
 		wrapper:node(footer)
