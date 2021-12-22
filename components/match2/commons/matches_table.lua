@@ -145,7 +145,7 @@ function MatchesTable._row(match)
 
 	--if the header is a default bracket header we need to convert it to proper display text
 	matchHeader = DisplayHelper.expandHeader(matchHeader)
-	
+
 	if Logic.readBool(_args.shortedroundnames) then
 		--for default headers in brackets the 3rd entry is the shortest, so use that
 		--for non default entries it might not be set, so use the first entry as fallback
