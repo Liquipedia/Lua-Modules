@@ -183,7 +183,7 @@ function MatchesTable._row(match)
 		row:node(roundCell)
 	end
 
-	-- workaround for a lpdb bug
+	-- workaround for a lpdb bug (attaching players to the wrong opponent)
 	-- remove when it is fixed
 	MatchGroupWorkaround.applyPlayerBugWorkaround(match)
 
