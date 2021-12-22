@@ -152,7 +152,8 @@ function p.getByMatchId(args)
 	for index, game in ipairs(match.games) do
 		if game.vod then
 			vods[index] = game.vod
-		end 
+		end
+	end
 
 	local footerSet = false
 	local footer = htmlCreate('div')
