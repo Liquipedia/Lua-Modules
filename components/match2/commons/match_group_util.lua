@@ -637,6 +637,17 @@ function MatchGroupUtil.indexTableFromRecord(record)
 	end)
 end
 
+-- Convert 1-based indexes to 0-based
+function MatchGroupUtil.indexTableToRecord(coordinates)
+	return Table.map(coordinates, function(key, value)
+		if key:match('Index') and type(value) == 'number' then
+			return key, value - 1
+		else
+			return key, value
+		end
+	end)
+end
+
 --[[
 Splits a matchId like h5HXaqbSVP_R02-M002 into the bracket ID h5HXaqbSVP and
 the base match ID R02-M002.
