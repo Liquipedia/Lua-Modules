@@ -24,6 +24,11 @@ MatchesTable.Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = tru
 
 local _UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 local _TBD = 'TBD'
+local _DEFAULT_TBD_IDENTIFIER = 'tbd'
+local _WINNER_LEFT = 1
+local _WINNER_RIGHT = 2
+local _SCORE_STATUS = 'S'
+
 local _args
 local _matchHeader
 local _currentId
@@ -135,7 +140,15 @@ function MatchesTable._row(match)
 	_currentId = match.match2bracketid
 
 	--if the header is a default bracket header we need to convert it to proper display text
-	matchHeader = DisplayHelper.expandHeader(matchHeader)[1]
+	matchHeader = DisplayHelper.expandHeader(matchHeader)
+	
+	if Logic.readBool(_args.shortedroundnames) then
+		--for default headers in brackets the 3rd entry is the shortest, so use that
+		--for non default entries it might not be set, so use the first entry as fallback
+		matchHeader = matchHeader[3] or matchHeader[1]
+	else
+		matchHeader = matchHeader[1]
+	end
 
 	local row = mw.html.create('tr')
 		:addClass('Match')
@@ -183,7 +196,7 @@ function MatchesTable._row(match)
 		row:node(roundCell)
 	end
 
-	-- workaround for a lpdb bug (attaching players to the wrong opponent)
+	-- workaround for a lpdb bug
 	-- remove when it is fixed
 	MatchGroupWorkaround.applyPlayerBugWorkaround(match)
 
@@ -228,7 +241,6 @@ function MatchesTable._buildOpponent(opponent, flip, side)
 		:node(opponentDisplay)
 end
 
-local _DEFAULT_TBD_IDENTIFIER = 'tbd'
 -- overridable value
 MatchesTable.tbdIdentifier = _DEFAULT_TBD_IDENTIFIER
 function MatchesTable.opponentIsTbdOrEmpty(opponent)
@@ -276,8 +288,6 @@ function MatchesTable.score(match)
 	return scoreCell:wikitext(scoreDisplay)
 end
 
-local _WINNER_LEFT = 1
-local _WINNER_RIGHT = 2
 function MatchesTable.scoreDisplay(match)
 	return MatchesTable.getOpponentScore(
 		match.match2opponents[1],
@@ -288,7 +298,6 @@ function MatchesTable.scoreDisplay(match)
 	)
 end
 
-local _SCORE_STATUS = 'S'
 function MatchesTable.getOpponentScore(opponent, isWinner)
 	local score
 	if opponent.status == _SCORE_STATUS then
