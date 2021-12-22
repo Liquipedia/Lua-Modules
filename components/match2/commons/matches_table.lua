@@ -26,7 +26,7 @@ local _UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UT
 local _TBD = 'TBD'
 local _args
 local _matchHeader
-local _currentID
+local _currentId
 
 -- If run in abbreviated roundnames mode
 local _ABBREVIATIONS = {
@@ -118,7 +118,7 @@ end
 function MatchesTable._row(match)
 	local matchHeader = match.match2bracketdata.header
 	if String.isEmpty(matchHeader) then
-		if _currentID == match.match2bracketid then
+		if _currentId == match.match2bracketid then
 			matchHeader = _matchHeader or match.match2bracketdata.sectionheader
 		else
 			matchHeader = match.match2bracketdata.sectionheader or _matchHeader
@@ -132,7 +132,7 @@ function MatchesTable._row(match)
 	else
 		matchHeader = '&nbsp;'
 	end
-	_currentID = match.match2bracketid
+	_currentId = match.match2bracketid
 
 	--if the header is a default bracket header we need to convert it to proper display text
 	matchHeader = DisplayHelper.expandHeader(matchHeader)[1]
