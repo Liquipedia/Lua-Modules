@@ -322,16 +322,16 @@ function CustomCommentator._addScoresToVS(vs, opponents, commentator)
 end
 
 function CustomCommentator:adjustLPDB(lpdbData, _, personType)
-	local extradata = {
-		race = _raceData.race,
-		faction = _raceData.faction,
-		faction2 = _raceData.faction2,
-		lc_id = string.lower(self.pagename),
-		teamname = _args.team,
-		role = _args.role,
-		role2 = _args.role2,
-		militaryservice = _militaryStore,
-	}
+	local extradata = lpdbData.extradata
+	extradata.race = _raceData.race
+	extradata.faction = _raceData.faction
+	extradata.faction2 = _raceData.faction2
+	extradata.lc_id = string.lower(self.pagename)
+	extradata.teamname = _args.team
+	extradata.role = _args.role
+	extradata.role2 = _args.role2
+	extradata.militaryservice = _militaryStore
+
 	if Variables.varDefault('racecount') then
 		extradata.racehistorical = true
 		extradata.factionhistorical = true
