@@ -28,6 +28,10 @@ local _DEFAULT_TBD_IDENTIFIER = 'tbd'
 local _WINNER_LEFT = 1
 local _WINNER_RIGHT = 2
 local _SCORE_STATUS = 'S'
+local _DO_FLIP = true
+local _NO_FLIP = false
+local _LEFT_SIDE_OPPONENT = 'Left'
+local _RIGHT_SIDE_OPPONENT = 'Right'
 
 local _args
 local _matchHeader
@@ -203,8 +207,8 @@ function MatchesTable._row(match)
 	row:node(
 		MatchesTable._buildOpponent(
 			match.match2opponents[1],
-			true,
-			'Left'
+			_DO_FLIP,
+			_LEFT_SIDE_OPPONENT
 		)
 	)
 
@@ -213,8 +217,8 @@ function MatchesTable._row(match)
 	row:node(
 		MatchesTable._buildOpponent(
 			match.match2opponents[2],
-			false,
-			'Right'
+			_NO_FLIP,
+			_RIGHT_SIDE_OPPONENT
 		)
 	)
 
