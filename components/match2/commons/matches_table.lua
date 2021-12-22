@@ -16,6 +16,7 @@ local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 local Lua = require('Module:Lua')
 local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
 -- overridable if wikis have custom modules
 MatchesTable.OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
@@ -25,6 +26,7 @@ local _UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UT
 local _TBD = 'TBD'
 local _args
 local _matchHeader
+local _currentID
 
 -- If run in abbreviated roundnames mode
 local _ABBREVIATIONS = {
@@ -115,13 +117,26 @@ function MatchesTable._header()
 end
 
 function MatchesTable._row(match)
-	--toDo: resolve default headers --> wikimessages
 	local matchHeader = match.match2bracketdata.header
 	if String.isEmpty(matchHeader) then
-		matchHeader = _matchHeader or match.match2bracketdata.sectionheader or ''
-	else
-		_matchHeader = matchHeader
+		if _currentID == match.match2bracketid then
+			matchHeader = _matchHeader or match.match2bracketdata.sectionheader
+		else
+			matchHeader = match.match2bracketdata.sectionheader or _matchHeader
+			if String.isEmpty(matchHeader) then
+				matchHeader = _matchHeader
+			end
+		end
 	end
+	if String.isNotEmpty(matchHeader) then
+		_matchHeader = matchHeader
+	else
+		matchHeader = '&nbsp;'
+	end
+	_currentID = match.match2bracketid
+
+	--if the header is a default bracket header we need to convert it to proper display text
+	matchHeader = DisplayHelper.expandHeader(matchHeader)[1]
 
 	local row = mw.html.create('tr')
 		:addClass('Match')
@@ -191,7 +206,6 @@ function MatchesTable._row(match)
 		)
 	)
 
-mw.logObject(row)
 	return row
 end
 
