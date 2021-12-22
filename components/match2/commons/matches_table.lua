@@ -148,8 +148,10 @@ function MatchesTable._row(match)
 
 	if Logic.readBool(_args.shortedroundnames) then
 		--for default headers in brackets the 3rd entry is the shortest, so use that
-		--for non default entries it might not be set, so use the first entry as fallback
-		matchHeader = matchHeader[3] or matchHeader[1]
+		--for non default (i.e. custom) entries it might not be set
+		--so use the first entry as a fallback
+		matchHeader = matchHeader[3]
+			or MatchesTable._applyCustomAbbreviations(matchHeader[1])
 	else
 		matchHeader = matchHeader[1]
 	end
@@ -190,11 +192,6 @@ function MatchesTable._row(match)
 		local roundCell = mw.html.create('td')
 			:addClass('Round')
 		if String.isNotEmpty(matchHeader) then
-			if Logic.readBool(_args.shortedroundnames) then
-				for long, short in pairs(_ABBREVIATIONS) do
-					matchHeader = matchHeader:gsub(long, short)
-				end
-			end
 			roundCell:wikitext(matchHeader)
 		end
 		row:node(roundCell)
@@ -223,6 +220,12 @@ function MatchesTable._row(match)
 	)
 
 	return row
+end
+
+function MatchesTable._applyCustomAbbreviations(header)
+	for long, short in pairs(_ABBREVIATIONS) do
+		matchHeader = matchHeader:gsub(long, short)
+	end
 end
 
 function MatchesTable._buildOpponent(opponent, flip, side)
