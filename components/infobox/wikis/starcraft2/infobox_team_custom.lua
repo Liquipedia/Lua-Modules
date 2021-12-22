@@ -284,9 +284,9 @@ function CustomTeam.getEarningsAndMedalsData(team)
 				information = playerEarnings,
 		})
 	end
-	_earnings_by_players_while_on_team = math.floor((playerEarnings or 0) * 100 + 0.5) / 100
+	_earnings_by_players_while_on_team = math.floor((playerEarnings or 0) + 0.5)
 
-	return math.floor((earnings.team.total or 0) * 100 + 0.5) / 100
+	return math.floor((earnings.team.total or 0) + 0.5)
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
