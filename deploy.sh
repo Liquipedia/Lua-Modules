@@ -96,7 +96,7 @@ do
         -X POST "${wikiApiUrl}?format=json&action=edit" \
         | gunzip
     )
-    result="$rawResult" | jq ".edit.result" -r
+    result=echo "$rawResult" | jq ".edit.result" -r
     echo "DEBUG: ...${rawResult}"
     echo "...${result}"
 
