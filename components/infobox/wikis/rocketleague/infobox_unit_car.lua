@@ -74,4 +74,8 @@ function CustomUnit:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint(objectName, lpdbData)
 end
 
+function CustomInjector:parse(_, widgets)
+	return widgets
+end
+
 return CustomUnit
