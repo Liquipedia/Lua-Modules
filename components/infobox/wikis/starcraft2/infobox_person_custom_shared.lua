@@ -148,7 +148,7 @@ function CustomPerson.getStatusToStore()
 		_statusStore = 'Deceased'
 	elseif _args.retired then
 		_statusStore = 'Retired'
-	elseif 
+	elseif
 		(not Logic.readBool(_args.isplayer)) and
 		string.lower(_args.role or _args.defaultPersonType) ~= 'player'
 	then
