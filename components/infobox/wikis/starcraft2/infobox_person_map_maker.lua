@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:Infobox/Person/MapMaker
+-- page=Module:Infobox/Person/MapMaker/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -19,18 +19,7 @@ local Variables = require('Module:Variables')
 local MapMaker = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 --race stuff tables
-local _FACTION1 = {
-	['p'] = 'Protoss', ['pt'] = 'Protoss', ['pz'] = 'Protoss',
-	['t'] = 'Terran', ['tp'] = 'Terran', ['tz'] = 'Terran',
-	['z'] = 'Zerg', ['zt'] = 'Zerg', ['zp'] = 'Zerg',
-	['r'] = 'Random', ['a'] = 'All'
-}
-local _FACTION2 = {
-	['pt'] = 'Terran', ['pz'] = 'Zerg',
-	['tp'] = 'Protoss', ['tz'] = 'Zerg',
-	['zt'] = 'Terran', ['zp'] = 'Protoss'
-}
-local _RACE_DISPLAY = {
+PersonSc2.raceDisplayLookupTable = {
 	['p'] = '[[Protoss]]',
 	['pt'] = '[[Protoss]],&nbsp;[[Terran]]',
 	['pz'] = '[[Protoss]],&nbsp;[[Zerg]]',
@@ -44,25 +33,6 @@ local _RACE_DISPLAY = {
 	['a'] = '[[Protoss]],&nbsp;[[Terran]],&nbsp;[[Zerg]]',
 }
 
---role stuff tables
-local _ROLES = {
-	['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
-	['commentator'] = 'Commentator', ['caster'] = 'Commentator',
-	['expert'] = 'Analyst', ['host'] = 'Host', ['streamer'] = 'Streamer',
-	['interviewer'] = 'Interviewer', ['journalist'] = 'Journalist',
-	['manager'] = 'Manager', ['player'] = 'Player',
-	['observer'] = 'Observer', ['photographer'] = 'Photographer',
-	['tournament organizer'] = 'Organizer', ['organizer'] = 'Organizer',
-}
-local _CLEAN_OTHER_ROLES = {
-	['blizzard'] = 'Blizzard', ['coach'] = 'Coach', ['staff'] = 'false',
-	['content producer'] = 'Content producer', ['streamer'] = 'false',
-}
-
-local _raceData
-local _statusStore
-local _militaryStore
-
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
@@ -74,29 +44,36 @@ local CustomInjector = Class.new(Injector)
 local _args
 
 function CustomMapMaker.run(frame)
-	local mapMaker = MapMaker(frame)
-	_args = mapMaker.args
+	local player = Person(frame)
+	_args = player.args
+	PersonSc2.args = _args
+	PersonSc2.setArgs(_args)
 
-	mapMaker.shouldStoreData = CustomMapMaker.shouldStoreData
-	mapMaker.getStatusToStore = CustomMapMaker.getStatusToStore
-	mapMaker.adjustLPDB = CustomMapMaker.adjustLPDB
-	mapMaker.getPersonType = CustomMapMaker.getPersonType
+	player.shouldStoreData = PersonSc2.shouldStoreData
+	player.getStatusToStore = PersonSc2.getStatusToStore
+	player.adjustLPDB = PersonSc2.adjustLPDB
+	player.getPersonType = PersonSc2.getPersonType
+	player.nameDisplay = PersonSc2.nameDisplay
 
-	mapMaker.nameDisplay = CustomMapMaker.nameDisplay
-	mapMaker.createWidgetInjector = CustomMapMaker.createWidgetInjector
+	player.calculateEarnings = CustomMapMaker.calculateEarnings
+	player.createBottomContent = CustomMapMaker.createBottomContent
+	player.createWidgetInjector = CustomMapMaker.createWidgetInjector
 
-	return mapMaker:createInfobox(frame)
+	return player:createInfobox(frame)
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
-		return { Cell{name = 'Race', content = { _raceData.display }
+		return {
+			Cell{
+				name = 'Race',
+				content = {PersonSc2.getRaceData(_args.race or 'unknown')}
 			}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
 	elseif id == 'achievements' then
-		if not(String.isEmpty(_args.maps_ladder) or String.isEmpty(_args.maps_special)) then
+		if String.isNotEmpty(_args.maps_ladder) or String.isNotEmpty(_args.maps_special) then
 			return {
 				Title{name = 'Achievements'},
 				Cell{name = 'Ladder maps created', content = {_args.maps_ladder}},
@@ -118,7 +95,7 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	return {
-		Cell{name = 'Military Service', content = { CustomMapMaker._military(_args.military) }},
+		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military)}},
 	}
 end
 
@@ -236,7 +213,5 @@ function CustomMapMaker:getPersonType()
 		category = 'Mapmaker'
 	end
 
-	return { store = store, category = category or 'Mapmaker' }
-end
 
 return CustomMapMaker
