@@ -28,7 +28,8 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 	roundData = roundData or {}
 	local lastRound = 0
 	for _, match in ipairs(matches) do
-		bracketData, lastRound, lowerHeader = MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketType, lowerHeader)
+		bracketData, lastRound, lowerHeader = MatchGroupLegacyDefault._getMatchMapping(match, bracketData,
+																					   bracketType, lowerHeader)
 	end
 
 	-- add reference for map mappings
