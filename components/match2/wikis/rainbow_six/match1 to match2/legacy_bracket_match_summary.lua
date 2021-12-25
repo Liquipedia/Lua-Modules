@@ -7,7 +7,7 @@
 --
 
 --[[
-	This module is used in the process convert Legacy match1 into match2.
+	This module is used in the process of converting Legacy match1 into match2.
 	It converts a few fields to new format, and jsonify the args.
 	It is invoked by Template:BracketMatchSummary.
 ]]

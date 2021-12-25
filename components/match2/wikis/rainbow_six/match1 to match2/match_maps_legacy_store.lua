@@ -95,7 +95,7 @@ function MatchMapsLegacyStore.close()
 	processMatches.isLegacy = true
 
 	-- store match
-	local matchhtml = MatchGroupDisplay.MatchlistBySpec(processMatches)
+	local matchHtml = MatchGroupDisplay.MatchlistBySpec(processMatches)
 
 	--local warnings = Json.parseIfString(matchlistVars:get('warnings')) or {}
 
@@ -110,7 +110,7 @@ function MatchMapsLegacyStore.close()
 	matchlistVars:delete('width')
 	matchlistVars:delete('gsl')
 
-	return matchhtml
+	return matchHtml
 end
 
 
@@ -134,7 +134,7 @@ function MatchMapsLegacyStore.closeSingle(frame)
 
 	local MatchGroupBase = require('Module:MatchGroup/Base')
 	-- display match
-	local matchhtml = MatchGroupDisplay.MatchByMatchId(
+	local matchHtml = MatchGroupDisplay.MatchByMatchId(
 		{id = MatchGroupBase.readBracketId(processMatches.id), matchid = '1', width = matchlistVars:get('width')}
 	)
 
@@ -148,7 +148,7 @@ function MatchMapsLegacyStore.closeSingle(frame)
 	matchlistVars:delete('bracketid')
 	matchlistVars:delete('width')
 
-	return matchhtml
+	return matchHtml
 end
 
 return MatchMapsLegacyStore
