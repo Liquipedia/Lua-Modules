@@ -16,9 +16,6 @@ local Template = require('Module:Template')
 
 local CustomTeam = Class.new()
 
-local _CURRENT_YEAR = os.date('%Y')
-local _START_YEAR = 2015
-
 local CustomInjector = Class.new(Injector)
 
 local _team
@@ -29,17 +26,7 @@ function CustomTeam.run(frame)
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	return team:createInfobox(frame)
-end
-
-function CustomInjector:parse(id, widgets)
-	if id == 'region' then
-		return {
-			Cell{name = 'Region', content = {_team:_createRegion(_team.args.region, _team.args.location)}}
-		}
-	end
-	return widgets
 end
 
 function CustomTeam:createBottomContent()
