@@ -60,11 +60,10 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomTeam:createBottomContent()
-	return Template.safeExpand(
+	return Template.expandTemplate(
 		mw.getCurrentFrame(),
 		'Upcoming and ongoing matches of',
-		{team = _team.pagename or _team.name},
-		''
+		{team = _team.pagename or _team.name}
 	)
 end
 
@@ -76,7 +75,6 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.logo = 'File:' .. args.image
 	end
 
-	lpdbData.extradata = {}
 	for year = _START_YEAR, _CURRENT_YEAR do
 		local id = args.id or _team.pagename
 		lpdbData.extradata['earningsin' .. year] = Earnings.team({id, year = year}):gsub(',', '')
@@ -90,7 +88,7 @@ function CustomTeam:createWidgetInjector()
 end
 
 function CustomTeam:defineCustomPageVariables(args)
-	Variables.varDefine('team_captain', _team.args.captain)
+	Variables.varDefine('team_captain', args.captain)
 end
 
 return CustomTeam
