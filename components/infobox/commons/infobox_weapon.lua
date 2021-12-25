@@ -95,10 +95,6 @@ function Weapon:createInfobox()
 	return builtInfobox
 end
 
-function Weapon:subHeader(args)
-	return nil
-end
-
 function Weapon:_createLocation(location)
 	if location == nil then
 		return ''
@@ -106,6 +102,10 @@ function Weapon:_createLocation(location)
 
 	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
 		'[[:Category:' .. location .. '|' .. location .. ']]'
+end
+
+function Weapon:subHeader(args)
+	return nil
 end
 
 function Weapon:getWikiCategories(args)
