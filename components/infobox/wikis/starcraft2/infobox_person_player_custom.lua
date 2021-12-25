@@ -59,8 +59,6 @@ PersonSc2.raceDisplayLookupTable = {
 local _earningsGlobal = {}
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _shouldQueryData
-local _raceData
-local _statusStore
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -145,7 +143,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	local rank1, rank2 = {}, {}
 	local yearsActive
-	if _shouldQueryData and not _statusStore then
+	if _shouldQueryData then
 		rank1, rank2 = CustomPlayer._getRank(_PAGENAME)
 		yearsActive = CustomPlayer._getMatchupData(_PAGENAME)
 	end
