@@ -45,6 +45,8 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.logo = 'File:' .. args.image
 	end
 
+	lpdbData.region = Variables.varDefault('region', '')
+
 	return lpdbData
 end
 
