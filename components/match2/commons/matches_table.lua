@@ -127,24 +127,35 @@ end
 function MatchesTable._row(match)
 	local matchHeader = match.match2bracketdata.header
 	if String.isEmpty(matchHeader) then
+		--if we are in the same matchGroup just use the previous _matchHeader
 		if _currentId == match.match2bracketid then
-			matchHeader = _matchHeader or match.match2bracketdata.sectionheader
-		else
-			matchHeader = match.match2bracketdata.sectionheader or _matchHeader
+			matchHeader = _matchHeader
+		end
+		--if we do not have a matchHeader yet try:
+		-- 1) the title (in case it is a matchlist)
+		-- 2) the sectionheader
+		-- 3) fallback to the previous _matchHeader
+		-- last one only applies if we are in a new matchGroup due to it already being used before else
+		if String.isEmpty(matchHeader) then
+			matchHeader = string.gsub(match.match2bracketdata.title or '', '%s[mM]atches', '')
 			if String.isEmpty(matchHeader) then
-				matchHeader = _matchHeader
+				matchHeader = match.match2bracketdata.sectionheader
+				if String.isEmpty(matchHeader) then
+					matchHeader = _matchHeader
+				end
 			end
 		end
 	end
-	if String.isNotEmpty(matchHeader) then
-		_matchHeader = matchHeader
-	else
+	if String.isEmpty(matchHeader) then
 		matchHeader = '&nbsp;'
 	end
 	_currentId = match.match2bracketid
 
-	--if the header is a default bracket header we need to convert it to proper display text
-	matchHeader = DisplayHelper.expandHeader(matchHeader)
+	if type(matchHeader) == 'string' then
+		--if the header is a default bracket header we need to convert it to proper display text
+		matchHeader = DisplayHelper.expandHeader(matchHeader)
+	end
+	_matchHeader = matchHeader
 
 	if Logic.readBool(_args.shortedroundnames) then
 		--for default headers in brackets the 3rd entry is the shortest, so use that
