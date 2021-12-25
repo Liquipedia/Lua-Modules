@@ -52,6 +52,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
 		bracketData.bracketindex = Variables.varDefault('match2bracketindex', 0)
 		bracketData.sectionheader = sectionHeader
+		bracketData.dateHeader = Logic.readBool(match.dateHeader)
 	end
 
 	return matches
