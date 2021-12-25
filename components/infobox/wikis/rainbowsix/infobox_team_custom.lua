@@ -7,7 +7,6 @@
 --
 
 local Team = require('Module:Infobox/Team')
-local Earnings = require('Module:Earnings of')
 local Variables = require('Module:Variables')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -35,23 +34,7 @@ function CustomTeam.run(frame)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'earnings' then
-		local earnings = Earnings.team({_team.args.id or _team.pagename})
-		Variables.varDefine('earnings', earnings:gsub(',', ''))
-		if earnings == 0 then
-			earnings = nil
-		else
-			earnings = '$' .. earnings
-		end
-		return {
-			Cell{
-				name = 'Earnings',
-				content = {
-					earnings
-				}
-			}
-		}
-	elseif id == 'region' then
+	if id == 'region' then
 		return {
 			Cell{name = 'Region', content = {_team:_createRegion(_team.args.region, _team.args.location)}}
 		}
@@ -73,11 +56,6 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.logo = 'File:' .. args.teamcardimage
 	elseif not String.isEmpty(args.image) then
 		lpdbData.logo = 'File:' .. args.image
-	end
-
-	for year = _START_YEAR, _CURRENT_YEAR do
-		local id = args.id or _team.pagename
-		lpdbData.extradata['earningsin' .. year] = Earnings.team({id, year = year}):gsub(',', '')
 	end
 
 	return lpdbData
