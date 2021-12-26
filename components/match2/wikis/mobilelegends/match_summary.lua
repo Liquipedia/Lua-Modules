@@ -314,8 +314,7 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 
 	local display = mw.html.create('div')
 	if isBan then
-		display:addClass('brkts-popup-side-shade-out')
-		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
+		display:addClass('brkts-popup-side-shade-out' .. (flip and '-flipped' or ''))
 	end
 
 	for _, item in ipairs(opponentChampionsDisplay) do
