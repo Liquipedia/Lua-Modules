@@ -183,7 +183,7 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	local function buildTierString(tierString)
 		local tierText = Tier.text[tierString]
 		if not tierText then
-			table.insert(_league._warnings, tierString .. ' is not a known Liquipedia Tier')
+			table.insert(_league.warnings, tierString .. ' is not a known Liquipedia Tier/Tiertype')
 			return ''
 		else
 			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']][[Category:' .. tierText .. ' Tournaments]]'

@@ -33,7 +33,7 @@ local Chronology = Widgets.Chronology
 
 local League = Class.new(BasicInfobox)
 
-local _warnings = {}
+League.warnings = {}
 
 function League.run(frame)
 	local league = League(frame)
@@ -182,7 +182,7 @@ function League:createInfobox()
 		self:_setLpdbData(args, links)
 	end
 
-	return builtInfobox .. WarningBox.displayAll(_warnings)
+	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
 end
 
 --- Allows for overriding this functionality
