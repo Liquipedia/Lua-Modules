@@ -27,11 +27,6 @@ local MODES = {
 --default opponent type (used if the entered mode is not found in the above table)
 local DefaultMode = 'team'
 
---returns the cleaned opponent type
-function wikiCopyPaste.getMode(mode)
-	return MODES[string.lower(mode or '')] or DefaultMode
-end
-
 --returns the Code for a Match, depending on the input
 function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local indent = '    '
