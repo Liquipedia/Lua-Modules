@@ -64,6 +64,8 @@ function Map:_setLpdbData(args)
 		name = self.name,
 		type = 'map',
 		image = args.image,
+		releasedate = args.releasedate,
+		game = args.game,
 		extradata = { creator = args.creator }
 	}
 
