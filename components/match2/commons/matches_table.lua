@@ -32,6 +32,7 @@ local _DO_FLIP = true
 local _NO_FLIP = false
 local _LEFT_SIDE_OPPONENT = 'Left'
 local _RIGHT_SIDE_OPPONENT = 'Right'
+local _DEFAULT_QUERY_LIMIT = 1000
 
 local _args
 local _matchHeader
@@ -47,7 +48,7 @@ function MatchesTable.run(args)
 	_args = args or {}
 
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
-		limit = tonumber(_args.limit) or 1000,
+		limit = tonumber(_args.limit) or _DEFAULT_QUERY_LIMIT,
 		offset = 0,
 		order = 'date asc',
 		conditions = MatchesTable._buildConditions(),
