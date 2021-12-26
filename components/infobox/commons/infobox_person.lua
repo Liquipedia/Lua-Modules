@@ -117,7 +117,7 @@ function Person:createInfobox()
 			builder = function()
 				if _totalEarnings and _totalEarnings ~= 0 then
 					return {
-						Cell{name = 'Total Earnings', content = {'$' .. Language:formatNum(_totalEarnings)}},
+						Cell{name = 'Approx. Total Winnings', content = {'$' .. Language:formatNum(_totalEarnings)}},
 					}
 				end
 			end

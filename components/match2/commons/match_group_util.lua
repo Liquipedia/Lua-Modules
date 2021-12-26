@@ -356,9 +356,14 @@ to the starcraft2 wiki as an example.
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
+	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
+	if bracketData.type == 'bracket' then
+		bracketData.lowerEdges = bracketData.loweredges
+			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
+	end
 
 	return {
-		bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata), #opponents),
+		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		date = Date.readTimestamp(record.date),
@@ -380,54 +385,21 @@ function MatchGroupUtil.matchFromRecord(record)
 	}
 end
 
-function MatchGroupUtil.bracketDataFromRecord(data, opponentCount)
+function MatchGroupUtil.bracketDataFromRecord(data)
 	if data.type == 'bracket' then
-		local lowerEdges = {}
-		local lowerMatchIds = {}
-		local midIx = math.floor(opponentCount / 2)
-		if nilIfEmpty(data.toupper) then
-			table.insert(lowerMatchIds, data.toupper)
-			table.insert(lowerEdges, {
-				opponentIndex = midIx,
-				lowerMatchIndex = #lowerMatchIds,
-			})
-		end
-		if nilIfEmpty(data.tolower) then
-			table.insert(lowerMatchIds, data.tolower)
-			table.insert(lowerEdges, {
-				opponentIndex = math.min(midIx + 1, opponentCount),
-				lowerMatchIndex = #lowerMatchIds,
-			})
-		end
-
-		local advanceSpots = {}
-		if nilIfEmpty(data.winnerto) then
-			advanceSpots[1] = {bg = 'up', type = 'custom', matchId = data.winnerto}
-		end
-		if nilIfEmpty(data.loserto) then
-			advanceSpots[2] = {bg = 'stayup', type = 'custom', matchId = data.loserto}
-		end
-		if Logic.readBool(data.qualwin) then
-			advanceSpots[1] = Table.merge(advanceSpots[1], {bg = 'up', type = 'qualify'})
-		end
-		if Logic.readBool(data.quallose) then
-			advanceSpots[2] = Table.merge(advanceSpots[2], {bg = 'stayup', type = 'qualify'})
-		end
-
+		local advanceSpots = data.advancespots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {
 			advanceSpots = advanceSpots,
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
-			bracketSection = data.bracketsection,
 			coordinates = data.coordinates and MatchGroupUtil.indexTableFromRecord(data.coordinates),
 			header = nilIfEmpty(data.header),
-			lowerEdges = lowerEdges,
-			lowerMatchIds = lowerMatchIds,
+			lowerEdges = data.loweredges and Array.map(data.loweredges, MatchGroupUtil.indexTableFromRecord),
+			lowerMatchIds = data.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(data),
 			qualLose = advanceSpots[2] and advanceSpots[2].type == 'qualify',
 			qualLoseLiteral = nilIfEmpty(data.qualloseLiteral),
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,
 			qualWin = advanceSpots[1] and advanceSpots[1].type == 'qualify',
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
-			rootIndex = tonumber(data.rootindex),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
@@ -503,17 +475,75 @@ function MatchGroupUtil.gameFromRecord(record)
 	}
 end
 
-function MatchGroupUtil.populateAdvanceSpots(bracket)
-	if bracket.type ~= 'bracket' then
-		return
+function MatchGroupUtil.computeLowerMatchIdsFromLegacy(data)
+	local lowerMatchIds = {}
+	if nilIfEmpty(data.toupper) then
+		table.insert(lowerMatchIds, data.toupper)
+	end
+	if nilIfEmpty(data.tolower) then
+		table.insert(lowerMatchIds, data.tolower)
+	end
+	return lowerMatchIds
+end
+
+--[[
+Auto compute lower edges, which encode the connector lines between lower
+matches and this match.
+]]
+function MatchGroupUtil.autoAssignLowerEdges(lowerMatchCount, opponentCount)
+	local lowerEdges = {}
+	if lowerMatchCount <= opponentCount then
+		-- More opponents than lower matches: connect lower matches to opponents near the middle.
+		local skip = math.ceil((opponentCount - lowerMatchCount) / 2)
+		for lowerMatchIndex = 1, lowerMatchCount do
+			table.insert(lowerEdges, {
+				lowerMatchIndex = lowerMatchIndex,
+				opponentIndex = lowerMatchIndex + skip,
+			})
+		end
+	else
+		-- More lower matches than opponents: The excess lower matches are all connected to the final opponent.
+		for lowerMatchIndex = 1, lowerMatchCount do
+			table.insert(lowerEdges, {
+				lowerMatchIndex = lowerMatchIndex,
+				opponentIndex = math.min(lowerMatchIndex, opponentCount),
+			})
+		end
+	end
+	return lowerEdges
+end
+
+--[[
+Computes just the advance spots that can be determined from a match bracket
+data. More are found in populateAdvanceSpots.
+]]
+function MatchGroupUtil.computeAdvanceSpots(data)
+	local advanceSpots = {}
+
+	if data.upperMatchId then
+		advanceSpots[1] = {bg = 'up', type = 'advance', matchId = data.upperMatchId}
 	end
 
-	-- Winner advances to upper match
-	for _, match in ipairs(bracket.matches) do
-		if match.bracketData.upperMatchId then
-			match.bracketData.advanceSpots[1] = match.bracketData.advanceSpots[1]
-				or {bg = 'up', type = 'advance', matchId = match.bracketData.upperMatchId}
-		end
+	if nilIfEmpty(data.winnerto) then
+		advanceSpots[1] = {bg = 'up', type = 'custom', matchId = data.winnerto}
+	end
+	if nilIfEmpty(data.loserto) then
+		advanceSpots[2] = {bg = 'stayup', type = 'custom', matchId = data.loserto}
+	end
+
+	if Logic.readBool(data.qualwin) then
+		advanceSpots[1] = Table.merge(advanceSpots[1], {bg = 'up', type = 'qualify'})
+	end
+	if Logic.readBool(data.quallose) then
+		advanceSpots[2] = Table.merge(advanceSpots[2], {bg = 'stayup', type = 'qualify'})
+	end
+
+	return advanceSpots
+end
+
+function MatchGroupUtil.populateAdvanceSpots(bracket)
+	if #bracket.matches == 0 then
+		return
 	end
 
 	-- Loser of semifinals play in third place match
@@ -606,6 +636,17 @@ function MatchGroupUtil.indexTableFromRecord(record)
 	return Table.map(record, function(key, value)
 		if key:match('Index') and type(value) == 'number' then
 			return key, value + 1
+		else
+			return key, value
+		end
+	end)
+end
+
+-- Convert 1-based indexes to 0-based
+function MatchGroupUtil.indexTableToRecord(coordinates)
+	return Table.map(coordinates, function(key, value)
+		if key:match('Index') and type(value) == 'number' then
+			return key, value - 1
 		else
 			return key, value
 		end

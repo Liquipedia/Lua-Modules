@@ -119,7 +119,7 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 		end
 	end
 
-	return MathUtils._round(totalEarnings, 2)
+	return MathUtils._round(totalEarnings)
 end
 
 ---
@@ -150,11 +150,11 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 	end
 
 	for year, earningsOfYear in pairs(earningsData) do
-		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear, 2)
+		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear)
 		totalEarnings = totalEarnings + earningsOfYear
 	end
 
-	totalEarnings = MathUtils._round(totalEarnings, 2)
+	totalEarnings = MathUtils._round(totalEarnings)
 
 	return totalEarnings, totalEarningsByYear
 end

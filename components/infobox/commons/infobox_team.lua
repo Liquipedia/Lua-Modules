@@ -95,7 +95,7 @@ function Team:createInfobox()
 							totalEarnings = '$' .. Language:formatNum(_totalEarnings)
 						end
 						return {
-							Cell{name = 'Earnings', content = {totalEarnings}}
+							Cell{name = 'Approx. Total Winnings', content = {totalEarnings}}
 						}
 					end
 				}

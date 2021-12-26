@@ -13,6 +13,7 @@ local String = require('Module:StringUtils')
 local Achievements = require('Module:Achievements in infoboxes')
 local RaceIcon = require('Module:RaceIcon').getSmallIcon
 local Matches = require('Module:Upcoming ongoing and recent matches team/new')
+local Math = require('Module:Math')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -71,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 			earningsFromPlayersDisplay = '$' .. Language:formatNum(_earnings_by_players_while_on_team)
 		end
 		return {
-			Cell{name = 'Earnings', content = {earningsDisplay}},
+			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
 			Cell{name = _PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
 		}
 	elseif id == 'achievements' then
@@ -284,9 +285,9 @@ function CustomTeam.getEarningsAndMedalsData(team)
 				information = playerEarnings,
 		})
 	end
-	_earnings_by_players_while_on_team = math.floor((playerEarnings or 0) * 100 + 0.5) / 100
+	_earnings_by_players_while_on_team = Math.round{playerEarnings or 0}
 
-	return math.floor((earnings.team.total or 0) * 100 + 0.5) / 100
+	return Math.round{earnings.team.total or 0}
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)

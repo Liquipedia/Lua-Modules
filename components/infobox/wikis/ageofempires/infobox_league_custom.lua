@@ -224,8 +224,11 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	Variables.varDefine('game', GameLookup.getName({args.game}))
 	Variables.varDefine('tournament_game', GameLookup.getName({args.game}))
-	Variables.varDefine('tournament_patch', args.patch)
-	Variables.varDefine('patch', args.patch)
+	-- Currently, args.patch shall be used for official patches,
+	-- whereas voobly is used to denote non-official version played via voobly
+	Variables.varDefine('tournament_patch', args.patch or args.voobly)
+	Variables.varDefine('patch', args.patch or args.voobly)
+	Variables.varDefine('tournament_gameversion', args.version)
 	Variables.varDefine('tournament_mode',
 		(not String.isEmpty(args.mode)) and args.mode or
 		(not String.isEmpty(args.team_number)) and 'team' or
@@ -279,12 +282,15 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['maps'] = table.concat(mappages, ';')
 
 	lpdbData['game'] = GameLookup.getName({args.game})
-	lpdbData['patch'] = args.patch
+	-- Currently, args.patch shall be used for official patches,
+	-- whereas voobly is used to denote non-official version played via voobly
+	lpdbData['patch'] = args.patch or args.voobly
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
 		deadline = DateClean(args.deadline or ''),
-		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ',')
+		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ','),
+		gameversion = args.version
 	}
 
 	return lpdbData
