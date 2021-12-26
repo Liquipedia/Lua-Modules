@@ -127,7 +127,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:_standardiseRawDate(dateString)
-	if String.isEmpty(dateString) then
+	-- Length 7 = YYYY-MM
+	-- Length 10 = YYYY-MM-??
+	if String.isEmpty(dateString) or (#dateString ~= 7 and #dateString ~= 10) then
 		return ''
 	end
 
