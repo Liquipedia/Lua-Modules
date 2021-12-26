@@ -128,9 +128,9 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.maps = table.concat(_league:getAllArgsForBase('map'), ';')
+	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
-	lpdbData.publishertier = args.ubisofttier
+	lpdbData.publishertier = args.ubisofttier:lower()
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
