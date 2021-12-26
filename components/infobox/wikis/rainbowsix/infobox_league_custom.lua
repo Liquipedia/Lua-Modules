@@ -39,14 +39,15 @@ local _UBISOFT_TIERS = {
 }
 
 function CustomLeague.run(frame)
-	_league = League(frame)
+	local league = League(frame)
+	_league = league
 	_args = _league.args
 
-	_league.createWidgetInjector = CustomLeague.createWidgetInjector
-	_league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	_league.addToLpdb = CustomLeague.addToLpdb
+	league.createWidgetInjector = CustomLeague.createWidgetInjector
+	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	league.addToLpdb = CustomLeague.addToLpdb
 
-	return _league:createInfobox(frame)
+	return league:createInfobox(frame)
 end
 
 function CustomLeague:createWidgetInjector()
