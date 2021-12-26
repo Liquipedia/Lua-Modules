@@ -158,7 +158,7 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Pre-Process Champion Ban Data
-	local showGameBans = {}
+	local championBanData = {}
 	for gameIndex, game in ipairs(match.games) do
 		local extradata = game.extradata
 		local banData = {{}, {}}
@@ -178,15 +178,15 @@ function CustomMatchSummary._createBody(match)
 			banData[1].color = extradata.team1side
 			banData[2].color = extradata.team2side
 			banData.numberOfBans = numberOfBans
-			showGameBans[gameIndex] = banData
+			championBanData[gameIndex] = banData
 		end
 	end
 
 	-- Add the Champion Bans
-	if not Table.isEmpty(showGameBans) then
+	if not Table.isEmpty(championBanData) then
 		local championBan = ChampionBan()
 
-		for gameIndex, banData in ipairs(showGameBans) do
+		for gameIndex, banData in ipairs(championBanData) do
 			championBan:banRow(banData, gameIndex, banData.numberOfBans)
 		end
 
