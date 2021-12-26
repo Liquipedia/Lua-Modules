@@ -116,14 +116,14 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'liquipediatier' then
 		widgets = {
 			Cell{
-				name = 'Liquipedia tier',
+				name = 'Liquipedia Tier',
 				content = {CustomLeague:_createLiquipediaTierDisplay()},
 			}
 		}
 		if String.isNotEmpty(args.ubisofttier) and _UBISOFT_TIERS[args.ubisofttier:lower()] then
 			table.insert(widgets,
 				Cell{
-					name = 'Ubisoft tier',
+					name = 'Ubisoft Tier',
 					content = {'[['.._UBISOFT_TIERS[args.ubisofttier:lower()]..']]'},
 					classes = {'valvepremier-highlighted'}
 				}
