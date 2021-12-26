@@ -112,16 +112,30 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function League:addToLpdb(lpdbData, args)
-	lpdbData.maps = CustomLeague:_concatArgs('map')
+function CustomLeague:addToLpdb(lpdbData, args)
+	lpdbData.maps = table.concat(_league:getAllArgsForBase('map'), ';')
 
 	lpdbData.publishertier = args.ubisofttier
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
-		individual = not String.isEmpty(args.player_number),
+		individual = String.isEmpty(args.player_number) and '' or 'true',
+		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
+		enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date),
 	}
 
 	return lpdbData
+end
+
+function CustomLeague:_standardiseRawDate(dateString)
+	if String.isEmpty(dateString) then
+		return ''
+	end
+
+	if #dateString == 7 then
+		dateString = dateString .. '-??'
+	end
+	dateString = dateString:gsub('-XX', '-??')
+	return dateString
 end
 
 function CustomLeague:_createPrizepool()
