@@ -16,9 +16,9 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local PageLink = require('Module:Page')
+local PrizePoolCurrency = require('Module:Prize pool currency')
 
-local _UBISOFT_ICON = '&nbsp;[[File:Ubisoft 2017 lightmode.png|x15px|middle|link=Ubisoft|'
-	.. 'Ubisoft Tournaments.]]'
+
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
 local _GAME_SIEGE = 'siege'
@@ -29,20 +29,23 @@ local _args
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
--- local _TIER_UBISOFT_SIX = 'six invitational'
--- local _TIER_UBISOFT_PL = 'pro league'
--- local _TIER_UBISOFT_NATIONAL = 'national league'
--- local _TIER_UBISOFT_MAJOR = 'six major'
--- local _TIER_UBISOFT_MINOR = 'six minor'
+local _UBISOFT_TIERS = {
+	si = 'Six Invitational',
+	pl = 'Pro League',
+	cl = 'Challenger League',
+	national = 'National',
+	major = 'Six Major',
+	minor = 'Minor',
+}
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-    _args = league.args
+	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
-    league.getWikiCategories = CustomLeague.getWikiCategories
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
@@ -81,7 +84,7 @@ function CustomInjector:parse(id, widgets)
 				local map = args['map' .. index]
 				table.insert(maps, '&nbsp;• ' ..
 					tostring(CustomLeague:_createNoWrappingSpan(
-						PageLink.makeInternalLink({}, args.map1, args.map1 .. game)
+						PageLink.makeInternalLink({}, map, map .. game)
 					))
 				)
 				index = index + 1
@@ -113,27 +116,20 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'liquipediatier' then
-		local ubisoftTier = ubisofttier
-		if not String.isEmpty(ubisoftTier) then
-			widgets = {
-				Cell{
-					name = 'Ubisoft tier',
-					content = {'[[Ubisoft|' .. ubisoftTier .. ']]'},
-					classes = {'valvepremier-highlighted'}
-				}
-			}
-		end
+		local ubisoftTier = args.ubisofttier
 		table.insert(widgets, Cell{
 			name = 'Liquipedia tier',
 			content = {CustomLeague:_createLiquipediaTierDisplay()},
-			classes = {String.isEmpty(['ubisoftmajor']) and '' or 'valvepremier-highlighted'}
 		})
-		table.insert(widgets, Cell{
-			name = 'Ubisoft tier',
-			content = {Tier['ubisoft'][string.lower(_args.eatier or '')]},
-			classes = {'valvepremier-highlighted'}
-		})
-		return widgets
+		if not String.isEmpty(ubisoftTier) then
+			table.insert(widgets,
+				Cell{
+					name = 'Ubisoft tier',
+					content = {_UBISOFT_TIERS[ubisoftTier]},
+					classes = {'valvepremier-highlighted'}
+				}
+			)
+		end
 	end
 	return widgets
 end
@@ -159,7 +155,6 @@ function CustomLeague:_createPrizepool()
 		date = _args.currency_date
 	end
 
-
 	return PrizePoolCurrency._get({
 		prizepool = _args.prizepool,
 		prizepoolusd = _args.prizepoolusd,
@@ -176,50 +171,19 @@ function CustomLeague:_createLiquipediaTierDisplay()
 		return nil
 	end
 
-	--clean tier from unallowed values
-	--convert from text (old entries) to numbers
-	local tierText = Tier.text[tier]
-	local hasInvalidTier = tierText == nil
-	local hasTypeSetAsTier
-	--the following converts a tier that should be a tiertype
-	if hasInvalidTier then
-		local tempTypeForCheck = Tier.numberToType[tier] or tier
-		tempTypeForCheck = Tier.types[string.lower(tempTypeForCheck)]
-		if tempTypeForCheck then
-			hasTypeSetAsTier = true
-			hasInvalidTier = nil
-			if String.isEmpty(tierType) then
-				tierType = tempTypeForCheck
-			end
-		end
-	end
-	tierText = tierText or tier
-
-	local hasInvalidTierType = false
-
+	local tierText = Tier.text[tier:lower()]
 	local tierDisplay = '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
 		.. '[[Category:' .. tierText .. ' Tournaments]]'
 
 
 	if not String.isEmpty(tierType) then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
-		local tierTypeDIsplay
-		tierTypeDIsplay = '[[' .. tierType .. ' Tournaments|' .. tierType .. ']]'
-			.. '[[Category:' .. tierType .. ' Tournaments]]'
-		if not hasTypeSetAsTier or tierType ~= tierTypeDIsplay  then
-			tierDisplay = tierTypeDIsplay .. '&nbsp;(' .. tierDisplay .. ')'
-		end
+		local tierTypeText = Tier.text[tierType:lower()]
+		local tierTypeDisplay = '[[' .. tierTypeText .. ' Tournaments|' .. tierTypeText .. ']]'
+			.. '[[Category:' .. tierTypeText .. ' Tournaments]]'
+		tierDisplay = tierTypeDisplay .. '&nbsp;(' .. tierDisplay .. ')'
 	end
+	-- TODO: Warning on invalid tiers
 
-	tierDisplay = tierDisplay ..
-		(_args['ubisoftmajor'] == 'true' and _UBISOFT_ICON or '') ..
-		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '') ..
-		(hasTypeSetAsTier and '[[Category:Pages with Tiertype set as Tier]]' or '')
-
-	Variables.varDefine('tournament_tiertype', tierType)
-	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
 	return tierDisplay
 end
 
@@ -232,7 +196,7 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
 	Variables.varDefine('tournament_currency', _args.currency or '')
-	
+
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
 	local edate = Variables.varDefault('tournament_enddate', '')
@@ -250,7 +214,7 @@ function CustomLeague.getWikiCategories(args)
 	if not String.isEmpty(args.player_number) or not String.isEmpty(args.participants_number) then
 		table.insert(categories, 'Individual Tournaments')
 	end
-	if not String.isEmpty(args.ubisofttier) or args['ubisoftmajor'] == 'true' then
+	if not String.isEmpty(args.ubisofttier) then
 		table.insert(categories, 'Ubisoft Tournaments')
 	end
 	return categories
