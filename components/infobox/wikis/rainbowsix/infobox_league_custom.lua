@@ -22,17 +22,11 @@ local _TODAY = os.date('%Y-%m-%d', os.time())
 
 local _DEFAULT_PLATFORM = 'PC'
 local _PLATFORM_ALIAS = {
-	computer = 'PC',
-	desktop = 'PC',
 	xone = 'Xbox',
 	['xbox one'] = 'Xbox',
-	['x one'] = 'Xbox',
-	xb = 'Xbox',
 	one = 'Xbox',
 	ps = 'Playstation',
 	ps4 = 'Playstation',
-	['ps 4'] = 'Playstation',
-	['playstation 4'] = 'Playstation',
 }
 
 local _GAME_SIEGE = 'siege'
