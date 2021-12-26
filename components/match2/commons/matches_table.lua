@@ -47,7 +47,7 @@ function MatchesTable.run(args)
 	_args = args or {}
 
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
-		limit = tonumber(_args.limit) or 10000,
+		limit = tonumber(_args.limit) or 1000,
 		offset = 0,
 		order = 'date asc',
 		conditions = MatchesTable._buildConditions(),
