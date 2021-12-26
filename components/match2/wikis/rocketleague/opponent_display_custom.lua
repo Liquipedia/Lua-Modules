@@ -7,9 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Lua = require('Module:Lua')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local CustomOpponentDisplay = {propTypes = {}, types = {}}

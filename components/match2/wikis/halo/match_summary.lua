@@ -6,14 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
+local VodLink = require('Module:VodLink')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 local htmlCreate = mw.html.create
@@ -160,17 +160,16 @@ function p.getByMatchId(args)
 		:addClass('brkts-popup-spaced')
 	if match.vod then
 		footerSet = true
-		footerSpacer:node(Template.safeExpand(mw.getCurrentFrame(), 'vodlink', {
+		footerSpacer:node(VodLink.display{
 			vod = match.vod,
-		}))
+		})
 	end
 	for index, vod in pairs(vods) do
 		footerSet = true
-		footerSpacer:node(Template.safeExpand(mw.getCurrentFrame(), 'vodlink', {
+		footerSpacer:node(VodLink.display{
 			gamenum = index,
 			vod = vod,
-			source = '' -- todo: provide source
-		}))
+		})
 	end
 	if footerSet then
 		footer:node(footerSpacer)

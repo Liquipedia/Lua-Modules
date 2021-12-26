@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 
 local Break = Class.new(
 	function(self)
@@ -22,26 +23,37 @@ local Header = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
 		self.root:addClass('brkts-popup-header-dev')
+		self.root:css('justify-content', 'center')
 	end
 )
 
-function Header:left(content)
-	self.leftElement = content:addClass('brkts-popup-header-opponent')
+function Header:leftOpponent(content)
+	self.leftElement = content
 	return self
 end
 
-function Header:right(content)
-	self.rightElement = content:addClass('brkts-popup-header-opponent')
+function Header:leftScore(content)
+	self.leftScore = content:addClass('brkts-popup-header-opponent-score-left')
 	return self
 end
 
-function Header:score(content)
-	self.scoreElement = content:addClass('brkts-popup-header-score')
+function Header:rightScore(content)
+	self.rightScore = content:addClass('brkts-popup-header-opponent-score-right')
+	return self
+end
+
+function Header:rightOpponent(content)
+	self.rightElement = content
 	return self
 end
 
 function Header:create()
-	self.root:node(self.leftElement):node(self.scoreElement or ''):node(self.rightElement)
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
+		:node(self.leftElement)
+		:node(self.leftScore or '')
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
+		:node(self.rightScore or '')
+		:node(self.rightElement)
 	return self.root
 end
 
@@ -73,6 +85,43 @@ function Row:create()
 		self.root:node(element)
 	end
 
+	return self.root
+end
+
+local Mvp = Class.new(
+	function(self)
+		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
+		self.players = {}
+	end
+)
+
+function Mvp:addPlayer(player)
+	if not Logic.isEmpty(player) then
+		table.insert(self.players, player)
+	end
+	return self
+end
+
+function Mvp:setPoints(points)
+	if Logic.isNumeric(points) then
+		self.points = points
+	end
+	return self
+end
+
+function Mvp:create()
+	local span = mw.html.create('span')
+	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
+	for index, player in ipairs(self.players) do
+		if index > 1 then
+			span:wikitext(', ')
+		end
+		span:wikitext('[['..player..']]')
+	end
+	if self.points and self.points ~= 1 then
+		span:wikitext(' ('.. self.points ..'pts)')
+	end
+	self.root:node(span)
 	return self.root
 end
 
@@ -137,6 +186,7 @@ MatchSummary.Comment = Comment
 MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Break = Break
+MatchSummary.Mvp = Mvp
 
 function MatchSummary:init(width)
 	self.root = mw.html.create('div')

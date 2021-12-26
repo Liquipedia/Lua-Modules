@@ -25,9 +25,11 @@ function NotabilityChecker.run(args)
 
 	if args.player1 then
 		local players = {}
-		for i = 1, 10 do
-			local player = args['player' .. tostring(i)]
+		local index = 1
+		while not String.isEmpty(args['player' .. tostring(index)]) do
+			local player = args['player' .. tostring(index)]
 			table.insert(players, player)
+			index = index + 1
 		end
 		weight, output = NotabilityChecker._calculateRosterNotability(args.team, players)
 	elseif args.team then
@@ -102,8 +104,10 @@ end
 
 function NotabilityChecker._calculatePlayerNotability(player)
 	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
-	local conditions = '[[players_p' .. tostring(1) .. '::' .. player .. ']]'
-	for i = 2, 10 do
+
+	local conditions = '[[players_p' .. tostring(1) .. '::' .. player .. ']]' ..
+		' OR [[participant::' .. player .. ']]'
+	for i = 2, Config.MAX_NUMBER_OF_PARTICIPANTS do
 		conditions = conditions .. ' OR [[players_p' .. tostring(i) .. '::' .. player .. ']]'
 	end
 
@@ -208,6 +212,14 @@ end
 function NotabilityChecker._parseTier(placement)
 	if String.isEmpty(placement.liquipediatiertype) then
 		return tonumber(placement.liquipediatier), nil
+	end
+
+	-- If true, this is a wiki that uses a legacy system where extradata.liquipediatier
+	-- contains the numerical liquipediatier, and liquipediatier contains the type.
+	local isWikiThatUsesLiquipediaTier2 = placement.liquipediatier == placement.liquipediatiertype
+
+	if not isWikiThatUsesLiquipediaTier2 then
+		return tonumber(placement.liquipediatier), placement.liquipediatiertype:lower()
 	end
 
 	local liquipediaTier2 = placement.extradata['liquipediatier2']

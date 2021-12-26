@@ -22,6 +22,8 @@ Config.TIER_TYPE_SCHOOL = 'school'
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
 
+Config.MAX_NUMBER_OF_PARTICIPANTS = 10
+
 -- Which LPDB placement parameters do we care about?
 Config.PLACEMENT_QUERY =
 	'pagename, tournament, date, placement, liquipediatier, ' ..

@@ -116,15 +116,14 @@ function CustomLeague:_createTier(args)
 	local content = ''
 
 	local tier = args.liquipediatier
+	local type = args.liquipediatiertype
+	local type2 = args.liquipediatiertype2
 
 	if String.isEmpty(tier) then
 		return nil
 	end
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier)
-	local tier2 = args.liquipediatier2
-	local type = args.liquipediatiertype
-	local type2 = args.liquipediatiertype2
 
 	if not String.isEmpty(type) then
 		local typeDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. type)
@@ -137,11 +136,6 @@ function CustomLeague:_createTier(args)
 		content = content .. ' ([[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']])'
 	else
 		content = content .. '[[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']]'
-
-		if not String.isEmpty(tier2) then
-			local tier2Display = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier2)
-			content = content .. ' ([[' .. tier2Display .. ' Tournaments|' .. tier2Display .. ']])'
-		end
 	end
 
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
@@ -199,8 +193,7 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	-- Legacy tier vars
 	Variables.varDefine('tournament_lptier', args.liquipediatier)
-	Variables.varDefine('tournament_tier', args.liquipediatiertype or args.liquipediatier)
-	Variables.varDefine('tournament_tier2', args.liquipediatier2)
+	Variables.varDefine('tournament_tier', args.liquipediatier)
 	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
 	Variables.varDefine('tournament_tiertype2', args.liquipediatiertype2)
 	Variables.varDefine('ltier', args.liquipediatier == 1 and 1 or
@@ -220,10 +213,6 @@ function CustomLeague:defineCustomPageVariables(args)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.liquipediatiertype) then
-		lpdbData['liquipediatier'] = args.liquipediatiertype
-	end
-
 	lpdbData['game'] = 'rocket league'
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
@@ -231,8 +220,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		region = args.region,
 		mode = args.mode,
 		notabilitymod = args.notabilitymod,
-		liquipediatier2 =
-			(not String.isEmpty(args.liquipediatiertype) and args.liquipediatier) or args.liquipediatier2,
 		liquipediatiertype2 = args.liquipediatiertype2,
 		participantsnumber =
 			not String.isEmpty(args.team_number) and args.team_number or args.player_number,

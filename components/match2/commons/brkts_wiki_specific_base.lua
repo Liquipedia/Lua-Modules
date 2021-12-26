@@ -14,34 +14,50 @@ local WikiSpecificBase = {}
 -- called from Module:MatchGroup
 -- called after processMap/processOpponent/processPlayer
 -- used to alter match related parameters, e.g. automatically setting the winner
+-- @parameter frame - the frame object
+-- @parameter match - a match
 -- @returns the match after changes have been applied
-function WikiSpecificBase.processMatch(frame, match)
-	error("This function needs to be implemented on your wiki")
-end
+WikiSpecificBase.processMatch = FnUtil.lazilyDefineFunction(function()
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	return InputModule and InputModule.processMatch
+		or error('Function "processMatch" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
+end)
 
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
+-- @parameter frame - the frame object
+-- @parameter map - a map
 -- @returns the map after changes have been applied
-function WikiSpecificBase.processMap(frame, map)
-	error("This function needs to be implemented on your wiki")
-end
+WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	return InputModule and InputModule.processMap
+		or error('Function "processMap" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
+end)
 
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
+-- @parameter frame - the frame object
+-- @parameter opponent - a opponent
 -- @returns the opponent after changes have been applied
-function WikiSpecificBase.processOpponent(frame, opponent)
-	error("This function needs to be implemented on your wiki")
-end
+WikiSpecificBase.processOpponent = FnUtil.lazilyDefineFunction(function()
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	return InputModule and InputModule.processOpponent
+		or error('Function "processOpponent" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
+end)
 
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
+-- @parameter frame - the frame object
+-- @parameter player - a player
 -- @returns the player after changes have been applied
-function WikiSpecificBase.processPlayer(frame, player)
-	error("This function needs to be implemented on your wiki")
-end
+WikiSpecificBase.processPlayer = FnUtil.lazilyDefineFunction(function()
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	return InputModule and InputModule.processPlayer
+		or error('Function "processPlayer" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
+end)
 
 --[[
 Converts a match record to a structurally typed table with the appropriate data
@@ -74,6 +90,25 @@ function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
 	return matchGroupType == 'matchlist'
 		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
 		or Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
+end
+
+--[[
+Returns a display component for single match. The display component must
+be a container, i.e. it takes in a match ID rather than a matches.
+See the default implementation (pointed to below) for details.
+
+To customize single match display for a wiki, override this to return
+a display component with the wiki-specific customizations.
+
+Called from MatchGroup/Display
+
+-- @returns module
+]]
+function WikiSpecificBase.getMatchContainer(displayMode)
+	if displayMode == 'singleMatch' then
+		-- Single match, displayed flat on a page (no popup)
+		return Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true}).SingleMatchContainer
+	end
 end
 
 return WikiSpecificBase

@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
@@ -19,6 +18,7 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
@@ -158,10 +158,7 @@ function BracketDisplay.computeBracketLayout(bracket, config, headerRowsByMatchI
 		local match = bracket.matchesById[matchId]
 
 		-- Recurse on lower round matches
-		local lowerLayouts = Array.map(
-			match.bracketData.lowerMatches,
-			function(lowerMatch) return computeNodeLayout(lowerMatch.matchId) end
-		)
+		local lowerLayouts = Array.map(match.bracketData.lowerMatchIds, computeNodeLayout)
 
 		-- Compute partial sums of heights of lower round matches
 		local heightSums = MathUtil.partialSums(
@@ -217,7 +214,7 @@ function BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums
 	-- match advancing an opponent that is placed near the middle of this match.
 	local showSingleStraightLine = false
 	if #lowerLayouts == 1 then
-		local opponentIx = match.bracketData.lowerMatches[1].opponentIx
+		local opponentIx = match.bracketData.lowerEdges[1].opponentIndex
 		if #match.opponents % 2 == 0 then
 			showSingleStraightLine = opponentIx == #match.opponents / 2
 				or opponentIx == #match.opponents / 2 + 1
@@ -230,7 +227,7 @@ function BracketDisplay.alignMatchWithLowerNodes(match, lowerLayouts, heightSums
 	if showSingleStraightLine then
 		-- Single straight line: Align the connecting line with the middle
 		-- of the opponent it connects into.
-		local opponentIx = match.bracketData.lowerMatches[1].opponentIx
+		local opponentIx = match.bracketData.lowerEdges[1].opponentIndex
 		return lowerLayouts[1].mid
 			- ((opponentIx - 1) + 0.5) * opponentHeight
 
@@ -266,10 +263,10 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 		-- Don't show the header if it's disabled. Also don't show the header
 		-- if it is the first match of a round because a higher round match can
 		-- show it instead.
-		local upperBracketData = bracket.upperMatchIds[matchId]
-			and bracket.bracketDatasById[bracket.upperMatchIds[matchId]]
+		local upperBracketData = bracketData.upperMatchId
+			and bracket.bracketDatasById[bracketData.upperMatchId]
 		local isFirstChild = upperBracketData
-			and matchId == upperBracketData.lowerMatches[1].matchId
+			and matchId == upperBracketData.lowerMatchIds[1]
 		local showHeader = bracketData.header and not isFirstChild
 		if showHeader then
 			headerRows[matchId] = {}
@@ -280,9 +277,10 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 	-- matches. When it gets to a root, it then traverses the roots in
 	-- reverse order until it gets to the first root.
 	local function getParent(matchId)
-		local coords = bracket.coordsByMatchId[matchId]
-		return bracket.upperMatchIds[matchId]
-			or coords.rootIx ~= 1 and bracket.rootMatchIds[coords.rootIx - 1]
+		local bracketData = bracket.bracketDatasById[matchId]
+		local coords = bracket.coordinatesByMatchId[matchId]
+		return bracketData.upperMatchId
+			or coords.rootIndex ~= 1 and bracket.rootMatchIds[coords.rootIndex - 1]
 			or nil
 	end
 
@@ -293,19 +291,19 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 
 	-- Determine the individual headers appearing in header rows
 	for matchId, bracketData in pairs(bracket.bracketDatasById) do
-		local coords = bracket.coordsByMatchId[matchId]
+		local coords = bracket.coordinatesByMatchId[matchId]
 		if bracketData.header then
 			local headerRow = getHeaderRow(matchId)
 			local brMatch = bracketData.bracketResetMatchId and bracket.matchesById[bracketData.bracketResetMatchId]
-			headerRow[coords.roundIx] = {
+			headerRow[coords.roundIndex] = {
 				hasBrMatch = brMatch and true or false,
 				header = bracketData.header,
-				roundIx = coords.roundIx,
+				roundIx = coords.roundIndex,
 			}
 		end
 		if bracketData.qualWin then
 			local headerRow = getHeaderRow(matchId)
-			local roundIx = coords.roundIx + 1 + bracketData.qualSkip
+			local roundIx = coords.roundIndex + 1 + bracketData.qualSkip
 			headerRow[roundIx] = {
 				header = config.qualifiedHeader or '!q',
 				roundIx = roundIx,
@@ -420,11 +418,11 @@ function BracketDisplay.NodeBody(props)
 
 	-- Matches from lower rounds
 	local lowerNode
-	if 0 < #match.bracketData.lowerMatches then
+	if 0 < #match.bracketData.lowerMatchIds then
 		lowerNode = html.create('div'):addClass('brkts-round-lower')
 			:css('margin-top', layout.lowerNodeMarginTop .. 'px')
-		for _, lowerMatch in ipairs(match.bracketData.lowerMatches) do
-			local childProps = Table.merge(props, {matchId = lowerMatch.matchId})
+		for _, lowerMatchId in ipairs(match.bracketData.lowerMatchIds) do
+			local childProps = Table.merge(props, {matchId = lowerMatchId})
 			lowerNode
 				:node(BracketDisplay.NodeHeader(childProps))
 				:node(BracketDisplay.NodeBody(childProps))
@@ -609,11 +607,11 @@ function BracketDisplay.NodeLowerConnectors(props)
 	local match = props.matchesById[props.matchId]
 	local layout = props.layoutsByMatchId[props.matchId]
 	local config = props.config
-	local lowerMatches = match.bracketData.lowerMatches
+	local bracketData = match.bracketData
 
 	local lowerLayouts = Array.map(
-		lowerMatches,
-		function(lowerMatch) return props.layoutsByMatchId[lowerMatch.matchId] end
+		bracketData.lowerMatchIds,
+		function(lowerMatchId) return props.layoutsByMatchId[lowerMatchId] end
 	)
 
 	-- Compute partial sums of heights of lower round matches
@@ -624,61 +622,48 @@ function BracketDisplay.NodeLowerConnectors(props)
 	-- Compute joints of connectors
 	local jointIxs = {}
 	local jointIxAbove = 0
-	for ix = math.ceil(#lowerMatches / 2), 1, -1 do
-		jointIxAbove = jointIxAbove + 1
-		jointIxs[lowerMatches[ix].opponentIx] = jointIxAbove
+	for ix = math.ceil(#bracketData.lowerEdges / 2), 1, -1 do
+		local lowerEdge = bracketData.lowerEdges[ix]
+		if not jointIxs[lowerEdge.opponentIndex] then
+			jointIxAbove = jointIxAbove + 1
+			jointIxs[lowerEdge.opponentIndex] = jointIxAbove
+		end
 	end
 	local jointIxBelow = 0
 	-- middle lower match is repeated if odd
-	for ix = math.floor(#lowerMatches / 2) + 1, #lowerMatches, 1 do
-		jointIxBelow = jointIxBelow + 1
-		jointIxs[lowerMatches[ix].opponentIx] = jointIxBelow
+	for ix = math.floor(#bracketData.lowerEdges / 2) + 1, #bracketData.lowerEdges, 1 do
+		local lowerEdge = bracketData.lowerEdges[ix]
+		if not jointIxs[lowerEdge.opponentIndex] then
+			jointIxBelow = jointIxBelow + 1
+			jointIxs[lowerEdge.opponentIndex] = jointIxBelow
+		end
 	end
 	local jointCount = math.max(jointIxAbove, jointIxBelow)
 
 	local lowerConnectorsNode = mw.html.create('div'):addClass('brkts-round-lower-connectors')
 
 	-- Draw connectors between lower round matches and this match
-	for ix, x in ipairs(lowerMatches) do
-		local lowerLayout = lowerLayouts[ix]
-		local leftTop = layout.lowerNodeMarginTop + heightSums[ix] + lowerLayout.mid
-		local rightTop = layout.matchMarginTop + ((x.opponentIx - 1) + 0.5) * config.opponentHeight
-		local jointLeft = (config.roundHorizontalMargin - 2) * jointIxs[x.opponentIx] / (jointCount + 1)
-
-		local segment1Node = html.create('div'):addClass('brkts-line')
-			:css('height', config.lineWidth .. 'px')
-			:css('width', jointLeft + config.lineWidth / 2 .. 'px')
-			:css('left', '0')
-			:css('top', leftTop - config.lineWidth / 2 .. 'px')
-
-		local segment2Node = html.create('div'):addClass('brkts-line')
-			:css('height', math.abs(leftTop - rightTop) .. 'px')
-			:css('width', config.lineWidth .. 'px')
-			:css('top', math.min(leftTop, rightTop) .. 'px')
-			:css('left', jointLeft - config.lineWidth / 2 .. 'px')
-
-		local segment3Node = html.create('div'):addClass('brkts-line')
-			:css('height', config.lineWidth .. 'px')
-			:css('left', jointLeft - config.lineWidth / 2 .. 'px')
-			:css('right', '0')
-			:css('top', rightTop - config.lineWidth / 2 .. 'px')
-
-		lowerConnectorsNode
-			:node(segment1Node)
-			:node(segment2Node)
-			:node(segment3Node)
+	for _, lowerEdge in ipairs(bracketData.lowerEdges) do
+		local lowerLayout = lowerLayouts[lowerEdge.lowerMatchIndex]
+		lowerConnectorsNode:node(
+			BracketDisplay.NodeConnector({
+				jointLeft = (config.roundHorizontalMargin - 2) * jointIxs[lowerEdge.opponentIndex] / (jointCount + 1),
+				leftTop = layout.lowerNodeMarginTop + heightSums[lowerEdge.lowerMatchIndex] + lowerLayout.mid,
+				lineWidth = config.lineWidth,
+				rightTop = layout.matchMarginTop + ((lowerEdge.opponentIndex - 1) + 0.5) * config.opponentHeight,
+			})
+		)
 	end
 
 	-- Draw line stubs for opponents not connected to a lower round match
 	for opponentIx, _ in ipairs(match.opponents) do
-		local rightTop = layout.matchMarginTop + ((opponentIx - 1) + 0.5) * config.opponentHeight
 		if not jointIxs[opponentIx] then
-			local stubNode = html.create('div'):addClass('brkts-line')
-				:css('height', config.lineWidth .. 'px')
-				:css('left', 10 .. 'px')
-				:css('right', '0')
-				:css('top', rightTop - config.lineWidth / 2 .. 'px')
-			lowerConnectorsNode:node(stubNode)
+			lowerConnectorsNode:node(
+				BracketDisplay.ConnectorStub({
+					lineWidth = config.lineWidth,
+					rightTop = layout.matchMarginTop + ((opponentIx - 1) + 0.5) * config.opponentHeight,
+				})
+			)
 		end
 	end
 
@@ -698,34 +683,96 @@ function BracketDisplay.NodeQualConnectors(props)
 
 	-- Qualified winner connector
 	local leftTop = layout.matchMarginTop + layout.matchHeight / 2
-	local lineNode = html.create('div'):addClass('brkts-line')
-		:css('height', config.lineWidth .. 'px')
-		:css('right', '0')
-		:css('left', '0')
-		:css('top', leftTop - config.lineWidth / 2 .. 'px')
-	qualConnectorsNode:node(lineNode)
+	qualConnectorsNode:node(
+		BracketDisplay.NodeConnector({
+			leftTop = leftTop,
+			lineWidth = config.lineWidth,
+			rightTop = leftTop,
+		})
+	)
 
 	-- Qualified loser connector
 	if match.bracketData.qualLose then
-		local rightTop = leftTop + config.opponentHeight / 2 + config.matchMargin + 6 + config.opponentHeight / 2
-		local jointRight = 11
-
-		local segment1Node = html.create('div'):addClass('brkts-line')
-			:css('width', config.lineWidth .. 'px')
-			:css('height', rightTop - leftTop .. 'px')
-			:css('right', jointRight - config.lineWidth / 2 .. 'px')
-			:css('top', leftTop .. 'px')
-
-		local segment2Node = html.create('div'):addClass('brkts-line')
-			:css('height', config.lineWidth .. 'px')
-			:css('right', '0')
-			:css('width', jointRight + config.lineWidth / 2 .. 'px')
-			:css('top', rightTop - config.lineWidth / 2 .. 'px')
-
-		qualConnectorsNode:node(segment1Node):node(segment2Node)
+		qualConnectorsNode:node(
+			BracketDisplay.NodeConnector({
+				jointRight = 11,
+				leftTop = leftTop,
+				lineWidth = config.lineWidth,
+				rightTop = leftTop + config.opponentHeight / 2 + config.matchMargin + 6 + config.opponentHeight / 2,
+			})
+		)
 	end
 
 	return qualConnectorsNode
+end
+
+BracketDisplay.propTypes.NodeConnector = {
+	jointLeft = 'number?',
+	jointRight = 'number?',
+	leftTop = 'number',
+	lineWidth = 'number',
+	rightTop = 'number',
+}
+
+--[[
+A connector between a lower round match and the current match.
+]]
+function BracketDisplay.NodeConnector(props)
+	local connectorNode = html.create('div'):addClass('brkts-connector')
+
+	if props.leftTop == props.rightTop then
+		-- Single line segment, no joint
+		local lineNode = html.create('div'):addClass('brkts-line')
+			:css('height', props.lineWidth .. 'px')
+			:css('right', '0')
+			:css('left', '0')
+			:css('top', (props.leftTop - props.lineWidth / 2) .. 'px')
+		return connectorNode:node(lineNode)
+
+	else
+		-- Three line segments
+		local leftNode = html.create('div'):addClass('brkts-line')
+			:css('height', props.lineWidth .. 'px')
+			:css('width', props.jointLeft and (props.jointLeft + props.lineWidth / 2) .. 'px')
+			:css('right', props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px')
+			:css('left', '0')
+			:css('top', (props.leftTop - props.lineWidth / 2) .. 'px')
+
+		local middleNode = html.create('div'):addClass('brkts-line')
+			:css('height', math.abs(props.leftTop - props.rightTop) .. 'px')
+			:css('width', props.lineWidth .. 'px')
+			:css('top', math.min(props.leftTop, props.rightTop) .. 'px')
+			:css('left', props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px')
+			:css('right', props.jointRight and (props.jointRight - props.lineWidth / 2) .. 'px')
+
+		local rightNode = html.create('div'):addClass('brkts-line')
+			:css('height', props.lineWidth .. 'px')
+			:css('left', props.jointLeft and (props.jointLeft - props.lineWidth / 2) .. 'px')
+			:css('width', props.jointRight and (props.jointRight + props.lineWidth / 2) .. 'px')
+			:css('right', '0')
+			:css('top', (props.rightTop - props.lineWidth / 2) .. 'px')
+
+		return connectorNode:node(leftNode):node(middleNode):node(rightNode)
+	end
+end
+
+BracketDisplay.propTypes.ConnectorStub = {
+	lineWidth = 'nunmber',
+	rightTop = 'nunmber',
+}
+
+--[[
+A stub connector into an opponent that does not connect to a lower match.
+]]
+function BracketDisplay.ConnectorStub(props)
+	local rightNode = html.create('div'):addClass('brkts-line')
+		:css('height', props.lineWidth .. 'px')
+		:css('left', 10 .. 'px')
+		:css('right', '0')
+		:css('top', (props.rightTop - props.lineWidth / 2) .. 'px')
+
+	return html.create('div'):addClass('brkts-connector-stub')
+		:node(rightNode)
 end
 
 function BracketDisplay.getRunnerUpOpponent(match)

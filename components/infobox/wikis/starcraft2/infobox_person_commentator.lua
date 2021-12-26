@@ -139,13 +139,13 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _earningsGlobal[tostring(_CURRENT_YEAR)]
 	if currentYearEarnings then
-		currentYearEarnings = Math.round{currentYearEarnings, 2}
+		currentYearEarnings = Math.round{currentYearEarnings}
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
 	return {
 		Cell{
-			name = 'Approx. Earnings ' .. _CURRENT_YEAR,
+			name = 'Approx. Winnings ' .. _CURRENT_YEAR,
 			content = { currentYearEarnings }
 		},
 		Cell{name = 'Military Service', content = { CustomCommentator._military(_args.military) }},
@@ -322,23 +322,19 @@ function CustomCommentator._addScoresToVS(vs, opponents, commentator)
 end
 
 function CustomCommentator:adjustLPDB(lpdbData, _, personType)
-	local extradata = {
-		race = _raceData.race,
-		faction = _raceData.faction,
-		faction2 = _raceData.faction2,
-		lc_id = string.lower(self.pagename),
-		teamname = _args.team,
-		role = _args.role,
-		role2 = _args.role2,
-		militaryservice = _militaryStore,
-	}
+	local extradata = lpdbData.extradata
+	extradata.race = _raceData.race
+	extradata.faction = _raceData.faction
+	extradata.faction2 = _raceData.faction2
+	extradata.lc_id = string.lower(self.pagename)
+	extradata.teamname = _args.team
+	extradata.role = _args.role
+	extradata.role2 = _args.role2
+	extradata.militaryservice = _militaryStore
+
 	if Variables.varDefault('racecount') then
 		extradata.racehistorical = true
 		extradata.factionhistorical = true
-	end
-
-	for key, item in pairs(_earningsGlobal or {}) do
-		extradata['earningsin' .. key] = item
 	end
 
 	lpdbData.extradata = extradata
@@ -349,8 +345,8 @@ end
 function CustomCommentator:calculateEarnings()
 	local earningsTotal
 	earningsTotal, _earningsGlobal = CustomCommentator._getEarningsMedalsData(self.pagename)
-	earningsTotal = Math.round{earningsTotal, 2}
-	return earningsTotal
+	earningsTotal = Math.round{earningsTotal}
+	return earningsTotal, _earningsGlobal
 end
 
 function CustomCommentator._getLPDBrecursive(cond, query, queryType)
@@ -474,19 +470,19 @@ function CustomCommentator._military(military)
 		local display = military
 		military = string.lower(military)
 		local militaryCategory = ''
-		if String.Contains(military, 'starting') or String.Contains(military, 'pending') then
+		if String.contains(military, 'starting') or String.contains(military, 'pending') then
 			militaryCategory = '[[Category:Commentators waiting for Military Duty]]'
 			_militaryStore = 'pending'
 		elseif
-			String.Contains(military, 'ending') or String.Contains(military, 'started')
-			or String.Contains(military, 'ongoing')
+			String.contains(military, 'ending') or String.contains(military, 'started')
+			or String.contains(military, 'ongoing')
 		then
 			militaryCategory = '[[Category:Commentators on Military Duty]]'
 			_militaryStore = 'ongoing'
-		elseif String.Contains(military, 'fulfilled') then
+		elseif String.contains(military, 'fulfilled') then
 			militaryCategory = '[[Category:Commentators expleted Military Duty]]'
 			_militaryStore = 'fulfilled'
-		elseif String.Contains(military, 'exempted') then
+		elseif String.contains(military, 'exempted') then
 			militaryCategory = '[[Category:Commentators exempted from Military Duty]]'
 			_militaryStore = 'exempted'
 		end

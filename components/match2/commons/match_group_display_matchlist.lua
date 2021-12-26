@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -15,6 +14,7 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 

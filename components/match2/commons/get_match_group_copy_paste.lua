@@ -173,4 +173,21 @@ function copyPaste.matchlist(frame, args)
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
+function copyPaste.singleMatch(frame, args)
+	if not args then
+		args = getArgs(frame)
+	end
+
+	local bestof = tonumber(args.bestof or 3) or 3
+	local opponents = tonumber(args.opponents or 2) or 2
+	local mode = WikiSpecific.getMode(args.mode)
+
+	local out = WikiSpecific.getStart(nil, copyPaste.generateID(), 'singlematch', args)
+
+	out = out .. '\n|' ..
+		WikiSpecific.getMatchCode(bestof, mode, 1, opponents, args)
+		.. '\n}}'
+	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
+end
+
 return copyPaste

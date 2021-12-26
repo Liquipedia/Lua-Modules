@@ -52,7 +52,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		table.insert(widgets, Cell{
-			name = 'Game Version',
+			name = 'Game & Version',
 			content = CustomLeague:_getGameVersion(args)
 		})
 
@@ -224,8 +224,11 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	Variables.varDefine('game', GameLookup.getName({args.game}))
 	Variables.varDefine('tournament_game', GameLookup.getName({args.game}))
-	Variables.varDefine('tournament_patch', args.patch)
-	Variables.varDefine('patch', args.patch)
+	-- Currently, args.patch shall be used for official patches,
+	-- whereas voobly is used to denote non-official version played via voobly
+	Variables.varDefine('tournament_patch', args.patch or args.voobly)
+	Variables.varDefine('patch', args.patch or args.voobly)
+	Variables.varDefine('tournament_gameversion', args.version)
 	Variables.varDefine('tournament_mode',
 		(not String.isEmpty(args.mode)) and args.mode or
 		(not String.isEmpty(args.team_number)) and 'team' or
@@ -252,10 +255,8 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	-- Legacy tier vars
 	Variables.varDefine('tournament_lptier', liquipediatier)
-	Variables.varDefine('tournament_tier', liquipediatiertype or liquipediatier)
-	Variables.varDefine('tournament_tier2', args.liquipediatier2)
+	Variables.varDefine('tournament_tier', liquipediatier)
 	Variables.varDefine('tournament_tiertype', liquipediatiertype)
-	Variables.varDefine('tournament_tiertype2', args.liquipediatiertype2)
 	Variables.varDefine('ltier', liquipediatier == 1 and 1 or
 		liquipediatier == 2 and 2 or
 		liquipediatier == 3 and 3 or 4
@@ -281,12 +282,15 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['maps'] = table.concat(mappages, ';')
 
 	lpdbData['game'] = GameLookup.getName({args.game})
-	lpdbData['patch'] = args.patch
+	-- Currently, args.patch shall be used for official patches,
+	-- whereas voobly is used to denote non-official version played via voobly
+	lpdbData['patch'] = args.patch or args.voobly
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
 		deadline = DateClean(args.deadline or ''),
-		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ',')
+		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ','),
+		gameversion = args.version
 	}
 
 	return lpdbData
@@ -314,8 +318,12 @@ function CustomLeague:_getGameVersion(args)
 	local gameversion = {}
 
 	if not String.isEmpty(args.game) then
+		local gameName = GameLookup.getName({args.game})
+		if String.isEmpty(gameName) then
+			error('Unknown or unsupported game: ' .. args.game)
+		end
 		table.insert(gameversion,
-			Page.makeInternalLink(GameLookup.getName({args.game})) .. (args.beta and ' Beta' or '')
+			Page.makeInternalLink(gameName) .. (args.beta and ' Beta' or '')
 		)
 
 		if not String.isEmpty(args.version) then
@@ -366,7 +374,10 @@ function CustomLeague:_getGameModes(args, makeLink)
 		function(index, mode)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
 
-			table.insert(categories, gameModes[index] .. ' Tournaments')
+			table.insert(categories, not String.isEmpty(gameModes[index])
+				and gameModes[index] ..  ' Tournaments'
+				or 'Pages with unknown game mode'
+			)
 
 			if makeLink then
 				gameModes[index] = Page.makeInternalLink(gameModes[index])

@@ -12,6 +12,11 @@ local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
+local Localisation = require('Module:Localisation')
+local String = require('Module:StringUtils')
+local WarningBox = require('Module:WarningBox')
+local Variables = require('Module:Variables')
+local Earnings = require('Module:Earnings')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -25,6 +30,13 @@ local Builder = Widgets.Builder
 local Team = Class.new(BasicInfobox)
 
 local _LINK_VARIANT = 'team'
+
+local Language = mw.language.new('en')
+local _defaultEarningsFunctionUsed = false
+local _earnings = {}
+local _totalEarnings
+
+local _warnings = {}
 
 function Team.run(frame)
 	local team = Team(frame)
@@ -75,7 +87,16 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						return error('You have not implemented a custom earnings function for your wiki')
+						_defaultEarningsFunctionUsed = true
+						_totalEarnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
+						Variables.varDefine('earnings', _totalEarnings) -- needed for SMW
+						local totalEarnings
+						if _totalEarnings > 0 then
+							totalEarnings = '$' .. Language:formatNum(_totalEarnings)
+						end
+						return {
+							Cell{name = 'Approx. Total Winnings', content = {totalEarnings}}
+						}
 					end
 				}
 			}
@@ -148,7 +169,7 @@ function Team:createInfobox()
 		self:defineCustomPageVariables(args)
 	end
 
-	return builtInfobox
+	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
 function Team:_createRegion(region)
@@ -164,20 +185,49 @@ function Team:_createLocation(location)
 		return ''
 	end
 
+	local locationDisplay = self:getStandardLocationValue(location)
+	local demonym
+	if String.isNotEmpty(locationDisplay) then
+		demonym = Localisation.getLocalisation(locationDisplay)
+		locationDisplay = '[[:Category:' .. locationDisplay
+			.. '|' .. locationDisplay .. ']]'
+	end
+
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
-			'[[:Category:' .. location .. '|' .. location .. ']]'
+			(String.isNotEmpty(demonym) and '[[Category:' .. demonym .. ' Teams]]' or '') ..
+			(locationDisplay or '')
+end
+
+function Team:getStandardLocationValue(location)
+	if String.isEmpty(location) then
+		return nil
+	end
+
+	local locationToStore = Flags.CountryName(location)
+
+	if String.isEmpty(locationToStore) then
+		table.insert(
+			_warnings,
+			'"' .. location .. '" is not supported as a value for locations'
+		)
+		locationToStore = nil
+	end
+
+	return locationToStore
 end
 
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
+	local earnings = _totalEarnings
 
 	local lpdbData = {
 		name = name,
-		location = args.location,
-		location2 = args.location2,
+		location = self:getStandardLocationValue(args.location),
+		location2 = self:getStandardLocationValue(args.location2),
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
+		earnings = earnings,
 		createdate = args.created,
 		disbanddate = args.disbanded,
 		coach = args.coaches,
@@ -186,12 +236,18 @@ function Team:_setLpdbData(args, links)
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
+		extradata = {}
 	}
+
+	for year, earningsOfYear in pairs(_earnings) do
+		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	if lpdbData['earnings'] == nil then
-		return error('You need to set the LPDB earnings storage in the custom module')
+	if String.isEmpty(lpdbData.earnings) and not _defaultEarningsFunctionUsed then
+		error('Since your wiki uses a customized earnings function you ' ..
+			'have to set the LPDB earnings storage in the custom module')
 	end
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})

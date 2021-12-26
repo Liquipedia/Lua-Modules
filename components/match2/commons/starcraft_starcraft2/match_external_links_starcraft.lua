@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local DisplayUtil = require('Module:DisplayUtil')
 local TypeUtil = require('Module:TypeUtil')
@@ -130,18 +131,18 @@ function StarcraftMatchExternalLinks.MatchExternalLinks(props)
 		}
 	end)
 
-	local list = mw.html.create('span')
+	local list = mw.html.create('span'):addClass('starcraft-match-external-links')
 	for _, link in ipairs(links) do
 		list:node(StarcraftMatchExternalLinks.ExternalLink(link))
 	end
 	return list
 end
 
--- Called by Template:MatchExternalLink
+-- Entry point of Template:MatchExternalLink
 function StarcraftMatchExternalLinks.TemplateMatchExternalLink(frame)
-	local args = require('Module:Arguments').getArgs(frame)
-	args.number = tonumber(args.number)
-	return StarcraftMatchExternalLinks.ExternalLink(args)
+	local args = Arguments.getArgs(frame)
+	local links = StarcraftMatchExternalLinks.extractFromArgs(args)
+	return StarcraftMatchExternalLinks.MatchExternalLinks({links = links})
 end
 
 return StarcraftMatchExternalLinks

@@ -22,7 +22,12 @@ function Logic.nilOr(...)
 	local args = require('Module:Table').pack(...)
 	for i = 1, args.n do
 		local arg = args[i]
-		local val = type(arg) == 'function' and arg() or arg
+		local val
+		if type(arg) == 'function' then
+			val = arg()
+		else
+			val = arg
+		end
 		if val ~= nil then
 			return val
 		end

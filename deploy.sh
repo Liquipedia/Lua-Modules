@@ -80,7 +80,7 @@ do
         | gunzip \
         | jq ".query.tokens.csrftoken" -r
     )
-    result=$(
+    rawResult=$(
       curl \
         -s \
         -b "$ckf" \
@@ -94,9 +94,10 @@ do
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
         -X POST "${wikiApiUrl}?format=json&action=edit" \
-        | gunzip \
-        | jq ".edit.result" -r
+        | gunzip
     )
+    result=$(echo "$rawResult" | jq ".edit.result" -r)
+    echo "DEBUG: ...${rawResult}"
     echo "...${result}"
 
     echo '...done'

@@ -73,7 +73,13 @@ function StarcraftMatchGroupInput.readDate(matchArgs)
 		Variables.varDefine('matchDate', dateProps.date)
 		return dateProps
 	else
-		local suggestedDate = Variables.varDefaultMulti('matchDate', 'Match_date', 'date', 'sdate', 'edate', '1970-01-01')
+		local suggestedDate = Variables.varDefaultMulti(
+			'matchDate',
+			'Match_date',
+			'tournament_startdate',
+			'tournament_enddate',
+			'1970-01-01'
+		)
 		return {
 			date = MatchGroupInput.getInexactDate(suggestedDate),
 			dateexact = false,
@@ -617,7 +623,7 @@ function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opp)
 	}
 end
 
-function StarcraftMatchGroupInput.getPlayersLegacy(playerData)
+function StarcraftMatchGroupInput.getManuallyEnteredPlayers(playerData)
 	local players = {}
 	playerData = Json.parseIfString(playerData) or {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
@@ -640,7 +646,7 @@ function StarcraftMatchGroupInput.getPlayersLegacy(playerData)
 	return players
 end
 
-function StarcraftMatchGroupInput.getPlayers(teamName)
+function StarcraftMatchGroupInput.getPlayersFromVariables(teamName)
 	local players = {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		local name = Variables.varDefault(teamName .. '_p' .. playerIndex)
@@ -684,9 +690,9 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 		name, icon, opp.template = StarcraftMatchGroupInput.processTeamTemplateInput(opp.template, date)
 	end
 	name = mw.ext.TeamLiquidIntegration.resolve_redirect(name or '')
-	local players = StarcraftMatchGroupInput.getPlayers(name)
+	local players = StarcraftMatchGroupInput.getManuallyEnteredPlayers(opp.players)
 	if Logic.isEmpty(players) then
-		players = StarcraftMatchGroupInput.getPlayersLegacy(opp.players)
+		players = StarcraftMatchGroupInput.getPlayersFromVariables(name)
 	end
 
 	return {

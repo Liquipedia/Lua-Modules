@@ -7,7 +7,7 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Autopatch = require('Module:Automated Patch')._main
@@ -67,7 +67,31 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
+	if id == 'type' then
+		if not String.isEmpty(_args.type) then
+			local value = string.lower(_args.type)
+			local category
+			if value == 'offline' then
+				category = 'Offline Tournaments'
+			elseif value == 'online' then
+				category = 'Online Tournaments'
+			elseif value:match('online') and value:match('offline') then
+				category = 'Online/Offline Tournaments'
+			elseif value == 'weekly online' then
+				category = 'Weekly Online Tournaments'
+			else
+				category = 'Unknown Type Tournaments'
+			end
+			return {
+				Cell{
+					name = 'Type',
+					content = {
+						mw.language.getContentLanguage():ucfirst(_args.type) .. '[[Category:' .. category .. ']]'
+					}
+				}
+			}
+		end
+	elseif id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {
 					CustomLeague._getGameVersion()
@@ -89,13 +113,16 @@ function CustomInjector:parse(id, widgets)
 				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
 			},
 		}
-	elseif id == 'chronology' and not (String.isEmpty(_args.previous) and String.isEmpty(_args.next)) then
-		return {
-			Title{name = 'Chronology'},
-			Chronology{
-				content = {CustomLeague._getChronologyData()}
+	elseif id == 'chronology' then
+		local content = CustomLeague._getChronologyData()
+		if String.isNotEmpty(content.previous) or String.isNotEmpty(content.next) then
+			return {
+				Title{name = 'Chronology'},
+				Chronology{
+					content = content
+				}
 			}
-		}
+		end
 	elseif id == 'customcontent' then
 		--player breakdown
 		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
@@ -168,7 +195,7 @@ function CustomLeague:_createPrizepool()
 			display = Template.safeExpand(
 				mw.getCurrentFrame(),
 				'Local currency',
-				{localCurrency:lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
+				{(localCurrency or ''):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
 			) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
 		elseif prizePool then
 			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText .. ' ' .. _ABBR_USD
@@ -323,7 +350,7 @@ function CustomLeague._computeChronology()
 			previous = previousPage .. '|#' .. tostring(number - 1)
 		end
 
-		return next, previous
+		return next or nil, previous or nil
 	else
 		return _args.next, _args.previous
 	end
@@ -342,8 +369,6 @@ function CustomLeague:_getServer()
 		return nil
 	end
 	local server = _args.server
-	--remove possible whitespaces around '/'
-	server = string.gsub(server, '%s?/%s?=', '/')
 	local servers = mw.text.split(server, '/')
 
 	local output = ''
@@ -352,7 +377,8 @@ function CustomLeague:_getServer()
 		if key ~= 1 then
 			output = output .. ' / '
 		end
-		output = output .. (AllowedServers[item] or ('[[Category:Server Unknown|' .. item .. ']]'))
+		item = mw.text.trim(item)
+		output = output .. (AllowedServers[string.lower(item)] or ('[[Category:Server Unknown|' .. item .. ']]'))
 	end
 	return output
 end
@@ -398,23 +424,13 @@ end
 
 function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 	if String.isEmpty(value) then
-		return nil, nil, nil
+		return nil, oldHasText, nil
 	end
 
-	--remove currency abbreviations
-	value = value:gsub('<abbr.*abbr>', ''):gsub(',', '')
-
-	--remove currency symbol
-	if currency then
-		Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
-		local symbol = Variables.varDefaultMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
-		value = value:gsub(symbol, '')
-	else
-		value = value:gsub('%$', '')
-	end
-
-	--remove white spaces and &nbsp;
-	value = value:gsub('%s', ''):gsub('&nbsp;', '')
+	--remove white spaces, '&nbsp;' and ','
+	value = string.gsub(value, '%s', '')
+	value = string.gsub(value, '&nbsp;', '')
+	value = string.gsub(value, ',', '')
 
 	--check if it has a '+' at the end
 	local hasPlus = string.match(value, '%+$')
@@ -521,19 +537,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
 
-	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('infobox_date', edate)
-	Variables.varDefine('infobox_sdate', sdate)
-	Variables.varDefine('infobox_edate', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('formatted_tournament_date', sdate)
-	Variables.varDefine('formatted_tournament_edate', edate)
-
 	--override var to standardize its entries
 	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game)] or {})[1] or _GAMES[_GAME_WOL][1])
 
@@ -565,7 +568,7 @@ function CustomLeague:defineCustomPageVariables()
 	end
 	Variables.varDefine('tournament_finished', finished or 'false')
 	--month and day
-	local monthAndDay = string.match(edate, '%d%d-%d%d') or ''
+	local monthAndDay = string.match(Variables.varDefault('tournament_enddate', ''), '%d%d-%d%d') or ''
 	Variables.varDefine('Month_Day', monthAndDay)
 end
 

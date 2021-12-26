@@ -11,6 +11,7 @@ local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -19,21 +20,18 @@ local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
 local _UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 
+--[[
+Deprecated. Use Opponent.typeIsParty
+]]
 function DisplayHelper.opponentTypeIsParty(opponentType)
-	return opponentType == 'solo'
-		or opponentType == 'duo'
-		or opponentType == 'trio'
-		or opponentType == 'quad'
+	return Opponent.typeIsParty(opponentType)
 end
 
+--[[
+Deprecated. Use Opponent.isTbd
+]]
 function DisplayHelper.opponentIsTBD(opponent)
-	return opponent.type == 'literal'
-		or opponent.type == 'team' and opponent.template == 'tbd'
-		or opponent.name == 'TBD'
-
-		-- solo/duo/trio/quad opponents are TBD if any of its players are marked TBD
-		or (DisplayHelper.opponentTypeIsParty(opponent.type)
-			and Array.any(opponent.players, function(player) return player.displayName == 'TBD' end))
+	return Opponent.isTbd(opponent)
 end
 
 -- Whether to allow highlighting an opponent via mouseover
@@ -48,25 +46,11 @@ function DisplayHelper.opponentIsHighlightable(opponent)
 	end
 end
 
---[[
-Builds a hash of the opponent that is used to visually highlight their progress
-in the bracket.
-]]
-function DisplayHelper.makeOpponentHighlightKey(opponent)
-	if opponent.type == 'literal' then
-		return opponent.name and string.lower(opponent.name) or ''
-	elseif opponent.type == 'team' then
-		return opponent.template or ''
-	else
-		return table.concat(Array.map(opponent.players or {}, function(player) return player.pageName or '' end), ',')
-	end
-end
-
 function DisplayHelper.addOpponentHighlight(node, opponent)
 	local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
 	return node
 		:addClass(canHighlight and 'brkts-opponent-hover' or nil)
-		:attr('aria-label', canHighlight and DisplayHelper.makeOpponentHighlightKey(opponent) or nil)
+		:attr('aria-label', canHighlight and Opponent.toName(opponent) or nil)
 end
 
 -- Expands a header code by making a RPC call.
@@ -103,7 +87,11 @@ different policy by setting props.matchHasDetails in the Bracket and Matchlist
 components.
 ]]
 function DisplayHelper.defaultMatchHasDetails(match)
-	return match.dateIsExact or 0 < #match.games
+	return match.dateIsExact
+		or match.vod
+		or not Table.isEmpty(match.links)
+		or match.comment
+		or 0 < #match.games
 end
 
 -- Display component showing the streams, date, and countdown of a match.

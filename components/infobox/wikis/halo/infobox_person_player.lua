@@ -9,7 +9,6 @@
 local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
-local Earnings = require('Module:Earnings')
 local GameAppearances = require('Module:GetGameAppearances')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Role = require('Module:Role')
@@ -35,7 +34,6 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 
-	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
@@ -83,10 +81,6 @@ end
 
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
-end
-
-function CustomPlayer:calculateEarnings()
-	return Earnings.calc_player({ args = { player = _pagename }})
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
