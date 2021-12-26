@@ -18,13 +18,13 @@ local Center = require('Module:Infobox/Widget/Center')
 local PageLink = require('Module:Page')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 
-
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
 local _GAME_SIEGE = 'siege'
 local _GAME_VEGAS2 = 'vegas2'
 
 local _args
+local _league
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -39,15 +39,15 @@ local _UBISOFT_TIERS = {
 }
 
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
+	_league = League(frame)
+	_args = _league.args
 
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
+	_league.createWidgetInjector = CustomLeague.createWidgetInjector
+	_league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	_league.addToLpdb = CustomLeague.addToLpdb
+	_league.getWikiCategories = CustomLeague.getWikiCategories
 
-	return league:createInfobox(frame)
+	return _league:createInfobox(frame)
 end
 
 function CustomLeague:createWidgetInjector()
@@ -171,18 +171,21 @@ function CustomLeague:_createLiquipediaTierDisplay()
 		return nil
 	end
 
-	local tierText = Tier.text[tier:lower()]
-	local tierDisplay = '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		.. '[[Category:' .. tierText .. ' Tournaments]]'
+	local function buildTierString(tierString)
+		local tierText = Tier.text[tierString]
+		if not tierText then
+			table.insert(_league._warnings, tierString .. ' is not a known Liquipedia Tier')
+			return ''
+		else
+			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']][[Category:' .. tierText .. ' Tournaments]]'
+		end
+	end
 
+	local tierDisplay = buildTierString(tier)
 
 	if not String.isEmpty(tierType) then
-		local tierTypeText = Tier.text[tierType:lower()]
-		local tierTypeDisplay = '[[' .. tierTypeText .. ' Tournaments|' .. tierTypeText .. ']]'
-			.. '[[Category:' .. tierTypeText .. ' Tournaments]]'
-		tierDisplay = tierTypeDisplay .. '&nbsp;(' .. tierDisplay .. ')'
+		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
 	end
-	-- TODO: Warning on invalid tiers
 
 	return tierDisplay
 end

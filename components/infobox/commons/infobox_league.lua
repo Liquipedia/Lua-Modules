@@ -19,6 +19,7 @@ local Variables = require('Module:Variables')
 local Locale = require('Module:Locale')
 local Page = require('Module:Page')
 local LeagueIcon = require('Module:LeagueIcon')
+local WarningBox = require('Module:WarningBox')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -30,6 +31,8 @@ local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
 local League = Class.new(BasicInfobox)
+
+local _warnings = {}
 
 function League.run(frame)
 	local league = League(frame)
@@ -173,7 +176,7 @@ function League:createInfobox()
 		self:_setLpdbData(args, links)
 	end
 
-	return builtInfobox
+	return builtInfobox .. WarningBox.displayAll(_warnings)
 end
 
 --- Allows for overriding this functionality
