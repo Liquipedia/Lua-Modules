@@ -70,6 +70,9 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.rating = Variables.varDefault('rating')
 	lpdbData.extradata.tier = string.lower(args.tier or '')
 
+	lpdbData.region = args.region
+	-- TODO: Save region to SMW, as RL Template:Region did that
+
 	return lpdbData
 end
 

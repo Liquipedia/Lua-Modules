@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
@@ -18,6 +17,7 @@ local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 local Earnings = require('Module:Earnings')
 local BasicInfobox = require('Module:Infobox/Basic')
+local Region = require('Module:Region')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -172,16 +172,20 @@ function Team:createInfobox()
 	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
-function Team:_createRegion(region)
-	if region == nil or region == '' then
+function Team:_createRegion(region, location)
+	if String.isEmpty(region) and String.isEmpty(location) then
 		return ''
 	end
 
-	return Template.safeExpand(self.infobox.frame, 'Region', {region})
+	return Region.run({
+		region = region,
+		country = self:getStandardRegionValue(region, location),
+		onlyDisplay = true
+	})
 end
 
 function Team:_createLocation(location)
-	if location == nil or location == '' then
+	if String.isEmpty(location) then
 		return ''
 	end
 
@@ -197,6 +201,28 @@ function Team:_createLocation(location)
 			'&nbsp;' ..
 			(String.isNotEmpty(demonym) and '[[Category:' .. demonym .. ' Teams]]' or '') ..
 			(locationDisplay or '')
+end
+
+function Team:getStandardRegionValue(region, location)
+	if String.isEmpty(region) and String.isEmpty(location) then
+		return nil
+	end
+
+	local standardizedRegion = Region.run({
+		region = region,
+		country = self:getStandardLocationValue(location),
+		onlyRegion = true
+	})
+
+	if String.isEmpty(standardizedRegion) then
+		table.insert(
+			_warnings,
+			'Could not determine a valid region for "' .. region .. '", "'.. location ..'"'
+		)
+		standardizedRegion = nil
+	end
+
+	return standardizedRegion
 end
 
 function Team:getStandardLocationValue(location)
@@ -232,7 +258,7 @@ function Team:_setLpdbData(args, links)
 		disbanddate = args.disbanded,
 		coach = args.coaches,
 		manager = args.manager,
-		region = args.region,
+		region = self:getStandardRegionValue(args.region, args.location),
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
