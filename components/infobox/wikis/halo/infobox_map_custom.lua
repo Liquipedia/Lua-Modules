@@ -68,7 +68,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomMap._getGameVersion()
-	local game = String.lower(_args.game or '')
+	local game = string.lower(_args.game or '')
 	_game = _GAME[game]
 	return _game
 end
