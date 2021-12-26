@@ -14,7 +14,6 @@ local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -94,28 +93,12 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
-	      :leftScore(CustomMatchSummary._createScore(match.opponents[1]))
-	      :rightScore(CustomMatchSummary._createScore(match.opponents[2]))
-	      :rightOpponent(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
+	      :leftScore(header:createScore(match.opponents[1]))
+	      :rightScore(header:createScore(match.opponents[2]))
+	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
-end
-
-function CustomMatchSummary._createScore(opponent)
-	return OpponentDisplay.BlockScore{
-		isWinner = opponent.placement == 1,
-		scoreText = OpponentDisplay.InlineScore(opponent),
-	}
-end
-
-function CustomMatchSummary._createOpponent(opponent, side)
-	return OpponentDisplay.BlockOpponent{
-		flip = side == 'left',
-		opponent = opponent,
-		overflow = 'wrap',
-		teamStyle = 'short',
-	}
 end
 
 function CustomMatchSummary._createBody(match)
