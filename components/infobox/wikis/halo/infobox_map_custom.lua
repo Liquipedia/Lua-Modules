@@ -81,7 +81,7 @@ function CustomMap:addToLpdb(lpdbData)
 	lpdbData.extradata = {
 		creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator),
 		creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2),
-		releasedate = _args.release_date,
+		releasedate = _args.releasedate,
 		type = _args.type,
 	}
 	return lpdbData
