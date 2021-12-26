@@ -9,13 +9,10 @@
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
 local String = require('Module:String')
 local Template = require('Module:Template')
 
 local CustomTeam = Class.new()
-
-local CustomInjector = Class.new(Injector)
 
 local _team
 
@@ -46,10 +43,6 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 
 	return lpdbData
-end
-
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
 end
 
 function CustomTeam:defineCustomPageVariables(args)
