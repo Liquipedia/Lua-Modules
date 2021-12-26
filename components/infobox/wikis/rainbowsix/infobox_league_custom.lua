@@ -85,7 +85,7 @@ function CustomInjector:parse(id, widgets)
 				)))
 			end
 			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = table.concat(maps, '&nbsp;• ')})
+			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'prizepool' then
 		return {
@@ -95,15 +95,17 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'liquipediatier' then
-		widgets = Cell{
-			name = 'Liquipedia tier',
-			content = {CustomLeague:_createLiquipediaTierDisplay()},
+		widgets = {
+			Cell{
+				name = 'Liquipedia tier',
+				content = {CustomLeague:_createLiquipediaTierDisplay()},
+			}
 		}
-		if String.isNotEmpty(args.ubisofttier) then
+		if String.isNotEmpty(args.ubisofttier) and _UBISOFT_TIERS[args.ubisofttier:lower()] then
 			table.insert(widgets,
 				Cell{
 					name = 'Ubisoft tier',
-					content = {_UBISOFT_TIERS[args.ubisofttier]},
+					content = {'[['.._UBISOFT_TIERS[args.ubisofttier:lower()]..']]'},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
