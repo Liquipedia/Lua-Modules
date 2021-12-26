@@ -20,6 +20,21 @@ local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
+local _DEFAULT_PLATFORM = 'PC'
+local _PLATFORM_ALIAS = {
+	computer = 'PC',
+	desktop = 'PC',
+	xone = 'Xbox',
+	['xbox one'] = 'Xbox',
+	['x one'] = 'Xbox',
+	xb = 'Xbox',
+	one = 'Xbox',
+	ps = 'Playstation',
+	ps4 = 'Playstation',
+	['ps 4'] = 'Playstation',
+	['playstation 4'] = 'Playstation',
+}
+
 local _GAME_SIEGE = 'siege'
 local _GAME_VEGAS2 = 'vegas2'
 
@@ -63,6 +78,10 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Game',
 		content = {CustomLeague:_createGameCell(args)}
+	})
+	table.insert(widgets, Cell{
+		name = 'Platform',
+		content = {CustomLeague:_createPlatformCell(args)}
 	})
 	table.insert(widgets, Cell{
 		name = 'Players',
@@ -234,6 +253,20 @@ function CustomLeague:_createGameCell(args)
 	end
 
 	return content
+end
+
+function CustomLeague:_createPlatformCell(args)
+	if String.isEmpty(args.platform) then
+		args.platform = _DEFAULT_PLATFORM
+	end
+
+	local platform = _PLATFORM_ALIAS[args.platform] or args.platform
+
+	if String.isNotEmpty(platform) then
+		return '[[' .. platform .. ']][[Category:' .. platform .. ' Tournaments]]'
+	end
+
+	return nil
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
