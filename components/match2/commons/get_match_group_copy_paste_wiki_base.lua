@@ -17,7 +17,7 @@ adjust this to fit the needs of your wiki^^
 local wikiCopyPaste = {}
 
 --allowed opponent types on the wiki
-local MODES = { 
+local MODES = {
 	['solo'] = 'solo',
 	['team'] = 'team',
 	['literal'] = 'literal',
