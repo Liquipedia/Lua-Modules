@@ -92,22 +92,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = maps})
 		end
-
-
-		if not String.isEmpty(args.team1) then
-			local teams = PageLink.makeInternalLink({}, args.team1)
-			local index = 2
-
-			while not String.isEmpty(args['team' .. index]) do
-				table.insert(teams, '&nbsp;• ' ..
-					tostring(CustomLeague:_createNoWrappingSpan(
-						PageLink.makeInternalLink({}, args.team1)
-					))
-				)
-				index = index + 1
-			end
-			table.insert(widgets, Center{content = teams})
-		end
 	elseif id == 'prizepool' then
 		return {
 			Cell{
