@@ -77,20 +77,15 @@ function CustomInjector:parse(id, widgets)
 	if id == 'customcontent' then
 		if not String.isEmpty(args.map1) then
 			local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
-			local maps = PageLink.makeInternalLink({}, args.map1, args.map1 .. game)
-			local index = 2
+			local maps = {}
 
-			while not String.isEmpty(args['map' .. index]) do
-				local map = args['map' .. index]
-				table.insert(maps, '&nbsp;• ' ..
-					tostring(CustomLeague:_createNoWrappingSpan(
-						PageLink.makeInternalLink({}, map, map .. game)
-					))
-				)
-				index = index + 1
+			for _, map in ipairs(_league:getAllArgsForBase(args, 'map')) do
+				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
+					PageLink.makeInternalLink({}, map, map .. game)
+				)))
 			end
 			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = maps})
+			table.insert(widgets, Center{content = table.concat(maps, '&nbsp;• ')})
 		end
 	elseif id == 'prizepool' then
 		return {
@@ -100,16 +95,15 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'liquipediatier' then
-		local ubisoftTier = args.ubisofttier
-		table.insert(widgets, Cell{
+		widgets = Cell{
 			name = 'Liquipedia tier',
 			content = {CustomLeague:_createLiquipediaTierDisplay()},
-		})
-		if not String.isEmpty(ubisoftTier) then
+		}
+		if not String.isEmpty(args.ubisofttier) then
 			table.insert(widgets,
 				Cell{
 					name = 'Ubisoft tier',
-					content = {_UBISOFT_TIERS[ubisoftTier]},
+					content = {_UBISOFT_TIERS[args.ubisofttier]},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
@@ -240,10 +234,6 @@ function CustomLeague:_createNoWrappingSpan(content)
 	span:css('white-space', 'nowrap')
 		:node(content)
 	return span
-end
-
-function CustomLeague:_makeInternalLink(content)
-	return '[[' .. content .. ']]'
 end
 
 return CustomLeague
