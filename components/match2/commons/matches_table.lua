@@ -126,7 +126,7 @@ function MatchesTable._header()
 end
 
 function MatchesTable._row(match)
-	local matchHeader = match.match2bracketdata.header
+	local matchHeader = match.extradata.matchsection or match.match2bracketdata.header
 	if String.isEmpty(matchHeader) then
 		--if we are in the same matchGroup just use the previous _matchHeader
 		if _currentId == match.match2bracketid then
