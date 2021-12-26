@@ -45,7 +45,6 @@ function CustomLeague.run(frame)
 	_league.createWidgetInjector = CustomLeague.createWidgetInjector
 	_league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	_league.addToLpdb = CustomLeague.addToLpdb
-	_league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return _league:createInfobox(frame)
 end
@@ -75,8 +74,8 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = _args
 	if id == 'customcontent' then
-		if not String.isEmpty(args.map1) then
-			local game = not String.isEmpty(args.game) and ('/' .. args.game) or ''
+		if String.isNotEmpty(args.map1) then
+			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
 			local maps = {}
 
 			for _, map in ipairs(_league:getAllArgsForBase(args, 'map')) do
@@ -99,7 +98,7 @@ function CustomInjector:parse(id, widgets)
 			name = 'Liquipedia tier',
 			content = {CustomLeague:_createLiquipediaTierDisplay()},
 		}
-		if not String.isEmpty(args.ubisofttier) then
+		if String.isNotEmpty(args.ubisofttier) then
 			table.insert(widgets,
 				Cell{
 					name = 'Ubisoft tier',
@@ -118,7 +117,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.publishertier = args.ubisofttier
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
-		individual = String.isEmpty(args.player_number) and '' or 'true',
+		individual = String.isNotEmpty(args.player_number) and 'true' or '',
 		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
 		enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date),
 	}
@@ -139,11 +138,11 @@ function CustomLeague:_standardiseRawDate(dateString)
 end
 
 function CustomLeague:_createPrizepool()
-	local date
 	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
 		return nil
 	end
-	if not String.isEmpty(_args.currency_rate) then
+	local date
+	if String.isNotEmpty(_args.currency_rate) then
 		date = _args.currency_date
 	end
 
@@ -175,7 +174,7 @@ function CustomLeague:_createLiquipediaTierDisplay()
 
 	local tierDisplay = buildTierString(tier)
 
-	if not String.isEmpty(tierType) then
+	if String.isNotEmpty(tierType) then
 		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
 	end
 
@@ -204,17 +203,6 @@ function CustomLeague:defineCustomPageVariables()
 
 end
 
-function CustomLeague.getWikiCategories(args)
-	local categories = {}
-	if not String.isEmpty(args.player_number) or not String.isEmpty(args.participants_number) then
-		table.insert(categories, 'Individual Tournaments')
-	end
-	if not String.isEmpty(args.ubisofttier) then
-		table.insert(categories, 'Ubisoft Tournaments')
-	end
-	return categories
-end
-
 function CustomLeague:_createGameCell(args)
 	if String.isEmpty(args.game) and String.isEmpty(args.patch) then
 		return nil
@@ -222,7 +210,7 @@ function CustomLeague:_createGameCell(args)
 
 	local content
 
-	local betaTag = not String.isEmpty(args.beta) and 'Beta&nbsp;' or ''
+	local betaTag = String.isNotEmpty(args.beta) and 'Beta&nbsp;' or ''
 
 	if args.game == _GAME_SIEGE then
 		content = '[[Siege]][[Category:' .. betaTag .. 'Siege Competitions]]'
@@ -234,10 +222,10 @@ function CustomLeague:_createGameCell(args)
 
 	content = content .. betaTag
 
-	if String.isEmpty(args.epatch) and not String.isEmpty(args.patch) then
+	if String.isNotEmpty(args.epatch)  then
+		content = content .. '<br> [[' .. args.patch .. ']] &ndash; [[' .. args.epatch .. ']]'
+	elseif String.isNotEmpty(args.patch) then
 		content = content .. '[[' .. args.patch .. ']]'
-	elseif not String.isEmpty(args.epatch) then
-		content = content .. '<br> [[' .. args.patch .. ']] ' .. '&ndash;' .. ' [[' .. args.epatch .. ']]'
 	end
 
 	return content
