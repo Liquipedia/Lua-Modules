@@ -81,8 +81,11 @@ function MatchesTable._buildConditions()
 	if _args.edate then
 		lpdbConditions = lpdbConditions .. ' AND ([[date::<' .. _args.edate .. ']] OR [[date::' .. _args.edate .. ']])'
 	end
-	if _args.matchsection then
+	if _args.section then
 		lpdbConditions = lpdbConditions .. ' AND [[match2bracketdata_sectionheader::' .. _args.matchsection .. ']]'
+	end
+	if _args.matchsection then
+		lpdbConditions = lpdbConditions .. ' AND [[extradata_matchsection::' .. _args.matchsection .. ']]'
 	end
 
 	return lpdbConditions
