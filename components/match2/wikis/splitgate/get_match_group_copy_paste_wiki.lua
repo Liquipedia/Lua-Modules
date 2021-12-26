@@ -21,7 +21,6 @@ local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Bas
 local MODES = {
 	['solo'] = 'solo',
 	['team'] = 'team',
-	['literal'] = 'literal',
 }
 
 --default opponent type (used if the entered mode is not found in the above table)
