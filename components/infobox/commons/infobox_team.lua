@@ -178,8 +178,7 @@ function Team:_createRegion(region, location)
 	end
 
 	return Region.run({
-		region = region,
-		country = self:getStandardRegionValue(region, location),
+		region = self:getStandardRegionValue(region, location),
 		onlyDisplay = true
 	})
 end
