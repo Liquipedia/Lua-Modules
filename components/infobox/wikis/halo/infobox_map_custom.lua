@@ -36,15 +36,6 @@ function CustomMap:createWidgetInjector()
 end
 
 function CustomInjector:addCustomCells(widgets)
-	--[[table.insert(widgets, Cell{
-		name = 'Game',
-		content = {_args.game},
-		options = { makeLink = true }
-	})]]
-	table.insert(widgets, Cell{
-		name = 'Release Date',
-		content = {_args.releasedate}
-	})
 	table.insert(widgets, Cell{
 		name = 'Location',
 		content = {_args.location}
