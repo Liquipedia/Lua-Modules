@@ -50,7 +50,8 @@ function AutomaticPointsTable.run(frame)
 
   pointsTable:queryPlacements()
   pointsTable:calculatePointsAndTotals()
-  
+
+
   pointsTable:getSortedData()
   pointsTable:storeLPDB()
   
