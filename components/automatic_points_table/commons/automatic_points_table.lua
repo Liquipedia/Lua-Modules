@@ -54,7 +54,8 @@ function AutomaticPointsTable.run(frame)
 
   pointsTable:getSortedData()
   pointsTable:storeLPDB()
-  
+
+
   pointsTable:setHeaders()
   local divTable = pointsTable:divTableFromData()
   return divTable
