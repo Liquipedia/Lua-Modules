@@ -44,17 +44,10 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Type',
 		content = {_args.type} --{CustomMap:_getType(id)}
 	})
-	return widgets
-end
-
-function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
-		return {
-			Cell{name = 'Game version', content = {
-					CustomMap._getGameVersion()
-				}},
-			}
-	end
+	table.insert(widgets, Cell{
+		name = 'Game version',
+		content = {CustomMap._getGameVersion()}
+	})
 	return widgets
 end
 
