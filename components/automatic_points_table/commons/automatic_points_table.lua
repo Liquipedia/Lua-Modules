@@ -27,7 +27,8 @@ function DivTable.Row:create()
       end
       self.root:node(cell)
   end
-  
+
+
   return self.root
 end
 
