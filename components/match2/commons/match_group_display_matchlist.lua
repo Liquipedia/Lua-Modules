@@ -105,9 +105,7 @@ function MatchlistDisplay.Matchlist(props)
 
 		local dateHeaderNode = match.bracketData.dateHeader
 			and match.dateIsExact
-			and MatchlistDisplay.DateHeader({
-				match = match,
-			})
+			and MatchlistDisplay.DateHeader({match = match})
 			or nil
 
 		local matchNode = MatchlistDisplay.Match({
