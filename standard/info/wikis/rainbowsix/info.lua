@@ -7,7 +7,7 @@
 --
 
 return {
-	startYear = 2015,
+	startYear = 2015, --vegas from 2006
 	wikiName = 'rainbowsix',
 	name = 'Rainbow Six ',
 	defaultTeamLogo = {
