@@ -19,18 +19,17 @@ local split = require('Module:StringUtils').split
 local getArgs = require('Module:Arguments').getArgs
 
 function DivTable.Row:create()
-  for _, cell in pairs(self.cells) do
-      cell:css('border-right', '1px solid #bbbbbb')
+	for _, cell in pairs(self.cells) do
+			cell:css('border-right', '1px solid #bbbbbb')
 
-      cell:css('text-align', 'center')
-      if cell.alignLeft then
-        cell:css('text-align', 'left')
-      end
-      self.root:node(cell)
-  end
+			cell:css('text-align', 'center')
+			if cell.alignLeft then
+				cell:css('text-align', 'left')
+			end
+			self.root:node(cell)
+	end
 
-
-  return self.root
+	return self.root
 end
 
 local AutomaticPointsTable = Class.new(
