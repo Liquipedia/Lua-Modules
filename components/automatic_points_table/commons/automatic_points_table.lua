@@ -11,8 +11,6 @@
 
 local Class = require('Module:Class')
 local Table = require('Module:Table')
-
-
 local DivTable = require('Module:DivTable')
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
