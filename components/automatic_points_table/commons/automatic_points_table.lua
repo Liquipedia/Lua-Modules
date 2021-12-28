@@ -41,24 +41,22 @@ local AutomaticPointsTable = Class.new(
 
 --- Main function
 function AutomaticPointsTable.run(frame)
-  local pointsTable = AutomaticPointsTable(frame)
+	local pointsTable = AutomaticPointsTable(frame)
 
-  pointsTable:extractPositionBackgroundData()
+	pointsTable:extractPositionBackgroundData()
 
-  pointsTable:extractTournaments()
-  pointsTable:extractTeams()
+	pointsTable:extractTournaments()
+	pointsTable:extractTeams()
 
-  pointsTable:queryPlacements()
-  pointsTable:calculatePointsAndTotals()
+	pointsTable:queryPlacements()
+	pointsTable:calculatePointsAndTotals()
 
+	pointsTable:getSortedData()
+	pointsTable:storeLPDB()
 
-  pointsTable:getSortedData()
-  pointsTable:storeLPDB()
-
-
-  pointsTable:setHeaders()
-  local divTable = pointsTable:divTableFromData()
-  return divTable
+	pointsTable:setHeaders()
+	local divTable = pointsTable:divTableFromData()
+	return divTable
 end
 
 function AutomaticPointsTable:extractPositionBackgroundData()
