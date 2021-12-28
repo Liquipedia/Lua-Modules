@@ -33,10 +33,10 @@ function DivTable.Row:create()
 end
 
 local AutomaticPointsTable = Class.new(
-  function(self, frame)
-    self.frame = frame
-    self.args = getArgs(frame)
-  end
+	function(self, frame)
+		self.frame = frame
+		self.args = getArgs(frame)
+	end
 )
 
 --- Main function
