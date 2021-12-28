@@ -64,11 +64,8 @@ end
 function AutomaticPointsTable:extractPositionBackgroundData()
   local args = self.args
   self.pbg = {}
-  for argKey, argVal in pairs(args) do
-    if string.find(argKey, 'pbg') then
-      local positionIndex = tonumber(split(argKey, 'pbg')[1])
-      self.pbg[positionIndex] = argVal
-    end
+  for _, background in Table.iter.pairsByPrefix(args, 'pbg') do
+      table.insert(self.pbg, background)
   end
 end
 
