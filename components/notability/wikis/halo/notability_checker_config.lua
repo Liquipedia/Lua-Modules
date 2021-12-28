@@ -39,9 +39,9 @@ Config.NOTABILITY_THRESHOLD_NOTABLE = 800
 -- quickly decrease the point rewards as the placement gets lower
 Config.EXTRA_DROP_OFF_TYPES = {
 	Config.TIER_TYPE_MONTHLY,
-    Config.TIER_TYPE_WEEKLY,
-    Config.TIER_TYPE_DAILY, 
-    Config.TIER_TYPE_FFA,
+   	Config.TIER_TYPE_WEEKLY,
+   	Config.TIER_TYPE_DAILY,
+    	Config.TIER_TYPE_FFA,
 }
 
 -- Weights used for tournaments
@@ -68,7 +68,7 @@ Config.weights = {
 				name = Config.TIER_TYPE_FFA,
 				points = 10,
 			},
-            {
+           		{
 				name = Config.TIER_TYPE_DAILY,
 				points = 5,
 			},
@@ -96,7 +96,7 @@ Config.weights = {
 				name = Config.TIER_TYPE_FFA,
 				points = 10,
 			},
-            {
+            		{
 				name = Config.TIER_TYPE_DAILY,
 				points = 5,
 			},
@@ -124,7 +124,7 @@ Config.weights = {
 				name = Config.TIER_TYPE_FFA,
 				points = 10,
 			},
-            {
+           		{
 				name = Config.TIER_TYPE_DAILY,
 				points = 5,
 			},
@@ -152,7 +152,7 @@ Config.weights = {
 				name = Config.TIER_TYPE_FFA,
 				points = 10,
 			},
-            {
+            		{
 				name = Config.TIER_TYPE_DAILY,
 				points = 5,
 			},
