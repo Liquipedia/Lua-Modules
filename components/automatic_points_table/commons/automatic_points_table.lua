@@ -71,17 +71,17 @@ end
 
 --- Extracts the tournaments while guaranteeing the order.
 function AutomaticPointsTable:extractTournaments()
-  local args = self.args
-  self.tournaments = {}
-  for argKey, argVal in pairs(args) do
-    if (type(argVal) == 'string') and (string.find(argKey, 'tournament')) then
-      local tournamentIndexString = split(argKey, 'tournament')[1]
-      local tournamentIndex = tonumber(tournamentIndexString)
-      local unpackedTournament = Json.parse(argVal)
-      self.tournaments[tournamentIndex] = unpackedTournament
-    end
-  end
-  return nil
+	local args = self.args
+	self.tournaments = {}
+	for argKey, argVal in pairs(args) do
+		if (type(argVal) == 'string') and (string.find(argKey, 'tournament')) then
+			local tournamentIndexString = split(argKey, 'tournament')[1]
+			local tournamentIndex = tonumber(tournamentIndexString)
+			local unpackedTournament = Json.parse(argVal)
+			self.tournaments[tournamentIndex] = unpackedTournament
+		end
+	end
+	return nil
 end
 
 --- Extracts the teams without guaranteeing the order.
