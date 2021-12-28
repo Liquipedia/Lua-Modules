@@ -7,21 +7,15 @@
 --
 
 return {
-	startYear = 2015, --vegas from 2006
+	startYear = 2006, --vegas from 2006; siege from 2015
 	wikiName = 'rainbowsix',
 	name = 'Rainbow Six ',
 	defaultTeamLogo = {
-		-- order new to old
-		{logo = 'Rainbow Six Siege Logo lightmode.png', game = 'siege'},
-		{logo = 'Rainbow_Six Vegas Logo lightmode.png', game = 'vegas'},
-	},
-	teamLogoSwitchDates = {
-		-- order new to old
-		'2015-11-26'
+		siege = 'Rainbow Six Siege Logo lightmode.png',
+		vegas2 = 'Rainbow Six Vegas Logo lightmode.png',
 	},
 	defaultTeamLogoDark = {
-		-- order new to old
-		{logo = 'Rainbow Six Siege Logo darkmode.png', game = 'siege'},
-		{logo = 'Rainbow_Six Vegas Logo darkmode.png', game = 'vegas'},
+		siege = 'Rainbow Six Siege Logo darkmode.png',
+		vegas2 = 'Rainbow Six Vegas Logo darkmode.png',
 	},
 }
