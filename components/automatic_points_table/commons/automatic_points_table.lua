@@ -15,7 +15,8 @@ local Table = require('Module:Table')
 
 local DivTable = require('Module:DivTable')
 local Json = require('Module:Json')
-local split = require('Module:StringUtils').split
+local String = require('Module:StringUtils')
+
 local getArgs = require('Module:Arguments').getArgs
 
 function DivTable.Row:create()
