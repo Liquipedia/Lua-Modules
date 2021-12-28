@@ -37,7 +37,7 @@ end
 local AutomaticPointsTable = Class.new(
 	function(self, frame)
 		self.frame = frame
-		self.args = getArgs(frame)
+		self.args = Arguments.getArgs(frame)
 	end
 )
 
