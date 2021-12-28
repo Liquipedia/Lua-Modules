@@ -16,7 +16,6 @@ local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Arguments = require('Module:Arguments')
 
-
 function DivTable.Row:create()
 	for _, cell in pairs(self.cells) do
 			cell:css('border-right', '1px solid #bbbbbb')
