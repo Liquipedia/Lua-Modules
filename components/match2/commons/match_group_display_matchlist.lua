@@ -106,7 +106,7 @@ function MatchlistDisplay.Matchlist(props)
 		local dateHeaderNode = match.bracketData.dateHeader
 			and match.dateIsExact
 			and MatchlistDisplay.DateHeader({
-				dateHeader = DisplayHelper.MatchCountdownBlock(match),
+				match = match,
 			})
 			or nil
 
@@ -216,18 +216,12 @@ function MatchlistDisplay.Header(props)
 	return DisplayUtil.applyOverflowStyles(headerNode, 'wrap')
 end
 
-MatchlistDisplay.propTypes.DateHeader = {
-	dateHeader = 'table',
-}
-
 --[[
-Display component for a header in a matchlist.
+Display component for a dateHeader in a matchlist.
 ]]
 function MatchlistDisplay.DateHeader(props)
-	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.DateHeader)
-
 	local dateHeaderNode = mw.html.create('div'):addClass('brkts-matchlist-header')
-		:node(props.dateHeader)
+		:node(DisplayHelper.MatchCountdownBlock(props.match))
 
 	return DisplayUtil.applyOverflowStyles(dateHeaderNode, 'wrap')
 end
