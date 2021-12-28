@@ -62,11 +62,11 @@ function AutomaticPointsTable.run(frame)
 end
 
 function AutomaticPointsTable:extractPositionBackgroundData()
-  local args = self.args
-  self.pbg = {}
-  for _, background in Table.iter.pairsByPrefix(args, 'pbg') do
-      table.insert(self.pbg, background)
-  end
+	local args = self.args
+	self.pbg = {}
+	for _, background in Table.iter.pairsByPrefix(args, 'pbg') do
+			table.insert(self.pbg, background)
+	end
 end
 
 --- Extracts the tournaments while guaranteeing the order.
