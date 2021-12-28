@@ -74,7 +74,7 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
 	title = 'string?',
-	dateheader = 'boolean?',
+	dateHeader = 'boolean?',
 	type = TypeUtil.literal('matchlist'),
 })
 MatchGroupUtil.types.BracketData = TypeUtil.union(
