@@ -16,6 +16,8 @@ local Table = require('Module:Table')
 local NotabilityChecker = {}
 
 local _lang = mw.language.new('en')
+local _NOW = os.time()
+local _SECONDS_IN_YEAR = 365.25 * 86400
 
 function NotabilityChecker.run(args)
 
@@ -241,9 +243,9 @@ function NotabilityChecker._parseNotabilityMod(notabilityMod)
 end
 
 function NotabilityChecker._calculateDateLoss(date)
-	local year = _lang:formatDate('Y', date)
-	local now = os.date('%Y')
-    return (tonumber(now) - tonumber(year)) + 1
+	local timestamp = _lang:formatDate('U', date)
+	local differenceSeconds = _NOW - timestamp
+    return math.floor(differenceSeconds / _SECONDS_IN_YEAR) + 1
 end
 
 function NotabilityChecker._firstToLower(s)
