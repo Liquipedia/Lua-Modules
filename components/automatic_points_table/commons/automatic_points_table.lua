@@ -75,7 +75,7 @@ function AutomaticPointsTable:extractTournaments()
 	self.tournaments = {}
 	for argKey, argVal in pairs(args) do
 		if (type(argVal) == 'string') and (string.find(argKey, 'tournament')) then
-			local tournamentIndexString = split(argKey, 'tournament')[1]
+			local tournamentIndexString = String.split(argKey, 'tournament')[1]
 			local tournamentIndex = tonumber(tournamentIndexString)
 			local unpackedTournament = Json.parse(argVal)
 			self.tournaments[tournamentIndex] = unpackedTournament
