@@ -23,5 +23,6 @@ return {
 		css = 'CS default darkmode.png',
 		cs16 = 'CS default darkmode.png',
 		cscz = 'CS default darkmode.png',
-	}
+	},
+	defaultGame = 'csgo',
 }
