@@ -49,7 +49,7 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Game Modes',
-		content = {CustomMap._getGameMode(_args.mode)}
+		content = {CustomMap._getGameMode()}
 	})
 	return widgets
 end
@@ -61,12 +61,12 @@ function CustomMap._getGameVersion()
 end
 
 function CustomMap._getGameMode()
-	
+
 	if String.isEmpty(_args.mode) then
 		return nil
 	end
 	local modeIcon = MapModes.get({mode = _args.mode, date = _args.releasedate, size = 15})
-	local mapModeDisplay = modeIcon .. " [[".._args.mode.."|".._args.mode.."]]"
+	local mapModeDisplay = modeIcon .. ' [[' .. _args.mode .. ']]'
 	return mapModeDisplay
 end
 
