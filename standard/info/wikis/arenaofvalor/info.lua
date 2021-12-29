@@ -18,4 +18,5 @@ return {
 		aov = 'Arena of ValorLogo.png', --Arena of Valor
 		hok = 'Honor of Kings 2018-12-24 Logo.png', --Honor of Kings
 	},
+	defaultGame = 'aov'
 }
