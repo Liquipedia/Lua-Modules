@@ -151,7 +151,7 @@ function CustomLeague:_standardiseRawDate(dateString)
 	if #dateString == 7 then
 		dateString = dateString .. '-??'
 	end
-	dateString = dateString:gsub('-XX', '-??')
+	dateString = dateString:gsub('%-XX', '-??')
 	return dateString
 end
 
