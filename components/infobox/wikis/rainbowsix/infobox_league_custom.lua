@@ -22,9 +22,12 @@ local _TODAY = os.date('%Y-%m-%d', os.time())
 
 local _DEFAULT_PLATFORM = 'PC'
 local _PLATFORM_ALIAS = {
+	pc = 'PC',
+	xbox = 'Xbox',
 	xone = 'Xbox',
 	['xbox one'] = 'Xbox',
 	one = 'Xbox',
+	playstation = 'Playstation',
 	ps = 'Playstation',
 	ps4 = 'Playstation',
 }
@@ -55,6 +58,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
@@ -186,7 +190,7 @@ function CustomLeague:_createLiquipediaTierDisplay()
 			table.insert(_league.warnings, tierString .. ' is not a known Liquipedia Tier/Tiertype')
 			return ''
 		else
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']][[Category:' .. tierText .. ' Tournaments]]'
+			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
 		end
 	end
 
@@ -206,7 +210,14 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or '')
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
-	Variables.varDefine('tournament_currency', _args.currency or '')
+
+	-- Module:Prize pool currency will usually set this variable.
+	-- However the module won't be run if certain arguments are not yet known
+	-- Set the Variable here if the createPrizepool returns nil
+	-- Needed in Module:Prize pool slot
+	if not CustomLeague:_createPrizepool() then
+		Variables.varDefine('tournament_currency', _args.localcurrency or '')
+	end
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -217,49 +228,83 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
-
 end
 
-function CustomLeague:_createGameCell(args)
-	if String.isEmpty(args.game) and String.isEmpty(args.patch) then
+function CustomLeague:getWikiCategories(args)
+	local categories = {}
+	if String.isNotEmpty(args.player_number) then
+		table.insert(categories, 'Individual Tournaments')
+	end
+
+	if not self:_gameLookup(args.game) then
+		table.insert(categories, 'Tournaments without game version')
+	else
+		table.insert(categories, self:_gameLookup(args.game) .. ' Competitions')
+	end
+
+	if self:_platformLookup(args.platform) then
+		table.insert(categories, self:_gameLookup(args.platform) .. ' Tournaments')
+	end
+
+	local tier = args.liquipediatier
+	local tierType = args.liquipediatiertype
+
+	if String.isNotEmpty(tier) and String.isNotEmpty(Tier.text[tier]) then
+		table.insert(categories, Tier.text[tier]  .. ' Tournaments')
+	end
+
+	if String.isNotEmpty(tierType) and String.isNotEmpty(Tier.text[tierType]) then
+		table.insert(categories, Tier.text[tierType] .. ' Tournaments')
+	end
+
+	return categories
+end
+
+function CustomLeague:_gameLookup(game)
+	if String.isEmpty(game) then
 		return nil
 	end
 
-	local content
-
-	local betaTag = String.isNotEmpty(args.beta) and 'Beta&nbsp;' or ''
-
-	if args.game == _GAME_SIEGE then
-		content = '[[Siege]][[Category:' .. betaTag .. 'Siege Competitions]]'
-	elseif args.game == _GAME_VEGAS2 then
-		content = '[[Vegas 2]][[Category:' .. betaTag .. 'Vegas 2 Competitions]]'
+	game = game:lower()
+	if game == _GAME_SIEGE then
+		return 'Siege'
+	elseif game == _GAME_VEGAS2 then
+		return 'Vegas 2'
 	else
-		content = '[[Category:Tournaments without game version]]'
+		return nil
+	end
+end
+
+function CustomLeague:_platformLookup(platform)
+	if String.isEmpty(platform) then
+		platform = _DEFAULT_PLATFORM
 	end
 
-	content = content .. betaTag
+	return _PLATFORM_ALIAS[platform]
+end
 
-	if String.isNotEmpty(args.epatch)  then
-		content = content .. '<br> [[' .. args.patch .. ']] &ndash; [[' .. args.epatch .. ']]'
-	elseif String.isNotEmpty(args.patch) then
-		content = content .. '[[' .. args.patch .. ']]'
+function CustomLeague:_createGameCell(args)
+	if String.isEmpty(args.game) then
+		return nil
 	end
 
-	return content
+	local game = self:_gameLookup(args.game)
+
+	if String.isNotEmpty(game) then
+		return '[['.. game ..']]'
+	else
+		return nil
+	end
 end
 
 function CustomLeague:_createPlatformCell(args)
-	if String.isEmpty(args.platform) then
-		args.platform = _DEFAULT_PLATFORM
-	end
-
-	local platform = _PLATFORM_ALIAS[args.platform] or args.platform
+	local platform = self:_platformLookup(args.platform)
 
 	if String.isNotEmpty(platform) then
-		return '[[' .. platform .. ']][[Category:' .. platform .. ' Tournaments]]'
+		return '[[' .. platform .. ']]'
+	else
+		return nil
 	end
-
-	return nil
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
