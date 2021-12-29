@@ -236,14 +236,14 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'Individual Tournaments')
 	end
 
-	if not self:_gameLookup(args.game) then
+	if not CustomLeague:_gameLookup(args.game) then
 		table.insert(categories, 'Tournaments without game version')
 	else
-		table.insert(categories, self:_gameLookup(args.game) .. ' Competitions')
+		table.insert(categories, CustomLeague:_gameLookup(args.game) .. ' Competitions')
 	end
 
-	if self:_platformLookup(args.platform) then
-		table.insert(categories, self:_gameLookup(args.platform) .. ' Tournaments')
+	if CustomLeague:_platformLookup(args.platform) then
+		table.insert(categories, CustomLeague:_gameLookup(args.platform) .. ' Tournaments')
 	end
 
 	local tier = args.liquipediatier
@@ -288,7 +288,7 @@ function CustomLeague:_createGameCell(args)
 		return nil
 	end
 
-	local game = self:_gameLookup(args.game)
+	local game = CustomLeague:_gameLookup(args.game)
 
 	if String.isNotEmpty(game) then
 		return '[['.. game ..']]'
@@ -298,7 +298,7 @@ function CustomLeague:_createGameCell(args)
 end
 
 function CustomLeague:_createPlatformCell(args)
-	local platform = self:_platformLookup(args.platform)
+	local platform = CustomLeague:_platformLookup(args.platform)
 
 	if String.isNotEmpty(platform) then
 		return '[[' .. platform .. ']]'
