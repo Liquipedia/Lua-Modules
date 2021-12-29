@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=wildrift
+-- wiki=mobilelegends
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -9,15 +9,15 @@
 local CustomMatchSummary = {}
 
 local Class = require('Module:Class')
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ChampionIcon = require('Module:ChampionIcon')
+local ChampionIcon = require('Module:HeroIcon')
 local Table = require('Module:Table')
 local ExternalLinks = require('Module:ExternalLinks')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
@@ -158,7 +158,7 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Pre-Process Champion Ban Data
-	local showGameBans = {}
+	local championBanData = {}
 	for gameIndex, game in ipairs(match.games) do
 		local extradata = game.extradata
 		local banData = {{}, {}}
@@ -178,15 +178,15 @@ function CustomMatchSummary._createBody(match)
 			banData[1].color = extradata.team1side
 			banData[2].color = extradata.team2side
 			banData.numberOfBans = numberOfBans
-			showGameBans[gameIndex] = banData
+			championBanData[gameIndex] = banData
 		end
 	end
 
 	-- Add the Champion Bans
-	if not Table.isEmpty(showGameBans) then
+	if not Table.isEmpty(championBanData) then
 		local championBan = ChampionBan()
 
-		for gameIndex, banData in ipairs(showGameBans) do
+		for gameIndex, banData in ipairs(championBanData) do
 			championBan:banRow(banData, gameIndex, banData.numberOfBans)
 		end
 
@@ -314,8 +314,7 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 
 	local display = mw.html.create('div')
 	if isBan then
-		display:addClass('brkts-popup-side-shade-out')
-		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
+		display:addClass('brkts-popup-side-shade-out' .. (flip and '-flipped' or ''))
 	end
 
 	for _, item in ipairs(opponentChampionsDisplay) do

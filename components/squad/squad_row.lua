@@ -58,11 +58,11 @@ function SquadRow:id(args)
 	cell:wikitext('\'\'\'' .. Player._player(args) .. '\'\'\'')
 
 	if not String.isEmpty(args.captain) then
-		cell:wikitext(_ICON_CAPTAIN)
+		cell:wikitext('&nbsp;' .. _ICON_CAPTAIN)
 	end
 
 	if args.role == 'sub' then
-		cell:wikitext(_ICON_SUBSTITUTE)
+		cell:wikitext('&nbsp;' .. _ICON_SUBSTITUTE)
 	end
 
 	if mw.ext.TeamTemplate.teamexists(string.lower(args.team or '')) then

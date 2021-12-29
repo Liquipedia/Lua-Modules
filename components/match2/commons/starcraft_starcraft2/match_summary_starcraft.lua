@@ -7,11 +7,11 @@
 --
 
 local Array = require('Module:Array')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
@@ -36,23 +36,25 @@ StarcraftMatchSummary.propTypes.MatchSummaryContainer = {
 
 function StarcraftMatchSummary.MatchSummaryContainer(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
-	local config = {
-		showScore = props.config or false
-	}
 	local MatchSummary = match.isFfa
 		and Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary
 		or StarcraftMatchSummary.MatchSummary
-	return MatchSummary({match = match, config = config})
+	return MatchSummary({match = match, config = props.config})
 end
 
 StarcraftMatchSummary.propTypes.MatchSummary = {
 	match = StarcraftMatchGroupUtil.types.Match,
-	config = 'table'
+	config = 'table',
 }
 
 function StarcraftMatchSummary.MatchSummary(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.MatchSummary)
 	local match = props.match
+
+	local propsConfig = props.config or {}
+	local config = {
+		showScore = propsConfig.showScore or false,
+	}
 
 	-- Compute offraces
 	if match.opponentMode == 'uniform' then
@@ -67,7 +69,7 @@ function StarcraftMatchSummary.MatchSummary(props)
 		:addClass('brkts-popup')
 		:addClass('brkts-popup-sc')
 		:addClass(match.opponentMode == 'uniform' and 'brkts-popup-sc-uniform-match' or 'brkts-popup-sc-team-match')
-		:node(StarcraftMatchSummary.Header({match = match, config = props.config}))
+		:node(StarcraftMatchSummary.Header({match = match, config = config}))
 		:node(StarcraftMatchSummary.Body({match = match}))
 		:node(StarcraftMatchSummary.Footer({match = match, showHeadToHead = match.headToHead}))
 end
@@ -168,9 +170,7 @@ function StarcraftMatchSummary.Body(props)
 	for ix, veto in ipairs(match.vetoes) do
 		local vetoNode = StarcraftMatchSummary.Veto(veto)
 		if ix == 1 then
-			vetoNode = html.create('div')
-				:node(StarcraftMatchSummary.GameHeader({header = 'Vetoes'}))
-				:node(vetoNode)
+			body:node(StarcraftMatchSummary.VetoHeader{header = 'Vetoes'})
 		end
 		body:node(vetoNode:addClass('brkts-popup-body-element'))
 	end
@@ -178,7 +178,7 @@ function StarcraftMatchSummary.Body(props)
 	-- Match casters
 	if match.casters then
 		body:node(
-			html.create('div'):addClass('brkts-popup-sc-game-comment')
+			html.create('div'):addClass('brkts-popup-body-element brkts-popup-sc-game-comment')
 				:node('Caster(s): ' .. match.casters)
 		)
 	end
@@ -334,6 +334,17 @@ function StarcraftMatchSummary.GameHeader(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.GameHeader)
 	return html.create('div')
 		:addClass('brkts-popup-sc-game-header')
+		:wikitext(props.header)
+end
+
+StarcraftMatchSummary.propTypes.VetoHeader = {
+	header = 'string',
+}
+
+function StarcraftMatchSummary.VetoHeader(props)
+	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.VetoHeader)
+	return html.create('div')
+		:addClass('brkts-popup-body-element brkts-popup-sc-game-header brkts-popup-sc-veto-center')
 		:wikitext(props.header)
 end
 

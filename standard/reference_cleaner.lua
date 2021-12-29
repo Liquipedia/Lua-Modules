@@ -15,8 +15,10 @@ function ReferenceCleaner.clean(dateWithRef)
 		return ''
 	end
 
-	dateWithRef = dateWithRef:gsub('-??', '-01')
-	dateWithRef = dateWithRef:gsub('-XX', '-01')
+	-- due to '-' and '?' being part of the 'magic' characters for patterns
+	-- we have to escape them with '%'
+	dateWithRef = dateWithRef:gsub('%-%?%?', '-01')
+	dateWithRef = dateWithRef:gsub('%-XX', '-01')
 	local correctDate = string.match(dateWithRef, '(%d+-%d+-%d+)')
 	if correctDate then
 		return correctDate

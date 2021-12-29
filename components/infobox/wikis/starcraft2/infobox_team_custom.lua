@@ -7,11 +7,13 @@
 --
 
 local Team = require('Module:Infobox/Team')
+local Json = require('Module:Json')
 local Variables = require('Module:Variables')
 local String = require('Module:StringUtils')
 local Achievements = require('Module:Achievements in infoboxes')
 local RaceIcon = require('Module:RaceIcon').getSmallIcon
 local Matches = require('Module:Upcoming ongoing and recent matches team/new')
+local Math = require('Module:Math')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -70,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 			earningsFromPlayersDisplay = '$' .. Language:formatNum(_earnings_by_players_while_on_team)
 		end
 		return {
-			Cell{name = 'Earnings', content = {earningsDisplay}},
+			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
 			Cell{name = _PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
 		}
 	elseif id == 'achievements' then
@@ -139,7 +141,23 @@ end
 function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.earnings = _earnings or 0
 	lpdbData.region = nil
+	lpdbData.extradata.subteams = CustomTeam.listSubTeams()
 	return lpdbData
+end
+
+-- gets a list of sub/accademy teams of the team
+-- this data can be used in results queries to include
+-- results of accademy teams of the current team
+function CustomTeam.listSubTeams()
+	if String.isEmpty(_team.args.subteam) and String.isEmpty(_team.args.subteam1) then
+		return nil
+	end
+	local subTeams = Team:getAllArgsForBase(_team.args, 'subteam')
+	local subTeamsToStore = {}
+	for index, subTeam in pairs(subTeams) do
+		subTeamsToStore['subteam' .. index] = mw.ext.TeamLiquidIntegration.resolve_redirect(subTeam)
+	end
+	return Json.stringify(subTeamsToStore)
 end
 
 function CustomTeam.playerBreakDown(args)
@@ -267,9 +285,9 @@ function CustomTeam.getEarningsAndMedalsData(team)
 				information = playerEarnings,
 		})
 	end
-	_earnings_by_players_while_on_team = math.floor((playerEarnings or 0) * 100 + 0.5) / 100
+	_earnings_by_players_while_on_team = Math.round{playerEarnings or 0}
 
-	return math.floor((earnings.team.total or 0) * 100 + 0.5) / 100
+	return Math.round{earnings.team.total or 0}
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)

@@ -28,6 +28,7 @@ Display components for players used in the starcraft and starcraft2 wikis.
 local StarcraftPlayerDisplay = {propTypes = {}}
 
 StarcraftPlayerDisplay.propTypes.BlockPlayer = {
+	dq = 'boolean?',
 	flip = 'boolean?',
 	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
 	player = StarcraftMatchGroupUtil.types.Player,
@@ -45,7 +46,7 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
 	local zeroWidthSpace = '&#8203;'
-	local nameNode = html.create('span'):addClass('name')
+	local nameNode = html.create(props.dq and 's' or 'span'):addClass('name')
 		:wikitext(props.showLink ~= false and player.pageName
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
 			or Logic.emptyOr(player.displayName, zeroWidthSpace)

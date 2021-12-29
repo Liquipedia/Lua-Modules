@@ -19,6 +19,8 @@ local Variables = require('Module:Variables')
 local Locale = require('Module:Locale')
 local Page = require('Module:Page')
 local LeagueIcon = require('Module:LeagueIcon')
+local WarningBox = require('Module:WarningBox')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -30,6 +32,8 @@ local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
 local League = Class.new(BasicInfobox)
+
+League.warnings = {}
 
 function League.run(frame)
 	local league = League(frame)
@@ -88,28 +92,33 @@ function League:createInfobox()
 				Cell{name = 'Server', content = {args.server}}
 			}
 		},
-		Builder{
-			builder = function()
-				local value = tostring(args.type):lower()
-				if value == 'offline' then
-					self.infobox:categories('Offline Tournaments')
-				elseif value == 'online' then
-					self.infobox:categories('Online Tournaments')
-				else
-					self.infobox:categories('Unknown Type Tournaments')
-				end
+		Customizable{id = 'type', children = {
+				Builder{
+					builder = function()
+						local value = tostring(args.type):lower()
+						if value == 'offline' then
+							self.infobox:categories('Offline Tournaments')
+						elseif value == 'online' then
+							self.infobox:categories('Online Tournaments')
+						elseif value:match('online') and value:match('offline') then
+							self.infobox:categories('Online/Offline Tournaments')
+						else
+							self.infobox:categories('Unknown Type Tournaments')
+						end
 
-				if not String.isEmpty(args.type) then
-					return {
-						Cell{
-							name = 'Type',
-							content = {
-								args.type:sub(1,1):upper()..args.type:sub(2)
+						if not String.isEmpty(args.type) then
+							return {
+								Cell{
+									name = 'Type',
+									content = {
+										mw.language.getContentLanguage():ucfirst(args.type)
+									}
+								}
 							}
-						}
-					}
-				end
-			end
+						end
+					end
+				}
+			}
 		},
 		Cell{
 			name = 'Location',
@@ -173,7 +182,7 @@ function League:createInfobox()
 		self:_setLpdbData(args, links)
 	end
 
-	return builtInfobox
+	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
 end
 
 --- Allows for overriding this functionality
@@ -423,10 +432,7 @@ function League:_cleanDate(date)
 	if self:_isUnknownDate(date) then
 		return nil
 	end
-
-	date = date:gsub('-??', '-01')
-	date = date:gsub('-XX', '-01')
-	return date
+	return ReferenceCleaner.clean(date)
 end
 
 function League:_isUnknownDate(date)

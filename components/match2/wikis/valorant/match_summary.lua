@@ -7,12 +7,12 @@
 --
 
 local Class = require('Module:Class')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require("Module:Logic")
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
@@ -217,13 +217,13 @@ function CustomMatchSummary._createMap(frame, game)
 	local score1, score2
 
 	local extradata = game.extradata
+	score1 = Score():setLeft()
+	score2 = Score():setRight()
+
+	score1:setMapScore(game.scores[1])
+	score2:setMapScore(game.scores[2])
+
 	if not Table.isEmpty(extradata) then
-		score1 = Score():setLeft()
-		score2 = Score():setRight()
-
-		score1:setMapScore(game.opponents[1].score)
-		score2:setMapScore(game.opponents[2].score)
-
 		score1:setFirstRoundScore(extradata.op1startside, extradata.half1score1)
 		score1:setSecondRoundScore(
 			CustomMatchSummary._getOppositeSide(extradata.op1startside), extradata.half2score1)

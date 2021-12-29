@@ -7,13 +7,13 @@
 --
 
 local Class = require('Module:Class')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
+local VodLink = require('Module:VodLink')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
@@ -41,6 +41,7 @@ local _LINK_DATA = {
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	lpl = {icon = 'File:LPL Play icon.png', text = 'Match page on LPL Play'},
 	r6esports = {icon = 'File:Copa Elite Six icon.png', text = 'R6 Esports LATAM Match Page'},
+	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
@@ -313,8 +314,6 @@ local CustomMatchSummary = {}
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
-	local frame = mw.getCurrentFrame()
-
 	local matchSummary = MatchSummary():init()
 	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
@@ -341,11 +340,11 @@ function CustomMatchSummary.getByMatchId(args)
 
 		-- Game Vods
 		for index, vod in pairs(vods) do
-			footer:addElement(Template.safeExpand(frame, 'vodlink', {
+			footer:addElement(VodLink.display{
 				gamenum = index,
 				vod = vod,
 				source = vod.url
-			}))
+			})
 		end
 
 		-- Match Vod + other links
