@@ -62,7 +62,7 @@ end
 
 function CustomMap._getGameMode()
 	local modeIcon = MapModes.get({date = _args.releasedate, size = 25})
-	local mapModeDisplay = modeIcon .. "'''[[".._args.mode.."|".._args.mode.."]]'''"
+	local mapModeDisplay = modeIcon .. "[[".._args.mode.."|".._args.mode.."]]"
 	return mapModeDisplay
 end
 
@@ -74,7 +74,7 @@ function CustomMap:addToLpdb(lpdbData)
 	lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2)
 	lpdbData.extradata.type = _args.type
 	lpdbData.extradata.game = _game
-	lpdbData.extradata.modes = _mode
+	lpdbData.extradata.modes = _args.mode
 	return lpdbData
 end
 
