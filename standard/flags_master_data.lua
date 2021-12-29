@@ -1773,11 +1773,11 @@ local aliases = {
 	['southgeorgiaandthesouthsandwichisl'] = 'southgeorgiaandthesouthsandwichislands',
 
 	--language flag abbreviations
-	['usuk'] = 'englishspeaking'
-	['deat'] = 'germanspeaking'
-	['esmx'] = 'spanishspeaking'
-	['ptbr'] = 'portuguesespeaking'
-	['ruby'] = 'russianspeaking'
+	['usuk'] = 'englishspeaking',
+	['deat'] = 'germanspeaking',
+	['esmx'] = 'spanishspeaking',
+	['ptbr'] = 'portuguesespeaking',
+	['ruby'] = 'russianspeaking',
 
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
