@@ -18,4 +18,5 @@ return {
 		siege = 'Rainbow Six Siege Logo darkmode.png',
 		vegas2 = 'Rainbow Six Vegas Logo darkmode.png',
 	},
+	defaultGame = 'siege',
 }
