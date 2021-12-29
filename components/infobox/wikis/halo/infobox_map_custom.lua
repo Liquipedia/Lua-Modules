@@ -8,10 +8,8 @@
 
 local Class = require('Module:Class')
 local Map = require('Module:Infobox/Map')
-local Widgets = require('Module:Infobox/Widget/All')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local String = require('Module:StringUtils')
 local MapModes = require('Module:MapModes')
 
 local CustomMap = Class.new()
@@ -20,10 +18,8 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 local _game
-local _mode
 
 local _GAME = mw.loadData('Module:GameVersion')
-local _MAPMODES = mw.loadData('Module:MapModes/Data')
 
 function CustomMap.run(frame)
 	local customMap = Map(frame)
