@@ -200,8 +200,7 @@ end
 -- Adjusts the score to compensate for the mode, you might
 -- want to decrease the points given for a certain mode
 function Config.adjustScoreForMode(score, mode)
-	local modeMod = 1
-	return score * modeMod
+	return score
 end
 
 return Config
