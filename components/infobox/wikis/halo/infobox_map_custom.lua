@@ -20,8 +20,10 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 local _game
+local _mode
 
 local _GAME = mw.loadData('Module:GameVersion')
+local _MAPMODES = mw.loadData('Module:MapModes/Data')
 
 function CustomMap.run(frame)
 	local customMap = Map(frame)
@@ -42,11 +44,16 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Type',
-		content = {_args.type} --{CustomMap:_getType(id)}
+		content = {_args.type}
 	})
 	table.insert(widgets, Cell{
-		name = 'Game version',
-		content = {CustomMap._getGameVersion()}
+		name = 'Game Version',
+		content = {CustomMap._getGameVersion()},
+		options = {makeLink = true}
+	})
+	table.insert(widgets, Cell{
+		name = 'Game Modes',
+		content = {CustomMap._getGameMode(_args.mode)}
 	})
 	return widgets
 end
@@ -57,17 +64,21 @@ function CustomMap._getGameVersion()
 	return _game
 end
 
+function CustomMap._getGameMode()
+	local modeIcon = MapModes.get({date = _args.releasedate, size = 25})
+	local mapModeDisplay = modeIcon .. "'''[[".._args.mode.."|".._args.mode.."]]'''"
+	return mapModeDisplay
+end
+
 function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
 function CustomMap:addToLpdb(lpdbData)
-	lpdbData.extradata = {
-		creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator),
-		creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2),
-		releasedate = _args.releasedate,
-		type = _args.type,
-	}
+	lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2)
+	lpdbData.extradata.type = _args.type
+	lpdbData.extradata.game = _game
+	lpdbData.extradata.modes = _mode
 	return lpdbData
 end
 
