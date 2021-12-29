@@ -1139,10 +1139,30 @@ local data = {
 		name = 'World',
 		flag = 'File:World hd.png'
 	},
+	['englishspeaking'] = {
+		name = 'English Speaking',
+		flag = 'File:UsGb hd.png'
+	},
+	['germanspeaking'] = {
+		name = 'German Speaking',
+		flag = 'File:DeAt hd.png'
+	},
+	['spanishspeaking'] = {
+		name = 'Spanish Speaking',
+		flag = 'File:EsMx hd.png'
+	},
+	['portuguesespeaking'] = {
+		name = 'Portuguese Speaking',
+		flag = 'File:PtBr hd.png'
+	},
+	['russianspeaking'] = {
+		name = 'Russian Speaking',
+		flag = 'File:RuBy hd.png'
+	},
 	['filler'] = {
 		name = '',
 		flag = 'File:Space filler flag.png'
-	}
+	},
 }
 
 -- This table includes:
@@ -1751,6 +1771,13 @@ local aliases = {
 	--minus the spaces in cut of the flag names
 	['southgeorgiaandth'] = 'southgeorgiaandthesouthsandwichislands',
 	['southgeorgiaandthesouthsandwichisl'] = 'southgeorgiaandthesouthsandwichislands',
+
+	--language flag abbreviations
+	['usuk'] = 'englishspeaking'
+	['deat'] = 'germanspeaking'
+	['esmx'] = 'spanishspeaking'
+	['ptbr'] = 'portuguesespeaking'
+	['ruby'] = 'russianspeaking'
 
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
