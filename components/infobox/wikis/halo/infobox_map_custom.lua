@@ -61,8 +61,8 @@ function CustomMap._getGameVersion()
 end
 
 function CustomMap._getGameMode()
-	local modeIcon = MapModes.get({date = _args.releasedate, size = 25})
-	local mapModeDisplay = modeIcon .. "[[".._args.mode.."|".._args.mode.."]]"
+	local modeIcon = MapModes.get({mode = _args.mode, date = _args.releasedate, size = 15})
+	local mapModeDisplay = modeIcon .. " [[".._args.mode.."|".._args.mode.."]]"
 	return mapModeDisplay
 end
 
