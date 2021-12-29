@@ -17,7 +17,7 @@ local NotabilityChecker = {}
 
 local _lang = mw.language.new('en')
 local _NOW = os.time()
-local _SECONDS_IN_YEAR = 365.25 * 86400
+local _SECONDS_IN_YEAR = 365.2425 * 86400
 
 function NotabilityChecker.run(args)
 
