@@ -20,6 +20,12 @@ local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
+local _args
+local _league
+
+local CustomLeague = Class.new()
+local CustomInjector = Class.new(Injector)
+
 local _DEFAULT_PLATFORM = 'PC'
 local _PLATFORM_ALIAS = {
 	pc = 'PC',
@@ -32,14 +38,10 @@ local _PLATFORM_ALIAS = {
 	ps4 = 'Playstation',
 }
 
-local _GAME_SIEGE = 'siege'
-local _GAME_VEGAS2 = 'vegas2'
-
-local _args
-local _league
-
-local CustomLeague = Class.new()
-local CustomInjector = Class.new(Injector)
+local _GAMES = {
+	siege = 'Siege',
+	vegas2 = 'Vegas 2'
+}
 
 local _UBISOFT_TIERS = {
 	si = 'Six Invitational',
@@ -265,14 +267,7 @@ function CustomLeague:_gameLookup(game)
 		return nil
 	end
 
-	game = game:lower()
-	if game == _GAME_SIEGE then
-		return 'Siege'
-	elseif game == _GAME_VEGAS2 then
-		return 'Vegas 2'
-	else
-		return nil
-	end
+	return _GAMES[game:lower()]
 end
 
 function CustomLeague:_platformLookup(platform)
@@ -280,7 +275,7 @@ function CustomLeague:_platformLookup(platform)
 		platform = _DEFAULT_PLATFORM
 	end
 
-	return _PLATFORM_ALIAS[platform]
+	return _PLATFORM_ALIAS[platform:lower()]
 end
 
 function CustomLeague:_createGameCell(args)
