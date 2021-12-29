@@ -264,7 +264,7 @@ end
 
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
+		:css('white-space', 'nowrap')
 		:node(content)
 	return span
 end
