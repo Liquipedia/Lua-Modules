@@ -150,11 +150,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:_validPublisherTier(publishertier)
-	if String.isNotEmpty(publishertier) and _UBISOFT_TIERS[publishertier:lower()] then
-		return true
-	else
-		return false
-	end
+	return String.isNotEmpty(publishertier) and _UBISOFT_TIERS[publishertier:lower()]
 end
 
 function CustomLeague:_standardiseRawDate(dateString)
