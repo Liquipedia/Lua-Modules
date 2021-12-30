@@ -17,7 +17,7 @@ CustomActiveYears.additionalConditions = ''
 
 -- legacy entry point
 function CustomActiveYears.get(input)
-	local args = input.args
+	local args = input.args or input
 	return CustomActiveYears.display(args)
 end
 
