@@ -141,14 +141,7 @@ function ActiveYears._calculate(conditions)
 	end
 
 	-- Generate output for activity ranges
-	local output = ''
-	for index, range in ipairs(yearRanges) do
-		if index == 1 then
-			output = range
-		else
-			output = output .. ',</br>' .. range
-		end
-	end
+	local output = table.concat(yearRanges, ',</br>')
 
 	-- Return text with years active
 	return output
