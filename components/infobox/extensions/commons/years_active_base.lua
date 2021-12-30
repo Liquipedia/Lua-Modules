@@ -115,29 +115,16 @@ function ActiveYears._calculate(conditions)
 	for index, year in ipairs(sortedYears) do
 		if index == 1 then
 			startYear = year
-			endYear = year
-		else
-			if year - endYear == 1 then
-				endYear = year
-			else
-				if startYear == endYear then
-					table.insert(yearRanges, tostring(startYear))
-				else
-					table.insert(yearRanges, tostring(startYear) .. ' - ' .. tostring(endYear))
-				end
-				startYear = year
-				endYear = year
-			end
+		elseif year - endYear ~= 1 then
+			yearRanges = ActiveYears._insertYears(startYear, endYear, yearRanges)
+			startYear = year
 		end
+		endYear = year
 	end
 	if endYear == _CURRENT_YEAR then
 		table.insert(yearRanges, tostring(startYear) .. ' - ' .. "'''Present'''")
 	else
-		if startYear == endYear then
-			table.insert(yearRanges, tostring(startYear))
-		else
-			table.insert(yearRanges, tostring(startYear) .. ' - ' .. tostring(endYear))
-		end
+		yearRanges = ActiveYears._insertYears(startYear, endYear, yearRanges)
 	end
 
 	-- Generate output for activity ranges
@@ -145,6 +132,16 @@ function ActiveYears._calculate(conditions)
 
 	-- Return text with years active
 	return output
+end
+
+function ActiveYears._insertYears(startYear, endYear, yearRanges)
+	if startYear == endYear then
+		table.insert(yearRanges, tostring(startYear))
+	else
+		table.insert(yearRanges, tostring(startYear) .. ' - ' .. tostring(endYear))
+	end
+	
+	return yearRanges
 end
 
 return Class.export(ActiveYears)
