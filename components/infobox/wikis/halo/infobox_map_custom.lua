@@ -95,12 +95,8 @@ function CustomMap:addToLpdb(lpdbData)
 	lpdbData.extradata.type = _args.type
 	lpdbData.extradata.players = _args.players
 	lpdbData.extradata.game = _game
-	lpdbData.extradata.modes = CustomMap:_concatArgs('mode')
+	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(_args, 'mode'), ',')
 	return lpdbData
-end
-
-function CustomMap:_concatArgs(base)
-	return table.concat(Map:getAllArgsForBase(_args, 'mode'), ',')
 end
 
 return CustomMap
