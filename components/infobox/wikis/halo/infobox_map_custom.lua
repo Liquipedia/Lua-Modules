@@ -89,14 +89,19 @@ function CustomMap:createWidgetInjector()
 end
 
 function CustomMap:addToLpdb(lpdbData)
+	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator)
 	if String.isNotEmpty(_args.creator2) then
 		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2)
 	end
 	lpdbData.extradata.type = _args.type
 	lpdbData.extradata.players = _args.players
 	lpdbData.extradata.game = _game
-	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(_args, 'mode'), ',')
+	lpdbData.extradata.modes = CustomMap:_concatArgs('mode')
 	return lpdbData
+end
+
+function CustomMap:_concatArgs(base)
+	return table.concat(Map:getAllArgsForBase(_args, 'mode'), ',')
 end
 
 return CustomMap
