@@ -17,6 +17,10 @@ local _DEFAULT_DATE = '1970-01-01 00:00:00'
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _MAX_QUERY_LIMIT = 5000
 
+local _startYear
+local _endYear
+local _yearRanges = {}
+
 -- overwritable per wiki
 ActiveYears.startYear = Info.startYear
 ActiveYears.defaultNumberOfStoredPlayersPerMatch = 10
@@ -109,39 +113,34 @@ function ActiveYears._calculate(conditions)
 	table.sort(sortedYears)
 
 	-- Determine activity ranges by grouping consecutive years
-	local startYear
-	local endYear
-	local yearRanges = {}
 	for index, year in ipairs(sortedYears) do
 		if index == 1 then
-			startYear = year
-		elseif year - endYear ~= 1 then
-			yearRanges = ActiveYears._insertYears(startYear, endYear, yearRanges)
-			startYear = year
+			_startYear = year
+		elseif year - _endYear ~= 1 then
+			ActiveYears._insertYears()
+			_startYear = year
 		end
-		endYear = year
+		_endYear = year
 	end
-	if endYear == _CURRENT_YEAR then
-		table.insert(yearRanges, tostring(startYear) .. ' - ' .. "'''Present'''")
+	if _endYear == _CURRENT_YEAR then
+		table.insert(_yearRanges, tostring(_startYear) .. ' - ' .. "'''Present'''")
 	else
-		yearRanges = ActiveYears._insertYears(startYear, endYear, yearRanges)
+		ActiveYears._insertYears()
 	end
 
 	-- Generate output for activity ranges
-	local output = table.concat(yearRanges, ',</br>')
+	local output = table.concat(_yearRanges, ',</br>')
 
 	-- Return text with years active
 	return output
 end
 
-function ActiveYears._insertYears(startYear, endYear, yearRanges)
-	if startYear == endYear then
-		table.insert(yearRanges, tostring(startYear))
+function ActiveYears._insertYears()
+	if _startYear == _endYear then
+		table.insert(_yearRanges, tostring(_startYear))
 	else
-		table.insert(yearRanges, tostring(startYear) .. ' - ' .. tostring(endYear))
+		table.insert(_yearRanges, tostring(_startYear) .. ' - ' .. tostring(_endYear))
 	end
-	
-	return yearRanges
 end
 
 return Class.export(ActiveYears)
