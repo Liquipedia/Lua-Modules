@@ -116,7 +116,8 @@ function ActiveYears._calculate(conditions)
 	for index, year in ipairs(sortedYears) do
 		if index == 1 then
 			_startYear = year
-		elseif year - _endYear ~= 1 then
+		elseif year - _endYear > 1 then
+		-- If the difference is greater than 1 we have skipped a year, so we have to insert
 			ActiveYears._insertYears()
 			_startYear = year
 		end
