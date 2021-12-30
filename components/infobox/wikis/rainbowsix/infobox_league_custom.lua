@@ -26,6 +26,7 @@ local _league
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
+local _DEFAULT_TIERTYPE = 'General'
 local _DEFAULT_PLATFORM = 'PC'
 local _PLATFORM_ALIAS = {
 	pc = 'PC',
@@ -140,6 +141,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.publishertier = args.ubisofttier:lower()
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
+	lpdbData.liquipediatiertype = args.liquipediatiertype or _DEFAULT_TIERTYPE
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
 		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
@@ -212,10 +214,13 @@ function CustomLeague:_createLiquipediaTierDisplay()
 end
 
 function CustomLeague:defineCustomPageVariables()
+	-- Variables with different handling compared to commons
+	Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or _DEFAULT_TIERTYPE)
+
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or '')
+	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or _DEFAULT_TIERTYPE)
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
 
@@ -302,7 +307,7 @@ function CustomLeague:_createPlatformCell(args)
 	local platform = CustomLeague:_platformLookup(args.platform)
 
 	if String.isNotEmpty(platform) then
-		return '[[' .. platform .. ']]'
+		return PageLink.makeInternalLink({}, platform, ':Category:'..platform)
 	else
 		return nil
 	end
