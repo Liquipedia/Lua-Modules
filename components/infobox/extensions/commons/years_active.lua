@@ -12,7 +12,6 @@ local Lua = require('Module:Lua')
 local CustomActiveYears = Lua.import('Module:YearsActive/Base', {requireDevIfEnabled = true})
 
 -- wiki specific settings
-CustomActiveYears.startYear = 1970
 CustomActiveYears.defaultNumberOfStoredPlayersPerMatch = 10
 CustomActiveYears.additionalConditions = ''
 
