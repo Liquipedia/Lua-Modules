@@ -17,6 +17,8 @@ CustomActiveYears.additionalConditions = ''
 
 -- legacy entry point
 function CustomActiveYears.get(input)
+	-- if invoked directly input == args
+	-- if passed from modules it might be a table that holds the args table
 	local args = input.args or input
 	return CustomActiveYears.display(args)
 end
