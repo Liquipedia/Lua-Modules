@@ -44,6 +44,10 @@ function CustomInjector:addCustomCells(widgets)
 		content = {_args.type}
 	})
 	table.insert(widgets, Cell{
+		name = 'Max Players',
+		content = {_args.players}
+	})
+	table.insert(widgets, Cell{
 		name = 'Game Version',
 		content = {CustomMap._getGameVersion()},
 		options = {makeLink = true}
@@ -78,6 +82,7 @@ end
 function CustomMap:addToLpdb(lpdbData)
 	lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2)
 	lpdbData.extradata.type = _args.type
+	lpdbData.extradata.players = _args.players
 	lpdbData.extradata.game = _game
 	lpdbData.extradata.modes = _args.mode
 	return lpdbData
