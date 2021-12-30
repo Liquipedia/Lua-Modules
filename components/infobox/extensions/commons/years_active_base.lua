@@ -94,7 +94,7 @@ function ActiveYears._calculate(conditions)
 		-- Find all years for which the player has at least one placement
 		for _, item in ipairs(lpdbQueryData) do
 			local year = tonumber(string.sub(item.date, 1, 4))
-			years[year] = 0
+			years[year] = true
 		end
 
 		count = #lpdbQueryData
