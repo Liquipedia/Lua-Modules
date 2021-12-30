@@ -11,13 +11,14 @@ local ActiveYears = {}
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
+local Info = mw.loadData('Module:Info')
 
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _MAX_QUERY_LIMIT = 5000
 
 -- overwritable per wiki
-ActiveYears.startYear = 1970
+ActiveYears.startYear = Info.startYear
 ActiveYears.defaultNumberOfStoredPlayersPerMatch = 10
 ActiveYears.additionalConditions = ''
 
