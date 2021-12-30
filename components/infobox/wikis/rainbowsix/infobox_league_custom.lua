@@ -140,6 +140,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.publishertier = args.ubisofttier:lower()
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
+	lpdbData.liquipediatiertype = args.liquipediatiertype or 'General'
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
 		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
@@ -215,7 +216,8 @@ function CustomLeague:defineCustomPageVariables()
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or '')
+	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or 'General')
+	Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or 'General')
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
 
