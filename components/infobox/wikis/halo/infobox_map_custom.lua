@@ -54,7 +54,7 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Game Modes',
-		content = {CustomMap._getGameMode()}
+		content = CustomMap._getGameMode(),
 	})
 	return widgets
 end
@@ -66,13 +66,21 @@ function CustomMap._getGameVersion()
 end
 
 function CustomMap._getGameMode()
-
-	if String.isEmpty(_args.mode) then
-		return nil
+	if String.isEmpty(_args.mode) and String.isEmpty(_args.mode1) then
+		return {}
 	end
-	local modeIcon = MapModes.get({mode = _args.mode, date = _args.releasedate, size = 15})
-	local mapModeDisplay = modeIcon .. ' [[' .. _args.mode .. ']]'
-	return mapModeDisplay
+
+	local modes = Map:getAllArgsForBase(_args, 'mode')
+	local releasedate = _args.releasedate
+
+	local modeDisplayTable = {}
+	for _, mode in ipairs(modes) do
+		local modeIcon = MapModes.get({mode = mode, date = releasedate, size = 15})
+		local mapModeDisplay = modeIcon .. ' [[' .. mode .. ']]'
+		table.insert(modeDisplayTable, mapModeDisplay)
+	end
+
+	return modeDisplayTable
 end
 
 function CustomMap:createWidgetInjector()
@@ -84,8 +92,23 @@ function CustomMap:addToLpdb(lpdbData)
 	lpdbData.extradata.type = _args.type
 	lpdbData.extradata.players = _args.players
 	lpdbData.extradata.game = _game
-	lpdbData.extradata.modes = _args.mode
+	lpdbData.extradata.modes = CustomMap:_concatArgs('mode')
 	return lpdbData
+end
+
+function CustomMap:_concatArgs(base)
+	local firstArg = _args[base] or _args[base .. '1']
+	if String.isEmpty(firstArg) then
+		return nil
+	end
+	local foundArgs = {firstArg}
+	local index = 2
+	while not String.isEmpty(_args[base .. index]) do
+		table.insert(foundArgs, _args[base .. index])
+		index = index + 1
+	end
+
+	return table.concat(foundArgs, ',')
 end
 
 return CustomMap
