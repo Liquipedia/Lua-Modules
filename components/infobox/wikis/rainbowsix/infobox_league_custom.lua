@@ -245,7 +245,7 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	if CustomLeague:_platformLookup(args.platform) then
-		table.insert(categories, CustomLeague:_gameLookup(args.platform) .. ' Tournaments')
+		table.insert(categories, CustomLeague:_platformLookup(args.platform) .. ' Tournaments')
 	end
 
 	local tier = args.liquipediatier
