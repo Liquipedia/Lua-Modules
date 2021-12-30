@@ -11,7 +11,7 @@ local Map = require('Module:Infobox/Map')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local MapModes = require('Module:MapModes')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 
 local CustomMap = Class.new()
 
@@ -26,6 +26,7 @@ function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
 	customMap.getCategories = CustomMap.getCategories
+	customMap.addToLpdb = CustomMap.addToLpdb
 	_args = customMap.args
 	return customMap:createInfobox(frame)
 end
@@ -88,7 +89,9 @@ function CustomMap:createWidgetInjector()
 end
 
 function CustomMap:addToLpdb(lpdbData)
-	lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2)
+	if String.isNotEmpty(_args.creator2) then
+		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2)
+	end
 	lpdbData.extradata.type = _args.type
 	lpdbData.extradata.players = _args.players
 	lpdbData.extradata.game = _game
@@ -97,18 +100,7 @@ function CustomMap:addToLpdb(lpdbData)
 end
 
 function CustomMap:_concatArgs(base)
-	local firstArg = _args[base] or _args[base .. '1']
-	if String.isEmpty(firstArg) then
-		return nil
-	end
-	local foundArgs = {firstArg}
-	local index = 2
-	while not String.isEmpty(_args[base .. index]) do
-		table.insert(foundArgs, _args[base .. index])
-		index = index + 1
-	end
-
-	return table.concat(foundArgs, ',')
+	return table.concat(Map:getAllArgsForBase(_args, 'mode'), ',')
 end
 
 return CustomMap
