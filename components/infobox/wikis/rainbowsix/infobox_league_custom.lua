@@ -304,7 +304,7 @@ function CustomLeague:_createPlatformCell(args)
 	local platform = CustomLeague:_platformLookup(args.platform)
 
 	if String.isNotEmpty(platform) then
-		return '[[' .. platform .. ']]'
+		return PageLink.makeInternalLink({}, platform, ':Category:'..platform)
 	else
 		return nil
 	end
