@@ -120,7 +120,7 @@ function CustomInjector:parse(id, widgets)
 				content = {CustomLeague:_createLiquipediaTierDisplay()},
 			}
 		}
-		if String.isNotEmpty(args.ubisofttier) and _UBISOFT_TIERS[args.ubisofttier:lower()] then
+		if CustomLeague:_validPublisherTier(args.ubisofttier) then
 			table.insert(widgets,
 				Cell{
 					name = 'Ubisoft Tier',
@@ -136,7 +136,9 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
-	lpdbData.publishertier = args.ubisofttier:lower()
+	if CustomLeague:_validPublisherTier(args.ubisofttier) then
+		lpdbData.publishertier = args.ubisofttier:lower()
+	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
@@ -145,6 +147,10 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	}
 
 	return lpdbData
+end
+
+function CustomLeague:_validPublisherTier(publishertier)
+	return String.isNotEmpty(publishertier) and _UBISOFT_TIERS[publishertier:lower()]
 end
 
 function CustomLeague:_standardiseRawDate(dateString)
@@ -245,7 +251,7 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	if CustomLeague:_platformLookup(args.platform) then
-		table.insert(categories, CustomLeague:_gameLookup(args.platform) .. ' Tournaments')
+		table.insert(categories, CustomLeague:_platformLookup(args.platform) .. ' Tournaments')
 	end
 
 	local tier = args.liquipediatier
