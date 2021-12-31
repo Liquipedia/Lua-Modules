@@ -31,7 +31,6 @@ local _args
 function CustomMapMaker.run(frame)
 	local player = Person(frame)
 	_args = player.args
-	PersonSc2.args = _args
 	PersonSc2.setArgs(_args)
 
 	player.shouldStoreData = PersonSc2.shouldStoreData
