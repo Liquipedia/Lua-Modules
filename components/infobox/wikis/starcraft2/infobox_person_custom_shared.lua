@@ -100,7 +100,8 @@ function CustomPerson.getRaceData(race, asCategory)
 	else
 		if asCategory then
 			for raceIndex, raceValue in ipairs(raceTable) do
-				raceTable[raceIndex] = ':Category:' .. raceValue .. ' Players|' .. raceValue .. ']][[Category:' .. raceValue .. ' Players'
+				raceTable[raceIndex] = ':Category:' .. raceValue .. ' Players|' .. raceValue .. ']]'
+					.. '[[Category:' .. raceValue .. ' Players'
 			end
 		end
 		display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
