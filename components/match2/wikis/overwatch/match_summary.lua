@@ -10,7 +10,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local OpponentDisplay = require('Module:OpponentDisplay')
-local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
@@ -18,32 +17,12 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 
 local htmlCreate = mw.html.create
 
-local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
-
 local p = {}
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local _RED_CROSS = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
-local _ICONS = {
-	check = _GREEN_CHECK,
-	cross = _RED_CROSS
-}
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-local _LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
-	owl = {icon = 'File:OWL-BMS icon.png', text = 'Overwatch League matchpage'},
-	owc = {icon = 'File:OWC-BMS icon.png', text = 'Overwatch Contenders matchpage'},
-	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
-	pllg = {icon = 'File:Peliliiga-BMS icon.png', text = 'Peliliiga matchpage'},
-	oceow = {icon = 'File:OCEOW-BMS icon.png', text = 'OCEOverwatch matchpage'},
-	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
-	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
-	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
-	--wl = {icon 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
-}
 
 function p.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
