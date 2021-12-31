@@ -15,18 +15,7 @@ local CleanRace = require('Module:CleanRace')
 local Logic = require('Module:Logic')
 
 --race stuff tables
-local _FACTION1 = {
-	['p'] = 'Protoss', ['pt'] = 'Protoss', ['pz'] = 'Protoss',
-	['t'] = 'Terran', ['tp'] = 'Terran', ['tz'] = 'Terran',
-	['z'] = 'Zerg', ['zt'] = 'Zerg', ['zp'] = 'Zerg',
-	['r'] = 'Random', ['a'] = 'All'
-}
-local _FACTION2 = {
-	['pt'] = 'Terran', ['pz'] = 'Zerg',
-	['tp'] = 'Protoss', ['tz'] = 'Zerg',
-	['zt'] = 'Terran', ['zp'] = 'Protoss'
-}
-local _RACE_DISPLAY_DATA = {
+local _RACE_DATA = {
 	p = {'Protoss'},
 	pt = {'Protoss', 'Terran'},
 	pz = {'Protoss', 'Zerg'},
@@ -39,6 +28,8 @@ local _RACE_DISPLAY_DATA = {
 	r = {'Random'},
 	a = {'Protoss', 'Terran', 'Zerg'},
 }
+local _RACE_ALL = 'All'
+local _RACE_ALL_SHORT = 'a'
 
 --role stuff tables
 local _ROLES = {
@@ -92,7 +83,16 @@ end
 function CustomPerson.getRaceData(race, asCategory)
 	race = string.lower(race)
 	race = CleanRace[race] or race
-	local raceTable = _RACE_DISPLAY_DATA[race]
+	local raceTable = _RACE_DATA[race]
+
+	local faction, faction2
+	if race == _RACE_ALL_SHORT then
+		faction = _RACE_ALL
+	else
+		faction = (raceTable or {})[1]
+		faction2 = (raceTable or {})[2]
+	end
+
 	local display
 	if not raceTable and race ~= 'unknown' then
 		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
@@ -109,9 +109,9 @@ function CustomPerson.getRaceData(race, asCategory)
 
 	_raceData = {
 		race = race,
-		faction = _FACTION1[race] or '',
-		faction2 = _FACTION2[race] or '',
-		display = display
+		faction = faction or '',
+		faction2 = faction2 or '',
+		display = display,
 	}
 
 	return display
