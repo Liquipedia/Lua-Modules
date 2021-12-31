@@ -75,12 +75,6 @@ function p.processOpponent(frame, opponent)
 			opponent.type = 'literal'
 	end
 
-	--fix for legacy conversion
-	local players = opponent.players or opponent.match2players
-	if opponent.type == 'solo' and players == nil then
-		opponent = opponentFunctions.getSoloFromLegacy(opponent)
-	end
-
 	--score2 & score3 support for every match
 	local score2 = tonumber(opponent.score2 or '')
 	local score3 = tonumber(opponent.score3 or '')
@@ -534,45 +528,6 @@ function opponentFunctions.getTeamNameAndIcon(template, date)
 	end
 
 	return team, icon, template
-end
-
---the following 2 functions are a fallback
---they are only useful if the team template doesn't exist
---in the team template extension
-function opponentFunctions.getTeamName(template)
-	if template ~= nil then
-		local team = Template.expandTemplate(_frame, 'Team', { template })
-		team = team:gsub('%&', '')
-		team = String.split(team, 'link=')[2]
-		team = String.split(team, ']]')[1]
-		return team
-	else
-		return nil
-	end
-end
-
-function opponentFunctions.getIconName(template)
-	if template ~= nil then
-		local icon = Template.expandTemplate(_frame, 'Team', { template })
-		icon = icon:gsub('%&', '')
-		icon = String.split(icon, 'File:')[2]
-		icon = String.split(icon, '|')[1]
-		return icon
-	else
-		return nil
-	end
-end
-
---needed for legacy conversion to work for solo brackets
-function opponentFunctions.getSoloFromLegacy(opponent)
-	local player = {
-		name = opponent.name,
-		displayname = opponent.displayname or opponent.name,
-		flag = opponent.flag
-	}
-	opponent.match2players = {player}
-	opponent.name = nil
-	return opponent
 end
 
 return p
