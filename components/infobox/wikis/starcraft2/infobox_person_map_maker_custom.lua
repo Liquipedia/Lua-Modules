@@ -18,21 +18,6 @@ local Variables = require('Module:Variables')
 
 local MapMaker = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
---race stuff tables
-PersonSc2.raceDisplayLookupTable = {
-	['p'] = '[[Protoss]]',
-	['pt'] = '[[Protoss]],&nbsp;[[Terran]]',
-	['pz'] = '[[Protoss]],&nbsp;[[Zerg]]',
-	['t'] = '[[Terran]]',
-	['tp'] = '[[Terran]],&nbsp;[[Protoss]]',
-	['tz'] = '[[Terran]],&nbsp;[[Zerg]]',
-	['z'] = '[[Zerg]]',
-	['zt'] = '[[Zerg]],&nbsp;[[Terran]]',
-	['zp'] = '[[Zerg]],&nbsp;[[Protoss]]',
-	['r'] = '[[Random]]',
-	['a'] = '[[Protoss]],&nbsp;[[Terran]],&nbsp;[[Zerg]]',
-}
-
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
