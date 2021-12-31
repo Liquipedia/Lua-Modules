@@ -47,11 +47,9 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Person(frame)
 	_args = player.args
-	PersonSc2.args = _args
 	PersonSc2.setArgs(_args)
 
-	--player.shouldStoreData = PersonSc2.shouldStoreData
-	player.shouldStoreData = CustomPlayer.testStore
+	player.shouldStoreData = PersonSc2.shouldStoreData
 	player.getStatusToStore = PersonSc2.getStatusToStore
 	player.adjustLPDB = PersonSc2.adjustLPDB
 	player.getPersonType = PersonSc2.getPersonType
@@ -64,10 +62,6 @@ function CustomPlayer.run(frame)
 	_shouldQueryData = PersonSc2.shouldStoreData()
 
 	return player:createInfobox(frame)
-end
-
-function CustomPlayer.testStore()
-	return true
 end
 
 function CustomInjector:parse(id, widgets)
