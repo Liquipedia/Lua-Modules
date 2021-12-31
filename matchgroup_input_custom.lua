@@ -70,7 +70,7 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(_, map)
-	if map.map == '_DUMMY_MAP' then
+	if map.map == _DUMMY_MAP then
 		map.map = nil
 	end
 	map = mapFunctions.getScoresAndWinner(map)
@@ -123,8 +123,8 @@ end
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
 	if
-Table.includes(_NP_STATUSES, data.finished) or 
-Table.includes(_NP_STATUSES, data.winner)
+		Table.includes(_NP_STATUSES, data.finished) or
+		Table.includes(_NP_STATUSES, data.winner)
 	then
 		data.resulttype = 'np'
 		data.finished = true
