@@ -26,6 +26,19 @@ local _FACTION2 = {
 	['tp'] = 'Protoss', ['tz'] = 'Zerg',
 	['zt'] = 'Terran', ['zp'] = 'Protoss'
 }
+local _RACE_DISPLAY_DATA = {
+	p = {'Protoss'},
+	pt = {'Protoss', 'Terran'},
+	pz = {'Protoss', 'Zerg'},
+	t = {'Terran'},
+	tp = {'Terran', 'Protoss'},
+	tz = {'Terran', 'Zerg'},
+	z = {'Zerg'},
+	zt = {'Zerg', 'Terran'},
+	zp = {'Zerg', 'Protoss'},
+	r = {'Random'},
+	a = {'Protoss', 'Terran', 'Zerg'},
+}
 
 --role stuff tables
 local _ROLES = {
@@ -76,13 +89,21 @@ function CustomPerson.nameDisplay()
 	return raceIcon .. '&nbsp;' .. name
 end
 
-function CustomPerson.getRaceData(race)
+function CustomPerson.getRaceData(race, asCategory)
 	race = string.lower(race)
 	race = CleanRace[race] or race
-	local display = CustomPerson.raceDisplayLookupTable[race]
-	if not display and race ~= 'unknown' then
+	local raceTable = _RACE_DISPLAY_DATA[race]
+	local display
+	if not raceTable and race ~= 'unknown' then
 		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
+	else
+		if asCategory then
+			for raceIndex, raceValue in ipairs(raceTable) do
+				raceTable[raceIndex] = ':Category:' .. raceValue .. ' Players|' .. raceValue .. ']][[Category:' .. raceValue .. ' Players'
+			end
+		end
+		display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
 	end
 
 	_raceData = {
