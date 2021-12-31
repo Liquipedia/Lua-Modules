@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local getIconName = require('Module:IconName').luaGet
@@ -121,7 +120,7 @@ function p._placementSortFunction(table, key1, key2)
 		elseif op1.status == _STATUS_DEFAULT_WIN then return true
 		elseif Table.includes(_ALLOWED_STATUSES, op1.status) then return false
 		elseif op2.status == _STATUS_DEFAULT_WIN then return false
-		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
+		elseif Table.includes(_ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
 end
