@@ -324,20 +324,9 @@ function matchFunctions.getVodStuff(match)
 	}
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
-
 	match.links = {}
 	local links = match.links
 	if match.reddit then links.reddit = match.reddit end
-	if match.matchhistory then links.matchhistory = match.matchhistory end
-	local historyIndex = 1
-	while String.isNotEmpty(match['matchhistory' .. historyIndex]) do
-		links['matchhistory' .. historyIndex] = match['matchhistory' .. historyIndex]
-		historyIndex = historyIndex + 1
-	end
-	if match.interview then links.interview = match.interview end
-	if match.review then links.review = match.review end
-	if match.recap then links.recap = match.recap end
 
 	return match
 end
