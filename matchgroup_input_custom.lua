@@ -21,8 +21,8 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 5
 local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
-local _DUMMY_MAP = 'default'
-local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
+local DUMMY_MAP = 'default'
+local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 
 -- containers for process helper functions
@@ -70,7 +70,7 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(_, map)
-	if map.map == '_DUMMY_MAP' then
+	if map.map == 'DUMMY_MAP' then
 		map.map = nil
 	end
 	map = mapFunctions.getScoresAndWinner(map)
@@ -123,8 +123,8 @@ end
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
 	if
-		Table.includes(_NP_STATUSES, data.finished) or 
-		Table.includes(_NP_STATUSES, data.winner)
+		Table.includes(NP_STATUSES, data.finished) or 
+		Table.includes(NP_STATUSES, data.winner)
 	then
 		data.resulttype = 'np'
 		data.finished = true
