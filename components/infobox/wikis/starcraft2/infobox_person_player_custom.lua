@@ -25,36 +25,9 @@ local _DISCARD_PLACEMENT = '99'
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local _EARNING_MODES = {['1v1'] = '1v1', ['team_individual'] = 'team'}
 
---race stuff tables
+--race stuff
 local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
-PersonSc2.raceDisplayLookupTable = {
-	['p'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]',
-	['pt'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
-		'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['pz'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
-		'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['t'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]]',
-	['tp'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
-		'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['tz'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
-		'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['z'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]',
-	['zt'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
-		'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['zp'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
-		'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['r'] = '[[:Category:Random Players|Random]][[Category:Random Players]]',
-	['a'] = '[[:Category:Protoss Players|Protoss]],&nbsp;' ..
-		'[[:Category:Terran Players|Terran]],&nbsp;[[:Category:Zerg Players|Zerg]]' ..
-		'[[Category:Protoss Players]][[Category:Terran Players]]' ..
-		'[[Category:Zerg Players]][[Category:Players with multiple races]]'
-}
+local _RACE_FIELD_AS_CATEGORY_LINK = true
 
 local _earningsGlobal = {}
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
@@ -102,7 +75,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				content = {PersonSc2.getRaceData(_args.race or 'unknown')}
+				content = {PersonSc2.getRaceData(_args.race or 'unknown', _RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
