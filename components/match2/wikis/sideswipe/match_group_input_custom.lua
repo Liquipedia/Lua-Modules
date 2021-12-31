@@ -23,11 +23,11 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 
 local _STATUS_HAS_SCORE = 'S'
 local _STATUS_DEFAULT_WIN = 'W'
-local ALLOWED_STATUSES = { _STATUS_DEFAULT_WIN, 'FF', 'DQ', 'L' }
-local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
-local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 10
-local MAX_NUM_VODGAMES = 20
+local _ALLOWED_STATUSES = { _STATUS_DEFAULT_WIN, 'FF', 'DQ', 'L' }
+local _STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
+local _MAX_NUM_OPPONENTS = 2
+local _MAX_NUM_PLAYERS = 10
+local _MAX_NUM_VODGAMES = 20
 local _RESULT_TYPE_DRAW = 'draw'
 local _EARNINGS_LIMIT_FOR_FEATURED = 10000
 local _CURRENT_YEAR = os.date('%Y')
@@ -125,7 +125,7 @@ function p._placementSortFunction(table, key1, key2)
 	else
 		if op2norm then return false
 		elseif op1.status == _STATUS_DEFAULT_WIN then return true
-		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
+		elseif Table.includes(_ALLOWED_STATUSES, op1.status) then return false
 		elseif op2.status == _STATUS_DEFAULT_WIN then return false
 		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
 		else return true end
@@ -190,7 +190,7 @@ function matchFunctions.getVodStuff(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	-- apply vodgames
-	for index = 1, MAX_NUM_VODGAMES do
+	for index = 1, _MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]
 		if not Logic.isEmpty(vodgame) then
 			local map = match['map' .. index] or {}
@@ -262,7 +262,7 @@ function matchFunctions.getOpponents(args)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = Json.parseIfString(args['opponent' .. opponentIndex])
 		if not Logic.isEmpty(opponent) then
@@ -282,13 +282,13 @@ function matchFunctions.getOpponents(args)
 			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = _STATUS_HAS_SCORE
 				isScoreSet = true
-			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
+			elseif Table.includes(_ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
 				opponent.score = -1
 			end
 
 			--set Walkover from Opponent status
-			args.walkover = args.walkover or STATUS_TO_WALKOVER[opponent.status]
+			args.walkover = args.walkover or _STATUS_TO_WALKOVER[opponent.status]
 
 			opponents[opponentIndex] = opponent
 
@@ -375,7 +375,7 @@ function matchFunctions.getOpponents(args)
 end
 
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	for playerIndex = 1, MAX_NUM_PLAYERS do
+	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
@@ -406,7 +406,7 @@ end
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
-	for scoreIndex = 1, MAX_NUM_OPPONENTS do
+	for scoreIndex = 1, _MAX_NUM_OPPONENTS do
 		-- read scores
 		local score = map['score' .. scoreIndex]
 		local obj = {}
@@ -416,7 +416,7 @@ function mapFunctions.getScoresAndWinner(map)
 				obj.status = _STATUS_HAS_SCORE
 				obj.score = score
 				obj.index = scoreIndex
-			elseif Table.includes(ALLOWED_STATUSES, score) then
+			elseif Table.includes(_ALLOWED_STATUSES, score) then
 				obj.status = score
 				obj.score = -1
 				obj.index = scoreIndex
@@ -455,9 +455,9 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 	else
 		if op2norm then return false
 		elseif op1.status == _STATUS_DEFAULT_WIN then return true
-		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
+		elseif Table.includes(_ALLOWED_STATUSES, op1.status) then return false
 		elseif op2.status == _STATUS_DEFAULT_WIN then return false
-		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
+		elseif Table.includes(_ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
 end
@@ -497,8 +497,8 @@ function mapFunctions.getParticipantsData(map)
 
 	-- fill in goals and cars
 	-- goals are overwritten if set here
-	for o = 1, MAX_NUM_OPPONENTS do
-		for player = 1, MAX_NUM_PLAYERS do
+	for o = 1, _MAX_NUM_OPPONENTS do
+		for player = 1, _MAX_NUM_PLAYERS do
 			local participant = participants[o .. '_' .. player] or {}
 			local opstring = 'opponent' .. o .. '_p' .. player
 			local goals = map[opstring .. 'goals']
