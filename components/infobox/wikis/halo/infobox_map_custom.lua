@@ -100,8 +100,4 @@ function CustomMap:addToLpdb(lpdbData)
 	return lpdbData
 end
 
-function CustomMap:_concatArgs()
-	return table.concat(Map:getAllArgsForBase(_args, 'mode'), ',')
-end
-
 return CustomMap
