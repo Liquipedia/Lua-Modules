@@ -36,7 +36,6 @@ function Map:createInfobox(frame)
 				args.creator or args['created-by'], args.creator2 or args['created-by2']}, options = { makeLink = true }
 		},
 		Cell{name = 'Release Date', content = {args.releasedate}},
-		Cell{name = 'Game', content = {args.game}, options = { makeLink = true }},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
 	}
@@ -65,7 +64,6 @@ function Map:_setLpdbData(args)
 		type = 'map',
 		image = args.image,
 		date = args.releasedate,
-		--game = args.game,
 		extradata = { creator = args.creator }
 	}
 
