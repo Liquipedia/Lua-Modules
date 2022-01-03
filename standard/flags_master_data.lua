@@ -1779,14 +1779,31 @@ local aliases = {
 	['ptbr'] = 'portuguesespeaking',
 	['ruby'] = 'russianspeaking',
 
+	--language flag aliases
+	['engspeaking'] = 'englishspeaking',
+	['gerspeaking'] = 'germanspeaking',
+
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
 	['unknown'] = 'filler',
+}
+
+-- This table includes
+-- ISO 639-1 (language iso) values
+-- for languages that have a special flag
+local languages = {
+	--language flag abbreviations
+	['en'] = 'englishspeaking',
+	['de'] = 'germanspeaking',
+	['es'] = 'spanishspeaking',
+	['pt'] = 'portuguesespeaking',
+	['ru'] = 'russianspeaking',
 }
 
 return {
 	data = data,
 	twoLetter = twoLetter,
 	threeLetter = threeLetter,
-	aliases = aliases
+	aliases = aliases,
+	languages = languages
 }
