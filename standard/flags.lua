@@ -62,19 +62,19 @@ function Flags.Icon(args, flagName)
 	end
 end
 
-function Flags.LanguageIcon(args, flagName)
+function Flags.LanguageIcon(args, langName)
 	if type(args) == 'string' then
-		flagName = args
+		langName = args
 		args = {}
-	elseif String.isEmpty(flagName) then
-		flagName = args.flag
+	elseif String.isEmpty(langName) then
+		langName = args.language or args.flag
 	end
-	if String.isEmpty(flagName) then
+	if String.isEmpty(langName) then
 		return ''
 	end
-	flagName = MasterData.languages[flagName] or flagName
+	langName = Flags._convertToLangKey(langName)
 
-	return Flags.Icon(args, flagName)
+	return Flags.Icon(args, langName)
 end
 
 -- Converts a country name, flag code, or alias to a standardized country name
@@ -152,6 +152,10 @@ function Flags._convertToKey(flagName)
 		or MasterData.threeLetter[flagName]
 		or MasterData.aliases[flagName]
 		or (MasterData.data[flagName] and flagName)
+end
+
+function Flags._convertToLangKey(langName)
+	return MasterData.languages[langName] or langName
 end
 
 return Class.export(Flags)
