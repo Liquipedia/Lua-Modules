@@ -62,6 +62,21 @@ function Flags.Icon(args, flagName)
 	end
 end
 
+function Flags.LanguageIcon(args, langName)
+	if type(args) == 'string' then
+		langName = args
+		args = {}
+	elseif String.isEmpty(langName) then
+		langName = args.language or args.flag
+	end
+	if String.isEmpty(langName) then
+		return ''
+	end
+	langName = Flags._convertToLangKey(langName)
+
+	return Flags.Icon(args, langName)
+end
+
 -- Converts a country name, flag code, or alias to a standardized country name
 function Flags.CountryName(flagName)
 	if String.isEmpty(flagName) then
@@ -95,9 +110,9 @@ function Flags.CountryCode(flagName, format)
 
 	if flagKey then
 		if format == 'alpha3' then
-			return Flags._getAlpha3CodesByKey()[flagKey]
+			return Flags._getAlpha3CodesByKey()[flagKey] or Flags._getLanguageCodesByKey()[flagKey]
 		else
-			return Flags._getAlpha2CodesByKey()[flagKey]
+			return Flags._getAlpha2CodesByKey()[flagKey] or Flags._getLanguageCodesByKey()[flagKey]
 		end
 	end
 	mw.log('Unknown flag: ', flagName)
@@ -110,6 +125,10 @@ end)
 
 Flags._getAlpha3CodesByKey = FnUtil.memoize(function()
 	return Table.map(MasterData.threeLetter, function(key, code) return code, key end)
+end)
+
+Flags._getLanguageCodesByKey = FnUtil.memoize(function()
+	return Table.map(MasterData.languages, function(key, code) return code, key end)
 end)
 
 
@@ -133,6 +152,10 @@ function Flags._convertToKey(flagName)
 		or MasterData.threeLetter[flagName]
 		or MasterData.aliases[flagName]
 		or (MasterData.data[flagName] and flagName)
+end
+
+function Flags._convertToLangKey(langName)
+	return MasterData.languages[langName] or langName
 end
 
 return Class.export(Flags)
