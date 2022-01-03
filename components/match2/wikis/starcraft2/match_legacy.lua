@@ -12,6 +12,7 @@
 
 local p = {}
 
+local Date = require('Module:Date/Ext')
 local json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -53,7 +54,7 @@ function p.storeGames(match, match2)
 		then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
-			game.date = match.date
+			game.date = Date.formatTimestamp("c", match.date or 0)
 			local scores = json.parseIfString(game.scores or '{}') or {}
 			game.opponent1score = scores[1] or 0
 			game.opponent2score = scores[2] or 0
@@ -167,7 +168,7 @@ function p.storeTeamMatchSMW(match, match2)
 		--apparently needed for sorting ...
 		'has player left page=' .. (match.opponent1 or ''),
 		'has player right page=' .. (match.opponent2 or ''),
-		'has match date=' .. (match.date or ''),
+		'has match date=' .. (Date.formatTimestamp("c", match.date or 0)),
 		'has tournament=' .. (match.tournament or ''),
 		'has tournament tier=' .. (match.liquipediatier or ''),
 		'is finished=' .. (match.finished == '1' and 'true' or ''),
@@ -209,7 +210,7 @@ function p.storeSoloMatchSMW(match, match2)
 		'has player right flag=' .. match.opponent2flag,
 		'has player left race=' .. extradata.opponent1race,
 		'has player right race=' .. extradata.opponent2race,
-		'has match date=' .. (match.date or ''),
+		'has match date=' .. (Date.formatTimestamp("c", match.date or 0)),
 		'has tournament=' .. (match.tournament or ''),
 		'has tournament tier=' .. (match.liquipediatier or ''),
 		'is finished=' .. (match.finished == '1' and 'true' or ''),
@@ -234,7 +235,7 @@ end
 function p.storeSoloMapSMW(game, gameIndex, tournament, id)
 	game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 	local object = 'Map ' .. (game.opponent1 or 'TBD') .. ' vs ' .. (game.opponent2 or 'TBD') .. ' at ' ..
-		(game.date or '') .. 'in Match TBD Map ' .. gameIndex .. ' on ' .. (game.map or '')
+		(Date.formatTimestamp("c", game.date or 0)) .. 'in Match TBD Map ' .. gameIndex .. ' on ' .. (game.map or '')
 	mw.smw.subobject({
 		'legacymatch_' .. id .. object,
 		'has winning race=' .. (game.extradata.winnerrace or ''),

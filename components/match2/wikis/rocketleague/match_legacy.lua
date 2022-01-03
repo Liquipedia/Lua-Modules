@@ -8,6 +8,7 @@
 
 local p = {}
 
+local Date = require("Module:Date/Ext")
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
 local String = require("Module:StringUtils")
@@ -31,7 +32,7 @@ function p.storeMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == "string" then streams = json.parse(streams) end
 	local icon = Variables.varDefault("tournament_icon")
-	local smwFormattedDate = mw.getContentLanguage():formatDate("c", match.date or "")
+	local smwFormattedDate = Date.formatTimestamp("c", match.date or 0)
 	local extradata = json.parseIfString(match.extradata) or {}
 	mw.smw.subobject({
 		"legacymatch_" .. match2.match2id,
@@ -59,7 +60,7 @@ function p.storeMatchSMW(match, match2)
 		"Has calendar icon=" .. (not Logic.isEmpty(icon) and "File:" .. icon or ""),
 		"Has calendar description=" .. " - " .. Logic.emptyOr(match.opponent1, "TBD")
 			.. " vs " .. Logic.emptyOr(match.opponent2, "TBD") .. " on "
-			.. Logic.emptyOr(match.date, "TBD")
+			.. Logic.emptyOr(smwFormattedDate, "TBD")
 	 })
 end
 
@@ -71,7 +72,7 @@ function p.storeGames(match, match2)
 		game.opponent2 = match.opponent2
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
-		game.date = match.date
+		game.date = Date.formatTimestamp("c", match.date or 0)
 		local scores = game.scores or {}
 		if type(scores) == "string" then
 			scores = json.parse(scores)

@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Date = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
@@ -44,9 +45,6 @@ local _LINK_DATA = {
 	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Operator Bans Class
 
@@ -377,7 +375,7 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= Date.epochZero) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(

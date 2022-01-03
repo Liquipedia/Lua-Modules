@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -70,7 +71,7 @@ function StarcraftMatchGroupInput.readDate(matchArgs)
 	if matchArgs.date then
 		local dateProps = MatchGroupInput.readDate(matchArgs.date)
 		dateProps.dateexact = Logic.readBool(matchArgs.dateexact) or dateProps.dateexact
-		Variables.varDefine('matchDate', dateProps.date)
+		Variables.varDefine('matchDate', Date.formatTimestamp('c', dateProps.date))
 		return dateProps
 	else
 		local suggestedDate = Variables.varDefaultMulti(
@@ -80,10 +81,7 @@ function StarcraftMatchGroupInput.readDate(matchArgs)
 			'tournament_enddate',
 			'1970-01-01'
 		)
-		return {
-			date = MatchGroupInput.getInexactDate(suggestedDate),
-			dateexact = false,
-		}
+		return MatchGroupInput.getInexactDate(suggestedDate)
 	end
 end
 
@@ -100,9 +98,8 @@ function StarcraftMatchGroupInput.checkFinished(match)
 	-- certain amount of time (depending on whether the date is exact)
 	if match.finished ~= true then
 		local currentUnixTime = os.time(os.date('!*t'))
-		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if match.date + threshold < currentUnixTime then
 			match.finished = true
 		end
 	end
