@@ -16,6 +16,8 @@ local Table = require('Module:Table')
 local NotabilityChecker = {}
 
 local _lang = mw.language.new('en')
+local _NOW = os.time()
+local _SECONDS_IN_YEAR = 365.2425 * 86400
 
 function NotabilityChecker.run(args)
 
@@ -37,18 +39,18 @@ function NotabilityChecker.run(args)
 	end
 
 	output = output .. '===Summary===\n'
-    output = output .. '\'\'\'Final weight:\'\'\' ' .. tostring(weight) .. '\n\n'
+	output = output .. '\'\'\'Final weight:\'\'\' ' .. tostring(weight) .. '\n\n'
 
-    if weight < Config.NOTABILITY_THRESHOLD_NOTABLE and weight > Config.NOTABILITY_THRESHOLD_MIN then
-        output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
+	if weight < Config.NOTABILITY_THRESHOLD_NOTABLE and weight > Config.NOTABILITY_THRESHOLD_MIN then
+		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
 		' is \'\'\'OPEN FOR DISCUSSION\'\'\'\n'
-    elseif weight < Config.NOTABILITY_THRESHOLD_MIN then
-        output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
+	elseif weight < Config.NOTABILITY_THRESHOLD_MIN then
+		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
 		' is \'\'\'NOT NOTABLE\'\'\'\n'
-    else
-        output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
+	else
+		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
 		' is \'\'\'NOTABLE\'\'\'\n'
-    end
+	end
 
 	return output
 end
@@ -93,11 +95,11 @@ function NotabilityChecker._calculateRosterNotability(team, players)
 end
 
 function NotabilityChecker._calculateTeamNotability(team)
-    local data = mw.ext.LiquipediaDB.lpdb('placement', {
-        limit = Config.PLACEMENT_LIMIT,
-        conditions = '[[participant::' .. team .. ']]',
-        query = Config.PLACEMENT_QUERY,
-    })
+	local data = mw.ext.LiquipediaDB.lpdb('placement', {
+		limit = Config.PLACEMENT_LIMIT,
+		conditions = '[[participant::' .. team .. ']]',
+		query = Config.PLACEMENT_QUERY,
+	})
 
 	return NotabilityChecker._calculateWeight(data)
 end
@@ -143,12 +145,12 @@ function NotabilityChecker._calculateWeight(placementData)
 		end
 	end
 
-    local finalWeight = 0
-    for _, weight in pairs(weights) do
-        finalWeight = finalWeight + weight
-    end
+	local finalWeight = 0
+	for _, weight in pairs(weights) do
+		finalWeight = finalWeight + weight
+	end
 
-    return finalWeight
+	return finalWeight
 end
 
 function NotabilityChecker._calculateWeightForTournament(tier, tierType, placement, dateLoss, notabilityMod, mode)
@@ -192,19 +194,19 @@ function NotabilityChecker._preparePlacement(placement)
 
 	placement = placement:lower()
 
-    -- Deal with forfeits
-    if placement == 'l' then
-        placement = '2'
-    elseif placement == 'w' then
-        placement = '1'
-    end
+	-- Deal with forfeits
+	if placement == 'l' then
+		placement = '2'
+	elseif placement == 'w' then
+		placement = '1'
+	end
 
-    if string.find(placement, '-', 1, true) then
-        local one, _ = placement:match("([^-]+)-([^-]+)")
-        placement = tonumber(one)
-    else
-        placement = tonumber(placement)
-    end
+	if string.find(placement, '-', 1, true) then
+		local one, _ = placement:match("([^-]+)-([^-]+)")
+		placement = tonumber(one)
+	else
+		placement = tonumber(placement)
+	end
 
 	return placement
 end
@@ -241,9 +243,9 @@ function NotabilityChecker._parseNotabilityMod(notabilityMod)
 end
 
 function NotabilityChecker._calculateDateLoss(date)
-	local year = _lang:formatDate('Y', date)
-	local now = os.date('%Y')
-    return (tonumber(now) - tonumber(year)) + 1
+	local timestamp = _lang:formatDate('U', date)
+	local differenceSeconds = _NOW - timestamp
+	return math.floor(differenceSeconds / _SECONDS_IN_YEAR) + 1
 end
 
 function NotabilityChecker._firstToLower(s)
