@@ -7,84 +7,88 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Table = require('Module:Table')
+local CustomData = Lua.loadDataIfExists('Module:Links/CustomData', {})
 
 local Links = {}
 
 local _PREFIXES = {
-	['5ewin'] = 'https://arena.5eplay.com/tournament/',
-	abiosgaming = 'https://abiosgaming.com/tournaments/',
-	afreeca = 'http://afreecatv.com/',
-	aligulac = 'http://aligulac.com/results/events/',
-	aoezone = 'https://aoezone.net/',
-	askfm = 'https://ask.fm/',
-	battlefy = 'https://www.battlefy.com/',
-	booyah = 'https://booyah.live/',
-	bracket = '',
-	challengermode = 'https://www.challengermode.com/tournaments/',
-	challonge = '',
-	cybergamer = 'https://au.cybergamer.com/profile/',
-	discord = 'https://discord.gg/',
-	dlive = 'https://www.dlive.tv/',
-	douyu = 'https://www.douyu.com/',
-	esea = 'https://play.esea.net/events/',
-	['esea-d'] = 'https://play.esea.net/league/standings?divisionId=',
-	esl = '',
-	facebook = 'https://facebook.com/',
-	['facebook-gaming'] = 'https://fb.gg/',
-	faceit = 'https://www.faceit.com/en/players/',
-	['faceit-c'] = 'https://www.faceit.com/en/championship/',
-	fanclub = '',
-	gamersclub = 'https://csgo.gamersclub.gg/campeonatos/csgo/',
-	gplus = 'http://plus.google.com/-plus',
-	home = '',
-	huomaotv = 'http://www.huomao.com/',
-	huyatv = 'https://www.huya.com/',
-	instagram = 'https://www.instagram.com/',
-	loco = 'https://loco.gg/streamers/',
-	matcherino = 'https://matcherino.com/tournaments/',
-	matcherinolink = 'https://matcherino.com/t/',
-	mildom = 'https://www.mildom.com/',
-	octane = 'https://octane.gg/events/',
-	patreon = 'https://www.patreon.com/',
-	playlist = '',
-	reddit = 'https://www.reddit.com/user/',
-	rulebook = '',
-	rules = '',
-	site = '',
-	sk = 'https://sk-gaming.com/member/',
-	['smash-gg'] = 'https://smash.gg/',
-	snapchat = 'https://www.snapchat.com/add/',
-	sostronk = 'https://www.sostronk.com/tournament/',
-	steam = 'https://steamcommunity.com/id/',
-	steamalternative = 'https://steamcommunity.com/profiles/',
-	stream = '',
-	telegram = 'https://t.me/',
-	tiktok = 'https://tiktok.com/@',
-	tlprofile = 'https://www.teamliquid.net/forum/profile.php?user=',
-	tlstream = 'https://www.teamliquid.net/video/streams/',
-	toornament = 'https://www.toornament.com/tournaments/',
-	trovo = 'https://trovo.live/',
-	twitch = 'https://www.twitch.tv/',
-	twitter = 'https://twitter.com/',
-	vk = 'https://www.vk.com/',
-	website = '',
-	weibo = 'https://weibo.com/',
-	youtube = 'https://www.youtube.com/',
-	zhangyutv = 'http://www.zhangyu.tv/',
-	team = {
-		aligulac = 'http://aligulac.com/teams/',
-		esl = 'https://play.eslgaming.com/team/',
+	['5ewin'] = {'https://arena.5eplay.com/tournament/'},
+	abiosgaming = {'https://abiosgaming.com/tournaments/'},
+	afreeca = {'http://afreecatv.com/'},
+	aoezone = {'https://aoezone.net/'},
+	askfm = {'https://ask.fm/'},
+	battlefy = {'https://www.battlefy.com/'},
+	booyah = {'https://booyah.live/'},
+	bracket = {''},
+	challengermode = {'https://www.challengermode.com/tournaments/'},
+	challonge = {
+		'',
+		player = 'https://challonge.com/users/',
 	},
-	player = {
-		aligulac = 'http://aligulac.com/players/',
-		esl = 'https://play.eslgaming.com/player/',
-		challonge = 'https://challonge.com/users/'
+	cybergamer = {'https://au.cybergamer.com/profile/'},
+	discord = {'https://discord.gg/'},
+	dlive = {'https://www.dlive.tv/'},
+	douyu = {'https://www.douyu.com/'},
+	esea = {'https://play.esea.net/events/'},
+	['esea-d'] = {'https://play.esea.net/league/standings?divisionId='},
+	esl = {
+		'',
+		team = 'https://play.eslgaming.com/team/',
+		player = 'https://play.eslgaming.com/player/',
 	},
+	facebook = {'https://facebook.com/'},
+	['facebook-gaming'] = {'https://fb.gg/'},
+	faceit = {'https://www.faceit.com/en/players/'},
+	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
+	fanclub = {''},
+	gamersclub = {'https://csgo.gamersclub.gg/campeonatos/csgo/'},
+	gplus = {'http://plus.google.com/-plus'},
+	home = {''},
+	huomaotv = {'http://www.huomao.com/'},
+	huyatv = {'https://www.huya.com/'},
+	instagram = {'https://www.instagram.com/'},
+	loco = {'https://loco.gg/streamers/'},
+	matcherino = {'https://matcherino.com/tournaments/'},
+	matcherinolink = {'https://matcherino.com/t/'},
+	mildom = {'https://www.mildom.com/'},
+	octane = {'https://octane.gg/events/'},
+	patreon = {'https://www.patreon.com/'},
+	playlist = {''},
+	reddit = {'https://www.reddit.com/user/'},
+	rulebook = {''},
+	rules = {''},
+	site = {''},
+	sk = {'https://sk-gaming.com/member/'},
+	['smash-gg'] = {'https://smash.gg/'},
+	snapchat = {'https://www.snapchat.com/add/'},
+	sostronk = {'https://www.sostronk.com/tournament/'},
+	steam = {'https://steamcommunity.com/id/'},
+	steamalternative = {'https://steamcommunity.com/profiles/'},
+	stream = {''},
+	telegram = {'https://t.me/'},
+	tiktok = {'https://tiktok.com/@'},
+	tlprofile = {'https://www.teamliquid.net/forum/profile.php?user='},
+	tlstream = {'https://www.teamliquid.net/video/streams/'},
+	toornament = {'https://www.toornament.com/tournaments/'},
+	trovo = {'https://trovo.live/'},
+	twitch = {'https://www.twitch.tv/'},
+	twitter = {'https://twitter.com/'},
+	vk = {'https://www.vk.com/'},
+	website = {''},
+	weibo = {'https://weibo.com/'},
+	youtube = {'https://www.youtube.com/'},
+	zhangyutv = {'http://www.zhangyu.tv/'},
 }
+
+_PREFIXES = Table.merge(_PREFIXES, CustomData.prefixes or {})
 
 local _SUFFIXES = {
 	['faceit-c'] = '/event',
 }
+
+_SUFFIXES = Table.merge(_SUFFIXES, CustomData.suffixes or {})
 
 function Links.transform(links)
 	return {
@@ -189,18 +193,13 @@ function Links.makeFullLink(platform, id, variant)
 		return ''
 	end
 
-	local prefix
-	if _PREFIXES[variant] then
-		prefix = _PREFIXES[variant][platform]
-	end
+	local prefixData = _PREFIXES[platform]
 
-	if not prefix then
-		prefix = _PREFIXES[platform]
-	end
-
-	if prefix == nil then
+	if not prefixData then
 		return ''
 	end
+
+	local prefix = prefixData[variant] or prefixData[1]
 
 	return prefix .. id .. (_SUFFIXES[platform] or '')
 end
