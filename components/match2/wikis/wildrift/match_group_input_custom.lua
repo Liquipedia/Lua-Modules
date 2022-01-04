@@ -32,6 +32,7 @@ local _ALLOWED_STATUSES = {
 local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 5
 local _DEFAULT_BESTOF = 3
+local _DEFAULT_MODE = 'team'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
@@ -153,7 +154,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner,'draw')
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')
 		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
 			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
 			data.resulttype = _DEFAULT_RESULT_TYPE
@@ -309,7 +310,7 @@ function matchFunctions.readDate(matchArgs)
 end
 
 function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', _TEAM_OPPONENT_TYPE))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
 	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
 	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_tickername'))
@@ -597,7 +598,7 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', _TEAM_OPPONENT_TYPE))
+	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
 	map.shortname = Logic.emptyOr(map.shortname, Variables.varDefault('tournament_shortname'))
