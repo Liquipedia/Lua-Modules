@@ -17,7 +17,7 @@
 local Arguments = require('Module:Arguments')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local MatchGroup = require('Module:MatchGroup')
+local MatchGroupDisplay = require('Module:MatchGroup/Display')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Template = require('Module:Template')
 
@@ -95,7 +95,7 @@ function MatchMapsLegacyStore.close()
 	processMatches.isLegacy = true
 
 	-- store match
-	local matchHtml = MatchGroup.MatchList(processMatches)
+	local matchHtml = MatchGroupDisplay.MatchlistBySpec(processMatches)
 
 	--local warnings = Json.parseIfString(matchlistVars:get('warnings')) or {}
 
@@ -130,11 +130,11 @@ function MatchMapsLegacyStore.closeSingle(frame)
 	processMatches.hide = true
 
 	-- store match
-	MatchGroup.MatchList(processMatches)
+	MatchGroupDisplay.MatchlistBySpec(processMatches)
 
 	local MatchGroupBase = require('Module:MatchGroup/Base')
 	-- display match
-	local matchHtml = MatchGroup.MatchByMatchId(
+	local matchHtml = MatchGroupDisplay.MatchByMatchId(
 		{id = MatchGroupBase.readBracketId(processMatches.id), matchid = '1', width = matchlistVars:get('width')}
 	)
 
