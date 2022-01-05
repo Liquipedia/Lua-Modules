@@ -53,6 +53,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		bracketData.bracketindex = context.bracketIndex
 		bracketData.groupRoundIndex = context.groupRoundIndex
 		bracketData.sectionheader = context.sectionHeader
+		bracketData.dateheader = Logic.readBool(match.dateheader) or nil
 	end
 
 	return matches
