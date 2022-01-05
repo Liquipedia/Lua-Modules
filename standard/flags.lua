@@ -110,7 +110,7 @@ function Flags.CountryCode(flagName, format)
 
 	if flagKey then
 		if format == 'alpha3' then
-			return Flags._getAlpha3CodesByKey()[flagKey] or Flags._getLanguageCodesByKey()[flagKey]
+			return Flags._getAlpha3CodesByKey()[flagKey] or Flags._getLanguage3LetterCodesByKey()[flagKey]
 		else
 			return Flags._getAlpha2CodesByKey()[flagKey] or Flags._getLanguageCodesByKey()[flagKey]
 		end
@@ -128,7 +128,11 @@ Flags._getAlpha3CodesByKey = FnUtil.memoize(function()
 end)
 
 Flags._getLanguageCodesByKey = FnUtil.memoize(function()
-	return Table.map(MasterData.languages, function(key, code) return code, key end)
+	return Table.map(MasterData.languageTwoLetter, function(key, code) return code, key end)
+end)
+
+Flags._getLanguage3LetterCodesByKey = FnUtil.memoize(function()
+	return Table.map(MasterData.languageThreeLetter, function(key, code) return code, key end)
 end)
 
 
@@ -155,7 +159,9 @@ function Flags._convertToKey(flagName)
 end
 
 function Flags._convertToLangKey(langName)
-	return MasterData.languages[langName] or langName
+	return MasterData.languageTwoLetter[langName]
+		or MasterData.languageThreeLetter[langName]
+		or langName
 end
 
 return Class.export(Flags)
