@@ -62,7 +62,7 @@ function Flags.Icon(args, flagName)
 	end
 end
 
-function Flags.LanguageIcon(args, langName)
+function Flags.languageIcon(args, langName)
 	if type(args) == 'string' then
 		langName = args
 		args = {}
