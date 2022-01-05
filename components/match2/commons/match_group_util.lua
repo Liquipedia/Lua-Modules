@@ -411,6 +411,30 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 	end
 end
 
+function MatchGroupUtil.bracketDataToRecord(bracketData)
+	local coordinates = bracketData.coordinates
+	return {
+		bracketreset = bracketData.bracketResetMatchId,
+		bracketsection = coordinates
+			and MatchGroupUtil.sectionIndexToString(coordinates.sectionIndex, coordinates.sectionCount),
+		coordinates = coordinates and MatchGroupUtil.indexTableToRecord(coordinates),
+		header = bracketData.header,
+		lowerMatchIds = bracketData.lowerMatchIds,
+		loweredges = bracketData.lowerEdges and Array.map(bracketData.lowerEdges, MatchGroupUtil.indexTableToRecord),
+		quallose = bracketData.qualLose and 'true' or nil,
+		qualloseLiteral = bracketData.qualLoseLiteral,
+		qualskip = bracketData.qualSkip ~= 0 and bracketData.qualSkip or nil,
+		qualwin = bracketData.qualWin and 'true' or nil,
+		qualwinLiteral = bracketData.qualwinLiteral,
+		skipround = bracketData.skipRound ~= 0 and bracketData.skipRound or nil,
+		thirdplace = bracketData.thirdPlaceMatchId,
+		tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds],
+		toupper = bracketData.lowerMatchIds[#bracketData.lowerMatchIds - 1],
+		type = bracketData.type,
+		upperMatchId = bracketData.upperMatchId,
+	}
+end
+
 function MatchGroupUtil.opponentFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
@@ -648,6 +672,16 @@ function MatchGroupUtil.indexTableToRecord(coordinates)
 			return key, value
 		end
 	end)
+end
+
+function MatchGroupUtil.sectionIndexToString(sectionIndex, sectionCount)
+	if sectionIndex == 1 then
+		return 'upper'
+	elseif sectionIndex == sectionCount then
+		return 'lower'
+	else
+		return 'mid'
+	end
 end
 
 --[[

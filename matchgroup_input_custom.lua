@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=wildrift
+-- wiki=mobilelegends
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local ChampionNames = mw.loadData('Module:ChampionNames')
+local ChampionNames = mw.loadData('Module:HeroNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
@@ -32,7 +32,6 @@ local _ALLOWED_STATUSES = {
 local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 5
 local _DEFAULT_BESTOF = 3
-local _DEFAULT_MODE = 'team'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
@@ -154,7 +153,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner,'draw')
 		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
 			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
 			data.resulttype = _DEFAULT_RESULT_TYPE
@@ -310,7 +309,7 @@ function matchFunctions.readDate(matchArgs)
 end
 
 function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', _DEFAULT_MODE))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', _TEAM_OPPONENT_TYPE))
 	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
 	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
 	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_tickername'))
@@ -334,8 +333,6 @@ function matchFunctions.getVodStuff(match)
 		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
 		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
 		nimo = Logic.emptyOr(match.stream.nimo or match.nimo, Variables.varDefault('nimo')),
-		trovo = Logic.emptyOr(match.stream.trovo or match.trovo, Variables.varDefault('trovo')),
-		huya = Logic.emptyOr(match.stream.huya or match.huya, Variables.varDefault('huya')),
 		afreeca = Logic.emptyOr(match.stream.afreeca or match.afreeca, Variables.varDefault('afreeca')),
 		afreecatv = Logic.emptyOr(match.stream.afreecatv or match.afreecatv, Variables.varDefault('afreecatv')),
 		dailymotion = Logic.emptyOr(match.stream.dailymotion or match.dailymotion, Variables.varDefault('dailymotion')),
@@ -519,7 +516,7 @@ function mapFunctions.getParticipants(map, opponents)
 	local championData = {}
 	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
 		for playerIndex = 1, _MAX_NUM_PLAYERS do
-			local champ = map['t' .. opponentIndex .. 'c' .. playerIndex]
+			local champ = map['t' .. opponentIndex .. 'h' .. playerIndex]
 			championData['team' .. opponentIndex .. 'champion' .. playerIndex] =
 				ChampionNames[champ] or champ
 
@@ -598,7 +595,7 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', _DEFAULT_MODE))
+	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', _TEAM_OPPONENT_TYPE))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
 	map.shortname = Logic.emptyOr(map.shortname, Variables.varDefault('tournament_shortname'))
