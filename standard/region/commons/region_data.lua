@@ -12,6 +12,7 @@ return {
 
 		us = 'na',
 		usa = 'na',
+		['united states'] = 'na',
 		america = 'na',
 		americas = 'na',
 		['north america'] = 'na',
