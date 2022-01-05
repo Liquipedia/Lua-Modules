@@ -43,6 +43,7 @@ function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
 	team.createBottomContent = CustomTeam.createBottomContent
+	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	return team:createInfobox(frame)
@@ -143,6 +144,14 @@ function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.region = nil
 	lpdbData.extradata.subteams = CustomTeam.listSubTeams()
 	return lpdbData
+end
+
+function CustomTeam.getWikiCategories()
+	local categories = {}
+	if String.isNotEmpty(_team.args.disbanded) then
+		table.insert(categories, 'Disbanded Teams')
+	end
+	return categories
 end
 
 -- gets a list of sub/accademy teams of the team

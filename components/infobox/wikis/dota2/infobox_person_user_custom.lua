@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=commons
--- page=Module:Infobox/Person/User
+-- wiki=dota2
+-- page=Module:Infobox/Person/User/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local User = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
+local Template = require('Module:Template')
 local Class = require('Module:Class')
 
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -53,6 +54,7 @@ function CustomInjector:addCustomCells()
 	local widgets = {
 		Cell{name = 'Gender', content = {_args.gender}},
 		Cell{name = 'Languages', content = {_args.languages}},
+		Cell{name = 'Favorite heroes', content = CustomUser:_getFavouriteHeroes()},
 		Cell{name = 'Favorite players', content = CustomUser:_getArgsfromBaseDefault('fav-player', 'fav-players')},
 		Cell{name = 'Favorite casters', content = CustomUser:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
 		Cell{name = 'Favorite teams', content = {_args['fav-teams']}}
@@ -63,6 +65,19 @@ function CustomInjector:addCustomCells()
 	end
 
 	return widgets
+end
+
+function CustomUser:_getFavouriteHeroes()
+	local foundArgs = User:getAllArgsForBase(_args, 'fav-hero-')
+
+	local heroes = {}
+	for _, item in ipairs(foundArgs) do
+		local hero = Template.safeExpand(mw.getCurrentFrame(), 'HeroBracket/' .. item:lower(), nil, '')
+		if not String.isEmpty(hero) then
+			table.insert(heroes, hero)
+		end
+	end
+	return heroes
 end
 
 function CustomUser:_getFavouriteTeams()
