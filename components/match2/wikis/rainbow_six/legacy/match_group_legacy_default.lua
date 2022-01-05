@@ -235,7 +235,7 @@ function MatchGroupLegacyDefault.matchMappingFromCustom(data, bracketType)
 	data has the form {
 		opp1, -- e.g. R1D1
 		opp2, -- e.g. R1D20
-		details, -- e.g. R1G5details
+		details, -- e.g. R1G5
 	}
 	]]--
 	bracketType = bracketType or 'team'
