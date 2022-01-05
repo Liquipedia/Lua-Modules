@@ -1791,7 +1791,7 @@ local aliases = {
 -- This table includes
 -- ISO 639-1 (language iso) values
 -- for languages that have a special flag
-local languages = {
+local languageTwoLetter = {
 	--language flag abbreviations
 	['en'] = 'englishspeaking',
 	['de'] = 'germanspeaking',
@@ -1800,10 +1800,23 @@ local languages = {
 	['ru'] = 'russianspeaking',
 }
 
+-- This table includes
+-- ISO 639-2/T (language iso) values
+-- for languages that have a special flag
+local languageThreeLetter = {
+	--language flag abbreviations
+	['eng'] = 'englishspeaking',
+	['deu'] = 'germanspeaking',
+	['spa'] = 'spanishspeaking',
+	['por'] = 'portuguesespeaking',
+	['rus'] = 'russianspeaking',
+}
+
 return {
 	data = data,
 	twoLetter = twoLetter,
 	threeLetter = threeLetter,
 	aliases = aliases,
-	languages = languages
+	languageTwoLetter = languageTwoLetter,
+	languageThreeLetter = languageThreeLetter,
 }
