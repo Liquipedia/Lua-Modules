@@ -72,7 +72,7 @@ function Person:createInfobox()
 	end
 
 	local widgets = {
-		Header{name = self:nameDisplay(args), image = args.image, imageDefault = args.default},
+		Header{name = self:nameDisplay(args), image = args.image, imageDefault = args.default, subHeader = args.localid},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},
 		Cell{name = 'Name', content = {args.name}},
