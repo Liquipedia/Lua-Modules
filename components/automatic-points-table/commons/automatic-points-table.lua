@@ -16,15 +16,13 @@ local AutomaticPointsTable = Class.new(
 	function(self, frame)
 		self.frame = frame
 		self.args = Arguments.getArgs(frame)
+		self:parseInput()
 	end
 )
 
 function AutomaticPointsTable.run(frame)
 	local pointsTable = AutomaticPointsTable(frame)
 
-	pointsTable:extractPositionBackgroundData()
-
-	pointsTable:extractTournaments()
 
 	mw.logObject(pointsTable.pbg)
 	mw.logObject(pointsTable.tournaments)
@@ -32,7 +30,9 @@ function AutomaticPointsTable.run(frame)
 	return nil
 end
 
-function AutomaticPointsTable:extractPositionBackgroundData()
+--- parses the pbg arguments, these are the background colors of specific positions
+--- Usually used to indicate where a team in a specific position will end up qualifying to
+function AutomaticPointsTable:parsePositionBackgroundData()
 	local args = self.args
 	self.pbg = {}
 	for _, background in Table.iter.pairsByPrefix(args, 'pbg') do
@@ -40,16 +40,11 @@ function AutomaticPointsTable:extractPositionBackgroundData()
 	end
 end
 
-function AutomaticPointsTable:extractTournaments()
+function AutomaticPointsTable:parseTournaments()
 	local args = self.args
 	self.tournaments = {}
-	for argKey, argVal in pairs(args) do
-		if (type(argVal) == 'string') and (string.find(argKey, 'tournament')) then
-			local tournamentIndexString = String.split(argKey, 'tournament')[1]
-			local tournamentIndex = tonumber(tournamentIndexString)
-			local unpackedTournament = Json.parse(argVal)
-			self.tournaments[tournamentIndex] = unpackedTournament
-		end
+	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
+		table.insert(self.tournaments, (Json.parse(tournament)))
 	end
 	return nil
 end
