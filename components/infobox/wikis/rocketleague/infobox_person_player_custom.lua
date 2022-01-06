@@ -158,7 +158,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, 'Players')
 
 			if
-				string.lower(args.status) == 'active' and
+				string.lower(args.status or '') == 'active' and
 				not args.teamlink and not args.team
 			then
 				table.insert(categories, 'Teamless Players')
@@ -207,7 +207,15 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.status = lpdbData.status or 'Unknown'
+	local status = lpdbData.status
+	if String.isEmpty(status) then
+		if String.isNotEmpty(_args.death_date) then
+			status = 'Deceased'
+		else
+			status = 'Unknown'
+		end
+	end
+	lpdbData.status = status
 
 	lpdbData.extradata.role = _args.role
 	lpdbData.extradata.birthmonthandday = Variables.varDefault('birth_monthandday')
