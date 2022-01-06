@@ -200,7 +200,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		nationality2 = Person:getStandardNationalityValue(args.country2 or args.nationality2),
 		nationality3 = Person:getStandardNationalityValue(args.country3 or args.nationality3),
 		birthdate = Variables.varDefault('player_birthdate'),
-		deathdate = Variables.varDefault('player_deathhdate'),
+		deathdate = Variables.varDefault('player_deathdate'),
 		image = args.image,
 		region = _region,
 		team = args.teamlink or args.team,
