@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=halo
--- page=Module:Infobox/Map
+-- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -82,10 +82,6 @@ function CustomMap._getGameMode()
 	end
 
 	return modeDisplayTable
-end
-
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
 end
 
 function CustomMap:addToLpdb(lpdbData)
