@@ -9,7 +9,6 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local AutomaticPointsTable = Class.new(
