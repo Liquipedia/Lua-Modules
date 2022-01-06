@@ -49,10 +49,10 @@ function ChampionBan:createHeader()
 	return self
 end
 
-function ChampionBan:banRow(banData, gameNumber, numberOfBans)
+function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 	self.table:tag('tr')
 		:tag('td')
-			:node(CustomMatchSummary._opponentChampionsDisplay(banData[1], numberOfBans, false, true))
+			:node(CustomMatchSummary._opponentChampionsDisplay(banData[1], numberOfBans, date, false, true))
 		:tag('td')
 			:node(mw.html.create('div')
 				:wikitext(CustomMatchSummary._createAbbreviation{
@@ -61,7 +61,7 @@ function ChampionBan:banRow(banData, gameNumber, numberOfBans)
 				})
 			)
 		:tag('td')
-			:node(CustomMatchSummary._opponentChampionsDisplay(banData[2], numberOfBans, true, true))
+			:node(CustomMatchSummary._opponentChampionsDisplay(banData[2], numberOfBans, date, true, true))
 	return self
 end
 
@@ -134,7 +134,7 @@ function CustomMatchSummary._createBody(match)
 
 	-- Iterate each map
 	for gameIndex, game in ipairs(match.games) do
-		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex)
+		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex, match.date)
 		if rowDisplay then
 			body:addRow(rowDisplay)
 		end
@@ -187,7 +187,7 @@ function CustomMatchSummary._createBody(match)
 		local championBan = ChampionBan()
 
 		for gameIndex, banData in ipairs(championBanData) do
-			championBan:banRow(banData, gameIndex, banData.numberOfBans)
+			championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
 		end
 
 		body:addRow(championBan)
@@ -196,7 +196,7 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
-function CustomMatchSummary._createGame(game, gameIndex)
+function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
@@ -227,7 +227,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		:css('font-size', '85%')
 		:css('overflow', 'hidden')
 
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[1], _NUM_CHAMPIONS_PICK, false))
+	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[1], _NUM_CHAMPIONS_PICK, date, false))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -237,7 +237,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		})
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], _NUM_CHAMPIONS_PICK, true))
+	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], _NUM_CHAMPIONS_PICK, date, true))
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -287,7 +287,7 @@ function CustomMatchSummary._createAbbreviation(args)
 	return '<i><abbr title="' .. args.title .. '">' .. args.text .. '</abbr></i>'
 end
 
-function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, flip, isBan)
+function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, date, flip, isBan)
 	local opponentChampionsDisplay = {}
 	local color = opponentChampionsData.color or ''
 	opponentChampionsData.color = nil
@@ -299,6 +299,7 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 		:node(ChampionIcon._getImage{
 			champ = opponentChampionsData[index],
 			class = 'brkts-champion-icon',
+			date = date,
 		})
 		if index == 1 then
 			champDisplay:css('padding-left', '2px')
