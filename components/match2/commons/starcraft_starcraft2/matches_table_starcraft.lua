@@ -7,7 +7,7 @@
 --
 
 local Lua = require('Module:Lua')
-local CustomMatchesTable = Lua.import('MatchesTable', {requireDevIfEnabled = true})
+local CustomMatchesTable = Lua.import('Module:MatchesTable', {requireDevIfEnabled = true})
 
 CustomMatchesTable.OpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 CustomMatchesTable.Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
