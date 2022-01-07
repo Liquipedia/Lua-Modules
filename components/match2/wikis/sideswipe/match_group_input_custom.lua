@@ -80,7 +80,7 @@ end
 --
 --
 -- function to sort out winner/placements
-function p._placementSortFunction(table, key1, key2)
+function matchFunctions._placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
 	local op1norm = op1.status == _STATUS_HAS_SCORE
@@ -165,7 +165,6 @@ function matchFunctions.getExtraData(match)
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
-		octane = match.octane,
 		isconverted = 0,
 		isfeatured = matchFunctions.isFeatured(match)
 	}
@@ -187,11 +186,10 @@ function matchFunctions.isFeatured(match)
 		return true
 	end
 
-	if matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
+	if matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED or
+	   matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
+		
 		return true
-	or matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
-		return true
-	end
 	return false
 end
 
