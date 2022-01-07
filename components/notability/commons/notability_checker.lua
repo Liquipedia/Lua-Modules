@@ -236,8 +236,4 @@ function NotabilityChecker._calculateDateLoss(date)
 	return math.floor(differenceSeconds / _SECONDS_IN_YEAR) + 1
 end
 
-function NotabilityChecker._firstToLower(s)
-	return s:sub(1, 1):lower() .. s:sub(2)
-end
-
 return Class.export(NotabilityChecker)
