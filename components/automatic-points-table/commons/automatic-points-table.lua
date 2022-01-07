@@ -50,7 +50,6 @@ function AutomaticPointsTable:parsePositionBackgroundData(args)
 end
 
 function AutomaticPointsTable:parseTournaments(args)
-
 	local tournaments = {}
 	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
 		table.insert(tournaments, (Json.parse(tournament)))
