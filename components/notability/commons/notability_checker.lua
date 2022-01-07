@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Config = require('Module:NotabilityChecker/config')
 local String = require('Module:String')
-local LuaUtils = require('Module:LuaUtils')
 local Array = require('Module:Array')
 local Table = require('Module:Table')
 
@@ -219,22 +218,7 @@ function NotabilityChecker._parseTier(placement)
 		return tonumber(placement.liquipediatier), nil
 	end
 
-	-- If true, this is a wiki that uses a legacy system where extradata.liquipediatier
-	-- contains the numerical liquipediatier, and liquipediatier contains the type.
-	local isWikiThatUsesLiquipediaTier2 = placement.liquipediatier == placement.liquipediatiertype
-
-	if not isWikiThatUsesLiquipediaTier2 then
-		return tonumber(placement.liquipediatier), placement.liquipediatiertype:lower()
-	end
-
-	local liquipediaTier2 = placement.extradata['liquipediatier2']
-	if String.isEmpty(liquipediaTier2) then
-		local tournament = LuaUtils.lpdb.getSingle('tournament',
-			{ conditions = '[[pagename::' .. placement.pagename .. ']]' })
-		liquipediaTier2 = (tournament or { extradata = {} }).extradata['liquipediatier2'] or ''
-	end
-
-	return tonumber(liquipediaTier2), placement.liquipediatiertype:lower()
+	return tonumber(placement.liquipediatier), placement.liquipediatiertype:lower()
 end
 
 function NotabilityChecker._parseNotabilityMod(notabilityMod)
@@ -249,10 +233,6 @@ function NotabilityChecker._calculateDateLoss(date)
 	local timestamp = _lang:formatDate('U', date)
 	local differenceSeconds = _NOW - timestamp
 	return math.floor(differenceSeconds / _SECONDS_IN_YEAR) + 1
-end
-
-function NotabilityChecker._firstToLower(s)
-	return s:sub(1, 1):lower() .. s:sub(2)
 end
 
 return Class.export(NotabilityChecker)
