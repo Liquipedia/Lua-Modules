@@ -103,6 +103,11 @@ function MatchlistDisplay.Matchlist(props)
 			})
 			or nil
 
+		local dateHeaderNode = match.bracketData.dateHeader
+			and match.dateIsExact
+			and MatchlistDisplay.DateHeader({match = match})
+			or nil
+
 		local matchNode = MatchlistDisplay.Match({
 			MatchSummaryContainer = config.MatchSummaryContainer,
 			Opponent = config.Opponent,
@@ -111,7 +116,7 @@ function MatchlistDisplay.Matchlist(props)
 			matchHasDetails = config.matchHasDetails,
 		})
 
-		matchlistNode:node(titleNode):node(headerNode):node(matchNode)
+		matchlistNode:node(titleNode):node(headerNode):node(dateHeaderNode):node(matchNode)
 	end
 
 	return matchlistNode
@@ -207,6 +212,16 @@ function MatchlistDisplay.Header(props)
 		:wikitext(props.header)
 
 	return DisplayUtil.applyOverflowStyles(headerNode, 'wrap')
+end
+
+--[[
+Display component for a dateHeader in a matchlist.
+]]
+function MatchlistDisplay.DateHeader(props)
+	local dateHeaderNode = mw.html.create('div'):addClass('brkts-matchlist-header')
+		:node(DisplayHelper.MatchCountdownBlock(props.match))
+
+	return DisplayUtil.applyOverflowStyles(dateHeaderNode, 'wrap')
 end
 
 --[[

@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
--- wiki=dota2
--- page=Module:Infobox/Person/User
+-- wiki=overwatch
+-- page=Module:Infobox/Person/User/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -54,25 +54,43 @@ function CustomInjector:addCustomCells()
 	local widgets = {
 		Cell{name = 'Gender', content = {_args.gender}},
 		Cell{name = 'Languages', content = {_args.languages}},
-		Cell{name = 'Favorite heroes', content = CustomUser:_getFavouriteHeroes()},
+		Cell{name = 'BattleTag', content = {_args.battletag}},
+		Cell{name = 'Main Hero', content = CustomUser:_getHeroes()},
 		Cell{name = 'Favorite players', content = CustomUser:_getArgsfromBaseDefault('fav-player', 'fav-players')},
 		Cell{name = 'Favorite casters', content = CustomUser:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
 		Cell{name = 'Favorite teams', content = {_args['fav-teams']}}
 	}
+
 	if not String.isEmpty(_args['fav-team-1']) then
 		table.insert(widgets, Title{name = 'Favorite teams'})
 		table.insert(widgets, Center{content = {CustomUser:_getFavouriteTeams()}})
 	end
 
+	if not String.isEmpty(_args.s1high) then
+		table.insert(widgets, Title{name = '[[Leaderboards|Skill Ratings]]'})
+	end
+
+	local index = 1
+	while not String.isEmpty(_args['s' .. index .. 'high']) do
+		local display = _args['s' .. index .. 'high']
+		if not String.isEmpty(_args['s' .. index .. 'final']) then
+			display = display .. '&nbsp;<small>(Final: ' .. _args['s' .. index .. 'final'] .. ')</small>'
+		end
+		table.insert(widgets, Cell{name = 'Season ' .. index, content = {display}})
+		index = index + 1
+	end
+
+	table.insert(widgets, Cell{name = 'National teams', content = {_args['nationalteams']}})
+
 	return widgets
 end
 
-function CustomUser:_getFavouriteHeroes()
-	local foundArgs = User:getAllArgsForBase(_args, 'fav-hero-')
+function CustomUser:_getHeroes()
+	local foundArgs = User:getAllArgsForBase(_args, 'hero')
 
 	local heroes = {}
 	for _, item in ipairs(foundArgs) do
-		local hero = Template.safeExpand(mw.getCurrentFrame(), 'HeroBracket/' .. item:lower(), nil, '')
+		local hero = Template.safeExpand(mw.getCurrentFrame(), 'Hero/' .. item, nil, '')
 		if not String.isEmpty(hero) then
 			table.insert(heroes, hero)
 		end
