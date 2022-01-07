@@ -26,7 +26,6 @@ local _ALLOWED_STATUSES = { _STATUS_DEFAULT_WIN, 'FF', 'DQ', 'L' }
 local _STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
 local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 10
-local _MAX_NUM_VODGAMES = 20
 local _RESULT_TYPE_DRAW = 'draw'
 local _EARNINGS_LIMIT_FOR_FEATURED = 10000
 local _CURRENT_YEAR = os.date('%Y')
