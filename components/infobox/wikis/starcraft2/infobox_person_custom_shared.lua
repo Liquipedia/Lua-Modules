@@ -49,12 +49,13 @@ local _CLEAN_OTHER_ROLES = {
 
 local _MILITARY_DATA = {
 	starting = {category = 'Persons waiting for Military Duty', storeValue = 'pending'},
-	ending = {category = 'Persons on Military Duty', storeValue = 'ongoing'},
+	ongoing = {category = 'Persons on Military Duty', storeValue = 'ongoing'},
 	fulfilled = {category = 'Persons expleted Military Duty', storeValue = 'fulfilled'},
 	exempted = {category = 'Persons exempted from Military Duty', storeValue = 'exempted'},
 }
 _MILITARY_DATA.pending = _MILITARY_DATA.starting
-_MILITARY_DATA.started = _MILITARY_DATA.ending
+_MILITARY_DATA.started = _MILITARY_DATA.ongoing
+_MILITARY_DATA.ending = _MILITARY_DATA.ongoing
 
 local _raceData
 local _statusStore
