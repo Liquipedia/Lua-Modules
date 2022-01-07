@@ -47,6 +47,15 @@ local _CLEAN_OTHER_ROLES = {
 	['content producer'] = 'Content producer', ['streamer'] = 'false',
 }
 
+local _MILITARY_DATA = {
+	starting = {category = 'Persons waiting for Military Duty', storeValue = 'pending'},
+	pending = {category = 'Persons waiting for Military Duty', storeValue = 'pending'},
+	ending = {category = 'Persons on Military Duty', storeValue = 'ongoing'},
+	started = {category = 'Persons on Military Duty', storeValue = 'ongoing'},
+	fulfilled = {category = 'Persons expleted Military Duty', storeValue = 'fulfilled'},
+	exempted = {category = 'Persons exempted from Military Duty', storeValue = 'exempted'},
+}
+
 local _raceData
 local _statusStore
 local _militaryStore
@@ -142,23 +151,14 @@ end
 function CustomPerson.military(military)
 	if military and military ~= 'false' then
 		local display = military
-		military = string.lower(military)
 		local militaryCategory = ''
-		if String.contains(military, 'starting') or String.contains(military, 'pending') then
-			militaryCategory = '[[Category:Persons waiting for Military Duty]]'
-			_militaryStore = 'pending'
-		elseif
-			String.contains(military, 'ending') or String.contains(military, 'started')
-			or String.contains(military, 'ongoing')
-		then
-			militaryCategory = '[[Category:Persons on Military Duty]]'
-			_militaryStore = 'ongoing'
-		elseif String.contains(military, 'fulfilled') then
-			militaryCategory = '[[Category:Persons expleted Military Duty]]'
-			_militaryStore = 'fulfilled'
-		elseif String.contains(military, 'exempted') then
-			militaryCategory = '[[Category:Persons exempted from Military Duty]]'
-			_militaryStore = 'exempted'
+		military = string.lower(military)
+		for key, item in pairs(_MILITARY_DATA) do
+			if String.contains(military, key) then
+				militaryCategory = '[[Category:' .. item.category .. ']]'
+				_militaryStore = item.storeValue 
+				break
+			end
 		end
 
 		return display .. militaryCategory
