@@ -15,7 +15,8 @@ local AutomaticPointsTable = Class.new(
 	function(self, frame)
 		self.frame = frame
 		self.args = Arguments.getArgs(frame)
-		self:parseInput()
+		self:parseInput(self.args)
+
 	end
 )
 
@@ -29,18 +30,23 @@ function AutomaticPointsTable.run(frame)
 	return nil
 end
 
+function AutomaticPointsTable:parseInput(args)
+	self:parsePositionBackgroundData(args)
+	self:parseTournaments(args)
+end
+
 --- parses the pbg arguments, these are the background colors of specific positions
 --- Usually used to indicate where a team in a specific position will end up qualifying to
-function AutomaticPointsTable:parsePositionBackgroundData()
-	local args = self.args
+function AutomaticPointsTable:parsePositionBackgroundData(args)
+
 	self.pbg = {}
 	for _, background in Table.iter.pairsByPrefix(args, 'pbg') do
 		table.insert(self.pbg, background)
 	end
 end
 
-function AutomaticPointsTable:parseTournaments()
-	local args = self.args
+function AutomaticPointsTable:parseTournaments(args)
+
 	self.tournaments = {}
 	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
 		table.insert(self.tournaments, (Json.parse(tournament)))
