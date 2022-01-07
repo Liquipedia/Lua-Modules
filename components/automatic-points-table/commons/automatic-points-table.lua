@@ -16,14 +16,11 @@ local AutomaticPointsTable = Class.new(
 		self.frame = frame
 		self.args = Arguments.getArgs(frame)
 		self.parsedInput = self:parseInput(self.args)
-
 	end
 )
 
 function AutomaticPointsTable.run(frame)
 	local pointsTable = AutomaticPointsTable(frame)
-
-
 	mw.logObject(pointsTable.parsedInput.pbg)
 	mw.logObject(pointsTable.parsedInput.tournaments)
 
@@ -55,7 +52,6 @@ function AutomaticPointsTable:parseTournaments(args)
 		table.insert(tournaments, (Json.parse(tournament)))
 	end
 	return tournaments
-
 end
 
 return AutomaticPointsTable
