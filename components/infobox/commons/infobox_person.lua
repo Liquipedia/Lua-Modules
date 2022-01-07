@@ -76,7 +76,7 @@ function Person:createInfobox()
 			name = self:nameDisplay(args),
 			image = args.image,
 			imageDefault = args.default,
-			subHeader = self:localIdDisplay(args)
+			subHeader = self:subHeaderDisplay(args)
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},
@@ -300,7 +300,7 @@ function Person:nameDisplay(args)
 end
 
 --- Allows for overriding this functionality
-function Person:localIdDisplay(args)
+function Person:subHeaderDisplay(args)
 	return args.localid
 end
 
