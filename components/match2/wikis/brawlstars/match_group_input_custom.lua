@@ -9,6 +9,7 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -16,8 +17,6 @@ local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-
-local _frame
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
@@ -34,7 +33,6 @@ local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(frame, match)
-	_frame = frame
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -49,7 +47,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(frame, map)
-	_frame = frame
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -58,27 +55,21 @@ function CustomMatchGroupInput.processMap(frame, map)
 	return map
 end
 
--- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processOpponent(frame, opponent)
-	_frame = frame
-	if not Logic.isEmpty(opponent.template) and
-		string.lower(opponent.template) == 'bye' then
-			opponent.name = 'BYE'
-			opponent.type = 'literal'
+function CustomMatchGroupInput.processOpponent(record, date)
+	local opponent = Opponent.readOpponentArgs(record)
+		or Opponent.blank()
+
+	-- Convert byes to literals
+	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	--fix for legacy conversion
-	--local players = opponent.players or opponent.match2players
-	--if opponent.type == 'solo' and players == nil then
-		--opponent = opponentFunctions.getSoloFromLegacy(opponent)
-	--end
-
-	return opponent
+	Opponent.resolve(opponent, date)
+	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processPlayer(frame, player)
-	_frame = frame
 	return player
 end
 
@@ -216,17 +207,15 @@ function matchFunctions.getOpponents(args)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			--retrieve name and icon for teams from team templates
-			if opponent.type == 'team' and
-				not Logic.isEmpty(opponent.template, args.date) then
-					local name, icon, template = opponentFunctions.getTeamNameAndIcon(opponent.template, args.date)
-					opponent.template = template
-					opponent.name = mw.ext.TeamLiquidIntegration.resolve_redirect(
-						opponent.name or name or
-						opponentFunctions.getTeamName(opponent.template)
-						or '')
-					opponent.icon = opponent.icon or icon or opponentFunctions.getIconName(opponent.template)
+			CustomMatchGroupInput.processOpponent(opponent, args.date)
+
+			-- Retrieve icon and legacy name for team
+			if opponent.type == Opponent.team then
+				opponent.icon = opponentFunctions.getTeamIcon(opponent.template)
+					or opponentFunctions.getLegacyTeamIcon(opponent.template)
+				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
 			end
+
 			opponent.score = opponent.score or sumscores[opponentIndex]
 
 			-- apply status
@@ -357,61 +346,28 @@ end
 --
 -- opponent related functions
 --
-function opponentFunctions.getTeamNameAndIcon(template, date)
-	local icon, team
-	template = string.lower(template or ''):gsub('_', ' ')
-	if template ~= '' and template ~= 'noteam' and
-		mw.ext.TeamTemplate.teamexists(template) then
-
-		local templateData = mw.ext.TeamTemplate.raw(template, date)
-		icon = templateData.image
-		if icon == '' then
-			icon = templateData.legacyimage
-		end
-		team = templateData.page
-		template = templateData.templatename or template
-	end
-
-	return team, icon, template
+function opponentFunctions.getTeamIcon(template)
+	local raw = mw.ext.TeamTemplate.raw(template)
+	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
 end
 
 --the following 2 functions are a fallback
 --they are only useful if the team template doesn't exist
 --in the team template extension
-function opponentFunctions.getTeamName(template)
-	if template ~= nil then
-		local team = Template.expandTemplate(_frame, 'Team', { template })
-		team = team:gsub('%&', '')
-		team = String.split(team, 'link=')[2]
-		team = String.split(team, ']]')[1]
-		return team
-	else
-		return nil
-	end
+function opponentFunctions.getLegacyTeamName(template)
+	local team = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
+	team = team:gsub('%&', '')
+	team = String.split(team, 'link=')[2]
+	team = String.split(team, ']]')[1]
+	return team
 end
 
-function opponentFunctions.getIconName(template)
-	if template ~= nil then
-		local icon = Template.expandTemplate(_frame, 'Team', { template })
-		icon = icon:gsub('%&', '')
-		icon = String.split(icon, 'File:')[2]
-		icon = String.split(icon, '|')[1]
-		return icon
-	else
-		return nil
-	end
-end
-
---maybe needed for legacy conversion to work for solo brackets
-function opponentFunctions.getSoloFromLegacy(opponent)
-	local player = {
-		name = opponent.name,
-		displayname = opponent.displayname or opponent.name,
-		flag = opponent.flag
-	}
-	opponent.match2players = {player}
-	opponent.name = nil
-	return opponent
+function opponentFunctions.getLegacyTeamIcon(template)
+	local icon = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
+	icon = icon:gsub('%&', '')
+	icon = String.split(icon, 'File:')[2]
+	icon = String.split(icon, '|')[1]
+	return icon
 end
 
 return CustomMatchGroupInput

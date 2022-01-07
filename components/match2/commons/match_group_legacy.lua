@@ -203,7 +203,7 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 				nestedArgs[innerKey] = _args[innerVal] or flattened[innerVal]
 			end
 			if String.startsWith(realKey, 'opponent') then
-				match[realKey] = MatchSubobjects.luaGetOpponent(_frame, nestedArgs)
+				match[realKey] = nestedArgs
 			elseif String.startsWith(realKey, 'map') then
 				match[realKey] = MatchSubobjects.luaGetMap(_frame, nestedArgs)
 			else

@@ -47,8 +47,4 @@ function WikiSpecific.processMap(frame, map)
 	return map
 end
 
-function WikiSpecific.processOpponent(frame, opponent)
-	return opponent
-end
-
 return WikiSpecific
