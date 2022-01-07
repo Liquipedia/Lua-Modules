@@ -17,6 +17,7 @@ Config.TIER_TYPE_QUALIFIER = 'qualifier'
 Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
 Config.TIER_TYPE_SHOW_MATCH = 'show match'
+Config.TIER_TYPE_MISC = 'misc'
 
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
@@ -69,6 +70,10 @@ Config.weights = {
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 25,
 			},
+			{
+				name = Config.TIER_TYPE_MISC,
+				points = 0,
+			},
 		},
 	},
 	{
@@ -96,6 +101,10 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 25,
+			},
+			{
+				name = Config.TIER_TYPE_MISC,
+				points = 0,
 			},
 		},
 	},
@@ -125,6 +134,10 @@ Config.weights = {
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 25,
 			},
+			{
+				name = Config.TIER_TYPE_MISC,
+				points = 0,
+			},
 		},
 	},
 	{
@@ -153,6 +166,10 @@ Config.weights = {
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 25,
 			},
+			{
+				name = Config.TIER_TYPE_MISC,
+				points = 0,
+			},
 		},
 	},
 	{
@@ -180,6 +197,10 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 25,
+			},
+			{
+				name = Config.TIER_TYPE_MISC,
+				points = 0,
 			},
 		},
 	},
