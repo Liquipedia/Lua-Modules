@@ -25,6 +25,6 @@ function WikiSpecific.matchHasDetails(match)
 		or 0 < #match.games
 end
 
-WikiSpecific.defaultIcon = 'Mobile Legends allmode.png'
+WikiSpecific.defaultIcon = 'Arena of Valor allmode.png'
 
 return WikiSpecific
