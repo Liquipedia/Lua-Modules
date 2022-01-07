@@ -8,46 +8,30 @@
 
 -- This module is used for both the Player and Commentator infoboxes
 
-local Abbreviation = require('Module:Abbreviation')
-local Achievements = require('Module:Achievements in infoboxes')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace')
-local Json = require('Module:Json')
-local Lua = require('Module:Lua')
-local Lpdb = require('Module:Lpdb')
-local MatchTicker = require('Module:MatchTicker/Participant')
-local Math = require('Module:Math')
+local PersonSc2 = require('Module:Infobox/Person/Custom/Shared')
+local Person = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Class = require('Module:Class')
 local Variables = require('Module:Variables')
+local Achievements = require('Module:Achievements in infoboxes')._player
+local CleanRace = require('Module:CleanRace')
+local Math = require('Module:Math')
+local Matches = require('Module:Upcoming ongoing and recent matches player/new')
 
-local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
-local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-
-local Condition = require('Module:Condition')
-local ConditionTree = Condition.Tree
-local ConditionNode = Condition.Node
-local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
-local ColumnName = Condition.ColumnName
-
-local _EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
+local _EPT_SEASON = 2021
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
-local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
+local _DISCARD_PLACEMENT = '99'
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
-local _EARNING_MODES = {solo = '1v1', team = 'team'}
-local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
-local _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
-local _MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 40
-local _NUMBER_OF_RECENT_MATCHES = 10
+local _EARNING_MODES = {['1v1'] = '1v1', ['team_individual'] = 'team'}
 
 --race stuff
 local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
 local _RACE_FIELD_AS_CATEGORY_LINK = true
+
+local _earningsGlobal = {}
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
+local _shouldQueryData
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -59,24 +43,11 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _player
 
 function CustomPlayer.run(frame)
 	local player = Person(frame)
 	_args = player.args
-	_player = player
 	PersonSc2.setArgs(_args)
-
-	player.recentMatches = {}
-	player.infoboxAchievements = {}
-	player.awardAchievements = {}
-	player.achievements = {}
-	player.achievementsFallBack = {}
-	player.earningsGlobal = {}
-	player.shouldQueryData = PersonSc2.shouldStoreData()
-	if player.shouldQueryData then
-		player.yearsActive = CustomPlayer._getMatchupData(_PAGENAME)
-	end
 
 	player.shouldStoreData = PersonSc2.shouldStoreData
 	player.getStatusToStore = PersonSc2.getStatusToStore
@@ -87,6 +58,8 @@ function CustomPlayer.run(frame)
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+
+	_shouldQueryData = PersonSc2.shouldStoreData()
 
 	return player:createInfobox(frame)
 end
@@ -103,8 +76,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'region' then return {}
 	elseif id == 'achievements' then
 		local achievementCells = {}
-		if _player.shouldQueryData then
-			local achievements = Achievements.display(_player.infoboxAchievements)
+		if _shouldQueryData then
+			local achievements = Achievements({}, _PAGENAME)
 			if not String.isEmpty(achievements) then
 				table.insert(achievementCells, Center{content = {achievements}})
 			end
@@ -136,17 +109,17 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	local rank1, rank2 = {}, {}
-	if _player.shouldQueryData then
+	local yearsActive
+	if _shouldQueryData then
 		rank1, rank2 = CustomPlayer._getRank(_PAGENAME)
+		yearsActive = CustomPlayer._getMatchupData(_PAGENAME)
 	end
 
-	local currentYearEarnings = _player.earningsGlobal[tostring(_CURRENT_YEAR)]
+	local currentYearEarnings = _earningsGlobal[tostring(_CURRENT_YEAR)]
 	if currentYearEarnings then
 		currentYearEarnings = Math.round{currentYearEarnings}
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
-
-	local yearsActiveCaster = CustomPlayer._getActiveCasterYears()
 
 	return {
 		Cell{
@@ -156,33 +129,8 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = rank1.name or 'Rank', content = {rank1.rank}},
 		Cell{name = rank2.name or 'Rank', content = {rank2.rank}},
 		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military)}},
-		Cell{
-			name = Abbreviation.make('Years active', 'Years active as a player'),
-			content = {_player.yearsActive}
-		},
-		Cell{
-			name = Abbreviation.make('Years active (caster)', 'Years active as a caster'),
-			content = {yearsActiveCaster}
-		},
+		Cell{name = 'Years active', content = {yearsActive}}
 	}
-end
-
-function CustomPlayer._getActiveCasterYears()
-	if _player.shouldQueryData then
-		local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			query = 'year::date',
-			conditions = '[[page::' .. _PAGENAME:gsub('_', ' ') .. ']]',
-			limit = 5000,
-		})
-
-		local years = {}
-		for _, broadCastItem in pairs(queryData) do
-			local year = broadCastItem.year_date
-			years[tonumber(year)] = year
-		end
-
-		return Table.isNotEmpty(years) and CustomPlayer._getYearsActive(years) or nil
-	end
 end
 
 function CustomPlayer:createWidgetInjector()
@@ -190,36 +138,20 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if _player.shouldQueryData then
-		return MatchTicker.run({player = _PAGENAME}, _player.recentMatches)
+	if _shouldQueryData then
+		return tostring(Matches._get_ongoing({})) ..
+			tostring(Matches._get_upcoming({})) ..
+			tostring(Matches._get_recent({}))
 	end
 end
 
 function CustomPlayer._getMatchupData(player)
 	local yearsActive
 	player = string.gsub(player, '_', ' ')
-	local queryParameters = {
-		conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]',
-		order = 'date desc',
-		query = table.concat({
-				'match2opponents',
-				'winner',
-				'pagename',
-				'tournament',
-				'tickername',
-				'icon',
-				'date',
-				'publishertier',
-				'vod',
-				'stream',
-				'extradata',
-				'parent',
-				'finished',
-				'bestof',
-				'match2id',
-				'icondark',
-			}, ', '),
-	}
+	local cond = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]'
+	local query = 'match2opponents, date'
+
+	local data = CustomPlayer._getLPDBrecursive(cond, query, 'match2')
 
 	local years = {}
 	local vs = {}
@@ -230,22 +162,15 @@ function CustomPlayer._getMatchupData(player)
 		end
 	end
 
-	local foundData = false
-	local processMatch = function(match)
-		foundData = true
-		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player)
-		local year = string.sub(match.date, 1, 4)
-		years[tonumber(year)] = year
-		if #_player.recentMatches <= _NUMBER_OF_RECENT_MATCHES then
-			table.insert(_player.recentMatches, match)
+	if type(data[1]) == 'table' then
+		for i=1, #data do
+			vs = CustomPlayer._addScoresToVS(vs, data[i].match2opponents, player)
+			years[tonumber(string.sub(data[i].date, 1, 4))] = string.sub(data[i].date, 1, 4)
 		end
-	end
 
-	Lpdb.executeMassQuery('match2', queryParameters, processMatch)
-
-	if foundData then
 		local category
 		if years[_CURRENT_YEAR] or years[_CURRENT_YEAR - 1] or years[_CURRENT_YEAR - 2] then
+			category = 'Active players'
 			Variables.varDefine('isActive', 'true')
 		else
 			category = 'Players with no matches in the last three years'
@@ -255,13 +180,12 @@ function CustomPlayer._getMatchupData(player)
 
 		yearsActive = string.gsub(yearsActive, '<br>', '', 1)
 
-		if String.isNotEmpty(category) and String.isNotEmpty(yearsActive) then
+		if not (String.isEmpty(category) or String.isEmpty(yearsActive)) then
 			yearsActive = yearsActive .. '[[Category:' .. category .. ']]'
 		end
 
 		CustomPlayer._setVarsForVS(vs)
 	end
-
 	return yearsActive
 end
 
@@ -342,42 +266,41 @@ end
 
 function CustomPlayer:calculateEarnings()
 	local earningsTotal
-	earningsTotal, _player.earningsGlobal = CustomPlayer._getEarningsMedalsData(self.pagename)
+	earningsTotal, _earningsGlobal = CustomPlayer._getEarningsMedalsData(self.pagename)
 	earningsTotal = Math.round{earningsTotal}
-	return earningsTotal, _player.earningsGlobal
+	return earningsTotal, _earningsGlobal
+end
+
+function CustomPlayer._getLPDBrecursive(cond, query, queryType)
+	local data = {} -- get LPDB results in here
+	local count
+	local offset = 0
+	repeat
+		local additionalData = mw.ext.LiquipediaDB.lpdb(queryType, {
+			conditions = cond,
+			query = query,
+			offset = offset,
+			limit = 5000
+		})
+		count = #additionalData
+		-- Merging
+		for i, item in ipairs(additionalData) do
+			data[offset + i] = item
+		end
+		offset = offset + count
+	until count ~= 5000
+
+	return data
 end
 
 function CustomPlayer._getEarningsMedalsData(player)
-	local playerConditions = ConditionTree(BooleanOperator.any)
-	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
-		playerConditions:add({
-			ConditionNode(ColumnName('players_p' .. playerIndex), Comparator.eq, player),
-		})
-	end
+	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR ' ..
+		'([[mode::1v1]] AND ([[placement::1]] OR [[placement::2]] OR [[placement::3]]' ..
+		' OR [[placement::4]] OR [[placement::3-4]]))) AND ' ..
+		'[[participant::' .. player .. ']]'
+	local query = 'liquipediatier, liquipediatiertype, placement, date, prizemoney, mode'
 
-	local placementConditions = ConditionTree(BooleanOperator.any)
-	for _, item in pairs(_ALLOWED_PLACES) do
-		placementConditions:add({
-			ConditionNode(ColumnName('placement'), Comparator.eq, item),
-		})
-	end
-
-	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('participantlink'), Comparator.eq, player),
-			playerConditions,
-		},
-		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
-		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
-			ConditionNode(ColumnName('extradata_award'), Comparator.neq, ''),
-			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('players_type'), Comparator.gt, Opponent.solo),
-				placementConditions,
-			},
-		},
-	}
+	local data = CustomPlayer._getLPDBrecursive(cond, query, 'placement')
 
 	local earnings = {}
 	local medals = {}
@@ -385,32 +308,16 @@ function CustomPlayer._getEarningsMedalsData(player)
 	medals['total'] = {}
 	local earnings_total = 0
 
-	local queryParameters = {
-		conditions = conditions:toString(),
-		order = 'liquipediatier asc, placement asc, weight desc',
-	}
+	if type(data[1]) == 'table' then
+		for _, item in pairs(data) do
+			--handle earnings
+			earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, item)
 
-	local processPlacement = function(placement)
-		--handle earnings
-		earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, placement)
-
-		--handle medals
-		medals = CustomPlayer._addPlacementToMedals(medals, placement)
+			--handle medals
+			medals = CustomPlayer._addPlacementToMedals(medals, item)
+		end
 	end
 
-	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
-
-	-- if < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS achievements fill them up
-	if #_player.achievements < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
-		_player.achievements = Array.extendWith(_player.achievements, _player.achievementsFallBack)
-		_player.achievements = Array.sub(_player.achievements, 1, _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS)
-	end
-	if #_player.achievements > 0 then
-		Variables.varDefine('achievements', Json.stringify(_player.achievements))
-	end
-	if #_player.awardAchievements > 0 then
-		Variables.varDefine('awardAchievements', Json.stringify(_player.awardAchievements))
-	end
 	CustomPlayer._setVarsFromTable(earnings)
 	CustomPlayer._setVarsFromTable(medals)
 
@@ -418,33 +325,31 @@ function CustomPlayer._getEarningsMedalsData(player)
 end
 
 function CustomPlayer._addPlacementToEarnings(earnings, earnings_total, data)
-	local mode = _EARNING_MODES[(data.players or {}).type or ''] or 'other'
+	local mode = _EARNING_MODES[data.mode] or 'other'
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
-	local year = string.sub(data.date, 1, 4)
-	earnings[mode][year] = (earnings[mode][year] or 0) + data.individualprizemoney
-	earnings['total'][year] = (earnings['total'][year] or 0) + data.individualprizemoney
-	earnings_total = (earnings_total or 0) + data.individualprizemoney
+	local date = string.sub(data.date, 1, 4)
+	earnings[mode][date] = (earnings[mode][date] or 0) + data.prizemoney
+	earnings['total'][date] = (earnings['total'][date] or 0) + data.prizemoney
+	earnings_total = (earnings_total or 0) + data.prizemoney
 
 	return earnings, earnings_total
 end
 
 function CustomPlayer._addPlacementToMedals(medals, data)
-	if data.liquipediatiertype ~= 'Qualifier' then
-		local place = CustomPlayer._getPlacement(data.placement)
-		CustomPlayer._setAchievements(data, place)
-		if
-			(data.players or {}).type == Opponent.solo
-			and place and place <= 3
-		then
+	if data.mode == '1v1' then
+		local place = CustomPlayer._Placements(data.placement)
+		if place ~= _DISCARD_PLACEMENT then
 			local tier = data.liquipediatier or 'undefined'
-			if not medals[place] then
-				medals[place] = {}
+			if data.liquipediatiertype ~= 'Qualifier' then
+				if not medals[place] then
+					medals[place] = {}
+				end
+				medals[place][tier] = (medals[place][tier] or 0) + 1
+				medals[place]['total'] = (medals[place]['total'] or 0) + 1
+				medals['total'][tier] = (medals['total'][tier] or 0) + 1
 			end
-			medals[place][tier] = (medals[place][tier] or 0) + 1
-			medals[place]['total'] = (medals[place]['total'] or 0) + 1
-			medals['total'][tier] = (medals['total'][tier] or 0) + 1
 		end
 	end
 
@@ -459,48 +364,15 @@ function CustomPlayer._setVarsFromTable(table)
 	end
 end
 
-function CustomPlayer._getPlacement(value)
-	if String.isNotEmpty(value) then
-		value = mw.text.split(value, '-')[1]
-		if Table.includes(_ALLOWED_PLACES, value) then
-			return tonumber(value)
-		end
+function CustomPlayer._Placements(value)
+	value = (value or '') ~= '' and value or _DISCARD_PLACEMENT
+	value = mw.text.split(value, '-')[1]
+	if value ~= '1' and value ~= '2' and value ~= '3' then
+		value = _DISCARD_PLACEMENT
+	elseif value == '3' then
+		value = 'sf'
 	end
-end
-
-function CustomPlayer._setAchievements(data, place)
-	local tier = tonumber(data.liquipediatier)
-
-	if tier == 1 and place == 1 and (data.players or {}).type == Opponent.solo then
-		table.insert(_player.infoboxAchievements, data)
-	end
-
-	if CustomPlayer._isAwardAchievement(data, tier) then
-		table.insert(_player.awardAchievements, data)
-	elseif CustomPlayer._isAchievement(data, place, tier) then
-		table.insert(_player.achievements, data)
-	elseif (#_player.achievementsFallBack + #_player.achievements) < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
-		table.insert(_player.achievementsFallBack, data)
-	end
-end
-
-function CustomPlayer._isAchievement(data, place, tier)
-	return place and (
-			tier == 1 and place <= 4 or
-			tier == 2 and place <= 2 or
-			#_player.achievements < _MAXIMUM_NUMBER_OF_ACHIEVEMENTS and (
-				tier == 2 and place <= 4 or
-				tier == 3 and place <= 2 or
-				tier == 4 and place <= 1
-			)
-		)
-end
-
-function CustomPlayer._isAwardAchievement(data, tier)
-	return String.isNotEmpty((data.extradata or {}).award) and (
-		tier == 1 or
-		tier == 2 and data.individualprizemoney > 50
-	)
+	return value
 end
 
 function CustomPlayer._getRank(player)
@@ -535,7 +407,7 @@ function CustomPlayer._getRankDisplay(data)
 end
 
 function CustomPlayer._getAllkills()
-	if _player.shouldQueryData then
+	if _shouldQueryData then
 		local allkillsData = mw.ext.LiquipediaDB.lpdb('datapoint', {
 			conditions = '[[pagename::' .. _PAGENAME .. ']] AND [[type::allkills]]',
 			query = 'information',
