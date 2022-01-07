@@ -189,7 +189,7 @@ function matchFunctions.isFeatured(match)
 
 	if matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
 		return true
-	elseif matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
+	or matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
 		return true
 	end
 	return false
@@ -305,25 +305,8 @@ function matchFunctions.getOpponents(args)
 			args['opponent' .. opponentIndex] = opponent
 		end
 	end
-	if
-		winner == _RESULT_TYPE_DRAW or
-		winner == '0' or (
-			Logic.readBool(args.finished) and
-			#opponents == 2 and
-			opponents[1].status == _STATUS_HAS_SCORE and
-			opponents[2].status == _STATUS_HAS_SCORE and
-			opponents[1].score == opponents[2].score
-		)
-	then
-		args.winner = 0
-		args.resulttype = _RESULT_TYPE_DRAW
-	elseif
-		Logic.readBool(args.finished) and
-		#opponents == 2 and
-		opponents[1].status ~= _STATUS_HAS_SCORE and
-		opponents[1].status == opponents[2].status
-	then
-		args.winner = 0
+	if winner == _RESULT_TYPE_DRAW
+	then args.resulttype = _RESULT_TYPE_DRAW
 	end
 	return args
 end
