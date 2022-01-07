@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Config = require('Module:NotabilityChecker/config')
 local String = require('Module:String')
-local LuaUtils = require('Module:LuaUtils')
 local Array = require('Module:Array')
 local Table = require('Module:Table')
 
