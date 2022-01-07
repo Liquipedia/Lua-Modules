@@ -112,6 +112,9 @@ function NotabilityChecker._calculatePlayerNotability(player)
 	for i = 2, Config.MAX_NUMBER_OF_PARTICIPANTS do
 		conditions = conditions .. ' OR [[players_p' .. tostring(i) .. '::' .. player .. ']]'
 	end
+	for i= 1, Config.MAX_NUMBER_OF_COACHES do
+		conditions = conditions .. ' OR [[players_c' .. tostring(i) .. '::' .. player .. ']]'
+	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = Config.PLACEMENT_LIMIT,
