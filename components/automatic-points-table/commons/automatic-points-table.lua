@@ -61,7 +61,7 @@ end
 function AutomaticPointsTable:parseTeams(args)
 	local teams = {}
 	for _, team in Table.iter.pairsByPrefix(args, 'team') do
-		parsedTeam = Json.parse(team)
+		local parsedTeam = Json.parse(team)
 		parsedTeam.aliases = self:parseAliases(parsedTeam)
 		parsedTeam.deductions = self:parseDeductions(parsedTeam)
 		parsedTeam.manualPoints = self:parseManualPoints(parsedTeam)
