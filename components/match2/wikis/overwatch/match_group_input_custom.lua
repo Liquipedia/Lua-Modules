@@ -320,15 +320,6 @@ function matchFunctions.getVodStuff(match)
 	if match.wl then links.wl = 'https://www.winstonslab.com/matches/match.php?id=' .. match.wl end
 	if match.stats then links.stats = match.stats end
 
-	-- apply vodgames
-	for index = 1, _MAX_NUM_VODGAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
 	return match
 end
 
