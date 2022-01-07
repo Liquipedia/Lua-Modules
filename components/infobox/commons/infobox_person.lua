@@ -72,7 +72,12 @@ function Person:createInfobox()
 	end
 
 	local widgets = {
-		Header{name = self:nameDisplay(args), image = args.image, imageDefault = args.default, subHeader = args.localid},
+		Header{
+			name = self:nameDisplay(args),
+			image = args.image,
+			imageDefault = args.default,
+			subHeader = self:localIdDisplay(args)
+		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},
 		Cell{name = 'Name', content = {args.name}},
@@ -292,6 +297,11 @@ function Person:nameDisplay(args)
 	end
 
 	return display
+end
+
+--- Allows for overriding this functionality
+function Person:localIdDisplay(args)
+	return args.localid
 end
 
 --- Allows for overriding this functionality
