@@ -12,19 +12,20 @@ local MapModes = require('Module:MapModes')
 local OpponentDisplay = require('Module:OpponentDisplay')
 local VodLink = require('Module:VodLink')
 
+local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 local htmlCreate = mw.html.create
 
-local p = {}
+local CustomMatchSummary = {}
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 --local _RED_CROSS = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
-function p.getByMatchId(args)
+function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local wrapper = htmlCreate('div')
@@ -63,11 +64,11 @@ function p.getByMatchId(args)
 		:node(renderOpponent(1))
 		:node(renderOpponent(2))
 		:node(renderSoloOpponentTeam(2))
-	wrapper:node(header):node(p._breakNode())
+	wrapper:node(header):node(CustomMatchSummary._breakNode())
 
 	-- body
 	local body = htmlCreate('div'):addClass('brkts-popup-body')
-	body = p._addFlexRow(body, {DisplayHelper.MatchCountdownBlock(match)})
+	body = CustomMatchSummary._addFlexRow(body, {DisplayHelper.MatchCountdownBlock(match)})
 	for _, game in ipairs(match.games) do
 		if game.map then
 			local mapDisplay = '[[' .. game.map .. ']]'
@@ -96,7 +97,7 @@ function p.getByMatchId(args)
 
 			local gameHeader = game.header or ''
 			if gameHeader ~= '' then
-				table.insert(gameElements, 1, p._breakNode())
+				table.insert(gameElements, 1, CustomMatchSummary._breakNode())
 				table.insert(gameElements, 1, htmlCreate('div')
 					:node(gameHeader)
 					:css('font-weight','bold')
@@ -104,17 +105,17 @@ function p.getByMatchId(args)
 					:css('margin','auto'))
 			end
 			if game.comment then
-				table.insert(gameElements, p._breakNode())
+				table.insert(gameElements, CustomMatchSummary._breakNode())
 				table.insert(gameElements, htmlCreate('div')
 					:node(game.comment)
 					:css('margin','auto')
 					:css('max-width', '60%'))
 			end
-			body = p._addFlexRow(body, gameElements, 'brkts-popup-body-game')
+			body = CustomMatchSummary._addFlexRow(body, gameElements, 'brkts-popup-body-game')
 		end
 	end
 
-	wrapper:node(body):node(p._breakNode())
+	wrapper:node(body):node(CustomMatchSummary._breakNode())
 
 	-- comment
 	if match.comment then
@@ -123,7 +124,7 @@ function p.getByMatchId(args)
 			:css('white-space','normal')
 			:css('font-size','85%')
 			:node(match.comment)
-		wrapper:node(comment):node(p._breakNode())
+		wrapper:node(comment):node(CustomMatchSummary._breakNode())
 	end
 
 	-- footer
@@ -159,7 +160,7 @@ function p.getByMatchId(args)
 	return wrapper
 end
 
-function p._addFlexRow(wrapper, contentElements, class, style)
+function CustomMatchSummary._addFlexRow(wrapper, contentElements, class, style)
 	local node = htmlCreate('div'):addClass('brkts-popup-body-element')
 	if not Logic.isEmpty(class) then
 		node:addClass(class)
@@ -173,9 +174,9 @@ function p._addFlexRow(wrapper, contentElements, class, style)
 	return wrapper:node(node)
 end
 
-function p._breakNode()
+function CustomMatchSummary._breakNode()
 	return htmlCreate('div')
 		:addClass('brkts-popup-break')
 end
 
-return p
+return CustomMatchSummary
