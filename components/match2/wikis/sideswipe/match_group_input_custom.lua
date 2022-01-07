@@ -77,9 +77,6 @@ function p.processOpponent(frame, opponent)
 		opponent.extradata = {
 			score2 = score2,
 			score3 = score3,
-			set1win = Logic.readBool(opponent.set1win),
-			set2win = Logic.readBool(opponent.set2win),
-			set3win = Logic.readBool(opponent.set3win),
 			additionalScores = true
 		}
 	end
@@ -118,15 +115,6 @@ function p._placementSortFunction(table, key1, key2)
 		elseif Table.includes(_ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
-end
-
-function p._getSetWins(opp)
-	local extradata = opp.extradata or {}
-	local set1win = extradata.set1win and 1 or 0
-	local set2win = extradata.set2win and 1 or 0
-	local set3win = extradata.set3win and 1 or 0
-	local sum = set1win + set2win + set3win
-	return sum
 end
 
 --
