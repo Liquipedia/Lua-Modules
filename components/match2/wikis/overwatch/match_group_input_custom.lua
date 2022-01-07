@@ -16,6 +16,7 @@ local Variables = require('Module:Variables')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
 local _ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
+local _FINISHED_INDICATORS = { 'skip', 'np', 'cancelled', 'canceled' }
 local _MAX_NUM_OPPONENTS = 8
 local _MAX_NUM_PLAYERS = 10
 local _MAX_NUM_VODGAMES = 9
@@ -103,16 +104,7 @@ end
 
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
-	if
-		data.finished == 'skip' or
-		data.finished == 'np' or
-		data.finished == 'cancelled' or
-		data.finished == 'canceled' or
-		data.winner == 'skip' or
-		data.winner == 'np' or
-		data.winner == 'cancelled' or
-		data.winner == 'canceled'
-	then
+	if Table.includes(_FINISHED_INDICATORS, data.finished) or Table.includes(_FINISHED_INDICATORS, data.winner) then
 		data.resulttype = 'np'
 		data.finished = true
 	-- Map or Match is marked as finished.
