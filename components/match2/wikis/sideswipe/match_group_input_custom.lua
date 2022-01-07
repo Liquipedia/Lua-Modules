@@ -70,17 +70,6 @@ function p.processOpponent(frame, opponent)
 			opponent.type = 'literal'
 	end
 
-	--score2 & score3 support for every match
-	local score2 = tonumber(opponent.score2 or '')
-	local score3 = tonumber(opponent.score3 or '')
-	if score2 then
-		opponent.extradata = {
-			score2 = score2,
-			score3 = score3,
-			additionalScores = true
-		}
-	end
-
 	return opponent
 end
 
@@ -165,15 +154,6 @@ function matchFunctions.getVodStuff(match)
 	}
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	-- apply vodgames
-	for index = 1, _MAX_NUM_VODGAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
 	return match
 end
 
