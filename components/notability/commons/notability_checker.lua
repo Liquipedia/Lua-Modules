@@ -26,14 +26,14 @@ function NotabilityChecker.run(args)
 	local isTeamResult = args.team ~= nil
 
 	if args.player1 then
-		local players = {}
+		local people = {}
 		local index = 1
 		while not String.isEmpty(args['player' .. tostring(index)]) do
-			local player = args['player' .. tostring(index)]
-			table.insert(players, player)
+			local person = args['player' .. tostring(index)]
+			table.insert(people, person)
 			index = index + 1
 		end
-		weight, output = NotabilityChecker._calculateRosterNotability(args.team, players)
+		weight, output = NotabilityChecker._calculateRosterNotability(args.team, people)
 	elseif args.team then
 		weight, output = NotabilityChecker._runForTeam(args.team)
 	end
@@ -42,13 +42,13 @@ function NotabilityChecker.run(args)
 	output = output .. '\'\'\'Final weight:\'\'\' ' .. tostring(weight) .. '\n\n'
 
 	if weight < Config.NOTABILITY_THRESHOLD_NOTABLE and weight > Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
+		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
 		' is \'\'\'OPEN FOR DISCUSSION\'\'\'\n'
 	elseif weight < Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
+		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
 		' is \'\'\'NOT NOTABLE\'\'\'\n'
 	else
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'player') ..
+		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
 		' is \'\'\'NOTABLE\'\'\'\n'
 	end
 
@@ -67,7 +67,7 @@ function NotabilityChecker._runForTeam(team)
 	return weight, output
 end
 
-function NotabilityChecker._calculateRosterNotability(team, players)
+function NotabilityChecker._calculateRosterNotability(team, people)
 	local weight = 0
 	local output = ''
 	if team then
@@ -76,20 +76,20 @@ function NotabilityChecker._calculateRosterNotability(team, players)
 		weight = weight + teamWeight
 	end
 
-	output = output .. '===Player Results===\n'
+	output = output .. '===People Results===\n'
 
-	local playerAverage = 0
-	for _, player in pairs(players) do
-		local playerWeight = NotabilityChecker._calculatePlayerNotability(player)
+	local average = 0
+	for _, person in pairs(people) do
+		local personWeight = NotabilityChecker._calculatePersonNotability(person)
 		output = output .. mw.getCurrentFrame():expandTemplate{
-			title = 'NotabilityPlayerMatchesTable', args = {title = player}}
-		output = output .. '*\'\'\'Player:\'\'\' [[' .. player .. ']] \'\'\'Weight:\'\'\' ' ..
-			tonumber(playerWeight) .. '\n\n'
-		playerAverage = playerAverage + tonumber(playerWeight or 0)
+			title = 'NotabilityPlayerMatchesTable', args = {title = person}}
+		output = output .. '*\'\'\'Person:\'\'\' [[' .. person .. ']] \'\'\'Weight:\'\'\' ' ..
+			tonumber(personWeight) .. '\n\n'
+			average = average + tonumber(personWeight or 0)
 	end
 
-	playerAverage = playerAverage / Table.size(players)
-	weight = weight + playerAverage
+	average = average / Table.size(people)
+	weight = weight + average
 
 	return weight, output
 end
@@ -104,13 +104,16 @@ function NotabilityChecker._calculateTeamNotability(team)
 	return NotabilityChecker._calculateWeight(data)
 end
 
-function NotabilityChecker._calculatePlayerNotability(player)
-	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
+function NotabilityChecker._calculatePersonNotability(person)
+	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person)
 
-	local conditions = '[[players_p' .. tostring(1) .. '::' .. player .. ']]' ..
-		' OR [[participant::' .. player .. ']]'
+	local conditions = '[[players_p' .. tostring(1) .. '::' .. person .. ']]' ..
+		' OR [[participant::' .. person .. ']]'
 	for i = 2, Config.MAX_NUMBER_OF_PARTICIPANTS do
-		conditions = conditions .. ' OR [[players_p' .. tostring(i) .. '::' .. player .. ']]'
+		conditions = conditions .. ' OR [[players_p' .. tostring(i) .. '::' .. person .. ']]'
+	end
+	for i = 1, Config.MAX_NUMBER_OF_COACHES do
+		conditions = conditions .. ' OR [[players_c' .. tostring(i) .. '::' .. person .. ']]'
 	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {

@@ -23,6 +23,7 @@ Config.TIER_TYPE_SCHOOL = 'school'
 Config.PLACEMENT_LIMIT = 2000
 
 Config.MAX_NUMBER_OF_PARTICIPANTS = 10
+Config.MAX_NUMBER_OF_COACHES = 0
 
 -- Which LPDB placement parameters do we care about?
 Config.PLACEMENT_QUERY =
