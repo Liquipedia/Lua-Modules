@@ -1,17 +1,19 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:Infobox/Person/Player
+-- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Player = require('Module:Infobox/Person')
+-- This module is used for both the Player and Commentator infoboxes
+
+local PersonSc2 = require('Module:Infobox/Person/Custom/Shared')
+local Person = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local Achievements = require('Module:Achievements in infoboxes')._player
-local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
 local Math = require('Module:Math')
 local Matches = require('Module:Upcoming ongoing and recent matches player/new')
@@ -20,72 +22,16 @@ local _EPT_SEASON = 2021
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
 local _DISCARD_PLACEMENT = '99'
-local _ALLKILLICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
-local _EARNING_MODES = { ['1v1'] = '1v1', ['team_individual'] = 'team' }
+local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
+local _EARNING_MODES = {['1v1'] = '1v1', ['team_individual'] = 'team'}
 
---race stuff tables
-local _AVAILABLE_RACES = { 'p', 't', 'z', 'r', 'total' }
-local _FACTION1 = {
-	['p'] = 'Protoss', ['pt'] = 'Protoss', ['pz'] = 'Protoss',
-	['t'] = 'Terran', ['tp'] = 'Terran', ['tz'] = 'Terran',
-	['z'] = 'Zerg', ['zt'] = 'Zerg', ['zp'] = 'Zerg',
-	['r'] = 'Random', ['a'] = 'All'
-}
-local _FACTION2 = {
-	['pt'] = 'Terran', ['pz'] = 'Zerg',
-	['tp'] = 'Protoss', ['tz'] = 'Zerg',
-	['zt'] = 'Terran', ['zp'] = 'Protoss'
-}
-local _RACE_CATEGORY = {
-	['p'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]',
-	['pt'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
-		'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['pz'] = '[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]],' ..
-		'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['t'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]]',
-	['tp'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
-		'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['tz'] = '[[:Category:Terran Players|Terran]][[Category:Terran Players]],' ..
-		'&nbsp;[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['z'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]]',
-	['zt'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
-		'&nbsp;[[:Category:Terran Players|Terran]][[Category:Terran Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['zp'] = '[[:Category:Zerg Players|Zerg]][[Category:Zerg Players]],' ..
-		'&nbsp;[[:Category:Protoss Players|Protoss]][[Category:Protoss Players]]' ..
-		'[[Category:Players with multiple races]]',
-	['r'] = '[[:Category:Random Players|Random]][[Category:Random Players]]',
-	['a'] = '[[:Category:Protoss Players|Protoss]],&nbsp;' ..
-		'[[:Category:Terran Players|Terran]],&nbsp;[[:Category:Zerg Players|Zerg]]' ..
-		'[[Category:Protoss Players]][[Category:Terran Players]]' ..
-		'[[Category:Zerg Players]][[Category:Players with multiple races]]'
-}
-
---role stuff tables
-local _ROLES = {
-	['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
-	['commentator'] = 'Commentator', ['caster'] = 'Commentator',
-	['expert'] = 'Analyst', ['host'] = 'Host', ['streamer'] = 'Streamer',
-	['interviewer'] = 'Interviewer', ['journalist'] = 'Journalist',
-	['manager'] = 'Manager', ['map maker'] = 'Map maker',
-	['observer'] = 'Observer', ['photographer'] = 'Photographer',
-	['tournament organizer'] = 'Organizer', ['organizer'] = 'Organizer',
-}
-local _CLEAN_OTHER_ROLES = {
-	['blizzard'] = 'Blizzard', ['coach'] = 'Coach', ['staff'] = 'false',
-	['content producer'] = 'Content producer', ['streamer'] = 'false',
-}
+--race stuff
+local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
+local _RACE_FIELD_AS_CATEGORY_LINK = true
 
 local _earningsGlobal = {}
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _shouldQueryData
-local _raceData
-local _statusStore
-local _militaryStore
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -99,27 +45,31 @@ local CustomInjector = Class.new(Injector)
 local _args
 
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = Person(frame)
 	_args = player.args
+	PersonSc2.setArgs(_args)
 
-	player.shouldStoreData = CustomPlayer.shouldStoreData
-	player.getStatusToStore = CustomPlayer.getStatusToStore
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.getPersonType = CustomPlayer.getPersonType
+	player.shouldStoreData = PersonSc2.shouldStoreData
+	player.getStatusToStore = PersonSc2.getStatusToStore
+	player.adjustLPDB = PersonSc2.adjustLPDB
+	player.getPersonType = PersonSc2.getPersonType
+	player.nameDisplay = PersonSc2.nameDisplay
 
-	player.nameDisplay = CustomPlayer.nameDisplay
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
-	_shouldQueryData = CustomPlayer:shouldStoreData()
+	_shouldQueryData = PersonSc2.shouldStoreData()
 
 	return player:createInfobox(frame)
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
-		return { Cell{name = 'Race', content = { _raceData.display }
+		return {
+			Cell{
+				name = 'Race',
+				content = {PersonSc2.getRaceData(_args.race or 'unknown', _RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -136,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 			if not String.isEmpty(allkills) and allkills ~= '0' then
 				table.insert(achievementCells, Cell{
 						name = 'All-kills',
-						content = {_ALLKILLICON .. allkills}
+						content = {_ALL_KILL_ICON .. allkills}
 					})
 			end
 
@@ -160,7 +110,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	local rank1, rank2 = {}, {}
 	local yearsActive
-	if _shouldQueryData and not _statusStore then
+	if _shouldQueryData then
 		rank1, rank2 = CustomPlayer._getRank(_PAGENAME)
 		yearsActive = CustomPlayer._getMatchupData(_PAGENAME)
 	end
@@ -174,42 +124,17 @@ function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell{
 			name = 'Approx. Winnings ' .. _CURRENT_YEAR,
-			content = { currentYearEarnings }
+			content = {currentYearEarnings}
 		},
-		Cell{name = rank1.name or 'Rank', content = { rank1.rank }},
-		Cell{name = rank2.name or 'Rank', content = { rank2.rank }},
-		Cell{name = 'Military Service', content = { CustomPlayer._military(_args.military) }},
-		Cell{name = 'Years active', content = { yearsActive }}
+		Cell{name = rank1.name or 'Rank', content = {rank1.rank}},
+		Cell{name = rank2.name or 'Rank', content = {rank2.rank}},
+		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military)}},
+		Cell{name = 'Years active', content = {yearsActive}}
 	}
 end
 
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
-end
-
-function CustomPlayer:nameDisplay()
-	CustomPlayer._getRaceData(_args.race or 'unknown')
-	local raceIcon = RaceIcon({'alt_' .. _raceData.race})
-	local name = _args.id or self.pagename
-
-	return raceIcon .. '&nbsp;' .. name
-end
-
-function CustomPlayer._getRaceData(race)
-	race = string.lower(race)
-	race = CleanRace[race] or race
-	local display = _RACE_CATEGORY[race]
-	if not display and race ~= 'unknown' then
-		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
-			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
-	end
-
-	_raceData = {
-		race = race,
-		faction = _FACTION1[race] or '',
-		faction2 = _FACTION2[race] or '',
-		display = display
-	}
 end
 
 function CustomPlayer:createBottomContent(infobox)
@@ -218,18 +143,6 @@ function CustomPlayer:createBottomContent(infobox)
 			tostring(Matches._get_upcoming({})) ..
 			tostring(Matches._get_recent({}))
 	end
-end
-
-function CustomPlayer:shouldStoreData()
-	if
-		_args.disable_smw == 'true' or _args.disable_lpdb == 'true' or _args.disable_storage == 'true'
-		or Variables.varDefault('disable_SMW_storage', 'false') == 'true'
-		or mw.title.getCurrentTitle().nsText ~= ''
-	then
-		Variables.varDefine('disable_SMW_storage', 'true')
-		return false
-	end
-	return true
 end
 
 function CustomPlayer._getMatchupData(player)
@@ -245,7 +158,7 @@ function CustomPlayer._getMatchupData(player)
 	for _, item1 in pairs(_AVAILABLE_RACES) do
 		vs[item1] = {}
 		for _, item2 in pairs(_AVAILABLE_RACES) do
-			vs[item1][item2] = { ['win'] = 0, ['loss'] = 0 }
+			vs[item1][item2] = {['win'] = 0, ['loss'] = 0}
 		end
 	end
 
@@ -349,28 +262,6 @@ function CustomPlayer._addScoresToVS(vs, opponents, player)
 	end
 
 	return vs
-end
-
-function CustomPlayer:adjustLPDB(lpdbData, _, personType)
-	local extradata = lpdbData.extradata
-	extradata.race = _raceData.race
-	extradata.faction = _raceData.faction
-	extradata.faction2 = _raceData.faction2
-	extradata.lc_id = string.lower(self.pagename)
-	extradata.teamname = _args.team
-	extradata.role = _args.role
-	extradata.role2 = _args.role2
-	extradata.militaryservice = _militaryStore
-	extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive', '') or ''
-
-	if Variables.varDefault('racecount') then
-		extradata.racehistorical = true
-		extradata.factionhistorical = true
-	end
-
-	lpdbData.extradata = extradata
-
-	return lpdbData
 end
 
 function CustomPlayer:calculateEarnings()
@@ -515,32 +406,6 @@ function CustomPlayer._getRankDisplay(data)
 	return rank
 end
 
-function CustomPlayer._military(military)
-	if military and military ~= 'false' then
-		local display = military
-		military = string.lower(military)
-		local militaryCategory = ''
-		if String.contains(military, 'starting') or String.contains(military, 'pending') then
-			militaryCategory = '[[Category:Players waiting for Military Duty]]'
-			_militaryStore = 'pending'
-		elseif
-			String.contains(military, 'ending') or String.contains(military, 'started')
-			or String.contains(military, 'ongoing')
-		then
-			militaryCategory = '[[Category:Players on Military Duty]]'
-			_militaryStore = 'ongoing'
-		elseif String.contains(military, 'fulfilled') then
-			militaryCategory = '[[Category:Players expleted Military Duty]]'
-			_militaryStore = 'fulfilled'
-		elseif String.contains(military, 'exempted') then
-			militaryCategory = '[[Category:Players exempted from Military Duty]]'
-			_militaryStore = 'exempted'
-		end
-
-		return display .. militaryCategory
-	end
-end
-
 function CustomPlayer._getAllkills()
 	if _shouldQueryData then
 		local allkillsData = mw.ext.LiquipediaDB.lpdb('datapoint', {
@@ -552,26 +417,6 @@ function CustomPlayer._getAllkills()
 			return allkillsData[1].information
 		end
 	end
-end
-
-function CustomPlayer:getStatusToStore()
-	if _args.death_date then
-		_statusStore = 'Deceased'
-	elseif _args.retired then
-		_statusStore = 'Retired'
-	elseif string.lower(_args.role or 'player') ~= 'player' then
-		_statusStore = 'not player'
-	end
-	return _statusStore
-end
-
-function CustomPlayer:getPersonType()
-	local role = _args.role or _args.occupation or 'player'
-	role = string.lower(role)
-	local category = _ROLES[role]
-	local store = category or _CLEAN_OTHER_ROLES[role] or 'Player'
-
-	return { store = store, category = category or 'Player' }
 end
 
 return CustomPlayer
