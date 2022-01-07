@@ -219,22 +219,7 @@ function NotabilityChecker._parseTier(placement)
 		return tonumber(placement.liquipediatier), nil
 	end
 
-	-- If true, this is a wiki that uses a legacy system where extradata.liquipediatier
-	-- contains the numerical liquipediatier, and liquipediatier contains the type.
-	local isWikiThatUsesLiquipediaTier2 = placement.liquipediatier == placement.liquipediatiertype
-
-	if not isWikiThatUsesLiquipediaTier2 then
-		return tonumber(placement.liquipediatier), placement.liquipediatiertype:lower()
-	end
-
-	local liquipediaTier2 = placement.extradata['liquipediatier2']
-	if String.isEmpty(liquipediaTier2) then
-		local tournament = LuaUtils.lpdb.getSingle('tournament',
-			{ conditions = '[[pagename::' .. placement.pagename .. ']]' })
-		liquipediaTier2 = (tournament or { extradata = {} }).extradata['liquipediatier2'] or ''
-	end
-
-	return tonumber(liquipediaTier2), placement.liquipediatiertype:lower()
+	return tonumber(placement.liquipediatier), placement.liquipediatiertype:lower()
 end
 
 function NotabilityChecker._parseNotabilityMod(notabilityMod)
