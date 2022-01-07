@@ -31,7 +31,6 @@ local _RESULT_TYPE_DRAW = 'draw'
 local _EARNINGS_LIMIT_FOR_FEATURED = 10000
 local _CURRENT_YEAR = os.date('%Y')
 
-local _frame
 local globalVars = PageVariableNamespace()
 
 -- containers for process helper functions
@@ -41,7 +40,6 @@ local opponentFunctions = {}
 
 -- called from Module:MatchGroup
 function p.processMatch(frame, match)
-	_frame = frame
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -56,7 +54,6 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processMap(frame, map)
-	_frame = frame
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -67,7 +64,6 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processOpponent(frame, opponent)
-	_frame = frame
 	if not Logic.isEmpty(opponent.template) and
 		string.lower(opponent.template) == 'bye' then
 			opponent.name = 'BYE'
@@ -93,7 +89,6 @@ end
 
 -- called from Module:Match/Subobjects
 function p.processPlayer(frame, player)
-	_frame = frame
 	return player
 end
 
@@ -147,7 +142,7 @@ function matchFunctions.readDate(matchArgs)
 end
 
 function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '3v3'))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '2v2'))
 	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
 	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
 	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_ticker_name'))
@@ -220,7 +215,6 @@ function matchFunctions.isFeatured(match)
 	if
 		tonumber(match.liquipediatier or '') == 1
 		or tonumber(match.liquipediatier or '') == 2
-		or not String.isEmpty(Variables.varDefault('tournament_rlcs_premier'))
 		or not String.isEmpty(Variables.varDefault('match_featured_override'))
 	then
 		return true
@@ -456,7 +450,7 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 end
 
 function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '3v3'))
+	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '2v2'))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
 	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault('tournament_ticker_name'))
