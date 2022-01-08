@@ -169,8 +169,6 @@ function MatchLegacy.storeMatchSMW(match, match2)
 
 	local extradata = match.extradata or {}
 	extradata = Json.parseIfString(extradata)
-	for key, item in pairs(extradata) do
-	end
 
 	mw.smw.subobject(data)
 end
