@@ -75,7 +75,7 @@ function MatchLegacy._convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == 'team' then
 			match[prefix] = opponent.name
-			match[prefix..'score'] = (tonumber(opponent.score) or 0) >= 0 and opponent.score or 0
+			match[prefix.."score"] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
 			for i = 1, 10 do
 				local player = opponentmatch2players[i] or {}
@@ -87,7 +87,7 @@ function MatchLegacy._convertParameters(match2)
 		elseif opponent.type == 'solo' then
 			local player = opponentmatch2players[1] or {}
 			match[prefix] = player.name
-			match[prefix..'score'] = (tonumber(opponent.score) or 0) >= 0 and opponent.score or 0
+			match[prefix.."score"] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix..'flag'] = player.flag
 		elseif opponent.type == 'literal' then
 			match[prefix] = 'TBD'
@@ -109,13 +109,6 @@ function MatchLegacy.storeGames(match, match2)
 		local extradata = Json.parseIfString(game2.extradata)
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
-		for key, item in pairs(extradata) do
-			local teamIndex, typeIndicator, typeIndex = string.match(key, 'team(%d)(%a+)(%d)')
-			if typeIndicator and typeIndex then
-				local newKey = 't' .. teamIndex .. string.sub(typeIndicator, 1, 1) .. typeIndex
-				game.extradata[newKey] = item
-			end
-		end
 		game.extradata.team1side = extradata.team1side
 		game.extradata.team2side = extradata.team2side
 
@@ -163,7 +156,6 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has teams=' .. (match.opponent2 or ''),
 		'Has teams name=' .. (match.opponent1 or ''),
 		'Has teams name=' .. (match.opponent2 or ''),
-		'Has calendar description=- ' .. (match.opponent1 or '') .. ' vs ' .. (match.opponent2 or '') .. ' on ' .. match.date,
 	}
 
 	local streams = match.stream or {}
@@ -178,39 +170,6 @@ function MatchLegacy.storeMatchSMW(match, match2)
 	local extradata = match.extradata or {}
 	extradata = Json.parseIfString(extradata)
 	for key, item in pairs(extradata) do
-		if String.startsWith(key, 'vodgame') then
-			table.insert(
-				data,
-				'Has match ' .. key .. '=' .. item
-			)
-		end
-	end
-
-	local mvpTable = mw.text.split(extradata.mvp or '', ',')
-	local mvpTeamsTable = mw.text.split(extradata.mvpteam or '', ',')
-	if String.isNotEmpty(mvpTable[1]) then
-		for key, item in pairs(mvpTable) do
-			local mvp = mw.text.trim(item)
-			local mvpTeam = mw.text.trim(mvpTeamsTable[key] or '')
-			if Logic.isNumeric(mvpTeam) then
-				mvpTeam = match['opponent' .. mvpTeam]
-			else
-				mvpTeam = mvpTeam or ''
-			end
-			table.insert(
-				data,
-				'Has mvp ' .. key .. '=' .. mvp .. '§§§§' .. mvpTeam .. '§§§§0'
-			)
-		end
-	end
-
-	if match.dateexact then
-		--shift date about 1 hour
-		local calendarEndDate = string.gsub(match.date, '+00:00', '-01:00')
-		table.insert(
-			data,
-			'Has calendar end date=' .. calendarEndDate
-		)
 	end
 
 	mw.smw.subobject(data)
