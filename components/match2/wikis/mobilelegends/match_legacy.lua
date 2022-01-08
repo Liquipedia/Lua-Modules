@@ -166,5 +166,5 @@ function MatchLegacy.storeMatchSMW(match, match2)
 			'Has match ' .. key .. '=' .. item
 		)
 	end
-
+end
 return MatchLegacy
