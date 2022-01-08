@@ -14,6 +14,8 @@ local String = require('Module:StringUtils')
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+
 local Break = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-break')
