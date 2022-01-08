@@ -9,13 +9,14 @@
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapModes = require('Module:MapModes')
-local OpponentDisplay = require('Module:OpponentDisplay')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+
+local _EPOCH_TIME = '1970-01-01 00:00:00'
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local htmlCreate = mw.html.create
 
