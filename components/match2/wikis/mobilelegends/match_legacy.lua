@@ -166,7 +166,6 @@ function MatchLegacy.storeMatchSMW(match, match2)
 			'Has match ' .. key .. '=' .. item
 		)
 	end
-	
 	mw.smw.subobject(data)
 end
 
