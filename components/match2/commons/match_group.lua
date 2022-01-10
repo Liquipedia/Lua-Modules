@@ -178,7 +178,7 @@ end
 
 -- Deprecated
 function MatchGroup.luaBracket(_, args)
-	return tostring(MatchGroup.MatchGroupById(args)) .. MatchGroup.deprecatedCategory
+	return MatchGroup.TemplateBracket(args) .. MatchGroup.deprecatedCategory
 end
 
 -- Entry point used by Template:Matchlist
@@ -189,7 +189,7 @@ end
 
 -- Deprecated
 function MatchGroup.luaMatchlist(_, args)
-	return tostring(MatchGroup.MatchGroupById(args)) .. MatchGroup.deprecatedCategory
+	return MatchGroup.TemplateMatchlist(args) .. MatchGroup.deprecatedCategory
 end
 
 -- Entry point from Template:ShowBracket and direct #invoke
