@@ -11,12 +11,6 @@ local Table = require('Module:Table')
 
 local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
 
-function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
-		or Lua.import('Module:MatchGroup/Display/Bracket/Custom', {requireDevIfEnabled = true}).BracketContainer
-end
-
 WikiSpecific.defaultIcon = 'Sideswipe allmode.png'
 
 return WikiSpecific
