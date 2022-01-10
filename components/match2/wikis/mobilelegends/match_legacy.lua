@@ -14,6 +14,11 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local _GAME_EXTRADATA_CONVERTER = {
+	ban = 'b',
+	champion = 'h',
+}
+
 function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 
@@ -112,6 +117,15 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.team1side = extradata.team1side
 		game.extradata.team2side = extradata.team2side
 
+		local parameterType, teamIndex, parameterIndex
+		for key, item in pairs(extradata) do
+			teamIndex, parameterType, parameterIndex = string.match(key, 'team(%d)(%a+)(%d)')
+			parameterType = _GAME_EXTRADATA_CONVERTER[parameterType or '']
+			if parameterType then
+				game.extradata['t' .. teamIndex .. parameterType .. parameterIndex] = item
+			end
+		end
+
 		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
 
 		-- Other stuff
@@ -124,7 +138,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1score = winner == 1 and 1 or 0
 		game.opponent2score = winner == 2 and 1 or 0
 		local res = mw.ext.LiquipediaDB.lpdb_game(
-			'legacygame_' .. match2.match2id .. gameIndex,
+			'legacygame_' .. match2.match2id .. '_' .. gameIndex,
 			game
 		)
 		games = games .. res
