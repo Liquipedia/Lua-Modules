@@ -49,6 +49,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		bracketData.next = args['M' .. (matchIndex + 1)] and nextMatchId or nil
 		bracketData.title = matchIndex == 1 and args.title or nil
 		bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
+		bracketData.matchIndex = matchIndex
 
 		match.parent = context.tournamentParent
 		bracketData.bracketindex = context.bracketIndex
