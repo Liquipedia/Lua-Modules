@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchGroup/Display
+-- page=Module:MatchGroup/Core
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -20,12 +20,16 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
-local MatchGroupDisplay = {}
+--[[
+	The core module behind every type of MatchGroup. A MatchGroup is a collection of matches, such as a bracket or
+	a matchlist.
+]]
+local Core = {}
 
 --[[
 Reads a matchlist input spec, saves it to LPDB, and displays the matchlist.
 ]]
-function MatchGroupDisplay.MatchlistBySpec(args)
+function Core.MatchlistBySpec(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
 	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
 	Match.storeMatchGroup(matches, options)
@@ -50,7 +54,7 @@ end
 --[[
 Reads a bracket input spec, saves it to LPDB, and displays the bracket.
 ]]
-function MatchGroupDisplay.BracketBySpec(args)
+function Core.BracketBySpec(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
 	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, options)
 	Match.storeMatchGroup(matches, options)
@@ -76,7 +80,7 @@ end
 --[[
 Displays a matchlist or bracket specified by ID.
 ]]
-function MatchGroupDisplay.MatchGroupById(args)
+function Core.MatchGroupById(args)
 	local bracketId = args.id or args[1]
 	args.id = bracketId
 	args[1] = bracketId
@@ -107,7 +111,7 @@ end
 --[[
 Displays a singleMatch specified by a bracket ID and matchID.
 ]]
-function MatchGroupDisplay.MatchByMatchId(args)
+function Core.MatchByMatchId(args)
 	local bracketId = args.id
 	local matchId = args.matchid
 	assert(bracketId, 'Missing bracket ID')
@@ -133,73 +137,73 @@ end
 
 
 -- Entry point of Template:Matchlist
-function MatchGroupDisplay.TemplateMatchlist(frame)
+function Core.TemplateMatchlist(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchGroupDisplay.MatchlistBySpec(args)
+	return Core.MatchlistBySpec(args)
 end
 
 -- Entry point of Template:Bracket
-function MatchGroupDisplay.TemplateBracket(frame)
+function Core.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchGroupDisplay.BracketBySpec(args)
+	return Core.BracketBySpec(args)
 end
 
 -- Entry point of Template:ShowSingleMatch
-function MatchGroupDisplay.TemplateShowSingleMatch(frame)
+function Core.TemplateShowSingleMatch(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchGroupDisplay.MatchByMatchId(args)
+	return Core.MatchByMatchId(args)
 end
 
 -- Entry point of Template:ShowBracket, Template:DisplayMatchGroup
-function MatchGroupDisplay.TemplateShowBracket(frame)
+function Core.TemplateShowBracket(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchGroupDisplay.MatchGroupById(args)
+	return Core.MatchGroupById(args)
 end
 
 if FeatureFlag.get('perf') then
-	MatchGroupDisplay.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'perf'})
-	require('Module:Performance/Util').setupEntryPoints(MatchGroupDisplay)
+	Core.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'perf'})
+	require('Module:Performance/Util').setupEntryPoints(Core)
 end
 
-Lua.autoInvokeEntryPoints(MatchGroupDisplay, 'Module:MatchGroup/Display')
+Lua.autoInvokeEntryPoints(Core, 'Module:MatchGroup/Display')
 
 
-MatchGroupDisplay.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
+Core.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
 
 -- Unused entry point
 -- Deprecated
-function MatchGroupDisplay.bracket(frame)
-	return MatchGroupDisplay.TemplateBracket(frame) .. MatchGroupDisplay.deprecatedCategory
+function Core.bracket(frame)
+	return Core.TemplateBracket(frame) .. Core.deprecatedCategory
 end
 
 -- Deprecated
-function MatchGroupDisplay.luaBracket(_, args)
-	return tostring(MatchGroupDisplay.MatchGroupById(args)) .. MatchGroupDisplay.deprecatedCategory
+function Core.luaBracket(_, args)
+	return tostring(Core.MatchGroupById(args)) .. Core.deprecatedCategory
 end
 
 -- Unused entry point
 -- Deprecated
-function MatchGroupDisplay.matchlist(frame)
-	return MatchGroupDisplay.TemplateMatchlist(frame) .. MatchGroupDisplay.deprecatedCategory
+function Core.matchlist(frame)
+	return Core.TemplateMatchlist(frame) .. Core.deprecatedCategory
 end
 
 -- Deprecated
-function MatchGroupDisplay.luaMatchlist(_, args)
-	return tostring(MatchGroupDisplay.MatchGroupById(args)) .. MatchGroupDisplay.deprecatedCategory
+function Core.luaMatchlist(_, args)
+	return tostring(Core.MatchGroupById(args)) .. Core.deprecatedCategory
 end
 
 -- Entry point from Template:ShowBracket and direct #invoke
 -- Deprecated
-function MatchGroupDisplay.Display(frame)
-	return tostring(MatchGroupDisplay.TemplateShowBracket(frame)) .. MatchGroupDisplay.deprecatedCategory
+function Core.Display(frame)
+	return tostring(Core.TemplateShowBracket(frame)) .. Core.deprecatedCategory
 end
 
 -- Entry point from direct #invoke
 -- Deprecated
-function MatchGroupDisplay.DisplayDev(frame)
+function Core.DisplayDev(frame)
 	local args = Arguments.getArgs(frame)
 	args.dev = true
-	return tostring(MatchGroupDisplay.TemplateShowBracket(args)) .. MatchGroupDisplay.deprecatedCategory
+	return tostring(Core.TemplateShowBracket(args)) .. Core.deprecatedCategory
 end
 
-return MatchGroupDisplay
+return Core
