@@ -70,7 +70,7 @@ details.
 To customize matchlists and brackets for a wiki, override this to return
 a display component with the wiki-specific customizations.
 
-Called from MatchGroup/Display
+Called from MatchGroup
 
 -- @returns module
 ]]
@@ -88,7 +88,7 @@ See the default implementation (pointed to below) for details.
 To customize single match display for a wiki, override this to return
 a display component with the wiki-specific customizations.
 
-Called from MatchGroup/Display
+Called from MatchGroup
 
 -- @returns module
 ]]

@@ -165,7 +165,7 @@ if FeatureFlag.get('perf') then
 	require('Module:Performance/Util').setupEntryPoints(MatchGroup)
 end
 
-Lua.autoInvokeEntryPoints(MatchGroup, 'Module:MatchGroup/Display')
+Lua.autoInvokeEntryPoints(MatchGroup, 'Module:MatchGroup')
 
 
 MatchGroup.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
