@@ -119,7 +119,7 @@ function MatchLegacy.storeGames(match, match2)
 
 		local parameterType, teamIndex, parameterIndex
 		for key, item in pairs(extradata) do
-			_, teamIndex, parameterType, parameterIndex = string.match(key, '(team)(%d)(%a+)(%d)')
+			teamIndex, parameterType, parameterIndex = string.match(key, 'team(%d)(%a+)(%d)')
 			parameterType = _GAME_EXTRADATA_CONVERTER[parameterType or '']
 			if parameterType then
 				game.extradata['t' .. teamIndex .. parameterType .. parameterIndex] = item
