@@ -70,6 +70,8 @@ function AutomaticPointsTable:parseTeams(args)
 	return teams
 end
 
+--- Parses the team aliases, used in cases where a team is picked up by an org or changed name in some
+--- of the tournaments, in which case aliases are required to correctly query the team's results & points
 function AutomaticPointsTable:parseAliases(team)
 	local aliases = {}
 	for argKey, argVal in pairs(team) do
@@ -83,9 +85,12 @@ function AutomaticPointsTable:parseAliases(team)
 	return aliases
 end
 
+--- Parses the teams' deductions, used in cases where a team has disbanded or made a roster change
+--- that causes them to lose a portion or all of their points that they've accumulated up until that change
 function AutomaticPointsTable:parseDeductions(team)
 	local deductions = {}
-	for argKey, argVal in pairs(team) do
+	for key, value in pairs(team) do
+
 		if type(argKey) == 'string' then
 			if string.find(argKey, 'deduction%d+note') then
 				local deductionIndex = tonumber(string.match(argKey, '%d+'))
@@ -113,7 +118,8 @@ end
 
 function AutomaticPointsTable:parseManualPoints(team)
 	local manualPoints = {}
-	for argKey, argVal in pairs(team) do
+	for key, value in pairs(team) do
+
 		if type(argKey) == 'string' and string.find(argKey, 'points%d+') then
 			local pointsIndex = tonumber(String.split(argKey, 'points')[1])
 			local points = tonumber(argVal)
