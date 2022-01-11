@@ -63,15 +63,9 @@ function p.processMap(frame, map)
 end
 
 -- called from Module:Match/Subobjects
-function p.processOpponent(frame, opponent)
-	if not Logic.isEmpty(opponent.template) and
-		string.lower(opponent.template) == 'bye' then
-			opponent.name = 'BYE'
-			opponent.type = 'literal'
-	end
-
-	return opponent
-end
+function p.processOpponent(record, date)
+	local opponent = Opponent.readOpponentArgs(record)
+		or Opponent.blank()
 
 -- called from Module:Match/Subobjects
 function p.processPlayer(frame, player)
