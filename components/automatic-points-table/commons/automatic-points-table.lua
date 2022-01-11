@@ -119,8 +119,8 @@ end
 function AutomaticPointsTable:parseManualPoints(team)
 	local manualPoints = {}
 	for key, value in pairs(team) do
-
 		if type(key) == 'string' and string.find(key, 'points%d+') then
+
 			local pointsIndex = tonumber(String.split(key, 'points')[1])
 			local points = tonumber(value)
 
