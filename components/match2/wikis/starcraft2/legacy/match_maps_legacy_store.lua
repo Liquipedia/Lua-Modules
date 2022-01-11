@@ -50,9 +50,6 @@ end
 
 function MatchMapsLegacyStore.close()
 	local bracketId = matchlistVars:get('bracketid')
-	if not bracketId then
-		return '</table>'
-	end
 
 	local matches = Template.retrieveReturnValues('LegacyMatchlist')
 
