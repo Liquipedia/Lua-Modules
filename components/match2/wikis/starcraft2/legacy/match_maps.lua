@@ -68,19 +68,21 @@ function MatchMaps.run(args)
 	MatchMaps._setPlayerVars()
 	globalVars:set('bestof', args.bestof or globalVars:get('bestof') or '')
 
-	local rawMatchDate = globalVars:get('Raw_Match_date') or globalVars:get('Raw_Group_date') or 'TBD'
 	local matchDate = globalVars:get('Match_date') or globalVars:get('Group_date') or ''
 	local timeZone = globalVars:get('timezone') or ''
 
-	local dateHeader, matchDate, timeZone = MatchMaps._dateHeader(matchDate, timeZone)
+	local dateHeader
+	dateHeader, matchDate, timeZone = MatchMaps._dateHeader(matchDate, timeZone)
 
-	MatchMaps._dateHandling(matchDate)
+	matchDate = MatchMaps._dateHandling(matchDate)
+
+	local matchRow, scores = MatchMaps._matchRow()
 
 	local output = mw.html.create()
 		:node(MatchMaps._title(args.title))
 		:node(dateHeader)
-		:node(MatchMaps._matchRow())
-		:node(MatchMaps._maps())
+		:node(matchRow)
+		:node(MatchMaps._maps(scores))
 		:node(MatchMaps._links())
 		:node(MatchMaps._comment())
 
@@ -99,9 +101,6 @@ function MatchMaps._setPlayerVars()
 	local args = _args
 	local player1Id = MatchMaps._cleanPlayerInput(args.player1 or 'TBD')
 	local player2Id = MatchMaps._cleanPlayerInput(args.player2 or 'TBD')
-
-	local player1Page = MatchMaps._getPlayerPage(args.player1link, player1Id)
-	local player2Page = MatchMaps._getPlayerPage(args.player2link, player2Id)
 
 	local player1Race = args.player1race or globalVars:get(player1Id .. '_race') or 'TBD'
 	args.player1Race = player1Race
@@ -127,20 +126,6 @@ function MatchMaps._cleanPlayerInput(player)
 	return player
 end
 
-function MatchMaps._getPlayerPage(playerLink, player)
-	local playerPage = mw.ext.TeamLiquidIntegration.resolve_redirect(
-		playerLink or
-		globalVars:get(player .. '_page') or
-		player or 'TBD'
-	)
-
-	if playerPage == 'Definitions' then
-		playerPage = 'TBD'
-	end
-
-	return playerPage
-end
-
 function MatchMaps._title(title)
 	if String.isEmpty(title) then
 		return nil
@@ -163,7 +148,7 @@ function MatchMaps._dateHeader(matchDate, timeZone)
 		return nil, matchDate, timeZone
 	end
 
-	rawMatchDate = args.date:gsub('<.*', '')
+	local rawMatchDate = args.date:gsub('<.*', '')
 	matchDate = rawMatchDate:gsub('- ', '')
 	timeZone = args.date:match('data%-tz="([+-].-)"') or ''
 	-- Storing date info via #vardefine for the following matches
@@ -195,6 +180,8 @@ function MatchMaps._dateHandling(matchDate)
 			globalVars:set('Match_date', matchDatePlus1Second)
 		end
 	end
+
+	return matchDate
 end
 
 function MatchMaps._matchRow()
@@ -233,12 +220,14 @@ function MatchMaps._matchRow()
 		popup:wikitext(args.details)
 	end
 
-	return mw.html.create('tr')
+	local matchRow = mw.html.create('tr')
 		:addClass('match-row')
 		:node(playerLeftNode)
 		:node(scoreLeftNode)
 		:node(scoreRightNode)
 		:node(playerRightNode)
+
+	return matchRow, scores
 end
 
 function MatchMaps._playerNode(playerIndex, isDraw)
@@ -285,7 +274,7 @@ function MatchMaps._scoreNode(score, isBold)
 	return scoreNode
 end
 
-function MatchMaps._maps()
+function MatchMaps._maps(scores)
 local args = _args
 
 	local maps = {}
@@ -330,8 +319,8 @@ local args = _args
 			:node(mapsDisplay)
 
 	elseif String.isEmpty(args.walkover) then
-		globalVars:set('player1wins', score1)
-		globalVars:set('player2wins', score2)
+		globalVars:set('player1wins', scores[1])
+		globalVars:set('player2wins', scores[2])
 	end
 end
 
@@ -342,9 +331,9 @@ function MatchMaps._links()
 		if String.isNotEmpty(args[linkParam]) then
 			table.insert(
 				links,
-				'[[File:' .. linkData.file .. 
-					'|link=' .. args[linkParam] .. 
-					'|alt=' .. linkParam .. '|15px|' .. 
+				'[[File:' .. linkData.file ..
+					'|link=' .. args[linkParam] ..
+					'|alt=' .. linkParam .. '|15px|' ..
 					linkData.text .. ']]'
 			)
 		end
@@ -361,7 +350,7 @@ function MatchMaps._links()
 		if String.isNotEmpty(args['vodgame' .. vodIndex]) then
 			table.insert(
 				links,
-				Vodlink._main{amenum = i, vod = args['vodgame' .. vodIndex], source = 'url'}
+				Vodlink._main{amenum = vodIndex, vod = args['vodgame' .. vodIndex], source = 'url'}
 			)
 		end
 	end
@@ -414,7 +403,10 @@ function MatchMaps._prepareToStore(matchDate, timeZone)
 
 	-- maps
 	for gameIndex = 1, _GAME_NUMBER_MAX do
-		if String.isNotEmpty(storageArgs['map' .. gameIndex]) or String.isNotEmpty(storageArgs['map' .. gameIndex .. 'win']) then
+		if
+			String.isNotEmpty(storageArgs['map' .. gameIndex]) or
+			String.isNotEmpty(storageArgs['map' .. gameIndex .. 'win'])
+		then
 			local temp = storageArgs['map' .. gameIndex]
 			storageArgs['map' .. gameIndex] = {
 				map = temp or 'unknown',
@@ -434,7 +426,7 @@ function MatchMaps._prepareToStore(matchDate, timeZone)
 	storageArgs.date = mw.getContentLanguage():formatDate('c', matchDate .. timeZone)
 
 	-- call match2 processing
-	storageArgs = WikiSpecific.processMatch(_, storageArgs)
+	storageArgs = WikiSpecific.processMatch(nil, storageArgs)
 	Template.stashReturnValue(storageArgs, 'LegacyMatchlist')
 end
 
