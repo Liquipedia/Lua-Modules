@@ -49,7 +49,7 @@ function Legacy.get(frame)
 	newArgs.id = bracketid
 	newArgs[1] = templateid
 
-	return MatchGroup.luaBracket(frame, newArgs)
+	return MatchGroup.TemplateBracket(newArgs)
 end
 
 function Legacy.getTemplate(frame)
