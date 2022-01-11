@@ -74,11 +74,11 @@ end
 --- of the tournaments, in which case aliases are required to correctly query the team's results & points
 function AutomaticPointsTable:parseAliases(team)
 	local aliases = {}
-	for argKey, argVal in pairs(team) do
-		if type(argKey) == 'string' and string.find(argKey, 'alias%d+') then
-			local aliasIndexString = String.split(argKey, 'alias')[1]
+	for key, value in pairs(team) do
+		if type(key) == 'string' and string.find(key, 'alias%d+') then
+			local aliasIndexString = String.split(key, 'alias')[1]
 			local aliasIndex = tonumber(aliasIndexString)
-			local aliasName = argVal
+			local aliasName = value
 			aliases[aliasIndex] = aliasName
 		end
 	end
@@ -91,19 +91,19 @@ function AutomaticPointsTable:parseDeductions(team)
 	local deductions = {}
 	for key, value in pairs(team) do
 
-		if type(argKey) == 'string' then
-			if string.find(argKey, 'deduction%d+note') then
-				local deductionIndex = tonumber(string.match(argKey, '%d+'))
-				local deductionNote = argVal
+		if type(key) == 'string' then
+			if string.find(key, 'deduction%d+note') then
+				local deductionIndex = tonumber(string.match(key, '%d+'))
+				local deductionNote = value
 
 				if not deductions[deductionIndex] then
 					deductions[deductionIndex] = {}
 				end
 
 				deductions[deductionIndex].note = deductionNote
-			elseif string.find(argKey, 'deduction%d+') then
-				local deductionIndex = tonumber(String.split(argKey, 'deduction')[1])
-				local deductionAmount = argVal
+			elseif string.find(key, 'deduction%d+') then
+				local deductionIndex = tonumber(String.split(key, 'deduction')[1])
+				local deductionAmount = value
 
 				if not deductions[deductionIndex] then
 					deductions[deductionIndex] = {}
@@ -120,9 +120,9 @@ function AutomaticPointsTable:parseManualPoints(team)
 	local manualPoints = {}
 	for key, value in pairs(team) do
 
-		if type(argKey) == 'string' and string.find(argKey, 'points%d+') then
-			local pointsIndex = tonumber(String.split(argKey, 'points')[1])
-			local points = tonumber(argVal)
+		if type(key) == 'string' and string.find(key, 'points%d+') then
+			local pointsIndex = tonumber(String.split(key, 'points')[1])
+			local points = tonumber(value)
 
 			manualPoints[pointsIndex] = points
 		end
