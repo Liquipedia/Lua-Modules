@@ -66,6 +66,7 @@ end
 function p.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
+end
 
 -- called from Module:Match/Subobjects
 function p.processPlayer(frame, player)
