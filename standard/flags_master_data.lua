@@ -1467,6 +1467,26 @@ local data = {
 		localised = 'non-country representing',
 		name = 'Non-representing',
 	},
+	['englishspeaking'] = {
+		name = 'English Speaking',
+		flag = 'File:UsGb hd.png'
+	},
+	['germanspeaking'] = {
+		name = 'German Speaking',
+		flag = 'File:DeAt hd.png'
+	},
+	['spanishspeaking'] = {
+		name = 'Spanish Speaking',
+		flag = 'File:EsMx hd.png'
+	},
+	['portuguesespeaking'] = {
+		name = 'Portuguese Speaking',
+		flag = 'File:PtBr hd.png'
+	},
+	['russianspeaking'] = {
+		name = 'Russian Speaking',
+		flag = 'File:RuBy hd.png'
+	},
 	['filler'] = {
 		flag = 'File:Space filler flag.png',
 		localised = '',
@@ -2154,6 +2174,30 @@ local iso31662 = {
 	['scotland'] = 'unitedkingdom',
 	['england'] = 'unitedkingdom',
 	['northernireland'] = 'unitedkingdom',
+}
+
+-- This table includes
+-- ISO 639-1 (language iso) values
+-- for languages that have a special flag
+local languageTwoLetter = {
+	--language flag abbreviations
+	['en'] = 'englishspeaking',
+	['de'] = 'germanspeaking',
+	['es'] = 'spanishspeaking',
+	['pt'] = 'portuguesespeaking',
+	['ru'] = 'russianspeaking',
+}
+
+-- This table includes
+-- ISO 639-2/T (language iso) values
+-- for languages that have a special flag
+local languageThreeLetter = {
+	--language flag abbreviations
+	['eng'] = 'englishspeaking',
+	['deu'] = 'germanspeaking',
+	['spa'] = 'spanishspeaking',
+	['por'] = 'portuguesespeaking',
+	['rus'] = 'russianspeaking',
 }
 
 return {
