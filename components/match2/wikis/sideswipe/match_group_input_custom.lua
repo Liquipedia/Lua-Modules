@@ -66,6 +66,14 @@ end
 function p.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
+
+	-- Convert byes to literals
+	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+		opponent = {type = Opponent.literal, name = 'BYE'}
+	end
+
+	Opponent.resolve(opponent, date)
+	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 -- called from Module:Match/Subobjects
