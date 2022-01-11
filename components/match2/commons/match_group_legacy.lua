@@ -75,7 +75,7 @@ function Legacy.get(frame)
 	newArgs.noDuplicateCheck = _args.noDuplicateCheck
 	newArgs.isLegacy = true
 
-	return MatchGroup.luaBracket(frame, newArgs)
+	return MatchGroup.TemplateBracket(newArgs)
 end
 
 function Legacy.getTemplate(frame)
