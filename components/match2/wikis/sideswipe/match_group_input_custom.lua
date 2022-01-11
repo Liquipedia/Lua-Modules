@@ -184,8 +184,8 @@ function matchFunctions.isFeatured(match)
 
 	if matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED or
 	   matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
-		
 		return true
+	end
 	return false
 end
 
