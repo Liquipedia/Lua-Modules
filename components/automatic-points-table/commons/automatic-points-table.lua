@@ -32,7 +32,7 @@ end
 function AutomaticPointsTable:parseInput(args)
 	local pbg = self:parsePositionBackgroundData(args)
 	local tournaments = self:parseTournaments(args)
-	local teams = self:parseTeams(args)
+	local teams = self:parseTeams(args, #tournaments)
 	return {
 		pbg = pbg,
 		tournaments = tournaments,
@@ -58,13 +58,13 @@ function AutomaticPointsTable:parseTournaments(args)
 	return tournaments
 end
 
-function AutomaticPointsTable:parseTeams(args)
+function AutomaticPointsTable:parseTeams(args, tournamentCount)
 	local teams = {}
 	for _, team in Table.iter.pairsByPrefix(args, 'team') do
 		local parsedTeam = Json.parse(team)
-		parsedTeam.aliases = self:parseAliases(parsedTeam)
-		parsedTeam.deductions = self:parseDeductions(parsedTeam)
-		parsedTeam.manualPoints = self:parseManualPoints(parsedTeam)
+		parsedTeam.aliases = self:parseAliases(parsedTeam, tournamentCount)
+		parsedTeam.deductions = self:parseDeductions(parsedTeam, tournamentCount)
+		parsedTeam.manualPoints = self:parseManualPoints(parsedTeam, tournamentCount)
 		table.insert(teams, parsedTeam)
 	end
 	return teams
@@ -72,14 +72,11 @@ end
 
 --- Parses the team aliases, used in cases where a team is picked up by an org or changed name in some
 --- of the tournaments, in which case aliases are required to correctly query the team's results & points
-function AutomaticPointsTable:parseAliases(team)
+function AutomaticPointsTable:parseAliases(team, tournamentCount)
 	local aliases = {}
-	for key, value in pairs(team) do
-		if type(key) == 'string' and string.find(key, 'alias%d+') then
-			local aliasIndexString = String.split(key, 'alias')[1]
-			local aliasIndex = tonumber(aliasIndexString)
-			local aliasName = value
-			aliases[aliasIndex] = aliasName
+	for index = 1, tournamentCount do
+		if String.isNotEmpty(team['alias' .. index]) then
+			aliases[index] = team['alias' .. index]
 		end
 	end
 	return aliases
@@ -87,44 +84,30 @@ end
 
 --- Parses the teams' deductions, used in cases where a team has disbanded or made a roster change
 --- that causes them to lose a portion or all of their points that they've accumulated up until that change
-function AutomaticPointsTable:parseDeductions(team)
+function AutomaticPointsTable:parseDeductions(team, tournamentCount)
 	local deductions = {}
-	for key, value in pairs(team) do
-
-		if type(key) == 'string' then
-			if string.find(key, 'deduction%d+note') then
-				local deductionIndex = tonumber(string.match(key, '%d+'))
-				local deductionNote = value
-
-				if not deductions[deductionIndex] then
-					deductions[deductionIndex] = {}
-				end
-
-				deductions[deductionIndex].note = deductionNote
-			elseif string.find(key, 'deduction%d+') then
-				local deductionIndex = tonumber(String.split(key, 'deduction')[1])
-				local deductionAmount = value
-
-				if not deductions[deductionIndex] then
-					deductions[deductionIndex] = {}
-				end
-
-				deductions[deductionIndex].amount = tonumber(deductionAmount)
+	for index = 1, tournamentCount do
+		if String.isNotEmpty(team['deduction' .. index .. 'note']) then
+			if not deductions[index] then
+				deductions[index] = {}
 			end
+			deductions[index].note = team['deduction' .. index .. 'note']
+		end
+		if String.isNotEmpty(team['deduction' .. index]) then
+			if not deductions[index] then
+				deductions[index] = {}
+			end
+			deductions[index].amount = tonumber(team['deduction' .. index])
 		end
 	end
 	return deductions
 end
 
-function AutomaticPointsTable:parseManualPoints(team)
+function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
 	local manualPoints = {}
-	for key, value in pairs(team) do
-		if type(key) == 'string' and string.find(key, 'points%d+') then
-
-			local pointsIndex = tonumber(String.split(key, 'points')[1])
-			local points = tonumber(value)
-
-			manualPoints[pointsIndex] = points
+	for index = 1, tournamentCount do
+		if String.isNotEmpty(team['points' .. index]) then
+			manualPoints[index] = tonumber(team['points' .. index])
 		end
 	end
 	return manualPoints
