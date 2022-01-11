@@ -188,13 +188,16 @@ function MatchMaps._matchRow()
 	local args = _args
 
 	-- determine scores
-	local scores = _WALKOVER_TO_SCORE[args.walkover or ''] or {0, 0}
-	if args.p1score and args.p2score then
-		scores = {args.p1score, args.p2score}
-	else
-		for gameIndex = 1, _GAME_NUMBER_MAX do
-			scores[1] = scores[1] + (args['map' .. gameIndex .. 'win'] == '1' and 1 or 0)
-			scores[2] = scores[2] + (args['map' .. gameIndex .. 'win'] == '2' and 1 or 0)
+	local scores = _WALKOVER_TO_SCORE[args.walkover or '']
+	if not scores then
+		if args.p1score and args.p2score then
+			scores = {args.p1score, args.p2score}
+		else
+			scores = {0, 0}
+			for gameIndex = 1, _GAME_NUMBER_MAX do
+				scores[1] = scores[1] + (args['map' .. gameIndex .. 'win'] == '1' and 1 or 0)
+				scores[2] = scores[2] + (args['map' .. gameIndex .. 'win'] == '2' and 1 or 0)
+			end
 		end
 	end
 
