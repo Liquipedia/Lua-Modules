@@ -11,6 +11,7 @@ local p = require('Module:Brkts/WikiSpecific/Base')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -216,18 +217,15 @@ function matchFunctions.getOpponents(args)
 	local isScoreSet = false
 	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
 		-- read opponent
-		local opponent = Json.parseIfString(args['opponent' .. opponentIndex])
+		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			--retrieve name and icon for teams from team templates
-			if opponent.type == 'team' and
-				not Logic.isEmpty(opponent.template, args.date) then
-					local name, icon, template = opponentFunctions.getTeamNameAndIcon(opponent.template, args.date)
-					opponent.template = template
-					opponent.name = mw.ext.TeamLiquidIntegration.resolve_redirect(
-						opponent.name or name or
-						opponentFunctions.getTeamName(opponent.template)
-						or '')
-					opponent.icon = opponent.icon or icon or opponentFunctions.getIconName(opponent.template)
+			p.processOpponent(opponent, args.date)
+
+			-- Retrieve icon and legacy name for team
+			if opponent.type == Opponent.team then
+				opponent.icon = opponentFunctions.getTeamIcon(opponent.template)
+					or opponentFunctions.getLegacyTeamIcon(opponent.template)
+				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
 			end
 
 			-- apply status
@@ -453,22 +451,9 @@ end
 --
 -- opponent related functions
 --
-function opponentFunctions.getTeamNameAndIcon(template, date)
-	local icon, team
-	template = string.lower(template or ''):gsub('_', ' ')
-	if template ~= '' and template ~= 'noteam' and
-		mw.ext.TeamTemplate.teamexists(template) then
-
-		local templateData = mw.ext.TeamTemplate.raw(template, date)
-		icon = templateData.image
-		if icon == '' then
-			icon = templateData.legacyimage
-		end
-		team = templateData.page
-		template = templateData.templatename or template
-	end
-
-	return team, icon, template
+function opponentFunctions.getTeamIcon(template)
+	local raw = mw.ext.TeamTemplate.raw(template)
+	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
 end
 
 return p
