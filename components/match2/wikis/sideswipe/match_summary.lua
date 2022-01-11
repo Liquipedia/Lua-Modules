@@ -159,12 +159,6 @@ function CustomMatchSummary.getByMatchId(args)
 		:addClass('brkts-popup-footer')
 	local footerSpacer = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-	if not Logic.isEmpty(match.extradata.octane) then
-		footerSet = true
-		footerSpacer:node('[[File:Octane_gg.png|14x14px|link=http://octane.gg/matches/' ..
-			match.extradata.octane ..
-			'|Octane matchpage]]')
-	end
 	for index, vod in pairs(vods) do
 		footerSet = true
 		footerSpacer:node(VodLink.display{
