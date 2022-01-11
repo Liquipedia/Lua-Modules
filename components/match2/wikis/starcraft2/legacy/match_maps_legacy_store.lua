@@ -86,11 +86,7 @@ function MatchMapsLegacyStore.close()
 	matchlistVars:delete('bracketid')
 	matchlistVars:delete('matchListTitle')
 
-	local parts = Array.extend(
-		'</table>',
-		Array.map(warnings, WarningBox.display)
-	)
-	return table.concat(Array.map(parts, tostring))
+	return table.concat(Array.map(Array.map(warnings, WarningBox.display), tostring))
 end
 
 return MatchMapsLegacyStore
