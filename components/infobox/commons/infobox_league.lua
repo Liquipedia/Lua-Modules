@@ -43,7 +43,7 @@ end
 function League:createInfobox()
 	local args = self.args
 	local frame = mw.getCurrentFrame()
-	self.args.abbreviation = self:_fetchAbbreviation()
+	args.abbreviation = self:_fetchAbbreviation()
 	local links
 
 	-- set Variables here already so they are available in functions
