@@ -456,7 +456,7 @@ function League:_getPageNameFromChronology(item)
 end
 
 
--- Given a series query its abbreviation if abbreviation is not set manually
+-- Given a series, query its abbreviation if abbreviation is not set manually
 function League:_fetchAbbreviation()
 	if not String.isEmpty(self.args.abbreviation) then
 		return self.args.abbreviation
