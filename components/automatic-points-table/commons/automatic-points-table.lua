@@ -87,19 +87,18 @@ end
 function AutomaticPointsTable:parseDeductions(team, tournamentCount)
 	local deductions = {}
 	for index = 1, tournamentCount do
-		if String.isNotEmpty(team['deduction' .. index .. 'note']) then
-			if not deductions[index] then
-				deductions[index] = {}
-			end
-			deductions[index].note = team['deduction' .. index .. 'note']
-		end
 		if String.isNotEmpty(team['deduction' .. index]) then
 			if not deductions[index] then
 				deductions[index] = {}
 			end
 			deductions[index].amount = tonumber(team['deduction' .. index])
+
+			if String.isNotEmpty(team['deduction' .. index .. 'note']) then
+				deductions[index].note = team['deduction' .. index .. 'note']
+			end
 		end
 	end
+
 	return deductions
 end
 
