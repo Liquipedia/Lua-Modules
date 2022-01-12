@@ -1,4 +1,4 @@
-name: Deploy
+name: Dev Wiki Deploy
 
 on:
   workflow_dispatch:
@@ -18,4 +18,5 @@ jobs:
           DEV_WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
           DEV_WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
           DEV_WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
+          DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
         run: bash deploy_dev.sh

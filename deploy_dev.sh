@@ -51,6 +51,7 @@ do
           -d "format=json&action=query&meta=tokens&type=login" \
           -H "User-Agent: ${userAgent}" \
           -H 'Accept-Encoding: gzip' \
+          -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
           -X POST "$wikiApiUrl" \
           | gunzip \
           | jq ".query.tokens.logintoken" -r
@@ -65,7 +66,7 @@ do
         --data-urlencode "loginreturnurl=http://darkrai.wiki.tldev.eu" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}"
+        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "${wikiApiUrl}?format=json&action=clientlogin" \
         | gunzip \
         > /dev/null
@@ -83,7 +84,7 @@ do
         -d "format=json&action=query&meta=tokens" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}"
+        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "$wikiApiUrl" \
         | gunzip \
         | jq ".query.tokens.csrftoken" -r
@@ -101,7 +102,7 @@ do
         --data-urlencode "token=${editToken}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}"
+        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "${wikiApiUrl}?format=json&action=edit" \
         | gunzip
     )
