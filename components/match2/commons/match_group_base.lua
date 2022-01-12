@@ -95,7 +95,7 @@ end
 -- Deprecated
 function MatchGroupBase.luaMatchlist(_, args)
 	local MatchGroup = Lua.import('Module:MatchGroup', {requireDevIfEnabled = true})
-	return MatchGroup.MatchlistBySpec(args) .. MatchGroup.deprecatedCategory
+	return MatchGroup.MatchList(args) .. MatchGroup.deprecatedCategory
 end
 
 -- Deprecated

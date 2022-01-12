@@ -29,7 +29,7 @@ local MatchGroup = {}
 --[[
 Reads a matchlist input spec, saves it to LPDB, and displays the matchlist.
 ]]
-function MatchGroup.MatchlistBySpec(args)
+function MatchGroup.MatchList(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
 	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
 	Match.storeMatchGroup(matches, options)
@@ -139,7 +139,7 @@ end
 -- Entry point of Template:Matchlist
 function MatchGroup.TemplateMatchlist(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchGroup.MatchlistBySpec(args)
+	return MatchGroup.MatchList(args)
 end
 
 -- Entry point of Template:Bracket
