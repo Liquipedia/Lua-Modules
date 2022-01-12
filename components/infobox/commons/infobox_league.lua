@@ -41,6 +41,7 @@ function League.run(frame)
 end
 
 function League:createInfobox()
+	self.args.abbreviation = self:_fetchAbbreviation()
 	local args = self.args
 	local frame = mw.getCurrentFrame()
 	local links
@@ -452,6 +453,26 @@ function League:_getPageNameFromChronology(item)
 	end
 
 	return mw.text.split(item, '|')[1]
+end
+
+
+-- Given a series query its abbreviation if abreviation is not set manually
+function League:_fetchAbbreviation()
+	if not String.isEmpty(self.args.abbreviation) then
+		return args.abbreviation
+	elseif String.isEmpty(self.args.series) then
+		return nil
+	end
+
+	local series = string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(self.args.series), ' ', '_')
+	local seriesData = mw.ext.LiquipediaDB.lpdb('series', {
+			conditions = '[[pagename::' .. string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(series), ' ', '_') .. ']] AND [[abbreviation::>]]',
+			query = 'abbreviation',
+	  		limit = 1
+		})
+	if seriesData and seriesData[1] then
+		return seriesData[1].abbreviation
+	end
 end
 
 return League
