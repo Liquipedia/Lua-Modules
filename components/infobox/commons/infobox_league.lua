@@ -470,7 +470,7 @@ function League:_fetchAbbreviation()
 			query = 'abbreviation',
 			limit = 1
 		})
-	if seriesData and seriesData[1] then
+	if type(seriesData) == 'table' and seriesData[1] then
 		return seriesData[1].abbreviation
 	end
 end
