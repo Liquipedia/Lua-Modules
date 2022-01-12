@@ -42,7 +42,6 @@ end
 
 function League:createInfobox()
 	local args = self.args
-	local frame = mw.getCurrentFrame()
 	args.abbreviation = self:_fetchAbbreviation()
 	local links
 
@@ -58,14 +57,13 @@ function League:createInfobox()
 			name = 'Series',
 			content = {
 				self:_createSeries(
-					frame,
 					args.series,
 					args.abbreviation,
 					true,
 					args.icon,
 					args.icondarkmode
 				),
-				self:_createSeries(frame, args.series2, args.abbreviation2)
+				self:_createSeries(args.series2, args.abbreviation2)
 			}
 		},
 		Builder{
@@ -328,20 +326,24 @@ function League:_createLocation(args)
 	return content
 end
 
-function League:_createSeries(frame, series, abbreviation, isFirst, icon, iconDark)
+function League:_createSeries(series, abbreviation, shouldSetVariable, icon, iconDark)
 	if String.isEmpty(series) then
 		return nil
 	end
 
-	local output = ''
+	local output = LeagueIcon.display{
+		icon = icon,
+		iconDark = iconDark,
+		series = series,
+		abbreviation = abbreviation,
+		date = Variables.varDefault('tournament_enddate')
+	}
 
-	if Page.exists('Template:LeagueIconSmall/' .. series:lower()) then
-		output = Template.safeExpand(
-			frame,
-			'LeagueIconSmall/' .. series:lower(),
-			{ date = Variables.varDefault('tournament_enddate') }
-		) .. ' '
-		if isFirst then
+	if output == LeagueIcon.display{} then
+		output = ''
+	else
+		output = output .. ' '
+		if shouldSetVariable then
 			League:_setIconVariable(output, icon, iconDark)
 		end
 	end
