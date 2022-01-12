@@ -31,8 +31,6 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
-local _FILLER_ICON = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
-
 local League = Class.new(BasicInfobox)
 
 League.warnings = {}
@@ -327,24 +325,31 @@ function League:_createLocation(args)
 	return content
 end
 
-function League:_createSeries(series, abbreviation, isFirst, icon, iconDark)
+function League:_createSeries(series, abbreviation, setVariable, icon, iconDark)
 	if String.isEmpty(series) then
 		return nil
 	end
 
-	local output = LeagueIcon.display({
+	local output = LeagueIcon.display{
 		icon = icon,
 		iconDark = iconDark,
 		series = series,
 		abbreviation = abbreviation,
 		date = Variables.varDefault('tournament_enddate')
-	})
+	}
 
-	if isFirst and output ~= _FILLER_ICON then
-		League:_setIconVariable(output, icon, iconDark)
+	if output == LeagueIcon.display{} then
+		output = ''
+	else
+		output = output .. ' '
+		if setVariable then
+			League:_setIconVariable(output, icon, iconDark)
+		end
 	end
 
-	output = output .. ' '
+	if setVariable and output ~= LeagueIcon.display{} then
+		League:_setIconVariable(output, icon, iconDark)
+	end
 
 	if not Page.exists(series) then
 		if String.isEmpty(abbreviation) then
