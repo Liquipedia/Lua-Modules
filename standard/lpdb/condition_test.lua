@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Condition/testcases
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 local Condition = require('Module:Condition')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 local suite = ScribuntoUnit:new()
