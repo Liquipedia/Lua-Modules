@@ -325,7 +325,7 @@ function League:_createLocation(args)
 	return content
 end
 
-function League:_createSeries(series, abbreviation, setVariable, icon, iconDark)
+function League:_createSeries(series, abbreviation, shouldSetVariable, icon, iconDark)
 	if String.isEmpty(series) then
 		return nil
 	end
@@ -342,13 +342,9 @@ function League:_createSeries(series, abbreviation, setVariable, icon, iconDark)
 		output = ''
 	else
 		output = output .. ' '
-		if setVariable then
+		if shouldSetVariable then
 			League:_setIconVariable(output, icon, iconDark)
 		end
-	end
-
-	if setVariable and output ~= LeagueIcon.display{} then
-		League:_setIconVariable(output, icon, iconDark)
 	end
 
 	if not Page.exists(series) then
