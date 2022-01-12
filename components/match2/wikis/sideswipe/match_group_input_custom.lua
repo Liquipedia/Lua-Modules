@@ -91,13 +91,7 @@ function matchFunctions._placementSortFunction(table, key1, key2)
 	local op2norm = op2.status == _STATUS_HAS_SCORE
 	if op1norm then
 		if op2norm then
-			local op1setwins = p._getSetWins(op1)
-			local op2setwins = p._getSetWins(op2)
-			if op1setwins + op2setwins > 0 then
-				return op1setwins > op2setwins
-			else
-				return tonumber(op1.score) > tonumber(op2.score)
-			end
+			return tonumber(op1.score) > tonumber(op2.score)
 		else return true end
 	else
 		if op2norm then return false
@@ -277,7 +271,7 @@ function matchFunctions.getOpponents(args)
 		local lastPlacement = 1
 		local lastStatus
 		-- luacheck: push ignore
-		for opponentIndex, opponent in Table.iter.spairs(opponents, p._placementSortFunction) do
+		for opponentIndex, opponent in Table.iter.spairs(opponents, matchFunctions._placementSortFunction) do
 			if opponent.status ~= _STATUS_HAS_SCORE and opponent.status ~= _STATUS_DEFAULT_WIN and placement == 1 then
 				placement = 2
 			end
