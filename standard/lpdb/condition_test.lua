@@ -23,7 +23,8 @@ function suite:test()
 	})
 
 	self:assertEquals(
-		'[[date::<2020-03-02T00:00:00.000]] AND ([[opponent::Team Liquid]] OR [[opponent::Team Secret]]) AND [[extradata_region::Europe]]',
+		'[[date::<2020-03-02T00:00:00.000]] AND ([[opponent::Team Liquid]] OR [[opponent::Team Secret]]) ' ..
+		'AND [[extradata_region::Europe]]',
 		tree:toString()
 	)
 end
