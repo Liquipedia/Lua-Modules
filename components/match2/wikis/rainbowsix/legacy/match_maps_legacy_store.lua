@@ -95,7 +95,7 @@ function MatchMapsLegacyStore.close()
 	processMatches.isLegacy = true
 
 	-- store match
-	local matchHtml = MatchGroup.MatchlistBySpec(processMatches)
+	local matchHtml = MatchGroup.MatchList(processMatches)
 
 	--local warnings = Json.parseIfString(matchlistVars:get('warnings')) or {}
 
@@ -130,7 +130,7 @@ function MatchMapsLegacyStore.closeSingle(frame)
 	processMatches.hide = true
 
 	-- store match
-	MatchGroup.MatchlistBySpec(processMatches)
+	MatchGroup.MatchList(processMatches)
 
 	local MatchGroupBase = require('Module:MatchGroup/Base')
 	-- display match
