@@ -27,7 +27,8 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnable
 local MatchGroup = {}
 
 --[[
-Reads a matchlist input spec, saves it to LPDB, and displays the matchlist.
+	Sets up a MatchList, a list of matches displayed vertically. The matches
+	are saved to LPDB.
 ]]
 function MatchGroup.MatchList(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
@@ -52,7 +53,7 @@ function MatchGroup.MatchList(args)
 end
 
 --[[
-Reads a bracket input spec, saves it to LPDB, and displays the bracket.
+	Sets up a Bracket, a tree structure of matches. The matches are saved to LPDB.
 ]]
 function MatchGroup.Bracket(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
