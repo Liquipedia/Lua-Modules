@@ -27,9 +27,10 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnable
 local MatchGroup = {}
 
 --[[
-Reads a matchlist input spec, saves it to LPDB, and displays the matchlist.
+	Sets up a MatchList, a list of matches displayed vertically. The matches
+	are saved to LPDB.
 ]]
-function MatchGroup.MatchlistBySpec(args)
+function MatchGroup.MatchList(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
 	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
 	Match.storeMatchGroup(matches, options)
@@ -52,9 +53,9 @@ function MatchGroup.MatchlistBySpec(args)
 end
 
 --[[
-Reads a bracket input spec, saves it to LPDB, and displays the bracket.
+	Sets up a Bracket, a tree structure of matches. The matches are saved to LPDB.
 ]]
-function MatchGroup.BracketBySpec(args)
+function MatchGroup.Bracket(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
 	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, options)
 	Match.storeMatchGroup(matches, options)
@@ -139,13 +140,13 @@ end
 -- Entry point of Template:Matchlist
 function MatchGroup.TemplateMatchlist(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchGroup.MatchlistBySpec(args)
+	return MatchGroup.MatchList(args)
 end
 
 -- Entry point of Template:Bracket
 function MatchGroup.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchGroup.BracketBySpec(args)
+	return MatchGroup.Bracket(args)
 end
 
 -- Entry point of Template:ShowSingleMatch
