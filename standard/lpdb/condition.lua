@@ -16,7 +16,7 @@ local Condition = {}
 local _ConditionNode = Class.new()
 
 --[[
-	A tree of condition, specifying the conditions for an LPDB request
+	A tree of conditions, specifying the conditions for an LPDB request
 
 	Can be used recursively, as in, a tree of trees
 ]]
