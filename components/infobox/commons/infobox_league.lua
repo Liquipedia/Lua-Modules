@@ -459,16 +459,17 @@ end
 -- Given a series query its abbreviation if abreviation is not set manually
 function League:_fetchAbbreviation()
 	if not String.isEmpty(self.args.abbreviation) then
-		return args.abbreviation
+		return self.args.abbreviation
 	elseif String.isEmpty(self.args.series) then
 		return nil
 	end
 
 	local series = string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(self.args.series), ' ', '_')
 	local seriesData = mw.ext.LiquipediaDB.lpdb('series', {
-			conditions = '[[pagename::' .. string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(series), ' ', '_') .. ']] AND [[abbreviation::>]]',
+			conditions = '[[pagename::' .. string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(series), ' ', '_') .. ']]'
+				.. ' AND [[abbreviation::>]]',
 			query = 'abbreviation',
-	  		limit = 1
+			limit = 1
 		})
 	if seriesData and seriesData[1] then
 		return seriesData[1].abbreviation
