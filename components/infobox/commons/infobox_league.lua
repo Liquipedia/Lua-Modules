@@ -466,7 +466,7 @@ function League:_fetchAbbreviation()
 
 	local series = string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(self.args.series), ' ', '_')
 	local seriesData = mw.ext.LiquipediaDB.lpdb('series', {
-			conditions = '[[pagename::' .. series, ' ', '_') .. ']] AND [[abbreviation::!]]',
+			conditions = '[[pagename::' .. series .. ']] AND [[abbreviation::!]]',
 			query = 'abbreviation',
 			limit = 1
 		})
