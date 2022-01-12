@@ -18,4 +18,4 @@ jobs:
           DEV_WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
           DEV_WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
           DEV_WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
-        run: bash deploy.sh
+        run: bash deploy_dev.sh
