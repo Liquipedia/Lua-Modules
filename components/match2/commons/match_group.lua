@@ -54,7 +54,7 @@ end
 --[[
 Reads a bracket input spec, saves it to LPDB, and displays the bracket.
 ]]
-function MatchGroup.BracketBySpec(args)
+function MatchGroup.Bracket(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
 	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, options)
 	Match.storeMatchGroup(matches, options)
@@ -145,7 +145,7 @@ end
 -- Entry point of Template:Bracket
 function MatchGroup.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
-	return MatchGroup.BracketBySpec(args)
+	return MatchGroup.Bracket(args)
 end
 
 -- Entry point of Template:ShowSingleMatch
