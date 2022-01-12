@@ -22,9 +22,14 @@ local AutomaticPointsTable = Class.new(
 
 function AutomaticPointsTable.run(frame)
 	local pointsTable = AutomaticPointsTable(frame)
+
+	local tournaments = pointsTable.parsedInput.tournaments
+	local tournamentsWithPlacements = AutomaticPointsTable:queryPlacements(tournaments)
+
 	mw.logObject(pointsTable.parsedInput.pbg)
 	mw.logObject(pointsTable.parsedInput.tournaments)
 	mw.logObject(pointsTable.parsedInput.teams)
+	mw.logObject(tournamentsWithPlacements)
 
 	return nil
 end
@@ -110,6 +115,37 @@ function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
 		end
 	end
 	return manualPoints
+end
+
+function AutomaticPointsTable:queryPlacements(tournaments)
+	local queryParams = {
+		limit = 5000,
+		query = 'participant, placement, extradata'
+	}
+
+	local tournamentsWithPlacements = Table.mapValues(tournaments,
+		function(tournament)
+			local placements = {}
+
+			queryParams.conditions = '[[tournament::' .. tournament.name .. ']]'
+			local tournamentResults = mw.ext.LiquipediaDB.lpdb('placement', queryParams)
+
+			for _, result in pairs(tournamentResults) do
+				result.points = tonumber(result.extradata.prizepoints)
+				result.securedPoints = tonumber(result.extradata.securedpoints)
+				result.extradata = nil
+
+				local teamName = result.participant
+				placements[teamName] = result
+			end
+
+			local tournamentWithPlacements = Table.deepCopy(tournament)
+			tournamentWithPlacements.placements = placements
+			return tournamentWithPlacements
+		end
+	)
+
+	return tournamentsWithPlacements
 end
 
 return AutomaticPointsTable
