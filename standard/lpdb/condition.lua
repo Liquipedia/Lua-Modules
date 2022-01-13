@@ -28,13 +28,13 @@ local ConditionTree = Class.new(_ConditionNode,
 )
 
 function ConditionTree:add(node)
-	table.insert(self._nodes, node)
-	return self
-end
-
-function ConditionTree:addAll(nodes)
-	for _, value in pairs(nodes) do
-		table.insert(self._nodes, value)
+	if node.is_a ~= nil and node:is_a(_ConditionNode) then
+		table.insert(self._nodes, node)
+	else
+		-- List of nodes
+		for _, value in pairs(node) do
+			table.insert(self._nodes, value)
+		end
 	end
 	return self
 end
