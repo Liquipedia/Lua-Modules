@@ -79,7 +79,7 @@ local Comparator = {
 	equals = '::',
 	notEquals = '!::',
 	greaterThan = '::>',
-	lesserThan = '::<'
+	lessThan = '::<'
 }
 
 local BooleanOperator = {
