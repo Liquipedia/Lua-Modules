@@ -83,8 +83,8 @@ local Comparator = {
 }
 Comparator.eq = Comparator.equals
 Comparator.neq = Comparator.notEquals
-Comparator.gt= Comparator.greaterThan
-Comparator.lt= Comparator.lessThan
+Comparator.gt = Comparator.greaterThan
+Comparator.lt = Comparator.lessThan
 
 local BooleanOperator = {
 	all = 'AND',
