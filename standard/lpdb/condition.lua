@@ -76,9 +76,13 @@ function ConditionNode:toString()
 end
 
 local Comparator = {
+	eq = '::',
 	equals = '::',
+	neq = '!::',
 	notEquals = '!::',
+	gt = '::>',
 	greaterThan = '::>',
+	lt = '::<',
 	lessThan = '::<'
 }
 
