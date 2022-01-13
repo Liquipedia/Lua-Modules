@@ -129,39 +129,44 @@ function AutomaticPointsTable:queryPlacements(tournaments)
 		end
 	)
 
-	local conditions = '[[tournament::' ..
-		table.concat(tournamentNames, ']] OR [[tournament::') ..
-		']]'
+	local tree = ConditionTree(BooleanOperator.any)
+	local columnName = ColumnName('tournament')
+	Table.forEach(tournaments,
+		function(t)
+			tree:add(ConditionNode(columnName, Comparator.eq, t.name))
+		end
+	)
+	local conditions = tree:toString()
 
 	queryParams.conditions = conditions
 	local allQueryResult = mw.ext.LiquipediaDB.lpdb('placement', queryParams)
 
-	local tournamentsWithPlacements = Table.mapValues(tournaments,
-		function(tournament)
-			local filteredResult = Table.filter(allQueryResult,
-				function(result, tournamentName)
-					return result.tournament == tournamentName
-				end,
-				tournament.name
-			)
+	local indexedResults = {}
 
-			local tournamentPlacements = Table.mapValues(filteredResult,
-				function(result)
-					result.points = tonumber(result.extradata.prizepoints)
-					result.securedPoints = tonumber(result.extradata.securedpoints)
-					result.extradata = nil
-					return result
-				end
-			)
+	local tournamentIndices = Table.map(tournaments,
+		function(index, tournament)
+			indexedResults[index] = {}
+			return tournament.name, index
+		end
+	)
+	
+	Table.iter.forEach(allQueryResult,
+		function(result)
+			result.points = tonumber(result.extradata.prizepoints)
+			result.securedPoints = tonumber(result.extradata.securedpoints)
 
-			local tournamentWithPlacements = Table.deepCopy(tournament)
-			tournamentWithPlacements.placements = tournamentPlacements
-
-			return tournamentWithPlacements
+			local tournamentIndex = tournamentIndices[result.tournament]
+			table.insert(indexedResults[tournamentIndex], result)
 		end
 	)
 
-	return tournamentsWithPlacements
+	Table.iter.forEachIndexed(tournaments,
+		function(index, tournament)
+			tournament.placements = indexedResults[index]
+		end
+	)
+
+	return tournaments
 end
 
 return AutomaticPointsTable
