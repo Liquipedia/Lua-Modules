@@ -16,11 +16,11 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 function suite:test()
-	local tree = ConditionTree(BooleanOperator['and']):addAll({
+	local tree = ConditionTree(BooleanOperator.all):addAll({
 		ConditionNode(
 			ColumnName('date'), Comparator.lesserThan, '2020-03-02T00:00:00.000'
 		),
-		ConditionTree(BooleanOperator['or']):addAll({
+		ConditionTree(BooleanOperator.any):addAll({
 			ConditionNode(ColumnName('opponent'), Comparator.equals, 'Team Liquid'),
 			ConditionNode(ColumnName('opponent'), Comparator.equals, 'Team Secret'),
 		}),

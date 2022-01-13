@@ -83,8 +83,8 @@ local Comparator = {
 }
 
 local BooleanOperator = {
-	['and'] = 'AND',
-	['or'] = 'OR',
+	any = 'AND',
+	all = 'OR',
 }
 
 --[[
