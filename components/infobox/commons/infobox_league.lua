@@ -251,7 +251,9 @@ function League:_setLpdbData(args, links)
 		endpatch = args.endpatch or args.epatch,
 		type = args.type,
 		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
-			League:_getNamedTableofAllArgsForBase(args, 'organizer')
+			League:_resolveAllRedirectsInTable(
+				League:_getNamedTableofAllArgsForBase(args, 'organizer')
+			)
 		),
 		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', '1970-01-01'),
 		enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
@@ -475,6 +477,17 @@ function League:_fetchAbbreviation()
 	if type(seriesData) == 'table' and seriesData[1] then
 		return seriesData[1].abbreviation
 	end
+end
+
+-- Given a table, resolves all redirects in any value of the table
+function League:_resolveAllRedirectsInTable(table)
+	if table == nil then return nil end
+
+	for key, value in pairs(table) do
+		table[key] = mw.ext.TeamLiquidIntegration.resolve_redirect(value)
+	end
+
+	return table
 end
 
 return League
