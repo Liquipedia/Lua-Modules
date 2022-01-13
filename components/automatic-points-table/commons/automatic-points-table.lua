@@ -8,9 +8,16 @@
 
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
+local Condition = require('Module:Condition')
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local AutomaticPointsTable = Class.new(
 	function(self, frame)
