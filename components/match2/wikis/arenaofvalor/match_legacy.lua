@@ -59,10 +59,6 @@ function MatchLegacy._convertParameters(match2)
 	local opponents = match2.match2opponents or {}
 	match.extradata.team1icon = (opponents[1] or {}).icon
 	match.extradata.team2icon = (opponents[2] or {}).icon
-	match.extradata.opponent1literal = tostring((opponents[1] or {}).type == 'literal')
-	match.extradata.opponent2literal = tostring((opponents[2] or {}).type == 'literal')
-	match.extradata.opponent1game = 'false'
-	match.extradata.opponent2game = 'false'
 
 	local games = match2.match2games or {}
 	for key, game in ipairs(games) do
