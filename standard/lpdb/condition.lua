@@ -76,15 +76,15 @@ function ConditionNode:toString()
 end
 
 local Comparator = {
-	eq = '::',
 	equals = '::',
-	neq = '!::',
-	notEquals = '!::',
-	gt = '::>',
+	notEquals = '::!',
 	greaterThan = '::>',
-	lt = '::<',
 	lessThan = '::<'
 }
+Comparator.eq = Comparator.equals
+Comparator.neq = Comparator.notEquals
+Comparator.gt= Comparator.greaterThan
+Comparator.lt= Comparator.lessThan
 
 local BooleanOperator = {
 	all = 'AND',
