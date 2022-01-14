@@ -16,7 +16,6 @@ local VodLink = require('Module:VodLink')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local _POSITION_LEFT = 1
 local _POSITION_RIGHT = 2
@@ -366,10 +365,10 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
-	      :leftScore(CustomMatchSummary._createScore(match.opponents[1]))
-	      :rightScore(CustomMatchSummary._createScore(match.opponents[2]))
-	      :rightOpponent(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
+	      :leftScore(header:createScore(match.opponents[1]))
+	      :rightScore(header:createScore(match.opponents[2]))
+	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
@@ -570,22 +569,6 @@ function CustomMatchSummary._createCheckMark(isWinner, position)
 	end
 
 	return container
-end
-
-function CustomMatchSummary._createOpponent(opponent, side)
-	return OpponentDisplay.BlockOpponent{
-		flip = side == 'left',
-		opponent = opponent,
-		overflow = 'wrap',
-		teamStyle = 'short',
-	}
-end
-
-function CustomMatchSummary._createScore(opponent)
-	return OpponentDisplay.BlockScore{
-		isWinner = opponent.placement == 1 or opponent.advances,
-		scoreText = OpponentDisplay.InlineScore(opponent),
-	}
 end
 
 return CustomMatchSummary

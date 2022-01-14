@@ -72,7 +72,12 @@ function Person:createInfobox()
 	end
 
 	local widgets = {
-		Header{name = self:nameDisplay(args), image = args.image, imageDefault = args.default},
+		Header{
+			name = self:nameDisplay(args),
+			image = args.image,
+			imageDefault = args.default,
+			subHeader = self:subHeaderDisplay(args)
+		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},
 		Cell{name = 'Name', content = {args.name}},
@@ -200,7 +205,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		nationality2 = Person:getStandardNationalityValue(args.country2 or args.nationality2),
 		nationality3 = Person:getStandardNationalityValue(args.country3 or args.nationality3),
 		birthdate = Variables.varDefault('player_birthdate'),
-		deathdate = Variables.varDefault('player_deathhdate'),
+		deathdate = Variables.varDefault('player_deathdate'),
 		image = args.image,
 		region = _region,
 		team = args.teamlink or args.team,
@@ -292,6 +297,11 @@ function Person:nameDisplay(args)
 	end
 
 	return display
+end
+
+--- Allows for overriding this functionality
+function Person:subHeaderDisplay(args)
+	return args.localid
 end
 
 --- Allows for overriding this functionality

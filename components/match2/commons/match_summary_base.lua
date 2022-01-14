@@ -7,7 +7,10 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local Break = Class.new(
 	function(self)
@@ -45,6 +48,22 @@ end
 function Header:rightOpponent(content)
 	self.rightElement = content
 	return self
+end
+
+function Header:createOpponent(opponent, side)
+	return OpponentDisplay.BlockOpponent{
+		flip = side == 'left',
+		opponent = opponent,
+		overflow = 'wrap',
+		teamStyle = 'short',
+	}
+end
+
+function Header:createScore(opponent)
+	return OpponentDisplay.BlockScore{
+		isWinner = opponent.placement == 1 or opponent.advances,
+		scoreText = OpponentDisplay.InlineScore(opponent),
+	}
 end
 
 function Header:create()

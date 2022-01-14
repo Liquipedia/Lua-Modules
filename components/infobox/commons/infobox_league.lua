@@ -19,6 +19,7 @@ local Variables = require('Module:Variables')
 local Locale = require('Module:Locale')
 local Page = require('Module:Page')
 local LeagueIcon = require('Module:LeagueIcon')
+local WarningBox = require('Module:WarningBox')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -32,6 +33,8 @@ local Chronology = Widgets.Chronology
 
 local League = Class.new(BasicInfobox)
 
+League.warnings = {}
+
 function League.run(frame)
 	local league = League(frame)
 	return league:createInfobox()
@@ -39,7 +42,7 @@ end
 
 function League:createInfobox()
 	local args = self.args
-	local frame = mw.getCurrentFrame()
+	args.abbreviation = self:_fetchAbbreviation()
 	local links
 
 	-- set Variables here already so they are available in functions
@@ -54,14 +57,13 @@ function League:createInfobox()
 			name = 'Series',
 			content = {
 				self:_createSeries(
-					frame,
 					args.series,
 					args.abbreviation,
 					true,
 					args.icon,
 					args.icondarkmode
 				),
-				self:_createSeries(frame, args.series2, args.abbreviation2)
+				self:_createSeries(args.series2, args.abbreviation2)
 			}
 		},
 		Builder{
@@ -179,7 +181,7 @@ function League:createInfobox()
 		self:_setLpdbData(args, links)
 	end
 
-	return builtInfobox
+	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
 end
 
 --- Allows for overriding this functionality
@@ -324,20 +326,24 @@ function League:_createLocation(args)
 	return content
 end
 
-function League:_createSeries(frame, series, abbreviation, isFirst, icon, iconDark)
+function League:_createSeries(series, abbreviation, shouldSetVariable, icon, iconDark)
 	if String.isEmpty(series) then
 		return nil
 	end
 
-	local output = ''
+	local output = LeagueIcon.display{
+		icon = icon,
+		iconDark = iconDark,
+		series = series,
+		abbreviation = abbreviation,
+		date = Variables.varDefault('tournament_enddate')
+	}
 
-	if Page.exists('Template:LeagueIconSmall/' .. series:lower()) then
-		output = Template.safeExpand(
-			frame,
-			'LeagueIconSmall/' .. series:lower(),
-			{ date = Variables.varDefault('tournament_enddate') }
-		) .. ' '
-		if isFirst then
+	if output == LeagueIcon.display{} then
+		output = ''
+	else
+		output = output .. ' '
+		if shouldSetVariable then
 			League:_setIconVariable(output, icon, iconDark)
 		end
 	end
@@ -449,6 +455,26 @@ function League:_getPageNameFromChronology(item)
 	end
 
 	return mw.text.split(item, '|')[1]
+end
+
+
+-- Given a series, query its abbreviation if abbreviation is not set manually
+function League:_fetchAbbreviation()
+	if not String.isEmpty(self.args.abbreviation) then
+		return self.args.abbreviation
+	elseif String.isEmpty(self.args.series) then
+		return nil
+	end
+
+	local series = string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(self.args.series), ' ', '_')
+	local seriesData = mw.ext.LiquipediaDB.lpdb('series', {
+			conditions = '[[pagename::' .. series .. ']] AND [[abbreviation::!]]',
+			query = 'abbreviation',
+			limit = 1
+		})
+	if type(seriesData) == 'table' and seriesData[1] then
+		return seriesData[1].abbreviation
+	end
 end
 
 return League
