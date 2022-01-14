@@ -251,7 +251,10 @@ function League:_setLpdbData(args, links)
 		endpatch = args.endpatch or args.epatch,
 		type = args.type,
 		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
-			League:_getNamedTableofAllArgsForBase(args, 'organizer')
+			Table.mapValues(
+				League:_getNamedTableofAllArgsForBase(args, 'organizer'),
+				mw.ext.TeamLiquidIntegration.resolve_redirect
+			)
 		),
 		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', '1970-01-01'),
 		enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
