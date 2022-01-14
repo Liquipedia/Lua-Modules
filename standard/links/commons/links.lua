@@ -40,7 +40,11 @@ local _PREFIXES = {
 	},
 	facebook = {'https://facebook.com/'},
 	['facebook-gaming'] = {'https://fb.gg/'},
-	faceit = {'https://www.faceit.com/en/players/'},
+	faceit = {
+		'',
+		team = 'https://www.faceit.com/teams/',
+		player = 'https://www.faceit.com/players/',
+	},
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	fanclub = {''},
 	gamersclub = {'https://csgo.gamersclub.gg/campeonatos/csgo/'},
