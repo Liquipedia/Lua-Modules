@@ -231,7 +231,7 @@ end
 
 function NotabilityChecker._calculateDateLoss(date)
 	local timestamp = _lang:formatDate('U', date)
-	local differenceSeconds = _NOW - timestamp
+	local differenceSeconds = math.max(_NOW - timestamp, 0) -- No dates in the future
 	return math.floor(differenceSeconds / _SECONDS_IN_YEAR) + 1
 end
 
