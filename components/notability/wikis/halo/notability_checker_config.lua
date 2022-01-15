@@ -38,10 +38,7 @@ Config.NOTABILITY_THRESHOLD_NOTABLE = 800
 -- Generally these types will award the same points for first, but then
 -- quickly decrease the point rewards as the placement gets lower
 Config.EXTRA_DROP_OFF_TYPES = {
-	Config.TIER_TYPE_MONTHLY,
-	Config.TIER_TYPE_WEEKLY,
-	Config.TIER_TYPE_DAILY,
-	Config.TIER_TYPE_FFA,
+	Config.TIER_TYPE_QUALIFIER,
 }
 
 -- Weights used for tournaments
@@ -72,6 +69,10 @@ Config.weights = {
 				name = Config.TIER_TYPE_DAILY,
 				points = 5,
 			},
+			{
+				name = Config.TIER_TYPE_QUALIFIER,
+				points = 0,
+			},
 		},
 	},
 	{
@@ -99,6 +100,10 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_DAILY,
 				points = 5,
+			},
+			{
+				name = Config.TIER_TYPE_QUALIFIER,
+				points = 0,
 			},
 		},
 	},
@@ -128,6 +133,10 @@ Config.weights = {
 				name = Config.TIER_TYPE_DAILY,
 				points = 5,
 			},
+			{
+				name = Config.TIER_TYPE_QUALIFIER,
+				points = 0,
+			},
 		},
 	},
 	{
@@ -155,6 +164,10 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_DAILY,
 				points = 5,
+			},
+			{
+				name = Config.TIER_TYPE_QUALIFIER,
+				points = 0,
 			},
 		},
 	},
