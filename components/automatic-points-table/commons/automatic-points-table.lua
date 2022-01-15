@@ -130,17 +130,13 @@ function AutomaticPointsTable:queryPlacements(tournaments)
 		query = 'tournament, participant, placement, extradata'
 	}
 
-	local tournamentNames = Table.mapValues(tournaments,
-		function(tournament)
-			return tournament.name
-		end
-	)
-
 	local tree = ConditionTree(BooleanOperator.any)
 	local columnName = ColumnName('tournament')
-	Table.forEach(tournaments,
-		function(t)
+	local tournamentIndices = {}
+	Table.iter.forEachIndexed(tournaments,
+		function(index, t)
 			tree:add(ConditionNode(columnName, Comparator.eq, t.name))
+			tournamentIndices[t.name] = index
 		end
 	)
 	local conditions = tree:toString()
@@ -150,26 +146,18 @@ function AutomaticPointsTable:queryPlacements(tournaments)
 
 	local indexedResults = {}
 
-	local tournamentIndices = Table.map(tournaments,
-		function(index, tournament)
-			indexedResults[index] = {}
-			return tournament.name, index
-		end
-	)
-	
 	Table.iter.forEach(allQueryResult,
 		function(result)
+			local tournamentIndex = tournamentIndices[result.tournament]
+			local tournament = tournaments[tournamentIndex]
+
 			result.points = tonumber(result.extradata.prizepoints)
 			result.securedPoints = tonumber(result.extradata.securedpoints)
-
-			local tournamentIndex = tournamentIndices[result.tournament]
-			table.insert(indexedResults[tournamentIndex], result)
-		end
-	)
-
-	Table.iter.forEachIndexed(tournaments,
-		function(index, tournament)
-			tournament.placements = indexedResults[index]
+			
+			if Table.isEmpty(tournament.placements) then
+				tournament.placements = {}
+			end
+			table.insert(tournament.placements, result)
 		end
 	)
 
