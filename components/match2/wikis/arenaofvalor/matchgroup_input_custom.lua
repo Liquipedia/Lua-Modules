@@ -384,14 +384,14 @@ function matchFunctions.getOpponents(match)
 			end
 
 			-- get players from vars for teams
-			if opponent.type == _TEAM_OPPONENT_TYPE then
+			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
 					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name, opponent.players)
 				end
-			elseif opponent.type == 'solo' then
+			elseif Opponent.typeIsParty(opponent) then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
 				opponent.match2players[1].name = opponent.name
-			else
+			elseif opponent.type ~= Opponent.literal then
 				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
 
@@ -465,7 +465,6 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
 	playersData = Json.parseIfString(playersData) or {}
 	local players = {}
-	local count = 1
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
@@ -482,7 +481,6 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 
 		if not Table.isEmpty(player) then
 			table.insert(players, player)
-			count = count + 1
 		end
 	end
 	match['opponent' .. oppIndex].match2players = players
