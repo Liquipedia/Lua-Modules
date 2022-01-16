@@ -84,11 +84,9 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata = {
-		isplayer = _role.isPlayer or 'true',
-		role = _role.role,
-		role2 = _role2.role
-	}
+	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
+	lpdbData.extradata.role = _role.role
+	lpdbData.extradata.role2 = _role2.role
 
 	local region = Region.run({region = _args.region, country = _args.country})
 	if type(region) == 'table' then
