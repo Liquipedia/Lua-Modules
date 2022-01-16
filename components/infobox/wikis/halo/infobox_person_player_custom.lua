@@ -84,7 +84,6 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	
 	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
 	lpdbData.extradata.role = _role.role
 	lpdbData.extradata.role2 = _role2.role
