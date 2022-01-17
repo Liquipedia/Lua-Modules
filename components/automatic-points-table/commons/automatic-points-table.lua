@@ -8,9 +8,16 @@
 
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
+local Condition = require('Module:Condition')
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local AutomaticPointsTable = Class.new(
 	function(self, frame)
@@ -22,9 +29,14 @@ local AutomaticPointsTable = Class.new(
 
 function AutomaticPointsTable.run(frame)
 	local pointsTable = AutomaticPointsTable(frame)
+
+	local tournaments = pointsTable.parsedInput.tournaments
+	local tournamentsWithPlacements = pointsTable:queryPlacements(tournaments)
+
 	mw.logObject(pointsTable.parsedInput.pbg)
 	mw.logObject(pointsTable.parsedInput.tournaments)
 	mw.logObject(pointsTable.parsedInput.teams)
+	mw.logObject(tournamentsWithPlacements)
 
 	return nil
 end
@@ -110,6 +122,41 @@ function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
 		end
 	end
 	return manualPoints
+end
+
+function AutomaticPointsTable:queryPlacements(tournaments)
+	local queryParams = {
+		limit = 5000,
+		query = 'tournament, participant, placement, extradata'
+	}
+
+	local tree = ConditionTree(BooleanOperator.any)
+	local columnName = ColumnName('tournament')
+	local tournamentIndices = {}
+	Table.iter.forEachIndexed(tournaments,
+		function(index, t)
+			tree:add(ConditionNode(columnName, Comparator.eq, t.name))
+			tournamentIndices[t.name] = index
+			t.placements = {}
+		end
+	)
+	local conditions = tree:toString()
+
+	queryParams.conditions = conditions
+	local allQueryResult = mw.ext.LiquipediaDB.lpdb('placement', queryParams)
+
+	Table.iter.forEach(allQueryResult,
+		function(result)
+			local tournamentIndex = tournamentIndices[result.tournament]
+			local tournament = tournaments[tournamentIndex]
+
+			result.points = tonumber(result.extradata.prizepoints)
+			result.securedPoints = tonumber(result.extradata.securedpoints)
+			table.insert(tournament.placements, result)
+		end
+	)
+
+	return tournaments
 end
 
 return AutomaticPointsTable
