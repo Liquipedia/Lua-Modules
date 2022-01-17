@@ -12,12 +12,10 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
 local PageLink = require('Module:Page')
-local Json = require('Module:Json')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local CustomLeague = Class.new()
@@ -25,7 +23,6 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
-local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
 function CustomLeague.run(frame)
@@ -150,9 +147,7 @@ end
 
 function CustomLeague._getPatchVersion()
 	if String.isEmpty(_args.patch) then return nil end
-	
 	local content = PageLink.makeInternalLink(_args.patch, 'Patch ' .. _args.patch)
-	
 	if not String.isEmpty(_args.epatch) then
 		content = content .. '&nbsp;&ndash;&nbsp;'
 		content = content .. PageLink.makeInternalLink(_args.epatch, 'Patch ' .. _args.epatch)
