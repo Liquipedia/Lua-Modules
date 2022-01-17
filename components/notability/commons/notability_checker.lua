@@ -154,10 +154,10 @@ function NotabilityChecker._calculateWeight(placementData)
 	return finalWeight
 end
 
-function NotabilityChecker.calculateTournament(liquipediatier, liquipediatiertype, placement, date, notabilityMod, mode)
+function NotabilityChecker.calculateTournament(tier, tierType, placement, date, notabilityMod, mode)
 	local dateLoss = NotabilityChecker._calculateDateLoss(date)
 	notabilityMod = NotabilityChecker._parseNotabilityMod(notabilityMod)
-	local tier, tierType = NotabilityChecker._parseTier(liquipediatier, liquipediatiertype)
+	tier, tierType = NotabilityChecker._parseTier(tier, tierType)
 
 	local weight = NotabilityChecker._calculateWeightForTournament(
 		tier, tierType, placement, dateLoss, notabilityMod, mode
@@ -231,12 +231,12 @@ function NotabilityChecker._preparePlacement(placement)
 	return placement
 end
 
-function NotabilityChecker._parseTier(liquipediatier, liquipediatiertype)
-	if String.isEmpty(liquipediatiertype) then
-		return tonumber(liquipediatier), nil
+function NotabilityChecker._parseTier(tier, tierType)
+	if String.isEmpty(tierType) then
+		return tonumber(tier), nil
 	end
 
-	return tonumber(liquipediatier), liquipediatiertype:lower()
+	return tonumber(tier), tierType:lower()
 end
 
 function NotabilityChecker._parseNotabilityMod(notabilityMod)
