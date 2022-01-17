@@ -7,7 +7,7 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
@@ -92,6 +92,9 @@ function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_endpatch', _args.epatch)
 
 	Variables.varDefine('tournament_publishertier', _args['moonton-sponsored'])
+	
+		--Legacy Vars:
+	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
 function CustomLeague:_createPrizepool()
@@ -154,92 +157,6 @@ function CustomLeague._getPatchVersion()
 	end
 
 	return content
-end
-
-function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
-	if exchangeDate and currency and currency ~= 'USD' then
-		localPrize = tonumber(localPrize)
-		if localPrize then
-			local usdPrize = mw.ext.CurrencyExchange.currencyexchange(
-				localPrize,
-				currency,
-				'USD',
-				exchangeDate
-			)
-			if type(usdPrize) == 'number' then
-				return usdPrize
-			end
-		end
-	end
-
-	return nil
-end
-
-function CustomLeague:_displayPrizeValue(value, numDigits)
-	if String.isEmpty(value) or value == 0 or value == '0' then
-		return '-'
-	end
-
-	numDigits = tonumber(numDigits or 0) or 0
-	local factor = 10^numDigits
-	value = math.floor(value * factor + 0.5) / factor
-
-	--split value into
-	--left = first digit
-	--num = all remaining digits before a possible '.'
-	--right = the '.' and all digits after it (unless they are all 0 or do not exist)
-	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
-	if right:len() > 0 then
-		local decimal = string.sub('0' .. right, 3)
-		right = '.' .. decimal .. string.rep('0', 2 - string.len(decimal))
-	end
-	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
-end
-
-function CustomLeague:_cleanPrizeValue(value, currency)
-	if String.isEmpty(value) then
-		return nil
-	end
-
-	--remove currency abbreviations
-	value = value:gsub('<abbr.*abbr>', '')
-	value = value:gsub(',', '')
-
-	--remove currency symbol
-	if currency then
-		Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
-		local symbol = Variables.varDefaultMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
-		value = value:gsub(symbol, '')
-	else --remove $ symbol
-		value = value:gsub('%$', '')
-	end
-
-	return value
-end
-
-function CustomLeague:_makeBasedListFromArgs(base)
-	local firstArg = _args[base .. '1']
-	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
-	local index = 2
-
-	while not String.isEmpty(_args[base .. index]) do
-		local currentArg = _args[base .. index]
-		table.insert(foundArgs, '&nbsp;• ' ..
-			tostring(CustomLeague:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, currentArg)
-			))
-		)
-		index = index + 1
-	end
-
-	return foundArgs
-end
-
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomLeague
