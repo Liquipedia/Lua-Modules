@@ -8,7 +8,6 @@
 
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
 local PageLink = require('Module:Page')
@@ -92,7 +91,6 @@ function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_endpatch', _args.epatch)
 
 	Variables.varDefine('tournament_publishertier', _args['moonton-sponsored'])
-	
 		--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
