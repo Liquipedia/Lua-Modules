@@ -39,7 +39,6 @@ local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
-local _TEAM_OPPONENT_TYPE = 'team'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
 local _SECONDS_UNTIL_FINISHED_EXACT = 30800
