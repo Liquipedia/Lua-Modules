@@ -152,7 +152,6 @@ function AutomaticPointsTable:queryPlacements(tournaments)
 
 			result.points = tonumber(result.extradata.prizepoints)
 			result.securedPoints = tonumber(result.extradata.securedpoints)
-			
 			table.insert(tournament.placements, result)
 		end
 	)
