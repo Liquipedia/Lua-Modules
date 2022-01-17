@@ -137,14 +137,13 @@ function AutomaticPointsTable:queryPlacements(tournaments)
 		function(index, t)
 			tree:add(ConditionNode(columnName, Comparator.eq, t.name))
 			tournamentIndices[t.name] = index
+			t.placements = {}
 		end
 	)
 	local conditions = tree:toString()
 
 	queryParams.conditions = conditions
 	local allQueryResult = mw.ext.LiquipediaDB.lpdb('placement', queryParams)
-
-	local indexedResults = {}
 
 	Table.iter.forEach(allQueryResult,
 		function(result)
@@ -154,9 +153,6 @@ function AutomaticPointsTable:queryPlacements(tournaments)
 			result.points = tonumber(result.extradata.prizepoints)
 			result.securedPoints = tonumber(result.extradata.securedpoints)
 			
-			if Table.isEmpty(tournament.placements) then
-				tournament.placements = {}
-			end
 			table.insert(tournament.placements, result)
 		end
 	)
