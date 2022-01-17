@@ -134,7 +134,7 @@ function NotabilityChecker._calculateWeight(placementData)
 
 	for _, placement in pairs(placementData) do
 		if not String.isEmpty(placement.placement) then
-			if NotabilityChecker._EXTRA_LOGGING then
+			if NotabilityChecker.EXTRA_LOGGING then
 				mw.log('Tournament: ' .. placement.tournament)
 			end
 
@@ -163,7 +163,7 @@ function NotabilityChecker.calculateTournament(tier, tierType, placement, date, 
 		tier, tierType, placement, dateLoss, notabilityMod, mode
 	)
 
-	if NotabilityChecker._EXTRA_LOGGING then
+	if NotabilityChecker.EXTRA_LOGGING then
 		mw.log('weight: ' .. weight,
 			'mod: ' .. notabilityMod,
 			'mode: ' .. mode
