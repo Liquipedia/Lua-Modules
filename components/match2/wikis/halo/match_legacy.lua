@@ -27,42 +27,6 @@ function p.storeMatch(match2)
 	)
 end
 
-function p.storeMatchSMW(match, match2)
-	local streams = match.stream or {}
-	if type(streams) == "string" then streams = json.parse(streams) end
-	local icon = Variables.varDefault("tournament_icon")
-	local smwFormattedDate = mw.getContentLanguage():formatDate("c", match.date or "")
-	local extradata = json.parseIfString(match.extradata) or {}
-	mw.smw.subobject({
-		"legacymatch_" .. match2.match2id,
-		"has mode=" .. (match2.mode or ""),
-		"is map number=1",
-		"has team left=" .. (match.opponent1 or ""),
-		"has team right=" .. (match.opponent2 or ""),
-		"has teams=" .. (match.opponent1 or "") .. "," ..
-			(match.opponent2 or ""), "+sep=,",
-		"Has map date=" .. (smwFormattedDate or ""),
-		"Has tournament=" .. mw.title.getCurrentTitle().prefixedText,
-		"Has tournament tier=" .. (match.liquipediatier or ""),
-		"Has match stream=" .. (streams.stream or ""),
-		"Has match twitch=" .. (streams.twitch or ""),
-		"Has match twitch2=" .. (streams.twitch2 or ""),
-		"Has match youtube=" .. (streams.youtube or ""),
-		"Has tournament name=" .. Logic.emptyOr(match.tickername, match.name, ""),
-		"Has tournament icon=" .. (icon or ""),
-		"Has team left score=" .. (match.opponent1score or "0"),
-		"Has team right score=" .. (match.opponent2score or "0"),
-		"Has exact time=" .. (Logic.readBool(match.dateexact) and "true" or "false"),
-		"Is finished=" .. (Logic.readBool(match.finished) and "true" or "false"),
-		"Has winner=" .. (match.winner or ""),
-		"Is featured match=" .. (extradata.isfeatured and "true" or "false"),
-		"Has calendar icon=" .. (not Logic.isEmpty(icon) and "File:" .. icon or ""),
-		"Has calendar description=" .. " - " .. Logic.emptyOr(match.opponent1, "TBD")
-			.. " vs " .. Logic.emptyOr(match.opponent2, "TBD") .. " on "
-			.. Logic.emptyOr(match.date, "TBD")
-	 })
-end
-
 function p.storeGames(match, match2)
 	local games = ""
 	for gameIndex, game in ipairs(match2.match2games or {}) do
