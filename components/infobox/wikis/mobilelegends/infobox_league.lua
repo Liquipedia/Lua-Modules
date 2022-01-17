@@ -18,6 +18,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
+local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -53,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool()},
+				content = {CustomLeague:_createPrizepool()}
 			},
 		}
 	elseif id == 'liquipediatier' then
@@ -76,16 +77,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Teams'})
 		end
 		table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
-		if not String.isEmpty(_args.team1) then
-			local teams = CustomLeague:_makeBasedListFromArgs('team')
-			table.insert(widgets, Center{content = teams})
-		end
-
-		--maps
-		if not String.isEmpty(_args.map1) then
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeMapList()})
-		end
 	end
 	return widgets
 end
@@ -104,82 +95,24 @@ function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_endpatch', _args.epatch)
 
 	Variables.varDefine('tournament_publishertier', _args['moonton-sponsored'])
-
-	--Legacy Vars:
-	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
-end
-
-function CustomLeague:_concatArgs(base)
-	local firstArg = _args[base] or _args[base .. '1']
-	if String.isEmpty(firstArg) then
-		return nil
-	end
-	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
-	local index = 2
-	while not String.isEmpty(_args[base .. index]) do
-		table.insert(foundArgs,
-			mw.ext.TeamLiquidIntegration.resolve_redirect(_args[base .. index])
-		)
-		index = index + 1
-	end
-
-	return table.concat(foundArgs, ';')
 end
 
 function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and
-		String.isEmpty(_args.prizepoolusd) then
+	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
 		return nil
 	end
-
-	local localCurrency = _args.localcurrency
-	local prizePoolUSD = _args.prizepoolusd
-	local prizePool = _args.prizepool
-
-	prizePool = CustomLeague:_cleanPrizeValue(prizePool, localCurrency)
-	prizePoolUSD = CustomLeague:_cleanPrizeValue(prizePoolUSD)
-
-	if String.isEmpty(prizePool) and String.isEmpty(prizePoolUSD) then
-		return nil
+	local date
+	if String.isNotEmpty(_args.currency_rate) then
+		date = _args.currency_date
 	end
 
-	if localCurrency then
-		localCurrency = string.upper(localCurrency)
-		local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
-		local exchangeRate = CustomLeague:_currencyConversion(
-			1,
-			localCurrency,
-			exchangeDate
-		)
-		--set currency vars for usage in prize pools
-		Variables.varDefine('tournament_currency_rate', exchangeRate or '')
-		Variables.varDefine('tournament_currency', localCurrency)
-		if prizePool and not prizePoolUSD then
-			if not exchangeRate then
-				error('Invalid local currency "' .. localCurrency .. '"')
-			end
-			prizePoolUSD = exchangeRate * prizePool
-		end
-	end
-
-	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
-	Variables.varDefine('tournament_prizepoollocal', prizePool)
-
-	if prizePoolUSD and prizePool then
-		return Template.safeExpand(
-			mw.getCurrentFrame(),
-			'Local currency',
-			{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2)}
-		) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. ' ' .. _ABBR_USD .. ')'
-	elseif prizePoolUSD then
-		return '$' .. CustomLeague:_displayPrizeValue(prizePoolUSD, 2) .. ' ' .. _ABBR_USD
-	elseif prizePool then
-		return Template.safeExpand(
-			mw.getCurrentFrame(),
-			'Local currency',
-			{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2)}
-		)
-	end
+	return PrizePoolCurrency._get({
+		prizepool = _args.prizepool,
+		prizepoolusd = _args.prizepoolusd,
+		currency = _args.localcurrency,
+		rate = _args.currency_rate,
+		date = date or Variables.varDefault('tournament_enddate', _TODAY),
+	})
 end
 
 function CustomLeague:_createTierDisplay()
@@ -287,28 +220,6 @@ function CustomLeague:_cleanPrizeValue(value, currency)
 	end
 
 	return value
-end
-
-function CustomLeague:_makeMapList()
-	local date = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', os.date('%Y-%m-%d'))
-end
-
-function CustomLeague:_getMapModes(modesString, date)
-	if String.isEmpty(modesString) then
-		return ''
-	end
-	local display = ''
-	local tempModesList = mw.text.split(modesString, ',')
-	for _, item in ipairs(tempModesList) do
-		local mode = MapModes.clean(item)
-		if not String.isEmpty(mode) then
-			if display ~= '' then
-				display = display .. '&nbsp;'
-			end
-			display = display .. MapModes.get({mode = mode, date = date, size = 15})
-		end
-	end
-	return display .. '&nbsp;'
 end
 
 function CustomLeague:_makeBasedListFromArgs(base)
