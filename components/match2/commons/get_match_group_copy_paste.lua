@@ -131,7 +131,7 @@ function copyPaste.bracket(frame, args)
 		local matchKey = bracketData.matchKey
 		if matchKey == 'RxMTP' or matchKey == 'RxMBR' then
 			if args.extra == 'true' then
-				local header
+				local header = ''
 				if matchKey == 'RxMTP' then
 					header = '\n\n' .. '<!-- Third Place Match -->' .. '\n|' .. matchKey .. 'header='
 				end
