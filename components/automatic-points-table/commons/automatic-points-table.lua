@@ -193,55 +193,67 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 			local teamPointsData = {}
 			local totalPoints = 0
 			for tournamentIndex = 1, #tournaments do
-				local tournamentTeamPointsData = {}
-				local manualPoints = team.manualPoints[tournamentIndex]
-				local placement = team.results[tournamentIndex]
-
-				-- manual points get highest priority
-				if manualPoints ~= nil then
-					tournamentTeamPointsData = Table.mergeInto(tournamentTeamPointsData, {
-						amount = manualPoints,
-						type = 'MANUAL'
-					})
-					totalPoints = totalPoints + manualPoints
-				-- placement points get next priority
-				elseif placement ~= nil then
-					local prizePoints = placement.prizePoints
-					local securedPoints = placement.securedPoints
-					if prizePoints ~= nil then
-						tournamentTeamPointsData = Table.mergeInto(tournamentTeamPointsData, {
-							amount = prizePoints,
-							type = 'PRIZE'
-						})
-						totalPoints = totalPoints + prizePoints
-					-- secured points are the points that are guaranteed for a team in a tournament
-					-- a team with X secured points will get X or more points at the end of the tournament
-					elseif securedPoints ~= nil then
-						tournamentTeamPointsData = Table.mergeInto(tournamentTeamPointsData, {
-							amount = securedPoints,
-							type = 'SECURED'
-						})
-						totalPoints = totalPoints + securedPoints
-					end
+				local tournamentTeamPointsData = self:getTournamentTeamPointsData(manualPoints, placement)
+				if Table.isNotEmpty(tournamentTeamPointsData) then
+					totalPoints = totalPoints + tournamentTeamPointsData.amount
 				end
 
 				local deduction = team.deductions[tournamentIndex]
-				if deduction ~= nil then
-					local deductionAmount = deduction.amount
-					if deductionAmount ~= nil then
-						tournamentTeamPointsData.deduction = deduction
-						totalPoints = totalPoints - deductionAmount
-						-- will only show the deductions column if there's atleast one team with
-						-- some deduction for a tournament
-						tournaments[tournamentIndex].deductionsVisible = true
-					end
+				local dataWithDeduction = self:getDeductionData(deduction, tournamentTeamPointsData)
+				if Table.isNotEmpty(dataWithDeduction.deduction) then
+					-- will only show the deductions column if there's atleast one team with
+					-- some deduction for a tournament
+					tournaments[tournamentIndex].deductionsVisible = true
+					totalPoints = totalPoints - dataWithDeduction.deduction.amount
 				end
+				
 				teamPointsData[tournamentIndex] = tournamentTeamPointsData
 			end
 			teamPointsData.totalPoints = totalPoints
 			pointsData[teamIndex] = teamPointsData
 		end
 	)
+
+	return pointsData
+end
+
+function AutomaticPointsTable:getTournamentTeamPointsData(manualPoints, placement)
+	local pointsData = {}
+	-- manual points get highest priority
+	if manualPoints ~= nil then
+		pointsData = Table.mergeInto(pointsData, {
+			amount = manualPoints,
+			type = 'MANUAL'
+		})
+	-- placement points get next priority
+	elseif placement ~= nil then
+		local prizePoints = placement.prizePoints
+		local securedPoints = placement.securedPoints
+		if prizePoints ~= nil then
+			pointsData = Table.mergeInto(pointsData, {
+				amount = prizePoints,
+				type = 'PRIZE'
+			})
+		-- secured points are the points that are guaranteed for a team in a tournament
+		-- a team with X secured points will get X or more points at the end of the tournament
+		elseif securedPoints ~= nil then
+			pointsData = Table.mergeInto(pointsData, {
+				amount = securedPoints,
+				type = 'SECURED'
+			})
+		end
+	end
+
+	return pointsData
+end
+
+function AutomaticPointsTable:getDeductionData(deduction, pointsData)
+	if deduction ~= nil then
+		local deductionAmount = deduction.amount
+		if deductionAmount ~= nil then
+			pointsData.deduction = deduction
+		end
+	end
 
 	return pointsData
 end
