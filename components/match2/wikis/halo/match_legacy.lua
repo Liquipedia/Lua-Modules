@@ -9,10 +9,8 @@
 local p = {}
 
 local json = require("Module:Json")
-local Logic = require("Module:Logic")
 local String = require("Module:StringUtils")
 local Table = require("Module:Table")
-local Variables = require("Module:Variables")
 
 function p.storeMatch(match2)
 	local match = p._convertParameters(match2)
