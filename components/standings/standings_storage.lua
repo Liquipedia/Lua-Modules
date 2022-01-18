@@ -10,7 +10,7 @@ local StandingsStorage = {}
 
 function StandingsStorage.run(index, data)
 	mw.ext.LiquipediaDB.lpdb_standing(
-		'standing_' .. data.standingsindex .. '_' .. data.itemindex,
+		'standing_' .. data.standingsindex .. '_' .. index,
 		{
 			title = data.title,
 			tournament = data.tournament,
