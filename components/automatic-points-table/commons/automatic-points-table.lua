@@ -193,6 +193,8 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 			local teamPointsData = {}
 			local totalPoints = 0
 			for tournamentIndex = 1, #tournaments do
+				local manualPoints = team.manualPoints[tournamentIndex]
+				local placement = team.results[tournamentIndex]
 				local tournamentTeamPointsData = self:getTournamentTeamPointsData(manualPoints, placement)
 				if Table.isNotEmpty(tournamentTeamPointsData) then
 					totalPoints = totalPoints + tournamentTeamPointsData.amount
