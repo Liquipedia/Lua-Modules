@@ -17,8 +17,6 @@ function p.storeMatch(match2)
 
 	match.games = p.storeGames(match, match2)
 
-	p.storeMatchSMW(match, match2)
-
 	return mw.ext.LiquipediaDB.lpdb_match(
 		"legacymatch_" .. match2.match2id,
 		match
