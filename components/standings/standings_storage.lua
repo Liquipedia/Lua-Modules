@@ -28,7 +28,7 @@ function StandingsStorage.run(index, data)
 				points = data.points,
 			}),
 			standingsindex = data.standingsindex,
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json({})
+			extradata = mw.ext.LiquipediaDB.lpdb_create_json({data.extradata or {}})
 		}
 	)
 end
