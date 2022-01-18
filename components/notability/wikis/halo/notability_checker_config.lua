@@ -16,7 +16,6 @@ Config.TIER_TYPE_GENERAL = 'general'
 Config.TIER_TYPE_QUALIFIER = 'qualifier'
 Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
-Config.TIER_TYPE_CHARITY = 'charity'
 Config.TIER_TYPE_DAILY = 'daily'
 Config.TIER_TYPE_FFA = 'ffa'
 
@@ -187,9 +186,6 @@ end
 -- want to decrease the points given for a certain mode
 function Config.adjustScoreForMode(score, mode)
 	local modeMod = 1
-	if mode == "2v2" then
-		modeMod = 0.5
-	end
 	return score * modeMod
 end
 
