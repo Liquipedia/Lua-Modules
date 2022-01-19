@@ -132,18 +132,23 @@ function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
 	return manualPoints
 end
 
-function AutomaticPointsTable:queryPlacements(teams, tournaments)
-	-- to get a team index, use reverseAliasLookupTable[tournamentIndex][alias]
-	local reverseAliasLookupTable = {}
+function AutomaticPointsTable:generateReverseAliasLookupTable(teams, tournaments)
+	local LookupTable = {}
 	for tournamentIndex = 1, #tournaments do
-		reverseAliasLookupTable[tournamentIndex] = {}
+		LookupTable[tournamentIndex] = {}
 		Table.iter.forEachIndexed(teams,
 			function(index, team)
 				local alias = mw.language.getContentLanguage():ucfirst(team.aliases[tournamentIndex])
-				reverseAliasLookupTable[tournamentIndex][alias] = index
+				LookupTable[tournamentIndex][alias] = index
 			end
 		)
 	end
+	return LookupTable
+end
+
+function AutomaticPointsTable:queryPlacements(teams, tournaments)
+	-- to get a team index, use reverseAliasLookupTable[tournamentIndex][alias]
+	local reverseAliasLookupTable = self:generateReverseAliasLookupTable(teams, tournaments)
 
 	local queryParams = {
 		limit = 5000,
@@ -208,7 +213,6 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 					tournaments[tournamentIndex].deductionsVisible = true
 					totalPoints = totalPoints - dataWithDeduction.deduction.amount
 				end
-				
 				teamPointsData[tournamentIndex] = tournamentTeamPointsData
 			end
 			teamPointsData.totalPoints = totalPoints
