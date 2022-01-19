@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Flags = require('Module:Flags')
+
 local StandingsStorage = {}
 
 function StandingsStorage.run(index, data)
@@ -16,7 +18,7 @@ function StandingsStorage.run(index, data)
 			tournament = data.tournament,
 			participant = data.participant,
 			participantdisplay = data.participantdisplay,
-			participantflag = data.participantflag,
+			participantflag = Flags.CountryName(data.participantflag),
 			icon = data.icon,
 			placement = data.placement or data.rank,
 			definitestatus = data.definitestatus or data.bg,
