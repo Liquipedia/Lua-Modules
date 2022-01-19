@@ -17,7 +17,7 @@ local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', 
 
 local StarcraftMatchlistDisplay = {}
 
-function StarcraftMatchlistDisplay.MatchlistContainer(props)
+function StarcraftMatchlistDisplay.MatchlistContainer(props, matches)
 	return MatchlistDisplay.Matchlist({
 		config = Table.merge(props.config, {
 			MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
@@ -25,7 +25,7 @@ function StarcraftMatchlistDisplay.MatchlistContainer(props)
 			Score = StarcraftMatchlistDisplay.Score,
 			matchHasDetails = StarcraftMatchGroupUtil.matchHasDetails,
 		}),
-		matches = MatchGroupUtil.fetchMatches(props.bracketId),
+		matches = matches or MatchGroupUtil.fetchMatches(props.bracketId),
 	})
 end
 
