@@ -20,9 +20,9 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local _POINTS_TYPE = {
-	'MANUAL' = 1,
-	'PRIZE' = 2,
-	'SECURED' = 3,
+	MANUAL = 'MANUAL',
+	PRIZE = 'PRIZE',
+	SECURED = 'SECURED'
 }
 
 local AutomaticPointsTable = Class.new(
@@ -138,23 +138,24 @@ function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
 	return manualPoints
 end
 
-function AutomaticPointsTable:generateReverseAliasLookupTable(teams, tournaments)
-	local LookupTable = {}
+function AutomaticPointsTable:generateReverseAliases(teams, tournaments)
+	local reverseAliases = {}
 	for tournamentIndex = 1, #tournaments do
-		LookupTable[tournamentIndex] = {}
+		reverseAliases[tournamentIndex] = {}
 		Table.iter.forEachIndexed(teams,
 			function(index, team)
 				local alias = mw.language.getContentLanguage():ucfirst(team.aliases[tournamentIndex])
-				LookupTable[tournamentIndex][alias] = index
+				reverseAliases[tournamentIndex][alias] = index
 			end
 		)
 	end
-	return LookupTable
+	return reverseAliases
 end
+
 
 function AutomaticPointsTable:queryPlacements(teams, tournaments)
 	-- to get a team index, use reverseAliasLookupTable[tournamentIndex][alias]
-	local reverseAliasLookupTable = self:generateReverseAliasLookupTable(teams, tournaments)
+	local reverseAliases = self:generateReverseAliasLookupTable(teams, tournaments)
 
 	local queryParams = {
 		limit = 5000,
@@ -198,65 +199,66 @@ function AutomaticPointsTable:queryPlacements(teams, tournaments)
 end
 
 function AutomaticPointsTable:getPointsData(teams, tournaments)
-	local pointsData = {}
-	Table.iter.forEachIndexed(teams,
+	return Table.map(teams,
 		function(teamIndex, team)
 			local teamPointsData = {}
 			local totalPoints = 0
 			for tournamentIndex = 1, #tournaments do
 				local manualPoints = team.manualPoints[tournamentIndex]
 				local placement = team.results[tournamentIndex]
-				local tournamentTeamPointsData = self:getTournamentTeamPointsData(manualPoints, placement)
-				if Table.isNotEmpty(tournamentTeamPointsData) then
-					totalPoints = totalPoints + tournamentTeamPointsData.amount
+
+				local pointsForTournament = self:calculatePointsForTournament(manualPoints, placement)
+				if Table.isNotEmpty(pointsForTournament) then
+					totalPoints = totalPoints + pointsForTournament.amount
 				end
 
 				local deduction = team.deductions[tournamentIndex]
-				local dataWithDeduction = self:getDeductionData(deduction, tournamentTeamPointsData)
-				if Table.isNotEmpty(dataWithDeduction.deduction) then
+				pointsForTournament.deduction = deduction ~= nil and deduction or nil
+				if Table.isNotEmpty(pointsForTournament.deduction) then
 					-- will only show the deductions column if there's atleast one team with
 					-- some deduction for a tournament
-					tournaments[tournamentIndex].deductionsVisible = true
-					totalPoints = totalPoints - dataWithDeduction.deduction.amount
+					tournaments[tournamentIndex].shouldDeductionsBeVisible = true
+					totalPoints = totalPoints - (pointsForTournament.deduction.amount or 0)
 				end
-				teamPointsData[tournamentIndex] = tournamentTeamPointsData
+
+				teamPointsData[tournamentIndex] = pointsForTournament
 			end
+
+			-- need teamIndex to reference team after sorting pointsData
+			teamPointsData.teamIndex = teamIndex
 			teamPointsData.totalPoints = totalPoints
-			pointsData[teamIndex] = teamPointsData
+			return teamIndex, teamPointsData
 		end
 	)
-
-	return pointsData
 end
 
-function AutomaticPointsTable:getTournamentTeamPointsData(manualPoints, placement)
-	local pointsData = {}
+function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoints)
 	-- manual points get highest priority
 	if manualPoints ~= nil then
-		pointsData = Table.mergeInto(pointsData, {
+		return {
 			amount = manualPoints,
-			type = 'MANUAL'
-		})
+			type = _POINTS_TYPE.MANUAL
+		}
 	-- placement points get next priority
 	elseif placement ~= nil then
 		local prizePoints = placement.prizePoints
 		local securedPoints = placement.securedPoints
 		if prizePoints ~= nil then
-			pointsData = Table.mergeInto(pointsData, {
+			return {
 				amount = prizePoints,
-				type = 'PRIZE'
-			})
+				type = _POINTS_TYPE.PRIZE
+			}
 		-- secured points are the points that are guaranteed for a team in a tournament
 		-- a team with X secured points will get X or more points at the end of the tournament
 		elseif securedPoints ~= nil then
-			pointsData = Table.mergeInto(pointsData, {
+			return {
 				amount = securedPoints,
-				type = 'SECURED'
-			})
+				type = _POINTS_TYPE.SECURED
+			}
 		end
 	end
 
-	return pointsData
+	return {}
 end
 
 function AutomaticPointsTable:getDeductionData(deduction, pointsData)
