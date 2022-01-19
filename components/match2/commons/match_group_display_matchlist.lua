@@ -52,11 +52,11 @@ MatchlistDisplay.propTypes.MatchlistContainer = {
 Display component for a tournament matchlist. The matchlist is specified by ID.
 The component fetches the match data from LPDB or page variables.
 ]]
-function MatchlistDisplay.MatchlistContainer(props)
+function MatchlistDisplay.MatchlistContainer(props, matches)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.MatchlistContainer)
 	return MatchlistDisplay.Matchlist({
 		config = props.config,
-		matches = MatchGroupUtil.fetchMatches(props.bracketId),
+		matches = matches or MatchGroupUtil.fetchMatches(props.bracketId),
 	})
 end
 
