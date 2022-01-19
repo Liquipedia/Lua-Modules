@@ -188,7 +188,7 @@ function AutomaticPointsTable:queryPlacements(teams, tournaments)
 			table.insert(tournament.placements, result)
 
 			local participant = result.participant
-			local teamIndex = reverseAliasLookupTable[tournamentIndex][participant]
+			local teamIndex = reverseAliases[tournamentIndex][participant]
 			if teamIndex ~= nil then
 				teams[teamIndex].results[tournamentIndex] = result
 			end
