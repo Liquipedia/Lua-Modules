@@ -84,9 +84,6 @@ function League:addToLpdb(lpdbData, args)
 end
 
 function League:defineCustomPageVariables()
-	if _args.player_number then
-		Variables.varDefine('tournament_mode', 'solo')
-	end
 	Variables.varDefine('tournament_patch', _args.patch)
 	Variables.varDefine('tournament_endpatch', _args.epatch)
 
@@ -140,9 +137,6 @@ function CustomLeague:_createTierDisplay()
 	output = output ..
 		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
 		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
-
-	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_tiertype', tierType)
 	return output
 end
 
