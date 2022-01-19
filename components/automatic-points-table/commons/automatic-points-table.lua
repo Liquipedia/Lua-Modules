@@ -19,6 +19,12 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local _POINTS_TYPE = {
+	'MANUAL' = 1,
+	'PRIZE' = 2,
+	'SECURED' = 3,
+}
+
 local AutomaticPointsTable = Class.new(
 	function(self, frame)
 		self.frame = frame
