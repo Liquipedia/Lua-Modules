@@ -154,8 +154,8 @@ end
 
 
 function AutomaticPointsTable:queryPlacements(teams, tournaments)
-	-- to get a team index, use reverseAliasLookupTable[tournamentIndex][alias]
-	local reverseAliases = self:generateReverseAliasLookupTable(teams, tournaments)
+	-- to get a team index, use reverseAliases[tournamentIndex][alias]
+	local reverseAliases = self:generateReverseAliases(teams, tournaments)
 
 	local queryParams = {
 		limit = 5000,
@@ -207,7 +207,7 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 				local manualPoints = team.manualPoints[tournamentIndex]
 				local placement = team.results[tournamentIndex]
 
-				local pointsForTournament = self:calculatePointsForTournament(manualPoints, placement)
+				local pointsForTournament = self:calculatePointsForTournament(placement, manualPoints)
 				if Table.isNotEmpty(pointsForTournament) then
 					totalPoints = totalPoints + pointsForTournament.amount
 				end
@@ -259,17 +259,6 @@ function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoin
 	end
 
 	return {}
-end
-
-function AutomaticPointsTable:getDeductionData(deduction, pointsData)
-	if deduction ~= nil then
-		local deductionAmount = deduction.amount
-		if deductionAmount ~= nil then
-			pointsData.deduction = deduction
-		end
-	end
-
-	return pointsData
 end
 
 return AutomaticPointsTable
