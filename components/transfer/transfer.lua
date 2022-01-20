@@ -1,4 +1,3 @@
-local p = {}
 local htmlCreate = mw.html.create
 local getArgs = require('Module:Arguments').getArgs
 local Flag = require('Module:Flags')
@@ -6,23 +5,25 @@ local Localisation = require('Module:Localisation')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
-function p.create(frame)
+local Transfer = {}
+
+function Transfer.create(frame)
 	local args = getArgs(frame)
 	local date = args.date_est or args.date
 	local refTable = {}
-	args, refTable = p._parseArgs(args)
+	args, refTable = Transfer._parseArgs(args)
 
 	local wrapper = htmlCreate('div')
-	wrapper:attr('class', 'divRow mainpage-transfer-' .. p._getStatus(args.team1, args.team2))
-	wrapper:node(p._createDate(args.date))
+	wrapper:attr('class', 'divRow mainpage-transfer-' .. Transfer._getStatus(args.team1, args.team2))
+	wrapper:node(Transfer._createDate(args.date))
 	if (args.platformIcons or '') == 'true' then
-		wrapper:node(p._createPlatform(frame, args))
+		wrapper:node(Transfer._createPlatform(frame, args))
 	end
-	wrapper:node(p._createName(frame, args))
-	wrapper:node(p._createTeam(frame, args.team1, args.team1_2, args.role1, args.role1_2, true, args.from_date))
-	wrapper:node(p._createIcon(frame, args.transferIcon))
-	wrapper:node(p._createTeam(frame, args.team2, args.team2_2, args.role2, args.role2_2, false, date))
-	wrapper:node(p._createReferences(args.ref, refTable))
+	wrapper:node(Transfer._createName(frame, args))
+	wrapper:node(Transfer._createTeam(frame, args.team1, args.team1_2, args.role1, args.role1_2, true, args.from_date))
+	wrapper:node(Transfer._createIcon(frame, args.transferIcon))
+	wrapper:node(Transfer._createTeam(frame, args.team2, args.team2_2, args.role2, args.role2_2, false, date))
+	wrapper:node(Transfer._createReferences(args.ref, refTable))
 
 	local shouldDisableLpdbStorage = Logic.readBool(mw.ext.VariablesLua.var('disable_LPDB_storage'))
 	local shouldDisableSmwStorage = Logic.readBool(mw.ext.VariablesLua.var('disable_SMW_storage'))
@@ -31,17 +32,17 @@ function p.create(frame)
 		if transferSortIndex == nil then
 			mw.ext.VariablesLua.vardefine('transfer_sort_index', 0)
 		end
-		p._saveToLpdb(args, date, refTable)
+		Transfer._saveToLpdb(args, date, refTable)
 	end
 	return wrapper
 end
 
-function p._parseArgs(args)
-	args.from_date = p.adjustDate(args.date_est or args.date)
+function Transfer._parseArgs(args)
+	args.from_date = Transfer.adjustDate(args.date_est or args.date)
 
 	for i=1,2 do
-		args['role' .. i] = args['role' .. i] and p._firstToUpper(args['role' .. i])
-		args['role' .. i .. '_2'] = args['role' .. i .. '_2'] and p._firstToUpper(args['role' .. i .. '_2'])
+		args['role' .. i] = args['role' .. i] and Transfer._firstToUpper(args['role' .. i])
+		args['role' .. i .. '_2'] = args['role' .. i .. '_2'] and Transfer._firstToUpper(args['role' .. i .. '_2'])
 		-- for " multi transfers" move inactive part to secondary
 		if args['role' .. i .. '_2'] and args['role' .. i .. '_2'] ~= 'Inactive' and args['role' .. i] and args['role' .. i] == 'Inactive' then
 			args['role' .. i], args['role' .. i .. '_2'] = args['role' .. i .. '_2'], args['role' .. i]
@@ -90,11 +91,11 @@ function p._parseArgs(args)
 	return args, refTable
 end
 
-function p._firstToUpper(str)
+function Transfer._firstToUpper(str)
 	return (str:gsub("^%l", string.upper))
 end
 
-function p._getStatus(team1, team2)
+function Transfer._getStatus(team1, team2)
 	if team1 ~= nil then
 		if team2 ~= nil then
 			return 'neutral'
@@ -106,7 +107,7 @@ function p._getStatus(team1, team2)
 	return 'to-team'
 end
 
-function p._createDate(date)
+function Transfer._createDate(date)
 	local div = htmlCreate('div')
 	div:attr('class', 'divCell Date')
 	div:wikitext(date)
@@ -114,7 +115,7 @@ function p._createDate(date)
 	return div
 end
 
-function p._createPlatform(frame, args)
+function Transfer._createPlatform(frame, args)
 	local getPlatform = require('Module:Platform')
 	args.platform = getPlatform._getName(args.platform)
 
@@ -125,7 +126,7 @@ function p._createPlatform(frame, args)
 	return div
 end
 
-function p._createName(frame, args)
+function Transfer._createName(frame, args)
 	local getIcon, getPositionName
 	if args.iconModule then
 		getIcon = mw.loadData(args.iconModule)
@@ -133,12 +134,12 @@ function p._createName(frame, args)
 
 	local div = htmlCreate('div')
 	div:attr('class', 'divCell Name')
-	div:wikitext(p._createNameRow(frame, args.name, args.flag, args.link, args.posIcon, getIcon))
+	div:wikitext(Transfer._createNameRow(frame, args.name, args.flag, args.link, args.posIcon, getIcon))
 
 	local nameIndex = 2
 	while (args['name' .. nameIndex] ~= nil) do
 		div:wikitext('<br/>')
-		div:wikitext(p._createNameRow(
+		div:wikitext(Transfer._createNameRow(
 			frame,
 			args['name' .. nameIndex],
 			args['flag' .. nameIndex],
@@ -152,7 +153,7 @@ function p._createName(frame, args)
 	return div
 end
 
-function p._createNameRow(frame, name, flag, link, icon, iconModule)
+function Transfer._createNameRow(frame, name, flag, link, icon, iconModule)
 	local row = ''
 
 	if flag ~= nil then
@@ -176,7 +177,7 @@ function p._createNameRow(frame, name, flag, link, icon, iconModule)
 	return row
 end
 
-function p._createTeam(frame, team, teamsec, role, rolesec, isOldTeam, date)
+function Transfer._createTeam(frame, team, teamsec, role, rolesec, isOldTeam, date)
 	local teamCell = htmlCreate('div')
 	teamCell:attr('class', 'divCell Team ' .. (isOldTeam and 'OldTeam' or 'NewTeam'))
 
@@ -192,12 +193,12 @@ function p._createTeam(frame, team, teamsec, role, rolesec, isOldTeam, date)
 	if teamsec then
 		teamCell:node('/' .. mw.ext.TeamTemplate.teamicon(teamsec, date))
 	end
-	teamCell:node(p._createRole(role, rolesec, team))
+	teamCell:node(Transfer._createRole(role, rolesec, team))
 
 	return teamCell
 end
 
-function p._createRole(role, rolesec, hasTeam)
+function Transfer._createRole(role, rolesec, hasTeam)
 	if role == nil then
 		return nil
 	end
@@ -216,7 +217,7 @@ function p._createRole(role, rolesec, hasTeam)
 	return span
 end
 
-function p._createIcon(frame, icon)
+function Transfer._createIcon(frame, icon)
 	local div = htmlCreate('div'):attr('class', 'divCell Icon'):css('font-size','larger')
 
 	if icon == nil then
@@ -228,7 +229,7 @@ function p._createIcon(frame, icon)
 	return div
 end
 
-function p._createReferences(reference, refTable)
+function Transfer._createReferences(reference, refTable)
 	local div = htmlCreate('div'):attr('class', 'divCell Ref')
 
 	if not(refTable['reference1']) then
@@ -254,12 +255,12 @@ end
 ---
 -- Saves all players to LPDB
 --
-function p._saveToLpdb(args, date, refTable)
-	p._savePlayerToLpdb(args, date, refTable, 1)
+function Transfer._saveToLpdb(args, date, refTable)
+	Transfer._savePlayerToLpdb(args, date, refTable, 1)
 
 	local index = 2
 	while (args['name' .. index]  ~= nil) do
-		p._savePlayerToLpdb(args, date, refTable, index)
+		Transfer._savePlayerToLpdb(args, date, refTable, index)
 		index = index + 1
 	end
 end
@@ -267,7 +268,7 @@ end
 ---
 -- Saves an individual player to LPDB
 --
-function p._savePlayerToLpdb(args, date, refTable, index)
+function Transfer._savePlayerToLpdb(args, date, refTable, index)
 	local references
 	if refTable['reference1'] and args.allRef then
 		references = refTable
@@ -322,7 +323,7 @@ function p._savePlayerToLpdb(args, date, refTable, index)
 end
 
 -- earlier date for fromteam to account for rebrands
-function p.adjustDate(date)
+function Transfer.adjustDate(date)
 	if type(date) == 'string' then
 		local year, month, day = date:match('(%d+)-(%d+)-(%d+)')
 		date = os.time({day=day, month=month, year=year})
@@ -334,8 +335,8 @@ end
 
 
 --backwards compatibility
-function p.row(frame)
-	return p.create(frame)
+function Transfer.row(frame)
+	return Transfer.create(frame)
 end
 
-return p
+return Transfer
