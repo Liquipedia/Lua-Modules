@@ -62,7 +62,7 @@ end
 function Transfer._parseArgs(args)
 	args.from_date = Transfer.adjustDate(args.date_est or args.date)
 
-	for i=1,2 do
+	for i= 1, 2 do
 		args['role' .. i] = args['role' .. i] and Transfer._firstToUpper(args['role' .. i])
 		args['role' .. i .. '_2'] = args['role' .. i .. '_2'] and Transfer._firstToUpper(args['role' .. i .. '_2'])
 		-- for " multi transfers" move inactive part to secondary
@@ -72,24 +72,33 @@ function Transfer._parseArgs(args)
 		end
 	end
 
+	local nameIndex = 2
 	if args.positionConvert then
 		local getPositionName = mw.loadData(args.positionConvert)
-		args[(args.iconParam or 'pos')] = getPositionName[ string.lower(args[(args.iconParam or 'pos')] or '') ] or args[(args.iconParam or 'pos')]
-		local nameIndex = 2
+		args[(args.iconParam or 'pos')] =
+			getPositionName[string.lower(args[(args.iconParam or 'pos')] or '')] or
+			args[(args.iconParam or 'pos')]
 		while (args['name' .. nameIndex] ~= nil) do
-			args[(args.iconParam or 'pos') .. nameIndex] = getPositionName[ string.lower(args[(args.iconParam or 'pos') .. nameIndex] or '') ] or args[(args.iconParam or 'pos') .. nameIndex]
+			args[(args.iconParam or 'pos') .. nameIndex] =
+				getPositionName[string.lower(args[(args.iconParam or 'pos') .. nameIndex] or '')] or
+				args[(args.iconParam or 'pos') .. nameIndex]
 			nameIndex = nameIndex + 1
 		end
 	end
-	args.posIcon = args[(args.iconParam or 'pos')] and (args[(args.iconParam or 'pos')] .. (args.sub and '_Substitute' or '')) or (args.sub and 'Substitute' or '')
-	local nameIndex = 2
+	args.posIcon = args[(args.iconParam or 'pos')] and
+		(args[(args.iconParam or 'pos')] .. (args.sub and '_Substitute' or '')) or
+		(args.sub and 'Substitute' or '')
+
+	nameIndex = 2
 	while (args['name' .. nameIndex] ~= nil) do
-		args['posIcon' .. nameIndex] = args[(args.iconParam or 'pos') .. nameIndex] and (args[(args.iconParam or 'pos') .. nameIndex] .. (args['sub' .. nameIndex] and '_Substitute' or '')) or (args['sub' .. nameIndex] and 'Substitute' or '')
+		args['posIcon' .. nameIndex] = args[(args.iconParam or 'pos') .. nameIndex] and
+		(args[(args.iconParam or 'pos') .. nameIndex] .. (args['sub' .. nameIndex] and
+		'_Substitute' or '')) or (args['sub' .. nameIndex] and 'Substitute' or '')
 		nameIndex = nameIndex + 1
 	end
 
 	local refTable, refIndex = {}, 0
-	args.allRef = true --enter all references for all players into LPDB
+	args.allRef = true -- Enter all references for all players into LPDB
 	if args.refType == 'table' and args.ref then
 		local references = mw.text.split(args.ref, ';;;', true)
 		for index, fullRef in pairs(references) do
@@ -99,10 +108,6 @@ function Transfer._parseArgs(args)
 			end
 		end
 
-		local nameIndex = 1
-		while (args['name' .. (nameIndex + 1)] ~= nil) do
-			nameIndex = nameIndex + 1
-		end
 		-- same amount of players and references? individually allocate them later for LPDB storage
 		-- special case: 2 refs/players (often times this will be a reference from both teams)
 		if nameIndex == refIndex and (refIndex > 2 or not(args.team1) or not(args.team2)) then
