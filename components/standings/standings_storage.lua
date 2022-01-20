@@ -27,6 +27,7 @@ function StandingsStorage.run(index, data)
 			scoreboard = mw.ext.LiquipediaDB.lpdb_create_json({
 				match = data.match, -- [won, draw, lost]
 				overtime = data.overtime, -- [won, draw, lost]
+				game = data.game, -- [won, draw, lost]
 				points = data.points,
 				diff = data.diff,
 
