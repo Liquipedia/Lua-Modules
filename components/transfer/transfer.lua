@@ -319,7 +319,7 @@ function Transfer._savePlayerToLpdb(args, date, refTable, index)
 	else
 		references = { reference1 = refTable['reference' .. index] or args.ref or '' }
 	end
-	local name, flag, link = '', '', ''
+	local name, flag, link, pos, icon, sub
 	if index == 1 then
 		name = args.name
 		flag = args.flag
