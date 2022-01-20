@@ -213,12 +213,12 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 				end
 
 				local deduction = team.deductions[tournamentIndex]
-				pointsForTournament.deduction = deduction ~= nil and deduction or nil
-				if Table.isNotEmpty(pointsForTournament.deduction) then
+				if Table.isNotEmpty(deduction) then
+					pointsForTournament.deduction = deduction
 					-- will only show the deductions column if there's atleast one team with
 					-- some deduction for a tournament
 					tournaments[tournamentIndex].shouldDeductionsBeVisible = true
-					totalPoints = totalPoints - (pointsForTournament.deduction.amount or 0)
+					totalPoints = totalPoints - (deduction.amount or 0)
 				end
 
 				teamPointsData[tournamentIndex] = pointsForTournament
