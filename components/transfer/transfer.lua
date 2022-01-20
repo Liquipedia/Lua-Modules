@@ -8,6 +8,15 @@ local Transfer = {}
 
 local _SECONDS_24_HOURS = 86400
 
+---
+-- These strings are "reserved" keywords, e.g. so that we can set a player to Retired
+local _SPECIAL_TEAMS = {
+    'inactive',
+    'active',
+    'retired',
+    'none'
+}
+
 -- Provide for backwards compatibility
 function Transfer.row(frame)
 	return Transfer.create(frame)
@@ -108,16 +117,33 @@ function Transfer._firstToUpper(str)
 	return (str:gsub("^%l", string.upper))
 end
 
+---
+-- Returns true if the team string denotes a reserved string, see specialTeams
+--
+function Transfer._isSpecialTeam(team)
+    for _, value in ipairs(_SPECIAL_TEAMS) do
+        if value == string.lower(team) then
+            return true
+        end
+    end
+
+    return false
+end
+
 function Transfer._getStatus(team1, team2)
-	if team1 ~= nil then
-		if team2 ~= nil then
-			return 'neutral'
-		end
+    if team1 ~= nil and not Transfer._isSpecialTeam(team1) then
+        if team2 ~= nil and not Transfer._isSpecialTeam(team2) then
+            return 'neutral'
+        end
 
-		return 'from-team'
-	end
+        return 'from-team'
+    end
 
-	return 'to-team'
+    if team2 ~= nil and Transfer._isSpecialTeam(team2) then
+        return 'from-team'
+    end
+
+    return 'to-team'
 end
 
 function Transfer._createDate(date)
