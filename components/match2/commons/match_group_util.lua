@@ -146,6 +146,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	vod = 'string?',
 	walkover = 'string?',
 	winner = 'number?',
+	lrthread = 'string?',
 })
 
 MatchGroupUtil.types.Team = TypeUtil.struct({
@@ -378,6 +379,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
 		winner = tonumber(record.winner),
+		lrthread = nilIfEmpty(record.lrthread),
 	}
 end
 
