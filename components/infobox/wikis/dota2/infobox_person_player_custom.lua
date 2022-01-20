@@ -24,23 +24,23 @@ local Center = require('Module:Infobox/Widget/Center')
 
 local _BANNED = mw.loadData('Module:Banned')
 local _ROLES = {
-	['analyst'] = '[[:Category:Analysts|' .. Variables.varDefineEcho('role', 'Analyst') .. ']]',
-	['carry'] = '[[:Category:Carry players|' .. Variables.varDefineEcho('role', 'Carry') .. ']]',
-	['mid'] = '[[:Category:Solo middle players|' .. Variables.varDefineEcho('role', 'Solo Middle') .. ']]',
-	['solo middle'] = '[[:Category:Solo middle players|' .. Variables.varDefineEcho('role', 'Solo Middle') .. ']]',
-	['solomiddle'] = '[[:Category:Solo middle players|' .. Variables.varDefineEcho('role', 'Solo Middle') .. ']]',
-	['offlane'] = '[[:Category:Offlaners|' .. Variables.varDefineEcho('role', 'Offlaner') .. ']]',
-	['offlaner'] = '[[:Category:Offlaners|' .. Variables.varDefineEcho('role', 'Offlaner') .. ']]',
-	['observer'] = '[[:Category:Observers|' .. Variables.varDefineEcho('role', 'Observer') .. ']]',
-	['host'] = '[[:Category:Hosts|' .. Variables.varDefineEcho('role', 'Host') .. ']]',
-	['captain'] = '[[:Category:Captains|' .. Variables.varDefineEcho('role', 'Captain') .. ']]',
-	['journalist'] = '[[:Category:Journalists|' .. Variables.varDefineEcho('role', 'Journalist') .. ']]',
-	['support'] = '[[:Category:Support players|' .. Variables.varDefineEcho('role', 'Support') .. ']]',
-	['expert'] = '[[:Category:Experts|' .. Variables.varDefineEcho('role', 'Expert') .. ']]',
-	['coach'] = '[[:Category:Coaches|' .. Variables.varDefineEcho('role', 'Coach') .. ']]',
-	['caster'] = '[[:Category:Casters|' .. Variables.varDefineEcho('role', 'Caster') .. ']]',
-	['manager'] = '[[:Category:Managers|' .. Variables.varDefineEcho('role', 'Manager') .. ']]',
-	['streamer'] = '[[:Category:Streamers|' .. Variables.varDefineEcho('role', 'Streamer') .. ']]'
+	['analyst'] = {category = 'Analysts', variable = 'Analyst'},
+	['carry'] = {category = 'Carry players', variable = 'Carry'},
+	['mid'] = {category = 'Solo middle players', variable = 'Solo Middle'},
+	['solo middle'] = {category = 'Solo middle players', variable = 'Solo Middle'},
+	['solomiddle'] = {category = 'Solo middle players', variable = 'Solo Middle'},
+	['offlane'] = {category = 'Offlaners', variable = 'Offlaner'},
+	['offlaner'] = {category = 'Offlaners', variable = 'Offlaner'},
+	['observer'] = {category = 'Observers', variable = 'Observer'},
+	['host'] = {category = 'Hosts', variable = 'Host'},
+	['captain'] = {category = 'Captains', variable = 'Captain'},
+	['journalist'] = {category = 'Journalists', variable = 'Journalist'},
+	['support'] = {category = 'Support players', variable = 'Support'},
+	['expert'] = {category = 'Experts', variable = 'Expert'},
+	['coach'] = {category = 'Coaches', variable = 'Coach'},
+	['caster'] = {category = 'Casters', variable = 'Caster'},
+	['manager'] = {category = 'Managers', variable = 'Manager'},
+	['streamer'] = {category = 'Streamers', variable = 'Streamer'}
 }
 
 local _title = mw.title.getCurrentTitle()
@@ -104,7 +104,10 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Current Role', content = {_ROLES[_args.role:lower()]}},
+			Cell{name = 'Current Role', content = {
+					CustomPlayer._createRole('role', _args.role),
+					CustomPlayer._createRole('role2', _args.role2)
+				}},
 		}
 	elseif id == 'nationality' then
 		return {
@@ -201,6 +204,20 @@ function CustomPlayer:_createLocation(country)
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
 				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 				.. '[[Category:' .. demonym .. ' Players]]'
+end
+
+function CustomPlayer._createRole(key, role)
+	if String.isEmpty(role) then
+		return nil
+	end
+
+	local roleData = _ROLES[role:lower()]
+	if not roleData then
+		return nil
+	end
+
+	return '[[:Category:' .. roleData.category .. '|' ..
+		Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
 end
 
 
