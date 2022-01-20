@@ -138,7 +138,13 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.status = lpdbData.status or 'Unknown'
 
 	lpdbData.extradata.role = _args.role
-	lpdbData.extradata.birthmonthandday = Variables.varDefault('birth_monthandday')
+	lpdbData.extradata.role2 = _args.role2
+	lpdbData.extradata.hero = _args.hero
+	lpdbData.extradata.hero2 = _args.hero2
+	lpdbData.extradata.hero3 = _args.hero3
+	lpdbData.extradata['lc_id'] = _base_page_name:lower()
+	lpdbData.extradata.team2 = mw.ext.TeamLiquidIntegration.resolve_redirect(
+		not String.isEmpty(_args.team2link) and _args.team2link or _args.team2)
 
 	return lpdbData
 end
