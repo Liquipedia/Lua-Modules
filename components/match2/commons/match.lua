@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
 
@@ -315,6 +316,7 @@ function Match._prepareMatchRecordForStore(match)
 	match.match2bracketdata = match.match2bracketdata or match.bracketdata
 	match.match2bracketid = match.match2bracketid or match.bracketid
 	match.match2id = match.match2id or match.bracketid .. '_' .. match.matchid
+	match.section = Variables.varDefault('last_heading', 'none')
 	Match.clampFields(match, Match.matchFields)
 end
 
@@ -350,6 +352,7 @@ Match.matchFields = Table.map({
 	'vod',
 	'walkover',
 	'winner',
+	'section',
 }, function(_, field) return field, true end)
 
 Match.opponentFields = Table.map({
