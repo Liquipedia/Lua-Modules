@@ -1,6 +1,6 @@
 local Flag = require('Module:Flags')
 local Arguments = require('Module:Arguments')
-local Localisation = require('Module:Localisation')
+local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
@@ -335,7 +335,7 @@ function Transfer._savePlayerToLpdb(args, date, refTable, index)
 	-- note: playername is currently not part of the objectname due to LPDB issues with pending edits
 	mw.ext.LiquipediaDB.lpdb_transfer('transfer_' .. date .. '_' .. transferSortIndex, {
 			player = mw.ext.TeamLiquidIntegration.resolve_redirect(link),
-			nationality = flag and Localisation.getCountryName(flag, 'false'),
+			nationality = flag and Flags.CountryName(flag),
 			fromteam = args.team1 and mw.ext.TeamTemplate.teampage(args.team1, args.from_date),
 			toteam = args.team2 and mw.ext.TeamTemplate.teampage(args.team2, date),
 			role1 = args.role1 or args.team1 and sub and 'Substitute',
