@@ -1,37 +1,44 @@
-local getArgs = require('Module:Arguments').getArgs
 local Flag = require('Module:Flags')
+local Arguments = require('Module:Arguments')
 local Localisation = require('Module:Localisation')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
 local Transfer = {}
 
+local _SECONDS_24_HOURS = 86400
+
+-- Provide for backwards compatibility
+function Transfer.row(frame)
+	return Transfer.create(frame)
+end
+
 function Transfer.create(frame)
-	local args = getArgs(frame)
+	local args = Arguments.getArgs(frame)
+
 	local date = args.date_est or args.date
-	local refTable = {}
-	args, refTable = Transfer._parseArgs(args)
+	local parsedArgs, refTable = Transfer._parseArgs(args)
 
 	local wrapper = mw.html.create('div')
-	wrapper:attr('class', 'divRow mainpage-transfer-' .. Transfer._getStatus(args.team1, args.team2))
-	wrapper:node(Transfer._createDate(args.date))
-	if (args.platformIcons or '') == 'true' then
-		wrapper:node(Transfer._createPlatform(frame, args))
+	wrapper:attr('class', 'divRow mainpage-transfer-' .. Transfer._getStatus(parsedArgs.team1, parsedArgs.team2))
+	wrapper:node(Transfer._createDate(parsedArgs.date))
+	if (parsedArgs.platformIcons or '') == 'true' then
+		wrapper:node(Transfer._createPlatform(frame, parsedArgs))
 	end
-	wrapper:node(Transfer._createName(frame, args))
-	wrapper:node(Transfer._createTeam(frame, args.team1, args.team1_2, args.role1, args.role1_2, true, args.from_date))
-	wrapper:node(Transfer._createIcon(frame, args.transferIcon))
-	wrapper:node(Transfer._createTeam(frame, args.team2, args.team2_2, args.role2, args.role2_2, false, date))
-	wrapper:node(Transfer._createReferences(args.ref, refTable))
+	wrapper:node(Transfer._createName(frame, parsedArgs))
+	wrapper:node(Transfer._createTeam(frame, parsedArgs.team1, parsedArgs.team1_2, parsedArgs.role1, parsedArgs.role1_2, true, parsedArgs.from_date))
+	wrapper:node(Transfer._createIcon(frame, parsedArgs.transferIcon))
+	wrapper:node(Transfer._createTeam(frame, parsedArgs.team2, parsedArgs.team2_2, parsedArgs.role2, parsedArgs.role2_2, false, date))
+	wrapper:node(Transfer._createReferences(parsedArgs.ref, refTable))
 
 	local shouldDisableLpdbStorage = Logic.readBool(mw.ext.VariablesLua.var('disable_LPDB_storage'))
 	local shouldDisableSmwStorage = Logic.readBool(mw.ext.VariablesLua.var('disable_SMW_storage'))
-	if not shouldDisableLpdbStorage and not shouldDisableSmwStorage and (args.disable_storage or 'false') ~= 'true' and mw.title.getCurrentTitle():inNamespaces(0) then
+	if not shouldDisableLpdbStorage and not shouldDisableSmwStorage and (parsedArgs.disable_storage or 'false') ~= 'true' and mw.title.getCurrentTitle():inNamespaces(0) then
 		local transferSortIndex = mw.ext.VariablesLua.var('transfer_sort_index')
 		if transferSortIndex == nil then
 			mw.ext.VariablesLua.vardefine('transfer_sort_index', 0)
 		end
-		Transfer._saveToLpdb(args, date, refTable)
+		Transfer._saveToLpdb(parsedArgs, date, refTable)
 	end
 	return wrapper
 end
@@ -326,16 +333,11 @@ function Transfer.adjustDate(date)
 	if type(date) == 'string' then
 		local year, month, day = date:match('(%d+)-(%d+)-(%d+)')
 		date = os.time({day=day, month=month, year=year})
-		date = date - 86400
+		date = date - _SECONDS_24_HOURS
 		date = os.date( "%Y-%m-%d", date)
 	end
 	return date
 end
 
-
---backwards compatibility
-function Transfer.row(frame)
-	return Transfer.create(frame)
-end
 
 return Transfer
