@@ -1,4 +1,3 @@
-local htmlCreate = mw.html.create
 local getArgs = require('Module:Arguments').getArgs
 local Flag = require('Module:Flags')
 local Localisation = require('Module:Localisation')
@@ -13,7 +12,7 @@ function Transfer.create(frame)
 	local refTable = {}
 	args, refTable = Transfer._parseArgs(args)
 
-	local wrapper = htmlCreate('div')
+	local wrapper = mw.html.create('div')
 	wrapper:attr('class', 'divRow mainpage-transfer-' .. Transfer._getStatus(args.team1, args.team2))
 	wrapper:node(Transfer._createDate(args.date))
 	if (args.platformIcons or '') == 'true' then
@@ -108,7 +107,7 @@ function Transfer._getStatus(team1, team2)
 end
 
 function Transfer._createDate(date)
-	local div = htmlCreate('div')
+	local div = mw.html.create('div')
 	div:attr('class', 'divCell Date')
 	div:wikitext(date)
 
@@ -119,7 +118,7 @@ function Transfer._createPlatform(frame, args)
 	local getPlatform = require('Module:Platform')
 	args.platform = getPlatform._getName(args.platform)
 
-	local div = htmlCreate('div')
+	local div = mw.html.create('div')
 	div:attr('class', 'divCell GameIcon')
 	div:wikitext(getPlatform._getIcon(args.platform))
 
@@ -132,7 +131,7 @@ function Transfer._createName(frame, args)
 		getIcon = mw.loadData(args.iconModule)
 	end
 
-	local div = htmlCreate('div')
+	local div = mw.html.create('div')
 	div:attr('class', 'divCell Name')
 	div:wikitext(Transfer._createNameRow(frame, args.name, args.flag, args.link, args.posIcon, getIcon))
 
@@ -178,7 +177,7 @@ function Transfer._createNameRow(frame, name, flag, link, icon, iconModule)
 end
 
 function Transfer._createTeam(frame, team, teamsec, role, rolesec, isOldTeam, date)
-	local teamCell = htmlCreate('div')
+	local teamCell = mw.html.create('div')
 	teamCell:attr('class', 'divCell Team ' .. (isOldTeam and 'OldTeam' or 'NewTeam'))
 
 	if team == nil and role == nil then
@@ -203,7 +202,7 @@ function Transfer._createRole(role, rolesec, hasTeam)
 		return nil
 	end
 
-	local span = htmlCreate('span')
+	local span = mw.html.create('span')
 	if hasTeam then
 		span:wikitext('<br/>')
 		span:css('font-size', '85%')
@@ -218,7 +217,7 @@ function Transfer._createRole(role, rolesec, hasTeam)
 end
 
 function Transfer._createIcon(frame, icon)
-	local div = htmlCreate('div'):attr('class', 'divCell Icon'):css('font-size','larger')
+	local div = mw.html.create('div'):attr('class', 'divCell Icon'):css('font-size','larger')
 
 	if icon == nil then
 		div:wikitext('&#x21d2;')
@@ -230,7 +229,7 @@ function Transfer._createIcon(frame, icon)
 end
 
 function Transfer._createReferences(reference, refTable)
-	local div = htmlCreate('div'):attr('class', 'divCell Ref')
+	local div = mw.html.create('div'):attr('class', 'divCell Ref')
 
 	if not(refTable['reference1']) then
 		div:wikitext(reference)
