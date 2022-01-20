@@ -18,6 +18,9 @@ Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
 Config.TIER_TYPE_DAILY = 'daily'
 Config.TIER_TYPE_FFA = 'ffa'
+Config.TIER_TYPE_MISC = 'misc'
+Config.TIER_TYPE_SHOW_MATCH = 'show match'
+Config.TIER_TYPE_CHARITY = 'charity'
 
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
@@ -71,6 +74,18 @@ Config.weights = {
 				name = Config.TIER_TYPE_QUALIFIER,
 				points = 0,
 			},
+			{
+				name = Config.TIER_TYPE_SHOW_MATCH,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_CHARITY,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_MISC,
+				points = 0,
+			},
 		},
 	},
 	{
@@ -101,6 +116,18 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_SHOW_MATCH,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_CHARITY,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_MISC,
 				points = 0,
 			},
 		},
@@ -135,6 +162,18 @@ Config.weights = {
 				name = Config.TIER_TYPE_QUALIFIER,
 				points = 0,
 			},
+			{
+				name = Config.TIER_TYPE_SHOW_MATCH,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_CHARITY,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_MISC,
+				points = 0,
+			},
 		},
 	},
 	{
@@ -165,6 +204,18 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_SHOW_MATCH,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_CHARITY,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_MISC,
 				points = 0,
 			},
 		},
