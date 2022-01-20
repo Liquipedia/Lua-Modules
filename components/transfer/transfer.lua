@@ -24,14 +24,14 @@ function Transfer.create(frame)
 		Transfer._getStatus(parsedArgs.team1, parsedArgs.team2))
 	wrapper:node(Transfer._createDate(parsedArgs.date))
 	if (parsedArgs.platformIcons or '') == 'true' then
-		wrapper:node(Transfer._createPlatform(frame, parsedArgs))
+		wrapper:node(Transfer._createPlatform(parsedArgs))
 	end
-	wrapper:node(Transfer._createName(frame, parsedArgs))
+	wrapper:node(Transfer._createName(parsedArgs))
 	wrapper:node(Transfer._createTeam(
-		frame, parsedArgs.team1, parsedArgs.team1_2, parsedArgs.role1, parsedArgs.role1_2, true, parsedArgs.from_date))
-	wrapper:node(Transfer._createIcon(frame, parsedArgs.transferIcon))
+		parsedArgs.team1, parsedArgs.team1_2, parsedArgs.role1, parsedArgs.role1_2, true, parsedArgs.from_date))
+	wrapper:node(Transfer._createIcon(parsedArgs.transferIcon))
 	wrapper:node(Transfer._createTeam(
-		frame, parsedArgs.team2, parsedArgs.team2_2, parsedArgs.role2, parsedArgs.role2_2, false, date))
+		parsedArgs.team2, parsedArgs.team2_2, parsedArgs.role2, parsedArgs.role2_2, false, date))
 	wrapper:node(Transfer._createReferences(parsedArgs.ref, refTable))
 
 	local shouldDisableLpdbStorage = Logic.readBool(
@@ -128,7 +128,7 @@ function Transfer._createDate(date)
 	return div
 end
 
-function Transfer._createPlatform(frame, args)
+function Transfer._createPlatform(args)
 	local getPlatform = require('Module:Platform')
 	args.platform = getPlatform._getName(args.platform)
 
@@ -139,7 +139,7 @@ function Transfer._createPlatform(frame, args)
 	return div
 end
 
-function Transfer._createName(frame, args)
+function Transfer._createName(args)
 	local getIcon, getPositionName
 	if args.iconModule then
 		getIcon = mw.loadData(args.iconModule)
@@ -148,13 +148,12 @@ function Transfer._createName(frame, args)
 	local div = mw.html.create('div')
 	div:attr('class', 'divCell Name')
 	div:wikitext(Transfer._createNameRow(
-		frame, args.name, args.flag, args.link, args.posIcon, getIcon))
+		args.name, args.flag, args.link, args.posIcon, getIcon))
 
 	local nameIndex = 2
 	while (args['name' .. nameIndex] ~= nil) do
 		div:wikitext('<br/>')
 		div:wikitext(Transfer._createNameRow(
-			frame,
 			args['name' .. nameIndex],
 			args['flag' .. nameIndex],
 			args['link' .. nameIndex],
@@ -167,7 +166,7 @@ function Transfer._createName(frame, args)
 	return div
 end
 
-function Transfer._createNameRow(frame, name, flag, link, icon, iconModule)
+function Transfer._createNameRow(name, flag, link, icon, iconModule)
 	local row = ''
 
 	if flag ~= nil then
@@ -191,7 +190,7 @@ function Transfer._createNameRow(frame, name, flag, link, icon, iconModule)
 	return row
 end
 
-function Transfer._createTeam(frame, team, teamsec, role, rolesec, isOldTeam, date)
+function Transfer._createTeam(team, teamsec, role, rolesec, isOldTeam, date)
 	local teamCell = mw.html.create('div')
 	teamCell:attr('class', 'divCell Team ' .. (isOldTeam and 'OldTeam' or 'NewTeam'))
 
@@ -231,7 +230,7 @@ function Transfer._createRole(role, rolesec, hasTeam)
 	return span
 end
 
-function Transfer._createIcon(frame, icon)
+function Transfer._createIcon(icon)
 	local div = mw.html.create('div'):attr('class', 'divCell Icon'):css('font-size','larger')
 
 	if icon == nil then
