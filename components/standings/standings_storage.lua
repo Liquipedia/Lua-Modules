@@ -18,7 +18,7 @@ function StandingsStorage.run(index, data)
 			tournament = data.tournament,
 			participant = data.participant,
 			participantdisplay = data.participantdisplay,
-			participantflag = Flags.CountryName(data.participantflag),
+			participantflag = Flags.CountryCode(data.participantflag),
 			icon = data.icon,
 			placement = data.placement or data.rank,
 			definitestatus = data.definitestatus or data.bg,
