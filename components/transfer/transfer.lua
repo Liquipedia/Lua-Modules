@@ -11,7 +11,7 @@ function p.create(frame)
 	local date = args.date_est or args.date
 	local refTable = {}
 	args, refTable = p._parseArgs(args)
-	
+
 	local wrapper = htmlCreate('div')
 	wrapper:attr('class', 'divRow mainpage-transfer-' .. p._getStatus(args.team1, args.team2))
 	wrapper:node(p._createDate(args.date))
@@ -23,7 +23,7 @@ function p.create(frame)
 	wrapper:node(p._createIcon(frame, args.transferIcon))
 	wrapper:node(p._createTeam(frame, args.team2, args.team2_2, args.role2, args.role2_2, false, date))
 	wrapper:node(p._createReferences(args.ref, refTable))
-	
+
 	local shouldDisableLpdbStorage = Logic.readBool(mw.ext.VariablesLua.var('disable_LPDB_storage'))
 	local shouldDisableSmwStorage = Logic.readBool(mw.ext.VariablesLua.var('disable_SMW_storage'))
 	if not shouldDisableLpdbStorage and not shouldDisableSmwStorage and (args.disable_storage or 'false') ~= 'true' and mw.title.getCurrentTitle():inNamespaces(0) then
@@ -38,7 +38,7 @@ end
 
 function p._parseArgs(args)
 	args.from_date = p.adjustDate(args.date_est or args.date)
-	
+
 	for i=1,2 do
 		args['role' .. i] = args['role' .. i] and p._firstToUpper(args['role' .. i])
 		args['role' .. i .. '_2'] = args['role' .. i .. '_2'] and p._firstToUpper(args['role' .. i .. '_2'])
@@ -48,7 +48,7 @@ function p._parseArgs(args)
 			args['team' .. i], args['team' .. i .. '_2'] = args['team' .. i .. '_2'], args['team' .. i]
 		end
 	end
-	
+
 	if args.positionConvert then
 		local getPositionName = mw.loadData(args.positionConvert)
 		args[(args.iconParam or 'pos')] = getPositionName[ string.lower(args[(args.iconParam or 'pos')] or '') ] or args[(args.iconParam or 'pos')]
@@ -64,7 +64,7 @@ function p._parseArgs(args)
 		args['posIcon' .. nameIndex] = args[(args.iconParam or 'pos') .. nameIndex] and (args[(args.iconParam or 'pos') .. nameIndex] .. (args['sub' .. nameIndex] and '_Substitute' or '')) or (args['sub' .. nameIndex] and 'Substitute' or '')
 		nameIndex = nameIndex + 1
 	end
-	
+
 	local refTable, refIndex = {}, 0
 	args.allRef = true --enter all references for all players into LPDB
 	if args.refType == 'table' and args.ref then
@@ -75,7 +75,7 @@ function p._parseArgs(args)
 				refIndex = refIndex + 1
 			end
 		end
-		
+
 		local nameIndex = 1
 		while (args['name' .. (nameIndex + 1)] ~= nil) do
 			nameIndex = nameIndex + 1
@@ -86,7 +86,7 @@ function p._parseArgs(args)
 			args.allRef = false
 		end
 	end
-	
+
 	return args, refTable
 end
 
@@ -99,29 +99,29 @@ function p._getStatus(team1, team2)
 		if team2 ~= nil then
 			return 'neutral'
 		end
-		
+
 		return 'from-team'
 	end
-	
+
 	return 'to-team'
 end
 
-function p._createDate(date) 
+function p._createDate(date)
 	local div = htmlCreate('div')
 	div:attr('class', 'divCell Date')
 	div:wikitext(date)
-	
+
 	return div
 end
 
 function p._createPlatform(frame, args)
 	local getPlatform = require('Module:Platform')
 	args.platform = getPlatform._getName(args.platform)
-	
+
 	local div = htmlCreate('div')
 	div:attr('class', 'divCell GameIcon')
 	div:wikitext(getPlatform._getIcon(args.platform))
-	
+
 	return div
 end
 
@@ -130,11 +130,11 @@ function p._createName(frame, args)
 	if args.iconModule then
 		getIcon = mw.loadData(args.iconModule)
 	end
-	
+
 	local div = htmlCreate('div')
 	div:attr('class', 'divCell Name')
 	div:wikitext(p._createNameRow(frame, args.name, args.flag, args.link, args.posIcon, getIcon))
-	
+
 	local nameIndex = 2
 	while (args['name' .. nameIndex] ~= nil) do
 		div:wikitext('<br/>')
@@ -148,19 +148,19 @@ function p._createName(frame, args)
 		))
 		nameIndex = nameIndex + 1
 	end
-	
+
 	return div
 end
 
 function p._createNameRow(frame, name, flag, link, icon, iconModule)
 	local row = ''
-	
+
 	if flag ~= nil then
 		row = row .. Flag.Icon({flag = flag, shouldLink = true}) .. ' '
 	else
 		row = row .. '<span class=flag>[[File:Space filler flag.png|link=]]</span> '
 	end
-	
+
 	if icon and iconModule then
 		local iconTemp = iconModule[ string.lower(icon) ]
 		if iconTemp then
@@ -170,22 +170,22 @@ function p._createNameRow(frame, name, flag, link, icon, iconModule)
 			row = row .. '[[File:Logo filler event.png|16px|link=]][[Category:Pages with transfer errors]] '
 		end
 	end
-	
+
 	row = row .. '[[' .. (link or name) .. '|' .. name .. ']]'
-	
+
 	return row
 end
 
 function p._createTeam(frame, team, teamsec, role, rolesec, isOldTeam, date)
 	local teamCell = htmlCreate('div')
 	teamCell:attr('class', 'divCell Team ' .. (isOldTeam and 'OldTeam' or 'NewTeam'))
-	
+
 	if team == nil and role == nil then
 		teamCell:css('font-style', 'italic')
 		teamCell:wikitext('None')
 		return teamCell
 	end
-	
+
 	if team then
 		teamCell:node(mw.ext.TeamTemplate.teamicon(team, date))
 	end
@@ -193,7 +193,7 @@ function p._createTeam(frame, team, teamsec, role, rolesec, isOldTeam, date)
 		teamCell:node('/' .. mw.ext.TeamTemplate.teamicon(teamsec, date))
 	end
 	teamCell:node(p._createRole(role, rolesec, team))
-	
+
 	return teamCell
 end
 
@@ -201,7 +201,7 @@ function p._createRole(role, rolesec, hasTeam)
 	if role == nil then
 		return nil
 	end
-	
+
 	local span = htmlCreate('span')
 	if hasTeam then
 		span:wikitext('<br/>')
@@ -212,25 +212,25 @@ function p._createRole(role, rolesec, hasTeam)
 		span:css('font-style', 'italic')
 		span:wikitext(role .. (rolesec and '/' .. rolesec or ''))
 	end
-	
+
 	return span
 end
 
 function p._createIcon(frame, icon)
 	local div = htmlCreate('div'):attr('class', 'divCell Icon'):css('font-size','larger')
-	
+
 	if icon == nil then
 		div:wikitext('&#x21d2;')
 	else
 		div:wikitext(icon)
 	end
-	
+
 	return div
 end
 
 function p._createReferences(reference, refTable)
 	local div = htmlCreate('div'):attr('class', 'divCell Ref')
-	
+
 	if not(refTable['reference1']) then
 		div:wikitext(reference)
 	else
@@ -247,7 +247,7 @@ function p._createReferences(reference, refTable)
 		end
 		div:wikitext(refPrint)
 	end
-	
+
 	return div
 end
 
@@ -256,7 +256,7 @@ end
 --
 function p._saveToLpdb(args, date, refTable)
 	p._savePlayerToLpdb(args, date, refTable, 1)
-	
+
 	local index = 2
 	while (args['name' .. index]  ~= nil) do
 		p._savePlayerToLpdb(args, date, refTable, index)
@@ -282,7 +282,7 @@ function p._savePlayerToLpdb(args, date, refTable, index)
 		pos = args[(args.iconParam or 'pos')]
 		icon = args.posIcon
 		sub = args.sub
-	else 
+	else
 		name = args['name' .. index]
 		flag = args['flag' .. index]
 		link = args['link' .. index] or args['name' .. index]
@@ -290,7 +290,7 @@ function p._savePlayerToLpdb(args, date, refTable, index)
 		icon = args['posIcon' .. index]
 		sub = args['sub' .. index]
 	end
-	
+
 	local transferSortIndex = tonumber(mw.ext.VariablesLua.var('transfer_sort_index')) or 0
 	-- note: playername is currently not part of the objectname due to LPDB issues with pending edits
 	mw.ext.LiquipediaDB.lpdb_transfer('transfer_' .. date .. '_' .. transferSortIndex, {
@@ -317,7 +317,7 @@ function p._savePlayerToLpdb(args, date, refTable, index)
 				platform = args.platform or ''
 			})
 	})
-	
+
 	mw.ext.VariablesLua.vardefine('transfer_sort_index', transferSortIndex + 1)
 end
 
