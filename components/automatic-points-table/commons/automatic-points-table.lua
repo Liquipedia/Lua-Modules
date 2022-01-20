@@ -278,21 +278,6 @@ function AutomaticPointsTable:sortData(pointsData, teams)
 
 	local maxPoints = pointsData[#pointsData].totalPoints
 
-	-- In-case two teams are tied for the same team they will have the same position
-	local jointPosition = 0
-	local previousTeamPoints = maxPoints + 1
-
-	Table.iter.forEachIndexed(pointsData,
-		function(dataIndex, dataPoint)
-			if dataPoint.totalPoints < previousTeamPoints then
-				jointPosition = jointPosition + 1
-			else
-				jointPosition = dataIndex
-			end
-			dataPoint.position = jointPosition
-		end
-	)
-
 	return pointsData
 end
 
