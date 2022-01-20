@@ -20,20 +20,27 @@ function Transfer.create(frame)
 	local parsedArgs, refTable = Transfer._parseArgs(args)
 
 	local wrapper = mw.html.create('div')
-	wrapper:attr('class', 'divRow mainpage-transfer-' .. Transfer._getStatus(parsedArgs.team1, parsedArgs.team2))
+	wrapper:attr('class', 'divRow mainpage-transfer-' ..
+		Transfer._getStatus(parsedArgs.team1, parsedArgs.team2))
 	wrapper:node(Transfer._createDate(parsedArgs.date))
 	if (parsedArgs.platformIcons or '') == 'true' then
 		wrapper:node(Transfer._createPlatform(frame, parsedArgs))
 	end
 	wrapper:node(Transfer._createName(frame, parsedArgs))
-	wrapper:node(Transfer._createTeam(frame, parsedArgs.team1, parsedArgs.team1_2, parsedArgs.role1, parsedArgs.role1_2, true, parsedArgs.from_date))
+	wrapper:node(Transfer._createTeam(
+		frame, parsedArgs.team1, parsedArgs.team1_2, parsedArgs.role1, parsedArgs.role1_2, true, parsedArgs.from_date))
 	wrapper:node(Transfer._createIcon(frame, parsedArgs.transferIcon))
-	wrapper:node(Transfer._createTeam(frame, parsedArgs.team2, parsedArgs.team2_2, parsedArgs.role2, parsedArgs.role2_2, false, date))
+	wrapper:node(Transfer._createTeam(
+		frame, parsedArgs.team2, parsedArgs.team2_2, parsedArgs.role2, parsedArgs.role2_2, false, date))
 	wrapper:node(Transfer._createReferences(parsedArgs.ref, refTable))
 
-	local shouldDisableLpdbStorage = Logic.readBool(mw.ext.VariablesLua.var('disable_LPDB_storage'))
-	local shouldDisableSmwStorage = Logic.readBool(mw.ext.VariablesLua.var('disable_SMW_storage'))
-	if not shouldDisableLpdbStorage and not shouldDisableSmwStorage and (parsedArgs.disable_storage or 'false') ~= 'true' and mw.title.getCurrentTitle():inNamespaces(0) then
+	local shouldDisableLpdbStorage = Logic.readBool(
+		mw.ext.VariablesLua.var('disable_LPDB_storage'))
+	local shouldDisableSmwStorage = Logic.readBool(
+		mw.ext.VariablesLua.var('disable_SMW_storage'))
+	if not shouldDisableLpdbStorage and not shouldDisableSmwStorage and (
+		parsedArgs.disable_storage or 'false') ~= 'true' and
+		mw.title.getCurrentTitle():inNamespaces(0) then
 		local transferSortIndex = mw.ext.VariablesLua.var('transfer_sort_index')
 		if transferSortIndex == nil then
 			mw.ext.VariablesLua.vardefine('transfer_sort_index', 0)
@@ -140,7 +147,8 @@ function Transfer._createName(frame, args)
 
 	local div = mw.html.create('div')
 	div:attr('class', 'divCell Name')
-	div:wikitext(Transfer._createNameRow(frame, args.name, args.flag, args.link, args.posIcon, getIcon))
+	div:wikitext(Transfer._createNameRow(
+		frame, args.name, args.flag, args.link, args.posIcon, getIcon))
 
 	local nameIndex = 2
 	while (args['name' .. nameIndex] ~= nil) do
