@@ -40,12 +40,12 @@ function AutomaticPointsTable.run(frame)
 	local tournaments = pointsTable.parsedInput.tournaments
 	local teamsWithResults, tournamentsWithResults = pointsTable:queryPlacements(teams, tournaments)
 	local pointsData = pointsTable:getPointsData(teamsWithResults, tournamentsWithResults)
-
+	local sortedData = pointsTable:sortData(pointsData, teams)
 	-- mw.logObject(pointsTable.parsedInput.pbg)
 	-- mw.logObject(pointsTable.parsedInput.tournaments)
 	-- mw.logObject(pointsTable.parsedInput.teams)
 	-- mw.logObject(tournamentsWithPlacements)
-	mw.logObject(pointsData)
+	mw.logObject(sortedData)
 
 	return nil
 end
@@ -259,6 +259,41 @@ function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoin
 	end
 
 	return {}
+end
+
+function AutomaticPointsTable:sortData(pointsData, teams)
+	table.sort(pointsData,
+		function(a, b)
+			if a.totalPoints == b.totalPoints then
+				local t1 = teams[a.teamIndex]
+				local t1Name = t1.aliases[#t1.aliases]
+				local t2 = teams[b.teamIndex]
+				local t2Name = t2.aliases[#t2.aliases]
+				return t1Name < t2Name
+			else
+				return a.totalPoints > b.totalPoints
+			end
+		end
+	)
+
+	local maxPoints = pointsData[#pointsData].totalPoints
+
+	-- In-case two teams are tied for the same team they will have the same position
+	local jointPosition = 0
+	local previousTeamPoints = maxPoints + 1
+
+	Table.iter.forEachIndexed(pointsData,
+		function(dataIndex, dataPoint)
+			if dataPoint.totalPoints < previousTeamPoints then
+				jointPosition = jointPosition + 1
+			else
+				jointPosition = dataIndex
+			end
+			dataPoint.position = jointPosition
+		end
+	)
+
+	return pointsData
 end
 
 return AutomaticPointsTable
