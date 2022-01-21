@@ -40,12 +40,14 @@ function AutomaticPointsTable.run(frame)
 	local tournaments = pointsTable.parsedInput.tournaments
 	local teamsWithResults, tournamentsWithResults = pointsTable:queryPlacements(teams, tournaments)
 	local pointsData = pointsTable:getPointsData(teamsWithResults, tournamentsWithResults)
+	local sortedData = pointsTable:sortData(pointsData)
+	local sortedDataWithPositions = pointsTable:addPositionData(sortedData)
 
 	-- mw.logObject(pointsTable.parsedInput.pbg)
 	-- mw.logObject(pointsTable.parsedInput.tournaments)
 	-- mw.logObject(pointsTable.parsedInput.teams)
 	-- mw.logObject(tournamentsWithPlacements)
-	mw.logObject(pointsData)
+	mw.logObject(sortedDataWithPositions)
 
 	return nil
 end
@@ -199,8 +201,8 @@ function AutomaticPointsTable:queryPlacements(teams, tournaments)
 end
 
 function AutomaticPointsTable:getPointsData(teams, tournaments)
-	return Table.map(teams,
-		function(teamIndex, team)
+	return Table.mapValues(teams,
+		function(team)
 			local teamPointsData = {}
 			local totalPoints = 0
 			for tournamentIndex = 1, #tournaments do
@@ -224,10 +226,9 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 				teamPointsData[tournamentIndex] = pointsForTournament
 			end
 
-			-- need teamIndex to reference team after sorting pointsData
-			teamPointsData.teamIndex = teamIndex
+			teamPointsData.team = team
 			teamPointsData.totalPoints = totalPoints
-			return teamIndex, teamPointsData
+			return teamPointsData
 		end
 	)
 end
@@ -259,6 +260,42 @@ function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoin
 	end
 
 	return {}
+end
+
+--- sort by total points (desc) then by name (asc)
+function AutomaticPointsTable:sortData(pointsData, teams)
+	table.sort(pointsData,
+		function(a, b)
+			if a.totalPoints == b.totalPoints then
+				local aName = a.team.aliases[#a.team.aliases]
+				local bName = b.team.aliases[#b.team.aliases]
+				return aName < bName
+			else
+				return a.totalPoints > b.totalPoints
+			end
+		end
+	)
+
+	return pointsData
+end
+
+function AutomaticPointsTable:addPositionData(pointsData)
+	local maxPoints = pointsData[1].totalPoints
+
+	local teamPosition = 0
+	local previousTeamPoints = maxPoints + 1
+
+	return Table.map(pointsData,
+		function(index, dataPoint)
+			if dataPoint.totalPoints < previousTeamPoints then
+				teamPosition = index
+			end
+			dataPoint.position = teamPosition
+			previousTeamPoints = dataPoint.totalPoints
+			return index, dataPoint
+
+		end
+	)
 end
 
 return AutomaticPointsTable
