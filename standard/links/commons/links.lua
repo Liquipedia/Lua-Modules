@@ -30,15 +30,15 @@ local _PREFIXES = {
 	cybergamer = {'https://au.cybergamer.com/profile/'},
 	datdota = {
 		'',
-		player = {'https://datdota.com/players/'},
-		team = {'https://datdota.com/teams/'}
+		player = 'https://datdota.com/players/',
+		team = 'https://datdota.com/teams/'
 	},
 	discord = {'https://discord.gg/'},
 	dlive = {'https://www.dlive.tv/'},
 	dotabuff = {
 		'',
-		player = {'https://dotabuff.com/esports/players/'},
-		team = {'https://dotabuff.com/esports/teams/'}
+		player = 'https://dotabuff.com/esports/players/',
+		team = 'https://dotabuff.com/esports/teams/'
 	},
 	douyu = {'https://www.douyu.com/'},
 	esea = {'https://play.esea.net/events/'},
