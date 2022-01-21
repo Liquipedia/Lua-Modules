@@ -188,10 +188,10 @@ function CustomPlayer._createLocations()
 		return countryDisplayData
 	end
 
-	return Table.mapValues(Player:getAllArgsForBase(_args, 'country'), CustomPlayer:_createLocation)
+	return Table.mapValues(Player:getAllArgsForBase(_args, 'country'), CustomPlayer._createLocation)
 end
 
-function CustomPlayer:_createLocation(country)
+function CustomPlayer._createLocation(country)
 	if String.isEmpty(country) then
 		return nil
 	end
