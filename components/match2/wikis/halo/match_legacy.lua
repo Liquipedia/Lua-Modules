@@ -24,7 +24,7 @@ function p.storeMatch(match2)
 end
 
 function p.storeGames(match, match2)
-	local games = '
+	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game = Table.deepCopy(game)
 		game.opponent1 = match.opponent1
