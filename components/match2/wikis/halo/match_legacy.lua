@@ -66,7 +66,7 @@ function p._convertParameters(match2)
 		local opponent1players = {}
 		for i = 1,10 do
 			local player = opponent1match2players[i] or {}
-			opponent1players'"p' .. i] = player.name or ""
+			opponent1players['p' .. i] = player.name or ""
 			opponent1players['p' .. i .. 'flag'] = player.flag or ""
 		end
 		match.opponent1players = json.stringify(opponent1players)
@@ -87,8 +87,8 @@ function p._convertParameters(match2)
 		local opponent2players = {}
 		for i = 1,10 do
 			local player = opponent2match2players[i] or {}
-			opponent2players['p' .. i] = player.name or ""
-			opponent2players['p' .. i .. 'flag'] = player.flag or ""
+			opponent2players['p' .. i] = player.name or ''
+			opponent2players['p' .. i .. 'flag'] = player.flag or ''
 		end
 		match.opponent2players = json.stringify(opponent2players)
 	elseif opponent2.type == 'solo' then
