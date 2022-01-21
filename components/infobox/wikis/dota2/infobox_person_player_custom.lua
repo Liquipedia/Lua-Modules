@@ -18,9 +18,11 @@ local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
 local Table = require('Module:Table')
 local Array = require('Module:Array')
+local HeroIcon = require('Module:HeroIcon')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
+local Builder = require('Module:Infobox/Widget/Builder')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 
@@ -44,6 +46,7 @@ local _ROLES = {
 	['manager'] = {category = 'Managers', variable = 'Manager'},
 	['streamer'] = {category = 'Streamers', variable = 'Streamer'}
 }
+local _SIZE_HERO = '44x25px'
 
 local _title = mw.title.getCurrentTitle()
 local _base_page_name = _title.baseText
@@ -121,8 +124,26 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	-- TODO add hero
-	return {}
+	return {
+		Builder{
+			builder = function()
+				local heroes = Player:getAllArgsForBase(_args, 'hero')
+				local icons = Array.map(heroes,
+					function(h, _)
+						return HeroIcon._getImage{hero = h, size = _SIZE_HERO}
+					end
+				)
+				return {
+					Cell{
+						name = 'Signature Hero',
+						content = {
+							table.concat(icons, '&nbsp;')
+						}
+					}
+				}
+			end
+		},
+	}
 end
 
 function CustomPlayer:createWidgetInjector()
