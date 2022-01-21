@@ -13,8 +13,6 @@ local Tier = require('Module:Tier')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
