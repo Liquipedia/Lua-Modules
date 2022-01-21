@@ -16,6 +16,7 @@ local YearsActive = require('Module:YearsActive')
 local Matches = require('Module:Matches_Player')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
+local Table = require('Module:Table')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
