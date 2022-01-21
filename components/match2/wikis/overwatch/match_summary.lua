@@ -143,7 +143,8 @@ function CustomMatchSummary._createMapRow(game)
 
 	local centerNode = htmlCreate('div')
 		:addClass('brkts-popup-spaced')
-		:wikitext(game.mode .. '[[' .. game.map .. ']]')
+		-- TODO: Add Game Mode icon
+		:wikitext('[[' .. game.map .. ']]')
 		:css('text-align', 'center')
 
 	if game.resultType == 'np' then
