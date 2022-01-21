@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
 local DivTable = require('Module:DivTable')
@@ -300,7 +301,9 @@ function AutomaticPointsTable:addPositionData(pointsData)
 end
 
 function AutomaticPointsTable:generatePointsTable(pointsData, tournaments)
-	local columnCount = self:countColumns(tournaments)
+local columnCount = Array.reduce(tournaments, function(count, t)
+			return count + (t.shouldDeductionsBeVisible and 2 or 1)
+		end)
 	local headerRow = self:generateHeaderRow(tournaments)
 
 	local divTable = DivTable.create() :row(headerRow)
@@ -320,31 +323,21 @@ function AutomaticPointsTable:generatePointsTable(pointsData, tournaments)
 	return responsiveWrapper
 end
 
-function AutomaticPointsTable:countColumns(tournaments)
-	local columnCount = 0
-	-- tournaments with deductions have 2 columns
-	Table.iter.forEach(tournaments, function(t)
-		columnCount = columnCount + (t.shouldDeductionsBeVisible and 2 or 1)
-	end)
-	return columnCount
-end
-
 function AutomaticPointsTable:generateHeaderRow(tournaments)
 	local headerRow = DivTable.HeaderRow()
-	headerRow.root :addClass('diagonal')
+	headerRow.root:addClass('diagonal')
+
 	-- fixed headers
 	local headers = {{
 		text = 'Ranking',
-		additionalClass = 'ranking'}, {
+		additionalClass = 'ranking'
+	}, {
 		text = 'Team',
-		additionalClass = 'team' }, {
+		additionalClass = 'team'
+	}, {
 		text = 'Total Points'
 	}}
-	Table.iter.forEach(headers,
-		function(header)
-			headerRow:cell(self:createHeaderCell(header))
-		end
-	)
+	Table.iter.forEach(headers,function(h) headerRow:cell(self:createHeaderCell(h)) end)
 	-- variable headers (according to tournaments in given in module arguments)
 	Table.iter.forEach(tournaments,
 		function(tournament)
@@ -367,7 +360,7 @@ end
 function AutomaticPointsTable:createHeaderCell(header)
 	local additionalClass = header.additionalClass
 
-	local innerDiv = self:divWrap(header.text)
+	local innerDiv = self:wrapInDiv(header.text)
 		:addClass('border-color-grey')
 		:addClass('content')
 
@@ -381,7 +374,7 @@ function AutomaticPointsTable:createHeaderCell(header)
 end
 
 --- syntactic sugar
-function AutomaticPointsTable:divWrap(text)
+function AutomaticPointsTable:wrapInDiv(text)
 	return mw.html.create('div'):wikitext(tostring(text))
 end
 
