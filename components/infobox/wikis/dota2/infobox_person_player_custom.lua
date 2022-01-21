@@ -125,7 +125,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	return {
+	table.insert(widgets,
 		Builder{
 			builder = function()
 				local heroes = Player:getAllArgsForBase(_args, 'hero')
@@ -143,8 +143,8 @@ function CustomInjector:addCustomCells(widgets)
 					}
 				}
 			end
-		},
-	}
+		})
+	return widgets
 end
 
 function CustomPlayer:createWidgetInjector()
