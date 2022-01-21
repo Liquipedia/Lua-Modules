@@ -17,6 +17,7 @@ local Matches = require('Module:Matches_Player')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
 local Table = require('Module:Table')
+local Array = require('Module:Array')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -170,13 +171,11 @@ function CustomPlayer._getStatusContents()
 		table.insert(statusContents, banned)
 	end
 
-	local index = 2
-	banned = _BANNED[string.lower(_args['banned' .. index] or '')]
-	while banned do
-		table.insert(statusContents, banned)
-		index = index + 1
-		banned = _BANNED[string.lower(_args['banned' .. index] or '')]
-	end
+	statusContents = Array.map(Player.getAllArgsForBase(_args, 'banned'),
+		function(item, _)
+			return _BANNED[string.lower(item)]
+		end
+	)
 
 	return statusContents
 end
@@ -188,7 +187,7 @@ function CustomPlayer._createLocations()
 		return countryDisplayData
 	end
 
-	return Table.mapValues(Player:getAllArgsForBase(_args, 'country'), CustomPlayer._createLocation)
+	return Table.mapValues(Player.getAllArgsForBase(_args, 'country'), CustomPlayer._createLocation)
 end
 
 function CustomPlayer._createLocation(country)
