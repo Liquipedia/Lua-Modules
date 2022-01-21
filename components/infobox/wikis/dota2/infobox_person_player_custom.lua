@@ -187,17 +187,7 @@ function CustomPlayer._createLocations()
 		return countryDisplayData
 	end
 
-	countryDisplayData[1] = CustomPlayer:_createLocation(country)
-
-	local index = 2
-	country = _args['country2']
-	while (not String.isEmpty(country)) do
-		countryDisplayData[index] = CustomPlayer:_createLocation(country)
-		index = index + 1
-		country = _args['country' .. index]
-	end
-
-	return countryDisplayData
+	return Table.mapValues(Player:getAllArgsForBase(_args, 'country'), CustomPlayer:_createLocation)
 end
 
 function CustomPlayer:_createLocation(country)
