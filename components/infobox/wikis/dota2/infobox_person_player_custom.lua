@@ -46,6 +46,10 @@ local _ROLES = {
 	['manager'] = {category = 'Managers', variable = 'Manager'},
 	['streamer'] = {category = 'Streamers', variable = 'Streamer'}
 }
+local _ROLES_CATEGORY = {
+	host = 'Casters',
+	caster = 'Casters'
+}
 local _SIZE_HERO = '44x25px'
 
 local _title = mw.title.getCurrentTitle()
@@ -226,9 +230,14 @@ function CustomPlayer._createLocation(country)
 	local countryDisplay = Flags.CountryName(country)
 	local demonym = Localisation.getLocalisation(countryDisplay)
 
+	local roleCategory = _ROLES_CATEGORY[_args.role or ''] or 'Players'
+	local role2Category = _ROLES_CATEGORY[_args.role2 or ''] or 'Players'
+
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
-				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
-				.. '[[Category:' .. demonym .. ' Players]]'
+		'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
+		.. '[[Category:' .. demonym .. ' ' .. roleCategory .. ']]'
+		.. '[[Category:' .. demonym .. ' ' .. role2Category .. ']]'
+
 end
 
 function CustomPlayer._createRole(key, role)
