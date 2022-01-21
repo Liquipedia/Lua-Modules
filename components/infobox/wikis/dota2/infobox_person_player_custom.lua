@@ -171,7 +171,7 @@ function CustomPlayer._getStatusContents()
 		table.insert(statusContents, banned)
 	end
 
-	statusContents = Array.map(Player.getAllArgsForBase(_args, 'banned'),
+	statusContents = Array.map(Player:getAllArgsForBase(_args, 'banned'),
 		function(item, _)
 			return _BANNED[string.lower(item)]
 		end
@@ -187,7 +187,7 @@ function CustomPlayer._createLocations()
 		return countryDisplayData
 	end
 
-	return Table.mapValues(Player.getAllArgsForBase(_args, 'country'), CustomPlayer._createLocation)
+	return Table.mapValues(Player:getAllArgsForBase(_args, 'country'), CustomPlayer._createLocation)
 end
 
 function CustomPlayer._createLocation(country)
