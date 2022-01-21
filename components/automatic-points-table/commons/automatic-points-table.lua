@@ -25,10 +25,6 @@ local _POINTS_TYPE = {
 	SECURED = 'SECURED'
 }
 
-function Table.getLast(t)
-	return t[#t]
-end
-
 local AutomaticPointsTable = Class.new(
 	function(self, frame)
 		self.frame = frame
@@ -266,13 +262,13 @@ function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoin
 	return {}
 end
 
+--- sort by total points (desc) then by name (asc)
 function AutomaticPointsTable:sortData(pointsData, teams)
-	-- sort by total points (desc) then by name (asc)
 	table.sort(pointsData,
 		function(a, b)
 			if a.totalPoints == b.totalPoints then
-				local aName = Table.getLast(a.team.aliases)
-				local bName = Table.getLast(b.team.aliases)
+				local aName = a.team.aliases[#a.team.aliases]
+				local bName = b.team.aliases[#b.team.aliases]
 				return aName < bName
 			else
 				return a.totalPoints > b.totalPoints
@@ -290,13 +286,14 @@ function AutomaticPointsTable:addPositionData(pointsData)
 	local previousTeamPoints = maxPoints + 1
 
 	return Table.map(pointsData,
-		function(dataIndex, dataPoint)
+		function(index, dataPoint)
 			if dataPoint.totalPoints < previousTeamPoints then
-				teamPosition = dataIndex
+				teamPosition = index
 			end
 			dataPoint.position = teamPosition
 			previousTeamPoints = dataPoint.totalPoints
-			return dataIndex, dataPoint
+			return index, dataPoint
+
 		end
 	)
 end
