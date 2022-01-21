@@ -303,7 +303,7 @@ end
 function AutomaticPointsTable:generatePointsTable(pointsData, tournaments)
 local columnCount = Array.reduce(tournaments, function(count, t)
 			return count + (t.shouldDeductionsBeVisible and 2 or 1)
-		end)
+		end, 0)
 	local headerRow = self:generateHeaderRow(tournaments)
 
 	local divTable = DivTable.create() :row(headerRow)
