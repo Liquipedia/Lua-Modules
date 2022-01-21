@@ -73,7 +73,7 @@ function CustomInjector:parse(id, widgets)
 
 		local yearsActive = _args.years_active
 		if String.isEmpty(yearsActive) then
-			yearsActive = YearsActive.get({player = _base_page_name})
+			yearsActive = YearsActive.display({player = _base_page_name})
 		else
 			yearsActive = Page.makeInternalLink({onlyIfExists = true}, yearsActive)
 		end
