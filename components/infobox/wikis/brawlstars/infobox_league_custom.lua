@@ -14,6 +14,8 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local PrizePoolCurrency = require('Module:Prize pool currency')
+local _SUPERCELL_SPONSORED_TIER_ICON = '[[File:Supercell icon.png|x18px|link=Supercell|Tournament sponsored by Supercell.]]'
+S
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
