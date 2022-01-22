@@ -146,6 +146,7 @@ function Links.transform(links)
 		gamersclub = links.gamersclub,
 		gamersclub2 = links.gamersclub2,
 		home = links.website or links.web or links.site or links.url,
+		halodatahive = links.halodatahive
 		home2 = links.website2 or links.web2 or links.site2 or links.url2,
 		huyatv = links.huyatv,
 		huyatv2 = links.huyatv2,
