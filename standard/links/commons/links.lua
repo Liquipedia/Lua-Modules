@@ -28,8 +28,18 @@ local _PREFIXES = {
 		player = 'https://challonge.com/users/',
 	},
 	cybergamer = {'https://au.cybergamer.com/profile/'},
+	datdota = {
+		'',
+		player = 'https://datdota.com/players/',
+		team = 'https://datdota.com/teams/'
+	},
 	discord = {'https://discord.gg/'},
 	dlive = {'https://www.dlive.tv/'},
+	dotabuff = {
+		'',
+		player = 'https://dotabuff.com/esports/players/',
+		team = 'https://dotabuff.com/esports/teams/'
+	},
 	douyu = {'https://www.douyu.com/'},
 	esea = {'https://play.esea.net/events/'},
 	['esea-d'] = {'https://play.esea.net/league/standings?divisionId='},
@@ -70,6 +80,10 @@ local _PREFIXES = {
 	sostronk = {'https://www.sostronk.com/tournament/'},
 	steam = {'https://steamcommunity.com/id/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
+	stratz = {
+		'',
+		player = 'https://stratz.com/player/'
+	},
 	stream = {''},
 	telegram = {'https://t.me/'},
 	tiktok = {'https://tiktok.com/@'},
@@ -126,8 +140,10 @@ function Links.transform(links)
 		challonge4 = links.challonge4,
 		challonge5 = links.challonge5,
 		cybergamer = links.cybergamer,
+		datdota = links.datdota,
 		discord = links.discord,
 		dlive = links.dlive,
+		dotabuff = links.dotabuff,
 		douyu = links.douyu,
 		esea = links.esea,
 		['esea-d'] = links['esea-d'],
@@ -165,6 +181,7 @@ function Links.transform(links)
 		sostronk = links.sostronk,
 		steam = links.steam,
 		steamalternative = links.steamalternative,
+		stratz = links.stratz,
 		stream = links.stream,
 		stream2 = links.stream2,
 		tiktok = links.tiktok,
