@@ -12,7 +12,7 @@ return {
 			'https://halodatahive.com/Series/Summary/',
 			team = 'https://halodatahive.com/Team/Detail/',
 			player = 'https://halodatahive.com/Player/Detail/',
-      tournament = 'https://halodatahive.com/Tournament/Detail/',
+      			tournament = 'https://halodatahive.com/Tournament/Detail/',
 		}
 	},
 }
