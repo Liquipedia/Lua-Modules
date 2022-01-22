@@ -45,6 +45,7 @@ local _PRIORITY_GROUPS = {
 		'esl',
 		'faceit',
 		'gamersclub',
+		'halodatahive',
 		'matcherino',
 		'matcherinolink',
 		'smash-gg',
