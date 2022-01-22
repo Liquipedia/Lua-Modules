@@ -9,10 +9,10 @@
 return {
 	prefixes = {
 		halodatahive = {
-			'https://halodatahive.com/Series/Summary/',
+			'https://halodatahive.com/Tournament/Detail/',
 			team = 'https://halodatahive.com/Team/Detail/',
 			player = 'https://halodatahive.com/Player/Detail/',
-			tournament = 'https://halodatahive.com/Tournament/Detail/',
+			series = 'https://halodatahive.com/Series/Summary/',
 		}
 	},
 }
