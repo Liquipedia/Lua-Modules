@@ -15,7 +15,6 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 local _SUPERCELL_SPONSORED_TIER_ICON = '[[File:Supercell icon.png|x18px|link=Supercell|Tournament sponsored by Supercell.]]'
-S
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
@@ -46,7 +45,7 @@ function CustomInjector:addCustomCells(widgets)
 	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Teams',
-		content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}
+		content = {args.team_number}
 	})
 
 	return widgets
@@ -135,7 +134,6 @@ function CustomLeague:_createLiquipediaTierDisplay()
 end
 
 function CustomLeague:defineCustomPageVariables()
-
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
