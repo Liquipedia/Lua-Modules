@@ -12,7 +12,6 @@ return {
 			'https://halodatahive.com/Tournament/Detail/',
 			team = 'https://halodatahive.com/Team/Detail/',
 			player = 'https://halodatahive.com/Player/Detail/',
-			series = 'https://halodatahive.com/Series/Summary/',
 		}
 	},
 }
