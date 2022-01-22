@@ -65,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 				Cell{
 					name = 'Liquipedia Tier',
 					content = {(CustomLeague:_createLiquipediaTierDisplay() or '') .. '&nbsp;' ..
-								'[[File:Supercell icon.png|x18px|link=Supercell|Tournament sponsored by Supercell.]]'},
+								SUPERCELL_SPONSORED_TIER_ICON},
 					classes = {'valvepremier-highlighted'}
 				}
 			}
