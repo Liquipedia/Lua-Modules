@@ -18,7 +18,7 @@ local _lang = mw.language.new('en')
 local _NOW = os.time()
 local _SECONDS_IN_YEAR = 365.2425 * 86400
 
-NotabilityChecker.EXTRA_LOGGING = true
+NotabilityChecker.LOGGING = true
 
 function NotabilityChecker.run(args)
 
@@ -134,7 +134,7 @@ function NotabilityChecker._calculateWeight(placementData)
 
 	for _, placement in pairs(placementData) do
 		if not String.isEmpty(placement.placement) then
-			if NotabilityChecker.EXTRA_LOGGING then
+			if NotabilityChecker.LOGGING then
 				mw.log('Tournament: ' .. placement.tournament)
 			end
 
@@ -155,17 +155,17 @@ function NotabilityChecker._calculateWeight(placementData)
 end
 
 function NotabilityChecker.calculateTournament(tier, tierType, placement, date, notabilityMod, mode)
-	local dateLoss = NotabilityChecker._calculateDateLoss(date)
-	notabilityMod = NotabilityChecker._parseNotabilityMod(notabilityMod)
+	local dateLossModifier = NotabilityChecker._calculateDateLoss(date)
+	local notabilityModifier = NotabilityChecker._parseNotabilityMod(notabilityMod)
 	tier, tierType = NotabilityChecker._parseTier(tier, tierType)
 
 	local weight = NotabilityChecker._calculateWeightForTournament(
-		tier, tierType, placement, dateLoss, notabilityMod, mode
+		tier, tierType, placement, dateLossModifier, notabilityModifier, mode
 	)
 
-	if NotabilityChecker.EXTRA_LOGGING then
+	if NotabilityChecker.LOGGING then
 		mw.log('weight: ' .. weight,
-			'mod: ' .. notabilityMod,
+			'mod: ' .. notabilityModifier,
 			'mode: ' .. mode
 		)
 	end
