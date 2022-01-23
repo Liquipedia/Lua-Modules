@@ -60,7 +60,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Liquipedia tier',
 				content = {CustomLeague:_createTierDisplay()},
-				classes = {_args['moonton-sponsored'] == 'true' and 'valvepremier-highlighted' or ''},
+				classes = {_args['garena-sponsored'] == 'true' and 'valvepremier-highlighted' or ''},
 			},
 		}
 	elseif id == 'customcontent' then
@@ -70,11 +70,9 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		--teams section
-		if _args.team_number or (not String.isEmpty(_args.team1)) then
-			Variables.varDefine('is_team_tournament', 1)
+		if _args.team_number then
 			table.insert(widgets, Title{name = 'Teams'})
-		end
-		table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
+		    table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
 	end
 	return widgets
 end
@@ -146,14 +144,6 @@ function CustomLeague:_createTierDisplay()
 		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
 	return output
 end
-
-function CustomLeague._getPatchVersion()
-	if String.isEmpty(_args.patch) then return nil end
-	local content = PageLink.makeInternalLink(_args.patch, 'Patch ' .. _args.patch)
-	if not String.isEmpty(_args.epatch) then
-		content = content .. '&nbsp;&ndash;&nbsp;'
-		content = content .. PageLink.makeInternalLink(_args.epatch, 'Patch ' .. _args.epatch)
-	end
 
 	return content
 end
