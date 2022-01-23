@@ -61,23 +61,19 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'liquipediatier' then
+		local tierDisplay = CustomLeague:_createLiquipediaTierDisplay()
+		local class
 		if args['supercell-sponsored'] == 'true' then
-			return {
-				Cell{
-					name = 'Liquipedia Tier',
-					content = {(CustomLeague:_createLiquipediaTierDisplay() or '') .. '&nbsp;' ..
-								SUPERCELL_SPONSORED_ICON},
-					classes = {'valvepremier-highlighted'}
-				}
-			}
-		else
-			return {
-				Cell{
-					name = 'Liquipedia Tier',
-					content = {CustomLeague:_createLiquipediaTierDisplay()},
-				}
-			}
+			tierDisplay = (tierDisplay or '').. '&nbsp;' .. SUPERCELL_SPONSORED_ICON
+			class = {'valvepremier-highlighted'}
 		end
+		return {
+			Cell{
+				name = 'Liquipedia Tier',
+				content = {tierDisplay},
+				classes = class 
+			}
+		}
 	end
 	return widgets
 end
