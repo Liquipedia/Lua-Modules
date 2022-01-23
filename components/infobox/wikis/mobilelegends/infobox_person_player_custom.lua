@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=mobilelegends
--- page=Module:Infobox/Person/Player
+-- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,6 +11,7 @@ local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Role = require('Module:Role')
+local Region = require('Module:Region')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -57,6 +58,7 @@ function CustomInjector:parse(id, widgets)
 				Center{content = {automatedHistory}},
 			}
 		end
+	elseif id == 'region' then return {}
 	elseif id == 'role' then
 		_role = Role.run({role = _args.role})
 		_role2 = Role.run({role = _args.role2})
@@ -71,16 +73,15 @@ function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomPlayer:calculateEarnings()
-	return Earnings.calc_player({ args = { player = _pagename }})
-end
-
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata = {
-		isplayer = _role.isPlayer or 'true',
-		role = _role.role,
-		role2 = _role2.role
-	}
+	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
+	lpdbData.extradata.role = _role.role
+	lpdbData.extradata.role2 = _role2.role
+
+	local region = Region.run({region = _args.region, country = _args.country})
+	if type(region) == 'table' then
+		lpdbData.region = region.region
+	end
 
 	return lpdbData
 end
