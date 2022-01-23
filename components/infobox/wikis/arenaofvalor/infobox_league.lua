@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 		--teams section
 		if _args.team_number then
 			table.insert(widgets, Title{name = 'Teams'})
-		    table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
+			table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
 		end
 	end
 	return widgets
