@@ -10,7 +10,6 @@ local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
-local PageLink = require('Module:Page')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -144,8 +143,6 @@ function CustomLeague:_createTierDisplay()
 		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
 	return output
 end
-
-	return content
 end
 
 return CustomLeague
