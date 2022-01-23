@@ -76,14 +76,14 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function League:addToLpdb(lpdbData, args)
+function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = _game or args.game
 	lpdbData.participantsnumber = args.player_number or args.team_number
 
 	return lpdbData
 end
 
-function League:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', _game or _args.game)
 	Variables.varDefine('tournament_publishertier', _args['garena-sponsored'])
 		--Legacy Vars:
