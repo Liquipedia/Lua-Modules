@@ -72,6 +72,7 @@ function CustomInjector:parse(id, widgets)
 		if _args.team_number then
 			table.insert(widgets, Title{name = 'Teams'})
 		    table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
+		end
 	end
 	return widgets
 end
@@ -142,7 +143,6 @@ function CustomLeague:_createTierDisplay()
 		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
 		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
 	return output
-end
 end
 
 return CustomLeague
