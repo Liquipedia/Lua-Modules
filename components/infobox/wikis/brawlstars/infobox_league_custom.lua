@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Liquipedia Tier',
 				content = {tierDisplay},
-				classes = class 
+				classes = class
 			}
 		}
 	end
