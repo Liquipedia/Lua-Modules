@@ -13,12 +13,12 @@ local Namespace = require('Module:Namespace')
 local Variables = require('Module:Variables')
 local Page = require('Module:Page')
 local YearsActive = require('Module:YearsActive')
-local Matches = require('Module:Matches_Player')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
 local Table = require('Module:Table')
 local Array = require('Module:Array')
 local HeroIcon = require('Module:HeroIcon')
+local Template = require('Module:Template')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -193,7 +193,11 @@ end
 
 function CustomPlayer:createBottomContent(infobox)
 	if Namespace.isMain() then
-		return tostring(Matches.get({args = {noClass = true}}))
+		return tostring(Template.safeExpand(
+			mw.getCurrentFrame(), 'Upcoming_and_ongoing_matches_of_player', {player = _base_page_name})
+			.. '<br>' .. Template.safeExpand(
+			mw.getCurrentFrame(), 'Upcoming_and_ongoing_tournaments_of_player', {player = _base_page_name})
+		)
 	end
 end
 
