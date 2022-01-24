@@ -63,14 +63,23 @@ function Transfer._parseArgs(args)
 	args.from_date = Transfer.adjustDate(args.date_est or args.date)
 
 	for i= 1, 2 do
-		args['role' .. i] = args['role' .. i] and Transfer._firstToUpper(args['role' .. i])
-		args['role' .. i .. '_2'] = args['role' .. i .. '_2'] and Transfer._firstToUpper(args['role' .. i .. '_2'])
+		local roleIndex = 'role' .. i
+		local role = args[roleIndex]
+		local role2Index = 'role' .. i .. '_'
+		local role2= 'role' .. i .. '_'
+		args[roleIndex] = role and Transfer._firstToUpper(role)
+		args[role2Index] = role2 and Transfer._firstToUpper(role2)
+
 		-- for " multi transfers" move inactive part to secondary
-		if args['role' .. i .. '_2'] and
-			args['role' .. i .. '_2'] ~= 'Inactive' and
-			args['role' .. i] and args['role' .. i] == 'Inactive' then
-			args['role' .. i], args['role' .. i .. '_2'] = args['role' .. i .. '_2'], args['role' .. i]
-			args['team' .. i], args['team' .. i .. '_2'] = args['team' .. i .. '_2'], args['team' .. i]
+		local isFirstRoleInactive = (args[role2Index] and
+			args[role2Index] ~= 'Inactive') and
+			(args[roleIndex] and args[roleIndex] == 'Inactive')
+		if isFirstRoleInactive then
+			-- swap
+			args[roleIndex] = args[role2Index]
+			args[role2Index] = args[roleIndex]
+			args['team' .. i] = args['team' .. i .. '_2']
+			args['team' .. i .. '_2'] = args['team' .. i]
 		end
 	end
 
