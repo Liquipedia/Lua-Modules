@@ -373,7 +373,6 @@ function AutomaticPointsTable:createHeaderCell(header)
 	return outerDiv
 end
 
---- syntactic sugar
 function AutomaticPointsTable:wrapInDiv(text)
 	return mw.html.create('div'):wikitext(tostring(text))
 end
