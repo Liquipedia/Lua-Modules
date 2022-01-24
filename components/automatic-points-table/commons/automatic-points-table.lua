@@ -7,8 +7,10 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
+local DivTable = require('Module:DivTable')
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -49,7 +51,7 @@ function AutomaticPointsTable.run(frame)
 	-- mw.logObject(tournamentsWithPlacements)
 	mw.logObject(sortedDataWithPositions)
 
-	return nil
+	return pointsTable:generatePointsTable(sortedDataWithPositions, tournamentsWithResults)
 end
 
 function AutomaticPointsTable:parseInput(args)
@@ -296,6 +298,83 @@ function AutomaticPointsTable:addPositionData(pointsData)
 
 		end
 	)
+end
+
+function AutomaticPointsTable:generatePointsTable(pointsData, tournaments)
+local columnCount = Array.reduce(tournaments, function(count, t)
+			return count + (t.shouldDeductionsBeVisible and 2 or 1)
+		end, 0)
+	local headerRow = self:generateHeaderRow(tournaments)
+
+	local divTable = DivTable.create() :row(headerRow)
+	divTable.root :addClass('border-color-grey') :addClass('border-bottom')
+
+	-- for top and left borders
+	local divWrapper = mw.html.create('div') :addClass('fixed-size-table-container')
+		:addClass('border-color-grey')
+		:css('width', tostring(450 + (columnCount * 50)) .. 'px')
+		:node(divTable:create())
+
+	-- for mobile / responsive scrolling
+	local responsiveWrapper = mw.html.create('div') :addClass('table-responsive')
+		:addClass('automatic-points-table')
+		:node(divWrapper)
+
+	return responsiveWrapper
+end
+
+function AutomaticPointsTable:generateHeaderRow(tournaments)
+	local headerRow = DivTable.HeaderRow()
+	headerRow.root:addClass('diagonal')
+
+	-- fixed headers
+	local headers = {{
+		text = 'Ranking',
+		additionalClass = 'ranking'
+	}, {
+		text = 'Team',
+		additionalClass = 'team'
+	}, {
+		text = 'Total Points'
+	}}
+	Table.iter.forEach(headers,function(h) headerRow:cell(self:createHeaderCell(h)) end)
+	-- variable headers (according to tournaments in given in module arguments)
+	Table.iter.forEach(tournaments,
+		function(tournament)
+			headerRow:cell(self:createHeaderCell({
+				text = tournament.display and tournament.display or tournament.name
+			}))
+
+			if tournament.shouldDeductionsBeVisible == true then
+				local deductionsHeader = tournament['deductionsheader']
+				headerRow:cell(self:createHeaderCell({
+					text = deductionsHeader and deductionsHeader or 'Deductions'
+				}))
+			end
+		end
+	)
+
+	return headerRow
+end
+
+function AutomaticPointsTable:createHeaderCell(header)
+	local additionalClass = header.additionalClass
+
+	local innerDiv = self:wrapInDiv(header.text)
+		:addClass('border-color-grey')
+		:addClass('content')
+
+	local outerDiv = mw.html.create('div')
+		:addClass('diagonal-header-div-cell')
+	if additionalClass ~= nil then
+		outerDiv:addClass(additionalClass)
+	end
+	outerDiv:node(innerDiv)
+	return outerDiv
+end
+
+function AutomaticPointsTable:wrapInDiv(text)
+	return mw.html.create('div'):wikitext(tostring(text))
 end
 
 return AutomaticPointsTable
