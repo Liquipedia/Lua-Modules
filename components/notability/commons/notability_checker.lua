@@ -157,10 +157,10 @@ end
 function NotabilityChecker.calculateTournament(tier, tierType, placement, date, notabilityMod, mode)
 	local dateLossModifier = NotabilityChecker._calculateDateLoss(date)
 	local notabilityModifier = NotabilityChecker._parseNotabilityMod(notabilityMod)
-	tier, tierType = NotabilityChecker._parseTier(tier, tierType)
+	local parsedTier, parsedTierType = NotabilityChecker._parseTier(tier, tierType)
 
 	local weight = NotabilityChecker._calculateWeightForTournament(
-		tier, tierType, placement, dateLossModifier, notabilityModifier, mode
+		parsedTier, parsedTierType, placement, dateLossModifier, notabilityModifier, mode
 	)
 
 	if NotabilityChecker.LOGGING then
