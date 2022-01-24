@@ -233,7 +233,7 @@ function NotabilityChecker._calculateDateLoss(date)
 	local timestamp = _lang:formatDate('U', date)
 	local differenceSeconds = _NOW - timestamp
 
-	-- If given recieved a date in the future, set the modifier from date to 1
+	-- If given received a date in the future, set the modifier from date to 1
 	-- This can happen due to editor mistake on a prizepool, or due to incorrectly setup prizepool/teamcard interaction
 	if differenceSeconds < 0 then
 		return 1
