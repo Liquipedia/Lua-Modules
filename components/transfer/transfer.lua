@@ -66,7 +66,9 @@ function Transfer._parseArgs(args)
 		args['role' .. i] = args['role' .. i] and Transfer._firstToUpper(args['role' .. i])
 		args['role' .. i .. '_2'] = args['role' .. i .. '_2'] and Transfer._firstToUpper(args['role' .. i .. '_2'])
 		-- for " multi transfers" move inactive part to secondary
-		if args['role' .. i .. '_2'] and args['role' .. i .. '_2'] ~= 'Inactive' and args['role' .. i] and args['role' .. i] == 'Inactive' then
+		if args['role' .. i .. '_2'] and
+			args['role' .. i .. '_2'] ~= 'Inactive' and
+			args['role' .. i] and args['role' .. i] == 'Inactive' then
 			args['role' .. i], args['role' .. i .. '_2'] = args['role' .. i .. '_2'], args['role' .. i]
 			args['team' .. i], args['team' .. i .. '_2'] = args['team' .. i .. '_2'], args['team' .. i]
 		end
@@ -171,7 +173,7 @@ function Transfer._createPlatform(args)
 end
 
 function Transfer._createName(args)
-	local getIcon, getPositionName
+	local getIcon
 	if args.iconModule then
 		getIcon = mw.loadData(args.iconModule)
 	end
@@ -280,14 +282,22 @@ function Transfer._createReferences(reference, refTable)
 		div:wikitext(reference)
 	else
 		local refPrint = ''
-		for key, fullRef in Table.iter.pairsByPrefix(refTable, 'reference') do
+		for _, fullRef in Table.iter.pairsByPrefix(refTable, 'reference') do
 			local refTemp = mw.text.split(fullRef, ',,,', true)
 			if (refTemp[1] or '') == 'web source' and (refTemp[2] or '') ~= '' then
 				refPrint = refPrint .. '[' .. refTemp[2] .. '<i class="fad fa-external-link-alt wiki-color-dark"></i>]' .. '<br>'
 			elseif (refTemp[1] or '') == 'tournament source' then
-				refPrint = refPrint .. '[[' .. refTemp[2] .. '|' .. mw.getCurrentFrame():callParserFunction{ name = '#tag:abbr', args = {'<i class="fad fa-link wiki-color-dark"></i>', title = 'Transfer wasn\'t formally announced, but individual represented team starting with this tournament'} } .. ']]<br>'
+				refPrint = refPrint .. '[[' .. refTemp[2] .. '|' .. 
+					mw.getCurrentFrame():callParserFunction{ name = '#tag:abbr', args = {
+						'<i class="fad fa-link wiki-color-dark"></i>',
+						title = 'Transfer wasn\'t formally announced, but individual represented team starting with this tournament'
+					} } .. ']]<br>'
 			elseif (refTemp[1] or '') == 'inside source' then
-				refPrint = refPrint .. mw.getCurrentFrame():callParserFunction{ name = '#tag:abbr', args = {'<i class="fad fa-user-secret wiki-color-dark"></i>', title = 'Liquipedia has gained this information from a trusted inside source'} } .. '<br>'
+				refPrint = refPrint ..
+					mw.getCurrentFrame():callParserFunction{ name = '#tag:abbr', args = {
+						'<i class="fad fa-user-secret wiki-color-dark"></i>',
+						title = 'Liquipedia has gained this information from a trusted inside source'
+					} } .. '<br>'
 			end
 		end
 		div:wikitext(refPrint)
