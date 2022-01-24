@@ -62,45 +62,10 @@ end
 function Transfer._parseArgs(args)
 	args.from_date = Transfer.adjustDate(args.date_est or args.date)
 
-	for i= 1, 2 do
-		local roleIndex = 'role' .. i
-		local role = args[roleIndex]
-		local role2Index = 'role' .. i .. '_'
-		local role2= 'role' .. i .. '_'
-		args[roleIndex] = role and Transfer._firstToUpper(role)
-		args[role2Index] = role2 and Transfer._firstToUpper(role2)
-
-		-- for " multi transfers" move inactive part to secondary
-		local isFirstRoleInactive = (args[role2Index] and
-			args[role2Index] ~= 'Inactive') and
-			(args[roleIndex] and args[roleIndex] == 'Inactive')
-		if isFirstRoleInactive then
-			-- swap
-			args[roleIndex] = args[role2Index]
-			args[role2Index] = args[roleIndex]
-			args['team' .. i] = args['team' .. i .. '_2']
-			args['team' .. i .. '_2'] = args['team' .. i]
-		end
-	end
+	Transfer._parseRole(args)
+	Transfer._parsePosition(args)
 
 	local nameIndex = 2
-	if args.positionConvert then
-		local getPositionName = mw.loadData(args.positionConvert)
-		args[(args.iconParam or 'pos')] =
-			getPositionName[string.lower(args[(args.iconParam or 'pos')] or '')] or
-			args[(args.iconParam or 'pos')]
-		while (args['name' .. nameIndex] ~= nil) do
-			args[(args.iconParam or 'pos') .. nameIndex] =
-				getPositionName[string.lower(args[(args.iconParam or 'pos') .. nameIndex] or '')] or
-				args[(args.iconParam or 'pos') .. nameIndex]
-			nameIndex = nameIndex + 1
-		end
-	end
-	args.posIcon = args[(args.iconParam or 'pos')] and
-		(args[(args.iconParam or 'pos')] .. (args.sub and '_Substitute' or '')) or
-		(args.sub and 'Substitute' or '')
-
-	nameIndex = 2
 	while (args['name' .. nameIndex] ~= nil) do
 		args['posIcon' .. nameIndex] = args[(args.iconParam or 'pos') .. nameIndex] and
 		(args[(args.iconParam or 'pos') .. nameIndex] .. (args['sub' .. nameIndex] and
@@ -127,6 +92,48 @@ function Transfer._parseArgs(args)
 	end
 
 	return args, refTable
+end
+
+function Transfer._parseRole(args)
+	for i= 1, 2 do
+		local roleIndex = 'role' .. i
+		local role = args[roleIndex]
+		local role2Index = 'role' .. i .. '_2'
+		local role2= args[role2Index]
+		args[roleIndex] = role and Transfer._firstToUpper(role)
+		args[role2Index] = role2 and Transfer._firstToUpper(role2)
+
+		-- for " multi transfers" move inactive part to secondary
+		local isFirstRoleInactive = (args[role2Index] and
+			args[role2Index] ~= 'Inactive') and
+			(args[roleIndex] and args[roleIndex] == 'Inactive')
+		if isFirstRoleInactive then
+			-- swap
+			args[roleIndex] = args[role2Index]
+			args[role2Index] = args[roleIndex]
+			args['team' .. i] = args['team' .. i .. '_2']
+			args['team' .. i .. '_2'] = args['team' .. i]
+		end
+	end
+end
+
+function Transfer._parsePosition(args)
+	local nameIndex = 2
+	if args.positionConvert then
+		local getPositionName = mw.loadData(args.positionConvert)
+		args[(args.iconParam or 'pos')] =
+			getPositionName[string.lower(args[(args.iconParam or 'pos')] or '')] or
+			args[(args.iconParam or 'pos')]
+		while (args['name' .. nameIndex] ~= nil) do
+			args[(args.iconParam or 'pos') .. nameIndex] =
+				getPositionName[string.lower(args[(args.iconParam or 'pos') .. nameIndex] or '')] or
+				args[(args.iconParam or 'pos') .. nameIndex]
+			nameIndex = nameIndex + 1
+		end
+	end
+	args.posIcon = args[(args.iconParam or 'pos')] and
+		(args[(args.iconParam or 'pos')] .. (args.sub and '_Substitute' or '')) or
+		(args.sub and 'Substitute' or '')
 end
 
 function Transfer._firstToUpper(str)
