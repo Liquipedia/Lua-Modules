@@ -54,6 +54,7 @@ local _SIZE_HERO = '44x25px'
 
 local _title = mw.title.getCurrentTitle()
 local _base_page_name = _title.baseText
+local _CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
 local CustomPlayer = Class.new()
 
@@ -69,6 +70,7 @@ function CustomPlayer.run(frame)
 	player.args.datdota = player.args.playerid
 	player.args.dotabuff = player.args.playerid
 	player.args.stratz = player.args.playerid
+	player.args.steamalternative = '765' .. (tonumber(player.args.playerid) + _CONVERSION_PLAYER_ID_TO_STEAM)
 
 	_args = player.args
 	player.args.informationType = player.args.informationType or 'Player'
