@@ -86,8 +86,6 @@ function MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
 	mapArgs = MatchMapsTeamLegacy._processMapOpponent(1, prefix, mapArgs, archon)
 	mapArgs = MatchMapsTeamLegacy._processMapOpponent(2, prefix, mapArgs, archon)
 
-	MatchMapsTeamLegacy._setPlayersForOpponents(mapArgs)
-
 	MatchMapsTeamLegacy._removeProcessedMapInput(prefix)
 
 	return mapArgs
@@ -96,45 +94,43 @@ end
 function MatchMapsTeamLegacy._processMapOpponent(side, prefix, mapArgs, archon)
 	local storageArgs = _storageArgs
 
-	mapArgs['t' .. side .. 'p1'] = String.isNotEmpty(storageArgs[prefix .. 'p' .. side .. 'link'])
-		and storageArgs[prefix .. 'p' .. side .. 'link']
-		or storageArgs[prefix .. 'p' .. side .. '']
-	mapArgs['t' .. side .. 'p1race'] = storageArgs[prefix .. 'p' .. side .. 'race']
-	mapArgs['t' .. side .. 'p1flag'] = storageArgs[prefix .. 'p' .. side .. 'flag']
+	local addToMapArgs = {
+		['t' .. side .. 'p1'] = String.isNotEmpty(storageArgs[prefix .. 'p' .. side .. 'link'])
+			and storageArgs[prefix .. 'p' .. side .. 'link']
+			or storageArgs[prefix .. 'p' .. side],
+		['t' .. side .. 'p1race'] = storageArgs[prefix .. 'p' .. side .. 'race'],
+		['t' .. side .. 'p1flag'] = storageArgs[prefix .. 'p' .. side .. 'flag'],
 
-	mapArgs['opponent' .. side .. 'archon'] = archon and 'true' or nil
-	mapArgs['opponent' .. side .. 'race'] = archon and storageArgs[prefix .. 'p' .. side .. 'race'] or nil
+		['opponent' .. side .. 'archon'] = archon and 'true' or nil,
+		['opponent' .. side .. 'race'] = archon and storageArgs[prefix .. 'p' .. side .. 'race'] or nil,
 
-	mapArgs['t' .. side .. 'p2'] = String.isNotEmpty(storageArgs[prefix .. 't' .. side .. 'p2link'])
+		['t' .. side .. 'p2'] = String.isNotEmpty(storageArgs[prefix .. 't' .. side .. 'p2link'])
 			and storageArgs[prefix .. 't' .. side .. 'p2link']
-			or storageArgs[prefix .. 't' .. side .. 'p2']
-	mapArgs['t' .. side .. 'p2race'] = storageArgs[prefix .. 't' .. side .. 'p2race']
-	mapArgs['t' .. side .. 'p2flag'] = storageArgs[prefix .. 't' .. side .. 'p2flag']
+			or storageArgs[prefix .. 't' .. side .. 'p2'],
+		['t' .. side .. 'p2race'] = storageArgs[prefix .. 't' .. side .. 'p2race'],
+		['t' .. side .. 'p2flag'] = storageArgs[prefix .. 't' .. side .. 'p2flag'],
 
-	mapArgs['t' .. side .. 'p3'] = String.isNotEmpty(storageArgs[prefix .. 't' .. side .. 'p3link'])
+		['t' .. side .. 'p3'] = String.isNotEmpty(storageArgs[prefix .. 't' .. side .. 'p3link'])
 			and storageArgs[prefix .. 't' .. side .. 'p3link']
-			or storageArgs[prefix .. 't' .. side .. 'p3']
-	mapArgs['t' .. side .. 'p3race'] = storageArgs[prefix .. 't' .. side .. 'p3race']
-	mapArgs['t' .. side .. 'p3flag'] = storageArgs[prefix .. 't' .. side .. 'p2flag']
+			or storageArgs[prefix .. 't' .. side .. 'p3'],
+		['t' .. side .. 'p3race'] = storageArgs[prefix .. 't' .. side .. 'p3race'],
+		['t' .. side .. 'p3flag'] = storageArgs[prefix .. 't' .. side .. 'p2flag'],
+	}
 
-	return mapArgs
+	MatchMapsTeamLegacy._setPlayersForOpponents(addToMapArgs, side, storageArgs[prefix .. 'p' .. side])
+
+	return Table.mergeInto(mapArgs, addToMapArgs)
 end
 
-function MatchMapsTeamLegacy._setPlayersForOpponents(mapArgs)
+function MatchMapsTeamLegacy._setPlayersForOpponents(args, side, displayName)
 	local index = 1
-	while mapArgs['t1p' .. index] do
-		_opponentPlayers[1][mapArgs['t1p' .. index]] = {
-			race = mapArgs['t1p' .. index .. 'race'],
-			flag = mapArgs['t1p' .. index .. 'flag'],
-		}
-		index = index + 1
-	end
+	local prefix = 't' .. side .. 'p'
 
-	index = 1
-	while mapArgs['t2p' .. index] do
-		_opponentPlayers[2][mapArgs['t2p' .. index]] = {
-			race = mapArgs['t2p' .. index .. 'race'],
-			flag = mapArgs['t2p' .. index .. 'flag'],
+	while args[prefix .. index] do
+		_opponentPlayers[side][args[prefix .. index]] = {
+			race = args[prefix .. index .. 'race'],
+			flag = args[prefix .. index .. 'flag'],
+			display = displayName,
 		}
 		index = index + 1
 	end
@@ -170,7 +166,8 @@ function MatchMapsTeamLegacy._handleOpponents()
 				local players = {}
 				local playerIndex = 1
 				for player, playerData in pairs(_opponentPlayers[opponentIndex]) do
-					players['p' .. playerIndex] = player
+					players['p' .. playerIndex .. 'link'] = player
+					players['p' .. playerIndex] = playerData.display
 					players['p' .. playerIndex .. 'flag'] = playerData.flag
 					players['p' .. playerIndex .. 'race'] = playerData.race
 					playerIndex = playerIndex + 1
