@@ -66,7 +66,6 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 
 	-- Override links to allow one param to set multiple links
-	player.args.steam = player.args.playerid
 	player.args.datdota = player.args.playerid
 	player.args.dotabuff = player.args.playerid
 	player.args.stratz = player.args.playerid
