@@ -80,6 +80,9 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = _game or args.game
 	lpdbData.participantsnumber = args.player_number or args.team_number
+	lpdbData.extradata = {
+		individual = String.isNotEmpty(args.player_number) and 'true' or '',
+	}
 
 	return lpdbData
 end
@@ -87,7 +90,7 @@ end
 function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', _game or _args.game)
 	Variables.varDefine('tournament_publishertier', _args['garena-sponsored'])
-		--Legacy Vars:
+	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
