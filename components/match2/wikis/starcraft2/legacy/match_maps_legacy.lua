@@ -21,7 +21,7 @@ local MatchMapsLegacy = {}
 
 local _storageArgs
 
-local _OPPONENT_NUMBER = 2
+local _NUMBER_OF_OPPONENTS = 2
 
 -- invoked by Template:Legacy Match list start
 function MatchMapsLegacy.init(frame)
@@ -67,7 +67,7 @@ end
 function MatchMapsLegacy._handleOpponents()
 	local storageArgs = _storageArgs
 
-	for opponentIndex = 1, _OPPONENT_NUMBER do
+	for opponentIndex = 1, _NUMBER_OF_OPPONENTS do
 		if storageArgs['player' .. opponentIndex] and storageArgs['player' .. opponentIndex]:lower() == 'bye' then
 			storageArgs['opponent' .. opponentIndex] = {
 				['type'] = 'literal',
