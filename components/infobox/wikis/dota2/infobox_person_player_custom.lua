@@ -75,9 +75,7 @@ function CustomPlayer.run(frame)
 	player.args.informationType = player.args.informationType or 'Player'
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.createBottomContent = CustomPlayer.createBottomContent
-	player.getCategories = CustomPlayer.getCategories
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	return player:createInfobox(frame)
@@ -183,13 +181,6 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.playerid = _args.playerid
 
 	return lpdbData
-end
-
-function CustomPlayer:defineCustomPageVariables(args)
-	--retrieve birth month + day for storage in smw
-	local birthMonthAndDay = string.match(args.birth_date or '', '%-%d%d?%-%d%d?$')
-	birthMonthAndDay = string.gsub(birthMonthAndDay or '', '^%-', '')
-	Variables.varDefine('birthday', birthMonthAndDay)
 end
 
 function CustomPlayer:createBottomContent(infobox)
