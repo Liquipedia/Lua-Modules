@@ -11,7 +11,7 @@ local Abbreviation = {}
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
 
-function Abbreviation.make(title, text)
+function Abbreviation.make(text, title)
 	if String.isEmpty(title) or String.isEmpty(text) then
 		return nil
 	end
