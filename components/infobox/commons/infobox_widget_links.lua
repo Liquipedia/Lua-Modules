@@ -24,6 +24,7 @@ local _ICON_KEYS_TO_RENAME = {
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
 	matcherinolink = 'matcherino',
+	steamalternative = 'steam',
 }
 
 local _PRIORITY_GROUPS = {
