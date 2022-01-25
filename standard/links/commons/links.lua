@@ -53,7 +53,7 @@ local _PREFIXES = {
 		'https://halodatahive.com/Tournament/Detail/',
 		team = 'https://halodatahive.com/Team/Detail/',
 		player = 'https://halodatahive.com/Player/Detail/',
-	}
+	},
 	home = {''},
 	huomaotv = {'http://www.huomao.com/'},
 	huyatv = {'https://www.huya.com/'},
