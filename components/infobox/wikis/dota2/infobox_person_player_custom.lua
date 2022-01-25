@@ -180,6 +180,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata['lc_id'] = _base_page_name:lower()
 	lpdbData.extradata.team2 = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		not String.isEmpty(_args.team2link) and _args.team2link or _args.team2 or '')
+	lpdbData.extradata.playerid = _args.playerid
 
 	return lpdbData
 end
