@@ -18,6 +18,8 @@ local _lang = mw.language.new('en')
 local _NOW = os.time()
 local _SECONDS_IN_YEAR = 365.2425 * 86400
 
+NotabilityChecker.LOGGING = true
+
 function NotabilityChecker.run(args)
 
 	local weight = 0
@@ -132,18 +134,15 @@ function NotabilityChecker._calculateWeight(placementData)
 
 	for _, placement in pairs(placementData) do
 		if not String.isEmpty(placement.placement) then
-			local dateLoss = NotabilityChecker._calculateDateLoss(placement.date)
-			local notabilityMod = NotabilityChecker._parseNotabilityMod(
-				placement.extradata['notabilitymod'])
-			local tier, tierType = NotabilityChecker._parseTier(placement)
+			if NotabilityChecker.LOGGING then
+				mw.log('Tournament: ' .. placement.tournament)
+			end
 
-			local weight = NotabilityChecker._calculateWeightForTournament(
-				tier, tierType, placement.placement, dateLoss, notabilityMod, placement.mode)
-			table.insert(weights, weight)
-			mw.log('Tournament: ' .. placement.tournament ..
-			'    weight: ' .. weight .. '    mod: ' .. notabilityMod ..
-			'    mode: ' .. placement.mode
+			local weight = NotabilityChecker.calculateTournament(
+				placement.liquipediatier, placement.liquipediatiertype, placement.placement,
+				placement.date, placement.extradata.notabilitymod, placement.mode
 			)
+			table.insert(weights, weight)
 		end
 	end
 
@@ -153,6 +152,25 @@ function NotabilityChecker._calculateWeight(placementData)
 	end
 
 	return finalWeight
+end
+
+function NotabilityChecker.calculateTournament(tier, tierType, placement, date, notabilityMod, mode)
+	local dateLossModifier = NotabilityChecker._calculateDateLoss(date)
+	local notabilityModifier = NotabilityChecker._parseNotabilityMod(notabilityMod)
+	local parsedTier, parsedTierType = NotabilityChecker._parseTier(tier, tierType)
+
+	local weight = NotabilityChecker._calculateWeightForTournament(
+		parsedTier, parsedTierType, placement, dateLossModifier, notabilityModifier, mode
+	)
+
+	if NotabilityChecker.LOGGING then
+		mw.log('weight: ' .. weight,
+			'mod: ' .. notabilityModifier,
+			'mode: ' .. mode
+		)
+	end
+
+	return weight
 end
 
 function NotabilityChecker._calculateWeightForTournament(tier, tierType, placement, dateLoss, notabilityMod, mode)
@@ -213,12 +231,12 @@ function NotabilityChecker._preparePlacement(placement)
 	return placement
 end
 
-function NotabilityChecker._parseTier(placement)
-	if String.isEmpty(placement.liquipediatiertype) then
-		return tonumber(placement.liquipediatier), nil
+function NotabilityChecker._parseTier(tier, tierType)
+	if String.isEmpty(tierType) then
+		return tonumber(tier), nil
 	end
 
-	return tonumber(placement.liquipediatier), placement.liquipediatiertype:lower()
+	return tonumber(tier), tierType:lower()
 end
 
 function NotabilityChecker._parseNotabilityMod(notabilityMod)
