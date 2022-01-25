@@ -123,13 +123,19 @@ end
 function MatchMapsTeamLegacy._setPlayersForOpponents(mapArgs)
 	local index = 1
 	while mapArgs['t1p' .. index] do
-		_opponentPlayers[1][mapArgs['t1p' .. index]] = true
+		_opponentPlayers[1][mapArgs['t1p' .. index]] = {
+			race = mapArgs['t1p' .. index .. 'race'],
+			flag = mapArgs['t1p' .. index .. 'flag'],
+		}
 		index = index + 1
 	end
 
 	index = 1
 	while mapArgs['t2p' .. index] do
-		_opponentPlayers[2][mapArgs['t2p' .. index]] = true
+		_opponentPlayers[2][mapArgs['t2p' .. index]] = {
+			race = mapArgs['t2p' .. index .. 'race'],
+			flag = mapArgs['t2p' .. index .. 'flag'],
+		}
 		index = index + 1
 	end
 end
@@ -163,8 +169,10 @@ function MatchMapsTeamLegacy._handleOpponents()
 			else
 				local players = {}
 				local playerIndex = 1
-				for player, _ in pairs(_opponentPlayers[opponentIndex]) do
+				for player, playerData in pairs(_opponentPlayers[opponentIndex]) do
 					players['p' .. playerIndex] = player
+					players['p' .. playerIndex .. 'flag'] = playerData.flag
+					players['p' .. playerIndex .. 'race'] = playerData.race
 					playerIndex = playerIndex + 1
 				end
 				storageArgs['opponent' .. opponentIndex].players = players
