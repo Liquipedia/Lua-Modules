@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local ChampionNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -14,6 +13,7 @@ local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+local ChampionNames = mw.loadData('Module:ChampionNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
@@ -39,7 +39,6 @@ local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
-local _TEAM_OPPONENT_TYPE = 'team'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
 local _SECONDS_UNTIL_FINISHED_EXACT = 30800
@@ -386,14 +385,14 @@ function matchFunctions.getOpponents(match)
 			end
 
 			-- get players from vars for teams
-			if opponent.type == _TEAM_OPPONENT_TYPE then
+			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
 					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name, opponent.players)
 				end
-			elseif opponent.type == 'solo' then
+			elseif Opponent.typeIsParty(opponent) then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
 				opponent.match2players[1].name = opponent.name
-			else
+			elseif opponent.type ~= Opponent.literal then
 				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
 
@@ -467,7 +466,6 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
 	playersData = Json.parseIfString(playersData) or {}
 	local players = {}
-	local count = 1
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
@@ -484,7 +482,6 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 
 		if not Table.isEmpty(player) then
 			table.insert(players, player)
-			count = count + 1
 		end
 	end
 	match['opponent' .. oppIndex].match2players = players
