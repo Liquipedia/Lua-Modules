@@ -7,8 +7,6 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Json = require('Module:Json')
-local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
@@ -127,7 +125,7 @@ end
 function MatchMapsLegacy.close()
 	local bracketId = matchlistVars:get('bracketid')
 	-- since the same template is also used for old team match lists
-	-- that are not yet converted we need to return an empty string 
+	-- that are not yet converted we need to return an empty string
 	-- in case we have no bracketId
 	if String.isEmpty(bracketId) then
 		return ''
