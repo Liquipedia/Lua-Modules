@@ -134,6 +134,10 @@ function MatchMapsLegacy.close()
 	local matches = Template.retrieveReturnValues('LegacyMatchlist')
 
 	for matchIndex, match in ipairs(matches) do
+		-- catch bs entries to first unnamed argument in match maps calls
+		-- this needs to be empty for the _toEncodedJson call
+		match[1] = nil
+
 		matches['M' .. matchIndex] = Match._toEncodedJson(match)
 		matches[matchIndex] = nil
 	end
