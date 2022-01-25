@@ -69,7 +69,9 @@ function CustomPlayer.run(frame)
 	player.args.datdota = player.args.playerid
 	player.args.dotabuff = player.args.playerid
 	player.args.stratz = player.args.playerid
-	player.args.steamalternative = '765' .. (tonumber(player.args.playerid) + _CONVERSION_PLAYER_ID_TO_STEAM)
+	if not String.isEmpty(player.args.playerid) then
+		player.args.steamalternative = '765' .. (tonumber(player.args.playerid) + _CONVERSION_PLAYER_ID_TO_STEAM)
+	end
 
 	_args = player.args
 	player.args.informationType = player.args.informationType or 'Player'
