@@ -82,47 +82,40 @@ function MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
 	local mapArgs = {
 		map = map or 'unknown',
 		winner = mapWinner,
-
-		--opponent1 side
-		t1p1 = String.isNotEmpty(storageArgs[prefix .. 'p1link'])
-			and storageArgs[prefix .. 'p1link']
-			or storageArgs[prefix .. 'p1'],
-		t1p1race = storageArgs[prefix .. 'p1race'],
-
-		opponent1archon = archon and 'true' or nil,
-		opponent1race = archon and storageArgs[prefix .. 'p1race'] or nil,
-
-		t1p2 = String.isNotEmpty(storageArgs[prefix .. 't1p2link'])
-			and storageArgs[prefix .. 't1p2link']
-			or storageArgs[prefix .. 't1p2'],
-		t1p2race = storageArgs[prefix .. 't1p2race'],
-		t1p3 = String.isNotEmpty(storageArgs[prefix .. 't1p3link'])
-			and storageArgs[prefix .. 't1p3link']
-			or storageArgs[prefix .. 't1p3'],
-		t1p3race = storageArgs[prefix .. 't1p3race'],
-
-		--opponent2 side
-		t2p1 = String.isNotEmpty(storageArgs[prefix .. 'p2link'])
-			and storageArgs[prefix .. 'p2link']
-			or storageArgs[prefix .. 'p2'],
-		t2p1race = storageArgs[prefix .. 'p2race'],
-
-		opponent2archon = archon and 'true' or nil,
-		opponent2race = archon and storageArgs[prefix .. 'p2race'] or nil,
-
-		t2p2 = String.isNotEmpty(storageArgs[prefix .. 't2p2link'])
-			and storageArgs[prefix .. 't2p2link']
-			or storageArgs[prefix .. 't2p2'],
-		t2p2race = storageArgs[prefix .. 't2p2race'],
-		t2p3 = String.isNotEmpty(storageArgs[prefix .. 't2p3link'])
-			and storageArgs[prefix .. 't2p3link']
-			or storageArgs[prefix .. 't2p3'],
-		t2p3race = storageArgs[prefix .. 't2p3race'],
 	}
+	mapArgs = MatchMapsTeamLegacy._processMapOpponent(1, prefix, mapArgs, archon)
+	mapArgs = MatchMapsTeamLegacy._processMapOpponent(2, prefix, mapArgs, archon)
 
 	MatchMapsTeamLegacy._setPlayersForOpponents(mapArgs)
 
 	MatchMapsTeamLegacy._removeProcessedMapInput(prefix)
+
+	return mapArgs
+end
+
+function MatchMapsTeamLegacy._processMapOpponent(side, prefix, mapArgs, archon)
+	local storageArgs = _storageArgs
+
+	mapArgs['t' .. side .. 'p1'] = String.isNotEmpty(storageArgs[prefix .. 'p' .. side .. 'link'])
+		and storageArgs[prefix .. 'p' .. side .. 'link']
+		or storageArgs[prefix .. 'p' .. side .. '']
+	mapArgs['t' .. side .. 'p1race'] = storageArgs[prefix .. 'p' .. side .. 'race']
+	mapArgs['t' .. side .. 'p1flag'] = storageArgs[prefix .. 'p' .. side .. 'flag']
+
+	mapArgs['opponent' .. side .. 'archon'] = archon and 'true' or nil
+	mapArgs['opponent' .. side .. 'race'] = archon and storageArgs[prefix .. 'p' .. side .. 'race'] or nil
+
+	mapArgs['t' .. side .. 'p2'] = String.isNotEmpty(storageArgs[prefix .. 't' .. side .. 'p2link'])
+			and storageArgs[prefix .. 't' .. side .. 'p2link']
+			or storageArgs[prefix .. 't' .. side .. 'p2']
+	mapArgs['t' .. side .. 'p2race'] = storageArgs[prefix .. 't' .. side .. 'p2race']
+	mapArgs['t' .. side .. 'p2flag'] = storageArgs[prefix .. 't' .. side .. 'p2flag']
+
+	mapArgs['t' .. side .. 'p3'] = String.isNotEmpty(storageArgs[prefix .. 't' .. side .. 'p3link'])
+			and storageArgs[prefix .. 't' .. side .. 'p3link']
+			or storageArgs[prefix .. 't' .. side .. 'p3']
+	mapArgs['t' .. side .. 'p3race'] = storageArgs[prefix .. 't' .. side .. 'p3race']
+	mapArgs['t' .. side .. 'p3flag'] = storageArgs[prefix .. 't' .. side .. 'p2flag']
 
 	return mapArgs
 end
