@@ -130,7 +130,6 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'nationality' then
 		return {
-			Cell{name = 'Location', content = {_args.location}},
 			Cell{name = 'Nationality', content = CustomPlayer._createLocations()}
 		}
 	end
