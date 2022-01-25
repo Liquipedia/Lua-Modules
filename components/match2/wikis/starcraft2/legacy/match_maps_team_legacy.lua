@@ -9,15 +9,9 @@
 local Arguments = require('Module:Arguments')
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Template = require('Module:Template')
 local Json = require('Module:Json')
 local Table = require('Module:Table')
-local Match = require('Module:Match')
-local MatchGroup = require('Module:MatchGroup')
-
-local globalVars = PageVariableNamespace()
-local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 
 local MatchMapsTeamLegacy = {}
 
@@ -63,8 +57,6 @@ function MatchMapsTeamLegacy._handleMaps()
 	local mapWinner = storageArgs[prefix .. 'win']
 
 	while map or mapWinner do
-		local archon = Logic.readBool(storageArgs[prefix .. 'archon'])
-
 		storageArgs['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
 
 		gameIndex = gameIndex + 1
@@ -84,6 +76,8 @@ end
 
 function MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
 	local storageArgs = _storageArgs
+
+	local archon = Logic.readBool(storageArgs[prefix .. 'archon'])
 
 	local mapArgs = {
 		map = map or 'unknown',
