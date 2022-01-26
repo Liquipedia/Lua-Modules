@@ -10,7 +10,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local OpponentDisplay = require('Module:OpponentDisplay')
-local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
@@ -23,7 +22,6 @@ local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 local p = {}
 
 local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local _RED_CROSS = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 function p.getByMatchId(args)
