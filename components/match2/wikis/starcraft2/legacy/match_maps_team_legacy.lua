@@ -15,7 +15,7 @@ local Table = require('Module:Table')
 
 local MatchMapsTeamLegacy = {}
 
-local _storageArgs
+local _match2Args
 local _args
 local _opponentPlayers = {{}, {}}
 
@@ -28,8 +28,7 @@ function MatchMapsTeamLegacy.preprocess(frame)
 end
 
 function MatchMapsTeamLegacy._preProcess(args)
-	local storageArgs = Json.parse(args.details or '{}')
-	_storageArgs = storageArgs
+	_match2Args = Json.parse(args.details or '{}')
 
 	args.details = nil
 	_args = args
@@ -42,39 +41,35 @@ function MatchMapsTeamLegacy._preProcess(args)
 		args.dateheader = true
 	end
 
-	Template.stashReturnValue(Table.merge(args, storageArgs), 'LegacyMatchlist')
+	Template.stashReturnValue(Table.merge(args, _match2Args), 'LegacyMatchlist')
 end
 
 function MatchMapsTeamLegacy._handleMaps()
-	local storageArgs = _storageArgs
-
 	local gameIndex = 1
 	local prefix = 'm' .. gameIndex
-	local map = storageArgs[prefix .. 'map']
-	local mapWinner = storageArgs[prefix .. 'win']
+	local map = _match2Args[prefix .. 'map']
+	local mapWinner = _match2Args[prefix .. 'win']
 
 	while map or mapWinner do
-		storageArgs['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
+		_match2Args['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
 
 		gameIndex = gameIndex + 1
 		prefix = 'm' .. gameIndex
-		map = storageArgs[prefix .. 'map']
-		mapWinner = storageArgs[prefix .. 'win']
+		map = _match2Args[prefix .. 'map']
+		mapWinner = _match2Args[prefix .. 'win']
 	end
 
 	prefix = 'ace'
-	map = storageArgs[prefix .. 'map']
-	mapWinner = storageArgs[prefix .. 'win']
+	map = _match2Args[prefix .. 'map']
+	mapWinner = _match2Args[prefix .. 'win']
 
 	if map or mapWinner then
-		storageArgs['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
+		_match2Args['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
 	end
 end
 
 function MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
-	local storageArgs = _storageArgs
-
-	local archon = Logic.readBool(storageArgs[prefix .. 'archon'])
+	local archon = Logic.readBool(_match2Args[prefix .. 'archon'])
 
 	local mapArgs = {
 		map = map or 'unknown',
@@ -89,32 +84,30 @@ function MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
 end
 
 function MatchMapsTeamLegacy._processMapOpponent(side, prefix, mapArgs, archon)
-	local storageArgs = _storageArgs
-
 	local addToMapArgs = {
-		['t' .. side .. 'p1'] = String.isNotEmpty(storageArgs[prefix .. 'p' .. side .. 'link'])
-			and storageArgs[prefix .. 'p' .. side .. 'link']
-			or storageArgs[prefix .. 'p' .. side],
-		['t' .. side .. 'p1race'] = storageArgs[prefix .. 'p' .. side .. 'race'],
-		['t' .. side .. 'p1flag'] = storageArgs[prefix .. 'p' .. side .. 'flag'],
+		['t' .. side .. 'p1'] = String.isNotEmpty(_match2Args[prefix .. 'p' .. side .. 'link'])
+			and _match2Args[prefix .. 'p' .. side .. 'link']
+			or _match2Args[prefix .. 'p' .. side],
+		['t' .. side .. 'p1race'] = _match2Args[prefix .. 'p' .. side .. 'race'],
+		['t' .. side .. 'p1flag'] = _match2Args[prefix .. 'p' .. side .. 'flag'],
 
 		['opponent' .. side .. 'archon'] = archon and 'true' or nil,
-		['opponent' .. side .. 'race'] = archon and storageArgs[prefix .. 'p' .. side .. 'race'] or nil,
+		['opponent' .. side .. 'race'] = archon and _match2Args[prefix .. 'p' .. side .. 'race'] or nil,
 
-		['t' .. side .. 'p2'] = String.isNotEmpty(storageArgs[prefix .. 't' .. side .. 'p2link'])
-			and storageArgs[prefix .. 't' .. side .. 'p2link']
-			or storageArgs[prefix .. 't' .. side .. 'p2'],
-		['t' .. side .. 'p2race'] = storageArgs[prefix .. 't' .. side .. 'p2race'],
-		['t' .. side .. 'p2flag'] = storageArgs[prefix .. 't' .. side .. 'p2flag'],
+		['t' .. side .. 'p2'] = String.isNotEmpty(_match2Args[prefix .. 't' .. side .. 'p2link'])
+			and _match2Args[prefix .. 't' .. side .. 'p2link']
+			or _match2Args[prefix .. 't' .. side .. 'p2'],
+		['t' .. side .. 'p2race'] = _match2Args[prefix .. 't' .. side .. 'p2race'],
+		['t' .. side .. 'p2flag'] = _match2Args[prefix .. 't' .. side .. 'p2flag'],
 
-		['t' .. side .. 'p3'] = String.isNotEmpty(storageArgs[prefix .. 't' .. side .. 'p3link'])
-			and storageArgs[prefix .. 't' .. side .. 'p3link']
-			or storageArgs[prefix .. 't' .. side .. 'p3'],
-		['t' .. side .. 'p3race'] = storageArgs[prefix .. 't' .. side .. 'p3race'],
-		['t' .. side .. 'p3flag'] = storageArgs[prefix .. 't' .. side .. 'p3flag'],
+		['t' .. side .. 'p3'] = String.isNotEmpty(_match2Args[prefix .. 't' .. side .. 'p3link'])
+			and _match2Args[prefix .. 't' .. side .. 'p3link']
+			or _match2Args[prefix .. 't' .. side .. 'p3'],
+		['t' .. side .. 'p3race'] = _match2Args[prefix .. 't' .. side .. 'p3race'],
+		['t' .. side .. 'p3flag'] = _match2Args[prefix .. 't' .. side .. 'p3flag'],
 	}
 
-	MatchMapsTeamLegacy._setPlayersForOpponents(addToMapArgs, side, storageArgs[prefix .. 'p' .. side])
+	MatchMapsTeamLegacy._setPlayersForOpponents(addToMapArgs, side, _match2Args[prefix .. 'p' .. side])
 
 	return Table.mergeInto(mapArgs, addToMapArgs)
 end
@@ -132,31 +125,30 @@ function MatchMapsTeamLegacy._setPlayersForOpponents(args, side, displayName)
 end
 
 function MatchMapsTeamLegacy._removeProcessedMapInput(prefix)
-	for key, _ in pairs(_storageArgs) do
+	for key, _ in pairs(_match2Args) do
 		if String.startsWith(key, prefix) then
-			_storageArgs[key] = nil
+			_match2Args[key] = nil
 		end
 	end
 end
 
 function MatchMapsTeamLegacy._handleOpponents()
-	local storageArgs = _storageArgs
 	local args = _args
 
 	for opponentIndex = 1, _NUMBER_OF_OPPONENTS do
 		if args['team' .. opponentIndex] and args['team' .. opponentIndex]:lower() == 'bye' then
-			storageArgs['opponent' .. opponentIndex] = {
+			_match2Args['opponent' .. opponentIndex] = {
 				['type'] = 'literal',
 				name = 'BYE',
 			}
 		else
-			storageArgs['opponent' .. opponentIndex] = {
+			_match2Args['opponent' .. opponentIndex] = {
 				['type'] = 'team',
 				template = args['team' .. opponentIndex],
 				score = args['score' .. opponentIndex],
 			}
 			if args['team' .. opponentIndex] == '' then
-				storageArgs['opponent' .. opponentIndex]['type'] = 'literal'
+				_match2Args['opponent' .. opponentIndex]['type'] = 'literal'
 			else
 				local players = {}
 				local playerIndex = 1
@@ -167,7 +159,7 @@ function MatchMapsTeamLegacy._handleOpponents()
 					players['p' .. playerIndex .. 'race'] = playerData.race
 					playerIndex = playerIndex + 1
 				end
-				storageArgs['opponent' .. opponentIndex].players = players
+				_match2Args['opponent' .. opponentIndex].players = players
 			end
 		end
 
