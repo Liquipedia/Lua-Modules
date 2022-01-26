@@ -34,9 +34,6 @@ function MatchMapsTeamLegacy._preProcess(args)
 	args.details = nil
 	_args = args
 
-	storageArgs.winner = args.winner
-	storageArgs.bestof = args.bestof
-
 	MatchMapsTeamLegacy._handleMaps()
 
 	MatchMapsTeamLegacy._handleOpponents()
