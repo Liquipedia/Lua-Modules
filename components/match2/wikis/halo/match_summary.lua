@@ -116,23 +116,6 @@ function p.getByMatchId(args)
 		end
 	end
 
-	-- Vetoes
-	local vetoData = (match.extradata or {}).mapveto
-	if not Table.isEmpty(vetoData) then
-		for index, vetoMap in ipairs(vetoData) do
-			local vetoElements = p._getVetoDisplay(vetoMap.map, vetoMap.by)
-			if index == 1 then
-				table.insert(vetoElements, 1, p._breakNode())
-				table.insert(vetoElements, 1, htmlCreate('div')
-					:css('font-size','85%')
-					:css('margin','auto')
-					:wikitext('Vetoes')
-				)
-			end
-			body = p._addFlexRow(body, vetoElements, 'brkts-popup-body-game')
-		end
-	end
-
 	wrapper:node(body):node(p._breakNode())
 
 	-- comment
@@ -176,21 +159,6 @@ function p.getByMatchId(args)
 		wrapper:node(footer)
 	end
 	return wrapper
-end
-
-function p._getVetoDisplay(vetoMap, vetoOpponent)
-	local vetoElements = {
-		htmlCreate('div')
-			:addClass('brkts-popup-spaced')
-			:node(vetoOpponent == 1 and _RED_CROSS or _NO_CHECK),
-		htmlCreate('div')
-			:addClass('brkts-popup-spaced')
-			:node(htmlCreate('div'):node('[[' .. vetoMap .. ']]')),
-		htmlCreate('div')
-			:addClass('brkts-popup-spaced')
-			:node(vetoOpponent == 2 and _RED_CROSS or _NO_CHECK)
-	}
-	return vetoElements
 end
 
 function p._addFlexRow(wrapper, contentElements, class, style)
