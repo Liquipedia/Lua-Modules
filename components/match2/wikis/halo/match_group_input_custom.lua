@@ -20,7 +20,6 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 8
 local MAX_NUM_PLAYERS = 10
-local MAX_NUM_VODGAMES = 9
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 
@@ -317,22 +316,12 @@ function matchFunctions.getVodStuff(match)
 	if match.faceit then links.faceit = 'https://www.faceit.com/en/halo_infinite/room/' .. match.faceit end
 	if match.stats then links.stats = match.stats end
 
-	-- apply vodgames
-	for index = 1, MAX_NUM_VODGAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
 	return match
 end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
-		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
 		mvp = matchFunctions.getMVP(match),
 		isconverted = 0
