@@ -20,7 +20,6 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 8
 local MAX_NUM_PLAYERS = 10
-local MAX_NUM_VODGAMES = 9
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 
@@ -313,58 +312,21 @@ function matchFunctions.getVodStuff(match)
 	match.links = {}
 	local links = match.links
 	if match.preview then links.preview = match.preview end
-	if match.siegegg then links.siegegg = 'https://siege.gg/matches/' .. match.siegegg end
-	if match.opl then links.opl = 'https://www.opleague.eu/match/' .. match.opl end
 	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
-	if match.faceit then links.faceit = 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit end
-	if match.lpl then links.lpl = 'https://letsplay.live/match/' .. match.lpl end
-	if match.r6esports then links.r6esports = 'https://www.r6esports.com.br/en/match/' .. match.r6esports end
+	if match.faceit then links.faceit = 'https://www.faceit.com/en/halo_infinite/room/' .. match.faceit end
 	if match.stats then links.stats = match.stats end
 
-	-- apply vodgames
-	for index = 1, MAX_NUM_VODGAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
 	return match
 end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
-		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
-		mapveto = matchFunctions.getMapVeto(match),
 		mvp = matchFunctions.getMVP(match),
 		isconverted = 0
 	}
 	return match
-end
-
--- Parse the mapVeto input
-function matchFunctions.getMapVeto(match)
-	if not match.vetoes then return {} end
-
-	local vetoes = mw.text.split(match.vetoes or '', ',')
-	match.vetoes = nil
-	local vetoesBy = mw.text.split(match.vetoesBy or '', ',')
-	match.vetoesBy = nil
-	local index = 1
-	local currentVetoMap = mw.text.trim(vetoes[1])
-	local vetoData = {}
-
-	while not String.isEmpty(currentVetoMap) do
-		local by = tonumber(mw.text.trim(vetoesBy[index]) or '')
-		vetoData[index] = { map = currentVetoMap, by = by }
-		index = index + 1
-		currentVetoMap = mw.text.trim(vetoes[index] or '')
-	end
-
-	return vetoData
 end
 
 -- Parse MVP input

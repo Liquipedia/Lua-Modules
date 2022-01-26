@@ -10,7 +10,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local OpponentDisplay = require('Module:OpponentDisplay')
-local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
@@ -23,7 +22,6 @@ local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 local p = {}
 
 local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local _RED_CROSS = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 function p.getByMatchId(args)
@@ -116,23 +114,6 @@ function p.getByMatchId(args)
 		end
 	end
 
-	-- Vetoes
-	local vetoData = (match.extradata or {}).mapveto
-	if not Table.isEmpty(vetoData) then
-		for index, vetoMap in ipairs(vetoData) do
-			local vetoElements = p._getVetoDisplay(vetoMap.map, vetoMap.by)
-			if index == 1 then
-				table.insert(vetoElements, 1, p._breakNode())
-				table.insert(vetoElements, 1, htmlCreate('div')
-					:css('font-size','85%')
-					:css('margin','auto')
-					:wikitext('Vetoes')
-				)
-			end
-			body = p._addFlexRow(body, vetoElements, 'brkts-popup-body-game')
-		end
-	end
-
 	wrapper:node(body):node(p._breakNode())
 
 	-- comment
@@ -176,21 +157,6 @@ function p.getByMatchId(args)
 		wrapper:node(footer)
 	end
 	return wrapper
-end
-
-function p._getVetoDisplay(vetoMap, vetoOpponent)
-	local vetoElements = {
-		htmlCreate('div')
-			:addClass('brkts-popup-spaced')
-			:node(vetoOpponent == 1 and _RED_CROSS or _NO_CHECK),
-		htmlCreate('div')
-			:addClass('brkts-popup-spaced')
-			:node(htmlCreate('div'):node('[[' .. vetoMap .. ']]')),
-		htmlCreate('div')
-			:addClass('brkts-popup-spaced')
-			:node(vetoOpponent == 2 and _RED_CROSS or _NO_CHECK)
-	}
-	return vetoElements
 end
 
 function p._addFlexRow(wrapper, contentElements, class, style)
