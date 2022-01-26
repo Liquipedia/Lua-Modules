@@ -238,10 +238,14 @@ function CustomPlayer._createLocation(country)
 	local roleCategory = _ROLES_CATEGORY[_args.role or ''] or 'Players'
 	local role2Category = _ROLES_CATEGORY[_args.role2 or ''] or 'Players'
 
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
-		'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
+	local categories = ''
+	if Namespace.isMain() then
+		categories = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 		.. '[[Category:' .. demonym .. ' ' .. roleCategory .. ']]'
 		.. '[[Category:' .. demonym .. ' ' .. role2Category .. ']]'
+	end
+
+	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. categories
 
 end
 
