@@ -114,7 +114,7 @@ function MatchMapsTeamLegacy._processMapOpponent(side, prefix, mapArgs, archon)
 			and storageArgs[prefix .. 't' .. side .. 'p3link']
 			or storageArgs[prefix .. 't' .. side .. 'p3'],
 		['t' .. side .. 'p3race'] = storageArgs[prefix .. 't' .. side .. 'p3race'],
-		['t' .. side .. 'p3flag'] = storageArgs[prefix .. 't' .. side .. 'p2flag'],
+		['t' .. side .. 'p3flag'] = storageArgs[prefix .. 't' .. side .. 'p3flag'],
 	}
 
 	MatchMapsTeamLegacy._setPlayersForOpponents(addToMapArgs, side, storageArgs[prefix .. 'p' .. side])
