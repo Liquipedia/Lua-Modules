@@ -12,8 +12,10 @@ local Class = require('Module:Class')
 local Condition = require('Module:Condition')
 local DivTable = require('Module:DivTable')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Team = require('Module:Team')
 
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
@@ -49,9 +51,9 @@ function AutomaticPointsTable.run(frame)
 	-- mw.logObject(pointsTable.parsedInput.tournaments)
 	-- mw.logObject(pointsTable.parsedInput.teams)
 	-- mw.logObject(tournamentsWithPlacements)
-	mw.logObject(sortedDataWithPositions)
-
-	return pointsTable:generatePointsTable(sortedDataWithPositions, tournamentsWithResults)
+	-- mw.logObject(sortedDataWithPositions)
+	local pbg = pointsTable.parsedInput.pbg
+	return pointsTable:generatePointsTable(sortedDataWithPositions, tournamentsWithResults, pbg)
 end
 
 function AutomaticPointsTable:parseInput(args)
@@ -90,6 +92,7 @@ function AutomaticPointsTable:parseTeams(args, tournamentCount)
 		parsedTeam.aliases = self:parseAliases(parsedTeam, tournamentCount)
 		parsedTeam.deductions = self:parseDeductions(parsedTeam, tournamentCount)
 		parsedTeam.manualPoints = self:parseManualPoints(parsedTeam, tournamentCount)
+		parsedTeam.tiebreakerPoints = tonumber(parsedTeam.tiebreaker_points) or 0
 		parsedTeam.results = {}
 		table.insert(teams, parsedTeam)
 	end
@@ -230,6 +233,7 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 
 			teamPointsData.team = team
 			teamPointsData.totalPoints = totalPoints
+			teamPointsData.tiebreakerPoints = team.tiebreakerPoints
 			return teamPointsData
 		end
 	)
@@ -268,13 +272,15 @@ end
 function AutomaticPointsTable:sortData(pointsData, teams)
 	table.sort(pointsData,
 		function(a, b)
-			if a.totalPoints == b.totalPoints then
-				local aName = a.team.aliases[#a.team.aliases]
-				local bName = b.team.aliases[#b.team.aliases]
-				return aName < bName
-			else
+			if a.totalPoints ~= b.totalPoints then
 				return a.totalPoints > b.totalPoints
 			end
+			if a.tiebreakerPoints ~= b.tiebreakerPoints then
+				return a.tiebreakerPoints > b.tiebreakerPoints
+			end
+			local aName = a.team.aliases[#a.team.aliases]
+			local bName = b.team.aliases[#b.team.aliases]
+			return aName < bName
 		end
 	)
 
@@ -282,28 +288,31 @@ function AutomaticPointsTable:sortData(pointsData, teams)
 end
 
 function AutomaticPointsTable:addPositionData(pointsData)
-	local maxPoints = pointsData[1].totalPoints
-
 	local teamPosition = 0
-	local previousTeamPoints = maxPoints + 1
+	local previousTotalPoints = pointsData[1].totalPoints + 1
+	local previousTiebreakerPoints = pointsData[1].tiebreakerPoints + 1
 
 	return Table.map(pointsData,
 		function(index, dataPoint)
-			if dataPoint.totalPoints < previousTeamPoints then
+			local lessTotalPoints = dataPoint.totalPoints < previousTotalPoints
+			local equalTotalPoints = dataPoint.totalPoints == previousTotalPoints
+			local lessTiebreakerPoints = dataPoint.tiebreakerPoints < previousTiebreakerPoints
+			if lessTotalPoints or (equalTotalPoints and lessTiebreakerPoints) then
 				teamPosition = index
 			end
 			dataPoint.position = teamPosition
-			previousTeamPoints = dataPoint.totalPoints
+			previousTotalPoints = dataPoint.totalPoints
+			previousTiebreakerPoints = dataPoint.tiebreakerPoints
 			return index, dataPoint
 
 		end
 	)
 end
 
-function AutomaticPointsTable:generatePointsTable(pointsData, tournaments)
-local columnCount = Array.reduce(tournaments, function(count, t)
-			return count + (t.shouldDeductionsBeVisible and 2 or 1)
-		end, 0)
+function AutomaticPointsTable:generatePointsTable(pointsData, tournaments, pbg)
+	local columnCount = Array.reduce(tournaments, function(count, t)
+		return count + (t.shouldDeductionsBeVisible and 2 or 1)
+	end, 0)
 	local headerRow = self:generateHeaderRow(tournaments)
 
 	local divTable = DivTable.create() :row(headerRow)
@@ -313,14 +322,48 @@ local columnCount = Array.reduce(tournaments, function(count, t)
 	local divWrapper = mw.html.create('div') :addClass('fixed-size-table-container')
 		:addClass('border-color-grey')
 		:css('width', tostring(450 + (columnCount * 50)) .. 'px')
-		:node(divTable:create())
 
 	-- for mobile / responsive scrolling
 	local responsiveWrapper = mw.html.create('div') :addClass('table-responsive')
 		:addClass('automatic-points-table')
 		:node(divWrapper)
 
+	Table.iter.forEachIndexed(pointsData, function(index, teamPointsData)
+		local row = DivTable.Row()
+		local team = teamPointsData.team
+		-- fixed cells
+		row:cell(self:createPositionCellNode(teamPointsData.position, pbg[index]))
+		row:cell(self:createNameCellNode(team))
+		row:cell(self:createTableCellNode(teamPointsData.totalPoints):css('font-weight', 'bold'))
+		-- variable cells
+		Table.iter.forEachIndexed(teamPointsData, function(tournamentIndex, points)
+			local tournament = tournaments[tournamentIndex]
+			row:cell(self:createPointsCellNode(points, tournament))
+			if tournament.shouldDeductionsBeVisible then
+				row:cell(self:createDeductionCellNode(points.deduction))
+			end
+		end)
+		-- row background
+		if team.bg then
+			row.root:addClass('bg-' .. team.bg)
+		end
+		divTable:row(row)
+	end)
+
+	divWrapper:node(divTable:create())
 	return responsiveWrapper
+end
+
+function AutomaticPointsTable:createDeductionCellNode(deduction)
+	if Table.isEmpty(deduction) then
+		return self:createTableCellNode('')
+	end
+	local abbr = mw.html.create('abbr'):addClass('bg-down'):addClass('deduction-box')
+		:wikitext(deduction.amount)
+	if deduction.note then
+		abbr:attr('title', deduction.note)
+	end
+	return self:createTableCellNode(abbr)
 end
 
 function AutomaticPointsTable:generateHeaderRow(tournaments)
@@ -371,6 +414,37 @@ function AutomaticPointsTable:createHeaderCell(header)
 	end
 	outerDiv:node(innerDiv)
 	return outerDiv
+end
+
+function AutomaticPointsTable:createTableCellNode(text, bg)
+	local div = self:wrapInDiv(text)
+		:addClass('va-middle'):addClass('centered-cell')
+		:addClass('border-color-grey'):addClass('border-top-right')
+	if bg ~= nil then
+		div:addClass('bg-' .. bg)
+	end
+	return div
+end
+
+function AutomaticPointsTable:createPositionCellNode(position, bg)
+	return self:createTableCellNode(position .. '.', bg):css('font-weight', 'bold')
+end
+
+function AutomaticPointsTable:createNameCellNode(team, bg)
+	local lastAlias = team.aliases[#team.aliases]
+	local teamDisplay = team.display and team.display or mw.ext.TeamTemplate.team(lastAlias)
+	return self:createTableCellNode(teamDisplay, bg)
+		:addClass('name-cell')
+end
+
+function AutomaticPointsTable:createPointsCellNode(points, tournament)
+	local finished = Logic.readBool(tournament.finished)
+	local pointString = points.amount ~= nil and points.amount or (finished and '-' or '')
+	if points.type == _POINTS_TYPE.SECURED then
+		return self:createTableCellNode(pointString):css('font-weight', 'lighter')
+			:css('font-style', 'italic')
+	end
+	return self:createTableCellNode(pointString)
 end
 
 function AutomaticPointsTable:wrapInDiv(text)
