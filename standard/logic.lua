@@ -52,13 +52,13 @@ function Logic.isNotEmpty(val)
 end
 
 function Logic.readBool(val)
-	return val == 'true' or val == true or val == '1' or val == 1
+	return val == 'true' or val == 'yes' or val == true or val == '1' or val == 1
 end
 
 function Logic.readBoolOrNil(val)
-	if val == 'true' or val == true or val == '1' or val == 1 then
+	if Logic.readBool(val) then
 		return true
-	elseif val == 'false' or val == false or val == '0' or val == 0 then
+	elseif val == 'false' or val == 'no' or val == false or val == '0' or val == 0 then
 		return false
 	else
 		return nil
