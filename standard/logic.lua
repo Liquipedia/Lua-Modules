@@ -56,7 +56,7 @@ function Logic.readBool(val)
 end
 
 function Logic.readBoolOrNil(val)
-	if val == 'true' or val == 'yes' or val == true or val == '1' or val == 1 then
+	if Logic.readBool(val) then
 		return true
 	elseif val == 'false' or val == 'no' or val == false or val == '0' or val == 0 then
 		return false
