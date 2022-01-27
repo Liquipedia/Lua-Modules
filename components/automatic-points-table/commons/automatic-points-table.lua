@@ -15,7 +15,6 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
