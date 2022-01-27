@@ -51,29 +51,30 @@ function AutomaticPointsTable.run(frame)
 	-- mw.logObject(pointsTable.parsedInput.teams)
 	-- mw.logObject(tournamentsWithPlacements)
 	-- mw.logObject(sortedDataWithPositions)
-	local pbg = pointsTable.parsedInput.pbg
-	return pointsTable:generatePointsTable(sortedDataWithPositions, tournamentsWithResults, pbg)
+	local positionBackgrounds = pointsTable.parsedInput.positionBackgrounds
+	return pointsTable:makePointsTable(sortedDataWithPositions, tournamentsWithResults,
+		positionBackgrounds)
 end
 
 function AutomaticPointsTable:parseInput(args)
-	local pbg = self:parsePositionBackgroundData(args)
+	local positionBackgrounds = self:parsePositionBackgroundData(args)
 	local tournaments = self:parseTournaments(args)
 	local teams = self:parseTeams(args, #tournaments)
 	return {
-		pbg = pbg,
+		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
 		teams = teams
 	}
 end
 
---- parses the pbg arguments, these are the background colors of specific positions
---- Usually used to indicate where a team in a specific position will end up qualifying to
+--- parses the position_background arguments, these are the background colors of specific
+--- positions, usually used to indicate if a team in a specific position will end up qualifying
 function AutomaticPointsTable:parsePositionBackgroundData(args)
-	local pbg = {}
-	for _, background in Table.iter.pairsByPrefix(args, 'pbg') do
-		table.insert(pbg, background)
+	local positionBackgrounds = {}
+	for _, background in Table.iter.pairsByPrefix(args, 'position_background') do
+		table.insert(positionBackgrounds, background)
 	end
-	return pbg
+	return positionBackgrounds
 end
 
 function AutomaticPointsTable:parseTournaments(args)
@@ -308,11 +309,11 @@ function AutomaticPointsTable:addPositionData(pointsData)
 	)
 end
 
-function AutomaticPointsTable:generatePointsTable(pointsData, tournaments, pbg)
+function AutomaticPointsTable:makePointsTable(pointsData, tournaments, positionBackgrounds)
 	local columnCount = Array.reduce(tournaments, function(count, t)
 		return count + (t.shouldDeductionsBeVisible and 2 or 1)
 	end, 0)
-	local headerRow = self:generateHeaderRow(tournaments)
+	local headerRow = self:makeHeaderRow(tournaments)
 
 	local divTable = DivTable.create() :row(headerRow)
 	divTable.root :addClass('border-color-grey') :addClass('border-bottom')
@@ -328,29 +329,34 @@ function AutomaticPointsTable:generatePointsTable(pointsData, tournaments, pbg)
 		:node(divWrapper)
 
 	Table.iter.forEachIndexed(pointsData, function(index, teamPointsData)
-		local row = DivTable.Row()
-		local team = teamPointsData.team
-		-- fixed cells
-		row:cell(self:createPositionCellNode(teamPointsData.position, pbg[index]))
-		row:cell(self:createNameCellNode(team))
-		row:cell(self:createTableCellNode(teamPointsData.totalPoints):css('font-weight', 'bold'))
-		-- variable cells
-		Table.iter.forEachIndexed(teamPointsData, function(tournamentIndex, points)
-			local tournament = tournaments[tournamentIndex]
-			row:cell(self:createPointsCellNode(points, tournament))
-			if tournament.shouldDeductionsBeVisible then
-				row:cell(self:createDeductionCellNode(points.deduction))
-			end
-		end)
-		-- row background
-		if team.bg then
-			row.root:addClass('bg-' .. team.bg)
-		end
-		divTable:row(row)
+		local positionBackground = positionBackgrounds[index]
+		divTable:row(self:makeTableRow(teamPointsData, tournaments, positionBackground))
 	end)
 
 	divWrapper:node(divTable:create())
 	return responsiveWrapper
+end
+
+function AutomaticPointsTable:makeTableRow(teamPointsData, tournaments, positionBackground)
+	local row = DivTable.Row()
+	local team = teamPointsData.team
+	-- fixed cells
+	row:cell(self:createPositionCellNode(teamPointsData.position, positionBackground))
+	row:cell(self:createNameCellNode(team))
+	row:cell(self:createTableCellNode(teamPointsData.totalPoints):css('font-weight', 'bold'))
+	-- variable cells
+	Table.iter.forEachIndexed(teamPointsData, function(tournamentIndex, points)
+		local tournament = tournaments[tournamentIndex]
+		row:cell(self:createPointsCellNode(points, tournament))
+		if tournament.shouldDeductionsBeVisible then
+			row:cell(self:createDeductionCellNode(points.deduction))
+		end
+	end)
+	-- row background
+	if team.bg then
+		row.root:addClass('bg-' .. team.bg)
+	end
+	return row
 end
 
 function AutomaticPointsTable:createDeductionCellNode(deduction)
@@ -365,7 +371,7 @@ function AutomaticPointsTable:createDeductionCellNode(deduction)
 	return self:createTableCellNode(abbr)
 end
 
-function AutomaticPointsTable:generateHeaderRow(tournaments)
+function AutomaticPointsTable:makeHeaderRow(tournaments)
 	local headerRow = DivTable.HeaderRow()
 	headerRow.root:addClass('diagonal')
 
