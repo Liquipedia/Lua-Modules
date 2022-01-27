@@ -30,8 +30,8 @@ local _args
 local _pagename = mw.title.getCurrentTitle().text
 local _frame
 
-local _BLUE_ESSENCE_ICON = '[[File:Blue Essence Icon.png|x16px|Blue Essence|link=Blue Essence]]'
-local _RP_POINTS_ICON = '[[File:RP_Points.png|Riot Points|x16px|link=Riot Points]]'
+local _BLUE_MOTES_ICON = '[[File:Blue Motes icon.png|20px|Blue Motes|link=Blue Motes]]'
+local _WILD_CORES_ICON = '[[File:Wild Cores icon.png|20px|Wild Cores|link=Wild Cores]]'
 
 function CustomChampion.run(frame)
 	local unit = Unit(frame)
@@ -52,9 +52,6 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Secondary Bar', content = {_args.secondarybar1}},
 		Cell{name = 'Secondary Attributes', content = {_args.secondaryattributes1}},
 		Cell{name = 'Release Date', content = {_args.releasedate}},
-		Cell{name = 'Species', content = {_args.species}},
-		Cell{name = 'Year of birth', content = {_args.birth}},
-		Cell{name = 'Faction(s)', content = {_args.factions}},
 	}
 
 	if not (
@@ -137,13 +134,13 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'cost' then
 		local cost = ''
 		if not String.isEmpty(_args.costbe) then
-			cost = cost .. _args.costbe .. ' ' .. _BLUE_ESSENCE_ICON
+			cost = cost .. _args.costbe .. ' ' .. _BLUE_MOTES_ICON
 		end
 		if not String.isEmpty(_args.costrp) then
 			if cost ~= '' then
 				cost = cost .. '&emsp;&ensp;'
 			end
-			cost = cost .. _args.costrp .. ' ' .. _RP_POINTS_ICON
+			cost = cost .. _args.costrp .. ' ' .. _WILD_CORES_ICON
 		end
 		return {
 			Cell{name = 'Price', content = {cost}},
