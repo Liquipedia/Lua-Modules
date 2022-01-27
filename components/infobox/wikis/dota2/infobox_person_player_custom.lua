@@ -259,10 +259,10 @@ function CustomPlayer._createRole(key, role)
 		return nil
 	end
 
-	local categoryCoreText = 'Category:' .. roleData.category .. '|' ..
-		Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
+	local categoryCoreText = 'Category:' .. roleData.category
 
-	return '[[' .. categoryCoreText .. '[[:' .. categoryCoreText
+	return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
+		Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
 end
 
 
