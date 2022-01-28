@@ -77,7 +77,7 @@ function CustomInjector:addCustomCells()
 		end
 	end
 	table.insert(widgets, Title{name = 'Esports Statistics'})
-	
+
 function HeroStatsDisplay()
 		local stats = HeroWL.create({hero = _args.heroname or _pagename})
 		stats = mw.text.split(stats, ';')
@@ -86,8 +86,8 @@ function HeroStatsDisplay()
 		local HeroStatsDisplay = (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
 	return stats
 end
-	
-		table.insert(widgets, Cell{name = 'Win Rate', content = {_HeroStatsDisplay}})
+
+		table.insert(widgets, Cell{name = 'Win Rate', content = {HeroStatsDisplay}})
 
 	return widgets
 end
