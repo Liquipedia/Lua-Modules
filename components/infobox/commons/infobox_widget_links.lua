@@ -55,6 +55,7 @@ local _PRIORITY_GROUPS = {
 		'sostronk',
 		'stratz',
 		'toornament',
+		'vlr',
 		'bracket',
 		'rules',
 		'rulebook',
