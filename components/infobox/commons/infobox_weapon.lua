@@ -1,3 +1,4 @@
+---
 -- @Liquipedia
 -- wiki=commons
 -- page=Module:Infobox/Weapon
