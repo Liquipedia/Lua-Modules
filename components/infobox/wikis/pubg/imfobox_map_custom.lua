@@ -7,10 +7,8 @@
 --
 
 local Weapon = require('Module:Infobox/Weapon')
-local Variables = require('Module:Variables')
 local Class = require('Module:Class')
 local String = require('Module:String')
-local Template = require('Module:Template')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
