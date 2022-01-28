@@ -13,6 +13,7 @@ local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+local Template = require('Module:Template')
 local HeroNames = mw.loadData('Module:HeroNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
@@ -318,7 +319,10 @@ function matchFunctions.getTournamentVars(match)
 	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
 	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
 	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icondark'))
-	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
+	match.liquipediatier = Logic.emptyOr(
+		match.liquipediatier,
+		Variables.varDefault('tournament_liquipediatier')
+	)
 	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_liquipediatiertype'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
@@ -397,9 +401,13 @@ function matchFunctions.isFeatured(match)
 
 	local opponent1 = match.opponent1
 	local opponent2 = match.opponent2
-	if opponent1.type == Opponent.team and matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
+	if
+		opponent1.type == Opponent.team and matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED
+	then
 		return true
-	elseif opponent2.type == Opponent.team and matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
+	elseif
+		opponent2.type == Opponent.team and matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED
+	then
 		return true
 	end
 
