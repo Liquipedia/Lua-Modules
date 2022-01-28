@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Unit = require('Module:Infobox/Unit/dev')
+local Unit = require('Module:Infobox/Unit')
 local String = require('Module:StringUtils')
 local Namespace = require('Module:Namespace')
 local ClassIcon = require('Module:ClassIcon')
@@ -18,7 +18,6 @@ local Table = require('Module:Table')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
-local Header = require('Module:Infobox/Widget/Header')
 local Breakdown = require('Module:Infobox/Widget/Breakdown')
 
 local CustomHero = {}
@@ -79,16 +78,16 @@ function CustomInjector:addCustomCells()
 	end
 	table.insert(widgets, Title{name = 'Esports Statistics'})
 	
-function _HeroStatsDisplay() 
-			local stats = HeroWL.create({hero = _args.heroname or _pagename})
-			stats = mw.text.split(stats, ';')
-			local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
-			winPercentage = Math.round({winPercentage, 4}) * 100
-			local statsDisplay = (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
+function HeroStatsDisplay()
+		local stats = HeroWL.create({hero = _args.heroname or _pagename})
+		stats = mw.text.split(stats, ';')
+		local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
+		winPercentage = Math.round({winPercentage, 4}) * 100
+		local HeroStatsDisplay = (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
 	return stats
 end
 	
-			table.insert(widgets, Cell{name = 'Win Rate', content = {_HeroStatsDisplay}})
+		table.insert(widgets, Cell{name = 'Win Rate', content = {_HeroStatsDisplay}})
 
 	return widgets
 end
