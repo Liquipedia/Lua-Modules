@@ -319,11 +319,11 @@ function matchFunctions.getTournamentVars(match)
 	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
 	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
 	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icondark'))
-	match.liquipediatier = Logic.emptyOr(
-		match.liquipediatier,
-		Variables.varDefault('tournament_liquipediatier')
+	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
+	match.liquipediatiertype = Logic.emptyOr(
+		match.liquipediatiertype,
+		Variables.varDefault('tournament_liquipediatiertype')
 	)
-	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_liquipediatiertype'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	return match
