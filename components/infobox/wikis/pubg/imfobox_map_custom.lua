@@ -11,6 +11,9 @@ local Class = require('Module:Class')
 local String = require('Module:String')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
+local Title = require('Module:Infobox/Widget/Title')
+local Center = require('Module:Infobox/Widget/Center')
+local PageLink = require('Module:Page')
 
 local CustomWeapon = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -42,11 +45,11 @@ end
 
 function CustomInjector:parse(id, widgets)
 	local args = _args
-	
+
 	if id == 'custom' then
 		if String.isNotEmpty(args.map1) then
 			local maps = {}
-			
+
 			for _, map in ipairs(_weapon:getAllArgsForBase(args, 'map')) do
 				table.insert(maps, tostring(CustomWeapon:_createNoWrappingSpan(
 							PageLink.makeInternalLink({}, map)
@@ -60,7 +63,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomWeapon:addToLpdb(lpdbData, args)
-	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
+	lpdbData.maps = table.concat(_weapon:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata = {
 		ammotype = args.ammo_type,
