@@ -369,7 +369,7 @@ function matchFunctions.getLinks(match)
 		review = match.review,
 		recap = match.recap,
 	}
-	if match.faceit then links.faceit = 'https://www.faceit.com/en/dota2/room/' .. match.faceit end
+	if match.faceit then match.links.faceit = 'https://www.faceit.com/en/dota2/room/' .. match.faceit end
 	return match
 end
 
