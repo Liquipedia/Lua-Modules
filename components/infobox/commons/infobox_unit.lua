@@ -40,6 +40,7 @@ function Unit:createInfobox()
 					imageDefault = args.default,
 					imageDark = args.imagedark or args.imagedarkmode,
 					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+					subHeader = self:subHeaderDisplay(args)
 				},
 			}
 		},
@@ -126,6 +127,11 @@ function Unit:nameDisplay(args)
 end
 
 function Unit:setLpdbData(args)
+end
+
+--- Allows for overriding this functionality
+function Unit:subHeaderDisplay(args)
+	return args.title
 end
 
 return Unit
