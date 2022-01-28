@@ -78,18 +78,15 @@ function CustomInjector:addCustomCells()
 	end
 	table.insert(widgets, Title{name = 'Esports Statistics'})
 
-function HeroStatsDisplay()
-		local stats = HeroWL.create({hero = _args.heroname or _pagename})
-		stats = mw.text.split(stats, ';')
-		local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
-		winPercentage = Math.round({winPercentage, 4}) * 100
-		local HeroStatsDisplay = (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
-	return stats
+	table.insert(widgets, Cell{name = 'Win Rate', content = {CustomHero._heroStatsDisplay()}})
+	return widgets
 end
 
-		table.insert(widgets, Cell{name = 'Win Rate', content = {HeroStatsDisplay}})
-
-	return widgets
+function CustomHero._heroStatsDisplay()
+	local stats = mw.text.split(HeroWL.create({hero = _args.heroname or _pagename}), ';')
+	local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
+	winPercentage = Math.round({winPercentage, 4}) * 100
+	return (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
 end
 
 function CustomInjector:parse(id, widgets)
