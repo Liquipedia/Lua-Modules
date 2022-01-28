@@ -26,7 +26,6 @@ function CustomWeapon.run(frame)
 	_weapon = weapon
 	_args = _weapon.args
 	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
-	weapon.addToLpdb = CustomWeapon.addToLpdb
 	return weapon:createInfobox(frame)
 end
 
@@ -61,16 +60,6 @@ function CustomInjector:parse(id, widgets)
 		end
 	end
 	return widgets
-end
-
-function CustomWeapon:addToLpdb(lpdbData, args)
-	lpdbData.maps = table.concat(_weapon:getAllArgsForBase(args, 'map'), ';')
-
-	lpdbData.extradata = {
-		ammotype = args.ammo_type,
-	}
-
-	return lpdbData
 end
 
 function CustomWeapon:_createNoWrappingSpan(content)
