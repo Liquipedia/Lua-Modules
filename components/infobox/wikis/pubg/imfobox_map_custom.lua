@@ -19,6 +19,7 @@ local CustomWeapon = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _weapon
+local _args
 
 function CustomWeapon.run(frame)
 	local weapon = Weapon(frame)
