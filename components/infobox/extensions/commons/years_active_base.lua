@@ -10,6 +10,7 @@ local ActiveYears = {}
 
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Logic = require('Module:Logic')
 local Info = mw.loadData('Module:Info')
 
@@ -78,6 +79,22 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 end
 
 function ActiveYears._calculate(conditions)
+	local years = ActiveYears._getYears(conditions)
+
+	if Table.isEmpty(years) then
+		return 'Player has no results.'
+	end
+
+	local sortedYears = ActiveYears._sortYears(years)
+
+	-- Generate output for activity ranges
+	local output = table.concat(ActiveYears._groupYears(sortedYears), ',</br>')
+
+	-- Return text with years active
+	return output
+end
+
+function ActiveYears._getYears(conditions)
 	local years = {}
 	local offset = 0
 	local count = _MAX_QUERY_LIMIT
@@ -92,7 +109,7 @@ function ActiveYears._calculate(conditions)
 		})
 
 		if offset == 0 and #lpdbQueryData == 0 then
-			return 'Player has no results.'
+			return {}
 		end
 
 		-- Find all years for which the player has at least one placement
@@ -105,15 +122,8 @@ function ActiveYears._calculate(conditions)
 		offset = offset + _MAX_QUERY_LIMIT
 	end
 
-	local sortedYears = ActiveYears._sortYears(years)
-
-	-- Generate output for activity ranges
-	local output = table.concat(ActiveYears._groupYears(sortedYears), ',</br>')
-
-	-- Return text with years active
-	return output
+	return years
 end
-
 
 function ActiveYears._groupYears(sortedYears)
 	local startYear
@@ -138,9 +148,6 @@ function ActiveYears._groupYears(sortedYears)
 
 	return yearRanges
 end
-
-
-
 
 function ActiveYears._sortYears(years)
 	-- Sort years chronologically
