@@ -99,6 +99,11 @@ local _PREFIXES = {
 	twitch = {'https://www.twitch.tv/'},
 	twitter = {'https://twitter.com/'},
 	vk = {'https://www.vk.com/'},
+	vlr = {
+		'https://www.vlr.gg/event/',
+		team = 'https://www.vlr.gg/team/',
+		player = 'https://www.vlr.gg/player/'
+	},
 	website = {''},
 	weibo = {'https://weibo.com/'},
 	youtube = {'https://www.youtube.com/'},
@@ -206,6 +211,7 @@ function Links.transform(links)
 		twitter = links.twitter,
 		twitter2 = links.twitter2,
 		vk = links.vk,
+		vlr = vlr,
 		weibo = links.weibo,
 		youtube = links.youtube,
 		youtube2 = links.youtube2,
