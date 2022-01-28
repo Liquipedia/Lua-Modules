@@ -12,7 +12,7 @@ return {
 			'https://siege.gg/competitions/',
 			team = 'https://siege.gg/teams/',
 			player = 'https://siege.gg/players/',
-		}
+		},
 		faceit = {
 			'https://www.faceit.com/en/championship/',
 			team = 'https://www.faceit.com/teams/',
