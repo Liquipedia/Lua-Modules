@@ -38,7 +38,7 @@ function CustomInjector:addCustomCells(widgets)
 	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Ammo Type',
-		content = {args.ammo_type}
+		content = {args.ammotype}
 	})
 
 	return widgets
@@ -53,8 +53,8 @@ function CustomInjector:parse(id, widgets)
 
 			for _, map in ipairs(_weapon:getAllArgsForBase(args, 'map')) do
 				table.insert(maps, tostring(CustomWeapon:_createNoWrappingSpan(
-							PageLink.makeInternalLink({}, map)
-						)))
+					PageLink.makeInternalLink({}, map)
+				)))
 			end
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
