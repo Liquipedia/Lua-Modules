@@ -13,7 +13,7 @@ local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Template = require('Module:Template')
+local Earnings = require('Module:Earnings')
 local HeroNames = mw.loadData('Module:HeroNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
@@ -35,7 +35,7 @@ local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 10
 local _MAX_NUM_GAMES = 7
 local _DEFAULT_BESTOF = 3
-local _DEFAULT_MODE = Opponent.team
+local _DEFAULT_MODE = 'team'
 local _DEFAULT_GAME = 'dota2'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
@@ -46,7 +46,7 @@ local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
 local _SECONDS_UNTIL_FINISHED_EXACT = 30800
 local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
-local _EARNINGS_LIMIT_FOR_FEATURED = 100000
+local _MIN_EARNINGS_FOR_FEATURED = 100000
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -382,7 +382,7 @@ function matchFunctions.getExtraData(match)
 		matchsection = Variables.varDefault('matchsection'),
 		comment = match.comment,
 		featured = Logic.emptyOr(
-			Logic.readBool(match.featured),
+			match.featured,
 			matchFunctions.isFeatured(match)
 		),
 		mvp = match.mvp,
@@ -392,40 +392,30 @@ function matchFunctions.getExtraData(match)
 end
 
 function matchFunctions.isFeatured(match)
-	if
-		tonumber(match.liquipediatier or '') == 1
-		or tonumber(match.liquipediatier or '') == 2
-	then
+	local tier = tonumber(match.liquipediatier or '') 
+	if tier == 1 or tier == 2 then
 		return true
 	end
 
-	local opponent1 = match.opponent1
-	local opponent2 = match.opponent2
+	local opponent1, opponent2 = match.opponent1, match.opponent2
+	local year, month = match.date:match('^(%d%d%d%d)-(%d%d)')
+	if year == '1970' then
+		return false
+	end
+	if tonumber(month) < 3 then
+		year = tonumber(year) - 1
+	end
+	
 	if
-		opponent1.type == Opponent.team and matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED
-	then
-		return true
-	elseif
-		opponent2.type == Opponent.team and matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED
+		(opponent1.type == Opponent.team
+		and Earnings.calculateForTeam({team = opponent1.name, year = year}) >= _MIN_EARNINGS_FOR_FEATURED)
+		or (opponent2.type == Opponent.team
+		and Earnings.calculateForTeam({team = opponent2.name, year = year}) >= _MIN_EARNINGS_FOR_FEATURED)
 	then
 		return true
 	end
 
 	return false
-end
-
-function matchFunctions.currentEarnings(name)
-	if String.isEmpty(name) then
-		return 0
-	else
-		local year = os.date('%Y')
-		if tonumber(os.date('%m')) < 3 then
-			year = year - 1
-		end
-		local currentEarnings = Template.safeExpand(mw.getCurrentFrame(), 'Total earnings of', {name, year = year}, '')
-		currentEarnings = string.gsub(string.sub(currentEarnings, 2), ',', '')
-		return tonumber(currentEarnings or 0) or 0
-	end
 end
 
 function matchFunctions.getOpponents(match)
