@@ -76,8 +76,8 @@ function CustomInjector:addCustomCells()
 			table.insert(widgets, Cell{name = display, content = {_args[key]}})
 		end
 	end
-	table.insert(widgets, Title{name = 'Esports Statistics'})
 
+	table.insert(widgets, Title{name = 'Esports Statistics'})
 	table.insert(widgets, Cell{name = 'Win Rate', content = {CustomHero._heroStatsDisplay()}})
 	return widgets
 end
@@ -91,33 +91,32 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'type' then
+		local breakDowns = {
+			lane = 'Lane',
+			primaryrole = 'Primary Role',
+			secondaryrole = 'Secondary Role',
+		}
 		local breakDownContents = {}
-		local lane = _args.lane
-		if String.isNotEmpty(lane) then
-			lane = '<b>Lane</b><br>' .. ClassIcon.display({}, lane)
-			table.insert(breakDownContents, lane)
-		end
-		local primaryRole = _args.primaryrole
-		if String.isNotEmpty(primaryRole) then
-			primaryRole = '<b>Primary Role</b><br>' .. ClassIcon.display({}, primaryRole)
-			table.insert(breakDownContents, primaryRole)
-		end
-		local secondaryRole = _args.secondaryrole
-		if String.isNotEmpty(secondaryRole) then
-			secondaryRole = '<b>Secondary Role</b><br>' .. ClassIcon.display({}, secondaryRole)
-			table.insert(breakDownContents, secondaryRole)
+		for key, display in pairs(breakDowns) do
+			if String.isNotEmpty(_args[key]) then
+				lane = '<b>'.. display..'</b><br>' .. ClassIcon.display({}, _args[key])
+				table.insert(breakDownContents, _args[key])
+			end
 		end
 		return {
 			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
 			Cell{name = 'Real Name', content = {_args.realname}},
 		}
 	elseif id == 'cost' then
+		local costTypes = {
+			costbp = _BATTLE_POINTS_ICON,
+			costdia = _DIAMONDS_ICON,
+		}
 		local costs = {}
-		if String.isNotEmpty(_args.costbp) then
-			table.insert(costs, _args.costbp .. ' ' .. _BATTLE_POINTS_ICON)
-		end
-		if String.isNotEmpty(_args.costdia) then
-			table.insert(costs, _args.costdia .. ' ' .. _DIAMONDS_ICON)
+		for key, icon in pairs(breakDowns) do
+			if String.isNotEmpty(_args[key]) then
+				table.insert(costs, _args[key] .. ' ' .. icon)
+			end
 		end
 		return {
 			Cell{name = 'Price', content = {table.concat(costs, '&emsp;&ensp;')}},
@@ -135,11 +134,11 @@ function CustomHero.getWikiCategories()
 	local categories = {}
 	if Namespace.isMain() then
 		categories = {'Heroes'}
-		if String.isNotEmpty(_args.attacktype) then
-			table.insert(categories, _args.attacktype .. ' Heroes')
-		end
-		if String.isNotEmpty(_args.primaryrole) then
-			table.insert(categories, _args.primaryrole .. ' Heroes')
+		local categoryDefinitions = {attacktype, primaryrole}
+		for _, key in pairs(categoryDefinitions) do
+			if String.isNotEmpty(_args[key]) then
+				table.insert(costs, _args[key] .. ' Heroes')
+			end
 		end
 	end
 	return categories
