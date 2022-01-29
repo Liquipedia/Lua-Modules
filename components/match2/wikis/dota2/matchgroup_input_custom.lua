@@ -392,7 +392,7 @@ function matchFunctions.getExtraData(match)
 end
 
 function matchFunctions.isFeatured(match)
-	local tier = tonumber(match.liquipediatier or '') 
+	local tier = tonumber(match.liquipediatier or '')
 	if tier == 1 or tier == 2 then
 		return true
 	end
@@ -405,7 +405,7 @@ function matchFunctions.isFeatured(match)
 	if tonumber(month) < 3 then
 		year = tonumber(year) - 1
 	end
-	
+
 	if
 		(opponent1.type == Opponent.team
 		and Earnings.calculateForTeam({team = opponent1.name, year = year}) >= _MIN_EARNINGS_FOR_FEATURED)
