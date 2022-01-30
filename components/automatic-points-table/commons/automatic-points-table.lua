@@ -67,11 +67,11 @@ function AutomaticPointsTable:parseInput(args)
 	}
 end
 
---- parses the position_background arguments, these are the background colors of specific
+--- parses the positionbg arguments, these are the background colors of specific
 --- positions, usually used to indicate if a team in a specific position will end up qualifying
 function AutomaticPointsTable:parsePositionBackgroundData(args)
 	local positionBackgrounds = {}
-	for _, background in Table.iter.pairsByPrefix(args, 'position_background') do
+	for _, background in Table.iter.pairsByPrefix(args, 'positionbg') do
 		table.insert(positionBackgrounds, background)
 	end
 	return positionBackgrounds
