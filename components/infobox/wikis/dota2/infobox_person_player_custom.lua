@@ -28,24 +28,28 @@ local Center = require('Module:Infobox/Widget/Center')
 
 local _BANNED = mw.loadData('Module:Banned')
 local _ROLES = {
-	['analyst'] = {category = 'Analysts', variable = 'Analyst'},
-	['carry'] = {category = 'Carry players', variable = 'Carry'},
-	['mid'] = {category = 'Solo middle players', variable = 'Solo Middle'},
-	['solo middle'] = {category = 'Solo middle players', variable = 'Solo Middle'},
-	['solomiddle'] = {category = 'Solo middle players', variable = 'Solo Middle'},
-	['offlane'] = {category = 'Offlaners', variable = 'Offlaner'},
-	['offlaner'] = {category = 'Offlaners', variable = 'Offlaner'},
-	['observer'] = {category = 'Observers', variable = 'Observer'},
-	['host'] = {category = 'Hosts', variable = 'Host'},
-	['captain'] = {category = 'Captains', variable = 'Captain'},
-	['journalist'] = {category = 'Journalists', variable = 'Journalist'},
-	['support'] = {category = 'Support players', variable = 'Support'},
-	['expert'] = {category = 'Experts', variable = 'Expert'},
-	['coach'] = {category = 'Coaches', variable = 'Coach'},
-	['caster'] = {category = 'Casters', variable = 'Caster'},
-	['manager'] = {category = 'Managers', variable = 'Manager'},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer'}
+	-- Players
+	['carry'] = {category = 'Carry players', variable = 'Carry', isplayer = true},
+	['mid'] = {category = 'Solo middle players', variable = 'Solo Middle', isplayer = true},
+	['solo middle'] = {category = 'Solo middle players', variable = 'Solo Middle', isplayer = true},
+	['solomiddle'] = {category = 'Solo middle players', variable = 'Solo Middle', isplayer = true},
+	['offlane'] = {category = 'Offlaners', variable = 'Offlaner', isplayer = true},
+	['offlaner'] = {category = 'Offlaners', variable = 'Offlaner', isplayer = true},
+	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
+	['captain'] = {category = 'Captains', variable = 'Captain', isplayer = true},
+
+	-- Staff and Talents
+	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
+	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
+	['host'] = {category = 'Hosts', variable = 'Host', isplayer = false},
+	['journalist'] = {category = 'Journalists', variable = 'Journalist', isplayer = false},
+	['expert'] = {category = 'Experts', variable = 'Expert', isplayer = false},
+	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
+	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
+	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
+	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
 }
+
 local _ROLES_CATEGORY = {
 	host = 'Casters',
 	caster = 'Casters'
@@ -79,6 +83,7 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	return player:createInfobox(frame)
 end
@@ -172,8 +177,8 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.status = lpdbData.status or 'Unknown'
 
-	lpdbData.extradata.role = _args.role
-	lpdbData.extradata.role2 = _args.role2
+	lpdbData.extradata.role = Variables.varDefault('role')
+	lpdbData.extradata.role2 = Variables.varDefault('role2')
 	lpdbData.extradata.hero = _args.hero
 	lpdbData.extradata.hero2 = _args.hero2
 	lpdbData.extradata.hero3 = _args.hero3
@@ -265,5 +270,19 @@ function CustomPlayer._createRole(key, role)
 		Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
 end
 
+function CustomPlayer:defineCustomPageVariables(args)
+	-- isplayer and country needed for SMW
+	if String.isNotEmpty(args.role) then
+		local roleData = _ROLES[args.role:lower()]
+		-- If the role is missing, assume it is a player
+		if roleData and roleData.isplayer == false then
+			Variables.varDefine('isplayer', 'false')
+		else
+			Variables.varDefine('isplayer', 'true')
+		end
+	end
+
+	Variables.varDefine('country', Player:getStandardNationalityValue(args.country or args.nationality))
+end
 
 return CustomPlayer
