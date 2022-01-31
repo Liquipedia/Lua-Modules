@@ -99,8 +99,8 @@ function CustomInjector:parse(id, widgets)
 		local breakDownContents = {}
 		for key, display in pairs(breakDowns) do
 			if String.isNotEmpty(_args[key]) then
-				lane = '<b>'.. display..'</b><br>' .. ClassIcon.display({}, _args[key])
-				table.insert(breakDownContents, _args[key])
+				local displayText = '<b>'.. display..'</b><br>' .. ClassIcon.display({}, _args[key])
+				table.insert(breakDownContents, displayText)
 			end
 		end
 		return {
@@ -113,7 +113,7 @@ function CustomInjector:parse(id, widgets)
 			costdia = _DIAMONDS_ICON,
 		}
 		local costs = {}
-		for key, icon in pairs(breakDowns) do
+		for key, icon in pairs(costTypes) do
 			if String.isNotEmpty(_args[key]) then
 				table.insert(costs, _args[key] .. ' ' .. icon)
 			end
@@ -134,10 +134,10 @@ function CustomHero.getWikiCategories()
 	local categories = {}
 	if Namespace.isMain() then
 		categories = {'Heroes'}
-		local categoryDefinitions = {attacktype, primaryrole}
+		local categoryDefinitions = {'attacktype', 'primaryrole'}
 		for _, key in pairs(categoryDefinitions) do
 			if String.isNotEmpty(_args[key]) then
-				table.insert(costs, _args[key] .. ' Heroes')
+				table.insert(categories, _args[key] .. ' Heroes')
 			end
 		end
 	end
