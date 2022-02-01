@@ -80,7 +80,7 @@ function Weapon:createInfobox()
 			}
 		},
 		Cell{name = 'Game Appearance(s)', content = {args.games}},
-		Customizable{id = 'customcontent', children = {}},
+		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
 	}
 
