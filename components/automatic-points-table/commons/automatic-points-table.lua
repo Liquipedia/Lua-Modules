@@ -7,12 +7,10 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
 local TableDisplay = require('Module:AutomaticPointsTable/Display')
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 

@@ -36,7 +36,7 @@ local CustomDivTable = Class.new(DivTable.DivTable,
 		self.wrapper = mw.html.create('div') :addClass('table-responsive')
 			:addClass('automatic-points-table')
 			:node(innerWrapper)
-		
+
 		self.rows = {}
 		self.pointsData = pointsData
 		self.tournaments = tournaments
@@ -54,7 +54,7 @@ local CustomRow = Class.new(DivTable.Row,
 		if team.bg ~= nil then
 			self.root:addClass('bg-' .. team.bg)
 		end
-		
+
 		self.pointsData = pointsData
 		self.tournaments = tournaments
 		self.team = team
@@ -106,6 +106,10 @@ function CustomRow:create()
 	return self.root
 end
 
+local function wrapInDiv(text)
+	return mw.html.create('div'):wikitext(tostring(text))
+end
+
 function CustomRow:baseCell(text, bg, bold)
 	local div = wrapInDiv(text) :addClass('divCell') :addClass('va-middle')
 		:addClass('centered-cell')	:addClass('border-color-grey') :addClass('border-top-right')
@@ -134,7 +138,7 @@ end
 function CustomRow:nameCell(team)
 	local lastAlias = team.aliases[#team.aliases]
 	local teamDisplay = team.display and team.display or mw.ext.TeamTemplate.team(lastAlias)
-	local nameCell = self:baseCell(teamDisplay, bg):addClass('name-cell')
+	local nameCell = self:baseCell(teamDisplay, team.bg):addClass('name-cell')
 	table.insert(self.cells, nameCell)
 	return self
 end
@@ -163,10 +167,6 @@ function CustomRow:deductionCell(deduction)
 	local deductionCell = self:baseCell(abbr)
 	table.insert(self.cells, deductionCell)
 	return self
-end
-
-function wrapInDiv(text)
-	return mw.html.create('div'):wikitext(tostring(text))
 end
 
 function CustomHeaderRow:cell(header)
