@@ -169,15 +169,15 @@ end
 function matchFunctions.getVodStuff(match)
 	match.stream = match.stream or {}
 	match.stream = {
-		stream = Logic.emptyOr(match.stream.stream, Variables.varDefault('stream')),
-		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
-		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
-		afreeca = Logic.emptyOr(match.stream.afreeca or match.afreeca, Variables.varDefault('afreeca')),
-		afreecatv = Logic.emptyOr(match.stream.afreecatv or match.afreecatv, Variables.varDefault('afreecatv')),
-		dailymotion = Logic.emptyOr(match.stream.dailymotion or match.dailymotion, Variables.varDefault('dailymotion')),
-		douyu = Logic.emptyOr(match.stream.douyu or match.douyu, Variables.varDefault('douyu')),
-		smashcast = Logic.emptyOr(match.stream.smashcast or match.smashcast, Variables.varDefault('smashcast')),
-		youtube = Logic.emptyOr(match.stream.youtube or match.youtube, Variables.varDefault('youtube'))
+		stream = MatchGroupInput.processStream(match, 'stream'),
+		twitch = MatchGroupInput.processStream(match, 'twitch'),
+		twitch2 = MatchGroupInput.processStream(match, 'twitch2'),
+		afreeca = MatchGroupInput.processStream(match, 'afreeca'),
+		afreecatv = MatchGroupInput.processStream(match, 'afreecatv'),
+		dailymotion = MatchGroupInput.processStream(match, 'dailymotion'),
+		douyu = MatchGroupInput.processStream(match, 'douyu'),
+		smashcast = MatchGroupInput.processStream(match, 'smashcast'),
+		youtube = MatchGroupInput.processStream(match, 'youtube'),
 	}
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
