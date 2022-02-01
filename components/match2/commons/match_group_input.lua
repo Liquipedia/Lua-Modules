@@ -345,7 +345,9 @@ function MatchGroupInput.processStream(match, platformName, variableName)
 		variableName = platformName
 	end
 
-	local streamValue = Logic.emptyOr(match[platformName], Variables.varDefault(variableName))
+	local streams = match.streams or {}
+
+	local streamValue = Logic.emptyOr(streams[platformName] or match[platformName], Variables.varDefault(variableName))
 	if String.isEmpty(streamValue) then
 		return nil
 	end
