@@ -39,25 +39,17 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Ammo Type',
 		content = {args.ammotype}
 	})
+	if String.isNotEmpty(args.map1) then
+		local maps = {}
 
-	return widgets
-end
+		for _, map in ipairs(_weapon:getAllArgsForBase(args, 'map')) do
+			table.insert(maps, tostring(CustomWeapon:_createNoWrappingSpan(
+						PageLink.makeInternalLink({}, map)
+					)))
 
-function CustomInjector:parse(id, widgets)
-	local args = _args
-	if id == 'customcontent' then
-		if String.isNotEmpty(args.map1) then
-			local maps = {}
-
-			for _, map in ipairs(_weapon:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(CustomWeapon:_createNoWrappingSpan(
-							PageLink.makeInternalLink({}, map)
-						)))
-
-			end
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
+		table.insert(widgets, Title{name = 'Maps'})
+		table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 	end
 	return widgets
 end
