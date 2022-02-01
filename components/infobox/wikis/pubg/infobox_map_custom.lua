@@ -8,7 +8,7 @@
 
 local Weapon = require('Module:Infobox/Weapon')
 local Class = require('Module:Class')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
@@ -45,15 +45,15 @@ end
 
 function CustomInjector:parse(id, widgets)
 	local args = _args
-
-	if id == 'custom' then
+	if id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
 			local maps = {}
 
 			for _, map in ipairs(_weapon:getAllArgsForBase(args, 'map')) do
 				table.insert(maps, tostring(CustomWeapon:_createNoWrappingSpan(
-					PageLink.makeInternalLink({}, map)
-				)))
+							PageLink.makeInternalLink({}, map)
+						)))
+
 			end
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
