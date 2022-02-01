@@ -13,6 +13,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
+local Variables = require('Module:Variables')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -328,6 +329,30 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 	record.type = opponent.type
 
 	return record
+end
+
+--[[
+Processes stream inputs
+- automatically looks up the according variable
+- resolves the stream redirects so they can be found properly by StreamPage templates
+]]
+function MatchGroupInput.processStream(match, platformName, variableName)
+	if String.isEmpty(platformName) then
+		return nil
+	end
+
+	if String.isEmpty(variableName) then
+		variableName = platformName
+	end
+	
+	local streamValue = Logic.emptyOr(match[platformName], Variables.varDefault(variableName))
+	if String.isEmpty(streamValue) then
+		return nil
+	end
+
+	local streamLink = mw.ext.StreamPage.resolve_stream(platformName, streamValue)
+
+	return string.gsub(streamLink, 'Special:Stream/' .. platformName, '')
 end
 
 return MatchGroupInput
