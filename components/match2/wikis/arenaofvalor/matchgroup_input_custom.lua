@@ -324,7 +324,7 @@ function matchFunctions.getTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
-	Streams.processStreams(match)
+	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	match.links = {}
