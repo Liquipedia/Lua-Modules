@@ -221,8 +221,7 @@ end
 
 -- Take raw game input and format it to standard
 function CustomMatchGroupInput.getGameVersion(gameRaw)
-	local game = _GAME[gameRaw]
-	return game
+	return _GAME[gameRaw]
 end
 
 --
