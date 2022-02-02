@@ -65,22 +65,29 @@ function StreamLinks.resolve(platformName, streamValue)
 end
 
 --[[
-Extracts the streaming platform args from an argument table or a nested streams table inside the arguments table.
+Extracts the streaming platform args from an argument table or a nested stream table inside the arguments table.
 Uses variable fallbacks and resolves stream redirects.
 ]]
 function StreamLinks.processStreams(args)
-	local streams = args.streams or {}
-
-	-- handle args.stream differently due to it having no platform
-	streams.stream = Logic.emptyOr(streams.stream or args.stream, Variables.varDefault('stream'))
+	local streams = {}
+	if type(args.stream) == 'table' then
+		streams = args.stream
+	end
 
 	for _, platformName in pairs(StreamLinks.countdownPlatformNames) do
-		local streamValue = Logic.emptyOr(streams[platformName] or args[platformName], Variables.varDefault(platformName))
-
-		-- stream has no platform
+		-- stream has no platform and might be a table or a string
 		if platformName == 'stream' then
+			local streamValue = streams.stream
+			if String.isEmpty(streamValue) and type(args.stream) == 'string' then
+				streamValue = args.stream
+			end
+			if String.isEmpty(streamValue) then
+				streamValue = Variables.varDefault(platformName)
+			end
 			streams.stream = streamValue
 		else
+			local streamValue = Logic.emptyOr(streams[platformName] or args[platformName], Variables.varDefault(platformName))
+
 			-- twitch2 is not a platform but uses the twitch platform instead
 			local lookUpPlatform = platformName
 			if platformName == 'twitch2' then
