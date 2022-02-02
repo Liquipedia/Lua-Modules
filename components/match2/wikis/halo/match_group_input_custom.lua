@@ -220,9 +220,9 @@ function CustomMatchGroupInput.getDefaultWinner(table)
 end
 
 -- Take raw game input and format it to standard
-function CustomMatchGroupInput.getGameVersion(game)
-	_game = _GAME[game]
-	return _game
+function CustomMatchGroupInput.getGameVersion(gameRaw)
+	local game = _GAME[gameRaw]
+	return game
 end
 
 --
