@@ -84,7 +84,9 @@ function StreamLinks.processStreams(args)
 			if String.isEmpty(streamValue) then
 				streamValue = Variables.varDefault(platformName)
 			end
-			streams.stream = streamValue
+			if String.isNotEmpty(streamValue) then
+				streams.stream = streamValue
+			end
 		else
 			local streamValue = Logic.emptyOr(streams[platformName] or args[platformName], Variables.varDefault(platformName))
 
