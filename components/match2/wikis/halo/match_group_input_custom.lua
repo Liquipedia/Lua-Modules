@@ -219,11 +219,6 @@ function CustomMatchGroupInput.getDefaultWinner(table)
 	return -1
 end
 
--- Take raw game input and format it to standard
-function CustomMatchGroupInput.getGameVersion(gameRaw)
-	return _GAME[gameRaw]
-end
-
 --
 -- match related functions
 --
@@ -295,7 +290,7 @@ function matchFunctions.getTournamentVars(match)
 	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_tier_type'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	local game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
-	match.game = CustomMatchGroupInput.getGameVersion(game)
+	match.game = _GAME[game or '']
 	return match
 end
 
@@ -489,7 +484,7 @@ function mapFunctions.getTournamentVars(map)
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
 	map.liquipediatiertype = Logic.emptyOr(map.liquipediatiertype, Variables.varDefault('tournament_tier_type'))
 	local game = Logic.emptyOr(map.game, Variables.varDefault('tournament_game'))
-	map.game = CustomMatchGroupInput.getGameVersion(game)
+	map.game = _GAME[game or '']
 	return map
 end
 
