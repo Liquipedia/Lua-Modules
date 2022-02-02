@@ -151,6 +151,7 @@ function MatchMapsLegacy.close()
 	if Logic.readBool(matchlistVars:get('store')) then
 		matches.store = true
 	else
+		matches.noDuplicateCheck = true
 		matches.store = false
 	end
 
