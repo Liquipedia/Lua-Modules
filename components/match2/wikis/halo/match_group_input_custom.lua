@@ -488,9 +488,8 @@ function mapFunctions.getTournamentVars(map)
 	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault("tournament_icon_dark"))
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
 	map.liquipediatiertype = Logic.emptyOr(map.liquipediatiertype, Variables.varDefault('tournament_tier_type'))
-	local game = Logic.emptyOr(game, Variables.varDefault('tournament_game'))
-	game = CustomMatchGroupInput.getGameVersion(game)
-	map.game = game
+	local game = Logic.emptyOr(map.game, Variables.varDefault('tournament_game'))
+	map.game = CustomMatchGroupInput.getGameVersion(game)
 	return map
 end
 
