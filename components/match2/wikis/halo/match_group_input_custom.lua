@@ -24,6 +24,7 @@ local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
+local _GAME = mw.loadData('Module:GameVersion')
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -218,6 +219,12 @@ function CustomMatchGroupInput.getDefaultWinner(table)
 	return -1
 end
 
+-- Take raw game input and format it to standard
+function CustomMatchGroupInput.getGameVersion(game)
+	_game = _GAME[game]
+	return _game
+end
+
 --
 -- match related functions
 --
@@ -288,6 +295,9 @@ function matchFunctions.getTournamentVars(match)
 	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_tier'))
 	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_tier_type'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
+	local game = Logic.emptyOr(game, Variables.varDefault('tournament_game'))
+	game = CustomMatchGroupInput.getGameVersion(game)
+	match.game = game
 	return match
 end
 
@@ -480,6 +490,9 @@ function mapFunctions.getTournamentVars(map)
 	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault("tournament_icon_dark"))
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
 	map.liquipediatiertype = Logic.emptyOr(map.liquipediatiertype, Variables.varDefault('tournament_tier_type'))
+	local game = Logic.emptyOr(game, Variables.varDefault('tournament_game'))
+	game = CustomMatchGroupInput.getGameVersion(game)
+	map.game = game
 	return map
 end
 
