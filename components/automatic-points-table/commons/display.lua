@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DivTable = require('Module:DivTable')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -19,7 +18,7 @@ local _POINTS_TYPE = {
 	SECURED = 'SECURED'
 }
 
-local CustomDivTable = Class.new(DivTable.DivTable,
+local PointsDivTable = Class.new(
 	function(self, pointsData, tournaments, positionBackgrounds)
 		self.root = mw.html.create('div') :addClass('divTable')
 			:addClass('border-color-grey') :addClass('border-bottom')
@@ -44,7 +43,7 @@ local CustomDivTable = Class.new(DivTable.DivTable,
 	end
 )
 
-local CustomRow = Class.new(DivTable.Row,
+local TableRow = Class.new(
 	function(self, pointsData, tournaments, positionBackground)
 		self.root = mw.html.create('div'):addClass('divRow')
 		self.cells = {}
@@ -62,7 +61,7 @@ local CustomRow = Class.new(DivTable.Row,
 	end
 )
 
-local CustomHeaderRow = Class.new(DivTable.HeaderRow,
+local TableHeaderRow = Class.new(
 	function(self, tournaments)
 		self.tournaments = tournaments
 		self.root = mw.html.create('div') :addClass('divHeaderRow') :addClass('diagonal')
@@ -70,13 +69,18 @@ local CustomHeaderRow = Class.new(DivTable.HeaderRow,
 	end
 )
 
-function CustomDivTable:create()
-	local headerRow = CustomHeaderRow(self.tournaments)
+function PointsDivTable:row(row)
+	table.insert(self.rows, row)
+	return self
+end
+
+function PointsDivTable:create()
+	local headerRow = TableHeaderRow(self.tournaments)
 	self:row(headerRow)
 
 	Table.iter.forEachIndexed(self.pointsData, function(index, teamPointsData)
 		local positionBackground = self.positionBackgrounds[index]
-		self:row(CustomRow(teamPointsData, self.tournaments, positionBackground))
+		self:row(TableRow(teamPointsData, self.tournaments, positionBackground))
 	end)
 
 	for _, row in pairs(self.rows) do
@@ -86,7 +90,7 @@ function CustomDivTable:create()
 	return self.wrapper
 end
 
-function CustomRow:create()
+function TableRow:create()
 	-- fixed cells
 	self:positionCell(self.pointsData.position, self.positionBackground)
 	self:nameCell(self.team)
@@ -110,7 +114,7 @@ local function wrapInDiv(text)
 	return mw.html.create('div'):wikitext(tostring(text))
 end
 
-function CustomRow:baseCell(text, bg, bold)
+function TableRow:baseCell(text, bg, bold)
 	local div = wrapInDiv(text) :addClass('divCell') :addClass('va-middle')
 		:addClass('centered-cell')	:addClass('border-color-grey') :addClass('border-top-right')
 
@@ -123,19 +127,19 @@ function CustomRow:baseCell(text, bg, bold)
 	return div
 end
 
-function CustomRow:totalCell(points)
+function TableRow:totalCell(points)
 	local totalCell = self:baseCell(points, nil, true)
 	table.insert(self.cells, totalCell)
 	return self
 end
 
-function CustomRow:positionCell(position, bg)
+function TableRow:positionCell(position, bg)
 	local positionCell = self:baseCell(position .. '.', bg, true)
 	table.insert(self.cells, positionCell)
 	return self
 end
 
-function CustomRow:nameCell(team)
+function TableRow:nameCell(team)
 	local lastAlias = team.aliases[#team.aliases]
 	local teamDisplay = team.display and team.display or mw.ext.TeamTemplate.team(lastAlias)
 	local nameCell = self:baseCell(teamDisplay, team.bg):addClass('name-cell')
@@ -143,7 +147,7 @@ function CustomRow:nameCell(team)
 	return self
 end
 
-function CustomRow:pointsCell(points, tournament)
+function TableRow:pointsCell(points, tournament)
 	local finished = Logic.readBool(tournament.finished)
 	local pointString = points.amount ~= nil and points.amount or (finished and '-' or '')
 	local pointsCell = self:baseCell(pointString)
@@ -154,7 +158,7 @@ function CustomRow:pointsCell(points, tournament)
 	return self
 end
 
-function CustomRow:deductionCell(deduction)
+function TableRow:deductionCell(deduction)
 	if Table.isEmpty(deduction) then
 		table.insert(self.cells, self:baseCell(''))
 		return self
@@ -169,7 +173,7 @@ function CustomRow:deductionCell(deduction)
 	return self
 end
 
-function CustomHeaderRow:cell(header)
+function TableHeaderRow:cell(header)
 	local additionalClass = header.additionalClass
 
 	local innerDiv = wrapInDiv(header.text) :addClass('border-color-grey')
@@ -185,7 +189,7 @@ function CustomHeaderRow:cell(header)
 	return self
 end
 
-function CustomHeaderRow:create()
+function TableHeaderRow:create()
 	-- fixed headers
 	local headers = {{
 		text = 'Ranking',
@@ -219,7 +223,7 @@ function CustomHeaderRow:create()
 	return self.root
 end
 
-function CustomHeaderRow:headerCell(header)
+function TableHeaderRow:headerCell(header)
 	local innerDiv = wrapInDiv(header.text)
 		:addClass('border-color-grey')
 		:addClass('content')
@@ -237,4 +241,4 @@ function CustomHeaderRow:headerCell(header)
 	return self
 end
 
-return CustomDivTable
+return PointsDivTable
