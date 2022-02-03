@@ -39,6 +39,14 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Ammo Type',
 		content = {args.ammotype}
 	})
+	table.insert(widgets, Cell{
+		name = 'Throw Speed',
+		content = {args.throwspeed}
+	})
+	table.insert(widgets, Cell{
+		name = 'Throw Cooldown',
+		content = {args.throwcooldown}
+	})
 	if String.isNotEmpty(args.map1) then
 		local maps = {}
 
