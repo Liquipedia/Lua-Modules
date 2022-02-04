@@ -14,6 +14,7 @@ local StreamLinks = {}
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
+local Table = require('Module:Table')
 
 --[[
 List of streaming platforms supported in Module:Countdown. This is a subset of
@@ -78,30 +79,21 @@ Uses variable fallbacks and resolves stream redirects.
 function StreamLinks.processStreams(args)
 	local streams = {}
 	if type(args.stream) == 'table' then
-		streams = args.stream
-	end
+ 		streams = Table.copy(args.stream)
+ 		args.stream = nil
+ 	end
 
 	for _, platformName in pairs(StreamLinks.countdownPlatformNames) do
-		-- stream has no platform and might be a table or a string
-		if platformName == 'stream' then
-			local streamValue = streams.stream
-			if String.isEmpty(streamValue) and type(args.stream) == 'string' then
-				streamValue = args.stream
-			end
-			if String.isEmpty(streamValue) then
-				streamValue = Variables.varDefault(platformName)
-			end
-			if String.isNotEmpty(streamValue) then
-				streams.stream = streamValue
-			end
-		else
-			local streamValue = Logic.emptyOr(streams[platformName] or args[platformName], Variables.varDefault(platformName))
+		local streamValue = Logic.emptyOr(streams[platformName], args[platformName], Variables.varDefault(platformName))
 
-			local lookUpPlatform = StreamLinks.streamPlatformLookupNames[platformName] or platformName
+		if String.isNotEmpty(streamValue) then
+			-- stream has no platform
+			if platformName ~= 'stream' then
+				local lookUpPlatform = StreamLinks.streamPlatformLookupNames[platformName] or platformName
 
-			if String.isNotEmpty(streamValue) then
-				streams[platformName] = StreamLinks.resolve(lookUpPlatform, streamValue)
+				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
 			end
+			streams[platformName] = streamValue
 		end
 	end
 
