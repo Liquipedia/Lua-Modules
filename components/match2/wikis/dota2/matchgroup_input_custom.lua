@@ -14,6 +14,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Earnings = require('Module:Earnings')
+local Streams = require('Module:Links/Stream')
 local HeroNames = mw.loadData('Module:HeroNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
@@ -32,7 +33,7 @@ local _ALLOWED_STATUSES = {
 	_STATUS_DEFAULT_LOSS,
 }
 local _MAX_NUM_OPPONENTS = 2
-local _MAX_NUM_PLAYERS = 10
+local _MAX_NUM_PLAYERS = 15
 local _MAX_NUM_GAMES = 7
 local _DEFAULT_BESTOF = 3
 local _DEFAULT_MODE = 'team'
@@ -330,22 +331,7 @@ function matchFunctions.getTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
-	match.stream = match.stream or {}
-	match.stream = {
-		stream = MatchGroupInput.processStream(match, 'stream'),
-		twitch = MatchGroupInput.processStream(match, 'twitch'),
-		twitch2 = MatchGroupInput.processStream(match, 'twitch2'),
-		nimo = MatchGroupInput.processStream(match, 'nimo'),
-		trovo = MatchGroupInput.processStream(match, 'trovo'),
-		huya = MatchGroupInput.processStream(match, 'huya'),
-		afreeca = MatchGroupInput.processStream(match, 'afreeca'),
-		afreecatv = MatchGroupInput.processStream(match, 'afreecatv'),
-		dailymotion = MatchGroupInput.processStream(match, 'dailymotion'),
-		douyu = MatchGroupInput.processStream(match, 'douyu'),
-		smashcast = MatchGroupInput.processStream(match, 'smashcast'),
-		youtube = MatchGroupInput.processStream(match, 'youtube'),
-		facebook = MatchGroupInput.processStream(match, 'facebook'),
-	}
+	match.stream = Streams.processStreams(match)
 
 	for index = 1, _MAX_NUM_GAMES do
 		local vodgame = match['vodgame' .. index]
