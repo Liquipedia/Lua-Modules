@@ -79,9 +79,9 @@ Uses variable fallbacks and resolves stream redirects.
 function StreamLinks.processStreams(args)
 	local streams = {}
 	if type(args.stream) == 'table' then
- 		streams = Table.copy(args.stream)
- 		args.stream = nil
- 	end
+		streams = Table.copy(args.stream)
+		args.stream = nil
+	end
 
 	for _, platformName in pairs(StreamLinks.countdownPlatformNames) do
 		local streamValue = Logic.emptyOr(streams[platformName], args[platformName], Variables.varDefault(platformName))
