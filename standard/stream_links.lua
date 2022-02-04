@@ -97,7 +97,6 @@ function StreamLinks.processStreams(args)
 		else
 			local streamValue = Logic.emptyOr(streams[platformName] or args[platformName], Variables.varDefault(platformName))
 
-			-- twitch2 is not a platform but uses the twitch platform instead
 			local lookUpPlatform = StreamLinks.streamPlatformLookupNames[platformName] or platformName
 
 			if String.isNotEmpty(streamValue) then
