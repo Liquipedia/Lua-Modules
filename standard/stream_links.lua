@@ -43,6 +43,10 @@ StreamLinks.countdownPlatformNames = {
 	'youtube',
 }
 
+StreamLinks.streamPlatformLookupNames = {
+	twitch2 = 'twitch',
+}
+
 --[[
 Extracts the streaming platform args from an argument table for use in
 Module:Countdown.
@@ -91,10 +95,7 @@ function StreamLinks.processStreams(args)
 			local streamValue = Logic.emptyOr(streams[platformName] or args[platformName], Variables.varDefault(platformName))
 
 			-- twitch2 is not a platform but uses the twitch platform instead
-			local lookUpPlatform = platformName
-			if platformName == 'twitch2' then
-				lookUpPlatform = 'twitch'
-			end
+			local lookUpPlatform = StreamLinks.streamPlatformLookupNames[platformName] or platformName
 
 			if String.isNotEmpty(streamValue) then
 				streams[platformName] = StreamLinks.resolve(lookUpPlatform, streamValue)
