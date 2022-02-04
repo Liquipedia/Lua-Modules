@@ -14,7 +14,6 @@ local StreamLinks = {}
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Table = require('Module:Table')
 
 --[[
 List of streaming platforms supported in Module:Countdown. This is a subset of
@@ -79,7 +78,7 @@ Uses variable fallbacks and resolves stream redirects.
 function StreamLinks.processStreams(forwardedInputArgs)
 	local streams = {}
 	if type(forwardedInputArgs.stream) == 'table' then
-		streams = Table.copy(forwardedInputArgs.stream)
+		streams = forwardedInputArgs.stream
 		forwardedInputArgs.stream = nil
 	end
 
