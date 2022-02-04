@@ -84,7 +84,11 @@ function StreamLinks.processStreams(forwardedInputArgs)
 	end
 
 	for _, platformName in pairs(StreamLinks.countdownPlatformNames) do
-		local streamValue = Logic.emptyOr(streams[platformName], forwardedInputArgs[platformName], Variables.varDefault(platformName))
+		local streamValue = Logic.emptyOr(
+			streams[platformName],
+			forwardedInputArgs[platformName],
+			Variables.varDefault(platformName)
+		)
 
 		if String.isNotEmpty(streamValue) then
 			-- stream has no platform
