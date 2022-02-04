@@ -52,7 +52,7 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Patch',
-		content = {CustomLeague:_createGameCell(args)}
+		content = {CustomLeague:_createPatchCell(args)}
 	})
 
 	return widgets
@@ -106,7 +106,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 
-function CustomLeague:_createGameCell(args)
+function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
 		return nil
 	end
