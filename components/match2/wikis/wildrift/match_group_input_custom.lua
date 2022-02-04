@@ -16,6 +16,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local ChampionNames = mw.loadData('Module:ChampionNames')
+local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
