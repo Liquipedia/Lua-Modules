@@ -76,15 +76,15 @@ end
 Extracts the streaming platform args from an argument table or a nested stream table inside the arguments table.
 Uses variable fallbacks and resolves stream redirects.
 ]]
-function StreamLinks.processStreams(args)
+function StreamLinks.processStreams(forwardedInputArgs)
 	local streams = {}
-	if type(args.stream) == 'table' then
-		streams = Table.copy(args.stream)
-		args.stream = nil
+	if type(forwardedInputArgs.stream) == 'table' then
+		streams = Table.copy(forwardedInputArgs.stream)
+		forwardedInputArgs.stream = nil
 	end
 
 	for _, platformName in pairs(StreamLinks.countdownPlatformNames) do
-		local streamValue = Logic.emptyOr(streams[platformName], args[platformName], Variables.varDefault(platformName))
+		local streamValue = Logic.emptyOr(streams[platformName], forwardedInputArgs[platformName], Variables.varDefault(platformName))
 
 		if String.isNotEmpty(streamValue) then
 			-- stream has no platform
