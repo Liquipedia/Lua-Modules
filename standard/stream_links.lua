@@ -43,6 +43,13 @@ StreamLinks.countdownPlatformNames = {
 }
 
 --[[
+Lookup table of allowed inputs that use a plattform with a different name
+]]
+StreamLinks.streamPlatformLookupNames = {
+	twitch2 = 'twitch',
+}
+
+--[[
 Extracts the streaming platform args from an argument table for use in
 Module:Countdown.
 ]]
