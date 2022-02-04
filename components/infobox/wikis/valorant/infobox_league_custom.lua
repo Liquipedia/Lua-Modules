@@ -17,8 +17,7 @@ local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local PageLink = require('Module:Page')
 local PrizePoolCurrency = require('Module:Prize pool currency')
-local RIOT_SPONSORED_ICON =
-			[[File:Riot Games Tier Icon.png|x18px|link=Riot Games|Tournament supported by Riot Games.]]'
+local RIOT_SPONSORED = [[File:Riot Games Tier Icon.png|x18px|link=Riot Games|Tournament supported by Riot Games.]]'
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
@@ -84,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 		local tierDisplay = CustomLeague:_createLiquipediaTierDisplay()
 		local class
 		if args['riot-sponsored'] == 'true' then
-			tierDisplay = (tierDisplay or '').. '&nbsp;' .. RIOT_SPONSORED_ICON
+			tierDisplay = (tierDisplay or '').. '&nbsp;' .. RIOT_SPONSORED
 			class = {'valvepremier-highlighted'}
 		end
 		return {
