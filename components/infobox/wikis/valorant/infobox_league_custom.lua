@@ -17,7 +17,8 @@ local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local PageLink = require('Module:Page')
 local PrizePoolCurrency = require('Module:Prize pool currency')
-local RIOT_SPONSORED_ICON = '[[File:Riot Games Tier Icon.png|x18px|link=Riot Games|Tournament supported by Riot Games.]]'
+local RIOT_SPONSORED_ICON = 
+		'[[File:Riot Games Tier Icon.png|x18px|link=Riot Games|Tournament supported by Riot Games.]]'
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
@@ -101,7 +102,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 	lpdbData.publishertier = args['riot-sponsored']
 	lpdbData.participantsnumber = args.team_number
-	lpdbData.liquipediatiertype = args.liquipediatiertype or _DEFAULT_TIERTYPE
+	lpdbData.liquipediatiertype = args.liquipediatiertype 
 	return lpdbData
 end
 
@@ -116,7 +117,8 @@ function CustomLeague:_createGameCell(args)
 	if String.isEmpty(args.epatch) and not String.isEmpty(args.patch) then
 		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]'
 	elseif not String.isEmpty(args.epatch) then
-		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]' .. '&ndash;' .. '[[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
+		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]' .. '&ndash;' .. 
+			'[[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
 	end
 
 	return content
@@ -185,7 +187,6 @@ end
 
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
-	
 	local tier = args.liquipediatier
 	local tierType = args.liquipediatiertype
 
