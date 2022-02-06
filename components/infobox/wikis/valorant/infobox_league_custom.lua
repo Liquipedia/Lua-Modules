@@ -97,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)	
+function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 	lpdbData.participantsnumber = args.team_number
 	lpdbData.liquipediatiertype = args.liquipediatiertype
@@ -229,7 +229,7 @@ function CustomLeague:getWikiCategories(args)
 	if String.isNotEmpty(tierType) and String.isNotEmpty(Tier.text[tierType]) then
 		table.insert(categories, Tier.text[tierType] .. ' Tournaments')
 	end
-	
+
 	if String.isNotEmpty(female) then
 		table.insert(categories, 'Female Tournaments')
 	end
