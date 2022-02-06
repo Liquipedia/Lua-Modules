@@ -48,7 +48,7 @@ function CustomInjector:addCustomCells(widgets)
 	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Teams',
-		content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}
+		content = (args.team_number)
 	})
 	table.insert(widgets, Cell{
 		name = 'Patch',
@@ -98,10 +98,31 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
+	local icon_dark
+	local banner_dark
+	
+	if String.isNotEmpty(args.icon_darkmode) then
+		icon_dark = 'File:' .. args.icon_darkmode
+	end
+	
+	if String.isNotEmpty(args.banner_darkmode) then
+		banner_dark = 'File:' .. args.banner_darkmode
+	end
+	
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
-	lpdbData.publishertier = args['riot-sponsored']
 	lpdbData.participantsnumber = args.team_number
 	lpdbData.liquipediatiertype = args.liquipediatiertype
+	lpdbData.publishertier = args['riotpremier'] == 'true' and 'major' or args['riot-sponsored'] == 'true' and 'Sponsored'
+	lpdbData.extradata = {
+		prizepoollocal = args.prizepoollocal or 'false',
+		startdate_raw = CustomLeague:_standardiseRawDate(args.sdate or args.date),
+		enddate_raw = CustomLeague:_standardiseRawDate(args.edate or args.date),
+		female = args.female or 'false',
+		region = args.country or 'false',
+		icon_darkmode = args.icon_darkmode or args.icon,
+		banner_darkmode = args.banner_darkmode or args.banner,
+	}
+	
 	return lpdbData
 end
 
@@ -121,6 +142,20 @@ function CustomLeague:_createPatchCell(args)
 	end
 
 	return content
+end
+
+function CustomLeague:_standardiseRawDate(dateString)
+	-- Length 7 = YYYY-MM
+	-- Length 10 = YYYY-MM-??
+	if String.isEmpty(dateString) or (#dateString ~= 7 and #dateString ~= 10) then
+		return ''
+	end
+
+	if #dateString == 7 then
+		dateString = dateString .. '-??'
+	end
+	dateString = dateString:gsub('%-XX', '-??')
+	return dateString
 end
 
 function CustomLeague:_createPrizepool()
@@ -169,9 +204,19 @@ end
 
 function CustomLeague:defineCustomPageVariables()
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
+	Variables.varDefine('tournament_name', _args.name or '')
+	Variables.varDefine('tournament_short_name', _args.shortname or '')
+	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
+	Variables.varDefine('special_ticker_name', _args.tickername_special or '')
+	Variables.varDefine('tournament_icon', _args.icon or '')
+	Variables.varDefine('tournament_type', _args.type or '')
+	Variables.varDefine('tournament_series', _args.series or '')
+	Variables.varDefine('tournament_riot_premier', _args.riotpremier or '')
+	Variables.varDefine('tournament_riot_tier', _args.riotpremier or '')
+	Variables.varDefine('tournament_mode', _args.individual or '')
+	Variables.varDefine('patch', _args.patch or '')
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -188,6 +233,7 @@ function CustomLeague:getWikiCategories(args)
 	local categories = {}
 	local tier = args.liquipediatier
 	local tierType = args.liquipediatiertype
+	local female = args.female
 
 	if String.isNotEmpty(tier) and String.isNotEmpty(Tier.text[tier]) then
 		table.insert(categories, Tier.text[tier]  .. ' Tournaments')
@@ -195,6 +241,10 @@ function CustomLeague:getWikiCategories(args)
 
 	if String.isNotEmpty(tierType) and String.isNotEmpty(Tier.text[tierType]) then
 		table.insert(categories, Tier.text[tierType] .. ' Tournaments')
+	end
+	
+	if String.isNotEmpty(female) then
+		table.insert(categories, 'Female Tournaments')
 	end
 
 	return categories
