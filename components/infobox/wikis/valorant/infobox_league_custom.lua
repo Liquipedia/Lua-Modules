@@ -97,18 +97,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)
-	local icon_dark
-	local banner_dark
-	
-	if String.isNotEmpty(args.icon_darkmode) then
-		icon_dark = 'File:' .. args.icon_darkmode
-	end
-	
-	if String.isNotEmpty(args.banner_darkmode) then
-		banner_dark = 'File:' .. args.banner_darkmode
-	end
-	
+function CustomLeague:addToLpdb(lpdbData, args)	
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 	lpdbData.participantsnumber = args.team_number
 	lpdbData.liquipediatiertype = args.liquipediatiertype
@@ -122,7 +111,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		icon_darkmode = args.icon_darkmode or args.icon,
 		banner_darkmode = args.banner_darkmode or args.banner,
 	}
-	
 	return lpdbData
 end
 
@@ -131,7 +119,6 @@ function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
 		return nil
 	end
-
 	local content
 
 	if String.isEmpty(args.epatch) and not String.isEmpty(args.patch) then
@@ -246,7 +233,6 @@ function CustomLeague:getWikiCategories(args)
 	if String.isNotEmpty(female) then
 		table.insert(categories, 'Female Tournaments')
 	end
-
 	return categories
 end
 
