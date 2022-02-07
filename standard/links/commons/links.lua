@@ -211,7 +211,7 @@ function Links.transform(links)
 		twitch5 = links.twitch5,
 		twitter = links.twitter,
 		twitter2 = links.twitter2,
-		vidio = vidio,
+		vidio = links.vidio,
 		vk = links.vk,
 		vlr = links.vlr,
 		weibo = links.weibo,
