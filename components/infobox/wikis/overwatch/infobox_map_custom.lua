@@ -22,7 +22,6 @@ local _args
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getCategories = CustomMap.getCategories
 	customMap.addToLpdb = CustomMap.addToLpdb
 	_args = customMap.args
 	return customMap:createInfobox(frame)
