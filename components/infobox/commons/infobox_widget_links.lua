@@ -79,7 +79,8 @@ local _PRIORITY_GROUPS = {
 		'youtube',
 		'afreeca',
 		'dlive',
-		'facebook-gaming'
+		'facebook-gaming',
+		'vidio',
 	}
 }
 
