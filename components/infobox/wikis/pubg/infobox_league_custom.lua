@@ -55,7 +55,7 @@ local _PLATFORMS = {
 	pclite = '[[PC LITE]][[Category:PC Competitions]][[Category:PC LITE Competitions]]',
 	peace = '[[Peacekeeper Elite|Peace Elite]][[Category:Peacekeeper Elite Competitions]][[Category:Mobile Competitions]]',
 	bgmi = '[[Battlegrounds Mobile India|BGMI]]' ..
-	'[[Category:Battlegrounds Mobile India Competitions]][[Category:Mobile Competitions]]',
+		'[[Category:Battlegrounds Mobile India Competitions]][[Category:Mobile Competitions]]',
 	console = '[[Console]][[Category:Console Competitions]]',
 	default = '[[Category:Unknown Platform Competitions]]',
 }
