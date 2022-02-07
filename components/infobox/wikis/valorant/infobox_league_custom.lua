@@ -17,7 +17,7 @@ local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local PageLink = require('Module:Page')
 local PrizePoolCurrency = require('Module:Prize pool currency')
-local RIOT_SPONSORED = '[[File:Riot Games Tier Icon.png|x18px|link=Riot Games|Tournament supported by Riot Games.]]'
+local _RIOT_SPONSORED = '[[File:Riot Games Tier Icon.png|x18px|link=Riot Games|Tournament supported by Riot Games.]]'
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 
@@ -83,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 		local tierDisplay = CustomLeague:_createLiquipediaTierDisplay()
 		local class
 		if args['riot-sponsored'] == 'true' then
-			tierDisplay = (tierDisplay or '').. '&nbsp;' .. RIOT_SPONSORED
+			tierDisplay = (tierDisplay or '') .. '&nbsp;' .. _RIOT_SPONSORED
 			class = {'valvepremier-highlighted'}
 		end
 		return {
@@ -164,8 +164,7 @@ function CustomLeague:_createPrizepool()
 end
 
 function CustomLeague:_createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or ''
+	local tier = _args.liquipediatier
 	if String.isEmpty(tier) then
 		return nil
 	end
@@ -182,6 +181,7 @@ function CustomLeague:_createLiquipediaTierDisplay()
 
 	local tierDisplay = buildTierString(tier)
 
+	local tierType = _args.liquipediatiertype
 	if String.isNotEmpty(tierType) then
 		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
 	end
@@ -192,14 +192,10 @@ end
 function CustomLeague:defineCustomPageVariables()
 	--Legacy vars
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
-	Variables.varDefine('tournament_name', _args.name or '')
+	Variables.varDefine('tournament_prizepool', Variables.varDefault('tournament_prizepoolusd'))
 	Variables.varDefine('tournament_short_name', _args.shortname or '')
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('special_ticker_name', _args.tickername_special or '')
-	Variables.varDefine('tournament_icon', _args.icon or '')
-	Variables.varDefine('tournament_type', _args.type or '')
-	Variables.varDefine('tournament_series', _args.series or '')
 	Variables.varDefine('tournament_riot_premier', _args.riotpremier or '')
 	Variables.varDefine('tournament_riot_tier', _args.riotpremier or '')
 	Variables.varDefine('tournament_mode', _args.individual or '')
