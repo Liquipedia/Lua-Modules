@@ -206,11 +206,10 @@ function CustomLeague:_getGameMode()
 		perspective = string.gsub(perspective, ' perspective', '')
 		return _PERSPECTIVES[perspective] or {}
 	end
-	local getPerspectiveDisplay = function(perspective) 
-		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/' .. perspective) 
+	local getPerspectiveDisplay = function(perspective)
+		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/' .. perspective)
 	end
-	
-	local displayPerspectives = Table.mapValues(getPerspectives(_args.perspective), getPerspectiveDisplay) 
+	local displayPerspectives = Table.mapValues(getPerspectives(_args.perspective), getPerspectiveDisplay)
 
 	local mode = _MODES[string.lower(_args.mode or '')] or _MODES['default']
 
