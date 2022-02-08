@@ -1,0 +1,9 @@
+use_tab: true
+indent_width: 1
+continuation_indent_width: 1
+align_args: false
+align_parameter: false
+break_after_functioncall_lp: true
+break_before_functioncall_rp: true
+keep_simple_control_block_one_line: false
+keep_simple_function_one_line: false
