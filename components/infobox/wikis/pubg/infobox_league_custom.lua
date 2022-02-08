@@ -16,6 +16,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local PrizePoolCurrency = require('Module:Prize pool currency')
+local Table = require('Module:Table')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -32,7 +33,7 @@ local _MODES = {
 	squad = 'Squads[[Category:Squads Mode Tournaments]]',
 	['2v2'] = '2v2 TDM[[Category:2v2 TDM Tournaments]]',
 	['4v4'] = '4v4 TDM[[Category:4v4 TDM Tournaments]]',
-	['war mode'] = 'War Mode',
+	['war mode'] = 'War Mode[[Category:War Mode Tournaments]]',
 	default = '[[Category:Unknown Mode Tournaments]]',
 }
 _MODES.solos = _MODES.solo
@@ -198,17 +199,22 @@ function CustomLeague:_getGameMode()
 		return nil
 	end
 
-	local perspective = string.lower(_args.perspective or '')
-	perspective = string.gsub(perspective, ' person', '')
-	perspective = string.gsub(perspective, ' perspective', '')
-	perspective = _PERSPECTIVES[perspective] or {}
-	for key, item in pairs(perspective) do
-		perspective[key] = Template.safeExpand(mw.getCurrentFrame(), 'Abbr/' .. item)
+	local getPerspectives = function(perspectiveInput)
+		local perspective = string.lower(perspectiveInput or '')
+		-- Clean unnecessary data from the input
+		perspective = string.gsub(perspective, ' person', '')
+		perspective = string.gsub(perspective, ' perspective', '')
+		return _PERSPECTIVES[perspective] or {}
 	end
+	local getPerspectiveDisplay = function(perspective) 
+		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/' .. perspective) 
+	end
+	
+	local displayPerspectives = Table.mapValues(getPerspectives(_args.perspective), getPerspectiveDisplay) 
 
 	local mode = _MODES[string.lower(_args.mode or '')] or _MODES['default']
 
-	return mode .. '&nbsp;' .. table.concat(perspective, '&nbsp;')
+	return mode .. '&nbsp;' .. table.concat(displayPerspectives, '&nbsp;')
 end
 
 function CustomLeague:_getPlatform()
