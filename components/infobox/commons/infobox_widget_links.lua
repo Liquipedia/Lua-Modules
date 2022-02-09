@@ -51,6 +51,7 @@ local _PRIORITY_GROUPS = {
 		'halodatahive',
 		'matcherino',
 		'matcherinolink',
+		'siegegg',
 		'smash-gg',
 		'sostronk',
 		'stratz',
