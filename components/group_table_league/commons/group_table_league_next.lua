@@ -840,11 +840,27 @@ function GroupTableLeague.computeRoundStatus(groupTable)
 	local currentRoundIndex = GroupTableLeague.getCurrentRoundIndex(groupTable.rounds)
 	local records = groupTable.matchRecordsByRound[currentRoundIndex]
 
-	local roundStarted = tableProps.isLive
-	if not roundStarted then
-		local firstWithTime = Array.find(records, function(record) return Logic.readBool(record.dateexact) end)
-		roundStarted = firstWithTime ~= nil and DateExt.readTimestamp(firstWithTime.date) <= os.time()
+	local function getRoundStartTime()
+		-- Use exact start time of first match if known
+		if #records > 0 and Logic.readBool(records[1].dateexact) then
+			return DateExt.readTimestamp(records[1].date)
+
+		-- Otherwise use date param if specified
+		elseif tableProps.headerTime then
+			return tableProps.headerTime
+
+		-- Otherwise use inexact start time of first match
+		elseif #records > 0 then
+			return DateExt.readTimestamp(records[1].date)
+		
+		-- Fallback: Round has already started
+		else
+			return groupTable.rounds[currentRoundIndex].range[1]
+		end
 	end
+
+	local roundStarted = tableProps.isLive
+		or getRoundStartTime() <= os.time()
 
 	local isLive = Logic.nilOr(
 		tableProps.isLive,
