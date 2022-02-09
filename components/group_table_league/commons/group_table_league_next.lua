@@ -852,7 +852,7 @@ function GroupTableLeague.computeRoundStatus(groupTable)
 		-- Otherwise use inexact start time of first match
 		elseif #records > 0 then
 			return DateExt.readTimestamp(records[1].date)
-		
+
 		-- Fallback: Round has already started
 		else
 			return groupTable.rounds[currentRoundIndex].range[1]
