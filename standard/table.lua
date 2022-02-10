@@ -220,6 +220,75 @@ function Table.map(xTable, f)
 end
 
 --[[
+Extracts prefixed keys interleaved with numeric indexes from an arguments
+table, and applies a transform to each key or index.
+
+Used for template calls that support both prefixed and indexed params. See
+Module:ParticipantTable/Starcraft, Module:GroupTableLeage for examples of how
+it is used.
+
+Example:
+In the template call
+{{Foo
+	|A
+	|p2=B
+	|C
+	|player4=D
+}}
+
+Table.mapInterleavedPrefix(args, {'p', 'player'}, f)
+will invoke
+
+f(1, 1)
+f('p2', 2, 'p')
+f(3, 3)
+f('player4', 4, 'player')
+
+]]
+function Table.mapInterleavedPrefix(args, prefixes, f)
+	local function indexFromKey(key)
+		local prefix, index = key:match('^([%a_]+)(%d+)$')
+		if Table.includes(prefixes, prefix) then
+			return tonumber(index), prefix
+		else
+			return nil
+		end
+	end
+
+	return Table.mapInterleaved(args, indexFromKey, f)
+end
+
+function Table.mapInterleaved(args, indexFromKey, f)
+	local entriesByIndex = {}
+
+	-- Non-numeric args
+	for key, _ in pairs(args) do
+		local function post(index, ...)
+			if index and not entriesByIndex[index] then
+				entriesByIndex[index] = f(key, index, ...)
+			end
+		end
+		if type(key) == 'string' then
+			post(indexFromKey(key))
+		end
+	end
+
+	-- Numeric index entries fills in gaps of prefixN= entries
+	local entryIndex = 1
+	for argIndex = 1, math.huge do
+		if not args[argIndex] then
+			break
+		end
+		while entriesByIndex[entryIndex] do
+			entryIndex = entryIndex + 1
+		end
+		entriesByIndex[entryIndex] = f(argIndex, entryIndex)
+	end
+
+	return entriesByIndex
+end
+
+--[[
 Applies a function to each value in a table and places the results in a new
 table under the same keys.
 
