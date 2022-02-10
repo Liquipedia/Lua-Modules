@@ -33,7 +33,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 	local matchKeys = TournamentUtil.mapInterleavedPrefix(args, {'M'}, FnUtil.identity)
 
 	return Array.map(matchKeys, function(matchKey, matchIndex)
-			local matchId = MatchGroupUtil.matchIdFromKey(matchIndex)
+			local matchId = string.format('%04d', matchIndex)
 			local matchArgs = Json.parse(args[matchKey])
 
 			local context = MatchGroupInput.readContext(matchArgs, args)
@@ -58,7 +58,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.sectionheader = context.sectionHeader
 			bracketData.dateheader = Logic.readBool(match.dateheader) or nil
 
-			local nextMatchId = bracketId .. '_' .. MatchGroupUtil.matchIdFromKey(matchIndex + 1)
+			local nextMatchId = bracketId .. '_' .. string.format('%04d', matchIndex + 1)
 			bracketData.next = matchIndex ~= #matchKeys and nextMatchId or nil
 
 			return match
