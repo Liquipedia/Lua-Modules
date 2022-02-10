@@ -23,42 +23,47 @@ local globalVars = PageVariableNamespace({cached = true})
 
 local MatchGroupInput = {}
 
+
+--remove this once #1050 is merged;;; use module:Table instead
+local TournamentUtil = require('Module:Tournament/Util')
+
 function MatchGroupInput.readMatchlist(bracketId, args)
 	local matches = {}
-	for matchKey, matchArgs in Table.iter.pairsByPrefix(args, 'M') do
-		local matchIndex = tonumber(matchKey:match('(%d+)$'))
-		local matchId = string.format('%04d', matchIndex)
 
-		matchArgs = Json.parse(matchArgs)
+	local matchKeys = TournamentUtil.mapInterleavedPrefix(args, {'M'}, FnUtil.identity)
 
-		local context = MatchGroupInput.readContext(matchArgs, args)
-		MatchGroupInput.persistContextChanges(context)
+	return Array.map(matchKeys, function(matchKey, matchIndex)
+			local matchId = MatchGroupUtil.matchIdFromKey(matchIndex)
+			local matchArgs = Json.parse(args[matchKey])
 
-		matchArgs.bracketid = bracketId
-		matchArgs.matchid = matchId
-		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
+			local context = MatchGroupInput.readContext(matchArgs, args)
+			MatchGroupInput.persistContextChanges(context)
 
-		table.insert(matches, match)
+			matchArgs.bracketid = bracketId
+			matchArgs.matchid = matchId
+			local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
 
-		-- Add more fields to bracket data
-		match.bracketdata = match.bracketdata or {}
-		local bracketData = match.bracketdata
+			-- Add more fields to bracket data
+			match.bracketdata = match.bracketdata or {}
+			local bracketData = match.bracketdata
 
-		bracketData.type = 'matchlist'
-		local nextMatchId = bracketId .. '_' .. string.format('%04d', matchIndex + 1)
-		bracketData.next = args['M' .. (matchIndex + 1)] and nextMatchId or nil
-		bracketData.title = matchIndex == 1 and args.title or nil
-		bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
-		bracketData.matchIndex = matchIndex
+			bracketData.type = 'matchlist'
+			bracketData.title = matchIndex == 1 and args.title or nil
+			bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
+			bracketData.matchIndex = matchIndex
 
-		match.parent = context.tournamentParent
-		bracketData.bracketindex = context.bracketIndex
-		bracketData.groupRoundIndex = context.groupRoundIndex
-		bracketData.sectionheader = context.sectionHeader
-		bracketData.dateheader = Logic.readBool(match.dateheader) or nil
-	end
+			match.parent = context.tournamentParent
+			bracketData.bracketindex = context.bracketIndex
+			bracketData.groupRoundIndex = context.groupRoundIndex
+			bracketData.sectionheader = context.sectionHeader
+			bracketData.dateheader = Logic.readBool(match.dateheader) or nil
 
-	return matches
+			local nextMatchId = bracketId .. '_' .. MatchGroupUtil.matchIdFromKey(matchIndex + 1)
+			bracketData.next = matchIndex ~= #matchKeys and nextMatchId or nil
+
+			return match
+		end
+	)
 end
 
 function MatchGroupInput.readBracket(bracketId, args, options)
