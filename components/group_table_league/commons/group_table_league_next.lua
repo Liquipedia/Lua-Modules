@@ -847,8 +847,8 @@ function GroupTableLeague.computeRoundStatus(groupTable)
 	end)
 
 	local roundStarted = tableProps.isLive
-		or tableProps.headerTime and tableProps.headerTime <= os.time()
-		or firstExactMatchTime() and firstExactMatchTime() <= os.time()
+		or (tableProps.headerTime and tableProps.headerTime <= os.time())
+		or (firstExactMatchTime() and firstExactMatchTime() <= os.time())
 		or Array.any(records, function(record) return Logic.readBool(record.finished) end)
 
 	local isLive = Logic.nilOr(
