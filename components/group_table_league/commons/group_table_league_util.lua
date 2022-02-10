@@ -169,7 +169,8 @@ end
 function GroupTableLeagueUtil.importRounds(rounds, matchRecords, config)
 	if config.importRounds then
 		local lpdbStartTimes = GroupTableLeagueUtil.computeStartTimesFromSections(config.importRoundCount, matchRecords)
-		GroupTableLeagueUtil.mergeRounds(rounds, config.importRoundCount, lpdbStartTimes)
+		local lpdbEndTime = GroupTableLeagueUtil.computeEndTime(matchRecords)
+		GroupTableLeagueUtil.mergeRounds(rounds, config.importRoundCount, lpdbStartTimes, lpdbEndTime)
 	end
 end
 
@@ -196,7 +197,23 @@ function GroupTableLeagueUtil.computeStartTimesFromSections(importRoundCount, ma
 	return startTimes
 end
 
-function GroupTableLeagueUtil.mergeRounds(rounds, importRoundCount, lpdbStartTimes)
+--[[
+Infer the end time of the last round to be the a hour after the final match.
+]]
+function GroupTableLeagueUtil.computeEndTime(matchRecords)
+	local lastMatch = matchRecords[#matchRecords]
+	if lastMatch then
+		local date = DateExt.readTimestamp(lastMatch.date)
+		return Logic.readBool(lastMatch.dateexact)
+			and date + 3600
+			or date + 24 * 3600
+	else
+		return nil
+	end
+end
+
+function GroupTableLeagueUtil.mergeRounds(rounds, importRoundCount, lpdbStartTimes, lpdbEndTime)
+	assert(#rounds > 0)
 	local roundCount = math.max(
 		#rounds,
 		importRoundCount or 0,
@@ -212,10 +229,17 @@ function GroupTableLeagueUtil.mergeRounds(rounds, importRoundCount, lpdbStartTim
 		startTimes[roundIx] = math.min(startTime, nextStartTime)
 	end
 
+	local endTime = math.max(
+		startTimes[#startTimes],
+		rounds[#rounds].range[2] ~= DateExt.maxTimestamp and rounds[#rounds].range[2]
+			or lpdbEndTime
+			or DateExt.maxTimestamp
+	)
+
 	local newRounds = Array.map(startTimes, function(startTime, roundIx)
 		local range = {
 			startTime,
-			startTimes[roundIx + 1] or DateExt.maxTimestamp,
+			startTimes[roundIx + 1] or endTime,
 		}
 		return {range = range}
 	end)
