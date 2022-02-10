@@ -78,7 +78,7 @@ local _PREFIXES = {
 	reddit = {'https://www.reddit.com/user/'},
 	rulebook = {''},
 	rules = {''},
-	siegegg = {
+	['siege-gg'] = {
 		'https://siege.gg/competitions/',
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
@@ -193,7 +193,7 @@ function Links.transform(links)
 		playlist = links.playlist,
 		reddit = links.reddit,
 		rules = links.rules or links.rulebook,
-		siegegg = links.siegegg,
+		['siege-gg'] = links.siegegg,
 		['smash-gg'] = links.smashgg,
 		snapchat = links.snapchat,
 		sostronk = links.sostronk,
