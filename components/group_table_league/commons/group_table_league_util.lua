@@ -19,6 +19,9 @@ local Wdl = require('Module:Wdl')
 
 local GroupTableLeagueUtil = {}
 
+local _HOURS_PER_DAY = 24
+local _SECONDS_PER_HOUR = 3600
+
 GroupTableLeagueUtil.blankResult = {
 	bg = nil,
 	dq = nil,
@@ -205,8 +208,8 @@ function GroupTableLeagueUtil.computeEndTime(matchRecords)
 	if lastMatch then
 		local date = DateExt.readTimestamp(lastMatch.date)
 		return Logic.readBool(lastMatch.dateexact)
-			and date + 3600
-			or date + 24 * 3600
+			and date + _SECONDS_PER_HOUR
+			or date + _HOURS_PER_DAY * _SECONDS_PER_HOUR
 	else
 		return nil
 	end
