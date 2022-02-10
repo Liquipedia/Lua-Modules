@@ -258,6 +258,13 @@ function Table.mapInterleavedPrefix(args, prefixes, f)
 	return Table.mapInterleaved(args, indexFromKey, f)
 end
 
+--[[
+Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
+from an arguments table, and applies a transform to each key or index.
+
+Most common use-case will be `Table.mapInterleavedPrefix` where
+the `indexFromKey` function retrieves keys based on a prefix.
+]]
 function Table.mapInterleaved(args, indexFromKey, f)
 	local entriesByIndex = {}
 
