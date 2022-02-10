@@ -14,6 +14,7 @@ local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local DisplayUtil = require('Module:DisplayUtil')
 local Flags = require('Module:Flags')
+local FnUtil = require('Module:FnUtil')
 local GeneralCollapsible = require('Module:GeneralCollapsible')
 local Json = require('Module:Json')
 local JsonExt = require('Module:Json/Ext')
@@ -840,27 +841,15 @@ function GroupTableLeague.computeRoundStatus(groupTable)
 	local currentRoundIndex = GroupTableLeague.getCurrentRoundIndex(groupTable.rounds)
 	local records = groupTable.matchRecordsByRound[currentRoundIndex]
 
-	local function getRoundStartTime()
-		-- Use exact start time of first match if known
-		if #records > 0 and Logic.readBool(records[1].dateexact) then
-			return DateExt.readTimestamp(records[1].date)
-
-		-- Otherwise use date param if specified
-		elseif tableProps.headerTime then
-			return tableProps.headerTime
-
-		-- Otherwise use inexact start time of first match
-		elseif #records > 0 then
-			return DateExt.readTimestamp(records[1].date)
-
-		-- Fallback: Round has already started
-		else
-			return groupTable.rounds[currentRoundIndex].range[1]
-		end
-	end
+	local firstExactMatchTime = FnUtil.memoize(function()
+		local firstWithTime = Array.find(records, function(record) return Logic.readBool(record.dateexact) end)
+		return firstWithTime and DateExt.readTimestamp(firstWithTime.date)
+	end)
 
 	local roundStarted = tableProps.isLive
-		or getRoundStartTime() <= os.time()
+		or tableProps.headerTime and tableProps.headerTime <= os.time()
+		or firstExactMatchTime() and firstExactMatchTime() <= os.time()
+		or Array.any(records, function(record) return Logic.readBool(record.finished) end)
 
 	local isLive = Logic.nilOr(
 		tableProps.isLive,
