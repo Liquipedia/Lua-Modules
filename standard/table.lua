@@ -245,7 +245,7 @@ f(3, 3)
 f('player4', 4, 'player')
 
 ]]
-function Table.mapInterleavedPrefix(args, prefixes, f)
+function Table.mapArgumentsByPrefix(args, prefixes, f)
 	local function indexFromKey(key)
 		local prefix, index = key:match('^([%a_]+)(%d+)$')
 		if Table.includes(prefixes, prefix) then
@@ -255,7 +255,7 @@ function Table.mapInterleavedPrefix(args, prefixes, f)
 		end
 	end
 
-	return Table.mapInterleaved(args, indexFromKey, f)
+	return Table.mapArguments(args, indexFromKey, f)
 end
 
 --[[
@@ -265,7 +265,7 @@ from an arguments table, and applies a transform to each key or index.
 Most common use-case will be `Table.mapInterleavedPrefix` where
 the `indexFromKey` function retrieves keys based on a prefix.
 ]]
-function Table.mapInterleaved(args, indexFromKey, f)
+function Table.mapArguments(args, indexFromKey, f)
 	local entriesByIndex = {}
 
 	-- Non-numeric args
