@@ -23,12 +23,8 @@ local globalVars = PageVariableNamespace({cached = true})
 
 local MatchGroupInput = {}
 
-
---remove this once #1050 is merged;;; use module:Table instead
-local TournamentUtil = require('Module:Tournament/Util')
-
 function MatchGroupInput.readMatchlist(bracketId, args)
-	local matchKeys = TournamentUtil.mapInterleavedPrefix(args, {'M'}, FnUtil.identity)
+	local matchKeys = Table.mapInterleavedPrefix(args, {'M'}, FnUtil.identity)
 
 	return Array.map(matchKeys, function(matchKey, matchIndex)
 			local matchId = string.format('%04d', matchIndex)
