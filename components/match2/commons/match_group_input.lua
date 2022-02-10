@@ -24,7 +24,7 @@ local globalVars = PageVariableNamespace({cached = true})
 local MatchGroupInput = {}
 
 function MatchGroupInput.readMatchlist(bracketId, args)
-	local matchKeys = Table.mapInterleavedPrefix(args, {'M'}, FnUtil.identity)
+	local matchKeys = Table.mapArgumentsByPrefix(args, {'M'}, FnUtil.identity)
 
 	return Array.map(matchKeys, function(matchKey, matchIndex)
 			local matchId = string.format('%04d', matchIndex)
