@@ -198,7 +198,7 @@ function GroupTableLeagueUtil.computeStartTimesFromSections(importRoundCount, ma
 end
 
 --[[
-Infer the end time of the last round to be the a hour after the final match.
+Infer the end time of the last round to be an hour after the final match.
 ]]
 function GroupTableLeagueUtil.computeEndTime(matchRecords)
 	local lastMatch = matchRecords[#matchRecords]
