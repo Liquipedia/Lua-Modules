@@ -28,8 +28,6 @@ local MatchGroupInput = {}
 local TournamentUtil = require('Module:Tournament/Util')
 
 function MatchGroupInput.readMatchlist(bracketId, args)
-	local matches = {}
-
 	local matchKeys = TournamentUtil.mapInterleavedPrefix(args, {'M'}, FnUtil.identity)
 
 	return Array.map(matchKeys, function(matchKey, matchIndex)
