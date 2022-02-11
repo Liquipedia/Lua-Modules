@@ -16,6 +16,7 @@ local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local WikiSpecific = require('Module:Brkts/WikiSpecific')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
@@ -27,7 +28,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 	local matchKeys = Table.mapArgumentsByPrefix(args, {'M'}, FnUtil.identity)
 
 	return Array.map(matchKeys, function(matchKey, matchIndex)
-			local matchId = string.format('%04d', matchIndex)
+			local matchId = MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
 			local matchArgs = Json.parse(args[matchKey])
 
 			local context = MatchGroupInput.readContext(matchArgs, args)
@@ -35,7 +36,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 			matchArgs.bracketid = bracketId
 			matchArgs.matchid = matchId
-			local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
+			local match = WikiSpecific.processMatch(mw.getCurrentFrame(), matchArgs)
 
 			-- Add more fields to bracket data
 			match.bracketdata = match.bracketdata or {}
@@ -52,12 +53,16 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.sectionheader = context.sectionHeader
 			bracketData.dateheader = Logic.readBool(match.dateheader) or nil
 
-			local nextMatchId = bracketId .. '_' .. string.format('%04d', matchIndex + 1)
+			local nextMatchId = bracketId .. '_' .. MatchGroupInput._matchlistMatchIdFromIndex(matchIndex + 1)
 			bracketData.next = matchIndex ~= #matchKeys and nextMatchId or nil
 
 			return match
 		end
 	)
+end
+
+function MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
+	return string.format('%04d', matchIndex)
 end
 
 function MatchGroupInput.readBracket(bracketId, args, options)
@@ -98,7 +103,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = require('Module:Brkts/WikiSpecific').processMatch(mw.getCurrentFrame(), matchArgs)
+		local match = WikiSpecific.processMatch(mw.getCurrentFrame(), matchArgs)
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
