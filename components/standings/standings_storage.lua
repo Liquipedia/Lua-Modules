@@ -7,6 +7,7 @@
 --
 
 local Flags = require('Module:Flags')
+local Variables = require('Module:Variables')
 
 local StandingsStorage = {}
 
@@ -33,6 +34,7 @@ function StandingsStorage.run(index, data)
 
 			}),
 			standingsindex = data.standingsindex,
+			section = Variables.varDefault('last_heading', ''),
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json({data.extradata or {}})
 		}
 	)
