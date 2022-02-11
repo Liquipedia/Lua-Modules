@@ -1766,10 +1766,12 @@ local aliases = {
 	['u.s.minoroutlyingislands'] = 'unitedstatesminoroutlyingislands',
 	['global'] = 'world',
 	--needed due to lpdb length restrictions
-	--first for inside matches --> max length 20
-	--second for inside player --> max length 40
+	--for inside matches --> max length 20
 	--minus the spaces in cut of the flag names
 	['southgeorgiaandth'] = 'southgeorgiaandthesouthsandwichislands',
+	['bosniaandherzegovi'] = 'bosniaandherzegovina',
+	--for inside player --> max length 40
+	--minus the spaces in cut of the flag names
 	['southgeorgiaandthesouthsandwichisl'] = 'southgeorgiaandthesouthsandwichislands',
 
 	--language flag abbreviations
