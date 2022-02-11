@@ -262,7 +262,7 @@ end
 Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
 from an arguments table, and applies a transform to each key or index.
 
-Most common use-case will be `Table.mapInterleavedPrefix` where
+Most common use-case will be `Table.mapArgumentsByPrefix` where
 the `indexFromKey` function retrieves keys based on a prefix.
 ]]
 function Table.mapArguments(args, indexFromKey, f)
