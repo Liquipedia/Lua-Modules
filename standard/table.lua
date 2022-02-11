@@ -236,7 +236,7 @@ In the template call
 	|player4=D
 }}
 
-Table.mapInterleavedPrefix(args, {'p', 'player'}, f)
+Table.mapArgumentsByPrefix(args, {'p', 'player'}, f)
 will invoke
 
 f(1, 1)
