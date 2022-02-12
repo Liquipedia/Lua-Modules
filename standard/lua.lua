@@ -11,6 +11,9 @@ local StringUtils = require('Module:StringUtils')
 
 local Lua = {}
 
+local _DEFAULT_QUERY_LIMIT = 20
+local _DEFAULT_INITIAL_OFFSET = 0
+
 function Lua.moduleExists(name)
 	if package.loaded[name] then
 		return true
@@ -192,6 +195,51 @@ function Lua.getDefaultEntryPoints(module)
 		end
 	end
 	return fnNames
+end
+
+--[==[
+Wrapper for mass LPDB queries.
+
+example:
+	local cond = '[[match2id::!]]'
+	local query = 'match2id'
+
+	local function queryFunct(foundElements, offset, maxQueryLimit)
+		local data = mw.ext.LiquipediaDB.lpdb('match2', {
+			limit = maxQueryLimit,
+			offset = offset,
+			conditions = cond,
+			query = query,
+		})
+
+		for _, item in ipairs(data) do
+			if string.match(item.match2id, '_0001') then
+				table.insert(foundElements, item.match2id)
+			end
+		end
+
+		return foundElements, #data
+	end
+
+	local queryData = Lua.massQueryWrapper(queryFunct, 0, 5000)
+]==]
+function Lua.massQueryWrapper(funct, initialOffset, maxQueryLimit, maxRounds)
+	local offset = initialOffset or _DEFAULT_INITIAL_OFFSET
+	count = maxQueryLimit or _DEFAULT_QUERY_LIMIT
+	local count = maxQueryLimit
+	maxRounds = maxRounds or math.huge
+	local rounds = 0
+
+	local foundElements = {}
+
+	while count == maxQueryLimit and rounds < maxRounds do
+		foundElements, count = funct(foundElements, offset, maxQueryLimit)
+
+		offset = offset + maxQueryLimit
+		rounds = rounds + 1
+	end
+
+	return foundElements
 end
 
 return Lua
