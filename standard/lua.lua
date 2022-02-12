@@ -226,7 +226,6 @@ example:
 function Lua.massQueryWrapper(funct, initialOffset, maxQueryLimit, maxRounds)
 	local offset = initialOffset or _DEFAULT_INITIAL_OFFSET
 	local count = maxQueryLimit or _DEFAULT_QUERY_LIMIT
-	local count = maxQueryLimit
 	maxRounds = maxRounds or math.huge
 	local rounds = 0
 
