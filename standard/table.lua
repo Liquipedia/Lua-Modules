@@ -224,7 +224,7 @@ Extracts prefixed keys interleaved with numeric indexes from an arguments
 table, and applies a transform to each key or index.
 
 Used for template calls that support both prefixed and indexed params. See
-Module:ParticipantTable/Starcraft, Module:GroupTableLeage for examples of how
+Module:ParticipantTable/Starcraft, Module:GroupTableLeague for examples of how
 it is used.
 
 Example:
