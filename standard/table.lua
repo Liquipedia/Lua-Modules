@@ -241,7 +241,7 @@ will invoke
 
 f(1, 1)
 f('p2', 2, 'p')
-f(3, 3)
+f(2, 3)
 f('player4', 4, 'player')
 
 ]]
