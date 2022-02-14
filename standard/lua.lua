@@ -199,6 +199,8 @@ end
 
 --[==[
 Wrapper for mass LPDB queries.
+Used when > 5000 results are needed (LPDB max limit is 5000) or when
+additional filtering is to be done after the query and memory is an issue.
 
 example:
 	local cond = '[[match2id::!]]'
