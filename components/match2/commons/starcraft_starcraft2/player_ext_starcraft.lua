@@ -80,8 +80,8 @@ function StarcraftPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	local lpdbPlayer = StarcraftPlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.raceHistory then
 		date = date or TournamentUtil.getContextualDateOrNow()
-		local entry = Array.find(lpdbPlayer.raceHistory, function(entry) return entry.startDate <= date end)
-		return StarcraftPlayerExt.readRace(entry.race)
+		local entry = Array.find(lpdbPlayer.raceHistory, function(entry) return date <= entry.endDate end)
+		return entry and StarcraftPlayerExt.readRace(entry.race)
 	else
 		return lpdbPlayer and lpdbPlayer.race
 	end
@@ -110,13 +110,15 @@ function StarcraftPlayerExt.fetchRaceHistory(resolvedPageName)
 		query = 'information, extradata',
 	})
 
-	return Array.map(rows, function(row)
+	local raceHistory = Array.map(rows, function(row)
 		return {
 			endDate = row.extradata.enddate,
 			race = StarcraftPlayerExt.readRace(row.information),
 			startDate = row.extradata.startdate,
 		}
 	end)
+	Array.sortInPlaceBy(raceHistory, function(entry) return entry.startDate end)
+	return raceHistory
 end
 
 --[[
