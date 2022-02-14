@@ -90,7 +90,7 @@ function Flags.getLocalisation(args)
 			return data.localised
 		end
 	end
-		
+
 	-- Return message if none is found
 	mw.log('Unknown localisation entry: ', country)
 	local display
