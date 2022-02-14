@@ -32,14 +32,13 @@ function CustomMap:createWidgetInjector()
 end
 
 function CustomInjector:addCustomCells(widgets)
-	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Game Modes',
 		content = CustomMap._getGameMode(),
 	})
 	table.insert(widgets, Cell{
 		name = 'Checkpoints',
-		content = {args.checkpoints}
+		content = {_args.checkpoints}
 	})
 	return widgets
 end
