@@ -62,6 +62,50 @@ function Flags.Icon(args, flagName)
 	end
 end
 
+-- Returns the localisation of a country or region
+--[[
+supported args are:
+country					- country name, flag code, or alias of the Flag
+displayNoError			- boolean that decides if there should be a displayed error if no entry is found
+shouldReturnSimpleError	- boolean that decides if displayed error should be simple or detailed
+]]--
+function Flags.getLocalisation(args)
+	--avoid indexing nil
+	args = args or {}
+	local country = args.country
+
+	if String.isEmpty(country) then
+		return ''
+	end
+
+	local displayNoError = Logic.readBool(args.displayNoError)
+	local shouldReturnSimpleError = Logic.readBool(args.shouldReturnSimpleError)
+
+	-- clean the entered value
+	local countryKey = Flags._convertToKey(country)
+
+	if countryKey then
+		local data = MasterData.data[countryKey]
+		if String.isNotEmpty(data.localised) then
+			return data.localised
+		end
+	end
+		
+	-- Return message if none is found
+	mw.log('Unknown localisation entry: ', country)
+	local display
+	if displayNoError then
+		display = ''
+	elseif shouldReturnSimpleError then
+		display = 'error'
+	else
+		display = 'Unknown localisation entry "[[lpcommons:Module:Flags/MasterData' ..
+			'|' .. country .. ']][[Category:Pages with unknown countries]]'
+	end
+
+	return display
+end
+
 function Flags.languageIcon(args, langName)
 	if type(args) == 'string' then
 		langName = args
