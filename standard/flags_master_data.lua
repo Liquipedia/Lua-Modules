@@ -21,1147 +21,1427 @@
 --   Other
 local data = {
 	-- ISO 3166-1 alpha-2
-	['andorra'] = {
-		name = 'Andorra',
-		flag = 'File:ad_hd.png'
-	},
-	['unitedarabemirates'] = {
-		name = 'United Arab Emirates',
-		flag = 'File:ae_hd.png'
-	},
 	['afghanistan'] = {
+		flag = 'File:af_hd.png',
+		localised = 'Afghan',
 		name = 'Afghanistan',
-		flag = 'File:af_hd.png'
-	},
-	['antiguaandbarbuda'] = {
-		name = 'Antigua and Barbuda',
-		flag = 'File:ag_hd.png'
-	},
-	['anguilla'] = {
-		name = 'Anguilla',
-		flag = 'File:ai_hd.png'
 	},
 	['albania'] = {
+		flag = 'File:al_hd.png',
+		localised = 'Albanian',
 		name = 'Albania',
-		flag = 'File:al_hd.png'
-	},
-	['armenia'] = {
-		name = 'Armenia',
-		flag = 'File:am_hd.png'
-	},
-	['angola'] = {
-		name = 'Angola',
-		flag = 'File:ao_hd.png'
-	},
-	['antarctica'] = {
-		name = 'Antarctica',
-		flag = 'File:aq_hd.png'
-	},
-	['argentina'] = {
-		name = 'Argentina',
-		flag = 'File:ar_hd.png'
-	},
-	['americansamoa'] = {
-		name = 'American Samoa',
-		flag = 'File:as_hd.png'
-	},
-	['ascensionisland'] = {
-		name = 'Ascension Island',
-		flag = 'File:ac_hd.png'
-	},
-	['austria'] = {
-		name = 'Austria',
-		flag = 'File:at_hd.png'
-	},
-	['australia'] = {
-		name = 'Australia',
-		flag = 'File:au_hd.png'
-	},
-	['aruba'] = {
-		name = 'Aruba',
-		flag = 'File:aw_hd.png'
-	},
-	['ålandislands'] = {
-		name = 'Åland Islands',
-		flag = 'File:ax_hd.png'
-	},
-	['azerbaijan'] = {
-		name = 'Azerbaijan',
-		flag = 'File:az_hd.png'
-	},
-	['bosniaandherzegovina'] = {
-		name = 'Bosnia and Herzegovina',
-		flag = 'File:ba_hd.png'
-	},
-	['barbados'] = {
-		name = 'Barbados',
-		flag = 'File:bb_hd.png'
-	},
-	['bangladesh'] = {
-		name = 'Bangladesh',
-		flag = 'File:bd_hd.png'
-	},
-	['belgium'] = {
-		name = 'Belgium',
-		flag = 'File:be_hd.png'
-	},
-	['burkinafaso'] = {
-		name = 'Burkina Faso',
-		flag = 'File:bf_hd.png'
-	},
-	['bulgaria'] = {
-		name = 'Bulgaria',
-		flag = 'File:bg_hd.png'
-	},
-	['bahrain'] = {
-		name = 'Bahrain',
-		flag = 'File:bh_hd.png'
-	},
-	['burundi'] = {
-		name = 'Burundi',
-		flag = 'File:bi_hd.png'
-	},
-	['benin'] = {
-		name = 'Benin',
-		flag = 'File:bj_hd.png'
-	},
-	['saintbarthélemy'] = {
-		name = 'Saint Barthélemy',
-		flag = 'File:bl_hd.png'
-	},
-	['bermuda'] = {
-		name = 'Bermuda',
-		flag = 'File:bm_hd.png'
-	},
-	['brunei'] = {
-		name = 'Brunei',
-		flag = 'File:bn_hd.png'
-	},
-	['bolivia'] = {
-		name = 'Bolivia',
-		flag = 'File:bo_hd.png'
-	},
-	['bonaire,sinteustatiusandsaba'] = {
-		name = 'Bonaire, Sint Eustatius and Saba',
-		flag = 'File:bq_hd.png'
-	},
-	['brazil'] = {
-		name = 'Brazil',
-		flag = 'File:br_hd.png'
-	},
-	['bahamas'] = {
-		name = 'Bahamas',
-		flag = 'File:bs_hd.png'
-	},
-	['bhutan'] = {
-		name = 'Bhutan',
-		flag = 'File:bt_hd.png'
-	},
-	['bouvetisland'] = {
-		name = 'Bouvet Island',
-		flag = 'File:bv_hd.png'
-	},
-	['botswana'] = {
-		name = 'Botswana',
-		flag = 'File:bw_hd.png'
-	},
-	['belarus'] = {
-		name = 'Belarus',
-		flag = 'File:by_hd.png'
-	},
-	['belize'] = {
-		name = 'Belize',
-		flag = 'File:bz_hd.png'
-	},
-	['canada'] = {
-		name = 'Canada',
-		flag = 'File:ca_hd.png'
-	},
-	['cocos(keeling)islands'] = {
-		name = 'Cocos (Keeling) Islands',
-		flag = 'File:cc_hd.png'
-	},
-	['congo,democraticrepublicofthe'] = {
-		name = 'Democratic Republic of the Congo',
-		flag = 'File:cd_hd.png'
-	},
-	['centralafricanrepublic'] = {
-		name = 'Central African Republic',
-		flag = 'File:cf_hd.png'
-	},
-	['congo'] = {
-		name = 'Congo',
-		flag = 'File:cg_hd.png'
-	},
-	['switzerland'] = {
-		name = 'Switzerland',
-		flag = 'File:ch_hd.png'
-	},
-	["côted'ivoire"] = {
-		name = "Côte d'Ivoire",
-		flag = 'File:ci_hd.png'
-	},
-	['cookislands'] = {
-		name = 'Cook Islands',
-		flag = 'File:ck_hd.png'
-	},
-	['chile'] = {
-		name = 'Chile',
-		flag = 'File:cl_hd.png'
-	},
-	['cameroon'] = {
-		name = 'Cameroon',
-		flag = 'File:cm_hd.png'
-	},
-	['china'] = {
-		name = 'China',
-		flag = 'File:cn_hd.png'
-	},
-	['colombia'] = {
-		name = 'Colombia',
-		flag = 'File:co_hd.png'
-	},
-	['costarica'] = {
-		name = 'Costa Rica',
-		flag = 'File:cr_hd.png'
-	},
-	['cuba'] = {
-		name = 'Cuba',
-		flag = 'File:cu_hd.png'
-	},
-	['caboverde'] = {
-		name = 'Cabo Verde',
-		flag = 'File:cv_hd.png'
-	},
-	['curaçao'] = {
-		name = 'Curaçao',
-		flag = 'File:cw_hd.png'
-	},
-	['christmasisland'] = {
-		name = 'Christmas Island',
-		flag = 'File:cx_hd.png'
-	},
-	['cyprus'] = {
-		name = 'Cyprus',
-		flag = 'File:cy_hd.png'
-	},
-	['czechia'] = {
-		name = 'Czechia',
-		flag = 'File:cz_hd.png'
-	},
-	['germany'] = {
-		name = 'Germany',
-		flag = 'File:de_hd.png'
-	},
-	['djibouti'] = {
-		name = 'Djibouti',
-		flag = 'File:dj_hd.png'
-	},
-	['denmark'] = {
-		name = 'Denmark',
-		flag = 'File:dk_hd.png'
-	},
-	['dominica'] = {
-		name = 'Dominica',
-		flag = 'File:dm_hd.png'
-	},
-	['dominicanrepublic'] = {
-		name = 'Dominican Republic',
-		flag = 'File:do_hd.png'
 	},
 	['algeria'] = {
+		flag = 'File:dz_hd.png',
+		localised = 'Algerian',
 		name = 'Algeria',
-		flag = 'File:dz_hd.png'
 	},
-	['ecuador'] = {
-		name = 'Ecuador',
-		flag = 'File:ec_hd.png'
+	['americansamoa'] = {
+		flag = 'File:as_hd.png',
+		localised = 'American Samoan',
+		name = 'American Samoa',
 	},
-	['estonia'] = {
-		name = 'Estonia',
-		flag = 'File:ee_hd.png'
+	['andorra'] = {
+		flag = 'File:ad_hd.png',
+		localised = 'Andorran',
+		name = 'Andorra',
 	},
-	['egypt'] = {
-		name = 'Egypt',
-		flag = 'File:eg_hd.png'
+	['angola'] = {
+		flag = 'File:ao_hd.png',
+		localised = 'Angolan',
+		name = 'Angola',
 	},
-	['westernsahara'] = {
-		name = 'Western Sahara',
-		flag = 'File:eh_hd.png'
+	['anguilla'] = {
+		flag = 'File:ai_hd.png',
+		localised = 'Anguillan',
+		name = 'Anguilla',
 	},
-	['eritrea'] = {
-		name = 'Eritrea',
-		flag = 'File:er_hd.png'
+	['antarctica'] = {
+		flag = 'File:aq_hd.png',
+		localised = 'Antarctic',
+		name = 'Antarctica',
 	},
-	['spain'] = {
-		name = 'Spain',
-		flag = 'File:es_hd.png'
+	['antiguaandbarbuda'] = {
+		flag = 'File:ag_hd.png',
+		localised = 'Antigua and Barbuda',
+		name = 'Antigua and Barbuda',
 	},
-	['ethiopia'] = {
-		name = 'Ethiopia',
-		flag = 'File:et_hd.png'
+	['argentina'] = {
+		flag = 'File:ar_hd.png',
+		localised = 'Argentine',
+		name = 'Argentina',
 	},
-	['finland'] = {
-		name = 'Finland',
-		flag = 'File:fi_hd.png'
+	['armenia'] = {
+		flag = 'File:am_hd.png',
+		localised = 'Armenian',
+		name = 'Armenia',
 	},
-	['fiji'] = {
-		name = 'Fiji',
-		flag = 'File:fj_hd.png'
+	['aruba'] = {
+		flag = 'File:aw_hd.png',
+		localised = 'Aruban',
+		name = 'Aruba',
 	},
-	['falklandislands'] = {
-		name = 'Falkland Islands',
-		flag = 'File:fk_hd.png'
+	['ascensionisland'] = {
+		flag = 'File:ac_hd.png',
+		localised = '',
+		name = 'Ascension Island',
 	},
-	['federatedstatesofmicronesia'] = {
-		name = 'Federated States of Micronesia',
-		flag = 'File:fm_hd.png'
+	['australia'] = {
+		flag = 'File:au_hd.png',
+		localised = 'Australian',
+		name = 'Australia',
 	},
-	['faroeislands'] = {
-		name = 'Faroe Islands',
-		flag = 'File:fo_hd.png'
+	['austria'] = {
+		flag = 'File:at_hd.png',
+		localised = 'Austrian',
+		name = 'Austria',
 	},
-	['france'] = {
-		name = 'France',
-		flag = 'File:fr_hd.png'
+	['azerbaijan'] = {
+		flag = 'File:az_hd.png',
+		localised = 'Azerbaijani',
+		name = 'Azerbaijan',
 	},
-	['gabon'] = {
-		name = 'Gabon',
-		flag = 'File:ga_hd.png'
+	['bahamas'] = {
+		flag = 'File:bs_hd.png',
+		localised = 'Bahamian',
+		name = 'Bahamas',
 	},
-	['unitedkingdom'] = {
-		name = 'United Kingdom',
-		flag = 'File:gb_hd.png'
+	['bahrain'] = {
+		flag = 'File:bh_hd.png',
+		localised = 'Bahraini',
+		name = 'Bahrain',
 	},
-	['grenada'] = {
-		name = 'Grenada',
-		flag = 'File:gd_hd.png'
+	['bangladesh'] = {
+		flag = 'File:bd_hd.png',
+		localised = 'Bangladeshi',
+		name = 'Bangladesh',
 	},
-	['georgia'] = {
-		name = 'Georgia',
-		flag = 'File:ge_hd.png'
+	['barbados'] = {
+		flag = 'File:bb_hd.png',
+		localised = 'Barbadian',
+		name = 'Barbados',
 	},
-	['frenchguiana'] = {
-		name = 'French Guiana',
-		flag = 'File:gf_hd.png'
+	['belarus'] = {
+		flag = 'File:by_hd.png',
+		localised = 'Belarusian',
+		name = 'Belarus',
 	},
-	['guernsey'] = {
-		name = 'Guernsey',
-		flag = 'File:gg_hd.png'
+	['belgium'] = {
+		flag = 'File:be_hd.png',
+		localised = 'Belgian',
+		name = 'Belgium',
 	},
-	['ghana'] = {
-		name = 'Ghana',
-		flag = 'File:gh_hd.png'
+	['belize'] = {
+		flag = 'File:bz_hd.png',
+		localised = 'Belizean',
+		name = 'Belize',
 	},
-	['gibraltar'] = {
-		name = 'Gibraltar',
-		flag = 'File:gi_hd.png'
+	['benin'] = {
+		flag = 'File:bj_hd.png',
+		localised = 'Beninese',
+		name = 'Benin',
 	},
-	['greenland'] = {
-		name = 'Greenland',
-		flag = 'File:gl_hd.png'
+	['bermuda'] = {
+		flag = 'File:bm_hd.png',
+		localised = 'Bermudian',
+		name = 'Bermuda',
 	},
-	['gambia'] = {
-		name = 'Gambia',
-		flag = 'File:gm_hd.png'
+	['bhutan'] = {
+		flag = 'File:bt_hd.png',
+		localised = 'Bhutanese',
+		name = 'Bhutan',
 	},
-	['guinea'] = {
-		name = 'Guinea',
-		flag = 'File:gn_hd.png'
+	['bolivia'] = {
+		flag = 'File:bo_hd.png',
+		localised = 'Bolivian',
+		name = 'Bolivia',
 	},
-	['guadeloupe'] = {
-		name = 'Guadeloupe',
-		flag = 'File:gp_hd.png'
+	['bonaire,sinteustatiusandsaba'] = {
+		flag = 'File:bq_hd.png',
+		localised = '',
+		name = 'Bonaire, Sint Eustatius and Saba',
 	},
-	['equatorialguinea'] = {
-		name = 'Equatorial Guinea',
-		flag = 'File:gq_hd.png'
+	['bosniaandherzegovina'] = {
+		flag = 'File:ba_hd.png',
+		localised = 'Bosnian',
+		name = 'Bosnia and Herzegovina',
 	},
-	['greece'] = {
-		name = 'Greece',
-		flag = 'File:gr_hd.png'
+	['botswana'] = {
+		flag = 'File:bw_hd.png',
+		localised = 'Botswanan',
+		name = 'Botswana',
 	},
-	['southgeorgiaandthesouthsandwichislands'] = {
-		name = 'South Georgia and the South Sandwich Islands',
-		flag = 'File:gs_hd.png'
+	['bouvetisland'] = {
+		flag = 'File:bv_hd.png',
+		localised = '',
+		name = 'Bouvet Island',
 	},
-	['guatemala'] = {
-		name = 'Guatemala',
-		flag = 'File:gt_hd.png'
-	},
-	['guam'] = {
-		name = 'Guam',
-		flag = 'File:gu_hd.png'
-	},
-	['guinea-bissau'] = {
-		name = 'Guinea-Bissau',
-		flag = 'File:gw_hd.png'
-	},
-	['guyana'] = {
-		name = 'Guyana',
-		flag = 'File:gy_hd.png'
-	},
-	['hongkong'] = {
-		name = 'Hong Kong',
-		flag = 'File:hk_hd.png'
-	},
-	['heardislandandmcdonaldislands'] = {
-		name = 'Heard Island and McDonald Islands',
-		flag = 'File:hm_hd.png'
-	},
-	['honduras'] = {
-		name = 'Honduras',
-		flag = 'File:hn_hd.png'
-	},
-	['croatia'] = {
-		name = 'Croatia',
-		flag = 'File:hr_hd.png'
-	},
-	['haiti'] = {
-		name = 'Haiti',
-		flag = 'File:ht_hd.png'
-	},
-	['hungary'] = {
-		name = 'Hungary',
-		flag = 'File:hu_hd.png'
-	},
-	['indonesia'] = {
-		name = 'Indonesia',
-		flag = 'File:id_hd.png'
-	},
-	['ireland'] = {
-		name = 'Ireland',
-		flag = 'File:ie_hd.png'
-	},
-	['israel'] = {
-		name = 'Israel',
-		flag = 'File:il_hd.png'
-	},
-	['isleofman'] = {
-		name = 'Isle of Man',
-		flag = 'File:im_hd.png'
-	},
-	['india'] = {
-		name = 'India',
-		flag = 'File:in_hd.png'
+	['brazil'] = {
+		flag = 'File:br_hd.png',
+		localised = 'Brazilian',
+		name = 'Brazil',
 	},
 	['britishindianoceanterritory'] = {
+		flag = 'File:io_hd.png',
+		localised = 'British Indian Ocean Territory',
 		name = 'British Indian Ocean Territory',
-		flag = 'File:io_hd.png'
 	},
-	['iraq'] = {
-		name = 'Iraq',
-		flag = 'File:iq_hd.png'
+	['brunei'] = {
+		flag = 'File:bn_hd.png',
+		localised = 'Bruneian',
+		name = 'Brunei',
 	},
-	['iran'] = {
-		name = 'Iran',
-		flag = 'File:ir_hd.png'
+	['bulgaria'] = {
+		flag = 'File:bg_hd.png',
+		localised = 'Bulgarian',
+		name = 'Bulgaria',
 	},
-	['iceland'] = {
-		name = 'Iceland',
-		flag = 'File:is_hd.png'
+	['burkinafaso'] = {
+		flag = 'File:bf_hd.png',
+		localised = 'Burkinabé',
+		name = 'Burkina Faso',
 	},
-	['italy'] = {
-		name = 'Italy',
-		flag = 'File:it_hd.png'
+	['burundi'] = {
+		flag = 'File:bi_hd.png',
+		localised = 'Burundian',
+		name = 'Burundi',
 	},
-	['jersey'] = {
-		name = 'Jersey',
-		flag = 'File:je_hd.png'
-	},
-	['jamaica'] = {
-		name = 'Jamaica',
-		flag = 'File:jm_hd.png'
-	},
-	['jordan'] = {
-		name = 'Jordan',
-		flag = 'File:jo_hd.png'
-	},
-	['japan'] = {
-		name = 'Japan',
-		flag = 'File:jp_hd.png'
-	},
-	['kenya'] = {
-		name = 'Kenya',
-		flag = 'File:ke_hd.png'
-	},
-	['kyrgyzstan'] = {
-		name = 'Kyrgyzstan',
-		flag = 'File:kg_hd.png'
+	['caboverde'] = {
+		flag = 'File:cv_hd.png',
+		localised = 'Cape Verdean',
+		name = 'Cabo Verde',
 	},
 	['cambodia'] = {
+		flag = 'File:kh_hd.png',
+		localised = 'Cambodian',
 		name = 'Cambodia',
-		flag = 'File:kh_hd.png'
 	},
-	['kiribati'] = {
-		name = 'Kiribati',
-		flag = 'File:ki_hd.png'
+	['cameroon'] = {
+		flag = 'File:cm_hd.png',
+		localised = 'Cameroonian',
+		name = 'Cameroon',
 	},
-	['comoros'] = {
-		name = 'Comoros',
-		flag = 'File:km_hd.png'
-	},
-	['saintkittsandnevis'] = {
-		name = 'Saint Kitts and Nevis',
-		flag = 'File:kn_hd.png'
-	},
-	['northkorea'] = {
-		name = 'North Korea',
-		flag = 'File:kp_hd.png'
-	},
-	['southkorea'] = {
-		name = 'South Korea',
-		flag = 'File:kr_hd.png'
-	},
-	['kuwait'] = {
-		name = 'Kuwait',
-		flag = 'File:kw_hd.png'
+	['canada'] = {
+		flag = 'File:ca_hd.png',
+		localised = 'Canadian',
+		name = 'Canada',
 	},
 	['caymanislands'] = {
+		flag = 'File:ky_hd.png',
+		localised = 'Caymanian',
 		name = 'Cayman Islands',
-		flag = 'File:ky_hd.png'
 	},
-	['kazakhstan'] = {
-		name = 'Kazakhstan',
-		flag = 'File:kz_hd.png'
-	},
-	['laos'] = {
-		name = 'Laos',
-		flag = 'File:la_hd.png'
-	},
-	['lebanon'] = {
-		name = 'Lebanon',
-		flag = 'File:lb_hd.png'
-	},
-	['saintlucia'] = {
-		name = 'Saint Lucia',
-		flag = 'File:lc_hd.png'
-	},
-	['liechtenstein'] = {
-		name = 'Liechtenstein',
-		flag = 'File:li_hd.png'
-	},
-	['srilanka'] = {
-		name = 'Sri Lanka',
-		flag = 'File:lk_hd.png'
-	},
-	['liberia'] = {
-		name = 'Liberia',
-		flag = 'File:lr_hd.png'
-	},
-	['lesotho'] = {
-		name = 'Lesotho',
-		flag = 'File:ls_hd.png'
-	},
-	['lithuania'] = {
-		name = 'Lithuania',
-		flag = 'File:lt_hd.png'
-	},
-	['luxembourg'] = {
-		name = 'Luxembourg',
-		flag = 'File:lu_hd.png'
-	},
-	['latvia'] = {
-		name = 'Latvia',
-		flag = 'File:lv_hd.png'
-	},
-	['libya'] = {
-		name = 'Libya',
-		flag = 'File:ly_hd.png'
-	},
-	['morocco'] = {
-		name = 'Morocco',
-		flag = 'File:ma_hd.png'
-	},
-	['monaco'] = {
-		name = 'Monaco',
-		flag = 'File:mc_hd.png'
-	},
-	['moldova'] = {
-		name = 'Moldova',
-		flag = 'File:md_hd.png'
-	},
-	['montenegro'] = {
-		name = 'Montenegro',
-		flag = 'File:me_hd.png'
-	},
-	['saintmartin(frenchpart)'] = {
-		name = 'Saint Martin (French part)',
-		flag = 'File:mf_hd.png'
-	},
-	['madagascar'] = {
-		name = 'Madagascar',
-		flag = 'File:mg_hd.png'
-	},
-	['marshallislands'] = {
-		name = 'Marshall Islands',
-		flag = 'File:mh_hd.png'
-	},
-	['northmacedonia'] = {
-		name = 'North Macedonia',
-		flag = 'File:mk_hd.png'
-	},
-	['mali'] = {
-		name = 'Mali',
-		flag = 'File:ml_hd.png'
-	},
-	['myanmar'] = {
-		name = 'Myanmar',
-		flag = 'File:mm_hd.png'
-	},
-	['mongolia'] = {
-		name = 'Mongolia',
-		flag = 'File:mn_hd.png'
-	},
-	['macau'] = {
-		name = 'Macau',
-		flag = 'File:mo_hd.png'
-	},
-	['northernmarianaislands'] = {
-		name = 'Northern Mariana Islands',
-		flag = 'File:mp_hd.png'
-	},
-	['martinique'] = {
-		name = 'Martinique',
-		flag = 'File:mq_hd.png'
-	},
-	['mauritania'] = {
-		name = 'Mauritania',
-		flag = 'File:mr_hd.png'
-	},
-	['montserrat'] = {
-		name = 'Montserrat',
-		flag = 'File:ms_hd.png'
-	},
-	['malta'] = {
-		name = 'Malta',
-		flag = 'File:mt_hd.png'
-	},
-	['mauritius'] = {
-		name = 'Mauritius',
-		flag = 'File:mu_hd.png'
-	},
-	['maldives'] = {
-		name = 'Maldives',
-		flag = 'File:mv_hd.png'
-	},
-	['malawi'] = {
-		name = 'Malawi',
-		flag = 'File:mw_hd.png'
-	},
-	['mexico'] = {
-		name = 'Mexico',
-		flag = 'File:mx_hd.png'
-	},
-	['malaysia'] = {
-		name = 'Malaysia',
-		flag = 'File:my_hd.png'
-	},
-	['mozambique'] = {
-		name = 'Mozambique',
-		flag = 'File:mz_hd.png'
-	},
-	['namibia'] = {
-		name = 'Namibia',
-		flag = 'File:na_hd.png'
-	},
-	['newcaledonia'] = {
-		name = 'New Caledonia',
-		flag = 'File:nc_hd.png'
-	},
-	['niger'] = {
-		name = 'Niger',
-		flag = 'File:ne_hd.png'
-	},
-	['norfolkisland'] = {
-		name = 'Norfolk Island',
-		flag = 'File:nf_hd.png'
-	},
-	['nigeria'] = {
-		name = 'Nigeria',
-		flag = 'File:ng_hd.png'
-	},
-	['nicaragua'] = {
-		name = 'Nicaragua',
-		flag = 'File:ni_hd.png'
-	},
-	['netherlands'] = {
-		name = 'Netherlands',
-		flag = 'File:nl_hd.png'
-	},
-	['norway'] = {
-		name = 'Norway',
-		flag = 'File:no_hd.png'
-	},
-	['nepal'] = {
-		name = 'Nepal',
-		flag = 'File:np_hd.png'
-	},
-	['nauru'] = {
-		name = 'Nauru',
-		flag = 'File:nr_hd.png'
-	},
-	['niue'] = {
-		name = 'Niue',
-		flag = 'File:nu_hd.png'
-	},
-	['newzealand'] = {
-		name = 'New Zealand',
-		flag = 'File:nz_hd.png'
-	},
-	['oman'] = {
-		name = 'Oman',
-		flag = 'File:om_hd.png'
-	},
-	['panama'] = {
-		name = 'Panama',
-		flag = 'File:pa_hd.png'
-	},
-	['peru'] = {
-		name = 'Peru',
-		flag = 'File:pe_hd.png'
-	},
-	['frenchpolynesia'] = {
-		name = 'French Polynesia',
-		flag = 'File:pf_hd.png'
-	},
-	['papuanewguinea'] = {
-		name = 'Papua New Guinea',
-		flag = 'File:pg_hd.png'
-	},
-	['philippines'] = {
-		name = 'Philippines',
-		flag = 'File:ph_hd.png'
-	},
-	['pakistan'] = {
-		name = 'Pakistan',
-		flag = 'File:pk_hd.png'
-	},
-	['poland'] = {
-		name = 'Poland',
-		flag = 'File:pl_hd.png'
-	},
-	['saintpierreandmiquelon'] = {
-		name = 'Saint Pierre and Miquelon',
-		flag = 'File:pm_hd.png'
-	},
-	['pitcairn'] = {
-		name = 'Pitcairn',
-		flag = 'File:pn_hd.png'
-	},
-	['puertorico'] = {
-		name = 'Puerto Rico',
-		flag = 'File:pr_hd.png'
-	},
-	['palestine'] = {
-		name = 'Palestine',
-		flag = 'File:ps_hd.png'
-	},
-	['portugal'] = {
-		name = 'Portugal',
-		flag = 'File:pt_hd.png'
-	},
-	['palau'] = {
-		name = 'Palau',
-		flag = 'File:pw_hd.png'
-	},
-	['paraguay'] = {
-		name = 'Paraguay',
-		flag = 'File:py_hd.png'
-	},
-	['qatar'] = {
-		name = 'Qatar',
-		flag = 'File:qa_hd.png'
-	},
-	['réunion'] = {
-		name = 'Réunion',
-		flag = 'File:re_hd.png'
-	},
-	['romania'] = {
-		name = 'Romania',
-		flag = 'File:ro_hd.png'
-	},
-	['serbia'] = {
-		name = 'Serbia',
-		flag = 'File:rs_hd.png'
-	},
-	['russia'] = {
-		name = 'Russia',
-		flag = 'File:ru_hd.png'
-	},
-	['rwanda'] = {
-		name = 'Rwanda',
-		flag = 'File:rw_hd.png'
-	},
-	['saudiarabia'] = {
-		name = 'Saudi Arabia',
-		flag = 'File:sa_hd.png'
-	},
-	['solomonislands'] = {
-		name = 'Solomon Islands',
-		flag = 'File:sb_hd.png'
-	},
-	['seychelles'] = {
-		name = 'Seychelles',
-		flag = 'File:sc_hd.png'
-	},
-	['sudan'] = {
-		name = 'Sudan',
-		flag = 'File:sd_hd.png'
-	},
-	['sweden'] = {
-		name = 'Sweden',
-		flag = 'File:se_hd.png'
-	},
-	['singapore'] = {
-		name = 'Singapore',
-		flag = 'File:sg_hd.png'
-	},
-	['sainthelena'] = {
-		name = 'Saint Helena',
-		flag = 'File:sh_hd.png'
-	},
-	['slovenia'] = {
-		name = 'Slovenia',
-		flag = 'File:si_hd.png'
-	},
-	['svalbardandjanmayen'] = {
-		name = 'Svalbard and Jan Mayen',
-		flag = 'File:sj_hd.png'
-	},
-	['slovakia'] = {
-		name = 'Slovakia',
-		flag = 'File:sk_hd.png'
-	},
-	['sierraleone'] = {
-		name = 'Sierra Leone',
-		flag = 'File:sl_hd.png'
-	},
-	['sanmarino'] = {
-		name = 'San Marino',
-		flag = 'File:sm_hd.png'
-	},
-	['senegal'] = {
-		name = 'Senegal',
-		flag = 'File:sn_hd.png'
-	},
-	['somalia'] = {
-		name = 'Somalia',
-		flag = 'File:so_hd.png'
-	},
-	['suriname'] = {
-		name = 'Suriname',
-		flag = 'File:sr_hd.png'
-	},
-	['southsudan'] = {
-		name = 'South Sudan',
-		flag = 'File:ss_hd.png'
-	},
-	['saotomeandprincipe'] = {
-		name = 'Sao Tome and Principe',
-		flag = 'File:st_hd.png'
-	},
-	['elsalvador'] = {
-		name = 'El Salvador',
-		flag = 'File:sv_hd.png'
-	},
-	['sintmaarten(dutchpart)'] = {
-		name = 'Sint Maarten (Dutch part)',
-		flag = 'File:sx_hd.png'
-	},
-	['syria'] = {
-		name = 'Syria',
-		flag = 'File:sy_hd.png'
-	},
-	['eswatini'] = {
-		name = 'Eswatini',
-		flag = 'File:sz_hd.png'
-	},
-	['turksandcaicosislands'] = {
-		name = 'Turks and Caicos Islands',
-		flag = 'File:tc_hd.png'
+	['centralafricanrepublic'] = {
+		flag = 'File:cf_hd.png',
+		localised = 'Central African',
+		name = 'Central African Republic',
 	},
 	['chad'] = {
+		flag = 'File:td_hd.png',
+		localised = 'Chadian',
 		name = 'Chad',
-		flag = 'File:td_hd.png'
+	},
+	['chile'] = {
+		flag = 'File:cl_hd.png',
+		localised = 'Chilean',
+		name = 'Chile',
+	},
+	['china'] = {
+		flag = 'File:cn_hd.png',
+		localised = 'Chinese',
+		name = 'China',
+	},
+	['christmasisland'] = {
+		flag = 'File:cx_hd.png',
+		localised = '',
+		name = 'Christmas Island',
+	},
+	['cocos(keeling)islands'] = {
+		flag = 'File:cc_hd.png',
+		localised = '',
+		name = 'Cocos (Keeling) Islands',
+	},
+	['colombia'] = {
+		flag = 'File:co_hd.png',
+		localised = 'Colombian',
+		name = 'Colombia',
+	},
+	['comoros'] = {
+		flag = 'File:km_hd.png',
+		localised = 'Comorian',
+		name = 'Comoros',
+	},
+	['congo'] = {
+		flag = 'File:cg_hd.png',
+		localised = '',
+		name = 'Congo',
+	},
+	['congo,democraticrepublicofthe'] = {
+		flag = 'File:cd_hd.png',
+		localised = 'Congolese',
+		name = 'Democratic Republic of the Congo',
+	},
+	['cookislands'] = {
+		flag = 'File:ck_hd.png',
+		localised = 'Cook Island',
+		name = 'Cook Islands',
+	},
+	['costarica'] = {
+		flag = 'File:cr_hd.png',
+		localised = 'Costa Rican',
+		name = 'Costa Rica',
+	},
+	['croatia'] = {
+		flag = 'File:hr_hd.png',
+		localised = 'Croatian',
+		name = 'Croatia',
+	},
+	['cuba'] = {
+		flag = 'File:cu_hd.png',
+		localised = 'Cuban',
+		name = 'Cuba',
+	},
+	['curaçao'] = {
+		flag = 'File:cw_hd.png',
+		localised = 'Curaçaoan',
+		name = 'Curaçao',
+	},
+	['cyprus'] = {
+		flag = 'File:cy_hd.png',
+		localised = 'Cypriot',
+		name = 'Cyprus',
+	},
+	['czechia'] = {
+		flag = 'File:cz_hd.png',
+		localised = 'Czech',
+		name = 'Czechia',
+	},
+	['côted\'ivoire'] = {
+		flag = 'File:ci_hd.png',
+		localised = 'Ivorian',
+		name = 'Côte d\'Ivoire',
+	},
+	['denmark'] = {
+		flag = 'File:dk_hd.png',
+		localised = 'Danish',
+		name = 'Denmark',
+	},
+	['djibouti'] = {
+		flag = 'File:dj_hd.png',
+		localised = 'Djiboutian',
+		name = 'Djibouti',
+	},
+	['dominica'] = {
+		flag = 'File:dm_hd.png',
+		localised = 'Dominica',
+		name = 'Dominica',
+	},
+	['dominicanrepublic'] = {
+		flag = 'File:do_hd.png',
+		localised = 'Dominican',
+		name = 'Dominican Republic',
+	},
+	['ecuador'] = {
+		flag = 'File:ec_hd.png',
+		localised = 'Ecuadorian',
+		name = 'Ecuador',
+	},
+	['egypt'] = {
+		flag = 'File:eg_hd.png',
+		localised = 'Egyptian',
+		name = 'Egypt',
+	},
+	['elsalvador'] = {
+		flag = 'File:sv_hd.png',
+		localised = 'Salvadoran',
+		name = 'El Salvador',
+	},
+	['equatorialguinea'] = {
+		flag = 'File:gq_hd.png',
+		localised = 'Equatoguinean',
+		name = 'Equatorial Guinea',
+	},
+	['eritrea'] = {
+		flag = 'File:er_hd.png',
+		localised = 'Eritrean',
+		name = 'Eritrea',
+	},
+	['estonia'] = {
+		flag = 'File:ee_hd.png',
+		localised = 'Estonian',
+		name = 'Estonia',
+	},
+	['eswatini'] = {
+		flag = 'File:sz_hd.png',
+		localised = 'Swazi',
+		name = 'Eswatini',
+	},
+	['ethiopia'] = {
+		flag = 'File:et_hd.png',
+		localised = 'Ethiopian',
+		name = 'Ethiopia',
+	},
+	['falklandislands'] = {
+		flag = 'File:fk_hd.png',
+		localised = 'Falkland Islands',
+		name = 'Falkland Islands',
+	},
+	['faroeislands'] = {
+		flag = 'File:fo_hd.png',
+		localised = 'Faeroese',
+		name = 'Faroe Islands',
+	},
+	['federatedstatesofmicronesia'] = {
+		flag = 'File:fm_hd.png',
+		localised = 'Micronesian',
+		name = 'Federated States of Micronesia',
+	},
+	['fiji'] = {
+		flag = 'File:fj_hd.png',
+		localised = 'Fijian',
+		name = 'Fiji',
+	},
+	['finland'] = {
+		flag = 'File:fi_hd.png',
+		localised = 'Finnish',
+		name = 'Finland',
+	},
+	['france'] = {
+		flag = 'File:fr_hd.png',
+		localised = 'French',
+		name = 'France',
+	},
+	['frenchguiana'] = {
+		flag = 'File:gf_hd.png',
+		localised = 'French Guianan',
+		name = 'French Guiana',
+	},
+	['frenchpolynesia'] = {
+		flag = 'File:pf_hd.png',
+		localised = 'French Polynesian',
+		name = 'French Polynesia',
 	},
 	['frenchsouthernterritories'] = {
+		flag = 'File:tf_hd.png',
+		localised = '',
 		name = 'French Southern Territories',
-		flag = 'File:tf_hd.png'
 	},
-	['togo'] = {
-		name = 'Togo',
-		flag = 'File:tg_hd.png'
+	['gabon'] = {
+		flag = 'File:ga_hd.png',
+		localised = 'Gabonese',
+		name = 'Gabon',
 	},
-	['thailand'] = {
-		name = 'Thailand',
-		flag = 'File:th_hd.png'
+	['gambia'] = {
+		flag = 'File:gm_hd.png',
+		localised = 'Gambian',
+		name = 'Gambia',
 	},
-	['tajikistan'] = {
-		name = 'Tajikistan',
-		flag = 'File:tj_hd.png'
+	['georgia'] = {
+		flag = 'File:ge_hd.png',
+		localised = 'Georgian',
+		name = 'Georgia',
 	},
-	['tokelau'] = {
-		name = 'Tokelau',
-		flag = 'File:tk_hd.png'
+	['germany'] = {
+		flag = 'File:de_hd.png',
+		localised = 'German',
+		name = 'Germany',
 	},
-	['timor-leste'] = {
-		name = 'Timor-Leste',
-		flag = 'File:tl_hd.png'
+	['ghana'] = {
+		flag = 'File:gh_hd.png',
+		localised = 'Ghanaian',
+		name = 'Ghana',
 	},
-	['turkmenistan'] = {
-		name = 'Turkmenistan',
-		flag = 'File:tm_hd.png'
+	['gibraltar'] = {
+		flag = 'File:gi_hd.png',
+		localised = 'Gibraltarian',
+		name = 'Gibraltar',
 	},
-	['tunisia'] = {
-		name = 'Tunisia',
-		flag = 'File:tn_hd.png'
+	['greece'] = {
+		flag = 'File:gr_hd.png',
+		localised = 'Greek',
+		name = 'Greece',
 	},
-	['tonga'] = {
-		name = 'Tonga',
-		flag = 'File:to_hd.png'
+	['greenland'] = {
+		flag = 'File:gl_hd.png',
+		localised = 'Greenlandic',
+		name = 'Greenland',
 	},
-	['turkey'] = {
-		name = 'Turkey',
-		flag = 'File:tr_hd.png'
+	['grenada'] = {
+		flag = 'File:gd_hd.png',
+		localised = 'Grenadian',
+		name = 'Grenada',
 	},
-	['tristandacunha'] = {
-		name = 'Tristan da Cunha',
-		flag = 'File:sh-ta hd.png'
+	['guadeloupe'] = {
+		flag = 'File:gp_hd.png',
+		localised = 'Guadeloupean',
+		name = 'Guadeloupe',
 	},
-	['trinidadandtobago'] = {
-		name = 'Trinidad and Tobago',
-		flag = 'File:tt_hd.png'
+	['guam'] = {
+		flag = 'File:gu_hd.png',
+		localised = 'Guamanian',
+		name = 'Guam',
 	},
-	['tuvalu'] = {
-		name = 'Tuvalu',
-		flag = 'File:tv_hd.png'
+	['guatemala'] = {
+		flag = 'File:gt_hd.png',
+		localised = 'Guatemalan',
+		name = 'Guatemala',
 	},
-	['taiwan'] = {
-		name = 'Taiwan',
-		flag = 'File:tw_hd.png'
+	['guernsey'] = {
+		flag = 'File:gg_hd.png',
+		localised = 'Guernsey',
+		name = 'Guernsey',
 	},
-	['tanzania'] = {
-		name = 'Tanzania',
-		flag = 'File:tz_hd.png'
+	['guinea'] = {
+		flag = 'File:gn_hd.png',
+		localised = 'Guinean',
+		name = 'Guinea',
 	},
-	['ukraine'] = {
-		name = 'Ukraine',
-		flag = 'File:ua_hd.png'
+	['guinea-bissau'] = {
+		flag = 'File:gw_hd.png',
+		localised = 'Bissau-Guinean',
+		name = 'Guinea-Bissau',
 	},
-	['uganda'] = {
-		name = 'Uganda',
-		flag = 'File:ug_hd.png'
+	['guyana'] = {
+		flag = 'File:gy_hd.png',
+		localised = 'Guyanese',
+		name = 'Guyana',
 	},
-	['unitedstatesminoroutlyingislands'] = {
-		name = 'United States Minor Outlying Islands',
-		flag = 'File:um_hd.png'
+	['haiti'] = {
+		flag = 'File:ht_hd.png',
+		localised = 'Haitian',
+		name = 'Haiti',
 	},
-	['unitedstates'] = {
-		name = 'United States',
-		flag = 'File:us_hd.png'
+	['heardislandandmcdonaldislands'] = {
+		flag = 'File:hm_hd.png',
+		localised = '',
+		name = 'Heard Island and McDonald Islands',
 	},
-	['uruguay'] = {
-		name = 'Uruguay',
-		flag = 'File:uy_hd.png'
+	['honduras'] = {
+		flag = 'File:hn_hd.png',
+		localised = 'Honduran',
+		name = 'Honduras',
 	},
-	['uzbekistan'] = {
-		name = 'Uzbekistan',
-		flag = 'File:uz_hd.png'
+	['hongkong'] = {
+		flag = 'File:hk_hd.png',
+		localised = 'Hong Kong',
+		name = 'Hong Kong',
 	},
-	['vaticancity'] = {
-		name = 'Vatican City',
-		flag = 'File:va_hd.png'
+	['hungary'] = {
+		flag = 'File:hu_hd.png',
+		localised = 'Hungarian',
+		name = 'Hungary',
 	},
-	['saintvincentandthegrenadines'] = {
-		name = 'Saint Vincent and the Grenadines',
-		flag = 'File:vc_hd.png'
+	['iceland'] = {
+		flag = 'File:is_hd.png',
+		localised = 'Icelandic',
+		name = 'Iceland',
 	},
-	['venezuela'] = {
-		name = 'Venezuela',
-		flag = 'File:ve_hd.png'
+	['india'] = {
+		flag = 'File:in_hd.png',
+		localised = 'Indian',
+		name = 'India',
 	},
-	['virginislands(british)'] = {
-		name = 'Virgin Islands (British)',
-		flag = 'File:vg_hd.png'
+	['indonesia'] = {
+		flag = 'File:id_hd.png',
+		localised = 'Indonesian',
+		name = 'Indonesia',
 	},
-	['virginislands(u.s.)'] = {
-		name = 'Virgin Islands (U.S.)',
-		flag = 'File:vi_hd.png'
+	['iran'] = {
+		flag = 'File:ir_hd.png',
+		localised = 'Iranian',
+		name = 'Iran',
 	},
-	['vietnam'] = {
-		name = 'Vietnam',
-		flag = 'File:vn_hd.png'
+	['iraq'] = {
+		flag = 'File:iq_hd.png',
+		localised = 'Iraqi',
+		name = 'Iraq',
 	},
-	['vanuatu'] = {
-		name = 'Vanuatu',
-		flag = 'File:vu_hd.png'
+	['ireland'] = {
+		flag = 'File:ie_hd.png',
+		localised = 'Irish',
+		name = 'Ireland',
 	},
-	['wallisandfutuna'] = {
-		name = 'Wallis and Futuna',
-		flag = 'File:wf_hd.png'
+	['isleofman'] = {
+		flag = 'File:im_hd.png',
+		localised = 'Manx',
+		name = 'Isle of Man',
 	},
-	['samoa'] = {
-		name = 'Samoa',
-		flag = 'File:ws_hd.png'
+	['israel'] = {
+		flag = 'File:il_hd.png',
+		localised = 'Israeli',
+		name = 'Israel',
 	},
-	['yemen'] = {
-		name = 'Yemen',
-		flag = 'File:ye_hd.png'
+	['italy'] = {
+		flag = 'File:it_hd.png',
+		localised = 'Italian',
+		name = 'Italy',
+	},
+	['jamaica'] = {
+		flag = 'File:jm_hd.png',
+		localised = 'Jamaican',
+		name = 'Jamaica',
+	},
+	['japan'] = {
+		flag = 'File:jp_hd.png',
+		localised = 'Japanese',
+		name = 'Japan',
+	},
+	['jersey'] = {
+		flag = 'File:je_hd.png',
+		localised = 'Jersey',
+		name = 'Jersey',
+	},
+	['jordan'] = {
+		flag = 'File:jo_hd.png',
+		localised = 'Jordanian',
+		name = 'Jordan',
+	},
+	['kazakhstan'] = {
+		flag = 'File:kz_hd.png',
+		localised = 'Kazakhstani',
+		name = 'Kazakhstan',
+	},
+	['kenya'] = {
+		flag = 'File:ke_hd.png',
+		localised = 'Kenyan',
+		name = 'Kenya',
+	},
+	['kiribati'] = {
+		flag = 'File:ki_hd.png',
+		localised = 'I-Kiribati',
+		name = 'Kiribati',
+	},
+	['kuwait'] = {
+		flag = 'File:kw_hd.png',
+		localised = 'Kuwaiti',
+		name = 'Kuwait',
+	},
+	['kyrgyzstan'] = {
+		flag = 'File:kg_hd.png',
+		localised = 'Kyrgyz',
+		name = 'Kyrgyzstan',
+	},
+	['laos'] = {
+		flag = 'File:la_hd.png',
+		localised = 'Laotian',
+		name = 'Laos',
+	},
+	['latvia'] = {
+		flag = 'File:lv_hd.png',
+		localised = 'Latvian',
+		name = 'Latvia',
+	},
+	['lebanon'] = {
+		flag = 'File:lb_hd.png',
+		localised = 'Lebanese',
+		name = 'Lebanon',
+	},
+	['lesotho'] = {
+		flag = 'File:ls_hd.png',
+		localised = 'Basotho',
+		name = 'Lesotho',
+	},
+	['liberia'] = {
+		flag = 'File:lr_hd.png',
+		localised = 'Liberian',
+		name = 'Liberia',
+	},
+	['libya'] = {
+		flag = 'File:ly_hd.png',
+		localised = 'Libyan',
+		name = 'Libya',
+	},
+	['liechtenstein'] = {
+		flag = 'File:li_hd.png',
+		localised = 'Liechtensteiner',
+		name = 'Liechtenstein',
+	},
+	['lithuania'] = {
+		flag = 'File:lt_hd.png',
+		localised = 'Lithuanian',
+		name = 'Lithuania',
+	},
+	['luxembourg'] = {
+		flag = 'File:lu_hd.png',
+		localised = 'Luxembourger',
+		name = 'Luxembourg',
+	},
+	['macau'] = {
+		flag = 'File:mo_hd.png',
+		localised = 'Macau',
+		name = 'Macau',
+	},
+	['madagascar'] = {
+		flag = 'File:mg_hd.png',
+		localised = 'Malagasy',
+		name = 'Madagascar',
+	},
+	['malawi'] = {
+		flag = 'File:mw_hd.png',
+		localised = 'Malawian',
+		name = 'Malawi',
+	},
+	['malaysia'] = {
+		flag = 'File:my_hd.png',
+		localised = 'Malaysian',
+		name = 'Malaysia',
+	},
+	['maldives'] = {
+		flag = 'File:mv_hd.png',
+		localised = 'Maldivian',
+		name = 'Maldives',
+	},
+	['mali'] = {
+		flag = 'File:ml_hd.png',
+		localised = 'Malian',
+		name = 'Mali',
+	},
+	['malta'] = {
+		flag = 'File:mt_hd.png',
+		localised = 'Maltese',
+		name = 'Malta',
+	},
+	['marshallislands'] = {
+		flag = 'File:mh_hd.png',
+		localised = 'Marshallese',
+		name = 'Marshall Islands',
+	},
+	['martinique'] = {
+		flag = 'File:mq_hd.png',
+		localised = 'Martiniquais',
+		name = 'Martinique',
+	},
+	['mauritania'] = {
+		flag = 'File:mr_hd.png',
+		localised = 'Mauritanian',
+		name = 'Mauritania',
+	},
+	['mauritius'] = {
+		flag = 'File:mu_hd.png',
+		localised = 'Mauritian',
+		name = 'Mauritius',
 	},
 	['mayotte'] = {
+		flag = 'File:yt_hd.png',
+		localised = '',
 		name = 'Mayotte',
-		flag = 'File:yt_hd.png'
+	},
+	['mexico'] = {
+		flag = 'File:mx_hd.png',
+		localised = 'Mexican',
+		name = 'Mexico',
+	},
+	['moldova'] = {
+		flag = 'File:md_hd.png',
+		localised = 'Moldovan',
+		name = 'Moldova',
+	},
+	['monaco'] = {
+		flag = 'File:mc_hd.png',
+		localised = 'Monegasque',
+		name = 'Monaco',
+	},
+	['mongolia'] = {
+		flag = 'File:mn_hd.png',
+		localised = 'Mongolian',
+		name = 'Mongolia',
+	},
+	['montenegro'] = {
+		flag = 'File:me_hd.png',
+		localised = 'Montenegrin',
+		name = 'Montenegro',
+	},
+	['montserrat'] = {
+		flag = 'File:ms_hd.png',
+		localised = 'Montserratian',
+		name = 'Montserrat',
+	},
+	['morocco'] = {
+		flag = 'File:ma_hd.png',
+		localised = 'Moroccan',
+		name = 'Morocco',
+	},
+	['mozambique'] = {
+		flag = 'File:mz_hd.png',
+		localised = 'Mozambican',
+		name = 'Mozambique',
+	},
+	['myanmar'] = {
+		flag = 'File:mm_hd.png',
+		localised = 'Burmese',
+		name = 'Myanmar',
+	},
+	['namibia'] = {
+		flag = 'File:na_hd.png',
+		localised = 'Namibian',
+		name = 'Namibia',
+	},
+	['nauru'] = {
+		flag = 'File:nr_hd.png',
+		localised = 'Nauruan',
+		name = 'Nauru',
+	},
+	['nepal'] = {
+		flag = 'File:np_hd.png',
+		localised = 'Nepalese',
+		name = 'Nepal',
+	},
+	['netherlands'] = {
+		flag = 'File:nl_hd.png',
+		localised = 'Dutch',
+		name = 'Netherlands',
+	},
+	['newcaledonia'] = {
+		flag = 'File:nc_hd.png',
+		localised = 'New Caledonian',
+		name = 'New Caledonia',
+	},
+	['newzealand'] = {
+		flag = 'File:nz_hd.png',
+		localised = 'New Zealand',
+		name = 'New Zealand',
+	},
+	['nicaragua'] = {
+		flag = 'File:ni_hd.png',
+		localised = 'Nicaraguan',
+		name = 'Nicaragua',
+	},
+	['niger'] = {
+		flag = 'File:ne_hd.png',
+		localised = 'Nigerien',
+		name = 'Niger',
+	},
+	['nigeria'] = {
+		flag = 'File:ng_hd.png',
+		localised = 'Nigerian',
+		name = 'Nigeria',
+	},
+	['niue'] = {
+		flag = 'File:nu_hd.png',
+		localised = 'Niuean',
+		name = 'Niue',
+	},
+	['norfolkisland'] = {
+		flag = 'File:nf_hd.png',
+		localised = '',
+		name = 'Norfolk Island',
+	},
+	['northernmarianaislands'] = {
+		flag = 'File:mp_hd.png',
+		localised = 'Northern Mariana Islands',
+		name = 'Northern Mariana Islands',
+	},
+	['northkorea'] = {
+		flag = 'File:kp_hd.png',
+		localised = 'North Korean',
+		name = 'North Korea',
+	},
+	['northmacedonia'] = {
+		flag = 'File:mk_hd.png',
+		localised = 'North Macedonian',
+		name = 'North Macedonia',
+	},
+	['norway'] = {
+		flag = 'File:no_hd.png',
+		localised = 'Norwegian',
+		name = 'Norway',
+	},
+	['oman'] = {
+		flag = 'File:om_hd.png',
+		localised = 'Omani',
+		name = 'Oman',
+	},
+	['pakistan'] = {
+		flag = 'File:pk_hd.png',
+		localised = 'Pakistani',
+		name = 'Pakistan',
+	},
+	['palau'] = {
+		flag = 'File:pw_hd.png',
+		localised = 'Palauan',
+		name = 'Palau',
+	},
+	['palestine'] = {
+		flag = 'File:ps_hd.png',
+		localised = 'Palestinian',
+		name = 'Palestine',
+	},
+	['panama'] = {
+		flag = 'File:pa_hd.png',
+		localised = 'Panamanian',
+		name = 'Panama',
+	},
+	['papuanewguinea'] = {
+		flag = 'File:pg_hd.png',
+		localised = 'Papua New Guinean',
+		name = 'Papua New Guinea',
+	},
+	['paraguay'] = {
+		flag = 'File:py_hd.png',
+		localised = 'Paraguayan',
+		name = 'Paraguay',
+	},
+	['peru'] = {
+		flag = 'File:pe_hd.png',
+		localised = 'Peruvian',
+		name = 'Peru',
+	},
+	['philippines'] = {
+		flag = 'File:ph_hd.png',
+		localised = 'Filipino',
+		name = 'Philippines',
+	},
+	['pitcairn'] = {
+		flag = 'File:pn_hd.png',
+		localised = '',
+		name = 'Pitcairn',
+	},
+	['poland'] = {
+		flag = 'File:pl_hd.png',
+		localised = 'Polish',
+		name = 'Poland',
+	},
+	['portugal'] = {
+		flag = 'File:pt_hd.png',
+		localised = 'Portuguese',
+		name = 'Portugal',
+	},
+	['puertorico'] = {
+		flag = 'File:pr_hd.png',
+		localised = 'Puerto Rican',
+		name = 'Puerto Rico',
+	},
+	['qatar'] = {
+		flag = 'File:qa_hd.png',
+		localised = 'Qatari',
+		name = 'Qatar',
+	},
+	['romania'] = {
+		flag = 'File:ro_hd.png',
+		localised = 'Romanian',
+		name = 'Romania',
+	},
+	['russia'] = {
+		flag = 'File:ru_hd.png',
+		localised = 'Russian',
+		name = 'Russia',
+	},
+	['rwanda'] = {
+		flag = 'File:rw_hd.png',
+		localised = 'Rwandan',
+		name = 'Rwanda',
+	},
+	['réunion'] = {
+		flag = 'File:re_hd.png',
+		localised = 'Réunionese',
+		name = 'Réunion',
+	},
+	['saintbarthélemy'] = {
+		flag = 'File:bl_hd.png',
+		localised = '',
+		name = 'Saint Barthélemy',
+	},
+	['sainthelena'] = {
+		flag = 'File:sh_hd.png',
+		localised = '',
+		name = 'Saint Helena',
+	},
+	['saintkittsandnevis'] = {
+		flag = 'File:kn_hd.png',
+		localised = 'Saint Kitts and Nevis',
+		name = 'Saint Kitts and Nevis',
+	},
+	['saintlucia'] = {
+		flag = 'File:lc_hd.png',
+		localised = 'Saint Lucian',
+		name = 'Saint Lucia',
+	},
+	['saintmartin(frenchpart)'] = {
+		flag = 'File:mf_hd.png',
+		localised = '',
+		name = 'Saint Martin (French part)',
+	},
+	['saintpierreandmiquelon'] = {
+		flag = 'File:pm_hd.png',
+		localised = '',
+		name = 'Saint Pierre and Miquelon',
+	},
+	['saintvincentandthegrenadines'] = {
+		flag = 'File:vc_hd.png',
+		localised = 'Saint Vincent and the Grenadines',
+		name = 'Saint Vincent and the Grenadines',
+	},
+	['samoa'] = {
+		flag = 'File:ws_hd.png',
+		localised = 'Samoan',
+		name = 'Samoa',
+	},
+	['sanmarino'] = {
+		flag = 'File:sm_hd.png',
+		localised = 'Sammarinese',
+		name = 'San Marino',
+	},
+	['saotomeandprincipe'] = {
+		flag = 'File:st_hd.png',
+		localised = '',
+		name = 'Sao Tome and Principe',
+	},
+	['saudiarabia'] = {
+		flag = 'File:sa_hd.png',
+		localised = 'Saudi Arabian',
+		name = 'Saudi Arabia',
+	},
+	['senegal'] = {
+		flag = 'File:sn_hd.png',
+		localised = 'Senegalese',
+		name = 'Senegal',
+	},
+	['serbia'] = {
+		flag = 'File:rs_hd.png',
+		localised = 'Serbian',
+		name = 'Serbia',
+	},
+	['seychelles'] = {
+		flag = 'File:sc_hd.png',
+		localised = 'Scottish',
+		name = 'Seychelles',
+	},
+	['sierraleone'] = {
+		flag = 'File:sl_hd.png',
+		localised = 'Sierra Leonean',
+		name = 'Sierra Leone',
+	},
+	['singapore'] = {
+		flag = 'File:sg_hd.png',
+		localised = 'Singaporean',
+		name = 'Singapore',
+	},
+	['sintmaarten(dutchpart)'] = {
+		flag = 'File:sx_hd.png',
+		localised = '',
+		name = 'Sint Maarten (Dutch part)',
+	},
+	['slovakia'] = {
+		flag = 'File:sk_hd.png',
+		localised = 'Slovak',
+		name = 'Slovakia',
+	},
+	['slovenia'] = {
+		flag = 'File:si_hd.png',
+		localised = 'Slovenian',
+		name = 'Slovenia',
+	},
+	['solomonislands'] = {
+		flag = 'File:sb_hd.png',
+		localised = 'Solomon Islands',
+		name = 'Solomon Islands',
+	},
+	['somalia'] = {
+		flag = 'File:so_hd.png',
+		localised = 'Somali',
+		name = 'Somalia',
 	},
 	['southafrica'] = {
+		flag = 'File:za_hd.png',
+		localised = 'South African',
 		name = 'South Africa',
-		flag = 'File:za_hd.png'
+	},
+	['southgeorgiaandthesouthsandwichislands'] = {
+		flag = 'File:gs_hd.png',
+		localised = '',
+		name = 'South Georgia and the South Sandwich Islands',
+	},
+	['southkorea'] = {
+		flag = 'File:kr_hd.png',
+		localised = 'Korean',
+		name = 'South Korea',
+	},
+	['southsudan'] = {
+		flag = 'File:ss_hd.png',
+		localised = 'South Sudanese',
+		name = 'South Sudan',
+	},
+	['spain'] = {
+		flag = 'File:es_hd.png',
+		localised = 'Spanish',
+		name = 'Spain',
+	},
+	['srilanka'] = {
+		flag = 'File:lk_hd.png',
+		localised = 'Sri Lankan',
+		name = 'Sri Lanka',
+	},
+	['sudan'] = {
+		flag = 'File:sd_hd.png',
+		localised = 'Sudanese',
+		name = 'Sudan',
+	},
+	['suriname'] = {
+		flag = 'File:sr_hd.png',
+		localised = 'Surinamese',
+		name = 'Suriname',
+	},
+	['svalbardandjanmayen'] = {
+		flag = 'File:sj_hd.png',
+		localised = '',
+		name = 'Svalbard and Jan Mayen',
+	},
+	['sweden'] = {
+		flag = 'File:se_hd.png',
+		localised = 'Swedish',
+		name = 'Sweden',
+	},
+	['switzerland'] = {
+		flag = 'File:ch_hd.png',
+		localised = 'Swiss',
+		name = 'Switzerland',
+	},
+	['syria'] = {
+		flag = 'File:sy_hd.png',
+		localised = 'Syrian',
+		name = 'Syria',
+	},
+	['taiwan'] = {
+		flag = 'File:tw_hd.png',
+		localised = 'Taiwanese',
+		name = 'Taiwan',
+	},
+	['tajikistan'] = {
+		flag = 'File:tj_hd.png',
+		localised = 'Tajik',
+		name = 'Tajikistan',
+	},
+	['tanzania'] = {
+		flag = 'File:tz_hd.png',
+		localised = 'Tanzanian',
+		name = 'Tanzania',
+	},
+	['thailand'] = {
+		flag = 'File:th_hd.png',
+		localised = 'Thai',
+		name = 'Thailand',
+	},
+	['timor-leste'] = {
+		flag = 'File:tl_hd.png',
+		localised = '',
+		name = 'Timor-Leste',
+	},
+	['togo'] = {
+		flag = 'File:tg_hd.png',
+		localised = 'Togolese',
+		name = 'Togo',
+	},
+	['tokelau'] = {
+		flag = 'File:tk_hd.png',
+		localised = 'Tokelauan',
+		name = 'Tokelau',
+	},
+	['tonga'] = {
+		flag = 'File:to_hd.png',
+		localised = 'Tongan',
+		name = 'Tonga',
+	},
+	['trinidadandtobago'] = {
+		flag = 'File:tt_hd.png',
+		localised = 'Trinidadian and Tobagonians',
+		name = 'Trinidad and Tobago',
+	},
+	['tristandacunha'] = {
+		flag = 'File:sh-ta hd.png',
+		localised = '',
+		name = 'Tristan da Cunha',
+	},
+	['tunisia'] = {
+		flag = 'File:tn_hd.png',
+		localised = 'Tunisian',
+		name = 'Tunisia',
+	},
+	['turkey'] = {
+		flag = 'File:tr_hd.png',
+		localised = 'Turkish',
+		name = 'Turkey',
+	},
+	['turkmenistan'] = {
+		flag = 'File:tm_hd.png',
+		localised = 'Turkmen',
+		name = 'Turkmenistan',
+	},
+	['turksandcaicosislands'] = {
+		flag = 'File:tc_hd.png',
+		localised = 'Turks and Caicos Islands',
+		name = 'Turks and Caicos Islands',
+	},
+	['tuvalu'] = {
+		flag = 'File:tv_hd.png',
+		localised = 'Tuvaluan',
+		name = 'Tuvalu',
+	},
+	['uganda'] = {
+		flag = 'File:ug_hd.png',
+		localised = 'Ugandan',
+		name = 'Uganda',
+	},
+	['ukraine'] = {
+		flag = 'File:ua_hd.png',
+		localised = 'Ukrainian',
+		name = 'Ukraine',
+	},
+	['unitedarabemirates'] = {
+		flag = 'File:ae_hd.png',
+		localised = 'Emirati',
+		name = 'United Arab Emirates',
+	},
+	['unitedkingdom'] = {
+		flag = 'File:gb_hd.png',
+		localised = 'British',
+		name = 'United Kingdom',
+	},
+	['unitedstates'] = {
+		flag = 'File:us_hd.png',
+		localised = 'American',
+		name = 'United States',
+	},
+	['unitedstatesminoroutlyingislands'] = {
+		flag = 'File:um_hd.png',
+		localised = '',
+		name = 'United States Minor Outlying Islands',
+	},
+	['uruguay'] = {
+		flag = 'File:uy_hd.png',
+		localised = 'Uruguayan',
+		name = 'Uruguay',
+	},
+	['uzbekistan'] = {
+		flag = 'File:uz_hd.png',
+		localised = 'Uzbek',
+		name = 'Uzbekistan',
+	},
+	['vanuatu'] = {
+		flag = 'File:vu_hd.png',
+		localised = 'Vanuatuan',
+		name = 'Vanuatu',
+	},
+	['vaticancity'] = {
+		flag = 'File:va_hd.png',
+		localised = 'Vaticans',
+		name = 'Vatican City',
+	},
+	['venezuela'] = {
+		flag = 'File:ve_hd.png',
+		localised = 'Venezuelan',
+		name = 'Venezuela',
+	},
+	['vietnam'] = {
+		flag = 'File:vn_hd.png',
+		localised = 'Vietnamese',
+		name = 'Vietnam',
+	},
+	['virginislands(british)'] = {
+		flag = 'File:vg_hd.png',
+		localised = '',
+		name = 'Virgin Islands (British)',
+	},
+	['virginislands(u.s.)'] = {
+		flag = 'File:vi_hd.png',
+		localised = '',
+		name = 'Virgin Islands (U.S.)',
+	},
+	['wallisandfutuna'] = {
+		flag = 'File:wf_hd.png',
+		localised = 'Wallis and Futuna',
+		name = 'Wallis and Futuna',
+	},
+	['westernsahara'] = {
+		flag = 'File:eh_hd.png',
+		localised = '',
+		name = 'Western Sahara',
+	},
+	['yemen'] = {
+		flag = 'File:ye_hd.png',
+		localised = 'Yemeni',
+		name = 'Yemen',
 	},
 	['zambia'] = {
+		flag = 'File:zm_hd.png',
+		localised = 'Zambian',
 		name = 'Zambia',
-		flag = 'File:zm_hd.png'
 	},
 	['zimbabwe'] = {
+		flag = 'File:zw_hd.png',
+		localised = 'Zimbabwean',
 		name = 'Zimbabwe',
-		flag = 'File:zw_hd.png'
+	},
+	['ålandislands'] = {
+		flag = 'File:ax_hd.png',
+		localised = '',
+		name = 'Åland Islands',
 	},
 
 	-- ISO 3166-1 alpha-2 User-assigned Code Elements
 	['kosovo'] = {
+		flag = 'File:xk_hd.png',
+		localised = 'Kosovan',
 		name = 'Kosovo',
-		flag = 'File:xk_hd.png'
 	},
 
 	-- ISO 3166-1 alpha-2 Exceptional Reservations
 	['europeanunion'] = {
+		flag = 'File:eu_hd.png',
+		localised = 'European',
 		name = 'Europe',
-		flag = 'File:eu_hd.png'
 	},
 	['unitednations'] = {
+		flag = 'File:un_hd.png',
+		localised = 'Global',
 		name = 'United Nations',
-		flag = 'File:un_hd.png'
 	},
 	['ussr'] = {
+		flag = 'File:ussr_hd.png',
+		localised = 'Soviet',
 		name = 'USSR',
-		flag = 'File:ussr_hd.png'
 	},
 
 	-- ISO 3166-1 alpha-2 Traditional Reservations
 	['yugoslavia'] = {
+		flag = 'File:yu_hd.png',
+		localised = '',
 		name = 'Yugoslavia',
-		flag = 'File:yu_hd.png'
 	},
 
 	-- ISO 3166-2:GB
 	['england'] = {
+		flag = 'File:gb-eng hd.png',
+		localised = 'English',
 		name = 'England',
-		flag = 'File:gb-eng hd.png'
 	},
 	['northernireland'] = {
+		flag = 'File:gb-nir hd.png',
+		localised = 'Northern Irish',
 		name = 'Northern Ireland',
-		flag = 'File:gb-nir hd.png'
 	},
 	['scotland'] = {
+		flag = 'File:gb-sct hd.png',
+		localised = 'Scottish',
 		name = 'Scotland',
-		flag = 'File:gb-sct hd.png'
 	},
 	['wales'] = {
+		flag = 'File:gb-wls hd.png',
+		localised = 'Welsh',
 		name = 'Wales',
-		flag = 'File:gb-wls hd.png'
 	},
 
 	-- Other
 	['africa'] = {
+		flag = 'File:african union hd.png',
+		localised = 'African',
 		name = 'Africa',
-		flag = 'File:african union hd.png'
-	},
-	['americas'] = {
-		name = 'Americas',
-		flag = 'File:UsCa hd.png'
 	},
 	['asia'] = {
+		flag = 'File:Asia flag hd.png',
+		localised = 'Asian',
 		name = 'Asia',
-		flag = 'File:Asia flag hd.png'
 	},
 	['benelux'] = {
+		flag = 'File:benelux hd.png',
+		localised = 'Benelux',
 		name = 'Benelux',
-		flag = 'File:benelux hd.png'
 	},
 	['centralamerica'] = {
+		flag = 'File:cais flag hd.png',
+		localised = 'Central America',
 		name = 'Central America',
-		flag = 'File:cais flag hd.png'
 	},
 	['commonwealthofindependentstates'] = {
+		flag = 'File:Cis hd.png',
+		localised = 'CIS',
 		name = 'CIS',
-		flag = 'File:Cis hd.png'
 	},
 	['eastasia'] = {
+		flag = 'File:East asia flag hd.png',
+		localised = 'East Asian',
 		name = 'East Asia',
-		flag = 'File:East asia flag hd.png'
 	},
 	['iberia'] = {
+		flag = 'File:EsPt hd.png',
+		localised = 'Iberian',
 		name = 'Iberia',
-		flag = 'File:EsPt hd.png'
-	},
-	['northamerica'] = {
-		name = 'North America',
-		flag = 'File:UsCa hd.png'
 	},
 	['middleeast'] = {
+		flag = 'File:Middle east flag hd.png',
+		localised = 'Middle Eastern',
 		name = 'Middle East',
-		flag = 'File:Middle east flag hd.png'
 	},
 	['nordiccountries'] = {
+		flag = 'File:Nordic hd.png',
+		localised = 'Nordic',
 		name = 'Nordic Countries',
-		flag = 'File:Nordic hd.png'
 	},
 	['northafrica'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'North African',
 		name = 'North Africa',
-		flag = 'File:Space filler flag.png'
+	},
+	['northamerica'] = {
+		flag = 'File:UsCa hd.png',
+		localised = 'North American',
+		name = 'North America',
 	},
 	['oceania'] = {
+		flag = 'File:anz hd.png',
+		localised = 'Oceanian',
 		name = 'Oceania',
-		flag = 'File:anz hd.png'
 	},
 	['southamerica'] = {
+		flag = 'File:Unasur hd.png',
+		localised = 'South American',
 		name = 'South America',
-		flag = 'File:Unasur hd.png'
 	},
 	['southasia'] = {
+		flag = 'File:south asia flag hd.png',
+		localised = 'South Asian',
 		name = 'South Asia',
-		flag = 'File:south asia flag hd.png'
 	},
 	['southeastasia'] = {
+		flag = 'File:asean hd.png',
+		localised = 'Southeast Asian',
 		name = 'Southeast Asia',
-		flag = 'File:asean hd.png'
 	},
 	['world'] = {
+		flag = 'File:World hd.png',
+		localised = 'Global',
 		name = 'World',
-		flag = 'File:World hd.png'
 	},
+
 	['englishspeaking'] = {
+		flag = 'File:UsGb hd.png',
+		localised = '',
 		name = 'English Speaking',
-		flag = 'File:UsGb hd.png'
 	},
 	['germanspeaking'] = {
+		flag = 'File:DeAt hd.png',
+		localised = '',
 		name = 'German Speaking',
-		flag = 'File:DeAt hd.png'
 	},
 	['spanishspeaking'] = {
+		flag = 'File:EsMx hd.png',
+		localised = '',
 		name = 'Spanish Speaking',
-		flag = 'File:EsMx hd.png'
 	},
 	['portuguesespeaking'] = {
+		flag = 'File:PtBr hd.png',
+		localised = '',
 		name = 'Portuguese Speaking',
-		flag = 'File:PtBr hd.png'
 	},
 	['russianspeaking'] = {
+		flag = 'File:RuBy hd.png',
+		localised = '',
 		name = 'Russian Speaking',
-		flag = 'File:RuBy hd.png'
 	},
+
 	['filler'] = {
+		flag = 'File:Space filler flag.png',
+		localised = '',
 		name = '',
-		flag = 'File:Space filler flag.png'
 	},
 }
 
@@ -1724,6 +2004,8 @@ local aliases = {
 	['ivorycoast'] = "côted'ivoire",
 
 	-- Other
+	['america'] = 'unitedstates',
+	['americas'] = 'northamerica',
 	['bonaire'] = 'bonaire,sinteustatiusandsaba',
 	['sinteustatius'] = 'bonaire,sinteustatiusandsaba',
 	['saba'] = 'bonaire,sinteustatiusandsaba',
@@ -1732,11 +2014,14 @@ local aliases = {
 	['bosnia&herzegovina'] = 'bosniaandherzegovina',
 	['bruneidarussalam'] = 'brunei',
 	['democraticrepublicofthecongo'] = 'congo,democraticrepublicofthe',
+	['republicofthecongo'] = 'congo',
 	['cocosislands'] = 'cocos(keeling)islands',
 	['keelingislands'] = 'cocos(keeling)islands',
 	['czech'] = 'czechia',
 	['czechrepublic'] = 'czechia',
 	['europe'] = 'europeanunion',
+	['greatbritain'] = 'unitedkingdom',
+	['britain'] = 'unitedkingdom',
 	['holland'] = 'netherlands',
 	['international'] = 'world',
 	['korea'] = 'southkorea',
@@ -1753,6 +2038,7 @@ local aliases = {
 	['sintmaarten'] = 'sintmaarten(dutchpart)',
 	['slovakrepublic'] = 'slovakia',
 	['chinesetaipei'] = 'taiwan',
+	['thenetherlands'] = 'netherlands',
 	['tristan'] = 'tristandacunha',
 	['usca'] = 'northamerica',
 	['unasur'] = 'southamerica',
@@ -1764,6 +2050,8 @@ local aliases = {
 	['u.s.virginislands'] = 'virginislands(u.s.)',
 	['unitedstatesvirginislands'] = 'virginislands(u.s.)',
 	['u.s.minoroutlyingislands'] = 'unitedstatesminoroutlyingislands',
+	['oce'] = 'oceania',
+	['australia/newzealand'] = 'oceania',
 	['global'] = 'world',
 	--needed due to lpdb length restrictions
 	--for inside matches --> max length 20
@@ -1773,6 +2061,12 @@ local aliases = {
 	--for inside player --> max length 40
 	--minus the spaces in cut of the flag names
 	['southgeorgiaandthesouthsandwichisl'] = 'southgeorgiaandthesouthsandwichislands',
+
+	--uk flags
+	['ukwa'] = 'wales',
+	['uksc'] = 'scotland',
+	['uken'] = 'england',
+	['ukni'] = 'northernireland',
 
 	--language flag abbreviations
 	['usuk'] = 'englishspeaking',
