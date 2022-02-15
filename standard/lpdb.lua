@@ -8,6 +8,8 @@
 
 local Lpdb = {}
 
+local _MAXIMUM_QUERY_LIMIT = 5000
+
 -- Executes a mass query.
 --[==[
 Loops LPDB queries to e.g.
@@ -42,7 +44,7 @@ example:
 ]==]
 function Lpdb.executeMassQuery(lpdbTable, queryParameters, callbackFunction, limit)
 	queryParameters.offset = queryParameters.offset or 0
-	queryParameters.limit = queryParameters.limit or 5000
+	queryParameters.limit = queryParameters.limit or _MAXIMUM_QUERY_LIMIT
 	limit = limit or math.huge
 
 	while queryParameters.offset < limit do
@@ -50,15 +52,14 @@ function Lpdb.executeMassQuery(lpdbTable, queryParameters, callbackFunction, lim
 
 		local lpdbData = mw.ext.LiquipediaDB.lpdb(lpdbTable, queryParameters)
 		for _, value in ipairs(lpdbData) do
-			local success = callbackFunction(value)
-			if success == false then
+			if callbackFunction(value) == false then
 				return
 			end
 		end
 
 		queryParameters.offset = queryParameters.offset + #lpdbData
 		if #lpdbData < queryParameters.limit then
-			return
+			break
 		end
 	end
 end
