@@ -34,6 +34,3 @@ function Lpdb._defaultBbreakCallbackFunction()
 end
 
 return Lpdb
-
-
-return Lpdb
