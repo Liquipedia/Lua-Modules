@@ -14,6 +14,13 @@ local Table = require('Module:Table')
 local Logic = require('Module:Logic')
 local Info = mw.loadData('Module:Info')
 
+local Condition = require('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _MAX_QUERY_LIMIT = 5000
@@ -60,22 +67,33 @@ function ActiveYears.display(args)
 end
 
 function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, mode)
-	local conditions = '([[participant::' .. player .. ']] OR [[participant::' .. playerAsPageName .. ']]'
+	local playerConditionTree = ConditionTree(BooleanOperator.any):add({
+		ConditionNode(ColumnName('participant'), Comparator.eq, player),
+		ConditionNode(ColumnName('participant'), Comparator.eq, playerAsPageName),
+	})
 	for playerIndex = 1, playerPositionLimit do
-		conditions = conditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
-		conditions = conditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]'
+		playerConditionTree:add({
+			ConditionNode(ColumnName('players_' .. prefix .. playerIndex), Comparator.eq, player),
+			ConditionNode(ColumnName('players_' .. prefix .. playerIndex), Comparator.eq, playerAsPageName),
+		})
 	end
-	conditions = conditions .. ')'
 
-	conditions = conditions .. ' AND [[date::!' .. _DEFAULT_DATE .. ']] AND (' ..
-		'[[date_year::>' .. ActiveYears.startYear .. ']] OR ' ..
-		'[[date_year::' .. ActiveYears.startYear .. ']])'
+	local conditionTree = ConditionTree(BooleanOperator.all):add({
+		playerConditionTree,
+		ConditionNode(ColumnName('date'), Comparator.neq, _DEFAULT_DATE),
+		ConditionTree(BooleanOperator.any):add({
+			ConditionNode(ColumnName('date_year'), Comparator.gt, ActiveYears.startYear),
+			ConditionNode(ColumnName('date_year'), Comparator.eq, ActiveYears.startYear),
+		}),
+	})
 
 	if String.isNotEmpty(mode) then
-		conditions = conditions .. ' AND [[mode::' .. mode .. ']]'
+		conditionTree:add({
+			ConditionNode(ColumnName('mode'), Comparator.eq, mode),
+		})
 	end
 
-	return conditions .. ActiveYears.additionalConditions
+	return conditionTree:toString() .. ActiveYears.additionalConditions
 end
 
 function ActiveYears._calculate(conditions)
