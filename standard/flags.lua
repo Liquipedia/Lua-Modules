@@ -70,7 +70,6 @@ displayNoError			- boolean that decides if there should be a displayed error if 
 shouldReturnSimpleError	- boolean that decides if displayed error should be simple or detailed
 ]]--
 function Flags.getLocalisation(args)
-	--avoid indexing nil
 	args = args or {}
 	local country = args.country
 
