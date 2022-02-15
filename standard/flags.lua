@@ -62,12 +62,17 @@ function Flags.Icon(args, flagName)
 	end
 end
 
--- Returns the localisation of a country or region
+-- Returns the localisation/country-adjective of a country or region
 --[[
 supported args are:
-country					- country name, flag code, or alias of the Flag
-displayNoError			- boolean that decides if there should be a displayed error if no entry is found
+country			- country name, flag code, or alias of the Flag
+displayNoError		- boolean that decides if there should be a displayed error if no entry is found
 shouldReturnSimpleError	- boolean that decides if displayed error should be simple or detailed
+
+examples:
+Flags.getLocalisation({country = de}) = German
+Flags.getLocalisation({country = Germany}) = German
+Flags.getLocalisation({country = deu}) = German
 ]]--
 function Flags.getLocalisation(args)
 	args = args or {}
