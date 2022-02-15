@@ -15,7 +15,7 @@ function Lpdb.executeMassQuery(lpdbTable, queryParameters, callbackFunction, lim
 	queryParameters.limit = queryParameters.limit or 5000
 	breakCallbackFunction = breakCallbackFunction or Lpdb._defaultBbreakCallbackFunction
 
-	local lpdbData = {}
+	local lpdbData
 	while queryParameters.offset < limit do
 		queryParameters.limit = math.min(queryParameters.limit, limit - queryParameters.offset)
 
