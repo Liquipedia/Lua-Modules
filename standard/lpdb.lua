@@ -10,27 +10,27 @@ local Lpdb = {}
 
 local Table = require('Module:Table')
 
-function Lpdb.executeMassQuery(lpdbTable, queryParameters, callbackFunction, limit, breakCallbackFunction)
+function Lpdb.executeMassQuery(lpdbTable, queryParameters, callbackFunction, limit)
 	queryParameters.offset = queryParameters.offset or 0
 	queryParameters.limit = queryParameters.limit or 5000
-	breakCallbackFunction = breakCallbackFunction or Lpdb._defaultBbreakCallbackFunction
+	limit = limit or math.huge
 
-	local lpdbData
 	while queryParameters.offset < limit do
 		queryParameters.limit = math.min(queryParameters.limit, limit - queryParameters.offset)
 
-		lpdbData = mw.ext.LiquipediaDB.lpdb(lpdbTable, queryParameters)
-		Table.iter.forEachIndexed(lpdbData, callbackFunction)
+		local lpdbData = mw.ext.LiquipediaDB.lpdb(lpdbTable, queryParameters)
+		for _, value in ipairs(lpdbData) do
+			local success = callbackFunction(value)
+			if success == false then
+				return
+			end
+		end
 
 		queryParameters.offset = queryParameters.offset + #lpdbData
-		if #lpdbData < queryParameters.limit or breakCallbackFunction() then
-			break
+		if #lpdbData < queryParameters.limit then
+			return
 		end
 	end
-end
-
-function Lpdb._defaultBbreakCallbackFunction()
-	return false
 end
 
 return Lpdb
