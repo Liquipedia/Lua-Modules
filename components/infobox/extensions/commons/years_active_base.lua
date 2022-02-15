@@ -14,6 +14,7 @@ local Table = require('Module:Table')
 local Logic = require('Module:Logic')
 local Info = mw.loadData('Module:Info')
 local Lpdb = require('Module:Lpdb')
+local Set = require('Module:Set')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -103,21 +104,22 @@ function ActiveYears._calculate(conditions)
 		return 'Player has no results.'
 	end
 
-	local sortedYears = ActiveYears._sortYears(years)
+	-- Sort years chronologically
+	table.sort(years)
 
 	-- Generate output for activity ranges
-	local output = table.concat(ActiveYears._groupYears(sortedYears), ',</br>')
+	local output = table.concat(ActiveYears._groupYears(years), ',</br>')
 
 	-- Return text with years active
 	return output
 end
 
 function ActiveYears._getYears(conditions)
-	local years = {}
+	local years = Set{}
 	local checkYear = function(placement)
 		-- set the year in which the placement happened as true (i.e. active)
 		local year = tonumber(string.sub(placement.date, 1, 4))
-		years[year] = true
+		years:add(year)
 	end
 	local queryParameters = {
 		conditions = conditions,
@@ -126,7 +128,7 @@ function ActiveYears._getYears(conditions)
 	}
 	Lpdb.executeMassQuery('placement', queryParameters, checkYear)
 
-	return years
+	return years:toArray()
 end
 
 function ActiveYears._groupYears(sortedYears)
@@ -151,17 +153,6 @@ function ActiveYears._groupYears(sortedYears)
 	end
 
 	return yearRanges
-end
-
-function ActiveYears._sortYears(years)
-	-- Sort years chronologically
-	local sortedYears = {}
-	for year in pairs(years) do
-		table.insert(sortedYears, year)
-	end
-	table.sort(sortedYears)
-
-	return sortedYears
 end
 
 function ActiveYears._insertYears(startYear, endYear, yearRanges)
