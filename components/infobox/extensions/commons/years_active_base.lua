@@ -13,6 +13,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Logic = require('Module:Logic')
 local Info = mw.loadData('Module:Info')
+local Lpdb = require('Module:Lpdb')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -23,7 +24,6 @@ local ColumnName = Condition.ColumnName
 
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
-local _MAX_QUERY_LIMIT = 5000
 
 -- overwritable per wiki
 ActiveYears.startYear = Info.startYear
@@ -114,31 +114,17 @@ end
 
 function ActiveYears._getYears(conditions)
 	local years = {}
-	local offset = 0
-	local count = _MAX_QUERY_LIMIT
-
-	while count == _MAX_QUERY_LIMIT do
-		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
-			order = 'date asc',
-			conditions = conditions,
-			query = 'date',
-			limit = _MAX_QUERY_LIMIT,
-			offset = offset
-		})
-
-		if offset == 0 and #lpdbQueryData == 0 then
-			return {}
-		end
-
-		-- Find all years for which the player has at least one placement
-		for _, item in ipairs(lpdbQueryData) do
-			local year = tonumber(string.sub(item.date, 1, 4))
-			years[year] = true
-		end
-
-		count = #lpdbQueryData
-		offset = offset + _MAX_QUERY_LIMIT
+	local checkYear = function(placement)
+		-- set the year in which the placement happened as true (i.e. active)
+		local year = tonumber(string.sub(placement.date, 1, 4))
+		years[year] = true
 	end
+	local queryParameters = {
+		conditions = conditions,
+		order = 'date asc',
+		query = 'date',
+	}
+	Lpdb.executeMassQuery('placement', queryParameters, checkYear)
 
 	return years
 end
