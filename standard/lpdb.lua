@@ -8,53 +8,32 @@
 
 local Lpdb = {}
 
-local _DEFAULT_QUERY_LIMIT = 20
-local _DEFAULT_INITIAL_OFFSET = 0
+local Table = require('Module:Table')
 
---[==[
-Wrapper for mass LPDB queries.
-Used when > 5000 results are needed (LPDB max limit is 5000) or when
-additional filtering is to be done after the query and memory is an issue.
+function Lpdb.executeMassQuery(lpdbTable, queryParameters, callbackFunction, limit, breakCallbackFunction)
+	queryParameters.offset = queryParameters.offset or 0
+	queryParameters.limit = queryParameters.limit or 5000
+	breakCallbackFunction = breakCallbackFunction or Lpdb._defaultBbreakCallbackFunction
 
-example:
-	local cond = '[[match2id::!]]'
-	local query = 'match2id'
+	local lpdbData = {}
+	while queryParameters.offset < limit do
+		queryParameters.limit = math.min(queryParameters.limit, limit - queryParameters.offset)
 
-	local function queryFunct(foundElements, offset, maxQueryLimit)
-		local data = mw.ext.LiquipediaDB.lpdb('match2', {
-			limit = maxQueryLimit,
-			offset = offset,
-			conditions = cond,
-			query = query,
-		})
+		lpdbData = mw.ext.LiquipediaDB.lpdb(lpdbTable, queryParameters)
+		Table.iter.forEachIndexed(lpdbData, callbackFunction)
 
-		for _, item in ipairs(data) do
-			if string.match(item.match2id, '_0001') then
-				table.insert(foundElements, item.match2id)
-			end
+		queryParameters.offset = queryParameters.offset + #lpdbData
+		if #lpdbData < queryParameters.limit or breakCallbackFunction() then
+			break
 		end
-
-		return foundElements, #data
 	end
-
-	local queryData = Lpdb.massQueryWrapper(queryFunct, 0, 5000)
-]==]
-function Lpdb.massQueryWrapper(funct, initialOffset, maxQueryLimit, maxRounds)
-	local offset = initialOffset or _DEFAULT_INITIAL_OFFSET
-	local count = maxQueryLimit or _DEFAULT_QUERY_LIMIT
-	maxRounds = maxRounds or math.huge
-	local rounds = 0
-
-	local foundElements = {}
-
-	while count == maxQueryLimit and rounds < maxRounds do
-		foundElements, count = funct(foundElements, offset, maxQueryLimit)
-
-		offset = offset + maxQueryLimit
-		rounds = rounds + 1
-	end
-
-	return foundElements
 end
+
+function Lpdb._defaultBbreakCallbackFunction()
+	return false
+end
+
+return Lpdb
+
 
 return Lpdb
