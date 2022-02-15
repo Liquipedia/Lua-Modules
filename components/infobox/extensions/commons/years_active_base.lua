@@ -27,7 +27,7 @@ local _CURRENT_YEAR = tonumber(os.date('%Y'))
 
 -- overwritable per wiki
 ActiveYears.startYear = Info.startYear
-ActiveYears.defaultNumberOfStoredPlayersPerMatch = 10
+ActiveYears.defaultNumberOfStoredPlayersPerPlacement = 10
 ActiveYears.additionalConditions = ''
 
 ---
@@ -56,7 +56,7 @@ function ActiveYears.display(args)
 
 	local prefix = args.prefix or 'p'
 
-	local playerPositionLimit = tonumber(args.playerPositionLimit) or ActiveYears.defaultNumberOfStoredPlayersPerMatch
+	local playerPositionLimit = tonumber(args.playerPositionLimit) or ActiveYears.defaultNumberOfStoredPlayersPerPlacement
 	if playerPositionLimit <=0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end
