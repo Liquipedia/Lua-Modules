@@ -42,7 +42,7 @@ example:
 
 	return foundMatchIds
 ]==]
-function Lpdb.executeMassQuery(lpdbTable, queryParameters, callbackFunction, limit)
+function Lpdb.executeMassQuery(tableName, queryParameters, itemChecker, limit)
 	queryParameters.offset = queryParameters.offset or 0
 	queryParameters.limit = queryParameters.limit or _MAXIMUM_QUERY_LIMIT
 	limit = limit or math.huge
@@ -50,9 +50,9 @@ function Lpdb.executeMassQuery(lpdbTable, queryParameters, callbackFunction, lim
 	while queryParameters.offset < limit do
 		queryParameters.limit = math.min(queryParameters.limit, limit - queryParameters.offset)
 
-		local lpdbData = mw.ext.LiquipediaDB.lpdb(lpdbTable, queryParameters)
+		local lpdbData = mw.ext.LiquipediaDB.lpdb(tableName, queryParameters)
 		for _, value in ipairs(lpdbData) do
-			if callbackFunction(value) == false then
+			if itemChecker(value) == false then
 				return
 			end
 		end
