@@ -8,8 +8,6 @@
 
 local Lpdb = {}
 
-local Table = require('Module:Table')
-
 function Lpdb.executeMassQuery(lpdbTable, queryParameters, callbackFunction, limit)
 	queryParameters.offset = queryParameters.offset or 0
 	queryParameters.limit = queryParameters.limit or 5000
