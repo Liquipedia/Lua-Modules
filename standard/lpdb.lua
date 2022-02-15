@@ -10,9 +10,9 @@ local Lpdb = {}
 
 -- Executes a mass query.
 --[==[
-Loops Lpdb queries to e.g.
+Loops LPDB queries to e.g.
 - circumvent the maximum limit of 5000
-- use additional filtering (e.g. because lpdb does not support it)
+- use additional filtering (e.g. because LPDB does not support it)
 	and query so long until a certain amount of elements is found
 	or additional limitations are reached
 
