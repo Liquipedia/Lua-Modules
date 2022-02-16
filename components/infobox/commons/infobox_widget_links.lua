@@ -82,6 +82,7 @@ local _PRIORITY_GROUPS = {
 		'dlive',
 		'facebook-gaming',
 		'vidio',
+		'bilibili',
 	}
 }
 
