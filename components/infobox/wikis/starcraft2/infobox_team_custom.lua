@@ -12,7 +12,7 @@ local Variables = require('Module:Variables')
 local String = require('Module:StringUtils')
 local Achievements = require('Module:Achievements in infoboxes')
 local RaceIcon = require('Module:RaceIcon').getSmallIcon
-local Matches = require('Module:Upcoming ongoing and recent matches team/new')
+local MatchTicker = require('Module:MatchTicker/Participant')
 local Math = require('Module:Math')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -133,9 +133,7 @@ end
 
 function CustomTeam:createBottomContent()
 	if doStore then
-		return tostring(Matches._get_ongoing({})) ..
-			tostring(Matches._get_upcoming({})) ..
-			tostring(Matches._get_recent({}))
+		return MatchTicker.run({team = pagename})
 	end
 end
 
