@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
+-- wiki=commons
 -- page=Module:MatchTicker/Participant
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,65 +10,69 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
+local Table = require('Module:Table')
 local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
+
 local MatchTicker = Lua.import('Module:MatchTicker', {requireDevIfEnabled = true})
-MatchTicker.OpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
-MatchTicker.Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+local Query = MatchTicker.Query
+local Display = MatchTicker.Display
+local HelperFunctions = MatchTicker.HelperFunctions
 
 local ParticipantMatchTicker = {}
 
 local _LIMIT_ONGOING = 5
 local _LIMIT_UPCOMING = 3
 local _LIMIT_RRECENT = 5
-local _wrapper = MatchTicker.Wrapper()
+local _WINNER_LEFT = 1
+local _WINNER_RIGHT = 2
+
+local _wrapper = Display.Wrapper()
 
 function ParticipantMatchTicker.run(args)
 	args = args or {}
+
 	if String.isNotEmpty(args.player) then
 		args.player = mw.ext.TeamLiquidIntegration.resolve_redirect(args.player)
 	elseif String.isNotEmpty(args.team) then
 		args.team = mw.ext.TeamLiquidIntegration.resolve_redirect(args.team)
+	else
+		error('No participant (player/team) specified')
 	end
 
-	args.recent = false
-	args.upcoming = false
-	args.ongoing = true
-	ParticipantMatchTicker.get(args, 'Ongoing Matches', _LIMIT_ONGOING)
+	-- empty values
+	args.recent = nil
+	args.upcoming = nil
+	args.ongoing = nil
 
-	args.upcoming = true
-	args.ongoing = false
-	ParticipantMatchTicker.get(args, 'Upcoming Matches', _LIMIT_UPCOMING)
+	ParticipantMatchTicker.get(Table.merge(args, {ongoing = true}), 'Ongoing Matches', args.ongoing_limit or _LIMIT_ONGOING)
 
-	args.recent = true
-	args.upcoming = false
+	ParticipantMatchTicker.get(Table.merge(args, {upcoming = true}), 'Upcoming Matches', args.upcoming_limit or _LIMIT_UPCOMING)
+
 	-- we want to include non exact dates for the recent matches
-	args.notExact = true
-	ParticipantMatchTicker.get(args, 'Recent Matches', _LIMIT_RRECENT, true)
+	ParticipantMatchTicker.get(Table.merge(args, {recent = true, notExact = true}), 'Recent Matches', _LIMIT_RRECENT, true)
 
 	return _wrapper:create()
 end
 
 function ParticipantMatchTicker.get(args, headerText, limitInput)
-	local lpdbConditions = MatchTicker.LpdbConditions()
-	lpdbConditions:addDefaultConditions(args)
+	local lpdbConditions = Query.BaseConditions()
+		:addDefaultConditions(args)
+		:build(args)
+		:toString()
 
-	if Logic.readBool(args.featured) then
-		lpdbConditions:addCondition('[[extradata_featured::true]]')
-	end
-
-	local lpdb = MatchTicker.Lpdb()
-	lpdb:conditions(lpdbConditions:build())
+	local lpdb = Query.Query()
+	lpdb:setConditions(lpdbConditions)
 	if Logic.readBool(args.recent) then
-		lpdb:order('date desc, liquipediatier asc, tournament asc')
+		lpdb:setOrder('date desc, liquipediatier asc, tournament asc')
 	end
-	lpdb:limit(limitInput)
+	lpdb:setLimit(limitInput)
 
 	local data = lpdb:get()
 	if not data then
 		return
 	end
 
-	local header = MatchTicker.Header()
+	local header = Display.Header()
 	header:text(headerText)
 	_wrapper:addElement(header:create())
 
@@ -91,26 +95,25 @@ end
 
 function ParticipantMatchTicker._isValidMatch(matchData)
 	return not (
-		MatchTicker.checkForTbdMatches(matchData.match2opponents[1], matchData.match2opponents[2], matchData.pagename)
-		or MatchTicker.isByeOpponent(matchData.match2opponents[1])
-		or MatchTicker.isByeOpponent(matchData.match2opponents[1])
+		HelperFunctions.checkForTbdMatches(matchData.match2opponents[1], matchData.match2opponents[2], matchData.pagename)
+		or HelperFunctions.isByeOpponent(matchData.match2opponents[1])
+		or HelperFunctions.isByeOpponent(matchData.match2opponents[1])
 	)
 end
 
-local _WINNER_LEFT = 1
-local _WINNER_RIGHT = 2
 function ParticipantMatchTicker._match(matchData, participant, args)
 	matchData = ParticipantMatchTicker._orderOpponents(matchData, participant)
 
 	local winner = tonumber(matchData.winner or 0) or 0
 
-	local upperRow = MatchTicker.UpperRow()
+	local upperRow = Display.UpperRow()
 
-	upperRow:addOpponent(matchData.match2opponents[1], 'left', true)
-	upperRow:addOpponent(matchData.match2opponents[2], 'right')
+	-- we do not want the left opponent to link as it is the participants page
+	upperRow:addOpponent(matchData.match2opponents[1], 1, true)
+	upperRow:addOpponent(matchData.match2opponents[2], 2)
 	upperRow:winner(winner)
 
-	local versus = MatchTicker.Versus()
+	local versus = Display.Versus()
 	versus:bestOf(tonumber(matchData.bestof or ''))
 	if not Logic.readBool(args.upcoming) then
 		versus:score(matchData)
@@ -135,16 +138,17 @@ function ParticipantMatchTicker._match(matchData, participant, args)
 		end
 	end
 
-	local lowerRow = MatchTicker.LowerRow()
+	local lowerRow = Display.LowerRow()
 
 	lowerRow:countDown(matchData, countDownArgs)
 
 	lowerRow:tournament(matchData)
-	if Logic.readBool((matchData.extradata or {}).featured) then
-		lowerRow:addClass('sc2premier-highlighted')
+
+	if HelperFunctions.isFeatured(matchData) then
+		lowerRow:addClass(HelperFunctions.featuredClass)
 	end
 
-	local match = MatchTicker.Match()
+	local match = Display.Match()
 	match:upperRow(upperRow:create())
 	match:lowerRow(lowerRow:create())
 
