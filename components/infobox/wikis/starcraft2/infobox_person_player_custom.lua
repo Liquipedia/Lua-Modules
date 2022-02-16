@@ -16,7 +16,7 @@ local Variables = require('Module:Variables')
 local Achievements = require('Module:Achievements in infoboxes')._player
 local CleanRace = require('Module:CleanRace')
 local Math = require('Module:Math')
-local Matches = require('Module:Upcoming ongoing and recent matches player/new')
+local MatchTicker = require('Module:MatchTicker/Participant')
 
 local _EPT_SEASON = 2021
 
@@ -139,9 +139,7 @@ end
 
 function CustomPlayer:createBottomContent(infobox)
 	if _shouldQueryData then
-		return tostring(Matches._get_ongoing({})) ..
-			tostring(Matches._get_upcoming({})) ..
-			tostring(Matches._get_recent({}))
+		return MatchTicker.run({player = _PAGENAME})
 	end
 end
 
