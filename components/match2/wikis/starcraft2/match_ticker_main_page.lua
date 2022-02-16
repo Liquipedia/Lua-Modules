@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
+-- wiki=commons
 -- page=Module:MatchTicker/MainPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,36 +10,39 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
+
 local MatchTicker = Lua.import('Module:MatchTicker', {requireDevIfEnabled = true})
-MatchTicker.OpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
-MatchTicker.Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+local Query = MatchTicker.Query
+local Display = MatchTicker.Display
+local HelperFunctions = MatchTicker.HelperFunctions
+
+local _WINNER_LEFT = 1
+local _WINNER_RIGHT = 2
 
 local MainPageMatchTicker = {}
 
 function MainPageMatchTicker.run(args)
 	args = args or {}
 
-	local lpdbConditions = MatchTicker.LpdbConditions()
-	lpdbConditions:addDefaultConditions(args)
+	local lpdbConditions = Query.BaseConditions()
+		:addDefaultConditions(args)
+		:build(args)
+		:toString()
 
-	if Logic.readBool(args.featured) then
-		lpdbConditions:addCondition('[[extradata_featured::true]]')
-	end
-
-	local lpdb = MatchTicker.Lpdb()
-	lpdb:conditions(lpdbConditions:build())
+	local lpdb = Query.Query()
+	lpdb:setConditions(lpdbConditions)
 	if Logic.readBool(args.recent) then
-		lpdb:order('date desc, liquipediatier asc, tournament asc')
+		lpdb:setOrder('date desc, liquipediatier asc, tournament asc')
 	end
-	local limitInput = tonumber(args.limit or 8) or 8
-	lpdb:limit(limitInput)
+	local limitInput = tonumber(args.limit or 30) or 30
+	lpdb:setLimit(limitInput)
 
 	local data = lpdb:get()
 	if not data then
 		return
 	end
 
-	local wrapper = MatchTicker.Wrapper()
+	local wrapper = Display.Wrapper()
 
 	local matchIndex = 1
 	local limitCounter = 1
@@ -60,29 +63,29 @@ end
 
 function MainPageMatchTicker._isValidMatch(matchData)
 	return not (
-		MatchTicker.checkForTbdMatches(matchData.match2opponents[1], matchData.match2opponents[2], matchData.pagename)
-		or MatchTicker.isByeOpponent(matchData.match2opponents[1])
-		or MatchTicker.isByeOpponent(matchData.match2opponents[1])
+		HelperFunctions.checkForTbdMatches(matchData.match2opponents[1], matchData.match2opponents[2], matchData.pagename)
+		or HelperFunctions.isByeOpponent(matchData.match2opponents[1])
+		or HelperFunctions.isByeOpponent(matchData.match2opponents[1])
 	)
 end
 
-local _WINNER_LEFT = 1
-local _WINNER_RIGHT = 2
 function MainPageMatchTicker._match(matchData, args)
 	local winner = tonumber(matchData.winner or 0) or 0
 
-	local upperRow = MatchTicker.UpperRow()
+	local upperRow = Display.UpperRow()
 
-	upperRow:addOpponent(matchData.match2opponents[1], 'left')
-	upperRow:addOpponent(matchData.match2opponents[2], 'right')
+	upperRow:addOpponent(matchData.match2opponents[1], 1)
+	upperRow:addOpponent(matchData.match2opponents[2], 2)
 	upperRow:winner(winner)
 
-	local versus = MatchTicker.Versus()
+	local versus = Display.Versus()
 	versus:bestOf(tonumber(matchData.bestof or ''))
 	if not Logic.readBool(args.upcoming) then
 		versus:score(matchData)
 	end
 	upperRow:versus(versus:create())
+
+	local lowerRow = Display.LowerRow()
 
 	local countDownArgs = {}
 	if Logic.readBool(matchData.finished) then
@@ -96,22 +99,18 @@ function MainPageMatchTicker._match(matchData, args)
 
 		countDownArgs.rawdatetime = 'true'
 	else
+		countDownArgs = matchData.stream or {}
 		countDownArgs.rawcountdown = 'true'
-		for key, item in pairs(matchData.stream or {}) do
-			countDownArgs[key] = item
-		end
 	end
-
-	local lowerRow = MatchTicker.LowerRow()
-
 	lowerRow:countDown(matchData, countDownArgs)
 
 	lowerRow:tournament(matchData)
-	if Logic.readBool((matchData.extradata or {}).featured) then
-		lowerRow:addClass('sc2premier-highlighted')
+
+	if HelperFunctions.isFeatured(matchData) then
+		lowerRow:addClass(HelperFunctions.featuredClass)
 	end
 
-	local match = MatchTicker.Match()
+	local match = Display.Match()
 	match:upperRow(upperRow:create())
 	match:lowerRow(lowerRow:create())
 
