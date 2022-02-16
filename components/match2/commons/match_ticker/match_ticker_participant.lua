@@ -44,12 +44,25 @@ function ParticipantMatchTicker.run(args)
 	args.upcoming = nil
 	args.ongoing = nil
 
-	ParticipantMatchTicker.get(Table.merge(args, {ongoing = true}), 'Ongoing Matches', args.ongoing_limit or _LIMIT_ONGOING)
+	ParticipantMatchTicker.get(
+		Table.merge(args, {ongoing = true}),
+		'Ongoing Matches',
+		args.ongoing_limit or _LIMIT_ONGOING
+	)
 
-	ParticipantMatchTicker.get(Table.merge(args, {upcoming = true}), 'Upcoming Matches', args.upcoming_limit or _LIMIT_UPCOMING)
+	ParticipantMatchTicker.get(
+		Table.merge(args, {upcoming = true}),
+		'Upcoming Matches',
+		args.upcoming_limit or _LIMIT_UPCOMING
+	)
 
 	-- we want to include non exact dates for the recent matches
-	ParticipantMatchTicker.get(Table.merge(args, {recent = true, notExact = true}), 'Recent Matches', _LIMIT_RRECENT, true)
+	ParticipantMatchTicker.get(
+		Table.merge(args, {recent = true, notExact = true}),
+		'Recent Matches',
+		args.upcoming_limit or _LIMIT_RRECENT,
+		true
+	)
 
 	return _wrapper:create()
 end
