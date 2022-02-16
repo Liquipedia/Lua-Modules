@@ -14,8 +14,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local LeagueIcon = require('Module:LeagueIcon')
 local VodLink = require('Module:VodLink')
---local HelperFunctions = Lua.import('Module:MatchTicker/Helpers/Custom', {requireDevIfEnabled = true})
-local HelperFunctions = require('Module:Hjpalpha/sandbox5')
+local HelperFunctions = Lua.import('Module:MatchTicker/Helpers/Custom', {requireDevIfEnabled = true})
 
 local MatchTickerDisplay = Class.new()
 
