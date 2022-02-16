@@ -235,7 +235,6 @@ end
 function LowerRow:tournament(matchData)
 	local icon = String.isNotEmpty(matchData.icon) and matchData.icon or _TOURNAMENT_DEFAULT_ICON
 	local iconDark = String.isNotEmpty(matchData.icondark) and matchData.icondark or icon
-	local displayName = String.isNotEmpty(matchData.tickername) and matchData.tickername or matchData.tournament
 	local link = String.isNotEmpty(matchData.parent) and matchData.parent or matchData.pagename
 	local displayName = String.isNotEmpty(matchData.tickername) and matchData.tickername
 		or String.isNotEmpty(matchData.tickername) and matchData.tournament
