@@ -263,11 +263,14 @@ function CustomPlayer._createRole(key, role)
 	if not roleData then
 		return nil
 	end
+	if Namespace.isMain() then
+		local categoryCoreText = 'Category:' .. roleData.category
 
-	local categoryCoreText = 'Category:' .. roleData.category
-
-	return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-		Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
+		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
+			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
+	else
+		return Variables.varDefineEcho(key or 'role', roleData.variable)
+	end
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
