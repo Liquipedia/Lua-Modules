@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local LeagueIcon = require('Module:LeagueIcon')
 local VodLink = require('Module:VodLink')
-local HelperFunctions = Lua.import('Module:MatchTicker/Helpers/Custom', {requireDevIfEnabled = true})
+local HelperFunctions = Lua.import('Module:MatchTicker/Helpers', {requireDevIfEnabled = true})
 
 local MatchTickerDisplay = Class.new()
 
@@ -30,6 +30,9 @@ local _WINNER_RIGHT = 2
 local _TOURNAMENT_DEFAULT_ICON = 'InfoboxIcon_Tournament.png'
 local _MATCH_FINISHED = 1
 local _ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+
+MatchTickerDisplay.OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+MatchTickerDisplay.Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local Header = Class.new(
 	function(self)
@@ -87,7 +90,7 @@ local UpperRow = Class.new(
 )
 
 function UpperRow:addOpponent(opponent, side, noLink)
-	opponent = HelperFunctions.Opponent.fromMatch2Record(opponent)
+	opponent = MatchTickerDisplay.Opponent.fromMatch2Record(opponent)
 	local OpponentDisplay
 
 	-- catch empty and 'TBD' opponents
@@ -95,7 +98,7 @@ function UpperRow:addOpponent(opponent, side, noLink)
 		OpponentDisplay = mw.html.create('i')
 			:wikitext(_TBD)
 	else
-		OpponentDisplay = HelperFunctions.OpponentDisplay.InlineOpponent{
+		OpponentDisplay = MatchTickerDisplay.OpponentDisplay.InlineOpponent{
 			opponent = opponent,
 			teamStyle = 'short',
 			flip = side == _LEFT_SIDE,
@@ -330,5 +333,6 @@ MatchTickerDisplay.UpperRow = UpperRow
 MatchTickerDisplay.LowerRow = LowerRow
 MatchTickerDisplay.Versus = Versus
 MatchTickerDisplay.Wrapper = Wrapper
+MatchTickerDisplay.HelperFunctions = HelperFunctions
 
 return MatchTickerDisplay
