@@ -65,7 +65,7 @@ function CustomMap._getGameMode()
 	end
 
 	local modes = Map:getAllArgsForBase(_args, 'mode')
-	local releasedate = _args.releasedate
+	local releaseDate = _args.releasedate
 
 	local modeDisplayTable = {}
 	for _, mode in ipairs(modes) do
