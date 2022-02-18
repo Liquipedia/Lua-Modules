@@ -15,7 +15,7 @@ MatchTicker.Display = Lua.import('Module:MatchTicker/Display', {requireDevIfEnab
 
 MatchTicker.Query = Lua.import('Module:MatchTicker/Query', {requireDevIfEnabled = true})
 
-MatchTicker.HelperFunctions = Lua.import('Module:MatchTicker/Helpers/Custom', {requireDevIfEnabled = true})
+MatchTicker.HelperFunctions = MatchTicker.Display.HelperFunctions
 
 --overwrite stuff if needed
 
