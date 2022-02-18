@@ -74,7 +74,7 @@ function CustomMap._getGameMode()
 		table.insert(modeDisplayTable, mapModeDisplay)
 	end
 	return modeDisplayTable
-end	
+end
 
 function CustomMap:addToLpdb(lpdbData)
 	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator)
