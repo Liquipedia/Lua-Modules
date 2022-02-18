@@ -21,9 +21,12 @@ MatchTicker.Display = Lua.import('Module:MatchTicker/Display', {requireDevIfEnab
 
 MatchTicker.Query = Lua.import('Module:MatchTicker/Query', {requireDevIfEnabled = true})
 
-MatchTicker.HelperFunctions = Lua.import('Module:MatchTicker/Helpers/Custom', {requireDevIfEnabled = true})
+MatchTicker.HelperFunctions = MatchTicker.Display.HelperFunctions
 
 --overwrite stuff
+MatchTicker.Display.OpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
+MatchTicker.Display.Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+
 function MatchTicker.Query.BaseConditions:build(queryArgs)
 	if Logic.readBool(queryArgs.featured) then
 		self.conditionTree:add({ConditionNode(ColumnName('extradata_featured'), Comparator.eq, 'true')})
@@ -32,5 +35,10 @@ function MatchTicker.Query.BaseConditions:build(queryArgs)
 	return self.conditionTree
 end
 
+MatchTicker.HelperFunctions.tbdIdentifier = 'definitions'
+MatchTicker.HelperFunctions.featuredClass = 'sc2premier-highlighted'
+MatchTicker.HelperFunctions.isFeatured = function(matchData)
+	return Logic.readBool((matchData.extradata or {}).featured)
+end
 
 return MatchTicker
