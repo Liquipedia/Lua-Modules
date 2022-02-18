@@ -69,7 +69,7 @@ function CustomMap._getGameMode()
 
 	local modeDisplayTable = {}
 	for _, mode in ipairs(modes) do
-		local modeIcon = MapModes.get({mode = mode, date = releasedate, size = 15})
+		local modeIcon = MapModes.get({mode = mode, date = releaseDate, size = 15})
 		local mapModeDisplay = modeIcon .. ' [[' .. mode .. ']]'
 		table.insert(modeDisplayTable, mapModeDisplay)
 	end
