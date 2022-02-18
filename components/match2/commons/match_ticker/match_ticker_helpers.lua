@@ -8,7 +8,6 @@
 
 -- Holds helper functions for the MatchTicker modules
 
-local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 
