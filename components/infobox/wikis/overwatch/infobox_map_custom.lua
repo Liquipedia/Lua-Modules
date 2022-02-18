@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local Map = require('Module:Infobox/Map/dev')
+local Map = require('Module:Infobox/Map')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local MapModes = require('Module:MapModes')
