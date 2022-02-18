@@ -24,10 +24,6 @@ local _lastMatchWasTbd
 HelperFunctions.tbdIdentifier = 'tbd'
 HelperFunctions.featuredClass = 'valvepremier-highlighted'
 
--- overridable in case of wikis having custom modules
-HelperFunctions.OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-HelperFunctions.Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-
 function HelperFunctions.getOpponentScore(opponent, isWinner, hasScore2)
 	local score
 	if opponent.status == _SCORE_STATUS then
