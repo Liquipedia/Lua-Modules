@@ -35,7 +35,7 @@ function Map:createInfobox(frame)
 		Cell{name = 'Creator', content = {
 				args.creator or args['created-by'], args.creator2 or args['created-by2']}, options = { makeLink = true }
 		},
-		Cell{name = 'Location', content = {args.location}},
+		Customizable{id = 'location', children = {}},
 		Cell{name = 'Release Date', content = {args.releasedate}},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
