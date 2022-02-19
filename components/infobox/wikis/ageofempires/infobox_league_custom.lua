@@ -269,6 +269,10 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Module:Prize pool, Module:Prize pool team, Module:TeamCard and Module:TeamCard2
 	Variables.varDefine('tournament_deadline', DateClean(args.deadline or ''))
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
+
+	-- StreamSearch
+	Variables.varDefine('tournament_opencast', args.opencast)
+	Variables.varDefine('tournament_opencastname', args.opencastname)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
