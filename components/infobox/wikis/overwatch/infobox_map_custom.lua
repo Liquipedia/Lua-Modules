@@ -23,7 +23,6 @@ local _args
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getCategories = CustomMap.getCategories
 	customMap.addToLpdb = CustomMap.addToLpdb
 	_args = customMap.args
 	return customMap:createInfobox(frame)
@@ -47,7 +46,6 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomInjector:parse(id, widgets)
-	mw.logObject(_args)
 	if id == 'location' then
 		return {
 			Cell{
