@@ -270,7 +270,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_deadline', DateClean(args.deadline or ''))
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
 
-	-- StreamSearch
+	-- Variables for Template:OpencastStreams
 	Variables.varDefine('tournament_opencast', args.opencast)
 	Variables.varDefine('tournament_opencastname', args.opencastname)
 end
