@@ -99,7 +99,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'prizepool' then
 		return {
 			Cell{
-				name = 'Prize pool',
+				name = 'Prize Pool',
 				content = {CustomLeague:_createPrizepool(args)}
 			}
 		}
