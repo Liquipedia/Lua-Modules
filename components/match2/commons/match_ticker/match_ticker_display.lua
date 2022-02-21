@@ -141,6 +141,67 @@ function UpperRow:create()
 		:node(self[_RIGHT_SIDE])
 end
 
+local Versus = Class.new(
+	function(self)
+		self.root = mw.html.create('div')
+		self.text = 'vs.'
+	end
+)
+
+function Versus:bestOf(bestOf)
+	if String.isNotEmpty(bestOf) then
+		self.bestOfDisplay = mw.html.create('abbr')
+			:attr('title', 'Best of ' .. bestOf)
+			:wikitext('Bo' .. bestOf)
+	end
+	return self
+end
+
+function Versus:score(matchData)
+	local leftScore, leftScore2, hasScore2, rightScore, rightScore2
+	leftScore, leftScore2, hasScore2 = HelperFunctions.getOpponentScore(
+		matchData.match2opponents[1],
+		matchData.winner == _WINNER_LEFT
+	)
+	rightScore, rightScore2, hasScore2 = HelperFunctions.getOpponentScore(
+		matchData.match2opponents[2],
+		matchData.winner == _WINNER_RIGHT,
+		hasScore2
+	)
+	self.text = leftScore .. ':' .. rightScore
+
+	if hasScore2 then
+		self.score2 = leftScore2 .. ':' .. rightScore2
+	end
+
+	return self
+end
+
+function Versus:create()
+	local lowerText, upperText
+	if self.score2 then
+		upperText = self.score2
+		lowerText = self.text
+	else
+		upperText = self.text
+		lowerText = self.bestOfDisplay
+	end
+	if lowerText then
+		return self.root
+			:node(mw.html.create('div')
+				:css('line-height', '1.1')
+				:node(upperText)
+			)
+			:node(mw.html.create('div')
+				:addClass('versus-lower')
+				:wikitext('(')
+				:node(lowerText)
+				:wikitext(')')
+			)
+	end
+	return self.root:wikitext(self.text)
+end
+
 --classes here step by step
 
 
