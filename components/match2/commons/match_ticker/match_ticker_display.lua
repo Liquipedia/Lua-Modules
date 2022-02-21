@@ -202,6 +202,79 @@ function Versus:create()
 	return self.root:wikitext(self.text)
 end
 
+local LowerRow = Class.new(
+	function(self)
+		self.root = mw.html.create('tr')
+		self.tournamentDisplay = ''
+	end
+)
+
+function LowerRow:addClass(class)
+	self.root:addClass(class)
+	return self
+end
+
+function LowerRow:countDown(matchData, countdownArgs)
+	countdownArgs = countdownArgs or {}
+	-- the countdown module needs the string
+	countdownArgs.finished = matchData.finished == _MATCH_FINISHED and 'true'
+	countdownArgs.date = matchData.date .. _ABBR_UTC
+
+	local countdownDisplay = mw.html.create('span')
+		:addClass('match-countdown')
+		:node(Countdown._create(countdownArgs))
+		:node('&nbsp;&nbsp;')
+
+	if String.isNotEmpty(matchData.vod) then
+		countdownDisplay:node(VodLink.display{vod = matchData.vod})
+	end
+
+	self.countDownDisplay = countdownDisplay
+	return self
+end
+
+function LowerRow:tournament(matchData)
+	local icon = String.isNotEmpty(matchData.icon) and matchData.icon or _TOURNAMENT_DEFAULT_ICON
+	local iconDark = String.isNotEmpty(matchData.icondark) and matchData.icondark or icon
+	local link = String.isNotEmpty(matchData.parent) and matchData.parent or matchData.pagename
+	local displayName = String.isNotEmpty(matchData.tickername) and matchData.tickername
+		or String.isNotEmpty(matchData.tickername) and matchData.tournament
+		or string.gsub(matchData.pagename, '_', ' ')
+
+	local tournamentDisplay = mw.html.create('div')
+		:addClass('tournament')
+		:node(mw.html.create('span')
+			:css('float', 'right')
+			:node(LeagueIcon.display{
+				icon = icon,
+				iconDark = iconDark,
+				link = link,
+				name = matchData.tournament,
+				options = {noTemplate = true},
+			})
+		)
+		:node(mw.html.create('div')
+			:addClass('tournament-text')
+			:wikitext('[[' .. link .. '|' .. displayName .. ']]&nbsp;&nbsp;')
+		)
+
+	self.tournamentDisplay = tournamentDisplay
+
+	return self
+end
+
+function LowerRow:create()
+	return self.root
+		:node(mw.html.create('td')
+			:addClass('match-filler')
+			:attr('colspan', 3)
+			:node(mw.html.create('span')
+				:node(self.countDownDisplay)
+				:node(self.tournamentDisplay)
+			)
+		)
+end
+
 --classes here step by step
 
 
