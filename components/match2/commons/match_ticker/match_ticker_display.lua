@@ -34,7 +34,26 @@ local _ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)
 MatchTickerDisplay.OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 MatchTickerDisplay.Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
+local Header = Class.new(
+	function(self)
+		self.root = mw.html.create('div')
+			:addClass('infobox-header wiki-backgroundcolor-light')
+	end
+)
 
+function Header:text(text)
+	self.root:wikitext(text)
+	return self
+end
+
+function Header:addClass(class)
+	self.root:addClass(class)
+	return self
+end
+
+function Header:create()
+	return self.root
+end
 
 --classes here step by step
 
