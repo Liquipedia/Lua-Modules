@@ -83,6 +83,64 @@ function Match:create()
 		:node(self.lowerRow)
 end
 
+local UpperRow = Class.new(
+	function(self)
+		self.root = mw.html.create('tr')
+	end
+)
+
+function UpperRow:addOpponent(opponent, side, noLink)
+	opponent = MatchTickerDisplay.Opponent.fromMatch2Record(opponent)
+	local OpponentDisplay
+
+	-- catch empty and 'TBD' opponents
+	if HelperFunctions.opponentIsTbdOrEmpty(opponent) then
+		OpponentDisplay = mw.html.create('i')
+			:wikitext(_TBD)
+	else
+		OpponentDisplay = MatchTickerDisplay.OpponentDisplay.InlineOpponent{
+			opponent = opponent,
+			teamStyle = 'short',
+			flip = side == _LEFT_SIDE,
+			showLink = not noLink
+		}
+	end
+
+	self[side] = mw.html.create('td')
+		:addClass('team-' .. (_SIDE_CLASS[side] or ''))
+		:node(OpponentDisplay)
+
+	return self
+end
+
+function UpperRow:addClass(class)
+	self.root:addClass(class)
+	return self
+end
+
+function UpperRow:versus(versus)
+	self.versusDisplay = mw.html.create('td')
+		:addClass('versus')
+		:node(versus)
+	return self
+end
+
+function UpperRow:winner(winner)
+	self.winnerValue = winner
+	return self
+end
+
+function UpperRow:create()
+	if self.winnerValue and self[self.winnerValue] then
+		self[self.winnerValue]:css('font-weight', 'bold')
+	end
+
+	return self.root
+		:node(self[_LEFT_SIDE])
+		:node(self.versusDisplay)
+		:node(self[_RIGHT_SIDE])
+end
+
 --classes here step by step
 
 
