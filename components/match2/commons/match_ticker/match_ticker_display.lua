@@ -55,6 +55,34 @@ function Header:create()
 	return self.root
 end
 
+local Match = Class.new(
+	function(self)
+		self.root = mw.html.create('table')
+			:addClass('wikitable wikitable-striped infobox_matches_content')
+	end
+)
+
+function Match:addClass(class)
+	self.root:addClass(class)
+	return self
+end
+
+function Match:upperRow(upperRow)
+	self.upperRow = upperRow
+	return self
+end
+
+function Match:lowerRow(lowerRow)
+	self.lowerRow = lowerRow
+	return self
+end
+
+function Match:create()
+	return self.root
+		:node(self.upperRow)
+		:node(self.lowerRow)
+end
+
 --classes here step by step
 
 
