@@ -275,9 +275,44 @@ function LowerRow:create()
 		)
 end
 
---classes here step by step
+local Wrapper = Class.new(
+	function(self)
+		self.root = mw.html.create('div')
+		self.elements = {}
+	end
+)
 
+function Wrapper:addElement(element, position)
+	if position then
+		table.insert(self.elements, position, element)
+	else
+		table.insert(self.elements, element)
+	end
+	return self
+end
 
+function Wrapper:addClass(class)
+	self.root:addClass(class)
+	return self
+end
+
+function Wrapper:addInnerWrapperClass(class)
+	self.innerWrapperClass = class
+	return self
+end
+
+function Wrapper:create()
+	local innerWrapper = mw.html.create('div')
+	if self.innerWrapperClass then
+		innerWrapper:addClass(self.innerWrapperClass)
+	end
+
+	for _, element in ipairs(self.elements or {}) do
+		innerWrapper:node(element)
+	end
+
+	return self.root:node(innerWrapper)
+end
 
 MatchTickerDisplay.Header = Header
 MatchTickerDisplay.Match = Match
