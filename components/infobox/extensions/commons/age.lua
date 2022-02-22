@@ -190,7 +190,7 @@ function Age:makeDisplay()
 end
 
 function Age:_secondsToAge(seconds)
-	return math.ceil(seconds / 60 / 60 / 24 / 365.25)
+	return math.floor(seconds / 60 / 60 / 24 / 365.2425)
 end
 
 function AgeCalculation.run(args)
