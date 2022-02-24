@@ -352,7 +352,7 @@ function mapFunctions.getParticipantsData(map)
 		) do
 			local brawlerRaw = map['team' .. opponentIndex .. 'pick' .. pickIndex]
 				or map['t' .. opponentIndex .. 'p' .. pickIndex]
-			local brawler = BrawlerNames[brawler]
+			local brawler = BrawlerNames[brawlerRaw]
 			if not brawler then
 				error('Unsupported brawler input ' .. brawlerRaw)
 			end
@@ -363,7 +363,7 @@ function mapFunctions.getParticipantsData(map)
 			pickIndex = pickIndex + 1
 		end
 	end
-	
+
 	map.extradata.maximumpickindex = maximumPickIndex
 	map.participants = participants
 	return map
