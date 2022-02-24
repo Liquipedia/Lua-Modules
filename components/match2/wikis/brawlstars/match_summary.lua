@@ -14,7 +14,6 @@ local VodLink = require('Module:VodLink')
 local MapTypeIcon = require('Module:MapType')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
-local Table = require('Module:Table')
 local BrawlerIcon = require('Module:BrawlerIcon')
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
@@ -192,7 +191,6 @@ function CustomMatchSummary._createBody(match)
 	-- Pre-Process Brawler picks
 	local showGamePicks = {}
 	for gameIndex, game in ipairs(match.games) do
-		local extradata = game.extradata
 		local pickData = {{}, {}}
 		local numberOfPicks = game.extradata.maximumpickindex
 		local participants = game.participants
