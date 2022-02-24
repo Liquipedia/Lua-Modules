@@ -282,7 +282,7 @@ function mapFunctions.getExtraData(map)
 		bestof = bestof,
 		comment = map.comment,
 		header = map.header,
-		maptype = map.type,
+		maptype = map.maptype,
 	}
 
 	local bans = {}
