@@ -60,11 +60,11 @@ function Brawler:createHeader(text)
 	return self
 end
 
-function Brawler:row(brawlerData, gameNumber, numberBrawlers, isBan)
+function Brawler:row(brawlerData, gameNumber, numberBrawlers, isBan, date)
 	if numberBrawlers > 0 then
 		self.table:tag('tr')
 			:tag('td')
-				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[1], numberBrawlers, false, isBan))
+				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[1], numberBrawlers, false, isBan, date))
 			:tag('td')
 				:node(mw.html.create('div')
 					:wikitext(Abbreviation.make(
@@ -74,7 +74,7 @@ function Brawler:row(brawlerData, gameNumber, numberBrawlers, isBan)
 					)
 				)
 			:tag('td')
-				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[2], numberBrawlers, true, isBan))
+				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[2], numberBrawlers, true, isBan, date))
 	end
 
 	return self
@@ -214,7 +214,7 @@ function CustomMatchSummary._createBody(match)
 		local brawler = Brawler('Picks')
 
 		for gameIndex, pickData in ipairs(showGamePicks) do
-			brawler:row(pickData, gameIndex, pickData.numberOfPicks, false)
+			brawler:row(pickData, gameIndex, pickData.numberOfPicks, false, match.date)
 		end
 
 		body:addRow(brawler)
@@ -238,7 +238,7 @@ function CustomMatchSummary._createBody(match)
 		local brawler = Brawler('Bans')
 
 		for gameIndex, banData in ipairs(showGameBans) do
-			brawler:row(banData, gameIndex, banData.numberOfBans, true)
+			brawler:row(banData, gameIndex, banData.numberOfBans, true, match.date)
 		end
 
 		body:addRow(brawler)
@@ -325,7 +325,7 @@ function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	return container
 end
 
-function CustomMatchSummary._opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, isBan)
+function CustomMatchSummary._opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, isBan, date)
 	local opponentBrawlerDisplay = {}
 
 	for index = 1, numberOfBrawlers do
@@ -335,6 +335,7 @@ function CustomMatchSummary._opponentBrawlerDisplay(brawlerData, numberOfBrawler
 		:node(BrawlerIcon._getImage{
 			brawler = brawlerData[index],
 			class = 'brkts-champion-icon',
+			date = date,
 		})
 		if index == 1 then
 			brawlerDisplay:css('padding-left', '2px')
