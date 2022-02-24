@@ -53,7 +53,6 @@ function CustomMatchGroupInput.processMap(frame, map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getParticipantsData(map)
-mw.logObject(map)
 
 	return map
 end
@@ -295,7 +294,7 @@ function mapFunctions.getExtraData(map)
 			String.isNotEmpty(map['t' .. opponentIndex .. 'b' .. banIndex])
 		) do
 			local banRaw = map['team' .. opponentIndex .. 'ban' .. banIndex] or map['t' .. opponentIndex .. 'b' .. banIndex]
-			local ban = BrawlerNames[banRaw]
+			local ban = BrawlerNames[string.lower(banRaw)]
 			if not ban then
 				error('Unsupported ban input ' .. ban)
 			end
@@ -352,11 +351,11 @@ function mapFunctions.getParticipantsData(map)
 		) do
 			local brawlerRaw = map['team' .. opponentIndex .. 'pick' .. pickIndex]
 				or map['t' .. opponentIndex .. 'p' .. pickIndex]
-			local brawler = BrawlerNames[brawlerRaw]
+			local brawler = BrawlerNames[string.lower(brawlerRaw)]
 			if not brawler then
 				error('Unsupported brawler input ' .. brawlerRaw)
 			end
-			map.participants[opponentIndex .. '_' .. pickIndex] = {brawler=brawler}
+			participants[opponentIndex .. '_' .. pickIndex] = {brawler=brawler}
 			if maximumPickIndex < pickIndex then
 				maximumPickIndex = pickIndex
 			end
