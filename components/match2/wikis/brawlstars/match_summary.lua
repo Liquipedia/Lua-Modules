@@ -227,9 +227,11 @@ function CustomMatchSummary._createBody(match)
 		local bans = Json.parseIfString(extradata.bans or '{}')
 		if not Table.isEmpty(bans) then
 			bans.numberOfBans = math.max(#bans.team1, #bans.team2)
-			bans[1] = bans.team1
-			bans[2] = bans.team2
-			showGameBans[gameIndex] = bans
+			if bans.numberOfBans > 0 then
+				bans[1] = bans.team1
+				bans[2] = bans.team2
+				showGameBans[gameIndex] = bans
+			end
 		end
 	end
 
