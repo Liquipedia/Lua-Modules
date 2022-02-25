@@ -34,6 +34,9 @@ local _ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)
 MatchTickerDisplay.OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 MatchTickerDisplay.Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
+--[[
+Display Class for the Header of MatchTickers
+]]
 local Header = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -55,6 +58,9 @@ function Header:create()
 	return self.root
 end
 
+--[[
+Display Class for matches within MatchTickers
+]]
 local Match = Class.new(
 	function(self)
 		self.root = mw.html.create('table')
@@ -62,34 +68,55 @@ local Match = Class.new(
 	end
 )
 
+--[[
+@class - css class to be applied to the Match table
+]]
 function Match:addClass(class)
 	self.root:addClass(class)
 	return self
 end
 
-function Match:upperRow(upperRow)
-	self.upperRow = upperRow
+--[[
+@scoreBoard - scoreBoard row (build via the ScoreBoard class)
+]]
+function Match:scoreBoard(scoreBoard)
+	self.scoreBoard = scoreBoard
 	return self
 end
 
-function Match:lowerRow(lowerRow)
-	self.lowerRow = lowerRow
+--[[
+@details - details row (build via the Details class)
+]]
+function Match:details(details)
+	self.details = details
 	return self
 end
 
 function Match:create()
 	return self.root
-		:node(self.upperRow)
-		:node(self.lowerRow)
+		:node(self.scoreBoard)
+		:node(self.details)
 end
 
-local UpperRow = Class.new(
+--[[
+Display Class to generate the scoreBoard row within matches
+- opponent are inputted via `:addOpponent()`
+- additional css classes can be set via `:addClass()`
+- score/vs display are inputted via `:versus()`
+- match winner is inputted via `:winner()` (to bold the winner)
+]]
+local ScoreBoard = Class.new(
 	function(self)
 		self.root = mw.html.create('tr')
 	end
 )
 
-function UpperRow:addOpponent(opponent, side, noLink)
+--[[
+@opponent - opponent (match2opponent object)
+@side - side on which the opponent is to be displayed
+@noLink - if set to true disables the links in this opponents display
+]]
+function ScoreBoard:addOpponent(opponent, side, noLink)
 	opponent = MatchTickerDisplay.Opponent.fromMatch2Record(opponent)
 	local OpponentDisplay
 
@@ -113,24 +140,33 @@ function UpperRow:addOpponent(opponent, side, noLink)
 	return self
 end
 
-function UpperRow:addClass(class)
+--[[
+@class - the css class to be applied to the scoreBoard row
+]]
+function ScoreBoard:addClass(class)
 	self.root:addClass(class)
 	return self
 end
 
-function UpperRow:versus(versus)
+--[[
+@versus - versus display for the scoreBoard
+]]
+function ScoreBoard:versus(versus)
 	self.versusDisplay = mw.html.create('td')
 		:addClass('versus')
 		:node(versus)
 	return self
 end
 
-function UpperRow:winner(winner)
+--[[
+@winner - winner of the match for which the scoreBoard is being build
+]]
+function ScoreBoard:winner(winner)
 	self.winnerValue = winner
 	return self
 end
 
-function UpperRow:create()
+function ScoreBoard:create()
 	if self.winnerValue and self[self.winnerValue] then
 		self[self.winnerValue]:css('font-weight', 'bold')
 	end
@@ -141,6 +177,12 @@ function UpperRow:create()
 		:node(self[_RIGHT_SIDE])
 end
 
+--here
+--[[
+Display Class to generate the versus (score + bestof) td within the scoreBoard display
+- `:bestOf()` sets bestof display
+- `:score()` builds the score display
+]]
 local Versus = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -148,6 +190,9 @@ local Versus = Class.new(
 	end
 )
 
+--[[
+@bestOf - bestOf of the match for which the score display is build
+]]
 function Versus:bestOf(bestOf)
 	if String.isNotEmpty(bestOf) then
 		self.bestOfDisplay = mw.html.create('abbr')
@@ -157,6 +202,9 @@ function Versus:bestOf(bestOf)
 	return self
 end
 
+--[[
+@matchData - matchData of the match for which the score display is build
+]]
 function Versus:score(matchData)
 	local leftScore, leftScore2, hasScore2, rightScore, rightScore2
 	leftScore, leftScore2, hasScore2 = HelperFunctions.getOpponentScore(
@@ -202,19 +250,37 @@ function Versus:create()
 	return self.root:wikitext(self.text)
 end
 
-local LowerRow = Class.new(
+--[[
+Display Class to generate the details row within matches
+- the countdown/date + streams display gets set via `:countDown()`
+- additional css classes can be set via `:addClass()`
+- tournament display gets set via `:tournament()`
+]]
+local Details = Class.new(
 	function(self)
 		self.root = mw.html.create('tr')
 		self.tournamentDisplay = ''
 	end
 )
 
-function LowerRow:addClass(class)
+--[[
+@class - the css class to be applied to the details row
+]]
+function Details:addClass(class)
 	self.root:addClass(class)
 	return self
 end
 
-function LowerRow:countDown(matchData, countdownArgs)
+--[[
+@matchData - matchData of the match for which the details display is build
+@countdownArgs - the args to be passed to the countdown module, that can include
+				-> date
+				-> finished
+				-> stream data
+				-> rawcountdown (to display the countdown without the date display)
+				-> rawdatetime (to display the date without the countdown display)
+]]
+function Details:countDown(matchData, countdownArgs)
 	countdownArgs = countdownArgs or {}
 	-- the countdown module needs the bool as string
 	countdownArgs.finished = matchData.finished == _MATCH_FINISHED and 'true'
@@ -233,7 +299,10 @@ function LowerRow:countDown(matchData, countdownArgs)
 	return self
 end
 
-function LowerRow:tournament(matchData)
+--[[
+@matchData - matchData of a match for which the tournament display (Icon + text) is to be created
+]]
+function Details:tournament(matchData)
 	local icon = String.isNotEmpty(matchData.icon) and matchData.icon or _TOURNAMENT_DEFAULT_ICON
 	local iconDark = String.isNotEmpty(matchData.icondark) and matchData.icondark or icon
 	local link = String.isNotEmpty(matchData.parent) and matchData.parent or matchData.pagename
@@ -263,7 +332,7 @@ function LowerRow:tournament(matchData)
 	return self
 end
 
-function LowerRow:create()
+function Details:create()
 	return self.root
 		:node(mw.html.create('td')
 			:addClass('match-filler')
@@ -275,6 +344,14 @@ function LowerRow:create()
 		)
 end
 
+--[[
+Display Class to generate the wrapper around the MatchTicker
+only needed if the MatchTicker is not already displayed inside a wrapper
+(e.g. infobox or the wrappers on main page)
+- `:addElement()` adds an element to be displayed in the wrapper
+- additional css classes can be set via `:addClass()`
+- additional css classes for the inner wrapper can be set via `:addInnerWrapperClass()`
+]]
 local Wrapper = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -282,6 +359,10 @@ local Wrapper = Class.new(
 	end
 )
 
+--[[
+@element - the element to be added into the list of elements (for display in the wrapper)
+@position - the position inside the list the element is to be added at
+]]
 function Wrapper:addElement(element, position)
 	if position then
 		table.insert(self.elements, position, element)
@@ -291,11 +372,17 @@ function Wrapper:addElement(element, position)
 	return self
 end
 
+--[[
+@class - the css class to be applied to the outer wrapper
+]]
 function Wrapper:addClass(class)
 	self.root:addClass(class)
 	return self
 end
 
+--[[
+@class - the css class to be applied to the inner wrapper
+]]
 function Wrapper:addInnerWrapperClass(class)
 	self.innerWrapperClass = class
 	return self
@@ -316,8 +403,8 @@ end
 
 MatchTickerDisplay.Header = Header
 MatchTickerDisplay.Match = Match
-MatchTickerDisplay.UpperRow = UpperRow
-MatchTickerDisplay.LowerRow = LowerRow
+MatchTickerDisplay.ScoreBoard = ScoreBoard
+MatchTickerDisplay.Details = Details
 MatchTickerDisplay.Versus = Versus
 MatchTickerDisplay.Wrapper = Wrapper
 MatchTickerDisplay.HelperFunctions = HelperFunctions
