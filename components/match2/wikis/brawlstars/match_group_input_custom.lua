@@ -178,7 +178,9 @@ function matchFunctions.getOpponents(args)
 		sumscores[map.winner] = (sumscores[map.winner] or 0) + 1
 	end
 
-	local bestof = tonumber(args.bestof or 5) or 5
+	local bestof = Logic.emptyOr(args.bestof, Variables.varDefault('bestof', 5))
+	bestof = tonumber(bestof) or 5
+	Variables.varDefine('bestof', bestof)
 	local firstTo = math.ceil(bestof / 2)
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
@@ -276,7 +278,9 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	local bestof = tonumber(map.bestof or 3) or 3
+	local bestof = Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof', 3))
+	bestof = tonumber(bestof) or 3
+	Variables.varDefine('map_bestof', bestof)
 	map.extradata = {
 		bestof = bestof,
 		comment = map.comment,
