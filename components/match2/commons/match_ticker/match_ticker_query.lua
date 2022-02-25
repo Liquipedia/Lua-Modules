@@ -69,7 +69,12 @@ function Query:setConditions(conditions)
 end
 
 function Query:setLimit(limit)
-	-- increase the limit in case we have inelligable matches
+	-- increase the limit in case we have inelligable matches, such as:
+	-- > matches with lpdb query bugs that we can not fix (e.g. missing opponent append)
+	-- > for player/team pages: recent matches that contain a "TBD" or empty opponent
+	-- > for main page mass "TBD"(or empty) vs "TBD"(or empty) from the same page
+	-- with the limit increase we query a few more matches so that if inelligable are removed
+	-- we still have enough to reach the limt (if the other conditions allow it)
 	self.limitValue = limit + _LIMIT_INCREASE
 	return self
 end
