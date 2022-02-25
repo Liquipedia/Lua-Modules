@@ -186,8 +186,6 @@ function CustomMatchSummary._createBody(match)
 		end
 	end
 
-
---here
 	-- Pre-Process Brawler picks
 	local showGamePicks = {}
 	for gameIndex, game in ipairs(match.games) do
