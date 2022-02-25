@@ -44,37 +44,38 @@ local CustomMatchSummary = {}
 
 -- Brawler Pick/Ban Class
 local Brawler = Class.new(
-	function(self, title)
+	function(self, isBan)
+		self.isBan = isBan
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
-		self:createHeader(title)
+		self:createHeader()
 	end
 )
 
 function Brawler:createHeader(text)
 	self.table:tag('tr')
 		:tag('th'):css('width','40%'):wikitext(''):done()
-		:tag('th'):css('width','20%'):wikitext(text or ''):done()
+		:tag('th'):css('width','20%'):wikitext(self.isBan and 'Bans' or 'Picks'):done()
 		:tag('th'):css('width','40%'):wikitext(''):done()
 	return self
 end
 
-function Brawler:row(brawlerData, gameNumber, numberBrawlers, isBan, date)
+function Brawler:row(brawlerData, gameNumber, numberBrawlers, date)
 	if numberBrawlers > 0 then
 		self.table:tag('tr')
 			:tag('td')
-				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[1], numberBrawlers, false, isBan, date))
+				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[1], numberBrawlers, false, self.isBan, date))
 			:tag('td')
 				:node(mw.html.create('div')
 					:wikitext(Abbreviation.make(
 							'Game ' .. gameNumber,
-							(isBan and 'Bans' or 'Picks') .. ' in game ' .. gameNumber
+							(self.isBan and 'Bans' or 'Picks') .. ' in game ' .. gameNumber
 						)
 					)
 				)
 			:tag('td')
-				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[2], numberBrawlers, true, isBan, date))
+				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[2], numberBrawlers, true, self.isBan, date))
 	end
 
 	return self
@@ -209,10 +210,10 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add the Brawler pics
 	if not Table.isEmpty(showGamePicks) then
-		local brawler = Brawler('Picks')
+		local brawler = Brawler()
 
 		for gameIndex, pickData in ipairs(showGamePicks) do
-			brawler:row(pickData, gameIndex, pickData.numberOfPicks, false, match.date)
+			brawler:row(pickData, gameIndex, pickData.numberOfPicks, match.date)
 		end
 
 		body:addRow(brawler)
@@ -235,10 +236,10 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add the Brawler bans
 	if not Table.isEmpty(showGameBans) then
-		local brawler = Brawler('Bans')
+		local brawler = Brawler(true)
 
 		for gameIndex, banData in ipairs(showGameBans) do
-			brawler:row(banData, gameIndex, banData.numberOfBans, true, match.date)
+			brawler:row(banData, gameIndex, banData.numberOfBans, match.date)
 		end
 
 		body:addRow(brawler)
