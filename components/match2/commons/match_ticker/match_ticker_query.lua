@@ -40,7 +40,7 @@ local _DEFAULT_QUERY_COLUMNS = {
 	'match2id',
 	'icondark',
 }
-local _DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
+local _ORDER_DEFAULT = 'date asc, liquipediatier asc, tournament asc'
 
 local MatchTickerQuery = Class.new()
 MatchTickerQuery.maximumLiveHoursOfMatches = 3
@@ -48,7 +48,7 @@ MatchTickerQuery.maximumLiveHoursOfMatches = 3
 local Query = Class.new(
 	function(self)
 		self.queryColumns = _DEFAULT_QUERY_COLUMNS
-		self.orderValue = _DEFAULT_ODER
+		self.orderValue = _ORDER_DEFAULT
 		self.limitValue = _DEFAULT_LIMIT + _LIMIT_INCREASE
 	end
 )
