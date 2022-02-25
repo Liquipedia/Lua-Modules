@@ -216,7 +216,7 @@ end
 
 function LowerRow:countDown(matchData, countdownArgs)
 	countdownArgs = countdownArgs or {}
-	-- the countdown module needs the string
+	-- the countdown module needs the bool as string
 	countdownArgs.finished = matchData.finished == _MATCH_FINISHED and 'true'
 	countdownArgs.date = matchData.date .. _ABBR_UTC
 
