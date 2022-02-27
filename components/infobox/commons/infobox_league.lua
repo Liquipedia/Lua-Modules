@@ -278,6 +278,10 @@ function League:_setLpdbData(args, links)
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
+
+	-- store extradata (as a json string) into a wiki variable
+	-- so it can be adjusted in later modules (e.g. prize pools)
+	Variables.varDefine('tournament_extradata', lpdbData.extradata)
 end
 
 function League:_getNamedTableofAllArgsForBase(args, base)
