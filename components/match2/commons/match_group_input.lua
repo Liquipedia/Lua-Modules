@@ -315,7 +315,7 @@ Merges an opponent struct into a match2 opponent record.
 ]]
 function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 	if opponent.type == Opponent.team then
-		record.template = record.template or opponent.template
+		record.template = opponent.template or record.template
 
 	elseif Opponent.typeIsParty(opponent.type) then
 		record.match2players = record.match2players
