@@ -293,10 +293,7 @@ function mapFunctions.getExtraData(map)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		bans['team' .. opponentIndex] = {}
 		local banIndex = 1
-		while (
-			String.isNotEmpty(map['team' .. opponentIndex .. 'ban' .. banIndex]) or
-			String.isNotEmpty(map['t' .. opponentIndex .. 'b' .. banIndex])
-		) do
+		while String.isNotEmpty(map['t' .. opponentIndex .. 'b' .. banIndex]) do
 			local banRaw = map['team' .. opponentIndex .. 'ban' .. banIndex] or map['t' .. opponentIndex .. 'b' .. banIndex]
 			local ban = BrawlerNames[string.lower(banRaw)]
 			if not ban then
@@ -349,10 +346,7 @@ function mapFunctions.getParticipantsData(map)
 	local maximumPickIndex = 0
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local pickIndex = 1
-		while (
-			String.isNotEmpty(map['team' .. opponentIndex .. 'pick' .. pickIndex])
-			or String.isNotEmpty(map['t' .. opponentIndex .. 'p' .. pickIndex])
-		) do
+		while String.isNotEmpty(map['t' .. opponentIndex .. 'p' .. pickIndex]) do
 			local brawlerRaw = map['team' .. opponentIndex .. 'pick' .. pickIndex]
 				or map['t' .. opponentIndex .. 'p' .. pickIndex]
 			local brawler = BrawlerNames[string.lower(brawlerRaw)]
