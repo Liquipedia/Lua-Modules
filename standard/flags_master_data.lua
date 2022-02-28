@@ -273,7 +273,7 @@ local data = {
 	},
 	['congo'] = {
 		flag = 'File:cg_hd.png',
-		localised = '',
+		localised = 'Congolese',
 		name = 'Congo',
 	},
 	['congo,democraticrepublicofthe'] = {
