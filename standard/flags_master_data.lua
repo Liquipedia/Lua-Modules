@@ -1083,7 +1083,7 @@ local data = {
 	},
 	['svalbardandjanmayen'] = {
 		flag = 'File:sj_hd.png',
-		localised = '',
+		localised = 'Jan Mayen',
 		name = 'Svalbard and Jan Mayen',
 	},
 	['sweden'] = {
@@ -1123,7 +1123,7 @@ local data = {
 	},
 	['timor-leste'] = {
 		flag = 'File:tl_hd.png',
-		localised = '',
+		localised = 'Timorese',
 		name = 'Timor-Leste',
 	},
 	['togo'] = {
@@ -1148,7 +1148,7 @@ local data = {
 	},
 	['tristandacunha'] = {
 		flag = 'File:sh-ta hd.png',
-		localised = '',
+		localised = 'Saint Helenian',
 		name = 'Tristan da Cunha',
 	},
 	['tunisia'] = {
@@ -1238,12 +1238,12 @@ local data = {
 	},
 	['virginislands(british)'] = {
 		flag = 'File:vg_hd.png',
-		localised = '',
+		localised = 'British Virgin Island',
 		name = 'Virgin Islands (British)',
 	},
 	['virginislands(u.s.)'] = {
 		flag = 'File:vi_hd.png',
-		localised = '',
+		localised = 'U.S. Virgin Island',
 		name = 'Virgin Islands (U.S.)',
 	},
 	['wallisandfutuna'] = {
