@@ -18,7 +18,7 @@ local CleanRace = require('Module:CleanRace')
 local Math = require('Module:Math')
 local Matches = require('Module:Upcoming ongoing and recent matches player/new')
 
-local _EPT_SEASON = 2021
+local _EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
 local _DISCARD_PLACEMENT = '99'
