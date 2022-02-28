@@ -293,7 +293,7 @@ function mapFunctions.getExtraData(map)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		bans['team' .. opponentIndex] = {}
 		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
-			ban = mapFunctions._CleanBrawlerName(ban)
+			ban = mapFunctions._cleanBrawlerName(ban)
 			table.insert(bans['team' .. opponentIndex], ban)
 		end
 	end
@@ -340,7 +340,7 @@ function mapFunctions.getParticipantsData(map)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for pickKey, brawler in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
 			local pickIndex = tonumber(string.sub(pickKey, -1))
-			brawler = mapFunctions._CleanBrawlerName(brawler)
+			brawler = mapFunctions._cleanBrawlerName(brawler)
 			participants[opponentIndex .. '_' .. pickIndex] = {brawler=brawler}
 			if maximumPickIndex < pickIndex then
 				maximumPickIndex = pickIndex
@@ -353,7 +353,7 @@ function mapFunctions.getParticipantsData(map)
 	return map
 end
 
-function mapFunctions._CleanBrawlerName(brawlerRaw)
+function mapFunctions._cleanBrawlerName(brawlerRaw)
 	local brawler = BrawlerNames[string.lower(brawlerRaw)]
 	if not brawler then
 		error('Unsupported brawler input: ' .. brawlerRaw)
