@@ -723,7 +723,7 @@ local data = {
 	},
 	['mayotte'] = {
 		flag = 'File:yt_hd.png',
-		localised = '',
+		localised = 'Mahoran',
 		name = 'Mayotte',
 	},
 	['mexico'] = {
@@ -823,7 +823,7 @@ local data = {
 	},
 	['norfolkisland'] = {
 		flag = 'File:nf_hd.png',
-		localised = '',
+		localised = 'Norfolk Island',
 		name = 'Norfolk Island',
 	},
 	['northernmarianaislands'] = {
@@ -893,7 +893,7 @@ local data = {
 	},
 	['pitcairn'] = {
 		flag = 'File:pn_hd.png',
-		localised = '',
+		localised = 'Pitcairn Island',
 		name = 'Pitcairn',
 	},
 	['poland'] = {
@@ -938,12 +938,12 @@ local data = {
 	},
 	['saintbarthélemy'] = {
 		flag = 'File:bl_hd.png',
-		localised = '',
+		localised = 'Barthélemois',
 		name = 'Saint Barthélemy',
 	},
 	['sainthelena'] = {
 		flag = 'File:sh_hd.png',
-		localised = '',
+		localised = 'Saint Helenian',
 		name = 'Saint Helena',
 	},
 	['saintkittsandnevis'] = {
@@ -958,12 +958,12 @@ local data = {
 	},
 	['saintmartin(frenchpart)'] = {
 		flag = 'File:mf_hd.png',
-		localised = '',
+		localised = 'Saint-Martinoise',
 		name = 'Saint Martin (French part)',
 	},
 	['saintpierreandmiquelon'] = {
 		flag = 'File:pm_hd.png',
-		localised = '',
+		localised = 'Miquelonnais',
 		name = 'Saint Pierre and Miquelon',
 	},
 	['saintvincentandthegrenadines'] = {
@@ -983,7 +983,7 @@ local data = {
 	},
 	['saotomeandprincipe'] = {
 		flag = 'File:st_hd.png',
-		localised = '',
+		localised = 'São Toméan',
 		name = 'Sao Tome and Principe',
 	},
 	['saudiarabia'] = {
@@ -1018,7 +1018,7 @@ local data = {
 	},
 	['sintmaarten(dutchpart)'] = {
 		flag = 'File:sx_hd.png',
-		localised = '',
+		localised = 'Sint Maarten',
 		name = 'Sint Maarten (Dutch part)',
 	},
 	['slovakia'] = {
@@ -1048,7 +1048,7 @@ local data = {
 	},
 	['southgeorgiaandthesouthsandwichislands'] = {
 		flag = 'File:gs_hd.png',
-		localised = '',
+		localised = 'South Georgia Island',
 		name = 'South Georgia and the South Sandwich Islands',
 	},
 	['southkorea'] = {
