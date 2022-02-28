@@ -83,7 +83,7 @@ local data = {
 	},
 	['ascensionisland'] = {
 		flag = 'File:ac_hd.png',
-		localised = '',
+		localised = 'Saint Helenian',
 		name = 'Ascension Island',
 	},
 	['australia'] = {
@@ -173,7 +173,7 @@ local data = {
 	},
 	['bouvetisland'] = {
 		flag = 'File:bv_hd.png',
-		localised = 'Bouvet Island',
+		localised = 'Bouvet Islander',
 		name = 'Bouvet Island',
 	},
 	['brazil'] = {
@@ -253,12 +253,12 @@ local data = {
 	},
 	['christmasisland'] = {
 		flag = 'File:cx_hd.png',
-		localised = 'Christmas Island',
+		localised = 'Christmas Islander',
 		name = 'Christmas Island',
 	},
 	['cocos(keeling)islands'] = {
 		flag = 'File:cc_hd.png',
-		localised = 'Cocos Island',
+		localised = 'Cocos Islander',
 		name = 'Cocos (Keeling) Islands',
 	},
 	['colombia'] = {
@@ -283,7 +283,7 @@ local data = {
 	},
 	['cookislands'] = {
 		flag = 'File:ck_hd.png',
-		localised = 'Cook Island',
+		localised = 'Cook Islander',
 		name = 'Cook Islands',
 	},
 	['costarica'] = {
@@ -423,7 +423,7 @@ local data = {
 	},
 	['frenchsouthernterritories'] = {
 		flag = 'File:tf_hd.png',
-		localised = '',
+		localised = 'French',
 		name = 'French Southern Territories',
 	},
 	['gabon'] = {
@@ -513,7 +513,7 @@ local data = {
 	},
 	['heardislandandmcdonaldislands'] = {
 		flag = 'File:hm_hd.png',
-		localised = '',
+		localised = 'Heard Island',
 		name = 'Heard Island and McDonald Islands',
 	},
 	['honduras'] = {
@@ -823,7 +823,7 @@ local data = {
 	},
 	['norfolkisland'] = {
 		flag = 'File:nf_hd.png',
-		localised = 'Norfolk Island',
+		localised = 'Norfolk Islander',
 		name = 'Norfolk Island',
 	},
 	['northernmarianaislands'] = {
@@ -1273,7 +1273,7 @@ local data = {
 	},
 	['ålandislands'] = {
 		flag = 'File:ax_hd.png',
-		localised = '',
+		localised = 'Ålander',
 		name = 'Åland Islands',
 	},
 
