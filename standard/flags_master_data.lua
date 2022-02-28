@@ -158,7 +158,7 @@ local data = {
 	},
 	['bonaire,sinteustatiusandsaba'] = {
 		flag = 'File:bq_hd.png',
-		localised = '',
+		localised = 'Bonairean',
 		name = 'Bonaire, Sint Eustatius and Saba',
 	},
 	['bosniaandherzegovina'] = {
@@ -173,7 +173,7 @@ local data = {
 	},
 	['bouvetisland'] = {
 		flag = 'File:bv_hd.png',
-		localised = '',
+		localised = 'Bouvet Island',
 		name = 'Bouvet Island',
 	},
 	['brazil'] = {
@@ -253,12 +253,12 @@ local data = {
 	},
 	['christmasisland'] = {
 		flag = 'File:cx_hd.png',
-		localised = '',
+		localised = 'Christmas Island',
 		name = 'Christmas Island',
 	},
 	['cocos(keeling)islands'] = {
 		flag = 'File:cc_hd.png',
-		localised = '',
+		localised = 'Cocos Island',
 		name = 'Cocos (Keeling) Islands',
 	},
 	['colombia'] = {
@@ -1253,7 +1253,7 @@ local data = {
 	},
 	['westernsahara'] = {
 		flag = 'File:eh_hd.png',
-		localised = '',
+		localised = 'Western Saharan',
 		name = 'Western Sahara',
 	},
 	['yemen'] = {
@@ -1304,7 +1304,7 @@ local data = {
 	-- ISO 3166-1 alpha-2 Traditional Reservations
 	['yugoslavia'] = {
 		flag = 'File:yu_hd.png',
-		localised = '',
+		localised = 'Yugoslavian',
 		name = 'Yugoslavia',
 	},
 
