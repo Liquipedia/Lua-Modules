@@ -294,7 +294,7 @@ function mapFunctions.getExtraData(map)
 		bans['team' .. opponentIndex] = {}
 		local banIndex = 1
 		while String.isNotEmpty(map['t' .. opponentIndex .. 'b' .. banIndex]) do
-			local banRaw = map['team' .. opponentIndex .. 'ban' .. banIndex] or map['t' .. opponentIndex .. 'b' .. banIndex]
+			local banRaw = map['t' .. opponentIndex .. 'b' .. banIndex]
 			local ban = BrawlerNames[string.lower(banRaw)]
 			if not ban then
 				error('Unsupported ban input ' .. ban)
@@ -347,8 +347,7 @@ function mapFunctions.getParticipantsData(map)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local pickIndex = 1
 		while String.isNotEmpty(map['t' .. opponentIndex .. 'p' .. pickIndex]) do
-			local brawlerRaw = map['team' .. opponentIndex .. 'pick' .. pickIndex]
-				or map['t' .. opponentIndex .. 'p' .. pickIndex]
+			local brawlerRaw = map['t' .. opponentIndex .. 'p' .. pickIndex]
 			local brawler = BrawlerNames[string.lower(brawlerRaw)]
 			if not brawler then
 				error('Unsupported brawler input ' .. brawlerRaw)
