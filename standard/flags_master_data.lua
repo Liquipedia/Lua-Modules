@@ -1203,7 +1203,7 @@ local data = {
 	},
 	['unitedstatesminoroutlyingislands'] = {
 		flag = 'File:um_hd.png',
-		localised = '',
+		localised = 'American Islander',
 		name = 'United States Minor Outlying Islands',
 	},
 	['uruguay'] = {
