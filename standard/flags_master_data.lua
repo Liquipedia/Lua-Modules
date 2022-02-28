@@ -1341,6 +1341,11 @@ local data = {
 		localised = 'Asian',
 		name = 'Asia',
 	},
+	['asia-pacific'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'APAC',
+		name = 'Asia-Pacific',
+	},
 	['benelux'] = {
 		flag = 'File:benelux hd.png',
 		localised = 'Benelux',
@@ -1350,6 +1355,11 @@ local data = {
 		flag = 'File:cais flag hd.png',
 		localised = 'Central America',
 		name = 'Central America',
+	},
+	['centralasia'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'Central Asian',
+		name = 'Central Asia',
 	},
 	['commonwealthofindependentstates'] = {
 		flag = 'File:Cis hd.png',
@@ -1365,6 +1375,11 @@ local data = {
 		flag = 'File:EsPt hd.png',
 		localised = 'Iberian',
 		name = 'Iberia',
+	},
+	['latinamerica'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'Latin American',
+		name = 'Latin America',
 	},
 	['middleeast'] = {
 		flag = 'File:Middle east flag hd.png',
@@ -1386,10 +1401,20 @@ local data = {
 		localised = 'North American',
 		name = 'North America',
 	},
+	['northeastasia'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'Northeast Asian',
+		name = 'Northeast Asia',
+	},
 	['oceania'] = {
 		flag = 'File:anz hd.png',
 		localised = 'Oceanian',
 		name = 'Oceania',
+	},
+	['persiangulfstates'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'Persian Gulf State',
+		name = 'Persian Gulf States',
 	},
 	['southamerica'] = {
 		flag = 'File:Unasur hd.png',
@@ -2006,6 +2031,8 @@ local aliases = {
 	-- Other
 	['america'] = 'unitedstates',
 	['americas'] = 'northamerica',
+	['asiapacific'] = 'asia-pacific',
+	['apac'] = 'asia-pacific',
 	['bonaire'] = 'bonaire,sinteustatiusandsaba',
 	['sinteustatius'] = 'bonaire,sinteustatiusandsaba',
 	['saba'] = 'bonaire,sinteustatiusandsaba',
@@ -2025,7 +2052,9 @@ local aliases = {
 	['holland'] = 'netherlands',
 	['international'] = 'world',
 	['korea'] = 'southkorea',
+	['latam'] = 'latinamerica',
 	['macao'] = 'macau',
+	['nea'] = 'northeastasia',
 	['nord'] = 'nordiccountries',
 	['nordic'] = 'nordiccountries',
 	['nordiccouncil'] = 'nordiccountries',
