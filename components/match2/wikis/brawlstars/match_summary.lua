@@ -44,8 +44,9 @@ local CustomMatchSummary = {}
 
 -- Brawler Pick/Ban Class
 local Brawler = Class.new(
-	function(self, isBan)
-		self.isBan = isBan
+	function(self, options)
+		options = options or {}
+		self.isBan = options.isBan
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
@@ -210,7 +211,7 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add the Brawler pics
 	if not Table.isEmpty(showGamePicks) then
-		local brawler = Brawler()
+		local brawler = Brawler({isBan = false})
 
 		for gameIndex, pickData in ipairs(showGamePicks) do
 			brawler:row(pickData, gameIndex, pickData.numberOfPicks, match.date)
@@ -236,7 +237,7 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add the Brawler bans
 	if not Table.isEmpty(showGameBans) then
-		local brawler = Brawler(true)
+		local brawler = Brawler({isBan = true})
 
 		for gameIndex, banData in ipairs(showGameBans) do
 			brawler:row(banData, gameIndex, banData.numberOfBans, match.date)
