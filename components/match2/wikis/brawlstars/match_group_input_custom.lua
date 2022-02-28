@@ -292,16 +292,9 @@ function mapFunctions.getExtraData(map)
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		bans['team' .. opponentIndex] = {}
-		local banIndex = 1
-		while String.isNotEmpty(map['t' .. opponentIndex .. 'b' .. banIndex]) do
-			local banRaw = map['t' .. opponentIndex .. 'b' .. banIndex]
-			local ban = BrawlerNames[string.lower(banRaw)]
-			if not ban then
-				error('Unsupported ban input ' .. ban)
-			end
+		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
+			ban = mapFunctions._CleanBrawlerName(ban)
 			table.insert(bans['team' .. opponentIndex], ban)
-
-			banIndex = banIndex + 1
 		end
 	end
 
@@ -345,24 +338,28 @@ function mapFunctions.getParticipantsData(map)
 
 	local maximumPickIndex = 0
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		local pickIndex = 1
-		while String.isNotEmpty(map['t' .. opponentIndex .. 'p' .. pickIndex]) do
-			local brawlerRaw = map['t' .. opponentIndex .. 'p' .. pickIndex]
-			local brawler = BrawlerNames[string.lower(brawlerRaw)]
-			if not brawler then
-				error('Unsupported brawler input ' .. brawlerRaw)
-			end
+		for pickKey, brawler in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+			local pickIndex = tonumber(string.sub(pickKey, -1))
+			brawler = mapFunctions._CleanBrawlerName(brawler)
 			participants[opponentIndex .. '_' .. pickIndex] = {brawler=brawler}
 			if maximumPickIndex < pickIndex then
 				maximumPickIndex = pickIndex
 			end
-			pickIndex = pickIndex + 1
 		end
 	end
 
 	map.extradata.maximumpickindex = maximumPickIndex
 	map.participants = participants
 	return map
+end
+
+function mapFunctions._CleanBrawlerName(brawlerRaw)
+	local brawler = BrawlerNames[string.lower(brawlerRaw)]
+	if not brawler then
+		error('Unsupported brawler input ' .. brawlerRaw)
+	end
+
+	return brawler
 end
 
 --
