@@ -356,7 +356,7 @@ end
 function mapFunctions._CleanBrawlerName(brawlerRaw)
 	local brawler = BrawlerNames[string.lower(brawlerRaw)]
 	if not brawler then
-		error('Unsupported brawler input ' .. brawlerRaw)
+		error('Unsupported brawler input: ' .. brawlerRaw)
 	end
 
 	return brawler
