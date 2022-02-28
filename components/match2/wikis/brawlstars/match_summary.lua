@@ -66,7 +66,7 @@ function Brawler:row(brawlerData, gameNumber, numberBrawlers, date)
 	if numberBrawlers > 0 then
 		self.table:tag('tr')
 			:tag('td')
-				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[1], numberBrawlers, false, self.isBan, date))
+				:node(self:_opponentBrawlerDisplay(brawlerData[1], numberBrawlers, false, date))
 			:tag('td')
 				:node(mw.html.create('div')
 					:wikitext(Abbreviation.make(
@@ -76,10 +76,47 @@ function Brawler:row(brawlerData, gameNumber, numberBrawlers, date)
 					)
 				)
 			:tag('td')
-				:node(CustomMatchSummary._opponentBrawlerDisplay(brawlerData[2], numberBrawlers, true, self.isBan, date))
+				:node(self:_opponentBrawlerDisplay(brawlerData[2], numberBrawlers, true, date))
 	end
 
 	return self
+end
+
+function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, date)
+	local opponentBrawlerDisplay = {}
+
+	for index = 1, numberOfBrawlers do
+		local brawlerDisplay = mw.html.create('div')
+		:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
+		:css('float', flip and 'right' or 'left')
+		:node(BrawlerIcon._getImage{
+			brawler = brawlerData[index],
+			class = 'brkts-champion-icon',
+			date = date,
+		})
+		if index == 1 then
+			brawlerDisplay:css('padding-left', '2px')
+		elseif index == numberOfBrawlers then
+			brawlerDisplay:css('padding-right', '2px')
+		end
+		table.insert(opponentBrawlerDisplay, brawlerDisplay)
+	end
+
+	if flip then
+		opponentBrawlerDisplay = Array.reverse(opponentBrawlerDisplay)
+	end
+
+	local display = mw.html.create('div')
+	if self.isBan then
+		display:addClass('brkts-popup-side-shade-out')
+		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
+	end
+
+	for _, item in ipairs(opponentBrawlerDisplay) do
+		display:node(item)
+	end
+
+	return display
 end
 
 function Brawler:create()
@@ -209,7 +246,7 @@ function CustomMatchSummary._createBody(match)
 		end
 	end
 
-	-- Add the Brawler pics
+	-- Add the Brawler picks
 	if not Table.isEmpty(showGamePicks) then
 		local brawler = Brawler({isBan = false})
 
@@ -220,7 +257,7 @@ function CustomMatchSummary._createBody(match)
 		body:addRow(brawler)
 	end
 
-	-- Pre-Process Brawler picks
+	-- Pre-Process Brawler bans
 	local showGameBans = {}
 	for gameIndex, game in ipairs(match.games) do
 		local extradata = game.extradata
@@ -325,43 +362,6 @@ function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	end
 
 	return container
-end
-
-function CustomMatchSummary._opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, isBan, date)
-	local opponentBrawlerDisplay = {}
-
-	for index = 1, numberOfBrawlers do
-		local brawlerDisplay = mw.html.create('div')
-		:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
-		:css('float', flip and 'right' or 'left')
-		:node(BrawlerIcon._getImage{
-			brawler = brawlerData[index],
-			class = 'brkts-champion-icon',
-			date = date,
-		})
-		if index == 1 then
-			brawlerDisplay:css('padding-left', '2px')
-		elseif index == numberOfBrawlers then
-			brawlerDisplay:css('padding-right', '2px')
-		end
-		table.insert(opponentBrawlerDisplay, brawlerDisplay)
-	end
-
-	if flip then
-		opponentBrawlerDisplay = Array.reverse(opponentBrawlerDisplay)
-	end
-
-	local display = mw.html.create('div')
-	if isBan then
-		display:addClass('brkts-popup-side-shade-out')
-		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
-	end
-
-	for _, item in ipairs(opponentBrawlerDisplay) do
-		display:node(item)
-	end
-
-	return display
 end
 
 return CustomMatchSummary
