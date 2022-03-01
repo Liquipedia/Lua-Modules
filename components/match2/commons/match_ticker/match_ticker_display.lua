@@ -99,8 +99,8 @@ function Match:create()
 end
 
 --[[
-Display Class to generate the scoreBoard row within matches
-- opponent are inputted via `:addOpponent()`
+Renders the scoreboard row, the row showing the opponents and the score.
+- opponent are input via `:addOpponent()`
 - additional css classes can be set via `:addClass()`
 - score/vs display are inputted via `:versus()`
 - match winner is inputted via `:winner()` (to bold the winner)
