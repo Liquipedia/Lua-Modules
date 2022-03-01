@@ -35,7 +35,7 @@ MatchTickerDisplay.OpponentDisplay = Lua.import('Module:OpponentDisplay', {requi
 MatchTickerDisplay.Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 --[[
-Display Class for the Header of MatchTickers
+Display class for the header of a match ticker
 ]]
 local Header = Class.new(
 	function(self)
