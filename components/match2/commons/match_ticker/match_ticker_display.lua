@@ -59,7 +59,7 @@ function Header:create()
 end
 
 --[[
-Display Class for matches within MatchTickers
+Display class for the matches shown within a match ticker
 ]]
 local Match = Class.new(
 	function(self)
