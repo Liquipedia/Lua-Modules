@@ -9,7 +9,8 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
-local TableDisplay = require('Module:AutomaticPointsTable/Display')
+local PointsDivTable = require('Module:AutomaticPointsTable/Display')
+
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -50,7 +51,7 @@ function AutomaticPointsTable.run(frame)
 	-- mw.logObject(tournamentsWithPlacements)
 	-- mw.logObject(sortedDataWithPositions)
 	local positionBackgrounds = pointsTable.parsedInput.positionBackgrounds
-	local divTable = TableDisplay(sortedDataWithPositions, tournamentsWithResults, positionBackgrounds)
+	local divTable = PointsDivTable(sortedDataWithPositions, tournamentsWithResults, positionBackgrounds)
 	return divTable:create()
 end
 

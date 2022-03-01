@@ -49,7 +49,6 @@ local TableRow = Class.new(
 		self.cells = {}
 
 		local team = pointsData.team
-		-- row background
 		if team.bg ~= nil then
 			self.root:addClass('bg-' .. team.bg)
 		end
