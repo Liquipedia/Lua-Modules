@@ -312,6 +312,9 @@ end
 
 --[[
 Merges an opponent struct into a match2 opponent record.
+
+If any property exists in both the record and opponent struct, the value from the opponent struct will be prioritized.
+Reason for this is that the opponent struct is retrived programmatically via Module:Opponent.
 ]]
 function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 	if opponent.type == Opponent.team then
