@@ -186,7 +186,7 @@ function CustomPerson.getPersonType()
 	end
 
 	local role = _args.role or _args.occupation or _args.defaultPersonType
-	role = string.lower(role)
+	role = string.lower(role or '')
 	local category = _ROLES[role]
 	local store = category or _CLEAN_OTHER_ROLES[role] or _args.defaultPersonType
 	if category == 'Map Maker' then
