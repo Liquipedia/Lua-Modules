@@ -407,6 +407,11 @@ function Person:_createLocation(country, location, personType)
 		category = '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
 	end
 
+	local category = ''
+	if Namespace.isMain() then
+		category = '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
+	end
+
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
 		'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]' ..
 		category ..
