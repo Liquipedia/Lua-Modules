@@ -16,6 +16,7 @@ local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
+local BrawlerNames = mw.loadData('Module:BrawlerNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
@@ -51,7 +52,7 @@ function CustomMatchGroupInput.processMap(frame, map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
-	--map = mapFunctions.getParticipantsData(map)
+	map = mapFunctions.getParticipantsData(map)
 
 	return map
 end
@@ -162,18 +163,7 @@ function matchFunctions.getExtraData(match)
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
 		comment = match.comment,
-		ban1 = match.ban1,
-		ban2 = match.ban2,
-		ban3 = match.ban3,
-		ban4 = match.ban4,
-		ban5 = match.ban5,
-		ban6 = match.ban6,
-		ban1opponent = match.ban1opponent,
-		ban2opponent = match.ban2opponent,
-		ban3opponent = match.ban3opponent,
-		ban4opponent = match.ban4opponent,
-		ban5opponent = match.ban5opponent,
-		ban6opponent = match.ban6opponent,
+		mvp = match.mvp,
 	}
 	return match
 end
@@ -188,7 +178,9 @@ function matchFunctions.getOpponents(args)
 		sumscores[map.winner] = (sumscores[map.winner] or 0) + 1
 	end
 
-	local bestof = tonumber(args.bestof or 5) or 5
+	local bestof = Logic.emptyOr(args.bestof, Variables.varDefault('bestof', 5))
+	bestof = tonumber(bestof) or 5
+	Variables.varDefine('bestof', bestof)
 	local firstTo = math.ceil(bestof / 2)
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
@@ -286,13 +278,29 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	local bestof = tonumber(map.bestof or 3) or 3
+	local bestof = Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof', 3))
+	bestof = tonumber(bestof) or 3
+	Variables.varDefine('map_bestof', bestof)
 	map.extradata = {
 		bestof = bestof,
 		comment = map.comment,
 		header = map.header,
+		maptype = map.maptype,
 	}
+
+	local bans = {}
+
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+		bans['team' .. opponentIndex] = {}
+		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
+			ban = mapFunctions._cleanBrawlerName(ban)
+			table.insert(bans['team' .. opponentIndex], ban)
+		end
+	end
+
+	map.extradata.bans = Json.stringify(bans)
 	map.bestof = bestof
+
 	return map
 end
 
@@ -326,9 +334,32 @@ function mapFunctions.getTournamentVars(map)
 end
 
 function mapFunctions.getParticipantsData(map)
-	local participants = map.participants or {}
+	local participants = {}
+
+	local maximumPickIndex = 0
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+		for pickKey, brawler in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+			local pickIndex = tonumber(string.sub(pickKey, -1))
+			brawler = mapFunctions._cleanBrawlerName(brawler)
+			participants[opponentIndex .. '_' .. pickIndex] = {brawler=brawler}
+			if maximumPickIndex < pickIndex then
+				maximumPickIndex = pickIndex
+			end
+		end
+	end
+
+	map.extradata.maximumpickindex = maximumPickIndex
 	map.participants = participants
 	return map
+end
+
+function mapFunctions._cleanBrawlerName(brawlerRaw)
+	local brawler = BrawlerNames[string.lower(brawlerRaw)]
+	if not brawler then
+		error('Unsupported brawler input: ' .. brawlerRaw)
+	end
+
+	return brawler
 end
 
 --
