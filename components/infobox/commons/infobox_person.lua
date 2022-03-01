@@ -347,10 +347,15 @@ function Person:_createLocation(country, location, personType)
 	local countryDisplay = Flags.CountryName(country)
 	local demonym = Localisation(countryDisplay)
 
+	local category = ''
+	if Namespace.isMain() then
+		category = '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
+	end
+
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
-				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
-				.. '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
-				.. (location ~= nil and (',&nbsp;' .. location) or '')
+		'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]' ..
+		category ..
+		(location ~= nil and (',&nbsp;' .. location) or '')
 end
 
 function Person:_createTeam(team, link)
