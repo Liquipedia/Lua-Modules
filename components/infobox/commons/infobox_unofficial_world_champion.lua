@@ -92,7 +92,7 @@ function UnofficialWorldChampion:createInfobox()
 		},
 		Title{name = 'Most Times Held'},
 		Cell{
-			name = (args['most times held no'] or '?') .. ' days',
+			name = (args['most times held no'] or '?') .. ' times',
 			content = { args['most times held'] },
 		},
 		Customizable{id = 'custom', children = {}},
