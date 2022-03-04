@@ -353,14 +353,15 @@ function mapFunctions.getParticipantsData(map)
 	local maximumPickIndex = 0
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerKey, player in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
-			local index = tonumber(string.sub(playerKey, -1))
-			local brawler = map['t' .. opponentIndex .. 'c' .. index] or ''
-			local pickIndex = 0
-			if String.isNotEmpty(brawler) then
-				pickIndex = index
-				brawler = mapFunctions._cleanBrawlerName(brawler)
-			end
-			participants[opponentIndex .. '_' .. index] = {brawler=brawler, player = player}
+			local playerIndex = tonumber(string.sub(playerKey, -1))
+			participants[opponentIndex .. '_' .. playerIndex] = {player = player}
+		end
+
+		for pickKey, brawler in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c') do
+			local pickIndex = tonumber(string.sub(pickKey, -1))
+			brawler = mapFunctions._cleanBrawlerName(brawler)
+			participants[opponentIndex .. '_' .. pickIndex] = participants[opponentIndex .. '_' .. pickIndex] or {}
+			participants[opponentIndex .. '_' .. pickIndex].brawler = brawler
 			if maximumPickIndex < pickIndex then
 				maximumPickIndex = pickIndex
 			end
