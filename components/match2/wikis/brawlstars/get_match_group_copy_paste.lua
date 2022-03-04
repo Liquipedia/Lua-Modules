@@ -111,7 +111,6 @@ function wikiCopyPaste._pickBanParams(key, numberOfOpponents)
 	local shortKey = _PARAM_TO_SHORT[key]
 	local limit = _LIMIT_OF_PARAM[key]
 	local display = ''
-mw.logObject({key = key, shortKey = shortKey, limit = limit})
 
 	for opponentIndex = 1, numberOfOpponents do
 		display = display .. '\n' .. indent .. indent
