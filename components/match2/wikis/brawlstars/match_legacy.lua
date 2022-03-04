@@ -32,7 +32,6 @@ end
 
 function p.storeMatchSMW(match, match2)
 	local streams = Json.parseIfString(match.stream or {})
-	local links = Json.parseIfString(match.links or {})
 	local icon = Variables.varDefault('tournament_icon')
 	local opponents = match2.match2opponents
 
@@ -69,7 +68,6 @@ function p.storeMatchSMW(match, match2)
 		'has teams page=' .. mw.ext.TeamLiquidIntegration.resolve_redirect(match.opponent2 or ''),
 	}
 
-	local streams = Json.parseIfString(match2.stream)
 	for key, item in pairs(streams) do
 		table.insert(
 			subObjectTable,
@@ -186,7 +184,7 @@ function p.convertParameters(match2)
 		elseif opponent.type == 'literal' then
 			match[prefix] = 'TBD'
 		end
-		
+
 		if opponent.type == 'literal' then
 			match.extradata['opponent' .. index .. 'literal'] = 'true'
 		else
