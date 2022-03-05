@@ -226,6 +226,20 @@ function matchFunctions.getOpponents(args)
 	--set resulttype to 'default' if walkover is set
 	if args.walkover then
 		args.resulttype = 'default'
+	elseif isScoreSet then
+		-- if isScoreSet is true we have scores from at least one opponent
+		-- in case the other opponent(s) have no score set manually and
+		-- no sumscore set we have to set them to 0 now so they are
+		-- not displayed as blank
+		for _, opponent in pairs(opponents) do
+			if
+				String.isEmpty(opponent.status)
+				and String.isEmpty(opponent.score)
+			then
+				opponent.score = 0
+				opponent.status = 'S'
+			end
+		end
 	end
 
 	-- see if match should actually be finished if score is set
@@ -338,10 +352,14 @@ function mapFunctions.getParticipantsData(map)
 
 	local maximumPickIndex = 0
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		for pickKey, brawler in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
-			local pickIndex = tonumber(string.sub(pickKey, -1))
+		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+			participants[opponentIndex .. '_' .. playerIndex] = {player = player}
+		end
+
+		for _, brawler, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c') do
 			brawler = mapFunctions._cleanBrawlerName(brawler)
-			participants[opponentIndex .. '_' .. pickIndex] = {brawler=brawler}
+			participants[opponentIndex .. '_' .. pickIndex] = participants[opponentIndex .. '_' .. pickIndex] or {}
+			participants[opponentIndex .. '_' .. pickIndex].brawler = brawler
 			if maximumPickIndex < pickIndex then
 				maximumPickIndex = pickIndex
 			end
