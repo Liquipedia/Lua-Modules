@@ -464,7 +464,7 @@ local args = {
 	foo = {},
 	p10 = {},
 }
-for key, player in Table.iter.pairsByPrefix(args, 'p') do
+for key, player, index in Table.iter.pairsByPrefix(args, 'p') do
 	mw.log(key)
 end
 
@@ -476,7 +476,7 @@ function Table.iter.pairsByPrefix(tbl, prefix)
 		local key = prefix .. i
 		local value = tbl[key]
 		i = i + 1
-		return value and key, value or nil
+		return value and key, value, (i - 1) or nil
 	end
 end
 
