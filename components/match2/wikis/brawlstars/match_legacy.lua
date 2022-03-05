@@ -173,9 +173,9 @@ function p.convertParameters(match2)
 			local playerIndex = 1
 			while not Table.isEmpty(opponentmatch2players[playerIndex] or {}) do
 				local player = opponentmatch2players[playerIndex]
-				opponentplayers['p' .. i] = player.name or ''
-				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
-				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
+				opponentplayers['p' .. playerIndex] = player.name or ''
+				opponentplayers['p' .. playerIndex .. 'flag'] = player.flag or ''
+				opponentplayers['p' .. playerIndex .. 'dn'] = player.displayname or ''
 				playerIndex = playerIndex + 1
 			end
 			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
