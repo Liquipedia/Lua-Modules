@@ -152,7 +152,7 @@ function HiddenInfoboxLeague.getTierCategories()
 	end
 
 	if String.isNotEmpty(tierType) and Tier['types'][string.lower(tierType)] == nil then
-		table.inssert(tierCategories, 'Pages with invalid Tiertype')
+		table.insert(tierCategories, 'Pages with invalid Tiertype')
 	end
 
 	if tierCategories == {} then
