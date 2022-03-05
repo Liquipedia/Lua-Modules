@@ -10,6 +10,27 @@ local Table = require('Module:Table')
 local Array = require('Module:Array')
 local String = require('Module:StringUtils')
 
+local _CONVERT_PICK_BAN_ENTRY = {
+	none = {},
+	pick = {'pick'},
+	ban = {'ban'},
+	player = {'player'},
+	['pick + ban'] = {'pick', 'ban'},
+	['pick + player'] = {'player', 'pick'},
+	['ban + player'] = {'player', 'ban'},
+	all = {'player', 'pick', 'ban'},
+}
+local _PARAM_TO_SHORT = {
+	pick = 'c',
+	ban = 'b',
+	player = 'p',
+}
+local _LIMIT_OF_PARAM = {
+	pick = 3,
+	ban = 2,
+	player = 3,
+}
+
 --[[
 
 WikiSpecific Code for MatchList, Bracket and SingleMatch Code Generators
@@ -33,7 +54,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score or ''))
 	end
 
-	lines = wikiCopyPaste._getMaps(lines, bestof, args, index)
+	lines = wikiCopyPaste._getMaps(lines, bestof, args, index, opponents)
 
 	table.insert(lines, '}}')
 
@@ -57,20 +78,14 @@ end
 
 --subfunction used to generate the code for the Map template
 --sets up as many maps as specified via the bestoff param
-function wikiCopyPaste._getMaps(lines, bestof, args, index)
+function wikiCopyPaste._getMaps(lines, bestof, args, index, numberOfOpponents)
 	if bestof > 0 then
 		local map = '{{Map'
 			.. '\n' .. indent .. indent .. '|map=|maptype='
 			.. '\n' .. indent .. indent .. '|score1=|score2='
 
-		if args.pickBan == 'both' or args.pickBan == 'pick' then
-			map = map .. '\n' .. indent .. indent .. '|t1p1=|t1p2=|t1p3='
-				.. '\n' .. indent .. indent .. '|t2p1=|t2p2=|t2p3='
-		end
-
-		if args.pickBan == 'both' or args.pickBan == 'ban' then
-			map = map .. '\n' .. indent .. indent .. '|t1b1=|t1b2=|t1b3='
-				.. '\n' .. indent .. indent .. '|t2b1=|t2b2=|t2b3='
+		for _, item in ipairs(_CONVERT_PICK_BAN_ENTRY[args.pickBan or ''] or {}) do
+			map = map .. wikiCopyPaste._pickBanParams(item, numberOfOpponents)
 		end
 
 		--first map has additional mapBestof if it is the first match
@@ -90,6 +105,21 @@ function wikiCopyPaste._getMaps(lines, bestof, args, index)
 	end
 
 	return lines
+end
+
+function wikiCopyPaste._pickBanParams(key, numberOfOpponents)
+	local shortKey = _PARAM_TO_SHORT[key]
+	local limit = _LIMIT_OF_PARAM[key]
+	local display = ''
+
+	for opponentIndex = 1, numberOfOpponents do
+		display = display .. '\n' .. indent .. indent
+		for keyIndex = 1, limit do
+			display = display .. '|t' .. opponentIndex .. shortKey .. keyIndex .. '='
+		end
+	end
+
+	return display
 end
 
 return wikiCopyPaste
