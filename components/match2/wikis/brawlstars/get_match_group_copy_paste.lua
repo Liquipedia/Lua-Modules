@@ -117,4 +117,19 @@ function wikiCopyPaste._pickBanParams(key, numberOfOpponents)
 	return display
 end
 
+function wikiCopyPaste._pickBanParams(key, numberOfOpponents)
+	local shortKey = _PARAM_TO_SHORT[key]
+	local limit = _LIMIT_OF_PARAM[key]
+	local display = ''
+
+	for opponentIndex = 1, numberOfOpponents do
+		display = display .. '\n' .. indent .. indent
+		for keyIndex = 1, limit do
+			display = display .. '|t' .. opponentIndex .. shortKey .. keyIndex .. '='
+		end
+	end
+
+	return display
+end
+
 return wikiCopyPaste
