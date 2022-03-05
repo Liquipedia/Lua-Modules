@@ -476,7 +476,7 @@ function Table.iter.pairsByPrefix(tbl, prefix)
 		local key = prefix .. i
 		local value = tbl[key]
 		i = i + 1
-		return value and key, value, (i - 1) or nil
+		return value and (key, value, (i - 1)) or nil
 	end
 end
 
