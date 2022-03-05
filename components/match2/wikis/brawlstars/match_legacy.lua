@@ -169,11 +169,14 @@ function p.convertParameters(match2)
 			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
-			for i = 1,10 do
-				local player = opponentmatch2players[i] or {}
+
+			local playerIndex = 1
+			while not Table.isEmpty(opponentmatch2players[playerIndex] or {}) do
+				local player = opponentmatch2players[playerIndex]
 				opponentplayers['p' .. i] = player.name or ''
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
 				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
+				playerIndex = playerIndex + 1
 			end
 			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
 		elseif opponent.type == 'solo' then
