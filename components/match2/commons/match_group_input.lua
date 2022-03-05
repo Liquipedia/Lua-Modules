@@ -312,10 +312,14 @@ end
 
 --[[
 Merges an opponent struct into a match2 opponent record.
+
+If any property exists in both the record and opponent struct, the value from the opponent struct will be prioritized.
+The opponent struct is retrieved programmatically via Module:Opponent, by using the team template extension.
+Using the team template extension, the opponent struct is standardised and not user input dependant, unlike the record.
 ]]
 function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 	if opponent.type == Opponent.team then
-		record.template = record.template or opponent.template
+		record.template = opponent.template or record.template
 
 	elseif Opponent.typeIsParty(opponent.type) then
 		record.match2players = record.match2players
