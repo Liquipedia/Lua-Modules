@@ -487,7 +487,6 @@ function opponentFunctions.getIcon(template)
 		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
 		return icon, iconDark
 	end
-	return false
 end
 
 return CustomMatchGroupInput
