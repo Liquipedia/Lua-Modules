@@ -524,7 +524,7 @@ function opponentFunctions.getLegacyTeamIcon(template)
 	local iconDark = String.split(iconTemplate, 'File:')[3] or icon
 	icon = String.split(icon, '|')[1]
 	iconDark = String.split(iconDark, '|')[1]
-	return icon
+	return icon, iconDark
 end
 
 return p
