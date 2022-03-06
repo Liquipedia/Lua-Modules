@@ -358,6 +358,7 @@ Match.matchFields = Table.map({
 Match.opponentFields = Table.map({
 	'extradata',
 	'icon',
+	'icondark',
 	'name',
 	'placement',
 	'score',
