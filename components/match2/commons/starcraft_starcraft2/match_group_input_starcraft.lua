@@ -676,7 +676,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 		if opp.template == '' then
 			opp.template = 'tbd'
 		end
-		name, icon, opp.template = StarcraftMatchGroupInput.processTeamTemplateInput(opp.template, date)
+		name, icon, iconDark, opp.template = StarcraftMatchGroupInput.processTeamTemplateInput(opp.template, date)
 	end
 	name = mw.ext.TeamLiquidIntegration.resolve_redirect(name or '')
 	local players = StarcraftMatchGroupInput.getManuallyEnteredPlayers(opp.players)
@@ -686,6 +686,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 
 	return {
 		icon = icon,
+		icondark = iconDark,
 		template = opp.template,
 		['type'] = opp['type'],
 		name = name,
@@ -703,14 +704,18 @@ function StarcraftMatchGroupInput.processTeamTemplateInput(template, date)
 
 		local templateData = mw.ext.TeamTemplate.raw(template, date)
 		icon = templateData.image
+		iconDark = templateData.imagedark
 		if icon == '' then
 			icon = templateData.legacyimage
+		end
+		if iconDark == '' then
+			iconDark = templateData.legacyimagedark
 		end
 		name = templateData.page
 		template = templateData.templatename or template
 	end
 
-	return name, icon, template
+	return name, icon, iconDark, template
 end
 
 --[[
