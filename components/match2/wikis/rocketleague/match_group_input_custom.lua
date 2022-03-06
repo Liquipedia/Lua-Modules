@@ -253,7 +253,9 @@ function matchFunctions.getOpponents(args)
 			-- Retrieve icon and legacy name for team
 			if opponent.type == Opponent.team then
 				opponent.icon, opponent.icondark = opponentFunctions.getTeamIcon(opponent.template)
-					or opponentFunctions.getLegacyTeamIcon(opponent.template)
+				if not opponent.icon then
+					opponent.icon, opponent.icondark = opponentFunctions.getLegacyTeamIcon(opponent.template)
+				end
 				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
 			end
 
