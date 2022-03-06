@@ -658,6 +658,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 	local customTeam = Logic.readBool(opp.default) or Logic.readBool(opp.defaulticon) or Logic.readBool(opp.custom)
 	local name
 	local icon
+	local iconDark
 
 	if customTeam then
 		if not defaultIcon then
@@ -697,7 +698,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opp, date)
 end
 
 function StarcraftMatchGroupInput.processTeamTemplateInput(template, date)
-	local icon, name
+	local icon, name, iconDark
 	template = string.lower(template or ''):gsub('_', ' ')
 	if template ~= '' and template ~= 'noteam' and
 		mw.ext.TeamTemplate.teamexists(template) then
