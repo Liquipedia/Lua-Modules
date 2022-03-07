@@ -48,6 +48,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.matchIndex = matchIndex
 
 			match.parent = context.tournamentParent
+			match.parentname = context.tournamentParentName
 			bracketData.bracketindex = context.bracketIndex
 			bracketData.groupRoundIndex = context.groupRoundIndex
 			bracketData.sectionheader = context.sectionHeader
@@ -114,6 +115,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
 
 		match.parent = context.tournamentParent
+		match.parentname = context.tournamentParentName
 		bracketData.bracketindex = context.bracketIndex
 		bracketData.groupRoundIndex = context.groupRoundIndex
 		bracketData.sectionheader = context.sectionHeader
@@ -261,6 +263,7 @@ function MatchGroupInput.readContext(matchArgs, matchGroupArgs)
 		matchSection = matchArgs.matchsection or matchGroupArgs.matchsection or globalVars:get('matchsection'),
 		sectionHeader = matchGroupArgs.section or globalVars:get('bracket_header'),
 		tournamentParent = globalVars:get('tournament_parent'),
+		tournamentParentName = globalVars:get('tournament_parentname'),
 	}
 end
 
