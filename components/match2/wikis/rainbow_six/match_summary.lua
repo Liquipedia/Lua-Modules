@@ -452,7 +452,7 @@ function CustomMatchSummary._createMap(game)
 	local team2Halfs = extradata.t2halfs or {}
 	local firstSides = extradata.t1firstside or {}
 
-	local firstSide = (firstSides[1] or ''):lower()
+	local firstSide = (firstSides.rt or ''):lower()
 	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
 
 	if not Logic.isEmpty(firstSide) then
