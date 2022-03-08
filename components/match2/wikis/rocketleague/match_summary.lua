@@ -105,7 +105,7 @@ function CustomMatchSummary.getByMatchId(args)
 						game.extradata.t1goals .. '</abbr>')
 				table.insert(gameElements, mw.html.create('div')
 					:node(goals)
-					:css('max-width', '15%')
+					:css('max-width', '50%')
 					:css('maxfont-size', '11px;'))
 			end
 			if game.comment then
@@ -128,7 +128,7 @@ function CustomMatchSummary.getByMatchId(args)
 						game.extradata.t2goals .. '</abbr>')
 				table.insert(gameElements, mw.html.create('div')
 					:node(goals)
-					:css('max-width', '15%')
+					:css('max-width', '50%')
 					:css('maxfont-size', '11px;'))
 			end
 			body = CustomMatchSummary._addFlexRow(body, gameElements, 'brkts-popup-body-game')
