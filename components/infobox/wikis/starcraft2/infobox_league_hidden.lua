@@ -193,7 +193,7 @@ function HiddenInfoboxLeague._definePageVariables()
 	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game or '')] or {})[1] or _GAMES[_GAME_WOL][1])
 
 	Variables.varDefine('tournament_parent', _args.parent or mw.title.getCurrentTitle().prefixedText)
-	Variables.varDefine('tournament_parentname', _args.parentname or _args.name)
+	Variables.varDefine('tournament_parentname', _args.parentname)
 	Variables.varDefine('tournament_subpage', _args.subpage)
 
 	local sdate = HiddenInfoboxLeague._cleanDate(_args.sdate) or HiddenInfoboxLeague._cleanDate(_args.date)
