@@ -466,7 +466,15 @@ end
 -- Parse extradata information
 function mapFunctions.getExtraData(map)
 	map.extradata = {
-		comment = map.comment,
+		comment = map.comment,		
+		t1p1 = {score = map.t1p1score, kills = map.t1p1kills, deaths = map.t1p1deaths},
+		t1p2 = {score = map.t1p2score, kills = map.t1p2kills, deaths = map.t1p2deaths},
+		t1p3 = {score = map.t1p3score, kills = map.t1p3kills, deaths = map.t1p3deaths},
+		t1p4 = {score = map.t1p4score, kills = map.t1p4kills, deaths = map.t1p4deaths},
+		t2p1 = {score = map.t2p1score, kills = map.t2p1kills, deaths = map.t2p1deaths},
+		t2p2 = {score = map.t2p2score, kills = map.t2p2kills, deaths = map.t2p2deaths},
+		t2p3 = {score = map.t2p3score, kills = map.t2p3kills, deaths = map.t2p3deaths},
+		t2p4 = {score = map.t2p4score, kills = map.t2p4kills, deaths = map.t2p4deaths},
 	}
 	return map
 end
