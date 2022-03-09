@@ -252,8 +252,10 @@ function matchFunctions.getOpponents(args)
 
 			-- Retrieve icon and legacy name for team
 			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getTeamIcon(opponent.template)
-					or opponentFunctions.getLegacyTeamIcon(opponent.template)
+				opponent.icon, opponent.icondark = opponentFunctions.getTeamIcon(opponent.template)
+				if not opponent.icon then
+					opponent.icon, opponent.icondark = opponentFunctions.getLegacyTeamIcon(opponent.template)
+				end
 				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
 			end
 
@@ -499,7 +501,11 @@ end
 --
 function opponentFunctions.getTeamIcon(template)
 	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
+	end
 end
 
 --the following 2 functions are a fallback
@@ -514,11 +520,13 @@ function opponentFunctions.getLegacyTeamName(template)
 end
 
 function opponentFunctions.getLegacyTeamIcon(template)
-	local icon = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
-	icon = icon:gsub('%&', '')
-	icon = String.split(icon, 'File:')[2]
+	local iconTemplate = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
+	iconTemplate = iconTemplate:gsub('%&', '')
+	local icon = String.split(iconTemplate, 'File:')[2]
+	local iconDark = String.split(iconTemplate, 'File:')[3] or icon
 	icon = String.split(icon, '|')[1]
-	return icon
+	iconDark = String.split(iconDark, '|')[1]
+	return icon, iconDark
 end
 
 return p

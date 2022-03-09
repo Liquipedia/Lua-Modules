@@ -377,7 +377,7 @@ function matchFunctions.getOpponents(match)
 
 			-- Retrieve icon for team
 			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getIcon(opponent.template)
+				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
 			end
 
 			-- apply status
@@ -517,7 +517,11 @@ end
 --
 function opponentFunctions.getIcon(template)
 	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
+	end
 end
 
 return CustomMatchGroupInput
