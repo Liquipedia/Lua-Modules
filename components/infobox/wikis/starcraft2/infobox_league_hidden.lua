@@ -192,6 +192,7 @@ function HiddenInfoboxLeague._definePageVariables()
 
 	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game or '')] or {})[1] or _GAMES[_GAME_WOL][1])
 
+	-- Using current page title as parent is intended. See PR #1087 for background.
 	Variables.varDefine('tournament_parent', _args.parent or mw.title.getCurrentTitle().prefixedText)
 	Variables.varDefine('tournament_parentname', _args.parentname)
 	Variables.varDefine('tournament_subpage', _args.subpage)

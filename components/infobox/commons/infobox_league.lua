@@ -220,6 +220,7 @@ function League:_definePageVariables(args)
 
 	Variables.varDefine('tournament_game', string.lower(args.game or ''))
 
+	-- Using current page title as parent is intended. See PR #1087 for background.
 	Variables.varDefine('tournament_parent', args.parent or mw.title.getCurrentTitle().prefixedText)
 	Variables.varDefine('tournament_parentname', args.parentname)
 	Variables.varDefine('tournament_subpage', args.subpage)
