@@ -322,7 +322,6 @@ end
 
 function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 	gameRecord.parent = matchRecord.parent
-	gameRecord.parentname = matchRecord.parentname
 	Match.clampFields(gameRecord, Match.gameFields)
 end
 
@@ -388,7 +387,6 @@ Match.gameFields = Table.map({
 	'map',
 	'mode',
 	'parent',
-	'parentname',
 	'participants',
 	'resulttype',
 	'rounds',
