@@ -306,7 +306,7 @@ function Match._prepareRecordsForStore(records)
 		end
 	end
 	for _, gameRecord in ipairs(records.gameRecords) do
-		Match.clampFields(gameRecord, Match.gameFields)
+		Match._prepareGameRecordForStore(records.matchRecord, gameRecord)
 	end
 end
 
@@ -319,6 +319,12 @@ function Match._prepareMatchRecordForStore(match)
 	match.section = Variables.varDefault('last_heading', 'none')
 	Match.clampFields(match, Match.matchFields)
 end
+
+function Match._prepareGameRecordForStore(matchRecord, gameRecord)
+	gameRecord.parent = matchRecord.parent
+	Match.clampFields(gameRecord, Match.gameFields)
+end
+
 
 Match.matchFields = Table.map({
 	'bestof',
@@ -381,6 +387,7 @@ Match.gameFields = Table.map({
 	'length',
 	'map',
 	'mode',
+	'parent',
 	'participants',
 	'resulttype',
 	'rounds',
