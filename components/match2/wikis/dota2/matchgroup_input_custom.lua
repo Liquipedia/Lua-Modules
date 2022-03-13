@@ -441,7 +441,7 @@ function matchFunctions.getOpponents(match)
 			-- get players from vars for teams
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
-					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name, opponent.players)
+					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name)
 				end
 			elseif opponent.type == Opponent.solo then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
@@ -516,9 +516,8 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 end
 
 -- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
+function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	playersData = Json.parseIfString(playersData) or {}
 	local players = {}
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		-- parse player
