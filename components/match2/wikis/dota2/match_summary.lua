@@ -120,7 +120,7 @@ function CustomMatchSummary.getByMatchId(args)
 		match.opponents[2].type == Opponent.team
 	then
 		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
-		match.links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) .. 
+		match.links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
 		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
 		'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
 	end
@@ -136,20 +136,21 @@ function CustomMatchSummary.getByMatchId(args)
 			})
 		end
 
-		for _, site in ipairs(_AUTO_LINKS) do
-			for index, publisherid in pairs(publisherids) do
-				footer:addElement('[['.. site.icon ..'|link='..site.url..publisherid..'|15px|'..'Game '..index..' on '.. site.name..']]')
-			end
-		end
-
 		-- Match Vod + other links
-		local buildLink = function (linktype, link)
-			local icon, text = _LINK_DATA[linktype].icon, _LINK_DATA[linktype].text
+		local buildLink = function (link, icon, text)
 			return '[['..icon..'|link='..link..'|15px|'..text..']]'
 		end
 
+		for _, site in ipairs(_AUTO_LINKS) do
+			for index, publisherid in pairs(publisherids) do
+				local link = site.url .. publisherid
+				local text = 'Game '..index..' on '.. site.name
+				footer:addElement(buildLink(link, site.icon, text))
+			end
+		end
+
 		for linktype, link in pairs(match.links) do
-			footer:addElement(buildLink(linktype, link))
+			footer:addElement(buildLink(link, _LINK_DATA[linktype].icon, _LINK_DATA[linktype].text))
 		end
 
 		matchSummary:footer(footer)
