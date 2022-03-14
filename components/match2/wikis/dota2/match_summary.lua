@@ -151,7 +151,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 		for linkType, link in pairs(match.links) do
 			if not _LINK_DATA[linkType] then
-				mw.log('Unknown link: '.. linkType)
+				mw.log('Unknown link: ' .. linkType)
 			else
 				footer:addElement(buildLink(link, _LINK_DATA[linkType].icon, _LINK_DATA[linkType].text))
 			end
