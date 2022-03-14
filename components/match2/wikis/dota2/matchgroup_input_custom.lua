@@ -70,6 +70,7 @@ function CustomMatchGroupInput.processMatch(_, match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
+	match = matchFunctions.getPublisherId(match)
 	match = matchFunctions.getLinks(match)
 	match = matchFunctions.getExtraData(match)
 
@@ -335,12 +336,19 @@ function matchFunctions.getVodStuff(match)
 
 	for index = 1, _MAX_NUM_GAMES do
 		local vodgame = match['vodgame' .. index]
-		local publisherid = match['matchid' .. index]
 		if not Logic.isEmpty(vodgame) then
 			local map = match['map' .. index] or {}
 			map.vod = map.vod or vodgame
 			match['map' .. index] = map
 		end
+	end
+
+	return match
+end
+
+function matchFunctions.getPublisherId(match)
+	for index = 1, _MAX_NUM_GAMES do
+		local publisherid = match['matchid' .. index]
 		if not Logic.isEmpty(publisherid) then
 			local map = match['map' .. index] or {}
 			map.publisherid = map.matchid or publisherid
@@ -433,7 +441,7 @@ function matchFunctions.getOpponents(match)
 			-- get players from vars for teams
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
-					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name, opponent.players)
+					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name)
 				end
 			elseif opponent.type == Opponent.solo then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
@@ -508,19 +516,15 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 end
 
 -- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
+function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	playersData = Json.parseIfString(playersData) or {}
 	local players = {}
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or playersData['p' .. playerIndex]
-			or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
+		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
+		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
 		if String.isNotEmpty(player.name) then
 			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
@@ -555,45 +559,21 @@ function mapFunctions.getParticipants(map, opponents)
 	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
 		for playerIndex = 1, _MAX_NUM_PLAYERS do
 			local hero = map['t' .. opponentIndex .. 'h' .. playerIndex]
-			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = HeroNames[hero] or hero
-
-			local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
-			if String.isNotEmpty(player) then
-				participants = mapFunctions.attachToParticipant(
-					player,
-					opponentIndex,
-					opponents[opponentIndex].match2players,
-					participants,
-					heroData['team' .. opponentIndex .. 'hero' .. playerIndex]
-				)
-			end
+			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = HeroNames[hero]
 		end
+
 		local banIndex = 1
-		local currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
-		while currentBan do
-			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[currentBan] or currentBan
+		local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+		while nextBan do
+			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[nextBan]
 			banIndex = banIndex + 1
-			currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+			nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		end
 	end
 
 	map.extradata = heroData
 	map.participants = participants
 	return mapFunctions.getAdditionalExtraData(map)
-end
-
-function mapFunctions.attachToParticipant(player, opponentIndex, players, participants, hero)
-	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
-	for playerIndex, item in pairs(players or {}) do
-		if player == item.name then
-			participants[opponentIndex .. '_' .. playerIndex] = {
-				hero = hero,
-			}
-			break
-		end
-	end
-
-	return participants
 end
 
 -- Calculate Score and Winner of the map
