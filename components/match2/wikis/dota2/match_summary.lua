@@ -50,7 +50,7 @@ local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 -- Hero Ban Class
 local HeroBan = Class.new(
 	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto'):css('overflow', 'hidden')
+		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
 		self:createHeader()
@@ -93,6 +93,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 	local matchSummary = MatchSummary():init('400px')
 	matchSummary.root:css('flex-wrap', 'unset')
+	matchSummary.root:css('overflow', 'hidden')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -282,7 +283,6 @@ function CustomMatchSummary._createGame(game, gameIndex)
 
 	row:addClass('brkts-popup-body-game')
 		:css('font-size', '80%')
-		:css('overflow', 'hidden')
 		:css('padding-left', '5px')
 		:css('padding-right', '5px')
 
