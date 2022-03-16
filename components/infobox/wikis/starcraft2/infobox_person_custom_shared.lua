@@ -109,12 +109,12 @@ function CustomPerson.getRaceData(race, asCategory)
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
 	else
 		if asCategory then
-			for raceIndex, raceValue in ipairs(raceTable) do
+			for raceIndex, raceValue in ipairs(raceTable or {}) do
 				raceTable[raceIndex] = ':Category:' .. raceValue .. ' Players|' .. raceValue .. ']]'
 					.. '[[Category:' .. raceValue .. ' Players'
 			end
 		end
-		display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
+		display = '[[' .. table.concat(raceTable or {}, ']],&nbsp;[[') .. ']]'
 	end
 
 	_raceData = {
