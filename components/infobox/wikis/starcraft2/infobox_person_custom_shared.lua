@@ -114,7 +114,7 @@ function CustomPerson.getRaceData(race, asCategory)
 					.. '[[Category:' .. raceValue .. ' Players'
 			end
 		end
-		display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
+		display = '[[' .. table.concat(raceTable or {}, ']],&nbsp;[[') .. ']]'
 	end
 
 	_raceData = {
