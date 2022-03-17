@@ -230,7 +230,7 @@ end
 -- Check if any opponent has a none-standard status
 function CustomMatchGroupInput.placementCheckSpecialStatus(table)
 	return Table.any(table,
-		function (_, scoreinfo) 
+		function (_, scoreinfo)
 			return scoreinfo.status ~= _STATUS_SCORE and String.isNotEmpty(scoreinfo.status)
 		end
 	)
