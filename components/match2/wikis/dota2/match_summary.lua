@@ -337,6 +337,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	for index = 1, numberOfHeroes do
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
+			:addClass('brkts-popup-side-hero')
 			:addClass('brkts-popup-side-hero-hover')
 			:css('float', flip and 'right' or 'left')
 			:node(HeroIcon._getImage{
