@@ -340,7 +340,8 @@ function CustomTeam.getEarningsAndMedalsData(team)
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
-	local mode = _EARNINGS_MODES[data.mode] or 'other'
+	local mode = (data.players or {}).type
+	mode = _EARNINGS_MODES[mode] or 'other'
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
