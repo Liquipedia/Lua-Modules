@@ -30,6 +30,7 @@ local _EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
 local _DISCARD_PLACEMENT = '99'
+local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local _EARNING_MODES = {['solo'] = '1v1', ['team'] = 'team'}
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 30
@@ -312,6 +313,13 @@ function CustomPlayer._getEarningsMedalsData(player)
 		})
 	end
 
+	local placementConditions = ConditionTree(BooleanOperator.any)
+	for _, item in pairs(_ALLOWED_PLACES) do
+		placementConditions:add({
+			ConditionNode(ColumnName('placement'), Comparator.eq, item),
+		})
+	end
+
 	local conditions = ConditionTree(BooleanOperator.all):add({
 		playerConditions,
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
@@ -321,13 +329,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
 			ConditionTree(BooleanOperator.all):add({
 				ConditionNode(ColumnName('players_type'), Comparator.gt, 'solo'),
-				ConditionTree(BooleanOperator.any):add({
-					ConditionNode(ColumnName('placement'), Comparator.eq, '1'),
-					ConditionNode(ColumnName('placement'), Comparator.eq, '2'),
-					ConditionNode(ColumnName('placement'), Comparator.eq, '3'),
-					ConditionNode(ColumnName('placement'), Comparator.eq, '4'),
-					ConditionNode(ColumnName('placement'), Comparator.eq, '3-4'),
-				}),
+				placementConditions,
 			}),
 		}),
 	})
