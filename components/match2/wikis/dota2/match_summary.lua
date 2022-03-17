@@ -240,8 +240,11 @@ function CustomMatchSummary._createBody(match)
 	if not Table.isEmpty(showGameBans) then
 		local heroBan = HeroBan()
 
-		for gameIndex, banData in ipairs(showGameBans) do
-			heroBan:banRow(banData, gameIndex, banData.numberOfBans)
+		for gameIndex in ipairs(match.games) do
+			local banData = showGameBans[gameIndex]
+			if banData then
+				heroBan:banRow(banData, gameIndex, banData.numberOfBans)
+			end
 		end
 
 		body:addRow(heroBan)
