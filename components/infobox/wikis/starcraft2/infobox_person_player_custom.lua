@@ -317,7 +317,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
 		ConditionTree(BooleanOperator.any):add({
 			ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
-			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, ''),
+			ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
 		}),
 		ConditionTree(BooleanOperator.any):add({
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
