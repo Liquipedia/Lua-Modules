@@ -270,7 +270,6 @@ function CustomTeam.getEarningsAndMedalsData(team)
 		ConditionTree(BooleanOperator.any):add({
 			ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 			ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
-			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, ''),
 		}),
 		ConditionTree(BooleanOperator.any):add({
 			ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
