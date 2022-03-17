@@ -22,6 +22,14 @@ local Builder = require('Module:Infobox/Widget/Builder')
 local Center = require('Module:Infobox/Widget/Center')
 local Breakdown = require('Module:Infobox/Widget/Breakdown')
 
+local Condition = require('Module:Condition')
+
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
 local doStore = true
 local pagename = mw.title.getCurrentTitle().prefixedText
 
@@ -34,9 +42,10 @@ local _team
 
 local _earnings = 0
 local _earnings_by_players_while_on_team = 0
-local _ALLOWED_PLACES = { '1', '2', '3', '4', '3-4' }
 local _EARNINGS_MODES = { ['team'] = 'team' }
+local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _DISCARD_PLACEMENT = 99
+local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 30
 local _PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
 function CustomTeam.run(frame)
@@ -237,7 +246,7 @@ function CustomTeam._getLPDBrecursive(cond, query, queryType)
 		})
 		count = #additionalData
 		-- Merging
-		for i, item in ipairs(additionalData) do
+		for i, item in ipairs(additionalData or {}) do
 			data[offset + i] = item
 		end
 		offset = offset + count
@@ -247,15 +256,45 @@ function CustomTeam._getLPDBrecursive(cond, query, queryType)
 end
 
 function CustomTeam.getEarningsAndMedalsData(team)
-	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR [[placement::' ..
-		table.concat(_ALLOWED_PLACES, ']] OR [[placement::')
-		.. ']]) AND(' .. '[[participant::' .. team .. ']] OR ' ..
-		'([[mode::!team_individual]] AND ([[extradata_participantteamclean::' ..
-		string.lower(team) .. ']] OR [[extradata_participantteamclean::' .. team .. ']] OR ' ..
-		'[[extradata_participantteam::' .. team .. ']])))'
-	local query = 'liquipediatier, placement, date, prizemoney, mode'
+	local query = 'liquipediatier, liquipediatiertype, placement, date, individualprizemoney, prizemoney, players'
 
-	local data = CustomTeam._getLPDBrecursive(cond, query, 'placement')
+	local playerTeamConditions = ConditionTree(BooleanOperator.any):add({
+	})
+	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
+		playerTeamConditions:add({
+			ConditionNode(ColumnName('players_p' .. playerIndex .. 'team'), Comparator.eq, team),
+		})
+	end
+
+	local placementConditions = ConditionTree(BooleanOperator.any)
+	for _, item in pairs(_ALLOWED_PLACES) do
+		placementConditions:add({
+			ConditionNode(ColumnName('placement'), Comparator.eq, item),
+		})
+	end
+
+	local conditions = ConditionTree(BooleanOperator.all):add({
+		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
+		ConditionTree(BooleanOperator.any):add({
+			ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
+			ConditionTree(BooleanOperator.all):add({
+				ConditionNode(ColumnName('players_type'), Comparator.eq, 'team'),
+				ConditionNode(ColumnName('participantlink'), Comparator.eq, team),
+				placementConditions,
+			}),
+		}),
+		ConditionTree(BooleanOperator.any):add({
+			ConditionNode(ColumnName('participantlink'), Comparator.eq, team),
+			ConditionTree(BooleanOperator.all):add({
+				ConditionNode(ColumnName('players_type'), Comparator.neq, 'team'),
+				playerTeamConditions
+			}),
+		}),
+	})
+
+	local data = CustomTeam._getLPDBrecursive(conditions:toString(), query, 'placement')
 
 	local earnings = {}
 	local medals = {}
@@ -271,9 +310,10 @@ function CustomTeam.getEarningsAndMedalsData(team)
 			earnings, playerEarnings = CustomTeam._addPlacementToEarnings(earnings, playerEarnings, item)
 
 			--handle medals
-			if item.mode == '1v1' then
+			local mode = (item.players or {}).type
+			if mode == 'solo' then
 				medals = CustomTeam._addPlacementToMedals(medals, item)
-			elseif item.mode == 'team' then
+			elseif mode == 'team' then
 				teamMedals = CustomTeam._addPlacementToMedals(teamMedals, item)
 			end
 		end
@@ -300,7 +340,8 @@ function CustomTeam.getEarningsAndMedalsData(team)
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
-	local mode = _EARNINGS_MODES[data.mode] or 'other'
+	local mode = (data.players or {}).type
+	mode = _EARNINGS_MODES[mode] or 'other'
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
