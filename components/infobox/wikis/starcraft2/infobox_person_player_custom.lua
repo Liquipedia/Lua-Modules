@@ -18,12 +18,22 @@ local CleanRace = require('Module:CleanRace')
 local Math = require('Module:Math')
 local Matches = require('Module:Upcoming ongoing and recent matches player/new')
 
+local Condition = require('Module:Condition')
+
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
 local _EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
 local _DISCARD_PLACEMENT = '99'
+local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
-local _EARNING_MODES = {['1v1'] = '1v1', ['team_individual'] = 'team'}
+local _EARNING_MODES = {['solo'] = '1v1', ['team'] = 'team'}
+local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 30
 
 --race stuff
 local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
@@ -294,13 +304,37 @@ function CustomPlayer._getLPDBrecursive(cond, query, queryType)
 end
 
 function CustomPlayer._getEarningsMedalsData(player)
-	local cond = '[[date::!1970-01-01 00:00:00]] AND ([[prizemoney::>0]] OR ' ..
-		'([[mode::1v1]] AND ([[placement::1]] OR [[placement::2]] OR [[placement::3]]' ..
-		' OR [[placement::4]] OR [[placement::3-4]]))) AND ' ..
-		'[[participant::' .. player .. ']]'
-	local query = 'liquipediatier, liquipediatiertype, placement, date, prizemoney, mode'
+	local query = 'liquipediatier, liquipediatiertype, placement, date, individualprizemoney, players'
 
-	local data = CustomPlayer._getLPDBrecursive(cond, query, 'placement')
+	local playerConditions = ConditionTree(BooleanOperator.any)
+	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
+		playerConditions:add({
+			ConditionNode(ColumnName('players_p' .. playerIndex), Comparator.eq, player),
+		})
+	end
+
+	local placementConditions = ConditionTree(BooleanOperator.any)
+	for _, item in pairs(_ALLOWED_PLACES) do
+		placementConditions:add({
+			ConditionNode(ColumnName('placement'), Comparator.eq, item),
+		})
+	end
+
+	local conditions = ConditionTree(BooleanOperator.all):add({
+		playerConditions,
+		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
+		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
+		ConditionTree(BooleanOperator.any):add({
+			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
+			ConditionTree(BooleanOperator.all):add({
+				ConditionNode(ColumnName('players_type'), Comparator.gt, 'solo'),
+				placementConditions,
+			}),
+		}),
+	})
+
+	local data = CustomPlayer._getLPDBrecursive(conditions:toString(), query, 'placement')
 
 	local earnings = {}
 	local medals = {}
@@ -325,20 +359,20 @@ function CustomPlayer._getEarningsMedalsData(player)
 end
 
 function CustomPlayer._addPlacementToEarnings(earnings, earnings_total, data)
-	local mode = _EARNING_MODES[data.mode] or 'other'
+	local mode = _EARNING_MODES[(data.players or {}).type or ''] or 'other'
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
-	local date = string.sub(data.date, 1, 4)
-	earnings[mode][date] = (earnings[mode][date] or 0) + data.prizemoney
-	earnings['total'][date] = (earnings['total'][date] or 0) + data.prizemoney
-	earnings_total = (earnings_total or 0) + data.prizemoney
+	local year = string.sub(data.date, 1, 4)
+	earnings[mode][year] = (earnings[mode][year] or 0) + data.individualprizemoney
+	earnings['total'][year] = (earnings['total'][year] or 0) + data.individualprizemoney
+	earnings_total = (earnings_total or 0) + data.individualprizemoney
 
 	return earnings, earnings_total
 end
 
 function CustomPlayer._addPlacementToMedals(medals, data)
-	if data.mode == '1v1' then
+	if (data.players or {}).type == 'solo' then
 		local place = CustomPlayer._Placements(data.placement)
 		if place ~= _DISCARD_PLACEMENT then
 			local tier = data.liquipediatier or 'undefined'
@@ -365,7 +399,7 @@ function CustomPlayer._setVarsFromTable(table)
 end
 
 function CustomPlayer._Placements(value)
-	value = (value or '') ~= '' and value or _DISCARD_PLACEMENT
+	value = String.isNotEmpty(value) and value or _DISCARD_PLACEMENT
 	value = mw.text.split(value, '-')[1]
 	if value ~= '1' and value ~= '2' and value ~= '3' then
 		value = _DISCARD_PLACEMENT
