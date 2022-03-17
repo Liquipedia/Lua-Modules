@@ -229,7 +229,11 @@ end
 
 -- Check if any opponent has a none-standard status
 function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= _STATUS_SCORE and String.isNotEmpty(scoreinfo.status) end)
+	return Table.any(table,
+		function (_, scoreinfo) 
+			return scoreinfo.status ~= _STATUS_SCORE and String.isNotEmpty(scoreinfo.status)
+		end
+	)
 end
 
 -- function to check for forfeits
