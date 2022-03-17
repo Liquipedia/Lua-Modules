@@ -49,6 +49,8 @@ local _SECONDS_UNTIL_FINISHED_EXACT = 30800
 local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 local _MIN_EARNINGS_FOR_FEATURED = 100000
 
+local _CURRENT_TIME_UNIX = os.time(os.date('!*t'))
+
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
@@ -58,15 +60,13 @@ local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(_, match)
-	-- Count number of maps, check for empty maps to remove, and automatically count score
-	match = matchFunctions.getBestOf(match)
-	match = matchFunctions.getScoreFromMapWinners(match)
-
 	-- process match
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
 	)
+	match = matchFunctions.getBestOf(match)
+	match = matchFunctions.getScoreFromMapWinners(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
@@ -272,20 +272,28 @@ end
 -- 2) At least one map has a winner
 function matchFunctions.getScoreFromMapWinners(match)
 	local newScores = {}
-	local foundScores = false
+	local setScores = false
+
+	-- If the match has started, we want to use the automatic calculations
+	if match.dateexact then
+		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
+		if matchUnixTime <= _CURRENT_TIME_UNIX then
+			setScores = true
+		end
+	end
 
 	local mapIndex = 1
 	while match['map'..mapIndex] do
 		local winner = tonumber(match['map'..mapIndex].winner)
-		foundScores = true
 		if winner and winner > 0 and winner <= _MAX_NUM_OPPONENTS then
+			setScores = true
 			newScores[winner] = (newScores[winner] or 0) + 1
 		end
 		mapIndex = mapIndex + 1
 	end
 
 	for index = 1, _MAX_NUM_OPPONENTS do
-		if not match['opponent' .. index].score and foundScores then
+		if not match['opponent' .. index].score and setScores then
 			match['opponent' .. index].score = newScores[index] or 0
 		end
 	end
@@ -481,12 +489,11 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and _SECONDS_UNTIL_FINISHED_EXACT
 			or _SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if matchUnixTime + threshold < currentUnixTime then
+		if matchUnixTime + threshold < _CURRENT_TIME_UNIX then
 			match.finished = true
 		end
 	end
