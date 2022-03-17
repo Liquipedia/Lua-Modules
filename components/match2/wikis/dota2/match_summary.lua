@@ -98,6 +98,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 	local matchSummary = MatchSummary():init('400px')
 	matchSummary.root:css('flex-wrap', 'unset')
+	matchSummary.root:css('overflow', 'hidden')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
