@@ -42,7 +42,6 @@ local _team
 
 local _earnings = 0
 local _earnings_by_players_while_on_team = 0
-local _ALLOWED_PLACES = { '1', '2', '3', '4', '3-4' }
 local _EARNINGS_MODES = { ['team'] = 'team' }
 local _DISCARD_PLACEMENT = 99
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 30
@@ -311,7 +310,7 @@ function CustomTeam.getEarningsAndMedalsData(team)
 			earnings, playerEarnings = CustomTeam._addPlacementToEarnings(earnings, playerEarnings, item)
 
 			--handle medals
-			local mode = (players or {}).type
+			local mode = (item.players or {}).type
 			if mode == 'solo' then
 				medals = CustomTeam._addPlacementToMedals(medals, item)
 			elseif mode == 'team' then
