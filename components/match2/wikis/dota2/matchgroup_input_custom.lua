@@ -519,6 +519,7 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 		opponents[index].score = _NOT_PLAYED_SCORE
 		opponents[index].status = walkoverType
 	end
+	return opponents
 end
 
 -- Get Playerdata from Vars (get's set in TeamCards)
