@@ -9,6 +9,7 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -19,7 +20,6 @@ local _ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local _FINISHED_INDICATORS = { 'skip', 'np', 'cancelled', 'canceled' }
 local _MAX_NUM_OPPONENTS = 8
 local _MAX_NUM_PLAYERS = 10
-local _MAX_NUM_VODGAMES = 9
 local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
