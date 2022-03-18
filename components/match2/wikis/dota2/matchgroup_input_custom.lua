@@ -311,13 +311,8 @@ function matchFunctions.readDate(matchArgs)
 		dateProps.hasDate = true
 		return dateProps
 	else
-		local suggestedDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			_EPOCH_TIME
-		)
 		return {
-			date = MatchGroupInput.getInexactDate(suggestedDate),
+			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
 			dateexact = false,
 		}
 	end
