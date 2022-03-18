@@ -12,13 +12,13 @@ local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Bas
 
 local VETOES = {
 	[0] = '',
-	[1] = 'ban,ban,ban,decider',
-	[2] = 'ban,ban,pick,ban',
-	[3] = 'ban,pick,ban,decider',
-	[4] = 'pick,ban,pick,ban',
-	[5] = 'pick,ban,pick,decider',
-	[6] = 'pick,pick,pick,ban',
-	[7] = 'pick,pick,pick,decider',
+	[1] = 'ban,ban,ban,ban,decider',
+	[2] = 'ban,ban,ban,pick,ban',
+	[3] = 'ban,ban,pick,ban,decider',
+	[4] = 'ban,ban,pick,pick,ban',
+	[5] = 'ban,pick,ban,pick,decider',
+	[6] = 'ban,ban,pick,pick,ban',
+	[7] = 'ban,pick,pick,pick,decider',
 	[8] = 'pick,pick,pick,pick,ban',
 	[9] = 'pick,pick,pick,pick,decider',
 }
@@ -47,6 +47,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		out = out .. '\n\t\t|t1map1=|t2map1='
 		out = out .. '\n\t\t|t1map2=|t2map2='
 		out = out .. '\n\t\t|t1map3=|t2map3='
+		out = out .. '\n\t\t|t1map4=|t2map4='
 		out = out .. '\n\t\t|decider='
 		out = out .. '\n\t}}'
 	end
