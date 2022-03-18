@@ -316,7 +316,7 @@ function Match._prepareMatchRecordForStore(match)
 	match.match2bracketdata = match.match2bracketdata or match.bracketdata
 	match.match2bracketid = match.match2bracketid or match.bracketid
 	match.match2id = match.match2id or match.bracketid .. '_' .. match.matchid
-	match.section = Variables.varDefault('last_heading', 'none')
+	match.section = Variables.varDefault('last_heading', 'none'):gsub('<.->', '')
 	Match.clampFields(match, Match.matchFields)
 end
 
