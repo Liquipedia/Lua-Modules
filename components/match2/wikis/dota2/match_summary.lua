@@ -189,9 +189,7 @@ function CustomMatchSummary._createBody(match)
 	-- Iterate each map
 	for gameIndex, game in ipairs(match.games) do
 		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex)
-		if rowDisplay then
-			body:addRow(rowDisplay)
-		end
+		body:addRow(rowDisplay)
 	end
 
 	-- Add Match MVP(s)
@@ -274,14 +272,6 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		end
 		heroesData[1].side = extradata.team1side
 		heroesData[2].side = extradata.team2side
-	end
-
-	if
-		String.isEmpty(game.length) and
-		String.isEmpty(game.winner) and
-		heroesDataIsEmpty
-	then
-		return nil
 	end
 
 	row:addClass('brkts-popup-body-game')
