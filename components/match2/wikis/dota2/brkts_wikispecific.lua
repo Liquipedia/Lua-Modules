@@ -7,6 +7,7 @@
 --
 
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
 
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -22,7 +23,8 @@ function WikiSpecific.matchHasDetails(match)
 		or match.vod
 		or not Table.isEmpty(match.links)
 		or match.comment
-		or 0 < #match.games
+		or not Opponent.isTbd(match.opponents[1])
+		or not Opponent.isTbd(match.opponents[2])
 end
 
 return WikiSpecific
