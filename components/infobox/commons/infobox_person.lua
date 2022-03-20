@@ -217,7 +217,6 @@ function Person:_setLpdbData(args, links, status, personType)
 		image = args.image,
 		region = _region,
 		team = teamLink or args.teamlink or args.team,
-		teampagename = teamLink,
 		teamtemplate = teamTemplate,
 		status = status,
 		type = personType,
