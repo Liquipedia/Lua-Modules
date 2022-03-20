@@ -7,10 +7,10 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
-local DivTable = require('Module:DivTable')
+local PointsDivTable = require('Module:AutomaticPointsTable/Display')
+
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -49,30 +49,31 @@ function AutomaticPointsTable.run(frame)
 	-- mw.logObject(pointsTable.parsedInput.tournaments)
 	-- mw.logObject(pointsTable.parsedInput.teams)
 	-- mw.logObject(tournamentsWithPlacements)
-	mw.logObject(sortedDataWithPositions)
-
-	return pointsTable:generatePointsTable(sortedDataWithPositions, tournamentsWithResults)
+	-- mw.logObject(sortedDataWithPositions)
+	local positionBackgrounds = pointsTable.parsedInput.positionBackgrounds
+	local divTable = PointsDivTable(sortedDataWithPositions, tournamentsWithResults, positionBackgrounds)
+	return divTable:create()
 end
 
 function AutomaticPointsTable:parseInput(args)
-	local pbg = self:parsePositionBackgroundData(args)
+	local positionBackgrounds = self:parsePositionBackgroundData(args)
 	local tournaments = self:parseTournaments(args)
 	local teams = self:parseTeams(args, #tournaments)
 	return {
-		pbg = pbg,
+		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
 		teams = teams
 	}
 end
 
---- parses the pbg arguments, these are the background colors of specific positions
---- Usually used to indicate where a team in a specific position will end up qualifying to
+--- parses the positionbg arguments, these are the background colors of specific
+--- positions, usually used to indicate if a team in a specific position will end up qualifying
 function AutomaticPointsTable:parsePositionBackgroundData(args)
-	local pbg = {}
-	for _, background in Table.iter.pairsByPrefix(args, 'pbg') do
-		table.insert(pbg, background)
+	local positionBackgrounds = {}
+	for _, background in Table.iter.pairsByPrefix(args, 'positionbg') do
+		table.insert(positionBackgrounds, background)
 	end
-	return pbg
+	return positionBackgrounds
 end
 
 function AutomaticPointsTable:parseTournaments(args)
@@ -90,6 +91,7 @@ function AutomaticPointsTable:parseTeams(args, tournamentCount)
 		parsedTeam.aliases = self:parseAliases(parsedTeam, tournamentCount)
 		parsedTeam.deductions = self:parseDeductions(parsedTeam, tournamentCount)
 		parsedTeam.manualPoints = self:parseManualPoints(parsedTeam, tournamentCount)
+		parsedTeam.tiebreakerPoints = tonumber(parsedTeam.tiebreaker_points) or 0
 		parsedTeam.results = {}
 		table.insert(teams, parsedTeam)
 	end
@@ -230,6 +232,7 @@ function AutomaticPointsTable:getPointsData(teams, tournaments)
 
 			teamPointsData.team = team
 			teamPointsData.totalPoints = totalPoints
+			teamPointsData.tiebreakerPoints = team.tiebreakerPoints
 			return teamPointsData
 		end
 	)
@@ -268,13 +271,15 @@ end
 function AutomaticPointsTable:sortData(pointsData, teams)
 	table.sort(pointsData,
 		function(a, b)
-			if a.totalPoints == b.totalPoints then
-				local aName = a.team.aliases[#a.team.aliases]
-				local bName = b.team.aliases[#b.team.aliases]
-				return aName < bName
-			else
+			if a.totalPoints ~= b.totalPoints then
 				return a.totalPoints > b.totalPoints
 			end
+			if a.tiebreakerPoints ~= b.tiebreakerPoints then
+				return a.tiebreakerPoints > b.tiebreakerPoints
+			end
+			local aName = a.team.aliases[#a.team.aliases]
+			local bName = b.team.aliases[#b.team.aliases]
+			return aName < bName
 		end
 	)
 
@@ -282,99 +287,25 @@ function AutomaticPointsTable:sortData(pointsData, teams)
 end
 
 function AutomaticPointsTable:addPositionData(pointsData)
-	local maxPoints = pointsData[1].totalPoints
-
 	local teamPosition = 0
-	local previousTeamPoints = maxPoints + 1
+	local previousTotalPoints = pointsData[1].totalPoints + 1
+	local previousTiebreakerPoints = pointsData[1].tiebreakerPoints + 1
 
 	return Table.map(pointsData,
 		function(index, dataPoint)
-			if dataPoint.totalPoints < previousTeamPoints then
+			local lessTotalPoints = dataPoint.totalPoints < previousTotalPoints
+			local equalTotalPoints = dataPoint.totalPoints == previousTotalPoints
+			local lessTiebreakerPoints = dataPoint.tiebreakerPoints < previousTiebreakerPoints
+			if lessTotalPoints or (equalTotalPoints and lessTiebreakerPoints) then
 				teamPosition = index
 			end
 			dataPoint.position = teamPosition
-			previousTeamPoints = dataPoint.totalPoints
+			previousTotalPoints = dataPoint.totalPoints
+			previousTiebreakerPoints = dataPoint.tiebreakerPoints
 			return index, dataPoint
 
 		end
 	)
-end
-
-function AutomaticPointsTable:generatePointsTable(pointsData, tournaments)
-local columnCount = Array.reduce(tournaments, function(count, t)
-			return count + (t.shouldDeductionsBeVisible and 2 or 1)
-		end, 0)
-	local headerRow = self:generateHeaderRow(tournaments)
-
-	local divTable = DivTable.create() :row(headerRow)
-	divTable.root :addClass('border-color-grey') :addClass('border-bottom')
-
-	-- for top and left borders
-	local divWrapper = mw.html.create('div') :addClass('fixed-size-table-container')
-		:addClass('border-color-grey')
-		:css('width', tostring(450 + (columnCount * 50)) .. 'px')
-		:node(divTable:create())
-
-	-- for mobile / responsive scrolling
-	local responsiveWrapper = mw.html.create('div') :addClass('table-responsive')
-		:addClass('automatic-points-table')
-		:node(divWrapper)
-
-	return responsiveWrapper
-end
-
-function AutomaticPointsTable:generateHeaderRow(tournaments)
-	local headerRow = DivTable.HeaderRow()
-	headerRow.root:addClass('diagonal')
-
-	-- fixed headers
-	local headers = {{
-		text = 'Ranking',
-		additionalClass = 'ranking'
-	}, {
-		text = 'Team',
-		additionalClass = 'team'
-	}, {
-		text = 'Total Points'
-	}}
-	Table.iter.forEach(headers,function(h) headerRow:cell(self:createHeaderCell(h)) end)
-	-- variable headers (according to tournaments in given in module arguments)
-	Table.iter.forEach(tournaments,
-		function(tournament)
-			headerRow:cell(self:createHeaderCell({
-				text = tournament.display and tournament.display or tournament.name
-			}))
-
-			if tournament.shouldDeductionsBeVisible == true then
-				local deductionsHeader = tournament['deductionsheader']
-				headerRow:cell(self:createHeaderCell({
-					text = deductionsHeader and deductionsHeader or 'Deductions'
-				}))
-			end
-		end
-	)
-
-	return headerRow
-end
-
-function AutomaticPointsTable:createHeaderCell(header)
-	local additionalClass = header.additionalClass
-
-	local innerDiv = self:wrapInDiv(header.text)
-		:addClass('border-color-grey')
-		:addClass('content')
-
-	local outerDiv = mw.html.create('div')
-		:addClass('diagonal-header-div-cell')
-	if additionalClass ~= nil then
-		outerDiv:addClass(additionalClass)
-	end
-	outerDiv:node(innerDiv)
-	return outerDiv
-end
-
-function AutomaticPointsTable:wrapInDiv(text)
-	return mw.html.create('div'):wikitext(tostring(text))
 end
 
 return AutomaticPointsTable
