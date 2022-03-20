@@ -49,7 +49,7 @@ local TableRow = Class.new(
 		self.cells = {}
 
 		local team = pointsData.team
-		if team.bg ~= nil then
+		if team.bg nil then
 			self.root:addClass('bg-' .. team.bg)
 		end
 
@@ -117,10 +117,10 @@ function TableRow:baseCell(text, bg, bold)
 	local div = wrapInDiv(text) :addClass('divCell') :addClass('va-middle')
 		:addClass('centered-cell')	:addClass('border-color-grey') :addClass('border-top-right')
 
-	if bg ~= nil then
+	if bg then
 		div:addClass('bg-' .. bg)
 	end
-	if bold == true then
+	if bold then
 		div:css('font-weight', 'bold')
 	end
 	return div
@@ -180,7 +180,7 @@ function TableHeaderRow:cell(header)
 
 	local outerDiv = mw.html.create('div') :addClass('divCell')
 		:addClass('diagonal-header-div-cell')
-	if additionalClass ~= nil then
+	if additionalClass then
 		outerDiv:addClass(additionalClass)
 	end
 	outerDiv:node(innerDiv)
@@ -207,7 +207,7 @@ function TableHeaderRow:create()
 				text = tournament.display and tournament.display or tournament.name
 			})
 
-			if tournament.shouldDeductionsBeVisible == true then
+			if tournament.shouldDeductionsBeVisible then
 				local deductionsHeader = tournament['deductionsheader']
 				self:headerCell({
 					text = deductionsHeader and deductionsHeader or 'Deductions'
@@ -231,7 +231,8 @@ function TableHeaderRow:headerCell(header)
 		:addClass('diagonal-header-div-cell')
 
 	local additionalClass = header.additionalClass
-	if additionalClass ~= nil then
+	if additionalClass then
+
 		outerDiv:addClass(additionalClass)
 	end
 	outerDiv:node(innerDiv)
