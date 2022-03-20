@@ -49,7 +49,7 @@ local TableRow = Class.new(
 		self.cells = {}
 
 		local team = pointsData.team
-		if team.bg nil then
+		if team.bg then
 			self.root:addClass('bg-' .. team.bg)
 		end
 
