@@ -201,6 +201,11 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, 'SARPBC Players')
 		end
 
+		local team = args.teamlink or args.team
+		if team and not mw.ext.TeamTemplate.teamexists(team) then
+			table.insert(categories, 'Players with invalid team')
+		end
+
 		return categories
 	end
 	return {}
