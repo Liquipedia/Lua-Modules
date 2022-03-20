@@ -40,6 +40,11 @@ local SquadRow = Class.new(
 		end
 
 		self.lpdbData = {}
+
+		local pagename = mw.title.getCurrentTitle().text
+		if mw.ext.TeamTemplate.teamexists(pagename) then
+			self.lpdbData['teamtemplate'] = mw.ext.TeamTemplate.raw(pagename).templatename
+		end
 	end)
 
 SquadRow.specialTeamsTemplateMapping = {
@@ -143,6 +148,7 @@ function SquadRow:newteam(args)
 				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
 
 			self.lpdbData['newteam'] = mw.ext.TeamTemplate.teampage(newTeam)
+			self.lpdbData['newteamtemplate'] = mw.ext.TeamTemplate.raw(newTeam).templatename
 		elseif self.options.useTemplatesForSpecialTeams then
 			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
 			if newTeamTemplate then
