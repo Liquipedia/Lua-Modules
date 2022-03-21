@@ -72,18 +72,19 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
+	local teamTemplateDate = date
 	-- If date if epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date, but in order to get correct child team template
-	-- We need a present date and not 1970
-	if date == _EPOCH_TIME_EXTENDED then
-		date = Variables.varDefaultMulti(
+	-- Epoch indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
 			_EPOCH_TIME_EXTENDED
 		)
 	end
 
-	Opponent.resolve(opponent, date)
+	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
