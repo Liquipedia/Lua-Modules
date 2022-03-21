@@ -195,6 +195,14 @@ end
 function Person:_setLpdbData(args, links, status, personType)
 	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
 
+	local teamLink, teamTemplate
+	local team = args.teamlink or args.team
+	if team and mw.ext.TeamTemplate.teamexists(team) then
+		local teamRaw = mw.ext.TeamTemplate.raw(team)
+		teamLink = teamRaw.page
+		teamTemplate = teamRaw.templatename
+	end
+
 	local lpdbData = {
 		id = args.id or mw.title.getCurrentTitle().prefixedText,
 		alternateid = args.ids,
@@ -208,7 +216,8 @@ function Person:_setLpdbData(args, links, status, personType)
 		deathdate = Variables.varDefault('player_deathdate'),
 		image = args.image,
 		region = _region,
-		team = args.teamlink or args.team,
+		team = teamLink or args.teamlink or args.team,
+		teamtemplate = teamTemplate,
 		status = status,
 		type = personType,
 		earnings = _totalEarnings,
@@ -400,6 +409,11 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		end
 		if String.isEmpty(birthDisplay) then
 			table.insert(categories, personType .. 's with unknown birth date')
+		end
+
+		local team = args.teamlink or args.team
+		if team and not mw.ext.TeamTemplate.teamexists(team) then
+			table.insert(categories, 'Players with invalid team')
 		end
 
 		return categories
