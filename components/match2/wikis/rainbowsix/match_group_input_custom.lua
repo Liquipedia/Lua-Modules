@@ -73,7 +73,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	end
 
 	local teamTemplateDate = date
-	-- If date if epoch, resolve using tournament dates instead
+	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
 	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
