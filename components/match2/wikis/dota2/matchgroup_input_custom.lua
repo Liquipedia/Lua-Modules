@@ -41,7 +41,7 @@ local _DEFAULT_GAME = 'dota2'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local _EPOCH_TIME = '1970-01-01 00:00:00'
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
@@ -112,6 +112,18 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	-- Convert byes to literals
 	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
 		opponent = {type = Opponent.literal, name = 'BYE'}
+	end
+
+	local teamTemplateDate = date
+	-- If date if epoch, resolve using tournament dates instead
+	-- Epoch indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+		teamTemplateDate = Variables.varDefaultMulti(
+			'tournament_enddate',
+			'tournament_startdate',
+			_EPOCH_TIME_EXTENDED
+		)
 	end
 
 	Opponent.resolve(opponent, date)
@@ -312,7 +324,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
+			date = _EPOCH_TIME_EXTENDED,
 			dateexact = false,
 		}
 	end

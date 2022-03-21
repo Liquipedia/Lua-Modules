@@ -24,7 +24,7 @@ local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local _GAME = mw.loadData('Module:GameVersion')
 
 -- containers for process helper functions
@@ -69,6 +69,18 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	-- Convert byes to literals
 	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
 		opponent = {type = Opponent.literal, name = 'BYE'}
+	end
+
+	local teamTemplateDate = date
+	-- If date if epoch, resolve using tournament dates instead
+	-- Epoch indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+		teamTemplateDate = Variables.varDefaultMulti(
+			'tournament_enddate',
+			'tournament_startdate',
+			_EPOCH_TIME_EXTENDED
+		)
 	end
 
 	Opponent.resolve(opponent, date)
@@ -272,7 +284,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
+			date = _EPOCH_TIME_EXTENDED,
 			dateexact = false,
 		}
 	end
