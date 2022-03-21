@@ -139,10 +139,11 @@ function SquadRow:newteam(args)
 
 		local newTeam = args.newteam:lower()
 		if mw.ext.TeamTemplate.teamexists(newTeam) then
-			cell:wikitext(mw.ext.TeamTemplate.team(newTeam,
-				args.newteamdate or ReferenceCleaner.clean(args.leavedate)))
+			local date = args.newteamdate or ReferenceCleaner.clean(args.leavedate)
+			cell:wikitext(mw.ext.TeamTemplate.team(newTeam, date))
 
 			self.lpdbData['newteam'] = mw.ext.TeamTemplate.teampage(newTeam)
+			self.lpdbData['newteamtemplate'] = mw.ext.TeamTemplate.raw(newTeam, date).templatename
 		elseif self.options.useTemplatesForSpecialTeams then
 			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
 			if newTeamTemplate then
