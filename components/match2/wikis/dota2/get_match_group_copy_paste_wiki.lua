@@ -19,7 +19,7 @@ local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Bas
 
 --returns the Code for a Match, depending on the input
 function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local indent = '    '
+	local indent = ''
 
 	if bestof == 0 and args.score ~= 'false' then
 		args.score = 'true'
