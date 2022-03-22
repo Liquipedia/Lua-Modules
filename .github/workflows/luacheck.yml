@@ -21,4 +21,13 @@ jobs:
 
       - name: test
         run: |
-          luacheck ./
+          luacheck ./ |
+          luacheck ./ --formatter=JUnit > report.xml
+
+      - name: junit
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: 'report.xml'
+          check_name: 'junit-report'
+
