@@ -10,8 +10,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Json = require('Module:Json')
 local Table = require('Module:Table')
-local String = require('Module:StringUtils')
-local Abbreviation = require('Module:Abbreviation')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
