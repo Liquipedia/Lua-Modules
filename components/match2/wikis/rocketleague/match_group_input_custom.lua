@@ -186,6 +186,14 @@ end
 function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
+
+	local casters = {}
+	local casterIndex = 1
+	while String.isNotEmpty(match['caster' .. casterIndex]) do
+		table.insert(casters, match['caster' .. casterIndex])
+		casterIndex = casterIndex + 1
+	end
+
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
 		team1icon = getIconName(opponent1.template or ''),
@@ -194,7 +202,8 @@ function matchFunctions.getExtraData(match)
 		comment = match.comment,
 		octane = match.octane,
 		isconverted = 0,
-		isfeatured = matchFunctions.isFeatured(match)
+		isfeatured = matchFunctions.isFeatured(match),
+		casters = (#casters > 0) and Json.stringify(casters) or nil,
 	}
 	return match
 end
@@ -372,6 +381,12 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
+	local timeoutInput = mw.text.split(map.timeout or '', ',')
+	local timeouts = {}
+	for _, timeoutValue in pairs(timeoutInput) do
+		table.insert(timeouts, tonumber(timeoutValue))
+	end
+	
 	map.extradata = {
 		ot = map.ot,
 		otlength = map.otlength,
@@ -380,6 +395,7 @@ function mapFunctions.getExtraData(map)
 		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
+		timeout = (#timeouts > 0) and Json.stringify(timeouts) or nil
 	}
 	return map
 end
