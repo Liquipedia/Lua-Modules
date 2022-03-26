@@ -386,7 +386,7 @@ function mapFunctions.getExtraData(map)
 	for _, timeoutValue in pairs(timeoutInput) do
 		table.insert(timeouts, tonumber(timeoutValue))
 	end
-	
+
 	map.extradata = {
 		ot = map.ot,
 		otlength = map.otlength,
