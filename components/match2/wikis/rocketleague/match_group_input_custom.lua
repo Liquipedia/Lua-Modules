@@ -209,7 +209,7 @@ function matchFunctions.isFeatured(match)
 	if
 		tonumber(match.liquipediatier or '') == 1
 		or tonumber(match.liquipediatier or '') == 2
-		or Variables.varDefault('tournament_rlcs_premier') == '1'
+		or Logic.readBool(Variables.varDefault('tournament_rlcs_premier'))
 		or not String.isEmpty(Variables.varDefault('match_featured_override'))
 	then
 		return true
