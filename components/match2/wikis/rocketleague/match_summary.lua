@@ -8,6 +8,10 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Json = require('Module:Json')
+local Table = require('Module:Table')
+local String = require('Module:StringUtils')
+local Abbreviation = require('Module:Abbreviation')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
@@ -96,6 +100,29 @@ function CustomMatchSummary.getByMatchId(args)
 					:css('font-size','85%')
 					:css('margin','auto'))
 			end
+			if game.extradata.timeout then
+				local timeouts = Json.parseIfString(game.extradata.timeout)
+				table.insert(gameElements, CustomMatchSummary._breakNode())
+				table.insert(gameElements,
+					mw.html.create('div')
+						:addClass('brkts-popup-spaced')
+						:node(Table.includes(timeouts, 1) and
+							'[[File:Cooldown_Clock.png|14x14px|link=]]' or
+							'[[File:NoCheck.png|link=]]')
+				)
+				table.insert(gameElements,
+					mw.html.create('div')
+						:addClass('brkts-popup-spaced')
+						:node(mw.html.create('div'):node('Timeout'))
+				)
+				table.insert(gameElements,
+					mw.html.create('div')
+						:addClass('brkts-popup-spaced')
+						:node(Table.includes(timeouts, 2) and
+							'[[File:Cooldown_Clock.png|14x14px|link=]]' or
+							'[[File:NoCheck.png|link=]]')
+				)
+			end
 			local hasCommentLineBreakNode = false
 			if game.extradata.t1goals then
 				table.insert(gameElements, CustomMatchSummary._breakNode())
@@ -136,6 +163,20 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 	wrapper:node(body):node(CustomMatchSummary._breakNode())
 
+	-- casters
+	if match.extradata.casters then
+		local casters = Json.parseIfString(match.extradata.casters)
+		for index, caster in pairs(casters) do
+			casters[index] = '[[' .. caster .. ']]'
+		end
+		local casterRow = mw.html.create('div')
+			:addClass('brkts-popup-comment')
+			:css('white-space','normal')
+			:css('font-size','85%')
+			:node('<b>Caster' .. (#casters > 1 and 's' or '') .. ':</b><br>')
+			:node(table.concat(casters, ', '))
+		wrapper:node(casterRow):node(CustomMatchSummary._breakNode())
+	end
 	-- comment
 	if match.comment then
 		local comment = mw.html.create('div')
