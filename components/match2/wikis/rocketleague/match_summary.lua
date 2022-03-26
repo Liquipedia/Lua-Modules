@@ -145,7 +145,7 @@ function Header:soloOpponentTeam(opponent, date)
 	if opponent.type == 'solo' then
 		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
 		local display = teamExists
-			and mw.ext.TeamTemplate.teamicon(opponent.template, match.date)
+			and mw.ext.TeamTemplate.teamicon(opponent.template, date)
 			or _TBD_ICON
 		return mw.html.create('div'):wikitext(display)
 			:addClass('brkts-popup-header-opponent-solo-team')
