@@ -12,10 +12,12 @@ local Variables = require('Module:Variables')
 local StandingsStorage = {}
 
 function StandingsStorage.run(index, data)
+	local title = data.title or ''
+	local cleanedTitle = title:gsub('<.->.-</.->', '')
 	mw.ext.LiquipediaDB.lpdb_standing(
 		'standing_' .. data.standingsindex .. '_' .. data.roundindex .. '_' .. index,
 		{
-			title = data.title,
+			title = mw.text.trim(cleanedTitle),
 			tournament = data.tournament,
 			participant = data.participant,
 			participantdisplay = data.participantdisplay,
