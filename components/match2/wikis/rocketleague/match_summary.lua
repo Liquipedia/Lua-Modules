@@ -26,6 +26,8 @@ local _TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link=http://octane.gg/matches/'
 local _OCTANE_SUFFIX = '|Octane matchpage]]'
 
+local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
+
 -- Custom Caster Class
 local Casters = Class.new(
 	function(self)
@@ -133,13 +135,13 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	--[[
 		unbox this once score display is wanted due to usage of Template:SingleMatch
 		also kick the line below this comment
-	
+
 	return scoreBoardNode:node(score)
 	]]
 	return ''
 end
 
-function Header:soloOpponentTeam(opponent)
+function Header:soloOpponentTeam(opponent, date)
 	if opponent.type == 'solo' then
 		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
 		local display = teamExists
@@ -211,7 +213,6 @@ function CustomMatchSummary.getByMatchId(args)
 		if String.isNotEmpty(match.vod) then
 			footer:addElement(VodLink.display{
 				vod = match.vod,
-				source = vod.url
 			})
 		end
 
@@ -220,7 +221,6 @@ function CustomMatchSummary.getByMatchId(args)
 			footer:addElement(VodLink.display{
 				gamenum = index,
 				vod = vod,
-				source = vod.url
 			})
 		end
 
@@ -234,7 +234,7 @@ function CustomMatchSummary._createHeader(match)
 	local header = Header()
 
 	header
-		:leftOpponentTeam(header:soloOpponentTeam(match.opponents[1]))
+		:leftOpponentTeam(header:soloOpponentTeam(match.opponents[1], match.date))
 		:leftOpponent(header:createOpponent(match.opponents[1], 1))
 		:scoreBoard(header:createScoreBoard(
 			header:createScoreDisplay(
@@ -245,7 +245,7 @@ function CustomMatchSummary._createHeader(match)
 			not match.finished
 		))
 		:rightOpponent(header:createOpponent(match.opponents[2], 2))
-		:rightOpponentTeam(header:soloOpponentTeam(match.opponents[2]))
+		:rightOpponentTeam(header:soloOpponentTeam(match.opponents[2], match.date))
 
 	return header
 end
@@ -267,7 +267,7 @@ function CustomMatchSummary._createBody(match)
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
 		local casterRow = Casters()
-		for index, caster in pairs(casters) do
+		for _, caster in pairs(casters) do
 			casterRow:addCaster(caster)
 		end
 
