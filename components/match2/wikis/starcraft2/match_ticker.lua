@@ -28,6 +28,7 @@ MatchTicker.Display.OpponentDisplay = Lua.import('Module:OpponentDisplay/Starcra
 MatchTicker.Display.Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 
 function MatchTicker.Query.BaseConditions:build(queryArgs)
+	self.conditionTree:add({ConditionNode(ColumnName('extradata_ffa'), Comparator.eq, 'false')})
 	if Logic.readBool(queryArgs.featured) then
 		self.conditionTree:add({ConditionNode(ColumnName('extradata_featured'), Comparator.eq, 'true')})
 	end
