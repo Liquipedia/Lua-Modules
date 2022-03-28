@@ -381,9 +381,8 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	local timeoutInput = mw.text.split(map.timeout or '', ',')
 	local timeouts = {}
-	for _, timeoutValue in pairs(timeoutInput) do
+	for _, timeoutValue in pairs(mw.text.split(map.timeout or '', ',')) do
 		table.insert(timeouts, tonumber(timeoutValue))
 	end
 
