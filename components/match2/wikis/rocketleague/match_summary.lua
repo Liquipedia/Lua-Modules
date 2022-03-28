@@ -378,7 +378,7 @@ function CustomMatchSummary._iconDisplay(icon, shouldDisplay, additionalElement,
 		:addClass('brkts-popup-spaced')
 		:node(additionalElement and flip and mw.html.create('div'):node(additionalElement) or nil)
 		:node(shouldDisplay and icon or _NO_CHECK)
-		:node(additionalElement and mw.html.create('div'):node(additionalElement) or nil)
+		:node(additionalElement and (not flip) and mw.html.create('div'):node(additionalElement) or nil)
 end
 
 return CustomMatchSummary
