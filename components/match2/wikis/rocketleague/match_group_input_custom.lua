@@ -203,7 +203,7 @@ function matchFunctions.getExtraData(match)
 		octane = match.octane,
 		isconverted = 0,
 		isfeatured = matchFunctions.isFeatured(match),
-		casters = (#casters > 0) and Json.stringify(casters) or nil,
+		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
 	}
 	return match
 end
