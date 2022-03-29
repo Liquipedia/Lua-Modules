@@ -342,7 +342,7 @@ function CustomMatchSummary._createGame(game)
 		row:addElement(MatchSummary.Break():create())
 	end
 	if String.isNotEmpty(extradata.t1goals) then
-		row:addElement(CustomMatchSummary._(extradata.t1goals, 1))
+		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t1goals, 1))
 	end
 	if String.isNotEmpty(game.comment) then
 		row:addElement(mw.html.create('div')
@@ -352,13 +352,13 @@ function CustomMatchSummary._createGame(game)
 		)
 	end
 	if String.isNotEmpty(extradata.t2goals) then
-		row:addElement(CustomMatchSummary._(extradata.t2goals, 2))
+		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t2goals, 2))
 	end
 
 	return row
 end
 
-function CustomMatchSummary._(goalesValue, side)
+function CustomMatchSummary._goalDisaplay(goalesValue, side)
 	local goalsDisplay = mw.html.create('div')
 		:cssText(side == 2 and 'float:right; margin-right:10px;')
 		:node(Abbreviation.make(
