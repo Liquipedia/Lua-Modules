@@ -17,6 +17,8 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
+local _COOLDOWN_ICON = '[[File:Cooldown_Clock.png|14x14px|link=]]'
+local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local CustomMatchSummary = {}
 
@@ -105,8 +107,8 @@ function CustomMatchSummary.getByMatchId(args)
 					mw.html.create('div')
 						:addClass('brkts-popup-spaced')
 						:node(Table.includes(timeouts, 1) and
-							'[[File:Cooldown_Clock.png|14x14px|link=]]' or
-							'[[File:NoCheck.png|link=]]')
+							_COOLDOWN_ICON or
+							_NO_CHECK)
 				)
 				table.insert(gameElements,
 					mw.html.create('div')
@@ -117,8 +119,8 @@ function CustomMatchSummary.getByMatchId(args)
 					mw.html.create('div')
 						:addClass('brkts-popup-spaced')
 						:node(Table.includes(timeouts, 2) and
-							'[[File:Cooldown_Clock.png|14x14px|link=]]' or
-							'[[File:NoCheck.png|link=]]')
+							_COOLDOWN_ICON or
+							_NO_CHECK)
 				)
 			end
 			local hasCommentLineBreakNode = false
