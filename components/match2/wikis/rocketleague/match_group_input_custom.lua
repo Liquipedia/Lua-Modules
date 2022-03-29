@@ -188,10 +188,8 @@ function matchFunctions.getExtraData(match)
 	local opponent2 = match.opponent2 or {}
 
 	local casters = {}
-	local casterIndex = 1
-	while String.isNotEmpty(match['caster' .. casterIndex]) do
-		table.insert(casters, match['caster' .. casterIndex])
-		casterIndex = casterIndex + 1
+	for _, caster in Table.iter.pairsByPrefix(match, 'caster') do
+		table.insert(casters, caster)
 	end
 
 	match.extradata = {
