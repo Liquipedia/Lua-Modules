@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Json = require('Module:Json')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 local Json = require('Module:Json')
@@ -27,6 +28,8 @@ local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link=http://octane.gg/match
 local _OCTANE_SUFFIX = '|Octane matchpage]]'
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
+local _COOLDOWN_ICON = '[[File:Cooldown_Clock.png|14x14px|link=]]'
+local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 -- Custom Caster Class
 local Casters = Class.new(

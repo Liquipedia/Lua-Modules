@@ -107,19 +107,23 @@ function MatchMapsTeamLegacy._processMapOpponent(side, prefix, mapArgs, archon)
 		['t' .. side .. 'p3flag'] = _match2Args[prefix .. 't' .. side .. 'p3flag'],
 	}
 
-	MatchMapsTeamLegacy._setPlayersForOpponents(addToMapArgs, side, _match2Args[prefix .. 'p' .. side])
+	MatchMapsTeamLegacy._setPlayersForOpponents(addToMapArgs, side, {
+			_match2Args[prefix .. 'p' .. side],
+			_match2Args[prefix .. 't' .. side .. 'p2'],
+			_match2Args[prefix .. 't' .. side .. 'p3'],
+	})
 
 	return Table.mergeInto(mapArgs, addToMapArgs)
 end
 
-function MatchMapsTeamLegacy._setPlayersForOpponents(args, side, displayName)
+function MatchMapsTeamLegacy._setPlayersForOpponents(args, side, displayNames)
 	local prefix = 't' .. side .. 'p'
 
-	for playerKey, player in Table.iter.pairsByPrefix(args, prefix) do
+	for playerKey, player, playerIndex in Table.iter.pairsByPrefix(args, prefix) do
 		_opponentPlayers[side][player] = {
 			race = args[playerKey .. 'race'],
 			flag = args[playerKey .. 'flag'],
-			display = displayName,
+			display = displayNames[playerIndex],
 		}
 	end
 end

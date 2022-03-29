@@ -10,6 +10,7 @@ local p = require('Module:Brkts/WikiSpecific/Base')
 
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
@@ -186,6 +187,12 @@ end
 function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
+
+	local casters = {}
+	for _, caster in Table.iter.pairsByPrefix(match, 'caster') do
+		table.insert(casters, caster)
+	end
+
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
 		team1icon = getIconName(opponent1.template or ''),
@@ -194,7 +201,8 @@ function matchFunctions.getExtraData(match)
 		comment = match.comment,
 		octane = match.octane,
 		isconverted = 0,
-		isfeatured = matchFunctions.isFeatured(match)
+		isfeatured = matchFunctions.isFeatured(match),
+		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
 	}
 	return match
 end
@@ -209,7 +217,7 @@ function matchFunctions.isFeatured(match)
 	if
 		tonumber(match.liquipediatier or '') == 1
 		or tonumber(match.liquipediatier or '') == 2
-		or not String.isEmpty(Variables.varDefault('tournament_rlcs_premier'))
+		or Logic.readBool(Variables.varDefault('tournament_rlcs_premier'))
 		or not String.isEmpty(Variables.varDefault('match_featured_override'))
 	then
 		return true
@@ -372,6 +380,8 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
+	local timeouts = Array.extractValues(Table.mapValues(mw.text.split(map.timeout or '', ','), tonumber))
+
 	map.extradata = {
 		ot = map.ot,
 		otlength = map.otlength,
@@ -380,6 +390,7 @@ function mapFunctions.getExtraData(map)
 		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
+		timeout = Table.isNotEmpty(timeouts) and Json.stringify(timeouts) or nil
 	}
 	return map
 end
