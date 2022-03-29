@@ -361,6 +361,7 @@ function MatchGroupUtil.matchFromRecord(record)
 	end
 
 	return {
+		bestof = record.bestof,
 		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
