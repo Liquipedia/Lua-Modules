@@ -394,7 +394,7 @@ function mapFunctions.getExtraData(map)
 		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
-		timeout = (#timeouts > 0) and Json.stringify(timeouts) or nil
+		timeout = Table.isNotEmpty(timeouts) and Json.stringify(timeouts) or nil
 	}
 	return map
 end
