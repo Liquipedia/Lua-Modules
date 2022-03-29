@@ -40,7 +40,7 @@ local Casters = Class.new(
 )
 
 function Casters:addCaster(caster)
-	if not Logic.isEmpty(caster) then
+	if Logic.isNotEmpty(caster) then
 		table.insert(self.casters, '[[' .. caster .. ']]')
 	end
 	return self
@@ -200,12 +200,12 @@ function CustomMatchSummary.getByMatchId(args)
 	if
 		Table.isNotEmpty(vods) or
 		String.isNotEmpty(match.vod) or
-		not Logic.isEmpty(match.extradata.octane)
+		Logic.isNotEmpty(match.extradata.octane)
 	then
 		local footer = MatchSummary.Footer()
 
 		-- Octane
-		if not Logic.isEmpty(match.extradata.octane) then
+		if Logic.isNotEmpty(match.extradata.octane) then
 			footer:addElement(_OCTANE_PREFIX .. match.extradata.octane .. _OCTANE_SUFFIX)
 		end
 
@@ -298,7 +298,7 @@ function CustomMatchSummary._createGame(game)
 		:node(mw.html.create('div'):node('[[' .. game.map .. ']]'))
 	if Logic.readBool(extradata.ot) then
 		centerNode:node(mw.html.create('div'):node('- OT'))
-		if not Logic.isEmpty(extradata.otlength) then
+		if Logic.isNotEmpty(extradata.otlength) then
 			centerNode:node(mw.html.create('div'):node('(' .. extradata.otlength .. ')'))
 		end
 	end
