@@ -10,6 +10,7 @@ local p = require('Module:Brkts/WikiSpecific/Base')
 
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
