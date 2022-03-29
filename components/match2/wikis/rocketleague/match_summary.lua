@@ -48,8 +48,8 @@ end
 
 function Casters:create()
 	return self.root
-		:node('<b>Caster' .. (#self.casters > 1 and 's' or '') .. ':</b><br>')
-		:node(table.concat(self.casters, ', '))
+		:wikitext('<b>Caster' .. (#self.casters > 1 and 's' or '') .. ':</b><br>')
+		:wikitext(table.concat(self.casters, ', '))
 end
 
 -- Custom Header Class
