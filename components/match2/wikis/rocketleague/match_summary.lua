@@ -171,8 +171,8 @@ function CustomMatchSummary.getByMatchId(args)
 			:addClass('brkts-popup-comment')
 			:css('white-space','normal')
 			:css('font-size','85%')
-			:node('<b>Caster' .. (#casters > 1 and 's' or '') .. ':</b><br>')
-			:node(table.concat(casters, ', '))
+			:wikitext('<b>Caster' .. (#casters > 1 and 's' or '') .. ':</b><br>')
+			:wikitext(table.concat(casters, ', '))
 		wrapper:node(casterRow):node(CustomMatchSummary._breakNode())
 	end
 	-- comment
