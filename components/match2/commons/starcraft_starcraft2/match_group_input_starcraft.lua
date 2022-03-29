@@ -865,9 +865,10 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 						-- allows fetching the link of the player from preset wiki vars
 						-- map['t' .. i .. 'p' .. j .. 'link'] for manual overwrite
 						-- map['t' .. i .. 'p' .. j] for the input of the displayName
-						local mapPlayer = map['t' .. i .. 'p' .. j .. 'link'] or
-							Variables.varDefault(map['t' .. i .. 'p' .. j] .. '_page', map['t' .. i .. 'p' .. j])
-						map['t' .. i .. 'p' .. j] = mw.ext.TeamLiquidIntegration.resolve_redirect(mapPlayer)
+						local playerIndex = 't' .. i .. 'p' .. j
+						local mapPlayer = map[playerIndex .. 'link'] or
+							Variables.varDefault(map[playerIndex] .. '_page') or map[playerIndex]
+						map[playerIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(mapPlayer)
 
 						if map['opponent' .. i .. 'archon'] == 'true' then
 							PlayerData[map['t' .. i .. 'p' .. j]] = {
