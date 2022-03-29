@@ -379,10 +379,7 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	local timeouts = {}
-	for _, timeoutValue in pairs(mw.text.split(map.timeout or '', ',')) do
-		table.insert(timeouts, tonumber(timeoutValue))
-	end
+	local timeouts = Array.extractValues(Table.mapValues(mw.text.split(map.timeout or '', ','), tonumber))
 
 	map.extradata = {
 		ot = map.ot,
