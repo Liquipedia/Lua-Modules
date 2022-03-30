@@ -215,7 +215,7 @@ end
 
 function getPlayerFlag(name)
 	local data = mw.ext.LiquipediaDB.lpdb('player', {
-		conditions = '[[pagename::' .. mw.ext.TeamLiquidIntegration.resolve_redirect( name ):gsub('%s+', '_') .. ']]',
+		conditions = '[[pagename::' .. mw.ext.TeamLiquidIntegration.resolve_redirect( name ):gsub(' ', '_') .. ']]',
 		query = 'nationality'
 	})
 	if type(data) == 'table' and data[1] then
