@@ -44,6 +44,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 			bracketData.type = 'matchlist'
 			bracketData.title = matchIndex == 1 and args.title or nil
+			bracketData.vod = matchIndex == 1 and args.vod or nil
 			bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
 			bracketData.matchIndex = matchIndex
 
