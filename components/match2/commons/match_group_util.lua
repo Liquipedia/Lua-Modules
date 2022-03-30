@@ -72,10 +72,11 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 	semanticRoundIndex = 'number',
 })
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
+	dateHeader = 'boolean?',
 	header = 'string?',
 	title = 'string?',
-	dateHeader = 'boolean?',
 	type = TypeUtil.literal('matchlist'),
+	vod = 'string?',
 })
 MatchGroupUtil.types.BracketData = TypeUtil.union(
 	MatchGroupUtil.types.MatchlistBracketData,
@@ -404,10 +405,11 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 		}
 	else
 		return {
-			header = nilIfEmpty(data.header),
 			dateHeader = nilIfEmpty(data.dateheader),
+			header = nilIfEmpty(data.header),
 			title = nilIfEmpty(data.title),
 			type = 'matchlist',
+			vod = nilIfEmpty(data.vod),
 		}
 	end
 end
