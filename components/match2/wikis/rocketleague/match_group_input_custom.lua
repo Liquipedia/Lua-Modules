@@ -193,7 +193,7 @@ function matchFunctions.getExtraData(match)
 		if string.match(key, 'caster%d+$') then
 			table.insert(casters, {
 				name = name,
-				flag = match[key .. 'flag'] ~= nil and match[key .. 'flag'] or getPlayerFlag(name)
+				flag = match[key .. 'flag'] or getPlayerFlag(name)
 			})
 		end
 	end
