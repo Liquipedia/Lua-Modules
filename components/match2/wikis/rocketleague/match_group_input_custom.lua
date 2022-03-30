@@ -189,11 +189,12 @@ function matchFunctions.getExtraData(match)
 	local opponent2 = match.opponent2 or {}
 
 	local casters = {}
-	local casterFlags = {}
-	for key, caster in Table.iter.pairsByPrefix(match, 'caster') do
-		if not String.endsWith(key, 'flag') then
-			table.insert(casters, caster)
-			casterFlags[caster] = match[key .. 'flag']
+	for key, name in pairs(match) do
+		if string.match(key, 'caster%d+$') then
+			table.insert(casters, {
+				name = name,
+				flag = match[key .. 'flag'] ~= nil and match[key .. 'flag'] or getPlayerFlag(name)
+			})
 		end
 	end
 
@@ -207,9 +208,19 @@ function matchFunctions.getExtraData(match)
 		isconverted = 0,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
-		casterFlags = casterFlags,
 	}
 	return match
+end
+
+function getPlayerFlag(name)
+	local data = mw.ext.LiquipediaDB.lpdb('player', {
+		conditions = '[[pagename::' .. mw.ext.TeamLiquidIntegration.resolve_redirect( name ):gsub('%s+', '_') .. ']]',
+		query = 'nationality'
+	})
+	if type(data) == 'table' and data[1] then
+		return data[1]['nationality']:lower()
+	end
+	return 'world'
 end
 
 function matchFunctions.isFeatured(match)
