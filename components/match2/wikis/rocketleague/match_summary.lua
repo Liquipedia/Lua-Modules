@@ -30,13 +30,13 @@ local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
 -- Custom Caster Class
 local Casters = Class.new(
-	function(self, casters_flags)
+	function(self, casterFlags)
 		self.root = mw.html.create('div')
 			:addClass('brkts-popup-comment')
 			:css('white-space','normal')
 			:css('font-size','85%')
 		self.casters = {}
-		self.casters_flags = casters_flags
+		self.casterFlags = casterFlags
 	end
 )
 
@@ -49,8 +49,8 @@ end
 
 function Casters:getFlag(caster)
 	local nationality = 'world'
-	if self.casters_flags[caster] ~= nil then
-		nationality = self.casters_flags[caster]
+	if self.casterFlags[caster] ~= nil then
+		nationality = self.casterFlags[caster]
 	else
 		local data = mw.ext.LiquipediaDB.lpdb('player', {
 			conditions = '[[pagename::' .. mw.ext.TeamLiquidIntegration.resolve_redirect( caster ):gsub('%s+', '_') .. ']]',
@@ -283,8 +283,8 @@ function CustomMatchSummary._createBody(match)
 	-- casters
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
-		local casters_flags = match.extradata.casters_flags
-		local casterRow = Casters(casters_flags)
+		local casterFlags = match.extradata.casterFlags
+		local casterRow = Casters(casterFlags)
 		table.sort(casters)
 		for _, caster in pairs(casters) do
 			casterRow:addCaster(caster)

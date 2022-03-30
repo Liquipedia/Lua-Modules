@@ -189,11 +189,11 @@ function matchFunctions.getExtraData(match)
 	local opponent2 = match.opponent2 or {}
 
 	local casters = {}
-	local casters_flags = {}
+	local casterFlags = {}
 	for key, caster in Table.iter.pairsByPrefix(match, 'caster') do
 		if not String.endsWith(key, 'flag') then
 			table.insert(casters, caster)
-			casters_flags[caster] = match[key .. 'flag']
+			casterFlags[caster] = match[key .. 'flag']
 		end
 	end
 
@@ -207,7 +207,7 @@ function matchFunctions.getExtraData(match)
 		isconverted = 0,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
-		casters_flags = casters_flags,
+		casterFlags = casterFlags,
 	}
 	return match
 end
