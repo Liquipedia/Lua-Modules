@@ -197,6 +197,7 @@ function matchFunctions.getExtraData(match)
 			})
 		end
 	end
+	table.sort(casters, function(c1, c2) return c1.name:lower() < c2.name:lower() end)
 
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
