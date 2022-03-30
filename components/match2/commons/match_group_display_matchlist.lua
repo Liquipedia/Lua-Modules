@@ -193,15 +193,14 @@ MatchlistDisplay.propTypes.Title = {
 Display component for a title in a matchlist.
 ]]
 function MatchlistDisplay.Title(props)
+	local VodLink = require('Module:VodLink')
+
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Title)
 	local titleNode = mw.html.create('div'):addClass('brkts-matchlist-title')
 		:wikitext(props.title)
-		:node(props.vod and mw.html.create('span')
-				:addClass('plainlinks vodlink')
-				:css('position', 'absolute')
-				:css('right', '52px')
-				:attr('title', 'Watch VOD')
-				:wikitext('[[File:VOD Icon.png|link=' .. props.vod .. ']]')
+		:node(props.vod and VodLink.display{vod = props.vod}
+			:css('position', 'absolute')
+			:css('right', '52px')
 		or nil)
 
 	return DisplayUtil.applyOverflowStyles(titleNode, 'wrap')
