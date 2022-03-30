@@ -30,26 +30,43 @@ local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
 -- Custom Caster Class
 local Casters = Class.new(
-	function(self)
+	function(self, casters_flags)
 		self.root = mw.html.create('div')
 			:addClass('brkts-popup-comment')
 			:css('white-space','normal')
 			:css('font-size','85%')
 		self.casters = {}
+		self.casters_flags = casters_flags
 	end
 )
 
 function Casters:addCaster(caster)
 	if Logic.isNotEmpty(caster) then
-		table.insert(self.casters, '[[' .. caster .. ']]')
+		table.insert(self.casters, self:getFlag(caster) .. ' [[' .. caster .. ']]')
 	end
 	return self
 end
 
+function Casters:getFlag(caster)
+	local nationality = 'world'
+	if self.casters_flags[caster] ~= nil then
+		nationality = self.casters_flags[caster]
+	else
+		local data = mw.ext.LiquipediaDB.lpdb('player', {
+			conditions = '[[pagename::' .. mw.ext.TeamLiquidIntegration.resolve_redirect( caster ):gsub('%s+', '_') .. ']]',
+			query = 'nationality'
+		})
+		if type(data) == 'table' and data[1] then
+			nationality = data[1]['nationality']:lower()
+		end
+	end
+	return mw.getCurrentFrame():expandTemplate{ title = 'flag/' .. nationality }
+end
+
 function Casters:create()
 	return self.root
-		:wikitext('<b>Caster' .. (#self.casters > 1 and 's' or '') .. ':</b><br>')
-		:wikitext(table.concat(self.casters, ', '))
+		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
+		:wikitext(table.concat(self.casters, #self.casters > 2 and ', ' or ' & '))
 end
 
 -- Custom Header Class
@@ -266,7 +283,9 @@ function CustomMatchSummary._createBody(match)
 	-- casters
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = Casters()
+		local casters_flags = match.extradata.casters_flags
+		local casterRow = Casters(casters_flags)
+		table.sort(casters)
 		for _, caster in pairs(casters) do
 			casterRow:addCaster(caster)
 		end
