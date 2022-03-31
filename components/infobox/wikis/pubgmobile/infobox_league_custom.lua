@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=pubg
+-- wiki=pubgmobile
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -51,17 +51,13 @@ _PERSPECTIVES.first = _PERSPECTIVES.fpp
 _PERSPECTIVES.third = _PERSPECTIVES.tpp
 
 local _PLATFORMS = {
-	pc = '[[PC]][[Category:PC Competitions]]',
 	mobile = '[[Mobile]][[Category:Mobile Competitions]]',
 	newstate = '[[New State]][[Category:Mobile Competitions]]',
-	pclite = '[[PC LITE]][[Category:PC Competitions]][[Category:PC LITE Competitions]]',
 	peace = '[[Peacekeeper Elite|Peace Elite]][[Category:Peacekeeper Elite Competitions]][[Category:Mobile Competitions]]',
 	bgmi = '[[Battlegrounds Mobile India|BGMI]]' ..
 		'[[Category:Battlegrounds Mobile India Competitions]][[Category:Mobile Competitions]]',
-	console = '[[Console]][[Category:Console Competitions]]',
 	default = '[[Category:Unknown Platform Competitions]]',
 }
-_PLATFORMS.lite = _PLATFORMS.pclite
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -125,7 +121,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = _game or args.game
+	lpdbData.game = _platform or args.platform
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = args.pubgpremier
 	lpdbData.extradata = {
