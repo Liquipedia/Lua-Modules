@@ -23,7 +23,6 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 local _game
-local _platform
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 local _GAME = mw.loadData('Module:GameVersion')
@@ -121,7 +120,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = _platform or args.platform
+	lpdbData.game = _args.platform or args.platform
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = args.pubgpremier
 	lpdbData.extradata = {
