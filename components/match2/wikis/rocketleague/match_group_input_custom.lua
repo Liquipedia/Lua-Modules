@@ -217,7 +217,7 @@ function getPlayerFlag(name)
 		query = 'nationality'
 	})
 	if type(data) == 'table' and data[1] then
-		return data[1]['nationality']:lower()
+		return data[1]['nationality']
 	end
 	return 'world'
 end
