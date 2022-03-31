@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 local CustomSquad = {}
 
 function CustomSquad.run(frame)
-	-- This function needs to be implemented on the local wiki is using manual Squad Tables
+	error("R6 wiki doesn't support manual Squad Tables")
 end
 
 function CustomSquad.runAuto(playerList, squadType)
@@ -38,11 +38,11 @@ end
 
 function CustomSquad._playerRow(player, squadType)
 	--Get Reference(s)
-	local refTextJoin = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
-	local refTextLeave = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
+	local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
+	local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
 
-	local joinText = (player.joindatedisplay or player.joindate) .. ' ' .. refTextJoin
-	local leaveText = (player.leavedatedisplay or player.leavedate) .. ' ' .. refTextLeave
+	local joinText = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
+	local leaveText = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
 
 	local row = SquadRow(mw.getCurrentFrame(), player.thisTeam.role)
 	row:id({
