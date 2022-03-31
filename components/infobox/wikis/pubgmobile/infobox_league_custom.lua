@@ -120,7 +120,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = _game or args.game
+	lpdbData.game = _platform or args.platform
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = args.pubgpremier
 	lpdbData.extradata = {
