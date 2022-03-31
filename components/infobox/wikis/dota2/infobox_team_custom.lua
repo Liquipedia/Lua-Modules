@@ -66,7 +66,8 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.logo = 'File:' .. _team.args.image
 	end
 
-	-- TODO: Investigate - Legacy Infobox store the raw input. Should be investigated if it should use the output of Template:Region (via #var:region) instead
+	-- TODO: Investigate - Legacy Infobox store the raw input.
+	-- Needs be investigated if it should use the output of Template:Region (via #var:region) instead
 	-- lpdbData.region = Variables.varDefault('region', '')
 
 	return lpdbData
