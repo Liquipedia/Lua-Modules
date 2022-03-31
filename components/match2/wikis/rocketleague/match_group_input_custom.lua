@@ -189,13 +189,11 @@ function matchFunctions.getExtraData(match)
 	local opponent2 = match.opponent2 or {}
 
 	local casters = {}
-	for key, name in pairs(match) do
-		if string.match(key, 'caster%d+$') then
-			table.insert(casters, {
-				name = name,
-				flag = match[key .. 'flag'] or getPlayerFlag(name)
-			})
-		end
+	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
+		table.insert(casters, {
+			name = name,
+			flag = match[key .. 'flag'] or getPlayerFlag(name)
+		})
 	end
 	table.sort(casters, function(c1, c2) return c1.name:lower() < c2.name:lower() end)
 
