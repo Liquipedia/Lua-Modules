@@ -12,11 +12,11 @@
 local CustomSquad = {}
 
 function CustomSquad.run(frame)
-	-- This function needs to be implemented on the local wiki is using manual Squad Tables
+	error("CustomSquad.run() needs to be implemented on the local wiki if using manual Squad Tables")
 end
 
 function CustomSquad.runAuto(playerList, squadType)
-	-- This function needs to be implemented on the local wiki if using SquadAuto
+	error("CustomSquad.runAuto() needs to be implemented on the local wiki if using SquadAuto")
 end
 
 return CustomSquad
