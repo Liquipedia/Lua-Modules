@@ -104,9 +104,16 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 		return Earnings.calculatePerYear(conditions, divisionFactor)
 	end
 
+	local query = 'mode, '
+	if divisionFactor == nil then
+		query = query .. ''
+	else
+		query = query .. ''
+	end
+
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
-		query = 'sum::prizemoney, mode, sum::individualprizemoney',
+		query = 'mode, ' .. (divisionFactor == nil and 'sum::individualprizemoney' or 'sum::prizemoney'),
 		groupby = 'mode asc'
 	})
 
@@ -137,7 +144,7 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 	while count == _MAX_QUERY_LIMIT do
 		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions,
-			query = 'prizemoney, mode, date, individualprizemoney',
+			query = 'mode, date, ' .. (divisionFactor == nil and 'individualprizemoney' or 'prizemoney'),
 			limit = _MAX_QUERY_LIMIT,
 			offset = offset
 		})
