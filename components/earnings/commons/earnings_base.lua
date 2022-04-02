@@ -50,7 +50,7 @@ function Earnings.calculateForPlayer(args)
 	local prefix = args.prefix or 'p'
 
 	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
-	if playerPositionLimit <=0 then
+	if playerPositionLimit <= 0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end
 
@@ -106,14 +106,16 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
-		query = 'sum::prizemoney, mode',
+		query = 'sum::prizemoney, mode, sum::individualprizemoney',
 		groupby = 'mode asc'
 	})
 
 	local totalEarnings = 0
 
 	for _, item in ipairs(lpdbQueryData) do
-		if item['sum_prizemoney'] ~= nil then
+		if divisionFactor == nil then
+			totalEarnings = totalEarnings + item['sum_individualprizemoney']
+		elseif item['sum_prizemoney'] ~= nil then
 			local prizeMoney = item['sum_prizemoney']
 			totalEarnings = totalEarnings + (prizeMoney / divisionFactor(item['mode']))
 		end
@@ -135,14 +137,19 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 	while count == _MAX_QUERY_LIMIT do
 		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions,
-			query = 'prizemoney, mode, date',
+			query = 'prizemoney, mode, date, individualprizemoney',
 			limit = _MAX_QUERY_LIMIT,
 			offset = offset
 		})
 		for _, item in pairs(lpdbQueryData) do
-			local prizeMoney = tonumber(item.prizemoney) or 0
 			local year = string.sub(item.date, 1, 4)
-			prizeMoney = prizeMoney / divisionFactor(item['mode'])
+			local prizeMoney
+			if divisionFactor == nil then
+				prizeMoney = tonumber(item.individualprizemoney) or 0
+			else
+				prizeMoney = tonumber(item.prizemoney) or 0
+				prizeMoney = prizeMoney / divisionFactor(item['mode'])
+			end
 			earningsData[year] = (earningsData[year] or 0) + prizeMoney
 		end
 		count = #lpdbQueryData
