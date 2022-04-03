@@ -132,6 +132,7 @@ function Links.transform(links)
 		afreeca = links.afreeca,
 		afreeca2 = links.afreeca2,
 		aligulac = links.aligulac,
+		aligulac2 = links.aligulac2,
 		aoezone = links.aoezone,
 		aoezone2 = links.aoezone2,
 		aoezone3 = links.aoezone3,
