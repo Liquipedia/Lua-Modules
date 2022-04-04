@@ -74,10 +74,10 @@ function MatchGroupInput.readSingleMatch(bracketId, args)
 
 	local context = MatchGroupInput.readContext(matchArgs, args)
 	MatchGroupInput.persistContextChanges(context)
-	
+
 	matchArgs.bracketid = bracketId
 	matchArgs.matchid = matchId
-	local match = WikiSpecific.processMatch(mw.getCurrentFrame(), matchArgs)
+	match = WikiSpecific.processMatch(mw.getCurrentFrame(), matchArgs)
 
 	-- Add more fields to bracket data
 	match.bracketdata = match.bracketdata or {}
