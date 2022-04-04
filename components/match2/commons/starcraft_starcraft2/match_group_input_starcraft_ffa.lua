@@ -252,7 +252,9 @@ end
 function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 	local counter = 0
 	local temp = {}
-	match.finished = String.isNotEmpty(match.finished) and match.finished ~= 'false' and match.finished ~= '0' and 'true' or nil
+	match.finished = String.isNotEmpty(match.finished)
+		and match.finished ~= 'false' and match.finished ~= '0'
+		and 'true' or nil
 
 	if not noscore then
 		for scoreIndex, score in Table.iter.spairs(IndScore, StarcraftFfaInput.placementSortFunction) do
