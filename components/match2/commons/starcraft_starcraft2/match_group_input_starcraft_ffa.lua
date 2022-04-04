@@ -44,11 +44,11 @@ function StarcraftFfaInput.adjustData(match)
 	match.noscore = noscore
 
 	--process pbg entries and set them into match.pbg (will get merged into extradata later on)
-	match = StarcraftFfaInput.getPbg(match)
+	match = StarcraftFfaInput._getPbg(match)
 
 	--parse opponents + determine match mode + set initial stuff
 	match.mode = ''
-	match, OppNumber = StarcraftFfaInput.OpponentInput(match, OppNumber, noscore)
+	match, OppNumber = StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
 
 	--indicate it is an FFA match
 	match.mode = match.mode .. '_ffa'
@@ -62,7 +62,7 @@ function StarcraftFfaInput.adjustData(match)
 			or String.isNotEmpty(map.score1) or String.isNotEmpty(map.opponent1score)
 			or String.isNotEmpty(map.map)
 		then
-			match, subgroup = StarcraftFfaInput.MapInput(match, mapKey, subgroup, noscore, OppNumber)
+			match, subgroup = StarcraftFfaInput._mapInput(match, mapKey, subgroup, noscore, OppNumber)
 		else
 			match[mapKey] = nil
 			break
@@ -77,12 +77,12 @@ function StarcraftFfaInput.adjustData(match)
 		end
 	end
 
-	match = StarcraftFfaInput.MatchWinnerProcessing(match, OppNumber, noscore)
+	match = StarcraftFfaInput._matchWinnerProcessing(match, OppNumber, noscore)
 
 	return match
 end
 
-function StarcraftFfaInput.getPbg(match)
+function StarcraftFfaInput._getPbg(match)
 	local pbg = {}
 
 	local advancecount = tonumber(match.advancecount or 0) or 0
@@ -93,8 +93,8 @@ function StarcraftFfaInput.getPbg(match)
 	end
 
 	local index = 1
-	while StarcraftFfaInput.bgClean(match['pbg' .. index]) ~= '' do
-		pbg[index] = StarcraftFfaInput.bgClean(match['pbg' .. index])
+	while StarcraftFfaInput._bgClean(match['pbg' .. index]) ~= '' do
+		pbg[index] = StarcraftFfaInput._bgClean(match['pbg' .. index])
 		match['pbg' .. index] = nil
 		index = index + 1
 	end
@@ -105,7 +105,7 @@ function StarcraftFfaInput.getPbg(match)
 end
 
 --helper function
-function StarcraftFfaInput.bgClean(pbg)
+function StarcraftFfaInput._bgClean(pbg)
 	local temp = pbg
 	pbg = string.lower(pbg or '')
 	if pbg == '' then
@@ -154,7 +154,7 @@ function StarcraftFfaInput.getExtraData(match)
 end
 
 -- function to sort out placements
-function StarcraftFfaInput.placementSortFunction(table, key1, key2)
+function StarcraftFfaInput._placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
 	return tonumber(op1) > tonumber(op2)
@@ -165,7 +165,7 @@ end
 Match Winner, Walkover, Placement, Resulttype, Status functions
 
 ]]--
-function StarcraftFfaInput.MatchWinnerProcessing(match, OppNumber, noscore)
+function StarcraftFfaInput._matchWinnerProcessing(match, OppNumber, noscore)
 	local bestof = tonumber(match.firstto or '') or tonumber(match.bestof or '') or 9999
 	match.bestof = bestof
 	local walkover = match.walkover or ''
@@ -243,13 +243,13 @@ function StarcraftFfaInput.MatchWinnerProcessing(match, OppNumber, noscore)
 		end
 	end
 
-	match = StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
+	match = StarcraftFfaInput._matchPlacements(match, OppNumber, noscore, IndScore)
 
 	return match
 end
 
 --determine placements and winner (if not already set)
-function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
+function StarcraftFfaInput._matchPlacements(match, OppNumber, noscore, IndScore)
 	local counter = 0
 	local temp = {}
 	match.finished = String.isNotEmpty(match.finished)
@@ -257,7 +257,7 @@ function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 		and 'true' or nil
 
 	if not noscore then
-		for scoreIndex, score in Table.iter.spairs(IndScore, StarcraftFfaInput.placementSortFunction) do
+		for scoreIndex, score in Table.iter.spairs(IndScore, StarcraftFfaInput._placementSortFunction) do
 			local opponent = match['opponent' .. scoreIndex]
 			counter = counter + 1
 			if counter == 1 and (match.winner or '') == '' then
@@ -327,12 +327,12 @@ end
 OpponentInput functions
 
 ]]--
-function StarcraftFfaInput.OpponentInput(match, OppNumber, noscore)
+function StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
 	for opponentKey, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
 		local opponentIndex = tonumber(opponentKey:match('(%d+)$'))
 		OppNumber = opponentIndex
 
-		local bg = StarcraftFfaInput.bgClean(opponent.bg)
+		local bg = StarcraftFfaInput._bgClean(opponent.bg)
 		opponent.bg = nil
 		local advances = opponent.advance or ''
 		if advances == '' then
@@ -402,7 +402,7 @@ end
 MapInput functions
 
 ]]--
-function StarcraftFfaInput.MapInput(match, mapKey, subgroup, noscore, OppNumber)
+function StarcraftFfaInput._mapInput(match, mapKey, subgroup, noscore, OppNumber)
 	local map = match[mapKey]
 
 	--redirect maps
@@ -429,7 +429,7 @@ function StarcraftFfaInput.MapInput(match, mapKey, subgroup, noscore, OppNumber)
 	map = StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 
 	--determine scores, resulttype, walkover and winner
-	map = StarcraftFfaInput.MapScoreProcessing(map, OppNumber, noscore)
+	map = StarcraftFfaInput._mapScoreProcessing(map, OppNumber, noscore)
 
 	--adjust sumscores if scores/points are used
 	if not noscore then
@@ -451,7 +451,7 @@ function StarcraftFfaInput.MapInput(match, mapKey, subgroup, noscore, OppNumber)
 end
 
 
-function StarcraftFfaInput.MapScoreProcessing(map, OppNumber, noscore)
+function StarcraftFfaInput._mapScoreProcessing(map, OppNumber, noscore)
 	map.scores = {}
 	local indexedScores = {}
 	local hasScoreSet = false
@@ -495,7 +495,7 @@ function StarcraftFfaInput.MapScoreProcessing(map, OppNumber, noscore)
 		if hasScoreSet then
 			local counter = 0
 			local temp = {}
-			for scoreIndex, score in Table.iter.spairs(indexedScores, StarcraftFfaInput.placementSortFunction) do
+			for scoreIndex, score in Table.iter.spairs(indexedScores, StarcraftFfaInput._placementSortFunction) do
 				counter = counter + 1
 				if counter == 1 and (map.winner or '') == '' then
 					map.winner = scoreIndex
