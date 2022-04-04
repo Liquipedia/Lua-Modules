@@ -161,6 +161,12 @@ MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 	type = TypeUtil.literal('matchlist'),
 })
 
+MatchGroupUtil.types.SingleMatch = TypeUtil.struct({
+	matches = TypeUtil.array(MatchGroupUtil.types.Match),
+	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
+	type = TypeUtil.literal('match'),
+})
+
 MatchGroupUtil.types.Bracket = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
 	coordinatesByMatchId = TypeUtil.table('string', MatchGroupUtil.types.MatchCoordinates),
@@ -174,7 +180,8 @@ MatchGroupUtil.types.Bracket = TypeUtil.struct({
 
 MatchGroupUtil.types.MatchGroup = TypeUtil.union(
 	MatchGroupUtil.types.Matchlist,
-	MatchGroupUtil.types.Bracket
+	MatchGroupUtil.types.Bracket,
+	MatchGroupUtil.types.SingleMatch
 )
 
 --[[
@@ -217,9 +224,26 @@ function MatchGroupUtil.makeMatchGroup(matchRecords)
 		return MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
 	elseif type == 'bracket' then
 		return MatchGroupUtil.makeBracketFromRecords(matchRecords)
+	elseif type == 'match' then
+		return MatchGroupUtil.makeMatchFromRecords(matchRecords)
 	else
 		error('Invalid match2bracketdata.type: ' .. type .. '. Expected matchlist or bracket.')
 	end
+end
+
+function MatchGroupUtil.makeMatchFromRecords(matchRecords)
+	local matches = Array.map(matchRecords, WikiSpecific.matchFromRecord)
+
+	local singleMatch = {
+		matches = matches,
+		matchesById = Table.map(matches, function(_, match) return match.matchId, match end),
+		type = 'match',
+	}
+
+	local isSingleMatch = true
+	MatchGroupUtil.populateAdvanceSpots(singleMatch, isSingleMatch)
+
+	return singleMatch
 end
 
 function MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
@@ -383,7 +407,7 @@ function MatchGroupUtil.matchFromRecord(record)
 end
 
 function MatchGroupUtil.bracketDataFromRecord(data)
-	if data.type == 'bracket' then
+	if data.type == 'bracket' or data.type == 'match' then
 		local advanceSpots = data.advancespots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {
 			advanceSpots = advanceSpots,
@@ -407,6 +431,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			header = nilIfEmpty(data.header),
 			dateHeader = nilIfEmpty(data.dateheader),
 			title = nilIfEmpty(data.title),
+			vod = nilIfEmpty(data.vod),
 			type = 'matchlist',
 		}
 	end
@@ -563,19 +588,21 @@ function MatchGroupUtil.computeAdvanceSpots(data)
 	return advanceSpots
 end
 
-function MatchGroupUtil.populateAdvanceSpots(bracket)
+function MatchGroupUtil.populateAdvanceSpots(bracket, isSingleMatch)
 	if #bracket.matches == 0 then
 		return
 	end
 
-	-- Loser of semifinals play in third place match
-	local firstBracketData = bracket.bracketDatasById[bracket.rootMatchIds[1]]
-	local thirdPlaceMatchId = firstBracketData.thirdPlaceMatchId
-	if thirdPlaceMatchId and bracket.matchesById[thirdPlaceMatchId] then
-		for _, lowerMatchId in ipairs(firstBracketData.lowerMatchIds) do
-			local bracketData = bracket.bracketDatasById[lowerMatchId]
-			bracketData.advanceSpots[2] = bracketData.advanceSpots[2]
-				or {bg = 'stayup', type = 'advance', matchId = thirdPlaceMatchId}
+	if not isSingleMatch then
+		-- Loser of semifinals play in third place match
+		local firstBracketData = bracket.bracketDatasById[bracket.rootMatchIds[1]]
+		local thirdPlaceMatchId = firstBracketData.thirdPlaceMatchId
+		if thirdPlaceMatchId and bracket.matchesById[thirdPlaceMatchId] then
+			for _, lowerMatchId in ipairs(firstBracketData.lowerMatchIds) do
+				local bracketData = bracket.bracketDatasById[lowerMatchId]
+				bracketData.advanceSpots[2] = bracketData.advanceSpots[2]
+					or {bg = 'stayup', type = 'advance', matchId = thirdPlaceMatchId}
+			end
 		end
 	end
 
