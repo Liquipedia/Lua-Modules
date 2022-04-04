@@ -56,10 +56,12 @@ function StarcraftFfaInput.adjustData(match)
 	--main processing done here
 	local subgroup = 0
 	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
-		if ((map.opponent1placement or '') ~= '' or (map.placement1 or '') ~= '' or
-				(map.points1 or '') ~= '' or (map.opponent1points or '') ~= '' or
-				(map.score1 or '') ~= '' or (map.opponent1score or '') ~= '' or
-				(map.map or '') ~= '') then
+		if
+			String.isNotEmpty(map.opponent1placement) or String.isNotEmpty(map.placement1)
+			or String.isNotEmpty(map.points1) or String.isNotEmpty(map.opponent1points)
+			or String.isNotEmpty(map.score1) or String.isNotEmpty(map.opponent1score)
+			or String.isNotEmpty(map.map)
+		then
 			match, subgroup = StarcraftFfaInput.MapInput(match, mapKey, subgroup, noscore, OppNumber)
 		else
 			match[mapKey] = nil
@@ -125,17 +127,17 @@ function StarcraftFfaInput.getExtraData(match)
 		matchsection = Variables.varDefault('matchsection'),
 		comment = match.comment,
 		featured = match.featured,
-		veto1by = (match.vetoplayer1 or '') ~= '' and match.vetoplayer1 or match.vetoopponent1,
+		veto1by = Logic.nilIfEmpty(match.vetoplayer1) or match.vetoopponent1,
 		veto1 = match.veto1,
-		veto2by = (match.vetoplayer2 or '') ~= '' and match.vetoplayer2 or match.vetoopponent2,
+		veto2by = Logic.nilIfEmpty(match.vetoplayer2) or match.vetoopponent2,
 		veto2 = match.veto2,
-		veto3by = (match.vetoplayer3 or '') ~= '' and match.vetoplayer3 or match.vetoopponent3,
+		veto3by = Logic.nilIfEmpty(match.vetoplayer3) or match.vetoopponent3,
 		veto3 = match.veto3,
-		veto4by = (match.vetoplayer4 or '') ~= '' and match.vetoplayer4 or match.vetoopponent4,
+		veto4by = Logic.nilIfEmpty(match.vetoplayer4) or match.vetoopponent4,
 		veto4 = match.veto4,
-		veto5by = (match.vetoplayer5 or '') ~= '' and match.vetoplayer5 or match.vetoopponent5,
+		veto5by = Logic.nilIfEmpty(match.vetoplayer5) or match.vetoopponent5,
 		veto5 = match.veto5,
-		veto6by = (match.vetoplayer6 or '') ~= '' and match.vetoplayer6 or match.vetoopponent6,
+		veto6by = Logic.nilIfEmpty(match.vetoplayer6) or match.vetoopponent6,
 		veto6 = match.veto6,
 		ffa = 'true',
 		noscore = match.noscore,
@@ -250,7 +252,7 @@ end
 function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 	local counter = 0
 	local temp = {}
-	match.finished = (match.finished or '') ~= '' and match.finished ~= 'false' and match.finished ~= '0' and 'true' or nil
+	match.finished = String.isNotEmpty(match.finished) and match.finished ~= 'false' and match.finished ~= '0' and 'true' or nil
 
 	if not noscore then
 		for scoreIndex, score in Table.iter.spairs(IndScore, StarcraftFfaInput.placementSortFunction) do
@@ -454,10 +456,11 @@ function StarcraftFfaInput.MapScoreProcessing(map, OppNumber, noscore)
 	--read scores
 	if not noscore then
 		for scoreIndex = 1, OppNumber do
-			local score =	(map['score' .. scoreIndex] or '') ~= '' and map['score' .. scoreIndex] or
-							(map['points' .. scoreIndex] or '') ~= '' and map['points' .. scoreIndex] or
-							(map['opponent' .. scoreIndex .. 'points'] or '') ~= '' and map['opponent' .. scoreIndex .. 'points'] or
-							(map['opponent' .. scoreIndex .. 'score'] or '') ~= '' and map['opponent' .. scoreIndex .. 'score'] or ''
+			local score = Logic.nilIfEmpty(map['score' .. scoreIndex])
+				or Logic.nilIfEmpty(map['points' .. scoreIndex])
+				or Logic.nilIfEmpty(map['opponent' .. scoreIndex .. 'points'])
+				or Logic.nilIfEmpty(map['opponent' .. scoreIndex .. 'score'])
+				or ''
 			score = ALLOWED_STATUSES2[score] or tonumber(score) or 0
 			indexedScores[scoreIndex] = score
 			if not Logic.isNumeric(score) then
