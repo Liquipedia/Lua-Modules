@@ -199,7 +199,7 @@ end
 
 function Earnings._applyDivisionFactor(totalEarnings, prizeMoney, divisionFactor, mode)
 	if divisionFactor and prizeMoney then
-		prizeMoney = prizeMoney / divisionFactor(item['mode'])
+		prizeMoney = prizeMoney / divisionFactor(mode)
 	end
 	return totalEarnings + prizeMoney
 end
