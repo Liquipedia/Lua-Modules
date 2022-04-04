@@ -65,6 +65,34 @@ function MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
 	return string.format('%04d', matchIndex)
 end
 
+function MatchGroupInput.readSingleMatch(bracketId, args)
+	-- legacy support for input param names
+	local match = args.match or args.R1M1 or args.M1 or args[1]
+
+	local matchId = '0001'
+	local matchArgs = Json.parse(match)
+
+	local context = MatchGroupInput.readContext(matchArgs, args)
+	MatchGroupInput.persistContextChanges(context)
+	
+	matchArgs.bracketid = bracketId
+	matchArgs.matchid = matchId
+	local match = WikiSpecific.processMatch(mw.getCurrentFrame(), matchArgs)
+
+	-- Add more fields to bracket data
+	match.bracketdata = match.bracketdata or {}
+	local bracketData = match.bracketdata
+
+	bracketData.type = 'match' --naming of the type still up for discussion
+
+	match.parent = context.tournamentParent
+	bracketData.bracketindex = context.bracketIndex
+	bracketData.groupRoundIndex = context.groupRoundIndex
+	bracketData.sectionheader = context.sectionHeader
+
+	return match
+end
+
 function MatchGroupInput.readBracket(bracketId, args, options)
 	local warnings = {}
 	local templateId = args[1]
