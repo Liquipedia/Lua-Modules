@@ -37,6 +37,8 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 	if Logic.readBool(args.isLegacy) then
 		if matchGroupType == 'matchlist' then
 			table.insert(warnings, 'This is a legacy matchlist! Please use the new matchlist instead.')
+		elseif matchGroupType == 'match' then
+			table.insert(warnings, 'This is a legacy singleMatch! Please use the new singleMatch instead.')
 		else
 			table.insert(warnings, 'This is a legacy bracket! Please use the new bracket instead.')
 		end
