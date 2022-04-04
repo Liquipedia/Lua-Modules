@@ -104,21 +104,21 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 		return Earnings.calculatePerYear(conditions, divisionFactor)
 	end
 
+	local prizePoolColumn = Earnings._getPrizePoolType(divisionFactor)
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
-		query = 'mode, sum::' .. Earnings._divisionFactorSwitch(divisionFactor),
+		query = 'mode, sum::' .. prizePoolColumn,
 		groupby = 'mode asc'
 	})
 
 	local totalEarnings = 0
 
 	for _, item in ipairs(lpdbQueryData) do
-		if divisionFactor == nil then
-			totalEarnings = totalEarnings + item['sum_individualprizemoney']
-		elseif item['sum_prizemoney'] ~= nil then
-			local prizeMoney = item['sum_prizemoney']
-			totalEarnings = totalEarnings + (prizeMoney / divisionFactor(item['mode']))
+		local prizeMoney = item['sum_' .. prizePoolColumn]
+		if divisionFactor ~= nil and item['sum_prizemoney'] ~= nil then
+			prizeMoney = prizeMoney / divisionFactor(item['mode'])
 		end
+		totalEarnings = totalEarnings + prizeMoney
 	end
 
 	return MathUtils._round(totalEarnings)
@@ -131,23 +131,21 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 	local totalEarningsByYear = {}
 	local earningsData = {}
 	local totalEarnings = 0
+	local prizePoolColumn = Earnings._getPrizePoolType(divisionFactor)
 
 	local offset = 0
 	local count = _MAX_QUERY_LIMIT
 	while count == _MAX_QUERY_LIMIT do
 		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions,
-			query = 'mode, date, ' .. Earnings._divisionFactorSwitch(divisionFactor),
+			query = 'mode, date, ' .. prizePoolColumn,
 			limit = _MAX_QUERY_LIMIT,
 			offset = offset
 		})
 		for _, item in pairs(lpdbQueryData) do
 			local year = string.sub(item.date, 1, 4)
-			local prizeMoney
-			if divisionFactor == nil then
-				prizeMoney = tonumber(item.individualprizemoney) or 0
-			else
-				prizeMoney = tonumber(item.prizemoney) or 0
+			local prizeMoney = tonumber(item[prizePoolColumn]) or 0
+			if divisionFactor ~= nil then
 				prizeMoney = prizeMoney / divisionFactor(item['mode'])
 			end
 			earningsData[year] = (earningsData[year] or 0) + prizeMoney
@@ -201,7 +199,7 @@ function Earnings.divisionFactorTeam(mode)
 	return 1
 end
 
-function Earnings._divisionFactorSwitch(divisionFactor)
+function Earnings._getPrizePoolType(divisionFactor)
 	return divisionFactor == nil and 'individualprizemoney' or 'prizemoney'
 end
 
