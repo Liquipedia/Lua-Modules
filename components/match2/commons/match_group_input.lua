@@ -90,7 +90,7 @@ function MatchGroupInput.readSingleMatch(bracketId, args)
 	bracketData.groupRoundIndex = context.groupRoundIndex
 	bracketData.sectionheader = context.sectionHeader
 
-	return match
+	return {match}
 end
 
 function MatchGroupInput.readBracket(bracketId, args, options)
