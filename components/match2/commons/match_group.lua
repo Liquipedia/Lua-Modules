@@ -79,6 +79,29 @@ function MatchGroup.Bracket(args)
 end
 
 --[[
+	Sets up a SingleMatch. The match is saved to LPDB.
+]]
+function MatchGroup.SingleMatch(args)
+	args.matchid = '0001'
+	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'match')
+	local matches = MatchGroupInput.readSingleMatch(options.bracketId, args, options)
+	Match.storeMatchGroup(matches, options)
+
+	local singleMatchNode
+	if options.show then
+		local fullMatchId = options.bracketId .. '_' .. args.matchid
+		singleMatchNode = MatchGroup._displaySingleMatch(args, fullMatchId)
+	end
+
+	local parts = Array.extend(
+		{singleMatchNode},
+		Array.map(optionsWarnings, WarningBox.display)
+	)
+
+	return table.concat(Array.map(parts, tostring))
+end
+
+--[[
 Displays a matchlist or bracket specified by ID.
 ]]
 function MatchGroup.MatchGroupById(args)
@@ -126,14 +149,16 @@ function MatchGroup.MatchByMatchId(args)
 
 	assert(match, 'Match bracketId= ' .. bracketId .. ' matchId=' .. matchId .. ' not found')
 
-	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
-	local config = SingleMatchDisplay.configFromArgs(args)
+	return MatchGroup._displaySingleMatch(args, fullMatchId)
+end
 
-	local MatchGroupContainer = WikiSpecific.getMatchContainer('singleMatch')
-	return MatchGroupContainer({
-		matchId = fullMatchId,
-		config = config,
-	})
+function MatchGroup._displaySingleMatch(args, fullMatchId)
+	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
+	local SingleMatchContainer = WikiSpecific.getMatchGroupContainer('singleMatch')
+	return SingleMatchContainer({
+			matchId = fullMatchId,
+			config = SingleMatchDisplay.configFromArgs(args),
+		})
 end
 
 
@@ -147,6 +172,12 @@ end
 function MatchGroup.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.Bracket(args)
+end
+
+-- Entry point of Template:SingleMatch
+function MatchGroup.TemplateSingleMatch(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchGroup.SingleMatch(args)
 end
 
 -- Entry point of Template:ShowSingleMatch
