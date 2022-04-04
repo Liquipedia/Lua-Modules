@@ -127,17 +127,17 @@ function StarcraftFfaInput.getExtraData(match)
 		matchsection = Variables.varDefault('matchsection'),
 		comment = match.comment,
 		featured = match.featured,
-		veto1by = Logic.nilIfEmpty(match.vetoplayer1) or match.vetoopponent1,
+		veto1by = String.nilIfEmpty(match.vetoplayer1) or match.vetoopponent1,
 		veto1 = match.veto1,
-		veto2by = Logic.nilIfEmpty(match.vetoplayer2) or match.vetoopponent2,
+		veto2by = String.nilIfEmpty(match.vetoplayer2) or match.vetoopponent2,
 		veto2 = match.veto2,
-		veto3by = Logic.nilIfEmpty(match.vetoplayer3) or match.vetoopponent3,
+		veto3by = String.nilIfEmpty(match.vetoplayer3) or match.vetoopponent3,
 		veto3 = match.veto3,
-		veto4by = Logic.nilIfEmpty(match.vetoplayer4) or match.vetoopponent4,
+		veto4by = String.nilIfEmpty(match.vetoplayer4) or match.vetoopponent4,
 		veto4 = match.veto4,
-		veto5by = Logic.nilIfEmpty(match.vetoplayer5) or match.vetoopponent5,
+		veto5by = String.nilIfEmpty(match.vetoplayer5) or match.vetoopponent5,
 		veto5 = match.veto5,
-		veto6by = Logic.nilIfEmpty(match.vetoplayer6) or match.vetoopponent6,
+		veto6by = String.nilIfEmpty(match.vetoplayer6) or match.vetoopponent6,
 		veto6 = match.veto6,
 		ffa = 'true',
 		noscore = match.noscore,
@@ -458,10 +458,10 @@ function StarcraftFfaInput._mapScoreProcessing(map, OppNumber, noscore)
 	--read scores
 	if not noscore then
 		for scoreIndex = 1, OppNumber do
-			local score = Logic.nilIfEmpty(map['score' .. scoreIndex])
-				or Logic.nilIfEmpty(map['points' .. scoreIndex])
-				or Logic.nilIfEmpty(map['opponent' .. scoreIndex .. 'points'])
-				or Logic.nilIfEmpty(map['opponent' .. scoreIndex .. 'score'])
+			local score = String.nilIfEmpty(map['score' .. scoreIndex])
+				or String.nilIfEmpty(map['points' .. scoreIndex])
+				or String.nilIfEmpty(map['opponent' .. scoreIndex .. 'points'])
+				or String.nilIfEmpty(map['opponent' .. scoreIndex .. 'score'])
 				or ''
 			score = ALLOWED_STATUSES2[score] or tonumber(score) or 0
 			indexedScores[scoreIndex] = score
