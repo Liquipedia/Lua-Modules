@@ -115,10 +115,7 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 
 	for _, item in ipairs(lpdbQueryData) do
 		local prizeMoney = item['sum_' .. prizePoolColumn]
-		if divisionFactor ~= nil and item['sum_prizemoney'] ~= nil then
-			prizeMoney = prizeMoney / divisionFactor(item['mode'])
-		end
-		totalEarnings = totalEarnings + prizeMoney
+		totalEarnings = Earnings._applyDivisionFactor(totalEarnings, prizeMoney, divisionFactor, item['mode'])
 	end
 
 	return MathUtils._round(totalEarnings)
@@ -145,10 +142,7 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 		for _, item in pairs(lpdbQueryData) do
 			local year = string.sub(item.date, 1, 4)
 			local prizeMoney = tonumber(item[prizePoolColumn]) or 0
-			if divisionFactor ~= nil then
-				prizeMoney = prizeMoney / divisionFactor(item['mode'])
-			end
-			earningsData[year] = (earningsData[year] or 0) + prizeMoney
+			earningsData[year] = Earnings._applyDivisionFactor(earningsData[year] or 0, prizeMoney, divisionFactor, item['mode'])
 		end
 		count = #lpdbQueryData
 		offset = offset + _MAX_QUERY_LIMIT
@@ -201,6 +195,13 @@ end
 
 function Earnings._getPrizePoolType(divisionFactor)
 	return divisionFactor == nil and 'individualprizemoney' or 'prizemoney'
+end
+
+function Earnings._applyDivisionFactor(totalEarnings, prizeMoney, divisionFactor, mode)
+	if divisionFactor and prizeMoney then
+		prizeMoney = prizeMoney / divisionFactor(item['mode'])
+	end
+	return totalEarnings + prizeMoney
 end
 
 return Class.export(Earnings)
