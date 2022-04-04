@@ -8,32 +8,32 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft', {requireDevIfEnabled = true})
 
-local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
-local ALLOWED_STATUSES2 = { ['W'] = 'W', ['FF'] = 'FF', ['L'] = 'L', ['DQ'] = 'DQ', ['-'] = 'L' }
-local MAX_NUM_OPPONENTS = 8
+local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
+local ALLOWED_STATUSES2 = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local MAX_NUM_VODGAMES = 9
 local MODES2 = {
-	['solo'] = '1',
-	['duo'] = '2',
-	['trio'] = '3',
-	['quad'] = '4',
-	['team'] = 'team',
-	['literal'] = 'literal'
+	solo = '1',
+	duo = '2',
+	trio = '3',
+	quad = '4',
+	team = 'team',
+	literal = 'literal'
 }
 local ALLOWED_BG = {
-	['up'] = 'up',
-	['down'] = 'down',
-	['stayup'] = 'stayup',
-	['staydown'] = 'staydown',
-	['stay'] = 'stay',
-	['mid'] = 'stay',
-	['drop'] = 'down',
-	['proceed'] = 'up',
+	up = 'up',
+	down = 'down',
+	stayup = 'stayup',
+	staydown = 'staydown',
+	stay = 'stay',
+	mid = 'stay',
+	drop = 'down',
+	proceed = 'up',
 }
 
 local StarcraftFfaInput = {}
@@ -55,15 +55,14 @@ function StarcraftFfaInput.adjustData(match)
 
 	--main processing done here
 	local subgroup = 0
-	for mapKey, _ in Table.iter.pairsByPrefix(match, 'map') do
-		local i = tonumber(mapKey:match('(%d+)$'))
-		if ((match['map' .. i].opponent1placement or '') ~= '' or (match['map' .. i].placement1 or '') ~= '' or
-				(match['map' .. i].points1 or '') ~= '' or (match['map' .. i].opponent1points or '') ~= '' or
-				(match['map' .. i].score1 or '') ~= '' or (match['map' .. i].opponent1score or '') ~= '' or
-				(match['map' .. i].map or '') ~= '') then
-			match, subgroup = StarcraftFfaInput.MapInput(match, i, subgroup, noscore, OppNumber)
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
+		if ((map.opponent1placement or '') ~= '' or (map.placement1 or '') ~= '' or
+				(map.points1 or '') ~= '' or (map.opponent1points or '') ~= '' or
+				(map.score1 or '') ~= '' or (map.opponent1score or '') ~= '' or
+				(map.map or '') ~= '') then
+			match, subgroup = StarcraftFfaInput.MapInput(match, mapKey, subgroup, noscore, OppNumber)
 		else
-			match['map' .. i] = nil
+			match[mapKey] = nil
 			break
 		end
 	end
@@ -71,17 +70,12 @@ function StarcraftFfaInput.adjustData(match)
 	--apply vodgames
 	for index = 1, MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]
-		if (not Logic.isEmpty(vodgame)) and (not Logic.isEmpty(match['map' .. index])) then
+		if Logic.isNotEmpty(vodgame) and Logic.isNotEmpty(match['map' .. index]) then
 			match['map' .. index].vod = match['map' .. index].vod or vodgame
 		end
 	end
 
 	match = StarcraftFfaInput.MatchWinnerProcessing(match, OppNumber, noscore)
-
-	--Bracket Contest Handling
-	if match.contest and tostring(match.contest.finished) == '1' then
-		match = StarcraftFfaInput.processContest(match, OppNumber)
-	end
 
 	return match
 end
@@ -175,6 +169,7 @@ function StarcraftFfaInput.MatchWinnerProcessing(match, OppNumber, noscore)
 	local walkover = match.walkover or ''
 	local IndScore = {}
 	for opponentIndex = 1, OppNumber do
+		local opponent = match['opponent' .. opponentIndex]
 		--determine opponent scores, status
 		--determine MATCH winner, resulttype and walkover
 		if walkover ~= '' then
@@ -183,66 +178,66 @@ function StarcraftFfaInput.MatchWinnerProcessing(match, OppNumber, noscore)
 				if walkover == opponentIndex then
 					match.winner = opponentIndex
 					match.walkover = 'L'
-					match['opponent' .. opponentIndex].status = 'W'
+					opponent.status = 'W'
 					IndScore[opponentIndex] = 9999
 				elseif walkover == 0 then
 					match.winner = 0
 					match.walkover = 'L'
-					match['opponent' .. opponentIndex].status = 'L'
+					opponent.status = 'L'
 					IndScore[opponentIndex] = -1
 				else
-					match['opponent' .. opponentIndex].status =
-						ALLOWED_STATUSES2[string.upper(match['opponent' .. opponentIndex].score or '')] or 'L'
+					opponent.status =
+						ALLOWED_STATUSES2[string.upper(opponent.score or '')] or 'L'
 					IndScore[opponentIndex] = -1
 				end
 			elseif Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
 				if tonumber(match.winner or 0) == opponentIndex then
 					IndScore[opponentIndex] = 9999
-					match['opponent' .. opponentIndex].status = 'W'
+					opponent.status = 'W'
 				else
 					IndScore[opponentIndex] = -1
-					match['opponent' .. opponentIndex].status = ALLOWED_STATUSES2[string.upper(walkover)] or 'L'
+					opponent.status = ALLOWED_STATUSES2[string.upper(walkover)] or 'L'
 				end
 			else
-				match['opponent' .. opponentIndex].status =
-					ALLOWED_STATUSES2[string.upper(match['opponent' .. opponentIndex].score or '')] or 'L'
+				opponent.status =
+					ALLOWED_STATUSES2[string.upper(opponent.score or '')] or 'L'
 				match.walkover = 'L'
-				if ALLOWED_STATUSES2[string.upper(match['opponent' .. opponentIndex].score or '')] == 'W' then
+				if ALLOWED_STATUSES2[string.upper(opponent.score or '')] == 'W' then
 					IndScore[opponentIndex] = 9999
 				else
 					IndScore[opponentIndex] = -1
 				end
 			end
-			match['opponent' .. opponentIndex].score = -1
+			opponent.score = -1
 			match.finished = 'true'
 			match.resulttype = 'default'
 		elseif Logic.readBool(match.cancelled) then
 			match.resulttype = 'np'
 			match.finished = 'true'
-			match['opponent' .. opponentIndex].score = -1
+			opponent.score = -1
 			IndScore[opponentIndex] = -1
-		elseif ALLOWED_STATUSES2[string.upper(match['opponent' .. opponentIndex].score or '')] then
-			if string.upper(match['opponent' .. opponentIndex].score) == 'W' then
+		elseif ALLOWED_STATUSES2[string.upper(opponent.score or '')] then
+			if string.upper(opponent.score) == 'W' then
 				match.winner = opponentIndex
 				match.resulttype = 'default'
 				match.finished = 'true'
-				match['opponent' .. opponentIndex].score = -1
-				match['opponent' .. opponentIndex].status = 'W'
+				opponent.score = -1
+				opponent.status = 'W'
 				IndScore[opponentIndex] = 9999
 			else
 				match.resulttype = 'default'
 				match.finished = 'true'
-				match.walkover = ALLOWED_STATUSES2[string.upper(match['opponent' .. opponentIndex].score)]
-				match['opponent' .. opponentIndex].status =
-					ALLOWED_STATUSES2[string.upper(match['opponent' .. opponentIndex].score)]
-				match['opponent' .. opponentIndex].score = -1
+				match.walkover = ALLOWED_STATUSES2[string.upper(opponent.score)]
+				opponent.status =
+					ALLOWED_STATUSES2[string.upper(opponent.score)]
+				opponent.score = -1
 				IndScore[opponentIndex] = -1
 			end
 		else
-			match['opponent' .. opponentIndex].status = 'S'
-			match['opponent' .. opponentIndex].score = tonumber(match['opponent' .. opponentIndex].score or '') or
-				tonumber(match['opponent' .. opponentIndex].sumscore) or -1
-			IndScore[opponentIndex] = match['opponent' .. opponentIndex].score
+			opponent.status = 'S'
+			opponent.score = tonumber(opponent.score or '')
+				or tonumber(opponent.sumscore) or -1
+			IndScore[opponentIndex] = opponent.score
 		end
 	end
 
@@ -259,15 +254,17 @@ function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 
 	if not noscore then
 		for scoreIndex, score in Table.iter.spairs(IndScore, StarcraftFfaInput.placementSortFunction) do
+			local opponent = match['opponent' .. scoreIndex]
 			counter = counter + 1
 			if counter == 1 and (match.winner or '') == '' then
 				if match.finished or score >= match.bestof then
 					match.winner = scoreIndex
 					match.finished = 'true'
-					match['opponent' .. scoreIndex].placement = tonumber(match['opponent' .. scoreIndex].placement or '') or counter
-					match['opponent' .. scoreIndex].extradata.advances = true
-					match['opponent' .. scoreIndex].extradata.bg = match['opponent' .. scoreIndex].extradata.bg
-						or match.pbg[match['opponent' .. scoreIndex].placement] or 'down'
+					opponent.placement = tonumber(opponent.placement or '') or counter
+					opponent.extradata.advances = true
+					opponent.extradata.bg = StringUtils.nilIfEmpty(opponent.extradata.bg)
+						or match.pbg[opponent.placement]
+						or 'down'
 					temp.place = counter
 					temp.score = IndScore[scoreIndex]
 				else
@@ -275,16 +272,17 @@ function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 				end
 			elseif match.finished then
 				if temp.score == score then
-					match['opponent' .. scoreIndex].placement = tonumber(match['opponent' .. scoreIndex].placement or '') or temp.place
+					opponent.placement = tonumber(opponent.placement or '') or temp.place
 				else
-					match['opponent' .. scoreIndex].placement = tonumber(match['opponent' .. scoreIndex].placement or '') or counter
+					opponent.placement = tonumber(opponent.placement or '') or counter
 					temp.place = counter
 					temp.score = IndScore[scoreIndex]
 				end
-				match['opponent' .. scoreIndex].extradata.bg = match['opponent' .. scoreIndex].extradata.bg
-						or match.pbg[match['opponent' .. scoreIndex].placement] or 'down'
-				if match['opponent' .. scoreIndex].extradata.bg == 'up' then
-					match['opponent' .. scoreIndex].extradata.advances = true
+				opponent.extradata.bg = StringUtils.nilIfEmpty(opponent.extradata.bg)
+					or match.pbg[opponent.placement]
+					or 'down'
+				if opponent.extradata.bg == 'up' then
+					opponent.extradata.advances = true
 				end
 			else
 				break
@@ -292,17 +290,28 @@ function StarcraftFfaInput.MatchPlacements(match, OppNumber, noscore, IndScore)
 		end
 	elseif tonumber(match.winner or '') then
 		for oppIndex = 1, OppNumber do
-			match['opponent' .. oppIndex].placement = tonumber(match['opponent' .. oppIndex].placement or '') or 99
-			if match['opponent' .. oppIndex].placement == 99 and tonumber(match.winner) == oppIndex then
-				match['opponent' .. oppIndex].placement = 1
+			local opponent = match['opponent' .. oppIndex]
+			opponent.placement = tonumber(opponent.placement or '') or 99
+			if opponent.placement == 99 and tonumber(match.winner) == oppIndex then
+				opponent.placement = 1
 			end
 		end
 	else
 		for oppIndex = 1, OppNumber do
-			match['opponent' .. oppIndex].placement = tonumber(match['opponent' .. oppIndex].placement or '') or 99
-			if match['opponent' .. oppIndex].placement == 1 then
+			local opponent = match['opponent' .. oppIndex]
+			opponent.placement = tonumber(opponent.placement or '') or 99
+			if opponent.placement == 1 then
 				match.winner = oppIndex
 			end
+		end
+	end
+
+	if match.finished then
+		for oppIndex = 1, OppNumber do
+			local opponent = match['opponent' .. oppIndex]
+			opponent.extradata.bg = StringUtils.nilIfEmpty(opponent.extradata.bg)
+				or match.pbg[opponent.placement]
+				or 'down'
 		end
 	end
 
@@ -315,78 +324,70 @@ OpponentInput functions
 
 ]]--
 function StarcraftFfaInput.OpponentInput(match, OppNumber, noscore)
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		if not Logic.isEmpty(match['opponent' .. opponentIndex]) then
-			OppNumber = opponentIndex
+	for opponentKey, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+		local opponentIndex = tonumber(opponentKey:match('(%d+)$'))
+		OppNumber = opponentIndex
 
-			local bg = StarcraftFfaInput.bgClean(match['opponent' .. opponentIndex].bg)
-			match['opponent' .. opponentIndex].bg = nil
-			local advances = match['opponent' .. opponentIndex].advance or ''
+		local bg = StarcraftFfaInput.bgClean(opponent.bg)
+		opponent.bg = nil
+		local advances = opponent.advance or ''
+		if advances == '' then
+			advances = opponent.win or ''
 			if advances == '' then
-				advances = match['opponent' .. opponentIndex].win or ''
-				if advances == '' then
-					advances = match['opponent' .. opponentIndex].advances or ''
-				end
+				advances = opponent.advances or ''
 			end
-			advances = advances ~= 'false' and advances ~= '' and advances ~= '0'
-
-			--opponent processing (first part)
-			--sort out extradata
-			match['opponent' .. opponentIndex].extradata = {
-				advantage = match['opponent' .. opponentIndex].advantage,
-				score2 = match['opponent' .. opponentIndex].score2,
-				isarchon = match['opponent' .. opponentIndex].isarchon,
-				advances = advances,
-				noscore = noscore,
-				bg = bg
-			}
-
-			--set initial opponent sumscore
-			match['opponent' .. opponentIndex].sumscore =
-				tonumber(match['opponent' .. opponentIndex].extradata.advantage or '') or ''
-
-			local temp_place = match['opponent' .. opponentIndex].placement
-			--process input depending on type
-			if match['opponent' .. opponentIndex]['type'] == 'solo' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessSoloOpponentInput(match['opponent' .. opponentIndex])
-			elseif match['opponent' .. opponentIndex]['type'] == 'duo' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessDuoOpponentInput(match['opponent' .. opponentIndex])
-			elseif match['opponent' .. opponentIndex]['type'] == 'trio' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 3)
-			elseif match['opponent' .. opponentIndex]['type'] == 'quad' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessOpponentInput(match['opponent' .. opponentIndex], 4)
-			elseif match['opponent' .. opponentIndex]['type'] == 'team' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessTeamOpponentInput(match['opponent' .. opponentIndex], match.date)
-			elseif match['opponent' .. opponentIndex]['type'] == 'literal' then
-				match['opponent' .. opponentIndex] =
-					StarcraftMatchGroupInput.ProcessLiteralOpponentInput(match['opponent' .. opponentIndex])
-			else
-				error('Unsupported Opponent Type')
-			end
-
-			match['opponent' .. opponentIndex].placement = temp_place
-
-			--mark match as noQuery if it contains BYE/TBD/TBA/'' or Literal opponents
-			local pltemp = string.lower(match['opponent' .. opponentIndex].name or '')
-			if pltemp == '' or pltemp == 'tbd' or pltemp == 'tba' or pltemp == 'bye' or
-					match['opponent' .. opponentIndex]['type'] == 'literal' then
-				match.noQuery = 'true'
-			end
-
-			local mode = MODES2[match['opponent' .. opponentIndex]['type']]
-			if mode == '2' and match['opponent' .. opponentIndex].extradata.isarchon == 'true' then
-				mode = 'Archon'
-			end
-
-			match.mode = match.mode .. (opponentIndex ~= 1 and '_' or '') .. mode
-		else
-			break
 		end
+		advances = advances ~= 'false' and advances ~= '' and advances ~= '0'
+
+		--opponent processing (first part)
+		--sort out extradata
+		opponent.extradata = {
+			advances = advances,
+			advantage = opponent.advantage,
+			bg = bg,
+			isarchon = opponent.isarchon,
+			noscore = noscore,
+			score2 = opponent.score2,
+		}
+
+		--set initial opponent sumscore
+		opponent.sumscore =
+			tonumber(opponent.extradata.advantage or '') or ''
+
+		local temp_place = opponent.placement
+		--process input depending on type
+		if opponent.type == 'solo' then
+			opponent = StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
+		elseif opponent.type == 'duo' then
+			opponent = StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
+		elseif opponent.type == 'trio' then
+			opponent = StarcraftMatchGroupInput.ProcessOpponentInput(opponent, 3)
+		elseif opponent.type == 'quad' then
+			opponent = StarcraftMatchGroupInput.ProcessOpponentInput(opponent, 4)
+		elseif opponent.type == 'team' then
+			opponent = StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, match.date)
+		elseif opponent.type == 'literal' then
+			opponent = StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
+		else
+			error('Unsupported Opponent Type')
+		end
+		match[opponentKey] = opponent
+
+		opponent.placement = temp_place
+
+		--mark match as noQuery if it contains BYE/TBD/TBA/'' or Literal opponents
+		local pltemp = string.lower(opponent.name or '')
+		if pltemp == '' or pltemp == 'tbd' or pltemp == 'tba' or pltemp == 'bye' or
+				opponent.type == 'literal' then
+			match.noQuery = 'true'
+		end
+
+		local mode = MODES2[opponent.type]
+		if mode == '2' and opponent.extradata.isarchon == 'true' then
+			mode = 'Archon'
+		end
+
+		match.mode = match.mode .. (opponentIndex ~= 1 and '_' or '') .. mode
 	end
 
 	return match, OppNumber
@@ -397,32 +398,34 @@ end
 MapInput functions
 
 ]]--
-function StarcraftFfaInput.MapInput(match, i, subgroup, noscore, OppNumber)
+function StarcraftFfaInput.MapInput(match, mapKey, subgroup, noscore, OppNumber)
+	local map = match[mapKey]
+
 	--redirect maps
-	if match['map' .. i].map ~= 'TBD' then
-		match['map' .. i].map = mw.ext.TeamLiquidIntegration.resolve_redirect(match['map' .. i].map or '')
+	if map.map ~= 'TBD' then
+		map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map or '')
 	end
 
 	--set initial extradata for maps
-	match['map' .. i].extradata = {
-		comment = match['map' .. i].comment or '',
-		header = match['map' .. i].header or '',
+	map.extradata = {
+		comment = map.comment or '',
+		header = map.header or '',
+		isSubMatch = 'false',
 		noQuery = match.noQuery,
-		isSubMatch = 'false'
 	}
 
 	--inherit stuff from match data
-	match['map' .. i]['type'] = match['type']
-	match['map' .. i].liquipediatier = match.liquipediatier
-	match['map' .. i].liquipediatiertype = match.liquipediatiertype
-	match['map' .. i].game = match.game
-	match['map' .. i].date = match.date
+	map.type = match.type
+	map.liquipediatier = match.liquipediatier
+	map.liquipediatiertype = match.liquipediatiertype
+	map.game = match.game
+	map.date = match.date
 
 	--get participants data for the map + get map mode
-	match['map' .. i] = StarcraftMatchGroupInput.ProcessPlayerMapData(match['map' .. i], match, OppNumber)
+	map = StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, OppNumber)
 
 	--determine scores, resulttype, walkover and winner
-	match['map' .. i] = StarcraftFfaInput.MapScoreProcessing(match['map' .. i], OppNumber, noscore)
+	map = StarcraftFfaInput.MapScoreProcessing(map, OppNumber, noscore)
 
 	--adjust sumscores if scores/points are used
 	if not noscore then
@@ -431,12 +434,14 @@ function StarcraftFfaInput.MapInput(match, i, subgroup, noscore, OppNumber)
 			if (match['opponent' .. j].sumscore or '') == '' then
 				match['opponent' .. j].sumscore = 0
 			end
-			match['opponent' .. j].sumscore = match['opponent' .. j].sumscore + (tonumber(match['map' .. i].scores[j] or 0) or 0)
+			match['opponent' .. j].sumscore = match['opponent' .. j].sumscore + (tonumber(map.scores[j] or 0) or 0)
 		end
 	end
 
 	--subgroup handling
-	subgroup = tonumber(match['map' .. i].subgroup or '') or subgroup + 1
+	subgroup = tonumber(map.subgroup) or subgroup + 1
+
+	match[mapKey] = map
 
 	return match, subgroup
 end
@@ -523,67 +528,6 @@ function StarcraftFfaInput.MapScoreProcessing(map, OppNumber, noscore)
 	end
 
 	return map
-end
-
-
-
-
-
-
---[[
-
-Bracket Contests function
-
-]]--
-function StarcraftFfaInput.processContest(match, OppNumber)
-	local points = tonumber(Variables.varDefault('contestPoints', 0)) or 0
-	local score1 = {}
-	local score2 = {}
-	local Rscore1 = {}
-	local Rscore2 = {}
-	for opponentIndex = 1, OppNumber do
-		local Opp = match['opponent' .. opponentIndex]
-		local ResultOpp = match.contest.opponents[opponentIndex]
-		ResultOpp.extradata = ResultOpp.extradata or {}
-		if ResultOpp.name ~= Opp.name then
-			break
-		end
-		score1[opponentIndex] = tonumber(Opp.score or 0) or 0
-		score2[opponentIndex] = tonumber(Opp.extradata.score2 or 0) or 0
-		Rscore1[opponentIndex] = tonumber(ResultOpp.score or 0) or 0
-		Rscore2[opponentIndex] = tonumber(ResultOpp.extradata.score2 or 0) or 0
-
-		if score1[opponentIndex] == Rscore1[opponentIndex] and score2[opponentIndex] == Rscore2[opponentIndex] then
-			match['opponent' .. opponentIndex].extradata.contest =
-				'<i class="fa fa-check forest-green-text" aria-hidden="true"></i>'
-		else
-			match['opponent' .. opponentIndex].extradata.contest = '&nbsp;'
-		end
-	end
-
-	if match.opponent1.extradata.contest ~= '&nbsp;' and match.opponent1.extradata.contest ~= '&nbsp;' then
-		points = points + match.contest.points.score
-	else
-		local diff = score1[1] - Rscore1[1]
-		local hasSameDiff = true
-		for i = 2, OppNumber do
-			if score1[i] - Rscore1[i] - diff ~= 0 then
-				hasSameDiff = false
-				break
-			end
-		end
-		if hasSameDiff then
-			points = points + match.contest.points.diff
-		elseif tostring(match.winner) == tostring(match.contest.winner) then
-			points = points + match.contest.points.win
-		end
-	end
-
-	match.contest = nil
-
-	Variables.varDefine('contestPoints', points)
-
-	return match
 end
 
 return StarcraftFfaInput
