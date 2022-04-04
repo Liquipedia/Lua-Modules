@@ -354,7 +354,7 @@ function StarcraftFfaInput.OpponentInput(match, OppNumber, noscore)
 		opponent.sumscore =
 			tonumber(opponent.extradata.advantage or '') or ''
 
-		local temp_place = opponent.placement
+		local inputPlace = opponent.placement
 		--process input depending on type
 		if opponent.type == 'solo' then
 			opponent = StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
@@ -373,7 +373,7 @@ function StarcraftFfaInput.OpponentInput(match, OppNumber, noscore)
 		end
 		match[opponentKey] = opponent
 
-		opponent.placement = temp_place
+		opponent.placement = inputPlace
 
 		--mark match as noQuery if it contains BYE/TBD/TBA/'' or Literal opponents
 		local pltemp = string.lower(opponent.name or '')
