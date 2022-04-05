@@ -21,6 +21,7 @@ local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requi
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
+local _TYPE_SINGLE_MATCH = 'match'
 
 local nilIfEmpty = StringUtils.nilIfEmpty
 
@@ -164,7 +165,7 @@ MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 MatchGroupUtil.types.SingleMatch = TypeUtil.struct({
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
-	type = TypeUtil.literal('match'),
+	type = TypeUtil.literal(_TYPE_SINGLE_MATCH),
 })
 
 MatchGroupUtil.types.Bracket = TypeUtil.struct({
@@ -224,7 +225,7 @@ function MatchGroupUtil.makeMatchGroup(matchRecords)
 		return MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
 	elseif type == 'bracket' then
 		return MatchGroupUtil.makeBracketFromRecords(matchRecords)
-	elseif type == 'match' then
+	elseif type == _TYPE_SINGLE_MATCH then
 		return MatchGroupUtil.makeMatchFromRecords(matchRecords)
 	else
 		error('Invalid match2bracketdata.type: ' .. type .. '. Expected matchlist or bracket.')
@@ -237,11 +238,10 @@ function MatchGroupUtil.makeMatchFromRecords(matchRecords)
 	local singleMatch = {
 		matches = matches,
 		matchesById = Table.map(matches, function(_, match) return match.matchId, match end),
-		type = 'match',
+		type = _TYPE_SINGLE_MATCH,
 	}
 
-	local isSingleMatch = true
-	MatchGroupUtil.populateAdvanceSpots(singleMatch, isSingleMatch)
+	MatchGroupUtil.populateAdvanceSpots(singleMatch, _TYPE_SINGLE_MATCH)
 
 	return singleMatch
 end
@@ -426,11 +426,11 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			type = 'bracket',
 			upperMatchId = nilIfEmpty(data.upperMatchId),
 		}
-	elseif data.type == 'match' then
+	elseif data.type == _TYPE_SINGLE_MATCH then
 		local advanceSpots = data.advancespots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {
 			advanceSpots = advanceSpots,
-			type = 'match',
+			type = _TYPE_SINGLE_MATCH,
 		}
 	else
 		return {
@@ -593,12 +593,12 @@ function MatchGroupUtil.computeAdvanceSpots(data)
 	return advanceSpots
 end
 
-function MatchGroupUtil.populateAdvanceSpots(bracket, isSingleMatch)
+function MatchGroupUtil.populateAdvanceSpots(bracket, matchGroupType)
 	if #bracket.matches == 0 then
 		return
 	end
 
-	if not isSingleMatch then
+	if matchGroupType == _TYPE_SINGLE_MATCH then
 		-- Loser of semifinals play in third place match
 		local firstBracketData = bracket.bracketDatasById[bracket.rootMatchIds[1]]
 		local thirdPlaceMatchId = firstBracketData.thirdPlaceMatchId
