@@ -192,7 +192,7 @@ function matchFunctions.getExtraData(match)
 	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
 		table.insert(casters, {
 			name = name,
-			flag = match[key .. 'flag'] or getPlayerFlag(name)
+			flag = match[key .. 'flag'] or p.getPlayerFlag(name)
 		})
 	end
 	table.sort(casters, function(c1, c2) return c1.name:lower() < c2.name:lower() end)
@@ -211,7 +211,7 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
-function getPlayerFlag(name)
+function p.getPlayerFlag(name)
 	local data = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. mw.ext.TeamLiquidIntegration.resolve_redirect( name ):gsub(' ', '_') .. ']]',
 		query = 'nationality'
