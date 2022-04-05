@@ -407,7 +407,7 @@ function MatchGroupUtil.matchFromRecord(record)
 end
 
 function MatchGroupUtil.bracketDataFromRecord(data)
-	if data.type == 'bracket' or data.type == 'match' then
+	if data.type == 'bracket' then
 		local advanceSpots = data.advancespots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {
 			advanceSpots = advanceSpots,
@@ -425,6 +425,12 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
 			upperMatchId = nilIfEmpty(data.upperMatchId),
+		}
+	elseif data.type == 'match' then
+		local advanceSpots = data.advancespots or MatchGroupUtil.computeAdvanceSpots(data)
+		return {
+			advanceSpots = advanceSpots,
+			type = 'match',
 		}
 	else
 		return {
