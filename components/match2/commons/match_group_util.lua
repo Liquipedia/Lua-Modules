@@ -431,7 +431,6 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			header = nilIfEmpty(data.header),
 			dateHeader = nilIfEmpty(data.dateheader),
 			title = nilIfEmpty(data.title),
-			vod = nilIfEmpty(data.vod),
 			type = 'matchlist',
 		}
 	end
