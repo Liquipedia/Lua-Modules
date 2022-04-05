@@ -598,7 +598,7 @@ function MatchGroupUtil.populateAdvanceSpots(bracket, matchGroupType)
 		return
 	end
 
-	if matchGroupType == _TYPE_SINGLE_MATCH then
+	if matchGroupType ~= _TYPE_SINGLE_MATCH then
 		-- Loser of semifinals play in third place match
 		local firstBracketData = bracket.bracketDatasById[bracket.rootMatchIds[1]]
 		local thirdPlaceMatchId = firstBracketData.thirdPlaceMatchId
