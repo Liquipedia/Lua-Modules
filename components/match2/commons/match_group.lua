@@ -85,12 +85,12 @@ function MatchGroup.SingleMatch(args)
 	args.matchid = '0001'
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'match')
 	local matches = MatchGroupInput.readSingleMatch(options.bracketId, args, options)
+	args.id = options.bracketId
 	Match.storeMatchGroup(matches, options)
 
 	local singleMatchNode
 	if options.show then
-		local fullMatchId = options.bracketId .. '_' .. args.matchid
-		singleMatchNode = MatchGroup._displaySingleMatch(args, fullMatchId)
+		singleMatchNode = MatchGroup.MatchByMatchId(args)
 	end
 
 	local parts = Array.extend(
@@ -149,18 +149,13 @@ function MatchGroup.MatchByMatchId(args)
 
 	assert(match, 'Match bracketId= ' .. bracketId .. ' matchId=' .. matchId .. ' not found')
 
-	return MatchGroup._displaySingleMatch(args, fullMatchId)
-end
-
-function MatchGroup._displaySingleMatch(args, fullMatchId)
 	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
 	local SingleMatchContainer = WikiSpecific.getMatchGroupContainer('singleMatch')
 	return SingleMatchContainer({
-			matchId = fullMatchId,
-			config = SingleMatchDisplay.configFromArgs(args),
-		})
+		matchId = fullMatchId,
+		config = SingleMatchDisplay.configFromArgs(args),
+	})
 end
-
 
 -- Entry point of Template:Matchlist
 function MatchGroup.TemplateMatchlist(frame)
