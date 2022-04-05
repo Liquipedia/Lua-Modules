@@ -1159,6 +1159,10 @@ local data = {
 		name = 'Russian Speaking',
 		flag = 'File:RuBy hd.png'
 	},
+	['non-representing'] = {
+		name = 'Non-representing',
+		flag = 'File:non hd.png'
+	},
 	['filler'] = {
 		name = '',
 		flag = 'File:Space filler flag.png'
@@ -1788,6 +1792,10 @@ local aliases = {
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
 	['unknown'] = 'filler',
+
+	['nonrepresenting'] = 'non-representing',
+	['non'] = 'non-representing',
+	['none'] = 'non-representing',
 }
 
 -- This table includes
