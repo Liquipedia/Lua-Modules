@@ -107,7 +107,7 @@ end
 
 --helper function
 function StarcraftFfaInput._bgClean(pbg)
-	local temp = pbg
+	local pbgInput = pbg
 	pbg = string.lower(pbg or '')
 	if pbg == '' then
 		return ''
@@ -115,7 +115,7 @@ function StarcraftFfaInput._bgClean(pbg)
 		pbg = ALLOWED_BG[pbg]
 
 		if not pbg then
-			error('Bad bg/pbg entry "' .. temp .. '"')
+			error('Bad bg/pbg entry "' .. pbgInput .. '"')
 		end
 
 		return pbg
