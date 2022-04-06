@@ -381,8 +381,8 @@ function StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
 		opponent.placement = inputPlace
 
 		--mark match as noQuery if it contains BYE/TBD/TBA/'' or Literal opponents
-		local pltemp = string.lower(opponent.name or '')
-		if Opponent.isTbd(opponent) or pltemp == 'tba' or pltemp == 'bye' then
+		local opponentName = string.lower(opponent.name or '')
+		if Opponent.isTbd(opponent) or opponentName == 'tba' or opponentName == 'bye' then
 			match.noQuery = 'true'
 		end
 
