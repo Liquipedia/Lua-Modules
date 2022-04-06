@@ -261,7 +261,7 @@ function StarcraftFfaInput._matchPlacements(match, OppNumber, noscore, IndScore)
 		for scoreIndex, score in Table.iter.spairs(IndScore, StarcraftFfaInput._placementSortFunction) do
 			local opponent = match['opponent' .. scoreIndex]
 			counter = counter + 1
-			if counter == 1 and (match.winner or '') == '' then
+			if counter == 1 and String.isEmpty(match.winner) then
 				if match.finished or score >= match.bestof then
 					match.winner = scoreIndex
 					match.finished = 'true'
@@ -335,14 +335,14 @@ function StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
 
 		local bg = StarcraftFfaInput._bgClean(opponent.bg)
 		opponent.bg = nil
-		local advances = opponent.advance or ''
-		if advances == '' then
-			advances = opponent.win or ''
-			if advances == '' then
-				advances = opponent.advances or ''
+		local advances = opponent.advance
+		if String.isEmpty(advances) then
+			advances = opponent.win
+			if String.isEmpty(advances) then
+				advances = opponent.advances
 			end
 		end
-		advances = advances ~= 'false' and advances ~= '' and advances ~= '0'
+		advances = String.isNotEmpty(advances) and advances ~= 'false' and advances ~= '0'
 
 		--opponent processing (first part)
 		--sort out extradata
@@ -435,7 +435,7 @@ function StarcraftFfaInput._mapInput(match, mapKey, subgroup, noscore, OppNumber
 	if not noscore then
 		for j = 1, OppNumber do
 			--set sumscore to 0 if it isn't a number
-			if (match['opponent' .. j].sumscore or '') == '' then
+			if String.isEmpty(match['opponent' .. j].sumscore) then
 				match['opponent' .. j].sumscore = 0
 			end
 			match['opponent' .. j].sumscore = match['opponent' .. j].sumscore + (tonumber(map.scores[j] or 0) or 0)
@@ -467,7 +467,7 @@ function StarcraftFfaInput._mapScoreProcessing(map, OppNumber, noscore)
 			indexedScores[scoreIndex] = score
 			if not Logic.isNumeric(score) then
 				map.resulttype = 'default'
-				if (map.walkover or '') == '' or map.walkover == 'L' then
+				if String.isEmpty(map.walkover) or map.walkover == 'L' then
 					if score == 'DQ' then
 						map.walkover = 'DQ'
 					elseif score == 'FF' then
@@ -497,7 +497,7 @@ function StarcraftFfaInput._mapScoreProcessing(map, OppNumber, noscore)
 			local temp = {}
 			for scoreIndex, score in Table.iter.spairs(indexedScores, StarcraftFfaInput._placementSortFunction) do
 				counter = counter + 1
-				if counter == 1 and (map.winner or '') == '' then
+				if counter == 1 and String.isEmpty(map.winner) then
 					map.winner = scoreIndex
 					map.extradata['placement' .. scoreIndex] = tonumber(map['placement' .. scoreIndex] or '') or
 						tonumber(map['opponent' .. scoreIndex .. 'placement'] or '') or counter
