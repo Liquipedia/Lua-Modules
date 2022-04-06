@@ -467,8 +467,6 @@ function StarcraftFfaInput._mapScoreProcessing(map, numberOfOpponents, noscore)
 		for scoreIndex = 1, numberOfOpponents do
 			local score = String.nilIfEmpty(map['score' .. scoreIndex])
 				or String.nilIfEmpty(map['points' .. scoreIndex])
-				or String.nilIfEmpty(map['opponent' .. scoreIndex .. 'points'])
-				or String.nilIfEmpty(map['opponent' .. scoreIndex .. 'score'])
 				or ''
 			score = ALLOWED_STATUSES2[score] or tonumber(score) or 0
 			indexedScores[scoreIndex] = score
