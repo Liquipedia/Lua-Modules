@@ -333,6 +333,11 @@ function StarcraftFfaInput._opponentInput(match, noscore)
 	for opponentKey, opponent, opponentIndex in Table.iter.pairsByPrefix(match, 'opponent') do
 		numberOfOpponents = opponentIndex
 
+		-- Convert byes to literals
+		if string.lower(opponent.template or '') == 'bye' or string.lower(opponent.name or '') == 'bye' then
+			opponent = {type = Opponent.literal, name = 'BYE'}
+		end
+
 		local bg = StarcraftFfaInput._bgClean(opponent.bg)
 		opponent.bg = nil
 		local advances = opponent.advance
@@ -385,7 +390,7 @@ function StarcraftFfaInput._opponentInput(match, noscore)
 
 		--mark match as noQuery if it contains BYE/TBD/TBA/'' or Literal opponents
 		local opponentName = string.lower(opponent.name or '')
-		if Opponent.isTbd(opponent) or opponentName == 'tba' or opponentName == 'bye' then
+		if Opponent.isTbd(opponent) or opponentName == 'tba' then
 			match.noQuery = 'true'
 		end
 
