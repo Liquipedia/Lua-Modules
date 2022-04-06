@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+local Opponent = require('Module:Opponent')
 
 local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft', {requireDevIfEnabled = true})
 
@@ -51,7 +52,7 @@ function StarcraftFfaInput.adjustData(match)
 	match, OppNumber = StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
 
 	--indicate it is an FFA match
-	match.mode = match.mode .. '_ffa'
+	match.mode = match.mode .. 'ffa'
 
 	--main processing done here
 	local subgroup = 0
@@ -360,17 +361,17 @@ function StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
 
 		local inputPlace = opponent.placement
 		--process input depending on type
-		if opponent.type == 'solo' then
+		if opponent.type == Opponent.solo then
 			opponent = StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
-		elseif opponent.type == 'duo' then
+		elseif opponent.type == Opponent.duo then
 			opponent = StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
-		elseif opponent.type == 'trio' then
+		elseif opponent.type == Opponent.trio then
 			opponent = StarcraftMatchGroupInput.ProcessOpponentInput(opponent, 3)
-		elseif opponent.type == 'quad' then
+		elseif opponent.type == Opponent.quad then
 			opponent = StarcraftMatchGroupInput.ProcessOpponentInput(opponent, 4)
-		elseif opponent.type == 'team' then
+		elseif opponent.type == Opponent.team then
 			opponent = StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, match.date)
-		elseif opponent.type == 'literal' then
+		elseif opponent.type == Opponent.literal then
 			opponent = StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 		else
 			error('Unsupported Opponent Type')
@@ -381,8 +382,7 @@ function StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
 
 		--mark match as noQuery if it contains BYE/TBD/TBA/'' or Literal opponents
 		local pltemp = string.lower(opponent.name or '')
-		if pltemp == '' or pltemp == 'tbd' or pltemp == 'tba' or pltemp == 'bye' or
-				opponent.type == 'literal' then
+		if Opponent.isTbd(opponent) or pltemp == 'tba' or pltemp == 'bye' then
 			match.noQuery = 'true'
 		end
 
@@ -391,7 +391,7 @@ function StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
 			mode = 'Archon'
 		end
 
-		match.mode = match.mode .. (opponentIndex ~= 1 and '_' or '') .. mode
+		match.mode = match.mode .. mode .. '_'
 	end
 
 	return match, OppNumber
