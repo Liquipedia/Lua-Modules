@@ -142,7 +142,7 @@ function Opponent.isTbd(opponent)
 		return true
 
 	else
-		return Array.any(opponent.players, Opponent.playerIsTbd)
+		return Array.any(opponent.players or opponent.match2players, Opponent.playerIsTbd)
 	end
 end
 
