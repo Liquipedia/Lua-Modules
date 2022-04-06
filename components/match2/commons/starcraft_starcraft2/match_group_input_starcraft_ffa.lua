@@ -359,6 +359,9 @@ function StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
 		opponent.sumscore =
 			tonumber(opponent.extradata.advantage or '') or ''
 
+		-- read placement input for the opponent to overwrite
+		-- the one set by the default opponent input processing
+		-- as that sets placements assuming it is a non ffa match
 		local inputPlace = opponent.placement
 		--process input depending on type
 		if opponent.type == Opponent.solo then
