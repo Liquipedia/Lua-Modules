@@ -329,8 +329,7 @@ OpponentInput functions
 
 ]]--
 function StarcraftFfaInput._opponentInput(match, OppNumber, noscore)
-	for opponentKey, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
-		local opponentIndex = tonumber(opponentKey:match('(%d+)$'))
+	for opponentKey, opponent, opponentIndex in Table.iter.pairsByPrefix(match, 'opponent') do
 		OppNumber = opponentIndex
 
 		local bg = StarcraftFfaInput._bgClean(opponent.bg)
