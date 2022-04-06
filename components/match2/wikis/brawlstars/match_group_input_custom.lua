@@ -22,6 +22,7 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
+local _NOT_PLAYED = {'skip', 'np'}
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
@@ -324,6 +325,12 @@ function mapFunctions.getScoresAndWinner(map)
 	map.score1 = tonumber(map.score1 or '')
 	map.score2 = tonumber(map.score2 or '')
 	map.scores = { map.score1, map.score2 }
+	if Table.includes(_NOT_PLAYED, string.lower(map.winner or '')) then
+		map.winner = 0
+		map.resulttype = 'np'
+	elseif Logic.isNumeric(map.winner) then
+		map.winner = tonumber(map.winner)
+	end
 	local firstTo = math.ceil( map.bestof / 2 )
 	if (map.score1 or 0) >= firstTo then
 		map.winner = 1
