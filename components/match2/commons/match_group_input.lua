@@ -239,7 +239,7 @@ function MatchGroupInput._roundHeader(headerInput)
 	local roundHeader = headerInput or globalVars:get('roundHeader')
 	globalVars:set('roundHeader', roundHeader)
 	return roundHeader
-end	
+end
 
 function MatchGroupInput.readDate(dateString)
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
