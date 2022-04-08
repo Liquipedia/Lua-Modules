@@ -45,6 +45,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.type = 'matchlist'
 			bracketData.title = matchIndex == 1 and args.title or nil
 			bracketData.header = args['M' .. matchIndex .. 'header'] or bracketData.header
+			bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 			bracketData.matchIndex = matchIndex
 
 			match.parent = context.tournamentParent
@@ -112,6 +113,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		bracketData.type = 'bracket'
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
+		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
 		match.parent = context.tournamentParent
 		bracketData.bracketindex = context.bracketIndex
@@ -232,6 +234,12 @@ function MatchGroupInput.applyOverrideArgs(matches, args)
 end
 
 local getContentLanguage = FnUtil.memoize(mw.getContentLanguage)
+
+function MatchGroupInput._inheritedHeader(headerInput)
+	local inheritedHeader = headerInput or globalVars:get('inheritedHeader')
+	globalVars:set('inheritedHeader', inheritedHeader)
+	return inheritedHeader
+end
 
 function MatchGroupInput.readDate(dateString)
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
