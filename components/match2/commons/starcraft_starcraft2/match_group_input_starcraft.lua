@@ -179,7 +179,8 @@ function StarcraftMatchGroupInput.getExtraData(match)
 			ffa = 'false',
 		}
 		for subGroupIndex = 1, MAX_NUM_MAPS do
-			match.extradata['subGroup' .. subGroupIndex .. 'header'] = StarcraftMatchGroupInput.getSubGroupHeader(subGroupIndex, match)
+			match.extradata['subGroup' .. subGroupIndex .. 'header']
+				= StarcraftMatchGroupInput.getSubGroupHeader(subGroupIndex, match)
 		end
 	end
 
