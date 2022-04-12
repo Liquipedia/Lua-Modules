@@ -235,7 +235,6 @@ function Legacy._storeTeamMatchSMW(match, match2)
 		'has match afreecatv=' .. (streams.afreecatv or ''),
 		'has match dailymotion=' .. (streams.dailymotion or ''),
 		'has match douyu=' .. (streams.douyu or ''),
-		'has match smashcast=' .. (streams.smashcast or ''),
 		'has match youtube=' .. (streams.youtube or ''),
 		'has best of=' .. (extradata.bestof or ''),
 	})
@@ -273,7 +272,6 @@ function Legacy._storeSoloMatchSMW(match, match2)
 		'has match afreecatv=' .. (streams.afreecatv or ''),
 		'has match dailymotion=' .. (streams.dailymotion or ''),
 		'has match douyu=' .. (streams.douyu or ''),
-		'has match smashcast=' .. (streams.smashcast or ''),
 		'has match youtube=' .. (streams.youtube or ''),
 		'has best of=' .. (extradata.bestof or ''),
 	})
