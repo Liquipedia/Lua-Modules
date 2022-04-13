@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=AgeOfEmpires
+-- wiki=ageofempires
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
