@@ -29,7 +29,6 @@ function CustomTournamentsSummaryTable.dateConditions(type)
 	local currentTime = os.time()
 	local today = os.date("!%Y-%m-%d", currentTime)
 	local completedThreshold = os.date("!%Y-%m-%d", currentTime - _COMPLETED_OFFSET)
-	local defaultCompletedThreshold = os.date("!%Y-%m-%d", currentTime - CustomTournamentsSummaryTable.completedOffset)
 
 	if type == CustomTournamentsSummaryTable.upcomingType then
 		conditions
