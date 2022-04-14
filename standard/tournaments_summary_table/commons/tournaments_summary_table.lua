@@ -221,7 +221,7 @@ function TournamentsSummaryTable.row(eventInformation, type)
 		local iconInput = string.gsub(eventInformation.icon, 'File:', '')
 		if mw.title.new('Media:' .. iconInput).exists then
 			iconFile = 'File:' .. iconInput
-	  	end
+		end
 	end
 
 	local iconDarkFile
@@ -229,7 +229,7 @@ function TournamentsSummaryTable.row(eventInformation, type)
 		local iconInput = string.gsub(eventInformation.icondark, 'File:', '')
 		if mw.title.new('Media:' .. iconInput).exists then
 			iconDarkFile = 'File:' .. iconInput
-	  	end
+		end
 	end
 
 	local rowComponents = {
@@ -261,7 +261,7 @@ function TournamentsSummaryTable._dateDisplay(dateString)
 
 	-- create time
 	local date = os.time{year=year, month=month, day=day, hour=0}
-	
+
 	-- return date display
 	return os.date('%b %d', date)
 end
@@ -295,6 +295,8 @@ function TournamentsSummaryTable.manualUpcomingRow(args)
 		icondark = args.icondark,
 		series = args.series,
 	}
+
+	local startdate = eventInformation.startdate
 
 	if
 		String.isNotEmpty(startdate) and _today < startdate and
