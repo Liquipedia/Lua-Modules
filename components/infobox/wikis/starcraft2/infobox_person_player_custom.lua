@@ -502,6 +502,34 @@ function CustomPlayer._isAwardAchievement(data, tier)
 	)
 end
 
+function CustomPlayer._setAchievements(data, place)
+	local tier = tonumber(data.liquipediatier) or 0
+	if CustomPlayer._isAwardAchievement(data, tier) then
+		table.insert(_awardAchievements, data)
+	elseif CustomPlayer._isAchievement(data, place, tier) then
+		table.insert(_achievements, data)
+	elseif (#_achievementsFallBack + #_achievements) < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
+		table.insert(_achievementsFallBack, data)
+	end
+end
+
+function CustomPlayer._isAchievement(data, place, tier)
+	return tier == 1 and place <= 4 or
+		tier == 2 and place <= 2 or
+		#_achievements < _MAXIMUM_NUMBER_OF_ACHIEVEMENTS and (
+			tier == 2 and place <= 4 or
+			tier == 3 and place <= 2 or
+			tier == 4 and place <= 1
+		)
+end
+
+function CustomPlayer._isAwardAchievement(data, tier)
+	return String.isNotEmpty((data.extradata or {}).award) and (
+		tier == 1 or 
+		tier == 2 and data.individualprizemoney > 50
+	)
+end
+
 function CustomPlayer._getRank(player)
 	local rank_region = require('Module:EPT player region ' .. _EPT_SEASON)[player]
 		or {'noregion'}
