@@ -434,7 +434,7 @@ end
 
 function CustomPlayer._isAwardAchievement(data, tier)
 	return String.isNotEmpty((data.extradata or {}).award) and (
-		tier == 1 or 
+		tier == 1 or
 		tier == 2 and data.individualprizemoney > 50
 	)
 end
