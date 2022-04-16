@@ -16,8 +16,8 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
-local _ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
-local _FINISHED_INDICATORS = { 'skip', 'np', 'cancelled', 'canceled' }
+local _ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
+local _FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}
 local _MAX_NUM_OPPONENTS = 8
 local _MAX_NUM_PLAYERS = 10
 local _MAX_NUM_MAPS = 9
@@ -323,7 +323,6 @@ function matchFunctions.getExtraData(match)
 	match.extradata = {
 		comment = match.comment,
 		mvp = matchFunctions.getMVP(match),
-		isconverted = 0
 	}
 	return match
 end
@@ -337,7 +336,7 @@ function matchFunctions.getMVP(match)
 	local players = mw.text.split(match.mvp, ',')
 
 	-- Trim the input
-	for index,player in pairs(players) do
+	for index, player in pairs(players) do
 		players[index] = mw.text.trim(player)
 	end
 
