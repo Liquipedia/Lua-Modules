@@ -8,12 +8,11 @@
 
 local Patch = require('Module:Infobox/Patch')
 local Class = require('Module:Class')
-local Variables = require('Module:Variables')
-local Logic = require('Module:Logic')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
 local CustomPatch = Class.new()
+local CustomInjector = Class.new(Injector)
 
 local _args
 
@@ -44,4 +43,4 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-return CustomTeam
+return CustomPatch
