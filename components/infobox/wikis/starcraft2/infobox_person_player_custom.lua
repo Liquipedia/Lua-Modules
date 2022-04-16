@@ -315,6 +315,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionTree(BooleanOperator.any):add({
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
+			ConditionNode(ColumnName('extradata_award'), Comparator.neq, ''),
 			ConditionTree(BooleanOperator.all):add({
 				ConditionNode(ColumnName('players_type'), Comparator.gt, 'solo'),
 				placementConditions,
