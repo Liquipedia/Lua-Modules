@@ -56,6 +56,7 @@ local _PRIORITY_GROUPS = {
 		'sostronk',
 		'stratz',
 		'toornament',
+		'trackmania-io',
 		'vlr',
 		'bracket',
 		'rules',
