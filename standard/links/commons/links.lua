@@ -101,6 +101,10 @@ local _PREFIXES = {
 	tlprofile = {'https://tl.net/forum/profile.php?user='},
 	tlstream = {'https://tl.net/video/streams/'},
 	toornament = {'https://www.toornament.com/tournaments/'},
+	['trackmania-io'] = {
+		'https://trackmania.io/#/',
+		player = 'https://trackmania.io/#/player/',
+	}
 	trovo = {'https://trovo.live/'},
 	twitch = {'https://www.twitch.tv/'},
 	twitter = {'https://twitter.com/'},
@@ -211,6 +215,7 @@ function Links.transform(links)
 		toornament = links.toornament,
 		toornament2 = links.toornament2,
 		toornament3 = links.toornament3,
+		['trackmania-io'] = links['trackmania-io'] or links.trackmania_io,
 		trovo = links.trovo,
 		trovo2 = links.trovo2,
 		twitch = links.twitch,
