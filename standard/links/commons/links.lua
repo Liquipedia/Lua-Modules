@@ -102,7 +102,7 @@ local _PREFIXES = {
 	tlstream = {'https://tl.net/video/streams/'},
 	toornament = {'https://www.toornament.com/tournaments/'},
 	['trackmania-io'] = {
-		'https://trackmania.io/#/',
+		'https://trackmania.io/#/competitions/comp/',
 		player = 'https://trackmania.io/#/player/',
 	},
 	trovo = {'https://trovo.live/'},
