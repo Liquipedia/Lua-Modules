@@ -104,7 +104,7 @@ local _PREFIXES = {
 	['trackmania-io'] = {
 		'https://trackmania.io/#/',
 		player = 'https://trackmania.io/#/player/',
-	}
+	},
 	trovo = {'https://trovo.live/'},
 	twitch = {'https://www.twitch.tv/'},
 	twitter = {'https://twitter.com/'},
