@@ -215,7 +215,7 @@ function Links.transform(links)
 		toornament = links.toornament,
 		toornament2 = links.toornament2,
 		toornament3 = links.toornament3,
-		['trackmania-io'] = links['trackmania-io'] or links.trackmania_io,
+		['trackmania-io'] = links['trackmania-io'] or links.trackmania_id,
 		trovo = links.trovo,
 		trovo2 = links.trovo2,
 		twitch = links.twitch,
