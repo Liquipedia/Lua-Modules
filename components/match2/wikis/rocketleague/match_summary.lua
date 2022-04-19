@@ -42,7 +42,11 @@ local Casters = Class.new(
 
 function Casters:addCaster(caster)
 	if Logic.isNotEmpty(caster) then
-		table.insert(self.casters, Flags.Icon(caster['flag']) .. ' [[' .. caster['name'] .. ']]')
+		if caster['flag'] then
+			table.insert(self.casters, Flags.Icon(caster['flag']) .. ' [[' .. caster['name'] .. ']]')
+		else
+			table.insert(self.casters, '[[' .. caster['name'] .. ']]')
+		end
 	end
 	return self
 end

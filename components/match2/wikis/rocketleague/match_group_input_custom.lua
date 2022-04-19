@@ -224,8 +224,7 @@ function p.getPlayerInfo(name)
 		}
 	end
 	return {
-		name = name,
-		flag = 'World'
+		name = name
 	}
 end
 
