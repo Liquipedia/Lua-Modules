@@ -212,19 +212,39 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
-function p.getPlayerInfo(name)
-	local data = mw.ext.LiquipediaDB.lpdb('player', {
-		conditions = '[[pagename::' .. mw.ext.TeamLiquidIntegration.resolve_redirect( name ):gsub(' ', '_') .. ']]',
-		query = 'pagename, nationality'
-	})
-	if type(data) == 'table' and data[1] then
-		return {
-			name = data[1]['pagename'],
-			flag = data[1]['nationality']
-		}
+function p._getCasterInformation(name, flag, id)
+	if String.isEmpty(flag) then
+		flag = Variables.varDefault(name .. '_flag')
+	end
+	if String.isEmpty(id) then
+		id = Variables.varDefault(name .. '_dn')
+	end
+	if String.isEmpty(flag) or String.isEmpty(id) then
+		local parent = Variables.varDefault('tournament_parent')
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
+			query = 'flag, id',
+			limit = 1,
+		})
+		if type(data) == 'table' and data[1] then
+			flag = String.isEmpty(flag) and data[1].flag or flag
+			id = String.isEmpty(id) and data[1].id or id
+		end
+	end
+	if String.isNotEmpty(flag) then
+		Variables.varDefine(name .. '_flag', flag)
+	end
+	if String.isEmpty(id) then
+		id = name
+	end
+	if String.isNotEmpty(id) then
+		Variables.varDefine(name .. '_dn', id)
 	end
 	return {
-		name = name
+		name = name,
+		id = id,
+		flag = flag,
 	}
 end
 
