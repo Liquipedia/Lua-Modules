@@ -189,7 +189,7 @@ function matchFunctions.getExtraData(match)
 	local opponent2 = match.opponent2 or {}
 
 	local casters = {}
-	for key, caster in Table.iter.pairsByPrefix(match, 'caster') do
+	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
 		table.insert(casters, p._getCasterInformation(
 			name,
 			match[key .. 'flag'],
