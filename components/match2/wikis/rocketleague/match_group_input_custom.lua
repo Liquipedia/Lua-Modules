@@ -190,9 +190,10 @@ function matchFunctions.getExtraData(match)
 
 	local casters = {}
 	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
+		info = p.getPlayerInfo(name)
 		table.insert(casters, {
-			name = name,
-			flag = match[key .. 'flag'] or p.getPlayerFlag(name)
+			name = info.name,
+			flag = match[key .. 'flag'] or info.flag
 		})
 	end
 	table.sort(casters, function(c1, c2) return c1.name:lower() < c2.name:lower() end)
@@ -211,15 +212,21 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
-function p.getPlayerFlag(name)
+function p.getPlayerInfo(name)
 	local data = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. mw.ext.TeamLiquidIntegration.resolve_redirect( name ):gsub(' ', '_') .. ']]',
-		query = 'nationality'
+		query = 'pagename, nationality'
 	})
 	if type(data) == 'table' and data[1] then
-		return data[1]['nationality']
+		return {
+			name = data[1]['pagename'],
+			flag = data[1]['nationality']
+		}
 	end
-	return 'world'
+	return {
+		name = name,
+		flag = 'World'
+	}
 end
 
 function matchFunctions.isFeatured(match)
