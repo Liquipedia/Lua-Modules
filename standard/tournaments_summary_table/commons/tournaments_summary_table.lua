@@ -12,10 +12,6 @@ Generates the list of upcoming/ongoing/recent tournaments needed for the Tournam
 
 ]]--
 
--- darkmode file by default disabled until extension is updated
-local _enableDarkMode = false
-
-
 local TournamentsSummaryTable = {}
 
 local Class = require('Module:Class')
@@ -60,8 +56,6 @@ local _TYPE_TO_TITLE = {
 
 function TournamentsSummaryTable.run(args)
 	args = args or {}
-
-	_enableDarkMode = args.enableDarkMode or _enableDarkMode
 
 	local type
 	if args.upcoming == 'true' then
@@ -239,7 +233,7 @@ function TournamentsSummaryTable.row(eventInformation, type)
 		'enddate=' .. TournamentsSummaryTable._dateDisplay(eventInformation.enddate),
 		'icon=' .. icon,
 		'iconfile=' .. iconFile,
-		_enableDarkMode and ('icondarkfile=' .. (iconDarkFile or iconFile)) or nil,
+		'icondarkfile=' .. (iconDarkFile or iconFile),
 	}
 
 	return table.concat(rowComponents, ' | ')
