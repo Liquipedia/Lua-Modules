@@ -333,7 +333,11 @@ function CustomPlayer._getEarningsMedalsData(player)
 		order = 'liquipediatier asc, placement asc, weight desc',
 	}
 
+<<<<<<< HEAD
 	local processPlacement = function(placement)
+=======
+	local processPlacement = function(item)
+>>>>>>> 95cf2ea (rename local functions)
 		--handle earnings
 		earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, placement)
 
