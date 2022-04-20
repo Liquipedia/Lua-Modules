@@ -10,15 +10,15 @@ local Team = require('Module:Infobox/Team')
 local Class = require('Module:Class')
 local String = require('Module:String')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
 
 local CustomTeam = Class.new()
 
 local _team
 
--- TODO: Image rescaling
-
 function CustomTeam.run(frame)
 	local team = Team(frame)
+	_team = team
 
 	-- Override links to allow one param to set multiple links
 	team.args.datdota = team.args.teamid
@@ -33,9 +33,9 @@ function CustomTeam.run(frame)
 	team.args.manager = Template.expandTemplate(frame, 'Manager of')
 	team.args.captain = Template.expandTemplate(frame, 'Captain of')
 
-	_team = team
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
+
 	return team:createInfobox(frame)
 end
 
@@ -66,9 +66,7 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.logo = 'File:' .. _team.args.image
 	end
 
-	-- TODO: Investigate - Legacy Infobox store the raw input.
-	-- Needs be investigated if it should use the output of Template:Region (via #var:region) instead
-	-- lpdbData.region = Variables.varDefault('region', '')
+	lpdbData.region = Variables.varDefault('region', '')
 
 	return lpdbData
 end
