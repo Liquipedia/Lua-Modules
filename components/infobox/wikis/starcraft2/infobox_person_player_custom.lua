@@ -334,12 +334,12 @@ function CustomPlayer._getEarningsMedalsData(player)
 		order = 'liquipediatier asc, placement asc, weight desc',
 	}
 
-	local processPlacement = function(item)
+	local processPlacement = function(placement)
 		--handle earnings
-		earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, item)
+		earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, placement)
 
 		--handle medals
-		medals = CustomPlayer._addPlacementToMedals(medals, item)
+		medals = CustomPlayer._addPlacementToMedals(medals, placement)
 	end
 
 	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
