@@ -331,7 +331,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 
 	local queryParameters = {
 		conditions = conditions:toString(),
-		order = 'liquipediatier asc, weight desc',
+		order = 'liquipediatier asc, placement asc, weight desc',
 	}
 
 	local processPlacement = function(item)
