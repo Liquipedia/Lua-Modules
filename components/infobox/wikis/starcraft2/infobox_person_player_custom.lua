@@ -334,10 +334,14 @@ function CustomPlayer._getEarningsMedalsData(player)
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	local processPlacement = function(placement)
 =======
 	local processPlacement = function(item)
 >>>>>>> 95cf2ea (rename local functions)
+=======
+	local processPlacement = function(placement)
+>>>>>>> f04c3af (rename function param)
 		--handle earnings
 		earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, placement)
 
