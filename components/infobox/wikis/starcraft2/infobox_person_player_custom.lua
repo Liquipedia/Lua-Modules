@@ -347,7 +347,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 	-- if < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS achievements fill them up
 	if #_achievements < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
 		_achievements = Array.extendWith(_achievements, _achievementsFallBack)
-		_achievements = Array.sub(_achievements, 1, 10)
+		_achievements = Array.sub(_achievements, 1, _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS)
 	end
 	if #_achievements > 0 then
 		Variables.varDefine('achievements', Json.stringify(_achievements))
