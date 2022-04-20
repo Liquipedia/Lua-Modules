@@ -35,7 +35,12 @@ function Strategy:createInfobox()
 
 	local widgets = {
 		Customizable{id = 'header', children = {
-				Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+				Header{
+					name = args.name,
+					image = args.image,
+					imageDark = args.imagedark or args.imagedarkmode,
+					size = args.imagesize,
+				},
 			}
 		},
 		Center{content = {args.caption}},

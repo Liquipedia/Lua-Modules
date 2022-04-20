@@ -25,7 +25,12 @@ function Campaign:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = self.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = self.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 	}
 
