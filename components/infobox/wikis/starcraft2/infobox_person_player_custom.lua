@@ -180,7 +180,6 @@ function CustomPlayer._getMatchupData(player)
 
 		local category
 		if years[_CURRENT_YEAR] or years[_CURRENT_YEAR - 1] or years[_CURRENT_YEAR - 2] then
-			category = 'Active players'
 			Variables.varDefine('isActive', 'true')
 		else
 			category = 'Players with no matches in the last three years'
@@ -190,7 +189,7 @@ function CustomPlayer._getMatchupData(player)
 
 		yearsActive = string.gsub(yearsActive, '<br>', '', 1)
 
-		if not (String.isEmpty(category) or String.isEmpty(yearsActive)) then
+		if String.isNotEmpty(category) and String.isNotEmpty(yearsActive) then
 			yearsActive = yearsActive .. '[[Category:' .. category .. ']]'
 		end
 
