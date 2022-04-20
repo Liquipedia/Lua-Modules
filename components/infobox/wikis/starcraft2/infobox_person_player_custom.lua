@@ -356,7 +356,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 		medals = CustomPlayer._addPlacementToMedals(medals, placement)
 	end
 
-	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
+	Lpdb.executeMassQuery('placement', queryParameters, itemChecker)
 
 	-- if < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS achievements fill them up
 	if #_achievements < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
@@ -503,7 +503,7 @@ function CustomPlayer._isAwardAchievement(data, tier)
 end
 
 function CustomPlayer._setAchievements(data, place)
-	local tier = tonumber(data.liquipediatier) or 0
+	local tier = tonumber(data.liquipediatier)
 	if CustomPlayer._isAwardAchievement(data, tier) then
 		table.insert(_awardAchievements, data)
 	elseif CustomPlayer._isAchievement(data, place, tier) then
