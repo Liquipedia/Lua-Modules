@@ -342,7 +342,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 		medals = CustomPlayer._addPlacementToMedals(medals, placement)
 	end
 
-	Lpdb.executeMassQuery('placement', queryParameters, itemChecker)
+	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
 
 	-- if < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS achievements fill them up
 	if #_achievements < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
