@@ -33,6 +33,10 @@ local ColumnName = Condition.ColumnName
 local _EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
+<<<<<<< HEAD
+=======
+local _DISCARD_PLACEMENT = 99
+>>>>>>> 2923967 (Update infobox_person_player_custom.lua)
 local _ALLOWED_PLACES = {1, 2, 3, 4, '3-4'}
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local _EARNING_MODES = {['solo'] = '1v1', ['team'] = 'team'}
@@ -349,7 +353,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 		medals = CustomPlayer._addPlacementToMedals(medals, placement)
 	end
 
-	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
+	Lpdb.executeMassQuery('placement', queryParameters, itemChecker)
 
 	-- if < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS achievements fill them up
 	if #_achievements < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
@@ -410,13 +414,18 @@ function CustomPlayer._setVarsFromTable(table)
 	end
 end
 
+<<<<<<< HEAD
 function CustomPlayer._getPlacement(value)
+=======
+function CustomPlayer._Placements(value)
+>>>>>>> 2923967 (Update infobox_person_player_custom.lua)
 	if String.isNotEmpty(value) then
 		value = tonumber(mw.text.split(value, '-')[1])
 		if Table.includes(_ALLOWED_PLACES, value) then
 			return value
 		end
 	end
+<<<<<<< HEAD
 end
 
 function CustomPlayer._setAchievements(data, place)
@@ -447,10 +456,14 @@ function CustomPlayer._isAwardAchievement(data, tier)
 		tier == 1 or
 		tier == 2 and data.individualprizemoney > 50
 	)
+=======
+
+	return _DISCARD_PLACEMENT
+>>>>>>> 2923967 (Update infobox_person_player_custom.lua)
 end
 
 function CustomPlayer._setAchievements(data, place)
-	local tier = tonumber(data.liquipediatier) or 0
+	local tier = tonumber(data.liquipediatier)
 	if CustomPlayer._isAwardAchievement(data, tier) then
 		table.insert(_awardAchievements, data)
 	elseif CustomPlayer._isAchievement(data, place, tier) then
