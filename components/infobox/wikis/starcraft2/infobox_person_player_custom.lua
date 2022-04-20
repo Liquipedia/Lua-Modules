@@ -33,7 +33,6 @@ local ColumnName = Condition.ColumnName
 local _EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
-local _DISCARD_PLACEMENT = 99
 local _ALLOWED_PLACES = {1, 2, 3, 4, '3-4'}
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local _EARNING_MODES = {['solo'] = '1v1', ['team'] = 'team'}
@@ -376,11 +375,11 @@ end
 
 function CustomPlayer._addPlacementToMedals(medals, data)
 	if data.liquipediatiertype ~= 'Qualifier' then
-		local place = CustomPlayer._Placements(data.placement)
+		local place = CustomPlayer._getPlacement(data.placement)
 		CustomPlayer._setAchievements(data, place)
 		if
 			(data.players or {}).type == 'solo'
-			and place <= 3
+			and place and place <= 3
 		then
 			local tier = data.liquipediatier or 'undefined'
 			if not medals[place] then
@@ -403,15 +402,13 @@ function CustomPlayer._setVarsFromTable(table)
 	end
 end
 
-function CustomPlayer._Placements(value)
+function CustomPlayer._getPlacement(value)
 	if String.isNotEmpty(value) then
 		value = tonumber(mw.text.split(value, '-')[1])
 		if Table.includes(_ALLOWED_PLACES, value) then
 			return value
 		end
 	end
-
-	return _DISCARD_PLACEMENT
 end
 
 function CustomPlayer._setAchievements(data, place)
@@ -426,12 +423,14 @@ function CustomPlayer._setAchievements(data, place)
 end
 
 function CustomPlayer._isAchievement(data, place, tier)
-	return tier == 1 and place <= 4 or
-		tier == 2 and place <= 2 or
-		#_achievements < _MAXIMUM_NUMBER_OF_ACHIEVEMENTS and (
-			tier == 2 and place <= 4 or
-			tier == 3 and place <= 2 or
-			tier == 4 and place <= 1
+	return place and (
+			tier == 1 and place <= 4 or
+			tier == 2 and place <= 2 or
+			#_achievements < _MAXIMUM_NUMBER_OF_ACHIEVEMENTS and (
+				tier == 2 and place <= 4 or
+				tier == 3 and place <= 2 or
+				tier == 4 and place <= 1
+			)
 		)
 end
 
