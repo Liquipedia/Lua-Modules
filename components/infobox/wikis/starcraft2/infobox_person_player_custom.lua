@@ -514,12 +514,14 @@ function CustomPlayer._setAchievements(data, place)
 end
 
 function CustomPlayer._isAchievement(data, place, tier)
-	return tier == 1 and place <= 4 or
-		tier == 2 and place <= 2 or
-		#_achievements < _MAXIMUM_NUMBER_OF_ACHIEVEMENTS and (
-			tier == 2 and place <= 4 or
-			tier == 3 and place <= 2 or
-			tier == 4 and place <= 1
+	return place and (
+			tier == 1 and place <= 4 or
+			tier == 2 and place <= 2 or
+			#_achievements < _MAXIMUM_NUMBER_OF_ACHIEVEMENTS and (
+				tier == 2 and place <= 4 or
+				tier == 3 and place <= 2 or
+				tier == 4 and place <= 1
+			)
 		)
 end
 
