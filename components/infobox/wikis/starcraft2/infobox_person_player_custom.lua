@@ -34,7 +34,7 @@ local _EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
 local _DISCARD_PLACEMENT = 99
-local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
+local _ALLOWED_PLACES = {1, 2, 3, 4, '3-4'}
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local _EARNING_MODES = {['solo'] = '1v1', ['team'] = 'team'}
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 30
@@ -342,7 +342,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 		medals = CustomPlayer._addPlacementToMedals(medals, placement)
 	end
 
-	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
+	Lpdb.executeMassQuery('placement', queryParameters, itemChecker)
 
 	-- if < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS achievements fill them up
 	if #_achievements < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
@@ -404,16 +404,18 @@ function CustomPlayer._setVarsFromTable(table)
 end
 
 function CustomPlayer._Placements(value)
-	value = String.isNotEmpty(value) and value or _DISCARD_PLACEMENT
-	value = tonumber(mw.text.split(value, '-')[1]) or _DISCARD_PLACEMENT
-	if not Table.includes(_ALLOWED_PLACES, tostring(value)) then
-		value = _DISCARD_PLACEMENT
+	if String.isNotEmpty(value) then
+		value = tonumber(mw.text.split(value, '-')[1])
+		if Table.includes(_ALLOWED_PLACES, value) then
+			return value
+		end
 	end
-	return value
+
+	return _DISCARD_PLACEMENT
 end
 
 function CustomPlayer._setAchievements(data, place)
-	local tier = tonumber(data.liquipediatier) or 0
+	local tier = tonumber(data.liquipediatier)
 	if CustomPlayer._isAwardAchievement(data, tier) then
 		table.insert(_awardAchievements, data)
 	elseif CustomPlayer._isAchievement(data, place, tier) then
