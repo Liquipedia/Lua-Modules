@@ -182,14 +182,14 @@ function CustomPlayer._getMatchupData(player)
 	end
 
 	local foundData = false
-	local itemChecker = function(match)
+	local processMatch = function(match)
 		foundData = true
 		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player)
 		local year = string.sub(match.date, 1, 4)
 		years[tonumber(year)] = year
 	end
 
-	Lpdb.executeMassQuery('match2', queryParameters, itemChecker)
+	Lpdb.executeMassQuery('match2', queryParameters, processMatch)
 
 	if foundData then
 		local category
@@ -334,7 +334,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 		order = 'liquipediatier asc, weight desc',
 	}
 
-	local itemChecker = function(item)
+	local processPlacement = function(item)
 		--handle earnings
 		earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, item)
 
@@ -342,7 +342,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 		medals = CustomPlayer._addPlacementToMedals(medals, item)
 	end
 
-	Lpdb.executeMassQuery('placement', queryParameters, itemChecker)
+	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
 
 	-- if < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS achievements fill them up
 	if #_achievements < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
