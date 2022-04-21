@@ -80,13 +80,24 @@ end
 
 function Header:_makeSizedImage(imageName, fileName, size, mode)
 	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
-	size = tonumber(size or '')
-	if size then
-		size = size .. 'px'
+
+	-- Number (interpret as pixels)
+	if tonumber(size or '') then
+		size = tonumber(size) .. 'px'
 		infoboxImage:addClass('infobox-fixed-size-image')
+	-- Percentage (interpret as scaling)
+	elseif size:find('%%') then
+		local scale = size:gsub('%%', '')
+		scale = tonumber(scale)
+		if scale then
+			size = 'frameless|upright=' .. (scale / 100)
+			infoboxImage:addClass('infobox-fixed-size-image')
+		end
+	-- Default
 	else
 		size = '600px'
 	end
+
 	local fullFileName = '[[File:' .. imageName .. '|center|' .. size .. ']]'
 	infoboxImage:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
 
