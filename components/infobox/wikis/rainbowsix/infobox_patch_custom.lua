@@ -45,7 +45,6 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomPatch:addToLpdb(lpdbData)
-	mw.logObject(_args)
 	local date = _args.release or _args.pcrelease or _args.consolerelease
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
 		name = _args.name,
