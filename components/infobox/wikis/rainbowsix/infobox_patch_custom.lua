@@ -11,6 +11,8 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
+local _args
+
 local CustomPatch = Class.new()
 local CustomInjector = Class.new(Injector)
 
