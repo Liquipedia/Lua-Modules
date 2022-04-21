@@ -90,7 +90,7 @@ function Header:_makeSizedImage(imageName, fileName, size, mode)
 		local scale = size:gsub('%%', '')
 		scale = tonumber(scale)
 		if scale then
-			size = 'frameless|upright=' .. (scale/100)
+			size = 'frameless|upright=' .. (scale / 100)
 			infoboxImage:addClass('infobox-fixed-size-image')
 		end
 	-- Default
