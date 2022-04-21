@@ -14,12 +14,11 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local CustomPatch = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local _args
-
 function CustomPatch.run(frame)
 	local customPatch = Patch(frame)
 	_args = customPatch.args
 	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
+	customPatch.addToLpdb = CustomPatch.addToLpdb
 	return customPatch:createInfobox(frame)
 end
 
@@ -41,6 +40,21 @@ function CustomInjector:parse(id, widgets)
 		}
 	end
 	return widgets
+end
+
+function CustomPatch:addToLpdb(lpdbData)
+	mw.logObject(_args)
+	local date = _args.release or _args.pcrelease or _args.consolerelease
+	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
+		name = _args.name,
+		type = 'patch',
+		information = _args.game,
+		date = date,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+			version = _args.version,
+		}
+	})
+	return lpdbData
 end
 
 return CustomPatch
