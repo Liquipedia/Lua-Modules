@@ -33,13 +33,6 @@ local ColumnName = Condition.ColumnName
 local _EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
 
 local _PAGENAME = mw.title.getCurrentTitle().prefixedText
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-local _DISCARD_PLACEMENT = 99
->>>>>>> 2923967 (Update infobox_person_player_custom.lua)
-=======
->>>>>>> 8fd50b4 (Update infobox_person_player_custom.lua)
 local _ALLOWED_PLACES = {1, 2, 3, 4, '3-4'}
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local _EARNING_MODES = {['solo'] = '1v1', ['team'] = 'team'}
@@ -340,15 +333,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 		order = 'liquipediatier asc, placement asc, weight desc',
 	}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 	local processPlacement = function(placement)
-=======
-	local processPlacement = function(item)
->>>>>>> 95cf2ea (rename local functions)
-=======
-	local processPlacement = function(placement)
->>>>>>> f04c3af (rename function param)
 		--handle earnings
 		earnings, earnings_total = CustomPlayer._addPlacementToEarnings(earnings, earnings_total, placement)
 
@@ -417,59 +402,13 @@ function CustomPlayer._setVarsFromTable(table)
 	end
 end
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 function CustomPlayer._getPlacement(value)
-=======
-function CustomPlayer._Placements(value)
->>>>>>> 2923967 (Update infobox_person_player_custom.lua)
-=======
-function CustomPlayer._getPlacement(value)
->>>>>>> 8fd50b4 (Update infobox_person_player_custom.lua)
 	if String.isNotEmpty(value) then
 		value = tonumber(mw.text.split(value, '-')[1])
 		if Table.includes(_ALLOWED_PLACES, value) then
 			return value
 		end
 	end
-<<<<<<< HEAD
-<<<<<<< HEAD
-end
-
-function CustomPlayer._setAchievements(data, place)
-	local tier = tonumber(data.liquipediatier)
-	if CustomPlayer._isAwardAchievement(data, tier) then
-		table.insert(_awardAchievements, data)
-	elseif CustomPlayer._isAchievement(data, place, tier) then
-		table.insert(_achievements, data)
-	elseif (#_achievementsFallBack + #_achievements) < _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
-		table.insert(_achievementsFallBack, data)
-	end
-end
-
-function CustomPlayer._isAchievement(data, place, tier)
-	return place and (
-			tier == 1 and place <= 4 or
-			tier == 2 and place <= 2 or
-			#_achievements < _MAXIMUM_NUMBER_OF_ACHIEVEMENTS and (
-				tier == 2 and place <= 4 or
-				tier == 3 and place <= 2 or
-				tier == 4 and place <= 1
-			)
-		)
-end
-
-function CustomPlayer._isAwardAchievement(data, tier)
-	return String.isNotEmpty((data.extradata or {}).award) and (
-		tier == 1 or
-		tier == 2 and data.individualprizemoney > 50
-	)
-=======
-
-	return _DISCARD_PLACEMENT
->>>>>>> 2923967 (Update infobox_person_player_custom.lua)
-=======
->>>>>>> 8fd50b4 (Update infobox_person_player_custom.lua)
 end
 
 function CustomPlayer._setAchievements(data, place)
