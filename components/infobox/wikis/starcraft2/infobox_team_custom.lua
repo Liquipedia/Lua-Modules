@@ -42,7 +42,7 @@ local _team
 
 local _earnings = 0
 local _earnings_by_players_while_on_team = 0
-local _EARNINGS_MODES = { ['team'] = 'team' }
+local _EARNINGS_MODES = {team = 'team'}
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _DISCARD_PLACEMENT = 99
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 30
@@ -340,18 +340,21 @@ function CustomTeam.getEarningsAndMedalsData(team)
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
+	local prizeMoney = data.prizemoney
 	local mode = (data.players or {}).type
-	mode = _EARNINGS_MODES[mode] or 'other'
+	mode = _EARNINGS_MODES[mode]
+	if not mode then
+		prizeMoney = data.individualprizemoney
+		playerEarnings = playerEarnings + prizeMoney
+		mode = 'other'
+	end
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
 	local date = string.sub(data.date, 1, 4)
-	earnings[mode][date] = (earnings[mode][date] or 0) + data.prizemoney
-	earnings[mode]['total'] = (earnings[mode]['total'] or 0) + data.prizemoney
-	earnings['total'][date] = (earnings['total'][date] or 0) + data.prizemoney
-	if data.mode ~= 'team' then
-		playerEarnings = playerEarnings + data.prizemoney
-	end
+	earnings[mode][date] = (earnings[mode][date] or 0) + prizeMoney
+	earnings[mode]['total'] = (earnings[mode]['total'] or 0) + prizeMoney
+	earnings['total'][date] = (earnings['total'][date] or 0) + prizeMoney
 
 	return earnings, playerEarnings
 end
