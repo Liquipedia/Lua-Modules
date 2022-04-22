@@ -60,13 +60,17 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(_team.args.teamcardimage) then
-		lpdbData.logo = 'File:' .. _team.args.teamcardimage
-	elseif not String.isEmpty(_team.args.image) then
-		lpdbData.logo = 'File:' .. _team.args.image
+	if not String.isEmpty(args.teamcardimage) then
+		lpdbData.logo = 'File:' .. args.teamcardimage
+	elseif not String.isEmpty(args.image) then
+		lpdbData.logo = 'File:' .. args.image
 	end
 
 	lpdbData.region = Variables.varDefault('region', '')
+
+	lpdbData.extradata.teamid = args.teamid
+	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
+	lpdbData.manager = Variables.varDefault('managerid') or args.manager
 
 	return lpdbData
 end
