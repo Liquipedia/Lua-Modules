@@ -13,7 +13,6 @@ local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Earnings = require('Module:Earnings')
 local Streams = require('Module:Links/Stream')
 local HeroNames = mw.loadData('Module:ChampionNames')
 
