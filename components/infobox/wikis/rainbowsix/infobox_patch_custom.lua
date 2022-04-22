@@ -20,6 +20,7 @@ function CustomPatch.run(frame)
 	local customPatch = Patch(frame)
 	_args = customPatch.args
 	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
+	customPatch.getChronologyData = CustomPatch.getChronologyData
 	customPatch.addToLpdb = CustomPatch.addToLpdb
 	return customPatch:createInfobox(frame)
 end
@@ -31,6 +32,10 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'release' then
 		return {
+			Cell{
+				name = 'Release Date',
+				content = {_args.release}
+			},
 			Cell{
 				name = 'PC Release Date',
 				content = {_args.pcrelease}
@@ -56,6 +61,17 @@ function CustomPatch:addToLpdb(lpdbData)
 		}
 	})
 	return lpdbData
+end
+
+function CustomPatch:getChronologyData()
+	local data = {}
+	if _args.previous then
+		data.previous = _args.previous .. ' Patch|' .. _args.previous
+	end
+	if _args.next then
+		data.next = _args.next .. ' Patch|' .. _args.next
+	end
+	return data
 end
 
 return CustomPatch
