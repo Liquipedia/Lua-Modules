@@ -435,18 +435,24 @@ function matchFunctions.getEarnings(name, year)
 	if String.isEmpty(name) then
 		return 0
 	end
+	
+	if String.isNotEmpty(Variables.varDefault(name .. '_featured_earnings')) then
+		return tonumber(Variables.varDefault(name .. '_featured_earnings'))
+	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
 		conditions = '[[pagename::' .. name:gsub(' ', '_') .. ']]',
 		query = 'extradata'
 	})
 
+	local currentEarnings = 0
 	if type(data[1]) == 'table' then
-		local currentEarnings = (data[1].extradata or {})['earningsin' .. year]
-		return tonumber(currentEarnings or 0) or 0
+		currentEarnings = tonumber((data[1].extradata or {})['earningsin' .. year] or 0) or 0
 	end
 
-	return 0
+	Variables.varDefine(name .. '_featured_earnings', currentEarnings)
+
+	return currentEarnings
 end
 
 function matchFunctions.getOpponents(match)
