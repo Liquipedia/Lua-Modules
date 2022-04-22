@@ -46,7 +46,7 @@ local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
 local _SECONDS_UNTIL_FINISHED_EXACT = 30800
 local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
-local _MIN_EARNINGS_FOR_FEATURED = 100000
+local _MIN_EARNINGS_FOR_FEATURED = 50000
 
 local _CURRENT_TIME_UNIX = os.time(os.date('!*t'))
 
@@ -413,11 +413,9 @@ function matchFunctions.isFeatured(match)
 	local year, month = match.date:match('^(%d%d%d%d)-(%d%d)')
 	if year == '1970' then
 		return false
-	else
-		year = tonumber(year)
 	end
 	if tonumber(month) < 3 then
-		year = year - 1
+		year = tonumber(year) - 1
 	end
 
 	if
