@@ -182,12 +182,21 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has teams=' .. (match.opponent1 or ''),
 		'Has teams=' .. (match.opponent2 or ''),
 	}
-
-	local mvp = Json.parseIfString((match2.extradata or {}).mvp)
+	
+	local getTeamOfPlayer = function(playerName)
+		for _, opponent in ipairs(match2.match2opponents or {}) do
+			for _, player in ipairs(opponent.match2players or {}) do
+				if player.name == playerName then
+					return opponent.name
+				end
+			end
+		end
+	end
+	local extradata = Json.parseIfString(match2.extradata)
+	local mvp = Json.parseIfString((extradata or {}).mvp)
 	if mvp and mvp.players then
 		for index, player in ipairs(mvp.players) do
-			-- TODO: Lookup player team
-			local team = 'foobar'
+			local team = getTeamOfPlayer(player) or ''
 			local mvpString = player .. '§§§§'.. team ..'§§§§0'
 			table.insert(data, 'Has mvp ' .. index .. '=' .. mvpString)
 		end
