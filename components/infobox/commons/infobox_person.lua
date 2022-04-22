@@ -76,7 +76,8 @@ function Person:createInfobox()
 			name = self:nameDisplay(args),
 			image = args.image,
 			imageDefault = args.default,
-			subHeader = self:subHeaderDisplay(args)
+			subHeader = self:subHeaderDisplay(args),
+			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},

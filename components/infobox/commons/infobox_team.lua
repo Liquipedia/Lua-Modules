@@ -56,6 +56,7 @@ function Team:createInfobox()
 			imageDefault = args.default,
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Team Information'},

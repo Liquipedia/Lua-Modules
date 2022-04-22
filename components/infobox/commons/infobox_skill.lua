@@ -35,7 +35,12 @@ function Skill:createInfobox()
 	end
 
 	local widgets = {
-		Header{name = args.name, image = args.image, size = args.imageSize, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = args.informationType .. ' Information'},
 		Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', { makeLink = true })},

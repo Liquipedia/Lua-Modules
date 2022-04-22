@@ -31,7 +31,12 @@ function Website:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Website Information'},
 		Cell{name = 'Type', content = {args.type}},

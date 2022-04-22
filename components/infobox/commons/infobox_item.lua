@@ -38,7 +38,7 @@ function Item:createInfobox()
 					imageDefault = args.default,
 					imageDark = args.imagedark or args.imagedarkmode,
 					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-					size = args.size
+					size = args.imagesize
 				},
 			}
 		},
