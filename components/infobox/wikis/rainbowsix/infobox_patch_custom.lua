@@ -33,6 +33,10 @@ function CustomInjector:parse(id, widgets)
 	if id == 'release' then
 		return {
 			Cell{
+				name = 'Release Date',
+				content = {_args.release}
+			},
+			Cell{
 				name = 'PC Release Date',
 				content = {_args.pcrelease}
 			},
