@@ -13,7 +13,6 @@ local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Earnings = require('Module:Earnings')
 local Streams = require('Module:Links/Stream')
 local HeroNames = mw.loadData('Module:HeroNames')
 
@@ -420,15 +419,40 @@ function matchFunctions.isFeatured(match)
 	end
 
 	if
-		(opponent1.type == Opponent.team
-		and Earnings.calculateForTeam({team = opponent1.name, year = year}) >= _MIN_EARNINGS_FOR_FEATURED)
-		or (opponent2.type == Opponent.team
-		and Earnings.calculateForTeam({team = opponent2.name, year = year}) >= _MIN_EARNINGS_FOR_FEATURED)
+		opponent1.type == Opponent.team and
+		matchFunctions.getEarnings(opponent1.name, year) >= _MIN_EARNINGS_FOR_FEATURED
+	or
+		opponent2.type == Opponent.team and
+		matchFunctions.getEarnings(opponent2.name, year) >= _MIN_EARNINGS_FOR_FEATURED
 	then
 		return true
 	end
 
 	return false
+end
+
+function matchFunctions.getEarnings(name, year)
+	if String.isEmpty(name) then
+		return 0
+	end
+
+	if String.isNotEmpty(Variables.varDefault(name .. '_featured_earnings')) then
+		return tonumber(Variables.varDefault(name .. '_featured_earnings'))
+	end
+
+	local data = mw.ext.LiquipediaDB.lpdb('team', {
+		conditions = '[[pagename::' .. name:gsub(' ', '_') .. ']]',
+		query = 'extradata'
+	})
+
+	local currentEarnings = 0
+	if type(data[1]) == 'table' then
+		currentEarnings = tonumber((data[1].extradata or {})['earningsin' .. year] or 0) or 0
+	end
+
+	Variables.varDefine(name .. '_featured_earnings', currentEarnings)
+
+	return currentEarnings
 end
 
 function matchFunctions.getOpponents(match)
