@@ -14,11 +14,8 @@ local Variables = require('Module:Variables')
 
 local CustomTeam = Class.new()
 
-local _team
-
 function CustomTeam.run(frame)
 	local team = Team(frame)
-	_team = team
 
 	-- Override links to allow one param to set multiple links
 	team.args.datdota = team.args.teamid
@@ -40,8 +37,8 @@ function CustomTeam.run(frame)
 end
 
 function CustomTeam:createBottomContent()
-	if not _team.args.disbanded then
 --[[
+	if not _team.args.disbanded then
 		TODO:
 		Leaving this out for now, will be a follow-up PR,
 		as both the templates needs to be removed from team pages plus the templates also requires some div changes
@@ -55,8 +52,8 @@ function CustomTeam:createBottomContent()
 			'Upcoming and ongoing tournaments of',
 			{team = _team.name or _team.pagename}
 		)
---]]
 	end
+--]]
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
