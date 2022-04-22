@@ -82,7 +82,8 @@ function Header:_makeSizedImage(imageName, fileName, size, mode)
 	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
 
 	-- Number (interpret as pixels)
-	if tonumber(size or '') then
+	size = size or ''
+	if tonumber(size) then
 		size = tonumber(size) .. 'px'
 		infoboxImage:addClass('infobox-fixed-size-image')
 	-- Percentage (interpret as scaling)
