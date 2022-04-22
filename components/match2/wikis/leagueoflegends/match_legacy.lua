@@ -182,7 +182,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has teams=' .. (match.opponent1 or ''),
 		'Has teams=' .. (match.opponent2 or ''),
 	}
-	
+
 	local mvp = Json.parseIfString((match2.extradata or {}).mvp)
 	if mvp and mvp.players then
 		for index, player in ipairs(mvp.players) do
