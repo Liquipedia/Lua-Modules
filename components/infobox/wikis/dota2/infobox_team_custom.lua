@@ -40,12 +40,12 @@ function CustomTeam.run(frame)
 end
 
 function CustomTeam:createBottomContent()
---[[
-	TODO:
-	Leaving this out for now, will be a follow-up PR,
-	as both the templates needs to be removed from team pages plus the templates also requires some div changes
-
 	if not _team.args.disbanded then
+--[[
+		TODO:
+		Leaving this out for now, will be a follow-up PR,
+		as both the templates needs to be removed from team pages plus the templates also requires some div changes
+
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing matches of',
@@ -55,8 +55,8 @@ function CustomTeam:createBottomContent()
 			'Upcoming and ongoing tournaments of',
 			{team = _team.name or _team.pagename}
 		)
-	end
 --]]
+	end
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
