@@ -435,7 +435,7 @@ function matchFunctions.getEarnings(name, year)
 	if String.isEmpty(name) then
 		return 0
 	end
-	
+
 	if String.isNotEmpty(Variables.varDefault(name .. '_featured_earnings')) then
 		return tonumber(Variables.varDefault(name .. '_featured_earnings'))
 	end
