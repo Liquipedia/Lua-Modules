@@ -118,7 +118,7 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						if args.achievements then
+						if String.isNotEmpty(args.achievements) then
 							return {
 								Title{name = 'Achievements'},
 								Center{content = {args.achievements}}
