@@ -421,9 +421,7 @@ function matchFunctions.isFeatured(match)
 	if
 		opponent1.type == Opponent.team and
 		matchFunctions.getEarnings(opponent1.name, year) >= _MIN_EARNINGS_FOR_FEATURED
-	then
-		return true
-	elseif
+	or
 		opponent2.type == Opponent.team and
 		matchFunctions.getEarnings(opponent2.name, year) >= _MIN_EARNINGS_FOR_FEATURED
 	then
@@ -439,7 +437,7 @@ function matchFunctions.getEarnings(name, year)
 	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
-		conditions = '[[name::' .. name .. ']]',
+		conditions = '[[pagename::' .. name:gsub(' ', '_') .. ']]',
 		query = 'extradata'
 	})
 
