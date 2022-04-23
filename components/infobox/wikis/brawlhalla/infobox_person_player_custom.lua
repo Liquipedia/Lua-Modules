@@ -7,7 +7,6 @@
 --
 
 local Player = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local Math = require('Module:Math')
