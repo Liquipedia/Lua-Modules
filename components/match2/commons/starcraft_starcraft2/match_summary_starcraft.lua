@@ -158,7 +158,7 @@ function StarcraftMatchSummary.Body(props)
 
 		-- Show the submatch score if any submatch consists of more than one game
 		local showScore = Array.any(match.submatches, function(submatch)
-			return 1 < #submatch.games
+			return #submatch.games > 1
 				or #submatch.games == 1 and String.startsWith(submatch.games[1].map or '', 'Submatch')
 		end)
 
