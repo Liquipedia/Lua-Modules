@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
@@ -156,7 +157,11 @@ function StarcraftMatchSummary.Body(props)
 	else -- match.opponentMode == 'team'
 
 		-- Show the submatch score if any submatch consists of more than one game
-		local showScore = Array.any(match.submatches, function(submatch) return 1 < #submatch.games end)
+		-- or if the Map name starts with 'Submatch' (and the submatch has a game)
+		local showScore = Array.any(match.submatches, function(submatch)
+			return #submatch.games > 1
+				or #submatch.games == 1 and String.startsWith(submatch.games[1].map or '', 'Submatch')
+		end)
 
 		for _, submatch in ipairs(match.submatches) do
 			body:node(
@@ -260,7 +265,10 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 	local centerNode = html.create('div')
 		:addClass('brkts-popup-sc-submatch-center')
 	for _, game in ipairs(submatch.games) do
-		if game.map or game.winner then
+		if
+			(game.map or game.winner) and
+			not String.startsWith(game.map or '', 'Submatch')
+		then
 			centerNode:node(StarcraftMatchSummary.Game(game))
 		end
 	end

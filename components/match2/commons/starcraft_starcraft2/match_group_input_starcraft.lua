@@ -175,18 +175,13 @@ function StarcraftMatchGroupInput.getExtraData(match)
 			veto5by = (match.vetoplayer5 or '') ~= '' and match.vetoplayer5 or match.vetoopponent5,
 			veto6by = (match.vetoplayer6 or '') ~= '' and match.vetoplayer6 or match.vetoopponent6,
 			contestname = (match.contestname or '') ~= '' and (match.contestname .. ' Bracket Contest') or nil,
-			subGroup1header = StarcraftMatchGroupInput.getSubGroupHeader(1, match),
-			subGroup2header = StarcraftMatchGroupInput.getSubGroupHeader(2, match),
-			subGroup3header = StarcraftMatchGroupInput.getSubGroupHeader(3, match),
-			subGroup4header = StarcraftMatchGroupInput.getSubGroupHeader(4, match),
-			subGroup5header = StarcraftMatchGroupInput.getSubGroupHeader(5, match),
-			subGroup6header = StarcraftMatchGroupInput.getSubGroupHeader(6, match),
-			subGroup7header = StarcraftMatchGroupInput.getSubGroupHeader(7, match),
-			subGroup8header = StarcraftMatchGroupInput.getSubGroupHeader(8, match),
-			subGroup9header = StarcraftMatchGroupInput.getSubGroupHeader(9, match),
 			headtohead = match.headtohead,
 			ffa = 'false',
 		}
+		for subGroupIndex = 1, MAX_NUM_MAPS do
+			match.extradata['subGroup' .. subGroupIndex .. 'header']
+				= StarcraftMatchGroupInput.getSubGroupHeader(subGroupIndex, match)
+		end
 	end
 
 	return match
@@ -386,7 +381,11 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 				winner = 0
 			}
 			--adjust sub-match scores
-			if tonumber(match['map' .. i].winner) == 1 then
+			if match['map' .. i].map and String.startsWith(match['map' .. i].map, 'Submatch') then
+				for opponentIx, score in ipairs(SubMatches[k].scores) do
+					SubMatches[k].scores[opponentIx] = score + (match['map' .. i].scores[opponentIx] or 0)
+				end
+			elseif tonumber(match['map' .. i].winner) == 1 then
 				SubMatches[k].scores[1] = SubMatches[k].scores[1] + 1
 			elseif tonumber(match['map' .. i].winner) == 2 then
 				SubMatches[k].scores[2] = SubMatches[k].scores[2] + 1
@@ -632,6 +631,7 @@ function StarcraftMatchGroupInput.getManuallyEnteredPlayers(playerData)
 			break
 		end
 	end
+
 	return players
 end
 
@@ -651,6 +651,7 @@ function StarcraftMatchGroupInput.getPlayersFromVariables(teamName)
 			break
 		end
 	end
+
 	return players
 end
 
