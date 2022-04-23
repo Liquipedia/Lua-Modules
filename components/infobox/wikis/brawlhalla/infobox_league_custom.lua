@@ -14,23 +14,12 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
-local PageLink = require('Module:Page')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local _MODES = {
-	['1v1'] = '1v1',
-	['2v2'] = '2v2',
-	['3v3'] = '3v3',
-}
-_MODES.solo = _MODES['1v1']
-_MODES.singles = _MODES['1v1']
-_MODES.duo = _MODES['2v2']
-_MODES.doubles = _MODES['2v2']
-_MODES.default = _MODES['1v1']
+local _TODAY = os.date('%Y-%m-%d')
 
 local _league
 
@@ -49,28 +38,18 @@ function CustomLeague:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomInjector:addCustomCells(widgets)
-	local args = _league.args
-	table.insert(widgets, Cell{
-		name = 'Mode',
-		content = {CustomLeague:_displayMode(args.mode)}
-	})
-	table.insert(widgets, Cell{
-		name = 'Misc Mode:',
-		content = {args.miscmode}
-	})
-
-	return widgets
-end
-
 function CustomInjector:parse(id, widgets)
 	local args = _league.args
 	if id == 'customcontent' then
-		if not String.isEmpty(args.team_number) then
-			table.insert(widgets, Title{name = 'Teams'})
+		if not String.isEmpty(args.player_number) or not String.isEmpty(args.doubles_number) then
+			table.insert(widgets, Title{name = 'Player Breakdown'})
 			table.insert(widgets, Cell{
-				name = 'Number of teams',
-				content = {args.team_number}
+				name = 'Number of Players',
+				content = {args.player_number}
+			})
+			table.insert(widgets, Cell{
+				name = 'Doubles Players',
+				content = {args.doubles_number}
 			})
 		end
 	elseif id == 'prizepool' then
@@ -135,20 +114,18 @@ function CustomLeague:_createPrizepool(args)
 	})
 end
 
-function CustomLeague:_displayMode(mode)
-	if String.isEmpty(mode) then
-		return _MODES.default
-	end
-
-	return _MODES[mode:lower()] or _MODES.default 
-end
-
 function CustomLeague:defineCustomPageVariables(args)
 	-- Legacy vars
+	local sdate = Variables.varDefault('tournament_startdate', _TODAY)
+	local edate = Variables.varDefault('tournament_enddate', _TODAY)
 	Variables.varDefine('tournament_sdate', sdate)
 	Variables.varDefine('tournament_edate', edate)
 	Variables.varDefine('tournament_date', edate)
+
 	Variables.varDefine('tournament_ticker_name', args.tickername)
+	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier'))
+	Variables.varDefine('tournament_valve_premier', args.valvepremier)
+	Variables.varDefine('tournament_link', mw.title.getCurrentTitle().prefixedText)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
@@ -162,28 +139,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	}
 
 	return lpdbData
-end
-
-function CustomLeague:_concatArgs(args, base)
-	local foundArgs = {args[base] or args[base .. '1']}
-	local index = 2
-	while not String.isEmpty(args[base .. index]) do
-		table.insert(foundArgs, args[base .. index])
-		index = index + 1
-	end
-
-	return table.concat(foundArgs, ';')
-end
-
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
-end
-
-function CustomLeague:_makeInternalLink(content)
-	return '[[' .. content .. ']]'
 end
 
 return CustomLeague
