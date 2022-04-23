@@ -93,7 +93,7 @@ function MatchLegacy._convertParameters(match2)
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == 'team' then
-			match[prefix] = opponent.name
+			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
 			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
 			for i = 1, _NUMBER_OF_PLAYERS_TO_STORE do
@@ -182,7 +182,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has teams=' .. (match.opponent1 or ''),
 		'Has teams=' .. (match.opponent2 or ''),
 	}
-	
+
 	local getTeamOfPlayer = function(playerName)
 		for _, opponent in ipairs(match2.match2opponents or {}) do
 			for _, player in ipairs(opponent.match2players or {}) do
@@ -192,12 +192,13 @@ function MatchLegacy.storeMatchSMW(match, match2)
 			end
 		end
 	end
-	local extradata = Json.parseIfString(match2.extradata)
+	local extradata = Json.parseIfString(match2.extradata or {})
 	local mvp = Json.parseIfString((extradata or {}).mvp)
 	if mvp and mvp.players then
 		for index, player in ipairs(mvp.players) do
 			local team = getTeamOfPlayer(player) or ''
 			local mvpString = player .. '§§§§'.. team ..'§§§§0'
+			mw.log(player, team, mvpString)
 			table.insert(data, 'Has mvp ' .. index .. '=' .. mvpString)
 		end
 	end
@@ -211,8 +212,6 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		)
 	end
 
-	local extradata = match.extradata or {}
-	extradata = Json.parseIfString(extradata)
 	for key, item in pairs(extradata) do
 		if String.startsWith(key, 'vodgame') then
 			table.insert(
