@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Opponent = require('Module:Opponent')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
@@ -51,9 +52,11 @@ function Header:rightOpponent(content)
 end
 
 function Header:createOpponent(opponent, side)
+	local showLink = not Opponent.isTbd(opponent) and true or false
 	return OpponentDisplay.BlockOpponent{
 		flip = side == 'left',
 		opponent = opponent,
+		showLink = showLink,
 		overflow = 'wrap',
 		teamStyle = 'short',
 	}
