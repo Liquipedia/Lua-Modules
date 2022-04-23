@@ -134,8 +134,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['extradata'] = {
 		region = args.region,
 		mode = args.mode,
-		participantsnumber =
-			not String.isEmpty(args.team_number) and args.team_number or args.player_number,
 	}
 
 	return lpdbData
