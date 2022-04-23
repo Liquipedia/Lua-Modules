@@ -677,6 +677,7 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 			break
 		end
 	end
+
 	return players
 end
 
