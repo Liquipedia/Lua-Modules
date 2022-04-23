@@ -58,7 +58,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 		if bans then
 			Array.appendWith(lines,
-				indent .. indent .. '|t1b1=|t1b2=|t1b3=|t1b4=|t1b5=|t1b6=|t1b7='
+				indent .. indent .. '|t1b1=|t1b2=|t1b3=|t1b4=|t1b5='
 			)
 		end
 
@@ -69,7 +69,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 		if bans then
 			Array.appendWith(lines,
-				indent .. indent .. '|t2b1=|t2b2=|t2b3=|t2b4=|t2b5=|t2b6=|t2b7='
+				indent .. indent .. '|t2b1=|t2b2=|t2b3=|t2b4=|t2b5='
 			)
 		end
 
