@@ -147,7 +147,8 @@ function Opponent.isTbd(opponent)
 end
 
 function Opponent.playerIsTbd(player)
-	return player.displayName == '' or player.displayName == 'TBD'
+	displayName = player.displayName or player.displayname
+	return displayName == '' or displayName == 'TBD'
 end
 
 function Opponent.isType(type)
