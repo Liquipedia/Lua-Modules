@@ -124,7 +124,6 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier'))
-	Variables.varDefine('tournament_valve_premier', args.valvepremier)
 	Variables.varDefine('tournament_link', mw.title.getCurrentTitle().prefixedText)
 end
 
