@@ -7,10 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
+local IsolatedWidget = require('Module:Infobox/IsolatedWidget')
 
 local Header = Class.new(
-	Widget,
+	IsolatedWidget,
 	function(self, input)
 		self.name = input.name
 		self.subHeader = input.subHeader
@@ -22,7 +22,7 @@ local Header = Class.new(
 	end
 )
 
-function Header:make()
+function Header:create()
 	local header = {
 		Header:_name(self.name),
 		Header:_image(

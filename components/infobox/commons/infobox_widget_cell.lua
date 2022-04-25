@@ -7,9 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
+local IsolatedWidget = require('Module:Infobox/IsolatedWidget')
 
-local Cell = Class.new(Widget,
+local Cell = Class.new(IsolatedWidget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
 		self.content = input.content
@@ -68,7 +68,7 @@ function Cell:_content(...)
 	return self
 end
 
-function Cell:make()
+function Cell:create()
 	self:_new(self.name)
 	self:_class(unpack(self.classes or {}))
 	self:_content(unpack(self.content))
