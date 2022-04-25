@@ -7,9 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local IsolatedWidget = require('Module:Infobox/IsolatedWidget')
+local Widget = require('Module:Infobox/Widget')
 
-local Cell = Class.new(IsolatedWidget,
+local Cell = Class.new(Widget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
 		self.content = input.content

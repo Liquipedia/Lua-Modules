@@ -7,8 +7,14 @@
 --
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
+local String = require('Module:StringUtils')
 
 local Widget = Class.new()
+
+local _ERROR_TEXT = '<span style="color:#ff0000;font-weight:bold" class="show-when-logged-in">' ..
+					'Unexpected Error, report this in #bugs on our [https://discord.gg/liquipedia Discord]. ' ..
+					'${errorMessage}' ..
+					'</span>[[Category:Pages with script errors]]'
 
 function Widget:assertExistsAndCopy(value)
 	if value == nil or value == '' then
@@ -19,7 +25,15 @@ function Widget:assertExistsAndCopy(value)
 end
 
 function Widget:make()
-	return error('A Widget must override the make() function!')
+	local result, output = pcall(self.create, self) -- Equivalent of self:create()
+	if not result then
+		output = {String.interpolate(_ERROR_TEXT, {errorMessage = output})}
+	end
+	return output
+end
+
+function Widget:create()
+	return error('A Widget must override the create() function!')
 end
 
 function Widget:setContext(context)

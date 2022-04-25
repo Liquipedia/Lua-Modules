@@ -7,10 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local IsolatedWidget = require('Module:Infobox/IsolatedWidget')
+local Widget = require('Module:Infobox/Widget')
 
 local Header = Class.new(
-	IsolatedWidget,
+	Widget,
 	function(self, input)
 		self.name = input.name
 		self.subHeader = input.subHeader
