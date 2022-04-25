@@ -22,7 +22,7 @@ local Header = Class.new(
 	end
 )
 
-function Header:create()
+function Header:_make()
 	local header = {
 		Header:_name(self.name),
 		Header:_image(
