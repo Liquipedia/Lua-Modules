@@ -27,7 +27,7 @@ local _MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local _FACTIONS = mw.loadData('Module:Races')
 local _ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local _CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
-local _DEFAULT_LOSS_STATUSES = {FF, L, DQ}
+local _DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 30
 local _MAX_NUM_VETOS = 6
