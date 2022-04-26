@@ -14,6 +14,7 @@ local VodLink = require('Module:VodLink')
 local Json = require('Module:Json')
 local Abbreviation = require('Module:Abbreviation')
 local String = require('Module:StringUtils')
+local Flags = require('Module:Flags')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -41,15 +42,21 @@ local Casters = Class.new(
 
 function Casters:addCaster(caster)
 	if Logic.isNotEmpty(caster) then
-		table.insert(self.casters, '[[' .. caster .. ']]')
+		local nameDisplay = caster.id or caster.name
+		nameDisplay = '[[' .. caster.name .. '|' .. nameDisplay .. ']]'
+		if caster.flag then
+			table.insert(self.casters, Flags.Icon(caster['flag']) .. ' ' .. nameDisplay)
+		else
+			table.insert(self.casters, nameDisplay)
+		end
 	end
 	return self
 end
 
 function Casters:create()
 	return self.root
-		:wikitext('<b>Caster' .. (#self.casters > 1 and 's' or '') .. ':</b><br>')
-		:wikitext(table.concat(self.casters, ', '))
+		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
+		:wikitext(table.concat(self.casters, #self.casters > 2 and ', ' or ' & '))
 end
 
 -- Custom Header Class
