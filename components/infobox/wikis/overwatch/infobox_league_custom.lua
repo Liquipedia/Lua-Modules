@@ -124,7 +124,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.publishertier = args.blizzardtier:lower()
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.liquipediatiertype = args.liquipediatiertype or _DEFAULT_TIERTYPE
+	lpdbData.liquipediatiertype = args.liquipediatiertype
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
 		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
@@ -198,13 +198,12 @@ end
 
 function CustomLeague:defineCustomPageVariables()
 	-- Variables with different handling compared to commons
-	Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or _DEFAULT_TIERTYPE)
+	Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype)
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or _DEFAULT_TIERTYPE)
-	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
+	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype)
 	Variables.varDefine('tournament_mode', _args.mode or '')
 
 	Variables.varDefine('tournament_currency', Variables.varDefault('tournament_currency', _args.localcurrency or ''))
