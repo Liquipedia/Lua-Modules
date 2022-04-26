@@ -108,10 +108,6 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 		:addClass('brkts-popup-spaced')
 
 	if String.isNotEmpty(bestof) and isNotFinished then
-		--[[
-			unbox this once score display is wanted due to usage of Template:SingleMatch
-			also kick the line below this comment
-
 		return scoreBoardNode
 			:node(mw.html.create('span')
 				:css('line-height', '1.1')
@@ -128,17 +124,9 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 				))
 				:wikitext(')')
 			)
-		]]
-		return scoreBoardNode:node(Abbreviation.make('Bo' .. bestof, 'Best of ' .. bestof))
 	end
 
-	--[[
-		unbox this once score display is wanted due to usage of Template:SingleMatch
-		also kick the line below this comment
-
 	return scoreBoardNode:node(score)
-	]]
-	return ''
 end
 
 function Header:soloOpponentTeam(opponent, date)
