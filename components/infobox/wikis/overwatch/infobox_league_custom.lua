@@ -171,7 +171,7 @@ function CustomLeague:_createPrizepool()
 end
 
 function CustomLeague:_createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier or ''
+	local tier = _args.liquipediatier
 	local tierType = _args.liquipediatiertype or ''
 	if String.isEmpty(tier) then
 		return nil
@@ -207,13 +207,7 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
 
-	-- Module:Prize pool currency will usually set this variable.
-	-- However the module won't be run if certain arguments are not yet known
-	-- Set the Variable here if the createPrizepool returns nil
-	-- Needed in Module:Prize pool slot
-	if not CustomLeague:_createPrizepool() then
-		Variables.varDefine('tournament_currency', _args.localcurrency or '')
-	end
+	Variables.varDefine('tournament_currency', Variables.varDefault('tournament_currency', _args.localcurrency or ''))
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
