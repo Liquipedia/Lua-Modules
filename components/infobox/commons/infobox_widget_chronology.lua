@@ -17,7 +17,7 @@ local Chronology = Class.new(
 	end
 )
 
-function Chronology:make()
+function Chronology:_make()
 	return Chronology:_chronology(self.links)
 end
 

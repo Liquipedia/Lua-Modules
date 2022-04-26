@@ -17,7 +17,7 @@ local Breakdown = Class.new(
 	end
 )
 
-function Breakdown:make()
+function Breakdown:_make()
 	return {Breakdown:_breakdown(self.contents, self.classes)}
 end
 

@@ -18,7 +18,7 @@ local Center = Class.new(
 	end
 )
 
-function Center:make()
+function Center:_make()
 	return {
 		Center:_create(self.content, self.classes)
 	}

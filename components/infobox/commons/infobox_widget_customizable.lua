@@ -17,7 +17,7 @@ local Customizable = Class.new(
 	end
 )
 
-function Customizable:make()
+function Customizable:_make()
 	if self.context.injector == nil then
 		return self.children
 	end
