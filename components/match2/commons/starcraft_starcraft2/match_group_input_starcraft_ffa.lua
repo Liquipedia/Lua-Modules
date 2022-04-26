@@ -36,6 +36,9 @@ local ALLOWED_BG = {
 	drop = 'down',
 	proceed = 'up',
 }
+local _BESTOF_DUMMY = 9999
+local _DEFAULT_WIN_SCORE_VALUE = 9999
+local _PLACEMENT_DUMMY = 99
 
 local StarcraftFfaInput = {}
 
@@ -167,7 +170,7 @@ Match Winner, Walkover, Placement, Resulttype, Status functions
 
 ]]--
 function StarcraftFfaInput._matchWinnerProcessing(match, numberOfOpponents, noscore)
-	local bestof = tonumber(match.firstto or '') or tonumber(match.bestof or '') or 9999
+	local bestof = tonumber(match.firstto or '') or tonumber(match.bestof or '') or _BESTOF_DUMMY
 	match.bestof = bestof
 	local walkover = match.walkover or ''
 	local IndScore = {}
@@ -182,7 +185,7 @@ function StarcraftFfaInput._matchWinnerProcessing(match, numberOfOpponents, nosc
 					match.winner = opponentIndex
 					match.walkover = 'L'
 					opponent.status = 'W'
-					IndScore[opponentIndex] = 9999
+					IndScore[opponentIndex] = _DEFAULT_WIN_SCORE_VALUE
 				elseif walkover == 0 then
 					match.winner = 0
 					match.walkover = 'L'
@@ -195,7 +198,7 @@ function StarcraftFfaInput._matchWinnerProcessing(match, numberOfOpponents, nosc
 				end
 			elseif Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
 				if tonumber(match.winner or 0) == opponentIndex then
-					IndScore[opponentIndex] = 9999
+					IndScore[opponentIndex] = _DEFAULT_WIN_SCORE_VALUE
 					opponent.status = 'W'
 				else
 					IndScore[opponentIndex] = -1
@@ -206,7 +209,7 @@ function StarcraftFfaInput._matchWinnerProcessing(match, numberOfOpponents, nosc
 					ALLOWED_STATUSES2[string.upper(opponent.score or '')] or 'L'
 				match.walkover = 'L'
 				if ALLOWED_STATUSES2[string.upper(opponent.score or '')] == 'W' then
-					IndScore[opponentIndex] = 9999
+					IndScore[opponentIndex] = _DEFAULT_WIN_SCORE_VALUE
 				else
 					IndScore[opponentIndex] = -1
 				end
@@ -226,7 +229,7 @@ function StarcraftFfaInput._matchWinnerProcessing(match, numberOfOpponents, nosc
 				match.finished = 'true'
 				opponent.score = -1
 				opponent.status = 'W'
-				IndScore[opponentIndex] = 9999
+				IndScore[opponentIndex] = _DEFAULT_WIN_SCORE_VALUE
 			else
 				match.resulttype = 'default'
 				match.finished = 'true'
@@ -296,15 +299,15 @@ function StarcraftFfaInput._matchPlacements(match, numberOfOpponents, noscore, I
 	elseif tonumber(match.winner or '') then
 		for oppIndex = 1, numberOfOpponents do
 			local opponent = match['opponent' .. oppIndex]
-			opponent.placement = tonumber(opponent.placement or '') or 99
-			if opponent.placement == 99 and tonumber(match.winner) == oppIndex then
+			opponent.placement = tonumber(opponent.placement or '') or _PLACEMENT_DUMMY
+			if opponent.placement == _PLACEMENT_DUMMY and tonumber(match.winner) == oppIndex then
 				opponent.placement = 1
 			end
 		end
 	else
 		for oppIndex = 1, numberOfOpponents do
 			local opponent = match['opponent' .. oppIndex]
-			opponent.placement = tonumber(opponent.placement or '') or 99
+			opponent.placement = tonumber(opponent.placement or '') or _PLACEMENT_DUMMY
 			if opponent.placement == 1 then
 				match.winner = oppIndex
 			end
@@ -482,7 +485,7 @@ function StarcraftFfaInput._mapScoreProcessing(map, numberOfOpponents, noscore)
 					end
 				end
 				if score == 'W' then
-					indexedScores[scoreIndex] = 9999
+					indexedScores[scoreIndex] = _DEFAULT_WIN_SCORE_VALUE
 				else
 					indexedScores[scoreIndex] = -1
 				end
@@ -522,15 +525,15 @@ function StarcraftFfaInput._mapScoreProcessing(map, numberOfOpponents, noscore)
 	elseif tonumber(map.winner or '') then
 		for oppIndex = 1, numberOfOpponents do
 			map.extradata['placement' .. oppIndex] = tonumber(map['placement' .. oppIndex] or '') or
-				tonumber(map['opponent' .. oppIndex .. 'placement'] or '') or 99
-			if map.extradata['placement' .. oppIndex] == 99 and tonumber(map.winner) == oppIndex then
+				tonumber(map['opponent' .. oppIndex .. 'placement'] or '') or _PLACEMENT_DUMMY
+			if map.extradata['placement' .. oppIndex] == _PLACEMENT_DUMMY and tonumber(map.winner) == oppIndex then
 				map.extradata['placement' .. oppIndex] = 1
 			end
 		end
 	else
 		for oppIndex = 1, numberOfOpponents do
 			map.extradata['placement' .. oppIndex] = tonumber(map['placement' .. oppIndex] or '') or
-				tonumber(map['opponent' .. oppIndex .. 'placement'] or '') or 99
+				tonumber(map['opponent' .. oppIndex .. 'placement'] or '') or _PLACEMENT_DUMMY
 			if map.extradata['placement' .. oppIndex] == 1 then
 				map.winner = oppIndex
 			end
