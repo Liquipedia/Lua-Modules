@@ -48,6 +48,8 @@ function Casters:addCaster(caster)
 		else
 			table.insert(self.casters, nameDisplay)
 		end
+
+		matchSummary:footer(footer)
 	end
 	return self
 end
@@ -204,12 +206,8 @@ function CustomMatchSummary.getByMatchId(args)
 		matchSummary:comment(comment)
 	end
 
-	-- footer
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
+		row:addElement(gameHeader)
+		row:addElement(MatchSummary.Break():create())
 	end
 
 	if
