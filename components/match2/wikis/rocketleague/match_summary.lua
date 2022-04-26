@@ -87,9 +87,26 @@ end
 
 function Header:createScoreDisplay(opponent1, opponent2)
 	local function getScore(opponent)
+		local scoreText
+		local isWinner = opponent.placement == 1 or opponent.advances
+		if opponent.placement2 then
+			-- Bracket Reset, show W/L
+			if opponent.placement2 == 1 then
+				isWinner = true
+				scoreText = 'W'
+			else
+				isWinner = false
+				scoreText = 'L'
+			end
+		elseif opponent.extradata and opponent.extradata.additionalScores then
+			-- Match Series (Sets), show the series score
+			scoreText = (opponent.extradata.set1win and 1 or 0) + (opponent.extradata.set2win and 1 or 0) + (opponent.extradata.set3win and 1 or 0)
+		else
+			scoreText = OpponentDisplay.InlineScore(opponent)
+		end
 		return OpponentDisplay.BlockScore{
-			isWinner = opponent.placement == 1 or opponent.advances,
-			scoreText = OpponentDisplay.InlineScore(opponent),
+			isWinner = isWinner,
+			scoreText = scoreText,
 		}
 	end
 
