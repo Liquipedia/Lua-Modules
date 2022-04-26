@@ -15,10 +15,11 @@ local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate/Named')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
+local Flags = require('Module:Flags')
 
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local cleanFlag = require('Module:Flags').CountryName
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local defaultIcon
 
@@ -344,7 +345,6 @@ end
 
 function StarcraftMatchGroupInput.SubMatchStructure(match)
 	local SubMatches = {}
-	local j = 0
 
 	local mapIndex = 1
 	local map = match['map' .. mapIndex]
@@ -353,8 +353,8 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 		local opponent = {}
 		if map.mode == '1v1' then
 			for participantKey, participant in pairs(participants) do
-				local participantKeyField = String.split(key, '_')
-				opponent[participantKeyField[1]] = item.player
+				local participantKeyField = String.split(participantKey, '_')
+				opponent[participantKeyField[1]] = participant.player
 			end
 		end
 
@@ -516,7 +516,7 @@ function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
 	players[1] = {
 		displayname = name,
 		name = link,
-		flag = cleanFlag(flag),
+		flag = Flags.CountryName(flag),
 		extradata = {faction = _FACTIONS[string.lower(race)] or 'u'}
 	}
 
@@ -564,11 +564,11 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 			opponent['p' .. playerIndex .. 'flag'],
 			Variables.varDefault(opponent['p' .. playerIndex] .. '_flag')
 		)
-			
+
 		players[playerIndex] = {
 			displayname = opponent['p' .. playerIndex],
 			name = opponent['link' .. playerIndex],
-			flag = cleanFlag(flag),
+			flag = Flags.CountryName(flag),
 			extradata = {faction = _FACTIONS[string.lower(opponent['p' .. playerIndex .. 'race'])] or 'u'}
 		}
 	end
@@ -599,7 +599,7 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 			Variables.varDefault(playerName .. '_race'),
 			''
 		)
-		name = name .. (i ~= 1 and ' / ' or '') .. link
+		name = name .. (playerIndex ~= 1 and ' / ' or '') .. link
 		local flag = Logic.emptyOr(
 			opponent['p' .. playerIndex .. 'flag'],
 			Variables.varDefault((opponent['p' .. playerIndex] or '') .. '_flag')
@@ -608,10 +608,10 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 		players[playerIndex] = {
 			displayname = playerName,
 			name = link,
-			flag = cleanFlag(flag),
+			flag = Flags.CountryName(flag),
 			extradata = {faction = _FACTIONS[string.lower(race)] or 'u'}
 		}
-	end 
+	end
 
 	return {
 		type = opponent.type,
@@ -631,7 +631,7 @@ function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 		players[1] = {
 			displayname = opponent[1],
 			name = '',
-			flag = cleanFlag(flag),
+			flag = Flags.CountryName(flag),
 			extradata = {faction = _FACTIONS[string.lower(race)] or 'u'}
 		}
 		local extradata = opponent.extradata or {}
@@ -660,7 +660,7 @@ function StarcraftMatchGroupInput.getManuallyEnteredPlayers(playerData)
 			players[playerIndex] = {
 				name = name,
 				displayname = playerData['p' .. playerIndex],
-				flag = cleanFlag(playerData['p' .. playerIndex .. 'flag']),
+				flag = Flags.CountryName(playerData['p' .. playerIndex .. 'flag']),
 				extradata = {
 					faction = playerData['p' .. playerIndex .. 'race'],
 					position = playerIndex
@@ -683,7 +683,7 @@ function StarcraftMatchGroupInput.getPlayersFromVariables(teamName)
 			players[playerIndex] = {
 				name = name,
 				displayname = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'display'),
-				flag = cleanFlag(flag),
+				flag = Flags.CountryName(flag),
 				extradata = {faction = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'race')}
 			}
 		else
@@ -694,7 +694,9 @@ function StarcraftMatchGroupInput.getPlayersFromVariables(teamName)
 end
 
 function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
-	local customTeam = Logic.readBool(opponent.default) or Logic.readBool(opponent.defaulticon) or Logic.readBool(opponent.custom)
+	local customTeam = Logic.readBool(opponent.default)
+		or Logic.readBool(opponent.defaulticon)
+		or Logic.readBool(opponent.custom)
 	local name
 	local icon
 	local iconDark
@@ -811,7 +813,7 @@ function StarcraftMatchGroupInput.MapInput(match, mapIndex, subGroupIndex)
 		if map.subgroup then
 			subGroupIndex = map.subgroup
 		else
-			subGroupIndex = subgroup + 1
+			subGroupIndex = map.subgroup + 1
 			map.subgroup = subGroupIndex
 		end
 	end
@@ -935,7 +937,7 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOppon
 				)
 			end
 		end
-		mapMode = mapMode .. (i ~= 1 and 'v' or '') .. opponentMapMode
+		mapMode = mapMode .. (opponentIndex ~= 1 and 'v' or '') .. opponentMapMode
 
 		if mapMode == '1v1' and numberOfOpponents == 2 then
 			local opponentRaces, playerNameArray = StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
@@ -1024,7 +1026,7 @@ function StarcraftMatchGroupInput.ProcessTeamPlayerMapData(players, map, opponen
 				-- allows fetching the link of the player from preset wiki vars
 				local mapPlayer = map[playerKey .. 'link'] or
 					Variables.varDefault(map[playerKey] .. '_page') or map[playerKey]
-					mapPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(mapPlayer)
+				mapPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(mapPlayer)
 				if Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
 					playerData[map[playerKey]] = {
 						faction = _FACTIONS[string.lower(Logic.emptyOr(
@@ -1035,12 +1037,12 @@ function StarcraftMatchGroupInput.ProcessTeamPlayerMapData(players, map, opponen
 									'u'
 								)
 							))] or 'u',
-						position = j
+						position = playerIndex
 					}
 				else
 					playerData[map[playerKey]] = {
 						faction = _FACTIONS[string.lower(Logic.emptyOr(map[playerKey .. 'race'], 'u'))] or 'u',
-						position = j
+						position = playerIndex
 					}
 				end
 			else
@@ -1060,10 +1062,9 @@ function StarcraftMatchGroupInput.ProcessTeamPlayerMapData(players, map, opponen
 				faction = faction,
 				player = player.name,
 				position = playerData[player.name].position,
-				flag = cleanFlag(player.flag),
+				flag = Flags.CountryName(player.flag),
 			}
 			end
-			
 	end
 
 	local numberOfPlayers = #players + amountOfTbds
