@@ -1022,7 +1022,7 @@ function StarcraftMatchGroupInput.ProcessTeamPlayerMapData(players, map, opponen
 					map[playerKey]
 				)
 				if Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
-					playerData[map[playerKey]] = {
+					playerData[mapPlayer] = {
 						faction = _FACTIONS[string.lower(Logic.emptyOr(
 								map['t' .. opponentIndex .. 'race'],
 								map['opponent' .. opponentIndex .. 'race'],
@@ -1034,7 +1034,7 @@ function StarcraftMatchGroupInput.ProcessTeamPlayerMapData(players, map, opponen
 						position = playerIndex
 					}
 				else
-					playerData[map[playerKey]] = {
+					playerData[mapPlayer] = {
 						faction = _FACTIONS[string.lower(Logic.emptyOr(map[playerKey .. 'race'], 'u'))] or 'u',
 						position = playerIndex
 					}
