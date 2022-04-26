@@ -36,6 +36,10 @@ local ALLOWED_BG = {
 	drop = 'down',
 	proceed = 'up',
 }
+local _TBD_STRINGS = {
+	'definitions',
+	'tbd'
+}
 local _BESTOF_DUMMY = 9999
 local _DEFAULT_WIN_SCORE_VALUE = 9999
 local _PLACEMENT_DUMMY = 99
@@ -392,7 +396,13 @@ function StarcraftFfaInput._opponentInput(match, noscore)
 		opponent.placement = inputPlace
 
 		--mark match as noQuery if it contains TBD or Literal opponents
-		if Opponent.isTbd(opponent) then
+		local opponentName = string.lower(opponent.name or '')
+		local playerName = string.lower(((opponent.match2players or {})[1] or {}).name or '')
+		if
+			opponent.type == Opponent.literal or
+			Table.includes(_TBD_STRINGS, opponentName) or
+			Table.includes(_TBD_STRINGS, playerName)
+		then
 			match.noQuery = 'true'
 		end
 
