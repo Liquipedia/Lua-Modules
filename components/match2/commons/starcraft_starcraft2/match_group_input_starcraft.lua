@@ -26,7 +26,8 @@ local defaultIcon
 local _MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local _FACTIONS = mw.loadData('Module:Races')
 local _ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
-local _CONVERT_STATUS_INPUT = {['W'] = 'W', ['FF'] = 'FF', ['L'] = 'L', ['DQ'] = 'DQ', ['-'] = 'L'}
+local _CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
+local _DEFAULT_LOSS_STATUSES = {FF, L, DQ}
 local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 30
 local _MAX_NUM_VETOS = 6
@@ -349,15 +350,6 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 	local mapIndex = 1
 	local map = match['map' .. mapIndex]
 	while Logic.isNotEmpty(map) do
-		local participants = map.participants or {}
-		local opponent = {}
-		if map.mode == '1v1' then
-			for participantKey, participant in pairs(participants) do
-				local participantKeyField = String.split(participantKey, '_')
-				opponent[participantKeyField[1]] = participant.player
-			end
-		end
-
 		local subGroupIndex = map.subgroup
 
 		--create a new sub-match if necessary
@@ -366,7 +358,7 @@ function StarcraftMatchGroupInput.SubMatchStructure(match)
 			game = map.game,
 			liquipediatier = map.liquipediatier,
 			liquipediatiertype = map.liquipediatiertype,
-			participants = Table.deepCopy(participants),
+			participants = Table.deepCopy(map.participants or {}),
 			mode = map.mode,
 			resulttype = 'submatch',
 			subgroup = subGroupIndex,
@@ -1024,9 +1016,11 @@ function StarcraftMatchGroupInput.ProcessTeamPlayerMapData(players, map, opponen
 		if Logic.isNotEmpty(map[playerKey]) then
 			if map[playerKey] ~= 'TBD' and map[playerKey] ~= 'TBA' then
 				-- allows fetching the link of the player from preset wiki vars
-				local mapPlayer = map[playerKey .. 'link'] or
-					Variables.varDefault(map[playerKey] .. '_page') or map[playerKey]
-				mapPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(mapPlayer)
+				local mapPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(
+					map[playerKey .. 'link'] or
+					Variables.varDefault(map[playerKey] .. '_page') or
+					map[playerKey]
+				)
 				if Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
 					playerData[map[playerKey]] = {
 						faction = _FACTIONS[string.lower(Logic.emptyOr(
@@ -1102,13 +1096,9 @@ function StarcraftMatchGroupInput.placementSortFunction(table, key1, key2)
 	else
 		if opponent2Norm then return false
 		elseif opponent1.status == 'W' then return true
-		elseif opponent1.status == 'DQ' then return false
-		elseif opponent1.status == 'FF' then return false
-		elseif opponent1.status == 'L' then return false
+		elseif Table.includes(_DEFAULT_LOSS_STATUSES, opponent1.status) then return false
 		elseif opponent2.status == 'W' then return false
-		elseif opponent2.status == 'DQ' then return true
-		elseif opponent2.status == 'FF' then return true
-		elseif opponent2.status == 'L' then return true
+		elseif Table.includes(_DEFAULT_LOSS_STATUSES, opponent2.status) then return true
 		else return true end
 	end
 end
