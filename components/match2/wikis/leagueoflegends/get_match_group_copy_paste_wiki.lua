@@ -41,7 +41,8 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			indent .. '|date=',
 			indent .. '|finished=',
 			indent .. '|twitch=|youtube=',
-			indent .. '|reddit=|gol='
+			indent .. '|reddit=|gol=',
+			indent .. '|mvp='
 		)
 	end
 
