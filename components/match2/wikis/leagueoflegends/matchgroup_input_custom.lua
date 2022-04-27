@@ -468,11 +468,17 @@ function matchFunctions.getOpponents(match)
 	-- see if match should actually be finished if bestof limit was reached
 	if isScoreSet and not Logic.readBool(match.finished) then
 		local firstTo = math.floor(match.bestof / 2)
+		local scoreSum = 0
 		for _, item in pairs(opponents) do
-			if tonumber(item.score or 0) > firstTo then
+			local score = tonumber(item.score or 0)
+			if score > firstTo then
 				match.finished = true
 				break
 			end
+			scoreSum = scoreSum + score
+		end
+		if scoreSum >= match.bestof then
+			match.finished = true
 		end
 	end
 
