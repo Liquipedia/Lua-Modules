@@ -273,15 +273,19 @@ end
 -- match related functions
 --
 function matchFunctions.getBestOf(match)
-	local mapCount = 0
-	for i = 1, _MAX_NUM_GAMES do
-		if match['map'..i] then
-			mapCount = mapCount + 1
-		else
-			break
+	if tonumber(match.bestof) then
+		match.bestof = tonumber(match.bestof)
+	else
+		local mapCount = 0
+		for i = 1, _MAX_NUM_GAMES do
+			if match['map'..i] then
+				mapCount = mapCount + 1
+			else
+				break
+			end
 		end
+		match.bestof = mapCount
 	end
-	match.bestof = mapCount
 	return match
 end
 
