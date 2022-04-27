@@ -402,7 +402,7 @@ function matchFunctions.getMVP(match)
 		players[index] = mw.text.trim(player)
 	end
 
-	return {players=players, points=mvppoints}
+	return {players = players, points = mvppoints}
 end
 
 function matchFunctions.getOpponents(match)
