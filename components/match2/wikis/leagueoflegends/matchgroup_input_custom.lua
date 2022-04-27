@@ -466,8 +466,8 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) then
-		matchFunctions._finishMatch(match, opponents)
+	if not Logic.readBool(match.finished) then
+		matchFunctions._finishMatch(match, opponents, isScoreSet)
 	end
 
 	-- apply placements and winner if finshed
@@ -482,7 +482,7 @@ function matchFunctions.getOpponents(match)
 	return match
 end
 
-function matchFunctions._finishMatch(match, opponents)
+function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
 	if String.isEmpty(match.winner) then
 		match.finished = true
@@ -494,22 +494,24 @@ function matchFunctions._finishMatch(match, opponents)
 	end
 
 	-- Check if all/enough games have been played. If they have, mark as finished
-	local firstTo = math.floor(match.bestof / 2)
-	local scoreSum = 0
-	for _, item in pairs(opponents) do
-		local score = tonumber(item.score or 0)
-		if score > firstTo then
-			match.finished = true
-			break
+	if isScoreSet then
+		local firstTo = math.floor(match.bestof / 2)
+		local scoreSum = 0
+		for _, item in pairs(opponents) do
+			local score = tonumber(item.score or 0)
+			if score > firstTo then
+				match.finished = true
+				break
+			end
+			scoreSum = scoreSum + score
 		end
-		scoreSum = scoreSum + score
-	end
-	if scoreSum >= match.bestof then
-		match.finished = true
+		if scoreSum >= match.bestof then
+			match.finished = true
+		end
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
-	if match.hasDate then
+	if isScoreSet and match.hasDate then
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and _SECONDS_UNTIL_FINISHED_EXACT
