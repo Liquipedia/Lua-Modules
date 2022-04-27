@@ -465,25 +465,51 @@ function matchFunctions.getOpponents(match)
 		match.finished = true
 	end
 
-	-- see if match should actually be finished if bestof limit was reached
+	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) then
-		local firstTo = math.floor(match.bestof / 2)
-		local scoreSum = 0
-		for _, item in pairs(opponents) do
-			local score = tonumber(item.score or 0)
-			if score > firstTo then
-				match.finished = true
-				break
-			end
-			scoreSum = scoreSum + score
-		end
-		if scoreSum >= match.bestof then
-			match.finished = true
-		end
+		matchFunctions._finishMatch(match, opponents)
 	end
 
-	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
+	-- apply placements and winner if finshed
+	if Logic.readBool(match.finished) then
+		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
+	end
+
+	-- Update all opponents with new values
+	for opponentIndex, opponent in pairs(opponents) do
+		match['opponent' .. opponentIndex] = opponent
+	end
+	return match
+end
+
+function matchFunctions._finishMatch(match, opponents)
+	-- If a winner has been set
+	if String.isEmpty(match.winner) then
+		match.finished = true
+	end
+
+	-- If special status has been applied to a team
+	if CustomMatchGroupInput.placementCheckSpecialStatus(opponents) then
+		match.finished = true
+	end
+
+	-- Check if all/enough games have been played. If they have, mark as finished
+	local firstTo = math.floor(match.bestof / 2)
+	local scoreSum = 0
+	for _, item in pairs(opponents) do
+		local score = tonumber(item.score or 0)
+		if score > firstTo then
+			match.finished = true
+			break
+		end
+		scoreSum = scoreSum + score
+	end
+	if scoreSum >= match.bestof then
+		match.finished = true
+	end
+
+	-- If enough time has passed since match started, it should be marked as finished
+	if match.hasDate then
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and _SECONDS_UNTIL_FINISHED_EXACT
@@ -493,20 +519,6 @@ function matchFunctions.getOpponents(match)
 		end
 	end
 
-	-- apply placements and winner if finshed
-	if
-		not String.isEmpty(match.winner) or
-		Logic.readBool(match.finished) or
-		CustomMatchGroupInput.placementCheckSpecialStatus(opponents)
-	then
-		match.finished = true
-		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
-	end
-
-	-- Update all opponents with new values
-	for opponentIndex, opponent in pairs(opponents) do
-		match['opponent' .. opponentIndex] = opponent
-	end
 	return match
 end
 
