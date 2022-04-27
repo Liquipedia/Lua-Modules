@@ -63,9 +63,24 @@ function Header:createOpponent(opponent, side)
 end
 
 function Header:createScore(opponent)
+	local isWinner, scoreText
+	if opponent.placement2 then
+		-- Bracket Reset, show W/L
+		if opponent.placement2 == 1 then
+			isWinner = true
+			scoreText = 'W'
+		else
+			isWinner = false
+			scoreText = 'L'
+		end
+	else
+		isWinner = opponent.placement == 1 or opponent.advances
+		scoreText = OpponentDisplay.InlineScore(opponent)
+	end
+
 	return OpponentDisplay.BlockScore{
-		isWinner = opponent.placement == 1 or opponent.advances,
-		scoreText = OpponentDisplay.InlineScore(opponent),
+		isWinner = isWinner,
+		scoreText = scoreText,
 	}
 end
 
