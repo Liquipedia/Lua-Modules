@@ -373,10 +373,7 @@ function StarcraftMatchGroupUtil.mergeResetSubmatches(match, bracketId)
 	if match and String.isNotEmpty(match.bracketData.bracketResetMatchId) then
 		local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
 		local bracketResetMatch = bracket.matchesById[match.bracketData.bracketResetMatchId]
-
-		for _, submatch in ipairs(bracketResetMatch.submatches or {}) do
-			table.insert(match.submatches, submatch)
-		end
+		Array.extendWith(match.submatches, bracketResetMatch.submatches)
 	end
 
 	return match.submatches
