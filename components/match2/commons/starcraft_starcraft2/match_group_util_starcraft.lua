@@ -368,4 +368,18 @@ function StarcraftMatchGroupUtil.playerFromRecord(record)
 	}
 end
 
+-- merge submatches for reset matches
+function StarcraftMatchGroupUtil.mergeResetSubmatches(match, bracketId)
+	if String.isNotEmpty(match and match.bracketData.bracketResetMatchId or nil) then
+		local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
+		local bracketResetMatch = bracket.matchesById[match.bracketData.bracketResetMatchId]
+
+		for _, submatch in ipairs(bracketResetMatch.submatches or {}) do
+			table.insert(match.submatches, submatch)
+		end
+	end
+
+	return match.submatches
+end
+
 return StarcraftMatchGroupUtil
