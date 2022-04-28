@@ -191,16 +191,9 @@ function CustomLeague:_createLiquipediaTierDisplay()
 end
 
 function CustomLeague:defineCustomPageVariables()
-	-- Variables with different handling compared to commons
-	Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype)
-
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype)
-	Variables.varDefine('tournament_mode', _args.mode or '')
-
-	Variables.varDefine('tournament_currency', Variables.varDefault('tournament_currency', _args.localcurrency or ''))
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -208,9 +201,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_sdate', sdate)
 	Variables.varDefine('tournament_edate', edate)
 	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
 end
 
 function CustomLeague:getWikiCategories(args)
