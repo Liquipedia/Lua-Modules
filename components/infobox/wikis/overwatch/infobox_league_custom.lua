@@ -34,10 +34,6 @@ local _GAMES = {
 local _BLIZZARD_TIERS = {
 	owl = 'Overwatch League',
 	owc = 'Overwatch Contenders',
-	--[[cl = 'Challenger League',
-	national = 'National',
-	major = 'Six Major',
-	minor = 'Minor',]]--
 }
 
 function CustomLeague.run(frame)
@@ -127,8 +123,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.liquipediatiertype = args.liquipediatiertype
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
-		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
-		enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date),
 	}
 
 	return lpdbData
