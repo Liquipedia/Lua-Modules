@@ -100,14 +100,11 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData, _, personType)
-	local extradata = lpdbData.extradata
-	extradata.lc_id = string.lower(self.pagename)
-	extradata.teamname = _args.team
-	extradata.role = _args.role
-	extradata.role2 = _args.role2
-	extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive', '') or ''
-
-	lpdbData.extradata = extradata
+	lpdbData.extradata.lc_id = string.lower(self.pagename)
+	lpdbData.extradata.teamname = _args.team
+	lpdbData.extradata.role = _args.role
+	lpdbData.extradata.role2 = _args.role2
+	lpdbData.extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive') or ''
 
 	return lpdbData
 end
