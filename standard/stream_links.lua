@@ -11,6 +11,7 @@ Module containing utility functions for streaming platforms.
 ]]
 local StreamLinks = {}
 
+local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
@@ -114,11 +115,13 @@ function StreamLinks.processStreams(forwardedInputArgs)
 
 				streamValue = StreamLinks.resolve(platform, streamValue)
 			end
-			local key = StreamLinks._buildKey(platform, languageCode, count)
-			streams[key] = streamValue
 
-			-- Insert legacy format as well for backwards compatibility
-			streams[platformName] = streamValue
+			if FeatureFlag.get('new_stream_format') then
+				local key = StreamLinks._buildKey(platform, languageCode, count)
+				streams[key] = streamValue
+			else
+				streams[platformName] = streamValue
+			end
 		end
 	end
 
