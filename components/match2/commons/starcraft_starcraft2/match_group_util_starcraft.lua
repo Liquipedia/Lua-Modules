@@ -368,4 +368,15 @@ function StarcraftMatchGroupUtil.playerFromRecord(record)
 	}
 end
 
+-- merge submatches for reset matches
+function StarcraftMatchGroupUtil.mergeResetSubmatches(match, bracketId)
+	if match and String.isNotEmpty(match.bracketData.bracketResetMatchId) then
+		local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
+		local bracketResetMatch = bracket.matchesById[match.bracketData.bracketResetMatchId]
+		Array.extendWith(match.submatches, bracketResetMatch.submatches)
+	end
+
+	return match.submatches
+end
+
 return StarcraftMatchGroupUtil
