@@ -220,9 +220,8 @@ function StarcraftMatchGroupInput._adjustData(match)
 
 	--main processing done here
 	local subGroupIndex = 0
-	for mapKey, _ in Table.iter.pairsByPrefix(match, 'map') do
-		local i = tonumber(mapKey:match('(%d+)$'))
-		match, subGroupIndex = StarcraftMatchGroupInput._mapInput(match, i, subGroupIndex)
+	for mapKey, _, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
+		match, subGroupIndex = StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	end
 
 	--apply vodgames
@@ -346,7 +345,7 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 end
 
 function StarcraftMatchGroupInput._subMatchStructure(match)
-	local SubMatches = {}
+	local subMatches = {}
 
 	local mapIndex = 1
 	local map = match['map' .. mapIndex]
@@ -354,7 +353,7 @@ function StarcraftMatchGroupInput._subMatchStructure(match)
 		local subGroupIndex = map.subgroup
 
 		--create a new sub-match if necessary
-		SubMatches[subGroupIndex] = SubMatches[subGroupIndex] or {
+		subMatches[subGroupIndex] = subMatches[subGroupIndex] or {
 			date = map.date,
 			game = map.game,
 			liquipediatier = map.liquipediatier,
@@ -383,13 +382,13 @@ function StarcraftMatchGroupInput._subMatchStructure(match)
 
 		--adjust sub-match scores
 		if map.map and String.startsWith(map.map, 'Submatch') then
-			for opponentIndex, score in ipairs(SubMatches[subGroupIndex].scores) do
-				SubMatches[subGroupIndex].scores[opponentIndex] = score + (map.scores[opponentIndex] or 0)
+			for opponentIndex, score in ipairs(subMatches[subGroupIndex].scores) do
+				subMatches[subGroupIndex].scores[opponentIndex] = score + (map.scores[opponentIndex] or 0)
 			end
 		else
 			local winner = tonumber(map.winner) or ''
-			if SubMatches[subGroupIndex].scores[winner] then
-				SubMatches[subGroupIndex].scores[winner] = SubMatches[subGroupIndex].scores[winner] + 1
+			if subMatches[subGroupIndex].scores[winner] then
+				subMatches[subGroupIndex].scores[winner] = subMatches[subGroupIndex].scores[winner] + 1
 			end
 		end
 
@@ -397,7 +396,7 @@ function StarcraftMatchGroupInput._subMatchStructure(match)
 		map = match['map' .. mapIndex]
 	end
 
-	for subMatchIndex, subMatch in ipairs(SubMatches) do
+	for subMatchIndex, subMatch in ipairs(subMatches) do
 		--get winner
 		if subMatch.scores[1] > subMatch.scores[2] then
 			subMatch.winner = 1
