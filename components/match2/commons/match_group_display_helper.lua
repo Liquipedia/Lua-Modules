@@ -119,10 +119,16 @@ end
 Displays the map name and link, and the status of the match if it had an
 unusual status.
 ]]
-function DisplayHelper.MapAndStatus(game)
-	local mapText = game.map
-		and ('[[' .. game.map .. ']]')
-		or 'Unknown'
+function DisplayHelper.MapAndStatus(game, config)
+	config = config or {}
+	local mapText
+	if game.map and not config.noLink then
+		mapText = '[[' .. game.map .. ']]'
+	elseif game.map then
+		mapText = game.map
+	else
+		mapText = 'Unknown'
+	end
 	if game.resultType == 'np' or game.resultType == 'default' then
 		mapText = '<s>' .. mapText .. '</s>'
 	end
