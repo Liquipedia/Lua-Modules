@@ -69,6 +69,21 @@ function StreamLinks.resolve(platformName, streamValue)
 end
 
 --[[
+Builds a key for the Stream Key.
+
+Format of a Stream Key is:
+platform_languageCode_index
+]]
+function StreamLinks._buildKey(platform, languageCode, index)
+	assert(Logic.isNotEmpty(platform), 'StreamLinks: Platform is required.')
+	assert(Logic.isNotEmpty(languageCode), 'StreamLinks: Language Code is required.')
+	assert(Logic.isNumeric(index), 'StreamLinks: Numeric Platform Index is required.')
+	languageCode = languageCode:lower()
+	index = tonumber(index)
+	return platform + "_" + languageCode + "_" + index
+end
+
+--[[
 Extracts the streaming platform args from an argument table or a nested stream table inside the arguments table.
 Uses variable fallbacks and resolves stream redirects.
 ]]
@@ -87,12 +102,22 @@ function StreamLinks.processStreams(forwardedInputArgs)
 		)
 
 		if String.isNotEmpty(streamValue) then
+			local platform = platformName
+			local languageCode = 'en'
+			local count = 1
 			-- stream has no platform
-			if platformName ~= 'stream' then
-				local lookUpPlatform = StreamLinks.streamPlatformLookupNames[platformName] or platformName
+			if platform ~= 'stream' then
+				if StreamLinks.streamPlatformLookupNames[platform] then
+					count = tonumber(platform:match('(%d+)$'))
+					platform = StreamLinks.streamPlatformLookupNames[platform]
+				end
 
-				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
+				streamValue = StreamLinks.resolve(platform, streamValue)
 			end
+			local key = StreamLinks._buildKey(platform, languageCode, count)
+			streams[key] = streamValue
+
+			-- Insert legacy format as well for backwards compatibility
 			streams[platformName] = streamValue
 		end
 	end
