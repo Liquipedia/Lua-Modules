@@ -151,10 +151,7 @@ function StarcraftMatchSummary.Body(props)
 	if match.opponentMode == 'uniform' then
 		for _, game in ipairs(match.games) do
 			if game.map or game.winner then
-				body:node(StarcraftMatchSummary.Game(
-						game,
-						{noLink = String.startsWith(game.map or '', 'Submatch')}
-					):addClass('brkts-popup-body-element'))
+				body:node(StarcraftMatchSummary.Game(game):addClass('brkts-popup-body-element'))
 			end
 		end
 	else -- match.opponentMode == 'team'
@@ -269,7 +266,11 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 		:addClass('brkts-popup-sc-submatch-center')
 	for _, game in ipairs(submatch.games) do
 		if game.map or game.winner then
-			centerNode:node(StarcraftMatchSummary.Game(game))
+			centerNode:node(StarcraftMatchSummary.Game(
+					game,
+					{noLink = String.startsWith(game.map or '', 'Submatch')}
+				)
+			)
 		end
 	end
 
