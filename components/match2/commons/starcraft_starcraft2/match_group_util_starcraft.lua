@@ -370,7 +370,7 @@ end
 
 -- merge submatches for reset matches
 function StarcraftMatchGroupUtil.mergeResetSubmatches(match, bracketId)
-	if String.isNotEmpty(match and match.bracketData.bracketResetMatchId or nil) then
+	if match and String.isNotEmpty(match.bracketData.bracketResetMatchId) then
 		local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
 		local bracketResetMatch = bracket.matchesById[match.bracketData.bracketResetMatchId]
 
