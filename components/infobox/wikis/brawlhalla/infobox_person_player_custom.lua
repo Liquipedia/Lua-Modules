@@ -77,7 +77,7 @@ function CustomInjector:addCustomCells(widgets)
 		player = _PAGENAME,
 	}
 
-	local currentYearEarnings = _earningsPerYear[tostring(_CURRENT_YEAR)]
+	local currentYearEarnings = _earningsPerYear[_CURRENT_YEAR]
 	if currentYearEarnings then
 		currentYearEarnings = Math.round{currentYearEarnings}
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
