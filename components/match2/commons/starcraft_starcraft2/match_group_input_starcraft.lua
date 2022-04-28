@@ -346,10 +346,9 @@ end
 
 function StarcraftMatchGroupInput._subMatchStructure(match)
 	local subMatches = {}
+	local numberOfMaps = 0
 
-	local mapIndex = 1
-	local map = match['map' .. mapIndex]
-	while Logic.isNotEmpty(map) do
+	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
 		local subGroupIndex = map.subgroup
 
 		--create a new sub-match if necessary
@@ -391,9 +390,7 @@ function StarcraftMatchGroupInput._subMatchStructure(match)
 				subMatches[subGroupIndex].scores[winner] = subMatches[subGroupIndex].scores[winner] + 1
 			end
 		end
-
-		mapIndex = mapIndex + 1
-		map = match['map' .. mapIndex]
+		numberOfMaps = mapIndex
 	end
 
 	for subMatchIndex, subMatch in ipairs(subMatches) do
@@ -404,7 +401,7 @@ function StarcraftMatchGroupInput._subMatchStructure(match)
 			subMatch.winner = 2
 		end
 
-		match['map' .. ((mapIndex - 1) + subMatchIndex)] = subMatch
+		match['map' .. (numberOfMaps + subMatchIndex)] = subMatch
 	end
 
 	return match
