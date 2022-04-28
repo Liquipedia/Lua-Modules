@@ -220,7 +220,7 @@ function StarcraftMatchGroupInput._adjustData(match)
 
 	--main processing done here
 	local subGroupIndex = 0
-	for mapKey, _, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
+	for _, _, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
 		match, subGroupIndex = StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	end
 
