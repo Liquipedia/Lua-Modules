@@ -199,11 +199,11 @@ function StarcraftMatchSummary.Body(props)
 	return body
 end
 
-function StarcraftMatchSummary.Game(game)
+function StarcraftMatchSummary.Game(game, config)
 	DisplayUtil.assertPropTypes(game, StarcraftMatchGroupUtil.types.Game.struct)
 
 	local centerNode = html.create('div'):addClass('brkts-popup-sc-game-center')
-		:wikitext(DisplayHelper.MapAndStatus(game))
+		:wikitext(DisplayHelper.MapAndStatus(game, config))
 
 	local winnerIcon = function(opponentIx)
 		return game.resultType == 'draw' and StarcraftMatchSummary.ColoredIcon('YellowLine')
@@ -265,10 +265,7 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 	local centerNode = html.create('div')
 		:addClass('brkts-popup-sc-submatch-center')
 	for _, game in ipairs(submatch.games) do
-		if
-			(game.map or game.winner) and
-			not String.startsWith(game.map or '', 'Submatch')
-		then
+		if game.map or game.winner then
 			centerNode:node(StarcraftMatchSummary.Game(game))
 		end
 	end
