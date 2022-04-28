@@ -805,7 +805,7 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		if map.subgroup then
 			subGroupIndex = map.subgroup
 		else
-			subGroupIndex = map.subgroup + 1
+			subGroupIndex = subGroupIndex + 1
 			map.subgroup = subGroupIndex
 		end
 	end
