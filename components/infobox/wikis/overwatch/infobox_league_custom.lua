@@ -132,20 +132,6 @@ function CustomLeague:_validPublisherTier(publishertier)
 	return String.isNotEmpty(publishertier) and _BLIZZARD_TIERS[publishertier:lower()]
 end
 
-function CustomLeague:_standardiseRawDate(dateString)
-	-- Length 7 = YYYY-MM
-	-- Length 10 = YYYY-MM-??
-	if String.isEmpty(dateString) or (#dateString ~= 7 and #dateString ~= 10) then
-		return ''
-	end
-
-	if #dateString == 7 then
-		dateString = dateString .. '-??'
-	end
-	dateString = dateString:gsub('%-XX', '-??')
-	return dateString
-end
-
 function CustomLeague:_createPrizepool()
 	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
 		return nil
