@@ -201,6 +201,8 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_sdate', sdate)
 	Variables.varDefine('tournament_edate', edate)
 	Variables.varDefine('tournament_date', edate)
+
+	Variables.varDefine('tournament_blizzard_premier', _args.publishertier or '')
 end
 
 function CustomLeague:getWikiCategories(args)
