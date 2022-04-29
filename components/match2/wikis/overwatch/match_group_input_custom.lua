@@ -355,7 +355,17 @@ function matchFunctions.getOpponents(match)
 
 			-- Retrieve icon for team
 			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getIcon(opponent.template)
+				if opponent.template:lower() == 'bye' then
+					opponent = {type = Opponent.literal, name = 'BYE'}
+				else
+					opponent.icon = opponentFunctions.getIcon(opponent.template)
+				end
+			elseif opponent.type ~= Opponent.literal then
+				-- process other opponent types (especially in regards to their player inputs)
+				-- ..........
+				if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
+					opponent = {type = Opponent.literal, name = 'BYE'}
+				end
 			end
 
 			-- apply status
@@ -435,6 +445,10 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 		end
 	end
 	return match
+end
+
+function CustomMatchGroupInput._playerIsBye(player)
+	return (player.name or ''):lower() == 'bye' or (player.displayname or ''):lower() == 'bye'
 end
 
 --
