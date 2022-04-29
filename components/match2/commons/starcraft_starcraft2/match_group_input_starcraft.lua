@@ -164,7 +164,7 @@ end
 function StarcraftMatchGroupInput._getExtraData(match)
 	local extradata
 	if Logic.readBool(match.ffa) then
-		match.extradata = getStarcraftFfaInputModule().getExtraData(match)
+		extradata = getStarcraftFfaInputModule().getExtraData(match)
 	else
 		extradata = {
 			noQuery = match.noQuery,
