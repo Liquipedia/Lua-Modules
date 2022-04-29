@@ -66,9 +66,19 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
-	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
-		opponent = {type = Opponent.literal, name = 'BYE'}
+	-- Retrieve icon for teams and do tbd checks
+	if opponent.type == Opponent.team then
+		if opponent.template:lower() == 'bye' then
+			opponent = {type = Opponent.literal, name = 'BYE'}
+		else
+			opponent.icon = opponentFunctions.getIcon(opponent.template)
+		end
+	elseif opponent.type ~= Opponent.literal then
+		opponent.match2players = matchFunctions.getPlayers(record, opponentIndex)
+		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
+			opponent = {type = Opponent.literal, name = 'BYE'}
+		end
+		
 	end
 
 	Opponent.resolve(opponent, date)
@@ -354,21 +364,6 @@ function matchFunctions.getOpponents(match)
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				if opponent.template:lower() == 'bye' then
-					opponent = {type = Opponent.literal, name = 'BYE'}
-				else
-					opponent.icon = opponentFunctions.getIcon(opponent.template)
-				end
-			elseif opponent.type ~= Opponent.literal then
-				-- process other opponent types (especially in regards to their player inputs)
-				-- ..........
-				if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
-					opponent = {type = Opponent.literal, name = 'BYE'}
-				end
-			end
-
 			-- apply status
 			if Logic.isNumeric(opponent.score) then
 				opponent.status = 'S'
@@ -381,7 +376,7 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
+				match = matchFunctions.getTeamPlayers(match, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -430,8 +425,8 @@ function matchFunctions.getOpponents(match)
 	return match
 end
 
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
+-- Get Playerdata from Vars (get's set in TeamCards) for team opponents
+function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
 	local count = 1
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
@@ -446,6 +441,23 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 		end
 	end
 	return match
+end
+
+-- Get Playerdata for non-team opponents
+function matchFunctions.getPlayers(match, opponentIndex)
+	local players = {}
+	for playerIndex = 1, _MAX_NUM_PLAYERS do
+		-- parse player
+		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
+		player.name = player.name ot 'TBD'
+		player.flag = player.flag
+		player.displayname = player.displayname or player.name
+		if Table.isNotEmpty(player) then
+			table.insert(players, player)
+		end
+	end
+
+	return players
 end
 
 function CustomMatchGroupInput._playerIsBye(player)
