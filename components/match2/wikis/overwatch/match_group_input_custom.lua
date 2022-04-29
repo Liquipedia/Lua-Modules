@@ -24,6 +24,16 @@ local _MAX_NUM_PLAYERS = 10
 local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
+local _CONVERT_TYPE_TO_PLAYER_NUMBER = {
+	solo = 1,
+	--duo = 2,
+	--trio = 3,
+	--quad = 4,
+}
+local _ALLOWED_OPPONENT_TYPES = {
+	'solo',
+	'team'
+}
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 
@@ -74,7 +84,10 @@ function CustomMatchGroupInput.processOpponent(record, date)
 			opponent.icon = opponentFunctions.getIcon(opponent.template)
 		end
 	elseif opponent.type ~= Opponent.literal then
-		opponent.match2players = matchFunctions.getPlayers(record, opponentIndex)
+		if not _ALLOWED_OPPONENT_TYPES[opponent.type or ''] then
+			error('Unsupported opponent type "' .. (opponent.type or '') .. '"')
+		end
+		opponent.match2players = matchFunctions.getPlayers(record, opponent.type, opponentIndex)
 		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
 			opponent = {type = Opponent.literal, name = 'BYE'}
 		end
@@ -444,9 +457,9 @@ function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
 end
 
 -- Get Playerdata for non-team opponents
-function matchFunctions.getPlayers(match, opponentIndex)
+function matchFunctions.getPlayers(match, opponentType, opponentIndex)
 	local players = {}
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
+	for playerIndex = 1, _CONVERT_TYPE_TO_PLAYER_NUMBER[opponentType] do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name ot 'TBD'
