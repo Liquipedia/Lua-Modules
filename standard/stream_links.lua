@@ -81,7 +81,7 @@ function StreamLinks._buildKey(platform, languageCode, index)
 	assert(Logic.isNumeric(index), 'StreamLinks: Numeric Platform Index is required.')
 	languageCode = languageCode:lower()
 	index = tonumber(index)
-	return platform + "_" + languageCode + "_" + index
+	return platform .. "_" .. languageCode .. "_" .. index
 end
 
 --[[
