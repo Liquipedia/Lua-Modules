@@ -33,7 +33,7 @@ function StarcraftSingleMatchDisplay.SingleMatch(props)
 	local singleMatchNode = SingleMatchDisplay.SingleMatch(props)
 
 	return singleMatchNode 
-		:addClass(props.match.isFfa and 'ffa-match-summary')
+		:addClass(props.match.isFfa and 'ffa-match-summary' or nil)
 end
 
 return StarcraftSingleMatchDisplay
