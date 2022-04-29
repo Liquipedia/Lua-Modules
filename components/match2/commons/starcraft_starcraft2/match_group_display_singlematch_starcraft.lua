@@ -20,13 +20,20 @@ function StarcraftSingleMatchDisplay.SingleMatchContainer(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
 
 	return match
-		and SingleMatchDisplay.SingleMatch{
+		and StarcraftSingleMatchDisplay.SingleMatch{
 			match = match,
 			config = Table.merge(props.config, {
 				MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
 			})
 		}
 		or ''
+end
+
+function StarcraftSingleMatchDisplay.SingleMatch(props)
+	local singleMatchNode = SingleMatchDisplay.SingleMatch(props)
+
+	return singleMatchNode 
+		:addClass(props.match.isFfa and 'ffa-match-summary')
 end
 
 return StarcraftSingleMatchDisplay
