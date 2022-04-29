@@ -220,7 +220,10 @@ function p._getCasterInformation(name, flag, id)
 		id = Variables.varDefault(name .. '_dn')
 	end
 	if String.isEmpty(flag) or String.isEmpty(id) then
-		local parent = Variables.varDefault('tournament_parent')
+		local parent = Variables.varDefault(
+			'tournament_parent',
+			mw.title.getCurrentTitle().text
+		)
 		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
