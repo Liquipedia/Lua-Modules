@@ -134,7 +134,7 @@ function Person:createInfobox()
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
-						Widgets.Links{content = links, variant = _LINK_VARIANT}
+						Widgets.Links{content = links, variant = self:getLinkVariant(args)}
 					}
 				end
 			end
@@ -194,7 +194,7 @@ function Person:createInfobox()
 end
 
 function Person:_setLpdbData(args, links, status, personType)
-	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
+	links = Links.makeFullLinksForTableItems(links, self:getLinkVariant(args))
 
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
@@ -279,6 +279,11 @@ end
 --- Allows for overriding this functionality
 function Person:getStatusToStore(args)
 	return args.status
+end
+
+--- Allows for overriding this functionality
+function Person:getLinkVariant(args)
+	return _LINK_VARIANT
 end
 
 --- Allows for overriding this functionality
