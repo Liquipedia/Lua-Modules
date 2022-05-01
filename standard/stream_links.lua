@@ -90,7 +90,8 @@ function StreamKey:new(tbl, languageCode, index)
 	elseif type(tbl) == 'string' then
 		local components = mw.text.split(tbl, '_', true)
 		if #components == 1 then
-			platform, languageCode, index = self:_fromLegacy(tbl)
+			platform, index = self:_fromLegacy(tbl)
+			languageCode = 'en'
 		elseif #components == 3 then
 			platform, languageCode, index = unpack(components)
 		end
@@ -103,23 +104,20 @@ function StreamKey:new(tbl, languageCode, index)
 	self.languageCode = self.languageCode:lower()
 end
 
-function StreamKey:_fromLegacy(platform)
-	local languageCode = 'en'
-	for _, validPlatform in pairs(StreamLinks.countdownPlatformNames) do
+function StreamKey:_fromLegacy(input)
+	for _, platform in pairs(StreamLinks.countdownPlatformNames) do
 		-- The intersection between countdownPlatformNames and streamPlatformLookupNames are not valid platforms.
-		if not StreamLinks.streamPlatformLookupNames[validPlatform] then
-			-- Let's find the actual platform of the input. (Eg. "twitch" in the input "twitch35")
-			-- Offset will be the location of the last letter of the actual platform
-			local _, offset = platform:find(validPlatform, 1, true)
-			if offset then
+		if not StreamLinks.streamPlatformLookupNames[platform] then
+			-- Check if this platform matches the input
+			if string.find(input, platform, 1, true) then
 				local index
-				-- If there's more than just the platform name in the input means there's an index at the end
-				if #platform > #validPlatform then
-					index = tonumber(platform:sub(offset+1))
+				-- If the input is longer than the platform, there's an index at the end
+				if #input > #platform then
+					index = tonumber(input:sub(#platform+1))
 				else
 					index = 1
 				end
-				return validPlatform, languageCode, index
+				return platform, index
 			end
 		end
 	end
