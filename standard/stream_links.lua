@@ -70,15 +70,58 @@ function StreamLinks.resolve(platformName, streamValue)
 end
 
 --[[
+Converts a key of new format to legacy format
+]]
+function StreamLinks.keyToLegacy(key)
+	if String.isNotEmpty(key) then
+		local splitKey = mw.text.split(key, '_', true)
+		if #splitKey == 3 and Logic.isNumeric(splitKey[3]) then
+			local platform = splitKey[3]
+			local index = tonumber(splitKey[3])
+			if index > 1 then
+				platform = platform .. index
+			end
+			return platform
+		end
+	end
+	return false, "StreamLinks.keyToLegacy: Invalid input"
+end
+
+--[[
+Converts legacy input to a key of new format
+]]
+function StreamLinks.legacyToKey(platform)
+	local languageCode = 'en'
+	local index = 1
+	for _, validPlatform in pairs(StreamLinks.countdownPlatformNames) do
+		-- The intersection between countdownPlatformNames and streamPlatformLookupNames are not valid platforms.
+		if not StreamLinks.streamPlatformLookupNames[validPlatform] then
+			-- Let's find the actual platform of the input. (Eg. "twitch" in the input "twitch35")
+			-- Offset will be the location of the last letter of the actual platform
+			local _, offset = platform:find(validPlatform, 1, true)
+			if offset then
+				-- If there's more than just the platform name in the input means there's an index at the end
+				if #platform > #validPlatform then
+					index = tonumber(platform:sub(offset+1))
+					platform = validPlatform
+				end
+				return StreamLinks._buildKey(platform, languageCode, index)
+			end
+		end
+	end
+	return false, "StreamLinks.legacyToKey: Invalid input"
+end
+
+--[[
 Builds a key for the Stream Key.
 
 Format of a Stream Key is:
 platform_languageCode_index
 ]]
 function StreamLinks._buildKey(platform, languageCode, index)
-	assert(Logic.isNotEmpty(platform), 'StreamLinks: Platform is required.')
-	assert(Logic.isNotEmpty(languageCode), 'StreamLinks: Language Code is required.')
-	assert(Logic.isNumeric(index), 'StreamLinks: Numeric Platform Index is required.')
+	assert(Logic.isNotEmpty(platform), 'StreamLinks._buildKey: Platform is required')
+	assert(Logic.isNotEmpty(languageCode), 'StreamLinks._buildKey: Language Code is required')
+	assert(Logic.isNumeric(index), 'StreamLinks._buildKey: Platform Index must be numeric')
 	languageCode = languageCode:lower()
 	index = tonumber(index)
 	return platform .. "_" .. languageCode .. "_" .. index
@@ -103,21 +146,15 @@ function StreamLinks.processStreams(forwardedInputArgs)
 		)
 
 		if String.isNotEmpty(streamValue) then
-			local platform = platformName
-			local languageCode = 'en'
-			local count = 1
 			-- stream has no platform
-			if platform ~= 'stream' then
-				if StreamLinks.streamPlatformLookupNames[platform] then
-					count = tonumber(platform:match('(%d+)$'))
-					platform = StreamLinks.streamPlatformLookupNames[platform]
-				end
+			if platformName ~= 'stream' then
+				local lookUpPlatform = StreamLinks.streamPlatformLookupNames[platformName] or platformName
 
-				streamValue = StreamLinks.resolve(platform, streamValue)
+				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
 			end
-
+			
 			if FeatureFlag.get('new_stream_format') then
-				local key = StreamLinks._buildKey(platform, languageCode, count)
+				local key = StreamLinks.legacyToKey(platformName)
 				streams[key] = streamValue
 			end
 			streams[platformName] = streamValue
