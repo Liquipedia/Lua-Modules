@@ -152,7 +152,7 @@ function StreamLinks.processStreams(forwardedInputArgs)
 
 				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
 			end
-			
+
 			if FeatureFlag.get('new_stream_format') then
 				local key = StreamLinks.legacyToKey(platformName)
 				streams[key] = streamValue
