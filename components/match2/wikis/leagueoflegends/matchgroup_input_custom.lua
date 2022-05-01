@@ -484,7 +484,7 @@ end
 
 function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
-	if String.isEmpty(match.winner) then
+	if String.isNotEmpty(match.winner) then
 		match.finished = true
 	end
 
