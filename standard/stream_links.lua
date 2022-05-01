@@ -119,19 +119,24 @@ local StreamKey = StreamLinks.StreamKey
 
 function StreamKey:new(tbl, languageCode, index)
 	local platform
+	-- Input is another StreamKey - Make a copy
 	if StreamKey._isStreamKey(tbl) then
 		platform = tbl.platform
 		languageCode = tbl.languageCode
 		index = tbl.index
+	-- Input is another table, assume format is {platform, languageCode, index}
 	elseif type(tbl) == 'table' then
 		platform, languageCode, index = unpack(tbl)
+	-- All three parameters are supplied
 	elseif languageCode and index then
 		platform = tbl
 	elseif type(tbl) == 'string' then
 		local components = mw.text.split(tbl, '_', true)
+		-- Input is in legacy format (eg. twitch2)
 		if #components == 1 then
 			platform, index = self:_fromLegacy(tbl)
 			languageCode = 'en'
+		-- Input is a StreamKey in string format
 		elseif #components == 3 then
 			platform, languageCode, index = unpack(components)
 		end
