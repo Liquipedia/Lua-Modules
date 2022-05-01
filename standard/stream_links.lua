@@ -70,12 +70,52 @@ function StreamLinks.resolve(platformName, streamValue)
 	return string.gsub(streamLink, 'Special:Stream/' .. platformName, '')
 end
 
+--[[
+Extracts the streaming platform args from an argument table or a nested stream table inside the arguments table.
+Uses variable fallbacks and resolves stream redirects.
+]]
+function StreamLinks.processStreams(forwardedInputArgs)
+	local streams = {}
+	if type(forwardedInputArgs.stream) == 'table' then
+		streams = forwardedInputArgs.stream
+		forwardedInputArgs.stream = nil
+	end
 
-local StreamKey = Class.new(
-	function(self, ...)
+	for _, platformName in pairs(StreamLinks.countdownPlatformNames) do
+		local streamValue = Logic.emptyOr(
+			streams[platformName],
+			forwardedInputArgs[platformName],
+			Variables.varDefault(platformName)
+		)
+
+		if String.isNotEmpty(streamValue) then
+			-- stream has no platform
+			if platformName ~= 'stream' then
+				local lookUpPlatform = StreamLinks.streamPlatformLookupNames[platformName] or platformName
+
+				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
+			end
+
+			if FeatureFlag.get('new_stream_format') then
+				local key = StreamLinks.StreamKey(platformName):toString()
+				streams[key] = streamValue
+			end
+			streams[platformName] = streamValue
+		end
+	end
+
+	return streams
+end
+
+--- StreamKey Class
+-- Contains the truple that makes up a stream key
+-- [platform, languageCode, index]
+StreamLinks.StreamKey = Class.new(
+	function (self,...)
 		self:new(...)
 	end
 )
+local StreamKey = StreamLinks.StreamKey
 
 function StreamKey:new(tbl, languageCode, index)
 	local platform
@@ -145,43 +185,5 @@ function StreamKey._isStreamKey(value)
 	return false
 end
 StreamKey.__tostring = StreamKey.toString
-StreamLinks.StreamKey = StreamKey
-
---[[
-Extracts the streaming platform args from an argument table or a nested stream table inside the arguments table.
-Uses variable fallbacks and resolves stream redirects.
-]]
-function StreamLinks.processStreams(forwardedInputArgs)
-	local streams = {}
-	if type(forwardedInputArgs.stream) == 'table' then
-		streams = forwardedInputArgs.stream
-		forwardedInputArgs.stream = nil
-	end
-
-	for _, platformName in pairs(StreamLinks.countdownPlatformNames) do
-		local streamValue = Logic.emptyOr(
-			streams[platformName],
-			forwardedInputArgs[platformName],
-			Variables.varDefault(platformName)
-		)
-
-		if String.isNotEmpty(streamValue) then
-			-- stream has no platform
-			if platformName ~= 'stream' then
-				local lookUpPlatform = StreamLinks.streamPlatformLookupNames[platformName] or platformName
-
-				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
-			end
-
-			if FeatureFlag.get('new_stream_format') then
-				local key = StreamKey(platformName):toString()
-				streams[key] = streamValue
-			end
-			streams[platformName] = streamValue
-		end
-	end
-
-	return streams
-end
 
 return StreamLinks
