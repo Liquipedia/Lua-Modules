@@ -119,9 +119,8 @@ function StreamLinks.processStreams(forwardedInputArgs)
 			if FeatureFlag.get('new_stream_format') then
 				local key = StreamLinks._buildKey(platform, languageCode, count)
 				streams[key] = streamValue
-			else
-				streams[platformName] = streamValue
 			end
+			streams[platformName] = streamValue
 		end
 	end
 
