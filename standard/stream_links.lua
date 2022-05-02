@@ -152,7 +152,7 @@ end
 function StreamKey:_fromLegacy(input)
 	for _, platform in pairs(StreamLinks.countdownPlatformNames) do
 		-- The intersection of values in countdownPlatformNames and keys in streamPlatformLookupNames
-		-- are not valid platforms.
+		-- are not valid platforms. For example "twitch2" is not a valid platform.
 		if not StreamLinks.streamPlatformLookupNames[platform] then
 			-- Check if this platform matches the input
 			if string.find(input, platform, 1, true) then
