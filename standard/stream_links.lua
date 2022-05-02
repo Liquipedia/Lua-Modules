@@ -152,13 +152,13 @@ end
 function StreamKey:_fromLegacy(input)
 	for _, platform in pairs(StreamLinks.countdownPlatformNames) do
 		-- The intersection of values in countdownPlatformNames and keys in streamPlatformLookupNames
-		-- are not valid platforms. For example "twitch2" is not a valid platform.
+		-- are not valid platforms. E.g. "twitch2" is not a valid platform.
 		if not StreamLinks.streamPlatformLookupNames[platform] then
 			-- Check if this platform matches the input
 			if string.find(input, platform, 1, true) then
 				local index = 1
 				-- If the input is longer than the platform, there's an index at the end
-				-- e.g. twitch2
+				-- Eg. In "twitch2", the 2 would the index.
 				if #input > #platform then
 					index = tonumber(input:sub(#platform + 1))
 				end
