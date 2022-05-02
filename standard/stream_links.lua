@@ -11,6 +11,8 @@ Module containing utility functions for streaming platforms.
 ]]
 local StreamLinks = {}
 
+local Class = require('Module:Class')
+local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
@@ -93,11 +95,101 @@ function StreamLinks.processStreams(forwardedInputArgs)
 
 				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
 			end
+
+			if FeatureFlag.get('new_stream_format') then
+				local key = StreamLinks.StreamKey(platformName):toString()
+				streams[key] = streamValue
+			end
 			streams[platformName] = streamValue
 		end
 	end
 
 	return streams
 end
+
+--- StreamKey Class
+-- Contains the triplet that makes up a stream key
+-- [platform, languageCode, index]
+StreamLinks.StreamKey = Class.new(
+	function (self, ...)
+		self:new(...)
+	end
+)
+local StreamKey = StreamLinks.StreamKey
+
+function StreamKey:new(tbl, languageCode, index)
+	local platform
+	-- Input is another StreamKey - Make a copy
+	if StreamKey._isStreamKey(tbl) then
+		platform = tbl.platform
+		languageCode = tbl.languageCode
+		index = tbl.index
+	-- All three parameters are supplied
+	elseif languageCode and index then
+		platform = tbl
+	elseif type(tbl) == 'string' then
+		local components = mw.text.split(tbl, '_', true)
+		-- Input is in legacy format (eg. twitch2)
+		if #components == 1 then
+			platform, index = self:_fromLegacy(tbl)
+			languageCode = 'en'
+		-- Input is a StreamKey in string format
+		elseif #components == 3 then
+			platform, languageCode, index = unpack(components)
+		end
+	end
+
+	self.platform = platform
+	self.languageCode = languageCode
+	self.index = tonumber(index)
+	self:_isValid()
+	self.languageCode = self.languageCode:lower()
+end
+
+function StreamKey:_fromLegacy(input)
+	for _, platform in pairs(StreamLinks.countdownPlatformNames) do
+		-- The intersection of values in countdownPlatformNames and keys in streamPlatformLookupNames
+		-- are not valid platforms. E.g. "twitch2" is not a valid platform.
+		if not StreamLinks.streamPlatformLookupNames[platform] then
+			-- Check if this platform matches the input
+			if string.find(input, platform, 1, true) then
+				local index = 1
+				-- If the input is longer than the platform, there's an index at the end
+				-- Eg. In "twitch2", the 2 would the index.
+				if #input > #platform then
+					index = tonumber(input:sub(#platform + 1))
+				end
+				return platform, index
+			end
+		end
+	end
+end
+
+function StreamKey:toString()
+	return self.platform .. '_' .. self.languageCode .. '_' .. self.index
+end
+
+function StreamKey:toLegacy()
+	-- Return twitch instead of twitch1
+	if self.index == 1 then
+		return self.platform
+	end
+	return self.platform .. self.index
+end
+
+function StreamKey:_isValid()
+	assert(Logic.isNotEmpty(self.platform), 'StreamKey: Platform is required')
+	assert(Logic.isNotEmpty(self.languageCode), 'StreamKey: Language Code is required')
+	assert(Logic.isNumeric(self.index), 'StreamKey: Platform Index must be numeric')
+	return true
+end
+
+function StreamKey._isStreamKey(value)
+	if type(value) == 'table' and type(value.is_a) == 'function' and value:is_a(StreamKey) then
+		return true
+	end
+	return false
+end
+StreamKey.__tostring = StreamKey.toString
 
 return StreamLinks
