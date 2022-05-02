@@ -108,10 +108,10 @@ function StreamLinks.processStreams(forwardedInputArgs)
 end
 
 --- StreamKey Class
--- Contains the truple that makes up a stream key
+-- Contains the triplet that makes up a stream key
 -- [platform, languageCode, index]
 StreamLinks.StreamKey = Class.new(
-	function (self,...)
+	function (self, ...)
 		self:new(...)
 	end
 )
@@ -151,14 +151,15 @@ end
 
 function StreamKey:_fromLegacy(input)
 	for _, platform in pairs(StreamLinks.countdownPlatformNames) do
-		-- The intersection between countdownPlatformNames and streamPlatformLookupNames are not valid platforms.
+		-- The intersection of values in countdownPlatformNames and keys in streamPlatformLookupNames
+		-- are not valid platforms.
 		if not StreamLinks.streamPlatformLookupNames[platform] then
 			-- Check if this platform matches the input
 			if string.find(input, platform, 1, true) then
 				local index
 				-- If the input is longer than the platform, there's an index at the end
 				if #input > #platform then
-					index = tonumber(input:sub(#platform+1))
+					index = tonumber(input:sub(#platform + 1))
 				else
 					index = 1
 				end
@@ -169,7 +170,7 @@ function StreamKey:_fromLegacy(input)
 end
 
 function StreamKey:toString()
-	return self.platform .. "_" .. self.languageCode .. "_" .. self.index
+	return self.platform .. '_' .. self.languageCode .. '_' .. self.index
 end
 
 function StreamKey:toLegacy()
