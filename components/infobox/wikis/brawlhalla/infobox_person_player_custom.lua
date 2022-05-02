@@ -41,10 +41,12 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
+	_player = player
 
 	player.getStatusToStore = CustomPlayer.getStatusToStore
 	player.adjustLPDB = CustomPlayer.adjustLPDB
@@ -74,7 +76,7 @@ function CustomInjector:addCustomCells(widgets)
 		player = _PAGENAME,
 	}
 
-	local currentYearEarnings = Player.earningsPerYear[_CURRENT_YEAR]
+	local currentYearEarnings = _player.earningsPerYear[_CURRENT_YEAR]
 	if currentYearEarnings then
 		currentYearEarnings = Math.round{currentYearEarnings}
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
