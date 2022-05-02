@@ -173,7 +173,11 @@ function StreamKey:toString()
 end
 
 function StreamKey:toLegacy()
-	return self.platform .. (self.index > 1 and self.index or '')
+	-- Return twitch instead of twitch1
+	if self.index == 1 then
+		return self.platform
+	end
+	return self.platform .. self.index
 end
 
 function StreamKey:_isValid()
