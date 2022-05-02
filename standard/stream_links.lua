@@ -124,9 +124,6 @@ function StreamKey:new(tbl, languageCode, index)
 		platform = tbl.platform
 		languageCode = tbl.languageCode
 		index = tbl.index
-	-- Input is another table, assume format is {platform, languageCode, index}
-	elseif type(tbl) == 'table' then
-		platform, languageCode, index = unpack(tbl)
 	-- All three parameters are supplied
 	elseif languageCode and index then
 		platform = tbl
