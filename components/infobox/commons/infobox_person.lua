@@ -58,7 +58,7 @@ function Person:createInfobox()
 	local links = Links.transform(args)
 	local personType = self:getPersonType(args)
 	--make earnings values available in the /Custom modules
-	Person.totalEarnings, Person.earningsPerYear = self:calculateEarnings(args)
+	self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
 
 	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
 			birthdate = args.birth_date,
