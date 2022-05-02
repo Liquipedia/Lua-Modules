@@ -156,12 +156,11 @@ function StreamKey:_fromLegacy(input)
 		if not StreamLinks.streamPlatformLookupNames[platform] then
 			-- Check if this platform matches the input
 			if string.find(input, platform, 1, true) then
-				local index
+				local index = 1
 				-- If the input is longer than the platform, there's an index at the end
+				-- e.g. twitch2
 				if #input > #platform then
 					index = tonumber(input:sub(#platform + 1))
-				else
-					index = 1
 				end
 				return platform, index
 			end
