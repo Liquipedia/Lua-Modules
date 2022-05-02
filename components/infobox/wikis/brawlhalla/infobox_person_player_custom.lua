@@ -10,7 +10,6 @@ local Player = require('Module:Infobox/Person')
 local Class = require('Module:Class')
 local Variables = require('Module:Variables')
 local Math = require('Module:Math')
-local Earnings = require('Module:Earnings')
 local ActiveYears = require('Module:YearsActive')
 local PlayersSignatureLegends = require('Module:PlayersSignatureLegends')
 
@@ -42,7 +41,6 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _earningsPerYear = {}
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
@@ -52,7 +50,6 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.getPersonType = CustomPlayer.getPersonType
 
-	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	return player:createInfobox(frame)
@@ -77,7 +74,7 @@ function CustomInjector:addCustomCells(widgets)
 		player = _PAGENAME,
 	}
 
-	local currentYearEarnings = _earningsPerYear[_CURRENT_YEAR]
+	local currentYearEarnings = Player.earningsPerYear[_CURRENT_YEAR]
 	if currentYearEarnings then
 		currentYearEarnings = Math.round{currentYearEarnings}
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
@@ -107,15 +104,6 @@ function CustomPlayer:adjustLPDB(lpdbData, _, personType)
 	lpdbData.extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive') or ''
 
 	return lpdbData
-end
-
-function CustomPlayer:calculateEarnings(args)
-	local totalEarnings
-	totalEarnings, _earningsPerYear = Earnings.calculateForPlayer{
-		player = args.earnings or self.pagename,
-		perYear = true
-	}
-	return totalEarnings, _earningsPerYear
 end
 
 function CustomPlayer:getStatusToStore()
