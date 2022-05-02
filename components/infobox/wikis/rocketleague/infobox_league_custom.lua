@@ -53,7 +53,7 @@ function CustomInjector:addCustomCells(widgets)
 		content = {CustomLeague:_createGameCell(args.game)}
 	})
 	table.insert(widgets, Cell{
-		name = 'Misc Mode:',
+		name = 'Misc Mode',
 		content = {args.miscmode}
 	})
 
