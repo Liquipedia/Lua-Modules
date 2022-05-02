@@ -238,6 +238,7 @@ function CustomPlayer._createLocation(country)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
+	countryDisplay = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 	local demonym = Localisation.getLocalisation(countryDisplay)
 
 	local roleCategory = _ROLES_CATEGORY[_args.role or ''] or 'Players'
@@ -245,12 +246,11 @@ function CustomPlayer._createLocation(country)
 
 	local categories = ''
 	if Namespace.isMain() then
-		categories = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
-		.. '[[Category:' .. demonym .. ' ' .. roleCategory .. ']]'
+		categories = '[[Category:' .. demonym .. ' ' .. roleCategory .. ']]'
 		.. '[[Category:' .. demonym .. ' ' .. role2Category .. ']]'
 	end
 
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. categories
+	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. countryDisplay .. categories
 
 end
 
