@@ -65,8 +65,8 @@ function StandingsStorage.fromTemplate(frame)
 		data.participant = 'tbd'
 		data.participantdisplay = 'TBD'
 	end
-	data.match = {data.win_m or 0, data.tie_m or 0, data.lost_m or 0}
-	data.game = {data.win_g or 0, data.tie_g or 0, data.lost_g or 0}
+	data.match = {data.win_m, data.tie_m, data.lose_m}
+	data.game = {data.win_g, data.tie_g, data.lose_g}
 	return StandingsStorage.run(data.placement, data)
 end
 
