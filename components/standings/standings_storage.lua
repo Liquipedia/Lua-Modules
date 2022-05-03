@@ -24,6 +24,7 @@ function StandingsStorage.run(index, data)
 			participantdisplay = data.participantdisplay,
 			participantflag = Flags.CountryCode(data.participantflag),
 			icon = data.icon,
+			icondark = data.icondark,
 			placement = data.placement or data.rank,
 			definitestatus = data.definitestatus or data.bg,
 			currentstatus = data.currentstatus or data.pbg,
