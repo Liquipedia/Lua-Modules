@@ -231,8 +231,8 @@ function p._getCasterInformation(name, flag, id)
 			limit = 1,
 		})
 		if type(data) == 'table' and data[1] then
-			flag = String.isEmpty(flag) and data[1].flag or flag
-			id = String.isEmpty(id) and data[1].id or id
+			flag = String.isNotEmpty(flag) and flag or data[1].flag
+			id = String.isNotEmpty(id) and id or data[1].id
 		end
 	end
 	if String.isNotEmpty(flag) then
