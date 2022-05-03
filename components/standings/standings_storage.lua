@@ -40,7 +40,7 @@ function StandingsStorage.run(index, data)
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
 			roundindex = data.roundindex,
 			parent = Variables.varDefault('tournament_parent', ''),
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json({data.extradata or {}})
+			extradata = mw.ext.LiquipediaDB.lpdb_create_json(data.extradata or {})
 		}
 	)
 end
