@@ -34,6 +34,7 @@ function StandingsStorage.run(index, data)
 				game = data.game, -- [won, draw, lost]
 				points = data.points,
 				diff = data.diff,
+				buchholz = data.buchholz,
 			}),
 			standingsindex = data.standingsindex,
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
