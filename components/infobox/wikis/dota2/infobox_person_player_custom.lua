@@ -238,8 +238,8 @@ function CustomPlayer._createLocation(country)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	countryDisplay = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 	local demonym = Localisation.getLocalisation(countryDisplay)
+	countryDisplay = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 
 	local roleCategory = _ROLES_CATEGORY[_args.role or ''] or 'Players'
 	local role2Category = _ROLES_CATEGORY[_args.role2 or ''] or 'Players'
