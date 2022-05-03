@@ -16,7 +16,7 @@ local Title = Class.new(
 	end
 )
 
-function Title:_make()
+function Title:make()
 	return {
 		Title:_create(self.content)
 	}

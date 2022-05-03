@@ -17,7 +17,7 @@ local Highlights = Class.new(
 	end
 )
 
-function Highlights:_make()
+function Highlights:make()
 	return Highlights:_highlights(self.list)
 end
 

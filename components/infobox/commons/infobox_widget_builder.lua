@@ -17,7 +17,7 @@ local Builder = Class.new(
 	end
 )
 
-function Builder:_make()
+function Builder:make()
 	local children = self.builder()
 	local widgets = {}
 	for _, child in ipairs(children or {}) do

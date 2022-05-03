@@ -68,7 +68,7 @@ function Cell:_content(...)
 	return self
 end
 
-function Cell:_make()
+function Cell:make()
 	self:_new(self.name)
 	self:_class(unpack(self.classes or {}))
 	self:_content(unpack(self.content))

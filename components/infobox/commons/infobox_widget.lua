@@ -25,15 +25,15 @@ function Widget:assertExistsAndCopy(value)
 end
 
 function Widget:make()
-	local result, output = pcall(self._make, self) -- Equivalent of self:create()
+	return error('A Widget must override the make() function!')
+end
+
+function Widget:tryMake()
+	local result, output = pcall(self.make, self) -- Equivalent of self:make()
 	if not result then
 		output = {String.interpolate(_ERROR_TEXT, {errorMessage = output})}
 	end
 	return output
-end
-
-function Widget:_make()
-	return error('A Widget must override the _make() function!')
 end
 
 function Widget:setContext(context)
