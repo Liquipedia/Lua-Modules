@@ -19,6 +19,7 @@ function StandingsStorage.run(index, data)
 		{
 			title = mw.text.trim(cleanedTitle),
 			tournament = data.tournament,
+			type = data.type,
 			participant = data.participant,
 			participantdisplay = data.participantdisplay,
 			participantflag = Flags.CountryCode(data.participantflag),
@@ -33,7 +34,7 @@ function StandingsStorage.run(index, data)
 				game = data.game, -- [won, draw, lost]
 				points = data.points,
 				diff = data.diff,
-
+				buchholz = data.buchholz,
 			}),
 			standingsindex = data.standingsindex,
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
