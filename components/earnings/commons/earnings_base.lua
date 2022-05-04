@@ -197,11 +197,11 @@ function Earnings._getPrizePoolType(divisionFactor)
 	return divisionFactor == nil and 'individualprizemoney' or 'prizemoney'
 end
 
-function Earnings._applyDivisionFactor(totalEarnings, prizeMoney, divisionFactor, mode)
-	if divisionFactor and prizeMoney then
-		prizeMoney = prizeMoney / divisionFactor(mode)
+function Earnings._applyDivisionFactor(prizeMoney, divisionFactor, mode)
+	if divisionFactor then
+		return prizeMoney / divisionFactor(mode)
 	end
-	return totalEarnings + prizeMoney
+	return prizeMoney
 end
 
 return Class.export(Earnings)
