@@ -35,8 +35,6 @@ local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
 local _warnings = {}
-local _earningsPerYear = {}
-local _totalEarnings
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -59,7 +57,8 @@ function Person:createInfobox()
 	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
 	local personType = self:getPersonType(args)
-	_totalEarnings, _earningsPerYear = self:calculateEarnings(args)
+	--make earnings values available in the /Custom modules
+	self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
 
 	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
 			birthdate = args.birth_date,
@@ -121,9 +120,9 @@ function Person:createInfobox()
 		Cell{name = 'Nicknames', content = {args.nicknames}},
 		Builder{
 			builder = function()
-				if _totalEarnings and _totalEarnings ~= 0 then
+				if self.totalEarnings and self.totalEarnings ~= 0 then
 					return {
-						Cell{name = 'Approx. Total Winnings', content = {'$' .. Language:formatNum(_totalEarnings)}},
+						Cell{name = 'Approx. Total Winnings', content = {'$' .. Language:formatNum(self.totalEarnings)}},
 					}
 				end
 			end
@@ -221,12 +220,12 @@ function Person:_setLpdbData(args, links, status, personType)
 		teamtemplate = teamTemplate,
 		status = status,
 		type = personType,
-		earnings = _totalEarnings,
+		earnings = self.totalEarnings,
 		links = links,
 		extradata = {},
 	}
 
-	for year, earningsOfYear in pairs(_earningsPerYear) do
+	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
 
