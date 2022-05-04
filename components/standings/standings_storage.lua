@@ -57,8 +57,8 @@ function StandingsStorage.fromTemplate(frame)
 	end
 
 	if data.team then
-		-- finds [[page|display]] and skips images (images have multiple |)
-		local teamParsed = string.match(data.team, '%[%[([^|]-)|[^|]-%]%]')
+		-- attempts to find [[teamPage|teamDisplay]] and skips images (images have multiple |)
+		local teamPage = string.match(data.team, '%[%[([^|]-)|[^|]-%]%]')
 		local date = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', nil)
 		local team
 
@@ -66,8 +66,8 @@ function StandingsStorage.fromTemplate(frame)
 		if data.team and mw.ext.TeamTemplate.teamexists(data.team) then
 			team = mw.ext.TeamTemplate.raw(data.team, date)
 		-- Input is link (possiblity with icon etc), and we managed to parse it
-		elseif teamParsed and mw.ext.TeamTemplate.teamexists(teamParsed) then
-			team = mw.ext.TeamTemplate.raw(teamParsed, date)
+		elseif teamPage and mw.ext.TeamTemplate.teamexists(teamPage) then
+			team = mw.ext.TeamTemplate.raw(teamPage, date)
 		end
 
 		if team then
