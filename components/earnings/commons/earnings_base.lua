@@ -142,7 +142,8 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 		for _, item in pairs(lpdbQueryData) do
 			local year = string.sub(item.date, 1, 4)
 			local prizeMoney = tonumber(item[prizePoolColumn]) or 0
-			earningsData[year] = (earningsData[year] or 0) + Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item['mode'])
+			earningsData[year] = (earningsData[year] or 0)
+				+ Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item['mode'])
 		end
 		count = #lpdbQueryData
 		offset = offset + _MAX_QUERY_LIMIT
