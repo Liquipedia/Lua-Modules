@@ -225,7 +225,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		extradata = {},
 	}
 
-	for year, earningsOfYear in pairs(self.earningsPerYear) do
+	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
 
