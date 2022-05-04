@@ -13,8 +13,6 @@ local Math = require('Module:Math')
 local ActiveYears = require('Module:YearsActive')
 local PlayersSignatureLegends = require('Module:PlayersSignatureLegends')
 
-local _PAGENAME = mw.title.getCurrentTitle().prefixedText
-
 --role stuff tables
 local _ROLES = {
 	['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
@@ -73,7 +71,7 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	local yearsActive = ActiveYears.display{
-		player = _PAGENAME,
+		player = _player.pagename,
 	}
 
 	local currentYearEarnings = _player.earningsPerYear[_CURRENT_YEAR]
@@ -89,7 +87,7 @@ function CustomInjector:addCustomCells(widgets)
 		},
 		Cell{name = 'Years active', content = {yearsActive}},
 		Cell{name = 'Main Legends', content = {PlayersSignatureLegends.get{
-			player = _PAGENAME,
+			player = _player.pagename,
 		}}},
 	}
 end
