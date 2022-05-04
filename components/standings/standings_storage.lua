@@ -48,23 +48,34 @@ end
 
 function StandingsStorage.fromTemplate(frame)
 	local data = Arguments.getArgs(frame)
+
 	if not data.standingsindex or not data.roundindex or not data.placement then
 		return
 	end
-
-	 -- finds [[page|display]] and skips images (images have multiple |)
-	data.team = string.match(data.team, '%[%[([^|]-)|[^|]-%]%]')
-	if data.team and mw.ext.TeamTemplate.teamexists(data.team) then
-		local team = mw.ext.TeamTemplate.raw(data.team)
-		data.participant = team.page
-		data.participantdisplay = team.name
-		data.participantflag = ''
-		data.icon = team.image
-		data.icondark = team.imagedark
-	else
-		data.participant = 'tbd'
-		data.participantdisplay = 'TBD'
+	if not data.team and not data.player then
+		return
 	end
+
+	if data.team then
+		-- finds [[page|display]] and skips images (images have multiple |)
+		data.team = string.match(data.team, '%[%[([^|]-)|[^|]-%]%]')
+		if data.team and mw.ext.TeamTemplate.teamexists(data.team) then
+			local date = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', nil)
+			local team = mw.ext.TeamTemplate.raw(data.team, date)
+			data.participant = team.page
+			data.participantdisplay = team.name
+			data.participantflag = ''
+			data.icon = team.image
+			data.icondark = team.imagedark
+		else
+			data.participant = 'tbd'
+			data.participantdisplay = 'TBD'
+		end
+	elseif data.player then
+		data.participant, data.participantdisplay = string.match(data.team, '%[%[([^|]-)|([^|]-)%]%]')
+		-- TODO: sanity checks and parse flag
+	end
+
 	data.match = {data.win_m, data.tie_m, data.lose_m}
 	data.game = {data.win_g, data.tie_g, data.lose_g}
 	return StandingsStorage.run(data.placement, data)
