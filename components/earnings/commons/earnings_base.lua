@@ -115,7 +115,7 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 
 	for _, item in ipairs(lpdbQueryData) do
 		local prizeMoney = item['sum_' .. prizePoolColumn]
-		totalEarnings = Earnings._applyDivisionFactor(totalEarnings, prizeMoney, divisionFactor, item['mode'])
+		totalEarnings = totalEarnings + Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item['mode'])
 	end
 
 	return MathUtils._round(totalEarnings)
