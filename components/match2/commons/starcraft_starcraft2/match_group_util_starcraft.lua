@@ -269,7 +269,7 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 		scores[opponentIx] = 0
 	end
 	for _, game in pairs(games) do
-		if game.map and String.startsWith(game.map, 'Submatch') then
+		if game.map and String.startsWith(game.map, 'Submatch') and not game.resultType then
 			for opponentIx, score in pairs(scores) do
 				scores[opponentIx] = score + (game.scores[opponentIx] or 0)
 			end
