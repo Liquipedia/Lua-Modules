@@ -227,7 +227,7 @@ function CustomSeries._createTier(tier, tierType)
 		return nil
 	end
 
-	local tierText = Tier['text'][tier]
+	local tierText = Tier.text.tiers[tier]
 	local hasInvalidTier = tierText == nil
 	tierText = tierText or tier
 
@@ -237,8 +237,8 @@ function CustomSeries._createTier(tier, tierType)
 	local output = '[[' .. tierText .. ' Tournaments|'
 
 	if hasTierType then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
+		tierType = Tier.text.types[string.lower(tierType or '')] or tierType
+		hasInvalidTierType = Tier.text.types[string.lower(tierType or '')] == nil
 
 		output = output .. tierType .. '&nbsp;(' .. tierText .. ')'
 	else
