@@ -11,6 +11,7 @@ local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
@@ -197,8 +198,11 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	local function buildTierString(tierString)
 		local tierText = Tier.text[tierString]
 		if not tierText then
-			table.insert(_league.warnings, tierString .. ' is not a known Liquipedia Tier/Tiertype')
-			return '[[Category:Pages invalid tier or tiertype]]'
+			table.insert(
+				_league.warnings,
+				tierString .. ' is not a known Liquipedia Tier/Tiertype[[Category:Pages invalid tier or tiertype]]'
+			)
+			return ''
 		else
 			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
 		end
@@ -211,8 +215,10 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	end
 
 	if not Logic.isNumeric(tier) then
-		table.insert(_league.warnings, tierString .. ' is not numeric')
-		tierDisplay = tierDisplay .. '[[Category:Pages with non-numeric tier]]'
+		table.insert(
+			_league.warnings,
+			tierString .. ' is not numeric[[Category:Pages with non-numeric tier]]'
+		)
 	end
 
 	return tierDisplay
