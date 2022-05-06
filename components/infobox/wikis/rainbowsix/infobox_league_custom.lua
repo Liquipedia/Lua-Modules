@@ -217,7 +217,7 @@ function CustomLeague:_createLiquipediaTierDisplay()
 	if not Logic.isNumeric(tier) then
 		table.insert(
 			_league.warnings,
-			tierString .. ' is not numeric[[Category:Pages with non-numeric tier]]'
+			tier .. ' is not numeric[[Category:Pages with non-numeric tier]]'
 		)
 	end
 
