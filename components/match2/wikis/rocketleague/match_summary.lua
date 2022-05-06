@@ -42,8 +42,7 @@ local Casters = Class.new(
 
 function Casters:addCaster(caster)
 	if Logic.isNotEmpty(caster) then
-		local nameDisplay = caster.id or caster.name
-		nameDisplay = '[[' .. caster.name .. '|' .. nameDisplay .. ']]'
+		local nameDisplay = '[[' .. caster.name .. '|' .. caster.dname .. ']]'
 		if caster.flag then
 			table.insert(self.casters, Flags.Icon(caster['flag']) .. ' ' .. nameDisplay)
 		else
