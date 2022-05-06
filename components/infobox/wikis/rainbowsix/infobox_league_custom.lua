@@ -198,7 +198,7 @@ function CustomLeague:_createLiquipediaTierDisplay()
 		local tierText = Tier.text[tierString]
 		if not tierText then
 			table.insert(_league.warnings, tierString .. ' is not a known Liquipedia Tier/Tiertype')
-			return ''
+			return '[[Category:Pages invalid tier or tiertype]]'
 		else
 			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
 		end
@@ -208,6 +208,11 @@ function CustomLeague:_createLiquipediaTierDisplay()
 
 	if String.isNotEmpty(tierType) then
 		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
+	end
+
+	if not Logic.isNumeric(tier) then
+		table.insert(_league.warnings, tierString .. ' is not numeric')
+		tierDisplay = tierDisplay .. '[[Category:Pages with non-numeric tier]]'
 	end
 
 	return tierDisplay
