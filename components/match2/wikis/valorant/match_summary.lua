@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local AgentIcon = require("Module:AgentIcon")
 local Class = require('Module:Class')
 local Logic = require("Module:Logic")
 local Lua = require('Module:Lua')
@@ -43,7 +44,7 @@ function Agents:add(frame, agent)
 		return self
 	end
 
-	self.text = self.text .. Template.safeExpand(frame, 'AgentBracket/' .. agent)
+	self.text = self.text .. AgentIcon._getBracketIcon{agent}
 	return self
 end
 
