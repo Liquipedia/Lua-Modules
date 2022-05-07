@@ -196,7 +196,7 @@ function matchFunctions.getExtraData(match)
 			match[key .. 'name']
 		))
 	end
-	table.sort(casters, function(c1, c2) return c1.dname:lower() < c2.dname:lower() end)
+	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
@@ -212,14 +212,14 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
-function p._getCasterInformation(name, flag, dname)
+function p._getCasterInformation(name, flag, displayName)
 	if String.isEmpty(flag) then
 		flag = Variables.varDefault(name .. '_flag')
 	end
-	if String.isEmpty(dname) then
-		dname = Variables.varDefault(name .. '_dn')
+	if String.isEmpty(displayName) then
+		displayName = Variables.varDefault(name .. '_dn')
 	end
-	if String.isEmpty(flag) or String.isEmpty(dname) then
+	if String.isEmpty(flag) or String.isEmpty(displayName) then
 		local parent = Variables.varDefault(
 			'tournament_parent',
 			mw.title.getCurrentTitle().text
@@ -232,21 +232,21 @@ function p._getCasterInformation(name, flag, dname)
 		})
 		if type(data) == 'table' and data[1] then
 			flag = String.isNotEmpty(flag) and flag or data[1].flag
-			dname = String.isNotEmpty(dname) and dname or data[1].id
+			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
 		end
 	end
 	if String.isNotEmpty(flag) then
 		Variables.varDefine(name .. '_flag', flag)
 	end
-	if String.isEmpty(dname) then
-		dname = name
+	if String.isEmpty(displayName) then
+		displayName = name
 	end
-	if String.isNotEmpty(dname) then
-		Variables.varDefine(name .. '_dn', dname)
+	if String.isNotEmpty(displayName) then
+		Variables.varDefine(name .. '_dn', displayName)
 	end
 	return {
 		name = name,
-		dname = dname,
+		displayName = displayName,
 		flag = flag,
 	}
 end
