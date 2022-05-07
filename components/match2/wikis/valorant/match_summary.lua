@@ -6,9 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AgentIcon = require("Module:AgentIcon")
+local AgentIcon = require('Module:AgentIcon')
 local Class = require('Module:Class')
-local Logic = require("Module:Logic")
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
