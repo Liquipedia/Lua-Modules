@@ -60,7 +60,7 @@ function StandingsStorage.fromTemplate(frame)
 	if data.team then
 		-- attempts to find [[teamPage|teamDisplay]] and skips images (images have multiple |)
 		local teamPage = string.match(data.team, '%[%[([^|]-)|[^|]-%]%]')
-		local date = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', nil)
+		local date = Variables.varDefault('tournament_startdate', Variables.varDefault('tournament_enddate'))
 		local team
 
 		-- Input contains an actual team
