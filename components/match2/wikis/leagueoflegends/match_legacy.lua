@@ -47,6 +47,11 @@ function MatchLegacy._convertParameters(match2)
 		match.walkover = match.winner
 	end
 
+	if match.resulttype == 'draw' then
+		match.resulttype = ''
+		match.winner = 'draw'
+	end
+
 	match.staticid = 'Legacy_' .. match2.match2id
 
 	-- Handle extradata fields
