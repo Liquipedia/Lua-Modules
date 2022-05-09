@@ -8,7 +8,7 @@
 
 local Custom = require('Module:TeamCard/Custom')
 local String = require('Module:StringUtils')
--- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier
+-- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier Module
 local Qualifier = require('Module:TeamCard/Qualifier')
 local Variables = require('Module:Variables')
 
@@ -16,7 +16,6 @@ local TeamCardStorage = {}
 
 function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	local team, teamTemplateName
-	local image, imageDark
 
 	if type(teamObject) == 'table' then
 		if teamObject.team2 or teamObject.team3 then
@@ -24,60 +23,68 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 		else
 			teamTemplateName = teamObject.teamtemplate
 			team = teamObject.lpdb
-			image = args.image1
-			imageDark = args.imagedark1
 		end
 	end
 
 	local smwPrefix = args.smw_prefix or args['smw prefix']
 					  or Variables.varDefault('smw prefix', Variables.varDefault('smw_prefix', ''))
-	local qualifierText, qualifierPage, qualifierUrl = Qualifier.parseQualifier(args.qualifier)
-	local title = mw.title.getCurrentTitle().text
-	local date = Variables.varDefault('tournament_date')
-	local endDate = Variables.varDefault('tournament_enddate', Variables.varDefault('tournament_edate', date))
-	local startDate = Variables.varDefault('tournament_startdate', Variables.varDefault('tournament_sdate', date))
 
-	local lpdbData = {
-		tournament = Variables.varDefault('tournament name pp') or Variables.varDefault('tournament_name') or title,
-		series = Variables.varDefault('tournament_series'),
-		parent = Variables.varDefault('tournament_parent'),
-		image = image,
-		imagedark = imageDark,
-		startdate = startDate,
-		date = args.date or Variables.varDefault('enddate_' .. team .. smwPrefix .. '_date') or endDate,
-		participant = team,
-		participanttemplate = teamTemplateName,
-		players = players,
-		individualprizemoney = playerPrize,
-		mode = Variables.varDefault('tournament_mode', 'team'),
-		publishertier = Variables.varDefault('tournament_publisher_tier'),
-		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icondark'),
-		game = Variables.varDefault('tournament_game'),
-		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
-		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		qualifier = qualifierText,
-		qualifierpage = qualifierPage,
-		qualifierurl = qualifierUrl,
-		extradata = {},
-	}
+	-- Setup LPDB Data
+	local lpdbData = {}
+	lpdbData = TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, smwPrefix)
+	lpdbData.participanttemplate = teamTemplateName
+	lpdbData.players = players
+	lpdbData.individualprizemoney = playerPrize
 
 	-- If a custom override for LPDB exists, use it
-	lpdbData = Custom.adjustLPDB and Custom.adjustLPDB(lpdbData, team, args, smwPrefix) or lpdbData
+	lpdbData = Custom.adjustLpdb and Custom.adjustLpdb(lpdbData, team, args, smwPrefix) or lpdbData
 
-	-- Create jsons on json fields
+	-- Jsonify the json fields
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
 	lpdbData.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.players)
 
 	-- Name must match prize pool insertion
-	local storageName = Custom.getLPDBObjectName and Custom.getLPDBObjectName(team, smwPrefix)
-						or TeamCardStorage._getLPDBObjectName(team, smwPrefix)
+	local storageName = Custom.getLpdbObjectName and Custom.getLpdbObjectName(team, smwPrefix)
+						or TeamCardStorage._getLpdbObjectName(team, smwPrefix)
 
 	mw.ext.LiquipediaDB.lpdb_placement(storageName, lpdbData)
 end
 
+-- Adds basic lpdb fields
+function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, smwPrefix)
+	local title = mw.title.getCurrentTitle().text
+	local tournamentName = Variables.varDefault('tournament name pp') or Variables.varDefault('tournament_name')
+	local date = Variables.varDefault('tournament_date')
+	local startDate = Variables.varDefault('tournament_startdate', Variables.varDefault('tournament_sdate', date))
+	local endDate = Variables.varDefault('tournament_enddate', Variables.varDefault('tournament_edate', date))
+
+	lpdbData.participant = team
+	lpdbData.tournament = tournamentName or title
+	lpdbData.series = Variables.varDefault('tournament_series')
+	lpdbData.parent = Variables.varDefault('tournament_parent')
+	lpdbData.startdate = startDate
+	lpdbData.date = args.date or Variables.varDefault('enddate_' .. team .. smwPrefix .. '_date') or endDate
+	lpdbData.qualifier, lpdbData.qualifierpage, lpdbData.qualifierurl = Qualifier.parseQualifier(args.qualifier)
+
+	if team ~= 'TBD' then
+		lpdbData.image = args.image1
+		lpdbData.imagedark = args.imagedark1
+	end
+
+	lpdbData.mode = Variables.varDefault('tournament_mode', 'team')
+	lpdbData.publishertier = Variables.varDefault('tournament_publisher_tier')
+	lpdbData.icon = Variables.varDefault('tournament_icon')
+	lpdbData.icondark = Variables.varDefault('tournament_icondark')
+	lpdbData.game = Variables.varDefault('tournament_game')
+	lpdbData.liquipediatier = Variables.varDefault('tournament_liquipediatier')
+	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')
+	lpdbData.extradata = {}
+
+	return lpdbData
+end
+
 -- Build the standard LPDB "Object Name", which is used as primary key in the DB record
-function TeamCardStorage._getLPDBObjectName(team, smwPrefix)
+function TeamCardStorage._getLpdbObjectName(team, smwPrefix)
 	local storageName = 'ranking'
 	if String.isNotEmpty(smwPrefix) then
 		storageName = storageName .. '_' .. smwPrefix
