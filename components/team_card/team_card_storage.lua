@@ -15,14 +15,14 @@ local Variables = require('Module:Variables')
 local TeamCardStorage = {}
 
 function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
-	local team, teamTemplate
+	local team, teamTemplateName
 	local image, imageDark
 
 	if type(teamObject) == 'table' then
 		if teamObject.team2 or teamObject.team3 then
 			team = 'TBD'
 		else
-			teamTemplate = teamObject.teamtemplate
+			teamTemplateName = teamObject.teamtemplate
 			team = teamObject.lpdb
 			image = args.image1
 			imageDark = args.imagedark1
@@ -44,7 +44,7 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 		startdate = Variables.varDefault('tournament_sdate', Variables.varDefault('tournament_date')),
 		date = args.date or Variables.varDefault('enddate_' .. team .. smwPrefix .. '_date', endDate),
 		participant = team,
-		participanttemplate = teamTemplate,
+		participanttemplate = teamTemplateName,
 		players = players,
 		individualprizemoney = playerPrize,
 		mode = Variables.varDefault('tournament_mode', 'team'),
@@ -72,22 +72,19 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 						or TeamCardStorage._getDefaultStorageName(team, smwPrefix)
 
 	mw.ext.LiquipediaDB.lpdb_placement(storageName, lpdbData)
-
-	if team == 'TBD' then
-		-- Increase the wiki-variable TBD_placements by 1
-		Variables.varDefine('TBD_placements', tonumber(Variables.varDefault('TBD_placements', '1')) + 1)
-	end
 end
 
 -- Default storage (object) name format
-function TeamCardStorage.getDefaultStorageName(team, smwPrefix)
+function TeamCardStorage._getDefaultStorageName(team, smwPrefix)
 	local storageName = 'ranking'
 	if String.isNotEmpty(smwPrefix) then
 		storageName = storageName .. '_' .. smwPrefix
 	end
 	storageName = storageName .. '_' ..  mw.ustring.lower(team)
 	if team == 'TBD' then
-		storageName = storageName .. '_' .. Variables.varDefault('TBD_placements', '1')
+		local placement = tonumber(Variables.varDefault('TBD_placements', '1'))
+		storageName = storageName .. '_' .. placement
+		Variables.varDefine('TBD_placements', placement + 1)
 	end
 	return storageName
 end
