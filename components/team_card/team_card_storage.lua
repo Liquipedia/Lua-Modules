@@ -31,7 +31,7 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 
 	local smwPrefix = args.smw_prefix or args['smw prefix']
 					  or Variables.varDefault('smw prefix', Variables.varDefault('smw_prefix', ''))
-	local qualifierText, qualifierInternal, qualifierExternal = Qualifier.parseQualifier(args.qualifier)
+	local qualifierText, qualifierPage, qualifierUrl = Qualifier.parseQualifier(args.qualifier)
 	local title = mw.title.getCurrentTitle().text
 	local endDate = Variables.varDefault('tournament_edate', Variables.varDefault('tournament_date'))
 
@@ -55,8 +55,8 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
 		qualifier = qualifierText,
-		qualifierpage = qualifierInternal,
-		qualifierurl = qualifierExternal,
+		qualifierpage = qualifierPage,
+		qualifierurl = qualifierUrl,
 		extradata = {},
 	}
 
