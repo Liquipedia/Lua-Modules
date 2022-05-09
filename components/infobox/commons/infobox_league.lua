@@ -210,7 +210,7 @@ function League:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
---- Allows for overriding this functionality
+--- Export this function as it gets called for some checks in /Custom
 function League:createPrizepool(args)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return nil
