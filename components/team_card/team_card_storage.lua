@@ -33,16 +33,18 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 					  or Variables.varDefault('smw prefix', Variables.varDefault('smw_prefix', ''))
 	local qualifierText, qualifierPage, qualifierUrl = Qualifier.parseQualifier(args.qualifier)
 	local title = mw.title.getCurrentTitle().text
-	local endDate = Variables.varDefault('tournament_edate', Variables.varDefault('tournament_date'))
+	local date = Variables.varDefault('tournament_date')
+	local endDate = Variables.varDefault('tournament_enddate', Variables.varDefault('tournament_edate', date))
+	local startDate = Variables.varDefault('tournament_startdate', Variables.varDefault('tournament_sdate', date))
 
 	local lpdbData = {
-		tournament = Variables.varDefault('tournament name pp', Variables.varDefault('tournament_name', title)),
+		tournament = Variables.varDefault('tournament name pp') or Variables.varDefault('tournament_name') or title,
 		series = Variables.varDefault('tournament_series'),
 		parent = Variables.varDefault('tournament_parent'),
 		image = image,
 		imagedark = imageDark,
-		startdate = Variables.varDefault('tournament_sdate', Variables.varDefault('tournament_date')),
-		date = args.date or Variables.varDefault('enddate_' .. team .. smwPrefix .. '_date', endDate),
+		startdate = startDate,
+		date = args.date or Variables.varDefault('enddate_' .. team .. smwPrefix .. '_date') or endDate,
 		participant = team,
 		participanttemplate = teamTemplateName,
 		players = players,
@@ -68,14 +70,14 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	lpdbData.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.players)
 
 	-- Name must match prize pool insertion
-	local storageName = Custom.getLPDBStorageName and Custom.getLPDBStorageName(team, smwPrefix)
-						or TeamCardStorage._getDefaultStorageName(team, smwPrefix)
+	local storageName = Custom.getLPDBObjectName and Custom.getLPDBObjectName(team, smwPrefix)
+						or TeamCardStorage._getLPDBObjectName(team, smwPrefix)
 
 	mw.ext.LiquipediaDB.lpdb_placement(storageName, lpdbData)
 end
 
--- Default storage (object) name format
-function TeamCardStorage._getDefaultStorageName(team, smwPrefix)
+-- Build the standard LPDB "Object Name", which is used as primary key in the DB record
+function TeamCardStorage._getLPDBObjectName(team, smwPrefix)
 	local storageName = 'ranking'
 	if String.isNotEmpty(smwPrefix) then
 		storageName = storageName .. '_' .. smwPrefix
