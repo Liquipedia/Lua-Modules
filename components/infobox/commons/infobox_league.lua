@@ -214,22 +214,40 @@ function League:addToLpdb(lpdbData, args)
 end
 
 --- Allows for overriding this functionality
-function League:createPrizepool(args)
-	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
+function League:createLiquipediaTierDisplay(args)
+	local tier = args.liquipediatier or ''
+	local tierType = args.liquipediatiertype or ''
+	if String.isEmpty(tier) then
 		return nil
 	end
-	local date
-	if String.isNotEmpty(args.currency_rate) then
-		date = args.currency_date
+
+	local function buildTierString(tierString, tierMode)
+		local tierText
+		if not Tier.text[tierMode] then -- allow legacy tier modules
+			tierText = Tier.text[tierString]
+		else -- default case, i.e. tier module with intended format
+			tierText = Tier.text[tierMode][tierString]
+		end
+		if not tierText then
+			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
+			table.insert(
+				self.warnings,
+				tierString .. ' is not a known Liquipedia ' .. tierMode
+					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
+			)
+			return ''
+		else
+			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
+		end
 	end
 
-	return PrizePoolCurrency._get{
-		prizepool = args.prizepool,
-		prizepoolusd = args.prizepoolusd,
-		currency = args.localcurrency,
-		rate = args.currency_rate,
-		date = date or Variables.varDefault('tournament_enddate', _TODAY),
-	}
+	local tierDisplay = buildTierString(tier, _TIER_MODE_TIERS)
+
+	if String.isNotEmpty(tierType) then
+		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
+	end
+
+	return tierDisplay
 end
 
 function League:_definePageVariables(args)
