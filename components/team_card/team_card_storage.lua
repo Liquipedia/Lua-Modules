@@ -29,17 +29,20 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 		end
 	end
 
-	local smw_prefix = args.smw_prefix or args['smw prefix'] or Variables.varDefault('smw prefix', Variables.varDefault('smw_prefix', ''))
+	local smwPrefix = args.smw_prefix or args['smw prefix'] or
+                      Variables.varDefault('smw prefix', Variables.varDefault('smw_prefix', ''))
 	local qualifierText, qualifierInternal, qualifierExternal = Qualifier.parseQualifier(args.qualifier)
+    local title = mw.title.getCurrentTitle().text
+    local endDate = Variables.varDefault('tournament_edate', Variables.varDefault('tournament_date'))
 
 	local lpdbData = {
-		tournament = Variables.varDefault('tournament name pp', Variables.varDefault('tournament_name', mw.title.getCurrentTitle().text)),
+		tournament = Variables.varDefault('tournament name pp', Variables.varDefault('tournament_name', title)),
 		series = Variables.varDefault('tournament_series'),
 		parent = Variables.varDefault('tournament_parent'),
 		image = image,
 		imagedark = imageDark,
 		startdate = Variables.varDefault('tournament_sdate', Variables.varDefault('tournament_date')),
-		date = args.date or Variables.varDefault('enddate_' .. team .. smw_prefix .. '_date', Variables.varDefault('tournament_edate', Variables.varDefault('tournament_date'))),
+		date = args.date or Variables.varDefault('enddate_' .. team .. smwPrefix .. '_date', endDate),
 		participant = team,
 		participanttemplate = teamTemplate,
 		players = players,
@@ -58,20 +61,20 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	}
 
 	-- If a custom override for LPDB exists, use it
-	lpdbData = Custom.adjustLPDB and Custom.adjustLPDB(lpdbData, team, args, smw_prefix) or lpdbData
+	lpdbData = Custom.adjustLPDB and Custom.adjustLPDB(lpdbData, team, args, smwPrefix) or lpdbData
 
 	-- Create jsons on json fields
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
 	lpdbData.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.players)
 
 	-- Name must match prize pool insertion
-	local storageName = Custom.getLPDBStorageName and Custom.getLPDBStorageName(team, smw_prefix)
+	local storageName = Custom.getLPDBStorageName and Custom.getLPDBStorageName(team, smwPrefix)
 
 	if not storageName then
 		-- Default name format if no custom exists
 		storageName = 'ranking'
-		if String.isNotEmpty(smw_prefix) then
-			storageName = storageName .. '_' .. smw_prefix
+		if String.isNotEmpty(smwPrefix) then
+			storageName = storageName .. '_' .. smwPrefix
 		end
 		storageName = storageName .. '_' ..  mw.ustring.lower(team)
 		if team == 'TBD' then
