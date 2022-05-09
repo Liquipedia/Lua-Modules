@@ -29,11 +29,11 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 		end
 	end
 
-	local smwPrefix = args.smw_prefix or args['smw prefix'] or
-                      Variables.varDefault('smw prefix', Variables.varDefault('smw_prefix', ''))
+	local smwPrefix = args.smw_prefix or args['smw prefix']
+					  or Variables.varDefault('smw prefix', Variables.varDefault('smw_prefix', ''))
 	local qualifierText, qualifierInternal, qualifierExternal = Qualifier.parseQualifier(args.qualifier)
-    local title = mw.title.getCurrentTitle().text
-    local endDate = Variables.varDefault('tournament_edate', Variables.varDefault('tournament_date'))
+	local title = mw.title.getCurrentTitle().text
+	local endDate = Variables.varDefault('tournament_edate', Variables.varDefault('tournament_date'))
 
 	local lpdbData = {
 		tournament = Variables.varDefault('tournament name pp', Variables.varDefault('tournament_name', title)),
@@ -69,24 +69,27 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 
 	-- Name must match prize pool insertion
 	local storageName = Custom.getLPDBStorageName and Custom.getLPDBStorageName(team, smwPrefix)
-
-	if not storageName then
-		-- Default name format if no custom exists
-		storageName = 'ranking'
-		if String.isNotEmpty(smwPrefix) then
-			storageName = storageName .. '_' .. smwPrefix
-		end
-		storageName = storageName .. '_' ..  mw.ustring.lower(team)
-		if team == 'TBD' then
-			storageName = storageName .. '_' .. Variables.varDefault('TBD_placements', '1')
-		end
-	end
+						or TeamCardStorage._getDefaultStorageName(team, smwPrefix)
 
 	mw.ext.LiquipediaDB.lpdb_placement(storageName, lpdbData)
 
 	if team == 'TBD' then
+		-- Increase the wiki-variable TBD_placements by 1
 		Variables.varDefine('TBD_placements', tonumber(Variables.varDefault('TBD_placements', '1')) + 1)
 	end
+end
+
+-- Default storage (object) name format
+function TeamCardStorage.getDefaultStorageName(team, smwPrefix)
+	local storageName = 'ranking'
+	if String.isNotEmpty(smwPrefix) then
+		storageName = storageName .. '_' .. smwPrefix
+	end
+	storageName = storageName .. '_' ..  mw.ustring.lower(team)
+	if team == 'TBD' then
+		storageName = storageName .. '_' .. Variables.varDefault('TBD_placements', '1')
+	end
+	return storageName
 end
 
 return TeamCardStorage
