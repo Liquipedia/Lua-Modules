@@ -23,8 +23,6 @@ local WarningBox = require('Module:WarningBox')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 
-local _TODAY = os.date('%Y-%m-%d', os.time())
-
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
