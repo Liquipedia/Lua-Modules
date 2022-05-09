@@ -136,18 +136,18 @@ function League:createInfobox()
 		},
 		Cell{name = 'Venue', content = {args.venue}},
 		Cell{name = 'Format', content = {args.format}},
-		Customizable{id = 'prizepool', children = {
-			Cell{
-					name = 'Prize pool',
-					content = {self:createPrizepool(args)},
-				},
-			},
-		},
+		Customizable{id = 'prizepool', children = {}},
 		Cell{name = 'Date', content = {args.date}},
 		Cell{name = 'Start Date', content = {args.sdate}},
 		Cell{name = 'End Date', content = {args.edate}},
 		Customizable{id = 'custom', children = {}},
-		Customizable{id = 'liquipediatier', children = {}},
+		Customizable{id = 'liquipediatier', children = {
+				Cell{
+					name = 'Liquipedia tier',
+					content = {self:createLiquipediaTierDisplay(args)},
+				},
+			},
+		},
 		Builder{
 			builder = function()
 				links = Links.transform(args)
