@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
@@ -21,6 +21,7 @@ local Page = require('Module:Page')
 local LeagueIcon = require('Module:LeagueIcon')
 local WarningBox = require('Module:WarningBox')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -132,7 +133,13 @@ function League:createInfobox()
 		},
 		Cell{name = 'Venue', content = {args.venue}},
 		Cell{name = 'Format', content = {args.format}},
-		Customizable{id = 'prizepool', children = {}},
+		Customizable{id = 'prizepool', children = {
+			Cell{
+					name = 'Prize pool',
+					content = {self:createPrizepool(args)},
+				},
+			},
+		},
 		Cell{name = 'Date', content = {args.date}},
 		Cell{name = 'Start Date', content = {args.sdate}},
 		Cell{name = 'End Date', content = {args.edate}},
@@ -201,6 +208,25 @@ end
 --- Allows for overriding this functionality
 function League:addToLpdb(lpdbData, args)
 	return lpdbData
+end
+
+--- Allows for overriding this functionality
+function League:createPrizepool(args)
+	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
+		return nil
+	end
+	local date
+	if String.isNotEmpty(args.currency_rate) then
+		date = args.currency_date
+	end
+
+	return PrizePoolCurrency._get{
+		prizepool = args.prizepool,
+		prizepoolusd = args.prizepoolusd,
+		currency = args.localcurrency,
+		rate = args.currency_rate,
+		date = date or Variables.varDefault('tournament_enddate', _TODAY),
+	}
 end
 
 function League:_definePageVariables(args)
