@@ -145,6 +145,7 @@ function League:createInfobox()
 				Cell{
 					name = 'Liquipedia tier',
 					content = {self:createLiquipediaTierDisplay(args)},
+					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
 				},
 			},
 		},
@@ -211,6 +212,11 @@ end
 --- Allows for overriding this functionality
 function League:addToLpdb(lpdbData, args)
 	return lpdbData
+end
+
+--- Allows for overriding this functionality
+function League:liquipediaTierHighlighted(args)
+	return false
 end
 
 --- Allows for overriding this functionality
