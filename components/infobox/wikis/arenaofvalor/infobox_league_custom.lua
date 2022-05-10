@@ -21,7 +21,6 @@ local CustomInjector = Class.new(Injector)
 local _args
 local _game
 
-local _TODAY = os.date('%Y-%m-%d', os.time())
 local _GAME = mw.loadData('Module:GameVersion')
 
 function CustomLeague.run(frame)
