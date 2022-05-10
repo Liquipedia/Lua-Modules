@@ -16,8 +16,6 @@ local Cell = require('Module:Infobox/Widget/Cell')
 
 local SUPERCELL_SPONSORED_ICON = '[[File:Supercell icon.png|x18px|link=Supercell|Tournament sponsored by Supercell.]]'
 
-local _TODAY = os.date('%Y-%m-%d', os.time())
-
 local _args
 local _league
 
