@@ -8,7 +8,6 @@
 
 local League = require('Module:Infobox/League')
 local String = require('Module:String')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
 local PageLink = require('Module:Page')
@@ -26,8 +25,6 @@ local CustomInjector = Class.new(Injector)
 local _args
 local _game
 
-local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
-local _TODAY = os.date('%Y-%m-%d', os.time())
 local _GAME = mw.loadData('Module:GameVersion')
 
 function CustomLeague.run(frame)
