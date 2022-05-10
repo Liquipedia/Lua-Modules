@@ -20,7 +20,6 @@ local Center = require('Module:Infobox/Widget/Center')
 local _GAME_MODE = mw.loadData('Module:GameMode')
 local _EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
 	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
-local _TODAY = os.date('%Y-%m-%d', os.time())
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
