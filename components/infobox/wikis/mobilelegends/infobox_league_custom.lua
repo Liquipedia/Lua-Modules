@@ -21,8 +21,6 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
-local _TODAY = os.date('%Y-%m-%d', os.time())
-
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
