@@ -15,7 +15,6 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
-local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -46,13 +45,6 @@ function CustomInjector:parse(id, widgets)
 					CustomLeague._getPatchVersion()
 				}},
 			}
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool()}
-			},
-		}
 	elseif id == 'liquipediatier' then
 		return {
 			Cell{
@@ -91,24 +83,6 @@ function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_publishertier', _args['moonton-sponsored'])
 		--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
-end
-
-function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
-		return nil
-	end
-	local date
-	if String.isNotEmpty(_args.currency_rate) then
-		date = _args.currency_date
-	end
-
-	return PrizePoolCurrency._get({
-		prizepool = _args.prizepool,
-		prizepoolusd = _args.prizepoolusd,
-		currency = _args.localcurrency,
-		rate = _args.currency_rate,
-		date = date or Variables.varDefault('tournament_enddate', _TODAY),
-	})
 end
 
 function CustomLeague:_createTierDisplay()
