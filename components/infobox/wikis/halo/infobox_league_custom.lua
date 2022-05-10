@@ -59,13 +59,6 @@ function CustomInjector:parse(id, widgets)
 					CustomLeague._getGameVersion()
 				}},
 			}
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool()},
-			},
-		}
 	elseif id == 'liquipediatier' then
 		return {
 			Cell{
@@ -148,62 +141,6 @@ function CustomLeague:_concatArgs(base)
 	return table.concat(foundArgs, ';')
 end
 
-function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and
-		String.isEmpty(_args.prizepoolusd) then
-		return nil
-	end
-
-	local localCurrency = _args.localcurrency
-	local prizePoolUSD = _args.prizepoolusd
-	local prizePool = _args.prizepool
-
-	prizePool = CustomLeague:_cleanPrizeValue(prizePool, localCurrency)
-	prizePoolUSD = CustomLeague:_cleanPrizeValue(prizePoolUSD)
-
-	if String.isEmpty(prizePool) and String.isEmpty(prizePoolUSD) then
-		return nil
-	end
-
-	if localCurrency then
-		localCurrency = string.upper(localCurrency)
-		local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
-		local exchangeRate = CustomLeague:_currencyConversion(
-			1,
-			localCurrency,
-			exchangeDate
-		)
-		--set currency vars for usage in prize pools
-		Variables.varDefine('tournament_currency_rate', exchangeRate or '')
-		Variables.varDefine('tournament_currency', localCurrency)
-		if prizePool and not prizePoolUSD then
-			if not exchangeRate then
-				error('Invalid local currency "' .. localCurrency .. '"')
-			end
-			prizePoolUSD = exchangeRate * prizePool
-		end
-	end
-
-	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
-	Variables.varDefine('tournament_prizepoollocal', prizePool)
-
-	if prizePoolUSD and prizePool then
-		return Template.safeExpand(
-			mw.getCurrentFrame(),
-			'Local currency',
-			{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2)}
-		) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. ' ' .. _ABBR_USD .. ')'
-	elseif prizePoolUSD then
-		return '$' .. CustomLeague:_displayPrizeValue(prizePoolUSD, 2) .. ' ' .. _ABBR_USD
-	elseif prizePool then
-		return Template.safeExpand(
-			mw.getCurrentFrame(),
-			'Local currency',
-			{(localCurrency or 'usd'):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2)}
-		)
-	end
-end
-
 function CustomLeague:_createTierDisplay()
 	local tier = _args.liquipediatier or ''
 	local tierType = _args.liquipediatiertype or _args.tiertype or ''
@@ -241,67 +178,6 @@ function CustomLeague._getGameVersion()
 	local game = string.lower(_args.game or '')
 	_game = _GAME[game]
 	return _game
-end
-
-function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
-	if exchangeDate and currency and currency ~= 'USD' then
-		localPrize = tonumber(localPrize)
-		if localPrize then
-			local usdPrize = mw.ext.CurrencyExchange.currencyexchange(
-				localPrize,
-				currency,
-				'USD',
-				exchangeDate
-			)
-			if type(usdPrize) == 'number' then
-				return usdPrize
-			end
-		end
-	end
-
-	return nil
-end
-
-function CustomLeague:_displayPrizeValue(value, numDigits)
-	if String.isEmpty(value) or value == 0 or value == '0' then
-		return '-'
-	end
-
-	numDigits = tonumber(numDigits or 0) or 0
-	local factor = 10^numDigits
-	value = math.floor(value * factor + 0.5) / factor
-
-	--split value into
-	--left = first digit
-	--num = all remaining digits before a possible '.'
-	--right = the '.' and all digits after it (unless they are all 0 or do not exist)
-	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
-	if right:len() > 0 then
-		local decimal = string.sub('0' .. right, 3)
-		right = '.' .. decimal .. string.rep('0', 2 - string.len(decimal))
-	end
-	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
-end
-
-function CustomLeague:_cleanPrizeValue(value, currency)
-	if String.isEmpty(value) then
-		return nil
-	end
-
-	--remove currency abbreviations
-	value = value:gsub('<abbr.*abbr>', '')
-	value = value:gsub(',', '')
-
-	--remove currency symbol
-	if currency then
-		Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {currency:lower()})
-		local symbol = Variables.varDefaultMulti('localcurrencysymbol', 'localcurrencysymbolafter') or ''
-		value = value:gsub(symbol, '')
-	else --remove $ symbol
-		value = value:gsub('%$', '')
-	end
-
-	return value
 end
 
 function CustomLeague:_makeMapList()
