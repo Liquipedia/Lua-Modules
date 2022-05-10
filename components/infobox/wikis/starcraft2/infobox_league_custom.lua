@@ -9,6 +9,7 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Autopatch = require('Module:Automated Patch')._main
 local Tier = require('Module:Tier')
@@ -513,25 +514,22 @@ function CustomLeague._playerRaceBreakDown()
 	return playerBreakDown or {}
 end
 
-function CustomLeague:_makeBasedListFromArgs(base)
-	local firstArg = _args[base .. '1']
-	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
-	local index = 2
+function CustomLeague:_makeBasedListFromArgs(prefix)
+	local foundArgs = {}
+	for key, linkValue in Table.iter.pairsByPrefix(_args, prefix) do
+		local displayValue = String.isNotEmpty(_args[key .. 'display'])
+			and _args[key .. 'display']
+			or linkValue
 
-	while String.isNotEmpty(_args[base .. index]) do
-		local currentArg = _args[base .. index]
-		local display = String.isNotEmpty(_args[base .. index .. 'display']) 
-			and _args[base .. index .. 'display']
-			or _args[base .. index]
-		table.insert(foundArgs, '&nbsp;• ' ..
+		table.insert(
+			foundArgs,
 			tostring(CustomLeague:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, display, currentArg)
+				PageLink.makeInternalLink({}, displayValue, linkValue)
 			))
 		)
-		index = index + 1
 	end
 
-	return foundArgs
+	return {table.concat(foundArgs, '&nbsp;• ')}
 end
 
 function CustomLeague:defineCustomPageVariables()
