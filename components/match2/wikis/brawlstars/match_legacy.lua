@@ -127,8 +127,10 @@ function p.convertParameters(match2)
 	end
 
 	if match.walkover == 'ff' or match.walkover == 'dq' then
+		match.resulttype = match.walkover
 		match.walkover = match.winner
 	elseif match.walkover == 'l' then
+		match.resulttype = match.walkover
 		match.walkover = nil
 	end
 
