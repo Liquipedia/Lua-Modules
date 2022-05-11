@@ -18,8 +18,6 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Builder = require('Module:Infobox/Widget/Builder')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local String = require('Module:StringUtils')
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 local _TIER_MODE_TYPES = 'types'
