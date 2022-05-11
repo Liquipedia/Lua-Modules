@@ -12,6 +12,13 @@ local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
+local Table = require('Module:Table')
+
+-- TODO: Decided on all valid types
+-- TODO: Move to dedicated module
+local _VALID_TYPES = {'player', 'staff'}
+local _DEFAULT_TYPE = 'player'
+
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
@@ -40,6 +47,7 @@ local SquadRow = Class.new(
 		end
 
 		self.lpdbData = {}
+		self.lpdbData.type = _DEFAULT_TYPE
 	end)
 
 SquadRow.specialTeamsTemplateMapping = {
@@ -160,6 +168,14 @@ function SquadRow:newteam(args)
 
 	self.content:node(cell)
 
+	return self
+end
+
+function SquadRow:setType(type)
+	type = type:lower()
+	if Table.includes(_VALID_TYPES, type) then
+		self.lpdbData.type = type
+	end
 	return self
 end
 
