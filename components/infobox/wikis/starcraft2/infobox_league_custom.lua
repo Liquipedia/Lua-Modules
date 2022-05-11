@@ -34,6 +34,8 @@ local _previous
 
 local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local _TODAY = os.date('%Y-%m-%d', os.time())
+local _TIER_MODE_TYPES = 'types'
+local _TIER_MODE_TIERS = 'tiers'
 
 local _GAME_WOL = 'wol'
 local _GAME_HOTS = 'hots'
@@ -110,7 +112,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Liquipedia tier',
-				content = {CustomLeague:_createTierDisplay()},
+				content = {CustomLeague:_createLiquipediaTierDisplay()},
 				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
 			},
 		}
@@ -214,45 +216,45 @@ function CustomLeague:_createPrizepool()
 	end
 end
 
-function CustomLeague:_createTierDisplay()
+--function for custom tier handling
+function CustomSeries._createLiquipediaTierDisplay(tier, tierType)
 	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
+	local tierType = _args.liquipediatiertype or _args.tiertype
 	if String.isEmpty(tier) then
 		return nil
 	end
 
-	local tierText = Tier.text.tiers[tier]
-	local hasInvalidTier = tierText == nil
-	tierText = tierText or tier
+	local teamEventCategoryInfix = (String.isNotEmpty(_args.team_number) or String.isNotEmpty(_args.team1))
+		and ' Team ' or ' '
 
-	local hasInvalidTierType = false
+	local function buildTierText(tierString, tierMode)
+		local tierText = Tier.text[tierMode][tierString]
+		if not tierText then
+			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
+			table.insert(
+				_series.warnings,
+				tierString .. ' is not a known Liquipedia ' .. tierMode
+					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
+			)
+			return ''
+		else
+			return tierText
+		end
+	end
 
-	local output = '[[' .. tierText .. ' Tournaments|'
+	tier = buildTierText(tier, _TIER_MODE_TIERS)
+
+	local tierDisplay = '[[Category:' .. tier .. teamEventCategoryInfix .. 'Tournaments]]'
+		.. '[[' .. tier .. ' Tournaments|'
 
 	if String.isNotEmpty(tierType) then
-		tierType = Tier.text.types[string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier.text.types[string.lower(tierType or '')] == nil
-
-		output = output .. tierType .. '&nbsp;(' .. tierText .. ')'
+		tierType = buildTierText(tierType:lower(), _TIER_MODE_TYPES)
+		tierDisplay = tierDisplay .. tierType .. '&nbsp;(' .. tier .. ')]]'
 	else
-		output = output .. tierText
+		tierDisplay = tierDisplay .. tier .. ']]'
 	end
 
-	output = output .. ']]' .. '[[Category:' .. tierText .. ' '
-
-	if _args.team_number or _args.team1 then
-		output = output .. 'Team Tournaments]][[Category:Team '
-	end
-
-	output = output .. 'Tournaments]]' ..
-		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
-
-	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_tiertype', tierType)
-	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
-	Variables.varDefine('tournament_liquipediatiertype', tierType)
-	return output
+	return tierDisplay
 end
 
 function CustomLeague._getGameVersion()
@@ -543,6 +545,13 @@ function CustomLeague:defineCustomPageVariables()
 	local name = self.name
 	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
+
+	local tierType = _args.liquipediatiertype or _args.tiertype or ''
+	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
+	Variables.varDefine('tournament_liquipediatiertype', tierType)
+	--Legacy tier(type) vars
+	Variables.varDefine('tournament_tiertype', tierType)
+	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 
 	--override var to standardize its entries
 	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game)] or {})[1] or _GAMES[_GAME_WOL][1])
