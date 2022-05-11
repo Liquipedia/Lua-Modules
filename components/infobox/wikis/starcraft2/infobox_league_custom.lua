@@ -11,7 +11,7 @@ local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Autopatch = require('Module:Automated Patch')._main
+local Autopatch = require('Module:Automated Patch')
 local Tier = require('Module:Tier')
 local Namespace = require('Module:Namespace')
 local AllowedServers = require('Module:Server')
@@ -258,52 +258,58 @@ end
 function CustomLeague._getGameVersion()
 	local game = string.lower(_args.game or '')
 	local patch = _args.patch or ''
-	local shouldUseAutoPatch = _args.autopatch or ''
-	local modName = _args.modname or ''
-	local beta = _args.beta or ''
-	local epatch = _args.epatch or ''
-	local sdate = Variables.varDefault('tournament_startdate', _TODAY)
-	local edate = Variables.varDefault('tournament_enddate', _TODAY)
+	local shouldUseAutoPatch = (_args.autopatch or '') ~= 'false'
+	local modName = _args.modname
+	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
+	local endPatch = _args.epatch
+	local startDate = _args.sdate
+	local endDate = _args.edate
 
-	if game ~= '' or patch ~= '' then
-		local gameversion
+	if String.isNotEmpty(game) or String.isNotEmpty(patch) then
+		local gameVersion
 		if game == _GAME_MOD then
-			gameversion = modName or 'Mod'
-		elseif _GAMES[game] ~= nil then
-			gameversion = '[[' .. _GAMES[game][1] .. ']][[Category:' ..
-				(beta ~= '' and 'Beta ' or '') .. _GAMES[game][2] .. ' Competitions]]'
+			gameVersion = modName or 'Mod'
+		elseif _GAMES[game] then
+			gameVersion = '[[' .. _GAMES[game][1] .. ']]' ..
+				'[[Category:' .. betaPrefix .. _GAMES[game][2] .. ' Competitions]]'
 		else
-			gameversion = '[[Category:' .. (beta ~= '' and 'Beta ' or '') .. ' Competitions]]'
+			gameVersion = '[[Category:' .. betaPrefix .. 'Competitions]]'
 		end
 
-		if (shouldUseAutoPatch == 'false' or game ~= 'lotv') and epatch == '' then
-			epatch = patch
-		end
-		if patch == '' and game == _GAME_LOTV and shouldUseAutoPatch ~= 'false' then
-			patch = 'Patch ' .. (
-				Autopatch({ sdate }) or '')
-		end
-		if epatch == '' and game == 'lotv' and shouldUseAutoPatch ~= 'false' then
-			epatch = 'Patch ' .. (
-				Autopatch({ edate }) or '')
+		if game == _GAME_LOTV and shouldUseAutoPatch then
+			if String.isEmpty(patch) then
+				patch = 'Patch ' .. (Autopatch._main({CustomLeague._retrievePatchDate(startDate)}) or '')
+			end
+			if String.isEmpty(endPatch) then
+				endPatch = 'Patch ' .. (Autopatch._main({CustomLeague._retrievePatchDate(endDate)}) or '')
+			end
+		elseif String.isEmpty(endPatch) then
+			endPatch = patch
 		end
 
-		local patch_display = beta ~= '' and 'Beta ' or ''
+		local patchDisplay = betaPrefix
 
-		if patch ~= '' then
-			if patch == epatch then
-				patch_display = patch_display .. '<br/>[[' .. patch .. ']]'
+		if String.isNotEmpty(patch) then
+			if patch == endPatch then
+				patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
 			else
-				patch_display = patch_display .. '<br/>[[' .. patch .. ']] &ndash; [[' .. epatch .. ']]'
+				patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']] &ndash; [[' .. endPatch .. ']]'
 			end
 		end
 
 		--set patch variables
 		Variables.varDefine('patch', patch)
-		Variables.varDefine('epatch', epatch)
+		Variables.varDefine('epatch', endPatch)
 
-		return gameversion .. patch_display
+		return gameVersion .. patchDisplay
 	end
+end
+
+function CustomLeague._retrievePatchDate(dateEntry)
+	return String.isNotEmpty(dateEntry)
+		and dateEntry:lower() ~= 'tbd'
+		and dateEntry:lower() ~= 'tba'
+		and dateEntry or _TODAY
 end
 
 function CustomLeague._getChronologyData()
