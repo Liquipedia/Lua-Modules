@@ -72,29 +72,7 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'type' then
-		if String.isNotEmpty(_args.type) then
-			local value = string.lower(_args.type)
-			local category
-			if value == 'offline' then
-				category = 'Offline Tournaments'
-			elseif value == 'online' then
-				category = 'Online Tournaments'
-			elseif value:match('online') and value:match('offline') then
-				category = 'Online/Offline Tournaments'
-			else
-				category = 'Unknown Type Tournaments'
-			end
-			return {
-				Cell{
-					name = 'Type',
-					content = {
-						mw.language.getContentLanguage():ucfirst(_args.type) .. '[[Category:' .. category .. ']]'
-					}
-				}
-			}
-		end
-	elseif id == 'gamesettings' then
+	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {
 					CustomLeague._getGameVersion()
