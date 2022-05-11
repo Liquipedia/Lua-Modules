@@ -16,9 +16,6 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local PageLink = require('Module:Page')
-local PrizePoolCurrency = require('Module:Prize pool currency')
-
-local _TODAY = os.date('%Y-%m-%d', os.time())
 
 local _args
 local _league
@@ -86,13 +83,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool()}
-			},
-		}
 	elseif id == 'liquipediatier' then
 		widgets = {
 			Cell{
@@ -130,24 +120,6 @@ end
 
 function CustomLeague:_validPublisherTier(publishertier)
 	return String.isNotEmpty(publishertier) and _BLIZZARD_TIERS[publishertier:lower()]
-end
-
-function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
-		return nil
-	end
-	local date
-	if String.isNotEmpty(_args.currency_rate) then
-		date = _args.currency_date
-	end
-
-	return PrizePoolCurrency._get({
-		prizepool = _args.prizepool,
-		prizepoolusd = _args.prizepoolusd,
-		currency = _args.localcurrency,
-		rate = _args.currency_rate,
-		date = date or Variables.varDefault('tournament_enddate', _TODAY),
-	})
 end
 
 function CustomLeague:_createLiquipediaTierDisplay()

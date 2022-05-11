@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Links = require('Module:Links')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
@@ -21,6 +21,7 @@ local Page = require('Module:Page')
 local LeagueIcon = require('Module:LeagueIcon')
 local WarningBox = require('Module:WarningBox')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -46,7 +47,7 @@ function League:createInfobox()
 	local links
 
 	-- set Variables here already so they are available in functions
-	-- we call from here on, e.g. createPrizepool
+	-- we call from here on, e.g. _createPrizepool
 	self:_definePageVariables(args)
 
 	local widgets = {
@@ -132,7 +133,13 @@ function League:createInfobox()
 		},
 		Cell{name = 'Venue', content = {args.venue}},
 		Cell{name = 'Format', content = {args.format}},
-		Customizable{id = 'prizepool', children = {}},
+		Customizable{id = 'prizepool', children = {
+			Cell{
+					name = 'Prize pool',
+					content = {self:_createPrizepool(args)},
+				},
+			},
+		},
 		Cell{name = 'Date', content = {args.date}},
 		Cell{name = 'Start Date', content = {args.sdate}},
 		Cell{name = 'End Date', content = {args.edate}},
@@ -203,6 +210,24 @@ function League:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+function League:_createPrizepool(args)
+	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
+		return nil
+	end
+	local date
+	if String.isNotEmpty(args.currency_rate) then
+		date = args.currency_date
+	end
+
+	return PrizePoolCurrency._get{
+		prizepool = args.prizepool,
+		prizepoolusd = args.prizepoolusd,
+		currency = args.localcurrency,
+		rate = args.currency_rate,
+		date = date or Variables.varDefault('tournament_enddate'),
+	}
+end
+
 function League:_definePageVariables(args)
 	Variables.varDefine('tournament_name', args.name)
 	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
@@ -234,6 +259,11 @@ function League:_definePageVariables(args)
 	self:_cleanDate(args.sdate) or self:_cleanDate(args.date))
 	Variables.varDefine('tournament_enddate',
 	self:_cleanDate(args.edate) or self:_cleanDate(args.date))
+
+	-- gets overwritten by the League:_createPrizepool call if args.prizepool
+	-- or args.prizepoolusd is a valid input
+	-- if wikis want it unset they can unset it via the defineCustomPageVariables() call
+	Variables.varDefine('tournament_currency', args.localcurrency or '')
 
 	self:defineCustomPageVariables(args)
 end
