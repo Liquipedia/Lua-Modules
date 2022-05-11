@@ -29,6 +29,7 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _league
 local _next
 local _previous
 
@@ -55,6 +56,7 @@ local _CICON = '[[File:CIcon.png|text-bottom|Challenger League]]'
 
 function CustomLeague.run(frame)
 	local league = League(frame)
+	_league = league
 	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
@@ -217,7 +219,7 @@ function CustomLeague:_createPrizepool()
 end
 
 --function for custom tier handling
-function CustomSeries._createLiquipediaTierDisplay(tier, tierType)
+function CustomLeague._createLiquipediaTierDisplay()
 	local tier = _args.liquipediatier or ''
 	local tierType = _args.liquipediatiertype or _args.tiertype
 	if String.isEmpty(tier) then
@@ -232,7 +234,7 @@ function CustomSeries._createLiquipediaTierDisplay(tier, tierType)
 		if not tierText then
 			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
 			table.insert(
-				_series.warnings,
+				_league.warnings,
 				tierString .. ' is not a known Liquipedia ' .. tierMode
 					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
 			)
