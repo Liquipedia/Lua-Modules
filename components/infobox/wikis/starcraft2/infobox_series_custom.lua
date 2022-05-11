@@ -18,6 +18,7 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Builder = require('Module:Infobox/Widget/Builder')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 local _TIER_MODE_TYPES = 'types'
@@ -214,20 +215,25 @@ function Series:addToLpdb(lpdbData)
 end
 
 function CustomSeries._setDateMatchVar(date, edate, sdate)
-	local endDate = CustomSeries._validDateOr(date, edate, sdate)
-	local startDate = CustomSeries._validDateOr(date, sdate, edate)
+	local endDate = CustomSeries._validDateOr{date, edate, sdate}
+	local startDate = CustomSeries._validDateOr{date, sdate, edate}
 
 	Variables.varDefine('date', endDate)
 	Variables.varDefine('tournament_enddate', endDate)
 	Variables.varDefine('tournament_startdate', startDate)
 end
 
-function CustomSeries._validDateOr(dateString1, dateString2, dateString3)
+function CustomSeries._validDateOr(dateStrings)
 	local regexString = '%d%d%d%d%-%d%d%-%d%d' --(i.e. YYYY-MM-DD)
-	return string.match(dateString1 or '', regexString)
-		or string.match(dateString2 or '', regexString)
-		or string.match(dateString3 or '', regexString)
-		or ''
+
+	for _, dateString in Table.iter.spairs(dateStrings) do
+		dateString = string.match(dateString or '', regexString)
+		if dateString then
+			return dateString
+		end
+	end
+
+	return ''
 end
 
 --function for custom tier handling
