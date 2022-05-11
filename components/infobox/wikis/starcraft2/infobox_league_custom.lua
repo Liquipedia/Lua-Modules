@@ -227,9 +227,9 @@ function CustomLeague._createLiquipediaTierDisplay()
 	local tierDisplay
 	if String.isNotEmpty(tierType) then
 		tierType = buildTierText(tierType:lower(), _TIER_MODE_TYPES)
-		tierDisplay = tierType .. '&nbsp;(' .. tier .. ')]]'
+		tierDisplay = tierType .. '&nbsp;(' .. tier .. ')'
 	else
-		tierDisplay = tier .. ']]'
+		tierDisplay = tier
 	end
 
 	return '[[' .. tierLink .. '|' .. tierDisplay .. ']]' .. tierCategory
