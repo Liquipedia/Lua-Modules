@@ -203,7 +203,7 @@ function CustomLeague._createLiquipediaTierDisplay()
 	end
 
 	local teamEventCategoryInfix = (String.isNotEmpty(_args.team_number) or String.isNotEmpty(_args.team1))
-		and ' Team ' or ' '
+		and 'Team ' or ''
 
 	local function buildTierText(tierString, tierMode)
 		local tierText = Tier.text[tierMode][tierString]
