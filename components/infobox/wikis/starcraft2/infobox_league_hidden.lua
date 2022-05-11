@@ -141,7 +141,7 @@ function HiddenInfoboxLeague.getTierCategories()
 	local tier = _args.liquipediatier or ''
 	local tierType = _args.liquipediatiertype or _args.tiertype or ''
 
-	local tierText = Tier['text'][tier]
+	local tierText = Tier.text.tiers[tier]
 	if String.isNotEmpty(tier) and tierText == nil then
 		table.insert(tierCategories, 'Pages with invalid Tier')
 	end
@@ -151,7 +151,7 @@ function HiddenInfoboxLeague.getTierCategories()
 		table.insert(tierCategories, tierText .. ' Team Tournaments')
 	end
 
-	if String.isNotEmpty(tierType) and Tier['types'][string.lower(tierType)] == nil then
+	if String.isNotEmpty(tierType) and Tier.text.types[string.lower(tierType)] == nil then
 		table.insert(tierCategories, 'Pages with invalid Tiertype')
 	end
 

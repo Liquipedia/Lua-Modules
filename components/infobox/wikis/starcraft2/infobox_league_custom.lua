@@ -221,7 +221,7 @@ function CustomLeague:_createTierDisplay()
 		return nil
 	end
 
-	local tierText = Tier['text'][tier]
+	local tierText = Tier.text.tiers[tier]
 	local hasInvalidTier = tierText == nil
 	tierText = tierText or tier
 
@@ -230,8 +230,8 @@ function CustomLeague:_createTierDisplay()
 	local output = '[[' .. tierText .. ' Tournaments|'
 
 	if String.isNotEmpty(tierType) then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
+		tierType = Tier.text.types[string.lower(tierType or '')] or tierType
+		hasInvalidTierType = Tier.text.types[string.lower(tierType or '')] == nil
 
 		output = output .. tierType .. '&nbsp;(' .. tierText .. ')'
 	else
