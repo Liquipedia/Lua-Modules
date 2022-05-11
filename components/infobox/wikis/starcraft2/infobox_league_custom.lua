@@ -196,7 +196,7 @@ end
 
 --function for custom tier handling
 function CustomLeague._createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier or ''
+	local tier = _args.liquipediatier
 	local tierType = _args.liquipediatiertype or _args.tiertype
 	if String.isEmpty(tier) then
 		return nil
@@ -222,9 +222,9 @@ function CustomLeague._createLiquipediaTierDisplay()
 
 	tier = buildTierText(tier, _TIER_MODE_TIERS)
 
-	local tierDisplay = '[[Category:' .. tier .. teamEventCategoryInfix .. 'Tournaments]]'
-		.. '[[' .. tier .. ' Tournaments|'
-
+	local tierLink = tier .. ' Tournaments'
+	local tierCategory = '[[Category:' .. tier .. ' ' .. teamEventCategoryInfix .. 'Tournaments]]'
+	local tierDisplay
 	if String.isNotEmpty(tierType) then
 		tierType = buildTierText(tierType:lower(), _TIER_MODE_TYPES)
 		tierDisplay = tierDisplay .. tierType .. '&nbsp;(' .. tier .. ')]]'
@@ -232,7 +232,7 @@ function CustomLeague._createLiquipediaTierDisplay()
 		tierDisplay = tierDisplay .. tier .. ']]'
 	end
 
-	return tierDisplay
+	return '[[' .. tierLink .. '|' .. tierDisplay .. ']]' .. tierCategory
 end
 
 function CustomLeague._getGameVersion()
