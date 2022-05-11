@@ -16,6 +16,7 @@ local Localisation = require('Module:Localisation')
 local Links = require('Module:Links')
 local String = require('Module:String')
 local Flags = require('Module:Flags')
+local WarningBox = require('Module:WarningBox')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -27,6 +28,8 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
 local Series = Class.new(BasicInfobox)
+
+Series.warnings = {}
 
 function Series.run(frame)
 	local series = Series(frame)
@@ -172,7 +175,8 @@ function Series:createInfobox(frame)
 		)
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return tostring(infobox:widgetInjector(self:createWidgetInjector()):build(widgets))
+		.. WarningBox.displayAll(Series.warnings)
 end
 
 --- Allows for overriding this functionality
