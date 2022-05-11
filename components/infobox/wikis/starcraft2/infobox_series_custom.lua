@@ -156,7 +156,7 @@ function CustomSeries._getGameVersion(game, patch)
 		local patchDisplay = betaPrefix
 
 		if String.isNotEmpty(patch) then
-				patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
+			patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
 			if patch ~= endPatch then
 				patchDisplay = patchDisplay .. ' &ndash; [[' .. endPatch .. ']]'
 			end
