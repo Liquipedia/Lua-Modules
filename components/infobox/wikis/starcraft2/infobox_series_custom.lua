@@ -172,6 +172,13 @@ function CustomSeries._getGameVersion(game, patch)
 	end
 end
 
+function CustomSeries._retrievePatchDate(dateEntry)
+	return String.isNotEmpty(dateEntry)
+		and dateEntry:lower() ~= 'tbd'
+		and dateEntry:lower() ~= 'tba'
+		and dateEntry or _TODAY
+end
+
 function CustomSeries._addCustomVariables(args)
 	if
 		(not Namespace.isMain()) or
