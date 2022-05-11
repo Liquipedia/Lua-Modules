@@ -16,6 +16,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local PrizePoolCurrency = require('Module:Prize pool currency')
+local Logic = require('Module:Logic')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -79,7 +80,7 @@ end
 
 function League:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier =  _args['riotpremier'] == 'true' and 'true' or nil
+	lpdbData.publishertier =  Logic.readBool(_args['riotpremier']) and 'true' or nil
 
 	return lpdbData
 end
@@ -89,7 +90,7 @@ function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_endpatch', _args.epatch)
 
 	Variables.varDefine('tournament_publishertier', _args['riotpremier'])
-		--Legacy Vars:
+	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
