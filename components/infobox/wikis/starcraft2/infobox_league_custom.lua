@@ -82,8 +82,6 @@ function CustomInjector:parse(id, widgets)
 				category = 'Online Tournaments'
 			elseif value:match('online') and value:match('offline') then
 				category = 'Online/Offline Tournaments'
-			elseif value == 'weekly online' then
-				category = 'Weekly Online Tournaments'
 			else
 				category = 'Unknown Type Tournaments'
 			end
