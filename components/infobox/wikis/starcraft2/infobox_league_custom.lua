@@ -270,10 +270,9 @@ function CustomLeague._getGameVersion()
 		local patchDisplay = betaPrefix
 
 		if String.isNotEmpty(patch) then
-			if patch == endPatch then
-				patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
-			else
-				patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']] &ndash; [[' .. endPatch .. ']]'
+			patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
+			if patch ~= endPatch then
+				patchDisplay = patchDisplay .. ' &ndash; [[' .. endPatch .. ']]'
 			end
 		end
 
