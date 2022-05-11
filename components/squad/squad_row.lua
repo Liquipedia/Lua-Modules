@@ -7,17 +7,18 @@
 --
 
 local Class = require('Module:Class')
-local String = require('Module:String')
+local Flags = require('Module:Flags')
 local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
-local Flags = require('Module:Flags')
 local Table = require('Module:Table')
 
 -- TODO: Decided on all valid types
 -- TODO: Move to dedicated module
 local _VALID_TYPES = {'player', 'staff'}
 local _DEFAULT_TYPE = 'player'
+
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
@@ -64,7 +65,7 @@ function SquadRow:id(args)
 	cell:addClass('ID')
 	cell:wikitext('\'\'\'' .. Player._player(args) .. '\'\'\'')
 
-	if not String.isEmpty(args.captain) then
+	if String.isNotEmpty(args.captain) then
 		cell:wikitext('&nbsp;' .. _ICON_CAPTAIN)
 	end
 
@@ -104,7 +105,7 @@ function SquadRow:role(args)
 	-- The CSS class has this name, not a typo.
 	cell:addClass('Position')
 
-	if not String.isEmpty(args.role) then
+	if String.isNotEmpty(args.role) then
 		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'))
 		cell:wikitext('\'\'(' .. args.role .. ')\'\'')
 	end
@@ -122,7 +123,7 @@ function SquadRow:date(dateValue, cellTitle, lpdbColumn)
 
 	cell:node(mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle))
 
-	if not String.isEmpty(dateValue) then
+	if String.isNotEmpty(dateValue) then
 		cell:node(mw.html.create('div'):addClass('Date'):wikitext('\'\'' .. dateValue .. '\'\''))
 	end
 	self.content:node(cell)
@@ -137,7 +138,7 @@ function SquadRow:newteam(args)
 	cell:addClass('NewTeam')
 
 
-	if not String.isEmpty(args.newteam) then
+	if String.isNotEmpty(args.newteam) then
 		local mobileStuffDiv = mw.html.create('div'):addClass('MobileStuff')
 		mobileStuffDiv	:node(mw.html.create('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'))
 						:wikitext('&nbsp;')
@@ -159,7 +160,7 @@ function SquadRow:newteam(args)
 		end
 
 
-		if not String.isEmpty(args.newteamrole) then
+		if String.isNotEmpty(args.newteamrole) then
 			cell:wikitext('&nbsp;\'\'<small>(' .. args.newteamrole .. ')</small>\'\'')
 		end
 
