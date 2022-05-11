@@ -222,7 +222,7 @@ end
 --- Allows for overriding this functionality
 function League:createLiquipediaTierDisplay(args)
 	local tier = args.liquipediatier or ''
-	local tierType = args.liquipediatiertype or ''
+	local tierType = string.lower(args.liquipediatiertype or '')
 	if String.isEmpty(tier) then
 		return nil
 	end
