@@ -17,6 +17,7 @@ local Table = require('Module:Table')
 -- TODO: Decided on all valid types
 -- TODO: Move to dedicated module
 local _VALID_TYPES = {'player', 'staff'}
+local _DEFAULT_TYPE = 'player'
 
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
@@ -45,7 +46,7 @@ local SquadRow = Class.new(
 		end
 
 		self.lpdbData = {}
-		self.lpdbData.type = 'player'
+		self.lpdbData.type = _DEFAULT_TYPE
 	end)
 
 SquadRow.specialTeamsTemplateMapping = {
