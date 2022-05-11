@@ -176,7 +176,9 @@ function matchFunctions.getOpponents(args)
 
 	local sumscores = {}
 	for _, map in Table.iter.pairsByPrefix(args, 'map') do
-		sumscores[map.winner] = (sumscores[map.winner] or 0) + 1
+		if map.winner then
+			sumscores[map.winner] = (sumscores[map.winner] or 0) + 1
+		end
 	end
 
 	local bestof = Logic.emptyOr(args.bestof, Variables.varDefault('bestof', 5))

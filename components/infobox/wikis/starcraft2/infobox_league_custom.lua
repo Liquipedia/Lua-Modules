@@ -9,6 +9,7 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Autopatch = require('Module:Automated Patch')._main
 local Tier = require('Module:Tier')
@@ -68,7 +69,7 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'type' then
-		if not String.isEmpty(_args.type) then
+		if String.isNotEmpty(_args.type) then
 			local value = string.lower(_args.type)
 			local category
 			if value == 'offline' then
@@ -137,24 +138,24 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		--teams section
-		if _args.team_number or (not String.isEmpty(_args.team1)) then
+		if _args.team_number or String.isNotEmpty(_args.team1) then
 			Variables.varDefine('is_team_tournament', 1)
 			table.insert(widgets, Title{name = 'Teams'})
 		end
 		table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
-		if not String.isEmpty(_args.team1) then
+		if String.isNotEmpty(_args.team1) then
 			local teams = CustomLeague:_makeBasedListFromArgs('team')
 			table.insert(widgets, Center{content = teams})
 		end
 
 		--maps
-		if not String.isEmpty(_args.map1) then
+		if String.isNotEmpty(_args.map1) then
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('map')})
-		elseif not String.isEmpty(_args['2map1']) then
+		elseif String.isNotEmpty(_args['2map1']) then
 			table.insert(widgets, Title{name = _args['2maptitle'] or '2v2 Maps'})
 			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('2map')})
-		elseif not String.isEmpty(_args['3map1']) then
+		elseif String.isNotEmpty(_args['3map1']) then
 			table.insert(widgets, Title{name = _args['3maptitle'] or '3v3 Maps'})
 			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('3map')})
 		end
@@ -228,7 +229,7 @@ function CustomLeague:_createTierDisplay()
 
 	local output = '[[' .. tierText .. ' Tournaments|'
 
-	if not String.isEmpty(tierType) then
+	if String.isNotEmpty(tierType) then
 		tierType = Tier.text.types[string.lower(tierType or '')] or tierType
 		hasInvalidTierType = Tier.text.types[string.lower(tierType or '')] == nil
 
@@ -513,22 +514,22 @@ function CustomLeague._playerRaceBreakDown()
 	return playerBreakDown or {}
 end
 
-function CustomLeague:_makeBasedListFromArgs(base)
-	local firstArg = _args[base .. '1']
-	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
-	local index = 2
+function CustomLeague:_makeBasedListFromArgs(prefix)
+	local foundArgs = {}
+	for key, linkValue in Table.iter.pairsByPrefix(_args, prefix) do
+		local displayValue = String.isNotEmpty(_args[key .. 'display'])
+			and _args[key .. 'display']
+			or linkValue
 
-	while not String.isEmpty(_args[base .. index]) do
-		local currentArg = _args[base .. index]
-		table.insert(foundArgs, '&nbsp;• ' ..
+		table.insert(
+			foundArgs,
 			tostring(CustomLeague:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, currentArg)
+				PageLink.makeInternalLink({}, displayValue, linkValue)
 			))
 		)
-		index = index + 1
 	end
 
-	return foundArgs
+	return {table.concat(foundArgs, '&nbsp;• ')}
 end
 
 function CustomLeague:defineCustomPageVariables()
@@ -595,7 +596,7 @@ function CustomLeague:_concatArgs(base)
 	end
 	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
 	local index = 2
-	while not String.isEmpty(_args[base .. index]) do
+	while String.isNotEmpty(_args[base .. index]) do
 		table.insert(foundArgs,
 			mw.ext.TeamLiquidIntegration.resolve_redirect(_args[base .. index])
 		)

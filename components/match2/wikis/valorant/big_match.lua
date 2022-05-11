@@ -6,19 +6,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require("Module:Arguments")
+local AgentIcon = require('Module:AgentIcon')
+local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DivTable = require('Module:DivTable')
-local Json = require("Module:Json")
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Logic = require('Module:Logic')
-local Match = require("Module:Match")
+local Match = require('Module:Match')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local Template = require('Module:Template')
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 
 local BigMatch = Class.new()
@@ -38,7 +38,7 @@ function BigMatch.run(frame)
 	match = CustomMatchGroupInput.processMatch(frame, match, {isStandalone = true})
 
 	local identifiers = bigMatch:_getId()
-	match['bracketid'] = "MATCH_" .. identifiers[1]
+	match['bracketid'] = 'MATCH_' .. identifiers[1]
 	match['matchid'] = identifiers[2]
 	-- Don't store match1 as BigMatch records are not complete
 	Match.store(match, {storeMatch1 = false, storeSmw = false})
@@ -94,7 +94,7 @@ function BigMatch:header(match, opponent1, opponent2, tournament)
 	if tournament.link and tournament.name then
 		tournamentRow:wikitext('[[' .. tournament.link .. '|' .. tournament.name .. ']]')
 	end
-	return mw.html.create('div'):addClass("fb-match-page-header")
+	return mw.html.create('div'):addClass('fb-match-page-header')
 								:node(tournamentRow)
 								:node(teamsRow)
 end
@@ -145,7 +145,7 @@ function BigMatch:overview(match)
 			))
 		)
 		:row(
-			DivTable.Row():cell(mw.html.create('div'):wikitext(match.patch and "Patch " .. match.patch))
+			DivTable.Row():cell(mw.html.create('div'):wikitext(match.patch and 'Patch ' .. match.patch))
 		)
 	boxRight = boxRight:create()
 	boxRight:addClass('fb-match-page-box')
@@ -206,7 +206,7 @@ function BigMatch:stats(frame, match, playerLookUp, opponents)
 						)
 						:cell(
 							mw.html.create('div')	:addClass('fb-match-page-valorant-stats-agent')
-													:wikitext(Template.safeExpand(frame, 'AgentIcon/' .. player['agent']))
+													:wikitext(AgentIcon._getBracketIcon{player['agent']})
 						)
 						:cell(mw.html.create('div'):wikitext(player['kills']))
 						:cell(mw.html.create('div'):wikitext(player['deaths']))
