@@ -22,7 +22,7 @@ function Infobox:create(frame, gameName, forceDarkMode)
 	self.content = mw.html.create('div')	:addClass('fo-nttax-infobox')
 											:addClass('wiki-bordercolor-light')
 	self.root	:addClass('fo-nttax-infobox-wrapper')
-				:addClass('infobox-' .. gameName)
+				:addClass('infobox-' .. gameName:lower())
 	if forceDarkMode then
 		self.root:addClass('infobox-darkmodeforced')
 	end
