@@ -214,19 +214,19 @@ function Series:addToLpdb(lpdbData)
 end
 
 function CustomSeries._setDateMatchVar(date, edate, sdate)
-	local endDate = CustomSeries._validDateOr{date, edate, sdate} or ''
-	local startDate = CustomSeries._validDateOr{date, sdate, edate} or ''
+	local endDate = CustomSeries._validDateOr(date, edate, sdate) or ''
+	local startDate = CustomSeries._validDateOr(date, sdate, edate) or ''
 
 	Variables.varDefine('date', endDate)
 	Variables.varDefine('tournament_enddate', endDate)
 	Variables.varDefine('tournament_startdate', startDate)
 end
 
-function CustomSeries._validDateOr(dateStrings)
+function CustomSeries._validDateOr(...)
 	local regexString = '%d%d%d%d%-%d%d%-%d%d' --(i.e. YYYY-MM-DD)
 
-	for _, dateString in Table.iter.spairs(dateStrings) do
-		dateString = string.match(dateString, regexString)
+	for _, input in Table.iter.spairs({...}) do
+		local dateString = string.match(input, regexString)
 		if dateString then
 			return dateString
 		end
