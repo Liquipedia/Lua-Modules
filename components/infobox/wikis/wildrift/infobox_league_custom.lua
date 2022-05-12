@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=mobilelegends
+-- wiki=wildrift
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,6 +15,7 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
+local Logic = require('Module:Logic')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -48,7 +49,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Liquipedia tier',
 				content = {CustomLeague:_createTierDisplay()},
-				classes = {_args['moonton-sponsored'] == 'true' and 'valvepremier-highlighted' or ''},
+				classes = {_args['riotpremier'] == 'true' and 'valvepremier-highlighted' or ''},
 			},
 		}
 	elseif id == 'customcontent' then
@@ -69,7 +70,7 @@ end
 
 function League:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier =  _args['moonton-sponsored'] == 'true' and 'true' or nil
+	lpdbData.publishertier =  Logic.readBool(_args['riotpremier']) and 'true' or nil
 
 	return lpdbData
 end
@@ -78,8 +79,8 @@ function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_patch', _args.patch)
 	Variables.varDefine('tournament_endpatch', _args.epatch)
 
-	Variables.varDefine('tournament_publishertier', _args['moonton-sponsored'])
-		--Legacy Vars:
+	Variables.varDefine('tournament_publishertier', _args['riotpremier'])
+	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 

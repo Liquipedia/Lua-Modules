@@ -16,9 +16,6 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local PageLink = require('Module:Page')
-local PrizePoolCurrency = require('Module:Prize pool currency')
-
-local _TODAY = os.date('%Y-%m-%d', os.time())
 
 local _args
 local _league
@@ -107,13 +104,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool()}
-			},
-		}
 	elseif id == 'liquipediatier' then
 		widgets = {
 			Cell{
@@ -169,24 +159,6 @@ function CustomLeague:_standardiseRawDate(dateString)
 	return dateString
 end
 
-function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
-		return nil
-	end
-	local date
-	if String.isNotEmpty(_args.currency_rate) then
-		date = _args.currency_date
-	end
-
-	return PrizePoolCurrency._get({
-		prizepool = _args.prizepool,
-		prizepoolusd = _args.prizepoolusd,
-		currency = _args.localcurrency,
-		rate = _args.currency_rate,
-		date = date or Variables.varDefault('tournament_enddate', _TODAY),
-	})
-end
-
 function CustomLeague:_createLiquipediaTierDisplay()
 	local tier = _args.liquipediatier or ''
 	local tierType = _args.liquipediatiertype or ''
@@ -223,14 +195,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or _DEFAULT_TIERTYPE)
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
-
-	-- Module:Prize pool currency will usually set this variable.
-	-- However the module won't be run if certain arguments are not yet known
-	-- Set the Variable here if the createPrizepool returns nil
-	-- Needed in Module:Prize pool slot
-	if not CustomLeague:_createPrizepool() then
-		Variables.varDefine('tournament_currency', _args.localcurrency or '')
-	end
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')

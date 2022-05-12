@@ -12,7 +12,6 @@ local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
-local PrizePool = require('Module:Prize pool currency')
 local MapMode = require('Module:MapMode')
 local GameModeLookup = require('Module:GameModeLookup')
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -96,13 +95,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = maps})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool(args)}
-			}
-		}
 	elseif id == 'liquipediatier' then
 		return {
 			Cell{
@@ -170,31 +162,6 @@ function CustomLeague:_createTier(args)
 	else
 		content = content .. tierDisplay
 	end
-
-	return content
-end
-
-function CustomLeague:_createPrizepool(args)
-	if String.isEmpty(args.prizepool) and
-		String.isEmpty(args.prizepoolusd) then
-			return nil
-	end
-
-	local date
-	if not String.isEmpty(args.currency_rate) then
-		date = args.currency_date
-	else
-		date = args.edate or args.date
-	end
-
-	local content = PrizePool._get({
-			prizepool = args.prizepool,
-			prizepoolusd = args.prizepoolusd,
-			currency = args.localcurrency,
-			rate = args.currency_rate,
-			date = date
-		}
-	)
 
 	return content
 end

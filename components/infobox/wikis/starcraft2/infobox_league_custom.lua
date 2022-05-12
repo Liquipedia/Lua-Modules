@@ -9,8 +9,9 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Autopatch = require('Module:Automated Patch')._main
+local Autopatch = require('Module:Automated Patch')
 local Tier = require('Module:Tier')
 local Namespace = require('Module:Namespace')
 local AllowedServers = require('Module:Server')
@@ -28,11 +29,14 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _league
 local _next
 local _previous
 
 local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local _TODAY = os.date('%Y-%m-%d', os.time())
+local _TIER_MODE_TYPES = 'types'
+local _TIER_MODE_TIERS = 'tiers'
 
 local _GAME_WOL = 'wol'
 local _GAME_HOTS = 'hots'
@@ -52,6 +56,7 @@ local _CICON = '[[File:CIcon.png|text-bottom|Challenger League]]'
 
 function CustomLeague.run(frame)
 	local league = League(frame)
+	_league = league
 	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
@@ -67,31 +72,7 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'type' then
-		if not String.isEmpty(_args.type) then
-			local value = string.lower(_args.type)
-			local category
-			if value == 'offline' then
-				category = 'Offline Tournaments'
-			elseif value == 'online' then
-				category = 'Online Tournaments'
-			elseif value:match('online') and value:match('offline') then
-				category = 'Online/Offline Tournaments'
-			elseif value == 'weekly online' then
-				category = 'Weekly Online Tournaments'
-			else
-				category = 'Unknown Type Tournaments'
-			end
-			return {
-				Cell{
-					name = 'Type',
-					content = {
-						mw.language.getContentLanguage():ucfirst(_args.type) .. '[[Category:' .. category .. ']]'
-					}
-				}
-			}
-		end
-	elseif id == 'gamesettings' then
+	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {
 					CustomLeague._getGameVersion()
@@ -109,7 +90,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Liquipedia tier',
-				content = {CustomLeague:_createTierDisplay()},
+				content = {CustomLeague:_createLiquipediaTierDisplay()},
 				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
 			},
 		}
@@ -137,24 +118,24 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		--teams section
-		if _args.team_number or (not String.isEmpty(_args.team1)) then
+		if _args.team_number or String.isNotEmpty(_args.team1) then
 			Variables.varDefine('is_team_tournament', 1)
 			table.insert(widgets, Title{name = 'Teams'})
 		end
 		table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
-		if not String.isEmpty(_args.team1) then
+		if String.isNotEmpty(_args.team1) then
 			local teams = CustomLeague:_makeBasedListFromArgs('team')
 			table.insert(widgets, Center{content = teams})
 		end
 
 		--maps
-		if not String.isEmpty(_args.map1) then
+		if String.isNotEmpty(_args.map1) then
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('map')})
-		elseif not String.isEmpty(_args['2map1']) then
+		elseif String.isNotEmpty(_args['2map1']) then
 			table.insert(widgets, Title{name = _args['2maptitle'] or '2v2 Maps'})
 			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('2map')})
-		elseif not String.isEmpty(_args['3map1']) then
+		elseif String.isNotEmpty(_args['3map1']) then
 			table.insert(widgets, Title{name = _args['3maptitle'] or '3v3 Maps'})
 			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('3map')})
 		end
@@ -213,96 +194,101 @@ function CustomLeague:_createPrizepool()
 	end
 end
 
-function CustomLeague:_createTierDisplay()
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
+--function for custom tier handling
+function CustomLeague._createLiquipediaTierDisplay()
+	local tier = _args.liquipediatier
+	local tierType = _args.liquipediatiertype or _args.tiertype
 	if String.isEmpty(tier) then
 		return nil
 	end
 
-	local tierText = Tier['text'][tier]
-	local hasInvalidTier = tierText == nil
-	tierText = tierText or tier
+	local teamEventCategoryInfix = (String.isNotEmpty(_args.team_number) or String.isNotEmpty(_args.team1))
+		and 'Team ' or ''
 
-	local hasInvalidTierType = false
+	local function buildTierText(tierString, tierMode)
+		local tierText = Tier.text[tierMode][tierString]
+		if not tierText then
+			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
+			table.insert(
+				_league.warnings,
+				tierString .. ' is not a known Liquipedia ' .. tierMode
+					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
+			)
+			return ''
+		else
+			return tierText
+		end
+	end
 
-	local output = '[[' .. tierText .. ' Tournaments|'
+	tier = buildTierText(tier, _TIER_MODE_TIERS)
 
-	if not String.isEmpty(tierType) then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
-
-		output = output .. tierType .. '&nbsp;(' .. tierText .. ')'
+	local tierLink = tier .. ' Tournaments'
+	local tierCategory = '[[Category:' .. tier .. ' ' .. teamEventCategoryInfix .. 'Tournaments]]'
+	local tierDisplay
+	if String.isNotEmpty(tierType) then
+		tierType = buildTierText(tierType:lower(), _TIER_MODE_TYPES)
+		tierDisplay = tierType .. '&nbsp;(' .. tier .. ')'
 	else
-		output = output .. tierText
+		tierDisplay = tier
 	end
 
-	output = output .. ']]' .. '[[Category:' .. tierText .. ' '
-
-	if _args.team_number or _args.team1 then
-		output = output .. 'Team Tournaments]][[Category:Team '
-	end
-
-	output = output .. 'Tournaments]]' ..
-		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
-
-	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_tiertype', tierType)
-	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
-	Variables.varDefine('tournament_liquipediatiertype', tierType)
-	return output
+	return '[[' .. tierLink .. '|' .. tierDisplay .. ']]' .. tierCategory
 end
 
 function CustomLeague._getGameVersion()
 	local game = string.lower(_args.game or '')
 	local patch = _args.patch or ''
-	local shouldUseAutoPatch = _args.autopatch or ''
-	local modName = _args.modname or ''
-	local beta = _args.beta or ''
-	local epatch = _args.epatch or ''
-	local sdate = Variables.varDefault('tournament_startdate', _TODAY)
-	local edate = Variables.varDefault('tournament_enddate', _TODAY)
+	local shouldUseAutoPatch = (_args.autopatch or '') ~= 'false'
+	local modName = _args.modname
+	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
+	local endPatch = _args.epatch
+	local startDate = _args.sdate
+	local endDate = _args.edate
 
-	if game ~= '' or patch ~= '' then
-		local gameversion
+	if String.isNotEmpty(game) or String.isNotEmpty(patch) then
+		local gameVersion
 		if game == _GAME_MOD then
-			gameversion = modName or 'Mod'
-		elseif _GAMES[game] ~= nil then
-			gameversion = '[[' .. _GAMES[game][1] .. ']][[Category:' ..
-				(beta ~= '' and 'Beta ' or '') .. _GAMES[game][2] .. ' Competitions]]'
+			gameVersion = modName or 'Mod'
+		elseif _GAMES[game] then
+			gameVersion = '[[' .. _GAMES[game][1] .. ']]' ..
+				'[[Category:' .. betaPrefix .. _GAMES[game][2] .. ' Competitions]]'
 		else
-			gameversion = '[[Category:' .. (beta ~= '' and 'Beta ' or '') .. ' Competitions]]'
+			gameVersion = '[[Category:' .. betaPrefix .. 'Competitions]]'
 		end
 
-		if (shouldUseAutoPatch == 'false' or game ~= 'lotv') and epatch == '' then
-			epatch = patch
-		end
-		if patch == '' and game == _GAME_LOTV and shouldUseAutoPatch ~= 'false' then
-			patch = 'Patch ' .. (
-				Autopatch({ sdate }) or '')
-		end
-		if epatch == '' and game == 'lotv' and shouldUseAutoPatch ~= 'false' then
-			epatch = 'Patch ' .. (
-				Autopatch({ edate }) or '')
+		if game == _GAME_LOTV and shouldUseAutoPatch then
+			if String.isEmpty(patch) then
+				patch = 'Patch ' .. (Autopatch._main({CustomLeague._retrievePatchDate(startDate)}) or '')
+			end
+			if String.isEmpty(endPatch) then
+				endPatch = 'Patch ' .. (Autopatch._main({CustomLeague._retrievePatchDate(endDate)}) or '')
+			end
+		elseif String.isEmpty(endPatch) then
+			endPatch = patch
 		end
 
-		local patch_display = beta ~= '' and 'Beta ' or ''
+		local patchDisplay = betaPrefix
 
-		if patch ~= '' then
-			if patch == epatch then
-				patch_display = patch_display .. '<br/>[[' .. patch .. ']]'
-			else
-				patch_display = patch_display .. '<br/>[[' .. patch .. ']] &ndash; [[' .. epatch .. ']]'
+		if String.isNotEmpty(patch) then
+			patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
+			if patch ~= endPatch then
+				patchDisplay = patchDisplay .. ' &ndash; [[' .. endPatch .. ']]'
 			end
 		end
 
 		--set patch variables
 		Variables.varDefine('patch', patch)
-		Variables.varDefine('epatch', epatch)
+		Variables.varDefine('epatch', endPatch)
 
-		return gameversion .. patch_display
+		return gameVersion .. patchDisplay
 	end
+end
+
+function CustomLeague._retrievePatchDate(dateEntry)
+	return String.isNotEmpty(dateEntry)
+		and dateEntry:lower() ~= 'tbd'
+		and dateEntry:lower() ~= 'tba'
+		and dateEntry or _TODAY
 end
 
 function CustomLeague._getChronologyData()
@@ -513,22 +499,22 @@ function CustomLeague._playerRaceBreakDown()
 	return playerBreakDown or {}
 end
 
-function CustomLeague:_makeBasedListFromArgs(base)
-	local firstArg = _args[base .. '1']
-	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
-	local index = 2
+function CustomLeague:_makeBasedListFromArgs(prefix)
+	local foundArgs = {}
+	for key, linkValue in Table.iter.pairsByPrefix(_args, prefix) do
+		local displayValue = String.isNotEmpty(_args[key .. 'display'])
+			and _args[key .. 'display']
+			or linkValue
 
-	while not String.isEmpty(_args[base .. index]) do
-		local currentArg = _args[base .. index]
-		table.insert(foundArgs, '&nbsp;• ' ..
+		table.insert(
+			foundArgs,
 			tostring(CustomLeague:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, currentArg)
+				PageLink.makeInternalLink({}, displayValue, linkValue)
 			))
 		)
-		index = index + 1
 	end
 
-	return foundArgs
+	return {table.concat(foundArgs, '&nbsp;• ')}
 end
 
 function CustomLeague:defineCustomPageVariables()
@@ -536,6 +522,13 @@ function CustomLeague:defineCustomPageVariables()
 	local name = self.name
 	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
+
+	local tierType = _args.liquipediatiertype or _args.tiertype or ''
+	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
+	Variables.varDefine('tournament_liquipediatiertype', tierType)
+	--Legacy tier(type) vars
+	Variables.varDefine('tournament_tiertype', tierType)
+	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 
 	--override var to standardize its entries
 	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game)] or {})[1] or _GAMES[_GAME_WOL][1])
@@ -595,7 +588,7 @@ function CustomLeague:_concatArgs(base)
 	end
 	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
 	local index = 2
-	while not String.isEmpty(_args[base .. index]) do
+	while String.isNotEmpty(_args[base .. index]) do
 		table.insert(foundArgs,
 			mw.ext.TeamLiquidIntegration.resolve_redirect(_args[base .. index])
 		)
