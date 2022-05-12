@@ -228,8 +228,8 @@ end
 
 --- Allows for overriding this functionality
 function League:createLiquipediaTierDisplay(args)
-	local tier = args.liquipediatier or ''
-	local tierType = string.lower(args.liquipediatiertype or '')
+	local tier = args.liquipediatier
+	local tierType = args.liquipediatiertype
 	if String.isEmpty(tier) then
 		return nil
 	end
@@ -239,7 +239,7 @@ function League:createLiquipediaTierDisplay(args)
 		if not Tier.text[tierMode] then -- allow legacy tier modules
 			tierText = Tier.text[tierString]
 		else -- default case, i.e. tier module with intended format
-			tierText = Tier.text[tierMode][tierString]
+			tierText = Tier.text[tierMode][tierString:lower()]
 		end
 		if not tierText then
 			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
@@ -250,6 +250,7 @@ function League:createLiquipediaTierDisplay(args)
 			)
 			return ''
 		else
+			self.infobox:categories(tierText .. ' Tournaments')
 			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
 		end
 	end
@@ -289,7 +290,15 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
-	Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)
+	Variables.varDefine(
+		'tournament_liquipediatiertype',
+		Tier.text.types
+			and Tier.text.types[args.liquipediatiertype or '']
+			or args.liquipediatiertype
+	)
+	--[[ once tier modules all follow the new format we can simplify this again:
+	Variables.varDefine('tournament_liquipediatiertype', Tier.text.types[args.liquipediatiertype or ''])
+	]]
 
 	Variables.varDefine('tournament_type', args.type)
 	Variables.varDefine('tournament_status', args.status)
@@ -548,7 +557,6 @@ function League:_getPageNameFromChronology(item)
 
 	return mw.text.split(item, '|')[1]
 end
-
 
 -- Given a series, query its abbreviation if abbreviation is not set manually
 function League:_fetchAbbreviation()
