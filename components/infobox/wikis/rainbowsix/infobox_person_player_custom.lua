@@ -74,7 +74,7 @@ function CustomPlayer.run(frame)
 
 	player.args.history = Template.safeExpand(frame, 'TeamHistoryAuto', {player = player.args.id})
 
-	player.args.informationType = player.args.informationType or 'Player'
+	player.args.informationType = player.args.informationType or 'player'
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
@@ -180,10 +180,11 @@ function CustomPlayer:adjustLPDB(lpdbData)
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if Namespace.isMain() then
+	if Namespace.isMain() and String.isNotEmpty(_args.team) then
+		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
 		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = _args.team}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = _args.team})
+			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
+			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 	end
 end
 
