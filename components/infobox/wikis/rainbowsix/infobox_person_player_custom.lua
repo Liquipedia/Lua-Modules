@@ -72,7 +72,7 @@ function CustomPlayer.run(frame)
 		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
 	end
 
-	player.args.history = Template.safeExpand(frame, 'TeamHistoryAuto')
+	player.args.history = Template.safeExpand(frame, 'TeamHistoryAuto', {player = player.args.id})
 
 	player.args.informationType = player.args.informationType or 'Player'
 
@@ -88,10 +88,8 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
-		local statusContents = CustomPlayer._getStatusContents()
-
 		return {
-			Cell{name = 'Status', content = statusContents},
+			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
 			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
 			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
 			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
@@ -100,11 +98,16 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Current Role', content = {
-					CustomPlayer._createRole('role', _args.role),
-					CustomPlayer._createRole('role2', _args.role2)
-				}},
+			Cell{name = 'Role', content = {
+				CustomPlayer._createRole('role', _args.role),
+				CustomPlayer._createRole('role2', _args.role2)
+			}},
 		}
+	elseif id == 'history' then
+		table.insert(widgets, Cell{
+			name = 'Retired',
+			content = {_args.retired}
+		})
 	end
 	return widgets
 end
@@ -134,7 +137,7 @@ function CustomInjector:addCustomCells(widgets)
 		Builder{
 			builder = function()
 				local activeInGames = {}
-				Table.forEachPair(_GAMES,
+				Table.iter.forEachPair(_GAMES,
 					function(key)
 						if _args[key] then
 							table.insert(activeInGames, _GAMES[key])
@@ -186,11 +189,10 @@ end
 
 function CustomPlayer._getStatusContents()
 	local statusContents = {}
-	local status
+
 	if not String.isEmpty(_args.status) then
-		status = Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status
+		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
 	end
-	table.insert(statusContents, status)
 
 	local banned = _BANNED[string.lower(_args.banned or '')]
 	if not banned and not String.isEmpty(_args.banned) then
@@ -198,10 +200,12 @@ function CustomPlayer._getStatusContents()
 		table.insert(statusContents, banned)
 	end
 
-	statusContents = Array.map(Player:getAllArgsForBase(_args, 'banned'),
-		function(item, _)
-			return _BANNED[string.lower(item)]
-		end
+	statusContents = Array.extendWith(statusContents,
+		Array.map(Player:getAllArgsForBase(_args, 'banned'),
+			function(item, _)
+				return _BANNED[string.lower(item)]
+			end
+		)
 	)
 
 	return statusContents
