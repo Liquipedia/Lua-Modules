@@ -171,6 +171,8 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.isplayer = Variables.varDefault('isplayer')
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
 
+	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
+
 	if String.isNotEmpty(_args.team2) then
 		lpdbData.extradata.team2 = Team.page(_args.team2)
 	end
