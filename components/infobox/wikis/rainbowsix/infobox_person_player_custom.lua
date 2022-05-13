@@ -74,8 +74,6 @@ function CustomPlayer.run(frame)
 
 	player.args.history = Template.safeExpand(frame, 'TeamHistoryAuto', {player = player.args.id})
 
-	player.args.informationType = player.args.informationType or 'player'
-
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
@@ -171,6 +169,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.signatureOperator4 = _args.operator4
 	lpdbData.extradata.signatureOperator5 = _args.operator5
 	lpdbData.extradata.isplayer = Variables.varDefault('isplayer')
+	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
 
 	if String.isNotEmpty(_args.team2) then
 		lpdbData.extradata.team2 = Team.page(_args.team2)
