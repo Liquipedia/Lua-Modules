@@ -30,9 +30,6 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 		queryResult.shortname
 	)
 
-	Variables.varDefine('tournament_abbreviation', Variables.varDefault('tournament_liquipediatiertype', ''))
-	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
-
 	--custom stuff
 	Variables.varDefine('headtohead', args.headtohead)
 	BasicHiddenDataBox:checkAndAssign(
