@@ -63,7 +63,6 @@ local _args
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
-	local resolvedId = mw.ext.TeamLiquidIntegration.resolve_redirect(player.args.id)
 
 	if String.isEmpty(player.args.team) then
 		player.args.team = PlayerTeamAuto._main{team = 'team'}
