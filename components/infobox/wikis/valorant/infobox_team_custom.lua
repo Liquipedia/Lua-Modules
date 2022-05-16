@@ -35,14 +35,14 @@ function CustomTeam:createBottomContent()
 	)
 end
 
-function CustomTeam.addCustomCells(team, infobox, args)
+function CustomInjector:addCustomCells(widgets)
     Variables.varDefine('rating', args.rating)
     local teamName = args.rankingname or team.pagename or team.name
     local vctRanking = TeamRanking.get({ranking = 'VCT_2021_Ranking', team = teamName})
 
-    infobox :cell('[[Portal:Rating|LPRating]]', args.rating or 'Not enough data')
-            :cell('[[VALORANT_Champions_Tour/2021/Circuit_Points|VCT Points]]', vctRanking)
-    return infobox
+table.insert(widgets, Cell{name = '[[Portal:Rating|LPRating]]', content = {args.rating or 'Not enough data'}})
+table.insert(widgets, Cell{name = '[[VALORANT_Champions_Tour/2021/Circuit_Points|VCT Points]]', content = {vctRanking}})
+    return widgets
 
 end
 
