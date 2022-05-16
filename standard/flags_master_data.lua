@@ -1487,6 +1487,10 @@ local data = {
 		name = 'Russian Speaking',
 		flag = 'File:RuBy hd.png'
 	},
+	['non-representing'] = {
+		name = 'Non-representing',
+		flag = 'File:non hd.png'
+	},
 	['filler'] = {
 		flag = 'File:Space filler flag.png',
 		localised = '',
