@@ -16,6 +16,7 @@ local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
+local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
@@ -65,14 +66,14 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 
 	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{}
+		player.args.team = PlayerTeamAuto._main{player = player.args.id, team = 'team'}
 	end
 
 	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
+		player.args.team2 = PlayerTeamAuto._main{player = player.args.id, team = 'team2'}
 	end
 
-	player.args.history = Template.safeExpand(frame, 'TeamHistoryAuto', {player = player.args.id})
+	player.args.history = tostring(TeamHistoryAuto._results{player = player.args.id, addlpdbdata='true'})
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
@@ -168,7 +169,6 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.signatureOperator3 = _args.operator3
 	lpdbData.extradata.signatureOperator4 = _args.operator4
 	lpdbData.extradata.signatureOperator5 = _args.operator5
-	lpdbData.extradata.isplayer = Variables.varDefault('isplayer')
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
@@ -181,7 +181,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if Namespace.isMain() and String.isNotEmpty(_args.team) then
+	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
 		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
 		return
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
@@ -192,12 +192,12 @@ end
 function CustomPlayer._getStatusContents()
 	local statusContents = {}
 
-	if not String.isEmpty(_args.status) then
+	if String.isNotEmpty(_args.status) then
 		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
 	end
 
 	local banned = _BANNED[string.lower(_args.banned or '')]
-	if not banned and not String.isEmpty(_args.banned) then
+	if not banned and String.isNotEmpty(_args.banned) then
 		banned = '[[Banned Players|Multiple Bans]]'
 		table.insert(statusContents, banned)
 	end
@@ -222,7 +222,7 @@ function CustomPlayer._createRole(key, role)
 	if not roleData then
 		return nil
 	end
-	if Namespace.isMain() then
+	if Player:shouldStoreData(_args) then
 		local categoryCoreText = 'Category:' .. roleData.category
 
 		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
