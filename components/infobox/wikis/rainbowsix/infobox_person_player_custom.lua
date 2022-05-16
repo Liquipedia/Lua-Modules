@@ -63,13 +63,14 @@ local _args
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
+	local resolvedId = mw.ext.TeamLiquidIntegration.resolve_redirect(player.args.id)
 
 	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{player = player.args.id, team = 'team'}
+		player.args.team = PlayerTeamAuto._main{player = resolvedId, team = 'team'}
 	end
 
 	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{player = player.args.id, team = 'team2'}
+		player.args.team2 = PlayerTeamAuto._main{player = resolvedId, team = 'team2'}
 	end
 
 	player.args.history = tostring(TeamHistoryAuto._results{player = player.args.id, addlpdbdata='true'})
@@ -229,14 +230,15 @@ end
 
 function CustomPlayer:defineCustomPageVariables(args)
 	-- isplayer needed for SMW
+	local roleData
 	if String.isNotEmpty(args.role) then
-		local roleData = _ROLES[args.role:lower()]
-		-- If the role is missing, assume it is a player
-		if roleData and roleData.isplayer == false then
-			Variables.varDefine('isplayer', 'false')
-		else
-			Variables.varDefine('isplayer', 'true')
-		end
+		roleData = _ROLES[args.role:lower()]
+	end
+	-- If the role is missing, assume it is a player
+	if roleData and roleData.isplayer == false then
+		Variables.varDefine('isplayer', 'false')
+	else
+		Variables.varDefine('isplayer', 'true')
 	end
 end
 
