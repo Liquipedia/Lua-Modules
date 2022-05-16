@@ -565,8 +565,8 @@ return {
 	['north america'] = [=[North America]=],
 	['world'] = [=[World]=],
 
-	['xx'] = [=[non-country representing]=],
-	['non-representing'] = [=[non-country representing]=],
+	['xx'] = [=[Non-country representing]=],
+	['non-representing'] = [=[Non-country representing]=],
 
 	['bye'] = [=[]=],
 	['filler'] = [=[]=],
