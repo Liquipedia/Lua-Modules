@@ -152,7 +152,7 @@ function StreamKey:_fromLegacy(input)
 		-- are not valid platforms. E.g. "twitch2" is not a valid platform.
 		if not StreamLinks.streamPlatformLookupNames[platform] then
 			-- Check if this platform matches the input
-			if string.find(input, platform, 1, true) then
+			if string.find(input, platform .. '%d-$') then
 				local index = 1
 				-- If the input is longer than the platform, there's an index at the end
 				-- Eg. In "twitch2", the 2 would the index.
