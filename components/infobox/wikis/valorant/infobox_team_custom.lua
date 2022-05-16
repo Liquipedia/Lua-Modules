@@ -10,14 +10,17 @@ local Team = require('Module:Infobox/Team')
 local Earnings = require('Module:Earnings')
 local Variables = require('Module:Variables')
 local String = require('Module:String')
-local TeamMatches = require('Module:Matches/Team')
+local Template = require('Module:Template')
 
 local TeamRanking = require('Module:TeamRanking')
 
 local CustomTeam = {}
 
+local _team
+
 function CustomTeam.run(frame)
     local team = Team(frame)
+	_team = team
     team.addCustomCells = CustomTeam.addCustomCells
 	team.addToLpdb = CustomTeam.addToLpdb
     team.calculateEarnings = CustomTeam.calculateEarnings
