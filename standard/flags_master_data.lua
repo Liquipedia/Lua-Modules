@@ -1428,6 +1428,7 @@ local twoLetter = {
 
 	--   ISO 3166-1 alpha-2 User-assigned Code Elements
 	['xk'] = 'kosovo',
+	['xx'] = 'non-representing',
 
 	--   ISO 3166-1 alpha-2 Exceptional Reservations
 	['eu'] = 'europeanunion',
