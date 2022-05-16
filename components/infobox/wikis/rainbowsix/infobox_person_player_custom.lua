@@ -145,9 +145,7 @@ function CustomInjector:addCustomCells(widgets)
 				return {
 					Cell{
 						name = #activeInGames > 1 and 'Games' or 'Game',
-						content = {
-							table.concat(activeInGames, '<br>')
-						}
+						content = activeInGames
 					}
 				}
 			end
