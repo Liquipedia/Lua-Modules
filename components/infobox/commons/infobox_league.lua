@@ -66,7 +66,7 @@ function League:createInfobox()
 				self:_createSeries(
 					{
 						shouldSetVariable = true,
-						diaplayManualIcons = not Logic.readBool(args.icon_display_from_lis or true),
+						diaplayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 					},
 					args.series,
 					args.abbreviation,
