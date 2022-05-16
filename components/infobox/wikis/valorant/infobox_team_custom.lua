@@ -19,12 +19,12 @@ local CustomTeam = {}
 local _team
 
 function CustomTeam.run(frame)
-    local team = Team(frame)
+	local team = Team(frame)
 	_team = team
-    team.addCustomCells = CustomTeam.addCustomCells
+	team.addCustomCells = CustomTeam.addCustomCells
 	team.addToLpdb = CustomTeam.addToLpdb
-    team.calculateEarnings = CustomTeam.calculateEarnings
-    return team:createInfobox(frame)
+	team.calculateEarnings = CustomTeam.calculateEarnings
+	return team:createInfobox(frame)
 end
 
 function CustomTeam:createBottomContent()
@@ -36,18 +36,13 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomInjector:addCustomCells(widgets)
-    Variables.varDefine('rating', args.rating)
-    local teamName = args.rankingname or team.pagename or team.name
-    local vctRanking = TeamRanking.get({ranking = 'VCT_2021_Ranking', team = teamName})
+	Variables.varDefine('rating', args.rating)
+	local teamName = args.rankingname or team.pagename or team.name
+	local vctRanking = TeamRanking.get({ranking = 'VCT_2021_Ranking', team = teamName})
 
-table.insert(widgets, Cell{name = '[[Portal:Rating|LPRating]]', content = {args.rating or 'Not enough data'}})
-table.insert(widgets, Cell{name = '[[VALORANT_Champions_Tour/2021/Circuit_Points|VCT Points]]', content = {vctRanking}})
-    return widgets
-
-end
-
-function CustomTeam.calculateEarnings(team, args)
-    return Earnings.calculateForTeam({team = team.pagename or team.name})
+	table.insert(widgets, Cell{name = '[[Portal:Rating|LPRating]]', content = {args.rating or 'Not enough data'}})
+	table.insert(widgets, Cell{name = '[[VALORANT_Champions_Tour/2021/Circuit_Points|VCT Points]]', content = {vctRanking}})
+	return widgets
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
