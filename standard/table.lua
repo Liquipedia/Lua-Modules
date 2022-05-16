@@ -224,7 +224,7 @@ Extracts prefixed keys interleaved with numeric indexes from an arguments
 table, and applies a transform to each key or index.
 
 Used for template calls that support both prefixed and indexed params. See
-Module:ParticipantTable/Starcraft, Module:GroupTableLeage for examples of how
+Module:ParticipantTable/Starcraft, Module:GroupTableLeague for examples of how
 it is used.
 
 Example:
@@ -241,7 +241,7 @@ will invoke
 
 f(1, 1)
 f('p2', 2, 'p')
-f(3, 3)
+f(2, 3)
 f('player4', 4, 'player')
 
 ]]
