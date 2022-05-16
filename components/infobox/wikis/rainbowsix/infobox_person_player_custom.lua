@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Namespace = require('Module:Namespace')
 local OperatorIcon = require('Module:OperatorIcon')
 local Page = require('Module:Page')
 local Player = require('Module:Infobox/Person')
