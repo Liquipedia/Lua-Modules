@@ -199,15 +199,13 @@ function CustomPlayer._getStatusContents()
 		table.insert(statusContents, banned)
 	end
 
-	statusContents = Array.extendWith(statusContents,
+	return Array.extendWith(statusContents,
 		Array.map(Player:getAllArgsForBase(_args, 'banned'),
 			function(item, _)
 				return _BANNED[string.lower(item)]
 			end
 		)
 	)
-
-	return statusContents
 end
 
 function CustomPlayer._createRole(key, role)
