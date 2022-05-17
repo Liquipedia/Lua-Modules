@@ -229,6 +229,11 @@ function League:liquipediaTierHighlighted(args)
 end
 
 --- Allows for overriding this functionality
+function League:appendLiquipediatierDisplay()
+	return ''
+end
+
+--- Allows for overriding this functionality
 function League:createLiquipediaTierDisplay(args)
 	local tier = args.liquipediatier
 	local tierType = args.liquipediatiertype
@@ -263,10 +268,6 @@ function League:createLiquipediaTierDisplay(args)
 	end
 
 	return tierDisplay .. self.appendLiquipediatierDisplay(args)
-end
-
-function League:appendLiquipediatierDisplay()
-	return ''
 end
 
 function League:_createPrizepool(args)
