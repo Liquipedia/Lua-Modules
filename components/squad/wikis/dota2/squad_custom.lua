@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=mobilelegends
+-- wiki=dota2
 -- page=Module:Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
