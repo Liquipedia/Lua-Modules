@@ -91,6 +91,7 @@ function CustomSquad.run(frame)
 				captain = player.captain,
 				role = player.role,
 				team = player.team,
+                teamrole = player.teamrole,
 			})
 			:name({name = player.name})
 			:position({position = player.position})
