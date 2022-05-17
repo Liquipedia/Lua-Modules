@@ -67,10 +67,15 @@ function Series:createInfobox(frame)
 				makeLink = true
 			}
 		},
-		Cell{
-			name = 'Location',
-			content = {
-				self:_createLocation(args.country, args.city)
+		Customizable{
+			id = 'location',
+			children = {
+				Cell{
+					name = 'Location',
+					content = {
+						self:_createLocation(args.country, args.city)
+					}
+				},
 			}
 		},
 		Cell{
@@ -82,7 +87,7 @@ function Series:createInfobox(frame)
 		Cell{
 			name = 'Start Date',
 			content = {
-				args.sdate or args.launched
+				args.sdate or args.launched or args.inaugurated
 			}
 		},
 		Cell{
@@ -131,7 +136,7 @@ function Series:createInfobox(frame)
 			prizepool = args.prizepool,
 			liquipediatier = args.liquipediatier,
 			publishertier = args.publishertier,
-			launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate),
+			launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
 			defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
 			defunctfate = ReferenceCleaner.clean(args.defunctfate),
 			organizers = mw.ext.LiquipediaDB.lpdb_create_json({
