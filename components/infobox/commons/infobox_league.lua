@@ -245,8 +245,10 @@ function League:createLiquipediaTierDisplay(args)
 			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
 			table.insert(
 				self.warnings,
-				tierString .. ' is not a known Liquipedia ' .. tierMode
-					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
+				String.interpolate(
+					'${tierString} is not a known Liquipedia ${tierMode}[[Category:Pages with invalid ${tierMode}]]',
+					{tierString = tierString, tierMode = tierMode}
+				)
 			)
 			return ''
 		else
