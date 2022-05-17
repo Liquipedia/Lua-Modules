@@ -22,6 +22,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local WarningBox = require('Module:WarningBox')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local PrizePoolCurrency = require('Module:Prize pool currency')
+local Logic = require('Module:Logic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -63,13 +64,20 @@ function League:createInfobox()
 			name = 'Series',
 			content = {
 				self:_createSeries(
+					{
+						shouldSetVariable = true,
+						displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
+					},
 					args.series,
 					args.abbreviation,
-					true,
 					args.icon,
 					args.icondarkmode
 				),
-				self:_createSeries(args.series2, args.abbreviation2)
+				self:_createSeries(
+					{shouldSetVariable = false},
+					args.series2,
+					args.abbreviation2
+				)
 			}
 		},
 		Builder{
@@ -366,14 +374,15 @@ function League:_createLocation(args)
 	return content
 end
 
-function League:_createSeries(series, abbreviation, shouldSetVariable, icon, iconDark)
+function League:_createSeries(options, series, abbreviation, icon, iconDark)
 	if String.isEmpty(series) then
 		return nil
 	end
+	options = options or {}
 
 	local output = LeagueIcon.display{
-		icon = icon,
-		iconDark = iconDark,
+		icon = options.displayManualIcons and icon or nil,
+		iconDark = options.displayManualIcons and iconDark or nil,
 		series = series,
 		abbreviation = abbreviation,
 		date = Variables.varDefault('tournament_enddate')
@@ -383,7 +392,7 @@ function League:_createSeries(series, abbreviation, shouldSetVariable, icon, ico
 		output = ''
 	else
 		output = output .. ' '
-		if shouldSetVariable then
+		if options.shouldSetVariable then
 			League:_setIconVariable(output, icon, iconDark)
 		end
 	end
