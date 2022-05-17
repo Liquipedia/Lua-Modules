@@ -30,6 +30,7 @@ function CustomSquad.header(self)
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
 	headerRow	:node(makeHeader('ID'))
+				:node(makeHeader())
 				:node(makeHeader('Name'))
 				:node(makeHeader('Position'))
 				:node(makeHeader('Join Date'))
