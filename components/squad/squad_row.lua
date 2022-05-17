@@ -75,6 +75,9 @@ function SquadRow:id(args)
 
 	if mw.ext.TeamTemplate.teamexists(string.lower(args.team or '')) then
 		cell:wikitext(mw.ext.TeamTemplate.teampart(args.team:lower()))
+		if args.teamrole then
+			cell:wikitext('\'\''.. args.teamrole ..'\'\'')
+		end
 	end
 
 	self.content:node(cell)
