@@ -95,7 +95,7 @@ function CustomSquad.run(frame)
 				teamrole = player.teamrole,
 			})
 			:name({name = player.name})
-			:position({position = player.position})
+			:position({position = player.position, role = player.role})
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
 		if squad.type == Squad.TYPE_FORMER then
