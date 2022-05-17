@@ -41,6 +41,8 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
+	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
 	_league = league
 	_args = _league.args
@@ -85,7 +87,6 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'liquipediatier' then
-		widgets = {}
 		if _args.pctier and _args.liquipediatiertype ~= 'Qualifier' then
 			local valveIcon = ''
 			if Logic.readBool(_args.valvepremier) then
@@ -99,15 +100,19 @@ function CustomInjector:parse(id, widgets)
 				}
 			)
 		end
-		table.insert(widgets,
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createLiquipediaTierDisplay()},
-				classes = {Logic.readBool(_args.valvepremier) and 'valvepremier-highlighted' or nil}
-			}
-		)
 	end
 	return widgets
+end
+
+function CustomLeague:appendLiquipediatierDisplay()
+	if String.isEmpty(_args.pctier) and Logic.readBool(_args.valvepremier) then
+		return Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox')
+	end
+	return ''
+end
+
+function CustomLeague:liquipediaTierHighlighted()
+	return Logic.readBool(_args.valvepremier)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
@@ -121,35 +126,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	}
 
 	return lpdbData
-end
-
-function CustomLeague:_createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or ''
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString)
-		local tierText = Tier.text[tierString]
-		if not tierText then
-			table.insert(_league.warnings, tierString .. ' is not a known Liquipedia Tier/Tiertype')
-			return ''
-		else
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-	if String.isEmpty(_args.pctier) and Logic.readBool(_args.valvepremier) then
-		tierDisplay = tierDisplay .. Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox')
-	end
-
-	return tierDisplay
 end
 
 function CustomLeague:defineCustomPageVariables()
@@ -175,17 +151,6 @@ function CustomLeague:getWikiCategories(args)
 	local categories = {}
 	if String.isNotEmpty(args.player_number) then
 		table.insert(categories, 'Individual Tournaments')
-	end
-
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-
-	if String.isNotEmpty(tier) and String.isNotEmpty(Tier.text[tier]) then
-		table.insert(categories, Tier.text[tier]  .. ' Tournaments')
-	end
-
-	if String.isNotEmpty(tierType) and String.isNotEmpty(Tier.text[tierType]) then
-		table.insert(categories, Tier.text[tierType] .. ' Tournaments')
 	end
 
 	return categories
