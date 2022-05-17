@@ -49,6 +49,13 @@ function Person:createInfobox()
 		error('You need to specify an "id"')
 	end
 
+	-- check if non-representing is used and set an according value in self
+	-- so it can be accessed in the /Custom modules
+	args.country = Person:getStandardNationalityValue(args.country or args.nationality)
+	if args.country ~= Person:getStandardNationalityValue('non-representing') then
+		self.notNonRepresenting = true
+	end
+
 	_shouldStoreData = Person:shouldStoreData(args)
 	-- set custom variables here already so they are available
 	-- in functions we call from here on
@@ -209,7 +216,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		name = args.romanized_name or args.name,
 		romanizedname = args.romanized_name or args.name,
 		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
-		nationality = Person:getStandardNationalityValue(args.country or args.nationality),
+		nationality = args.country, -- already standardized above
 		nationality2 = Person:getStandardNationalityValue(args.country2 or args.nationality2),
 		nationality3 = Person:getStandardNationalityValue(args.country3 or args.nationality3),
 		birthdate = Variables.varDefault('player_birthdate'),
@@ -395,7 +402,11 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		local team = args.teamlink or args.team
 		local categories = { personType .. 's' }
 
-		if args.country2 or args.nationality2 then
+		if
+			self.notNonRepresenting and (args.country2 or args.nationality2)
+			or args.country3
+			or args.nationality3
+		then
 			table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
 		end
 		if args.death_date then
