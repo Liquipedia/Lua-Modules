@@ -11,6 +11,7 @@ local Variables = require('Module:Variables')
 local String = require('Module:String')
 local Template = require('Module:Template')
 local Class = require('Module:Class')
+local Cell = require('Module:Infobox/Widget/Cell')
 local Injector = require('Module:Infobox/Widget/Injector')
 local TeamRanking = require('Module:TeamRanking')
 
@@ -38,11 +39,13 @@ end
 
 function CustomInjector:addCustomCells(widgets, args)
 	Variables.varDefine('rating', args.rating)
-	local teamName = args.rankingname or team.pagename or team.name
+	local teamName = args.rankingname or _team.pagename or _team.name
 	local vctRanking = TeamRanking.get({ranking = 'VCT_2021_Ranking', team = teamName})
 
-	table.insert(widgets, Cell{name = '[[Portal:Rating|LPRating]]', content = {args.rating or 'Not enough data'}})
-	table.insert(widgets, Cell{name = '[[VALORANT_Champions_Tour/2021/Circuit_Points|VCT Points]]', content = {vctRanking}})
+	table.insert(widgets, Cell{name = '[[Portal:Rating|LPRating]]', 
+			content = {args.rating or 'Not enough data'}})
+	table.insert(widgets, Cell{name = '[[VALORANT_Champions_Tour/2021/Circuit_Points|VCT Points]]', 
+			content = {vctRanking}})
 	return widgets
 end
 
