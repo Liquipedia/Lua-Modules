@@ -178,7 +178,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 
 		--_player
 		if
-			_player.notNonRepresenting and (args.country2 or args.nationality2)
+			not _player.nonRepresenting and (args.country2 or args.nationality2)
 			or args.country3
 			or args.nationality3
 		then
