@@ -30,13 +30,18 @@ local _GAMES = {
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-	_league = league
-	_args = _league.args
+
+	-- Override links to allow one param to set multiple links
+	league.args.datdota = league.args.leagueid
+	league.args.dotabuff = league.args.leagueid
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
+
+	_league = league
+	_args = _league.args
 
 	return league:createInfobox(frame)
 end
