@@ -299,7 +299,7 @@ function League:_definePageVariables(args)
 			or args.liquipediatiertype
 	)
 	--[[ once tier modules all follow the new format we can simplify this again:
-	Variables.varDefine('tournament_liquipediatiertype', Tier.text.types[args.liquipediatiertype or ''])
+	Variables.varDefine('tournament_liquipediatiertype', Tier.text.types[string.lower(args.liquipediatiertype or '')])
 	]]
 
 	Variables.varDefine('tournament_type', args.type)
