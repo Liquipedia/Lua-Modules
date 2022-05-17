@@ -28,15 +28,6 @@ local _GAMES = {
 	['auto chess'] = {name = 'Auto Chess', category = 'Auto Chess Competitions'},
 }
 
-local _UBISOFT_TIERS = {
-	si = 'Six Invitational',
-	pl = 'Pro League',
-	cl = 'Challenger League',
-	national = 'National',
-	major = 'Six Major',
-	minor = 'Minor',
-}
-
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
