@@ -73,11 +73,17 @@ function SquadRow:id(args)
 		cell:wikitext('&nbsp;' .. _ICON_SUBSTITUTE)
 	end
 
+	local teamNode = mw.html.create('td')
 	if mw.ext.TeamTemplate.teamexists(string.lower(args.team or '')) then
-		cell:wikitext(mw.ext.TeamTemplate.teampart(args.team:lower()))
+		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team:lower()))
+		if args.teamrole then
+			teamNode:css('text-align', 'center')
+			teamNode:tag('div'):css('font-size', '85%'):wikitext('(\'\''.. args.teamrole ..'\'\')')
+		end
 	end
 
 	self.content:node(cell)
+	self.content:node(teamNode)
 
 	self.lpdbData['id'] = args[1]
 	self.lpdbData['nationality'] = Flags.CountryName(args.flag)

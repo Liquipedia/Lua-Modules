@@ -91,8 +91,9 @@ function Squad:header()
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
 		headerRow	:node(makeHeader('ID'))
+					:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
 					:node(makeHeader('Name'))
-					:node(makeHeader())
+					:node(makeHeader()) -- "Role"
 					:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_FORMER then
 		headerRow	:node(makeHeader('Leave Date'))
