@@ -66,7 +66,7 @@ function League:createInfobox()
 				self:_createSeries(
 					{
 						shouldSetVariable = true,
-						diaplayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
+						displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 					},
 					args.series,
 					args.abbreviation,
@@ -381,8 +381,8 @@ function League:_createSeries(options, series, abbreviation, icon, iconDark)
 	options = options or {}
 
 	local output = LeagueIcon.display{
-		icon = options.diaplayManualIcons and icon or nil,
-		iconDark = options.diaplayManualIcons and iconDark or nil,
+		icon = options.displayManualIcons and icon or nil,
+		iconDark = options.displayManualIcons and iconDark or nil,
 		series = series,
 		abbreviation = abbreviation,
 		date = Variables.varDefault('tournament_enddate')
