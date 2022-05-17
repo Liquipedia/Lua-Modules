@@ -26,6 +26,8 @@ local PrizePoolCurrency = require('Module:Prize pool currency')
 
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
+local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
+	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -245,10 +247,7 @@ function League:createLiquipediaTierDisplay(args)
 			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
 			table.insert(
 				self.warnings,
-				String.interpolate(
-					'${tierString} is not a known Liquipedia ${tierMode}[[Category:Pages with invalid ${tierMode}]]',
-					{tierString = tierString, tierMode = tierMode}
-				)
+				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
 			)
 			return ''
 		else
