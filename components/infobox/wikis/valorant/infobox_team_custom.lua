@@ -10,6 +10,7 @@ local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 local String = require('Module:String')
 local Template = require('Module:Template')
+local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local TeamRanking = require('Module:TeamRanking')
 
@@ -35,7 +36,7 @@ function CustomTeam:createBottomContent()
 	)
 end
 
-function CustomInjector:addCustomCells(widgets)
+function CustomInjector:addCustomCells(widgets, args)
 	Variables.varDefine('rating', args.rating)
 	local teamName = args.rankingname or team.pagename or team.name
 	local vctRanking = TeamRanking.get({ranking = 'VCT_2021_Ranking', team = teamName})
