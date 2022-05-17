@@ -11,6 +11,8 @@ local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Template = require('Module:Template')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -57,6 +59,10 @@ function CustomInjector:addCustomCells(widgets)
 		content = {CustomLeague:_createGameCell(args)}
 	})
 	table.insert(widgets, Cell{
+		name = 'Version',
+		content = {CustomLeague:_createPatchCell(args)}
+	})
+	table.insert(widgets, Cell{
 		name = 'Teams',
 		content = {args.team_number}
 	})
@@ -68,31 +74,38 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Dota TV Ticket',
 		content = {args.dotatv}
 	})
-	table.insert(widgets, Cell{
-		name = 'Pro Circuit Points',
-		content = {args.points} -- TODO: Format nicely
-	})
-
+	if args.points then
+		table.insert(widgets, Cell{
+			name = 'Pro Circuit Points',
+			content = {mw.language.new('en'):formatNum(tonumber(args.points))}
+		})
+	end
 	return widgets
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'liquipediatier' then
-		widgets = {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createLiquipediaTierDisplay()},  -- TODO: Add Valve icon
-			}
-		}
+		widgets = {}
 		if _args.pctier and _args.liquipediatiertype ~= 'Qualifier' then
+			local valveIcon = ''
+			if Logic.readBool(_args.valvepremier) then
+				valveIcon = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox')
+			end
 			table.insert(widgets,
 				Cell{
 					name = 'Pro Circuit Tier',
-					content = {'[[Dota Pro Circuit|' .. _args.pctier .. ']]'}, -- TODO: Add Valve icon
+					content = {'[[Dota Pro Circuit|' .. _args.pctier .. ']] ' .. valveIcon},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
 		end
+		table.insert(widgets,
+			Cell{
+				name = 'Liquipedia Tier',
+				content = {CustomLeague:_createLiquipediaTierDisplay()},
+				classes = {Logic.readBool(_args.valvepremier) and 'valvepremier-highlighted' or nil}
+			}
+		)
 	end
 	return widgets
 end
@@ -131,6 +144,9 @@ function CustomLeague:_createLiquipediaTierDisplay()
 
 	if String.isNotEmpty(tierType) then
 		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
+	end
+	if String.isEmpty(_args.pctier) and Logic.readBool(_args.valvepremier) then
+		tierDisplay = tierDisplay .. Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox')
 	end
 
 	return tierDisplay
@@ -195,6 +211,18 @@ function CustomLeague:_createGameCell(args)
 	else
 		return nil
 	end
+end
+
+function CustomLeague:_createPatchCell(args)
+	if String.isEmpty(args.patch) then
+		return nil
+	end
+
+	local displayText = '[['.. args.patch .. ']]'
+	if args.epatch then
+		displayText = displayText .. ' &ndash; [['.. args.epatch .. ']]'
+	end
+	return displayText
 end
 
 return CustomLeague
