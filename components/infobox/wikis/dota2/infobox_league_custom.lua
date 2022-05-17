@@ -79,11 +79,11 @@ function CustomInjector:parse(id, widgets)
 				content = {CustomLeague:_createLiquipediaTierDisplay()},  -- TODO: Add Valve icon
 			}
 		}
-		if CustomLeague:_validPublisherTier(_args.pctier) and _args.liquipediatiertype ~= 'Qualifier' then
+		if _args.pctier and _args.liquipediatiertype ~= 'Qualifier' then
 			table.insert(widgets,
 				Cell{
 					name = 'Pro Circuit Tier',
-					content = {'[[Dota Pro Circuit|{{{' .. _args.pctier .. '}}}]]'}, -- TODO: Add Valve icon
+					content = {'[[Dota Pro Circuit|' .. _args.pctier .. ']]'}, -- TODO: Add Valve icon
 					classes = {'valvepremier-highlighted'}
 				}
 			)
