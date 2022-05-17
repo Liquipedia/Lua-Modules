@@ -38,6 +38,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
+	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 
 	return league:createInfobox(frame)
 end
@@ -95,13 +96,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = maps})
 		end
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createTier(args)}
-			}
-		}
 	elseif id == 'sponsors' then
 		if not String.isEmpty(args.sponsors) then
 			local sponsors = mw.text.split(args.sponsors, ',', true)
@@ -143,7 +137,7 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
-function CustomLeague:_createTier(args)
+function CustomLeague:createLiquipediaTierDisplay(args)
 	local content = ''
 
 	local tierVar = Variables.varDefault('tournament_liquipediatier', '')
