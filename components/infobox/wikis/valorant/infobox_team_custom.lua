@@ -10,16 +10,19 @@ local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 local String = require('Module:String')
 local Template = require('Module:Template')
+local Injector = require('Module:Infobox/Widget/Injector')
 local TeamRanking = require('Module:TeamRanking')
 
 local CustomTeam = {}
+
+local CustomInjector = Class.new(Injector)
 
 local _team
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
-	team.addCustomCells = CustomTeam.addCustomCells
+	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.addToLpdb = CustomTeam.addToLpdb
 	return team:createInfobox(frame)
 end
@@ -52,6 +55,10 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 
 	return lpdbData
+end
+
+function CustomTeam:createWidgetInjector()
+	return CustomInjector()
 end
 
 return CustomTeam
