@@ -52,8 +52,8 @@ function Person:createInfobox()
 	-- check if non-representing is used and set an according value in self
 	-- so it can be accessed in the /Custom modules
 	args.country = Person:getStandardNationalityValue(args.country or args.nationality)
-	if args.country ~= Person:getStandardNationalityValue('non-representing') then
-		self.notNonRepresenting = true
+	if args.country == Person:getStandardNationalityValue('non-representing') then
+		self.nonRepresenting = true
 	end
 
 	_shouldStoreData = Person:shouldStoreData(args)
@@ -403,7 +403,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		local categories = { personType .. 's' }
 
 		if
-			self.notNonRepresenting and (args.country2 or args.nationality2)
+			not self.nonRepresenting and (args.country2 or args.nationality2)
 			or args.country3
 			or args.nationality3
 		then
