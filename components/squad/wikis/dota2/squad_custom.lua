@@ -85,7 +85,7 @@ function CustomSquad.run(frame)
 	while args['p' .. index] ~= nil or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
 		local row = ExtendedSquadRow(frame, player.role)
-		row	:id({
+		row	:id{
 				player.id,
 				flag = player.flag,
 				link = player.link,
@@ -93,19 +93,19 @@ function CustomSquad.run(frame)
 				role = player.role,
 				team = player.team,
 				teamrole = player.teamrole,
-			})
-			:name({name = player.name})
-			:position({position = player.position, role = player.role})
+			}
+			:name{name = player.name}
+			:position{position = player.position, role = mw.language.new('en'):ucfirst(player.role or '')}
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
 		if squad.type == Squad.TYPE_FORMER then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-			row:newteam({
+			row:newteam{
 				newteam = player.newteam,
 				newteamrole = player.newteamrole,
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
-			})
+			}
 		elseif squad.type == Squad.TYPE_INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
