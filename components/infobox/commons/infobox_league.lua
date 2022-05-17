@@ -34,6 +34,11 @@ local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 local VENUE_DESCRIPTION = "<br><small><small>(${desc})</small></small>"
 
+local _TIER_MODE_TYPES = 'types'
+local _TIER_MODE_TIERS = 'tiers'
+local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
+	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
