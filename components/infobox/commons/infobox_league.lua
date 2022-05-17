@@ -262,8 +262,13 @@ function League:createLiquipediaTierDisplay(args)
 		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
 	end
 
-	return tierDisplay
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
 end
+
+function League:appendLiquipediatierDisplay()
+	return ''
+end
+
 function League:_createPrizepool(args)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return nil
