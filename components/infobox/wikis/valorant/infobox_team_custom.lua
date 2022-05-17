@@ -42,9 +42,9 @@ function CustomInjector:addCustomCells(widgets, args)
 	local teamName = args.rankingname or _team.pagename or _team.name
 	local vctRanking = TeamRanking.get({ranking = 'VCT_2021_Ranking', team = teamName})
 
-	table.insert(widgets, Cell{name = '[[Portal:Rating|LPRating]]', 
+	table.insert(widgets, Cell{name = '[[Portal:Rating|LPRating]]',
 			content = {args.rating or 'Not enough data'}})
-	table.insert(widgets, Cell{name = '[[VALORANT_Champions_Tour/2021/Circuit_Points|VCT Points]]', 
+	table.insert(widgets, Cell{name = '[[VALORANT_Champions_Tour/2021/Circuit_Points|VCT Points]]',
 			content = {vctRanking}})
 	return widgets
 end
