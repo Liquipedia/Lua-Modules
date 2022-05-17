@@ -21,8 +21,14 @@ local Page = require('Module:Page')
 local LeagueIcon = require('Module:LeagueIcon')
 local WarningBox = require('Module:WarningBox')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local Tier = require('Module:Tier')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 local Logic = require('Module:Logic')
+
+local _TIER_MODE_TYPES = 'types'
+local _TIER_MODE_TIERS = 'tiers'
+local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
+	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -152,7 +158,14 @@ function League:createInfobox()
 		Cell{name = 'Start Date', content = {args.sdate}},
 		Cell{name = 'End Date', content = {args.edate}},
 		Customizable{id = 'custom', children = {}},
-		Customizable{id = 'liquipediatier', children = {}},
+		Customizable{id = 'liquipediatier', children = {
+				Cell{
+					name = 'Liquipedia tier',
+					content = {self:createLiquipediaTierDisplay(args)},
+					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
+				},
+			},
+		},
 		Builder{
 			builder = function()
 				links = Links.transform(args)
@@ -218,6 +231,53 @@ function League:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+--- Allows for overriding this functionality
+function League:liquipediaTierHighlighted(args)
+	return false
+end
+
+--- Allows for overriding this functionality
+function League:appendLiquipediatierDisplay()
+	return ''
+end
+
+--- Allows for overriding this functionality
+function League:createLiquipediaTierDisplay(args)
+	local tier = args.liquipediatier
+	local tierType = args.liquipediatiertype
+	if String.isEmpty(tier) then
+		return nil
+	end
+
+	local function buildTierString(tierString, tierMode)
+		local tierText
+		if not Tier.text[tierMode] then -- allow legacy tier modules
+			tierText = Tier.text[tierString]
+		else -- default case, i.e. tier module with intended format
+			tierText = Tier.text[tierMode][tierString:lower()]
+		end
+		if not tierText then
+			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
+			table.insert(
+				self.warnings,
+				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
+			)
+			return ''
+		else
+			self.infobox:categories(tierText .. ' Tournaments')
+			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
+		end
+	end
+
+	local tierDisplay = buildTierString(tier, _TIER_MODE_TIERS)
+
+	if String.isNotEmpty(tierType) then
+		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
+	end
+
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+end
+
 function League:_createPrizepool(args)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return nil
@@ -245,7 +305,15 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
 	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
-	Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)
+	Variables.varDefine(
+		'tournament_liquipediatiertype',
+		Tier.text.types
+			and Tier.text.types[string.lower(args.liquipediatiertype or '')]
+			or args.liquipediatiertype
+	)
+	--[[ once tier modules all follow the new format we can simplify this again:
+	Variables.varDefine('tournament_liquipediatiertype', Tier.text.types[string.lower(args.liquipediatiertype or '')])
+	]]
 
 	Variables.varDefine('tournament_type', args.type)
 	Variables.varDefine('tournament_status', args.status)
@@ -505,7 +573,6 @@ function League:_getPageNameFromChronology(item)
 
 	return mw.text.split(item, '|')[1]
 end
-
 
 -- Given a series, query its abbreviation if abbreviation is not set manually
 function League:_fetchAbbreviation()
