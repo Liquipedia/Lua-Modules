@@ -9,7 +9,6 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Tier = require('Module:Tier')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Template = require('Module:Template')
