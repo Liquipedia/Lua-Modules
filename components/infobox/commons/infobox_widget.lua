@@ -11,7 +11,6 @@ local String = require('Module:StringUtils')
 
 local Widget = Class.new()
 
-
 local _ERROR_TEXT = '<span style="color:#ff0000;font-weight:bold" class="show-when-logged-in">' ..
 					'Unexpected Error, report this in #bugs on our [https://discord.gg/liquipedia Discord]. ' ..
 					'${errorMessage}' ..
