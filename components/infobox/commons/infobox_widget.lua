@@ -46,7 +46,7 @@ function Widget:tryMake()
 	)
 
 	-- if no error occurs then `erroOutput` is nil, so the result is taken
-	return erroOutput or result
+	return errorOutput or result
 end
 
 function Widget:setContext(context)
