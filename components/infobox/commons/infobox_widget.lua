@@ -29,22 +29,20 @@ function Widget:make()
 end
 
 function Widget:tryMake()
-	local result, errorOutput
-	xpcall(
+	local _, output = xpcall(
 		function()
-			result = self:make()
+			return self:make()
 		end,
 		function(errorMessage)
 			mw.log('-----Error in Widget:tryMake()-----')
 			mw.logObject(errorMessage, 'error')
 			mw.logObject(self, 'widget')
 			mw.log(debug.traceback())
-			errorOutput = {Widget.Error{errorMessage = errorMessage}}
+			return {Widget.Error({errorMessage = errorMessage})}
 		end
 	)
 
-	-- if no error occurs then `errorOutput` is nil, so the result is taken
-	return errorOutput or result
+	return output
 end
 
 function Widget:setContext(context)
