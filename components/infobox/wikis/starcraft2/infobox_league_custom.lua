@@ -63,6 +63,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
+	league.createLiquipediaTierDisplay = nil -- for performance reasons
 
 	return league:createInfobox(frame)
 end
