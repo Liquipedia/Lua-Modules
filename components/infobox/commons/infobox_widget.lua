@@ -31,19 +31,23 @@ function Widget:make()
 end
 
 function Widget:tryMake()
-	-- todo: make it xpcall and do the traceback in there
-	local result, output = pcall(self.make, self) -- Equivalent of self:make()
-	if not result then
-		-- log stacked trace call and log self
-		mw.log('-----Error in Widget:tryMake()-----')
-		mw.logObject(output, 'error')
-		mw.logObject(self, 'widget')
-		mw.log(debug.traceback())
-		output = {String.interpolate(_ERROR_TEXT, {errorMessage = output})}
-		output = {ErrorWidget({content = output})}
-	end
+	local result, erroOutput
+	xpcall(
+		function()
+			result = self:make()
+		end,
+		function(message)
+			mw.log('-----Error in Widget:tryMake()-----')
+			mw.logObject(message, 'error')
+			mw.logObject(self, 'widget')
+			mw.log(debug.traceback())
+			erroOutput = String.interpolate(_ERROR_TEXT, {errorMessage = message})
+			erroOutput = {ErrorWidget({content = erroOutput})}
+		end
+	)
 
-	return output
+	-- if no error occurs then `erroOutput` is nil, so the result is taken
+	return erroOutput or result
 end
 
 function Widget:setContext(context)
@@ -54,7 +58,7 @@ function Widget:setContext(context)
 	end
 end
 
--- error widget for displaying errors of child widgets
+-- error widget for displaying errors of widgets
 -- have to add it here instead of a sep. module to avoid circular requires
 ErrorWidget = Class.new(
 	Widget,
@@ -70,15 +74,8 @@ function ErrorWidget:make()
 end
 
 function ErrorWidget:_create(content)
-	if Table.isEmpty(content) then
-		return nil
-	end
-
 	local errorDiv = mw.html.create('div')
-
-	for _, item in pairs(content) do
-		errorDiv:wikitext(item)
-	end
+		:node(content)
 
 	return mw.html.create('div'):node(errorDiv)
 end
