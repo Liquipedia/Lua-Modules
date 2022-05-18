@@ -35,12 +35,12 @@ function Widget:tryMake()
 		function()
 			result = self:make()
 		end,
-		function(message)
+		function(errorMessage)
 			mw.log('-----Error in Widget:tryMake()-----')
-			mw.logObject(message, 'error')
+			mw.logObject(errorMessage, 'error')
 			mw.logObject(self, 'widget')
 			mw.log(debug.traceback())
-			errorOutput = {ErrorWidget({errorMessage = message})}
+			errorOutput = {ErrorWidget({errorMessage = errorMessage})}
 		end
 	)
 
