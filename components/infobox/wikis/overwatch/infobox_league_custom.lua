@@ -165,9 +165,6 @@ end
 
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
-	if String.isNotEmpty(args.player_number) then
-		table.insert(categories, 'Individual Tournaments')
-	end
 
 	if not CustomLeague:_gameLookup(args.game) then
 		table.insert(categories, 'Tournaments without game version')
