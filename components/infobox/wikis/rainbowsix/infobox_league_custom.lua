@@ -105,12 +105,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'liquipediatier' then
-		widgets = {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createLiquipediaTierDisplay()},
-			}
-		}
 		if CustomLeague:_validPublisherTier(args.ubisofttier) then
 			table.insert(widgets,
 				Cell{
@@ -131,7 +125,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.publishertier = args.ubisofttier:lower()
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.liquipediatiertype = args.liquipediatiertype or _DEFAULT_TIERTYPE
+	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
 		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
@@ -159,40 +153,17 @@ function CustomLeague:_standardiseRawDate(dateString)
 	return dateString
 end
 
-function CustomLeague:_createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or ''
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString)
-		local tierText = Tier.text[tierString]
-		if not tierText then
-			table.insert(_league.warnings, tierString .. ' is not a known Liquipedia Tier/Tiertype')
-			return ''
-		else
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-
-	return tierDisplay
-end
-
 function CustomLeague:defineCustomPageVariables()
 	-- Variables with different handling compared to commons
-	Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or _DEFAULT_TIERTYPE)
+	Variables.varDefine(
+		'tournament_liquipediatiertype',
+		Tier.text.types[string.lower(_args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
+	)
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or _DEFAULT_TIERTYPE)
+	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype'))
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
 
@@ -221,17 +192,6 @@ function CustomLeague:getWikiCategories(args)
 
 	if CustomLeague:_platformLookup(args.platform) then
 		table.insert(categories, CustomLeague:_platformLookup(args.platform) .. ' Tournaments')
-	end
-
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-
-	if String.isNotEmpty(tier) and String.isNotEmpty(Tier.text[tier]) then
-		table.insert(categories, Tier.text[tier]  .. ' Tournaments')
-	end
-
-	if String.isNotEmpty(tierType) and String.isNotEmpty(Tier.text[tierType]) then
-		table.insert(categories, Tier.text[tierType] .. ' Tournaments')
 	end
 
 	return categories
