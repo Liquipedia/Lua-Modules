@@ -74,7 +74,7 @@ function ErrorWidget:_create(content)
 		return nil
 	end
 
-	local errorDiv = mw.html.create('div'):addClass('infobox-center')
+	local errorDiv = mw.html.create('div')
 
 	for _, item in pairs(content) do
 		errorDiv:wikitext(item)
