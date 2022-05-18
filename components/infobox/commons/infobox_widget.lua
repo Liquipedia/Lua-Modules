@@ -40,7 +40,7 @@ function Widget:tryMake()
 			mw.logObject(errorMessage, 'error')
 			mw.logObject(self, 'widget')
 			mw.log(debug.traceback())
-			errorOutput = {Widget.ErrorWidget({errorMessage = errorMessage})}
+			errorOutput = {Widget.ErrorWidget{errorMessage = errorMessage}}
 		end
 	)
 
