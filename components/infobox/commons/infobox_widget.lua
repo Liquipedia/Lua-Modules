@@ -39,7 +39,7 @@ function Widget:tryMake()
 			mw.logObject(errorMessage, 'error')
 			mw.logObject(self, 'widget')
 			mw.log(debug.traceback())
-			errorOutput = {Widget.ErrorWidget{errorMessage = errorMessage}}
+			errorOutput = {Widget.Error{errorMessage = errorMessage}}
 		end
 	)
 
@@ -77,6 +77,6 @@ function ErrorWidget:_create(errorMessage)
 	return mw.html.create('div'):node(errorDiv)
 end
 
-Widget.ErrorWidget = ErrorWidget
+Widget.Error = ErrorWidget
 
 return Widget
