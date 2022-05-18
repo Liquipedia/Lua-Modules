@@ -35,17 +35,16 @@ function Widget:tryMake()
 		function()
 			result = self:make()
 		end,
-		function(message)
+		function(errorMessage)
 			mw.log('-----Error in Widget:tryMake()-----')
 			mw.logObject(message, 'error')
 			mw.logObject(self, 'widget')
 			mw.log(debug.traceback())
-			errorOutput = String.interpolate(_ERROR_TEXT, {errorMessage = message})
-			errorOutput = {ErrorWidget({content = errorOutput})}
+			errorOutput = {ErrorWidget({errorMessage = errorMessage})}
 		end
 	)
 
-	-- if no error occurs then `erroOutput` is nil, so the result is taken
+	-- if no error occurs then `errorOutput` is nil, so the result is taken
 	return errorOutput or result
 end
 
@@ -62,7 +61,7 @@ end
 ErrorWidget = Class.new(
 	Widget,
 	function(self, input)
-		self.content = input.content
+		self.errorMessage = input.errorMessage
 	end
 )
 
@@ -72,9 +71,10 @@ function ErrorWidget:make()
 	}
 end
 
-function ErrorWidget:_create(content)
+function ErrorWidget:_create(errorMessage)
+	local errorOutput = String.interpolate(_ERROR_TEXT, {errorMessage = errorMessage})
 	local errorDiv = mw.html.create('div')
-		:node(content)
+		:node(errorOutput)
 
 	return mw.html.create('div'):node(errorDiv)
 end
