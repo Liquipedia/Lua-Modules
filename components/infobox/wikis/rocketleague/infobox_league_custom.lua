@@ -34,6 +34,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 
 	return league:createInfobox(frame)
 end
