@@ -73,8 +73,7 @@ end
 
 function ErrorWidget:_create(errorMessage)
 	local errorOutput = String.interpolate(_ERROR_TEXT, {errorMessage = errorMessage})
-	local errorDiv = mw.html.create('div')
-		:node(errorOutput)
+	local errorDiv = mw.html.create('div'):node(errorOutput)
 
 	return mw.html.create('div'):node(errorDiv)
 end
