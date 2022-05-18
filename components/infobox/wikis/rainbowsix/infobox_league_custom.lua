@@ -160,7 +160,10 @@ function CustomLeague:defineCustomPageVariables()
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', Tier.text.types[string.lower(_args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE)
+	Variables.varDefine(
+		'tournament_tier_type',
+		Tier.text.types[string.lower(_args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
+	)
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
 
