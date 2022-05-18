@@ -94,13 +94,6 @@ function CustomInjector:parse(id, widgets)
 				content = {CustomLeague:_createPrizepool(args)}
 			},
 		}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createTier(args)}
-			},
-		}
 	end
 	return widgets
 end
@@ -112,7 +105,7 @@ function CustomLeague:addCustomCells(infobox, args)
 	return infobox
 end
 
-function CustomLeague:_createTier(args)
+function CustomLeague:createLiquipediaTierDisplay(args)
 	local content = ''
 
 	local tier = args.liquipediatier
