@@ -8,7 +8,6 @@
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local Widget = Class.new()
 local ErrorWidget
