@@ -93,7 +93,7 @@ function p.storeGames(match, match2)
 	local games = ''
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
-		local extradata = Json.parseIfString(game2.extradata)
+		local extradata = Json.parseIfString(game2.extradata) or {}
 
 		game.mode = extradata.maptype
 
