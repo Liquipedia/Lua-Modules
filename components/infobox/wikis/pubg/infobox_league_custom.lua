@@ -9,13 +9,13 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Tier = require('Module:Tier')
 local Template = require('Module:Template')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Table = require('Module:Table')
+local Logic = require('Module:Logic')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -67,6 +67,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
 	return league:createInfobox(frame)
 end
@@ -89,14 +90,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Platform', content = {
 					CustomLeague:_getPlatform()
 				}
-			},
-		}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {CustomLeague:_createTierDisplay()},
-				classes = {_args['pubgpremier'] == 'true' and 'valvepremier-highlighted' or ''},
 			},
 		}
 	elseif id == 'customcontent' then
@@ -138,34 +131,8 @@ function CustomLeague._getGameVersion()
 	return _game
 end
 
-function CustomLeague:_createTierDisplay()
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local tierText = Tier['text'][tier]
-	local hasInvalidTier = tierText == nil
-	tierText = tierText or tier
-
-	local hasInvalidTierType = false
-
-	local output = '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		.. '[[Category:' .. tierText .. ' Tournaments]]'
-
-	if not String.isEmpty(tierType) then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
-		tierType = '[[' .. tierType .. ' Tournaments|' .. tierType .. ']]'
-			.. '[[Category:' .. tierType .. ' Tournaments]]'
-		output = tierType .. '&nbsp;(' .. output .. ')'
-	end
-
-	output = output ..
-		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
-	return output
+function CustomLeague:liquipediaTierHighlighted()
+	return Logic.readBool(_args.pubgpremier)
 end
 
 function CustomLeague:_getGameMode()
