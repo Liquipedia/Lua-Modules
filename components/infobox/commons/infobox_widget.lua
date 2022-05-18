@@ -30,7 +30,7 @@ function Widget:make()
 end
 
 function Widget:tryMake()
-	local result, erroOutput
+	local result, errorOutput
 	xpcall(
 		function()
 			result = self:make()
@@ -40,8 +40,8 @@ function Widget:tryMake()
 			mw.logObject(message, 'error')
 			mw.logObject(self, 'widget')
 			mw.log(debug.traceback())
-			erroOutput = String.interpolate(_ERROR_TEXT, {errorMessage = message})
-			erroOutput = {ErrorWidget({content = erroOutput})}
+			errorOutput = String.interpolate(_ERROR_TEXT, {errorMessage = message})
+			errorOutput = {ErrorWidget({content = errorOutput})}
 		end
 	)
 
