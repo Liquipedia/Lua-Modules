@@ -63,7 +63,10 @@ function SquadRow:id(args)
 
 	local cell = mw.html.create('td')
 	cell:addClass('ID')
+
+	args['noclean'] = true
 	cell:wikitext('\'\'\'' .. Player._player(args) .. '\'\'\'')
+	args['noclean'] = nil
 
 	if String.isNotEmpty(args.captain) then
 		cell:wikitext('&nbsp;' .. _ICON_CAPTAIN)
