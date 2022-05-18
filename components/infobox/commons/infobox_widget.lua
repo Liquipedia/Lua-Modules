@@ -10,7 +10,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local String = require('Module:StringUtils')
 
 local Widget = Class.new()
-local ErrorWidget
+
 
 local _ERROR_TEXT = '<span style="color:#ff0000;font-weight:bold" class="show-when-logged-in">' ..
 					'Unexpected Error, report this in #bugs on our [https://discord.gg/liquipedia Discord]. ' ..
@@ -40,7 +40,7 @@ function Widget:tryMake()
 			mw.logObject(errorMessage, 'error')
 			mw.logObject(self, 'widget')
 			mw.log(debug.traceback())
-			errorOutput = {ErrorWidget({errorMessage = errorMessage})}
+			errorOutput = {Widget.ErrorWidget({errorMessage = errorMessage})}
 		end
 	)
 
@@ -58,7 +58,7 @@ end
 
 -- error widget for displaying errors of widgets
 -- have to add it here instead of a sep. module to avoid circular requires
-ErrorWidget = Class.new(
+local ErrorWidget = Class.new(
 	Widget,
 	function(self, input)
 		self.errorMessage = input.errorMessage
@@ -77,5 +77,7 @@ function ErrorWidget:_create(errorMessage)
 
 	return mw.html.create('div'):node(errorDiv)
 end
+
+Widget.ErrorWidget = ErrorWidget
 
 return Widget
