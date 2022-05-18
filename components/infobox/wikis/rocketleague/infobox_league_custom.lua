@@ -34,6 +34,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 
 	return league:createInfobox(frame)
 end
@@ -94,13 +95,6 @@ function CustomInjector:parse(id, widgets)
 				content = {CustomLeague:_createPrizepool(args)}
 			},
 		}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createTier(args)}
-			},
-		}
 	end
 	return widgets
 end
@@ -112,7 +106,7 @@ function CustomLeague:addCustomCells(infobox, args)
 	return infobox
 end
 
-function CustomLeague:_createTier(args)
+function CustomLeague:createLiquipediaTierDisplay(args)
 	local content = ''
 
 	local tier = args.liquipediatier
