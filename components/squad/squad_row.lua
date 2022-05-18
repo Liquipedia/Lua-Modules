@@ -143,33 +143,33 @@ function SquadRow:newteam(args)
 	local cell = mw.html.create('td')
 	cell:addClass('NewTeam')
 
-
-	if String.isNotEmpty(args.newteam) then
+	if String.isNotEmpty(args.newteam) or String.isNotEmpty(args.newteamrole) then
 		local mobileStuffDiv = mw.html.create('div'):addClass('MobileStuff')
 		mobileStuffDiv	:node(mw.html.create('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'))
 						:wikitext('&nbsp;')
 		cell:node(mobileStuffDiv)
 
+		if String.isNotEmpty(args.newteam) then
+			local newTeam = args.newteam:lower()
+			if mw.ext.TeamTemplate.teamexists(newTeam) then
+				local date = args.newteamdate or ReferenceCleaner.clean(args.leavedate)
+				cell:wikitext(mw.ext.TeamTemplate.team(newTeam, date))
 
-		local newTeam = args.newteam:lower()
-		if mw.ext.TeamTemplate.teamexists(newTeam) then
-			local date = args.newteamdate or ReferenceCleaner.clean(args.leavedate)
-			cell:wikitext(mw.ext.TeamTemplate.team(newTeam, date))
-
-			self.lpdbData['newteam'] = mw.ext.TeamTemplate.teampage(newTeam)
-			self.lpdbData['newteamtemplate'] = mw.ext.TeamTemplate.raw(newTeam, date).templatename
-		elseif self.options.useTemplatesForSpecialTeams then
-			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
-			if newTeamTemplate then
-				cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
+				self.lpdbData['newteam'] = mw.ext.TeamTemplate.teampage(newTeam)
+				self.lpdbData['newteamtemplate'] = mw.ext.TeamTemplate.raw(newTeam, date).templatename
+			elseif self.options.useTemplatesForSpecialTeams then
+				local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
+				if newTeamTemplate then
+					cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
+				end
 			end
+
+			if String.isNotEmpty(args.newteamrole) then
+				cell:wikitext('&nbsp;\'\'<small>(' .. args.newteamrole .. ')</small>\'\'')
+			end
+		elseif not self.options.useTemplatesForSpecialTeams and String.isNotEmpty(args.newteamrole) then
+			cell:tag('div'):addClass('NewTeamRole'):wikitext(args.newteamrole)
 		end
-
-
-		if String.isNotEmpty(args.newteamrole) then
-			cell:wikitext('&nbsp;\'\'<small>(' .. args.newteamrole .. ')</small>\'\'')
-		end
-
 	end
 
 	self.content:node(cell)
