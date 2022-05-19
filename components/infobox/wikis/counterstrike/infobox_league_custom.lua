@@ -49,6 +49,8 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 
 	return league:createInfobox(frame)
 end
@@ -119,18 +121,21 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'liquipediatier' then
-		return {
-			Cell(CustomLeague:_createTier(args)),
+		table.insert(
+			widgets,
 			Cell{
 				name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
 				content = {CustomLeague:_createEslProTierCell(args.eslprotier)}
-			},
+			}
+		)
+		table.insert(
+			widgets,
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
 				content = {CustomLeague:_createValveTierCell(args.valvetier)},
 				classes = {'valvepremier-highlighted'}
-			},
-		}
+			}
+		)
 	end
 
 	mw.getCurrentFrame():extensionTag{name = 'metadescl', MetadataGenerator.tournament(_league.args)}
@@ -170,27 +175,26 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
-function CustomLeague:_createTier(args)
-	local cell = {name ='Liquipedia Tier'}
+function CustomLeague:liquipediaTierHighlighted(args)
+	return String.isEmpty(args.valvetier) and Logic.readBool(args.valvemajor)
+end
 
-	local content = ''
-
+function CustomLeague:createLiquipediaTierDisplay(args)
 	local tier = args.liquipediatier
 
 	if String.isEmpty(tier) then
-		return cell
+		return nil
 	end
 
-	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay', { tier })
-	local tierDisplayLink = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/link', { tier })
+	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay', {tier})
+	local tierDisplayLink = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/link', {tier})
 	local valvetier = args.valvetier
-	local valvemajor = args.valvetier
+	local valvemajor = args.valvemajor
 	local cstrikemajor = args.cstrikemajor
 
-	content = content .. tierDisplayLink
+	local content = tierDisplayLink
 
 	if String.isEmpty(valvetier) and Logic.readBool(valvemajor) then
-		cell.classes = {'valvepremier-highlighted'}
 		local logo = ' [[File:Valve_logo_black.svg|x12px|link=Valve_icon.png|x16px|' ..
 			'link=Counter-Strike Majors|Counter-Strike Major]]'
 		content = content .. logo
@@ -202,9 +206,8 @@ function CustomLeague:_createTier(args)
 	end
 
 	content = content .. '[[Category:' .. tierDisplay.. ' Tournaments]]'
-	cell.content = {content}
 
-	return cell
+	return content
 end
 
 function CustomLeague:_createPrizepool(args)
