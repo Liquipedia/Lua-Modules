@@ -30,15 +30,21 @@ function CustomSquad.header(self)
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
 	headerRow	:node(makeHeader('ID'))
-				:node(makeHeader())
-				:node(makeHeader('Name'))
-				:node(makeHeader('Position'))
-				:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_FORMER then
+			:node(makeHeader())
+			:node(makeHeader('Name'))
+			:node(makeHeader('Position'))
+			:node(makeHeader('Join Date'))
+	if self.type == Squad.TYPE_INACTIVE then
+		headerRow	:node(makeHeader('Inactive Date'))
+				:node(makeHeader('Active Team'))
+	end
+	if self.type == Squad.TYPE_FORMER_INACTIVE then
+		headerRow	:node(makeHeader('Inactive Date'))
+				:node(makeHeader('Last Active Team'))
+	end
+	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow	:node(makeHeader('Leave Date'))
-					:node(makeHeader('New Team'))
-	elseif self.type == Squad.TYPE_INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
+				:node(makeHeader('New Team'))
 	end
 
 	self.content:node(headerRow)
@@ -76,10 +82,24 @@ end
 function CustomSquad.run(frame)
 	local squad = Squad()
 
-	squad.header = CustomSquad.header
-	squad:init(frame):title():header()
+	squad:init(frame):title()
 
 	local args = squad.args
+
+	if squad.type == Squad.TYPE_FORMER then
+		local index = 1
+		while args['p' .. index] ~= nil or args[index] or squad.type ~= Squad.TYPE_FORMER_INACTIVE do
+			local player = Json.parseIfString(args['p' .. index] or args[index])
+			if player.inactivedate then
+				squad.type = Squad.TYPE_FORMER_INACTIVE
+			end
+
+			index = index + 1
+		end
+	end
+
+	squad.header = CustomSquad.header
+	squad:header()
 
 	local index = 1
 	while args['p' .. index] ~= nil or args[index] do
@@ -98,7 +118,15 @@ function CustomSquad.run(frame)
 			:position{position = player.position, role = mw.language.new('en'):ucfirst(player.role or '')}
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.TYPE_FORMER then
+		if squad.type == Squad.TYPE_INACTIVE or squad.type == Squad.TYPE_FORMER_INACTIVE then
+			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+			row:newteam{
+				newteam = player.activeteam,
+				newteamrole = player.activeteamrole,
+				newteamdate = player.inactivedate
+			}
+		end
+		if squad.type == Squad.TYPE_FORMER or squad.type == Squad.TYPE_FORMER_INACTIVE then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -106,8 +134,6 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			}
-		elseif squad.type == Squad.TYPE_INACTIVE then
-			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
 		squad:row(row:create(
