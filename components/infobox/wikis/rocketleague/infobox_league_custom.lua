@@ -7,11 +7,12 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local TournamentNotability = require('Module:TournamentNotability')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -141,6 +142,14 @@ function CustomLeague:_createPrizepool(args)
 	if String.isEmpty(args.prizepool) and
 		String.isEmpty(args.prizepoolusd) then
 			return nil
+	end
+
+	local endDate = Variables.varDefault('tournament_enddate')
+	if
+		Logic.readBool(args.convertPrizePool) or
+		String.isNotEmpty(endDate) and os.date('%Y-%m-%d') >= endDate
+	then
+		return _league:createPrizepool(args)
 	end
 
 	local content
