@@ -176,7 +176,7 @@ function CustomLeague:getWikiCategories(args)
 end
 
 function CustomLeague:liquipediaTierHighlighted(args)
-	return String.isEmpty(_args.valvetier) and Logic.readBool(_args.valvemajor)
+	return String.isEmpty(args.valvetier) and Logic.readBool(args.valvemajor)
 end
 
 function CustomLeague:createLiquipediaTierDisplay(args)
@@ -188,8 +188,8 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay', {tier})
 	local tierDisplayLink = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/link', {tier})
-	local valvetier = _args.valvetier
-	local valvemajor = _args.valvemajor
+	local valvetier = args.valvetier
+	local valvemajor = args.valvemajor
 	local cstrikemajor = args.cstrikemajor
 
 	local content = tierDisplayLink
