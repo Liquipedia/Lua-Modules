@@ -26,7 +26,6 @@ local _GAMES = {
 	dota2 = {name = 'Dota 2', category = 'Dota 2 Competitions'},
 	dota = {name = 'DotA', category = 'DotA Competitions'},
 	hon = {name = 'Heroes of Newerth', category = 'Heroes of Newerth Competitions'},
-	['auto chess'] = {name = 'Auto Chess', category = 'Auto Chess Competitions'},
 }
 
 function CustomLeague.run(frame)
@@ -114,6 +113,7 @@ function CustomLeague:liquipediaTierHighlighted()
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
+	lpdbData.game = string.lower(args.game or 'dota2')
 	lpdbData.publishertier = args.pctier
 	lpdbData.participantsnumber = args.team_number or args.player_number
 	lpdbData.extradata = {
@@ -127,6 +127,11 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:defineCustomPageVariables()
+	-- Custom Vars
+	Variables.varDefine('tournament_pro_circuit_points', _args.points or '')
+	local isIndividual = String.isNotEmpty(_args.individual) or String.isNotEmpty(_args.player_number)
+	Variables.varDefine('tournament_individual', isIndividual and 'true' or '')
+
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
