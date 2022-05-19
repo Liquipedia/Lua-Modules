@@ -150,7 +150,7 @@ function League:createInfobox()
 		Customizable{id = 'prizepool', children = {
 			Cell{
 					name = 'Prize pool',
-					content = {self:_createPrizepool(args)},
+					content = {self:createPrizepool(args)},
 				},
 			},
 		},
@@ -281,7 +281,7 @@ function League:createLiquipediaTierDisplay(args)
 	return tierDisplay .. self.appendLiquipediatierDisplay(args)
 end
 
-function League:_createPrizepool(args)
+function League:createPrizepool(args)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return nil
 	end
