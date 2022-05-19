@@ -54,7 +54,7 @@ function CustomLeague:liquipediaTierHighlighted(args)
 end
 
 function CustomLeague:appendLiquipediatierDisplay()
-	return Logic.readBool(_args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON)
+	return Logic.readBool(_args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
