@@ -34,7 +34,11 @@ function CustomSquad.header(self)
 			:node(makeHeader('Name'))
 			:node(makeHeader('Position'))
 			:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
+	if self.type == Squad.TYPE_INACTIVE then
+		headerRow	:node(makeHeader('Inactive Date'))
+				:node(makeHeader('Active Team'))
+	end
+	if self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow	:node(makeHeader('Inactive Date'))
 				:node(makeHeader('Last Active Team'))
 	end
