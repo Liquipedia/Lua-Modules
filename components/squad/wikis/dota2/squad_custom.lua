@@ -81,7 +81,7 @@ function CustomSquad.run(frame)
 	squad:init(frame):title()
 
 	local args = squad.args
-	
+
 	if squad.type == Squad.TYPE_FORMER then
 		local index = 1
 		while args['p' .. index] ~= nil or args[index] or squad.type ~= Squad.TYPE_FORMER_INACTIVE do
@@ -89,11 +89,11 @@ function CustomSquad.run(frame)
 			if player.inactivedate then
 				squad.type = Squad.TYPE_FORMER_INACTIVE
 			end
-			
+
 			index = index + 1
 		end
 	end
-	
+
 	squad.header = CustomSquad.header
 	squad:header()
 
