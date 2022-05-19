@@ -215,7 +215,7 @@ function CustomLeague.getWikiCategories(args)
 	if String.isNotEmpty(args.format) then
 		table.insert(categories, args.format .. ' Format Tournaments')
 	end
-	if String.isNotEmpty(args.player_number) or String.isNotEmpty(args.participants_number) then
+	if String.isNotEmpty(args.participants_number) then
 		table.insert(categories, 'Individual Tournaments')
 	end
 	if String.isNotEmpty(args.eatier) or args['ea-sponsored'] == 'true' then

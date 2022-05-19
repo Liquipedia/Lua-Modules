@@ -39,7 +39,6 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
@@ -144,15 +143,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
-end
-
-function CustomLeague:getWikiCategories(args)
-	local categories = {}
-	if String.isNotEmpty(args.player_number) then
-		table.insert(categories, 'Individual Tournaments')
-	end
-
-	return categories
 end
 
 function CustomLeague:_gameLookup(game)
