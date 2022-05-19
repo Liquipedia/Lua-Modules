@@ -7,7 +7,6 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Logic = require('Module:Logic')
 local Class = require('Module:Class')
@@ -56,7 +55,7 @@ function CustomLeague:liquipediaTierHighlighted(args)
 end
 
 function CustomLeague:appendLiquipediatierDisplay()
-	return Logic.readBool(args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON)
+	return Logic.readBool(_args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
