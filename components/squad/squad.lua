@@ -15,6 +15,7 @@ local Squad = Class.new()
 Squad.TYPE_ACTIVE = 0
 Squad.TYPE_INACTIVE = 1
 Squad.TYPE_FORMER = 2
+TYPE_FORMER_INACTIVE = 3
 
 function Squad:init(frame)
 	self.frame = frame
