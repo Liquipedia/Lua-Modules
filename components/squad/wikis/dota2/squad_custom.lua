@@ -88,10 +88,11 @@ function CustomSquad.run(frame)
 
 	if squad.type == Squad.TYPE_FORMER then
 		local index = 1
-		while args['p' .. index] ~= nil or args[index] or squad.type ~= Squad.TYPE_FORMER_INACTIVE do
+		while args['p' .. index] ~= nil or args[index] do
 			local player = Json.parseIfString(args['p' .. index] or args[index])
 			if player.inactivedate then
 				squad.type = Squad.TYPE_FORMER_INACTIVE
+				break
 			end
 
 			index = index + 1
