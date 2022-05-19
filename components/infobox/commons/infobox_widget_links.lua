@@ -61,8 +61,6 @@ local _PRIORITY_GROUPS = {
 		'bracket',
 		'rules',
 		'rulebook',
-		'rules2',
-		'rulebook2',
 	},
 	social = {
 		'discord',
