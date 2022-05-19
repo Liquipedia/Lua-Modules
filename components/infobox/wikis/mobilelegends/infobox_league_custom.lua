@@ -9,7 +9,7 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Tier = require('Module:Tier')
+local Logic = require('Module:Logic')
 local PageLink = require('Module:Page')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -28,6 +28,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
 	return league:createInfobox(frame)
 end
@@ -43,14 +44,6 @@ function CustomInjector:parse(id, widgets)
 					CustomLeague._getPatchVersion()
 				}},
 			}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {CustomLeague:_createTierDisplay()},
-				classes = {_args['moonton-sponsored'] == 'true' and 'valvepremier-highlighted' or ''},
-			},
-		}
 	elseif id == 'customcontent' then
 		if _args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
@@ -83,34 +76,8 @@ function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
-function CustomLeague:_createTierDisplay()
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local tierText = Tier['text'][tier]
-	local hasInvalidTier = tierText == nil
-	tierText = tierText or tier
-
-	local hasInvalidTierType = false
-
-	local output = '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		.. '[[Category:' .. tierText .. ' Tournaments]]'
-
-	if not String.isEmpty(tierType) then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
-		tierType = '[[' .. tierType .. ' Tournaments|' .. tierType .. ']]'
-			.. '[[Category:' .. tierType .. ' Tournaments]]'
-		output = tierType .. '&nbsp;(' .. output .. ')'
-	end
-
-	output = output ..
-		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
-	return output
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args['moonton-sponsored'])
 end
 
 function CustomLeague._getPatchVersion()

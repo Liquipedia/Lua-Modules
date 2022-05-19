@@ -9,10 +9,10 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:String')
 local Variables = require('Module:Variables')
-local Tier = require('Module:Tier')
 local PageLink = require('Module:Page')
 local MapModes = require('Module:MapModes')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -31,9 +31,12 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
+	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
 	return league:createInfobox(frame)
 end
@@ -56,14 +59,6 @@ function CustomInjector:parse(id, widgets)
 					CustomLeague._getGameVersion()
 				}},
 			}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {CustomLeague:_createTierDisplay()},
-				classes = {_args['hcs-sponsored'] == 'true' and 'valvepremier-highlighted' or ''},
-			},
-		}
 	elseif id == 'customcontent' then
 		--maps
 		if not String.isEmpty(_args.map1) then
@@ -119,6 +114,8 @@ function League:defineCustomPageVariables()
 
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
+	Variables.varDefine('tournament_tier', _args.liquipediatier)
+	Variables.varDefine('tournament_tiertype', _args.liquipediatiertype)
 end
 
 function CustomLeague:_concatArgs(base)
@@ -138,37 +135,8 @@ function CustomLeague:_concatArgs(base)
 	return table.concat(foundArgs, ';')
 end
 
-function CustomLeague:_createTierDisplay()
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local tierText = Tier['text'][tier]
-	local hasInvalidTier = tierText == nil
-	tierText = tierText or tier
-
-	local hasInvalidTierType = false
-
-	local output = '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		.. '[[Category:' .. tierText .. ' Tournaments]]'
-
-	if not String.isEmpty(tierType) then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
-		tierType = '[[' .. tierType .. ' Tournaments|' .. tierType .. ']]'
-			.. '[[Category:' .. tierType .. ' Tournaments]]'
-		output = tierType .. '&nbsp;(' .. output .. ')'
-	end
-
-	output = output ..
-		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
-
-	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_tiertype', tierType)
-	return output
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(_args['hcs-sponsored'])
 end
 
 function CustomLeague._getGameVersion()

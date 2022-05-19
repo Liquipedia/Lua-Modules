@@ -9,7 +9,6 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Tier = require('Module:Tier')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -84,12 +83,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'liquipediatier' then
-		widgets = {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createLiquipediaTierDisplay()},
-			}
-		}
 		if CustomLeague:_validPublisherTier(args.blizzardtier) then
 			table.insert(widgets,
 				Cell{
@@ -122,32 +115,6 @@ function CustomLeague:_validPublisherTier(publishertier)
 	return String.isNotEmpty(publishertier) and _BLIZZARD_TIERS[publishertier:lower()]
 end
 
-function CustomLeague:_createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier
-	local tierType = _args.liquipediatiertype or ''
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString)
-		local tierText = Tier.text[tierString]
-		if not tierText then
-			table.insert(_league.warnings, tierString .. ' is not a known Liquipedia Tier/Tiertype')
-			return ''
-		else
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-
-	return tierDisplay
-end
-
 function CustomLeague:defineCustomPageVariables()
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
@@ -170,17 +137,6 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'Tournaments without game version')
 	else
 		table.insert(categories, CustomLeague:_gameLookup(args.game) .. ' Competitions')
-	end
-
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-
-	if String.isNotEmpty(tier) and String.isNotEmpty(Tier.text[tier]) then
-		table.insert(categories, Tier.text[tier]  .. ' Tournaments')
-	end
-
-	if String.isNotEmpty(tierType) and String.isNotEmpty(Tier.text[tierType]) then
-		table.insert(categories, Tier.text[tierType] .. ' Tournaments')
 	end
 
 	return categories
