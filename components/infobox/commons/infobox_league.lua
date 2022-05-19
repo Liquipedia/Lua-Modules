@@ -210,7 +210,7 @@ function League:createInfobox()
 		if not String.isEmpty(args.team_number) then
 			self.infobox:categories('Team Tournaments')
 		end
-		if not String.isEmpty(args.player_number) then
+		if String.isNotEmpty(args.player_number) or String.isNotEmpty(args.individual) then
 			self.infobox:categories('Individual Tournaments')
 		end
 		self.infobox:categories(unpack(self:getWikiCategories(args)))
