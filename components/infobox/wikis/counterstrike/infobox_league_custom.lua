@@ -7,7 +7,7 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:StringUtils')
+local String = require('Module:String')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
@@ -140,10 +140,6 @@ end
 
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
-
-	if String.isNotEmpty(args.individual) then
-		table.insert(categories, 'Individual Tournaments')
-	end
 
 	if String.isEmpty(args.game) then
 		table.insert(categories, 'Tournaments without game version')
