@@ -39,6 +39,10 @@ function CustomLeague:createWidgetInjector()
 	return CustomInjector()
 end
 
+function CustomInjector:parse(id, widgets)
+	return widgets
+end
+
 function CustomInjector:addCustomCells(widgets)
 	local args = _args
 	table.insert(widgets, Cell{
@@ -54,7 +58,7 @@ function CustomLeague:liquipediaTierHighlighted(args)
 end
 
 function CustomLeague:appendLiquipediatierDisplay()
-	return Logic.readBool(_args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON)
+	return Logic.readBool(_args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
