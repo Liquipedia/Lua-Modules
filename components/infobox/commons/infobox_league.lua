@@ -54,7 +54,7 @@ function League:createInfobox()
 	local links
 
 	-- set Variables here already so they are available in functions
-	-- we call from here on, e.g. _createPrizepool
+	-- we call from here on, e.g. createPrizepool
 	self:_definePageVariables(args)
 
 	local widgets = {
@@ -339,7 +339,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_enddate',
 	self:_cleanDate(args.edate) or self:_cleanDate(args.date))
 
-	-- gets overwritten by the League:_createPrizepool call if args.prizepool
+	-- gets overwritten by the League:createPrizepool call if args.prizepool
 	-- or args.prizepoolusd is a valid input
 	-- if wikis want it unset they can unset it via the defineCustomPageVariables() call
 	Variables.varDefine('tournament_currency', args.localcurrency or '')
