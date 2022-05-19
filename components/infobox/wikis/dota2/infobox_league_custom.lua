@@ -105,7 +105,7 @@ end
 
 function CustomLeague:appendLiquipediatierDisplay()
 	if String.isEmpty(_args.pctier) and Logic.readBool(_args.valvepremier) then
-		return Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox')
+		return ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox')
 	end
 	return ''
 end
