@@ -51,40 +51,8 @@ function CustomInjector:parse(id, widgets)
 				content = {args.doubles_number}
 			})
 		end
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createLiquipediaTierDisplay(args)}
-			},
-		}
 	end
 	return widgets
-end
-
-function CustomLeague:_createLiquipediaTierDisplay(args)
-	local tier = args.liquipediatier or ''
-	local tierType = args.liquipediatiertype or ''
-
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString)
-		local tierText = Tier.text[tierString]
-		if not tierText then
-			table.insert(_league.warnings, tierString .. ' is not a known Liquipedia Tier/Tiertype')
-			return ''
-		else
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		end
-	end
-	local tierDisplay = buildTierString(tier)
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-
-	return tierDisplay
 end
 
 function CustomLeague:defineCustomPageVariables(args)
