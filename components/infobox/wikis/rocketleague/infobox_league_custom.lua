@@ -26,6 +26,7 @@ local _SERIES_RLCS = 'Rocket League Championship Series'
 local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
+local _TODAY = os.date('%Y-%m-%d')
 
 local _league
 
@@ -147,7 +148,7 @@ function CustomLeague:_createPrizepool(args)
 	local endDate = Variables.varDefault('tournament_enddate')
 	if
 		Logic.readBool(args.convertPrizePool) or
-		String.isNotEmpty(endDate) and os.date('%Y-%m-%d') >= endDate
+		String.isNotEmpty(endDate) and _TODAY >= endDate
 	then
 		return _league:createPrizepool(args)
 	end
