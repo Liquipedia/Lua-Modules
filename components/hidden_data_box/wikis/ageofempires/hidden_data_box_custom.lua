@@ -34,6 +34,9 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 	Variables.varDefine('headtohead', args.headtohead)
 
+	-- tournament mode (1v1 or team)
+	BasicHiddenDataBox:checkAndAssign('tournament_mode', args.mode, queryResult.extradata.mode)
+
 	--gamemode
 	BasicHiddenDataBox:checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
 end
