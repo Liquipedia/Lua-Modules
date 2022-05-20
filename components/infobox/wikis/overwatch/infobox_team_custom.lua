@@ -10,15 +10,15 @@ local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
+--[[local Template = require('Module:Template')]]--
 
 local CustomTeam = Class.new()
 
-local _team
+--[[local _team]]--
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
-	_team = team
+	--[[_team = team]]--
 	--[[team.createBottomContent = CustomTeam.createBottomContent]]--
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
