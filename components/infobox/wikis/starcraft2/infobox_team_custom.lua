@@ -45,7 +45,7 @@ local _earnings_by_players_while_on_team = 0
 local _EARNINGS_MODES = {team = 'team'}
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _DISCARD_PLACEMENT = 99
-local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 30
+local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local _PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
 function CustomTeam.run(frame)

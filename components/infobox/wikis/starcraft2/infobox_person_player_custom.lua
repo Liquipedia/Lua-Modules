@@ -36,7 +36,7 @@ local _PAGENAME = mw.title.getCurrentTitle().prefixedText
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local _EARNING_MODES = {['solo'] = '1v1', ['team'] = 'team'}
-local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 30
+local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
 local _MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 40
 
