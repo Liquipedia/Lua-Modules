@@ -131,6 +131,11 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_pro_circuit_points', _args.points or '')
 	local isIndividual = String.isNotEmpty(_args.individual) or String.isNotEmpty(_args.player_number)
 	Variables.varDefine('tournament_individual', isIndividual and 'true' or '')
+	Variables.varDefine('tournament_valve_premier', _args.valvepremier)
+	Variables.varDefine('tournament_publisher_major', _args.valvepremier)
+	Variables.varDefine('tournament_pro_circuit_tier', _args.pctier)
+	Variables.varDefine('tournament_publishertier', _args.pctier)
+	Variables.varDefine('tournament_game', string.lower(_args.game or 'dota2'))
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
