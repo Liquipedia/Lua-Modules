@@ -91,7 +91,7 @@ function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
 		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
 			opponent = {type = Opponent.literal, name = 'BYE'}
 		end
-	
+
 	end
 
 	Opponent.resolve(opponent, date)
@@ -462,7 +462,7 @@ function matchFunctions.getPlayers(match, opponentType, opponentIndex)
 	for playerIndex = 1, _CONVERT_TYPE_TO_PLAYER_NUMBER[opponentType] do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name ot 'TBD'
+		player.name = player.name or 'TBD'
 		player.flag = player.flag
 		player.displayname = player.displayname or player.name
 		if Table.isNotEmpty(player) then
