@@ -8,6 +8,8 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
 
 local MatchGroupBase = {}
 
@@ -83,13 +85,33 @@ function MatchGroupBase.getBracketIdPrefix()
 end
 
 function MatchGroupBase._checkBracketDuplicate(bracketId)
-	local status = mw.ext.Brackets.checkBracketDuplicate(bracketId)
-	if status ~= 'ok' then
+	if MatchGroupBase._isduplicate(bracketId) then
 		local warning = 'This match group uses the duplicate ID \'' .. bracketId .. '\'.'
 		local category = '[[Category:Pages with duplicate Bracketid]]'
 		mw.addWarning(warning)
 		return warning .. category
 	end
+end
+
+function MatchGroupBase._isduplicate(bracketId)
+	-- if the bracketId is already used on the same page then the according variable is set
+	if String.isNotEmpty(Variables.varDefault('match2bracket_' .. bracketId)) then
+		return true
+	end
+	-- if the bracketId is not used on this page we need to check if it is used
+	-- on another page in the same namespace
+	local page = mw.title.getCurrentTitle()
+
+	local queryData = mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = '[[namespace::' .. page.namespace .. ']] AND [[pagename::!' .. page.text .. ']] AND [[match2bracketid::' .. bracketId .. ']]',
+		query = 'pagename, namespace',
+	})
+	if type(queryData) == 'table' and queryData[1] then
+		mw.logObject(queryData, 'Pages with the same bracketId')
+		return true
+	end
+
+	return false
 end
 
 -- Deprecated
