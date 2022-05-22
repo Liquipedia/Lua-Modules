@@ -29,11 +29,11 @@ PlayerExt.extractFromLink('[[Dream (Korean Terran player)|Dream]]')
 -- returns 'Dream (Korean Terran player)', 'Dream'
 --]===]
 function PlayerExt.extractFromLink(name)
-	name = mw.text.trim(
-		name:gsub('%b{}', '')
-			:gsub('%b<>', '')
-			:gsub('%b[]', '')
-	)
+	name = name
+		:gsub('%b{}', '')
+		:gsub('%b<>', '')
+		:gsub('%b[]', '')
+	name = mw.text.trim(name)
 
 	local pageName, displayName = unpack(mw.text.split(name, '|', true))
 	if displayName and displayName ~= '' then
