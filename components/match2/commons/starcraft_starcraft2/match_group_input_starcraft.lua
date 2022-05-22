@@ -98,7 +98,7 @@ function StarcraftMatchGroupInput._readDate(matchArgs)
 end
 
 function StarcraftMatchGroupInput._checkFinished(match)
-	if match.finished == 'false' then
+	if Logic.readBoolOrNil(match.finished) == false then
 		match.finished = false
 	elseif Logic.readBool(match.finished) then
 		match.finished = true
