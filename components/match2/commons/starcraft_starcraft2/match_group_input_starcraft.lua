@@ -14,9 +14,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate/Named')
 local Variables = require('Module:Variables')
-local Streams = require('Module:Links/Stream')
 local Flags = require('Module:Flags')
 
+local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -34,12 +34,12 @@ local _MAX_NUM_VETOS = 6
 local _MAX_NUM_VODGAMES = 9
 local _DEFAULT_BEST_OF = 99
 local _OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
-	['solo'] = '1',
-	['duo'] = '2',
-	['trio'] = '3',
-	['quad'] = '4',
-	['team'] = 'team',
-	['literal'] = 'literal',
+	solo = '1',
+	duo = '2',
+	trio = '3',
+	quad = '4',
+	team = 'team',
+	literal = 'literal',
 }
 local _TBD_STRINGS = {
 	'definitions',
@@ -424,7 +424,7 @@ function StarcraftMatchGroupInput._opponentInput(match)
 			string.lower(opponent.template or '') == 'bye'
 			or string.lower(opponent.name or '') == 'bye'
 		then
-			opponent = {type = 'literal', name = 'BYE'}
+			opponent = {type = Opponent.literal, name = 'BYE'}
 		end
 
 		-- Fix legacy winner
@@ -446,18 +446,18 @@ function StarcraftMatchGroupInput._opponentInput(match)
 		}
 
 		--process input depending on type
-		if opponent.type == 'solo' then
+		if opponent.type == Opponent.solo then
 			opponent =
 				StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
-		elseif opponent.type == 'duo' then
+		elseif opponent.type == Opponent.duo then
 			opponent = StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
-		elseif opponent.type == 'trio' then
+		elseif opponent.type == Opponent.trio then
 			opponent = StarcraftMatchGroupInput.ProcessOpponentInput(opponent, 3)
-		elseif opponent.type == 'quad' then
+		elseif opponent.type == Opponent.quad then
 			opponent = StarcraftMatchGroupInput.ProcessOpponentInput(opponent, 4)
-		elseif opponent.type == 'team' then
+		elseif opponent.type == Opponent.team then
 			opponent = StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, match.date)
-		elseif opponent.type == 'literal' then
+		elseif opponent.type == Opponent.literal then
 			opponent = StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 		else
 			error('Unsupported Opponent Type')
@@ -885,7 +885,7 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOppon
 
 	for opponentIndex = 1, numberOfOpponents do
 		local opponentMapMode
-		if match['opponent' .. opponentIndex].type == 'team' then
+		if match['opponent' .. opponentIndex].type == Opponent.team then
 			local players = match['opponent' .. opponentIndex].match2players
 			if Table.isEmpty(players) then
 				break
@@ -897,10 +897,10 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOppon
 					participants
 				)
 			end
-		elseif match['opponent' .. opponentIndex].type == 'literal' then
+		elseif match['opponent' .. opponentIndex].type == Opponent.literal then
 			opponentMapMode = 'Literal'
 		elseif
-			match['opponent' .. opponentIndex].type == 'duo' and
+			match['opponent' .. opponentIndex].type == Opponent.duo and
 			Logic.readBool(match['opponent' .. opponentIndex].extradata.isarchon)
 		then
 			opponentMapMode = 'Archon'
