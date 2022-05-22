@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -14,12 +15,11 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate/Named')
 local Variables = require('Module:Variables')
-local Flags = require('Module:Flags')
 
-local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 
 local defaultIcon
 
