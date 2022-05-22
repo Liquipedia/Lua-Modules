@@ -72,7 +72,7 @@ function CustomMatchGroupInput.processMap(_, map)
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -91,7 +91,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
 			opponent = {type = Opponent.literal, name = 'BYE'}
 		end
-		
+	
 	end
 
 	Opponent.resolve(opponent, date)
