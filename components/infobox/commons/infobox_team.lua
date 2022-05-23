@@ -242,6 +242,8 @@ function Team:_setLpdbData(args, links)
 
 	for year, earningsOfYear in pairs(_earnings) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+		--make these values available for smw storage
+		Variables.varDefine('earningsin' .. year, earningsOfYear)
 	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
