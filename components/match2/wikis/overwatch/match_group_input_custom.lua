@@ -388,7 +388,7 @@ function matchFunctions.getOpponents(match)
 			opponents[opponentIndex] = opponent
 
 			-- get players from vars for teams
-			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
+			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
 				match = matchFunctions.getTeamPlayers(match, opponentIndex, opponent.name)
 			end
 		end
