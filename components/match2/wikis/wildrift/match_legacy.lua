@@ -154,6 +154,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 			Variables.varDefault('tournament_name', mw.title.getCurrentTitle().prefixedText)
 		),
 		'Has tournament icon=' .. Variables.varDefault('tournament_icon', ''),
+		'Is riot premier=' .. Variables.varDefault('tournament_riot_premier', ''),
 		'Has winner=' .. (match.winner or ''),
 		'Has team left score=' .. (match.opponent1score or '0'),
 		'Has team right score=' .. (match.opponent2score or '0'),
