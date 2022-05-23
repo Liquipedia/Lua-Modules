@@ -58,6 +58,7 @@ function MatchLegacy._convertParameters(match2)
 	match.extradata = {}
 	local extradata = Json.parseIfString(match2.extradata)
 	match.extradata.gamecount = tostring(match2.bestof)
+	match.extradata.matchsection = extradata.matchsection
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		match.extradata.mvp = table.concat(mvp.players, ",")
