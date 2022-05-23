@@ -104,7 +104,7 @@ function MatchGroupBase._isduplicate(bracketId)
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = '[[namespace::' .. page.namespace .. ']]'
-			.. ' AND [[pagename::!' .. page.text .. ']]'
+			.. ' AND [[pagename::!' .. page.text:gsub(' ', '_') .. ']]'
 			.. ' AND [[match2bracketid::' .. bracketId .. ']]',
 		query = 'pagename, namespace',
 	})
