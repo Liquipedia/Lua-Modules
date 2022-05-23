@@ -15,7 +15,6 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate/Named')
 local Variables = require('Module:Variables')
-local Streams = require('Module:Links/Stream')
 
 local config = Lua.loadDataIfExists('Module:Match/Config') or {}
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
@@ -677,7 +676,6 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 			break
 		end
 	end
-
 	return players
 end
 
