@@ -8,13 +8,11 @@
 
 local Class = require('Module:Class')
 local League = require('Module:Infobox/League')
-local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -28,21 +26,18 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _league
 local _next
 local _previous
 
-local _ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
-local _TODAY = os.date('%Y-%m-%d', os.time())
-
+--[=[
 local _SICON = '[[File:Sicon.png|text-bottom|Code S|link=Code S]]'
 local _AICON = '[[File:Aicon.png|text-bottom|Code A]]'
 local _PICON = '[[File:PIcon.png|text-bottom|Premier League]]'
 local _CICON = '[[File:CIcon.png|text-bottom|Challenger League]]'
+]=]
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-	_league = league
 	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
