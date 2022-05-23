@@ -110,7 +110,7 @@ function CustomInjector:parse(id, widgets)
 		local playerBreakDownEvent = CustomLeague._playerBreakDownEvent() or {}
 		local playerNumber = playerRaceBreakDown.playerNumber or playerBreakDownEvent.playerNumber or 0
 		--make playerNumber available for commons category check
-		_args.player_number = playerNumber
+		_args.player_number = playerNumber ~= 0 and playerNumber or nil
 		Variables.varDefine('tournament_playerNumber', playerNumber)
 		if playerNumber > 0 then
 			table.insert(widgets, Title{name = 'Player breakdown'})
