@@ -934,14 +934,14 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOppon
 		if mapMode == '1v1' and numberOfOpponents == 2 then
 			local opponentRaces, playerNameArray = StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
 			if tonumber(map.winner or 0) == 1 then
-				map.extradata.winnerfaction = opponentRaces[1]
-				map.extradata.loserfaction = opponentRaces[2]
+				map.extradata.winnerfaction = opponentRaces['1']
+				map.extradata.loserfaction = opponentRaces['2']
 			elseif tonumber(map.winner or 0) == 2 then
-				map.extradata.winnerfaction = opponentRaces[2]
-				map.extradata.loserfaction = opponentRaces[1]
+				map.extradata.winnerfaction = opponentRaces['2']
+				map.extradata.loserfaction = opponentRaces['1']
 			end
-			map.extradata.opponent1 = playerNameArray[1]
-			map.extradata.opponent2 = playerNameArray[2]
+			map.extradata.opponent1 = playerNameArray['1']
+			map.extradata.opponent2 = playerNameArray['2']
 		end
 		map.patch = Variables.varDefault('tournament_patch', '')
 	end
@@ -957,7 +957,7 @@ function StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
 	for participantKey, participantData in pairs(participants) do
 		local opponentIndex = string.sub(participantKey, 1, 1)
 		opponentRaces[opponentIndex] = participantData.faction
-		playerNameArray[opponentIndex] = participantData.name
+		playerNameArray[opponentIndex] = participantData.player
 	end
 
 	return opponentRaces, playerNameArray
