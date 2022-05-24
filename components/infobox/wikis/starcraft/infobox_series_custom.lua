@@ -22,6 +22,8 @@ local Table = require('Module:Table')
 
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
+local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
+	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
 local CustomInjector = Class.new(Injector)
 
@@ -197,7 +199,7 @@ function CustomSeries:_createLiquipediaTierDisplay(tier, tierType)
 		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
 	end
 
-	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+	return tierDisplay
 end
 
 return CustomSeries
