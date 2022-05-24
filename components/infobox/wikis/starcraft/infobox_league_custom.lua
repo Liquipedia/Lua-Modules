@@ -29,13 +29,6 @@ local _args
 local _next
 local _previous
 
---[=[
-local _SICON = '[[File:Sicon.png|text-bottom|Code S|link=Code S]]'
-local _AICON = '[[File:Aicon.png|text-bottom|Code A]]'
-local _PICON = '[[File:PIcon.png|text-bottom|Premier League]]'
-local _CICON = '[[File:CIcon.png|text-bottom|Challenger League]]'
-]=]
-
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
@@ -68,8 +61,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		--player breakdown
 		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
-		--local playerBreakDownEvent = CustomLeague._playerBreakDownEvent() or {}
-		local playerNumber = playerRaceBreakDown.playerNumber or 0--or playerBreakDownEvent.playerNumber or 0
+		local playerNumber = playerRaceBreakDown.playerNumber or 0
 		--make playerNumber available for commons category check
 		_args.player_number = playerNumber
 		Variables.varDefine('tournament_playerNumber', playerNumber)
@@ -77,7 +69,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Player breakdown'})
 			table.insert(widgets, Cell{name = 'Number of players', content = {playerNumber}})
 			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
-			--table.insert(widgets, Breakdown{content = playerBreakDownEvent.display, classes = {'infobox-center'}})
 		end
 
 		--teams section
@@ -179,34 +170,7 @@ function CustomLeague:shouldStore(args)
 		Variables.varDefault('disable_SMW_storage', 'false') ~= 'true' and
 		Variables.varDefault('disable_LPDB_storage', 'false') ~= 'true'
 end
---[[
-function CustomLeague._playerBreakDownEvent()
-	local playerBreakDown = {}
-	local codeS = tonumber(_args.code_s_number or 0) or 0
-	local codeA = tonumber(_args.code_a_number or 0) or 0
-	local premier = tonumber(_args.premier_number or 0) or 0
-	local challenger = tonumber(_args.challenger_number or 0) or 0
-	local playerNumber = codeS + codeA + premier + challenger
 
-	if playerNumber > 0 then
-		playerBreakDown.playerNumber = playerNumber
-		playerBreakDown.display = {}
-		if codeS > 0 then
-			playerBreakDown.display[#playerBreakDown.display + 1] = _SICON .. ' ' .. codeS
-		end
-		if codeA > 0 then
-			playerBreakDown.display[#playerBreakDown.display + 1] = _AICON .. ' ' .. codeA
-		end
-		if premier > 0 then
-			playerBreakDown.display[#playerBreakDown.display + 1] = _PICON .. ' ' .. premier
-		end
-		if challenger > 0 then
-			playerBreakDown.display[#playerBreakDown.display + 1] = _CICON .. ' ' .. challenger
-		end
-	end
-	return playerBreakDown or {}
-end
-]]
 function CustomLeague._playerRaceBreakDown()
 	local playerBreakDown = {}
 	local playerNumber = tonumber(_args.player_number or 0) or 0
