@@ -8,6 +8,8 @@
 
 local Class = require('Module:Class')
 local BasicHiddenDataBox = require('Module:HiddenDataBox')
+local Variables = require('Module:Variables')
+
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
@@ -21,6 +23,7 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 		args.riotpremier,
 		queryResult.publishertier
 	)
+	Variables.varDefine('tournament_riot_premier', Variables.varDefault('tournament_publishertier', ''))
 end
 
 return Class.export(CustomHiddenDataBox)
