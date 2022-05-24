@@ -141,6 +141,8 @@ function CustomInjector:addCustomCells(widgets)
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
+	local yearsActiveCaster = CustomPlayer._getActiveCasterYears(_PAGENAME)
+
 	return {
 		Cell{
 			name = 'Approx. Winnings ' .. _CURRENT_YEAR,
@@ -152,8 +154,29 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{
 			name = Abbreviation.make('Years active', 'Years active as a player'),
 			content = {yearsActive}
-		}
+		},
+		Cell{
+			name = Abbreviation.make('Years active (caster)', 'Years active as a caster'),
+			content = {yearsActiveCaster}
+		},
 	}
+end
+
+--todo
+function CustomPlayer._getActiveCasterYears(_PAGENAME)
+	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+		query = 'year::date',
+		conditions = '[[page::' .. _PAGENAME:gsub('_', ' ') .. ']]',
+		limit = 5000,
+	})
+
+	local years = {}
+	for _, broadCastItem in pairs(queryData) do
+		local year = broadCastItem.year_date
+		years[tonumber(year)] = year
+	end
+
+	return Table.isNotEmpty(years) and CustomPlayer._getYearsActive(years) or nil
 end
 
 function CustomPlayer:createWidgetInjector()
