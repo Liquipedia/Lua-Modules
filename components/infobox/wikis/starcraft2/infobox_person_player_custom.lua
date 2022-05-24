@@ -10,17 +10,19 @@
 
 local PersonSc2 = require('Module:Infobox/Person/Custom/Shared')
 local Person = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
+
+local Abbreviation = require('Module:Abbreviation')
+local Achievements = require('Module:Achievements in infoboxes')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Variables = require('Module:Variables')
-local Achievements = require('Module:Achievements in infoboxes')._player
 local CleanRace = require('Module:CleanRace')
-local Math = require('Module:Math')
 local Json = require('Module:Json')
 local Lpdb = require('Module:Lpdb')
-local Table = require('Module:Table')
-local Array = require('Module:Array')
 local Matches = require('Module:Upcoming ongoing and recent matches player/new')
+local Math = require('Module:Math')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local Condition = require('Module:Condition')
 
@@ -95,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'achievements' then
 		local achievementCells = {}
 		if _shouldQueryData then
-			local achievements = Achievements({}, _PAGENAME)
+			local achievements = Achievements._player({}, _PAGENAME)
 			if not String.isEmpty(achievements) then
 				table.insert(achievementCells, Center{content = {achievements}})
 			end
@@ -147,7 +149,10 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = rank1.name or 'Rank', content = {rank1.rank}},
 		Cell{name = rank2.name or 'Rank', content = {rank2.rank}},
 		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military)}},
-		Cell{name = 'Years active', content = {yearsActive}}
+		Cell{
+			name = Abbreviation.make('Years active', 'Years active as a player'),
+			content = {yearsActive}
+		}
 	}
 end
 
