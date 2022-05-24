@@ -141,7 +141,7 @@ function CustomInjector:addCustomCells(widgets)
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
-	local yearsActiveCaster = CustomPlayer._getActiveCasterYears(_PAGENAME)
+	local yearsActiveCaster = CustomPlayer._getActiveCasterYears()
 
 	return {
 		Cell{
@@ -163,7 +163,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 --todo
-function CustomPlayer._getActiveCasterYears(_PAGENAME)
+function CustomPlayer._getActiveCasterYears()
 	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'year::date',
 		conditions = '[[page::' .. _PAGENAME:gsub('_', ' ') .. ']]',
