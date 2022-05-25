@@ -355,11 +355,9 @@ function mapFunctions.getExtraData(map)
 		ot = map.ot,
 		otlength = map.otlength,
 		comment = map.comment,
-		op1startside = map['op1_startside'],
-		half1score1 = map.half1score1,
-		half1score2 = map.half1score2,
-		half2score1 = map.half2score1,
-		half2score2 = map.half2score2,
+		t1firstside = map.t1firstside,
+		t1halfs = {atk = map.t1atk, def = map.t1def, otatk = map.t1otatk, otdef = map.t1otdef},
+		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
 	}
 	return map
 end
