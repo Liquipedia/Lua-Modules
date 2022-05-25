@@ -156,7 +156,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			end
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 		else
-			--R6 only has exactly 2 opponents, neither more or less
+			--Valorant only has exactly 2 opponents, neither more or less
 			if #indexedScores ~= 2 then
 				error('Unexpected number of opponents when calculating map winner')
 			end
@@ -227,7 +227,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 			if match['map'..i] then
 				local winner = tonumber(match['map'..i].winner)
 				foundScores = true
-				-- Only two opponents in R6
+				-- Only two opponents in Valorant
 				if winner and winner > 0 and winner <= 2 then
 					newScores[winner] = (newScores[winner] or 0) + 1
 				end
