@@ -211,15 +211,16 @@ end
 -- 1) Not manually added
 -- 2) At least one map has a winner
 function matchFunctions.getScoreFromMapWinners(match)
-	-- For best of 1, display the results of the single map
 	local opponent1 = match.opponent1
 	local opponent2 = match.opponent2
 	local newScores = {}
 	local foundScores = false
 	if match.bestof == 1 and match.map1 then
+		-- For best of 1, display the results of the single map
 		newScores = match.map1.scores
 		foundScores = true
-	elseif match.bestof > 1 -- For best of >1, display the map wins
+	elseif match.bestof > 1 then
+		-- For best of >1, display the map wins
 		for i = 1, MAX_NUM_MAPS do
 			if match['map'..i] then
 				local winner = tonumber(match['map' .. i].winner)
