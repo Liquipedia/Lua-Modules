@@ -14,7 +14,6 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
-local getIconName = require('Module:IconName').luaGet
 local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
@@ -24,7 +23,6 @@ local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
-local MAX_NUM_VODGAMES = 20
 local MAX_NUM_ROUNDS = 24
 
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -182,30 +180,14 @@ function matchFunctions.getVodStuff(match)
 	match.links = {}
 	if match.vlr then match.links.vlr = 'https://vlr.gg/' .. match.vlr end
 
-	-- apply vodgames
-	for index = 1, MAX_NUM_VODGAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
 	return match
 end
 
 function matchFunctions.getExtraData(match)
-	local opponent1 = match.opponent1 or {}
-	local opponent2 = match.opponent2 or {}
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
 		mapveto = matchFunctions.getMapVeto(match),
-		team1icon = getIconName(opponent1.template or ''),
-		team2icon = getIconName(opponent2.template or ''),
-		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
-		octane = match.octane,
-		isconverted = 0
 	}
 	return match
 end
@@ -240,15 +222,15 @@ function matchFunctions.getMapVeto(match)
 	return data
 end
 
-function matchFunctions.getOpponents(args)
+function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
-		local opponent = args['opponent' .. opponentIndex]
+		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, args.date)
+			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
 			-- Retrieve icon for team
 			if opponent.type == Opponent.team then
@@ -267,40 +249,40 @@ function matchFunctions.getOpponents(args)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
+				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
 			end
 		end
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(args.finished) then
+	if isScoreSet and not Logic.readBool(match.finished) then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
-		local threshold = args.dateexact and 30800 or 86400
+		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
+		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then
-			args.finished = true
+			match.finished = true
 		end
 	end
 
 	-- apply placements and winner if finshed
-	if Logic.readBool(args.finished) then
+	if Logic.readBool(match.finished) then
 		local placement = 1
 		for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
 			if placement == 1 then
-				args.winner = opponentIndex
+				match.winner = opponentIndex
 			end
 			opponent.placement = placement
-			args['opponent' .. opponentIndex] = opponent
+			match['opponent' .. opponentIndex] = opponent
 			placement = placement + 1
 		end
 	-- only apply arg changes otherwise
 	else
 		for opponentIndex, opponent in pairs(opponents) do
-			args['opponent' .. opponentIndex] = opponent
+			match['opponent' .. opponentIndex] = opponent
 		end
 	end
-	return args
+	return match
 end
 
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
@@ -366,8 +348,6 @@ end
 
 function mapFunctions.getExtraData(map)
 	map.extradata = {
-		ot = map.ot,
-		otlength = map.otlength,
 		comment = map.comment,
 		t1firstside = map.t1firstside,
 		t1halfs = {atk = map.t1atk, def = map.t1def, otatk = map.t1otatk, otdef = map.t1otdef},

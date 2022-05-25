@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
+local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -22,6 +22,9 @@ local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local _ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local _ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+
+local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
@@ -262,11 +265,11 @@ function CustomMatchSummary.getByMatchId(args)
 		local footer = MatchSummary.Footer()
 
 		for index, vod in pairs(vods) do
-			footer:addElement(Template.safeExpand(frame, 'vodlink', {
+			footer:addElement(VodLink.display{
 				gamenum = index,
 				vod = vod,
 				source = vod.url
-			}))
+			})
 		end
 
 		-- Match Vod + other links
@@ -434,11 +437,11 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	container:addClass('brkts-popup-spaced')
 
 	if isWinner then
-		container:node('[[File:GreenCheck.png|14x14px|link=]]')
-		return container
+		container:node(_GREEN_CHECK)
+	else
+		container:node(_NO_CHECK)
 	end
 
-	container:node('[[File:NoCheck.png|link=]]')
 	return container
 end
 
