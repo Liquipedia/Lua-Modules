@@ -225,7 +225,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	else -- For best of >1, disply the map wins
 		for i = 1, MAX_NUM_MAPS do
 			if match['map'..i] then
-				local winner = tonumber(match['map'..i].winner)
+				local winner = tonumber(match['map' .. i].winner)
 				foundScores = true
 				-- Only two opponents in Valorant
 				if winner and winner > 0 and winner <= 2 then
