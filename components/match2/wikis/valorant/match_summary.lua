@@ -183,7 +183,7 @@ function MapVeto:addRound(vetotype, map1, map2)
 	if Logic.isEmpty(map2) then
 		map2 = 'TBD'
 	else
-		map2 = '[['..map2..']]'
+		map2 = '[[' .. map2 .. ']]'
 	end
 	local class
 	local vetoText
