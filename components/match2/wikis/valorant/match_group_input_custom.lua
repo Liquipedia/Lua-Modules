@@ -20,8 +20,8 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
+local NOT_PLAYED_INPUTS = { 'skip', 'np', 'canceled', 'cancelled' }
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_MAPS = 9
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local MAX_NUM_ROUNDS = 24
@@ -140,7 +140,7 @@ end
 
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
-	if data.finished == 'skip' or data.finished == 'np' or data.finished == 'cancelled' or data.finished == 'canceled' then
+	if Table.includes(NOT_PLAYED_INPUTS, data.finished) then
 		data.resulttype = 'np'
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
