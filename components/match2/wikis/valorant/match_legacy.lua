@@ -74,21 +74,22 @@ function p.storeGames(match, match2)
 				extradata.t2halfs = json.parseIfString(extradata.t2halfs)
 				local team1 = {}
 				local team2 = {}
-				if extradata.t1firstside[1] == "atk" then
+				if extradata.t1firstside == "atk" then
 					team1 = {"atk", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
 					team2 = {"def", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
-				elseif extradata.t1firstside[1] == "def" then
+				elseif extradata.t1firstside == "def" then
 					team2 = {"atk", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
 					team1 = {"def", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
 				end
-				if extradata.t1firstside.ot == "atk" then
+				-- TODO: Needs check that OT has occured
+				if extradata.t1fisrtside == "atk" then
 					table.insert(team1, "atk")
 					table.insert(team1, extradata.t1halfs.otatk or 0)
 					table.insert(team1, extradata.t1halfs.otdef or 0)
 					table.insert(team2, "def")
 					table.insert(team2, extradata.t2halfs.otatk or 0)
 					table.insert(team2, extradata.t2halfs.otdef or 0)
-				elseif extradata.t1firstside.ot == "def" then
+				elseif extradata.t1firstside == "def" then
 					table.insert(team2, "atk")
 					table.insert(team2, extradata.t2halfs.otatk or 0)
 					table.insert(team2, extradata.t2halfs.otdef or 0)
@@ -100,12 +101,14 @@ function p.storeGames(match, match2)
 				game.extradata.opponent2scores = table.concat(team2, ", ")
 			end
 		end
-		if game2.participants then
+		local participants = json.parseIfString(game2.participants)
+		if participants then
 			for team = 1, 2 do
 				for player = 1, 5 do
-					local data = game2.participants[team..'_'..player]
+					local data = participants[team..'_'..player]
 					if data then
-						game.extradata['t'..team..'p'..player] = match2.match2opponents[team].match2players[player].name
+						-- TODO: Needs fixing
+						-- game.extradata['t'..team..'p'..player] = match2.match2opponents[team].match2players[player].name
 						if data.kills and data.deaths and data.assists then
 							game.extradata['t'..team..'kda'..player] = data.kills..'/'..data.deaths..'/'..data.assists
 						end
@@ -162,7 +165,7 @@ function p.convertParameters(match2)
 	match.extradata.female = Variables.varDefault("female")
 	match.extradata.bestofx = tostring(match2.bestof or '')
 	match.extradata.maps = table.concat(p._getAllInGames(match2, 'map'), ',')
-	for index, vod in ipairs(p._getAllInGames(match2, 'vod'), ',') do
+	for index, vod in ipairs(p._getAllInGames(match2, 'vod')) do
 		match.extradata['vodgame'..index] = vod
 	end
 
