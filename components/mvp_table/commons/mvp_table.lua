@@ -12,7 +12,6 @@ local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
-local Variables = require('Module:Variables')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -50,7 +49,7 @@ function MvpTable.run(args)
 		:attr('data-definedcutafter', '')
 		:node(MvpTable._header1(args))
 		:node(MvpTable._header2(args))
-	
+
 	for _, item in ipairs(mvpList) do
 		output:node(MvpTable._row(item, args))
 	end
@@ -174,7 +173,7 @@ function MvpTable.processData(queryData)
 	for _, item in pairs(queryData) do
 		local mvp = (item.extradata or {}).mvp
 		if mvp then
-			for index, player in pairs(mvp.players or {}) do
+			for _, player in pairs(mvp.players or {}) do
 				if not playerList[player] then
 					playerList[player] = MvpTable.createPlayer(item.match2opponents, player)
 				end
@@ -187,7 +186,7 @@ function MvpTable.processData(queryData)
 	for _, item in Table.iter.spairs(playerList, MvpTable.sortFunction) do
 		table.insert(mvpList, item)
 	end
-	
+
 	return mvpList
 end
 
