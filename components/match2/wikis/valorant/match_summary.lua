@@ -178,7 +178,7 @@ function MapVeto:addRound(vetotype, map1, map2)
 	if Logic.isEmpty(map1) then
 		map1 = 'TBD'
 	else
-		map1 = '[['..map1..']]'
+		map1 = '[[' .. map1 .. ']]'
 	end
 	if Logic.isEmpty(map2) then
 		map2 = 'TBD'
