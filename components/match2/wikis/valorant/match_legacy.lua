@@ -100,12 +100,14 @@ function p.storeGames(match, match2)
 				game.extradata.opponent2scores = table.concat(team2, ", ")
 			end
 		end
-		if game2.participants then
+		local participants = json.parseIfString(game2.participants)
+		if participants then
 			for team = 1, 2 do
 				for player = 1, 5 do
-					local data = game2.participants[team..'_'..player]
+					local data = participants[team..'_'..player]
 					if data then
-						game.extradata['t'..team..'p'..player] = match2.match2opponents[team].match2players[player].name
+						-- TODO: Needs fixing
+						-- game.extradata['t'..team..'p'..player] = match2.match2opponents[team].match2players[player].name
 						if data.kills and data.deaths and data.assists then
 							game.extradata['t'..team..'kda'..player] = data.kills..'/'..data.deaths..'/'..data.assists
 						end
