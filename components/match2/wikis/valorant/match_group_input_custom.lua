@@ -418,6 +418,12 @@ function mapFunctions.getScoresAndWinner(map)
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do
 		-- read scores
 		local score = map['score' .. scoreIndex]
+		if map['t'.. scoreIndex ..'atk'] or map['t'.. scoreIndex ..'def'] then
+			score =   (tonumber(map['t'.. scoreIndex ..'atk']) or 0)
+					+ (tonumber(map['t'.. scoreIndex ..'def']) or 0)
+					+ (tonumber(map['t'.. scoreIndex ..'otatk']) or 0)
+					+ (tonumber(map['t'.. scoreIndex ..'otdef']) or 0)
+		end
 		local obj = {}
 		if not Logic.isEmpty(score) then
 			if TypeUtil.isNumeric(score) then
