@@ -162,7 +162,7 @@ function MapVeto:addDecider(map)
 	if Logic.isEmpty(map) then
 		map = 'TBD'
 	else
-		map = '[['..map..']]'
+		map = '[[' .. map .. ']]'
 	end
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
