@@ -888,7 +888,6 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOppon
 		if match['opponent' .. opponentIndex].type == Opponent.team then
 			local players = match['opponent' .. opponentIndex].match2players
 			if Table.isEmpty(players) then
-				opponentMapMode = 0
 				break
 			else
 				participants, opponentMapMode = StarcraftMatchGroupInput._processTeamPlayerMapData(
