@@ -21,7 +21,7 @@ function MvpTable.createPlayer(opponents, mvp)
 
 	for _, opponent in pairs(opponents) do
 		local players = opponent.match2players or {}
-		mvpPageName = MvpTable.pageFromMvp(mvp)
+		local mvpPageName = MvpTable.pageFromMvp(mvp)
 		for _, matchPlayer in pairs(players) do
 			if
 				mvpPageName == matchPlayer.name or
