@@ -888,6 +888,7 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOppon
 		if match['opponent' .. opponentIndex].type == Opponent.team then
 			local players = match['opponent' .. opponentIndex].match2players
 			if Table.isEmpty(players) then
+				opponentMapMode = 0
 				break
 			else
 				participants, opponentMapMode = StarcraftMatchGroupInput._processTeamPlayerMapData(
@@ -1047,10 +1048,12 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 		end
 	end
 
+	local numberOfParticipants = 0
 	for playerIndex, player in pairs(players) do
 		if player and playerData[player.name] then
+			numberOfParticipants = numberOfParticipants + 1
 			local faction = playerData[player.name].faction ~= 'u'
-				and playerData[player.name]
+				and playerData[player.name].faction
 				or player.extradata.faction or 'u'
 			participants[opponentIndex .. '_' .. playerIndex] = {
 				faction = faction,
@@ -1061,7 +1064,7 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 			end
 	end
 
-	local numberOfPlayers = #players + amountOfTbds
+	numberOfParticipants = numberOfParticipants + amountOfTbds
 	for tbdIndex = 1, amountOfTbds do
 		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
 			faction = 'u',
@@ -1070,14 +1073,14 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 	end
 
 	local opponentMapMode
-	if numberOfPlayers == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
+	if numberOfParticipants == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
 		opponentMapMode = 'Archon'
-	elseif numberOfPlayers == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'duoSpecial']) then
+	elseif numberOfParticipants == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'duoSpecial']) then
 		opponentMapMode = '2S'
-	elseif numberOfPlayers == 4 and Logic.readBool(map['opponent' .. opponentIndex .. 'quadSpecial']) then
+	elseif numberOfParticipants == 4 and Logic.readBool(map['opponent' .. opponentIndex .. 'quadSpecial']) then
 		opponentMapMode = '4S'
 	else
-		opponentMapMode = numberOfPlayers
+		opponentMapMode = numberOfParticipants
 	end
 
 	return participants, opponentMapMode
