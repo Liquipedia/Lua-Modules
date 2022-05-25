@@ -21,6 +21,7 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local MAX_NUM_OPPONENTS = 2
+local MAX_NUM_MAPS = 9
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
 local MAX_NUM_ROUNDS = 24
@@ -35,6 +36,7 @@ local CustomMatchGroupInput = {}
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(frame, match, options)
 	options = options or {}
+	match = matchFunctions.getScoreFromMapWinners(match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -76,28 +78,175 @@ end
 --
 --
 -- function to sort out winner/placements
-function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
-	local op1 = table[key1]
-	local op2 = table[key2]
-	local op1norm = op1.status == 'S'
-	local op2norm = op2.status == 'S'
-	if op1norm then
-		if op2norm then
-			return tonumber(op1.score) > tonumber(op2.score)
-		else return true end
-	else
-		if op2norm then return false
-		elseif op1.status == 'W' then return true
-		elseif op1.status == 'DQ' then return false
-		elseif op2.status == 'W' then return false
-		elseif op2.status == 'DQ' then return true
-		else return true end
+-- function to check for draws
+function CustomMatchGroupInput.placementCheckDraw(table)
+	local last
+	for _, scoreInfo in pairs(table) do
+		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
+			return false
+		end
+		if last and last ~= scoreInfo.score then
+			return false
+		else
+			last = scoreInfo.score
+		end
 	end
+
+	return true
+end
+
+-- Set the field 'placement' for the two participants in the opponenets list.
+-- Set the placementWinner field to the winner, and placementLoser to the other team
+-- Special cases:
+-- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
+-- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will gt placementLoser
+function CustomMatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser)
+	if opponents and #opponents == 2 then
+		local loserIdx
+		local winnerIdx
+		if winner == 1 then
+			winnerIdx = 1
+			loserIdx = 2
+		elseif winner == 2 then
+			winnerIdx = 2
+			loserIdx = 1
+		elseif winner == 0 then
+			-- Draw; idx of winner/loser doesn't matter
+			-- since loser and winner gets the same placement
+			placementLoser = placementWinner
+			winnerIdx = 1
+			loserIdx = 2
+		elseif winner == -1 then
+			-- No Winner (both loses). For example if both teams DQ.
+			-- idx's doesn't matter
+			placementWinner = placementLoser
+			winnerIdx = 1
+			loserIdx = 2
+		else
+			error('setPlacement: Unexpected winner')
+			return opponents
+		end
+		opponents[winnerIdx].placement = placementWinner
+		opponents[loserIdx].placement = placementLoser
+	end
+	return opponents
+end
+
+
+function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
+	-- Map or Match wasn't played, set not played
+	if data.finished == 'skip' or data.finished == 'np' or data.finished == 'cancelled' or data.finished == 'canceled' then
+		data.resulttype = 'np'
+	-- Map or Match is marked as finished.
+	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
+	elseif Logic.readBool(data.finished) then
+		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
+			data.winner = 0
+			data.resulttype = 'draw'
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
+		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
+			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
+			data.resulttype = 'default'
+			if CustomMatchGroupInput.placementCheckFF(indexedScores) then
+				data.walkover = 'ff'
+			elseif CustomMatchGroupInput.placementCheckDQ(indexedScores) then
+				data.walkover = 'dq'
+			elseif CustomMatchGroupInput.placementCheckWL(indexedScores) then
+				data.walkover = 'l'
+			end
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+		else
+			--R6 only has exactly 2 opponents, neither more or less
+			if #indexedScores ~= 2 then
+				error('Unexpected number of opponents when calculating map winner')
+			end
+			if tonumber(indexedScores[1].score) > tonumber(indexedScores[2].score) then
+				data.winner = 1
+			else
+				data.winner = 2
+			end
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+		end
+	end
+	return data, indexedScores
+end
+
+
+-- Check if any team has a none-standard status
+function CustomMatchGroupInput.placementCheckSpecialStatus(table)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
+end
+
+-- function to check for forfeits
+function CustomMatchGroupInput.placementCheckFF(table)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
+end
+
+-- function to check for DQ's
+function CustomMatchGroupInput.placementCheckDQ(table)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
+end
+
+-- function to check for W/L
+function CustomMatchGroupInput.placementCheckWL(table)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'L' end)
+end
+
+-- Get the winner when resulttype=default
+function CustomMatchGroupInput.getDefaultWinner(table)
+	for index, scoreInfo in pairs(table) do
+		if scoreInfo.status == 'W' then
+			return index
+		end
+	end
+	return -1
 end
 
 --
 -- match related functions
 --
+-- Calculate the match scores based on the map results.
+-- If it's a Best of 1, we'll take the exact score of that map
+-- If it's not a Best of 1, we should count the map wins
+-- Only update a teams result if it's
+-- 1) Not manually added
+-- 2) At least one map has a winner
+function matchFunctions.getScoreFromMapWinners(match)
+	-- For best of 1, display the results of the single map
+	local opponent1 = match.opponent1
+	local opponent2 = match.opponent2
+	local newScores = {}
+	local foundScores = false
+	if match.bestof == 1 then
+		if match.map1 then
+			newScores = match.map1.scores
+			foundScores = true
+		end
+	else -- For best of >1, disply the map wins
+		for i = 1, MAX_NUM_MAPS do
+			if match['map'..i] then
+				local winner = tonumber(match['map'..i].winner)
+				foundScores = true
+				-- Only two opponents in R6
+				if winner and winner > 0 and winner <= 2 then
+					newScores[winner] = (newScores[winner] or 0) + 1
+				end
+			else
+				break
+			end
+		end
+	end
+	if not opponent1.score and foundScores then
+		opponent1.score = newScores[1] or 0
+	end
+	if not opponent2.score and foundScores then
+		opponent2.score = newScores[2] or 0
+	end
+	match.opponent1 = opponent1
+	match.opponent2 = opponent2
+	return match
+end
+
 function matchFunctions.readDate(matchArgs)
 	return matchArgs.date
 		and MatchGroupInput.readDate(matchArgs.date)
@@ -188,20 +337,12 @@ function matchFunctions.getOpponents(args)
 
 	-- apply placements and winner if finshed
 	if Logic.readBool(args.finished) then
-		local placement = 1
-		for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
-			if placement == 1 then
-				args.winner = opponentIndex
-			end
-			opponent.placement = placement
-			args['opponent' .. opponentIndex] = opponent
-			placement = placement + 1
-		end
-	-- only apply arg changes otherwise
-	else
-		for opponentIndex, opponent in pairs(opponents) do
-			args['opponent' .. opponentIndex] = opponent
-		end
+		args, opponents = CustomMatchGroupInput.getResultTypeAndWinner(args, opponents)
+	end
+
+	-- Update all opponents with new values
+	for opponentIndex, opponent in pairs(opponents) do
+		args['opponent' .. opponentIndex] = opponent
 	end
 	return args
 end
@@ -293,12 +434,7 @@ function mapFunctions.getScoresAndWinner(map)
 		end
 	end
 
-	-- luacheck: ignore
-	-- TODO this always iterates just once
-	for scoreIndex, _ in Table.iter.spairs(indexedScores, CustomMatchGroupInput._placementSortFunction) do
-		map.winner = scoreIndex
-		break
-	end
+	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map
 end
