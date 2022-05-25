@@ -145,18 +145,18 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
-		if placementFunctions.isPlacementADraw(indexedScores) then
+		if placementFunctions.isDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
-		elseif placementFunctions.isAnyPlacementSpecialStatus(indexedScores) then
+		elseif placementFunctions.isSpecialStatus(indexedScores) then
 			data.winner = placementFunctions.getDefaultWinner(indexedScores)
 			data.resulttype = 'default'
-			if placementFunctions.isAnyPlacementForfeit(indexedScores) then
+			if placementFunctions.isForfeit(indexedScores) then
 				data.walkover = 'ff'
-			elseif placementFunctions.isAnyPlacementDisqualified(indexedScores) then
+			elseif placementFunctions.isDisqualified(indexedScores) then
 				data.walkover = 'dq'
-			elseif placementFunctions.isAnyPlacementWL(indexedScores) then
+			elseif placementFunctions.isWL(indexedScores) then
 				data.walkover = 'l'
 			end
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
@@ -180,7 +180,7 @@ end
 -- Placement related functions
 --
 -- function to check for draws
-function placementFunctions.isPlacementADraw(table)
+function placementFunctions.isDraw(table)
 	local last
 	for _, scoreInfo in pairs(table) do
 		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
@@ -197,22 +197,22 @@ function placementFunctions.isPlacementADraw(table)
 end
 
 -- Check if any team has a none-standard status
-function placementFunctions.isAnyPlacementSpecialStatus(table)
+function placementFunctions.isSpecialStatus(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
 end
 
 -- function to check for forfeits
-function placementFunctions.isAnyPlacementForfeit(table)
+function placementFunctions.isForfeit(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
 end
 
 -- function to check for DQ's
-function placementFunctions.isAnyPlacementDisqualified(table)
+function placementFunctions.isDisqualified(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
 end
 
 -- function to check for W/L
-function placementFunctions.isAnyPlacementWL(table)
+function placementFunctions.isWL(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'L' end)
 end
 
