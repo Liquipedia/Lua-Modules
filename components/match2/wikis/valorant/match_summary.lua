@@ -17,6 +17,9 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
+local _EPOCH_TIME = '1970-01-01 00:00:00'
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+
 local _ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local _ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 
@@ -280,8 +283,13 @@ end
 function CustomMatchSummary._createBody(frame, match)
 	local body = MatchSummary.Body()
 
-	local streamElement = DisplayHelper.MatchCountdownBlock(match)
-	body:addRow(MatchSummary.Row():addElement(streamElement))
+	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+		-- dateIsExact means we have both date and time. Show countdown
+		-- if match is not epoch=0, we have a date, so display the date
+		body:addRow(MatchSummary.Row():addElement(
+			DisplayHelper.MatchCountdownBlock(match)
+		))
+	end
 
 	for _, game in ipairs(match.games) do
 		if game.map then

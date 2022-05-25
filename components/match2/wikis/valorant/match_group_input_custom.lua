@@ -27,6 +27,7 @@ local MAX_NUM_MAPS = 9
 local MAX_NUM_VODGAMES = 20
 local MAX_NUM_ROUNDS = 24
 
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local DEFAULT_MODE = 'team'
 
@@ -72,7 +73,19 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
-	Opponent.resolve(opponent, date)
+	local teamTemplateDate = date
+	-- If date is epoch, resolve using tournament dates instead
+	-- Epoch indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+		teamTemplateDate = Variables.varDefaultMulti(
+			'tournament_enddate',
+			'tournament_startdate',
+			_EPOCH_TIME_EXTENDED
+		)
+	end
+
+	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
