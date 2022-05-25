@@ -174,11 +174,11 @@ function CustomMatchSummary._createBody(frame, match)
 	local streamElement = DisplayHelper.MatchCountdownBlock(match)
 	body:addRow(MatchSummary.Row():addElement(streamElement))
 
-	local matchPageElement = mw.html.create('center')
-	matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
-					:css('display', 'block')
-					:css('margin', 'auto')
-	body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
+--	local matchPageElement = mw.html.create('center')
+--	matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+--					:css('display', 'block')
+--					:css('margin', 'auto')
+--	body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
 
 	for _, game in ipairs(match.games) do
 		if game.map then
