@@ -215,6 +215,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	local opponent2 = match.opponent2
 	local newScores = {}
 	local foundScores = false
+
 	if match.bestof == 1 and match.map1 then
 		-- For best of 1, display the results of the single map
 		newScores = match.map1.scores
