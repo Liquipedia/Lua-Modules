@@ -22,8 +22,11 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
+local MAX_NUM_MAPS = 9
 local MAX_NUM_VODGAMES = 20
 local MAX_NUM_ROUNDS = 24
+
+local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -35,6 +38,9 @@ local CustomMatchGroupInput = {}
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(frame, match, options)
 	options = options or {}
+	-- Count number of maps, check for empty maps to remove
+	match = matchFunctions.getBestOf(match)
+	match = matchFunctions.removeUnsetMaps(match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -98,6 +104,36 @@ end
 --
 -- match related functions
 --
+function matchFunctions.getBestOf(match)
+	local mapCount = 0
+	for i = 1, MAX_NUM_MAPS do
+		if match['map'..i] then
+			mapCount = mapCount + 1
+		else
+			break
+		end
+	end
+	match.bestof = mapCount
+	return match
+end
+
+-- Template:Map sets a default map name so we can count the number of maps.
+-- These maps however shouldn't be stored in lpdb, nor displayed
+-- The discardMap function will check if a map should be removed
+-- Remove all maps that should be removed.
+function matchFunctions.removeUnsetMaps(match)
+	for i = 1, MAX_NUM_MAPS do
+		if match['map'..i] then
+			if mapFunctions.discardMap(match['map'..i]) then
+				match['map'..i] = nil
+			end
+		else
+			break
+		end
+	end
+	return match
+end
+
 function matchFunctions.readDate(matchArgs)
 	return matchArgs.date
 		and MatchGroupInput.readDate(matchArgs.date)
@@ -257,6 +293,16 @@ end
 --
 -- map related functions
 --
+-- Check if a map should be discarded due to being redundant
+-- DUMMY_MAP_NAME needs the match the default value in Template:Map
+function mapFunctions.discardMap(map)
+	if map.map == DUMMY_MAP_NAME then
+		return true
+	else
+		return false
+	end
+end
+
 function mapFunctions.getExtraData(map)
 	map.extradata = {
 		ot = map.ot,
