@@ -191,7 +191,7 @@ function MvpTable.processData(queryData)
 	return mvpList
 end
 
--- exported so it can be used in /Custom
+-- overwritable function via /Custom
 function MvpTable.createPlayer(opponents, mvp)
 	local player = {
 		points = 0,
