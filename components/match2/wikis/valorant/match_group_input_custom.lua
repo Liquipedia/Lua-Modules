@@ -19,20 +19,30 @@ local Streams = require('Module:Links/Stream')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
+local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
+local MAX_NUM_MAPS = 9
 local MAX_NUM_ROUNDS = 24
+
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
+local DEFAULT_MODE = 'team'
 
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
 local roundFunctions = {}
+local opponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(frame, match, options)
 	options = options or {}
+	-- Count number of maps, check for empty maps to remove
+	match = matchFunctions.getBestOf(match)
+	match = matchFunctions.removeUnsetMaps(match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -62,7 +72,24 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
-	Opponent.resolve(opponent, date)
+	-- Convert byes to literals
+	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+		opponent = {type = Opponent.literal, name = 'BYE'}
+	end
+
+	local teamTemplateDate = date
+	-- If date is epoch, resolve using tournament dates instead
+	-- Epoch indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+		teamTemplateDate = Variables.varDefaultMulti(
+			'tournament_enddate',
+			'tournament_startdate',
+			_EPOCH_TIME_EXTENDED
+		)
+	end
+
+	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -96,6 +123,36 @@ end
 --
 -- match related functions
 --
+function matchFunctions.getBestOf(match)
+	local mapCount = 0
+	for i = 1, MAX_NUM_MAPS do
+		if match['map'..i] then
+			mapCount = mapCount + 1
+		else
+			break
+		end
+	end
+	match.bestof = mapCount
+	return match
+end
+
+-- Template:Map sets a default map name so we can count the number of maps.
+-- These maps however shouldn't be stored in lpdb, nor displayed
+-- The discardMap function will check if a map should be removed
+-- Remove all maps that should be removed.
+function matchFunctions.removeUnsetMaps(match)
+	for i = 1, MAX_NUM_MAPS do
+		if match['map'..i] then
+			if mapFunctions.discardMap(match['map'..i]) then
+				match['map'..i] = nil
+			end
+		else
+			break
+		end
+	end
+	return match
+end
+
 function matchFunctions.readDate(matchArgs)
 	return matchArgs.date
 		and MatchGroupInput.readDate(matchArgs.date)
@@ -103,7 +160,7 @@ function matchFunctions.readDate(matchArgs)
 end
 
 function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '3v3'))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
 	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
 	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_ticker_name'))
@@ -112,6 +169,7 @@ function matchFunctions.getTournamentVars(match)
 	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
 	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
 	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_tier'))
+	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_tiertype'))
 	return match
 end
 
@@ -119,15 +177,49 @@ function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
+	match.links = {}
+	if match.vlr then match.links.vlr = 'https://vlr.gg/' .. match.vlr end
+
 	return match
 end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
+		mapveto = matchFunctions.getMapVeto(match),
 		comment = match.comment,
 	}
 	return match
+end
+
+-- Parse the mapVeto input
+function matchFunctions.getMapVeto(match)
+	if not match.mapveto then return nil end
+
+	match.mapveto = Json.parseIfString(match.mapveto)
+
+	local vetotypes = mw.text.split(match.mapveto.types or '', ',')
+	local deciders = mw.text.split(match.mapveto.decider or '', ',')
+	local vetostart = match.mapveto.firstpick or ''
+	local deciderIndex = 1
+
+	local data = {}
+	for index, vetoType in ipairs(vetotypes) do
+		vetoType = mw.text.trim(vetoType):lower()
+		if not Table.includes(ALLOWED_VETOES, vetoType) then
+			return nil -- Any invalid input will not store (ie hide) all vetoes.
+		end
+		if vetoType == 'decider' then
+			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
+			deciderIndex = deciderIndex + 1
+		else
+			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map'..index], team2 = match.mapveto['t2map'..index]})
+		end
+	end
+	if data[1] then
+		data[1].vetostart = vetostart
+	end
+	return data
 end
 
 function matchFunctions.getOpponents(match)
@@ -139,6 +231,11 @@ function matchFunctions.getOpponents(match)
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
+
+			-- Retrieve icon for team
+			if opponent.type == Opponent.team then
+				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
+			end
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
@@ -239,14 +336,22 @@ end
 --
 -- map related functions
 --
+-- Check if a map should be discarded due to being redundant
+-- DUMMY_MAP_NAME needs the match the default value in Template:Map
+function mapFunctions.discardMap(map)
+	if map.map == DUMMY_MAP_NAME then
+		return true
+	else
+		return false
+	end
+end
+
 function mapFunctions.getExtraData(map)
 	map.extradata = {
 		comment = map.comment,
-		op1startside = map['op1_startside'],
-		half1score1 = map.half1score1,
-		half1score2 = map.half1score2,
-		half2score1 = map.half2score1,
-		half2score2 = map.half2score2,
+		t1firstside = map.t1firstside,
+		t1halfs = {atk = map.t1atk, def = map.t1def, otatk = map.t1otatk, otdef = map.t1otdef},
+		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
 	}
 	return map
 end
@@ -284,7 +389,7 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '3v3'))
+	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
 	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault('tournament_ticker_name'))
@@ -293,6 +398,7 @@ function mapFunctions.getTournamentVars(map)
 	map.icon = Logic.emptyOr(map.icon, Variables.varDefault('tournament_icon'))
 	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault('tournament_icon_dark'))
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
+	map.liquipediatiertype = Logic.emptyOr(map.liquipediatiertype, Variables.varDefault('tournament_tiertype'))
 	return map
 end
 
@@ -391,6 +497,18 @@ function roundFunctions.getRoundData(round)
 
 	round.participants = participants
 	return round
+end
+
+--
+-- opponent related functions
+--
+function opponentFunctions.getIcon(template)
+	local raw = mw.ext.TeamTemplate.raw(template)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
+	end
 end
 
 return CustomMatchGroupInput
