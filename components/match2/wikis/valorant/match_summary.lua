@@ -71,6 +71,8 @@ local Score = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
 		self.table = self.root:tag('table'):css('line-height', '20px')
+		self.top = mw.html.create('tr')
+		self.bottom = mw.html.create('tr')
 	end
 )
 
@@ -89,9 +91,6 @@ function Score:setRight()
 end
 
 function Score:setMapScore(score)
-	self.top = mw.html.create('tr')
-	self.bottom = mw.html.create('tr')
-
 	local mapScore = mw.html.create('td')
 	mapScore:attr('rowspan', '2')
 			:css('font-size', '16px')
@@ -102,19 +101,21 @@ function Score:setMapScore(score)
 	return self
 end
 
-function Score:setFirstRoundScore(side, score)
+function Score:addTopRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore  :addClass('bracket-popup-body-match-sidewins')
 				:css('color', self:_getSideColor(side))
+				:css('width', '7px')
 				:wikitext(score)
 	self.top:node(roundScore)
 	return self
 end
 
-function Score:setSecondRoundScore(side, score)
+function Score:addBottomRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore  :addClass('bracket-popup-body-match-sidewins')
 				:css('color', self:_getSideColor(side))
+				:css('width', '7px')
 				:wikitext(score)
 	self.bottom:node(roundScore)
 	return self
@@ -371,23 +372,28 @@ function CustomMatchSummary._createMap(frame, game)
 	score2 = Score():setRight()
 
 	score1:setMapScore(game.scores[1])
-	score2:setMapScore(game.scores[2])
 
 	if not Table.isEmpty(extradata) then
 		-- Detailed scores
 		local team1Halfs = extradata.t1halfs or {}
 		local team2Halfs = extradata.t2halfs or {}
-		local firstSide = (extradata.t1firstside or ''):lower()
+		local firstSide = string.lower(extradata.t1firstside or '')
 		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
 
-		score1:setFirstRoundScore(firstSide, team1Halfs[firstSide])
-		score1:setSecondRoundScore(oppositeSide, team1Halfs[oppositeSide])
+		score1:addTopRoundScore(firstSide, team1Halfs[firstSide])
+		score1:addBottomRoundScore(oppositeSide, team1Halfs[oppositeSide])
 
-		-- TODO: Overtime support
+		score1:addTopRoundScore(firstSide, team1Halfs['ot' .. firstSide])
+		score1:addBottomRoundScore(oppositeSide, team1Halfs['ot' .. oppositeSide])
 
-		score2:setFirstRoundScore(oppositeSide, team2Halfs[oppositeSide])
-		score2:setSecondRoundScore(firstSide, team2Halfs[firstSide])
+		score2:addTopRoundScore(oppositeSide, team2Halfs['ot' .. oppositeSide])
+		score2:addBottomRoundScore(firstSide, team2Halfs['ot' .. firstSide])
+
+		score2:addTopRoundScore(oppositeSide, team2Halfs[oppositeSide])
+		score2:addBottomRoundScore(firstSide, team2Halfs[firstSide])
 	end
+
+	score2:setMapScore(game.scores[2])
 
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	if team1Agents ~= nil then

@@ -69,33 +69,35 @@ function p.storeGames(match, match2)
 		game.extradata.gamenumber = gameIndex
 		if extradata then
 			if extradata.t1firstside and extradata.t1halfs and extradata.t2halfs then
-				extradata.t1firstside = json.parseIfString(extradata.t1firstside)
-				extradata.t1halfs = json.parseIfString(extradata.t1halfs)
-				extradata.t2halfs = json.parseIfString(extradata.t2halfs)
+				local firstSide = extradata.t1firstside
+				local team1Halfs = json.parseIfString(extradata.t1halfs)
+				local team2Halfs = json.parseIfString(extradata.t2halfs)
+				local hasOvertime = team1Halfs.otatk or team1Halfs.otdef or team2Halfs.otatk or team2Halfs.otdef
 				local team1 = {}
 				local team2 = {}
-				if extradata.t1firstside == "atk" then
-					team1 = {"atk", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
-					team2 = {"def", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
-				elseif extradata.t1firstside == "def" then
-					team2 = {"atk", extradata.t2halfs.atk or 0, extradata.t2halfs.def or 0}
-					team1 = {"def", extradata.t1halfs.atk or 0, extradata.t1halfs.def or 0}
+				if firstSide == "atk" then
+					team1 = {"atk", team1Halfs.atk or 0, team1Halfs.def or 0}
+					team2 = {"def", team2Halfs.atk or 0, team2Halfs.def or 0}
+				elseif firstSide == "def" then
+					team2 = {"atk", team2Halfs.atk or 0, team2Halfs.def or 0}
+					team1 = {"def", team1Halfs.atk or 0, team1Halfs.def or 0}
 				end
-				-- TODO: Needs check that OT has occured
-				if extradata.t1fisrtside == "atk" then
-					table.insert(team1, "atk")
-					table.insert(team1, extradata.t1halfs.otatk or 0)
-					table.insert(team1, extradata.t1halfs.otdef or 0)
-					table.insert(team2, "def")
-					table.insert(team2, extradata.t2halfs.otatk or 0)
-					table.insert(team2, extradata.t2halfs.otdef or 0)
-				elseif extradata.t1firstside == "def" then
-					table.insert(team2, "atk")
-					table.insert(team2, extradata.t2halfs.otatk or 0)
-					table.insert(team2, extradata.t2halfs.otdef or 0)
-					table.insert(team1, "def")
-					table.insert(team1, extradata.t1halfs.otatk or 0)
-					table.insert(team1, extradata.t1halfs.otdef or 0)
+				if hasOvertime then
+					if firstSide == "atk" then
+						table.insert(team1, "atk")
+						table.insert(team1, team1Halfs.otatk or 0)
+						table.insert(team1, team1Halfs.otdef or 0)
+						table.insert(team2, "def")
+						table.insert(team2, team2Halfs.otatk or 0)
+						table.insert(team2, team2Halfs.otdef or 0)
+					elseif firstSide == "def" then
+						table.insert(team2, "atk")
+						table.insert(team2, team2Halfs.otatk or 0)
+						table.insert(team2, team2Halfs.otdef or 0)
+						table.insert(team1, "def")
+						table.insert(team1, team1Halfs.otatk or 0)
+						table.insert(team1, team1Halfs.otdef or 0)
+					end
 				end
 				game.extradata.opponent1scores = table.concat(team1, ", ")
 				game.extradata.opponent2scores = table.concat(team2, ", ")
