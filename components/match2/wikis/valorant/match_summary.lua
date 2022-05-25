@@ -224,13 +224,19 @@ function CustomMatchSummary._createMap(frame, game)
 	score2:setMapScore(game.scores[2])
 
 	if not Table.isEmpty(extradata) then
-		score1:setFirstRoundScore(extradata.op1startside, extradata.half1score1)
-		score1:setSecondRoundScore(
-			CustomMatchSummary._getOppositeSide(extradata.op1startside), extradata.half2score1)
+		-- Detailed scores
+		local team1Halfs = extradata.t1halfs or {}
+		local team2Halfs = extradata.t2halfs or {}
+		local firstSide = (extradata.t1firstside or ''):lower()
+		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
 
-		score2:setFirstRoundScore(
-			CustomMatchSummary._getOppositeSide(extradata.op1startside), extradata.half1score2)
-		score2:setSecondRoundScore(extradata.op1startside, extradata.half2score2)
+		score1:setFirstRoundScore(firstSide, team1Halfs[firstSide])
+		score1:setSecondRoundScore(oppositeSide, team1Halfs[oppositeSide])
+
+		-- TODO: Overtime support
+
+		score2:setFirstRoundScore(oppositeSide, team2Halfs[oppositeSide])
+		score2:setSecondRoundScore(firstSide, team2Halfs[firstSide])
 	end
 
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
