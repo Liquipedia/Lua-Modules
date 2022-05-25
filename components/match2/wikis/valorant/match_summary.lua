@@ -17,6 +17,9 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
+local _EPOCH_TIME = '1970-01-01 00:00:00'
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+
 local Agents = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -171,8 +174,13 @@ end
 function CustomMatchSummary._createBody(frame, match)
 	local body = MatchSummary.Body()
 
-	local streamElement = DisplayHelper.MatchCountdownBlock(match)
-	body:addRow(MatchSummary.Row():addElement(streamElement))
+	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+		-- dateIsExact means we have both date and time. Show countdown
+		-- if match is not epoch=0, we have a date, so display the date
+		body:addRow(MatchSummary.Row():addElement(
+			DisplayHelper.MatchCountdownBlock(match)
+		))
+	end
 
 	local matchPageElement = mw.html.create('center')
 	matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
