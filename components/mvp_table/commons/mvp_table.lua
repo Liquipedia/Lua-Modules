@@ -84,6 +84,7 @@ function MvpTable._parseArgs(args)
 	while String.isNotEmpty(args['tournament' .. tournamentIndex]) do
 		local tournament = args['tournament' .. tournamentIndex]
 		table.insert(parsedArgs.tournaments, tournament)
+		tournamentIndex = tournamentIndex + 1
 	end
 
 	return parsedArgs
