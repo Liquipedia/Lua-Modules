@@ -173,6 +173,9 @@ function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
+	match.links = {}
+	if match.vlr then match.links.vlr = 'https://vlr.gg/' .. match.vlr end
+
 	-- apply vodgames
 	for index = 1, MAX_NUM_VODGAMES do
 		local vodgame = match['vodgame' .. index]

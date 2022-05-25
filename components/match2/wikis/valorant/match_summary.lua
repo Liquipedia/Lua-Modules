@@ -23,6 +23,11 @@ local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local _ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local _ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 
+local _LINK_DATA = {
+	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
+	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
+}
+
 local Agents = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -252,7 +257,8 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
-	if not Table.isEmpty(vods) then
+	match.links.vod = match.vod
+	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
 		local footer = MatchSummary.Footer()
 
 		for index, vod in pairs(vods) do
@@ -261,6 +267,16 @@ function CustomMatchSummary.getByMatchId(args)
 				vod = vod,
 				source = vod.url
 			}))
+		end
+
+		-- Match Vod + other links
+		local buildLink = function (linktype, link)
+			local icon, text = _LINK_DATA[linktype].icon, _LINK_DATA[linktype].text
+			return '[['..icon..'|link='..link..'|15px|'..text..']]'
+		end
+
+		for linktype, link in pairs(match.links) do
+			footer:addElement(buildLink(linktype,link))
 		end
 
 		matchSummary:footer(footer)
