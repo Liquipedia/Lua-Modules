@@ -27,6 +27,7 @@ local MAX_NUM_VODGAMES = 20
 local MAX_NUM_ROUNDS = 24
 
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
+local DEFAULT_MODE = 'team'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -141,7 +142,7 @@ function matchFunctions.readDate(matchArgs)
 end
 
 function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '3v3'))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
 	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
 	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_ticker_name'))
@@ -150,6 +151,7 @@ function matchFunctions.getTournamentVars(match)
 	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
 	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
 	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_tier'))
+	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_tiertype'))
 	return match
 end
 
@@ -350,7 +352,7 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '3v3'))
+	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
 	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault('tournament_ticker_name'))
@@ -359,6 +361,7 @@ function mapFunctions.getTournamentVars(map)
 	map.icon = Logic.emptyOr(map.icon, Variables.varDefault('tournament_icon'))
 	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault('tournament_icon_dark'))
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
+	map.liquipediatiertype = Logic.emptyOr(map.liquipediatiertype, Variables.varDefault('tournament_tiertype'))
 	return map
 end
 
