@@ -323,10 +323,11 @@ function mapFunctions.getParticipantsData(map)
 	for o = 1, MAX_NUM_OPPONENTS do
 		for player = 1, MAX_NUM_PLAYERS do
 			local participant = participants[o .. '_' .. player] or {}
-			local opstring = 'opponent' .. o .. '_p' .. player
-			local stats = map[opstring .. 'stats']
+			local opstring_big = 'opponent' .. o .. '_p' .. player
+			local opstring_normal = 't' .. o .. 'p' .. player
+			local stats = map[opstring_big .. 'stats'] or map[opstring_normal]
 
-			if stats ~= nil then
+			if stats then
 				stats = Json.parse(stats)
 
 				local kills = stats['kills']
