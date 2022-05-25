@@ -20,12 +20,16 @@ local Streams = require('Module:Links/Stream')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
+local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
+local MAX_NUM_MAPS = 9
 local MAX_NUM_VODGAMES = 20
 local MAX_NUM_ROUNDS = 24
 
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
+local DEFAULT_MODE = 'team'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -37,6 +41,9 @@ local CustomMatchGroupInput = {}
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(frame, match, options)
 	options = options or {}
+	-- Count number of maps, check for empty maps to remove
+	match = matchFunctions.getBestOf(match)
+	match = matchFunctions.removeUnsetMaps(match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -112,6 +119,36 @@ end
 --
 -- match related functions
 --
+function matchFunctions.getBestOf(match)
+	local mapCount = 0
+	for i = 1, MAX_NUM_MAPS do
+		if match['map'..i] then
+			mapCount = mapCount + 1
+		else
+			break
+		end
+	end
+	match.bestof = mapCount
+	return match
+end
+
+-- Template:Map sets a default map name so we can count the number of maps.
+-- These maps however shouldn't be stored in lpdb, nor displayed
+-- The discardMap function will check if a map should be removed
+-- Remove all maps that should be removed.
+function matchFunctions.removeUnsetMaps(match)
+	for i = 1, MAX_NUM_MAPS do
+		if match['map'..i] then
+			if mapFunctions.discardMap(match['map'..i]) then
+				match['map'..i] = nil
+			end
+		else
+			break
+		end
+	end
+	return match
+end
+
 function matchFunctions.readDate(matchArgs)
 	return matchArgs.date
 		and MatchGroupInput.readDate(matchArgs.date)
@@ -119,7 +156,7 @@ function matchFunctions.readDate(matchArgs)
 end
 
 function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '3v3'))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
 	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
 	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_ticker_name'))
@@ -128,6 +165,7 @@ function matchFunctions.getTournamentVars(match)
 	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
 	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
 	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_tier'))
+	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_tiertype'))
 	return match
 end
 
@@ -152,6 +190,7 @@ function matchFunctions.getExtraData(match)
 	local opponent2 = match.opponent2 or {}
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
+		mapveto = matchFunctions.getMapVeto(match),
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
@@ -160,6 +199,36 @@ function matchFunctions.getExtraData(match)
 		isconverted = 0
 	}
 	return match
+end
+
+-- Parse the mapVeto input
+function matchFunctions.getMapVeto(match)
+	if not match.mapveto then return nil end
+
+	match.mapveto = Json.parseIfString(match.mapveto)
+
+	local vetotypes = mw.text.split(match.mapveto.types or '', ',')
+	local deciders = mw.text.split(match.mapveto.decider or '', ',')
+	local vetostart = match.mapveto.firstpick or ''
+	local deciderIndex = 1
+
+	local data = {}
+	for index, vetoType in ipairs(vetotypes) do
+		vetoType = mw.text.trim(vetoType):lower()
+		if not Table.includes(ALLOWED_VETOES, vetoType) then
+			return nil -- Any invalid input will not store (ie hide) all vetoes.
+		end
+		if vetoType == 'decider' then
+			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
+			deciderIndex = deciderIndex + 1
+		else
+			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map'..index], team2 = match.mapveto['t2map'..index]})
+		end
+	end
+	if data[1] then
+		data[1].vetostart = vetostart
+	end
+	return data
 end
 
 function matchFunctions.getOpponents(args)
@@ -271,6 +340,16 @@ end
 --
 -- map related functions
 --
+-- Check if a map should be discarded due to being redundant
+-- DUMMY_MAP_NAME needs the match the default value in Template:Map
+function mapFunctions.discardMap(map)
+	if map.map == DUMMY_MAP_NAME then
+		return true
+	else
+		return false
+	end
+end
+
 function mapFunctions.getExtraData(map)
 	map.extradata = {
 		ot = map.ot,
@@ -318,7 +397,7 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '3v3'))
+	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
 	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
 	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault('tournament_ticker_name'))
@@ -327,6 +406,7 @@ function mapFunctions.getTournamentVars(map)
 	map.icon = Logic.emptyOr(map.icon, Variables.varDefault('tournament_icon'))
 	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault('tournament_icon_dark'))
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
+	map.liquipediatiertype = Logic.emptyOr(map.liquipediatiertype, Variables.varDefault('tournament_tiertype'))
 	return map
 end
 
