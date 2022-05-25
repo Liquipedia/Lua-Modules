@@ -20,6 +20,7 @@ local Streams = require('Module:Links/Stream')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
+local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
@@ -141,6 +142,7 @@ function matchFunctions.getExtraData(match)
 	local opponent2 = match.opponent2 or {}
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
+		mapveto = matchFunctions.getMapVeto(match),
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
@@ -149,6 +151,36 @@ function matchFunctions.getExtraData(match)
 		isconverted = 0
 	}
 	return match
+end
+
+-- Parse the mapVeto input
+function matchFunctions.getMapVeto(match)
+	if not match.mapveto then return nil end
+
+	match.mapveto = Json.parseIfString(match.mapveto)
+
+	local vetotypes = mw.text.split(match.mapveto.types or '', ',')
+	local deciders = mw.text.split(match.mapveto.decider or '', ',')
+	local vetostart = match.mapveto.firstpick or ''
+	local deciderIndex = 1
+
+	local data = {}
+	for index, vetoType in ipairs(vetotypes) do
+		vetoType = mw.text.trim(vetoType):lower()
+		if not Table.includes(ALLOWED_VETOES, vetoType) then
+			return nil -- Any invalid input will not store (ie hide) all vetoes.
+		end
+		if vetoType == 'decider' then
+			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
+			deciderIndex = deciderIndex + 1
+		else
+			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map'..index], team2 = match.mapveto['t2map'..index]})
+		end
+	end
+	if data[1] then
+		data[1].vetostart = vetostart
+	end
+	return data
 end
 
 function matchFunctions.getOpponents(args)
