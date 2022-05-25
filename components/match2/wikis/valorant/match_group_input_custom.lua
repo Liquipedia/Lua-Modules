@@ -30,6 +30,7 @@ local MAX_NUM_ROUNDS = 24
 local matchFunctions = {}
 local mapFunctions = {}
 local roundFunctions = {}
+local placementFunctions = {}
 
 local CustomMatchGroupInput = {}
 
@@ -75,26 +76,6 @@ function CustomMatchGroupInput.processPlayer(frame, player)
 	return player
 end
 
---
---
--- function to sort out winner/placements
--- function to check for draws
-function CustomMatchGroupInput.placementCheckDraw(table)
-	local last
-	for _, scoreInfo in pairs(table) do
-		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
-			return false
-		end
-		if last and last ~= scoreInfo.score then
-			return false
-		else
-			last = scoreInfo.score
-		end
-	end
-
-	return true
-end
-
 -- Set the field 'placement' for the two participants in the opponenets list.
 -- Set the placementWinner field to the winner, and placementLoser to the other team
 -- Special cases:
@@ -132,7 +113,6 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, placementWinner, 
 	return opponents
 end
 
-
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
 	if data.finished == 'skip' or data.finished == 'np' or data.finished == 'cancelled' or data.finished == 'canceled' then
@@ -140,18 +120,18 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
-		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
+		if placementFunctions.isPlacementDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
-		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
-			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
+		elseif placementFunctions.isAnyPlacementSpecialStatus(indexedScores) then
+			data.winner = placementFunctions.getDefaultWinner(indexedScores)
 			data.resulttype = 'default'
-			if CustomMatchGroupInput.placementCheckFF(indexedScores) then
+			if placementFunctions.isAnyPlacementForfeit(indexedScores) then
 				data.walkover = 'ff'
-			elseif CustomMatchGroupInput.placementCheckDQ(indexedScores) then
+			elseif placementFunctions.isAnyPlacementDisqualified(indexedScores) then
 				data.walkover = 'dq'
-			elseif CustomMatchGroupInput.placementCheckWL(indexedScores) then
+			elseif placementFunctions.isAnyPlacementWL(indexedScores) then
 				data.walkover = 'l'
 			end
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
@@ -171,29 +151,48 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	return data, indexedScores
 end
 
+--
+-- Placement related functions
+--
+-- function to check for draws
+function placementFunctions.isPlacementDraw(table)
+	local last
+	for _, scoreInfo in pairs(table) do
+		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
+			return false
+		end
+		if last and last ~= scoreInfo.score then
+			return false
+		else
+			last = scoreInfo.score
+		end
+	end
+
+	return true
+end
 
 -- Check if any team has a none-standard status
-function CustomMatchGroupInput.placementCheckSpecialStatus(table)
+function placementFunctions.isAnyPlacementSpecialStatus(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
 end
 
 -- function to check for forfeits
-function CustomMatchGroupInput.placementCheckFF(table)
+function placementFunctions.isAnyPlacementForfeit(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
 end
 
 -- function to check for DQ's
-function CustomMatchGroupInput.placementCheckDQ(table)
+function placementFunctions.isAnyPlacementDisqualified(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
 end
 
 -- function to check for W/L
-function CustomMatchGroupInput.placementCheckWL(table)
+function placementFunctions.isAnyPlacementWL(table)
 	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'L' end)
 end
 
 -- Get the winner when resulttype=default
-function CustomMatchGroupInput.getDefaultWinner(table)
+function placementFunctions.getDefaultWinner(table)
 	for index, scoreInfo in pairs(table) do
 		if scoreInfo.status == 'W' then
 			return index
