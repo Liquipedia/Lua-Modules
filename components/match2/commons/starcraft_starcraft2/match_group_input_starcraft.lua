@@ -955,9 +955,9 @@ end
 function StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
 	local opponentRaces, playerNameArray = {}, {}
 	for participantKey, participantData in pairs(participants) do
-		local opponentIndex = string.sub(participantKey, 1, 1)
+		local opponentIndex = tonumber(string.sub(participantKey, 1, 1))
 		opponentRaces[opponentIndex] = participantData.faction
-		playerNameArray[opponentIndex] = participantData.name
+		playerNameArray[opponentIndex] = participantData.player
 	end
 
 	return opponentRaces, playerNameArray
