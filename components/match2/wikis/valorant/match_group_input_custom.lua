@@ -22,7 +22,6 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
-local MAX_NUM_VODGAMES = 20
 local MAX_NUM_ROUNDS = 24
 
 -- containers for process helper functions
@@ -121,42 +120,26 @@ function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	-- apply vodgames
-	for index = 1, MAX_NUM_VODGAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
 	return match
 end
 
 function matchFunctions.getExtraData(match)
-	local opponent1 = match.opponent1 or {}
-	local opponent2 = match.opponent2 or {}
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
-		team1icon = getIconName(opponent1.template or ''),
-		team2icon = getIconName(opponent2.template or ''),
-		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
-		octane = match.octane,
-		isconverted = 0
 	}
 	return match
 end
 
-function matchFunctions.getOpponents(args)
+function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
-		local opponent = args['opponent' .. opponentIndex]
+		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, args.date)
+			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
@@ -170,40 +153,40 @@ function matchFunctions.getOpponents(args)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
+				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
 			end
 		end
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(args.finished) then
+	if isScoreSet and not Logic.readBool(match.finished) then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
-		local threshold = args.dateexact and 30800 or 86400
+		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
+		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then
-			args.finished = true
+			match.finished = true
 		end
 	end
 
 	-- apply placements and winner if finshed
-	if Logic.readBool(args.finished) then
+	if Logic.readBool(match.finished) then
 		local placement = 1
 		for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
 			if placement == 1 then
-				args.winner = opponentIndex
+				match.winner = opponentIndex
 			end
 			opponent.placement = placement
-			args['opponent' .. opponentIndex] = opponent
+			match['opponent' .. opponentIndex] = opponent
 			placement = placement + 1
 		end
 	-- only apply arg changes otherwise
 	else
 		for opponentIndex, opponent in pairs(opponents) do
-			args['opponent' .. opponentIndex] = opponent
+			match['opponent' .. opponentIndex] = opponent
 		end
 	end
-	return args
+	return match
 end
 
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
@@ -259,8 +242,6 @@ end
 --
 function mapFunctions.getExtraData(map)
 	map.extradata = {
-		ot = map.ot,
-		otlength = map.otlength,
 		comment = map.comment,
 		op1startside = map['op1_startside'],
 		half1score1 = map.half1score1,
