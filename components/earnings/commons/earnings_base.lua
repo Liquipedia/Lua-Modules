@@ -101,9 +101,12 @@ function Earnings.calculateForTeam(args)
 	end
 
 	local formatParicipant = function(lpdbField, participants)
-		return '([['..lpdbField..'::'.. table.concat(participants, ']] OR [['..lpdbField..'::') ..']])'
+		return '([[' .. lpdbField .. '::' ..
+			table.concat(participants, ']] OR [[' .. lpdbField .. '::')
+			.. ']])'
 	end
-	local teamConditions = '('.. formatParicipant('participant', queryTeams) ..' OR '.. formatParicipant('extradata_participantteam',  queryTeams) ..')'
+	local teamConditions = '(' .. formatParicipant('participant', queryTeams) .. ' OR '
+		.. formatParicipant('extradata_participantteam',  queryTeams) ..')'
 	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
 end
 
