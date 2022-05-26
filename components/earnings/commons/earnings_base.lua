@@ -72,8 +72,8 @@ end
 -- @teams - list of teams
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
--- @noRedirect - (optional) team redirects get not resolved before query
 -- @queryHistorical - (optional) fetch the pageNames from the subTemplates of the entered team template
+-- @noRedirect - (optional) team redirects get not resolved before query (only available if queryHistorical is not used)
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 function Earnings.calculateForTeam(args)
 	args = args or {}
