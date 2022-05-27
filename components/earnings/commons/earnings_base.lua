@@ -57,6 +57,7 @@ function Earnings.calculateForPlayer(args)
 	end
 
 	local playerConditions = '([[participant::' .. player .. ']] OR [[participant::' .. playerAsPageName .. ']]'
+		.. '[[participantlink::' .. player .. ']] OR [[participantlink::' .. playerAsPageName .. ']]'
 	for playerIndex = 1, playerPositionLimit do
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]'
@@ -93,7 +94,7 @@ function Earnings.calculateForTeam(args)
 			end
 		end
 	elseif not Logic.readBool(args.noRedirect) then
-		for index, team in pairs(queryTeams) do
+		for index, team in pairs(teams) do
 			queryTeams[index] = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
 		end
 	else
@@ -106,7 +107,8 @@ function Earnings.calculateForTeam(args)
 			.. ']])'
 	end
 	local teamConditions = '(' .. formatParicipant('participant', queryTeams) .. ' OR '
-		.. formatParicipant('extradata_participantteam',  queryTeams) ..')'
+		.. formatParicipant('extradata_participantteam',  queryTeams) .. ' OR '
+		.. formatParicipant('participantlink',  queryTeams) ..')'
 	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
 end
 
