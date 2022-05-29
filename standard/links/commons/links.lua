@@ -34,6 +34,7 @@ local _PREFIXES = {
 		player = 'https://datdota.com/players/',
 		team = 'https://datdota.com/teams/'
 	},
+	daumcafe = {'http://cafe.daum.net/'}
 	discord = {'https://discord.gg/'},
 	dlive = {'https://www.dlive.tv/'},
 	dotabuff = {
