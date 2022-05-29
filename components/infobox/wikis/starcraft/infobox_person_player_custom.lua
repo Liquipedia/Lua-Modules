@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local CleanRace = require('Module:CleanRace')
 local Info = require('Module:Info')
@@ -14,7 +13,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
-local Namespace = require('Module:Namespace')
+--local Namespace = require('Module:Namespace')
 local Notability = require('Module:Notability')
 local Person = require('Module:Infobox/Person/dev')
 local RaceIcon = require('Module:RaceIcon')
@@ -32,8 +31,6 @@ local ColumnName = Condition.ColumnName
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
 
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
@@ -45,7 +42,7 @@ local _LAST_DAY_OF_YEAR = '-12-31'
 local _KOREAN = 'South Korea'
 
 --race stuff
-local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
+--local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
 local _RACE_FIELD_AS_CATEGORY_LINK = true
 local _RACE_DATA = {
 	p = {'Protoss'},
@@ -194,7 +191,7 @@ function CustomPlayer.adjustLPDB(_, lpdbData)
 		extradata.racehistorical = true
 		extradata.factionhistorical = true
 	end
-	
+
 	--Notability values per year
 	for year = Info.startYear, _CURRENT_YEAR do
 		extradata['notabilityin' .. year] = Notability.notabilityScore{
