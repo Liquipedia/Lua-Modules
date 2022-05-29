@@ -434,7 +434,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, 'Players with invalid team')
 		end
 
-		return categories
+		return self:getWikiCategories(categories)
 	end
 	return {}
 end
