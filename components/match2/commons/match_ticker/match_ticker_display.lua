@@ -308,7 +308,7 @@ function Details:tournament(matchData)
 	local link = String.isNotEmpty(matchData.parent) and matchData.parent or matchData.pagename
 	local displayName = String.isNotEmpty(matchData.tickername) and matchData.tickername
 		or String.isNotEmpty(matchData.tickername) and matchData.tournament
-		or string.gsub(matchData.pagename, '_', ' ')
+		or string.gsub(matchData.parent, '_', ' ')
 
 	local tournamentDisplay = mw.html.create('div')
 		:addClass('tournament')
