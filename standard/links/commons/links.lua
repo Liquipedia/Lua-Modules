@@ -68,6 +68,7 @@ local _PREFIXES = {
 	home = {''},
 	huomaotv = {'http://www.huomao.com/'},
 	huyatv = {'https://www.huya.com/'},
+	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'}
 	instagram = {'https://www.instagram.com/'},
 	loco = {'https://loco.gg/streamers/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
@@ -142,6 +143,7 @@ local _PREFIXES = {
 _PREFIXES = Table.merge(_PREFIXES, CustomData.prefixes or {})
 
 local _SUFFIXES = {
+	iccup = '.html',
 	['faceit-c'] = '/event',
 }
 
