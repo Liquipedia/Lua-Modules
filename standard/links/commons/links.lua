@@ -100,6 +100,22 @@ local _PREFIXES = {
 	stream = {''},
 	telegram = {'https://t.me/'},
 	tiktok = {'https://tiktok.com/@'},
+	tlpd = {''},
+	tlpdint = {
+		'',
+		team = 'https://tl.net/tlpd/international/teams/'
+		player = 'https://tl.net/tlpd/international/players/',
+	},
+	tlpdkr = {
+		'',
+		team = 'https://tl.net/tlpd/korean/teams/'
+		player = 'https://tl.net/tlpd/korean/players/',
+	},
+	tlpdsospa = {
+		'',
+		team = 'https://tl.net/tlpd/sospa/teams/'
+		player = 'https://tl.net/tlpd/sospa/players/',
+	},
 	tlprofile = {'https://tl.net/forum/profile.php?user='},
 	tlstream = {'https://tl.net/video/streams/'},
 	toornament = {'https://www.toornament.com/tournaments/'},
