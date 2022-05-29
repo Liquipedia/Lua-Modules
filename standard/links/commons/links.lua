@@ -105,17 +105,17 @@ local _PREFIXES = {
 	tlpd = {''},
 	tlpdint = {
 		'',
-		team = 'https://tl.net/tlpd/international/teams/'
+		team = 'https://tl.net/tlpd/international/teams/',
 		player = 'https://tl.net/tlpd/international/players/',
 	},
 	tlpdkr = {
 		'',
-		team = 'https://tl.net/tlpd/korean/teams/'
+		team = 'https://tl.net/tlpd/korean/teams/',
 		player = 'https://tl.net/tlpd/korean/players/',
 	},
 	tlpdsospa = {
 		'',
-		team = 'https://tl.net/tlpd/sospa/teams/'
+		team = 'https://tl.net/tlpd/sospa/teams/',
 		player = 'https://tl.net/tlpd/sospa/players/',
 	},
 	tlprofile = {'https://tl.net/forum/profile.php?user='},
