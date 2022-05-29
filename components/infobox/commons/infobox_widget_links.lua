@@ -20,12 +20,17 @@ local Links = Class.new(
 )
 
 local _ICON_KEYS_TO_RENAME = {
+	daumcafe = 'cafe-daum',
 	['esea-d'] = 'esea',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
 	steamalternative = 'steam',
+	tlpdint = 'tlpd',
+	tlpdkr = 'tlpd-wol-korea',
+	tlpdsospa = 'tlpd-sospa',
+	tlpd = '',
 }
 
 local _PRIORITY_GROUPS = {
