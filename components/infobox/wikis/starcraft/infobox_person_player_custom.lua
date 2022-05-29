@@ -85,6 +85,7 @@ function CustomPlayer.run(frame)
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.getWikiCategories = CustomPlayer.getWikiCategories
+	player.getPersonType = CustomPlayer.getPersonType
 
 	return player:createInfobox(frame)
 end
@@ -214,9 +215,13 @@ function CustomPlayer.getStatusToStore()
 		_statusStore = 'Deceased'
 	elseif _args.retired then
 		_statusStore = 'Retired'
-	elseif not Logic.readBool(_args.isplayer) then
+	elseif
+		(not Logic.readBool(_args.isplayer)) and
+		string.lower(_args.role or _args.defaultPersonType) ~= 'player'
+	then
 		_statusStore = 'not player'
 	end
+
 	return _statusStore
 end
 
@@ -496,6 +501,10 @@ function CustomPlayer:getWikiCategories(categories)
 	end
 
 	return categories
+end
+
+function CustomPlayer.getPersonType()
+	return {store = _args.defaultPersonType, category = _args.defaultPersonType}
 end
 
 return CustomPlayer
