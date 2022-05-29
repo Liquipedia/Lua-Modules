@@ -439,6 +439,11 @@ function Person:getCategories(args, birthDisplay, personType, status)
 	return {}
 end
 
+--- Allows for overriding this functionality
+function Person:getWikiCategories(categories)
+	return categories
+end
+
 function Person._createAgeCalculationErrorMessage(text)
 	-- Return formatted message text for an error.
 	local strongStart = '<strong class="error">Error: '
