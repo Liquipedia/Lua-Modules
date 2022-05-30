@@ -15,7 +15,7 @@ local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
 --local Namespace = require('Module:Namespace')
 local Notability = require('Module:Notability')
-local Person = require('Module:Infobox/Person/dev')
+local Person = require('Module:Infobox/Person')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -95,7 +95,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				content = {CustomPlayer._getRaceData(_args.race or 'unknown', _RACE_FIELD_AS_CATEGORY_LINK)}
+				content = {CustomPlayer._getRaceData(_args.race, _RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -132,7 +132,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomPlayer.nameDisplay()
-	CustomPlayer._getRaceData(_args.race or 'unknown')
+	CustomPlayer._getRaceData(_args.race)
 	local raceIcon = RaceIcon.getNormalIcon{_raceData.race}
 	local name = _args.id or _player.pagename
 
@@ -140,7 +140,7 @@ function CustomPlayer.nameDisplay()
 end
 
 function CustomPlayer._getRaceData(race, asCategory)
-	race = string.lower(race)
+	race = string.lower(race or 'unknown')
 	race = CleanRace[race] or race
 	local raceTable = _RACE_DATA[race]
 
@@ -184,7 +184,6 @@ function CustomPlayer.adjustLPDB(_, lpdbData)
 	extradata.race = _raceData.race
 	extradata.faction = _raceData.faction
 	extradata.faction2 = _raceData.faction2
-	extradata.lc_id = string.lower(_player.pagename)
 	extradata.teamname = _args.team
 	extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive', '') or ''
 
@@ -496,7 +495,7 @@ function CustomPlayer:getWikiCategories(categories)
 		table.insert(categories, 'SOSPA Players')
 	end
 
-	if _lpdbData.nationality ~= _KOREAN then
+	if _args.country ~= _KOREAN then
 		table.insert(categories, 'Foreign Players')
 	end
 
