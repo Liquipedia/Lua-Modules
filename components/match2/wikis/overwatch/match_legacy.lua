@@ -61,7 +61,6 @@ function p.storeGames(match, match2)
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
 		-- Extradata
-		local extradata = json.parseIfString(game2.extradata)
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
