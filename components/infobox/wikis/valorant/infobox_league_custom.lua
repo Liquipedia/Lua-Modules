@@ -124,7 +124,7 @@ function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.epatch) then
 		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]'
 	else
-		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]' .. '&ndash;' ..
+		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]' .. ' &ndash; ' ..
 		'[[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
 	end
 
