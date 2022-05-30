@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local RaceIcon = require('Module:RaceIcon')
@@ -57,10 +58,10 @@ function CustomTeam.run(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell({
+	table.insert(widgets, Cell{
 		name = 'Gaming Director',
 		content = {_args['gaming director']}
-	}))
+	})
 
 	return widgets
 end
@@ -157,16 +158,16 @@ function CustomTeam.playerBreakDown(args)
 		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
 			playerBreakDown.display = {}
 			if protossnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon({'p'}) .. ' ' .. protossnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'p'} .. ' ' .. protossnumber
 			end
 			if terrannumbner > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon({'t'}) .. ' ' .. terrannumbner
+				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'t'} .. ' ' .. terrannumbner
 			end
 			if zergnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon({'z'}) .. ' ' .. zergnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'z'} .. ' ' .. zergnumber
 			end
 			if randomnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon({'r'}) .. ' ' .. randomnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'r'} .. ' ' .. randomnumber
 			end
 		end
 	end
@@ -215,43 +216,46 @@ function CustomTeam.getEarningsAndMedalsData()
 	local team = _team.pagename
 	local query = 'liquipediatier, liquipediatiertype, placement, date, individualprizemoney, prizemoney, players'
 
-	local playerTeamConditions = ConditionTree(BooleanOperator.any):add({
-	})
+	local playerTeamConditions = ConditionTree(BooleanOperator.any)
 	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
-		playerTeamConditions:add({
+		playerTeamConditions:add{
 			ConditionNode(ColumnName('players_p' .. playerIndex .. 'team'), Comparator.eq, team),
-		})
+		}
 	end
 
 	local placementConditions = ConditionTree(BooleanOperator.any)
 	for _, item in pairs(_ALLOWED_PLACES) do
-		placementConditions:add({
+		placementConditions:add{
 			ConditionNode(ColumnName('placement'), Comparator.eq, item),
-		})
+		}
 	end
 
-	local conditions = ConditionTree(BooleanOperator.all):add({
+	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
-		ConditionTree(BooleanOperator.any):add({
+		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
-			ConditionTree(BooleanOperator.all):add({
+			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('players_type'), Comparator.eq, 'team'),
 				ConditionNode(ColumnName('participantlink'), Comparator.eq, team),
 				placementConditions,
-			}),
-		}),
-		ConditionTree(BooleanOperator.any):add({
+			},
+		},
+		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('participantlink'), Comparator.eq, team),
-			ConditionTree(BooleanOperator.all):add({
+			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('players_type'), Comparator.neq, 'team'),
 				playerTeamConditions
-			}),
-		}),
-	})
+			},
+		},
+	}
 
-	local data = CustomTeam._getLPDBrecursive(conditions:toString(), query, 'placement')
+	local queryParameters = {
+		conditions = conditions:toString(),
+		query = query,
+		order = 'weight desc, liquipediatier asc, placement asc',
+	}
 
 	local earnings = {}
 	local medals = {}
@@ -261,20 +265,20 @@ function CustomTeam.getEarningsAndMedalsData()
 	medals['total'] = {}
 	teamMedals['total'] = {}
 
-	if type(data[1]) == 'table' then
-		for _, item in pairs(data) do
-			--handle earnings
-			earnings, playerEarnings = CustomTeam._addPlacementToEarnings(earnings, playerEarnings, item)
+	local processPlacement = function(placement)
+		--handle earnings
+		earnings, playerEarnings = CustomTeam._addPlacementToEarnings(earnings, playerEarnings, placement)
 
-			--handle medals
-			local mode = (item.players or {}).type
-			if mode == 'solo' then
-				medals = CustomTeam._addPlacementToMedals(medals, item)
-			elseif mode == 'team' then
-				teamMedals = CustomTeam._addPlacementToMedals(teamMedals, item)
-			end
+		--handle medals
+		local mode = (placement.players or {}).type
+		if mode == 'solo' then
+			medals = CustomTeam._addPlacementToMedals(medals, placement)
+		elseif mode == 'team' then
+			teamMedals = CustomTeam._addPlacementToMedals(teamMedals, placement)
 		end
 	end
+
+	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
 
 	CustomTeam._setVarsFromTable(earnings)
 	CustomTeam._setVarsFromTable(medals)
