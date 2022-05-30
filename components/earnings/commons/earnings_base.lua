@@ -7,10 +7,12 @@
 --
 
 local Earnings = {}
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local MathUtils = require('Module:Math')
 local String = require('Module:StringUtils')
-local Logic = require('Module:Logic')
-local Class = require('Module:Class')
+local Table = require('Module:Table')
+local Team = require('Module:Team')
 
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
 local _MAX_QUERY_LIMIT = 5000
@@ -66,24 +68,46 @@ end
 
 ---
 -- Entry point for teams
--- @team - the team for which the earnings shall be calculated
+-- @team - the team (either pageName or team template) for which the earnings shall be calculated
+-- @teams - list of teams
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
--- @noRedirect - (optional) player redirects get not resolved before query
+-- @queryHistorical - (optional) fetch the pageNames from the subTemplates of the entered team template
+-- @noRedirect - (optional) team redirects get not resolved before query (only available if queryHistorical is not used)
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 function Earnings.calculateForTeam(args)
 	args = args or {}
-	local team = args.team
+	local teams = args.teams or {}
+	table.insert(teams, args.team)
 
-	if String.isEmpty(team) then
+	if Table.isEmpty(teams) then
 		return 0
 	end
-	if not Logic.readBool(args.noRedirect) then
-		team = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
+
+	local queryTeams = {}
+	if Logic.readBool(args.queryHistorical) then
+		for _, team in pairs(teams) do
+			local historicalNames = Team.queryHistoricalNames(team)
+			for _, historicalTeam in pairs(historicalNames) do
+				table.insert(queryTeams, historicalTeam)
+			end
+		end
+	elseif not Logic.readBool(args.noRedirect) then
+		for index, team in pairs(teams) do
+			queryTeams[index] = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
+		end
+	else
+		queryTeams = teams
 	end
 
-	local teamConditions = '([[participant::' .. team .. ']] OR [[extradata_participantteam::' .. team .. ']])'
-
+	local formatParicipant = function(lpdbField, participants)
+		return '([[' .. lpdbField .. '::' ..
+			table.concat(participants, ']] OR [[' .. lpdbField .. '::')
+			.. ']])'
+	end
+	local teamConditions = '(' .. formatParicipant('participant', queryTeams) .. ' OR '
+		.. formatParicipant('extradata_participantteam',  queryTeams) .. ' OR '
+		.. formatParicipant('participantlink',  queryTeams) ..')'
 	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
 end
 
@@ -105,6 +129,7 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 	end
 
 	local prizePoolColumn = Earnings._getPrizePoolType(divisionFactor)
+
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
 		query = 'mode, sum::' .. prizePoolColumn,

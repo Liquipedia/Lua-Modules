@@ -89,7 +89,11 @@ function Team:createInfobox()
 				Builder{
 					builder = function()
 						_defaultEarningsFunctionUsed = true
-						_totalEarnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
+						_totalEarnings, _earnings = Earnings.calculateForTeam{
+							team = self.pagename or self.name,
+							perYear = true,
+							queryHistorical = args.queryEarningsHistorical
+						}
 						Variables.varDefine('earnings', _totalEarnings) -- needed for SMW
 						local totalEarnings
 						if _totalEarnings > 0 then
