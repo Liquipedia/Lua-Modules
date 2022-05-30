@@ -27,7 +27,6 @@ function CustomSeries.run(frame)
 	local series = Series(frame)
 	_args = series.args
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
-	series.createBottomContent = CustomSeries.createBottomContent
 
 	return series:createInfobox(frame)
 end
