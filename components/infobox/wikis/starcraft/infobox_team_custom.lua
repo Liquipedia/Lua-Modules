@@ -29,7 +29,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local doStore = true
-local pagename = mw.title.getCurrentTitle().prefixedText
 
 local CustomTeam = Class.new()
 
@@ -37,16 +36,17 @@ local CustomInjector = Class.new(Injector)
 local _LANGUAGE = mw.language.new('en')
 
 local _earnings = 0
-local _earnings_by_players_while_on_team = 0
 local _EARNINGS_MODES = {team = 'team'}
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 35
 local _PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
 local _args
+local _team
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
+	_team = team
 	_args = team.args
 
 	team.getWikiCategories = CustomTeam.getWikiCategories
@@ -61,17 +61,14 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Gaming Director',
 		content = {_args['gaming director']}
 	}))
-	table.insert(widgets, Cell({
-		name = 'TLPD',
-		content = {_args.tlpd}
-	}))
 
 	return widgets
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		_earnings = CustomTeam.calculateEarnings(_args)
+		local earningsWhileOnTeam
+		_earnings, earningsWhileOnTeam = CustomTeam.calculateEarnings(_args)
 		local earningsDisplay
 		if _earnings == 0 then
 			earningsDisplay = nil
@@ -79,10 +76,8 @@ function CustomInjector:parse(id, widgets)
 			earningsDisplay = '$' .. _LANGUAGE:formatNum(_earnings)
 		end
 		local earningsFromPlayersDisplay
-		if _earnings_by_players_while_on_team == 0 then
-			earningsFromPlayersDisplay = nil
-		else
-			earningsFromPlayersDisplay = '$' .. _LANGUAGE:formatNum(_earnings_by_players_while_on_team)
+		if earningsWhileOnTeam > 0 then
+			earningsFromPlayersDisplay = '$' .. _LANGUAGE:formatNum(earningsWhileOnTeam)
 		end
 		return {
 			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
@@ -185,11 +180,13 @@ function CustomTeam.calculateEarnings(args)
 			doStore = false
 			Variables.varDefine('disable_SMW_storage', 'true')
 	else
-		local earnings = CustomTeam.getEarningsAndMedalsData(pagename) or 0
+		local earnings, earningsWhileOnTeam = CustomTeam.getEarningsAndMedalsData()
 		Variables.varDefine('earnings', earnings)
-		return earnings
+
+		return earnings, earningsWhileOnTeam
 	end
-	return 0
+
+	return 0, 0
 end
 
 function CustomTeam._getLPDBrecursive(cond, query, queryType)
@@ -214,7 +211,8 @@ function CustomTeam._getLPDBrecursive(cond, query, queryType)
 	return data
 end
 
-function CustomTeam.getEarningsAndMedalsData(team)
+function CustomTeam.getEarningsAndMedalsData()
+	local team = _team.pagename
 	local query = 'liquipediatier, liquipediatiertype, placement, date, individualprizemoney, prizemoney, players'
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any):add({
@@ -289,13 +287,12 @@ function CustomTeam.getEarningsAndMedalsData(team)
 	if doStore then
 		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
 				type = 'total_earnings_players_while_on_team',
-				name = pagename,
+				name = _team.pagename,
 				information = playerEarnings,
 		})
 	end
-	_earnings_by_players_while_on_team = Math.round{playerEarnings or 0}
 
-	return Math.round{earnings.team.total or 0}
+	return Math.round{earnings.team.total or 0}, Math.round{playerEarnings or 0}
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
