@@ -29,7 +29,7 @@ local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 10
 local _EARNINGS_MODES = {team = 'team'}
 local _LANGUAGE = mw.language.new('en')
 
-local _team, _args
+local _team, _args, _earnings
 
 local CustomInjector = Class.new(Injector)
 
@@ -121,7 +121,7 @@ function CustomTeam.calculateEarnings(args)
 		earnings.team = {}
 	end
 
-	if doStore then
+	if Namespace.isMain() then
 		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
 				type = 'total_earnings_players_while_on_team',
 				name = _team.pagename,
