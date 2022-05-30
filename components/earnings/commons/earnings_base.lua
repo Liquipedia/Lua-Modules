@@ -57,7 +57,6 @@ function Earnings.calculateForPlayer(args)
 	end
 
 	local playerConditions = '([[participant::' .. player .. ']] OR [[participant::' .. playerAsPageName .. ']]'
-		.. ' OR [[participantlink::' .. player .. ']] OR [[participantlink::' .. playerAsPageName .. ']]'
 	for playerIndex = 1, playerPositionLimit do
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]'
