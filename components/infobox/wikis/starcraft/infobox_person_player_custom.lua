@@ -40,6 +40,7 @@ local _NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
 local _FIRST_DAY_OF_YEAR = '-01-01'
 local _LAST_DAY_OF_YEAR = '-12-31'
 local _KOREAN = 'South Korea'
+local _UNKNOWN_RACE = 'unknown'
 
 --race stuff
 --local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
@@ -139,7 +140,7 @@ function CustomPlayer.nameDisplay()
 end
 
 function CustomPlayer._getRaceData(race, asCategory)
-	race = string.lower(race or 'unknown')
+	race = string.lower(race or _UNKNOWN_RACE)
 	race = CleanRace[race] or race
 	local raceTable = _RACE_DATA[race]
 
@@ -152,7 +153,7 @@ function CustomPlayer._getRaceData(race, asCategory)
 	end
 
 	local display
-	if not raceTable and race ~= 'unknown' then
+	if not raceTable and race ~= _UNKNOWN_RACE then
 		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
 	else
