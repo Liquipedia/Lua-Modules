@@ -93,7 +93,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')]
 	lpdbData.extradata = {
 		region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country}),
 		startdate_raw = args.sdate or args.date,
@@ -132,17 +131,16 @@ function CustomLeague:_createPatchCell(args)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	-- Custom
+	-- Wiki Custom
 	Variables.varDefine('female', _args.female or 'false')
 	Variables.varDefine('tournament_riot_premier', _args.riotpremier and 'true' or '')
 	Variables.varDefine('tournament_mode', (_args.individual or _args. player_number) and '1v1' or 'team')
 	Variables.varDefine('patch', _args.patch or '')
 
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
-	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or '')
-	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
+	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername', ''))
+	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
+	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -156,10 +154,9 @@ function CustomLeague:defineCustomPageVariables()
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
+	return mw.html.create('span')
 		:css('white-space', 'nowrap')
 		:node(content)
-	return span
 end
 
 return CustomLeague
