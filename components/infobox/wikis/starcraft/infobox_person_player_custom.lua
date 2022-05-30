@@ -72,7 +72,6 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 local _player
-local _lpdbData = {}
 
 function CustomPlayer.run(frame)
 	local player = Person(frame)
@@ -179,7 +178,6 @@ function CustomPlayer._getRaceData(race, asCategory)
 end
 
 function CustomPlayer.adjustLPDB(_, lpdbData)
-	_lpdbData = lpdbData
 	local extradata = lpdbData.extradata or {}
 	extradata.race = _raceData.race
 	extradata.faction = _raceData.faction
