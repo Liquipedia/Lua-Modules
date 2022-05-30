@@ -32,7 +32,6 @@ end
 
 function p.storeMatchSMW(match, match2)
 	local streams = json.parseIfString(match.stream or {})
-	local links = json.parseIfString(match.links or {})
 	local icon = Variables.varDefault("tournament_icon")
 	mw.smw.subobject({
 		"legacymatch_" .. match2.match2id,
