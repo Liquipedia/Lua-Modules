@@ -13,7 +13,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
---local Namespace = require('Module:Namespace')
+local Namespace = require('Module:Namespace')
 local Notability = require('Module:Notability')
 local Person = require('Module:Infobox/Person')
 local RaceIcon = require('Module:RaceIcon')
@@ -42,8 +42,8 @@ local _LAST_DAY_OF_YEAR = '-12-31'
 local _KOREAN = 'South Korea'
 local _UNKNOWN_RACE = 'unknown'
 
---race stuff
---local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
+-- race stuff
+local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
 local _RACE_FIELD_AS_CATEGORY_LINK = true
 local _RACE_DATA = {
 	p = {'Protoss'},
@@ -113,8 +113,8 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	--enable this AFTER the match to match2 conversion of 1v1 matchlists and brackets
-	--local yearsActive = Namespace.isMain() and CustomPlayer._getMatchupData() or nil
+	-- switch to enable yearsActive once 1v1 matches have been converted to match2 storage
+	local yearsActive = Logic.readBool(_args.enableYearsActive) and Namespace.isMain() and CustomPlayer._getMatchupData() or nil
 
 	local currentYearEarnings = _earningsGlobal[tostring(_CURRENT_YEAR)]
 	if currentYearEarnings then
@@ -127,7 +127,7 @@ function CustomInjector:addCustomCells(widgets)
 			name = 'Approx. Winnings ' .. _CURRENT_YEAR,
 			content = {currentYearEarnings}
 		},
-		--Cell{name = 'Years active', content = {yearsActive}}
+		Cell{name = 'Years active', content = {yearsActive}}
 	}
 end
 
@@ -191,7 +191,7 @@ function CustomPlayer.adjustLPDB(_, lpdbData)
 		extradata.factionhistorical = true
 	end
 
-	--Notability values per year
+	-- Notability values per year
 	for year = Info.startYear, _CURRENT_YEAR do
 		extradata['notabilityin' .. year] = Notability.notabilityScore{
 			players = _player.pagename,
@@ -227,7 +227,6 @@ function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
 
---[==[enable this AFTER the match to match2 conversion of 1v1 matchlists and brackets
 function CustomPlayer._getMatchupData()
 	local yearsActive
 	player = string.gsub(_player.pagename, '_', ' ')
@@ -324,7 +323,7 @@ end
 function CustomPlayer._addScoresToVS(vs, opponents, player)
 	local plIndex = 1
 	local vsIndex = 2
-	--catch matches vs empty opponents
+	-- catch matches vs empty opponents
 	if opponents[1] and opponents[2] then
 		if opponents[2].name == player then
 			plIndex = 2
@@ -351,7 +350,6 @@ function CustomPlayer._addScoresToVS(vs, opponents, player)
 
 	return vs
 end
-]==]
 
 function CustomPlayer:calculateEarnings()
 	local earningsTotal
@@ -401,10 +399,10 @@ function CustomPlayer._getEarningsMedalsData(player)
 	}
 
 	local processPlacement = function(placement)
-		--handle earnings
+		-- handle earnings
 		earnings, earningsTotal = CustomPlayer._addPlacementToEarnings(earnings, earningsTotal, placement)
 
-		--handle medals
+		-- handle medals
 		medals = CustomPlayer._addPlacementToMedals(medals, placement)
 	end
 
