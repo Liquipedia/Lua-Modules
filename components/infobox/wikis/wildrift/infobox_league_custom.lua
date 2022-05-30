@@ -72,8 +72,10 @@ function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_endpatch', _args.epatch)
 
 	Variables.varDefine('tournament_publishertier', _args['riotpremier'])
+
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
+	Variables.varDefine('tournament_riot_premier', _args['riotpremier'])
 end
 
 function CustomLeague:liquipediaTierHighlighted(args)
