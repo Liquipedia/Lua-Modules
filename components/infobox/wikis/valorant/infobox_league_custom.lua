@@ -94,8 +94,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')]
-	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
 	lpdbData.extradata = {
+		region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country}),
 		startdate_raw = args.sdate or args.date,
 		enddate_raw = args.edate or args.date,
 		female = args.female or 'false',
