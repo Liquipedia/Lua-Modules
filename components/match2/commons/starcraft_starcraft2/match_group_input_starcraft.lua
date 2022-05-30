@@ -619,7 +619,7 @@ function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 	local flag = opponent.flag or ''
 
 	local players = {}
-	if String.isEmpty(race) or String.isEmpty(flag) then
+	if String.isNotEmpty(race) or String.isNotEmpty(flag) then
 		players[1] = {
 			displayname = opponent[1],
 			name = '',
