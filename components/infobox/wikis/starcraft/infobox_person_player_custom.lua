@@ -114,7 +114,8 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	-- switch to enable yearsActive once 1v1 matches have been converted to match2 storage
-	local yearsActive = Logic.readBool(_args.enableYearsActive) and Namespace.isMain() and CustomPlayer._getMatchupData() or nil
+	local yearsActive = Logic.readBool(_args.enableYearsActive)
+		and Namespace.isMain() and CustomPlayer._getMatchupData() or nil
 
 	local currentYearEarnings = _earningsGlobal[tostring(_CURRENT_YEAR)]
 	if currentYearEarnings then
@@ -229,7 +230,7 @@ end
 
 function CustomPlayer._getMatchupData()
 	local yearsActive
-	player = string.gsub(_player.pagename, '_', ' ')
+	local player = string.gsub(_player.pagename, '_', ' ')
 	local queryParameters = {
 		conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]',
 		query = 'match2opponents, date',
@@ -281,7 +282,7 @@ function CustomPlayer._getYearsActive(years)
 	local tempYear = nil
 	local firstYear = true
 
-	for i = _START_YEAR, _CURRENT_YEAR do
+	for i = Info.startYear, _CURRENT_YEAR do
 		if years[i] then
 			if (not tempYear) and (i ~= _CURRENT_YEAR) then
 				if firstYear then
