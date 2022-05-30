@@ -40,7 +40,6 @@ local _earnings = 0
 local _earnings_by_players_while_on_team = 0
 local _EARNINGS_MODES = {team = 'team'}
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
-local _DISCARD_PLACEMENT = 99
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 35
 local _PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
@@ -320,8 +319,8 @@ function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 end
 
 function CustomTeam._addPlacementToMedals(medals, data)
-	local place = CustomTeam._Placements(data.placement)
-	if place ~= _DISCARD_PLACEMENT then
+	local place = CustomTeam._placements(data.placement)
+	if place then
 		if data.liquipediatiertype ~= 'Qualifier' then
 			local tier = data.liquipediatier or 'undefined'
 			if not medals[place] then
@@ -344,15 +343,15 @@ function CustomTeam._setVarsFromTable(table, prefix)
 	end
 end
 
-function CustomTeam._Placements(value)
-	value = (value or '') ~= '' and value or _DISCARD_PLACEMENT
-	value = mw.text.split(value, '-')[1]
-	if value ~= '1' and value ~= '2' and value ~= '3' then
-		value = _DISCARD_PLACEMENT
+function CustomTeam._placements(value)
+	value = mw.text.split(value or '', '-')[1]
+	if value == '1' or value == '2' then
+		return value
 	elseif value == '3' then
-		value = 'sf'
+		return 'sf'
 	end
-	return value
+
+	return nil
 end
 
 return CustomTeam
