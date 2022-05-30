@@ -190,28 +190,6 @@ function CustomTeam.calculateEarnings(args)
 	return 0, 0
 end
 
-function CustomTeam._getLPDBrecursive(cond, query, queryType)
-	local data = {} -- get LPDB results in here
-	local count
-	local offset = 0
-	repeat
-		local additionalData = mw.ext.LiquipediaDB.lpdb(queryType, {
-			conditions = cond,
-			query = query,
-			offset = offset,
-			limit = 5000
-		})
-		count = #additionalData
-		-- Merging
-		for i, item in ipairs(additionalData or {}) do
-			data[offset + i] = item
-		end
-		offset = offset + count
-	until count ~= 5000
-
-	return data
-end
-
 function CustomTeam.getEarningsAndMedalsData()
 	local team = _team.pagename
 	local query = 'liquipediatier, liquipediatiertype, placement, date, individualprizemoney, prizemoney, players'
