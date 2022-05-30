@@ -114,7 +114,8 @@ function Series:createInfobox(frame)
 					}
 				end
 			end
-		}
+		},
+		Customizable{id = 'customcontent', children = {}},
 	}
 
 	if Namespace.isMain() then
