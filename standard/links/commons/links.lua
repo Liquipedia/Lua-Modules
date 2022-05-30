@@ -34,6 +34,7 @@ local _PREFIXES = {
 		player = 'https://datdota.com/players/',
 		team = 'https://datdota.com/teams/'
 	},
+	daumcafe = {'http://cafe.daum.net/'},
 	discord = {'https://discord.gg/'},
 	dlive = {'https://www.dlive.tv/'},
 	dotabuff = {
@@ -68,6 +69,7 @@ local _PREFIXES = {
 	home = {''},
 	huomaotv = {'http://www.huomao.com/'},
 	huyatv = {'https://www.huya.com/'},
+	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
 	loco = {'https://loco.gg/streamers/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
@@ -100,6 +102,22 @@ local _PREFIXES = {
 	stream = {''},
 	telegram = {'https://t.me/'},
 	tiktok = {'https://tiktok.com/@'},
+	tlpd = {''},
+	tlpdint = {
+		'',
+		team = 'https://tl.net/tlpd/international/teams/',
+		player = 'https://tl.net/tlpd/international/players/',
+	},
+	tlpdkr = {
+		'',
+		team = 'https://tl.net/tlpd/korean/teams/',
+		player = 'https://tl.net/tlpd/korean/players/',
+	},
+	tlpdsospa = {
+		'',
+		team = 'https://tl.net/tlpd/sospa/teams/',
+		player = 'https://tl.net/tlpd/sospa/players/',
+	},
 	tlprofile = {'https://tl.net/forum/profile.php?user='},
 	tlstream = {'https://tl.net/video/streams/'},
 	toornament = {'https://www.toornament.com/tournaments/'},
@@ -126,6 +144,7 @@ local _PREFIXES = {
 _PREFIXES = Table.merge(_PREFIXES, CustomData.prefixes or {})
 
 local _SUFFIXES = {
+	iccup = '.html',
 	['faceit-c'] = '/event',
 }
 
@@ -166,6 +185,7 @@ function Links.transform(links)
 		challonge5 = links.challonge5,
 		cybergamer = links.cybergamer,
 		datdota = links.datdota,
+		daumcafe = links.daumcafe,
 		discord = links.discord,
 		dlive = links.dlive,
 		dotabuff = links.dotabuff,
@@ -191,6 +211,7 @@ function Links.transform(links)
 		home2 = links.website2 or links.web2 or links.site2 or links.url2,
 		huyatv = links.huyatv,
 		huyatv2 = links.huyatv2,
+		iccup = links.iccup,
 		instagram = links.instagram,
 		instagram2 = links.instagram2,
 		loco = links.loco,
@@ -213,6 +234,10 @@ function Links.transform(links)
 		stream = links.stream,
 		stream2 = links.stream2,
 		tiktok = links.tiktok,
+		tlpd = links.tlpd,
+		tlpdint = links.tlpdint,
+		tlpdkr = links.tlpdkr,
+		tlpdsospa = links.tlpdsospa,
 		tlprofile = links.tlprofile,
 		tlstream = links.tlstream,
 		toornament = links.toornament,
