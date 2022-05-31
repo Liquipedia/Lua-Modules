@@ -253,7 +253,6 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	if game.mode == Opponent.solo then
 		numberOfHeroes = _NUM_HEROES_PICK_SOLO
 	end
-
 	local heroesData = {{}, {}}
 	for heroIndex = 1, numberOfHeroes do
 		if String.isNotEmpty(extradata['team1hero' .. heroIndex]) then
