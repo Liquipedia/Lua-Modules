@@ -562,12 +562,14 @@ function mapFunctions.getParticipantsData(map)
 				local assists = stats['assists']
 				local agent = stats['agent']
 				local averageCombatScore = stats['acs']
+				local playerName = stats['player']
 
 				participant.kills = Logic.isEmpty(kills) and participant.kills or kills
 				participant.deaths = Logic.isEmpty(deaths) and participant.deaths or deaths
 				participant.assists = Logic.isEmpty(assists) and participant.assists or assists
 				participant.agent = Logic.isEmpty(agent) and participant.agent or agent
 				participant.acs = Logic.isEmpty(averageCombatScore) and participant.averagecombatscore or averageCombatScore
+				participant.player = Logic.isEmpty(playerName) and participant.player or playerName
 
 				if not Table.isEmpty(participant) then
 					participants[o .. '_' .. player] = participant
