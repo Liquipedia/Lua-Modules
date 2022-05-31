@@ -329,7 +329,6 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 			:addClass('brkts-popup-side-hero')
 			:addClass('brkts-popup-side-hero-hover')
 			:css('float', flip and 'right' or 'left')
-			:css('padding', '2px') --CSS brkts-popup-side-hero
 			:node(HeroIcon._getImage{
 				hero = opponentHeroesData[index],
 				size = _SIZE_HERO,
