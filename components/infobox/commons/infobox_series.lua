@@ -40,6 +40,9 @@ function Series:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
 
+	-- define this here so we can use it in lpdb data and the display
+	local links = Links.transform(args)
+
 	local widgets = {
 		Header{
 			name = args.name,
@@ -106,7 +109,6 @@ function Series:createInfobox(frame)
 		},
 		Builder{
 			builder = function()
-				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
@@ -154,17 +156,9 @@ function Series:createInfobox(frame)
 				sponsor4 = args.sponsor4,
 				sponsor5 = args.sponsor5,
 			}),
-			links = mw.ext.LiquipediaDB.lpdb_create_json({
-				discord = Links.makeFullLink('discord', args.discord),
-				facebook = Links.makeFullLink('facebook', args.facebook),
-				instagram = Links.makeFullLink('instagram', args.instagram),
-				twitch = Links.makeFullLink('twitch', args.twitch),
-				twitter = Links.makeFullLink('twitter', args.twitter),
-				website = Links.makeFullLink('website', args.website),
-				weibo = Links.makeFullLink('weibo', args.weibo),
-				vk = Links.makeFullLink('vk', args.vk),
-				youtube = Links.makeFullLink('youtube', args.youtube),
-			}),
+			links = mw.ext.LiquipediaDB.lpdb_create_json(
+				Links.makeFullLinksForTableItems(links or {})
+			),
 		}
 		lpdbData = self:_getIconFromLeagueIconSmall(frame, lpdbData)
 
