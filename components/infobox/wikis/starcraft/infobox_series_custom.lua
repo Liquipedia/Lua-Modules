@@ -10,7 +10,6 @@ local Json = require('Module:Json')
 local Namespace = require('Module:Namespace')
 local Series = require('Module:Infobox/Series')
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -19,11 +18,6 @@ local Builder = require('Module:Infobox/Widget/Builder')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-
-local _TIER_MODE_TYPES = 'types'
-local _TIER_MODE_TIERS = 'tiers'
-local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
-	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
 local CustomInjector = Class.new(Injector)
 
