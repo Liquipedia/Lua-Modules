@@ -164,11 +164,24 @@ function p.convertParameters(match2)
 
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.female = Variables.varDefault("female")
+	match.extradata.hidden = Logic.readBool(Variables.varDefault('match_hidden')) and '1' or '0'
+	match.extradata.cancelled = Logic.readBool(Variables.varDefault('cancelled')) and '1' or '0'
 	match.extradata.bestofx = tostring(match2.bestof or '')
 	match.extradata.maps = table.concat(p._getAllInGames(match2, 'map'), ',')
 	for index, vod in ipairs(p._getAllInGames(match2, 'vod')) do
 		match.extradata['vodgame'..index] = vod
 	end
+
+	local opponent1score = 0
+	local opponent2score = 0
+	local scores = p._getAllInGames(match2, 'scores')
+	for _, stringScore in pairs(scores) do
+		local score = json.parseIfString(stringScore)
+		opponent1score = opponent1score + (score[1] or 0)
+		opponent2score = opponent2score + (score[2] or 0)
+	end
+	match.extradata.opponent1rounds = opponent1score
+	match.extradata.opponent2rounds = opponent2score
 
 	local bracketData = json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
