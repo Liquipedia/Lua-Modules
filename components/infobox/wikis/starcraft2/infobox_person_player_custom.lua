@@ -162,7 +162,6 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
---todo
 function CustomPlayer._getActiveCasterYears()
 	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'year::date',
