@@ -259,7 +259,6 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	if game.mode == Opponent.solo then
 		numberOfHeroes = _NUM_HEROES_PICK_SOLO
 	end
-
 	local heroesData = {{}, {}}
 	for heroIndex = 1, numberOfHeroes do
 		if String.isNotEmpty(extradata['team1hero' .. heroIndex]) then
@@ -274,8 +273,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 
 	row:addClass('brkts-popup-body-game')
 		:css('font-size', '80%')
-		:css('padding-left', '5px')
-		:css('padding-right', '5px')
+		:css('padding', '4px')
 
 	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[1], numberOfHeroes, false))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
@@ -335,12 +333,6 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 				hero = opponentHeroesData[index],
 				size = _SIZE_HERO,
 			})
-		if index == 1 then
-			heroDisplay:css('padding-left', '2px')
-		end
-		if index == numberOfHeroes then
-			heroDisplay:css('padding-right', '2px')
-		end
 		if numberOfHeroes == _NUM_HEROES_PICK_SOLO then
 			if flip then
 				heroDisplay:css('margin-right', '70px')
@@ -356,11 +348,6 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	end
 
 	local display = mw.html.create('div')
-	if isBan then
-		--display:addClass('brkts-popup-side-shade-out')
-		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
-	end
-
 	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)
 	end
