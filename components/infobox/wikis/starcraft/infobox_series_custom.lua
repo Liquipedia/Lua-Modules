@@ -35,6 +35,8 @@ function CustomSeries.run(frame)
 	local series = Series(frame)
 	_args = series.args
 
+	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
 	return series:createInfobox(frame)
@@ -63,24 +65,6 @@ function CustomInjector:addCustomCells(widgets)
 	}))
 
 	CustomSeries._addCustomVariables()
-
-	return widgets
-end
-
-function CustomInjector:parse(id, widgets)
-	if id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {
-					CustomSeries._createLiquipediaTierDisplay(
-						_args.liquipediatier,
-						_args.liquipediatiertype or _args.tiertype
-					)
-				}
-			}
-		}
-	end
 
 	return widgets
 end
@@ -129,7 +113,7 @@ function CustomSeries._addCustomVariables()
 		Variables.varDefine('featured', _args.featured or '')
 		Variables.varDefine('headtohead', _args.headtohead or '')
 		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
-		Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or _args.tiertype or '')
+		Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or '')
 		Variables.varDefine('tournament_mode', _args.mode or '1v1')
 		Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 		Variables.varDefine('tournament_shortname', _args.shortname or '')
@@ -165,41 +149,6 @@ function CustomSeries._validDateOr(...)
 			return dateString
 		end
 	end
-end
-
---function for custom tier handling
-function CustomSeries:_createLiquipediaTierDisplay(tier, tierType)
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString, tierMode)
-		local tierText
-		if not Tier.text[tierMode] then -- allow legacy tier modules
-			tierText = Tier.text[tierString]
-		else -- default case, i.e. tier module with intended format
-			tierText = Tier.text[tierMode][tierString:lower()]
-		end
-		if not tierText then
-			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				self.warnings,
-				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
-			)
-			return ''
-		else
-			self.infobox:categories(tierText .. ' Tournaments')
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier, _TIER_MODE_TIERS)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-
-	return tierDisplay
 end
 
 return CustomSeries
