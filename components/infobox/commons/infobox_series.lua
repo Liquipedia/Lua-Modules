@@ -142,7 +142,6 @@ function Series:createInfobox(frame)
 			next = args.next,
 			next2 = args.next2,
 			prizepool = args.prizepool,
-			liquipediatier = args.liquipediatier,
 			liquipediatier = Tier.text.tiers
 				and Tier.text.tiers[string.lower(args.liquipediatier or '')]
 				or args.liquipediatiertype,
