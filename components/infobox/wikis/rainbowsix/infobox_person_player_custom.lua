@@ -171,7 +171,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
 
 	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = Team.page(_args.team2)
+		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
 	end
 
 	return lpdbData
