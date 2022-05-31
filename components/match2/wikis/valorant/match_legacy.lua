@@ -109,8 +109,7 @@ function p.storeGames(match, match2)
 				for player = 1, 5 do
 					local data = participants[team..'_'..player]
 					if data then
-						-- TODO: Needs fixing
-						-- game.extradata['t'..team..'p'..player] = match2.match2opponents[team].match2players[player].name
+						game.extradata['t'..team..'p'..player] = data.player or ''
 						if data.kills and data.deaths and data.assists then
 							game.extradata['t'..team..'kda'..player] = data.kills..'/'..data.deaths..'/'..data.assists
 						end
