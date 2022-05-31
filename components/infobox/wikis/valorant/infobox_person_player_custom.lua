@@ -6,21 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Page = require('Module:Page')
 local Player = require('Module:Infobox/Person')
 local PlayersSignatureAgents = require('Module:PlayersSignatureAgents')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Builder = require('Module:Infobox/Widget/Builder')
 
 local _ROLES = {
 	-- Players
@@ -36,8 +32,6 @@ local _ROLES = {
 	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
 }
 _ROLES['in-game leader'] = _ROLES.igl
-
-local _SIZE_OPERATOR = '25x25px'
 
 local CustomPlayer = Class.new()
 
