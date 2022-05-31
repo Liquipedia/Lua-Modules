@@ -65,7 +65,6 @@ local _earningsGlobal = {}
 local _achievements = {}
 local _awardAchievements = {}
 local _raceData
-local _statusStore
 
 local CustomPlayer = Class.new()
 
@@ -185,7 +184,6 @@ function CustomPlayer.adjustLPDB(_, lpdbData)
 	extradata.faction = _raceData.faction
 	extradata.faction2 = _raceData.faction2
 	extradata.teamname = _args.team
-	extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive', '') or ''
 
 	if Variables.varDefault('racecount') then
 		extradata.racehistorical = true
@@ -209,19 +207,14 @@ end
 
 function CustomPlayer.getStatusToStore()
 	if String.isNotEmpty(_args.status) then
-		_statusStore = mw.getContentLanguage():ucfirst(_args.status)
+		return mw.getContentLanguage():ucfirst(_args.status)
 	elseif _args.death_date then
-		_statusStore = 'Deceased'
+		return 'Deceased'
 	elseif _args.retired then
-		_statusStore = 'Retired'
-	elseif
-		(not Logic.readBool(_args.isplayer)) and
-		string.lower(_args.role or _args.defaultPersonType) ~= 'player'
-	then
-		_statusStore = 'not player'
+		return 'Retired'
 	end
 
-	return _statusStore
+	return nil
 end
 
 function CustomPlayer:createWidgetInjector()
