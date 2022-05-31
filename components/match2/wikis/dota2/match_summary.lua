@@ -273,7 +273,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 
 	row:addClass('brkts-popup-body-game')
 		:css('font-size', '80%')
-		:css('padding', '4px !important')
+		:css('padding', '4px')
 
 	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[1], numberOfHeroes, false))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
