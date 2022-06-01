@@ -302,9 +302,16 @@ function matchFunctions.getScoreFromMapWinners(match)
 end
 
 function matchFunctions.readDate(matchArgs)
-	return matchArgs.date
-		and MatchGroupInput.readDate(matchArgs.date)
-		or {date = MatchGroupInput.getInexactDate(), dateexact = false}
+	if matchArgs.date then
+		local dateProps = MatchGroupInput.readDate(matchArgs.date)
+		dateProps.hasDate = true
+		return dateProps
+	else
+		return {
+			date = _EPOCH_TIME_EXTENDED,
+			dateexact = false,
+		}
+	end
 end
 
 function matchFunctions.getTournamentVars(match)
@@ -403,7 +410,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) then
+	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
