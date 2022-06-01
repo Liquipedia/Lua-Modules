@@ -7,6 +7,7 @@
 --
 
 local Player = require('Module:Infobox/Person')
+local Abbreviation = require('Module:Abbreviation')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
