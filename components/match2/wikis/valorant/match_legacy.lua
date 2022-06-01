@@ -109,7 +109,8 @@ function p.storeGames(match, match2)
 				for player = 1, 5 do
 					local data = participants[team..'_'..player]
 					if data then
-						game.extradata['t'..team..'p'..player] = data.player or ''
+						local playerPage = data.player and mw.ext.TeamLiquidIntegration.resolve_redirect(data.player) or ''
+						game.extradata['t'..team..'p'..player] = playerPage
 						if data.kills and data.deaths and data.assists then
 							game.extradata['t'..team..'kda'..player] = data.kills..'/'..data.deaths..'/'..data.assists
 						end
@@ -177,8 +178,8 @@ function p.convertParameters(match2)
 	local scores = p._getAllInGames(match2, 'scores')
 	for _, stringScore in pairs(scores) do
 		local score = json.parseIfString(stringScore)
-		opponent1score = opponent1score + (score[1] or 0)
-		opponent2score = opponent2score + (score[2] or 0)
+		opponent1score = opponent1score + (tonumber(score[1]) or 0)
+		opponent2score = opponent2score + (tonumber(score[2]) or 0)
 	end
 	match.extradata.opponent1rounds = opponent1score
 	match.extradata.opponent2rounds = opponent2score
