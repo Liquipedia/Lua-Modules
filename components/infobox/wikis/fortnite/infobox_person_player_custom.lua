@@ -91,7 +91,6 @@ function CustomInjector:addCustomCells(widgets)
 			content = {currentYearEarnings}
 		},
 		Cell{name = 'Years active', content = {yearsActive}},
-	
 		Cell{
 			name = CustomPlayer:makeAbbr(
 				'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products',
