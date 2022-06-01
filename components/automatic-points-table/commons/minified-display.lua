@@ -15,10 +15,6 @@ local PointsDivTable = Class.new(
 		self.root = mw.html.create('div') :addClass('divTable')
 			:addClass('border-color-grey') :addClass('border-bottom')
 
-		local columnCount = Array.reduce(tournaments, function(count, t)
-			return count + (t.shouldDeductionsBeVisible and 2 or 1)
-		end, 0)
-
 		local innerWrapper = mw.html.create('div') :addClass('fixed-size-table-container')
 			:addClass('border-color-grey')
 			:css('width', '283px')
