@@ -246,7 +246,7 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 	local frame = mw.getCurrentFrame()
 
-	local matchSummary = MatchSummary:init('480px')
+	local matchSummary = MatchSummary():init('480px')
 	matchSummary:header(CustomMatchSummary._createHeader(frame, match))
 				:body(CustomMatchSummary._createBody(frame, match))
 
