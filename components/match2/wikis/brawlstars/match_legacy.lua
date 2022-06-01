@@ -187,7 +187,7 @@ function p.convertParameters(match2)
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix .. 'flag'] = player.flag
 		elseif opponent.type == 'literal' then
-			match[prefix] = 'TBD'
+			match[prefix] = opponent.name or 'TBD'
 		end
 
 		if opponent.type == 'literal' then
