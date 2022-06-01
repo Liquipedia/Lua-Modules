@@ -121,6 +121,19 @@ function Series:createInfobox(frame)
 	}
 
 	if Namespace.isMain() then
+		infobox:categories(
+			'Tournament series',
+			self:_setCountryCategories(args.country),
+			self:_setCountryCategories(args.country2),
+			self:_setCountryCategories(args.country3),
+			self:_setCountryCategories(args.country4),
+			self:_setCountryCategories(args.country5)
+		)
+	end
+
+	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+
+	if Namespace.isMain() then
 		local lpdbData = {
 			name = self.name,
 			image = args.image,
@@ -164,18 +177,9 @@ function Series:createInfobox(frame)
 
 		lpdbData = self:addToLpdb(lpdbData)
 		mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
-
-		infobox:categories(
-			'Tournament series',
-			self:_setCountryCategories(args.country),
-			self:_setCountryCategories(args.country2),
-			self:_setCountryCategories(args.country3),
-			self:_setCountryCategories(args.country4),
-			self:_setCountryCategories(args.country5)
-		)
 	end
 
-	return tostring(infobox:widgetInjector(self:createWidgetInjector()):build(widgets))
+	return tostring(builtInfobox)
 		.. WarningBox.displayAll(Series.warnings)
 end
 
