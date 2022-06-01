@@ -50,10 +50,6 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
-		name = 'Patch',
-		content = {CustomLeague:_createPatchCell(_args)}
-	})
-	table.insert(widgets, Cell{
 		name = 'Teams',
 		content = {(_args.team_number or '') .. (_args.team_slots and ('/' .. _args.team_slots) or '')}
 	})
@@ -79,7 +75,13 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
+	elseif id == 'gamesettings' then
+		table.insert(widgets, Cell{
+			name = 'Patch',
+			content = {CustomLeague:_createPatchCell(_args)}
+		})
 	end
+
 	return widgets
 end
 
