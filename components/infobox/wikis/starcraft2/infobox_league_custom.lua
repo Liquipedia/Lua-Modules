@@ -59,6 +59,8 @@ function CustomLeague.run(frame)
 	_league = league
 	_args = league.args
 
+	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
@@ -199,7 +201,7 @@ end
 --function for custom tier handling
 function CustomLeague._createLiquipediaTierDisplay()
 	local tier = _args.liquipediatier
-	local tierType = _args.liquipediatiertype or _args.tiertype
+	local tierType = _args.liquipediatiertype
 	if String.isEmpty(tier) then
 		return nil
 	end
@@ -525,11 +527,8 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
 
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
-	--overwrite wiki var `tournament_liquipediatiertype` to allow `args.tiertype` as alias entry point for tiertype
-	Variables.varDefine('tournament_liquipediatiertype', tierType)
 	--Legacy tier(type) vars
-	Variables.varDefine('tournament_tiertype', tierType)
+	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 
 	--override var to standardize its entries
