@@ -43,7 +43,7 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	player.args.history = tostring(TeamHistoryAuto._results{convertrole='true'})
+	player.args.history = tostring(TeamHistoryAuto._results{convertrole = 'true'})
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
@@ -114,7 +114,7 @@ function CustomPlayer._getStatusContents()
 	if String.isEmpty(_args.status) then
 		return {}
 	end
-	return { Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status }
+	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
 end
 
 function CustomPlayer._createRole(key, role)
