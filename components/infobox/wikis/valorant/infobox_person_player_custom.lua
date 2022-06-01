@@ -83,7 +83,7 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{
 			name = 'Main Agents',
 			content = {
-				PlayersSignatureAgents.get{player = mw.title.getCurrentTitle().text}
+				PlayersSignatureAgents.get{player = _player.pagename}
 			}
 		}
 	)
