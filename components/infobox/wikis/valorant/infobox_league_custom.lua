@@ -39,7 +39,7 @@ function CustomLeague.run(frame)
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
-	_args.liquipediatier = Tier.number[_args.liquipediatier]
+	_args.liquipediatier = Tier.number[_args.liquipediatier] or _args.liquipediatier
 
 	return league:createInfobox(frame)
 end
