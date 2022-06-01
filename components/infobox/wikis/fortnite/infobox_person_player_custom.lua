@@ -92,9 +92,9 @@ function CustomInjector:addCustomCells(widgets)
 		},
 		Cell{name = 'Years active', content = {yearsActive}},
 		Cell{
-			name = CustomPlayer:makeAbbr(
-				'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products',
-				'Epic Creator Code'
+			name = Abbreviation.make(
+				'Epic Creator Code',
+				'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products'
 			),
 			content = {_args.creatorcode}
 		},
