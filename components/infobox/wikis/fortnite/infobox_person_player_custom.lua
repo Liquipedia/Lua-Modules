@@ -105,13 +105,6 @@ function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomPlayer:makeAbbr(title, text)
-	if String.isEmpty(title) or String.isEmpty(text) then
-		return nil
-	end
-	return '<abbr title="' .. title .. '>' .. text .. '</abbr>'
-end
-
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
 	lpdbData.extradata.role = _role.role
