@@ -91,11 +91,26 @@ function CustomInjector:addCustomCells(widgets)
 			content = {currentYearEarnings}
 		},
 		Cell{name = 'Years active', content = {yearsActive}},
+	
+		Cell{
+			name = CustomPlayer:makeAbbr(
+				'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products',
+				'Epic Creator Code'
+			),
+			content = {_args.creatorcode}
+		},
 	}
 end
 
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
+end
+
+function CustomPlayer:makeAbbr(title, text)
+	if String.isEmpty(title) or String.isEmpty(text) then
+		return nil
+	end
+	return '<abbr title="' .. title .. '>' .. text .. '</abbr>'
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
