@@ -253,8 +253,7 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
 	--series number
 	local seriesNumber = _args.number or ''
-	local seriesNumberLength = string.len(seriesNumber)
-	if seriesNumberLength > 0 then
+	if String.isNotEmpty(seriesNumber) then
 		seriesNumber = string.format("%05i", seriesNumber)
 	end
 	Variables.varDefine('tournament_series_number', seriesNumber)
