@@ -19,8 +19,7 @@ function WidgetFactory.work(widget, injector)
 		return {}
 	end
 
-	local children = widget:tryMake()
-	for _, child in ipairs(children) do
+	for _, child in ipairs(widget:tryMake() or {}) do
 		if type(child) == 'table' and child['is_a'] and child:is_a(Widget) then
 			child:setContext{injector = injector}
 			Array.extendWith(convertedWidgets, WidgetFactory.work(child, injector))
