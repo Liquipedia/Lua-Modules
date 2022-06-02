@@ -9,9 +9,10 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
-local PointsDivTable = require('Module:AutomaticPointsTable/Display')
-
+local TableDisplay = require('Module:AutomaticPointsTable/Display')
+local MinifiedDisplay = require('Module:AutomaticPointsTable/MinifiedDisplay')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -45,13 +46,22 @@ function AutomaticPointsTable.run(frame)
 	local sortedData = pointsTable:sortData(pointsData)
 	local sortedDataWithPositions = pointsTable:addPositionData(sortedData)
 
-	-- mw.logObject(pointsTable.parsedInput.pbg)
-	-- mw.logObject(pointsTable.parsedInput.tournaments)
-	-- mw.logObject(pointsTable.parsedInput.teams)
-	-- mw.logObject(tournamentsWithPlacements)
-	-- mw.logObject(sortedDataWithPositions)
 	local positionBackgrounds = pointsTable.parsedInput.positionBackgrounds
-	local divTable = PointsDivTable(sortedDataWithPositions, tournamentsWithResults, positionBackgrounds)
+
+	-- A display module is a module that takes in 3 arguments and returns some html,
+	-- which will be displayed when this module is invoked
+	local usedDisplayModule
+	if pointsTable.parsedInput.shouldTableBeMinified then
+		usedDisplayModule = MinifiedDisplay
+	else
+		usedDisplayModule = TableDisplay
+	end
+	local divTable = usedDisplayModule(
+
+		sortedDataWithPositions,
+		tournamentsWithResults,
+		positionBackgrounds
+	)
 	return divTable:create()
 end
 
@@ -59,10 +69,12 @@ function AutomaticPointsTable:parseInput(args)
 	local positionBackgrounds = self:parsePositionBackgroundData(args)
 	local tournaments = self:parseTournaments(args)
 	local teams = self:parseTeams(args, #tournaments)
+	local minified = Logic.readBool(args.minified)
 	return {
 		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
-		teams = teams
+		teams = teams,
+		shouldTableBeMinified = minified
 	}
 end
 
