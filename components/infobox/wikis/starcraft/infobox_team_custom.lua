@@ -130,7 +130,7 @@ end
 -- gets a list of sub/accademy teams of the team
 -- this data can be used in results queries to include
 -- results of accademy teams of the current team
-function CustomTeam.listSubTeams()
+function CustomTeam._listSubTeams()
 	if String.isEmpty(_args.subteam) and String.isEmpty(_args.subteam1) then
 		return nil
 	end
