@@ -136,7 +136,7 @@ function CustomLeague._computeChronology()
 	-- - prev or next are unspecified
 	-- - and not suppressed via auto_chronology=false
 	local title = mw.title.getCurrentTitle()
-	local number = tonumber(title.subpageText or '')
+	local number = tonumber(title.subpageText)
 	local automateChronology = String.isNotEmpty(_args.series)
 		and number
 		and tonumber(_args.number) == number
