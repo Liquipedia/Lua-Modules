@@ -294,7 +294,7 @@ end
 
 function CustomLeague:_concatArgs(base)
 	return table.concat(
-		Array.map(League:getAllArgsForBase(_args, 'base'), mw.ext.TeamLiquidIntegration.resolve_redirect),
+		Array.map(League:getAllArgsForBase(_args, base), mw.ext.TeamLiquidIntegration.resolve_redirect),
 		';'
 	)
 end
