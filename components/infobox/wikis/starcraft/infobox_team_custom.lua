@@ -144,11 +144,11 @@ end
 
 function CustomTeam.playerBreakDown(args)
 	local playerBreakDown = {}
-	local playernumber = tonumber(args.player_number or 0) or 0
-	local zergnumber = tonumber(args.zerg_number or 0) or 0
-	local terrannumbner = tonumber(args.terran_number or 0) or 0
-	local protossnumber = tonumber(args.protoss_number or 0) or 0
-	local randomnumber = tonumber(args.random_number or 0) or 0
+	local playernumber = tonumber(args.player_number) or 0
+	local zergnumber = tonumber(args.zerg_number) or 0
+	local terrannumbner = tonumber(args.terran_number) or 0
+	local protossnumber = tonumber(args.protoss_number) or 0
+	local randomnumber = tonumber(args.random_number) or 0
 	if playernumber == 0 then
 		playernumber = zergnumber + terrannumbner + protossnumber + randomnumber
 	end
