@@ -163,19 +163,21 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomPlayer._getActiveCasterYears()
-	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-		query = 'year::date',
-		conditions = '[[page::' .. _PAGENAME:gsub('_', ' ') .. ']]',
-		limit = 5000,
-	})
+	if _shouldQueryData then
+		local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+			query = 'year::date',
+			conditions = '[[page::' .. _PAGENAME:gsub('_', ' ') .. ']]',
+			limit = 5000,
+		})
 
-	local years = {}
-	for _, broadCastItem in pairs(queryData) do
-		local year = broadCastItem.year_date
-		years[tonumber(year)] = year
+		local years = {}
+		for _, broadCastItem in pairs(queryData) do
+			local year = broadCastItem.year_date
+			years[tonumber(year)] = year
+		end
+
+		return Table.isNotEmpty(years) and CustomPlayer._getYearsActive(years) or nil
 	end
-
-	return Table.isNotEmpty(years) and CustomPlayer._getYearsActive(years) or nil
 end
 
 function CustomPlayer:createWidgetInjector()
