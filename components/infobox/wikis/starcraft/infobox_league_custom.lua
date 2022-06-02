@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local League = require('Module:Infobox/League')
 local Logic = require('Module:Logic')
@@ -167,17 +168,17 @@ end
 
 function CustomLeague:shouldStore(args)
 	return Namespace.isMain() and
-		Variables.varDefault('disable_SMW_storage', 'false') ~= 'true' and
-		Variables.varDefault('disable_LPDB_storage', 'false') ~= 'true'
+		not Logic.readBool(Variables.varDefault('disable_SMW_storage', 'false')) and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
 end
 
 function CustomLeague._playerRaceBreakDown()
 	local playerBreakDown = {}
-	local playerNumber = tonumber(_args.player_number or 0) or 0
-	local zergNumber = tonumber(_args.zerg_number or 0) or 0
-	local terranNumbner = tonumber(_args.terran_number or 0) or 0
-	local protossNumber = tonumber(_args.protoss_number or 0) or 0
-	local randomNumber = tonumber(_args.random_number or 0) or 0
+	local playerNumber = tonumber(_args.player_number) or 0
+	local zergNumber = tonumber(_args.zerg_number) or 0
+	local terranNumbner = tonumber(_args.terran_number) or 0
+	local protossNumber = tonumber(_args.protoss_number) or 0
+	local randomNumber = tonumber(_args.random_number) or 0
 	if playerNumber == 0 then
 		playerNumber = zergNumber + terranNumbner + protossNumber + randomNumber
 	end
@@ -254,13 +255,13 @@ function CustomLeague:defineCustomPageVariables()
 	local seriesNumber = _args.number or ''
 	local seriesNumberLength = string.len(seriesNumber)
 	if seriesNumberLength > 0 then
-		seriesNumber = string.rep('0', 5 - seriesNumberLength) .. seriesNumber
+		seriesNumber = string.format("%05i", seriesNumber)
 	end
 	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
-	local finished = _args.finished
+	local finished = Logic.readBool(_args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
-	if finished ~= 'true' and os.date('%Y-%m-%d') >= queryDate then
+	if not finished and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
 				.. 'AND [[participant::!Definitions]] AND [[placement::1]]',
@@ -269,10 +270,11 @@ function CustomLeague:defineCustomPageVariables()
 			limit = 1
 		})
 		if data ~= nil and data[1] ~= nil then
-			finished = 'true'
+			finished = true
 		end
 	end
-	Variables.varDefine('tournament_finished', finished or 'false')
+
+	Variables.varDefine('tournament_finished', tostring(finished or 'false'))
 end
 
 function CustomLeague:addToLpdb(lpdbData)
@@ -280,8 +282,8 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefault('epatch', '')
 	local status = _args.status
-		or Variables.varDefault('cancelled tournament', '') == 'true' and 'cancelled'
-		or Variables.varDefault('tournament_finished', '') == 'true' and 'finished'
+		or Logic.readBool(Variables.varDefault('cancelled tournament')) and 'cancelled'
+		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
@@ -292,20 +294,10 @@ function CustomLeague:addToLpdb(lpdbData)
 end
 
 function CustomLeague:_concatArgs(base)
-	local firstArg = _args[base] or _args[base .. '1']
-	if String.isEmpty(firstArg) then
-		return nil
-	end
-	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
-	local index = 2
-	while String.isNotEmpty(_args[base .. index]) do
-		table.insert(foundArgs,
-			mw.ext.TeamLiquidIntegration.resolve_redirect(_args[base .. index])
-		)
-		index = index + 1
-	end
-
-	return table.concat(foundArgs, ';')
+	return table.concat(
+		Array.map(League:getAllArgsForBase(_args, 'base'), mw.ext.TeamLiquidIntegration.resolve_redirect),
+		';'
+	)
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
