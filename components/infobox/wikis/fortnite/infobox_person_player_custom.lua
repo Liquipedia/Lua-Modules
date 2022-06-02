@@ -7,6 +7,7 @@
 --
 
 local Player = require('Module:Infobox/Person')
+local Abbreviation = require('Module:Abbreviation')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
@@ -91,6 +92,13 @@ function CustomInjector:addCustomCells(widgets)
 			content = {currentYearEarnings}
 		},
 		Cell{name = 'Years active', content = {yearsActive}},
+		Cell{
+			name = Abbreviation.make(
+				'Epic Creator Code',
+				'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products'
+			),
+			content = {_args.creatorcode}
+		},
 	}
 end
 
