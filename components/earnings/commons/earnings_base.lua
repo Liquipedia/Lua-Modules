@@ -89,10 +89,13 @@ function Earnings.calculateForTeam(args)
 	if Logic.readBool(args.queryHistorical) then
 		for _, team in pairs(teams) do
 			local historicalNames = Team.queryHistoricalNames(team)
-			if historicalNames then
-				for _, historicalTeam in pairs(historicalNames) do
-					table.insert(queryTeams, historicalTeam)
-				end
+
+			if not historicalNames then
+				return 0
+			end
+
+			for _, historicalTeam in pairs(historicalNames) do
+				table.insert(queryTeams, historicalTeam)
 			end
 		end
 	elseif not Logic.readBool(args.noRedirect) then
