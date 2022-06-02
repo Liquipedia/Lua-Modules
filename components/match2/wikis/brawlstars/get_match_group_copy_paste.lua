@@ -98,7 +98,7 @@ function wikiCopyPaste._getMaps(lines, bestof, args, index, numberOfOpponents)
 		--other maps do not have mapBestof
 		map = map .. '\n' .. indent .. '}}'
 		if bestof > 1 then
-			for i = 1, bestof do
+			for i = 2, bestof do
 				table.insert(lines, indent .. '|map' .. i .. '=' .. map)
 			end
 		end
