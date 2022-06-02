@@ -141,7 +141,7 @@ function CustomLeague._computeChronology()
 		and number
 		and tonumber(_args.number) == number
 		and title.subpageText ~= title.text
-		and Logic.readBool(_args.auto_chronology or 'true')
+		and Logic.readBool(_args.auto_chronology or true)
 		and (String.isEmpty(_args.next) or String.isEmpty(_args.previous))
 
 	if automateChronology then
