@@ -269,7 +269,7 @@ function CustomLeague:defineCustomPageVariables()
 			order = 'date asc',
 			limit = 1
 		})
-		if data ~= nil and data[1] ~= nil then
+		if data and data[1] then
 			finished = true
 		end
 	end
