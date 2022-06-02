@@ -135,20 +135,19 @@ function CustomLeague._computeChronology()
 	-- - and not suppressed via auto_chronology=false
 	local title = mw.title.getCurrentTitle()
 	local number = tonumber(title.subpageText or '')
-	local automateChronology =
-		(_args.series or '') ~= ''
-		and number ~= nil
-		and tonumber(_args.number or '') == number
+	local automateChronology = String.isNotEmpty(_args.series)
+		and number
+		and tonumber(_args.number) == number
 		and title.subpageText ~= title.text
-		and _args.auto_chronology ~= 'false'
-		and ((_args.next or '') == '' or (_args.previous or '') == '')
+		and Logic.readBool(_args.auto_chronology or 'true')
+		and (String.isEmpty(_args.next) or String.isEmpty(_args.previous))
 
 	if automateChronology then
-		local previous = (_args.previous or '') ~= '' and _args.previous
-		local next = (_args.next or '') ~= '' and _args.next
-		local nextPage = (_args.next or '') == '' and
+		local previous = String.isNotEmpty(_args.previous) and _args.previous
+		local next = String.isNotEmpty(_args.next) and _args.next
+		local nextPage = String.isEmpty(_args.next) and
 			title.basePageTitle:subPageTitle(tostring(number + 1)).fullText
-		local previousPage = (_args.previous or '') == '' and
+		local previousPage = String.isEmpty(_args.previous) and
 			title.basePageTitle:subPageTitle(tostring(number - 1)).fullText
 
 		if not next and PageLink.exists(nextPage) then
