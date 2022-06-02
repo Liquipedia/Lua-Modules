@@ -51,6 +51,7 @@ function MatchLegacy._convertParameters(match2)
 	-- Handle extradata fields
 	match.extradata = {}
 	local extradata = Json.parseIfString(match2.extradata)
+	match.extradata.gamecount = tostring(match2.bestof)
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.mvpteam = extradata.mvpteam
 	match.extradata.mvp = extradata.mvp
