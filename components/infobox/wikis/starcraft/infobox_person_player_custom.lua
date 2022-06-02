@@ -213,8 +213,6 @@ function CustomPlayer.getStatusToStore()
 	elseif _args.retired then
 		return 'Retired'
 	end
-
-	return nil
 end
 
 function CustomPlayer:createWidgetInjector()
