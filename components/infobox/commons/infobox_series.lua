@@ -6,18 +6,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Template = require('Module:Template')
-local Table = require('Module:Table')
-local Namespace = require('Module:Namespace')
-local Locale = require('Module:Locale')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Localisation = require('Module:Localisation')
-local Links = require('Module:Links')
-local String = require('Module:String')
-local Flags = require('Module:Flags')
-local WarningBox = require('Module:WarningBox')
 local BasicInfobox = require('Module:Infobox/Basic')
+local Class = require('Module:Class')
+local Flags = require('Module:Flags')
+local Links = require('Module:Links')
+local Locale = require('Module:Locale')
+local Localisation = require('Module:Localisation')
+local Namespace = require('Module:Namespace')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
+local Tier = require('Module:Tier')
+local WarningBox = require('Module:WarningBox')
+
+local _TIER_MODE_TYPES = 'types'
+local _TIER_MODE_TIERS = 'tiers'
+local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
+	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -56,10 +62,9 @@ function Series:createInfobox(frame)
 			id = 'liquipediatier',
 			children = {
 				Cell{
-					name = 'Liquipedia Tier',
-					content = {
-						self:_createTier(args.liquipediatier, (args.liquipediatiertype or args.tiertype))
-					}
+					name = 'Liquipedia tier',
+					content = {self:createLiquipediaTierDisplay(args)},
+					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
 				},
 			}
 		},
@@ -150,7 +155,12 @@ function Series:createInfobox(frame)
 			next = args.next,
 			next2 = args.next2,
 			prizepool = args.prizepool,
-			liquipediatier = args.liquipediatier,
+			liquipediatier = Tier.text.tiers
+				and Tier.text.tiers[string.lower(args.liquipediatier or '')]
+				or args.liquipediatiertype,
+			liquipediatiertype = Tier.text.types
+				and Tier.text.types[string.lower(args.liquipediatiertype or '')]
+				or args.liquipediatiertype,
 			publishertier = args.publishertier,
 			launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
 			defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
@@ -188,30 +198,50 @@ function Series:addToLpdb(lpdbData)
 	return lpdbData
 end
 
-function Series:_createTier(tier, tierType)
-	if tier == nil or tier == '' then
-		return ''
+function Series:createLiquipediaTierDisplay(args)
+	local tier = args.liquipediatier
+	local tierType = args.liquipediatiertype
+	if String.isEmpty(tier) then
+		return nil
 	end
 
-	local output = ''
-
-	local hasTierType = tierType ~= nil and tierType ~= ''
-
-	if hasTierType then
-		local tierTypeDisplay = Template.safeExpand(self.infobox.frame, 'TierDisplay/' .. tierType)
-		output = output .. '[[' .. tierTypeDisplay .. '_Tournaments|' .. tierTypeDisplay .. ']]'
-		output = output .. '&nbsp;('
-
+	local function buildTierString(tierString, tierMode)
+		local tierText
+		if not Tier.text[tierMode] then -- allow legacy tier modules
+			tierText = Tier.text[tierString]
+		else -- default case, i.e. tier module with intended format
+			tierText = Tier.text[tierMode][tierString:lower()]
+		end
+		if not tierText then
+			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
+			table.insert(
+				self.warnings,
+				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
+			)
+			return ''
+		else
+			self.infobox:categories(tierText .. ' Tournaments')
+			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
+		end
 	end
 
-	local tierDisplay = Template.safeExpand(self.infobox.frame, 'TierDisplay/' .. tier)
-	output = output .. '[[' .. tierDisplay .. '_Tournaments|' .. tierDisplay .. ']]'
+	local tierDisplay = buildTierString(tier, _TIER_MODE_TIERS)
 
-	if hasTierType then
-		output = output .. ')'
+	if String.isNotEmpty(tierType) then
+		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
 	end
 
-	return output
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+end
+
+--- Allows for overriding this functionality
+function Series:liquipediaTierHighlighted(args)
+	return false
+end
+
+--- Allows for overriding this functionality
+function Series:appendLiquipediatierDisplay()
+	return ''
 end
 
 function Series:_getIconFromLeagueIconSmall(frame, lpdbData)

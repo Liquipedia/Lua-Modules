@@ -44,9 +44,12 @@ local _series
 
 function CustomSeries.run(frame)
 	local series = Series(frame)
-	series.createWidgetInjector = CustomSeries.createWidgetInjector
 	_args = series.args
 	_series = series
+
+	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+
+	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
 	return series:createInfobox(frame)
 end
@@ -88,24 +91,6 @@ function CustomInjector:addCustomCells(widgets)
 	}))
 
 	CustomSeries._addCustomVariables()
-
-	return widgets
-end
-
-function CustomInjector:parse(id, widgets)
-	if id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {
-					CustomSeries._createLiquipediaTierDisplay(
-						_args.liquipediatier,
-						_args.liquipediatiertype or _args.tiertype
-					)
-				}
-			}
-		}
-	end
 
 	return widgets
 end
@@ -190,8 +175,8 @@ function CustomSeries._addCustomVariables()
 		local name = _args.name or mw.title.getCurrentTitle().text
 		Variables.varDefine('featured', _args.featured or '')
 		Variables.varDefine('headtohead', _args.headtohead or '')
-		Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-		Variables.varDefine('tournament_tiertype', _args.liquipediatiertype or _args.tiertype or '')
+		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
+		Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or '')
 		Variables.varDefine('tournament_mode', _args.mode or '1v1')
 		Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 		Variables.varDefine('tournament_shortname', _args.shortname or '')
@@ -234,7 +219,9 @@ function CustomSeries._validDateOr(...)
 end
 
 --function for custom tier handling
-function CustomSeries._createLiquipediaTierDisplay(tier, tierType)
+function CustomSeries.createLiquipediaTierDisplay()
+	local tier = _args.liquipediatier
+	local tierType = _args.liquipediatiertype
 	if String.isEmpty(tier) then
 		return nil
 	end
