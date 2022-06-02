@@ -327,17 +327,17 @@ function CustomPlayer._addScoresToVS(vs, opponents, player)
 		local prace = CleanRace[plOpp.match2players[1].extradata.faction] or 'r'
 		local orace = CleanRace[vsOpp.match2players[1].extradata.faction] or 'r'
 
-		vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
+		vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score) or 0)
+		vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score) or 0)
 
-		vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score or 0) or 0)
+		vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score) or 0)
+		vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score) or 0)
 
-		vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+		vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score) or 0)
+		vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score) or 0)
 
-		vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+		vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score) or 0)
+		vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score) or 0)
 	end
 
 	return vs
