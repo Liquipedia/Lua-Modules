@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local League = require('Module:Infobox/League')
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
 local RaceIcon = require('Module:RaceIcon')
