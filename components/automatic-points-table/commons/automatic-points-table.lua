@@ -50,10 +50,14 @@ function AutomaticPointsTable.run(frame)
 
 	-- A display module is a module that takes in 3 arguments and returns some html,
 	-- which will be displayed when this module is invoked
-	local displayModules = {TableDisplay, MinifiedDisplay}
-	local displayModuleIndex = pointsTable.parsedInput.shouldTableBeMinified and 2 or 1
-	local UsedDisplayModule = displayModules[displayModuleIndex]
-	local divTable = UsedDisplayModule(
+	local usedDisplayModule
+	if pointsTable.parsedInput.shouldTableBeMinified then
+		usedDisplayModule = MinifiedDisplay
+	else
+		usedDisplayModule = TableDisplay
+	end
+	local divTable = usedDisplayModule(
+
 		sortedDataWithPositions,
 		tournamentsWithResults,
 		positionBackgrounds

@@ -169,7 +169,6 @@ function TableHeaderRow:headerCell(header)
 
 	local additionalClass = header.additionalClass
 	if additionalClass then
-
 		outerDiv:addClass(additionalClass)
 	end
 	outerDiv:node(innerDiv)
