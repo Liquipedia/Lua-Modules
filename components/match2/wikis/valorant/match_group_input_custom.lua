@@ -354,7 +354,7 @@ function matchFunctions.getMVP(match)
 		return nil
 	end
 
-	local mvppoints = tonumber(match.mvppoints) or 1
+	local mvpPoints = tonumber(match.mvppoints) or 1
 
 	-- Split the input
 	local players = mw.text.split(match.mvp, ',')
@@ -364,7 +364,7 @@ function matchFunctions.getMVP(match)
 		players[index] = mw.text.trim(player)
 	end
 
-	return {players=players, points=mvppoints}
+	return {players = players, points = mvpPoints}
 end
 
 -- Parse the mapVeto input
