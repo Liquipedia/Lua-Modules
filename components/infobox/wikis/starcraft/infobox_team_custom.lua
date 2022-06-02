@@ -114,7 +114,7 @@ end
 function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.earnings = _earnings or 0
 	lpdbData.region = nil
-	lpdbData.extradata.subteams = CustomTeam.listSubTeams()
+	lpdbData.extradata.subteams = CustomTeam._listSubTeams()
 	return lpdbData
 end
 
