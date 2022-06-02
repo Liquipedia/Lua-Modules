@@ -274,7 +274,7 @@ function CustomLeague:defineCustomPageVariables()
 		end
 	end
 
-	Variables.varDefine('tournament_finished', tostring(finished or 'false'))
+	Variables.varDefine('tournament_finished', tostring(finished))
 end
 
 function CustomLeague:addToLpdb(lpdbData)
