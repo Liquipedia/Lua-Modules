@@ -78,7 +78,7 @@ end
 
 --subfunction used to generate the code for the Map template
 --sets up as many maps as specified via the bestoff param
-function wikiCopyPaste._getMaps(lines, bestof, args, index, numberOfOpponents)
+function wikiCopyPaste._getMaps(lines, bestof, args, matchIndex, numberOfOpponents)
 	if bestof > 0 then
 		local map = '{{Map'
 			.. '\n' .. indent .. indent .. '|map=|maptype='
@@ -88,19 +88,14 @@ function wikiCopyPaste._getMaps(lines, bestof, args, index, numberOfOpponents)
 			map = map .. wikiCopyPaste._pickBanParams(item, numberOfOpponents)
 		end
 
-		--first map has additional mapBestof if it is the first match
-		local mapBestof = ''
-		if index == 1 and String.isNotEmpty(args.mapBestof) then
-			mapBestof = '\n' .. indent .. indent .. '|bestof=' .. args.mapBestof
-		end
-		table.insert(lines, indent .. '|map1=' .. map .. mapBestof .. '\n' .. indent .. '}}')
-
-		--other maps do not have mapBestof
-		map = map .. '\n' .. indent .. '}}'
-		if bestof > 1 then
-			for i = 1, bestof do
-				table.insert(lines, indent .. '|map' .. i .. '=' .. map)
+		for mapIndex = 1, bestof do
+			local currentMap = indent .. '|map' .. mapIndex .. '=' .. map
+			--first map has additional mapBestof if it is the first match
+			if matchIndex == 1 and mapIndex == 1 and String.isNotEmpty(args.mapBestof) then
+				currentMap = currentMap .. '\n' .. indent .. indent .. '|bestof=' .. args.mapBestof
 			end
+			currentMap = currentMap .. '\n' .. indent .. '}}'
+			table.insert(lines, currentMap)
 		end
 	end
 
