@@ -15,6 +15,7 @@ local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local Notability = require('Module:Notability')
+local Opponent = require('Module:Opponent')
 local Person = require('Module:Infobox/Person')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
@@ -34,7 +35,8 @@ local Cell = require('Module:Infobox/Widget/Cell')
 
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
-local _EARNING_MODES = {['solo'] = '1v1', ['team'] = 'team'}
+local _EARNING_MODES = {solo = '1v1', team = 'team'}
+local _OTHER_MODE = 'other'
 local _NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
 local _FIRST_DAY_OF_YEAR = '-01-01'
 local _LAST_DAY_OF_YEAR = '-12-31'
@@ -370,7 +372,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
 			ConditionNode(ColumnName('extradata_award'), Comparator.neq, ''),
 			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('players_type'), Comparator.gt, 'solo'),
+				ConditionNode(ColumnName('players_type'), Comparator.gt, Opponent.solo),
 				placementConditions,
 			},
 		},
@@ -410,7 +412,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 end
 
 function CustomPlayer._addPlacementToEarnings(earnings, earningsTotal, data)
-	local mode = _EARNING_MODES[(data.players or {}).type or ''] or 'other'
+	local mode = _EARNING_MODES[(data.players or {}).type or ''] or _OTHER_MODE
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
@@ -427,7 +429,7 @@ function CustomPlayer._addPlacementToMedals(medals, data)
 		local place = CustomPlayer._getPlacement(data.placement)
 		CustomPlayer._setAchievements(data, place)
 		if
-			(data.players or {}).type == 'solo'
+			(data.players or {}).type == Opponent.solo
 			and place and place <= 3
 		then
 			local tier = data.liquipediatier or 'undefined'
