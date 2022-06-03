@@ -11,6 +11,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
+local String = require('Module:StringUtils')
+local MapModes = require('Module:MapModes')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -143,8 +145,7 @@ function CustomMatchSummary._createMapRow(game)
 
 	local centerNode = htmlCreate('div')
 		:addClass('brkts-popup-spaced')
-		-- TODO: Add Game Mode icon
-		:wikitext('[[' .. game.map .. ']]')
+		:wikitext(CustomMatchSummary._getMapDisplay(game))
 		:css('text-align', 'center')
 
 	if game.resultType == 'np' then
@@ -178,6 +179,14 @@ function CustomMatchSummary._createMapRow(game)
 	end
 
 	return row
+end
+
+function CustomMatchSummary._getMapDisplay(game)
+	local mapDisplay = '[[' .. game.map .. ']]'
+	if String.isNotEmpty(game.mode) then
+		mapDisplay = MapModes.get{mode = game.mode} .. mapDisplay
+	end
+	return mapDisplay
 end
 
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
