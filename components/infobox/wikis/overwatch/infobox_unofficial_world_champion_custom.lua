@@ -38,7 +38,7 @@ function CustomInjector:addCustomCells(widgets)
 		table.insert(
 			widgets,
 			Cell{
-				name = _args[regionKey .. ' no'] .. ' champions',
+				name = (_args[regionKey .. ' no'] or '') .. ' champions',
 				content = {region},
 			}
 		)
