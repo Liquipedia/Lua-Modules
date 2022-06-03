@@ -287,7 +287,7 @@ function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 	local mode = (data.players or {}).type
 	mode = _EARNINGS_MODES[mode]
 	if not mode then
-		prizeMoney = data.individualprizemoney
+		prizeMoney = data.individualprizemoney * CustomTeam._amountOfTeamPlayersInPlacement(data.players)
 		playerEarnings = playerEarnings + prizeMoney
 		mode = 'other'
 	end
@@ -336,6 +336,17 @@ function CustomTeam._placements(value)
 	end
 
 	return nil
+end
+
+function CustomTeam._amountOfTeamPlayersInPlacement(players)
+	local amount = 0
+	for playerKey in Table.iter.pairsByPrefix(players, 'p') do
+		if players[playerKey .. 'team'] == _team.pagename then
+			amount = amount + 1
+		end
+	end
+
+	return amount
 end
 
 return CustomTeam
