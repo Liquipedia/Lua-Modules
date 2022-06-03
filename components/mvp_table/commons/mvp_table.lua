@@ -74,7 +74,7 @@ function MvpTable._parseArgs(args)
 		end
 	end
 
-	args.tourament1 = args.tournament or args.tournament1
+	args.tournament1 = args.tournament or args.tournament1
 	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
 		tournament = tournament:gsub(' ', '_')
 		table.insert(parsedArgs.tournaments, tournament)
