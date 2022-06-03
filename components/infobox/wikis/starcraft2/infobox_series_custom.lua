@@ -64,7 +64,7 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Game version',
 		content = {
-			CustomSeries._getGameVersion(string.lower(_args.game or ''), _args.patch or '')
+			CustomSeries._getGameVersion(string.lower(_args.game or ''), _args.patch)
 		}
 	})
 	table.insert(widgets, Cell{
@@ -111,7 +111,7 @@ function CustomSeries._getSeriesPrizepools()
 end
 
 function CustomSeries._getGameVersion(game, patch)
-	local shouldUseAutoPatch = (_args.autopatch or '') ~= 'false'
+	local shouldUseAutoPatch = Logic.readBool(_args.autopatch or true)
 	local modName = _args.modname
 	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
 	local endPatch = _args.epatch
