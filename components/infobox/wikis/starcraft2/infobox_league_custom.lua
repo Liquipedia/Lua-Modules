@@ -547,8 +547,6 @@ function CustomLeague:defineCustomPageVariables()
 	end
 	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
-	local finished = _args.finished
-	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
 	local finished = Logic.readBool(_args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
 	if not finished and os.date('%Y-%m-%d') >= queryDate then
