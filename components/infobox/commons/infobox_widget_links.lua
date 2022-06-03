@@ -30,7 +30,6 @@ local _ICON_KEYS_TO_RENAME = {
 	tlpdint = 'tlpd',
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
-	tlpd = '',
 }
 
 local _PRIORITY_GROUPS = {
