@@ -45,7 +45,7 @@ function CustomTeam.run(frame)
 end
 
 function CustomTeam:addToLpdb(lpdbData)
-	lpdbData.earnings = _earnings or 0
+	lpdbData.earnings = _earnings
 
 	return lpdbData
 end
