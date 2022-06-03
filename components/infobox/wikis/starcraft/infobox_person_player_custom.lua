@@ -35,7 +35,6 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _EARNING_MODES = {['solo'] = '1v1', ['team'] = 'team'}
-local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 30
 local _NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
 local _FIRST_DAY_OF_YEAR = '-01-01'
 local _LAST_DAY_OF_YEAR = '-12-31'
@@ -156,16 +155,14 @@ function CustomPlayer._getRaceData(race, asCategory)
 	if not raceTable and race ~= _UNKNOWN_RACE then
 		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
-	else
+	elseif Table.isNotEmpty(raceTable) then
 		if asCategory then
-			for raceIndex, raceValue in ipairs(raceTable or {}) do
+			for raceIndex, raceValue in ipairs(raceTable) do
 				raceTable[raceIndex] = ':Category:' .. raceValue .. ' Players|' .. raceValue .. ']]'
 					.. '[[Category:' .. raceValue .. ' Players'
 			end
 		end
-		if raceTable then
-			display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
-		end
+		display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
 	end
 
 	_raceData = {
@@ -352,7 +349,7 @@ end
 
 function CustomPlayer._getEarningsMedalsData(player)
 	local playerConditions = ConditionTree(BooleanOperator.any)
-	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
+	for playerIndex = 1, Info.maximumNumberOfPlayersInPlacements do
 		playerConditions:add{
 			ConditionNode(ColumnName('players_p' .. playerIndex), Comparator.eq, player),
 		}
