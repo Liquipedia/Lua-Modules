@@ -7,6 +7,7 @@
 --
 
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local Series = require('Module:Infobox/Series')
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')
