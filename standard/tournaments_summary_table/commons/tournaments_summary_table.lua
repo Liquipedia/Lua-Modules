@@ -243,7 +243,7 @@ function TournamentsSummaryTable._dateDisplay(dateString)
 	local year, month, day = dateString:match("(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$")
 	-- fallback
 	if String.isEmpty(year) then
-		return os.time{year=1970}
+		year = 1970
 	end
 	-- defaults
 	if String.isEmpty(month) then
