@@ -96,9 +96,9 @@ end
 function CustomSeries._addCustomVariables()
 	if
 		(not Namespace.isMain()) or
-		_args.disable_smw == 'true' or
-		_args.disable_lpdb == 'true' or
-		_args.disable_storage == 'true'
+		Logic.readBool(_args.disable_smw) or
+		Logic.readBool(_args.disable_lpdb) or
+		Logic.readBool(_args.disable_storage)
 	then
 		Variables.varDefine('disable_SMW_storage', 'true')
 	else
