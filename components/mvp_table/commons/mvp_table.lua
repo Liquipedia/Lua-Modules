@@ -47,8 +47,8 @@ function MvpTable.run(args)
 		:attr('data-closetext', 'place ' .. (args.cutafter + 1) .. ' to ' .. #mvpList)
 		:attr('data-cutafter', args.cutafter + (String.isNotEmpty(args.title) and 1 or 0))
 		:attr('data-definedcutafter', '')
-		:node(MvpTable._header1(args))
-		:node(MvpTable._header2(args))
+		:node(MvpTable._mainHeader(args))
+		:node(MvpTable._subHeader(args))
 
 	for _, item in ipairs(mvpList) do
 		output:node(MvpTable._row(item, args))
@@ -122,7 +122,7 @@ function MvpTable._buildConditions(args)
 	return conditions:toString()
 end
 
-function MvpTable._header1(args)
+function MvpTable._mainHeader(args)
 	if String.isEmpty(args.title) then
 		return nil
 	end
@@ -133,7 +133,7 @@ function MvpTable._header1(args)
 		:tag('th'):wikitext(args.title):attr('colspan', colspan):done():done()
 end
 
-function MvpTable._header2(args)
+function MvpTable._subHeader(args)
 	local header = mw.html.create('tr')
 		:tag('th'):wikitext('Player'):done()
 		:tag('th'):wikitext('#MVPs'):done()
