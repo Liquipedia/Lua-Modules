@@ -39,7 +39,7 @@ TournamentsSummaryTable.tiers = {1, 2}
 TournamentsSummaryTable.upcomingOffset = _SECONDS_PER_DAY * 10
 TournamentsSummaryTable.completedOffset = _SECONDS_PER_DAY * 10
 TournamentsSummaryTable.tierTypeExcluded = {}
-TournamentsSummaryTable.statusExcluded = {'cancelled', 'postponed'}
+TournamentsSummaryTable.statusExcluded = {'canceled', 'cancelled', 'postponed'}
 TournamentsSummaryTable.disableLIS = false
 TournamentsSummaryTable.defaultLimit = 7
 
