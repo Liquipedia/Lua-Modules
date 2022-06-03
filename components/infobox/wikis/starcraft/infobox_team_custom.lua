@@ -15,6 +15,7 @@ local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 
