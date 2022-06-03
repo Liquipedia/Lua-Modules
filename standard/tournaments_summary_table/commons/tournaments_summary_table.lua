@@ -263,9 +263,7 @@ end
 function TournamentsSummaryTable._lisTemplateExists(series)
 	local lis = Template.safeExpand(
 		mw.getCurrentFrame(),
-		'LeagueIconSmall/' .. series,
-		{},
-		''
+		'LeagueIconSmall/' .. series
 	)
 
 	return String.isNotEmpty(lis)
@@ -283,8 +281,8 @@ function TournamentsSummaryTable.manualUpcomingRow(args)
 	local eventInformation = {
 		pagename  = pageName,
 		tickername = args.tickername  or args.display or pageName,
-		startdate = string.match(args.estimated_start or args.startdate or '', '%d%d%d%d%-%d%d%-%d%d'),
-		enddate = string.match(args.estimated_end or args.enddate or '', '%d%d%d%d%-%d%d%-%d%d'),
+		startdate = TournamentsSummaryTable._dateDisplay(args.estimated_start or args.startdate),
+		enddate = TournamentsSummaryTable._dateDisplay(args.estimated_end or args.enddate),
 		icon = args.icon,
 		icondark = args.icondark,
 		series = args.series,
