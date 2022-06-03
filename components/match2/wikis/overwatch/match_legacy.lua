@@ -115,16 +115,8 @@ function p.convertParameters(match2)
 	match.extradata.bestofx = tostring(match2.bestof)
 	local bracketData = json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
-		local headerName
-		if bracketData.header then
-			headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
-		end
-		if String.isEmpty(headerName) then
-			headerName = Variables.varDefault('match_legacy_header_name')
-		end
-		if String.isNotEmpty(headerName) then
-			match.header = headerName
-			Variables.varDefine('match_legacy_header_name', headerName)
+		if bracketData.inheritedheader then
+			match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
 		end
 	end
 
