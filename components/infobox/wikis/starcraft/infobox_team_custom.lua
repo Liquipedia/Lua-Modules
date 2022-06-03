@@ -7,7 +7,9 @@
 --
 
 local Class = require('Module:Class')
+local Info = require('Module:Info')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
@@ -39,7 +41,6 @@ local _LANGUAGE = mw.language.new('en')
 local _earnings = 0
 local _EARNINGS_MODES = {team = 'team'}
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
-local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 35
 local _PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
 local _args
@@ -112,7 +113,7 @@ function CustomTeam:createWidgetInjector()
 end
 
 function CustomTeam:addToLpdb(lpdbData)
-	lpdbData.earnings = _earnings or 0
+	lpdbData.earnings = _earnings
 	lpdbData.region = nil
 	lpdbData.extradata.subteams = CustomTeam._listSubTeams()
 	return lpdbData
@@ -175,9 +176,13 @@ function CustomTeam.playerBreakDown(args)
 end
 
 function CustomTeam.calculateEarnings(args)
-	if args.disable_smw == 'true' or args.disable_lpdb == 'true' or args.disable_storage == 'true'
-		or Variables.varDefault('disable_SMW_storage', 'false') == 'true'
-		or (not Namespace.isMain()) then
+	if
+		Logic.readBool(args.disable_smw) or
+		Logic.readBool(args.disable_lpdb) or
+		Logic.readBool(args.disable_storage) or
+		Logic.readBool(Variables.varDefault('disable_SMW_storage')) or
+		(not Namespace.isMain())
+	then
 			doStore = false
 			Variables.varDefine('disable_SMW_storage', 'true')
 	else
@@ -195,7 +200,7 @@ function CustomTeam.getEarningsAndMedalsData()
 	local query = 'liquipediatier, liquipediatiertype, placement, date, individualprizemoney, prizemoney, players'
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any)
-	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
+	for playerIndex = 1, Info.maximumNumberOfPlayersInPlacements do
 		playerTeamConditions:add{
 			ConditionNode(ColumnName('players_p' .. playerIndex .. 'team'), Comparator.eq, team),
 		}
