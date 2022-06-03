@@ -12,6 +12,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
+local Table = require('Module:Table')
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 
@@ -136,10 +137,11 @@ end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 	local prizeMoney = data.prizemoney
-	local mode = (data.players or {}).type or data.mode or ''
+	data.players = data.players or {}
+	local mode = data.players.type or data.mode or ''
 	mode = _EARNINGS_MODES[mode]
 	if not mode then
-		prizeMoney = data.individualprizemoney
+		prizeMoney = data.individualprizemoney * CustomTeam._amountOfTeamPlayersInPlacement(data.players)
 		playerEarnings = playerEarnings + prizeMoney
 		mode = 'other'
 	end
@@ -152,6 +154,17 @@ function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 	earnings['total'][date] = (earnings['total'][date] or 0) + prizeMoney
 
 	return earnings, playerEarnings
+end
+
+function CustomTeam._amountOfTeamPlayersInPlacement(players)
+	local amount = 0
+	for playerKey in Table.iter.pairsByPrefix(players, 'p') do
+		if players[playerKey .. 'team'] == _team.pagename then
+			amount = amount + 1
+		end
+	end
+
+	return amount
 end
 
 return CustomTeam
