@@ -74,17 +74,13 @@ function MvpTable._parseArgs(args)
 		end
 	end
 
-	if String.isNotEmpty(args.tournament) then
-		local tournament = args.tournament:gsub(' ', '_')
+	args.tourament1 = args.tournament or args.tournament1
+	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
+		tournament = tournament:gsub(' ', '_')
 		table.insert(parsedArgs.tournaments, tournament)
-	elseif Table.isEmpty(parsedArgs.matchGroupIds) then
-		table.insert(parsedArgs.tournaments, _PAGENAME)
 	end
-	local tournamentIndex = 2
-	while String.isNotEmpty(args['tournament' .. tournamentIndex]) do
-		local tournament = args['tournament' .. tournamentIndex]
-		table.insert(parsedArgs.tournaments, tournament)
-		tournamentIndex = tournamentIndex + 1
+	if Table.isEmpty(parsedArgs.matchGroupIds) and Table.isEmpty(parsedArgs.tournaments) then
+		table.insert(parsedArgs.tournaments, _PAGENAME)
 	end
 
 	return parsedArgs
