@@ -16,8 +16,8 @@ local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
-local Team = require('Module:Infobox/Team')
 local Table = require('Module:Table')
+local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -127,9 +127,9 @@ end
 
 function CustomTeam:createBottomContent()
 	if _doStore then
-		return tostring(Matches._get_ongoing{}) ..
-			tostring(Matches._get_upcoming{}) ..
-			tostring(Matches._get_recent{})
+		return tostring(Matches._get_ongoing()) ..
+			tostring(Matches._get_upcoming()) ..
+			tostring(Matches._get_recent())
 	end
 end
 
@@ -196,10 +196,8 @@ function CustomTeam.playerBreakDown(args)
 end
 
 function CustomTeam.getAutomatedAchievements(team)
-	local achievements = Achievements.team{team=team}
-	local achievementsSolo = Achievements.team_solo{team=team}
-	if achievements == '' then achievements = nil end
-	if achievementsSolo == '' then achievementsSolo = nil end
+	local achievements = String.nilIfEmpty(Achievements.team{team = team})
+	local achievementsSolo = String.nilIfEmpty(Achievements.team_solo{team = team})
 
 	return achievements, achievementsSolo
 end
