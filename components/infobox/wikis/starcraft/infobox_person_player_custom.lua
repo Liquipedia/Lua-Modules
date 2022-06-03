@@ -472,9 +472,10 @@ function CustomPlayer._setAchievements(data, place)
 end
 
 function CustomPlayer._isAwardAchievement(data, tier)
+	local prize = tonumber(data.individualprizemoney) or 0
 	return String.isNotEmpty((data.extradata or {}).award) and (
 		tier == 1 or
-		tier == 2 and data.individualprizemoney > 50
+		tier == 2 and prize > 50
 	)
 end
 
