@@ -309,7 +309,8 @@ end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 	local prizeMoney = data.prizemoney
-	local mode = (data.players or {}).type
+	data.players = data.players or {}
+	local mode = data.players.type
 	mode = _EARNINGS_MODES[mode]
 	if not mode then
 		prizeMoney = data.individualprizemoney * CustomTeam._amountOfTeamPlayersInPlacement(data.players)
