@@ -6,13 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Series = require('Module:Infobox/Series')
 local Autopatch = require('Module:Automated Patch')
+local Json = require('Module:Json')
+local Logic = require('Module:Logic')
+local Namespace = require('Module:Namespace')
+local Series = require('Module:Infobox/Series')
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')
 local Tier = require('Module:Tier')
-local Json = require('Module:Json')
 local Variables = require('Module:Variables')
-local Namespace = require('Module:Namespace')
+
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Builder = require('Module:Infobox/Widget/Builder')
@@ -62,22 +64,22 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Game version',
 		content = {
-			CustomSeries._getGameVersion(string.lower(_args.game or ''), _args.patch or '')
+			CustomSeries._getGameVersion(string.lower(_args.game or ''), _args.patch)
 		}
 	})
-	table.insert(widgets, Cell({
+	table.insert(widgets, Cell{
 		name = 'Server',
 		content = {_args.server}
-	}))
-	table.insert(widgets, Cell({
+	})
+	table.insert(widgets, Cell{
 		name = 'Type',
 		content = {_args.type}
-	}))
-	table.insert(widgets, Cell({
+	})
+	table.insert(widgets, Cell{
 		name = 'Format',
 		content = {_args.format}
-	}))
-	table.insert(widgets, Builder({
+	})
+	table.insert(widgets, Builder{
 		builder = function()
 			if _args.prizepooltot ~= 'false' then
 				return {
@@ -88,7 +90,7 @@ function CustomInjector:addCustomCells(widgets)
 				}
 			end
 		end
-	}))
+	})
 
 	CustomSeries._addCustomVariables()
 
@@ -109,7 +111,7 @@ function CustomSeries._getSeriesPrizepools()
 end
 
 function CustomSeries._getGameVersion(game, patch)
-	local shouldUseAutoPatch = (_args.autopatch or '') ~= 'false'
+	local shouldUseAutoPatch = Logic.readBool(_args.autopatch or true)
 	local modName = _args.modname
 	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
 	local endPatch = _args.epatch
@@ -165,9 +167,9 @@ end
 function CustomSeries._addCustomVariables()
 	if
 		(not Namespace.isMain()) or
-		_args.disable_smw == 'true' or
-		_args.disable_lpdb == 'true' or
-		_args.disable_storage == 'true'
+		Logic.readBool(_args.disable_smw) or
+		Logic.readBool(_args.disable_lpdb) or
+		Logic.readBool(_args.disable_storage)
 	then
 		Variables.varDefine('disable_SMW_storage', 'true')
 	else
