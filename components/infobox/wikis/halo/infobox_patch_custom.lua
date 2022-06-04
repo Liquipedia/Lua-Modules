@@ -42,12 +42,11 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomPatch:addToLpdb(lpdbData)
-	local date = _args.release or _args.pcrelease or _args.consolerelease
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
 		name = _args.name,
 		type = 'patch',
-		information = _game,
-		date = date,
+		information = CustomPatch:_getGameVersion(),
+		date = _args.release,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
 			version = _args.version,
 		}
