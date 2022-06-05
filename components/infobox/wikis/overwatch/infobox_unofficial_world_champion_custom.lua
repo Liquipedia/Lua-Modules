@@ -32,7 +32,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	--Regional distribution
 	if String.isNotEmpty(_args.region1) then
-		table.insert(widgets, Title{name = 'Racial distribution'})
+		table.insert(widgets, Title{name = 'Regional distribution'})
 	end
 	for regionKey, region in Table.iter.pairsByPrefix(_args, 'region') do
 		table.insert(
