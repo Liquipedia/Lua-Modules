@@ -146,8 +146,8 @@ function p.convertParameters(match2)
 
 	local mvp = json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
-		match.extradata.mvp = table.concat(mvp.players, ",")
-		match.extradata.mvp = match.extradata.mvp .. ";" .. mvp.points
+		mvp.players = Table.mapValues(mvp.players, mw.ext.TeamLiquidIntegration.resolve_redirect)
+		match.extradata.mvp = table.concat(mvp.players, ",") .. ";" .. mvp.points
 	end
 
 	match.extradata.matchsection = extradata.matchsection
@@ -196,7 +196,7 @@ function p.convertParameters(match2)
 			local opponentplayers = {}
 			for i = 1,10 do
 				local player = opponentmatch2players[i] or {}
-				opponentplayers["p" .. i] = player.name or ""
+				opponentplayers["p" .. i] = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name or "")
 				opponentplayers["p" .. i .. "flag"] = player.flag or ""
 				opponentplayers["p" .. i .. "dn"] = player.displayname or ""
 			end
