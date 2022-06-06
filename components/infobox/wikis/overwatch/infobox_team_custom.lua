@@ -21,20 +21,19 @@ function CustomTeam.run(frame)
 	_team = team
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
-	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
+	team.getWikiCategories = CustomTeam.getWikiCategories
 	return team:createInfobox(frame)
 end
 
---[[ TODO: Impliment after wiki transitions to Match2 ]]--
 function CustomTeam:createBottomContent()
 	return Template.expandTemplate(
 		mw.getCurrentFrame(),
 		'Upcoming and ongoing matches of',
-		{team = _team.name or _team.pagename}
+		{team = _team.name}
 	) .. Template.expandTemplate(
 		mw.getCurrentFrame(),
 		'Upcoming and ongoing tournaments of',
-		{team = _team.name or _team.pagename}
+		{team = _team.name}
 	)
 end
 
