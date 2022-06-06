@@ -32,6 +32,16 @@ local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
 	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+	esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
+	owl = {icon = 'File:Overwatch League allmode.png', text = 'Overwatch League matchpage'},
+	owc = {icon = 'File:OWC-BMS icon.png', text = 'OW Contenders matchpage'},
+	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
+	pllg = {icon = 'File:Peliliiga-BMS icon.png', text = 'Peliliiga matchpage'},
+	oceow = {icon = 'File:OCEOW-BMS icon.png', text = 'OCEOverwatch matchpage'},
+	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
+	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
+	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
+	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
 }
 
 local CustomMatchSummary = {}
