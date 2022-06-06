@@ -12,7 +12,6 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
 local _args
-local _game
 
 local _GAME = mw.loadData('Module:GameVersion')
 
@@ -67,7 +66,6 @@ end
 
 function CustomPatch._getGameVersion()
 	local game = string.lower(_args.game or '')
-	_game = _GAME[game]
-	return _game
+	return _GAME[game]
 end
 return CustomPatch
