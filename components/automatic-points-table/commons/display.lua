@@ -19,7 +19,7 @@ local _POINTS_TYPE = {
 }
 
 local PointsDivTable = Class.new(
-	function(self, pointsData, tournaments, positionBackgrounds)
+	function(self, pointsData, tournaments, positionBackgrounds, limit)
 		self.root = mw.html.create('div') :addClass('divTable')
 			:addClass('border-color-grey') :addClass('border-bottom')
 
@@ -40,6 +40,7 @@ local PointsDivTable = Class.new(
 		self.pointsData = pointsData
 		self.tournaments = tournaments
 		self.positionBackgrounds = positionBackgrounds
+		self.limit = limit
 	end
 )
 
@@ -77,7 +78,9 @@ function PointsDivTable:create()
 	local headerRow = TableHeaderRow(self.tournaments)
 	self:row(headerRow)
 
+	local limit = self.limit
 	Table.iter.forEachIndexed(self.pointsData, function(index, teamPointsData)
+		if index > limit then return end
 		local positionBackground = self.positionBackgrounds[index]
 		self:row(TableRow(teamPointsData, self.tournaments, positionBackground))
 	end)
