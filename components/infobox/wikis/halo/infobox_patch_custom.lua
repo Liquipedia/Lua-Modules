@@ -42,6 +42,7 @@ end
 
 function CustomPatch:addToLpdb(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
+		name = self.name,
 		type = 'patch',
 		information = CustomPatch:_getGameVersion(),
 		date = args.release,
