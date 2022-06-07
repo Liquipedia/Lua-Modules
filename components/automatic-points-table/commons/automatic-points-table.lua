@@ -72,13 +72,7 @@ function AutomaticPointsTable:parseInput(args)
 	local tournaments = self:parseTournaments(args)
 	local teams = self:parseTeams(args, #tournaments)
 	local minified = Logic.readBool(args.minified)
-	local limit
-	if args.limit then
-		limit = tonumber(args.limit)
-	else
-		limit = #teams
-	end
-
+	local limit = tonumber(args.limit) or #teams
 	return {
 		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
