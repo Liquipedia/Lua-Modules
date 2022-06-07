@@ -79,7 +79,6 @@ function PointsDivTable:create()
 	self:row(headerRow)
 
 	local limit = self.limit
-	local pointsData = {}
 	Table.iter.forEachIndexed(self.pointsData, function(index, teamPointsData)
 		if index > limit then return end
 		local positionBackground = self.positionBackgrounds[index]
