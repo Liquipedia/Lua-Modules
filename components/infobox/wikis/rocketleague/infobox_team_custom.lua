@@ -62,9 +62,9 @@ end
 
 function CustomTeam:addToLpdb(lpdbData, args)
 	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = 'File:' .. args.teamcardimage
+		lpdbData.logo = args.teamcardimage
 	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = 'File:' .. args.image
+		lpdbData.logo = args.image
 	end
 
 	lpdbData.extradata.rating = Variables.varDefault('rating')
