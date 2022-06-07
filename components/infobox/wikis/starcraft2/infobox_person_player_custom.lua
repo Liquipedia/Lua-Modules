@@ -18,7 +18,7 @@ local Class = require('Module:Class')
 local CleanRace = require('Module:CleanRace')
 local Json = require('Module:Json')
 local Lpdb = require('Module:Lpdb')
-local Matches = require('Module:Upcoming ongoing and recent matches player/new')
+local MatchTicker = require('Module:MatchTicker/Participant')
 local Math = require('Module:Math')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -186,9 +186,7 @@ end
 
 function CustomPlayer:createBottomContent(infobox)
 	if _shouldQueryData then
-		return tostring(Matches._get_ongoing({})) ..
-			tostring(Matches._get_upcoming({})) ..
-			tostring(Matches._get_recent({}))
+		return MatchTicker.run({player = _PAGENAME})
 	end
 end
 
