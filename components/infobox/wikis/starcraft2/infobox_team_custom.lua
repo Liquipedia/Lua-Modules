@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
-local Matches = require('Module:Upcoming ongoing and recent matches team/new')
+local MatchTicker = require('Module:MatchTicker/Participant')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local RaceIcon = require('Module:RaceIcon')
@@ -127,9 +127,7 @@ end
 
 function CustomTeam:createBottomContent()
 	if _doStore then
-		return tostring(Matches._get_ongoing()) ..
-			tostring(Matches._get_upcoming()) ..
-			tostring(Matches._get_recent())
+		return MatchTicker.run({team = _team.pagename})
 	end
 end
 
