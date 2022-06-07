@@ -10,23 +10,24 @@ local Class = require('Module:Class')
 local Table = require('Module:Table')
 
 local PointsDivTable = Class.new(
-	function(self, pointsData, tournaments, positionBackgrounds)
+	function(self, pointsData, tournaments, positionBackgrounds, limit)
 		self.root = mw.html.create('div') :addClass('divTable')
 			:addClass('border-color-grey') :addClass('border-bottom')
 
 		local innerWrapper = mw.html.create('div') :addClass('fixed-size-table-container')
 			:addClass('border-color-grey')
-			:css('width', '283px')
+			:css('width', '310px')
 			:node(self.root)
 
 		self.wrapper = mw.html.create('div') :addClass('table-responsive')
-			:addClass('automatic-points-table')
+			:addClass('automatic-points-table') :addClass('minified')
 			:node(innerWrapper)
 
 		self.rows = {}
 		self.pointsData = pointsData
 		self.tournaments = tournaments
 		self.positionBackgrounds = positionBackgrounds
+		self.limit = limit
 	end
 )
 
@@ -64,7 +65,10 @@ function PointsDivTable:create()
 	local headerRow = TableHeaderRow(self.tournaments)
 	self:row(headerRow)
 
+	local limit = self.limit
+	local pointsData = {}
 	Table.iter.forEachIndexed(self.pointsData, function(index, teamPointsData)
+		if index > limit then return end
 		local positionBackground = self.positionBackgrounds[index]
 		self:row(TableRow(teamPointsData, self.tournaments, positionBackground))
 	end)
@@ -150,6 +154,7 @@ function TableHeaderRow:create()
 		additionalClass = 'team'
 	}, {
 		text = 'Points',
+		additionalClass = 'total'
 	}}
 	Table.iter.forEach(headers, function(h) self:headerCell(h) end)
 

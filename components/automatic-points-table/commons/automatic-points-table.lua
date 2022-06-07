@@ -45,8 +45,8 @@ function AutomaticPointsTable.run(frame)
 	local pointsData = pointsTable:getPointsData(teamsWithResults, tournamentsWithResults)
 	local sortedData = pointsTable:sortData(pointsData)
 	local sortedDataWithPositions = pointsTable:addPositionData(sortedData)
-
 	local positionBackgrounds = pointsTable.parsedInput.positionBackgrounds
+	local limit = pointsTable.parsedInput.limit
 
 	-- A display module is a module that takes in 3 arguments and returns some html,
 	-- which will be displayed when this module is invoked
@@ -56,12 +56,14 @@ function AutomaticPointsTable.run(frame)
 	else
 		usedDisplayModule = TableDisplay
 	end
-	local divTable = usedDisplayModule(
 
+	local divTable = usedDisplayModule(
 		sortedDataWithPositions,
 		tournamentsWithResults,
-		positionBackgrounds
+		positionBackgrounds,
+		limit
 	)
+
 	return divTable:create()
 end
 
@@ -70,11 +72,19 @@ function AutomaticPointsTable:parseInput(args)
 	local tournaments = self:parseTournaments(args)
 	local teams = self:parseTeams(args, #tournaments)
 	local minified = Logic.readBool(args.minified)
+	local limit
+	if args.limit then
+		limit = tonumber(args.limit)
+	else
+		limit = #teams
+	end
+
 	return {
 		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
 		teams = teams,
-		shouldTableBeMinified = minified
+		shouldTableBeMinified = minified,
+		limit = limit
 	}
 end
 
@@ -314,8 +324,8 @@ function AutomaticPointsTable:addPositionData(pointsData)
 			dataPoint.position = teamPosition
 			previousTotalPoints = dataPoint.totalPoints
 			previousTiebreakerPoints = dataPoint.tiebreakerPoints
-			return index, dataPoint
 
+			return index, dataPoint
 		end
 	)
 end
