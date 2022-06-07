@@ -8,6 +8,7 @@
 
 local Arguments = require('Module:Arguments')
 local Flags = require('Module:Flags')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local StandingsStorage = {}
@@ -30,17 +31,17 @@ function StandingsStorage.run(index, data)
 			definitestatus = data.definitestatus or data.bg,
 			currentstatus = data.currentstatus or data.pbg,
 			change = data.change,
-			scoreboard = mw.ext.LiquipediaDB.lpdb_create_json({
-				match = data.match, -- [won, draw, lost]
-				overtime = data.overtime, -- [won, draw, lost]
-				game = data.game, -- [won, draw, lost]
-				points = data.points,
-				diff = data.diff,
-				buchholz = data.buchholz,
-			}),
-			standingsindex = data.standingsindex,
+			scoreboard = mw.ext.LiquipediaDB.lpdb_create_json{
+				match = Table.mapValues(data.match or {}, tonumber), -- [won, draw, lost]
+				overtime = Table.mapValues(data.overtime or {}, tonumber), -- [won, draw, lost]
+				game = Table.mapValues(data.game or {}, tonumber), -- [won, draw, lost]
+				points = tonumber(data.points),
+				diff = tonumber(data.diff),
+				buchholz = tonumber(data.buchholz),
+			},
+			standingsindex = tonumber(data.standingsindex),
+			roundindex = tonumber(data.roundindex),
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
-			roundindex = data.roundindex,
 			parent = Variables.varDefault('tournament_parent', ''),
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json(data.extradata or {})
 		}
