@@ -70,7 +70,7 @@ end
 local Score = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
-		self.table = self.root:tag('table'):css('line-height', '20px')
+		self.table = self.root:tag('table'):css('line-height', '20px'):css('text-align', 'center')
 		self.top = mw.html.create('tr')
 		self.bottom = mw.html.create('tr')
 	end
@@ -78,14 +78,14 @@ local Score = Class.new(
 
 function Score:setLeft()
 	self.root   :css('float', 'left')
-				:css('margin-left', '5px')
+				:css('margin-left', '4px')
 
 	return self
 end
 
 function Score:setRight()
 	self.root   :css('float', 'right')
-				:css('margin-right', '5px')
+				:css('margin-right', '4px')
 
 	return self
 end
@@ -94,7 +94,7 @@ function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore:attr('rowspan', '2')
 			:css('font-size', '16px')
-			:css('width', '25px')
+			:css('width', '24px')
 			:wikitext(score or '')
 	self.top:node(mapScore)
 
@@ -105,7 +105,7 @@ function Score:addTopRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore  :addClass('bracket-popup-body-match-sidewins')
 				:css('color', self:_getSideColor(side))
-				:css('width', '7px')
+				:css('width', '12px')
 				:wikitext(score)
 	self.top:node(roundScore)
 	return self
@@ -115,7 +115,7 @@ function Score:addBottomRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore  :addClass('bracket-popup-body-match-sidewins')
 				:css('color', self:_getSideColor(side))
-				:css('width', '7px')
+				:css('width', '12px')
 				:wikitext(score)
 	self.bottom:node(roundScore)
 	return self
