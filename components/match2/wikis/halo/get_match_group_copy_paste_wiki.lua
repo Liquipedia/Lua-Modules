@@ -54,7 +54,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	if bestof ~= 0 then
 		for i = 1, bestof do
 			Array.appendWith(lines,
-				indent .. '|map' .. i .. 
+				indent .. '|map' .. i ..
 				'={{Map|map=|mode=|score1=|score2=|winner=}}'
 			)
 		end
