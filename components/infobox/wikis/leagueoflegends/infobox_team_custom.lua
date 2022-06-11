@@ -80,8 +80,9 @@ end
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
-	if String.isNotEmpty(league) then
-		table.insert(categories, args.league.upper .. ' Teams')
+	if String.isNotEmpty(args.league) then
+		league = string.upper(args.league)
+		table.insert(categories, league .. ' Teams')
 	end
 
 	return categories
