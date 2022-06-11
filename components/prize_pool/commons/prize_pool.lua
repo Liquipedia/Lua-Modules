@@ -79,7 +79,7 @@ function PrizePool:init(args)
 	if self.options.showUSD then
 		self:addPrize('USD', 1)
 	end
-	self.placements = {} -- TODO
+	self.placements = self:_readPlacements(args)
 end
 
 function PrizePool:create()
@@ -119,12 +119,54 @@ function PrizePool:_readStandardPrizes(args)
 	return self.prizes
 end
 
+function PrizePool:_readPlacements(args)
+	self.placements = {}
+
+	local currentPlace = 0
+	for placementIndex = 1, math.huge do
+		local placementInput = Json.parseIfString(args[placementIndex])
+		if not placementInput then
+			break
+		end
+
+		local placement = {}
+		-- TODO: Parse prizes
+		placement.prizes = {}
+
+		placement.opponents = {}
+		for opponentIndex = 1, math.huge do
+			if not placementInput[opponentIndex] then
+				break
+			end
+			local parsedOpponent = Json.parseIfString(placementInput[opponentIndex])
+			table.insert(placement.opponents, parsedOpponent)
+			-- TODO: parse it into our struct
+		end
+
+		if not placementInput.place then
+			placement.placeStart = currentPlace + 1
+			placement.placeEnd = currentPlace + #placement.opponents
+		else
+			local places = Table.mapValues(mw.text.split(placementInput.place, '-'), mw.text.trim)
+			placement.placeStart = places[1]
+			placement.placeEnd = places[2] or places[1]
+		end
+
+		assert(placement.placeStart and placement.placeEnd, 'readPlacements: Invalid |place= provided.')
+		assert(#placement.opponents > placement.placeEnd - placement.placeStart, 'readPlacements: Number of opponents')
+		currentPlace = placement.placeEnd
+		table.insert(self.placements, placement)
+	end
+
+	return self.placements
+end
+
 function PrizePool:setOption(option, value)
 	self.options[option] = value
 	return self
 end
 
--- TODO extract of this to the future Enum class
+-- TODO extract parts of this to the future Enum class
 local CUSTOM_TYPES_OFFSET = 100
 local CUSTOM_TYPES_USED = 0
 function PrizePool:addPrizeType(enum, data)
@@ -138,12 +180,12 @@ function PrizePool:addPrize(enum, index, data)
 	assert(prizeTypes[enum], 'addPrize: Not a valid prizeEnum!')
 	assert(Logic.isNumeric(index), 'addPrize: Index is not numeric!')
 	data = data or {}
-	table.insert(self.prizes, {enum = enum, index = index, data = data})
+	table.insert(self.prizes, {id = enum .. index, enum = enum, index = index, data = data})
 	return self
 end
 
 function PrizePool:setWidgetInjector(widgetInjector)
-	assert(widgetInjector:is_a(WidgetInjector), "Not a WidgetIjector")
+	assert(widgetInjector:is_a(WidgetInjector), "setWidgetInjector: Not a WidgetIjector")
 	self.widgetInjector = widgetInjector
 	return self
 end
