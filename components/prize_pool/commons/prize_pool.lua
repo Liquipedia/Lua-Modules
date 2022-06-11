@@ -81,7 +81,7 @@ function PrizePool:_readPrizes(args)
 		local fieldName = prizeDatum.header
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
-			for id, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
+			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
 				-- TODO: parse the prizeValue into structured data
 				self:addPrize(prizeEnum, index, prizeValue)
 			end
