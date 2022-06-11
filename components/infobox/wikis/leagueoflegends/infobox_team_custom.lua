@@ -29,7 +29,7 @@ function CustomTeam.run(frame)
 	team.args.coach = Template.expandTemplate(frame, 'Coach of')
 	team.args.manager = Template.expandTemplate(frame, 'Manager of')
 	team.args.captain = Template.expandTemplate(frame, 'Captain of')
-	
+
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
