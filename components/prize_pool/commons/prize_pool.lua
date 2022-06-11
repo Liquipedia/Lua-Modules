@@ -24,19 +24,45 @@ local prizeTypes = Table.map({
 }, function(value, name) return name, value end)
 
 local prizeData = {
-	[prizeTypes.USD] = {row = 'usdprize'},
-	[prizeTypes.LOCAL_CURRENCY] = {header = 'localcurrency', row = 'localprize'},
-	[prizeTypes.POINTS] = {header = 'points', row = 'points'},
-	[prizeTypes.QUALIFIES] = {header = 'qualifies', row = 'qualified'},
-	[prizeTypes.FREETEXT] = {header = 'freetext', row = 'freetext'},
+	[prizeTypes.USD] = {
+		row = 'usdprize'
+	},
+	[prizeTypes.LOCAL_CURRENCY] = {
+		header = 'localcurrency',
+		headerParse = function (input)
+			return {currency = string.upper(input)}
+		end,
+		row = 'localprize'
+	},
+	[prizeTypes.POINTS] = {
+		header = 'points',
+		headerParse = function (input)
+			local pointsData = mw.loadData('Module:Points/data')
+			return pointsData[input] or {title = 'Points'}
+		end,
+		row = 'points'
+	},
+	[prizeTypes.QUALIFIES] = {
+		header = 'qualifies',
+		headerParse = function (input)
+			-- TODO: Add manual and automatic retrevial of additional data
+			return {link = input:gsub(' ', '_')}
+		end,
+		row = 'qualified'
+	},
+	[prizeTypes.FREETEXT] = {
+		header = 'freetext',
+		headerParse = function (input)
+			return {title = input}
+		end,
+		row = 'freetext'
+	},
 }
 
 function PrizePool:init(args)
 	self.args = args
 	self.pagename = mw.title.getCurrentTitle().text
 	self.args.type = Json.parseIfString(self.args.type)
-	self.widgetInjector = nil
-	self.lpdbInjector = nil
 
 	if not self.args.type then
 		return error('Please provide a type!')
@@ -48,8 +74,8 @@ function PrizePool:init(args)
 
 	self.type = self.args.type.type
 
-	self.options = self:_readOptions(args)
-	self.prizes = self:_readPrizes(args)
+	self.options = self:_readStandardOptions(args)
+	self.prizes = self:_readStandardPrizes(args)
 	if self.options.showUSD then
 		self:addPrize('USD', 1)
 	end
@@ -62,18 +88,20 @@ function PrizePool:create()
 	return ''
 end
 
-function PrizePool:_readOptions(args)
-	return {
-		autoUSD = Logic.nilOr(Logic.readBoolOrNil(args.autousd), true),
-		showUSD = Logic.nilOr(Logic.readBoolOrNil(args.showusd), true), -- TODO: Improve
-		prizeSummary = Logic.nilOr(Logic.readBoolOrNil(args.prizesummary), true),
-		exchangeInfo = Logic.nilOr(Logic.readBoolOrNil(args.exchangeinfo), true),
-		storeSmw = Logic.nilOr(Logic.readBoolOrNil(args.storesmw), true),
-		storeLpdb = Logic.nilOr(Logic.readBoolOrNil(args.storelpdb), true),
-	}
+function PrizePool:_readStandardOptions(args)
+	self.options = {}
+
+	self:setOption('autoUSD', Logic.nilOr(Logic.readBoolOrNil(args.autousd), true))
+	self:setOption('showUSD', Logic.nilOr(Logic.readBoolOrNil(args.showusd), true)) -- TODO: Improve
+	self:setOption('prizeSummary', Logic.nilOr(Logic.readBoolOrNil(args.prizesummary), true))
+	self:setOption('exchangeInfo', Logic.nilOr(Logic.readBoolOrNil(args.exchangeinfo), true))
+	self:setOption('storeSmw', Logic.nilOr(Logic.readBoolOrNil(args.storesmw), true))
+	self:setOption('storeLpdb', Logic.nilOr(Logic.readBoolOrNil(args.storelpdb), true))
+
+	return self.options
 end
 
-function PrizePool:_readPrizes(args)
+function PrizePool:_readStandardPrizes(args)
 	self.prizes = {}
 
 	for prizeEnum in pairs(prizeTypes) do
@@ -82,8 +110,8 @@ function PrizePool:_readPrizes(args)
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				-- TODO: parse the prizeValue into structured data
-				self:addPrize(prizeEnum, index, prizeValue)
+				local data = prizeDatum.headerParse(prizeValue)
+				self:addPrize(prizeEnum, index, data)
 			end
 		end
 	end
