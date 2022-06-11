@@ -25,6 +25,11 @@ function CustomTeam.run(frame)
 	_team = team
 	_args = _team.args
 
+	-- Automatic org people
+	team.args.coach = Template.expandTemplate(frame, 'Coach of')
+	team.args.manager = Template.expandTemplate(frame, 'Manager of')
+	team.args.captain = Template.expandTemplate(frame, 'Captain of')
+	
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
@@ -81,8 +86,8 @@ function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
 	if String.isNotEmpty(args.league) then
-		league = string.upper(args.league)
-		table.insert(categories, league .. ' Teams')
+		local division = string.upper(args.league)
+		table.insert(categories, division .. ' Teams')
 	end
 
 	return categories
