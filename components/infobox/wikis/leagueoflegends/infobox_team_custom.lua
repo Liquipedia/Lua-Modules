@@ -24,11 +24,11 @@ function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
 	_args = _team.args
-	
+
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
-	--[[team.getWikiCategories = CustomTeam.getWikiCategories]]--
+	team.getWikiCategories = CustomTeam.getWikiCategories
 	return team:createInfobox(frame)
 end
 
@@ -68,18 +68,22 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 
 	lpdbData.extradata = {
-		competesin = args.league
+		competesin = string.upper(args.league)
 	}
-	
+
 	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
 	lpdbData.manager = Variables.varDefault('managerid') or args.manager
-	
+
 	return lpdbData
 end
 
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
-
+	
+	if String.isNotEmpty(competesin) then
+		table.insert(categories, competesin .. ' Teams')
+	end
+	
 	return categories
 end
 
