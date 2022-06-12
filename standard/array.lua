@@ -393,8 +393,8 @@ function Array.maxBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
 	local max, maxScore
-	for _, item in ipairs(array) do
-		local score = funct(item)
+	for index, item in ipairs(array) do
+		local score = funct(item, index)
 		if max == nil or compare(maxScore, score) then
 			max = item
 			maxScore = score
@@ -418,8 +418,8 @@ function Array.minBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
 	local min, minScore
-	for _, item in ipairs(array) do
-		local score = funct(item)
+	for index, item in ipairs(array) do
+		local score = funct(item, index)
 		if min == nil or compare(score, minScore) then
 			min = item
 			minScore = score
