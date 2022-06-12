@@ -173,10 +173,10 @@ end
 
 -- Lexicographically compare two arrays.
 function Array.lexicalCompare(tblX, tblY)
-	for i = 1, math.min(#tblX, #tblY) do
-		if tblX[i] < tblY[i] then
+	for index = 1, math.min(#tblX, #tblY) do
+		if tblX[index] < tblY[index] then
 			return true
-		elseif tblX[i] > tblY[i] then
+		elseif tblX[index] > tblY[index] then
 			return false
 		end
 	end
@@ -285,13 +285,13 @@ array is mutated in the process.
 ]]
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
-	for i = 1, arrays.n do
-		if type(arrays[i]) == 'table' then
-			for _, element in ipairs(arrays[i]) do
+	for index = 1, arrays.n do
+		if type(arrays[index]) == 'table' then
+			for _, element in ipairs(arrays[index]) do
 				table.insert(tbl, element)
 			end
-		elseif arrays[i] ~= nil then
-			table.insert(tbl, arrays[i])
+		elseif arrays[index] ~= nil then
+			table.insert(tbl, arrays[index])
 		end
 	end
 	return tbl
@@ -306,8 +306,8 @@ Array.mapIndexes(function(x) return x < 5 and x * x or nil end)
 ]]
 function Array.mapIndexes(funct)
 	local arr = {}
-	for i = 1, math.huge do
-		local y = funct(i)
+	for index = 1, math.huge do
+		local y = funct(index)
 		if y then
 			table.insert(arr, y)
 		else
@@ -379,8 +379,8 @@ function Array.reduce(array, operator, initialValue)
 		aggregate = array[1]
 	end
 
-	for i = initialValue ~= nil and 1 or 2, #array do
-		aggregate = operator(aggregate, array[i])
+	for index = initialValue ~= nil and 1 or 2, #array do
+		aggregate = operator(aggregate, array[index])
 	end
 	return aggregate
 end
