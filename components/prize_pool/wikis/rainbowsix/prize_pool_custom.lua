@@ -23,6 +23,7 @@ local CustomWidgetInjector = Class.new(WidgetInjector)
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args)
+	prizePool:readInput(args)
 
 	prizePool:setWidgetInjector(CustomWidgetInjector())
 	--prizePool:setLpdbInjector(...)

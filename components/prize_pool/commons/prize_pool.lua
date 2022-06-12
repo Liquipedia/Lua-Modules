@@ -34,14 +34,6 @@ local prizeData = {
 		end,
 		row = 'localprize'
 	},
-	[prizeTypes.POINTS] = {
-		header = 'points',
-		headerParse = function (input)
-			local pointsData = mw.loadData('Module:Points/data')
-			return pointsData[input] or {title = 'Points'}
-		end,
-		row = 'points'
-	},
 	[prizeTypes.QUALIFIES] = {
 		header = 'qualifies',
 		headerParse = function (input)
@@ -49,6 +41,14 @@ local prizeData = {
 			return {link = input:gsub(' ', '_')}
 		end,
 		row = 'qualified'
+	},
+	[prizeTypes.POINTS] = {
+		header = 'points',
+		headerParse = function (input)
+			local pointsData = mw.loadData('Module:Points/data')
+			return pointsData[input] or {title = 'Points'}
+		end,
+		row = 'points'
 	},
 	[prizeTypes.FREETEXT] = {
 		header = 'freetext',
@@ -72,14 +72,20 @@ function PrizePool:init(args)
 		return error('Not a valid type!')
 	end
 
-	self.type = self.args.type.type
+	self.opponentType = self.args.type.type
 
+	return self
+end
+
+function PrizePool:readInput(args)
 	self.options = self:_readStandardOptions(args)
 	self.prizes = self:_readStandardPrizes(args)
 	if self.options.showUSD then
 		self:addPrize('USD', 1)
 	end
 	self.placements = self:_readPlacements(args)
+
+	return self
 end
 
 function PrizePool:create()
@@ -130,30 +136,44 @@ function PrizePool:_readPlacements(args)
 		end
 
 		local placement = {}
-		-- TODO: Parse prizes
-		placement.prizes = {}
-
-		placement.opponents = {}
-		for opponentIndex = 1, math.huge do
-			if not placementInput[opponentIndex] then
-				break
-			end
-			local parsedOpponent = Json.parseIfString(placementInput[opponentIndex])
-			table.insert(placement.opponents, parsedOpponent)
-			-- TODO: parse it into our struct
-		end
-
-		if not placementInput.place then
-			placement.placeStart = currentPlace + 1
-			placement.placeEnd = currentPlace + #placement.opponents
-		else
+		-- Parse place, explicit
+		if placementInput.place then
 			local places = Table.mapValues(mw.text.split(placementInput.place, '-'), mw.text.trim)
+			places = Table.mapValues(places, tonumber)
 			placement.placeStart = places[1]
 			placement.placeEnd = places[2] or places[1]
 		end
 
+
+		-- TODO: Parse prizes
+		placement.prizes = {}
+
+		-- Parse opponents in the placement
+		placement.opponents = {}
+		for opponentIndex = 1, math.huge do
+			local opponentInput = Json.parseIfString(placementInput[opponentIndex])
+			if not opponentInput then -- TODO: always iterate until the end placeEnd, if given
+				break
+			end
+			opponentInput.type = opponentInput.type or self.opponentType
+
+			local opponent = {opponentData = {}, prizes = {}, data = {}}
+			-- TODO: Add support to use wiki specific opponent modules
+			opponent.opponentData = Opponent.readOpponentArgs(opponentInput) or Opponent.tbd()
+			opponent.date = opponentInput.date
+			-- TODO: parse special prizes
+			-- TODO: parse additional data (and create enums for them)
+			table.insert(placement.opponents, opponent)
+		end
+
+		-- Parse place, implicit
+		if not placementInput.place then
+			placement.placeStart = currentPlace + 1
+			placement.placeEnd = currentPlace + #placement.opponents
+		end
+
 		assert(placement.placeStart and placement.placeEnd, 'readPlacements: Invalid |place= provided.')
-		assert(#placement.opponents > placement.placeEnd - placement.placeStart, 'readPlacements: Number of opponents')
+		assert(#placement.opponents > placement.placeEnd - placement.placeStart, 'readPlacements: Too many opponents')
 		currentPlace = placement.placeEnd
 		table.insert(self.placements, placement)
 	end
