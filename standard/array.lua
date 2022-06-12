@@ -218,9 +218,9 @@ Array.sortBy({
 
 ]]
 function Array.sortBy(tbl, funct, compare)
-	local tbl2 = Table.copy(tbl)
-	Array.sortInPlaceBy(tbl2, funct, compare)
-	return tbl2
+	local copy = Table.copy(tbl)
+	Array.sortInPlaceBy(copy, funct, compare)
+	return copy
 end
 
 --[[
