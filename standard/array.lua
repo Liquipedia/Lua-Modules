@@ -57,12 +57,12 @@ Example:
 Array.map({1, 2, 3}, function(x) return 2 * x end)
 -- returns {2, 4, 6}
 ]]
-function Array.map(elems, funct)
-	local outElems = {}
-	for index, elem in ipairs(elems) do
-		table.insert(outElems, funct(elem, index))
+function Array.map(elements, funct)
+	local mappedArray = {}
+	for index, element in ipairs(elements) do
+		table.insert(mappedArray, funct(element, index))
 	end
-	return outElems
+	return mappedArray
 end
 
 --[[
@@ -86,17 +86,17 @@ end
 Flattens an array of arrays into an array.
 ]]
 function Array.flatten(tbl)
-	local out_tbl = {}
+	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
 		if type(x) == 'table' then
 			for _, y in ipairs(x) do
-				table.insert(out_tbl, y)
+				table.insert(flattenedArray, y)
 			end
 		else
-			table.insert(out_tbl, x)
+			table.insert(flattenedArray, x)
 		end
 	end
-	return out_tbl
+	return flattenedArray
 end
 
 function Array.flatMap(tbl, funct)
@@ -107,8 +107,8 @@ end
 Whether all elements in an array satisfy a predicate.
 ]]
 function Array.all(tbl, predicate)
-	for _, elem in ipairs(tbl) do
-		if not predicate(elem) then
+	for _, element in ipairs(tbl) do
+		if not predicate(element) then
 			return false
 		end
 	end
@@ -119,8 +119,8 @@ end
 Whether any elements in an array satisfies a predicate.
 ]]
 function Array.any(tbl, predicate)
-	for _, elem in ipairs(tbl) do
-		if predicate(elem) then
+	for _, element in ipairs(tbl) do
+		if predicate(element) then
 			return true
 		end
 	end
@@ -233,11 +233,11 @@ end
 
 -- Reverses the order of elements in an array.
 function Array.reverse(tbl)
-	local out_tbl = {}
-	for i = #tbl, 1, -1 do
-		table.insert(out_tbl, tbl[i])
+	local reversedArray = {}
+	for index = #tbl, 1, -1 do
+		table.insert(reversedArray, tbl[index])
 	end
-	return out_tbl
+	return reversedArray
 end
 
 --[[
@@ -255,10 +255,10 @@ end
 Adds elements to the end of an array. The array is mutated in the process.
 ]]
 function Array.appendWith(tbl, ...)
-	local elems = Table.pack(...)
-	for i = 1, elems.n do
-		if elems[i] ~= nil then
-			table.insert(tbl, elems[i])
+	local elements = Table.pack(...)
+	for index = 1, elements.n do
+		if elements[index] ~= nil then
+			table.insert(tbl, elements[index])
 		end
 	end
 	return tbl
@@ -287,8 +287,8 @@ function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
 	for i = 1, arrays.n do
 		if type(arrays[i]) == 'table' then
-			for _, elem in ipairs(arrays[i]) do
-				table.insert(tbl, elem)
+			for _, element in ipairs(arrays[i]) do
+				table.insert(tbl, element)
 			end
 		elseif arrays[i] ~= nil then
 			table.insert(tbl, arrays[i])
@@ -321,11 +321,11 @@ end
 Returns the array {from, from + 1, from + 2, ..., to}.
 ]]
 function Array.range(from, to)
-	local elems = {}
-	for elem = from, to do
-		table.insert(elems, elem)
+	local elements = {}
+	for element = from, to do
+		table.insert(elements, element)
 	end
-	return elems
+	return elements
 end
 
 function Array.extractKeys(tbl)
@@ -352,9 +352,9 @@ Example:
 Array.forEach({4, 6, 8}, mw.log)
 -- Prints 4 1 6 2 8 3
 ]]
-function Array.forEach(elems, funct)
-	for i, elem in ipairs(elems) do
-		funct(elem, i)
+function Array.forEach(elements, funct)
+	for index, element in ipairs(elements) do
+		funct(element, index)
 	end
 end
 
