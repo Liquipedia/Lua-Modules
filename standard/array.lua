@@ -380,7 +380,7 @@ function Array.reduce(array, operator, initialValue)
 	end
 
 	for index = initialValue ~= nil and 1 or 2, #array do
-		aggregate = operator(aggregate, array[index])
+		aggregate = operator(aggregate, array[index], index)
 	end
 	return aggregate
 end
