@@ -23,9 +23,16 @@ local prizeTypes = Table.map({
 	'USD', 'LOCAL_CURRENCY', 'POINTS', 'QUALIFIES', 'FREETEXT'
 }, function(value, name) return name, value end)
 
+local specialDataTypes = Table.map({
+	'LASTVS', 'GROUPSCORE', 'LASTVSSCORE'
+}, function(value, name) return name, value end)
+
 local prizeData = {
 	[prizeTypes.USD] = {
-		row = 'usdprize'
+		row = 'usdprize',
+		rowParse = function (input)
+			return tonumber((string.gsub(input, '[^%d.]', '')))
+		end
 	},
 	[prizeTypes.LOCAL_CURRENCY] = {
 		header = 'localcurrency',
@@ -40,7 +47,7 @@ local prizeData = {
 	[prizeTypes.QUALIFIES] = {
 		header = 'qualifies',
 		headerParse = function (input)
-			-- TODO: Add manual and automatic retrevial of additional data
+			-- TODO: Add support for manual and automatic retrevial of additional data
 			return {link = input:gsub(' ', '_')}
 		end,
 		row = 'qualified',
@@ -67,6 +74,28 @@ local prizeData = {
 		row = 'freetext',
 		rowParse = function (input)
 			return input
+		end
+	},
+}
+
+local specialData = {
+	[specialDataTypes.GROUPSCORE] = {
+		field = 'wdl',
+		parse = function (input)
+			return input
+		end
+	},
+	[specialDataTypes.LASTVS] = {
+		field = 'lastvs',
+		parse = function (input)
+			return {} -- TODO Parse properly
+		end
+	},
+	[specialDataTypes.LASTVSSCORE] = {
+		field = 'lastvsscore',
+		parse = function (input)
+			local scores = Table.mapValues(Table.mapValues(mw.text.split(input, '-'), mw.text.trim), tonumber)
+			return {score = scores[1], vsscore = scores[2]}
 		end
 	},
 }
@@ -120,6 +149,7 @@ function PrizePool:_readStandardOptions(args)
 end
 
 function PrizePool:_readPrizes(args, type)
+	-- TODO the return datastructure for row should be different. Split the functions?
 	type = type or 'row'
 	local prizes = {}
 
@@ -136,6 +166,20 @@ function PrizePool:_readPrizes(args, type)
 	end
 
 	return prizes
+end
+
+function PrizePool:_readSpecialData(args)
+	local data = {}
+
+	for enum in pairs(specialDataTypes) do
+		local type = specialData[specialDataTypes[enum]]
+		local fieldName = type.field
+		if args[fieldName] then
+			data[enum] = type.parse(args[fieldName])
+		end
+	end
+
+	return data
 end
 
 function PrizePool:_readPlacements(args)
@@ -156,7 +200,6 @@ function PrizePool:_readPlacements(args)
 			placement.placeStart = places[1]
 			placement.placeEnd = places[2] or places[1]
 		end
-
 
 		-- Parse prizes
 		placement.prizes = self:_readPrizes(placementInput)
@@ -180,7 +223,9 @@ function PrizePool:_readPlacements(args)
 			-- Parse special prizes for this opponent
 			opponent.prizes = self:_readPrizes(opponentInput)
 
-			-- TODO: parse additional data (and create enums for them)
+			-- Parse additional data (groupscore, last opponent etc)
+			opponent.data = self:_readSpecialData(opponentInput)
+
 			table.insert(placement.opponents, opponent)
 		end
 
