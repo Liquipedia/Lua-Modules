@@ -93,7 +93,7 @@ function ArrayExt.distinct(elements)
 	local byElement = {}
 	local distinctElements = {}
 	for _, element in ipairs(elements) do
-		if byElem[element] == nil then
+		if byElement[element] == nil then
 			table.insert(distinctElements, element)
 			byElement[element] = true
 		end
