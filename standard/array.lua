@@ -107,8 +107,8 @@ end
 Whether all elements in an array satisfy a predicate.
 ]]
 function Array.all(tbl, predicate)
-	for _, element in ipairs(tbl) do
-		if not predicate(element) then
+	for index, element in ipairs(tbl) do
+		if not predicate(element, index) then
 			return false
 		end
 	end
