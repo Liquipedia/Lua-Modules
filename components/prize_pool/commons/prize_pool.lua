@@ -32,7 +32,10 @@ local prizeData = {
 		headerParse = function (input)
 			return {currency = string.upper(input)}
 		end,
-		row = 'localprize'
+		row = 'localprize',
+		rowParse = function (input)
+			return tonumber((string.gsub(input, '[^%d.]', '')))
+		end
 	},
 	[prizeTypes.QUALIFIES] = {
 		header = 'qualifies',
@@ -40,7 +43,10 @@ local prizeData = {
 			-- TODO: Add manual and automatic retrevial of additional data
 			return {link = input:gsub(' ', '_')}
 		end,
-		row = 'qualified'
+		row = 'qualified',
+		rowParse = function (input)
+			return Logic.readBool(input)
+		end
 	},
 	[prizeTypes.POINTS] = {
 		header = 'points',
@@ -48,14 +54,20 @@ local prizeData = {
 			local pointsData = mw.loadData('Module:Points/data')
 			return pointsData[input] or {title = 'Points'}
 		end,
-		row = 'points'
+		row = 'points',
+		rowParse = function (input)
+			return tonumber((string.gsub(input, '[^%d.]', '')))
+		end
 	},
 	[prizeTypes.FREETEXT] = {
 		header = 'freetext',
 		headerParse = function (input)
 			return {title = input}
 		end,
-		row = 'freetext'
+		row = 'freetext',
+		rowParse = function (input)
+			return input
+		end
 	},
 }
 
@@ -79,7 +91,7 @@ end
 
 function PrizePool:readInput(args)
 	self.options = self:_readStandardOptions(args)
-	self.prizes = self:_readStandardPrizes(args)
+	self.prizes = self:_readPrizes(args, 'header')
 	if self.options.showUSD then
 		self:addPrize('USD', 1)
 	end
@@ -95,38 +107,39 @@ function PrizePool:create()
 end
 
 function PrizePool:_readStandardOptions(args)
-	self.options = {}
+	local options = {}
 
-	self:setOption('autoUSD', Logic.nilOr(Logic.readBoolOrNil(args.autousd), true))
-	self:setOption('showUSD', Logic.nilOr(Logic.readBoolOrNil(args.showusd), true)) -- TODO: Improve
-	self:setOption('prizeSummary', Logic.nilOr(Logic.readBoolOrNil(args.prizesummary), true))
-	self:setOption('exchangeInfo', Logic.nilOr(Logic.readBoolOrNil(args.exchangeinfo), true))
-	self:setOption('storeSmw', Logic.nilOr(Logic.readBoolOrNil(args.storesmw), true))
-	self:setOption('storeLpdb', Logic.nilOr(Logic.readBoolOrNil(args.storelpdb), true))
+	self:setOption('autoUSD', Logic.nilOr(Logic.readBoolOrNil(args.autousd), true), options)
+	self:setOption('showUSD', Logic.nilOr(Logic.readBoolOrNil(args.showusd), true), options) -- TODO: Improve
+	self:setOption('prizeSummary', Logic.nilOr(Logic.readBoolOrNil(args.prizesummary), true), options)
+	self:setOption('exchangeInfo', Logic.nilOr(Logic.readBoolOrNil(args.exchangeinfo), true), options)
+	self:setOption('storeSmw', Logic.nilOr(Logic.readBoolOrNil(args.storesmw), true), options)
+	self:setOption('storeLpdb', Logic.nilOr(Logic.readBoolOrNil(args.storelpdb), true), options)
 
-	return self.options
+	return options
 end
 
-function PrizePool:_readStandardPrizes(args)
-	self.prizes = {}
+function PrizePool:_readPrizes(args, type)
+	type = type or 'row'
+	local prizes = {}
 
 	for prizeEnum in pairs(prizeTypes) do
 		local prizeDatum = prizeData[prizeTypes[prizeEnum]]
-		local fieldName = prizeDatum.header
+		local fieldName = prizeDatum[type]
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				local data = prizeDatum.headerParse(prizeValue)
-				self:addPrize(prizeEnum, index, data)
+				local data = prizeDatum[type ..'Parse'](prizeValue)
+				self:addPrize(prizeEnum, index, data, prizes)
 			end
 		end
 	end
 
-	return self.prizes
+	return prizes
 end
 
 function PrizePool:_readPlacements(args)
-	self.placements = {}
+	local placements = {}
 
 	local currentPlace = 0
 	for placementIndex = 1, math.huge do
@@ -145,8 +158,8 @@ function PrizePool:_readPlacements(args)
 		end
 
 
-		-- TODO: Parse prizes
-		placement.prizes = {}
+		-- Parse prizes
+		placement.prizes = self:_readPrizes(placementInput)
 
 		-- Parse opponents in the placement
 		placement.opponents = {}
@@ -155,13 +168,18 @@ function PrizePool:_readPlacements(args)
 			if not opponentInput then -- TODO: always iterate until the end placeEnd, if given
 				break
 			end
-			opponentInput.type = opponentInput.type or self.opponentType
 
 			local opponent = {opponentData = {}, prizes = {}, data = {}}
+
+			-- Parse Opponent Data
 			-- TODO: Add support to use wiki specific opponent modules
+			opponentInput.type = opponentInput.type or self.opponentType
 			opponent.opponentData = Opponent.readOpponentArgs(opponentInput) or Opponent.tbd()
 			opponent.date = opponentInput.date
-			-- TODO: parse special prizes
+
+			-- Parse special prizes for this opponent
+			opponent.prizes = self:_readPrizes(opponentInput)
+
 			-- TODO: parse additional data (and create enums for them)
 			table.insert(placement.opponents, opponent)
 		end
@@ -175,32 +193,33 @@ function PrizePool:_readPlacements(args)
 		assert(placement.placeStart and placement.placeEnd, 'readPlacements: Invalid |place= provided.')
 		assert(#placement.opponents > placement.placeEnd - placement.placeStart, 'readPlacements: Too many opponents')
 		currentPlace = placement.placeEnd
-		table.insert(self.placements, placement)
+		table.insert(placements, placement)
 	end
 
-	return self.placements
+	return placements
 end
 
-function PrizePool:setOption(option, value)
-	self.options[option] = value
+function PrizePool:setOption(option, value, list)
+	list = list or self.options
+	list[option] = value
 	return self
 end
 
 -- TODO extract parts of this to the future Enum class
 local CUSTOM_TYPES_OFFSET = 100
 local CUSTOM_TYPES_USED = 0
-function PrizePool:addPrizeType(enum, data)
+function PrizePool:addCustomPrizeType(enum, data)
 	prizeTypes[enum] = CUSTOM_TYPES_OFFSET + CUSTOM_TYPES_USED
 	CUSTOM_TYPES_USED = CUSTOM_TYPES_USED + 1
 	prizeData[prizeTypes[enum]] = data
 	return self
 end
 
-function PrizePool:addPrize(enum, index, data)
+function PrizePool:addPrize(enum, index, data, list)
 	assert(prizeTypes[enum], 'addPrize: Not a valid prizeEnum!')
 	assert(Logic.isNumeric(index), 'addPrize: Index is not numeric!')
-	data = data or {}
-	table.insert(self.prizes, {id = enum .. index, enum = enum, index = index, data = data})
+	list = list or self.prizes
+	table.insert(list, {id = enum .. index, enum = enum, index = index, data = data})
 	return self
 end
 
