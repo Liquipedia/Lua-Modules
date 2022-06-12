@@ -132,9 +132,9 @@ Finds the first element in an array satisfying a predicate. Returs nil if no
 element satisfies the predicate.
 ]]
 function Array.find(tbl, predicate)
-	for ix, x in ipairs(tbl) do
-		if predicate(x, ix) then
-			return x
+	for index, element in ipairs(tbl) do
+		if predicate(element, index) then
+			return element
 		end
 	end
 	return nil
