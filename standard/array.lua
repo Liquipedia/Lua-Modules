@@ -155,15 +155,17 @@ Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 function Array.groupBy(tbl, f)
 	local groupsByKey = {}
 	local groups = {}
-	for _, x in ipairs(tbl) do
-		local y = f(x)
-		local group = groupsByKey[y]
-		if not group then
-			group = {}
-			groupsByKey[y] = group
-			table.insert(groups, group)
+	for index, xValue in ipairs(tbl) do
+		local yValue = f(xValue, index)
+		if yValue then
+			local group = groupsByKey[yValue]
+			if not group then
+				group = {}
+				groupsByKey[yValue] = group
+				table.insert(groups, group)
+			end
+			table.insert(group, xValue)
 		end
-		table.insert(group, x)
 	end
 
 	return groups, groupsByKey
