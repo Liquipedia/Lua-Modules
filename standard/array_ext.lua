@@ -1,18 +1,3 @@
----
--- @Liquipedia
--- wiki=commons
--- page=Module:Array/Ext
---
--- Please see https://github.com/Liquipedia/Lua-Modules to contribute
---
-
-local Logic = require('Module:Logic')
-
---[[
-Namespace of array functions that aren't as commonly used as ones in
-Module:Array
-]]
-local ArrayExt = {}
 
 --[[
 Finds the index of the element in an array satisfying a predicate. Returs 0
@@ -20,7 +5,7 @@ if no element satisfies the predicate.
 
 Example:
 
-ArrayExt.findIndex({3, 5, 4, 6, 7}, function(x) return x % 2 == 0 end)
+Array.findIndex({3, 5, 4, 6, 7}, function(x) return x % 2 == 0 end)
 -- returns 3
 ]]
 ---@generic V
@@ -42,7 +27,7 @@ distinct element, or if the array is empty.
 
 Example:
 
-ArrayExt.uniqueElement({4, 4, 4})
+Array.uniqueElement({4, 4, 4})
 -- Returns 4
 ]]
 ---@generic V
@@ -67,7 +52,7 @@ The optional equals parameter specifies the equality relation of the
 transformed elements.
 
 Example:
-ArrayExt.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
+Array.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
 -- returns {{2}, {3, 5, 7}, {14, 16}}
 ]]
 ---@generic V, T
@@ -97,7 +82,7 @@ Returns distinct elements of an array.
 
 Example:
 
-ArrayExt.distinct({4, 5, 4, 3})
+Array.distinct({4, 5, 4, 3})
 -- Returns {4, 5, 3}
 ]]
 ---@generic V
@@ -115,4 +100,4 @@ function ArrayExt.distinct(elements)
 	return distinctElements
 end
 
-return ArrayExt
+return Array
