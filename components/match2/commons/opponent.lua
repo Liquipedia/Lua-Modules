@@ -343,4 +343,78 @@ function Opponent.fromMatch2Record(record)
 	end
 end
 
+--[[
+Reads an opponent struct and builds a storage struct for standing/prizePool from it
+]]
+function Opponent.toLpdbStruct(opponent, resolveTeamToPageName)
+	local storageStruct = {
+		opponentname = opponent.name,
+		opponenttemplate = opponent.template,
+		opponenttype = opponent.type,
+	}
+
+	if opponent.type == Opponent.team then
+		if resolveTeamToPageName then
+			storageStruct.opponentname = Opponent.teamTemplateResolveRedirect(template)
+		end
+	elseif Opponent.typeIsParty(opponent.type) then
+		local players = {}
+		for playerIndex, player in ipairs(opponent.players) do
+			players['p' .. playerIndex .. 'dn'] = player.displayName
+			players['p' .. playerIndex .. 'flag'] = player.flag
+			players['p' .. playerIndex] = player.pageName
+			players['p' .. playerIndex .. 'team'] = resolveTeamToPageName
+				and Opponent.teamTemplateResolveRedirect(player.team)
+				or player.team
+			players['p' .. playerIndex .. 'template'] = resolveTeamToPageName
+				and player.team or nil
+		end
+		storageStruct.opponentplayers = players
+	end
+
+	return storageStruct
+end
+
+function Opponent.teamTemplateResolveRedirect(template)
+	if String.isEmpy(template) then
+		return nil
+	end
+
+	if mw.ext.TeamTemplate.teamexists(template) then
+		local page = mw.ext.TeamTemplate.raw(pageName).page
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(page)
+	end
+
+	return template
+end
+
+--[[
+Reads a standing/prizePool storage struct and builds an opponent struct from it
+]]
+function Opponent.fromLpdbStruct(storageStruct)
+	local partySize = Opponent.partySize(storageStruct.type)
+	if partySize then
+		local players = storageStruct.opponentplayers
+		local function playerFromLpdbStruct(playerIndex)
+			return {
+				displayName = players['p' .. playerIndex .. 'dn'],
+				flag = Flags.CountryName(players['p' .. playerIndex .. 'flag']),
+				pageName = players['p' .. playerIndex],
+				team = players['p' .. playerIndex .. 'team'],
+			}
+		end
+		local opponent = {
+			players = Array.map(Array.range(1, partySize), playerFromLpdbStruct),
+			type = storageStruct.type,
+		}
+		return opponent
+	else
+		return {
+			name = storageStruct.opponentname,
+			template = storageStruct.opponenttemplate,
+			type = storageStruct.opponenttype,
+		}
+	end
+end
+
 return Opponent
