@@ -12,11 +12,14 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent') -- Note: This can be overwritten
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 -- local LpdbInjector = Lua.import('Module...', {requireDevIfEnabled = true})
 
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
+
+local TODAY = os.date('%Y-%m-%d')
 
 -- TODO: Extract Enum handling to its own Module
 local prizeTypes = Table.map({
@@ -88,7 +91,8 @@ local specialData = {
 	[specialDataTypes.LASTVS] = {
 		field = 'lastvs',
 		parse = function (prizePool, input)
-			return prizePool:_parseOpponentArgs(input) -- TODO: Inherit date from above
+			-- TODO: Add option to inherit date from opponent instead of just global
+			return prizePool:_parseOpponentArgs(input)
 		end
 	},
 	[specialDataTypes.LASTVSSCORE] = {
@@ -104,6 +108,7 @@ function PrizePool:init(args)
 	self.args = args
 	self.pagename = mw.title.getCurrentTitle().text
 	self.args.type = Json.parseIfString(self.args.type)
+	self.date = args.date or Variables.varDefaultMulti('tournament_enddate', 'tournament_edate', 'edate', TODAY)
 	if args.opponentLibrary then
 		Opponent = require('Module:'.. args.opponentLibrary)
 	end
@@ -264,6 +269,7 @@ end
 function PrizePool:_parseOpponentArgs(input, date)
 	local opponentArgs = Json.parseIfTable(input) or (type(input) == 'table' and input or {input})
 	opponentArgs.type = opponentArgs.type or self.opponentType
+	opponentArgs.date = opponentArgs.date or self.date
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
 	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd()
 	return Opponent.resolve(opponentData, date)
