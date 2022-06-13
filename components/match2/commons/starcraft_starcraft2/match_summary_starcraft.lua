@@ -245,10 +245,18 @@ function StarcraftMatchSummary.Game(game, config)
 			:wikitext(game.comment)
 	end
 
+	local serverNode
+	if (game.extradata or {}).server then
+		serverNode = html.create('div')
+			:addClass('brkts-popup-sc-game-comment')
+			:wikitext('Played server: ' .. game.extradata.server)
+	end
+
 	local gameNode = html.create('div')
 		:addClass('brkts-popup-sc-game')
 		:node(game.header and StarcraftMatchSummary.GameHeader({header = game.header}) or nil)
 		:node(bodyNode)
+		:node(serverNode)
 		:node(commentNode)
 
 	return gameNode

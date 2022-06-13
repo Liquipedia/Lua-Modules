@@ -767,8 +767,9 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map.extradata = {
 		comment = map.comment or '',
 		header = map.header or '',
+		isSubMatch = 'false',
 		noQuery = match.noQuery,
-		isSubMatch = 'false'
+		server = map.server,
 	}
 
 	-- inherit stuff from match data
