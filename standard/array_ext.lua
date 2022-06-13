@@ -81,8 +81,7 @@ function ArrayExt.groupAdjacentBy(array, f, equals)
 end
 
 --[[
-Returns distinct elements of an array. Returns nil if there is more than one
-distinct element, or if the array is empty.
+Returns distinct elements of an array.
 
 Example:
 
