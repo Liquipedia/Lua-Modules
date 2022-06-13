@@ -74,7 +74,6 @@ function Infobox:build(widgets)
 		self.root:node(self.adbox)
 		Variables.varDefine('is_first_infobox', 'false')
 	end
-	
 	if self.bottomContent ~= nil then
 		self.root:node(self.bottomContent)
 	end
