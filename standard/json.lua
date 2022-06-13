@@ -6,20 +6,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local json = {}
+local Json = {}
 
 local Arguments = require('Module:Arguments')
 
-function json.fromArgs(frame)
+function Json.fromArgs(frame)
 	local args = Arguments.getArgs(frame)
-	return json.stringify(args)
+	return Json.stringify(args)
 end
 
-function json.stringify(obj, pretty)
+function Json.stringify(obj, pretty)
 	return mw.text.jsonEncode(obj, pretty == true and mw.text.JSON_PRETTY or nil)
 end
 
-function json.parse(obj)
+function Json.parse(obj)
 	local parse = function(object) return mw.text.jsonDecode(object, mw.text.JSON_TRY_FIXING) end
 	local status, res = pcall(parse, obj);
 	if status then
@@ -32,9 +32,9 @@ function json.parse(obj)
 	end
 end
 
-function json.parseIfString(obj)
+function Json.parseIfString(obj)
 	if type(obj) == 'string' then
-		return json.parse(obj)
+		return Json.parse(obj)
 	else
 		return obj
 	end
@@ -49,7 +49,7 @@ JsonExt.parseIfTable('{"a" = 3}')
 -- Returns {a = 3}
 
 ]]
-function json.parseIfTable(any)
+function Json.parseIfTable(any)
 	if type(any) == 'string' then
 		local firstChar = any:sub(1, 1)
 		if firstChar == '{' or firstChar == '[' then
@@ -62,4 +62,4 @@ function json.parseIfTable(any)
 	return nil
 end
 
-return json
+return Json
