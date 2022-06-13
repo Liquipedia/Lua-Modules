@@ -107,8 +107,8 @@ end
 Whether all elements in an array satisfy a predicate.
 ]]
 function Array.all(tbl, predicate)
-	for _, element in ipairs(tbl) do
-		if not predicate(element) then
+	for index, element in ipairs(tbl) do
+		if not predicate(element, index) then
 			return false
 		end
 	end
@@ -119,8 +119,8 @@ end
 Whether any elements in an array satisfies a predicate.
 ]]
 function Array.any(tbl, predicate)
-	for _, element in ipairs(tbl) do
-		if predicate(element) then
+	for index, element in ipairs(tbl) do
+		if predicate(element, index) then
 			return true
 		end
 	end
@@ -155,8 +155,8 @@ Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 function Array.groupBy(tbl, funct)
 	local groupsByKey = {}
 	local groups = {}
-	for _, xValue in ipairs(tbl) do
-		local yValue = funct(xValue)
+	for index, xValue in ipairs(tbl) do
+		local yValue = funct(xValue, index)
 		if yValue then
 			local group = groupsByKey[yValue]
 			if not group then
@@ -380,7 +380,7 @@ function Array.reduce(array, operator, initialValue)
 	end
 
 	for index = initialValue ~= nil and 1 or 2, #array do
-		aggregate = operator(aggregate, array[index])
+		aggregate = operator(aggregate, array[index], index)
 	end
 	return aggregate
 end
@@ -393,8 +393,8 @@ function Array.maxBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
 	local max, maxScore
-	for _, item in ipairs(array) do
-		local score = funct(item)
+	for index, item in ipairs(array) do
+		local score = funct(item, index)
 		if max == nil or compare(maxScore, score) then
 			max = item
 			maxScore = score
@@ -418,8 +418,8 @@ function Array.minBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
 	local min, minScore
-	for _, item in ipairs(array) do
-		local score = funct(item)
+	for index, item in ipairs(array) do
+		local score = funct(item, index)
 		if min == nil or compare(score, minScore) then
 			min = item
 			minScore = score
