@@ -74,8 +74,8 @@ Array.filter({1, 2, 3}, function(x) return x % 2 == 1 end)
 ]]
 function Array.filter(tbl, predicate)
 	local filteredArray = {}
-	for funct, element in ipairs(tbl) do
-		if predicate(element, funct) then
+	for index, element in ipairs(tbl) do
+		if predicate(element, index) then
 			table.insert(filteredArray, element)
 		end
 	end
