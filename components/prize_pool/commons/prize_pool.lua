@@ -33,49 +33,49 @@ local specialDataTypes = Table.map({
 local prizeData = {
 	[prizeTypes.USD] = {
 		row = 'usdprize',
-		rowParse = function (prizePool, input)
+		rowParse = function (prizePool, input, context)
 			return prizePool:_parseInteger(input)
 		end
 	},
 	[prizeTypes.LOCAL_CURRENCY] = {
 		header = 'localcurrency',
-		headerParse = function (prizePool, input)
+		headerParse = function (prizePool, input, context)
 			return {currency = string.upper(input)}
 		end,
 		row = 'localprize',
-		rowParse = function (prizePool, input)
+		rowParse = function (prizePool, input, context)
 			return prizePool:_parseInteger(input)
 		end
 	},
 	[prizeTypes.QUALIFIES] = {
 		header = 'qualifies',
-		headerParse = function (prizePool, input)
+		headerParse = function (prizePool, input, context)
 			-- TODO: Add support for manual and automatic retrevial of additional data
 			return {link = input:gsub(' ', '_')}
 		end,
 		row = 'qualified',
-		rowParse = function (prizePool, input)
+		rowParse = function (prizePool, input, context)
 			return Logic.readBool(input)
 		end
 	},
 	[prizeTypes.POINTS] = {
 		header = 'points',
-		headerParse = function (prizePool, input)
+		headerParse = function (prizePool, input, context)
 			local pointsData = mw.loadData('Module:Points/data')
 			return pointsData[input] or {title = 'Points'}
 		end,
 		row = 'points',
-		rowParse = function (prizePool, input)
-			return PrizePool:_parseInteger(input)
+		rowParse = function (prizePool, input, context)
+			return prizePool:_parseInteger(input)
 		end
 	},
 	[prizeTypes.FREETEXT] = {
 		header = 'freetext',
-		headerParse = function (prizePool, input)
+		headerParse = function (prizePool, input, context)
 			return {title = input}
 		end,
 		row = 'freetext',
-		rowParse = function (prizePool, input)
+		rowParse = function (prizePool, input, context)
 			return input
 		end
 	},
@@ -84,20 +84,19 @@ local prizeData = {
 local specialData = {
 	[specialDataTypes.GROUPSCORE] = {
 		field = 'wdl',
-		parse = function (prizePool, input)
+		parse = function (prizePool, input, context)
 			return input
 		end
 	},
 	[specialDataTypes.LASTVS] = {
 		field = 'lastvs',
-		parse = function (prizePool, input)
-			-- TODO: Add option to inherit date from opponent instead of just global
-			return prizePool:_parseOpponentArgs(input)
+		parse = function (prizePool, input, context)
+			return prizePool:_parseOpponentArgs(input, context.date)
 		end
 	},
 	[specialDataTypes.LASTVSSCORE] = {
 		field = 'lastvsscore',
-		parse = function (prizePool, input)
+		parse = function (prizePool, input, context)
 			local scores = Table.mapValues(Table.mapValues(mw.text.split(input, '-'), mw.text.trim), tonumber)
 			return {score = scores[1], vsscore = scores[2]}
 		end
@@ -165,7 +164,7 @@ function PrizePool:_readPrizes(args)
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				local data = prizeDatum.headerParse(self, prizeValue)
+				local data = prizeDatum.headerParse(self, prizeValue, args)
 				self:addPrize(prizeEnum, index, data, prizes)
 			end
 		end
@@ -183,7 +182,7 @@ function PrizePool:_readPrizeRewards(args)
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, rewardValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				rewards[prizeEnum .. index] = prizeDatum.rowParse(self, rewardValue)
+				rewards[prizeEnum .. index] = prizeDatum.rowParse(self, rewardValue, args)
 			end
 		end
 	end
@@ -198,7 +197,7 @@ function PrizePool:_readSpecialData(args)
 		local type = specialData[specialDataTypes[enum]]
 		local fieldName = type.field
 		if args[fieldName] then
-			data[enum] = type.parse(self, args[fieldName])
+			data[enum] = type.parse(self, args[fieldName], args)
 		end
 	end
 
@@ -239,14 +238,16 @@ function PrizePool:_readPlacements(args)
 
 			-- Parse Opponent Data
 			opponentInput.type = opponentInput.type or self.opponentType
-			opponent.date = opponentInput.date
-			opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponent.date)
+			opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponentInput.date)
 
 			-- Parse special prizes for this opponent
 			opponent.prizes = self:_readPrizeRewards(opponentInput)
 
 			-- Parse additional data (groupscore, last opponent etc)
 			opponent.data = self:_readSpecialData(opponentInput)
+
+			-- Set the date
+			opponent.date = opponentInput.date
 
 			table.insert(placement.opponents, opponent)
 		end
@@ -269,7 +270,7 @@ end
 function PrizePool:_parseOpponentArgs(input, date)
 	local opponentArgs = Json.parseIfTable(input) or (type(input) == 'table' and input or {input})
 	opponentArgs.type = opponentArgs.type or self.opponentType
-	opponentArgs.date = opponentArgs.date or self.date
+	opponentArgs.date = date or self.date
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
 	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd()
 	return Opponent.resolve(opponentData, date)
