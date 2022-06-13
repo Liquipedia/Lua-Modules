@@ -73,4 +73,35 @@ function StarcraftOpponent.fromMatch2Record(record)
 	return opponent
 end
 
+function StarcraftOpponent.toLpdbStruct(opponent)
+	local storageStruct = Opponent.toLpdbStruct(opponent, true)
+
+	if Opponent.typeIsParty(opponent.type) then
+		if opponent.isArchon then
+			storageStruct.players.isArchon = true
+			storageStruct.players.faction = opponent.players[1].race
+		else
+			for playerIndex, player in pairs(opponent.players) do
+				storageStruct.players['p' .. playerIndex .. 'faction'] = player.race
+			end
+		end
+	end
+
+	return storageStruct
+end
+
+function StarcraftOpponent.fromLpdbStruct(storageStruct)
+	local opponent = Opponent.fromLpdbStruct(storageStruct)
+
+	if Opponent.partySize(storageStruct.opponenttype) then
+		opponent.isArchon = storageStruct.players.isArchon
+		for playerIndex, player in pairs(opponent.players) do
+			player.race = storageStruct['p' .. playerIndex .. 'faction']
+				or storageStruct.faction
+		end
+	end
+
+	return opponent
+end
+
 return StarcraftOpponent
