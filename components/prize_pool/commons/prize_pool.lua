@@ -10,12 +10,11 @@ local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent') -- Note: This can be overwritten
 local Table = require('Module:Table')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 -- local LpdbInjector = Lua.import('Module...', {requireDevIfEnabled = true})
-
-local DEFAULT_OPPONENT_LIBRARY = 'Opponent'
 
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
 
@@ -105,13 +104,15 @@ function PrizePool:init(args)
 	self.args = args
 	self.pagename = mw.title.getCurrentTitle().text
 	self.args.type = Json.parseIfString(self.args.type)
-	self.opponentLibrary = require('Module:'.. (args.opponentLibrary or DEFAULT_OPPONENT_LIBRARY) ..'')
+	if args.opponentLibrary then
+		Opponent = require('Module:'.. args.opponentLibrary)
+	end
 
 	if not self.args.type then
 		return error('Please provide a type!')
 	elseif type(self.args.type) ~= 'table' or not self.args.type.type then
 		return error('Could not parse type!')
-	elseif not self.opponentLibrary.isType(self.args.type.type) then
+	elseif not Opponent.isType(self.args.type.type) then
 		return error('Not a valid type!')
 	end
 
@@ -263,9 +264,9 @@ end
 function PrizePool:_parseOpponentArgs(input, date)
 	local opponentArgs = Json.parseIfTable(input) or (type(input) == 'table' and input or {input})
 	opponentArgs.type = opponentArgs.type or self.opponentType
-	assert(self.opponentLibrary.isType(opponentArgs.type), 'Invalid type')
-	local opponentData = self.opponentLibrary.readOpponentArgs(opponentArgs) or self.opponentLibrary.tbd()
-	return self.opponentLibrary.resolve(opponentData, date)
+	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
+	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd()
+	return Opponent.resolve(opponentData, date)
 end
 
 function PrizePool:setOption(option, value, list)
