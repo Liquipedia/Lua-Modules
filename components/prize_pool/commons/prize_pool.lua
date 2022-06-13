@@ -10,11 +10,12 @@ local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 -- local LpdbInjector = Lua.import('Module...', {requireDevIfEnabled = true})
+
+local DEFAULT_OPPONENT_LIBRARY = 'Opponent'
 
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
 
@@ -104,12 +105,13 @@ function PrizePool:init(args)
 	self.args = args
 	self.pagename = mw.title.getCurrentTitle().text
 	self.args.type = Json.parseIfString(self.args.type)
+	self.opponentLibrary = require('Module:'.. (args.opponentLibrary or DEFAULT_OPPONENT_LIBRARY) ..'')
 
 	if not self.args.type then
 		return error('Please provide a type!')
 	elseif type(self.args.type) ~= 'table' or not self.args.type.type then
 		return error('Could not parse type!')
-	elseif not Opponent.isType(self.args.type.type) then
+	elseif not self.opponentLibrary.isType(self.args.type.type) then
 		return error('Not a valid type!')
 	end
 
@@ -232,7 +234,7 @@ function PrizePool:_readPlacements(args)
 			-- Parse Opponent Data
 			-- TODO: Add support to use wiki specific opponent modules
 			opponentInput.type = opponentInput.type or self.opponentType
-			opponent.opponentData = Opponent.readOpponentArgs(opponentInput) or Opponent.tbd()
+			opponent.opponentData = self.opponentLibrary.readOpponentArgs(opponentInput) or self.opponentLibrary.tbd()
 			opponent.date = opponentInput.date
 
 			-- Parse special prizes for this opponent
