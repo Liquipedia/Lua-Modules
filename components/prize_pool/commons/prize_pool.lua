@@ -112,7 +112,7 @@ local specialData = {
 	[specialDataTypes.LASTVSSCORE] = {
 		field = 'lastvsscore',
 		parse = function (prizePool, input, context)
-			local scores = Table.mapValues(Table.mapValues(mw.text.split(input, '-'), mw.text.trim), tonumber)
+			local scores = Table.mapValues(mw.text.split(input, '-'), tonumber)
 			return {score = scores[1], vsscore = scores[2]}
 		end
 	},
@@ -234,8 +234,7 @@ function PrizePool:_readPlacements(args)
 		local placement = {}
 		-- Parse place, explicit
 		if placementInput.place then
-			local places = Table.mapValues(mw.text.split(placementInput.place, '-'), mw.text.trim)
-			places = Table.mapValues(places, tonumber)
+			local places = Table.mapValues(mw.text.split(placementInput.place, '-'), tonumber)
 			placement.placeStart = places[1]
 			placement.placeEnd = places[2] or places[1]
 		end
@@ -247,25 +246,28 @@ function PrizePool:_readPlacements(args)
 		placement.opponents = {}
 		for opponentIndex = 1, math.huge do
 			local opponentInput = Json.parseIfString(placementInput[opponentIndex])
-			if not opponentInput then -- TODO: always iterate until the end placeEnd, if given
-				break
-			end
-
 			local opponent = {opponentData = {}, prizes = {}, data = {}}
+			if not opponentInput then
+				-- If given a range of opponents, add them all, even if they're missing from the input
+				if not placementInput.place or placement.placeStart + opponentIndex > placement.placeEnd + 1 then
+					break
+				else
+					opponent.opponentData = Opponent.tbd()
+				end
+			else
+				-- Parse Opponent Data
+				opponentInput.type = opponentInput.type or self.opponentType
+				opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponentInput.date)
 
-			-- Parse Opponent Data
-			opponentInput.type = opponentInput.type or self.opponentType
-			opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponentInput.date)
+				-- Parse special prizes for this opponent
+				opponent.prizes = self:_readPrizeRewards(opponentInput)
 
-			-- Parse special prizes for this opponent
-			opponent.prizes = self:_readPrizeRewards(opponentInput)
+				-- Parse additional data (groupscore, last opponent etc)
+				opponent.data = self:_readSpecialData(opponentInput)
 
-			-- Parse additional data (groupscore, last opponent etc)
-			opponent.data = self:_readSpecialData(opponentInput)
-
-			-- Set the date
-			opponent.date = opponentInput.date
-
+				-- Set the date
+				opponent.date = opponentInput.date
+			end
 			table.insert(placement.opponents, opponent)
 		end
 
