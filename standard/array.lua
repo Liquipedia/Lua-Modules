@@ -155,8 +155,8 @@ Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 function Array.groupBy(tbl, funct)
 	local groupsByKey = {}
 	local groups = {}
-	for index, xValue in ipairs(tbl) do
-		local yValue = funct(xValue, index)
+	for _, xValue in ipairs(tbl) do
+		local yValue = funct(xValue)
 		if yValue then
 			local group = groupsByKey[yValue]
 			if not group then
@@ -380,7 +380,7 @@ function Array.reduce(array, operator, initialValue)
 	end
 
 	for index = initialValue ~= nil and 1 or 2, #array do
-		aggregate = operator(aggregate, array[index], index)
+		aggregate = operator(aggregate, array[index])
 	end
 	return aggregate
 end
@@ -393,8 +393,8 @@ function Array.maxBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
 	local max, maxScore
-	for index, item in ipairs(array) do
-		local score = funct(item, index)
+	for _, item in ipairs(array) do
+		local score = funct(item)
 		if max == nil or compare(maxScore, score) then
 			max = item
 			maxScore = score
@@ -418,8 +418,8 @@ function Array.minBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
 	local min, minScore
-	for index, item in ipairs(array) do
-		local score = funct(item, index)
+	for _, item in ipairs(array) do
+		local score = funct(item)
 		if min == nil or compare(score, minScore) then
 			min = item
 			minScore = score
