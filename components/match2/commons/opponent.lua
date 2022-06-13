@@ -289,19 +289,29 @@ function Opponent.readOpponentArgs(args)
 		}
 
 	elseif partySize == 1 then
+		local playerTeam = args.team or args.p1team
+		if playerTeam then
+			playerTeam = playerTeam:lower():gsub('_', ' ')
+		end
 		local player = {
 			displayName = args[1] or args.p1 or args.name or '',
-			flag = String.nilIfEmpty(Flags.CountryName(args.flag)),
-			pageName = args.link,
+			flag = String.nilIfEmpty(Flags.CountryName(args.flag or args.p1flag)),
+			pageName = args.link or args.p1link,
+			team = playerTeam,
 		}
 		return {type = Opponent.solo, players = {player}}
 
 	elseif partySize then
-		local players = Array.map(Array.range(1, partySize), function(i)
+		local players = Array.map(Array.range(1, partySize), function(playerIndex)
+			local playerTeam = args['p' .. playerIndex .. 'team']
+			if playerTeam then
+				playerTeam = playerTeam:lower():gsub('_', ' ')
+			end
 			return {
-				displayName = args[i] or args['p' .. i] or '',
-				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. i .. 'flag'])),
-				pageName = args['p' .. i .. 'link'],
+				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
+				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. playerIndex .. 'flag'])),
+				pageName = args['p' .. playerIndex .. 'link'],
+				team = playerTeam,
 			}
 		end)
 		return {type = args.type, players = players}
