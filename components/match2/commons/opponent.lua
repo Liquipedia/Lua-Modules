@@ -278,7 +278,7 @@ Template:LiteralOpponent, and etc.
 Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
-function Opponent.readOpponentArgs(args)
+function Opponent.readOpponentArgs(args, date)
 	local partySize = Opponent.partySize(args.type)
 
 	if args.type == Opponent.team then
@@ -292,6 +292,7 @@ function Opponent.readOpponentArgs(args)
 		local playerTeam = args.team or args.p1team
 		if playerTeam then
 			playerTeam = playerTeam:lower():gsub('_', ' ')
+			playerTeam = TeamTemplate.resolve(playerTeam, date)
 		end
 		local player = {
 			displayName = args[1] or args.p1 or args.name or '',
