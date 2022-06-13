@@ -90,12 +90,12 @@ ArrayExt.distinct({4, 5, 4, 3})
 -- Returns {4, 5, 3}
 ]]
 function ArrayExt.distinct(elements)
-	local byElement = {}
+	local elementCache = {}
 	local distinctElements = {}
 	for _, element in ipairs(elements) do
-		if byElement[element] == nil then
+		if elementCache[element] == nil then
 			table.insert(distinctElements, element)
-			byElement[element] = true
+			elementCache[element] = true
 		end
 	end
 	return distinctElements
