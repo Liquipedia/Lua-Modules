@@ -34,6 +34,7 @@ local prizeData = {
 	[prizeTypes.USD] = {
 		row = 'usdprize',
 		rowParse = function (prizePool, input, context, index)
+			prizePool.hasUSD = true
 			return prizePool:_parseInteger(input)
 		end
 	},
@@ -142,10 +143,12 @@ end
 function PrizePool:readInput(args)
 	self.options = self:_readStandardOptions(args)
 	self.prizes = self:_readPrizes(args)
-	if self.options.showUSD then
+	self.placements = self:_readPlacements(args)
+
+	if self:_hasUsdPrizePool() then
+		self:setOption('showUSD', true)
 		self:addPrize('USD', 1)
 	end
-	self.placements = self:_readPlacements(args)
 
 	return self
 end
@@ -160,7 +163,7 @@ function PrizePool:_readStandardOptions(args)
 	local options = {}
 
 	self:setOption('autoUSD', Logic.nilOr(Logic.readBoolOrNil(args.autousd), true), options)
-	self:setOption('showUSD', Logic.nilOr(Logic.readBoolOrNil(args.showusd), true), options) -- TODO: Improve
+	self:setOption('showUSD', false, options)
 	self:setOption('prizeSummary', Logic.nilOr(Logic.readBoolOrNil(args.prizesummary), true), options)
 	self:setOption('exchangeInfo', Logic.nilOr(Logic.readBoolOrNil(args.exchangeinfo), true), options)
 	self:setOption('storeSmw', Logic.nilOr(Logic.readBoolOrNil(args.storesmw), true), options)
@@ -310,7 +313,7 @@ function PrizePool:addPrize(enum, index, data, list)
 	assert(prizeTypes[enum], 'addPrize: Not a valid prizeEnum!')
 	assert(Logic.isNumeric(index), 'addPrize: Index is not numeric!')
 	list = list or self.prizes
-	table.insert(list, {id = enum .. index, enum = enum, index = index, data = data})
+	table.insert(list, {id = enum .. index, enum = prizeTypes[enum], index = index, data = data})
 	return self
 end
 
@@ -329,6 +332,12 @@ end
 function PrizePool:_parseInteger(input)
 	-- Remove all none-numeric characters (such as ,.')
 	return tonumber((string.gsub(input, '[^%d.]', '')))
+end
+
+function PrizePool:_hasUsdPrizePool()
+	return self.hasUSD or (self.options.autoUSD and Table.any(self.prizes, function (_, prize)
+		return prize.enum == prizeTypes.LOCAL_CURRENCY
+	end))
 end
 
 function PrizePool:_getTournamentInfo(pageName)
