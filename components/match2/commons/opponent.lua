@@ -355,7 +355,7 @@ function Opponent.toLpdbStruct(opponent, resolveTeamToPageName)
 
 	if opponent.type == Opponent.team then
 		if resolveTeamToPageName then
-			storageStruct.opponentname = Opponent.teamTemplateResolveRedirect(template)
+			storageStruct.opponentname = Opponent.teamTemplateResolveRedirect(opponent.template)
 		end
 	elseif Opponent.typeIsParty(opponent.type) then
 		local players = {}
@@ -381,7 +381,7 @@ function Opponent.teamTemplateResolveRedirect(template)
 	end
 
 	if mw.ext.TeamTemplate.teamexists(template) then
-		local page = mw.ext.TeamTemplate.raw(pageName).page
+		local page = mw.ext.TeamTemplate.raw(template).page
 		return mw.ext.TeamLiquidIntegration.resolve_redirect(page)
 	end
 
