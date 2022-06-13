@@ -354,7 +354,7 @@ only needed if the MatchTicker is not already displayed inside a wrapper
 ]]
 local Wrapper = Class.new(
 	function(self)
-		self.root = mw.html.create('div')
+		self.root = mw.html.create('div'):addClass('fo-nttax-infobox wiki-bordercolor-light')
 		self.elements = {}
 	end
 )
