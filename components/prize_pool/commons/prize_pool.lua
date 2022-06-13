@@ -33,49 +33,63 @@ local specialDataTypes = Table.map({
 local prizeData = {
 	[prizeTypes.USD] = {
 		row = 'usdprize',
-		rowParse = function (prizePool, input, context)
+		rowParse = function (prizePool, input, context, index)
 			return prizePool:_parseInteger(input)
 		end
 	},
 	[prizeTypes.LOCAL_CURRENCY] = {
 		header = 'localcurrency',
-		headerParse = function (prizePool, input, context)
+		headerParse = function (prizePool, input, context, index)
 			return {currency = string.upper(input)}
 		end,
 		row = 'localprize',
-		rowParse = function (prizePool, input, context)
+		rowParse = function (prizePool, input, context, index)
 			return prizePool:_parseInteger(input)
 		end
 	},
 	[prizeTypes.QUALIFIES] = {
 		header = 'qualifies',
-		headerParse = function (prizePool, input, context)
-			-- TODO: Add support for manual and automatic retrevial of additional data
-			return {link = input:gsub(' ', '_')}
+		headerParse = function (prizePool, input, context, index)
+			local link = input:gsub(' ', '_')
+			local data = {link = link}
+
+			-- Automatically retrieve information from the Tournament
+			local tournamentData = prizePool:_getTournamentInfo(link)
+			if tournamentData then
+				data.title = tournamentData.tickername
+				data.icon = tournamentData.icon
+				data.iconDark = tournamentData.icondark
+			end
+
+			-- Manual override
+			local prefix = 'qualifies' .. index
+			data.title = context[prefix .. 'name'] or data.title
+
+			return data
 		end,
 		row = 'qualified',
-		rowParse = function (prizePool, input, context)
+		rowParse = function (prizePool, input, context, index)
 			return Logic.readBool(input)
 		end
 	},
 	[prizeTypes.POINTS] = {
 		header = 'points',
-		headerParse = function (prizePool, input, context)
+		headerParse = function (prizePool, input, context, index)
 			local pointsData = mw.loadData('Module:Points/data')
 			return pointsData[input] or {title = 'Points'}
 		end,
 		row = 'points',
-		rowParse = function (prizePool, input, context)
+		rowParse = function (prizePool, input, context, index)
 			return prizePool:_parseInteger(input)
 		end
 	},
 	[prizeTypes.FREETEXT] = {
 		header = 'freetext',
-		headerParse = function (prizePool, input, context)
+		headerParse = function (prizePool, input, context, index)
 			return {title = input}
 		end,
 		row = 'freetext',
-		rowParse = function (prizePool, input, context)
+		rowParse = function (prizePool, input, context, index)
 			return input
 		end
 	},
@@ -164,7 +178,7 @@ function PrizePool:_readPrizes(args)
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				local data = prizeDatum.headerParse(self, prizeValue, args)
+				local data = prizeDatum.headerParse(self, prizeValue, args, index)
 				self:addPrize(prizeEnum, index, data, prizes)
 			end
 		end
@@ -182,7 +196,7 @@ function PrizePool:_readPrizeRewards(args)
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, rewardValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				rewards[prizeEnum .. index] = prizeDatum.rowParse(self, rewardValue, args)
+				rewards[prizeEnum .. index] = prizeDatum.rowParse(self, rewardValue, args, index)
 			end
 		end
 	end
@@ -315,6 +329,13 @@ end
 function PrizePool:_parseInteger(input)
 	-- Remove all none-numeric characters (such as ,.')
 	return tonumber((string.gsub(input, '[^%d.]', '')))
+end
+
+function PrizePool:_getTournamentInfo(pageName)
+	return mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = '[[pagename::' .. pageName .. ']]',
+		limit = 1,
+	})[1]
 end
 
 return PrizePool
