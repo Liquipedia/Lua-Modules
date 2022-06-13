@@ -31,7 +31,7 @@ local prizeData = {
 	[prizeTypes.USD] = {
 		row = 'usdprize',
 		rowParse = function (input)
-			return tonumber((string.gsub(input, '[^%d.]', '')))
+			return PrizePool:_parseInteger(input)
 		end
 	},
 	[prizeTypes.LOCAL_CURRENCY] = {
@@ -41,7 +41,7 @@ local prizeData = {
 		end,
 		row = 'localprize',
 		rowParse = function (input)
-			return tonumber((string.gsub(input, '[^%d.]', '')))
+			return PrizePool:_parseInteger(input)
 		end
 	},
 	[prizeTypes.QUALIFIES] = {
@@ -63,7 +63,7 @@ local prizeData = {
 		end,
 		row = 'points',
 		rowParse = function (input)
-			return tonumber((string.gsub(input, '[^%d.]', '')))
+			return PrizePool:_parseInteger(input)
 		end
 	},
 	[prizeTypes.FREETEXT] = {
@@ -120,7 +120,7 @@ end
 
 function PrizePool:readInput(args)
 	self.options = self:_readStandardOptions(args)
-	self.prizes = self:_readPrizes(args, 'header')
+	self.prizes = self:_readPrizes(args)
 	if self.options.showUSD then
 		self:addPrize('USD', 1)
 	end
@@ -148,24 +148,39 @@ function PrizePool:_readStandardOptions(args)
 	return options
 end
 
-function PrizePool:_readPrizes(args, type)
-	-- TODO the return datastructure for row should be different. Split the functions?
-	type = type or 'row'
+function PrizePool:_readPrizes(args)
 	local prizes = {}
 
 	for prizeEnum in pairs(prizeTypes) do
 		local prizeDatum = prizeData[prizeTypes[prizeEnum]]
-		local fieldName = prizeDatum[type]
+		local fieldName = prizeDatum.header
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				local data = prizeDatum[type ..'Parse'](prizeValue)
+				local data = prizeDatum.headerParse(prizeValue)
 				self:addPrize(prizeEnum, index, data, prizes)
 			end
 		end
 	end
 
 	return prizes
+end
+
+function PrizePool:_readPrizeRewards(args)
+	local rewards = {}
+
+	for prizeEnum in pairs(prizeTypes) do
+		local prizeDatum = prizeData[prizeTypes[prizeEnum]]
+		local fieldName = prizeDatum.row
+		if fieldName then
+			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
+			for _, rewardValue, index in Table.iter.pairsByPrefix(args, fieldName) do
+				rewards[prizeEnum .. index] = prizeDatum.rowParse(rewardValue)
+			end
+		end
+	end
+
+	return rewards
 end
 
 function PrizePool:_readSpecialData(args)
@@ -202,7 +217,7 @@ function PrizePool:_readPlacements(args)
 		end
 
 		-- Parse prizes
-		placement.prizes = self:_readPrizes(placementInput)
+		placement.prizes = self:_readPrizeRewards(placementInput)
 
 		-- Parse opponents in the placement
 		placement.opponents = {}
@@ -221,7 +236,7 @@ function PrizePool:_readPlacements(args)
 			opponent.date = opponentInput.date
 
 			-- Parse special prizes for this opponent
-			opponent.prizes = self:_readPrizes(opponentInput)
+			opponent.prizes = self:_readPrizeRewards(opponentInput)
 
 			-- Parse additional data (groupscore, last opponent etc)
 			opponent.data = self:_readSpecialData(opponentInput)
@@ -278,6 +293,11 @@ function PrizePool:setLpdbInjector(lpdbInjector)
 	-- TODO: Add type check
 	self.lpdbInjector = lpdbInjector
 	return self
+end
+
+function PrizePool:_parseInteger(input)
+	-- Remove all none-numeric characters (such as ,.')
+	return tonumber((string.gsub(input, '[^%d.]', '')))
 end
 
 return PrizePool
