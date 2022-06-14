@@ -30,6 +30,36 @@ local specialDataTypes = Table.map({
 	'LASTVS', 'GROUPSCORE', 'LASTVSSCORE'
 }, function(value, name) return name, value end)
 
+local config = {
+	showUSD = {
+		default = false
+	},
+	autoUSD = {
+		default = true,
+		func = function(args)
+			return Logic.readBoolOrNil(args.autousd)
+		end
+	},
+	prizeSummary = {
+		default = true,
+		func = function(args)
+			return Logic.readBoolOrNil(args.prizesummary)
+		end
+	},
+	exchangeInfo = {
+		default = true,
+		func = function(args)
+			return Logic.readBoolOrNil(args.exchangeinfo)
+		end
+	},
+	storeSmw = {
+		default = true,
+	},
+	storelpdb = {
+		default = true,
+	},
+}
+
 local prizeData = {
 	[prizeTypes.USD] = {
 		row = 'usdprize',
@@ -128,6 +158,10 @@ function PrizePool:init(args)
 		Opponent = require('Module:'.. self.args.opponentLibrary)
 	end
 
+	self.options = {}
+	self.prizes = {}
+	self.placements = {}
+
 	return self
 end
 
@@ -148,12 +182,12 @@ function PrizePool:parseArgs(args)
 end
 
 function PrizePool:readInput()
-	self.options = self:_readStandardOptions(self.args)
+	self.options = self:_readConfig(self.args)
 	self.prizes = self:_readPrizes(self.args)
 	self.placements = self:_readPlacements(self.args)
 
 	if self:_hasUsdPrizePool() then
-		self:setOption('showUSD', true)
+		self:setConfig('showUSD', true)
 		self:addPrize('USD', 1)
 	end
 
@@ -166,22 +200,15 @@ function PrizePool:create()
 	return ''
 end
 
-function PrizePool:_readStandardOptions(args)
-	local options = {}
+function PrizePool:_readConfig(args)
+	for name, configData in pairs(config) do
+		self:setConfig(name, Logic.nilOr(configData.func(args), configData.default))
+	end
 
-	self:setOption('autoUSD', Logic.nilOr(Logic.readBoolOrNil(args.autousd), true), options)
-	self:setOption('showUSD', false, options)
-	self:setOption('prizeSummary', Logic.nilOr(Logic.readBoolOrNil(args.prizesummary), true), options)
-	self:setOption('exchangeInfo', Logic.nilOr(Logic.readBoolOrNil(args.exchangeinfo), true), options)
-	self:setOption('storeSmw', Logic.nilOr(Logic.readBoolOrNil(args.storesmw), true), options)
-	self:setOption('storeLpdb', Logic.nilOr(Logic.readBoolOrNil(args.storelpdb), true), options)
-
-	return options
+	return self.options
 end
 
 function PrizePool:_readPrizes(args)
-	local prizes = {}
-
 	for prizeEnum in pairs(prizeTypes) do
 		local prizeDatum = prizeData[prizeTypes[prizeEnum]]
 		local fieldName = prizeDatum.header
@@ -189,12 +216,12 @@ function PrizePool:_readPrizes(args)
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
 				local data = prizeDatum.headerParse(self, prizeValue, args, index)
-				self:addPrize(prizeEnum, index, data, prizes)
+				self:addPrize(prizeEnum, index, data)
 			end
 		end
 	end
 
-	return prizes
+	return self.prizes
 end
 
 function PrizePool:_readPrizeRewards(args)
@@ -311,9 +338,16 @@ function PrizePool:_parseOpponentArgs(input, date)
 	return Opponent.resolve(opponentData, opponentArgs.date)
 end
 
-function PrizePool:setOption(option, value, list)
-	list = list or self.options
-	list[option] = value
+function PrizePool:setConfig(option, value)
+	self.options[option] = value
+	return self
+end
+
+function PrizePool:addCustomConfig(name, default, func)
+	config[name] = {
+		default = default,
+		func = func
+	}
 	return self
 end
 
@@ -327,11 +361,10 @@ function PrizePool:addCustomPrizeType(enum, data)
 	return self
 end
 
-function PrizePool:addPrize(enum, index, data, list)
+function PrizePool:addPrize(enum, index, data)
 	assert(prizeTypes[enum], 'addPrize: Not a valid prizeEnum!')
 	assert(Logic.isNumeric(index), 'addPrize: Index is not numeric!')
-	list = list or self.prizes
-	table.insert(list, {id = enum .. index, enum = prizeTypes[enum], index = index, data = data})
+	table.insert(self.prizes, {id = enum .. index, enum = prizeTypes[enum], index = index, data = data})
 	return self
 end
 
