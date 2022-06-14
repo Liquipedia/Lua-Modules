@@ -35,7 +35,7 @@ local prizeData = {
 		row = 'usdprize',
 		rowParse = function (prizePool, input, context, index)
 			prizePool.hasUSD = true
-			return prizePool:_parseInteger(input)
+			return PrizePool._parseInteger(input)
 		end
 	},
 	[prizeTypes.LOCAL_CURRENCY] = {
@@ -45,7 +45,7 @@ local prizeData = {
 		end,
 		row = 'localprize',
 		rowParse = function (prizePool, input, context, index)
-			return prizePool:_parseInteger(input)
+			return PrizePool._parseInteger(input)
 		end
 	},
 	[prizeTypes.QUALIFIES] = {
@@ -55,7 +55,7 @@ local prizeData = {
 			local data = {link = link}
 
 			-- Automatically retrieve information from the Tournament
-			local tournamentData = prizePool:_getTournamentInfo(link)
+			local tournamentData = PrizePool._getTournamentInfo(link)
 			if tournamentData then
 				data.title = tournamentData.tickername
 				data.icon = tournamentData.icon
@@ -81,7 +81,7 @@ local prizeData = {
 		end,
 		row = 'points',
 		rowParse = function (prizePool, input, context, index)
-			return prizePool:_parseInteger(input)
+			return PrizePool._parseInteger(input)
 		end
 	},
 	[prizeTypes.FREETEXT] = {
@@ -237,6 +237,7 @@ function PrizePool:_readPlacements(args)
 			local places = Table.mapValues(mw.text.split(placementInput.place, '-'), tonumber)
 			placement.placeStart = places[1]
 			placement.placeEnd = places[2] or places[1]
+			assert(placement.placeStart and placement.placeEnd, placement.place .. ' is an invalid place (range).')
 		end
 
 		-- Parse prizes
@@ -255,18 +256,22 @@ function PrizePool:_readPlacements(args)
 					opponent.opponentData = Opponent.tbd()
 				end
 			else
+				-- Set the date
+				if PrizePool.isValidDate(opponentInput.date) then
+					opponent.date = opponentInput.date
+				else
+					opponent.date = self.date
+				end
+
 				-- Parse Opponent Data
 				opponentInput.type = opponentInput.type or self.opponentType
-				opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponentInput.date)
+				opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponent.date)
 
 				-- Parse special prizes for this opponent
 				opponent.prizes = self:_readPrizeRewards(opponentInput)
 
 				-- Parse additional data (groupscore, last opponent etc)
 				opponent.data = self:_readSpecialData(opponentInput)
-
-				-- Set the date
-				opponent.date = opponentInput.date
 			end
 			table.insert(placement.opponents, opponent)
 		end
@@ -331,18 +336,22 @@ function PrizePool:setLpdbInjector(lpdbInjector)
 	return self
 end
 
-function PrizePool:_parseInteger(input)
-	-- Remove all none-numeric characters (such as ,.')
-	return tonumber((string.gsub(input, '[^%d.]', '')))
-end
-
 function PrizePool:_hasUsdPrizePool()
 	return self.hasUSD or (self.options.autoUSD and Table.any(self.prizes, function (_, prize)
 		return prize.enum == prizeTypes.LOCAL_CURRENCY
 	end))
 end
 
-function PrizePool:_getTournamentInfo(pageName)
+function PrizePool._parseInteger(input)
+	-- Remove all none-numeric characters (such as ,.')
+	return tonumber((string.gsub(input, '[^%d.]', '')))
+end
+
+function PrizePool._isValidDateFormat(date)
+	return string.match(date, '%d%d%d%d-%d%d-%d%d')
+end
+
+function PrizePool._getTournamentInfo(pageName)
 	return mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[pagename::' .. pageName .. ']]',
 		limit = 1,
