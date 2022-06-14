@@ -375,6 +375,11 @@ function Opponent.toLpdbStruct(opponent, resolveTeamToPageName)
 	return storageStruct
 end
 
+-- function to resolve teamTemplate to pagename and resolve redirect on it
+-- needed for wikis that store redirected
+-- also works as a workaround if there are still duplicate teamTemplates on a wiki
+-- or if the teamplate name does not fit the pagename while the pagename is already another teamTemplate
+-- (which btw. can not be fixed in several cases due to the lock due to std logos)
 function Opponent.teamTemplateResolveRedirect(template)
 	if String.isEmpy(template) then
 		return nil
