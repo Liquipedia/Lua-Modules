@@ -27,7 +27,7 @@ local prizeTypes = Table.map({
 	'USD', 'LOCAL_CURRENCY', 'POINTS', 'QUALIFIES', 'FREETEXT'
 }, function(value, name) return name, value end)
 
-local specialDataTypes = Table.map({
+local additionalDataTypes = Table.map({
 	'LASTVS', 'GROUPSCORE', 'LASTVSSCORE'
 }, function(value, name) return name, value end)
 
@@ -128,20 +128,20 @@ local prizeData = {
 	},
 }
 
-local specialData = {
-	[specialDataTypes.GROUPSCORE] = {
+local additional = {
+	[additionalDataTypes.GROUPSCORE] = {
 		field = 'wdl',
 		parse = function (placement, input, context)
 			return input
 		end
 	},
-	[specialDataTypes.LASTVS] = {
+	[additionalDataTypes.LASTVS] = {
 		field = 'lastvs',
 		parse = function (placement, input, context)
 			return placement:_parseOpponentArgs(input, context.date)
 		end
 	},
-	[specialDataTypes.LASTVSSCORE] = {
+	[additionalDataTypes.LASTVSSCORE] = {
 		field = 'lastvsscore',
 		parse = function (placement, input, context)
 			local scores = Table.mapValues(mw.text.split(input, '-'), tonumber)
@@ -301,15 +301,19 @@ end
 --- Remove all non-numeric characters from an input and changes it to a number.
 -- Most commonly used on money inputs, as they often contain , or .
 function PrizePool._parseInteger(input)
-	return tonumber((string.gsub(input, '[^%d.]', '')))
+	if type(input) == 'number' then
+		return input
+	elseif type(input) == 'string' then
+		return tonumber((input:gsub('[^%d.]', '')))
+	end
 end
 
 --- Checks if the input matches the format of a date
 function PrizePool._isValidDateFormat(date)
-	if String.isEmpty(date) then
+	if type(date) ~= 'string' or String.isEmpty(date) then
 		return false
 	end
-	return string.match(date, '%d%d%d%d-%d%d-%d%d') and true or false
+	return date:match('%d%d%d%d-%d%d-%d%d') and true or false
 end
 
 --- Checks that an Opponent Struct is valid and has a valid type
@@ -395,11 +399,11 @@ function Placement:_readPrizeRewards(args)
 	return rewards
 end
 
-function Placement:_readSpecialData(args)
+function Placement:_readAdditionalData(args)
 	local data = {}
 
-	for enum in pairs(specialDataTypes) do
-		local type = specialData[specialDataTypes[enum]]
+	for enum in pairs(additionalDataTypes) do
+		local type = additional[additionalDataTypes[enum]]
 		local fieldName = type.field
 		if args[fieldName] then
 			data[enum] = type.parse(self, args[fieldName], args)
@@ -441,7 +445,7 @@ function Placement:_parseOpponents(args)
 			opponent.prizes = self:_readPrizeRewards(opponentInput)
 
 			-- Parse additional data (groupscore, last opponent etc)
-			opponent.data = self:_readSpecialData(opponentInput)
+			opponent.data = self:_readAdditionalData(opponentInput)
 
 			-- Set date
 			opponent.date = opponentInput.date
