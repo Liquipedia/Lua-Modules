@@ -7,8 +7,8 @@
 --
 
 local Class = require('Module:Class')
+local LeagueIcon = require('Module:LeagueIcon')
 local TableCell = require('Module:Widget/Table/Cell')
-local Template = require('Module:Template')
 
 local PointsCell = Class.new(
 	TableCell,
@@ -24,8 +24,9 @@ local PointsCell = Class.new(
 
 function PointsCell:make()
 	if self.icon then
-		local templateArgs = {self.icon, link = self.link, darkmode = self.iconDark, name = self.name}
-		self._base:addContent(Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/custom', templateArgs))
+		local iconArgs = {link = self.link, icon = self.icon, iconDark = self.iconDark, name = self.name}
+		self._base:addContent(LeagueIcon.display(iconArgs))
+		self._base:addContent('&nbsp;')
 	end
 	self._base:addContent(self.points)
 
