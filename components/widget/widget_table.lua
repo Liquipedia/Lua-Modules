@@ -29,13 +29,16 @@ function Table:addClass(class)
 end
 
 function Table:make()
-	local table = mw.html.create('table')
+	local table = mw.html.create('div'):addClass('divTable')
+
 	for _, class in ipairs(self.classes) do
 		table:addClass(class)
 	end
+
 	for _, tableRow in ipairs(self.tableRows) do
 		table:node(WidgetFactory.work(tableRow, self.injector))
 	end
+
 	return table
 end
 

@@ -15,6 +15,7 @@ local TableRow = Class.new(
 	function(self, input)
 		self.tableCells = input.cells or {}
 		self.classes = input.classes or {}
+		self.isHeader = (input.isHeader == true)
 	end
 )
 
@@ -29,13 +30,19 @@ function TableRow:addClass(class)
 end
 
 function TableRow:make()
-	local row = mw.html.create('tr')
+	local row = mw.html.create('tr'):addClass('divRow')
+	if self.isHeader == true then
+		row:addClass('divHeaderRow')
+	end
+
 	for _, class in ipairs(self.classes) do
 		row:addClass(class)
 	end
+
 	for _, tableCell in ipairs(self.tableCells) do
 		row:node(WidgetFactory.work(tableCell, self.injector))
 	end
+
 	return row
 end
 

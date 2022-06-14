@@ -14,7 +14,6 @@ local TableCell = Class.new(
 	function(self, input)
 		self.content = input.content or {}
 		self.classes = input.classes or {}
-		self.isHeader = input.isHeader and true or false
 	end
 )
 
@@ -29,18 +28,14 @@ function TableCell:addClass(class)
 end
 
 function TableCell:make()
-	local cell
-	if self.isHeader then
-		cell = mw.html.create('th')
-	else
-		cell = mw.html.create('td')
-	end
+	local cell = mw.html.create('div'):addClass('divCell')
 
 	for _, class in ipairs(self.classes) do
 		cell:addClass(class)
 	end
 
 	cell:wikitext(table.concat(self.content))
+
 	return cell
 end
 
