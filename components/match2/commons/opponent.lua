@@ -53,6 +53,7 @@ Opponent.types.Player = TypeUtil.struct({
 	displayName = 'string',
 	flag = 'string?',
 	pageName = 'string?',
+	team = 'string?',
 })
 
 Opponent.types.TeamOpponent = TypeUtil.struct({
