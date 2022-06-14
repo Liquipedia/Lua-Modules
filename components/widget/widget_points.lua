@@ -15,7 +15,11 @@ local PointsCell = Class.new(
 	function(self, input)
 		self._base:init{input.classes}
 		input.points = tonumber(input.point)
-		self.points = input.points > 0 and input.points or '-'
+		if input.points and input.points > 0 then
+			self.points = input.points
+		else
+			self.points = '-'
+		end
 		self.name = input.name
 		self.link = input.link
 		self.icon = input.icon
