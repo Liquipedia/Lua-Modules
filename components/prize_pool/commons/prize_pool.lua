@@ -92,9 +92,11 @@ local prizeData = {
 				data.iconDark = tournamentData.icondark
 			end
 
-			-- Manual override
+			-- Manual inputs
 			local prefix = 'qualifies' .. index
 			data.title = context[prefix .. 'name'] or data.title
+			data.icon = data.icon or context[prefix .. 'icon']
+			data.iconDark = data.iconDark or context[prefix .. 'icondark']
 
 			return data
 		end,
