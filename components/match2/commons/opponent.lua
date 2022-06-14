@@ -244,6 +244,9 @@ function Opponent.resolve(opponent, date)
 		local PlayerExt = require('Module:Player/Ext')
 		for _, player in ipairs(opponent.players) do
 			PlayerExt.populatePageName(player)
+			if player.team then
+				player.team = TeamTemplate.resolve(player.team, date)
+			end
 		end
 	end
 	return opponent
@@ -285,20 +288,15 @@ function Opponent.readOpponentArgs(args, date)
 		local template = args.template or args[1]
 		return template and {
 			type = Opponent.team,
-			template = template:lower():gsub('_', ' '),
+			template = template:lower(),
 		}
 
 	elseif partySize == 1 then
-		local playerTeam = args.team or args.p1team
-		if playerTeam then
-			playerTeam = playerTeam:lower():gsub('_', ' ')
-			playerTeam = TeamTemplate.resolve(playerTeam, date)
-		end
 		local player = {
 			displayName = args[1] or args.p1 or args.name or '',
 			flag = String.nilIfEmpty(Flags.CountryName(args.flag or args.p1flag)),
 			pageName = args.link or args.p1link,
-			team = playerTeam,
+			team = args.team or args.p1team,
 		}
 		return {type = Opponent.solo, players = {player}}
 
@@ -306,7 +304,7 @@ function Opponent.readOpponentArgs(args, date)
 		local players = Array.map(Array.range(1, partySize), function(playerIndex)
 			local playerTeam = args['p' .. playerIndex .. 'team']
 			if playerTeam then
-				playerTeam = playerTeam:lower():gsub('_', ' ')
+				playerTeam = playerTeam:lower()
 			end
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
