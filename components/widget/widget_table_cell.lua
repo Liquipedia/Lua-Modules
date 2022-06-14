@@ -41,7 +41,6 @@ function TableCell:make()
 	end
 
 	cell:wikitext(table.concat(self.content))
-
 	return cell
 end
 
