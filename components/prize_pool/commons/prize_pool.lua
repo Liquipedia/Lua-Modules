@@ -37,19 +37,19 @@ local config = {
 	},
 	autoUSD = {
 		default = true,
-		func = function(args)
+		read = function(args)
 			return Logic.readBoolOrNil(args.autousd)
 		end
 	},
 	prizeSummary = {
 		default = true,
-		func = function(args)
+		read = function(args)
 			return Logic.readBoolOrNil(args.prizesummary)
 		end
 	},
 	exchangeInfo = {
 		default = true,
-		func = function(args)
+		read = function(args)
 			return Logic.readBoolOrNil(args.exchangeinfo)
 		end
 	},
@@ -151,7 +151,7 @@ local specialData = {
 }
 
 function PrizePool:init(args)
-	self.args = self:parseArgs(args)
+	self.args = self:_parseArgs(args)
 
 	self.pagename = mw.title.getCurrentTitle().text
 	self.date = PrizePool._getTournamentDate()
@@ -167,24 +167,18 @@ function PrizePool:init(args)
 	return self
 end
 
-function PrizePool:parseArgs(args)
+function PrizePool:_parseArgs(args)
 	local parsedArgs = Table.deepCopy(args)
 	local typeStruct = Json.parseIfString(args.type)
 
-	if not typeStruct then
-		return error('Please provide a type!')
-	elseif type(typeStruct) ~= 'table' or not typeStruct.type then
-		return error('Could not parse type!')
-	elseif not Opponent.isType(typeStruct.type) then
-		return error('Not a valid type!')
-	end
+	PrizePool._assertOpponentStructType(typeStruct)
 
 	parsedArgs.type = typeStruct.type
 
 	return parsedArgs
 end
 
-function PrizePool:readInput()
+function PrizePool:create()
 	self.options = self:_readConfig(self.args)
 	self.prizes = self:_readPrizes(self.args)
 	self.placements = self:_readPlacements(self.args)
@@ -197,7 +191,7 @@ function PrizePool:readInput()
 	return self
 end
 
-function PrizePool:create()
+function PrizePool:build()
 	-- TODO
 	mw.logObject(self)
 	return ''
@@ -206,8 +200,8 @@ end
 function PrizePool:_readConfig(args)
 	for name, configData in pairs(config) do
 		local value = configData.default
-		if configData.func then
-			value = Logic.nilOr(configData.func(args), value)
+		if configData.read then
+			value = Logic.nilOr(configData.read(args), value)
 		end
 		self:setConfig(name, value)
 	end
@@ -219,6 +213,7 @@ end
 function PrizePool:_readPrizes(args)
 	for prizeEnum in pairs(prizeTypes) do
 		local prizeDatum = prizeData[prizeTypes[prizeEnum]]
+		assert(prizeDatum, 'Error: Missmatch between prizeData and prizeTypes. Is a prizeType missing in prizeData?')
 		local fieldName = prizeDatum.header
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
@@ -286,7 +281,7 @@ function PrizePool:setWidgetInjector(widgetInjector)
 end
 
 function PrizePool:setLpdbInjector(lpdbInjector)
-	-- TODO: Add type check
+	-- TODO: Add type check once interface has been created
 	self.lpdbInjector = lpdbInjector
 	return self
 end
@@ -317,6 +312,17 @@ function PrizePool._isValidDateFormat(date)
 	return string.match(date, '%d%d%d%d-%d%d-%d%d') and true or false
 end
 
+--- Checks that an Opponent Struct is valid and has a valid type
+function PrizePool._assertOpponentStructType(typeStruct)
+	if not typeStruct then
+		error('Please provide a type!')
+	elseif type(typeStruct) ~= 'table' or not typeStruct.type then
+		error('Could not parse type!')
+	elseif not Opponent.isType(typeStruct.type) then
+		error('Not a valid type!')
+	end
+end
+
 --- Fetches the LPDB object of a tournament
 function PrizePool._getTournamentInfo(pageName)
 	return mw.ext.LiquipediaDB.lpdb('tournament', {
@@ -332,7 +338,7 @@ end
 
 ---
 function Placement:init(args, placeStart, opponentType)
-	self.args = self:parseArgs(args)
+	self.args = self:_parseArgs(args)
 	self.date = self.args.date or PrizePool._getTournamentDate()
 	self.placeStart = self.args.placeStart
 	self.placeEnd = self.args.placeEnd
@@ -346,7 +352,8 @@ function Placement:init(args, placeStart, opponentType)
 	-- Parse opponents
 	self.opponents = self:_parseOpponents(self.args)
 
-	-- Implicit place range has been given
+	-- Implicit place range has been given (|place= is not set)
+	-- Use the last known place and set the place range based on the entered number of opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = placeStart
 		self.placeEnd = placeStart + #self.opponents - 1
@@ -356,7 +363,7 @@ function Placement:init(args, placeStart, opponentType)
 	assert(#self.opponents > self.placeEnd - self.placeStart, 'readPlacements: Too many opponents')
 end
 
-function Placement:parseArgs(args)
+function Placement:_parseArgs(args)
 	local parsedArgs = Table.deepCopy(args)
 	-- Explicit place range has been given
 	if args.place then
@@ -421,7 +428,13 @@ function Placement:_parseOpponents(args)
 			end
 
 			-- Parse Opponent Data
-			opponentInput.type = opponentInput.type or self.opponentType
+			local typeStruct = Json.parseIfString(opponentInput.type)
+			if typeStruct then
+				PrizePool._assertOpponentStructType(typeStruct)
+				opponentInput.type = typeStruct.type
+			else
+				opponentInput.type = self.opponentType
+			end
 			opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponentInput.date)
 
 			-- Parse specific prizes for this opponent

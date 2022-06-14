@@ -21,11 +21,11 @@ local CustomWidgetInjector = Class.new(WidgetInjector)
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args)
-	prizePool:readInput()
+	prizePool:create()
 
 	prizePool:setWidgetInjector(CustomWidgetInjector())
 
-	return prizePool:create()
+	return prizePool:build()
 end
 
 function CustomWidgetInjector:parse(id, widgets)
