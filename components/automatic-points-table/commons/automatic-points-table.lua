@@ -57,6 +57,8 @@ function AutomaticPointsTable.run(frame)
 		usedDisplayModule = TableDisplay
 	end
 
+	pointsTable:storeLPDB(sortedDataWithPositions)
+
 	local divTable = usedDisplayModule(
 		sortedDataWithPositions,
 		tournamentsWithResults,
@@ -67,18 +69,43 @@ function AutomaticPointsTable.run(frame)
 	return divTable:create()
 end
 
+function AutomaticPointsTable:storeLPDB(pointsData)
+	Table.iter.forEachIndexed(pointsData, function(index, teamPointsData)
+		local team = teamPointsData.team
+		local teamName = string.lower(team.aliases[#team.aliases])
+		local lpdbName = self.parsedInput.lpdbName
+		local uniqueId = teamName .. '_' .. lpdbName
+		local position = teamPointsData.position
+		local totalPoints = teamPointsData.totalPoints
+		local objectData = {
+			type = lpdbName,
+			name = teamName,
+			information = position,
+			date = os.date(),
+			extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+				position = position,
+				totalPoints = totalPoints
+			})
+		}
+
+		mw.ext.LiquipediaDB.lpdb_datapoint(uniqueId, objectData)
+	end)
+end
+
 function AutomaticPointsTable:parseInput(args)
 	local positionBackgrounds = self:parsePositionBackgroundData(args)
 	local tournaments = self:parseTournaments(args)
 	local teams = self:parseTeams(args, #tournaments)
 	local minified = Logic.readBool(args.minified)
 	local limit = tonumber(args.limit) or #teams
+	local lpdbName = args.lpdbName or mw.title.getCurrentTitle().text
 	return {
 		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
 		teams = teams,
 		shouldTableBeMinified = minified,
-		limit = limit
+		limit = limit,
+		lpdbName = lpdbName
 	}
 end
 
@@ -166,7 +193,7 @@ function AutomaticPointsTable:generateReverseAliases(teams, tournaments)
 		reverseAliases[tournamentIndex] = {}
 		Table.iter.forEachIndexed(teams,
 			function(index, team)
-				local alias = mw.language.getContentLanguage():ucfirst(team.aliases[tournamentIndex])
+				local alias = mw.getContentLanguage():ucfirst(mw.ext.TeamLiquidIntegration.resolve_redirect(team.aliases[tournamentIndex]))
 				reverseAliases[tournamentIndex][alias] = index
 			end
 		)
