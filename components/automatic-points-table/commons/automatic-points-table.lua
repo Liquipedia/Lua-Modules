@@ -193,7 +193,9 @@ function AutomaticPointsTable:generateReverseAliases(teams, tournaments)
 		reverseAliases[tournamentIndex] = {}
 		Table.iter.forEachIndexed(teams,
 			function(index, team)
-				local alias = mw.getContentLanguage():ucfirst(mw.ext.TeamLiquidIntegration.resolve_redirect(team.aliases[tournamentIndex]))
+				local alias = mw.getContentLanguage():ucfirst(
+					mw.ext.TeamLiquidIntegration.resolve_redirect(team.aliases[tournamentIndex])
+				)
 				reverseAliases[tournamentIndex][alias] = index
 			end
 		)
