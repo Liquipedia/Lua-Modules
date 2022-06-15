@@ -282,7 +282,7 @@ Template:LiteralOpponent, and etc.
 Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
-function Opponent.readOpponentArgs(args, date)
+function Opponent.readOpponentArgs(args)
 	local partySize = Opponent.partySize(args.type)
 
 	if args.type == Opponent.team then
