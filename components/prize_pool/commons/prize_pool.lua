@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -229,19 +230,18 @@ end
 
 function PrizePool:_readPlacements(args)
 	local currentPlace = 0
-	for placementIndex = 1, math.huge do
+	return Array.mapIndexes(function(placementIndex)
 		if not args[placementIndex] then
-			break
+			return
 		end
 
 		local placementInput = Json.parseIfString(args[placementIndex])
 		local placement = Placement(placementInput, currentPlace + 1, self.opponentType)
 
 		currentPlace = placement.placeEnd
-		table.insert(self.placements, placement)
-	end
 
-	return self.placements
+		return placement
+	end)
 end
 
 function PrizePool:setConfig(option, value)
@@ -252,7 +252,7 @@ end
 function PrizePool:addCustomConfig(name, default, func)
 	config[name] = {
 		default = default,
-		func = func
+		read = func
 	}
 	return self
 end
@@ -261,6 +261,7 @@ end
 local CUSTOM_TYPES_OFFSET = 100
 local CUSTOM_TYPES_USED = 0
 function PrizePool:addCustomPrizeType(enum, data)
+	-- Assign the first unassigned ID starting with CUSTOM_TYPES_OFFSET
 	prizeTypes[enum] = CUSTOM_TYPES_OFFSET + CUSTOM_TYPES_USED
 	CUSTOM_TYPES_USED = CUSTOM_TYPES_USED + 1
 	prizeData[prizeTypes[enum]] = data
@@ -274,22 +275,27 @@ function PrizePool:addPrize(enum, index, data)
 	return self
 end
 
+--- Set the WidgetInjector.
+-- @param widgetInjector WidgetInjector An instance of class that implements the WidgetInjector interface
 function PrizePool:setWidgetInjector(widgetInjector)
-	assert(widgetInjector:is_a(WidgetInjector), "setWidgetInjector: Not a WidgetIjector")
-	self.widgetInjector = widgetInjector
+	assert(widgetInjector:is_a(WidgetInjector), "setWidgetInjector: Not a WidgetInjector")
+	self._widgetInjector = widgetInjector
 	return self
 end
 
 function PrizePool:setLpdbInjector(lpdbInjector)
 	-- TODO: Add type check once interface has been created
-	self.lpdbInjector = lpdbInjector
+	self._lpdbInjector = lpdbInjector
 	return self
 end
 
+--- Checks if this prizePool has a US Dollar reward.
+-- This is determined if any placement has a dollar input
+-- or if any prize is in a local currency, with currency conversion active
 function PrizePool:_hasUsdPrizePool()
-	return (Table.any(self.placements, function (_, placement)
+	return (Array.any(self.placements, function (placement)
 		return placement.hasUSD
-	end)) or (self.options.autoUSD and Table.any(self.prizes, function (_, prize)
+	end)) or (self.options.autoUSD and Array.any(self.prizes, function (prize)
 		return prize.enum == prizeTypes.LOCAL_CURRENCY
 	end))
 end
@@ -379,6 +385,7 @@ function Placement:_parseArgs(args)
 end
 
 --- Parse the input for available rewards of prizes, for instance how much money a team would win.
+-- This also checks if the Placement instance has a dollar reward and assigns a variable if so.
 function Placement:_readPrizeRewards(args)
 	local rewards = {}
 
@@ -399,6 +406,8 @@ function Placement:_readPrizeRewards(args)
 	return rewards
 end
 
+--- Parse and set additional data fields for opponents.
+-- This includes fields such as group stage score (wdl) and last versus (lastvs).
 function Placement:_readAdditionalData(args)
 	local data = {}
 
@@ -415,13 +424,13 @@ end
 
 function Placement:_parseOpponents(args)
 	-- Parse opponents in the placement
-	for opponentIndex = 1, math.huge do
+	return Array.mapIndexes(function(opponentIndex)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
 		local opponent = {opponentData = {}, prizes = {}, data = {}}
 		if not opponentInput then
 			-- If given a range of opponents, add them all, even if they're missing from the input
 			if not args.place or self.placeStart + opponentIndex > self.placeEnd + 1 then
-				break
+				return
 			else
 				opponent.opponentData = Opponent.tbd()
 			end
@@ -450,9 +459,8 @@ function Placement:_parseOpponents(args)
 			-- Set date
 			opponent.date = opponentInput.date
 		end
-		table.insert(self.opponents, opponent)
-	end
-	return self.opponents
+		return opponent
+	end)
 end
 
 function Placement:_parseOpponentArgs(input, date)
