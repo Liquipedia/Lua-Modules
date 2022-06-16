@@ -14,6 +14,7 @@ local TableCell = Class.new(
 	function(self, input)
 		self.content = input.content or {}
 		self.classes = input.classes or {}
+		self.css = input.css or {}
 	end
 )
 
@@ -28,15 +29,18 @@ function TableCell:addClass(class)
 end
 
 function TableCell:make()
-	local cell = mw.html.create('div'):addClass('divCell')
+	local cell = mw.html.create('div')
+	cell:addClass('divCell'):css('border', '1px solid #bbb'):css('vertical-align', 'middle')
 
 	for _, class in ipairs(self.classes) do
 		cell:addClass(class)
 	end
 
+	cell:css(self.css)
+
 	cell:wikitext(table.concat(self.content))
 
-	return cell
+	return {cell}
 end
 
 return TableCell

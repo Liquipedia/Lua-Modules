@@ -13,14 +13,15 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local TableRow = Class.new(
 	Widget,
 	function(self, input)
-		self.tableCells = input.cells or {}
+		self.cells = input.cells or {}
 		self.classes = input.classes or {}
+		self.css = input.css or {}
 		self.isHeader = (input.isHeader == true)
 	end
 )
 
-function TableRow:addTableCell(tableCell)
-	table.insert(self.tableData, tableCell)
+function TableRow:addCell(cell)
+	table.insert(self.cells, cell)
 	return self
 end
 
@@ -30,7 +31,8 @@ function TableRow:addClass(class)
 end
 
 function TableRow:make()
-	local row = mw.html.create('tr'):addClass('divRow')
+	local row = mw.html.create('div'):addClass('divRow')
+
 	if self.isHeader == true then
 		row:addClass('divHeaderRow')
 	end
@@ -39,11 +41,15 @@ function TableRow:make()
 		row:addClass(class)
 	end
 
-	for _, tableCell in ipairs(self.tableCells) do
-		row:node(WidgetFactory.work(tableCell, self.injector))
+	row:css(self.css)
+
+	for _, cell in ipairs(self.cells) do
+		for _, node in ipairs(WidgetFactory.work(cell, self.injector)) do
+			row:node(node)
+		end
 	end
 
-	return row
+	return {row}
 end
 
 return TableRow
