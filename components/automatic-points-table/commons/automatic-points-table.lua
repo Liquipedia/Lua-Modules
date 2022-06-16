@@ -70,6 +70,7 @@ function AutomaticPointsTable.run(frame)
 end
 
 function AutomaticPointsTable:storeLPDB(pointsData)
+	local date = os.date()
 	Table.iter.forEachIndexed(pointsData, function(index, teamPointsData)
 		local team = teamPointsData.team
 		local teamName = string.lower(team.aliases[#team.aliases])
@@ -78,10 +79,10 @@ function AutomaticPointsTable:storeLPDB(pointsData)
 		local position = teamPointsData.position
 		local totalPoints = teamPointsData.totalPoints
 		local objectData = {
-			type = lpdbName,
+			type = 'automatic points',
 			name = teamName,
 			information = position,
-			date = os.date(),
+			date = date,
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 				position = position,
 				totalPoints = totalPoints
