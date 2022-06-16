@@ -23,17 +23,19 @@ local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevI
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
 
 --- @class Placement
---- A Placement is a set of opponents all share the same final place in the tournament.
+--- A Placement is a set of opponents who all share the same final place in the tournament.
 --- Its input is generally a table created by `Template:Placement`.
+--- It has a range from placeStart to placeEnd, for example 5 to 8
+--- and is expected to have the same amount of opponents as the range allows (4 is the 5-8 example).
 local Placement = Class.new(function(self, ...) self:init(...) end)
 
 local TODAY = os.date('%Y-%m-%d')
 
-local USD = 'USD'
-local LOCAL_CURRENCY = 'LOCAL_CURRENCY'
-local QUALIFIES = 'QUALIFIES'
-local POINTS = 'POINTS'
-local FREETEXT = 'FREETEXT'
+local PRIZE_TYPE_USD = 'USD'
+local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
+local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
+local PRIZE_TYPE_POINTS = 'POINTS'
+local PRIZE_TYPE_FREETEXT = 'FREETEXT'
 
 PrizePool.config = {
 	showUSD = {
@@ -60,19 +62,19 @@ PrizePool.config = {
 	storeSmw = {
 		default = true,
 	},
-	storelpdb = {
+	storeLpdb = {
 		default = true,
 	},
 }
 
 PrizePool.prizeTypes = {
-	[USD] = {
+	[PRIZE_TYPE_USD] = {
 		row = 'usdprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
 		end
 	},
-	[LOCAL_CURRENCY] = {
+	[PRIZE_TYPE_LOCAL_CURRENCY] = {
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
 			return {currency = string.upper(input)}
@@ -82,7 +84,7 @@ PrizePool.prizeTypes = {
 			return PrizePool._parseInteger(input)
 		end
 	},
-	[QUALIFIES] = {
+	[PRIZE_TYPE_QUALIFIES] = {
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
 			local link = input:gsub(' ', '_')
@@ -109,7 +111,7 @@ PrizePool.prizeTypes = {
 			return Logic.readBool(input)
 		end
 	},
-	[POINTS] = {
+	[PRIZE_TYPE_POINTS] = {
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
 			local pointsData = mw.loadData('Module:Points/data')
@@ -120,7 +122,7 @@ PrizePool.prizeTypes = {
 			return PrizePool._parseInteger(input)
 		end
 	},
-	[FREETEXT] = {
+	[PRIZE_TYPE_FREETEXT] = {
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
 			return {title = input}
@@ -189,7 +191,7 @@ function PrizePool:create()
 
 	if self:_hasUsdPrizePool() then
 		self:setConfig('showUSD', true)
-		self:addPrize(USD, 1)
+		self:addPrize(PRIZE_TYPE_USD, 1)
 	end
 
 	return self
@@ -265,14 +267,14 @@ function PrizePool:addCustomPrizeType(prizeType, data)
 end
 
 function PrizePool:addPrize(prizeType, index, data)
-	assert(self.prizeTypes[prizeType], 'addPrize: Not a valid prize name!')
+	assert(self.prizeTypes[prizeType], 'addPrize: Not a valid prize!')
 	assert(Logic.isNumeric(index), 'addPrize: Index is not numeric!')
 	table.insert(self.prizes, {id = prizeType .. index, type = prizeType, index = index, data = data})
 	return self
 end
 
 --- Set the WidgetInjector.
--- @param widgetInjector WidgetInjector An instance of class that implements the WidgetInjector interface
+-- @param widgetInjector WidgetInjector An instance of a class that implements the WidgetInjector interface
 function PrizePool:setWidgetInjector(widgetInjector)
 	assert(widgetInjector:is_a(WidgetInjector), "setWidgetInjector: Not a WidgetInjector")
 	self._widgetInjector = widgetInjector
@@ -285,20 +287,16 @@ function PrizePool:setLpdbInjector(lpdbInjector)
 	return self
 end
 
---- Checks if this prizePool has a US Dollar reward.
--- This is determined if any placement has a dollar input
--- or if any prize is in a local currency, with currency conversion active
+--- Returns true if this prizePool has a US Dollar reward.
+-- This is true if any placement has a dollar input,
+-- or if there is a money reward in another currency whilst currency conversion is active
 function PrizePool:_hasUsdPrizePool()
 	return (Array.any(self.placements, function (placement)
 		return placement.hasUSD
 	end)) or (self.options.autoUSD and Array.any(self.prizes, function (prize)
-		return prize.type == LOCAL_CURRENCY
+		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end))
 end
-
---
--- Static Functions
---
 
 --- Remove all non-numeric characters from an input and changes it to a number.
 -- Most commonly used on money inputs, as they often contain , or .
@@ -310,7 +308,7 @@ function PrizePool._parseInteger(input)
 	end
 end
 
---- Checks if the input matches the format of a date
+--- Returns true if the input matches the format of a date
 function PrizePool._isValidDateFormat(date)
 	if type(date) ~= 'string' or String.isEmpty(date) then
 		return false
@@ -318,7 +316,7 @@ function PrizePool._isValidDateFormat(date)
 	return date:match('%d%d%d%d-%d%d-%d%d') and true or false
 end
 
---- Checks that an Opponent Struct is valid and has a valid type
+--- Asserts that an Opponent Struct is valid and has a valid type
 function PrizePool._assertOpponentStructType(typeStruct)
 	if not typeStruct then
 		error('Please provide a type!')
@@ -337,7 +335,7 @@ function PrizePool._getTournamentInfo(pageName)
 	})[1]
 end
 
---- Get the default date based on wiki-variables set in the Infobox League
+--- Returns the default date based on wiki-variables set in the Infobox League
 function PrizePool._getTournamentDate()
 	return Variables.varDefaultMulti('tournament_enddate', 'tournament_edate', 'edate', TODAY)
 end
@@ -351,10 +349,8 @@ function Placement:init(args, parent, lastPlacement)
 	self.parent = parent
 	self.hasUSD = false
 
-	-- Parse prizes
-	self.prizes = self:_readPrizeRewards(self.args)
+	self.prizeRewards = self:_readPrizeRewards(self.args)
 
-	-- Parse opponents
 	self.opponents = self:_parseOpponents(self.args)
 
 	-- Implicit place range has been given (|place= is not set)
@@ -364,8 +360,7 @@ function Placement:init(args, parent, lastPlacement)
 		self.placeEnd = lastPlacement + #self.opponents - 1
 	end
 
-	assert(self.placeStart and self.placeEnd, 'readPlacements: Invalid |place= provided.')
-	assert(#self.opponents > self.placeEnd - self.placeStart, 'readPlacements: Too many opponents')
+	assert(#self.opponents > self.placeEnd - self.placeStart, 'Placement: Too many opponents')
 end
 
 function Placement:_parseArgs(args)
@@ -375,6 +370,7 @@ function Placement:_parseArgs(args)
 		local places = Table.mapValues(mw.text.split(args.place, '-'), tonumber)
 		parsedArgs.placeStart = places[1]
 		parsedArgs.placeEnd = places[2] or places[1]
+		assert(parsedArgs.placeStart and parsedArgs.placeEnd, 'Placement: Invalid |place= provided.')
 	end
 	return parsedArgs
 end
@@ -389,7 +385,7 @@ function Placement:_readPrizeRewards(args)
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, rewardValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				if prizeType == USD then
+				if prizeType == PRIZE_TYPE_USD then
 					self.hasUSD = true
 				end
 				rewards[prizeType .. index] = prizeData.rowParse(self, rewardValue, args, index)
@@ -416,10 +412,9 @@ function Placement:_readAdditionalData(args)
 end
 
 function Placement:_parseOpponents(args)
-	-- Parse opponents in the placement
 	return Array.mapIndexes(function(opponentIndex)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
-		local opponent = {opponentData = {}, prizes = {}, additionalData = {}}
+		local opponent = {opponentData = {}, prizeRewards = {}, additionalData = {}}
 		if not opponentInput then
 			-- If given a range of opponents, add them all, even if they're missing from the input
 			if not args.place or self.placeStart + opponentIndex > self.placeEnd + 1 then
@@ -443,10 +438,7 @@ function Placement:_parseOpponents(args)
 			end
 			opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponentInput.date)
 
-			-- Parse specific prizes for this opponent
-			opponent.prizes = self:_readPrizeRewards(opponentInput)
-
-			-- Parse additional data (groupscore, last opponent etc)
+			opponent.prizeRewards = self:_readPrizeRewards(opponentInput)
 			opponent.additionalData = self:_readAdditionalData(opponentInput)
 
 			-- Set date
