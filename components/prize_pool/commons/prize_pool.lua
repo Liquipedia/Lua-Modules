@@ -29,6 +29,12 @@ local Placement = Class.new(function(self, ...) self:init(...) end)
 
 local TODAY = os.date('%Y-%m-%d')
 
+local USD = 'USD'
+local LOCAL_CURRENCY = 'LOCAL_CURRENCY'
+local QUALIFIES = 'QUALIFIES'
+local POINTS = 'POINTS'
+local FREETEXT = 'FREETEXT'
+
 PrizePool.config = {
 	showUSD = {
 		default = false
@@ -60,13 +66,13 @@ PrizePool.config = {
 }
 
 PrizePool.prizeTypes = {
-	USD = {
+	[USD] = {
 		row = 'usdprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
 		end
 	},
-	LOCAL_CURRENCY = {
+	[LOCAL_CURRENCY] = {
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
 			return {currency = string.upper(input)}
@@ -76,7 +82,7 @@ PrizePool.prizeTypes = {
 			return PrizePool._parseInteger(input)
 		end
 	},
-	QUALIFIES = {
+	[QUALIFIES] = {
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
 			local link = input:gsub(' ', '_')
@@ -103,7 +109,7 @@ PrizePool.prizeTypes = {
 			return Logic.readBool(input)
 		end
 	},
-	POINTS = {
+	[POINTS] = {
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
 			local pointsData = mw.loadData('Module:Points/data')
@@ -114,7 +120,7 @@ PrizePool.prizeTypes = {
 			return PrizePool._parseInteger(input)
 		end
 	},
-	FREETEXT = {
+	[FREETEXT] = {
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
 			return {title = input}
@@ -183,7 +189,7 @@ function PrizePool:create()
 
 	if self:_hasUsdPrizePool() then
 		self:setConfig('showUSD', true)
-		self:addPrize('USD', 1)
+		self:addPrize(USD, 1)
 	end
 
 	return self
@@ -253,15 +259,15 @@ function PrizePool:addCustomConfig(name, default, func)
 end
 
 --- Add a Custom Prize Type
-function PrizePool:addCustomPrizeType(name, data)
-	self.prizeTypes[name] = data
+function PrizePool:addCustomPrizeType(prizeType, data)
+	self.prizeTypes[prizeType] = data
 	return self
 end
 
-function PrizePool:addPrize(name, index, data)
-	assert(self.prizeTypes[name], 'addPrize: Not a valid prize name!')
+function PrizePool:addPrize(prizeType, index, data)
+	assert(self.prizeTypes[prizeType], 'addPrize: Not a valid prize name!')
 	assert(Logic.isNumeric(index), 'addPrize: Index is not numeric!')
-	table.insert(self.prizes, {id = name .. index, enum = name, index = index, data = data})
+	table.insert(self.prizes, {id = prizeType .. index, type = prizeType, index = index, data = data})
 	return self
 end
 
@@ -286,7 +292,7 @@ function PrizePool:_hasUsdPrizePool()
 	return (Array.any(self.placements, function (placement)
 		return placement.hasUSD
 	end)) or (self.options.autoUSD and Array.any(self.prizes, function (prize)
-		return prize.enum == 'LOCAL_CURRENCY'
+		return prize.type == LOCAL_CURRENCY
 	end))
 end
 
@@ -378,15 +384,15 @@ end
 function Placement:_readPrizeRewards(args)
 	local rewards = {}
 
-	for name, prizeData in pairs(self.parent.prizeTypes) do
+	for prizeType, prizeData in pairs(self.parent.prizeTypes) do
 		local fieldName = prizeData.row
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, rewardValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				if name == 'USD' then
+				if prizeType == USD then
 					self.hasUSD = true
 				end
-				rewards[name .. index] = prizeData.rowParse(self, rewardValue, args, index)
+				rewards[prizeType .. index] = prizeData.rowParse(self, rewardValue, args, index)
 			end
 		end
 	end
@@ -399,10 +405,10 @@ end
 function Placement:_readAdditionalData(args)
 	local data = {}
 
-	for name, typeData in pairs(self.parent.additionalData) do
+	for prizeType, typeData in pairs(self.parent.additionalData) do
 		local fieldName = typeData.field
 		if args[fieldName] then
-			data[name] = typeData.parse(self, args[fieldName], args)
+			data[prizeType] = typeData.parse(self, args[fieldName], args)
 		end
 	end
 
