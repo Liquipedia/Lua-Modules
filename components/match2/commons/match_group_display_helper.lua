@@ -18,7 +18,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 
 local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
-local _UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+local _UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 
 --[[
 Deprecated. Use Opponent.typeIsParty

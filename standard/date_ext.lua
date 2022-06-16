@@ -81,7 +81,7 @@ param to Module:Countdown.
 ]]
 function DateExt.toCountdownArg(dateOrTimestamp)
 	local timestamp = DateExt.readTimestamp(dateOrTimestamp)
-	return DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. '<abbr data-tz="+0:00"></abbr>'
+	return DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' <abbr data-tz="+0:00"></abbr>'
 end
 
 --[[
