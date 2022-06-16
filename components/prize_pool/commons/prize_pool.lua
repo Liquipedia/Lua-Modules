@@ -11,11 +11,15 @@ local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent') -- Note: This can be overwritten
+---Note: This can be overwritten
+---@module'opponent'
+local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+---@module'variables'
 local Variables = require('Module:Variables')
 
+---@module'infobox_widget_injector'
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -426,7 +430,7 @@ function Placement:_parseOpponents(args)
 	-- Parse opponents in the placement
 	return Array.mapIndexes(function(opponentIndex)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
-		local opponent = {opponentData = {}, prizes = {}, data = {}}
+		local opponent = {opponentData = {}, prizes = {}, additionalData = {}}
 		if not opponentInput then
 			-- If given a range of opponents, add them all, even if they're missing from the input
 			if not args.place or self.placeStart + opponentIndex > self.placeEnd + 1 then
@@ -454,7 +458,7 @@ function Placement:_parseOpponents(args)
 			opponent.prizes = self:_readPrizeRewards(opponentInput)
 
 			-- Parse additional data (groupscore, last opponent etc)
-			opponent.data = self:_readAdditionalData(opponentInput)
+			opponent.additionalData = self:_readAdditionalData(opponentInput)
 
 			-- Set date
 			opponent.date = opponentInput.date
