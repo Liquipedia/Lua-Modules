@@ -18,7 +18,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 
 local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
-local _UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+local _UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 
 --[[
 Deprecated. Use Opponent.typeIsParty
@@ -99,7 +99,7 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateIsExact == true then
-		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. _UTC
+		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. _NONBREAKING_SPACE .. _UTC
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end
