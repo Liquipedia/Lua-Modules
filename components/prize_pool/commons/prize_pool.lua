@@ -12,14 +12,11 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 ---Note: This can be overwritten
----@module'opponent'
 local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
----@module'variables'
 local Variables = require('Module:Variables')
 
----@module'infobox_widget_injector'
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -27,16 +24,7 @@ local Placement = Class.new(function(self, ...) self:init(...) end)
 
 local TODAY = os.date('%Y-%m-%d')
 
--- TODO: Extract Enum handling to its own Module
-local prizeTypes = Table.map({
-	'USD', 'LOCAL_CURRENCY', 'POINTS', 'QUALIFIES', 'FREETEXT'
-}, function(value, name) return name, value end)
-
-local additionalDataTypes = Table.map({
-	'LASTVS', 'GROUPSCORE', 'LASTVSSCORE'
-}, function(value, name) return name, value end)
-
-local config = {
+PrizePool.config = {
 	showUSD = {
 		default = false
 	},
@@ -66,24 +54,15 @@ local config = {
 	},
 }
 
-local prizeData = {
-	[prizeTypes.USD] = {
-		row = 'usdprize',
-		rowParse = function (placement, input, context, index)
-			return PrizePool._parseInteger(input)
-		end
-	},
-	[prizeTypes.LOCAL_CURRENCY] = {
+PrizePool.prizeTypes = {
+	USD = {},
+	LOCAL_CURRENCY = {
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
 			return {currency = string.upper(input)}
 		end,
-		row = 'localprize',
-		rowParse = function (placement, input, context, index)
-			return PrizePool._parseInteger(input)
-		end
 	},
-	[prizeTypes.QUALIFIES] = {
+	QUALIFIES = {
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
 			local link = input:gsub(' ', '_')
@@ -105,27 +84,48 @@ local prizeData = {
 
 			return data
 		end,
-		row = 'qualified',
-		rowParse = function (placement, input, context, index)
-			return Logic.readBool(input)
-		end
 	},
-	[prizeTypes.POINTS] = {
+	POINTS = {
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
 			local pointsData = mw.loadData('Module:Points/data')
 			return pointsData[input] or {title = 'Points'}
 		end,
+	},
+	FREETEXT = {
+		header = 'freetext',
+		headerParse = function (prizePool, input, context, index)
+			return {title = input}
+		end,
+	}
+}
+
+Placement.prizeRewards = {
+	USD = {
+		row = 'usdprize',
+		rowParse = function (placement, input, context, index)
+			return PrizePool._parseInteger(input)
+		end
+	},
+	LOCAL_CURRENCY = {
+		row = 'localprize',
+		rowParse = function (placement, input, context, index)
+			return PrizePool._parseInteger(input)
+		end
+	},
+	QUALIFIES = {
+		row = 'qualified',
+		rowParse = function (placement, input, context, index)
+			return Logic.readBool(input)
+		end
+	},
+	POINTS = {
 		row = 'points',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
 		end
 	},
-	[prizeTypes.FREETEXT] = {
-		header = 'freetext',
-		headerParse = function (prizePool, input, context, index)
-			return {title = input}
-		end,
+	FREETEXT = {
 		row = 'freetext',
 		rowParse = function (placement, input, context, index)
 			return input
@@ -133,20 +133,20 @@ local prizeData = {
 	},
 }
 
-local additional = {
-	[additionalDataTypes.GROUPSCORE] = {
+Placement.additionalData = {
+	GROUPSCORE = {
 		field = 'wdl',
 		parse = function (placement, input, context)
 			return input
 		end
 	},
-	[additionalDataTypes.LASTVS] = {
+	LASTVS = {
 		field = 'lastvs',
 		parse = function (placement, input, context)
 			return placement:_parseOpponentArgs(input, context.date)
 		end
 	},
-	[additionalDataTypes.LASTVSSCORE] = {
+	LASTVSSCORE = {
 		field = 'lastvsscore',
 		parse = function (placement, input, context)
 			local scores = Table.mapValues(mw.text.split(input, '-'), tonumber)
@@ -203,7 +203,7 @@ function PrizePool:build()
 end
 
 function PrizePool:_readConfig(args)
-	for name, configData in pairs(config) do
+	for name, configData in pairs(self.config) do
 		local value = configData.default
 		if configData.read then
 			value = Logic.nilOr(configData.read(args), value)
@@ -216,15 +216,13 @@ end
 
 --- Parse the input for available prize types overall.
 function PrizePool:_readPrizes(args)
-	for prizeEnum in pairs(prizeTypes) do
-		local prizeDatum = prizeData[prizeTypes[prizeEnum]]
-		assert(prizeDatum, 'Error: Missmatch between prizeData and prizeTypes. Is a prizeType missing in prizeData?')
-		local fieldName = prizeDatum.header
+	for name, prizeData in pairs(self.prizeTypes) do
+		local fieldName = prizeData.header
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				local data = prizeDatum.headerParse(self, prizeValue, args, index)
-				self:addPrize(prizeEnum, index, data)
+				local data = prizeData.headerParse(self, prizeValue, args, index)
+				self:addPrize(name, index, data)
 			end
 		end
 	end
@@ -254,28 +252,24 @@ function PrizePool:setConfig(option, value)
 end
 
 function PrizePool:addCustomConfig(name, default, func)
-	config[name] = {
+	self.config[name] = {
 		default = default,
 		read = func
 	}
 	return self
 end
 
--- TODO extract parts of this to the future Enum class
-local CUSTOM_TYPES_OFFSET = 100
-local CUSTOM_TYPES_USED = 0
-function PrizePool:addCustomPrizeType(enum, data)
-	-- Assign the first unassigned ID starting with CUSTOM_TYPES_OFFSET
-	prizeTypes[enum] = CUSTOM_TYPES_OFFSET + CUSTOM_TYPES_USED
-	CUSTOM_TYPES_USED = CUSTOM_TYPES_USED + 1
-	prizeData[prizeTypes[enum]] = data
+--- Add a Custom Prize Type
+function PrizePool:addCustomPrizeType(name, dataHeader, dataPlacement)
+	self.prizeTypes[name] = dataHeader
+	self.prizeRewards[name] = dataPlacement
 	return self
 end
 
-function PrizePool:addPrize(enum, index, data)
-	assert(prizeTypes[enum], 'addPrize: Not a valid prizeEnum!')
+function PrizePool:addPrize(name, index, data)
+	assert(self.prizeTypes[name], 'addPrize: Not a valid prize name!')
 	assert(Logic.isNumeric(index), 'addPrize: Index is not numeric!')
-	table.insert(self.prizes, {id = enum .. index, enum = prizeTypes[enum], index = index, data = data})
+	table.insert(self.prizes, {id = name .. index, enum = name, index = index, data = data})
 	return self
 end
 
@@ -300,7 +294,7 @@ function PrizePool:_hasUsdPrizePool()
 	return (Array.any(self.placements, function (placement)
 		return placement.hasUSD
 	end)) or (self.options.autoUSD and Array.any(self.prizes, function (prize)
-		return prize.enum == prizeTypes.LOCAL_CURRENCY
+		return prize.enum == 'LOCAL_CURRENCY'
 	end))
 end
 
@@ -393,16 +387,15 @@ end
 function Placement:_readPrizeRewards(args)
 	local rewards = {}
 
-	for prizeEnum in pairs(prizeTypes) do
-		local prizeDatum = prizeData[prizeTypes[prizeEnum]]
-		local fieldName = prizeDatum.row
+	for name, prizeData in pairs(self.prizeRewards) do
+		local fieldName = prizeData.row
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
 			for _, rewardValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				if prizeTypes[prizeEnum] == prizeTypes.USD then
+				if name == 'USD' then
 					self.hasUSD = true
 				end
-				rewards[prizeEnum .. index] = prizeDatum.rowParse(self, rewardValue, args, index)
+				rewards[name .. index] = prizeData.rowParse(self, rewardValue, args, index)
 			end
 		end
 	end
@@ -415,11 +408,10 @@ end
 function Placement:_readAdditionalData(args)
 	local data = {}
 
-	for enum in pairs(additionalDataTypes) do
-		local type = additional[additionalDataTypes[enum]]
-		local fieldName = type.field
+	for name, typeData in pairs(self.additionalData) do
+		local fieldName = typeData.field
 		if args[fieldName] then
-			data[enum] = type.parse(self, args[fieldName], args)
+			data[name] = typeData.parse(self, args[fieldName], args)
 		end
 	end
 
