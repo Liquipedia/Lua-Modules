@@ -79,7 +79,8 @@ function AutomaticPointsTable:storeLPDB(pointsData)
 		local position = teamPointsData.position
 		local totalPoints = teamPointsData.totalPoints
 		local objectData = {
-			type = 'automatic points',
+			type = 'automatic_points',
+
 			name = teamName,
 			information = position,
 			date = date,
