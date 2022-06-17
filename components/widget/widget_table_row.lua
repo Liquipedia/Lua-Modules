@@ -16,7 +16,6 @@ local TableRow = Class.new(
 		self.cells = input.cells or {}
 		self.classes = input.classes or {}
 		self.css = input.css or {}
-		self.isHeader = (input.isHeader == true)
 	end
 )
 
@@ -30,12 +29,12 @@ function TableRow:addClass(class)
 	return self
 end
 
-function TableRow:make()
-	local row = mw.html.create('div'):addClass('divRow')
+function TableRow:getCellCount()
+	return #self.cells
+end
 
-	if self.isHeader == true then
-		row:addClass('divHeaderRow')
-	end
+function TableRow:make()
+	local row = mw.html.create('div'):css('display', 'contents')
 
 	for _, class in ipairs(self.classes) do
 		row:addClass(class)

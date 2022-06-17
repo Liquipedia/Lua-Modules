@@ -44,6 +44,7 @@ local Placement = Class.new(function(self, ...) self:init(...) end)
 local TODAY = os.date('%Y-%m-%d')
 local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
+local NON_BREAKING_SPACE = '&nbsp;'
 
 local PRIZE_TYPE_USD = 'USD'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
@@ -71,6 +72,12 @@ PrizePool.config = {
 		default = true,
 		read = function(args)
 			return Logic.readBoolOrNil(args.exchangeinfo)
+		end
+	},
+	cutAfter = {
+		default = 4,
+		read = function(args)
+			return tonumber(args.cutafter)
 		end
 	},
 	storeSmw = {
@@ -160,7 +167,7 @@ PrizePool.prizeTypes = {
 						iconDark = headerData.iconDark, icon = headerData.icon,
 					}
 					table.insert(text, icon)
-					table.insert(text, '&nbsp;')
+					table.insert(text, NON_BREAKING_SPACE)
 				end
 
 				if String.isNotEmpty(headerData.title) then
@@ -187,7 +194,7 @@ PrizePool.prizeTypes = {
 					link = data.link, icon = data.icon, iconDark = data.iconDark, name = data.title
 				}
 				table.insert(text, icon)
-				table.insert(text, '&nbsp;')
+				table.insert(text, NON_BREAKING_SPACE)
 			end
 
 			if String.isNotEmpty(data.title) then
@@ -293,15 +300,11 @@ function PrizePool:create()
 		self:addPrize(PRIZE_TYPE_USD, 1)
 	end
 
-	-- TODO: Add post-processing (eg convert local to USD)
-
-	mw.logObject(self)
-
 	return self
 end
 
 function PrizePool:build()
-	local table = WidgetTable{css = {['text-align'] = 'center'}}
+	local table = WidgetTable{css = {['text-align'] = 'center'}, classes={'general-collapsible', 'collapsed'}}
 
 	table:addRow(self:_buildHeader())
 
@@ -315,7 +318,7 @@ function PrizePool:build()
 end
 
 function PrizePool:_buildHeader()
-	local headerRow = WidgetTableRow{isHeader = true}
+	local headerRow = WidgetTableRow{css = {['font-weight'] = 'bold'}}
 
 	headerRow:addCell(WidgetTableCell{content = {'Place'}})
 
@@ -339,7 +342,7 @@ function PrizePool:_buildRows()
 		for _, opponent in ipairs(placement.opponents) do
 			local row = WidgetTableRow{classes = {placement:getBackground()}}
 			row:addCell(WidgetTableCell{
-				content = {placement:getMedal() or '' , '&nbsp;', placement:displayPlace()},
+				content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
 				css = {['font-weight'] = 'bolder'}
 			})
 			for _, prize in ipairs(self.prizes) do
