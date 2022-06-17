@@ -1,4 +1,10 @@
---[[Infobox Weapon Custom]]--
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Infobox/Weapon/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 local Weapon = require('Module:Infobox/Weapon')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
