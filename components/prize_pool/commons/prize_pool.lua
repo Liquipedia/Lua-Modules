@@ -27,6 +27,7 @@ local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
+local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
 local WidgetTableRow = require('Module:Widget/Table/Row')
 local WidgetTableCell = require('Module:Widget/Table/Cell')
@@ -181,23 +182,23 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data then
-				local text = {}
+				local content = {}
 				if String.isNotEmpty(headerData.icon) then
 					local icon = LeagueIcon.display{
 						link = headerData.link, name = headerData.title,
 						iconDark = headerData.iconDark, icon = headerData.icon,
 					}
-					table.insert(text, icon)
-					table.insert(text, NON_BREAKING_SPACE)
+					table.insert(content, icon)
+					table.insert(content, NON_BREAKING_SPACE)
 				end
 
 				if String.isNotEmpty(headerData.title) then
-					table.insert(text, '[[' .. headerData.link .. '|' .. headerData.title .. ']]')
+					table.insert(content, '[[' .. headerData.link .. '|' .. headerData.title .. ']]')
 				else
-					table.insert(text, '[[' .. headerData.link .. ']]')
+					table.insert(content, '[[' .. headerData.link .. ']]')
 				end
 
-				return WidgetTableCell{content = text}
+				return WidgetTableCell{content = content}
 			end
 		end,
 	},
@@ -350,7 +351,11 @@ function PrizePool:build()
 
 	table:setContext{self._widgetInjector}
 
-	return table:make()[1] -- This is wrong (should be via factory), but done for testing purposes
+	local wrapper = mw.html.create('div')
+	for _, node in ipairs(WidgetFactory.work(table, self._widgetInjector)) do
+		wrapper:node(node)
+	end
+	return wrapper
 end
 
 function PrizePool:_buildHeader()

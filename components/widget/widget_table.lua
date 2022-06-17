@@ -53,7 +53,7 @@ end
 
 function Table:_getMaxCells()
 	local getNumberCells = function(row)
-		return #row.cells -- Don't like this
+		return row:getCellCount()
 	end
 	return Array.reduce(Array.map(self.rows, getNumberCells), math.max)
 end
