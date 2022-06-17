@@ -5,6 +5,7 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
 local Weapon = require('Module:Infobox/Weapon')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
@@ -37,30 +38,6 @@ function CustomWeapon:createWidgetInjector()
 	return CustomInjector()
 end
 
---[[function CustomInjector:parse(id, widgets)
-	if id == 'user' then
-		table.insert(widgets,
-			Builder{
-				builder = function()
-					local operatorIcons = Array.map(Weapon:getAllArgsForBase(_args, 'user'),
-						function(operator, _)
-							return OperatorIcon.getImage{operator, size = _SIZE_OPERATOR}
-						end
-					)
-					return {
-						Cell{
-							name = #operatorIcons > 1 and 'Operators' or 'Operator',
-							content = {
-								table.concat(operatorIcons, '&nbsp;')
-							}
-						}
-					}
-				end
-		})
-	end
-	return widgets
-end]]--
-
 function CustomInjector:addCustomCells(widgets)
 	-- Operators
 	table.insert(widgets,
@@ -81,7 +58,6 @@ function CustomInjector:addCustomCells(widgets)
 				}
 			end
 		})
-	mw.logObject(_args)
 	return widgets
 end
 
