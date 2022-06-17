@@ -91,8 +91,7 @@ PrizePool.config = {
 PrizePool.prizeTypes = {
 	[PRIZE_TYPE_USD] = {
 		headerDisplay = function (data)
-			-- TODO: Exact currency info to new module
-			local currencyText = {'$ ', Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')}
+			local currencyText = {Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {'USD'})}
 			return WidgetTableCell{content = currencyText}
 		end,
 		row = 'usdprize',
@@ -108,24 +107,43 @@ PrizePool.prizeTypes = {
 	[PRIZE_TYPE_LOCAL_CURRENCY] = {
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			return {currency = string.upper(input)}
+			Variables.varDefine('localcurrencysymbol', '')
+			Variables.varDefine('localcurrencysymbolafter', '')
+			Variables.varDefine('localcurrencycode', '')
+			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {input})
+
+			local symbol, symbolFirst
+			if String.isNotEmpty(Variables.varDefault('localcurrencysymbol')) then
+				symbol = Variables.varDefault('localcurrencysymbol')
+				symbolFirst = true
+			elseif String.isNotEmpty(Variables.varDefault('localcurrencysymbolafter')) then
+				symbol = Variables.varDefault('localcurrencysymbolafter')
+				symbolFirst = false
+			end
+
+			return {
+				currency = Variables.varDefault('localcurrencycode'), currencyText = currencyText,
+				symbol = symbol, symbolFirst = symbolFirst
+			}
 		end,
 		headerDisplay = function (data)
-			-- TODO: Exact currency info to new module
-			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {data.currency})
-			return WidgetTableCell{content = {currencyText}}
+			return WidgetTableCell{content = {data.currencyText}}
 		end,
 		row = 'localprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
 		end,
 		rowDisplay = function (headerData, data)
-			-- TODO Move currency to new module
 			if data > 0 then
-				local text = {Variables.varDefault('localcurrencysymbol', ''),
-							LANG:formatNum(data),
-							Variables.varDefault('localcurrencysymbolafter', '')}
-				return WidgetTableCell{content = text}
+				local displayText = {LANG:formatNum(data)}
+
+				if headerData.symbolFirst then
+					table.insert(displayText, 1, headerData.symbol)
+				else
+					table.insert(displayText, headerData.symbol)
+				end
+
+				return WidgetTableCell{content = displayText}
 			end
 		end,
 	},
