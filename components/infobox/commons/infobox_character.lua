@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Hero
+-- page=Module:Infobox/Character
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -18,14 +18,14 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
-local Hero = Class.new(BasicInfobox)
+local Character = Class.new(BasicInfobox)
 
-function Hero.run(frame)
-	local hero = Hero(frame)
-	return hero:createInfobox()
+function Character.run(frame)
+	local character = Character(frame)
+	return character:createInfobox()
 end
 
-function Hero:createInfobox()
+function Character:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
@@ -84,7 +84,7 @@ function Hero:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:categories('Heroes')
+	infobox:categories('Characters')
 	infobox:categories(unpack(self:getWikiCategories(args)))
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
@@ -96,7 +96,7 @@ function Hero:createInfobox()
 	return builtInfobox
 end
 
-function Hero:_createLocation(location)
+function Character:_createLocation(location)
 	if location == nil then
 		return ''
 	end
@@ -105,19 +105,19 @@ function Hero:_createLocation(location)
 		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
-function Hero:subHeader(args)
+function Character:subHeader(args)
 	return args.title
 end
 
-function Hero:getWikiCategories(args)
+function Character:getWikiCategories(args)
 	return {}
 end
 
-function Hero:nameDisplay(args)
+function Character:nameDisplay(args)
 	return args.name
 end
 
-function Hero:setLpdbData(args)
+function Character:setLpdbData(args)
 end
 
-return Hero
+return Character
