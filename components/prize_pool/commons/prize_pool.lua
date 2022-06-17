@@ -209,25 +209,32 @@ PrizePool.prizeTypes = {
 			return pointsData[input] or {title = 'Points'}
 		end,
 		headerDisplay = function (data)
-			local text = {}
+			local headerDisplay = {}
 
 			if String.isNotEmpty(data.icon) then
 				local icon = LeagueIcon.display{
 					link = data.link, icon = data.icon, iconDark = data.iconDark, name = data.title
 				}
-				table.insert(text, icon)
-				table.insert(text, NON_BREAKING_SPACE)
+				table.insert(headerDisplay, icon)
+				table.insert(headerDisplay, NON_BREAKING_SPACE)
 			end
 
 			if String.isNotEmpty(data.title) then
+				local text
 				if String.isNotEmpty(data.titleLong) then
-					table.insert(text, Abbreviation.make(data.title, data.titleLong))
+					text = Abbreviation.make(data.title, data.titleLong)
 				elseif String.isNotEmpty(data.title) then
-					table.insert(text, data.title)
+					text = data.title
 				end
+
+				if String.isNotEmpty(data.link) then
+					text = '[[' .. data.link .. '|' .. text .. ']]'
+				end
+
+				table.insert(headerDisplay, text)
 			end
 
-			return WidgetTableCell{content = text}
+			return WidgetTableCell{content = headerDisplay}
 		end,
 		row = 'points',
 		rowParse = function (placement, input, context, index)
