@@ -6,18 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+
+local WidgetTableCell = require('Module:Widget/Table/Cell')
 
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -30,6 +35,8 @@ local PrizePool = Class.new(function(self, ...) self:init(...) end)
 local Placement = Class.new(function(self, ...) self:init(...) end)
 
 local TODAY = os.date('%Y-%m-%d')
+local LANG = mw.language.getContentLanguage()
+local NON_BREAKING_SPACE = '&nbsp;'
 
 local PRIZE_TYPE_USD = 'USD'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
@@ -69,20 +76,47 @@ PrizePool.config = {
 
 PrizePool.prizeTypes = {
 	[PRIZE_TYPE_USD] = {
+		headerDisplay = function (data)
+			local currencyText = {Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {'USD'})}
+			return WidgetTableCell{content = currencyText}
+		end,
+
 		row = 'usdprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if data > 0 then
+				return WidgetTableCell{content = {'$', LANG:formatNum(data)}}
+			end
+		end,
 	},
 	[PRIZE_TYPE_LOCAL_CURRENCY] = {
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			return {currency = string.upper(input)}
+			return {currency = string.upper(input), currencyText = 'TODO'}
 		end,
+		headerDisplay = function (data)
+			return WidgetTableCell{content = {data.currencyText}}
+		end,
+
 		row = 'localprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if data > 0 then
+				local displayText = {LANG:formatNum(data)}
+
+				if headerData.symbolFirst then
+					table.insert(displayText, 1, headerData.symbol)
+				else
+					table.insert(displayText, headerData.symbol)
+				end
+
+				return WidgetTableCell{content = displayText}
+			end
+		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
 		header = 'qualifies',
@@ -106,10 +140,35 @@ PrizePool.prizeTypes = {
 
 			return data
 		end,
+		headerDisplay = function (data)
+			return WidgetTableCell{content = {'Qualifies To'}}
+		end,
+
 		row = 'qualified',
 		rowParse = function (placement, input, context, index)
 			return Logic.readBool(input)
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if data then
+				local content = {}
+				if String.isNotEmpty(headerData.icon) then
+					local icon = LeagueIcon.display{
+						link = headerData.link, name = headerData.title,
+						iconDark = headerData.iconDark, icon = headerData.icon,
+					}
+					table.insert(content, icon)
+					table.insert(content, NON_BREAKING_SPACE)
+				end
+
+				if String.isNotEmpty(headerData.title) then
+					table.insert(content, '[[' .. headerData.link .. '|' .. headerData.title .. ']]')
+				else
+					table.insert(content, '[[' .. headerData.link .. ']]')
+				end
+
+				return WidgetTableCell{content = content}
+			end
+		end,
 	},
 	[PRIZE_TYPE_POINTS] = {
 		header = 'points',
@@ -117,20 +176,63 @@ PrizePool.prizeTypes = {
 			local pointsData = mw.loadData('Module:Points/data')
 			return pointsData[input] or {title = 'Points'}
 		end,
+		headerDisplay = function (data)
+			local headerDisplay = {}
+
+			if String.isNotEmpty(data.icon) then
+				local icon = LeagueIcon.display{
+					link = data.link, icon = data.icon, iconDark = data.iconDark, name = data.title
+				}
+				table.insert(headerDisplay, icon)
+				table.insert(headerDisplay, NON_BREAKING_SPACE)
+			end
+
+			if String.isNotEmpty(data.title) then
+				local text
+				if String.isNotEmpty(data.titleLong) then
+					text = Abbreviation.make(data.title, data.titleLong)
+				elseif String.isNotEmpty(data.title) then
+					text = data.title
+				end
+
+				if String.isNotEmpty(data.link) then
+					text = '[[' .. data.link .. '|' .. text .. ']]'
+				end
+
+				table.insert(headerDisplay, text)
+			end
+
+			return WidgetTableCell{content = headerDisplay}
+		end,
+
 		row = 'points',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if data > 0 then
+				return WidgetTableCell{content = {data}}
+			end
+		end,
 	},
 	[PRIZE_TYPE_FREETEXT] = {
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
 			return {title = input}
 		end,
+		headerDisplay = function (data)
+			return WidgetTableCell{content = {data.title}}
+		end,
+
 		row = 'freetext',
 		rowParse = function (placement, input, context, index)
 			return input
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if String.isNotEmpty(data) then
+				return WidgetTableCell{content = {data}}
+			end
+		end,
 	}
 }
 
