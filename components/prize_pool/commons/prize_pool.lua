@@ -92,10 +92,12 @@ PrizePool.config = {
 PrizePool.prizeTypes = {
 	[PRIZE_TYPE_USD] = {
 		sortOrder = 10,
+
 		headerDisplay = function (data)
 			local currencyText = {Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {'USD'})}
 			return WidgetTableCell{content = currencyText}
 		end,
+
 		row = 'usdprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
@@ -108,6 +110,7 @@ PrizePool.prizeTypes = {
 	},
 	[PRIZE_TYPE_LOCAL_CURRENCY] = {
 		sortOrder = 20,
+
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
 			Variables.varDefine('localcurrencysymbol', '')
@@ -132,6 +135,7 @@ PrizePool.prizeTypes = {
 		headerDisplay = function (data)
 			return WidgetTableCell{content = {data.currencyText}}
 		end,
+
 		row = 'localprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
@@ -152,6 +156,7 @@ PrizePool.prizeTypes = {
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
 		sortOrder = 40,
+
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
 			local link = input:gsub(' ', '_')
@@ -176,6 +181,7 @@ PrizePool.prizeTypes = {
 		headerDisplay = function (data)
 			return WidgetTableCell{content = {'Qualifies To'}}
 		end,
+
 		row = 'qualified',
 		rowParse = function (placement, input, context, index)
 			return Logic.readBool(input)
@@ -204,6 +210,7 @@ PrizePool.prizeTypes = {
 	},
 	[PRIZE_TYPE_POINTS] = {
 		sortOrder = 30,
+
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
 			local pointsData = mw.loadData('Module:Points/data')
@@ -237,6 +244,7 @@ PrizePool.prizeTypes = {
 
 			return WidgetTableCell{content = headerDisplay}
 		end,
+
 		row = 'points',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
@@ -249,6 +257,7 @@ PrizePool.prizeTypes = {
 	},
 	[PRIZE_TYPE_FREETEXT] = {
 		sortOrder = 50,
+
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
 			return {title = input}
@@ -256,6 +265,7 @@ PrizePool.prizeTypes = {
 		headerDisplay = function (data)
 			return WidgetTableCell{content = {data.title}}
 		end,
+
 		row = 'freetext',
 		rowParse = function (placement, input, context, index)
 			return input
@@ -296,6 +306,7 @@ function PrizePool:init(args)
 	self.pagename = mw.title.getCurrentTitle().text
 	self.date = PrizePool._getTournamentDate()
 	self.opponentType = self.args.type
+
 	if self.args.opponentLibrary then
 		Opponent = require('Module:'.. self.args.opponentLibrary)
 	end
