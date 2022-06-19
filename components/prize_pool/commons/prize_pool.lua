@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -77,7 +78,24 @@ PrizePool.prizeTypes = {
 	[PRIZE_TYPE_LOCAL_CURRENCY] = {
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			return {currency = string.upper(input)}
+			Variables.varDefine('localcurrencysymbol', '')
+			Variables.varDefine('localcurrencysymbolafter', '')
+			Variables.varDefine('localcurrencycode', '')
+			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {input})
+
+			local symbol, symbolFirst
+			if String.isNotEmpty(Variables.varDefault('localcurrencysymbol')) then
+				symbol = Variables.varDefault('localcurrencysymbol')
+				symbolFirst = true
+			elseif String.isNotEmpty(Variables.varDefault('localcurrencysymbolafter')) then
+				symbol = Variables.varDefault('localcurrencysymbolafter')
+				symbolFirst = false
+			end
+
+			return {
+				currency = Variables.varDefault('localcurrencycode'), currencyText = currencyText,
+				symbol = symbol, symbolFirst = symbolFirst
+			}
 		end,
 		row = 'localprize',
 		rowParse = function (placement, input, context, index)
