@@ -9,6 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
+local Custom = require('Module:AutomaticPointsTable/Custom')
 local TableDisplay = require('Module:AutomaticPointsTable/Display')
 local MinifiedDisplay = require('Module:AutomaticPointsTable/MinifiedDisplay')
 local Json = require('Module:Json')
