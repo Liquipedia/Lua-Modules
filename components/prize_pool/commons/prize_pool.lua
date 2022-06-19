@@ -11,13 +11,23 @@ local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MatchPlacement = require('Module:Match/Placement')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
+---Note: This can be overwritten
+local OpponentDisplay = require('Module:OpponentDisplay')
+local Ordinal = require('Module:Ordinal')
+local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+
+local WidgetFactory = require('Module:Infobox/Widget/Factory')
+local WidgetTable = require('Module:Widget/Table')
+local WidgetTableRow = require('Module:Widget/Table/Row')
+local WidgetTableCell = require('Module:Widget/Table/Cell')
 
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -30,6 +40,8 @@ local PrizePool = Class.new(function(self, ...) self:init(...) end)
 local Placement = Class.new(function(self, ...) self:init(...) end)
 
 local TODAY = os.date('%Y-%m-%d')
+local DASH = '&#045;'
+local NON_BREAKING_SPACE = '&nbsp;'
 
 local PRIZE_TYPE_USD = 'USD'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
@@ -198,9 +210,80 @@ function PrizePool:create()
 end
 
 function PrizePool:build()
-	-- TODO
-	mw.logObject(self)
-	return ''
+	local table = WidgetTable{css = {['text-align'] = 'center'}, classes={'general-collapsible', 'collapsed'}}
+
+	table:addRow(self:_buildHeader())
+
+	for _, row in ipairs(self:_buildRows()) do
+		table:addRow(row)
+	end
+
+	table:setContext{self._widgetInjector}
+
+	local wrapper = mw.html.create('div')
+	for _, node in ipairs(WidgetFactory.work(table, self._widgetInjector)) do
+		wrapper:node(node)
+	end
+
+	return wrapper
+end
+
+function PrizePool:_buildHeader()
+	local headerRow = WidgetTableRow{css = {['font-weight'] = 'bold'}}
+
+	headerRow:addCell(WidgetTableCell{content = {'Place'}})
+
+	for _, prize in ipairs(self.prizes) do
+		local prizeTypeData = self.prizeTypes[prize.type]
+		local cell = prizeTypeData.headerDisplay(prize.data)
+		headerRow:addCell(cell)
+	end
+
+	-- TODO: Add support for party types
+	headerRow:addCell(WidgetTableCell{content = {'Team'}})
+
+	return headerRow
+end
+
+function PrizePool:_buildRows()
+	local rows = {}
+	for _, placement in ipairs(self.placements) do
+		-- TODO RowSpan
+		-- TODO Cutoff
+
+		for _, opponent in ipairs(placement.opponents) do
+			local row = WidgetTableRow{}
+
+			row:addClass(placement:getBackground())
+			row:addCell(WidgetTableCell{
+				content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
+				css = {['font-weight'] = 'bolder'}
+			})
+
+			for _, prize in ipairs(self.prizes) do
+				local prizeTypeData = self.prizeTypes[prize.type]
+				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+
+				local cell
+				if reward then
+					cell = prizeTypeData.rowDisplay(prize.data, reward)
+				end
+
+				if not cell then
+					cell = WidgetTableCell{content = {DASH}}
+				end
+
+				row:addCell(cell)
+			end
+
+			-- TODO: Proper Support for Party Types
+			local opponentDisplay = OpponentDisplay.InlineOpponent{opponent = opponent.opponentData}
+			row:addCell(WidgetTableCell{content = {opponentDisplay}, css = {['text-align'] = 'left'}})
+
+			table.insert(rows, row)
+		end
+	end
+	return rows
 end
 
 function PrizePool:_readConfig(args)
@@ -455,6 +538,25 @@ function Placement:_parseOpponentArgs(input, date)
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
 	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd()
 	return Opponent.resolve(opponentData, date)
+end
+
+function Placement:displayPlace()
+	local start = Ordinal._ordinal(self.placeStart)
+	if self.placeEnd > self.placeStart then
+		return start .. DASH .. Ordinal._ordinal(self.placeEnd)
+	end
+	return start
+end
+
+function Placement:getBackground()
+	return PlacementInfo.getBgClass(self.placeStart)
+end
+
+function Placement:getMedal()
+	local medal = MatchPlacement.MedalIcon{range = {self.placeStart, self.placeEnd}}
+	if medal then
+		return tostring(medal)
+	end
 end
 
 return PrizePool
