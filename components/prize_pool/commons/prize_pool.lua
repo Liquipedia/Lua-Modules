@@ -69,12 +69,16 @@ PrizePool.config = {
 
 PrizePool.prizeTypes = {
 	[PRIZE_TYPE_USD] = {
+		sortOrder = 10,
+
 		row = 'usdprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
 		end
 	},
 	[PRIZE_TYPE_LOCAL_CURRENCY] = {
+		sortOrder = 20,
+
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
 			return {currency = string.upper(input)}
@@ -85,6 +89,8 @@ PrizePool.prizeTypes = {
 		end
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
+		sortOrder = 30,
+
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
 			local link = input:gsub(' ', '_')
@@ -112,6 +118,8 @@ PrizePool.prizeTypes = {
 		end
 	},
 	[PRIZE_TYPE_POINTS] = {
+		sortOrder = 40,
+
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
 			local pointsData = mw.loadData('Module:Points/data')
@@ -123,6 +131,8 @@ PrizePool.prizeTypes = {
 		end
 	},
 	[PRIZE_TYPE_FREETEXT] = {
+		sortOrder = 50,
+
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
 			return {title = input}
@@ -194,7 +204,14 @@ function PrizePool:create()
 		self:addPrize(PRIZE_TYPE_USD, 1)
 	end
 
+	table.sort(self.prizes, PrizePool._sortPrizes)
+
 	return self
+end
+
+--- Sort function for Prizes based on the lowest sortOrder
+function PrizePool._sortPrizes(x, y)
+	return PrizePool.prizeTypes[x.type].sortOrder < PrizePool.prizeTypes[y.type].sortOrder
 end
 
 function PrizePool:build()
