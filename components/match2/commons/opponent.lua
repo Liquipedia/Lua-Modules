@@ -289,7 +289,7 @@ function Opponent.readOpponentArgs(args)
 		local template = args.template or args[1]
 		return template and {
 			type = Opponent.team,
-			template = template:lower(),
+			template = template,
 		}
 
 	elseif partySize == 1 then
@@ -305,7 +305,7 @@ function Opponent.readOpponentArgs(args)
 		local players = Array.map(Array.range(1, partySize), function(playerIndex)
 			local playerTeam = args['p' .. playerIndex .. 'team']
 			if playerTeam then
-				playerTeam = playerTeam:lower()
+				playerTeam = playerTeam
 			end
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
