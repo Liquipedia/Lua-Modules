@@ -28,6 +28,7 @@ local _FORMATS = mw.loadData('Module:GameFormats')
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
+	_args.format = CustomLeague:_getGameFormat()
 
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
@@ -52,19 +53,13 @@ function CustomInjector:parse(id, widgets)
 					CustomLeague:_getGameMode()
 				}
 			},
-			Cell{name = 'Format', content = {
-					CustomLeague:_getGameFormat()
-				}
-			},
 		}
 	elseif id == 'customcontent' then
 		if _args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
 			table.insert(widgets, Cell{name = 'Number of players', content = {_args.player_number}})
-		end
 
-		--teams section
-		if _args.team_number then
+		elseif _args.team_number then
 			table.insert(widgets, Title{name = 'Teams'})
 			table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
 		end
@@ -87,12 +82,12 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', _game or _args.game)
 	Variables.varDefine('tournament_publishertier', _args['pokemonpremier'])
 	--Legacy Vars:
+	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
 function CustomLeague._getGameVersion()
 	local game = string.lower(_args.game or '')
-	_game = _GAME[game]
 	return _game
 end
 
@@ -104,7 +99,7 @@ function CustomLeague:_getGameMode()
 	if String.isEmpty(_args.mode) then
 		return nil
 	end
-	local mode = _MODES[string.lower(_args.mode or '')] or _MODES['default']
+	local mode = _MODES[_args.mode:lower()] or _MODES['default']
 	return mode
 end
 
@@ -113,9 +108,7 @@ function CustomLeague:_getGameFormat()
 		return nil
 	end
 
-	local format = string.lower(_args.format or '')
-
-	return _FORMATS[format] or _FORMATS['default']
+	return _FORMATS[_args.format:lower()] or _FORMATS['default']
 end
 
 return CustomLeague
