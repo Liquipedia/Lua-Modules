@@ -299,7 +299,7 @@ function PrizePool:_setLpdbData()
 		series = Variables.varDefault('tournament_series'),
 		shortname = Variables.varDefault('tournament_tickername'),
 		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_sdate', 'sdate', ''),
-		-- mode = ,
+		mode = Variables.varDefault('tournament_mode'),
 		type = Variables.varDefault('tournament_type'),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
