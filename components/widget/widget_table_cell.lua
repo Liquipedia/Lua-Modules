@@ -30,8 +30,12 @@ end
 
 function TableCell:make()
 	local cell = mw.html.create('div')
-	cell:css('border-left', '1px solid #bbb'):css('border-top', '1px solid #bbb'):css('background', 'inherit')
-	cell:css('padding', '5px'):css('line-height', '1.42857143')
+	cell:css{
+		['border-left'] = '1px solid #bbb',
+		['border-top'] = '1px solid #bbb',
+		['background'] = 'inherit',
+		['padding'] = '4px',
+	}
 
 	for _, class in ipairs(self.classes) do
 		cell:addClass(class)
