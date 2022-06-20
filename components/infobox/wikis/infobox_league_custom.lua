@@ -58,7 +58,6 @@ function CustomInjector:parse(id, widgets)
 		if _args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
 			table.insert(widgets, Cell{name = 'Number of players', content = {_args.player_number}})
-
 		elseif _args.team_number then
 			table.insert(widgets, Title{name = 'Teams'})
 			table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
@@ -87,7 +86,7 @@ function CustomLeague:defineCustomPageVariables()
 end
 
 function CustomLeague._getGameVersion()
-	local game = string.lower(_args.game or '')
+	_game = _GAME[string.lower(_args.game or '')]
 	return _game
 end
 
