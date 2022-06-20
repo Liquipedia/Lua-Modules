@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -200,6 +201,11 @@ end
 function PrizePool:build()
 	-- TODO
 	mw.logObject(self)
+
+	if self.options.storeLpdb then
+		self:_setLpdbData()
+	end
+
 	return ''
 end
 
@@ -284,6 +290,56 @@ end
 function PrizePool:setLpdbInjector(lpdbInjector)
 	-- TODO: Add type check once interface has been created
 	self._lpdbInjector = lpdbInjector
+	return self
+end
+
+function PrizePool:_setLpdbData()
+	local lpdbTournamentData = {
+		tournament = Variables.varDefault('tournament_name'),
+		series = Variables.varDefault('tournament_series'),
+		shortname = Variables.varDefault('tournament_tickername'),
+		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_sdate', 'sdate', ''),
+		-- mode = ,
+		type = Variables.varDefault('tournament_type'),
+		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
+		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
+		-- publishertier = ,
+		icon = Variables.varDefault('tournament_icon'),
+		icondark = Variables.varDefault('tournament_icondark'),
+		game = Variables.varDefault('tournament_game'),
+	}
+
+	local setWeight = function(lpdbEntry)
+		lpdbEntry.weight = Template.safeExpand(
+			mw.getCurrentFrame(), 'Weight', {
+				math.max(lpdbEntry.prizemoney, 1),
+				lpdbTournamentData.liquipediatier,
+				lpdbEntry.place,
+				lpdbTournamentData.type
+			})
+	end
+
+	local lpdbData = {}
+	for _, placement in ipairs(self.placements) do
+		local lpdbEntries = placement:_setLpdbData()
+
+		Array.forEach(lpdbEntries, function(lpdbEntry) Table.mergeInto(lpdbEntry, lpdbTournamentData) end)
+
+		Array.forEach(lpdbEntries, setWeight)
+
+		Array.extendWith(lpdbData, lpdbEntries)
+	end
+
+	if self._lpdbInjector then
+		for index, lpdbEntry in ipairs(lpdbData) do
+			lpdbData[index] = self._lpdbInjector:adjust(lpdbEntry)
+		end
+	end
+
+	for _, lpdbEntry in ipairs(lpdbData) do
+		mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. mw.ustring.lower(lpdbEntry.participant), lpdbEntry)
+	end
+
 	return self
 end
 
@@ -455,6 +511,48 @@ function Placement:_parseOpponentArgs(input, date)
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
 	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd()
 	return Opponent.resolve(opponentData, date)
+end
+
+function Placement:_setLpdbData()
+	local entries = {}
+	for _, opponent in ipairs(self.opponents) do
+		local participant, image, imageDark
+		if opponent.opponentData.type == Opponent.team then
+			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template)
+			participant = teamTemplate and teamTemplate.page or ''
+			image = teamTemplate.image
+			image = teamTemplate.imagedark
+		else
+			participant = Opponent.toName(opponent.opponentData)
+		end
+		local lastVsScore = mw.text.split(opponent.additionalData.LASTVSSCORE or '', '-')
+
+		local lpdbData = {
+			image = image,
+			imagedark = imageDark,
+			date = opponent.date,
+			participant = participant,
+			participantlink = Opponent.toName(opponent.opponentData),
+			participantflag = opponent.opponentData.flag,
+			participanttemplate = opponent.opponentData.template,
+			placement = self.placeStart .. (self.placeStart ~= self.placeEnd and ('-' .. self.placeEnd) or ''),
+			prizemoney = tonumber(opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1]) or 0,
+			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
+			lastscore = lastVsScore[1],
+			lastvsscore = lastVsScore[2],
+			groupscore = opponent.additionalData.GROUPSCORE,
+			extradata = {}
+
+			-- TODO: We need to create additional LPDB Fields
+			-- match2 opponents (opponent, opponenttemplate, opponentplayers at minimum)
+			-- Qualified To struct (json?)
+			-- Points struct (json?)
+		}
+
+		table.insert(entries, lpdbData)
+	end
+
+	return entries
 end
 
 return PrizePool
