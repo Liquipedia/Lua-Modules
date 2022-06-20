@@ -9,12 +9,10 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Template = require('Module:Template')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
-local Table = require('Module:Table')
 local Logic = require('Module:Logic')
 
 local CustomLeague = Class.new()
@@ -22,8 +20,6 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 local _game
-local _mode
-local _format
 
 local _GAME = mw.loadData('Module:GameVersion')
 local _MODES = mw.loadData('Module:GameModes')
