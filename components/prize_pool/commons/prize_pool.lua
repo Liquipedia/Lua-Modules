@@ -94,7 +94,7 @@ PrizePool.prizeTypes = {
 	[PRIZE_TYPE_LOCAL_CURRENCY] = {
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			return {currency = string.upper(input), currencyText = 'TODO'}
+			return {currency = string.upper(input), currencyText = 'TODO', symbol = ''}
 		end,
 		headerDisplay = function (data)
 			return WidgetTableCell{content = {data.currencyText}}
