@@ -521,7 +521,7 @@ function Placement:_setLpdbData()
 			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template)
 			participant = teamTemplate and teamTemplate.page or ''
 			image = teamTemplate.image
-			image = teamTemplate.imagedark
+			imageDark = teamTemplate.imagedark
 		else
 			participant = Opponent.toName(opponent.opponentData)
 		end
