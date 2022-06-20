@@ -347,6 +347,8 @@ end
 Reads an opponent struct and builds a storage struct for standing/prizePool from it
 ]]
 function Opponent.toLpdbStruct(opponent, resolveTeamToPageName)
+	-- this already handles literal and team opponents
+	-- (modulo resolveTeamToPageName if needed)
 	local storageStruct = {
 		opponentname = opponent.name,
 		opponenttemplate = opponent.template,
@@ -413,7 +415,7 @@ function Opponent.fromLpdbStruct(storageStruct)
 			type = storageStruct.type,
 		}
 		return opponent
-	else
+	else -- literal and team opponents can be handled the same way
 		return {
 			name = storageStruct.opponentname,
 			template = storageStruct.opponenttemplate,
