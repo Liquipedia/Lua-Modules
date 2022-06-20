@@ -31,24 +31,28 @@ function Table:addClass(class)
 end
 
 function Table:make()
-	local table = mw.html.create('div')
-	table:css{display = 'inline-grid', ['border-right'] = '1px solid #bbb', ['border-bottom'] = '1px solid #bbb'}
-	table:css('grid-template-rows', 'repeat(' .. #self.rows .. ', auto)')
-	table:css('grid-template-columns', 'repeat(' .. self:_getMaxCells() .. ', auto)')
+	local displayTable = mw.html.create('div')
+	displayTable:css{
+		['display'] = 'inline-grid',
+		['border-right'] = '1px solid #bbb',
+		['border-bottom'] = '1px solid #bbb',
+		['grid-template-rows'] = 'repeat(' .. #self.rows .. ', auto)',
+		['grid-template-columns'] = 'repeat(' .. self:_getMaxCells() .. ', auto)',
+	}
 
 	for _, class in ipairs(self.classes) do
-		table:addClass(class)
+		displayTable:addClass(class)
 	end
 
-	table:css(self.css)
+	displayTable:css(self.css)
 
 	for _, row in ipairs(self.rows) do
 		for _, node in ipairs(WidgetFactory.work(row, self.injector)) do
-			table:node(node)
+			displayTable:node(node)
 		end
 	end
 
-	return {table}
+	return {displayTable}
 end
 
 function Table:_getMaxCells()
