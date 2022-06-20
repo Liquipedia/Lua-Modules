@@ -204,13 +204,13 @@ function PrizePool:create()
 		self:addPrize(PRIZE_TYPE_USD, 1)
 	end
 
-	table.sort(self.prizes, PrizePool._sortPrizes)
+	table.sort(self.prizes, PrizePool._comparePrizes)
 
 	return self
 end
 
---- Sort function for Prizes based on the lowest sortOrder
-function PrizePool._sortPrizes(x, y)
+--- Compares the sort value of two prize entries
+function PrizePool._comparePrizes(x, y)
 	return PrizePool.prizeTypes[x.type].sortOrder < PrizePool.prizeTypes[y.type].sortOrder
 end
 
