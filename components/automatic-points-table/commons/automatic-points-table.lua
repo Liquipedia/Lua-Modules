@@ -190,7 +190,7 @@ function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
 	return manualPoints
 end
 
-function AutomaticPointsTable:generateReverseAliases(teams, tournaments, resolveRedirect)
+function AutomaticPointsTable:generateReverseAliases(teams, tournaments)
 	local reverseAliases = {}
 	local resolveRedirect = self.parsedInput.resolveRedirect
 	for tournamentIndex = 1, #tournaments do
