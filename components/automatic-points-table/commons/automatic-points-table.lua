@@ -9,7 +9,6 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
-local Custom = require('Module:AutomaticPointsTable/Custom')
 local TableDisplay = require('Module:AutomaticPointsTable/Display')
 local MinifiedDisplay = require('Module:AutomaticPointsTable/MinifiedDisplay')
 local Json = require('Module:Json')
@@ -81,7 +80,6 @@ function AutomaticPointsTable:storeLPDB(pointsData)
 		local totalPoints = teamPointsData.totalPoints
 		local objectData = {
 			type = 'automatic_points',
-
 			name = teamName,
 			information = position,
 			date = date,
@@ -102,13 +100,15 @@ function AutomaticPointsTable:parseInput(args)
 	local minified = Logic.readBool(args.minified)
 	local limit = tonumber(args.limit) or #teams
 	local lpdbName = args.lpdbName or mw.title.getCurrentTitle().text
+	local resolveRedirect = Logic.readBool(args.resolveRedirect)
 	return {
 		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
 		teams = teams,
 		shouldTableBeMinified = minified,
 		limit = limit,
-		lpdbName = lpdbName
+		lpdbName = lpdbName,
+		resolveRedirect = resolveRedirect,
 	}
 end
 
@@ -190,15 +190,16 @@ function AutomaticPointsTable:parseManualPoints(team, tournamentCount)
 	return manualPoints
 end
 
-function AutomaticPointsTable:generateReverseAliases(teams, tournaments)
+function AutomaticPointsTable:generateReverseAliases(teams, tournaments, resolveRedirect)
 	local reverseAliases = {}
+	local resolveRedirect = self.parsedInput.resolveRedirect
 	for tournamentIndex = 1, #tournaments do
 		reverseAliases[tournamentIndex] = {}
 		Table.iter.forEachIndexed(teams,
 			function(index, team)
 				local alias
-				if Custom.resolveTeamNames then
-					alias = Custom.resolveTeamNames(team.aliases[tournamentIndex])
+				if resolveRedirect then
+					alias = mw.ext.TeamLiquidIntegration.resolve_redirect(team.aliases[tournamentIndex])
 				else
 					alias = team.aliases[tournamentIndex]
 				end
