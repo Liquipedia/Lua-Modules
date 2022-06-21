@@ -296,6 +296,7 @@ end
 function PrizePool:_setLpdbData()
 	local lpdbTournamentData = {
 		tournament = Variables.varDefault('tournament_name'),
+		parent = Variables.varDefault('tournament_parent'),
 		series = Variables.varDefault('tournament_series'),
 		shortname = Variables.varDefault('tournament_tickername'),
 		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_sdate', 'sdate', ''),
@@ -525,7 +526,6 @@ function Placement:_setLpdbData()
 		else
 			participant = Opponent.toName(opponent.opponentData)
 		end
-		local lastVsScore = mw.text.split(opponent.additionalData.LASTVSSCORE or '', '-')
 
 		local lpdbData = {
 			image = image,
@@ -538,8 +538,8 @@ function Placement:_setLpdbData()
 			placement = self.placeStart .. (self.placeStart ~= self.placeEnd and ('-' .. self.placeEnd) or ''),
 			prizemoney = tonumber(opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1]) or 0,
 			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
-			lastscore = lastVsScore[1],
-			lastvsscore = lastVsScore[2],
+			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
+			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
 			groupscore = opponent.additionalData.GROUPSCORE,
 			extradata = {}
 
