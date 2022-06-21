@@ -82,7 +82,7 @@ function CustomLeague:_getGameMode()
 
 	local mode = _MODES[string.lower(_args.mode or '')] or _MODES['default']
 
-	return mode 
+	return mode
 end
 
 return CustomLeague
