@@ -84,12 +84,14 @@ PrizePool.prizeTypes = {
 			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {input})
 
 			local symbol, symbolFirst
-			if String.isNotEmpty(Variables.varDefault('localcurrencysymbol')) then
+			if Variables.varDefault('localcurrencysymbol') then
 				symbol = Variables.varDefault('localcurrencysymbol')
 				symbolFirst = true
-			elseif String.isNotEmpty(Variables.varDefault('localcurrencysymbolafter')) then
+			elseif Variables.varDefault('localcurrencysymbolafter') then
 				symbol = Variables.varDefault('localcurrencysymbolafter')
 				symbolFirst = false
+			else
+				error(input .. ' could not be parsed as a currency, has it been added to [[Template:Local currency]]?')
 			end
 
 			return {
