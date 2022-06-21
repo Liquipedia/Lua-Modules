@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:LocalCurrency
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Arguments = require('Module:Arguments')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
