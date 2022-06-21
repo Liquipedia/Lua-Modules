@@ -13,6 +13,7 @@ local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Math = require('Module:Math')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
@@ -594,13 +595,15 @@ end
 
 function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 	for _, opponent in ipairs(self.opponents) do
-		if not opponent.prizeRewards[PRIZE_TYPE_USD .. 1] then
+		if not opponent.prizeRewards[PRIZE_TYPE_USD .. 1] and not self.prizeRewards[PRIZE_TYPE_USD .. 1] then
 			local usdReward = 0
 			for _, prize in pairs(prizesToUse) do
-				local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id] or 0
-				usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
+				local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
+				if localMoney and localMoney > 0 then
+					usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
+				end
 			end
-			opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = math.floor(usdReward)
+			opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = Math.round{usdReward, 2}
 		end
 	end
 end
