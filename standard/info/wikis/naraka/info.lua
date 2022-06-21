@@ -7,7 +7,7 @@
 --
 
 return {
-	startYear = 2015,
+	startYear = 2021,
 	wikiName = 'naraka',
 	name = 'Naraka: Bladepoint',
 	defaultTeamLogo = 'NARAKA lightmode.png',
