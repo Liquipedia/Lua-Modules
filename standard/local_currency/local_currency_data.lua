@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:LocalCurrency/Data
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 return {
 	aed = {
 		code = 'AED',
