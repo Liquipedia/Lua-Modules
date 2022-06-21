@@ -30,8 +30,8 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 
 	if options.setVariables then
 		Variables.varDefine('localcurrencycode', localCurrencyData.code or '')
-		Variables.varDefine('localcurrencysymbol', isAfter and '' or localCurrencyData.symbol or '')
-		Variables.varDefine('localcurrencysymbolafter', isAfter and localCurrencyData.symbol or '')
+		Variables.varDefine('localcurrencysymbol', localCurrencyData.isAfter and '' or localCurrencyData.symbol or '')
+		Variables.varDefine('localcurrencysymbolafter', localCurrencyData.isAfter and localCurrencyData.symbol or '')
 	end
 
 	return localCurrencyData.text.prefix .. prizeValue .. localCurrencyData.text.suffix
