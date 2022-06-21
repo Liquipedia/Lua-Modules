@@ -329,7 +329,7 @@ function PrizePool._comparePrizes(x, y)
 end
 
 function PrizePool:build()
-	local table = WidgetTable{css = {['text-align'] = 'center'}, classes={'general-collapsible', 'collapsed'}}
+	local table = WidgetTable{}
 
 	table:addRow(self:_buildHeader())
 
@@ -366,6 +366,7 @@ end
 
 function PrizePool:_buildRows()
 	local rows = {}
+
 	for _, placement in ipairs(self.placements) do
 		-- TODO RowSpan
 		-- TODO Cutoff
@@ -397,11 +398,12 @@ function PrizePool:_buildRows()
 
 			-- TODO: Proper Support for Party Types
 			local opponentDisplay = OpponentDisplay.InlineOpponent{opponent = opponent.opponentData}
-			row:addCell(TableCell{content = {opponentDisplay}, css = {['text-align'] = 'left'}})
+			row:addCell(TableCell{content = {opponentDisplay}, css = {['justify-content'] = 'left'}})
 
 			table.insert(rows, row)
 		end
 	end
+
 	return rows
 end
 
