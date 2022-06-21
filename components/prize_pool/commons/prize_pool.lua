@@ -66,6 +66,9 @@ PrizePool.config = {
 	storeLpdb = {
 		default = true,
 	},
+	resolveRedirect = {
+		default = false,
+	}
 }
 
 PrizePool.prizeTypes = {
@@ -520,7 +523,12 @@ function Placement:_setLpdbData()
 		local participant, image, imageDark
 		if opponent.opponentData.type == Opponent.team then
 			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template)
+
 			participant = teamTemplate and teamTemplate.page or ''
+			if self.parent.options.resolveRedirect then
+				participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
+			end
+
 			image = teamTemplate.image
 			imageDark = teamTemplate.imagedark
 		else
