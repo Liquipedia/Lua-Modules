@@ -77,7 +77,7 @@ function CustomLeague:_getGameMode()
 		return nil
 	end
 
-	return _MODES[string.lower(_args.mode or '')] or _MODES['default']
+	return _MODES[_args.mode:lower()] or _MODES['default']
 end
 
 return CustomLeague
