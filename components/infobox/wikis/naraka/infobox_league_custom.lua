@@ -24,7 +24,7 @@ local _MODES = {
 	default = '[[Category:Unknown Mode Tournaments]]',
 }
 _MODES.solos = _MODES.solo
-_MODES.trio = _MODES.trios
+_MODES.trios = _MODES.trio
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -67,7 +67,7 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = args.platform
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier = args.pubgpremier
+	lpdbData.publishertier = args.narakapremier
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
 	}
@@ -76,7 +76,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:_getGameMode()
-	if String.isEmpty(_args.perspective) and String.isEmpty(_args.mode) then
+	if String.isEmpty(_args.mode) then
 		return nil
 	end
 
