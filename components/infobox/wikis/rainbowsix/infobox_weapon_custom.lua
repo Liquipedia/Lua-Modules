@@ -19,13 +19,11 @@ local CustomInjector = Class.new(Injector)
 
 local _SIZE_OPERATOR = '25x25px'
 
-local _weapon
 local _args
 
 function CustomWeapon.run(frame)
 	local weapon = Weapon(frame)
-	_weapon = weapon
-	_args = _weapon.args
+	_args = weapon.args
 	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
 	return weapon:createInfobox(frame)
 end
