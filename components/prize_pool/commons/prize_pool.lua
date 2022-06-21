@@ -26,8 +26,8 @@ local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevI
 
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
-local WidgetTableRow = require('Module:Widget/Table/Row')
-local WidgetTableCell = require('Module:Widget/Table/Cell')
+local TableRow = require('Module:Widget/Table/Row')
+local TableCell = require('Module:Widget/Table/Cell')
 
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -229,9 +229,9 @@ function PrizePool:build()
 end
 
 function PrizePool:_buildHeader()
-	local headerRow = WidgetTableRow{css = {['font-weight'] = 'bold'}}
+	local headerRow = TableRow{css = {['font-weight'] = 'bold'}}
 
-	headerRow:addCell(WidgetTableCell{content = {'Place'}})
+	headerRow:addCell(TableCell{content = {'Place'}})
 
 	for _, prize in ipairs(self.prizes) do
 		local prizeTypeData = self.prizeTypes[prize.type]
@@ -240,7 +240,7 @@ function PrizePool:_buildHeader()
 	end
 
 	-- TODO: Add support for party types
-	headerRow:addCell(WidgetTableCell{content = {'Team'}})
+	headerRow:addCell(TableCell{content = {'Team'}})
 
 	return headerRow
 end
@@ -252,10 +252,10 @@ function PrizePool:_buildRows()
 		-- TODO Cutoff
 
 		for _, opponent in ipairs(placement.opponents) do
-			local row = WidgetTableRow{}
+			local row = TableRow{}
 
 			row:addClass(placement:getBackground())
-			row:addCell(WidgetTableCell{
+			row:addCell(TableCell{
 				content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
 				css = {['font-weight'] = 'bolder'}
 			})
@@ -270,7 +270,7 @@ function PrizePool:_buildRows()
 				end
 
 				if not cell then
-					cell = WidgetTableCell{content = {DASH}}
+					cell = TableCell{content = {DASH}}
 				end
 
 				row:addCell(cell)
@@ -278,7 +278,7 @@ function PrizePool:_buildRows()
 
 			-- TODO: Proper Support for Party Types
 			local opponentDisplay = OpponentDisplay.InlineOpponent{opponent = opponent.opponentData}
-			row:addCell(WidgetTableCell{content = {opponentDisplay}, css = {['text-align'] = 'left'}})
+			row:addCell(TableCell{content = {opponentDisplay}, css = {['text-align'] = 'left'}})
 
 			table.insert(rows, row)
 		end
