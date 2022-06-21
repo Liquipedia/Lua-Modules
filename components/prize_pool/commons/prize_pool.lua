@@ -86,7 +86,11 @@ PrizePool.prizeTypes = {
 		row = 'localprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
-		end
+		end,
+
+		convertToUsd = function (headerData, data, date)
+			mw.ext.CurrencyExchange.currencyexchange(data, headerData.currency, 'USD', date)
+		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
 		sortOrder = 30,
@@ -202,6 +206,16 @@ function PrizePool:create()
 	if self:_hasUsdPrizePool() then
 		self:setConfig('showUSD', true)
 		self:addPrize(PRIZE_TYPE_USD, 1)
+
+		if self.options.autoUSD then
+			local canConvertCurrency = function(prize)
+				return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
+			end
+
+			for _, placement in ipairs(self.placements) do
+				placement:_setUsdFromRewards(Array.filter(self.prizes, canConvertCurrency), PrizePool.prizeTypes)
+			end
+		end
 	end
 
 	table.sort(self.prizes, PrizePool._comparePrizes)
@@ -472,6 +486,19 @@ function Placement:_parseOpponentArgs(input, date)
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
 	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd()
 	return Opponent.resolve(opponentData, date)
+end
+
+function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
+	for _, opponent in ipairs(self.opponents) do
+		if not opponent.prizeRewards[PRIZE_TYPE_USD .. 1] then
+			local usdReward = 0
+			for _, prize in pairs(prizesToUse) do
+				local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id] or 0
+				usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
+			end
+			opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = math.floor(usdReward)
+		end
+	end
 end
 
 return PrizePool
