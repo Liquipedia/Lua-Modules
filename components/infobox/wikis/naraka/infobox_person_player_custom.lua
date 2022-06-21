@@ -117,11 +117,10 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
-	lpdbData.extradata.signatureHero1 = _args.hero1 or _args.hero
-	lpdbData.extradata.signatureHero2 = _args.hero2
-	lpdbData.extradata.signatureHero3 = _args.hero3
-	lpdbData.extradata.signatureHero4 = _args.hero4
-	lpdbData.extradata.signatureHero5 = _args.hero5
+	_args.hero1 = _args.hero1 or _args.hero
+	for _, hero, heroIndex in Table.iter.pairsByPrefix(_args, 'hero') do
+		lpdbData.extradata['signatureHero' .. heroIndex] = hero
+	end
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
 
 	if String.isNotEmpty(_args.team2) then
