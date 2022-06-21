@@ -80,9 +80,7 @@ function CustomLeague:_getGameMode()
 		return nil
 	end
 
-	local mode = _MODES[string.lower(_args.mode or '')] or _MODES['default']
-
-	return mode
+	return _MODES[string.lower(_args.mode or '')] or _MODES['default']
 end
 
 return CustomLeague
