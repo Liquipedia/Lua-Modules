@@ -85,5 +85,4 @@ function CustomLeague:_getGameMode()
 	return mode 
 end
 
-
 return CustomLeague
