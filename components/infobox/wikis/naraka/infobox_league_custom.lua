@@ -8,14 +8,10 @@
 
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Template = require('Module:Template')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
-local Table = require('Module:Table')
-local Logic = require('Module:Logic')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -36,7 +32,6 @@ function CustomLeague.run(frame)
 
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
 	return league:createInfobox(frame)
