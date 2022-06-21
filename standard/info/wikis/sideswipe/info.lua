@@ -7,7 +7,7 @@
 --
 
 return {
-	startYear = 2015,
+	startYear = 2021,
 	wikiName = 'sideswipe',
 	name = 'Rocket League Sideswipe',
 	defaultTeamLogo = 'Sideswipe allmode.png',
