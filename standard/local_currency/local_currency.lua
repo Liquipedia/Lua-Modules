@@ -29,13 +29,11 @@ end
 
 function LocalCurrency.display(currencyCode, prizeValue, options)
 	if String.isEmpty(currencyCode) then
-		return nil --maybe error here? -> what is preferred?
+		return nil
 	end
-	currencyCode = currencyCode:lower()
 	options = options or {}
-	prizeValue = prizeValue or ''
 
-	local localCurrencyData = LocalCurrencyData[currencyCode]
+	local localCurrencyData = LocalCurrencyData[currencyCode:lower()]
 
 	if options.setVariables then
 		Variables.varDefine('localcurrencycode', localCurrencyData.code or '')
@@ -43,7 +41,7 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 		Variables.varDefine('localcurrencysymbolafter', localCurrencyData.isAfter and localCurrencyData.symbol or '')
 	end
 
-	return localCurrencyData.text.prefix .. prizeValue .. localCurrencyData.text.suffix
+	return localCurrencyData.text.prefix .. (prizeValue or '') .. localCurrencyData.text.suffix
 end
 
 return LocalCurrency
