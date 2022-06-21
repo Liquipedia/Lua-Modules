@@ -76,8 +76,8 @@ PrizePool.config = {
 
 PrizePool.prizeTypes = {
 	[PRIZE_TYPE_USD] = {
-    sortOrder = 10,
-    
+		sortOrder = 10,
+
 		headerDisplay = function (data)
 			local currencyText = {Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {'USD'})}
 			return TableCell{content = currencyText}
