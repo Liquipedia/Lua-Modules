@@ -358,7 +358,9 @@ function PrizePool:_buildHeader()
 		headerRow:addCell(cell)
 	end
 
-	-- TODO: Add support for party types
+	if self:_hasPartyType() then
+		headerRow:addCell(TableCell{content = {'Player'}})
+	end
 	headerRow:addCell(TableCell{content = {'Team'}})
 
 	return headerRow
@@ -396,9 +398,30 @@ function PrizePool:_buildRows()
 				row:addCell(cell)
 			end
 
-			-- TODO: Proper Support for Party Types
-			local opponentDisplay = OpponentDisplay.InlineOpponent{opponent = opponent.opponentData}
-			row:addCell(TableCell{content = {opponentDisplay}, css = {['justify-content'] = 'left'}})
+			local opponentDisplay = tostring(OpponentDisplay.InlineOpponent{opponent = opponent.opponentData})
+			local opponentCss = {['justify-content'] = 'left'}
+
+			if self:_hasPartyType() then
+				if Opponent.typeIsParty(opponent.opponentData.type) then
+					row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
+				else
+					row:addCell(TableCell{content = {DASH}})
+				end
+			end
+
+			if Opponent.typeIsParty(opponent.opponentData.type) then
+				-- Really don't like this
+				-- Move to Opponent Display?
+				if opponent.opponentData.players and opponent.opponentData.players[1] and opponent.opponentData.players[1].team then
+					row:addCell(TableCell{content = {tostring(OpponentDisplay.InlineOpponent{
+						opponent = {type = 'team', template = opponent.opponentData.players[1].team}
+					})}, css = opponentCss})
+				else
+					row:addCell(TableCell{content = {DASH}})
+				end
+			else
+				row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
+			end
 
 			table.insert(rows, row)
 		end
@@ -500,6 +523,15 @@ function PrizePool:_hasUsdPrizePool()
 	end)) or (self.options.autoUSD and Array.any(self.prizes, function (prize)
 		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end))
+end
+
+--- Returns true if this prizePool or any opponent entered into the prizepool is of a PartyType
+function PrizePool:_hasPartyType()
+	local placementHasParty = function (placement)
+		return placement.hasPartyType
+	end
+
+	return Opponent.typeIsParty(self.opponentType) or Array.any(self.placements, placementHasParty)
 end
 
 --- Remove all non-numeric characters from an input and changes it to a number.
@@ -647,6 +679,10 @@ function Placement:_parseOpponents(args)
 
 			-- Set date
 			opponent.date = opponentInput.date
+
+			if Opponent.typeIsParty(opponent.opponentData.type) then
+				self.hasPartyType = true
+			end
 		end
 		return opponent
 	end)
