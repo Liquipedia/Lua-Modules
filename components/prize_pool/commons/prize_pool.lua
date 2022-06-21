@@ -368,7 +368,8 @@ function PrizePool:_buildRows()
 	local rows = {}
 
 	for _, placement in ipairs(self.placements) do
-		local last = {}
+		local previousRow = {}
+		local isFirst = true
 		-- TODO Cutoff
 
 		for _, opponent in ipairs(placement.opponents) do
@@ -376,8 +377,9 @@ function PrizePool:_buildRows()
 
 			row:addClass(placement:getBackground())
 
-			if not last.isFirst then
-				last.isFirst = true
+			if isFirst then
+				isFirst = false
+
 				local placeCell = TableCell{
 					content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
 					css = {['font-weight'] = 'bolder'},
@@ -386,9 +388,10 @@ function PrizePool:_buildRows()
 				row:addCell(placeCell)
 			end
 
-			for index, prize in ipairs(self.prizes) do
+			for prizeIndex, prize in ipairs(self.prizes) do
 				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+				local lastInColumn = previousRow[prizeIndex]
 
 				local cell
 				if reward then
@@ -399,10 +402,10 @@ function PrizePool:_buildRows()
 					cell = TableCell{content = {DASH}}
 				end
 
-				if last[index] and Table.deepEquals(last[index].content, cell.content) then
-					last[index].rowSpan = (last[index].rowSpan or 1) + 1
+				if lastInColumn and Table.deepEquals(lastInColumn.content, cell.content) then
+					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
-					last[index] = cell
+					previousRow[prizeIndex] = cell
 					row:addCell(cell)
 				end
 			end
