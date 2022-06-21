@@ -24,6 +24,7 @@ function LocalCurrency.template(frame)
 	end
 	local prizeValue = args.prizepool or args[2]
 	return LocalCurrency.display(currencyCode, prizeValue, {setVariables = true})
+	-- should we add a default fallback here (like the current template)?
 end
 
 function LocalCurrency.display(currencyCode, prizeValue, options)
