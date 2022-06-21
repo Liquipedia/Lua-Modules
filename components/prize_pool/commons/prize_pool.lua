@@ -76,6 +76,8 @@ PrizePool.config = {
 
 PrizePool.prizeTypes = {
 	[PRIZE_TYPE_USD] = {
+    sortOrder = 10,
+    
 		headerDisplay = function (data)
 			local currencyText = {Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {'USD'})}
 			return TableCell{content = currencyText}
@@ -92,6 +94,8 @@ PrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_LOCAL_CURRENCY] = {
+		sortOrder = 20,
+
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
 			return {currency = string.upper(input), currencyText = 'TODO', symbol = ''}
@@ -119,6 +123,8 @@ PrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
+		sortOrder = 30,
+
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
 			local link = input:gsub(' ', '_')
@@ -173,6 +179,8 @@ PrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_POINTS] = {
+		sortOrder = 40,
+
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
 			local pointsData = mw.loadData('Module:Points/data')
@@ -218,6 +226,8 @@ PrizePool.prizeTypes = {
 		end,
 	},
 	[PRIZE_TYPE_FREETEXT] = {
+		sortOrder = 50,
+
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
 			return {title = input}
@@ -298,7 +308,14 @@ function PrizePool:create()
 		self:addPrize(PRIZE_TYPE_USD, 1)
 	end
 
+	table.sort(self.prizes, PrizePool._comparePrizes)
+
 	return self
+end
+
+--- Compares the sort value of two prize entries
+function PrizePool._comparePrizes(x, y)
+	return PrizePool.prizeTypes[x.type].sortOrder < PrizePool.prizeTypes[y.type].sortOrder
 end
 
 function PrizePool:build()
@@ -461,7 +478,7 @@ function Placement:init(args, parent, lastPlacement)
 	-- Use the last known place and set the place range based on the entered number of opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + #self.opponents - 1
+		self.placeEnd = lastPlacement + #self.opponents
 	end
 
 	assert(#self.opponents > self.placeEnd - self.placeStart, 'Placement: Too many opponents')
