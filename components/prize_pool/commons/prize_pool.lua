@@ -6,19 +6,31 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MatchPlacement = require('Module:Match/Placement')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
+---Note: This can be overwritten
+local OpponentDisplay = require('Module:OpponentDisplay')
+local Ordinal = require('Module:Ordinal')
+local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+
+local WidgetFactory = require('Module:Infobox/Widget/Factory')
+local WidgetTable = require('Module:Widget/Table')
+local TableRow = require('Module:Widget/Table/Row')
+local TableCell = require('Module:Widget/Table/Cell')
 
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -31,6 +43,10 @@ local PrizePool = Class.new(function(self, ...) self:init(...) end)
 local Placement = Class.new(function(self, ...) self:init(...) end)
 
 local TODAY = os.date('%Y-%m-%d')
+
+local LANG = mw.language.getContentLanguage()
+local DASH = '&#045;'
+local NON_BREAKING_SPACE = '&nbsp;'
 
 local PRIZE_TYPE_USD = 'USD'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
@@ -73,22 +89,74 @@ PrizePool.config = {
 
 PrizePool.prizeTypes = {
 	[PRIZE_TYPE_USD] = {
+		sortOrder = 10,
+
+		headerDisplay = function (data)
+			local currencyText = {Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {'USD'})}
+			return TableCell{content = currencyText}
+		end,
+
 		row = 'usdprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if data > 0 then
+				return TableCell{content = {'$', LANG:formatNum(data)}}
+			end
+		end,
 	},
 	[PRIZE_TYPE_LOCAL_CURRENCY] = {
+		sortOrder = 20,
+
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			return {currency = string.upper(input)}
+			Variables.varDefine('localcurrencysymbol', '')
+			Variables.varDefine('localcurrencysymbolafter', '')
+			Variables.varDefine('localcurrencycode', '')
+			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {input})
+
+			local symbol, symbolFirst
+			if Variables.varDefault('localcurrencysymbol') then
+				symbol = Variables.varDefault('localcurrencysymbol')
+				symbolFirst = true
+			elseif Variables.varDefault('localcurrencysymbolafter') then
+				symbol = Variables.varDefault('localcurrencysymbolafter')
+				symbolFirst = false
+			else
+				error(input .. ' could not be parsed as a currency, has it been added to [[Template:Local currency]]?')
+			end
+
+			return {
+				currency = Variables.varDefault('localcurrencycode'), currencyText = currencyText,
+				symbol = symbol, symbolFirst = symbolFirst
+			}
 		end,
+		headerDisplay = function (data)
+			return TableCell{content = {data.currencyText}}
+		end,
+
 		row = 'localprize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if data > 0 then
+				local displayText = {LANG:formatNum(data)}
+
+				if headerData.symbolFirst then
+					table.insert(displayText, 1, headerData.symbol)
+				else
+					table.insert(displayText, headerData.symbol)
+				end
+
+				return TableCell{content = displayText}
+			end
+		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
+		sortOrder = 30,
+
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
 			local link = input:gsub(' ', '_')
@@ -110,31 +178,105 @@ PrizePool.prizeTypes = {
 
 			return data
 		end,
+		headerDisplay = function (data)
+			return TableCell{content = {'Qualifies To'}}
+		end,
+
 		row = 'qualified',
 		rowParse = function (placement, input, context, index)
 			return Logic.readBool(input)
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if not data then
+				return
+			end
+
+			local content = {}
+			if String.isNotEmpty(headerData.icon) then
+				local icon = LeagueIcon.display{
+					link = headerData.link, name = headerData.title,
+					iconDark = headerData.iconDark, icon = headerData.icon,
+				}
+				table.insert(content, icon)
+				table.insert(content, NON_BREAKING_SPACE)
+			end
+
+			if String.isNotEmpty(headerData.title) then
+				table.insert(content, '[[' .. headerData.link .. '|' .. headerData.title .. ']]')
+			else
+				table.insert(content, '[[' .. headerData.link .. ']]')
+			end
+
+			return TableCell{content = content}
+		end,
 	},
 	[PRIZE_TYPE_POINTS] = {
+		sortOrder = 40,
+
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
 			local pointsData = mw.loadData('Module:Points/data')
 			return pointsData[input] or {title = 'Points'}
 		end,
+		headerDisplay = function (data)
+			local headerDisplay = {}
+
+			if String.isNotEmpty(data.icon) then
+				local icon = LeagueIcon.display{
+					link = data.link, icon = data.icon, iconDark = data.iconDark, name = data.title
+				}
+				table.insert(headerDisplay, icon)
+				table.insert(headerDisplay, NON_BREAKING_SPACE)
+			end
+
+			if String.isNotEmpty(data.title) then
+				local text
+				if String.isNotEmpty(data.titleLong) then
+					text = Abbreviation.make(data.title, data.titleLong)
+				elseif String.isNotEmpty(data.title) then
+					text = data.title
+				end
+
+				if String.isNotEmpty(data.link) then
+					text = '[[' .. data.link .. '|' .. text .. ']]'
+				end
+
+				table.insert(headerDisplay, text)
+			end
+
+			return TableCell{content = headerDisplay}
+		end,
+
 		row = 'points',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if data > 0 then
+				return TableCell{content = {data}}
+			end
+		end,
 	},
 	[PRIZE_TYPE_FREETEXT] = {
+		sortOrder = 50,
+
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
 			return {title = input}
 		end,
+		headerDisplay = function (data)
+			return TableCell{content = {data.title}}
+		end,
+
 		row = 'freetext',
 		rowParse = function (placement, input, context, index)
 			return input
-		end
+		end,
+		rowDisplay = function (headerData, data)
+			if String.isNotEmpty(data) then
+				return TableCell{content = {data}}
+			end
+		end,
 	}
 }
 
@@ -198,18 +340,97 @@ function PrizePool:create()
 		self:addPrize(PRIZE_TYPE_USD, 1)
 	end
 
+	table.sort(self.prizes, PrizePool._comparePrizes)
+
 	return self
 end
 
+--- Compares the sort value of two prize entries
+function PrizePool._comparePrizes(x, y)
+	return PrizePool.prizeTypes[x.type].sortOrder < PrizePool.prizeTypes[y.type].sortOrder
+end
+
 function PrizePool:build()
-	-- TODO
-	mw.logObject(self)
+	local table = WidgetTable{}
+
+	table:addRow(self:_buildHeader())
+
+	for _, row in ipairs(self:_buildRows()) do
+		table:addRow(row)
+	end
+
+	table:setContext{self._widgetInjector}
+
+	local wrapper = mw.html.create('div')
+	for _, node in ipairs(WidgetFactory.work(table, self._widgetInjector)) do
+		wrapper:node(node)
+	end
 
 	if self.options.storeLpdb then
 		self:_setLpdbData()
 	end
 
-	return ''
+	return wrapper
+end
+
+function PrizePool:_buildHeader()
+	local headerRow = TableRow{css = {['font-weight'] = 'bold'}}
+
+	headerRow:addCell(TableCell{content = {'Place'}})
+
+	for _, prize in ipairs(self.prizes) do
+		local prizeTypeData = self.prizeTypes[prize.type]
+		local cell = prizeTypeData.headerDisplay(prize.data)
+		headerRow:addCell(cell)
+	end
+
+	-- TODO: Add support for party types
+	headerRow:addCell(TableCell{content = {'Team'}})
+
+	return headerRow
+end
+
+function PrizePool:_buildRows()
+	local rows = {}
+
+	for _, placement in ipairs(self.placements) do
+		-- TODO RowSpan
+		-- TODO Cutoff
+
+		for _, opponent in ipairs(placement.opponents) do
+			local row = TableRow{}
+
+			row:addClass(placement:getBackground())
+			row:addCell(TableCell{
+				content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
+				css = {['font-weight'] = 'bolder'}
+			})
+
+			for _, prize in ipairs(self.prizes) do
+				local prizeTypeData = self.prizeTypes[prize.type]
+				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+
+				local cell
+				if reward then
+					cell = prizeTypeData.rowDisplay(prize.data, reward)
+				end
+
+				if not cell then
+					cell = TableCell{content = {DASH}}
+				end
+
+				row:addCell(cell)
+			end
+
+			-- TODO: Proper Support for Party Types
+			local opponentDisplay = OpponentDisplay.InlineOpponent{opponent = opponent.opponentData}
+			row:addCell(TableCell{content = {opponentDisplay}, css = {['justify-content'] = 'start'}})
+
+			table.insert(rows, row)
+		end
+	end
+
+	return rows
 end
 
 function PrizePool:_readConfig(args)
@@ -417,7 +638,7 @@ function Placement:init(args, parent, lastPlacement)
 	-- Use the last known place and set the place range based on the entered number of opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + #self.opponents - 1
+		self.placeEnd = lastPlacement + #self.opponents
 	end
 
 	assert(#self.opponents > self.placeEnd - self.placeStart, 'Placement: Too many opponents')
@@ -561,6 +782,25 @@ function Placement:_setLpdbData()
 	end
 
 	return entries
+end
+
+function Placement:displayPlace()
+	local start = Ordinal._ordinal(self.placeStart)
+	if self.placeEnd > self.placeStart then
+		return start .. DASH .. Ordinal._ordinal(self.placeEnd)
+	end
+	return start
+end
+
+function Placement:getBackground()
+	return PlacementInfo.getBgClass(self.placeStart)
+end
+
+function Placement:getMedal()
+	local medal = MatchPlacement.MedalIcon{range = {self.placeStart, self.placeEnd}}
+	if medal then
+		return tostring(medal)
+	end
 end
 
 return PrizePool

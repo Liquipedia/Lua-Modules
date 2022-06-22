@@ -53,6 +53,7 @@ Opponent.types.Player = TypeUtil.struct({
 	displayName = 'string',
 	flag = 'string?',
 	pageName = 'string?',
+	team = 'string?',
 })
 
 Opponent.types.TeamOpponent = TypeUtil.struct({
@@ -244,6 +245,9 @@ function Opponent.resolve(opponent, date)
 		local PlayerExt = require('Module:Player/Ext')
 		for _, player in ipairs(opponent.players) do
 			PlayerExt.populatePageName(player)
+			if player.team then
+				player.team = TeamTemplate.resolve(player.team, date)
+			end
 		end
 	end
 	return opponent
@@ -285,23 +289,29 @@ function Opponent.readOpponentArgs(args)
 		local template = args.template or args[1]
 		return template and {
 			type = Opponent.team,
-			template = template:lower():gsub('_', ' '),
+			template = template,
 		}
 
 	elseif partySize == 1 then
 		local player = {
 			displayName = args[1] or args.p1 or args.name or '',
-			flag = String.nilIfEmpty(Flags.CountryName(args.flag)),
-			pageName = args.link,
+			flag = String.nilIfEmpty(Flags.CountryName(args.flag or args.p1flag)),
+			pageName = args.link or args.p1link,
+			team = args.team or args.p1team,
 		}
 		return {type = Opponent.solo, players = {player}}
 
 	elseif partySize then
-		local players = Array.map(Array.range(1, partySize), function(i)
+		local players = Array.map(Array.range(1, partySize), function(playerIndex)
+			local playerTeam = args['p' .. playerIndex .. 'team']
+			if playerTeam then
+				playerTeam = playerTeam
+			end
 			return {
-				displayName = args[i] or args['p' .. i] or '',
-				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. i .. 'flag'])),
-				pageName = args['p' .. i .. 'link'],
+				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
+				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. playerIndex .. 'flag'])),
+				pageName = args['p' .. playerIndex .. 'link'],
+				team = playerTeam,
 			}
 		end)
 		return {type = args.type, players = players}
