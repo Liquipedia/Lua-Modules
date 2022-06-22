@@ -35,6 +35,10 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 
 	local localCurrencyData = LocalCurrencyData[currencyCode:lower()]
 
+	if not localCurrencyData then
+		return nil
+	end
+
 	if options.setVariables then
 		Variables.varDefine('localcurrencycode', localCurrencyData.code or '')
 		Variables.varDefine('localcurrencysymbol', localCurrencyData.isAfter and '' or localCurrencyData.symbol or '')
