@@ -387,21 +387,27 @@ function PrizePool:_buildRows()
 	local rows = {}
 
 	for _, placement in ipairs(self.placements) do
-		-- TODO RowSpan
+		local previousRow = {}
 		-- TODO Cutoff
 
-		for _, opponent in ipairs(placement.opponents) do
+		for opponentIndex, opponent in ipairs(placement.opponents) do
 			local row = TableRow{}
 
 			row:addClass(placement:getBackground())
-			row:addCell(TableCell{
-				content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
-				css = {['font-weight'] = 'bolder'}
-			})
 
-			for _, prize in ipairs(self.prizes) do
+			if opponentIndex == 1 then
+				local placeCell = TableCell{
+					content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
+					css = {['font-weight'] = 'bolder'},
+				}
+				placeCell.rowSpan = #placement.opponents
+				row:addCell(placeCell)
+			end
+
+			for prizeIndex, prize in ipairs(self.prizes) do
 				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+				local lastInColumn = previousRow[prizeIndex]
 
 				local cell
 				if reward then
@@ -412,7 +418,12 @@ function PrizePool:_buildRows()
 					cell = TableCell{content = {DASH}}
 				end
 
-				row:addCell(cell)
+				if lastInColumn and Table.deepEquals(lastInColumn.content, cell.content) then
+					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
+				else
+					previousRow[prizeIndex] = cell
+					row:addCell(cell)
+				end
 			end
 
 			-- TODO: Proper Support for Party Types
