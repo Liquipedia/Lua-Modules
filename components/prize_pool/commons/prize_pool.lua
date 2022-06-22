@@ -595,18 +595,24 @@ function Placement:_parseOpponentArgs(input, date)
 end
 
 function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
-	for _, opponent in ipairs(self.opponents) do
+	Array.foreach(self.opponents, function(opponent)
 		if not opponent.prizeRewards[PRIZE_TYPE_USD .. 1] and not self.prizeRewards[PRIZE_TYPE_USD .. 1] then
-			local usdReward = 0
-			for _, prize in pairs(prizesToUse) do
-				local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
-				if localMoney and localMoney > 0 then
-					usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
-				end
-			end
-			opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = Math.round{usdReward, 2}
+			return
 		end
-	end
+
+		local usdReward = 0
+		Array.foreach(prizesToUse, function(prize)
+			local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
+
+			if not localMoney or localMoney <= 0 then
+				return
+			end
+
+			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
+		end)
+
+		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = Math.round{usdReward, 2}
+	end)
 end
 
 return PrizePool
