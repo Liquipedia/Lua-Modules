@@ -43,7 +43,9 @@ local PrizePool = Class.new(function(self, ...) self:init(...) end)
 local tournamentVars = PageVariableNamespace('Tournament')
 
 local TODAY = os.date('%Y-%m-%d')
+
 local LANG = mw.language.getContentLanguage()
+local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 
 local LANG = mw.language.getContentLanguage()
