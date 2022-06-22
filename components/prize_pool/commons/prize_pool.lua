@@ -652,10 +652,8 @@ function Placement:_parseOpponents(args)
 			end
 
 			-- Parse Opponent Data
-			local typeStruct = Json.parseIfString(opponentInput.type)
-			if typeStruct then
-				PrizePool._assertOpponentStructType(typeStruct)
-				opponentInput.type = typeStruct.type
+			if opponentInput.type then
+				PrizePool._assertOpponentStructType(opponentInput)
 			else
 				opponentInput.type = self.parent.opponentType
 			end
