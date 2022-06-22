@@ -15,6 +15,7 @@ local LocalCurrency = {}
 
 local USD = 'usd'
 local USD_TEMPLATE_ALIAS = '1'
+local NON_BREAKING_SPACE = '&nbsp;'
 
 function LocalCurrency.template(frame)
 	local args = Arguments.getArgs(frame)
@@ -23,8 +24,17 @@ function LocalCurrency.template(frame)
 		currencyCode = USD
 	end
 	local prizeValue = args.prizepool or args[2]
-	return LocalCurrency.display(currencyCode, prizeValue, {setVariables = true})
-	-- should we add a default fallback here (like the current template)?
+	local display = LocalCurrency.display(currencyCode, prizeValue, {setVariables = true})
+
+	-- fallback handling like in the old template
+	if not display then
+		display = (currencyCode or '?')
+			.. (String.isNotEmpty(prizeValue) and (NON_BREAKING_SPACE .. prizeValue) or '')
+		Variables.varDefine('noncurrency', 'true')
+		Variables.varDefine('localcurrencysymbol', NON_BREAKING_SPACE)
+	end
+
+	return display
 end
 
 function LocalCurrency.display(currencyCode, prizeValue, options)
