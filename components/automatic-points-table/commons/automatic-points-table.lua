@@ -96,11 +96,12 @@ end
 function AutomaticPointsTable:parseInput(args)
 	local positionBackgrounds = self:parsePositionBackgroundData(args)
 	local tournaments = self:parseTournaments(args)
-	local teams = self:parseTeams(args, #tournaments)
+	local resolveRedirect = Logic.readBool(args.resolveRedirect)
+	local teams = self:parseTeams(args, #tournaments, resolveRedirect)
 	local minified = Logic.readBool(args.minified)
 	local limit = tonumber(args.limit) or #teams
 	local lpdbName = args.lpdbName or mw.title.getCurrentTitle().text
-	local resolveRedirect = Logic.readBool(args.resolveRedirect)
+
 	return {
 		positionBackgrounds = positionBackgrounds,
 		tournaments = tournaments,
@@ -130,11 +131,11 @@ function AutomaticPointsTable:parseTournaments(args)
 	return tournaments
 end
 
-function AutomaticPointsTable:parseTeams(args, tournamentCount)
+function AutomaticPointsTable:parseTeams(args, tournamentCount, resolveRedirect)
 	local teams = {}
 	for _, team in Table.iter.pairsByPrefix(args, 'team') do
 		local parsedTeam = Json.parse(team)
-		parsedTeam.aliases = self:parseAliases(parsedTeam, tournamentCount)
+		parsedTeam.aliases = self:parseAliases(parsedTeam, tournamentCount, resolveRedirect)
 		parsedTeam.deductions = self:parseDeductions(parsedTeam, tournamentCount)
 		parsedTeam.manualPoints = self:parseManualPoints(parsedTeam, tournamentCount)
 		parsedTeam.tiebreakerPoints = tonumber(parsedTeam.tiebreaker_points) or 0
@@ -147,14 +148,20 @@ end
 --- Parses the team aliases, used in cases where a team is picked up by an org or changed
 --- name in some of the tournaments, in which case aliases are required to correctly query
 --- the team's results & points
-function AutomaticPointsTable:parseAliases(team, tournamentCount)
+function AutomaticPointsTable:parseAliases(team, tournamentCount, resolveRedirect)
 	local aliases = {}
+	local parseAlias = function(x)
+		if (resolveRedirect) then
+			return mw.ext.TeamLiquidIntegration.resolve_redirect(x)
+		end
+		return mw.language.getContentLanguage():ucfirst(x)
+	end
 	local lastAlias = team.name
 	for index = 1, tournamentCount do
 		if String.isNotEmpty(team['alias' .. index]) then
 			lastAlias = team['alias' .. index]
 		end
-		aliases[index] = lastAlias
+		aliases[index] = parseAlias(lastAlias)
 	end
 	return aliases
 end
