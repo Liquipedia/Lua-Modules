@@ -38,6 +38,7 @@ local Placement = Class.new(function(self, ...) self:init(...) end)
 local TODAY = os.date('%Y-%m-%d')
 local LANG = mw.language.getContentLanguage()
 local NON_BREAKING_SPACE = '&nbsp;'
+local BASE_CURRENCY = 'USD'
 
 local PRIZE_TYPE_USD = 'USD'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
@@ -123,9 +124,9 @@ PrizePool.prizeTypes = {
 			end
 		end,
 
-    convertToUsd = function (headerData, data, date)
-			mw.ext.CurrencyExchange.currencyexchange(data, headerData.currency, 'USD', date)
-    end,
+		convertToUsd = function (headerData, data, date)
+			mw.ext.CurrencyExchange.currencyexchange(data, headerData.currency, BASE_CURRENCY, date)
+		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
 		sortOrder = 30,
