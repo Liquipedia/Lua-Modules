@@ -108,7 +108,26 @@ PrizePool.prizeTypes = {
 
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			return {currency = string.upper(input), currencyText = 'TODO', symbol = ''}
+			Variables.varDefine('localcurrencysymbol', '')
+			Variables.varDefine('localcurrencysymbolafter', '')
+			Variables.varDefine('localcurrencycode', '')
+			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {input})
+
+			local symbol, symbolFirst
+			if Variables.varDefault('localcurrencysymbol') then
+				symbol = Variables.varDefault('localcurrencysymbol')
+				symbolFirst = true
+			elseif Variables.varDefault('localcurrencysymbolafter') then
+				symbol = Variables.varDefault('localcurrencysymbolafter')
+				symbolFirst = false
+			else
+				error(input .. ' could not be parsed as a currency, has it been added to [[Template:Local currency]]?')
+			end
+
+			return {
+				currency = Variables.varDefault('localcurrencycode'), currencyText = currencyText,
+				symbol = symbol, symbolFirst = symbolFirst
+			}
 		end,
 		headerDisplay = function (data)
 			return TableCell{content = {data.currencyText}}
@@ -399,7 +418,7 @@ function PrizePool:_buildRows()
 			end
 
 			local opponentDisplay = tostring(OpponentDisplay.InlineOpponent{opponent = opponent.opponentData})
-			local opponentCss = {['justify-content'] = 'left'}
+			local opponentCss = {['justify-content'] = 'start'}
 
 			if self:_hasPartyType() then
 				if Opponent.typeIsParty(opponent.opponentData.type) then
