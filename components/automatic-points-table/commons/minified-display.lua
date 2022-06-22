@@ -16,7 +16,7 @@ local PointsDivTable = Class.new(
 
 		local innerWrapper = mw.html.create('div') :addClass('fixed-size-table-container')
 			:addClass('border-color-grey')
-			:css('width', '310px')
+			:css('width', '316px')
 			:node(self.root)
 
 		self.wrapper = mw.html.create('div') :addClass('table-responsive')
@@ -147,13 +147,13 @@ function TableHeaderRow:create()
 	-- fixed headers
 	local headers = {{
 		text = '#',
-		additionalClass = 'ranking'
+		width = '35px'
 	}, {
 		text = 'Team',
-		additionalClass = 'team'
+		width = '225px'
 	}, {
 		text = 'Points',
-		additionalClass = 'total'
+		width = '50px'
 	}}
 	Table.iter.forEach(headers, function(h) self:headerCell(h) end)
 
@@ -171,10 +171,7 @@ function TableHeaderRow:headerCell(header)
 	local outerDiv = mw.html.create('div') :addClass('divCell')
 		:addClass('border-right') :css('text-align', 'center')
 
-	local additionalClass = header.additionalClass
-	if additionalClass then
-		outerDiv:addClass(additionalClass)
-	end
+	outerDiv:css('width', header.width)
 	outerDiv:node(innerDiv)
 
 	table.insert(self.cells, outerDiv)
