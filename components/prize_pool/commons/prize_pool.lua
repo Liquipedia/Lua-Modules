@@ -398,7 +398,7 @@ function PrizePool:_buildRows()
 
 			-- TODO: Proper Support for Party Types
 			local opponentDisplay = OpponentDisplay.InlineOpponent{opponent = opponent.opponentData}
-			row:addCell(TableCell{content = {opponentDisplay}, css = {['justify-content'] = 'left'}})
+			row:addCell(TableCell{content = {opponentDisplay}, css = {['justify-content'] = 'start'}})
 
 			table.insert(rows, row)
 		end
