@@ -388,17 +388,14 @@ function PrizePool:_buildRows()
 
 	for _, placement in ipairs(self.placements) do
 		local previousRow = {}
-		local isFirst = true
 		-- TODO Cutoff
 
-		for _, opponent in ipairs(placement.opponents) do
+		for opponentIndex, opponent in ipairs(placement.opponents) do
 			local row = TableRow{}
 
 			row:addClass(placement:getBackground())
 
-			if isFirst then
-				isFirst = false
-
+			if opponentIndex == 1 then
 				local placeCell = TableCell{
 					content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
 					css = {['font-weight'] = 'bolder'},
