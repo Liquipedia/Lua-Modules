@@ -536,6 +536,7 @@ function PrizePool:_buildRows()
 			local prizeCells = Array.map(self.prizes, function (prize)
 				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+				local lastInColumn = previousRow[prizeIndex]
 
 				local cell
 				if reward then
