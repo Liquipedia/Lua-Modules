@@ -7,9 +7,10 @@
 --
 
 local Arguments = require('Module:Arguments')
+local LocalCurrencyData = mw.loadData('Module:LocalCurrency/Data')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local LocalCurrencyData = mw.loadData('Module:LocalCurrency/Data')
 
 local LocalCurrency = {}
 
@@ -53,6 +54,10 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 		Variables.varDefine('localcurrencycode', localCurrencyData.code or '')
 		Variables.varDefine('localcurrencysymbol', localCurrencyData.isAfter and '' or localCurrencyData.symbol or '')
 		Variables.varDefine('localcurrencysymbolafter', localCurrencyData.isAfter and localCurrencyData.symbol or '')
+	end
+
+	if Logic.isNumeric(prizeValue) and options.formatValue then
+		prizeValue = mw.getContentLanguage():formatNum(prizeValue)
 	end
 
 	return localCurrencyData.text.prefix .. (prizeValue or '') .. localCurrencyData.text.suffix
