@@ -25,7 +25,7 @@ function LeagueIcon.display(args)
 	local size = tonumber(args.size or '') or 50
 	local iconDark = args.iconDark
 	local icon = args.icon
-	if not Logic.readBool(options.noTemplate) and not (icon and iconDark) then
+	if not Logic.readBool(options.noTemplate) and not icon then
 		local stringOfExpandedTemplate = LeagueIcon.getTemplate({
 			series = args.series,
 			abbreviation = args.abbreviation,
@@ -91,14 +91,13 @@ function LeagueIcon.getIconFromTemplate(args)
 			--extract series icon from template:LeagueIconSmall
 			icon = mw.text.split(stringOfExpandedTemplate[2] or '', '|')
 			icon = icon[1]
-		end
-
-		--when Template:LeagueIconSmall has a darkmode icon retrieve that from the template too
-		if String.isEmpty(iconDark) then
-			iconDark = mw.text.split(stringOfExpandedTemplate[3] or '', '|')
-			iconDark = iconDark[1]
+			--when Template:LeagueIconSmall has a darkmode icon retrieve that from the template too
 			if String.isEmpty(iconDark) then
-				iconDark = icon
+				iconDark = mw.text.split(stringOfExpandedTemplate[3] or '', '|')
+				iconDark = iconDark[1]
+				if String.isEmpty(iconDark) then
+					iconDark = icon
+				end
 			end
 		end
 	else
