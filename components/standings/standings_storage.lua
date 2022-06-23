@@ -52,7 +52,7 @@ end
 
 function StandingsStorage.verifyScoreBoardEntry(entry)
 	-- A valid scoreboard entry must have 3 values in an array
-	if #entry < 3 then
+	if #entry ~= 3 then
 		return SCOREBOARD_FALLBACK
 	end
 	return entry
