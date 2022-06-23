@@ -274,7 +274,7 @@ function CustomLeague:defineCustomPageVariables()
 	end
 
 	Variables.varDefine('tournament_finished', tostring(finished))
-	-- do not reslolve redirect on the series input
+	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
 	Variables.varDefine('tournament_series', _args.series)
