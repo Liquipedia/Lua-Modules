@@ -84,24 +84,23 @@ function LeagueIcon.getIconFromTemplate(args)
 	local stringOfExpandedTemplate = args.stringOfExpandedTemplate
 
 	--if LeagueIconSmall template exists retrieve the icons from it
-	if stringOfExpandedTemplate then
+	if String.isEmpty(icon) and stringOfExpandedTemplate then
 		stringOfExpandedTemplate = mw.text.split(stringOfExpandedTemplate, 'File:')
 
-		if String.isEmpty(icon) then
-			--extract series icon from template:LeagueIconSmall
-			icon = mw.text.split(stringOfExpandedTemplate[2] or '', '|')
-			icon = icon[1]
-			--when Template:LeagueIconSmall has a darkmode icon retrieve that from the template too
-			if String.isEmpty(iconDark) then
-				iconDark = mw.text.split(stringOfExpandedTemplate[3] or '', '|')
-				iconDark = iconDark[1]
-				if String.isEmpty(iconDark) then
-					iconDark = icon
-				end
-			end
+		--extract series icon from template:LeagueIconSmall
+		icon = mw.text.split(stringOfExpandedTemplate[2] or '', '|')
+		icon = icon[1]
+		--when Template:LeagueIconSmall has a darkmode icon retrieve that from the template too
+		if String.isEmpty(iconDark) then
+			iconDark = mw.text.split(stringOfExpandedTemplate[3] or '', '|')
+			iconDark = iconDark[1]
 		end
 	else
 		icon = icon or ''
+	end
+
+	if String.isEmpty(iconDark) then
+		iconDark = icon
 	end
 
 	return icon, iconDark
