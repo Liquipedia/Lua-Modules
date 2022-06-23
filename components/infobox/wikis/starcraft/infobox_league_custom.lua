@@ -277,7 +277,7 @@ function CustomLeague:defineCustomPageVariables()
 	-- do not reslolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
-	Variables.varDefine('tournament_series', args.series)
+	Variables.varDefine('tournament_series', _args.series)
 end
 
 function CustomLeague:addToLpdb(lpdbData)
@@ -295,7 +295,7 @@ function CustomLeague:addToLpdb(lpdbData)
 	-- do not reslolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
-	lpdbData.series = args.series
+	lpdbData.series = _args.series
 
 	return lpdbData
 end
