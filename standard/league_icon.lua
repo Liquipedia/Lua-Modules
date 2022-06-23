@@ -94,12 +94,12 @@ function LeagueIcon.getIconFromTemplate(args)
 		end
 
 		--when Template:LeagueIconSmall has a darkmode icon retrieve that from the template too
-		if String.isEmpty(iconDark) and not String.contains(icon:lower(), 'allmode') then
+		if String.isEmpty(iconDark) then
 			iconDark = mw.text.split(stringOfExpandedTemplate[3] or '', '|')
 			iconDark = iconDark[1]
-		end
-		if String.isEmpty(iconDark) then
-			iconDark = icon
+			if String.isEmpty(iconDark) then
+				iconDark = icon
+			end
 		end
 	else
 		icon = icon or ''
