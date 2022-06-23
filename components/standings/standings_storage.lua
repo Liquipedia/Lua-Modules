@@ -12,6 +12,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local StandingsStorage = {}
+local SCOREBOARD_FALLBACK = {0, 0, 0}
 
 function StandingsStorage.run(index, data)
 	local title = data.title or ''
@@ -32,9 +33,10 @@ function StandingsStorage.run(index, data)
 			currentstatus = data.currentstatus or data.pbg,
 			change = data.change,
 			scoreboard = mw.ext.LiquipediaDB.lpdb_create_json{
-				match = Table.mapValues(data.match or {}, tonumber), -- [won, draw, lost]
-				overtime = Table.mapValues(data.overtime or {}, tonumber), -- [won, draw, lost]
-				game = Table.mapValues(data.game or {}, tonumber), -- [won, draw, lost]
+				-- [won, draw, lost]
+				match = StandingsStorage.verifyScoreBoardEntry(Table.mapValues(data.match or {}, tonumber)),
+				overtime = StandingsStorage.verifyScoreBoardEntry(Table.mapValues(data.overtime or {}, tonumber)),
+				game = StandingsStorage.verifyScoreBoardEntry(Table.mapValues(data.game or {}, tonumber)),
 				points = tonumber(data.points),
 				diff = tonumber(data.diff),
 				buchholz = tonumber(data.buchholz),
@@ -46,6 +48,14 @@ function StandingsStorage.run(index, data)
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json(data.extradata or {})
 		}
 	)
+end
+
+function StandingsStorage.verifyScoreBoardEntry(entry)
+	-- A valid scoreboard entry must have 3 values in an array
+	if #entry ~= 3 then
+		return SCOREBOARD_FALLBACK
+	end
+	return entry
 end
 
 function StandingsStorage.fromTemplate(frame)
