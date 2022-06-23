@@ -274,6 +274,10 @@ function CustomLeague:defineCustomPageVariables()
 	end
 
 	Variables.varDefine('tournament_finished', tostring(finished))
+	-- do not reslolve redirect on the series input
+	-- BW wiki has several series that are displayed on the same page
+	-- hence they need to not RR them
+	Variables.varDefine('tournament_series', args.series)
 end
 
 function CustomLeague:addToLpdb(lpdbData)
@@ -288,6 +292,10 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
+	-- do not reslolve redirect on the series input
+	-- BW wiki has several series that are displayed on the same page
+	-- hence they need to not RR them
+	lpdbData.series = args.series
 
 	return lpdbData
 end
