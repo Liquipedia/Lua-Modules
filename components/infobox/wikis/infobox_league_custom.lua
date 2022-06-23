@@ -19,7 +19,6 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _game
 
 local _GAME = mw.loadData('Module:GameVersion')
 local _MODES = mw.loadData('Module:GameModes')
@@ -67,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = args.game
+	lpdbData.game = CustomLeague._getGameVersion()
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = args.pokemonpremier
 	lpdbData.extradata = {
@@ -78,7 +77,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_game', _game or _args.game)
+	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
 	Variables.varDefine('tournament_publishertier', _args['pokemonpremier'])
 	--Legacy Vars:
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
@@ -86,8 +85,7 @@ function CustomLeague:defineCustomPageVariables()
 end
 
 function CustomLeague._getGameVersion()
-	_game = _GAME[string.lower(_args.game or '')]
-	return _game
+	return _GAME[string.lower(_args.game or '')]
 end
 
 function CustomLeague:liquipediaTierHighlighted()
