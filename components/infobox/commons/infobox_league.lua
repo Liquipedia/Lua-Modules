@@ -485,11 +485,11 @@ end
 
 function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
 	local trackingCategory
-	icon, iconDark, trackingCategory, = LeagueIcon.getIconFromTemplate({
+	icon, iconDark, trackingCategory, = LeagueIcon.getIconFromTemplate{
 		icon = icon,
 		iconDark = iconDark,
 		stringOfExpandedTemplate = iconSmallTemplate
-	})
+	}
 	Variables.varDefine('tournament_icon', icon)
 	Variables.varDefine('tournament_icondark', iconDark)
 
