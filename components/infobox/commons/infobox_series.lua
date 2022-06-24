@@ -247,20 +247,21 @@ end
 function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
 	local icon = lpdbData.icon
 	local iconDark = lpdbData.icondark
+	local iconSmallTemplate = LeagueIcon.getTemplate{}
+	local trackingCategory
 
-	if String.isEmpty(icon) then
-		local series = lpdbData.name:lower()
-		local iconSmallTemplate = Template.safeExpand(
-			frame,
-			'LeagueIconSmall/' .. series,
-			{ date = lpdbData.defunctfate }
+	icon, iconDark, trackingCategory, = LeagueIcon.getIconFromTemplate{
+		icon = icon,
+		iconDark = iconDark,
+		stringOfExpandedTemplate = iconSmallTemplate
+	}
+
+	if String.isNotEmpty(trackingCategory) then
+		table.insert(
+			self.warnings,
+			'Missing icon while icondark is set.' .. trackingCategory
 		)
-		--extract series icon from template:LeagueIconSmall
-		icon = mw.text.split(iconSmallTemplate, 'File:')
-		icon = mw.text.split(icon[2] or '', '|')
-		icon = icon[1]
 	end
-	--when Template:LeagueIconSmall has darkmodeicons retrieve that too
 
 	lpdbData.icon = icon
 	lpdbData.icondark = iconDark
