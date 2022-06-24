@@ -375,11 +375,9 @@ function matchFunctions.getOpponents(match)
 				if not Logic.isEmpty(opponent.name) then
 					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name, opponent.players)
 				end
-			elseif Opponent.typeIsParty(opponent) then
-				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-				opponent.match2players[1].name = opponent.name
-			elseif opponent.type == Opponent.solo then
-				--solo opponent processing here
+			elseif Opponent.typeIsParty(opponent.type) then
+				opponent.match2players = Json.parseIfString(opponent.match2players) or {{}}
+				opponent.match2players[1].name = opponent.match2players[1].name or opponent.name
 			elseif opponent.type ~= Opponent.literal then
 				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
