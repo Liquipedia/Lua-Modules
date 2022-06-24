@@ -77,7 +77,7 @@ function League:createInfobox()
 					args.series,
 					args.abbreviation,
 					args.icon,
-					args.icondarkmode
+					args.icondark or args.icondarkmode
 				),
 				self:_createSeries(
 					{shouldSetVariable = false},
