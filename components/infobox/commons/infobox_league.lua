@@ -484,13 +484,21 @@ function League:_createSeries(options, series, abbreviation, icon, iconDark)
 end
 
 function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
-	icon, iconDark = LeagueIcon.getIconFromTemplate({
+	local trackingCategory
+	icon, iconDark, trackingCategory, = LeagueIcon.getIconFromTemplate({
 		icon = icon,
 		iconDark = iconDark,
 		stringOfExpandedTemplate = iconSmallTemplate
 	})
 	Variables.varDefine('tournament_icon', icon)
 	Variables.varDefine('tournament_icondark', iconDark)
+
+	if String.isNotEmpty(trackingCategory) then
+		table.insert(
+			self.warnings,
+			'Missing icon while icondark is set.'
+		)
+	end
 end
 
 function League:_createOrganizer(organizer, name, link, reference)
