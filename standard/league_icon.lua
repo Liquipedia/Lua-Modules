@@ -14,7 +14,7 @@ local String = require('Module:StringUtils')
 
 local _FILLER = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
 local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY
-	= '[[Category:Pages with missing icon input while iconDark is set]]'
+	= '[[Category:Pages with unset icon while icondark is set]]'
 
 ---display an image in the fashion of LeagueIconSmall templates
 --i.e. it displays the icon in dark/light mode (depending on reader mode)
