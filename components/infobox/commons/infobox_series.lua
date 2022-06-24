@@ -247,7 +247,12 @@ end
 function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
 	local icon = lpdbData.icon
 	local iconDark = lpdbData.icondark
-	local iconSmallTemplate = LeagueIcon.getTemplate{}
+	local iconSmallTemplate = LeagueIcon.display{
+		icon = icon,
+		iconDark = iconDark,
+		series = lpdbData.name,
+		date = lpdbData.defunctfate
+	}
 	local trackingCategory
 
 	icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
