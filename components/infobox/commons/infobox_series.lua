@@ -250,7 +250,7 @@ function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
 	local iconSmallTemplate = LeagueIcon.getTemplate{}
 	local trackingCategory
 
-	icon, iconDark, trackingCategory, = LeagueIcon.getIconFromTemplate{
+	icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
 		icon = icon,
 		iconDark = iconDark,
 		stringOfExpandedTemplate = iconSmallTemplate
