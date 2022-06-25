@@ -8,13 +8,14 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Player = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Role = require('Module:Role')
-local Region = require('Module:Region')
 local HeroIcon = require('Module:HeroIcon')
+local HeroNames = mw.loadData('Module:HeroNames')
+local Player = require('Module:Infobox/Person')
+local Region = require('Module:Region')
+local Role = require('Module:Role')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -33,9 +34,11 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
+	_player = player
 	_args = player.args
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
@@ -77,26 +80,33 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	-- Signature Heroes
-	table.insert(widgets,
-		Builder{
-			builder = function()
-				local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
-					function(hero, _)
-						return HeroIcon.getImage{hero, size = _SIZE_HERO}
-					end
+	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
+		function(hero, _)
+			local standardizedHero = HeroNames[hero:lower()]
+			if not standardizedHero then
+				-- we have an invalid hero entry
+				-- add warning (including tracking category)
+				table.insert(
+					_player.warnings,
+					'Invalid hero input "' .. hero .. '"[[Category:Pages with invalid hero input]]'
 				)
-				if Table.isNotEmpty(heroIcons) then
-					return {
-						Cell{
-							name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-							content = {
-								table.concat(heroIcons, '&nbsp;')
-							}
-						}
-					}
-				end
 			end
-		})
+			return HeroIcon.getImage{standardizedHero or hero, size = _SIZE_HERO}
+		end
+	)
+
+	if Table.isNotEmpty(heroIcons) then
+		table.insert(
+			widgets,
+			Cell{
+				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
+				content = {
+					table.concat(heroIcons, '&nbsp;')
+				}
+			}
+		)
+	end
+
 	return widgets
 end
 
@@ -108,11 +118,11 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
 	lpdbData.extradata.role = _role.role
 	lpdbData.extradata.role2 = _role2.role
-	lpdbData.extradata.signatureHero1 = _args.hero1 or _args.hero
-	lpdbData.extradata.signatureHero2 = _args.hero2
-	lpdbData.extradata.signatureHero3 = _args.hero3
-	lpdbData.extradata.signatureHero4 = _args.hero4
-	lpdbData.extradata.signatureHero5 = _args.hero5
+
+	-- store signature heroes with standardized name
+	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
+		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]
+	end
 
 	local region = Region.run({region = _args.region, country = _args.country})
 	if type(region) == 'table' then
