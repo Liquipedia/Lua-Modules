@@ -14,6 +14,7 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Role = require('Module:Role')
 local Region = require('Module:Region')
 local HeroIcon = require('Module:HeroIcon')
+local Table = require('Module:Table')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -84,14 +85,16 @@ function CustomInjector:addCustomCells(widgets)
 						return HeroIcon.getImage{hero, size = _SIZE_HERO}
 					end
 				)
-				return {
-					Cell{
-						name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-						content = {
-							table.concat(heroIcons, '&nbsp;')
+				if Table.isNotEmpty(heroIcons) then
+					return {
+						Cell{
+							name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
+							content = {
+								table.concat(heroIcons, '&nbsp;')
+							}
 						}
 					}
-				}
+				end
 			end
 		})
 	return widgets
