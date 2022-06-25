@@ -6,22 +6,26 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
-local Class = require('Module:Class')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Role = require('Module:Role')
 local Region = require('Module:Region')
+local HeroIcon = require('Module:HeroIcon')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
+local Builder = require('Module:Infobox/Widget/Builder')
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
 local _role2
 local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
+local _SIZE_HERO = '25x25px'
 
 local CustomPlayer = Class.new()
 
@@ -69,6 +73,30 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+
+function CustomInjector:addCustomCells(widgets)
+	-- Signature Heroes
+	table.insert(widgets,
+		Builder{
+			builder = function()
+				local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
+					function(hero, _)
+						return HeroIcon.getImage{hero, size = _SIZE_HERO}
+					end
+				)
+				return {
+					Cell{
+						name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
+						content = {
+							table.concat(heroIcons, '&nbsp;')
+						}
+					}
+				}
+			end
+		})
+	return widgets
+end
+
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
@@ -77,6 +105,11 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
 	lpdbData.extradata.role = _role.role
 	lpdbData.extradata.role2 = _role2.role
+	lpdbData.extradata.signatureHero1 = _args.hero1 or _args.hero
+	lpdbData.extradata.signatureHero2 = _args.hero2
+	lpdbData.extradata.signatureHero3 = _args.hero3
+	lpdbData.extradata.signatureHero4 = _args.hero4
+	lpdbData.extradata.signatureHero5 = _args.hero5
 
 	local region = Region.run({region = _args.region, country = _args.country})
 	if type(region) == 'table' then
