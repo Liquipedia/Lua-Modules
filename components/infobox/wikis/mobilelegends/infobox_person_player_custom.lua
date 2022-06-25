@@ -21,7 +21,6 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
-local Builder = require('Module:Infobox/Widget/Builder')
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
