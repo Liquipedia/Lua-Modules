@@ -6,13 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Variables = require('Module:Variables')
 local BasicHiddenDataBox = require('Module:HiddenDataBox')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Variables = require('Module:Variables')
+
 local CustomHiddenDataBox = {}
+
+local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
+	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+local TIER_MODE_TYPES = 'types'
+local TIER_MODE_TIERS = 'tiers'
 
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
+	BasicHiddenDataBox.validateTier = CustomHiddenDataBox.validateTier
 	return BasicHiddenDataBox.run(args)
 end
 
@@ -39,6 +47,32 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 
 	--gamemode
 	BasicHiddenDataBox:checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
+end
+
+function CustomHiddenDataBox.validateTier(tierString, tierMode)
+	if String.isEmpty(tierString) then
+		return nil, nil
+	end
+	local warning
+	local tierValue = tierString
+	if tierMode == TIER_MODE_TIERS and not Logic.isNumeric(tierValue) then
+		tierValue = Tier.number[tierValue]
+	end
+	tierValue = Tier.text[tierMode][tierString:lower()]
+	if not tierValue then
+		tierValue = tierString
+		warning = String.interpolate(
+			INVALID_TIER_WARNING,
+			{
+				tierString = tierString,
+				tierMode = tierMode == TIER_MODE_TYPES and 'Tiertype' or 'Tier',
+			}
+		)
+	end
+
+	tierValue = tierMode == TIER_MODE_TYPES and tierValue or tierString
+
+	return tierValue, warning
 end
 
 return Class.export(CustomHiddenDataBox)
