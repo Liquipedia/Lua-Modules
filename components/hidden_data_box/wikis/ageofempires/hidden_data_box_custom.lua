@@ -68,7 +68,7 @@ function CustomHiddenDataBox.validateTier(tierString, tierMode)
 			INVALID_TIER_WARNING,
 			{
 				tierString = tierString,
-				tierMode = tierMode == TIER_MODE_TYPES and 'Tiertype' or 'Tier',
+				tierMode = tierMode == TIER_MODE_TYPES and 'Tier Type' or 'Tier',
 			}
 		)
 	end
