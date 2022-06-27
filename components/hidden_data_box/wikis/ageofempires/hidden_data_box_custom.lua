@@ -73,7 +73,7 @@ function CustomHiddenDataBox.validateTier(tierString, tierMode)
 		)
 	end
 
-	tierValue = (tierMode == TIER_MODE_TYPES and cleanedTierValue) or tierValue or tierString
+	tierValue = (tierMode == TIER_MODE_TYPES and cleanedTierValue) or tierValue
 
 	return tierValue, warning
 end
