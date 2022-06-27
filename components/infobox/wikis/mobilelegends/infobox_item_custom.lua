@@ -95,8 +95,8 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Physical Attack', parameter = 'physatk'},
 			{name = 'Physical Penetration', parameter = 'physpen'},
 			{name = 'Magical Penetration', parameter = 'magicpen'},
-			{name = 'Cooldown Reduction', parameter = 'critchance'},
-			{name = 'Critical Chance', parameter = 'critreduction'},
+			{name = 'Cooldown Reduction', parameter = 'cdreduction'},
+			{name = 'Critical Chance', parameter = 'critchance'},
 			{name = 'Movement Speed', funct = '_movementSpeedDisplay'},
 		}
 		widgets = CustomItem._getAttributeCells(attributeCells)
