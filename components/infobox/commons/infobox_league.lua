@@ -77,7 +77,7 @@ function League:createInfobox()
 					args.series,
 					args.abbreviation,
 					args.icon,
-					args.icondarkmode
+					args.icondark or args.icondarkmode
 				),
 				self:_createSeries(
 					{shouldSetVariable = false},
@@ -483,14 +483,21 @@ function League:_createSeries(options, series, abbreviation, icon, iconDark)
 	return output
 end
 
-function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
-	icon, iconDark = LeagueIcon.getIconFromTemplate({
-		icon = icon,
-		iconDark = iconDark,
+function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
+	local icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
+		icon = manualIcon,
+		iconDark = manualIconDark,
 		stringOfExpandedTemplate = iconSmallTemplate
-	})
+	}
 	Variables.varDefine('tournament_icon', icon)
 	Variables.varDefine('tournament_icondark', iconDark)
+
+	if String.isNotEmpty(trackingCategory) then
+		table.insert(
+			self.warnings,
+			'Missing icon while icondark is set.'
+		)
+	end
 end
 
 function League:_createOrganizer(organizer, name, link, reference)
