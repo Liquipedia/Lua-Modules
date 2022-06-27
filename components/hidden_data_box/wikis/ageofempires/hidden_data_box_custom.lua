@@ -9,6 +9,7 @@
 local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local CustomHiddenDataBox = {}
@@ -58,7 +59,7 @@ function CustomHiddenDataBox.validateTier(tierString, tierMode)
 	if tierMode == TIER_MODE_TIERS and not Logic.isNumeric(tierValue) then
 		tierValue = Tier.number[tierValue]
 	end
-	tierValue = Tier.text[tierMode][tierString:lower()]
+	tierValue = Tier.text[tierMode][tierValue:lower()]
 	if not tierValue then
 		tierValue = tierString
 		warning = String.interpolate(
