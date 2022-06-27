@@ -483,11 +483,10 @@ function League:_createSeries(options, series, abbreviation, icon, iconDark)
 	return output
 end
 
-function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
-	local trackingCategory
-	icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
-		icon = icon,
-		iconDark = iconDark,
+function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
+	local icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
+		icon = manualIcon,
+		iconDark = manualIconDark,
 		stringOfExpandedTemplate = iconSmallTemplate
 	}
 	Variables.varDefine('tournament_icon', icon)
