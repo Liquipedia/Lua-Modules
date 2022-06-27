@@ -7,14 +7,30 @@
 --
 
 local Class = require('Module:Class')
-local Variables = require('Module:Variables')
-local String = require('Module:StringUtils')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local String = require('Module:StringUtils')
+local Tier = require('Module:Tier')
+local Variables = require('Module:Variables')
+local WarningBox = require('Module:WarningBox')
 
 local HiddenDataBox = {}
+local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
+	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+local TIER_MODE_TYPES = 'types'
+local TIER_MODE_TIERS = 'tiers'
 
 function HiddenDataBox.run(args)
 	args = args or {}
+
+	local warnings = {}
+	local warning
+	args.liquipediatier, warning
+		= HiddenDataBox.validateTier(args.liquipediatier, TIER_MODE_TIERS)
+	table.insert(warnings, warning)
+	args.liquipediatiertype, warning
+		= HiddenDataBox.validateTier(args.liquipediatiertype, TIER_MODE_TYPES)
+	table.insert(warnings, warning)
+
 	local parent = args.tournament or tostring(mw.title.getCurrentTitle().basePageTitle)
 	parent = parent:gsub(' ', '_')
 
@@ -45,6 +61,8 @@ function HiddenDataBox.run(args)
 	HiddenDataBox:checkAndAssign('tournament_parentname', args.parentname, queryResult.name)
 
 	HiddenDataBox:addCustomVariables(args, queryResult)
+
+	return WarningBox.displayAll(warnings)
 end
 
 function HiddenDataBox:cleanDate(primaryDate, secondaryDate)
@@ -67,7 +85,31 @@ function HiddenDataBox:checkAndAssign(variableName, valueFromArgs, valueFromQuer
 	end
 end
 
---overridable so that wikis can add custom vars
+-- overridable so that wikis can add custom vars
 function HiddenDataBox:addCustomVariables() end
+
+-- overridable so that wikis can adjust
+-- according to their tier system
+function HiddenDataBox.validateTier(tierString, tierMode)
+	if String.isEmpty(tierString) then
+		return nil, nil
+	end
+	local warning
+	local tierValue = Tier.text[tierMode][tierString:lower()]
+	if not tierValue then
+		tierValue = tierString
+		warning = String.interpolate(
+			INVALID_TIER_WARNING,
+			{
+				tierString = tierString,
+				tierMode = tierMode == TIER_MODE_TYPES and 'Tiertype' or 'Tier',
+			}
+		)
+	end
+
+	tierValue = tierMode == TIER_MODE_TYPES and tierValue or tierString
+
+	return tierValue, warning
+end
 
 return Class.export(HiddenDataBox)
