@@ -61,7 +61,7 @@ function CustomHiddenDataBox.validateTier(tierString, tierMode)
 	if tierMode == TIER_MODE_TIERS and not Logic.isNumeric(tierValue) then
 		tierValue = Tier.number[tierValue]
 	end
-	local cleanedTierValue = Tier.text[tierMode][tierValue:lower()]
+	local cleanedTierValue = Tier.text[tierMode][(tierValue or ''):lower()]
 	if not cleanedTierValue then
 		cleanedTierValue = tierString
 		warning = String.interpolate(
