@@ -10,6 +10,7 @@ local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
+local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
 local CustomHiddenDataBox = {}
