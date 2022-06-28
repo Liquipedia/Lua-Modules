@@ -81,4 +81,31 @@ function CustomHiddenDataBox.validateTier(tierString, tierMode)
 	return tierValue, warning
 end
 
+function CustomHiddenDataBox.validateTier(tierString, tierMode)
+	if String.isEmpty(tierString) then
+		return nil, nil
+	end
+	local warning
+	local tierValue = tierString
+	-- tier should be a number defining a tier
+	if tierMode == TIER_MODE_TIERS and not Logic.isNumeric(tierValue) then
+		tierValue = Tier.number[tierValue:lower()] or tierValue
+	end
+	local cleanedTierValue = Tier.text[tierMode][(tierValue):lower()]
+	if not cleanedTierValue then
+		cleanedTierValue = tierString
+		warning = String.interpolate(
+			INVALID_TIER_WARNING,
+			{
+				tierString = tierString,
+				tierMode = tierMode == TIER_MODE_TYPES and 'Tier Type' or 'Tier',
+			}
+		)
+	end
+
+	tierValue = (tierMode == TIER_MODE_TYPES and cleanedTierValue) or tierValue
+
+	return tierValue, warning
+end
+
 return Class.export(CustomHiddenDataBox)

@@ -175,4 +175,28 @@ function HiddenDataBox.validateTier(tierString, tierMode)
 	return tierValue, warning
 end
 
+-- overridable so that wikis can adjust
+-- according to their tier system
+function HiddenDataBox.validateTier(tierString, tierMode)
+	if String.isEmpty(tierString) then
+		return nil, nil
+	end
+	local warning
+	local tierValue = Tier.text[tierMode][tierString:lower()]
+	if not tierValue then
+		tierValue = tierString
+		warning = String.interpolate(
+			INVALID_TIER_WARNING,
+			{
+				tierString = tierString,
+				tierMode = tierMode == TIER_MODE_TYPES and 'Tier Type' or 'Tier',
+			}
+		)
+	end
+
+	tierValue = tierMode == TIER_MODE_TYPES and tierValue or tierString
+
+	return tierValue, warning
+end
+
 return Class.export(HiddenDataBox)
