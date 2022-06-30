@@ -91,7 +91,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {'$', LANG:formatNum(data)}}
+				return TableCell{content = {'$', PrizePool._formatPrize(data)}}
 			end
 		end,
 	},
@@ -112,7 +112,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				local displayText = {LANG:formatNum(data)}
+				local displayText = {PrizePool._formatPrize(data)}
 
 				if headerData.symbolFirst then
 					table.insert(displayText, 1, headerData.symbol)
@@ -227,7 +227,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {data}}
+				return TableCell{content = {LANG:formatNum(data)}}
 			end
 		end,
 	},
@@ -475,6 +475,21 @@ end
 --- Returns the default date based on wiki-variables set in the Infobox League
 function PrizePool._getTournamentDate()
 	return Variables.varDefaultMulti('tournament_enddate', 'tournament_edate', 'edate', TODAY)
+end
+
+--- Formats a number for display as currency
+function PrizePool._formatPrize(value)
+	value = Math.round{value, 2}
+
+	-- if number is non integer and has only 1 digit after the `.` we need to fill it up
+	-- e.g. .5 --> .50
+	local decimal = string.match(value, '%.(.-)$') or ''
+	if String.isNotEmpty(decimal) then
+		decimal = '.' .. decimal .. string.rep('0', 2 - string.len(decimal))
+		value = math.floor(value)
+	end
+
+	return LANG:formatNum(value) .. decimal
 end
 
 --- @class Placement
