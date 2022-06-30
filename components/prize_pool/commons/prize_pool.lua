@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
+local LocalCurrency = require('Module:LocalCurrency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
@@ -22,7 +23,6 @@ local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -89,8 +89,7 @@ PrizePool.prizeTypes = {
 		sortOrder = 10,
 
 		headerDisplay = function (data)
-			local currencyText = {Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {'USD'})}
-			return TableCell{content = currencyText}
+			return TableCell{content = {LocalCurrency.display('USD')}}
 		end,
 
 		row = 'usdprize',
@@ -108,10 +107,7 @@ PrizePool.prizeTypes = {
 
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			Variables.varDefine('localcurrencysymbol', '')
-			Variables.varDefine('localcurrencysymbolafter', '')
-			Variables.varDefine('localcurrencycode', '')
-			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {input})
+			local currencyText = LocalCurrency.display(input, nil, {setVariables = true})
 
 			local symbol, symbolFirst
 			if Variables.varDefault('localcurrencysymbol') then
@@ -121,7 +117,7 @@ PrizePool.prizeTypes = {
 				symbol = Variables.varDefault('localcurrencysymbolafter')
 				symbolFirst = false
 			else
-				error(input .. ' could not be parsed as a currency, has it been added to [[Template:Local currency]]?')
+				error(input .. ' could not be parsed as a currency, has it been added to [[Module:LocalCurrency/Data]]?')
 			end
 
 			return {
