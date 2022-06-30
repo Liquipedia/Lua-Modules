@@ -330,7 +330,9 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_game', string.lower(args.game or ''))
 
 	-- If no parent is available, set pagename instead to ease querying
-	Variables.varDefine('tournament_parent', args.parent or mw.title.getCurrentTitle().prefixedText)
+	local parent = args.parent or mw.title.getCurrentTitle().prefixedText
+	parent = string.gsub(parent, ' ', '_')
+	Variables.varDefine('tournament_parent', parent)
 	Variables.varDefine('tournament_parentname', args.parentname)
 	Variables.varDefine('tournament_subpage', args.subpage)
 
