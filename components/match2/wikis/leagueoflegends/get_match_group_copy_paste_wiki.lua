@@ -39,9 +39,8 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	if args.hasDate == 'true' then
 		Array.appendWith(lines,
 			indent .. '|date=',
-			indent .. '|finished=',
-			indent .. '|twitch=|youtube=',
-			indent .. '|reddit=|gol=',
+			indent .. '|twitch= |youtube=',
+			indent .. '|reddit= |gol=',
 			indent .. '|mvp='
 		)
 	end
@@ -54,28 +53,28 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.appendWith(lines,
 			indent .. '|map' .. i .. '={{Map',
 			indent .. indent .. '|team1side=',
-			indent .. indent .. '|t1c1=|t1c2=|t1c3=|t1c4=|t1c5='
+			indent .. indent .. '|t1c1= |t1c2= |t1c3= |t1c4= |t1c5='
 		)
 
 		if bans then
 			Array.appendWith(lines,
-				indent .. indent .. '|t1b1=|t1b2=|t1b3=|t1b4=|t1b5='
+				indent .. indent .. '|t1b1= |t1b2= |t1b3= |t1b4= |t1b5='
 			)
 		end
 
 		Array.appendWith(lines,
 			indent .. indent .. '|team2side=',
-			indent .. indent .. '|t2c1=|t2c2=|t2c3=|t2c4=|t2c5='
+			indent .. indent .. '|t2c1= |t2c2= |t2c3= |t2c4= |t2c5='
 		)
 
 		if bans then
 			Array.appendWith(lines,
-				indent .. indent .. '|t2b1=|t2b2=|t2b3=|t2b4=|t2b5='
+				indent .. indent .. '|t2b1= |t2b2= |t2b3= |t2b4= |t2b5='
 			)
 		end
 
 		Array.appendWith(lines,
-			indent .. indent .. '|length=|winner=',
+			indent .. indent .. '|length= |winner=',
 			indent .. '}}'
 		)
 	end
