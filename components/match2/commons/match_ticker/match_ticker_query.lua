@@ -130,7 +130,7 @@ function BaseConditions:tournamentConditions(queryArgs)
 		tournament = queryArgs['tournament' .. tournamentIndex]
 	end
 	if not Table.isEmpty(tournaments) then
-		local tournamentConditionTree = ConditionTree(BooleanOperator.all)
+		local tournamentConditionTree = ConditionTree(BooleanOperator.any)
 		for _, item in pairs(tournaments) do
 			tournamentConditionTree:add({ConditionNode(ColumnName('pagename'), Comparator.eq, item)})
 		end
