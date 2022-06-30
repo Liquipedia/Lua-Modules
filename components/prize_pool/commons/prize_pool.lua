@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
+local LocalCurrencyData = mw.loadData('Module:LocalCurrency/Data')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
@@ -22,7 +23,6 @@ local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -88,9 +88,10 @@ PrizePool.prizeTypes = {
 	[PRIZE_TYPE_USD] = {
 		sortOrder = 10,
 
-		headerDisplay = function (data)
-			local currencyText = {Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {'USD'})}
-			return TableCell{content = currencyText}
+		headerDisplay = function ()
+			local currencyData = LocalCurrencyData['usd']
+			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
+			return TableCell{content = {currencyText}}
 		end,
 
 		row = 'usdprize',
@@ -108,25 +109,15 @@ PrizePool.prizeTypes = {
 
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			Variables.varDefine('localcurrencysymbol', '')
-			Variables.varDefine('localcurrencysymbolafter', '')
-			Variables.varDefine('localcurrencycode', '')
-			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {input})
-
-			local symbol, symbolFirst
-			if Variables.varDefault('localcurrencysymbol') then
-				symbol = Variables.varDefault('localcurrencysymbol')
-				symbolFirst = true
-			elseif Variables.varDefault('localcurrencysymbolafter') then
-				symbol = Variables.varDefault('localcurrencysymbolafter')
-				symbolFirst = false
-			else
-				error(input .. ' could not be parsed as a currency, has it been added to [[Template:Local currency]]?')
+			local currencyData = LocalCurrencyData[input:lower()]
+			if not currencyData then
+				error(input .. ' could not be parsed as a currency, has it been added to [[Module:LocalCurrency/Data]]?')
 			end
+			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
 
 			return {
-				currency = Variables.varDefault('localcurrencycode'), currencyText = currencyText,
-				symbol = symbol, symbolFirst = symbolFirst
+				currency = currencyData.code, currencyText = currencyText,
+				symbol = currencyData.symbol, symbolFirst = not currencyData.isAfter
 			}
 		end,
 		headerDisplay = function (data)
