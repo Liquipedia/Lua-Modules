@@ -17,6 +17,7 @@ local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
+local PositionIcon = require('Module:PositionIcon/data')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -26,10 +27,11 @@ local _BANNED = mw.loadData('Module:Banned')
 local _ROLES = {
 	-- Players
 	-- TODO adjust player roles to be relevant to OW
-	['entry'] = {category = 'Entry fraggers', variable = 'Entry fragger', isplayer = true},
-	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
-	['flex'] = {category = 'Flex players', variable = 'Flex', isplayer = true},
+	['dps'] = {category = 'DPS Players', variable = 'DPS', isplayer = true},
+	['flex'] = {category = 'Flex Players', variable = 'Flex', isplayer = true},
+	['support'] = {category = 'Support Players', variable = 'Support', isplayer = true},
 	['igl'] = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
+	['tank'] = {category = 'Tank Players', variable = 'Tank', isplayer = true},
 
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
@@ -44,7 +46,6 @@ local _ROLES = {
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
 }
-_ROLES.entryfragger = _ROLES.entry
 _ROLES['assistant coach'] = _ROLES.coach
 
 local _GAMES = {
@@ -53,6 +54,7 @@ local _GAMES = {
 }
 
 local _SIZE_HERO = '25x25px'
+local _SIZE_ROLE = '25x25px'
 
 local CustomPlayer = Class.new()
 
@@ -147,7 +149,7 @@ function CustomInjector:addCustomCells(widgets)
 		})
 	return widgets
 end
-
+			
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
@@ -197,6 +199,12 @@ function CustomPlayer._createRole(key, role)
 	if not roleData then
 		return nil
 	end
+	
+	if _args.type == 'player' then
+        local roleName = roleData.variable:lower()
+        return PositionIcon.roleName .. roleData
+    end  
+		
 	if Player:shouldStoreData(_args) then
 		local categoryCoreText = 'Category:' .. roleData.category
 
