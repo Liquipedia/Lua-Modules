@@ -13,7 +13,6 @@ local Page = require('Module:Page')
 local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
@@ -149,7 +148,7 @@ function CustomInjector:addCustomCells(widgets)
 		})
 	return widgets
 end
-			
+
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
@@ -174,7 +173,7 @@ function CustomPlayer._getStatusContents()
 	if String.isNotEmpty(_args.status) then
 		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
 	end
-	
+
 	local banned = _BANNED[string.lower(_args.banned or '')]
 	if not banned and String.isNotEmpty(_args.banned) then
 		banned = '[[Banned Players|Multiple Bans]]'
@@ -199,12 +198,12 @@ function CustomPlayer._createRole(key, role)
 	if not roleData then
 		return nil
 	end
-	
+
 	if _args.type == 'player' then
         local roleName = roleData.variable:lower()
         return PositionIcon.roleName .. roleData
     end  
-		
+
 	if Player:shouldStoreData(_args) then
 		local categoryCoreText = 'Category:' .. roleData.category
 
