@@ -53,7 +53,6 @@ local _GAMES = {
 }
 
 local _SIZE_HERO = '25x25px'
-local _SIZE_ROLE = '25x25px'
 
 local CustomPlayer = Class.new()
 
@@ -202,7 +201,7 @@ function CustomPlayer._createRole(key, role)
 	if _args.type == 'player' then
         local roleName = roleData.variable:lower()
         return PositionIcon.roleName .. roleData
-    end  
+    end
 
 	if Player:shouldStoreData(_args) then
 		local categoryCoreText = 'Category:' .. roleData.category
