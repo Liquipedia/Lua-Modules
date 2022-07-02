@@ -106,24 +106,32 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	-- Signature Heroes
-	table.insert(widgets,
-		Builder{
-			builder = function()
-				local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
-					function(hero, _)
-						return HeroIcon.getImage{hero, size = _SIZE_HERO}
-					end
+	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
+		function(hero, _)
+			local standardizedHero = HeroNames[hero:lower()]
+			if not standardizedHero then
+				-- we have an invalid hero entry
+				-- add warning (including tracking category)
+				table.insert(
+					_player.warnings,
+					'Invalid hero input "' .. hero .. '"[[Category:Pages with invalid hero input]]'
 				)
-				return {
-					Cell{
-						name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-						content = {
-							table.concat(heroIcons, '&nbsp;')
-						}
-					}
+			end	
+			return HeroIcon.getImage{standardizedHero or hero, size = _SIZE_HERO}
+		end
+	)
+
+	if Table.isNotEmpty(heroIcons) then
+		table.insert(widgets,
+			Cell{
+				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
+				content = {
+					table.concat(heroIcons, '&nbsp;')
 				}
-			end
-		})
+			}
+		)
+	end
+
 	-- Active in Games
 	table.insert(widgets,
 		Builder{
@@ -151,9 +159,11 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
-	lpdbData.extradata.signatureHero1 = _args.hero1 or _args.hero
-	lpdbData.extradata.signatureHero2 = _args.hero2
-	lpdbData.extradata.signatureHero3 = _args.hero3
+	-- store signature heroes with standardized name
+	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
+		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]
+	end
+
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
