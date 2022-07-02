@@ -34,25 +34,20 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	-- Operators
-	table.insert(widgets,
-		Builder{
-			builder = function()
-				local operatorIcons = Array.map(Weapon:getAllArgsForBase(_args, 'operator'),
-					function(operator, _)
-						return OperatorIcon.getImage{operator, size = _SIZE_OPERATOR}
-					end
-				)
-				return {
-					Cell{
-						name = #operatorIcons > 1 and 'Operators' or 'Operator',
-						content = {
-							table.concat(operatorIcons, '&nbsp;')
-						}
-					}
-				}
-			end
-		})
-	return widgets
+	local operatorIcons = Array.map(Weapon:getAllArgsForBase(_args, 'operator'),
+		function(operator, _)
+			return OperatorIcon.getImage{operator, size = _SIZE_OPERATOR}
+		end
+	)
+
+	return {
+		Cell{
+			name = #operatorIcons > 1 and 'Operators' or 'Operator',
+			content = {
+				table.concat(operatorIcons, '&nbsp;')
+			}
+		}
+	}
 end
 
 return CustomWeapon
