@@ -21,7 +21,6 @@ local Template = require('Module:Template')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Builder = require('Module:Infobox/Widget/Builder')
 
 local _BANNED = mw.loadData('Module:Banned')
 local _ROLES = {
@@ -48,17 +47,13 @@ local _ROLES = {
 }
 _ROLES['assistant coach'] = _ROLES.coach
 
-local _GAMES = {
-	ow2 = '[[Overwatch 2]]',
-	ow = '[[Overwatch]]',
-}
-
 local _SIZE_HERO = '25x25px'
 
 local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
+local _pagename = mw.title.getCurrentTitle().prefixedText
 local _args
 local _player
 
@@ -72,6 +67,7 @@ function CustomPlayer.run(frame)
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
+	_player = player
 
 	return player:createInfobox(frame)
 end
