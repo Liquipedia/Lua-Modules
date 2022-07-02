@@ -8,7 +8,6 @@
 
 local Weapon = require('Module:Infobox/Weapon')
 local Class = require('Module:Class')
-local Builder = require('Module:Infobox/Widget/Builder')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Array = require('Module:Array')
