@@ -16,7 +16,6 @@ local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
-local PositionIcon = require('Module:PositionIcon/data')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -197,11 +196,6 @@ function CustomPlayer._createRole(key, role)
 	if not roleData then
 		return nil
 	end
-
-	if _args.type == 'player' then
-        local roleName = roleData.variable:lower()
-        return PositionIcon.roleName .. roleData
-    end
 
 	if Player:shouldStoreData(_args) then
 		local categoryCoreText = 'Category:' .. roleData.category
