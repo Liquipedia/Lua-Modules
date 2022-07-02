@@ -9,10 +9,12 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local HeroIcon = require('Module:HeroIcon')
+local HeroNames = require('Module:HeroNames')
 local Page = require('Module:Page')
 local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local GameAppearances = require('Module:GetGameAppearances')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
@@ -58,6 +60,7 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
@@ -65,7 +68,6 @@ function CustomPlayer.run(frame)
 	player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
@@ -116,7 +118,7 @@ function CustomInjector:addCustomCells(widgets)
 					_player.warnings,
 					'Invalid hero input "' .. hero .. '"[[Category:Pages with invalid hero input]]'
 				)
-			end	
+			end
 			return HeroIcon.getImage{standardizedHero or hero, size = _SIZE_HERO}
 		end
 	)
@@ -133,25 +135,10 @@ function CustomInjector:addCustomCells(widgets)
 	end
 
 	-- Active in Games
-	table.insert(widgets,
-		Builder{
-			builder = function()
-				local activeInGames = {}
-				Table.iter.forEachPair(_GAMES,
-					function(key)
-						if _args[key] then
-							table.insert(activeInGames, _GAMES[key])
-						end
-					end
-				)
-				return {
-					Cell{
-						name = #activeInGames > 1 and 'Games' or 'Game',
-						content = activeInGames
-					}
-				}
-			end
-		})
+		Cell{
+			name = 'Game Appearances',
+			content = GameAppearances.player({ player = _pagename })
+		}
 	return widgets
 end
 
