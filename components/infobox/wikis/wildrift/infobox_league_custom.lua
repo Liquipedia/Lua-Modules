@@ -68,7 +68,6 @@ end
 function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_patch', _args.patch)
 	Variables.varDefine('tournament_endpatch', _args.epatch)
-	Variables.varDefine('tournament_device', _args.device)
 
 	Variables.varDefine('tournament_publishertier', _args['riotpremier'])
 
