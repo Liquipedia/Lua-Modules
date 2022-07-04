@@ -38,12 +38,10 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
-		return {
-			Cell{name = 'Patch', content = {
-					CustomLeague._getPatchVersion()
-				}},
-			}
+	if id == 'sponsors' then
+		table.insert(widgets, Cell{name = 'Official Device', content = {_args.device}})
+	elseif id == 'gamesettings' then
+		return {Cell{name = 'Patch', content = {CustomLeague._getPatchVersion()}}}
 	elseif id == 'customcontent' then
 		if _args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
@@ -70,6 +68,7 @@ end
 function League:defineCustomPageVariables()
 	Variables.varDefine('tournament_patch', _args.patch)
 	Variables.varDefine('tournament_endpatch', _args.epatch)
+	Variables.varDefine('tournament_device', _args.device)
 
 	Variables.varDefine('tournament_publishertier', _args['riotpremier'])
 
