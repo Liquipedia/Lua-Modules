@@ -71,7 +71,7 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 	return localCurrencyData.text.prefix .. (prizeValue or '') .. localCurrencyData.text.suffix
 end
 
-function LocalCurrency.formatPrizeValue(value)
+function LocalCurrency.formatMoney(value)
 	local roundedValue = Math.round{value or 0, 2}
 	local integer, decimal = math.modf(roundedValue)
 	if decimal == 0 then
