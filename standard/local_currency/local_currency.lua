@@ -9,14 +9,16 @@
 local Arguments = require('Module:Arguments')
 local LocalCurrencyData = mw.loadData('Module:LocalCurrency/Data')
 local Logic = require('Module:Logic')
+local Math = require('Module:Math')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local LocalCurrency = {}
 
+local LANG = mw.getContentLanguage()
+local NON_BREAKING_SPACE = '&nbsp;'
 local USD = 'usd'
 local USD_TEMPLATE_ALIAS = '1'
-local NON_BREAKING_SPACE = '&nbsp;'
 
 function LocalCurrency.template(frame)
 	local args = Arguments.getArgs(frame)
