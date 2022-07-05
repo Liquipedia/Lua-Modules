@@ -13,9 +13,14 @@ local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MatchPlacement = require('Module:Match/Placement')
 local Math = require('Module:Math')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
+---Note: This can be overwritten
+local OpponentDisplay = require('Module:OpponentDisplay')
+local Ordinal = require('Module:Ordinal')
+local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -23,6 +28,9 @@ local Variables = require('Module:Variables')
 
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
+local WidgetFactory = require('Module:Infobox/Widget/Factory')
+local WidgetTable = require('Module:Widget/Table')
+local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
 
 --- @class PrizePool
@@ -36,7 +44,9 @@ local PrizePool = Class.new(function(self, ...) self:init(...) end)
 local Placement = Class.new(function(self, ...) self:init(...) end)
 
 local TODAY = os.date('%Y-%m-%d')
+
 local LANG = mw.language.getContentLanguage()
+local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 local BASE_CURRENCY = 'USD'
 
@@ -100,7 +110,26 @@ PrizePool.prizeTypes = {
 
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			return {currency = string.upper(input), currencyText = 'TODO', symbol = ''}
+			Variables.varDefine('localcurrencysymbol', '')
+			Variables.varDefine('localcurrencysymbolafter', '')
+			Variables.varDefine('localcurrencycode', '')
+			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {input})
+
+			local symbol, symbolFirst
+			if Variables.varDefault('localcurrencysymbol') then
+				symbol = Variables.varDefault('localcurrencysymbol')
+				symbolFirst = true
+			elseif Variables.varDefault('localcurrencysymbolafter') then
+				symbol = Variables.varDefault('localcurrencysymbolafter')
+				symbolFirst = false
+			else
+				error(input .. ' could not be parsed as a currency, has it been added to [[Template:Local currency]]?')
+			end
+
+			return {
+				currency = Variables.varDefault('localcurrencycode'), currencyText = currencyText,
+				symbol = symbol, symbolFirst = symbolFirst
+			}
 		end,
 		headerDisplay = function (data)
 			return TableCell{content = {data.currencyText}}
@@ -335,9 +364,93 @@ function PrizePool._comparePrizes(x, y)
 end
 
 function PrizePool:build()
-	-- TODO
-	mw.logObject(self)
-	return ''
+	local table = WidgetTable{}
+
+	table:addRow(self:_buildHeader())
+
+	for _, row in ipairs(self:_buildRows()) do
+		table:addRow(row)
+	end
+
+	table:setContext{self._widgetInjector}
+
+	local wrapper = mw.html.create('div')
+	for _, node in ipairs(WidgetFactory.work(table, self._widgetInjector)) do
+		wrapper:node(node)
+	end
+
+	return wrapper
+end
+
+function PrizePool:_buildHeader()
+	local headerRow = TableRow{css = {['font-weight'] = 'bold'}}
+
+	headerRow:addCell(TableCell{content = {'Place'}})
+
+	for _, prize in ipairs(self.prizes) do
+		local prizeTypeData = self.prizeTypes[prize.type]
+		local cell = prizeTypeData.headerDisplay(prize.data)
+		headerRow:addCell(cell)
+	end
+
+	-- TODO: Add support for party types
+	headerRow:addCell(TableCell{content = {'Team'}})
+
+	return headerRow
+end
+
+function PrizePool:_buildRows()
+	local rows = {}
+
+	for _, placement in ipairs(self.placements) do
+		local previousRow = {}
+		-- TODO Cutoff
+
+		for opponentIndex, opponent in ipairs(placement.opponents) do
+			local row = TableRow{}
+
+			row:addClass(placement:getBackground())
+
+			if opponentIndex == 1 then
+				local placeCell = TableCell{
+					content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
+					css = {['font-weight'] = 'bolder'},
+				}
+				placeCell.rowSpan = #placement.opponents
+				row:addCell(placeCell)
+			end
+
+			for prizeIndex, prize in ipairs(self.prizes) do
+				local prizeTypeData = self.prizeTypes[prize.type]
+				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+				local lastInColumn = previousRow[prizeIndex]
+
+				local cell
+				if reward then
+					cell = prizeTypeData.rowDisplay(prize.data, reward)
+				end
+
+				if not cell then
+					cell = TableCell{content = {DASH}}
+				end
+
+				if lastInColumn and Table.deepEquals(lastInColumn.content, cell.content) then
+					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
+				else
+					previousRow[prizeIndex] = cell
+					row:addCell(cell)
+				end
+			end
+
+			-- TODO: Proper Support for Party Types
+			local opponentDisplay = OpponentDisplay.InlineOpponent{opponent = opponent.opponentData}
+			row:addCell(TableCell{content = {opponentDisplay}, css = {['justify-content'] = 'start'}})
+
+			table.insert(rows, row)
+		end
+	end
+
+	return rows
 end
 
 function PrizePool:_readConfig(args)
@@ -581,10 +694,8 @@ function Placement:_parseOpponents(args)
 			end
 
 			-- Parse Opponent Data
-			local typeStruct = Json.parseIfString(opponentInput.type)
-			if typeStruct then
-				PrizePool._assertOpponentStructType(typeStruct)
-				opponentInput.type = typeStruct.type
+			if opponentInput.type then
+				PrizePool._assertOpponentStructType(opponentInput)
 			else
 				opponentInput.type = self.parent.opponentType
 			end
@@ -610,13 +721,13 @@ function Placement:_parseOpponentArgs(input, date)
 end
 
 function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
-	Array.foreach(self.opponents, function(opponent)
+	Array.forEach(self.opponents, function(opponent)
 		if not opponent.prizeRewards[PRIZE_TYPE_USD .. 1] and not self.prizeRewards[PRIZE_TYPE_USD .. 1] then
 			return
 		end
 
 		local usdReward = 0
-		Array.foreach(prizesToUse, function(prize)
+		Array.forEach(prizesToUse, function(prize)
 			local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
 
 			if not localMoney or localMoney <= 0 then
@@ -628,6 +739,25 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 
 		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = Math.round{usdReward, 2}
 	end)
+end
+
+function Placement:displayPlace()
+	local start = Ordinal._ordinal(self.placeStart)
+	if self.placeEnd > self.placeStart then
+		return start .. DASH .. Ordinal._ordinal(self.placeEnd)
+	end
+	return start
+end
+
+function Placement:getBackground()
+	return PlacementInfo.getBgClass(self.placeStart)
+end
+
+function Placement:getMedal()
+	local medal = MatchPlacement.MedalIcon{range = {self.placeStart, self.placeEnd}}
+	if medal then
+		return tostring(medal)
+	end
 end
 
 return PrizePool

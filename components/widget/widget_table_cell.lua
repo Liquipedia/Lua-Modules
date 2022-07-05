@@ -35,6 +35,11 @@ function TableCell:make()
 		['border-top'] = '1px solid #bbb',
 		['background'] = 'inherit',
 		['padding'] = '4px',
+		['display'] = 'flex',
+		['align-items'] = 'center',
+		['justify-content'] = 'center',
+		['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil,
+		['grid-column'] = self.colSpan and 'span ' .. self.colSpan or nil,
 	}
 
 	for _, class in ipairs(self.classes) do

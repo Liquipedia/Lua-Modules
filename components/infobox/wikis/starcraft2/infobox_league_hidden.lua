@@ -193,7 +193,9 @@ function HiddenInfoboxLeague._definePageVariables()
 	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game or '')] or {})[1] or _GAMES[_GAME_WOL][1])
 
 	-- If no parent is available, set pagename instead to ease querying
-	Variables.varDefine('tournament_parent', _args.parent or mw.title.getCurrentTitle().prefixedText)
+	local parent = _args.parent or mw.title.getCurrentTitle().prefixedText
+	parent = string.gsub(parent, ' ', '_')
+	Variables.varDefine('tournament_parent', parent)
 	Variables.varDefine('tournament_parentname', _args.parentname)
 	Variables.varDefine('tournament_subpage', _args.subpage)
 

@@ -128,7 +128,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SCHOOL,
-				points = 175,
+				points = 150,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
@@ -148,11 +148,11 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 200,
+				points = 175,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 30,
+				points = 25,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
