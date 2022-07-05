@@ -38,8 +38,6 @@ local _ROLES = {
 	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
 	['talent'] = {category = 'Talents', variable = 'Talent', isplayer = false},
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
-	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
-	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
 }
 _ROLES['assistant coach'] = _ROLES.coach
 
@@ -94,6 +92,7 @@ function CustomInjector:addCustomCells(widgets)
 			return HeroIcon.getImage{hero, size = _SIZE_HERO}
 		end
 	)
+
 	if Table.isNotEmpty(heroIcons) then
 		table.insert(widgets,
 			Cell{
@@ -119,7 +118,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
-		lpdbData.extradata['signatureHero' .. heroIndex] = hero
+		lpdbData.extradata['signatureHero' .. heroIndex] = HeroIcon.getHeroName(hero)
 	end
 
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
