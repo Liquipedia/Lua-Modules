@@ -70,8 +70,8 @@ function Brawler:row(brawlerData, gameNumber, numberBrawlers, date)
 			:tag('td')
 				:node(mw.html.create('div')
 					:wikitext(Abbreviation.make(
-							'Game ' .. gameNumber,
-							(self.isBan and 'Bans' or 'Picks') .. ' in game ' .. gameNumber
+							'Set ' .. gameNumber,
+							(self.isBan and 'Bans' or 'Picks') .. ' in set ' .. gameNumber
 						)
 					)
 				)

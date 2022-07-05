@@ -30,11 +30,12 @@ local Customizable = Widgets.Customizable
 
 local Person = Class.new(BasicInfobox)
 
+Person.warnings = {}
+
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
-local _warnings = {}
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -196,7 +197,7 @@ function Person:createInfobox()
 		)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
+	return tostring(builtInfobox) .. WarningBox.displayAll(self.warnings)
 end
 
 function Person:_setLpdbData(args, links, status, personType)
@@ -255,7 +256,7 @@ function Person:getStandardNationalityValue(nationality)
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
-			_warnings,
+			self.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
 		nationalityToStore = nil
