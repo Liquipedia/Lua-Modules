@@ -9,7 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local HeroIcon = require('Module:HeroIcon')
-local HeroNames = require('Module:HeroNames')
+local HeroNames = mw.loadData('Module:HeroNames')
 local Page = require('Module:Page')
 local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
@@ -22,7 +22,6 @@ local Template = require('Module:Template')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
-local _BANNED = mw.loadData('Module:Banned')
 local _ROLES = {
 	-- Players
 	-- TODO adjust player roles to be relevant to OW
@@ -126,10 +125,10 @@ function CustomInjector:addCustomCells(widgets)
 	end
 
 	-- Active in Games
-		Cell{
-			name = 'Game Appearances',
-			content = GameAppearances.player({ player = _pagename })
-		}
+	Cell{
+		name = 'Game Appearances',
+		content = GameAppearances.player({ player = _pagename })
+	}
 	return widgets
 end
 
