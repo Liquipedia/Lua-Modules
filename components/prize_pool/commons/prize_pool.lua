@@ -545,6 +545,8 @@ function PrizePool:setLpdbInjector(lpdbInjector)
 end
 
 function PrizePool:_storeLpdb()
+ 	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
+ 	Variables.varDefine('prizepool_index', prizePoolIndex)
 	local lpdbTournamentData = {
 		tournament = Variables.varDefault('tournament_name'),
 		parent = Variables.varDefault('tournament_parent'),
