@@ -65,7 +65,7 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 	end
 
 	if Logic.isNumeric(prizeValue) and options.formatValue then
-		prizeValue = mw.getContentLanguage():formatNum(prizeValue)
+		prizeValue = LocalCurrency.formatMoney(prizeValue)
 	end
 
 	return localCurrencyData.text.prefix .. (prizeValue or '') .. localCurrencyData.text.suffix
