@@ -11,10 +11,10 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
+local Currency = require('Module:LocalCurrency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
-local Math = require('Module:Math')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
 ---Note: This can be overwritten
@@ -101,7 +101,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {'$', LANG:formatNum(data)}}
+				return TableCell{content = {'$', Currency.formatMoney(data)}}
 			end
 		end,
 	},
@@ -141,7 +141,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				local displayText = {LANG:formatNum(data)}
+				local displayText = {Currency.formatMoney(data)}
 
 				if headerData.symbolFirst then
 					table.insert(displayText, 1, headerData.symbol)
@@ -256,7 +256,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {data}}
+				return TableCell{content = {LANG:formatNum(data)}}
 			end
 		end,
 	},
@@ -722,7 +722,7 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
 		end)
 
-		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = Math.round{usdReward, 2}
+		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = usdReward
 	end)
 end
 
