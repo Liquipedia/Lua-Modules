@@ -444,15 +444,17 @@ function PrizePool:_buildRows()
 			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{opponent = opponent.opponentData})
 			local opponentCss = {['justify-content'] = 'start'}
 
+			local opponentIsParty = Opponent.typeIsParty(opponent.opponentData.type)
+
 			if self:_hasPartyType() then
-				if Opponent.typeIsParty(opponent.opponentData.type) then
+				if opponentIsParty then
 					row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
 				else
 					row:addCell(PrizePool._emptyCell())
 				end
 			end
 
-			if Opponent.typeIsParty(opponent.opponentData.type) then
+			if opponentIsParty then
 				if opponent.opponentData.players[1] and opponent.opponentData.players[1].team then
 					row:addCell(TableCell{content = {tostring(OpponentDisplay.BlockOpponent{
 						opponent = {type = 'team', template = opponent.opponentData.players[1].team}
