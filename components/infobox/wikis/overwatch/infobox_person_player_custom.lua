@@ -22,7 +22,6 @@ local Cell = require('Module:Infobox/Widget/Cell')
 
 local _ROLES = {
 	-- Players
-	-- TODO adjust player roles to be relevant to OW
 	['dps'] = {category = 'DPS Players', variable = 'DPS', isplayer = true},
 	['flex'] = {category = 'Flex Players', variable = 'Flex', isplayer = true},
 	['support'] = {category = 'Support Players', variable = 'Support', isplayer = true},
@@ -118,7 +117,6 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
-	mw.logObject(_args)
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = hero
