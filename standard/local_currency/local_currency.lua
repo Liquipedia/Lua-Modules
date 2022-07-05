@@ -9,14 +9,16 @@
 local Arguments = require('Module:Arguments')
 local LocalCurrencyData = mw.loadData('Module:LocalCurrency/Data')
 local Logic = require('Module:Logic')
+local Math = require('Module:Math')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local LocalCurrency = {}
 
+local LANG = mw.getContentLanguage()
+local NON_BREAKING_SPACE = '&nbsp;'
 local USD = 'usd'
 local USD_TEMPLATE_ALIAS = '1'
-local NON_BREAKING_SPACE = '&nbsp;'
 
 function LocalCurrency.template(frame)
 	local args = Arguments.getArgs(frame)
@@ -63,10 +65,23 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 	end
 
 	if Logic.isNumeric(prizeValue) and options.formatValue then
-		prizeValue = mw.getContentLanguage():formatNum(prizeValue)
+		prizeValue = LocalCurrency.formatMoney(prizeValue)
 	end
 
 	return localCurrencyData.text.prefix .. (prizeValue or '') .. localCurrencyData.text.suffix
+end
+
+function LocalCurrency.formatMoney(value)
+	if not Logic.isNumeric(value) then
+		return 0
+	end
+
+	local roundedValue = Math.round{value, 2}
+	local integer, decimal = math.modf(roundedValue)
+	if decimal == 0 then
+		return LANG:formatNum(integer)
+	end
+	return LANG:formatNum(integer) .. string.format('%.2f', decimal):sub(2)
 end
 
 return LocalCurrency
