@@ -63,7 +63,6 @@ function CustomPlayer.run(frame)
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
-	_player = player
 
 	return player:createInfobox(frame)
 end
