@@ -393,7 +393,9 @@ function PrizePool:_buildHeader()
 		headerRow:addCell(cell)
 	end
 
-	-- TODO: Add support for party types
+	if self:_hasPartyType() then
+		headerRow:addCell(TableCell{content = {'Player'}})
+	end
 	headerRow:addCell(TableCell{content = {'Team'}})
 
 	return headerRow
@@ -429,10 +431,7 @@ function PrizePool:_buildRows()
 				if reward then
 					cell = prizeTypeData.rowDisplay(prize.data, reward)
 				end
-
-				if not cell then
-					cell = TableCell{content = {DASH}}
-				end
+				cell = cell or PrizePool._emptyCell()
 
 				if lastInColumn and Table.deepEquals(lastInColumn.content, cell.content) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
@@ -442,9 +441,30 @@ function PrizePool:_buildRows()
 				end
 			end
 
-			-- TODO: Proper Support for Party Types
-			local opponentDisplay = OpponentDisplay.InlineOpponent{opponent = opponent.opponentData}
-			row:addCell(TableCell{content = {opponentDisplay}, css = {['justify-content'] = 'start'}})
+			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{opponent = opponent.opponentData})
+			local opponentCss = {['justify-content'] = 'start'}
+
+			local opponentIsParty = Opponent.typeIsParty(opponent.opponentData.type)
+
+			if self:_hasPartyType() then
+				if opponentIsParty then
+					row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
+				else
+					row:addCell(PrizePool._emptyCell())
+				end
+			end
+
+			if opponentIsParty then
+				if opponent.opponentData.players[1] and opponent.opponentData.players[1].team then
+					row:addCell(TableCell{content = {tostring(OpponentDisplay.BlockOpponent{
+						opponent = {type = 'team', template = opponent.opponentData.players[1].team}
+					})}, css = opponentCss})
+				else
+					row:addCell(PrizePool._emptyCell())
+				end
+			else
+				row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
+			end
 
 			table.insert(rows, row)
 		end
@@ -546,6 +566,20 @@ function PrizePool:_hasUsdPrizePool()
 	end)) or (self.options.autoUSD and Array.any(self.prizes, function (prize)
 		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end))
+end
+
+--- Returns true if this prizePool or any opponent entered into the prizepool is of a PartyType
+function PrizePool:_hasPartyType()
+	local placementHasParty = function (placement)
+		return placement.hasPartyType
+	end
+
+	return Opponent.typeIsParty(self.opponentType) or Array.any(self.placements, placementHasParty)
+end
+
+--- Creates an empty table cell
+function PrizePool._emptyCell()
+	return TableCell{content = {DASH}}
 end
 
 --- Remove all non-numeric characters from an input and changes it to a number.
@@ -691,6 +725,10 @@ function Placement:_parseOpponents(args)
 
 			-- Set date
 			opponent.date = opponentInput.date
+
+			if Opponent.typeIsParty(opponent.opponentData.type) then
+				self.hasPartyType = true
+			end
 		end
 		return opponent
 	end)
