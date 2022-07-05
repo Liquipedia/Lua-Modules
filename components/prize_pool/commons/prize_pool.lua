@@ -593,7 +593,7 @@ function PrizePool:_storeLpdb()
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
-		mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. mw.ustring.lower(lpdbEntry.participant), lpdbEntry)
+		mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. mw.ustring.lower(lpdbEntry.participant), lpdbEntry)
 	end
 
 	return self
