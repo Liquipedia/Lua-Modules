@@ -132,9 +132,10 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
+	mw.logObject(_args)
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
-		lpdbData.extradata['signatureHero' .. heroIndex] = HeroIcon.getHeroName
+		lpdbData.extradata['signatureHero' .. heroIndex] = hero
 	end
 
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
