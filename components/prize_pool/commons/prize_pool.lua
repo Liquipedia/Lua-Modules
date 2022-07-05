@@ -50,8 +50,6 @@ local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 local BASE_CURRENCY = 'USD'
 
-local EMPTY_CELL = TableCell{content = {DASH}}
-
 local PRIZE_TYPE_USD = 'USD'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
@@ -433,7 +431,7 @@ function PrizePool:_buildRows()
 				if reward then
 					cell = prizeTypeData.rowDisplay(prize.data, reward)
 				end
-				cell = cell or EMPTY_CELL
+				cell = cell or PrizePool._emptyCell()
 
 				if lastInColumn and Table.deepEquals(lastInColumn.content, cell.content) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
@@ -450,7 +448,7 @@ function PrizePool:_buildRows()
 				if Opponent.typeIsParty(opponent.opponentData.type) then
 					row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
 				else
-					row:addCell(EMPTY_CELL)
+					row:addCell(PrizePool._emptyCell())
 				end
 			end
 
@@ -460,7 +458,7 @@ function PrizePool:_buildRows()
 						opponent = {type = 'team', template = opponent.opponentData.players[1].team}
 					})}, css = opponentCss})
 				else
-					row:addCell(EMPTY_CELL)
+					row:addCell(PrizePool._emptyCell())
 				end
 			else
 				row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
@@ -575,6 +573,11 @@ function PrizePool:_hasPartyType()
 	end
 
 	return Opponent.typeIsParty(self.opponentType) or Array.any(self.placements, placementHasParty)
+end
+
+--- Creates an empty table cell
+function PrizePool._emptyCell()
+	return TableCell{content = {DASH}}
 end
 
 --- Remove all non-numeric characters from an input and changes it to a number.
