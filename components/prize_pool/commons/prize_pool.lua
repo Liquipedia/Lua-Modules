@@ -154,7 +154,7 @@ PrizePool.prizeTypes = {
 		end,
 
 		convertToUsd = function (headerData, data, date)
-			mw.ext.CurrencyExchange.currencyexchange(data, headerData.currency, BASE_CURRENCY, date)
+			return mw.ext.CurrencyExchange.currencyexchange(data, headerData.currency, BASE_CURRENCY, date)
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
@@ -707,7 +707,7 @@ end
 
 function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 	Array.forEach(self.opponents, function(opponent)
-		if not opponent.prizeRewards[PRIZE_TYPE_USD .. 1] and not self.prizeRewards[PRIZE_TYPE_USD .. 1] then
+		if opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1] then
 			return
 		end
 
