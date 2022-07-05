@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local HeroIcon = require('Module:HeroIcon')
-local HeroNames = mw.loadData('Module:HeroNames')
 local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -53,7 +52,6 @@ local CustomInjector = Class.new(Injector)
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _args
-local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
@@ -108,7 +106,7 @@ function CustomInjector:addCustomCells(widgets)
 			}
 		)
 	end
-	
+
 	-- Active in Games
 	Cell{
 		name = 'Game Appearances',
