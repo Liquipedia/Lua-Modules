@@ -383,7 +383,7 @@ function PrizePool:build()
 	end
 
 	if self.options.storeLpdb then
-		self:_setLpdbData()
+		self:_storeLpdb()
 	end
 
 	return wrapper
@@ -544,7 +544,7 @@ function PrizePool:setLpdbInjector(lpdbInjector)
 	return self
 end
 
-function PrizePool:_setLpdbData()
+function PrizePool:_storeLpdb()
 	local lpdbTournamentData = {
 		tournament = Variables.varDefault('tournament_name'),
 		parent = Variables.varDefault('tournament_parent'),
@@ -573,7 +573,7 @@ function PrizePool:_setLpdbData()
 
 	local lpdbData = {}
 	for _, placement in ipairs(self.placements) do
-		local lpdbEntries = placement:_setLpdbData()
+		local lpdbEntries = placement:_getLpdbData()
 
 		Array.forEach(lpdbEntries, function(lpdbEntry) Table.mergeInto(lpdbEntry, lpdbTournamentData) end)
 
@@ -765,7 +765,7 @@ function Placement:_parseOpponentArgs(input, date)
 	return Opponent.resolve(opponentData, date)
 end
 
-function Placement:_setLpdbData()
+function Placement:_getLpdbData()
 	local entries = {}
 	for _, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
