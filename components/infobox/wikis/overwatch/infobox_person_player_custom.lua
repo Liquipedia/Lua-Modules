@@ -76,11 +76,7 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'status' then
-		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
-		}
-	elseif id == 'role' then
+	if id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
 				CustomPlayer._createRole('role', _args.role),
@@ -99,7 +95,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	-- Signature Heroes
 	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
-		function(hero, _)
+		function(hero)
 			local standardizedHero = HeroNames[hero:lower()]
 			if not standardizedHero then
 				-- we have an invalid hero entry
@@ -138,7 +134,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
-		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]
+		lpdbData.extradata['signatureHero' .. heroIndex] = HeroIcon.getHeroName
 	end
 
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
@@ -150,14 +146,6 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	end
 
 	return lpdbData
-end
-
-function CustomPlayer._getStatusContents()
-	local statusContents = {}
-
-	if String.isNotEmpty(_args.status) then
-		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
-	end
 end
 
 function CustomPlayer._createRole(key, role)
