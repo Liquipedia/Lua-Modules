@@ -38,6 +38,7 @@ local _ROLES = {
 	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
 	['talent'] = {category = 'Talents', variable = 'Talent', isplayer = false},
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
+	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 }
 _ROLES['assistant coach'] = _ROLES.coach
 
