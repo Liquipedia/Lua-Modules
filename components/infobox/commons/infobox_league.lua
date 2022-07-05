@@ -77,7 +77,7 @@ function League:createInfobox()
 					args.series,
 					args.abbreviation,
 					args.icon,
-					args.icondarkmode
+					args.icondark or args.icondarkmode
 				),
 				self:_createSeries(
 					{shouldSetVariable = false},
@@ -330,7 +330,9 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_game', string.lower(args.game or ''))
 
 	-- If no parent is available, set pagename instead to ease querying
-	Variables.varDefine('tournament_parent', args.parent or mw.title.getCurrentTitle().prefixedText)
+	local parent = args.parent or mw.title.getCurrentTitle().prefixedText
+	parent = string.gsub(parent, ' ', '_')
+	Variables.varDefine('tournament_parent', parent)
 	Variables.varDefine('tournament_parentname', args.parentname)
 	Variables.varDefine('tournament_subpage', args.subpage)
 
@@ -483,14 +485,21 @@ function League:_createSeries(options, series, abbreviation, icon, iconDark)
 	return output
 end
 
-function League:_setIconVariable(iconSmallTemplate, icon, iconDark)
-	icon, iconDark = LeagueIcon.getIconFromTemplate({
-		icon = icon,
-		iconDark = iconDark,
+function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
+	local icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
+		icon = manualIcon,
+		iconDark = manualIconDark,
 		stringOfExpandedTemplate = iconSmallTemplate
-	})
+	}
 	Variables.varDefine('tournament_icon', icon)
 	Variables.varDefine('tournament_icondark', iconDark)
+
+	if String.isNotEmpty(trackingCategory) then
+		table.insert(
+			self.warnings,
+			'Missing icon while icondark is set.'
+		)
+	end
 end
 
 function League:_createOrganizer(organizer, name, link, reference)
