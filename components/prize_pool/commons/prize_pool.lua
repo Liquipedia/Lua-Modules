@@ -706,13 +706,13 @@ function Placement:_parseOpponentArgs(input, date)
 end
 
 function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
-	Array.foreach(self.opponents, function(opponent)
+	Array.forEach(self.opponents, function(opponent)
 		if not opponent.prizeRewards[PRIZE_TYPE_USD .. 1] and not self.prizeRewards[PRIZE_TYPE_USD .. 1] then
 			return
 		end
 
 		local usdReward = 0
-		Array.foreach(prizesToUse, function(prize)
+		Array.forEach(prizesToUse, function(prize)
 			local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
 
 			if not localMoney or localMoney <= 0 then
