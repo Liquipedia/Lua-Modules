@@ -48,6 +48,8 @@ local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 
+local EMPTY_CELL = TableCell{content = {DASH}}
+
 local PRIZE_TYPE_USD = 'USD'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
@@ -410,33 +412,27 @@ function PrizePool:_buildRows()
 					cell = prizeTypeData.rowDisplay(prize.data, reward)
 				end
 
-				if not cell then
-					cell = TableCell{content = {DASH}}
-				end
-
-				row:addCell(cell)
+				row:addCell(cell or EMPTY_CELL)
 			end
 
-			local opponentDisplay = tostring(OpponentDisplay.InlineOpponent{opponent = opponent.opponentData})
+			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{opponent = opponent.opponentData})
 			local opponentCss = {['justify-content'] = 'start'}
 
 			if self:_hasPartyType() then
 				if Opponent.typeIsParty(opponent.opponentData.type) then
 					row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
 				else
-					row:addCell(TableCell{content = {DASH}})
+					row:addCell(EMPTY_CELL)
 				end
 			end
 
 			if Opponent.typeIsParty(opponent.opponentData.type) then
-				-- Really don't like this
-				-- Move to Opponent Display?
-				if opponent.opponentData.players and opponent.opponentData.players[1] and opponent.opponentData.players[1].team then
-					row:addCell(TableCell{content = {tostring(OpponentDisplay.InlineOpponent{
+				if opponent.opponentData.players[1] and opponent.opponentData.players[1].team then
+					row:addCell(TableCell{content = {tostring(OpponentDisplay.BlockOpponent{
 						opponent = {type = 'team', template = opponent.opponentData.players[1].team}
 					})}, css = opponentCss})
 				else
-					row:addCell(TableCell{content = {DASH}})
+					row:addCell(EMPTY_CELL)
 				end
 			else
 				row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
