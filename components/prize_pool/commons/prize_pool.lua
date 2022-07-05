@@ -15,7 +15,6 @@ local Currency = require('Module:LocalCurrency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
-local Math = require('Module:Math')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
 ---Note: This can be overwritten
