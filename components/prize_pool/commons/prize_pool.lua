@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
+local Currency = require('Module:LocalCurrency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
@@ -101,7 +102,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {'$', PrizePool._formatPrize(data)}}
+				return TableCell{content = {'$', Currency.formatPrizeValue(data)}}
 			end
 		end,
 	},
@@ -141,7 +142,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				local displayText = {PrizePool._formatPrize(data)}
+				local displayText = {Currency.formatPrizeValue(data)}
 
 				if headerData.symbolFirst then
 					table.insert(displayText, 1, headerData.symbol)
@@ -588,21 +589,6 @@ end
 --- Returns the default date based on wiki-variables set in the Infobox League
 function PrizePool._getTournamentDate()
 	return Variables.varDefaultMulti('tournament_enddate', 'tournament_edate', 'edate', TODAY)
-end
-
---- Formats a number for display as currency
-function PrizePool._formatPrize(value)
-	value = Math.round{value, 2}
-
-	-- if number is non integer and has only 1 digit after the `.` we need to fill it up
-	-- e.g. .5 --> .50
-	local decimal = string.match(value, '%.(.-)$') or ''
-	if String.isNotEmpty(decimal) then
-		decimal = '.' .. decimal .. string.rep('0', 2 - string.len(decimal))
-		value = math.floor(value)
-	end
-
-	return LANG:formatNum(value) .. decimal
 end
 
 --- @class Placement
