@@ -93,21 +93,6 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	-- Signature Heroes
-	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
-		function(hero)
-			local standardizedHero = HeroNames[hero:lower()]
-			if not standardizedHero then
-				-- we have an invalid hero entry
-				-- add warning (including tracking category)
-				table.insert(
-					_player.warnings,
-					'Invalid hero input "' .. hero .. '"[[Category:Pages with invalid hero input]]'
-				)
-			end
-			return HeroIcon.getImage{standardizedHero or hero, size = _SIZE_HERO}
-		end
-	)
-
 	if Table.isNotEmpty(heroIcons) then
 		table.insert(widgets,
 			Cell{
