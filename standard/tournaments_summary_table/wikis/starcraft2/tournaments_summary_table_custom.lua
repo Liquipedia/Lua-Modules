@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:CustomTournamentsSummaryTable/Custom
+-- page=Module:TournamentsSummaryTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

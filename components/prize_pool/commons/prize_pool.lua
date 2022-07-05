@@ -14,6 +14,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
+local Math = require('Module:Math')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
 ---Note: This can be overwritten
@@ -47,6 +48,7 @@ local TODAY = os.date('%Y-%m-%d')
 local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
+local BASE_CURRENCY = 'USD'
 
 local EMPTY_CELL = TableCell{content = {DASH}}
 
@@ -151,6 +153,10 @@ PrizePool.prizeTypes = {
 
 				return TableCell{content = displayText}
 			end
+		end,
+
+		convertToUsd = function (headerData, data, date)
+			return mw.ext.CurrencyExchange.currencyexchange(data, headerData.currency, BASE_CURRENCY, date)
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
@@ -337,6 +343,16 @@ function PrizePool:create()
 	if self:_hasUsdPrizePool() then
 		self:setConfig('showUSD', true)
 		self:addPrize(PRIZE_TYPE_USD, 1)
+
+		if self.options.autoUSD then
+			local canConvertCurrency = function(prize)
+				return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
+			end
+
+			for _, placement in ipairs(self.placements) do
+				placement:_setUsdFromRewards(Array.filter(self.prizes, canConvertCurrency), PrizePool.prizeTypes)
+			end
+		end
 	end
 
 	table.sort(self.prizes, PrizePool._comparePrizes)
@@ -391,28 +407,40 @@ function PrizePool:_buildRows()
 	local rows = {}
 
 	for _, placement in ipairs(self.placements) do
-		-- TODO RowSpan
+		local previousRow = {}
 		-- TODO Cutoff
 
-		for _, opponent in ipairs(placement.opponents) do
+		for opponentIndex, opponent in ipairs(placement.opponents) do
 			local row = TableRow{}
 
 			row:addClass(placement:getBackground())
-			row:addCell(TableCell{
-				content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
-				css = {['font-weight'] = 'bolder'}
-			})
 
-			for _, prize in ipairs(self.prizes) do
+			if opponentIndex == 1 then
+				local placeCell = TableCell{
+					content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
+					css = {['font-weight'] = 'bolder'},
+				}
+				placeCell.rowSpan = #placement.opponents
+				row:addCell(placeCell)
+			end
+
+			for prizeIndex, prize in ipairs(self.prizes) do
 				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
+				local lastInColumn = previousRow[prizeIndex]
 
 				local cell
 				if reward then
 					cell = prizeTypeData.rowDisplay(prize.data, reward)
 				end
+				cell = cell or EMPTY_CELL
 
-				row:addCell(cell or EMPTY_CELL)
+				if lastInColumn and Table.deepEquals(lastInColumn.content, cell.content) then
+					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
+				else
+					previousRow[prizeIndex] = cell
+					row:addCell(cell)
+				end
 			end
 
 			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{opponent = opponent.opponentData})
@@ -680,10 +708,8 @@ function Placement:_parseOpponents(args)
 			end
 
 			-- Parse Opponent Data
-			local typeStruct = Json.parseIfString(opponentInput.type)
-			if typeStruct then
-				PrizePool._assertOpponentStructType(typeStruct)
-				opponentInput.type = typeStruct.type
+			if opponentInput.type then
+				PrizePool._assertOpponentStructType(opponentInput)
 			else
 				opponentInput.type = self.parent.opponentType
 			end
@@ -710,6 +736,27 @@ function Placement:_parseOpponentArgs(input, date)
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
 	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd()
 	return Opponent.resolve(opponentData, date)
+end
+
+function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
+	Array.forEach(self.opponents, function(opponent)
+		if opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1] then
+			return
+		end
+
+		local usdReward = 0
+		Array.forEach(prizesToUse, function(prize)
+			local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
+
+			if not localMoney or localMoney <= 0 then
+				return
+			end
+
+			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
+		end)
+
+		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = Math.round{usdReward, 2}
+	end)
 end
 
 function Placement:displayPlace()

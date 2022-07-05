@@ -27,7 +27,7 @@ local _PARAM_TO_SHORT = {
 }
 local _LIMIT_OF_PARAM = {
 	pick = 3,
-	ban = 2,
+	ban = 3,
 	player = 3,
 }
 

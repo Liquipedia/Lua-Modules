@@ -10,13 +10,13 @@ local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Links = require('Module:Links')
+local LeagueIcon = require('Module:LeagueIcon')
 local Locale = require('Module:Locale')
 local Localisation = require('Module:Localisation')
 local Namespace = require('Module:Namespace')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local Tier = require('Module:Tier')
 local WarningBox = require('Module:WarningBox')
 
@@ -247,20 +247,26 @@ end
 function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
 	local icon = lpdbData.icon
 	local iconDark = lpdbData.icondark
+	local iconSmallTemplate = LeagueIcon.display{
+		icon = icon,
+		iconDark = iconDark,
+		series = lpdbData.name,
+		date = lpdbData.defunctfate
+	}
+	local trackingCategory
 
-	if String.isEmpty(icon) then
-		local series = lpdbData.name:lower()
-		local iconSmallTemplate = Template.safeExpand(
-			frame,
-			'LeagueIconSmall/' .. series,
-			{ date = lpdbData.defunctfate }
+	icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
+		icon = icon,
+		iconDark = iconDark,
+		stringOfExpandedTemplate = iconSmallTemplate
+	}
+
+	if String.isNotEmpty(trackingCategory) then
+		table.insert(
+			self.warnings,
+			'Missing icon while icondark is set.' .. trackingCategory
 		)
-		--extract series icon from template:LeagueIconSmall
-		icon = mw.text.split(iconSmallTemplate, 'File:')
-		icon = mw.text.split(icon[2] or '', '|')
-		icon = icon[1]
 	end
-	--when Template:LeagueIconSmall has darkmodeicons retrieve that too
 
 	lpdbData.icon = icon
 	lpdbData.icondark = iconDark
