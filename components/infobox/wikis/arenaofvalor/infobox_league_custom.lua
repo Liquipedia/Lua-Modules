@@ -40,7 +40,9 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
+	if id == 'sponsors' then
+		table.insert(widgets, Cell{name = 'Official Device', content = {_args.device}})
+	elseif id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {
 					CustomLeague._getGameVersion()
