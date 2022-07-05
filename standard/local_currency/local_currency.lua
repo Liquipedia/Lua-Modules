@@ -76,9 +76,7 @@ function LocalCurrency.raw(currencyCode)
 		return nil
 	end
 
-	local localCurrencyData = LocalCurrencyData[currencyCode:lower()]
-
-	return localCurrencyData
+	return LocalCurrencyData[currencyCode:lower()]
 end
 
 function LocalCurrency.formatPrizeValue(value)
