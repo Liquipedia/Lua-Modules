@@ -737,7 +737,7 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
 		end)
 
-		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = Math.round{usdReward, 2}
+		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = usdReward
 	end)
 end
 
