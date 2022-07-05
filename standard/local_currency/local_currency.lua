@@ -69,4 +69,13 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 	return localCurrencyData.text.prefix .. (prizeValue or '') .. localCurrencyData.text.suffix
 end
 
+function LocalCurrency.formatPrizeValue(value)
+	local roundedValue = Math.round{value or 0, 2}
+	local integer, decimal = math.modf(roundedValue)
+	if decimal == 0 then
+		return LANG:formatNum(integer)
+	end
+	return LANG:formatNum(integer) .. string.format('%.2f', decimal):sub(2)
+end
+
 return LocalCurrency
