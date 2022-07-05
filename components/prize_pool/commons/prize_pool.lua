@@ -101,7 +101,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {'$', Currency.formatPrizeValue(data)}}
+				return TableCell{content = {'$', Currency.formatMoney(data)}}
 			end
 		end,
 	},
@@ -141,7 +141,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				local displayText = {Currency.formatPrizeValue(data)}
+				local displayText = {Currency.formatMoney(data)}
 
 				if headerData.symbolFirst then
 					table.insert(displayText, 1, headerData.symbol)
