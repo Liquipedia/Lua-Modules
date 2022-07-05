@@ -47,6 +47,7 @@ local TODAY = os.date('%Y-%m-%d')
 local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
+local BASE_CURRENCY = 'USD'
 
 local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
