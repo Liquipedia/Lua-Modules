@@ -11,8 +11,7 @@ local Character = require('Module:Infobox/Character')
 local CustomCharacter = {}
 
 function CustomCharacter.run(frame)
-	local character = Character(frame)
-	return character:createInfobox(frame)
+	return Character(frame):createInfobox(frame)
 end
 
 return CustomCharacter
