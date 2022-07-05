@@ -80,11 +80,6 @@ function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		return {
 			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
-			Cell{name = 'Time Banned', content = {_args.time_banned}},
 		}
 	elseif id == 'role' then
 		return {
@@ -164,20 +159,6 @@ function CustomPlayer._getStatusContents()
 	if String.isNotEmpty(_args.status) then
 		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
 	end
-
-	local banned = _BANNED[string.lower(_args.banned or '')]
-	if not banned and String.isNotEmpty(_args.banned) then
-		banned = '[[Banned Players|Multiple Bans]]'
-		table.insert(statusContents, banned)
-	end
-
-	return Array.extendWith(statusContents,
-		Array.map(Player:getAllArgsForBase(_args, 'banned'),
-			function(item, _)
-				return _BANNED[string.lower(item)]
-			end
-		)
-	)
 end
 
 function CustomPlayer._createRole(key, role)
