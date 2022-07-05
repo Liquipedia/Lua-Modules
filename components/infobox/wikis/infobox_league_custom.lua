@@ -89,15 +89,14 @@ function CustomLeague._getGameVersion()
 end
 
 function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args.pubgpremier)
+	return Logic.readBool(_args.pokemonpremier)
 end
 
 function CustomLeague:_getGameMode()
 	if String.isEmpty(_args.mode) then
 		return nil
 	end
-	local mode = _MODES[_args.mode:lower()] or _MODES['default']
-	return mode
+	return _MODES[_args.mode:lower()] or _MODES['default']
 end
 
 function CustomLeague:_getGameFormat()
