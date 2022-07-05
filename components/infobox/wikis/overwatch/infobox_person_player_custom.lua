@@ -93,7 +93,7 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	-- Signature Heroes
-	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
+	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero')
 	if Table.isNotEmpty(heroIcons) then
 		table.insert(widgets,
 			Cell{
