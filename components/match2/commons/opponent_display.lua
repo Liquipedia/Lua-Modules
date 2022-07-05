@@ -127,10 +127,6 @@ function OpponentDisplay.InlineOpponent(props)
 		return opponent.name or ''
 
 	elseif opponent.type == 'solo' then
-		if not opponent.players then
-			return
-		end
-
 		return PlayerDisplay.InlinePlayer{
 			player = opponent.players[1],
 			flip = props.flip,
