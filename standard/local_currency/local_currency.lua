@@ -72,7 +72,11 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 end
 
 function LocalCurrency.formatMoney(value)
-	local roundedValue = Math.round{value or 0, 2}
+	if not Logic.isNumeric(value) then
+		return 0
+	end
+
+	local roundedValue = Math.round{value, 2}
 	local integer, decimal = math.modf(roundedValue)
 	if decimal == 0 then
 		return LANG:formatNum(integer)
