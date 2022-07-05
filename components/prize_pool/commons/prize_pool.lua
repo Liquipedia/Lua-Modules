@@ -810,7 +810,7 @@ function Placement:_getLpdbData()
 			extradata = {}
 
 			-- TODO: We need to create additional LPDB Fields
-			-- match2 opponents (opponent, opponenttemplate, opponentplayers at minimum)
+			-- match2 opponents (opponent, opponenttemplate, opponentplayers, opponenttype at minimum)
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
 		}
