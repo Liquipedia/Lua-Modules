@@ -562,6 +562,8 @@ function PrizePool:_setLpdbData()
 	end
 
 	for _, lpdbEntry in ipairs(lpdbData) do
+		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
+		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 		mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. mw.ustring.lower(lpdbEntry.participant), lpdbEntry)
 	end
 
@@ -741,7 +743,9 @@ end
 function Placement:_setLpdbData()
 	local entries = {}
 	for _, opponent in ipairs(self.opponents) do
-		local participant, image, imageDark
+		local participant, image, imageDark, players
+		local playerCount = 0
+
 		if opponent.opponentData.type == Opponent.team then
 			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template)
 
@@ -752,10 +756,16 @@ function Placement:_setLpdbData()
 
 			image = teamTemplate.image
 			imageDark = teamTemplate.imagedark
+		elseif opponent.opponentData.type == Opponent.solo then
+			participant = Opponent.toName(opponent.opponentData)
+			local p1 = opponent.opponentData.players[1]
+			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
+			playerCount = 1
 		else
 			participant = Opponent.toName(opponent.opponentData)
 		end
 
+		local prizeMoney = tonumber(opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1]) or 0
 		local lpdbData = {
 			image = image,
 			imagedark = imageDark,
@@ -764,8 +774,10 @@ function Placement:_setLpdbData()
 			participantlink = Opponent.toName(opponent.opponentData),
 			participantflag = opponent.opponentData.flag,
 			participanttemplate = opponent.opponentData.template,
+			players = players,
 			placement = self.placeStart .. (self.placeStart ~= self.placeEnd and ('-' .. self.placeEnd) or ''),
-			prizemoney = tonumber(opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1]) or 0,
+			prizemoney = prizeMoney,
+			individualprizemoney = prizeMoney / playerCount,
 			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
 			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
 			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
