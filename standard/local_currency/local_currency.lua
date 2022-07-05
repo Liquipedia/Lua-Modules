@@ -41,14 +41,14 @@ function LocalCurrency.template(frame)
 end
 
 function LocalCurrency.display(currencyCode, prizeValue, options)
-	if String.isEmpty(currencyCode) then
-		return nil
-	end
 	options = options or {}
 
-	local localCurrencyData = LocalCurrencyData[currencyCode:lower()]
+	local localCurrencyData = LocalCurrency.raw(currencyCode)
 
 	if not localCurrencyData then
+		if currencyCode then
+			mw.log('Invalid currency "' .. currencyCode .. '"')
+		end
 		return nil
 	end
 
@@ -65,10 +65,20 @@ function LocalCurrency.display(currencyCode, prizeValue, options)
 	end
 
 	if Logic.isNumeric(prizeValue) and options.formatValue then
-		prizeValue = mw.getContentLanguage():formatNum(prizeValue)
+		prizeValue = LocalCurrency.formatPrizeValue(prizeValue)
 	end
 
 	return localCurrencyData.text.prefix .. (prizeValue or '') .. localCurrencyData.text.suffix
+end
+
+function LocalCurrency.raw(currencyCode)
+	if String.isEmpty(currencyCode) then
+		return nil
+	end
+
+	local localCurrencyData = LocalCurrencyData[currencyCode:lower()]
+
+	return localCurrencyData
 end
 
 function LocalCurrency.formatPrizeValue(value)
