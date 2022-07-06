@@ -94,7 +94,7 @@ PrizePool.prizeTypes = {
 		sortOrder = 10,
 
 		headerDisplay = function (data)
-			local currencyData = Currency.raw('usd')
+			local currencyData = Currency.raw('USD')
 			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
 			return TableCell{content = {currencyText}}
 		end,
