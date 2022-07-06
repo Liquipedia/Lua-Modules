@@ -8,13 +8,9 @@
 
 local Weapon = require('Module:Infobox/Weapon/dev')
 local Class = require('Module:Class')
-local String = require('Module:StringUtils')
 local Builder = require('Module:Infobox/Widget/Builder')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
-local PageLink = require('Module:Page')
 local Array = require('Module:Array')
 local OperatorIcon = require('Module:OperatorIcon')
 
