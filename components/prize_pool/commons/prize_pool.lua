@@ -547,6 +547,7 @@ end
 function PrizePool:_storeLpdb()
  	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
  	Variables.varDefine('prizepool_index', prizePoolIndex)
+
 	local lpdbTournamentData = {
 		tournament = Variables.varDefault('tournament_name'),
 		parent = Variables.varDefault('tournament_parent'),
@@ -561,10 +562,11 @@ function PrizePool:_storeLpdb()
 		icon = Variables.varDefault('tournament_icon'),
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
+		-- TODO: Add PrizePoolIndex as a field?
 	}
 
 	local setWeight = function(lpdbEntry)
-		lpdbEntry.weight = Template.safeExpand(
+		lpdbEntry.weight = lpdbEntry.weight or Template.safeExpand(
 			mw.getCurrentFrame(), 'Weight', {
 				math.max(lpdbEntry.prizemoney, 1),
 				lpdbTournamentData.liquipediatier,
@@ -584,16 +586,11 @@ function PrizePool:_storeLpdb()
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
 
-	if self._lpdbInjector then
-		for index, lpdbEntry in ipairs(lpdbData) do
-			lpdbData[index] = self._lpdbInjector:adjust(lpdbEntry)
-		end
-	end
-
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
-		mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. mw.ustring.lower(lpdbEntry.participant), lpdbEntry)
+		local lowerCaseParticipant = mw.ustring.lower(lpdbEntry.participant)
+		mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. lowerCaseParticipant, lpdbEntry)
 	end
 
 	return self
@@ -804,7 +801,7 @@ function Placement:_getLpdbData()
 			players = players,
 			placement = self.placeStart .. (self.placeStart ~= self.placeEnd and ('-' .. self.placeEnd) or ''),
 			prizemoney = prizeMoney,
-			individualprizemoney = prizeMoney / playerCount,
+			individualprizemoney = (playerCount > 0) and (prizeMoney / playerCount) or 0,
 			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
 			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
 			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
@@ -812,10 +809,15 @@ function Placement:_getLpdbData()
 			extradata = {}
 
 			-- TODO: We need to create additional LPDB Fields
-			-- match2 opponents (opponent, opponenttemplate, opponentplayers, opponenttype at minimum)
+			-- match2 opponents (opponent, opponenttemplate, opponentplayers, opponenttype)
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
+			-- lastvs match2 opponent (json?)
 		}
+
+		if self.parent._lpdbInjector then
+			lpdbData = self.parent._lpdbInjector:adjust(lpdbData, self, opponent)
+		end
 
 		table.insert(entries, lpdbData)
 	end
