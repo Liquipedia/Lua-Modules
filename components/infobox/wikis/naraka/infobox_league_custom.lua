@@ -30,10 +30,6 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
-
 	return league:createInfobox(frame)
 end
 
