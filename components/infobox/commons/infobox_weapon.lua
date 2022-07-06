@@ -12,7 +12,6 @@ local BasicInfobox = require('Module:Infobox/Basic')
 local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
 local Widgets = require('Module:Infobox/Widget/All')
-local WarningBox = require('Module:WarningBox')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -21,8 +20,6 @@ local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
 local Weapon = Class.new(BasicInfobox)
-
-local _warnings = {}
 
 function Weapon.run(frame)
 	local weapon = Weapon(frame)
@@ -112,7 +109,7 @@ function Weapon:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
+	return builtInfobox
 end
 
 function Weapon:_createLocation(location)
@@ -137,14 +134,9 @@ function Weapon:nameDisplay(args)
 end
 
 function Weapon:setLpdbData(args)
-	local name = args.romanized_name or self.name
-
 	local lpdbData = {
-		name = name,
-		location = self:getStandardLocationValue(args.location),
-		location2 = self:getStandardLocationValue(args.location2),
+		name = self.name,
 		image = args.image,
-		imagedark = args.imagedark or args.imagedarkmode,
 		extradata = {}
 	}
 
@@ -152,24 +144,6 @@ function Weapon:setLpdbData(args)
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_datapoint('weapon_' .. self.name, lpdbData)
-end
-
-function Weapon:getStandardLocationValue(location)
-	if String.isEmpty(location) then
-		return nil
-	end
-
-	local locationToStore = Flags.CountryName(location)
-
-	if String.isEmpty(locationToStore) then
-		table.insert(
-			_warnings,
-			'"' .. location .. '" is not supported as a value for locations'
-		)
-		locationToStore = nil
-	end
-
-	return locationToStore
 end
 
 function Weapon:addToLpdb(lpdbData, args)
