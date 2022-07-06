@@ -353,7 +353,8 @@ function Opponent.toLpdbStruct(opponent)
 		opponenttype = opponent.type,
 	}
 
-	-- add players for party types
+	-- Add players for Party Type opponents.
+	-- Team's will have their players added via the TeamCard.
 	if Opponent.typeIsParty(opponent.type) then
 		local players = {}
 		for playerIndex, player in ipairs(opponent.players) do
