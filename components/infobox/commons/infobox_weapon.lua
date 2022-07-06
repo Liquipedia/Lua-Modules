@@ -12,6 +12,7 @@ local BasicInfobox = require('Module:Infobox/Basic')
 local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
 local Widgets = require('Module:Infobox/Widget/All')
+local WarningBox = require('Module:WarningBox')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -20,6 +21,8 @@ local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
 local Weapon = Class.new(BasicInfobox)
+
+local _warnings = {}
 
 function Weapon.run(frame)
 	local weapon = Weapon(frame)
@@ -109,7 +112,7 @@ function Weapon:createInfobox()
 		self:setLpdbData(args)
 	end
 
-	return builtInfobox
+	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
 function Weapon:_createLocation(location)
