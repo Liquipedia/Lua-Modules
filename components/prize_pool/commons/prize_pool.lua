@@ -26,6 +26,7 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
+local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
@@ -553,13 +554,15 @@ end
 --- Set the WidgetInjector.
 -- @param widgetInjector WidgetInjector An instance of a class that implements the WidgetInjector interface
 function PrizePool:setWidgetInjector(widgetInjector)
-	assert(widgetInjector:is_a(WidgetInjector), "setWidgetInjector: Not a WidgetInjector")
+	assert(widgetInjector:is_a(WidgetInjector), "setWidgetInjector: Not a Widget Injector")
 	self._widgetInjector = widgetInjector
 	return self
 end
 
+--- Set the LpdbInjector.
+-- @param lpdbInjector LpdbInjector An instance of a class that implements the LpdbInjector interface
 function PrizePool:setLpdbInjector(lpdbInjector)
-	-- TODO: Add type check once interface has been created
+	assert(lpdbInjector:is_a(LpdbInjector), "setLpdbInjector: Not an LPDB Injector")
 	self._lpdbInjector = lpdbInjector
 	return self
 end
