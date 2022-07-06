@@ -614,8 +614,9 @@ function PrizePool:_storeData()
 end
 
 function PrizePool:_storeSmw(lpdbEntry)
+	-- TODO: Once Opponents has been added (instead of current Partipants), this can be cleaned up nicely
 	local isParty = type(lpdbEntry.players) == 'table' and Table.isNotEmpty(lpdbEntry.players)
-	local isTeam = String.isEmpty(lpdbEntry.participanttemplate)
+	local isTeam = String.isNotEmpty(lpdbEntry.participanttemplate)
 
 	local smwData = {
 		['has tournament page'] = lpdbEntry.parent,
