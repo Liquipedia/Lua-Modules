@@ -23,7 +23,6 @@ local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
@@ -95,8 +94,9 @@ PrizePool.prizeTypes = {
 		sortOrder = 10,
 
 		headerDisplay = function (data)
-			local currencyText = {Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {'USD'})}
-			return TableCell{content = currencyText}
+			local currencyData = Currency.raw(BASE_CURRENCY)
+			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
+			return TableCell{content = {currencyText}}
 		end,
 
 		row = 'usdprize',
@@ -114,25 +114,15 @@ PrizePool.prizeTypes = {
 
 		header = 'localcurrency',
 		headerParse = function (prizePool, input, context, index)
-			Variables.varDefine('localcurrencysymbol', '')
-			Variables.varDefine('localcurrencysymbolafter', '')
-			Variables.varDefine('localcurrencycode', '')
-			local currencyText = Template.safeExpand(mw.getCurrentFrame(), 'Local currency', {input})
-
-			local symbol, symbolFirst
-			if Variables.varDefault('localcurrencysymbol') then
-				symbol = Variables.varDefault('localcurrencysymbol')
-				symbolFirst = true
-			elseif Variables.varDefault('localcurrencysymbolafter') then
-				symbol = Variables.varDefault('localcurrencysymbolafter')
-				symbolFirst = false
-			else
-				error(input .. ' could not be parsed as a currency, has it been added to [[Template:Local currency]]?')
+			local currencyData = Currency.raw(input)
+			if not currencyData then
+				error(input .. ' could not be parsed as a currency, has it been added to [[Module:Currency/Data]]?')
 			end
+			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
 
 			return {
-				currency = Variables.varDefault('localcurrencycode'), currencyText = currencyText,
-				symbol = symbol, symbolFirst = symbolFirst
+				currency = currencyData.code, currencyText = currencyText,
+				symbol = currencyData.symbol, symbolFirst = not currencyData.isAfter,
 			}
 		end,
 		headerDisplay = function (data)
