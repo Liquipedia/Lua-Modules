@@ -9,7 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
+local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
@@ -29,17 +29,30 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
-function CustomLpdbInjector:parse(lpdbData, placement, opponent)
-	lpdbData.weight = Template.safeExpand(
-		mw.getCurrentFrame(), 'Weight', {
-			math.max(lpdbData.prizemoney, 1),
-			Variables.varDefault('tournament_liquipediatier'),
-			lpdbData.place,
-			Variables.varDefault('tournament_type')
-		}
+function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
+	lpdbData.weight = CustomPrizePool.calculateWeight(
+		lpdbData.prizemoney,
+		Variables.varDefault('tournament_liquipediatier'),
+		placement.placeStart,
+		Variables.varDefault('tournament_type')
 	)
 
 	return lpdbData
+end
+
+local TIER_VALUE = {
+	32, 16, 8, 4, 2
+}
+local TYPE_MODIFIER = {
+	Online = 0.65
+}
+
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
+	if String.isEmpty(tier) then
+		return 0
+	end
+
+	return (TIER_VALUE[tier] or 1) * math.max(prizeMoney, 1) * place * (TYPE_MODIFIER[type] or 1)
 end
 
 return CustomPrizePool
