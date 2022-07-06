@@ -353,4 +353,67 @@ function Opponent.fromMatch2Record(record)
 	end
 end
 
+--[[
+Reads an opponent struct and builds a standings/placement lpdb struct from it
+]]
+function Opponent.toLpdbStruct(opponent)
+	local storageStruct = {
+		opponentname = Opponent.toName(opponent),
+		opponenttemplate = opponent.template,
+		opponenttype = opponent.type,
+	}
+
+	-- Add players for Party Type opponents.
+	-- Team's will have their players added via the TeamCard.
+	if Opponent.typeIsParty(opponent.type) then
+		local players = {}
+		for playerIndex, player in ipairs(opponent.players) do
+			local prefix = 'p' .. playerIndex
+
+			players[prefix] = player.pageName
+			players[prefix .. 'dn'] = player.displayName
+			players[prefix .. 'flag'] = player.flag
+			players[prefix .. 'team'] = Opponent.toName({type = Opponent.team, template = player.team})
+			players[prefix .. 'template'] = player.team
+		end
+		storageStruct.opponentplayers = players
+	end
+
+	return storageStruct
+end
+
+--[[
+Reads a standings or placement lpdb structure and builds an opponent struct from it
+]]
+function Opponent.fromLpdbStruct(storageStruct)
+	local partySize = Opponent.partySize(storageStruct.opponenttype)
+	if partySize then
+		local players = storageStruct.opponentplayers
+		local function playerFromLpdbStruct(playerIndex)
+			return {
+				displayName = players['p' .. playerIndex .. 'dn'],
+				flag = Flags.CountryName(players['p' .. playerIndex .. 'flag']),
+				pageName = players['p' .. playerIndex],
+				team = players['p' .. playerIndex .. 'team'],
+			}
+		end
+		local opponent = {
+			players = Array.map(Array.range(1, partySize), playerFromLpdbStruct),
+			type = storageStruct.opponenttype,
+		}
+		return opponent
+	elseif storageStruct.opponenttype == Opponent.team then
+		return {
+			name = storageStruct.opponentname,
+			template = storageStruct.opponenttemplate,
+			type = Opponent.team,
+		}
+	elseif storageStruct.opponenttype == Opponent.literal then
+		return {
+			name = storageStruct.opponentname,
+			type = Opponent.literal,
+		}
+	end
+end
+
 return Opponent
