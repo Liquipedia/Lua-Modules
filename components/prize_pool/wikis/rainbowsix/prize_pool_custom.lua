@@ -50,7 +50,7 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
 
-	return tierValue * math.max(prizeMoney, 1) / place * (TYPE_MODIFIER[type] or 1)
+	return tierValue * math.max(prizeMoney, 1) * (TYPE_MODIFIER[type] or 1) / place
 end
 
 return CustomPrizePool
