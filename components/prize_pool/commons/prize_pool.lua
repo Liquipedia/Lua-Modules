@@ -84,6 +84,9 @@ PrizePool.config = {
 	storeLpdb = {
 		default = true,
 	},
+	resolveRedirect = {
+		default = false,
+	}
 }
 
 PrizePool.prizeTypes = {
@@ -379,6 +382,10 @@ function PrizePool:build()
 		wrapper:node(node)
 	end
 
+	if self.options.storeLpdb then
+		self:_storeLpdb()
+	end
+
 	return wrapper
 end
 
@@ -554,6 +561,45 @@ end
 function PrizePool:setLpdbInjector(lpdbInjector)
 	-- TODO: Add type check once interface has been created
 	self._lpdbInjector = lpdbInjector
+	return self
+end
+
+function PrizePool:_storeLpdb()
+	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
+	Variables.varDefine('prizepool_index', prizePoolIndex)
+
+	local lpdbTournamentData = {
+		tournament = Variables.varDefault('tournament_name'),
+		parent = Variables.varDefault('tournament_parent'),
+		series = Variables.varDefault('tournament_series'),
+		shortname = Variables.varDefault('tournament_tickername'),
+		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_sdate', 'sdate', ''),
+		mode = Variables.varDefault('tournament_mode'),
+		type = Variables.varDefault('tournament_type'),
+		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
+		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
+		icon = Variables.varDefault('tournament_icon'),
+		icondark = Variables.varDefault('tournament_icondark'),
+		game = Variables.varDefault('tournament_game'),
+		-- TODO: Add PrizePoolIndex as a field?
+	}
+
+	local lpdbData = {}
+	for _, placement in ipairs(self.placements) do
+		local lpdbEntries = placement:_getLpdbData()
+
+		Array.forEach(lpdbEntries, function(lpdbEntry) Table.mergeInto(lpdbEntry, lpdbTournamentData) end)
+
+		Array.extendWith(lpdbData, lpdbEntries)
+	end
+
+	for _, lpdbEntry in ipairs(lpdbData) do
+		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
+		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
+		local lowerCaseParticipant = mw.ustring.lower(lpdbEntry.participant)
+		mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. lowerCaseParticipant, lpdbEntry)
+	end
+
 	return self
 end
 
@@ -741,6 +787,67 @@ function Placement:_parseOpponentArgs(input, date)
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
 	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd()
 	return Opponent.resolve(opponentData, date)
+end
+
+function Placement:_getLpdbData()
+	local entries = {}
+	for _, opponent in ipairs(self.opponents) do
+		local participant, image, imageDark, players
+		local playerCount = 0
+
+		if opponent.opponentData.type == Opponent.team then
+			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template)
+
+			participant = teamTemplate and teamTemplate.page or ''
+			if self.parent.options.resolveRedirect then
+				participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
+			end
+
+			image = teamTemplate.image
+			imageDark = teamTemplate.imagedark
+		elseif opponent.opponentData.type == Opponent.solo then
+			participant = Opponent.toName(opponent.opponentData)
+			local p1 = opponent.opponentData.players[1]
+			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
+			playerCount = 1
+		else
+			participant = Opponent.toName(opponent.opponentData)
+		end
+
+		local prizeMoney = tonumber(opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1]) or 0
+		local lpdbData = {
+			image = image,
+			imagedark = imageDark,
+			date = opponent.date,
+			participant = participant,
+			participantlink = Opponent.toName(opponent.opponentData),
+			participantflag = opponent.opponentData.flag,
+			participanttemplate = opponent.opponentData.template,
+			players = players,
+			placement = self.placeStart .. (self.placeStart ~= self.placeEnd and ('-' .. self.placeEnd) or ''),
+			prizemoney = prizeMoney,
+			individualprizemoney = (playerCount > 0) and (prizeMoney / playerCount) or 0,
+			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
+			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
+			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
+			groupscore = opponent.additionalData.GROUPSCORE,
+			extradata = {}
+
+			-- TODO: We need to create additional LPDB Fields
+			-- match2 opponents (opponentname, opponenttemplate, opponentplayers, opponenttype)
+			-- Qualified To struct (json?)
+			-- Points struct (json?)
+			-- lastvs match2 opponent (json?)
+		}
+
+		if self.parent._lpdbInjector then
+			lpdbData = self.parent._lpdbInjector:adjust(lpdbData, self, opponent)
+		end
+
+		table.insert(entries, lpdbData)
+	end
+
+	return entries
 end
 
 function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
