@@ -10,7 +10,6 @@ local Class = require('Module:Class')
 local Namespace = require('Module:Namespace')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Flags = require('Module:Flags')
-local String = require('Module:StringUtils')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
@@ -137,6 +136,8 @@ function Weapon:setLpdbData(args)
 	local lpdbData = {
 		name = self.name,
 		image = args.image,
+		type = 'weapon',
+		information = self.name,
 		extradata = {}
 	}
 
@@ -151,3 +152,4 @@ function Weapon:addToLpdb(lpdbData, args)
 end
 
 return Weapon
+
