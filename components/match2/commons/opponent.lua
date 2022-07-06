@@ -344,7 +344,7 @@ function Opponent.fromMatch2Record(record)
 end
 
 --[[
-Reads an opponent struct and builds a storage struct for standing/prizePool from it
+Reads an opponent struct and builds a standings/placement lpdb struct from it
 ]]
 function Opponent.toLpdbStruct(opponent)
 	-- this already handles literal and team opponents
