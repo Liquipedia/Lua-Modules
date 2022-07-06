@@ -558,29 +558,17 @@ function PrizePool:_storeLpdb()
 		type = Variables.varDefault('tournament_type'),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		-- publishertier = ,
 		icon = Variables.varDefault('tournament_icon'),
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
 		-- TODO: Add PrizePoolIndex as a field?
 	}
-	local setWeight = function(lpdbEntry)
-		lpdbEntry.weight = lpdbEntry.weight or Template.safeExpand(
-			mw.getCurrentFrame(), 'Weight', {
-				math.max(lpdbEntry.prizemoney, 1),
-				lpdbTournamentData.liquipediatier,
-				lpdbEntry.place,
-				lpdbTournamentData.type
-			})
-	end
 
 	local lpdbData = {}
 	for _, placement in ipairs(self.placements) do
 		local lpdbEntries = placement:_getLpdbData()
 
 		Array.forEach(lpdbEntries, function(lpdbEntry) Table.mergeInto(lpdbEntry, lpdbTournamentData) end)
-
-		Array.forEach(lpdbEntries, setWeight)
 
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
@@ -808,7 +796,7 @@ function Placement:_getLpdbData()
 			extradata = {}
 
 			-- TODO: We need to create additional LPDB Fields
-			-- match2 opponents (opponent, opponenttemplate, opponentplayers, opponenttype)
+			-- match2 opponents (opponentname, opponenttemplate, opponentplayers, opponenttype)
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
 			-- lastvs match2 opponent (json?)
