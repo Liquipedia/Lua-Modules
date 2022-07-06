@@ -147,6 +147,9 @@ PrizePool.config = {
 			return Logic.readBoolOrNil(args.fillPlaceRange)
 		end
 	},
+	resolveRedirect = {
+		default = false,
+	}
 }
 
 PrizePool.prizeTypes = {
