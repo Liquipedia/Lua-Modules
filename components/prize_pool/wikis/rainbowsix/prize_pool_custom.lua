@@ -19,6 +19,9 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
+local TIER_VALUE = {32, 16, 8, 4, 2}
+local TYPE_MODIFIER = {Online = 0.65}
+
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
@@ -39,13 +42,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	return lpdbData
 end
-
-local TIER_VALUE = {
-	32, 16, 8, 4, 2
-}
-local TYPE_MODIFIER = {
-	Online = 0.65
-}
 
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
 	if String.isEmpty(tier) then
