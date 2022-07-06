@@ -32,7 +32,6 @@ function CustomLeague.run(frame)
 	
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
-
 	return league:createInfobox(frame)
 end
 
