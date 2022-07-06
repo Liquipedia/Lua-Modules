@@ -347,8 +347,6 @@ end
 Reads an opponent struct and builds a standings/placement lpdb struct from it
 ]]
 function Opponent.toLpdbStruct(opponent)
-	-- this already handles literal and team opponents
-	-- for team opponents the players will get added via TeamCards
 	local storageStruct = {
 		opponentname = Opponent.toName(opponent),
 		opponenttemplate = opponent.template,
