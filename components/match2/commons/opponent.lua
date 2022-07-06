@@ -358,11 +358,13 @@ function Opponent.toLpdbStruct(opponent)
 	if Opponent.typeIsParty(opponent.type) then
 		local players = {}
 		for playerIndex, player in ipairs(opponent.players) do
-			players['p' .. playerIndex .. 'dn'] = player.displayName
-			players['p' .. playerIndex .. 'flag'] = player.flag
-			players['p' .. playerIndex] = player.pageName
-			players['p' .. playerIndex .. 'team'] = Opponent.toName({type = Opponent.team, template = player.team})
-			players['p' .. playerIndex .. 'template'] = player.team
+			local prefix = 'p' .. playerIndex
+
+			players[prefix] = player.pageName
+			players[prefix .. 'dn'] = player.displayName
+			players[prefix .. 'flag'] = player.flag
+			players[prefix .. 'team'] = Opponent.toName({type = Opponent.team, template = player.team})
+			players[prefix .. 'template'] = player.team
 		end
 		storageStruct.opponentplayers = players
 	end
