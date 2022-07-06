@@ -85,12 +85,12 @@ function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomMap:getNameDisplay()
-	if String.isEmpty(_args.name) then
-		return CustomMap:_tlpdMap(_args.id, 'name')
+function CustomMap:getNameDisplay(args)
+	if String.isEmpty(args.name) then
+		return CustomMap:_tlpdMap(args.id, 'name')
 	end
 
-	return _args.name
+	return args.name
 end
 
 function CustomMap:addToLpdb(lpdbData)

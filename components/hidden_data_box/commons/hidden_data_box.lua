@@ -86,7 +86,7 @@ function HiddenDataBox:checkAndAssign(variableName, valueFromArgs, valueFromQuer
 end
 
 -- overridable so that wikis can add custom vars
-function HiddenDataBox:addCustomVariables() end
+function HiddenDataBox:addCustomVariables(args, queryResult) end
 
 -- overridable so that wikis can adjust
 -- according to their tier system
