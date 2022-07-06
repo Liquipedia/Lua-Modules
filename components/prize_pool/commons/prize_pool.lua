@@ -18,7 +18,6 @@ local Math = require('Module:Math')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Import = Lua.import('Module:PrizePool/Import', {requireDevIfEnabled = true})
