@@ -29,6 +29,9 @@ _MODES.trios = _MODES.trio
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
+	
+	league.addToLpdb = CustomLeague.addToLpdb
+	league.createWidgetInjector = CustomLeague.createWidgetInjector
 
 	return league:createInfobox(frame)
 end
