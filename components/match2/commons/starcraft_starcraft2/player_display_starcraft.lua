@@ -17,7 +17,7 @@ local TypeUtil = require('Module:TypeUtil')
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getSmallIcon = function(frame) end,
+	getSmallIcon = function(_) end,
 }
 
 local html = mw.html
