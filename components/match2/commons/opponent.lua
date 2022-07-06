@@ -346,30 +346,24 @@ end
 --[[
 Reads an opponent struct and builds a storage struct for standing/prizePool from it
 ]]
-function Opponent.toLpdbStruct(opponent, resolveTeamToPageName)
+function Opponent.toLpdbStruct(opponent)
 	-- this already handles literal and team opponents
-	-- (modulo resolveTeamToPageName if needed)
+	-- for team opponents the players will get added via TeamCards
 	local storageStruct = {
-		opponentname = opponent.name,
+		opponentname = Opponent.toName(opponent),
 		opponenttemplate = opponent.template,
 		opponenttype = opponent.type,
 	}
 
-	if opponent.type == Opponent.team then
-		if resolveTeamToPageName then
-			storageStruct.opponentname = Opponent.teamTemplateResolveRedirect(opponent.template)
-		end
-	elseif Opponent.typeIsParty(opponent.type) then
+	-- add players for party types
+	if Opponent.typeIsParty(opponent.type) then
 		local players = {}
 		for playerIndex, player in ipairs(opponent.players) do
 			players['p' .. playerIndex .. 'dn'] = player.displayName
 			players['p' .. playerIndex .. 'flag'] = player.flag
 			players['p' .. playerIndex] = player.pageName
-			players['p' .. playerIndex .. 'team'] = resolveTeamToPageName
-				and Opponent.teamTemplateResolveRedirect(player.team)
-				or player.team
-			players['p' .. playerIndex .. 'template'] = resolveTeamToPageName
-				and player.team or nil
+			players['p' .. playerIndex .. 'team'] = Opponent.toName({type = Opponent.team, template = player.team})
+			players['p' .. playerIndex .. 'template'] = player.team
 		end
 		storageStruct.opponentplayers = players
 	end
@@ -377,29 +371,11 @@ function Opponent.toLpdbStruct(opponent, resolveTeamToPageName)
 	return storageStruct
 end
 
--- function to resolve teamTemplate to pagename and resolve redirect on it
--- needed for wikis that store redirected
--- also works as a workaround if there are still duplicate teamTemplates on a wiki
--- or if the teamplate name does not fit the pagename while the pagename is already another teamTemplate
--- (which btw. can not be fixed in several cases due to the lock due to std logos)
-function Opponent.teamTemplateResolveRedirect(template)
-	if String.isEmpy(template) then
-		return nil
-	end
-
-	if mw.ext.TeamTemplate.teamexists(template) then
-		local page = mw.ext.TeamTemplate.raw(template).page
-		return mw.ext.TeamLiquidIntegration.resolve_redirect(page)
-	end
-
-	return template
-end
-
 --[[
 Reads a standing/prizePool storage struct and builds an opponent struct from it
 ]]
 function Opponent.fromLpdbStruct(storageStruct)
-	local partySize = Opponent.partySize(storageStruct.type)
+	local partySize = Opponent.partySize(storageStruct.opponenttype)
 	if partySize then
 		local players = storageStruct.opponentplayers
 		local function playerFromLpdbStruct(playerIndex)
@@ -412,14 +388,19 @@ function Opponent.fromLpdbStruct(storageStruct)
 		end
 		local opponent = {
 			players = Array.map(Array.range(1, partySize), playerFromLpdbStruct),
-			type = storageStruct.type,
+			type = storageStruct.opponenttype,
 		}
 		return opponent
-	else -- literal and team opponents can be handled the same way
+	elseif storageStruct.opponenttype == Opponent.team then
 		return {
 			name = storageStruct.opponentname,
 			template = storageStruct.opponenttemplate,
-			type = storageStruct.opponenttype,
+			type = Opponent.team,
+		}
+	elseif storageStruct.opponenttype == Opponent.literal then
+		return {
+			name = storageStruct.opponentname,
+			type = Opponent.literal,
 		}
 	end
 end
