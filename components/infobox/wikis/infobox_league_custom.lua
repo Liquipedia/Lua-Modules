@@ -96,6 +96,7 @@ function CustomLeague:_getGameMode()
 	if String.isEmpty(_args.mode) then
 		return nil
 	end
+
 	return _MODES[_args.mode:lower()] or _MODES['default']
 end
 
