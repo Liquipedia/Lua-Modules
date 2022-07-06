@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Weapon = require('Module:Infobox/Weapon/dev')
+local Weapon = require('Module:Infobox/Weapon')
 local Class = require('Module:Class')
 local Builder = require('Module:Infobox/Widget/Builder')
 local Injector = require('Module:Infobox/Widget/Injector')
