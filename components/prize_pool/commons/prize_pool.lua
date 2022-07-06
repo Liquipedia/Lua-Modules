@@ -565,8 +565,8 @@ function PrizePool:_storeLpdb()
 		-- TODO: Add PrizePoolIndex as a field?
 	}
 
-	local setWeight = function(lpdbEntry)
-		lpdbEntry.weight = lpdbEntry.weight or Template.safeExpand(
+    local setWeight = function(lpdbEntry)
+        lpdbEntry.weight = lpdbEntry.weight or Template.safeExpand(
 			mw.getCurrentFrame(), 'Weight', {
 				math.max(lpdbEntry.prizemoney, 1),
 				lpdbTournamentData.liquipediatier,
