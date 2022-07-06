@@ -383,8 +383,8 @@ function PrizePool:build()
 		wrapper:node(node)
 	end
 
-	if self.options.storeLpdb then
-		self:_storeLpdb()
+	if self.options.storeLpdb or self.options.storeSmw then
+		self:_storeData()
 	end
 
 	return wrapper
@@ -567,7 +567,7 @@ function PrizePool:setLpdbInjector(lpdbInjector)
 	return self
 end
 
-function PrizePool:_storeLpdb()
+function PrizePool:_storeData()
 	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
 	Variables.varDefine('prizepool_index', prizePoolIndex)
 
@@ -600,10 +600,55 @@ function PrizePool:_storeLpdb()
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 		local lowerCaseParticipant = mw.ustring.lower(lpdbEntry.participant)
-		mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. lowerCaseParticipant, lpdbEntry)
+
+		if self.options.storeLpdb then
+			mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. lowerCaseParticipant, lpdbEntry)
+		end
+
+		if self.options.storeSmw then
+			self:_storeSmw(lpdbEntry)
+		end
 	end
 
 	return self
+end
+
+function PrizePool:_storeSmw(lpdbEntry)
+	local isParty = type(lpdbEntry.players) == 'table' and Table.isNotEmpty(lpdbEntry.players)
+	local isTeam = String.isEmpty(lpdbEntry.participanttemplate)
+
+	local smwData = {
+		['has tournament page'] = lpdbEntry.parent,
+		['has tournament name'] = lpdbEntry.tournament,
+		['has tournament type'] = lpdbEntry.type,
+		['has tournament series'] = lpdbEntry.series,
+		['is result type'] = lpdbEntry.mode,
+		['has game'] = lpdbEntry.game,
+		['has date'] = lpdbEntry.date,
+		['is tier'] = lpdbEntry.liquipediatier,
+		['has placement'] = lpdbEntry.placement,
+		['has prizemoney'] = lpdbEntry.prizemoney,
+		['has last opponent'] = lpdbEntry.lastvs,
+		['has last score'] = lpdbEntry.lastscore,
+		['has last opponent score'] = lpdbEntry.lastvsscore,
+		['has last wdl'] = lpdbEntry.groupscore,
+		['has weight'] = lpdbEntry.weight,
+	}
+
+	if isParty then
+		smwData['has team page'] = lpdbEntry.players.p1team
+		smwData['has team'] = lpdbEntry.players.p1team
+		smwData['has player id'] = lpdbEntry.participant
+		smwData['has player page'] = lpdbEntry.participantlink
+		smwData['has flag'] = lpdbEntry.participantflag
+
+	elseif isTeam then
+		smwData['has team page'] = lpdbEntry.participant
+	else
+		smwData['has literal team'] = lpdbEntry.participant
+	end
+
+	mw.smw.subobject(smwData, 'ranking_' .. mw.ustring.lower(lpdbEntry.participant))
 end
 
 --- Returns true if this prizePool has a US Dollar reward.
