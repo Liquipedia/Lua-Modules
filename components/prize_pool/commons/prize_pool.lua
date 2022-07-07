@@ -23,6 +23,7 @@ local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
@@ -373,8 +374,8 @@ function PrizePool:build()
 		wrapper:node(node)
 	end
 
-	if self.options.storeLpdb then
-		self:_storeLpdb()
+	if self.options.storeLpdb or self.options.storeSmw then
+		self:_storeData()
 	end
 
 	return wrapper
@@ -557,7 +558,7 @@ function PrizePool:setLpdbInjector(lpdbInjector)
 	return self
 end
 
-function PrizePool:_storeLpdb()
+function PrizePool:_storeData()
 	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
 	Variables.varDefine('prizepool_index', prizePoolIndex)
 
@@ -590,7 +591,14 @@ function PrizePool:_storeLpdb()
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 		local lowerCaseParticipant = mw.ustring.lower(lpdbEntry.participant)
-		mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. lowerCaseParticipant, lpdbEntry)
+
+		if self.options.storeLpdb then
+			mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. lowerCaseParticipant, lpdbEntry)
+		end
+
+		if self.options.storeSmw then
+			Template.safeExpand(mw.getCurrentFrame(), 'PrizePoolSmwStorage', lpdbEntry)
+		end
 	end
 
 	return self
@@ -816,6 +824,7 @@ function Placement:_getLpdbData()
 			participantlink = Opponent.toName(opponent.opponentData),
 			participantflag = opponent.opponentData.flag,
 			participanttemplate = opponent.opponentData.template,
+			opponenttype = opponent.opponentData.type,
 			players = players,
 			placement = self.placeStart .. (self.placeStart ~= self.placeEnd and ('-' .. self.placeEnd) or ''),
 			prizemoney = prizeMoney,
