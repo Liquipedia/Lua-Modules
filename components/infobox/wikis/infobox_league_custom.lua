@@ -97,7 +97,7 @@ function CustomLeague:_getGameMode()
 		return nil
 	end
 
-	return _MODES[_args.mode:lower()] or _MODES['default']
+	return _MODES[_args.mode:lower()]
 end
 
 function CustomLeague:_getGameFormat()
@@ -105,7 +105,7 @@ function CustomLeague:_getGameFormat()
 		return nil
 	end
 
-	return _FORMATS[_args.format:lower()] or _FORMATS['default']
+	return _FORMATS[_args.format:lower()]
 end
 
 return CustomLeague
