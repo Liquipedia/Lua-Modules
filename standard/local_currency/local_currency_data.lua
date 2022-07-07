@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:LocalCurrency/Data
+-- page=Module:Currency/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
