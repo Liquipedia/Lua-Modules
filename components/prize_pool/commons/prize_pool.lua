@@ -79,6 +79,12 @@ PrizePool.config = {
 			return Logic.readBoolOrNil(args.exchangeinfo)
 		end
 	},
+	cutafter = {
+		default = 4,
+		read = function(args)
+			return tonumber(args.cutafter)
+		end
+	},
 	storeSmw = {
 		default = true,
 	},
@@ -359,7 +365,7 @@ function PrizePool._comparePrizes(x, y)
 end
 
 function PrizePool:build()
-	local table = WidgetTable{}
+	local table = WidgetTable{classes = {'collapsed', 'general-collapsible'}}
 
 	table:addRow(self:_buildHeader())
 
@@ -405,10 +411,13 @@ function PrizePool:_buildRows()
 
 	for _, placement in ipairs(self.placements) do
 		local previousRow = {}
-		-- TODO Cutoff
 
 		for opponentIndex, opponent in ipairs(placement.opponents) do
 			local row = TableRow{}
+
+			if placement.placeStart > self.options.cutafter then
+				row:addClass('ppt-hide-on-collapse')
+			end
 
 			row:addClass(placement:getBackground())
 
@@ -467,9 +476,27 @@ function PrizePool:_buildRows()
 
 			table.insert(rows, row)
 		end
+
+		if placement.placeStart <= self.options.cutafter
+			and placement.placeEnd >= self.options.cutafter
+			and placement ~= self.placements[#self.placements] then
+
+			local toogleExpandRow = self:_toggleExpand(placement.placeEnd + 1, self.placements[#self.placements].placeEnd)
+			table.insert(rows, toogleExpandRow)
+		end
 	end
 
 	return rows
+end
+
+function PrizePool:_toggleExpand(placeStart, placeEnd)
+	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
+	local expandButton = TableCell{content = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-down"></i></div>'}}
+		:addClass('general-collapsible-expand-button')
+	local collapseButton = TableCell{content = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-up"></i></div>'}}
+		:addClass('general-collapsible-collapse-button')
+
+	return TableRow{classes = {'ppt-toggle-expand'}}:addCell(expandButton):addCell(collapseButton)
 end
 
 function PrizePool:_readConfig(args)
