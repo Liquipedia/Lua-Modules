@@ -31,12 +31,8 @@ function Table:addClass(class)
 end
 
 function Table:make()
-	local displayTable = mw.html.create('div')
+	local displayTable = mw.html.create('div'):addClass('csstable-widget')
 	displayTable:css{
-		['display'] = 'inline-grid',
-		['border-right'] = '1px solid #bbb',
-		['border-bottom'] = '1px solid #bbb',
-		['grid-template-rows'] = 'repeat(' .. #self.rows .. ', auto)',
 		['grid-template-columns'] = 'repeat(' .. self:_getMaxCells() .. ', auto)',
 	}
 

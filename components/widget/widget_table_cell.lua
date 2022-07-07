@@ -29,15 +29,8 @@ function TableCell:addClass(class)
 end
 
 function TableCell:make()
-	local cell = mw.html.create('div')
+	local cell = mw.html.create('div'):addClass('csstable-widget-cell')
 	cell:css{
-		['border-left'] = '1px solid #bbb',
-		['border-top'] = '1px solid #bbb',
-		['background'] = 'inherit',
-		['padding'] = '4px',
-		['display'] = 'flex',
-		['align-items'] = 'center',
-		['justify-content'] = 'center',
 		['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil,
 		['grid-column'] = self.colSpan and 'span ' .. self.colSpan or nil,
 	}
