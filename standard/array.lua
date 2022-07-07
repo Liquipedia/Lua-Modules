@@ -173,21 +173,42 @@ end
 
 -- Lexicographically compare two arrays.
 function Array.lexicalCompare(tblX, tblY)
-	for index = 1, math.min(#tblX, #tblY) do
-		if tblX[index] < tblY[index] then
-			return true
-		elseif tblX[index] > tblY[index] then
-			return false
-		end
-	end
-	return #tblX < #tblY
+	return Array.lexicalSignCompare(tblX, tblY) < 0
 end
 
-function Array.lexicalCompareIfTable(y1, y2)
-	if type(y1) == 'table' and type(y2) == 'table' then
-		return Array.lexicalCompare(y1, y2)
+function Array.lexicalCompareIfTable(value1, value2)
+	return Array.lexicalSignCompareIfTable(value1, value2) < 0
+end
+
+--[[
+Variant of Array.lexicalCompare that returns a number instead of true/false.
+
+It returns negative number if the first array is lexically before the second
+array, 0 if they are the same, or a positive number if the first array is
+after the second array.
+]]
+function Array.lexicalSignCompare(tblX, tblY)
+	if tblX == tblY then return 0 end
+
+	for index = 1, math.min(#tblX, #tblY) do
+		if tblX[index] < tblY[index] then
+			return -1
+		elseif tblX[index] > tblY[index] then
+			return 1
+		end
+	end
+	return #tblX - #tblY
+end
+
+function Array.lexicalSignCompareIfTable(value1, value2)
+	if type(value1) == 'table' and type(value2) == 'table' then
+		return Array.lexicalSignCompare(value1, value2)
+	elseif value1 == value2 then
+		return 0
+	elseif value1 < value2 then
+		return -1
 	else
-		return y1 < y2
+		return 1
 	end
 end
 
