@@ -437,9 +437,8 @@ function PrizePool:_buildRows()
 				row:addCell(placeCell)
 			end
 
-			local prizeCells = {}
-			local previousOfType = {}
-			for prizeIndex, prize in ipairs(self.prizes) do
+			local previousOfPrizeType = {}
+			local prizeCells = Array.map(self.prizes, function (prize)
 				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
 
@@ -449,23 +448,25 @@ function PrizePool:_buildRows()
 				end
 				cell = cell or TableCell{}
 
-				if prizeTypeData.mergeDisplayColumns then
-					local addToCell = previousOfType[prize.type]
-					if addToCell then
-						if Table.isNotEmpty(addToCell.content) and Table.isNotEmpty(cell.content) then
-							addToCell:addContent(tostring(mw.html.create('hr'):css('flex-basis', '100%')))
-						end
-						Array.extendWith(addToCell.content, cell.content)
-						cell = nil
-					else
-						previousOfType[prize.type] = cell
-					end
-				end
-				prizeCells[prizeIndex] = cell
-			end
+				-- Update the previous column of this type in the same row
+				local lastCellOfType = previousOfPrizeType[prize.type]
+				if lastCellOfType and prizeTypeData.mergeDisplayColumns then
 
-			for prizeIndex, prizeCell in ipairs(prizeCells) do
-				local lastInColumn = previousRow[prizeIndex]
+					if Table.isNotEmpty(lastCellOfType.content) and Table.isNotEmpty(cell.content) then
+						lastCellOfType:addContent(tostring(mw.html.create('hr'):css('flex-basis', '100%')))
+					end
+
+					Array.extendWith(lastCellOfType.content, cell.content)
+
+					return nil
+				end
+
+				previousOfPrizeType[prize.type] = cell
+				return cell
+			end)
+
+			Array.forEach(prizeCells, function (prizeCell, columnIndex)
+				local lastInColumn = previousRow[columnIndex]
 
 				if Table.isEmpty(prizeCell.content) then
 					prizeCell = PrizePool._emptyCell()
@@ -474,10 +475,10 @@ function PrizePool:_buildRows()
 				if lastInColumn and Table.deepEquals(lastInColumn.content, prizeCell.content) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
-					previousRow[prizeIndex] = prizeCell
+					previousRow[columnIndex] = prizeCell
 					row:addCell(prizeCell)
 				end
-			end
+			end)
 
 			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{opponent = opponent.opponentData})
 			local opponentCss = {['justify-content'] = 'start'}
