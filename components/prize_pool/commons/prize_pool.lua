@@ -213,6 +213,8 @@ PrizePool.prizeTypes = {
 
 			return TableCell{content = content}
 		end,
+
+		mergeDisplayColumns = true,
 	},
 	[PRIZE_TYPE_POINTS] = {
 		sortOrder = 40,
@@ -365,7 +367,7 @@ function PrizePool._comparePrizes(x, y)
 end
 
 function PrizePool:build()
-	local table = WidgetTable{classes = {'collapsed', 'general-collapsible'}}
+	local table = WidgetTable{classes = {'collapsed', 'general-collapsible', 'prizepooltable'}}
 
 	table:addRow(self:_buildHeader())
 
@@ -392,10 +394,15 @@ function PrizePool:_buildHeader()
 
 	headerRow:addCell(TableCell{content = {'Place'}})
 
+	local previousOfType = {}
 	for _, prize in ipairs(self.prizes) do
 		local prizeTypeData = self.prizeTypes[prize.type]
-		local cell = prizeTypeData.headerDisplay(prize.data)
-		headerRow:addCell(cell)
+
+		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
+			local cell = prizeTypeData.headerDisplay(prize.data)
+			headerRow:addCell(cell)
+			previousOfType[prize.type] = cell
+		end
 	end
 
 	if self:_hasPartyType() then
@@ -430,24 +437,48 @@ function PrizePool:_buildRows()
 				row:addCell(placeCell)
 			end
 
-			for prizeIndex, prize in ipairs(self.prizes) do
+			local previousOfPrizeType = {}
+			local prizeCells = Array.map(self.prizes, function (prize)
 				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
-				local lastInColumn = previousRow[prizeIndex]
 
 				local cell
 				if reward then
 					cell = prizeTypeData.rowDisplay(prize.data, reward)
 				end
-				cell = cell or PrizePool._emptyCell()
+				cell = cell or TableCell{}
 
-				if lastInColumn and Table.deepEquals(lastInColumn.content, cell.content) then
+				-- Update the previous column of this type in the same row
+				local lastCellOfType = previousOfPrizeType[prize.type]
+				if lastCellOfType and prizeTypeData.mergeDisplayColumns then
+
+					if Table.isNotEmpty(lastCellOfType.content) and Table.isNotEmpty(cell.content) then
+						lastCellOfType:addContent(tostring(mw.html.create('hr'):css('flex-basis', '100%')))
+					end
+
+					Array.extendWith(lastCellOfType.content, cell.content)
+
+					return nil
+				end
+
+				previousOfPrizeType[prize.type] = cell
+				return cell
+			end)
+
+			Array.forEach(prizeCells, function (prizeCell, columnIndex)
+				local lastInColumn = previousRow[columnIndex]
+
+				if Table.isEmpty(prizeCell.content) then
+					prizeCell = PrizePool._emptyCell()
+				end
+
+				if lastInColumn and Table.deepEquals(lastInColumn.content, prizeCell.content) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
-					previousRow[prizeIndex] = cell
-					row:addCell(cell)
+					previousRow[columnIndex] = prizeCell
+					row:addCell(prizeCell)
 				end
-			end
+			end)
 
 			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{opponent = opponent.opponentData})
 			local opponentCss = {['justify-content'] = 'start'}
