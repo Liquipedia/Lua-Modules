@@ -32,7 +32,7 @@ local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevI
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
-local TableCell = require('Module:Widget/Table/Cell/dev')
+local TableCell = require('Module:Widget/Table/Cell')
 
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
