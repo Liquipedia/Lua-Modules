@@ -32,7 +32,7 @@ local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevI
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
-local TableCell = require('Module:Widget/Table/Cell')
+local TableCell = require('Module:Widget/Table/Cell/dev')
 
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -457,7 +457,7 @@ function PrizePool:_buildRows()
 					end
 
 					Array.extendWith(lastCellOfType.content, cell.content)
-					table.insert(cell.css, {'flex-direction', 'column'})
+					lastCellOfType.css['flex-direction'] = 'column'
 
 					return nil
 				end

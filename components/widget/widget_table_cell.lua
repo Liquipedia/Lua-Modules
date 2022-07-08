@@ -54,7 +54,7 @@ function TableCell:_concatContent()
 			Array.forEach(content, function (inner)
 				wrapper:node(inner)
 			end)
-			return wrapper
+			return tostring(wrapper)
 		else
 			return content
 		end
