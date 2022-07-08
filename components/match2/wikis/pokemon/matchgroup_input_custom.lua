@@ -216,34 +216,34 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or _NO_SCORE) or _NO_SCORE
-	local value2 = tonumber(table[key2].score or _NO_SCORE) or _NO_SCORE
+	local value1 = tonumber(table[key1].score) or _NO_SCORE
+	local value2 = tonumber(table[key2].score) or _NO_SCORE
 	return value1 > value2
 end
 
 -- Check if any opponent has a none-standard status
-function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= _STATUS_SCORE end)
+function CustomMatchGroupInput.placementCheckSpecialStatus(tb1)
+	return Table.any(tb1, function (_, scoreinfo) return scoreinfo.status ~= _STATUS_SCORE end)
 end
 
 -- function to check for forfeits
-function CustomMatchGroupInput.placementCheckFF(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == _STATUS_FORFEIT end)
+function CustomMatchGroupInput.placementCheckFF(tb2)
+	return Table.any(tb2, function (_, scoreinfo) return scoreinfo.status == _STATUS_FORFEIT end)
 end
 
 -- function to check for DQ's
-function CustomMatchGroupInput.placementCheckDQ(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == _STATUS_DISQUALIFIED end)
+function CustomMatchGroupInput.placementCheckDQ(tb3)
+	return Table.any(tb3, function (_, scoreinfo) return scoreinfo.status == _STATUS_DISQUALIFIED end)
 end
 
 -- function to check for W/L
-function CustomMatchGroupInput.placementCheckWL(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == _STATUS_DEFAULT_LOSS end)
+function CustomMatchGroupInput.placementCheckWL(tb4)
+	return Table.any(tb4, function (_, scoreinfo) return scoreinfo.status == _STATUS_DEFAULT_LOSS end)
 end
 
 -- Get the winner when resulttype=default
-function CustomMatchGroupInput.getDefaultWinner(table)
-	for index, scoreInfo in pairs(table) do
+function CustomMatchGroupInput.getDefaultWinner(tb5)
+	for index, scoreInfo in pairs(tb5) do
 		if scoreInfo.status == _STATUS_DEFAULT_WIN then
 			return index
 		end
