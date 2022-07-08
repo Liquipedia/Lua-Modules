@@ -367,7 +367,7 @@ function PrizePool._comparePrizes(x, y)
 end
 
 function PrizePool:build()
-	local table = WidgetTable{classes = {'collapsed', 'general-collapsible'}}
+	local table = WidgetTable{classes = {'collapsed', 'general-collapsible', 'prizepooltable'}}
 
 	table:addRow(self:_buildHeader())
 
@@ -452,13 +452,16 @@ function PrizePool:_buildRows()
 				if prizeTypeData.mergeDisplayColumns then
 					local addToCell = previousOfType[prize.type]
 					if addToCell then
+						if Table.isNotEmpty(addToCell.content) and Table.isNotEmpty(cell.content) then
+							addToCell:addContent(tostring(mw.html.create('hr'):css('flex-basis', '100%')))
+						end
 						Array.extendWith(addToCell.content, cell.content)
 						cell = nil
 					else
 						previousOfType[prize.type] = cell
 					end
 				end
-				table.insert(prizeCells, cell)
+				prizeCells[prizeIndex] = cell
 			end
 
 			for prizeIndex, prizeCell in ipairs(prizeCells) do
