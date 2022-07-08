@@ -213,6 +213,8 @@ PrizePool.prizeTypes = {
 
 			return TableCell{content = content}
 		end,
+
+		mergeDisplayColumns = true,
 	},
 	[PRIZE_TYPE_POINTS] = {
 		sortOrder = 40,
@@ -392,10 +394,15 @@ function PrizePool:_buildHeader()
 
 	headerRow:addCell(TableCell{content = {'Place'}})
 
+	local previousOfType = {}
 	for _, prize in ipairs(self.prizes) do
 		local prizeTypeData = self.prizeTypes[prize.type]
-		local cell = prizeTypeData.headerDisplay(prize.data)
-		headerRow:addCell(cell)
+
+		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
+			local cell = prizeTypeData.headerDisplay(prize.data)
+			headerRow:addCell(cell)
+			previousOfType[prize.type] = cell
+		end
 	end
 
 	if self:_hasPartyType() then
@@ -430,22 +437,42 @@ function PrizePool:_buildRows()
 				row:addCell(placeCell)
 			end
 
+			local prizeCells = {}
+			local previousOfType = {}
 			for prizeIndex, prize in ipairs(self.prizes) do
 				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
-				local lastInColumn = previousRow[prizeIndex]
 
 				local cell
 				if reward then
 					cell = prizeTypeData.rowDisplay(prize.data, reward)
 				end
-				cell = cell or PrizePool._emptyCell()
+				cell = cell or TableCell{}
 
-				if lastInColumn and Table.deepEquals(lastInColumn.content, cell.content) then
+				if prizeTypeData.mergeDisplayColumns then
+					local addToCell = previousOfType[prize.type]
+					if addToCell then
+						Array.extendWith(addToCell.content, cell.content)
+						cell = nil
+					else
+						previousOfType[prize.type] = cell
+					end
+				end
+				table.insert(prizeCells, cell)
+			end
+
+			for prizeIndex, prizeCell in ipairs(prizeCells) do
+				local lastInColumn = previousRow[prizeIndex]
+
+				if Table.isEmpty(prizeCell.content) then
+					prizeCell = PrizePool._emptyCell()
+				end
+
+				if lastInColumn and Table.deepEquals(lastInColumn.content, prizeCell.content) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
-					previousRow[prizeIndex] = cell
-					row:addCell(cell)
+					previousRow[prizeIndex] = prizeCell
+					row:addCell(prizeCell)
 				end
 			end
 
