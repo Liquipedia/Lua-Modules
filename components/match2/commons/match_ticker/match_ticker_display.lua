@@ -206,6 +206,7 @@ end
 @matchData - matchData of the match for which the score display is build
 ]]
 function Versus:score(matchData)
+	matchData.winner = tonumber(matchData.winner)
 	local leftScore, leftScore2, hasScore2, rightScore, rightScore2
 	leftScore, leftScore2, hasScore2 = HelperFunctions.getOpponentScore(
 		matchData.match2opponents[1],
