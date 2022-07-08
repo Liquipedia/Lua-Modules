@@ -375,7 +375,7 @@ function PrizePool:build()
 
 	table:setContext{self._widgetInjector}
 
-	local wrapper = mw.html.create('div')
+	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 	for _, node in ipairs(WidgetFactory.work(table, self._widgetInjector)) do
 		wrapper:node(node)
 	end
