@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
 
@@ -41,9 +42,23 @@ function TableCell:make()
 
 	cell:css(self.css)
 
-	cell:wikitext(table.concat(self.content))
+	cell:node(self:_concatContent())
 
 	return {cell}
+end
+
+function TableCell:_concatContent()
+	return table.concat(Array.map(self.content, function (content)
+		if type(content) == 'table' then
+			local wrapper = mw.html.create('div')
+			Array.forEach(content, function (inner)
+				wrapper:node(inner)
+			end)
+			return tostring(wrapper)
+		else
+			return content
+		end
+	end))
 end
 
 return TableCell

@@ -103,7 +103,7 @@ PrizePool.prizeTypes = {
 		headerDisplay = function (data)
 			local currencyData = Currency.raw(BASE_CURRENCY)
 			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
-			return TableCell{content = {currencyText}}
+			return TableCell{content = {{currencyText}}}
 		end,
 
 		row = 'usdprize',
@@ -112,7 +112,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {'$', Currency.formatMoney(data)}}
+				return TableCell{content = {{'$', Currency.formatMoney(data)}}}
 			end
 		end,
 	},
@@ -133,7 +133,7 @@ PrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {data.currencyText}}
+			return TableCell{content = {{data.currencyText}}}
 		end,
 
 		row = 'localprize',
@@ -150,7 +150,7 @@ PrizePool.prizeTypes = {
 					table.insert(displayText, headerData.symbol)
 				end
 
-				return TableCell{content = displayText}
+				return TableCell{content = {displayText}}
 			end
 		end,
 
@@ -211,7 +211,7 @@ PrizePool.prizeTypes = {
 				table.insert(content, '[[' .. headerData.link .. ']]')
 			end
 
-			return TableCell{content = content}
+			return TableCell{content = {content}}
 		end,
 
 		mergeDisplayColumns = true,
@@ -250,7 +250,7 @@ PrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCell{content = headerDisplay}
+			return TableCell{content = {headerDisplay}}
 		end,
 
 		row = 'points',
@@ -259,7 +259,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {LANG:formatNum(data)}}
+				return TableCell{content = {{LANG:formatNum(data)}}}
 			end
 		end,
 	},
@@ -271,7 +271,7 @@ PrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {data.title}}
+			return TableCell{content = {{data.title}}}
 		end,
 
 		row = 'freetext',
@@ -280,7 +280,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {data}}
+				return TableCell{content = {{data}}}
 			end
 		end,
 	}
@@ -430,7 +430,7 @@ function PrizePool:_buildRows()
 
 			if opponentIndex == 1 then
 				local placeCell = TableCell{
-					content = {placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()},
+					content = {{placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()}},
 					css = {['font-weight'] = 'bolder'},
 				}
 				placeCell.rowSpan = #placement.opponents
@@ -453,10 +453,11 @@ function PrizePool:_buildRows()
 				if lastCellOfType and prizeTypeData.mergeDisplayColumns then
 
 					if Table.isNotEmpty(lastCellOfType.content) and Table.isNotEmpty(cell.content) then
-						lastCellOfType:addContent(tostring(mw.html.create('hr'):css('flex-basis', '100%')))
+						lastCellOfType:addContent(tostring(mw.html.create('hr'):css('width', '100%')))
 					end
 
 					Array.extendWith(lastCellOfType.content, cell.content)
+					lastCellOfType.css['flex-direction'] = 'column'
 
 					return nil
 				end
