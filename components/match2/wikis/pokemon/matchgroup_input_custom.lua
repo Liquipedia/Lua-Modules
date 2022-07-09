@@ -222,28 +222,28 @@ function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
 end
 
 -- Check if any opponent has a none-standard status
-function CustomMatchGroupInput.placementCheckSpecialStatus(tb1)
-	return Table.any(tb1, function (_, scoreinfo) return scoreinfo.status ~= _STATUS_SCORE end)
+function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ~= _STATUS_SCORE end)
 end
 
 -- function to check for forfeits
-function CustomMatchGroupInput.placementCheckFF(tb2)
-	return Table.any(tb2, function (_, scoreinfo) return scoreinfo.status == _STATUS_FORFEIT end)
+function CustomMatchGroupInput.placementCheckFF(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == _STATUS_FORFEIT end)
 end
 
 -- function to check for DQ's
-function CustomMatchGroupInput.placementCheckDQ(tb3)
-	return Table.any(tb3, function (_, scoreinfo) return scoreinfo.status == _STATUS_DISQUALIFIED end)
+function CustomMatchGroupInput.placementCheckDQ(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == _STATUS_DISQUALIFIED end)
 end
 
 -- function to check for W/L
-function CustomMatchGroupInput.placementCheckWL(tb4)
-	return Table.any(tb4, function (_, scoreinfo) return scoreinfo.status == _STATUS_DEFAULT_LOSS end)
+function CustomMatchGroupInput.placementCheckWL(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == _STATUS_DEFAULT_LOSS end)
 end
 
 -- Get the winner when resulttype=default
-function CustomMatchGroupInput.getDefaultWinner(tb5)
-	for index, scoreInfo in pairs(tb5) do
+function CustomMatchGroupInput.getDefaultWinner(tbl)
+	for index, scoreInfo in pairs(tbl) do
 		if scoreInfo.status == _STATUS_DEFAULT_WIN then
 			return index
 		end
