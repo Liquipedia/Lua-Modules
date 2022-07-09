@@ -54,8 +54,6 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
-
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
