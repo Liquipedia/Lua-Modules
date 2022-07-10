@@ -874,8 +874,8 @@ function Placement:_getLpdbData()
 			participant = Opponent.toName(opponent.opponentData)
 		end
 
-		local prizeMoney = tonumber(self:_getPrizeRewardForOpponent(opponent, PRIZE_TYPE_USD .. 1)) or 0
-		local pointsReward = self:_getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_USD .. 1)) or 0
+		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local lpdbData = {
 			image = image,
 			imagedark = imageDark,
@@ -914,7 +914,7 @@ function Placement:_getLpdbData()
 	return entries
 end
 
-function Placement:_getPrizeRewardForOpponent(opponent, prize)
+function Placement:getPrizeRewardForOpponent(opponent, prize)
 	return opponent.prizeRewards[prize] or self.prizeRewards[prize]
 end
 
