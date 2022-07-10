@@ -137,7 +137,7 @@ function Weapon:setLpdbData(args)
 		name = self.name,
 		image = args.image,
 		type = 'weapon',
-		information = self.name,
+		information = name,
 		extradata = {}
 	}
 
