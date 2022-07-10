@@ -42,6 +42,7 @@ local _ROLES = {
 _ROLES['assistant coach'] = _ROLES.coach
 
 local _SIZE_HERO = '25x25px'
+local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
 
 local CustomPlayer = Class.new()
 
@@ -91,6 +92,7 @@ function CustomInjector:addCustomCells(widgets)
 			return HeroIcon.getImage{hero, size = _SIZE_HERO}
 		end
 	)
+	heroIcons = Array.sub(heroIcons, 1, MAX_NUMBER_OF_SIGNATURE_HEROES)
 
 	if Table.isNotEmpty(heroIcons) then
 		table.insert(widgets,
@@ -106,7 +108,7 @@ function CustomInjector:addCustomCells(widgets)
 	-- Active in Games
 	Cell{
 		name = 'Game Appearances',
-		content = GameAppearances.player({ player = _pagename })
+		content = GameAppearances.player({player = _pagename})
 	}
 	return widgets
 end
@@ -118,6 +120,9 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = HeroIcon.getHeroName(hero)
+		if heroIndex == MAX_NUMBER_OF_SIGNATURE_HEROES then
+			break
+		end
 	end
 
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
