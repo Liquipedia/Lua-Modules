@@ -13,7 +13,6 @@ local Player = require('Module:Infobox/Person')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local GameAppearances = require('Module:GetGameAppearances')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
@@ -54,7 +53,6 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
