@@ -727,7 +727,7 @@ function PrizePool:_storeData()
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement(PrizePool:_lpdbObjectName(lpdbEntry), lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex), lpdbEntry)
 		end
 
 		if self.options.storeSmw then
@@ -739,7 +739,7 @@ function PrizePool:_storeData()
 end
 
 -- get the lpdbObjectName depending on opponenttype
-function PrizePool:_lpdbObjectName(lpdbEntry)
+function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex)
 	local objectName = 'ranking_' .. prizePoolIndex .. '_'
 	if lpdbEntry.opponenttype == Opponent.team then
 		return objectName .. mw.ustring.lower(lpdbEntry.participant)
