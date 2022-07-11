@@ -367,6 +367,36 @@ PrizePool.prizeTypes = {
 
 
 
+Placement.specialStatuses = {
+	DQ = {
+		active = function (args)
+			return Logic.readBool(args.dq)
+		end,
+		display = function ()
+			return Abbreviation.make('DQ', 'Disqualified')
+		end,
+		lpdb = 'dq',
+	},
+	DNF = {
+		active = function (args)
+			return Logic.readBool(args.dnf)
+		end,
+		display = function ()
+			return Abbreviation.make('DNF', 'Did not finish')
+		end,
+		lpdb = 'dnf',
+	},
+	DNP = {
+		active = function (args)
+			return Logic.readBool(args.dnp)
+		end,
+		display = function ()
+			return Abbreviation.make('DNP', 'Did not participate')
+		end,
+		lpdb = 'dnp',
+	},
+}
+
 function PrizePool:init(args)
 	self.args = self:_parseArgs(args)
 
