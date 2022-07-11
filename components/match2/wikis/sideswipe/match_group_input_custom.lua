@@ -117,22 +117,15 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '2v2'))
-	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
+	match.type = Logic.emptyOr(match.type, Variables.varDefine('tournament_type', args.type)
 	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
-	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_ticker_name'))
-	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
-	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
-	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
-	match.liquipediatier = Logic.emptyOr(
-		match.liquipediatier,
-		Variables.varDefault('tournament_lptier'),
-		Variables.varDefault('tournament_tier')
-	)
-	match.liquipediatiertype = Logic.emptyOr(
-		match.liquipediatiertype,
-		Variables.varDefault('tournament_tiertype')
-	)
+	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_tickername'))
+	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
+	match.series = Logic.emptyOr(match.series, Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
+	match.icon = Logic.emptyOr(match.icon, Variables.varDefine('tournament_icon', args.icon)
+	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefine('tournament_icondark', args.icondark or args.icondarkmode)
+	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
+	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefine('tournament_liquipediatiertype', args.liquipediatiertype)	
 	return match
 end
 
