@@ -367,6 +367,12 @@ function PrizePool._comparePrizes(x, y)
 end
 
 function PrizePool:build()
+	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
+
+	if self.options.prizeSummary then
+		wrapper:wikitext(self:_getPrizeSummaryText())
+	end
+
 	local table = WidgetTable{classes = {'collapsed', 'general-collapsible', 'prizepooltable'}}
 
 	table:addRow(self:_buildHeader())
@@ -376,8 +382,6 @@ function PrizePool:build()
 	end
 
 	table:setContext{self._widgetInjector}
-
-	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 	for _, node in ipairs(WidgetFactory.work(table, self._widgetInjector)) do
 		wrapper:node(node)
 	end
@@ -387,6 +391,29 @@ function PrizePool:build()
 	end
 
 	return wrapper
+end
+
+function PrizePool:_getPrizeSummaryText()
+	local tba = Abbreviation.make('TBA', 'To Be Announced')
+	local tournamentCurrency = Variables.varDefault('tournament_currency')
+	local baseMoneyRaw = Variables.varDefault('tournament_prizepool_usd', tba)
+	local baseMoneyDisplay = Currency.display(BASE_CURRENCY, baseMoneyRaw, {formatValue = true})
+
+	local displayText = {baseMoneyDisplay}
+
+	if tournamentCurrency and tournamentCurrency:upper() ~= BASE_CURRENCY then
+		local localMoneyRaw = Variables.varDefault('tournament_prizepool_local', tba)
+		local localMoneyDisplay = Currency.display(tournamentCurrency, localMoneyRaw, {formatValue = true})
+
+		table.insert(displayText, 1, localMoneyDisplay)
+		table.insert(displayText, 2,' (≃ ')
+		table.insert(displayText, ')')
+	end
+
+	table.insert(displayText, ' are spread among the teams as seen below:')
+	table.insert(displayText, '<br>')
+
+	return table.concat(displayText)
 end
 
 function PrizePool:_buildHeader()
