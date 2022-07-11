@@ -15,6 +15,7 @@ local Currency = require('Module:LocalCurrency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
+local Math = require('Module:Math')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
 ---Note: This can be overwritten
@@ -322,6 +323,8 @@ function PrizePool:init(args)
 	self.prizes = {}
 	self.placements = {}
 
+	self.usedAutoConvertedCurrency = false
+
 	return self
 end
 
@@ -380,6 +383,10 @@ function PrizePool:build()
 	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 	for _, node in ipairs(WidgetFactory.work(table, self._widgetInjector)) do
 		wrapper:node(node)
+	end
+
+	if self.options.exchangeInfo then
+		wrapper:wikitext(self:_currencyExchangeInfo())
 	end
 
 	if self.options.storeLpdb or self.options.storeSmw then
@@ -519,6 +526,48 @@ function PrizePool:_buildRows()
 	end
 
 	return rows
+end
+
+function PrizePool:_currencyExchangeInfo()
+	if self.usedAutoConvertedCurrency then
+		local currencyText = Currency.display(BASE_CURRENCY)
+		local exchangeProvider = Abbreviation.make('exchange rate', Variables.varDefault('tournament_currency_text'))
+
+		if not exchangeProvider then
+			return
+		end
+
+		-- The exchange date display should not be in the future, as the extension uses current date for those.
+		local exchangeDate = self.date
+		if exchangeDate > TODAY then
+			exchangeDate = TODAY
+		end
+
+		local exchangeDateText = LANG:formatDate('M j, Y', exchangeDate)
+
+		local wrapper = mw.html.create('small')
+
+		wrapper:wikitext('<br>\'\'(')
+		wrapper:wikitext('Converted ' .. currencyText .. ' prizes are ')
+		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
+		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
+			return PrizePool.prizeTypes[prize.type].convertToUsd
+		end), PrizePool._CurrencyConvertionText), ', '))
+		wrapper:wikitext('\'\')')
+
+		return tostring(wrapper)
+	end
+end
+
+function PrizePool._CurrencyConvertionText(prize)
+	local exchangeRate = Math.round{
+		PrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToUsd(
+			prize.data, 1, PrizePool._getTournamentDate()
+		)
+		,5
+	}
+
+	return '1 ' .. Currency.display(prize.data.currency) .. ' ≃ ' .. exchangeRate .. ' ' .. Currency.display(BASE_CURRENCY)
 end
 
 function PrizePool:_toggleExpand(placeStart, placeEnd)
@@ -731,6 +780,9 @@ function PrizePool._getTournamentDate()
 end
 
 --- @class Placement
+--- @param args table Input information
+--- @param parent PrizePool The PrizePool this Placement is part of
+--- @param lastPlacement integer The previous placement's end
 function Placement:init(args, parent, lastPlacement)
 	self.args = self:_parseArgs(args)
 	self.date = self.args.date or PrizePool._getTournamentDate()
@@ -933,6 +985,7 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 			end
 
 			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
+			self.parent.usedAutoConvertedCurrency = true
 		end)
 
 		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = usdReward
