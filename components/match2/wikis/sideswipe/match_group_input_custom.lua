@@ -133,33 +133,16 @@ function matchFunctions.getTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
-	match.stream = match.stream or {}
-	match.stream = {
-		stream = Logic.emptyOr(match.stream.stream, Variables.varDefault('stream')),
-		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
-		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
-		afreeca = Logic.emptyOr(match.stream.afreeca or match.afreeca, Variables.varDefault('afreeca')),
-		afreecatv = Logic.emptyOr(match.stream.afreecatv or match.afreecatv, Variables.varDefault('afreecatv')),
-		dailymotion = Logic.emptyOr(match.stream.dailymotion or match.dailymotion, Variables.varDefault('dailymotion')),
-		douyu = Logic.emptyOr(match.stream.douyu or match.douyu, Variables.varDefault('douyu')),
-		smashcast = Logic.emptyOr(match.stream.smashcast or match.smashcast, Variables.varDefault('smashcast')),
-		youtube = Logic.emptyOr(match.stream.youtube or match.youtube, Variables.varDefault('youtube'))
-	}
+	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	return match
 end
 
 function matchFunctions.getExtraData(match)
-	local opponent1 = match.opponent1 or {}
-	local opponent2 = match.opponent2 or {}
 	match.extradata = {
 		matchsection = Variables.varDefault('matchsection'),
-		team1icon = getIconName(opponent1.template or ''),
-		team2icon = getIconName(opponent2.template or ''),
-		lastgame = Variables.varDefault('last_game'),
 		comment = match.comment,
-		isconverted = 0,
 		isfeatured = matchFunctions.isFeatured(match)
 	}
 	return match
@@ -322,7 +305,6 @@ function mapFunctions.getExtraData(map)
 		otlength = map.otlength,
 		comment = map.comment,
 		header = map.header,
-		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
 	}
