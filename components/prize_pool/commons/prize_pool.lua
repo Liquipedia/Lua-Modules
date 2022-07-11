@@ -308,6 +308,36 @@ PrizePool.additionalData = {
 	},
 }
 
+Placement.specialStatuses = {
+	DQ = {
+		active = function (args)
+			return Logic.readBool(args.dq)
+		end,
+		display = function ()
+			return Abbreviation.make('DQ', 'Disqualified')
+		end,
+		lpdb = 'dq',
+	},
+	DNF = {
+		active = function (args)
+			return Logic.readBool(args.dnf)
+		end,
+		display = function ()
+			return Abbreviation.make('DNF', 'Did not finish')
+		end,
+		lpdb = 'dnf',
+	},
+	DNP = {
+		active = function (args)
+			return Logic.readBool(args.dnp)
+		end,
+		display = function ()
+			return Abbreviation.make('DNP', 'Did not participate')
+		end,
+		lpdb = 'dnp',
+	},
+}
+
 function PrizePool:init(args)
 	self.args = self:_parseArgs(args)
 
@@ -457,7 +487,7 @@ function PrizePool:_buildRows()
 
 			if opponentIndex == 1 then
 				local placeCell = TableCell{
-					content = {{placement:getMedal() or '' , NON_BREAKING_SPACE, placement:displayPlace()}},
+					content = {{placement:getMedal() or '' , NON_BREAKING_SPACE, placement.placeDisplay}},
 					css = {['font-weight'] = 'bolder'},
 				}
 				placeCell.rowSpan = #placement.opponents
@@ -778,10 +808,13 @@ function Placement:init(args, parent, lastPlacement)
 	end
 
 	assert(#self.opponents > self.placeEnd - self.placeStart, 'Placement: Too many opponents')
+
+	self.placeDisplay = self:_displayPlace()
 end
 
 function Placement:_parseArgs(args)
 	local parsedArgs = Table.deepCopy(args)
+
 	-- Explicit place range has been given
 	if args.place then
 		local places = Table.mapValues(mw.text.split(args.place, '-'), tonumber)
@@ -789,6 +822,7 @@ function Placement:_parseArgs(args)
 		parsedArgs.placeEnd = places[2] or places[1]
 		assert(parsedArgs.placeStart and parsedArgs.placeEnd, 'Placement: Invalid |place= provided.')
 	end
+
 	return parsedArgs
 end
 
@@ -913,7 +947,7 @@ function Placement:_getLpdbData()
 			participanttemplate = opponent.opponentData.template,
 			opponenttype = opponent.opponentData.type,
 			players = players,
-			placement = self.placeStart .. (self.placeStart ~= self.placeEnd and ('-' .. self.placeEnd) or ''),
+			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
 			individualprizemoney = (playerCount > 0) and (prizeMoney / playerCount) or 0,
 			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
@@ -966,15 +1000,40 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 	end)
 end
 
-function Placement:displayPlace()
+function Placement:_lpdbValue()
+	for _, status in pairs(Placement.specialStatuses) do
+		if status.active(self.args) then
+			return status.lpdb
+		end
+	end
+
+	if self.placeEnd > self.placeStart then
+		return self.placeStart .. '-' .. self.placeEnd
+	end
+
+	return self.placeStart
+end
+
+function Placement:_displayPlace()
+	for _, status in pairs(Placement.specialStatuses) do
+		if status.active(self.args) then
+			return status.display()
+		end
+	end
+
 	local start = Ordinal._ordinal(self.placeStart)
 	if self.placeEnd > self.placeStart then
 		return start .. DASH .. Ordinal._ordinal(self.placeEnd)
 	end
+
 	return start
 end
 
 function Placement:getBackground()
+	if Placement.specialStatuses.DQ.active(self.args) then
+		return 'background-color-disqualified'
+	end
+
 	return PlacementInfo.getBgClass(self.placeStart)
 end
 
