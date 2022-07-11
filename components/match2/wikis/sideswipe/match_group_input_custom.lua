@@ -117,20 +117,15 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '2v2'))
-	match.type = Logic.emptyOr(match.type, Variables.varDefine('tournament_type', matchArgs.type))
+	match.type = Logic.emptyOr(match.type, Variables.varDefine('tournament_type'))
 	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
 	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_tickername'))
-	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefine('tournament_shortname', matchArgs.shortname or 
-			matchArgs.abbreviation))
-	match.series = Logic.emptyOr(match.series, Variables.varDefine('tournament_series', 
-			mw.ext.TeamLiquidIntegration.resolve_redirect(matchArgs.series or '')))
-	match.icon = Logic.emptyOr(match.icon, Variables.varDefine('tournament_icon', matchArgs.icon))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefine('tournament_icondark', matchArgs.icondark or 
-			matchArgs.icondarkmode))
-	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefine('tournament_liquipediatier', 
-			matchArgs.liquipediatier))
-	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefine('tournament_liquipediatiertype', 
-			matchArgs.liquipediatiertype))
+	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefine('tournament_shortname'))
+	match.series = Logic.emptyOr(match.series, Variables.varDefine('tournament_series'))
+	match.icon = Logic.emptyOr(match.icon, Variables.varDefine('tournament_icon'))
+	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefine('tournament_icondark'))
+	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefine('tournament_liquipediatier'))
+	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefine('tournament_liquipediatiertype'))
 	return match
 end
 
