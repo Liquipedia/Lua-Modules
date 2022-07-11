@@ -755,10 +755,9 @@ function PrizePool:_storeData()
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
-		local lowerCaseParticipant = mw.ustring.lower(lpdbEntry.participant)
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. lowerCaseParticipant, lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex), lpdbEntry)
 		end
 
 		if self.options.storeSmw then
@@ -767,6 +766,17 @@ function PrizePool:_storeData()
 	end
 
 	return self
+end
+
+-- get the lpdbObjectName depending on opponenttype
+function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex)
+	local objectName = 'ranking_' .. prizePoolIndex .. '_'
+	if lpdbEntry.opponenttype == Opponent.team then
+		return objectName .. mw.ustring.lower(lpdbEntry.participant)
+	end
+	-- for non team opponents the pagename can be case sensitive
+	-- so objectname needs to be case sensitive to avoid edge cases
+	return objectName .. lpdbEntry.participant
 end
 
 --- Returns true if this prizePool has a US Dollar reward.
