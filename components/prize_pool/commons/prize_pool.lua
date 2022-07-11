@@ -726,9 +726,17 @@ function PrizePool:_storeData()
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 		local lowerCaseParticipant = mw.ustring.lower(lpdbEntry.participant)
+		local objectName = 'ranking_' .. prizePoolIndex .. '_'
+		if lpdbEntry.opponenttype == Opponent.team then
+			objectName = objectName .. mw.ustring.lower(lpdbEntry.participant)
+		else
+			-- for non team opponents the pagename can be case sensitive
+			-- so objectname needs to be case sensitive to avoid edge cases
+			objectName = objectName .. lpdbEntry.participant
+		end
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement('ranking_' .. prizePoolIndex .. '_' .. lowerCaseParticipant, lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(objectName, lpdbEntry)
 		end
 
 		if self.options.storeSmw then
