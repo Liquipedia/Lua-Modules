@@ -725,7 +725,6 @@ function PrizePool:_storeData()
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
-		local lowerCaseParticipant = mw.ustring.lower(lpdbEntry.participant)
 		local objectName = 'ranking_' .. prizePoolIndex .. '_'
 		if lpdbEntry.opponenttype == Opponent.team then
 			objectName = objectName .. mw.ustring.lower(lpdbEntry.participant)
