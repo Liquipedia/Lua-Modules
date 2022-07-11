@@ -396,8 +396,8 @@ function mapFunctions.getTournamentVars(map)
 	map.shortname = Logic.emptyOr(map.shortname, Variables.varDefault('tournament_shortname'))
 	map.series = Logic.emptyOr(map.series, Variables.varDefault('tournament_series'))
 	map.icon = Logic.emptyOr(map.icon, Variables.varDefault('tournament_icon'))
-	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefine('tournament_icondark'))
-	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefine('tournament_liquipediatier'))
+	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault('tournament_icondark'))
+	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
 	return map
 end
 
