@@ -106,9 +106,10 @@ function StandingsStorage.entry(entry, standingsIndex)
 end
 
 ---@param data table
+---@return table
 function StandingsStorage.toScoreBoardEntry(data)
 	if Table.isEmpty(data) then
-		return
+		return SCOREBOARD_FALLBACK
 	end
 
 	local filterScoreBoard = function (_, key)
@@ -126,7 +127,7 @@ function StandingsStorage.toScoreBoardEntry(data)
 	return scoreBoard
 end
 
---- @deprecated
+---@deprecated
 ---@param index number
 ---@param data table
 function StandingsStorage.legacy(index, data)
