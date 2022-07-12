@@ -37,7 +37,7 @@ function LegacyPrizePool.run()
 		newArgs.localcurrency = header.localcurrency
 		inputToId.localprize = 'localprize'
 	else
-		LegacyPrizePool._assignType(newArgs, header, 'localcurrency')
+		LegacyPrizePool._assignType(newArgs, header, 'localcurrency', 'localprize')
 	end
 
 	LegacyPrizePool._assignType(newArgs, header, 'points')
@@ -50,7 +50,6 @@ function LegacyPrizePool.run()
 		newArgs.type = {type = 'team'}
 	end
 
-	mw.logObject(inputToId)
 	for slotIndex, slot in ipairs(slots) do
 		newArgs[slotIndex] = LegacyPrizePool._mapSlot(slot)
 	end
@@ -78,9 +77,6 @@ function LegacyPrizePool._mapSlot(slot)
 	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
 
 	Table.iter.forEachPair(inputToId, function(parameter, newParameter)
-		if parameter == 'localcurrency' then
-			parameter = 'localprize'
-		end
 		local input = slot[parameter]
 		if newParameter == 'seed' then
 			local links = LegacyPrizePool._parseWikiLink(input)
@@ -109,23 +105,24 @@ function LegacyPrizePool._mapSlot(slot)
 		newOpponent.lastscore = slot['lastscore' .. opponentIndex]
 		newOpponent.lastvsscore = slot['lastvsscore' .. opponentIndex]
 
-		newData[opponentIndex] = Json.stringify(newOpponent)
+		newData[opponentIndex] = newOpponent
 	end
 
 	return newData
 end
 
-function LegacyPrizePool._assignType(assignTo, args, parameter)
+function LegacyPrizePool._assignType(assignTo, args, parameter, slotParam)
+	slotParam = slotParam or parameter
 	local input = args[parameter]
 	if LegacyPrizePool._isValidPoints(input) then
 		assignTo['points' .. nextPoints] = input
-		inputToId[parameter] = 'points' .. nextPoints
+		inputToId[slotParam] = 'points' .. nextPoints
 		nextPoints = nextPoints + 1
 	elseif input == 'seed' then
-		inputToId[parameter] = 'seed'
+		inputToId[slotParam] = 'seed'
 	elseif String.isNotEmpty(input) then
 		assignTo['freetext' .. nextFreetext] = mw.getContentLanguage():ucfirst(input)
-		inputToId[parameter] = 'freetext' .. nextFreetext
+		inputToId[slotParam] = 'freetext' .. nextFreetext
 		nextFreetext = nextFreetext + 1
 	end
 end
