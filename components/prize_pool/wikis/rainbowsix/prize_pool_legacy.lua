@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Currency = require('Module:LocalCurrency')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Points = mw.loadData('Module:Points/data')
 local String = require('Module:StringUtils')
@@ -56,7 +55,6 @@ function LegacyPrizePool.run()
 	for link, idx in pairs(qualCache) do
 		newArgs['qualifies' .. idx] = link
 	end
-	mw.logObject(newArgs)
 
 	return CustomPrizePool.run(newArgs)
 end
