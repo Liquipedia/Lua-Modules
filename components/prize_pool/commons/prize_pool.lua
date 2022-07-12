@@ -348,6 +348,9 @@ function PrizePool:init(args)
 	if self.args.opponentLibrary then
 		Opponent = require('Module:'.. self.args.opponentLibrary)
 	end
+	if self.args.opponentDisplayLibrary then
+		OpponentDisplay = require('Module:'.. self.args.opponentDisplayLibrary)
+	end
 
 	self.options = {}
 	self.prizes = {}
