@@ -7,18 +7,19 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Flags = require('Module:Flags')
-local Json = require('Module:Json')
-local Opponent = require('Module:Opponent')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Array = require('Module:Array') ---@module "standard.array"
+local Flags = require('Module:Flags') ---@module "standard.flags"
+local Json = require('Module:Json') ---@module "standard.json"
+local Opponent = require('Module:Opponent') ---@module "opponent"
+local Table = require('Module:Table') ---@module "standard.table"
+local Variables = require('Module:Variables') ---@module "variables"
 
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local SCOREBOARD_LEGACY_FALLBACK = {0, 0, 0}
 
+---@param data table
 function StandingsStorage.run(data)
 	if Table.isEmpty(data) then
 		return
@@ -38,10 +39,11 @@ function StandingsStorage.run(data)
 
 	Array.forEach(data.entries, function (entry)
 		StandingsStorage.entry(entry, standingsIndex)
-		StandingsStorage.legacy(entry.slotIndex, entry) -- Deprecated
+		StandingsStorage.legacy(entry.slotIndex, entry)
 	end)
 end
 
+---@param data table
 function StandingsStorage.table(data)
 	local title = data.title or ''
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
@@ -65,6 +67,8 @@ function StandingsStorage.table(data)
 	)
 end
 
+---@param entry table
+---@param standingsIndex number
 function StandingsStorage.entry(entry, standingsIndex)
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
@@ -101,6 +105,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 	)
 end
 
+---@param data table
 function StandingsStorage.toScoreBoardEntry(data)
 	if Table.isEmpty(data) then
 		return
@@ -122,6 +127,8 @@ function StandingsStorage.toScoreBoardEntry(data)
 end
 
 --- @deprecated
+---@param index number
+---@param data table
 function StandingsStorage.legacy(index, data)
 	local title = data.title or ''
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
@@ -159,6 +166,8 @@ function StandingsStorage.legacy(index, data)
 end
 
 ---@deprecated
+---@param entry table
+---@return table
 function StandingsStorage.verifyScoreBoardEntry(entry)
 	-- A valid scoreboard entry must have 3 values in an array
 	if #entry ~= 3 then
@@ -167,6 +176,7 @@ function StandingsStorage.verifyScoreBoardEntry(entry)
 	return entry
 end
 
+---@param frame table
 function StandingsStorage.fromTemplateHeader(frame)
 	local data = Arguments.getArgs(frame)
 
@@ -174,9 +184,10 @@ function StandingsStorage.fromTemplateHeader(frame)
 		return
 	end
 
-	return StandingsStorage.table(data)
+	StandingsStorage.table(data)
 end
 
+---@param frame table
 function StandingsStorage.fromTemplateEntry(frame)
 	local data = Arguments.getArgs(frame)
 
@@ -241,9 +252,11 @@ function StandingsStorage.fromTemplateEntry(frame)
 	StandingsStorage.legacy(data.slotIndex, data)
 end
 
--- Legacy input
+-- Legacy input method
+---@deprecated
+---@param frame table
 function StandingsStorage.fromTemplate(frame)
-	return StandingsStorage.fromTemplateEntry(frame)
+	StandingsStorage.fromTemplateEntry(frame)
 end
 
 return StandingsStorage
