@@ -893,17 +893,31 @@ end
 function Placement:_readPrizeRewards(args)
 	local rewards = {}
 
-	for prizeType, prizeData in pairs(self.parent.prizeTypes) do
+	-- Loop through all prizes that have been defined in the header
+	Array.forEach(self.parent.prizes, function (prize)
+		local prizeData = self.parent.prizeTypes[prize.type]
 		local fieldName = prizeData.row
-		if fieldName then
-			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
-			for _, rewardValue, index in Table.iter.pairsByPrefix(args, fieldName) do
-				if prizeType == PRIZE_TYPE_USD then
-					self.hasUSD = true
-				end
-				rewards[prizeType .. index] = prizeData.rowParse(self, rewardValue, args, index)
-			end
+		if not fieldName then
+			return
 		end
+
+		local prizeIndex = prize.index
+		local reward = args[fieldName .. prizeIndex]
+		if prizeIndex == 1 then
+			reward = reward or args[fieldName]
+		end
+		if not reward then
+			return
+		end
+
+		rewards[prize.id] = prizeData.rowParse(self, reward, args, prizeIndex)
+	end)
+
+	-- Special case for USD, as it's not defined in the header.
+	local usdType = self.parent.prizeTypes[PRIZE_TYPE_USD]
+	if usdType.row and args[usdType.row] then
+		self.hasUSD = true
+		rewards[PRIZE_TYPE_USD .. 1] = usdType.rowParse(self, args[usdType.row], args, 1)
 	end
 
 	return rewards
