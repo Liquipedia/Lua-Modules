@@ -7,7 +7,7 @@
 --
 
 local Array = require('Module:Array')
-local Currency = require('Module:LocalCurrency')
+local Currency = require('Module:Currency')
 local Lua = require('Module:Lua')
 local Points = mw.loadData('Module:Points/data')
 local String = require('Module:StringUtils')
