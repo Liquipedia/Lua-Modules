@@ -388,7 +388,7 @@ function mapFunctions.getParticipantsData(map)
 
 	-- fill in goals from goal progression
 	local scorers = {}
-	for g = 1, 1000 do
+	for goalIndex = 1, 1000 do
 		local scorer = map['goal' .. g .. 'player']
 		if Logic.isEmpty(scorer) then
 			break
@@ -405,7 +405,7 @@ function mapFunctions.getParticipantsData(map)
 
 	-- fill in goals and cars
 	-- goals are overwritten if set here
-	for o = 1, _MAX_NUM_OPPONENTS do
+	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
 		for player = 1, _MAX_NUM_PLAYERS do
 			local participant = participants[o .. '_' .. player] or {}
 			local opstring = 'opponent' .. o .. '_p' .. player
