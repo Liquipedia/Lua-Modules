@@ -772,7 +772,8 @@ end
 function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex)
 	local objectName = 'ranking_'
 	if lpdbEntry.opponenttype == Opponent.team then
-		return objectName .. mw.ustring.lower(lpdbEntry.participant)
+		local smwPrefix = Variables.varDefault('smw_prefix', '')
+		return objectName .. smwPrefix .. mw.ustring.lower(lpdbEntry.participant)
 	end
 	-- for non team opponents the pagename can be case sensitive
 	-- so objectname needs to be case sensitive to avoid edge cases
