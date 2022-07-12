@@ -38,7 +38,7 @@ function StandingsStorage.run(data)
 
 	Array.forEach(data.entries, function (entry)
 		StandingsStorage.entry(entry, standingsIndex)
-		StandingsStorage.runLegacy(entry.slotIndex, entry) -- Deprecated
+		StandingsStorage.legacy(entry.slotIndex, entry) -- Deprecated
 	end)
 end
 
@@ -122,7 +122,7 @@ function StandingsStorage.toScoreBoardEntry(data)
 end
 
 --- @deprecated
-function StandingsStorage.runLegacy(index, data)
+function StandingsStorage.legacy(index, data)
 	local title = data.title or ''
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
 	mw.ext.LiquipediaDB.lpdb_standing(
@@ -229,13 +229,16 @@ function StandingsStorage.fromTemplateEntry(frame)
 
 	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(), date)
 
+	-- Template don't have SlotIndex, use placement as workaround
+	data.slotIndex = data.placement
+
 	data.match = {w = data.win_m, d = data.tie_m, l = data.lose_m}
 	data.game = {w = data.win_g, d = data.tie_g, l = data.lose_g}
 	StandingsStorage.entry(data, data.standingsindex)
 
 	data.match = {data.win_m, data.tie_m, data.lose_m}
 	data.game = {data.win_g, data.tie_g, data.lose_g}
-	StandingsStorage.runLegacy(data.standingsindex, data)
+	StandingsStorage.legacy(data.slotIndex, data)
 end
 
 -- Legacy input
