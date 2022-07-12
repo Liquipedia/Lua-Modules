@@ -112,12 +112,12 @@ function StandingsStorage.toScoreBoardEntry(data)
 		return SCOREBOARD_FALLBACK
 	end
 
-	local filterScoreBoard = function (_, key)
-		return ALLOWED_SCORE_BOARD_KEYS[key] and true or false
+	local filterScoreBoard = function (key, value)
+		return key, Table.includes(ALLOWED_SCORE_BOARD_KEYS, key) and value or nil
 	end
 
-	-- Need to use Array.filter here. Because strangely enough Table.filter has no access to keys...
-	local scoreBoard = Table.mapValues(Array.filter(data, filterScoreBoard), tonumber)
+	-- Using Table.map to filter. Because strangely enough Table.filter has no access to keys...
+	local scoreBoard = Table.mapValues(Table.map(data, filterScoreBoard), tonumber)
 
 	if not scoreBoard.w or not scoreBoard.l then
 		mw.logObject(scoreBoard, 'invalid scoreBoardEntry')
