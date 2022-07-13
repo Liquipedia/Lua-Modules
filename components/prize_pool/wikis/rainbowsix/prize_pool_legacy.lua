@@ -90,23 +90,33 @@ function LegacyPrizePool._mapSlot(slot)
 		end
 	end)
 
-	for opponentIndex = 1, 128 do
+	Table.mergeInto(newData, LegacyPrizePool._mapOpponents(slot))
+
+	return newData
+end
+
+function LegacyPrizePool._mapOpponents(slot)
+	local mapOpponent = function (opponentIndex)
 		if not slot[opponentIndex] then
-			break
+			return
 		end
 
 		local newOpponent = {}
 		newOpponent[1] = slot[opponentIndex]
 		newOpponent.date = slot['date' .. opponentIndex]
+		newOpponent.link = slot['link' .. opponentIndex]
 		newOpponent.wdl = slot['wdl' .. opponentIndex]
+		newOpponent.flag = slot['flag' .. opponentIndex]
+		newOpponent.team = slot['team' .. opponentIndex]
 		newOpponent.lastvs = slot['lastvs' .. opponentIndex]
+		newOpponent.lastvsflag = slot['lastvsflag' .. opponentIndex]
 		newOpponent.lastscore = slot['lastscore' .. opponentIndex]
 		newOpponent.lastvsscore = slot['lastvsscore' .. opponentIndex]
 
-		newData[opponentIndex] = newOpponent
+		return newOpponent
 	end
 
-	return newData
+	return Array.mapIndexes(mapOpponent)
 end
 
 function LegacyPrizePool._assignType(assignTo, args, parameter, slotParam)
