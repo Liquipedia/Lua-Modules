@@ -218,7 +218,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 			team = mw.ext.TeamTemplate.raw(teamPage, date)
 		end
 
-		opponentArgs = {type = 'team'}
+		opponentArgs = {type = Opponent.team}
 
 		if team then
 			opponentArgs.template = team.templatename
