@@ -11,8 +11,9 @@ local Array = require('Module:Array') ---@module "standard.array"
 local Flags = require('Module:Flags') ---@module "standard.flags"
 local Json = require('Module:Json') ---@module "standard.json"
 local Opponent = require('Module:Opponent') ---@module "opponent"
+local String = require('Module:StringUtils') ---@module "standard.string_utils"
 local Table = require('Module:Table') ---@module "standard.table"
-local Variables = require('Module:Variables') ---@module "variables"
+local Variables = require('Module:Variables') ---@module "standardvariables"
 
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
@@ -220,7 +221,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 		opponentArgs = {type = 'team'}
 
 		if team then
-			opponentArgs.team = team.templatename
+			opponentArgs.template = team.templatename
 
 			-- Legacy
 			data.participant = team.page
@@ -236,7 +237,17 @@ function StandingsStorage.fromTemplateEntry(frame)
 		-- TODO: sanity checks and parse flag
 		-- TODO: handle more input cases
 		data.participant, data.participantdisplay = string.match(data.player, '%[%[([^|]-)|([^|]-)%]%]')
-		opponentArgs = {link = data.participant, name = data.participantdisplay}
+		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
+		opponentArgs = {
+			link = data.participant,
+			name = data.participantdisplay,
+			type = Opponent.solo,
+			flag = data.participantflag
+		}
+		local race = string.match(data.player, '&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
+		if String.isNotEmpty(race) then
+			opponentArgs.race = race:sub(1, 1):lower()
+		end
 	end
 
 	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(), date)
