@@ -13,7 +13,7 @@ local Json = require('Module:Json') ---@module "standard.json"
 local Opponent = require('Module:Opponent') ---@module "opponent"
 local String = require('Module:StringUtils') ---@module "standard.string_utils"
 local Table = require('Module:Table') ---@module "standard.table"
-local Variables = require('Module:Variables') ---@module "standardvariables"
+local Variables = require('Module:Variables') ---@module "standard.variables"
 
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
