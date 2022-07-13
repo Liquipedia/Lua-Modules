@@ -17,9 +17,14 @@ local Template = require('Module:Template')
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
 
 local LegacyPrizePool = {}
-local nextPoints, nextQual, nextFreetext = 1, 1, 1
-local inputToId = {}
-local qualCache = {}
+
+local CACHED_DATA = {
+	nextPoints = 1,
+	nextQual = 1,
+	nextFreetext = 1,
+	inputToId = {},
+	qualifiers = {},
+}
 
 -- Template entry point
 function LegacyPrizePool.run()
@@ -33,15 +38,17 @@ function LegacyPrizePool.run()
 	newArgs.cutafter = header.cutafter
 
 	if Currency.raw(header.localcurrency) then
+		-- If the localcurrency is a valid currency, handle it like currency
 		newArgs.localcurrency = header.localcurrency
-		inputToId.localprize = 'localprize'
+		CACHED_DATA.inputToId.localprize = 'localprize'
 	else
-		LegacyPrizePool._assignType(newArgs, header, 'localcurrency', 'localprize')
+		-- Otherwise handle it like it would been a points input using different parameter
+		LegacyPrizePool._assignType(newArgs, header.localcurrency, 'localprize')
 	end
 
-	LegacyPrizePool._assignType(newArgs, header, 'points')
-	LegacyPrizePool._assignType(newArgs, header, 'points2')
-	LegacyPrizePool._assignType(newArgs, header, 'points3')
+	LegacyPrizePool._assignType(newArgs, header.points, 'points')
+	LegacyPrizePool._assignType(newArgs, header.points2, 'points2')
+	LegacyPrizePool._assignType(newArgs, header.points3, 'points3')
 
 	if args.indiv then
 		newArgs.type = {type = 'solo'}
@@ -52,7 +59,7 @@ function LegacyPrizePool.run()
 	for slotIndex, slot in ipairs(slots) do
 		newArgs[slotIndex] = LegacyPrizePool._mapSlot(slot)
 	end
-	for link, idx in pairs(qualCache) do
+	for link, idx in pairs(CACHED_DATA.qualifiers) do
 		newArgs['qualifies' .. idx] = link
 	end
 
@@ -74,17 +81,20 @@ function LegacyPrizePool._mapSlot(slot)
 	newData.date = slot.date
 	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
 
-	Table.iter.forEachPair(inputToId, function(parameter, newParameter)
+	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
 		if newParameter == 'seed' then
 			local links = LegacyPrizePool._parseWikiLink(input)
 			for _, link in ipairs(links) do
-				if not qualCache[link] then
-					qualCache[link] = nextQual
-					nextQual = nextQual + 1
+
+				if not CACHED_DATA.qualifiers[link] then
+					CACHED_DATA.qualifiers[link] = CACHED_DATA.nextQual
+					CACHED_DATA.nextQual = CACHED_DATA.nextQual + 1
 				end
-				newData['qualified' .. qualCache[link]] = true
+
+				newData['qualified' .. CACHED_DATA.qualifiers[link]] = true
 			end
+
 		elseif input and input ~= 0 then
 			newData[newParameter] = input
 		end
@@ -119,19 +129,19 @@ function LegacyPrizePool._mapOpponents(slot)
 	return Array.mapIndexes(mapOpponent)
 end
 
-function LegacyPrizePool._assignType(assignTo, args, parameter, slotParam)
-	slotParam = slotParam or parameter
-	local input = args[parameter]
+function LegacyPrizePool._assignType(assignTo, input, slotParam)
 	if LegacyPrizePool._isValidPoints(input) then
-		assignTo['points' .. nextPoints] = input
-		inputToId[slotParam] = 'points' .. nextPoints
-		nextPoints = nextPoints + 1
+		assignTo['points' .. CACHED_DATA.nextPoints] = input
+		CACHED_DATA.inputToId[slotParam] = 'points' .. CACHED_DATA.nextPoints
+		CACHED_DATA.nextPoints = CACHED_DATA.nextPoints + 1
+
 	elseif input == 'seed' then
-		inputToId[slotParam] = 'seed'
+		CACHED_DATA.inputToId[slotParam] = 'seed'
+
 	elseif String.isNotEmpty(input) then
-		assignTo['freetext' .. nextFreetext] = mw.getContentLanguage():ucfirst(input)
-		inputToId[slotParam] = 'freetext' .. nextFreetext
-		nextFreetext = nextFreetext + 1
+		assignTo['freetext' .. CACHED_DATA.nextFreetext] = mw.getContentLanguage():ucfirst(input)
+		CACHED_DATA.inputToId[slotParam] = 'freetext' .. CACHED_DATA.nextFreetext
+		CACHED_DATA.nextFreetext = CACHED_DATA.nextFreetext + 1
 	end
 end
 
