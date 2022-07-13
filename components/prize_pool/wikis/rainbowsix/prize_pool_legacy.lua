@@ -111,19 +111,18 @@ function LegacyPrizePool._mapOpponents(slot)
 			return
 		end
 
-		local newOpponent = {}
-		newOpponent[1] = slot[opponentIndex]
-		newOpponent.date = slot['date' .. opponentIndex]
-		newOpponent.link = slot['link' .. opponentIndex]
-		newOpponent.wdl = slot['wdl' .. opponentIndex]
-		newOpponent.flag = slot['flag' .. opponentIndex]
-		newOpponent.team = slot['team' .. opponentIndex]
-		newOpponent.lastvs = slot['lastvs' .. opponentIndex]
-		newOpponent.lastvsflag = slot['lastvsflag' .. opponentIndex]
-		newOpponent.lastscore = slot['lastscore' .. opponentIndex]
-		newOpponent.lastvsscore = slot['lastvsscore' .. opponentIndex]
-
-		return newOpponent
+		return {
+			[1] = slot[opponentIndex],
+			date = slot['date' .. opponentIndex],
+			link = slot['link' .. opponentIndex],
+			wdl = slot['wdl' .. opponentIndex],
+			flag = slot['flag' .. opponentIndex],
+			team = slot['team' .. opponentIndex],
+			lastvs = slot['lastvs' .. opponentIndex],
+			lastvsflag = slot['lastvsflag' .. opponentIndex],
+			lastscore = slot['lastscore' .. opponentIndex],
+			lastvsscore = slot['lastvsscore' .. opponentIndex],
+		}
 	end
 
 	return Array.mapIndexes(mapOpponent)
