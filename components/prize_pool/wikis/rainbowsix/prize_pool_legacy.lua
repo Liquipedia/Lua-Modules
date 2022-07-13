@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Currency = require('Module:Currency')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local Points = mw.loadData('Module:Points/data')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -51,9 +52,9 @@ function LegacyPrizePool.run()
 	LegacyPrizePool._assignType(newArgs, header.points3, 'points3')
 
 	if args.indiv then
-		newArgs.type = {type = 'solo'}
+		newArgs.type = {type = Opponent.solo}
 	else
-		newArgs.type = {type = 'team'}
+		newArgs.type = {type = Opponent.team}
 	end
 
 	for slotIndex, slot in ipairs(slots) do
