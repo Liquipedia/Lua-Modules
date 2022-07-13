@@ -234,8 +234,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 			data.participantdisplay = 'TBD'
 		end
 	elseif data.player then
-		-- TODO: sanity checks and parse flag
-		-- TODO: handle more input cases
+		-- TODO: sanity checks
 		data.participant, data.participantdisplay = string.match(data.player, '%[%[([^|]-)|([^|]-)%]%]')
 		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
 		opponentArgs = {
