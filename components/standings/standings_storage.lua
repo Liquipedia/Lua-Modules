@@ -40,7 +40,7 @@ function StandingsStorage.run(data)
 
 	Array.forEach(data.entries, function (entry)
 		StandingsStorage.entry(entry, standingsIndex)
-		StandingsStorage.legacy(entry.slotIndex, entry)
+		StandingsStorage.legacy(entry.slotindex, entry)
 	end)
 end
 
@@ -252,7 +252,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(), date)
 
 	-- Template don't have SlotIndex, use placement as workaround
-	data.slotIndex = data.placement
+	data.slotindex = data.placement
 
 	data.match = {w = data.win_m, d = data.tie_m, l = data.lose_m}
 	data.game = {w = data.win_g, d = data.tie_g, l = data.lose_g}
@@ -260,7 +260,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 
 	data.match = {data.win_m, data.tie_m, data.lose_m}
 	data.game = {data.win_g, data.tie_g, data.lose_g}
-	StandingsStorage.legacy(data.slotIndex, data)
+	StandingsStorage.legacy(data.slotindex, data)
 end
 
 -- Legacy input method
