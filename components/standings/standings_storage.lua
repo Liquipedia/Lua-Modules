@@ -114,7 +114,7 @@ end
 ---@return table
 function StandingsStorage.toScoreBoardEntry(data)
 	if Table.isEmpty(data) then
-		return SCOREBOARD_FALLBACK
+		return Table.cop(SCOREBOARD_FALLBACK)
 	end
 
 	local filterScoreBoard = function (key, value)
@@ -126,7 +126,7 @@ function StandingsStorage.toScoreBoardEntry(data)
 
 	if not scoreBoard.w or not scoreBoard.l then
 		mw.logObject(scoreBoard, 'invalid scoreBoardEntry')
-		return SCOREBOARD_FALLBACK
+		return Table.copy(SCOREBOARD_FALLBACK)
 	end
 
 	return scoreBoard
@@ -177,7 +177,7 @@ end
 function StandingsStorage.verifyScoreBoardEntry(entry)
 	-- A valid scoreboard entry must have 3 values in an array
 	if #entry ~= 3 then
-		return SCOREBOARD_LEGACY_FALLBACK
+		return Table.copy(SCOREBOARD_LEGACY_FALLBACK)
 	end
 	return entry
 end
