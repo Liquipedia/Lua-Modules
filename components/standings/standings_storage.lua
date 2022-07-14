@@ -78,6 +78,10 @@ function StandingsStorage.entry(entry, standingsIndex)
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
 
+	if not standingsIndex or not roundIndex or not slotIndex then
+		return
+	end
+
 	local extradata = {
 		enddate = entry.enddate,
 		roundfinished = entry.finished,
@@ -105,7 +109,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 	}
 
 	mw.ext.LiquipediaDB.lpdb_standingsentry(
-		'standing_' .. standingsIndex .. '_' .. entry.roundindex .. '_' .. slotIndex,
+		'standing_' .. standingsIndex .. '_' .. roundIndex .. '_' .. slotIndex,
 		Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))
 	)
 end
