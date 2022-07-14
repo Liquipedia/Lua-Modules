@@ -20,6 +20,7 @@ local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabl
 local LegacyPrizePool = {}
 
 local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp'}
+local LETTER_PLACE_TO_NUMBER = {w = 1, d = 1, l = 2}
 
 local CACHED_DATA = {
 	next = {points = 1, qual = 1, freetext = 1},
@@ -80,7 +81,9 @@ function LegacyPrizePool.mapSlot(slot)
 	end
 
 	local newData = {}
-	if SPECIAL_PLACES[slot.place:lower()] then
+	if LETTER_PLACE_TO_NUMBER[slot.place:lower()] then
+		newData.place = LETTER_PLACE_TO_NUMBER[slot.place:lower()]
+	elseif SPECIAL_PLACES[slot.place:lower()] then
 		newData[SPECIAL_PLACES[slot.place:lower()]] = true
 	else
 		newData.place = slot.place
