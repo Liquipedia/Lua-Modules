@@ -21,7 +21,11 @@ local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local SCOREBOARD_LEGACY_FALLBACK = {0, 0, 0}
 
 ---@param data table
-function StandingsStorage.run(data)
+function StandingsStorage.run(data, legacyData)
+	if type(data) ~= 'table' then
+		return StandingsStorage.legacy(data, legacyData)
+	end
+
 	if Table.isEmpty(data) then
 		return
 	end
