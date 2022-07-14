@@ -65,7 +65,7 @@ function LegacyPrizePool.run(dependency)
 	end
 
 	for slotIndex, slot in ipairs(slots) do
-		newArgs[slotIndex] = LegacyPrizePool._mapSlot(slot)
+		newArgs[slotIndex] = LegacyPrizePool.mapSlot(slot)
 	end
 	for link, idx in pairs(CACHED_DATA.qualifiers) do
 		newArgs['qualifies' .. idx] = link
@@ -74,7 +74,7 @@ function LegacyPrizePool.run(dependency)
 	return CustomPrizePool.run(newArgs)
 end
 
-function LegacyPrizePool._mapSlot(slot)
+function LegacyPrizePool.mapSlot(slot)
 	if not slot.place then
 		return {}
 	end
@@ -112,12 +112,12 @@ function LegacyPrizePool._mapSlot(slot)
 		newData = CUSTOM_HANDLER.customSlot(newData, CACHED_DATA, slot)
 	end
 
-	Table.mergeInto(newData, LegacyPrizePool._mapOpponents(slot))
+	Table.mergeInto(newData, LegacyPrizePool.mapOpponents(slot))
 
 	return newData
 end
 
-function LegacyPrizePool._mapOpponents(slot)
+function LegacyPrizePool.mapOpponents(slot)
 	local mapOpponent = function (opponentIndex)
 		if not slot[opponentIndex] then
 			return
