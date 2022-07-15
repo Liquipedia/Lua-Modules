@@ -11,6 +11,7 @@ local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
+local Locale = require('Module:Locale')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
 local String = require('Module:StringUtils')
@@ -230,6 +231,8 @@ function Team:_setLpdbData(args, links)
 		name = name,
 		location = self:getStandardLocationValue(args.location),
 		location2 = self:getStandardLocationValue(args.location2),
+		region = args.region,
+		locations = Locale.formatLocations(args),
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
 		earnings = earnings,
@@ -237,7 +240,6 @@ function Team:_setLpdbData(args, links)
 		disbanddate = args.disbanded,
 		coach = args.coaches,
 		manager = args.manager,
-		region = args.region,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),

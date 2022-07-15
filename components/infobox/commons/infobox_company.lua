@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local InfoboxBasic = require('Module:Infobox/Basic')
 local Links = require('Module:Links')
+local Locale = require('Module:Locale')
 local Flags = require('Module:Flags')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
@@ -92,6 +93,7 @@ function Company:createInfobox()
 		image = args.image,
 		imagedark = args.imagedark or args.imagedarkmode,
 		location = args.location,
+		locations = Locale.formatLocations(args),
 		headquarterslocation = args.headquarters,
 		parentcompany = args.parent,
 		foundeddate = ReferenceCleaner.clean(args.foundeddate),

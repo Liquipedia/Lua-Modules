@@ -13,6 +13,7 @@ local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Links = require('Module:Links')
+local Locale = require('Module:Locale')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
 local Variables = require('Module:Variables')
@@ -380,6 +381,7 @@ function League:_setLpdbData(args, links)
 		location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
 		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 		venue = args.venue,
+		locations = Locale.formatLocations(args),
 		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
