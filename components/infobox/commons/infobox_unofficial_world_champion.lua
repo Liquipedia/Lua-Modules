@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')

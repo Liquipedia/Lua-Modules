@@ -13,7 +13,7 @@ local Localisation = require('Module:Localisation')
 local Flags = require('Module:Flags')
 local Links = require('Module:Links')
 local InfoboxBasic = require('Module:Infobox/Basic')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell

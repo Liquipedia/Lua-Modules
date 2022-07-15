@@ -12,7 +12,7 @@ local Json = require('Module:Json')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 
 local CustomSquad = {}
 
