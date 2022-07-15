@@ -227,6 +227,13 @@ function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 	local earnings = _totalEarnings
 
+	local team = self.pagename
+	local teamTemplate
+	if team and mw.ext.TeamTemplate.teamexists(team) then
+		local teamRaw = mw.ext.TeamTemplate.raw(team)
+		teamTemplate = teamRaw.historicaltemplate or teamRaw.templatename
+	end
+
 	local lpdbData = {
 		name = name,
 		location = self:getStandardLocationValue(args.location),
@@ -240,6 +247,7 @@ function Team:_setLpdbData(args, links)
 		disbanddate = args.disbanded,
 		coach = args.coaches,
 		manager = args.manager,
+		template = teamTemplate,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
