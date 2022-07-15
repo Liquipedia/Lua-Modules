@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell

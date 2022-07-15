@@ -10,7 +10,7 @@ local Team = require('Module:Infobox/Team')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Region = require('Module:Region')
 
 local CustomTeam = Class.new()

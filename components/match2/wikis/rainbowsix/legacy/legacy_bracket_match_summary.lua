@@ -13,7 +13,7 @@
 ]]
 
 local Json = require('Module:Json')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 
 local LegacyBracketMatchSummary = {}

@@ -8,7 +8,7 @@
 
 local Class = require('Module:Class')
 local Infobox = require('Module:Infobox')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
 local getArgs = require('Module:Arguments').getArgs
 

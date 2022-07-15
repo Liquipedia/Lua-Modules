@@ -12,7 +12,7 @@ local Links = require('Module:Links')
 local Flags = require('Module:Flags')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
