@@ -17,7 +17,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnable
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft', {requireDevIfEnabled = true})
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getBigIcon = function() end,
+	getBigIcon = function(_) end,
 }
 
 local html = mw.html

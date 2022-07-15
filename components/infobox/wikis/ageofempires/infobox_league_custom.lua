@@ -7,6 +7,7 @@
 --
 
 local League = require('Module:Infobox/League')
+local Array = require('Module:Array')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
@@ -327,8 +328,8 @@ function CustomLeague:_getGameModes(args, makeLink)
 	end
 
 	local gameModes = mw.text.split(args.gamemode, ',', true)
-	table.foreach(gameModes,
-		function(index, mode)
+	Array.forEach(gameModes,
+		function(mode, index)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
 
 			table.insert(categories, not String.isEmpty(gameModes[index])
