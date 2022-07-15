@@ -7,7 +7,7 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local PageLink = require('Module:Page')
 local MapModes = require('Module:MapModes')

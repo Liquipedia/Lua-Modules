@@ -8,7 +8,7 @@
 
 local Class = require('Module:Class')
 local InfoboxBasic = require('Module:Infobox/Basic')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
 
@@ -103,7 +103,7 @@ function Skill:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkey.hotkey2(args.hotkey, args.hotkey2, 'slash')
 		else
 			display = Hotkey.hotkey(args.hotkey)
 		end

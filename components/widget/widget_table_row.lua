@@ -34,7 +34,7 @@ function TableRow:getCellCount()
 end
 
 function TableRow:make()
-	local row = mw.html.create('div'):css('display', 'contents')
+	local row = mw.html.create('div'):addClass('csstable-widget-row')
 
 	for _, class in ipairs(self.classes) do
 		row:addClass(class)

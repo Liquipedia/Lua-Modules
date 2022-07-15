@@ -9,8 +9,9 @@
 local Region = {}
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local regionData = mw.loadData('Module:Region/Data')
 local countryToRegionData = Lua.loadDataIfExists('Module:Region/CountryData', {})
 
@@ -19,8 +20,8 @@ local noEntryFoundCategory = '[[Category:Pages using unsupported region values]]
 function Region.run(args)
 	args = args or {}
 	local region = args.region
-	local shouldOnlyReturnRegionName = args.onlyRegion == 'true'
-	local shouldOnlyReturnDisplay = args.onlyDisplay == 'true'
+	local shouldOnlyReturnRegionName = Logic.readBool(args.onlyRegion)
+	local shouldOnlyReturnDisplay = Logic.readBool(args.onlyDisplay)
 
 	--determine region from country if region is empty
 	if String.isEmpty(region) then

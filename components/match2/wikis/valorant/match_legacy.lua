@@ -185,15 +185,17 @@ function p.convertParameters(match2)
 	match.extradata.opponent2rounds = opponent2score
 
 	local bracketData = json.parseIfString(match2.match2bracketdata)
-	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
-		local headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
-		if not headerName or headerName == "" then
-			headerName = Variables.varDefault("match_legacy_header_name")
-		else
-			Variables.varDefine("match_legacy_header_name", headerName)
+	if type(bracketData) == "table" and bracketData.type == "bracket" then
+		local headerName
+		if bracketData.header then
+			headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
 		end
-		if headerName and headerName ~= "" then
+		if String.isEmpty(headerName) then
+			headerName = Variables.varDefault("match_legacy_header_name")
+		end
+		if String.isNotEmpty(headerName) then
 			match.header = headerName
+			Variables.varDefine("match_legacy_header_name", headerName)
 		end
 	end
 

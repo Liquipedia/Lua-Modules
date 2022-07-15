@@ -1,33 +1,33 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:LocalCurrency
+-- page=Module:Currency
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Arguments = require('Module:Arguments')
-local LocalCurrencyData = mw.loadData('Module:LocalCurrency/Data')
+local CurrencyData = mw.loadData('Module:Currency/Data')
 local Logic = require('Module:Logic')
 local Math = require('Module:Math')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local LocalCurrency = {}
+local Currency = {}
 
 local LANG = mw.getContentLanguage()
 local NON_BREAKING_SPACE = '&nbsp;'
 local USD = 'usd'
 local USD_TEMPLATE_ALIAS = '1'
 
-function LocalCurrency.template(frame)
+function Currency.template(frame)
 	local args = Arguments.getArgs(frame)
 	local currencyCode = args.currency or args[1]
 	if currencyCode == USD_TEMPLATE_ALIAS then
 		currencyCode = USD
 	end
 	local prizeValue = args.prizepool or args[2]
-	local display = LocalCurrency.display(currencyCode, prizeValue, {setVariables = true})
+	local display = Currency.display(currencyCode, prizeValue, {setVariables = true})
 
 	-- fallback handling like in the old template
 	if not display then
@@ -40,38 +40,46 @@ function LocalCurrency.template(frame)
 	return display
 end
 
-function LocalCurrency.display(currencyCode, prizeValue, options)
-	if String.isEmpty(currencyCode) then
-		return nil
-	end
+function Currency.display(currencyCode, prizeValue, options)
 	options = options or {}
 
-	local localCurrencyData = LocalCurrencyData[currencyCode:lower()]
+	local currencyData = Currency.raw(currencyCode)
 
-	if not localCurrencyData then
+	if not currencyData then
+		if currencyCode then
+			mw.log('Invalid currency "' .. currencyCode .. '"')
+		end
 		return nil
 	end
 
 	if options.setVariables then
-		Variables.varDefine('localcurrencycode', localCurrencyData.code or '')
+		Variables.varDefine('localcurrencycode', currencyData.code or '')
 		Variables.varDefine(
 			'localcurrencysymbol',
-			localCurrencyData.isAfter and '' or localCurrencyData.symbol or ''
+			currencyData.isAfter and '' or currencyData.symbol or ''
 		)
 		Variables.varDefine(
 			'localcurrencysymbolafter',
-			localCurrencyData.isAfter and localCurrencyData.symbol or ''
+			currencyData.isAfter and currencyData.symbol or ''
 		)
 	end
 
 	if Logic.isNumeric(prizeValue) and options.formatValue then
-		prizeValue = LocalCurrency.formatMoney(prizeValue)
+		prizeValue = Currency.formatMoney(prizeValue)
 	end
 
-	return localCurrencyData.text.prefix .. (prizeValue or '') .. localCurrencyData.text.suffix
+	return currencyData.text.prefix .. (prizeValue or '') .. currencyData.text.suffix
 end
 
-function LocalCurrency.formatMoney(value)
+function Currency.raw(currencyCode)
+	if String.isEmpty(currencyCode) then
+		return nil
+	end
+
+	return CurrencyData[currencyCode:lower()]
+end
+
+function Currency.formatMoney(value)
 	if not Logic.isNumeric(value) then
 		return 0
 	end
@@ -84,4 +92,4 @@ function LocalCurrency.formatMoney(value)
 	return LANG:formatNum(integer) .. string.format('%.2f', decimal):sub(2)
 end
 
-return LocalCurrency
+return Currency

@@ -171,7 +171,7 @@ function Ability:getHotkeys()
 	local display
 	if not String.isEmpty(_args.hotkey) then
 		if not String.isEmpty(_args.hotkey2) then
-			display = Hotkeys.hotkey(_args.hotkey, _args.hotkey2, 'slash')
+			display = Hotkeys.hotkey2(_args.hotkey, _args.hotkey2, 'slash')
 		else
 			display = Hotkeys.hotkey(_args.hotkey)
 		end

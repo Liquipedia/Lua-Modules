@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -108,7 +108,7 @@ function Building:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkey.hotkey2(args.hotkey, args.hotkey2, 'slash')
 		else
 			display = Hotkey.hotkey(args.hotkey)
 		end

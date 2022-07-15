@@ -9,7 +9,7 @@
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 local Class = require('Module:Class')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
 local CustomTeam = Class.new()

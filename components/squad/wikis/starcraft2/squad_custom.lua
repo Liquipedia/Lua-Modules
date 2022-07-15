@@ -10,7 +10,7 @@ local Squad = require('Module:Squad')
 local SquadRow = require('Module:Squad/Row')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local CleanRace = require('Module:CleanRace')
 

@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Localisation = require('Module:Localisation')
 local Template = require('Module:Template')
 local Games = require('Module:Games')

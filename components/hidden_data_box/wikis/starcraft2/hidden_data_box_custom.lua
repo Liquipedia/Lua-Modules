@@ -43,8 +43,7 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	else
 		Variables.varDefine(
 			'participants_number',
-			args.participants or args.participantsnumber,
-			queryResult.participantsnumber
+			args.participants or args.participantsnumber or queryResult.participantsnumber
 		)
 		if args.teamevent == 'true' then
 			Variables.varDefine('is_team_tournament', 1)

@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
 
@@ -29,15 +30,8 @@ function TableCell:addClass(class)
 end
 
 function TableCell:make()
-	local cell = mw.html.create('div')
+	local cell = mw.html.create('div'):addClass('csstable-widget-cell')
 	cell:css{
-		['border-left'] = '1px solid #bbb',
-		['border-top'] = '1px solid #bbb',
-		['background'] = 'inherit',
-		['padding'] = '4px',
-		['display'] = 'flex',
-		['align-items'] = 'center',
-		['justify-content'] = 'center',
 		['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil,
 		['grid-column'] = self.colSpan and 'span ' .. self.colSpan or nil,
 	}
@@ -48,9 +42,23 @@ function TableCell:make()
 
 	cell:css(self.css)
 
-	cell:wikitext(table.concat(self.content))
+	cell:node(self:_concatContent())
 
 	return {cell}
+end
+
+function TableCell:_concatContent()
+	return table.concat(Array.map(self.content, function (content)
+		if type(content) == 'table' then
+			local wrapper = mw.html.create('div')
+			Array.forEach(content, function (inner)
+				wrapper:node(inner)
+			end)
+			return tostring(wrapper)
+		else
+			return content
+		end
+	end))
 end
 
 return TableCell

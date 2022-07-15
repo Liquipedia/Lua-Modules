@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:LocalCurrency/Data
+-- page=Module:Currency/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -19,7 +19,6 @@ return {
 	ars = {
 		code = 'ARS',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Argentine peso">ARS</abbr>',
@@ -28,7 +27,6 @@ return {
 	aud = {
 		code = 'AUD',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Australian Dollar">AUD</abbr>',
@@ -37,7 +35,6 @@ return {
 	azn = {
 		code = 'AZN',
 		symbol = '₼',
-		isAfter = true,
 		text = {
 			prefix = '₼',
 			suffix = '&nbsp;<abbr title="Azerbaijani manat">AZN</abbr>',
@@ -46,7 +43,6 @@ return {
 	bam = {
 		code = 'BAM',
 		symbol = 'KM',
-		isAfter = true,
 		text = {
 			prefix = 'KM',
 			suffix = '&nbsp;<abbr title="Bosnian Convertible Mark">BAM</abbr>',
@@ -55,7 +51,6 @@ return {
 	bdt = {
 		code = 'BDT',
 		symbol = '৳',
-		isAfter = true,
 		text = {
 			prefix = '৳',
 			suffix = '&nbsp;<abbr title="Bangladeshi taka">BDT</abbr>',
@@ -73,7 +68,6 @@ return {
 	bnd = {
 		code = 'BND',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Brunei Dollar">BND</abbr>',
@@ -82,7 +76,6 @@ return {
 	bob = {
 		code = 'BOB',
 		symbol = 'Bs',
-		isAfter = true,
 		text = {
 			prefix = 'Bs',
 			suffix = '&nbsp;<abbr title="Bolivian Boliviano">BOB</abbr>',
@@ -91,7 +84,6 @@ return {
 	brl = {
 		code = 'BRL',
 		symbol = 'R$',
-		isAfter = true,
 		text = {
 			prefix = 'R$',
 			suffix = '&nbsp;<abbr title="Brazilian Real">BRL</abbr>',
@@ -118,7 +110,6 @@ return {
 	cad = {
 		code = 'CAD',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Canadian Dollar">CAD</abbr>',
@@ -136,7 +127,6 @@ return {
 	clp = {
 		code = 'CLP',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Chilean Peso">CLP</abbr>',
@@ -145,7 +135,6 @@ return {
 	cny = {
 		code = 'CNY',
 		symbol = '¥',
-		isAfter = true,
 		text = {
 			prefix = '¥',
 			suffix = '&nbsp;<abbr title="Chinese Yuan Renminbi">CNY</abbr>',
@@ -154,7 +143,6 @@ return {
 	cop = {
 		code = 'COP',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Colombian Peso">COP</abbr>',
@@ -163,7 +151,6 @@ return {
 	crc = {
 		code = 'CRC',
 		symbol = '¢',
-		isAfter = true,
 		text = {
 			prefix = '¢',
 			suffix = '&nbsp;<abbr title="Costa Rican Colón">CRC</abbr>',
@@ -172,7 +159,6 @@ return {
 	cup = {
 		code = 'CUP',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Cuban Peso">CUP</abbr>',
@@ -208,7 +194,6 @@ return {
 	dzd = {
 		code = 'DZD',
 		symbol = 'DA',
-		isAfter = true,
 		text = {
 			prefix = 'DA',
 			suffix = '&nbsp;<abbr title="Algerian dinar">DZD</abbr>',
@@ -217,7 +202,6 @@ return {
 	egp = {
 		code = 'EGP',
 		symbol = 'E£',
-		isAfter = true,
 		text = {
 			prefix = 'E£',
 			suffix = '&nbsp;<abbr title="Egyptian pound">EGP</abbr>',
@@ -226,7 +210,6 @@ return {
 	eur = {
 		code = 'EUR',
 		symbol = '€',
-		isAfter = true,
 		text = {
 			prefix = '€',
 			suffix = '&nbsp;<abbr title="Euro">EUR</abbr>',
@@ -244,7 +227,6 @@ return {
 	gbp = {
 		code = 'GBP',
 		symbol = '£',
-		isAfter = true,
 		text = {
 			prefix = '£',
 			suffix = '&nbsp;<abbr title="British Pound Sterling">GBP</abbr>',
@@ -253,7 +235,6 @@ return {
 	gel = {
 		code = 'GEL',
 		symbol = '₾ ',
-		isAfter = true,
 		text = {
 			prefix = '₾&nbsp;',
 			suffix = '&nbsp;<abbr title="Georgian Lari">GEL</abbr>',
@@ -262,7 +243,6 @@ return {
 	ghs = {
 		code = 'GHS',
 		symbol = 'GH₵ ',
-		isAfter = true,
 		text = {
 			prefix = 'GH₵&nbsp;',
 			suffix = '&nbsp;<abbr title="Ghanaian Cedi">GHS</abbr>',
@@ -271,7 +251,6 @@ return {
 	gtq = {
 		code = 'GTQ',
 		symbol = 'Q',
-		isAfter = true,
 		text = {
 			prefix = 'Q',
 			suffix = '&nbsp;<abbr title="Guatemalan Quetzal">GTQ</abbr>',
@@ -280,7 +259,6 @@ return {
 	hkd = {
 		code = 'HKD',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Hong Kong Dollar">HKD</abbr>',
@@ -307,7 +285,6 @@ return {
 	idr = {
 		code = 'IDR',
 		symbol = 'Rp ',
-		isAfter = true,
 		text = {
 			prefix = 'Rp&nbsp;',
 			suffix = '&nbsp;<abbr title="Indonesian Rupee">IDR</abbr>',
@@ -316,7 +293,6 @@ return {
 	ils = {
 		code = 'ILS',
 		symbol = '₪ ',
-		isAfter = true,
 		text = {
 			prefix = '₪&nbsp;',
 			suffix = '&nbsp;<abbr title="Israeli new shekel">ILS</abbr>',
@@ -325,7 +301,6 @@ return {
 	inr = {
 		code = 'INR',
 		symbol = '₹',
-		isAfter = true,
 		text = {
 			prefix = '₹',
 			suffix = '&nbsp;<abbr title="Indian Rupee">INR</abbr>',
@@ -361,7 +336,6 @@ return {
 	jpy = {
 		code = 'JPY',
 		symbol = '¥',
-		isAfter = true,
 		text = {
 			prefix = '¥',
 			suffix = '&nbsp;<abbr title="Japanese Yen">JPY</abbr>',
@@ -388,7 +362,6 @@ return {
 	krw = {
 		code = 'KRW',
 		symbol = '₩',
-		isAfter = true,
 		text = {
 			prefix = '₩',
 			suffix = '&nbsp;<abbr title="South Korean Won">KRW</abbr>',
@@ -397,7 +370,6 @@ return {
 	kwd = {
 		code = 'KWD',
 		symbol = 'د.ك ',
-		isAfter = true,
 		text = {
 			prefix = 'د.ك&nbsp;',
 			suffix = '&nbsp;<abbr title="Kuwaiti Dinar">KWD</abbr>',
@@ -415,7 +387,6 @@ return {
 	lak = {
 		code = 'LAK',
 		symbol = '₭ ',
-		isAfter = true,
 		text = {
 			prefix = '₭&nbsp;',
 			suffix = '&nbsp;<abbr title="Lao Kip">LAK</abbr>',
@@ -424,7 +395,6 @@ return {
 	lbp = {
 		code = 'LBP',
 		symbol = 'ل.ل. ',
-		isAfter = true,
 		text = {
 			prefix = 'ل.ل.&nbsp;',
 			suffix = '&nbsp;<abbr title="Lebanese pound">LBP</abbr>',
@@ -433,7 +403,6 @@ return {
 	lkr = {
 		code = 'LKR',
 		symbol = 'රු.',
-		isAfter = true,
 		text = {
 			prefix = 'රු.',
 			suffix = '&nbsp;<abbr title="Sri Lankan Rupee">LKR</abbr>',
@@ -442,7 +411,6 @@ return {
 	ltc = {
 		code = 'LTC',
 		symbol = 'Ł',
-		isAfter = true,
 		text = {
 			prefix = 'Ł',
 			suffix = '&nbsp;<abbr title="Litecoin">LTC</abbr>',
@@ -460,7 +428,6 @@ return {
 	lvl = {
 		code = 'LVL',
 		symbol = 'Ls ',
-		isAfter = true,
 		text = {
 			prefix = 'Ls&nbsp;',
 			suffix = '&nbsp;<abbr title="Latvian lat">LVL</abbr>',
@@ -469,7 +436,6 @@ return {
 	mad = {
 		code = 'MAD',
 		symbol = 'د.م ',
-		isAfter = true,
 		text = {
 			prefix = 'د.م&nbsp;',
 			suffix = '&nbsp;<abbr title="Moroccan Dirham">MAD</abbr>',
@@ -496,7 +462,6 @@ return {
 	mmk = {
 		code = 'MMK',
 		symbol = 'K',
-		isAfter = true,
 		text = {
 			prefix = 'K',
 			suffix = '&nbsp;<abbr title="Myanmar Kyat">MMK</abbr>',
@@ -505,7 +470,6 @@ return {
 	mnt = {
 		code = 'MNT',
 		symbol = '₮',
-		isAfter = true,
 		text = {
 			prefix = '₮',
 			suffix = '&nbsp;<abbr title="Mongolian tögrög">MNT</abbr>',
@@ -514,7 +478,6 @@ return {
 	mop = {
 		code = 'MOP',
 		symbol = 'MOP$',
-		isAfter = true,
 		text = {
 			prefix = 'MOP$',
 			suffix = '&nbsp;<abbr title="Macau Pataca">MOP</abbr>',
@@ -523,7 +486,6 @@ return {
 	mur = {
 		code = 'MUR',
 		symbol = '₨',
-		isAfter = true,
 		text = {
 			prefix = '₨',
 			suffix = '&nbsp;<abbr title="Mauritian Rupee">MUR</abbr>',
@@ -532,7 +494,6 @@ return {
 	mvr = {
 		code = 'MVR',
 		symbol = 'Rf ',
-		isAfter = true,
 		text = {
 			prefix = 'Rf&nbsp;',
 			suffix = '&nbsp;<abbr title="Maldivian Rufiyaa">MVR</abbr>',
@@ -541,7 +502,6 @@ return {
 	mxn = {
 		code = 'MXN',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Mexican Peso">MXN</abbr>',
@@ -550,7 +510,6 @@ return {
 	myr = {
 		code = 'MYR',
 		symbol = 'RM ',
-		isAfter = true,
 		text = {
 			prefix = 'RM&nbsp;',
 			suffix = '&nbsp;<abbr title="Malaysian ringgit">MYR</abbr>',
@@ -559,7 +518,6 @@ return {
 	ngn = {
 		code = 'NGN',
 		symbol = '₦ ',
-		isAfter = true,
 		text = {
 			prefix = '₦&nbsp;',
 			suffix = '&nbsp;<abbr title="Nigerian Naira">NGN</abbr>',
@@ -568,7 +526,6 @@ return {
 	nis = {
 		code = 'NIS',
 		symbol = 'ILS',
-		isAfter = true,
 		text = {
 			prefix = 'ILS',
 			suffix = '&nbsp;<abbr title="Israeli new shekel">NIS</abbr>',
@@ -586,7 +543,6 @@ return {
 	npr = {
 		code = 'NPR',
 		symbol = 'रू ',
-		isAfter = true,
 		text = {
 			prefix = 'रू&nbsp;',
 			suffix = '&nbsp;<abbr title="Nepalese Rupee">NPR</abbr>',
@@ -595,7 +551,6 @@ return {
 	ntd = {
 		code = 'TWD',
 		symbol = 'NT$',
-		isAfter = true,
 		text = {
 			prefix = 'NT$',
 			suffix = '&nbsp;<abbr title="Taiwan New Dollar">TWD</abbr>',
@@ -604,7 +559,6 @@ return {
 	nzd = {
 		code = 'NZD',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="New Zealand Dollar">NZD</abbr>',
@@ -613,7 +567,6 @@ return {
 	pen = {
 		code = 'PEN',
 		symbol = 'S/.',
-		isAfter = true,
 		text = {
 			prefix = 'S/.',
 			suffix = '&nbsp;<abbr title="Peruvian sol">PEN</abbr>',
@@ -622,7 +575,6 @@ return {
 	php = {
 		code = 'PHP',
 		symbol = '₱',
-		isAfter = true,
 		text = {
 			prefix = '₱',
 			suffix = '&nbsp;<abbr title="Philippine Peso">PHP</abbr>',
@@ -631,7 +583,6 @@ return {
 	pkr = {
 		code = 'PKR',
 		symbol = '₨ ',
-		isAfter = true,
 		text = {
 			prefix = '₨&nbsp;',
 			suffix = '&nbsp;<abbr title="Pakistani Rupee">PKR</abbr>',
@@ -658,7 +609,6 @@ return {
 	rmb = {
 		code = 'CNY',
 		symbol = '¥',
-		isAfter = true,
 		text = {
 			prefix = '¥',
 			suffix = '&nbsp;<abbr title="Chinese Yuan Renminbi">CNY</abbr>',
@@ -712,7 +662,6 @@ return {
 	sgd = {
 		code = 'SGD',
 		symbol = '$',
-		isAfter = true,
 		text = {
 			prefix = '$',
 			suffix = '&nbsp;<abbr title="Singapore Dollar">SGD</abbr>',
@@ -721,7 +670,6 @@ return {
 	skk = {
 		code = 'SKK',
 		symbol = 'Sk',
-		isAfter = true,
 		text = {
 			prefix = 'Sk',
 			suffix = '&nbsp;<abbr title="Slovak koruna">SKK</abbr>',
@@ -730,7 +678,6 @@ return {
 	skw = {
 		code = 'KRW',
 		symbol = '₩',
-		isAfter = true,
 		text = {
 			prefix = '₩',
 			suffix = '&nbsp;<abbr title="South Korean Won">KRW</abbr>',
@@ -739,7 +686,6 @@ return {
 	thb = {
 		code = 'THB',
 		symbol = '฿',
-		isAfter = true,
 		text = {
 			prefix = '฿',
 			suffix = '&nbsp;<abbr title="Thai Baht">THB</abbr>',
@@ -748,7 +694,6 @@ return {
 	tjs = {
 		code = 'TJS',
 		symbol = 'SM ',
-		isAfter = true,
 		text = {
 			prefix = 'SM&nbsp;',
 			suffix = '&nbsp;<abbr title="Tajikistani Somoni">TJS</abbr>',
@@ -757,7 +702,6 @@ return {
 	tmt = {
 		code = 'TMT',
 		symbol = 'T',
-		isAfter = true,
 		text = {
 			prefix = 'T',
 			suffix = '&nbsp;<abbr title="Turkmenistan manat">TMT</abbr>',
@@ -766,7 +710,6 @@ return {
 	tnd = {
 		code = 'TND',
 		symbol = 'DT',
-		isAfter = true,
 		text = {
 			prefix = 'DT',
 			suffix = '&nbsp;<abbr title="Tunisian Dinar">TND</abbr>',
@@ -775,7 +718,6 @@ return {
 	try = {
 		code = 'TRY',
 		symbol = '₺',
-		isAfter = true,
 		text = {
 			prefix = '₺',
 			suffix = '&nbsp;<abbr title="Turkish Lira">TRY</abbr>',
@@ -784,7 +726,6 @@ return {
 	twd = {
 		code = 'TWD',
 		symbol = 'NT$',
-		isAfter = true,
 		text = {
 			prefix = 'NT$',
 			suffix = '&nbsp;<abbr title="Taiwan New Dollar">TWD</abbr>',
@@ -793,7 +734,6 @@ return {
 	uah = {
 		code = 'UAH',
 		symbol = '₴',
-		isAfter = true,
 		text = {
 			prefix = '₴',
 			suffix = '&nbsp;<abbr title="Ukrainian hryvnia">UAH</abbr>',
@@ -810,7 +750,6 @@ return {
 	uzs = {
 		code = 'UZS',
 		symbol = 'лв',
-		isAfter = true,
 		text = {
 			prefix = 'лв',
 			suffix = '&nbsp;<abbr title="Uzbekistani Som">UZS</abbr>',
@@ -828,7 +767,6 @@ return {
 	won = {
 		code = 'KRW',
 		symbol = '₩',
-		isAfter = true,
 		text = {
 			prefix = '₩',
 			suffix = '&nbsp;<abbr title="South Korean Won">KRW</abbr>',
@@ -837,7 +775,6 @@ return {
 	zar = {
 		code = 'ZAR',
 		symbol = 'R',
-		isAfter = true,
 		text = {
 			prefix = 'R',
 			suffix = '&nbsp;<abbr title="South African Rand">ZAR</abbr>',

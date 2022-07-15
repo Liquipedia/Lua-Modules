@@ -7,8 +7,8 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:String')
 local Array = require('Module:Array')
+local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
