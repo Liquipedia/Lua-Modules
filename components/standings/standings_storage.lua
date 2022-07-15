@@ -118,7 +118,7 @@ end
 ---@return table
 function StandingsStorage.toScoreBoardEntry(data)
 	if Table.isEmpty(data) then
-		return Table.cop(SCOREBOARD_FALLBACK)
+		return Table.copy(SCOREBOARD_FALLBACK)
 	end
 
 	local filterScoreBoard = function (key, value)
