@@ -20,16 +20,14 @@ local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
 local _UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 
---[[
-Deprecated. Use Opponent.typeIsParty
-]]
+---@deprecated
+---Use Opponent.typeIsParty
 function DisplayHelper.opponentTypeIsParty(opponentType)
 	return Opponent.typeIsParty(opponentType)
 end
 
---[[
-Deprecated. Use Opponent.isTbd
-]]
+---@deprecated
+---Use Opponent.isTbd
 function DisplayHelper.opponentIsTBD(opponent)
 	return Opponent.isTbd(opponent)
 end

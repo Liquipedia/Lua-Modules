@@ -43,9 +43,8 @@ function StarcraftPlayerExt.readRace(race)
 	end
 end
 
---[[
-Deprecated. Use PlayerExt.extractFromLink instead
-]]
+---@deprecated
+---Use PlayerExt.extractFromLink instead
 StarcraftPlayerExt.extractFromLink = PlayerExt.extractFromLink
 
 --[[
