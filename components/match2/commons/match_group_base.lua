@@ -92,13 +92,13 @@ function MatchGroupBase._checkBracketDuplicate(bracketId)
 	end
 end
 
--- Deprecated
+---@deprecated
 function MatchGroupBase.luaMatchlist(_, args)
 	local MatchGroup = Lua.import('Module:MatchGroup', {requireDevIfEnabled = true})
 	return MatchGroup.MatchList(args) .. MatchGroup.deprecatedCategory
 end
 
--- Deprecated
+---@deprecated
 function MatchGroupBase.luaBracket(_, args)
 	local MatchGroup = Lua.import('Module:MatchGroup', {requireDevIfEnabled = true})
 	return MatchGroup.Bracket(args) .. MatchGroup.deprecatedCategory
