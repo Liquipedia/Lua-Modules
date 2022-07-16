@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = {}
+local MatchLegacy = {}
 
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
@@ -17,12 +17,12 @@ local Variables = require("Module:Variables")
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
-function p.storeMatch(match2)
-	local match = p.convertParameters(match2)
+function MatchLegacy.storeMatch(match2)
+	local match = MatchLegacy.convertParameters(match2)
 
-	match.games = p.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-	p.storeMatchSMW(match, match2)
+	MatchLegacy.storeMatchSMW(match, match2)
 
 	return mw.ext.LiquipediaDB.lpdb_match(
 		"legacymatch_" .. match2.match2id,
@@ -30,7 +30,7 @@ function p.storeMatch(match2)
 	)
 end
 
-function p.storeMatchSMW(match, match2)
+function MatchLegacy.storeMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == "string" then streams = json.parse(streams) end
 	local icon = Variables.varDefault("tournament_icon")
@@ -59,7 +59,7 @@ function p.storeMatchSMW(match, match2)
 	 })
 end
 
-function p.storeGames(match, match2)
+function MatchLegacy.storeGames(match, match2)
 	local games = ""
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
@@ -142,7 +142,7 @@ function p.storeGames(match, match2)
 	return games
 end
 
-function p.convertParameters(match2)
+function MatchLegacy.convertParameters(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, "match2") then
@@ -168,14 +168,14 @@ function p.convertParameters(match2)
 	match.extradata.hidden = Logic.readBool(Variables.varDefault('match_hidden')) and '1' or '0'
 	match.extradata.cancelled = Logic.readBool(Variables.varDefault('cancelled')) and '1' or '0'
 	match.extradata.bestofx = tostring(match2.bestof or '')
-	match.extradata.maps = table.concat(p._getAllInGames(match2, 'map'), ',')
-	for index, vod in ipairs(p._getAllInGames(match2, 'vod')) do
+	match.extradata.maps = table.concat(MatchLegacy._getAllInGames(match2, 'map'), ',')
+	for index, vod in ipairs(MatchLegacy._getAllInGames(match2, 'vod')) do
 		match.extradata['vodgame'..index] = vod
 	end
 
 	local opponent1score = 0
 	local opponent2score = 0
-	local scores = p._getAllInGames(match2, 'scores')
+	local scores = MatchLegacy._getAllInGames(match2, 'scores')
 	for _, stringScore in pairs(scores) do
 		local score = json.parseIfString(stringScore)
 		opponent1score = opponent1score + (tonumber(score[1]) or 0)
@@ -249,7 +249,7 @@ function p.convertParameters(match2)
 	return match
 end
 
-function p._getAllInGames(match2, field)
+function MatchLegacy._getAllInGames(match2, field)
 	local ret = {}
 	for _, game2 in ipairs(match2.match2games or {}) do
 		table.insert(ret, game2[field])
@@ -257,4 +257,4 @@ function p._getAllInGames(match2, field)
 	return ret
 end
 
-return p
+return MatchLegacy

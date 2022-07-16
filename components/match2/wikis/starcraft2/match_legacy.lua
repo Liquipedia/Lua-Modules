@@ -10,7 +10,7 @@
 * Remove temp smw support (after lpdb api is available)
 ]]--
 
-local p = {}
+local MatchLegacy = {}
 
 local json = require('Module:Json')
 local String = require('Module:StringUtils')
@@ -19,16 +19,16 @@ local _UNKNOWNREASON_DEFAULT_LOSS = 'L'
 
 local MODES = { ['solo'] = '1v1', ['team'] = 'team' }
 
-function p.storeMatch(match2)
-	local match, do_store = p.convertParameters(match2)
+function MatchLegacy.storeMatch(match2)
+	local match, do_store = MatchLegacy.convertParameters(match2)
 
 	if do_store then
-		match.games = p.storeGames(match, match2)
+		match.games = MatchLegacy.storeGames(match, match2)
 
 		if (match2.match2opponents[1] or {}).type == 'team' then
-			p.storeTeamMatchSMW(match, match2)
+			MatchLegacy.storeTeamMatchSMW(match, match2)
 		elseif (match2.match2opponents[1] or {}).type == 'solo' then
-			p.storeSoloMatchSMW(match, match2)
+			MatchLegacy.storeSoloMatchSMW(match, match2)
 		end
 
 		return mw.ext.LiquipediaDB.lpdb_match(
@@ -40,7 +40,7 @@ function p.storeMatch(match2)
 	end
 end
 
-function p.storeGames(match, match2)
+function MatchLegacy.storeGames(match, match2)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
@@ -82,7 +82,7 @@ function p.storeGames(match, match2)
 				game
 			)
 
-			p.storeSoloMapSMW(game, gameIndex, match.tournament or '', match2.match2id)
+			MatchLegacy.storeSoloMapSMW(game, gameIndex, match.tournament or '', match2.match2id)
 
 			games = games .. res
 		end
@@ -90,7 +90,7 @@ function p.storeGames(match, match2)
 	return games
 end
 
-function p.convertParameters(match2)
+function MatchLegacy.convertParameters(match2)
 	local do_store = true
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
@@ -152,7 +152,7 @@ function p.convertParameters(match2)
 	return match, do_store
 end
 
-function p.storeTeamMatchSMW(match, match2)
+function MatchLegacy.storeTeamMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == 'string' then streams = json.parse(streams) end
 	local extradata = match.extradata or {}
@@ -192,7 +192,7 @@ function p.storeTeamMatchSMW(match, match2)
 	})
 end
 
-function p.storeSoloMatchSMW(match, match2)
+function MatchLegacy.storeSoloMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == 'string' then streams = json.parse(streams) end
 	local extradata = match.extradata or {}
@@ -229,7 +229,7 @@ function p.storeSoloMatchSMW(match, match2)
 	})
 end
 
-function p.storeSoloMapSMW(game, gameIndex, tournament, id)
+function MatchLegacy.storeSoloMapSMW(game, gameIndex, tournament, id)
 	game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 	local object = 'Map ' .. (game.opponent1 or 'TBD') .. ' vs ' .. (game.opponent2 or 'TBD') .. ' at ' ..
 		(game.date or '') .. 'in Match TBD Map ' .. gameIndex .. ' on ' .. (game.map or '')
@@ -242,4 +242,4 @@ function p.storeSoloMapSMW(game, gameIndex, tournament, id)
 	})
 end
 
-return p
+return MatchLegacy
