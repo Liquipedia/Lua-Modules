@@ -79,6 +79,29 @@ function MatchGroup.Bracket(args)
 end
 
 --[[
+	Sets up a SingleMatch. The match is saved to LPDB.
+]]
+function MatchGroup.SingleMatch(args)
+	args.matchid = '0001'
+	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'match')
+	local matches = MatchGroupInput.readSingleMatch(options.bracketId, args, options)
+	args.id = options.bracketId
+	Match.storeMatchGroup(matches, options)
+
+	local singleMatchNode
+	if options.show then
+		singleMatchNode = MatchGroup.MatchByMatchId(args)
+	end
+
+	local parts = Array.extend(
+		{singleMatchNode},
+		Array.map(optionsWarnings, WarningBox.display)
+	)
+
+	return table.concat(Array.map(parts, tostring))
+end
+
+--[[
 Displays a matchlist or bracket specified by ID.
 ]]
 function MatchGroup.MatchGroupById(args)
@@ -127,15 +150,12 @@ function MatchGroup.MatchByMatchId(args)
 	assert(match, 'Match bracketId= ' .. bracketId .. ' matchId=' .. matchId .. ' not found')
 
 	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
-	local config = SingleMatchDisplay.configFromArgs(args)
-
-	local MatchGroupContainer = WikiSpecific.getMatchContainer('singleMatch')
-	return MatchGroupContainer({
+	local SingleMatchContainer = WikiSpecific.getMatchGroupContainer('singleMatch')
+	return SingleMatchContainer({
 		matchId = fullMatchId,
-		config = config,
+		config = SingleMatchDisplay.configFromArgs(args),
 	})
 end
-
 
 -- Entry point of Template:Matchlist
 function MatchGroup.TemplateMatchlist(frame)
@@ -147,6 +167,12 @@ end
 function MatchGroup.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.Bracket(args)
+end
+
+-- Entry point of Template:SingleMatch
+function MatchGroup.TemplateSingleMatch(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchGroup.SingleMatch(args)
 end
 
 -- Entry point of Template:ShowSingleMatch
