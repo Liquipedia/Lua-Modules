@@ -11,7 +11,7 @@
 ***** ADJUST THIS FOR BROODWAR WIKI!!! *****
 ]]--
 
-local Legacy = {}
+local MatchLegacy = {}
 
 local json = require('Module:Json')
 local String = require('Module:StringUtils')
@@ -20,16 +20,16 @@ local Template = require('Module:Template')
 
 local _MODES = { ['solo'] = '1v1', ['team'] = 'team' }
 
-function Legacy.storeMatch(match2)
-	local match, do_store = Legacy._convertParameters(match2)
+function MatchLegacy.storeMatch(match2)
+	local match, do_store = MatchLegacy._convertParameters(match2)
 
 	if do_store then
-		match.games = Legacy._storeGames(match, match2)
+		match.games = MatchLegacy._storeGames(match, match2)
 
 		if (match2.match2opponents[1] or {}).type == 'team' then
-			Legacy._storeTeamMatchSMW(match, match2)
+			MatchLegacy._storeTeamMatchSMW(match, match2)
 		elseif (match2.match2opponents[1] or {}).type == 'solo' then
-			Legacy._storeSoloMatchSMW(match, match2)
+			MatchLegacy._storeSoloMatchSMW(match, match2)
 		end
 
 		return mw.ext.LiquipediaDB.lpdb_match(
@@ -41,7 +41,7 @@ function Legacy.storeMatch(match2)
 	end
 end
 
-function Legacy._storeGames(match, match2)
+function MatchLegacy._storeGames(match, match2)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
@@ -80,7 +80,7 @@ function Legacy._storeGames(match, match2)
 				game
 			)
 
-			Legacy._storeSoloMapSMW(game, gameIndex, match.tournament or '', match2.match2id)
+			MatchLegacy._storeSoloMapSMW(game, gameIndex, match.tournament or '', match2.match2id)
 
 			games = games .. res
 		elseif	game.mode == '1v1' then
@@ -134,7 +134,7 @@ function Legacy._storeGames(match, match2)
 	return games
 end
 
-function Legacy._convertParameters(match2)
+function MatchLegacy._convertParameters(match2)
 	local do_store = true
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
@@ -200,7 +200,7 @@ function Legacy._convertParameters(match2)
 	return match, do_store
 end
 
-function Legacy._storeTeamMatchSMW(match, match2)
+function MatchLegacy._storeTeamMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == 'string' then streams = json.parse(streams) end
 	local extradata = match.extradata or {}
@@ -240,7 +240,7 @@ function Legacy._storeTeamMatchSMW(match, match2)
 	})
 end
 
-function Legacy._storeSoloMatchSMW(match, match2)
+function MatchLegacy._storeSoloMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == 'string' then streams = json.parse(streams) end
 	local extradata = match.extradata or {}
@@ -277,7 +277,7 @@ function Legacy._storeSoloMatchSMW(match, match2)
 	})
 end
 
-function Legacy._storeSoloMapSMW(game, gameIndex, tournament, id)
+function MatchLegacy._storeSoloMapSMW(game, gameIndex, tournament, id)
 	game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 	local object = 'Map ' .. (game.opponent1 or 'TBD') .. ' vs ' .. (game.opponent2 or 'TBD') .. ' at ' ..
 		(game.date or '') .. 'in Match TBD Map ' .. gameIndex .. ' on ' .. (game.map or '')
@@ -295,4 +295,4 @@ function Legacy._storeSoloMapSMW(game, gameIndex, tournament, id)
 	})
 end
 
-return Legacy
+return MatchLegacy
