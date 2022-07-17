@@ -55,7 +55,7 @@ function LegacyPrizePool.run(dependency)
 	LegacyPrizePool.assignType(newArgs, header.points2, 'points2')
 	LegacyPrizePool.assignType(newArgs, header.points3, 'points3')
 
-	if args.indiv then
+	if header.indiv then
 		newArgs.type = {type = Opponent.solo}
 	else
 		newArgs.type = {type = Opponent.team}
