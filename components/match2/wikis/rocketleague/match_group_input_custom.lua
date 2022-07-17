@@ -43,7 +43,7 @@ local mapFunctions = {}
 local opponentFunctions = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(frame, match)
+function CustomMatchGroupInput.processMatch(match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)

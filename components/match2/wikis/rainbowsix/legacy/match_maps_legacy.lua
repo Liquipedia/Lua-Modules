@@ -134,8 +134,8 @@ function MatchMaps._main(args, frame)
 			for key, value in pairs(details) do
 				storage_args[key] = value
 			end
-			--call match2 processing
-			--storage_args = WikiSpecific.processMatch(frame, storage_args)
+
+			-- Store the processed args for later usage
 			Template.stashReturnValue(storage_args, 'LegacyMatchlist')
 		end
 	end
