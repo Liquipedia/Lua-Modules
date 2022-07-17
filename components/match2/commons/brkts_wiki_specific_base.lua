@@ -26,7 +26,6 @@ end)
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
--- @parameter frame - the frame object
 -- @parameter map - a map
 -- @returns the map after changes have been applied
 WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
