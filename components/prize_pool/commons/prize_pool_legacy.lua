@@ -156,7 +156,7 @@ function LegacyPrizePool.assignType(assignTo, input, slotParam)
 		CACHED_DATA.inputToId[slotParam] = 'points' .. index
 		CACHED_DATA.next.points = index + 1
 
-	elseif input == 'seed' then
+	elseif input and input:lower() == 'seed' then
 		CACHED_DATA.inputToId[slotParam] = 'seed'
 
 	elseif String.isNotEmpty(input) then
