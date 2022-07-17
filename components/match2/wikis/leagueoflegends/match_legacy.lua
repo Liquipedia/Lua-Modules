@@ -19,18 +19,21 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 
 local _NUMBER_OF_PLAYERS_TO_STORE = 10
 
-
-function MatchLegacy.storeMatch(match2)
+function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
 
-	match.games = MatchLegacy.storeGames(match, match2)
+	if options.storeSmw then
+		MatchLegacy.storeMatchSMW(match, match2)
+	end
 
-	MatchLegacy.storeMatchSMW(match, match2)
+	if options.storeMatch1 then
+		match.games = MatchLegacy.storeGames(match, match2)
 
-	return mw.ext.LiquipediaDB.lpdb_match(
-		'legacymatch_' .. match2.match2id,
-		match
-	)
+		return mw.ext.LiquipediaDB.lpdb_match(
+			"legacymatch_" .. match2.match2id,
+			match
+		)
+	end
 end
 
 function MatchLegacy._convertParameters(match2)
