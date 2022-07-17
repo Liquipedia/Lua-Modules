@@ -18,7 +18,7 @@ local Variables = require("Module:Variables")
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
 function MatchLegacy.storeMatch(match2, options)
-	local match = MatchLegacy.convertParameters(match2)
+	local match = MatchLegacy._convertParameters(match2)
 
 	if options.storeSmw then
 		MatchLegacy.storeMatchSMW(match, match2)
@@ -128,7 +128,7 @@ function MatchLegacy.storeGames(match, match2)
 	return games
 end
 
-function MatchLegacy.convertParameters(match2)
+function MatchLegacy._convertParameters(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, "match2") then
