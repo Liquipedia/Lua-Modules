@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = {}
+local MatchGroupLegacyDefault = {}
 
 local Lua = require("Module:Lua")
 local Logic = require("Module:Logic")
@@ -16,7 +16,7 @@ local config = Lua.moduleExists("Module:Match/Config") and require("Module:Match
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 
 local roundData
-function p.get(templateid, bracketType)
+function MatchGroupLegacyDefault.get(templateid, bracketType)
 	local LowerHeader = {}
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
 
@@ -25,7 +25,8 @@ function p.get(templateid, bracketType)
 	roundData = roundData or {}
 	local lastround = 0
 	for _, match in ipairs(matches) do
-		bracketData, lastround, LowerHeader = p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
+		bracketData, lastround, LowerHeader =
+			MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	end
 
 	-- add reference for map mappings
@@ -48,7 +49,7 @@ function p.get(templateid, bracketType)
 end
 
 local lastRound
-function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
+function MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	local id = String.split(match.match2id, "_")[2] or match.match2id
 	id = id:gsub("0*([1-9])", "%1"):gsub("%-", "")
 	local bd = match.match2bracketdata
@@ -157,4 +158,4 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	return bracketData, round.R, LowerHeader
 end
 
-return p
+return MatchGroupLegacyDefault

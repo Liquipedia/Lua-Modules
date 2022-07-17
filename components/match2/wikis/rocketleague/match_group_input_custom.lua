@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = require('Module:Brkts/WikiSpecific/Base')
+local CustomMatchGroupInput = {}
 
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -43,7 +43,7 @@ local mapFunctions = {}
 local opponentFunctions = {}
 
 -- called from Module:MatchGroup
-function p.processMatch(frame, match)
+function CustomMatchGroupInput.processMatch(frame, match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -57,7 +57,7 @@ function p.processMatch(frame, match)
 end
 
 -- called from Module:Match/Subobjects
-function p.processMap(frame, map)
+function CustomMatchGroupInput.processMap(frame, map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -66,7 +66,7 @@ function p.processMap(frame, map)
 	return map
 end
 
-function p.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -94,22 +94,22 @@ function p.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function p.processPlayer(frame, player)
+function CustomMatchGroupInput.processPlayer(frame, player)
 	return player
 end
 
 --
 --
 -- function to sort out winner/placements
-function p._placementSortFunction(table, key1, key2)
+function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
 	local op1norm = op1.status == _STATUS_HAS_SCORE
 	local op2norm = op2.status == _STATUS_HAS_SCORE
 	if op1norm then
 		if op2norm then
-			local op1setwins = p._getSetWins(op1)
-			local op2setwins = p._getSetWins(op2)
+			local op1setwins = CustomMatchGroupInput._getSetWins(op1)
+			local op2setwins = CustomMatchGroupInput._getSetWins(op2)
 			if op1setwins + op2setwins > 0 then
 				return op1setwins > op2setwins
 			else
@@ -126,7 +126,7 @@ function p._placementSortFunction(table, key1, key2)
 	end
 end
 
-function p._getSetWins(opp)
+function CustomMatchGroupInput._getSetWins(opp)
 	local extradata = opp.extradata or {}
 	local set1win = extradata.set1win and 1 or 0
 	local set2win = extradata.set2win and 1 or 0
@@ -190,7 +190,7 @@ function matchFunctions.getExtraData(match)
 
 	local casters = {}
 	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, p._getCasterInformation(
+		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
 			name,
 			match[key .. 'flag'],
 			match[key .. 'name']
@@ -212,7 +212,7 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
-function p._getCasterInformation(name, flag, displayName)
+function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 	if String.isEmpty(flag) then
 		flag = Variables.varDefault(name .. '_flag')
 	end
@@ -300,7 +300,7 @@ function matchFunctions.getOpponents(args)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			p.processOpponent(opponent, args.date)
+			CustomMatchGroupInput.processOpponent(opponent, args.date)
 
 			-- Retrieve icon and legacy name for team
 			if opponent.type == Opponent.team then
@@ -357,7 +357,7 @@ function matchFunctions.getOpponents(args)
 		local lastPlacement = 1
 		local lastStatus
 		-- luacheck: push ignore
-		for opponentIndex, opponent in Table.iter.spairs(opponents, p._placementSortFunction) do
+		for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
 			if opponent.status ~= _STATUS_HAS_SCORE and opponent.status ~= _STATUS_DEFAULT_WIN and placement == 1 then
 				placement = 2
 			end
@@ -584,4 +584,4 @@ function opponentFunctions.getLegacyTeamIcon(template)
 	return icon, iconDark
 end
 
-return p
+return CustomMatchGroupInput

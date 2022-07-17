@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = require('Module:Brkts/WikiSpecific/Base')
+local CustomMatchGroupInput = {}
 
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -39,7 +39,7 @@ local mapFunctions = {}
 local opponentFunctions = {}
 
 -- called from Module:MatchGroup
-function p.processMatch(frame, match)
+function CustomMatchGroupInput.processMatch(frame, match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -53,7 +53,7 @@ function p.processMatch(frame, match)
 end
 
 -- called from Module:Match/Subobjects
-function p.processMap(frame, map)
+function CustomMatchGroupInput.processMap(frame, map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -63,7 +63,7 @@ function p.processMap(frame, map)
 end
 
 -- called from Module:Match/Subobjects
-function p.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -77,7 +77,7 @@ function p.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function p.processPlayer(frame, player)
+function CustomMatchGroupInput.processPlayer(frame, player)
 	return player
 end
 
@@ -195,7 +195,7 @@ function matchFunctions.getOpponents(args)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			p.processOpponent(opponent, args.date)
+			CustomMatchGroupInput.processOpponent(opponent, args.date)
 
 			-- Retrieve icon and legacy name for team
 			if opponent.type == Opponent.team then
@@ -431,4 +431,4 @@ function opponentFunctions.getTeamIcon(template)
 	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
 end
 
-return p
+return CustomMatchGroupInput
