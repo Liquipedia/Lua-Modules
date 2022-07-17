@@ -19,7 +19,7 @@ local _UNKNOWNREASON_DEFAULT_LOSS = 'L'
 
 local MODES = { ['solo'] = '1v1', ['team'] = 'team' }
 
-function MatchLegacy.storeMatch(match2)
+function MatchLegacy.storeMatch(match2, options)
 	local match, do_store = MatchLegacy.convertParameters(match2)
 
 	if do_store then
