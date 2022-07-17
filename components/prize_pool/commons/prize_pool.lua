@@ -459,7 +459,7 @@ end
 function PrizePool:_buildHeader()
 	local headerRow = TableRow{css = {['font-weight'] = 'bold'}}
 
-	headerRow:addCell(TableCell{content = {'Place'}})
+	headerRow:addCell(TableCell{content = {'Place'}, css = {['min-width'] = '80px'}})
 
 	local previousOfType = {}
 	for _, prize in ipairs(self.prizes) do
@@ -473,9 +473,9 @@ function PrizePool:_buildHeader()
 	end
 
 	if self:_hasPartyType() then
-		headerRow:addCell(TableCell{content = {'Player'}})
+		headerRow:addCell(TableCell{content = {'Player'}, classes = {'prizepooltable-col-player'}})
 	end
-	headerRow:addCell(TableCell{content = {'Team'}})
+	headerRow:addCell(TableCell{content = {'Team'}, classes = {'prizepooltable-col-team'}})
 
 	return headerRow
 end
