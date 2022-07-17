@@ -227,7 +227,7 @@ function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 	local earnings = _totalEarnings
 
-	local team = self.pagename
+	local team = args.teamtemplate or self.pagename
 	local teamTemplate
 	if team and mw.ext.TeamTemplate.teamexists(team) then
 		local teamRaw = mw.ext.TeamTemplate.raw(team)
