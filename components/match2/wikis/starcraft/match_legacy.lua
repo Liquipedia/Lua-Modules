@@ -20,7 +20,7 @@ local Template = require('Module:Template')
 
 local _MODES = {solo = '1v1', team = 'team'}
 
-function MatchLegacy.storeMatch(match2, options, options)
+function MatchLegacy.storeMatch(match2, options)
 	local match, doStore = MatchLegacy._convertParameters(match2)
 
 	if not doStore then
