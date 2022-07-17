@@ -12,6 +12,7 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local TournamentNotability = require('Module:TournamentNotability')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -25,6 +26,7 @@ local _SERIES_RLCS = 'Rocket League Championship Series'
 local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
+local _TODAY = os.date('%Y-%m-%d')
 
 local _league
 
@@ -64,11 +66,11 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = _league.args
 	if id == 'customcontent' then
-		if not String.isEmpty(args.map1) then
+		if String.isNotEmpty(args.map1) then
 			local maps = {CustomLeague:_makeInternalLink(args.map1)}
 			local index = 2
 
-			while not String.isEmpty(args['map' .. index]) do
+			while String.isNotEmpty(args['map' .. index]) do
 				table.insert(maps, '&nbsp;• ' ..
 					tostring(CustomLeague:_createNoWrappingSpan(
 						CustomLeague:_makeInternalLink(args['map' .. index])
@@ -81,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 		end
 
 
-		if not String.isEmpty(args.team_number) then
+		if String.isNotEmpty(args.team_number) then
 			table.insert(widgets, Title{name = 'Teams'})
 			table.insert(widgets, Cell{
 				name = 'Number of teams',
@@ -119,11 +121,11 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 
 	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier)
 
-	if not String.isEmpty(type) then
+	if String.isNotEmpty(type) then
 		local typeDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. type)
 		content = content .. '[[' .. typeDisplay .. ' Tournaments|' .. type .. ']]'
 
-		if not String.isEmpty(type2) then
+		if String.isNotEmpty(type2) then
 			content = content .. ' ' .. type2
 		end
 
@@ -143,6 +145,14 @@ function CustomLeague:_createPrizepool(args)
 			return nil
 	end
 
+	local endDate = Variables.varDefault('tournament_enddate')
+	if
+		Logic.readBool(args.convertPrizePool) or
+		String.isNotEmpty(endDate) and _TODAY >= endDate
+	then
+		return _league:createPrizepool(args)
+	end
+
 	local content
 	local prizepool = args.prizepool
 	local prizepoolInUsd = args.prizepoolusd
@@ -151,7 +161,7 @@ function CustomLeague:_createPrizepool(args)
 	if String.isEmpty(prizepool) then
 		content = '$' .. prizepoolInUsd .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
 	else
-		if not String.isEmpty(localCurrency) then
+		if String.isNotEmpty(localCurrency) then
 			content = Template.safeExpand(
 				mw.getCurrentFrame(),
 				'Local currency',
@@ -161,13 +171,13 @@ function CustomLeague:_createPrizepool(args)
 			content = prizepool
 		end
 
-		if not String.isEmpty(prizepoolInUsd) then
+		if String.isNotEmpty(prizepoolInUsd) then
 			content = content .. '<br>(≃ $' .. prizepoolInUsd .. ' ' ..
 				Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
 		end
 	end
 
-	if not String.isEmpty(prizepoolInUsd) then
+	if String.isNotEmpty(prizepoolInUsd) then
 		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
 	end
 
@@ -216,7 +226,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		notabilitymod = args.notabilitymod,
 		liquipediatiertype2 = args.liquipediatiertype2,
 		participantsnumber =
-			not String.isEmpty(args.team_number) and args.team_number or args.player_number,
+			String.isNotEmpty(args.team_number) and args.team_number or args.player_number,
 		notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
 	}
 
@@ -238,7 +248,7 @@ end
 function CustomLeague:_concatArgs(args, base)
 	local foundArgs = {args[base] or args[base .. '1']}
 	local index = 2
-	while not String.isEmpty(args[base .. index]) do
+	while String.isNotEmpty(args[base .. index]) do
 		table.insert(foundArgs, args[base .. index])
 		index = index + 1
 	end
