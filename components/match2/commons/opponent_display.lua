@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
@@ -159,7 +160,7 @@ function OpponentDisplay.BlockOpponent(props)
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
-			showLink = props.showLink,
+			showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent)),
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
