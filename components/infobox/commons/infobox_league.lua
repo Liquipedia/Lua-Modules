@@ -245,26 +245,31 @@ function League:seoText(args)
 	local name = self.name
 	local tournamentType = args.type
 	local location = Localisation.getLocalisation({displayNoError = true}, args.country)
-	local game = args.game -- TODO Remove or improved via wiki custom
-	local tier = args.tier -- TODO Resolve to name
-	local tierType = args.tiertype or 'tournament'
+	local date, dateVerb -- TODO
+	local teamCount, playerCount = args.team_number, args.player_number
+	local prizePool = self:_createPrizepool(args)
+	local tierType = args.liquipediatiertype or 'tournament'
 	local organizers = {
 		args['organizer-name'] or args.organizer,
 		args['organizer2-name'] or args.organizer2,
 		args['organizer3-name'] or args.organizer3
 	}
+	local tierText -- TODO: Extract to function
+	if args.liquipediatier then
+		if not Tier.text[_TIER_MODE_TIERS] then -- allow legacy tier modules
+			tierText = Tier.text[args.liquipediatier]
+		else -- default case, i.e. tier module with intended format
+			tierText = Tier.text[_TIER_MODE_TIERS][args.liquipediatier:lower()]
+		end
+	end
 
 	local intro = ''
-
 	intro = intro .. name .. ' is a'
 	if String.isNotEmpty(tournamentType) then
 		intro = intro .. 'n ' .. tournamentType
 	end
 	if String.isNotEmpty(location) then
 		intro = intro .. ' ' .. location
-	end
-	if String.isNotEmpty(game) then
-		intro = intro .. ' ' .. game
 	end
 
 	intro = intro .. ' ' .. tierType
@@ -274,9 +279,33 @@ function League:seoText(args)
 	end
 
 	local details = ''
-	-- TODO
+	details = details .. 'This'
+	if String.isNotEmpty(tierText) then
+		details = details .. ' ' .. tierText
+	end
+	details = details .. ' ' .. tierType
 
-	return intro .. '. ' .. details
+	if date and dateVerb then
+		details = details .. ' ' .. dateVerb .. ' ' .. date
+	end
+
+	if teamCount or playerCount then
+		details = details .. ' features '
+		if teamCount then
+			details = details .. teamCount .. ' teams'
+		elseif playerCount then
+			details = details .. playerCount .. ' players'
+		end
+	end
+
+	if String.isNotEmpty(prizePool) then
+		if teamCount or playerCount then
+			details = details .. ' competing over'
+		end
+		details = details .. ' a total of ' .. prizePool
+	end
+
+	return intro .. '. ' .. details .. '.'
 end
 
 --- Allows for overriding this functionality
