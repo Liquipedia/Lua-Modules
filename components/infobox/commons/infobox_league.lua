@@ -215,6 +215,7 @@ function League:createInfobox()
 		end
 		self.infobox:categories(unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args, links)
+		self:_setSeoTags(args)
 	end
 
 	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
@@ -232,6 +233,50 @@ end
 --- Allows for overriding this functionality
 function League:addToLpdb(lpdbData, args)
 	return lpdbData
+end
+
+--- Allows for overriding this functionality
+function League:seoImage(args)
+	return args.image
+end
+
+--- Allows for overriding this functionality
+function League:seoText(args)
+	local name = self.name
+	local tournamentType = args.type
+	local location = Localisation.getLocalisation({displayNoError = true}, args.country)
+	local game = args.game -- TODO Remove or improved via wiki custom
+	local tier = args.tier -- TODO Resolve to name
+	local tierType = args.tiertype or 'tournament'
+	local organizers = {
+		args['organizer-name'] or args.organizer,
+		args['organizer2-name'] or args.organizer2,
+		args['organizer3-name'] or args.organizer3
+	}
+
+	local intro = ''
+
+	intro = intro .. name .. ' is a'
+	if String.isNotEmpty(tournamentType) then
+		intro = intro .. 'n ' .. tournamentType
+	end
+	if String.isNotEmpty(location) then
+		intro = intro .. ' ' .. location
+	end
+	if String.isNotEmpty(game) then
+		intro = intro .. ' ' .. game
+	end
+
+	intro = intro .. ' ' .. tierType
+
+	if Table.isNotEmpty(organizers) then
+		intro = intro .. ' organized by ' .. mw.text.listToText(organizers)
+	end
+
+	local details = ''
+	-- TODO
+
+	return intro .. '. ' .. details
 end
 
 --- Allows for overriding this functionality
@@ -397,6 +442,11 @@ function League:_setLpdbData(args, links)
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
+end
+
+function League:_setSeoTags(args)
+	mw.ext.SearchEngineOptimization.metaimage(self:seoImage(args))
+	mw.ext.SearchEngineOptimization.metadescl(self:seoText(args))
 end
 
 function League:_getNamedTableofAllArgsForBase(args, base)
