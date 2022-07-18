@@ -951,7 +951,7 @@ function Placement:_parseOpponents(args)
 			if not args.place or self.placeStart + opponentIndex > self.placeEnd + 1 then
 				return
 			else
-				opponent.opponentData = Opponent.tbd()
+				opponent.opponentData = Opponent.tbd(self.parent.opponentType)
 			end
 		else
 			-- Set the date
@@ -986,7 +986,7 @@ function Placement:_parseOpponentArgs(input, date)
 	local opponentArgs = Json.parseIfTable(input) or (type(input) == 'table' and input or {input})
 	opponentArgs.type = opponentArgs.type or self.parent.opponentType
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
-	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd()
+	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(opponentArgs.type)
 	return Opponent.resolve(opponentData, date)
 end
 
