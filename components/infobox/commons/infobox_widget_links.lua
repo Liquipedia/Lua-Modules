@@ -20,6 +20,7 @@ local Links = Class.new(
 )
 
 local _ICON_KEYS_TO_RENAME = {
+	['bilibili-stream'] = 'bilibili',
 	daumcafe = 'cafe-daum',
 	['esea-d'] = 'esea',
 	['faceit-c'] = 'faceit',
@@ -88,7 +89,7 @@ local _PRIORITY_GROUPS = {
 		'dlive',
 		'facebook-gaming',
 		'vidio',
-		'bilibili',
+		'bilibili-stream',
 	}
 }
 
