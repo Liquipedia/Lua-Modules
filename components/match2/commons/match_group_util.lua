@@ -368,6 +368,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		date = record.date,
 		dateIsExact = Logic.readBool(record.dateexact),
 		finished = Logic.readBool(record.finished),
+		game = record.game,
 		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
@@ -482,6 +483,7 @@ function MatchGroupUtil.gameFromRecord(record)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
+		game = record.game,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
 		length = record.length,
 		map = nilIfEmpty(record.map),
