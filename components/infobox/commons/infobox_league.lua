@@ -8,6 +8,7 @@
 
 local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
+local Date = require('Module:Date/Ext')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
@@ -242,10 +243,79 @@ end
 
 --- Allows for overriding this functionality
 function League:seoText(args)
+	local getDateText = function(sdate, edate)
+		if not sdate and not edate then
+			return
+		end
+
+		local displayDate, tense
+		local sMonth, sDay = sdate:match('%d%d%d%d-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
+		local eMonth, eDay = edate:match('%d%d%d%d-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
+
+		if not tonumber(sMonth) then
+			return
+		end
+
+		local eMonthExact = tonumber(eMonth) and true
+		local sDayExact, eDayExact = tonumber(sDay) and true, tonumber(eDay) and true
+
+		local sTimestamp, eTimestamp = Date.readTimestamp(sdate), Date.readTimestamp(edate)
+		local currentTimestamp = os.time()
+
+		if currentTimestamp < sTimestamp then
+			tense = 'future'
+		elseif currentTimestamp < eTimestamp then
+			tense = 'present'
+		elseif currentTimestamp > eTimestamp then
+			tense = 'past'
+		else
+			return
+		end
+
+		local prefix = ''
+		local sFormat, eFormat = '', ''
+		if sDayExact then
+			sFormat = '%b %d %Y'
+		else
+			sFormat = '%b %Y'
+		end
+
+		if eDayExact then
+			eFormat = '%b %d %Y'
+		elseif eMonthExact then
+			eFormat = '%b %Y'
+		end
+
+		if not eMonthExact then
+			if tense == 'future' then
+				prefix = 'starting'
+			else
+				prefix = 'started'
+			end
+		end
+
+		if sTimestamp == eTimestamp and eDayExact then
+			prefix = 'on'
+			eFormat = ''
+		elseif sTimestamp == eTimestamp and eMonthExact then
+			prefix = 'in'
+			eFormat = ''
+		else
+			prefix = 'from'
+		end
+		if String.isNotEmpty(eFormat) then
+			displayDate = os.date('!' .. prefix .. ' ' .. sFormat) .. ' to ' .. os.date('! ' .. eFormat)
+		else
+			displayDate = os.date('!' .. prefix .. ' ' .. sFormat)
+		end
+
+		return displayDate, tense
+	end
+
 	local name = self.name
 	local tournamentType = args.type
 	local location = Localisation.getLocalisation({displayNoError = true}, args.country)
-	local date, dateVerb -- TODO
+	local date, dateVerb = getDateText(args.edate or args.date, args.sdate or args.date)
 	local teamCount, playerCount = args.team_number, args.player_number
 	local prizePool = self:_createPrizepool(args)
 	local tierType = args.liquipediatiertype or 'tournament'
