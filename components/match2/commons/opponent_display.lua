@@ -305,7 +305,6 @@ function OpponentDisplay.BlockTeam(props)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
 	return mw.html.create('div'):addClass('block-team')
-		:addClass(props.showLink == false and 'block-team-hide-link' or nil)
 		:addClass(props.flip and 'flipped' or nil)
 		:node(props.icon)
 		:node(nameNode)
