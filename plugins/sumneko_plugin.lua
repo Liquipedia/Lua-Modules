@@ -5,8 +5,8 @@
 local liquipedia = {}
 
 local importFunctions = {}
-importFunctions.functions = { 'require', 'mw%.loadData', 'Lua%.import', 'Lua%.requireIfExists', 'Lua%.loadDataIfExists' }
-importFunctions.prefixModules = { table = 'standard.', math = 'standard.', string = 'standard.' }
+importFunctions.functions = {'require', 'mw%.loadData', 'Lua%.import', 'Lua%.requireIfExists', 'Lua%.loadDataIfExists'}
+importFunctions.prefixModules = {table = 'standard.', math = 'standard.', string = 'standard.'}
 
 function importFunctions._row(name)
     local normModuleName =
@@ -27,7 +27,7 @@ end
 
 function importFunctions.annotate(text, funcName, diffs)
     for module, positionEndOfRow in text:gmatch(funcName .. '%s*%(?%s*[\'"](.-)[\'"]%s*%)?.-()\r?\n') do
-        table.insert(diffs, { start = positionEndOfRow, finish = positionEndOfRow, text = importFunctions._row(module) })
+        table.insert(diffs, {start = positionEndOfRow, finish = positionEndOfRow, text = importFunctions._row(module)})
     end
 end
 
@@ -37,7 +37,10 @@ function liquipedia.annotate(text, diffs)
     end
 end
 
+-- luacheck: push ignore
+-- setting non-standard global variable 'OnSetText' (but it's mandatory)
 function OnSetText(uri, text)
+-- luacheck: pop ignore
     if text:sub(1, 3) ~= '---' then
         return nil
     end
