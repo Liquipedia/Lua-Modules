@@ -115,6 +115,7 @@ MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
 MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
+	game = 'string?',
 	header = 'string?',
 	length = 'number?',
 	map = 'string?',
@@ -135,6 +136,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	date = 'string',
 	dateIsExact = 'boolean',
 	finished = 'boolean',
+	game = 'string?',
 	games = TypeUtil.array(MatchGroupUtil.types.Game),
 	links = 'table',
 	matchId = 'string?',
@@ -368,6 +370,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		date = record.date,
 		dateIsExact = Logic.readBool(record.dateexact),
 		finished = Logic.readBool(record.finished),
+		game = record.game,
 		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
@@ -482,6 +485,7 @@ function MatchGroupUtil.gameFromRecord(record)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
+		game = record.game,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
 		length = record.length,
 		map = nilIfEmpty(record.map),
