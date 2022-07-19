@@ -94,7 +94,7 @@ function matchFunctions.adjustMapData(match)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(_, map)
+function CustomMatchGroupInput.processMap(map)
 	if map.map == _DUMMY_MAP then
 		map.map = nil
 	end

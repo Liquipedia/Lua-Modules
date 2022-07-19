@@ -203,7 +203,7 @@ function LegacyMatchList.processMaps(args, details)
 			local score2 = details['map' .. index .. 't2score'] or
 				LegacyMatchList.getMapScoreFromGoals(details['map' .. index .. 't2goals'])
 
-			local map = MatchSubobjects.luaGetMap(nil, {
+			local map = MatchSubobjects.luaGetMap{
 				map = details['map' .. index],
 				winner = details['map' .. index .. 'win'],
 				score1 = score1,
@@ -214,7 +214,7 @@ function LegacyMatchList.processMaps(args, details)
 				comment = details['map' .. index .. 'comment'],
 				t1goals = details['map' .. index .. 't1goals'],
 				t2goals = details['map' .. index .. 't2goals'],
-			})
+			}
 			args['map' .. index] = map
 			if map.winner == '1' then
 				t1wins = t1wins + 1
