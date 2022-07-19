@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=commons
 -- page=Module:PrizePool/Legacy/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -16,6 +16,5 @@ local CustomLegacyPrizePool = {}
 function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run()
 end
-
 
 return CustomLegacyPrizePool
