@@ -302,11 +302,16 @@ function OpponentDisplay.BlockTeam(props)
 			and '[[' .. props.team.pageName .. '|' .. displayName .. ']]'
 			or displayName
 		)
+
+	local icon = props.showLink
+		and props.icon
+		or DisplayUtil.removeLinkFromWikiLink(props.icon)
+
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
 	return mw.html.create('div'):addClass('block-team')
 		:addClass(props.flip and 'flipped' or nil)
-		:node(props.icon)
+		:node(icon)
 		:node(nameNode)
 end
 
