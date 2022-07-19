@@ -1036,7 +1036,7 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 					}
 				else
 					playerData[mapPlayer] = {
-						faction = _FACTIONS[string.lower(Logic.emptyOr(map[playerKey .. 'race'], 'u'))] or 'u',
+						faction = _FACTIONS[string.lower(map[playerKey .. 'race'] or '')],
 						position = playerIndex
 					}
 				end
@@ -1052,8 +1052,7 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 	for playerIndex, player in pairs(players) do
 		if player and playerData[player.name] then
 			numberOfParticipants = numberOfParticipants + 1
-			local faction = playerData[player.name].faction ~= 'u'
-				and playerData[player.name].faction
+			local faction = playerData[player.name].faction
 				or player.extradata.faction or 'u'
 			participants[opponentIndex .. '_' .. playerIndex] = {
 				faction = faction,
