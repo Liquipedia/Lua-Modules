@@ -249,8 +249,8 @@ function League:seoText(args)
 		end
 
 		local displayDate, tense
-		local sMonth, sDay = sdate:match('%d%d%d%d-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
-		local eMonth, eDay = edate:match('%d%d%d%d-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
+		local sYear, sMonth, sDay = sdate:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
+		local eYear, eMonth, eDay = edate:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
 
 		if not tonumber(sMonth) then
 			return
@@ -272,41 +272,50 @@ function League:seoText(args)
 			return
 		end
 
-		local prefix = ''
-		local sFormat, eFormat = '', ''
-		if sDayExact then
-			sFormat = '%b %d %Y'
-		else
-			sFormat = '%b %Y'
-		end
+		local prefix
+		local sFormat, eFormat
 
-		if eDayExact then
-			eFormat = '%b %d %Y'
-		elseif eMonthExact then
+		if sDayExact and sYear == eYear then
+			sFormat = '%b %d'
+		elseif sDayExact then
+			sFormat = '%b %d %Y'
+		elseif sYear == eYear then
+			sFormat = '%b'
+		else
 			eFormat = '%b %Y'
 		end
 
-		if not eMonthExact then
+		if eDayExact and sMonth == eMonth then
+			eFormat = '%d %Y'
+		elseif eDayExact then
+			eFormat = '%b %d %Y'
+		else
+			eFormat = '%b %Y'
+		end
+
+		if sTimestamp == eTimestamp and eDayExact then
+			prefix = 'on'
+			sFormat = '%b %d %Y'
+			eFormat = ''
+		elseif sTimestamp == eTimestamp and eMonthExact then
+			prefix = 'in'
+			sFormat = '%b %Y'
+			eFormat = ''
+		elseif not eMonthExact then
 			if tense == 'future' then
 				prefix = 'starting'
 			else
 				prefix = 'started'
 			end
-		end
-
-		if sTimestamp == eTimestamp and eDayExact then
-			prefix = 'on'
-			eFormat = ''
-		elseif sTimestamp == eTimestamp and eMonthExact then
-			prefix = 'in'
 			eFormat = ''
 		else
 			prefix = 'from'
 		end
+
 		if String.isNotEmpty(eFormat) then
-			displayDate = os.date('!' .. prefix .. ' ' .. sFormat) .. ' to ' .. os.date('! ' .. eFormat)
+			displayDate = os.date('!' .. prefix .. ' ' .. sFormat, sTimestamp) .. ' to ' .. os.date('!' .. eFormat, eTimestamp)
 		else
-			displayDate = os.date('!' .. prefix .. ' ' .. sFormat)
+			displayDate = os.date('!' .. prefix .. ' ' .. sFormat, sTimestamp)
 		end
 
 		return displayDate, tense
@@ -315,7 +324,8 @@ function League:seoText(args)
 	local name = self.name
 	local tournamentType = args.type
 	local location = Localisation.getLocalisation({displayNoError = true}, args.country)
-	local date, dateVerb = getDateText(args.edate or args.date, args.sdate or args.date)
+	local date, tense  = getDateText(args.sdate or args.date, args.edate or args.date)
+	local dateVerb = (tense == 'past' and 'took place') or (tense == 'future' and 'will take place') or 'takes place'
 	local teamCount, playerCount = args.team_number, args.player_number
 	local prizePool = self:_createPrizepool(args)
 	local tierType = args.liquipediatiertype or 'tournament'
@@ -360,11 +370,15 @@ function League:seoText(args)
 	end
 
 	if teamCount or playerCount then
-		details = details .. ' features '
+		if date and dateVerb then
+			details = details .. ' featuring'
+		else
+			details = details .. ' features'
+		end
 		if teamCount then
-			details = details .. teamCount .. ' teams'
+			details = details .. ' ' .. teamCount .. ' teams'
 		elseif playerCount then
-			details = details .. playerCount .. ' players'
+			details = details .. ' ' .. playerCount .. ' players'
 		end
 	end
 
