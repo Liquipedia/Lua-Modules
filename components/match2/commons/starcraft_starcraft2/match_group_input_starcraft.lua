@@ -987,11 +987,12 @@ function StarcraftMatchGroupInput._processDefaultPlayerMapData(players, map, opp
 end
 
 function StarcraftMatchGroupInput._processArchonPlayerMapData(players, map, opponentIndex, participants)
-	local faction = string.lower(Logic.emptyOr(
+	local faction = Logic.emptyOr(
 		map['opponent' .. opponentIndex .. 'race'],
 		map['race' .. opponentIndex],
-		players[1].extradata.faction or 'u'
-	))
+		players[1].extradata.faction
+	)
+	faction = string.lower(faction or '')
 	participants[opponentIndex .. '_1'] = {
 		faction = _FACTIONS[faction] or 'u',
 		player = players[1].name
