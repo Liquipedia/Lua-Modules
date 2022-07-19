@@ -15,12 +15,15 @@ local StringUtils = require('Module:StringUtils')
 local Class = require('Module:Class')
 local AnOrA = require('Module:A or an')
 local Tier = mw.loadData('Module:Tier')
+local Table = mw.loadData('Module:Table')
 
 local MetadataGenerator = {}
 
 local TIME_FUTURE = 1
 local TIME_ONGOING = 0
 local TIME_PAST = -1
+
+local TYPES_TO_DISPLAY = {'qualifier', 'showmatch', 'show match'}
 
 function MetadataGenerator.tournament(args)
 	local output
@@ -46,7 +49,7 @@ function MetadataGenerator.tournament(args)
 	local tierType = 'tournament'
 	if args.liquipediatiertype then
 		local tierTypeLower = args.liquipediatiertype:lower()
-		if tierTypeLower == 'qualifier' or tierTypeLower == 'showmatch' then
+		if Table.includes(TYPES_TO_DISPLAY, tierTypeLower) then
 			tierType = tierTypeLower
 		end
 	end
@@ -61,7 +64,7 @@ function MetadataGenerator.tournament(args)
 	local players = args.player_number
 
 	local game
-	if args.primarygame and String.isNotEmpty(args.game) and args.game == args.primarygame then
+	if type(Games.abbr) == 'function' and args.primarygame and String.isNotEmpty(args.game) and args.game == args.primarygame then
 		game = Games.abbr[args.game]
 	end
 
