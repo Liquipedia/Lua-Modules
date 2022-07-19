@@ -409,7 +409,10 @@ function PrizePool:build()
 		wrapper:wikitext(self:_getPrizeSummaryText())
 	end
 
-	local table = WidgetTable{classes = {'collapsed', 'general-collapsible', 'prizepooltable'}}
+	local table = WidgetTable{
+		classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
+		css = {width = 'max-content'},
+	}
 
 	table:addRow(self:_buildHeader())
 
