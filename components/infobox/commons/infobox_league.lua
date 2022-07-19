@@ -252,14 +252,15 @@ function League:seoText(args)
 		local sYear, sMonth, sDay = sdate:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
 		local eYear, eMonth, eDay = edate:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
 
-		if not tonumber(sMonth) then
+		if not tonumber(sYear) or not tonumber(eYear) or not tonumber(sMonth) then
 			return
 		end
 
 		local eMonthExact = tonumber(eMonth) and true
 		local sDayExact, eDayExact = tonumber(sDay) and true, tonumber(eDay) and true
 
-		local sTimestamp, eTimestamp = Date.readTimestamp(sdate), Date.readTimestamp(edate)
+		local sTimestamp = Date.readTimestamp(sdate:gsub('%?%?', '01'))
+		local eTimestamp = Date.readTimestamp(edate:gsub('%?%?', '01'))
 		local currentTimestamp = os.time()
 
 		if currentTimestamp < sTimestamp then
