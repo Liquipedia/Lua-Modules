@@ -258,10 +258,14 @@ function League:seoText(args)
 		args['organizer2-name'] or args.organizer2,
 		args['organizer3-name'] or args.organizer3
 	}
-	local tierType = args.liquipediatiertype and self:_getTierText(args.liquipediatiertype, _TIER_MODE_TYPES) or 'tournament'
-	local tierText = args.liquipediatier and self:_getTierText(args.liquipediatier, _TIER_MODE_TIERS) or nil
+	local tierType = args.liquipediatiertype
+		and self:_getTierText(args.liquipediatiertype, _TIER_MODE_TYPES)
+		or 'tournament'
+	local tierText = args.liquipediatier
+		and self:_getTierText(args.liquipediatier, _TIER_MODE_TIERS)
+		or nil
 
-	-- FooBar Season 4 is an offline American Qualifier orangized by X and Y. 
+	-- FooBar Season 4 is an offline American Qualifier orangized by X and Y.
 	local intro = name .. ' is a'
 	if String.isNotEmpty(tournamentType) then
 		intro = intro .. 'n ' .. tournamentType:lower()
