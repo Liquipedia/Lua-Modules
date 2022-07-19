@@ -24,6 +24,7 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Tier = require('Module:Tier')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 local Logic = require('Module:Logic')
+local MetadataGenerator = require('Module:MetadataGenerator')
 
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
@@ -215,6 +216,7 @@ function League:createInfobox()
 		end
 		self.infobox:categories(unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args, links)
+		self:_setSeoTags(args)
 	end
 
 	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
@@ -235,6 +237,11 @@ function League:addToLpdb(lpdbData, args)
 end
 
 --- Allows for overriding this functionality
+function League:seoText(args)
+	return MetadataGenerator.tournament(args)
+end
+
+--- Allows for overriding this functionality
 function League:liquipediaTierHighlighted(args)
 	return false
 end
@@ -242,6 +249,14 @@ end
 --- Allows for overriding this functionality
 function League:appendLiquipediatierDisplay()
 	return ''
+end
+
+function League:_getTierText(tierString, tierMode)
+	if not Tier.text[tierMode] then -- allow legacy tier modules
+		return Tier.text[tierString]
+	else -- default case, i.e. tier module with intended format
+		return Tier.text[tierMode][tierString:lower()]
+	end
 end
 
 --- Allows for overriding this functionality
@@ -253,12 +268,7 @@ function League:createLiquipediaTierDisplay(args)
 	end
 
 	local function buildTierString(tierString, tierMode)
-		local tierText
-		if not Tier.text[tierMode] then -- allow legacy tier modules
-			tierText = Tier.text[tierString]
-		else -- default case, i.e. tier module with intended format
-			tierText = Tier.text[tierMode][tierString:lower()]
-		end
+		local tierText = League:_getTierText(tierString, tierMode)
 		if not tierText then
 			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
 			table.insert(
@@ -397,6 +407,13 @@ function League:_setLpdbData(args, links)
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
+end
+
+function League:_setSeoTags(args)
+	local desc = self:seoText(args)
+	if desc then
+		mw.ext.SearchEngineOptimization.metadescl(desc)
+	end
 end
 
 function League:_getNamedTableofAllArgsForBase(args, base)

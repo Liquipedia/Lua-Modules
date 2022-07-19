@@ -34,6 +34,10 @@ function Header:make()
 		)
 	}
 
+	if self.image then
+		mw.ext.SearchEngineOptimization.metaimage(self.image)
+	end
+
 	local subHeader = Header:_subHeader(self.subHeader)
 	if subHeader then
 		table.insert(header, 2, subHeader)
@@ -100,7 +104,7 @@ function Header:_makeSizedImage(imageName, fileName, size, mode)
 	end
 
 	local fullFileName = '[[File:' .. imageName .. '|center|' .. size .. ']]'
-	infoboxImage:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
+	infoboxImage:wikitext(fullFileName)
 
 	return infoboxImage
 end

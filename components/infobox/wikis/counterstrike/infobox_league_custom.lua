@@ -17,7 +17,6 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
-local MetadataGenerator = require('Module:MetadataGenerator')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -137,8 +136,6 @@ function CustomInjector:parse(id, widgets)
 			}
 		)
 	end
-
-	mw.getCurrentFrame():extensionTag{name = 'metadescl', MetadataGenerator.tournament(_league.args)}
 
 	return widgets
 end

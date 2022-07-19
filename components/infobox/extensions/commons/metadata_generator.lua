@@ -7,31 +7,30 @@
 --
 
 local String = require('Module:StringUtils')
+local Date = require('Module:Date/Ext')
 local Localisation = require('Module:Localisation')
-local Template = require('Module:Template')
-local Games = require('Module:Games')
+local Games = mw.loadData('Module:Games')
 local Variables = require('Module:Variables')
 local StringUtils = require('Module:StringUtils')
 local Class = require('Module:Class')
 local AnOrA = require('Module:A or an')
+local Tier = mw.loadData('Module:Tier')
+local Table = require('Module:Table')
 
 local MetadataGenerator = {}
 
+local TIME_FUTURE = 1
+local TIME_ONGOING = 0
+local TIME_PAST = -1
+
+local TYPES_TO_DISPLAY = {'qualifier', 'showmatch', 'show match'}
+
 function MetadataGenerator.tournament(args)
-	if String.isEmpty(args.publisherdescription) then
-		error('You must provide the publisherdescription param!')
-	end
-
-	if String.isEmpty(args.primarygame) then
-		error('You must provide the primarygame param!')
-	end
-
 	local output
-	local frame = mw.getCurrentFrame()
 
 	local name = not String.isEmpty(args.name) and (args.name):gsub('&nbsp;', ' ') or mw.title.getCurrentTitle()
 
-	local type = args.type
+	local tournamentType = args.type
 	local locality = Localisation.getLocalisation({displayNoError = true}, args.country)
 
 	local organizers = {
@@ -40,24 +39,36 @@ function MetadataGenerator.tournament(args)
 		args['organizer3-name'] or args.organizer3,
 	}
 
-	local tier = args.liquipediatier and Template.safeExpand(frame, 'TierDisplay', {args.liquipediatier}) or nil
+	---@type string?
+	local tier = args.liquipediatier and MetadataGenerator.getTierText(args.liquipediatier) or nil
 
-	if tier then
-		tier = (tonumber(
-			Template.safeExpand(frame, 'TierDisplay/number', {args.liquipediatier})
-		) or 0) > 4 and tier:lower() or tier
-	else
+	if not tier then
 		tier = 'Unknown Tier'
 	end
 
-	local tierType = (tier == 'qualifier' or tier == 'showmatch') and tier or 'tournament'
-	local publisher = Variables.varDefault(args.publisherdescription, '')
-	local date, tense = MetadataGenerator.getDate(args.edate or args.date, args.sdate)
+	local tierType = 'tournament'
+	if args.liquipediatiertype then
+		local tierTypeLower = args.liquipediatiertype:lower()
+		if Table.includes(TYPES_TO_DISPLAY, tierTypeLower) then
+			tierType = tierTypeLower
+		end
+	end
+
+	local publisher
+	if args.publisherdescription then
+		publisher = Variables.varDefault(args.publisherdescription, '')
+	end
+	local date, tense = MetadataGenerator.getDate(args.sdate or args.date, args.edate or args.date)
 
 	local teams = args.team_number
 	local players = args.player_number
 
-	local game = (not String.isEmpty(args.game) and args.game ~= args.primarygame) and Games.abbr[args.game]
+	local game
+	if type(Games.abbr) == 'table' and args.primarygame and String.isNotEmpty(args.game)
+		and args.game == args.primarygame then
+
+		game = Games.abbr[args.game]
+	end
 
 	local prizepoolusd = args.prizepoolusd and ('$' .. args.prizepoolusd .. ' USD') or nil
 	local prizepool = prizepoolusd or (
@@ -68,16 +79,22 @@ function MetadataGenerator.tournament(args)
 		)
 	)
 	local charity = args.charity == 'true'
-	local dateVerb = (tense == 'past' and 'took place ') or (tense == 'future' and 'will take place ') or 'takes place '
+	local dateVerb = (tense == TIME_PAST and 'took place ')
+		or (tense == TIME_FUTURE and 'will take place ')
+		or 'takes place '
+
 	local dateVerbPublisher =
-		(tense == 'past' and ' which took place ') or
-		(tense == 'future' and ' which will take place ') or
+		(tense == TIME_PAST and ' which took place ') or
+		(tense == TIME_FUTURE and ' which will take place ') or
 		' taking place '
 
 	output = StringUtils.interpolate('${name} is ${a}${type}${locality}${game}${charity}${tierType}${organizer}', {
 		name = name,
-		a = AnOrA._main(type or locality or game or (charity and 'charity' or nil) or tierType) .. ' ',
-		type = type and (type:lower() .. ' ') or '',
+		a = AnOrA._main{
+			tournamentType or locality or game or (charity and 'charity' or nil) or tierType,
+			origStr = 'false' -- Ew (but has to be like this)
+		},
+		type = tournamentType and (tournamentType:lower() .. ' ') or '',
 		locality = locality and (locality .. ' ') or '',
 		game = game and (game .. ' ') or '',
 		charity = charity and 'charity ' or '',
@@ -129,48 +146,105 @@ function MetadataGenerator.tournament(args)
 	return output
 end
 
-function MetadataGenerator.getDate(date, sdate)
-	if String.isEmpty(date) then
-		return nil
+function MetadataGenerator.getTierText(tierString)
+	if not Tier.text.tiers then -- allow legacy tier modules
+		return Tier.text[tierString]
+	else -- default case, i.e. tier module with intended format
+		return Tier.text.tiers[tierString:lower()]
+	end
+end
+
+function MetadataGenerator.getDate(startDate, endDate)
+	if not startDate or not endDate then
+		return
 	end
 
-	local noStartDay, noEndDay, tense
-	local startRaw = (sdate or date):gsub('%-[?X]+', '')
-	local endRaw = date:gsub('%-[?X]+', '')
-	local currentU = tonumber(os.date("!%s"))
-	local startU = tonumber(mw.getContentLanguage():formatDate('U', startRaw))
-	local endU = tonumber(mw.getContentLanguage():formatDate('U', endRaw))
-	local startMD = startRaw:sub(6)
-	local endMD = endRaw:sub(6)
-
-	if tonumber(startMD) then
-		noStartDay = true
+	local dateStringToStruct = function (dateString)
+		local year, month, day = dateString:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
+		if not year then return {} end
+		return {
+			year = year,
+			month = month,
+			day = day,
+			yearExact = tonumber(year) and true,
+			monthExact = tonumber(month) and true,
+			dayExact = tonumber(day) and true,
+			timestamp = Date.readTimestamp(dateString:gsub('%?%?', '01'))
+		}
 	end
 
-	if tonumber(endMD) then
-		noEndDay = true
+	local currentTimestamp = os.time()
+	local startTime = dateStringToStruct(startDate)
+	local endTime = dateStringToStruct(endDate)
+
+	if not startTime.yearExact or not endTime.yearExact or not startTime.monthExact then
+		return
 	end
 
-	if currentU > endU then
-		tense = 'past'
-	elseif currentU < startU then
-		tense = 'future'
-	elseif startU < currentU and currentU < endU then
-		tense = 'present'
-	end
+	local relativeTime = MetadataGenerator.getTimeRelativity(currentTimestamp, startTime, endTime)
 
-	if startU == endU then
-		return os.date("!on %b " .. (noStartDay and "??" or "%d") .. " %Y", endU), tense
-	elseif os.date("!%m, %Y", startU) == os.date("!%m %Y", endU) then
-		return os.date("!from %b " .. (noStartDay and "??" or "%d"), startU) .. ' to ' ..
-			os.date("!" .. (noEndDay and "??" or "%d") .. " %Y", endU), tense
-	elseif os.date("!%Y", startU) == os.date("!%Y", endU) then
-		return os.date("!from %b " .. (noStartDay and "??" or "%d"), startU) .. ' to ' ..
-			os.date("!%b " .. (noEndDay and "??" or "%d") .. " %Y", endU), tense
+	local sFormat, eFormat = MetadataGenerator.getDateFormat(startTime, endTime)
+
+	local prefix
+	if startTime.timestamp == endTime.timestamp and endTime.dayExact then
+		prefix = 'on'
+		sFormat = '%b %d %Y'
+		eFormat = ''
+	elseif startTime.timestamp == endTime.timestamp and endTime.monthExact then
+		prefix = 'in'
+		sFormat = '%b %Y'
+		eFormat = ''
+	elseif not endTime.monthExact then
+		if relativeTime == TIME_FUTURE then
+			prefix = 'starting'
+		else
+			prefix = 'started'
+		end
+		eFormat = ''
 	else
-		return os.date("!from %b " .. (noStartDay and "??" or "%d") .. " %Y", startU) .. ' to ' ..
-			os.date("!%b " .. (noEndDay and "??" or "%d") .. " %Y", endU), tense
+		prefix = 'from'
 	end
+
+	local displayDate
+	displayDate = prefix .. ' ' .. os.date('!' .. sFormat, startTime.timestamp)
+	if String.isNotEmpty(eFormat) then
+		displayDate = displayDate .. ' to ' .. os.date('!' .. eFormat, endTime.timestamp)
+	end
+
+	return displayDate, relativeTime
+end
+
+function MetadataGenerator.getTimeRelativity(timeNow, startTime, endTime)
+	if timeNow < startTime.timestamp then
+		return TIME_FUTURE
+	elseif timeNow < endTime.timestamp then
+		return TIME_ONGOING
+	elseif timeNow > endTime.timestamp then
+		return TIME_PAST
+	end
+end
+
+function MetadataGenerator.getDateFormat(startTime, endTime)
+	local formatStart, formatEnd
+	if startTime.dayExact and startTime.year == endTime.year then
+		formatStart = '%b %d'
+	elseif startTime.dayExact then
+		formatStart = '%b %d %Y'
+	elseif startTime.year == endTime.year then
+		formatStart = '%b'
+	else
+		formatStart = '%b %Y'
+	end
+
+	if endTime.dayExact and startTime.month == endTime.month then
+		formatEnd = '%d %Y'
+	elseif endTime.dayExact then
+		formatEnd = '%b %d %Y'
+	else
+		formatEnd = '%b %Y'
+	end
+
+	return formatStart, formatEnd
 end
 
 return Class.export(MetadataGenerator)
