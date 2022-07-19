@@ -237,11 +237,6 @@ function League:addToLpdb(lpdbData, args)
 end
 
 --- Allows for overriding this functionality
-function League:seoImage(args)
-	return args.image
-end
-
---- Allows for overriding this functionality
 function League:seoText(args)
 	return MetadataGenerator.tournament(args)
 end
@@ -415,11 +410,6 @@ function League:_setLpdbData(args, links)
 end
 
 function League:_setSeoTags(args)
-	local image = self:seoImage(args)
-	if image then
-		mw.ext.SearchEngineOptimization.metaimage(image)
-	end
-
 	local desc = self:seoText(args)
 	if desc then
 		mw.ext.SearchEngineOptimization.metadescl(desc)
