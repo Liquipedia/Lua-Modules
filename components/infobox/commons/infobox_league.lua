@@ -282,7 +282,7 @@ function League:seoText(args)
 		elseif sYear == eYear then
 			sFormat = '%b'
 		else
-			eFormat = '%b %Y'
+			sFormat = '%b %Y'
 		end
 
 		if eDayExact and sMonth == eMonth then
