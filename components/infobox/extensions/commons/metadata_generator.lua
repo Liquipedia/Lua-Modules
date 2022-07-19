@@ -65,7 +65,8 @@ function MetadataGenerator.tournament(args)
 
 	local game
 	if type(Games.abbr) == 'function' and args.primarygame and String.isNotEmpty(args.game)
-			and args.game == args.primarygame then
+		and args.game == args.primarygame then
+
 		game = Games.abbr[args.game]
 	end
 
