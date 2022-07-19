@@ -38,7 +38,6 @@ end)
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
--- @parameter frame - the frame object
 -- @parameter player - a player
 -- @returns the player after changes have been applied
 WikiSpecificBase.processPlayer = FnUtil.lazilyDefineFunction(function()

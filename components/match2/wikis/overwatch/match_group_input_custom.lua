@@ -99,7 +99,7 @@ function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(_, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
