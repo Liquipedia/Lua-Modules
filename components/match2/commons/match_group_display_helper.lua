@@ -179,7 +179,7 @@ DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
 		matchHeight = 44, -- deprecated
 		matchWidth = 150,
 		matchWidthMobile = 90,
-		opponentHeight = 23,
+		opponentHeight = 26,
 		roundHorizontalMargin = 20,
 		scoreWidth = 20,
 	}
