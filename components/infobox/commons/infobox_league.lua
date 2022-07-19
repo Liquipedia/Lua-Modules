@@ -30,6 +30,9 @@ local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
 local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+local TIME_FUTURE = 1
+local TIME_ONGOING = 0
+local TIME_PAST = -1
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -243,111 +246,25 @@ end
 
 --- Allows for overriding this functionality
 function League:seoText(args)
-	local getDateText = function(sdate, edate)
-		if not sdate and not edate then
-			return
-		end
-
-		local displayDate, tense
-		local sYear, sMonth, sDay = sdate:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
-		local eYear, eMonth, eDay = edate:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
-
-		if not tonumber(sYear) or not tonumber(eYear) or not tonumber(sMonth) then
-			return
-		end
-
-		local eMonthExact = tonumber(eMonth) and true
-		local sDayExact, eDayExact = tonumber(sDay) and true, tonumber(eDay) and true
-
-		local sTimestamp = Date.readTimestamp(sdate:gsub('%?%?', '01'))
-		local eTimestamp = Date.readTimestamp(edate:gsub('%?%?', '01'))
-		local currentTimestamp = os.time()
-
-		if currentTimestamp < sTimestamp then
-			tense = 'future'
-		elseif currentTimestamp < eTimestamp then
-			tense = 'present'
-		elseif currentTimestamp > eTimestamp then
-			tense = 'past'
-		else
-			return
-		end
-
-		local prefix
-		local sFormat, eFormat
-
-		if sDayExact and sYear == eYear then
-			sFormat = '%b %d'
-		elseif sDayExact then
-			sFormat = '%b %d %Y'
-		elseif sYear == eYear then
-			sFormat = '%b'
-		else
-			sFormat = '%b %Y'
-		end
-
-		if eDayExact and sMonth == eMonth then
-			eFormat = '%d %Y'
-		elseif eDayExact then
-			eFormat = '%b %d %Y'
-		else
-			eFormat = '%b %Y'
-		end
-
-		if sTimestamp == eTimestamp and eDayExact then
-			prefix = 'on'
-			sFormat = '%b %d %Y'
-			eFormat = ''
-		elseif sTimestamp == eTimestamp and eMonthExact then
-			prefix = 'in'
-			sFormat = '%b %Y'
-			eFormat = ''
-		elseif not eMonthExact then
-			if tense == 'future' then
-				prefix = 'starting'
-			else
-				prefix = 'started'
-			end
-			eFormat = ''
-		else
-			prefix = 'from'
-		end
-
-		if String.isNotEmpty(eFormat) then
-			displayDate = os.date('!' .. prefix .. ' ' .. sFormat, sTimestamp) .. ' to ' .. os.date('!' .. eFormat, eTimestamp)
-		else
-			displayDate = os.date('!' .. prefix .. ' ' .. sFormat, sTimestamp)
-		end
-
-		return displayDate, tense
-	end
-
 	local name = self.name
 	local tournamentType = args.type
 	local location = Localisation.getLocalisation({displayNoError = true}, args.country)
-	local date, tense  = getDateText(args.sdate or args.date, args.edate or args.date)
-	local dateVerb = (tense == 'past' and 'took place') or (tense == 'future' and 'will take place') or 'takes place'
+	local date, tense = self:getSeoDateDisplay(args.sdate or args.date, args.edate or args.date)
+	local dateVerb = (tense == TIME_PAST and 'took place') or (tense == TIME_FUTURE and 'will take place') or 'takes place'
 	local teamCount, playerCount = args.team_number, args.player_number
 	local prizePool = self:_createPrizepool(args)
-	local tierType = args.liquipediatiertype or 'tournament'
 	local organizers = {
 		args['organizer-name'] or args.organizer,
 		args['organizer2-name'] or args.organizer2,
 		args['organizer3-name'] or args.organizer3
 	}
-	local tierText -- TODO: Extract to function
-	if args.liquipediatier then
-		if not Tier.text[_TIER_MODE_TIERS] then -- allow legacy tier modules
-			tierText = Tier.text[args.liquipediatier]
-		else -- default case, i.e. tier module with intended format
-			tierText = Tier.text[_TIER_MODE_TIERS][args.liquipediatier:lower()]
-		end
-	end
+	local tierType = args.liquipediatiertype and self:_getTierText(args.liquipediatiertype, _TIER_MODE_TYPES) or 'tournament'
+	local tierText = args.liquipediatier and self:_getTierText(args.liquipediatier, _TIER_MODE_TIERS) or nil
 
-	local intro = ''
-	intro = intro .. name .. ' is a'
+	-- FooBar Season 4 is an offline American Qualifier orangized by X and Y. 
+	local intro = name .. ' is a'
 	if String.isNotEmpty(tournamentType) then
-		intro = intro .. 'n ' .. tournamentType
+		intro = intro .. 'n ' .. tournamentType:lower()
 	end
 	if String.isNotEmpty(location) then
 		intro = intro .. ' ' .. location
@@ -359,6 +276,8 @@ function League:seoText(args)
 		intro = intro .. ' organized by ' .. mw.text.listToText(organizers)
 	end
 
+	-- This A-Tier Qualifier takes place from July 3 to 22 2022
+	-- featuring 12 teams competing over a total of $500 USD.
 	local details = ''
 	details = details .. 'This'
 	if String.isNotEmpty(tierText) then
@@ -394,6 +313,101 @@ function League:seoText(args)
 end
 
 --- Allows for overriding this functionality
+function League:getSeoDateDisplay(startDate, endDate)
+	if not startDate or not endDate then
+		return
+	end
+
+	local dateStringToStruct = function (dateString)
+		local year, month, day = dateString:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
+		return {
+			year = year,
+			month = month,
+			day = day,
+			yearExact = tonumber(year) and true,
+			monthExact = tonumber(month) and true,
+			dayExact = tonumber(day) and true,
+			timestamp = Date.readTimestamp(dateString:gsub('%?%?', '01'))
+		}
+	end
+
+	local currentTimestamp = os.time()
+	local startTime = dateStringToStruct(startDate)
+	local endTime = dateStringToStruct(endDate)
+
+	if not startTime.yearExact or not endTime.yearExact or not startTime.monthExact then
+		return
+	end
+
+	local relativeTime = self:getSeoTimeRelativity(currentTimestamp, startTime, endTime)
+
+	local sFormat, eFormat = self:getSeoDateFormat(startTime, endTime)
+
+	local prefix
+	if startTime.timestamp == endTime.timestamp and endTime.dayExact then
+		prefix = 'on'
+		sFormat = '%b %d %Y'
+		eFormat = ''
+	elseif startTime.timestamp == endTime.timestamp and endTime.monthExact then
+		prefix = 'in'
+		sFormat = '%b %Y'
+		eFormat = ''
+	elseif not endTime.monthExact then
+		if relativeTime == TIME_FUTURE then
+			prefix = 'starting'
+		else
+			prefix = 'started'
+		end
+		eFormat = ''
+	else
+		prefix = 'from'
+	end
+
+	local displayDate
+	displayDate = prefix .. ' ' .. os.date('!' .. sFormat, startTime.timestamp)
+	if String.isNotEmpty(eFormat) then
+		displayDate = displayDate .. ' to ' .. os.date('!' .. eFormat, endTime.timestamp)
+	end
+
+	return displayDate, relativeTime
+end
+
+--- Allows for overriding this functionality
+function League:getSeoTimeRelativity(timeNow, startTime, endTime)
+	if timeNow < startTime.timestamp then
+		return TIME_FUTURE
+	elseif timeNow < endTime.timestamp then
+		return TIME_ONGOING
+	elseif timeNow > endTime.timestamp then
+		return TIME_PAST
+	end
+end
+
+--- Allows for overriding this functionality
+function League:getSeoDateFormat(startTime, endTime)
+	local formatStart, formatEnd
+	if startTime.dayExact and startTime.year == endTime.year then
+		formatStart = '%b %d'
+	elseif startTime.dayExact then
+		formatStart = '%b %d %Y'
+	elseif startTime.year == endTime.year then
+		formatStart = '%b'
+	else
+		formatStart = '%b %Y'
+	end
+
+	if endTime.dayExact and startTime.month == endTime.month then
+		formatEnd = '%d %Y'
+	elseif endTime.dayExact then
+		formatEnd = '%b %d %Y'
+	else
+		formatEnd = '%b %Y'
+	end
+
+	return formatStart, formatEnd
+end
+
+--- Allows for overriding this functionality
 function League:liquipediaTierHighlighted(args)
 	return false
 end
@@ -401,6 +415,14 @@ end
 --- Allows for overriding this functionality
 function League:appendLiquipediatierDisplay()
 	return ''
+end
+
+function League:_getTierText(tierString, tierMode)
+	if not Tier.text[tierMode] then -- allow legacy tier modules
+		return Tier.text[tierString]
+	else -- default case, i.e. tier module with intended format
+		return Tier.text[tierMode][tierString:lower()]
+	end
 end
 
 --- Allows for overriding this functionality
@@ -412,12 +434,7 @@ function League:createLiquipediaTierDisplay(args)
 	end
 
 	local function buildTierString(tierString, tierMode)
-		local tierText
-		if not Tier.text[tierMode] then -- allow legacy tier modules
-			tierText = Tier.text[tierString]
-		else -- default case, i.e. tier module with intended format
-			tierText = Tier.text[tierMode][tierString:lower()]
-		end
+		local tierText = League:_getTierText(tierString, tierMode)
 		if not tierText then
 			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
 			table.insert(
