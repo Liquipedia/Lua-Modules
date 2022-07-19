@@ -9,6 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
@@ -48,6 +49,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
 	Variables.varDefine('enddate_'.. participantLower, lpdbData.date)
+
+	if Opponent.isTbd(opponent.opponentData) then
+		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
+	end
 
 	return lpdbData
 end
