@@ -50,7 +50,7 @@ local _CLEAN_OTHER_ROLES = {
 local _MILITARY_DATA = {
 	starting = {category = 'Persons waiting for Military Duty', storeValue = 'pending'},
 	ongoing = {category = 'Persons on Military Duty', storeValue = 'ongoing'},
-	fulfilled = {category = 'Persons expleted Military Duty', storeValue = 'fulfilled'},
+	fulfilled = {category = 'Persons that completed their Military Duty', storeValue = 'fulfilled'},
 	exempted = {category = 'Persons exempted from Military Duty', storeValue = 'exempted'},
 }
 _MILITARY_DATA.pending = _MILITARY_DATA.starting
