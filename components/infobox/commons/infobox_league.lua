@@ -8,7 +8,6 @@
 
 local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Date = require('Module:Date/Ext')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
@@ -25,14 +24,12 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Tier = require('Module:Tier')
 local PrizePoolCurrency = require('Module:Prize pool currency')
 local Logic = require('Module:Logic')
+local MetadataGenerator = require('Module:MetadataGenerator')
 
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
 local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
-local TIME_FUTURE = 1
-local TIME_ONGOING = 0
-local TIME_PAST = -1
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -246,169 +243,7 @@ end
 
 --- Allows for overriding this functionality
 function League:seoText(args)
-	local name = self.name
-	local tournamentType = args.type
-	local location = Localisation.getLocalisation({displayNoError = true}, args.country)
-	local date, tense = self:getSeoDateDisplay(args.sdate or args.date, args.edate or args.date)
-	local dateVerb = (tense == TIME_PAST and 'took place') or (tense == TIME_FUTURE and 'will take place') or 'takes place'
-	local teamCount, playerCount = args.team_number, args.player_number
-	local prizePool = self:_createPrizepool(args)
-	local organizers = {
-		args['organizer-name'] or args.organizer,
-		args['organizer2-name'] or args.organizer2,
-		args['organizer3-name'] or args.organizer3
-	}
-	local tierType = args.liquipediatiertype
-		and self:_getTierText(args.liquipediatiertype, _TIER_MODE_TYPES)
-		or 'tournament'
-	local tierText = args.liquipediatier
-		and self:_getTierText(args.liquipediatier, _TIER_MODE_TIERS)
-		or nil
-
-	-- FooBar Season 4 is an offline American Qualifier orangized by X and Y.
-	local intro = name .. ' is a'
-	if String.isNotEmpty(tournamentType) then
-		intro = intro .. 'n ' .. tournamentType:lower()
-	end
-	if String.isNotEmpty(location) then
-		intro = intro .. ' ' .. location
-	end
-
-	intro = intro .. ' ' .. tierType
-
-	if Table.isNotEmpty(organizers) then
-		intro = intro .. ' organized by ' .. mw.text.listToText(organizers)
-	end
-
-	-- This A-Tier Qualifier takes place from July 3 to 22 2022
-	-- featuring 12 teams competing over a total of $500 USD.
-	local details = ''
-	details = details .. 'This'
-	if String.isNotEmpty(tierText) then
-		details = details .. ' ' .. tierText
-	end
-	details = details .. ' ' .. tierType
-
-	if date and dateVerb then
-		details = details .. ' ' .. dateVerb .. ' ' .. date
-	end
-
-	if teamCount or playerCount then
-		if date and dateVerb then
-			details = details .. ' featuring'
-		else
-			details = details .. ' features'
-		end
-		if teamCount then
-			details = details .. ' ' .. teamCount .. ' teams'
-		elseif playerCount then
-			details = details .. ' ' .. playerCount .. ' players'
-		end
-	end
-
-	if String.isNotEmpty(prizePool) then
-		if teamCount or playerCount then
-			details = details .. ' competing over'
-		end
-		details = details .. ' a total of ' .. prizePool
-	end
-
-	return intro .. '. ' .. details .. '.'
-end
-
---- Allows for overriding this functionality
-function League:getSeoDateDisplay(startDate, endDate)
-	if not startDate or not endDate then
-		return
-	end
-
-	local dateStringToStruct = function (dateString)
-		local year, month, day = dateString:match('(%d%d%d%d)-?([%d%?]?[%d%?]?)-?([%d%?][%d%?]?)$')
-		return {
-			year = year,
-			month = month,
-			day = day,
-			yearExact = tonumber(year) and true,
-			monthExact = tonumber(month) and true,
-			dayExact = tonumber(day) and true,
-			timestamp = Date.readTimestamp(dateString:gsub('%?%?', '01'))
-		}
-	end
-
-	local currentTimestamp = os.time()
-	local startTime = dateStringToStruct(startDate)
-	local endTime = dateStringToStruct(endDate)
-
-	if not startTime.yearExact or not endTime.yearExact or not startTime.monthExact then
-		return
-	end
-
-	local relativeTime = self:getSeoTimeRelativity(currentTimestamp, startTime, endTime)
-
-	local sFormat, eFormat = self:getSeoDateFormat(startTime, endTime)
-
-	local prefix
-	if startTime.timestamp == endTime.timestamp and endTime.dayExact then
-		prefix = 'on'
-		sFormat = '%b %d %Y'
-		eFormat = ''
-	elseif startTime.timestamp == endTime.timestamp and endTime.monthExact then
-		prefix = 'in'
-		sFormat = '%b %Y'
-		eFormat = ''
-	elseif not endTime.monthExact then
-		if relativeTime == TIME_FUTURE then
-			prefix = 'starting'
-		else
-			prefix = 'started'
-		end
-		eFormat = ''
-	else
-		prefix = 'from'
-	end
-
-	local displayDate
-	displayDate = prefix .. ' ' .. os.date('!' .. sFormat, startTime.timestamp)
-	if String.isNotEmpty(eFormat) then
-		displayDate = displayDate .. ' to ' .. os.date('!' .. eFormat, endTime.timestamp)
-	end
-
-	return displayDate, relativeTime
-end
-
---- Allows for overriding this functionality
-function League:getSeoTimeRelativity(timeNow, startTime, endTime)
-	if timeNow < startTime.timestamp then
-		return TIME_FUTURE
-	elseif timeNow < endTime.timestamp then
-		return TIME_ONGOING
-	elseif timeNow > endTime.timestamp then
-		return TIME_PAST
-	end
-end
-
---- Allows for overriding this functionality
-function League:getSeoDateFormat(startTime, endTime)
-	local formatStart, formatEnd
-	if startTime.dayExact and startTime.year == endTime.year then
-		formatStart = '%b %d'
-	elseif startTime.dayExact then
-		formatStart = '%b %d %Y'
-	elseif startTime.year == endTime.year then
-		formatStart = '%b'
-	else
-		formatStart = '%b %Y'
-	end
-
-	if endTime.dayExact and startTime.month == endTime.month then
-		formatEnd = '%d %Y'
-	elseif endTime.dayExact then
-		formatEnd = '%b %d %Y'
-	else
-		formatEnd = '%b %Y'
-	end
-
-	return formatStart, formatEnd
+	return MetadataGenerator.tournament(args)
 end
 
 --- Allows for overriding this functionality
