@@ -576,8 +576,15 @@ function League:_setLpdbData(args, links)
 end
 
 function League:_setSeoTags(args)
-	mw.ext.SearchEngineOptimization.metaimage(self:seoImage(args))
-	mw.ext.SearchEngineOptimization.metadescl(self:seoText(args))
+	local image = self:seoImage(args)
+	if image then
+		mw.ext.SearchEngineOptimization.metaimage(image)
+	end
+
+	local desc = self:seoText(args)
+	if desc then
+		mw.ext.SearchEngineOptimization.metadescl(desc)
+	end
 end
 
 function League:_getNamedTableofAllArgsForBase(args, base)
