@@ -32,10 +32,6 @@ function CustomTeam:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomInjector:parse(id, widgets)
-	return widgets
-end
-
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'In-Game Leader',
