@@ -231,7 +231,10 @@ function Person:_setLpdbData(args, links, status, personType)
 		type = personType,
 		earnings = self.totalEarnings,
 		links = links,
-		extradata = {},
+		extradata = {
+			givenname = args.givenname,
+			familyname = args.familyname,
+		},
 	}
 
 	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
