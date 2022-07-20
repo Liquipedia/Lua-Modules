@@ -164,7 +164,7 @@ PrizePool.prizeTypes = {
 
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
-			local link = input:gsub(' ', '_')
+			local link = mw.ext.TeamLiquidIntegration.resolve_redirect(input):gsub(' ', '_')
 			local data = {link = link}
 
 			-- Automatically retrieve information from the Tournament
