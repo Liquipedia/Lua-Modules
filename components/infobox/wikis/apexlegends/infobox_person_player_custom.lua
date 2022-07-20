@@ -106,7 +106,7 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets,
 		Builder{
 			builder = function()
-				local legendIcons = Array.map(Player:getAllArgsForBase(_args, 'legend'),
+				local legendIcons = Array.map(Player:getAllArgsForBase(_args, 'legends'),
 					function(legend, _)
 						return LegendIcon.getImage{legend, size = _SIZE_LEGEND}
 					end
