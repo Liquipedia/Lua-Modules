@@ -7,6 +7,7 @@
 --
 
 local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
 
 local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
 
@@ -18,9 +19,14 @@ function CustomLegacyPrizePool.run()
 end
 
 function CustomLegacyPrizePool.customHeader(newArgs, data, header)
-    newArgs.prizesummary = header.prizenote and true or newArgs.prizesummary
+	newArgs.prizesummary = header.prizenote and true or newArgs.prizesummary
+	local localCurrency = Variables.varDefault('currency')
+	if not newArgs.localcurrency and localCurrency then
+		newArgs.localcurrency = localCurrency
+		data.inputToId.localprize = 'localprize'
+	end
 
-    return newArgs
+	return newArgs
 end
 
 return CustomLegacyPrizePool
