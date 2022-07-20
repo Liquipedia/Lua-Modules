@@ -15,7 +15,7 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
 
@@ -352,7 +352,7 @@ Displays the first score or status of the opponent, as a string.
 ]]
 function OpponentDisplay.InlineScore(opponent)
 	if opponent.status == 'S' then
-		if opponent.score == 0 and DisplayHelper.opponentIsTBD(opponent) then
+		if opponent.score == 0 and Opponent.isTbd(opponent) then
 			return ''
 		else
 			return opponent.score ~= -1 and tostring(opponent.score) or ''
@@ -367,7 +367,7 @@ Displays the second score or status of the opponent, as a string.
 ]]
 function OpponentDisplay.InlineScore2(opponent)
 	if opponent.status2 == 'S' then
-		if opponent.score2 == 0 and DisplayHelper.opponentIsTBD(opponent) then
+		if opponent.score2 == 0 and Opponent.isTbd(opponent) then
 			return ''
 		else
 			return opponent.score2 ~= -1 and tostring(opponent.score2) or ''

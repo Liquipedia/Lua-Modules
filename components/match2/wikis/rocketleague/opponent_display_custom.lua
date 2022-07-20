@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local CustomOpponentDisplay = {propTypes = {}, types = {}}
@@ -58,7 +58,7 @@ Displays the second score or status of the opponent, as a string.
 function CustomOpponentDisplay.InlineScore2(opponent)
 	local score2 = opponent.extradata.score2
 	if opponent.status2 == 'S' then
-		if opponent.score2 == 0 and DisplayHelper.opponentIsTBD(opponent) then
+		if opponent.score2 == 0 and Opponent.isTbd(opponent) then
 			return ''
 		else
 			return opponent.score2 ~= -1 and tostring(opponent.score2) or ''
@@ -74,7 +74,7 @@ Displays the third score or status of the opponent, as a string.
 function CustomOpponentDisplay.InlineScore3(opponent)
 	local score3 = opponent.extradata.score3
 	if opponent.status3 == 'S' then
-		if opponent.score3 == 0 and DisplayHelper.opponentIsTBD(opponent) then
+		if opponent.score3 == 0 and Opponent.isTbd(opponent) then
 			return ''
 		else
 			return opponent.score3 ~= -1 and tostring(opponent.score3) or ''
