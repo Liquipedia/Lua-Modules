@@ -103,24 +103,19 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	-- Signature Legends
+	local legendIcons = Array.map(Player:getAllArgsForBase(_args, 'legends'),
+		function(legend)
+			return LegendIcon.getImage{legend, size = _SIZE_LEGEND}
+		end
+	)
 	table.insert(widgets,
-		Builder{
-			builder = function()
-				local legendIcons = Array.map(Player:getAllArgsForBase(_args, 'legends'),
-					function(legend, _)
-						return LegendIcon.getImage{legend, size = _SIZE_LEGEND}
-					end
-				)
-				return {
-					Cell{
-						name = #legendIcons > 1 and 'Signature Legends' or 'Signature Legend',
-						content = {
-							table.concat(legendIcons, '&nbsp;')
-						}
-					}
-				}
-			end
-		})
+		Cell{
+			name = #legendIcons > 1 and 'Signature Legends' or 'Signature Legend',
+			content = {
+				table.concat(legendIcons, '&nbsp;')
+			}
+		}
+	)
 	table.insert(widgets, Cell{
 			name = 'Input',
 			content = {_INPUTS[_args.input] or _INPUTS.default}
