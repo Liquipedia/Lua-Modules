@@ -138,7 +138,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 
 	_args.legend1 = _args.legend1 or _args.legend
 	for _, legend, legendIndex in Table.iter.pairsByPrefix(_args, 'legends') do
-		lpdbData.extradata['signatureLegend' .. legendIndex] = legends
+		lpdbData.extradata['signatureLegend' .. legendIndex] = legend
 	end
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
 
