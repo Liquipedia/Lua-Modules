@@ -68,8 +68,10 @@ function LegacyPrizePool.run(dependency)
 	for slotIndex, slot in ipairs(slots) do
 		newArgs[slotIndex] = LegacyPrizePool.mapSlot(slot)
 	end
-	for link, idx in pairs(CACHED_DATA.qualifiers) do
-		newArgs['qualifies' .. idx] = link
+
+	for link, linkData in pairs(CACHED_DATA.qualifiers) do
+		newArgs['qualifies' .. linkData.id] = link
+		newArgs['qualifies' .. linkData.id .. 'name'] = linkData.name
 	end
 
 	return CustomPrizePool.run(newArgs)
@@ -96,14 +98,15 @@ function LegacyPrizePool.mapSlot(slot)
 		local input = slot[parameter]
 		if newParameter == 'seed' then
 			local links = LegacyPrizePool.parseWikiLink(input)
-			for _, link in ipairs(links) do
+			for _, linkData in ipairs(links) do
+				local link = linkData.link
 
 				if not CACHED_DATA.qualifiers[link] then
-					CACHED_DATA.qualifiers[link] = CACHED_DATA.next.qual
+					CACHED_DATA.qualifiers[link] = {id = CACHED_DATA.next.qual, name = linkData.name}
 					CACHED_DATA.next.qual = CACHED_DATA.next.qual + 1
 				end
 
-				newData['qualified' .. CACHED_DATA.qualifiers[link]] = true
+				newData['qualified' .. CACHED_DATA.qualifiers[link].id] = true
 			end
 
 		elseif input and input ~= 0 then
@@ -184,7 +187,7 @@ function LegacyPrizePool.parseWikiLink(input)
 		local cleanedInput = inputSection:gsub('%[', ''):gsub('%]', '')
 		if cleanedInput:find('|') then
 			local linkParts = mw.text.split(cleanedInput, '|', true)
-			local link = mw.text.trim(linkParts[1])
+			local link, displayName = mw.text.trim(linkParts[1]), linkParts[2]
 
 			if link:sub(1, 1) == '/' then
 				-- Relative link
@@ -192,7 +195,7 @@ function LegacyPrizePool.parseWikiLink(input)
 			end
 			link = link:gsub(' ', '_')
 
-			table.insert(links, link)
+			table.insert(links, {link = link, name = displayName})
 		end
 	end
 
