@@ -12,6 +12,7 @@ local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
+local Weight = require('Module:Weight')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
@@ -42,16 +43,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	)
 
 	return lpdbData
-end
-
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
-	if String.isEmpty(tier) then
-		return 0
-	end
-
-	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
-
-	return tierValue + tierValue * prizeMoney * (TYPE_MODIFIER[type] or 1) / place
 end
 
 return CustomPrizePool
