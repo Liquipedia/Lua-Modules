@@ -134,19 +134,20 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 		return Earnings.calculatePerYear(conditions, divisionFactor)
 	end
 
-	local prizePoolColumn = Earnings._getPrizePoolType(divisionFactor)
-
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
-		query = 'mode, sum::' .. prizePoolColumn,
+		query = 'mode, sum::individualprizemoney, sum::prizemoney',
 		groupby = 'mode asc'
 	})
 
 	local totalEarnings = 0
 
 	for _, item in ipairs(lpdbQueryData) do
-		local prizeMoney = item['sum_' .. prizePoolColumn]
-		totalEarnings = totalEarnings + Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item['mode'])
+		local prizeMoney = item.sum_individualprizemoney
+		if prizeMoney == 0 then
+			prizeMoney = Earnings._applyDivisionFactor(item.sum_prizemoney, divisionFactor, item.mode)
+		end
+		totalEarnings = totalEarnings + prizeMoney
 	end
 
 	return MathUtils._round(totalEarnings)
@@ -159,22 +160,23 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 	local totalEarningsByYear = {}
 	local earningsData = {}
 	local totalEarnings = 0
-	local prizePoolColumn = Earnings._getPrizePoolType(divisionFactor)
 
 	local offset = 0
 	local count = _MAX_QUERY_LIMIT
 	while count == _MAX_QUERY_LIMIT do
 		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions,
-			query = 'mode, date, ' .. prizePoolColumn,
+			query = 'mode, date, individualprizemoney, prizemoney',
 			limit = _MAX_QUERY_LIMIT,
 			offset = offset
 		})
 		for _, item in pairs(lpdbQueryData) do
 			local year = string.sub(item.date, 1, 4)
-			local prizeMoney = tonumber(item[prizePoolColumn]) or 0
-			earningsData[year] = (earningsData[year] or 0)
-				+ Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item['mode'])
+			local prizeMoney = tonumber(item.individualprizemoney) or 0
+			if prizeMoney == 0 then
+				prizeMoney = Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item.mode)
+			end
+			earningsData[year] = (earningsData[year] or 0) + prizeMoney
 		end
 		count = #lpdbQueryData
 		offset = offset + _MAX_QUERY_LIMIT
@@ -223,10 +225,6 @@ end
 -- customizable in /Custom
 function Earnings.divisionFactorTeam(mode)
 	return 1
-end
-
-function Earnings._getPrizePoolType(divisionFactor)
-	return divisionFactor == nil and 'individualprizemoney' or 'prizemoney'
 end
 
 function Earnings._applyDivisionFactor(prizeMoney, divisionFactor, mode)
