@@ -174,7 +174,7 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 			local year = string.sub(item.date, 1, 4)
 			local prizeMoney = tonumber(item.individualprizemoney) or 0
 			if prizeMoney == 0 then
-				prizeMoney = Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item.mode)
+				prizeMoney = Earnings._applyDivisionFactor(item.prizemoney, divisionFactor, item.mode)
 			end
 			earningsData[year] = (earningsData[year] or 0) + prizeMoney
 		end
