@@ -62,8 +62,6 @@ function CustomPlayer.run(frame)
 		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
 	end
 
-	player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
-
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
