@@ -135,8 +135,9 @@ function LegacyPrizePool.mapOpponents(slot)
 			team = slot['team' .. opponentIndex],
 			lastvs = slot['lastvs' .. opponentIndex],
 			lastvsflag = slot['lastvsflag' .. opponentIndex],
-			lastscore = slot['lastscore' .. opponentIndex],
-			lastvsscore = slot['lastvsscore' .. opponentIndex],
+			lastvsscore = (slot['lastscore' .. opponentIndex] or '') ..
+				'-' ..
+				(slot['lastvsscore' .. opponentIndex] or ''),
 		}
 
 		if CUSTOM_HANDLER.customOpponent then
