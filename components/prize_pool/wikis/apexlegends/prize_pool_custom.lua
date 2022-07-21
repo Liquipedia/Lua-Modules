@@ -41,19 +41,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		Variables.varDefault('tournament_type')
 	)
 
-	lpdbData.extradata.series = Variables.varDefault('tournament_series', '')
-	lpdbData.extradata.liquipediatiertype2 = Variables.varDefault('tournament_tiertype2', '')
-	lpdbData.extradata.notabilitymod = Variables.varDefault('tournament_notability_mod', '1')
-
-	local participantLower = mw.ustring.lower(lpdbData.participant)
-
-	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
-	Variables.varDefine('enddate_'.. participantLower, lpdbData.date)
-
-	if Opponent.isTbd(opponent.opponentData) then
-		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
-	end
-
 	return lpdbData
 end
 
