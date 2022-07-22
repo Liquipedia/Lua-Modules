@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 				name = 'Analysts',
 				content = {_team.args.analysts}
 			},
- 		}
+		}
 	end
 	return widgets
 end
