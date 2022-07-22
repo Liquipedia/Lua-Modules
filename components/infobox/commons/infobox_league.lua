@@ -343,7 +343,7 @@ function League:_definePageVariables(args)
 	local parent = args.parent or mw.title.getCurrentTitle().prefixedText
 	parent = string.gsub(parent, ' ', '_')
 	Variables.varDefine('tournament_parent', parent)
-	Variables.varDefine('tournament_parentname', args.parentname)
+	Variables.varDefine('tournament_parentname', args.parentname or args.name)
 	Variables.varDefine('tournament_subpage', args.subpage)
 
 	Variables.varDefine('tournament_startdate',
