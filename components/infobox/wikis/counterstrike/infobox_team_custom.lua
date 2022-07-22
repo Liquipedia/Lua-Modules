@@ -37,6 +37,7 @@ function CustomTeam.run(frame)
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
+	team.getWikiCategories = CustomTeam.getWikiCategories
 
 	return team:createInfobox(frame)
 end
