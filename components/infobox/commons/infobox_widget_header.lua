@@ -129,7 +129,7 @@ function Header:_createInfoboxButtons()
 	buttons:node(
 		mw.text.nowiki('[') ..
 		'[[' .. moduleTitle ..
-		'/doc|h]]' .. mw.text.nowiki(']')
+		'|h]]' .. mw.text.nowiki(']')
 	)
 
 	return buttons
