@@ -74,6 +74,8 @@ local _PRIORITY_GROUPS = {
 		'discord',
 		'facebook',
 		'instagram',
+		'privsteam',
+		'pubsteam',
 		'reddit',
 		'snapchat',
 		'steam',
