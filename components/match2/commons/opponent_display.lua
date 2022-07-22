@@ -155,12 +155,14 @@ determined by its layout context, and not of the opponent.
 function OpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
 	local opponent = props.opponent
+	-- Default TBDs to not show links
+	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
 	if opponent.type == 'team' then
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
-			showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent)),
+			showLink = showLink,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
@@ -176,7 +178,7 @@ function OpponentDisplay.BlockOpponent(props)
 			overflow = props.overflow,
 			player = opponent.players[1],
 			showFlag = props.showFlag,
-			showLink = props.showLink,
+			showLink = showLink,
 		})
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
