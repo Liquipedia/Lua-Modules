@@ -58,16 +58,6 @@ function Series:createInfobox(frame)
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Series Information'},
-		Customizable{
-			id = 'liquipediatier',
-			children = {
-				Cell{
-					name = 'Liquipedia tier',
-					content = {self:createLiquipediaTierDisplay(args)},
-					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
-				},
-			}
-		},
 		Cell{
 			name = 'Organizer',
 			content = self:getAllArgsForBase(args, 'organizer'),
@@ -75,6 +65,11 @@ function Series:createInfobox(frame)
 				makeLink = true
 			}
 		},
+		Cell{
+			name = 'Sponsor(s)',
+			content = self:getAllArgsForBase(args, 'sponsor')
+		},
+		Customizable{id = 'type', children = {}},
 		Customizable{
 			id = 'location',
 			children = {
@@ -84,6 +79,12 @@ function Series:createInfobox(frame)
 						self:_createLocation(args.country, args.city)
 					}
 				},
+			}
+		},
+		Cell{
+			name = 'Venue',
+			content = {
+				args.venue
 			}
 		},
 		Cell{
@@ -104,13 +105,19 @@ function Series:createInfobox(frame)
 				args.edate or args.defunct
 			}
 		},
-		Cell{
-			name = 'Sponsor(s)',
-			content = self:getAllArgsForBase(args, 'sponsor')
-		},
 		Customizable{
 			id = 'custom',
 			children = {}
+		},
+		Customizable{
+			id = 'liquipediatier',
+			children = {
+				Cell{
+					name = 'Liquipedia tier',
+					content = {self:createLiquipediaTierDisplay(args)},
+					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
+				},
+			}
 		},
 		Builder{
 			builder = function()
