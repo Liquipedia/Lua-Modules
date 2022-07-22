@@ -989,7 +989,13 @@ function Placement:_parseOpponentArgs(input, date)
 	local opponentArgs = Json.parseIfTable(input) or (type(input) == 'table' and input or {input})
 	opponentArgs.type = opponentArgs.type or self.parent.opponentType
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
-	local opponentData = Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(opponentArgs.type)
+
+	local opponentData = Opponent.readOpponentArgs(opponentArgs)
+
+	if not opponentData or Opponent.isTbd(opponentData) then
+		opponentData = Opponent.tbd(opponentArgs.type)
+	end
+
 	return Opponent.resolve(opponentData, date)
 end
 
