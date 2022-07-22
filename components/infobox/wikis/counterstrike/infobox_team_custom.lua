@@ -48,29 +48,14 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'staff' then
 		return {
-			Cell{
-				name = 'Founders',
-				content = {_team.args.founders}
-			},
-			Cell{
-				name = 'CEO',
-				content = {_team.args.ceo}
-			},
-			Cell{
-				name = 'Gaming Director',
-				content = {_team.args['gaming director']}
-			},
+			Cell{name = 'Founders',	content = {_team.args.founders}},
+			Cell{name = 'CEO', content = {_team.args.ceo}},
+			Cell{name = 'Gaming Director', content = {_team.args['gaming director']}},
 			widgets[4], -- Manager
 			widgets[5], -- Captain
-			Cell{
-				name = 'In-Game Leader',
-				content = {_team.args.igl}
-			},
+			Cell{name = 'In-Game Leader', content = {_team.args.igl}},
 			widgets[1], -- Coaches
-			Cell{
-				name = 'Analysts',
-				content = {_team.args.analysts}
-			},
+			Cell{name = 'Analysts', content = {_team.args.analysts}},
 		}
 	end
 	return widgets
