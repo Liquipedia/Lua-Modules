@@ -19,8 +19,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local TIER_VALUE = {8, 4, 2}
-local TYPE_MODIFIER = {Online = 0.65}
 
 -- Template entry point
 function CustomPrizePool.run(frame)
