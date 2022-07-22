@@ -19,6 +19,7 @@ local _PREFIXES = {
 	afreeca = {'http://afreecatv.com/'},
 	aoezone = {'https://aoezone.net/'},
 	['ask-fm'] = {'https://ask.fm/'},
+	b5csgo = {'https://www.b5csgo.com/clan/'},
 	battlefy = {'https://www.battlefy.com/'},
 	bilibili = {'https://space.bilibili.com/'},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
@@ -44,7 +45,11 @@ local _PREFIXES = {
 		team = 'https://dotabuff.com/esports/teams/'
 	},
 	douyu = {'https://www.douyu.com/'},
-	esea = {'https://play.esea.net/events/'},
+	esea = {
+		'https://play.esea.net/events/',
+		player = '',
+		team = 'https://play.esea.net/teams/'
+	},
 	['esea-d'] = {'https://play.esea.net/league/standings?divisionId='},
 	esl = {
 		'',
@@ -60,7 +65,11 @@ local _PREFIXES = {
 	},
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	fanclub = {''},
-	gamersclub = {'https://csgo.gamersclub.gg/campeonatos/csgo/'},
+	gamersclub = {
+		'https://csgo.gamersclub.gg/campeonatos/csgo/',
+		team = 'https://csgo.gamersclub.gg/team/',
+		player = '',
+	},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
@@ -95,6 +104,8 @@ local _PREFIXES = {
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
 	steam = {'https://steamcommunity.com/id/'},
+	privsteam = {'https://steamcommunity.com/groups/'},
+	pubsteam = {'https://steamcommunity.com/groups/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stratz = {
 		'',
@@ -223,6 +234,8 @@ function Links.transform(links)
 		octane = links.octane,
 		patreon = links.patreon,
 		playlist = links.playlist,
+		privsteam = links.privsteam,
+		pubsteam = links.pubsteam,
 		reddit = links.reddit,
 		rules = links.rules or links.rulebook,
 		rules2 = links.rules2 or links.rulebook2,
@@ -259,6 +272,7 @@ function Links.transform(links)
 		vk = links.vk,
 		vlr = links.vlr,
 		weibo = links.weibo,
+		weibo2 = links.weibo2,
 		youtube = links.youtube,
 		youtube2 = links.youtube2,
 		youtube3 = links.youtube3,
