@@ -103,11 +103,9 @@ local _PREFIXES = {
 	['smash-gg'] = {'https://smash.gg/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
-	steam = {
-		'https://steamcommunity.com/id/',
-		team = 'https://steamcommunity.com/groups/',
-		player = 'https://steamcommunity.com/id/',
-	},
+	steam = {'https://steamcommunity.com/id/'},
+	privsteam = {'https://steamcommunity.com/groups/'},
+	pubsteam = {'https://steamcommunity.com/groups/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stratz = {
 		'',
