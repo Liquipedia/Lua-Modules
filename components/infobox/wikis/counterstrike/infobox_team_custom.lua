@@ -45,30 +45,35 @@ function CustomTeam:createWidgetInjector()
 	return CustomInjector()
 end
 
+function CustomInjector:parse(id, widgets)
+	if id == 'staff' then
+		table.insert(widgets, Cell{
+			name = 'Founders',
+			content = {_team.args.founders}
+		})
+		table.insert(widgets, Cell{
+			name = 'CEO',
+			content = {_team.args.ceo}
+		})
+		table.insert(widgets, Cell{
+			name = 'In-Game Leader',
+			content = {_team.args.igl}
+		})
+		table.insert(widgets, Cell{
+			name = 'Analysts',
+			content = {_team.args.analysts}
+		})
+	end
+	return widgets
+end
+
 function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Founders',
-		content = {_team.args.founders}
-	})
-	table.insert(widgets, Cell{
-		name = 'CEO',
-		content = {_team.args.ceo}
-	})
-	table.insert(widgets, Cell{
-		name = 'In-Game Leader',
-		content = {_team.args.igl}
-	})
-	table.insert(widgets, Cell{
-		name = 'Analysts',
-		content = {_team.args.analysts}
-	})
-	table.insert(widgets, Cell{
+	return {Cell{
 		name = 'Games',
 		content = Array.map(CustomTeam.getGames(), function (gameData)
 			return Page.makeInternalLink({}, gameData.name, gameData.link)
 		end)
-	})
-	return widgets
+	}}
 end
 
 function CustomTeam.getGames()
