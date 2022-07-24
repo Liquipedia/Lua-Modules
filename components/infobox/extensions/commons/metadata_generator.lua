@@ -28,7 +28,7 @@ local TYPES_TO_DISPLAY = {'qualifier', 'showmatch', 'show match'}
 function MetadataGenerator.tournament(args)
 	local output
 
-	local name = not String.isEmpty(args.name) and (args.name):gsub('&nbsp;', ' ') or mw.title.getCurrentTitle()
+	local name = not String.isEmpty(args.name) and (args.name):gsub('&nbsp;', ' ') or mw.title.getCurrentTitle().text
 
 	local tournamentType = args.type
 	local locality = Localisation.getLocalisation({displayNoError = true}, args.country)
