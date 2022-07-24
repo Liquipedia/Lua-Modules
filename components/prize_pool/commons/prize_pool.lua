@@ -826,7 +826,7 @@ function PrizePool._isValidDateFormat(date)
 	if type(date) ~= 'string' or String.isEmpty(date) then
 		return false
 	end
-	return date:match('%d%d%d%d-%d%d-%d%d') and true or false
+	return date:match('%d%d%d%d%-%d%d%-%d%d') and true or false
 end
 
 --- Asserts that an Opponent Struct is valid and has a valid type
