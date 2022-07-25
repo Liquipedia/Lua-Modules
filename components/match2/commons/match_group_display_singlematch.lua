@@ -45,7 +45,7 @@ function SingleMatchDisplay.SingleMatchContainer(props)
 
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId, _)
 	return match
 		and SingleMatchDisplay.SingleMatch({
 			config = props.config,
