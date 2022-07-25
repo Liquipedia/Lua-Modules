@@ -21,11 +21,11 @@ local CustomSeries = {}
 local CustomInjector = Class.new(Injector)
 
 local GAMES = {
-	cs = {name = 'Counter-Strike', link = 'Counter-Strike', category = 'CS Teams'},
-	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero', category = 'CSCZ Teams'},
-	css = {name = 'Source', link = 'Counter-Strike: Source', category = 'CSS Teams'},
-	cso = {name = 'Online', link = 'Counter-Strike Online', category = 'CSO Teams'},
-	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive', category = 'CSGO Teams'},
+	cs = {name = 'Counter-Strike', link = 'Counter-Strike'},
+	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero'},
+	css = {name = 'Source', link = 'Counter-Strike: Source'},
+	cso = {name = 'Online', link = 'Counter-Strike Online'},
+	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive'},
 }
 
 local _args
