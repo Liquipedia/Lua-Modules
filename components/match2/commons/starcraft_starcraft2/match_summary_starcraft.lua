@@ -22,8 +22,6 @@ local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
 
 local html = mw.html
 
-local RESET_MATCH = 'RxMBR'
-
 --[[
 Display component for the match summary used by the starcraft and stacraft2
 wikis. Shows details of a StarCraft match, including opponents, maps,
@@ -41,7 +39,7 @@ function StarcraftMatchSummary.MatchSummaryContainer(props)
 	local options = {mergeBracketResetMatch = false}
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId, options)
 	local bracketResetMatch = match and match.bracketData.bracketResetMatchId
-		and MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.bracketId .. '_' .. RESET_MATCH, options)
+		and MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, match.bracketData.bracketResetMatchId, options)
 
 	local MatchSummary = match.isFfa
 		and Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary
