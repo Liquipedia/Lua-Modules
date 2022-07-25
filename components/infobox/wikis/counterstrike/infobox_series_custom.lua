@@ -46,15 +46,11 @@ function CustomSeries:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'location' then
-		table.insert(widgets, 1, Cell{
+	if id == 'type' then
+		return {Cell{
 			name = 'Type',
 			content = {String.isNotEmpty(_args.type) and mw.getContentLanguage():ucfirst(_args.type) or nil}
-		})
-		table.insert(widgets, Cell{
-			name = 'Venue',
-			content = {_args.venue}
-		})
+		}}
 	end
 	return widgets
 end
