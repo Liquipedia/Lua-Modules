@@ -280,7 +280,7 @@ end
 function CustomLeague:defineCustomPageVariables(args)
 	-- Legacy vars
 	Variables.varDefine('tournament_short_name', args.shortname)
-	Variables.varDefine('tournament_ticker_name', args.tickername)
+	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)
 	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))
 
 	if String.isNotEmpty(args.date) and args.date:lower() ~= _DATE_TBA then
@@ -300,7 +300,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	end
 
 	-- Legacy tier vars
-	Variables.varDefine('tournament_tier', Tier.text.tiers[args.liquipediatier])
+	Variables.varDefine('tournament_tier', Tier.text.tiers[args.liquipediatier]) -- Stores as X-tier, not the integer
 
 	-- Wiki specific vars
 	Variables.varDefine('raw_sdate', args.sdate or args.date)
