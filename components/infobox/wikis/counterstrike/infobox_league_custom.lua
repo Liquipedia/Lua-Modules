@@ -222,7 +222,7 @@ function CustomLeague:appendLiquipediatierDisplay()
 	end
 
 	if Logic.readBool(_args.cstrikemajor) then
-		content = content ' [[File:cstrike-icon.png|x16px|link=Counter-Strike Majors|Counter-Strike Major]]'
+		content = content .. ' [[File:cstrike-icon.png|x16px|link=Counter-Strike Majors|Counter-Strike Major]]'
 	end
 
 	return content
