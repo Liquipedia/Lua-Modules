@@ -25,7 +25,7 @@ local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14p
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, _)
 
 	local wrapper = htmlCreate('div')
 		:addClass('brkts-popup')
