@@ -80,7 +80,7 @@ end
 
 
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, _)
 
 	local matchSummary = MatchSummary():init('400px')
 	matchSummary.root:css('flex-wrap', 'unset')
