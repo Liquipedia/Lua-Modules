@@ -1,6 +1,7 @@
---@Author Rath
---Made for Liquipedia
---For use with sumneko-lua vscode/neovim extension
+-- For use with sumneko-lua vscode/neovim extension.
+-- This file is automatically read assuming the extension is setup correctly.
+-- The setting "Lua.runtime.plugin" needs to be set to "plugins/sumneko_plugin.lua"
+-- See more at https://github.com/sumneko/lua-language-server/wiki/Plugin
 
 local liquipedia = {}
 
