@@ -283,23 +283,20 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))
 
-	-- TODO: Recheck and clean
 	if String.isNotEmpty(args.date) and args.date:lower() ~= _DATE_TBA then
 		Variables.varDefine('date', ReferenceCleaner.clean(args.date))
 	end
+
 	if String.isNotEmpty(args.sdate) and args.sdate:lower() ~= _DATE_TBA then
 		Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
-	end
-	if String.isNotEmpty(args.edate) and args.edate:lower() ~= _DATE_TBA then
-		Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+		Variables.varDefine('tournament_sdate', ReferenceCleaner.clean(args.sdate or args.date))
 	end
 
 	if String.isNotEmpty(args.edate) and args.edate:lower() ~= _DATE_TBA then
-		Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.edate or args.date))
-		Variables.varDefine('tournament_edate', Variables.varDefault('tournament_date', ''))
-	end
-	if String.isNotEmpty(args.sdate) and args.sdate:lower() ~= _DATE_TBA then
-		Variables.varDefine('tournament_sdate', ReferenceCleaner.clean(args.sdate or args.date))
+		local cleandDate = ReferenceCleaner.clean(args.edate or args.date)
+		Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+		Variables.varDefine('tournament_date', cleandDate)
+		Variables.varDefine('tournament_edate', cleandDate)
 	end
 
 	-- Legacy tier vars
