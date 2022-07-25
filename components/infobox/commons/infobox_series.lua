@@ -122,6 +122,12 @@ function Series:createInfobox(frame)
 			end
 		},
 		Cell{
+			name = 'Venue',
+			content = {
+				args.venue
+			}
+		},
+		Cell{
 			name = 'Date',
 			content = {
 				args.date
