@@ -337,7 +337,7 @@ function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
 		and match.bracketData.bracketResetMatchId
 		and bracket.matchesById[match.bracketData.bracketResetMatchId]
 
-	if bracketResetMatch and options.mergeBracketResetMatch ~= false then
+	if bracketResetMatch and Logic.nilOr(options.mergeBracketResetMatch, true) then
 		return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	else
 		return match
