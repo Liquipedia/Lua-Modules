@@ -137,18 +137,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
-
-
-		if String.isNotEmpty(_args.team1) then
-			local teams = {}
-			for _, team in ipairs(League:getAllArgsForBase(_args, 'team')) do
-				table.insert(teams, tostring(CustomLeague:_createNoWrappingSpan(
-					Page.makeInternalLink({}, team)
-				)))
-			end
-
-			table.insert(widgets, Center{content = teams})
-		end
 	elseif id == 'prizepool' then
 		return {
 			Cell{
