@@ -36,11 +36,10 @@ StarcraftMatchSummary.propTypes.MatchSummaryContainer = {
 }
 
 function StarcraftMatchSummary.MatchSummaryContainer(props)
-	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(
-		props.bracketId,
-		props.matchId,
-		{seperateBracketResetMatch = true}
-	)
+	local options = {mergeBracketResetMatch = false}
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId, options)
+	local bracketResetMatch = match and match.bracketData.bracketResetMatchId
+		and MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.bracketId .. '_' .. RESET_MATCH, options)
 
 	local MatchSummary = match.isFfa
 		and Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary
