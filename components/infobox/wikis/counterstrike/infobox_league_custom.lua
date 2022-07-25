@@ -283,6 +283,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))
 
+	-- TODO: Recheck and clean
 	if String.isNotEmpty(args.date) and args.date:lower() ~= _DATE_TBA then
 		Variables.varDefine('date', ReferenceCleaner.clean(args.date))
 	end
@@ -292,9 +293,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	if String.isNotEmpty(args.edate) and args.edate:lower() ~= _DATE_TBA then
 		Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
 	end
-
-	Variables.varDefine('raw_sdate', ReferenceCleaner.clean(args.sdate or args.date))
-	Variables.varDefine('raw_edate', ReferenceCleaner.clean(args.edate or args.date))
 
 	if String.isNotEmpty(args.edate) and args.edate:lower() ~= _DATE_TBA then
 		Variables.varDefine('tournament_date', ReferenceCleaner.clean(args.edate or args.date))
@@ -308,6 +306,8 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_tier', Tier.text.tiers[args.liquipediatier])
 
 	-- Wiki specific vars
+	Variables.varDefine('raw_sdate', args.sdate or args.date)
+	Variables.varDefine('raw_edate', args.edate or args.date)
 	Variables.varDefine('tournament_valve_major',
 		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR and 'true' or args.valvemajor)
 	Variables.varDefine('tournament_valve_tier',
@@ -328,13 +328,14 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	if Logic.readBool(args.charity) or Logic.readBool(args.noprize) then
-		lpdbData['prizepool'] = 0
+		lpdbData.prizepool = 0
 	end
 
-	lpdbData['publishertier'] = args.valvetier
-	lpdbData['maps'] = table.concat(League:getAllArgsForBase(args, 'map'), ';')
-	lpdbData['participantsnumber'] = args.team_number or args.player_number
-	lpdbData['extradata'] = {
+	lpdbData.publishertier = args.valvetier
+	lpdbData.maps = table.concat(League:getAllArgsForBase(args, 'map'), ';')
+	lpdbData.participantsnumber = args.team_number or args.player_number
+	lpdbData.sortdate = args.sort_date or lpdbData.enddate
+	lpdbData.extradata = {
 		prizepoollocal = Variables.varDefault('prizepoollocal', ''),
 		startdate_raw = Variables.varDefault('raw_sdate', ''),
 		enddate_raw = Variables.varDefault('raw_edate', ''),
