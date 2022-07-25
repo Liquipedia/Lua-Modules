@@ -17,11 +17,7 @@ local StarcraftSingleMatchDisplay = {propTypes = {}}
 
 function StarcraftSingleMatchDisplay.SingleMatchContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(
-		bracketId,
-		props.matchId,
-		{seperateBracketResetMatch = true}
-	)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId, _)
 
 	return match
 		and StarcraftSingleMatchDisplay.SingleMatch{
