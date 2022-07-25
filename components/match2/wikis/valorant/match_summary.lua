@@ -243,7 +243,7 @@ end
 local CustomMatchSummary = {}
 
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, _)
 	local frame = mw.getCurrentFrame()
 
 	local matchSummary = MatchSummary():init('480px')
