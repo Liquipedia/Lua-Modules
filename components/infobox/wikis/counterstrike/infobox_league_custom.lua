@@ -6,14 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local League = require('Module:Infobox/League')
 local Logic = require('Module:Logic')
 local Page = require('Module:Page')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Tier = mw.loadData('Module:Tier')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -36,13 +34,41 @@ local GAMES = {
 
 local ESL_PRO_TIERS_SIZE = '40x40px'
 local ESL_PRO_TIERS = {
-	['national challenger'] = {icon = 'ESL Pro Tour Challenger.png', name = 'National Champ.', link = 'ESL National Championships'},
-	['international challenger'] = {icon = 'ESL Pro Tour Challenger.png', name = 'Challenger', link = 'ESL Pro Tour'},
-	['regional challenger'] = {icon = 'ESL Pro Tour Challenger.png', name = 'Regional Challenger', link = 'ESL/Pro Tour'},
-	['masters'] = {icon = 'ESL Pro Tour Masters.png', name = 'Masters', link = 'ESL/Pro Tour'},
-	['regional masters'] = {icon = 'ESL Pro Tour Masters.png', name = 'Regional Masters', link = 'ESL/Pro Tour'},
-	['masters championship'] = {icon = 'ESL Pro Tour Masters Championship.png', name = 'Masters Champ.', link = 'ESL Pro Tour'},
-	['major championship'] = {icon = 'Valve csgo tournament icon.png', name = 'Major Championship', link = 'Majors'},
+	['national challenger'] = {
+		icon = 'ESL Pro Tour Challenger.png',
+		name = 'National Champ.',
+		link = 'ESL National Championships'
+	},
+	['international challenger'] = {
+		icon = 'ESL Pro Tour Challenger.png',
+		name = 'Challenger',
+		link = 'ESL Pro Tour'
+	},
+	['regional challenger'] = {
+		icon = 'ESL Pro Tour Challenger.png',
+		name = 'Regional Challenger',
+		link = 'ESL/Pro Tour'
+	},
+	['masters'] = {
+		icon = 'ESL Pro Tour Masters.png',
+		name = 'Masters',
+		link = 'ESL/Pro Tour'
+	},
+	['regional masters'] = {
+		icon = 'ESL Pro Tour Masters.png',
+		name = 'Regional Masters',
+		link = 'ESL/Pro Tour'
+	},
+	['masters championship'] = {
+		icon = 'ESL Pro Tour Masters Championship.png',
+		name = 'Masters Champ.',
+		link = 'ESL Pro Tour'
+	},
+	['major championship'] = {
+		icon = 'Valve csgo tournament icon.png',
+		name = 'Major Championship',
+		link = 'Majors'
+	},
 }
 ESL_PRO_TIERS['national championship'] = ESL_PRO_TIERS['national challenger']
 ESL_PRO_TIERS['challenger'] = ESL_PRO_TIERS['international challenger']
@@ -350,7 +376,8 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 	local tierData = ESL_PRO_TIERS[eslProTier:lower()]
 
 	if tierData then
-		return '[[File:'.. tierData.icon ..'|' .. ESL_PRO_TIERS_SIZE .. '|link=' .. tierData.link .. '|' .. tierData.name .. ']] ' .. tierData.name
+		return '[[File:'.. tierData.icon ..'|' .. ESL_PRO_TIERS_SIZE .. '|link=' .. tierData.link ..
+				'|' .. tierData.name .. ']] ' .. tierData.name
 	end
 end
 
