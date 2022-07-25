@@ -22,7 +22,7 @@ local Links = Class.new(
 local _ICON_KEYS_TO_RENAME = {
 	['bilibili-stream'] = 'bilibili',
 	daumcafe = 'cafe-daum',
-	['esea-d'] = 'esea',
+	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
 	matcherinolink = 'matcherino',
@@ -54,6 +54,7 @@ local _PRIORITY_GROUPS = {
 		'esea',
 		'esea-d',
 		'esl',
+		'esportal',
 		'faceit',
 		'gamersclub',
 		'halodatahive',

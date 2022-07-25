@@ -56,6 +56,7 @@ local _PREFIXES = {
 		team = 'https://play.eslgaming.com/team/',
 		player = 'https://play.eslgaming.com/player/',
 	},
+	esportal = {'https://esportal.com/tournament/'},
 	facebook = {'https://facebook.com/'},
 	['facebook-gaming'] = {'https://fb.gg/'},
 	faceit = {
@@ -210,6 +211,7 @@ function Links.transform(links)
 		esl3 = links.eslgaming3 or links.esl3,
 		esl4 = links.eslgaming4 or links.esl4,
 		esl5 = links.eslgaming5 or links.esl5,
+		esportal = links.esportal,
 		facebook = links.facebook,
 		facebook2 = links.facebook2,
 		['facebook-gaming'] = links['facebook-gaming'] or links.fbgg,
