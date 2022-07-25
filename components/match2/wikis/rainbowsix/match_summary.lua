@@ -311,7 +311,7 @@ local CustomMatchSummary = {}
 
 
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, _)
 
 	local matchSummary = MatchSummary():init()
 	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
