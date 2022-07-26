@@ -11,6 +11,7 @@ local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Tier = require('Module:Tier')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
@@ -30,6 +31,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
 	return league:createInfobox(frame)
 end
@@ -54,12 +56,12 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'liquipediatier' then
-		local riotTier = _args.riotTier
-		if String.isNotEmpty(riotTier) then
+		if _args.pctier and _args.liquipediatiertype ~= 'Qualifier' then
+			local riotIcon = ''
 			table.insert(widgets,
 				Cell{
-					name = 'Riot Tier',
-					content = {'[[Worlds' .. riotTier']]'},
+					name = 'Worlds',
+					content = {'[[World Championship|' .. _args.riotTier .. ']] ' .. riotIcon},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
@@ -68,8 +70,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+function CustomLeague:liquipediaTierHighlighted()
+	return Logic.readBool(_args.riotpremier)
+end
+
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.publishertier = args.riottier:lower()
+	lpdbData.publishertier = args.pctier
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
 	lpdbData.extradata = {
@@ -96,11 +102,10 @@ function CustomLeague:_standardiseRawDate(dateString)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	-- Variables with different handling compared to commons
-	Variables.varDefine(
-		'tournament_liquipediatiertype',
-		Tier.text.types[string.lower(_args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
-	)
+	-- Custom Vars
+	Variables.varDefine('tournament_riot_premier', _args.riotpremier)
+	Variables.varDefine('tournament_publisher_major', _args.riotpremier)
+	Variables.varDefine('tournament_publishertier', _args.pctier)
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
