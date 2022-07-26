@@ -168,14 +168,14 @@ function Team:createInfobox()
 	}
 	infobox:bottom(self:createBottomContent())
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
 		infobox:categories('Teams')
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
 		self:defineCustomPageVariables(args)
 	end
@@ -204,9 +204,14 @@ function Team:_createLocation(location)
 			.. '|' .. locationDisplay .. ']]'
 	end
 
+	local category
+	if String.isNotEmpty(demonym) and self:shouldStore(self.args) then
+		category = '[[Category:' .. demonym .. ' Teams]]'
+	end
+
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
-			(String.isNotEmpty(demonym) and '[[Category:' .. demonym .. ' Teams]]' or '') ..
+			(category or '') ..
 			(locationDisplay or '')
 end
 
@@ -282,6 +287,10 @@ end
 
 function Team:addToLpdb(lpdbData, args)
 	return lpdbData
+end
+
+function Team:shouldStore(args)
+	return Namespace.isMain()
 end
 
 return Team

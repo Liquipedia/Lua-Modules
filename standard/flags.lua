@@ -55,10 +55,12 @@ function Flags.Icon(args, flagName)
 		end
 	elseif shouldLink then
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName) .. '[[Category:Pages with unknown flags]]'
+		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName:lower()) ..
+				'[[Category:Pages with unknown flags]]'
 	else
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName) .. '[[Category:Pages with unknown flags]]'
+		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName:lower()) ..
+				'[[Category:Pages with unknown flags]]'
 	end
 end
 
