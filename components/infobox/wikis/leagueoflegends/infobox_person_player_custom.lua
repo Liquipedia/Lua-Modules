@@ -13,7 +13,6 @@ local Page = require('Module:Page')
 local Player = require('Module:Infobox/Person')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
@@ -103,7 +102,7 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets,
 		Builder{
 			builder = function()
-				local championIcon = Array.map(Player:getAllArgsForBase(_args, 'champion'),
+				local championIcons = Array.map(Player:getAllArgsForBase(_args, 'champion'),
 					function(champion, _)
 						return ChampionIcon.getImage{champion, size = _SIZE_CHAMPION}
 					end
