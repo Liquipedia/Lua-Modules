@@ -79,7 +79,8 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
+			Cell{name = 'Status', content = {Page.makeInternalLink({onlyIfExists = true},
+						_args.status) or _args.status}},
 		}
 	elseif id == 'role' then
 		return {
@@ -151,15 +152,6 @@ function CustomPlayer:createBottomContent(infobox)
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 	end
-end
-
-function CustomPlayer._getStatusContents()
-	local statusContents = {}
-
-	if String.isNotEmpty(_args.status) then
-		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
-	end
-	return statusContents
 end
 
 function CustomPlayer._createRole(key, role)
