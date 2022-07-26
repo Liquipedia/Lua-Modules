@@ -13,9 +13,6 @@ local Tier = require('Module:Tier')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
-local PageLink = require('Module:Page')
 
 local _args
 local _league
@@ -72,9 +69,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	if CustomLeague:_validPublisherTier(args.riottier) then
-		lpdbData.publishertier = args.riottier:lower()
-	end
+	lpdbData.publishertier = args.riottier:lower()
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
 	lpdbData.extradata = {
@@ -84,10 +79,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	}
 
 	return lpdbData
-end
-
-function CustomLeague:_validPublisherTier(publishertier)
-	return String.isNotEmpty(publishertier) and _RIOT_TIERS[publishertier:lower()]
 end
 
 function CustomLeague:_standardiseRawDate(dateString)
