@@ -478,7 +478,7 @@ function Person._createAgeCalculationErrorMessage(text)
 end
 
 function Person:_flipNameOrder(args)
-	if not Logic.readBool(args.nonameflip) and Table.includes(_countriesEasterNameOrder, args.country) then
+	if not Logic.readBool(args.nonameflip) and Table.includes(_COUNTRIES_EASTER_NAME_ORDER, args.country) then
 		args.givenname, args.familyname = args.familyname, args.givenname
 	end
 	return args
