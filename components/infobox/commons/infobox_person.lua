@@ -37,6 +37,14 @@ local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
+local _countriesEasterNameOrder = {
+	'China',
+	'Taiwan',
+	'Hong Kong',
+	'Vietnam',
+	'South Korea',
+	'Cambodia'
+}
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -470,15 +478,7 @@ function Person._createAgeCalculationErrorMessage(text)
 end
 
 function Person:_flipNameOrder(args)
-	if not Logic.readBool(args.nonameflip) and Table.includes(
-		{
-		'China',
-		'Taiwan',
-		'Hong Kong',
-		'Vietnam',
-		'South Korea',
-		'Cambodia'
-		}, args.country) then
+	if not Logic.readBool(args.nonameflip) and Table.includes(_countriesEasterNameOrder, args.country) then
 		args.givenname, args.familyname = args.familyname, args.givenname
 	end
 	return args
