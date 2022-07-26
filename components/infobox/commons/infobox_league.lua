@@ -116,14 +116,16 @@ function League:createInfobox()
 				Builder{
 					builder = function()
 						local value = tostring(args.type):lower()
-						if value == 'offline' then
-							self.infobox:categories('Offline Tournaments')
-						elseif value == 'online' then
-							self.infobox:categories('Online Tournaments')
-						elseif value:match('online') and value:match('offline') then
-							self.infobox:categories('Online/Offline Tournaments')
-						else
-							self.infobox:categories('Unknown Type Tournaments')
+						if self:shouldStore(args) then
+							if value == 'offline' then
+								self.infobox:categories('Offline Tournaments')
+							elseif value == 'online' then
+								self.infobox:categories('Online Tournaments')
+							elseif value:match('online') and value:match('offline') then
+								self.infobox:categories('Online/Offline Tournaments')
+							else
+								self.infobox:categories('Unknown Type Tournaments')
+							end
 						end
 
 						if not String.isEmpty(args.type) then
@@ -277,7 +279,9 @@ function League:createLiquipediaTierDisplay(args)
 			)
 			return ''
 		else
-			self.infobox:categories(tierText .. ' Tournaments')
+			if self:shouldStore(self.args) then
+				self.infobox:categories(tierText .. ' Tournaments')
+			end
 			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
 		end
 	end
