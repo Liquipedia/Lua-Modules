@@ -19,6 +19,7 @@ local Region = require('Module:Region')
 local AgeCalculation = require('Module:AgeCalculation')
 local WarningBox = require('Module:WarningBox')
 local Earnings = require('Module:Earnings')
+local Logic = require('Module:Logic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -56,6 +57,8 @@ function Person:createInfobox()
 	if args.country == Person:getStandardNationalityValue('non-representing') then
 		self.nonRepresenting = true
 	end
+
+	args = self:_flipNameOrder(args)
 
 	_shouldStoreData = Person:shouldStoreData(args)
 	-- set custom variables here already so they are available
@@ -232,8 +235,8 @@ function Person:_setLpdbData(args, links, status, personType)
 		earnings = self.totalEarnings,
 		links = links,
 		extradata = {
-			givenname = args.givenname,
-			familyname = args.familyname,
+			firstname = args.givenname,
+			lastname = args.familyname,
 		},
 	}
 
@@ -464,6 +467,13 @@ function Person._createAgeCalculationErrorMessage(text)
 	else
 		return {birth = text}
 	end
+end
+
+function Person:_flipNameOrder(args)
+	if not Logic.readBool(args.nonameflip) and Table.includes({'China','Taiwan','Hong Kong','Vietnam','South Korea','Cambodia'}, args.country) then
+		args.givenname, args.familyname = args.familyname, args.givenname
+	end
+	return args
 end
 
 return Person
