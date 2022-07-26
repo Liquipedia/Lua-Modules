@@ -53,7 +53,6 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomInjector:parse(id, widgets)
-	local args = _args
 	if id == 'liquipediatier' then
 		local riotTier = _args.riotTier
 		if String.isNotEmpty(riotTier) then
