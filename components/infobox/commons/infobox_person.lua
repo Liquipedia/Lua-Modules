@@ -37,7 +37,7 @@ local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
-local _countriesEasterNameOrder = {
+local _COUNTRIES_EASTER_NAME_ORDER = {
 	'China',
 	'Taiwan',
 	'Hong Kong',
