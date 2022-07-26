@@ -64,7 +64,7 @@ function CustomPlayer.run(frame)
 		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
 	end
 
-	player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
+	--[[player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})]]
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
@@ -159,6 +159,7 @@ function CustomPlayer._getStatusContents()
 	if String.isNotEmpty(_args.status) then
 		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
 	end
+	return statusContents
 end
 
 function CustomPlayer._createRole(key, role)
