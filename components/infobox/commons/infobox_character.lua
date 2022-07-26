@@ -120,7 +120,7 @@ function Character:setLpdbData(args)
 	local lpdbData = {
 		name = self.name,
 		image = args.image,
-		type = 'character'
+		type = 'character',
 		extradata = {},
 	}
 	
