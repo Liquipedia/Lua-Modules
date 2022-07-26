@@ -40,7 +40,7 @@ function Character:createInfobox()
 			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
-		Title{name = (args.informationType or 'Hero') .. ' Information'},
+		Title{name = (args.informationType or 'Character') .. ' Information'},
 		Cell{name = 'Real Name', content = {args.realname}},
 		Customizable{
 			id = 'country',
@@ -84,12 +84,11 @@ function Character:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:categories('Characters')
-	infobox:categories(unpack(self:getWikiCategories(args)))
-
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if Namespace.isMain() then
+		infobox:categories('Characters')
+		infobox:categories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 
