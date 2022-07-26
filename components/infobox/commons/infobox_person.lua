@@ -470,7 +470,15 @@ function Person._createAgeCalculationErrorMessage(text)
 end
 
 function Person:_flipNameOrder(args)
-	if not Logic.readBool(args.nonameflip) and Table.includes({'China','Taiwan','Hong Kong','Vietnam','South Korea','Cambodia'}, args.country) then
+	if not Logic.readBool(args.nonameflip) and Table.includes(
+		{
+		'China',
+		'Taiwan',
+		'Hong Kong',
+		'Vietnam',
+		'South Korea',
+		'Cambodia'
+		}, args.country) then
 		args.givenname, args.familyname = args.familyname, args.givenname
 	end
 	return args
