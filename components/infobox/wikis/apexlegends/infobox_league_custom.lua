@@ -16,7 +16,7 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Center = require('Module:Infobox/Widget/Center') AAAA
 
 local _GAME_MODE = mw.loadData('Module:GameMode')
 local _EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
