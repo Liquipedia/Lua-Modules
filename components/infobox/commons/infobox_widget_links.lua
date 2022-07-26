@@ -25,6 +25,8 @@ local _ICON_KEYS_TO_RENAME = {
 	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
+	['faceit-hub'] = 'faceit',
+	['faceit-org'] = 'faceit',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
 	privsteam = 'steam',
@@ -56,6 +58,9 @@ local _PRIORITY_GROUPS = {
 		'esl',
 		'esportal',
 		'faceit',
+		'faceit-c',
+		'faceit-hub',
+		'faceit-org',
 		'gamersclub',
 		'halodatahive',
 		'matcherino',
@@ -90,10 +95,12 @@ local _PRIORITY_GROUPS = {
 	streams = {
 		'twitch',
 		'youtube',
+		'stream',
 		'afreeca',
 		'dlive',
 		'facebook-gaming',
 		'vidio',
+		'huyatv',
 		'bilibili-stream',
 	}
 }
