@@ -445,7 +445,10 @@ function League:_createLocation(args)
 	while not String.isEmpty(current) do
 		local nationality = Localisation.getLocalisation({displayNoError = true}, current)
 
-		if String.isNotEmpty(nationality) then
+		if String.isEmpty(nationality) then
+			content = content .. '[[Category:Unrecognised Country|' .. current .. ']]'
+
+		elseif String.isNotEmpty(nationality) then
 			local countryName = Localisation.getCountryName(current)
 			local displayText = currentLocation or countryName
 			if displayText == '' then
@@ -456,9 +459,6 @@ function League:_createLocation(args)
 				content = content .. '[[Category:' .. nationality .. ' Tournaments]]'
 			end
 			content = content .. Flags.Icon{flag = current, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>'
-
-		elseif self:shouldStore(args) and String.isEmpty(nationality) then
-			content = content .. '[[Category:Unrecognised Country|' .. current .. ']]'
 		end
 
 		index = index + 1
