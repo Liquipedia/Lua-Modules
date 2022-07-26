@@ -55,11 +55,12 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = _args
 	if id == 'liquipediatier' then
-		if CustomLeague:_validPublisherTier(args.riottier) then
+		local riotTier = _args.riotTier
+		if String.isNotEmpty(riotTier) then
 			table.insert(widgets,
 				Cell{
 					name = 'Riot Tier',
-					content = {'[[Worlds' .. riottier']]'},
+					content = {'[[Worlds' .. riotTier']]'},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
