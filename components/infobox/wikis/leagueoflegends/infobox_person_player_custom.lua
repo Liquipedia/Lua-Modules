@@ -44,6 +44,17 @@ local _ROLES = {
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
 }
 _ROLES['assistant coach'] = _ROLES.coach
+_ROLES['strategic coach'] = _ROLES.coach
+_ROLES['positional coach'] = _ROLES.coach
+_ROLES['head coach'] = _ROLES.coach
+_ROLES['jgl'] = _ROLES.jungle
+_ROLES['solomiddle'] = _ROLES.mid
+_ROLES['carry'] = _ROLES.bot
+_ROLES['adc'] = _ROLES.bot
+_ROLES['bot'] = _ROLES.bot
+_ROLES['bottom'] = _ROLES.bot
+_ROLES['ad carry'] = _ROLES.bot
+_ROLES['sup'] = _ROLES.sup
 
 local _SIZE_CHAMPION = '25x25px'
 
