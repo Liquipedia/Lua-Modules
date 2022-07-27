@@ -333,17 +333,16 @@ function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
 	local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
 	local match = bracket.matchesById[matchId]
 
-	if not Logic.nilOr(options.mergeBracketResetMatch, true) then
-		return match
+	if Logic.nilOr(options.mergeBracketResetMatch, true) then
+		local bracketResetMatch = match
+			and match.bracketData.bracketResetMatchId
+			and bracket.matchesById[match.bracketData.bracketResetMatchId]
+
+		if bracketResetMatch then
+			return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+		end
 	end
 
-	local bracketResetMatch = match
-		and match.bracketData.bracketResetMatchId
-		and bracket.matchesById[match.bracketData.bracketResetMatchId]
-
-	if bracketResetMatch then
-		return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
-	end
 	return match
 end
 
