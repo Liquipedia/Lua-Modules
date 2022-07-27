@@ -47,7 +47,7 @@ local _PREFIXES = {
 	douyu = {'https://www.douyu.com/'},
 	esea = {
 		'https://play.esea.net/events/',
-		player = '',
+		player = 'https://play.esea.net/users/',
 		team = 'https://play.esea.net/teams/'
 	},
 	['esea-d'] = {'https://play.esea.net/league/standings?divisionId='},
