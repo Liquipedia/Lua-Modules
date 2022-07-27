@@ -20,7 +20,6 @@ local Template = require('Module:Template')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Builder = require('Module:Infobox/Widget/Builder')
 
 local _ROLES = {
 	-- Players
