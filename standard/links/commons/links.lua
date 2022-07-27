@@ -61,8 +61,8 @@ local _PREFIXES = {
 	['facebook-gaming'] = {'https://fb.gg/'},
 	faceit = {
 		'',
-		team = 'https://www.faceit.com/teams/',
-		player = 'https://www.faceit.com/players/',
+		team = 'https://www.faceit.com/en/teams/',
+		player = 'https://www.faceit.com/en/players/',
 	},
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
