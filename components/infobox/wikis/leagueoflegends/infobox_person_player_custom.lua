@@ -27,7 +27,7 @@ local _ROLES = {
 	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
 	['jungle'] = {category = 'Jungle players', variable = 'Jungle', isplayer = true},
 	['mid'] = {category = 'Mid Lane players', variable = 'Mid', isplayer = true},
-	['bot'] = {category = 'Bot Lane players', variable = 'Bot', isplayer = true},
+	['bottom'] = {category = 'Bot Lane players', variable = 'Bot', isplayer = true},
 
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
@@ -48,12 +48,11 @@ _ROLES['positional coach'] = _ROLES.coach
 _ROLES['head coach'] = _ROLES.coach
 _ROLES['jgl'] = _ROLES.jungle
 _ROLES['solomiddle'] = _ROLES.mid
-_ROLES['carry'] = _ROLES.bot
-_ROLES['adc'] = _ROLES.bot
-_ROLES['bot'] = _ROLES.bot
-_ROLES['bottom'] = _ROLES.bot
-_ROLES['ad carry'] = _ROLES.bot
-_ROLES['sup'] = _ROLES.sup
+_ROLES['carry'] = _ROLES.bottom
+_ROLES['adc'] = _ROLES.bottom
+_ROLES['bot'] = _ROLES.bottom
+_ROLES['ad carry'] = _ROLES.bottom
+_ROLES['sup'] = _ROLES.support
 
 local _SIZE_CHAMPION = '25x25px'
 
