@@ -14,7 +14,6 @@ local WikiSpecificBase = {}
 -- called from Module:MatchGroup
 -- called after processMap/processPlayer
 -- used to alter match related parameters, e.g. automatically setting the winner
--- @parameter frame - the frame object
 -- @parameter match - a match
 -- @returns the match after changes have been applied
 WikiSpecificBase.processMatch = FnUtil.lazilyDefineFunction(function()

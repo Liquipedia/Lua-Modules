@@ -35,7 +35,7 @@ function BigMatch.run(frame)
 	local match = Json.parseIfString(args[1])
 	assert(type(match) == 'table')
 
-	match = CustomMatchGroupInput.processMatch(frame, match, {isStandalone = true})
+	match = CustomMatchGroupInput.processMatch(match, {isStandalone = true})
 
 	local identifiers = bigMatch:_getId()
 	match['bracketid'] = 'MATCH_' .. identifiers[1]

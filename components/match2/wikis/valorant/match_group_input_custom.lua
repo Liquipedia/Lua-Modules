@@ -40,7 +40,7 @@ local placementFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(frame, match, options)
+function CustomMatchGroupInput.processMatch(match, options)
 	options = options or {}
 	-- Count number of maps, check for empty maps to remove
 	match = matchFunctions.getBestOf(match)
