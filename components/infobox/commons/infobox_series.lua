@@ -14,6 +14,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Locale = require('Module:Locale')
 local Localisation = require('Module:Localisation')
 local Namespace = require('Module:Namespace')
+local Page = require('Module:Page')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -58,12 +59,18 @@ function Series:createInfobox(frame)
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Series Information'},
-		Cell{
-			name = 'Organizer',
-			content = self:getAllArgsForBase(args, 'organizer'),
-			options = {
-				makeLink = true
-			}
+		Builder{
+			builder = function()
+				local organizers = self:_createOrganizers(args)
+				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
+
+				return {
+					Cell{
+						name = title,
+						content = organizers
+					}
+				}
+			end
 		},
 		Cell{
 			name = 'Sponsor(s)',
@@ -113,7 +120,7 @@ function Series:createInfobox(frame)
 			id = 'liquipediatier',
 			children = {
 				Cell{
-					name = 'Liquipedia tier',
+					name = 'Liquipedia Tier',
 					content = {self:createLiquipediaTierDisplay(args)},
 					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
 				},
@@ -288,6 +295,64 @@ function Series:_createLocation(country, city)
 	end
 
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
+end
+
+function Series:_createOrganizer(organizer, name, link, reference)
+	if String.isEmpty(organizer) then
+		return nil
+	end
+
+	local output
+
+	if Page.exists(organizer) then
+		output = '[[' .. organizer .. '|'
+		if String.isEmpty(name) then
+			output = output .. organizer .. ']]'
+		else
+			output = output .. name .. ']]'
+		end
+
+	elseif not String.isEmpty(link) then
+		if String.isEmpty(name) then
+			output = '[' .. link .. ' ' .. organizer .. ']'
+		else
+			output = '[' .. link .. ' ' .. name .. ']'
+
+		end
+	elseif String.isEmpty(name) then
+		output = organizer
+	else
+		output = name
+	end
+
+	if not String.isEmpty(reference) then
+		output = output .. reference
+	end
+
+	return output
+end
+
+function Series:_createOrganizers(args)
+	local organizers = {
+		Series:_createOrganizer(
+			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
+	}
+
+	local index = 2
+
+	while not String.isEmpty(args['organizer' .. index]) do
+		table.insert(
+			organizers,
+			Series:_createOrganizer(
+				args['organizer' .. index],
+				args['organizer' .. index .. '-name'],
+				args['organizer' .. index .. '-link'],
+				args['organizerref' .. index])
+		)
+		index = index + 1
+	end
+
+	return organizers
 end
 
 function Series:_setCountryCategories(country)
