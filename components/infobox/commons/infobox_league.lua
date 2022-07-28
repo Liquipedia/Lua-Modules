@@ -282,7 +282,12 @@ function League:createLiquipediaTierDisplay(args)
 			if self:shouldStore(self.args) then
 				self.infobox:categories(tierText .. ' Tournaments')
 			end
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
+			local tierLink = tierText .. ' Tournaments'
+			if Tier.link and Tier.link[tierString] then
+				tierLink = Tier.link[tierString]
+			end
+
+			return '[[' .. tierLink .. '|' .. tierText .. ']]'
 		end
 	end
 
