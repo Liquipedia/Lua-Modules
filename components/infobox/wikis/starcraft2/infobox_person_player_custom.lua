@@ -200,7 +200,25 @@ function CustomPlayer._getMatchupData(player)
 	player = string.gsub(player, '_', ' ')
 	local queryParameters = {
 		conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]',
-		order = 'date desc'
+		order = 'date desc',
+		query = table.concat({
+				'match2opponents',
+				'winner',
+				'pagename',
+				'tournament',
+				'tickername',
+				'icon',
+				'date',
+				'publishertier',
+				'vod',
+				'stream',
+				'extradata',
+				'parent',
+				'finished',
+				'bestof',
+				'match2id',
+				'icondark',
+			}, ', '),
 	}
 
 	local years = {}
