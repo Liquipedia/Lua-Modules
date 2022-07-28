@@ -42,7 +42,7 @@ local _EARNING_MODES = {solo = '1v1', team = 'team'}
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
 local _MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 40
-local _NUMBER_OF_RECENT_MATCHES = 5
+local _NUMBER_OF_RECENT_MATCHES = 10
 
 --race stuff
 local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
