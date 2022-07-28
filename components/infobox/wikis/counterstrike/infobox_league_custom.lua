@@ -260,6 +260,8 @@ function CustomLeague:_createPrizepool(args)
 
 	if String.isNotEmpty(prizepoolInUsd) then
 		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
+	else
+		Variables.varDefine('tournament_prizepoolusd', 0)
 	end
 
 	return content
