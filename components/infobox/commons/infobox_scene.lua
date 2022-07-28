@@ -44,7 +44,7 @@ function Scene:createInfobox()
 		Center{content = {args.caption}},
 		Title{name = 'Scene Information'},
 		Cell{name = 'Region', content = {args.region}},
-		Cell{name = 'National team', content = {args.nationalteam}, options = {makeLink = true}},
+		Cell{name = 'National Team', content = {args.nationalteam}, options = {makeLink = true}},
 		Cell{name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})},
 		Cell{name = 'Size', content = {args.size}},
 		Customizable{id = 'custom', children = {}},

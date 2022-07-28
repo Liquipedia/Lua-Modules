@@ -152,7 +152,7 @@ function League:createInfobox()
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
 			Cell{
-					name = 'Prize pool',
+					name = 'Prize Pool',
 					content = {self:_createPrizepool(args)},
 				},
 			},
@@ -163,7 +163,7 @@ function League:createInfobox()
 		Customizable{id = 'custom', children = {}},
 		Customizable{id = 'liquipediatier', children = {
 				Cell{
-					name = 'Liquipedia tier',
+					name = 'Liquipedia Tier',
 					content = {self:createLiquipediaTierDisplay(args)},
 					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
 				},

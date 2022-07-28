@@ -52,7 +52,7 @@ function UnofficialWorldChampion:createInfobox()
 						contentCell = ' vs ' .. args['gained against']
 					end
 					return {
-						Title{name = 'Title gained'},
+						Title{name = 'Title Gained'},
 						Cell{
 							name = args['gained date'],
 							content = { contentCell },
@@ -61,7 +61,7 @@ function UnofficialWorldChampion:createInfobox()
 				end
 			end
 		},
-		Title{name = 'Most defences'},
+		Title{name = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
 			content = { args['most defences'] },
