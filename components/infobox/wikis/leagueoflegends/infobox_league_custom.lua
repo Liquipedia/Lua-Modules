@@ -21,7 +21,7 @@ local _league
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local _DEFAULT_TIERTYPE = 'General'
+local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -32,6 +32,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
 	return league:createInfobox(frame)
 end
@@ -50,34 +51,29 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Players',
 		content = {args.player_number}
 	})
-
-	return widgets
-end
-
-function CustomInjector:parse(id, widgets)
-	if id == 'liquipediatier' then
-		if _args.pctier and _args.liquipediatiertype ~= 'Qualifier' then
-			local riotIcon = ''
-			table.insert(widgets,
-				Cell{
-					name = 'Worlds',
-					content = {'[[World Championship|' .. _args.riotTier .. ']] ' .. riotIcon},
-					classes = {'valvepremier-highlighted'}
-				}
-			)
-		end
-	end
 	return widgets
 end
 
 function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args.riotpremier)
+	return Logic.readBool(_args['riot-sponsored'])
+end
+
+function CustomLeague:appendLiquipediatierDisplay()
+	if Logic.readBool(_args['riot-sponsored']) then
+		return ' ' .. RIOT_ICON
+	end
+	return ''
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.publishertier = args.pctier
+	
+	if Logic.readBool(args.riotpremier) then
+		lpdbData.publishertier = 'major'
+	elseif Logic.readBool(args['riot-sponsored']) then
+		lpdbData.publishertier = 'Sponsored'
+	end
+
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
 		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
@@ -103,7 +99,7 @@ end
 
 function CustomLeague:defineCustomPageVariables()
 	-- Custom Vars
-	Variables.varDefine('tournament_riot_premier', _args.riotpremier)
+	Variables.varDefine('tournament_riot_premier', _args.riotpremier and 'true' or '')
 	Variables.varDefine('tournament_publisher_major', _args.riotpremier)
 	Variables.varDefine('tournament_publishertier', _args.pctier)
 
