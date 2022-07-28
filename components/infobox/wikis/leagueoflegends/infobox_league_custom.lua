@@ -9,7 +9,6 @@
 local League = require('Module:Infobox/League')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Tier = require('Module:Tier')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -66,7 +65,6 @@ function CustomLeague:appendLiquipediatierDisplay()
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	
 	if Logic.readBool(args.riotpremier) then
 		lpdbData.publishertier = 'major'
 	elseif Logic.readBool(args['riot-sponsored']) then
