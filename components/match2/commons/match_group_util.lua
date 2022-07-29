@@ -328,18 +328,22 @@ Returns a match struct for use in a bracket display or match summary popup. The
 bracket display and match summary popup expects that the finals match also
 include results from the bracket reset match.
 ]]
-function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId)
+function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
+	options = options or {}
 	local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
 	local match = bracket.matchesById[matchId]
 
-	local bracketResetMatch = match
-		and match.bracketData.bracketResetMatchId
-		and bracket.matchesById[match.bracketData.bracketResetMatchId]
-	if bracketResetMatch then
-		return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
-	else
-		return match
+	if Logic.nilOr(options.mergeBracketResetMatch, true) then
+		local bracketResetMatch = match
+			and match.bracketData.bracketResetMatchId
+			and bracket.matchesById[match.bracketData.bracketResetMatchId]
+
+		if bracketResetMatch then
+			return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+		end
 	end
+
+	return match
 end
 
 --[[
