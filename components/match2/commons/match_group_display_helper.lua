@@ -97,7 +97,7 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateIsExact == true then
-		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. _UTC
+		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. _NONBREAKING_SPACE .. _UTC
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end
