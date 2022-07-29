@@ -384,6 +384,7 @@ function League:_setLpdbData(args, links)
 		next = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next)),
 		next2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next2)),
 		game = string.lower(args.game or ''),
+		mode = Variables.varDefault('tournament_mode', ''),
 		patch = args.patch,
 		endpatch = args.endpatch or args.epatch,
 		type = args.type,
