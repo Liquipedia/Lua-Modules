@@ -746,7 +746,7 @@ function PrizePool:_storeData()
 		icon = Variables.varDefault('tournament_icon'),
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
-		-- TODO: Add PrizePoolIndex as a field?
+		prizepoolindex = prizePoolIndex,
 	}
 
 	local lpdbData = {}
