@@ -11,6 +11,7 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
+local TypeUtil = require('Module:TypeUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -49,6 +50,7 @@ function StarcraftMatchSummary.MatchSummaryContainer(props)
 end
 
 StarcraftMatchSummary.propTypes.MatchSummary = {
+	bracketResetMatch = TypeUtil.optional(StarcraftMatchGroupUtil.types.Match),
 	match = StarcraftMatchGroupUtil.types.Match,
 	config = 'table',
 }
@@ -57,9 +59,6 @@ function StarcraftMatchSummary.MatchSummary(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.MatchSummary)
 	local match = props.match
 	local bracketResetMatch = props.bracketResetMatch
-	if bracketResetMatch then
-		DisplayUtil.assertPropTypes(bracketResetMatch, StarcraftMatchGroupUtil.types.Match)
-	end
 
 	local propsConfig = props.config or {}
 	local config = {
