@@ -23,8 +23,6 @@ local _DEFAULT_TYPE = 'player'
 local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
 local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
 
-local _COLOR_BACKGROUND_COACH = '#e5e5e5'
-
 local SquadRow = Class.new(
 	function(self, frame, role, options)
 		self.frame = frame
