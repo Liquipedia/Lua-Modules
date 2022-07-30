@@ -37,13 +37,13 @@ local SquadRow = Class.new(
 			self.content:addClass('sub')
 		elseif role == 'coach' then
 			self.content:addClass('coach')
-			self.content:css('background-color', _COLOR_BACKGROUND_COACH)
+			self.content:addClass('roster-coach')
 		elseif role == 'coach/manager' then
 			self.content:addClass('coach/manager')
-			self.content:css('background-color', _COLOR_BACKGROUND_COACH)
+			self.content:addClass('roster-coach')
 		elseif role == 'coach/substitute' then
 			self.content:addClass('coach/substitute')
-			self.content:css('background-color', _COLOR_BACKGROUND_COACH)
+			self.content:addClass('roster-coach')
 		end
 
 		self.lpdbData = {}
