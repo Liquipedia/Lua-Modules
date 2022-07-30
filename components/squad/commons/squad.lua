@@ -69,7 +69,7 @@ function Squad:title()
 	local titleRow2 = mw.html.create('th')
 	titleRow2:addClass('large-only')
 			:attr('colspan', '10')
-			:addCLass('roster-title-row2-border')
+			:addClass('roster-title-row2-border')
 			:wikitext(titleText)
 
 	titleContainer:node(titleRow):node(titleRow2)
