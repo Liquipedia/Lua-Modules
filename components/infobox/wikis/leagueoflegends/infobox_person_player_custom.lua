@@ -89,9 +89,11 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
+		local status = _args.status
+		status = status:gsub("^%l", string.upper)
 		return {
 			Cell{name = 'Status', content = {Page.makeInternalLink({onlyIfExists = true},
-						_args.status) or _args.status}},
+						status) or status}},
 		}
 	elseif id == 'role' then
 		return {
