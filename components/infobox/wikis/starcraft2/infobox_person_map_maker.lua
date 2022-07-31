@@ -6,13 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local MapMaker = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
 local Class = require('Module:Class')
-local Variables = require('Module:Variables')
-local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
 local Logic = require('Module:Logic')
+local MapMaker = require('Module:Infobox/Person')
+local RaceIcon = require('Module:RaceIcon')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 --race stuff tables
 local _FACTION1 = {
@@ -124,7 +125,7 @@ end
 
 function CustomMapMaker:nameDisplay()
 	CustomMapMaker._getRaceData(_args.race or 'unknown')
-	local raceIcon = RaceIcon({'alt_' .. _raceData.race})
+	local raceIcon = RaceIcon.getBigIcon({'alt_' .. _raceData.race})
 	local name = _args.id or self.pagename
 
 	return raceIcon .. '&nbsp;' .. name
@@ -175,7 +176,7 @@ function CustomMapMaker:adjustLPDB(lpdbData, _, personType)
 		extradata.factionhistorical = true
 	end
 
-	lpdbData.extradata = extradata
+	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, extradata)
 
 	return lpdbData
 end
