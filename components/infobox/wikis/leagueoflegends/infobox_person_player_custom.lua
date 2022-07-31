@@ -90,7 +90,10 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		local status = _args.status
-		status = status:gsub("^%l", string.upper)
+		if String.isNotEmpty(status) then
+			status = mw.language:ucfirst(status)
+		end
+
 		return {
 			Cell{name = 'Status', content = {Page.makeInternalLink({onlyIfExists = true},
 						status) or status}},
