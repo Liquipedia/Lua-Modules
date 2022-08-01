@@ -63,6 +63,7 @@ end
 
 function StarcraftOpponent.fromMatch2Record(record)
 	local opponent = Opponent.fromMatch2Record(record)
+
 	if Opponent.typeIsParty(opponent.type) then
 		for playerIx, player in ipairs(opponent.players) do
 			local playerRecord = record.match2players[playerIx]
@@ -70,6 +71,7 @@ function StarcraftOpponent.fromMatch2Record(record)
 		end
 		opponent.isArchon = Logic.readBool((record.extradata or {}).isarchon)
 	end
+
 	return opponent
 end
 
