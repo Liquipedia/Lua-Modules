@@ -1007,7 +1007,7 @@ function Placement:_parseOpponentArgs(input, date)
 	if not opponentData or Opponent.isTbd(opponentData) then
 		opponentData = Opponent.tbd(opponentArgs.type)
 	end
-	
+
 	local resolveOptions = {loadFlag = self.parent.options.loadFlags, loadTeam = self.parent.options.loadTeams}
 	return Opponent.resolve(opponentData, date, resolveOptions)
 end
