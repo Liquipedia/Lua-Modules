@@ -20,7 +20,7 @@ StarcraftOpponent.types.Player = TypeUtil.extendStruct(Opponent.types.Player, {
 
 StarcraftOpponent.types.PartyOpponent = TypeUtil.struct{
 	isArchon = 'boolean',
-	--isSpecialArchon = 'boolean',
+	isSpecialArchon = 'boolean?',
 	players = TypeUtil.array(StarcraftOpponent.types.Player),
 	type = TypeUtil.literalUnion(unpack(Opponent.partyTypes)),
 }
