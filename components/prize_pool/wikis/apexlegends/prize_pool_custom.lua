@@ -50,7 +50,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	if Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
 	end
-	
 	return lpdbData
 end
 
