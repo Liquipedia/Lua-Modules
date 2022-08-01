@@ -94,6 +94,18 @@ PrizePool.config = {
 	},
 	resolveRedirect = {
 		default = false,
+	},
+	loadFlags = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.loadFlags)
+		end
+	},
+	loadTeams = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.loadTeams)
+		end
 	}
 }
 
@@ -995,8 +1007,9 @@ function Placement:_parseOpponentArgs(input, date)
 	if not opponentData or Opponent.isTbd(opponentData) then
 		opponentData = Opponent.tbd(opponentArgs.type)
 	end
-
-	return Opponent.resolve(opponentData, date)
+	
+	local resolveOptions = {loadFlag = self.parent.options.loadFlags, loadTeam = self.parent.options.loadTeams}
+	return Opponent.resolve(opponentData, date, resolveOptions)
 end
 
 function Placement:_getLpdbData()
