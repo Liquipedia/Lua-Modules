@@ -237,16 +237,25 @@ Resolves the identifiers of an opponent.
 For team opponents, this resolves the team template to a particular date. For
 party opponents, this fills in players' pageNames using their displayNames,
 using data stored in page variables if present.
+
+options.loadFlag: Whether to fetch the flag from variables, match2 or LPDB. Disabled by default
+options.loadTeam: Whether to fetch the team from variables or LPDB. Disabled by default.
 ]]
-function Opponent.resolve(opponent, date)
+function Opponent.resolve(opponent, date, options)
+	options = options or {}
 	if opponent.type == Opponent.team then
 		opponent.template = TeamTemplate.resolve(opponent.template, date) or 'tbd'
 	elseif Opponent.typeIsParty(opponent.type) then
 		local PlayerExt = require('Module:Player/Ext')
 		for _, player in ipairs(opponent.players) do
 			PlayerExt.populatePageName(player)
+			if options.loadFlag then
+				PlayerExt.syncPlayer(player)
+			end
 			if player.team then
 				player.team = TeamTemplate.resolve(player.team, date)
+			elseif options.loadTeam then
+				player.team = PlayerExt.syncTeam(player.pageName, nil)
 			end
 		end
 	end
