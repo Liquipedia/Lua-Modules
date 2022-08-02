@@ -323,7 +323,8 @@ function matchFunctions.getTournamentVars(match)
 	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
 	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
 	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
-	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_liquipediatiertype'))
+	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, 
+											 Variables.varDefault('tournament_liquipediatiertype'))
 	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
 	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
@@ -334,7 +335,7 @@ function matchFunctions.getLinks(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
-	
+
 	match.links = {}
 
 	local links = match.links
@@ -623,7 +624,7 @@ end
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
-	
+
 	map = mapFunctions._getHalfScores(map)
 
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do

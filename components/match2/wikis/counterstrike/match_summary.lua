@@ -418,13 +418,12 @@ function CustomMatchSummary._createMap(game)
 	local t1Halfs = extradata["t1Halfs"] or {}
 	local t2Halfs = extradata["t2Halfs"] or {}
 
-	local oppositeSide = ''
 	local d = #t1Sides
 
 	if t1Sides then
 		-- Insert team scores
 		for i,side in ipairs(t1Sides) do
-			oppositeSide = CustomMatchSummary._getOppositeSide(t1Sides[d])
+			local oppositeSide = CustomMatchSummary._getOppositeSide(t1Sides[d])
 			-- Team 1 scores inserted from 1 .. n
 			if math.fmod(i,2) == 1 then
 				team1Score:setFirstHalfScore(t1Halfs[i], CustomMatchSummary._getSideColor(side))
@@ -442,7 +441,7 @@ function CustomMatchSummary._createMap(game)
 	end
 	-- Score Team 2
 	team2Score:setMapScore(game.scores[2])
-	
+
 	-- Map Info
 	local mapInfo = mw.html.create('div')
 	mapInfo	:addClass('brkts-popup-spaced')
@@ -462,7 +461,7 @@ function CustomMatchSummary._createMap(game)
 	row:addElement(team1Score:create())
 
 	row:addElement(mapInfo)
-	
+
 	row:addElement(team2Score:create())
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 

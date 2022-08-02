@@ -129,7 +129,7 @@ function MatchLegacy.convertParameters(match2)
 			else
 				match[prefix.."score"] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			end
-		
+
 			if Table.includes(LOSER_STATUSES, opponent.status) then
 				match.resulttype = opponent.status:lower()
 			end
@@ -167,8 +167,6 @@ function MatchLegacy.storeGames(match, match2)
 		local extradata = Json.parseIfString(game2.extradata)
 		game.extradata = {}
 
-		local t1Sides, t1Halfs, t2Halfs = {}, {}, {}
-
 		local opponent1scores, opponent2scores = {}, {}
 
 		local function getOpossiteSide(side)
@@ -176,9 +174,9 @@ function MatchLegacy.storeGames(match, match2)
 		end
 
 		if extradata.t1Sides and extradata.t1Halfs and extradata.t2Halfs then
-			t1Sides = Json.parseIfString(extradata.t1Sides)
-			t1Halfs = Json.parseIfString(extradata.t1Halfs)
-			t2Halfs = Json.parseIfString(extradata.t2Halfs)
+			local t1Sides = Json.parseIfString(extradata.t1Sides)
+			local t1Halfs = Json.parseIfString(extradata.t1Halfs)
+			local t2Halfs = Json.parseIfString(extradata.t2Halfs)
 
 			for index, side in ipairs(t1Sides) do
 				if math.fmod(index,2) == 1 then
