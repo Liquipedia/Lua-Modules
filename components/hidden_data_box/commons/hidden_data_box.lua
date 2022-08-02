@@ -18,7 +18,7 @@ local WarningBox = require('Module:WarningBox')
 local HiddenDataBox = {}
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
-local INVALID_PARENT = '${parent} is not a Liquipedia Tournament'
+local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local TIER_MODE_TYPES = 'types'
 local TIER_MODE_TIERS = 'tiers'
 
