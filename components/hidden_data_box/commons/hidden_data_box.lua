@@ -152,7 +152,7 @@ function HiddenDataBox.validateTier(tierString, tierMode)
 		)
 	end
 
-	-- For types we want to normalized value
+	-- For types we want to return the normalized value
 	-- For tiers we want to return the input
 	tierValue = tierMode == TIER_MODE_TYPES and tierValue or tierString
 
