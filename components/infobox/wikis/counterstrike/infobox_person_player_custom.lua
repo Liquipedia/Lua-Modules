@@ -131,8 +131,8 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.role = (_args.role or ''):lower()
+	lpdbData.extradata.role2 = (_args.role2 or ''):lower()
 
 	return lpdbData
 end
