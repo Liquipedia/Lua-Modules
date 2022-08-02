@@ -289,10 +289,6 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 				opponent.score = -1
 				match.finished = 'true'
 				match.resulttype = 'default'
-			elseif Logic.readBool(match.cancelled) then
-				match.resulttype = 'np'
-				match.finished = 'true'
-				opponent.score = -1
 			elseif _CONVERT_STATUS_INPUT[string.upper(opponent.score or '')] then
 				if string.upper(opponent.score) == 'W' then
 					match.winner = opponentIndex
@@ -313,8 +309,16 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 				opponent.score = tonumber(opponent.score or '') or
 					tonumber(opponent.sumscore) or -1
 				if opponent.score > bestof / 2 then
-					match.finished = Logic.nilOr(match.finished, 'true')
+					match.finished = Logic.emptyOr(match.finished, 'true')
 					match.winner = tonumber(match.winner or '') or opponentIndex
+				end
+			end
+
+			if Logic.readBool(match.cancelled) then
+				match.finished = 'true'
+				if String.isEmpty(match.resulttype) and String.isEmpty(opponent.score) then
+					match.resulttype = 'np'
+					opponent.score = opponent.score or -1
 				end
 			end
 		else
