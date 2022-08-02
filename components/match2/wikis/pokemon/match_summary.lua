@@ -199,26 +199,18 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local championsData = {{}, {}}
-	local championsDataIsEmpty = true
-	for champIndex = 1, _NUM_CHAMPIONS_PICK do
-		if String.isNotEmpty(extradata['team1champion' .. champIndex]) then
-			championsData[1][champIndex] = extradata['team1champion' .. champIndex]
-			championsDataIsEmpty = false
+	local getChampsForTeam = function(team)
+		local getChampFromIndex =  function(champIndex)
+			return champIndex, String.nilIfEmpty(extradata['team' .. team .. 'champion' .. champIndex])
 		end
-		if String.isNotEmpty(extradata['team2champion' .. champIndex]) then
-			championsData[2][champIndex] = extradata['team2champion' .. champIndex]
-			championsDataIsEmpty = false
-		end
-		championsData[1].color = extradata.team1side
-		championsData[2].color = extradata.team2side
+		return Table.map(Array.range(1, _NUM_CHAMPIONS_PICK), getChampFromIndex)
 	end
+	local championsData = Array.map(Array.range(1, 2), getChampsForTeam)
+	local championsDataIsEmpty = Array.all(championsData, Table.isEmpty)
+	championsData[1].color = extradata.team1side
+	championsData[2].color = extradata.team2side
 
-	if
-		Table.isEmpty(game.scores) and
-		String.isEmpty(game.winner) and
-		championsDataIsEmpty
-	then
+	if Table.isEmpty(game.scores) and String.isEmpty(game.winner) and championsDataIsEmpty then
 		return nil
 	end
 
@@ -277,9 +269,7 @@ end
 
 function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, date, flip, isBan)
 	local opponentChampionsDisplay = {}
-	local color = opponentChampionsData.color or ''
-	opponentChampionsData.color = nil
-
+	local color = Table.extract(opponentChampionsData, color) or ''
 	for index = 1, numberOfChampions do
 		local champDisplay = mw.html.create('div')
 		:addClass('brkts-popup-side-color-' .. color)
