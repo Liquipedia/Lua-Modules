@@ -460,7 +460,8 @@ function matchFunctions.getMapVeto(match)
 			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
 			deciderIndex = deciderIndex + 1
 		else
-			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map' .. index], team2 = match.mapveto['t2map' .. index]})
+			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map' .. index], 
+									team2 = match.mapveto['t2map' .. index]})
 		end
 	end
 	if data[1] then
