@@ -19,15 +19,15 @@ local EarningsOf = require('Module:Earnings of')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
-local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
-local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
+local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
+local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 local NP_MATCH_STATUS = {'cancelled','canceled', 'postponed'}
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
-local FEATURED_TIERS = { 'S-Tier', 'A-Tier'}
+local FEATURED_TIERS = {'S-Tier', 'A-Tier'}
 local MIN_EARNINGS_FOR_FEATURED = 200000
 
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -231,7 +231,7 @@ end
 function matchFunctions.getBestOf(match)
 	local mapCount = 0
 	for i = 1, MAX_NUM_MAPS do
-		if match['map'..i] then
+		if match['map' .. i] then
 			mapCount = mapCount + 1
 		else
 			break
@@ -247,9 +247,9 @@ end
 -- Remove all maps that should be removed.
 function matchFunctions.removeUnsetMaps(match)
 	for i = 1, MAX_NUM_MAPS do
-		if match['map'..i] then
-			if mapFunctions.discardMap(match['map'..i]) then
-				match['map'..i] = nil
+		if match['map' .. i] then
+			if mapFunctions.discardMap(match['map' .. i]) then
+				match['map' .. i] = nil
 			end
 		else
 			break
@@ -277,8 +277,8 @@ function matchFunctions.getScoreFromMapWinners(match)
 		end
 	else -- For best of >1, disply the map wins
 		for i = 1, MAX_NUM_MAPS do
-			if match['map'..i] then
-				local winner = tonumber(match['map'..i].winner)
+			if match['map' .. i] then
+				local winner = tonumber(match['map' .. i].winner)
 				foundScores = true
 				-- Only two opponents in CS
 				if winner and winner > 0 and winner <= 2 then
@@ -324,7 +324,7 @@ function matchFunctions.getTournamentVars(match)
 	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
 	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
 	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype,
-											 Variables.varDefault('tournament_liquipediatiertype'))
+												Variables.varDefault('tournament_liquipediatiertype'))
 	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
 	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
@@ -350,16 +350,16 @@ function matchFunctions.getLinks(match)
 			local plaformPrefixUrl = platform['link']
 
 			if match[platformName] then
-				table.insert(values,{plaformPrefixUrl .. match[platformName], 0 })
+				table.insert(values,{plaformPrefixUrl .. match[platformName], 0})
 				match[platformName] = nil
 			end
 
 			if not Logic.isEmpty(platform['isMapStats']) then
 				for i = 1, match.bestof do
-					if match["map" .. i] then
-						if match["map" .. i][platform.name] then
-							table.insert(values, {plaformPrefixUrl .. match["map" .. i][platformName], i })
-							match["map" .. i][platform.name] = nil
+					if match['map' .. i] then
+						if match['map' .. i][platform.name] then
+							table.insert(values, {plaformPrefixUrl .. match['map' .. i][platformName], i})
+							match['map' .. i][platform.name] = nil
 						end
 					end
 				end
@@ -367,7 +367,7 @@ function matchFunctions.getLinks(match)
 				if not Logic.isEmpty(platform['max']) then
 					for i = 2, platform['max'], 1 do
 						if match[platform.name .. i] then
-							table.insert(values, {plaformPrefixUrl .. match[platformName .. i], i })
+							table.insert(values, {plaformPrefixUrl .. match[platformName .. i], i})
 							match[platform.name .. i] = nil
 						end
 					end
@@ -460,7 +460,7 @@ function matchFunctions.getMapVeto(match)
 			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
 			deciderIndex = deciderIndex + 1
 		else
-			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map'..index], team2 = match.mapveto['t2map'..index]})
+			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map' .. index], team2 = match.mapveto['t2map' .. index]})
 		end
 	end
 	if data[1] then
@@ -576,9 +576,10 @@ function mapFunctions.getExtraData(map)
 end
 
 function mapFunctions._getHalfScores(map)
-	map.extradata["t1Sides"] = {}
-	map.extradata["t1Halfs"] = {}
-	map.extradata["t2Halfs"] = {}
+	map.extradata['t1sides'] = {}
+	map.extradata['t2sides'] = {}
+	map.extradata['t1halfs'] = {}
+	map.extradata['t2halfs'] = {}
 
 	local key = ''
 	local overtimes = 0
@@ -588,27 +589,23 @@ function mapFunctions._getHalfScores(map)
 	end
 
 	while true do
-		local t1Side = map[key .. "t1firstside"]
+		local t1Side = map[key .. 't1firstside']
 		if Logic.isEmpty(t1Side) or (t1Side ~= 'ct' and t1Side ~= 't') then
 			break
 		end
 		local t2Side = getOpossiteSide(t1Side)
 
-		-- first half
-		if(map[key .. 't1' .. t1Side] and map[key .. 't2' .. t2Side]) then
-			table.insert(map.extradata["t1Sides"], t1Side)
-			table.insert(map.extradata["t1Halfs"], tonumber(map[key .. 't1' .. t1Side]) or 0)
-			table.insert(map.extradata["t2Halfs"], tonumber(map[key .. 't2' .. t2Side]) or 0)
-			map[key .. 't1' .. t1Side] = nil
-			map[key .. 't2' .. t2Side] = nil
-
-			-- second half (sides switch)
-			if(map[key .. 't1' .. t2Side] and map[key .. 't2' .. t1Side]) then
-				table.insert(map.extradata["t1Sides"], t2Side)
-				table.insert(map.extradata["t1Halfs"], tonumber(map[key .. 't1' .. t2Side]) or 0)
-				table.insert(map.extradata["t2Halfs"], tonumber(map[key .. 't2' .. t1Side]) or 0)
-				map[key .. 't1' .. t2Side] = nil
-				map[key .. 't2' .. t1Side] = nil
+		-- Iterate over two Halfs (In regular time a half is 15 rounds, after that sides switch)
+		for _ = 1, 2, 1 do
+			if(map[key .. 't1' .. t1Side] and map[key .. 't2' .. t2Side]) then
+				table.insert(map.extradata['t1sides'], t1Side)
+				table.insert(map.extradata['t2sides'], t2Side)
+				table.insert(map.extradata['t1halfs'], tonumber(map[key .. 't1' .. t1Side]) or 0)
+				table.insert(map.extradata['t2halfs'], tonumber(map[key .. 't2' .. t2Side]) or 0)
+				map[key .. 't1' .. t1Side] = nil
+				map[key .. 't2' .. t2Side] = nil
+				-- second half (sides switch)
+				t1Side, t2Side = t2Side, t1Side
 			end
 		end
 
@@ -630,12 +627,12 @@ function mapFunctions.getScoresAndWinner(map)
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do
 		-- read scores
 		local score
-		if Table.includes(ALLOWED_STATUSES, map["score" .. scoreIndex]) then
-			score = map["score" .. scoreIndex]
-		elseif Logic.isNotEmpty(map.extradata["t".. scoreIndex .. "Halfs"]) then
-			score = MathUtil.sum(map.extradata["t".. scoreIndex .. "Halfs"])
+		if Table.includes(ALLOWED_STATUSES, map['score' .. scoreIndex]) then
+			score = map['score' .. scoreIndex]
+		elseif Logic.isNotEmpty(map.extradata['t' .. scoreIndex .. 'halfs']) then
+			score = MathUtil.sum(map.extradata['t' .. scoreIndex .. 'halfs'])
 		else
-			score = tonumber(map["score" .. scoreIndex])
+			score = tonumber(map['score' .. scoreIndex])
 		end
 		local obj = {}
 		if not Logic.isEmpty(score) then

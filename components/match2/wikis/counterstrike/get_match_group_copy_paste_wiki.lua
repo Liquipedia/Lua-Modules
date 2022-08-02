@@ -7,18 +7,20 @@
 --
 
 local Table = require('Module:Table')
+local Logic = require('Module:Logic')
 local Set = require('Module:Set')
+local Opponent = require('Module:Opponent')
 
 local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
 
 
 --returns the Code for a Match, depending on the input
 function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local streams = args.streams == 'true'
-	local showScore = args.score == 'true'
-	local mapDetails = args.detailedMap == 'true'
-	local mapDetailsOT = args.detailedMapOT == 'true'
-	local hltv = args.hltv == 'true'
+	local streams = Logic.readBool(args.streams)
+	local showScore = Logic.readBool(args.score)
+	local mapDetails = Logic.readBool(args.detailedMap)
+	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
+	local hltv = Logic.readBool(args.hltv)
 	local mapStats = args.mapStats and Set(mw.text.split(args.mapStats, ', ')):toArray() or {}
 	local matchMatchpages = args.matchMatchpages and Set(mw.text.split(args.matchMatchpages, ', ')):toArray() or {}
 	local out = '{{Match' .. '\n\t|date=|finished='
@@ -72,11 +74,11 @@ end
 function wikiCopyPaste._getOpponent(mode, showScore)
 	local score = showScore and '|score=' or ''
 
-	if mode == 'solo' then
+	if mode == Opponent.solo then
 		return '{{PlayerOpponent||flag=|team=' .. score .. '}}'
-	elseif mode == 'team' then
+	elseif mode == Opponent.team then
 		return '{{TeamOpponent|' .. score .. '}}'
-	elseif mode == 'literal' then
+	elseif mode == Opponent.literal then
 		return '{{LiteralOpponent|}}'
 	end
 end

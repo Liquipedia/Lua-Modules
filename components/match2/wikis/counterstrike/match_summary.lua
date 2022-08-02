@@ -309,7 +309,7 @@ function CustomMatchSummary._createBody(match)
 	if match.extradata.status then
 		local matchStatus = MatchStatus()
 		local lang = mw.getContentLanguage()
-		matchStatus:content('\'\'\'Match ' .. lang:ucfirst(match.extradata.status) ..'\'\'\'')
+		matchStatus:content('\'\'\'Match ' .. lang:ucfirst(match.extradata.status) .. '\'\'\'')
 		body:addRow(matchStatus)
 	end
 
@@ -318,6 +318,8 @@ end
 
 function CustomMatchSummary._createFooter(match, vods)
 	local footer = MatchSummary.Footer()
+
+	local dot = '<b>·</b>'
 
 	local function createFooterLink(icon, url, label, index)
 		local _icon = icon
@@ -328,7 +330,7 @@ function CustomMatchSummary._createFooter(match, vods)
 			label = label .. ' for Game ' .. index
 		end
 
-		return '[[FILE:'.. _icon ..'|link='.. url ..'|15px|'.. label ..'|alt=' .. url .. ']]'
+		return '[[FILE:' .. _icon .. '|link=' .. url .. '|15px|' .. label .. '|alt=' .. url .. ']]'
 	end
 
 	-- Match vod
@@ -348,8 +350,6 @@ function CustomMatchSummary._createFooter(match, vods)
 			source = vod.url
 		})
 	end
-
-	local dot = '<b>·</b>'
 
 	if Table.isNotEmpty(match.links) then
 		if Logic.isNotEmpty(vods) or match.vod then
@@ -381,7 +381,7 @@ function CustomMatchSummary._createFooter(match, vods)
 
 				for _, val in ipairs(link) do
 					footer:addElement(createFooterLink(icon, val[1], label,
-													   addGameLabel and val[2] or 0))
+														addGameLabel and val[2] or 0))
 					iconsInserted = iconsInserted + 1
 				end
 
@@ -414,27 +414,27 @@ function CustomMatchSummary._createMap(game)
 	-- Score Team 1
 	team1Score:setMapScore(game.scores[1])
 
-	local t1Sides = extradata["t1Sides"] or {}
-	local t1Halfs = extradata["t1Halfs"] or {}
-	local t2Halfs = extradata["t2Halfs"] or {}
+	local t1sides = extradata['t1sides'] or {}
+	local t1halfs = extradata['t1halfs'] or {}
+	local t2halfs = extradata['t2halfs'] or {}
 
-	local d = #t1Sides
+	local d = #t1sides
 
-	if t1Sides then
+	if t1sides then
 		-- Insert team scores
-		for i,side in ipairs(t1Sides) do
-			local oppositeSide = CustomMatchSummary._getOppositeSide(t1Sides[d])
+		for i,side in ipairs(t1sides) do
+			local oppositeSide = CustomMatchSummary._getOppositeSide(t1sides[d])
 			-- Team 1 scores inserted from 1 .. n
 			if math.fmod(i,2) == 1 then
-				team1Score:setFirstHalfScore(t1Halfs[i], CustomMatchSummary._getSideColor(side))
+				team1Score:setFirstHalfScore(t1halfs[i], CustomMatchSummary._getSideColor(side))
 			else
-				team1Score:setSecondHalfScore(t1Halfs[i], CustomMatchSummary._getSideColor(side))
+				team1Score:setSecondHalfScore(t1halfs[i], CustomMatchSummary._getSideColor(side))
 			end
 			-- Team 2 scores inserted from n .. 1
 			if math.fmod(d, 2) == 1 then
-				team2Score:setFirstHalfScore(t2Halfs[d], CustomMatchSummary._getSideColor(oppositeSide))
+				team2Score:setFirstHalfScore(t2halfs[d], CustomMatchSummary._getSideColor(oppositeSide))
 			else
-				team2Score:setSecondHalfScore(t2Halfs[d], CustomMatchSummary._getSideColor(oppositeSide))
+				team2Score:setSecondHalfScore(t2halfs[d], CustomMatchSummary._getSideColor(oppositeSide))
 			end
 			d = d - 1
 		end
@@ -495,7 +495,7 @@ end
 function CustomMatchSummary._createMapLink(map, game)
 	if Logic.isNotEmpty(map) then
 		if Logic.isNotEmpty(game) then
-			return '[[' .. map .. '/' .. game ..'|' .. map .. ']]'
+			return '[[' .. map .. '/' .. game .. '|' .. map .. ']]'
 		else
 			return '[[' .. map .. '|' .. map .. ']]'
 		end
