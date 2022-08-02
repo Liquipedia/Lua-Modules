@@ -18,6 +18,8 @@ local _MAXIMUM_DAYS_IN_FEBRUARY = 29
 local _MONTH_DECEMBER = 12
 local _CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y'))
 
+local NONE_BREAKING_SPACE = '&nbsp;'
+
 ---
 -- Represents a date
 --
@@ -176,10 +178,10 @@ function Age:makeDisplay()
 
 	if age ~= nil then
 		if not self.deathDate.isEmpty then
-			result.death = self.deathDate:makeDisplay() .. ' (aged ' .. age .. ')'
+			result.death = self.deathDate:makeDisplay() .. NONE_BREAKING_SPACE .. '(aged ' .. age .. ')'
 			result.birth = self.birthDate:makeDisplay()
 		else
-			result.birth = self.birthDate:makeDisplay() .. ' (age ' .. age .. ')'
+			result.birth = self.birthDate:makeDisplay() .. NONE_BREAKING_SPACE .. '(age ' .. age .. ')'
 		end
 	else
 		result.death = self.deathDate:makeDisplay()
