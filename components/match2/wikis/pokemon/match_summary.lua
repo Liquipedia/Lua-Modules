@@ -269,7 +269,7 @@ end
 
 function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, date, flip, isBan)
 	local opponentChampionsDisplay = {}
-	local color = Table.extract(opponentChampionsData, color) or ''
+	local color = Table.extract(opponentChampionsData, 'color') or ''
 	for index = 1, numberOfChampions do
 		local champDisplay = mw.html.create('div')
 		:addClass('brkts-popup-side-color-' .. color)
