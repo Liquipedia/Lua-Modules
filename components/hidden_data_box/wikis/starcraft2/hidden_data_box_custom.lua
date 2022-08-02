@@ -18,7 +18,7 @@ function CustomHiddenDataBox.run(args)
 	if args.team_number or Logic.readBool(args.teamevent) then
 		args.participantGrabber = true
 	else
-		args.participantGrabber = true
+		args.participantGrabber = false
 	end
 	return BasicHiddenDataBox.run(args)
 end
