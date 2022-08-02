@@ -25,7 +25,7 @@ local TIER_MODE_TIERS = 'tiers'
 ---Entry point
 function HiddenDataBox.run(args)
 	args = args or {}
-	args.participantGrabber = Logic.readBoolOrNil(args.participantGrabber) or true
+	args.participantGrabber = Logic.nilOr(Logic.readBoolOrNil(args.participantGrabber), true)
 
 	local warnings = {}
 	local warning
