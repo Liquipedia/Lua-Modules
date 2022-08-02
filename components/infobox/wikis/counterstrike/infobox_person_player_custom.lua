@@ -216,14 +216,14 @@ function CustomPlayer._createRole(key, role)
 	return text
 end
 
-function CustomPlayer._isPlayer(role)
+function CustomPlayer._isNotPlayer(role)
 	local roleData = _ROLES[(role or ''):lower()]
 	return roleData and (roleData.talent or roleData.management or roleData.coach)
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
 	-- isplayer and country needed for SMW
-	if CustomPlayer._isPlayer(args.role) or CustomPlayer._isPlayer(args.role2) then
+	if CustomPlayer._isNotPlayer(args.role) or CustomPlayer._isNotPlayer(args.role2) then
 		Variables.varDefine('isplayer', 'false')
 	else
 		Variables.varDefine('isplayer', 'true')
