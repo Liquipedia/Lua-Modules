@@ -92,7 +92,7 @@ end
 
 function HiddenDataBox.cleanDate(primaryDate, secondaryDate)
 	return String.nilIfEmpty(ReferenceCleaner.clean(primaryDate)) or
-		 	String.nilIfEmpty(ReferenceCleaner.clean(secondaryDate))
+			String.nilIfEmpty(ReferenceCleaner.clean(secondaryDate))
 end
 
 function HiddenDataBox.checkAndAssign(variableName, valueFromArgs, valueFromQuery)
@@ -139,7 +139,7 @@ function HiddenDataBox.validateTier(tierString, tierMode)
 	local warning
 	local tierValue = (Tier.text[tierMode] and
 						Tier.text[tierMode][tierString:lower()]) or
-					 	Tier.text[tierString]
+						Tier.text[tierString]
 
 	if not tierValue then
 		tierValue = tierString
