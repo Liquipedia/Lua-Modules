@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=leagueofledends
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -74,8 +74,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
-		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
-		enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date),
+		isriotpremier = String.isNotEmpty(args.riotpremier) and 'true' or '',
 	}
 
 	return lpdbData
