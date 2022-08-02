@@ -14,12 +14,10 @@ local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
+	args.participantGrabber = false
+
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	if args.team_number or Logic.readBool(args.teamevent) then
-		args.participantGrabber = true
-	else
-		args.participantGrabber = false
-	end
+
 	return BasicHiddenDataBox.run(args)
 end
 

@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logc')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -24,7 +25,7 @@ local TIER_MODE_TIERS = 'tiers'
 ---Entry point
 function HiddenDataBox.run(args)
 	args = args or {}
-	args.participantGrabber = args.participantGrabber or true
+	args.participantGrabber = Logic.readBoolOrNil(args.participantGrabber) or true
 
 	local warnings = {}
 	local warning
