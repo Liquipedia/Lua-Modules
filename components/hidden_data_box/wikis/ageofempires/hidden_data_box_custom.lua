@@ -26,7 +26,7 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
-function CustomHiddenDataBox:addCustomVariables(args, queryResult)
+function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	--legacy variables
 	Variables.varDefine('tournament_parent_name', Variables.varDefault('tournament_parentname', ''))
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
@@ -45,10 +45,10 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	Variables.varDefine('headtohead', args.headtohead)
 
 	-- tournament mode (1v1 or team)
-	BasicHiddenDataBox:checkAndAssign('tournament_mode', args.mode, queryResult.extradata.mode)
+	BasicHiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.extradata.mode)
 
 	--gamemode
-	BasicHiddenDataBox:checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
+	BasicHiddenDataBox.checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
 end
 
 function CustomHiddenDataBox.validateTier(tierString, tierMode)
