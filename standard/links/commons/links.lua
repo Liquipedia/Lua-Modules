@@ -14,12 +14,20 @@ local CustomData = Lua.loadDataIfExists('Module:Links/CustomData', {})
 local Links = {}
 
 local _PREFIXES = {
-	['5ewin'] = {'https://arena.5eplay.com/tournament/'},
+	['5ewin'] = {
+		'https://arena.5eplay.com/tournament/',
+		player = 'https://arena.5eplay.com/data/player/',
+		team = 'https://arena.5eplay.com/team/'
+	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
 	afreeca = {'http://afreecatv.com/'},
 	aoezone = {'https://aoezone.net/'},
 	['ask-fm'] = {'https://ask.fm/'},
-	b5csgo = {'https://www.b5csgo.com/clan/'},
+	b5csgo = {
+		'',
+		player = 'https://www.b5csgo.com/personalCenter/',
+		team = 'https://www.b5csgo.com/clan/'
+	},
 	battlefy = {'https://www.battlefy.com/'},
 	bilibili = {'https://space.bilibili.com/'},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
@@ -30,7 +38,6 @@ local _PREFIXES = {
 		'',
 		player = 'https://challonge.com/users/',
 	},
-	cybergamer = {'https://au.cybergamer.com/profile/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
 		player = 'https://datdota.com/players/',
@@ -71,7 +78,7 @@ local _PREFIXES = {
 	gamersclub = {
 		'https://csgo.gamersclub.gg/campeonatos/csgo/',
 		team = 'https://csgo.gamersclub.gg/team/',
-		player = '',
+		player = 'https://csgo.gamersclub.gg/jogador/',
 	},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
@@ -80,10 +87,10 @@ local _PREFIXES = {
 		player = 'https://halodatahive.com/Player/Detail/',
 	},
 	home = {''},
-	huomaotv = {'http://www.huomao.com/'},
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
+	letsplaylive = {'https://letsplay.live/profile/'},
 	loco = {'https://loco.gg/streamers/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
@@ -205,7 +212,7 @@ function Links.transform(links)
 		discord = links.discord,
 		dlive = links.dlive,
 		dotabuff = links.dotabuff,
-		douyu = links.douyu,
+		douyu = links.douyu or links.douyutv,
 		esea = links.esea,
 		esea2 = links.esea2,
 		['esea-d'] = links['esea-d'],
@@ -234,6 +241,7 @@ function Links.transform(links)
 		iccup = links.iccup,
 		instagram = links.instagram,
 		instagram2 = links.instagram2,
+		letsplaylive = links.letsplaylive or links.cybergamer,
 		loco = links.loco,
 		matcherino = links.matcherino,
 		matcherinolink = links.matcherinolink,
@@ -249,6 +257,7 @@ function Links.transform(links)
 		['siege-gg'] = links.siegegg,
 		['smash-gg'] = links.smashgg,
 		snapchat = links.snapchat,
+		sk = links.sk,
 		sostronk = links.sostronk,
 		steam = links.steam,
 		steamalternative = links.steamalternative,
@@ -285,6 +294,7 @@ function Links.transform(links)
 		youtube3 = links.youtube3,
 		youtube4 = links.youtube4,
 		youtube5 = links.youtube5,
+		zhangyutv = links.zhangyutv,
 	}
 end
 
