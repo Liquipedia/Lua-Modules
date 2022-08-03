@@ -30,7 +30,7 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
-function CustomLpdbInjector:adjust(lpdbData, placement)
+function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = Weight.calc(
 		lpdbData.prizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
