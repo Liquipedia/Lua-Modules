@@ -60,7 +60,6 @@ function MatchLegacy.convertParameters(match2)
 	end
 
 	match.extradata = {
-		bestofx = tostring(match2.bestof),
 		timezone = '',
 		timezoneID = '',
 		matchsection = extradata.matchsection,
@@ -94,6 +93,10 @@ function MatchLegacy.convertParameters(match2)
 		table.insert(maps, game.map)
 	end
 	match.extradata.maps = table.concat(maps, ',')
+
+	if #maps > 0 then
+		match.extradata.bestofx = tostring(match2.bestof)
+	end
 
 	-- Handle Opponents
 	local handleOpponent = function (index)
