@@ -25,7 +25,6 @@ local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Score Class
--- TODO: This class needs CSS updates for CS
 local Score = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):css('width','70px'):css('text-align', 'center')
@@ -312,7 +311,7 @@ end
 function CustomMatchSummary._createFooter(match, vods)
 	local footer = MatchSummary.Footer()
 
-	local dot = '<b>·</b>'
+	local separator = '<b>·</b>'
 
 	local function createFooterLink(icon, url, label, index)
 		local _icon = icon
@@ -346,7 +345,7 @@ function CustomMatchSummary._createFooter(match, vods)
 
 	if Table.isNotEmpty(match.links) then
 		if Logic.isNotEmpty(vods) or match.vod then
-			footer:addElement(dot)
+			footer:addElement(separator)
 		end
 	else
 		return footer
@@ -365,7 +364,7 @@ function CustomMatchSummary._createFooter(match, vods)
 			if link then
 				if insertDotNext then
 					insertDotNext = false
-					footer:addElement(dot)
+					footer:addElement(separator)
 				end
 
 				local icon = platform.icon
@@ -381,7 +380,7 @@ function CustomMatchSummary._createFooter(match, vods)
 				if platform.stats then
 					for _, site in ipairs(platform.stats) do
 						if links[site] then
-							footer:addElement(dot)
+							footer:addElement(separator)
 							break
 						end
 					end
@@ -412,24 +411,25 @@ function CustomMatchSummary._createMap(game)
 	local t1halfs = extradata['t1halfs'] or {}
 	local t2halfs = extradata['t2halfs'] or {}
 
-	local numberOfSides = #t1sides
+	local numberOfSides = #t2sides
 
 	-- Insert team scores
-	for sideIndex ,side in ipairs(t1sides) do
+	for sideIndex, side in ipairs(t1sides) do
 		-- Team 1 scores inserted from 1 .. n
 		if math.fmod(sideIndex, 2) == 1 then
 			team1Score:setFirstHalfScore(t1halfs[sideIndex], CustomMatchSummary._getSideColor(side))
 		else
 			team1Score:setSecondHalfScore(t1halfs[sideIndex], CustomMatchSummary._getSideColor(side))
 		end
+
 		-- Team 2 scores inserted from n .. 1
-		local oppositeSide = t2sides[numberOfSides]
-		if math.fmod(numberOfSides, 2) == 1 then
-			team2Score:setFirstHalfScore(t2halfs[numberOfSides], CustomMatchSummary._getSideColor(oppositeSide))
+		local t2SideIndex = numberOfSides - sideIndex + 1
+		local oppositeSide = t2sides[t2SideIndex]
+		if math.fmod(t2SideIndex, 2) == 1 then
+			team2Score:setFirstHalfScore(t2halfs[t2SideIndex], CustomMatchSummary._getSideColor(oppositeSide))
 		else
-			team2Score:setSecondHalfScore(t2halfs[numberOfSides], CustomMatchSummary._getSideColor(oppositeSide))
+			team2Score:setSecondHalfScore(t2halfs[t2SideIndex], CustomMatchSummary._getSideColor(oppositeSide))
 		end
-		numberOfSides = numberOfSides - 1
 	end
 
 	-- Score Team 2
