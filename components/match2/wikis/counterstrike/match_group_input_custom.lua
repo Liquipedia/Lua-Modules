@@ -408,11 +408,12 @@ function matchFunctions.isFeatured(match)
 		return true
 	end
 
-	local opponent1, opponent2 = match.opponent1, match.opponent2
-	local year = match.date:match('^(%d%d%d%d)')
-	if year == '1970' then
+	if not match.hasDate then
 		return false
 	end
+
+	local opponent1, opponent2 = match.opponent1, match.opponent2
+	local year = os.date('%Y')
 
 	if
 		opponent1.type == Opponent.team and
