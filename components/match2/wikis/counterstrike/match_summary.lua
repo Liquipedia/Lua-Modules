@@ -238,13 +238,6 @@ function CustomMatchSummary.getByMatchId(args)
 	return matchSummary:create()
 end
 
-function CustomMatchSummary._getOppositeSide(side)
-	if side == 'ct' then
-		return 't'
-	end
-	return 'ct'
-end
-
 function CustomMatchSummary._getSideColor(side)
 	if side == 'ct' then
 		return '#0000ff'
@@ -296,8 +289,8 @@ function CustomMatchSummary._createBody(match)
 					mapVeto:addDecider(CustomMatchSummary._createMapLink(vetoRound.decider, match.game))
 				else
 					mapVeto:addRound(vetoRound.type,
-									 CustomMatchSummary._createMapLink(vetoRound.team1, match.game),
-									 CustomMatchSummary._createMapLink(vetoRound.team2, match.game))
+										CustomMatchSummary._createMapLink(vetoRound.team1, match.game),
+										CustomMatchSummary._createMapLink(vetoRound.team2, match.game))
 				end
 			end
 
@@ -415,30 +408,30 @@ function CustomMatchSummary._createMap(game)
 	team1Score:setMapScore(game.scores[1])
 
 	local t1sides = extradata['t1sides'] or {}
+	local t2sides = extradata['t2sides'] or {}
 	local t1halfs = extradata['t1halfs'] or {}
 	local t2halfs = extradata['t2halfs'] or {}
 
-	local d = #t1sides
+	local numberOfSides = #t1sides
 
-	if t1sides then
-		-- Insert team scores
-		for i,side in ipairs(t1sides) do
-			local oppositeSide = CustomMatchSummary._getOppositeSide(t1sides[d])
-			-- Team 1 scores inserted from 1 .. n
-			if math.fmod(i,2) == 1 then
-				team1Score:setFirstHalfScore(t1halfs[i], CustomMatchSummary._getSideColor(side))
-			else
-				team1Score:setSecondHalfScore(t1halfs[i], CustomMatchSummary._getSideColor(side))
-			end
-			-- Team 2 scores inserted from n .. 1
-			if math.fmod(d, 2) == 1 then
-				team2Score:setFirstHalfScore(t2halfs[d], CustomMatchSummary._getSideColor(oppositeSide))
-			else
-				team2Score:setSecondHalfScore(t2halfs[d], CustomMatchSummary._getSideColor(oppositeSide))
-			end
-			d = d - 1
+	-- Insert team scores
+	for sideIndex ,side in ipairs(t1sides) do
+		-- Team 1 scores inserted from 1 .. n
+		if math.fmod(sideIndex, 2) == 1 then
+			team1Score:setFirstHalfScore(t1halfs[sideIndex], CustomMatchSummary._getSideColor(side))
+		else
+			team1Score:setSecondHalfScore(t1halfs[sideIndex], CustomMatchSummary._getSideColor(side))
 		end
+		-- Team 2 scores inserted from n .. 1
+		local oppositeSide = t2sides[numberOfSides]
+		if math.fmod(numberOfSides, 2) == 1 then
+			team2Score:setFirstHalfScore(t2halfs[numberOfSides], CustomMatchSummary._getSideColor(oppositeSide))
+		else
+			team2Score:setSecondHalfScore(t2halfs[numberOfSides], CustomMatchSummary._getSideColor(oppositeSide))
+		end
+		numberOfSides = numberOfSides - 1
 	end
+
 	-- Score Team 2
 	team2Score:setMapScore(game.scores[2])
 
