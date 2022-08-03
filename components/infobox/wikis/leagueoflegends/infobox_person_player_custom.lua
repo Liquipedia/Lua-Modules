@@ -91,7 +91,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		local status = _args.status
 		if String.isNotEmpty(status) then
-			status = mw.getContentLanguage():ucfirst(string)
+			status = mw.getContentLanguage():ucfirst(status)
 		end
 
 		return {
