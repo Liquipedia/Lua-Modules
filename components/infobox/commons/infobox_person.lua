@@ -14,6 +14,7 @@ local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Localisation = require('Module:Localisation').getLocalisation
 local Flags = require('Module:Flags')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Region = require('Module:Region')
 local AgeCalculation = require('Module:AgeCalculation')
@@ -125,16 +126,20 @@ function Person:createInfobox()
 			}
 		},
 		Customizable{id = 'teams', children = {
-			Cell{name = 'Team', content = {
-						self:_createTeam(args.team, args.teamlink),
-						self:_createTeam(args.team2, args.teamlink2),
-						self:_createTeam(args.team3, args.teamlink3),
-						self:_createTeam(args.team4, args.teamlink4),
-						self:_createTeam(args.team5, args.teamlink5)
-					}
+			Builder{builder = function()
+				local teams = {
+					self:_createTeam(args.team, args.teamlink),
+					self:_createTeam(args.team2, args.teamlink2),
+					self:_createTeam(args.team3, args.teamlink3),
+					self:_createTeam(args.team4, args.teamlink4),
+					self:_createTeam(args.team5, args.teamlink5)
 				}
-			}
-		},
+				return {Cell{
+					name = #teams > 1 and 'Teams' or 'Team',
+					content = teams
+				}}
+			end}
+		}},
 		Cell{name = 'Alternate IDs', content = {args.ids or args.alternateids}},
 		Cell{name = 'Nicknames', content = {args.nicknames}},
 		Builder{
@@ -406,10 +411,10 @@ function Person:_createTeam(team, link)
 
 	if mw.ext.TeamTemplate.teamexists(link) then
 		local data = mw.ext.TeamTemplate.raw(link)
-		return '[[' .. data.page .. '|' .. data.name .. ']]'
+		link, team = data.page, data.name
 	end
 
-	return '[[' .. link .. '|' .. team .. ']]'
+	return Page.makeInternalLink({onlyIfExists = true}, team, link) or team
 end
 
 --- Allows for overriding this functionality
