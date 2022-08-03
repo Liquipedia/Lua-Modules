@@ -83,22 +83,10 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
-		local statusContents = CustomPlayer._getStatusContents()
-
-		local yearsActive = _args.years_active
-		if String.isNotEmpty(yearsActive) then
-			yearsActive = Page.makeInternalLink({onlyIfExists = true}, yearsActive) or yearsActive
-		end
-
-		local yearsActiveOrg = _args.years_active_manage
-		if String.isNotEmpty(yearsActiveOrg) then
-			yearsActiveOrg = Page.makeInternalLink({onlyIfExists = true}, yearsActiveOrg) or yearsActiveOrg
-		end
-
 		return {
-			Cell{name = 'Status', content = statusContents},
-			Cell{name = 'Years Active (Player)', content = {yearsActive}},
-			Cell{name = 'Years Active (Org)', content = {yearsActiveOrg}},
+			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
+			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
+			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
 			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
 			Cell{name = 'Years Active (Analyst)', content = {_args.years_active_analyst}},
 			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
@@ -112,6 +100,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
 		}
 	end
+
 	return widgets
 end
 
