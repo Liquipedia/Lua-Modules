@@ -80,7 +80,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = maps})
 		end
 
-
 		if not String.isEmpty(args.team_number) then
 			table.insert(widgets, Title{name = 'Teams'})
 			table.insert(widgets, Cell{
@@ -88,13 +87,6 @@ function CustomInjector:parse(id, widgets)
 				content = {args.team_number}
 			})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool(args)}
-			},
-		}
 	end
 	return widgets
 end
@@ -133,43 +125,6 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	end
 
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
-
-	return content
-end
-
-function CustomLeague:_createPrizepool(args)
-	if String.isEmpty(args.prizepool) and
-		String.isEmpty(args.prizepoolusd) then
-			return nil
-	end
-
-	local content
-	local prizepool = args.prizepool
-	local prizepoolInUsd = args.prizepoolusd
-	local localCurrency = args.localcurrency
-
-	if String.isEmpty(prizepool) then
-		content = '$' .. prizepoolInUsd .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
-	else
-		if not String.isEmpty(localCurrency) then
-			content = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{localCurrency:lower(), prizepool = prizepool}
-			)
-		else
-			content = prizepool
-		end
-
-		if not String.isEmpty(prizepoolInUsd) then
-			content = content .. '<br>(≃ $' .. prizepoolInUsd .. ' ' ..
-				Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
-		end
-	end
-
-	if not String.isEmpty(prizepoolInUsd) then
-		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
-	end
 
 	return content
 end
