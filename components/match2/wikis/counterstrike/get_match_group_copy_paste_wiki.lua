@@ -67,7 +67,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		end
 	end
 
-	return out .. '\n\t}}'
+	return out .. '\n}}'
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
