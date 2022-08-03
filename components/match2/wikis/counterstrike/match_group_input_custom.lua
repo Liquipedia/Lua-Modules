@@ -346,37 +346,36 @@ function matchFunctions.getLinks(match)
 	for _, platform in ipairs(platforms) do
 		-- Stat external links inserted in {{Map}}
 		if Logic.isNotEmpty(platform) then
-			local values = {}
-			local platformName = platform['name']
-			local plaformPrefixUrl = platform['link']
+			local platformLinks = {}
+			local platformName = platform.name
+			local plaformPrefixUrl = platform.link
 
 			if match[platformName] then
-				table.insert(values,{plaformPrefixUrl .. match[platformName], 0})
+				table.insert(platformLinks, {plaformPrefixUrl .. match[platformName], 0})
 				match[platformName] = nil
 			end
 
-			if not Logic.isEmpty(platform['isMapStats']) then
+			if platform.isMapStats then
 				for i = 1, match.bestof do
-					if match['map' .. i] then
-						if match['map' .. i][platform.name] then
-							table.insert(values, {plaformPrefixUrl .. match['map' .. i][platformName], i})
-							match['map' .. i][platform.name] = nil
-						end
+					local map = match['map' .. i]
+					if map and map[platform.name] then
+						table.insert(platformLinks, {plaformPrefixUrl .. match['map' .. i][platformName], i})
+						match['map' .. i][platform.name] = nil
 					end
 				end
 			else
-				if not Logic.isEmpty(platform['max']) then
-					for i = 2, platform['max'], 1 do
+				if platform.max then
+					for i = 2, platform.max, 1 do
 						if match[platform.name .. i] then
-							table.insert(values, {plaformPrefixUrl .. match[platformName .. i], i})
+							table.insert(platformLinks, {plaformPrefixUrl .. match[platformName .. i], i})
 							match[platform.name .. i] = nil
 						end
 					end
 				end
 			end
 
-			if #values > 0 then
-				links[platformName] = values
+			if #platformLinks > 0 then
+				links[platformName] = platformLinks
 			end
 		end
 	end
