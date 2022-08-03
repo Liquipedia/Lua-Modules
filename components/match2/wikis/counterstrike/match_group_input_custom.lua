@@ -30,7 +30,8 @@ local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local FEATURED_TIERS = {'S-Tier', 'A-Tier'}
 local MIN_EARNINGS_FOR_FEATURED = 200000
 
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local TODAY = os.date('%Y-%m-%d')
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -81,11 +82,11 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+	if teamTemplateDate == EPOCH_TIME_EXTENDED then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME_EXTENDED
+			TODAY
 		)
 	end
 
@@ -307,7 +308,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = _EPOCH_TIME_EXTENDED,
+			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
 		}
 	end
