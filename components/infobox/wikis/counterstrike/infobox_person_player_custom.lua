@@ -23,10 +23,10 @@ local _ROLES = {
 	-- Players
 	['awper'] = {category = 'AWPers', display = 'AWPer'},
 	['igl'] = {category = 'In-game leaders', display = 'In-game leader'},
-	['lurker'] = {category = 'Rifler', display = 'Rifler', category2 = 'Lurkers', display2 = 'lurker'},
-	['support'] = {category = 'Rifler', display = 'Rifler', category2 = 'Support players', display2 = 'support'},
-	['entry'] = {category = 'Rifler', display = 'Rifler', category2 = 'Entry fraggers', display2 = 'entry fragger'},
-	['rifler'] = {category = 'Rifler', display = 'Rifler'},
+	['lurker'] = {category = 'Riflers', display = 'Rifler', category2 = 'Lurkers', display2 = 'lurker'},
+	['support'] = {category = 'Riflers', display = 'Rifler', category2 = 'Support players', display2 = 'support'},
+	['entry'] = {category = 'Riflers', display = 'Rifler', category2 = 'Entry fraggers', display2 = 'entry fragger'},
+	['rifler'] = {category = 'Riflers', display = 'Rifler'},
 
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', display = 'Analyst', coach = true},
@@ -50,11 +50,11 @@ _ROLES.entryfragger = _ROLES.entry
 _ROLES.rifle = _ROLES.rifler
 
 local GAMES = {
-	cs = {name = 'Counter-Strike', link = 'Counter-Strike', category = 'CS'},
-	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero', category = 'CSCZ'},
-	css = {name = 'Source', link = 'Counter-Strike: Source', category = 'CSS'},
-	cso = {name = 'Online', link = 'Counter-Strike Online', category = 'CSO'},
-	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive', category = 'CSGO'},
+	cs = {name = 'Counter-Strike', link = 'Counter-Strike', category = 'CS', order = 1},
+	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero', category = 'CSCZ', order = 2},
+	css = {name = 'Source', link = 'Counter-Strike: Source', category = 'CSS', order = 3},
+	cso = {name = 'Online', link = 'Counter-Strike Online', category = 'CSO', order = 4},
+	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive', category = 'CSGO', order = 5},
 }
 
 local CustomPlayer = Class.new()
@@ -138,12 +138,12 @@ function CustomPlayer:adjustLPDB(lpdbData)
 end
 
 function CustomPlayer._getGames()
-	return Array.extractValues(Table.map(GAMES, function (key, data)
+	return Array.sortBy(Array.extractValues(Table.map(GAMES, function (key, data)
 		if _args[key] then
 			return key, data
 		end
 		return key, nil
-	end))
+	end)), function(gameData) return gameData.order end)
 end
 
 function CustomPlayer._getStatusContents()
