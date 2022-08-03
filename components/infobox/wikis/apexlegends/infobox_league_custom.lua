@@ -167,7 +167,7 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = _args.team_number
 	lpdbData.publishertier = _args.pctier
 	lpdbData.extradata = {
-		['is ea major'] = Variables.varDefault('tournament_ea_major', '')
+		['is ea major'] = Variables.varDefault('tournament_ea_major', ''),
 		individual = Variables.varDefault('tournament_individual', ''),
 	}
 
