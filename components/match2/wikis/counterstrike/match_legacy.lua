@@ -98,21 +98,6 @@ function MatchLegacy.convertParameters(match2)
 	end
 	match.extradata.maps = table.concat(maps, ',')
 
-	local bracketData = Json.parseIfString(match2.match2bracketdata)
-	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
-		local headerName
-		if bracketData.header then
-			headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
-		end
-		if String.isEmpty(headerName) then
-			headerName = Variables.varDefault('match_legacy_header_name')
-		end
-		if String.isNotEmpty(headerName) then
-			match.header = headerName
-			Variables.varDefine('match_legacy_header_name', headerName)
-		end
-	end
-
 	-- Handle Opponents
 	local handleOpponent = function (index)
 		local prefix = 'opponent' .. index
