@@ -21,8 +21,8 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local _BANNED = mw.loadData('Module:Banned')
 local _ROLES = {
 	-- Players
-	['awper'] = {category = 'AWPers', display = 'AWPer'},
-	['igl'] = {category = 'In-game leaders', display = 'In-game leader'},
+	['awper'] = {category = 'AWPers', display = 'AWPer', store = 'awp'},
+	['igl'] = {category = 'In-game leaders', display = 'In-game leader', store = 'igl'},
 	['lurker'] = {category = 'Riflers', display = 'Rifler', category2 = 'Lurkers', display2 = 'lurker'},
 	['support'] = {category = 'Riflers', display = 'Rifler', category2 = 'Support players', display2 = 'support'},
 	['entry'] = {category = 'Riflers', display = 'Rifler', category2 = 'Entry fraggers', display2 = 'entry fragger'},
@@ -120,8 +120,15 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = (_args.role or ''):lower()
-	lpdbData.extradata.role2 = (_args.role2 or ''):lower()
+	local normalizeRole = function (role)
+		local roleData = _ROLES[(role or ''):lower()]
+		if roleData then
+			return (roleData.store or roleData.display2 or roleData.display or ''):lower()
+		end
+	end
+
+	lpdbData.extradata.role = normalizeRole(_args.role)
+	lpdbData.extradata.role2 = normalizeRole(_args.role2)
 
 	return lpdbData
 end
