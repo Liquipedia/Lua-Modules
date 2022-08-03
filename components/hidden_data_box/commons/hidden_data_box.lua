@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logc')
+local Logic = require('Module:Logic')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -112,7 +112,7 @@ function HiddenDataBox._fetchParticipants(parent)
 
 	return Table.map(placements, function(_, placement)
 		if String.isEmpty(placement.participant) or placement.participant:lower() == 'tbd' then
-			return
+			return placement.participant, nil
 		end
 
 		return placement.participant, placement.players
@@ -125,7 +125,7 @@ end
 
 -- overridable so that wikis can add custom vars
 function HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
-	Variables.varDefine(participant .. key, value)
+	Variables.varDefine(participant .. '_' .. key, value)
 	if participant ~= participantResolved then
 		Variables.varDefine(participantResolved .. key, value)
 	end
