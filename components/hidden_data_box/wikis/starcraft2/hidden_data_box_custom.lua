@@ -14,6 +14,7 @@ local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
+	args = args or {}
 	args.participantGrabber = false
 
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
