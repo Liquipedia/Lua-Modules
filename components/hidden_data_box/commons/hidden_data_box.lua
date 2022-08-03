@@ -110,13 +110,15 @@ function HiddenDataBox._fetchParticipants(parent)
 		query = 'players, participant',
 	})
 
-	return Table.map(placements, function(_, placement)
-		if String.isEmpty(placement.participant) or placement.participant:lower() == 'tbd' then
-			return placement.participant, nil
-		end
-
-		return placement.participant, placement.players
-	end)
+	return
+		Table.map(
+			Table.filter(placements, function(placement)
+				return String.isNotEmpty(placement.participant) and placement.participant:lower() ~= 'tbd'
+			end),
+			function(_, placement)
+				return placement.participant, placement.players
+			end
+		)
 end
 
 -- overridable so that wikis can add custom vars
