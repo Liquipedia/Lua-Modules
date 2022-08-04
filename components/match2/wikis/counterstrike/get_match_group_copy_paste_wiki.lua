@@ -16,6 +16,8 @@ local Table = require('Module:Table')
 local wikiCopyPaste = Table.copy(Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base', {requireDevIfEnabled = true}))
 
 local GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR = 'gf'
+local GSL_WINNERS = 'winners'
+local GSL_LOSERS = 'losers'
 
 --returns the Code for a Match, depending on the input
 function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
@@ -99,9 +101,9 @@ function wikiCopyPaste.getStart(template, id, modus, args)
 		args.customHeader = false
 		if String.startsWith(gslStyle:lower(), GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR) then
 			args.matches = 6
-			if String.endsWith(gslStyle:lower(), 'winners') then
+			if String.endsWith(gslStyle:lower(), GSL_WINNERS) then
 				out = out .. '|gsl=' .. 'winnersfirst'
-			elseif String.endsWith(gslStyle:lower(), 'losers') then
+			elseif String.endsWith(gslStyle:lower(), GSL_LOSERS) then
 				out = out .. '|gsl=' .. 'losersfirst'
 			end
 			out = out .. '\n|M6header=Grand Final'
