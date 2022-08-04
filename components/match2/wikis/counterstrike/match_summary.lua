@@ -59,22 +59,22 @@ function Score:setMapScore(score)
 	return self
 end
 
-function Score:setFirstHalfScore(score, color)
+function Score:setFirstHalfScore(score, side)
 	local halfScore =  mw.html.create('td')
 	halfScore
 		:addClass('brkts-popup-body-match-sidewins')
-		:css('color', color)
+		:addClass('brkts-cs-score-color-' .. side)
 		:wikitext(score)
 
 	self.top:node(halfScore)
 	return self
 end
 
-function Score:setSecondHalfScore(score, color)
+function Score:setSecondHalfScore(score, side)
 	local halfScore =  mw.html.create('td')
 	halfScore
 		:addClass('brkts-popup-body-match-sidewins')
-		:css('color', color)
+		:addClass('brkts-cs-score-color-' .. side)
 		:wikitext(score)
 
 	self.bottom:node(halfScore)
@@ -231,14 +231,6 @@ function CustomMatchSummary.getByMatchId(args)
 
 	return matchSummary:create()
 end
-
-function CustomMatchSummary._getSideColor(side)
-	if side == 'ct' then
-		return '#0000ff'
-	end
-	return '#ff0000'
-end
-
 
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
@@ -412,18 +404,18 @@ function CustomMatchSummary._createMap(game)
 	for sideIndex, side in ipairs(t1sides) do
 		-- Team 1 scores inserted from 1 .. n
 		if math.fmod(sideIndex, 2) == 1 then
-			team1Score:setFirstHalfScore(t1halfs[sideIndex], CustomMatchSummary._getSideColor(side))
+			team1Score:setFirstHalfScore(t1halfs[sideIndex], side)
 		else
-			team1Score:setSecondHalfScore(t1halfs[sideIndex], CustomMatchSummary._getSideColor(side))
+			team1Score:setSecondHalfScore(t1halfs[sideIndex], side)
 		end
 
 		-- Team 2 scores inserted from n .. 1
 		local t2SideIndex = numberOfSides - sideIndex + 1
 		local oppositeSide = t2sides[t2SideIndex]
 		if math.fmod(t2SideIndex, 2) == 1 then
-			team2Score:setFirstHalfScore(t2halfs[t2SideIndex], CustomMatchSummary._getSideColor(oppositeSide))
+			team2Score:setFirstHalfScore(t2halfs[t2SideIndex], oppositeSide)
 		else
-			team2Score:setSecondHalfScore(t2halfs[t2SideIndex], CustomMatchSummary._getSideColor(oppositeSide))
+			team2Score:setSecondHalfScore(t2halfs[t2SideIndex], oppositeSide)
 		end
 	end
 
