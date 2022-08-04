@@ -30,8 +30,8 @@ local _ICONS = {
 
 local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
+	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
 	owl = {icon = 'File:Overwatch League allmode.png', text = 'Overwatch League matchpage'},
 	owc = {icon = 'File:OWC-BMS icon.png', text = 'OW Contenders matchpage'},
