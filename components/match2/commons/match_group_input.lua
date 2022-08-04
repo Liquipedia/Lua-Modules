@@ -42,7 +42,6 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 	local gslGroupStyle = (args.gsl or ''):lower()
 	if Table.includes(VALID_GSL_GROUP_STYLES, gslGroupStyle) then
 		for matchIndex, header in pairs(GSL_GROUP_STYLE_DEFAULT_HEADERS) do
-			--args.M1header = args.M1header or 'Opening Matches'
 			args['M' .. matchIndex .. 'header'] = Logic.emptyOr(
 				args['M' .. matchIndex .. 'header'],
 				header[gslGroupStyle],
