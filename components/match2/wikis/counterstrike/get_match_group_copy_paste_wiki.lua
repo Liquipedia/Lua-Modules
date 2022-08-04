@@ -6,13 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
 local Logic = require('Module:Logic')
-local Set = require('Module:Set')
+local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
+local Set = require('Module:Set')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local wikiCopyPaste = Table.copy(Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base', {requireDevIfEnabled = true}))
 
+local GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR = 'gf'
 
 --returns the Code for a Match, depending on the input
 function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
@@ -26,12 +29,12 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local out = '{{Match' .. '\n\t|date=|finished='
 
 	if hltv then
-		table.insert( mapStats, 1, 'Stats' )
-		table.insert( matchMatchpages, 1, 'HLTV' )
+		table.insert(mapStats, 1, 'Stats')
+		table.insert(matchMatchpages, 1, 'HLTV')
 	end
 
 	if streams then
-		table.insert( mapStats, 1, 'vod' )
+		table.insert(mapStats, 1, 'vod')
 		out = out .. '\n\t|twitch=|youtube=|vod='
 	end
 
@@ -81,6 +84,34 @@ function wikiCopyPaste._getOpponent(mode, showScore)
 	elseif mode == Opponent.literal then
 		return '{{LiteralOpponent|}}'
 	end
+end
+
+function wikiCopyPaste.getStart(template, id, modus, args)
+	local out = '{{' .. (
+		(modus == 'bracket' and
+			('Bracket|Bracket/' .. template)
+		) or (modus == 'singlematch' and 'SingleMatch')
+		or 'Matchlist') ..
+		'|id=' .. id
+
+	local gslStyle = args.gsl
+	if modus == 'matchlist' and gslStyle then
+		args.customHeader = false
+		if String.startsWith(gslStyle:lower(), GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR) then
+			args.matches = 6
+			if String.endsWith(gslStyle:lower(), 'winners') then
+				out = out .. '|gsl=' .. 'winnersfirst'
+			elseif String.endsWith(gslStyle:lower(), 'losers') then
+				out = out .. '|gsl=' .. 'losersfirst'
+			end
+			out = out .. '\n|M6header=Grand Final'
+		else
+			args.matches = 5
+			out = out .. '|gsl=' .. gslStyle
+		end
+	end
+
+	return out, args
 end
 
 return wikiCopyPaste
