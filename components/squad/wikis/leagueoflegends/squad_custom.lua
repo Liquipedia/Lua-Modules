@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=leagueoflegends
 -- page=Module:Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -113,7 +113,7 @@ function CustomSquad._playerRow(player, squadType)
 		team = player.team,
 	})
 	row:name{name = player.name}
-	row:role{role = player.role}
+	row:position{role = player.role, position = player.position}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
 	if squadType == Squad.TYPE_FORMER then
