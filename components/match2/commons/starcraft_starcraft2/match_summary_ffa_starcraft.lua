@@ -72,7 +72,7 @@ function CustomFfaMatchSummary.Footer(props)
 	local links = StarcraftMatchExternalLinks.extractFromMatch(props.match)
 	if #links > 0 then
 		local linksNode = StarcraftMatchExternalLinks.MatchExternalLinks({links = links})
-			:addClass('brkts-popup-sc-footer-links')
+			:addClass('brkts-popup-sc-footer-links vodlink')
 		return mw.html.create('div'):addClass('ffa-match-summary-footer')
 			:node(linksNode)
 	else

@@ -436,7 +436,7 @@ function StarcraftMatchSummary.Footer(props)
 	if hasFooter then
 		local linksNode = StarcraftMatchExternalLinks.MatchExternalLinks({links = links})
 			:node(headToHeadNode)
-			:addClass('brkts-popup-sc-footer-links')
+			:addClass('brkts-popup-sc-footer-links vodlink')
 		return html.create('div')
 			:addClass('brkts-popup-footer')
 			:addClass('brkts-popup-sc-footer')
