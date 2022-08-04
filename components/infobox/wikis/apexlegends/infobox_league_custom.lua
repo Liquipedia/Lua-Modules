@@ -140,6 +140,12 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_publisher', _args['ea-sponsored'] or '')
 	Variables.varDefine('tournament_pro_circuit_tier', _args.pctier or '')
 
+	local isIndividual = ''
+	if String.isNotEmpty(_args.player_number) then
+		isIndividual = 'true'
+	end
+	Variables.varDefine('tournament_individual', isIndividual)
+
 	local eaMajor = _args.eamajor
 	if String.isEmpty(eaMajor) then
 		local eaTier = string.lower(_args.eatier or '')
@@ -161,7 +167,8 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = _args.team_number
 	lpdbData.publishertier = _args.pctier
 	lpdbData.extradata = {
-		['is ea major'] = Variables.varDefault('tournament_ea_major', '')
+		['is ea major'] = Variables.varDefault('tournament_ea_major', ''),
+		individual = Variables.varDefault('tournament_individual', ''),
 	}
 
 	--retrieve sponsors from _args.sponsors if sponsorX, X=1,...,3, is empty
