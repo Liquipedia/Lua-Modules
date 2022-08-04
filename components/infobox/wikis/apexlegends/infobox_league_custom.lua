@@ -144,7 +144,7 @@ function CustomLeague:defineCustomPageVariables()
 	if String.isNotEmpty(_args.player_number) then
 		isIndividual = 'true'
 	end
-	Variables.varDefine('tournament_individual', isIndividual')
+	Variables.varDefine('tournament_individual', isIndividual)
 
 	local eaMajor = _args.eamajor
 	if String.isEmpty(eaMajor) then
