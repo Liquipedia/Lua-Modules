@@ -24,8 +24,31 @@ local globalVars = PageVariableNamespace({cached = true})
 
 local MatchGroupInput = {}
 
+local GSL_GROUP_STYLE_DEFAULT_HEADERS = {
+	{default = 'Opening Matches'},
+	{},
+	{winnersfirst = 'Winners Match', losersfirst = 'Elimination Match'},
+	{winnersfirst = 'Elimination Match', losersfirst = 'Winners Match'},
+	{default = 'Decider Match'},
+}
+local VALID_GSL_GROUP_STYLES = {
+	'winnersfirst',
+	'losersfirst',
+}
+
 function MatchGroupInput.readMatchlist(bracketId, args)
 	local matchKeys = Table.mapArgumentsByPrefix(args, {'M'}, FnUtil.identity)
+
+	local gslGroupStyle = (args.gsl or ''):lower()
+	if Table.includes(VALID_GSL_GROUP_STYLES, gslGroupStyle) then
+		for matchIndex, header in pairs(GSL_GROUP_STYLE_DEFAULT_HEADERS) do
+			args['M' .. matchIndex .. 'header'] = Logic.emptyOr(
+				args['M' .. matchIndex .. 'header'],
+				header[gslGroupStyle],
+				header.default
+			)
+		end
+	end
 
 	return Array.map(matchKeys, function(matchKey, matchIndex)
 			local matchId = MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
