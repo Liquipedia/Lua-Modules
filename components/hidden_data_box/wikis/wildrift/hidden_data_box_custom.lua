@@ -17,8 +17,8 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
-function CustomHiddenDataBox:addCustomVariables(args, queryResult)
-	BasicHiddenDataBox:checkAndAssign(
+function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	BasicHiddenDataBox.checkAndAssign(
 		'tournament_publishertier',
 		args.riotpremier,
 		queryResult.publishertier
