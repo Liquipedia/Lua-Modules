@@ -139,7 +139,7 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_series2', _args.series2 or '')
 	Variables.varDefine('tournament_publisher', _args['ea-sponsored'] or '')
 	Variables.varDefine('tournament_pro_circuit_tier', _args.pctier or '')
-	
+
 	local isIndividual = ''
 	if String.isNotEmpty(_args.player_number) then
 		isIndividual = 'true'
