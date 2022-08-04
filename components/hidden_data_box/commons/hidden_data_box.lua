@@ -175,14 +175,16 @@ function HiddenDataBox.validateTier(tierString, tierMode)
 	return tierValue, warning
 end
 
--- overridable so that wikis can adjust
--- according to their tier system
+-- overridable so that wikis can adjust according to their tier system
 function HiddenDataBox.validateTier(tierString, tierMode)
 	if String.isEmpty(tierString) then
-		return nil, nil
+		return
 	end
 	local warning
-	local tierValue = Tier.text[tierMode][tierString:lower()]
+	local tierValue = (Tier.text[tierMode] and
+						Tier.text[tierMode][tierString:lower()]) or
+						Tier.text[tierString]
+
 	if not tierValue then
 		tierValue = tierString
 		warning = String.interpolate(
@@ -194,6 +196,8 @@ function HiddenDataBox.validateTier(tierString, tierMode)
 		)
 	end
 
+	-- For types we want to return the normalized value
+	-- For tiers we want to return the input
 	tierValue = tierMode == TIER_MODE_TYPES and tierValue or tierString
 
 	return tierValue, warning
