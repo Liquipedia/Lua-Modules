@@ -136,8 +136,8 @@ function MapVeto:addDecider(map)
 end
 
 function MapVeto:addRound(vetotype, map1, map2)
-	map1 = Logic.emptyOr(map2, TBD)
-	map2 = Logic.emptyOr(map1, TBD)
+	map1 = Logic.emptyOr(map1, TBD)
+	map2 = Logic.emptyOr(map2, TBD)
 
 	local class
 	local vetoText
