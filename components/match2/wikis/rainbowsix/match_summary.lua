@@ -32,8 +32,8 @@ local _ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]
 local _ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
+	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
 	opl = {icon = 'File:OPL Icon.png', text = 'OPL Match Page'},
 	esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
