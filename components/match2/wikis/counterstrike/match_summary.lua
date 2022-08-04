@@ -24,6 +24,8 @@ local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
+local TBD = 'TBD'
+
 -- Score Class
 local Score = Class.new(
 	function(self)
@@ -47,7 +49,7 @@ end
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore
-		:attr('rowspan', '2')
+		:attr('rowspan', 2)
 		:css('font-size', '16px')
 		:css('width', '25px')
 		:wikitext(score or '')
@@ -121,9 +123,7 @@ function MapVeto:vetoStart(firstVeto)
 end
 
 function MapVeto:addDecider(map)
-	if Logic.isEmpty(map) then
-		map = 'TBD'
-	end
+	map = Logic.emptyOr(map, TBD)
 
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
@@ -136,13 +136,8 @@ function MapVeto:addDecider(map)
 end
 
 function MapVeto:addRound(vetotype, map1, map2)
-	if Logic.isEmpty(map1) then
-		map1 = 'TBD'
-	end
-
-	if Logic.isEmpty(map2) then
-		map2 = 'TBD'
-	end
+	map1 = Logic.emptyOr(map2, TBD)
+	map2 = Logic.emptyOr(map1, TBD)
 
 	local class
 	local vetoText
@@ -178,7 +173,7 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	return self
 end
 
-function MapVeto:addColumnVetoMap(row,map)
+function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
 end

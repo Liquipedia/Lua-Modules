@@ -103,7 +103,7 @@ function MatchLegacy.convertParameters(match2)
 		local prefix = 'opponent' .. index
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
-		if opponent.type == 'team' then
+		if opponent.type == Opponent.team then
 			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
 			if isOverturned then
@@ -135,7 +135,7 @@ function MatchLegacy.convertParameters(match2)
 			match[prefix] = player.name
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix .. 'flag'] = player.flag
-		elseif opponent.type == 'literal' then
+		elseif opponent.type == Opponent.literal then
 			match[prefix] = 'TBD'
 		end
 	end
