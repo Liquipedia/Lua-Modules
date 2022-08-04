@@ -1032,7 +1032,7 @@ function Placement:_getLpdbData()
 			date = opponent.date,
 			participant = participant,
 			participantlink = Opponent.toName(opponent.opponentData),
-			participantflag = opponent.opponentData.flag,
+			participantflag = (players or {}).p1flag,
 			participanttemplate = opponent.opponentData.template,
 			opponenttype = opponent.opponentData.type,
 			players = players,
