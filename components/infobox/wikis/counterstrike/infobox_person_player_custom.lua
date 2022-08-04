@@ -67,6 +67,8 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 
 	player.args.history = player.args.team_history
+	player.args.steamalternative = player.args.steam
+	player.args.steam = nil
 
 	player.args.informationType = player.args.informationType or 'Player'
 
