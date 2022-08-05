@@ -86,9 +86,9 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
 			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},				
+			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
 			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},			
+			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
 		}
 	elseif id == 'region' then return {}
 	elseif id == 'role' then
