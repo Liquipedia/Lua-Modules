@@ -336,10 +336,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		timezoneid = match.timezoneId,
-		timezoneoffset = match.timezoneOffset,
-		matchsection = Variables.varDefault('matchsection'),
-		comment = match.comment,
 		mvp = match.mvp,
 		mvpteam = match.mvpteam or match.winner
 	}
