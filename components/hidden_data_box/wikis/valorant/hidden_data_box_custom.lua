@@ -45,10 +45,7 @@ function CustomHiddenDataBox.setWikiVariableForParticipantKey(participant, parti
 
 	-- Used in match1, remove once legacy is convert to match2 is done
 	local frame = mw.getCurrentFrame()
-	mw.log(key)
-	mw.log(key:sub(1,1) == 'p' and key:len() == 2)
 	if key:sub(1,1) == 'p' and key:len() == 2 then
-		mw.log(participant, value)
 		-- Skipping Flag, this was 100% broken in the before now anyway
 		frame:callParserFunction{name = '#arraydefine:temp_player_info', args = {value .. ','}}
 		if String.isEmpty(frame:callParserFunction{name = '#arrayprint:' .. participant .. '_players_info'}) then
