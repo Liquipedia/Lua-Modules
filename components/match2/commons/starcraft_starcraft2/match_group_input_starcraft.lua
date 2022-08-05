@@ -167,8 +167,8 @@ function StarcraftMatchGroupInput._getExtraData(match)
 		extradata = getStarcraftFfaInputModule().getExtraData(match)
 	else
 		extradata = {
-			timezoneid = timezoneId,
-			timezoneoffset = timezoneOffset,
+			timezoneid = match.timezoneId,
+			timezoneoffset = match.timezoneOffset,
 			noQuery = match.noQuery,
 			matchsection = Variables.varDefault('matchsection'),
 			comment = match.comment,
