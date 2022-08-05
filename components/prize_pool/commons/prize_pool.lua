@@ -35,6 +35,8 @@ local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
 
+local EMPTY_TEAM = '[[File:Logo_filler_std.png|link=]]'
+
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
 
@@ -565,10 +567,21 @@ function PrizePool:_buildRows()
 			end
 
 			if opponentIsParty then
-				if opponent.opponentData.players[1] and opponent.opponentData.players[1].team then
-					row:addCell(TableCell{content = {tostring(OpponentDisplay.BlockOpponent{
-						opponent = {type = 'team', template = opponent.opponentData.players[1].team}
-					})}, css = opponentCss})
+				local playerTeams = mw.html.create('div')
+				local hasTeam
+				for _, player in ipairs(opponent.opponentData.players) do
+					if player.team then
+						hasTeam = true
+						playerTeams:node(OpponentDisplay.BlockOpponent{
+							opponent = {type = 'team', template = player.team}
+						})
+					else
+						playerTeams:node(EMPTY_TEAM)
+					end
+				end
+
+				if hasTeam then
+					row:addCell(TableCell{content = {tostring(playerTeams)}, css = opponentCss})
 				else
 					row:addCell(PrizePool._emptyCell())
 				end
@@ -1026,15 +1039,16 @@ function Placement:_getLpdbData()
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_USD .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+		local opponentType = opponent.opponentData.type
 		local lpdbData = {
 			image = image,
 			imagedark = imageDark,
 			date = opponent.date,
 			participant = participant,
 			participantlink = Opponent.toName(opponent.opponentData),
-			participantflag = (players or {}).p1flag,
+			participantflag = opponentType == Opponent.solo and (players or {}).p1flag or nil,
 			participanttemplate = opponent.opponentData.template,
-			opponenttype = opponent.opponentData.type,
+			opponenttype = opponentType,
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
