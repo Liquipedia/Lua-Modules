@@ -199,13 +199,9 @@ function matchFunctions.getExtraData(match)
 	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 
 	match.extradata = {
-		timezoneid = match.timezoneId,
-		timezoneoffset = match.timezoneOffset,
-		matchsection = Variables.varDefault('matchsection'),
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
-		comment = match.comment,
 		octane = match.octane,
 		isconverted = 0,
 		isfeatured = matchFunctions.isFeatured(match),
