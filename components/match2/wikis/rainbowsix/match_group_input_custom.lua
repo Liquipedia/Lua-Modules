@@ -352,9 +352,7 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		matchsection = Variables.varDefault('matchsection'),
 		lastgame = Variables.varDefault('last_game'),
-		comment = match.comment,
 		mapveto = matchFunctions.getMapVeto(match),
 		mvp = matchFunctions.getMVP(match),
 		isconverted = 0

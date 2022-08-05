@@ -345,7 +345,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		comment = match.comment,
 		mvp = matchFunctions.getMVP(match),
 	}
 	return match

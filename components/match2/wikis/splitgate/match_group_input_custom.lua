@@ -331,7 +331,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		comment = match.comment,
 		mapveto = matchFunctions.getMapVeto(match),
 		mvp = matchFunctions.getMVP(match),
 		isconverted = 0

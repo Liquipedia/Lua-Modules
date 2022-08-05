@@ -168,8 +168,6 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	else
 		extradata = {
 			noQuery = match.noQuery,
-			matchsection = Variables.varDefault('matchsection'),
-			comment = match.comment,
 			featured = match.featured,
 			casters = match.casters,
 			headtohead = match.headtohead,

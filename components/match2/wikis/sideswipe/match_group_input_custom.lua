@@ -141,8 +141,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		matchsection = Variables.varDefault('matchsection'),
-		comment = match.comment,
 		isfeatured = matchFunctions.isFeatured(match)
 	}
 	return match
