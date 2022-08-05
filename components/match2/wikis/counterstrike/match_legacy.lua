@@ -60,6 +60,8 @@ function MatchLegacy.convertParameters(match2)
 	end
 
 	match.extradata = {
+		timezone = extradata.timezoneoffset,
+		timezoneID = extradata.timezoneid,
 		matchsection = extradata.matchsection,
 		opponent1rounds = 0,
 		opponent2rounds = 0,
