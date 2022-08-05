@@ -35,8 +35,6 @@ local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
 
-local EMPTY_TEAM = '[[File:Logo_filler_std.png|link=]]'
-
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
 
@@ -53,6 +51,7 @@ local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 local BASE_CURRENCY = 'USD'
+local EMPTY_TEAM = mw.html.create('div'):css('text-align', 'center'):wikitext(DASH)
 
 local PRIZE_TYPE_USD = 'USD'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
