@@ -132,8 +132,6 @@ end
 --function to get extradata for storage
 function StarcraftFfaInput.getExtraData(match)
 	local extradata = {
-		matchsection = Variables.varDefault('matchsection'),
-		comment = match.comment,
 		featured = match.featured,
 		veto1by = String.nilIfEmpty(match.vetoplayer1) or match.vetoopponent1,
 		veto1 = match.veto1,
