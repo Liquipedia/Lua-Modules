@@ -391,8 +391,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		matchsection = Variables.varDefault('matchsection'),
-		comment = match.comment,
 		featured = Logic.emptyOr(
 			match.featured,
 			matchFunctions.isFeatured(match)
