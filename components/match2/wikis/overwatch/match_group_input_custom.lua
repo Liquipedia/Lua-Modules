@@ -345,9 +345,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		timezoneid = match.timezoneId,
-		timezoneoffset = match.timezoneOffset,
-		comment = match.comment,
 		mvp = matchFunctions.getMVP(match),
 	}
 	return match
