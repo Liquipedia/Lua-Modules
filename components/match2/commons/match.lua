@@ -321,8 +321,22 @@ function Match._prepareMatchRecordForStore(match)
 	match.match2bracketid = match.match2bracketid or match.bracketid
 	match.match2id = match.match2id or match.bracketid .. '_' .. match.matchid
 	match.section = Match._getSection()
+	match.extradata = Match._addCommonMatchExtradata(match)
 	Match.clampFields(match, Match.matchFields)
 end
+
+function Match._addCommonMatchExtradata(match)
+	local commonExtradata = {
+		comment = match.comment,
+		matchsection = Variables.varDefault('matchsection'),
+		timezoneid = match.timezoneId,
+		timezoneoffset = match.timezoneOffset,
+	}
+
+	return Table.merge(commonExtradata, match.extradata or {})
+end
+
+
 
 function Match._getSection()
 	local cleanHtml = function(rawString)
