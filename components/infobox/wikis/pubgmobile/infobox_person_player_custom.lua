@@ -145,6 +145,14 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
+function CustomPlayer:createBottomContent(infobox)
+	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
+		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
+		return
+			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+	end
+end
+
 function CustomPlayer:defineCustomPageVariables(args)
 	-- isplayer needed for SMW
 	local roleData
