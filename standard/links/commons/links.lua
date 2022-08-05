@@ -206,7 +206,6 @@ function Links.transform(links)
 		challonge3 = links.challonge3,
 		challonge4 = links.challonge4,
 		challonge5 = links.challonge5,
-		cybergamer = links.cybergamer,
 		datdota = links.datdota,
 		daumcafe = links.daumcafe,
 		discord = links.discord,
