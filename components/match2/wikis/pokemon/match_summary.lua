@@ -17,6 +17,7 @@ local Table = require('Module:Table')
 local ExternalLinks = require('Module:ExternalLinks')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
+local Abbreviation = require('Module:Abbreviation')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
@@ -54,7 +55,7 @@ function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 			:node(CustomMatchSummary._opponentChampionsDisplay(banData[1], numberOfBans, date, false, true))
 		:tag('td')
 			:node(mw.html.create('div')
-				:wikitext(CustomMatchSummary._createAbbreviation{
+				:wikitext(Abbreviation.make{
 					title = 'Bans in game ' .. gameNumber,
 					text = 'Game ' .. gameNumber,
 				})
@@ -227,7 +228,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
-		:wikitext(CustomMatchSummary._createAbbreviation{
+		:wikitext(Abbreviation.make{
 			title = String.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Map Scores',
 			text = score or ('Game ' .. gameIndex),
 		})
@@ -261,10 +262,6 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	end
 
 	return container
-end
-
-function CustomMatchSummary._createAbbreviation(args)
-	return '<i><abbr title="' .. args.title .. '">' .. args.text .. '</abbr></i>'
 end
 
 function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, date, flip, isBan)
