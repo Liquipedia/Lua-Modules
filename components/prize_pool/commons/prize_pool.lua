@@ -1016,8 +1016,9 @@ function Placement:_getLpdbData()
 	for _, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
 		local playerCount = 0
+		local opponentType = opponent.opponentData.type
 
-		if opponent.opponentData.type == Opponent.team then
+		if opponentType == Opponent.team then
 			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template)
 
 			participant = teamTemplate and teamTemplate.page or ''
@@ -1027,7 +1028,7 @@ function Placement:_getLpdbData()
 
 			image = teamTemplate.image
 			imageDark = teamTemplate.imagedark
-		elseif opponent.opponentData.type == Opponent.solo then
+		elseif opponentType == Opponent.solo then
 			participant = Opponent.toName(opponent.opponentData)
 			local p1 = opponent.opponentData.players[1]
 			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
@@ -1038,7 +1039,6 @@ function Placement:_getLpdbData()
 
 		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_USD .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
-		local opponentType = opponent.opponentData.type
 		local lpdbData = {
 			image = image,
 			imagedark = imageDark,
