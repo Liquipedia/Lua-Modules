@@ -331,9 +331,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		timezoneid = match.timezoneId,
-		timezoneoffset = match.timezoneOffset,
-		comment = match.comment,
 		mapveto = matchFunctions.getMapVeto(match),
 		mvp = matchFunctions.getMVP(match),
 		isconverted = 0
