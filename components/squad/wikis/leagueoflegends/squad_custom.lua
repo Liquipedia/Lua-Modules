@@ -88,6 +88,7 @@ function CustomSquad.runAuto(playerList, squadType)
 		player.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
 		player.inactivedate = player.leavedate
 
+		player.link = player.page
 		player.role = player.thisTeam.role
 		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
 
@@ -107,7 +108,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:id({
 		(player.idleavedate or player.id),
 		flag = player.flag,
-		link = player.page,
+		link = player.link,
 		captain = player.captain,
 		role = player.role,
 		team = player.team,
