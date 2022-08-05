@@ -347,19 +347,20 @@ function matchFunctions.getLinks(match)
 		-- Stat external links inserted in {{Map}}
 		if Logic.isNotEmpty(platform) then
 			local platformLinks = {}
-			local platformName = platform.name
-			local plaformPrefixUrl = platform.link
+			local name = platform.name
+			local prefixLink = platform.prefixLink or ''
+			local suffixLink = platform.suffixLink or ''
 
-			if match[platformName] then
-				table.insert(platformLinks, {plaformPrefixUrl .. match[platformName], 0})
-				match[platformName] = nil
+			if match[name] then
+				table.insert(platformLinks, {prefixLink .. match[name] .. suffixLink, 0})
+				match[name] = nil
 			end
 
 			if platform.isMapStats then
 				for i = 1, match.bestof do
 					local map = match['map' .. i]
 					if map and map[platform.name] then
-						table.insert(platformLinks, {plaformPrefixUrl .. match['map' .. i][platformName], i})
+						table.insert(platformLinks, {prefixLink .. match['map' .. i][name] .. suffixLink, i})
 						match['map' .. i][platform.name] = nil
 					end
 				end
@@ -367,7 +368,7 @@ function matchFunctions.getLinks(match)
 				if platform.max then
 					for i = 2, platform.max, 1 do
 						if match[platform.name .. i] then
-							table.insert(platformLinks, {plaformPrefixUrl .. match[platformName .. i], i})
+							table.insert(platformLinks, {prefixLink .. match[name .. i] .. suffixLink, i})
 							match[platform.name .. i] = nil
 						end
 					end
@@ -375,7 +376,7 @@ function matchFunctions.getLinks(match)
 			end
 
 			if #platformLinks > 0 then
-				links[platformName] = platformLinks
+				links[name] = platformLinks
 			end
 		end
 	end
