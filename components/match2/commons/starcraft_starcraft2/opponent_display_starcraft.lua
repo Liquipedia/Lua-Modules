@@ -13,6 +13,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
+local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft', {requireDevIfEnabled = true})
@@ -77,23 +78,29 @@ determined by its layout context, and not of the opponent.
 function StarcraftOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, StarcraftOpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
+	-- Default TBDs to not show links
+	local showLink = Logic.nilOr(props.showLink, not StarcraftOpponent.isTbd(opponent))
 
 	if opponent.type == 'team' then
 		return StarcraftOpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
-			showLink = props.showLink,
+			showLink = showLink,
 			style = props.teamStyle,
 			team = opponent.team,
 			template = opponent.template or 'tbd',
 		})
 	elseif opponent.type == 'literal' and opponent.extradata.hasRaceOrFlag then
 		props.showRace = false
-		return StarcraftOpponentDisplay.PlayerBlockOpponent(props)
+		return StarcraftOpponentDisplay.PlayerBlockOpponent(
+			Table.merge(props, {showLink = showLink})
+		)
 	elseif opponent.type == 'literal' then
 		return OpponentDisplay.BlockOpponent(props)
 	else -- opponent.type == 'solo' 'duo' 'trio' 'quad'
-		return StarcraftOpponentDisplay.PlayerBlockOpponent(props)
+		return StarcraftOpponentDisplay.PlayerBlockOpponent(
+			Table.merge(props, {showLink = showLink})
+		)
 	end
 end
 
