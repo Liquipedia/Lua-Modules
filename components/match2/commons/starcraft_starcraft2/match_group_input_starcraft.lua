@@ -123,22 +123,13 @@ end
 function StarcraftMatchGroupInput._getTournamentVars(match)
 	match.noQuery = Variables.varDefault('disable_SMW_storage', 'false')
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
-	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
-	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
-	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_tickername'))
-	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
-	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
-	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
-	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_tier'))
-	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_tiertype'))
-	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	Variables.varDefine('headtohead', match.headtohead)
 	match.featured = Logic.emptyOr(match.featured, Variables.varDefault('featured'))
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
 	Variables.varDefine('bestof', match.bestof)
-	return match
+
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function StarcraftMatchGroupInput._getVodStuff(match)
