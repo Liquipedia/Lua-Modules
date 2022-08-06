@@ -55,10 +55,10 @@ function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 			:node(CustomMatchSummary._opponentChampionsDisplay(banData[1], numberOfBans, date, false, true))
 		:tag('td')
 			:node(mw.html.create('div')
-				:wikitext(Abbreviation.make{
-					title = 'Bans in game ' .. gameNumber,
-					text = 'Game ' .. gameNumber,
-				})
+				:wikitext(Abbreviation.make(
+					'Game ' .. gameNumber,
+					'Bans in game ' .. gameNumber
+				))
 			)
 		:tag('td')
 			:node(CustomMatchSummary._opponentChampionsDisplay(banData[2], numberOfBans, date, true, true))
@@ -228,10 +228,10 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
-		:wikitext(Abbreviation.make{
-			title = String.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Map Scores',
-			text = score or ('Game ' .. gameIndex),
-		})
+		:wikitext(Abbreviation.make(
+			score or ('Game ' .. gameIndex),
+			String.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Map Scores'
+		))
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], _NUM_CHAMPIONS_PICK, date, true))
