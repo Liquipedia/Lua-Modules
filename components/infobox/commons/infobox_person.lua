@@ -205,6 +205,7 @@ function Person:createInfobox()
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if _shouldStoreData then
+		self:_definePageVariables(args)
 		self:_setLpdbData(
 			args,
 			links,
@@ -214,6 +215,11 @@ function Person:createInfobox()
 	end
 
 	return tostring(builtInfobox) .. WarningBox.displayAll(self.warnings)
+end
+
+function Person:_definePageVariables(args)
+	Variables.varDefine('firstname', args.givenname or '')
+	Variables.varDefine('lastname', args.familyname or '')
 end
 
 function Person:_setLpdbData(args, links, status, personType)
