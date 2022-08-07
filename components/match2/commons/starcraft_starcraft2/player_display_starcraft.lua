@@ -67,7 +67,7 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 	end
 
 	local teamNode
-	if props.showPlayerTeam ~= false and props.team and props.team:lower() ~= 'tbd' then
+	if props.showPlayerTeam and props.team and props.team:lower() ~= 'tbd' then
 		teamNode = html.create('span')
 			:wikitext('&nbsp;')
 			:node(mw.ext.TeamTemplate.teampart(props.team))
