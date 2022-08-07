@@ -88,7 +88,7 @@ function CustomLeague:_standardiseRawDate(dateString)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	-- Custom Vars	
+	-- Custom Vars
 	Variables.varDefine('tournament_riot_premier', _args.riotpremier)
 	Variables.varDefine('tournament_publishertier', _args.riotpremier)
 
