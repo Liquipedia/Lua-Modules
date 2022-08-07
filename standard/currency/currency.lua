@@ -92,4 +92,18 @@ function Currency.formatMoney(value)
 	return LANG:formatNum(integer) .. string.format('%.2f', decimal):sub(2)
 end
 
+function Currency.getExchangeRate(props)
+	local setVariables = Logic.readBool(props.setVariables)
+	local currencyRate = tonumber(props.currencyRate)
+	if not currencyRate then
+		currencyRate = mw.ext.CurrencyExchange.currencyexchange(1, props.currency:upper(), USD, props.date)
+	end
+
+	if setVariables and String.isNotEmpty(currencyRate) then
+		Variables.varDefine(props.currency .. '_rate', currencyRate)
+	end
+
+	return tonumber(currencyRate)
+end
+
 return Currency
