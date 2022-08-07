@@ -13,14 +13,13 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
+local Template = require('Module:Template')
 
 local _args
 local _league
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
-
-local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -53,24 +52,18 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
-function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args['riot-sponsored'])
-end
-
 function CustomLeague:appendLiquipediatierDisplay()
-	if Logic.readBool(_args['riot-sponsored']) then
-		return ' ' .. RIOT_ICON
+	if String.isEmpty(_args.pctier) and Logic.readBool(_args.riotpremier) then
+		return ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Riot/infobox')
 	end
 	return ''
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)
-	if Logic.readBool(args.riotpremier) then
-		lpdbData.publishertier = 'major'
-	elseif Logic.readBool(args['riot-sponsored']) then
-		lpdbData.publishertier = 'Sponsored'
-	end
+function CustomLeague:liquipediaTierHighlighted()
+	return Logic.readBool(_args.riotpremier)
+end
 
+function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
@@ -95,10 +88,9 @@ function CustomLeague:_standardiseRawDate(dateString)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	-- Custom Vars
-	Variables.varDefine('tournament_riot_premier', _args.riotpremier and 'true' or '')
-	Variables.varDefine('tournament_publisher_major', _args.riotpremier)
-	Variables.varDefine('tournament_publishertier', _args.pctier)
+	-- Custom Vars	
+	Variables.varDefine('tournament_riot_premier', _args.riotpremier)
+	Variables.varDefine('tournament_publishertier', _args.riotpremier)
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
