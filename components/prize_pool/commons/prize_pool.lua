@@ -475,10 +475,7 @@ function PrizePool:_buildHeader()
 		end
 	end
 
-	if self:_hasPartyType() then
-		headerRow:addCell(TableCell{content = {'Player'}, classes = {'prizepooltable-col-player'}})
-	end
-	headerRow:addCell(TableCell{content = {'Team'}, classes = {'prizepooltable-col-team'}})
+	headerRow:addCell(TableCell{content = {'Participant'}, classes = {'prizepooltable-col-team'}})
 
 	return headerRow
 end
@@ -551,30 +548,10 @@ function PrizePool:_buildRows()
 				end
 			end)
 
-			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{opponent = opponent.opponentData})
+			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{opponent = opponent.opponentData, showPlayerTeam = true})
 			local opponentCss = {['justify-content'] = 'start'}
 
-			local opponentIsParty = Opponent.typeIsParty(opponent.opponentData.type)
-
-			if self:_hasPartyType() then
-				if opponentIsParty then
-					row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
-				else
-					row:addCell(PrizePool._emptyCell())
-				end
-			end
-
-			if opponentIsParty then
-				if opponent.opponentData.players[1] and opponent.opponentData.players[1].team then
-					row:addCell(TableCell{content = {tostring(OpponentDisplay.BlockOpponent{
-						opponent = {type = 'team', template = opponent.opponentData.players[1].team}
-					})}, css = opponentCss})
-				else
-					row:addCell(PrizePool._emptyCell())
-				end
-			else
-				row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
-			end
+			row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
 
 			table.insert(rows, row)
 		end
@@ -797,15 +774,6 @@ function PrizePool:_hasUsdPrizePool()
 	end))
 end
 
---- Returns true if this prizePool or any opponent entered into the prizepool is of a PartyType
-function PrizePool:_hasPartyType()
-	local placementHasParty = function (placement)
-		return placement.hasPartyType
-	end
-
-	return Opponent.typeIsParty(self.opponentType) or Array.any(self.placements, placementHasParty)
-end
-
 --- Creates an empty table cell
 function PrizePool._emptyCell()
 	return TableCell{content = {DASH}}
@@ -975,10 +943,6 @@ function Placement:_parseOpponents(args)
 
 			-- Set date
 			opponent.date = opponentInput.date
-
-			if Opponent.typeIsParty(opponent.opponentData.type) then
-				self.hasPartyType = true
-			end
 		end
 		return opponent
 	end)
@@ -1004,8 +968,9 @@ function Placement:_getLpdbData()
 	for _, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
 		local playerCount = 0
+		local opponentType = opponent.opponentData.type
 
-		if opponent.opponentData.type == Opponent.team then
+		if opponentType == Opponent.team then
 			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template)
 
 			participant = teamTemplate and teamTemplate.page or ''
@@ -1015,7 +980,7 @@ function Placement:_getLpdbData()
 
 			image = teamTemplate.image
 			imageDark = teamTemplate.imagedark
-		elseif opponent.opponentData.type == Opponent.solo then
+		elseif opponentType == Opponent.solo then
 			participant = Opponent.toName(opponent.opponentData)
 			local p1 = opponent.opponentData.players[1]
 			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
@@ -1032,9 +997,9 @@ function Placement:_getLpdbData()
 			date = opponent.date,
 			participant = participant,
 			participantlink = Opponent.toName(opponent.opponentData),
-			participantflag = (players or {}).p1flag,
+			participantflag = opponentType == Opponent.solo and players.p1flag or nil,
 			participanttemplate = opponent.opponentData.template,
-			opponenttype = opponent.opponentData.type,
+			opponenttype = opponentType,
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
