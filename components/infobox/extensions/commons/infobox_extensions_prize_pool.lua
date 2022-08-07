@@ -67,7 +67,7 @@ function PrizePoolCurrency.display(args)
 			Variables.varDefine(currency .. '_rate', currencyRate)
 		end
 		if String.isNotEmpty(args.currency) then
-			Variables.varDefine(tournament_currency, currency:upper())
+			Variables.varDefine('tournament_currency', currency:upper())
 		end
 
 		Variables.varDefine('tournament_currency_date', date)
@@ -75,7 +75,7 @@ function PrizePoolCurrency.display(args)
 		Variables.varDefine('tournament_prizepoollocal', prizepool)
 
 		local prizepoolUsdValue = string.gsub(prizepoolUsd or '', ',', '')
-		Variables.varDefine('tournament_prizepoolusd', prizepoolUsdValue)	
+		Variables.varDefine('tournament_prizepoolusd', prizepoolUsdValue)
 
 		-- legacy compatibility
 		Variables.varDefine('tournament_currency_rate', currencyRate or '')
@@ -99,14 +99,12 @@ function PrizePoolCurrency.display(args)
 end
 
 function PrizePoolCurrency._exchange(props)
-	local currency = props.currency
 	local prizepool = props.prizepool or ''
 	local prizepoolUsd = props.prizepoolUsd or ''
 	local currencyRate = Currency.getExchangeRate(props)
-	local errorMessage
 
 	if not currencyRate then
-		errorMessage = 'Need valid exchange date'
+		local errorMessage = 'Need valid exchange date'
 		return errorMessage, prizepool, prizepoolUsd, currencyRate
 	end
 
@@ -117,9 +115,9 @@ function PrizePoolCurrency._exchange(props)
 	if
 		not currencyRate
 		and not Logic.isNumeric(prizepool)
-		and not Logic.isNumeric(prizepoolUSD)
+		and not Logic.isNumeric(prizepoolUsd)
 	then
-		errorMessage = 'Need valid currency, exchange rate'
+		local errorMessage = 'Need valid currency, exchange rate'
 		return errorMessage, prizepool, prizepoolUsd, currencyRate
 	end
 
@@ -130,7 +128,7 @@ function PrizePoolCurrency._exchange(props)
 		prizepoolUsd = PrizePoolCurrency._format(prizepoolUsd)
 	end
 
-	return errorMessage, prizepool, prizepoolUsd, currencyRate
+	return nil, prizepool, prizepoolUsd, currencyRate
 end
 
 function PrizePoolCurrency._format(value)
