@@ -89,9 +89,14 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
+		local status = _args.status
+		if String.isNotEmpty(status) then
+			status = mw.getContentLanguage():ucfirst(status)
+		end
+
 		return {
 			Cell{name = 'Status', content = {Page.makeInternalLink({onlyIfExists = true},
-						_args.status) or _args.status}},
+						status) or status}},
 		}
 	elseif id == 'role' then
 		return {
