@@ -548,7 +548,10 @@ function PrizePool:_buildRows()
 				end
 			end)
 
-			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{opponent = opponent.opponentData, showPlayerTeam = true})
+			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{
+				opponent = opponent.opponentData,
+				showPlayerTeam = true
+			})
 			local opponentCss = {['justify-content'] = 'start'}
 
 			row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
