@@ -108,6 +108,7 @@ local _PRIORITY_GROUPS = {
 		'huyatv',
 		'zhangyutv',
 		'bilibili-stream',
+		'kuaishou',
 	}
 }
 
