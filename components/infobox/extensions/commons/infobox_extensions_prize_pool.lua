@@ -46,7 +46,7 @@ function PrizePoolCurrency.display(args)
 	end
 
 	if currency == USD and String.isEmpty(prizepoolUsd) then
-		return message('Need valid currency', CATEGRORY)--todo
+		return PrizePoolCurrency._errorMessage('Need valid currency')
 	elseif currency == USD then
 		prizepoolUsd = LANG:formatNum(math.floor(prizepoolUsd))
 	else
@@ -58,7 +58,7 @@ function PrizePoolCurrency.display(args)
 			prizepoolUsd = prizepoolUsd,
 		}
 		if errorMessage then
-			return message(errorMessage, CATEGRORY)--todo
+			return PrizePoolCurrency._errorMessage(errorMessage)
 		end
 	end
 
@@ -147,5 +147,16 @@ function PrizePoolCurrency._cleanValue(valueString)
 	return tonumber(string.gsub(valueString or '', '[^%d.?]', '') or '')
 end
 
+function PrizePoolCurrency._errorMessage(message)
+	local category = ''
+	if Namespace.isMain() then
+		category = CATEGRORY
+	end
+	return mw.html.create('strong')
+		:addClass('error')
+		:wikitext('Error: ')
+		:wikitext(mw.text.nowiki(message))
+		:wikitext(category)
+end
 
 return Class.export(PrizePoolCurrency)
