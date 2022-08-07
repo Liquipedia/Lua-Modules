@@ -27,6 +27,8 @@ PlayerDisplay.propTypes.BlockPlayer = {
 	player = MatchGroupUtil.types.Player,
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
+	showPlayerTeam = 'boolean?',
+	team = 'string?',
 }
 
 --[[
@@ -50,10 +52,20 @@ function PlayerDisplay.BlockPlayer(props)
 		flagNode = PlayerDisplay.Flag(player.flag)
 	end
 
+	local teamNode
+	if props.showPlayerTeam and props.team and props.team:lower() ~= 'tbd' then
+		teamNode = html.create('span')
+			:wikitext('&nbsp;')
+			:node(mw.ext.TeamTemplate.teampart(props.team))
+	end
+
 	return mw.html.create('div'):addClass('block-player')
 		:addClass(props.flip and 'flipped' or nil)
+		:addClass(props.showPlayerTeam and 'block-player-with-team' or nil)
+		:cssText(props.showPlayerTeam and 'width: 100%' or nil)--move into above class
 		:node(flagNode)
 		:node(nameNode)
+		:node(teamNode)
 end
 
 PlayerDisplay.propTypes.InlinePlayer = {
