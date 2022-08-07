@@ -54,7 +54,7 @@ function PlayerDisplay.BlockPlayer(props)
 
 	local teamNode
 	if props.showPlayerTeam and props.team and props.team:lower() ~= 'tbd' then
-		teamNode = html.create('span')
+		teamNode = mw.html.create('span')
 			:wikitext('&nbsp;')
 			:node(mw.ext.TeamTemplate.teampart(props.team))
 	end
