@@ -11,6 +11,7 @@ local Opponent = require('Module:Opponent')
 local StarcraftRace = require('Module:Race/Starcraft')
 local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local Table = require('Module:Table')
+local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
 
 local StarcraftOpponent = Table.deepCopy(Opponent)
