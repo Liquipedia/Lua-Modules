@@ -188,14 +188,12 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 			playerNodes = playerNodes,
 			raceNode = html.create('div'):wikitext(raceIcon),
 		})
-		:css('width', '100%')
-		:addClass(props.showPlayerTeam and 'className' or nil)
+		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 
 	elseif showRace and opponent.isSpecialArchon then
 		local archonsNode = html.create('div')
 			:addClass('starcraft-special-archon-block-opponent')
-			:css('width', '100%')
-			:addClass(props.showPlayerTeam and 'className' or nil)
+			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 		for archonIx = 1, #opponent.players / 2 do
 			local primaryRace = opponent.players[2 * archonIx - 1].race
 			local secondaryRace = opponent.players[2 * archonIx].race
@@ -226,8 +224,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 
 	else
 		local playersNode = html.create('div')
-			:css('width', '100%')
-			:addClass(props.showPlayerTeam and 'className' or nil)
+			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 		for _, playerNode in ipairs(playerNodes) do
 			playersNode:node(playerNode)
 		end
