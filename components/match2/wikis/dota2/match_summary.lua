@@ -40,7 +40,7 @@ local _LINK_DATA = {
 -- Auto generated links from Publisher ID
 local _AUTO_LINKS = {
 	{icon = 'File:DOTABUFF-icon.png', url = 'https://www.dotabuff.com/matches/', name = 'DOTABUFF'},
-	{icon = 'File:DatDota-icon.png', url = 'https://www.datdota.com/matches//', name = 'datDota'},
+	{icon = 'File:DatDota-icon.png', url = 'https://www.datdota.com/matches/', name = 'datDota'},
 	{icon = 'File:Stratz-icon.png', url = 'https://stratz.com/en-us/match/', name = 'Stratz'},
 }
 
