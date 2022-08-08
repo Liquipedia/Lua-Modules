@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
+local Opponent = require('Module:Opponent')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
@@ -43,15 +44,25 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart,
 		Variables.varDefault('tournament_type')
 	)
-	if opponent.opponentData.type == 'solo' then
+	if opponent.opponentData.type == Opponent.solo then
 		lpdbData.participantflag = opponent.opponentData.players[1].flag
+		
+		-- legacy extradata, to be removed once unused
 		lpdbData.extradata.participantname = opponent.opponentData.players[1].displayName
-
-		if opponent.additionalData.LASTVS ~= nil then
+		lpdbData.extradata.participantteam = opponent.opponentData.players[1].team
+		
+		if opponent.additionalData.LASTVS then
 			lpdbData.extradata.lastvsflag = opponent.additionalData.LASTVS.players[1].flag
 			lpdbData.extradata.lastvsname = opponent.additionalData.LASTVS.players[1].displayName
 		end
+		
+		lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
+		lpdbData.extradata.monthandday = placement.date:sub(-5)
 	end
+	
+	-- legacy points, to be standardized
+	lpdbData.extradata.points = placement.prizeRewards.POINTS1
+	lpdbData.extradata.points2 = placement.prizeRewards.POINTS2
 
 	return lpdbData
 end
