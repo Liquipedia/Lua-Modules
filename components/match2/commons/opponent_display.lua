@@ -181,7 +181,6 @@ function OpponentDisplay.BlockOpponent(props)
 			showFlag = props.showFlag,
 			showLink = showLink,
 			showPlayerTeam = props.showPlayerTeam,
-			team = opponent.players[1].team,
 		})
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
