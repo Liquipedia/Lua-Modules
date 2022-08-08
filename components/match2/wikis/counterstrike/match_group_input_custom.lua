@@ -318,7 +318,7 @@ function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
 	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
-	return match
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getLinks(match)
@@ -651,7 +651,7 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return map
+	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 --
