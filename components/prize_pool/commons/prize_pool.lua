@@ -149,6 +149,12 @@ PrizePool.config = {
 	},
 	resolveRedirect = {
 		default = false,
+	},
+	syncPlayers = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.syncPlayers)
+		end
 	}
 }
 
