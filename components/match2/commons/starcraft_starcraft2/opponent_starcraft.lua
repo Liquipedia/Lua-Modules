@@ -9,6 +9,7 @@
 local Logic = require('Module:Logic')
 local Opponent = require('Module:Opponent')
 local StarcraftRace = require('Module:Race/Starcraft')
+local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -103,6 +104,32 @@ function StarcraftOpponent.fromLpdbStruct(storageStruct)
 		end
 	end
 
+	return opponent
+end
+
+--[[
+Resolves the identifiers of an opponent.
+For team opponents, this resolves the team template to a particular date. For
+party opponents, this fills in players' pageNames using their displayNames,
+using data stored in page variables if present.
+options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
+]]
+function StarcraftOpponent.resolve(opponent, date, options)
+	options = options or {}
+	if opponent.type == Opponent.team then
+		opponent.template = TeamTemplate.resolve(opponent.template, date) or 'tbd'
+	elseif Opponent.typeIsParty(opponent.type) then
+		for _, player in ipairs(opponent.players) do
+			if options.syncPlayer then
+				StarcraftPlayerExt.syncPlayer(player)
+			else
+				StarcraftPlayerExt.populatePageName(player)
+			end
+			if player.team then
+				player.team = TeamTemplate.resolve(player.team, date)
+			end
+		end
+	end
 	return opponent
 end
 
