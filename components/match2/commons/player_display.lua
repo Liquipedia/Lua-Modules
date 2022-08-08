@@ -28,7 +28,6 @@ PlayerDisplay.propTypes.BlockPlayer = {
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
 	showPlayerTeam = 'boolean?',
-	team = 'string?',
 }
 
 --[[
@@ -53,10 +52,10 @@ function PlayerDisplay.BlockPlayer(props)
 	end
 
 	local teamNode
-	if props.showPlayerTeam and props.team and props.team:lower() ~= 'tbd' then
+	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
 		teamNode = mw.html.create('span')
 			:wikitext('&nbsp;')
-			:node(mw.ext.TeamTemplate.teampart(props.team))
+			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
 	return mw.html.create('div'):addClass('block-player')
