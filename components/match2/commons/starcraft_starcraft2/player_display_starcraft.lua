@@ -32,7 +32,6 @@ StarcraftPlayerDisplay.propTypes.BlockPlayer = {
 	flip = 'boolean?',
 	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
 	player = StarcraftMatchGroupUtil.types.Player,
-	team = 'string?',
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
 	showPlayerTeam = 'boolean?',
@@ -67,10 +66,10 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 	end
 
 	local teamNode
-	if props.showPlayerTeam and props.team and props.team:lower() ~= 'tbd' then
+	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
 		teamNode = html.create('span')
 			:wikitext('&nbsp;')
-			:node(mw.ext.TeamTemplate.teampart(props.team))
+			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
 	return html.create('div'):addClass('block-player starcraft-block-player')
