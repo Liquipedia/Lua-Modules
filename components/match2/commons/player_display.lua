@@ -61,8 +61,7 @@ function PlayerDisplay.BlockPlayer(props)
 
 	return mw.html.create('div'):addClass('block-player')
 		:addClass(props.flip and 'flipped' or nil)
-		:addClass(props.showPlayerTeam and 'block-player-with-team' or nil)
-		:cssText(props.showPlayerTeam and 'width: 100%' or nil)--move into above class
+		:addClass(props.showPlayerTeam and 'hast-team' or nil)
 		:node(flagNode)
 		:node(nameNode)
 		:node(teamNode)
