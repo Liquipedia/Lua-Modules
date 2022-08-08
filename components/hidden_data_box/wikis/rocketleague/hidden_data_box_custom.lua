@@ -17,7 +17,7 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
-function CustomHiddenDataBox:addCustomVariables(args, queryResult)
+function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier'))
 	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype'))
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate'))
