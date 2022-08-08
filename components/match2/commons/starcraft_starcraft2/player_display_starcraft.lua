@@ -75,7 +75,7 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 
 	return html.create('div'):addClass('block-player starcraft-block-player')
 		:addClass(props.flip and 'flipped' or nil)
-		:addClass(props.showPlayerTeam and 'hast-team' or nil)
+		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
 		:node(raceNode)
 		:node(nameNode)
