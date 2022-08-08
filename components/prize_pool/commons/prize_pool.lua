@@ -94,6 +94,12 @@ PrizePool.config = {
 	},
 	resolveRedirect = {
 		default = false,
+	},
+	syncPlayers = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.syncPlayers)
+		end
 	}
 }
 
@@ -996,7 +1002,7 @@ function Placement:_parseOpponentArgs(input, date)
 		opponentData = Opponent.tbd(opponentArgs.type)
 	end
 
-	return Opponent.resolve(opponentData, date)
+	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers})
 end
 
 function Placement:_getLpdbData()
