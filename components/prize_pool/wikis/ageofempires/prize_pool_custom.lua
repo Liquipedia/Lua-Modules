@@ -45,8 +45,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		Variables.varDefault('tournament_type')
 	)
 	if opponent.opponentData.type == Opponent.solo then
-		lpdbData.participantflag = opponent.opponentData.players[1].flag
-
 		-- legacy extradata, to be removed once unused
 		lpdbData.extradata.participantname = opponent.opponentData.players[1].displayName
 		lpdbData.extradata.participantteam = opponent.opponentData.players[1].team
