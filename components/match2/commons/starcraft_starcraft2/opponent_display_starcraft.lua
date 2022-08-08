@@ -171,7 +171,6 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 			showLink = props.showLink,
 			showPlayerTeam = props.showPlayerTeam,
 			showRace = showRace and not opponent.isArchon and not opponent.isSpecialArchon,
-			team = player.team,
 		})
 			:addClass(props.playerClass)
 	end)
