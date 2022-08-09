@@ -22,7 +22,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local WarningBox = require('Module:WarningBox')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Tier = require('Module:Tier')
-local PrizePoolCurrency = require('Module:Prize pool currency')
+local InfoboxPrizePool = require('Module:Infobox/Extensions/PrizePool')
 local Logic = require('Module:Logic')
 local MetadataGenerator = require('Module:MetadataGenerator')
 
@@ -309,7 +309,7 @@ function League:_createPrizepool(args)
 		date = args.currency_date
 	end
 
-	return PrizePoolCurrency._get{
+	return InfoboxPrizePool.display{
 		prizepool = args.prizepool,
 		prizepoolusd = args.prizepoolusd,
 		currency = args.localcurrency,
