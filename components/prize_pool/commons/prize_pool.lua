@@ -101,10 +101,10 @@ PrizePool.config = {
 			return Logic.readBoolOrNil(args.syncPlayers)
 		end
 	},
-	currencyRateFromVar = {
-		default = true,
+	currencyRatePerOpponent = {
+		default = false,
 		read = function(args)
-			return Logic.readBoolOrNil(args.currencyratefromvar)
+			return Logic.readBoolOrNil(args.currencyrateperopponent)
 		end
 	},
 }
@@ -140,9 +140,17 @@ PrizePool.prizeTypes = {
 			end
 			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
 
+			local currencyRate = Currency.getExchangeRate{
+				currency = currencyData.code,
+				currencyRate = Variables.varDefault(currencyData.code .. '_rate'),
+				date = prizePool.date,
+				setVariables = true,
+			}
+
 			return {
 				currency = currencyData.code, currencyText = currencyText,
 				symbol = currencyData.symbol, symbolFirst = not currencyData.isAfter,
+				rate = currencyRate or 0,
 			}
 		end,
 		headerDisplay = function (data)
@@ -167,14 +175,17 @@ PrizePool.prizeTypes = {
 			end
 		end,
 
-		convertToUsd = function (headerData, data, date, fromVar)
-			local currencyRate = Currency.getExchangeRate{
-				currency = headerData.currency,
-				currencyRate = fromVar and Variables.varDefault(headerData.currency .. '_rate'),
-				date = date,
-				setVariables = fromVar,
-			} or 0
-			return (tonumber(data) or 0) * currencyRate
+		convertToUsd = function (headerData, data, date, perOpponent)
+			local rate = headerData.rate
+
+			if perOpponent then
+				rate = Currency.getExchangeRate{
+					currency = headerData.currency,
+					date = date,
+				} or currencyRate
+			end
+
+			return (tonumber(data) or 0) * rate
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
@@ -633,7 +644,7 @@ function PrizePool:_currencyExchangeInfo()
 		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
 			return PrizePool.prizeTypes[prize.type].convertToUsd
-		end), PrizePool._CurrencyConvertionText), ', '))--maybe pass self.options.currencyRateFromVar along???
+		end), PrizePool._CurrencyConvertionText), ', '))
 		wrapper:wikitext('\'\')')
 
 		return tostring(wrapper)
@@ -643,7 +654,7 @@ end
 function PrizePool._CurrencyConvertionText(prize)
 	local exchangeRate = Math.round{
 		PrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToUsd(
-			prize.data, 1, PrizePool._getTournamentDate(), true --maybe pass self.options.currencyRateFromVar here???
+			prize.data, 1, PrizePool._getTournamentDate()
 		)
 		,5
 	}
@@ -1104,7 +1115,7 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 				prize.data,
 				localMoney,
 				opponent.date,
-				self.parent.options.currencyRateFromVar
+				self.parent.options.currencyRatePerOpponent
 			)
 			self.parent.usedAutoConvertedCurrency = true
 		end)
