@@ -142,7 +142,7 @@ PrizePool.prizeTypes = {
 
 			local currencyRate = Currency.getExchangeRate{
 				currency = currencyData.code,
-				currencyRate = Variables.varDefault(currencyData.code .. '_rate'),
+				currencyRate = Variables.varDefault('exchangerate_' .. currencyData.code),
 				date = prizePool.date,
 				setVariables = true,
 			}
