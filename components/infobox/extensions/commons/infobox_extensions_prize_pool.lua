@@ -128,13 +128,13 @@ function PrizePoolCurrency._format(value)
 end
 
 function PrizePoolCurrency._cleanDate(dateString)
-	dateString = string.gsub(dateString, '[^%d.-]', '')
-
+	dateString = string.gsub(dateString, '[^%d%-]', '')
 	return string.match(dateString, '%d%d%d%d%-%d%d%-%d%d')
 end
 
 function PrizePoolCurrency._cleanValue(valueString)
-	return tonumber(string.gsub(valueString or '', '[^%d.?]', '') or '')
+	valueString = string.gsub(valueString or '', '[^%d%.?]', '')
+	return tonumber(valueString)
 end
 
 function PrizePoolCurrency._errorMessage(message)
