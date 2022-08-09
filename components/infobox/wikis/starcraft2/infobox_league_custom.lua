@@ -376,7 +376,7 @@ function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
 	local usdPrize
 	local currencyRate = Currency.getExchangeRate{
 		currency = currency,
-		date = exchangeDate
+		date = exchangeDate,
 		setVariables = true,
 	}
 	if currencyRate then
