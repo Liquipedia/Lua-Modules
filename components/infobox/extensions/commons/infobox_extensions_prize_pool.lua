@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
+local Math = require('Module:Math')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
@@ -124,7 +125,7 @@ function PrizePoolCurrency._exchange(props)
 end
 
 function PrizePoolCurrency._format(value)
-	return LANG:formatNum(math.floor(value))
+	return LANG:formatNum(Math.round{value, 0})
 end
 
 function PrizePoolCurrency._cleanDate(dateString)
