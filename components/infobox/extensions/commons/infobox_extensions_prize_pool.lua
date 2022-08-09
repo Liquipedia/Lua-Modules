@@ -22,6 +22,7 @@ local LANG = mw.language.new('en')
 local CATEGRORY = '[[Category:Tournaments with invalid prize pool]]'
 
 function PrizePoolCurrency.display(args)
+	args = args or {}
 	local currency = string.upper(args.currency or USD)
 	local date = PrizePoolCurrency._cleanDate(args.date or NOW)
 	local text = args.text or 'Currency exchange rate taken from exchangerate.host'
@@ -58,6 +59,7 @@ function PrizePoolCurrency.display(args)
 			date = date,
 			prizepool = prizepool,
 			prizepoolUsd = prizepoolUsd,
+			setVariables = setVariables,
 		}
 		if errorMessage then
 			return PrizePoolCurrency._errorMessage(errorMessage)
@@ -65,9 +67,6 @@ function PrizePoolCurrency.display(args)
 	end
 
 	if setVariables then
-		if String.isNotEmpty(args.currency) and currencyRate then
-			Variables.varDefine(currency .. '_rate', currencyRate)
-		end
 		if String.isNotEmpty(args.currency) then
 			Variables.varDefine('tournament_currency', currency:upper())
 		end
