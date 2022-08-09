@@ -35,6 +35,7 @@ local _LINK_DATA = {
 	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
 	reddit = {icon = 'File:Reddit-icon.png', text = 'Head-to-head statistics'},
 	gol = {icon = 'File:Gol.gg_allmode.png', text = 'GolGG Match Report'},
+	factor = {icon = 'File:factor.gg lightmode.png', text = 'FactorGG Match Report'},
 }
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'

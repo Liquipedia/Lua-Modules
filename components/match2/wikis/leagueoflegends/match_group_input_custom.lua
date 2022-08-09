@@ -370,6 +370,7 @@ function matchFunctions.getLinks(match)
 	}
 	if match.reddit then match.links.reddit = 'https://redd.it/' .. match.reddit end
 	if match.gol then match.links.gol = 'https://gol.gg/game/stats/' .. match.gol .. '/page-game/' end
+	if match.factor then match.links.factor = 'https://www.factor.gg/match/' .. match.factor end
 	return match
 end
 
