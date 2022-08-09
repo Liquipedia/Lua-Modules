@@ -10,6 +10,7 @@ local AllowedServers = require('Module:Server')
 local Array = require('Module:Array')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
+local Currency = require('Module:Currency')
 local League = require('Module:Infobox/League')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -17,7 +18,6 @@ local PageLink = require('Module:Page')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
@@ -180,11 +180,8 @@ function CustomLeague:_createPrizepool()
 
 		local plusText = hasPlus and '+' or ''
 		if prizePoolUSD then
-			display = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{(localCurrency or ''):lower(), prizepool = CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText}
-			) .. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
+			display = Currency.display((localCurrency or ''):lower(), CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText)
+				.. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
 		elseif prizePool then
 			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText .. ' ' .. _ABBR_USD
 		end
@@ -376,21 +373,17 @@ function CustomLeague:_getServer()
 end
 
 function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
-	if exchangeDate and currency and currency ~= 'USD' then
-		if localPrize then
-			local usdPrize = mw.ext.CurrencyExchange.currencyexchange(
-				localPrize,
-				currency,
-				'USD',
-				exchangeDate
-			)
-			if type(usdPrize) == 'number' then
-				return usdPrize
-			end
-		end
+	local usdPrize
+	local currencyRate = Currency.getExchangeRate{
+		currency = currency,
+		date = exchangeDate
+		setVariables = true,
+	}
+	if currencyRate then
+		usdPrize = currencyRate * localPrize
 	end
 
-	return nil
+	return usdPrize
 end
 
 function CustomLeague:_displayPrizeValue(value, numDigits)
