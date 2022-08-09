@@ -13,8 +13,8 @@ local Abbreviation = require('Module:Abbreviation')
 
 local CustomOpponent = Table.deepCopy(Opponent)
 
-function CustomOpponent.resolve(opponent, date)
-	Opponent.resolve(opponent, date, {syncPlayer = true})
+function CustomOpponent.resolve(opponent, date, options)
+	Opponent.resolve(opponent, date, options)
 	if Opponent.typeIsParty(opponent.type) then
 		local PlayerExt = require('Module:Player/Ext/Custom')
 		for _, player in ipairs(opponent.players) do

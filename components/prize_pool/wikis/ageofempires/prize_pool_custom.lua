@@ -26,8 +26,7 @@ local TIER_VALUE = {10, 6, 4, 2}
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.opponentLibrary = 'Opponent/Custom'
-	args.loadFlags = true
-	args.loadTeams = true
+	args.syncPlayers = true
 
 	local prizePool = PrizePool(args)
 		:create()
