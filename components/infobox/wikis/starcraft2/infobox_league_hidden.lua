@@ -307,7 +307,7 @@ function HiddenInfoboxLeague._currencyConversion(localPrize, currency, exchangeD
 	local usdPrize
 	local currencyRate = Currency.getExchangeRate{
 		currency = currency,
-		date = exchangeDate
+		date = exchangeDate,
 		setVariables = true,
 	}
 	if currencyRate then
