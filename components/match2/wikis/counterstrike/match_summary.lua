@@ -287,8 +287,7 @@ function CustomMatchSummary._createBody(match)
 	-- Match Status (postponed/ cancel(l)ed)
 	if match.extradata.status then
 		local matchStatus = MatchStatus()
-		local lang = mw.getContentLanguage()
-		matchStatus:content('\'\'\'Match ' .. lang:ucfirst(match.extradata.status) .. '\'\'\'')
+		matchStatus:content('\'\'\'Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '\'\'\'')
 		body:addRow(matchStatus)
 	end
 
@@ -301,15 +300,14 @@ function CustomMatchSummary._createFooter(match, vods)
 	local separator = '<b>·</b>'
 
 	local function createFooterLink(icon, url, label, index)
-		local _icon = icon
 		if icon == 'stats' then
-			_icon = index ~= 0 and 'Match Info Stats' .. index .. '.png' or 'Match Info Stats.png'
+			icon = index ~= 0 and 'Match Info Stats' .. index .. '.png' or 'Match Info Stats.png'
 		end
 		if index > 0 then
 			label = label .. ' for Game ' .. index
 		end
 
-		return '[[FILE:' .. _icon .. '|link=' .. url .. '|15px|' .. label .. '|alt=' .. url .. ']]'
+		return '[[FILE:' .. icon .. '|link=' .. url .. '|15px|' .. label .. '|alt=' .. url .. ']]'
 	end
 
 	-- Match vod
