@@ -86,6 +86,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
 	pageName = 'string?',
+	team = 'string?',
 })
 
 MatchGroupUtil.types.Opponent = TypeUtil.struct({

@@ -145,6 +145,7 @@ OpponentDisplay.propTypes.BlockOpponent = {
 	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
+	showPlayerTeam = 'boolean?',
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 }
 
@@ -179,6 +180,7 @@ function OpponentDisplay.BlockOpponent(props)
 			player = opponent.players[1],
 			showFlag = props.showFlag,
 			showLink = showLink,
+			showPlayerTeam = props.showPlayerTeam,
 		})
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)

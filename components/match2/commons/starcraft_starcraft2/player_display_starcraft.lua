@@ -34,6 +34,7 @@ StarcraftPlayerDisplay.propTypes.BlockPlayer = {
 	player = StarcraftMatchGroupUtil.types.Player,
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
+	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
 }
 
@@ -64,11 +65,20 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 			:wikitext(StarcraftPlayerDisplay.Race(player.race))
 	end
 
+	local teamNode
+	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
+		teamNode = html.create('span')
+			:wikitext('&nbsp;')
+			:node(mw.ext.TeamTemplate.teampart(player.team))
+	end
+
 	return html.create('div'):addClass('block-player starcraft-block-player')
 		:addClass(props.flip and 'flipped' or nil)
+		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
 		:node(raceNode)
 		:node(nameNode)
+		:node(teamNode)
 end
 
 -- Called from Template:Player and Template:Player2

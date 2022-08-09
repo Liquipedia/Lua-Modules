@@ -66,6 +66,7 @@ StarcraftOpponentDisplay.propTypes.BlockOpponent = {
 	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
+	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 	playerClass = 'string?',
@@ -168,6 +169,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 			player = player,
 			showFlag = props.showFlag,
 			showLink = props.showLink,
+			showPlayerTeam = props.showPlayerTeam,
 			showRace = showRace and not opponent.isArchon and not opponent.isSpecialArchon,
 		})
 			:addClass(props.playerClass)
@@ -185,10 +187,12 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 			playerNodes = playerNodes,
 			raceNode = html.create('div'):wikitext(raceIcon),
 		})
+		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 
 	elseif showRace and opponent.isSpecialArchon then
 		local archonsNode = html.create('div')
 			:addClass('starcraft-special-archon-block-opponent')
+			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 		for archonIx = 1, #opponent.players / 2 do
 			local primaryRace = opponent.players[2 * archonIx - 1].race
 			local secondaryRace = opponent.players[2 * archonIx].race
@@ -219,6 +223,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 
 	else
 		local playersNode = html.create('div')
+			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 		for _, playerNode in ipairs(playerNodes) do
 			playersNode:node(playerNode)
 		end
