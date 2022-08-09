@@ -25,6 +25,4 @@ function WikiSpecific.matchHasDetails(match)
 		or 0 < #match.games
 end
 
-WikiSpecific.defaultIcon = 'Pokemon allmode.png'
-
 return WikiSpecific
