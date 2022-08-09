@@ -95,12 +95,13 @@ end
 function Currency.getExchangeRate(props)
 	local setVariables = Logic.readBool(props.setVariables)
 	local currencyRate = tonumber(props.currencyRate)
+	local currency = props.currency:upper()
 	if not currencyRate then
-		currencyRate = mw.ext.CurrencyExchange.currencyexchange(1, props.currency:upper(), USD:upper(), props.date)
+		currencyRate = mw.ext.CurrencyExchange.currencyexchange(1, currency, USD:upper(), props.date)
 	end
 
 	if setVariables and currencyRate and String.isNotEmpty(currencyRate) then
-		Variables.varDefine(props.currency .. '_rate', currencyRate)
+		Variables.varDefine(currency .. '_rate', currencyRate)
 	end
 
 	return tonumber(currencyRate)
