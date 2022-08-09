@@ -109,7 +109,7 @@ function PrizePoolCurrency._exchange(props)
 		return prizepool, prizepoolUsd, currencyRate, errorMessage
 	end
 
-	if currencyRate and Logic.isNumeric(prizepool) and currencyRate ~= math.huge then
+	if Logic.isNumeric(prizepool) and currencyRate ~= math.huge then
 		prizepoolUsd = tonumber(prizepool) * currencyRate
 	end
 
