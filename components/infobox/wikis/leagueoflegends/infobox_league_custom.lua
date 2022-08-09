@@ -64,27 +64,14 @@ function CustomLeague:liquipediaTierHighlighted()
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
+	lpdbData.participantsnumber = args.participants_number or args.team_number
 	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.player_number) and 'true' or '',
-		isriotpremier = String.isNotEmpty(args.riotpremier) and 'true' or '',
+		individual = String.isNotEmpty(args.participants_number) or 
+			String.isNotEmpty(args.individual) and 'true' or '',
+		['is riot premier'] = String.isNotEmpty(args.riotpremier) and 'true' or '',
 	}
 
 	return lpdbData
-end
-
-function CustomLeague:_standardiseRawDate(dateString)
-	-- Length 7 = YYYY-MM
-	-- Length 10 = YYYY-MM-??
-	if String.isEmpty(dateString) or (#dateString ~= 7 and #dateString ~= 10) then
-		return ''
-	end
-
-	if #dateString == 7 then
-		dateString = dateString .. '-??'
-	end
-	dateString = dateString:gsub('%-XX', '-??')
-	return dateString
 end
 
 function CustomLeague:defineCustomPageVariables()
@@ -96,7 +83,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
 	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype'))
-	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
 
 	--Legacy date vars
