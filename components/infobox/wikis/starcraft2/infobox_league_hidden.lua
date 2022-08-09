@@ -9,6 +9,7 @@
 --this "infobox" has no display and only stores into LPDB, sets wiki vars and categories
 
 local Class = require('Module:Class')
+local Currency = require('Module:Currency')
 local Template = require('Module:Template')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -303,21 +304,17 @@ function HiddenInfoboxLeague._cleanPrizeValue(value)
 end
 
 function HiddenInfoboxLeague._currencyConversion(localPrize, currency, exchangeDate)
-	if exchangeDate and currency and currency ~= 'USD' then
-		if localPrize then
-			local usdPrize = mw.ext.CurrencyExchange.currencyexchange(
-				localPrize,
-				currency,
-				'USD',
-				exchangeDate
-			)
-			if type(usdPrize) == 'number' then
-				return usdPrize
-			end
-		end
+	local usdPrize
+	local currencyRate = Currency.getExchangeRate{
+		currency = currency,
+		date = exchangeDate,
+		setVariables = true,
+	}
+	if currencyRate then
+		usdPrize = currencyRate * localPrize
 	end
 
-	return nil
+	return usdPrize
 end
 
 function HiddenInfoboxLeague._getPatch()
