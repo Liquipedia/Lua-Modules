@@ -120,7 +120,7 @@ function PrizePoolCurrency._exchange(props)
 		prizepoolUsd = PrizePoolCurrency._format(prizepoolUsd)
 	end
 
-	return nil, prizepool, prizepoolUsd, currencyRate
+	return prizepool, prizepoolUsd, currencyRate, nil
 end
 
 function PrizePoolCurrency._format(value)
@@ -142,11 +142,11 @@ function PrizePoolCurrency._errorMessage(message)
 	if Namespace.isMain() then
 		category = CATEGRORY
 	end
-	return mw.html.create('strong')
+	return tostring(mw.html.create('strong')
 		:addClass('error')
 		:wikitext('Error: ')
 		:wikitext(mw.text.nowiki(message))
-		:wikitext(category)
+		:wikitext(category))
 end
 
 return Class.export(PrizePoolCurrency)
