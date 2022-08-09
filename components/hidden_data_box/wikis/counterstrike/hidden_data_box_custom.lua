@@ -15,7 +15,9 @@ local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	args.liquipediatier = Tier.number[args.liquipediatier or '']
+	if args.liquipediatier then
+		args.liquipediatier = Tier.number[args.liquipediatier]
+	end
 	return BasicHiddenDataBox.run(args)
 end
 
@@ -28,13 +30,13 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate'))
 	Variables.varDefine('date', Variables.varDefault('tournament_enddate'))
 
-	Variables.varDefine('tournament_tier', Tier.text[Variables.varDefault('tournament_liquipediatier', '')])
+	Variables.varDefine('tournament_tier', Tier.text[tostring(Variables.varDefault('tournament_liquipediatier', ''))])
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
-	Variables.varDefine('tournament_icon_dark', Variables.varDefault('tournament_icondark'))
+	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))
 
 	Variables.varDefine('match_featured_override', args.featured)
-	Variables.varDefine('tournament_valve_major', args.valvemajor or args.valvetier == 'Major')
-	Variables.varDefine('tournament_valve_tier', args.valvetier)
+	Variables.varDefine('tournament_valve_major', args.valvemajor or (args.valvetier == 'Major' and 'true') or 'false')
+	BasicHiddenDataBox.checkAndAssign('tournament_valve_tier', args.valvetier, queryResult.publishertier)
 end
 
 return Class.export(CustomHiddenDataBox)
