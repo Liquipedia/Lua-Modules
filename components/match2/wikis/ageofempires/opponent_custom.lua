@@ -9,6 +9,7 @@
 local Table = require('Module:Table')
 local Opponent = require('Module:Opponent')
 local Abbreviation = require('Module:Abbreviation')
+local PlayerExt = require('Module:Player/Ext/Custom')
 
 
 local CustomOpponent = Table.deepCopy(Opponent)
@@ -16,7 +17,6 @@ local CustomOpponent = Table.deepCopy(Opponent)
 function CustomOpponent.resolve(opponent, date, options)
 	Opponent.resolve(opponent, date, options)
 	if Opponent.typeIsParty(opponent.type) then
-		local PlayerExt = require('Module:Player/Ext/Custom')
 		for _, player in ipairs(opponent.players) do
 			if Opponent.playerIsTbd(player) then
 				player.displayName = Abbreviation.make('TBD', 'To be determined (or to be decided)')
