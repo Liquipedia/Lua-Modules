@@ -110,7 +110,7 @@ function Currency.getExchangeRate(props)
 	end
 
 	if setVariables and currencyRate and String.isNotEmpty(currencyRate) then
-		Variables.varDefine(currency .. '_rate', currencyRate)
+		Variables.varDefine('exchangerate_' .. currency, currencyRate)
 	end
 
 	return tonumber(currencyRate)
