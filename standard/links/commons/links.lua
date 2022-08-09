@@ -235,6 +235,7 @@ function Links.transform(links)
 		['faceit-c2'] = links['faceit-c2'],
 		['faceit-hub'] = links['faceit-hub'],
 		['faceit-org'] = links['faceit-org'],
+		factor = links.factor,
 		fanclub = links.fanclub,
 		gamersclub = links.gamersclub,
 		gamersclub2 = links.gamersclub2,
