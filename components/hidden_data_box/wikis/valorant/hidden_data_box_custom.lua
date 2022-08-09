@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local String = require('Module:StringUtils')
 local Tier = mw.loadData('Module:Tier')
 local Variables = require('Module:Variables')
 
