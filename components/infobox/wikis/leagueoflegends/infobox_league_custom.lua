@@ -65,8 +65,9 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.participants_number or args.team_number
+	lpdbData.publishertier = Logic.readBool(args.riotpremier) and '1' or ''
 	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.participants_number) or 
+		individual = String.isNotEmpty(args.participants_number) or
 			String.isNotEmpty(args.individual) and 'true' or '',
 		['is riot premier'] = String.isNotEmpty(args.riotpremier) and 'true' or '',
 	}
@@ -77,7 +78,8 @@ end
 function CustomLeague:defineCustomPageVariables()
 	-- Custom Vars
 	Variables.varDefine('tournament_riot_premier', _args.riotpremier)
-	Variables.varDefine('tournament_publishertier', _args.riotpremier)
+	Variables.varDefine('tournament_publisher_major', _args.riotpremier)
+	Variables.varDefine('tournament_publishertier', Logic.readBool(_args.riotpremier) and '1' or nil)
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
