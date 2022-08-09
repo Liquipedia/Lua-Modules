@@ -51,7 +51,7 @@ function PrizePoolCurrency.display(args)
 		prizepoolUsd = PrizePoolCurrency._format(prizepoolUsd)
 	else
 		local errorMessage
-		errorMessage, prizepool, prizepoolUsd, currencyRate = PrizePoolCurrency._exchange{
+		prizepool, prizepoolUsd, currencyRate, errorMessage = PrizePoolCurrency._exchange{
 			currency = currency,
 			currencyRate = currencyRate,
 			date = date,
@@ -106,7 +106,7 @@ function PrizePoolCurrency._exchange(props)
 
 	if not currencyRate then
 		local errorMessage = 'Need valid exchange date'
-		return errorMessage, prizepool, prizepoolUsd, currencyRate
+		return prizepool, prizepoolUsd, currencyRate, errorMessage
 	end
 
 	if currencyRate and Logic.isNumeric(prizepool) and currencyRate ~= math.huge then
@@ -119,7 +119,7 @@ function PrizePoolCurrency._exchange(props)
 		and not Logic.isNumeric(prizepoolUsd)
 	then
 		local errorMessage = 'Need valid currency, exchange rate'
-		return errorMessage, prizepool, prizepoolUsd, currencyRate
+		return prizepool, prizepoolUsd, currencyRate, errorMessage
 	end
 
 	if Logic.isNumeric(prizepool) then
