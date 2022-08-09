@@ -73,20 +73,20 @@ function PrizePoolCurrency.display(args)
 
 		Variables.varDefine('tournament_currency_date', date)
 		Variables.varDefine('tournament_currency_text', text)
-		Variables.varDefine('tournament_prizepoollocal', prizepool)
+		Variables.varDefine('tournament_prizepoollocal', prizepool or '')
 
 		local prizepoolUsdValue = string.gsub(prizepoolUsd or '', ',', '')
 		Variables.varDefine('tournament_prizepoolusd', prizepoolUsdValue)
 
 		-- legacy compatibility
 		Variables.varDefine('tournament_currency_rate', currencyRate or '')
-		Variables.varDefine('tournament_prizepool_local', prizepool)
-		Variables.varDefine('tournament_prizepool_usd', prizepoolUsd)
-		Variables.varDefine('currency', args.currency and currency)
+		Variables.varDefine('tournament_prizepool_local', prizepool or '')
+		Variables.varDefine('tournament_prizepool_usd', prizepoolUsd or '')
+		Variables.varDefine('currency', args.currency and currency or '')
 		Variables.varDefine('currency date', date)
 		Variables.varDefine('currency rate', currencyRate)
-		Variables.varDefine('prizepool', prizepool)
-		Variables.varDefine('prizepool usd', prizepoolUsd)
+		Variables.varDefine('prizepool', prizepool or '')
+		Variables.varDefine('prizepool usd', prizepoolUsd or '')
 		Variables.varDefine('tournament_prizepool', prizepoolUsdValue)
 	end
 
@@ -100,8 +100,8 @@ function PrizePoolCurrency.display(args)
 end
 
 function PrizePoolCurrency._exchange(props)
-	local prizepool = props.prizepool or ''
-	local prizepoolUsd = props.prizepoolUsd or ''
+	local prizepool = props.prizepool
+	local prizepoolUsd = props.prizepoolUsd
 	local currencyRate = Currency.getExchangeRate(props)
 
 	if not currencyRate then
