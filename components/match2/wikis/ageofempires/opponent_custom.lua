@@ -20,10 +20,8 @@ function CustomOpponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if Opponent.playerIsTbd(player) then
 				player.displayName = Abbreviation.make('TBD', 'To be determined (or to be decided)')
-			else
-				if not player.team then
-					player.team = PlayerExt.syncTeam(player.pageName, nil)
-				end
+			elseif not player.team and options.syncPlayer then
+				player.team = PlayerExt.syncTeam(player.pageName, nil)
 			end
 		end
 	end
