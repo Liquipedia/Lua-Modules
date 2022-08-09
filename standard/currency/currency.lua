@@ -98,11 +98,11 @@ function Currency.getExchangeRate(props)
 	end
 	local setVariables = Logic.readBool(props.setVariables)
 	local currencyRate = tonumber(props.currencyRate)
+	if String.isEmpty(props.currency) then
+		error('No currency passed to "Currency.getExchangeRate"')
+	end
 	local currency = props.currency:upper()
 	if not currencyRate then
-		if String.isEmpty(props.currency) then
-			error('No currency passed to "Currency.getExchangeRate"')
-		end
 		if not props.date:match('%d%d%d%d%-%d%d%-%d%d') then
 			error('Invalid date passed to "Currency.getExchangeRate"')
 		end
