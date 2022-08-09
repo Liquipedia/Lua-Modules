@@ -100,7 +100,13 @@ PrizePool.config = {
 		read = function(args)
 			return Logic.readBoolOrNil(args.syncPlayers)
 		end
-	}
+	},
+	currencyRateFromVar = {
+		default = true,
+		read = function(args)
+			return Logic.readBoolOrNil(args.currencyratefromvar)
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
@@ -161,8 +167,14 @@ PrizePool.prizeTypes = {
 			end
 		end,
 
-		convertToUsd = function (headerData, data, date)
-			return mw.ext.CurrencyExchange.currencyexchange(data, headerData.currency, BASE_CURRENCY, date)
+		convertToUsd = function (headerData, data, date, fromVar)
+			local currencyRate = Currency.getExchangeRate{
+				currency = headerData.currency,
+				currencyRate = fromVar and Variables.varDefault(headerData.currency .. '_rate'),
+				date = date,
+				setVariables = fromVar,
+			} or 0
+			return (tonumber(data) or 0) * currencyRate
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
@@ -621,7 +633,7 @@ function PrizePool:_currencyExchangeInfo()
 		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
 			return PrizePool.prizeTypes[prize.type].convertToUsd
-		end), PrizePool._CurrencyConvertionText), ', '))
+		end), PrizePool._CurrencyConvertionText), ', '))--maybe pass self.options.currencyRateFromVar along???
 		wrapper:wikitext('\'\')')
 
 		return tostring(wrapper)
@@ -631,7 +643,7 @@ end
 function PrizePool._CurrencyConvertionText(prize)
 	local exchangeRate = Math.round{
 		PrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToUsd(
-			prize.data, 1, PrizePool._getTournamentDate()
+			prize.data, 1, PrizePool._getTournamentDate(), true --maybe pass self.options.currencyRateFromVar here???
 		)
 		,5
 	}
@@ -1088,7 +1100,7 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 				return
 			end
 
-			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
+			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date, self.parent.options.currencyRateFromVar)
 			self.parent.usedAutoConvertedCurrency = true
 		end)
 
