@@ -291,6 +291,9 @@ end
 
 --[[
 Compute the number of opponents from each round onward in a bracket.
+Computes an array, where each key is round (column) of the bracket,
+and the value is the number of opponents who are either in the
+current round (column) or are seeded into a later round (column).
 ]]
 function MatchGroupCoordinates.computeBracketOpponentCounts(bracket)
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
@@ -310,7 +313,7 @@ end
 --[[
 Computes the number of opponents from each round onward for each section in a
 bracket. Lower bracket counts may be negative. This indicates either that an
-opponent from the upper bracket dropped down to a earlier round, or that some
+opponent from the upper bracket dropped down to an earlier round, or that some
 opponents leave the tournament directly from the upper bracket.
 
 The third place match is not counted.
