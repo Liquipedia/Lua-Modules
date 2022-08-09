@@ -48,7 +48,7 @@ function PrizePoolCurrency.display(args)
 	if currency == USD and String.isEmpty(prizepoolUsd) then
 		return PrizePoolCurrency._errorMessage('Need valid currency')
 	elseif currency == USD then
-		prizepoolUsd = LANG:formatNum(math.floor(prizepoolUsd))
+		prizepoolUsd = PrizePoolCurrency._format(prizepoolUsd)
 	else
 		local errorMessage
 		errorMessage, prizepool, prizepoolUsd, currencyRate = PrizePoolCurrency._exchange{
@@ -90,9 +90,9 @@ function PrizePoolCurrency.display(args)
 		Variables.varDefine('tournament_prizepool', prizepoolUsdValue)
 	end
 
-	local display = Currency.display(USD, prizepoolUsd, {formatValue = false, setVariables = false})
+	local display = Currency.display(USD, prizepoolUsd, {setVariables = false})
 	if String.isNotEmpty(prizepool) then
-		display = Currency.display(currency, prizepool, {formatValue = false, setVariables = true})
+		display = Currency.display(currency, prizepool, {setVariables = true})
 			.. '<br>(≃ ' .. display .. ')'
 	end
 
