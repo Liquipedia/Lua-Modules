@@ -105,21 +105,12 @@ function PrizePoolCurrency._exchange(props)
 	local currencyRate = Currency.getExchangeRate(props)
 
 	if not currencyRate then
-		local errorMessage = 'Need valid exchange date'
+		local errorMessage = 'Need valid currency and exchange date or exchange rate'
 		return prizepool, prizepoolUsd, currencyRate, errorMessage
 	end
 
 	if Logic.isNumeric(prizepool) and currencyRate ~= math.huge then
 		prizepoolUsd = tonumber(prizepool) * currencyRate
-	end
-
-	if
-		not currencyRate
-		and not Logic.isNumeric(prizepool)
-		and not Logic.isNumeric(prizepoolUsd)
-	then
-		local errorMessage = 'Need valid currency, exchange rate'
-		return prizepool, prizepoolUsd, currencyRate, errorMessage
 	end
 
 	if Logic.isNumeric(prizepool) then
