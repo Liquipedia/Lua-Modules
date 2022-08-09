@@ -182,7 +182,7 @@ PrizePool.prizeTypes = {
 				rate = Currency.getExchangeRate{
 					currency = headerData.currency,
 					date = date,
-				} or currencyRate
+				} or rate
 			end
 
 			return (tonumber(data) or 0) * rate
