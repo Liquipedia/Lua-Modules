@@ -9,6 +9,7 @@
 --this "infobox" has no display and only stores into LPDB, sets wiki vars and categories
 
 local Class = require('Module:Class')
+local Currency = require('Module:Currency')
 local Template = require('Module:Template')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
