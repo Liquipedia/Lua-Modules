@@ -54,6 +54,7 @@ function PrizePoolCurrency.display(args)
 		errorMessage, prizepool, prizepoolUsd, currencyRate = PrizePoolCurrency._exchange{
 			currency = currency,
 			currencyRate = currencyRate,
+			date = date,
 			prizepool = prizepool,
 			prizepoolUsd = prizepoolUsd,
 		}
@@ -92,7 +93,7 @@ function PrizePoolCurrency.display(args)
 	local display = Currency.display(USD, prizepoolUsd, {formatValue = false, setVariables = false})
 	if String.isNotEmpty(prizepool) then
 		display = Currency.display(currency, prizepool, {formatValue = false, setVariables = true})
-			.. '<br>(≃ $' .. display .. ')'
+			.. '<br>(≃ ' .. display .. ')'
 	end
 
 	return display
