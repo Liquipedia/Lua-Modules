@@ -1100,7 +1100,12 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 				return
 			end
 
-			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date, self.parent.options.currencyRateFromVar)
+			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(
+				prize.data,
+				localMoney,
+				opponent.date,
+				self.parent.options.currencyRateFromVar
+			)
 			self.parent.usedAutoConvertedCurrency = true
 		end)
 
