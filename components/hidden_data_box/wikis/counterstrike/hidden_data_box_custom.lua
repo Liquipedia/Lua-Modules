@@ -15,7 +15,7 @@ local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	if args.liquipediatier then
+	if args.liquipediatier and not Logic.isNumeric then
 		args.liquipediatier = Tier.number[args.liquipediatier]
 	end
 	return BasicHiddenDataBox.run(args)
