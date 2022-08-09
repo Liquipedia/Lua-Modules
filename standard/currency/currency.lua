@@ -99,7 +99,7 @@ function Currency.getExchangeRate(props)
 		currencyRate = mw.ext.CurrencyExchange.currencyexchange(1, props.currency:upper(), USD, props.date)
 	end
 
-	if setVariables and String.isNotEmpty(currencyRate) then
+	if setVariables and currencyRate and String.isNotEmpty(currencyRate) then
 		Variables.varDefine(props.currency .. '_rate', currencyRate)
 	end
 
