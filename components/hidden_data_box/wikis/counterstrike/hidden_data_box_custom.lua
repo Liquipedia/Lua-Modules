@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Tier = mw.loadData('Module:Tier')
 local Variables = require('Module:Variables')
 
@@ -15,7 +16,7 @@ local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	if args.liquipediatier and not Logic.isNumeric then
+	if args.liquipediatier and not Logic.isNumeric(args.liquipediatier) then
 		args.liquipediatier = Tier.number[args.liquipediatier]
 	end
 	return BasicHiddenDataBox.run(args)
