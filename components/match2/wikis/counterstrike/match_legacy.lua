@@ -60,15 +60,14 @@ function MatchLegacy.convertParameters(match2)
 	end
 
 	match.extradata = {
-		timezone = extradata.timezoneoffset,
-		timezoneID = extradata.timezoneid,
-		matchsection = extradata.matchsection,
-		opponent1rounds = 0,
-		opponent2rounds = 0,
+		timezone = extradata.timezoneoffset or '',
+		timezoneID = extradata.timezoneid or '',
+		matchsection = extradata.matchsection or '',
 		overturned = Logic.readBool(extradata.overturned) and '1' or '',
 		hidden = Logic.readBool(extradata.hidden) and '1' or '0',
 		featured = Logic.readBool(extradata.featured) and '1' or '0',
-		icondark = Variables.varDefault('tournament_icon_dark'),
+		cancelled = '',
+		icondark = match2.icondark,
 		team1icon = match2.match2opponents[1] and match2.match2opponents[1].icon or nil,
 		team2icon = match2.match2opponents[2] and match2.match2opponents[2].icon or nil,
 	}
@@ -76,22 +75,23 @@ function MatchLegacy.convertParameters(match2)
 	if extradata.status then
 		if extradata.status == 'cancelled' or extradata.status == 'canceled' then
 			match.extradata.cancelled = '1'
-		else
-			match.extradata.cancelled = ''
 		end
 	end
 
+	local opponent1Rounds, opponent2Rounds = 0, 0
 	local maps = {}
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		local scores = ''
 		if type(scores) == 'string' then
 			scores = Json.parse(game.scores)
 		end
-		match.extradata.opponent1rounds = match.extradata.opponent1rounds + (tonumber(scores[1] or '') or 0)
-		match.extradata.opponent2rounds = match.extradata.opponent2rounds + (tonumber(scores[2] or '') or 0)
+		opponent1Rounds = opponent1Rounds + (tonumber(scores[1] or '') or 0)
+		opponent2Rounds = opponent2Rounds + (tonumber(scores[2] or '') or 0)
 		match.extradata['vodgame' .. gameIndex] = game.vod
 		table.insert(maps, game.map)
 	end
+	match.extradata.opponent1rounds = tostring(opponent1Rounds)
+	match.extradata.opponent2rounds = tostring(opponent2Rounds)
 	match.extradata.maps = table.concat(maps, ',')
 
 	if #maps > 0 then
@@ -211,7 +211,7 @@ function MatchLegacy.storeMatchSMW(match)
 			['has tournament'] = mw.title.getCurrentTitle().prefixedText,
 			['has tournament tier'] =  Variables.varDefault('tournament_tier'), -- Legacy support Infobox
 			['has tournament tier number'] = match.liquipediatier, -- or this ^
-			['has tournament icon'] = Variables.varDefault('tournament_icon'),
+			['has tournament icon'] = match.icon,
 			['has tournament name'] = match.tickername,
 			['is part of tournament series'] = match.series,
 			['has match vod'] = match.vod or '',
