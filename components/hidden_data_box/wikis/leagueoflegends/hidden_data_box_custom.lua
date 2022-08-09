@@ -32,9 +32,21 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 
 	BasicHiddenDataBox.checkAndAssign('patch', args.patch, queryResult.patch)
-	BasicHiddenDataBox.checkAndAssign('tournament_publishertier', Logic.readBool(args.riotpremier) and '1' or nil, queryResult.publishertier)
-	BasicHiddenDataBox.checkAndAssign('tournament_riot_premier', args.riotpremier, queryResult.extradata['is riot premier'])
-	BasicHiddenDataBox.checkAndAssign('tournament_publisher_major', args.riotpremier, queryResult.extradata['is riot premier'])
+	BasicHiddenDataBox.checkAndAssign(
+		'tournament_publishertier',
+		Logic.readBool(args.riotpremier) and '1' or nil,
+		queryResult.publishertier
+	)
+	BasicHiddenDataBox.checkAndAssign(
+		'tournament_riot_premier',
+		args.riotpremier,
+		queryResult.extradata['is riot premier']
+	)
+	BasicHiddenDataBox.checkAndAssign(
+		'tournament_publisher_major',
+		args.riotpremier,
+		queryResult.extradata['is riot premier']
+	)
 end
 
 return Class.export(CustomHiddenDataBox)
