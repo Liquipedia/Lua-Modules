@@ -13,9 +13,10 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local Template = require('Module:Template')
 
 local _args
+
+local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Premier Tournament held by Riot Games]]'
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -52,7 +53,7 @@ end
 
 function CustomLeague:appendLiquipediatierDisplay()
 	if Logic.readBool(_args.riotpremier) then
-		return ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Riot/infobox')
+		return ' ' .. RIOT_ICON
 	end
 	return ''
 end
@@ -64,6 +65,7 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.participants_number or args.team_number
 	lpdbData.publishertier = Logic.readBool(args.riotpremier) and '1' or ''
+
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.participants_number) or
 			String.isNotEmpty(args.individual) and 'true' or '',
