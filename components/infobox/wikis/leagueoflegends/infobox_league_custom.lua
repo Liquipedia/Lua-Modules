@@ -25,6 +25,9 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
+	_args.tickername = _args.tickername or _args.shortname
+
+
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
