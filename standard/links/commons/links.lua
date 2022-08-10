@@ -74,6 +74,11 @@ local _PREFIXES = {
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
+	factor = {
+		'',
+		team = 'https://www.factor.gg/team/',
+		player = 'https://www.factor.gg/player/',
+	},
 	fanclub = {''},
 	gamersclub = {
 		'https://csgo.gamersclub.gg/campeonatos/csgo/',
@@ -230,6 +235,7 @@ function Links.transform(links)
 		['faceit-c2'] = links['faceit-c2'],
 		['faceit-hub'] = links['faceit-hub'],
 		['faceit-org'] = links['faceit-org'],
+		factor = links.factor,
 		fanclub = links.fanclub,
 		gamersclub = links.gamersclub,
 		gamersclub2 = links.gamersclub2,
