@@ -155,7 +155,13 @@ PrizePool.config = {
 		read = function(args)
 			return Logic.readBoolOrNil(args.syncPlayers)
 		end
-	}
+	},
+	currencyRatePerOpponent = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.currencyrateperopponent)
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
