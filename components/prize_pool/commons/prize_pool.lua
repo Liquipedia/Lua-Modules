@@ -100,7 +100,13 @@ PrizePool.config = {
 		read = function(args)
 			return Logic.readBoolOrNil(args.syncPlayers)
 		end
-	}
+	},
+	currencyRatePerOpponent = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.currencyrateperopponent)
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
@@ -134,9 +140,17 @@ PrizePool.prizeTypes = {
 			end
 			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
 
+			local currencyRate = Currency.getExchangeRate{
+				currency = currencyData.code,
+				currencyRate = Variables.varDefault('exchangerate_' .. currencyData.code),
+				date = prizePool.date,
+				setVariables = true,
+			}
+
 			return {
 				currency = currencyData.code, currencyText = currencyText,
 				symbol = currencyData.symbol, symbolFirst = not currencyData.isAfter,
+				rate = currencyRate or 0,
 			}
 		end,
 		headerDisplay = function (data)
@@ -161,8 +175,17 @@ PrizePool.prizeTypes = {
 			end
 		end,
 
-		convertToUsd = function (headerData, data, date)
-			return mw.ext.CurrencyExchange.currencyexchange(data, headerData.currency, BASE_CURRENCY, date)
+		convertToUsd = function (headerData, data, date, perOpponent)
+			local rate = headerData.rate
+
+			if perOpponent then
+				rate = Currency.getExchangeRate{
+					currency = headerData.currency,
+					date = date,
+				} or rate
+			end
+
+			return (tonumber(data) or 0) * rate
 		end,
 	},
 	[PRIZE_TYPE_QUALIFIES] = {
@@ -1056,7 +1079,12 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 				return
 			end
 
-			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(prize.data, localMoney, opponent.date)
+			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(
+				prize.data,
+				localMoney,
+				opponent.date,
+				self.parent.options.currencyRatePerOpponent
+			)
 			self.parent.usedAutoConvertedCurrency = true
 		end)
 
