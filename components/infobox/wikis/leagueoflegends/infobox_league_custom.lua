@@ -16,15 +16,13 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Template = require('Module:Template')
 
 local _args
-local _league
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-	_league = league
-	_args = _league.args
+	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -43,7 +41,7 @@ function CustomInjector:addCustomCells(widgets)
 	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Teams',
-		content = {(args.team_number or '')}
+		content = {args.team_number}
 	})
 	table.insert(widgets, Cell{
 		name = 'Players',
@@ -53,7 +51,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomLeague:appendLiquipediatierDisplay()
-	if String.isEmpty(_args.pctier) and Logic.readBool(_args.riotpremier) then
+	if Logic.readBool(_args.riotpremier) then
 		return ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Riot/infobox')
 	end
 	return ''
@@ -96,13 +94,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
-end
-
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
 end
 
 return CustomLeague
