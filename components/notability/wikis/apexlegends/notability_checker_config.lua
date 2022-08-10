@@ -212,24 +212,24 @@ Config.weights = {
 function Config.placementDropOffFunction(tier, tierType)
 
 		return function(score, placement)
-			if (tier == 1)  
-				or (tier == 2 and placement <= 10) 
-				or (tier == 3 and placement <= 10) 
-				or (tier == 4 and placement <= 3) 
-				or (tier == 5 and placement <= 3) 
+			if (tier == 1)
+				or (tier == 2 and placement <= 10)
+				or (tier == 3 and placement <= 10)
+				or (tier == 4 and placement <= 3)
+				or (tier == 5 and placement <= 3)
 			then
 				return score
-			elseif (tier == 2 and placement <= 20) 
-				or (tier == 4 and placement <= 5) 
+			elseif (tier == 2 and placement <= 20)
+				or (tier == 4 and placement <= 5)
 			then
 				return (score * 0.5)
-			elseif (tier == 3 and placement <= 20) 
+			elseif (tier == 3 and placement <= 20)
 			then
 				return (score * 0.4)
-			elseif ((tier == 2 or tier == 3) and (placement <= 30)) 
+			elseif ((tier == 2 or tier == 3) and (placement <= 30))
 			then
 				return (score * 0.2)
-			elseif (tier == 2) 
+			elseif (tier == 2)
 			then
 				return (score * 0.1)
 			else
