@@ -44,6 +44,7 @@ local CustomMatchGroupInput = {}
 function CustomMatchGroupInput.processMatch(_, match)
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
+	match = matchFunctions.getLinks(match)
 	match = matchFunctions.removeUnsetMaps(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 
@@ -54,7 +55,6 @@ function CustomMatchGroupInput.processMatch(_, match)
 	)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getOpponents(match)
-	match = matchFunctions.getLinks(match)
 	match = matchFunctions.getExtraData(match)
 
 	return match
