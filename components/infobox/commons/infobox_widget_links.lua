@@ -62,6 +62,7 @@ local _PRIORITY_GROUPS = {
 		'faceit-c',
 		'faceit-hub',
 		'faceit-org',
+		'factor',
 		'gamersclub',
 		'halodatahive',
 		'letsplaylive',
