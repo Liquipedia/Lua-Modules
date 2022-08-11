@@ -150,6 +150,7 @@ function LegacyPrizePool.mapOpponents(slot)
 
 		local opponentData = {
 			[1] = slot[opponentIndex],
+			type = slot['literal' .. opponentIndex] and Opponent.literal or nil,
 			date = slot['date' .. opponentIndex],
 			link = slot['link' .. opponentIndex],
 			wdl = slot['wdl' .. opponentIndex],
