@@ -1003,18 +1003,15 @@ function Placement:_getLpdbData()
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
-			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template)
+			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
 
-			participant = ''
-			if teamTemplate then
-				participant = teamTemplate.page
-				if self.parent.options.resolveRedirect then
-					participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
-				end
-
-				image = teamTemplate.image
-				imageDark = teamTemplate.imagedark
+			participant = teamTemplate and teamTemplate.page or ''
+			if self.parent.options.resolveRedirect then
+				participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
 			end
+
+			image = teamTemplate.image
+			imageDark = teamTemplate.imagedark
 		elseif opponentType == Opponent.solo then
 			participant = Opponent.toName(opponent.opponentData)
 			local p1 = opponent.opponentData.players[1]
