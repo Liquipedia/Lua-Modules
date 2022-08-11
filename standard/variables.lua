@@ -10,19 +10,36 @@ local Class = require('Module:Class')
 
 local Variables = {}
 
-function Variables.varDefine(name, val)
-	return mw.ext.VariablesLua.vardefine(name, val)
+---Stores a wiki-variable and returns the empty string
+---@param name string Key of the wiki-variable
+---@param value string Value of the wiki-variable
+---@return string #always the empty string
+function Variables.varDefine(name, value)
+	return mw.ext.VariablesLua.vardefine(name, value)
 end
 
-function Variables.varDefineEcho(name, val)
-	return mw.ext.VariablesLua.vardefineecho(name, val)
+---Stored a wiki-variable and returns it
+---@param name string Key of the wiki-variable
+---@param value string Value of the wiki-variable
+---@return string
+function Variables.varDefineEcho(name, value)
+	return mw.ext.VariablesLua.vardefineecho(name, value)
 end
 
+---Gets the stored value of a wiki-variable 
+---@generic T
+---@param name string Key of the wiki-variable
+---@param default T fallback value if wiki-variable is not defined
+---@return string|T
+---@overload fun(name: string):string?
 function Variables.varDefault(name, default)
 	local val = mw.ext.VariablesLua.var(name)
 	return (val ~= '' and val ~= nil) and val or default
 end
 
+---
+---@param ... string wiki-variable keys
+---@return string
 function Variables.varDefaultMulti(...)
 	--pack varargs
 	local varargs = { n = select('#', ...), ... }
