@@ -30,6 +30,12 @@ local HEADER_DATA = {}
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
+
+	-- Turn off automations
+	args.prizesummary = false
+	args.autousd = false
+	args.exchangeInfo = false
+
 	local prizePool = PrizePool(args):create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
