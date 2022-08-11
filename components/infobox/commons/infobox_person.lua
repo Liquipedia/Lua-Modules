@@ -46,6 +46,9 @@ local _COUNTRIES_EASTERN_NAME_ORDER = {
 	'South Korea',
 	'Cambodia'
 }
+local STATUS_INACTIVE = 'inactive'
+local STATUS_BANNED = 'banned'
+local STATUS_RETIRED = 'retired'
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -440,10 +443,14 @@ function Person:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, 'Deceased ' .. personType .. 's')
 		elseif
 			args.retired == 'yes' or args.retired == 'true'
-			or string.lower(status or '') == 'retired'
+			or string.lower(status or '') == STATUS_RETIRED
 			or string.match(args.retired or '', '%d%d%d%d')--if retired has year set apply the retired category
 		then
 			table.insert(categories, 'Retired ' .. personType .. 's')
+		elseif string.lower(status or '') == STATUS_INACTIVE then
+			table.insert(categories, 'Inactive ' .. personType .. 's')
+		elseif string.lower(status or '') == STATUS_BANNED then
+			table.insert(categories, 'Banned ' .. personType .. 's')
 		else
 			table.insert(categories, 'Active ' .. personType .. 's')
 			if not team then
