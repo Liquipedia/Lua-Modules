@@ -129,6 +129,16 @@ function LegacyPrizePool.mapOpponents(slot)
 			return
 		end
 
+		-- Map Legacy WO flags into score
+		if slot['walkoverfrom' .. opponentIndex] or slot['wofrom' .. opponentIndex] then
+			slot['lastscore' .. opponentIndex] = 'W'
+			slot['lastvsscore' .. opponentIndex] = 'FF'
+
+		elseif slot['walkoverto' .. opponentIndex] or slot['woto' .. opponentIndex] then
+			slot['lastscore' .. opponentIndex] = 'FF'
+			slot['lastvsscore' .. opponentIndex] = 'W'
+		end
+
 		local opponentData = {
 			[1] = slot[opponentIndex],
 			date = slot['date' .. opponentIndex],
