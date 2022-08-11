@@ -8,8 +8,10 @@
 
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
+local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
@@ -23,12 +25,33 @@ local CustomPrizePool = {}
 local TIER_VALUE = {10, 6, 4, 2}
 local TYPE_MODIFIER = {offline = 1, ['offline/online'] = 0.75, ['online/offline'] = 0.75, default = 0.65}
 
+local HEADER_DATA = {}
+
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
+
+	if args['smw mute'] or not Namespace.isMain() then
+		prizePool:setConfig('storeSmw', false)
+		prizePool:setConfig('storeLpdb', false)
+	end
+
+	HEADER_DATA.tournamentName = args['tournament name']
+	HEADER_DATA.resultName = args['custom-name']
+
+	if Logic.readBool(args.qualifier) then
+		mw.ext.LiquipediaDB.lpdb_tournament('tournament_'.. Variables.varDefault('tournament_name', ''), {
+			extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+				prizepoollocal = Variables.varDefault('prizepoollocal', ''),
+				startdate_raw = Variables.varDefault('raw_sdate', ''),
+				enddate_raw = Variables.varDefault('raw_edate', ''),
+				qualifier = '1',
+			}
+		})
+	end
 
 	return prizePool:build()
 end
@@ -57,7 +80,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		lpdbData.extradata.lastvsflag = opponent.additionalData.LASTVS.players[1].flag
 	end
 
-	lpdbData.extradata.scorename = Variables.varDefault('custom result name')
+	lpdbData.extradata.scorename = HEADER_DATA.resultName
+	lpdbData.tournament = HEADER_DATA.tournamentName or lpdbData.tournament
 
 	if lpdbData.opponenttype == Opponent.solo then
 		lpdbData.extradata.participantteam = lpdbData.players.p1team
