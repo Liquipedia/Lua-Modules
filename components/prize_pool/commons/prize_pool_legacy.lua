@@ -120,7 +120,6 @@ function LegacyPrizePool.mapSlot(slot)
 
 	Table.mergeInto(newData, LegacyPrizePool.mapOpponents(slot))
 
-	mw.logObject(newData)
 	return newData
 end
 
