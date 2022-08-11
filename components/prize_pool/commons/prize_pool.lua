@@ -1013,9 +1013,9 @@ function Placement:_getLpdbData()
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
-			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template)
+			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
 
-			participant = teamTemplate and teamTemplate.page or ''
+			participant = teamTemplate.page or ''
 			if self.parent.options.resolveRedirect then
 				participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
 			end
