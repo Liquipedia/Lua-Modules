@@ -346,13 +346,10 @@ PrizePool.additionalData = {
 			local rawScores = Table.mapValues(mw.text.split(input, '-'), mw.text.trim)
 			local scores = {}
 			for index, rawScore in ipairs(rawScores) do
-				if String.isNotEmpty(rawScore) or not rawScores[index + 1]
-					or (rawScores[index + 1] and String.isEmpty(rawScores[index + 1])) then
-
-					table.insert(scores, rawScore)
-
-				elseif rawScores[index + 1] then
+				if String.isEmpty(rawScore) and rawScores[index + 1] and String.isNotEmpty(rawScores[index + 1]) then
 					rawScores[index + 1] = '-' .. rawScores[index + 1]
+				else
+					table.insert(scores, rawScore)
 				end
 			end
 
