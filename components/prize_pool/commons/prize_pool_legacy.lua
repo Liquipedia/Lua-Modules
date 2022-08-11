@@ -29,7 +29,7 @@ local CACHED_DATA = {
 	qualifiers = {},
 }
 
-local CHECKMARK = '<div class="fa fa-check green-check" style="cursor: auto;"></div>'
+local CHECKMARK = '<div class="fa fa-check green-check"></div>'
 
 local CUSTOM_HANDLER
 
