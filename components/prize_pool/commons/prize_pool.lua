@@ -492,7 +492,7 @@ function PrizePool:_getPrizeSummaryText()
 		table.insert(displayText, ')')
 	end
 
-	table.insert(displayText, ' are spread among the teams as seen below:')
+	table.insert(displayText, ' are spread among the participants as seen below:')
 	table.insert(displayText, '<br>')
 
 	return table.concat(displayText)
