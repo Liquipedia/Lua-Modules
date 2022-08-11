@@ -44,7 +44,9 @@ function StandingsStorage.run(data, legacyData)
 
 	Array.forEach(data.entries, function (entry)
 		StandingsStorage.entry(entry, standingsIndex)
-		StandingsStorage.legacy(entry.slotindex, entry)
+		if not data.noLegacy then
+			StandingsStorage.legacy(entry.slotindex, entry)
+		end
 	end)
 end
 
