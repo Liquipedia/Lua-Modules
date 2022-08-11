@@ -101,7 +101,7 @@ function StarcraftOpponent.fromLpdbStruct(storageStruct)
 		opponent.isArchon = storageStruct.opponentplayers.isArchon
 		for playerIndex, player in pairs(opponent.players) do
 			player.race = storageStruct.opponentplayers['p' .. playerIndex .. 'faction']
-				or storageStruct.faction
+				or storageStruct.opponentplayers.faction
 		end
 	end
 
