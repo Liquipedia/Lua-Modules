@@ -380,7 +380,7 @@ function Opponent.toLpdbStruct(opponent)
 			players[prefix] = player.pageName
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
-			players[prefix .. 'team'] = player.team and Opponent.toName({type = Opponent.team, template = player.team})
+			players[prefix .. 'team'] = player.team and Opponent.toName({type = Opponent.team, template = player.team}) or nil
 			players[prefix .. 'template'] = player.team
 		end
 		storageStruct.opponentplayers = players
