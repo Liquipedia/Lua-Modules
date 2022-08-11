@@ -988,7 +988,7 @@ function Placement:_parseOpponentArgs(input, date)
 
 	local opponentData = Opponent.readOpponentArgs(opponentArgs)
 
-	if not opponentData or (opponentData.type ~= Opponent.literal and Opponent.isTbd(opponentData)) then
+	if not opponentData or (Opponent.isTbd(opponentData) and opponentData.type ~= Opponent.literal) then
 		opponentData = Opponent.tbd(opponentArgs.type)
 	end
 
