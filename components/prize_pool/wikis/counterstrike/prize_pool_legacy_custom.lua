@@ -22,6 +22,12 @@ function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
 		newData.freetext1 = nil
 	end
 
+	if newData.localprize then
+		if newData.localprize:match('[^,%.%d]') then
+			error('Unexpected value in localprize for place=' .. slot.place)
+		end
+	end
+
 	return newData
 end
 
