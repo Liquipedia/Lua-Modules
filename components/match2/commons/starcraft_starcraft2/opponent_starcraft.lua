@@ -82,11 +82,11 @@ function StarcraftOpponent.toLpdbStruct(opponent)
 
 	if Opponent.typeIsParty(opponent.type) then
 		if opponent.isArchon then
-			storageStruct.players.isArchon = true
-			storageStruct.players.faction = opponent.players[1].race
+			storageStruct.opponentplayers.isArchon = true
+			storageStruct.opponentplayers.faction = opponent.players[1].race
 		else
 			for playerIndex, player in pairs(opponent.players) do
-				storageStruct.players['p' .. playerIndex .. 'faction'] = player.race
+				storageStruct.opponentplayers['p' .. playerIndex .. 'faction'] = player.race
 			end
 		end
 	end
@@ -98,9 +98,9 @@ function StarcraftOpponent.fromLpdbStruct(storageStruct)
 	local opponent = Opponent.fromLpdbStruct(storageStruct)
 
 	if Opponent.partySize(storageStruct.opponenttype) then
-		opponent.isArchon = storageStruct.players.isArchon
+		opponent.isArchon = storageStruct.opponentplayers.isArchon
 		for playerIndex, player in pairs(opponent.players) do
-			player.race = storageStruct['p' .. playerIndex .. 'faction']
+			player.race = storageStruct.opponentplayers['p' .. playerIndex .. 'faction']
 				or storageStruct.faction
 		end
 	end
