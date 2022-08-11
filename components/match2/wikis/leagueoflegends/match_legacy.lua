@@ -147,6 +147,8 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.team1side = extradata.team1side
 		game.extradata.team2side = extradata.team2side
 
+		game.extradata.parent = game2.parent
+
 		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
 
 		-- Other stuff
