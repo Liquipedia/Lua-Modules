@@ -27,6 +27,8 @@ function CustomHiddenDataBox.run(args)
 end
 
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	queryResult.extradata = queryResult.extradata or {}
+
 	--legacy variables
 	Variables.varDefine('tournament_parent_name', Variables.varDefault('tournament_parentname', ''))
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))

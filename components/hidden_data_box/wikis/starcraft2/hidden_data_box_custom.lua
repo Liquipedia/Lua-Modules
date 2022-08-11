@@ -23,6 +23,8 @@ function CustomHiddenDataBox.run(args)
 end
 
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	queryResult.extradata = queryResult.extradata or {}
+
 	--legacy variables
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
@@ -41,7 +43,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	BasicHiddenDataBox.checkAndAssign(
 		'featured',
 		args.featured,
-		(queryResult.extradata or {}).featured
+		queryResult.extradata.featured
 	)
 	if args.team_number then
 		Variables.varDefine('is_team_tournament', 1)
