@@ -48,7 +48,7 @@ function CustomPrizePool.run(frame)
 				prizepoollocal = Variables.varDefault('prizepoollocal', ''),
 				startdate_raw = Variables.varDefault('raw_sdate', ''),
 				enddate_raw = Variables.varDefault('raw_edate', ''),
-				qualifier = '1',
+				qualifier = '1', -- This is the new field, rest are just what Infobox League sets
 			}
 		})
 	end
