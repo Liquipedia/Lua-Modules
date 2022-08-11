@@ -58,6 +58,9 @@ local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
 
+-- Allowed none-numeric score values.
+local SPECIAL_SCORES = {'W', 'FF', 'L', 'DQ', 'D'}
+
 PrizePool.config = {
 	showUSD = {
 		default = false
@@ -332,7 +335,14 @@ PrizePool.additionalData = {
 	LASTVSSCORE = {
 		field = 'lastvsscore',
 		parse = function (placement, input, context)
-			local scores = Table.mapValues(mw.text.split(input, '-'), tonumber)
+			local forceValidScore = function(score)
+				if Table.includes(SPECIAL_SCORES, score:upper()) then
+					return score:upper()
+				end
+				return tonumber(score)
+			end
+
+			local scores = Table.mapValues(Table.mapValues(mw.text.split(input, '-'), mw.text.trim), forceValidScore)
 			return {score = scores[1], vsscore = scores[2]}
 		end
 	},
