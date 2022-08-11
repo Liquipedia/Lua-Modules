@@ -346,12 +346,13 @@ PrizePool.additionalData = {
 			local rawScores = Table.mapValues(mw.text.split(input, '-'), mw.text.trim)
 			local scores = {}
 			for index, rawScore in ipairs(rawScores) do
-				if String.isNotEmpty(rawScore) or (rawScores[index + 1] and String.isEmpty(rawScores[index + 1])) then
+				if String.isNotEmpty(rawScore) or not rawScores[index + 1]
+					or (rawScores[index + 1] and String.isEmpty(rawScores[index + 1])) then
+
 					table.insert(scores, rawScore)
+
 				elseif rawScores[index + 1] then
 					rawScores[index + 1] = '-' .. rawScores[index + 1]
-				else
-					error('Invalid entry "|lastvsscore=' .. input .. '"')
 				end
 			end
 
