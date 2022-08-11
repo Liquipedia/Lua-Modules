@@ -243,7 +243,7 @@ options.syncPlayer: Whether to fetch player information from variables or LPDB. 
 function Opponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
-		opponent.template = TeamTemplate.resolve(opponent.template, date) or 'tbd'
+		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
 	elseif Opponent.typeIsParty(opponent.type) then
 		local PlayerExt = require('Module:Player/Ext')
 		for _, player in ipairs(opponent.players) do
