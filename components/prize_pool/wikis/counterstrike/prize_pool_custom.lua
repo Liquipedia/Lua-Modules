@@ -88,6 +88,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.extradata.scorename = HEADER_DATA.resultName
 	lpdbData.tournament = HEADER_DATA.tournamentName or lpdbData.tournament
+	lpdbData.publishertier = Variables.varDefault('tournament_valve_tier', '')
 
 	if lpdbData.opponenttype == Opponent.solo then
 		lpdbData.extradata.participantteam = lpdbData.players.p1team
