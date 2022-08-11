@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Currency = require('Module:Currency')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
+local Page = require('Module:Page')
 local Points = mw.loadData('Module:Points/data')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -27,6 +28,8 @@ local CACHED_DATA = {
 	inputToId = {},
 	qualifiers = {},
 }
+
+local CHECKMARK = '<div class="fa fa-check green-check" style="cursor: auto;"></div>'
 
 local CUSTOM_HANDLER
 
@@ -110,6 +113,12 @@ function LegacyPrizePool.mapSlot(slot)
 			end
 
 		elseif input and input ~= 0 then
+			-- Handle the legacy checkmarks, they were set in value = 'q'
+			-- If want, in the future this could be parsed as a Qualification instead of a freetext as now
+			if input == 'q' then
+				input = slot.link and Page.makeInternalLink(CHECKMARK, slot.link) or CHECKMARK
+			end
+
 			newData[newParameter] = input
 		end
 	end)
