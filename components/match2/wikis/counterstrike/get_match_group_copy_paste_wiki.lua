@@ -26,7 +26,8 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
 	local hltv = Logic.readBool(args.hltv)
 	local mapStats = args.mapStats and wikiCopyPaste._ipairsSet(mw.text.split(args.mapStats, ', ')) or {}
-	local matchMatchpages = args.matchMatchpages and wikiCopyPaste._ipairsSet(mw.text.split(args.matchMatchpages, ', ')) or {}
+	local matchMatchpages = args.matchMatchpages and
+								wikiCopyPaste._ipairsSet(mw.text.split(args.matchMatchpages, ', ')) or {}
 	local out = '{{Match'
 
 	if hltv then
