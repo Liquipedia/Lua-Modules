@@ -8,6 +8,7 @@
 
 local Logic = require('Module:Logic')
 local Opponent = require('Module:Opponent')
+local PlayerExt = require('Module:Player/Ext')
 local StarcraftRace = require('Module:Race/Starcraft')
 local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local Table = require('Module:Table')
@@ -124,7 +125,7 @@ function StarcraftOpponent.resolve(opponent, date, options)
 			if options.syncPlayer then
 				StarcraftPlayerExt.syncPlayer(player)
 			else
-				StarcraftPlayerExt.populatePageName(player)
+				PlayerExt.populatePageName(player)
 			end
 			if player.team then
 				player.team = TeamTemplate.resolve(player.team, date)
