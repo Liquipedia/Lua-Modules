@@ -34,7 +34,7 @@ function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
 end
 
 function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, opponentIndex)
-	-- CS didn't support multiple points (etc), however they supported points (etc) per opponent 
+	-- CS didn't support multiple points (etc), however they supported points (etc) per opponent
 
 	if slot['usdprize' .. opponentIndex] then
 		opponentData.usdprize = slot['usdprize' .. opponentIndex]
