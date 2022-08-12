@@ -342,7 +342,18 @@ PrizePool.additionalData = {
 				return tonumber(score)
 			end
 
-			local scores = Table.mapValues(Table.mapValues(mw.text.split(input, '-'), mw.text.trim), forceValidScore)
+			-- split the lastvsscore entry by '-', but allow negative scores
+			local rawScores = Table.mapValues(mw.text.split(input, '-'), mw.text.trim)
+			local scores = {}
+			for index, rawScore in ipairs(rawScores) do
+				if String.isEmpty(rawScore) and String.isNotEmpty(rawScores[index + 1]) then
+					rawScores[index + 1] = '-' .. rawScores[index + 1]
+				else
+					table.insert(scores, rawScore)
+				end
+			end
+
+			scores = Table.mapValues(scores, forceValidScore)
 			return {score = scores[1], vsscore = scores[2]}
 		end
 	},
