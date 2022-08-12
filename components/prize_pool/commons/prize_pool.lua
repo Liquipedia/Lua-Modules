@@ -110,6 +110,12 @@ PrizePool.config = {
 			return Logic.readBoolOrNil(args.currencyrateperopponent)
 		end
 	},
+	currencyRoundPrecision = {
+		default = 2,
+		read = function(args)
+			return tonumber(args.currencyroundprecision)
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
@@ -128,7 +134,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {{'$', Currency.formatMoney(data)}}}
+				return TableCell{content = {{'$', Currency.formatMoney(data, headerData.roundPrecision)}}}
 			end
 		end,
 	},
@@ -153,7 +159,7 @@ PrizePool.prizeTypes = {
 			return {
 				currency = currencyData.code, currencyText = currencyText,
 				symbol = currencyData.symbol, symbolFirst = not currencyData.isAfter,
-				rate = currencyRate or 0,
+				rate = currencyRate or 0, roundPrecision = prizePool.options.currencyRoundPrecision,
 			}
 		end,
 		headerDisplay = function (data)
@@ -166,7 +172,7 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				local displayText = {Currency.formatMoney(data)}
+				local displayText = {Currency.formatMoney(data, headerData.roundPrecision)}
 
 				if headerData.symbolFirst then
 					table.insert(displayText, 1, headerData.symbol)
@@ -429,7 +435,7 @@ function PrizePool:create()
 
 	if self:_hasUsdPrizePool() then
 		self:setConfig('showUSD', true)
-		self:addPrize(PRIZE_TYPE_USD, 1)
+		self:addPrize(PRIZE_TYPE_USD, 1, {roundPrecision = self.options.currencyRoundPrecision})
 
 		if self.options.autoUSD then
 			local canConvertCurrency = function(prize)
