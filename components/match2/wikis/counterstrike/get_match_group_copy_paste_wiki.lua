@@ -9,7 +9,6 @@
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
-local Set = require('Module:Set')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -26,22 +25,33 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mapDetails = Logic.readBool(args.detailedMap)
 	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
 	local hltv = Logic.readBool(args.hltv)
-	local mapStats = args.mapStats and Set(mw.text.split(args.mapStats, ', ')):toArray() or {}
-	local matchMatchpages = args.matchMatchpages and Set(mw.text.split(args.matchMatchpages, ', ')):toArray() or {}
-	local out = '{{Match' .. '\n\t|date=|finished='
+	local mapStats = args.mapStats and wikiCopyPaste._ipairsSet(mw.text.split(args.mapStats, ', ')) or {}
+	local matchMatchpages = args.matchMatchpages and
+								wikiCopyPaste._ipairsSet(mw.text.split(args.matchMatchpages, ', ')) or {}
+	local out = '{{Match'
 
 	if hltv then
-		table.insert(mapStats, 1, 'Stats')
+		table.insert(mapStats, 'Stats')
 		table.insert(matchMatchpages, 1, 'HLTV')
 	end
 
+	out = out .. '\n\t'
+	for i = 1, opponents do
+		out = out .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, showScore)
+	end
+
+	out = out .. '\n\t|date=|finished='
+
 	if streams then
-		table.insert(mapStats, 1, 'vod')
+		table.insert(mapStats, 'vod')
 		out = out .. '\n\t|twitch=|youtube=|vod='
 	end
 
-	for i = 1, opponents do
-		out = out .. '\n\t|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, showScore)
+	if #matchMatchpages > 0 then
+		out = out .. '\n\t'
+		for _, matchpage in ipairs(matchMatchpages) do
+			out = out .. '|' .. matchpage:lower() .. '='
+		end
 	end
 
 	for i = 1, bestof do
@@ -61,15 +71,8 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			for _, stat in ipairs(mapStats) do
 				out = out .. '|' .. stat:lower() .. '='
 			end
-			out = out .. '\n\t'
 		end
 		out = out .. '}}'
-	end
-
-	if #matchMatchpages > 0 then
-		for _, matchpage in ipairs(matchMatchpages) do
-			out = out .. '\n\t|' .. matchpage:lower() .. '='
-		end
 	end
 
 	return out .. '\n}}'
@@ -86,6 +89,20 @@ function wikiCopyPaste._getOpponent(mode, showScore)
 	elseif mode == Opponent.literal then
 		return '{{LiteralOpponent|}}'
 	end
+end
+
+function wikiCopyPaste._ipairsSet(tbl)
+	local valuesSet = {}
+	local array = {}
+
+	for _, value in ipairs(tbl) do
+		if not valuesSet[value] then
+			table.insert(array, value)
+			valuesSet[value] = true
+		end
+	end
+
+	return array
 end
 
 function wikiCopyPaste.getStart(template, id, modus, args)
