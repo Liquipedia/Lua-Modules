@@ -162,6 +162,12 @@ PrizePool.config = {
 			return Logic.readBoolOrNil(args.currencyrateperopponent)
 		end
 	},
+	currencyRoundPrecision = {
+		default = 2,
+		read = function(args)
+			return tonumber(args.currencyroundprecision)
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
