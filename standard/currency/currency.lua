@@ -79,17 +79,18 @@ function Currency.raw(currencyCode)
 	return CurrencyData[currencyCode:lower()]
 end
 
-function Currency.formatMoney(value)
+function Currency.formatMoney(value, precision)
 	if not Logic.isNumeric(value) then
 		return 0
 	end
+	precision = tonumber(precision) or 2
 
-	local roundedValue = Math.round{value, 2}
+	local roundedValue = Math.round{value, precision}
 	local integer, decimal = math.modf(roundedValue)
 	if decimal == 0 then
 		return LANG:formatNum(integer)
 	end
-	return LANG:formatNum(integer) .. string.format('%.2f', decimal):sub(2)
+	return LANG:formatNum(integer) .. string.format('%.' .. precision .. 'f', decimal):sub(2)
 end
 
 function Currency.getExchangeRate(props)
