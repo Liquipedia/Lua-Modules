@@ -52,7 +52,7 @@ function CustomInjector:parse(id, widgets)
 			automatedHistory = nil
 		end
 
-		if not (String.isEmpty(manualHistory) and String.isEmpty(automatedHistory)) then
+		if String.isNotEmpty(manualHistory) and String.isNotEmpty(automatedHistory) then
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
