@@ -23,13 +23,19 @@ local _ROLES = {
 	['igl'] = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
 
 	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
-	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
-	['host'] = {category = 'Host', variable = 'Host', isplayer = false},
-	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
-	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
-	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
+	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
+	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
+	['observer'] = {category = 'Observers', variable = 'Observer', talent = true},
+	['host'] = {category = 'Host', variable = 'Host', talent = true},
+	['journalist'] = {category = 'Journalists', variable = 'Journalist', talent = true},
+	['expert'] = {category = 'Experts', variable = 'Expert', talent = true},
+	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
+	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
+	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
+	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
+	['producer'] = {category = 'Production Staff', variable = 'Producer', talent = true},
+	['director'] = {category = 'Production Staff', variable = 'Director', talent = true},
+	['interviewer'] = {category = 'Interviewers', variable = 'Interviewer', talent = true},
 }
 _ROLES['in-game leader'] = _ROLES.igl
 
@@ -48,6 +54,7 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
+	player.getPersonType = CustomPlayer.getPersonType
 
 	_args = player.args
 	_player = player
@@ -136,18 +143,30 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
+function CustomPlayer._isNotPlayer(role)
+	local roleData = _ROLES[(role or ''):lower()]
+	return roleData and (roleData.talent or roleData.staff)
+end
+
 function CustomPlayer:defineCustomPageVariables(args)
 	-- isplayer needed for SMW
-	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
-	end
-	-- If the role is missing, assume it is a player
-	if roleData and roleData.isplayer == false then
+	if CustomPlayer._isNotPlayer(args.role) then
 		Variables.varDefine('isplayer', 'false')
 	else
 		Variables.varDefine('isplayer', 'true')
 	end
+end
+
+function CustomPlayer:getPersonType(args)
+	local roleData = _ROLES[(args.role or ''):lower()]
+	if roleData then
+		if roleData.staff then
+			return { store = 'Staff', category = 'Staff' }
+		elseif roleData.talent then
+			return { store = 'Talent', category = 'Talent' }
+		end
+	end
+	return { store = 'Player', category = 'Player' }
 end
 
 return CustomPlayer
