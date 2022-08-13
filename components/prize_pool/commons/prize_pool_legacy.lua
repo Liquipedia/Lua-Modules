@@ -72,7 +72,6 @@ function LegacyPrizePool.run(dependency)
 	local newSlotIndex = 0
 	local currentPlace
 	local mergeSlots = Logic.readBool(header.mergeSlots)
-	mw.logObject(mergeSlots)
 	for _, slot in ipairs(slots) do
 		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots)
 		if mergeSlots and tempSlot.place and currentPlace == tempSlot.place then
