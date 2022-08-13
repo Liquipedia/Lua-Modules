@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local League = require('Module:Infobox/League')
 local Logic = require('Module:Logic')
+local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
@@ -102,8 +103,15 @@ function CustomLeague.run(frame)
 	league.getWikiCategories = CustomLeague.getWikiCategories
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
+	league.shouldStore = CustomLeague.shouldStore
 
 	return league:createInfobox(frame)
+end
+
+function CustomLeague:shouldStore(args)
+	return Namespace.isMain()
+			and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+			and not Logic.readBool(Variables.varDefault('disable_SMW_storage'))
 end
 
 function CustomLeague:createWidgetInjector()
