@@ -453,7 +453,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, 'Banned ' .. personType .. 's')
 		else
 			table.insert(categories, 'Active ' .. personType .. 's')
-			if not team then
+			if String.isEmpty(team) then
 				table.insert(categories, 'Teamless ' .. personType .. 's')
 			end
 		end
@@ -464,7 +464,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, personType .. 's with unknown birth date')
 		end
 
-		if team and not mw.ext.TeamTemplate.teamexists(team) then
+		if String.isNotEmpty(team) and not mw.ext.TeamTemplate.teamexists(team) then
 			table.insert(categories, 'Players with invalid team')
 		end
 
