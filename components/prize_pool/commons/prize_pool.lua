@@ -455,7 +455,9 @@ end
 
 --- Compares the sort value of two prize entries
 function PrizePool._comparePrizes(x, y)
-	return PrizePool.prizeTypes[x.type].sortOrder < PrizePool.prizeTypes[y.type].sortOrder
+	local sortX = PrizePool.prizeTypes[x.type].sortOrder
+	local sortY = PrizePool.prizeTypes[y.type].sortOrder
+	return sortX == sortY and x.index < y.index or sortX < sortY
 end
 
 function PrizePool:build()
