@@ -161,12 +161,12 @@ function CustomPlayer:getPersonType(args)
 	local roleData = _ROLES[(args.role or ''):lower()]
 	if roleData then
 		if roleData.staff then
-			return { store = 'Staff', category = 'Staff' }
+			return {store = 'Staff', category = 'Staff'}
 		elseif roleData.talent then
-			return { store = 'Talent', category = 'Talent' }
+			return {store = 'Talent', category = 'Talent'}
 		end
 	end
-	return { store = 'Player', category = 'Player' }
+	return {store = 'Player', category = 'Player'}
 end
 
 return CustomPlayer
