@@ -63,6 +63,7 @@ function MatchLegacy.convertParameters(match2)
 		timezone = extradata.timezoneoffset or '',
 		timezoneID = extradata.timezoneid or '',
 		matchsection = extradata.matchsection or '',
+		bestofx = tostring(match2.bestof),
 		overturned = Logic.readBool(extradata.overturned) and '1' or '',
 		hidden = Logic.readBool(extradata.hidden) and '1' or '0',
 		featured = Logic.readBool(extradata.featured) and '1' or '0',
@@ -94,10 +95,6 @@ function MatchLegacy.convertParameters(match2)
 	match.extradata.opponent2rounds = tostring(opponent2Rounds)
 	match.extradata.maps = table.concat(maps, ',')
 
-	if #maps > 0 then
-		match.extradata.bestofx = tostring(match2.bestof)
-	end
-
 	-- Handle Opponents
 	local handleOpponent = function (index)
 		local prefix = 'opponent' .. index
@@ -112,7 +109,7 @@ function MatchLegacy.convertParameters(match2)
 				else
 					match[prefix .. 'score'] = 0
 				end
-				match.extradata[prefix .. 'rounds'] = 0
+				match.extradata[prefix .. 'rounds'] = '0'
 			elseif opponent.status == 'W' then
 				match[prefix .. 'score'] = math.floor(match2.bestof /2) + 1
 			else
