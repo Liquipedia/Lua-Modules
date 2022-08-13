@@ -260,8 +260,14 @@ PrizePool.prizeTypes = {
 
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
-			local pointsData = mw.loadData('Module:Points/data')
-			return pointsData[input] or {title = 'Points'}
+			local pointsData = Table.copy(mw.loadData('Module:Points/data')[input] or {})
+			pointsData.title = pointsData.title or 'Points'
+
+			-- Manual overrides
+			local prefix = 'points' .. index
+			pointsData.link = context[prefix .. 'link'] or pointsData.link
+
+			return pointsData
 		end,
 		headerDisplay = function (data)
 			local headerDisplay = {}
