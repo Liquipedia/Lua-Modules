@@ -171,13 +171,14 @@ function copyPaste.matchlist(frame, args)
 	local matches = tonumber(args.matches) or 5
 	local opponents = tonumber(args.opponents) or 2
 	local mode = WikiSpecific.getMode(args.mode)
+	local namedMatchParams = Logic.readBool(Logic.nilOr(args.namedMatchParams, true))
 
 	for index = 1, matches do
 		if customHeader then
 			out = out .. '\n|M' .. index .. 'header='
 		end
 
-		out = out .. '\n|M' .. index .. '=' ..
+		out = out .. '\n|' .. (namedMatchParams and ('M' .. index .. '=') or '') ..
 			(not empty and WikiSpecific.getMatchCode(bestof, mode, index, opponents, args) or '')
 	end
 
