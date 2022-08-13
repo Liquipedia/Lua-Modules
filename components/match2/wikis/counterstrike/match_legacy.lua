@@ -109,7 +109,7 @@ function MatchLegacy.convertParameters(match2)
 				else
 					match[prefix .. 'score'] = 0
 				end
-				match.extradata[prefix .. 'rounds'] = 0
+				match.extradata[prefix .. 'rounds'] = '0'
 			elseif opponent.status == 'W' then
 				match[prefix .. 'score'] = math.floor(match2.bestof /2) + 1
 			else
