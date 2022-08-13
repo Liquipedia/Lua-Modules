@@ -36,6 +36,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.getWikiCategories = CustomLeague.getWikiCategories
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
@@ -83,6 +84,16 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
+end
+
+function CustomLeague:getWikiCategories(args)
+	local categories = {}
+
+	if Logic.readBool(args.female) then
+		table.insert(categories, 'Female Tournaments')
+	end
+
+	return categories
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
