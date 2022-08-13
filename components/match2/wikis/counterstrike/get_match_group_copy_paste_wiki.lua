@@ -106,6 +106,7 @@ function wikiCopyPaste._ipairsSet(tbl)
 end
 
 function wikiCopyPaste.getStart(template, id, modus, args)
+	args.namedMatchParams = false
 	local out = '{{' .. (
 		(modus == 'bracket' and
 			('Bracket|Bracket/' .. template)
