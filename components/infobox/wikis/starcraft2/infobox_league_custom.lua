@@ -179,11 +179,11 @@ function CustomLeague:_createPrizepool()
 		end
 
 		local plusText = hasPlus and '+' or ''
-		if prizePoolUSD then
+		if prizePoolUSD and prizePool then
 			display = Currency.display((localCurrency or ''):lower(), CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText)
 				.. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. _ABBR_USD .. ')'
-		elseif prizePool then
-			display = '$' .. CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText .. ' ' .. _ABBR_USD
+		elseif prizePool or prizePoolUSD then
+			display = '$' .. CustomLeague:_displayPrizeValue(prizePool or prizePoolUSD, 2) .. plusText .. ' ' .. _ABBR_USD
 		end
 		if hasText then
 			display = (display or _args.prizepool or '') ..
