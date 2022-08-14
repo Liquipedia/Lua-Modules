@@ -349,6 +349,7 @@ function CustomMatchSummary._createFooter(match, vods)
 			if link then
 				if insertDotNext then
 					insertDotNext = false
+					iconsInserted = 0
 					footer:addElement(separator)
 				end
 
@@ -373,7 +374,6 @@ function CustomMatchSummary._createFooter(match, vods)
 			end
 		else
 			insertDotNext = iconsInserted > 0 and true or false
-			iconsInserted = 0
 		end
 	end
 
