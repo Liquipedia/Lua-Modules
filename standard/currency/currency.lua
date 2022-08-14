@@ -46,7 +46,7 @@ function Currency.display(currencyCode, prizeValue, options)
 	local currencyData = Currency.raw(currencyCode)
 
 	if not currencyData then
-		if currencyCode then
+		if String.isNotEmpty(currencyCode) then
 			mw.log('Invalid currency "' .. currencyCode .. '"')
 		end
 		return nil
