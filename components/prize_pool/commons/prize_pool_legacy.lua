@@ -146,6 +146,12 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 
 	newData.opponents = LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 
+	if mergeSlots then
+		return {
+			opponents = newData.opponents,
+			place = newData.place
+		}
+	end
 	return newData
 end
 
