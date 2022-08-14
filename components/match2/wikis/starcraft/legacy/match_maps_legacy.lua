@@ -12,7 +12,6 @@ local Logic = require('Module:Logic')
 local Match = require('Module:Match')
 local MatchGroup = require('Module:MatchGroup')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 
