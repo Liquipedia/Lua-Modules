@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Namespace = require('Module:Namespace')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -51,7 +52,7 @@ function HiddenDataBox.run(args)
 		queryResult = {}
 	end
 
-	if not queryResult then
+	if not queryResult and Namespace.isMain() then
 		table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
 		queryResult = {}
 	elseif doQuery and args.participantGrabber then
