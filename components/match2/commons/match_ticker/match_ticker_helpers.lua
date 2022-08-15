@@ -65,6 +65,9 @@ function HelperFunctions.opponentIsTbdOrEmpty(opponent)
 end
 
 function HelperFunctions.isByeOpponent(opponent)
+	if not opponent then
+		return true
+	end
 	local name = string.lower(opponent.name or '')
 	local template = string.lower(opponent.template or '')
 
