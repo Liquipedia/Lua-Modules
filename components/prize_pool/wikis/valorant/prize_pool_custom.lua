@@ -47,6 +47,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	Variables.varDefine('enddate_'.. lpdbData.participant .. '_date', lpdbData.date)
 	Variables.varDefine('status'.. lpdbData.participant .. '_date', lpdbData.date)
 
+	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
+
 	if Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
 	end
