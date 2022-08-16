@@ -61,7 +61,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomMap:_createRingTable(ringTable, content)
-	local tr = ringTable:tag('tr')
+	local row = ringTable:tag('tr')
 
 	if not content then
 		tr:tag('th')
