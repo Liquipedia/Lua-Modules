@@ -45,7 +45,7 @@ local _LINK_DATA = {
 	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
 	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
 	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
-	wl = {icon = 'File:Winstons Lab-icon.png', iconDark = '', text = 'Winstons Lab matchpage'}, --toDo: add darkmode file
+	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
 }
 
 local CustomMatchSummary = {}
