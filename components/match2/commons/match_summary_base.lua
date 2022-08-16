@@ -220,7 +220,7 @@ function Footer:addLinks(LinkData, links)
 		return '[['..icon..'|link='..link..'|15px|'..text..'|class=show-when-light-mode]]'
 			.. '[['..iconDark..'|link='..link..'|15px|'..text..'|class=show-when-dark-mode]]'
 	end
-	
+
 	for linkType, link in pairs(links) do
 		local currentLinkData = LinkData[linkType]
 		if not currentLinkData then
