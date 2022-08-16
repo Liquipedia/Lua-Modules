@@ -324,7 +324,7 @@ PrizePool.prizeTypes = {
 			return input
 		end,
 		rowDisplay = function (headerData, data)
-			if String.isNotEmpty(data) then
+			if String.isNotEmpty(data) and tonumber(data) ~= 0 then
 				return TableCell{content = {{data}}}
 			end
 		end,
