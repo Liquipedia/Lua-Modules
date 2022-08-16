@@ -813,7 +813,10 @@ function PrizePool:_storeData()
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement(PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, self.options.smwPrefix), lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(
+				PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, self.options.smwPrefix),
+				lpdbEntry
+			)
 		end
 
 		if self.options.storeSmw then
