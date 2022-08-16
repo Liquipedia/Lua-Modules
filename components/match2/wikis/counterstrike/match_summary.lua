@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
@@ -299,7 +300,7 @@ function CustomMatchSummary._createFooter(match, vods)
 
 	local separator = '<b>·</b>'
 
-	local function createFooterLink(icon, url, label, index)
+	local function createFooterLink(icon, iconDark, url, label, index)
 		if icon == 'stats' then
 			icon = index ~= 0 and 'Match Info Stats' .. index .. '.png' or 'Match Info Stats.png'
 		end
@@ -307,7 +308,11 @@ function CustomMatchSummary._createFooter(match, vods)
 			label = label .. ' for Game ' .. index
 		end
 
-		return '[[FILE:' .. icon .. '|link=' .. url .. '|15px|' .. label .. '|alt=' .. url .. ']]'
+		if String.isEmpty(iconDark) then
+			return '[[FILE:' .. icon .. '|link=' .. url .. '|15px|' .. label .. '|alt=' .. url .. ']]'
+		end
+		return '[[FILE:' .. icon .. '|link=' .. url .. '|15px|' .. label .. '|alt=' .. url .. '|class=show-when-light-mode]]'
+			.. '[[FILE:' .. iconDark .. '|link=' .. url .. '|15px|' .. label .. '|alt=' .. url .. '|class=show-when-dark-mode]]'
 	end
 
 	-- Match vod
@@ -354,11 +359,12 @@ function CustomMatchSummary._createFooter(match, vods)
 				end
 
 				local icon = platform.icon
+				local iconDark = platform.iconDark
 				local label = platform.label
 				local addGameLabel = platform.isMapStats and match.bestof and match.bestof > 1
 
 				for _, val in ipairs(link) do
-					footer:addElement(createFooterLink(icon, val[1], label,
+					footer:addElement(createFooterLink(icon, iconDark, val[1], label,
 														addGameLabel and val[2] or 0))
 					iconsInserted = iconsInserted + 1
 				end
