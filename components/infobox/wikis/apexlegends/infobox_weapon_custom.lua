@@ -13,6 +13,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
+local PageLink = require('Module:Page')
 
 local CustomWeapon = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -38,8 +39,7 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(args.basedamage) then
 		local basedamages = {}
 		for i, basedamage in ipairs(_weapon:getAllArgsForBase(args, 'basedamage')) do
-			table.insert(basedamages, tostring(CustomWeapon:_createNoWrappingSpanDamage(basedamage, i
-					)))
+			table.insert(basedamages, tostring(CustomWeapon:_createNoWrappingSpanAttachment(basedamage, i, 'damage')))
 		end
 		local basedamageconcat = table.concat(basedamages, '&nbsp;• ')
 		if String.isEmpty(args.damage) then
@@ -64,8 +64,7 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(args.ammocapacity) then
 		local ammocapacitys = {}
 		for i, ammocapacity in ipairs(_weapon:getAllArgsForBase(args, 'ammocapacity')) do
-			table.insert(ammocapacitys, tostring(CustomWeapon:_createNoWrappingSpanMagazine(ammocapacity, i
-					)))
+			table.insert(ammocapacitys, tostring(CustomWeapon:_createNoWrappingSpanAttachment(ammocapacity, i, 'magazine')))
 		end
 		local ammocapacityconcat = table.concat(ammocapacitys, '<br>')
 		if String.isEmpty(args.ammocap) then
@@ -78,8 +77,7 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(args.reloadtime) then
 		local reloadtimes = {}
 		for i, reloadtime in ipairs(_weapon:getAllArgsForBase(args, 'reloadtime')) do
-			table.insert(reloadtimes, tostring(CustomWeapon:_createNoWrappingSpanMagazine(reloadtime, i
-					)))
+			table.insert(reloadtimes, tostring(CustomWeapon:_createNoWrappingSpanAttachment(reloadtime, i, 'magazine')))
 		end
 		local reloadtimeconcat = table.concat(reloadtimes, '<br>')
 		if String.isEmpty(args.reloadspeed) then
@@ -99,9 +97,8 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	if String.isNotEmpty(args.attachment) then
 		local attachments = {}
-		for _, attachment in ipairs(_weapon:getAllArgsForBase(args, 'attachment')) do
-			table.insert(attachments, tostring(CustomWeapon:_createNoWrappingSpanAttachment(attachment
-					)))
+		for i, attachment in ipairs(_weapon:getAllArgsForBase(args, 'attachment')) do
+			table.insert(attachments, tostring(CustomWeapon:_createNoWrappingSpanAttachment(attachment, i, 'attachment')))
 		end
 		table.insert(widgets, Title{name = 'Attachment Slots'})
 		table.insert(widgets, Center{content = {table.concat(attachments, '&nbsp;&nbsp;')}})
@@ -110,7 +107,7 @@ function CustomInjector:addCustomCells(widgets)
 		local hopups = {}
 		local hopupdescs = _weapon:getAllArgsForBase(args, 'hopupdesc')
 		for i, hopup in ipairs(_weapon:getAllArgsForBase(args, 'hopup')) do
-			table.insert(hopups, tostring(CustomWeapon:_createNoWrappingSpanHopUp(hopup)))
+			table.insert(hopups, tostring(CustomWeapon:_createNoWrappingSpanAttachment(hopup, i, 'attachment')))
 			table.insert(hopups, hopupdescs[i])
 		end
 		table.insert(widgets, Title{name = 'Hop-Ups'})
@@ -119,47 +116,75 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
-function CustomWeapon:_createNoWrappingSpanMagazine(content, i)
-	local magazineInfo = {
-		'&nbsp;<sup><strong></strong></sup>',
-		'&nbsp;<sup><strong>[[with Common Ext. Mag|<span class="gray-theme-dark-bg"; style="font-family:monospace;color:white;padding:0 1px;">EXT</span>]]</strong></sup>',
-		'&nbsp;<sup><strong>[[with Rare Ext. Mag|<span class="sapphire-a2"; style="font-family:monospace;color:white;padding:0 1px;">EXT</span>]]</strong></sup>',
-		'&nbsp;<sup><strong>[[with Epic Ext. Mag|<span class="vivid-violet-theme-dark-bg"; style="font-family:monospace;color:white;padding:0 1px;">EXT</span>]] [[with Legendary Ext. Mag|<span class="bright-sun-0"; style="font-family:monospace;color:black;padding:0 1px;">EXT</span>]]</strong></sup>'
-		}
-	local span = mw.html.create('span')
+local MAGAZINE_INFO = {
+	{},
+	{{text = 'with Common Ext. Mag|', bgClass = 'gray-theme-dark-bg', textBgClass = 'white-text'}},
+	{{text = 'with Rare Ext. Mag|', bgClass = 'sapphire-a2', textBgClass = 'white-text'}},
+	{
+		{text = 'with Epic Ext. Mag|', bgClass = 'vivid-violet-theme-dark-bg', textBgClass = 'white-text'},
+		{text = 'with Legendary Ext. Mag|', bgClass = 'bright-sun-0', textBgClass = 'black-text'}
+	},
+}
+
+local DAMAGE_INFO = {
+	{},
+	{{text = 'Head', bgClass = 'gray-theme-dark-bg', textBgClass = 'white-text'}},
+	{{text = 'Leg', bgClass = 'gray-theme-light-bg', textBgClass = 'black-text'}},
+}
+
+local NON_BREAKING_SPACE = '&nbsp;'
+
+function CustomWeapon:_createNoWrappingSpanAttachment(content, i, type)
+	local sup = mw.html.create('sup')
+		:css('font-weigth', 'bold')
+	if type == 'magazine' then
+		local magazineInfo = MAGAZINE_INFO[i]
+		if magazineInfo[1] then
+			for index, info in ipairs(magazineInfo) do
+				local span = mw.html.create('span')
+					:addClass(info.bgClass)
+					:addClass(info.textBgClass)
+					:css('font-family', 'monospace')
+					:css('padding', '0 1px')
+					:wikitext('EXT')
+				sup
+					:wikitext(index ~=1 and ' ' or '')
+					:wikitext('[[')
+					:wikitext(info.text)
+					:node(span)
+					:wikitext(']]')
+			end
+		end
+	elseif type == 'damage' then
+		local damageInfo = DAMAGE_INFO[i]
+		if damageInfo[1] then
+			for index, info in ipairs(damageInfo) do
+				local span = mw.html.create('span')
+				sup
+					:addClass(info.bgClass)
+					:addClass(info.textBgClass)
+					:css('font-family', 'monospace')
+					:css('padding', '0 1px')
+					:wikitext(index ~=1 and ' ' or '')
+					:wikitext(info.text)
+					:node(span)
+			end
+		end
+	elseif type == 'attachment' then
+		local fileName = '[[File:Apex ATTM_' .. content .. '_lightmode.png|60px|link=Portal:Attachments]]'
+		local span = mw.html.create('span')
+			:css('white-space', 'nowrap')
+			:node(fileName)
+		return span
+	else
+		local span = mw.html.create('span')
+	end
+
+	return mw.html.create('span')
 		:css('white-space', 'nowrap')
 		:node(content)
-		:node(magazineInfo[i])
-	return span
-end
-
-function CustomWeapon:_createNoWrappingSpanDamage(content, i)
-	local damageInfo = {
-		'<sup><strong></strong></sup>',
-		'&nbsp;<sup><strong><span class="gray-theme-dark-bg"; style="font-family:monospace;color:white;padding:0 1px;">Head</span></strong></sup>',
-		'&nbsp;<sup><strong><span class="gray-theme-light-bg"; style="font-family:monospace;color:black;padding:0 1px;">Leg</span></strong></sup>',
-		}
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-		:node(damageInfo[i])
-	return span
-end
-
-function CustomWeapon:_createNoWrappingSpanAttachment(content)
-	local fileName = "[[File:Apex ATTM_" .. content .. "_lightmode.png|60px|link=Portal:Attachments]]"
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(fileName)
-	return span
-end
-
-function CustomWeapon:_createNoWrappingSpanHopUp(content)
-	local fileName = "[[File:Apex ATTM_" .. content .. "_lightmode.png|60px|link=Portal:Attachments#Hop-Up Slot]]"
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(fileName)
-	return span
+		:wikitext(NON_BREAKING_SPACE)
+		:node(sup)
 end
 
 function CustomWeapon:addToLpdb(lpdbData)
