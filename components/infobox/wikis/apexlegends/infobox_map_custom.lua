@@ -66,11 +66,11 @@ function CustomMap:_createRingTable(content)
 
 	if not content then
 		row
- 			:tag('th'):wikitext('Ring'):done()
- 			:tag('th'):wikitext('Wait(s)'):done()
- 			:tag('th'):wikitext('Close<br>Time(s)'):done()
- 			:tag('th'):wikitext('Damage<br>per tick'):done()
- 			:tag('th'):wikitext('End Diameter (m)'):done()
+			:tag('th'):wikitext('Ring'):done()
+			:tag('th'):wikitext('Wait(s)'):done()
+			:tag('th'):wikitext('Close<br>Time(s)'):done()
+			:tag('th'):wikitext('Damage<br>per tick'):done()
+			:tag('th'):wikitext('End Diameter (m)'):done()
 	else
 		for _, item in ipairs(mw.text.split(content, ',')) do
 			row:tag('td'):wikitext(item):done()
