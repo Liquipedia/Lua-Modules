@@ -321,6 +321,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	end
 
 	local display = mw.html.create('div')
+		:addClass('brkts-popup-body-element-thumbs')
 	if isBan then
 		--display:addClass('brkts-popup-side-shade-out')
 		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
