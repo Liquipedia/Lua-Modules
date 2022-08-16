@@ -65,7 +65,12 @@ function CustomMap:_createRingTable(ringTable, content)
 	local row = mw.html.create('tr')
 
 	if not content then
-		row:tag('th')
+		row
+ 			:tag('th'):wikitext('Ring'):done()
+ 			:tag('th'):wikitext('Wait(s)'):done()
+ 			:tag('th'):wikitext('Close<br>Time(s)'):done()
+ 			:tag('th'):wikitext('Damage<br>per tick'):done()
+ 			:tag('th'):wikitext('End Diameter (m)'):done()
 			:wikitext('Ring')
 			:css('text-align', 'center')
 		row:tag('th')
