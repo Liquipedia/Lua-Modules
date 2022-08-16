@@ -74,13 +74,13 @@ function CustomInjector:addCustomCells(widgets)
 		content = {args.projectilespeed}
 	})
 	if String.isNotEmpty(args.ammocapacity) and String.isEmpty(args.ammocap) then
-		local ammoCapacitys = {}
-		for index, ammoCapacity in ipairs(_weapon:getAllArgsForBase(args, 'ammocapacity')) do
-			table.insert(ammoCapacitys, tostring(CustomWeapon:_createContextualNoWrappingSpan(ammoCapacity, index, MAGAZINE_INFO)))
+		local ammoSizes = {}
+		for index, ammoSize in ipairs(_weapon:getAllArgsForBase(args, 'ammocapacity')) do
+			table.insert(ammoSizes, tostring(CustomWeapon:_createContextualNoWrappingSpan(ammoSize, index, MAGAZINE_INFO)))
 		end
 		table.insert(widgets, Cell{
 			name = 'Ammo Capacity',
-			content = {table.concat(ammoCapacitys, '<br>')}
+			content = {table.concat(ammoSizes, '<br>')}
 		})
 	end
 	if String.isNotEmpty(args.reloadtime) and String.isEmpty(args.reloadspeed) then
@@ -122,12 +122,12 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
-function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTable, options)
-	options = options or {}
+function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTable)
 
 	if not lookUpTable then
-		local icon = '[[File:Apex ATTM_' .. content .. '_lightmode.png|60px|link=Portal:Attachments|class=show-when-light-mode]]'
-		local iconDark = '[[File:Apex ATTM_' .. content .. '_darkmode.png|60px|link=Portal:Attachments|class=show-when-dark-mode]]'
+		local linkSource = 'link=Portal:Attachments'
+		local icon = '[[File:Apex ATTM_' .. content .. '_lightmode.png|60px|'..linkSource..'|class=show-when-light-mode]]'
+		local iconDark = '[[File:Apex ATTM_' .. content .. '_darkmode.png|60px|'..linkSource..'|class=show-when-dark-mode]]'
 		return mw.html.create('span')
 			:css('white-space', 'nowrap')
 			:node(icon)
