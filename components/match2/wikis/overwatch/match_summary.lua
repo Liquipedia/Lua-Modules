@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -14,6 +13,7 @@ local VodLink = require('Module:VodLink')
 local String = require('Module:StringUtils')
 local MapModes = require('Module:MapModes')
 
+local DisplayHelper  = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
@@ -32,16 +32,20 @@ local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
-	esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
+	esl = {
+		icon = 'File:ESL_2019_icon_lightmode.png',
+		iconDark = 'File:ESL_2019_icon_darkmode.png',
+		text = 'Match page on ESL'
+	},
 	owl = {icon = 'File:Overwatch League allmode.png', text = 'Overwatch League matchpage'},
 	owc = {icon = 'File:OWC-BMS icon.png', text = 'OW Contenders matchpage'},
 	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
-	pllg = {icon = 'File:Peliliiga-BMS icon.png', text = 'Peliliiga matchpage'},
+	pllg = {icon = 'File:Peliliiga-BMS icon.png', iconDark = '', text = 'Peliliiga matchpage'}, --toDo: add darkmode file
 	oceow = {icon = 'File:OCEOW-BMS icon.png', text = 'OCEOverwatch matchpage'},
 	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
 	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
 	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
-	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
+	wl = {icon = 'File:Winstons Lab-icon.png', iconDark = '', text = 'Winstons Lab matchpage'}, --toDo: add darkmode file
 }
 
 local CustomMatchSummary = {}
@@ -82,19 +86,7 @@ function CustomMatchSummary.getByMatchId(args)
 			})
 		end
 
-		-- Match Vod + other links
-		local buildLink = function (linkType, link)
-			local linkData = _LINK_DATA[linkType]
-			if not linkData then
-				mw.log('linkType "' .. linkType .. '" is not supported by Module:MatchSummary')
-			else
-				return '[[' .. linkData.icon .. '|link=' .. link .. '|15px|' .. linkData.text .. ']]'
-			end
-		end
-
-		for linkType, link in pairs(match.links) do
-			footer:addElement(buildLink(linkType,link))
-		end
+		footer:addLinks(_LINK_DATA, match.links)
 
 		matchSummary:footer(footer)
 	end
