@@ -38,7 +38,7 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Game Mode(s)',
 		content = {_args.gamemode}
 	})
-	local spantext = ''
+	local spanText = ''
 	if String.isNotEmpty(_args.spanstart) then
 		spanText = spanText .. ' - '
 	end
