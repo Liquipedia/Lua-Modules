@@ -40,7 +40,6 @@ local _LINK_DATA = {
 	owl = {icon = 'File:Overwatch League allmode.png', text = 'Overwatch League matchpage'},
 	owc = {icon = 'File:OWC-BMS icon.png', text = 'OW Contenders matchpage'},
 	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
-	pllg = {icon = 'File:Peliliiga-BMS icon.png', iconDark = '', text = 'Peliliiga matchpage'}, --toDo: add darkmode file
 	oceow = {icon = 'File:OCEOW-BMS icon.png', text = 'OCEOverwatch matchpage'},
 	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
 	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
