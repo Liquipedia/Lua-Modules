@@ -105,7 +105,7 @@ end
 function CustomMap:addToLpdb(lpdbData)
 	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator)
 	lpdbData.extradata.gamemode = _args.gamemode
-	if ((String.isNotEmpty(_args.spanstart) and _args.spanstart ~= '') 
+	if ((String.isNotEmpty(_args.spanstart) and _args.spanstart ~= '')
 	and (String.isEmpty(_args.spanend) or _args.spanend == '')) then
 		lpdbData.extradata.competitive = true
 	else
