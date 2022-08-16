@@ -44,6 +44,7 @@ function LegacyPrizePool.run(dependency)
 
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
 	newArgs.cutafter = header.cutafter
+	newArgs.smw_prefix = header.smw_prefix
 
 	if Currency.raw(header.localcurrency) then
 		-- If the localcurrency is a valid currency, handle it like currency
