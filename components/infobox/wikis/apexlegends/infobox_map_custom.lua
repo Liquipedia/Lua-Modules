@@ -52,7 +52,7 @@ function CustomInjector:addCustomCells(widgets)
 			:css('width', '325px')
 		CustomMap:_createRingTable(ringTable)
 		for _, rings in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
-			CustomMap:_createRingTable(ringTable, rings)
+			ringTable:node(CustomMap:_createRingTable(rings))
 		end
 		table.insert(widgets, Title{name = 'Ring Information'})
 		table.insert(widgets, Center{content = {tostring(ringTable)}})
