@@ -40,7 +40,7 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	local spantext = ''
 	if String.isNotEmpty(_args.spanstart) then
-		spantext = spantext .. ' - '
+		spanText = spanText .. ' - '
 	end
 	table.insert(widgets, Cell{
 		name = 'Played in ALGS',
