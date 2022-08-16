@@ -41,7 +41,12 @@ local _LINK_DATA = {
 local _AUTO_LINKS = {
 	{icon = 'File:DOTABUFF-icon.png', url = 'https://www.dotabuff.com/matches/', name = 'DOTABUFF'},
 	{icon = 'File:DatDota-icon.png', url = 'https://www.datdota.com/matches/', name = 'datDota'},
-	{icon = 'File:Stratz-icon.png', url = 'https://stratz.com/en-us/match/', name = 'Stratz'},
+	{
+		icon = 'File:STRATZ_icon_lightmode.svg',
+		iconDark = 'File:STRATZ_icon_darkmode.svg',
+		url = 'https://stratz.com/en-us/match/',
+		name = 'Stratz'
+	},
 }
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
@@ -138,25 +143,23 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 
 		-- Match Vod + other links
-		local buildLink = function (link, icon, text)
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
+		local buildLink = function (link, icon, iconDark, text)
+			if String.isEmpty(iconDark) then
+				return '[['..icon..'|link='..link..'|15px|'..text..']]'
+			end
+			return '[['..icon..'|link='..link..'|15px|'..text..'|class=show-when-light-mode]]'
+				.. '[['..iconDark..'|link='..link..'|15px|'..text..'|class=show-when-dark-mode]]'
 		end
 
 		for _, site in ipairs(_AUTO_LINKS) do
 			for index, publisherid in pairs(publisherids) do
 				local link = site.url .. publisherid
 				local text = 'Game '..index..' on '.. site.name
-				footer:addElement(buildLink(link, site.icon, text))
+				footer:addElement(buildLink(link, site.icon, site.iconDark, text))
 			end
 		end
 
-		for linkType, link in pairs(match.links) do
-			if not _LINK_DATA[linkType] then
-				mw.log('Unknown link: ' .. linkType)
-			else
-				footer:addElement(buildLink(link, _LINK_DATA[linkType].icon, _LINK_DATA[linkType].text))
-			end
-		end
+		footer:addLinks(_LINK_DATA, match.links)
 
 		matchSummary:footer(footer)
 	end
