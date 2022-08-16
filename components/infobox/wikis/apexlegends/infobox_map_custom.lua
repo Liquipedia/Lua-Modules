@@ -97,7 +97,7 @@ function CustomMap:_createRingTable(ringTable, content)
 			:wikitext(parameters[5])
 			:css('text-align', 'center')
 	end
-		return ringTable
+	return row:done()
 end
 
 function CustomMap:addToLpdb(lpdbData)
