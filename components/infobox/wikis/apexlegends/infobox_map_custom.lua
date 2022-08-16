@@ -52,7 +52,7 @@ function CustomInjector:addCustomCells(widgets)
 			:addClass('wikitable wikitable-striped wikitable-bordered')
 			:css('width', '325px')
 		CustomMap:_createRingTable(ringTable)
-		for _, rings in ipairs(_map:getAllArgsForBase(args, 'ring')) do
+		for _, rings in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
 			CustomMap:_createRingTable(ringTable, rings)
 		end
 		table.insert(widgets, Title{name = 'Ring Information'})
