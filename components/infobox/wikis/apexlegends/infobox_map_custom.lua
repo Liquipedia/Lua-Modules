@@ -51,7 +51,7 @@ function CustomInjector:addCustomCells(widgets)
 			:addClass('wikitable wikitable-striped wikitable-bordered')
 			:css('width', '325px')
 			:css('text-align', 'center')
-		CustomMap:_createRingTable(ringTable)
+		ringTable:node(CustomMap:_createRingTable())
 		for _, rings in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
 			ringTable:node(CustomMap:_createRingTable(rings))
 		end
@@ -61,7 +61,7 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
-function CustomMap:_createRingTable(ringTable, content)
+function CustomMap:_createRingTable(content)
 	local row = mw.html.create('tr')
 
 	if not content then
@@ -71,39 +71,10 @@ function CustomMap:_createRingTable(ringTable, content)
  			:tag('th'):wikitext('Close<br>Time(s)'):done()
  			:tag('th'):wikitext('Damage<br>per tick'):done()
  			:tag('th'):wikitext('End Diameter (m)'):done()
-			:wikitext('Ring')
-			:css('text-align', 'center')
-		row:tag('th')
-			:wikitext('Wait(s)')
-			:css('text-align', 'center')
-		row:tag('th')
-			:wikitext('Close<br>Time(s)')
-			:css('text-align', 'center')
-		row:tag('th')
-			:wikitext('Damage<br>per tick')
-			:css('text-align', 'center')
-		row:tag('th')
-			:wikitext('End Diameter (m)')
-			:css('text-align', 'center')
 	else
 		for _, item in ipairs(mw.text.split(content, ',')) do
 			row:tag('td'):wikitext(item):done()
 		end
-		row:tag('td')
-			:wikitext(parameters[1])
-			:css('text-align', 'center')
-		row:tag('td')
-			:wikitext(parameters[2])
-			:css('text-align', 'center')
-		row:tag('td')
-			:wikitext(parameters[3])
-			:css('text-align', 'center')
-		row:tag('td')
-			:wikitext(parameters[4])
-			:css('text-align', 'center')
-		row:tag('td')
-			:wikitext(parameters[5])
-			:css('text-align', 'center')
 	end
 	return row:done()
 end
