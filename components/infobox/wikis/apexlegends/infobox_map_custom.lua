@@ -47,7 +47,7 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Played in ALGS',
 		content = {(_args.spanstart or '<i><b>Not </b></i>') .. spantext .. (_args.spanend or '<i><b>Currently</b></i>')}
 	})
-	if String.isNotEmpty(args.ring) then
+	if String.isNotEmpty(_args.ring) then
 		local ringTable = mw.html.create('table')
 			:addClass('wikitable wikitable-striped wikitable-bordered')
 			:css('width', '325px')
