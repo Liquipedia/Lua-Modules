@@ -86,7 +86,9 @@ function CustomMap:_createRingTable(ringTable, content)
 			:wikitext('End Diameter (m)')
 			:css('text-align', 'center')
 	else
-		local parameters = mw.text.split(content, ',')
+		for _, item in ipairs(mw.text.split(content, ',')) do
+			row:tag('td'):wikitext(item):done()
+		end
 		row:tag('td')
 			:wikitext(parameters[1])
 			:css('text-align', 'center')
