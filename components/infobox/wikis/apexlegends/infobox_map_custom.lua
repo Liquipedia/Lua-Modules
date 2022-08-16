@@ -50,6 +50,7 @@ function CustomInjector:addCustomCells(widgets)
 		local ringTable = mw.html.create('table')
 			:addClass('wikitable wikitable-striped wikitable-bordered')
 			:css('width', '325px')
+			:css('text-align', 'center')
 		CustomMap:_createRingTable(ringTable)
 		for _, rings in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
 			ringTable:node(CustomMap:_createRingTable(rings))
