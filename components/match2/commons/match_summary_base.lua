@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Opponent = require('Module:Opponent')
+local String = require('Module:StringUtils')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
@@ -208,6 +209,27 @@ local Footer = Class.new(
 
 function Footer:addElement(element)
 	self.inner:node(element)
+	return self
+end
+
+function Footer:addLinks(LinkData, links)
+	local buildLink = function (link, icon, iconDark, text)
+		if String.isEmpty(iconDark) then
+			return '[['..icon..'|link='..link..'|15px|'..text..']]'
+		end
+		return '[['..icon..'|link='..link..'|15px|'..text..'|class=show-when-light-mode]]'
+			.. '[['..iconDark..'|link='..link..'|15px|'..text..'|class=show-when-dark-mode]]'
+	end
+	
+	for linkType, link in pairs(links) do
+		local currentLinkData = LinkData[linkType]
+		if not currentLinkData then
+			mw.log('Unknown link: ' .. linkType)
+		else
+			self.inner:node(buildLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text))
+		end
+	end
+
 	return self
 end
 
