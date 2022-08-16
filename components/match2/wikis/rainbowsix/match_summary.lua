@@ -36,7 +36,11 @@ local _LINK_DATA = {
 	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
 	opl = {icon = 'File:OPL_icon_lightmode.png', iconDark = 'File:OPL_icon_darkmode.png', text = 'OPL Match Page'},
-	esl = {icon = 'File:ESL_2019_icon_lightmode.png', iconDark = 'File:ESL_2019_icon_darkmode.png', text = 'Match page on ESL'},
+	esl = {
+		icon = 'File:ESL_2019_icon_lightmode.png',
+		iconDark = 'File:ESL_2019_icon_darkmode.png',
+		text = 'Match page on ESL'
+	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	lpl = {icon = 'File:LPL_Logo_lightmode.png', iconDark = 'File:LPL_Logo_darkmode.png', text = 'Match page on LPL Play'},
 	r6esports = {icon = 'File:Copa Elite Six icon.png', text = 'R6 Esports LATAM Match Page'},
