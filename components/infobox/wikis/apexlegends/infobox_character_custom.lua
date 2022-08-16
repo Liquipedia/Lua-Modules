@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
 
 local CustomCharacter = Class.new()
 local CustomInjector = Class.new(Injector)
