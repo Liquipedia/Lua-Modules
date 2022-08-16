@@ -52,7 +52,7 @@ function CustomInjector:addCustomCells(widgets)
 			:addClass('wikitable wikitable-striped wikitable-bordered')
 			:css('width', '325px')
 		CustomMap:_createRingTable(ringTable)
-		for index, rings in ipairs(_map:getAllArgsForBase(args, 'ring')) do
+		for _, rings in ipairs(_map:getAllArgsForBase(args, 'ring')) do
 			CustomMap:_createRingTable(ringTable, rings)
 		end
 		table.insert(widgets, Title{name = 'Ring Information'})
@@ -64,7 +64,7 @@ end
 function CustomMap:_createRingTable(ringTable, content)
 
 	local tr = ringTable:tag('tr')
-	
+
 	if not content then
 		tr:tag('th')
 			:wikitext('Ring')
@@ -105,7 +105,8 @@ end
 function CustomMap:addToLpdb(lpdbData)
 	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator)
 	lpdbData.extradata.gamemode = _args.gamemode
-	if ((String.isNotEmpty(_args.spanstart) and _args.spanstart ~= '') and (String.isEmpty(_args.spanend) or _args.spanend == '')) then
+	if ((String.isNotEmpty(_args.spanstart) and _args.spanstart ~= '') 
+	and (String.isEmpty(_args.spanend) or _args.spanend == '')) then
 		lpdbData.extradata.competitive = true
 	else
 		lpdbData.extradata.competitive = false
