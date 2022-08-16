@@ -125,9 +125,9 @@ end
 function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTable)
 
 	if not lookUpTable then
-		local linkSource = 'link=Portal:Attachments'
-		local icon = '[[File:Apex ATTM_' .. content .. '_lightmode.png|60px|'..linkSource..'|class=show-when-light-mode]]'
-		local iconDark = '[[File:Apex ATTM_' .. content .. '_darkmode.png|60px|'..linkSource..'|class=show-when-dark-mode]]'
+		local page = 'link=Portal:Attachments'
+		local icon = '[[File:Apex ATTM_' .. content .. '_lightmode.png|60px|'.. page ..'|class=show-when-light-mode]]'
+		local iconDark = '[[File:Apex ATTM_' .. content .. '_darkmode.png|60px|'.. page ..'|class=show-when-dark-mode]]'
 		return mw.html.create('span')
 			:css('white-space', 'nowrap')
 			:node(icon)
