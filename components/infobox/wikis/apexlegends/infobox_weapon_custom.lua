@@ -13,7 +13,6 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
-local PageLink = require('Module:Page')
 
 local CustomWeapon = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -176,8 +175,6 @@ function CustomWeapon:_createNoWrappingSpanAttachment(content, i, type)
 			:css('white-space', 'nowrap')
 			:node(fileName)
 		return span
-	else
-		local span = mw.html.create('span')
 	end
 
 	return mw.html.create('span')
