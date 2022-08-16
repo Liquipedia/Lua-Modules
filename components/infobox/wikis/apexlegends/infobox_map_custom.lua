@@ -49,7 +49,7 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(_args.ring) then
 		local ringTable = mw.html.create('table')
 			:addClass('wikitable wikitable-striped wikitable-bordered')
-			:css('width', '325px')
+			:css('width', '100%')
 			:css('text-align', 'center')
 		ringTable:node(CustomMap:_createRingTable())
 		for _, rings in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
