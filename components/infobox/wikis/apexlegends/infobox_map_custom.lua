@@ -34,7 +34,6 @@ function CustomMap:createWidgetInjector()
 end
 
 function CustomInjector:addCustomCells(widgets)
-	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Game Mode(s)',
 		content = {_args.gamemode}
