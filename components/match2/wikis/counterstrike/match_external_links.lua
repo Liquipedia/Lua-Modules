@@ -104,7 +104,8 @@ return {
 	},
 	{
 		name = 'sostronk',
-		icon = 'SoStronk icon.png',
+		icon = 'SoStronk lightmode.png',
+		iconDark = 'SoStronk darkmode.png',
 		prefixLink = 'https://www.sostronk.com/match/',
 		label = 'Matchpage and Stats on SoStronk',
 		isMapStats = true
