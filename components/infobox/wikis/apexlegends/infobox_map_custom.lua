@@ -44,7 +44,7 @@ function CustomInjector:addCustomCells(widgets)
 	end
 	table.insert(widgets, Cell{
 		name = 'Played in ALGS',
-		content = {(_args.spanstart or '<i><b>Not </b></i>') .. spantext .. (_args.spanend or '<i><b>Currently</b></i>')}
+		content = {(_args.spanstart or '<i><b>Not </b></i>') .. spanText .. (_args.spanend or '<i><b>Currently</b></i>')}
 	})
 	if String.isNotEmpty(_args.ring) then
 		local ringTable = mw.html.create('table')
