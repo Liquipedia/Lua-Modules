@@ -202,7 +202,7 @@ local Footer = Class.new(
 		self.root = mw.html.create('div')
 		self.root:addClass('brkts-popup-footer')
 		self.inner = mw.html.create('div')
-		self.inner:addClass('brkts-popup-spaced')
+		self.inner:addClass('brkts-popup-spaced vodlink')
 	end
 )
 
