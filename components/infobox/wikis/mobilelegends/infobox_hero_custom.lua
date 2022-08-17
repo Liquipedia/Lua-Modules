@@ -46,6 +46,8 @@ end
 function CustomInjector:addCustomCells()
 	local widgets = {
 		Cell{name = 'Specialty', content = {_args.specialty}},
+		Cell{name = 'Region', content = {_args.region}},
+		Cell{name = 'City', content = {_args.city}},
 		Cell{name = 'Attack Type', content = {_args.attacktype}},
 		Cell{name = 'Resource Bar', content = {_args.resourcebar}},
 		Cell{name = 'Secondary Bar', content = {_args.secondarybar}},
