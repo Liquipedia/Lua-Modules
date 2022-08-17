@@ -212,7 +212,7 @@ function Footer:addElement(element)
 	return self
 end
 
-function Footer:addLinks(LinkData, links)
+function Footer:addLinks(linkData, links)
 	local buildLink = function (link, icon, iconDark, text)
 		if String.isEmpty(iconDark) then
 			return '[['..icon..'|link='..link..'|15px|'..text..']]'
@@ -222,7 +222,7 @@ function Footer:addLinks(LinkData, links)
 	end
 
 	for linkType, link in pairs(links) do
-		local currentLinkData = LinkData[linkType]
+		local currentLinkData = linkData[linkType]
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
 		else
