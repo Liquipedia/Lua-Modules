@@ -62,4 +62,5 @@ function CustomCharacter:addToLpdb(lpdbData)
 	lpdbData.extradata.class = _args.legendtype
 	return lpdbData
 end
+
 return CustomCharacter
