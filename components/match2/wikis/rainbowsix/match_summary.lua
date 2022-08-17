@@ -35,10 +35,14 @@ local _LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
-	opl = {icon = 'File:OPL Icon.png', text = 'OPL Match Page'},
-	esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
+	opl = {icon = 'File:OPL_icon_lightmode.png', iconDark = 'File:OPL_icon_darkmode.png', text = 'OPL Match Page'},
+	esl = {
+		icon = 'File:ESL_2019_icon_lightmode.png',
+		iconDark = 'File:ESL_2019_icon_darkmode.png',
+		text = 'Match page on ESL'
+	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
-	lpl = {icon = 'File:LPL Play icon.png', text = 'Match page on LPL Play'},
+	lpl = {icon = 'File:LPL_Logo_lightmode.png', iconDark = 'File:LPL_Logo_darkmode.png', text = 'Match page on LPL Play'},
 	r6esports = {icon = 'File:Copa Elite Six icon.png', text = 'R6 Esports LATAM Match Page'},
 	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
@@ -346,15 +350,7 @@ function CustomMatchSummary.getByMatchId(args)
 			})
 		end
 
-		-- Match Vod + other links
-		local buildLink = function (linktype, link)
-			local icon, text = _LINK_DATA[linktype].icon, _LINK_DATA[linktype].text
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-
-		for linktype, link in pairs(match.links) do
-			footer:addElement(buildLink(linktype,link))
-		end
+		footer:addLinks(_LINK_DATA, match.links)
 
 		matchSummary:footer(footer)
 	end
