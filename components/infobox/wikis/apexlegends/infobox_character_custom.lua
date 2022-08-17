@@ -19,7 +19,7 @@ local _args
 
 function CustomCharacter.run(frame)
 	local character = Character(frame)
-	_args = _character.args
+	_args = character.args
 	character.addToLpdb = CustomCharacter.addToLpdb
 	character.createWidgetInjector = CustomCharacter.createWidgetInjector
 	return character:createInfobox(frame)
