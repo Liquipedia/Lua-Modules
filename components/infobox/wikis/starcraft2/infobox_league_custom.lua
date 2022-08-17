@@ -347,10 +347,9 @@ end
 
 function CustomLeague:shouldStore(args)
 	return Namespace.isMain() and
-		not Logic.readBool(args.disable_smw) and
 		not Logic.readBool(args.disable_lpdb) and
 		not Logic.readBool(args.disable_storage) and
-		not Logic.readBool(Variables.varDefault('disable_SMW_storage', 'false'))
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
 end
 
 function CustomLeague:_getServer()
