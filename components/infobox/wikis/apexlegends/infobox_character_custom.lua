@@ -15,12 +15,10 @@ local Title = require('Module:Infobox/Widget/Title')
 local CustomCharacter = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local _character
 local _args
 
 function CustomCharacter.run(frame)
 	local character = Character(frame)
-	_character = character
 	_args = _character.args
 	character.addToLpdb = CustomCharacter.addToLpdb
 	character.createWidgetInjector = CustomCharacter.createWidgetInjector
@@ -47,15 +45,15 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Passive',
-		content = {"[[File:" .. _args.name .. " - Passive.png|20px]] " .. _args.passive}
+		content = {'[[File:' .. _args.name .. ' - Passive.png|20px]] ' .. _args.passive}
 	})
 	table.insert(widgets, Cell{
 		name = 'Tactical',
-		content = {"[[File:" .. _args.name .. " - Active.png|20px]] " .. _args.active}
+		content = {'[[File:' .. _args.name .. ' - Active.png|20px]] ' .. _args.active}
 	})
 	table.insert(widgets, Cell{
 		name = 'Ultimate',
-		content = {"[[File:" .. _args.name .. " - Ultimate.png|20px]] " .. _args.ultimate}
+		content = {'[[File:' .. _args.name .. ' - Ultimate.png|20px]] ' .. _args.ultimate}
 	})
 	return widgets
 end
