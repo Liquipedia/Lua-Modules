@@ -53,7 +53,7 @@ function HiddenInfoboxLeague.run(args)
 		HiddenInfoboxLeague._setLpdbData()
 		display = HiddenInfoboxLeague._getCategories()
 	else
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	end
 
 	return display
@@ -61,10 +61,9 @@ end
 
 function HiddenInfoboxLeague._shouldStore()
 	return Namespace.isMain() and
-		_args.disable_smw ~= 'true' and
 		_args.disable_lpdb ~= 'true' and
 		_args.disable_storage ~= 'true' and
-		Variables.varDefault('disable_SMW_storage', 'false') ~= 'true'
+		Variables.varDefault('disable_LPDB_storage', 'false') ~= 'true'
 end
 
 function HiddenInfoboxLeague._getCategories()
