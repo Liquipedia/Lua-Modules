@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
