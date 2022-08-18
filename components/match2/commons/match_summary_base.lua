@@ -220,7 +220,7 @@ function Footer:addLink(link, icon, iconDark, text)
 		content = '[['..icon..'|link='..link..'|15px|'..text..'|class=show-when-light-mode]]'
 			.. '[['..iconDark..'|link='..link..'|15px|'..text..'|class=show-when-dark-mode]]'
 	end
-	
+
 	self.inner:wikitext(content)
 	return self
 end
