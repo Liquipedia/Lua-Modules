@@ -142,20 +142,11 @@ function CustomMatchSummary.getByMatchId(args)
 			})
 		end
 
-		-- Match Vod + other links
-		local buildLink = function (link, icon, iconDark, text)
-			if String.isEmpty(iconDark) then
-				return '[['..icon..'|link='..link..'|15px|'..text..']]'
-			end
-			return '[['..icon..'|link='..link..'|15px|'..text..'|class=show-when-light-mode]]'
-				.. '[['..iconDark..'|link='..link..'|15px|'..text..'|class=show-when-dark-mode]]'
-		end
-
 		for _, site in ipairs(_AUTO_LINKS) do
 			for index, publisherid in pairs(publisherids) do
 				local link = site.url .. publisherid
 				local text = 'Game '..index..' on '.. site.name
-				footer:addElement(buildLink(link, site.icon, site.iconDark, text))
+				footer:addLink(link, site.icon, site.iconDark, text)
 			end
 		end
 
