@@ -138,8 +138,10 @@ function Legacy._convert(mapping)
 			end
 
 			if not Logic.isEmpty(nested) then
-				local score1 = json.parseIfString(nested.opponent1 or {}).score or ''
-				local score2 = json.parseIfString(nested.opponent2 or {}).score or ''
+				nested.opponent1 = nested.opponent1 or {}
+				nested.opponent2 = nested.opponent2 or {}
+				local score1 = json.parseIfString(nested.opponent1).score or ''
+				local score2 = json.parseIfString(nested.opponent2).score or ''
 
 				--handle advantages that were bassed the old way
 				nested.opponent1 = Legacy.checkAdvantage(score1, nested.opponent1)
