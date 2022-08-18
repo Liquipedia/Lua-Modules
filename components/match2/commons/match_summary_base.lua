@@ -212,21 +212,26 @@ function Footer:addElement(element)
 	return self
 end
 
-function Footer:addLinks(linkData, links)
-	local buildLink = function (link, icon, iconDark, text)
-		if String.isEmpty(iconDark) then
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-		return '[['..icon..'|link='..link..'|15px|'..text..'|class=show-when-light-mode]]'
+function Footer:addLink(link, icon, iconDark, text)
+	local content
+	if String.isEmpty(iconDark) then
+		content = '[['..icon..'|link='..link..'|15px|'..text..']]'
+	else
+		content = '[['..icon..'|link='..link..'|15px|'..text..'|class=show-when-light-mode]]'
 			.. '[['..iconDark..'|link='..link..'|15px|'..text..'|class=show-when-dark-mode]]'
 	end
+	
+	self.inner:wikitext(content)
+	return self
+end
 
+function Footer:addLinks(linkData, links)
 	for linkType, link in pairs(links) do
 		local currentLinkData = linkData[linkType]
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
 		else
-			self.inner:node(buildLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text))
+			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
 		end
 	end
 
