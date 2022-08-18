@@ -217,8 +217,8 @@ function Footer:addLink(link, icon, iconDark, text)
 	if String.isEmpty(iconDark) then
 		content = '[['..icon..'|link='..link..'|15px|'..text..'|alt=' .. link .. ']]'
 	else
-		content = '[['..icon..'|link='..link..'|15px|'..text..'|alt=' .. link .. 'class=show-when-light-mode]]'
-			.. '[['..iconDark..'|link='..link..'|15px|'..text..'|alt=' .. link .. 'class=show-when-dark-mode]]'
+		content = '[['..icon..'|link='..link..'|15px|'..text..'|alt=' .. link .. '|class=show-when-light-mode]]'
+			.. '[['..iconDark..'|link='..link..'|15px|'..text..'|alt=' .. link .. '|class=show-when-dark-mode]]'
 	end
 
 	self.inner:wikitext(content)
