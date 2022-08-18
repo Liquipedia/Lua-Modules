@@ -12,6 +12,7 @@ local Logic = require('Module:Logic')
 local Match = require('Module:Match')
 local MatchGroup = require('Module:MatchGroup')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 
@@ -42,11 +43,20 @@ function MatchMapsLegacy._matchlist(args)
 	local matches = {}
 
 	local matchIndex = 1
-	local match = Json.parseIfString(args['match' .. matchIndex])
+	local inputIndex = 1
+	local match = Json.parseIfString(args['match' .. inputIndex])
 	while match do
-		matches['M' .. matchIndex] = Match._toEncodedJson(match)
-		matchIndex = matchIndex + 1
-		match = Json.parseIfString(args['match' .. matchIndex])
+		if Table.isEmpty(match) then
+			-- catch some old bs where they put headers inside matches with tr and td stuff ...
+			local header = string.match(args['match' .. inputIndex], '<tr.-> ?<td.->(.-)</td')
+			matches['M' .. matchIndex .. 'header'] = header
+		else
+			matches['M' .. matchIndex] = Match._toEncodedJson(match)
+			matchIndex = matchIndex + 1
+		end
+
+		inputIndex = inputIndex + 1
+		match = Json.parseIfString(args['match' .. inputIndex])
 	end
 
 	matches.id = bracketId
@@ -83,7 +93,7 @@ function MatchMapsLegacy._resetVars()
 end
 
 
--- invoked by Template:MatchMaps/Legacy
+-- invoked by Template:MatchMaps/Legacy or Template:MatchMaps/Legacy2v2
 function MatchMapsLegacy.preprocess(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchMapsLegacy._preProcess(args)
@@ -124,7 +134,7 @@ function MatchMapsLegacy._handleOpponent(match, opponentIndex)
 			flag = match['player' .. opponentIndex .. 'flag'],
 			score = match['p' .. opponentIndex .. 'score'],
 		}
-		if match['player' .. opponentIndex] == '' then
+		if String.isEmpty(match['player' .. opponentIndex]) then
 			match['opponent' .. opponentIndex]['type'] = 'literal'
 		end
 	end
