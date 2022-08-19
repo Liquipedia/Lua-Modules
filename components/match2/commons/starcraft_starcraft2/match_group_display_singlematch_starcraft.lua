@@ -7,7 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
-local Logic = require('Module:Table')
 local DisplayUtil = require('Module:DisplayUtil')
 local Table = require('Module:Table')
 
