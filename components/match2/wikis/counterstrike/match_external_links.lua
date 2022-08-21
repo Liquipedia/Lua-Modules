@@ -31,7 +31,8 @@ return {
 	},
 	{
 		name = 'esl',
-		icon = 'ESL icon.png',
+		icon = 'ESL 2019 icon lightmode.png',
+		iconDark = 'ESL 2019 icon darkmode.png',
 		prefixLink = 'https://play.eslgaming.com/match/',
 		label = 'Matchpage and Stats on ESL Play',
 		isMapStats = true
@@ -83,26 +84,28 @@ return {
 	},
 	{
 		name = 'pinger',
-		icon = 'Pinger icon.png',
+		icon = 'Pinger icon lightmode.png',
+		iconDark = 'Pinger icon darkmode.png',
 		prefixLink = 'https://pinger.kz/matches/csgo/',
 		label = 'Matchpage and Stats on Pinger',
 	},
 	{
 		name = '99damage',
-		icon = '99DMG-icon.png',
+		icon = '99Damage_2021_allmode.png',
 		prefixLink = 'https://csgo.99damage.de/de/matches/',
 		label = '99Damage Matchpage',
 		stats = {'99liga'}
 	},
 	{
 		name = '99liga',
-		icon = '99DMG-icon.png',
+		icon = '99Damage_2021_allmode.png',
 		prefixLink = 'https://liga.99damage.de/de/leagues/matches/',
 		label = 'Matchpage and Stats on 99Liga',
 	},
 	{
 		name = 'sostronk',
-		icon = 'SoStronk icon.png',
+		icon = 'SoStronk lightmode.png',
+		iconDark = 'SoStronk darkmode.png',
 		prefixLink = 'https://www.sostronk.com/match/',
 		label = 'Matchpage and Stats on SoStronk',
 		isMapStats = true
@@ -165,21 +168,24 @@ return {
 	},
 	{
 		name = 'draft5',
-		icon = 'Draft5 icon.png',
+		icon = 'Draft5 icon lightmode.png',
+		iconDark = 'Draft5 icon darkmode.png',
 		prefixLink = 'https://draft5.gg/partida/',
 		label = 'Draft5 Matchpage',
 		stats = {'gamersclub', 'gamersclublobby', 'coliseum'}
 	},
 	{
 		name = 'gamersclub',
-		icon = 'Gamersclub.png',
+		icon = 'Gamers Club icon lightmode.png',
+		iconDark = 'Gamers Club icon darkmode.png',
 		prefixLink = 'https://csgo.gamersclub.gg/tournaments/csgo/',
 		label = 'Matchpage and Stats on Gamers Club',
 		isMapStats = true
 	},
 	{
 		name = 'gamersclublobby',
-		icon = 'Gamersclub.png',
+		icon = 'Gamers Club icon lightmode.png',
+		iconDark = 'Gamers Club icon darkmode.png',
 		prefixLink = 'https://csgo.gamersclub.gg/lobby/partida/',
 		label = 'Matchpage and Stats on Gamers Club',
 		isMapStats = true

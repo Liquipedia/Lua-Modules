@@ -299,7 +299,7 @@ function CustomMatchSummary._createFooter(match, vods)
 
 	local separator = '<b>·</b>'
 
-	local function createFooterLink(icon, url, label, index)
+	local function addFooterLink(icon, iconDark, url, label, index)
 		if icon == 'stats' then
 			icon = index ~= 0 and 'Match Info Stats' .. index .. '.png' or 'Match Info Stats.png'
 		end
@@ -307,7 +307,12 @@ function CustomMatchSummary._createFooter(match, vods)
 			label = label .. ' for Game ' .. index
 		end
 
-		return '[[FILE:' .. icon .. '|link=' .. url .. '|15px|' .. label .. '|alt=' .. url .. ']]'
+		icon = 'File:' .. icon
+		if iconDark then
+			iconDark = 'File:' .. iconDark
+		end
+
+		footer:addLink(url, icon, iconDark, label)
 	end
 
 	-- Match vod
@@ -354,12 +359,12 @@ function CustomMatchSummary._createFooter(match, vods)
 				end
 
 				local icon = platform.icon
+				local iconDark = platform.iconDark
 				local label = platform.label
 				local addGameLabel = platform.isMapStats and match.bestof and match.bestof > 1
 
 				for _, val in ipairs(link) do
-					footer:addElement(createFooterLink(icon, val[1], label,
-														addGameLabel and val[2] or 0))
+					addFooterLink(icon, iconDark, val[1], label, addGameLabel and val[2] or 0)
 					iconsInserted = iconsInserted + 1
 				end
 
