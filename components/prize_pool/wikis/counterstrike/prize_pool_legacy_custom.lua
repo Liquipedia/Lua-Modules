@@ -17,6 +17,12 @@ function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run(CustomLegacyPrizePool)
 end
 
+function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
+	newArgs.qualifier = header.qualifier
+
+	return newArgs
+end
+
 function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
 	-- 0 used to mean unset, so let's unset it
 	if newData.freetext1 == '0' then
