@@ -1069,6 +1069,8 @@ function Placement:_getLpdbData()
 			opponenttype = opponentType,
 			players = players,
 			placement = self:_lpdbValue(),
+			placestart = self.placeStart, -- Needed in SMW
+			placeend = self.placeEnd, -- Needed in SMW
 			prizemoney = prizeMoney,
 			individualprizemoney = (playerCount > 0) and (prizeMoney / playerCount) or 0,
 			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
