@@ -29,6 +29,7 @@ local CustomInjector = Class.new(Injector)
 
 local _league
 local categories = {}
+local _maps = {}
 
 local _TIER_SHOW_MATCH = 9
 
@@ -227,6 +228,13 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Module:Prize pool, Module:Prize pool team, Module:TeamCard and Module:TeamCard2
 	Variables.varDefine('tournament_deadline', DateClean(args.deadline or ''))
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
+
+	-- map links, to be used by brackets and mappool templates
+	local _
+	_, _maps = CustomLeague:_getMaps(args)
+	for _, map in ipairs(_maps) do
+		Variables.varDefine('tournament_map_'.. map.displayname, map.link)
+	end
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
@@ -236,7 +244,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData['sponsors'] = args.sponsors
 
-	local _, mappages = CustomLeague:_getMaps(args)
+	local mappages = Table.mapValues(_maps, function(map) return map.link end)
 	lpdbData['maps'] = table.concat(mappages, ';')
 
 	lpdbData['game'] = GameLookup.getName({args.game})
@@ -347,8 +355,8 @@ function CustomLeague:_getGameModes(args, makeLink)
 end
 
 function CustomLeague:_getMaps(args)
+	local mapsDisplay = {}
 	local maps = {}
-	local mappages = {}
 	local index = 1
 
 	while not String.isEmpty(args['map' .. index]) do
@@ -364,6 +372,7 @@ function CustomLeague:_getMaps(args)
 		local maplink
 		if not String.isEmpty(args['map' .. index .. 'link']) then
 			maplink = args['map' .. index .. 'link']
+			map = map[1]
 		else
 			maplink = map[1]
 			-- only check for a map page when map has only one part,
@@ -371,22 +380,23 @@ function CustomLeague:_getMaps(args)
 			if map[2] == nil and Page.exists(maplink .. ' (map)') then
 				maplink = maplink .. ' (map)'
 			end
+			map = map[2] or map[1]
 		end
 
 		if index == 1 then
-			maps = {Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)}
+			mapsDisplay = {Page.makeInternalLink({}, map .. mapmode, maplink)}
 		else
-			table.insert(maps, '&nbsp;• ' ..
+			table.insert(mapsDisplay, '&nbsp;• ' ..
 				tostring(CustomLeague:_createNoWrappingSpan(
-					Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)
+					Page.makeInternalLink({}, map .. mapmode, maplink)
 				))
 			)
 		end
-		table.insert(mappages, maplink)
+		table.insert(maps, {['displayname'] = map, ['link'] = maplink})
 		index = index + 1
 	end
 
-	return maps, mappages
+	return mapsDisplay, maps
 end
 
 return CustomLeague
