@@ -125,7 +125,7 @@ function copyPaste.bracket(frame, args)
 	local bestof = tonumber(args.bestof) or 3
 	local opponents = tonumber(args.opponents) or 2
 	local mode = WikiSpecific.getMode(args.mode)
-	local headersUpTop = Logic.readBool(args.headersUpTop)
+	local headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
 
 	local bracketDataList = copyPaste._getBracketData(templateid)
 
