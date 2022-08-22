@@ -22,6 +22,7 @@ local Center = require('Module:Infobox/Widget/Center')
 local Page = require('Module:Page')
 local DateClean = require('Module:DateTime')._clean
 local Tier = require('Module:Tier')
+local Table = require('Module:Table')
 
 
 local CustomLeague = Class.new()
