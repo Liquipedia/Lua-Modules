@@ -61,18 +61,22 @@ function CustomInjector:addCustomCells(widgets)
 			content = {table.concat(baseDamages, '&nbsp;• ')}
 		})
 	end
+
 	table.insert(widgets, Cell{
 		name = 'Rate of fire (Single)',
 		content = {args.rateoffiresingle}
 	})
+
 	table.insert(widgets, Cell{
 		name = 'Rate of fire (Auto)',
 		content = {args.rateoffireauto}
 	})
+
 	table.insert(widgets, Cell{
 		name = 'Projectile Speed',
 		content = {args.projectilespeed}
 	})
+
 	if String.isNotEmpty(args.ammocapacity) and String.isEmpty(args.ammocap) then
 		local ammoSizes = {}
 		for index, ammoSize in ipairs(_weapon:getAllArgsForBase(args, 'ammocapacity')) do
@@ -83,6 +87,7 @@ function CustomInjector:addCustomCells(widgets)
 			content = {table.concat(ammoSizes, '<br>')}
 		})
 	end
+
 	if String.isNotEmpty(args.reloadtime) and String.isEmpty(args.reloadspeed) then
 		local reloadTimes = {}
 		for index, reloadTime in ipairs(_weapon:getAllArgsForBase(args, 'reloadtime')) do
@@ -93,14 +98,17 @@ function CustomInjector:addCustomCells(widgets)
 			content = {table.concat(reloadTimes, '<br>')}
 		})
 	end
+
 	table.insert(widgets, Cell{
 		name = 'Ammo Type',
 		content = {args.ammotypeicon .. ' ' .. args.ammotype}
 	})
+
 	table.insert(widgets, Cell{
 		name = 'Release Date',
 		content = {args.release}
 	})
+
 	if String.isNotEmpty(args.attachment) then
 		local attachments = {}
 		for index, attachment in ipairs(_weapon:getAllArgsForBase(args, 'attachment')) do
@@ -109,6 +117,7 @@ function CustomInjector:addCustomCells(widgets)
 		table.insert(widgets, Title{name = 'Attachment Slots'})
 		table.insert(widgets, Center{content = {table.concat(attachments, '&nbsp;&nbsp;')}})
 	end
+
 	if String.isNotEmpty(args.hopup) then
 		local hopups = {}
 		args.hopupdesc1 = args.hopupdesc1 or args.hopupdesc
