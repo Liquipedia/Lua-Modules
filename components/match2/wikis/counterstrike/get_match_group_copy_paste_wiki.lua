@@ -107,6 +107,7 @@ end
 
 function wikiCopyPaste.getStart(template, id, modus, args)
 	args.namedMatchParams = false
+	args.headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
 	local out = '{{' .. (
 		(modus == 'bracket' and
 			('Bracket|Bracket/' .. template)
