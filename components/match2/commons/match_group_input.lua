@@ -73,6 +73,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.matchIndex = matchIndex
 
 			match.parent = context.tournamentParent
+			match.matchsection = context.matchSection
 			bracketData.bracketindex = context.bracketIndex
 			bracketData.groupRoundIndex = context.groupRoundIndex
 			bracketData.sectionheader = context.sectionHeader
@@ -140,6 +141,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
 		match.parent = context.tournamentParent
+		match.matchsection = context.matchSection
 		bracketData.bracketindex = context.bracketIndex
 		bracketData.groupRoundIndex = context.groupRoundIndex
 		bracketData.sectionheader = context.sectionHeader
