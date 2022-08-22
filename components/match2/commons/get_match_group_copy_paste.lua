@@ -87,11 +87,11 @@ function copyPaste._getBracketData(templateid)
 	return bracketDataList
 end
 
-function copyPaste._getHeader(headerCode, customHeader, matchKey)
+function copyPaste._getHeader(headerCode, customHeader)
 	local header = ''
 
 	if not headerCode then
-		return header
+		return header, false
 	end
 
 	headerCode = mw.text.split(string.gsub(headerCode, '$', '!'), '!')
@@ -104,9 +104,8 @@ function copyPaste._getHeader(headerCode, customHeader, matchKey)
 	header = mw.text.split(header, ',')[1]
 
 	header = '\n\n' .. '<!-- ' .. header .. ' -->'
-		.. (customHeader and ('\n|' .. matchKey .. 'header=') or '')
 
-	return header
+	return header, customHeader
 end
 
 function copyPaste.bracket(frame, args)
@@ -126,34 +125,41 @@ function copyPaste.bracket(frame, args)
 	local bestof = tonumber(args.bestof) or 3
 	local opponents = tonumber(args.opponents) or 2
 	local mode = WikiSpecific.getMode(args.mode)
+	local headersUpTop = Logic.readBool(args.headersUpTop)
 
 	local bracketDataList = copyPaste._getBracketData(templateid)
 
+	local matchOut = ''
 	for index, bracketData in ipairs(bracketDataList) do
 		local matchKey = bracketData.matchKey
-		if matchKey == 'RxMTP' or matchKey == 'RxMBR' then
-			if Logic.readBool(args.extra) then
-				local header = ''
-				if matchKey == 'RxMTP' then
-					header = '\n\n' .. '<!-- Third Place Match -->' .. '\n|' .. matchKey .. 'header='
-				end
-				if empty then
-					out = out .. header .. '\n|' .. matchKey .. '='
-				else
-					out = out .. header .. '\n|' .. matchKey .. '=' .. WikiSpecific.getMatchCode(bestof, mode, index, opponents, args)
-				end
+		local header, hasHeaderEntryParam
+		if Logic.readBool(args.extra) and (matchKey == 'RxMTP' or matchKey == 'RxMBR') then
+			header = ''
+			hasHeaderEntryParam = customHeader
+			if matchKey == 'RxMTP' then
+				header = '\n\n' .. '<!-- Third Place Match -->'
 			end
-		else
+		elseif matchKey ~= 'RxMTP' and matchKey ~= 'RxMBR' then
+			header, hasHeaderEntryParam = copyPaste._getHeader(bracketData.header, customHeader)
+		end
+
+		if Logic.readBool(args.extra) or (matchKey ~= 'RxMTP' and matchKey ~= 'RxMBR') then
+			matchOut = matchOut .. header
+			if hasHeaderEntryParam and headersUpTop then
+				out = out .. '\n|' .. matchKey .. 'header='
+			elseif hasHeaderEntryParam then
+				matchOut = matchOut .. '\n|' .. matchKey .. 'header='
+			end
 			if empty then
-				out = out .. copyPaste._getHeader(bracketData.header, customHeader, matchKey) .. '\n|' .. matchKey .. '='
+				matchOut = matchOut .. '\n|' .. matchKey .. '='
 			else
-				out = out .. copyPaste._getHeader(bracketData.header, customHeader, matchKey).. '\n|' .. matchKey .. '=' ..
+				matchOut = matchOut .. '\n|' .. matchKey .. '=' ..
 					WikiSpecific.getMatchCode(bestof, mode, index, opponents, args)
 			end
 		end
 	end
 
-	out = out .. '\n}}'
+	out = out .. matchOut .. '\n}}'
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
@@ -172,17 +178,21 @@ function copyPaste.matchlist(frame, args)
 	local opponents = tonumber(args.opponents) or 2
 	local mode = WikiSpecific.getMode(args.mode)
 	local namedMatchParams = Logic.readBool(Logic.nilOr(args.namedMatchParams, true))
+	local headersUpTop = Logic.readBool(args.headersUpTop)
 
+	local matchOut = ''
 	for index = 1, matches do
-		if customHeader then
+		if customHeader and headersUpTop then
 			out = out .. '\n|M' .. index .. 'header='
+		elseif customHeader then
+			matchOut = matchOut .. '\n|M' .. index .. 'header='
 		end
 
-		out = out .. '\n|' .. (namedMatchParams and ('M' .. index .. '=') or '') ..
+		matchOut = matchOut .. '\n|' .. (namedMatchParams and ('M' .. index .. '=') or '') ..
 			(not empty and WikiSpecific.getMatchCode(bestof, mode, index, opponents, args) or '')
 	end
 
-	out = out .. '\n}}'
+	out = out .. matchOut .. '\n}}'
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
