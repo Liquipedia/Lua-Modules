@@ -18,14 +18,9 @@ local Variables = require('Module:Variables') ---@module "standard.variables"
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
-local SCOREBOARD_LEGACY_FALLBACK = {0, 0, 0}
 
 ---@param data table
-function StandingsStorage.run(data, legacyData)
-	if type(data) ~= 'table' then
-		return StandingsStorage.legacy(data, legacyData)
-	end
-
+function StandingsStorage.run(data)
 	if Table.isEmpty(data) then
 		return
 	end
@@ -44,9 +39,6 @@ function StandingsStorage.run(data, legacyData)
 
 	Array.forEach(data.entries, function (entry)
 		StandingsStorage.entry(entry, standingsIndex)
-		if not data.noLegacy then
-			StandingsStorage.legacy(entry.slotindex, entry)
-		end
 	end)
 end
 
@@ -139,53 +131,7 @@ function StandingsStorage.toScoreBoardEntry(data)
 end
 
 ---@deprecated
----@param index number
----@param data table
 function StandingsStorage.legacy(index, data)
-	local title = data.title or ''
-	local cleanedTitle = title:gsub('<.->.-</.->', '')
-	mw.ext.LiquipediaDB.lpdb_standing(
-		'standing_' .. data.standingsindex .. '_' .. data.roundindex .. '_' .. index,
-		{
-			title = mw.text.trim(cleanedTitle),
-			tournament = data.tournament,
-			type = data.type,
-			participant = data.participant,
-			participantdisplay = data.participantdisplay,
-			participantflag = Flags.CountryCode(data.participantflag),
-			icon = data.icon,
-			icondark = data.icondark,
-			placement = data.placement or data.rank,
-			definitestatus = data.definitestatus or data.bg,
-			currentstatus = data.currentstatus or data.pbg,
-			change = data.change,
-			scoreboard = mw.ext.LiquipediaDB.lpdb_create_json{
-				-- [won, draw, lost]
-				match = StandingsStorage.verifyScoreBoardEntry(Table.mapValues(data.match or {}, tonumber)),
-				overtime = StandingsStorage.verifyScoreBoardEntry(Table.mapValues(data.overtime or {}, tonumber)),
-				game = StandingsStorage.verifyScoreBoardEntry(Table.mapValues(data.game or {}, tonumber)),
-				points = tonumber(data.points),
-				diff = tonumber(data.diff),
-				buchholz = tonumber(data.buchholz),
-			},
-			standingsindex = tonumber(data.standingsindex),
-			roundindex = tonumber(data.roundindex),
-			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
-			parent = Variables.varDefault('tournament_parent', ''),
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json(data.extradata or {})
-		}
-	)
-end
-
----@deprecated
----@param entry table
----@return table
-function StandingsStorage.verifyScoreBoardEntry(entry)
-	-- A valid scoreboard entry must have 3 values in an array
-	if #entry ~= 3 then
-		return Table.copy(SCOREBOARD_LEGACY_FALLBACK)
-	end
-	return entry
 end
 
 ---@param frame table
@@ -267,10 +213,6 @@ function StandingsStorage.fromTemplateEntry(frame)
 	data.match = {w = data.win_m, d = data.tie_m, l = data.lose_m}
 	data.game = {w = data.win_g, d = data.tie_g, l = data.lose_g}
 	StandingsStorage.entry(data, data.standingsindex)
-
-	data.match = {data.win_m, data.tie_m, data.lose_m}
-	data.game = {data.win_g, data.tie_g, data.lose_g}
-	StandingsStorage.legacy(data.slotindex, data)
 end
 
 -- Legacy input method
