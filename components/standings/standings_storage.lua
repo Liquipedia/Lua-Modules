@@ -129,10 +129,6 @@ function StandingsStorage.toScoreBoardEntry(data)
 	return scoreBoard
 end
 
----@deprecated
-function StandingsStorage.legacy(index, data)
-end
-
 ---@param frame table
 function StandingsStorage.fromTemplateHeader(frame)
 	local data = Arguments.getArgs(frame)
