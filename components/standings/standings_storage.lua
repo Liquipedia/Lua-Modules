@@ -7,13 +7,12 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Array = require('Module:Array') ---@module "standard.array"
-local Flags = require('Module:Flags') ---@module "standard.flags"
-local Json = require('Module:Json') ---@module "standard.json"
-local Opponent = require('Module:Opponent') ---@module "opponent"
-local String = require('Module:StringUtils') ---@module "standard.string_utils"
-local Table = require('Module:Table') ---@module "standard.table"
-local Variables = require('Module:Variables') ---@module "standard.variables"
+local Array = require('Module:Array')
+local Json = require('Module:Json')
+local Opponent = require('Module:Opponent')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
