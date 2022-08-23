@@ -31,6 +31,14 @@ local _TIER_MODE_TIERS = 'tiers'
 local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
+local NAME_SANITIZER = {
+	['<.->'] =  '', -- All html tags and their attributes
+	['&nbsp;'] = ' ', -- Non-breaking space
+	['&zwj;'] = '', -- Zero width joiner
+	['—'] = '-', -- Non-breaking hyphen
+	['&shy;'] = '', -- Soft hyphen
+}
+
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
@@ -634,6 +642,16 @@ function League:_fetchAbbreviation()
 	if type(seriesData) == 'table' and seriesData[1] then
 		return seriesData[1].abbreviation
 	end
+end
+
+function League:_sanitizeName(name)
+	local sanitizedName = name
+
+	for search, replace in pairs(NAME_SANITIZER) do
+		sanitizedName = sanitizedName:gsub(search, replace)
+	end
+
+	return sanitizedName
 end
 
 return League
