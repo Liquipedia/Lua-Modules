@@ -362,19 +362,22 @@ function CustomPlayer._getEarningsMedalsData(player)
 		})
 	end
 
-	local conditions = ConditionTree(BooleanOperator.all):add({
-		playerConditions,
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('participantlink'), Comparator.eq, player),
+			playerConditions,
+		},
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
-		ConditionTree(BooleanOperator.any):add({
+		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
 			ConditionNode(ColumnName('extradata_award'), Comparator.neq, ''),
-			ConditionTree(BooleanOperator.all):add({
+			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('players_type'), Comparator.gt, Opponent.solo),
 				placementConditions,
-			}),
-		}),
-	})
+			},
+		},
+	}
 
 	local earnings = {}
 	local medals = {}
