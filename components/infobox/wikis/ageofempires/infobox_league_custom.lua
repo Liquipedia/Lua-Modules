@@ -392,7 +392,7 @@ function CustomLeague:_getMaps(args)
 				))
 			)
 		end
-		table.insert(maps, {['displayname'] = map, ['link'] = maplink})
+		table.insert(maps, {['displayname'] = map, ['link'] = mw.ext.TeamLiquidIntegration.resolve_redirect(maplink)})
 		index = index + 1
 	end
 
