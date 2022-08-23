@@ -231,6 +231,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
 
 	-- map links, to be used by brackets and mappool templates
+	local _
 	_, _maps = CustomLeague:_getMaps(args)
 	for _, map in ipairs(_maps) do
 		Variables.varDefine('tournament_map_'.. map.displayname, map.link)
