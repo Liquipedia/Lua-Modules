@@ -644,7 +644,7 @@ function League:_fetchAbbreviation()
 	end
 end
 
----Replaces a set of html entities with ansi characters. 
+---Replaces a set of html entities with ansi characters.
 ---Removes all html tags and their attributes.
 ---@param name string?
 ---@return string?
