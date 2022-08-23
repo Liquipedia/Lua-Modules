@@ -31,6 +31,14 @@ local _TIER_MODE_TIERS = 'tiers'
 local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
+local NAME_SANITIZER = {
+	['<.->'] =  '', -- All html tags and their attributes
+	['&nbsp;'] = ' ', -- Non-breaking space
+	['&zwj;'] = '', -- Zero width joiner
+	['—'] = '-', -- Non-breaking hyphen
+	['&shy;'] = '', -- Soft hyphen
+}
+
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
@@ -319,9 +327,9 @@ function League:_createPrizepool(args)
 end
 
 function League:_definePageVariables(args)
-	Variables.varDefine('tournament_name', args.name)
-	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
-	Variables.varDefine('tournament_tickername', args.tickername)
+	Variables.varDefine('tournament_name', League.sanitizeName(args.name))
+	Variables.varDefine('tournament_shortname', League.sanitizeName(args.shortname or args.abbreviation))
+	Variables.varDefine('tournament_tickername', League.sanitizeName(args.tickername))
 	Variables.varDefine('tournament_icon', args.icon)
 	Variables.varDefine('tournament_icondark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
@@ -370,9 +378,9 @@ end
 
 function League:_setLpdbData(args, links)
 	local lpdbData = {
-		name = self.name,
-		tickername = args.tickername,
-		shortname = args.shortname or args.abbreviation,
+		name = League.sanitizeName(self.name),
+		tickername = League.sanitizeName(args.tickername),
+		shortname = League.sanitizeName(args.shortname or args.abbreviation),
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = Variables.varDefault('tournament_icon'),
@@ -634,6 +642,23 @@ function League:_fetchAbbreviation()
 	if type(seriesData) == 'table' and seriesData[1] then
 		return seriesData[1].abbreviation
 	end
+end
+
+---Replaces a set of html entities with ansi characters.
+---Removes all html tags and their attributes.
+---@param name string?
+---@return string?
+function League.sanitizeName(name)
+	if not name then
+		return
+	end
+
+	local sanitizedName = name
+	for search, replace in pairs(NAME_SANITIZER) do
+		sanitizedName = sanitizedName:gsub(search, replace)
+	end
+
+	return sanitizedName
 end
 
 return League
