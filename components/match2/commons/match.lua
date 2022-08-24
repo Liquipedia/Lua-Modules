@@ -328,7 +328,7 @@ end
 function Match._addCommonMatchExtradata(match)
 	local commonExtradata = {
 		comment = match.comment,
-		matchsection = Variables.varDefault('matchsection'),
+		matchsection = match.matchsection,
 		timezoneid = match.timezoneId,
 		timezoneoffset = match.timezoneOffset,
 	}
