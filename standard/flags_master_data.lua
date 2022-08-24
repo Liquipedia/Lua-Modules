@@ -1824,7 +1824,7 @@ local languageThreeLetter = {
 }
 
 -- This table includes
--- ISO 3166-2 to the ISO 3166-1 country, that fulfill 
+-- ISO 3166-2 to the ISO 3166-1 country, that fulfill
 -- https://liquipedia.net/commons/Liquipedia:Flag_and_Country_Policy#Countries
 local iso31662 = {
 	['wales'] = 'unitedkingdom',
