@@ -38,14 +38,17 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Game Mode(s)',
 		content = {_args.gamemode}
 	})
+
 	local spanText = ''
 	if String.isNotEmpty(_args.spanstart) then
 		spanText = spanText .. ' - '
 	end
+
 	table.insert(widgets, Cell{
 		name = 'Played in ALGS',
 		content = {(_args.spanstart or '<i><b>Not </b></i>') .. spanText .. (_args.spanend or '<i><b>Currently</b></i>')}
 	})
+
 	if String.isNotEmpty(_args.ring) then
 		local ringTable = mw.html.create('table')
 			:addClass('wikitable wikitable-striped wikitable-bordered')
@@ -58,6 +61,7 @@ function CustomInjector:addCustomCells(widgets)
 		table.insert(widgets, Title{name = 'Ring Information'})
 		table.insert(widgets, Center{content = {tostring(ringTable)}})
 	end
+
 	return widgets
 end
 
