@@ -45,7 +45,7 @@ function MatchLegacy._convertParameters(match2)
 		match.walkover = match.winner
 	end
 
-	match.staticid = 'Legacy_' .. match2.match2id
+	match.staticid = match2.match2id
 
 	-- Handle extradata fields
 	match.extradata = {}
