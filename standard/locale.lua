@@ -44,16 +44,24 @@ function Locale.formatLocation(args)
 end
 
 function Locale.formatLocations(args)
-	local LOCATION_KEYS = {'venue', 'city', 'country', 'region'}
+	local LOCATION_KEYS = {
+		'venue${index}',
+		'venue${index}link',
+		'city${index}',
+		'country${index}',
+		'region${index}'
+	}
 	local locations = Array.mapIndexes(function(index)
-		local getLocationData = function(_, parameter)
-			return parameter, args[parameter .. index]
+		local getLocationData = function(_, rawParameter)
+			local parameter = String.interpolate(rawParameter, {index = index})
+			return parameter, args[parameter]
 		end
 
 		local location = Table.mapValues(Table.map(LOCATION_KEYS, getLocationData), String.nilIfEmpty)
 
 		if index == 1 then
-			local getLocationDataIndexless = function(_, parameter)
+			local getLocationDataIndexless = function(_, rawParameter)
+				local parameter = String.interpolate(rawParameter, {index = ''})
 				return parameter, location[parameter] or args[parameter]
 			end
 
