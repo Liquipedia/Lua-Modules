@@ -18,6 +18,7 @@ function CustomLegacyPrizePool.run()
 end
 
 function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
+	newArgs.qualifier = header.qualifier
 	newArgs.points1link = header['points-link']
 
 	return newArgs
