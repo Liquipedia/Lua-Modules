@@ -55,6 +55,11 @@ function CustomLeague.run(frame)
 	_league = league
 	_args = _league.args
 
+	-- Temp solution until a commons solution is made
+	if _args.liquipediatier == 'Misc' then
+		_args.liquipediatier = '-1'
+	end
+
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
