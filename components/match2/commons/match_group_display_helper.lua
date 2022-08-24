@@ -173,6 +173,7 @@ MediaWiki:BracketConfig.
 ]]
 DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
 	local defaultConfig = {
+		forceShortName = false,
 		headerHeight = 25,
 		headerMargin = 8,
 		lineWidth = 2,
