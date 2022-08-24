@@ -32,7 +32,7 @@ end
 function MatchMapsLegacy._init(args)
 	local store = Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
-		not Logic.readBool(globalVars:get('disable_SMW_storage'))
+		not Logic.readBool(globalVars:get('disable_LPDB_storage'))
 	)
 
 	matchlistVars:set('store', tostring(store))

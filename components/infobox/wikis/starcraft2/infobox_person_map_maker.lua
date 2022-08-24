@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local CleanRace = require('Module:CleanRace')
 local Logic = require('Module:Logic')
 local MapMaker = require('Module:Infobox/Person')
+local Namespace = require('Module:Namespace')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -150,11 +151,11 @@ end
 
 function CustomMapMaker:shouldStoreData()
 	if
-		_args.disable_smw == 'true' or _args.disable_lpdb == 'true' or _args.disable_storage == 'true'
-		or Variables.varDefault('disable_SMW_storage', 'false') == 'true'
-		or mw.title.getCurrentTitle().nsText ~= ''
+		Logic.readBool(_args.disable_lpdb) or Logic.readBool(_args.disable_storage)
+		or Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		or not Namespace.isMain()
 	then
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 		return false
 	end
 	return true

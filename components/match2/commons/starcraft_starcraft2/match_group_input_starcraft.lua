@@ -121,7 +121,7 @@ function StarcraftMatchGroupInput._checkFinished(match)
 end
 
 function StarcraftMatchGroupInput._getTournamentVars(match)
-	match.noQuery = Variables.varDefault('disable_SMW_storage', 'false')
+	match.noQuery = Variables.varDefault('disable_LPDB_storage', 'false')
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	Variables.varDefine('headtohead', match.headtohead)
