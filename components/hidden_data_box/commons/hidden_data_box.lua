@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Namespace = require('Module:Namespace')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -26,6 +27,7 @@ local TIER_MODE_TIERS = 'tiers'
 function HiddenDataBox.run(args)
 	args = args or {}
 	args.participantGrabber = Logic.nilOr(Logic.readBoolOrNil(args.participantGrabber), true)
+	local doQuery = not Logic.readBool(args.noQuery)
 
 	local warnings = {}
 	local warning
@@ -39,16 +41,21 @@ function HiddenDataBox.run(args)
 	local parent = args.parent or args.tournament or tostring(mw.title.getCurrentTitle().basePageTitle)
 	parent = parent:gsub(' ', '_')
 
-	local queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. parent .. ']]',
-		limit = 1,
-	})
-	queryResult = queryResult[1]
+	local queryResult
+	if doQuery then
+		queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
+			conditions = '[[pagename::' .. parent .. ']]',
+			limit = 1,
+		})
+		queryResult = queryResult[1]
+	else
+		queryResult = {}
+	end
 
-	if not queryResult then
+	if not queryResult and Namespace.isMain() then
 		table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
 		queryResult = {}
-	elseif args.participantGrabber then
+	elseif doQuery and args.participantGrabber then
 		local participants = HiddenDataBox._fetchParticipants(parent)
 
 		Table.iter.forEachPair(participants, function (participant, players)
