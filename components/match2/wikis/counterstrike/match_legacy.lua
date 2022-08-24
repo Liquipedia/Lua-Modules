@@ -46,6 +46,8 @@ function MatchLegacy.convertParameters(match2)
 		match.walkover = match.winner
 	elseif match.walkover == 'l' then
 		match.walkover = nil
+	else
+		match.walkover = nil
 	end
 
 	match.staticid = match2.match2id
