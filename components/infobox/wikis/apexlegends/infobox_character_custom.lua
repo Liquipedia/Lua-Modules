@@ -34,27 +34,34 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Age',
 		content = {_args.age}
 	})
+
 	table.insert(widgets, Cell{
 		name = 'Home World',
 		content = {_args.homeworld}
 	})
+
 	table.insert(widgets, Title{name = 'Abilities'})
+
 	table.insert(widgets, Cell{
 		name = 'Legend Type',
 		content = {_args.legendtype}
 	})
+
 	table.insert(widgets, Cell{
 		name = 'Passive',
 		content = {'[[File:' .. _args.name .. ' - Passive.png|20px]] ' .. _args.passive}
 	})
+
 	table.insert(widgets, Cell{
 		name = 'Tactical',
 		content = {'[[File:' .. _args.name .. ' - Active.png|20px]] ' .. _args.active}
 	})
+
 	table.insert(widgets, Cell{
 		name = 'Ultimate',
 		content = {'[[File:' .. _args.name .. ' - Ultimate.png|20px]] ' .. _args.ultimate}
 	})
+
 	return widgets
 end
 
