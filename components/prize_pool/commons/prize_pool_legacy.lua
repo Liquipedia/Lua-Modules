@@ -73,16 +73,20 @@ function LegacyPrizePool.run(dependency)
 	local currentPlace
 	local mergeSlots = Logic.readBool(header.mergeSlots)
 	for _, slot in ipairs(slots) do
+		-- retrieve the slot and push it into a temp var so it can be altered (to merge slots if need be)
 		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots)
+		-- if we want to merge slots and the slot we just retireved
+		-- has the same place as the one before, then append the opponents
 		if mergeSlots and tempSlot.place and currentPlace == tempSlot.place then
 			Array.appendWith(newArgs[newSlotIndex].opponents, unpack(tempSlot.opponents))
-		else
+		else -- regular case we do not need to merge
 			currentPlace = tempSlot.place
 			newSlotIndex = newSlotIndex + 1
 			newArgs[newSlotIndex] = tempSlot
 		end
 	end
 
+	-- itterate over slots and merge opponents into the slots directly
 	local numberOfSlots = newSlotIndex
 	for slotIndex = 1, numberOfSlots do
 		Table.mergeInto(newArgs[slotIndex], newArgs[slotIndex].opponents)
