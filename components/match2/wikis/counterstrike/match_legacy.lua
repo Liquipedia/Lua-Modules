@@ -44,8 +44,6 @@ function MatchLegacy.convertParameters(match2)
 
 	if match.walkover == 'ff' or match.walkover == 'dq' then
 		match.walkover = match.winner
-	elseif match.walkover == 'l' then
-		match.walkover = nil
 	else
 		match.walkover = nil
 	end
