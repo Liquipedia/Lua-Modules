@@ -46,6 +46,7 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 )
 
 function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
+	options = options or {}
 	local forceShortName = options.forceShortName
 
 	local bracketStyleNode = OpponentDisplay.BlockTeamContainer({
