@@ -29,11 +29,11 @@ OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'br
 Display component for an opponent entry appearing in a bracket match.
 ]]
 OpponentDisplay.BracketOpponentEntry = Class.new(
-	function(self, opponent)
+	function(self, opponent, options)
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 
 		if opponent.type == 'team' then
-			self:createTeam(opponent.template or 'tbd')
+			self:createTeam(opponent.template or 'tbd', options)
 		elseif opponent.type == 'solo' then
 			self:createPlayer(opponent.players[1])
 		elseif opponent.type == 'literal' then
@@ -45,11 +45,13 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 	end
 )
 
-function OpponentDisplay.BracketOpponentEntry:createTeam(template)
+function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
+	local forceShortName = options.forceShortName
+
 	local bracketStyleNode = OpponentDisplay.BlockTeamContainer({
 		overflow = 'ellipsis',
 		showLink = false,
-		style = 'bracket',
+		style = forceShortName and 'short' or 'bracket',
 		template = template,
 	})
 		:addClass('hidden-xs')
