@@ -1823,6 +1823,16 @@ local languageThreeLetter = {
 	['rus'] = 'russianspeaking',
 }
 
+-- This table includes
+-- ISO 3166-2 to the ISO 3166-1 country, that fulfill
+-- https://liquipedia.net/commons/Liquipedia:Flag_and_Country_Policy#Countries
+local iso31662 = {
+	['wales'] = 'unitedkingdom',
+	['scotland'] = 'unitedkingdom',
+	['england'] = 'unitedkingdom',
+	['northernireland'] = 'unitedkingdom',
+}
+
 return {
 	data = data,
 	twoLetter = twoLetter,
@@ -1830,4 +1840,5 @@ return {
 	aliases = aliases,
 	languageTwoLetter = languageTwoLetter,
 	languageThreeLetter = languageThreeLetter,
+	iso31662 = iso31662,
 }

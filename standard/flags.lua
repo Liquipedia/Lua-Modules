@@ -114,6 +114,7 @@ function Flags.CountryCode(flagName, format)
 		if format == 'alpha3' then
 			return Flags._getAlpha3CodesByKey()[flagKey] or Flags._getLanguage3LetterCodesByKey()[flagKey]
 		else
+			flagKey = MasterData.iso31662[flagKey] or flagKey
 			return Flags._getAlpha2CodesByKey()[flagKey] or Flags._getLanguageCodesByKey()[flagKey]
 		end
 	end
