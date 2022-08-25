@@ -124,7 +124,7 @@ function Series:createInfobox(frame)
 		Cell{
 			name = 'Venue',
 			content = {
-				args.venue
+				Page.makeExternalLink(args.venue, args.venuelink) or args.venue
 			}
 		},
 		Cell{
