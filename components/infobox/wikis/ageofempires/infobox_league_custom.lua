@@ -369,7 +369,7 @@ function CustomLeague:_getMaps(args)
 			if mapInput[2] == nil and Page.exists(link .. ' (map)') then
 				link = link .. ' (map)'
 			end
-			map = map[2] or map[1]
+			display = mapInput[2] or mapInput[1]
 		end
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(link)
 
