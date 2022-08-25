@@ -13,7 +13,6 @@ local Logic = require('Module:Logic')
 local PlayerExt = require('Module:Player/Ext')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TournamentUtil = require('Module:Tournament/Util')
 
 local globalVars = PlayerExt.globalVars
 
@@ -78,7 +77,7 @@ For specific uses only.
 function StarcraftPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	local lpdbPlayer = StarcraftPlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.raceHistory then
-		date = date or TournamentUtil.getContextualDateOrNow()
+		date = date or PlayerExt.getContextualDateOrNow()
 		local entry = Array.find(lpdbPlayer.raceHistory, function(entry) return date <= entry.endDate end)
 		return entry and StarcraftPlayerExt.readRace(entry.race)
 	else
