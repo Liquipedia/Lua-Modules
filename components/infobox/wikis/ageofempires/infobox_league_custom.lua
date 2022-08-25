@@ -388,10 +388,10 @@ function CustomLeague:_displayMaps(maps)
 		))
 	end
 
-	return table.concat(
+	return {table.concat(
 		Table.mapValues(maps, function(map) return mapDisplay(map) end)
 		'&nbsp;• '
-	)
+	)}
 end
 
 return CustomLeague
