@@ -1078,6 +1078,7 @@ function Placement:_getLpdbData()
 			groupscore = opponent.additionalData.GROUPSCORE,
 			extradata = {
 				prizepoints = tostring(pointsReward or ''),
+				participantteam = opponentType == Opponent.solo and players.p1team or nil,
 			}
 
 			-- TODO: We need to create additional LPDB Fields
