@@ -353,7 +353,7 @@ end
 
 function CustomLeague:_getMaps(args)
 	local maps = {}
-	for prefix, mapInput in Table.iter.pairsByPrefix(args, '') do
+	for prefix, mapInput in Table.iter.pairsByPrefix(args, 'map') do
 		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or ''
 
 		mapInput = mw.text.split(mapInput, '|', true)
