@@ -30,7 +30,6 @@ local CustomInjector = Class.new(Injector)
 
 local _league
 local categories = {}
-local _maps = {}
 
 local _TIER_SHOW_MATCH = 9
 
@@ -95,9 +94,8 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		if not String.isEmpty(args.map1) then
-			local maps, _ = CustomLeague:_getMaps(args)
 			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = maps})
+			table.insert(widgets, Center{content = CustomLeague:_displayMaps(_league.maps)})
 		end
 	elseif id == 'sponsors' then
 		if not String.isEmpty(args.sponsors) then
@@ -231,10 +229,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
 
 	-- map links, to be used by brackets and mappool templates
-	local _
-	_, _maps = CustomLeague:_getMaps(args)
-	for _, map in ipairs(_maps) do
-		Variables.varDefine('tournament_map_'.. map.displayname, map.link)
+	local maps = CustomLeague:_getMaps(args)
+	for _, map in ipairs(maps) do
+		Variables.varDefine('tournament_map_'.. map.displayName, map.link)
 	end
 end
 
@@ -245,8 +242,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData['sponsors'] = args.sponsors
 
-	local mappages = Table.mapValues(_maps, function(map) return map.link end)
-	lpdbData['maps'] = table.concat(mappages, ';')
+	local mapPages = Table.mapValues(_league.maps, function(map) return map.link end)
+	lpdbData['maps'] = table.concat(mapPages, ';')
 
 	lpdbData['game'] = GameLookup.getName({args.game})
 	-- Currently, args.patch shall be used for official patches,
@@ -275,10 +272,9 @@ function CustomLeague:_concatArgs(args, base)
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
+	return mw.html.create('span')
+		:css('white-space', 'nowrap')
 		:node(content)
-	return span
 end
 
 function CustomLeague:_getGameVersion(args)
@@ -356,48 +352,46 @@ function CustomLeague:_getGameModes(args, makeLink)
 end
 
 function CustomLeague:_getMaps(args)
-	local mapsDisplay = {}
 	local maps = {}
-	local index = 1
+	for prefix, mapInput in Table.iter.pairsByPrefix(args, '') do
+		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or ''
 
-	while not String.isEmpty(args['map' .. index]) do
-		-- map game mode from mapXmode
-		local mapmode = ''
-		if not String.isEmpty(args['map' .. index .. 'mode']) then
-			mapmode = MapMode.get({args['map' .. index .. 'mode']})
-		end
+		mapInput = mw.text.split(mapInput, '|', true)
+		local display, link
 
-		-- map from mapX, might be pagename|displayname
-		local map = mw.text.split(args['map' .. index], '|', true)
-		-- maplink from mapXlink or first part of map or autolink
-		local maplink
-		if not String.isEmpty(args['map' .. index .. 'link']) then
-			maplink = args['map' .. index .. 'link']
-			map = map[1]
+		if String.isNotEmpty(args[prefix .. 'link']) then
+			link = args[prefix .. 'link']
+			display = mapInput[1]
 		else
-			maplink = map[1]
+			link = mapInput[1]
 			-- only check for a map page when map has only one part,
 			-- so no precise link is given
-			if map[2] == nil and Page.exists(maplink .. ' (map)') then
-				maplink = maplink .. ' (map)'
+			if mapInput[2] == nil and Page.exists(link .. ' (map)') then
+				link = link .. ' (map)'
 			end
 			map = map[2] or map[1]
 		end
+		link = mw.ext.TeamLiquidIntegration.resolve_redirect(link)
 
-		if index == 1 then
-			mapsDisplay = {Page.makeInternalLink({}, map .. mapmode, maplink)}
-		else
-			table.insert(mapsDisplay, '&nbsp;• ' ..
-				tostring(CustomLeague:_createNoWrappingSpan(
-					Page.makeInternalLink({}, map .. mapmode, maplink)
-				))
-			)
-		end
-		table.insert(maps, {['displayname'] = map, ['link'] = mw.ext.TeamLiquidIntegration.resolve_redirect(maplink)})
-		index = index + 1
+		table.insert(maps, {link = link, displayName = display, mode = mode})
 	end
 
-	return mapsDisplay, maps
+	_league.maps = maps
+
+	return maps
+end
+
+function CustomLeague:_displayMaps(maps)
+	local mapDisplay = function(map)
+		return tostring(CustomLeague:_createNoWrappingSpan(
+			Page.makeInternalLink({}, map.displayName .. map.mode, map.link)
+		))
+	end
+
+	return table.concat(
+		Table.mapValues(maps, function(map) return mapDisplay(map) end)
+		'&nbsp;• '
+	)
 end
 
 return CustomLeague
