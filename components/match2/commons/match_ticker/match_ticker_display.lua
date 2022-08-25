@@ -194,7 +194,7 @@ local Versus = Class.new(
 @bestOf - bestOf of the match for which the score display is build
 ]]
 function Versus:bestOf(bestOf)
-	if String.isNotEmpty(bestOf) then
+	if String.isNotEmpty(bestOf) and bestOf ~= 0 then
 		self.bestOfDisplay = mw.html.create('abbr')
 			:attr('title', 'Best of ' .. bestOf)
 			:wikitext('Bo' .. bestOf)
