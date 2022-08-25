@@ -62,6 +62,18 @@ function League:createInfobox()
 	args.abbreviation = self:_fetchAbbreviation()
 	local links
 
+	-- Split venue from legacy format to new format.
+	-- Legacy format is a wiki-code string that can include an external link
+	-- New format has |venue= and |venuelink= as different parameters.
+	-- This should be removed once there's been a bot run to change this.
+	if not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
+		-- Remove [] and split on space
+		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
+		args.venuelink = splitVenue[1]
+		table.remove(splitVenue, 1)
+		args.venue = table.concat(splitVenue, ' ')
+	end
+
 	-- set Variables here already so they are available in functions
 	-- we call from here on, e.g. _createPrizepool
 	self:_definePageVariables(args)
@@ -156,7 +168,12 @@ function League:createInfobox()
 				self:_createLocation(args)
 			}
 		},
-		Cell{name = 'Venue', content = {args.venue}},
+		Cell{
+			name = 'Venue',
+			content = {
+				Page.makeExternalLink(args.venue, args.venuelink) or args.venue
+			}
+		},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
 			Cell{
