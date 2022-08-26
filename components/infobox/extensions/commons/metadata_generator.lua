@@ -141,6 +141,10 @@ function MetadataGenerator.tournament(args)
 		})
 	end
 
+	if not (date or teams or players or prizepool) then
+		output = output .. 'is yet to take place'
+	end
+
 	output = output .. '.'
 
 	return output
