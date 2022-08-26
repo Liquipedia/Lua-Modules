@@ -53,16 +53,16 @@ function Locale.formatLocations(args)
 	}
 	local locations = Array.mapIndexes(function(index)
 		local getLocationData = function(_, rawParameter)
+			local parameterIndexless = String.interpolate(rawParameter, {index = ''})
 			local parameter = String.interpolate(rawParameter, {index = index})
-			return parameter, args[parameter]
+			return parameterIndexless, args[parameter]
 		end
 
 		local location = Table.mapValues(Table.map(LOCATION_KEYS, getLocationData), String.nilIfEmpty)
-
 		if index == 1 then
 			local getLocationDataIndexless = function(_, rawParameter)
-				local parameter = String.interpolate(rawParameter, {index = ''})
-				return parameter, location[parameter] or args[parameter]
+				local parameterIndexless = String.interpolate(rawParameter, {index = ''})
+				return parameterIndexless, location[parameterIndexless] or args[parameterIndexless]
 			end
 
 			location = Table.mapValues(Table.map(LOCATION_KEYS, getLocationDataIndexless), String.nilIfEmpty)
