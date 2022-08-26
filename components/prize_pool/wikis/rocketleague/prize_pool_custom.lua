@@ -44,6 +44,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.series = Variables.varDefault('tournament_series', '')
 	lpdbData.extradata.liquipediatiertype2 = Variables.varDefault('tournament_tiertype2', '')
 	lpdbData.extradata.notabilitymod = Variables.varDefault('tournament_notability_mod', '1')
+	if lpdbData.opponenttype == Opponent.solo then
+		lpdbData.extradata.participantteam = lpdbData.players.p1team
+	end
 
 	local participantLower = mw.ustring.lower(lpdbData.participant)
 
