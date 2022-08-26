@@ -108,17 +108,6 @@ function Wrapper._processOpponent(args)
 	return opponentArgs
 end
 
-function Wrapper._removeEmpty(tbl)
-	local newTable = {}
-	for _, item in ipairs(tbl) do
-		if String.isNotEmpty(item) then
-			table.insert(newTable, item)
-		end
-	end
-
-	return newTable
-end
-
 function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	-- parse the single player and add them to the opponentArgs
 	local link, name = playerInput:match('%[%[([^|]-)|([^|]-)%]%]')
