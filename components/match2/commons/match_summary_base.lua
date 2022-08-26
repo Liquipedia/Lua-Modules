@@ -270,6 +270,17 @@ function MatchSummary:body(body)
 	return self
 end
 
+function MatchSummary:resetBody(resetBody)
+	self.resetBodyElement = resetBody:create()
+	return self
+end
+
+function MatchSummary:resetHeader(resetHeader)
+	self.resetHeader = resetHeader:create()
+		:addClass('brkts-popup-header-reset')
+	return self
+end
+
 function MatchSummary:comment(comment)
 	self.commentElement = comment:create()
 	return self
@@ -280,12 +291,28 @@ function MatchSummary:footer(footer)
 	return self
 end
 
+function MatchSummary._fallbackResetHeader()
+	return mw.html.create('div')
+		:addClass('brkts-popup-body-element brkts-popup-header-reset')
+		:css('margin','auto')
+		:css('font-weight', 'bold')
+		:wikitext('Reset match')
+end
+
 function MatchSummary:create()
 	self.root
 		:node(self.headerElement)
 		:node(Break():create())
 		:node(self.bodyElement)
 		:node(Break():create())
+
+	if self.resetBodyElement then
+		self.root
+			:node(self.resetHeader or MatchSummary._fallbackResetHeader())
+			:node(Break():create())
+			:node(self.resetBodyElement)
+			:node(Break():create())
+	end
 
 	if self.commentElement ~= nil then
 		self.root
