@@ -89,7 +89,7 @@ function Wrapper._processOpponent(args)
 	-- split the opponentInput into the sep. playerInputs
 	local playerInputs = mw.text.split(opponentInput, '<span class="starcraft%-inline%-player')
 	-- since the split can add empty strings we need to remove them again
-	playerInputs = Wrapper._removeEmpty(playerInputs)
+	playerInputs = Array.filter(playerInputs, String.isNotEmpty)
 
 	local opponentType = TYPE_FROM_NUMBER[#playerInputs]
 	if not opponentType then
