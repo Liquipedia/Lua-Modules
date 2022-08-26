@@ -9,7 +9,9 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Opponent = require('Module:Opponent')
+local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -43,6 +45,10 @@ end
 
 ---@param data table
 function StandingsStorage.table(data)
+	if not StandingsStorage.shouldStore() then
+		return
+	end
+
 	local title = data.title or ''
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
 
@@ -68,6 +74,10 @@ end
 ---@param entry table
 ---@param standingsIndex number
 function StandingsStorage.entry(entry, standingsIndex)
+	if not StandingsStorage.shouldStore() then
+		return
+	end
+
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
 
@@ -105,6 +115,13 @@ function StandingsStorage.entry(entry, standingsIndex)
 		'standing_' .. standingsIndex .. '_' .. roundIndex .. '_' .. slotIndex,
 		Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))
 	)
+end
+
+---@return boolean
+function StandingsStorage.shouldStore()
+	return Namespace.isMain()
+			and not Logic.readBool(Variables.varDefault('disable_SMW_storage'))
+			and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 ---@param data table
