@@ -65,7 +65,7 @@ function Wrapper.entry(frame)
 		win_g = args.win_g,
 		tie_g = args.tie_g,
 		lose_g = args.lose_g,
-		points = points,
+		points = args.points,
 		roundindex = 1,
 		standingsindex = Variables.varDefault('standingsindex'),
 	}
@@ -82,8 +82,9 @@ function Wrapper._processOpponent(args)
 	end
 
 	local opponentArgs = {}
-	--split the value into 
-	local playerInputs = mw.text.split(opponentInput, '<span class="starcraft%-inline%-player ?f?l?i?p?p?e?d?">')
+	-- split the opponentInput into the sep. playerInputs
+	local playerInputs = mw.text.split(opponentInput, '<span class="starcraft%-inline%-player')
+	-- since the split can add empty strings we need to remove them again
 	playerInputs = Wrapper._removeEmpty(playerInputs)
 
 	local opponentType = TYPE_FROM_NUMBER[#playerInputs]
@@ -93,22 +94,7 @@ function Wrapper._processOpponent(args)
 	opponentArgs.type = opponentType
 
 	for playerIndex, playerInput in ipairs(playerInputs) do
-		local prefix = 'p' .. playerIndex
-		-- parse the single player and add them to the opponentArgs
-		local link, name = playerInput:match('%[%[([^|]-)|([^|]-)%]%]')
-		if String.isEmpty(link) or String.isEmpty(link) then
-			-- invalid input
-			return
-		end
-		opponentArgs[prefix] = name
-		opponentArgs[prefix .. 'link'] = link
-		opponentArgs[prefix .. 'flag'] = playerInput:match('<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
-
-		-- get the race
-		-- first remove the flag so that only 1 image is left
-		playerInput = playerInput:gsub('<span class="flag">.-</span>', '')
-		-- now read the race from the remaining file
-		opponentArgs[prefix .. 'race'] = playerInput:match('&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
+		Wrapper._processPlayer(playerInput, opponentArgs, 'p' .. playerIndex)
 	end
 
 	-- archon handling gets ignored here
@@ -127,6 +113,24 @@ function Wrapper._removeEmpty(tbl)
 	end
 
 	return newTable
+end
+
+function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
+	-- parse the single player and add them to the opponentArgs
+	local link, name = playerInput:match('%[%[([^|]-)|([^|]-)%]%]')
+	if String.isEmpty(link) or String.isEmpty(name) then
+		-- invalid input
+		return
+	end
+	opponentArgs[prefix] = name
+	opponentArgs[prefix .. 'link'] = link
+	opponentArgs[prefix .. 'flag'] = playerInput:match('<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
+
+	-- get the race
+	-- first remove the flag so that only 1 image is left
+	playerInput = playerInput:gsub('<span class="flag">.-</span>', '')
+	-- now read the race from the remaining file
+	opponentArgs[prefix .. 'race'] = playerInput:match('&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
 end
 
 return Wrapper
