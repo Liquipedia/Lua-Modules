@@ -29,6 +29,7 @@ local Wrapper = {}
 
 function Wrapper.table(frame)
 	local args = Arguments.getArgs(frame)
+	-- option to disable storage in case of transclusions etc
 	if not Logic.readBool(Logic.emptyOr(args.store, true)) then
 		return
 	end
