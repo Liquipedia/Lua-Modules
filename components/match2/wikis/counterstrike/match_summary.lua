@@ -247,6 +247,9 @@ function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+		if Logic.isNotEmpty(match.extradata.status) then
+			match.stream = {rawdatetime = true}
+		end
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
