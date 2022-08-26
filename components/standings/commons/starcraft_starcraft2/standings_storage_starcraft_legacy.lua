@@ -79,6 +79,9 @@ function Wrapper._processOpponent(args)
 	-- case team opponent
 	if opponentInput:match('class="team%-template') then
 		local teamPage = opponentInput:match('%[%[([^|]-)|[^|]-%]%]')
+		if not teamPage then
+			return
+		end
 		return {type = Opponent.team, template = teamPage:lower()}
 	end
 
