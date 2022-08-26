@@ -208,15 +208,11 @@ function Placement._placement(args)
 
 	if sortPrefix == nil then
 		mw.log('No placement found in Module:Placement: ' .. args.placement)
-		args.parent:tag('span')
-			:css('display', 'none')
-			:wikitext('ZZ')
+		args.parent:attr('data-sort-value', 'ZZ')
 		args.parent:tag('font')
 			:wikitext(args.placement .. ' [[Category:Pages with unknown placements]]')
 	else
-		args.parent:tag('span')
-			:css('display', 'none')
-			:wikitext(sortPrefix .. sortPrefix2)
+		args.parent:attr('data-sort-value', sortPrefix .. sortPrefix2)
 
 		-- Display text
 		args.parent:tag('font')
