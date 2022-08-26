@@ -1078,7 +1078,7 @@ function Placement:_getLpdbData()
 			groupscore = opponent.additionalData.GROUPSCORE,
 			extradata = {
 				prizepoints = tostring(pointsReward or ''),
-				participantteam = opponentType == Opponent.solo
+				participantteam = (opponentType == Opponent.solo and players.p1team)
 									and Opponent.toName{template = players.p1team, type = 'team'}
 									or nil,
 			}
