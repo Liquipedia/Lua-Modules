@@ -147,7 +147,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 	if not data.standingsindex or not data.roundindex or not data.placement then
 		return
 	end
-	if not data.team and not data.player then
+	if not data.team and not data.player and not data.opponent then
 		return
 	end
 
