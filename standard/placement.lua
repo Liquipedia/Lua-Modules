@@ -140,7 +140,7 @@ function Placement._placement(args)
 	local diff
 	if tonumber(placement[1]) == nil then
 		text = string.upper(placement[1])
-		diff = 1
+		diff = 0
 	elseif table.maxn(placement) == 2 then
 		if ordinalSuffix[placement[2]] then
 			text = placement[1] .. '&nbsp;-&nbsp;' .. placement[2] .. ordinalSuffix[placement[2]]
@@ -154,7 +154,7 @@ function Placement._placement(args)
 		else
 			text = placement[1] .. ordinalSuffix[string.sub(placement[1], -1)]
 		end
-		diff = 1
+		diff = 0
 	end
 
 	-- Cell color
@@ -198,7 +198,9 @@ function Placement._placement(args)
 	end
 
 	local sortPrefix2 --Sort key for second part
-	if tonumber(diff) <= 17 then
+	if tonumber(diff) == 0 then
+		sortPrefix2 = ''
+	elseif tonumber(diff) <= 17 then
 		sortPrefix2 = placeSortPrefix[tostring(diff)]
 	elseif tonumber(diff) <= 32 then
 		sortPrefix2 = 'R'
