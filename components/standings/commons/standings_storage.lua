@@ -90,9 +90,9 @@ function StandingsStorage.entry(entry, standingsIndex)
 		currentstatus = entry.currentstatus or entry.pbg,
 		placementchange = entry.placementchange or entry.change,
 		scoreboard = mw.ext.LiquipediaDB.lpdb_create_json{
-			match = StandingsStorage.toScoreBoardEntry(entry.match),
+			match = StandingsStorage.toScoreBoardEntry(entry.match, {isMandatory = true}),
 			overtime = StandingsStorage.toScoreBoardEntry(entry.overtime),
-			game = StandingsStorage.toScoreBoardEntry(entry.game),
+			game = StandingsStorage.toScoreBoardEntry(entry.game, {isMandatory = true}),
 			points = tonumber(entry.points),
 			diff = tonumber(entry.diff),
 			buchholz = tonumber(entry.buchholz),
@@ -109,8 +109,9 @@ end
 
 ---@param data table
 ---@return table
-function StandingsStorage.toScoreBoardEntry(data)
-	if Table.isEmpty(data) then
+function StandingsStorage.toScoreBoardEntry(data, options)
+	options = options or {}
+	if Table.isEmpty(data) and options.isMandatory then
 		return Table.copy(SCOREBOARD_FALLBACK)
 	end
 
@@ -147,7 +148,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 	if not data.standingsindex or not data.roundindex or not data.placement then
 		return
 	end
-	if not data.team and not data.player then
+	if not data.team and not data.player and not data.opponent then
 		return
 	end
 
