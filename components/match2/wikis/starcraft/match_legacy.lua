@@ -199,7 +199,7 @@ function MatchLegacy._convertParameters(match2)
 			match.resulttype = string.upper(match.walkover or '')
 			match.walkover = match.winner
 		end
-		match.extradata.bestof = tostring(match.bestof)
+		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 		match.extradata = json.stringify(match.extradata)
 	else
 		doStore = false

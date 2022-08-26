@@ -60,7 +60,7 @@ function MatchLegacy._convertParameters(match2)
 	-- Handle extradata fields
 	match.extradata = {}
 	local extradata = Json.parseIfString(match2.extradata)
-	match.extradata.gamecount = tostring(match2.bestof)
+	match.extradata.gamecount = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata.matchsection = extradata.matchsection
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then

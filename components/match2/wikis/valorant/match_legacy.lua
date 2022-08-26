@@ -171,7 +171,7 @@ function MatchLegacy._convertParameters(match2)
 	match.extradata.female = Variables.varDefault("female")
 	match.extradata.hidden = Logic.readBool(Variables.varDefault('match_hidden')) and '1' or '0'
 	match.extradata.cancelled = Logic.readBool(Variables.varDefault('cancelled')) and '1' or '0'
-	match.extradata.bestofx = tostring(match2.bestof or '')
+	match.extradata.bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata.maps = table.concat(MatchLegacy._getAllInGames(match2, 'map'), ',')
 	for index, vod in ipairs(MatchLegacy._getAllInGames(match2, 'vod')) do
 		match.extradata['vodgame'..index] = vod
