@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
