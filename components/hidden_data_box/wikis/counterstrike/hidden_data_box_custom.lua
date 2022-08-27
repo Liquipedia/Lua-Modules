@@ -11,7 +11,7 @@ local Logic = require('Module:Logic')
 local Tier = mw.loadData('Module:Tier')
 local Variables = require('Module:Variables')
 
-local BasicHiddenDataBox = require('Module:HiddenDataBox/dev')
+local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
