@@ -29,6 +29,7 @@ local INVALID_OPPONENT_CATEGORY = '[[Category:Pages with invalid opponent '
 local Wrapper = {}
 
 function Wrapper.table(frame)
+	frame.args.roundcount = 1
 	return StandingsStorage.fromTemplateHeader(frame)
 end
 
