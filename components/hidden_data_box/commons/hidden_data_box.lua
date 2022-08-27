@@ -71,8 +71,16 @@ function HiddenDataBox.run(args)
 	end
 
 	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.tournamentName(args.name), queryResult.name)
-	HiddenDataBox.checkAndAssign('tournament_shortname', TextSanitizer.tournamentName(args.shortname), queryResult.shortname)
-	HiddenDataBox.checkAndAssign('tournament_tickername', TextSanitizer.tournamentName(args.tickername), queryResult.tickername)
+	HiddenDataBox.checkAndAssign(
+		'tournament_shortname',
+		TextSanitizer.tournamentName(args.shortname),
+		queryResult.shortname
+	)
+	HiddenDataBox.checkAndAssign(
+		'tournament_tickername',
+		TextSanitizer.tournamentName(args.tickername),
+		queryResult.tickername
+	)
 	HiddenDataBox.checkAndAssign('tournament_icon', args.icon, queryResult.icon)
 	HiddenDataBox.checkAndAssign('tournament_icondark', args.icondark or args.icondarkmode, queryResult.icondark)
 	HiddenDataBox.checkAndAssign('tournament_series', args.series, queryResult.series)
