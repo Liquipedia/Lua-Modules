@@ -84,7 +84,7 @@ function HiddenDataBox.run(args)
 	HiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.mode)
 
 	HiddenDataBox.checkAndAssign('tournament_game', args.game, queryResult.game)
-	HiddenDataBox.checkAndAssign('tournament_parent', args.parent, parent)
+	HiddenDataBox.checkAndAssign('tournament_parent', parent)
 	HiddenDataBox.checkAndAssign('tournament_parentname', args.parentname, queryResult.name)
 
 	local startDate = HiddenDataBox.cleanDate(args.sdate, args.date)
