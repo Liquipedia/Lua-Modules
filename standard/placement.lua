@@ -218,10 +218,7 @@ function Placement._placement(args)
 
 		-- Display text
 		args.parent:tag('font')
-			:addClass('placement-text')
-			-- luacheck: ignore
-			-- line length
-			:css('text-shadow', (skipShadowCell and 'none' or '1px 1px rgba(64, 64, 64, 0.4), 1px -1px rgba(64, 64, 64, 0.4), -1px -1px rgba(64, 64, 64, 0.4), -1px 1px rgba(64, 64, 64, 0.4)'))
+			:addClass(skipShadowCell and '' or 'placement-text')
 			:css('font-weight', 'bold')
 			:css('color', textColorCell)
 			:wikitext(text .. (args.text and ' ' .. args.text or ''))
