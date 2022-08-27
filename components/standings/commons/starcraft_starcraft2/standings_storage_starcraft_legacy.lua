@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -91,11 +92,15 @@ function Wrapper._processOpponent(args)
 	if not opponentType then
 		return
 	end
-	opponentArgs.type = opponentType
 
 	for playerIndex, playerInput in ipairs(playerInputs) do
 		Wrapper._processPlayer(playerInput, opponentArgs, 'p' .. playerIndex)
 	end
+
+	if Table.isEmpty(opponentArgs) then
+		return
+	end
+	opponentArgs.type = opponentType
 
 	-- archon handling gets ignored here
 	-- due to the input patern for them being inconsistent it is unfeasible to regex them
