@@ -221,6 +221,8 @@ function League:createInfobox()
 			}
 		},
 	}
+	
+	self.name = TextSanitizer.tournamentName(self.name)
 
 	self.infobox:bottom(self:createBottomContent())
 
@@ -388,7 +390,7 @@ end
 
 function League:_setLpdbData(args, links)
 	local lpdbData = {
-		name = TextSanitizer.tournamentName(self.name),
+		name = self.name,
 		tickername = TextSanitizer.tournamentName(args.tickername),
 		shortname = TextSanitizer.tournamentName(args.shortname or args.abbreviation),
 		banner = args.image,
@@ -434,7 +436,7 @@ function League:_setLpdbData(args, links)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. TextSanitizer.tournamentName(self.name), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
 end
 
 function League:_setSeoTags(args)
