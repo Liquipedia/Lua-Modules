@@ -15,6 +15,7 @@ local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
+	args = args or {}
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	if args.liquipediatier and not Logic.isNumeric(args.liquipediatier) then
 		args.liquipediatier = Tier.number[args.liquipediatier]
