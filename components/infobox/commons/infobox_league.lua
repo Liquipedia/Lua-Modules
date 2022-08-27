@@ -221,7 +221,7 @@ function League:createInfobox()
 			}
 		},
 	}
-	
+
 	self.name = TextSanitizer.tournamentName(self.name)
 
 	self.infobox:bottom(self:createBottomContent())
