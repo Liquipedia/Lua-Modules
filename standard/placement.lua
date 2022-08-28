@@ -89,32 +89,32 @@ local placeSortPrefix = {
 	['relegated'] = 'W3',
 }
 
-local placeColor = {
-	['1'] = '#FFD739',
-	['2'] = '#BEBEBE',
-	['3'] = '#BB8644',
-	['4'] = '#F8996B',
-	['5'] = '#007F99',
-	['6'] = '#007F99',
-	['7'] = '#007F99',
-	['8'] = '#007F99',
-	['9'] = '#166F82',
-	['10'] = '#166F82',
-	['11'] = '#166F82',
-	['12'] = '#166F82',
-	['13'] = '#166F82',
-	['14'] = '#166F82',
-	['15'] = '#166F82',
-	['16'] = '#166F82',
-	['32'] = '#2D606B',
-	['256'] = '#445154',
-	['w'] = '#009E60',
-	['l'] = '#dddddd',
-	['dq'] = '#dddddd',
-	['dnp'] = '#d0d0d0',
-	['proceeded'] = '#89E069',
-	['stay'] = '#FEDE68',
-	['relegated'] = '#FF6F6F',
+local placeColorClass = {
+	['1'] = 'placement-1',
+	['2'] = 'placement-2',
+	['3'] = 'placement-3',
+	['4'] = 'placement-4',
+	['5'] = 'placement-lightblue',
+	['6'] = 'placement-lightblue',
+	['7'] = 'placement-lightblue',
+	['8'] = 'placement-lightblue',
+	['9'] = 'placement-blue',
+	['10'] = 'placement-blue',
+	['11'] = 'placement-blue',
+	['12'] = 'placement-blue',
+	['13'] = 'placement-blue',
+	['14'] = 'placement-blue',
+	['15'] = 'placement-blue',
+	['16'] = 'placement-blue',
+	['32'] = 'placement-darkblue',
+	['256'] = 'placement-darkgrey',
+	['w'] = 'placement-win',
+	['l'] = 'placement-lose',
+	['dq'] = 'placement-lose',
+	['dnp'] = 'placement-dnp',
+	['proceeded'] = 'placement-up',
+	['stay'] = 'placement-stay',
+	['relegated'] = 'placement-down',
 }
 
 local textColor = {
@@ -160,20 +160,20 @@ function Placement._placement(args)
 	-- Cell color
 	if tonumber(placement[1]) ~= nil then
 		if tonumber(placement[1]) <= 16 then
-			args.parent:attr('bgcolor', placeColor[placement[1]])
+			args.parent:addClass(placeColorClass[placement[1]])
 			textColorCell = textColor[placement[1]] or textColorCell
 			skipShadowCell = skipShadow[placement[1]] or skipShadowCell
 		elseif tonumber(placement[1]) <= 32 then
-			args.parent:attr('bgcolor', placeColor['32'])
+			args.parent:addClass(placeColorClass['32'])
 			textColorCell = textColor['32'] or textColorCell
 			skipShadowCell = skipShadow['32'] or skipShadowCell
 		else
-			args.parent:attr('bgcolor', placeColor['256'])
+			args.parent:addClass(placeColorClass['256'])
 			textColorCell = textColor['256'] or textColorCell
 			skipShadowCell = skipShadow['256'] or skipShadowCell
 		end
 	else
-		args.parent:attr('bgcolor', placeColor[placement[1]])
+		args.parent:addClass(placeColorClass[placement[1]])
 		textColorCell = textColor[placement[1]] or textColorCell
 		skipShadowCell = skipShadow[placement[1]] or skipShadowCell
 	end
