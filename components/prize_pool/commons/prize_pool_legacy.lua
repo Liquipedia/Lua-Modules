@@ -86,7 +86,7 @@ function LegacyPrizePool.run(dependency)
 		end
 	end
 
-	-- itterate over slots and merge opponents into the slots directly
+	-- iterate over slots and merge opponents into the slots directly
 	local numberOfSlots = newSlotIndex
 	for slotIndex = 1, numberOfSlots do
 		Table.mergeInto(newArgs[slotIndex], newArgs[slotIndex].opponents)
