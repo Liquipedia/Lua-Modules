@@ -218,7 +218,7 @@ function Placement._placement(args)
 
 		-- Display text
 		args.parent:tag('font')
-			:addClass(skipShadowCell and '' or 'placement-text')
+			:addClass(not skipShadowCell and 'placement-text' or nil)
 			:css('font-weight', 'bold')
 			:css('color', textColorCell)
 			:wikitext(text .. (args.text and ' ' .. args.text or ''))
