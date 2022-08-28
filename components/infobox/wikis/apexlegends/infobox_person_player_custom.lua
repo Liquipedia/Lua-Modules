@@ -23,6 +23,7 @@ local Cell = require('Module:Infobox/Widget/Cell')
 
 local _INPUTS = {
 	controller = 'Controller',
+	Controller = 'Controller',
 	cont = 'Controller',
 	c = 'Controller',
 	default = 'Mouse & Keyboard',
