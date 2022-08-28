@@ -54,6 +54,7 @@ function Wrapper.entry(frame)
 		tournament = Variables.varDefault('tournament_name', mw.title.getCurrentTitle().text),
 		type = args.type or LEAGUE_TYPE,
 		placement = args.place,
+		placerange = {tonumber(args.place), tonumber(args.place)},
 		definitestatus = args.bg,
 		currentstatus = args.pbg or args.bg,
 		diff = args.diff,
