@@ -33,6 +33,10 @@ Placement.placementClasses = {
 	'background-color-second-place',
 	'background-color-third-place',
 	'background-color-fourth-place',
+	w = 'bg-win',
+	d = 'bg-draw',
+	l = 'bg-lose',
+	dq = 'bg-dq',
 }
 
 --[[
