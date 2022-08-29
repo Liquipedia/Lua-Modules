@@ -12,6 +12,7 @@ local Namespace = require('Module:Namespace')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TextSanitizer = require('Module:TextSanitizer')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
@@ -69,9 +70,17 @@ function HiddenDataBox.run(args)
 		end)
 	end
 
-	HiddenDataBox.checkAndAssign('tournament_name', args.name, queryResult.name)
-	HiddenDataBox.checkAndAssign('tournament_shortname', args.shortname, queryResult.shortname)
-	HiddenDataBox.checkAndAssign('tournament_tickername', args.tickername, queryResult.tickername)
+	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.tournamentName(args.name), queryResult.name)
+	HiddenDataBox.checkAndAssign(
+		'tournament_shortname',
+		TextSanitizer.tournamentName(args.shortname),
+		queryResult.shortname
+	)
+	HiddenDataBox.checkAndAssign(
+		'tournament_tickername',
+		TextSanitizer.tournamentName(args.tickername),
+		queryResult.tickername
+	)
 	HiddenDataBox.checkAndAssign('tournament_icon', args.icon, queryResult.icon)
 	HiddenDataBox.checkAndAssign('tournament_icondark', args.icondark or args.icondarkmode, queryResult.icondark)
 	HiddenDataBox.checkAndAssign('tournament_series', args.series, queryResult.series)
