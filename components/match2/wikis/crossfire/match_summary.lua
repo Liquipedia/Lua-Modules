@@ -160,10 +160,10 @@ function CustomMatchSummary.getByMatchId(args)
 	return wrapper
 end
 
-function CustomMatchSummary._addFlexRow(wrapper, contentElements, class, style)
+function CustomMatchSummary._addFlexRow(wrapper, contentElements, Class, style)
 	local node = htmlCreate('div'):addClass('brkts-popup-body-element')
-	if not Logic.isEmpty(class) then
-		node:addClass(class)
+	if not Logic.isEmpty(Class) then
+		node:addClass(Class)
 	end
 	for key, val in pairs(style or {}) do
 		node:css(key, val)
