@@ -54,7 +54,7 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(args.basedamage) and String.isEmpty(args.damage) then
 		local baseDamages = {}
 		for index, baseDamage in ipairs(_weapon:getAllArgsForBase(args, 'basedamage')) do
-			table.insert(baseDamages, tostring(CustomWeapon:_createContextualNoWrappingSpan(baseDamage, index, DAMAGE_INFO)))
+			table.insert(baseDamages, CustomWeapon:_createContextualNoWrappingSpan(baseDamage, index, DAMAGE_INFO))
 		end
 		table.insert(widgets, Cell{
 			name = 'Damage',
@@ -80,7 +80,7 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(args.ammocapacity) and String.isEmpty(args.ammocap) then
 		local ammoSizes = {}
 		for index, ammoSize in ipairs(_weapon:getAllArgsForBase(args, 'ammocapacity')) do
-			table.insert(ammoSizes, tostring(CustomWeapon:_createContextualNoWrappingSpan(ammoSize, index, MAGAZINE_INFO)))
+			table.insert(ammoSizes, CustomWeapon:_createContextualNoWrappingSpan(ammoSize, index, MAGAZINE_INFO))
 		end
 		table.insert(widgets, Cell{
 			name = 'Ammo Capacity',
@@ -91,7 +91,7 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(args.reloadtime) and String.isEmpty(args.reloadspeed) then
 		local reloadTimes = {}
 		for index, reloadTime in ipairs(_weapon:getAllArgsForBase(args, 'reloadtime')) do
-			table.insert(reloadTimes, tostring(CustomWeapon:_createContextualNoWrappingSpan(reloadTime, index, MAGAZINE_INFO)))
+			table.insert(reloadTimes, CustomWeapon:_createContextualNoWrappingSpan(reloadTime, index, MAGAZINE_INFO))
 		end
 		table.insert(widgets, Cell{
 			name = 'Reload Speed',
@@ -112,7 +112,7 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(args.attachment) then
 		local attachments = {}
 		for index, attachment in ipairs(_weapon:getAllArgsForBase(args, 'attachment')) do
-			table.insert(attachments, tostring(CustomWeapon:_createContextualNoWrappingSpan(attachment, index)))
+			table.insert(attachments, CustomWeapon:_createContextualNoWrappingSpan(attachment, index))
 		end
 		table.insert(widgets, Title{name = 'Attachment Slots'})
 		table.insert(widgets, Center{content = {table.concat(attachments, '&nbsp;&nbsp;')}})
@@ -122,7 +122,7 @@ function CustomInjector:addCustomCells(widgets)
 		local hopups = {}
 		args.hopupdesc1 = args.hopupdesc1 or args.hopupdesc
 		for index, hopup in ipairs(_weapon:getAllArgsForBase(args, 'hopup')) do
-			table.insert(hopups, tostring(CustomWeapon:_createContextualNoWrappingSpan(hopup, index)))
+			table.insert(hopups, CustomWeapon:_createContextualNoWrappingSpan(hopup, index))
 			table.insert(hopups, args['hopupdesc' .. index])
 		end
 		table.insert(widgets, Title{name = 'Hop-Ups'})
@@ -137,10 +137,11 @@ function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTabl
 		local page = 'link=Portal:Attachments'
 		local icon = '[[File:Apex ATTM_' .. content .. '_lightmode.png|60px|'.. page ..'|class=show-when-light-mode]]'
 		local iconDark = '[[File:Apex ATTM_' .. content .. '_darkmode.png|60px|'.. page ..'|class=show-when-dark-mode]]'
-		return mw.html.create('span')
+		local returnSpan = mw.html.create('span')
 			:css('white-space', 'nowrap')
 			:node(icon)
 			:node(iconDark)
+		return tostring(returnSpan)
 	elseif not lookUpTable[index] then
 		return
 	end
@@ -164,7 +165,7 @@ function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTabl
 			:node(sup)
 	end
 
-	return span
+	return tostring(span)
 end
 
 function CustomWeapon:addToLpdb(lpdbData)
