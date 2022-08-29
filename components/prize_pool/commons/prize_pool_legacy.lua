@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Currency = require('Module:Currency')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local Page = require('Module:Page')
@@ -68,8 +69,28 @@ function LegacyPrizePool.run(dependency)
 		newArgs = CUSTOM_HANDLER.customHeader(newArgs, CACHED_DATA, header)
 	end
 
-	for slotIndex, slot in ipairs(slots) do
-		newArgs[slotIndex] = LegacyPrizePool.mapSlot(slot)
+	local newSlotIndex = 0
+	local currentPlace
+	local mergeSlots = Logic.readBool(header.mergeSlots)
+	for _, slot in ipairs(slots) do
+		-- retrieve the slot and push it into a temp var so it can be altered (to merge slots if need be)
+		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots)
+		-- if we want to merge slots and the slot we just retrieved
+		-- has the same place as the one before, then append the opponents
+		if mergeSlots and tempSlot.place and currentPlace == tempSlot.place then
+			Array.appendWith(newArgs[newSlotIndex].opponents, unpack(tempSlot.opponents))
+		else -- regular case we do not need to merge
+			currentPlace = tempSlot.place
+			newSlotIndex = newSlotIndex + 1
+			newArgs[newSlotIndex] = tempSlot
+		end
+	end
+
+	-- iterate over slots and merge opponents into the slots directly
+	local numberOfSlots = newSlotIndex
+	for slotIndex = 1, numberOfSlots do
+		Table.mergeInto(newArgs[slotIndex], newArgs[slotIndex].opponents)
+		newArgs[slotIndex].opponents = nil
 	end
 
 	for link, linkData in pairs(CACHED_DATA.qualifiers) do
@@ -80,7 +101,7 @@ function LegacyPrizePool.run(dependency)
 	return CustomPrizePool.run(newArgs)
 end
 
-function LegacyPrizePool.mapSlot(slot)
+function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	if not slot.place then
 		return {}
 	end
@@ -127,12 +148,18 @@ function LegacyPrizePool.mapSlot(slot)
 		newData = CUSTOM_HANDLER.customSlot(newData, CACHED_DATA, slot)
 	end
 
-	Table.mergeInto(newData, LegacyPrizePool.mapOpponents(slot))
+	newData.opponents = LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 
+	if mergeSlots then
+		return {
+			opponents = newData.opponents,
+			place = newData.place
+		}
+	end
 	return newData
 end
 
-function LegacyPrizePool.mapOpponents(slot)
+function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 	local mapOpponent = function (opponentIndex)
 		if not slot[opponentIndex] then
 			return
@@ -167,6 +194,9 @@ function LegacyPrizePool.mapOpponents(slot)
 			opponentData = CUSTOM_HANDLER.customOpponent(opponentData, CACHED_DATA, slot, opponentIndex)
 		end
 
+		if mergeSlots then
+			return Table.merge(newData, opponentData)
+		end
 		return opponentData
 	end
 
