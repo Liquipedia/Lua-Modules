@@ -234,7 +234,7 @@ function LegacyPrizePool.parseWikiLink(input)
 
 	local inputWithoutHtml = input:gsub('<.->.-</.->', '')
 
-	for inputSection in mw.text.gsplit(inputWithoutHtml, '< *[hb]r/? *>') do
+	for inputSection in mw.text.gsplit(inputWithoutHtml, '< *[hb]r */? *>') do
 		-- Does this contain a wiki link?
 		if string.find(inputSection, '%[') then
 			local cleanedInput = inputSection:gsub('^.-%[+', ''):gsub('%].-$', '')
