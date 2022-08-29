@@ -63,7 +63,7 @@ function MatchLegacy.convertParameters(match2)
 		timezone = extradata.timezoneoffset or '',
 		timezoneID = extradata.timezoneid or '',
 		matchsection = extradata.matchsection or '',
-		bestofx = tostring(match2.bestof),
+		bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or '',
 		overturned = Logic.readBool(extradata.overturned) and '1' or '',
 		hidden = Logic.readBool(extradata.hidden) and '1' or '0',
 		featured = Logic.readBool(extradata.featured) and '1' or '0',

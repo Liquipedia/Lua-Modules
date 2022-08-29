@@ -132,7 +132,7 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	local scoreBoardNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 
-	if String.isNotEmpty(bestof) and isNotFinished then
+	if String.isNotEmpty(bestof) and bestof > 0 and isNotFinished then
 		return scoreBoardNode
 			:node(mw.html.create('span')
 				:css('line-height', '1.1')
