@@ -169,7 +169,9 @@ function League:createInfobox()
 
 				local venues = {}
 				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
-					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], args[prefix .. 'desc']))
+					-- TODO: Description
+					local description
+					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
 				end
 
 				return Cell{
