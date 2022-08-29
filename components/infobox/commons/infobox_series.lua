@@ -109,7 +109,7 @@ function Series:createInfobox(frame)
 				local venues = {}
 				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
 					-- TODO: Description
-					local description
+					local description = ''
 					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
 				end
 
