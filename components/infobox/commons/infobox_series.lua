@@ -113,10 +113,10 @@ function Series:createInfobox(frame)
 					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
 				end
 
-				return Cell{
+				return {Cell{
 					name = 'Venue',
-					content = {venues}
-				}
+					content = venues
+				}}
 			end
 		},
 		Cell{
