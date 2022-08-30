@@ -1169,10 +1169,18 @@ function Placement:getBackground()
 end
 
 function Placement:getMedal()
+	if self:hasSpecialStatus() then
+		return
+	end
+
 	local medal = MatchPlacement.MedalIcon{range = {self.placeStart, self.placeEnd}}
 	if medal then
 		return tostring(medal)
 	end
+end
+
+function Placement:hasSpecialStatus()
+	return Table.any(Placement.specialStatuses, function(_, status) return status.active(self.args) end)
 end
 
 return PrizePool
