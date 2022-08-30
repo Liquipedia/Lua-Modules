@@ -1180,11 +1180,7 @@ function Placement:getMedal()
 end
 
 function Placement:hasSpecialStatus()
-	for _, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) then
-			return true
-		end
-	end
+	return Table.any(Placement.specialStatuses, function(_, status) return status.active(self.args) end)
 end
 
 return PrizePool
