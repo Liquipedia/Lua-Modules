@@ -75,12 +75,13 @@ function LegacyPrizePool.run(dependency)
 	for _, slot in ipairs(slots) do
 		-- retrieve the slot and push it into a temp var so it can be altered (to merge slots if need be)
 		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots)
+		local place = tempSlot.place or slot.place
 		-- if we want to merge slots and the slot we just retrieved
 		-- has the same place as the one before, then append the opponents
-		if mergeSlots and tempSlot.place and currentPlace == tempSlot.place then
+		if mergeSlots and place and currentPlace == place then
 			Array.appendWith(newArgs[newSlotIndex].opponents, unpack(tempSlot.opponents))
 		else -- regular case we do not need to merge
-			currentPlace = tempSlot.place
+			currentPlace = place
 			newSlotIndex = newSlotIndex + 1
 			newArgs[newSlotIndex] = tempSlot
 		end
@@ -151,10 +152,14 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	newData.opponents = LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 
 	if mergeSlots then
-		return {
+		local newSlot = {
 			opponents = newData.opponents,
 			place = newData.place
 		}
+		for _, item in pairs(SPECIAL_PLACES) do
+			newSlot[item] = newData[item]
+		end
+		return newSlot
 	end
 	return newData
 end
