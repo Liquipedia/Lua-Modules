@@ -832,7 +832,7 @@ function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 	local objectName = 'ranking_'
 	if lpdbEntry.opponenttype == Opponent.team then
 		if String.isNotEmpty(lpdbPrefix) then
-			objectName = objectName .. '_' .. lpdbPrefix
+			objectName = objectName .. lpdbPrefix
 		end
 		return objectName .. '_' .. mw.ustring.lower(lpdbEntry.participant)
 	end
