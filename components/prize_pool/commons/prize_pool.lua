@@ -1189,7 +1189,7 @@ end
 
 function Placement:getBackground()
 	for statusName, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) and PlacementInfo.getBgClass(statusName:lower())  then
+		if status.active(self.args) then
 			return PlacementInfo.getBgClass(statusName:lower())
 		end
 	end
