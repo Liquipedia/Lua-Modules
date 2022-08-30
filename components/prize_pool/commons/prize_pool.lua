@@ -829,16 +829,16 @@ end
 
 -- get the lpdbObjectName depending on opponenttype
 function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
-	local objectName = 'ranking_'
+	local objectName = 'ranking'
+	if String.isNotEmpty(lpdbPrefix) then
+		objectName = objectName .. '_' .. lpdbPrefix
+	end
 	if lpdbEntry.opponenttype == Opponent.team then
-		if String.isNotEmpty(lpdbPrefix) then
-			objectName = objectName .. lpdbPrefix
-		end
 		return objectName .. '_' .. mw.ustring.lower(lpdbEntry.participant)
 	end
 	-- for non team opponents the pagename can be case sensitive
 	-- so objectname needs to be case sensitive to avoid edge cases
-	return objectName .. lpdbPrefix .. prizePoolIndex .. '_' .. lpdbEntry.participant
+	return objectName .. prizePoolIndex .. '_' .. lpdbEntry.participant
 end
 
 --- Returns true if this prizePool has a US Dollar reward.
