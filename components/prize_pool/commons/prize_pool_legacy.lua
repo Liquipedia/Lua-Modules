@@ -21,8 +21,7 @@ local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabl
 
 local LegacyPrizePool = {}
 
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp'}
-local LETTER_PLACE_TO_NUMBER = {w = 1, d = 1, l = 2}
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l'}
 
 local CACHED_DATA = {
 	next = {points = 1, qual = 1, freetext = 1},
