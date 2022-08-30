@@ -119,7 +119,7 @@ PrizePool.config = {
 	lpdbPrefix = {
 		default = '',
 		read = function(args)
-			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix')
+			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix')
 		end
 	},
 }
