@@ -399,6 +399,33 @@ Placement.specialStatuses = {
 		end,
 		lpdb = 'dnp',
 	},
+	W = {
+		active = function (args)
+			return Logic.readBool(args.w)
+		end,
+		display = function ()
+			return 'W'
+		end,
+		lpdb = 'win',
+	},
+	D = {
+		active = function (args)
+			return Logic.readBool(args.d)
+		end,
+		display = function ()
+			return 'D'
+		end,
+		lpdb = 'draw',
+	},
+	L = {
+		active = function (args)
+			return Logic.readBool(args.l)
+		end,
+		display = function ()
+			return 'L'
+		end,
+		lpdb = 'loss',
+	},
 }
 
 function PrizePool:init(args)
@@ -1161,8 +1188,10 @@ function Placement:_displayPlace()
 end
 
 function Placement:getBackground()
-	if Placement.specialStatuses.DQ.active(self.args) then
-		return 'background-color-disqualified'
+	for statusName, status in pairs(Placement.specialStatuses) do
+		if status.active(self.args) and PlacementInfo.getBgClass(statusName:lower())  then
+			return PlacementInfo.getBgClass(statusName:lower())
+		end
 	end
 
 	return PlacementInfo.getBgClass(self.placeStart)
