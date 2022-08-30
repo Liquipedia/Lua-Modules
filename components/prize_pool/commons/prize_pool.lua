@@ -413,6 +413,33 @@ Placement.specialStatuses = {
 		end,
 		lpdb = 'dnp',
 	},
+	W = {
+		active = function (args)
+			return Logic.readBool(args.w)
+		end,
+		display = function ()
+			return 'W'
+		end,
+		lpdb = 1,
+	},
+	D = {
+		active = function (args)
+			return Logic.readBool(args.d)
+		end,
+		display = function ()
+			return 'D'
+		end,
+		lpdb = 1,
+	},
+	L = {
+		active = function (args)
+			return Logic.readBool(args.l)
+		end,
+		display = function ()
+			return 'L'
+		end,
+		lpdb = 2,
+	},
 }
 
 function PrizePool:init(args)
