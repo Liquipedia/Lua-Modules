@@ -26,8 +26,8 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 		end
 	end
 
-	local lpdbPrefix = args.lpdb_prefix or Variables.varDefault('lpdb_prefix')
-		or args.smw_prefix or Variables.varDefault('smw_prefix') or ''
+	local lpdbPrefix = args.lpdb_prefix or args.smw_prefix
+		or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix') or ''
 
 	-- Setup LPDB Data
 	local lpdbData = {}
