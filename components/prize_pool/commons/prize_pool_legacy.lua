@@ -131,7 +131,7 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 				newData['qualified' .. CACHED_DATA.qualifiers[link].id] = true
 			end
 
-		elseif input and input ~= 0 then
+		elseif input and tonumber(input) ~= 0 then
 			-- Handle the legacy checkmarks, they were set in value = 'q'
 			-- If want, in the future this could be parsed as a Qualification instead of a freetext as now
 			if input == 'q' then
