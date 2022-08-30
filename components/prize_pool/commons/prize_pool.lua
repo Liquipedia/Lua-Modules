@@ -406,7 +406,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return 'W'
 		end,
-		lpdb = 'win',
+		lpdb = 1,
 	},
 	D = {
 		active = function (args)
@@ -415,7 +415,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return 'D'
 		end,
-		lpdb = 'draw',
+		lpdb = 1,
 	},
 	L = {
 		active = function (args)
@@ -424,7 +424,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return 'L'
 		end,
-		lpdb = 'loss',
+		lpdb = 2,
 	},
 }
 
