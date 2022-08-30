@@ -106,9 +106,7 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	end
 
 	local newData = {}
-	if LETTER_PLACE_TO_NUMBER[slot.place:lower()] then
-		newData.place = LETTER_PLACE_TO_NUMBER[slot.place:lower()]
-	elseif SPECIAL_PLACES[slot.place:lower()] then
+	if SPECIAL_PLACES[slot.place:lower()] then
 		newData[SPECIAL_PLACES[slot.place:lower()]] = true
 	else
 		newData.place = slot.place
