@@ -65,10 +65,9 @@ end
 -- Returns the localisation/country-adjective of a country or region
 --[[
 supported args are:
-country			- country name, flag code, or alias of the Flag
-displayNoError		- boolean that decides if there should be a displayed error if no entry is found
-shouldReturnSimpleError	- boolean that decides if displayed error should be simple or detailed
-
+country		- country name, flag code, or alias of the Flag
+hideError	- boolean that decides if there should be a displayed error if no entry is found
+simpleError	- boolean that decides if displayed error should be simple or detailed
 examples:
 Flags.getLocalisation({country = de}) = German
 Flags.getLocalisation({country = Germany}) = German
@@ -82,8 +81,8 @@ function Flags.getLocalisation(args)
 		return ''
 	end
 
-	local displayNoError = Logic.readBool(args.displayNoError)
-	local shouldReturnSimpleError = Logic.readBool(args.shouldReturnSimpleError)
+	local hideError = Logic.readBool(args.hideError)
+	local simpleError = Logic.readBool(args.simpleError)
 
 	-- clean the entered value
 	local countryKey = Flags._convertToKey(country)
@@ -97,9 +96,9 @@ function Flags.getLocalisation(args)
 
 	-- Return message if none is found
 	mw.log('Unknown localisation entry: ', country)
-	if displayNoError then
+	if hideError then
 		return ''
-	elseif shouldReturnSimpleError then
+	elseif simpleError then
 		return 'error'
 	else
 		return 'Unknown localisation entry "[[lpcommons:Module:Flags/MasterData' ..
