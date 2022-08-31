@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
@@ -25,17 +26,17 @@ function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
 end
 
 function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
-	-- 0 used to mean unset, so let's unset it
-	if newData.freetext1 == '0' then
-		newData.freetext1 = nil
-	end
-
 	-- Requested by CS so they can do cleanup of tables with incorrect data
 	if newData.localprize then
 		if newData.localprize:match('[^,%.%d]') then
 			error('Unexpected value in localprize for place=' .. slot.place)
 		end
 	end
+
+	if Logic.readBoolOrNil(slot.noqual) ~= nil then
+		slot.qual = not Logic.readBool(slot.noqual)
+	end
+	newData.forceQualified = Logic.readBoolOrNil(slot.qual)
 
 	return newData
 end
@@ -49,15 +50,23 @@ function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, o
 
 	if slot['points' .. opponentIndex] then
 		local param = CACHED_DATA.inputToId['points']
-		opponentData[param] = slot['points' .. opponentIndex]
+		CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['points' .. opponentIndex])
 	end
 
 	if slot['localprize' .. opponentIndex] then
 		local param = CACHED_DATA.inputToId['localprize']
-		opponentData[param] = slot['localprize' .. opponentIndex]
+		CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['localprize' .. opponentIndex])
 	end
 
 	return opponentData
+end
+
+function CustomLegacyPrizePool._setOpponentReward(opponentData, param, value)
+	if param == 'seed' then
+		PrizePoolLegacy.handleSeed(opponentData, value)
+	else
+		opponentData[param] = value
+	end
 end
 
 return CustomLegacyPrizePool

@@ -116,6 +116,12 @@ PrizePool.config = {
 			return tonumber(args.currencyroundprecision)
 		end
 	},
+	lpdbPrefix = {
+		default = '',
+		read = function(args)
+			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix')
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
@@ -425,6 +431,15 @@ Placement.specialStatuses = {
 			return 'L'
 		end,
 		lpdb = 2,
+	},
+	Q = {
+		active = function (args)
+			return Logic.readBool(args.q)
+		end,
+		display = function ()
+			return Abbreviation.make('Q', 'Qualified Automatically')
+		end,
+		lpdb = 1,
 	},
 }
 
@@ -834,7 +849,10 @@ function PrizePool:_storeData()
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement(PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex), lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(
+				PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, self.options.lpdbPrefix),
+				lpdbEntry
+			)
 		end
 
 		if self.options.storeSmw then
@@ -846,11 +864,13 @@ function PrizePool:_storeData()
 end
 
 -- get the lpdbObjectName depending on opponenttype
-function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex)
-	local objectName = 'ranking_'
+function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
+	local objectName = 'ranking'
+	if String.isNotEmpty(lpdbPrefix) then
+		objectName = objectName .. '_' .. lpdbPrefix
+	end
 	if lpdbEntry.opponenttype == Opponent.team then
-		local smwPrefix = Variables.varDefault('smw_prefix', '')
-		return objectName .. smwPrefix .. mw.ustring.lower(lpdbEntry.participant)
+		return objectName .. '_' .. mw.ustring.lower(lpdbEntry.participant)
 	end
 	-- for non team opponents the pagename can be case sensitive
 	-- so objectname needs to be case sensitive to avoid edge cases
@@ -1189,7 +1209,7 @@ end
 
 function Placement:getBackground()
 	for statusName, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) and PlacementInfo.getBgClass(statusName:lower())  then
+		if status.active(self.args) then
 			return PlacementInfo.getBgClass(statusName:lower())
 		end
 	end

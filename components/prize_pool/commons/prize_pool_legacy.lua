@@ -21,7 +21,7 @@ local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabl
 
 local LegacyPrizePool = {}
 
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l'}
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
 
 local CACHED_DATA = {
 	next = {points = 1, qual = 1, freetext = 1},
@@ -44,6 +44,7 @@ function LegacyPrizePool.run(dependency)
 
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
 	newArgs.cutafter = header.cutafter
+	newArgs.lpdb_prefix = header.lpdb_prefix or header.smw_prefix
 
 	if Currency.raw(header.localcurrency) then
 		-- If the localcurrency is a valid currency, handle it like currency
@@ -157,20 +158,9 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
 		if newParameter == 'seed' then
-			local links = LegacyPrizePool.parseWikiLink(input)
-			for _, linkData in ipairs(links) do
-				local link = linkData.link
+			LegacyPrizePool.handleSeed(newData, input)
 
-				if not CACHED_DATA.qualifiers[link] then
-					CACHED_DATA.qualifiers[link] = {id = CACHED_DATA.next.qual, name = linkData.name, link = link, occurance = 0}
-					CACHED_DATA.next.qual = CACHED_DATA.next.qual + 1
-				end
-
-				CACHED_DATA.qualifiers[link].occurance = CACHED_DATA.qualifiers[link].occurance + 1
-				newData['qualified' .. CACHED_DATA.qualifiers[link].id] = true
-			end
-
-		elseif input and input ~= 0 then
+		elseif input and tonumber(input) ~= 0 then
 			-- Handle the legacy checkmarks, they were set in value = 'q'
 			-- If want, in the future this could be parsed as a Qualification instead of a freetext as now
 			if input == 'q' then
@@ -198,6 +188,21 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 		return newSlot
 	end
 	return newData
+end
+
+function LegacyPrizePool.handleSeed(storeTo, input)
+	local links = LegacyPrizePool.parseWikiLink(input)
+	for _, linkData in ipairs(links) do
+		local link = linkData.link
+
+		if not CACHED_DATA.qualifiers[link] then
+			CACHED_DATA.qualifiers[link] = {id = CACHED_DATA.next.qual, name = linkData.name, link = link, occurance = 0}
+			CACHED_DATA.next.qual = CACHED_DATA.next.qual + 1
+		end
+
+		CACHED_DATA.qualifiers[link].occurance = CACHED_DATA.qualifiers[link].occurance + 1
+		storeTo['qualified' .. CACHED_DATA.qualifiers[link].id] = true
+	end
 end
 
 function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
