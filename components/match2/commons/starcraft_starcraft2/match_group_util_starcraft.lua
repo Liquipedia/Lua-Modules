@@ -269,7 +269,11 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 		scores[opponentIx] = 0
 	end
 	for _, game in pairs(games) do
-		if game.winner then
+		if game.map and String.startsWith(game.map, 'Submatch') and not game.resultType then
+			for opponentIx, score in pairs(scores) do
+				scores[opponentIx] = score + (game.scores[opponentIx] or 0)
+			end
+		elseif game.winner then
 			scores[game.winner] = (scores[game.winner] or 0) + 1
 		end
 	end
@@ -362,6 +366,17 @@ function StarcraftMatchGroupUtil.playerFromRecord(record)
 		pageName = record.name,
 		race = Table.extract(record.extradata, 'faction') or 'u',
 	}
+end
+
+-- merge submatches for reset matches
+function StarcraftMatchGroupUtil.mergeResetSubmatches(match, bracketId)
+	if match and String.isNotEmpty(match.bracketData.bracketResetMatchId) then
+		local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
+		local bracketResetMatch = bracket.matchesById[match.bracketData.bracketResetMatchId]
+		Array.extendWith(match.submatches, bracketResetMatch.submatches)
+	end
+
+	return match.submatches
 end
 
 return StarcraftMatchGroupUtil

@@ -13,7 +13,7 @@ local Localisation = require('Module:Localisation')
 local Flags = require('Module:Flags')
 local Links = require('Module:Links')
 local InfoboxBasic = require('Module:Infobox/Basic')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -35,11 +35,16 @@ function Scene:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = self:createNameDisplay(args), image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = self:createNameDisplay(args),
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Scene Information'},
 		Cell{name = 'Region', content = {args.region}},
-		Cell{name = 'National team', content = {args.nationalteam}, options = {makeLink = true}},
+		Cell{name = 'National Team', content = {args.nationalteam}, options = {makeLink = true}},
 		Cell{name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})},
 		Cell{name = 'Size', content = {args.size}},
 		Customizable{id = 'custom', children = {}},

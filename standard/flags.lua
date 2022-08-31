@@ -55,10 +55,12 @@ function Flags.Icon(args, flagName)
 		end
 	elseif shouldLink then
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName) .. '[[Category:Pages with unknown flags]]'
+		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName:lower()) ..
+				'[[Category:Pages with unknown flags]]'
 	else
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName) .. '[[Category:Pages with unknown flags]]'
+		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName:lower()) ..
+				'[[Category:Pages with unknown flags]]'
 	end
 end
 
@@ -112,6 +114,7 @@ function Flags.CountryCode(flagName, format)
 		if format == 'alpha3' then
 			return Flags._getAlpha3CodesByKey()[flagKey] or Flags._getLanguage3LetterCodesByKey()[flagKey]
 		else
+			flagKey = MasterData.iso31662[flagKey] or flagKey
 			return Flags._getAlpha2CodesByKey()[flagKey] or Flags._getLanguageCodesByKey()[flagKey]
 		end
 	end

@@ -7,10 +7,12 @@
 --
 
 local Earnings = {}
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local MathUtils = require('Module:Math')
 local String = require('Module:StringUtils')
-local Logic = require('Module:Logic')
-local Class = require('Module:Class')
+local Table = require('Module:Table')
+local Team = require('Module:Team')
 
 local _DEFAULT_DATE = '1970-01-01 00:00:00'
 local _MAX_QUERY_LIMIT = 5000
@@ -50,11 +52,12 @@ function Earnings.calculateForPlayer(args)
 	local prefix = args.prefix or 'p'
 
 	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
-	if playerPositionLimit <=0 then
+	if playerPositionLimit <= 0 then
 		error('"playerPositionLimit" has to be >= 1')
 	end
 
 	local playerConditions = '([[participant::' .. player .. ']] OR [[participant::' .. playerAsPageName .. ']]'
+		.. ' OR [[participantlink::' .. player .. ']] OR [[participantlink::' .. playerAsPageName .. ']]'
 	for playerIndex = 1, playerPositionLimit do
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. player .. ']]'
 		playerConditions = playerConditions .. ' OR [[players_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]'
@@ -66,24 +69,51 @@ end
 
 ---
 -- Entry point for teams
--- @team - the team for which the earnings shall be calculated
+-- @team - the team (either pageName or team template) for which the earnings shall be calculated
+-- @teams - list of teams
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
--- @noRedirect - (optional) player redirects get not resolved before query
+-- @queryHistorical - (optional) fetch the pageNames from the subTemplates of the entered team template
+-- @noRedirect - (optional) team redirects get not resolved before query (only available if queryHistorical is not used)
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 function Earnings.calculateForTeam(args)
 	args = args or {}
-	local team = args.team
+	local teams = args.teams or {}
+	table.insert(teams, args.team)
 
-	if String.isEmpty(team) then
+	if Table.isEmpty(teams) then
 		return 0
 	end
-	if not Logic.readBool(args.noRedirect) then
-		team = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
+
+	local queryTeams = {}
+	if Logic.readBool(args.queryHistorical) then
+		for _, team in pairs(teams) do
+			local historicalNames = Team.queryHistoricalNames(team)
+
+			if not historicalNames then
+				return 0
+			end
+
+			for _, historicalTeam in pairs(historicalNames) do
+				table.insert(queryTeams, historicalTeam)
+			end
+		end
+	elseif not Logic.readBool(args.noRedirect) then
+		for index, team in pairs(teams) do
+			queryTeams[index] = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
+		end
+	else
+		queryTeams = teams
 	end
 
-	local teamConditions = '([[participant::' .. team .. ']] OR [[extradata_participantteam::' .. team .. ']])'
-
+	local formatParicipant = function(lpdbField, participants)
+		return '([[' .. lpdbField .. '::' ..
+			table.concat(participants, ']] OR [[' .. lpdbField .. '::')
+			.. ']])'
+	end
+	local teamConditions = '(' .. formatParicipant('participant', queryTeams) .. ' OR '
+		.. formatParicipant('extradata_participantteam',  queryTeams) .. ' OR '
+		.. formatParicipant('participantlink',  queryTeams) ..')'
 	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
 end
 
@@ -104,19 +134,19 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 		return Earnings.calculatePerYear(conditions, divisionFactor)
 	end
 
+	local prizePoolColumn = Earnings._getPrizePoolType(divisionFactor)
+
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
-		query = 'sum::prizemoney, mode',
+		query = 'mode, sum::' .. prizePoolColumn,
 		groupby = 'mode asc'
 	})
 
 	local totalEarnings = 0
 
 	for _, item in ipairs(lpdbQueryData) do
-		if item['sum_prizemoney'] ~= nil then
-			local prizeMoney = item['sum_prizemoney']
-			totalEarnings = totalEarnings + (prizeMoney / divisionFactor(item['mode']))
-		end
+		local prizeMoney = item['sum_' .. prizePoolColumn]
+		totalEarnings = totalEarnings + Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item['mode'])
 	end
 
 	return MathUtils._round(totalEarnings)
@@ -129,21 +159,22 @@ function Earnings.calculatePerYear(conditions, divisionFactor)
 	local totalEarningsByYear = {}
 	local earningsData = {}
 	local totalEarnings = 0
+	local prizePoolColumn = Earnings._getPrizePoolType(divisionFactor)
 
 	local offset = 0
 	local count = _MAX_QUERY_LIMIT
 	while count == _MAX_QUERY_LIMIT do
 		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions,
-			query = 'prizemoney, mode, date',
+			query = 'mode, date, ' .. prizePoolColumn,
 			limit = _MAX_QUERY_LIMIT,
 			offset = offset
 		})
 		for _, item in pairs(lpdbQueryData) do
-			local prizeMoney = tonumber(item.prizemoney) or 0
 			local year = string.sub(item.date, 1, 4)
-			prizeMoney = prizeMoney / divisionFactor(item['mode'])
-			earningsData[year] = (earningsData[year] or 0) + prizeMoney
+			local prizeMoney = tonumber(item[prizePoolColumn]) or 0
+			earningsData[year] = (earningsData[year] or 0)
+				+ Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item['mode'])
 		end
 		count = #lpdbQueryData
 		offset = offset + _MAX_QUERY_LIMIT
@@ -192,6 +223,17 @@ end
 -- customizable in /Custom
 function Earnings.divisionFactorTeam(mode)
 	return 1
+end
+
+function Earnings._getPrizePoolType(divisionFactor)
+	return divisionFactor == nil and 'individualprizemoney' or 'prizemoney'
+end
+
+function Earnings._applyDivisionFactor(prizeMoney, divisionFactor, mode)
+	if divisionFactor then
+		return prizeMoney / divisionFactor(mode)
+	end
+	return prizeMoney
 end
 
 return Class.export(Earnings)

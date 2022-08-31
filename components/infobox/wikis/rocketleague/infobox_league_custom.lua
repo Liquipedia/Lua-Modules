@@ -7,7 +7,7 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
@@ -34,6 +34,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 
 	return league:createInfobox(frame)
 end
@@ -53,7 +54,7 @@ function CustomInjector:addCustomCells(widgets)
 		content = {CustomLeague:_createGameCell(args.game)}
 	})
 	table.insert(widgets, Cell{
-		name = 'Misc Mode:',
+		name = 'Misc Mode',
 		content = {args.miscmode}
 	})
 
@@ -94,13 +95,6 @@ function CustomInjector:parse(id, widgets)
 				content = {CustomLeague:_createPrizepool(args)}
 			},
 		}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createTier(args)}
-			},
-		}
 	end
 	return widgets
 end
@@ -112,7 +106,7 @@ function CustomLeague:addCustomCells(infobox, args)
 	return infobox
 end
 
-function CustomLeague:_createTier(args)
+function CustomLeague:createLiquipediaTierDisplay(args)
 	local content = ''
 
 	local tier = args.liquipediatier

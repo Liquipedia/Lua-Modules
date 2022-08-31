@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -31,7 +31,12 @@ function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = 'Unofficial World Champion', image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = 'Unofficial World Champion',
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Current Champion'},
 		Center{content = { args['current champion'] }, classes = { 'infobox-size-20', 'infobox-bold' }},
@@ -47,7 +52,7 @@ function UnofficialWorldChampion:createInfobox()
 						contentCell = ' vs ' .. args['gained against']
 					end
 					return {
-						Title{name = 'Title gained'},
+						Title{name = 'Title Gained'},
 						Cell{
 							name = args['gained date'],
 							content = { contentCell },
@@ -56,7 +61,7 @@ function UnofficialWorldChampion:createInfobox()
 				end
 			end
 		},
-		Title{name = 'Most defences'},
+		Title{name = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
 			content = { args['most defences'] },
@@ -92,7 +97,7 @@ function UnofficialWorldChampion:createInfobox()
 		},
 		Title{name = 'Most Times Held'},
 		Cell{
-			name = (args['most times held no'] or '?') .. ' days',
+			name = (args['most times held no'] or '?') .. ' times',
 			content = { args['most times held'] },
 		},
 		Customizable{id = 'custom', children = {}},

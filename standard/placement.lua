@@ -33,6 +33,10 @@ Placement.placementClasses = {
 	'background-color-second-place',
 	'background-color-third-place',
 	'background-color-fourth-place',
+	w = 'bg-win',
+	d = 'bg-draw',
+	l = 'bg-lose',
+	dq = 'bg-dq',
 }
 
 --[[
@@ -89,32 +93,32 @@ local placeSortPrefix = {
 	['relegated'] = 'W3',
 }
 
-local placeColor = {
-	['1'] = '#FFD739',
-	['2'] = '#BEBEBE',
-	['3'] = '#BB8644',
-	['4'] = '#F8996B',
-	['5'] = '#007F99',
-	['6'] = '#007F99',
-	['7'] = '#007F99',
-	['8'] = '#007F99',
-	['9'] = '#166F82',
-	['10'] = '#166F82',
-	['11'] = '#166F82',
-	['12'] = '#166F82',
-	['13'] = '#166F82',
-	['14'] = '#166F82',
-	['15'] = '#166F82',
-	['16'] = '#166F82',
-	['32'] = '#2D606B',
-	['256'] = '#445154',
-	['w'] = '#009E60',
-	['l'] = '#dddddd',
-	['dq'] = '#dddddd',
-	['dnp'] = '#d0d0d0',
-	['proceeded'] = '#89E069',
-	['stay'] = '#FEDE68',
-	['relegated'] = '#FF6F6F',
+local placeColorClass = {
+	['1'] = 'placement-1',
+	['2'] = 'placement-2',
+	['3'] = 'placement-3',
+	['4'] = 'placement-4',
+	['5'] = 'placement-lightblue',
+	['6'] = 'placement-lightblue',
+	['7'] = 'placement-lightblue',
+	['8'] = 'placement-lightblue',
+	['9'] = 'placement-blue',
+	['10'] = 'placement-blue',
+	['11'] = 'placement-blue',
+	['12'] = 'placement-blue',
+	['13'] = 'placement-blue',
+	['14'] = 'placement-blue',
+	['15'] = 'placement-blue',
+	['16'] = 'placement-blue',
+	['32'] = 'placement-darkblue',
+	['256'] = 'placement-darkgrey',
+	['w'] = 'placement-win',
+	['l'] = 'placement-lose',
+	['dq'] = 'placement-lose',
+	['dnp'] = 'placement-dnp',
+	['proceeded'] = 'placement-up',
+	['stay'] = 'placement-stay',
+	['relegated'] = 'placement-down',
 }
 
 local textColor = {
@@ -140,7 +144,7 @@ function Placement._placement(args)
 	local diff
 	if tonumber(placement[1]) == nil then
 		text = string.upper(placement[1])
-		diff = 1
+		diff = 0
 	elseif table.maxn(placement) == 2 then
 		if ordinalSuffix[placement[2]] then
 			text = placement[1] .. '&nbsp;-&nbsp;' .. placement[2] .. ordinalSuffix[placement[2]]
@@ -154,26 +158,26 @@ function Placement._placement(args)
 		else
 			text = placement[1] .. ordinalSuffix[string.sub(placement[1], -1)]
 		end
-		diff = 1
+		diff = 0
 	end
 
 	-- Cell color
 	if tonumber(placement[1]) ~= nil then
 		if tonumber(placement[1]) <= 16 then
-			args.parent:attr('bgcolor', placeColor[placement[1]])
+			args.parent:addClass(placeColorClass[placement[1]])
 			textColorCell = textColor[placement[1]] or textColorCell
 			skipShadowCell = skipShadow[placement[1]] or skipShadowCell
 		elseif tonumber(placement[1]) <= 32 then
-			args.parent:attr('bgcolor', placeColor['32'])
+			args.parent:addClass(placeColorClass['32'])
 			textColorCell = textColor['32'] or textColorCell
 			skipShadowCell = skipShadow['32'] or skipShadowCell
 		else
-			args.parent:attr('bgcolor', placeColor['256'])
+			args.parent:addClass(placeColorClass['256'])
 			textColorCell = textColor['256'] or textColorCell
 			skipShadowCell = skipShadow['256'] or skipShadowCell
 		end
 	else
-		args.parent:attr('bgcolor', placeColor[placement[1]])
+		args.parent:addClass(placeColorClass[placement[1]])
 		textColorCell = textColor[placement[1]] or textColorCell
 		skipShadowCell = skipShadow[placement[1]] or skipShadowCell
 	end
@@ -198,7 +202,9 @@ function Placement._placement(args)
 	end
 
 	local sortPrefix2 --Sort key for second part
-	if tonumber(diff) <= 17 then
+	if tonumber(diff) == 0 then
+		sortPrefix2 = ''
+	elseif tonumber(diff) <= 17 then
 		sortPrefix2 = placeSortPrefix[tostring(diff)]
 	elseif tonumber(diff) <= 32 then
 		sortPrefix2 = 'R'
@@ -208,22 +214,15 @@ function Placement._placement(args)
 
 	if sortPrefix == nil then
 		mw.log('No placement found in Module:Placement: ' .. args.placement)
-		args.parent:tag('span')
-			:css('display', 'none')
-			:wikitext('ZZ')
+		args.parent:attr('data-sort-value', 'ZZ')
 		args.parent:tag('font')
 			:wikitext(args.placement .. ' [[Category:Pages with unknown placements]]')
 	else
-		args.parent:tag('span')
-			:css('display', 'none')
-			:wikitext(sortPrefix .. sortPrefix2)
+		args.parent:attr('data-sort-value', sortPrefix .. sortPrefix2)
 
 		-- Display text
 		args.parent:tag('font')
-			:addClass('placement-text')
-			-- luacheck: ignore
-			-- line length
-			:css('text-shadow', (skipShadowCell and 'none' or '1px 1px rgba(64, 64, 64, 0.4), 1px -1px rgba(64, 64, 64, 0.4), -1px -1px rgba(64, 64, 64, 0.4), -1px 1px rgba(64, 64, 64, 0.4)'))
+			:addClass(not skipShadowCell and 'placement-text' or nil)
 			:css('font-weight', 'bold')
 			:css('color', textColorCell)
 			:wikitext(text .. (args.text and ' ' .. args.text or ''))

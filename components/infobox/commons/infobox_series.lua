@@ -6,17 +6,25 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Template = require('Module:Template')
-local Table = require('Module:Table')
-local Namespace = require('Module:Namespace')
-local Locale = require('Module:Locale')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Localisation = require('Module:Localisation')
-local Links = require('Module:Links')
-local String = require('Module:String')
-local Flags = require('Module:Flags')
 local BasicInfobox = require('Module:Infobox/Basic')
+local Class = require('Module:Class')
+local Flags = require('Module:Flags')
+local Links = require('Module:Links')
+local LeagueIcon = require('Module:LeagueIcon')
+local Locale = require('Module:Locale')
+local Localisation = require('Module:Localisation')
+local Namespace = require('Module:Namespace')
+local Page = require('Module:Page')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Tier = require('Module:Tier')
+local WarningBox = require('Module:WarningBox')
+
+local _TIER_MODE_TYPES = 'types'
+local _TIER_MODE_TIERS = 'tiers'
+local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
+	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -28,6 +36,8 @@ local Builder = Widgets.Builder
 
 local Series = Class.new(BasicInfobox)
 
+Series.warnings = {}
+
 function Series.run(frame)
 	local series = Series(frame)
 	return series:createInfobox(frame)
@@ -37,33 +47,77 @@ function Series:createInfobox(frame)
 	local infobox = self.infobox
 	local args = self.args
 
+	-- define this here so we can use it in lpdb data and the display
+	local links = Links.transform(args)
+
+	-- Split venue from legacy format to new format.
+	-- Legacy format is a wiki-code string that can include an external link
+	-- New format has |venue= and |venuelink= as different parameters.
+	-- This should be removed once there's been a bot run to change this.
+	if not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
+		-- Remove [] and split on space
+		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
+		args.venuelink = splitVenue[1]
+		table.remove(splitVenue, 1)
+		args.venue = table.concat(splitVenue, ' ')
+	end
+
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Series Information'},
+		Builder{
+			builder = function()
+				local organizers = self:_createOrganizers(args)
+				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
+
+				return {
+					Cell{
+						name = title,
+						content = organizers
+					}
+				}
+			end
+		},
+		Cell{
+			name = 'Sponsor(s)',
+			content = self:getAllArgsForBase(args, 'sponsor')
+		},
+		Customizable{id = 'type', children = {}},
 		Customizable{
-			id = 'liquipediatier',
+			id = 'location',
 			children = {
 				Cell{
-					name = 'Liquipedia Tier',
+					name = 'Location',
 					content = {
-						self:_createTier(args.liquipediatier, (args.liquipediatiertype or args.tiertype))
+						self:_createLocation(args.country, args.city)
 					}
 				},
 			}
 		},
-		Cell{
-			name = 'Organizer',
-			content = self:getAllArgsForBase(args, 'organizer'),
-			options = {
-				makeLink = true
-			}
-		},
-		Cell{
-			name = 'Location',
-			content = {
-				self:_createLocation(args.country, args.city)
-			}
+		Builder{
+			builder = function()
+				args.venue1 = args.venue1 or args.venue
+				args.venue1link = args.venue1link or args.venuelink
+				args.venue1desc = args.venue1desc or args.venuedesc
+
+				local venues = {}
+				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
+					-- TODO: Description
+					local description = ''
+					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
+				end
+
+				return {Cell{
+					name = 'Venue',
+					content = venues
+				}}
+			end
 		},
 		Cell{
 			name = 'Date',
@@ -74,7 +128,7 @@ function Series:createInfobox(frame)
 		Cell{
 			name = 'Start Date',
 			content = {
-				args.sdate or args.launched
+				args.sdate or args.launched or args.inaugurated
 			}
 		},
 		Cell{
@@ -83,17 +137,22 @@ function Series:createInfobox(frame)
 				args.edate or args.defunct
 			}
 		},
-		Cell{
-			name = 'Sponsor(s)',
-			content = self:getAllArgsForBase(args, 'sponsor')
-		},
 		Customizable{
 			id = 'custom',
 			children = {}
 		},
+		Customizable{
+			id = 'liquipediatier',
+			children = {
+				Cell{
+					name = 'Liquipedia Tier',
+					content = {self:createLiquipediaTierDisplay(args)},
+					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
+				},
+			}
+		},
 		Builder{
 			builder = function()
-				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
@@ -101,8 +160,22 @@ function Series:createInfobox(frame)
 					}
 				end
 			end
-		}
+		},
+		Customizable{id = 'customcontent', children = {}},
 	}
+
+	if Namespace.isMain() then
+		infobox:categories(
+			'Tournament series',
+			self:_setCountryCategories(args.country),
+			self:_setCountryCategories(args.country2),
+			self:_setCountryCategories(args.country3),
+			self:_setCountryCategories(args.country4),
+			self:_setCountryCategories(args.country5)
+		)
+	end
+
+	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if Namespace.isMain() then
 		local lpdbData = {
@@ -116,14 +189,20 @@ function Series:createInfobox(frame)
 			type = args.type,
 			location = Locale.formatLocation({city = args.city, country = args.country}),
 			location2 = Locale.formatLocation({city = args.city2, country = args.country2}),
+			locations = Locale.formatLocations(args),
 			previous = args.previous,
 			previous2 = args.previous2,
 			next = args.next,
 			next2 = args.next2,
 			prizepool = args.prizepool,
-			liquipediatier = args.liquipediatier,
+			liquipediatier = Tier.text.tiers
+				and Tier.text.tiers[string.lower(args.liquipediatier or '')]
+				or args.liquipediatiertype,
+			liquipediatiertype = Tier.text.types
+				and Tier.text.types[string.lower(args.liquipediatiertype or '')]
+				or args.liquipediatiertype,
 			publishertier = args.publishertier,
-			launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate),
+			launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
 			defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
 			defunctfate = ReferenceCleaner.clean(args.defunctfate),
 			organizers = mw.ext.LiquipediaDB.lpdb_create_json({
@@ -140,34 +219,18 @@ function Series:createInfobox(frame)
 				sponsor4 = args.sponsor4,
 				sponsor5 = args.sponsor5,
 			}),
-			links = mw.ext.LiquipediaDB.lpdb_create_json({
-				discord = Links.makeFullLink('discord', args.discord),
-				facebook = Links.makeFullLink('facebook', args.facebook),
-				instagram = Links.makeFullLink('instagram', args.instagram),
-				twitch = Links.makeFullLink('twitch', args.twitch),
-				twitter = Links.makeFullLink('twitter', args.twitter),
-				website = Links.makeFullLink('website', args.website),
-				weibo = Links.makeFullLink('weibo', args.weibo),
-				vk = Links.makeFullLink('vk', args.vk),
-				youtube = Links.makeFullLink('youtube', args.youtube),
-			}),
+			links = mw.ext.LiquipediaDB.lpdb_create_json(
+				Links.makeFullLinksForTableItems(links or {})
+			),
 		}
 		lpdbData = self:_getIconFromLeagueIconSmall(frame, lpdbData)
 
 		lpdbData = self:addToLpdb(lpdbData)
 		mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
-
-		infobox:categories(
-			'Tournament series',
-			self:_setCountryCategories(args.country),
-			self:_setCountryCategories(args.country2),
-			self:_setCountryCategories(args.country3),
-			self:_setCountryCategories(args.country4),
-			self:_setCountryCategories(args.country5)
-		)
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return tostring(builtInfobox)
+		.. WarningBox.displayAll(Series.warnings)
 end
 
 --- Allows for overriding this functionality
@@ -175,49 +238,75 @@ function Series:addToLpdb(lpdbData)
 	return lpdbData
 end
 
-function Series:_createTier(tier, tierType)
-	if tier == nil or tier == '' then
-		return ''
+function Series:createLiquipediaTierDisplay(args)
+	local tier = args.liquipediatier
+	local tierType = args.liquipediatiertype
+	if String.isEmpty(tier) then
+		return nil
 	end
 
-	local output = ''
-
-	local hasTierType = tierType ~= nil and tierType ~= ''
-
-	if hasTierType then
-		local tierTypeDisplay = Template.safeExpand(self.infobox.frame, 'TierDisplay/' .. tierType)
-		output = output .. '[[' .. tierTypeDisplay .. '_Tournaments|' .. tierTypeDisplay .. ']]'
-		output = output .. '&nbsp;('
-
+	local function buildTierString(tierString, tierMode)
+		local tierText
+		if not Tier.text[tierMode] then -- allow legacy tier modules
+			tierText = Tier.text[tierString]
+		else -- default case, i.e. tier module with intended format
+			tierText = Tier.text[tierMode][tierString:lower()]
+		end
+		if not tierText then
+			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
+			table.insert(
+				self.warnings,
+				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
+			)
+			return ''
+		else
+			self.infobox:categories(tierText .. ' Tournaments')
+			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
+		end
 	end
 
-	local tierDisplay = Template.safeExpand(self.infobox.frame, 'TierDisplay/' .. tier)
-	output = output .. '[[' .. tierDisplay .. '_Tournaments|' .. tierDisplay .. ']]'
+	local tierDisplay = buildTierString(tier, _TIER_MODE_TIERS)
 
-	if hasTierType then
-		output = output .. ')'
+	if String.isNotEmpty(tierType) then
+		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
 	end
 
-	return output
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+end
+
+--- Allows for overriding this functionality
+function Series:liquipediaTierHighlighted(args)
+	return false
+end
+
+--- Allows for overriding this functionality
+function Series:appendLiquipediatierDisplay()
+	return ''
 end
 
 function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
 	local icon = lpdbData.icon
 	local iconDark = lpdbData.icondark
+	local iconSmallTemplate = LeagueIcon.display{
+		icon = icon,
+		iconDark = iconDark,
+		series = lpdbData.name,
+		date = lpdbData.defunctfate
+	}
+	local trackingCategory
 
-	if String.isEmpty(icon) then
-		local series = lpdbData.name:lower()
-		local iconSmallTemplate = Template.safeExpand(
-			frame,
-			'LeagueIconSmall/' .. series,
-			{ date = lpdbData.defunctfate }
+	icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
+		icon = icon,
+		iconDark = iconDark,
+		stringOfExpandedTemplate = iconSmallTemplate
+	}
+
+	if String.isNotEmpty(trackingCategory) then
+		table.insert(
+			self.warnings,
+			'Missing icon while icondark is set.' .. trackingCategory
 		)
-		--extract series icon from template:LeagueIconSmall
-		icon = mw.text.split(iconSmallTemplate, 'File:')
-		icon = mw.text.split(icon[2] or '', '|')
-		icon = icon[1]
 	end
-	--when Template:LeagueIconSmall has darkmodeicons retrieve that too
 
 	lpdbData.icon = icon
 	lpdbData.icondark = iconDark
@@ -231,6 +320,64 @@ function Series:_createLocation(country, city)
 	end
 
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
+end
+
+function Series:_createLink(id, name, link, desc)
+	if String.isEmpty(id) then
+		return nil
+	end
+
+	local output
+
+	if Page.exists(id) then
+		output = '[[' .. id .. '|'
+		if String.isEmpty(name) then
+			output = output .. id .. ']]'
+		else
+			output = output .. name .. ']]'
+		end
+
+	elseif not String.isEmpty(link) then
+		if String.isEmpty(name) then
+			output = '[' .. link .. ' ' .. id .. ']'
+		else
+			output = '[' .. link .. ' ' .. name .. ']'
+
+		end
+	elseif String.isEmpty(name) then
+		output = id
+	else
+		output = name
+	end
+
+	if not String.isEmpty(desc) then
+		output = output .. desc
+	end
+
+	return output
+end
+
+function Series:_createOrganizers(args)
+	local organizers = {
+		Series:_createLink(
+			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
+	}
+
+	local index = 2
+
+	while not String.isEmpty(args['organizer' .. index]) do
+		table.insert(
+			organizers,
+			Series:_createLink(
+				args['organizer' .. index],
+				args['organizer' .. index .. '-name'],
+				args['organizer' .. index .. '-link'],
+				args['organizerref' .. index])
+		)
+		index = index + 1
+	end
+
+	return organizers
 end
 
 function Series:_setCountryCategories(country)

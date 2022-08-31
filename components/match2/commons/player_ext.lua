@@ -14,7 +14,6 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
-local TournamentUtil = require('Module:Tournament/Util')
 
 local globalVars = PageVariableNamespace({cached = true})
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
@@ -29,11 +28,11 @@ PlayerExt.extractFromLink('[[Dream (Korean Terran player)|Dream]]')
 -- returns 'Dream (Korean Terran player)', 'Dream'
 --]===]
 function PlayerExt.extractFromLink(name)
-	name = mw.text.trim(
-		name:gsub('%b{}', '')
-			:gsub('%b<>', '')
-			:gsub('%b[]', '')
-	)
+	name = name
+		:gsub('%b{}', '')
+		:gsub('%b<>', '')
+		:gsub('%b[]', '')
+	name = mw.text.trim(name)
 
 	local pageName, displayName = unpack(mw.text.split(name, '|', true))
 	if displayName and displayName ~= '' then
@@ -98,7 +97,7 @@ teamhistory data point.
 For specific uses only.
 ]]
 function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
-	date = date or TournamentUtil.getContextualDateOrNow()
+	date = date or PlayerExt.getContextualDateOrNow()
 
 	local conditions = {
 		'[[type::teamhistory]]',
@@ -227,7 +226,7 @@ PlayerExt.syncTeam. Enabled by default.
 ]]
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
-	local date = options.date or TournamentUtil.getContextualDateOrNow()
+	local date = options.date or PlayerExt.getContextualDateOrNow()
 
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}
@@ -269,6 +268,12 @@ team to page variables.
 ]]
 function PlayerExt.populateTeam(pageName, template, options)
 	return PlayerExt.syncTeam(pageName, template, Table.merge(options, {savePageVar = false}))
+end
+
+-- copy of a function (2 merged into 1) from Module:Tournament/Util to avoid a require loop
+function PlayerExt.getContextualDateOrNow()
+	return globalVars:get('tournament_enddate')
+		or os.date('%F')
 end
 
 return PlayerExt

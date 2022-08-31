@@ -6,20 +6,25 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Series = require('Module:Infobox/Series')
-local Autopatch = require('Module:Automated Patch')._main
-local SeriesTotalPrize = require('Module:SeriesTotalPrize')._get
-local Tier = require('Module:Tier')
+local Autopatch = require('Module:Automated Patch')
 local Json = require('Module:Json')
-local VarDefine = require('Module:Variables').varDefine
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
+local Series = require('Module:Infobox/Series')
+local SeriesTotalPrize = require('Module:SeriesTotalPrize')
+local Tier = require('Module:Tier')
+local Variables = require('Module:Variables')
+
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Builder = require('Module:Infobox/Widget/Builder')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
+local Table = require('Module:Table')
 
+local _TODAY = os.date('%Y-%m-%d', os.time())
+local _TIER_MODE_TYPES = 'types'
+local _TIER_MODE_TIERS = 'tiers'
 local _GAME_WOL = 'wol'
 local _GAME_HOTS = 'hots'
 local _GAME_LOTV = 'lotv'
@@ -36,12 +41,18 @@ local CustomInjector = Class.new(Injector)
 
 local CustomSeries = {}
 
+local _args
 local _series
 
 function CustomSeries.run(frame)
 	local series = Series(frame)
-	series.createWidgetInjector = CustomSeries.createWidgetInjector
+	_args = series.args
 	_series = series
+
+	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+
+	series.createWidgetInjector = CustomSeries.createWidgetInjector
+
 	return series:createInfobox(frame)
 end
 
@@ -53,155 +64,135 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Game version',
 		content = {
-			CustomSeries._getGameVersion(
-				string.lower(_series.args.game or ''), _series.args.patch or '', _series.args)
+			CustomSeries._getGameVersion(string.lower(_args.game or ''), _args.patch)
 		}
 	})
-	table.insert(widgets, Cell({
+	table.insert(widgets, Cell{
 		name = 'Server',
-		content = {_series.args.server}
-	}))
-	table.insert(widgets, Cell({
+		content = {_args.server}
+	})
+	table.insert(widgets, Cell{
 		name = 'Type',
-		content = {_series.args.type}
-	}))
-	table.insert(widgets, Cell({
+		content = {_args.type}
+	})
+	table.insert(widgets, Cell{
 		name = 'Format',
-		content = {_series.args.format}
-	}))
-	table.insert(widgets, Builder({
+		content = {_args.format}
+	})
+	table.insert(widgets, Builder{
 		builder = function()
-			if _series.args.prizepooltot ~= 'false' then
+			if _args.prizepooltot ~= 'false' then
 				return {
 					Cell{
 						name = 'Total prize money',
-						content = {CustomSeries._getSeriesPrizepools(_series.args)}
+						content = {CustomSeries._getSeriesPrizepools()}
 					}
 				}
 			end
 		end
-	}))
-	CustomSeries._addCustomVariables(_series.args)
-	return widgets
-end
+	})
 
-function CustomInjector:parse(id, widgets)
-	if id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {
-					CustomSeries._createTier(
-						_series.args.liquipediatier, (_series.args.liquipediatiertype or _series.args.tiertype))
-				}
-
-			}
-		}
-	end
+	CustomSeries._addCustomVariables()
 
 	return widgets
 end
 
-function CustomSeries._getSeriesPrizepools(args)
-	local seriesTotalPrizeInput = Json.parseIfString(args.prizepooltot or '{}')
-	local series = seriesTotalPrizeInput.series or args.series or mw.title.getCurrentTitle().text
+function CustomSeries._getSeriesPrizepools()
+	local seriesTotalPrizeInput = Json.parseIfString(_args.prizepooltot or '{}')
+	local series = seriesTotalPrizeInput.series or _args.series or mw.title.getCurrentTitle().text
 
-	--build args for the SeriesTotalPrize Module
-	local newArgs = {
+	return SeriesTotalPrize._get{
 		series = series,
-		limit = seriesTotalPrizeInput.limit or args.limit,
-		offset = seriesTotalPrizeInput.offset or args.offset,
-		external = seriesTotalPrizeInput.external or args.external,
-		onlytotal = seriesTotalPrizeInput.onlytotal or args.onlytotal,
+		limit = seriesTotalPrizeInput.limit or _args.limit,
+		offset = seriesTotalPrizeInput.offset or _args.offset,
+		external = seriesTotalPrizeInput.external or _args.external,
+		onlytotal = seriesTotalPrizeInput.onlytotal or _args.onlytotal,
 	}
-	return SeriesTotalPrize(newArgs)
 end
 
-function CustomSeries._getGameVersion(game, patch, args)
-	local shouldUseAutoPatch = args.autopatch or ''
-	local modName = args.modname or ''
-	local beta = args.beta or ''
-	local epatch = args.epatch or ''
-	local sdate = args.sdate or ''
-	local edate = args.edate or ''
-	local today = os.date('%Y-%m-%d', os.time())
+function CustomSeries._getGameVersion(game, patch)
+	local shouldUseAutoPatch = Logic.readBool(_args.autopatch or true)
+	local modName = _args.modname
+	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
+	local endPatch = _args.epatch
+	local startDate = _args.sdate
+	local endDate = _args.edate
 
-	if game ~= '' or patch ~= '' then
-		local gameversion
+	if String.isNotEmpty(game) or String.isNotEmpty(patch) then
+		local gameVersion
 		if game == _GAME_MOD then
-			gameversion = modName or 'Mod'
-		elseif _GAMES[game] ~= nil then
-			gameversion = '[[' .. _GAMES[game][1] .. ']][[Category:' ..
-				(beta ~= '' and 'Beta ' or '') .. _GAMES[game][2] .. ' Competitions]]'
+			gameVersion = modName or 'Mod'
+		elseif _GAMES[game] then
+			gameVersion = '[[' .. _GAMES[game][1] .. ']]' ..
+				'[[Category:' .. betaPrefix .. _GAMES[game][2] .. ' Competitions]]'
 		else
-			gameversion = '[[Category:' .. (beta ~= '' and 'Beta ' or '') .. ' Competitions]]'
+			gameVersion = '[[Category:' .. betaPrefix .. 'Competitions]]'
 		end
 
-		if (shouldUseAutoPatch == 'false' or game ~= 'lotv') and epatch == '' then
-			epatch = patch
-		end
-		if patch == '' and game == _GAME_LOTV and shouldUseAutoPatch ~= 'false' then
-			patch = 'Patch ' .. (
-				Autopatch({sdate ~= '' and string.lower(sdate) ~= 'tbd' and string.lower(sdate) ~= 'tba' and sdate or today}) or '')
-		end
-		if epatch == '' and game == 'lotv' and shouldUseAutoPatch ~= 'false' then
-			epatch = 'Patch ' .. (
-				Autopatch({ edate ~= '' and
-							string.lower(edate) ~= 'tbd' and
-							string.lower(edate) ~= 'tba' and
-							edate or today
-						}) or '')
+		if game == _GAME_LOTV and shouldUseAutoPatch then
+			if String.isEmpty(patch) then
+				patch = 'Patch ' .. (Autopatch._main({CustomSeries._retrievePatchDate(startDate)}) or '')
+			end
+			if String.isEmpty(endPatch) then
+				endPatch = 'Patch ' .. (Autopatch._main({CustomSeries._retrievePatchDate(endDate)}) or '')
+			end
+		elseif String.isEmpty(endPatch) then
+			endPatch = patch
 		end
 
-		local patch_display = beta ~= '' and 'Beta ' or ''
+		local patchDisplay = betaPrefix
 
-		if patch ~= '' then
-			if patch == epatch then
-				patch_display = patch_display .. '<br/>[[' .. patch .. ']]'
-			else
-				patch_display = patch_display .. '<br/>[[' .. patch .. ']] &ndash; [[' .. epatch .. ']]'
+		if String.isNotEmpty(patch) then
+			patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
+			if patch ~= endPatch then
+				patchDisplay = patchDisplay .. ' &ndash; [[' .. endPatch .. ']]'
 			end
 		end
 
 		--set patch variables
-		VarDefine('patch', patch)
-		VarDefine('epatch', epatch)
+		Variables.varDefine('patch', patch)
+		Variables.varDefine('epatch', endPatch)
 
-		return gameversion .. patch_display
+		return gameVersion .. patchDisplay
 	end
 end
 
-function CustomSeries._addCustomVariables(args)
+function CustomSeries._retrievePatchDate(dateEntry)
+	return String.isNotEmpty(dateEntry)
+		and dateEntry:lower() ~= 'tbd'
+		and dateEntry:lower() ~= 'tba'
+		and dateEntry or _TODAY
+end
+
+function CustomSeries._addCustomVariables()
 	if
 		(not Namespace.isMain()) or
-		args.disable_smw == 'true' or
-		args.disable_lpdb == 'true' or
-		args.disable_storage == 'true'
+		Logic.readBool(_args.disable_lpdb) or
+		Logic.readBool(_args.disable_storage)
 	then
-		VarDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		--needed for e.g. External Cups Lists
-		local name = args.name or mw.title.getCurrentTitle().text
-		VarDefine('featured', args.featured or '')
-		VarDefine('headtohead', args.headtohead or '')
-		VarDefine('tournament_tier', args.liquipediatier or '')
-		VarDefine('tournament_tiertype', args.liquipediatiertype or args.tiertype or '')
-		VarDefine('tournament_mode', args.mode or '1v1')
-		VarDefine('tournament_ticker_name', args.tickername or name)
-		VarDefine('tournament_shortname', args.shortname or '')
-		VarDefine('tournament_name', name)
-		VarDefine('tournament_abbreviation', args.abbreviation or args.shortname or '')
-		local game = args.game
+		local name = _args.name or mw.title.getCurrentTitle().text
+		Variables.varDefine('featured', _args.featured or '')
+		Variables.varDefine('headtohead', _args.headtohead or '')
+		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
+		Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or '')
+		Variables.varDefine('tournament_mode', _args.mode or '1v1')
+		Variables.varDefine('tournament_ticker_name', _args.tickername or name)
+		Variables.varDefine('tournament_shortname', _args.shortname or '')
+		Variables.varDefine('tournament_name', name)
+		Variables.varDefine('tournament_abbreviation', _args.abbreviation or _args.shortname or '')
+		local game = _args.game
 		if game then
 			game = _GAMES[game] ~= nil and _GAMES[game][1] or game
 		end
-		VarDefine('tournament_game', game or '')
-		VarDefine('tournament_type', args.type or '')
-		CustomSeries._setDateMatchVar(args.date, args.edate, args.sdate)
+		Variables.varDefine('tournament_game', game or '')
+		Variables.varDefine('tournament_type', _args.type or '')
+		CustomSeries._setDateMatchVar(_args.date, _args.edate, _args.sdate)
 	end
 end
 
---- Allows for overriding this functionality
 function Series:addToLpdb(lpdbData)
 	Variables.varDefine('tournament_icon', lpdbData.icon)
 	Variables.varDefine('tournament_icon_dark', lpdbData.icondark)
@@ -209,47 +200,60 @@ function Series:addToLpdb(lpdbData)
 end
 
 function CustomSeries._setDateMatchVar(date, edate, sdate)
-	date = string.match(date or '', '%d%d%d%d%-%d%d%-%d%d')
-		or string.match(edate or '', '%d%d%d%d%-%d%d%-%d%d')
-		or string.match(sdate or '', '%d%d%d%d%-%d%d%-%d%d') or ''
-	sdate = string.match(date or '', '%d%d%d%d%-%d%d%-%d%d')
-		or string.match(sdate or '', '%d%d%d%d%-%d%d%-%d%d')
-		or string.match(edate or '', '%d%d%d%d%-%d%d%-%d%d') or ''
+	local endDate = CustomSeries._validDateOr(date, edate, sdate) or ''
+	local startDate = CustomSeries._validDateOr(date, sdate, edate) or ''
 
-	VarDefine('date', date)
-	VarDefine('tournament_enddate', date)
-	VarDefine('tournament_startdate', sdate)
+	Variables.varDefine('date', endDate)
+	Variables.varDefine('tournament_enddate', endDate)
+	Variables.varDefine('tournament_startdate', startDate)
+end
+
+function CustomSeries._validDateOr(...)
+	local regexString = '%d%d%d%d%-%d%d%-%d%d' --(i.e. YYYY-MM-DD)
+
+	for _, input in Table.iter.spairs({...}) do
+		local dateString = string.match(input, regexString)
+		if dateString then
+			return dateString
+		end
+	end
 end
 
 --function for custom tier handling
-function CustomSeries._createTier(tier, tierType)
+function CustomSeries.createLiquipediaTierDisplay()
+	local tier = _args.liquipediatier
+	local tierType = _args.liquipediatiertype
 	if String.isEmpty(tier) then
 		return nil
 	end
 
-	local tierText = Tier['text'][tier]
-	local hasInvalidTier = tierText == nil
-	tierText = tierText or tier
-
-	local hasTierType = tierType ~= nil and tierType ~= ''
-	local hasInvalidTierType = false
-
-	local output = '[[' .. tierText .. ' Tournaments|'
-
-	if hasTierType then
-		tierType = Tier['types'][string.lower(tierType or '')] or tierType
-		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
-
-		output = output .. tierType .. '&nbsp;(' .. tierText .. ')'
-	else
-		output = output .. tierText
+	local function buildTierText(tierString, tierMode)
+		local tierText = Tier.text[tierMode][tierString]
+		if not tierText then
+			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
+			table.insert(
+				_series.warnings,
+				tierString .. ' is not a known Liquipedia ' .. tierMode
+					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
+			)
+			return ''
+		else
+			return tierText
+		end
 	end
 
-	output = output .. ']]' ..
-		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
-		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
+	tier = buildTierText(tier, _TIER_MODE_TIERS)
 
-	return output
+	local tierLink = tier .. ' Tournaments'
+	local tierDisplay
+	if String.isNotEmpty(tierType) then
+		tierType = buildTierText(tierType:lower(), _TIER_MODE_TYPES)
+		tierDisplay = tierType .. '&nbsp;(' .. tier .. ')'
+	else
+		tierDisplay = tier
+	end
+
+	return '[[' .. tierLink .. '|' .. tierDisplay .. ']]'
 end
 
 return CustomSeries

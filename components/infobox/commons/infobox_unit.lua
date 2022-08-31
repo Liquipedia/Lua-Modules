@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local BasicInfobox = require('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -40,7 +40,8 @@ function Unit:createInfobox()
 					imageDefault = args.default,
 					imageDark = args.imagedark or args.imagedarkmode,
 					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-					subHeader = self:subHeaderDisplay(args)
+					subHeader = self:subHeaderDisplay(args),
+					size = args.imagesize,
 				},
 			}
 		},
@@ -58,7 +59,7 @@ function Unit:createInfobox()
 			}
 		},
 		Cell{name = 'Description', content = {args.description}},
-		Cell{name = 'Built from', content = {args.builtfrom}},
+		Cell{name = 'Built From', content = {args.builtfrom}},
 		Customizable{
 			id = 'requirements',
 			children = {
@@ -113,7 +114,7 @@ function Unit:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkey.hotkey2(args.hotkey, args.hotkey2, 'slash')
 		else
 			display = Hotkey.hotkey(args.hotkey)
 		end

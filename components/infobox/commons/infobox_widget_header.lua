@@ -34,6 +34,10 @@ function Header:make()
 		)
 	}
 
+	if self.image then
+		mw.ext.SearchEngineOptimization.metaimage(self.image)
+	end
+
 	local subHeader = Header:_subHeader(self.subHeader)
 	if subHeader then
 		table.insert(header, 2, subHeader)
@@ -80,15 +84,27 @@ end
 
 function Header:_makeSizedImage(imageName, fileName, size, mode)
 	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
-	size = tonumber(size or '')
-	if size then
-		size = size .. 'px'
+
+	-- Number (interpret as pixels)
+	size = size or ''
+	if tonumber(size) then
+		size = tonumber(size) .. 'px'
 		infoboxImage:addClass('infobox-fixed-size-image')
+	-- Percentage (interpret as scaling)
+	elseif size:find('%%') then
+		local scale = size:gsub('%%', '')
+		scale = tonumber(scale)
+		if scale then
+			size = 'frameless|upright=' .. (scale / 100)
+			infoboxImage:addClass('infobox-fixed-size-image')
+		end
+	-- Default
 	else
 		size = '600px'
 	end
+
 	local fullFileName = '[[File:' .. imageName .. '|center|' .. size .. ']]'
-	infoboxImage:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
+	infoboxImage:wikitext(fullFileName)
 
 	return infoboxImage
 end
@@ -113,7 +129,7 @@ function Header:_createInfoboxButtons()
 	buttons:node(
 		mw.text.nowiki('[') ..
 		'[[' .. moduleTitle ..
-		'/doc|h]]' .. mw.text.nowiki(']')
+		'|h]]' .. mw.text.nowiki(']')
 	)
 
 	return buttons

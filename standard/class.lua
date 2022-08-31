@@ -75,7 +75,10 @@ function Class.new(base, init)
 	return instance
 end
 
-
+---@generic T
+---@param class T
+---@param options ?table
+---@return T
 function Class.export(class, options)
 	for name, f in pairs(class) do
 		-- We only want to export functions, and only functions which are public (no underscore)

@@ -29,13 +29,20 @@ function Map:createInfobox(frame)
 	local args = self.args
 
 	local widgets = {
-		Header{name = self:getNameDisplay(args), image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = self:getNameDisplay(args),
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Map Information'},
 		Cell{name = 'Creator', content = {
 				args.creator or args['created-by'], args.creator2 or args['created-by2']}, options = { makeLink = true }
 		},
-		Cell{name = 'Location', content = {args.location}},
+		Customizable{id = 'location', children = {
+			Cell{name = 'Location', content = {args.location}}
+		}},
 		Cell{name = 'Release Date', content = {args.releasedate}},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},

@@ -7,16 +7,24 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
+
 local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
+	args = args or {}
+	args.participantGrabber = false
+
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
+
 	return BasicHiddenDataBox.run(args)
 end
 
-function CustomHiddenDataBox:addCustomVariables(args, queryResult)
+function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	queryResult.extradata = queryResult.extradata or {}
+
 	--legacy variables
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
@@ -24,21 +32,18 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate', ''))
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername', ''))
-	BasicHiddenDataBox:checkAndAssign(
+	BasicHiddenDataBox.checkAndAssign(
 		'tournament_abbreviation',
 		args.abbreviation or args.shortname,
 		queryResult.shortname
 	)
 
-	Variables.varDefine('tournament_abbreviation', Variables.varDefault('tournament_liquipediatiertype', ''))
-	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
-
 	--custom stuff
 	Variables.varDefine('headtohead', args.headtohead)
-	BasicHiddenDataBox:checkAndAssign(
+	BasicHiddenDataBox.checkAndAssign(
 		'featured',
 		args.featured,
-		(queryResult.extradata or {}).featured
+		queryResult.extradata.featured
 	)
 	if args.team_number then
 		Variables.varDefine('is_team_tournament', 1)
@@ -46,16 +51,15 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	else
 		Variables.varDefine(
 			'participants_number',
-			args.participants or args.participantsnumber,
-			queryResult.participantsnumber
+			args.participants or args.participantsnumber or queryResult.participantsnumber
 		)
-		if args.teamevent == 'true' then
+		if Logic.readBool(args.teamevent) then
 			Variables.varDefine('is_team_tournament', 1)
 		end
 	end
 
 	--if specified also store in lpdb (custom for sc2)
-	if args.storage == 'true' then
+	if Logic.readBool(args.storage) then
 		local prizepool = CustomHiddenDataBox.cleanPrizePool(args.prizepool) or queryResult.prizepool
 		local lpdbData = {
 			name = Variables.varDefault('tournament_name'),

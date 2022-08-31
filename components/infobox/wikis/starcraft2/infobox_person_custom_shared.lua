@@ -13,6 +13,7 @@ local Variables = require('Module:Variables')
 local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
 local Logic = require('Module:Logic')
+local Namespace = require('Module:Namespace')
 
 --race stuff tables
 local _RACE_DATA = {
@@ -50,7 +51,7 @@ local _CLEAN_OTHER_ROLES = {
 local _MILITARY_DATA = {
 	starting = {category = 'Persons waiting for Military Duty', storeValue = 'pending'},
 	ongoing = {category = 'Persons on Military Duty', storeValue = 'ongoing'},
-	fulfilled = {category = 'Persons expleted Military Duty', storeValue = 'fulfilled'},
+	fulfilled = {category = 'Persons that completed their Military Duty', storeValue = 'fulfilled'},
 	exempted = {category = 'Persons exempted from Military Duty', storeValue = 'exempted'},
 }
 _MILITARY_DATA.pending = _MILITARY_DATA.starting
@@ -72,11 +73,11 @@ end
 
 function CustomPerson.shouldStoreData()
 	if
-		_args.disable_smw == 'true' or _args.disable_lpdb == 'true' or _args.disable_storage == 'true'
-		or Variables.varDefault('disable_SMW_storage', 'false') == 'true'
-		or mw.title.getCurrentTitle().nsText ~= ''
+		Logic.readBool(_args.disable_lpdb) or Logic.readBool(_args.disable_storage)
+		or Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		or not Namespace.isMain()
 	then
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 		return false
 	end
 	return true
@@ -109,12 +110,14 @@ function CustomPerson.getRaceData(race, asCategory)
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
 	else
 		if asCategory then
-			for raceIndex, raceValue in ipairs(raceTable) do
+			for raceIndex, raceValue in ipairs(raceTable or {}) do
 				raceTable[raceIndex] = ':Category:' .. raceValue .. ' Players|' .. raceValue .. ']]'
 					.. '[[Category:' .. raceValue .. ' Players'
 			end
 		end
-		display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
+		if raceTable then
+			display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
+		end
 	end
 
 	_raceData = {
@@ -186,7 +189,7 @@ function CustomPerson.getPersonType()
 	end
 
 	local role = _args.role or _args.occupation or _args.defaultPersonType
-	role = string.lower(role)
+	role = string.lower(role or '')
 	local category = _ROLES[role]
 	local store = category or _CLEAN_OTHER_ROLES[role] or _args.defaultPersonType
 	if category == 'Map Maker' then

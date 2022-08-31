@@ -6,17 +6,29 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Variables = require('Module:Variables')
 local BasicHiddenDataBox = require('Module:HiddenDataBox')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
+local Tier = require('Module:Tier')
+local Variables = require('Module:Variables')
+
 local CustomHiddenDataBox = {}
+
+local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
+	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+local TIER_MODE_TYPES = 'types'
+local TIER_MODE_TIERS = 'tiers'
 
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
+	BasicHiddenDataBox.validateTier = CustomHiddenDataBox.validateTier
 	return BasicHiddenDataBox.run(args)
 end
 
-function CustomHiddenDataBox:addCustomVariables(args, queryResult)
+function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	queryResult.extradata = queryResult.extradata or {}
+
 	--legacy variables
 	Variables.varDefine('tournament_parent_name', Variables.varDefault('tournament_parentname', ''))
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
@@ -34,8 +46,38 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 	Variables.varDefine('headtohead', args.headtohead)
 
+	-- tournament mode (1v1 or team)
+	BasicHiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.extradata.mode)
+
 	--gamemode
-	BasicHiddenDataBox:checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
+	BasicHiddenDataBox.checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
+end
+
+function CustomHiddenDataBox.validateTier(tierString, tierMode)
+	if String.isEmpty(tierString) then
+		return nil, nil
+	end
+	local warning
+	local tierValue = tierString
+	-- tier should be a number defining a tier
+	if tierMode == TIER_MODE_TIERS and not Logic.isNumeric(tierValue) then
+		tierValue = Tier.number[tierValue:lower()] or tierValue
+	end
+	local cleanedTierValue = Tier.text[tierMode][(tierValue):lower()]
+	if not cleanedTierValue then
+		cleanedTierValue = tierString
+		warning = String.interpolate(
+			INVALID_TIER_WARNING,
+			{
+				tierString = tierString,
+				tierMode = tierMode == TIER_MODE_TYPES and 'Tier Type' or 'Tier',
+			}
+		)
+	end
+
+	tierValue = (tierMode == TIER_MODE_TYPES and cleanedTierValue) or tierValue
+
+	return tierValue, warning
 end
 
 return Class.export(CustomHiddenDataBox)

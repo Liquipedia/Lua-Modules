@@ -9,6 +9,8 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Opponent = require('Module:Opponent')
+local String = require('Module:StringUtils')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
@@ -51,18 +53,35 @@ function Header:rightOpponent(content)
 end
 
 function Header:createOpponent(opponent, side)
+	local showLink = not Opponent.isTbd(opponent) and true or false
 	return OpponentDisplay.BlockOpponent{
 		flip = side == 'left',
 		opponent = opponent,
+		showLink = showLink,
 		overflow = 'wrap',
 		teamStyle = 'short',
 	}
 end
 
 function Header:createScore(opponent)
+	local isWinner, scoreText
+	if opponent.placement2 then
+		-- Bracket Reset, show W/L
+		if opponent.placement2 == 1 then
+			isWinner = true
+			scoreText = 'W'
+		else
+			isWinner = false
+			scoreText = 'L'
+		end
+	else
+		isWinner = opponent.placement == 1 or opponent.advances
+		scoreText = OpponentDisplay.InlineScore(opponent)
+	end
+
 	return OpponentDisplay.BlockScore{
-		isWinner = opponent.placement == 1 or opponent.advances,
-		scoreText = OpponentDisplay.InlineScore(opponent),
+		isWinner = isWinner,
+		scoreText = scoreText,
 	}
 end
 
@@ -184,12 +203,38 @@ local Footer = Class.new(
 		self.root = mw.html.create('div')
 		self.root:addClass('brkts-popup-footer')
 		self.inner = mw.html.create('div')
-		self.inner:addClass('brkts-popup-spaced')
+		self.inner:addClass('brkts-popup-spaced vodlink')
 	end
 )
 
 function Footer:addElement(element)
 	self.inner:node(element)
+	return self
+end
+
+function Footer:addLink(link, icon, iconDark, text)
+	local content
+	if String.isEmpty(iconDark) then
+		content = '[['..icon..'|link='..link..'|15px|'..text..'|alt=' .. link .. ']]'
+	else
+		content = '[['..icon..'|link='..link..'|15px|'..text..'|alt=' .. link .. '|class=show-when-light-mode]]'
+			.. '[['..iconDark..'|link='..link..'|15px|'..text..'|alt=' .. link .. '|class=show-when-dark-mode]]'
+	end
+
+	self.inner:wikitext(content)
+	return self
+end
+
+function Footer:addLinks(linkData, links)
+	for linkType, link in pairs(links) do
+		local currentLinkData = linkData[linkType]
+		if not currentLinkData then
+			mw.log('Unknown link: ' .. linkType)
+		else
+			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
+		end
+	end
+
 	return self
 end
 
@@ -225,6 +270,17 @@ function MatchSummary:body(body)
 	return self
 end
 
+function MatchSummary:resetBody(resetBody)
+	self.resetBodyElement = resetBody:create()
+	return self
+end
+
+function MatchSummary:resetHeader(resetHeader)
+	self.resetHeader = resetHeader:create()
+		:addClass('brkts-popup-header-reset')
+	return self
+end
+
 function MatchSummary:comment(comment)
 	self.commentElement = comment:create()
 	return self
@@ -235,12 +291,28 @@ function MatchSummary:footer(footer)
 	return self
 end
 
+function MatchSummary._fallbackResetHeader()
+	return mw.html.create('div')
+		:addClass('brkts-popup-body-element brkts-popup-header-reset')
+		:css('margin','auto')
+		:css('font-weight', 'bold')
+		:wikitext('Reset match')
+end
+
 function MatchSummary:create()
 	self.root
 		:node(self.headerElement)
 		:node(Break():create())
 		:node(self.bodyElement)
 		:node(Break():create())
+
+	if self.resetBodyElement then
+		self.root
+			:node(self.resetHeader or MatchSummary._fallbackResetHeader())
+			:node(Break():create())
+			:node(self.resetBodyElement)
+			:node(Break():create())
+	end
 
 	if self.commentElement ~= nil then
 		self.root

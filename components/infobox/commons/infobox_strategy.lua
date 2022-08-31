@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local BasicInfobox = require('Module:Infobox/Basic')
 local Namespace = require('Module:Namespace')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -35,7 +35,12 @@ function Strategy:createInfobox()
 
 	local widgets = {
 		Customizable{id = 'header', children = {
-				Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+				Header{
+					name = args.name,
+					image = args.image,
+					imageDark = args.imagedark or args.imagedarkmode,
+					size = args.imagesize,
+				},
 			}
 		},
 		Center{content = {args.caption}},

@@ -1462,13 +1462,11 @@ local data = {
 		localised = '',
 		name = 'Russian Speaking',
 	},
-
 	['non-representing'] = {
 		flag = 'File:non hd.png',
 		localised = 'non-country representing',
 		name = 'Non-representing',
 	},
-
 	['filler'] = {
 		flag = 'File:Space filler flag.png',
 		localised = '',
@@ -1735,6 +1733,7 @@ local twoLetter = {
 
 	--   ISO 3166-1 alpha-2 User-assigned Code Elements
 	['xk'] = 'kosovo',
+	['xx'] = 'non-representing',
 
 	--   ISO 3166-1 alpha-2 Exceptional Reservations
 	['eu'] = 'europeanunion',
@@ -2147,6 +2146,16 @@ local languageThreeLetter = {
 	['rus'] = 'russianspeaking',
 }
 
+-- This table includes
+-- ISO 3166-2 to the ISO 3166-1 country, that fulfill
+-- https://liquipedia.net/commons/Liquipedia:Flag_and_Country_Policy#Countries
+local iso31662 = {
+	['wales'] = 'unitedkingdom',
+	['scotland'] = 'unitedkingdom',
+	['england'] = 'unitedkingdom',
+	['northernireland'] = 'unitedkingdom',
+}
+
 return {
 	data = data,
 	twoLetter = twoLetter,
@@ -2154,4 +2163,5 @@ return {
 	aliases = aliases,
 	languageTwoLetter = languageTwoLetter,
 	languageThreeLetter = languageThreeLetter,
+	iso31662 = iso31662,
 }

@@ -172,35 +172,35 @@ Lua.autoInvokeEntryPoints(MatchGroup, 'Module:MatchGroup')
 MatchGroup.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
 
 -- Entry point used by Template:Bracket
--- Deprecated
+---@deprecated
 function MatchGroup.bracket(frame)
 	return MatchGroup.TemplateBracket(frame) .. MatchGroup.deprecatedCategory
 end
 
--- Deprecated
+---@deprecated
 function MatchGroup.luaBracket(_, args)
 	return MatchGroup.TemplateBracket(args) .. MatchGroup.deprecatedCategory
 end
 
 -- Entry point used by Template:Matchlist
--- Deprecated
+---@deprecated
 function MatchGroup.matchlist(frame)
 	return MatchGroup.TemplateMatchlist(frame) .. MatchGroup.deprecatedCategory
 end
 
--- Deprecated
+---@deprecated
 function MatchGroup.luaMatchlist(_, args)
 	return MatchGroup.TemplateMatchlist(args) .. MatchGroup.deprecatedCategory
 end
 
 -- Entry point from Template:ShowBracket and direct #invoke
--- Deprecated
+---@deprecated
 function MatchGroup.Display(frame)
 	return tostring(MatchGroup.TemplateShowBracket(frame)) .. MatchGroup.deprecatedCategory
 end
 
 -- Entry point from direct #invoke
--- Deprecated
+---@deprecated
 function MatchGroup.DisplayDev(frame)
 	local args = Arguments.getArgs(frame)
 	args.dev = true

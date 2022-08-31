@@ -17,5 +17,6 @@ Widgets.Links = require('Module:Infobox/Widget/Links')
 Widgets.Chronology = require('Module:Infobox/Widget/Chronology')
 Widgets.Builder = require('Module:Infobox/Widget/Builder')
 Widgets.Breakdown = require('Module:Infobox/Widget/Breakdown')
+Widgets.Error = require('Module:Infobox/Widget/Error')
 
 return Widgets

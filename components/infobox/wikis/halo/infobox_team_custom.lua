@@ -10,7 +10,7 @@ local Team = require('Module:Infobox/Team')
 local Class = require('Module:Class')
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Region = require('Module:Region')
 
 local CustomTeam = Class.new()
@@ -48,9 +48,9 @@ end
 
 function CustomTeam:addToLpdb(lpdbData, args)
 	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = 'File:' .. args.teamcardimage
+		lpdbData.logo = args.teamcardimage
 	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = 'File:' .. args.image
+		lpdbData.logo = args.image
 	end
 
 	lpdbData.region = _region

@@ -9,6 +9,7 @@
 --this "infobox" has no display and only stores into LPDB, sets wiki vars and categories
 
 local Class = require('Module:Class')
+local Currency = require('Module:Currency')
 local Template = require('Module:Template')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -52,7 +53,7 @@ function HiddenInfoboxLeague.run(args)
 		HiddenInfoboxLeague._setLpdbData()
 		display = HiddenInfoboxLeague._getCategories()
 	else
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	end
 
 	return display
@@ -60,10 +61,9 @@ end
 
 function HiddenInfoboxLeague._shouldStore()
 	return Namespace.isMain() and
-		_args.disable_smw ~= 'true' and
 		_args.disable_lpdb ~= 'true' and
 		_args.disable_storage ~= 'true' and
-		Variables.varDefault('disable_SMW_storage', 'false') ~= 'true'
+		Variables.varDefault('disable_LPDB_storage', 'false') ~= 'true'
 end
 
 function HiddenInfoboxLeague._getCategories()
@@ -141,7 +141,7 @@ function HiddenInfoboxLeague.getTierCategories()
 	local tier = _args.liquipediatier or ''
 	local tierType = _args.liquipediatiertype or _args.tiertype or ''
 
-	local tierText = Tier['text'][tier]
+	local tierText = Tier.text.tiers[tier]
 	if String.isNotEmpty(tier) and tierText == nil then
 		table.insert(tierCategories, 'Pages with invalid Tier')
 	end
@@ -151,8 +151,8 @@ function HiddenInfoboxLeague.getTierCategories()
 		table.insert(tierCategories, tierText .. ' Team Tournaments')
 	end
 
-	if String.isNotEmpty(tierType) and Tier['types'][string.lower(tierType)] == nil then
-		table.inssert(tierCategories, 'Pages with invalid Tiertype')
+	if String.isNotEmpty(tierType) and Tier.text.types[string.lower(tierType)] == nil then
+		table.insert(tierCategories, 'Pages with invalid Tiertype')
 	end
 
 	if tierCategories == {} then
@@ -192,7 +192,10 @@ function HiddenInfoboxLeague._definePageVariables()
 
 	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game or '')] or {})[1] or _GAMES[_GAME_WOL][1])
 
-	Variables.varDefine('tournament_parent', _args.parent)
+	-- If no parent is available, set pagename instead to ease querying
+	local parent = _args.parent or mw.title.getCurrentTitle().prefixedText
+	parent = string.gsub(parent, ' ', '_')
+	Variables.varDefine('tournament_parent', parent)
 	Variables.varDefine('tournament_parentname', _args.parentname)
 	Variables.varDefine('tournament_subpage', _args.subpage)
 
@@ -300,21 +303,17 @@ function HiddenInfoboxLeague._cleanPrizeValue(value)
 end
 
 function HiddenInfoboxLeague._currencyConversion(localPrize, currency, exchangeDate)
-	if exchangeDate and currency and currency ~= 'USD' then
-		if localPrize then
-			local usdPrize = mw.ext.CurrencyExchange.currencyexchange(
-				localPrize,
-				currency,
-				'USD',
-				exchangeDate
-			)
-			if type(usdPrize) == 'number' then
-				return usdPrize
-			end
-		end
+	local usdPrize
+	local currencyRate = Currency.getExchangeRate{
+		currency = currency,
+		date = exchangeDate,
+		setVariables = true,
+	}
+	if currencyRate then
+		usdPrize = currencyRate * localPrize
 	end
 
-	return nil
+	return usdPrize
 end
 
 function HiddenInfoboxLeague._getPatch()

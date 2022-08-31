@@ -7,12 +7,12 @@
 --
 
 local League = require('Module:Infobox/League')
-local String = require('Module:String')
+local Array = require('Module:Array')
+local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
-local PrizePool = require('Module:Prize pool currency')
 local MapMode = require('Module:MapMode')
 local GameModeLookup = require('Module:GameModeLookup')
 local Injector = require('Module:Infobox/Widget/Injector')
@@ -39,6 +39,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
+	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 
 	return league:createInfobox(frame)
 end
@@ -96,20 +97,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = maps})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool(args)}
-			}
-		}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createTier(args)}
-			}
-		}
 	elseif id == 'sponsors' then
 		if not String.isEmpty(args.sponsors) then
 			local sponsors = mw.text.split(args.sponsors, ',', true)
@@ -125,10 +112,6 @@ end
 
 
 function CustomLeague:getWikiCategories(args)
-	if not (String.isEmpty(args.individual) and String.isEmpty(args.player_number)) then
-		table.insert(categories, 'Individual Tournaments')
-	end
-
 	if String.isEmpty(args.game) then
 		table.insert(categories, 'Tournaments without game version')
 	else
@@ -151,7 +134,7 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
-function CustomLeague:_createTier(args)
+function CustomLeague:createLiquipediaTierDisplay(args)
 	local content = ''
 
 	local tierVar = Variables.varDefault('tournament_liquipediatier', '')
@@ -170,31 +153,6 @@ function CustomLeague:_createTier(args)
 	else
 		content = content .. tierDisplay
 	end
-
-	return content
-end
-
-function CustomLeague:_createPrizepool(args)
-	if String.isEmpty(args.prizepool) and
-		String.isEmpty(args.prizepoolusd) then
-			return nil
-	end
-
-	local date
-	if not String.isEmpty(args.currency_rate) then
-		date = args.currency_date
-	else
-		date = args.edate or args.date
-	end
-
-	local content = PrizePool._get({
-			prizepool = args.prizepool,
-			prizepoolusd = args.prizepoolusd,
-			currency = args.localcurrency,
-			rate = args.currency_rate,
-			date = date
-		}
-	)
 
 	return content
 end
@@ -370,8 +328,8 @@ function CustomLeague:_getGameModes(args, makeLink)
 	end
 
 	local gameModes = mw.text.split(args.gamemode, ',', true)
-	table.foreach(gameModes,
-		function(index, mode)
+	Array.forEach(gameModes,
+		function(mode, index)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
 
 			table.insert(categories, not String.isEmpty(gameModes[index])

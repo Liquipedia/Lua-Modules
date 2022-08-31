@@ -12,4 +12,5 @@ return {
 	name = 'Brood War',
 	defaultTeamLogo = 'StarCraft_default_allmode.png',
 	defaultTeamLogoDark = 'StarCraft_default_allmode.png',
+	maximumNumberOfPlayersInPlacements = 35,
 }

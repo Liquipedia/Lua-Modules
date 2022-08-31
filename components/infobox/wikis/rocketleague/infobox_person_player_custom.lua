@@ -33,10 +33,12 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
+	_player = player
 	player.args.informationType = player.args.informationType or 'Player'
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
@@ -174,7 +176,12 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 			personTypeSuffix = 'es'
 		end
 
-		if args.country2 or args.nationality2 then
+		--_player
+		if
+			not _player.nonRepresenting and (args.country2 or args.nationality2)
+			or args.country3
+			or args.nationality3
+		then
 			table.insert(categories, 'Dual Citizenship ' .. personType .. personTypeSuffix)
 		end
 		if args.death_date then
@@ -199,6 +206,11 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 
 		if string.lower(args.game or '') == 'sarpbc' then
 			table.insert(categories, 'SARPBC Players')
+		end
+
+		local team = args.teamlink or args.team
+		if team and not mw.ext.TeamTemplate.teamexists(team) then
+			table.insert(categories, 'Players with invalid team')
 		end
 
 		return categories

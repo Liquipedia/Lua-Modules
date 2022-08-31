@@ -239,18 +239,18 @@ function CustomPlayer._createLocation(country)
 	end
 	local countryDisplay = Flags.CountryName(country)
 	local demonym = Localisation.getLocalisation(countryDisplay)
+	countryDisplay = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 
 	local roleCategory = _ROLES_CATEGORY[_args.role or ''] or 'Players'
 	local role2Category = _ROLES_CATEGORY[_args.role2 or ''] or 'Players'
 
 	local categories = ''
 	if Namespace.isMain() then
-		categories = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
-		.. '[[Category:' .. demonym .. ' ' .. roleCategory .. ']]'
+		categories = '[[Category:' .. demonym .. ' ' .. roleCategory .. ']]'
 		.. '[[Category:' .. demonym .. ' ' .. role2Category .. ']]'
 	end
 
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. categories
+	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. countryDisplay .. categories
 
 end
 
@@ -263,11 +263,14 @@ function CustomPlayer._createRole(key, role)
 	if not roleData then
 		return nil
 	end
+	if Namespace.isMain() then
+		local categoryCoreText = 'Category:' .. roleData.category
 
-	local categoryCoreText = 'Category:' .. roleData.category
-
-	return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-		Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
+		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
+			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
+	else
+		return Variables.varDefineEcho(key or 'role', roleData.variable)
+	end
 end
 
 function CustomPlayer:defineCustomPageVariables(args)

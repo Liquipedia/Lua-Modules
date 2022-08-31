@@ -27,19 +27,27 @@ local _ICONS = {
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
+	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 }
 
 local CustomMatchSummary = {}
 
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local options = {mergeBracketResetMatch = false}
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, options)
+	local bracketResetMatch = match and match.bracketData and match.bracketData.bracketResetMatchId
+		and MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, match.bracketData.bracketResetMatchId, options)
 
 	local matchSummary = MatchSummary():init()
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 		:body(CustomMatchSummary._createBody(match))
+
+	if bracketResetMatch then
+		matchSummary:resetHeader(CustomMatchSummary._createHeader(bracketResetMatch))
+			:resetBody(CustomMatchSummary._createBody(bracketResetMatch))
+	end
 
 	-- comment
 	if match.comment then

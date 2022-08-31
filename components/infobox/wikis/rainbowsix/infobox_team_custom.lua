@@ -9,7 +9,7 @@
 local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 local Class = require('Module:Class')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
 local CustomTeam = Class.new()
@@ -35,9 +35,9 @@ end
 
 function CustomTeam:addToLpdb(lpdbData, args)
 	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = 'File:' .. args.teamcardimage
+		lpdbData.logo = args.teamcardimage
 	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = 'File:' .. args.image
+		lpdbData.logo = args.image
 	end
 
 	lpdbData.region = Variables.varDefault('region', '')

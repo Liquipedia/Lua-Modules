@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local AgeCalculation = {}
@@ -17,6 +17,8 @@ local _DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 
 local _MAXIMUM_DAYS_IN_FEBRUARY = 29
 local _MONTH_DECEMBER = 12
 local _CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y'))
+
+local NON_BREAKING_SPACE = '&nbsp;'
 
 ---
 -- Represents a date
@@ -176,10 +178,10 @@ function Age:makeDisplay()
 
 	if age ~= nil then
 		if not self.deathDate.isEmpty then
-			result.death = self.deathDate:makeDisplay() .. ' (aged ' .. age .. ')'
+			result.death = self.deathDate:makeDisplay() .. ' (aged' .. NON_BREAKING_SPACE .. age .. ')'
 			result.birth = self.birthDate:makeDisplay()
 		else
-			result.birth = self.birthDate:makeDisplay() .. ' (age ' .. age .. ')'
+			result.birth = self.birthDate:makeDisplay() .. ' (age' .. NON_BREAKING_SPACE .. age .. ')'
 		end
 	else
 		result.death = self.deathDate:makeDisplay()
@@ -190,7 +192,7 @@ function Age:makeDisplay()
 end
 
 function Age:_secondsToAge(seconds)
-	return math.floor(seconds / 60 / 60 / 24 / 365.25)
+	return math.floor(seconds / 60 / 60 / 24 / 365.2425)
 end
 
 function AgeCalculation.run(args)

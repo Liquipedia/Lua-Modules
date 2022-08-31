@@ -54,7 +54,7 @@ function CustomMission._getEvolution()
 	elseif evolution == 'None' then
 		return evolution
 	else
-		return '[[evolution (Heart of the Swarm Campaign)|evolution]]'
+		return '[[' .. evolution .. ' (Heart of the Swarm Campaign)|' .. evolution .. ']]'
 	end
 end
 

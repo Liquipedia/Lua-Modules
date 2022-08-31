@@ -6,10 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = require('Module:Brkts/WikiSpecific/Base')
+local CustomMatchGroupInput = {}
 
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
@@ -42,7 +43,7 @@ local mapFunctions = {}
 local opponentFunctions = {}
 
 -- called from Module:MatchGroup
-function p.processMatch(frame, match)
+function CustomMatchGroupInput.processMatch(frame, match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -56,7 +57,7 @@ function p.processMatch(frame, match)
 end
 
 -- called from Module:Match/Subobjects
-function p.processMap(frame, map)
+function CustomMatchGroupInput.processMap(frame, map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -65,7 +66,7 @@ function p.processMap(frame, map)
 	return map
 end
 
-function p.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -93,22 +94,22 @@ function p.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function p.processPlayer(frame, player)
+function CustomMatchGroupInput.processPlayer(frame, player)
 	return player
 end
 
 --
 --
 -- function to sort out winner/placements
-function p._placementSortFunction(table, key1, key2)
+function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
 	local op1norm = op1.status == _STATUS_HAS_SCORE
 	local op2norm = op2.status == _STATUS_HAS_SCORE
 	if op1norm then
 		if op2norm then
-			local op1setwins = p._getSetWins(op1)
-			local op2setwins = p._getSetWins(op2)
+			local op1setwins = CustomMatchGroupInput._getSetWins(op1)
+			local op2setwins = CustomMatchGroupInput._getSetWins(op2)
 			if op1setwins + op2setwins > 0 then
 				return op1setwins > op2setwins
 			else
@@ -125,7 +126,7 @@ function p._placementSortFunction(table, key1, key2)
 	end
 end
 
-function p._getSetWins(opp)
+function CustomMatchGroupInput._getSetWins(opp)
 	local extradata = opp.extradata or {}
 	local set1win = extradata.set1win and 1 or 0
 	local set2win = extradata.set2win and 1 or 0
@@ -148,23 +149,7 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '3v3'))
-	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
-	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
-	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_ticker_name'))
-	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
-	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
-	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
-	match.liquipediatier = Logic.emptyOr(
-		match.liquipediatier,
-		Variables.varDefault('tournament_lptier'),
-		Variables.varDefault('tournament_tier')
-	)
-	match.liquipediatiertype = Logic.emptyOr(
-		match.liquipediatiertype,
-		Variables.varDefault('tournament_tiertype')
-	)
-	return match
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
@@ -186,17 +171,66 @@ end
 function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
+
+	local casters = {}
+	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
+		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
+			name,
+			match[key .. 'flag'],
+			match[key .. 'name']
+		))
+	end
+	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
+
 	match.extradata = {
-		matchsection = Variables.varDefault('matchsection'),
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
-		comment = match.comment,
 		octane = match.octane,
 		isconverted = 0,
-		isfeatured = matchFunctions.isFeatured(match)
+		isfeatured = matchFunctions.isFeatured(match),
+		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
 	}
 	return match
+end
+
+function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
+	if String.isEmpty(flag) then
+		flag = Variables.varDefault(name .. '_flag')
+	end
+	if String.isEmpty(displayName) then
+		displayName = Variables.varDefault(name .. '_dn')
+	end
+	if String.isEmpty(flag) or String.isEmpty(displayName) then
+		local parent = Variables.varDefault(
+			'tournament_parent',
+			mw.title.getCurrentTitle().text
+		)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
+			query = 'flag, id',
+			limit = 1,
+		})
+		if type(data) == 'table' and data[1] then
+			flag = String.isNotEmpty(flag) and flag or data[1].flag
+			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
+		end
+	end
+	if String.isNotEmpty(flag) then
+		Variables.varDefine(name .. '_flag', flag)
+	end
+	if String.isEmpty(displayName) then
+		displayName = name
+	end
+	if String.isNotEmpty(displayName) then
+		Variables.varDefine(name .. '_dn', displayName)
+	end
+	return {
+		name = name,
+		displayName = displayName,
+		flag = flag,
+	}
 end
 
 function matchFunctions.isFeatured(match)
@@ -209,7 +243,7 @@ function matchFunctions.isFeatured(match)
 	if
 		tonumber(match.liquipediatier or '') == 1
 		or tonumber(match.liquipediatier or '') == 2
-		or not String.isEmpty(Variables.varDefault('tournament_rlcs_premier'))
+		or Logic.readBool(Variables.varDefault('tournament_rlcs_premier'))
 		or not String.isEmpty(Variables.varDefault('match_featured_override'))
 	then
 		return true
@@ -248,12 +282,14 @@ function matchFunctions.getOpponents(args)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			p.processOpponent(opponent, args.date)
+			CustomMatchGroupInput.processOpponent(opponent, args.date)
 
 			-- Retrieve icon and legacy name for team
 			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getTeamIcon(opponent.template)
-					or opponentFunctions.getLegacyTeamIcon(opponent.template)
+				opponent.icon, opponent.icondark = opponentFunctions.getTeamIcon(opponent.template)
+				if not opponent.icon then
+					opponent.icon, opponent.icondark = opponentFunctions.getLegacyTeamIcon(opponent.template)
+				end
 				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
 			end
 
@@ -303,7 +339,7 @@ function matchFunctions.getOpponents(args)
 		local lastPlacement = 1
 		local lastStatus
 		-- luacheck: push ignore
-		for opponentIndex, opponent in Table.iter.spairs(opponents, p._placementSortFunction) do
+		for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
 			if opponent.status ~= _STATUS_HAS_SCORE and opponent.status ~= _STATUS_DEFAULT_WIN and placement == 1 then
 				placement = 2
 			end
@@ -370,6 +406,8 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
+	local timeouts = Array.extractValues(Table.mapValues(mw.text.split(map.timeout or '', ','), tonumber))
+
 	map.extradata = {
 		ot = map.ot,
 		otlength = map.otlength,
@@ -378,6 +416,7 @@ function mapFunctions.getExtraData(map)
 		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
+		timeout = Table.isNotEmpty(timeouts) and Json.stringify(timeouts) or nil
 	}
 	return map
 end
@@ -443,15 +482,7 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '3v3'))
-	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
-	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
-	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault('tournament_ticker_name'))
-	map.shortname = Logic.emptyOr(map.shortname, Variables.varDefault('tournament_shortname'))
-	map.series = Logic.emptyOr(map.series, Variables.varDefault('tournament_series'))
-	map.icon = Logic.emptyOr(map.icon, Variables.varDefault('tournament_icon'))
-	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault('tournament_icon_dark'))
-	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
-	return map
+	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 function mapFunctions.getParticipantsData(map)
@@ -499,7 +530,11 @@ end
 --
 function opponentFunctions.getTeamIcon(template)
 	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
+	end
 end
 
 --the following 2 functions are a fallback
@@ -514,11 +549,13 @@ function opponentFunctions.getLegacyTeamName(template)
 end
 
 function opponentFunctions.getLegacyTeamIcon(template)
-	local icon = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
-	icon = icon:gsub('%&', '')
-	icon = String.split(icon, 'File:')[2]
+	local iconTemplate = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
+	iconTemplate = iconTemplate:gsub('%&', '')
+	local icon = String.split(iconTemplate, 'File:')[2]
+	local iconDark = String.split(iconTemplate, 'File:')[3] or icon
 	icon = String.split(icon, '|')[1]
-	return icon
+	iconDark = String.split(iconDark, '|')[1]
+	return icon, iconDark
 end
 
-return p
+return CustomMatchGroupInput

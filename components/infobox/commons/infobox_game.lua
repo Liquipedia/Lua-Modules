@@ -29,11 +29,16 @@ function Game:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Game Information'},
 		Cell{name = 'Developer', content = self:getAllArgsForBase(args, 'developer')},
-		Cell{name = 'Release Dates', content = self:getAllArgsForBase(args, 'releasedate')},
+		Cell{name = 'Release Date(s)', content = self:getAllArgsForBase(args, 'releasedate')},
 		Cell{name = 'Platforms', content = self:getAllArgsForBase(args, 'platform')},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},

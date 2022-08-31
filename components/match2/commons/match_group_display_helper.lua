@@ -20,16 +20,14 @@ local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
 local _UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 
---[[
-Deprecated. Use Opponent.typeIsParty
-]]
+---@deprecated
+---Use Opponent.typeIsParty
 function DisplayHelper.opponentTypeIsParty(opponentType)
 	return Opponent.typeIsParty(opponentType)
 end
 
---[[
-Deprecated. Use Opponent.isTbd
-]]
+---@deprecated
+---Use Opponent.isTbd
 function DisplayHelper.opponentIsTBD(opponent)
 	return Opponent.isTbd(opponent)
 end
@@ -99,7 +97,7 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateIsExact == true then
-		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. _UTC
+		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. ' ' .. _UTC
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end
@@ -119,10 +117,16 @@ end
 Displays the map name and link, and the status of the match if it had an
 unusual status.
 ]]
-function DisplayHelper.MapAndStatus(game)
-	local mapText = game.map
-		and ('[[' .. game.map .. ']]')
-		or 'Unknown'
+function DisplayHelper.MapAndStatus(game, config)
+	config = config or {}
+	local mapText
+	if game.map and not config.noLink then
+		mapText = '[[' .. game.map .. ']]'
+	elseif game.map then
+		mapText = game.map
+	else
+		mapText = 'Unknown'
+	end
 	if game.resultType == 'np' or game.resultType == 'default' then
 		mapText = '<s>' .. mapText .. '</s>'
 	end
@@ -169,13 +173,14 @@ MediaWiki:BracketConfig.
 ]]
 DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
 	local defaultConfig = {
+		forceShortName = false,
 		headerHeight = 25,
 		headerMargin = 8,
 		lineWidth = 2,
 		matchHeight = 44, -- deprecated
 		matchWidth = 150,
 		matchWidthMobile = 90,
-		opponentHeight = 23,
+		opponentHeight = 24,
 		roundHorizontalMargin = 20,
 		scoreWidth = 20,
 	}

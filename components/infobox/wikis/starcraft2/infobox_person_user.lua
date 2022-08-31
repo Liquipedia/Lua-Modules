@@ -150,7 +150,7 @@ function CustomUser._getRaceData(race)
 end
 
 function CustomUser:shouldStoreData()
-	Variables.varDefine('disable_SMW_storage', 'true')
+	Variables.varDefine('disable_LPDB_storage', 'true')
 	return false
 end
 

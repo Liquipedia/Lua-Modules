@@ -16,9 +16,6 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 local PageLink = require('Module:Page')
-local PrizePoolCurrency = require('Module:Prize pool currency')
-
-local _TODAY = os.date('%Y-%m-%d', os.time())
 
 local _args
 local _league
@@ -57,6 +54,11 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
 	_args = _league.args
+
+	-- Temp solution until a commons solution is made
+	if _args.liquipediatier == 'Misc' then
+		_args.liquipediatier = '-1'
+	end
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -107,20 +109,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool()}
-			},
-		}
 	elseif id == 'liquipediatier' then
-		widgets = {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createLiquipediaTierDisplay()},
-			}
-		}
 		if CustomLeague:_validPublisherTier(args.ubisofttier) then
 			table.insert(widgets,
 				Cell{
@@ -141,7 +130,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.publishertier = args.ubisofttier:lower()
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.liquipediatiertype = args.liquipediatiertype or _DEFAULT_TIERTYPE
+	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
 		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
@@ -169,68 +158,19 @@ function CustomLeague:_standardiseRawDate(dateString)
 	return dateString
 end
 
-function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
-		return nil
-	end
-	local date
-	if String.isNotEmpty(_args.currency_rate) then
-		date = _args.currency_date
-	end
-
-	return PrizePoolCurrency._get({
-		prizepool = _args.prizepool,
-		prizepoolusd = _args.prizepoolusd,
-		currency = _args.localcurrency,
-		rate = _args.currency_rate,
-		date = date or Variables.varDefault('tournament_enddate', _TODAY),
-	})
-end
-
-function CustomLeague:_createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or ''
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString)
-		local tierText = Tier.text[tierString]
-		if not tierText then
-			table.insert(_league.warnings, tierString .. ' is not a known Liquipedia Tier/Tiertype')
-			return ''
-		else
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-
-	return tierDisplay
-end
-
 function CustomLeague:defineCustomPageVariables()
 	-- Variables with different handling compared to commons
-	Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or _DEFAULT_TIERTYPE)
+	Variables.varDefine(
+		'tournament_liquipediatiertype',
+		Tier.text.types[string.lower(_args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
+	)
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype or _DEFAULT_TIERTYPE)
+	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype'))
 	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
 	Variables.varDefine('tournament_mode', _args.mode or '')
-
-	-- Module:Prize pool currency will usually set this variable.
-	-- However the module won't be run if certain arguments are not yet known
-	-- Set the Variable here if the createPrizepool returns nil
-	-- Needed in Module:Prize pool slot
-	if not CustomLeague:_createPrizepool() then
-		Variables.varDefine('tournament_currency', _args.localcurrency or '')
-	end
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -245,9 +185,6 @@ end
 
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
-	if String.isNotEmpty(args.player_number) then
-		table.insert(categories, 'Individual Tournaments')
-	end
 
 	if not CustomLeague:_gameLookup(args.game) then
 		table.insert(categories, 'Tournaments without game version')
@@ -257,17 +194,6 @@ function CustomLeague:getWikiCategories(args)
 
 	if CustomLeague:_platformLookup(args.platform) then
 		table.insert(categories, CustomLeague:_platformLookup(args.platform) .. ' Tournaments')
-	end
-
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-
-	if String.isNotEmpty(tier) and String.isNotEmpty(Tier.text[tier]) then
-		table.insert(categories, Tier.text[tier]  .. ' Tournaments')
-	end
-
-	if String.isNotEmpty(tierType) and String.isNotEmpty(Tier.text[tierType]) then
-		table.insert(categories, Tier.text[tierType] .. ' Tournaments')
 	end
 
 	return categories

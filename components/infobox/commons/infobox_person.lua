@@ -14,11 +14,13 @@ local Variables = require('Module:Variables')
 local Namespace = require('Module:Namespace')
 local Localisation = require('Module:Localisation').getLocalisation
 local Flags = require('Module:Flags')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Region = require('Module:Region')
 local AgeCalculation = require('Module:AgeCalculation')
 local WarningBox = require('Module:WarningBox')
 local Earnings = require('Module:Earnings')
+local Logic = require('Module:Logic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -30,13 +32,23 @@ local Customizable = Widgets.Customizable
 
 local Person = Class.new(BasicInfobox)
 
+Person.warnings = {}
+
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
 local _shouldStoreData
 local _region
-local _warnings = {}
-local _earningsPerYear = {}
-local _totalEarnings
+local _COUNTRIES_EASTERN_NAME_ORDER = {
+	'China',
+	'Taiwan',
+	'Hong Kong',
+	'Vietnam',
+	'South Korea',
+	'Cambodia'
+}
+local STATUS_INACTIVE = 'inactive'
+local STATUS_BANNED = 'banned'
+local STATUS_RETIRED = 'retired'
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -51,6 +63,15 @@ function Person:createInfobox()
 		error('You need to specify an "id"')
 	end
 
+	-- check if non-representing is used and set an according value in self
+	-- so it can be accessed in the /Custom modules
+	args.country = Person:getStandardNationalityValue(args.country or args.nationality)
+	if args.country == Person:getStandardNationalityValue('non-representing') then
+		self.nonRepresenting = true
+	end
+
+	args = self:_flipNameOrder(args)
+
 	_shouldStoreData = Person:shouldStoreData(args)
 	-- set custom variables here already so they are available
 	-- in functions we call from here on
@@ -59,7 +80,8 @@ function Person:createInfobox()
 	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
 	local personType = self:getPersonType(args)
-	_totalEarnings, _earningsPerYear = self:calculateEarnings(args)
+	--make earnings values available in the /Custom modules
+	self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
 
 	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
 			birthdate = args.birth_date,
@@ -76,7 +98,8 @@ function Person:createInfobox()
 			name = self:nameDisplay(args),
 			image = args.image,
 			imageDefault = args.default,
-			subHeader = self:subHeaderDisplay(args)
+			subHeader = self:subHeaderDisplay(args),
+			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},
@@ -106,23 +129,27 @@ function Person:createInfobox()
 			}
 		},
 		Customizable{id = 'teams', children = {
-			Cell{name = 'Team', content = {
-						self:_createTeam(args.team, args.teamlink),
-						self:_createTeam(args.team2, args.teamlink2),
-						self:_createTeam(args.team3, args.teamlink3),
-						self:_createTeam(args.team4, args.teamlink4),
-						self:_createTeam(args.team5, args.teamlink5)
-					}
+			Builder{builder = function()
+				local teams = {
+					self:_createTeam(args.team, args.teamlink),
+					self:_createTeam(args.team2, args.teamlink2),
+					self:_createTeam(args.team3, args.teamlink3),
+					self:_createTeam(args.team4, args.teamlink4),
+					self:_createTeam(args.team5, args.teamlink5)
 				}
-			}
-		},
+				return {Cell{
+					name = #teams > 1 and 'Teams' or 'Team',
+					content = teams
+				}}
+			end}
+		}},
 		Cell{name = 'Alternate IDs', content = {args.ids or args.alternateids}},
 		Cell{name = 'Nicknames', content = {args.nicknames}},
 		Builder{
 			builder = function()
-				if _totalEarnings and _totalEarnings ~= 0 then
+				if self.totalEarnings and self.totalEarnings ~= 0 then
 					return {
-						Cell{name = 'Approx. Total Winnings', content = {'$' .. Language:formatNum(_totalEarnings)}},
+						Cell{name = 'Approx. Total Winnings', content = {'$' .. Language:formatNum(self.totalEarnings)}},
 					}
 				end
 			end
@@ -181,6 +208,7 @@ function Person:createInfobox()
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if _shouldStoreData then
+		self:_definePageVariables(args)
 		self:_setLpdbData(
 			args,
 			links,
@@ -189,11 +217,24 @@ function Person:createInfobox()
 		)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
+	return tostring(builtInfobox) .. WarningBox.displayAll(self.warnings)
+end
+
+function Person:_definePageVariables(args)
+	Variables.varDefine('firstname', args.givenname or '')
+	Variables.varDefine('lastname', args.familyname or '')
 end
 
 function Person:_setLpdbData(args, links, status, personType)
 	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
+
+	local teamLink, teamTemplate
+	local team = args.teamlink or args.team
+	if team and mw.ext.TeamTemplate.teamexists(team) then
+		local teamRaw = mw.ext.TeamTemplate.raw(team)
+		teamLink = teamRaw.page
+		teamTemplate = teamRaw.templatename
+	end
 
 	local lpdbData = {
 		id = args.id or mw.title.getCurrentTitle().prefixedText,
@@ -201,22 +242,27 @@ function Person:_setLpdbData(args, links, status, personType)
 		name = args.romanized_name or args.name,
 		romanizedname = args.romanized_name or args.name,
 		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
-		nationality = Person:getStandardNationalityValue(args.country or args.nationality),
+		nationality = args.country, -- already standardized above
 		nationality2 = Person:getStandardNationalityValue(args.country2 or args.nationality2),
 		nationality3 = Person:getStandardNationalityValue(args.country3 or args.nationality3),
 		birthdate = Variables.varDefault('player_birthdate'),
 		deathdate = Variables.varDefault('player_deathdate'),
 		image = args.image,
 		region = _region,
-		team = args.teamlink or args.team,
+		team = teamLink or team,
+		teampagename = (teamLink or team or ''):gsub(' ', '_'),
+		teamtemplate = teamTemplate,
 		status = status,
 		type = personType,
-		earnings = _totalEarnings,
+		earnings = self.totalEarnings,
 		links = links,
-		extradata = {},
+		extradata = {
+			firstname = args.givenname,
+			lastname = args.familyname,
+		},
 	}
 
-	for year, earningsOfYear in pairs(_earningsPerYear) do
+	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
 
@@ -238,7 +284,7 @@ function Person:getStandardNationalityValue(nationality)
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
-			_warnings,
+			self.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
 		nationalityToStore = nil
@@ -306,10 +352,18 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	return Earnings.calculateForPlayer{
+	local totalEarnings, earningsPerYear = Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
 		perYear = true
 	}
+
+	-- store earnings values in wiki variables for storage in smw
+	for year, earningsOfYear in pairs(earningsPerYear) do
+		Variables.varDefine('earningsin' .. year, earningsOfYear)
+	end
+	Variables.varDefine('earnings', totalEarnings)
+
+	return totalEarnings, earningsPerYear
 end
 
 function Person:_createRegion(region, country)
@@ -347,10 +401,15 @@ function Person:_createLocation(country, location, personType)
 	local countryDisplay = Flags.CountryName(country)
 	local demonym = Localisation(countryDisplay)
 
+	local category = ''
+	if Namespace.isMain() then
+		category = '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
+	end
+
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
-				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
-				.. '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
-				.. (location ~= nil and (',&nbsp;' .. location) or '')
+		'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]' ..
+		category ..
+		(location ~= nil and (',&nbsp;' .. location) or '')
 end
 
 function Person:_createTeam(team, link)
@@ -361,34 +420,42 @@ function Person:_createTeam(team, link)
 
 	if mw.ext.TeamTemplate.teamexists(link) then
 		local data = mw.ext.TeamTemplate.raw(link)
-		return '[[' .. data.page .. '|' .. data.name .. ']]'
+		link, team = data.page, data.name
 	end
 
-	return '[[' .. link .. '|' .. team .. ']]'
+	return Page.makeInternalLink({onlyIfExists = true}, team, link) or team
 end
 
 --- Allows for overriding this functionality
 function Person:getCategories(args, birthDisplay, personType, status)
 	if _shouldStoreData then
+		local team = args.teamlink or args.team
 		local categories = { personType .. 's' }
 
-		if not args.teamlink and not args.team then
-			table.insert(categories, 'Teamless ' .. personType .. 's')
-		end
-		if args.country2 or args.nationality2 then
+		if
+			not self.nonRepresenting and (args.country2 or args.nationality2)
+			or args.country3
+			or args.nationality3
+		then
 			table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
 		end
 		if args.death_date then
 			table.insert(categories, 'Deceased ' .. personType .. 's')
-		end
-		if
+		elseif
 			args.retired == 'yes' or args.retired == 'true'
-			or string.lower(status or '') == 'retired'
+			or string.lower(status or '') == STATUS_RETIRED
 			or string.match(args.retired or '', '%d%d%d%d')--if retired has year set apply the retired category
 		then
 			table.insert(categories, 'Retired ' .. personType .. 's')
+		elseif string.lower(status or '') == STATUS_INACTIVE then
+			table.insert(categories, 'Inactive ' .. personType .. 's')
+		elseif string.lower(status or '') == STATUS_BANNED then
+			table.insert(categories, 'Banned ' .. personType .. 's')
 		else
 			table.insert(categories, 'Active ' .. personType .. 's')
+			if String.isEmpty(team) then
+				table.insert(categories, 'Teamless ' .. personType .. 's')
+			end
 		end
 		if not args.image then
 			table.insert(categories, personType .. 's with no profile picture')
@@ -397,9 +464,18 @@ function Person:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, personType .. 's with unknown birth date')
 		end
 
-		return categories
+		if String.isNotEmpty(team) and not mw.ext.TeamTemplate.teamexists(team) then
+			table.insert(categories, 'Players with invalid team')
+		end
+
+		return self:getWikiCategories(categories)
 	end
 	return {}
+end
+
+--- Allows for overriding this functionality
+function Person:getWikiCategories(categories)
+	return categories
 end
 
 function Person._createAgeCalculationErrorMessage(text)
@@ -417,6 +493,13 @@ function Person._createAgeCalculationErrorMessage(text)
 	else
 		return {birth = text}
 	end
+end
+
+function Person:_flipNameOrder(args)
+	if not Logic.readBool(args.nonameflip) and Table.includes(_COUNTRIES_EASTERN_NAME_ORDER, args.country) then
+		args.givenname, args.familyname = args.familyname, args.givenname
+	end
+	return args
 end
 
 return Person

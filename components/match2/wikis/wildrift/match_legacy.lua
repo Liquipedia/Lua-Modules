@@ -14,17 +14,21 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-function MatchLegacy.storeMatch(match2)
+function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
 
-	match.games = MatchLegacy.storeGames(match, match2)
+	if options.storeSmw then
+		MatchLegacy.storeMatchSMW(match, match2)
+	end
 
-	MatchLegacy.storeMatchSMW(match, match2)
+	if options.storeMatch1 then
+		match.games = MatchLegacy.storeGames(match, match2)
 
-	return mw.ext.LiquipediaDB.lpdb_match(
-		'legacymatch_' .. match2.match2id,
-		match
-	)
+		return mw.ext.LiquipediaDB.lpdb_match(
+			"legacymatch_" .. match2.match2id,
+			match
+		)
+	end
 end
 
 function MatchLegacy._convertParameters(match2)
@@ -41,7 +45,7 @@ function MatchLegacy._convertParameters(match2)
 		match.walkover = match.winner
 	end
 
-	match.staticid = 'Legacy_' .. match2.match2id
+	match.staticid = match2.match2id
 
 	-- Handle extradata fields
 	match.extradata = {}
@@ -154,6 +158,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 			Variables.varDefault('tournament_name', mw.title.getCurrentTitle().prefixedText)
 		),
 		'Has tournament icon=' .. Variables.varDefault('tournament_icon', ''),
+		'Is riot premier=' .. Variables.varDefault('tournament_riot_premier', ''),
 		'Has winner=' .. (match.winner or ''),
 		'Has team left score=' .. (match.opponent1score or '0'),
 		'Has team right score=' .. (match.opponent2score or '0'),

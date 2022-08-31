@@ -16,11 +16,13 @@ local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
+local BrawlerNames = mw.loadData('Module:BrawlerNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
+local _NOT_PLAYED = {'skip', 'np'}
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
@@ -51,7 +53,7 @@ function CustomMatchGroupInput.processMap(frame, map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
-	--map = mapFunctions.getParticipantsData(map)
+	map = mapFunctions.getParticipantsData(map)
 
 	return map
 end
@@ -123,23 +125,7 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
-	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
-	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_ticker_name'))
-	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
-	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
-	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
-	match.liquipediatier = Logic.emptyOr(
-		match.liquipediatier,
-		Variables.varDefault('tournament_lptier'),
-		Variables.varDefault('tournament_tier')
-	)
-	match.liquipediatiertype = Logic.emptyOr(
-		match.liquipediatiertype,
-		Variables.varDefault('tournament_tiertype')
-	)
-	return match
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
@@ -160,20 +146,7 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		matchsection = Variables.varDefault('matchsection'),
-		comment = match.comment,
-		ban1 = match.ban1,
-		ban2 = match.ban2,
-		ban3 = match.ban3,
-		ban4 = match.ban4,
-		ban5 = match.ban5,
-		ban6 = match.ban6,
-		ban1opponent = match.ban1opponent,
-		ban2opponent = match.ban2opponent,
-		ban3opponent = match.ban3opponent,
-		ban4opponent = match.ban4opponent,
-		ban5opponent = match.ban5opponent,
-		ban6opponent = match.ban6opponent,
+		mvp = match.mvp,
 	}
 	return match
 end
@@ -185,10 +158,14 @@ function matchFunctions.getOpponents(args)
 
 	local sumscores = {}
 	for _, map in Table.iter.pairsByPrefix(args, 'map') do
-		sumscores[map.winner] = (sumscores[map.winner] or 0) + 1
+		if map.winner then
+			sumscores[map.winner] = (sumscores[map.winner] or 0) + 1
+		end
 	end
 
-	local bestof = tonumber(args.bestof or 5) or 5
+	local bestof = Logic.emptyOr(args.bestof, Variables.varDefault('bestof', 5))
+	bestof = tonumber(bestof) or 5
+	Variables.varDefine('bestof', bestof)
 	local firstTo = math.ceil(bestof / 2)
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
@@ -199,8 +176,10 @@ function matchFunctions.getOpponents(args)
 
 			-- Retrieve icon and legacy name for team
 			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getTeamIcon(opponent.template)
-					or opponentFunctions.getLegacyTeamIcon(opponent.template)
+				opponent.icon, opponent.icondark = opponentFunctions.getTeamIcon(opponent.template)
+				if not opponent.icon then
+					opponent.icon, opponent.icondark = opponentFunctions.getLegacyTeamIcon(opponent.template)
+				end
 				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
 			end
 
@@ -234,6 +213,20 @@ function matchFunctions.getOpponents(args)
 	--set resulttype to 'default' if walkover is set
 	if args.walkover then
 		args.resulttype = 'default'
+	elseif isScoreSet then
+		-- if isScoreSet is true we have scores from at least one opponent
+		-- in case the other opponent(s) have no score set manually and
+		-- no sumscore set we have to set them to 0 now so they are
+		-- not displayed as blank
+		for _, opponent in pairs(opponents) do
+			if
+				String.isEmpty(opponent.status)
+				and String.isEmpty(opponent.score)
+			then
+				opponent.score = 0
+				opponent.status = 'S'
+			end
+		end
 	end
 
 	-- see if match should actually be finished if score is set
@@ -286,13 +279,29 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	local bestof = tonumber(map.bestof or 3) or 3
+	local bestof = Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof', 3))
+	bestof = tonumber(bestof) or 3
+	Variables.varDefine('map_bestof', bestof)
 	map.extradata = {
 		bestof = bestof,
 		comment = map.comment,
 		header = map.header,
+		maptype = map.maptype,
 	}
+
+	local bans = {}
+
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+		bans['team' .. opponentIndex] = {}
+		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
+			ban = mapFunctions._cleanBrawlerName(ban)
+			table.insert(bans['team' .. opponentIndex], ban)
+		end
+	end
+
+	map.extradata.bans = Json.stringify(bans)
 	map.bestof = bestof
+
 	return map
 end
 
@@ -300,6 +309,12 @@ function mapFunctions.getScoresAndWinner(map)
 	map.score1 = tonumber(map.score1 or '')
 	map.score2 = tonumber(map.score2 or '')
 	map.scores = { map.score1, map.score2 }
+	if Table.includes(_NOT_PLAYED, string.lower(map.winner or '')) then
+		map.winner = 0
+		map.resulttype = 'np'
+	elseif Logic.isNumeric(map.winner) then
+		map.winner = tonumber(map.winner)
+	end
 	local firstTo = math.ceil( map.bestof / 2 )
 	if (map.score1 or 0) >= firstTo then
 		map.winner = 1
@@ -313,22 +328,41 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '3v3'))
-	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
-	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
-	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault('tournament_ticker_name'))
-	map.shortname = Logic.emptyOr(map.shortname, Variables.varDefault('tournament_shortname'))
-	map.series = Logic.emptyOr(map.series, Variables.varDefault('tournament_series'))
-	map.icon = Logic.emptyOr(map.icon, Variables.varDefault('tournament_icon'))
-	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault('tournament_icon_dark'))
-	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
-	return map
+	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
+	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 function mapFunctions.getParticipantsData(map)
-	local participants = map.participants or {}
+	local participants = {}
+
+	local maximumPickIndex = 0
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+			participants[opponentIndex .. '_' .. playerIndex] = {player = player}
+		end
+
+		for _, brawler, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c') do
+			brawler = mapFunctions._cleanBrawlerName(brawler)
+			participants[opponentIndex .. '_' .. pickIndex] = participants[opponentIndex .. '_' .. pickIndex] or {}
+			participants[opponentIndex .. '_' .. pickIndex].brawler = brawler
+			if maximumPickIndex < pickIndex then
+				maximumPickIndex = pickIndex
+			end
+		end
+	end
+
+	map.extradata.maximumpickindex = maximumPickIndex
 	map.participants = participants
 	return map
+end
+
+function mapFunctions._cleanBrawlerName(brawlerRaw)
+	local brawler = BrawlerNames[string.lower(brawlerRaw)]
+	if not brawler then
+		error('Unsupported brawler input: ' .. brawlerRaw)
+	end
+
+	return brawler
 end
 
 --
@@ -336,7 +370,11 @@ end
 --
 function opponentFunctions.getTeamIcon(template)
 	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
+	end
 end
 
 --the following 2 functions are a fallback
@@ -351,11 +389,13 @@ function opponentFunctions.getLegacyTeamName(template)
 end
 
 function opponentFunctions.getLegacyTeamIcon(template)
-	local icon = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
-	icon = icon:gsub('%&', '')
-	icon = String.split(icon, 'File:')[2]
+	local iconTemplate = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
+	iconTemplate = iconTemplate:gsub('%&', '')
+	local icon = String.split(iconTemplate, 'File:')[2]
+	local iconDark = String.split(iconTemplate, 'File:')[3] or icon
 	icon = String.split(icon, '|')[1]
-	return icon
+	iconDark = String.split(iconDark, '|')[1]
+	return icon, iconDark
 end
 
 return CustomMatchGroupInput

@@ -11,6 +11,7 @@ local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
+local Locale = require('Module:Locale')
 local Flags = require('Module:Flags')
 local Localisation = require('Module:Localisation')
 local String = require('Module:StringUtils')
@@ -56,6 +57,7 @@ function Team:createInfobox()
 			imageDefault = args.default,
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Team Information'},
@@ -77,18 +79,27 @@ function Team:createInfobox()
 				},
 			}
 		},
-		Cell{name = 'Coaches', content = {args.coaches}},
-		Cell{name = 'Coach', content = {args.coach}},
-		Cell{name = 'Director', content = {args.director}},
-		Cell{name = 'Manager', content = {args.manager}},
-		Cell{name = 'Team Captain', content = {args.captain}},
+		Customizable{
+			id = 'staff',
+			children = {
+				Cell{name = 'Coaches', content = {args.coaches}},
+				Cell{name = 'Coach', content = {args.coach}},
+				Cell{name = 'Director', content = {args.director}},
+				Cell{name = 'Manager', content = {args.manager}},
+				Cell{name = 'Team Captain', content = {args.captain}},
+			}
+		},
 		Customizable{
 			id = 'earnings',
 			children = {
 				Builder{
 					builder = function()
 						_defaultEarningsFunctionUsed = true
-						_totalEarnings, _earnings = Earnings.calculateForTeam({team = self.pagename or self.name, perYear = true})
+						_totalEarnings, _earnings = Earnings.calculateForTeam{
+							team = self.pagename or self.name,
+							perYear = true,
+							queryHistorical = args.queryEarningsHistorical
+						}
 						Variables.varDefine('earnings', _totalEarnings) -- needed for SMW
 						local totalEarnings
 						if _totalEarnings > 0 then
@@ -117,7 +128,7 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						if args.achievements then
+						if String.isNotEmpty(args.achievements) then
 							return {
 								Title{name = 'Achievements'},
 								Center{content = {args.achievements}}
@@ -157,14 +168,14 @@ function Team:createInfobox()
 	}
 	infobox:bottom(self:createBottomContent())
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
 		infobox:categories('Teams')
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
 		self:defineCustomPageVariables(args)
 	end
@@ -193,9 +204,14 @@ function Team:_createLocation(location)
 			.. '|' .. locationDisplay .. ']]'
 	end
 
+	local category
+	if String.isNotEmpty(demonym) and self:shouldStore(self.args) then
+		category = '[[Category:' .. demonym .. ' Teams]]'
+	end
+
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
-			(String.isNotEmpty(demonym) and '[[Category:' .. demonym .. ' Teams]]' or '') ..
+			(category or '') ..
 			(locationDisplay or '')
 end
 
@@ -221,10 +237,19 @@ function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 	local earnings = _totalEarnings
 
+	local team = args.teamtemplate or self.pagename
+	local teamTemplate
+	if team and mw.ext.TeamTemplate.teamexists(team) then
+		local teamRaw = mw.ext.TeamTemplate.raw(team)
+		teamTemplate = teamRaw.historicaltemplate or teamRaw.templatename
+	end
+
 	local lpdbData = {
 		name = name,
 		location = self:getStandardLocationValue(args.location),
 		location2 = self:getStandardLocationValue(args.location2),
+		region = args.region,
+		locations = Locale.formatLocations(args),
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
 		earnings = earnings,
@@ -232,15 +257,17 @@ function Team:_setLpdbData(args, links)
 		disbanddate = args.disbanded,
 		coach = args.coaches,
 		manager = args.manager,
-		region = args.region,
+		template = teamTemplate,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
 		extradata = {}
 	}
 
-	for year, earningsOfYear in pairs(_earnings) do
+	for year, earningsOfYear in pairs(_earnings or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+		--make these values available for smw storage
+		Variables.varDefine('earningsin' .. year, earningsOfYear)
 	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
@@ -260,6 +287,10 @@ end
 
 function Team:addToLpdb(lpdbData, args)
 	return lpdbData
+end
+
+function Team:shouldStore(args)
+	return Namespace.isMain()
 end
 
 return Team

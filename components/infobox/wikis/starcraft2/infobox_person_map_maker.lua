@@ -6,13 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local MapMaker = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
 local Class = require('Module:Class')
-local Variables = require('Module:Variables')
-local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
 local Logic = require('Module:Logic')
+local MapMaker = require('Module:Infobox/Person')
+local Namespace = require('Module:Namespace')
+local RaceIcon = require('Module:RaceIcon')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 --race stuff tables
 local _FACTION1 = {
@@ -124,7 +126,7 @@ end
 
 function CustomMapMaker:nameDisplay()
 	CustomMapMaker._getRaceData(_args.race or 'unknown')
-	local raceIcon = RaceIcon({'alt_' .. _raceData.race})
+	local raceIcon = RaceIcon.getBigIcon({'alt_' .. _raceData.race})
 	local name = _args.id or self.pagename
 
 	return raceIcon .. '&nbsp;' .. name
@@ -149,11 +151,11 @@ end
 
 function CustomMapMaker:shouldStoreData()
 	if
-		_args.disable_smw == 'true' or _args.disable_lpdb == 'true' or _args.disable_storage == 'true'
-		or Variables.varDefault('disable_SMW_storage', 'false') == 'true'
-		or mw.title.getCurrentTitle().nsText ~= ''
+		Logic.readBool(_args.disable_lpdb) or Logic.readBool(_args.disable_storage)
+		or Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		or not Namespace.isMain()
 	then
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 		return false
 	end
 	return true
@@ -175,7 +177,7 @@ function CustomMapMaker:adjustLPDB(lpdbData, _, personType)
 		extradata.factionhistorical = true
 	end
 
-	lpdbData.extradata = extradata
+	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, extradata)
 
 	return lpdbData
 end

@@ -46,6 +46,8 @@ end
 function CustomInjector:addCustomCells()
 	local widgets = {
 		Cell{name = 'Specialty', content = {_args.specialty}},
+		Cell{name = 'Region', content = {_args.region}},
+		Cell{name = 'City', content = {_args.city}},
 		Cell{name = 'Attack Type', content = {_args.attacktype}},
 		Cell{name = 'Resource Bar', content = {_args.resourcebar}},
 		Cell{name = 'Secondary Bar', content = {_args.secondarybar}},
@@ -54,26 +56,31 @@ function CustomInjector:addCustomCells()
 	}
 
 	local statisticsCells = {
-		hp = 'Health',
-		hpreg = 'Health Regen',
-		mana = 'Mana',
-		manareg = 'Mana Regen',
-		cdr = 'Cooldown Reduction',
-		energy = 'Energy',
-		energyreg = 'Energy Regen',
-		attacktype = 'Attack Type',
-		damage = 'Attack Damage',
-		attackspeed = 'Attack Speed',
-		attackrange = 'Attack Range',
-		ap = 'Ability Power',
-		armor = 'Armor',
-		magicresistance = 'Magic Resistance',
-		movespeed = 'Movement Speed',
+		hp = {order = 1, name = 'Health'},
+		hpreg = {order = 2, name = 'Health Regen'},
+		mana = {order = 3, name = 'Mana'},
+		manareg = {order = 4, name = 'Mana Regen'},
+		cdr = {order = 5, name = 'Cooldown Reduction'},
+		energy = {order = 6, name = 'Energy'},
+		energyreg = {order = 7, name = 'Energy Regen'},
+		attacktype = {order = 8, name = 'Attack Type'},
+		attackspeed = {order = 9, name = 'Attack Speed'},
+		attackrange = {order = 10, name = 'Attack Range'},
+		damage = {order = 11, name = 'Attack Damage'},
+		ap = {order = 12, name = 'Ability Power'},
+		phyatk = {order = 13, name = 'Physical Damage'},
+		magatk = {order = 14, name = 'Magical Damage'},
+		armor = {order = 15, name = 'Armor'},
+		phydef = {order = 16, name = 'Physical Defense'},
+		magdef = {order = 17, name = 'Magical Defense'},
+		magicresistance = {order = 18, name = 'Magic Resistance'},
+		movespeed = {order = 19, name = 'Movement Speed'},
 	}
 	if Table.any(_args, function(key) return statisticsCells[key] end) then
 		table.insert(widgets, Title{name = 'Base Statistics'})
-		for key, display in pairs(statisticsCells) do
-			table.insert(widgets, Cell{name = display, content = {_args[key]}})
+		local statisticsCellsOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
+		for key, item in Table.iter.spairs(statisticsCells, statisticsCellsOrder) do
+			table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
 		end
 	end
 

@@ -53,6 +53,7 @@ Opponent.types.Player = TypeUtil.struct({
 	displayName = 'string',
 	flag = 'string?',
 	pageName = 'string?',
+	team = 'string?',
 })
 
 Opponent.types.TeamOpponent = TypeUtil.struct({
@@ -236,14 +237,24 @@ Resolves the identifiers of an opponent.
 For team opponents, this resolves the team template to a particular date. For
 party opponents, this fills in players' pageNames using their displayNames,
 using data stored in page variables if present.
+
+options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
 ]]
-function Opponent.resolve(opponent, date)
+function Opponent.resolve(opponent, date, options)
+	options = options or {}
 	if opponent.type == Opponent.team then
-		opponent.template = TeamTemplate.resolve(opponent.template, date) or 'tbd'
+		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
 	elseif Opponent.typeIsParty(opponent.type) then
 		local PlayerExt = require('Module:Player/Ext')
 		for _, player in ipairs(opponent.players) do
-			PlayerExt.populatePageName(player)
+			if options.syncPlayer then
+				PlayerExt.syncPlayer(player)
+			else
+				PlayerExt.populatePageName(player)
+			end
+			if player.team then
+				player.team = TeamTemplate.resolve(player.team, date)
+			end
 		end
 	end
 	return opponent
@@ -285,23 +296,29 @@ function Opponent.readOpponentArgs(args)
 		local template = args.template or args[1]
 		return template and {
 			type = Opponent.team,
-			template = template:lower():gsub('_', ' '),
+			template = template,
 		}
 
 	elseif partySize == 1 then
 		local player = {
 			displayName = args[1] or args.p1 or args.name or '',
-			flag = String.nilIfEmpty(Flags.CountryName(args.flag)),
-			pageName = args.link,
+			flag = String.nilIfEmpty(Flags.CountryName(args.flag or args.p1flag)),
+			pageName = args.link or args.p1link,
+			team = args.team or args.p1team,
 		}
 		return {type = Opponent.solo, players = {player}}
 
 	elseif partySize then
-		local players = Array.map(Array.range(1, partySize), function(i)
+		local players = Array.map(Array.range(1, partySize), function(playerIndex)
+			local playerTeam = args['p' .. playerIndex .. 'team']
+			if playerTeam then
+				playerTeam = playerTeam
+			end
 			return {
-				displayName = args[i] or args['p' .. i] or '',
-				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. i .. 'flag'])),
-				pageName = args['p' .. i .. 'link'],
+				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
+				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. playerIndex .. 'flag'])),
+				pageName = args['p' .. playerIndex .. 'link'],
+				team = playerTeam,
 			}
 		end)
 		return {type = args.type, players = players}
@@ -340,6 +357,69 @@ function Opponent.fromMatch2Record(record)
 
 	else
 		return nil
+	end
+end
+
+--[[
+Reads an opponent struct and builds a standings/placement lpdb struct from it
+]]
+function Opponent.toLpdbStruct(opponent)
+	local storageStruct = {
+		opponentname = Opponent.toName(opponent),
+		opponenttemplate = opponent.template,
+		opponenttype = opponent.type,
+	}
+
+	-- Add players for Party Type opponents.
+	-- Team's will have their players added via the TeamCard.
+	if Opponent.typeIsParty(opponent.type) then
+		local players = {}
+		for playerIndex, player in ipairs(opponent.players) do
+			local prefix = 'p' .. playerIndex
+
+			players[prefix] = player.pageName
+			players[prefix .. 'dn'] = player.displayName
+			players[prefix .. 'flag'] = player.flag
+			players[prefix .. 'team'] = player.team and Opponent.toName({type = Opponent.team, template = player.team}) or nil
+			players[prefix .. 'template'] = player.team
+		end
+		storageStruct.opponentplayers = players
+	end
+
+	return storageStruct
+end
+
+--[[
+Reads a standings or placement lpdb structure and builds an opponent struct from it
+]]
+function Opponent.fromLpdbStruct(storageStruct)
+	local partySize = Opponent.partySize(storageStruct.opponenttype)
+	if partySize then
+		local players = storageStruct.opponentplayers
+		local function playerFromLpdbStruct(playerIndex)
+			return {
+				displayName = players['p' .. playerIndex .. 'dn'],
+				flag = Flags.CountryName(players['p' .. playerIndex .. 'flag']),
+				pageName = players['p' .. playerIndex],
+				team = players['p' .. playerIndex .. 'team'],
+			}
+		end
+		local opponent = {
+			players = Array.map(Array.range(1, partySize), playerFromLpdbStruct),
+			type = storageStruct.opponenttype,
+		}
+		return opponent
+	elseif storageStruct.opponenttype == Opponent.team then
+		return {
+			name = storageStruct.opponentname,
+			template = storageStruct.opponenttemplate,
+			type = Opponent.team,
+		}
+	elseif storageStruct.opponenttype == Opponent.literal then
+		return {
+			name = storageStruct.opponentname,
+			type = Opponent.literal,
+		}
 	end
 end
 

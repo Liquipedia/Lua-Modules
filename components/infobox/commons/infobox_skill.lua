@@ -8,7 +8,7 @@
 
 local Class = require('Module:Class')
 local InfoboxBasic = require('Module:Infobox/Basic')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
 
@@ -35,7 +35,12 @@ function Skill:createInfobox()
 	end
 
 	local widgets = {
-		Header{name = args.name, image = args.image, size = args.imageSize, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = args.informationType .. ' Information'},
 		Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', { makeLink = true })},
@@ -98,7 +103,7 @@ function Skill:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkey.hotkey2(args.hotkey, args.hotkey2, 'slash')
 		else
 			display = Hotkey.hotkey(args.hotkey)
 		end
