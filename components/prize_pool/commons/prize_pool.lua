@@ -168,6 +168,12 @@ PrizePool.config = {
 			return tonumber(args.currencyroundprecision)
 		end
 	},
+	lpdbPrefix = {
+		default = '',
+		read = function(args)
+			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix')
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
