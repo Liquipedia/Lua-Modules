@@ -12,6 +12,9 @@ local Table = require('Module:Table')
 
 local Placement = {}
 
+local ZERO_WIDTH_SPACE = '&#8203;'
+local EN_DASH = '–'
+
 local PLACEMENT_CLASSES = {
 	['1'] = 'placement-1',
 	['2'] = 'placement-2',
@@ -81,20 +84,20 @@ function Placement.raw(placement)
 
 	-- Identify appropriate background class
 	if raw.placement[1] == '3' and raw.placement[2] then
-		raw.backgroundClass = placementClasses['d']
-	elseif placementClasses[raw.placement[1]] then
-		raw.backgroundClass = placementClasses[raw.placement[1]]
-	elseif tonumber(raw.placement[1]) <= 128 then
-		raw.backgroundClass = placementClasses['17']
+		raw.backgroundClass = PLACEMENT_CLASSES['d']
+	elseif PLACEMENT_CLASSES[raw.placement[1]] then
+		raw.backgroundClass = PLACEMENT_CLASSES[raw.placement[1]]
+	elseif tonumber(raw.placement[1]) and tonumber(raw.placement[1]) <= 128 then
+		raw.backgroundClass = PLACEMENT_CLASSES['17']
 	elseif tonumber(raw.placement[1]) then
-		raw.backgroundClass = placementClasses['129']
+		raw.backgroundClass = PLACEMENT_CLASSES['129']
 	else
 		raw.unknown = true
 	end
 
 	-- Intercept non-numeric placements for sorting and ordinal creation
 	if not tonumber(raw.placement[1]) then
-		raw.sort = customSorts[raw.placement[1]] or customSorts['']
+		raw.sort = CUSTOM_SORTS[raw.placement[1]] or CUSTOM_SORTS['']
 		raw.ordinal = mw.text.split(string.upper(placement or ''), '-', true)
 	else
 		raw.sort = raw.placement[1] .. (raw.placement[2] and ('-' .. raw.placement[2]) or '')
@@ -136,7 +139,7 @@ function Placement._placement(args)
 		return
 	end
 	local raw = Placement.raw(args.placement or '')
-	args.parent:attr('align', 'center')
+	args.parent:css('text-align', 'center')
 			   :attr('data-sort-value', raw.sort)
 			   :addClass(raw.backgroundClass)
 			   :tag('b')
@@ -150,12 +153,10 @@ end
 ---@return string
 function Placement.RangeLabel(range)
 	local ordinal = Placement._makeOrdinal(range)
-	local zeroWidthSpace = '&#8203;'
-	local enDash = '–'
 	return table.concat({
 		ordinal[1],
 		range[1] < range[2] and ordinal[2] or nil,
-	}, zeroWidthSpace .. enDash .. zeroWidthSpace)
+	}, ZERO_WIDTH_SPACE .. EN_DASH .. ZERO_WIDTH_SPACE)
 end
 
 ---Takes string place value and returns prize pool color class.
