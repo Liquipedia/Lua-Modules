@@ -93,9 +93,16 @@ function LegacyPrizePool.run(dependency)
 		newArgs[slotIndex].opponents = nil
 	end
 
-	for link, linkData in pairs(CACHED_DATA.qualifiers) do
-		newArgs['qualifies' .. linkData.id] = link
-		newArgs['qualifies' .. linkData.id .. 'name'] = linkData.name
+	local qualifiers = Array.extractValues(CACHED_DATA.qualifiers)
+	local qualifiersSortValue = function (qualifier1, qualifier2)
+		return qualifier1.occurance == qualifier2.occurance and qualifier1.id < qualifier2.id
+			or qualifier1.occurance < qualifier2.occurance
+	end
+	table.sort(qualifiers, qualifiersSortValue)
+
+	for index, linkData in ipairs(qualifiers) do
+		newArgs['qualifies' .. index] = linkData.link
+		newArgs['qualifies' .. index .. 'name'] = linkData.name
 	end
 
 	return CustomPrizePool.run(newArgs)
@@ -124,10 +131,11 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 				local link = linkData.link
 
 				if not CACHED_DATA.qualifiers[link] then
-					CACHED_DATA.qualifiers[link] = {id = CACHED_DATA.next.qual, name = linkData.name}
+					CACHED_DATA.qualifiers[link] = {id = CACHED_DATA.next.qual, name = linkData.name, link = link, occurance = 0}
 					CACHED_DATA.next.qual = CACHED_DATA.next.qual + 1
 				end
 
+				CACHED_DATA.qualifiers[link].occurance = CACHED_DATA.qualifiers[link].occurance + 1
 				newData['qualified' .. CACHED_DATA.qualifiers[link].id] = true
 			end
 
