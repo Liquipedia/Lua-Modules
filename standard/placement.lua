@@ -12,7 +12,7 @@ local Table = require('Module:Table')
 
 local Placement = {}
 
-local placementClasses = {
+local PLACEMENT_CLASSES = {
 	['1'] = 'placement-1',
 	['2'] = 'placement-2',
 	['3'] = 'placement-3',
@@ -43,12 +43,12 @@ local placementClasses = {
 	['div'] = 'placement-darkgrey',
 }
 
-local customSorts = {
+local CUSTOM_SORTS = {
 	['w'] = '1025',
 	['proceeded'] = '1026',
 	['q'] = '1027',
 	['d'] = '1028',
-	['stay'] = '2019',
+	['stay'] = '1029',
 	['l'] = '1030',
 	['relegated'] = '1031',
 	['dnp'] = '1032',
