@@ -97,17 +97,14 @@ function Flags.getLocalisation(args)
 
 	-- Return message if none is found
 	mw.log('Unknown localisation entry: ', country)
-	local display
 	if displayNoError then
-		display = ''
+		return ''
 	elseif shouldReturnSimpleError then
-		display = 'error'
+		return 'error'
 	else
-		display = 'Unknown localisation entry "[[lpcommons:Module:Flags/MasterData' ..
+		return 'Unknown localisation entry "[[lpcommons:Module:Flags/MasterData' ..
 			'|' .. country .. ']][[Category:Pages with unknown countries]]'
 	end
-
-	return display
 end
 
 function Flags.languageIcon(args, langName)
