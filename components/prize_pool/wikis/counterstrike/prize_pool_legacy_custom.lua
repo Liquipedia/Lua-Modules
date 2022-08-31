@@ -25,11 +25,6 @@ function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
 end
 
 function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
-	-- 0 used to mean unset, so let's unset it
-	if newData.freetext1 == '0' then
-		newData.freetext1 = nil
-	end
-
 	-- Requested by CS so they can do cleanup of tables with incorrect data
 	if newData.localprize then
 		if newData.localprize:match('[^,%.%d]') then
