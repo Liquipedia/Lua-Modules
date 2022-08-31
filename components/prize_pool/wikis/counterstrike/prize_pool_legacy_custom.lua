@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
@@ -31,6 +32,11 @@ function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
 			error('Unexpected value in localprize for place=' .. slot.place)
 		end
 	end
+
+	if Logic.readBoolOrNil(slot.noqual) ~= nil then
+		slot.qualified = not Logic.readBool(slot.noqual)
+	end
+	newData.forceQualified = Logic.readBoolOrNil(slot.qualified)
 
 	return newData
 end

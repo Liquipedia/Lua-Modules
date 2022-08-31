@@ -90,7 +90,11 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.tournament = HEADER_DATA.tournamentName or lpdbData.tournament
 	lpdbData.publishertier = Variables.varDefault('tournament_valve_tier', '')
 
-	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, "QUALIFIES1") and 1 or 0
+	if placement.args.forceQualified ~= nil then
+		lpdbData.qualified = Logic.readBool(placement.args.forceQualified) and 1 or 0
+	else
+		lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, "QUALIFIES1") and 1 or 0
+	end
 
 	if lpdbData.opponenttype == Opponent.solo then
 		lpdbData.extradata.participantteam = lpdbData.players.p1team
