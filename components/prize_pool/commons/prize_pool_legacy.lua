@@ -119,17 +119,7 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
 		if newParameter == 'seed' then
-			local links = LegacyPrizePool.parseWikiLink(input)
-			for _, linkData in ipairs(links) do
-				local link = linkData.link
-
-				if not CACHED_DATA.qualifiers[link] then
-					CACHED_DATA.qualifiers[link] = {id = CACHED_DATA.next.qual, name = linkData.name}
-					CACHED_DATA.next.qual = CACHED_DATA.next.qual + 1
-				end
-
-				newData['qualified' .. CACHED_DATA.qualifiers[link].id] = true
-			end
+			LegacyPrizePool.handleSeed(newData, input)
 
 		elseif input and tonumber(input) ~= 0 then
 			-- Handle the legacy checkmarks, they were set in value = 'q'
@@ -159,6 +149,20 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 		return newSlot
 	end
 	return newData
+end
+
+function LegacyPrizePool.handleSeed(storeTo, input)
+	local links = LegacyPrizePool.parseWikiLink(input)
+	for _, linkData in ipairs(links) do
+		local link = linkData.link
+
+		if not CACHED_DATA.qualifiers[link] then
+			CACHED_DATA.qualifiers[link] = {id = CACHED_DATA.next.qual, name = linkData.name}
+			CACHED_DATA.next.qual = CACHED_DATA.next.qual + 1
+		end
+
+		storeTo['qualified' .. CACHED_DATA.qualifiers[link].id] = true
+	end
 end
 
 function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)

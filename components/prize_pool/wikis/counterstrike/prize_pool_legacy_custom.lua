@@ -44,15 +44,23 @@ function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, o
 
 	if slot['points' .. opponentIndex] then
 		local param = CACHED_DATA.inputToId['points']
-		opponentData[param] = slot['points' .. opponentIndex]
+		CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['points' .. opponentIndex])
 	end
 
 	if slot['localprize' .. opponentIndex] then
 		local param = CACHED_DATA.inputToId['localprize']
-		opponentData[param] = slot['localprize' .. opponentIndex]
+		CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['localprize' .. opponentIndex])
 	end
 
 	return opponentData
+end
+
+function CustomLegacyPrizePool._setOpponentReward(opponentData, param, value)
+	if param == 'seed' then
+		PrizePoolLegacy.handleSeed(opponentData, value)
+	else
+		opponentData[param] = value
+	end
 end
 
 return CustomLegacyPrizePool
