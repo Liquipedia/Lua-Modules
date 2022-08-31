@@ -116,6 +116,12 @@ PrizePool.config = {
 			return tonumber(args.currencyroundprecision)
 		end
 	},
+	lpdbPrefix = {
+		default = '',
+		read = function(args)
+			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix')
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
@@ -834,7 +840,10 @@ function PrizePool:_storeData()
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement(PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex), lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(
+				PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, self.options.lpdbPrefix),
+				lpdbEntry
+			)
 		end
 
 		if self.options.storeSmw then
@@ -846,11 +855,13 @@ function PrizePool:_storeData()
 end
 
 -- get the lpdbObjectName depending on opponenttype
-function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex)
-	local objectName = 'ranking_'
+function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
+	local objectName = 'ranking'
+	if String.isNotEmpty(lpdbPrefix) then
+		objectName = objectName .. '_' .. lpdbPrefix
+	end
 	if lpdbEntry.opponenttype == Opponent.team then
-		local smwPrefix = Variables.varDefault('smw_prefix', '')
-		return objectName .. smwPrefix .. mw.ustring.lower(lpdbEntry.participant)
+		return objectName .. '_' .. mw.ustring.lower(lpdbEntry.participant)
 	end
 	-- for non team opponents the pagename can be case sensitive
 	-- so objectname needs to be case sensitive to avoid edge cases
