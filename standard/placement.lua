@@ -173,7 +173,7 @@ end
 ---@return string
 function Placement.get(placement, customText)
 	local raw = Placement.raw(placement)
-	return 'class="' .. (raw.backgroundClass or '') .. '" data-sort-value="' .. raw.sort .. '"' ..
+	return 'class="text-center ' .. (raw.backgroundClass or '') .. '" data-sort-value="' .. raw.sort .. '"' ..
 		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (customText or raw.display) .. '</b>'
 end
 
