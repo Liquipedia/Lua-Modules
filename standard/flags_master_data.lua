@@ -1467,29 +1467,36 @@ local data = {
 		localised = 'non-country representing',
 		name = 'Non-representing',
 	},
+
 	['englishspeaking'] = {
+		flag = 'File:UsGb hd.png',
+		localised = '',
 		name = 'English Speaking',
-		flag = 'File:UsGb hd.png'
 	},
 	['germanspeaking'] = {
+		flag = 'File:DeAt hd.png',
+		localised = '',
 		name = 'German Speaking',
-		flag = 'File:DeAt hd.png'
 	},
 	['spanishspeaking'] = {
+		flag = 'File:EsMx hd.png',
+		localised = '',
 		name = 'Spanish Speaking',
-		flag = 'File:EsMx hd.png'
 	},
 	['portuguesespeaking'] = {
+		flag = 'File:PtBr hd.png',
+		localised = '',
 		name = 'Portuguese Speaking',
-		flag = 'File:PtBr hd.png'
 	},
 	['russianspeaking'] = {
+		flag = 'File:RuBy hd.png',
+		localised = '',
 		name = 'Russian Speaking',
-		flag = 'File:RuBy hd.png'
 	},
 	['non-representing'] = {
+		flag = 'File:non hd.png',
+		localised = 'non-country representing',
 		name = 'Non-representing',
-		flag = 'File:non hd.png'
 	},
 	['filler'] = {
 		flag = 'File:Space filler flag.png',
