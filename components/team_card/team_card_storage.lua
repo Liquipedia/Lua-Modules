@@ -6,7 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Custom = require('Module:TeamCard/Custom')
+local Lua = require('Module:Lua')
+local Custom = Lua.import('Module:TeamCard/Custom', {requireDevIfEnabled = true})
 local String = require('Module:StringUtils')
 -- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier Module
 local Qualifier = require('Module:TeamCard/Qualifier')
