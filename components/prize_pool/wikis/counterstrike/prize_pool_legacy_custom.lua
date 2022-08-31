@@ -34,9 +34,9 @@ function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
 	end
 
 	if Logic.readBoolOrNil(slot.noqual) ~= nil then
-		slot.qualified = not Logic.readBool(slot.noqual)
+		slot.qual = not Logic.readBool(slot.noqual)
 	end
-	newData.forceQualified = Logic.readBoolOrNil(slot.qualified)
+	newData.forceQualified = Logic.readBoolOrNil(slot.qual)
 
 	return newData
 end
