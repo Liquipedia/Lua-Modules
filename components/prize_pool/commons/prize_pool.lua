@@ -431,7 +431,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.q)
 		end,
 		display = function ()
-			return 'Q'
+			return Abbreviation.make('Q', 'Qualified Automatically')
 		end,
 		lpdb = 1,
 	},
