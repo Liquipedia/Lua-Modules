@@ -446,6 +446,15 @@ Placement.specialStatuses = {
 		end,
 		lpdb = 2,
 	},
+	Q = {
+		active = function (args)
+			return Logic.readBool(args.q)
+		end,
+		display = function ()
+			return Abbreviation.make('Q', 'Qualified Automatically')
+		end,
+		lpdb = 1,
+	},
 }
 
 function PrizePool:init(args)
