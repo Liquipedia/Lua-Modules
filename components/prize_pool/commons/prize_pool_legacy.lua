@@ -94,12 +94,50 @@ function LegacyPrizePool.run(dependency)
 		newArgs[slotIndex].opponents = nil
 	end
 
-	for link, linkData in pairs(CACHED_DATA.qualifiers) do
-		newArgs['qualifies' .. linkData.id] = link
+	LegacyPrizePool.sortQualifiers(newArgs)
+
+	for _, linkData in pairs(CACHED_DATA.qualifiers) do
+		newArgs['qualifies' .. linkData.id] = linkData.link
 		newArgs['qualifies' .. linkData.id .. 'name'] = linkData.name
 	end
 
 	return CustomPrizePool.run(newArgs)
+end
+
+function LegacyPrizePool.sortQualifiers(args)
+	local qualifiersSortValue = function (qualifier1, qualifier2)
+		return qualifier1.occurance == qualifier2.occurance and qualifier1.id < qualifier2.id
+			or qualifier1.occurance < qualifier2.occurance
+	end
+
+	local qualifiers = Array.extractValues(CACHED_DATA.qualifiers)
+
+	table.sort(qualifiers, qualifiersSortValue)
+
+	local newIndexMap = {}
+	Array.forEach(qualifiers, function (qualifier, index)
+		newIndexMap[qualifier.id] = index
+		qualifier.id = index
+	end)
+
+	local moveKeys = function (struct, oldPrefix, newPrefix, indexMap)
+		Array.forEach(qualifiers, function (_, index)
+			local newIndex = indexMap and indexMap[index] or index
+			struct[newPrefix .. newIndex] = struct[oldPrefix .. index]
+			struct[oldPrefix .. index] = nil
+		end)
+	end
+	Array.forEach(args, function (slot)
+		Array.forEach(slot, function (opponent)
+			moveKeys(opponent, 'qualified', 'qualified_temp_')
+		end)
+		moveKeys(slot, 'qualified', 'qualified_temp_')
+
+		Array.forEach(slot, function (opponent)
+			moveKeys(opponent, 'qualified_temp_', 'qualified', newIndexMap)
+		end)
+		moveKeys(slot, 'qualified_temp_', 'qualified', newIndexMap)
+	end)
 end
 
 function LegacyPrizePool.mapSlot(slot, mergeSlots)
@@ -117,10 +155,11 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	newData.date = slot.date
 	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
 
+	local opponentsInSlot = #slot
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
 		if newParameter == 'seed' then
-			LegacyPrizePool.handleSeed(newData, input)
+			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
 
 		elseif input and tonumber(input) ~= 0 then
 			-- Handle the legacy checkmarks, they were set in value = 'q'
@@ -152,16 +191,17 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	return newData
 end
 
-function LegacyPrizePool.handleSeed(storeTo, input)
+function LegacyPrizePool.handleSeed(storeTo, input, slotSize)
 	local links = LegacyPrizePool.parseWikiLink(input)
 	for _, linkData in ipairs(links) do
 		local link = linkData.link
 
 		if not CACHED_DATA.qualifiers[link] then
-			CACHED_DATA.qualifiers[link] = {id = CACHED_DATA.next.qual, name = linkData.name}
+			CACHED_DATA.qualifiers[link] = {id = CACHED_DATA.next.qual, name = linkData.name, link = link, occurance = 0}
 			CACHED_DATA.next.qual = CACHED_DATA.next.qual + 1
 		end
 
+		CACHED_DATA.qualifiers[link].occurance = CACHED_DATA.qualifiers[link].occurance + slotSize
 		storeTo['qualified' .. CACHED_DATA.qualifiers[link].id] = true
 	end
 end
