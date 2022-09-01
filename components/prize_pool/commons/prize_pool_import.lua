@@ -49,7 +49,7 @@ end
 
 function Import._importLimit(importLimitInput, placements)
 	local importLimit = tonumber(importLimitInput)
-	if not importLimit then 
+	if not importLimit then
 		return
 	end
 
@@ -70,7 +70,6 @@ function Import.importPlacements(inputPlacements, config)
 		local sums = MathUtil.partialSums(placementEntryCounts)
 		local index = ArrayExt.findIndex(sums, function(sum) return config.importLimit <= sum end)
 		if index ~= 0 then
-			placementEntryCounts = Array.sub(placementEntryCounts, 1, index - 1)
 			placementEntries = Array.sub(placementEntries, 1, index - 1)
 		end
 	end
@@ -95,10 +94,13 @@ function Import.computeStagePlacementEntries(stage, options)
 			or Import.computeBracketPlacementEntries(matchGroup, options)
 	end)
 
-	local maxPlacementCount = Array.max(Array.map(groupPlacementEntries, function(placementEntries) return #placementEntries end))
-	return Array.map(Array.range(1, maxPlacementCount or 0), function(placementIx)
+	local maxPlacementCount = Array.max(Array.map(
+			groupPlacementEntries,
+			function(placementEntries) return #placementEntries end
+		))
+	return Array.map(Array.range(1, maxPlacementCount or 0), function(placementIndex)
 		return Array.flatMap(groupPlacementEntries, function(placementEntries)
-			return placementEntries[placementIx]
+			return placementEntries[placementIndex]
 		end)
 	end)
 end
@@ -152,11 +154,11 @@ function Import.makeEntryFromMatch(placementEntry, match)
 	}
 
 	if match.winner and 1 <= match.winner and #match.opponents == 2 then
-		local entryOpponentIx = placementEntry.matchPlacement == 1
+		local entryOpponentIndex = placementEntry.matchPlacement == 1
 			and match.winner
 			or #match.opponents - match.winner + 1
-		local opponent = match.opponents[entryOpponentIx]
-		local vsOpponent = match.opponents[#match.opponents - entryOpponentIx + 1]
+		local opponent = match.opponents[entryOpponentIndex]
+		local vsOpponent = match.opponents[#match.opponents - entryOpponentIndex + 1]
 		opponent.isResolved = true
 		vsOpponent.isResolved = true
 
@@ -175,7 +177,7 @@ end
 -- @options.isFinalStage: If on the last stage, then include placement placements for
 -- winners of final matches.
 function Import.computeBracketPlacementGroups(bracket, options)
-	local firstDeRoundIx = Import.findDeRoundIndex(bracket)
+	local firstDeRoundIndex = Import.findDeRoundIndex(bracket)
 	local preTiebreakMatchIds = Import.getPreTiebreakMatchIds(bracket)
 
 	local function getGroupKeys(matchId)
@@ -211,7 +213,7 @@ function Import.computeBracketPlacementGroups(bracket, options)
 			if coordinates.sectionIndex == #bracket.sections
 
 				-- Include opponents directly knocked out from the upper bracket
-				or firstDeRoundIx and coordinates.roundIndex < firstDeRoundIx then
+				or firstDeRoundIndex and coordinates.roundIndex < firstDeRoundIndex then
 
 				table.insert(groupKeys, {2, coordinates.depth, 2})
 			end
@@ -267,10 +269,10 @@ function Import.findDeRoundIndex(bracket)
 	end
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
 
-	for roundIx = 1, #bracket.rounds do
-		local lbCount = countsByRound[roundIx][2]
+	for roundIndex = 1, #bracket.rounds do
+		local lbCount = countsByRound[roundIndex][2]
 		if lbCount == 0 then
-			return roundIx
+			return roundIndex
 		elseif lbCount > 0 then
 			return nil
 		end
@@ -357,7 +359,7 @@ function Import.entryToOpponent(lpdbEntry)
 				vsscore = Import._getScore(lpdbEntry.vsOpponent),
 			},
 		},
-		date = date,
+		date = lpdbEntry.date,
 		opponentData = Import._kickIfTbd(lpdbEntry.opponent),
 		prizeRewards = {},
 	}
