@@ -75,13 +75,7 @@ function Import.importPlacements(inputPlacements, config)
 	end
 
 	local merged = Import.mergePlacements(placementEntries, inputPlacements)
-mw.logObject(merged)
 
-	-- todo
-	-- add player teams ?!?!
-	--> custom?!
-
-	-- return the input to not break stuff for now
 	return merged
 end
 
