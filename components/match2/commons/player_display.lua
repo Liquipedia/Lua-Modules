@@ -12,6 +12,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local TypeUtil = require('Module:TypeUtil')
 local Flags = require('Module:Flags')
+local Abbreviation = require('Module:Abbreviation')
+local Opponent = require('Module:Opponent')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
@@ -28,6 +30,7 @@ PlayerDisplay.propTypes.BlockPlayer = {
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
 	showPlayerTeam = 'boolean?',
+	abbreviateTbdPlayer = 'boolean?',
 }
 
 --[[
@@ -40,7 +43,8 @@ function PlayerDisplay.BlockPlayer(props)
 
 	local zeroWidthSpace = '&#8203;'
 	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
-		:wikitext(props.showLink ~= false and player.pageName
+		:wikitext(props.abbreviateTbdPlayer and Opponent.playerIsTbd(player) and Abbreviation.make('TBD', 'To be determined (or to be decided)')
+			or props.showLink ~= false and player.pageName
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
 			or Logic.emptyOr(player.displayName, zeroWidthSpace)
 		)
