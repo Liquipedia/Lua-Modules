@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
@@ -93,7 +94,14 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	if placement.args.forceQualified ~= nil then
 		lpdbData.qualified = Logic.readBool(placement.args.forceQualified) and 1 or 0
 	else
-		lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, "QUALIFIES1") and 1 or 0
+		local prizeIsQualifier = function(prize)
+			return prize.type == "QUALIFIES"
+		end
+		local opponentHasPrize = function (prize)
+			placement:getPrizeRewardForOpponent(opponent, prize.id)
+		end
+
+		lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
 	end
 
 	if lpdbData.opponenttype == Opponent.solo then
