@@ -43,7 +43,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	local participantLower = mw.ustring.lower(lpdbData.participant)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
-	lpdbData.extradata.location = Variables.varDefault('tournament_location', '')
+	lpdbData.extradata.location = Variables.varDefault('tournament_location_region', '')
 	lpdbData.extradata['is ea major'] = Variables.varDefault('tournament_ea_major', '')
 	return lpdbData
 end
