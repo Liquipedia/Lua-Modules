@@ -31,6 +31,7 @@ local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
 local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+local VENUE_DESCRIPTION = "<br><small><small>${desc}</small></small>"
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -169,8 +170,11 @@ function League:createInfobox()
 
 				local venues = {}
 				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
-					-- TODO: Description
-					local description = ''
+					local description
+					if String.isNotEmpty(args.venuedesc) then
+						String.interpolate(VENUE_DESCRIPTION, {desc = args.venuedesc})
+					end
+
 					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
 				end
 
