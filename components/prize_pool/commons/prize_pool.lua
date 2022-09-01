@@ -955,10 +955,10 @@ function Placement:init(args, parent, lastPlacement)
 	-- Use the last known place and set the place range based on the entered number of opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + #self.opponents
+		self.placeEnd = lastPlacement + math.max(#self.opponents, 1)
 	end
 
-	assert(#self.opponents > self.placeEnd - self.placeStart, 'Placement: Too many opponents')
+	assert(#self.opponents <= 1 + self.placeEnd - self.placeStart, 'Placement: Too many opponents')
 
 	self.placeDisplay = self:_displayPlace()
 end
