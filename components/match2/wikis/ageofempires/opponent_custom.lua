@@ -8,7 +8,6 @@
 
 local Table = require('Module:Table')
 local Opponent = require('Module:Opponent')
-local Abbreviation = require('Module:Abbreviation')
 local PlayerExt = require('Module:Player/Ext/Custom')
 
 
