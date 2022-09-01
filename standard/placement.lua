@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Ordinal = require('Module:Ordinal')
 local Table = require('Module:Table')
 
@@ -87,16 +88,16 @@ function Placement.raw(placement)
 		raw.backgroundClass = PLACEMENT_CLASSES['d']
 	elseif PLACEMENT_CLASSES[raw.placement[1]] then
 		raw.backgroundClass = PLACEMENT_CLASSES[raw.placement[1]]
-	elseif tonumber(raw.placement[1]) and tonumber(raw.placement[1]) <= 128 then
+	elseif Logic.isNumeric(raw.placement[1]) and tonumber(raw.placement[1]) <= 128 then
 		raw.backgroundClass = PLACEMENT_CLASSES['17']
-	elseif tonumber(raw.placement[1]) then
+	elseif Logic.isNumeric(raw.placement[1]) then
 		raw.backgroundClass = PLACEMENT_CLASSES['129']
 	else
 		raw.unknown = true
 	end
 
 	-- Intercept non-numeric placements for sorting and ordinal creation
-	if not tonumber(raw.placement[1]) then
+	if not Logic.isNumeric(raw.placement[1]) then
 		raw.sort = CUSTOM_SORTS[raw.placement[1]] or CUSTOM_SORTS['']
 		raw.ordinal = mw.text.split(string.upper(placement or ''), '-', true)
 	else
