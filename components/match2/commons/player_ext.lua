@@ -189,7 +189,10 @@ function PlayerExt.populatePageName(player)
 		or globalVars:get(player.displayName .. '_page')
 		or player.displayName and mw.ext.TeamLiquidIntegration.resolve_redirect(player.displayName)
 
-	player.pageIsResolved = player.pageName and true or nil
+	if player.pageName then
+		player.pageIsResolved = true
+		player.pageName = player.pageName:gsub(' ', '_')
+	end
 end
 
 --[[
