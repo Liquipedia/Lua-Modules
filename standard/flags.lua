@@ -102,7 +102,7 @@ function Flags.getLocalisation(args)
 		return 'error'
 	else
 		return 'Unknown localisation entry "[[lpcommons:Module:Flags/MasterData' ..
-			'|' .. country .. ']][[Category:Pages with unknown countries]]'
+			'|' .. country .. ']]"[[Category:Pages with unknown countries]]'
 	end
 end
 
