@@ -525,7 +525,7 @@ function CustomMatchSummary._createMap(game)
 		row:addElement(comment)
 	end
 
-	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
+	row:addClass('brkts-popup-body-game'):css('font-size', '85%')
 
 	-- Winner/Loser backgrounds
 	if game.winner == 1 then
