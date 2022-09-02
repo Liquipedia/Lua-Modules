@@ -123,14 +123,6 @@ PrizePool.config = {
 			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix')
 		end
 	},
-	import = {
-		default = false,
-		read = function(args)
-			return Logic.readBool(args.import)
-				or String.isNotEmpty(args.matchGroupId1)
-				or String.isNotEmpty(args.tournament1)
-		end
-	},
 }
 
 PrizePool.prizeTypes = {
@@ -488,11 +480,7 @@ end
 function PrizePool:create()
 	self.options = self:_readConfig(self.args)
 	self.prizes = self:_readPrizes(self.args)
-	self.placements = self:_readPlacements(self.args)
-
-	if self.options.import then
-		self.placements = Import.run(self.placements, self.args)
-	end
+	self.placements = Import.run(self:_readPlacements(self.args), self.args)
 
 	if self:_hasUsdPrizePool() then
 		self:setConfig('showUSD', true)
