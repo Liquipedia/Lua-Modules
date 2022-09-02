@@ -13,8 +13,8 @@ local Lua = require('Module:Lua')
 local TypeUtil = require('Module:TypeUtil')
 local Flags = require('Module:Flags')
 local Abbreviation = require('Module:Abbreviation')
-local Opponent = require('Module:Opponent')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 --[[
