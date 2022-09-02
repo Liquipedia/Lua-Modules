@@ -79,6 +79,7 @@ determined by its layout context, and not of the opponent.
 function StarcraftOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, StarcraftOpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
+	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not StarcraftOpponent.isTbd(opponent))
 
@@ -171,6 +172,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 			showLink = props.showLink,
 			showPlayerTeam = props.showPlayerTeam,
 			showRace = showRace and not opponent.isArchon and not opponent.isSpecialArchon,
+			team = player.team,
 		})
 			:addClass(props.playerClass)
 	end)
