@@ -24,6 +24,7 @@ local TournamentUtil = Lua.import('Module:Tournament/Util', {requireDevIfEnabled
 local GROUPSCORE_DELIMITER = '-'
 local SCORE_STATUS = 'S'
 local DASH = '&#045;'
+local DEFAULT_ELIMINATION_STATUS = 'down'
 
 local Import = {}
 
@@ -50,6 +51,10 @@ function Import._getConfig(args, placements)
 		importLimit = Import._importLimit(args.importLimit, placements),
 		matchGroupsSpec = TournamentUtil.readMatchGroupsSpec(args)
 			or TournamentUtil.currentPageSpec(),
+		groupElimStatuses = Table.mapValues(
+			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
+			mw.text.trim
+		),
 	}
 end
 
@@ -67,7 +72,10 @@ end
 function Import._importPlacements(inputPlacements, config)
 	local stages = TournamentUtil.fetchStages(config.matchGroupsSpec)
 	local placementEntries = Array.flatMap(Array.reverse(stages), function(stage, reverseStageIndex)
-		return Import._computeStagePlacementEntries(stage, {isFinalStage = reverseStageIndex == 1})
+		return Import._computeStagePlacementEntries(stage, {
+					isFinalStage = reverseStageIndex == 1,
+					groupElimStatuses = config.groupElimStatuses
+				})
 	end)
 
 	-- Apply config.importLimit
@@ -107,7 +115,7 @@ end
 function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	local placementEntries = {}
 	for _, record in ipairs(standingRecords) do
-		if options.isFinalStage or record.currentstatus == 'down' then
+		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
 			local entry = {
 				date = record.extradata.endTime and DateExt.toYmdInUtc(record.extradata.endTime),
 				showMatchDraws = record.extradata.showMatchDraws or false,
