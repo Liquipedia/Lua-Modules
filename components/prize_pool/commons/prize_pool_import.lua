@@ -28,16 +28,16 @@ local DASH = '&#045;'
 local Import = {}
 
 function Import.run(placements, args)
-	local config = Import.getConfig(args, placements)
+	local config = Import._getConfig(args, placements)
 
 	if config.importLimit == 0 or not config.matchGroupsSpec then
 		return placements
 	end
 
-	return Import.importPlacements(placements, config)
+	return Import._importPlacements(placements, config)
 end
 
-function Import.getConfig(args, placements)
+function Import._getConfig(args, placements)
 	local doImport = Logic.readBool(args.import)
 		or String.isNotEmpty(args.matchGroupId1)
 		or String.isNotEmpty(args.tournament1)
@@ -64,10 +64,10 @@ function Import._importLimit(importLimitInput, placements)
 end
 
 -- fills in placements and opponents using data fetched from LPDB
-function Import.importPlacements(inputPlacements, config)
+function Import._importPlacements(inputPlacements, config)
 	local stages = TournamentUtil.fetchStages(config.matchGroupsSpec)
 	local placementEntries = Array.flatMap(Array.reverse(stages), function(stage, reverseStageIndex)
-		return Import.computeStagePlacementEntries(stage, {isFinalStage = reverseStageIndex == 1})
+		return Import._computeStagePlacementEntries(stage, {isFinalStage = reverseStageIndex == 1})
 	end)
 
 	-- Apply config.importLimit
@@ -80,16 +80,16 @@ function Import.importPlacements(inputPlacements, config)
 		end
 	end
 
-	return Import.mergePlacements(placementEntries, inputPlacements)
+	return Import._mergePlacements(placementEntries, inputPlacements)
 end
 
 -- Compute placements and their entries of all brackets or all group tables in a
 -- tournament stage. The placements are ordered from high placement to low.
-function Import.computeStagePlacementEntries(stage, options)
+function Import._computeStagePlacementEntries(stage, options)
 	local groupPlacementEntries = Array.map(stage, function(matchGroup)
 		return TournamentUtil.isGroupTable(matchGroup)
-			and Import.computeGroupTablePlacementEntries(matchGroup, options)
-			or Import.computeBracketPlacementEntries(matchGroup, options)
+			and Import._computeGroupTablePlacementEntries(matchGroup, options)
+			or Import._computeBracketPlacementEntries(matchGroup, options)
 	end)
 
 	local maxPlacementCount = Array.max(Array.map(
@@ -104,7 +104,7 @@ function Import.computeStagePlacementEntries(stage, options)
 end
 
 -- Compute placements and their entries from a GroupTableLeague record.
-function Import.computeGroupTablePlacementEntries(standingRecords, options)
+function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	local placementEntries = {}
 	for _, record in ipairs(standingRecords) do
 		if options.isFinalStage or record.currentstatus == 'down' then
@@ -133,20 +133,20 @@ function Import.computeGroupTablePlacementEntries(standingRecords, options)
 end
 
 -- Compute placements and their entries from the match records of a bracket.
-function Import.computeBracketPlacementEntries(matchRecords, options)
+function Import._computeBracketPlacementEntries(matchRecords, options)
 	local bracket = MatchGroupUtil.makeBracketFromRecords(matchRecords)
 	return Array.map(
-		Import.computeBracketPlacementGroups(bracket, options),
+		Import._computeBracketPlacementGroups(bracket, options),
 		function(group)
 			return Array.map(group, function(placementEntry)
 				local match = bracket.matchesById[placementEntry.matchId]
-				return Import.makeEntryFromMatch(placementEntry, match)
+				return Import._makeEntryFromMatch(placementEntry, match)
 			end)
 		end
 	)
 end
 
-function Import.makeEntryFromMatch(placementEntry, match)
+function Import._makeEntryFromMatch(placementEntry, match)
 	local entry = {
 		date = match.date:match('^[%d-]+'),
 	}
@@ -174,9 +174,9 @@ end
 -- Computes the placement placements of a LPDB bracket
 -- @options.isFinalStage: If on the last stage, then include placement placements for
 -- winners of final matches.
-function Import.computeBracketPlacementGroups(bracket, options)
-	local firstDeRoundIndex = Import.findDeRoundIndex(bracket)
-	local preTiebreakMatchIds = Import.getPreTiebreakMatchIds(bracket)
+function Import._computeBracketPlacementGroups(bracket, options)
+	local firstDeRoundIndex = Import._findDeRoundIndex(bracket)
+	local preTiebreakMatchIds = Import._getPreTiebreakMatchIds(bracket)
 
 	local function getGroupKeys(matchId)
 		local coordinates = bracket.coordinatesByMatchId[matchId]
@@ -245,7 +245,7 @@ end
 
 -- Returns the semifinals match IDs of a bracket if the losers also play in a
 -- third place match to determine placement.
-function Import.getPreTiebreakMatchIds(bracket)
+function Import._getPreTiebreakMatchIds(bracket)
 	local firstBracketData = bracket.bracketDatasById[bracket.rootMatchIds[1]]
 	local thirdPlaceMatchId = firstBracketData.thirdPlaceMatchId
 
@@ -261,7 +261,7 @@ end
 -- Finds the first round in where upper bracket opponents drop to the lower
 -- bracket. Returns nil if it cannot be determined unambiguously, or if the
 -- bracket is not double elimination.
-function Import.findDeRoundIndex(bracket)
+function Import._findDeRoundIndex(bracket)
 	if #bracket.sections ~= 2 then
 		return nil
 	end
@@ -277,9 +277,9 @@ function Import.findDeRoundIndex(bracket)
 	end
 end
 
-function Import.mergePlacements(lpdbEntries, placements)
+function Import._mergePlacements(lpdbEntries, placements)
 	for placementIndex, lpdbPlacement in ipairs(lpdbEntries) do
-		placements[placementIndex] = Import.mergePlacement(
+		placements[placementIndex] = Import._mergePlacement(
 			lpdbPlacement,
 			placements[placementIndex] or Import._emptyPlacement(placements[placementIndex - 1], #lpdbPlacement)
 		)
@@ -315,10 +315,10 @@ function Import._getPlaceDisplay(placeStart, placeEnd)
 	return display
 end
 
-function Import.mergePlacement(lpdbEntries, placement)
+function Import._mergePlacement(lpdbEntries, placement)
 	local defaultOpponentType = (placement.parent or {}).opponentType
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
-		placement.opponents[opponentIndex] = Import.mergeEntry(
+		placement.opponents[opponentIndex] = Import._mergeEntry(
 			opponent,
 			Table.mergeInto(Import._emptyOpponent(defaultOpponentType), placement.opponents[opponentIndex])
 		)
@@ -337,7 +337,7 @@ function Import._emptyOpponent(opponentType)
 	}
 end
 
-function Import.mergeEntry(lpdbEntry, entry)
+function Import._mergeEntry(lpdbEntry, entry)
 	if
 		not Opponent.isTbd(entry.opponentData)
 		or Table.isEmpty(lpdbEntry.opponent)
@@ -346,10 +346,10 @@ function Import.mergeEntry(lpdbEntry, entry)
 		return entry
 	end
 
-	return Table.deepMergeInto(entry, Import.entryToOpponent(lpdbEntry))
+	return Table.deepMergeInto(entry, Import._entryToOpponent(lpdbEntry))
 end
 
-function Import.entryToOpponent(lpdbEntry)
+function Import._entryToOpponent(lpdbEntry)
 	return {
 		additionalData = {
 			GROUPSCORE = Import.makeGroupScore(lpdbEntry),
