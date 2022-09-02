@@ -20,14 +20,14 @@ local CustomImport = {}
 local IMPORT_DEFAULT_ENABLE_START = '2022-01-14'
 
 function CustomImport.run(placements, args)
-	args.importLimit = tonumber(args.importLimit) or CustomImport._computeDefaultImportLimit()
-	args.import = CustomImport._computeImportEnable(args.import)
+	args.importLimit = tonumber(args.importLimit) or CustomImport._defaultImportLimit()
+	args.import = CustomImport._enableImport(args.import)
 
 	-- call the commons import + populate player Teams where necessary
 	return CustomImport._populatePlayerTeams(Import.run(placements, args))
 end
 
-function CustomImport._computeDefaultImportLimit()
+function CustomImport._defaultImportLimit()
 	local tier = tonumber(Variables.varDefault('tournament_liquipediatier'))
 	if not tier then
 		mw.log('Prize Pool Import: Unset liquipediatier')
@@ -39,7 +39,7 @@ function CustomImport._computeDefaultImportLimit()
 		or nil
 end
 
-function CustomImport._computeImportEnable(importInput)
+function CustomImport._enableImport(importInput)
 	local tournamentEndDate = TournamentUtil.getContextualDate()
 	return Logic.nilOr(
 		Logic.readBoolOrNil(importInput),
