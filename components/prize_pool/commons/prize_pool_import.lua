@@ -113,6 +113,9 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 				showMatchDraws = record.extradata.showMatchDraws or false,
 			}
 
+			if not record.extradata.placeRange then
+				record.extradata.placeRange = {record.placement, record.placement}
+			end
 			if record.extradata.placeRange[1] == record.extradata.placeRange[2] then
 				Table.mergeInto(entry, {
 					matchScore = record.scoreboard.match,
