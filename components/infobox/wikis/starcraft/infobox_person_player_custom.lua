@@ -313,12 +313,12 @@ function CustomPlayer._setVarsForVS(table)
 	end
 end
 
-function CustomPlayer._addScoresToVS(vs, opponents, player, playerAsPageName)
+function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUnderscore)
 	local plIndex = 1
 	local vsIndex = 2
 	-- catch matches vs empty opponents
 	if opponents[1] and opponents[2] then
-		if opponents[2].name == player or opponents[2].name == playerAsPageName then
+		if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
 			plIndex = 2
 			vsIndex = 1
 		end
