@@ -59,7 +59,7 @@ function Header:createOpponent(opponent, side)
 		opponent = opponent,
 		showLink = showLink,
 		overflow = 'wrap',
-		teamStyle = 'short',
+		teamStyle = 'bracket',
 	}
 end
 
