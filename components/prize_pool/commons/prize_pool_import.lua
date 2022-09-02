@@ -25,6 +25,7 @@ local GROUPSCORE_DELIMITER = '-'
 local SCORE_STATUS = 'S'
 local DASH = '&#045;'
 local DEFAULT_ELIMINATION_STATUS = 'down'
+local THIRD_PLACE_MATCH_ID = 'RxMTP'
 
 local Import = {}
 
@@ -200,7 +201,7 @@ function Import._computeBracketPlacementGroups(bracket, options)
 			)
 
 		-- Third place match
-		elseif String.endsWith(matchId, 'RxMTP') then
+		elseif String.endsWith(matchId, THIRD_PLACE_MATCH_ID) then
 			return {
 				{2, coordinates.depth + 0.5, 1},
 				{2, coordinates.depth + 0.5, 2},
@@ -337,7 +338,7 @@ function Import._mergePlacement(lpdbEntries, placement)
 
 	assert(
 		#placement.opponents <= 1 + placement.placeEnd - placement.placeStart,
-		'Import: Too many opponents queried for placement range ' .. placement.placeDisplay
+		'Import: Too many opponents returned from query for placement range ' .. placement.placeDisplay
 	)
 
 	return placement
