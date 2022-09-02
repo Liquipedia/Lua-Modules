@@ -324,6 +324,8 @@ function Import.mergePlacement(lpdbEntries, placement)
 		)
 	end
 
+	assert(#placement.opponents <= 1 + placement.placeEnd - placement.placeStart, 'Import: Too many opponents queried for placement range ' .. placement.placeDisplay)
+
 	return placement
 end
 
