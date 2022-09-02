@@ -78,11 +78,8 @@ function Flags.getLocalisation(args)
 	local country = args.country
 
 	if String.isEmpty(country) then
-		return ''
+		return
 	end
-
-	local hideError = Logic.readBool(args.hideError)
-	local simpleError = Logic.readBool(args.simpleError)
 
 	-- clean the entered value
 	local countryKey = Flags._convertToKey(country)
@@ -96,14 +93,23 @@ function Flags.getLocalisation(args)
 
 	-- Return message if none is found
 	mw.log('Unknown localisation entry: ', country)
-	if hideError then
-		return ''
-	elseif simpleError then
-		return 'error'
-	else
-		return 'Unknown localisation entry "[[lpcommons:Module:Flags/MasterData' ..
+	return nil, 'Unknown localisation entry "[[lpcommons:Module:Flags/MasterData' ..
 			'|' .. country .. ']]"[[Category:Pages with unknown countries]]'
+end
+
+function Flags.localisationTemplate(args)
+	args = args or {}
+	local display, error = Flags.getLocalisation(args)
+
+	if not error or Logic.readBool(args.hideError) then
+		return display
 	end
+
+	if Logic.readBool(args.simpleError) then
+		return 'error'
+	end
+
+	return error
 end
 
 function Flags.languageIcon(args, langName)
