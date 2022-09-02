@@ -471,7 +471,7 @@ function PrizePool:init(args)
 		OpponentDisplay = Lua.import('Module:'.. self.args.opponentDisplayLibrary, {requireDevIfEnabled = true})
 	end
 	if self.args.opponentDisplayLibrary then
-		OpponentDisplay = require('Module:'.. self.args.opponentDisplayLibrary)
+		OpponentDisplay = Lua.import('Module:'.. self.args.opponentDisplayLibrary, {requireDevIfEnabled = true})
 	end
 
 	self.options = {}
