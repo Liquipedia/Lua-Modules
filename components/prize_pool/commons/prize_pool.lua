@@ -123,7 +123,7 @@ PrizePool.config = {
 		end
 	},
 	abbreviateTbd = {
-		default = false,
+		default = true,
 		read = function(args)
 			return Logic.readBoolOrNil(args.abbreviateTbd)
 		end
