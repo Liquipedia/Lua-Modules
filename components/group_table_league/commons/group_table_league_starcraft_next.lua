@@ -13,7 +13,6 @@ local GeneralCollapsible = require('Module:GeneralCollapsible')
 local JsonExt = require('Module:Json/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
 local StarcraftOpponent = require('Module:Opponent/Starcraft')
 local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
@@ -23,6 +22,7 @@ local TournamentUtil = require('Module:Tournament/Util')
 
 local GroupTableLeague = Lua.import('Module:GroupTableLeague/next', {requireDevIfEnabled = true})
 local GroupTableLeagueUtil = Lua.import('Module:GroupTableLeague/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 
 local StarcraftGroupTableLeague = {}
