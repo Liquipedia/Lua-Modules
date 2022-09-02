@@ -18,8 +18,6 @@ local MatchPlacement = require('Module:Match/Placement')
 local Math = require('Module:Math')
 ---Note: This can be overwritten
 local Opponent = require('Module:Opponent')
----Note: This can be overwritten
-local OpponentDisplay = require('Module:OpponentDisplay')
 local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
@@ -28,6 +26,8 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+---Note: This can be overwritten
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
