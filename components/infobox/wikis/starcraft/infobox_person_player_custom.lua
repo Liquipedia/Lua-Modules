@@ -220,9 +220,11 @@ end
 
 function CustomPlayer._getMatchupData()
 	local yearsActive
-	local player = string.gsub(_player.pagename, '_', ' ')
+	local playerWithoutUnderscore = string.gsub(_player.pagename, '_', ' ')
+	local player = _player.pagename
 	local queryParameters = {
-		conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]',
+		conditions = '([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])' ..
+			'AND [[walkover::]] AND [[winner::>]]',
 		query = 'match2opponents, date',
 	}
 
@@ -238,7 +240,7 @@ function CustomPlayer._getMatchupData()
 	local foundData = false
 	local processMatch = function(match)
 		foundData = true
-		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player)
+		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player, playerWithoutUnderscore)
 		local year = string.sub(match.date, 1, 4)
 		years[tonumber(year)] = year
 	end
@@ -311,12 +313,12 @@ function CustomPlayer._setVarsForVS(table)
 	end
 end
 
-function CustomPlayer._addScoresToVS(vs, opponents, player)
+function CustomPlayer._addScoresToVS(vs, opponents, player, playerAsPageName)
 	local plIndex = 1
 	local vsIndex = 2
 	-- catch matches vs empty opponents
 	if opponents[1] and opponents[2] then
-		if opponents[2].name == player then
+		if opponents[2].name == player or opponents[2].name == playerAsPageName then
 			plIndex = 2
 			vsIndex = 1
 		end

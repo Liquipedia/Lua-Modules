@@ -197,9 +197,10 @@ end
 
 function CustomPlayer._getMatchupData(player)
 	local yearsActive
-	player = string.gsub(player, '_', ' ')
+	local playerWithoutUnderscore = string.gsub(player, '_', ' ')
 	local queryParameters = {
-		conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]',
+		conditions = '([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])' ..
+			'AND [[walkover::]] AND [[winner::>]]',
 		order = 'date desc',
 		query = table.concat({
 				'match2opponents',
@@ -233,7 +234,7 @@ function CustomPlayer._getMatchupData(player)
 	local foundData = false
 	local processMatch = function(match)
 		foundData = true
-		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player)
+		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player, playerWithoutUnderscore)
 		local year = string.sub(match.date, 1, 4)
 		years[tonumber(year)] = year
 		if #_player.recentMatches <= _NUMBER_OF_RECENT_MATCHES then
@@ -309,12 +310,12 @@ function CustomPlayer._setVarsForVS(table)
 	end
 end
 
-function CustomPlayer._addScoresToVS(vs, opponents, player)
+function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUnderscore)
 	local plIndex = 1
 	local vsIndex = 2
 	--catch matches vs empty opponents
 	if opponents[1] and opponents[2] then
-		if opponents[2].name == player then
+		if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
 			plIndex = 2
 			vsIndex = 1
 		end
