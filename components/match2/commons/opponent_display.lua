@@ -150,7 +150,7 @@ OpponentDisplay.propTypes.BlockOpponent = {
 	showLink = 'boolean?',
 	showPlayerTeam = 'boolean?',
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
-	abbreviateTbdPlayer = 'boolean?',
+	abbreviateTbd = 'boolean?',
 }
 
 --[[
@@ -185,7 +185,7 @@ function OpponentDisplay.BlockOpponent(props)
 			showFlag = props.showFlag,
 			showLink = showLink,
 			showPlayerTeam = props.showPlayerTeam,
-			abbreviateTbdPlayer = props.abbreviateTbdPlayer
+			abbreviateTbd = props.abbreviateTbd
 		})
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)

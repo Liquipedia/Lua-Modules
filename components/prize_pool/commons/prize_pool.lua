@@ -122,10 +122,10 @@ PrizePool.config = {
 			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix')
 		end
 	},
-	abbreviateTbdPlayer = {
+	abbreviateTbd = {
 		default = false,
 		read = function(args)
-			return Logic.readBoolOrNil(args.abbreviateTbdPlayer)
+			return Logic.readBoolOrNil(args.abbreviateTbd)
 		end
 	},
 }
@@ -663,7 +663,7 @@ function PrizePool:_buildRows()
 			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{
 				opponent = opponent.opponentData,
 				showPlayerTeam = true,
-				abbreviateTbdPlayer = self.options.abbreviateTbdPlayer
+				abbreviateTbd = self.options.abbreviateTbd,
 			})
 			local opponentCss = {['justify-content'] = 'start'}
 
