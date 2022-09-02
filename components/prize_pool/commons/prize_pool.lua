@@ -26,8 +26,10 @@ local Variables = require('Module:Variables')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true}) ---Note: This can be overwritten
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true}) ---Note: This can be overwritten
+---Note: This can be overwritten
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+---Note: This can be overwritten
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
