@@ -31,9 +31,10 @@ function CustomImport._computeDefaultImportLimit()
 	local tier = tonumber(Variables.varDefault('tournament_liquipediatier'))
 	if not tier then
 		mw.log('Prize Pool Import: Unset liquipediatier')
+		return
 	end
 
-	return tier and tier >= 4 and 8
+	return tier >= 4 and 8
 		or tier == 3 and 16
 		or nil
 end
