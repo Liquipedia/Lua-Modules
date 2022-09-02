@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Currency = require('Module:Currency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local Page = require('Module:Page')
 local Points = mw.loadData('Module:Points/data')
 local String = require('Module:StringUtils')
@@ -18,6 +17,7 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local LegacyPrizePool = {}
 

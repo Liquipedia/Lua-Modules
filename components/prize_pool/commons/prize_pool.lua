@@ -16,10 +16,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
 local Math = require('Module:Math')
----Note: This can be overwritten
-local Opponent = require('Module:Opponent')
----Note: This can be overwritten
-local OpponentDisplay = require('Module:OpponentDisplay')
 local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
@@ -29,6 +25,11 @@ local Variables = require('Module:Variables')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+
+---Note: This can be overwritten
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+---Note: This can be overwritten
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
@@ -450,10 +451,10 @@ function PrizePool:init(args)
 	self.date = PrizePool._getTournamentDate()
 	self.opponentType = self.args.type
 	if self.args.opponentLibrary then
-		Opponent = require('Module:'.. self.args.opponentLibrary)
+		Opponent = Lua.import('Module:'.. self.args.opponentLibrary, {requireDevIfEnabled = true})
 	end
 	if self.args.opponentDisplayLibrary then
-		OpponentDisplay = require('Module:'.. self.args.opponentDisplayLibrary)
+		OpponentDisplay = Lua.import('Module:'.. self.args.opponentDisplayLibrary, {requireDevIfEnabled = true})
 	end
 
 	self.options = {}

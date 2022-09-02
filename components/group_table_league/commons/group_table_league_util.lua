@@ -10,12 +10,14 @@ local Array = require('Module:Array')
 local ArrayExt = require('Module:Array/Ext')
 local DateExt = require('Module:Date/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local MathUtil = require('Module:MathUtil')
-local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
 local TournamentUtil = require('Module:Tournament/Util')
 local Wdl = require('Module:Wdl')
+
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local GroupTableLeagueUtil = {}
 
