@@ -63,20 +63,12 @@ function Flags.Icon(args, flagName)
 end
 
 -- Returns the localisation/country-adjective of a country or region
---[[
-supported args are:
-country		- country name, flag code, or alias of the Flag
-hideError	- boolean that decides if there should be a displayed error if no entry is found
-simpleError	- boolean that decides if displayed error should be simple or detailed
-examples:
-Flags.getLocalisation({country = de}) = German
-Flags.getLocalisation({country = Germany}) = German
-Flags.getLocalisation({country = deu}) = German
-]]--
-function Flags.getLocalisation(args)
-	args = args or {}
-	local country = args.country
-
+-- @country	- country name, flag code, or alias of the Flag
+-- examples:
+-- Flags.getLocalisation('de') = German
+-- Flags.getLocalisation('Germany') = German
+-- Flags.getLocalisation('deu') = German
+function Flags.getLocalisation(country)
 	if String.isEmpty(country) then
 		return
 	end
@@ -97,9 +89,14 @@ function Flags.getLocalisation(args)
 			'|' .. country .. ']]"[[Category:Pages with unknown countries]]'
 end
 
+-- supported args are:
+-- @country	- country name, flag code, or alias of the Flag
+-- @hideError	- boolean that decides if there should be a displayed error
+-- if no entry is found but a country input was made
+-- @simpleError	- boolean that decides if displayed error should be simple or detailed
 function Flags.localisationTemplate(args)
 	args = args or {}
-	local display, error = Flags.getLocalisation(args)
+	local display, error = Flags.getLocalisation(args.country)
 
 	if not error or Logic.readBool(args.hideError) then
 		return display
