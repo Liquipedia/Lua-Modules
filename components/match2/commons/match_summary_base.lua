@@ -9,9 +9,9 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local Break = Class.new(

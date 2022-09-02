@@ -35,6 +35,8 @@ function Localisation.getCountryName(country, noentry)
 	return countryname
 end
 
+-- use Module:Flags instead
+---@deprecated
 function Localisation.getLocalisation(options, country)
 	--in case no options are entered the country is the first var
 	--so we need to adjust for that

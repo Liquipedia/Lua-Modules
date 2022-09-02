@@ -9,13 +9,13 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Array = require('Module:Array')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local _FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}

@@ -6,10 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local Opponent = require('Module:Opponent')
 local PlayerExt = require('Module:Player/Ext/Custom')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local CustomOpponent = Table.deepCopy(Opponent)
 

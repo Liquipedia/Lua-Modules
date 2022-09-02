@@ -16,8 +16,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
 local Math = require('Module:Math')
----Note: This can be overwritten
-local Opponent = require('Module:Opponent')
 local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
@@ -26,9 +24,12 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+
+---Note: This can be overwritten
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 ---Note: This can be overwritten
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
@@ -456,10 +457,10 @@ function PrizePool:init(args)
 	self.date = PrizePool._getTournamentDate()
 	self.opponentType = self.args.type
 	if self.args.opponentLibrary then
-		Opponent = require('Module:'.. self.args.opponentLibrary)
+		Opponent = Lua.import('Module:'.. self.args.opponentLibrary, {requireDevIfEnabled = true})
 	end
 	if self.args.opponentDisplayLibrary then
-		OpponentDisplay = require('Module:'.. self.args.opponentDisplayLibrary)
+		OpponentDisplay = Lua.import('Module:'.. self.args.opponentDisplayLibrary, {requireDevIfEnabled = true})
 	end
 
 	self.options = {}
@@ -962,10 +963,10 @@ function Placement:init(args, parent, lastPlacement)
 	-- Use the last known place and set the place range based on the entered number of opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + #self.opponents
+		self.placeEnd = lastPlacement + math.max(#self.opponents, 1)
 	end
 
-	assert(#self.opponents > self.placeEnd - self.placeStart, 'Placement: Too many opponents')
+	assert(#self.opponents <= 1 + self.placeEnd - self.placeStart, 'Placement: Too many opponents')
 
 	self.placeDisplay = self:_displayPlace()
 end

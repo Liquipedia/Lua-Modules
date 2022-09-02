@@ -8,10 +8,10 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local wikiCopyPaste = Table.copy(Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base', {requireDevIfEnabled = true}))
 
 local GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR = 'gf'

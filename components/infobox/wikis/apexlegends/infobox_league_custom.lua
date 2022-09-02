@@ -17,6 +17,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
+local Locale = require('Module:Locale')
 
 local _GAME_MODE = mw.loadData('Module:GameMode')
 local _EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
@@ -161,6 +162,8 @@ function CustomLeague:defineCustomPageVariables()
 		end
 	end
 	Variables.varDefine('tournament_ea_major', eaMajor)
+	local regionData = Locale.formatLocations(_args)
+	Variables.varDefine('tournament_location_region', regionData.region1 or _args.country)
 end
 
 function CustomLeague:addToLpdb(lpdbData)

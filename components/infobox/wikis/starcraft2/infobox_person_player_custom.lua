@@ -17,13 +17,15 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local CleanRace = require('Module:CleanRace')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
 local MatchTicker = require('Module:MatchTicker/Participant')
 local Math = require('Module:Math')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local Condition = require('Module:Condition')
 

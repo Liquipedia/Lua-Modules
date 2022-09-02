@@ -6,14 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
-local Opponent = require('Module:Opponent')
 local PlayerExt = require('Module:Player/Ext')
 local StarcraftRace = require('Module:Race/Starcraft')
 local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
+
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local StarcraftOpponent = Table.deepCopy(Opponent)
 
@@ -79,7 +81,7 @@ function StarcraftOpponent.fromMatch2Record(record)
 end
 
 function StarcraftOpponent.toLpdbStruct(opponent)
-	local storageStruct = Opponent.toLpdbStruct(opponent, true)
+	local storageStruct = Opponent.toLpdbStruct(opponent)
 
 	if Opponent.typeIsParty(opponent.type) then
 		if opponent.isArchon then

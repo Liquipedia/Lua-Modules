@@ -63,7 +63,7 @@ end
 
 function CustomLegacyPrizePool._setOpponentReward(opponentData, param, value)
 	if param == 'seed' then
-		PrizePoolLegacy.handleSeed(opponentData, value)
+		PrizePoolLegacy.handleSeed(opponentData, value, 1)
 	else
 		opponentData[param] = value
 	end
