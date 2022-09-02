@@ -30,7 +30,7 @@ local Import = {}
 function Import.run(placements, args)
 	local config = Import.getConfig(args, placements)
 
-	if not config.matchGroupsSpec then
+	if config.importLimit == 0 or not config.matchGroupsSpec then
 		return placements
 	end
 
@@ -38,12 +38,18 @@ function Import.run(placements, args)
 end
 
 function Import.getConfig(args, placements)
-	local doImport = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
+	local doImport = Logic.readBool(args.import)
+		or String.isNotEmpty(args.matchGroupId1)
+		or String.isNotEmpty(args.tournament1)
+
+	if not doImport then
+		return {}
+	end
 
 	return {
 		importLimit = Import._importLimit(args.importLimit, placements),
 		matchGroupsSpec = TournamentUtil.readMatchGroupsSpec(args)
-			or doImport and TournamentUtil.currentPageSpec(),
+			or TournamentUtil.currentPageSpec(),
 	}
 end
 
@@ -74,9 +80,7 @@ function Import.importPlacements(inputPlacements, config)
 		end
 	end
 
-	local merged = Import.mergePlacements(placementEntries, inputPlacements)
-
-	return merged
+	return Import.mergePlacements(placementEntries, inputPlacements)
 end
 
 -- Compute placements and their entries of all brackets or all group tables in a
