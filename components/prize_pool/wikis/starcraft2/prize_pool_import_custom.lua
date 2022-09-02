@@ -8,6 +8,7 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
 
 local Import = Lua.import('Module:PrizePool/Import', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -27,7 +28,7 @@ function CustomImport.run(placements, args)
 end
 
 function CustomImport._computeDefaultImportLimit()
-	local tier = tonumber(globalVars:get('tournament_liquipediatier'))
+	local tier = tonumber(Variables.varDefault('tournament_liquipediatier'))
 	if not tier then
 		mw.log('Prize Pool Import: Unset liquipediatier')
 	end
@@ -65,7 +66,7 @@ function CustomImport._completeOpponentPlayerTeams(opponent, date)
 
 	for _, player in pairs(opponent.players) do
 		if not player.team and player.displayName and player.pageName and not Opponent.playerIsTbd(player) then
-			player.team = PlayerExt.syncTeam(player.pageName, team, {date = date})
+			player.team = PlayerExt.syncTeam(player.pageName, nil, {date = date})
 		end
 	end
 
