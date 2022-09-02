@@ -79,7 +79,7 @@ function StarcraftOpponent.fromMatch2Record(record)
 end
 
 function StarcraftOpponent.toLpdbStruct(opponent)
-	local storageStruct = Opponent.toLpdbStruct(opponent, true)
+	local storageStruct = Opponent.toLpdbStruct(opponent)
 
 	if Opponent.typeIsParty(opponent.type) then
 		if opponent.isArchon then
