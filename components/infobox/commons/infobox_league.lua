@@ -171,8 +171,8 @@ function League:createInfobox()
 				local venues = {}
 				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
 					local description
-					if String.isNotEmpty(args.venuedesc) then
-						description = String.interpolate(VENUE_DESCRIPTION, {desc = args.venuedesc})
+					if String.isNotEmpty(args[prefix .. 'desc']) then
+						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
 					end
 
 					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
