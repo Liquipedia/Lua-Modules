@@ -26,6 +26,13 @@ local SCORE_STATUS = 'S'
 local DASH = '&#045;'
 local DEFAULT_ELIMINATION_STATUS = 'down'
 local THIRD_PLACE_MATCH_ID = 'RxMTP'
+local GSL_GROUP_OPPONENT_NUMBER = 4
+local GSL_STYLE_SCORES = {
+	{2, 0, 0},
+	{2, 0, 1},
+	{1, 0, 2},
+	{0, 0, 2},
+}
 
 local Import = {}
 
@@ -116,6 +123,7 @@ end
 
 -- Compute placements and their entries from a GroupTableLeague record.
 function Import._computeGroupTablePlacementEntries(standingRecords, options)
+	local isGslStyleGroup = Import._isGslStyleGroup(standingRecords)
 	local placementEntries = {}
 	for _, record in ipairs(standingRecords) do
 		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
@@ -139,11 +147,29 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 				end
 			end
 
+			entry.isGslStyleGroup = isGslStyleGroup
+
 			table.insert(placementEntries, {entry})
 		end
 	end
 
 	return placementEntries
+end
+
+function Import._isGslStyleGroup(standingRecords)
+	if Import.config.gslStyleGroupAsWdl or #standingRecords ~= GSL_GROUP_OPPONENT_NUMBER then
+		return
+	end
+
+	for _, record in pairs(standingRecords) do
+		local placement = record.placement
+		if not placement or not GSL_STYLE_SCORES[placement] or
+			not Table.deepEquals(GSL_STYLE_SCORES[placement], record.scoreboard.match) then
+			return
+		end
+	end
+
+	return true
 end
 
 -- Compute placements and their entries from the match records of a bracket.
