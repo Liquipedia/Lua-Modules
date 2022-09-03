@@ -354,37 +354,40 @@ end
 
 function Import._mergeEntry(lpdbEntry, entry)
 	if
-		not Opponent.isTbd(entry.opponentData)
-		or Table.isEmpty(lpdbEntry.opponent)
+		not Opponent.isTbd(entry.opponentData) -- valid manual input
+		or Table.isEmpty(lpdbEntry.opponent) -- irrelevant lpdbEntry
 		or Opponent.isTbd(lpdbEntry.opponent)
 	then
 		return entry
 	end
 
-	return Table.deepMergeInto(entry, Import._entryToOpponent(lpdbEntry))
+	return Table.deepMergeInto(entry, Import.entryToOpponent(lpdbEntry))
 end
 
-function Import._entryToOpponent(lpdbEntry)
+-- overwritable so wikis can adjust to their needs
+function Import.entryToOpponent(lpdbEntry)
 	return {
 		additionalData = {
 			GROUPSCORE = Import.makeGroupScore(lpdbEntry),
-			LASTVS = Import._kickIfTbd(lpdbEntry.vsOpponent),
+			LASTVS = Import.kickIfTbd(lpdbEntry.vsOpponent),
 			LASTVSSCORE = {
-				score = Import._getScore(lpdbEntry.opponent),
-				vsscore = Import._getScore(lpdbEntry.vsOpponent),
+				score = Import.getScore(lpdbEntry.opponent),
+				vsscore = Import.getScore(lpdbEntry.vsOpponent),
 			},
 		},
 		date = lpdbEntry.date,
-		opponentData = Import._kickIfTbd(lpdbEntry.opponent),
+		opponentData = Import.kickIfTbd(lpdbEntry.opponent),
 		prizeRewards = {},
 	}
 end
 
-function Import._kickIfTbd(opponent)
+-- export for usage in /Custom
+function ImportkickIfTbd(opponent)
 	return (Table.isEmpty(opponent) or Opponent.isTbd(opponent))
 		and {} or opponent
 end
 
+-- overwritable so e.g. the delimiter can be changed
 function Import.makeGroupScore(lpdbEntry)
 	if not lpdbEntry.matchScore then
 		return
@@ -397,7 +400,8 @@ function Import.makeGroupScore(lpdbEntry)
 	return table.concat(lpdbEntry.matchScore, GROUPSCORE_DELIMITER)
 end
 
-function Import._getScore(opponentData)
+-- export for usage in /Custom
+function Import.getScore(opponentData)
 	if not opponentData then
 		return
 	end
