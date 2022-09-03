@@ -126,6 +126,8 @@ end
 function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	local needsLastVs = Import._needsLastVs(standingRecords)
 	local placementEntries = {}
+	local placementIndexes = {}
+
 	for _, record in ipairs(standingRecords) do
 		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
 			local entry = {
@@ -151,7 +153,12 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 			entry.needsLastVs = needsLastVs
 			entry.matches = record.matches
 
-			table.insert(placementEntries, {entry})
+			if not placementIndexes[record.placement] then
+				table.insert(placementEntries, {entry})
+				placementIndexes[record.placement] = #placementEntries
+			else
+				table.insert(placementEntries[placementIndexes[record.placement]], entry)
+			end
 		end
 	end
 
@@ -161,7 +168,7 @@ end
 function Import._needsLastVs(standingRecords)
 	if Import.config.allGroupsUseWdl then
 		return false
-	elseif standingRecords.type == SWISS_GROUP_TYPE then
+	elseif (standingRecords[1] or {}).type == SWISS_GROUP_TYPE then
 		return true
 	elseif #standingRecords ~= GSL_GROUP_OPPONENT_NUMBER then
 		return false
