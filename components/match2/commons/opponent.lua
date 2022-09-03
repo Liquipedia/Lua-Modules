@@ -148,7 +148,7 @@ function Opponent.isTbd(opponent)
 end
 
 function Opponent.playerIsTbd(player)
-	return player.displayName == '' or player.displayName:upper() == 'TBD'
+	return String.isEmpty(player.displayName) or player.displayName:upper() == 'TBD'
 end
 
 function Opponent.isType(type)
