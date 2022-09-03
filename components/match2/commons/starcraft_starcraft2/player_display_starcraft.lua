@@ -13,7 +13,9 @@ local PlayerExt = require('Module:Player/Ext')
 local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
+local Abbreviation = require('Module:Abbreviation')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
