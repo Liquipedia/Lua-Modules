@@ -70,6 +70,7 @@ StarcraftOpponentDisplay.propTypes.BlockOpponent = {
 	showRace = 'boolean?',
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 	playerClass = 'string?',
+	abbreviateTbd = 'boolean?',
 }
 
 --[[
