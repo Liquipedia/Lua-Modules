@@ -17,6 +17,36 @@ local Table = require('Module:Table')
 
 local CustomSquad = {}
 
+function CustomSquad.header(self)
+	local makeHeader = function(wikiText)
+		local headerCell = mw.html.create('th')
+
+		if wikiText == nil then
+			return headerCell
+		end
+
+		return headerCell:wikitext(wikiText):addClass('divCell')
+	end
+
+	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
+
+		headerRow	:node(makeHeader('ID'))
+					:node(makeHeader())
+					:node(makeHeader('Name'))
+					:node(makeHeader('Position'))
+					:node(makeHeader('Join Date'))
+	if self.type == Squad.TYPE_FORMER then
+		headerRow	:node(makeHeader('Leave Date'))
+					:node(makeHeader('New Team'))
+	elseif self.type == Squad.TYPE_INACTIVE then
+		headerRow:node(makeHeader('Inactive Date'))
+	end
+
+	self.content:node(headerRow)
+
+	return self
+end
+
 local ExtendedSquadRow = Class.new(SquadRow)
 
 function ExtendedSquadRow:position(args)
