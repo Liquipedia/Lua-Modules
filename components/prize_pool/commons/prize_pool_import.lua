@@ -394,15 +394,13 @@ function Import._mergeEntry(lpdbEntry, entry)
 end
 
 function Import._entryToOpponent(lpdbEntry)
+	local additionalData
 	if lpdbEntry.isGslStyleGroup then
-		local returnValue = Import._gslEntryToOpponent(lpdbEntry)
-		if returnValue.additionalData then
-			return returnValue
-		end
+		additionalData = Import._gslEntryToAdditionalData(lpdbEntry)
 	end
 
 	return {
-		additionalData = {
+		additionalData = additionalData or {
 			GROUPSCORE = Import._makeGroupScore(lpdbEntry),
 			LASTVS = Import._kickIfTbd(lpdbEntry.vsOpponent),
 			LASTVSSCORE = {
@@ -442,7 +440,7 @@ function Import._getScore(opponentData)
 		or opponentData.status
 end
 
-function Import._gslEntryToOpponent(lpdbEntry)
+function Import._gslEntryToAdditionalData(lpdbEntry)
 	local opponentName = Opponent.toName(lpdbEntry.opponent)
 	local matchConditions = {}
 	for _, matchId in pairs(lpdbEntry.matches) do
@@ -457,15 +455,10 @@ function Import._gslEntryToOpponent(lpdbEntry)
 	})
 
 	if not type(matchData) == 'table' or not matchData[1] then
-		return {}
+		return
 	end
 
-	return {
-		additionalData = Import._makeAdditionalDataFromGslMatch(opponentName, matchData[1]),
-		date = lpdbEntry.date,
-		opponentData = Import._kickIfTbd(lpdbEntry.opponent),
-		prizeRewards = {},
-	}
+	return Import._makeAdditionalDataFromGslMatch(opponentName, matchData[1])
 end
 
 function Import._makeAdditionalDataFromGslMatch(opponentName, match)
