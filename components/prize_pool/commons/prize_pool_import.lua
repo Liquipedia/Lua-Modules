@@ -148,6 +148,7 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 			end
 
 			entry.isGslStyleGroup = isGslStyleGroup
+			entry.matches = record.matches
 
 			table.insert(placementEntries, {entry})
 		end
