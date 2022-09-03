@@ -382,7 +382,7 @@ function Import.entryToOpponent(lpdbEntry)
 end
 
 -- export for usage in /Custom
-function ImportkickIfTbd(opponent)
+function Import.kickIfTbd(opponent)
 	return (Table.isEmpty(opponent) or Opponent.isTbd(opponent))
 		and {} or opponent
 end
