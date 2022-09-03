@@ -56,7 +56,8 @@ function Import._getConfig(args, placements)
 			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
 			mw.text.trim
 		),
-		gslStyleGroupAsWdl = Logic.readBool(args.gslStyleGroupAsWdl)
+		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
+		gslStyleGroupAsWdl = Logic.readBool(args.gslStyleGroupAsWdl),
 	}
 end
 
@@ -368,7 +369,7 @@ end
 function Import._entryToOpponent(lpdbEntry)
 	return {
 		additionalData = {
-			GROUPSCORE = Import.makeGroupScore(lpdbEntry),
+			GROUPSCORE = Import._makeGroupScore(lpdbEntry),
 			LASTVS = Import._kickIfTbd(lpdbEntry.vsOpponent),
 			LASTVSSCORE = {
 				score = Import._getScore(lpdbEntry.opponent),
@@ -386,7 +387,7 @@ function Import._kickIfTbd(opponent)
 		and {} or opponent
 end
 
-function Import.makeGroupScore(lpdbEntry)
+function Import._makeGroupScore(lpdbEntry)
 	if not lpdbEntry.matchScore then
 		return
 	end
@@ -395,7 +396,7 @@ function Import.makeGroupScore(lpdbEntry)
 		table.remove(lpdbEntry.matchScore, 2)
 	end
 
-	return table.concat(lpdbEntry.matchScore, GROUPSCORE_DELIMITER)
+	return table.concat(lpdbEntry.matchScore, Import.config.groupScoreDelimiter)
 end
 
 function Import._getScore(opponentData)
