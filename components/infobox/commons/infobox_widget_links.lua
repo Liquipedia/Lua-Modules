@@ -47,6 +47,7 @@ local _PRIORITY_GROUPS = {
 		'5ewin',
 		'abiosgaming',
 		'aligulac',
+		'apexlegendsstatus',
 		'battlefy',
 		'b5csgo',
 		'challengermode',
