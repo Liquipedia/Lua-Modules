@@ -394,6 +394,13 @@ function Import._mergeEntry(lpdbEntry, entry)
 end
 
 function Import._entryToOpponent(lpdbEntry)
+	if lpdbEntry.isGslStyleGroup then
+		local returnValue = Import._gslEntryToOpponent(lpdbEntry)
+		if returnValue.additionalData then
+			return returnValue
+		end
+	end
+
 	return {
 		additionalData = {
 			GROUPSCORE = Import._makeGroupScore(lpdbEntry),
@@ -433,6 +440,58 @@ function Import._getScore(opponentData)
 
 	return opponentData.status == SCORE_STATUS and opponentData.score
 		or opponentData.status
+end
+
+function Import._gslEntryToOpponent(lpdbEntry)
+	local opponentName = Opponent.toName(lpdbEntry.opponent)
+	local matchConditions = {}
+	for _, matchId in pairs(lpdbEntry.matches) do
+		table.insert(matchConditions, '[[match2id::' .. matchId .. ']]')
+	end
+
+	local matchData = mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = '[[opponent::' .. opponentName .. ']] AND (' .. table.concat(matchConditions, ' OR ') .. ')',
+		order = 'date desc',
+		query = 'match2opponents, winner',
+		limit = 1
+	})
+
+	if not type(matchData) == 'table' or not matchData[1] then
+		return {}
+	end
+
+	return {
+		additionalData = Import._makeAdditionalDataFromGslMatch(opponentName, matchData[1]),
+		date = lpdbEntry.date,
+		opponentData = Import._kickIfTbd(lpdbEntry.opponent),
+		prizeRewards = {},
+	}
+end
+
+function Import._makeAdditionalDataFromGslMatch(opponentName, match)
+	-- catch unfinished or invalid match for GSL style groups
+	local winner = tonumber(match.winner)
+	if not winner or winner < 1 or #match.match2opponents ~= 2 then
+		return
+	end
+
+	local score, vsScore, lastVs
+	for _, opponent in pairs(match.match2opponents) do
+		if opponent.name == opponentName then
+			score = Import._getScore(opponent)
+		else
+			vsScore = Import._getScore(opponent)
+			lastVs = MatchGroupUtil.opponentFromRecord(opponent)
+		end
+	end
+
+	return {
+		LASTVS = lastVs,
+		LASTVSSCORE = {
+			score = score,
+			vsscore = vsScore,
+		},
+	}
 end
 
 return Import
