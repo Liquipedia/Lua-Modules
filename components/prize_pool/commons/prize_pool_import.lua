@@ -30,13 +30,13 @@ local THIRD_PLACE_MATCH_ID = 'RxMTP'
 local Import = {}
 
 function Import.run(placements, args)
-	local config = Import._getConfig(args, placements)
+	Import.config = Import._getConfig(args, placements)
 
-	if config.importLimit == 0 or not config.matchGroupsSpec then
+	if Import.config.importLimit == 0 or not Import.config.matchGroupsSpec then
 		return placements
 	end
 
-	return Import._importPlacements(placements, config)
+	return Import._importPlacements(placements)
 end
 
 function Import._getConfig(args, placements)
@@ -56,6 +56,7 @@ function Import._getConfig(args, placements)
 			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
 			mw.text.trim
 		),
+		gslStyleGroupAsWdl = Logic.readBool(args.gslStyleGroupAsWdl)
 	}
 end
 
@@ -70,20 +71,20 @@ function Import._importLimit(importLimitInput, placements)
 end
 
 -- fills in placements and opponents using data fetched from LPDB
-function Import._importPlacements(inputPlacements, config)
-	local stages = TournamentUtil.fetchStages(config.matchGroupsSpec)
+function Import._importPlacements(inputPlacements)
+	local stages = TournamentUtil.fetchStages(Import.config.matchGroupsSpec)
 	local placementEntries = Array.flatMap(Array.reverse(stages), function(stage, reverseStageIndex)
 		return Import._computeStagePlacementEntries(stage, {
 					isFinalStage = reverseStageIndex == 1,
-					groupElimStatuses = config.groupElimStatuses
+					groupElimStatuses = Import.config.groupElimStatuses
 				})
 	end)
 
-	-- Apply config.importLimit
+	-- Apply Import.config.importLimit
 	local placementEntryCounts = Array.map(placementEntries, function(entries) return #entries end)
-	if config.importLimit then
+	if Import.config.importLimit then
 		local sums = MathUtil.partialSums(placementEntryCounts)
-		local index = ArrayExt.findIndex(sums, function(sum) return config.importLimit <= sum end)
+		local index = ArrayExt.findIndex(sums, function(sum) return Import.config.importLimit <= sum end)
 		if index ~= 0 then
 			placementEntries = Array.sub(placementEntries, 1, index - 1)
 		end
@@ -361,33 +362,30 @@ function Import._mergeEntry(lpdbEntry, entry)
 		return entry
 	end
 
-	return Table.deepMergeInto(entry, Import.entryToOpponent(lpdbEntry))
+	return Table.deepMergeInto(entry, Import._entryToOpponent(lpdbEntry))
 end
 
--- overwritable so wikis can adjust to their needs
-function Import.entryToOpponent(lpdbEntry)
+function Import._entryToOpponent(lpdbEntry)
 	return {
 		additionalData = {
 			GROUPSCORE = Import.makeGroupScore(lpdbEntry),
-			LASTVS = Import.kickIfTbd(lpdbEntry.vsOpponent),
+			LASTVS = Import._kickIfTbd(lpdbEntry.vsOpponent),
 			LASTVSSCORE = {
-				score = Import.getScore(lpdbEntry.opponent),
-				vsscore = Import.getScore(lpdbEntry.vsOpponent),
+				score = Import._getScore(lpdbEntry.opponent),
+				vsscore = Import._getScore(lpdbEntry.vsOpponent),
 			},
 		},
 		date = lpdbEntry.date,
-		opponentData = Import.kickIfTbd(lpdbEntry.opponent),
+		opponentData = Import._kickIfTbd(lpdbEntry.opponent),
 		prizeRewards = {},
 	}
 end
 
--- export for usage in /Custom
-function Import.kickIfTbd(opponent)
+function Import._kickIfTbd(opponent)
 	return (Table.isEmpty(opponent) or Opponent.isTbd(opponent))
 		and {} or opponent
 end
 
--- overwritable so e.g. the delimiter can be changed
 function Import.makeGroupScore(lpdbEntry)
 	if not lpdbEntry.matchScore then
 		return
@@ -400,8 +398,7 @@ function Import.makeGroupScore(lpdbEntry)
 	return table.concat(lpdbEntry.matchScore, GROUPSCORE_DELIMITER)
 end
 
--- export for usage in /Custom
-function Import.getScore(opponentData)
+function Import._getScore(opponentData)
 	if not opponentData then
 		return
 	end
