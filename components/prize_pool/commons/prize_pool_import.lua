@@ -27,6 +27,7 @@ local DASH = '&#045;'
 local DEFAULT_ELIMINATION_STATUS = 'down'
 local THIRD_PLACE_MATCH_ID = 'RxMTP'
 local GSL_GROUP_OPPONENT_NUMBER = 4
+local SWISS_GROUP_TYPE = 'swiss'
 local GSL_STYLE_SCORES = {
 	{2, 0, 0},
 	{2, 0, 1},
@@ -64,7 +65,7 @@ function Import._getConfig(args, placements)
 			mw.text.trim
 		),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
-		gslStyleGroupAsWdl = Logic.readBool(args.gslStyleGroupAsWdl),
+		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
 	}
 end
 
@@ -123,7 +124,7 @@ end
 
 -- Compute placements and their entries from a GroupTableLeague record.
 function Import._computeGroupTablePlacementEntries(standingRecords, options)
-	local isGslStyleGroup = Import._isGslStyleGroup(standingRecords)
+	local needsLastVs = Import._needsLastVs(standingRecords)
 	local placementEntries = {}
 	for _, record in ipairs(standingRecords) do
 		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
@@ -147,7 +148,7 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 				end
 			end
 
-			entry.isGslStyleGroup = isGslStyleGroup
+			entry.needsLastVs = needsLastVs
 			entry.matches = record.matches
 
 			table.insert(placementEntries, {entry})
@@ -157,16 +158,20 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	return placementEntries
 end
 
-function Import._isGslStyleGroup(standingRecords)
-	if Import.config.gslStyleGroupAsWdl or #standingRecords ~= GSL_GROUP_OPPONENT_NUMBER then
-		return
+function Import._needsLastVs(standingRecords)
+	if Import.config.allGroupsUseWdl then
+		return false
+	elseif standingRecords.type == SWISS_GROUP_TYPE then
+		return true
+	elseif #standingRecords ~= GSL_GROUP_OPPONENT_NUMBER then
+		return false
 	end
 
 	for _, record in pairs(standingRecords) do
 		local placement = record.placement
 		if not placement or not GSL_STYLE_SCORES[placement] or
 			not Table.deepEquals(GSL_STYLE_SCORES[placement], record.scoreboard.match) then
-			return
+			return false
 		end
 	end
 
@@ -395,8 +400,8 @@ end
 
 function Import._entryToOpponent(lpdbEntry)
 	local additionalData
-	if lpdbEntry.isGslStyleGroup then
-		additionalData = Import._gslEntryToAdditionalData(lpdbEntry)
+	if lpdbEntry.needsLastVs then
+		additionalData = Import._groupLastVsAdditionalData(lpdbEntry)
 	end
 
 	return {
@@ -440,7 +445,7 @@ function Import._getScore(opponentData)
 		or opponentData.status
 end
 
-function Import._gslEntryToAdditionalData(lpdbEntry)
+function Import._groupLastVsAdditionalData(lpdbEntry)
 	local opponentName = Opponent.toName(lpdbEntry.opponent)
 	local matchConditions = {}
 	for _, matchId in pairs(lpdbEntry.matches) do
@@ -458,11 +463,11 @@ function Import._gslEntryToAdditionalData(lpdbEntry)
 		return
 	end
 
-	return Import._makeAdditionalDataFromGslMatch(opponentName, matchData[1])
+	return Import._makeAdditionalDataFromMatch(opponentName, matchData[1])
 end
 
-function Import._makeAdditionalDataFromGslMatch(opponentName, match)
-	-- catch unfinished or invalid match for GSL style groups
+function Import._makeAdditionalDataFromMatch(opponentName, match)
+	-- catch unfinished or invalid match
 	local winner = tonumber(match.winner)
 	if not winner or winner < 1 or #match.match2opponents ~= 2 then
 		return
