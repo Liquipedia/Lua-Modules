@@ -78,8 +78,7 @@ function CustomPrizePool.run(frame)
 
 	local buildPrizePool = prizePool:build()
 
-	--if _prize_pool_index == 1 and Logic.readBool(Logic.emptyOr(args.storeTournament, Namespace.isMain())) then
-	if _prize_pool_index == 1 then
+	if _prize_pool_index == 1 and Logic.readBool(Logic.emptyOr(args.storeTournament, Namespace.isMain())) then
 		CustomPrizePool._storeIntoTournamentLpdb()
 	end
 
