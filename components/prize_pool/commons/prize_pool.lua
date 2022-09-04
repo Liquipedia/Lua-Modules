@@ -92,12 +92,21 @@ PrizePool.config = {
 	},
 	storeSmw = {
 		default = true,
+		read = function(args)
+			return Logic.readBoolOrNil(args.storesmw)
+		end
 	},
 	storeLpdb = {
 		default = true,
+		read = function(args)
+			return Logic.readBoolOrNil(args.storelpdb)
+		end
 	},
 	resolveRedirect = {
 		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.resolveRedirect)
+		end
 	},
 	syncPlayers = {
 		default = false,
