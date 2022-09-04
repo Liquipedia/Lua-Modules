@@ -7,14 +7,12 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Weight = require('Module:Weight')
 
@@ -132,7 +130,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, extradata)
 
-	lpdbData.mode = CustomPrizePool._getMode(opponentType, opponent.opponentData)
+	lpdbData.mode = CustomPrizePool._getMode(opponent.opponenttype, opponent.opponentData)
 	lpdbData.tournament = _tournament_name
 
 	if _prize_pool_index == 1 and _tournament_extradata_cache[lpdbData.placement or ''] then
@@ -161,7 +159,6 @@ end
 
 function CustomPrizePool._storeIntoTournamentLpdb()
 	local tournamentName = globalVars:get('tournament_name') or mw.title.getCurrentTitle().text
-	local objectName = 'tournament_' .. tournamentName
 
 	local seriesNumber = tonumber(globalVars:get('tournament_series_number'))
 
