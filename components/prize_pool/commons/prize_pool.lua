@@ -874,6 +874,10 @@ function PrizePool:_storeData()
 		end
 	end
 
+	if Table.isNotEmpty(smwTournamentStash) then
+		tournamentVars:set('smwRecords.tournament', Json.stringify(smwTournamentStash))
+	end
+
 	return self
 end
 
@@ -903,7 +907,6 @@ function PrizePool:_storeSmw(lpdbEntry, smwTournamentStash)
 		key = key .. ' place page'
 
 		smwTournamentStash[key] = lpdbEntry.participant
-		tournamentVars:set('smwRecords.tournament', Json.stringify(smwTournamentStash))
 	end
 
 	return smwTournamentStash
