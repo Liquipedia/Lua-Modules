@@ -838,7 +838,7 @@ function PrizePool:_storeData()
 
 	local lpdbData = {}
 	for _, placement in ipairs(self.placements) do
-		local lpdbEntries = placement:_getLpdbData()
+		local lpdbEntries = placement:_getLpdbData(prizePoolIndex, self.options.lpdbPrefix)
 
 		Array.forEach(lpdbEntries, function(lpdbEntry) Table.mergeInto(lpdbEntry, lpdbTournamentData) end)
 
@@ -850,10 +850,7 @@ function PrizePool:_storeData()
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement(
-				PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, self.options.lpdbPrefix),
-				lpdbEntry
-			)
+			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
 		end
 
 		if self.options.storeSmw then
@@ -1078,7 +1075,7 @@ function Placement:_parseOpponentArgs(input, date)
 	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers})
 end
 
-function Placement:_getLpdbData()
+function Placement:_getLpdbData(prizePoolIndex, lpdbPrefix)
 	local entries = {}
 	for opponentIndex, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
@@ -1137,6 +1134,8 @@ function Placement:_getLpdbData()
 			-- Points struct (json?)
 			-- lastvs match2 opponent (json?)
 		}
+
+		lpdbData.objectName = PrizePool:_lpdbObjectName(lpdbData, prizePoolIndex, lpdbPrefix)
 
 		if self.parent._lpdbInjector then
 			lpdbData = self.parent._lpdbInjector:adjust(lpdbData, self, opponent)
