@@ -1135,7 +1135,7 @@ function Placement:_getLpdbData(prizePoolIndex, lpdbPrefix)
 			-- lastvs match2 opponent (json?)
 		}
 
-		lpdbData.objectName = PrizePool:_lpdbObjectName(lpdbData, prizePoolIndex, lpdbPrefix)
+		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, prizePoolIndex, lpdbPrefix)
 
 		if self.parent._lpdbInjector then
 			lpdbData = self.parent._lpdbInjector:adjust(lpdbData, self, opponent)
