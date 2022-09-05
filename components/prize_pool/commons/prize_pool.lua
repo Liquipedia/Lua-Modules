@@ -1075,7 +1075,7 @@ function Placement:_parseOpponentArgs(input, date)
 	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers})
 end
 
-function Placement:_getLpdbData(prizePoolIndex, lpdbPrefix)
+function Placement:_getLpdbData(...)
 	local entries = {}
 	for opponentIndex, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
