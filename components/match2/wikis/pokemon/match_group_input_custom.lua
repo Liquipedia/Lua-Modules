@@ -513,7 +513,7 @@ function mapFunctions.getParticipants(map, opponents)
 end
 
 function mapFunctions.attachToParticipant(player, opponentIndex, players, participants, champion, kda)
-	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
+	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player):gsub(' ', '_')
 	for playerIndex, item in pairs(players or {}) do
 		if player == item.name then
 			participants[opponentIndex .. '_' .. playerIndex] = {
