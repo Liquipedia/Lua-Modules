@@ -20,6 +20,7 @@ local _PREFIXES = {
 		team = 'https://arena.5eplay.com/team/'
 	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
+	apexlegendsstatus = {'https://apexlegendsstatus.com/profile/uid/PC/'},
 	afreeca = {'http://afreecatv.com/'},
 	aoezone = {'https://aoezone.net/'},
 	['ask-fm'] = {'https://ask.fm/'},
@@ -182,6 +183,7 @@ function Links.transform(links)
 	return {
 		['5ewin'] = links['5ewin'],
 		abiosgaming = links.abiosgaming,
+		apexlegendsstatus = links.apexlegendsstatus,
 		afreeca = links.afreeca,
 		afreeca2 = links.afreeca2,
 		aligulac = links.aligulac,
