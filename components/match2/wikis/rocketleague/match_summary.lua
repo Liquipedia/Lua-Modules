@@ -169,8 +169,8 @@ function Header:createOpponent(opponent, opponentIndex)
 	return OpponentDisplay.BlockOpponent({
 		flip = opponentIndex == 1,
 		opponent = opponent,
-		overflow = 'wrap',
-		teamStyle = 'short',
+		overflow = 'ellipsis',
+		teamStyle = 'bracket',
 	})
 		:addClass(opponent.type ~= 'solo'
 			and 'brkts-popup-header-opponent'
