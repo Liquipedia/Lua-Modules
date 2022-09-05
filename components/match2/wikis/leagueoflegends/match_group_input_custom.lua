@@ -531,7 +531,7 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
 		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
 		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
+			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
 		end
 
 		if not Table.isEmpty(player) then
