@@ -849,7 +849,7 @@ function PrizePool:_storeData()
 	for _, placement in ipairs(self.placements) do
 		local lpdbEntries = placement:_getLpdbData()
 
-		Array.forEach(lpdbEntries, function(lpdbEntry) Table.merge(lpdbTournamentData, lpdbEntry) end)
+		lpdbEntries = Array.map(lpdbEntries, function(lpdbEntry) return Table.merge(lpdbTournamentData, lpdbEntry) end)
 
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
