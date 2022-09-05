@@ -8,10 +8,13 @@
 
 local Array = require('Module:Array')
 local Flags = require('Module:Flags')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
+
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
 --[[
 Structural type representation of an opponent.
@@ -245,7 +248,6 @@ function Opponent.resolve(opponent, date, options)
 	if opponent.type == Opponent.team then
 		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
 	elseif Opponent.typeIsParty(opponent.type) then
-		local PlayerExt = require('Module:Player/Ext')
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				PlayerExt.syncPlayer(player)
