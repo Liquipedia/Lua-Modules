@@ -8,14 +8,14 @@
 
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
-local PlayerExt = require('Module:Player/Ext')
 local StarcraftRace = require('Module:Race/Starcraft')
-local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft', {requireDevIfEnabled = true})
 
 local StarcraftOpponent = Table.deepCopy(Opponent)
 
