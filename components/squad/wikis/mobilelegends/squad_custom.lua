@@ -106,6 +106,7 @@ function CustomSquad.runAuto(playerList, squadType)
 
 	squad.type = squadType
 
+	squad.header = CustomSquad.header
 	squad:title():header()
 
 	for _, player in pairs(playerList) do
