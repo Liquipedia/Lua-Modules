@@ -95,7 +95,7 @@ function CustomInjector:parse(id, widgets)
 
 		if not String.isEmpty(args.map1) then
 			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_displayMaps(CustomLeague:_getMaps(args))})
+			table.insert(widgets, Center{content = CustomLeague:_displayMaps(CustomLeague:_getMaps())})
 		end
 	elseif id == 'sponsors' then
 		if not String.isEmpty(args.sponsors) then
@@ -229,7 +229,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
 
 	-- map links, to be used by brackets and mappool templates
-	for _, map in ipairs(CustomLeague:_getMaps(args)) do
+	for _, map in ipairs(CustomLeague:_getMaps()) do
 		Variables.varDefine('tournament_map_'.. map.displayName, map.link)
 	end
 end
@@ -350,11 +350,12 @@ function CustomLeague:_getGameModes(args, makeLink)
 	return gameModes
 end
 
-function CustomLeague:_getMaps(args)
+function CustomLeague:_getMaps()
 	if _league.maps then
 		return _league.maps
 	end
 
+	local args = _league.args
 	local maps = {}
 	for prefix, mapInput in Table.iter.pairsByPrefix(args, 'map') do
 		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or ''
