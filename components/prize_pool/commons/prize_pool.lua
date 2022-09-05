@@ -97,12 +97,6 @@ PrizePool.config = {
 	storeSmw = {
 		default = true,
 	},
-	stashSmw = {
-		default = false,
-		read = function(args)
-			return Logic.readBoolOrNil(args.stashsmw)
-		end
-	},
 	storeLpdb = {
 		default = true,
 	},
@@ -864,10 +858,7 @@ function PrizePool:_storeData()
 	end
 
 	for _, lpdbEntry in ipairs(lpdbData) do
-		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
-		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
-
-		if self.options.storeSmw and self.options.stashSmw then
+		if self.options.storeSmw then
 			local smwEntry = self:_lpdbToSmw(lpdbEntry)
 
 			if self._smwInjector then
@@ -879,9 +870,10 @@ function PrizePool:_storeData()
 			tournamentVars:set('smwRecords.count', count + 1)
 			tournamentVars:set('smwRecords.' .. count .. '.id', Table.extract(smwEntry, 'objectName'))
 			tournamentVars:set('smwRecords.' .. count .. '.data', Json.stringify(smwEntry))
-		elseif self.options.storeSmw then
-			Template.safeExpand(mw.getCurrentFrame(), 'PrizePoolSmwStorage', lpdbEntry)
 		end
+
+		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
+		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 
 		if self.options.storeLpdb then
 			mw.ext.LiquipediaDB.lpdb_placement(
