@@ -17,6 +17,7 @@ local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
 local Math = require('Module:Math')
 local Ordinal = require('Module:Ordinal')
+local PageVariableNamespace = require('Module:PageVariableNamespace')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -24,6 +25,7 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local SmwInjector = Lua.import('Module:Smw/Injector', {requireDevIfEnabled = true})
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 ---Note: This can be overwritten
@@ -35,6 +37,8 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
+
+local tournamentVars = PageVariableNamespace('Tournament')
 
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -92,6 +96,12 @@ PrizePool.config = {
 	},
 	storeSmw = {
 		default = true,
+	},
+	stashSmw = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.stashsmw)
+		end
 	},
 	storeLpdb = {
 		default = true,
@@ -816,6 +826,14 @@ function PrizePool:setLpdbInjector(lpdbInjector)
 	return self
 end
 
+--- Set the SmwInjector.
+-- @param smwInjector SmwInjector An instance of a class that implements the SmwInjector interface
+function PrizePool:setSmwInjector(smwInjector)
+	assert(smwInjector:is_a(SmwInjector), "setSmwInjector: Not an SMW Injector")
+	self._smwInjector = smwInjector
+	return self
+end
+
 function PrizePool:_storeData()
 	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
 	Variables.varDefine('prizepool_index', prizePoolIndex)
@@ -849,19 +867,72 @@ function PrizePool:_storeData()
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 
+		if self.options.storeSmw and self.options.stashSmw then
+			local smwEntry = self:_lpdbToSmw(lpdbEntry)
+
+			if self._smwInjector then
+				smwEntry = self.parent._smwInjector:adjust(smwEntry, lpdbEntry)
+			end
+
+			local count = tonumber(tournamentVars:get('smwRecords.count')) or 0
+			count = count + 1
+			tournamentVars:set('smwRecords.count', count + 1)
+			tournamentVars:set('smwRecords.' .. count .. '.id', Table.extract(smwEntry, 'objectName'))
+			tournamentVars:set('smwRecords.' .. count .. '.data', Json.stringify(smwEntry))
+		elseif self.options.storeSmw then
+			Template.safeExpand(mw.getCurrentFrame(), 'PrizePoolSmwStorage', lpdbEntry)
+		end
+
 		if self.options.storeLpdb then
 			mw.ext.LiquipediaDB.lpdb_placement(
 				PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, self.options.lpdbPrefix),
 				lpdbEntry
 			)
 		end
-
-		if self.options.storeSmw then
-			Template.safeExpand(mw.getCurrentFrame(), 'PrizePoolSmwStorage', lpdbEntry)
-		end
 	end
 
 	return self
+end
+
+function PrizePool:_lpdbToSmw(lpdbData)
+	local smwOpponentData = {}
+	if lpdbData.opponenttype == Opponent.team then
+		smwOpponentData['has team page'] = lpdbData.participant
+	elseif lpdbData.opponenttype == Opponent.literal then
+		smwOpponentData['has literal team'] = lpdbData.participant
+	elseif lpdbData.opponenttype == Opponent.solo then
+		local playersData = Json.parseIfString(lpdbData.players) or {}
+		smwOpponentData = {
+			['has player id'] = lpdbData.participant,
+			['has player page'] = lpdbData.participantlink,
+			['has flag'] = lpdbData.participantflag,
+			['has team page'] = playersData.p1team,
+			['has team'] = playersData.p1team,
+		}
+	end
+
+	return Table.mergeInto({
+			objectName = lpdbData.objectName,
+
+			['has tournament page'] = lpdbData.parent,
+			['has tournament name'] = lpdbData.tournament,
+			['has tournament type'] = lpdbData.type,
+			['has tournament series'] = lpdbData.series,
+			['has icon'] = lpdbData.icon,
+			['is result type'] = lpdbData.mode,
+			['has game'] = lpdbData.game,
+			['has date'] = lpdbData.date,
+			['is tier'] = lpdbData.liquipediatier,
+			['has placement'] = lpdbData.placement,
+			['has prizemoney'] = lpdbData.prizemoney,
+			['has last opponent'] = lpdbData.lastvs,
+			['has last score'] = lpdbData.lastscore,
+			['has last opponent score'] = lpdbData.lastvsscore,
+			['has last wdl'] = lpdbData.groupscore,
+			['has weight'] = lpdbData.weight,
+		},
+		smwOpponentData
+	)
 end
 
 -- get the lpdbObjectName depending on opponenttype
