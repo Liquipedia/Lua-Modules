@@ -105,7 +105,7 @@ function Wrapper._processOpponent(args)
 
 	-- archon handling gets ignored here
 	-- due to the input patern for them being inconsistent it is unfeasible to regex them
-	-- hence they will be manually converted to use the automated GroupTableLeague
+	-- hence they already got manually converted to use the automated GroupTableLeague
 
 	return opponentArgs
 end
