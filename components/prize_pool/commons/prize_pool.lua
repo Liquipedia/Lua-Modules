@@ -884,9 +884,8 @@ function PrizePool:_storeSmw(lpdbEntry, smwTournamentStash)
 		smwEntry = self._smwInjector:adjust(smwEntry, lpdbEntry)
 	end
 
-	local count = tonumber(tournamentVars:get('smwRecords.count')) or 0
-	count = count + 1
-	tournamentVars:set('smwRecords.count', count + 1)
+	local count = (tonumber(tournamentVars:get('smwRecords.count')) or 0) + 1
+	tournamentVars:set('smwRecords.count', count)
 	tournamentVars:set('smwRecords.' .. count .. '.id', Table.extract(smwEntry, 'objectName'))
 	tournamentVars:set('smwRecords.' .. count .. '.data', Json.stringify(smwEntry))
 
