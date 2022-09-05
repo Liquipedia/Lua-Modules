@@ -169,7 +169,7 @@ function Header:createOpponent(opponent, opponentIndex)
 	return OpponentDisplay.BlockOpponent({
 		flip = opponentIndex == 1,
 		opponent = opponent,
-		overflow = 'wrap',
+		overflow = 'ellipsis',
 		teamStyle = 'bracket',
 	})
 		:addClass(opponent.type ~= 'solo'
