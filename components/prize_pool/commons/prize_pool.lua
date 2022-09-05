@@ -16,6 +16,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
 local Math = require('Module:Math')
+local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
@@ -35,6 +36,8 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
+
+local pageVars = PageVariableNamespace('PrizePool')
 
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -95,6 +98,12 @@ PrizePool.config = {
 	},
 	storeLpdb = {
 		default = true,
+	},
+	stashLpdb = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.stashlpdb)
+		end
 	},
 	resolveRedirect = {
 		default = false,
@@ -843,6 +852,10 @@ function PrizePool:_storeData()
 		Array.forEach(lpdbEntries, function(lpdbEntry) Table.mergeInto(lpdbEntry, lpdbTournamentData) end)
 
 		Array.extendWith(lpdbData, lpdbEntries)
+	end
+
+	if self.options.stashLpdb then
+		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
 	end
 
 	for _, lpdbEntry in ipairs(lpdbData) do
