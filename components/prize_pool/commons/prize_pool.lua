@@ -860,35 +860,7 @@ function PrizePool:_storeData()
 	local smwTournamentStash = {}
 	for _, lpdbEntry in ipairs(lpdbData) do
 		if self.options.storeSmw then
-			local smwEntry = self:_lpdbToSmw(lpdbEntry)
-
-			if self._smwInjector then
-				smwEntry = self._smwInjector:adjust(smwEntry, lpdbEntry)
-			end
-
-			local count = tonumber(tournamentVars:get('smwRecords.count')) or 0
-			count = count + 1
-			tournamentVars:set('smwRecords.count', count + 1)
-			tournamentVars:set('smwRecords.' .. count .. '.id', Table.extract(smwEntry, 'objectName'))
-			tournamentVars:set('smwRecords.' .. count .. '.data', Json.stringify(smwEntry))
-
-			local place = smwEntry['has placement']
-			if place and not Placement.specialStatuses[string.upper(place)] then
-				local key = 'has '
-				if String.isNotEmpty(self.options.lpdbPrefix) then
-					key = key .. self.options.lpdbPrefix .. ' '
-				end
-				place = mw.text.split(place, '-')[1]
-				key = key .. Template.safeExpand(mw.getCurrentFrame(), 'OrdinalWritten/' .. place, {}, '')
-				if lpdbEntry.opponentindex ~= 1 then
-					key = key .. lpdbEntry.opponentindex
-				end
-				key = key .. ' place page'
-
-				smwTournamentStash[key] = lpdbEntry.participant
-
-				tournamentVars:set('smwRecords.tournament', Json.stringify(smwTournamentStash))
-			end
+			smwTournamentStash = self:_storeSmw(lpdbEntry, smwTournamentStash)
 		end
 
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
@@ -903,6 +875,39 @@ function PrizePool:_storeData()
 	end
 
 	return self
+end
+
+function PrizePool:_storeSmw(lpdbEntry, smwTournamentStash)
+	local smwEntry = self:_lpdbToSmw(lpdbEntry)
+
+	if self._smwInjector then
+		smwEntry = self._smwInjector:adjust(smwEntry, lpdbEntry)
+	end
+
+	local count = tonumber(tournamentVars:get('smwRecords.count')) or 0
+	count = count + 1
+	tournamentVars:set('smwRecords.count', count + 1)
+	tournamentVars:set('smwRecords.' .. count .. '.id', Table.extract(smwEntry, 'objectName'))
+	tournamentVars:set('smwRecords.' .. count .. '.data', Json.stringify(smwEntry))
+
+	local place = smwEntry['has placement']
+	if place and not Placement.specialStatuses[string.upper(place)] then
+		local key = 'has '
+		if String.isNotEmpty(self.options.lpdbPrefix) then
+			key = key .. self.options.lpdbPrefix .. ' '
+		end
+		place = mw.text.split(place, '-')[1]
+		key = key .. Template.safeExpand(mw.getCurrentFrame(), 'OrdinalWritten/' .. place, {}, '')
+		if lpdbEntry.opponentindex ~= 1 then
+			key = key .. lpdbEntry.opponentindex
+		end
+		key = key .. ' place page'
+
+		smwTournamentStash[key] = lpdbEntry.participant
+		tournamentVars:set('smwRecords.tournament', Json.stringify(smwTournamentStash))
+	end
+
+	return smwTournamentStash
 end
 
 function PrizePool:_lpdbToSmw(lpdbData)
