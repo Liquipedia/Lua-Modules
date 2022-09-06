@@ -63,12 +63,11 @@ function CustomInjector:addCustomCells(widgets)
 			table.insert(baseDamages, CustomWeapon:_createContextualNoWrappingSpan(baseDamage, index, DAMAGE_INFO))
 		end
 		if String.isNotEmpty(args.basedamagenote) then
-			local noteString = '<span style="font-size:80%">' .. args.basedamagenote .. '</span>'
-			table.insert(baseDamages, noteString)
+			table.insert(baseDamages, CustomWeapon:_createContextualNoWrappingNote(args.basedamagenote))
 		end
 		table.insert(widgets, Cell{
 			name = 'Damage',
-			content = {table.concat(baseDamages, '<br>')}
+			content = baseDamages
 		})
 	end
 
@@ -93,12 +92,11 @@ function CustomInjector:addCustomCells(widgets)
 			table.insert(rofTimes, CustomWeapon:_createContextualNoWrappingSpan(rofTime, index, BOLT_INFO))
 		end
 		if String.isNotEmpty(args.ratesoffirenote) then
-			local noteString = '<span style="font-size:80%">' .. args.ratesoffirenote .. '</span>'
-			table.insert(rofTimes, noteString)
+			table.insert(rofTimes, CustomWeapon:_createContextualNoWrappingNote(args.ratesoffirenote))
 		end
 		table.insert(widgets, Cell{
 			name = 'Rates of Fire',
-			content = {table.concat(rofTimes, '<br>')}
+			content = rofTimes
 		})
 	end
 
@@ -113,12 +111,11 @@ function CustomInjector:addCustomCells(widgets)
 			table.insert(ammoSizes, CustomWeapon:_createContextualNoWrappingSpan(ammoSize, index, MAGAZINE_INFO))
 		end
 		if String.isNotEmpty(args.ammocapacitynote) then
-			local noteString = '<span style="font-size:80%">' .. args.ammocapacitynote .. '</span>'
-			table.insert(ammoSizes, noteString)
+			table.insert(ammoSizes, CustomWeapon:_createContextualNoWrappingNote(args.ammocapacitynote))
 		end
 		table.insert(widgets, Cell{
 			name = 'Ammo Capacity',
-			content = {table.concat(ammoSizes, '<br>')}
+			content = ammoSizes
 		})
 	end
 
@@ -128,12 +125,11 @@ function CustomInjector:addCustomCells(widgets)
 			table.insert(reloadTimes, CustomWeapon:_createContextualNoWrappingSpan(reloadTime, index, MAGAZINE_INFO))
 		end
 		if String.isNotEmpty(args.reloadtimenote) then
-			local noteString = '<span style="font-size:80%">' .. args.reloadtimenote .. '</span>'
-			table.insert(reloadTimes, noteString)
+			table.insert(reloadTimes, CustomWeapon:_createContextualNoWrappingNote(args.reloadtimenote))
 		end
 		table.insert(widgets, Cell{
 			name = 'Reload Speed',
-			content = {table.concat(reloadTimes, '<br>')}
+			content = reloadTimes
 		})
 	end
 
@@ -204,6 +200,10 @@ function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTabl
 	end
 
 	return tostring(span)
+end
+
+function CustomWeapon:_createContextualNoWrappingNote(noteText)
+	return '<span style="font-size:80%">' .. noteText .. '</span>'
 end
 
 function CustomWeapon:addToLpdb(lpdbData)
