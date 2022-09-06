@@ -15,7 +15,7 @@ local OUTPUT_FORMAT = '<abbr data-tz="${tzDataLong}" title="${tzTitle} (UTC${tzD
 
 local Timezone = {}
 
-function Timezone._getTimezoneData(timezone)
+function Timezone.getTimezoneData(timezone)
 	if String.isEmpty(timezone) then
 		return
 	end
@@ -34,7 +34,7 @@ function Timezone._getTimezoneData(timezone)
 end
 
 function Timezone.getTimezoneString(timezone)
-	local timezoneData = Timezone._getTimezoneData(timezone)
+	local timezoneData = Timezone.getTimezoneData(timezone)
 	if not timezoneData then
 		return
 	end
