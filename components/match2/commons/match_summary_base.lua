@@ -58,8 +58,8 @@ function Header:createOpponent(opponent, side)
 		flip = side == 'left',
 		opponent = opponent,
 		showLink = showLink,
-		overflow = 'wrap',
-		teamStyle = 'short',
+		overflow = 'ellipsis',
+		teamStyle = 'bracket',
 	}
 end
 

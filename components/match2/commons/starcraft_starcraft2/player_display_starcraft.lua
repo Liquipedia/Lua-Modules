@@ -9,15 +9,15 @@
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PlayerExt = require('Module:Player/Ext')
-local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
 local Abbreviation = require('Module:Abbreviation')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft', {requireDevIfEnabled = true})
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
 	getSmallIcon = function(_) end,
 }

@@ -169,8 +169,8 @@ function Header:createOpponent(opponent, opponentIndex)
 	return OpponentDisplay.BlockOpponent({
 		flip = opponentIndex == 1,
 		opponent = opponent,
-		overflow = 'wrap',
-		teamStyle = 'short',
+		overflow = 'ellipsis',
+		teamStyle = 'bracket',
 	})
 		:addClass(opponent.type ~= 'solo'
 			and 'brkts-popup-header-opponent'
@@ -178,12 +178,14 @@ function Header:createOpponent(opponent, opponentIndex)
 end
 
 function Header:create()
-	return self.root
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
 		:node(self.leftElementAdditional)
 		:node(self.leftElement)
-		:node(self.scoreBoard)
+	self.root:node(self.scoreBoard)
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
 		:node(self.rightElement)
 		:node(self.rightElementAdditional)
+	return self.root
 end
 
 

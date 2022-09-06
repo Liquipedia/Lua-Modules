@@ -10,9 +10,11 @@ local Array = require('Module:Array')
 local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
-local PlayerExt = require('Module:Player/Ext')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
 local globalVars = PlayerExt.globalVars
 
