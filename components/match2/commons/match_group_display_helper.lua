@@ -101,8 +101,8 @@ function DisplayHelper.MatchCountdownBlock(match)
 	local dateString
 	if match.dateIsExact == true then
 		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
-		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', timestamp) .. ' '
-					.. (Timezone.getTimezoneString(match.extradata.timezoneid) or _UTC)
+		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
+				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or _UTC)
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end
