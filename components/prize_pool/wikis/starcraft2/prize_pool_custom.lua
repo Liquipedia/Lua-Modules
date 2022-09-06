@@ -14,17 +14,19 @@ local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local SmwInjector = Lua.import('Module:Smw/Injector', {requireDevIfEnabled = true})
 local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 
-local globalVars = PageVariableNamespace{cached = true}
-local pageVars = PageVariableNamespace('PrizePool')
-
 local CustomLpdbInjector = Class.new(LpdbInjector)
+local CustomSmwInjector = Class.new(SmwInjector)
+
+local pageVars = PageVariableNamespace('PrizePool')
 
 local CustomPrizePool = {}
 
@@ -42,11 +44,11 @@ local PLACE_TO_KEY_PREFIX = {'winner', 'runnerup', 'third', 'fourth'}
 local SEMIFINALS_PREFIX = 'sf'
 local TBD = 'TBD'
 
-local _tournament_name
-local _prize_pool_index
-local _lpdb_prefix
-local _placement_cache = {}
+local _lpdb_stash = {}
+local _series
+local _tier
 local _tournament_extradata_cache = {{}, {}, {}, {}, ['3-4'] = {}}
+local _tournament_name
 
 -- Template entry point
 function CustomPrizePool.run(frame)
@@ -63,11 +65,9 @@ function CustomPrizePool.run(frame)
 	args.storesmw = Logic.emptyOr(args.storesmw, Namespace.isMain())
 	args.syncPlayers = Logic.emptyOr(args.syncPlayers, true)
 
-	-- set default lpdb_prefix as a hack to make TeamCards work ...
-	_prize_pool_index = (tonumber(globalVars:get('prizepool_index')) or 0) + 1
-	_lpdb_prefix = (args.lpdb_prefix or '') .. _prize_pool_index
-	args.lpdb_prefix = _lpdb_prefix
 	_tournament_name = args['tournament name']
+	_series = args.series
+	_tier = args.tier
 
 	-- fixed setting
 	args.resolveRedirect = true
@@ -75,26 +75,30 @@ function CustomPrizePool.run(frame)
 	local prizePool = PrizePool(args):create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
+	prizePool:setSmwInjector(CustomSmwInjector())
 
 	local buildPrizePool = prizePool:build()
 
-	if _prize_pool_index == 1 and Logic.readBool(Logic.emptyOr(args.storeTournament, Namespace.isMain())) then
+	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
+	if prizePoolIndex == 1 and Logic.readBool(Logic.emptyOr(args.storeTournament, Namespace.isMain())) then
 		CustomPrizePool._storeIntoTournamentLpdb()
 	end
 
-	pageVars:set('placementRecords.' .. _prize_pool_index, Json.stringify(_placement_cache))
+	if Logic.readBool(args.storelpdb) then
+		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(_lpdb_stash))
+	end
 
 	return buildPrizePool
 end
 
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
-	local seriesNumber = tonumber(globalVars:get('tournament_series_number'))
+	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	local lastStatuses = {
 		CustomPrizePool._getStatusFromScore(lpdbData.lastscore),
 		CustomPrizePool._getStatusFromScore(lpdbData.lastvsscore),
 	}
 	local extradata = {
-		featured = globalVars:get('featured') or 'false',
+		featured = Variables.varDefault('featured') or 'false',
 		lastStatuses = lastStatuses,
 		placeRange = {placement.placeStart, placement.placeEnd},
 		playernumber = StarcraftOpponent.partySize(opponent.opponentData),
@@ -105,43 +109,60 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		woto = lastStatuses[2] == WALKOVER_VS_STATUS or nil,
 	}
 
+	-- make these available for the stash further down
+	lpdbData.liquipediatier = _tier or Variables.varDefault('tournament_liquipediatier')
+	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')
+	lpdbData.type = Variables.varDefault('tournament_type')
+
 	lpdbData.weight = Weight.calc(
 		lpdbData.individualprizemoney or 0,
-		globalVars:get('tournament_liquipediatier'),
+		lpdbData.liquipediatier,
 		lpdbData.placement,
-		globalVars:get('tournament_liquipediatiertype'),
-		globalVars:get('tournament_type')
+		lpdbData.liquipediatiertype,
+		lpdbData.type
 	)
 
 	if type(lpdbData.players) == 'table' then
-		lpdbData.players.type = lpdbData.opponenttype
+		lpdbData.players = StarcraftOpponent.toLpdbStruct(opponent.opponentData).opponentplayers
 	end
 
 	if lpdbData.lastvs then
-		local lastVs = (opponent.additionalData or {}).LASTVS
-		extradata.vsOpponent = Json.stringify(lastVs)
-		lastVs = StarcraftOpponent.toLpdbStruct(lastVs) or {}
-		lpdbData.lastvs = Json.stringify(Table.merge(
-				lastVs.opponentplayers or {},
-				{type = lastVs.opponenttype}
-			))
+		local lastVs = opponent.additionalData.LASTVS
+		extradata.vsOpponent = Table.deepCopy(lastVs)
+		if lastVs.type ~= StarcraftOpponent.team then
+			lastVs = StarcraftOpponent.toLpdbStruct(lastVs) or {}
+			lpdbData.lastvs = Json.stringify(Table.merge(
+					lastVs.opponentplayers or {},
+					{type = lastVs.opponenttype}
+				))
+		end
 	end
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, extradata)
 
 	lpdbData.mode = CustomPrizePool._getMode(opponent.opponenttype, opponent.opponentData)
 	lpdbData.tournament = _tournament_name
+	lpdbData.series = _series
 
-	if _prize_pool_index == 1 and _tournament_extradata_cache[lpdbData.placement or ''] then
+	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
+	if prizePoolIndex == 1 and _tournament_extradata_cache[lpdbData.placement or ''] then
 		table.insert(_tournament_extradata_cache[lpdbData.placement], Table.deepCopy(lpdbData))
 	end
 
-	-- store lpdbData as wiki-var for TeamCards
-	-- ugly hack for now ...
-	lpdbData.id = PrizePool:_lpdbObjectName(lpdbData, _prize_pool_index, _lpdb_prefix)
-	table.insert(_placement_cache, Table.deepCopy(lpdbData))
+	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
+	lpdbData.id = lpdbData.objectName -- wanted for the stash
+
+	table.insert(_lpdb_stash, Table.deepCopy(lpdbData))
 
 	return lpdbData
+end
+
+function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
+	if lpdbData.opponenttype == StarcraftOpponent.team then
+		return lpdbData.objectName .. '_' .. prizePoolIndex
+	end
+
+	return lpdbData.objectName
 end
 
 function CustomPrizePool._getMode(opponentType, opponent)
@@ -157,13 +178,13 @@ function CustomPrizePool._getStatusFromScore(score)
 end
 
 function CustomPrizePool._storeIntoTournamentLpdb()
-	local tournamentName = globalVars:get('tournament_name') or mw.title.getCurrentTitle().text
+	local tournamentName = Variables.varDefault('tournament_name', mw.title.getCurrentTitle().text)
 
-	local seriesNumber = tonumber(globalVars:get('tournament_series_number'))
+	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 
 	local extradata = {
 		seriesNumber = seriesNumber and string.format('%05d', seriesNumber) or '',
-		featured = globalVars:get('featured') or 'false'
+		featured = Variables.varDefault('featured') or 'false'
 	}
 
 	for _, placement in pairs(_tournament_extradata_cache) do
@@ -238,6 +259,66 @@ function CustomPrizePool._entryToTournamentExtradata(prefix, entry)
 	end
 
 	return {[prefix] = TBD}
+end
+
+function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
+	local extradata = Json.parseIfString(lpdbEntry.extradata) or {}
+	local additionalCommonProps = {
+		mode = lpdbEntry.mode,
+		['has points'] = extradata.points,
+		['has points2'] = extradata.points2,
+		['has walkover from'] = extradata.wofrom and '1' or nil,
+		['has walkover to'] = extradata.woto and '1' or nil,	
+	}
+
+	-- fix lastvs opponent stuff
+	if lpdbEntry.lastvs then
+		local lastVs = extradata.vsOpponent or {}
+		if lastVs.type == StarcraftOpponent.solo then
+			smwEntry['has last opponent page'] = lastVs.players[1].pageName
+			smwEntry['has last opponent'] = lastVs.players[1].displayName
+		elseif StarcraftOpponent.typeIsParty(lastVs.type) then
+			smwEntry['has last opponent'] = nil
+			for playerIndex, player in ipairs(lastVs.players) do
+				smwEntry['has last opponent ' .. playerIndex .. ' page'] = player.pageName
+				smwEntry['has last opponent ' .. playerIndex] = player.displayName
+			end
+		end
+	end
+
+	return Table.merge(
+		CustomPrizePool._opponentSmwProps(smwEntry, lpdbEntry),
+		additionalCommonProps
+	)
+end
+
+function CustomPrizePool._opponentSmwProps(smwEntry, lpdbData)
+	if lpdbData.opponenttype == StarcraftOpponent.team or lpdbData.opponenttype == StarcraftOpponent.literal then
+		return smwEntry
+	elseif lpdbData.opponenttype == StarcraftOpponent.solo then
+		local playersData = Json.parseIfString(lpdbData.players) or {}
+		smwEntry['has race'] = playersData.p1race
+		return smwEntry
+	end
+
+	local playersData = Json.parseIfString(lpdbData.players) or {}
+	local isArchon = playersData.isArchon
+	if isArchon then
+		smwEntry['is Archon'] = 'true'
+	end
+
+	for prefix, playerPage, playerIndex in Table.iter.pairsByPrefix(playersData, 'p') do
+		-- skip first as it is already processed and syntax is different
+		if playerIndex ~= 1 then
+			smwEntry['has player ' .. playerIndex] = playersData[prefix .. 'dn']
+			smwEntry['has player ' .. playerIndex .. ' page'] = playerPage
+			smwEntry['has player ' .. playerIndex .. ' flag'] = playersData[prefix .. 'flag']
+			smwEntry['has player ' .. playerIndex .. ' team'] = playersData[prefix .. 'team']
+			smwEntry['has player ' .. playerIndex .. ' race'] = (not isArchon) and playersData[prefix .. 'race'] or nil
+		end
+	end
+
+	return smwEntry
 end
 
 return CustomPrizePool
