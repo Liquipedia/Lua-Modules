@@ -1061,7 +1061,8 @@ function Placement:init(args, parent, lastPlacement)
 		self.placeEnd = lastPlacement + math.max(#self.opponents, 1)
 	end
 
-	assert(#self.opponents <= 1 + self.placeEnd - self.placeStart, 'Placement: Too many opponents')
+	assert(#self.opponents <= 1 + self.placeEnd - self.placeStart,
+		'Placement: Too many opponents in place ' .. self.placeStart .. '-' .. self.placeStart)
 
 	self.placeDisplay = self:_displayPlace()
 end
