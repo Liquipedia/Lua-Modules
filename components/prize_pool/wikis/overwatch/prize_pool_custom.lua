@@ -20,7 +20,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local TIER_VALUE = {10, 6, 4, 2}
+local TIER_VALUE = {10000, 5000, 2}
 local TYPE_MODIFIER = {Online = 0.65}
 
 -- Template entry point
@@ -43,9 +43,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	local participantLower = mw.ustring.lower(lpdbData.participant)
 
-	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
-	Variables.varDefine('enddate_'.. lpdbData.participant .. '_date', lpdbData.date)
-	Variables.varDefine('status'.. lpdbData.participant .. '_date', lpdbData.date)
+	Variables.varDefine(participantLower .. '_pointprize', lpdbData.extradata.prizepoints)
+	Variables.varDefine('enddate_'.. lpdbData.participant, lpdbData.date)
+	Variables.varDefine('status'.. lpdbData.participant, lpdbData.date)
 
 	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 
