@@ -36,7 +36,7 @@ function CustomSquad.header(self)
 	headerRow		:node(makeHeader('ID'))
 					:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
 	if HAS_NUMBER then
-		headerRow 	:node(makeHeader('Number'))
+		headerRow	:node(makeHeader('Number'))
 	end
 	headerRow		:node(makeHeader('Name'))
 					:node(makeHeader('Position'))
