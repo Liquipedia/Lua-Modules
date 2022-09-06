@@ -23,7 +23,6 @@ local TournamentUtil = Lua.import('Module:Tournament/Util', {requireDevIfEnabled
 
 local GROUPSCORE_DELIMITER = '-'
 local SCORE_STATUS = 'S'
-local DASH = '&#045;'
 local DEFAULT_ELIMINATION_STATUS = 'down'
 local THIRD_PLACE_MATCH_ID = 'RxMTP'
 local GSL_GROUP_OPPONENT_NUMBER = 4
