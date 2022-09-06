@@ -31,7 +31,7 @@ local CACHED_DATA = {
 }
 
 function StarcraftLegacyPrizePool.run(frame)
-	local args = Template.retrieveReturnValues('StarcraftLegacyPrizePool')
+	local args = Template.retrieveReturnValues('PrizePool')
 	local header = Array.sub(args, 1, 1)[1]
 
 	if Logic.readBool(header.award) then
