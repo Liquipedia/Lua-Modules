@@ -345,24 +345,20 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	priorPlacement = priorPlacement or {}
 	local placement = Table.deepCopy(priorPlacement, {copyMetatable = true})
 
-	local placeStart = (priorPlacement.placeEnd or 0) + 1
-	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
-
 	return Table.mergeInto(placement, {
 			args = {},
 			hasUSD = false,
 			opponents = {},
 			prizeRewards = {},
-			placeStart = placeStart,
-			placeEnd = placeEnd,
-			placeDisplay = Import._getPlaceDisplay(placeStart, placeEnd),
+			placeStart = (priorPlacement.placeEnd or 0) + 1,
+			placeEnd = (priorPlacement.placeEnd or 0) + placementSize,
 		})
 end
 
 function Import._getPlaceDisplay(placeStart, placeEnd)
 	local display = Ordinal._ordinal(placeStart)
 	if placeEnd > placeStart then
-		return display .. DASH .. Ordinal._ordinal(placeEnd)
+		return display .. '-' .. Ordinal._ordinal(placeEnd)
 	end
 
 	return display
@@ -377,9 +373,11 @@ function Import._mergePlacement(lpdbEntries, placement)
 		)
 	end
 
+mw.logObject(placement)
 	assert(
 		#placement.opponents <= 1 + placement.placeEnd - placement.placeStart,
-		'Import: Too many opponents returned from query for placement range ' .. placement.placeDisplay
+		'Import: Too many opponents returned from query for placement range '
+			.. Import._getPlaceDisplay(placement.placeStart, placement.placeEnd)
 	)
 
 	return placement
@@ -414,19 +412,19 @@ function Import._entryToOpponent(lpdbEntry)
 	return {
 		additionalData = additionalData or {
 			GROUPSCORE = Import._makeGroupScore(lpdbEntry),
-			LASTVS = Import._kickIfTbd(lpdbEntry.vsOpponent),
+			LASTVS = Import._removeIfTbd(lpdbEntry.vsOpponent),
 			LASTVSSCORE = {
 				score = Import._getScore(lpdbEntry.opponent),
 				vsscore = Import._getScore(lpdbEntry.vsOpponent),
 			},
 		},
 		date = lpdbEntry.date,
-		opponentData = Import._kickIfTbd(lpdbEntry.opponent),
+		opponentData = Import._removeIfTbd(lpdbEntry.opponent),
 		prizeRewards = {},
 	}
 end
 
-function Import._kickIfTbd(opponent)
+function Import._removeIfTbd(opponent)
 	return (Table.isEmpty(opponent) or Opponent.isTbd(opponent))
 		and {} or opponent
 end
