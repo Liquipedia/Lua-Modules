@@ -11,7 +11,9 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
+local Abbreviation = require('Module:Abbreviation')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
 local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
@@ -19,6 +21,8 @@ local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft', {requireDev
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
 	getSmallIcon = function(_) end,
 }
+
+local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 
 local html = mw.html
 
@@ -36,6 +40,7 @@ StarcraftPlayerDisplay.propTypes.BlockPlayer = {
 	showLink = 'boolean?',
 	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
+	abbreviateTbd = 'boolean?',
 }
 
 --[[
@@ -48,7 +53,9 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 
 	local zeroWidthSpace = '&#8203;'
 	local nameNode = html.create(props.dq and 's' or 'span'):addClass('name')
-		:wikitext(props.showLink ~= false and player.pageName
+		:wikitext(
+			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
+			or props.showLink ~= false and player.pageName
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
 			or Logic.emptyOr(player.displayName, zeroWidthSpace)
 		)

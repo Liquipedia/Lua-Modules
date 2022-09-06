@@ -70,6 +70,7 @@ StarcraftOpponentDisplay.propTypes.BlockOpponent = {
 	showRace = 'boolean?',
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 	playerClass = 'string?',
+	abbreviateTbd = 'boolean?',
 }
 
 --[[
@@ -173,6 +174,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 			showPlayerTeam = props.showPlayerTeam,
 			showRace = showRace and not opponent.isArchon and not opponent.isSpecialArchon,
 			team = player.team,
+			abbreviateTbd = props.abbreviateTbd,
 		})
 			:addClass(props.playerClass)
 	end)
