@@ -119,7 +119,6 @@ function StarcraftLegacyPrizePool.run(frame)
 		newArgs['qualifies' .. linkData.id] = linkData.link
 		newArgs['qualifies' .. linkData.id .. 'name'] = linkData.name
 	end
-mw.logObject(newArgs)
 
 	return CustomPrizePool.run(newArgs)
 end
