@@ -8,9 +8,9 @@
 
 local Array = require('Module:Array')
 local Currency = require('Module:Currency')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local Points = mw.loadData('Module:Points/data')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -29,8 +29,6 @@ local CACHED_DATA = {
 	inputToId = {},
 	qualifiers = {},
 }
-
-local CHECKMARK = '<div class="fa fa-check green-check"></div>'
 
 function StarcraftLegacyPrizePool.run(frame)
 	local args = Template.retrieveReturnValues('StarcraftLegacyPrizePool')
@@ -78,7 +76,6 @@ function StarcraftLegacyPrizePool.run(frame)
 	newArgs['tournament name'] = header['tournament name']
 
 	-- import settings
-	local import = header.lpdb
 	if header.lpdb and header.lpdb ~= 'auto' then
 		newArgs.import = header.lpdb
 	end
@@ -294,13 +291,13 @@ function StarcraftLegacyPrizePool.mapOpponents(slot, newData)
 
 		if slot['points' .. opponentIndex] then
 			local param = CACHED_DATA.inputToId['points']
-			CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['points' .. opponentIndex])
+			StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, slot['points' .. opponentIndex])
 		end
 
 		local points2 = slot['2points' .. opponentIndex] or slot['2points']
 		if points2 then
 			local param = CACHED_DATA.inputToId['points2']
-			CustomLegacyPrizePool._setOpponentReward(opponentData, param, points2)
+			StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, points2)
 		end
 
 		return Table.merge(newData, opponentData)
@@ -319,7 +316,7 @@ function StarcraftLegacyPrizePool.mapOpponents(slot, newData)
 			table.insert(emptyOpponentCache, {})
 		end
 	end
-	
+
 	return opponents
 end
 
@@ -339,7 +336,7 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 		else
 			nameInput = slot[argsIndex]
 		end
-		nameInput = mwt.ext.split(nameInput, '|')
+		nameInput = mw.text.split(nameInput, '|')
 		return {
 			type = CACHED_DATA.defaultOpponentType,
 			isarchon = CACHED_DATA.defaultIsArchon,
@@ -365,7 +362,7 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 			nameInput = slot[argsIndex]
 			argsIndex = argsIndex + 1
 		end
-		nameInput = mwt.ext.split(nameInput, '|')
+		nameInput = mw.text.split(nameInput, '|')
 
 		opponentData['p' .. playerIndex] = nameInput[#nameInput]
 		opponentData['p' .. playerIndex .. 'link'] = slot[prefix .. 'link' .. opponentIndex .. 'p' .. playerIndex]
@@ -435,6 +432,14 @@ function StarcraftLegacyPrizePool.parseWikiLink(input)
 	end
 
 	return links
+end
+
+function StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, value)
+	if param == 'seed' then
+		PrizePoolLegacy.handleSeed(opponentData, value, 1)
+	else
+		opponentData[param] = value
+	end
 end
 
 return StarcraftLegacyPrizePool
