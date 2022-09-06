@@ -22,7 +22,7 @@ jobs:
       - name: test
         run: |
           luacheck ./ |
-          luacheck ./ --quiet --formatter=JUnit > report.xml
+          luacheck ./ --formatter=JUnit > report.xml
 
       - name: junit
         uses: mikepenz/action-junit-report@v3
@@ -30,4 +30,5 @@ jobs:
         with:
           report_paths: 'report.xml'
           check_name: 'junit-report'
+          job_summary: false
 
