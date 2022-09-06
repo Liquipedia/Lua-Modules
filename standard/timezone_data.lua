@@ -64,9 +64,13 @@ return {
 		name = 'Central Standard Time',
 		offset = {-6, 0},
 	},
+	CDT = {
+		name = 'Central Daylight Time',
+		offset = {-5, 0},
+	},
 	CT = {
 		name = 'Central Standard Time',
-		offset = {-5, 0},
+		offset = {-6, 0},
 	},
 	EDT = {
 		name = 'Eastern Daylight Time',
