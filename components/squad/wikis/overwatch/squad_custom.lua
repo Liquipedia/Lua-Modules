@@ -34,7 +34,7 @@ function CustomSquad.header(self)
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
 	headerRow		:node(makeHeader('ID'))
-	 				:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
+					:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
 	if HAS_NUMBER then
 		headerRow 	:node(makeHeader('Number'))
 	end
@@ -115,11 +115,10 @@ function CustomSquad.run(frame)
 
 		index = index + 1
 	end
-	
+
 	squad.header = CustomSquad.header
 	squad:header()
 
-	local index = 1
 	while args['p' .. index] or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
 
