@@ -14,15 +14,17 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
+local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
 local OldStarcraftPrizePool = Lua.import('Module:PrizePool/Starcraft/next', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
 
 local StarcraftLegacyPrizePool = {}
 
 local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+local IMPORT_DEFAULT_ENABLE_START = '2022-01-14'
 
 local CACHED_DATA = {
 	next = {points = 1, qual = 1, freetext = 1},
@@ -79,12 +81,14 @@ function StarcraftLegacyPrizePool.run(frame)
 	if header.lpdb and header.lpdb ~= 'auto' then
 		newArgs.import = header.lpdb
 	end
+	newArgs.importDefaultEnableStart = header.importDefaultEnableStart
+		or IMPORT_DEFAULT_ENABLE_START
 	newArgs.importLimit = header.importLimit
-	newArgs.tournament = header.tournament
+	newArgs.tournament1 = header.tournament1 or header.tournament1
 	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament') do
 		newArgs[key] = tournament
 	end
-	newArgs.matchGroupId = header.matchGroupId
+	newArgs.matchGroupId1 = header.matchGroupId1 or header.matchGroupId
 	for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId') do
 		newArgs[key] = matchGroupId
 	end
@@ -109,6 +113,17 @@ function StarcraftLegacyPrizePool.run(frame)
 	-- iterate over slots and merge opponents into the slots directly
 	local numberOfSlots = newSlotIndex
 	for slotIndex = 1, numberOfSlots do
+		-- if we have to merge we need to kick empty opponents
+		-- while if we import we want tom keep them
+		if
+			not StarcraftLegacyPrizePool._enableImport(newArgs)
+			and #newArgs[slotIndex].opponents > newArgs[slotIndex].opponentsInSlot
+		then
+			newArgs[slotIndex].opponents = Array.filter(
+				newArgs[slotIndex].opponents,
+				function(opponent) return not opponent.isEmpty end
+			)
+		end
 		Table.mergeInto(newArgs[slotIndex], newArgs[slotIndex].opponents)
 		newArgs[slotIndex].opponents = nil
 	end
@@ -121,6 +136,17 @@ function StarcraftLegacyPrizePool.run(frame)
 	end
 
 	return CustomPrizePool.run(newArgs)
+end
+
+function StarcraftLegacyPrizePool._enableImport(args)
+	local tournamentEndDate = Variables.varDefault('tournament_enddate',
+		Variables.varDefault('tournament_startdate'))
+	return Logic.nilOr(
+		Logic.readBoolOrNil(args.input),
+		args.tournament1,
+		args.matchGroupId1,
+		not tournamentEndDate or tournamentEndDate >= args.importDefaultEnableStart
+	)
 end
 
 function StarcraftLegacyPrizePool._sortQualifiers(args)
@@ -207,7 +233,8 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 
 	local newSlot = {
 		opponents = opponents,
-		place = newData.place
+		opponentsInSlot = opponentsInSlot,
+		place = newData.place,
 	}
 
 	for _, item in pairs(SPECIAL_PLACES) do
@@ -240,7 +267,6 @@ function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
 		if slot['walkoverfrom' .. opponentIndex] or slot['wofrom' .. opponentIndex] then
 			slot['lastscore' .. opponentIndex] = 'W'
 			slot['lastvsscore' .. opponentIndex] = 'FF'
-
 		elseif slot['walkoverto' .. opponentIndex] or slot['woto' .. opponentIndex] then
 			slot['lastscore' .. opponentIndex] = 'FF'
 			slot['lastvsscore' .. opponentIndex] = 'W'
@@ -282,10 +308,6 @@ function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
 			}
 		)
 
-		if slot['usdprize' .. opponentIndex] then
-			opponentData.usdprize = slot['usdprize' .. opponentIndex]
-		end
-
 		if slot['points' .. opponentIndex] then
 			local param = CACHED_DATA.inputToId['points']
 			StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, slot['points' .. opponentIndex])
@@ -297,18 +319,20 @@ function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
 			StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, points2)
 		end
 
+		if slot['usdprize' .. opponentIndex] then
+			opponentData.usdprize = slot['usdprize' .. opponentIndex]
+		end
+
+		if Table.isEmpty(opponentData) then
+			opponentData.isEmpty = true
+		end
+
 		return Table.merge(newData, opponentData)
 	end
 
 	local opponents = {}
-	local opponentCache = {}
 	for opponentIndex = 1, opponentsInSlot do
-		local opponent = mapOpponent(opponentIndex)
-		table.insert(opponentCache, opponent or {})
-		if opponent then
-			Array.appendWith(opponents, unpack(opponentCache))
-			opponentCache = {}
-		end
+		table.insert(opponents, mapOpponent(opponentIndex) or {})
 	end
 
 	return opponents
