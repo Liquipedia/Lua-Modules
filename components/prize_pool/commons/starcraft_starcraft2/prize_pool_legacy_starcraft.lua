@@ -306,11 +306,9 @@ function StarcraftLegacyPrizePool.mapOpponents(slot, newData, opponentsInSlot)
 	for opponentIndex = 1, opponentsInSlot do
 		local opponent = mapOpponent(opponentIndex)
 		table.insert(opponentCache, opponent or {})
-		opponentIndex = opponentIndex + 1
 		if opponent then
 			Array.appendWith(opponents, unpack(opponentCache))
 			opponentCache = {}
-		else
 		end
 	end
 
