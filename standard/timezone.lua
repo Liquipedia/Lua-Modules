@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local TimezoneData = mw.loadData('Module:Timezone/Data')
 
 local OUTPUT_FORMAT = '<abbr data-tz="${tzDataLong}" title="${tzTitle} (UTC${tzDataShort})">${tzNameShort}</abbr>'
@@ -24,6 +25,7 @@ function Timezone._getTimezoneData(timezone)
 		return
 	end
 
+	timezoneData = Table.copy(timezoneData)
 	if not timezoneData.abbr then
 		timezoneData.abbr = timezone:upper()
 	end
