@@ -22,7 +22,7 @@ jobs:
       - name: test
         run: |
           luacheck ./ |
-          luacheck ./ --formatter=JUnit > report.xml
+          luacheck ./ --quiet --formatter=JUnit > report.xml
 
       - name: junit
         uses: mikepenz/action-junit-report@v3
