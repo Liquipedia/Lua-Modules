@@ -1062,8 +1062,7 @@ function Placement:init(args, parent, lastPlacement)
 	end
 
 	assert(#self.opponents <= 1 + self.placeEnd - self.placeStart,
-		'Placement: Too many opponents in place ' .. self.placeStart
-		.. (self.placeStart ~= self.placeEnd and ('-' .. self.placeEnd) or ''))
+		'Placement: Too many opponents in place ' .. self.placeDisplay:gsub('&#045;', '-'))
 
 	self.placeDisplay = self:_displayPlace()
 end
