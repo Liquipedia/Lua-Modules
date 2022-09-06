@@ -44,7 +44,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	if streams then
 		table.insert(mapStats, 'vod')
-		out = out .. '\n\t|twitch=|youtube=|vod='
+		out = out .. '\n\t|twitch=|youtube='
 	end
 
 	if #matchMatchpages > 0 then
