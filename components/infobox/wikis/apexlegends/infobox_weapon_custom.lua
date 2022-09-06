@@ -86,7 +86,7 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Rate of fire (Burst)',
 		content = {args.rateoffireburst}
 	})
-	
+
 	if String.isNotEmpty(args.ratesoffire) and String.isEmpty(args.ratesoffireauto) then
 		local rofTimes = {}
 		for index, rofTime in ipairs(_weapon:getAllArgsForBase(args, 'ratesoffire')) do
