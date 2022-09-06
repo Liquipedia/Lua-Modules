@@ -81,12 +81,12 @@ function StarcraftLegacyPrizePool.run(frame)
 	end
 	newArgs.importLimit = header.importLimit
 	newArgs.tournament = header.tournament
-	for key, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
+	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament') do
 		newArgs[key] = tournament
 	end
 	newArgs.matchGroupId = header.matchGroupId
-	for key, tournament in Table.iter.pairsByPrefix(args, 'matchGroupId') do
-		newArgs[key] = tournament
+	for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId') do
+		newArgs[key] = matchGroupId
 	end
 
 	local newSlotIndex = 0
@@ -119,6 +119,7 @@ function StarcraftLegacyPrizePool.run(frame)
 		newArgs['qualifies' .. linkData.id] = linkData.link
 		newArgs['qualifies' .. linkData.id .. 'name'] = linkData.name
 	end
+mw.logObject(newArgs)
 
 	return CustomPrizePool.run(newArgs)
 end
@@ -177,8 +178,7 @@ function StarcraftLegacyPrizePool.mapSlot(slot)
 	local opponentsInSlot = tonumber(slot.count)
 	if not opponentsInSlot and newData.place then
 		local placeRange = mw.text.split(newData.place, '-')
-		placeRange = Array.map(placeRange, tonumber)
-		opponentsInSlot = placeRange[#placeRange] - placeRange[1] + 1
+		opponentsInSlot = tonumber(placeRange[#placeRange]) - tonumber(placeRange[1]) + 1
 	end
 	opponentsInSlot = opponentsInSlot or #slot
 
@@ -198,7 +198,7 @@ function StarcraftLegacyPrizePool.mapSlot(slot)
 		end
 	end
 
-	local opponents = StarcraftLegacyPrizePool.mapOpponents(slot, newData)
+	local opponents = StarcraftLegacyPrizePool.mapOpponents(slot, newData, opponentsInSlot)
 
 	if Logic.isNumeric(slot.count) then
 		for opponentIndex = 1, tonumber(slot.count) do
@@ -233,14 +233,10 @@ function StarcraftLegacyPrizePool.handleSeed(storeTo, input, slotSize)
 	end
 end
 
-function StarcraftLegacyPrizePool.mapOpponents(slot, newData)
+function StarcraftLegacyPrizePool.mapOpponents(slot, newData, opponentsInSlot)
 	local argsIndex = 1
 
 	local mapOpponent = function (opponentIndex)
-		if not slot[opponentIndex] then
-			return
-		end
-
 		-- Map Legacy WO flags into score
 		if slot['walkoverfrom' .. opponentIndex] or slot['wofrom' .. opponentIndex] then
 			slot['lastscore' .. opponentIndex] = 'W'
@@ -260,11 +256,8 @@ function StarcraftLegacyPrizePool.mapOpponents(slot, newData)
 			}
 		end
 		argsIndex = argsIndex + 1
-		if not opponentData then
-			return
-		end
 
-		local lastVsData = Json.parseIfTable(opponentData.lastvs or slot[opponentIndex])
+		local lastVsData = Json.parseIfTable((opponentData or {}).lastvs or slot[opponentIndex])
 		if not lastVsData then
 			lastVsData = StarcraftLegacyPrizePool._readOpponentArgs{
 				slot = slot,
@@ -273,15 +266,20 @@ function StarcraftLegacyPrizePool.mapOpponents(slot, newData)
 			}
 		end
 
+		opponentData = opponentData or {}
+		local score
+		if slot['lastscore' .. opponentIndex] or slot['lastvsscore' .. opponentIndex] then
+			score = (slot['lastscore' .. opponentIndex] or '') ..
+					'-' .. (slot['lastvsscore' .. opponentIndex] or '')
+		end
+
 		Table.mergeInto(
 			opponentData,
 			{
 				date = slot['date' .. opponentIndex],
 				wdl = slot['wdl' .. opponentIndex],
 				lastvs = lastVsData,
-				lastvsscore = (slot['lastscore' .. opponentIndex] or '') ..
-					'-' ..
-					(slot['lastvsscore' .. opponentIndex] or '')
+				lastvsscore = score
 			}
 		)
 
@@ -304,16 +302,15 @@ function StarcraftLegacyPrizePool.mapOpponents(slot, newData)
 	end
 
 	local opponents = {}
-	local emptyOpponentCache = {}
-	local opponentIndex = 1
-	while slot[opponentIndex] do
+	local opponentCache = {}
+	for opponentIndex = 1, opponentsInSlot do
 		local opponent = mapOpponent(opponentIndex)
+		table.insert(opponentCache, opponent or {})
 		opponentIndex = opponentIndex + 1
 		if opponent then
-			Array.append(opponents, unpack(emptyOpponentCache), opponent)
-			emptyOpponentCache = {}
+			Array.appendWith(opponents, unpack(opponentCache))
+			opponentCache = {}
 		else
-			table.insert(emptyOpponentCache, {})
 		end
 	end
 
@@ -336,6 +333,9 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 		else
 			nameInput = slot[argsIndex]
 		end
+		if not nameInput then
+			return nil, argsIndex
+		end
 		nameInput = mw.text.split(nameInput, '|')
 		return {
 			type = CACHED_DATA.defaultOpponentType,
@@ -349,6 +349,7 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 	end
 
 	local defaultPartySize = Opponent.partySize(CACHED_DATA.defaultOpponentType)
+	local newArgsIndex = argsIndex + defaultPartySize - 1
 
 	local opponentData = {
 		type = CACHED_DATA.defaultOpponentType,
@@ -362,6 +363,9 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 			nameInput = slot[argsIndex]
 			argsIndex = argsIndex + 1
 		end
+		if not nameInput then
+			return nil, newArgsIndex
+		end
 		nameInput = mw.text.split(nameInput, '|')
 
 		opponentData['p' .. playerIndex] = nameInput[#nameInput]
@@ -372,7 +376,7 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 		opponentData['p' .. playerIndex .. 'race'] = slot[prefix .. 'race' .. opponentIndex .. 'p' .. playerIndex]
 	end
 
-	return opponentData, argsIndex - 1
+	return opponentData, newArgsIndex
 end
 
 function StarcraftLegacyPrizePool.assignType(assignTo, input, slotParam)
