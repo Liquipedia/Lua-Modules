@@ -239,6 +239,12 @@ function PlayerExt.syncTeam(pageName, template, options)
 		template = template ~= 'noteam' and template or nil,
 	}
 
+	-- catch some edge cases for pageVarEntry
+	if pageVarEntry and not pageVarEntry.template then
+		pageVarEntry.template = pageVarEntry.team
+		pageVarEntry.isResolved = nil
+	end
+
 	local entry = timelessEntry
 		or pageVarEntry
 		or options.fetchPlayer ~= false and PlayerExt.fetchTeamHistoryEntry(pageName, options.date)
