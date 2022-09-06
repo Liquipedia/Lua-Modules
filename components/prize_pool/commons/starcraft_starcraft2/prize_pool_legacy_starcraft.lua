@@ -58,7 +58,7 @@ function StarcraftLegacyPrizePool.run(frame)
 	StarcraftLegacyPrizePool.assignType(newArgs, header.points, 'points')
 	StarcraftLegacyPrizePool.assignType(newArgs, header.points2, 'points2')
 
-	local defaultOpponentType = Opponent.readType(header.opponentType or Opponnet.solo)
+	local defaultOpponentType = Opponent.readType(header.opponentType or Opponent.solo)
 	if defaultOpponentType then
 		newArgs.type = {type = defaultOpponentType}
 	end
@@ -436,7 +436,7 @@ end
 
 function StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, value)
 	if param == 'seed' then
-		PrizePoolLegacy.handleSeed(opponentData, value, 1)
+		StarcraftLegacyPrizePool.handleSeed(opponentData, value, 1)
 	else
 		opponentData[param] = value
 	end
