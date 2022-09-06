@@ -19,6 +19,7 @@ local Template = require('Module:Template')
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
 local OldStarcraftPrizePool = Lua.import('Module:PrizePool/Starcraft/next', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
 
 local StarcraftLegacyPrizePool = {}
 
@@ -52,11 +53,11 @@ function StarcraftLegacyPrizePool.run(frame)
 		CACHED_DATA.inputToId.localprize = 'localprize'
 	else
 		-- Otherwise handle it like it would been a points input using different parameter
-		StarcraftLegacyPrizePool.assignType(newArgs, header.localcurrency, 'localprize')
+		StarcraftLegacyPrizePool._assignType(newArgs, header.localcurrency, 'localprize')
 	end
 
-	StarcraftLegacyPrizePool.assignType(newArgs, header.points, 'points')
-	StarcraftLegacyPrizePool.assignType(newArgs, header.points2, 'points2')
+	StarcraftLegacyPrizePool._assignType(newArgs, header.points, 'points')
+	StarcraftLegacyPrizePool._assignType(newArgs, header['2points'] or header.points2, 'points2')
 
 	local defaultOpponentType = Opponent.readType(header.opponentType or Opponent.solo)
 	if defaultOpponentType then
@@ -93,7 +94,7 @@ function StarcraftLegacyPrizePool.run(frame)
 	local currentPlace
 	for _, slot in ipairs(slots) do
 		-- retrieve the slot and push it into a temp var so it can be altered (to merge slots if need be)
-		local tempSlot = StarcraftLegacyPrizePool.mapSlot(slot)
+		local tempSlot = StarcraftLegacyPrizePool._mapSlot(slot)
 		local place = tempSlot.place or slot.place
 		-- if we want to merge slots and the slot we just retrieved
 		-- has the same place as the one before, then append the opponents
@@ -113,7 +114,7 @@ function StarcraftLegacyPrizePool.run(frame)
 		newArgs[slotIndex].opponents = nil
 	end
 
-	StarcraftLegacyPrizePool.sortQualifiers(newArgs)
+	StarcraftLegacyPrizePool._sortQualifiers(newArgs)
 
 	for _, linkData in pairs(CACHED_DATA.qualifiers) do
 		newArgs['qualifies' .. linkData.id] = linkData.link
@@ -123,7 +124,7 @@ function StarcraftLegacyPrizePool.run(frame)
 	return CustomPrizePool.run(newArgs)
 end
 
-function StarcraftLegacyPrizePool.sortQualifiers(args)
+function StarcraftLegacyPrizePool._sortQualifiers(args)
 	local qualifiersSortValue = function (qualifier1, qualifier2)
 		return qualifier1.occurance == qualifier2.occurance and qualifier1.id < qualifier2.id
 			or qualifier1.occurance < qualifier2.occurance
@@ -159,7 +160,7 @@ function StarcraftLegacyPrizePool.sortQualifiers(args)
 	end)
 end
 
-function StarcraftLegacyPrizePool.mapSlot(slot)
+function StarcraftLegacyPrizePool._mapSlot(slot)
 	if not slot.place then
 		return {}
 	end
@@ -184,7 +185,7 @@ function StarcraftLegacyPrizePool.mapSlot(slot)
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
 		if newParameter == 'seed' then
-			StarcraftLegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
+			StarcraftLegacyPrizePool._handleSeed(newData, input, opponentsInSlot)
 
 		elseif input and tonumber(input) ~= 0 then
 			newData[newParameter] = input
@@ -197,7 +198,7 @@ function StarcraftLegacyPrizePool.mapSlot(slot)
 		end
 	end
 
-	local opponents = StarcraftLegacyPrizePool.mapOpponents(slot, newData, opponentsInSlot)
+	local opponents = StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
 
 	if Logic.isNumeric(slot.count) then
 		for opponentIndex = 1, tonumber(slot.count) do
@@ -217,8 +218,8 @@ function StarcraftLegacyPrizePool.mapSlot(slot)
 	return newSlot
 end
 
-function StarcraftLegacyPrizePool.handleSeed(storeTo, input, slotSize)
-	local links = StarcraftLegacyPrizePool.parseWikiLink(input)
+function StarcraftLegacyPrizePool._handleSeed(storeTo, input, slotSize)
+	local links = LegacyPrizePool.parseWikiLink(input)
 	for _, linkData in ipairs(links) do
 		local link = linkData.link
 
@@ -232,7 +233,7 @@ function StarcraftLegacyPrizePool.handleSeed(storeTo, input, slotSize)
 	end
 end
 
-function StarcraftLegacyPrizePool.mapOpponents(slot, newData, opponentsInSlot)
+function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
 	local argsIndex = 1
 
 	local mapOpponent = function (opponentIndex)
@@ -376,8 +377,8 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 	return opponentData, newArgsIndex
 end
 
-function StarcraftLegacyPrizePool.assignType(assignTo, input, slotParam)
-	if StarcraftLegacyPrizePool.isValidPoints(input) then
+function StarcraftLegacyPrizePool._assignType(assignTo, input, slotParam)
+	if LegacyPrizePool.isValidPoints(input) then
 		local index = CACHED_DATA.next.points
 		assignTo['points' .. index] = input
 		CACHED_DATA.inputToId[slotParam] = 'points' .. index
@@ -394,50 +395,9 @@ function StarcraftLegacyPrizePool.assignType(assignTo, input, slotParam)
 	end
 end
 
-function StarcraftLegacyPrizePool.isValidPoints(input)
-	return Points[input] and true or false
-end
-
-function StarcraftLegacyPrizePool.parseWikiLink(input)
-	if not input then
-		return {}
-	end
-
-	local links = {}
-
-	local inputWithoutHtml = input:gsub('<.->.-</.->', '')
-
-	for inputSection in mw.text.gsplit(inputWithoutHtml, '< *[hb]r */? *>') do
-		-- Does this contain a wiki link?
-		if string.find(inputSection, '%[') then
-			local cleanedInput = inputSection:gsub('^.-%[+', ''):gsub('%].-$', '')
-			local link, displayName
-			if cleanedInput:find('|') then
-				-- Link and Display
-				local linkParts = mw.text.split(cleanedInput, '|', true)
-				link, displayName = mw.text.trim(linkParts[1]), linkParts[2]
-
-			else
-				-- Just link
-				link, displayName = cleanedInput, cleanedInput
-			end
-
-			if link:sub(1, 1) == '/' then
-				-- Relative link
-				link = mw.title.getCurrentTitle().fullText .. link
-			end
-			link = link:gsub(' ', '_')
-
-			table.insert(links, {link = link, name = displayName})
-		end
-	end
-
-	return links
-end
-
 function StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, value)
 	if param == 'seed' then
-		StarcraftLegacyPrizePool.handleSeed(opponentData, value, 1)
+		StarcraftLegacyPrizePool._handleSeed(opponentData, value, 1)
 	else
 		opponentData[param] = value
 	end
