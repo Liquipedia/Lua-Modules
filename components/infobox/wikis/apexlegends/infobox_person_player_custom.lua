@@ -14,9 +14,8 @@ local Player = require('Module:Infobox/Person')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 local Variables = require('Module:Variables')
-local Template = require('Module:Template')
+local UpcomingMatches = require('Module:Matches Player')
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -142,10 +141,8 @@ function CustomPlayer:adjustLPDB(lpdbData)
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
-		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+	if Player:shouldStoreData(_args) then
+		return UpcomingMatches.get(_args)
 	end
 end
 
