@@ -59,11 +59,6 @@ return {
 		name = 'China Standard Time',
 		offset = {8, 0},
 	},
-	CST2 = {
-		abbr = 'CST',
-		name = 'Central Standard Time',
-		offset = {-6, 0},
-	},
 	CDT = {
 		name = 'Central Daylight Time',
 		offset = {-5, 0},
@@ -104,8 +99,7 @@ return {
 		name = 'Iran Daylight Time',
 		offset = {4, 30},
 	},
-	IST2 = {
-		abbr = 'IST',
+	IST = {
 		name = 'Indian Standard Time',
 		offset = {5, 30},
 	},
