@@ -53,4 +53,13 @@ function Timezone.getTimezoneString(timezone)
 	})
 end
 
+function Timezone.getOffset(timezone)
+	local timezoneData = Timezone.getTimezoneData(timezone)
+	if not timezoneData then
+		return
+	end
+
+	return timezoneData.offset[1] * 60 * 60 + timezoneData.offset[2] * 60
+end
+
 return Class.export(Timezone)
