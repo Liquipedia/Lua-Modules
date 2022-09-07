@@ -76,10 +76,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	Variables.varDefine('enddate_' .. lpdbData.participant, lpdbData.date)
 	Variables.varDefine('placement_' .. lpdbData.participant, lpdbData.placement)
 
-	if (lpdbData.wdl or ''):len() > 10 then
-		lpdbData.extradata.groupscore = lpdbData.wdl
-		Variables.varDefine('groupscore_' .. lpdbData.participant, lpdbData.wdl)
-		lpdbData.wdl = 'custom'
+	if (lpdbData.groupscore or ''):len() > 10 then
+		lpdbData.extradata.groupscore = lpdbData.groupscore
+		Variables.varDefine('groupscore_' .. lpdbData.participant, lpdbData.groupscore)
+		lpdbData.groupscore = 'custom'
 	end
 
 	if opponent.additionalData.LASTVS and opponent.additionalData.LASTVS.type == Opponent.solo then
