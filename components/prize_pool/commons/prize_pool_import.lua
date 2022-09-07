@@ -19,6 +19,7 @@ local Table = require('Module:Table')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
 local TournamentUtil = Lua.import('Module:Tournament/Util', {requireDevIfEnabled = true})
 
 local GROUPSCORE_DELIMITER = '-'
@@ -342,16 +343,10 @@ end
 
 function Import._emptyPlacement(priorPlacement, placementSize)
 	priorPlacement = priorPlacement or {}
-	local placement = Table.deepCopy(priorPlacement, {copyMetatable = true})
+	local placeStart = (priorPlacement.placeEnd or 0) + 1
+	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
-	return Table.mergeInto(placement, {
-			args = {},
-			hasUSD = false,
-			opponents = {},
-			prizeRewards = {},
-			placeStart = (priorPlacement.placeEnd or 0) + 1,
-			placeEnd = (priorPlacement.placeEnd or 0) + placementSize,
-		})
+	return Placement({placeStart = placeStart, placeEnd = placeEnd}, priorPlacement.parent, priorPlacement.placeEnd or 0)
 end
 
 function Import._getPlaceDisplay(placeStart, placeEnd)
