@@ -623,7 +623,7 @@ function PrizePool:_buildRows()
 
 			if opponentIndex == 1 then
 				local placeCell = TableCell{
-					content = {{placement:getMedal() or '' , NON_BREAKING_SPACE, placement.placeDisplay}},
+					content = {{placement:getMedal() or '' , NON_BREAKING_SPACE, placement:_displayPlace()}},
 					css = {['font-weight'] = 'bolder'},
 				}
 				placeCell.rowSpan = #placement.opponents
@@ -1061,10 +1061,8 @@ function Placement:init(args, parent, lastPlacement)
 		self.placeEnd = lastPlacement + math.max(#self.opponents, 1)
 	end
 
-	self.placeDisplay = self:_displayPlace()
-
 	assert(#self.opponents <= 1 + self.placeEnd - self.placeStart,
-		'Placement: Too many opponents in place ' .. self.placeDisplay:gsub('&#045;', '-'))
+		'Placement: Too many opponents in place ' .. self:_displayPlace():gsub('&#045;', '-'))
 end
 
 function Placement:_parseArgs(args)
