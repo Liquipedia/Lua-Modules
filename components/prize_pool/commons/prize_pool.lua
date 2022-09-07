@@ -520,7 +520,7 @@ function PrizePool:_buildHeader()
 
 	local previousOfType = {}
 	for _, prize in ipairs(self.prizes) do
-		local prizeTypeData = PrizePool.prizeTypes[prize.type]
+		local prizeTypeData = self.prizeTypes[prize.type]
 
 		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
 			local cell = prizeTypeData.headerDisplay(prize.data)
@@ -560,7 +560,7 @@ function PrizePool:_buildRows()
 
 			local previousOfPrizeType = {}
 			local prizeCells = Array.map(self.prizes, function (prize)
-				local prizeTypeData = PrizePool.prizeTypes[prize.type]
+				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
 
 				local cell
@@ -692,7 +692,7 @@ end
 
 --- Parse the input for available prize types overall.
 function PrizePool:_readPrizes(args)
-	for name, prizeData in pairs(PrizePool.prizeTypes) do
+	for name, prizeData in pairs(self.prizeTypes) do
 		local fieldName = prizeData.header
 		if fieldName then
 			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
@@ -714,7 +714,7 @@ function PrizePool:_readPlacements(args)
 		end
 
 		local placementInput = Json.parseIfString(args[placementIndex])
-		local placement = Placement(placementInput, self, currentPlace, PrizePool.prizeTypes)
+		local placement = Placement(placementInput, self, currentPlace)
 
 		currentPlace = placement.placeEnd
 
@@ -737,12 +737,12 @@ end
 
 --- Add a Custom Prize Type
 function PrizePool:addCustomPrizeType(prizeType, data)
-	PrizePool.prizeTypes[prizeType] = data
+	self.prizeTypes[prizeType] = data
 	return self
 end
 
 function PrizePool:addPrize(prizeType, index, data)
-	assert(PrizePool.prizeTypes[prizeType], 'addPrize: Not a valid prize!')
+	assert(self.prizeTypes[prizeType], 'addPrize: Not a valid prize!')
 	assert(Logic.isNumeric(index), 'addPrize: Index is not numeric!')
 	table.insert(self.prizes, {id = prizeType .. index, type = prizeType, index = index, data = data})
 	return self
