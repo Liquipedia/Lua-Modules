@@ -348,46 +348,6 @@ PrizePool.prizeTypes = {
 	}
 }
 
-PrizePool.additionalData = {
-	GROUPSCORE = {
-		field = 'wdl',
-		parse = function (placement, input, context)
-			return input
-		end
-	},
-	LASTVS = {
-		field = 'lastvs',
-		parse = function (placement, input, context)
-			return placement:_parseOpponentArgs(input, context.date)
-		end
-	},
-	LASTVSSCORE = {
-		field = 'lastvsscore',
-		parse = function (placement, input, context)
-			local forceValidScore = function(score)
-				if Table.includes(SPECIAL_SCORES, score:upper()) then
-					return score:upper()
-				end
-				return tonumber(score)
-			end
-
-			-- split the lastvsscore entry by '-', but allow negative scores
-			local rawScores = Table.mapValues(mw.text.split(input, '-'), mw.text.trim)
-			local scores = {}
-			for index, rawScore in ipairs(rawScores) do
-				if String.isEmpty(rawScore) and String.isNotEmpty(rawScores[index + 1]) then
-					rawScores[index + 1] = '-' .. rawScores[index + 1]
-				else
-					table.insert(scores, rawScore)
-				end
-			end
-
-			scores = Table.mapValues(scores, forceValidScore)
-			return {score = scores[1], vsscore = scores[2]}
-		end
-	},
-}
-
 
 
 function PrizePool:init(args)
