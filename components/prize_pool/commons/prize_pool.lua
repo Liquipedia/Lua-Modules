@@ -65,6 +65,8 @@ local PRIZE_TYPE_FREETEXT = 'FREETEXT'
 
 -- Allowed none-numeric score values.
 local SPECIAL_SCORES = {'W', 'FF', 'L', 'DQ', 'D'}
+local WALKOVER_SCORE = 'W'
+local FORFEIT_SCORE = 'FF'
 
 PrizePool.config = {
 	showUSD = {
@@ -942,6 +944,20 @@ function PrizePool:_lpdbToSmw(lpdbData)
 		}
 	end
 
+	local scoreData = {
+		['has last wdl'] = lpdbData.groupscore,
+	}
+	if Table.includes(SPECIAL_SCORES, lpdbData.lastscore) then
+		if lpdbData.lastscore == WALKOVER_SCORE then
+			scoreData['has walkover from'] = lpdbData.lastvs
+		else if lpdbData.lastscore == FORFEIT_SCORE then
+			scoreData['has walkover to'] = lpdbData.lastvs
+		end
+	else
+		scoreData['has last score'] = lpdbData.lastscore
+		scoreData['has last opponent score'] = lpdbData.lastvsscore
+	end
+
 	return Table.mergeInto({
 			objectName = lpdbData.objectName,
 
@@ -957,12 +973,10 @@ function PrizePool:_lpdbToSmw(lpdbData)
 			['has placement'] = lpdbData.placement,
 			['has prizemoney'] = lpdbData.prizemoney,
 			['has last opponent'] = lpdbData.lastvs,
-			['has last score'] = lpdbData.lastscore,
-			['has last opponent score'] = lpdbData.lastvsscore,
-			['has last wdl'] = lpdbData.groupscore,
 			['has weight'] = lpdbData.weight,
 		},
-		smwOpponentData
+		smwOpponentData,
+		scoreData
 	)
 end
 
