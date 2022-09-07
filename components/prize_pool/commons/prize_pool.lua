@@ -409,7 +409,7 @@ function PrizePool:init(args)
 	self.placements = {}
 
 	-- needed by Module:PrizePool/Placement
-	self.prizeTypes = PrizePool.prizeTypes
+	self.prizeTypes = Table.deepCopy(PrizePool.prizeTypes)
 
 	self.usedAutoConvertedCurrency = false
 
