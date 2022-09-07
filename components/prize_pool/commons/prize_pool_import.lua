@@ -346,7 +346,12 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	local placeStart = (priorPlacement.placeEnd or 0) + 1
 	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
-	return Placement({placeStart = placeStart, placeEnd = placeEnd}, priorPlacement.parent, priorPlacement.placeEnd or 0)
+	return Placement(
+		{placeStart = placeStart, placeEnd = placeEnd},
+		priorPlacement.parent,
+		priorPlacement.placeEnd or 0,
+		priorPlacement.prizeTypes
+	)
 end
 
 function Import._getPlaceDisplay(placeStart, placeEnd)
