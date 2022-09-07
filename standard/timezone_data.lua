@@ -9,7 +9,7 @@
 return {
 	ADT = {
 		name ='Atlantic Daylight Time',
-		offset = {4, 0},
+		offset = {-3, 0},
 	},
 	AEDT = {
 		name = 'Australian Eastern Daylight Time',
