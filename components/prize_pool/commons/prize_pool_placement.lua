@@ -106,7 +106,7 @@ function Placement:init(args, parent, lastPlacement, prizeTypes)
 	self.args = self:_parseArgs(args)
 	self.parent = parent
 	self.prizeTypes = prizeTypes
-	self.date = self.args.date or self.parent:getTournamentDate()
+	self.date = self.args.date or self.parent.date
 	self.placeStart = self.args.placeStart
 	self.placeEnd = self.args.placeEnd
 	self.hasUSD = false
