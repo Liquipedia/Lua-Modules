@@ -239,7 +239,9 @@ function PlayerExt.syncTeam(pageName, template, options)
 		template = template ~= 'noteam' and template or nil,
 	}
 
-	-- catch some edge cases for pageVarEntry
+	-- catch some edge cases for pageVarEntry where pageVarEntry.team
+	-- (unresolved team template or lowercased underscore replaced pagename of the team)
+	-- is set while pageVarEntry.template is not set
 	if pageVarEntry and not pageVarEntry.template then
 		pageVarEntry.template = pageVarEntry.team
 		pageVarEntry.isResolved = nil
