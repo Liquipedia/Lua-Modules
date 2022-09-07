@@ -86,7 +86,7 @@ function CustomInjector:addCustomCells(widgets)
 		content = {args.rateoffireburst}
 	})
 
-	if String.isNotEmpty(args.ratesoffire) and String.isEmpty(args.ratesoffireauto) then
+	if String.isNotEmpty(args.ratesoffire) and String.isEmpty(args.rateoffireauto) then
 		local rofTimes = {}
 		for index, rofTime in ipairs(_weapon:getAllArgsForBase(args, 'ratesoffire')) do
 			table.insert(rofTimes, CustomWeapon:_createContextualNoWrappingSpan(rofTime, index, BOLT_INFO))
