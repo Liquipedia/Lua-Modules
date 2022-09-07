@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
@@ -14,12 +15,10 @@ local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
 local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-
-local TODAY = os.date('%Y-%m-%d')
 
 local DASH = '&#045;'
 
