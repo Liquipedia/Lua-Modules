@@ -25,6 +25,9 @@ local DASH = '&#045;'
 local PRIZE_TYPE_USD = 'USD'
 local PRIZE_TYPE_POINTS = 'POINTS'
 
+-- Allowed none-numeric score values.
+local SPECIAL_SCORES = {'W', 'FF' , 'L', 'DQ', 'D'}
+
 --- @class Placement
 --- A Placement is a set of opponents who all share the same final place in the tournament.
 --- Its input is generally a table created by `Template:Placement`.
@@ -95,6 +98,46 @@ Placement.specialStatuses = {
 			return Abbreviation.make('Q', 'Qualified Automatically')
 		end,
 		lpdb = 1,
+	},
+}
+
+Placement.additionalData = {
+	GROUPSCORE = {
+		field = 'wdl',
+		parse = function (placement, input, context)
+			return input
+		end
+	},
+	LASTVS = {
+		field = 'lastvs',
+		parse = function (placement, input, context)
+			return placement:_parseOpponentArgs(input, context.date)
+		end
+	},
+	LASTVSSCORE = {
+		field = 'lastvsscore',
+		parse = function (placement, input, context)
+			local forceValidScore = function(score)
+				if Table.includes(SPECIAL_SCORES, score:upper()) then
+					return score:upper()
+				end
+				return tonumber(score)
+			end
+
+			-- split the lastvsscore entry by '-', but allow negative scores
+			local rawScores = Table.mapValues(mw.text.split(input, '-'), mw.text.trim)
+			local scores = {}
+			for index, rawScore in ipairs(rawScores) do
+				if String.isEmpty(rawScore) and String.isNotEmpty(rawScores[index + 1]) then
+					rawScores[index + 1] = '-' .. rawScores[index + 1]
+				else
+					table.insert(scores, rawScore)
+				end
+			end
+
+			scores = Table.mapValues(scores, forceValidScore)
+			return {score = scores[1], vsscore = scores[2]}
+		end
 	},
 }
 
@@ -182,7 +225,7 @@ end
 function Placement:_readAdditionalData(args)
 	local data = {}
 
-	for prizeType, typeData in pairs(self.parent.additionalData) do
+	for prizeType, typeData in pairs(self.additionalData) do
 		local fieldName = typeData.field
 		if args[fieldName] then
 			data[prizeType] = typeData.parse(self, args[fieldName], args)
