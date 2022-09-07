@@ -276,7 +276,12 @@ function Placement:_parseOpponentArgs(input, date)
 	opponentArgs.type = opponentArgs.type or self.parent.opponentType
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
 
-	local opponentData = Opponent.readOpponentArgs(opponentArgs)
+	local opponentData
+	if opponentArgs.isAlreadyParsed then
+		opponentData = opponentArgs[1] or opponentArgs
+	else
+		opponentData = Opponent.readOpponentArgs(opponentArgs)
+	end
 
 	if not opponentData or (Opponent.isTbd(opponentData) and opponentData.type ~= Opponent.literal) then
 		opponentData = Opponent.tbd(opponentArgs.type)
