@@ -950,7 +950,7 @@ function PrizePool:_lpdbToSmw(lpdbData)
 	if Table.includes(SPECIAL_SCORES, lpdbData.lastscore) then
 		if lpdbData.lastscore == WALKOVER_SCORE then
 			scoreData['has walkover from'] = lpdbData.lastvs
-		else if lpdbData.lastscore == FORFEIT_SCORE then
+		elseif lpdbData.lastscore == FORFEIT_SCORE then
 			scoreData['has walkover to'] = lpdbData.lastvs
 		end
 	else
