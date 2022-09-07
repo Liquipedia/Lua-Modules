@@ -102,11 +102,11 @@ Placement.specialStatuses = {
 --- @param args table Input information
 --- @param parent PrizePool The PrizePool this Placement is part of
 --- @param lastPlacement integer The previous placement's end
-function Placement:init(args, parent, lastPlacement, prizeTypes)
+function Placement:init(args, parent, lastPlacement)
 	self.args = self:_parseArgs(args)
 	self.parent = parent
-	self.prizeTypes = prizeTypes
-	self.date = self.args.date or self.parent.date
+	self.prizeTypes = parent.prizeTypes
+	self.date = self.args.date or parent.date
 	self.placeStart = self.args.placeStart
 	self.placeEnd = self.args.placeEnd
 	self.hasUSD = false
