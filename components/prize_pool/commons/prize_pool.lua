@@ -394,7 +394,7 @@ function PrizePool:init(args)
 	self.args = self:_parseArgs(args)
 
 	self.pagename = mw.title.getCurrentTitle().text
-	self.date = self:getTournamentDate()
+	self.date = PrizePool._getTournamentDate()
 	self.opponentType = self.args.type
 	if self.args.opponentLibrary then
 		Opponent = Lua.import('Module:'.. self.args.opponentLibrary, {requireDevIfEnabled = true})
@@ -660,7 +660,7 @@ end
 function PrizePool._CurrencyConvertionText(prize)
 	local exchangeRate = Math.round{
 		PrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToUsd(
-			prize.data, 1, self:getTournamentDate()
+			prize.data, 1, PrizePool._getTournamentDate()
 		)
 		,5
 	}
@@ -954,7 +954,7 @@ function PrizePool._getTournamentInfo(pageName)
 end
 
 --- Returns the default date based on wiki-variables set in the Infobox League
-function PrizePool:getTournamentDate()
+function PrizePool._getTournamentDate()
 	return Variables.varDefaultMulti('tournament_enddate', 'tournament_edate', 'edate', TODAY)
 end
 
