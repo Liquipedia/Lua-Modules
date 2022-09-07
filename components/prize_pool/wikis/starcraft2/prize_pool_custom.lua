@@ -268,7 +268,7 @@ function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
 		['has points'] = extradata.points,
 		['has points2'] = extradata.points2,
 		['has walkover from'] = extradata.wofrom and '1' or nil,
-		['has walkover to'] = extradata.woto and '1' or nil,	
+		['has walkover to'] = extradata.woto and '1' or nil,
 	}
 
 	-- fix lastvs opponent stuff
