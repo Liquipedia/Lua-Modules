@@ -102,9 +102,10 @@ Placement.specialStatuses = {
 --- @param args table Input information
 --- @param parent PrizePool The PrizePool this Placement is part of
 --- @param lastPlacement integer The previous placement's end
-function Placement:init(args, parent, lastPlacement)
+function Placement:init(args, parent, lastPlacement, prizeTypes)
 	self.args = self:_parseArgs(args)
 	self.parent = parent
+	self.prizeTypes = prizeTypes
 	self.date = self.args.date or self.parent:getTournamentDate()
 	self.placeStart = self.args.placeStart
 	self.placeEnd = self.args.placeEnd
@@ -148,7 +149,7 @@ function Placement:_readPrizeRewards(args)
 
 	-- Loop through all prizes that have been defined in the header
 	Array.forEach(self.parent.prizes, function (prize)
-		local prizeData = self.parent.prizeTypes[prize.type]
+		local prizeData = self.prizeTypes[prize.type]
 		local fieldName = prizeData.row
 		if not fieldName then
 			return
@@ -167,8 +168,7 @@ function Placement:_readPrizeRewards(args)
 	end)
 
 	-- Special case for USD, as it's not defined in the header.
-	local usdType = self.parent.prizeTypes[PRIZE_TYPE_USD]
-mw.logObject(self.parent)
+	local usdType = self.prizeTypes[PRIZE_TYPE_USD]
 	if usdType.row and args[usdType.row] then
 		self.hasUSD = true
 		rewards[PRIZE_TYPE_USD .. 1] = usdType.rowParse(self, args[usdType.row], args, 1)
