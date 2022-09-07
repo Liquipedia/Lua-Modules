@@ -64,9 +64,9 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
 
 -- Allowed none-numeric score values.
-local SPECIAL_SCORES = {'W', 'FF', 'L', 'DQ', 'D'}
 local WALKOVER_SCORE = 'W'
 local FORFEIT_SCORE = 'FF'
+local SPECIAL_SCORES = {WALKOVER_SCORE, FORFEIT_SCORE , 'L', 'DQ', 'D'}
 
 PrizePool.config = {
 	showUSD = {
