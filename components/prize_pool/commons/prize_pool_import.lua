@@ -48,11 +48,7 @@ function Import.run(placements, args)
 end
 
 function Import._getConfig(args, placements)
-	local doImport = Logic.readBool(args.import)
-		or String.isNotEmpty(args.matchGroupId1)
-		or String.isNotEmpty(args.tournament1)
-
-	if not doImport then
+	if String.isEmpty(args.matchGroupId1) and String.isEmpty(args.tournament1) and not Logic.readBool(args.import) then
 		return {}
 	end
 
@@ -89,10 +85,9 @@ function Import._importPlacements(inputPlacements)
 				})
 	end)
 
-	-- Apply Import.config.importLimit
-	local placementEntryCounts = Array.map(placementEntries, function(entries) return #entries end)
+	-- Apply importLimit if set
 	if Import.config.importLimit then
-		local sums = MathUtil.partialSums(placementEntryCounts)
+		local sums = MathUtil.partialSums(Array.map(placementEntries, function(entries) return #entries end))
 		local index = ArrayExt.findIndex(sums, function(sum) return Import.config.importLimit <= sum end)
 		if index ~= 0 then
 			placementEntries = Array.sub(placementEntries, 1, index - 1)
@@ -224,8 +219,8 @@ function Import._makeEntryFromMatch(placementEntry, match)
 	return entry
 end
 
--- Computes the placement placements of a LPDB bracket
--- @options.isFinalStage: If on the last stage, then include placement placements for
+-- Computes the placements of a LPDB bracket
+-- @options.isFinalStage: If on the last stage, then include placements for
 -- winners of final matches.
 function Import._computeBracketPlacementGroups(bracket, options)
 	local firstDeRoundIndex = Import._findDeRoundIndex(bracket)
@@ -349,8 +344,7 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	return Placement(
 		{placeStart = placeStart, placeEnd = placeEnd},
 		priorPlacement.parent,
-		priorPlacement.placeEnd or 0,
-		priorPlacement.prizeTypes
+		priorPlacement.placeEnd or 0
 	)
 end
 
@@ -372,7 +366,6 @@ function Import._mergePlacement(lpdbEntries, placement)
 		)
 	end
 
-mw.logObject(placement)
 	assert(
 		#placement.opponents <= 1 + placement.placeEnd - placement.placeStart,
 		'Import: Too many opponents returned from query for placement range '
