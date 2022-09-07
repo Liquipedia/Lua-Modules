@@ -358,11 +358,11 @@ function Import._getPlaceDisplay(placeStart, placeEnd)
 end
 
 function Import._mergePlacement(lpdbEntries, placement)
-	local defaultOpponentType = (placement.parent or {}).opponentType
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
 		placement.opponents[opponentIndex] = Import._mergeEntry(
 			opponent,
-			Table.mergeInto(Import._emptyOpponent(defaultOpponentType), placement.opponents[opponentIndex])
+			Table.mergeInto(placement:_parseOpponents{{}}[1], placement.opponents[opponentIndex]),
+			placement
 		)
 	end
 
@@ -375,15 +375,7 @@ function Import._mergePlacement(lpdbEntries, placement)
 	return placement
 end
 
-function Import._emptyOpponent(opponentType)
-	return {
-		opponentData = Opponent.tbd(opponentType),
-		additionalData = {},
-		prizeRewards = {},
-	}
-end
-
-function Import._mergeEntry(lpdbEntry, entry)
+function Import._mergeEntry(lpdbEntry, entry, placement)
 	if
 		not Opponent.isTbd(entry.opponentData) -- valid manual input
 		or Table.isEmpty(lpdbEntry.opponent) -- irrelevant lpdbEntry
@@ -392,33 +384,35 @@ function Import._mergeEntry(lpdbEntry, entry)
 		return entry
 	end
 
-	return Table.deepMergeInto(entry, Import._entryToOpponent(lpdbEntry))
+	return Table.deepMergeInto(entry, Import._entryToOpponent(lpdbEntry, placement))
 end
 
-function Import._entryToOpponent(lpdbEntry)
-	local additionalData
+function Import._entryToOpponent(lpdbEntry, placement)
+	local additionalData = {}
 	if lpdbEntry.needsLastVs then
 		additionalData = Import._groupLastVsAdditionalData(lpdbEntry)
 	end
 
-	return {
-		additionalData = additionalData or {
-			GROUPSCORE = Import._makeGroupScore(lpdbEntry),
-			LASTVS = Import._removeIfTbd(lpdbEntry.vsOpponent),
-			LASTVSSCORE = {
-				score = Import._getScore(lpdbEntry.opponent),
-				vsscore = Import._getScore(lpdbEntry.vsOpponent),
-			},
-		},
+	local score = Import._getScore(lpdbEntry.opponent)
+	local vsScore = Import._getScore(lpdbEntry.vsOpponent)
+	local lastVsScore
+	if score or vsScore then
+		lastVsScore = (score or '') .. '-' .. (vsScore or '')
+	end
+
+	return placement:_parseOpponents{{
+		Import._removeIfTbd(lpdbEntry.opponent),
+		wdl = (not lpdbEntry.needsLastVs) and Import._makeGroupScore(lpdbEntry) or nil,
+		lastvs = additionalData.lastVs or Import._removeIfTbd(lpdbEntry.vsOpponent),
+		lastvsscore = additionalData.score or lastVsScore,
 		date = lpdbEntry.date,
-		opponentData = Import._removeIfTbd(lpdbEntry.opponent),
-		prizeRewards = {},
-	}
+		isAlreadyParsed = true,
+	}}[1]
 end
 
 function Import._removeIfTbd(opponent)
 	return (Table.isEmpty(opponent) or Opponent.isTbd(opponent))
-		and {} or opponent
+		and {} or Table.merge(opponent, {isAlreadyParsed = true})
 end
 
 function Import._makeGroupScore(lpdbEntry)
@@ -457,7 +451,7 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 	})
 
 	if not type(matchData) == 'table' or not matchData[1] then
-		return
+		return {}
 	end
 
 	return Import._makeAdditionalDataFromMatch(opponentName, matchData[1])
@@ -467,7 +461,7 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	-- catch unfinished or invalid match
 	local winner = tonumber(match.winner)
 	if not winner or winner < 1 or #match.match2opponents ~= 2 then
-		return
+		return {}
 	end
 
 	local score, vsScore, lastVs
@@ -480,12 +474,14 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 		end
 	end
 
+	local lastVsScore
+	if score or vsScore then
+		lastVsScore = (score or '') .. '-' .. (vsScore or '')
+	end
+
 	return {
-		LASTVS = lastVs,
-		LASTVSSCORE = {
-			score = score,
-			vsscore = vsScore,
-		},
+		lastVs = lastVs,
+		score = lastVsScore,
 	}
 end
 
