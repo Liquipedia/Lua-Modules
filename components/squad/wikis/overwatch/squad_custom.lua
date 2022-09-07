@@ -119,6 +119,7 @@ function CustomSquad.run(frame)
 	squad.header = CustomSquad.header
 	squad:header()
 
+	index = 1
 	while args['p' .. index] or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
 
