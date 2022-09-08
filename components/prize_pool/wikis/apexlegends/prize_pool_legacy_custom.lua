@@ -13,7 +13,7 @@ local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabl
 
 local CustomLegacyPrizePool = {}
 
-local _remove_Place
+local _remove_place
 
 -- Template entry point
 function CustomLegacyPrizePool.run()
@@ -30,7 +30,7 @@ function CustomLegacyPrizePool.customHeader(newArgs, data, header)
 end
 
 function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
-	if _remove_Place then
+	if _remove_place then
 		newData["place"] = nil
 	end
 
