@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
@@ -274,7 +275,13 @@ function MatchGroupInput.readDate(dateString)
 	local matchDate = String.explode(dateString, '<', 0):gsub('-', '')
 	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
 	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
-	return {date = date, dateexact = isDateExact, timezoneId = timezoneId, timezoneOffset = timezoneOffset}
+	return {
+		date = date,
+		dateexact = isDateExact,
+		timezoneId = timezoneId,
+		timezoneOffset = timezoneOffset,
+		timestamp = DateExt.readTimestamp(dateString),
+	}
 end
 
 function MatchGroupInput.getInexactDate(suggestedDate)

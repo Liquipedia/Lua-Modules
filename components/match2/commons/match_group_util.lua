@@ -383,6 +383,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		opponents = opponents,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
+		timestamp = tonumber(Table.extract(extradata, 'timestamp')) or 0,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
