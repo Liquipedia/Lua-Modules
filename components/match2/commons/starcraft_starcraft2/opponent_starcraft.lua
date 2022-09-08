@@ -44,7 +44,7 @@ TeamOpponent without team template ({{TeamOpponent|name=...|short=...}})
 ]]
 function StarcraftOpponent.readOpponentArgs(args)
 	local opponent = Opponent.readOpponentArgs(args)
-	local partySize = Opponent.partySize(opponent.type)
+	local partySize = Opponent.partySize((opponent or {}).type)
 
 	if partySize == 1 then
 		opponent.players[1].race = StarcraftRace.read(args.race)
@@ -126,6 +126,9 @@ function StarcraftOpponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				StarcraftPlayerExt.syncPlayer(player)
+				if not player.team then
+					player.team = PlayerExt.syncTeam(player.pageName, nil, {date = date})
+				end
 			else
 				PlayerExt.populatePageName(player)
 			end

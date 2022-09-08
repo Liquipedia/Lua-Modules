@@ -143,7 +143,7 @@ end
 function HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
 	Variables.varDefine(participant .. '_' .. key, value)
 	if participant ~= participantResolved then
-		Variables.varDefine(participantResolved .. key, value)
+		Variables.varDefine(participantResolved .. '_' .. key, value)
 	end
 end
 
