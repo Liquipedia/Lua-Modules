@@ -325,7 +325,7 @@ function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
 
 		if slot['localprize' .. opponentIndex] then
 			local param = CACHED_DATA.inputToId['localprize']
-			CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['localprize' .. opponentIndex])
+			StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, slot['localprize' .. opponentIndex])
 		end
 
 		if Table.isEmpty(opponentData) then
