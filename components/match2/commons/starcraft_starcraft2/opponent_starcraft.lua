@@ -126,6 +126,9 @@ function StarcraftOpponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				StarcraftPlayerExt.syncPlayer(player)
+				if not player.team then
+					player.team = PlayerExt.syncTeam(player.pageName, nil, {date = date})
+				end
 			else
 				PlayerExt.populatePageName(player)
 			end
