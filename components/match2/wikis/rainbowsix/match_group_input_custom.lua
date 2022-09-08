@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -302,6 +303,7 @@ function matchFunctions.readDate(matchArgs)
 		return {
 			date = _EPOCH_TIME_EXTENDED,
 			dateexact = false,
+			timestamp = DateExt.epochZero,
 		}
 	end
 end
@@ -432,10 +434,8 @@ function matchFunctions.getOpponents(match)
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
 		local currentUnixTime = os.time(os.date('!*t'))
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if match.timestamp + threshold < currentUnixTime then
 			match.finished = true
 		end
 	end
