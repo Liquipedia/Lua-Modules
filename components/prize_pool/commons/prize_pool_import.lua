@@ -330,7 +330,7 @@ function Import._findDeRoundIndex(bracket)
 		if lbCount == 0 then
 			return roundIndex
 		elseif lbCount > 0 then
-			return nil
+			return
 		end
 	end
 end
