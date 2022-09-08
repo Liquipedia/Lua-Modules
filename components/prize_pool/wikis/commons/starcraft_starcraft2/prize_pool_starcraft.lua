@@ -89,6 +89,8 @@ function CustomPrizePool.run(frame)
 	local buildPrizePool = prizePool:build()
 
 	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
+	-- set an additional wiki-var for legacy reasons so that combination with award prize pools still work
+	Variables.varDefine('prize pool table id', prizePoolIndex)
 	if prizePoolIndex == 1 and Logic.readBool(Logic.emptyOr(args.storeTournament, Namespace.isMain())) then
 		CustomPrizePool._storeIntoTournamentLpdb()
 	end
