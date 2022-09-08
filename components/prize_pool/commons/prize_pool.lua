@@ -37,8 +37,6 @@ local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
 
-local tournamentVars = PageVariableNamespace('Tournament')
-
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
 
