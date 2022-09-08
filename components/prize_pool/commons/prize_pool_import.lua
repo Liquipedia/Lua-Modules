@@ -358,15 +358,6 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	)
 end
 
-function Import._getPlaceDisplay(placeStart, placeEnd)
-	local display = Ordinal._ordinal(placeStart)
-	if placeEnd > placeStart then
-		return display .. '-' .. Ordinal._ordinal(placeEnd)
-	end
-
-	return display
-end
-
 function Import._mergePlacement(lpdbEntries, placement)
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
 		placement.opponents[opponentIndex] = Import._mergeEntry(
@@ -379,7 +370,7 @@ function Import._mergePlacement(lpdbEntries, placement)
 	assert(
 		#placement.opponents <= 1 + placement.placeEnd - placement.placeStart,
 		'Import: Too many opponents returned from query for placement range '
-			.. Import._getPlaceDisplay(placement.placeStart, placement.placeEnd)
+			.. placement:_displayPlace():gsub('&#045;', '-')
 	)
 
 	return placement
@@ -403,8 +394,8 @@ function Import._entryToOpponent(lpdbEntry, placement)
 		additionalData = Import._groupLastVsAdditionalData(lpdbEntry)
 	end
 
-	local score = Import._getScore(lpdbEntry.opponent)
-	local vsScore = Import._getScore(lpdbEntry.vsOpponent)
+	local score = additionalData.score or Import._getScore(lpdbEntry.opponent)
+	local vsScore = additionalData.vsScore or Import._getScore(lpdbEntry.vsOpponent)
 	local lastVsScore
 	if score or vsScore then
 		lastVsScore = (score or '') .. '-' .. (vsScore or '')
@@ -484,14 +475,10 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 		end
 	end
 
-	local lastVsScore
-	if score or vsScore then
-		lastVsScore = (score or '') .. '-' .. (vsScore or '')
-	end
-
 	return {
 		lastVs = lastVs,
-		score = lastVsScore,
+		score = score,
+		vsScore = vsScore,
 	}
 end
 
