@@ -26,4 +26,9 @@ function CustomLegacyPrizePool.customHeader(newArgs, data, header)
 	return newArgs
 end
 
+function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
+	newData["place"] = nil
+	return newData
+end
+
 return CustomLegacyPrizePool
