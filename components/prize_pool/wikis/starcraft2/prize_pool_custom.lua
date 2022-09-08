@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
--- page=Module:PrizePool/Custom
+-- wiki=commons
+-- page=Module:PrizePool/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
+local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -40,10 +41,11 @@ local OPPONENT_TYPE_TO_MODE = {
 	quad = '4v4',
 	team = 'team',
 }
-local IMPORT_DEFAULT_ENABLE_START = '2022-01-14'
+local IMPORT_START_DATE = '2022-01-14'
 local PLACE_TO_KEY_PREFIX = {'winner', 'runnerup', 'third', 'fourth'}
 local SEMIFINALS_PREFIX = 'sf'
 local TBD = 'TBD'
+local SC2 = 'starcraft2'
 
 local _lpdb_stash = {}
 local _series
@@ -74,7 +76,7 @@ function CustomPrizePool.run(frame)
 	-- adjust import settings params
 	args.importLimit = tonumber(args.importLimit) or CustomPrizePool._defaultImportLimit()
 	args.allGroupsUseWdl = Logic.emptyOr(args.allGroupsUseWdl, true)
-	args.importEnableStartDate = IMPORT_DEFAULT_ENABLE_START
+	args.importEnableStartDate = IMPORT_START_DATE
 
 	-- fixed setting
 	args.resolveRedirect = true
@@ -329,6 +331,10 @@ function CustomPrizePool._opponentSmwProps(smwEntry, lpdbData)
 end
 
 function CustomPrizePool._defaultImportLimit()
+	if Info.wikiName ~= SC2 then
+		return
+	end
+
 	local tier = tonumber(_tier)
 	if not tier then
 		mw.log('Prize Pool Import: Unset/Invalid liquipediatier')
