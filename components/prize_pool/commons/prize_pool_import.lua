@@ -321,7 +321,7 @@ end
 -- bracket is not double elimination.
 function Import._findDeRoundIndex(bracket)
 	if #bracket.sections ~= 2 then
-		return nil
+		return
 	end
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
 
