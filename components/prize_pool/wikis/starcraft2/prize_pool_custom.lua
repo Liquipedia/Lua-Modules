@@ -40,6 +40,7 @@ local OPPONENT_TYPE_TO_MODE = {
 	quad = '4v4',
 	team = 'team',
 }
+local IMPORT_DEFAULT_ENABLE_START = '2022-01-14'
 local PLACE_TO_KEY_PREFIX = {'winner', 'runnerup', 'third', 'fourth'}
 local SEMIFINALS_PREFIX = 'sf'
 local TBD = 'TBD'
@@ -65,9 +66,15 @@ function CustomPrizePool.run(frame)
 	args.storesmw = Logic.emptyOr(args.storesmw, Namespace.isMain())
 	args.syncPlayers = Logic.emptyOr(args.syncPlayers, true)
 
+	-- overwrite some wiki vars for this PrizePool call
 	_tournament_name = args['tournament name']
 	_series = args.series
-	_tier = args.tier
+	_tier = args.tier or Variables.varDefault('tournament_liquipediatier')
+
+	-- adjust import settings params
+	args.importLimit = tonumber(args.importLimit) or CustomPrizePool._defaultImportLimit()
+	args.allGroupsUseWdl = Logic.emptyOr(args.allGroupsUseWdl, true)
+	args.importEnableStartDate = IMPORT_DEFAULT_ENABLE_START
 
 	-- fixed setting
 	args.resolveRedirect = true
@@ -110,7 +117,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	}
 
 	-- make these available for the stash further down
-	lpdbData.liquipediatier = _tier or Variables.varDefault('tournament_liquipediatier')
+	lpdbData.liquipediatier = _tier
 	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')
 	lpdbData.type = Variables.varDefault('tournament_type')
 
@@ -319,6 +326,18 @@ function CustomPrizePool._opponentSmwProps(smwEntry, lpdbData)
 	end
 
 	return smwEntry
+end
+
+function CustomPrizePool._defaultImportLimit()
+	local tier = tonumber(_tier)
+	if not tier then
+		mw.log('Prize Pool Import: Unset/Invalid liquipediatier')
+		return
+	end
+
+	return tier >= 4 and 8
+		or tier == 3 and 16
+		or nil
 end
 
 return CustomPrizePool
