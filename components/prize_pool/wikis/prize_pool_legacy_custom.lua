@@ -18,16 +18,23 @@ function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run(CustomLegacyPrizePool)
 end
 
-function CustomLegacyPrizePool.customHeader(newArgs, data, header)
-	newArgs.prizesummary = header.prizenote and true or newArgs.prizesummary
+function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, opponentIndex)
+	-- ML has use case of same placement but has different earnings
 
-	local localCurrency = Variables.varDefault('currency')
-	if not newArgs.localcurrency and localCurrency then
-		newArgs.localcurrency = localCurrency
-		data.inputToId.localprize = 'localprize'
+	if slot['usdprize' .. opponentIndex] then
+		opponentData.usdprize = slot['usdprize' .. opponentIndex]
 	end
 
-	return newArgs
-end
+	if slot['points' .. opponentIndex] then
+		local param = CACHED_DATA.inputToId['points']
+		CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['points' .. opponentIndex])
+	end
 
+	if slot['localprize' .. opponentIndex] then
+		local param = CACHED_DATA.inputToId['localprize']
+		CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['localprize' .. opponentIndex])
+	end
+
+	return opponentData
+end
 return CustomLegacyPrizePool
