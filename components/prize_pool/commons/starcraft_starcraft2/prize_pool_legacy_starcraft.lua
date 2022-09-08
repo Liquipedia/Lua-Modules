@@ -217,7 +217,7 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 		end
 	end)
 
-	if newData.localprize then
+	if newData.usdprize then
 		if newData.usdprize:match('[^,%.%d]') then
 			error('Unexpected value in usdprize for place=' .. slot.place)
 		end
