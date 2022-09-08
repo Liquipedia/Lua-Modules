@@ -48,7 +48,9 @@ function Import.run(placements, args)
 end
 
 function Import._getConfig(args, placements)
-	if String.isEmpty(args.matchGroupId1) and String.isEmpty(args.tournament1) and not Logic.readBool(args.import) then
+	if String.isEmpty(args.matchGroupId1) and String.isEmpty(args.tournament1)
+		and not Import._enableImport(args.import, args.importEnableStartDate) then
+
 		return {}
 	end
 
@@ -63,6 +65,14 @@ function Import._getConfig(args, placements)
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
 	}
+end
+
+function Import._enableImport(importInput, importEnableStartDate)
+	local date = TournamentUtil.getContextualDate()
+	return Logic.nilOr(
+		Logic.readBoolOrNil(importInput),
+		importEnableStartDate and (not date or date >= importEnableStartDate)
+	)
 end
 
 function Import._importLimit(importLimitInput, placements)
