@@ -27,7 +27,7 @@ function CustomLegacyPrizePool.customHeader(newArgs, data, header)
 end
 
 function CustomLegacyPrizePool.customSlot(newData, CACHED_DATA, slot)
-	if Logic.readBool(CLEAN_PLACE) then
+	if CLEAN_PLACE then
 		newData["place"] = nil
 	end
 	return newData
