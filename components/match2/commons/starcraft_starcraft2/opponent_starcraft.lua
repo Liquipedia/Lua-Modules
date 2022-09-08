@@ -44,7 +44,7 @@ TeamOpponent without team template ({{TeamOpponent|name=...|short=...}})
 ]]
 function StarcraftOpponent.readOpponentArgs(args)
 	local opponent = Opponent.readOpponentArgs(args)
-	local partySize = Opponent.partySize(opponent.type)
+	local partySize = Opponent.partySize((opponent or {}).type)
 
 	if partySize == 1 then
 		opponent.players[1].race = StarcraftRace.read(args.race)
