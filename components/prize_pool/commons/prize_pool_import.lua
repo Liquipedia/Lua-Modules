@@ -12,7 +12,6 @@ local ArrayExt = require('Module:Array/Ext')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local MathUtil = require('Module:MathUtil')
-local Ordinal = require('Module:Ordinal')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
