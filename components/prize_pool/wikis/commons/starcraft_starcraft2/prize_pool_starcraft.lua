@@ -140,7 +140,12 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	if lpdbData.lastvs then
 		local lastVs = opponent.additionalData.LASTVS
 		extradata.vsOpponent = Table.deepCopy(lastVs)
-		if lastVs.type ~= StarcraftOpponent.team then
+		if lastVs.type == StarcraftOpponent.team then
+			lpdbData.lastvs = Json.stringify{
+				type = lastVs.opponenttype,
+				name = lastVs.name
+			}
+		else
 			lastVs = StarcraftOpponent.toLpdbStruct(lastVs) or {}
 			lpdbData.lastvs = Json.stringify(Table.merge(
 					lastVs.opponentplayers or {},
@@ -294,6 +299,8 @@ function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
 				smwEntry['has last opponent ' .. playerIndex .. ' page'] = player.pageName
 				smwEntry['has last opponent ' .. playerIndex] = player.displayName
 			end
+		elseif lastVs.type == StarcraftOpponent.team then
+			smwEntry['has last opponent'] = lastVs.name
 		end
 	end
 
