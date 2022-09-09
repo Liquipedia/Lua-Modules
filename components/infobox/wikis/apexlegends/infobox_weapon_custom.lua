@@ -133,7 +133,7 @@ function CustomInjector:addCustomCells(widgets)
 		})
 	end
 
-	if String.isNotEmpty(args.ammotype) then
+	if String.isNotEmpty(args.ammotype) and String.isNotEmpty(args.ammotypeicon) then
 		table.insert(widgets, Cell{
 			name = 'Ammo Type',
 			content = {args.ammotypeicon .. ' ' .. args.ammotype}
