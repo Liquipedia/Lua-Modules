@@ -47,7 +47,7 @@ function MatchLegacy.convertParameters(match2)
 	if match.winner == 0 then
 		match.winner = 'draw'
 	end
-	
+
 	match.resulttype = nil
 
 	if match.walkover == 'ff' or match.walkover == 'dq' then
