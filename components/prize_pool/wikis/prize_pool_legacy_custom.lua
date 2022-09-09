@@ -24,11 +24,6 @@ function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, o
 		opponentData.usdprize = slot['usdprize' .. opponentIndex]
 	end
 
-	if slot['points' .. opponentIndex] then
-		local param = CACHED_DATA.inputToId['points']
-		CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['points' .. opponentIndex])
-	end
-
 	if slot['localprize' .. opponentIndex] then
 		local param = CACHED_DATA.inputToId['localprize']
 		CustomLegacyPrizePool._setOpponentReward(opponentData, param, slot['localprize' .. opponentIndex])
@@ -36,4 +31,13 @@ function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, o
 
 	return opponentData
 end
+
+function CustomLegacyPrizePool._setOpponentReward(opponentData, param, value)
+	if param == 'seed' then
+		PrizePoolLegacy.handleSeed(opponentData, value, 1)
+	else
+		opponentData[param] = value
+	end
+end
+
 return CustomLegacyPrizePool
