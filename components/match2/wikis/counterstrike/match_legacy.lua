@@ -44,6 +44,10 @@ function MatchLegacy.convertParameters(match2)
 		end
 	end
 
+	if match.winner == 0 then
+		match.winner = 'draw'
+	end
+
 	if match.walkover == 'ff' or match.walkover == 'dq' then
 		match.walkover = match.winner
 	else
