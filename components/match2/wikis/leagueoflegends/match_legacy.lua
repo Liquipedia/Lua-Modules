@@ -30,7 +30,7 @@ function MatchLegacy.storeMatch(match2, options)
 		match.games = MatchLegacy.storeGames(match, match2)
 
 		return mw.ext.LiquipediaDB.lpdb_match(
-			"legacymatch_" .. match2.match2id,
+			'legacymatch_' .. match2.match2id,
 			match
 		)
 	end
@@ -64,22 +64,30 @@ function MatchLegacy._convertParameters(match2)
 	match.extradata.matchsection = extradata.matchsection
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
-		match.extradata.mvp = table.concat(mvp.players, ",")
-		match.extradata.mvp = match.extradata.mvp .. ";" .. mvp.points
+		local players = {}
+		if type(mvp.players[1]) == 'string' then
+			players = mvp.players
+		else
+			for _, player in ipairs(mvp.players) do
+				table.insert(players, player.name .. '|' .. player.displayname)
+			end
+		end
+		match.extradata.mvp = table.concat(players, ',')
+		match.extradata.mvp = match.extradata.mvp .. ';' .. mvp.points
 	end
 
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
-	if type(bracketData) == "table" and bracketData.type == "bracket" then
+	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
 		local headerName
 		if bracketData.header then
 			headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
 		end
 		if String.isEmpty(headerName) then
-			headerName = Variables.varDefault("match_legacy_header_name")
+			headerName = Variables.varDefault('match_legacy_header_name')
 		end
 		if String.isNotEmpty(headerName) then
 			match.extradata.matchsection = headerName
-			Variables.varDefine("match_legacy_header_name", headerName)
+			Variables.varDefine('match_legacy_header_name', headerName)
 		end
 	end
 
@@ -207,8 +215,14 @@ function MatchLegacy.storeMatchSMW(match, match2)
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		for index, player in ipairs(mvp.players) do
-			local team = getTeamOfPlayer(player) or ''
-			local mvpString = player .. '§§§§'.. team ..'§§§§0'
+			local playerString
+			if type(player) == 'table' then
+				playerString = player.name
+			else
+				playerString = player
+			end
+			local team = getTeamOfPlayer(playerString) or ''
+			local mvpString = playerString .. '§§§§'.. team ..'§§§§0'
 			table.insert(data, 'Has mvp ' .. index .. '=' .. mvpString)
 		end
 	end
