@@ -133,9 +133,21 @@ function CustomInjector:addCustomCells(widgets)
 		})
 	end
 
+	if String.isNotEmpty(args.ammotype) and String.isNotEmpty(args.ammotypeicon) then
+		table.insert(widgets, Cell{
+			name = 'Ammo Type',
+			content = {args.ammotypeicon .. ' ' .. args.ammotype}
+		})
+	end
+
 	table.insert(widgets, Cell{
-		name = 'Ammo Type',
-		content = {args.ammotypeicon .. ' ' .. args.ammotype}
+		name = 'Range',
+		content = {args.range}
+	})
+
+	table.insert(widgets, Cell{
+		name = 'Ignition Time',
+		content = {args.ignitiontime}
 	})
 
 	table.insert(widgets, Cell{
