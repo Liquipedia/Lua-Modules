@@ -329,6 +329,7 @@ function Match._addCommonMatchExtradata(match)
 	local commonExtradata = {
 		comment = match.comment,
 		matchsection = match.matchsection,
+		timestamp = tonumber(match.timestamp),
 		timezoneid = match.timezoneId,
 		timezoneoffset = match.timezoneOffset,
 	}
