@@ -201,8 +201,7 @@ function MvpTable.createPlayer(opponents, mvp)
 		-- this function call is currently needed due to wikis currently storing mvp sometimes as `link|display`
 		mvp = MvpTable.pageFromMvp(mvp)
 		for _, matchPlayer in pairs(players) do
-			local mvpWithoutUnderscores = mvp:gsub('_', ' ')
-			if mvp == matchPlayer.name or mvpWithoutUnderscores == matchPlayer.name then
+			if mvp == matchPlayer.name then
 				player.displayName = matchPlayer.displayname
 				player.flag = matchPlayer.flag
 				player.name = matchPlayer.name
