@@ -388,12 +388,19 @@ function matchFunctions.getMVP(match)
 	-- Split the input
 	local players = mw.text.split(match.mvp, ',')
 
-	-- Trim the input
-	for index, player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
+	-- parse the players to get their information
+	local parsedPlayers = Table.mapValues(players, function(player)
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
+		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+			for _, lookUpPlayer in pairs(opponent.match2players) do
+				if link == lookUpPlayer.name then
+					return Table.merge(lookUpPlayer, {team = opponent.template})
+				end
+			end
+		end
+	end)
 
-	return {players = players, points = mvppoints}
+	return {players = parsedPlayers, points = mvppoints}
 end
 
 function matchFunctions.getOpponents(match)
