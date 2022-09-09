@@ -198,6 +198,7 @@ function MvpTable.createPlayer(opponents, mvp)
 
 	for _, opponent in pairs(opponents) do
 		local players = opponent.match2players or {}
+		-- this function call is currently needed due to wikis currently storing mvp sometimes as `link|display`
 		mvp = MvpTable.pageFromMvp(mvp)
 		for _, matchPlayer in pairs(players) do
 			local mvpWithoutUnderscores = mvp:gsub('_', ' ')
