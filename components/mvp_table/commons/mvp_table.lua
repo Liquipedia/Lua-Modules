@@ -200,7 +200,8 @@ function MvpTable.createPlayer(opponents, mvp)
 		local players = opponent.match2players or {}
 		mvp = MvpTable.pageFromMvp(mvp)
 		for _, matchPlayer in pairs(players) do
-			if mvp == matchPlayer.name then
+			local mvpWithoutUnderscores = mvp:gsub('_', ' ')
+			if mvp == matchPlayer.name or mvpWithoutUnderscores == matchPlayer.name then
 				player.displayName = matchPlayer.displayname
 				player.flag = matchPlayer.flag
 				player.name = matchPlayer.name
@@ -218,7 +219,7 @@ end
 function MvpTable.pageFromMvp(mvp)
 	mvp = mw.text.split(mvp, '|')
 
-	return mvp[1]:gsub('_', ' ')
+	return mw.ext.TeamLiquidIntegration.resolve_redirect(mvp[1]):gsub(' ', '_')
 end
 
 -- exported so it can be used in /Custom
