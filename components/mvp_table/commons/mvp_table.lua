@@ -189,6 +189,18 @@ end
 
 -- overwritable function via /Custom
 function MvpTable.createPlayer(opponents, mvp)
+	if type(mvp) == 'table' then
+		return {
+			points = 0,
+			mvp = 0,
+			displayName = mvp.displayname,
+			name = mvp.name,
+			flag = mvp.flag,
+			team = mvp.team
+		}
+	end
+
+	-- legacy mvp storage format
 	local player = {
 		points = 0,
 		mvp = 0,
