@@ -412,7 +412,7 @@ function MatchGroupInput.readMvp(match)
 		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
 			for _, lookUpPlayer in pairs(opponent.match2players) do
 				if link == lookUpPlayer.name then
-					return Table.merge(lookUpPlayer, {team = opponent.template})
+					return Table.merge(lookUpPlayer, {team = opponent.name, template = opponent.template})
 				end
 			end
 		end
