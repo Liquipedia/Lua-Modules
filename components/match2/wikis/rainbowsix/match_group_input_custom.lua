@@ -64,7 +64,7 @@ function CustomMatchGroupInput.processMap(_, map)
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -73,11 +73,11 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date
+	local teamTemplateDate = timestamp
 	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+	if teamTemplateDate == DateExt.epochZero then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
@@ -296,9 +296,7 @@ end
 
 function matchFunctions.readDate(matchArgs)
 	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
-		dateProps.hasDate = true
-		return dateProps
+		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
 			date = _EPOCH_TIME_EXTENDED,
@@ -407,7 +405,7 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.date)
+			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 			-- Retrieve icon for team
 			if opponent.type == Opponent.team then
@@ -432,7 +430,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < currentUnixTime then
