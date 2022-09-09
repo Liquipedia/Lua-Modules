@@ -196,7 +196,7 @@ function MvpTable.createPlayer(opponents, mvp)
 			displayName = mvp.displayname,
 			name = mvp.name,
 			flag = mvp.flag,
-			team = mvp.team
+			team = mvp.template,
 		}
 	end
 
