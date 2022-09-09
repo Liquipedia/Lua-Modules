@@ -215,13 +215,14 @@ function MatchLegacy.storeMatchSMW(match, match2)
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		for index, player in ipairs(mvp.players) do
-			local playerString
+			local playerString, team
 			if type(player) == 'table' then
 				playerString = player.name
+				team = player.team or ''
 			else
 				playerString = player
+				team = getTeamOfPlayer(playerString) or ''
 			end
-			local team = getTeamOfPlayer(playerString) or ''
 			local mvpString = playerString .. '§§§§'.. team ..'§§§§0'
 			table.insert(data, 'Has mvp ' .. index .. '=' .. mvpString)
 		end
