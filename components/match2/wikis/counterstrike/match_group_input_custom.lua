@@ -103,6 +103,10 @@ end
 --
 -- function to check for draws
 function CustomMatchGroupInput.placementCheckDraw(table)
+	if #table < MAX_NUM_OPPONENTS then
+		return false
+	end
+
 	local last
 	for _, scoreInfo in pairs(table) do
 		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
@@ -178,15 +182,14 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			-- A winner can be set in case of a overturned match
 			if Logic.isEmpty(data.winner) then
 				--CS only has exactly 2 opponents, neither more or less
-				if #indexedScores ~= 2 then
-					error('Unexpected number of opponents when calculating map winner')
+				if #indexedScores == MAX_NUM_OPPONENTS then
+					if tonumber(indexedScores[1].score) > tonumber(indexedScores[2].score) then
+						data.winner = 1
+					else
+						data.winner = 2
+					end
+					indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 				end
-				if tonumber(indexedScores[1].score) > tonumber(indexedScores[2].score) then
-					data.winner = 1
-				else
-					data.winner = 2
-				end
-				indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 			elseif Logic.isNumeric(data.winner) then
 				indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, tonumber(data.winner), 1, 2)
 			end
@@ -634,10 +637,8 @@ function mapFunctions.getScoresAndWinner(map)
 				obj.status = score
 				obj.score = -1
 			end
-			table.insert(map.scores, score)
+			map.scores[scoreIndex] = score
 			indexedScores[scoreIndex] = obj
-		else
-			break
 		end
 	end
 
