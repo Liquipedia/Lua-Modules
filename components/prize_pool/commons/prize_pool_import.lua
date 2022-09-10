@@ -384,7 +384,27 @@ function Import._mergeEntry(lpdbEntry, entry, placement)
 		return entry
 	end
 
-	return Table.deepMergeInto(entry, Import._entryToOpponent(lpdbEntry, placement))
+	return Table.deepMergeInto(Import._entryToOpponent(lpdbEntry, placement), Import._removeTbd(entry))
+end
+
+function Import._removeTbd(entry)
+	-- if we get here we know entry is a TBD Opponent
+	-- but it still might hold data (e.g. flag or race of players) for non party opponents
+	local opponent = entry.opponentData
+	if not Opponent.typeIsParty(opponent.type) then
+		-- TBD opponents of non party types do not hold additional data
+		entry.opponentData = {}
+	else
+		for _, player in pairs(opponent.players or {}) do
+			if Opponent.playerIsTbd(player) then
+				player.displayName = nil
+				player.pageIsResolved = nil
+				player.pageName = nil
+			end
+		end
+	end
+
+	return entry
 end
 
 function Import._entryToOpponent(lpdbEntry, placement)
