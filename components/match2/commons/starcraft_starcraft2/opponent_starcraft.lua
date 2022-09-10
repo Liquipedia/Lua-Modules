@@ -9,6 +9,7 @@
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local StarcraftRace = require('Module:Race/Starcraft')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
@@ -72,7 +73,7 @@ function StarcraftOpponent.fromMatch2Record(record)
 	if Opponent.typeIsParty(opponent.type) then
 		for playerIx, player in ipairs(opponent.players) do
 			local playerRecord = record.match2players[playerIx]
-			player.race = StarcraftRace.read(playerRecord.extradata.faction) or 'u'
+			player.race = StarcraftRace.read(playerRecord.extradata.faction) or StarcraftRace.defaultRace
 		end
 		opponent.isArchon = Logic.readBool((record.extradata or {}).isarchon)
 	end
@@ -125,10 +126,12 @@ function StarcraftOpponent.resolve(opponent, date, options)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
+				local hasRace = String.isNotEmpty(player.race)
 				StarcraftPlayerExt.syncPlayer(player)
 				if not player.team then
 					player.team = PlayerExt.syncTeam(player.pageName, nil, {date = date})
 				end
+				player.race = (hasRace or player.race ~= StarcraftRace.defaultRace) and player.race or nil
 			else
 				PlayerExt.populatePageName(player)
 			end
