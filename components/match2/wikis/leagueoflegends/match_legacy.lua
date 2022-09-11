@@ -65,12 +65,8 @@ function MatchLegacy._convertParameters(match2)
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		local players = {}
-		if type(mvp.players[1]) == 'string' then
-			players = mvp.players
-		else
-			for _, player in ipairs(mvp.players) do
-				table.insert(players, player.name .. '|' .. player.displayname)
-			end
+		for _, player in ipairs(mvp.players) do
+			table.insert(players, player.name .. '|' .. player.displayname)
 		end
 		match.extradata.mvp = table.concat(players, ',')
 		match.extradata.mvp = match.extradata.mvp .. ';' .. mvp.points
@@ -215,15 +211,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		for index, player in ipairs(mvp.players) do
-			local playerString, team
-			if type(player) == 'table' then
-				playerString = player.name
-				team = player.team or ''
-			else
-				playerString = player
-				team = getTeamOfPlayer(playerString) or ''
-			end
-			local mvpString = playerString .. '§§§§'.. team ..'§§§§0'
+			local mvpString = player.name .. '§§§§'.. (player.team or '') ..'§§§§0'
 			table.insert(data, 'Has mvp ' .. index .. '=' .. mvpString)
 		end
 	end
