@@ -121,7 +121,8 @@ function CustomPlayer._getStatusContents()
 	if String.isNotEmpty(_args.banned) then
 		local banned = _BANNED[string.lower(_args.banned)]
 		table.insert(statusContents, banned)
-		end
+	end
+
 	return statusContents
 end
 
