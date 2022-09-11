@@ -73,7 +73,9 @@ function CustomInjector:parse(id, widgets)
 
 		if String.isNotEmpty(manualHistory) or String.isNotEmpty(automatedHistory) then
 			return {
-				Title{name = 'History'}, Center{content = {manualHistory}}, Center{content = {automatedHistory}},
+				Title{name = 'History'},
+				Center{content = {manualHistory}},
+				Center{content = {automatedHistory}},
 			        }
 end
 	elseif id == 'role' then
