@@ -400,7 +400,7 @@ function MatchGroupInput.getCommonTournamentVars(obj)
 end
 
 function MatchGroupInput.readMvp(match)
-	if not match.mvp then return nil end
+	if not match.mvp then return end
 	local mvppoints = match.mvppoints or 1
 
 	-- Split the input
