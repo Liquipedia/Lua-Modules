@@ -29,23 +29,19 @@ local _ROLES = {
 	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
 	['rusher'] = {category = 'Rusher', variable = 'Rusher', isplayer = true},
 	['sniper'] = {category = 'Snipers', variable = 'Snipers', isplayer = true},
-	['lurker'] = {category = 'Lurkers', variable = 'Lurkers', isplayer = true},
+	['granader'] = {category = 'Granader', variable = 'Granader', isplayer = true},
 	['igl'] = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
 
-	-- [[Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
-	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
-	['host'] = {category = 'Hosts', variable = 'Host', isplayer = false},
-	['journalist'] = {category = 'Journalists', variable = 'Journalist', isplayer = false},
-	['expert'] = {category = 'Experts', variable = 'Expert', isplayer = false},
-	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
-	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
-	['talent'] = {category = 'Talents', variable = 'Talent', isplayer = false},
-	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
-	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
-	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},--]]
+	--Staff and Talents
+	['analyst'] = {category = 'Analysts', variable = 'Analyst', talent = true},
+	['host'] = {category = 'Hosts', variable = 'Host', talent = true},
+	['journalist'] = {category = 'Journalists', variable = 'Journalist', talent = true},
+	['coach'] = {category = 'Coaches', variable = 'Coach', staff= true},
+	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
+	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
+	['producer'] = {category = 'Producers', variable = 'Producer', talent = true},
+	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
 }
-_ROLES.lurk= _ROLES.lurker
 
 local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -56,6 +52,8 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 
+	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
+	player.getPersonType = CustomPlayer.getPersonType
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
@@ -76,8 +74,8 @@ function CustomInjector:parse(id, widgets)
 
 	if not (String.isEmpty(manualHistory) and String.isEmpty(automatedHistory)) then
 			return {
-				Title{name = 'History'}, Center{content = {manualHistory}},	Center{content = {automatedHistory}},
-			      }
+				Title{name = 'History'}, Center{content = {manualHistory}}, Center{content = {automatedHistory}},
+			        }
 end
 	elseif id == 'role' then
 		return {
@@ -128,6 +126,11 @@ function CustomPlayer._getStatusContents()
 	return statusContents
 end
 
+function CustomPlayer._isNotPlayer(role)
+	local roleData = _ROLES[(role or ''):lower()]
+	return roleData and (roleData.talent or roleData.staff)
+end
+
 function CustomPlayer:defineCustomPageVariables(args)
 	-- isplayer and country needed for SMW
 	if CustomPlayer._isNotPlayer(args.role) or CustomPlayer._isNotPlayer(args.role2) then
@@ -137,6 +140,18 @@ function CustomPlayer:defineCustomPageVariables(args)
 	end
 
 	Variables.varDefine('country', Player:getStandardNationalityValue(args.country or args.nationality))
+end
+
+function CustomPlayer:getPersonType(args)
+	local roleData = _ROLES[(args.role or ''):lower()]
+	if roleData then
+		if roleData.staff then
+			return {store = 'Staff', category = 'Staff'}
+		elseif roleData.talent then
+			return {store = 'Talent', category = 'Talent'}
+		end
+	end
+	return {store = 'Player', category = 'Player'}
 end
 
 function CustomPlayer._createRole(key, role)
@@ -150,7 +165,6 @@ function CustomPlayer._createRole(key, role)
 	end
 	if Player:shouldStoreData(_args) then
 		local categoryCoreText = 'Category:' .. roleData.category
-
 		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
 			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
 	else
