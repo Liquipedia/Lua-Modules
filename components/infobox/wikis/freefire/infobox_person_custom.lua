@@ -77,7 +77,7 @@ function CustomInjector:parse(id, widgets)
 				Center{content = {manualHistory}},
 				Center{content = {automatedHistory}},
 			        }
-end
+		end
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
