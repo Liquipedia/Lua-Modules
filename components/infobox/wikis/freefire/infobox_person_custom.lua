@@ -168,7 +168,7 @@ function CustomPlayer._createRole(key, role)
 			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
 	else
 		return Variables.varDefineEcho(key or 'role', roleData.variable)
-end
+	end
 end
 
 return CustomPlayer
