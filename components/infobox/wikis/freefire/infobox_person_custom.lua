@@ -25,21 +25,21 @@ local _BANNED = {['banned'] = {category = 'Banned players', variable = 'Banned',
 
 local _ROLES = {
 	-- Players
-	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
-	['rusher'] = {category = 'Rusher', variable = 'Rusher', isplayer = true},
-	['sniper'] = {category = 'Snipers', variable = 'Snipers', isplayer = true},
-	['granader'] = {category = 'Granader', variable = 'Granader', isplayer = true},
-	['igl'] = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
+	support = {category = 'Support players', variable = 'Support', isplayer = true},
+	rusher = {category = 'Rusher', variable = 'Rusher', isplayer = true},
+	sniper = {category = 'Snipers', variable = 'Snipers', isplayer = true},
+	granader = {category = 'Granader', variable = 'Granader', isplayer = true},
+	igl = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
 
 	--Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', talent = true},
-	['host'] = {category = 'Hosts', variable = 'Host', talent = true},
-	['journalist'] = {category = 'Journalists', variable = 'Journalist', talent = true},
-	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
-	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
-	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
-	['producer'] = {category = 'Producers', variable = 'Producer', talent = true},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
+	analyst = {category = 'Analysts', variable = 'Analyst', talent = true},
+	host = {category = 'Hosts', variable = 'Host', talent = true},
+	journalist = {category = 'Journalists', variable = 'Journalist', talent = true},
+	coach = {category = 'Coaches', variable = 'Coach', staff = true},
+	caster = {category = 'Casters', variable = 'Caster', talent = true},
+	manager = {category = 'Managers', variable = 'Manager', staff = true},
+	producer = {category = 'Producers', variable = 'Producer', talent = true},
+	streamer = {category = 'Streamers', variable = 'Streamer', talent = true},
 }
 
 local CustomPlayer = Class.new()
@@ -108,7 +108,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
 
 	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
+		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2 or '')
 	end
 	return lpdbData
 end
