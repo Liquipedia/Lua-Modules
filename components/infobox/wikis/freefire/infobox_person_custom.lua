@@ -76,7 +76,7 @@ function CustomInjector:parse(id, widgets)
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
 				Center{content = {automatedHistory}},
-			        }
+			}
 		end
 	elseif id == 'role' then
 		return {
