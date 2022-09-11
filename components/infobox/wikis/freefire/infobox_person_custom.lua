@@ -11,7 +11,6 @@ local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local Page = require('Module:Page')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Region = require('Module:Region')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
@@ -45,7 +44,7 @@ local _ROLES = {
 
 local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
-
+local _pagename = mw.title.getCurrentTitle().prefixedText
 local _args
 
 function CustomPlayer.run(frame)
@@ -171,5 +170,5 @@ function CustomPlayer._createRole(key, role)
 		return Variables.varDefineEcho(key or 'role', roleData.variable)
 end
 end
-	
+
 return CustomPlayer
