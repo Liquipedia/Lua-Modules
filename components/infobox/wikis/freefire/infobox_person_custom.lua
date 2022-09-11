@@ -90,7 +90,7 @@ end
 			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
 			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
 		}
-		end
+	end
 	return widgets
 end
 
