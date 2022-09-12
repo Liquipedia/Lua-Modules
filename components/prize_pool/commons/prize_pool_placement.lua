@@ -240,8 +240,9 @@ function Placement:_parseOpponents(args)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
 		local opponent = {opponentData = {}, prizeRewards = {}, additionalData = {}}
 		if not opponentInput then
-			-- If given a range of opponents, add them all, even if they're missing from the input
-			if not args.place or self.placeStart + opponentIndex > self.placeEnd + 1 then
+			-- If enabled and given a range of opponents, add them all, even if they're missing from the input
+			if not self.parent.options.fillPlaceRange or not args.place
+				or self.placeStart + opponentIndex > self.placeEnd + 1 then
 				return
 			else
 				opponent.opponentData = Opponent.tbd(self.parent.opponentType)

@@ -135,6 +135,12 @@ PrizePool.config = {
 			return Logic.readBoolOrNil(args.abbreviateTbd)
 		end
 	},
+	fillPlaceRange = {
+		default = true,
+		read = function(args)
+			return Logic.readBoolOrNil(args.fillPlaceRange)
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
