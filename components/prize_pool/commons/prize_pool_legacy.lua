@@ -45,6 +45,7 @@ function LegacyPrizePool.run(dependency)
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
 	newArgs.cutafter = header.cutafter
 	newArgs.lpdb_prefix = header.lpdb_prefix or header.smw_prefix
+	newArgs.fillPlaceRange = Logic.readBoolOrNil(eader.fillPlaceRange) or false
 
 	if Currency.raw(header.localcurrency) then
 		-- If the localcurrency is a valid currency, handle it like currency
