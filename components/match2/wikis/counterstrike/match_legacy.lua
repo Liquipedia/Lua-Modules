@@ -44,7 +44,7 @@ function MatchLegacy.convertParameters(match2)
 		end
 	end
 
-	if match.winner == 0 then
+	if match.resulttype == 'draw' then
 		match.winner = 'draw'
 	end
 
