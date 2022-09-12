@@ -66,10 +66,6 @@ function FortniteOpponentDisplay.BlockOpponent(props)
 			team = opponent.team,
 			template = opponent.template or 'tbd',
 		})
-	elseif opponent.type == 'literal' and opponent.extradata.hasRaceOrFlag then
-		return FortniteOpponentDisplay.PlayerBlockOpponent(
-			Table.merge(props, {showLink = showLink})
-		)
 	elseif opponent.type == 'literal' then
 		return OpponentDisplay.BlockOpponent(props)
 	else -- opponent.type == 'solo' 'duo' 'trio' 'quad'
@@ -97,6 +93,9 @@ function FortniteOpponentDisplay.PlayerInlineOpponent(props)
 	if props.flip then
 		playerTexts = Array.reverse(playerTexts)
 	end
+
+	return html.create('span')
+		:node(table.concat(playerTexts, ' / '))
 end
 
 --[[
