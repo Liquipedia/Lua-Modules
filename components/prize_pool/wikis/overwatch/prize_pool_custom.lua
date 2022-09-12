@@ -13,7 +13,6 @@ local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local CustomLpdbInjector = Class.new(LpdbInjector)
@@ -40,12 +39,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart,
 		Variables.varDefault('tournament_type')
 	)
-
-	local participantLower = mw.ustring.lower(lpdbData.participant)
-
-	Variables.varDefine(participantLower .. '_pointprize', lpdbData.extradata.prizepoints)
-	Variables.varDefine('enddate_'.. lpdbData.participant, lpdbData.date)
-	Variables.varDefine('status'.. lpdbData.participant, lpdbData.date)
 
 	return lpdbData
 end
