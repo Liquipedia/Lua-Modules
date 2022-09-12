@@ -130,10 +130,10 @@ PrizePool.config = {
 			return Logic.readBoolOrNil(args.abbreviateTbd)
 		end
 	},
-	fillPlaceRangeWithTbd = {
+	fillPlaceRange = {
 		default = true,
 		read = function(args)
-			return Logic.readBoolOrNil(args.fillPlaceRangeWithTbd)
+			return Logic.readBoolOrNil(args.fillPlaceRange)
 		end
 	},
 }
