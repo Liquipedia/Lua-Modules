@@ -264,7 +264,7 @@ function CustomPlayer._getMatchupData(player)
 		CustomPlayer._setVarsForVS(vs)
 	end
 
-	_player.yearsActive = yearsActive
+	return yearsActive
 end
 
 function CustomPlayer._getYearsActive(years)
