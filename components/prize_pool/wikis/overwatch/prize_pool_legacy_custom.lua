@@ -19,18 +19,6 @@ function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run(CustomLegacyPrizePool)
 end
 
-function CustomLegacyPrizePool.customHeader(newArgs, data, header)
-	newArgs.prizesummary = header.prizenote and true or newArgs.prizesummary
-
-	local localCurrency = Variables.varDefault('currency')
-	if not newArgs.localcurrency and localCurrency then
-		newArgs.localcurrency = localCurrency
-		data.inputToId.localprize = 'localprize'
-	end
-
-	return newArgs
-end
-
 function CustomLegacyPrizePool.customSlot(newData, data, slot)
 	-- Remove points with only image
 	-- Table.filter doesn't work on Tables (only Arrays)... Let's use Table.map instead
