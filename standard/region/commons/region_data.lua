@@ -10,9 +10,6 @@ return {
 	aliases = {
 		europe = 'eu',
 
-		us = 'na',
-		usa = 'na',
-		['united states'] = 'na',
 		america = 'na',
 		americas = 'na',
 		['north america'] = 'na',
@@ -34,12 +31,6 @@ return {
 		anz = 'oce',
 		oceania = 'oce',
 
-		china = 'cn',
-		['south korea'] = 'kr',
-		sk = 'kr',
-
-		taiwan = 'tw',
-
 		['middle east'] = 'me',
 
 		africa = 'af',
@@ -47,12 +38,6 @@ return {
 		['asia pacific'] = 'apac',
 		['asia-pacific'] = 'apac',
 		ap = 'apac',
-
-		japan = 'jp',
-
-		brazil = 'br',
-
-		vietnam = 'vn',
 
 		['malaysia/singapore/philippines'] = 'msp',
 		['malaysia, singapore, philippines'] = 'msp',
@@ -95,18 +80,6 @@ return {
 		region = 'Oceania',
 		flag = 'anz',
 	},
-	cn = {
-		region = 'China',
-		flag = 'cn',
-	},
-	kr = {
-		region = 'Korea',
-		flag = 'kr',
-	},
-	tw = {
-		region = 'Taiwan',
-		flag = 'tw',
-	},
 	me = {
 		region = 'Middle East',
 		flag = 'middle east',
@@ -122,18 +95,6 @@ return {
 	apac = {
 		region = 'Asia Pacific',
 		flag = 'asia',
-	},
-	jp = {
-		region = 'Japan',
-		flag = 'jp',
-	},
-	br = {
-		region = 'Brazil',
-		flag = 'br',
-	},
-	vn = {
-		region = 'Vietnam',
-		flag = 'vn',
 	},
 	msp = {
 		region = 'MSP',
