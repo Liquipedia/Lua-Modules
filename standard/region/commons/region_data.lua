@@ -25,9 +25,7 @@ return {
 
 		['southeast asia'] = 'sea',
 
-		australia = 'oce',
 		['australia/new zealand'] = 'oce',
-		['new zealand'] = 'oce',
 		anz = 'oce',
 		oceania = 'oce',
 
