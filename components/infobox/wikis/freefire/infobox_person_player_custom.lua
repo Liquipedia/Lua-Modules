@@ -35,7 +35,7 @@ local _ROLES = {
 	host = {category = 'Hosts', variable = 'Host', talent = true},
 	journalist = {category = 'Journalists', variable = 'Journalist', talent = true},
 	coach = {category = 'Coaches', variable = 'Coach', staff = true},
-	assistant coach  = {category = 'Assistant Coach ', variable = 'Assistant Coach', staff = true},
+	['assistant coach']  = {category = 'Assistant Coach ', variable = 'Assistant Coach', staff = true},
 	caster = {category = 'Casters', variable = 'Caster', talent = true},
 	manager = {category = 'Managers', variable = 'Manager', staff = true},
 	producer = {category = 'Producers', variable = 'Producer', talent = true},
