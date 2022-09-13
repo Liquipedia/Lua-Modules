@@ -79,7 +79,7 @@ function CustomInjector:parse(id, widgets)
 
 		if not String.isEmpty(args.team1) then
 			local teams = {Page.makeInternalLink(args.team1)}
-			local index  = 2
+			local index = 2
 
 			while not String.isEmpty(args['team' .. index]) do
 				table.insert(teams, '&nbsp;• ' ..
@@ -124,7 +124,7 @@ function CustomLeague:getWikiCategories(args)
 	if String.isEmpty(tier) then
 		table.insert(categories, 'Pages with unsupported Tier')
 	else
-		table.insert(categories, Tier['text'][tier]  .. ' Tournaments')
+		table.insert(categories, Tier['text'][tier] .. ' Tournaments')
 	end
 
 	if not String.isEmpty(tiertype) then
@@ -337,7 +337,7 @@ function CustomLeague:_getGameModes(args, makeLink)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
 
 			table.insert(categories, not String.isEmpty(gameModes[index])
-				and gameModes[index] ..  ' Tournaments'
+				and gameModes[index] .. ' Tournaments'
 				or 'Pages with unknown game mode'
 			)
 

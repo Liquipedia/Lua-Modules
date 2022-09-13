@@ -57,7 +57,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has team right score=' .. (match.opponent2score or '0'),
 		'Has exact time=' .. (Logic.readBool(match.dateexact) and 'true' or 'false'),
 		'Is finished=' .. (Logic.readBool(match.finished) and 'true' or 'false'),
-	 })
+	})
 end
 
 function MatchLegacy.storeGames(match, match2)

@@ -60,7 +60,7 @@ function Score:setMapScore(score)
 end
 
 function Score:setFirstHalfScore(score, side)
-	local halfScore =  mw.html.create('td')
+	local halfScore = mw.html.create('td')
 	halfScore
 		:addClass('brkts-popup-body-match-sidewins')
 		:addClass('brkts-cs-score-color-' .. side)
@@ -71,7 +71,7 @@ function Score:setFirstHalfScore(score, side)
 end
 
 function Score:setSecondHalfScore(score, side)
-	local halfScore =  mw.html.create('td')
+	local halfScore = mw.html.create('td')
 	halfScore
 		:addClass('brkts-popup-body-match-sidewins')
 		:addClass('brkts-cs-score-color-' .. side)
@@ -236,9 +236,9 @@ function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
 	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end

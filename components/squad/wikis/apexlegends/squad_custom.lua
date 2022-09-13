@@ -28,16 +28,16 @@ function CustomSquad.header(self)
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
 	headerRow:node(makeHeader('ID'))
-			 :node(makeHeader())
-			 :node(makeHeader('Name'))
-			 :node(makeHeader()) -- "Role"
-			 :node(makeHeader('Join Date'))
+			:node(makeHeader())
+			:node(makeHeader('Name'))
+			:node(makeHeader()) -- "Role"
+			:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
-				 :node(makeHeader('New Team'))
+				:node(makeHeader('New Team'))
 	end
 
 	self.content:node(headerRow)
