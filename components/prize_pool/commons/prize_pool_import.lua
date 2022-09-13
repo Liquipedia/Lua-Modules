@@ -48,6 +48,7 @@ end
 
 function Import._getConfig(args, placements)
 	if String.isEmpty(args.matchGroupId1) and String.isEmpty(args.tournament1)
+		and String.isEmpty(args.matchGroupId) and String.isEmpty(args.tournament)
 		and not Import._enableImport(args.import, args.importEnableStartDate) then
 
 		return {}
@@ -96,10 +97,12 @@ function Import._importPlacements(inputPlacements)
 
 	-- Apply importLimit if set
 	if Import.config.importLimit then
-		local sums = MathUtil.partialSums(Array.map(placementEntries, function(entries) return #entries end))
-		local index = ArrayExt.findIndex(sums, function(sum) return Import.config.importLimit <= sum end)
-		if index ~= 0 then
-			placementEntries = Array.sub(placementEntries, 1, index - 1)
+		-- array of partial sums of the number of entries until a given placement/slot
+		local importedEntriesSums = MathUtil.partialSums(Array.map(placementEntries, function(entries) return #entries end))
+		-- slotIndex of the slot until which we want to import based on importLimit
+		local slotIndex = ArrayExt.findIndex(importedEntriesSums, function(sum) return Import.config.importLimit <= sum end)
+		if slotIndex ~= 0 then
+			placementEntries = Array.sub(placementEntries, 1, slotIndex - 1)
 		end
 	end
 
