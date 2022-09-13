@@ -121,8 +121,8 @@ function Import._computeStagePlacementEntries(stage, options)
 	local maxPlacementCount = Array.max(Array.map(
 			groupPlacementEntries,
 			function(placementEntries) return #placementEntries end
-		))
-	return Array.map(Array.range(1, maxPlacementCount or 0), function(placementIndex)
+		)) or 0
+	return Array.map(Array.range(1, maxPlacementCount), function(placementIndex)
 		return Array.flatMap(groupPlacementEntries, function(placementEntries)
 			return placementEntries[placementIndex]
 		end)
@@ -139,7 +139,6 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
 			local entry = {
 				date = record.extradata.endTime and DateExt.toYmdInUtc(record.extradata.endTime),
-				showMatchDraws = record.extradata.showMatchDraws or false,
 			}
 
 			if not record.extradata.placeRange then
@@ -148,11 +147,9 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 			if record.extradata.placeRange[1] == record.extradata.placeRange[2] then
 				Table.mergeInto(entry, {
 					matchScore = record.scoreboard.match,
-					opponent = record.extradata.opponent,
+					opponent = record.opponent,
 				})
-				if entry.opponent.template then
-					entry.opponent.name = entry.opponent.template
-				else
+				if entry.opponent.name then
 					entry.opponent.isResolved = true
 				end
 			end
@@ -208,7 +205,7 @@ end
 
 function Import._makeEntryFromMatch(placementEntry, match)
 	local entry = {
-		date = match.date:match('^[%d-]+'),
+		date = DateExt.toYmdInUtc(match.date),
 	}
 
 	if match.winner and 1 <= match.winner and #match.opponents == 2 then
@@ -441,10 +438,6 @@ end
 function Import._makeGroupScore(lpdbEntry)
 	if not lpdbEntry.matchScore then
 		return
-	end
-
-	if not lpdbEntry.showMatchDraws then
-		table.remove(lpdbEntry.matchScore, 2)
 	end
 
 	return table.concat(lpdbEntry.matchScore, Import.config.groupScoreDelimiter)
