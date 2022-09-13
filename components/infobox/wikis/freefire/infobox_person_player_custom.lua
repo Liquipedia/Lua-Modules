@@ -21,8 +21,6 @@ local Center = require('Module:Infobox/Widget/Center')
 
 local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 
-local _BANNED = {['banned'] = {category = 'Banned players', variable = 'Banned', isplayer = true},}
-
 local _ROLES = {
 	-- Players
 	support = {category = 'Support players', variable = 'Support', isplayer = true},
@@ -30,12 +28,14 @@ local _ROLES = {
 	sniper = {category = 'Snipers', variable = 'Snipers', isplayer = true},
 	granader = {category = 'Granader', variable = 'Granader', isplayer = true},
 	igl = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
+	captain = {category = 'Captain', variable = 'Captain', isplayer = true},
 
 	--Staff and Talents
 	analyst = {category = 'Analysts', variable = 'Analyst', talent = true},
 	host = {category = 'Hosts', variable = 'Host', talent = true},
 	journalist = {category = 'Journalists', variable = 'Journalist', talent = true},
 	coach = {category = 'Coaches', variable = 'Coach', staff = true},
+	assistant coach  = {category = 'Assistant Coach ', variable = 'Assistant Coach', staff = true},
 	caster = {category = 'Casters', variable = 'Caster', talent = true},
 	manager = {category = 'Managers', variable = 'Manager', staff = true},
 	producer = {category = 'Producers', variable = 'Producer', talent = true},
@@ -107,25 +107,18 @@ function CustomPlayer:adjustLPDB(lpdbData)
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
 
-	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2 or '')
-	end
+   local team2 = _args.team2link or _args.team2
+ 	if String.isNotEmpty(team2) then
+ 		lpdbData.extradata.team2 = (mw.ext.TeamTemplate.raw(team2) or {}).page or team2
+ 	end
 	return lpdbData
 end
 
 function CustomPlayer._getStatusContents()
-	local statusContents = {}
-
-	if String.isNotEmpty(_args.status) then
-		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
+	if String.isEmpty(_args.status) then
+		return {}
 	end
-
-	if String.isNotEmpty(_args.banned) then
-		local banned = _BANNED[string.lower(_args.banned)]
-		table.insert(statusContents, banned)
-	end
-
-	return statusContents
+	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
 end
 
 function CustomPlayer._isNotPlayer(role)
