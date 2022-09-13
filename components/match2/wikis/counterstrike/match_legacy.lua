@@ -15,6 +15,7 @@ local Variables = require('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
+local DRAW = 'draw'
 local LOSER_STATUSES = {'FF', 'DQ', 'L'}
 
 local MatchLegacy = {}
@@ -43,6 +44,12 @@ function MatchLegacy.convertParameters(match2)
 			match[key] = nil
 		end
 	end
+
+	if match.resulttype == DRAW then
+		match.winner = 'draw'
+	end
+
+	match.resulttype = nil
 
 	if match.walkover == 'ff' or match.walkover == 'dq' then
 		match.walkover = match.winner
