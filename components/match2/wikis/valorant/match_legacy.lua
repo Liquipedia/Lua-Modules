@@ -60,7 +60,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		"Has exact time=" .. (Logic.readBool(match.dateexact) and "true" or "false"),
 		"Is featured match=" .. (Logic.readBool(match.extradata.featured) and "true" or "false"),
 		"Is finished=" .. (Logic.readBool(match.finished) and "true" or "false"),
-	 })
+	})
 end
 
 function MatchLegacy.storeGames(match, match2)

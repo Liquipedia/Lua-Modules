@@ -475,9 +475,9 @@ end
 ---
 -- Format:
 -- {
---     region: Region or continent
---     country: the country
---     location: the city or place
+--	region: Region or continent
+--	country: the country
+--	location: the city or place
 -- }
 function League:_createLocation(args)
 	if String.isEmpty(args.country) then

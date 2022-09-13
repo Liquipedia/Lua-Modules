@@ -137,7 +137,7 @@ function Score:setFirstRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins')
+	roundScore	:addClass('brkts-popup-body-match-sidewins')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -152,7 +152,7 @@ function Score:setSecondRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins')
+	roundScore	:addClass('brkts-popup-body-match-sidewins')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -167,7 +167,7 @@ function Score:setFirstOvertimeRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins-overtime')
+	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -182,7 +182,7 @@ function Score:setSecondOvertimeRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins-overtime')
+	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -360,9 +360,9 @@ function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
 	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
@@ -379,7 +379,7 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	--local matchPageElement = mw.html.create('center')
-	--matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+	--matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
 	--				:css('display', 'block')
 	--				:css('margin', 'auto')
 	--body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
@@ -497,7 +497,7 @@ function CustomMatchSummary._createMap(game)
 	row:addElement(team1Score:create())
 
 	local centerNode = mw.html.create('div')
-	centerNode  :addClass('brkts-popup-spaced')
+	centerNode	:addClass('brkts-popup-spaced')
 				:wikitext('[[' .. game.map .. ']]')
 				:css('text-align', 'center')
 				:css('padding','5px 2px')

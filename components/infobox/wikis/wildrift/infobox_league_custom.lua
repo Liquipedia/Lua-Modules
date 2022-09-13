@@ -60,7 +60,7 @@ end
 
 function League:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier =  Logic.readBool(args.riotpremier) and 'true' or nil
+	lpdbData.publishertier = Logic.readBool(args.riotpremier) and 'true' or nil
 
 	return lpdbData
 end

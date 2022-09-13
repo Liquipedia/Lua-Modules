@@ -26,7 +26,7 @@ function Class.new(base, init)
 		for index, value in pairs(base) do
 			instance[index] = value
 		end
-	  instance._base = base
+		instance._base = base
 	end
 
 	instance.__index = instance

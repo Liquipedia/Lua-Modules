@@ -90,7 +90,7 @@ function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
 	if String.isNotEmpty(lpdbPrefix) then
 		storageName = storageName .. '_' .. lpdbPrefix
 	end
-	storageName = storageName .. '_' ..  mw.ustring.lower(team)
+	storageName = storageName .. '_' .. mw.ustring.lower(team)
 	if team == 'TBD' then
 		local placement = tonumber(Variables.varDefault('TBD_placements', '1'))
 		storageName = storageName .. '_' .. placement

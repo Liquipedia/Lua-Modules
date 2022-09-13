@@ -141,11 +141,11 @@ function Placement._placement(args)
 	end
 	local raw = Placement.raw(args.placement or '')
 	args.parent:css('text-align', 'center')
-			   :attr('data-sort-value', raw.sort)
-			   :addClass(raw.backgroundClass)
-			   :tag('b')
-			   :addClass(not raw.blackText and 'placement-text' or nil)
-			   :wikitext(raw.display)
+				:attr('data-sort-value', raw.sort)
+				:addClass(raw.backgroundClass)
+				:tag('b')
+				:addClass(not raw.blackText and 'placement-text' or nil)
+				:wikitext(raw.display)
 
 end
 

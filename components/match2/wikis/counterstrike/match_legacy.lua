@@ -208,7 +208,7 @@ function MatchLegacy.storeMatchSMW(match)
 			['has team right'] = match.opponent2 or '',
 			['has map date'] = match.date or '',
 			['has tournament'] = mw.title.getCurrentTitle().prefixedText,
-			['has tournament tier'] =  Variables.varDefault('tournament_tier'), -- Legacy support Infobox
+			['has tournament tier'] = Variables.varDefault('tournament_tier'), -- Legacy support Infobox
 			['has tournament tier number'] = match.liquipediatier, -- or this ^
 			['has tournament icon'] = match.icon,
 			['has tournament name'] = match.tickername,

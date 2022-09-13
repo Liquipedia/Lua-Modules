@@ -8,7 +8,7 @@
 local TextSanitizer = {}
 
 local NAME_SANITIZER = {
-	['<.->'] =  '', -- All html tags and their attributes
+	['<.->'] = '', -- All html tags and their attributes
 	['&nbsp;'] = ' ', -- Non-breaking space
 	['&zwj;'] = '', -- Zero width joiner
 	['—'] = '-', -- Non-breaking hyphen

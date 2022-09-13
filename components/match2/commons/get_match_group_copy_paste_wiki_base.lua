@@ -37,7 +37,7 @@ function wikiCopyPaste._getMaps(bestof)
 	local map = '{{Map|map=}}'
 	local out = ''
 	for i = 1, bestof do
-		out = out .. '\n    |map' .. i .. '=' .. map
+		out = out .. '\n	|map' .. i .. '=' .. map
 	end
 
 	return out
