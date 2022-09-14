@@ -25,7 +25,7 @@ function Ordinal.written(valueInput, options)
 	-- clean value input
 	value = tonumber(string.match(value, '(%d*)%W*$'))
 	if not value then
-		return 
+		return
 	end
 
 	options = options or {}
@@ -54,15 +54,16 @@ function Ordinal.written(valueInput, options)
 	end
 
 	local display = ''
-	local ordinalApplied = false
+	local applyOrdinal = true
 	for groupIndex, digitGroup in ipairs(digitGroups) do
 		local groupPostfix = ''
 		if groupIndex ~= 1 and digitGroup ~= 0 then
 			groupPostfix = ' ' .. OrdinalData.groups[groupIndex - 1] .. (applyOrdinal and 'th' or '') .. ' '
-			ordinalApplied = true
+			applyOrdinal = false
 		end
 
-		local text, ordinalApplied = Ordinal._writtenBelowThousand(digitGroup, not ordinalApplied, concatText)
+		local text
+		text, applyOrdinal = Ordinal._writtenBelowThousand(digitGroup, applyOrdinal, concatText)
 		display = text .. groupPostfix .. display
 	end
 
@@ -87,21 +88,21 @@ end
 
 function Ordinal._writtenBelowThousand(value, applyOrdinal, concatText)
 	if value == 0 then
-		return '', not applyOrdinal
+		return '', applyOrdinal
 	end
 
 	if value < 100 then
-		return Ordinal._writtenBelowHundred(value, applyOrdinal), true
+		return Ordinal._writtenBelowHundred(value, applyOrdinal), false
 	end
 
 	local display = OrdinalData.position[math.floor(value / 100)] .. ' hundred'
 	if value % 100 == 0 then
-		return display .. (applyOrdinal and 'th' or ''), true
+		return display .. (applyOrdinal and 'th' or ''), false
 	end
 
 	display = display .. concatText .. Ordinal._writtenBelowHundred(value % 100, applyOrdinal)
 
-	return display, true
+	return display, false
 end
 
 function Ordinal._writtenBelowHundred(value, applyOrdinal)
@@ -121,13 +122,13 @@ end
 
 function Ordinal.suffix(value, options)
 	if String.isEmpty(value) then
-		return 
+		return
 	end
 
 	-- clean value input
 	value = tonumber(string.match(value, '(%d*)%W*$'))
 	if not value then
-		return 
+		return
 	end
 
 	options = options or {}
@@ -163,7 +164,7 @@ function Ordinal.ordinal(frame)
 end
 
 function Ordinal._ordinal(value, abbreviateSuffixD, superScript)
-	return Ordinal.suffix(args[1], {
+	return Ordinal.suffix(value, {
 		abbreviateSuffixD = abbreviateSuffixD,
 		superScript = superScript,
 	}) or ''
