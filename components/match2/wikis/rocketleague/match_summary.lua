@@ -170,7 +170,7 @@ function Header:createOpponent(opponent, opponentIndex)
 		flip = opponentIndex == 1,
 		opponent = opponent,
 		overflow = 'ellipsis',
-		teamStyle = 'bracket',
+		teamStyle = 'short',
 	})
 		:addClass(opponent.type ~= 'solo'
 			and 'brkts-popup-header-opponent'

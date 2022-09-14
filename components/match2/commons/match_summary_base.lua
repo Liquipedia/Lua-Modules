@@ -52,14 +52,14 @@ function Header:rightOpponent(content)
 	return self
 end
 
-function Header:createOpponent(opponent, side)
+function Header:createOpponent(opponent, side, style)
 	local showLink = not Opponent.isTbd(opponent) and true or false
 	return OpponentDisplay.BlockOpponent{
 		flip = side == 'left',
 		opponent = opponent,
 		showLink = showLink,
 		overflow = 'ellipsis',
-		teamStyle = 'bracket',
+		teamStyle = style or 'short',
 	}
 end
 
@@ -134,11 +134,7 @@ local Mvp = Class.new(
 )
 
 function Mvp:addPlayer(player)
-	if Logic.isEmpty(player) then
-		return self
-	elseif type(player) == 'table' then
-		table.insert(self.players, player.name .. '|' .. player.displayname)
-	else
+	if not Logic.isEmpty(player) then
 		table.insert(self.players, player)
 	end
 	return self

@@ -36,7 +36,7 @@ function CustomMatchSummary.getByMatchId(args)
 			flip = opponentIndex == 1,
 			opponent = match.opponents[opponentIndex],
 			overflow = 'ellipsis',
-			teamStyle = 'bracket',
+			teamStyle = 'short',
 		})
 			:addClass(match.opponents[opponentIndex].type ~= 'solo'
 				and 'brkts-popup-header-opponent'
