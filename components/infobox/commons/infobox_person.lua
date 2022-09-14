@@ -232,7 +232,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	local team = args.teamlink or args.team
 	if team and mw.ext.TeamTemplate.teamexists(team) then
 		local teamRaw = mw.ext.TeamTemplate.raw(team)
-		teamLink = mw.ext.TeamLiquidIntegration.resolve_redirect(teamRaw.page)
+		teamLink = teamRaw.page
 		teamTemplate = teamRaw.templatename
 	end
 
@@ -250,7 +250,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		image = args.image,
 		region = _region,
 		team = teamLink or team,
-		teampagename = (teamLink or team or ''):gsub(' ', '_'),
+		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
 		teamtemplate = teamTemplate,
 		status = status,
 		type = personType,
