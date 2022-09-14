@@ -232,7 +232,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	local team = args.teamlink or args.team
 	if team and mw.ext.TeamTemplate.teamexists(team) then
 		local teamRaw = mw.ext.TeamTemplate.raw(team)
-		teamLink = teamRaw.page
+		teamLink = mw.ext.TeamLiquidIntegration.resolve_redirect(teamRaw.page)
 		teamTemplate = teamRaw.templatename
 	end
 
