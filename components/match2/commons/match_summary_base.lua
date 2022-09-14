@@ -134,7 +134,11 @@ local Mvp = Class.new(
 )
 
 function Mvp:addPlayer(player)
-	if not Logic.isEmpty(player) then
+	if Logic.isEmpty(player) then
+		return self
+	elseif type(player) == 'table' then
+		table.insert(self.players, player.name .. '|' .. player.displayname)
+	else
 		table.insert(self.players, player)
 	end
 	return self
