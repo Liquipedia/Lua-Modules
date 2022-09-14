@@ -52,14 +52,14 @@ function Header:rightOpponent(content)
 	return self
 end
 
-function Header:createOpponent(opponent, side)
+function Header:createOpponent(opponent, side, style)
 	local showLink = not Opponent.isTbd(opponent) and true or false
 	return OpponentDisplay.BlockOpponent{
 		flip = side == 'left',
 		opponent = opponent,
 		showLink = showLink,
 		overflow = 'ellipsis',
-		teamStyle = 'bracket',
+		teamStyle = style or 'short',
 	}
 end
 

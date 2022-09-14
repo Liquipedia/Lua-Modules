@@ -113,10 +113,10 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
 		:leftScore(header:createScore(match.opponents[1]))
 		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
 
 	return header
 end
