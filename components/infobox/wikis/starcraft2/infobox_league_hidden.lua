@@ -419,13 +419,13 @@ function HiddenInfoboxLeague._getMaps()
 	local mapArgs
 	local prefix
 	if String.isNotEmpty(_args.map1) then
-		mapArgs = _league:getAllArgsForBase(_args, 'map')
+		mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, 'map')
 		prefix = 'map'
 	elseif String.isNotEmpty(_args['2map1']) then
-		mapArgs = _league:getAllArgsForBase(_args, '2map')
+		mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, '2map')
 		prefix = '2map'
 	elseif String.isNotEmpty(_args['3map1']) then
-		mapArgs = _league:getAllArgsForBase(_args, '3map')
+		mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, '3map')
 		prefix = '3map'
 	end
 
