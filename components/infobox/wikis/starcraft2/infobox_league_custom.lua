@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
+local Json = require('Module:Json')
 local League = require('Module:Infobox/League')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -138,16 +139,31 @@ function CustomInjector:parse(id, widgets)
 		--maps
 		if String.isNotEmpty(_args.map1) then
 			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('map')})
 		elseif String.isNotEmpty(_args['2map1']) then
 			table.insert(widgets, Title{name = _args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('2map')})
 		elseif String.isNotEmpty(_args['3map1']) then
 			table.insert(widgets, Title{name = _args['3maptitle'] or '3v3 Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('3map')})
+		end
+
+		local maps = Variables.varDefault('tournament_maps')
+		if String.isNotEmpty(maps) then
+			table.insert(widgets, Center{content = CustomLeague._mapsDisplay(maps)})
 		end
 	end
 	return widgets
+end
+
+function CustomLeague._mapsDisplay(maps)
+	maps = Json.parseIfTable(maps)
+
+	return {table.concat(
+		Array.map(maps, function(mapData)
+			return tostring(CustomLeague:_createNoWrappingSpan(
+				PageLink.makeInternalLink({}, mapData.displayname, mapData.link)
+			))
+		end),
+		'&nbsp;• '
+	)}
 end
 
 function CustomLeague:_createPrizepool()
@@ -557,6 +573,36 @@ function CustomLeague:defineCustomPageVariables()
 	--month and day
 	local monthAndDay = string.match(Variables.varDefault('tournament_enddate', ''), '%d%d-%d%d') or ''
 	Variables.varDefine('Month_Day', monthAndDay)
+
+	--maps
+	Variables.varDefine('tournament_maps', CustomLeague._getMaps())
+end
+
+function CustomLeague._getMaps()
+	local mapArgs
+	local prefix
+	if String.isNotEmpty(_args.map1) then
+		mapArgs = _league:getAllArgsForBase(_args, 'map')
+		prefix = 'map'
+	elseif String.isNotEmpty(_args['2map1']) then
+		mapArgs = _league:getAllArgsForBase(_args, '2map')
+		prefix = '2map'
+	elseif String.isNotEmpty(_args['3map1']) then
+		mapArgs = _league:getAllArgsForBase(_args, '3map')
+		prefix = '3map'
+	end
+
+	if not mapArgs then
+		return ''
+	end
+
+	return Json.stringify(Table.map(mapArgs, function(mapIndex, map)
+		map = mw.text.split(map, '|')
+		return mapIndex, {
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(map[1]),
+			displayname = _args[prefix .. mapIndex .. 'display'] or map[#map],
+		}
+	end))
 end
 
 function CustomLeague:addToLpdb(lpdbData)
@@ -567,19 +613,12 @@ function CustomLeague:addToLpdb(lpdbData)
 		or Logic.readBool(Variables.varDefault('cancelled tournament')) and 'cancelled'
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
-	lpdbData.maps = CustomLeague:_concatArgs('map')
+	lpdbData.maps = Variables.varDefault('tournament_maps')
 	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
 
 	return lpdbData
-end
-
-function CustomLeague:_concatArgs(base)
-	return table.concat(
-		Array.map(_league:getAllArgsForBase(_args, base), mw.ext.TeamLiquidIntegration.resolve_redirect),
-		';'
-	)
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
