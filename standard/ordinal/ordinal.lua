@@ -31,12 +31,11 @@ function Ordinal.written(valueInput, options)
 	options = options or {}
 	local signText = value >= 0 and ''
 		or (options.negativeSignText or DEFAULT_NEGATIVE_SIGN_TEXT) .. ' '
-	local concatText = options.concatWithAnd and ' and ' or ' ' --what do we want as default for this option value?
+	local concatText = Logic.nilOr(Logic.readBoolOrNil(options.concatWithAnd), true) and ' and ' or ' '
 
 	value = tostring(math.abs(value))
 	local decimals = value:match('%.(%d+)')
 	if decimals then
-		--do we want support for this???
 		error('Currently only integers are supported in Module:Ordinal.written')
 	end
 
@@ -71,7 +70,7 @@ function Ordinal.written(valueInput, options)
 
 	if String.isEmpty(display) then
 		display = OrdinalData.zeroOrdinal
-	elseif options.plural then -- to my knowledge zeroth has no plural
+	elseif options.plural then
 		display = display .. 's'
 	end
 
