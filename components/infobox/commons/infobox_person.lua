@@ -250,7 +250,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		image = args.image,
 		region = _region,
 		team = teamLink or team,
-		teampagename = (teamLink or team or ''):gsub(' ', '_'),
+		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
 		teamtemplate = teamTemplate,
 		status = status,
 		type = personType,
