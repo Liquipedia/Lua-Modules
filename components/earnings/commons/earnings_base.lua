@@ -213,7 +213,7 @@ function Earnings.divisionFactorPlayer(mode)
 		return 3
 	elseif mode == '2v2' then
 		return 2
-	elseif mode == '1v1' or mode == 'individual' then
+	elseif mode == '1v1' or mode == 'individual' or mode == 'award_individual' then
 		return 1
 	end
 
