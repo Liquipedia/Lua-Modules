@@ -145,8 +145,7 @@ function Placement._placement(args)
 				:addClass(raw.backgroundClass)
 				:tag('b')
 				:addClass(not raw.blackText and 'placement-text' or nil)
-				:wikitext(raw.display)
-
+				:wikitext(raw.display .. (Logic.isNotEmpty(args.text) and (' ' .. args.text) or ''))
 end
 
 ---Converts a placement table into a ordinal string.
