@@ -28,10 +28,10 @@ local THIRD_PLACE_MATCH_ID = 'RxMTP'
 local GSL_GROUP_OPPONENT_NUMBER = 4
 local SWISS_GROUP_TYPE = 'swiss'
 local GSL_STYLE_SCORES = {
-	{2, 0, 0},
-	{2, 0, 1},
-	{1, 0, 2},
-	{0, 0, 2},
+	{w = 2, d = 0, l = 0},
+	{w = 2, d = 0, l = 1},
+	{w = 1, d = 0, l = 2},
+	{w = 0, d = 0, l = 2},
 }
 
 local Import = {}
@@ -146,7 +146,7 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 			end
 			if record.extradata.placeRange[1] == record.extradata.placeRange[2] then
 				Table.mergeInto(entry, {
-					matchScore = record.scoreboard.match,
+					scoreBoard = record.scoreboard,
 					opponent = record.opponent,
 				})
 				if entry.opponent.name then
@@ -395,6 +395,7 @@ function Import._removeTbd(entry)
 		-- TBD opponents of non party types do not hold additional data
 		entry.opponentData = {}
 	else
+		opponent.type = nil
 		for _, player in pairs(opponent.players or {}) do
 			if Opponent.playerIsTbd(player) then
 				player.displayName = nil
@@ -436,11 +437,22 @@ function Import._removeIfTbd(opponent)
 end
 
 function Import._makeGroupScore(lpdbEntry)
-	if not lpdbEntry.matchScore then
+	if not lpdbEntry.scoreBoard then
 		return
 	end
 
-	return table.concat(lpdbEntry.matchScore, Import.config.groupScoreDelimiter)
+	local matches = lpdbEntry.scoreBoard.match
+	local overtime = lpdbEntry.scoreBoard.overtime
+	local wdl = {}
+	if (matches.d or 0) ~= 0 then
+		wdl = {matches.w or '', matches.d or '', matches.l or ''}
+	elseif (overtime.w or 0) ~= 0 or (overtime.l or 0) ~= 0 then
+		wdl = {matches.w or '', overtime.w or '', overtime.l or '', matches.l or ''}
+	else
+		wdl = {matches.w or '', matches.l or ''}
+	end
+
+	return table.concat(wdl, Import.config.groupScoreDelimiter)
 end
 
 function Import._getScore(opponentData)
