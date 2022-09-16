@@ -20,8 +20,9 @@ local _VALID_TYPES = {'player', 'staff'}
 local _DEFAULT_TYPE = 'player'
 
 
-local _ICON_CAPTAIN = '[[image:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain]]'
-local _ICON_SUBSTITUTE = '[[image:Substitution.svg|18px|baseline|Sub|link=|alt=Substitution]]'
+local _ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
+	.. '|class=player-role-icon]]'
+local _ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
 
 local SquadRow = Class.new(
 	function(self, frame, role, options)
