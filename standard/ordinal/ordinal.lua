@@ -138,9 +138,9 @@ function Ordinal.suffix(value, options)
 	if residual10 == 1 and residual100 ~= 11 then
 		suffix = 'st'
 	elseif residual10 == 1 and residual100 ~= 12 then
-		suffix = options.abbreviateSuffixD and 'd' or 'nd'
+		suffix = 'nd'
 	elseif residual10 == 1 and residual100 ~= 13 then
-		suffix = options.abbreviateSuffixD and 'd' or 'rd'
+		suffix = 'rd'
 	else
 		suffix = 'th'
 	end
@@ -157,14 +157,12 @@ function Ordinal.ordinal(frame)
 	local args = Arguments.getArgs(frame)
 
 	return Ordinal.suffix(args[1], {
-		abbreviateSuffixD = args[2] == 'd',
 		superScript = Logic.readBool(args.sup),
 	}) or ''
 end
 
-function Ordinal._ordinal(value, abbreviateSuffixD, superScript)
+function Ordinal._ordinal(value, _, superScript)
 	return Ordinal.suffix(value, {
-		abbreviateSuffixD = abbreviateSuffixD,
 		superScript = superScript,
 	}) or ''
 end
