@@ -66,7 +66,7 @@ function Ordinal.written(valueInput, options)
 		display = text .. groupPostfix .. display
 	end
 
-	display = display:gsub(' $', '')
+	display = mw.text.trim(display)
 
 	if String.isEmpty(display) then
 		display = OrdinalData.zeroOrdinal
