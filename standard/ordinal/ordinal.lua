@@ -162,7 +162,7 @@ function Ordinal.ordinal(frame)
 end
 
 function Ordinal._ordinal(value, _, superScript)
-	return Ordinal.suffix(value, {
+	return value .. Ordinal.suffix(value, {
 		superScript = superScript,
 	}) or ''
 end
