@@ -503,6 +503,7 @@ function matchFunctions.getOpponents(match)
 		match.resulttype = 'np'
 		match.status = match.finished
 		match.finished = false
+		match.dateexact = false
 	else
 		-- see if match should actually be finished if score is set
 		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
