@@ -62,7 +62,7 @@ function CustomMatchGroupInput.processMatch(_, match)
 	-- process match
 	Table.mergeInto(
 		match,
-		matchFunctions.readDate(match)
+		CustomMatchGroupInput.readDate(match)
 	)
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
@@ -316,7 +316,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
-function matchFunctions.readDate(matchArgs)
+function CustomMatchGroupInput.readDate(matchArgs)
 	if matchArgs.date then
 		local dateProps = MatchGroupInput.readDate(matchArgs.date)
 		dateProps.hasDate = true
@@ -388,6 +388,7 @@ function matchFunctions.getExtraData(match)
 		),
 		mvp = match.mvp,
 		headtohead = match.headtohead,
+		dateheaderfinished = Logic.readBool(match.dateheaderfinished),
 	}
 	return match
 end
@@ -512,7 +513,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
+	if isScoreSet and Logic.readBoolOrNil(match.finished) == nil and match.hasDate then
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and _SECONDS_UNTIL_FINISHED_EXACT
@@ -520,15 +521,16 @@ function matchFunctions.getOpponents(match)
 		if matchUnixTime + threshold < _CURRENT_TIME_UNIX then
 			match.finished = true
 		end
+	else
+		match.finished = Logic.readBool(match.finished)
 	end
 
 	-- apply placements and winner if finshed
 	if
 		not String.isEmpty(match.winner) or
-		Logic.readBool(match.finished) or
+		match.finished or
 		CustomMatchGroupInput.placementCheckSpecialStatus(opponents)
 	then
-		match.finished = true
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
@@ -580,6 +582,22 @@ function mapFunctions.getAdditionalExtraData(map)
 	map.extradata.team1side = string.lower(map.team1side or '')
 	map.extradata.team2side = string.lower(map.team2side or '')
 	map.extradata.publisherid = map.publisherid or ''
+
+	return mapFunctions.processMapDate(map)
+end
+
+function mapFunctions.processMapDate(map)
+	local mapDateProps = CustomMatchGroupInput.readDate(map)
+	if mapDateProps.hasDate then
+		map.date = mapDateProps.date
+		Table.mergeInto(map.extradata, {
+			timezoneoffset = mapDateProps.timezoneOffset,
+			timezoneid = mapDateProps.timezoneId,
+			finished = Logic.readBool(map.finished) or String.isNotEmpty(map.winner),
+			dateheader = Logic.readBool(map.dateheader) and mapDateProps.dateexact,
+			dateexact = mapDateProps.dateexact,
+		})
+	end
 
 	return map
 end
