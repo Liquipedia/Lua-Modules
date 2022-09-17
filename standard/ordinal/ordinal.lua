@@ -160,9 +160,9 @@ function Ordinal.ordinal(frame)
 		return
 	end
 
-	return args[1] .. Ordinal.suffix(args[1], {
+	return args[1] .. (Ordinal.suffix(args[1], {
 		superScript = Logic.readBool(args.sup),
-	}) or ''
+	}) or '')
 end
 
 function Ordinal._ordinal(value, _, superScript)
