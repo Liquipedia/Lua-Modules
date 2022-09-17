@@ -137,9 +137,9 @@ function Ordinal.suffix(value, options)
 	local suffix
 	if residual10 == 1 and residual100 ~= 11 then
 		suffix = 'st'
-	elseif residual10 == 1 and residual100 ~= 12 then
+	elseif residual10 == 2 and residual100 ~= 12 then
 		suffix = 'nd'
-	elseif residual10 == 1 and residual100 ~= 13 then
+	elseif residual10 == 3 and residual100 ~= 13 then
 		suffix = 'rd'
 	else
 		suffix = 'th'
