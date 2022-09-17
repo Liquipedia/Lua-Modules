@@ -171,11 +171,18 @@ function MvpTable.processData(queryData)
 		local mvp = (item.extradata or {}).mvp
 		if mvp then
 			for _, player in pairs(mvp.players or {}) do
-				if not playerList[player] then
-					playerList[player] = MvpTable.createPlayer(item.match2opponents, player)
+				if not playerList[player.name] then
+					playerList[player.name] = {
+						points = 0,
+						mvp = 0,
+						displayName = player.displayname,
+						name = player.name,
+						flag = player.flag,
+						team = player.team
+					}
 				end
-				playerList[player].mvp = playerList[player].mvp + 1
-				playerList[player].points = playerList[player].points + (mvp.points or 0)
+				playerList[player.name].mvp = playerList[player.name].mvp + 1
+				playerList[player.name].points = playerList[player.name].points + (mvp.points or 0)
 			end
 		end
 	end
@@ -185,53 +192,6 @@ function MvpTable.processData(queryData)
 	end
 
 	return mvpList
-end
-
--- overwritable function via /Custom
-function MvpTable.createPlayer(opponents, mvp)
-	if type(mvp) == 'table' then
-		return {
-			points = 0,
-			mvp = 0,
-			displayName = mvp.displayname,
-			name = mvp.name,
-			flag = mvp.flag,
-			team = mvp.template,
-		}
-	end
-
-	-- legacy mvp storage format
-	local player = {
-		points = 0,
-		mvp = 0,
-		displayName = mvp,
-		name = mvp,
-	}
-
-	for _, opponent in pairs(opponents) do
-		local players = opponent.match2players or {}
-		-- this function call is currently needed due to wikis currently storing mvp sometimes as `link|display`
-		mvp = MvpTable.pageFromMvp(mvp)
-		for _, matchPlayer in pairs(players) do
-			if mvp == matchPlayer.name then
-				player.displayName = matchPlayer.displayname
-				player.flag = matchPlayer.flag
-				player.name = matchPlayer.name
-				player.team = opponent.template
-
-				return player
-			end
-		end
-	end
-
-	return player
-end
-
--- exported so it can be used in /Custom
-function MvpTable.pageFromMvp(mvp)
-	mvp = mw.text.split(mvp, '|')
-
-	return mw.ext.TeamLiquidIntegration.resolve_redirect(mvp[1]):gsub(' ', '_')
 end
 
 -- exported so it can be used in /Custom
