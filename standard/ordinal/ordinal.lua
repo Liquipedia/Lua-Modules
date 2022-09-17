@@ -156,13 +156,7 @@ end
 function Ordinal.ordinal(frame)
 	local args = Arguments.getArgs(frame)
 
-	if not args[1] then
-		return
-	end
-
-	return args[1] .. (Ordinal.suffix(args[1], {
-		superScript = Logic.readBool(args.sup),
-	}) or '')
+	return Ordinal._ordinal(args[1], _, Logic.readBool(args['sup']))
 end
 
 function Ordinal._ordinal(value, _, superScript)
