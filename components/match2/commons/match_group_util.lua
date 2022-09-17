@@ -490,6 +490,7 @@ function MatchGroupUtil.gameFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
+		date = record.date,
 		extradata = extradata,
 		game = record.game,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
