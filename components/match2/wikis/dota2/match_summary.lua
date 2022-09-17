@@ -175,12 +175,19 @@ function CustomMatchSummary._createBody(match)
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
+			DisplayHelper.MatchCountdownBlock(Table.merge(match,
+				{finished = match.finished or match.extradata.dateheaderfinished}))
 		))
 	end
 
 	-- Iterate each map
 	for gameIndex, game in ipairs(match.games) do
+		if game.extradata.dateheader then
+			body:addRow(MatchSummary.Row():addElement(
+				DisplayHelper.MatchCountdownBlock(Table.merge(game,
+					{finished = game.extradata.finished, dateIsExact = game.extradata.dateexact}))
+			))
+		end
 		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex)
 		body:addRow(rowDisplay)
 	end
