@@ -156,15 +156,23 @@ end
 function Ordinal.ordinal(frame)
 	local args = Arguments.getArgs(frame)
 
-	return Ordinal.suffix(args[1], {
+	if not args[1] then
+		return
+	end
+
+	return args[1] .. Ordinal.suffix(args[1], {
 		superScript = Logic.readBool(args.sup),
 	}) or ''
 end
 
 function Ordinal._ordinal(value, _, superScript)
-	return value .. Ordinal.suffix(value, {
+	if Logic.isEmpty(value) then
+		return
+	end
+
+	return value .. (Ordinal.suffix(value, {
 		superScript = superScript,
-	}) or ''
+	}) or '')
 end
 
 return Ordinal
