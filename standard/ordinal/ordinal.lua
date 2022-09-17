@@ -156,7 +156,7 @@ end
 function Ordinal.ordinal(frame)
 	local args = Arguments.getArgs(frame)
 
-	return Ordinal._ordinal(args[1], _, Logic.readBool(args['sup']))
+	return Ordinal._ordinal(args[1], nil, Logic.readBool(args['sup']))
 end
 
 function Ordinal._ordinal(value, _, superScript)
