@@ -13,6 +13,9 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local String = require('Module:StringUtils')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
+local WidgetTable = require('Module:Widget/Table')
+local TableRow = require('Module:Widget/Table/Row')
+local TableCell = require('Module:Widget/Table/Cell')
 
 local CustomMap = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -53,37 +56,36 @@ function CustomInjector:addCustomCells(widgets)
 	})
 
 	if String.isNotEmpty(_args.ring) then
-		local ringTable = mw.html.create('table')
-			:addClass('wikitable wikitable-striped wikitable-bordered')
-			:css('width', '100%')
-			:css('text-align', 'center')
-		ringTable:node(CustomMap:_createRingTable())
-		for _, rings in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
-			ringTable:node(CustomMap:_createRingTable(rings))
+		local ringTable = WidgetTable{
+			classes = {'fo-nttax-infobox wiki-bordercolor-light'},--row alternating bg needed
+			css = {['text-align'] = 'center', display = 'inline-grid !important', ['padding-top'] = '0px', ['padding-bottom'] = '0px', ['border-top-style'] = 'none'},
+		}
+		ringTable:addRow(CustomMap:_createRingTableHeader())
+		for _, ringData in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
+			ringTable:addRow(CustomMap:_createRingTableRow(ringData))
 		end
 		table.insert(widgets, Title{name = 'Ring Information'})
-		table.insert(widgets, Center{content = {tostring(ringTable)}})
+		table.insert(widgets, ringTable)
 	end
-
 	return widgets
 end
 
-function CustomMap:_createRingTable(content)
-	local row = mw.html.create('tr')
+function CustomMap:_createRingTableHeader()
+	local headerRow = TableRow{css = {['font-weight'] = 'bold'}} -- bg needed
+	return headerRow
+		:addCell(TableCell{content = {'Ring'}})
+		:addCell(TableCell{content = {'Wait(s)'}})
+		:addCell(TableCell{content = {'Close<br>Time(s)'}})
+		:addCell(TableCell{content = {'Damage<br>per tick'}})
+		:addCell(TableCell{content = {'End Diameter (m)'}})
+end
 
-	if not content then
-		row
-			:tag('th'):wikitext('Ring'):done()
-			:tag('th'):wikitext('Wait(s)'):done()
-			:tag('th'):wikitext('Close<br>Time(s)'):done()
-			:tag('th'):wikitext('Damage<br>per tick'):done()
-			:tag('th'):wikitext('End Diameter (m)'):done()
-	else
-		for _, item in ipairs(mw.text.split(content, ',')) do
-			row:tag('td'):wikitext(item):done()
-		end
+function CustomMap:_createRingTableRow(ringData)
+	local row = TableRow{}-- row alternating bg needed
+	for _, item in ipairs(mw.text.split(ringData, ',')) do
+		row:addCell(TableCell{content = {item}})
 	end
-	return row:done()
+	return row
 end
 
 function CustomMap:addToLpdb(lpdbData)
