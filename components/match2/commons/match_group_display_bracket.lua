@@ -122,6 +122,7 @@ function BracketDisplay.Bracket(props)
 		:css('--match-width-mobile', config.matchWidthMobile .. 'px')
 		:css('--score-width', config.scoreWidth .. 'px')
 		:css('--round-horizontal-margin', config.roundHorizontalMargin .. 'px')
+		:css('--opponent-height', config.opponentHeight .. 'px')
 
 	-- Draw all top level subtrees of the bracket. These are subtrees rooted
 	-- at matches that do not advance to higher rounds.
