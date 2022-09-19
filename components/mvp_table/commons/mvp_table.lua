@@ -112,7 +112,6 @@ function MvpTable._buildConditions(args)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		tournamentConditions,
 		matchGroupIDConditions,
-		--ConditionNode(ColumnName('extradata_mvp'), Comparator.neq, ''),
 	}
 
 	return conditions:toString()
