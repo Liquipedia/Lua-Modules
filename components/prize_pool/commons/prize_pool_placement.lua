@@ -277,9 +277,9 @@ function Placement:_parseOpponentArgs(input, date)
 	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
 
 	local opponentData
-	if opponentArgs.isAlreadyParsed then
+	if type(opponentArgs[1]) == 'table' and opponentArgs[1].isAlreadyParsed then
 		opponentData = opponentArgs[1] or opponentArgs
-	else
+	elseif type(opponentArgs[1]) ~= 'table' then
 		opponentData = Opponent.readOpponentArgs(opponentArgs)
 	end
 
