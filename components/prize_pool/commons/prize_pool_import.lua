@@ -350,9 +350,12 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	local placeStart = (priorPlacement.placeEnd or 0) + 1
 	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
+	local parent = Table.deepCopy(priorPlacement.parent, {copyMetatable = true})
+	parent.placements = nil
+
 	return Placement(
 		{placeStart = placeStart, placeEnd = placeEnd},
-		priorPlacement.parent,
+		parent,
 		priorPlacement.placeEnd or 0
 	)
 end
@@ -384,28 +387,32 @@ function Import._mergeEntry(lpdbEntry, entry, placement)
 		return entry
 	end
 
-	return Table.deepMergeInto(Import._entryToOpponent(lpdbEntry, placement), Import._removeTbd(entry))
+	entry.opponentData = Import._removeTbdIdentifiers(entry.opponentData)
+	return Table.deepMergeInto(Import._entryToOpponent(lpdbEntry, placement), entry)
 end
 
-function Import._removeTbd(entry)
-	-- if we get here we know entry is a TBD Opponent
-	-- but it still might hold data (e.g. flag or race of players) for non party opponents
-	local opponent = entry.opponentData
-	if not Opponent.typeIsParty(opponent.type) then
-		-- TBD opponents of non party types do not hold additional data
-		entry.opponentData = {}
-	else
-		opponent.type = nil
-		for _, player in pairs(opponent.players or {}) do
-			if Opponent.playerIsTbd(player) then
-				player.displayName = nil
-				player.pageIsResolved = nil
-				player.pageName = nil
-			end
+function Import._removeTbdIdentifiers(opponent)
+	if Table.isEmpty(opponent) then
+		return {}
+	elseif not Opponent.isTbd(opponent) then
+		opponent.isAlreadyParsed = true
+		return opponent
+	elseif not opponent.type or not Opponent.typeIsParty(opponent.type) then
+		return {}
+	end
+
+	-- Entry is a TBD Opponent, but could contain data (e.g. flag or faction) for party opponents
+	opponent.isAlreadyParsed = true
+	opponent.type = nil
+	for _, player in pairs(opponent.players or {}) do
+		if Opponent.playerIsTbd(player) then
+			player.displayName = nil
+			player.pageIsResolved = nil
+			player.pageName = nil
 		end
 	end
 
-	return entry
+	return opponent
 end
 
 function Import._entryToOpponent(lpdbEntry, placement)
@@ -422,18 +429,12 @@ function Import._entryToOpponent(lpdbEntry, placement)
 	end
 
 	return placement:_parseOpponents{{
-		Import._removeIfTbd(lpdbEntry.opponent),
+		Import._removeTbdIdentifiers(lpdbEntry.opponent),
 		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
-		lastvs = additionalData.lastVs or Import._removeIfTbd(lpdbEntry.vsOpponent),
+		lastvs = {additionalData.lastVs or Import._removeTbdIdentifiers(lpdbEntry.vsOpponent)},
 		lastvsscore = additionalData.score or lastVsScore,
 		date = lpdbEntry.date,
-		isAlreadyParsed = true,
 	}}[1]
-end
-
-function Import._removeIfTbd(opponent)
-	return (Table.isEmpty(opponent) or Opponent.isTbd(opponent))
-		and {} or Table.merge(opponent, {isAlreadyParsed = true})
 end
 
 function Import._formatGroupScore(lpdbEntry)
