@@ -42,6 +42,9 @@ function CustomInjector:addCustomCells(widgets)
 	local spanText = ''
 	if String.isNotEmpty(_args.spanstart) then
 		spanText = spanText .. ' - '
+	else
+		--If it never started being played competitively, it can't have an end date
+		_args.spanend = nil
 	end
 
 	table.insert(widgets, Cell{
