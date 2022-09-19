@@ -23,7 +23,7 @@ local zeroWidthSpace = '&#8203;'
 
 local OpponentDisplay = {propTypes = {}, types = {}}
 
-OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket')
+OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid')
 
 --[[
 Display component for an opponent entry appearing in a bracket match.
@@ -49,21 +49,13 @@ function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 	options = options or {}
 	local forceShortName = options.forceShortName
 
-	local bracketStyleNode = OpponentDisplay.BlockTeamContainer({
-		overflow = 'ellipsis',
+	local opponentNode = OpponentDisplay.BlockTeamContainer({
 		showLink = false,
-		style = forceShortName and 'short' or 'bracket',
+		style = 'hybrid',
 		template = template,
 	})
-		:addClass('hidden-xs')
-	local shortStyleNode = OpponentDisplay.BlockTeamContainer({
-		overflow = 'hidden',
-		showLink = false,
-		style = 'short',
-		template = template,
-	})
-		:addClass('visible-xs')
-	self.content:node(bracketStyleNode):node(shortStyleNode)
+
+	self.content:node(opponentNode)
 end
 
 function OpponentDisplay.BracketOpponentEntry:createPlayer(player)
@@ -302,26 +294,43 @@ function OpponentDisplay.BlockTeam(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockTeam)
 	local style = props.style or 'standard'
 
-	local displayName = style == 'standard' and props.team.displayName
-		or style == 'short' and props.team.shortName
-		or style == 'bracket' and props.team.bracketName
+	local function createNameNode(name)
+		return mw.html.create('span'):addClass('name')
+			:wikitext(props.showLink ~= false and props.team.pageName
+				and '[[' .. props.team.pageName .. '|' .. name .. ']]'
+				or name
+			)
+	end
 
-	local nameNode = mw.html.create('span'):addClass('name')
-		:wikitext(props.showLink ~= false and props.team.pageName
-			and '[[' .. props.team.pageName .. '|' .. displayName .. ']]'
-			or displayName
-		)
+	local displayNameNode = createNameNode(props.team.displayName)
+	local bracketNameNode = createNameNode(props.team.bracketName)
+	local shortNameNode = createNameNode(props.team.shortName)
 
 	local icon = props.showLink
 		and props.icon
 		or DisplayUtil.removeLinkFromWikiLink(props.icon)
 
-	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
-
-	return mw.html.create('div'):addClass('block-team')
+	local blockNode = mw.html.create('div'):addClass('block-team')
 		:addClass(props.flip and 'flipped' or nil)
 		:node(icon)
-		:node(nameNode)
+
+	if style == 'standard' then
+		DisplayUtil.applyOverflowStyles(displayNameNode, props.overflow or 'ellipsis')
+		blockNode:node(displayNameNode)
+	elseif style == 'bracket' then
+		DisplayUtil.applyOverflowStyles(bracketNameNode, props.overflow or 'ellipsis')
+		blockNode:node(bracketNameNode)
+	elseif style == 'short' then
+		DisplayUtil.applyOverflowStyles(shortNameNode, props.overflow or 'ellipsis')
+		blockNode:node(shortNameNode)
+	elseif style == 'hybrid' then
+		DisplayUtil.applyOverflowStyles(bracketNameNode, 'ellipsis')
+		DisplayUtil.applyOverflowStyles(shortNameNode, 'hidden')
+		blockNode:node(bracketNameNode:addClass('hidden-xs'))
+		blockNode:node(shortNameNode:addClass('visible-xs'))
+	end
+
+	return blockNode
 end
 
 OpponentDisplay.propTypes.BlockLiteral = {
