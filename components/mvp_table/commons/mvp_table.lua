@@ -76,7 +76,7 @@ function MvpTable._parseArgs(args)
 
 	args.tournament1 = args.tournament or args.tournament1
 	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
-		tournament = tournament:gsub(' ', '_')
+		tournament = mw.ext.TeamLiquidIntegration.resolve_redirect(tournament):gsub(' ', '_')
 		table.insert(parsedArgs.tournaments, tournament)
 	end
 	if Table.isEmpty(parsedArgs.matchGroupIds) and Table.isEmpty(parsedArgs.tournaments) then
