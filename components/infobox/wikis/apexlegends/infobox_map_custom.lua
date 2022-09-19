@@ -57,10 +57,10 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(_args.ring) then
 		local ringTable = WidgetTable{
 			classes = {'fo-nttax-infobox wiki-bordercolor-light'},--row alternating bg needed
-			css = {['text-align'] = 'center', 
-				display = 'inline-grid !important', 
-				['padding-top'] = '0px', 
-				['padding-bottom'] = '0px', 
+			css = {['text-align'] = 'center',
+				display = 'inline-grid !important',
+				['padding-top'] = '0px',
+				['padding-bottom'] = '0px',
 				['border-top-style'] = 'none'},
 			}
 		ringTable:addRow(CustomMap:_createRingTableHeader())
