@@ -33,6 +33,8 @@ local CHECKMARK = '<div class="fa fa-check green-check"></div>'
 
 local CUSTOM_HANDLER
 
+local IS_SOLO = false
+
 function LegacyPrizePool.run(dependency)
 	local args = Template.retrieveReturnValues('LegacyPrizePool')
 	local header = Array.sub(args, 1, 1)[1]
@@ -62,6 +64,7 @@ function LegacyPrizePool.run(dependency)
 
 	if header.indiv then
 		newArgs.type = {type = Opponent.solo}
+		IS_SOLO = true
 	else
 		newArgs.type = {type = Opponent.team}
 	end
@@ -241,6 +244,12 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 				'-' ..
 				(slot['lastvsscore' .. opponentIndex] or ''),
 		}
+
+		if not opponentData.link and IS_SOLO then
+			local splitPlayer = mw.text.split(opponentData[1], '|')
+			opponentData.link = splitPlayer[1]
+			opponentData[1] = splitPlayer[#splitPlayer]
+		end
 
 		if CUSTOM_HANDLER.customOpponent then
 			opponentData = CUSTOM_HANDLER.customOpponent(opponentData, CACHED_DATA, slot, opponentIndex)
