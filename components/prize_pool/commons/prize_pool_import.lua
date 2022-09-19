@@ -423,7 +423,7 @@ function Import._entryToOpponent(lpdbEntry, placement)
 
 	return placement:_parseOpponents{{
 		Import._removeIfTbd(lpdbEntry.opponent),
-		wdl = (not lpdbEntry.needsLastVs) and Import._makeGroupScore(lpdbEntry) or nil,
+		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
 		lastvs = additionalData.lastVs or Import._removeIfTbd(lpdbEntry.vsOpponent),
 		lastvsscore = additionalData.score or lastVsScore,
 		date = lpdbEntry.date,
@@ -436,7 +436,7 @@ function Import._removeIfTbd(opponent)
 		and {} or Table.merge(opponent, {isAlreadyParsed = true})
 end
 
-function Import._makeGroupScore(lpdbEntry)
+function Import._formatGroupScore(lpdbEntry)
 	if not lpdbEntry.scoreBoard then
 		return
 	end
