@@ -12,7 +12,6 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local String = require('Module:StringUtils')
 local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
 local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
@@ -58,8 +57,12 @@ function CustomInjector:addCustomCells(widgets)
 	if String.isNotEmpty(_args.ring) then
 		local ringTable = WidgetTable{
 			classes = {'fo-nttax-infobox wiki-bordercolor-light'},--row alternating bg needed
-			css = {['text-align'] = 'center', display = 'inline-grid !important', ['padding-top'] = '0px', ['padding-bottom'] = '0px', ['border-top-style'] = 'none'},
-		}
+			css = {['text-align'] = 'center', 
+				display = 'inline-grid !important', 
+				['padding-top'] = '0px', 
+				['padding-bottom'] = '0px', 
+				['border-top-style'] = 'none'},
+			}
 		ringTable:addRow(CustomMap:_createRingTableHeader())
 		for _, ringData in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
 			ringTable:addRow(CustomMap:_createRingTableRow(ringData))
