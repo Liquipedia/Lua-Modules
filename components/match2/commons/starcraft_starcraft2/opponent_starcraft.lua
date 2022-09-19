@@ -127,7 +127,7 @@ function StarcraftOpponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				local hasRace = String.isNotEmpty(player.race)
-				StarcraftPlayerExt.syncPlayer(player)
+				StarcraftPlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
 				if not player.team then
 					player.team = PlayerExt.syncTeam(player.pageName, nil, {date = date})
 				end
