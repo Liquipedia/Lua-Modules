@@ -56,7 +56,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	if String.isNotEmpty(_args.ring) then
 		local ringTable = WidgetTable{
-			classes = {'fo-nttax-infobox wiki-bordercolor-light'},--row alternating bg needed
+			classes = {'fo-nttax-infobox' ,'wiki-bordercolor-light'}, --row alternating bg
 			css = {['text-align'] = 'center',
 				display = 'inline-grid !important',
 				['padding-top'] = '0px',
