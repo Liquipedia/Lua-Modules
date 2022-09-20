@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Namespace = require('Module:Namespace')
@@ -254,7 +255,7 @@ function Team:_setLpdbData(args, links)
 		logodark = args.imagedark or args.imagedarkmode,
 		earnings = earnings,
 		createdate = args.created,
-		disbanddate = args.disbanded,
+		disbanddate = ReferenceCleaner.clean(args.disbanded),
 		coach = args.coaches,
 		manager = args.manager,
 		template = teamTemplate,
