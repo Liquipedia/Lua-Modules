@@ -77,8 +77,8 @@ function CustomMap:_createRingTableHeader()
 	local headerRow = TableRow{css = {['font-weight'] = 'bold'}} -- bg needed
 	return headerRow
 		:addCell(TableCell{content = {'Ring'}})
-		:addCell(TableCell{content = {'Wait(s)'}})
-		:addCell(TableCell{content = {'Close<br>Time(s)'}})
+		:addCell(TableCell{content = {'Wait (s)'}})
+		:addCell(TableCell{content = {'Close<br>Time (s)'}})
 		:addCell(TableCell{content = {'Damage<br>per tick'}})
 		:addCell(TableCell{content = {'End Diameter (m)'}})
 end
