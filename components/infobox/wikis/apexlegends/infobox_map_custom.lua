@@ -92,7 +92,7 @@ function CustomMap:_createRingTableRow(ringData)
 end
 
 function CustomMap:addToLpdb(lpdbData)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator)
+	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator or '')
 	lpdbData.extradata.gamemode = _args.gamemode
 	lpdbData.extradata.competitive = String.isNotEmpty(_args.spanstart) and String.isEmpty(_args.spanend)
 	return lpdbData
