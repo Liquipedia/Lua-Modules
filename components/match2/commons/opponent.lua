@@ -250,7 +250,7 @@ function Opponent.resolve(opponent, date, options)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
-				PlayerExt.syncPlayer(player)
+				PlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
 			else
 				PlayerExt.populatePageName(player)
 			end
