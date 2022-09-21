@@ -61,11 +61,11 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	-- legacy points, to be standardized
 	lpdbData.extradata.points = placement.prizeRewards.POINTS1
 	lpdbData.extradata.points2 = placement.prizeRewards.POINTS2
-	
+
 	if Logic.readBool(placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_QUALIFIES .. 1)) then
 		lpdbData.qualified = 1
 	end
-	
+
 	return lpdbData
 end
 
