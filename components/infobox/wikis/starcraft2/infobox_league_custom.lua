@@ -582,12 +582,10 @@ function CustomLeague:defineCustomPageVariables()
 end
 
 function CustomLeague._getMaps(prefix)
-	local mapArgs
-	if String.isNotEmpty(_args[prefix .. '1']) then
-		mapArgs = _league:getAllArgsForBase(_args, prefix)
-	else
+	if String.isEmpty(_args[prefix .. '1']) then
 		return
 	end
+	local mapArgs = _league:getAllArgsForBase(_args, prefix)
 
 	return Table.map(mapArgs, function(mapIndex, map)
 		map = mw.text.split(map, '|')
