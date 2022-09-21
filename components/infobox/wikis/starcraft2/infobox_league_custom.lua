@@ -138,7 +138,7 @@ function CustomInjector:parse(id, widgets)
 
 		--maps
 		if String.isNotEmpty(_args.map1) then
-			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Title{name = _args['maptitle'] or 'Maps'})
 			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('map')})
 		end
 
