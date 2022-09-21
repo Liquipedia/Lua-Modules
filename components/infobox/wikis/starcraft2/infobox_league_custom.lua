@@ -139,22 +139,24 @@ function CustomInjector:parse(id, widgets)
 		--maps
 		if String.isNotEmpty(_args.map1) then
 			table.insert(widgets, Title{name = 'Maps'})
-		elseif String.isNotEmpty(_args['2map1']) then
-			table.insert(widgets, Title{name = _args['2maptitle'] or '2v2 Maps'})
-		elseif String.isNotEmpty(_args['3map1']) then
-			table.insert(widgets, Title{name = _args['3maptitle'] or '3v3 Maps'})
+			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('map')})
 		end
 
-		local maps = Variables.varDefault('tournament_maps')
-		if String.isNotEmpty(maps) then
-			table.insert(widgets, Center{content = CustomLeague._mapsDisplay(maps)})
+		if String.isNotEmpty(_args['2map1']) then
+			table.insert(widgets, Title{name = _args['2maptitle'] or '2v2 Maps'})
+			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('2map')})
+		end
+
+		if String.isNotEmpty(_args['3map1']) then
+			table.insert(widgets, Title{name = _args['3maptitle'] or '3v3 Maps'})
+			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('3map')})
 		end
 	end
 	return widgets
 end
 
-function CustomLeague._mapsDisplay(maps)
-	maps = Json.parseIfTable(maps)
+function CustomLeague._mapsDisplay(prefix)
+	maps = CustomLeague._getMaps(prefix)
 
 	return {table.concat(
 		Array.map(maps, function(mapData)
@@ -575,34 +577,25 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('Month_Day', monthAndDay)
 
 	--maps
-	Variables.varDefine('tournament_maps', CustomLeague._getMaps())
+	local maps = CustomLeague._getMaps('map')
+	Variables.varDefine('tournament_maps', maps and Json.stringify(maps) or '')
 end
 
-function CustomLeague._getMaps()
+function CustomLeague._getMaps(prefix)
 	local mapArgs
-	local prefix
-	if String.isNotEmpty(_args.map1) then
-		mapArgs = _league:getAllArgsForBase(_args, 'map')
-		prefix = 'map'
-	elseif String.isNotEmpty(_args['2map1']) then
-		mapArgs = _league:getAllArgsForBase(_args, '2map')
-		prefix = '2map'
-	elseif String.isNotEmpty(_args['3map1']) then
-		mapArgs = _league:getAllArgsForBase(_args, '3map')
-		prefix = '3map'
+	if String.isNotEmpty(_args[prefix .. '1']) then
+		mapArgs = _league:getAllArgsForBase(_args, prefix)
+	else
+		return
 	end
 
-	if not mapArgs then
-		return ''
-	end
-
-	return Json.stringify(Table.map(mapArgs, function(mapIndex, map)
+	return Table.map(mapArgs, function(mapIndex, map)
 		map = mw.text.split(map, '|')
 		return mapIndex, {
 			link = mw.ext.TeamLiquidIntegration.resolve_redirect(map[1]),
 			displayname = _args[prefix .. mapIndex .. 'display'] or map[#map],
 		}
-	end))
+	end)
 end
 
 function CustomLeague:addToLpdb(lpdbData)
