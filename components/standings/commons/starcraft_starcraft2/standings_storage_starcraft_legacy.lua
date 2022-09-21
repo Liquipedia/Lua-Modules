@@ -111,7 +111,7 @@ end
 
 -- parse the single player and add them to the opponentArgs
 function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
-	-- attempts to find [[link|displayName]] and skips images (images have multiple |)
+	-- attempts to find [[link|name]] and skips images (images have multiple |)
 	local link, name = playerInput:match('%[%[([^|]-)|([^|]-)%]%]')
 	if String.isEmpty(link) or String.isEmpty(name) then
 		-- invalid input
