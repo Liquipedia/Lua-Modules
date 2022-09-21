@@ -451,7 +451,7 @@ function Import._formatGroupScore(lpdbEntry)
 	local matches = lpdbEntry.scoreBoard.match
 	local overtime = lpdbEntry.scoreBoard.overtime
 	local wdl
-	if (matches.d or 0) ~= 0 then
+	if String.isNotEmpty(matches.d) then
 		wdl = {matches.w or '', matches.d or '', matches.l or ''}
 	elseif (overtime.w or 0) ~= 0 or (overtime.l or 0) ~= 0 then
 		wdl = {matches.w or '', overtime.w or '', overtime.l or '', matches.l or ''}
