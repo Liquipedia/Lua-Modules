@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MvpTable
+-- page=Module:MvpTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
