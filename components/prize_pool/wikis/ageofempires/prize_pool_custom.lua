@@ -66,7 +66,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		return prize.type == PRIZE_TYPE_QUALIFIES
 	end
 	local opponentHasPrize = function (prize)
-		placement:getPrizeRewardForOpponent(opponent, prize.id)
+		return placement:getPrizeRewardForOpponent(opponent, prize.id)
 	end
 
 	lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
