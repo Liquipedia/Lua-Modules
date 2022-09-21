@@ -421,7 +421,7 @@ function HiddenInfoboxLeague._getMaps()
 	if String.isEmpty(_args[prefix .. '1']) then
 		return ''
 	end
-	local mapArgs = _league:getAllArgsForBase(_args, prefix)
+	local mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, prefix)
 
 	return Json.stringify(Table.map(mapArgs, function(mapIndex, map)
 		map = mw.text.split(map, '|')
