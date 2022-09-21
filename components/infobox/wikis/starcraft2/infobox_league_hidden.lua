@@ -417,22 +417,11 @@ function HiddenInfoboxLeague._setLpdbData()
 end
 
 function HiddenInfoboxLeague._getMaps()
-	local mapArgs
-	local prefix
-	if String.isNotEmpty(_args.map1) then
-		mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, 'map')
-		prefix = 'map'
-	elseif String.isNotEmpty(_args['2map1']) then
-		mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, '2map')
-		prefix = '2map'
-	elseif String.isNotEmpty(_args['3map1']) then
-		mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, '3map')
-		prefix = '3map'
-	end
-
-	if not mapArgs then
+	local prefix = 'map'
+	if String.isEmpty(_args[prefix .. '1']) then
 		return ''
 	end
+	local mapArgs = _league:getAllArgsForBase(_args, prefix)
 
 	return Json.stringify(Table.map(mapArgs, function(mapIndex, map)
 		map = mw.text.split(map, '|')
