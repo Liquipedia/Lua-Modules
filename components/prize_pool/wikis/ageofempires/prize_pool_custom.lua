@@ -12,6 +12,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Opponent = require('Module:Opponent/Custom')
+local Logic = require('Module:Logic')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
@@ -20,6 +21,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
+local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local TIER_VALUE = {10, 6, 4, 2}
 
 -- Template entry point
@@ -59,7 +61,11 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	-- legacy points, to be standardized
 	lpdbData.extradata.points = placement.prizeRewards.POINTS1
 	lpdbData.extradata.points2 = placement.prizeRewards.POINTS2
-
+	
+	if Logic.readBool(placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_QUALIFIES .. 1)) then
+		lpdbData.qualified = 1
+	end
+	
 	return lpdbData
 end
 
