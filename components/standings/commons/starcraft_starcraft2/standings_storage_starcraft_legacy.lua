@@ -73,6 +73,7 @@ function Wrapper._processOpponent(args)
 	local opponentInput = args[1] or ''
 	-- case team opponent
 	if opponentInput:match('class="team%-template') then
+		-- attempts to find [[teamPage|teamDisplay]] and skips images (images have multiple |)
 		local teamPage = opponentInput:match('%[%[([^|]-)|[^|]-%]%]')
 		if not teamPage then
 			return
@@ -107,8 +108,9 @@ function Wrapper._processOpponent(args)
 	return opponentArgs
 end
 
+-- parse the single player and add them to the opponentArgs
 function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
-	-- parse the single player and add them to the opponentArgs
+	-- attempts to find [[link|displayName]] and skips images (images have multiple |)
 	local link, name = playerInput:match('%[%[([^|]-)|([^|]-)%]%]')
 	if String.isEmpty(link) or String.isEmpty(name) then
 		-- invalid input
