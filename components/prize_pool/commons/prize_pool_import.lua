@@ -395,14 +395,12 @@ function Import._removeTbdIdentifiers(opponent)
 	if Table.isEmpty(opponent) then
 		return {}
 	elseif not Opponent.isTbd(opponent) then
-		opponent.isAlreadyParsed = true
 		return opponent
 	-- Entry is a TBD Opponent, but could contain data (e.g. flag or faction) for party opponents
 	elseif not opponent.type or not Opponent.typeIsParty(opponent.type) then
 		return {}
 	end
 
-	opponent.isAlreadyParsed = true
 	opponent.type = nil
 	for _, player in pairs(opponent.players or {}) do
 		if Opponent.playerIsTbd(player) then
@@ -429,12 +427,20 @@ function Import._entryToOpponent(lpdbEntry, placement)
 	end
 
 	return placement:_parseOpponents{{
-		Import._removeTbdIdentifiers(lpdbEntry.opponent),
+		Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.opponent)),
 		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
-		lastvs = {additionalData.lastVs or Import._removeTbdIdentifiers(lpdbEntry.vsOpponent)},
+		lastvs = {additionalData.lastVs or Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))},
 		lastvsscore = additionalData.score or lastVsScore,
 		date = lpdbEntry.date,
 	}}[1]
+end
+
+function Import._checkIfParsed(opponent)
+	if Table.isNotEmpty(opponent) then
+		opponent.isAlreadyParsed = true
+	end
+
+	return opponent
 end
 
 function Import._formatGroupScore(lpdbEntry)
