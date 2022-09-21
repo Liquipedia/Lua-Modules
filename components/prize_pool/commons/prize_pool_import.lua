@@ -397,11 +397,11 @@ function Import._removeTbdIdentifiers(opponent)
 	elseif not Opponent.isTbd(opponent) then
 		opponent.isAlreadyParsed = true
 		return opponent
+	-- Entry is a TBD Opponent, but could contain data (e.g. flag or faction) for party opponents
 	elseif not opponent.type or not Opponent.typeIsParty(opponent.type) then
 		return {}
 	end
 
-	-- Entry is a TBD Opponent, but could contain data (e.g. flag or faction) for party opponents
 	opponent.isAlreadyParsed = true
 	opponent.type = nil
 	for _, player in pairs(opponent.players or {}) do
