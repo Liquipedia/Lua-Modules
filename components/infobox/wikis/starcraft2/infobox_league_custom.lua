@@ -156,7 +156,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague._mapsDisplay(prefix)
-	maps = CustomLeague._getMaps(prefix)
+	local maps = CustomLeague._getMaps(prefix)
 
 	return {table.concat(
 		Array.map(maps, function(mapData)
