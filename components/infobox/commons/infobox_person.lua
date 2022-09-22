@@ -7,20 +7,22 @@
 --
 
 local Class = require('Module:Class')
-local BasicInfobox = require('Module:Infobox/Basic')
-local Links = require('Module:Links')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local Localisation = require('Module:Localisation').getLocalisation
-local Flags = require('Module:Flags')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Region = require('Module:Region')
-local AgeCalculation = require('Module:AgeCalculation')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
-local Earnings = require('Module:Earnings')
-local Logic = require('Module:Logic')
+
+local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Earnings = Lua.import('Module:Earnings', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Region = Lua.import('Module:Region', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -399,7 +401,7 @@ function Person:_createLocation(country, location, personType)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	local demonym = Localisation(countryDisplay)
+	local demonym = Localisation.getLocalisation(countryDisplay)
 
 	local category = ''
 	if Namespace.isMain() then
