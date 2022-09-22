@@ -7,14 +7,18 @@
 --
 
 local Array = require('Module:Array')
-local Cell = require('Module:Infobox/Widget/Cell')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
+local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local Series = require('Module:Infobox/Series')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomSeries = {}
 

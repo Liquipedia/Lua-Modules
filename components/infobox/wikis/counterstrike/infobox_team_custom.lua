@@ -7,15 +7,19 @@
 --
 
 local Array = require('Module:Array')
-local Cell = require('Module:Infobox/Widget/Cell')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
+local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Infobox/Team')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
