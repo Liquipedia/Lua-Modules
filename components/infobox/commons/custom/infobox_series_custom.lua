@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Series = require('Module:Infobox/Series')
+local Lua = require('Module:Lua')
+
+local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
 
 local CustomSeries = {}
 
