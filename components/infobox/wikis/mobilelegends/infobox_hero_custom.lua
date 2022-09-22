@@ -6,19 +6,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Unit = require('Module:Infobox/Unit')
-local String = require('Module:StringUtils')
-local Namespace = require('Module:Namespace')
-local ClassIcon = require('Module:ClassIcon')
-local Math = require('Module:Math')
-local HeroWL = require('Module:HeroWL')
 local Class = require('Module:Class')
+local ClassIcon = require('Module:ClassIcon')
+local Lua = require('Module:Lua')
+local HeroWL = require('Module:HeroWL')
+local Math = require('Module:Math')
+local Namespace = require('Module:Namespace')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Breakdown = Widgets.Breakdown
 
 local CustomHero = {}
 
