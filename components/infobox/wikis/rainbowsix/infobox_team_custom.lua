@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
