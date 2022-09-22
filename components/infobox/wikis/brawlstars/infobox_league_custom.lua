@@ -6,12 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
-local Variables = require('Module:Variables')
-local Logic = require('Module:Logic')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local SUPERCELL_SPONSORED_ICON = '[[File:Supercell icon.png|x18px|link=Supercell|Tournament sponsored by Supercell.]]'
 
