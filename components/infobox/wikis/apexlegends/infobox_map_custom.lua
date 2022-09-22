@@ -7,14 +7,18 @@
 --
 
 local Class = require('Module:Class')
-local Map = require('Module:Infobox/Map')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Title = require('Module:Infobox/Widget/Title')
-local WidgetTable = require('Module:Widget/Table')
-local TableRow = require('Module:Widget/Table/Row')
-local TableCell = require('Module:Widget/Table/Cell')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local TableCell = Lua.import('Module:Widget/Table/Cell', {requireDevIfEnabled = true})
+local TableRow = Lua.import('Module:Widget/Table/Row', {requireDevIfEnabled = true})
+local WidgetTable = Lua.import('Module:Widget/Table', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local CustomMap = Class.new()
 local CustomInjector = Class.new(Injector)

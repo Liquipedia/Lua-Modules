@@ -6,11 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Character = require('Module:Infobox/Character')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
+local Lua = require('Module:Lua')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Character = Lua.import('Module:Infobox/Character', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local CustomCharacter = Class.new()
 local CustomInjector = Class.new(Injector)
