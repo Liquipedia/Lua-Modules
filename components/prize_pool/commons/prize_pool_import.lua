@@ -139,6 +139,8 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
 			local entry = {
 				date = record.extradata.endTime and DateExt.toYmdInUtc(record.extradata.endTime),
+				hasDraw = record.hasDraw,
+				hasOvertime = record.hasOvertime,
 			}
 
 			if not record.extradata.placeRange then
@@ -450,13 +452,13 @@ function Import._formatGroupScore(lpdbEntry)
 
 	local matches = lpdbEntry.scoreBoard.match
 	local overtime = lpdbEntry.scoreBoard.overtime
-	local wdl
-	if String.isNotEmpty(matches.d) then
-		wdl = {matches.w or '', matches.d or '', matches.l or ''}
-	elseif (overtime.w or 0) ~= 0 or (overtime.l or 0) ~= 0 then
-		wdl = {matches.w or '', overtime.w or '', overtime.l or '', matches.l or ''}
-	else
-		wdl = {matches.w or '', matches.l or ''}
+	local wdl = {matches.w or '', matches.l or ''}
+	if lpdbEntry.hasDraw then
+		table.insert(wdl, 2, matches.d or '')
+	end
+	if lpdbEntry.hasOvertime then
+		table.insert(wdl, 2, overtime.w or '')
+		table.insert(wdl, -1, overtime.l or '')
 	end
 
 	return table.concat(wdl, Import.config.groupScoreDelimiter)
