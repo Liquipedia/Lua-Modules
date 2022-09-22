@@ -219,6 +219,11 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	local vods = {}
+	if Logic.isNotEmpty(match.links.vod2) then
+		for _, vodpart in ipairs(match.links.vod2) do
+			vods[vodpart[2] + 100] = vodpart[1]
+		end
+	end
 	for index, game in ipairs(match.games) do
 		if game.vod then
 			vods[index] = game.vod
@@ -318,22 +323,34 @@ function CustomMatchSummary._createFooter(match, vods)
 		footer:addLink(url, icon, iconDark, label)
 	end
 
+	local function addVodLink(gamenum, vod, htext)
+		if not Logic.isEmpty(vod) then
+			footer:addElement(VodLink.display{
+				gamenum = gamenum,
+				vod = vod,
+				htext = htext
+			})
+		end
+	end
+
 	-- Match vod
-	if not Logic.isEmpty(match.vod) then
-		footer:addElement(VodLink.display{
-			vod = match.vod,
-			source = match.vod.url
-		})
+	if vods[100] then
+		addVodLink(nil, match.vod, 'Watch VOD ' .. '(part 1)')
+		addVodLink(nil, vods[100], 'Watch VOD ' .. '(part 2)')
+	else
+		addVodLink(nil, match.vod, nil)
 	end
 
 	-- Game Vods
 	for index, vod in pairs(vods) do
-		-- TODO: Darkmode VodIcons
-		footer:addElement(VodLink.display{
-			gamenum = index,
-			vod = vod,
-			source = vod.url
-		})
+		if index < 100 then
+			if vods[index + 100] then
+				addVodLink(index, vod, 'Watch Game ' .. index .. ' (part 1)')
+				addVodLink(index, vods[index + 100], 'Watch Game ' .. index .. ' (part 2)')
+			else
+				addVodLink(index, vod, nil)
+			end
+		end
 	end
 
 	if Table.isNotEmpty(match.links) then
