@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local UnofficialWorldChampion = require('Module:Infobox/UnofficialWorldChampion')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion', {requireDevIfEnabled = true})
 
 local CustomUnofficialWorldChampion = Class.new()
 

@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
+local Lua = require('Module:Lua')
+
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 
 local CustomLeague = {}
 

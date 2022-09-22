@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Weapon = require('Module:Infobox/Weapon')
+local Lua = require('Module:Lua')
+
+local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
 
 local CustomWeapon = {}
 
