@@ -6,24 +6,27 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
 local Array = require('Module:Array')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
+local DateClean = require('Module:DateTime')
 local GameLookup = require('Module:GameLookup')
-local MapMode = require('Module:MapMode')
 local GameModeLookup = require('Module:GameModeLookup')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Lua = require('Module:Lua')
+local MapMode = require('Module:MapMode')
 local Page = require('Module:Page')
-local DateClean = require('Module:DateTime')._clean
+local String = require('Module:StringUtils')
 local Tier = require('Module:Tier')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -225,7 +228,7 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	-- Variables for extradata to be added again in
 	-- Module:Prize pool, Module:Prize pool team, Module:TeamCard and Module:TeamCard2
-	Variables.varDefine('tournament_deadline', DateClean(args.deadline or ''))
+	Variables.varDefine('tournament_deadline', DateClean._clean(args.deadline or ''))
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
 
 	-- map links, to be used by brackets and mappool templates
@@ -251,7 +254,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
-		deadline = DateClean(args.deadline or ''),
+		deadline = DateClean._clean(args.deadline or ''),
 		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ','),
 		gameversion = args.version
 	}
