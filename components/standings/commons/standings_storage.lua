@@ -55,6 +55,8 @@ function StandingsStorage.table(data)
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
 
 	local extradata = {
+		hasdraw = data.hasdraw,
+		hasovertime = data.hasovertime,
 		roundcount = data.roundcount,
 		stagename = data.stagename or Variables.varDefault('bracket_header'),
 	}
