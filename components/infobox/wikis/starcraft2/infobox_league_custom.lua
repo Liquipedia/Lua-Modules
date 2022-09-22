@@ -12,8 +12,8 @@ local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Json = require('Module:Json')
-local League = require('Module:Infobox/League')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
 local RaceIcon = require('Module:RaceIcon')
@@ -22,12 +22,15 @@ local Table = require('Module:Table')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
-local Chronology = require('Module:Infobox/Widget/Chronology')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Chronology = Widgets.Chronology
+local Title = Widgets.Title
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)

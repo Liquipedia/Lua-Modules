@@ -8,12 +8,12 @@
 
 --Shared functions between SC2 person infoboxes (Player/Commentator and MapMaker)
 
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
+local RaceIcon = require('Module:RaceIcon').getBigIcon
+local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
 
 --race stuff tables
 local _RACE_DATA = {

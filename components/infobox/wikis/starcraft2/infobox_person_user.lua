@@ -6,12 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local User = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
 local Class = require('Module:Class')
-local Variables = require('Module:Variables')
-local RaceIcon = require('Module:RaceIcon').getBigIcon
 local CleanRace = require('Module:CleanRace')
+local Lua = require('Module:Lua')
+local RaceIcon = require('Module:RaceIcon').getBigIcon
+local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
+
+local User = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 --race stuff tables
 local _FACTION1 = {

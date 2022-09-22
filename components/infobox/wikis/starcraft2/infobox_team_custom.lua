@@ -11,20 +11,23 @@ local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
+local Lua = require('Module:Lua')
 local MatchTicker = require('Module:MatchTicker/Participant')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Title = Widgets.Title
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
