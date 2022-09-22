@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Website = require('Module:Infobox/Website')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Website = Lua.import('Module:Infobox/Website', {requireDevIfEnabled = true})
 
 local CustomWebsite = Class.new()
 

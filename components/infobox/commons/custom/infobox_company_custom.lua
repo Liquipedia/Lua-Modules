@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Company = require('Module:Infobox/Company')
+local Lua = require('Module:Lua')
+
+local Company = Lua.import('Module:Infobox/Company', {requireDevIfEnabled = true})
 
 local CustomCompany = {}
 

@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local Game = require('Module:Infobox/Game')
-local Injector = require('Module:Infobox/Widget/Injector')
+local Lua = require('Module:Lua')
+
+local Game = Lua.import('Module:Infobox/Game', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local CustomGame = Class.new()
 

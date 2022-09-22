@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local Strategy = require('Module:Infobox/Strategy')
-local Injector = require('Module:Infobox/Widget/Injector')
+local Lua = require('Module:Lua')
+
+local Strategy = Lua.import('Module:Infobox/Strategy', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local CustomStrategy = Class.new()
 

@@ -7,11 +7,12 @@
 --
 
 local Class = require('Module:Class')
-local Show = require('Module:Infobox/Show')
-local Injector = require('Module:Infobox/Widget/Injector')
+local Lua = require('Module:Lua')
+
+local Show = Lua.import('Module:Infobox/Show', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local CustomShow = Class.new()
-
 
 local CustomInjector = Class.new(Injector)
 

@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local Patch = require('Module:Infobox/Patch')
-local Injector = require('Module:Infobox/Widget/Injector')
+local Lua = require('Module:Lua')
+
+local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local CustomPatch = Class.new()
 

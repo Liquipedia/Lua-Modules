@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Character = require('Module:Infobox/Character')
+local Lua = require('Module:Lua')
+
+local Character = Lua.import('Module:Infobox/Character', {requireDevIfEnabled = true})
 
 local CustomCharacter = {}
 
