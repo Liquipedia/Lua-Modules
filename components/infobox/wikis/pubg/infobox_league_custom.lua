@@ -119,6 +119,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:defineCustomPageVariables()
+	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_game', _game or _args.game)
 	Variables.varDefine('tournament_publishertier', _args['pubgpremier'])
 	--Legacy Vars:
