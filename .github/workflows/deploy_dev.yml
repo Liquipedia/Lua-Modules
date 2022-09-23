@@ -13,10 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: tj-actions/changed-files@v29
+        with:
+          separator: " "
+
       - name: Deploy
         env:
           DEV_WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
           DEV_WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
           DEV_WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
           DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
-        run: bash deploy_dev.sh
+        run: bash deploy_dev.sh  ${{ steps.changed-files.outputs.all_changed_files }}
