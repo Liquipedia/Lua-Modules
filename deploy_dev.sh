@@ -3,7 +3,7 @@
 userAgent="GitHub Autodeploy Bot/1.0.0 (${DEV_WIKI_UA_EMAIL})"
 wikiBaseUrl='http://darkrai.wiki.tldev.eu/'
 devWikis=('callofduty' 'rocketleague' 'commons')
-luaFiles=$(find . -type f -name '*.lua')
+luaFiles=$1
 pat='\-\-\-\
 \-\- @Liquipedia\
 \-\- wiki=([^
