@@ -7,19 +7,21 @@
 --
 
 local Class = require('Module:Class')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Template = require('Module:Template')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local Links = require('Module:Links')
-local Locale = require('Module:Locale')
-local Flags = require('Module:Flags')
-local Localisation = require('Module:Localisation')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
 local String = require('Module:StringUtils')
 local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
-local Earnings = require('Module:Earnings')
-local BasicInfobox = require('Module:Infobox/Basic')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Earnings = Lua.import('Module:Earnings', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
+local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell

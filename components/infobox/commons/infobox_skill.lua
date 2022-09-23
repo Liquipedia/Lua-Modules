@@ -7,10 +7,12 @@
 --
 
 local Class = require('Module:Class')
-local InfoboxBasic = require('Module:Infobox/Basic')
-local String = require('Module:StringUtils')
-local Namespace = require('Module:Namespace')
+local Lua = require('Module:Lua')
 local Hotkey = require('Module:Hotkey')
+local Namespace = require('Module:Namespace')
+local String = require('Module:StringUtils')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -19,7 +21,7 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
-local Skill = Class.new(InfoboxBasic)
+local Skill = Class.new(BasicInfobox)
 
 function Skill.run(frame)
 	local skill = Skill(frame)

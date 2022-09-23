@@ -6,26 +6,28 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Template = require('Module:Template')
-local Table = require('Module:Table')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Links = require('Module:Links')
-local Flags = require('Module:Flags')
-local Localisation = require('Module:Localisation')
-local Variables = require('Module:Variables')
-local Locale = require('Module:Locale')
-local Page = require('Module:Page')
-local LeagueIcon = require('Module:LeagueIcon')
-local WarningBox = require('Module:WarningBox')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local TextSanitizer = require('Module:TextSanitizer')
-local Tier = require('Module:Tier')
-local InfoboxPrizePool = require('Module:Infobox/Extensions/PrizePool')
 local Logic = require('Module:Logic')
-local MetadataGenerator = require('Module:MetadataGenerator')
+local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
+local Tier = require('Module:Tier') -- loadData?
+local Variables = require('Module:Variables')
+local WarningBox = require('Module:WarningBox')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
+local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
+local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
+local MetadataGenerator = Lua.import('Module:MetadataGenerator', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local TextSanitizer = Lua.import('Module:TextSanitizer', {requireDevIfEnabled = true})
 
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
