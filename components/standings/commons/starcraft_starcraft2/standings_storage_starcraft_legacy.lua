@@ -8,7 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -19,9 +18,7 @@ local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local StandingsStorage = Lua.import('Module:Standings/Storage', {requireDevIfEnabled = true})
 
 local LEAGUE_TYPE = 'league'
-local TYPE_FROM_NUMBER = FnUtil.memoize(function ()
-	Table.map(Opponent.partySizes, function(key, code) return code, key end)
-end)
+local TYPE_FROM_NUMBER = Table.map(Opponent.partySizes, function(key, code) return code, key end)
 local INVALID_OPPONENT_CATEGORY = '[[Category:Pages with invalid opponent '
 	.. 'parsing in legacy group tables]]'
 
