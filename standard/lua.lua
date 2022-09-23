@@ -30,19 +30,15 @@ function Lua.moduleExists(name)
 	end
 end
 
-function Lua.requireIfExists(name, default)
+function Lua.requireIfExists(name, options)
 	if Lua.moduleExists(name) then
-		return require(name)
-	else
-		return default
+		return Lua.import(name, options)
 	end
 end
 
-function Lua.loadDataIfExists(name, default)
+function Lua.loadDataIfExists(name)
 	if Lua.moduleExists(name) then
 		return mw.loadData(name)
-	else
-		return default
 	end
 end
 
