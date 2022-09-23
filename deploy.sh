@@ -2,7 +2,7 @@
 
 userAgent="GitHub Autodeploy Bot/1.0.0 (${LP_UA_EMAIL})"
 wikiBaseUrl='https://liquipedia.net/'
-luaFiles=$(find . -type f -name '*.lua')
+luaFiles=$1
 pat='\-\-\-\
 \-\- @Liquipedia\
 \-\- wiki=([^
