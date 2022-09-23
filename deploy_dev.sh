@@ -17,8 +17,8 @@ declare -A loggedin
 
 for luaFile in $luaFiles
 do
-  echo "== Checking $luaFile =="
-  fileContents=$(cat "$luaFile")
+  echo "== Checking ./$luaFile =="
+  fileContents=$(cat "./$luaFile")
 
   [[ $fileContents =~ $pat ]]
 
