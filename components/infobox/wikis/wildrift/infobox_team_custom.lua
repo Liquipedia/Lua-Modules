@@ -41,19 +41,23 @@ function CustomTeam:createWidgetInjector()
 end
 
 function CustomTeam:createBottomContent()
-	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing matches of',
-		{team = _team.name}
-	) .. Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing tournaments of',
-		{team = _team.name}
-	).. Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Placement summary',
-		{team = _team.name}
-	)
+	if not _team.args.disbanded and mw.ext.TeamTemplate.teamexists(_team.pagename) then
+		local teamPage = mw.ext.TeamTemplate.teampage(_team.pagename)
+
+		return Template.expandTemplate(
+			mw.getCurrentFrame(),
+			'Upcoming and ongoing matches of',
+			{team = _team.lpdbname or teamPage}
+		) .. Template.expandTemplate(
+			mw.getCurrentFrame(),
+			'Upcoming and ongoing tournaments of',
+			{team = _team.lpdbname or teamPage}
+		) .. Template.expandTemplate(
+			mw.getCurrentFrame(),
+			'Placement summary',
+			{team = _team.lpdbname or teamPage}
+		)
+	end
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -76,12 +80,6 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 
 	return lpdbData
-end
-
-function CustomTeam:getWikiCategories(args)
-	local categories = {}
-
-	return categories
 end
 
 return CustomTeam
