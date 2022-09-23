@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Company = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Company = Lua.import('Module:Infobox/Company', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
