@@ -19,6 +19,7 @@ jobs:
           files: |
             components/**/*.lua
             standard/**/*.lua
+
       - name: Deploy
         env:
           DEV_WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
