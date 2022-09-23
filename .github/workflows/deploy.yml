@@ -16,6 +16,7 @@ jobs:
       - uses: tj-actions/changed-files@v29
         with:
           separator: " "
+          dir_names: true
 
       - name: Deploy
         env:
