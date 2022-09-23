@@ -26,4 +26,4 @@ jobs:
           DEV_WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
           DEV_WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
           DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
-        run: bash deploy_dev.sh  ${{ steps.changed-files.outputs.all_changed_files }}
+        run: bash deploy_dev.sh  "${{ steps.changed-files.outputs.all_changed_files }}"
