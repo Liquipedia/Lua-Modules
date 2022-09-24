@@ -117,11 +117,13 @@ function MatchLegacy.convertParameters(match2)
 				match.extradata[prefix .. 'rounds'] = '0'
 			elseif opponent.status == 'W' then
 				match[prefix .. 'score'] = math.floor(match2.bestof /2) + 1
-			elseif match.winner == DRAW then
-				match[prefix .. 'score'] = 0
 			else
 				if match2.bestof == 1 then
-					match[prefix .. 'score'] = tonumber(match.winner) == index and 1 or 0
+					if match.winner == DRAW then
+						match[prefix .. 'score'] = 0
+					else
+						match[prefix .. 'score'] = tonumber(match.winner) == index and 1 or 0
+					end
 				else
 					match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 				end
