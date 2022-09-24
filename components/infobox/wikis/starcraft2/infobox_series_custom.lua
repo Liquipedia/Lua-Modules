@@ -7,20 +7,23 @@
 --
 
 local Autopatch = require('Module:Automated Patch')
+local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local Series = require('Module:Infobox/Series')
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Builder = require('Module:Infobox/Widget/Builder')
-local Class = require('Module:Class')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Builder = Widgets.Builder
+local Cell = Widgets.Cell
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 local _TIER_MODE_TYPES = 'types'

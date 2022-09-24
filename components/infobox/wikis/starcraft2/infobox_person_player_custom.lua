@@ -8,9 +8,6 @@
 
 -- This module is used for both the Player and Commentator infoboxes
 
-local PersonSc2 = require('Module:Infobox/Person/Custom/Shared')
-local Person = require('Module:Infobox/Person')
-
 local Abbreviation = require('Module:Abbreviation')
 local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
@@ -25,10 +22,11 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local Condition = require('Module:Condition')
-
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator

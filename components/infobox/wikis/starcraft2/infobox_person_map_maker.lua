@@ -9,12 +9,14 @@
 local Class = require('Module:Class')
 local CleanRace = require('Module:CleanRace')
 local Logic = require('Module:Logic')
-local MapMaker = require('Module:Infobox/Person')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+
+local MapMaker = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 --race stuff tables
 local _FACTION1 = {
