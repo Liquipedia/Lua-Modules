@@ -16,24 +16,24 @@ local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local Notability = require('Module:Notability')
-local Person = require('Module:Infobox/Person')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local Condition = require('Module:Condition')
-
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
-
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
 
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
