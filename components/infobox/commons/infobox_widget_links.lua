@@ -7,9 +7,11 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
-local UtilLinks = require('Module:Links')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+
+local UtilLinks = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 local Links = Class.new(
 	Widget,
