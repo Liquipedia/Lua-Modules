@@ -7,9 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local Variables = require('Module:Variables')
 
+local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
@@ -18,12 +18,17 @@ function CustomHiddenDataBox.run(args)
 end
 
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
-	BasicHiddenDataBox.checkAndAssign(
-		'tournament_publishertier',
-		args.riotpremier,
-		queryResult.publishertier
-	)
-	Variables.varDefine('tournament_riot_premier', Variables.varDefault('tournament_publishertier', ''))
+	queryResult.extradata = queryResult.extradata or {}
+
+	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
+	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
+	Variables.varDefine('edate', Variables.varDefault('tournament_enddate'))
+	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier'))
+	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype'))
+	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
+
+	BasicHiddenDataBox.checkAndAssign('tournament_patch', args.patch, queryResult.patch)
+	BasicHiddenDataBox.checkAndAssign('tournament_publishertier', args['riotpremier'], queryResult.publishertier)
 end
 
 return Class.export(CustomHiddenDataBox)
