@@ -25,10 +25,9 @@ jobs:
 
       - name: Deploy
         env:
-          WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
-          WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
-          WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
-          DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
+          WIKI_USER: ${{ secrets.LP_USER }}
+          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
         run: bash deploy_dev.sh "${{ steps.changed-files.outputs.all_changed_files }}"
 
   dev-deploy:
@@ -49,7 +48,8 @@ jobs:
 
       - name: Deploy
         env:
-          WIKI_USER: ${{ secrets.LP_USER }}
-          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
-          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
+          WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
+          DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
         run: bash deploy_dev.sh "${{ steps.changed-files.outputs.all_changed_files }}"
