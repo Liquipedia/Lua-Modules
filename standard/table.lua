@@ -8,7 +8,6 @@
 
 local Table = {}
 
----#1954 - #tbl & doesn't make sense on tables
 ---@generic T
 ---@param tbl T[]
 ---@return T[]
@@ -33,7 +32,6 @@ function Table.size(tbl)
 	return i
 end
 
----#1954 - uses ipairs
 ---@param tbl any[]
 ---@param value any
 ---@return boolean
@@ -46,7 +44,6 @@ function Table.includes(tbl, value)
 	return false
 end
 
----#1954 - doesn't give the key to function
 ---@generic K, V, T
 ---@param tbl {[K]: V}
 ---@param predicate fun(value: V, argument: T?): boolean
