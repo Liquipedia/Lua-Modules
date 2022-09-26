@@ -1,8 +1,9 @@
 #!/bin/bash
 
-userAgent="GitHub Autodeploy Bot/1.0.0 (${LP_UA_EMAIL})"
-wikiBaseUrl='https://liquipedia.net/'
-luaFiles=$1
+userAgent="GitHub Autodeploy Bot/1.0.0 (${WIKI_UA_EMAIL})"
+lpBaseUrl='https://liquipedia.net'
+devBaseUrl='http://darkrai.wiki.tldev.eu'
+devWikis=('callofduty' 'rocketleague' 'commons')
 pat='\-\-\-\
 \-\- @Liquipedia\
 \-\- wiki=([^
@@ -13,6 +14,18 @@ pat='\-\-\-\
 gitCommitSubject=$(git log -1 --pretty='%h %s')
 
 declare -A loggedin
+
+if [[ "$1" == "REDEPLOY" ]]; then
+  luaFiles=$(find . -type f -name '*.lua')
+else
+  luaFiles=$1
+fi
+
+if [[ "${DEV_WIKI_BASIC_AUTH}" == "" ]]; then
+  wikiBaseUrl=${lpBaseUrl}
+else
+  wikiBaseUrl=$devBaseUrl
+fi
 
 for luaFile in $luaFiles
 do
@@ -28,9 +41,14 @@ do
     echo '...magic comment found - updating wiki...'
     wiki="${BASH_REMATCH[1]}"
     page="${BASH_REMATCH[2]}"
+
+    if [[ ! ($wikiBaseUrl == "${lpBaseUrl}" ||  "${devWikis[*]}" =~ ${wiki}) ]]; then
+        continue
+    fi
+
     echo "...wiki = $wiki"
     echo "...page = $page"
-    wikiApiUrl="${wikiBaseUrl}${wiki}/api.php"
+    wikiApiUrl="${wikiBaseUrl}/${wiki}/api.php"
     ckf="cookie_${wiki}.ck"
 
     if [[ ${loggedin[${wiki}]} != 1 ]]
@@ -45,6 +63,7 @@ do
           -d "format=json&action=query&meta=tokens&type=login" \
           -H "User-Agent: ${userAgent}" \
           -H 'Accept-Encoding: gzip' \
+          -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
           -X POST "$wikiApiUrl" \
           | gunzip \
           | jq ".query.tokens.logintoken" -r
@@ -53,12 +72,13 @@ do
         -s \
         -b "$ckf" \
         -c "$ckf" \
-        --data-urlencode "username=${LP_USER}" \
-        --data-urlencode "password=${LP_PASSWORD}" \
+        --data-urlencode "username=${WIKI_USER}" \
+        --data-urlencode "password=${WIKI_PASSWORD}" \
         --data-urlencode "logintoken=${loginToken}" \
-        --data-urlencode "loginreturnurl=https://liquipedia.net" \
+        --data-urlencode "loginreturnurl=${wikiBaseUrl}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
+        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "${wikiApiUrl}?format=json&action=clientlogin" \
         | gunzip \
         > /dev/null
@@ -76,6 +96,7 @@ do
         -d "format=json&action=query&meta=tokens" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
+        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "$wikiApiUrl" \
         | gunzip \
         | jq ".query.tokens.csrftoken" -r
@@ -93,6 +114,7 @@ do
         --data-urlencode "token=${editToken}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
+        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "${wikiApiUrl}?format=json&action=edit" \
         | gunzip
     )
@@ -106,4 +128,6 @@ do
   fi
 done
 
-rm cookie_*
+if [[ ! "$luaFiles" == "" ]]; then
+  rm cookie_*
+fi
