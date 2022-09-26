@@ -324,7 +324,7 @@ function CustomMatchSummary._createFooter(match, vods)
 	end
 
 	local function addVodLink(gamenum, vod, htext)
-		if not Logic.isEmpty(vod) then
+		if vod then
 			footer:addElement(VodLink.display{
 				gamenum = gamenum,
 				vod = vod,
