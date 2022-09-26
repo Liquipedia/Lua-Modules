@@ -178,7 +178,6 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has teams name=' .. (match.opponent2 or ''),
 		'Has calendar description=- ' .. match.opponent1 .. ' vs ' .. match.opponent2 .. ' on ' .. match.date,
 	}
-	
 	local extradata = Json.parseIfString(match2.extradata) or {}
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
@@ -187,7 +186,6 @@ function MatchLegacy.storeMatchSMW(match, match2)
 			table.insert(data, 'Has mvp ' .. index .. '=' .. mvpString)
 		end
 	end
-	
 	local streams = match.stream or {}
 	streams = Json.parseIfString(streams)
 	for key, item in pairs(streams) do
@@ -197,31 +195,11 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		)
 	end
 
-	local extradata = match.extradata or {}
-	extradata = Json.parseIfString(extradata)
 	for key, item in pairs(extradata) do
 		if String.startsWith(key, 'vodgame') then
 			table.insert(
 				data,
 				'Has match ' .. key .. '=' .. item
-			)
-		end
-	end
-
-	local mvpTable = mw.text.split(extradata.mvp or '', ',')
-	local mvpTeamsTable = mw.text.split(extradata.mvpteam or '', ',')
-	if String.isNotEmpty(mvpTable[1]) then
-		for key, item in pairs(mvpTable) do
-			local mvp = mw.text.trim(item)
-			local mvpTeam = mw.text.trim(mvpTeamsTable[key] or '')
-			if Logic.isNumeric(mvpTeam) then
-				mvpTeam = match['opponent' .. mvpTeam]
-			else
-				mvpTeam = mvpTeam or ''
-			end
-			table.insert(
-				data,
-				'Has mvp ' .. key .. '=' .. mvp .. '§§§§' .. mvpTeam .. '§§§§0'
 			)
 		end
 	end
