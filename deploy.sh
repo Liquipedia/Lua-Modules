@@ -15,7 +15,7 @@ gitCommitSubject=$(git log -1 --pretty='%h %s')
 
 declare -A loggedin
 
-if [[ "$1" == "REDEPLOY" ]]; then
+if [[ -z "$1" ]]; then
   luaFiles=$(find . -type f -name '*.lua')
 else
   luaFiles=$1
