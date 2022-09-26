@@ -120,7 +120,7 @@ function Placement.raw(placement)
 end
 
 ---Takes a table of placement numbers and makes them ordinal.
----@param placement table
+---@param placement number[]
 ---@return table
 function Placement._makeOrdinal(placement)
 	return Table.mapValues(placement,
@@ -133,8 +133,7 @@ end
 
 ---Takes parent mw html object and childs a placement.
 ---Expected args fields are `parent` and `placement`.
----@param placement table?
----@return nil
+---@param args table?
 function Placement._placement(args)
 	if not (type(args) == 'table' and type(args.parent) == 'table') then
 		return
@@ -149,7 +148,7 @@ function Placement._placement(args)
 end
 
 ---Converts a placement table into a ordinal string.
----@param placement table
+---@param range number[]
 ---@return string
 function Placement.RangeLabel(range)
 	local ordinal = Placement._makeOrdinal(range)

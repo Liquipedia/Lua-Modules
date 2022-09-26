@@ -12,7 +12,7 @@ local Variables = {}
 
 ---Stores a wiki-variable and returns the empty string
 ---@param name string Key of the wiki-variable
----@param value string Value of the wiki-variable
+---@param value any? Value of the wiki-variable. Must have a __tostring metamethod.
 ---@return string #always the empty string
 function Variables.varDefine(name, value)
 	return mw.ext.VariablesLua.vardefine(name, value)
@@ -20,7 +20,7 @@ end
 
 ---Stores a wiki-variable and returns the stored value
 ---@param name string Key of the wiki-variable
----@param value string Value of the wiki-variable
+---@param value any? Value of the wiki-variable. Must have a __tostring metamethod.
 ---@return string
 function Variables.varDefineEcho(name, value)
 	return mw.ext.VariablesLua.vardefineecho(name, value)
