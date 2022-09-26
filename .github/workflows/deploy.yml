@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 2
 
@@ -29,7 +29,8 @@ jobs:
           WIKI_USER: ${{ secrets.LP_USER }}
           WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
-        run: bash deploy_dev.sh "${{ steps.changed-files.outputs.all_changed_files }}"
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+        run: bash deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"
 
   dev-deploy:
     name: Dev Wikis
@@ -53,5 +54,6 @@ jobs:
           WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
           WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.DEV_WIKI_BASE_URL }}
           DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
         run: bash deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"

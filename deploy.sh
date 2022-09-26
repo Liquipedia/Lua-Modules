@@ -1,9 +1,7 @@
 #!/bin/bash
 
 userAgent="GitHub Autodeploy Bot/1.0.0 (${WIKI_UA_EMAIL})"
-lpBaseUrl='https://liquipedia.net'
-devBaseUrl='http://darkrai.wiki.tldev.eu'
-devWikis=('callofduty' 'rocketleague' 'commons')
+devWikis=('callofduty' 'rocketleague' 'teamfortress' 'commons')
 pat='\-\-\-\
 \-\- @Liquipedia\
 \-\- wiki=([^
@@ -21,16 +19,13 @@ else
   luaFiles=$1
 fi
 
-if [[ "${DEV_WIKI_BASIC_AUTH}" == "" ]]; then
-  wikiBaseUrl=${lpBaseUrl}
-else
-  wikiBaseUrl=$devBaseUrl
-fi
-
 for luaFile in $luaFiles
 do
-  echo "== Checking ./$luaFile =="
-  fileContents=$(cat "./$luaFile")
+  if [[ -n "$1" ]]; then
+    luaFile="./$luaFile"
+  fi
+  echo "== Checking $luaFile =="
+  fileContents=$(cat "$luaFile")
 
   [[ $fileContents =~ $pat ]]
 
@@ -42,13 +37,13 @@ do
     wiki="${BASH_REMATCH[1]}"
     page="${BASH_REMATCH[2]}"
 
-    if [[ ! ($wikiBaseUrl == "${lpBaseUrl}" ||  "${devWikis[*]}" =~ ${wiki}) ]]; then
+    if [[ ! ( ("${DEV_WIKI_BASIC_AUTH}" == "") || ("${devWikis[*]}" =~ ${wiki}) ) ]]; then
         continue
     fi
 
     echo "...wiki = $wiki"
     echo "...page = $page"
-    wikiApiUrl="${wikiBaseUrl}/${wiki}/api.php"
+    wikiApiUrl="${WIKI_BASE_URL}/${wiki}/api.php"
     ckf="cookie_${wiki}.ck"
 
     if [[ ${loggedin[${wiki}]} != 1 ]]
@@ -75,7 +70,7 @@ do
         --data-urlencode "username=${WIKI_USER}" \
         --data-urlencode "password=${WIKI_PASSWORD}" \
         --data-urlencode "logintoken=${loginToken}" \
-        --data-urlencode "loginreturnurl=${wikiBaseUrl}" \
+        --data-urlencode "loginreturnurl=${WIKI_BASE_URL}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
         -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
