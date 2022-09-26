@@ -334,7 +334,6 @@ function matchFunctions.getLinks(match)
 	local links = match.links
 
 	local platforms = mw.loadData('Module:MatchExternalLinks')
-
 	table.insert(platforms, {name = 'vod2', isMapStats = true})
 
 	for _, platform in ipairs(platforms) do

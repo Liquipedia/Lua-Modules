@@ -220,8 +220,8 @@ function CustomMatchSummary.getByMatchId(args)
 
 	local vods = {}
 	if Logic.isNotEmpty(match.links.vod2) then
-		for _, vodpart in ipairs(match.links.vod2) do
-			vods[vodpart[2] + 100] = vodpart[1]
+		for _, vod2 in ipairs(match.links.vod2) do
+			vods[vod2[2] + 100] = vod2[1]
 		end
 	end
 	for index, game in ipairs(match.games) do
