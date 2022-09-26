@@ -113,16 +113,20 @@ function MatchLegacy.convertParameters(match2)
 			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
 			if isOverturned then
-				if tonumber(match.winner) == index then
-					match[prefix .. 'score'] = math.floor(match2.bestof /2) + 1
-				else
-					match[prefix .. 'score'] = 0
-				end
+				match[prefix .. 'score'] = tonumber(match.winner) == index and (math.floor(match2.bestof /2) + 1) or 0
 				match.extradata[prefix .. 'rounds'] = '0'
 			elseif opponent.status == 'W' then
 				match[prefix .. 'score'] = math.floor(match2.bestof /2) + 1
 			else
-				match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				if match2.bestof == 1 then
+					if match.winner == DRAW then
+						match[prefix .. 'score'] = 0
+					else
+						match[prefix .. 'score'] = tonumber(match.winner) == index and 1 or 0
+					end
+				else
+					match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				end
 			end
 
 			if Table.includes(LOSER_STATUSES, opponent.status) then
