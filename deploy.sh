@@ -1,6 +1,6 @@
 #!/bin/bash
 
-userAgent="GitHub Autodeploy Bot/1.0.0 (${WIKI_UA_EMAIL})"
+userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
 devWikis=('callofduty' 'rocketleague' 'teamfortress' 'commons')
 pat='\-\-\-\
 \-\- @Liquipedia\
