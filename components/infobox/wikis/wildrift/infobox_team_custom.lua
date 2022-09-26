@@ -46,21 +46,16 @@ function CustomTeam:createWidgetInjector()
 end
 
 function CustomTeam:createBottomContent()
-	if not _team.args.disbanded and mw.ext.TeamTemplate.teamexists(_team.pagename) then
-		local teamPage = mw.ext.TeamTemplate.teampage(_team.pagename)
-
+	if not _team.args.disbanded then
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
-			'Upcoming and ongoing matches of',
-			{team = _team.lpdbname or teamPage}
+			'Upcoming and ongoing matches of'
 		) .. Template.expandTemplate(
 			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of',
-			{team = _team.lpdbname or teamPage}
+			'Upcoming and ongoing tournaments of'
 		) .. Template.expandTemplate(
 			mw.getCurrentFrame(),
-			'Placement summary',
-			{team = _team.lpdbname or teamPage}
+			'Placement summary'
 		)
 	end
 end
