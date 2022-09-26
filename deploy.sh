@@ -128,6 +128,4 @@ do
   fi
 done
 
-if [[ ! "$luaFiles" == "" ]]; then
-  rm cookie_*
-fi
+rm cookie_*

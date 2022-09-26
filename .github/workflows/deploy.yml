@@ -24,6 +24,7 @@ jobs:
             standard/**/*.lua
 
       - name: Deploy
+        if: steps.changed-files.outputs.any_changed == 'true'
         env:
           WIKI_USER: ${{ secrets.LP_USER }}
           WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
