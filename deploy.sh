@@ -13,10 +13,10 @@ gitCommitSubject=$(git log -1 --pretty='%h %s')
 
 declare -A loggedin
 
-if [[ -z "$1" ]]; then
-  luaFiles=$(find . -type f -name '*.lua')
-else
+if [[ -n "$1" ]]; then
   luaFiles=$1
+else
+  luaFiles=$(find . -type f -name '*.lua')
 fi
 
 for luaFile in $luaFiles
