@@ -324,7 +324,7 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = match.mvp,
+		mvp = MatchGroupInput.readMvp(match),
 		mvpteam = match.mvpteam or match.winner
 	}
 	return match
@@ -438,26 +438,37 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
 	playersData = Json.parseIfString(playersData) or {}
 	local players = {}
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or playersData['p' .. playerIndex]
-			or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
-		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
-		end
+	-- need unlimited import here so we do not cut off players due to TeamCards storing players weirdly
+	local playerIndex = 1
+	local player = matchFunctions.parsePlayer(match, oppIndex, teamName, playersData, playerIndex)
 
-		if not Table.isEmpty(player) then
-			table.insert(players, player)
-		end
+	while not Table.isEmpty(player) do
+		table.insert(players, player)
+		playerIndex = playerIndex + 1
+		player = matchFunctions.parsePlayer(match, oppIndex, teamName, playersData, playerIndex)
 	end
+
 	match['opponent' .. oppIndex].match2players = players
+
 	return match
+end
+
+function matchFunctions.parsePlayer(match, oppIndex, teamName, playersData, playerIndex)
+	local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
+
+	player.name = player.name or playersData['p' .. playerIndex]
+		or Variables.varDefault(teamName .. '_p' .. playerIndex)
+	player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
+		or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+	player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
+		or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
+
+	if String.isNotEmpty(player.name) then
+		player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
+	end
+
+	return player
 end
 
 --
