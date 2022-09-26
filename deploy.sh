@@ -115,7 +115,11 @@ do
     )
     result=$(echo "$rawResult" | jq ".edit.result" -r)
     echo "DEBUG: ...${rawResult}"
-    echo "...${result}"
+    if [[ "${result}" == "Success" ]]; then
+      echo "...${result}"
+    else
+      exit 1
+    fi
 
     echo '...done'
     # Don't get rate limited
