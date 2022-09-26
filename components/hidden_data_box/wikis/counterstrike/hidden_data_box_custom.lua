@@ -8,10 +8,11 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Tier = mw.loadData('Module:Tier')
 local Variables = require('Module:Variables')
 
-local BasicHiddenDataBox = require('Module:HiddenDataBox')
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)

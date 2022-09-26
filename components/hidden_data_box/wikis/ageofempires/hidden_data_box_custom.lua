@@ -5,13 +5,14 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-
-local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
+
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 
 local CustomHiddenDataBox = {}
 
