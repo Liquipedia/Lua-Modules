@@ -1,0 +1,40 @@
+name: Scheduled Deploy
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1'
+
+jobs:
+  deploy:
+    name: LP Wikis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Deploy
+        env:
+          WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
+          WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
+          DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
+        run: bash deploy_dev.sh REDEPLOY
+
+  dev-deploy:
+    name: Dev Wikis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Deploy
+        env:
+          WIKI_USER: ${{ secrets.LP_USER }}
+          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+        run: bash deploy_dev.sh REDEPLOY
