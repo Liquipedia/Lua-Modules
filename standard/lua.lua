@@ -114,7 +114,6 @@ function Lua.invoke(frame)
 			end
 			currentFrame = currentFrame:getParent()
 		end
-		return false
 	end
 
 	local flags = {dev = devEnabled(frame)}
