@@ -323,7 +323,6 @@ function Placement:_getLpdbData(...)
 			participantflag = opponentType == Opponent.solo and players.p1flag or nil,
 			participanttemplate = opponent.opponentData.template,
 			opponentindex = opponentIndex, -- Needed in SMW
-			opponenttype = opponentType,
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
