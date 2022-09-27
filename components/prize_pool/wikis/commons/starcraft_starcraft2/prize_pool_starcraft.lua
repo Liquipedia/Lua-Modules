@@ -41,7 +41,6 @@ local OPPONENT_TYPE_TO_MODE = {
 	quad = '4v4',
 	team = 'team',
 }
-local IMPORT_START_DATE = '2022-01-14'
 local PLACE_TO_KEY_PREFIX = {'winner', 'runnerup', 'third', 'fourth'}
 local SEMIFINALS_PREFIX = 'sf'
 local TBD = 'TBD'
