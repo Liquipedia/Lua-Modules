@@ -219,10 +219,12 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	local vods = {}
+	local secondVods = {}
 	if Logic.isNotEmpty(match.links.vod2) then
 		for _, vod2 in ipairs(match.links.vod2) do
-			vods[vod2[2] + 100] = vod2[1]
+			secondVods[vod2[2]] = vod2[1]
 		end
+		match.links.vod2 = nil
 	end
 	for index, game in ipairs(match.games) do
 		if game.vod then
@@ -231,7 +233,7 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) or not Logic.isEmpty(match.vod) then
-		matchSummary:footer(CustomMatchSummary._createFooter(match, vods))
+		matchSummary:footer(CustomMatchSummary._createFooter(match, vods, secondVods))
 	end
 
 	return matchSummary:create()
@@ -302,7 +304,7 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
-function CustomMatchSummary._createFooter(match, vods)
+function CustomMatchSummary._createFooter(match, vods, secondVods)
 	local footer = MatchSummary.Footer()
 
 	local separator = '<b>·</b>'
@@ -334,22 +336,20 @@ function CustomMatchSummary._createFooter(match, vods)
 	end
 
 	-- Match vod
-	if vods[100] then
+	if secondVods[0] then
 		addVodLink(nil, match.vod, 'Watch VOD ' .. '(part 1)')
-		addVodLink(nil, vods[100], 'Watch VOD ' .. '(part 2)')
+		addVodLink(nil, secondVods[0], 'Watch VOD ' .. '(part 2)')
 	else
 		addVodLink(nil, match.vod, nil)
 	end
 
 	-- Game Vods
 	for index, vod in pairs(vods) do
-		if index < 100 then
-			if vods[index + 100] then
-				addVodLink(index, vod, 'Watch Game ' .. index .. ' (part 1)')
-				addVodLink(index, vods[index + 100], 'Watch Game ' .. index .. ' (part 2)')
-			else
-				addVodLink(index, vod, nil)
-			end
+		if secondVods[index] then
+			addVodLink(index, vod, 'Watch Game ' .. index .. ' (part 1)')
+			addVodLink(index, secondVods[index], 'Watch Game ' .. index .. ' (part 2)')
+		else
+			addVodLink(index, vod, nil)
 		end
 	end
 
