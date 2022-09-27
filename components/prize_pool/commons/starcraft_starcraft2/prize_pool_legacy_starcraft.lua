@@ -23,8 +23,8 @@ local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local StarcraftLegacyPrizePool = {}
 
+local AUTOMATION_START_DATE = '2022-01-14'
 local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
-local IMPORT_DEFAULT_ENABLE_START = '2022-01-14'
 
 local CACHED_DATA = {
 	next = {points = 1, qual = 1, freetext = 1},
@@ -81,8 +81,8 @@ function StarcraftLegacyPrizePool.run(frame)
 	if header.lpdb and header.lpdb ~= 'auto' then
 		newArgs.import = header.lpdb
 	end
-	newArgs.importDefaultEnableStart = header.importDefaultEnableStart
-		or IMPORT_DEFAULT_ENABLE_START
+	newArgs.import = StarcraftLegacyPrizePool._enableImport(newArgs)
+
 	newArgs.importLimit = header.importLimit
 	newArgs.tournament1 = header.tournament1 or header.tournament1
 	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament') do
@@ -116,7 +116,7 @@ function StarcraftLegacyPrizePool.run(frame)
 		-- if we have to merge we need to kick empty opponents
 		-- while if we import we want tom keep them
 		if
-			not StarcraftLegacyPrizePool._enableImport(newArgs)
+			not newArgs.import
 			and #newArgs[slotIndex].opponents > newArgs[slotIndex].opponentsInSlot
 		then
 			newArgs[slotIndex].opponents = Array.filter(
@@ -139,13 +139,13 @@ function StarcraftLegacyPrizePool.run(frame)
 end
 
 function StarcraftLegacyPrizePool._enableImport(args)
-	local tournamentEndDate = Variables.varDefault('tournament_enddate',
+	local tournamentDate = Variables.varDefault('tournament_enddate',
 		Variables.varDefault('tournament_startdate'))
 	return Logic.nilOr(
 		Logic.readBoolOrNil(args.input),
 		args.tournament1,
 		args.matchGroupId1,
-		not tournamentEndDate or tournamentEndDate >= args.importDefaultEnableStart
+		not tournamentDate or tournamentDate >= AUTOMATION_START_DATE
 	)
 end
 
