@@ -222,7 +222,8 @@ function CustomMatchSummary.getByMatchId(args)
 	local secondVods = {}
 	if Logic.isNotEmpty(match.links.vod2) then
 		for _, vod2 in ipairs(match.links.vod2) do
-			secondVods[vod2[2]] = vod2[1]
+			local link, gameIndex = unpack(vod2)
+			secondVods[gameIndex] = link
 		end
 		match.links.vod2 = nil
 	end
