@@ -67,16 +67,10 @@ end
 ---@param tbl table?
 ---@return boolean
 function Table.isEmpty(tbl)
-	if tbl == nil then
+	if not tbl then
 		return true
 	end
-	-- luacheck: push ignore
-	--it is intended that the loop is executed at most once
-	for _, _ in pairs(tbl) do
-		return false
-	end
-	-- luacheck: pop
-	return true
+	return not next(tbl)
 end
 
 ---Return true if table is neither empty nor nil
