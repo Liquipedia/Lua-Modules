@@ -60,7 +60,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomWeapon:addToLpdb(lpdbData, args)
-	lpdbData.extradata = {
+	lpdbData.extradata = Table.merge(lpdbData.extradata, {
 		desc = args.desc,
 		class = args.class,
 		damage = args.damage,
@@ -71,7 +71,7 @@ function CustomWeapon:addToLpdb(lpdbData, args)
 		firemode = table.concat(_weapon:getAllArgsForBase(args, 'firemode'), ';'),
 		operators = table.concat(_weapon:getAllArgsForBase(args, 'operator'), ';'),
 		games = table.concat(_weapon:getAllArgsForBase(args, 'game'), ';'),
-	}
+	})
 	return lpdbData
 end
 
