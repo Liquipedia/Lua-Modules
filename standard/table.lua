@@ -70,7 +70,7 @@ function Table.isEmpty(tbl)
 	if not tbl then
 		return true
 	end
-	return next(tbl) and true or false
+	return next(tbl) and false or true
 end
 
 ---Return true if table is neither empty nor nil
