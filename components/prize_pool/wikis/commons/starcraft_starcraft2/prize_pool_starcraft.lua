@@ -76,7 +76,7 @@ function CustomPrizePool.run(frame)
 	-- adjust import settings params
 	args.importLimit = tonumber(args.importLimit) or CustomPrizePool._defaultImportLimit()
 	args.allGroupsUseWdl = Logic.emptyOr(args.allGroupsUseWdl, true)
-	args.importEnableStartDate = IMPORT_START_DATE
+	args.import = Logic.emptyOr(args.import, true)
 
 	-- fixed setting
 	args.resolveRedirect = true
