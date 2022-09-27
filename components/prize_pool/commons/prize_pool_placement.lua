@@ -338,13 +338,13 @@ function Placement:_getLpdbData(...)
 									and Opponent.toName{template = players.p1team, type = 'team'}
 									or nil,
 			}
-
 			-- TODO: We need to create additional LPDB Fields
-			-- match2 opponents (opponentname, opponenttemplate, opponentplayers, opponenttype)
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
 			-- lastvs match2 opponent (json?)
 		}
+
+		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent))
 
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 
