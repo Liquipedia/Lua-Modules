@@ -21,6 +21,7 @@ local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
 local TournamentUtil = Lua.import('Module:Tournament/Util', {requireDevIfEnabled = true})
 
+local AUTOMATION_START_DATE = '2023-01-01'
 local GROUPSCORE_DELIMITER = '-'
 local SCORE_STATUS = 'S'
 local DEFAULT_ELIMINATION_STATUS = 'down'
@@ -49,7 +50,7 @@ end
 function Import._getConfig(args, placements)
 	if String.isEmpty(args.matchGroupId1) and String.isEmpty(args.tournament1)
 		and String.isEmpty(args.matchGroupId) and String.isEmpty(args.tournament)
-		and not Import._enableImport(args.import, args.importEnableStartDate) then
+		and not Import._enableImport(args.import) then
 
 		return {}
 	end
@@ -67,11 +68,11 @@ function Import._getConfig(args, placements)
 	}
 end
 
-function Import._enableImport(importInput, importEnableStartDate)
+function Import._enableImport(importInput)
 	local date = TournamentUtil.getContextualDate()
 	return Logic.nilOr(
 		Logic.readBoolOrNil(importInput),
-		importEnableStartDate and (not date or date >= importEnableStartDate)
+		not date or date >= AUTOMATION_START_DATE
 	)
 end
 
