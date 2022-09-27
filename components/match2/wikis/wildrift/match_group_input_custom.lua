@@ -6,14 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local ChampionNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local ChampionNames = mw.loadData('Module:ChampionNames')
-local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -437,19 +438,10 @@ end
 function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
 	playersData = Json.parseIfString(playersData) or {}
-	local players = {}
 
-	-- need unlimited import here so we do not cut off players due to TeamCards storing players weirdly
-	local playerIndex = 1
-	local player = matchFunctions.parsePlayer(match, oppIndex, teamName, playersData, playerIndex)
-
-	while not Table.isEmpty(player) do
-		table.insert(players, player)
-		playerIndex = playerIndex + 1
-		player = matchFunctions.parsePlayer(match, oppIndex, teamName, playersData, playerIndex)
-	end
-
-	match['opponent' .. oppIndex].match2players = players
+	match['opponent' .. oppIndex].match2players = Array.mapIndexes(function(playerIndex)
+		return matchFunctions.parsePlayer(match, oppIndex, teamName, playersData, playerIndex)
+	end)
 
 	return match
 end
@@ -466,6 +458,10 @@ function matchFunctions.parsePlayer(match, oppIndex, teamName, playersData, play
 
 	if String.isNotEmpty(player.name) then
 		player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
+	end
+
+	if Table.isEmpty(player) then
+		return
 	end
 
 	return player
