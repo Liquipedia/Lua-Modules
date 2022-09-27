@@ -12,11 +12,11 @@ local AllowedServers = require('Module:Server')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
+local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Links = require('Module:Links')
 local Locale = require('Module:Locale')
-local Localisation = require('Module:Localisation')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -122,7 +122,7 @@ function HiddenInfoboxLeague._getCountryCategories()
 	local current = _args.country
 
 	while not String.isEmpty(current) do
-		local nationality = Localisation.getLocalisation({displayNoError = true}, current)
+		local nationality = Flags.getLocalisation(current)
 
 		if String.isEmpty(nationality) then
 			table.insert(countryCategories, 'Unrecognised Country')

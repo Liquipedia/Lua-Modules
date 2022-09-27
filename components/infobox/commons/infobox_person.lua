@@ -401,7 +401,7 @@ function Person:_createLocation(country, location, personType)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	local demonym = Localisation.getLocalisation(countryDisplay)
+	local demonym = Flags.getLocalisation(countryDisplay) or ''
 
 	local category = ''
 	if Namespace.isMain() then

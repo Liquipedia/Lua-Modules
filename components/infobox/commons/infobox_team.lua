@@ -20,7 +20,6 @@ local Earnings = Lua.import('Module:Earnings', {requireDevIfEnabled = true})
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -202,7 +201,7 @@ function Team:_createLocation(location)
 	local locationDisplay = self:getStandardLocationValue(location)
 	local demonym
 	if String.isNotEmpty(locationDisplay) then
-		demonym = Localisation.getLocalisation(locationDisplay)
+		demonym = Flags.getLocalisation(locationDisplay)
 		locationDisplay = '[[:Category:' .. locationDisplay
 			.. '|' .. locationDisplay .. ']]'
 	end

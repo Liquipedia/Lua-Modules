@@ -492,7 +492,7 @@ function League:_createLocation(args)
 	local currentLocation = args['city'] or args['location']
 
 	while not String.isEmpty(current) do
-		local nationality = Localisation.getLocalisation({displayNoError = true}, current)
+		local nationality = Flags.getLocalisation(current)
 
 		if String.isEmpty(nationality) then
 			content = content .. '[[Category:Unrecognised Country|' .. current .. ']]'

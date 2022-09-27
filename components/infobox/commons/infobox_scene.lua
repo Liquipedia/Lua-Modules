@@ -15,7 +15,6 @@ local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
-local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -84,9 +83,9 @@ function Scene:createNameDisplay(args)
 	local name = args.name
 	local country = Flags.CountryName(args.country or args.scene)
 	if not name then
-		local localised = Localisation.getLocalisation(country)
+		local localised, errorText = Flags.getLocalisation(country)
 		local flag = Flags.Icon({flag = country, shouldLink = true})
-		name = flag .. '&nbsp;' .. localised .. ((' ' .. args.gamenamedisplay) or '') .. ' scene'
+		name = flag .. '&nbsp;' .. (localised or errorText) .. ((' ' .. args.gamenamedisplay) or '') .. ' scene'
 	end
 
 	Variables.varDefine('country', country)

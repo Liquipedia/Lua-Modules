@@ -20,7 +20,6 @@ local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 
 local _TIER_MODE_TYPES = 'types'
@@ -383,12 +382,12 @@ function Series:_createOrganizers(args)
 end
 
 function Series:_setCountryCategories(country)
-	if country == nil or country == '' then
+	if String.isEmpty(country) then
 		return ''
 	end
 
-	local countryAdjective = Localisation.getLocalisation({ shouldReturnSimpleError = true }, country)
-	if countryAdjective == 'error' then
+	local countryAdjective = Flags.getLocalisation(country)
+	if not countryAdjective then
 		return 'Unrecognised Country||' .. country
 	end
 

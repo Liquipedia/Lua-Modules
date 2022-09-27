@@ -19,7 +19,6 @@ local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
-local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
@@ -241,7 +240,7 @@ function CustomPlayer._createLocation(country)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	local demonym = Localisation.getLocalisation(countryDisplay)
+	local demonym = Flags.getLocalisation(countryDisplay) or ''
 	countryDisplay = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 
 	local roleCategory = _ROLES_CATEGORY[_args.role or ''] or 'Players'

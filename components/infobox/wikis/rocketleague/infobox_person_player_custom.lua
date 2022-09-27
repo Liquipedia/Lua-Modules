@@ -11,7 +11,6 @@ local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local Matches = require('Module:Matches_Player')
 local Namespace = require('Module:Namespace')
-local Localisation = require('Module:Localisation')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
@@ -295,7 +294,7 @@ function CustomPlayer:_createLocation(country)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	local demonym = Localisation.getLocalisation(countryDisplay)
+	local demonym = Flags.getLocalisation(countryDisplay) or ''
 
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
 				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
