@@ -39,9 +39,9 @@ do
     if [[ ! ( ("${DEV_WIKI_BASIC_AUTH}" == "") || ("${devWikis[*]}" =~ ${wiki}) ) ]]; then
         echo '...skipping - dev wiki not applicable...'
         continue
-    else
-        echo '...magic comment found - updating wiki...'
     fi
+
+    echo '...magic comment found - updating wiki...'
 
     echo "...wiki = $wiki"
     echo "...page = $page"
