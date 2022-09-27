@@ -106,7 +106,18 @@ function Lua.invoke(frame)
 	frame.args.module = nil
 	frame.args.fn = nil
 
-	local flags = {dev = Logic.readBoolOrNil(frame.args.dev)}
+	local devEnabled = function(startFrame)
+		local currentFrame = startFrame
+		while currentFrame do
+			if Logic.readBoolOrNil(currentFrame.args.dev) ~= nil then
+				return Logic.readBool(currentFrame.args.dev)
+			end
+			currentFrame = currentFrame:getParent()
+		end
+		return false
+	end
+
+	local flags = {dev = devEnabled(frame)}
 	return require('Module:FeatureFlag').with(flags, function()
 		local module = Lua.import('Module:' .. moduleName, {requireDevIfEnabled = true})
 		return module[fnName](frame)
