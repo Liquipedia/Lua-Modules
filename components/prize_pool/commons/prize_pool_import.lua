@@ -429,10 +429,12 @@ function Import._entryToOpponent(lpdbEntry, placement)
 		lastVsScore = (score or '') .. '-' .. (vsScore or '')
 	end
 
+	local lastVs = additionalData.lastVs or Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))
+
 	return placement:_parseOpponents{{
 		Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.opponent)),
 		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
-		lastvs = {additionalData.lastVs or Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))},
+		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
 		lastvsscore = additionalData.score or lastVsScore,
 		date = lpdbEntry.date,
 	}}[1]
