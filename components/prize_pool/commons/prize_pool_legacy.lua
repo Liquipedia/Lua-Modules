@@ -44,6 +44,9 @@ function LegacyPrizePool.run(dependency)
 
 	local newArgs = {}
 
+	-- disable import legacy prize pools
+	newArgs.import = false
+
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
 	newArgs.cutafter = header.cutafter
 	newArgs.lpdb_prefix = header.lpdb_prefix or header.smw_prefix
