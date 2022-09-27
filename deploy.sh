@@ -33,13 +33,15 @@ do
   then
     echo '...skipping - no magic comment found'
   else
-    echo '...magic comment found - updating wiki...'
     wiki="${BASH_REMATCH[1]}"
     page="${BASH_REMATCH[2]}"
 
     if [[ ! ( ("${DEV_WIKI_BASIC_AUTH}" == "") || ("${devWikis[*]}" =~ ${wiki}) ) ]]; then
+        echo '...skipping - dev wiki not applicable...'
         continue
     fi
+
+    echo '...magic comment found - updating wiki...'
 
     echo "...wiki = $wiki"
     echo "...page = $page"
