@@ -127,4 +127,4 @@ do
   fi
 done
 
-rm cookie_*
+rm -f cookie_*
