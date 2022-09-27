@@ -13,6 +13,7 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Array = require('Module:Array')
 local OperatorIcon = require('Module:OperatorIcon')
+local Table = require('Module:Table')
 
 local CustomWeapon = Class.new()
 local CustomInjector = Class.new(Injector)
