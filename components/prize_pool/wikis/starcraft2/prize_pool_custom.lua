@@ -6,4 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-return require('Module:PrizePool/Starcraft')
+local Lua = require('Module:Lua')
+
+return Lua.import('Module:PrizePool/Starcraft', {requireDevIfEnabled = true})
