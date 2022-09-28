@@ -84,7 +84,7 @@ function StarcraftLegacyPrizePool.run(frame)
 	newArgs.import = StarcraftLegacyPrizePool._enableImport(newArgs)
 
 	newArgs.importLimit = header.importLimit
-	newArgs.tournament1 = header.tournament1 or header.tournament1
+	newArgs.tournament1 = header.tournament1 or header.tournament
 	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament') do
 		newArgs[key] = tournament
 	end
@@ -128,8 +128,6 @@ function StarcraftLegacyPrizePool.run(frame)
 		newArgs[slotIndex].opponents = nil
 	end
 
-	StarcraftLegacyPrizePool._sortQualifiers(newArgs)
-
 	for _, linkData in pairs(CACHED_DATA.qualifiers) do
 		newArgs['qualifies' .. linkData.id] = linkData.link
 		newArgs['qualifies' .. linkData.id .. 'name'] = linkData.name
@@ -147,42 +145,6 @@ function StarcraftLegacyPrizePool._enableImport(args)
 		args.matchGroupId1,
 		not tournamentDate or tournamentDate >= AUTOMATION_START_DATE
 	)
-end
-
-function StarcraftLegacyPrizePool._sortQualifiers(args)
-	local qualifiersSortValue = function (qualifier1, qualifier2)
-		return qualifier1.occurance == qualifier2.occurance and qualifier1.id < qualifier2.id
-			or qualifier1.occurance < qualifier2.occurance
-	end
-
-	local qualifiers = Array.extractValues(CACHED_DATA.qualifiers)
-
-	table.sort(qualifiers, qualifiersSortValue)
-
-	local newIndexMap = {}
-	Array.forEach(qualifiers, function (qualifier, index)
-		newIndexMap[qualifier.id] = index
-		qualifier.id = index
-	end)
-
-	local moveKeys = function (struct, oldPrefix, newPrefix, indexMap)
-		Array.forEach(qualifiers, function (_, index)
-			local newIndex = indexMap and indexMap[index] or index
-			struct[newPrefix .. newIndex] = struct[oldPrefix .. index]
-			struct[oldPrefix .. index] = nil
-		end)
-	end
-	Array.forEach(args, function (slot)
-		Array.forEach(slot, function (opponent)
-			moveKeys(opponent, 'qualified', 'qualified_temp_')
-		end)
-		moveKeys(slot, 'qualified', 'qualified_temp_')
-
-		Array.forEach(slot, function (opponent)
-			moveKeys(opponent, 'qualified_temp_', 'qualified', newIndexMap)
-		end)
-		moveKeys(slot, 'qualified_temp_', 'qualified', newIndexMap)
-	end)
 end
 
 function StarcraftLegacyPrizePool._mapSlot(slot)
