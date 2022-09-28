@@ -95,6 +95,7 @@ function CustomPrizePool.run(frame)
 	end
 
 	if Logic.readBool(args.storelpdb) then
+		-- stash the lpdb_placement data so teamCards can use them
 		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(_lpdb_stash))
 	end
 
@@ -170,7 +171,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, lpdbData.prizepoolindex)
-	lpdbData.id = lpdbData.objectName -- wanted for the stash
 
 	table.insert(_lpdb_stash, Table.deepCopy(lpdbData))
 
