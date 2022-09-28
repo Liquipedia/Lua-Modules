@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Tier = mw.loadData('Module:Tier')
 local Variables = require('Module:Variables')
 
@@ -17,8 +16,7 @@ local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	BasicHiddenDataBox.setWikiVariableForParticipantKey = CustomHiddenDataBox.setWikiVariableForParticipantKey
-	args.liquipediatier = Tier.number[args.liquipediatier]
+	args.liquipediatier = Tier.number[args.liquipediatier or '']
 	return BasicHiddenDataBox.run(args)
 end
 
@@ -38,32 +36,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('female', queryResult.extradata.female or args.female and 'true' or 'false')
 	BasicHiddenDataBox.checkAndAssign('patch', args.patch, queryResult.patch)
 	BasicHiddenDataBox.checkAndAssign('tournament_riot_premier', queryResult.tournament_riot_premier, args.riotpremier)
-end
-
-function CustomHiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
-	Variables.varDefine(participant .. '_' .. key, value)
-	if participant ~= participantResolved then
-		Variables.varDefine(participantResolved .. key, value)
-	end
-
-	-- Used in match1, remove once legacy is convert to match2 is done
-	local frame = mw.getCurrentFrame()
-	if key:sub(1,1) == 'p' and key:len() == 2 then
-		-- Skipping Flag, this was 100% broken in the before now anyway
-		frame:callParserFunction{name = '#arraydefine:temp_player_info', args = {value .. ','}}
-		if String.isEmpty(frame:callParserFunction{name = '#arrayprint:' .. participant .. '_players_info'}) then
-
-			frame:callParserFunction{
-				name = '#arraymerge:' .. participant .. '_players_info',
-				args = {'temp_player_info'}
-			}
-		else
-			frame:callParserFunction{
-				name = '#arraymerge:' .. participant .. '_players_info',
-				args = {participant .. '_players_info', 'temp_player_info'}
-			}
-		end
-	end
 end
 
 return Class.export(CustomHiddenDataBox)
