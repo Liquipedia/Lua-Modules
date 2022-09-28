@@ -165,12 +165,11 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.tournament = _tournament_name
 	lpdbData.series = _series
 
-	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
-	if prizePoolIndex == 1 and _tournament_extradata_cache[lpdbData.placement or ''] then
+	if lpdbData.prizepoolindex == 1 and _tournament_extradata_cache[lpdbData.placement or ''] then
 		table.insert(_tournament_extradata_cache[lpdbData.placement], Table.deepCopy(lpdbData))
 	end
 
-	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
+	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, lpdbData.prizepoolindex)
 	lpdbData.id = lpdbData.objectName -- wanted for the stash
 
 	table.insert(_lpdb_stash, Table.deepCopy(lpdbData))
