@@ -343,7 +343,7 @@ function Placement:_getLpdbData(...)
 			-- lastvs match2 opponent (json?)
 		}
 
-		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent))
+		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
 
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 
