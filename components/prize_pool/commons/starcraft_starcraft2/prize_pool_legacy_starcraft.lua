@@ -84,11 +84,11 @@ function StarcraftLegacyPrizePool.run(frame)
 	newArgs.import = StarcraftLegacyPrizePool._enableImport(newArgs)
 
 	newArgs.importLimit = header.importLimit
-	newArgs.tournament1 = header.tournament1 or header.tournament
+	header.tournament1 = header.tournament1 or header.tournament
 	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament') do
 		newArgs[key] = tournament
 	end
-	newArgs.matchGroupId1 = header.matchGroupId1 or header.matchGroupId
+	header.matchGroupId1 = header.matchGroupId1 or header.matchGroupId
 	for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId') do
 		newArgs[key] = matchGroupId
 	end
