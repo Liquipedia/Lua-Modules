@@ -85,7 +85,7 @@ function CustomPrizePool.run(frame)
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 	prizePool:setSmwInjector(CustomSmwInjector())
 
-	local buildPrizePool = prizePool:build()
+	local builtPrizePool = prizePool:build()
 
 	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
 	-- set an additional wiki-var for legacy reasons so that combination with award prize pools still work
@@ -98,7 +98,7 @@ function CustomPrizePool.run(frame)
 		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(_lpdb_stash))
 	end
 
-	return buildPrizePool
+	return builtPrizePool
 end
 
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
