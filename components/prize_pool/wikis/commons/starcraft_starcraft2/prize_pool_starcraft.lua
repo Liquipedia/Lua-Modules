@@ -108,16 +108,22 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		CustomPrizePool._getStatusFromScore(lpdbData.lastvsscore),
 	}
 	local extradata = {
-		featured = Variables.varDefault('featured') or 'false',
-		lastStatuses = lastStatuses,
-		placeRange = {placement.placeStart, placement.placeEnd},
+		featured = Variables.varDefault('featured') or 'false', -- to be replaced by lpdbData.publishertier
 		playernumber = StarcraftOpponent.partySize(opponent.opponentData),
+		seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or '',
+
+		 -- to be removed once poinst storage is standardized
 		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
 		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
-		seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or '',
+
+		 -- to be removed once usage is removed
+		lastStatuses = lastStatuses,
+		placeRange = {placement.placeStart, placement.placeEnd},
 		wofrom = lastStatuses[1] == WALKOVER_VS_STATUS or nil,
 		woto = lastStatuses[2] == WALKOVER_VS_STATUS or nil,
 	}
+
+	lpdbData.publishertier = Variables.varDefault('featured')
 
 	-- make these available for the stash further down
 	lpdbData.liquipediatier = _tier
