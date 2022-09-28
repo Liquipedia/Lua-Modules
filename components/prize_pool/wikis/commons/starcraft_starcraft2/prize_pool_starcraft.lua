@@ -162,7 +162,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, extradata)
 
+	-- remove the following line once the consumers have been updated
 	lpdbData.mode = CustomPrizePool._getMode(opponent.opponenttype, opponent.opponentData)
+
 	lpdbData.tournament = _tournament_name
 	lpdbData.series = _series
 
