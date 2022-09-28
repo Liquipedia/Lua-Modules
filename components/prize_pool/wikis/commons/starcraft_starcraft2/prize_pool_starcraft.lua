@@ -51,6 +51,7 @@ local _series
 local _tier
 local _tournament_extradata_cache = {{}, {}, {}, {}, ['3-4'] = {}}
 local _tournament_name
+local _series_number = CustomPrizePool._seriesNumber()
 
 -- Template entry point
 function CustomPrizePool.run(frame)
@@ -103,7 +104,6 @@ function CustomPrizePool.run(frame)
 end
 
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	local lastStatuses = {
 		CustomPrizePool._getStatusFromScore(lpdbData.lastscore),
 		CustomPrizePool._getStatusFromScore(lpdbData.lastvsscore),
@@ -111,7 +111,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	local extradata = {
 		featured = Variables.varDefault('featured') or 'false', -- to be replaced by lpdbData.publishertier
 		playernumber = StarcraftOpponent.partySize(opponent.opponentData),
-		seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or '',
+		seriesnumber = _series_number,
 
 		 -- to be removed once poinst storage is standardized
 		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
@@ -202,10 +202,8 @@ end
 function CustomPrizePool._appendLpdbTournament()
 	local tournamentName = Variables.varDefault('tournament_name', mw.title.getCurrentTitle().text)
 
-	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-
 	local extradata = {
-		seriesNumber = seriesNumber and string.format('%05d', seriesNumber) or '',
+		seriesnumber = _series_number,
 		featured = Variables.varDefault('featured') or 'false'
 	}
 
@@ -359,6 +357,11 @@ function CustomPrizePool._defaultImportLimit()
 	return tier >= 4 and 8
 		or tier == 3 and 16
 		or nil
+end
+
+function CustomPrizePool._seriesNumber()
+	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
+	return seriesNumber and string.format('%05d', seriesNumber) or ''
 end
 
 return CustomPrizePool
