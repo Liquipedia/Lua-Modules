@@ -20,7 +20,6 @@ local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Earnings = Lua.import('Module:Earnings', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
-local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 local Region = Lua.import('Module:Region', {requireDevIfEnabled = true})
 
@@ -401,7 +400,7 @@ function Person:_createLocation(country, location, personType)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	local demonym = Localisation.getLocalisation(countryDisplay)
+	local demonym = Flags.getLocalisation(countryDisplay) or ''
 
 	local category = ''
 	if Namespace.isMain() then
