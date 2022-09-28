@@ -7,13 +7,15 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Links = require('Module:Links')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Localisation = require('Module:Localisation')
-local Flags = require('Module:Flags')
-local Links = require('Module:Links')
-local InfoboxBasic = require('Module:Infobox/Basic')
-local String = require('Module:StringUtils')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -23,7 +25,7 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
-local Scene = Class.new(InfoboxBasic)
+local Scene = Class.new(BasicInfobox)
 
 function Scene.run(frame)
 	local scene = Scene(frame)

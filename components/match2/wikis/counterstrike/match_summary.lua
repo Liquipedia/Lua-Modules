@@ -60,7 +60,7 @@ function Score:setMapScore(score)
 end
 
 function Score:setFirstHalfScore(score, side)
-	local halfScore =  mw.html.create('td')
+	local halfScore = mw.html.create('td')
 	halfScore
 		:addClass('brkts-popup-body-match-sidewins')
 		:addClass('brkts-cs-score-color-' .. side)
@@ -71,7 +71,7 @@ function Score:setFirstHalfScore(score, side)
 end
 
 function Score:setSecondHalfScore(score, side)
-	local halfScore =  mw.html.create('td')
+	local halfScore = mw.html.create('td')
 	halfScore
 		:addClass('brkts-popup-body-match-sidewins')
 		:addClass('brkts-cs-score-color-' .. side)
@@ -219,6 +219,14 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	local vods = {}
+	local secondVods = {}
+	if Logic.isNotEmpty(match.links.vod2) then
+		for _, vod2 in ipairs(match.links.vod2) do
+			local link, gameIndex = unpack(vod2)
+			secondVods[gameIndex] = link
+		end
+		match.links.vod2 = nil
+	end
 	for index, game in ipairs(match.games) do
 		if game.vod then
 			vods[index] = game.vod
@@ -226,7 +234,7 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) or not Logic.isEmpty(match.vod) then
-		matchSummary:footer(CustomMatchSummary._createFooter(match, vods))
+		matchSummary:footer(CustomMatchSummary._createFooter(match, vods, secondVods))
 	end
 
 	return matchSummary:create()
@@ -236,9 +244,9 @@ function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
 	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
@@ -247,6 +255,9 @@ function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+		if Logic.isNotEmpty(match.extradata.status) then
+			match.stream = {rawdatetime = true}
+		end
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -294,12 +305,12 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
-function CustomMatchSummary._createFooter(match, vods)
+function CustomMatchSummary._createFooter(match, vods, secondVods)
 	local footer = MatchSummary.Footer()
 
 	local separator = '<b>·</b>'
 
-	local function createFooterLink(icon, url, label, index)
+	local function addFooterLink(icon, iconDark, url, label, index)
 		if icon == 'stats' then
 			icon = index ~= 0 and 'Match Info Stats' .. index .. '.png' or 'Match Info Stats.png'
 		end
@@ -307,25 +318,40 @@ function CustomMatchSummary._createFooter(match, vods)
 			label = label .. ' for Game ' .. index
 		end
 
-		return '[[FILE:' .. icon .. '|link=' .. url .. '|15px|' .. label .. '|alt=' .. url .. ']]'
+		icon = 'File:' .. icon
+		if iconDark then
+			iconDark = 'File:' .. iconDark
+		end
+
+		footer:addLink(url, icon, iconDark, label)
+	end
+
+	local function addVodLink(gamenum, vod, htext)
+		if vod then
+			footer:addElement(VodLink.display{
+				gamenum = gamenum,
+				vod = vod,
+				htext = htext
+			})
+		end
 	end
 
 	-- Match vod
-	if not Logic.isEmpty(match.vod) then
-		footer:addElement(VodLink.display{
-			vod = match.vod,
-			source = match.vod.url
-		})
+	if secondVods[0] then
+		addVodLink(nil, match.vod, 'Watch VOD ' .. '(part 1)')
+		addVodLink(nil, secondVods[0], 'Watch VOD ' .. '(part 2)')
+	else
+		addVodLink(nil, match.vod, nil)
 	end
 
 	-- Game Vods
 	for index, vod in pairs(vods) do
-		-- TODO: Darkmode VodIcons
-		footer:addElement(VodLink.display{
-			gamenum = index,
-			vod = vod,
-			source = vod.url
-		})
+		if secondVods[index] then
+			addVodLink(index, vod, 'Watch Game ' .. index .. ' (part 1)')
+			addVodLink(index, secondVods[index], 'Watch Game ' .. index .. ' (part 2)')
+		else
+			addVodLink(index, vod, nil)
+		end
 	end
 
 	if Table.isNotEmpty(match.links) then
@@ -349,16 +375,17 @@ function CustomMatchSummary._createFooter(match, vods)
 			if link then
 				if insertDotNext then
 					insertDotNext = false
+					iconsInserted = 0
 					footer:addElement(separator)
 				end
 
 				local icon = platform.icon
+				local iconDark = platform.iconDark
 				local label = platform.label
 				local addGameLabel = platform.isMapStats and match.bestof and match.bestof > 1
 
 				for _, val in ipairs(link) do
-					footer:addElement(createFooterLink(icon, val[1], label,
-														addGameLabel and val[2] or 0))
+					addFooterLink(icon, iconDark, val[1], label, addGameLabel and val[2] or 0)
 					iconsInserted = iconsInserted + 1
 				end
 
@@ -373,7 +400,6 @@ function CustomMatchSummary._createFooter(match, vods)
 			end
 		else
 			insertDotNext = iconsInserted > 0 and true or false
-			iconsInserted = 0
 		end
 	end
 

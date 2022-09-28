@@ -64,7 +64,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		"Has calendar description=" .. " - " .. Logic.emptyOr(match.opponent1, "TBD")
 			.. " vs " .. Logic.emptyOr(match.opponent2, "TBD") .. " on "
 			.. Logic.emptyOr(match.date, "TBD")
-	 })
+	})
 end
 
 function MatchLegacy.storeGames(match, match2)

@@ -7,12 +7,15 @@
 --
 
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Opponent = require('Module:Opponent')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+
+local DRAW = 'draw'
 local LOSER_STATUSES = {'FF', 'DQ', 'L'}
 
 local MatchLegacy = {}
@@ -42,9 +45,15 @@ function MatchLegacy.convertParameters(match2)
 		end
 	end
 
+	if match.resulttype == DRAW then
+		match.winner = 'draw'
+	end
+
+	match.resulttype = nil
+
 	if match.walkover == 'ff' or match.walkover == 'dq' then
 		match.walkover = match.winner
-	elseif match.walkover == 'l' then
+	else
 		match.walkover = nil
 	end
 
@@ -60,15 +69,15 @@ function MatchLegacy.convertParameters(match2)
 	end
 
 	match.extradata = {
-		timezone = extradata.timezoneoffset,
-		timezoneID = extradata.timezoneid,
-		matchsection = extradata.matchsection,
-		opponent1rounds = 0,
-		opponent2rounds = 0,
+		timezone = extradata.timezoneoffset or '',
+		timezoneID = extradata.timezoneid or '',
+		matchsection = extradata.matchsection or '',
+		bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or '',
 		overturned = Logic.readBool(extradata.overturned) and '1' or '',
 		hidden = Logic.readBool(extradata.hidden) and '1' or '0',
 		featured = Logic.readBool(extradata.featured) and '1' or '0',
-		icondark = Variables.varDefault('tournament_icon_dark'),
+		cancelled = '',
+		icondark = match2.icondark,
 		team1icon = match2.match2opponents[1] and match2.match2opponents[1].icon or nil,
 		team2icon = match2.match2opponents[2] and match2.match2opponents[2].icon or nil,
 	}
@@ -76,27 +85,24 @@ function MatchLegacy.convertParameters(match2)
 	if extradata.status then
 		if extradata.status == 'cancelled' or extradata.status == 'canceled' then
 			match.extradata.cancelled = '1'
-		else
-			match.extradata.cancelled = ''
 		end
 	end
 
+	local opponent1Rounds, opponent2Rounds = 0, 0
 	local maps = {}
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		local scores = ''
 		if type(scores) == 'string' then
 			scores = Json.parse(game.scores)
 		end
-		match.extradata.opponent1rounds = match.extradata.opponent1rounds + (tonumber(scores[1] or '') or 0)
-		match.extradata.opponent2rounds = match.extradata.opponent2rounds + (tonumber(scores[2] or '') or 0)
+		opponent1Rounds = opponent1Rounds + (tonumber(scores[1] or '') or 0)
+		opponent2Rounds = opponent2Rounds + (tonumber(scores[2] or '') or 0)
 		match.extradata['vodgame' .. gameIndex] = game.vod
 		table.insert(maps, game.map)
 	end
+	match.extradata.opponent1rounds = tostring(opponent1Rounds)
+	match.extradata.opponent2rounds = tostring(opponent2Rounds)
 	match.extradata.maps = table.concat(maps, ',')
-
-	if #maps > 0 then
-		match.extradata.bestofx = tostring(match2.bestof)
-	end
 
 	-- Handle Opponents
 	local handleOpponent = function (index)
@@ -107,16 +113,20 @@ function MatchLegacy.convertParameters(match2)
 			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
 			if isOverturned then
-				if tonumber(match.winner) == index then
-					match[prefix .. 'score'] = math.floor(match2.bestof /2) + 1
-				else
-					match[prefix .. 'score'] = 0
-				end
-				match.extradata[prefix .. 'rounds'] = 0
+				match[prefix .. 'score'] = tonumber(match.winner) == index and (math.floor(match2.bestof /2) + 1) or 0
+				match.extradata[prefix .. 'rounds'] = '0'
 			elseif opponent.status == 'W' then
 				match[prefix .. 'score'] = math.floor(match2.bestof /2) + 1
 			else
-				match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				if match2.bestof == 1 then
+					if match.winner == DRAW then
+						match[prefix .. 'score'] = 0
+					else
+						match[prefix .. 'score'] = tonumber(match.winner) == index and 1 or 0
+					end
+				else
+					match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				end
 			end
 
 			if Table.includes(LOSER_STATUSES, opponent.status) then
@@ -209,9 +219,9 @@ function MatchLegacy.storeMatchSMW(match)
 			['has team right'] = match.opponent2 or '',
 			['has map date'] = match.date or '',
 			['has tournament'] = mw.title.getCurrentTitle().prefixedText,
-			['has tournament tier'] =  Variables.varDefault('tournament_tier'), -- Legacy support Infobox
+			['has tournament tier'] = Variables.varDefault('tournament_tier'), -- Legacy support Infobox
 			['has tournament tier number'] = match.liquipediatier, -- or this ^
-			['has tournament icon'] = Variables.varDefault('tournament_icon'),
+			['has tournament icon'] = match.icon,
 			['has tournament name'] = match.tickername,
 			['is part of tournament series'] = match.series,
 			['has match vod'] = match.vod or '',

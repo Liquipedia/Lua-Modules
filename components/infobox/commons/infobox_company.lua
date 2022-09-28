@@ -7,13 +7,15 @@
 --
 
 local Class = require('Module:Class')
-local InfoboxBasic = require('Module:Infobox/Basic')
+local Flags = require('Module:Flags')
 local Links = require('Module:Links')
 local Locale = require('Module:Locale')
-local Flags = require('Module:Flags')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Table = require('Module:Table')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -25,7 +27,7 @@ local Builder = Widgets.Builder
 
 local Language = mw.language.new('en')
 
-local Company = Class.new(InfoboxBasic)
+local Company = Class.new(BasicInfobox)
 
 local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 

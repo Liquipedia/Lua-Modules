@@ -8,9 +8,10 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local BasicHiddenDataBox = require('Module:HiddenDataBox')
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
@@ -23,6 +24,8 @@ function CustomHiddenDataBox.run(args)
 end
 
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	queryResult.extradata = queryResult.extradata or {}
+
 	--legacy variables
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
@@ -41,7 +44,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	BasicHiddenDataBox.checkAndAssign(
 		'featured',
 		args.featured,
-		(queryResult.extradata or {}).featured
+		queryResult.extradata.featured
 	)
 	if args.team_number then
 		Variables.varDefine('is_team_tournament', 1)

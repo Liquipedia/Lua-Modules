@@ -7,10 +7,11 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local Tier = mw.loadData('Module:Tier')
 local Variables = require('Module:Variables')
 
-local BasicHiddenDataBox = require('Module:HiddenDataBox')
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
@@ -20,6 +21,8 @@ function CustomHiddenDataBox.run(args)
 end
 
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	queryResult.extradata = queryResult.extradata or {}
+
 	Variables.varDefine('tournament_parent_name', Variables.varDefault('tournament_parentname'))
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier'))
 	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype'))

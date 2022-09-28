@@ -7,19 +7,21 @@
 --
 
 local Array = require('Module:Array')
-local Page = require('Module:Page')
 local Class = require('Module:Class')
 local LegendIcon = require('Module:LegendIcon')
-local Player = require('Module:Infobox/Person')
+local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local UpcomingMatches = require('Module:Matches Player')
 local Variables = require('Module:Variables')
-local Template = require('Module:Template')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local _INPUTS = {
 	controller = 'Controller',
@@ -126,6 +128,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.retired = _args.retired
 
 	_args.legend1 = _args.legend1 or _args.legend
 	for _, legend, legendIndex in Table.iter.pairsByPrefix(_args, 'legends') do
@@ -141,10 +144,8 @@ function CustomPlayer:adjustLPDB(lpdbData)
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
-		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+	if Player:shouldStoreData(_args) then
+		return UpcomingMatches.get(_args)
 	end
 end
 

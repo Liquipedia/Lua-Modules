@@ -30,4 +30,5 @@ jobs:
         with:
           report_paths: 'report.xml'
           check_name: 'junit-report'
+          annotate_notice: false
 

@@ -7,10 +7,12 @@
 --
 
 local Class = require('Module:Class')
-local Infobox = require('Module:Infobox')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
 local getArgs = require('Module:Arguments').getArgs
+
+local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
 
 local BasicInfobox = Class.new(
 	function(self, frame)

@@ -7,11 +7,15 @@
 --
 
 local Class = require('Module:Class')
-local Variables = require('Module:Variables')
 local Logic = require('Module:Logic')
-local Patch = require('Module:Infobox/Patch')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomPatch = Class.new()
 
@@ -57,7 +61,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomPatch:addToLpdb()
-	if not Logic.readBool(Variables.varDefault('disable_SMW_storage')) then
+	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		local date = _args.narelease or _args.eurelease
 		local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
 		mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {

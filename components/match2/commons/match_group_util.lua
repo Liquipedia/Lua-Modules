@@ -86,6 +86,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
 	pageName = 'string?',
+	team = 'string?',
 })
 
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
@@ -367,7 +368,7 @@ function MatchGroupUtil.matchFromRecord(record)
 	end
 
 	return {
-		bestof = record.bestof,
+		bestof = tonumber(record.bestof) or 0,
 		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
@@ -382,6 +383,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		opponents = opponents,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
+		timestamp = tonumber(Table.extract(extradata, 'timestamp')) or 0,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
@@ -488,6 +490,7 @@ function MatchGroupUtil.gameFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
+		date = record.date,
 		extradata = extradata,
 		game = record.game,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),

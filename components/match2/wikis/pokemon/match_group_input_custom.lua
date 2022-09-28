@@ -9,7 +9,6 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -17,6 +16,7 @@ local ChampionNames = mw.loadData('Module:HeroNames')
 local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _STATUS_SCORE = 'S'
 local _STATUS_DRAW = 'D'
@@ -449,7 +449,7 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
 		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
+			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
 		end
 
 		if not Table.isEmpty(player) then
@@ -513,7 +513,7 @@ function mapFunctions.getParticipants(map, opponents)
 end
 
 function mapFunctions.attachToParticipant(player, opponentIndex, players, participants, champion, kda)
-	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
+	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player):gsub(' ', '_')
 	for playerIndex, item in pairs(players or {}) do
 		if player == item.name then
 			participants[opponentIndex .. '_' .. playerIndex] = {

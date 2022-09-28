@@ -8,14 +8,17 @@
 
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
-local Series = require('Module:Infobox/Series')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Chronology = require('Module:Infobox/Widget/Chronology')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Chronology = Widgets.Chronology
+local Title = Widgets.Title
 
 local CustomSeries = {}
 

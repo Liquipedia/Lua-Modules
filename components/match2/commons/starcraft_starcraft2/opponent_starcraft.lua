@@ -6,13 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
-local Opponent = require('Module:Opponent')
 local StarcraftRace = require('Module:Race/Starcraft')
-local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
+
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft', {requireDevIfEnabled = true})
 
 local StarcraftOpponent = Table.deepCopy(Opponent)
 
@@ -41,7 +45,7 @@ TeamOpponent without team template ({{TeamOpponent|name=...|short=...}})
 ]]
 function StarcraftOpponent.readOpponentArgs(args)
 	local opponent = Opponent.readOpponentArgs(args)
-	local partySize = Opponent.partySize(opponent.type)
+	local partySize = Opponent.partySize((opponent or {}).type)
 
 	if partySize == 1 then
 		opponent.players[1].race = StarcraftRace.read(args.race)
@@ -69,7 +73,7 @@ function StarcraftOpponent.fromMatch2Record(record)
 	if Opponent.typeIsParty(opponent.type) then
 		for playerIx, player in ipairs(opponent.players) do
 			local playerRecord = record.match2players[playerIx]
-			player.race = StarcraftRace.read(playerRecord.extradata.faction) or 'u'
+			player.race = StarcraftRace.read(playerRecord.extradata.faction) or StarcraftRace.defaultRace
 		end
 		opponent.isArchon = Logic.readBool((record.extradata or {}).isarchon)
 	end
@@ -78,15 +82,15 @@ function StarcraftOpponent.fromMatch2Record(record)
 end
 
 function StarcraftOpponent.toLpdbStruct(opponent)
-	local storageStruct = Opponent.toLpdbStruct(opponent, true)
+	local storageStruct = Opponent.toLpdbStruct(opponent)
 
 	if Opponent.typeIsParty(opponent.type) then
 		if opponent.isArchon then
-			storageStruct.players.isArchon = true
-			storageStruct.players.faction = opponent.players[1].race
+			storageStruct.opponentplayers.isArchon = true
+			storageStruct.opponentplayers.faction = opponent.players[1].race
 		else
 			for playerIndex, player in pairs(opponent.players) do
-				storageStruct.players['p' .. playerIndex .. 'faction'] = player.race
+				storageStruct.opponentplayers['p' .. playerIndex .. 'faction'] = player.race
 			end
 		end
 	end
@@ -98,10 +102,10 @@ function StarcraftOpponent.fromLpdbStruct(storageStruct)
 	local opponent = Opponent.fromLpdbStruct(storageStruct)
 
 	if Opponent.partySize(storageStruct.opponenttype) then
-		opponent.isArchon = storageStruct.players.isArchon
+		opponent.isArchon = storageStruct.opponentplayers.isArchon
 		for playerIndex, player in pairs(opponent.players) do
-			player.race = storageStruct['p' .. playerIndex .. 'faction']
-				or storageStruct.faction
+			player.race = storageStruct.opponentplayers['p' .. playerIndex .. 'faction']
+				or storageStruct.opponentplayers.faction
 		end
 	end
 
@@ -118,13 +122,18 @@ options.syncPlayer: Whether to fetch player information from variables or LPDB. 
 function StarcraftOpponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
-		opponent.template = TeamTemplate.resolve(opponent.template, date) or 'tbd'
+		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
-				StarcraftPlayerExt.syncPlayer(player)
+				local hasRace = String.isNotEmpty(player.race)
+				StarcraftPlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
+				if not player.team then
+					player.team = PlayerExt.syncTeam(player.pageName, nil, {date = date})
+				end
+				player.race = (hasRace or player.race ~= StarcraftRace.defaultRace) and player.race or nil
 			else
-				StarcraftPlayerExt.populatePageName(player)
+				PlayerExt.populatePageName(player)
 			end
 			if player.team then
 				player.team = TeamTemplate.resolve(player.team, date)

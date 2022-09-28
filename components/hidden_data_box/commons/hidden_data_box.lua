@@ -8,9 +8,11 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Namespace = require('Module:Namespace')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TextSanitizer = require('Module:TextSanitizer')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
@@ -26,6 +28,7 @@ local TIER_MODE_TIERS = 'tiers'
 function HiddenDataBox.run(args)
 	args = args or {}
 	args.participantGrabber = Logic.nilOr(Logic.readBoolOrNil(args.participantGrabber), true)
+	local doQuery = not Logic.readBool(args.noQuery)
 
 	local warnings = {}
 	local warning
@@ -39,32 +42,43 @@ function HiddenDataBox.run(args)
 	local parent = args.parent or args.tournament or tostring(mw.title.getCurrentTitle().basePageTitle)
 	parent = parent:gsub(' ', '_')
 
-	local queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. parent .. ']]',
-		limit = 1,
-	})
-	queryResult = queryResult[1]
+	local queryResult = {}
+	if doQuery then
+		queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
+			conditions = '[[pagename::' .. parent .. ']]',
+			limit = 1,
+		})
 
-	if not queryResult then
-		table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
-		queryResult = {}
-	elseif args.participantGrabber then
-		local participants = HiddenDataBox._fetchParticipants(parent)
+		if not queryResult[1] and Namespace.isMain() then
+			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
+		elseif args.participantGrabber then
+			local participants = HiddenDataBox._fetchParticipants(parent)
 
-		Table.iter.forEachPair(participants, function (participant, players)
-			-- TODO: An improvement would be called TeamCard module for this
-			-- Would need a rework for the function that does it however
-			local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
+			Table.iter.forEachPair(participants, function (participant, players)
+				-- TODO: An improvement would be called TeamCard module for this
+				-- Would need a rework for the function that does it however
+				local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
 
-			Table.iter.forEachPair(players, function(key, value)
-				HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+				Table.iter.forEachPair(players, function(key, value)
+					HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+				end)
 			end)
-		end)
+		end
+
+		queryResult = queryResult[1] or {}
 	end
 
-	HiddenDataBox.checkAndAssign('tournament_name', args.name, queryResult.name)
-	HiddenDataBox.checkAndAssign('tournament_shortname', args.shortname, queryResult.shortname)
-	HiddenDataBox.checkAndAssign('tournament_tickername', args.tickername, queryResult.tickername)
+	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.tournamentName(args.name), queryResult.name)
+	HiddenDataBox.checkAndAssign(
+		'tournament_shortname',
+		TextSanitizer.tournamentName(args.shortname),
+		queryResult.shortname
+	)
+	HiddenDataBox.checkAndAssign(
+		'tournament_tickername',
+		TextSanitizer.tournamentName(args.tickername),
+		queryResult.tickername
+	)
 	HiddenDataBox.checkAndAssign('tournament_icon', args.icon, queryResult.icon)
 	HiddenDataBox.checkAndAssign('tournament_icondark', args.icondark or args.icondarkmode, queryResult.icondark)
 	HiddenDataBox.checkAndAssign('tournament_series', args.series, queryResult.series)
@@ -77,7 +91,7 @@ function HiddenDataBox.run(args)
 	HiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.mode)
 
 	HiddenDataBox.checkAndAssign('tournament_game', args.game, queryResult.game)
-	HiddenDataBox.checkAndAssign('tournament_parent', args.parent, parent)
+	HiddenDataBox.checkAndAssign('tournament_parent', parent)
 	HiddenDataBox.checkAndAssign('tournament_parentname', args.parentname, queryResult.name)
 
 	local startDate = HiddenDataBox.cleanDate(args.sdate, args.date)
@@ -129,7 +143,7 @@ end
 function HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
 	Variables.varDefine(participant .. '_' .. key, value)
 	if participant ~= participantResolved then
-		Variables.varDefine(participantResolved .. key, value)
+		Variables.varDefine(participantResolved .. '_' .. key, value)
 	end
 end
 

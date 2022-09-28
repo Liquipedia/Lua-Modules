@@ -48,7 +48,7 @@ function CustomFfaMatchSummary.Opponent(props)
 	local contentNode = StarcraftOpponentDisplay.BlockOpponent({
 		opponent = props.opponent,
 		overflow = props.opponent.type == 'team' and 'hidden' or 'ellipsis',
-		teamStyle = 'short',
+		teamStyle = 'bracket',
 	})
 		:addClass('ffa-match-summary-cell-content')
 	return mw.html.create('div')

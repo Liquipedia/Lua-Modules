@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local CustomData = Lua.loadDataIfExists('Module:Links/CustomData', {})
+local CustomData = Lua.loadDataIfExists('Module:Links/CustomData') or {}
 
 local Links = {}
 
@@ -20,6 +20,7 @@ local _PREFIXES = {
 		team = 'https://arena.5eplay.com/team/'
 	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
+	apexlegendsstatus = {'https://apexlegendsstatus.com/profile/uid/PC/'},
 	afreeca = {'http://afreecatv.com/'},
 	aoezone = {'https://aoezone.net/'},
 	['ask-fm'] = {'https://ask.fm/'},
@@ -74,6 +75,11 @@ local _PREFIXES = {
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
+	factor = {
+		'',
+		team = 'https://www.factor.gg/team/',
+		player = 'https://www.factor.gg/player/',
+	},
 	fanclub = {''},
 	gamersclub = {
 		'https://csgo.gamersclub.gg/campeonatos/csgo/',
@@ -177,6 +183,7 @@ function Links.transform(links)
 	return {
 		['5ewin'] = links['5ewin'],
 		abiosgaming = links.abiosgaming,
+		apexlegendsstatus = links.apexlegendsstatus,
 		afreeca = links.afreeca,
 		afreeca2 = links.afreeca2,
 		aligulac = links.aligulac,
@@ -230,6 +237,7 @@ function Links.transform(links)
 		['faceit-c2'] = links['faceit-c2'],
 		['faceit-hub'] = links['faceit-hub'],
 		['faceit-org'] = links['faceit-org'],
+		factor = links.factor,
 		fanclub = links.fanclub,
 		gamersclub = links.gamersclub,
 		gamersclub2 = links.gamersclub2,

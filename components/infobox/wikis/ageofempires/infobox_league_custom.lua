@@ -6,23 +6,27 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
 local Array = require('Module:Array')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
+local DateClean = require('Module:DateTime')
 local GameLookup = require('Module:GameLookup')
-local MapMode = require('Module:MapMode')
 local GameModeLookup = require('Module:GameModeLookup')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Lua = require('Module:Lua')
+local MapMode = require('Module:MapMode')
 local Page = require('Module:Page')
-local DateClean = require('Module:DateTime')._clean
+local String = require('Module:StringUtils')
 local Tier = require('Module:Tier')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -78,7 +82,7 @@ function CustomInjector:parse(id, widgets)
 
 		if not String.isEmpty(args.team1) then
 			local teams = {Page.makeInternalLink(args.team1)}
-			local index  = 2
+			local index = 2
 
 			while not String.isEmpty(args['team' .. index]) do
 				table.insert(teams, '&nbsp;• ' ..
@@ -93,9 +97,8 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		if not String.isEmpty(args.map1) then
-			local maps, _ = CustomLeague:_getMaps(args)
 			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = maps})
+			table.insert(widgets, Center{content = CustomLeague:_displayMaps(CustomLeague:_getMaps())})
 		end
 	elseif id == 'sponsors' then
 		if not String.isEmpty(args.sponsors) then
@@ -124,7 +127,7 @@ function CustomLeague:getWikiCategories(args)
 	if String.isEmpty(tier) then
 		table.insert(categories, 'Pages with unsupported Tier')
 	else
-		table.insert(categories, Tier['text'][tier]  .. ' Tournaments')
+		table.insert(categories, Tier['text'][tier] .. ' Tournaments')
 	end
 
 	if not String.isEmpty(tiertype) then
@@ -225,8 +228,13 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	-- Variables for extradata to be added again in
 	-- Module:Prize pool, Module:Prize pool team, Module:TeamCard and Module:TeamCard2
-	Variables.varDefine('tournament_deadline', DateClean(args.deadline or ''))
+	Variables.varDefine('tournament_deadline', DateClean._clean(args.deadline or ''))
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
+
+	-- map links, to be used by brackets and mappool templates
+	for _, map in ipairs(CustomLeague:_getMaps()) do
+		Variables.varDefine('tournament_map_'.. map.displayName, map.link)
+	end
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
@@ -236,8 +244,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData['sponsors'] = args.sponsors
 
-	local _, mappages = CustomLeague:_getMaps(args)
-	lpdbData['maps'] = table.concat(mappages, ';')
+	local mapPages = Table.mapValues(_league.maps, function(map) return map.link end)
+	lpdbData['maps'] = table.concat(mapPages, ';')
 
 	lpdbData['game'] = GameLookup.getName({args.game})
 	-- Currently, args.patch shall be used for official patches,
@@ -246,7 +254,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
 	lpdbData['extradata'] = {
 		region = args.region,
-		deadline = DateClean(args.deadline or ''),
+		deadline = DateClean._clean(args.deadline or ''),
 		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ','),
 		gameversion = args.version
 	}
@@ -266,10 +274,9 @@ function CustomLeague:_concatArgs(args, base)
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
+	return mw.html.create('span')
+		:css('white-space', 'nowrap')
 		:node(content)
-	return span
 end
 
 function CustomLeague:_getGameVersion(args)
@@ -333,7 +340,7 @@ function CustomLeague:_getGameModes(args, makeLink)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
 
 			table.insert(categories, not String.isEmpty(gameModes[index])
-				and gameModes[index] ..  ' Tournaments'
+				and gameModes[index] .. ' Tournaments'
 				or 'Pages with unknown game mode'
 			)
 
@@ -346,47 +353,52 @@ function CustomLeague:_getGameModes(args, makeLink)
 	return gameModes
 end
 
-function CustomLeague:_getMaps(args)
-	local maps = {}
-	local mappages = {}
-	local index = 1
-
-	while not String.isEmpty(args['map' .. index]) do
-		-- map game mode from mapXmode
-		local mapmode = ''
-		if not String.isEmpty(args['map' .. index .. 'mode']) then
-			mapmode = MapMode.get({args['map' .. index .. 'mode']})
-		end
-
-		-- map from mapX, might be pagename|displayname
-		local map = mw.text.split(args['map' .. index], '|', true)
-		-- maplink from mapXlink or first part of map or autolink
-		local maplink
-		if not String.isEmpty(args['map' .. index .. 'link']) then
-			maplink = args['map' .. index .. 'link']
-		else
-			maplink = map[1]
-			-- only check for a map page when map has only one part,
-			-- so no precise link is given
-			if map[2] == nil and Page.exists(maplink .. ' (map)') then
-				maplink = maplink .. ' (map)'
-			end
-		end
-
-		if index == 1 then
-			maps = {Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)}
-		else
-			table.insert(maps, '&nbsp;• ' ..
-				tostring(CustomLeague:_createNoWrappingSpan(
-					Page.makeInternalLink({}, (map[2] or map[1]) .. mapmode, maplink)
-				))
-			)
-		end
-		table.insert(mappages, maplink)
-		index = index + 1
+function CustomLeague:_getMaps()
+	if _league.maps then
+		return _league.maps
 	end
 
-	return maps, mappages
+	local args = _league.args
+	local maps = {}
+	for prefix, mapInput in Table.iter.pairsByPrefix(args, 'map') do
+		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or ''
+
+		mapInput = mw.text.split(mapInput, '|', true)
+		local display, link
+
+		if String.isNotEmpty(args[prefix .. 'link']) then
+			link = args[prefix .. 'link']
+			display = mapInput[1]
+		else
+			link = mapInput[1]
+			-- only check for a map page when map has only one part,
+			-- so no precise link is given
+			if mapInput[2] == nil and Page.exists(link .. ' (map)') then
+				link = link .. ' (map)'
+			end
+			display = mapInput[2] or mapInput[1]
+		end
+		link = mw.ext.TeamLiquidIntegration.resolve_redirect(link)
+
+		table.insert(maps, {link = link, displayName = display, mode = mode})
+	end
+
+	_league.maps = maps
+
+	return maps
+end
+
+function CustomLeague:_displayMaps(maps)
+	local mapDisplay = function(map)
+		return tostring(CustomLeague:_createNoWrappingSpan(
+			Page.makeInternalLink({}, map.displayName .. map.mode, map.link)
+		))
+	end
+
+	return {table.concat(
+		Table.mapValues(maps, function(map) return mapDisplay(map) end),
+		'&nbsp;• '
+	)}
 end
 
 return CustomLeague

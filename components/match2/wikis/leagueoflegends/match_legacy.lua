@@ -30,7 +30,7 @@ function MatchLegacy.storeMatch(match2, options)
 		match.games = MatchLegacy.storeGames(match, match2)
 
 		return mw.ext.LiquipediaDB.lpdb_match(
-			"legacymatch_" .. match2.match2id,
+			'legacymatch_' .. match2.match2id,
 			match
 		)
 	end
@@ -55,31 +55,35 @@ function MatchLegacy._convertParameters(match2)
 		match.winner = 'draw'
 	end
 
-	match.staticid = 'Legacy_' .. match2.match2id
+	match.staticid = match2.match2id
 
 	-- Handle extradata fields
 	match.extradata = {}
 	local extradata = Json.parseIfString(match2.extradata)
-	match.extradata.gamecount = tostring(match2.bestof)
+	match.extradata.gamecount = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata.matchsection = extradata.matchsection
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
-		match.extradata.mvp = table.concat(mvp.players, ",")
-		match.extradata.mvp = match.extradata.mvp .. ";" .. mvp.points
+		local players = {}
+		for _, player in ipairs(mvp.players) do
+			table.insert(players, player.name .. '|' .. player.displayname)
+		end
+		match.extradata.mvp = table.concat(players, ',')
+		match.extradata.mvp = match.extradata.mvp .. ';' .. mvp.points
 	end
 
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
-	if type(bracketData) == "table" and bracketData.type == "bracket" then
+	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
 		local headerName
 		if bracketData.header then
 			headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
 		end
 		if String.isEmpty(headerName) then
-			headerName = Variables.varDefault("match_legacy_header_name")
+			headerName = Variables.varDefault('match_legacy_header_name')
 		end
 		if String.isNotEmpty(headerName) then
 			match.extradata.matchsection = headerName
-			Variables.varDefine("match_legacy_header_name", headerName)
+			Variables.varDefine('match_legacy_header_name', headerName)
 		end
 	end
 
@@ -147,6 +151,8 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.team1side = extradata.team1side
 		game.extradata.team2side = extradata.team2side
 
+		game.extradata.parent = game2.parent
+
 		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
 
 		-- Other stuff
@@ -192,21 +198,11 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has teams=' .. (match.opponent2 or ''),
 	}
 
-	local getTeamOfPlayer = function(playerName)
-		for _, opponent in ipairs(match2.match2opponents or {}) do
-			for _, player in ipairs(opponent.match2players or {}) do
-				if player.name == playerName then
-					return opponent.name
-				end
-			end
-		end
-	end
 	local extradata = Json.parseIfString(match2.extradata) or {}
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		for index, player in ipairs(mvp.players) do
-			local team = getTeamOfPlayer(player) or ''
-			local mvpString = player .. '§§§§'.. team ..'§§§§0'
+			local mvpString = player.name .. '§§§§'.. (player.team or '') ..'§§§§0'
 			table.insert(data, 'Has mvp ' .. index .. '=' .. mvpString)
 		end
 	end

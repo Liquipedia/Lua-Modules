@@ -16,11 +16,11 @@ local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 local VodLink = require('Module:VodLink')
-local Opponent = require('Module:Opponent')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _MAX_NUM_BANS = 7
 local _NUM_HEROES_PICK_TEAM = 5
@@ -35,6 +35,7 @@ local _LINK_DATA = {
 	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
 	reddit = {icon = 'File:Reddit-icon.png', text = 'Head-to-head statistics'},
 	gol = {icon = 'File:Gol.gg_allmode.png', text = 'GolGG Match Report'},
+	factor = {icon = 'File:Factor.gg lightmode.png', text = 'FactorGG Match Report'},
 }
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
@@ -62,7 +63,7 @@ end
 function HeroBan:banRow(banData, gameNumber, numberOfBans)
 	self.table:tag('tr')
 		:tag('td'):css('float', 'left')
-			:node(CustomMatchSummary._opponentHeroesDisplay(banData[1], numberOfBans, true, true, self.date))
+			:node(CustomMatchSummary._opponentHeroesDisplay(banData[1], numberOfBans, true, self.date))
 		:tag('td'):css('font-size', '80%'):node(mw.html.create('div')
 			:wikitext(CustomMatchSummary._createAbbreviation{
 				title = 'Bans in game ' .. gameNumber,
@@ -70,7 +71,7 @@ function HeroBan:banRow(banData, gameNumber, numberOfBans)
 			})
 		)
 		:tag('td'):css('float', 'right')
-			:node(CustomMatchSummary._opponentHeroesDisplay(banData[2], numberOfBans, true, true, self.date))
+			:node(CustomMatchSummary._opponentHeroesDisplay(banData[2], numberOfBans, true, self.date))
 	return self
 end
 
@@ -84,7 +85,6 @@ function CustomMatchSummary.getByMatchId(args)
 
 	local matchSummary = MatchSummary():init('400px')
 	matchSummary.root:css('flex-wrap', 'unset')
-	matchSummary.root:css('overflow', 'unset')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -136,10 +136,10 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
 
 	return header
 end
@@ -241,8 +241,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 
 	row:addClass('brkts-popup-body-game')
 		:css('font-size', '80%')
-		:css('padding-left', '5px')
-		:css('padding-right', '5px')
+		:css('padding', '4px')
 		:css('min-height', '32px')
 
 	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[1], numberOfHeroes, false))
@@ -289,7 +288,7 @@ function CustomMatchSummary._createAbbreviation(args)
 	return '<i><abbr title="' .. args.title .. '">' .. args.text .. '</abbr></i>'
 end
 
-function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfHeroes, flip, isBan, date)
+function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfHeroes, flip, date)
 	local opponentHeroesDisplay = {}
 	local color = opponentHeroesData.side or ''
 
@@ -299,12 +298,6 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 			:addClass('brkts-champion-icon')
 			:css('float', flip and 'right' or 'left')
 			:node(HeroIcon._getImage{opponentHeroesData[index], date = date})
-		if index == 1 then
-			heroDisplay:css('padding-left', '2px')
-		end
-		if index == numberOfHeroes then
-			heroDisplay:css('padding-right', '2px')
-		end
 		if numberOfHeroes == _NUM_HEROES_PICK_SOLO then
 			if flip then
 				heroDisplay:css('margin-right', '70px')
@@ -320,10 +313,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	end
 
 	local display = mw.html.create('div')
-	if isBan then
-		--display:addClass('brkts-popup-side-shade-out')
-		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
-	end
+		:addClass('brkts-popup-body-element-thumbs')
 
 	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)

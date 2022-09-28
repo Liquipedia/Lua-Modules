@@ -7,9 +7,11 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
-local UtilLinks = require('Module:Links')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+
+local UtilLinks = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 local Links = Class.new(
 	Widget,
@@ -47,6 +49,7 @@ local _PRIORITY_GROUPS = {
 		'5ewin',
 		'abiosgaming',
 		'aligulac',
+		'apexlegendsstatus',
 		'battlefy',
 		'b5csgo',
 		'challengermode',
@@ -62,6 +65,7 @@ local _PRIORITY_GROUPS = {
 		'faceit-c',
 		'faceit-hub',
 		'faceit-org',
+		'factor',
 		'gamersclub',
 		'halodatahive',
 		'letsplaylive',

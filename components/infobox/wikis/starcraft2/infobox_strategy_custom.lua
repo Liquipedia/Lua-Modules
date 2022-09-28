@@ -7,14 +7,18 @@
 --
 
 local Class = require('Module:Class')
-local Strategy = require('Module:Infobox/Strategy')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local RaceIcon = require('Module:RaceIcon')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Header = require('Module:Infobox/Widget/Header')
 local CleanRace = mw.loadData('Module:CleanRace2')
+local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
+local RaceIcon = require('Module:RaceIcon')
+local String = require('Module:StringUtils')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Strategy = Lua.import('Module:Infobox/Strategy', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
 
 local CustomStrategy = Class.new()
 

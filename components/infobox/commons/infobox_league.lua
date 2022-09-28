@@ -6,30 +6,34 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Template = require('Module:Template')
-local Table = require('Module:Table')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
-local Links = require('Module:Links')
-local Flags = require('Module:Flags')
-local Localisation = require('Module:Localisation')
-local Variables = require('Module:Variables')
-local Locale = require('Module:Locale')
-local Page = require('Module:Page')
-local LeagueIcon = require('Module:LeagueIcon')
-local WarningBox = require('Module:WarningBox')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Tier = require('Module:Tier')
-local PrizePoolCurrency = require('Module:Prize pool currency')
 local Logic = require('Module:Logic')
-local MetadataGenerator = require('Module:MetadataGenerator')
+local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
+local Tier = require('Module:Tier') -- loadData?
+local Variables = require('Module:Variables')
+local WarningBox = require('Module:WarningBox')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
+local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
+local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
+local MetadataGenerator = Lua.import('Module:MetadataGenerator', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local TextSanitizer = Lua.import('Module:TextSanitizer', {requireDevIfEnabled = true})
 
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
 local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+local VENUE_DESCRIPTION = "<br><small><small>(${desc})</small></small>"
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -53,6 +57,18 @@ function League:createInfobox()
 	local args = self.args
 	args.abbreviation = self:_fetchAbbreviation()
 	local links
+
+	-- Split venue from legacy format to new format.
+	-- Legacy format is a wiki-code string that can include an external link
+	-- New format has |venue= and |venuelink= as different parameters.
+	-- This should be removed once there's been a bot run to change this.
+	if not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
+		-- Remove [] and split on space
+		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
+		args.venuelink = splitVenue[1]
+		table.remove(splitVenue, 1)
+		args.venue = table.concat(splitVenue, ' ')
+	end
 
 	-- set Variables here already so they are available in functions
 	-- we call from here on, e.g. _createPrizepool
@@ -148,7 +164,28 @@ function League:createInfobox()
 				self:_createLocation(args)
 			}
 		},
-		Cell{name = 'Venue', content = {args.venue}},
+		Builder{
+			builder = function()
+				args.venue1 = args.venue1 or args.venue
+				args.venue1link = args.venue1link or args.venuelink
+				args.venue1desc = args.venue1desc or args.venuedesc
+
+				local venues = {}
+				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
+					local description
+					if String.isNotEmpty(args[prefix .. 'desc']) then
+						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
+					end
+
+					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
+				end
+
+				return {Cell{
+					name = 'Venue',
+					content = venues
+				}}
+			end
+		},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
 			Cell{
@@ -203,6 +240,8 @@ function League:createInfobox()
 			}
 		},
 	}
+
+	self.name = TextSanitizer.tournamentName(self.name)
 
 	self.infobox:bottom(self:createBottomContent())
 
@@ -309,7 +348,7 @@ function League:_createPrizepool(args)
 		date = args.currency_date
 	end
 
-	return PrizePoolCurrency._get{
+	return InfoboxPrizePool.display{
 		prizepool = args.prizepool,
 		prizepoolusd = args.prizepoolusd,
 		currency = args.localcurrency,
@@ -319,9 +358,9 @@ function League:_createPrizepool(args)
 end
 
 function League:_definePageVariables(args)
-	Variables.varDefine('tournament_name', args.name)
-	Variables.varDefine('tournament_shortname', args.shortname or args.abbreviation)
-	Variables.varDefine('tournament_tickername', args.tickername)
+	Variables.varDefine('tournament_name', TextSanitizer.tournamentName(args.name))
+	Variables.varDefine('tournament_shortname', TextSanitizer.tournamentName(args.shortname or args.abbreviation))
+	Variables.varDefine('tournament_tickername', TextSanitizer.tournamentName(args.tickername))
 	Variables.varDefine('tournament_icon', args.icon)
 	Variables.varDefine('tournament_icondark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
@@ -371,8 +410,8 @@ end
 function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
-		tickername = args.tickername,
-		shortname = args.shortname or args.abbreviation,
+		tickername = TextSanitizer.tournamentName(args.tickername),
+		shortname = TextSanitizer.tournamentName(args.shortname or args.abbreviation),
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = Variables.varDefault('tournament_icon'),
@@ -438,9 +477,9 @@ end
 ---
 -- Format:
 -- {
---     region: Region or continent
---     country: the country
---     location: the city or place
+--	region: Region or continent
+--	country: the country
+--	location: the city or place
 -- }
 function League:_createLocation(args)
 	if String.isEmpty(args.country) then
@@ -533,36 +572,36 @@ function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
 	end
 end
 
-function League:_createOrganizer(organizer, name, link, reference)
-	if String.isEmpty(organizer) then
+function League:_createLink(id, name, link, desc)
+	if String.isEmpty(id) then
 		return nil
 	end
 
 	local output
 
-	if Page.exists(organizer) then
-		output = '[[' .. organizer .. '|'
+	if Page.exists(id) then
+		output = '[[' .. id .. '|'
 		if String.isEmpty(name) then
-			output = output .. organizer .. ']]'
+			output = output .. id .. ']]'
 		else
 			output = output .. name .. ']]'
 		end
 
 	elseif not String.isEmpty(link) then
 		if String.isEmpty(name) then
-			output = '[' .. link .. ' ' .. organizer .. ']'
+			output = '[' .. link .. ' ' .. id .. ']'
 		else
 			output = '[' .. link .. ' ' .. name .. ']'
 
 		end
 	elseif String.isEmpty(name) then
-		output = organizer
+		output = id
 	else
 		output = name
 	end
 
-	if not String.isEmpty(reference) then
-		output = output .. reference
+	if not String.isEmpty(desc) then
+		output = output .. desc
 	end
 
 	return output
@@ -570,7 +609,7 @@ end
 
 function League:_createOrganizers(args)
 	local organizers = {
-		League:_createOrganizer(
+		League:_createLink(
 			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
 	}
 
@@ -579,7 +618,7 @@ function League:_createOrganizers(args)
 	while not String.isEmpty(args['organizer' .. index]) do
 		table.insert(
 			organizers,
-			League:_createOrganizer(
+			League:_createLink(
 				args['organizer' .. index],
 				args['organizer' .. index .. '-name'],
 				args['organizer' .. index .. '-link'],

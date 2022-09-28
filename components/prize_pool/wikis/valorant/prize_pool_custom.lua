@@ -9,11 +9,11 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local CustomLpdbInjector = Class.new(LpdbInjector)
@@ -46,6 +46,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
 	Variables.varDefine('enddate_'.. lpdbData.participant .. '_date', lpdbData.date)
 	Variables.varDefine('status'.. lpdbData.participant .. '_date', lpdbData.date)
+
+	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 
 	if Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)

@@ -7,20 +7,22 @@
 --
 
 local Class = require('Module:Class')
-local BasicInfobox = require('Module:Infobox/Basic')
-local Links = require('Module:Links')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local Localisation = require('Module:Localisation').getLocalisation
-local Flags = require('Module:Flags')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Region = require('Module:Region')
-local AgeCalculation = require('Module:AgeCalculation')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
-local Earnings = require('Module:Earnings')
-local Logic = require('Module:Logic')
+
+local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Earnings = Lua.import('Module:Earnings', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Region = Lua.import('Module:Region', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -46,6 +48,9 @@ local _COUNTRIES_EASTERN_NAME_ORDER = {
 	'South Korea',
 	'Cambodia'
 }
+local STATUS_INACTIVE = 'inactive'
+local STATUS_BANNED = 'banned'
+local STATUS_RETIRED = 'retired'
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -247,7 +252,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		image = args.image,
 		region = _region,
 		team = teamLink or team,
-		teampagename = (teamLink or team or ''):gsub(' ', '_'),
+		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
 		teamtemplate = teamTemplate,
 		status = status,
 		type = personType,
@@ -396,7 +401,7 @@ function Person:_createLocation(country, location, personType)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	local demonym = Localisation(countryDisplay)
+	local demonym = Localisation.getLocalisation(countryDisplay)
 
 	local category = ''
 	if Namespace.isMain() then
@@ -440,13 +445,17 @@ function Person:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, 'Deceased ' .. personType .. 's')
 		elseif
 			args.retired == 'yes' or args.retired == 'true'
-			or string.lower(status or '') == 'retired'
+			or string.lower(status or '') == STATUS_RETIRED
 			or string.match(args.retired or '', '%d%d%d%d')--if retired has year set apply the retired category
 		then
 			table.insert(categories, 'Retired ' .. personType .. 's')
+		elseif string.lower(status or '') == STATUS_INACTIVE then
+			table.insert(categories, 'Inactive ' .. personType .. 's')
+		elseif string.lower(status or '') == STATUS_BANNED then
+			table.insert(categories, 'Banned ' .. personType .. 's')
 		else
 			table.insert(categories, 'Active ' .. personType .. 's')
-			if not team then
+			if String.isEmpty(team) then
 				table.insert(categories, 'Teamless ' .. personType .. 's')
 			end
 		end
@@ -457,7 +466,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 			table.insert(categories, personType .. 's with unknown birth date')
 		end
 
-		if team and not mw.ext.TeamTemplate.teamexists(team) then
+		if String.isNotEmpty(team) and not mw.ext.TeamTemplate.teamexists(team) then
 			table.insert(categories, 'Players with invalid team')
 		end
 

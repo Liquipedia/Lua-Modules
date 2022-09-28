@@ -73,7 +73,8 @@ function Match.storeMatchGroup(matchRecords, options)
 		storePageVar = Logic.nilOr(options.storePageVar, false),
 		storeSmw = Logic.nilOr(options.storeSmw, true),
 	}
-	local LegacyMatch = (options.storeMatch1 or options.storeSmw) and Lua.requireIfExists('Module:Match/Legacy')
+	local LegacyMatch = (options.storeMatch1 or options.storeSmw)
+		and Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
 
 	matchRecords = Array.map(matchRecords, function(matchRecord)
 		local records = Match.splitRecordsByType(matchRecord)
@@ -328,7 +329,8 @@ end
 function Match._addCommonMatchExtradata(match)
 	local commonExtradata = {
 		comment = match.comment,
-		matchsection = Variables.varDefault('matchsection'),
+		matchsection = match.matchsection,
+		timestamp = tonumber(match.timestamp),
 		timezoneid = match.timezoneId,
 		timezoneoffset = match.timezoneOffset,
 	}

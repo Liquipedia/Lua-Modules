@@ -8,10 +8,13 @@
 
 local Array = require('Module:Array')
 local Flags = require('Module:Flags')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
+
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
 --[[
 Structural type representation of an opponent.
@@ -148,7 +151,7 @@ function Opponent.isTbd(opponent)
 end
 
 function Opponent.playerIsTbd(player)
-	return player.displayName == '' or player.displayName == 'TBD'
+	return String.isEmpty(player.displayName) or player.displayName:upper() == 'TBD'
 end
 
 function Opponent.isType(type)
@@ -243,12 +246,11 @@ options.syncPlayer: Whether to fetch player information from variables or LPDB. 
 function Opponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
-		opponent.template = TeamTemplate.resolve(opponent.template, date) or 'tbd'
+		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
 	elseif Opponent.typeIsParty(opponent.type) then
-		local PlayerExt = require('Module:Player/Ext')
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
-				PlayerExt.syncPlayer(player)
+				PlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
 			else
 				PlayerExt.populatePageName(player)
 			end
@@ -380,7 +382,7 @@ function Opponent.toLpdbStruct(opponent)
 			players[prefix] = player.pageName
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
-			players[prefix .. 'team'] = Opponent.toName({type = Opponent.team, template = player.team})
+			players[prefix .. 'team'] = player.team and Opponent.toName({type = Opponent.team, template = player.team}) or nil
 			players[prefix .. 'template'] = player.team
 		end
 		storageStruct.opponentplayers = players

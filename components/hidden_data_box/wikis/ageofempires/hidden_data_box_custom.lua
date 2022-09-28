@@ -5,13 +5,14 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-
-local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
+
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 
 local CustomHiddenDataBox = {}
 
@@ -27,6 +28,8 @@ function CustomHiddenDataBox.run(args)
 end
 
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	queryResult.extradata = queryResult.extradata or {}
+
 	--legacy variables
 	Variables.varDefine('tournament_parent_name', Variables.varDefault('tournament_parentname', ''))
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))

@@ -7,12 +7,12 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -20,6 +20,7 @@ local Variables = require('Module:Variables')
 local WikiSpecific = require('Module:Brkts/WikiSpecific')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local globalVars = PageVariableNamespace({cached = true})
 
@@ -73,6 +74,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.matchIndex = matchIndex
 
 			match.parent = context.tournamentParent
+			match.matchsection = context.matchSection
 			bracketData.bracketindex = context.bracketIndex
 			bracketData.groupRoundIndex = context.groupRoundIndex
 			bracketData.sectionheader = context.sectionHeader
@@ -140,6 +142,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
 		match.parent = context.tournamentParent
+		match.matchsection = context.matchSection
 		bracketData.bracketindex = context.bracketIndex
 		bracketData.groupRoundIndex = context.groupRoundIndex
 		bracketData.sectionheader = context.sectionHeader
@@ -272,7 +275,13 @@ function MatchGroupInput.readDate(dateString)
 	local matchDate = String.explode(dateString, '<', 0):gsub('-', '')
 	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
 	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
-	return {date = date, dateexact = isDateExact, timezoneId = timezoneId, timezoneOffset = timezoneOffset}
+	return {
+		date = date,
+		dateexact = isDateExact,
+		timezoneId = timezoneId,
+		timezoneOffset = timezoneOffset,
+		timestamp = DateExt.readTimestamp(dateString),
+	}
 end
 
 function MatchGroupInput.getInexactDate(suggestedDate)
@@ -388,6 +397,28 @@ function MatchGroupInput.getCommonTournamentVars(obj)
 	obj.type = Logic.emptyOr(obj.type, Variables.varDefault('tournament_type'))
 
 	return obj
+end
+
+function MatchGroupInput.readMvp(match)
+	if not match.mvp then return end
+	local mvppoints = match.mvppoints or 1
+
+	-- Split the input
+	local players = mw.text.split(match.mvp, ',')
+
+	-- parse the players to get their information
+	local parsedPlayers = Table.mapValues(players, function(player)
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
+		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+			for _, lookUpPlayer in pairs(opponent.match2players) do
+				if link == lookUpPlayer.name then
+					return Table.merge(lookUpPlayer, {team = opponent.name, template = opponent.template})
+				end
+			end
+		end
+	end)
+
+	return {players = parsedPlayers, points = mvppoints}
 end
 
 return MatchGroupInput

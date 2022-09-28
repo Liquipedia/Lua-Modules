@@ -9,7 +9,6 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -17,6 +16,7 @@ local Streams = require('Module:Links/Stream')
 local HeroNames = mw.loadData('Module:ChampionNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _STATUS_SCORE = 'S'
 local _STATUS_DRAW = 'D'
@@ -370,29 +370,16 @@ function matchFunctions.getLinks(match)
 	}
 	if match.reddit then match.links.reddit = 'https://redd.it/' .. match.reddit end
 	if match.gol then match.links.gol = 'https://gol.gg/game/stats/' .. match.gol .. '/page-game/' end
+	if match.factor then match.links.factor = 'https://www.factor.gg/match/' .. match.factor end
 	return match
 end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = matchFunctions.getMVP(match),
+		mvp = MatchGroupInput.readMvp(match),
 	}
+
 	return match
-end
-
-function matchFunctions.getMVP(match)
-	if not match.mvp then return nil end
-	local mvppoints = match.mvppoints or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index, player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players = players, points = mvppoints}
 end
 
 function matchFunctions.getOpponents(match)
@@ -530,7 +517,7 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
 		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
 		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
+			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
 		end
 
 		if not Table.isEmpty(player) then

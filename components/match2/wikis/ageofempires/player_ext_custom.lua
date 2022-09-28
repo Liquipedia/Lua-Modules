@@ -6,14 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local PlayerExt = require('Module:Player/Ext')
 local Table = require('Module:Table')
 local Array = require('Module:Array')
 local TeamTemplate = require('Module:TeamTemplate')
 local TournamentUtil = require('Module:Tournament/Util')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
+
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
 local CustomPlayerExt = Table.deepCopy(PlayerExt)
 

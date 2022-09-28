@@ -34,12 +34,20 @@ local _LINK_DATA = {
 local CustomMatchSummary = {}
 
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local options = {mergeBracketResetMatch = false}
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, options)
+	local bracketResetMatch = match and match.bracketData and match.bracketData.bracketResetMatchId
+		and MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, match.bracketData.bracketResetMatchId, options)
 
 	local matchSummary = MatchSummary():init()
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 		:body(CustomMatchSummary._createBody(match))
+
+	if bracketResetMatch then
+		matchSummary:resetHeader(CustomMatchSummary._createHeader(bracketResetMatch))
+			:resetBody(CustomMatchSummary._createBody(bracketResetMatch))
+	end
 
 	-- comment
 	if match.comment then
@@ -94,9 +102,9 @@ function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
 	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end

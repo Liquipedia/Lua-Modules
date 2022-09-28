@@ -6,17 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local ChampionNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
+local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local ChampionNames = mw.loadData('Module:ChampionNames')
-local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _STATUS_SCORE = 'S'
 local _STATUS_DRAW = 'D'
@@ -324,7 +325,7 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = match.mvp,
+		mvp = MatchGroupInput.readMvp(match),
 		mvpteam = match.mvpteam or match.winner
 	}
 	return match
@@ -437,27 +438,33 @@ end
 function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
 	playersData = Json.parseIfString(playersData) or {}
-	local players = {}
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or playersData['p' .. playerIndex]
-			or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
-		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
-		end
+	match['opponent' .. oppIndex].match2players = Array.mapIndexes(function(playerIndex)
+		return matchFunctions.parsePlayer(match, oppIndex, teamName, playersData, playerIndex)
+	end)
 
-		if not Table.isEmpty(player) then
-			table.insert(players, player)
-		end
-	end
-	match['opponent' .. oppIndex].match2players = players
 	return match
+end
+
+function matchFunctions.parsePlayer(match, oppIndex, teamName, playersData, playerIndex)
+	local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
+
+	player.name = player.name or playersData['p' .. playerIndex]
+		or Variables.varDefault(teamName .. '_p' .. playerIndex)
+	player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
+		or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+	player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
+		or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
+
+	if String.isNotEmpty(player.name) then
+		player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
+	end
+
+	if Table.isEmpty(player) then
+		return
+	end
+
+	return player
 end
 
 --
@@ -513,7 +520,7 @@ function mapFunctions.getParticipants(map, opponents)
 end
 
 function mapFunctions.attachToParticipant(player, opponentIndex, players, participants, champion, kda)
-	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
+	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player):gsub(' ', '_')
 	for playerIndex, item in pairs(players or {}) do
 		if player == item.name then
 			participants[opponentIndex .. '_' .. playerIndex] = {

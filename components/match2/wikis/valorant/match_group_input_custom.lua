@@ -9,7 +9,6 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -17,6 +16,7 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
@@ -519,7 +519,7 @@ function mapFunctions.getScoresAndWinner(map)
 		-- read scores
 		local score = map['score' .. scoreIndex]
 		if map['t'.. scoreIndex ..'atk'] or map['t'.. scoreIndex ..'def'] then
-			score =   (tonumber(map['t'.. scoreIndex ..'atk']) or 0)
+			score = (tonumber(map['t'.. scoreIndex ..'atk']) or 0)
 					+ (tonumber(map['t'.. scoreIndex ..'def']) or 0)
 					+ (tonumber(map['t'.. scoreIndex ..'otatk']) or 0)
 					+ (tonumber(map['t'.. scoreIndex ..'otdef']) or 0)

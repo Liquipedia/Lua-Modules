@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
@@ -20,6 +21,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
+local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local TIER_VALUE = {10, 6, 4, 2}
 
 -- Template entry point
@@ -59,6 +61,15 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	-- legacy points, to be standardized
 	lpdbData.extradata.points = placement.prizeRewards.POINTS1
 	lpdbData.extradata.points2 = placement.prizeRewards.POINTS2
+
+	local prizeIsQualifier = function(prize)
+		return prize.type == PRIZE_TYPE_QUALIFIES
+	end
+	local opponentHasPrize = function (prize)
+		return placement:getPrizeRewardForOpponent(opponent, prize.id)
+	end
+
+	lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
 
 	return lpdbData
 end

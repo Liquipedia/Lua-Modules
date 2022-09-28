@@ -9,8 +9,8 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local ChampionIcon = require('Module:ChampionIcon')
+local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local Player = require('Module:Infobox/Person')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
@@ -18,8 +18,11 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local _ROLES = {
 	-- Players

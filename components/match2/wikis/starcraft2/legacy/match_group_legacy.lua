@@ -30,11 +30,13 @@ function Legacy.get(frame)
 	local nameSpaceNumber = mw.title.getCurrentTitle().namespace
 
 	local storage = _args.store
-	if storage == '' or storage == nil then
-		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false' or nil
+	if String.isEmpty(storage) then
+		storage = not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	else
+		storage = Logic.readBoolOrNil(storage)
 	end
-	if (storage or '') ~= 'true' and nameSpaceNumber == _NAMESPACE_USER then
-		storage = 'false'
+	if not storage and nameSpaceNumber == _NAMESPACE_USER then
+		storage = false
 		_IS_USERSPACE = true
 	end
 

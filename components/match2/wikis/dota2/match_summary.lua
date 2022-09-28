@@ -16,11 +16,11 @@ local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 local VodLink = require('Module:VodLink')
-local Opponent = require('Module:Opponent')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _MAX_NUM_BANS = 7
 local _NUM_HEROES_PICK_TEAM = 5
@@ -41,7 +41,12 @@ local _LINK_DATA = {
 local _AUTO_LINKS = {
 	{icon = 'File:DOTABUFF-icon.png', url = 'https://www.dotabuff.com/matches/', name = 'DOTABUFF'},
 	{icon = 'File:DatDota-icon.png', url = 'https://www.datdota.com/matches/', name = 'datDota'},
-	{icon = 'File:Stratz-icon.png', url = 'https://stratz.com/en-us/match/', name = 'Stratz'},
+	{
+		icon = 'File:STRATZ_icon_lightmode.svg',
+		iconDark = 'File:STRATZ_icon_darkmode.svg',
+		url = 'https://stratz.com/en-us/match/',
+		name = 'Stratz'
+	},
 }
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
@@ -93,7 +98,6 @@ function CustomMatchSummary.getByMatchId(args)
 
 	local matchSummary = MatchSummary():init('400px')
 	matchSummary.root:css('flex-wrap', 'unset')
-	matchSummary.root:css('overflow', 'hidden')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -137,26 +141,15 @@ function CustomMatchSummary.getByMatchId(args)
 			})
 		end
 
-		-- Match Vod + other links
-		local buildLink = function (link, icon, text)
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-
 		for _, site in ipairs(_AUTO_LINKS) do
 			for index, publisherid in pairs(publisherids) do
 				local link = site.url .. publisherid
 				local text = 'Game '..index..' on '.. site.name
-				footer:addElement(buildLink(link, site.icon, text))
+				footer:addLink(link, site.icon, site.iconDark, text)
 			end
 		end
 
-		for linkType, link in pairs(match.links) do
-			if not _LINK_DATA[linkType] then
-				mw.log('Unknown link: ' .. linkType)
-			else
-				footer:addElement(buildLink(link, _LINK_DATA[linkType].icon, _LINK_DATA[linkType].text))
-			end
-		end
+		footer:addLinks(_LINK_DATA, match.links)
 
 		matchSummary:footer(footer)
 	end
@@ -167,10 +160,10 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
 
 	return header
 end
@@ -348,6 +341,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	end
 
 	local display = mw.html.create('div')
+		:addClass('brkts-popup-body-element-thumbs')
 	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)
 	end

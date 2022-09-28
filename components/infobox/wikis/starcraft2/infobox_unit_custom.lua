@@ -6,18 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Unit = require('Module:Infobox/Unit')
-local String = require('Module:StringUtils')
-local RaceIcon = require('Module:RaceIcon')
+local Class = require('Module:Class')
 local CleanRace = require('Module:CleanRace')
 local CleanRaceFullName = require('Module:CleanRace2')
 local Hotkeys = require('Module:Hotkey')
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local RaceIcon = require('Module:RaceIcon')
+local String = require('Module:StringUtils')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Center = require('Module:Infobox/Widget/Center')
-local Title = require('Module:Infobox/Widget/Title')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local CustomUnit = Class.new()
 

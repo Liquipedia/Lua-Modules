@@ -8,25 +8,25 @@
 
 -- This module is used for both the Player and Commentator infoboxes
 
-local PersonSc2 = require('Module:Infobox/Person/Custom/Shared')
-local Person = require('Module:Infobox/Person')
-
 local Abbreviation = require('Module:Abbreviation')
 local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local CleanRace = require('Module:CleanRace')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
 local MatchTicker = require('Module:MatchTicker/Participant')
 local Math = require('Module:Math')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Condition = require('Module:Condition')
+local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
+local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
@@ -262,7 +262,7 @@ function CustomPlayer._getMatchupData(player)
 		CustomPlayer._setVarsForVS(vs)
 	end
 
-	_player.yearsActive = yearsActive
+	return yearsActive
 end
 
 function CustomPlayer._getYearsActive(years)
@@ -362,19 +362,22 @@ function CustomPlayer._getEarningsMedalsData(player)
 		})
 	end
 
-	local conditions = ConditionTree(BooleanOperator.all):add({
-		playerConditions,
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('participantlink'), Comparator.eq, player),
+			playerConditions,
+		},
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
-		ConditionTree(BooleanOperator.any):add({
+		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
 			ConditionNode(ColumnName('extradata_award'), Comparator.neq, ''),
-			ConditionTree(BooleanOperator.all):add({
+			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('players_type'), Comparator.gt, Opponent.solo),
 				placementConditions,
-			}),
-		}),
-	})
+			},
+		},
+	}
 
 	local earnings = {}
 	local medals = {}
