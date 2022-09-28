@@ -51,7 +51,7 @@ local _series
 local _tier
 local _tournament_extradata_cache = {{}, {}, {}, {}, ['3-4'] = {}}
 local _tournament_name
-local _series_number = CustomPrizePool._seriesNumber()
+local _series_number
 
 -- Template entry point
 function CustomPrizePool.run(frame)
@@ -80,6 +80,9 @@ function CustomPrizePool.run(frame)
 
 	-- fixed setting
 	args.resolveRedirect = true
+
+	-- stash seriesNumber
+	_series_number = CustomPrizePool._seriesNumber()
 
 	local prizePool = PrizePool(args):create()
 
@@ -168,11 +171,12 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.tournament = _tournament_name
 	lpdbData.series = _series
 
-	if lpdbData.prizepoolindex == 1 and _tournament_extradata_cache[lpdbData.placement or ''] then
+	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
+	if prizePoolIndex == 1 and _tournament_extradata_cache[lpdbData.placement or ''] then
 		table.insert(_tournament_extradata_cache[lpdbData.placement], Table.deepCopy(lpdbData))
 	end
 
-	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, lpdbData.prizepoolindex)
+	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 
 	table.insert(_lpdb_stash, Table.deepCopy(lpdbData))
 
@@ -233,7 +237,7 @@ function CustomPrizePool._placementToTournamentExtradata(entries)
 	if not prefix then
 		return Table.merge(
 			CustomPrizePool._entryToTournamentExtradata(SEMIFINALS_PREFIX .. 1, entries[1]),
-			CustomPrizePool._entryToTournamentExtradata(SEMIFINALS_PREFIX .. 1, entries[1])
+			CustomPrizePool._entryToTournamentExtradata(SEMIFINALS_PREFIX .. 2, entries[2])
 		)
 	end
 
