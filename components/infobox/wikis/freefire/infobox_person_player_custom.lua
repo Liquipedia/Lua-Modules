@@ -34,16 +34,18 @@ local _ROLES = {
 	captain = {category = 'Captain', variable = 'Captain', isplayer = true},
 
 	--Staff and Talents
-	analyst = {category = 'Analysts', variable = 'Analyst', talent = true},
-	host = {category = 'Hosts', variable = 'Host', talent = true},
-	journalist = {category = 'Journalists', variable = 'Journalist', talent = true},
+	analyst = {category = 'Analysts', variable = 'Analyst', staff = true},
 	coach = {category = 'Coaches', variable = 'Coach', staff = true},
 	['assistant coach'] = {category = 'Assistant Coach ', variable = 'Assistant Coach', staff = true},
-	caster = {category = 'Casters', variable = 'Caster', talent = true},
 	manager = {category = 'Managers', variable = 'Manager', staff = true},
+	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
+	host = {category = 'Hosts', variable = 'Host', talent = true},
+	journalist = {category = 'Journalists', variable = 'Journalist', talent = true},
+	caster = {category = 'Casters', variable = 'Caster', talent = true},
+	commentator = {category = 'Commentators', variable = 'Commentator', talent = true},
 	producer = {category = 'Producers', variable = 'Producer', talent = true},
 	streamer = {category = 'Streamers', variable = 'Streamer', talent = true},
-}
+	interviewer = {category = 'Interviewers', variable = 'Interviewer', talent = true},}
 
 local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -94,6 +96,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
 			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
 			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
+			Cell{name = 'Years Active (Analyst)', content = {_args.years_active_analyst}},
+			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
 		}
 	end
 	return widgets
