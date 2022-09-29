@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Customizable = Lua.import('Module:Infobox/Widget/Customizable', {requireDevIfEnabled = true})
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 local WidgetFactory = Class.new()
