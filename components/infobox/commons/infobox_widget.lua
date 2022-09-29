@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local Widget = Class.new()
 

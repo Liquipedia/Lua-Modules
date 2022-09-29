@@ -155,7 +155,7 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	match.extradata.matchsection = extradata.matchsection
-	match.extradata.bestofx = tostring(match2.bestof)
+	match.extradata.bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	local bracketData = json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == "table" and bracketData.type == "bracket" then
 		local headerName

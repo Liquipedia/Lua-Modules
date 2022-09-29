@@ -18,30 +18,34 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local _MODES = { ['solo'] = '1v1', ['team'] = 'team' }
+local _MODES = {solo = '1v1', team = 'team'}
 
 function MatchLegacy.storeMatch(match2, options)
-	local match, do_store = MatchLegacy._convertParameters(match2)
+	local match, doStore = MatchLegacy._convertParameters(match2)
 
-	if do_store then
-		match.games = MatchLegacy._storeGames(match, match2)
+	if not doStore then
+		return
+	end
 
+	match.games = MatchLegacy._storeGames(match, match2, options)
+
+	if options.storeSmw then
 		if (match2.match2opponents[1] or {}).type == 'team' then
 			MatchLegacy._storeTeamMatchSMW(match, match2)
 		elseif (match2.match2opponents[1] or {}).type == 'solo' then
 			MatchLegacy._storeSoloMatchSMW(match, match2)
 		end
+	end
 
+	if options.storeMatch1 then
 		return mw.ext.LiquipediaDB.lpdb_match(
 			'legacymatch_' .. match2.match2id,
 			match
 		)
-	else
-		return ''
 	end
 end
 
-function MatchLegacy._storeGames(match, match2)
+function MatchLegacy._storeGames(match, match2, options)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
@@ -75,15 +79,20 @@ function MatchLegacy._storeGames(match, match2)
 			game.extradata.gamenumber = gameIndex
 
 			game.extradata = json.stringify(game.extradata)
-			local res = mw.ext.LiquipediaDB.lpdb_game(
-				'legacygame_' .. match2.match2id .. gameIndex,
-				game
-			)
+			local res = ''
+			if options.storeMatch1 then
+				res = mw.ext.LiquipediaDB.lpdb_game(
+					'legacygame_' .. match2.match2id .. gameIndex,
+					game
+				)
+			end
 
-			MatchLegacy._storeSoloMapSMW(game, gameIndex, match.tournament or '', match2.match2id)
+			if options.storeSmw then
+				MatchLegacy._storeSoloMapSMW(game, gameIndex, match.tournament or '', match2.match2id)
+			end
 
 			games = games .. res
-		elseif	game.mode == '1v1' then
+		elseif	game.mode == '1v1' and options.storeMatch1 then
 			local submatch = {}
 
 			submatch.opponent1 = game.extradata.opponent1
@@ -135,7 +144,7 @@ function MatchLegacy._storeGames(match, match2)
 end
 
 function MatchLegacy._convertParameters(match2)
-	local do_store = true
+	local doStore = true
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, 'match2') then
@@ -190,14 +199,14 @@ function MatchLegacy._convertParameters(match2)
 			match.resulttype = string.upper(match.walkover or '')
 			match.walkover = match.winner
 		end
-		match.extradata.bestof = match.bestof
+		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 		match.extradata = json.stringify(match.extradata)
 	else
-		do_store = false
+		doStore = false
 		match = nil
 	end
 
-	return match, do_store
+	return match, doStore
 end
 
 function MatchLegacy._storeTeamMatchSMW(match, match2)

@@ -10,17 +10,20 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local HeroIcon = require('Module:HeroIcon')
 local HeroNames = mw.loadData('Module:HeroNames')
-local Player = require('Module:Infobox/Person')
+local Lua = require('Module:Lua')
 local Region = require('Module:Region')
 local Role = require('Module:Role')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role

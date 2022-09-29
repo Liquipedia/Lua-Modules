@@ -50,12 +50,12 @@ function MatchLegacy._convertParameters(match2)
 		match.walkover = match.winner
 	end
 
-	match.staticid = 'Legacy_' .. match2.match2id
+	match.staticid = match2.match2id
 
 	-- Handle extradata fields
 	match.extradata = {}
 	local extradata = Json.parseIfString(match2.extradata)
-	match.extradata.gamecount = tostring(match2.bestof)
+	match.extradata.gamecount = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.mvpteam = extradata.mvpteam
 	match.extradata.mvp = extradata.mvp

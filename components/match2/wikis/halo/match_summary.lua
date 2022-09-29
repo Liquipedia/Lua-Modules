@@ -32,15 +32,12 @@ function CustomMatchSummary.getByMatchId(args)
 		:css('flex-wrap', 'unset') -- temporary workaround
 
 	local function renderOpponent(opponentIndex)
-		return OpponentDisplay.BlockOpponent({
+		return OpponentDisplay.BlockOpponent{
 			flip = opponentIndex == 1,
 			opponent = match.opponents[opponentIndex],
-			overflow = 'wrap',
+			overflow = 'ellipsis',
 			teamStyle = 'short',
-		})
-			:addClass(match.opponents[opponentIndex].type ~= 'solo'
-				and 'brkts-popup-header-opponent'
-				or 'brkts-popup-header-opponent-solo-with-team')
+		}
 	end
 
 	local function renderSoloOpponentTeam(opponentIndex)
@@ -58,10 +55,19 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	-- header
+	local leftOpponent = mw.html.create('div')
+			:addClass('brkts-popup-header-opponent')
+			:addClass('brkts-popup-header-opponent-left')
+			:node(renderOpponent(1))
+	local rightOpponent = mw.html.create('div')
+			:addClass('brkts-popup-header-opponent')
+			:addClass('brkts-popup-header-opponent-right')
+			:node(renderOpponent(2))
+
 	local header = htmlCreate('div'):addClass('brkts-popup-header-dev')
 		:node(renderSoloOpponentTeam(1))
-		:node(renderOpponent(1))
-		:node(renderOpponent(2))
+		:node(leftOpponent)
+		:node(rightOpponent)
 		:node(renderSoloOpponentTeam(2))
 	wrapper:node(header):node(CustomMatchSummary._breakNode())
 

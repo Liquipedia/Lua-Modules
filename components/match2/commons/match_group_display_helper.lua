@@ -7,18 +7,21 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
+local Timezone = require('Module:Timezone')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+
 
 local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
-local _UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+local _UTC = Timezone.getTimezoneString('UTC')
 
 ---@deprecated
 ---Use Opponent.typeIsParty
@@ -97,7 +100,9 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateIsExact == true then
-		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. _UTC
+		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
+		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
+				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or _UTC)
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end
@@ -173,13 +178,14 @@ MediaWiki:BracketConfig.
 ]]
 DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
 	local defaultConfig = {
+		forceShortName = false,
 		headerHeight = 25,
 		headerMargin = 8,
 		lineWidth = 2,
 		matchHeight = 44, -- deprecated
 		matchWidth = 150,
 		matchWidthMobile = 90,
-		opponentHeight = 23,
+		opponentHeight = 24,
 		roundHorizontalMargin = 20,
 		scoreWidth = 20,
 	}

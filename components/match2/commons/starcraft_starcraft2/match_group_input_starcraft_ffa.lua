@@ -10,7 +10,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -132,8 +131,6 @@ end
 --function to get extradata for storage
 function StarcraftFfaInput.getExtraData(match)
 	local extradata = {
-		matchsection = Variables.varDefault('matchsection'),
-		comment = match.comment,
 		featured = match.featured,
 		veto1by = String.nilIfEmpty(match.vetoplayer1) or match.vetoopponent1,
 		veto1 = match.veto1,

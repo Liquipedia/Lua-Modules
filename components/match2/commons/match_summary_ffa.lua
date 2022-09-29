@@ -499,7 +499,7 @@ function FfaMatchSummary.Opponent(props)
 	local contentNode = OpponentDisplay.BlockOpponent({
 		opponent = props.opponent,
 		overflow = props.opponent.type == 'team' and 'hidden' or 'ellipsis',
-		teamStyle = 'short',
+		teamStyle = 'bracket',
 	})
 	return mw.html.create('div')
 		:addClass('ffa-match-summary-cell ffa-match-summary-opponent')

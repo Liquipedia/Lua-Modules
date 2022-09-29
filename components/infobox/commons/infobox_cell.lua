@@ -86,7 +86,7 @@ function Cell:make()
 		self.setCategories(self, self.contentText)
 	end
 
-	self.root   :node(self.description)
+	self.root	:node(self.description)
 				:node(self.contentDiv)
 	return self.root
 end

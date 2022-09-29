@@ -86,6 +86,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
 	pageName = 'string?',
+	team = 'string?',
 })
 
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
@@ -115,6 +116,7 @@ MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
 MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
+	game = 'string?',
 	header = 'string?',
 	length = 'number?',
 	map = 'string?',
@@ -135,6 +137,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	date = 'string',
 	dateIsExact = 'boolean',
 	finished = 'boolean',
+	game = 'string?',
 	games = TypeUtil.array(MatchGroupUtil.types.Game),
 	links = 'table',
 	matchId = 'string?',
@@ -326,18 +329,22 @@ Returns a match struct for use in a bracket display or match summary popup. The
 bracket display and match summary popup expects that the finals match also
 include results from the bracket reset match.
 ]]
-function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId)
+function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
+	options = options or {}
 	local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
 	local match = bracket.matchesById[matchId]
 
-	local bracketResetMatch = match
-		and match.bracketData.bracketResetMatchId
-		and bracket.matchesById[match.bracketData.bracketResetMatchId]
-	if bracketResetMatch then
-		return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
-	else
-		return match
+	if Logic.nilOr(options.mergeBracketResetMatch, true) then
+		local bracketResetMatch = match
+			and match.bracketData.bracketResetMatchId
+			and bracket.matchesById[match.bracketData.bracketResetMatchId]
+
+		if bracketResetMatch then
+			return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+		end
 	end
+
+	return match
 end
 
 --[[
@@ -361,13 +368,14 @@ function MatchGroupUtil.matchFromRecord(record)
 	end
 
 	return {
-		bestof = record.bestof,
+		bestof = tonumber(record.bestof) or 0,
 		bracketData = bracketData,
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		extradata = extradata,
 		date = record.date,
 		dateIsExact = Logic.readBool(record.dateexact),
 		finished = Logic.readBool(record.finished),
+		game = record.game,
 		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
@@ -375,6 +383,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		opponents = opponents,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
+		timestamp = tonumber(Table.extract(extradata, 'timestamp')) or 0,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
@@ -481,7 +490,9 @@ function MatchGroupUtil.gameFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
+		date = record.date,
 		extradata = extradata,
+		game = record.game,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
 		length = record.length,
 		map = nilIfEmpty(record.map),

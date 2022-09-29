@@ -6,21 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Player = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
 local Class = require('Module:Class')
-local Namespace = require('Module:Namespace')
-local Variables = require('Module:Variables')
-local Page = require('Module:Page')
-local YearsActive = require('Module:YearsActive')
-local Matches = require('Module:Matches_Player')
 local Flags = require('Module:Flags')
-local Localisation = require('Module:Localisation')
+local Lua = require('Module:Lua')
+local Matches = require('Module:Matches_Player')
+local Namespace = require('Module:Namespace')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
+local YearsActive = require('Module:YearsActive')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local _BANNED = mw.loadData('Module:Banned')
 
@@ -292,7 +294,7 @@ function CustomPlayer:_createLocation(country)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	local demonym = Localisation.getLocalisation(countryDisplay)
+	local demonym = Flags.getLocalisation(countryDisplay) or ''
 
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
 				'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'

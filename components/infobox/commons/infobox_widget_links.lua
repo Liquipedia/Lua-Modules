@@ -7,9 +7,11 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
-local UtilLinks = require('Module:Links')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+
+local UtilLinks = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 local Links = Class.new(
 	Widget,
@@ -20,12 +22,17 @@ local Links = Class.new(
 )
 
 local _ICON_KEYS_TO_RENAME = {
+	['bilibili-stream'] = 'bilibili',
 	daumcafe = 'cafe-daum',
-	['esea-d'] = 'esea',
+	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
+	['faceit-hub'] = 'faceit',
+	['faceit-org'] = 'faceit',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
+	privsteam = 'steam',
+	pubsteam = 'steam',
 	steamalternative = 'steam',
 	tlpdint = 'tlpd',
 	tlpdkr = 'tlpd-wol-korea',
@@ -42,7 +49,9 @@ local _PRIORITY_GROUPS = {
 		'5ewin',
 		'abiosgaming',
 		'aligulac',
+		'apexlegendsstatus',
 		'battlefy',
+		'b5csgo',
 		'challengermode',
 		'challonge',
 		'cybergamer',
@@ -51,12 +60,19 @@ local _PRIORITY_GROUPS = {
 		'esea',
 		'esea-d',
 		'esl',
+		'esportal',
 		'faceit',
+		'faceit-c',
+		'faceit-hub',
+		'faceit-org',
+		'factor',
 		'gamersclub',
 		'halodatahive',
+		'letsplaylive',
 		'matcherino',
 		'matcherinolink',
 		'siege-gg',
+		'sk',
 		'smash-gg',
 		'sostronk',
 		'stratz',
@@ -71,6 +87,8 @@ local _PRIORITY_GROUPS = {
 		'discord',
 		'facebook',
 		'instagram',
+		'privsteam',
+		'pubsteam',
 		'reddit',
 		'snapchat',
 		'steam',
@@ -84,11 +102,17 @@ local _PRIORITY_GROUPS = {
 	streams = {
 		'twitch',
 		'youtube',
+		'stream',
 		'afreeca',
 		'dlive',
 		'facebook-gaming',
 		'vidio',
-		'bilibili',
+		'booyah',
+		'douyu',
+		'huyatv',
+		'zhangyutv',
+		'bilibili-stream',
+		'kuaishou',
 	}
 }
 

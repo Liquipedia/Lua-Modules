@@ -7,13 +7,14 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Links = require('Module:Links')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Localisation = require('Module:Localisation')
-local Flags = require('Module:Flags')
-local Links = require('Module:Links')
-local InfoboxBasic = require('Module:Infobox/Basic')
-local String = require('Module:StringUtils')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -23,7 +24,7 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
-local Scene = Class.new(InfoboxBasic)
+local Scene = Class.new(BasicInfobox)
 
 function Scene.run(frame)
 	local scene = Scene(frame)
@@ -44,7 +45,7 @@ function Scene:createInfobox()
 		Center{content = {args.caption}},
 		Title{name = 'Scene Information'},
 		Cell{name = 'Region', content = {args.region}},
-		Cell{name = 'National team', content = {args.nationalteam}, options = {makeLink = true}},
+		Cell{name = 'National Team', content = {args.nationalteam}, options = {makeLink = true}},
 		Cell{name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})},
 		Cell{name = 'Size', content = {args.size}},
 		Customizable{id = 'custom', children = {}},
@@ -82,9 +83,9 @@ function Scene:createNameDisplay(args)
 	local name = args.name
 	local country = Flags.CountryName(args.country or args.scene)
 	if not name then
-		local localised = Localisation.getLocalisation(country)
+		local localised, errorText = Flags.getLocalisation(country)
 		local flag = Flags.Icon({flag = country, shouldLink = true})
-		name = flag .. '&nbsp;' .. localised .. ((' ' .. args.gamenamedisplay) or '') .. ' scene'
+		name = flag .. '&nbsp;' .. (localised or errorText) .. ((' ' .. args.gamenamedisplay) or '') .. ' scene'
 	end
 
 	Variables.varDefine('country', country)

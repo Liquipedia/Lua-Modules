@@ -6,11 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Team = require('Module:Infobox/Team')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
+
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local CustomTeam = Class.new()
 
