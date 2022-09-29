@@ -23,18 +23,6 @@ local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
 local _UTC = Timezone.getTimezoneString('UTC')
 
----@deprecated
----Use Opponent.typeIsParty
-function DisplayHelper.opponentTypeIsParty(opponentType)
-	return Opponent.typeIsParty(opponentType)
-end
-
----@deprecated
----Use Opponent.isTbd
-function DisplayHelper.opponentIsTBD(opponent)
-	return Opponent.isTbd(opponent)
-end
-
 -- Whether to allow highlighting an opponent via mouseover
 function DisplayHelper.opponentIsHighlightable(opponent)
 	if opponent.type == 'literal' then
