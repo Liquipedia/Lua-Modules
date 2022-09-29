@@ -11,6 +11,7 @@ local String = require('Module:StringUtils')
 
 local Localisation = {}
 
+---@deprecated
 function Localisation.getCountryName(country, noentry)
 	local data = mw.loadData('Module:Localisation/data/country')
 
