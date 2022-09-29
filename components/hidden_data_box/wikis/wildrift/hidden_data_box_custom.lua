@@ -7,9 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local BasicHiddenDataBox = require('Module:HiddenDataBox')
+local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
@@ -17,8 +18,8 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
-function CustomHiddenDataBox:addCustomVariables(args, queryResult)
-	BasicHiddenDataBox:checkAndAssign(
+function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	BasicHiddenDataBox.checkAndAssign(
 		'tournament_publishertier',
 		args.riotpremier,
 		queryResult.publishertier

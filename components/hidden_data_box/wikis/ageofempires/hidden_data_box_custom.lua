@@ -5,13 +5,14 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-
-local BasicHiddenDataBox = require('Module:HiddenDataBox')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
+
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 
 local CustomHiddenDataBox = {}
 
@@ -26,7 +27,9 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
-function CustomHiddenDataBox:addCustomVariables(args, queryResult)
+function CustomHiddenDataBox.addCustomVariables(args, queryResult)
+	queryResult.extradata = queryResult.extradata or {}
+
 	--legacy variables
 	Variables.varDefine('tournament_parent_name', Variables.varDefault('tournament_parentname', ''))
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
@@ -45,10 +48,10 @@ function CustomHiddenDataBox:addCustomVariables(args, queryResult)
 	Variables.varDefine('headtohead', args.headtohead)
 
 	-- tournament mode (1v1 or team)
-	BasicHiddenDataBox:checkAndAssign('tournament_mode', args.mode, queryResult.extradata.mode)
+	BasicHiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.extradata.mode)
 
 	--gamemode
-	BasicHiddenDataBox:checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
+	BasicHiddenDataBox.checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
 end
 
 function CustomHiddenDataBox.validateTier(tierString, tierMode)

@@ -55,11 +55,60 @@ function Flags.Icon(args, flagName)
 		end
 	elseif shouldLink then
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName) .. '[[Category:Pages with unknown flags]]'
+		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName:lower()) ..
+				'[[Category:Pages with unknown flags]]'
 	else
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName) .. '[[Category:Pages with unknown flags]]'
+		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName:lower()) ..
+				'[[Category:Pages with unknown flags]]'
 	end
+end
+
+-- Returns the localisation/country-adjective of a country or region
+-- @country	- country name, flag code, or alias of the Flag
+-- examples:
+-- Flags.getLocalisation('de') = German
+-- Flags.getLocalisation('Germany') = German
+-- Flags.getLocalisation('deu') = German
+function Flags.getLocalisation(country)
+	if String.isEmpty(country) then
+		return
+	end
+
+	-- clean the entered value
+	local countryKey = Flags._convertToKey(country)
+
+	if countryKey then
+		local data = MasterData.data[countryKey]
+		if String.isNotEmpty(data.localised) then
+			return data.localised
+		end
+	end
+
+	-- Return message if none is found
+	mw.log('Unknown localisation entry: ', country)
+	return nil, 'Unknown localisation entry "[[lpcommons:Module:Flags/MasterData' ..
+			'|' .. country .. ']]"[[Category:Pages with unknown countries]]'
+end
+
+-- supported args are:
+-- @country	- country name, flag code, or alias of the Flag
+-- @hideError	- boolean that decides if there should be a displayed error
+-- if no entry is found but a country input was made
+-- @simpleError	- boolean that decides if displayed error should be simple or detailed
+function Flags.localisationTemplate(args)
+	args = args or {}
+	local display, error = Flags.getLocalisation(args.country)
+
+	if not error or Logic.readBool(args.hideError) then
+		return display
+	end
+
+	if Logic.readBool(args.simpleError) then
+		return 'error'
+	end
+
+	return error
 end
 
 function Flags.languageIcon(args, langName)
@@ -112,6 +161,7 @@ function Flags.CountryCode(flagName, format)
 		if format == 'alpha3' then
 			return Flags._getAlpha3CodesByKey()[flagKey] or Flags._getLanguage3LetterCodesByKey()[flagKey]
 		else
+			flagKey = MasterData.iso31662[flagKey] or flagKey
 			return Flags._getAlpha2CodesByKey()[flagKey] or Flags._getLanguageCodesByKey()[flagKey]
 		end
 	end

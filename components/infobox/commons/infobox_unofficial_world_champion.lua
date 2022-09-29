@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local BasicInfobox = require('Module:Infobox/Basic')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -45,14 +47,14 @@ function UnofficialWorldChampion:createInfobox()
 				if not String.isEmpty(args['gained date']) then
 					local contentCell
 					if not (String.isEmpty(args['gained against result']) or String.isEmpty(args['gained against'])) then
-						contentCell = args['gained against result'] ..  ' vs ' .. args['gained against']
+						contentCell = args['gained against result'] .. ' vs ' .. args['gained against']
 					elseif not String.isEmpty(args['gained against result']) then
-						contentCell = args['gained against result'] ..  ' vs Unknown'
+						contentCell = args['gained against result'] .. ' vs Unknown'
 					elseif not String.isEmpty(args['gained against']) then
 						contentCell = ' vs ' .. args['gained against']
 					end
 					return {
-						Title{name = 'Title gained'},
+						Title{name = 'Title Gained'},
 						Cell{
 							name = args['gained date'],
 							content = { contentCell },
@@ -61,7 +63,7 @@ function UnofficialWorldChampion:createInfobox()
 				end
 			end
 		},
-		Title{name = 'Most defences'},
+		Title{name = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
 			content = { args['most defences'] },

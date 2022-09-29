@@ -6,19 +6,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Item = require('Module:Infobox/Item')
-local String = require('Module:StringUtils')
-local Namespace = require('Module:Namespace')
-local Icon = require('Module:Icon')
-local Table = require('Module:Table')
-local ItemIcon = require('Module:ItemIcon')
 local Class = require('Module:Class')
+local Icon = require('Module:Icon')
+local ItemIcon = require('Module:ItemIcon')
+local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Center = require('Module:Infobox/Widget/Center')
-local Title = require('Module:Infobox/Widget/Title')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Item = Lua.import('Module:Infobox/Item', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Breakdown = Widgets.Breakdown
 
 local CustomItem = Class.new()
 

@@ -279,8 +279,8 @@ function TournamentsSummaryTable.manualUpcomingRow(args)
 	end
 
 	local eventInformation = {
-		pagename  = pageName,
-		tickername = args.tickername  or args.display or pageName,
+		pagename = pageName,
+		tickername = args.tickername or args.display or pageName,
 		startdate = TournamentsSummaryTable._dateDisplay(args.estimated_start or args.startdate),
 		enddate = TournamentsSummaryTable._dateDisplay(args.estimated_end or args.enddate),
 		icon = args.icon,

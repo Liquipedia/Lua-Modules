@@ -8,16 +8,19 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local GameAppearances = require('Module:GetGameAppearances')
 local HeroIcon = require('Module:HeroIcon')
-local Player = require('Module:Infobox/Person')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local GameAppearances = require('Module:GetGameAppearances')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local _ROLES = {
 	-- Players

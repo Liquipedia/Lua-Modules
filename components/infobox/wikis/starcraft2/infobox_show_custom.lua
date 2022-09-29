@@ -7,10 +7,14 @@
 --
 
 local Class = require('Module:Class')
-local Show = require('Module:Infobox/Show')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Show = Lua.import('Module:Infobox/Show', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomShow = Class.new()
 

@@ -7,13 +7,15 @@
 --
 
 local Class = require('Module:Class')
-local InfoboxBasic = require('Module:Infobox/Basic')
+local Flags = require('Module:Flags')
 local Links = require('Module:Links')
 local Locale = require('Module:Locale')
-local Flags = require('Module:Flags')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Table = require('Module:Table')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -25,7 +27,7 @@ local Builder = Widgets.Builder
 
 local Language = mw.language.new('en')
 
-local Company = Class.new(InfoboxBasic)
+local Company = Class.new(BasicInfobox)
 
 local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
@@ -48,7 +50,7 @@ function Company:createInfobox()
 		Center{content = {args.caption}},
 		Title{name = 'Company Information'},
 		Cell{
-			name = 'Parent company',
+			name = 'Parent Company',
 			content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
 		},
 		Cell{name = 'Founded', content = {args.foundeddate},},
@@ -59,7 +61,7 @@ function Company:createInfobox()
 		},
 		Cell{name = 'Headquarters', content = {args.headquarters}},
 		Cell{name = 'Employees', content = {args.employees}},
-		Cell{name = 'Traded as', content = {args.tradedas}},
+		Cell{name = 'Trades as', content = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
@@ -67,7 +69,7 @@ function Company:createInfobox()
 					infobox:categories('Tournament organizers')
 					return {
 						Cell{
-							name = 'Total prize money',
+							name = 'Total Prize Money',
 							content = {self:_getOrganizerPrizepools()}
 						}
 					}

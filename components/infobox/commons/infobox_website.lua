@@ -7,9 +7,11 @@
 --
 
 local Class = require('Module:Class')
-local BasicInfobox = require('Module:Infobox/Basic')
-local Links = require('Module:Links')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -40,10 +42,10 @@ function Website:createInfobox()
 		Center{content = {args.caption}},
 		Title{name = 'Website Information'},
 		Cell{name = 'Type', content = {args.type}},
-		Cell{name = 'Available language(s)', content = self:getAllArgsForBase(args, 'language')},
-		Cell{name = 'Content license', content = {args.content_license}},
+		Cell{name = 'Available Language(s)', content = self:getAllArgsForBase(args, 'language')},
+		Cell{name = 'Content License', content = {args.content_license}},
 		Cell{name = 'Launched', content = {args.date_of_launch}},
-		Cell{name = 'Current status', content = {args.current_status}},
+		Cell{name = 'Current Status', content = {args.current_status}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
