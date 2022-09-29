@@ -45,7 +45,8 @@ local _ROLES = {
 	commentator = {category = 'Commentators', variable = 'Commentator', talent = true},
 	producer = {category = 'Producers', variable = 'Producer', talent = true},
 	streamer = {category = 'Streamers', variable = 'Streamer', talent = true},
-	interviewer = {category = 'Interviewers', variable = 'Interviewer', talent = true},}
+	interviewer = {category = 'Interviewers', variable = 'Interviewer', talent = true},
+}
 
 local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
