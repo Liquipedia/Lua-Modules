@@ -328,7 +328,6 @@ function Placement:_getLpdbData(...)
 			participantflag = opponentType == Opponent.solo and players.p1flag or nil,
 			participanttemplate = opponent.opponentData.template,
 			opponentindex = opponentIndex, -- Needed in SMW
-			opponenttype = opponentType,
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
@@ -343,13 +342,13 @@ function Placement:_getLpdbData(...)
 									and Opponent.toName{template = players.p1team, type = 'team'}
 									or nil,
 			}
-
 			-- TODO: We need to create additional LPDB Fields
-			-- match2 opponents (opponentname, opponenttemplate, opponentplayers, opponenttype)
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
 			-- lastvs match2 opponent (json?)
 		}
+
+		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
 
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 
