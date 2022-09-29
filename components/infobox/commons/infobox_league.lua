@@ -24,7 +24,6 @@ local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requ
 local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
 local MetadataGenerator = Lua.import('Module:MetadataGenerator', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 local TextSanitizer = Lua.import('Module:TextSanitizer', {requireDevIfEnabled = true})
@@ -498,7 +497,7 @@ function League:_createLocation(args)
 			content = content .. '[[Category:Unrecognised Country|' .. current .. ']]'
 
 		else
-			local countryName = Localisation.getCountryName(current)
+			local countryName = Flags.CountryName(current)
 			local displayText = currentLocation or countryName
 			if displayText == '' then
 				displayText = current
