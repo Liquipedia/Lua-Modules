@@ -34,20 +34,20 @@ local _LINK_DATA = {
 local Agents = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
-		self.root   :addClass('hide-mobile')
+		self.root:addClass('hide-mobile')
 		self.text = ''
 	end
 )
 
 function Agents:setLeft()
-	self.root   :css('float', 'left')
+	self.root	:css('float', 'left')
 				:css('margin-left', '10px')
 
 	return self
 end
 
 function Agents:setRight()
-	self.root   :css('float', 'right')
+	self.root	:css('float', 'right')
 				:css('margin-right', '10px')
 
 	return self
@@ -70,22 +70,22 @@ end
 local Score = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
-		self.table = self.root:tag('table'):css('line-height', '20px')
+		self.table = self.root:tag('table'):css('line-height', '20px'):css('text-align', 'center')
 		self.top = mw.html.create('tr')
 		self.bottom = mw.html.create('tr')
 	end
 )
 
 function Score:setLeft()
-	self.root   :css('float', 'left')
-				:css('margin-left', '5px')
+	self.root	:css('float', 'left')
+				:css('margin-left', '4px')
 
 	return self
 end
 
 function Score:setRight()
-	self.root   :css('float', 'right')
-				:css('margin-right', '5px')
+	self.root	:css('float', 'right')
+				:css('margin-right', '4px')
 
 	return self
 end
@@ -94,7 +94,7 @@ function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore:attr('rowspan', '2')
 			:css('font-size', '16px')
-			:css('width', '25px')
+			:css('width', '24px')
 			:wikitext(score or '')
 	self.top:node(mapScore)
 
@@ -103,9 +103,9 @@ end
 
 function Score:addTopRoundScore(side, score)
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('bracket-popup-body-match-sidewins')
+	roundScore	:addClass('bracket-popup-body-match-sidewins')
 				:css('color', self:_getSideColor(side))
-				:css('width', '7px')
+				:css('width', '12px')
 				:wikitext(score)
 	self.top:node(roundScore)
 	return self
@@ -113,9 +113,9 @@ end
 
 function Score:addBottomRoundScore(side, score)
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('bracket-popup-body-match-sidewins')
+	roundScore	:addClass('bracket-popup-body-match-sidewins')
 				:css('color', self:_getSideColor(side))
-				:css('width', '7px')
+				:css('width', '12px')
 				:wikitext(score)
 	self.bottom:node(roundScore)
 	return self
@@ -292,10 +292,10 @@ end
 function CustomMatchSummary._createHeader(frame, match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
 
 	return header
 end
@@ -317,6 +317,22 @@ function CustomMatchSummary._createBody(frame, match)
 		end
 	end
 
+	-- Add Match MVP(s)
+	if match.extradata.mvp then
+		local mvpData = match.extradata.mvp
+		if not Table.isEmpty(mvpData) and mvpData.players then
+			local mvp = MatchSummary.Mvp()
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
+			end
+			mvp:setPoints(mvpData.points)
+
+			body:addRow(mvp)
+		end
+
+	end
+
+	-- Add Map Veto
 	if match.extradata.mapveto then
 		local vetoData = match.extradata.mapveto
 		if vetoData then
@@ -402,7 +418,7 @@ function CustomMatchSummary._createMap(frame, game)
 	row:addElement(score1:create())
 
 	local centerNode = mw.html.create('div')
-	centerNode  :addClass('brkts-popup-spaced')
+	centerNode	:addClass('brkts-popup-spaced')
 				:wikitext('[[' .. game.map .. ']]')
 				:css('width', '100px')
 				:css('text-align', 'center')

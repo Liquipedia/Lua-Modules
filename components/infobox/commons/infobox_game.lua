@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local BasicInfobox = require('Module:Infobox/Basic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -38,7 +40,7 @@ function Game:createInfobox()
 		Center{content = {args.caption}},
 		Title{name = 'Game Information'},
 		Cell{name = 'Developer', content = self:getAllArgsForBase(args, 'developer')},
-		Cell{name = 'Release Dates', content = self:getAllArgsForBase(args, 'releasedate')},
+		Cell{name = 'Release Date(s)', content = self:getAllArgsForBase(args, 'releasedate')},
 		Cell{name = 'Platforms', content = self:getAllArgsForBase(args, 'platform')},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},

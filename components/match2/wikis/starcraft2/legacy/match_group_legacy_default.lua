@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = {}
+local MatchGroupLegacyDefault = {}
 
 local Lua = require("Module:Lua")
 local Logic = require("Module:Logic")
@@ -16,7 +16,7 @@ local config = Lua.moduleExists("Module:Match/Config") and require("Module:Match
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 
 local roundData
-function p.get(templateid, bracketType)
+function MatchGroupLegacyDefault.get(templateid, bracketType)
 	local LowerHeader = {}
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
 
@@ -25,7 +25,8 @@ function p.get(templateid, bracketType)
 	roundData = roundData or {}
 	local lastround = 0
 	for _, match in ipairs(matches) do
-		bracketData, lastround, LowerHeader = p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
+		bracketData, lastround, LowerHeader =
+			MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	end
 
 	-- add reference for map mappings
@@ -48,7 +49,7 @@ function p.get(templateid, bracketType)
 end
 
 local lastRound
-function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
+function MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	local id = String.split(match.match2id, "_")[2] or match.match2id
 	id = id:gsub("0*([1-9])", "%1"):gsub("%-", "")
 	local bd = match.match2bracketdata
@@ -143,7 +144,7 @@ function p.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 		["$flatten$"] = { "R" .. round.R .. "G" .. round.G .. "details" }
 	}
 
-	bracketData[id] = p.addMaps(match)
+	bracketData[id] = MatchGroupLegacyDefault.addMaps(match)
 	lastRound = round
 	roundData[round.R] = round
 
@@ -157,7 +158,7 @@ parameter format of the old bracket
 ]]--
 
 --this can be used for custom mappings too
-function p.addMaps(match)
+function MatchGroupLegacyDefault.addMaps(match)
 	for mapIndex = 1, MAX_NUM_MAPS do
 		match["map" .. mapIndex] = {
 			["$ref$"] = "map",
@@ -168,7 +169,7 @@ function p.addMaps(match)
 end
 
 --this is for custom mappings
-function p.matchMappingFromCustom(data)
+function MatchGroupLegacyDefault.matchMappingFromCustom(data)
 	--[[
 	data has the form {
 		opp1,
@@ -203,7 +204,7 @@ function p.matchMappingFromCustom(data)
 	if data.match and data.header then
 		mapping[data.match .. 'header'] = data.header
 	end
-	mapping = p.addMaps(mapping)
+	mapping = MatchGroupLegacyDefault.addMaps(mapping)
 
 	return mapping
 end
@@ -211,7 +212,7 @@ end
 --this is for custom mappings for Reset finals matches
 --it switches score2 into the place of score
 --and sets flatten to nil
-function p.matchResetMappingFromCustom(mapping)
+function MatchGroupLegacyDefault.matchResetMappingFromCustom(mapping)
 	local mapping3rd = mw.clone(mapping)
 	mapping3rd.opponent1.score = mapping.opponent1.score .. '2'
 	mapping3rd.opponent2.score = mapping.opponent2.score .. '2'
@@ -219,4 +220,4 @@ function p.matchResetMappingFromCustom(mapping)
 	return mapping3rd
 end
 
-return p
+return MatchGroupLegacyDefault

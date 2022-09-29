@@ -73,7 +73,8 @@ function Match.storeMatchGroup(matchRecords, options)
 		storePageVar = Logic.nilOr(options.storePageVar, false),
 		storeSmw = Logic.nilOr(options.storeSmw, true),
 	}
-	local LegacyMatch = (options.storeMatch1 or options.storeSmw) and Lua.requireIfExists('Module:Match/Legacy')
+	local LegacyMatch = (options.storeMatch1 or options.storeSmw)
+		and Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
 
 	matchRecords = Array.map(matchRecords, function(matchRecord)
 		local records = Match.splitRecordsByType(matchRecord)
@@ -321,8 +322,23 @@ function Match._prepareMatchRecordForStore(match)
 	match.match2bracketid = match.match2bracketid or match.bracketid
 	match.match2id = match.match2id or match.bracketid .. '_' .. match.matchid
 	match.section = Match._getSection()
+	match.extradata = Match._addCommonMatchExtradata(match)
 	Match.clampFields(match, Match.matchFields)
 end
+
+function Match._addCommonMatchExtradata(match)
+	local commonExtradata = {
+		comment = match.comment,
+		matchsection = match.matchsection,
+		timestamp = tonumber(match.timestamp),
+		timezoneid = match.timezoneId,
+		timezoneoffset = match.timezoneOffset,
+	}
+
+	return Table.merge(commonExtradata, match.extradata or {})
+end
+
+
 
 function Match._getSection()
 	local cleanHtml = function(rawString)
@@ -338,6 +354,7 @@ end
 
 function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 	gameRecord.parent = matchRecord.parent
+	gameRecord.tournament = matchRecord.tournament
 	Match.clampFields(gameRecord, Match.gameFields)
 end
 
@@ -409,6 +426,7 @@ Match.gameFields = Table.map({
 	'rounds',
 	'scores',
 	'subgroup',
+	'tournament',
 	'type',
 	'vod',
 	'walkover',

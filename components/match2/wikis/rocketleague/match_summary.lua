@@ -24,7 +24,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnable
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
-local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link=http://octane.gg/matches/'
+local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link=https://octane.gg/matches/'
 local _OCTANE_SUFFIX = '|Octane matchpage]]'
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
@@ -107,8 +107,8 @@ function Header:createScoreDisplay(opponent1, opponent2)
 		elseif opponent.extradata and opponent.extradata.additionalScores then
 			-- Match Series (Sets), show the series score
 			scoreText = (opponent.extradata.set1win and 1 or 0)
-					  + (opponent.extradata.set2win and 1 or 0)
-					  + (opponent.extradata.set3win and 1 or 0)
+					+ (opponent.extradata.set2win and 1 or 0)
+					+ (opponent.extradata.set3win and 1 or 0)
 		else
 			scoreText = OpponentDisplay.InlineScore(opponent)
 		end
@@ -132,7 +132,7 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	local scoreBoardNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 
-	if String.isNotEmpty(bestof) and isNotFinished then
+	if String.isNotEmpty(bestof) and bestof > 0 and isNotFinished then
 		return scoreBoardNode
 			:node(mw.html.create('span')
 				:css('line-height', '1.1')
@@ -169,7 +169,7 @@ function Header:createOpponent(opponent, opponentIndex)
 	return OpponentDisplay.BlockOpponent({
 		flip = opponentIndex == 1,
 		opponent = opponent,
-		overflow = 'wrap',
+		overflow = 'ellipsis',
 		teamStyle = 'short',
 	})
 		:addClass(opponent.type ~= 'solo'
@@ -178,12 +178,14 @@ function Header:createOpponent(opponent, opponentIndex)
 end
 
 function Header:create()
-	return self.root
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
 		:node(self.leftElementAdditional)
 		:node(self.leftElement)
-		:node(self.scoreBoard)
+	self.root:node(self.scoreBoard)
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
 		:node(self.rightElement)
 		:node(self.rightElementAdditional)
+	return self.root
 end
 
 

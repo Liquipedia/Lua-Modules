@@ -11,13 +11,14 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
+local TypeUtil = require('Module:TypeUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getTinyIcon = function() end,
+	getTinyIcon = function(_) end,
 }
 
 local html = mw.html
@@ -36,15 +37,20 @@ StarcraftMatchSummary.propTypes.MatchSummaryContainer = {
 }
 
 function StarcraftMatchSummary.MatchSummaryContainer(props)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
-	match.submatches = StarcraftMatchGroupUtil.mergeResetSubmatches(match, props.bracketId)
+	local options = {mergeBracketResetMatch = false}
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId, options)
+	local bracketResetMatch = match and match.bracketData.bracketResetMatchId
+		and MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, match.bracketData.bracketResetMatchId, options)
+
 	local MatchSummary = match.isFfa
 		and Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary
 		or StarcraftMatchSummary.MatchSummary
-	return MatchSummary({match = match, config = props.config})
+
+	return MatchSummary{match = match, bracketResetMatch = bracketResetMatch, config = props.config}
 end
 
 StarcraftMatchSummary.propTypes.MatchSummary = {
+	bracketResetMatch = TypeUtil.optional(StarcraftMatchGroupUtil.types.Match),
 	match = StarcraftMatchGroupUtil.types.Match,
 	config = 'table',
 }
@@ -52,6 +58,7 @@ StarcraftMatchSummary.propTypes.MatchSummary = {
 function StarcraftMatchSummary.MatchSummary(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.MatchSummary)
 	local match = props.match
+	local bracketResetMatch = props.bracketResetMatch
 
 	local propsConfig = props.config or {}
 	local config = {
@@ -59,21 +66,19 @@ function StarcraftMatchSummary.MatchSummary(props)
 	}
 
 	-- Compute offraces
-	if match.opponentMode == 'uniform' then
-		StarcraftMatchSummary.computeMatchOffraces(match)
-	else
-		for _, submatch in pairs(match.submatches) do
-			StarcraftMatchSummary.computeMatchOffraces(submatch)
-		end
+	StarcraftMatchSummary.computeOffraces(match)
+	if bracketResetMatch then
+		StarcraftMatchSummary.computeOffraces(bracketResetMatch)
 	end
 
 	return html.create('div')
 		:addClass('brkts-popup')
 		:addClass('brkts-popup-sc')
 		:addClass(match.opponentMode == 'uniform' and 'brkts-popup-sc-uniform-match' or 'brkts-popup-sc-team-match')
-		:node(StarcraftMatchSummary.Header({match = match, config = config}))
-		:node(StarcraftMatchSummary.Body({match = match}))
-		:node(StarcraftMatchSummary.Footer({match = match, showHeadToHead = match.headToHead}))
+		:node(StarcraftMatchSummary.Header{match = match, config = config})
+		:node(StarcraftMatchSummary.Body{match = match})
+		:node(bracketResetMatch and StarcraftMatchSummary.Body{match = bracketResetMatch, config = {isReset = true}} or nil)
+		:node(StarcraftMatchSummary.Footer{match = match, showHeadToHead = match.headToHead})
 end
 
 StarcraftMatchSummary.propTypes.Header = {
@@ -131,15 +136,21 @@ end
 
 StarcraftMatchSummary.propTypes.Body = {
 	match = StarcraftMatchGroupUtil.types.Match,
+	config = 'table?',
 }
 
 function StarcraftMatchSummary.Body(props)
 	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.Body)
+	local config = props.config or {}
 	local match = props.match
 
 	local body = html.create('div')
 		:addClass('brkts-popup-body')
 		:addClass('brkts-popup-sc-body')
+
+	if config.isReset then
+		body:node(StarcraftMatchSummary.ResetHeader())
+	end
 
 	-- Stream, date, and countdown
 	if match.dateIsExact then
@@ -245,10 +256,18 @@ function StarcraftMatchSummary.Game(game, config)
 			:wikitext(game.comment)
 	end
 
+	local serverNode
+	if (game.extradata or {}).server then
+		serverNode = html.create('div')
+			:addClass('brkts-popup-sc-game-comment')
+			:wikitext('Played server: ' .. game.extradata.server)
+	end
+
 	local gameNode = html.create('div')
 		:addClass('brkts-popup-sc-game')
 		:node(game.header and StarcraftMatchSummary.GameHeader({header = game.header}) or nil)
 		:node(bodyNode)
+		:node(serverNode)
 		:node(commentNode)
 
 	return gameNode
@@ -347,6 +366,13 @@ function StarcraftMatchSummary.GameHeader(props)
 		:wikitext(props.header)
 end
 
+function StarcraftMatchSummary.ResetHeader()
+	return html.create('div')
+		:addClass('brkts-popup-body-element brkts-popup-sc-veto-center')
+		:css('font-weight', 'bold')
+		:wikitext('Reset match')
+end
+
 StarcraftMatchSummary.propTypes.VetoHeader = {
 	header = 'string',
 }
@@ -410,7 +436,7 @@ function StarcraftMatchSummary.Footer(props)
 	if hasFooter then
 		local linksNode = StarcraftMatchExternalLinks.MatchExternalLinks({links = links})
 			:node(headToHeadNode)
-			:addClass('brkts-popup-sc-footer-links')
+			:addClass('brkts-popup-sc-footer-links vodlink')
 		return html.create('div')
 			:addClass('brkts-popup-footer')
 			:addClass('brkts-popup-sc-footer')
@@ -445,6 +471,16 @@ function StarcraftMatchSummary.OffraceIcons(races)
 	end
 
 	return racesNode
+end
+
+function StarcraftMatchSummary.computeOffraces(match)
+	if match.opponentMode == 'uniform' then
+		StarcraftMatchSummary.computeMatchOffraces(match)
+	else
+		for _, submatch in pairs(match.submatches) do
+			StarcraftMatchSummary.computeMatchOffraces(submatch)
+		end
+	end
 end
 
 --[[

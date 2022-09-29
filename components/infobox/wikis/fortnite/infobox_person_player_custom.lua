@@ -6,19 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Player = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
-local Class = require('Module:Class')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+local Abbreviation = require('Module:Abbreviation')
 local ActiveYears = require('Module:YearsActive')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local Role = require('Module:Role')
 local Region = require('Module:Region')
 local Math = require('Module:Math')
+local String = require('Module:StringUtils')
+local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
@@ -91,6 +95,13 @@ function CustomInjector:addCustomCells(widgets)
 			content = {currentYearEarnings}
 		},
 		Cell{name = 'Years active', content = {yearsActive}},
+		Cell{
+			name = Abbreviation.make(
+				'Epic Creator Code',
+				'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products'
+			),
+			content = {_args.creatorcode}
+		},
 	}
 end
 

@@ -6,15 +6,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local UnofficialWorldChampion = require('Module:Infobox/UnofficialWorldChampion')
-local String = require('Module:StringUtils')
-local RaceIcon = require('Module:RaceIcon')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Builder = require('Module:Infobox/Widget/Builder')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Lua = require('Module:Lua')
+local RaceIcon = require('Module:RaceIcon')
+local String = require('Module:StringUtils')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Builder = Widgets.Builder
+local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local CustomUnofficialWorldChampion = Class.new()
 

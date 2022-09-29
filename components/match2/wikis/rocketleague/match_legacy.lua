@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = {}
+local MatchLegacy = {}
 
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
@@ -14,20 +14,24 @@ local String = require("Module:StringUtils")
 local Table = require("Module:Table")
 local Variables = require("Module:Variables")
 
-function p.storeMatch(match2)
-	local match = p._convertParameters(match2)
+function MatchLegacy.storeMatch(match2, options)
+	local match = MatchLegacy._convertParameters(match2)
 
-	match.games = p.storeGames(match, match2)
+	if options.storeSmw then
+		MatchLegacy.storeMatchSMW(match, match2)
+	end
 
-	p.storeMatchSMW(match, match2)
+	if options.storeMatch1 then
+		match.games = MatchLegacy.storeGames(match, match2)
 
-	return mw.ext.LiquipediaDB.lpdb_match(
-		"legacymatch_" .. match2.match2id,
-		match
-	)
+		return mw.ext.LiquipediaDB.lpdb_match(
+			"legacymatch_" .. match2.match2id,
+			match
+		)
+	end
 end
 
-function p.storeMatchSMW(match, match2)
+function MatchLegacy.storeMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == "string" then streams = json.parse(streams) end
 	local icon = Variables.varDefault("tournament_icon")
@@ -60,10 +64,10 @@ function p.storeMatchSMW(match, match2)
 		"Has calendar description=" .. " - " .. Logic.emptyOr(match.opponent1, "TBD")
 			.. " vs " .. Logic.emptyOr(match.opponent2, "TBD") .. " on "
 			.. Logic.emptyOr(match.date, "TBD")
-	 })
+	})
 end
 
-function p.storeGames(match, match2)
+function MatchLegacy.storeGames(match, match2)
 	local games = ""
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game = Table.deepCopy(game)
@@ -87,7 +91,7 @@ function p.storeGames(match, match2)
 	return games
 end
 
-function p._convertParameters(match2)
+function MatchLegacy._convertParameters(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, "match2") then
@@ -146,4 +150,4 @@ function p._convertParameters(match2)
 	return match
 end
 
-return p
+return MatchLegacy

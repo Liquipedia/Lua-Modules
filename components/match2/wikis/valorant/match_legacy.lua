@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = {}
+local MatchLegacy = {}
 
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
@@ -17,20 +17,24 @@ local Variables = require("Module:Variables")
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
-function p.storeMatch(match2)
-	local match = p.convertParameters(match2)
+function MatchLegacy.storeMatch(match2, options)
+	local match = MatchLegacy._convertParameters(match2)
 
-	match.games = p.storeGames(match, match2)
+	if options.storeSmw then
+		MatchLegacy.storeMatchSMW(match, match2)
+	end
 
-	p.storeMatchSMW(match, match2)
+	if options.storeMatch1 then
+		match.games = MatchLegacy.storeGames(match, match2)
 
-	return mw.ext.LiquipediaDB.lpdb_match(
-		"legacymatch_" .. match2.match2id,
-		match
-	)
+		return mw.ext.LiquipediaDB.lpdb_match(
+			"legacymatch_" .. match2.match2id,
+			match
+		)
+	end
 end
 
-function p.storeMatchSMW(match, match2)
+function MatchLegacy.storeMatchSMW(match, match2)
 	local streams = match.stream or {}
 	if type(streams) == "string" then streams = json.parse(streams) end
 	local icon = Variables.varDefault("tournament_icon")
@@ -56,10 +60,10 @@ function p.storeMatchSMW(match, match2)
 		"Has exact time=" .. (Logic.readBool(match.dateexact) and "true" or "false"),
 		"Is featured match=" .. (Logic.readBool(match.extradata.featured) and "true" or "false"),
 		"Is finished=" .. (Logic.readBool(match.finished) and "true" or "false"),
-	 })
+	})
 end
 
-function p.storeGames(match, match2)
+function MatchLegacy.storeGames(match, match2)
 	local games = ""
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
@@ -142,7 +146,7 @@ function p.storeGames(match, match2)
 	return games
 end
 
-function p.convertParameters(match2)
+function MatchLegacy._convertParameters(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, "match2") then
@@ -167,15 +171,15 @@ function p.convertParameters(match2)
 	match.extradata.female = Variables.varDefault("female")
 	match.extradata.hidden = Logic.readBool(Variables.varDefault('match_hidden')) and '1' or '0'
 	match.extradata.cancelled = Logic.readBool(Variables.varDefault('cancelled')) and '1' or '0'
-	match.extradata.bestofx = tostring(match2.bestof or '')
-	match.extradata.maps = table.concat(p._getAllInGames(match2, 'map'), ',')
-	for index, vod in ipairs(p._getAllInGames(match2, 'vod')) do
+	match.extradata.bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or ''
+	match.extradata.maps = table.concat(MatchLegacy._getAllInGames(match2, 'map'), ',')
+	for index, vod in ipairs(MatchLegacy._getAllInGames(match2, 'vod')) do
 		match.extradata['vodgame'..index] = vod
 	end
 
 	local opponent1score = 0
 	local opponent2score = 0
-	local scores = p._getAllInGames(match2, 'scores')
+	local scores = MatchLegacy._getAllInGames(match2, 'scores')
 	for _, stringScore in pairs(scores) do
 		local score = json.parseIfString(stringScore)
 		opponent1score = opponent1score + (tonumber(score[1]) or 0)
@@ -185,15 +189,17 @@ function p.convertParameters(match2)
 	match.extradata.opponent2rounds = opponent2score
 
 	local bracketData = json.parseIfString(match2.match2bracketdata)
-	if type(bracketData) == "table" and bracketData.type == "bracket" and bracketData.header then
-		local headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
-		if not headerName or headerName == "" then
-			headerName = Variables.varDefault("match_legacy_header_name")
-		else
-			Variables.varDefine("match_legacy_header_name", headerName)
+	if type(bracketData) == "table" and bracketData.type == "bracket" then
+		local headerName
+		if bracketData.header then
+			headerName = (DisplayHelper.expandHeader(bracketData.header) or {})[1]
 		end
-		if headerName and headerName ~= "" then
+		if String.isEmpty(headerName) then
+			headerName = Variables.varDefault("match_legacy_header_name")
+		end
+		if String.isNotEmpty(headerName) then
 			match.header = headerName
+			Variables.varDefine("match_legacy_header_name", headerName)
 		end
 	end
 
@@ -247,7 +253,7 @@ function p.convertParameters(match2)
 	return match
 end
 
-function p._getAllInGames(match2, field)
+function MatchLegacy._getAllInGames(match2, field)
 	local ret = {}
 	for _, game2 in ipairs(match2.match2games or {}) do
 		table.insert(ret, game2[field])
@@ -255,4 +261,4 @@ function p._getAllInGames(match2, field)
 	return ret
 end
 
-return p
+return MatchLegacy

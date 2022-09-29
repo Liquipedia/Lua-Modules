@@ -7,7 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
+local Lua = require('Module:Lua')
+
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 local Header = Class.new(
 	Widget,
@@ -33,6 +35,10 @@ function Header:make()
 			self.size
 		)
 	}
+
+	if self.image then
+		mw.ext.SearchEngineOptimization.metaimage(self.image)
+	end
 
 	local subHeader = Header:_subHeader(self.subHeader)
 	if subHeader then
@@ -100,7 +106,7 @@ function Header:_makeSizedImage(imageName, fileName, size, mode)
 	end
 
 	local fullFileName = '[[File:' .. imageName .. '|center|' .. size .. ']]'
-	infoboxImage:wikitext(mw.getCurrentFrame():preprocess('{{#metaimage:' .. (fileName or '') .. '}}') .. fullFileName)
+	infoboxImage:wikitext(fullFileName)
 
 	return infoboxImage
 end
@@ -125,7 +131,7 @@ function Header:_createInfoboxButtons()
 	buttons:node(
 		mw.text.nowiki('[') ..
 		'[[' .. moduleTitle ..
-		'/doc|h]]' .. mw.text.nowiki(']')
+		'|h]]' .. mw.text.nowiki(']')
 	)
 
 	return buttons

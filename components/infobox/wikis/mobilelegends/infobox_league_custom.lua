@@ -6,15 +6,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Logic = require('Module:Logic')
-local PageLink = require('Module:Page')
-local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -38,12 +42,10 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
-		return {
-			Cell{name = 'Patch', content = {
-					CustomLeague._getPatchVersion()
-				}},
-			}
+	if id == 'sponsors' then
+		table.insert(widgets, Cell{name = 'Official Device', content = {_args.device}})
+	elseif id == 'gamesettings' then
+		return {Cell{name = 'Patch', content = {CustomLeague._getPatchVersion()}}}
 	elseif id == 'customcontent' then
 		if _args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
@@ -62,7 +64,7 @@ end
 
 function League:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier =  _args['moonton-sponsored'] == 'true' and 'true' or nil
+	lpdbData.publishertier = _args['moonton-sponsored'] == 'true' and 'true' or nil
 
 	return lpdbData
 end

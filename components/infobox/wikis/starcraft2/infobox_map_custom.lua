@@ -7,12 +7,16 @@
 --
 
 local Class = require('Module:Class')
-local Map = require('Module:Infobox/Map')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
-local String = require('Module:StringUtils')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomMap = Class.new()
 
@@ -85,12 +89,12 @@ function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomMap:getNameDisplay()
-	if String.isEmpty(_args.name) then
-		return CustomMap:_tlpdMap(_args.id, 'name')
+function CustomMap:getNameDisplay(args)
+	if String.isEmpty(args.name) then
+		return CustomMap:_tlpdMap(args.id, 'name')
 	end
 
-	return _args.name
+	return args.name
 end
 
 function CustomMap:addToLpdb(lpdbData)

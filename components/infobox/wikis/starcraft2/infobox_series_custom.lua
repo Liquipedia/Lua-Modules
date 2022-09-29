@@ -6,19 +6,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Series = require('Module:Infobox/Series')
 local Autopatch = require('Module:Automated Patch')
-local SeriesTotalPrize = require('Module:SeriesTotalPrize')
-local Tier = require('Module:Tier')
-local Json = require('Module:Json')
-local Variables = require('Module:Variables')
-local Namespace = require('Module:Namespace')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Builder = require('Module:Infobox/Widget/Builder')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
+local SeriesTotalPrize = require('Module:SeriesTotalPrize')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Tier = require('Module:Tier')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Builder = Widgets.Builder
+local Cell = Widgets.Cell
 
 local _TODAY = os.date('%Y-%m-%d', os.time())
 local _TIER_MODE_TYPES = 'types'
@@ -44,9 +49,12 @@ local _series
 
 function CustomSeries.run(frame)
 	local series = Series(frame)
-	series.createWidgetInjector = CustomSeries.createWidgetInjector
 	_args = series.args
 	_series = series
+
+	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+
+	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
 	return series:createInfobox(frame)
 end
@@ -59,22 +67,22 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Game version',
 		content = {
-			CustomSeries._getGameVersion(string.lower(_args.game or ''), _args.patch or '')
+			CustomSeries._getGameVersion(string.lower(_args.game or ''), _args.patch)
 		}
 	})
-	table.insert(widgets, Cell({
+	table.insert(widgets, Cell{
 		name = 'Server',
 		content = {_args.server}
-	}))
-	table.insert(widgets, Cell({
+	})
+	table.insert(widgets, Cell{
 		name = 'Type',
 		content = {_args.type}
-	}))
-	table.insert(widgets, Cell({
+	})
+	table.insert(widgets, Cell{
 		name = 'Format',
 		content = {_args.format}
-	}))
-	table.insert(widgets, Builder({
+	})
+	table.insert(widgets, Builder{
 		builder = function()
 			if _args.prizepooltot ~= 'false' then
 				return {
@@ -85,27 +93,9 @@ function CustomInjector:addCustomCells(widgets)
 				}
 			end
 		end
-	}))
+	})
 
 	CustomSeries._addCustomVariables()
-
-	return widgets
-end
-
-function CustomInjector:parse(id, widgets)
-	if id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {
-					CustomSeries._createLiquipediaTierDisplay(
-						_args.liquipediatier,
-						_args.liquipediatiertype or _args.tiertype
-					)
-				}
-			}
-		}
-	end
 
 	return widgets
 end
@@ -124,7 +114,7 @@ function CustomSeries._getSeriesPrizepools()
 end
 
 function CustomSeries._getGameVersion(game, patch)
-	local shouldUseAutoPatch = (_args.autopatch or '') ~= 'false'
+	local shouldUseAutoPatch = Logic.readBool(_args.autopatch or true)
 	local modName = _args.modname
 	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
 	local endPatch = _args.epatch
@@ -180,18 +170,17 @@ end
 function CustomSeries._addCustomVariables()
 	if
 		(not Namespace.isMain()) or
-		_args.disable_smw == 'true' or
-		_args.disable_lpdb == 'true' or
-		_args.disable_storage == 'true'
+		Logic.readBool(_args.disable_lpdb) or
+		Logic.readBool(_args.disable_storage)
 	then
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		--needed for e.g. External Cups Lists
 		local name = _args.name or mw.title.getCurrentTitle().text
 		Variables.varDefine('featured', _args.featured or '')
 		Variables.varDefine('headtohead', _args.headtohead or '')
-		Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-		Variables.varDefine('tournament_tiertype', _args.liquipediatiertype or _args.tiertype or '')
+		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
+		Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or '')
 		Variables.varDefine('tournament_mode', _args.mode or '1v1')
 		Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 		Variables.varDefine('tournament_shortname', _args.shortname or '')
@@ -234,7 +223,9 @@ function CustomSeries._validDateOr(...)
 end
 
 --function for custom tier handling
-function CustomSeries._createLiquipediaTierDisplay(tier, tierType)
+function CustomSeries.createLiquipediaTierDisplay()
+	local tier = _args.liquipediatier
+	local tierType = _args.liquipediatiertype
 	if String.isEmpty(tier) then
 		return nil
 	end

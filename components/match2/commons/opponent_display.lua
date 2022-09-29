@@ -16,23 +16,24 @@ local TypeUtil = require('Module:TypeUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
 
 local zeroWidthSpace = '&#8203;'
 
 local OpponentDisplay = {propTypes = {}, types = {}}
 
-OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket')
+OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid')
 
 --[[
 Display component for an opponent entry appearing in a bracket match.
 ]]
 OpponentDisplay.BracketOpponentEntry = Class.new(
-	function(self, opponent)
+	function(self, opponent, options)
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 
 		if opponent.type == 'team' then
-			self:createTeam(opponent.template or 'tbd')
+			self:createTeam(opponent.template or 'tbd', options)
 		elseif opponent.type == 'solo' then
 			self:createPlayer(opponent.players[1])
 		elseif opponent.type == 'literal' then
@@ -44,22 +45,17 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 	end
 )
 
-function OpponentDisplay.BracketOpponentEntry:createTeam(template)
-	local bracketStyleNode = OpponentDisplay.BlockTeamContainer({
-		overflow = 'ellipsis',
+function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
+	options = options or {}
+	local forceShortName = options.forceShortName
+
+	local opponentNode = OpponentDisplay.BlockTeamContainer({
 		showLink = false,
-		style = 'bracket',
+		style = forceShortName and 'short' or 'hybrid',
 		template = template,
 	})
-		:addClass('hidden-xs')
-	local shortStyleNode = OpponentDisplay.BlockTeamContainer({
-		overflow = 'hidden',
-		showLink = false,
-		style = 'short',
-		template = template,
-	})
-		:addClass('visible-xs')
-	self.content:node(bracketStyleNode):node(shortStyleNode)
+
+	self.content:node(opponentNode)
 end
 
 function OpponentDisplay.BracketOpponentEntry:createPlayer(player)
@@ -127,7 +123,11 @@ function OpponentDisplay.InlineOpponent(props)
 		return opponent.name or ''
 
 	elseif opponent.type == 'solo' then
-		return OpponentDisplay.PlayerInlineOpponent(props)
+		return PlayerDisplay.InlinePlayer{
+			player = opponent.players[1],
+			flip = props.flip,
+			dq = props.dq,
+		}
 
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
@@ -140,7 +140,9 @@ OpponentDisplay.propTypes.BlockOpponent = {
 	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
+	showPlayerTeam = 'boolean?',
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
+	abbreviateTbd = 'boolean?',
 }
 
 --[[
@@ -150,12 +152,14 @@ determined by its layout context, and not of the opponent.
 function OpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
 	local opponent = props.opponent
+	-- Default TBDs to not show links
+	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
 	if opponent.type == 'team' then
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
-			showLink = props.showLink,
+			showLink = showLink,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
@@ -171,7 +175,9 @@ function OpponentDisplay.BlockOpponent(props)
 			overflow = props.overflow,
 			player = opponent.players[1],
 			showFlag = props.showFlag,
-			showLink = props.showLink,
+			showLink = showLink,
+			showPlayerTeam = props.showPlayerTeam,
+			abbreviateTbd = props.abbreviateTbd
 		})
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
@@ -288,22 +294,43 @@ function OpponentDisplay.BlockTeam(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockTeam)
 	local style = props.style or 'standard'
 
-	local displayName = style == 'standard' and props.team.displayName
-		or style == 'short' and props.team.shortName
-		or style == 'bracket' and props.team.bracketName
+	local function createNameNode(name)
+		return mw.html.create('span'):addClass('name')
+			:wikitext(props.showLink ~= false and props.team.pageName
+				and '[[' .. props.team.pageName .. '|' .. name .. ']]'
+				or name
+			)
+	end
 
-	local nameNode = mw.html.create('span'):addClass('name')
-		:wikitext(props.showLink ~= false and props.team.pageName
-			and '[[' .. props.team.pageName .. '|' .. displayName .. ']]'
-			or displayName
-		)
-	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
+	local displayNameNode = createNameNode(props.team.displayName)
+	local bracketNameNode = createNameNode(props.team.bracketName)
+	local shortNameNode = createNameNode(props.team.shortName)
 
-	return mw.html.create('div'):addClass('block-team')
-		:addClass(props.showLink == false and 'block-team-hide-link' or nil)
+	local icon = props.showLink
+		and props.icon
+		or DisplayUtil.removeLinkFromWikiLink(props.icon)
+
+	local blockNode = mw.html.create('div'):addClass('block-team')
 		:addClass(props.flip and 'flipped' or nil)
-		:node(props.icon)
-		:node(nameNode)
+		:node(icon)
+
+	if style == 'standard' then
+		DisplayUtil.applyOverflowStyles(displayNameNode, props.overflow or 'ellipsis')
+		blockNode:node(displayNameNode)
+	elseif style == 'bracket' then
+		DisplayUtil.applyOverflowStyles(bracketNameNode, props.overflow or 'ellipsis')
+		blockNode:node(bracketNameNode)
+	elseif style == 'short' then
+		DisplayUtil.applyOverflowStyles(shortNameNode, props.overflow or 'ellipsis')
+		blockNode:node(shortNameNode)
+	elseif style == 'hybrid' then
+		DisplayUtil.applyOverflowStyles(bracketNameNode, 'ellipsis')
+		DisplayUtil.applyOverflowStyles(shortNameNode, 'hidden')
+		blockNode:node(bracketNameNode:addClass('hidden-xs'))
+		blockNode:node(shortNameNode:addClass('visible-xs'))
+	end
+
+	return blockNode
 end
 
 OpponentDisplay.propTypes.BlockLiteral = {

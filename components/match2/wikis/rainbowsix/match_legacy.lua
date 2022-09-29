@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = {}
+local MatchLegacy = {}
 
 local json = require("Module:Json")
 local Logic = require("Module:Logic")
@@ -17,20 +17,24 @@ local Variables = require("Module:Variables")
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
-function p.storeMatch(match2)
-	local match = p.convertParameters(match2)
+function MatchLegacy.storeMatch(match2, options)
+	local match = MatchLegacy._convertParameters(match2)
 
-	match.games = p.storeGames(match, match2)
+	if options.storeSmw then
+		MatchLegacy.storeMatchSMW(match, match2)
+	end
 
-	p.storeMatchSMW(match, match2)
+	if options.storeMatch1 then
+		match.games = MatchLegacy.storeGames(match, match2)
 
-	return mw.ext.LiquipediaDB.lpdb_match(
-		"legacymatch_" .. match2.match2id,
-		match
-	)
+		return mw.ext.LiquipediaDB.lpdb_match(
+			"legacymatch_" .. match2.match2id,
+			match
+		)
+	end
 end
 
-function p.storeMatchSMW(match, match2)
+function MatchLegacy.storeMatchSMW(match, match2)
 	local streams = json.parseIfString(match.stream or {})
 	local links = json.parseIfString(match.links or {})
 	local icon = Variables.varDefault("tournament_icon")
@@ -59,7 +63,7 @@ function p.storeMatchSMW(match, match2)
 	 })
 end
 
-function p.storeGames(match, match2)
+function MatchLegacy.storeGames(match, match2)
 	local games = ""
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
@@ -124,7 +128,7 @@ function p.storeGames(match, match2)
 	return games
 end
 
-function p.convertParameters(match2)
+function MatchLegacy._convertParameters(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, "match2") then
@@ -146,12 +150,12 @@ function p.convertParameters(match2)
 
 	local mvp = json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
-		match.extradata.mvp = table.concat(mvp.players, ",")
-		match.extradata.mvp = match.extradata.mvp .. ";" .. mvp.points
+		mvp.players = Table.mapValues(mvp.players, mw.ext.TeamLiquidIntegration.resolve_redirect)
+		match.extradata.mvp = table.concat(mvp.players, ",") .. ";" .. mvp.points
 	end
 
 	match.extradata.matchsection = extradata.matchsection
-	match.extradata.bestofx = tostring(match2.bestof)
+	match.extradata.bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	local bracketData = json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == "table" and bracketData.type == "bracket" then
 		local headerName
@@ -196,7 +200,7 @@ function p.convertParameters(match2)
 			local opponentplayers = {}
 			for i = 1,10 do
 				local player = opponentmatch2players[i] or {}
-				opponentplayers["p" .. i] = player.name or ""
+				opponentplayers["p" .. i] = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name or "")
 				opponentplayers["p" .. i .. "flag"] = player.flag or ""
 				opponentplayers["p" .. i .. "dn"] = player.displayname or ""
 			end
@@ -217,4 +221,4 @@ function p.convertParameters(match2)
 	return match
 end
 
-return p
+return MatchLegacy

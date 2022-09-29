@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 local Chronology = Class.new(
 	Widget,

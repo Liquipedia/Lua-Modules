@@ -1,8 +1,7 @@
 #!/bin/bash
 
-userAgent="GitHub Autodeploy Bot/1.0.0 (${LP_UA_EMAIL})"
-wikiBaseUrl='https://liquipedia.net/'
-luaFiles=$(find . -type f -name '*.lua')
+userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
+devWikis=('callofduty' 'rocketleague' 'teamfortress' 'commons')
 pat='\-\-\-\
 \-\- @Liquipedia\
 \-\- wiki=([^
@@ -14,8 +13,17 @@ gitCommitSubject=$(git log -1 --pretty='%h %s')
 
 declare -A loggedin
 
+if [[ -n "$1" ]]; then
+  luaFiles=$1
+else
+  luaFiles=$(find . -type f -name '*.lua')
+fi
+
 for luaFile in $luaFiles
 do
+  if [[ -n "$1" ]]; then
+    luaFile="./$luaFile"
+  fi
   echo "== Checking $luaFile =="
   fileContents=$(cat "$luaFile")
 
@@ -25,12 +33,19 @@ do
   then
     echo '...skipping - no magic comment found'
   else
-    echo '...magic comment found - updating wiki...'
     wiki="${BASH_REMATCH[1]}"
     page="${BASH_REMATCH[2]}"
+
+    if [[ ! ( ("${DEV_WIKI_BASIC_AUTH}" == "") || ("${devWikis[*]}" =~ ${wiki}) ) ]]; then
+        echo '...skipping - dev wiki not applicable...'
+        continue
+    fi
+
+    echo '...magic comment found - updating wiki...'
+
     echo "...wiki = $wiki"
     echo "...page = $page"
-    wikiApiUrl="${wikiBaseUrl}${wiki}/api.php"
+    wikiApiUrl="${WIKI_BASE_URL}/${wiki}/api.php"
     ckf="cookie_${wiki}.ck"
 
     if [[ ${loggedin[${wiki}]} != 1 ]]
@@ -45,6 +60,7 @@ do
           -d "format=json&action=query&meta=tokens&type=login" \
           -H "User-Agent: ${userAgent}" \
           -H 'Accept-Encoding: gzip' \
+          -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
           -X POST "$wikiApiUrl" \
           | gunzip \
           | jq ".query.tokens.logintoken" -r
@@ -53,12 +69,13 @@ do
         -s \
         -b "$ckf" \
         -c "$ckf" \
-        --data-urlencode "username=${LP_USER}" \
-        --data-urlencode "password=${LP_PASSWORD}" \
+        --data-urlencode "username=${WIKI_USER}" \
+        --data-urlencode "password=${WIKI_PASSWORD}" \
         --data-urlencode "logintoken=${loginToken}" \
-        --data-urlencode "loginreturnurl=https://liquipedia.net" \
+        --data-urlencode "loginreturnurl=${WIKI_BASE_URL}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
+        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "${wikiApiUrl}?format=json&action=clientlogin" \
         | gunzip \
         > /dev/null
@@ -76,6 +93,7 @@ do
         -d "format=json&action=query&meta=tokens" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
+        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "$wikiApiUrl" \
         | gunzip \
         | jq ".query.tokens.csrftoken" -r
@@ -93,12 +111,17 @@ do
         --data-urlencode "token=${editToken}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
+        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "${wikiApiUrl}?format=json&action=edit" \
         | gunzip
     )
     result=$(echo "$rawResult" | jq ".edit.result" -r)
     echo "DEBUG: ...${rawResult}"
-    echo "...${result}"
+    if [[ "${result}" == "Success" ]]; then
+      echo "...${result}"
+    else
+      exit 1
+    fi
 
     echo '...done'
     # Don't get rate limited
@@ -106,4 +129,4 @@ do
   fi
 done
 
-rm cookie_*
+rm -f cookie_*

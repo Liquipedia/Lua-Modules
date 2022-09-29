@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
-      - uses: leafo/gh-actions-lua@v8
+      - uses: leafo/gh-actions-lua@v9
         with:
           luaVersion: "5.1"
 
@@ -30,4 +30,5 @@ jobs:
         with:
           report_paths: 'report.xml'
           check_name: 'junit-report'
+          annotate_notice: false
 

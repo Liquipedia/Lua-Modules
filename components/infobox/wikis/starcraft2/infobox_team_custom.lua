@@ -6,51 +6,57 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Team = require('Module:Infobox/Team')
-local Json = require('Module:Json')
-local Variables = require('Module:Variables')
-local String = require('Module:StringUtils')
 local Achievements = require('Module:Achievements in infoboxes')
-local RaceIcon = require('Module:RaceIcon').getSmallIcon
-local Matches = require('Module:Upcoming ongoing and recent matches team/new')
-local Math = require('Module:Math')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Builder = require('Module:Infobox/Widget/Builder')
-local Center = require('Module:Infobox/Widget/Center')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Json = require('Module:Json')
+local Logic = require('Module:Logic')
+local Lpdb = require('Module:Lpdb')
+local Lua = require('Module:Lua')
+local MatchTicker = require('Module:MatchTicker/Participant')
+local Math = require('Module:Math')
+local Namespace = require('Module:Namespace')
+local RaceIcon = require('Module:RaceIcon')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Title = Widgets.Title
 
 local Condition = require('Module:Condition')
-
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local doStore = true
-local pagename = mw.title.getCurrentTitle().prefixedText
+local _doStore = true
 
 local CustomTeam = Class.new()
 
 local CustomInjector = Class.new(Injector)
-local Language = mw.language.new('en')
-
-local _team
+local _LANGUAGE = mw.language.new('en')
 
 local _earnings = 0
-local _earnings_by_players_while_on_team = 0
 local _EARNINGS_MODES = {team = 'team'}
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
-local _DISCARD_PLACEMENT = 99
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local _PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
+
+local _team
+local _args
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
+	_args = team.args
+
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
@@ -59,76 +65,58 @@ function CustomTeam.run(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell({
+	table.insert(widgets, Cell{
 		name = 'Gaming Director',
-		content = {_team.args['gaming director']}
-	}))
+		content = {_args['gaming director']}
+	})
 	return widgets
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		_earnings = CustomTeam.calculateEarnings(_team.args)
+		local earningsWhileOnTeam
+		_earnings, earningsWhileOnTeam = CustomTeam.calculateEarnings(_args)
 		local earningsDisplay
-		if _earnings == 0 then
-			earningsDisplay = nil
-		else
-			earningsDisplay = '$' .. Language:formatNum(_earnings)
+		if _earnings > 0 then
+			earningsDisplay = '$' .. _LANGUAGE:formatNum(_earnings)
 		end
 		local earningsFromPlayersDisplay
-		if _earnings_by_players_while_on_team == 0 then
-			earningsFromPlayersDisplay = nil
-		else
-			earningsFromPlayersDisplay = '$' .. Language:formatNum(_earnings_by_players_while_on_team)
+		if earningsWhileOnTeam > 0 then
+			earningsFromPlayersDisplay = '$' .. _LANGUAGE:formatNum(earningsWhileOnTeam)
 		end
 		return {
 			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
 			Cell{name = _PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
 		}
 	elseif id == 'achievements' then
-		local achievements, soloAchievements = CustomTeam.getAutomatedAchievements(pagename)
-		return {
-			Builder{
-				builder = function()
-					if achievements then
-						return {
-							Title{name = 'Achievements'},
-							Center{content = {achievements}},
-						}
-					end
-				end
-			},
-			Builder{
-				builder = function()
-					if soloAchievements then
-						return {
-							Title{name = 'Solo Achievements'},
-							Center{content = {soloAchievements}},
-						}
-					end
-				end
-			},
-			--need this ABOVE the history display and below the
-			--achievements display, hence moved it here
-			Builder{
-				builder = function()
-					local playerBreakDown = CustomTeam.playerBreakDown(_team.args)
-					if playerBreakDown.playernumber then
-						return {
-							Title{name = 'Player Breakdown'},
-							Cell{name = 'Number of players', content = {playerBreakDown.playernumber}},
-							Breakdown{content = playerBreakDown.display, classes = {'infobox-center'}}
-						}
-					end
-				end
-			}
-		}
+		local achievements, soloAchievements = CustomTeam.getAutomatedAchievements(_team.pagename)
+		widgets = {}
+		if achievements then
+			table.insert(widgets, Title{name = 'Achievements'})
+			table.insert(widgets, Center{content = {achievements}})
+		end
+
+		if soloAchievements then
+			table.insert(widgets, Title{name = 'Solo Achievements'})
+			table.insert(widgets, Center{content = {soloAchievements}})
+		end
+
+		--need this ABOVE the history display and below the
+		--achievements display, hence moved it here
+		local playerBreakDown = CustomTeam.playerBreakDown(_args)
+		if playerBreakDown.playernumber then
+			table.insert(widgets, Title{name = 'Player Breakdown'})
+			table.insert(widgets, Cell{name = 'Number of players', content = {playerBreakDown.playernumber}})
+			table.insert(widgets, Breakdown{content = playerBreakDown.display, classes = {'infobox-center'}})
+		end
+
+		return widgets
 	elseif id == 'history' then
 		local index = 1
-		while(not String.isEmpty(_team.args['history' .. index .. 'title'])) do
+		while(not String.isEmpty(_args['history' .. index .. 'title'])) do
 			table.insert(widgets, Cell{
-				name = _team.args['history' .. index .. 'title'],
-				content = {_team.args['history' .. index]}
+				name = _args['history' .. index .. 'title'],
+				content = {_args['history' .. index]}
 			})
 			index = index + 1
 		end
@@ -141,23 +129,21 @@ function CustomTeam:createWidgetInjector()
 end
 
 function CustomTeam:createBottomContent()
-	if doStore then
-		return tostring(Matches._get_ongoing({})) ..
-			tostring(Matches._get_upcoming({})) ..
-			tostring(Matches._get_recent({}))
+	if _doStore then
+		return MatchTicker.run({team = _team.pagename})
 	end
 end
 
 function CustomTeam:addToLpdb(lpdbData)
-	lpdbData.earnings = _earnings or 0
+	lpdbData.earnings = _earnings
 	lpdbData.region = nil
-	lpdbData.extradata.subteams = CustomTeam.listSubTeams()
+	lpdbData.extradata.subteams = CustomTeam._listSubTeams()
 	return lpdbData
 end
 
 function CustomTeam.getWikiCategories()
 	local categories = {}
-	if String.isNotEmpty(_team.args.disbanded) then
+	if String.isNotEmpty(_args.disbanded) then
 		table.insert(categories, 'Disbanded Teams')
 	end
 	return categories
@@ -166,11 +152,11 @@ end
 -- gets a list of sub/accademy teams of the team
 -- this data can be used in results queries to include
 -- results of accademy teams of the current team
-function CustomTeam.listSubTeams()
-	if String.isEmpty(_team.args.subteam) and String.isEmpty(_team.args.subteam1) then
+function CustomTeam._listSubTeams()
+	if String.isEmpty(_args.subteam) and String.isEmpty(_args.subteam1) then
 		return nil
 	end
-	local subTeams = Team:getAllArgsForBase(_team.args, 'subteam')
+	local subTeams = Team:getAllArgsForBase(_args, 'subteam')
 	local subTeamsToStore = {}
 	for index, subTeam in pairs(subTeams) do
 		subTeamsToStore['subteam' .. index] = mw.ext.TeamLiquidIntegration.resolve_redirect(subTeam)
@@ -180,11 +166,11 @@ end
 
 function CustomTeam.playerBreakDown(args)
 	local playerBreakDown = {}
-	local playernumber = tonumber(args.player_number or 0) or 0
-	local zergnumber = tonumber(args.zerg_number or 0) or 0
-	local terrannumbner = tonumber(args.terran_number or 0) or 0
-	local protossnumber = tonumber(args.protoss_number or 0) or 0
-	local randomnumber = tonumber(args.random_number or 0) or 0
+	local playernumber = tonumber(args.player_number) or 0
+	local zergnumber = tonumber(args.zerg_number) or 0
+	local terrannumbner = tonumber(args.terran_number) or 0
+	local protossnumber = tonumber(args.protoss_number) or 0
+	local randomnumber = tonumber(args.random_number) or 0
 	if playernumber == 0 then
 		playernumber = zergnumber + terrannumbner + protossnumber + randomnumber
 	end
@@ -194,16 +180,16 @@ function CustomTeam.playerBreakDown(args)
 		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
 			playerBreakDown.display = {}
 			if protossnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon({'p'}) .. ' ' .. protossnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'p'} .. ' ' .. protossnumber
 			end
 			if terrannumbner > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon({'t'}) .. ' ' .. terrannumbner
+				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'t'} .. ' ' .. terrannumbner
 			end
 			if zergnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon({'z'}) .. ' ' .. zergnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'z'} .. ' ' .. zergnumber
 			end
 			if randomnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon({'r'}) .. ' ' .. randomnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'r'} .. ' ' .. randomnumber
 			end
 		end
 	end
@@ -211,90 +197,73 @@ function CustomTeam.playerBreakDown(args)
 end
 
 function CustomTeam.getAutomatedAchievements(team)
-	local achievements = Achievements.team({team=team})
-	local achievementsSolo = Achievements.team_solo({team=team})
-	if achievements == '' then achievements = nil end
-	if achievementsSolo == '' then achievementsSolo = nil end
+	local achievements = String.nilIfEmpty(Achievements.team{team = team})
+	local achievementsSolo = String.nilIfEmpty(Achievements.team_solo{team = team})
 
 	return achievements, achievementsSolo
 end
 
 function CustomTeam.calculateEarnings(args)
-	if args.disable_smw == 'true' or args.disable_lpdb == 'true' or args.disable_storage == 'true'
-		or Variables.varDefault('disable_SMW_storage', 'false') == 'true'
-		or mw.title.getCurrentTitle().nsText ~= '' then
-			doStore = false
-			Variables.varDefine('disable_SMW_storage', 'true')
+	if
+		Logic.readBool(args.disable_lpdb) or
+		Logic.readBool(args.disable_storage) or
+		Logic.readBool(Variables.varDefault('disable_LPDB_storage')) or
+		(not Namespace.isMain())
+	then
+		_doStore = false
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
-		local earnings = CustomTeam.getEarningsAndMedalsData(pagename) or 0
+		local earnings, earningsWhileOnTeam = CustomTeam.getEarningsAndMedalsData(_team.pagename)
 		Variables.varDefine('earnings', earnings)
-		return earnings
+		return earnings, earningsWhileOnTeam
 	end
-	return 0
-end
 
-function CustomTeam._getLPDBrecursive(cond, query, queryType)
-	local data = {} -- get LPDB results in here
-	local count
-	local offset = 0
-	repeat
-		local additionalData = mw.ext.LiquipediaDB.lpdb(queryType, {
-			conditions = cond,
-			query = query,
-			offset = offset,
-			limit = 5000
-		})
-		count = #additionalData
-		-- Merging
-		for i, item in ipairs(additionalData or {}) do
-			data[offset + i] = item
-		end
-		offset = offset + count
-	until count ~= 5000
-
-	return data
+	return 0, 0
 end
 
 function CustomTeam.getEarningsAndMedalsData(team)
 	local query = 'liquipediatier, liquipediatiertype, placement, date, individualprizemoney, prizemoney, players'
 
-	local playerTeamConditions = ConditionTree(BooleanOperator.any):add({
-	})
+	local playerTeamConditions = ConditionTree(BooleanOperator.any)
 	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
-		playerTeamConditions:add({
+		playerTeamConditions:add{
 			ConditionNode(ColumnName('players_p' .. playerIndex .. 'team'), Comparator.eq, team),
-		})
+		}
 	end
 
 	local placementConditions = ConditionTree(BooleanOperator.any)
 	for _, item in pairs(_ALLOWED_PLACES) do
-		placementConditions:add({
+		placementConditions:add{
 			ConditionNode(ColumnName('placement'), Comparator.eq, item),
-		})
+		}
 	end
 
-	local conditions = ConditionTree(BooleanOperator.all):add({
+	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
-		ConditionTree(BooleanOperator.any):add({
+		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
-			ConditionTree(BooleanOperator.all):add({
+			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('players_type'), Comparator.eq, 'team'),
 				ConditionNode(ColumnName('participantlink'), Comparator.eq, team),
 				placementConditions,
-			}),
-		}),
-		ConditionTree(BooleanOperator.any):add({
+			},
+		},
+		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('participantlink'), Comparator.eq, team),
-			ConditionTree(BooleanOperator.all):add({
+			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('players_type'), Comparator.neq, 'team'),
 				playerTeamConditions
-			}),
-		}),
-	})
+			},
+		},
+	}
 
-	local data = CustomTeam._getLPDBrecursive(conditions:toString(), query, 'placement')
+	local queryParameters = {
+		conditions = conditions:toString(),
+		query = query,
+		order = 'weight desc, liquipediatier asc, placement asc',
+	}
 
 	local earnings = {}
 	local medals = {}
@@ -304,20 +273,20 @@ function CustomTeam.getEarningsAndMedalsData(team)
 	medals['total'] = {}
 	teamMedals['total'] = {}
 
-	if type(data[1]) == 'table' then
-		for _, item in pairs(data) do
-			--handle earnings
-			earnings, playerEarnings = CustomTeam._addPlacementToEarnings(earnings, playerEarnings, item)
+	local processPlacement = function(placement)
+		--handle earnings
+		earnings, playerEarnings = CustomTeam._addPlacementToEarnings(earnings, playerEarnings, placement)
 
-			--handle medals
-			local mode = (item.players or {}).type
-			if mode == 'solo' then
-				medals = CustomTeam._addPlacementToMedals(medals, item)
-			elseif mode == 'team' then
-				teamMedals = CustomTeam._addPlacementToMedals(teamMedals, item)
-			end
+		--handle medals
+		local mode = (placement.players or {}).type
+		if mode == 'solo' then
+			medals = CustomTeam._addPlacementToMedals(medals, placement)
+		elseif mode == 'team' then
+			teamMedals = CustomTeam._addPlacementToMedals(teamMedals, placement)
 		end
 	end
+
+	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
 
 	CustomTeam._setVarsFromTable(earnings)
 	CustomTeam._setVarsFromTable(medals)
@@ -327,24 +296,24 @@ function CustomTeam.getEarningsAndMedalsData(team)
 		earnings.team = {}
 	end
 
-	if doStore then
+	if _doStore then
 		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
 				type = 'total_earnings_players_while_on_team',
-				name = pagename,
+				name = _team.pagename,
 				information = playerEarnings,
 		})
 	end
-	_earnings_by_players_while_on_team = Math.round{playerEarnings or 0}
 
-	return Math.round{earnings.team.total or 0}
+	return Math.round{earnings.team.total or 0}, Math.round{playerEarnings or 0}
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 	local prizeMoney = data.prizemoney
-	local mode = (data.players or {}).type
+	data.players = data.players or {}
+	local mode = data.players.type
 	mode = _EARNINGS_MODES[mode]
 	if not mode then
-		prizeMoney = data.individualprizemoney
+		prizeMoney = data.individualprizemoney * CustomTeam._amountOfTeamPlayersInPlacement(data.players)
 		playerEarnings = playerEarnings + prizeMoney
 		mode = 'other'
 	end
@@ -360,8 +329,8 @@ function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 end
 
 function CustomTeam._addPlacementToMedals(medals, data)
-	local place = CustomTeam._Placements(data.placement)
-	if place ~= _DISCARD_PLACEMENT then
+	local place = CustomTeam._placements(data.placement)
+	if place then
 		if data.liquipediatiertype ~= 'Qualifier' then
 			local tier = data.liquipediatier or 'undefined'
 			if not medals[place] then
@@ -384,15 +353,24 @@ function CustomTeam._setVarsFromTable(table, prefix)
 	end
 end
 
-function CustomTeam._Placements(value)
-	value = (value or '') ~= '' and value or _DISCARD_PLACEMENT
-	value = mw.text.split(value, '-')[1]
-	if value ~= '1' and value ~= '2' and value ~= '3' then
-		value = _DISCARD_PLACEMENT
+function CustomTeam._placements(value)
+	value = mw.text.split(value or '', '-')[1]
+	if value == '1' or value == '2' then
+		return value
 	elseif value == '3' then
-		value = 'sf'
+		return 'sf'
 	end
-	return value
+end
+
+function CustomTeam._amountOfTeamPlayersInPlacement(players)
+	local amount = 0
+	for playerKey in Table.iter.pairsByPrefix(players, 'p') do
+		if players[playerKey .. 'team'] == _team.pagename then
+			amount = amount + 1
+		end
+	end
+
+	return amount
 end
 
 return CustomTeam

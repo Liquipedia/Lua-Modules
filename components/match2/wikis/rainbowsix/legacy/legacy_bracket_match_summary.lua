@@ -13,7 +13,7 @@
 ]]
 
 local Json = require('Module:Json')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 
 local LegacyBracketMatchSummary = {}
@@ -40,7 +40,7 @@ function LegacyBracketMatchSummary.convert(args)
 		args['map' .. index .. 'score2'] = mw.text.trim(score2 or '')
 		args['map' .. index .. 'score'] = nil
 		args['map' .. index .. 'finished'] = (args[prefix ..'win'] == 'skip' and 'skip') or
-											 (not String.isEmpty(args[prefix ..'win']) and 'true') or 'false'
+											(not String.isEmpty(args[prefix ..'win']) and 'true') or 'false'
 		args['map' .. index .. 'win'] = nil
 		index = index + 1
 	end

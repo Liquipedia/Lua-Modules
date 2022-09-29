@@ -121,24 +121,15 @@ function StarcraftMatchGroupInput._checkFinished(match)
 end
 
 function StarcraftMatchGroupInput._getTournamentVars(match)
-	match.noQuery = Variables.varDefault('disable_SMW_storage', 'false')
+	match.noQuery = Variables.varDefault('disable_LPDB_storage', 'false')
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
-	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
-	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
-	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_tickername'))
-	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
-	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
-	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
-	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_tier'))
-	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_tiertype'))
-	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	Variables.varDefine('headtohead', match.headtohead)
 	match.featured = Logic.emptyOr(match.featured, Variables.varDefault('featured'))
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
 	Variables.varDefine('bestof', match.bestof)
-	return match
+
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function StarcraftMatchGroupInput._getVodStuff(match)
@@ -168,8 +159,6 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	else
 		extradata = {
 			noQuery = match.noQuery,
-			matchsection = Variables.varDefault('matchsection'),
-			comment = match.comment,
 			featured = match.featured,
 			casters = match.casters,
 			headtohead = match.headtohead,
@@ -289,10 +278,6 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 				opponent.score = -1
 				match.finished = 'true'
 				match.resulttype = 'default'
-			elseif Logic.readBool(match.cancelled) then
-				match.resulttype = 'np'
-				match.finished = 'true'
-				opponent.score = -1
 			elseif _CONVERT_STATUS_INPUT[string.upper(opponent.score or '')] then
 				if string.upper(opponent.score) == 'W' then
 					match.winner = opponentIndex
@@ -313,8 +298,16 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 				opponent.score = tonumber(opponent.score or '') or
 					tonumber(opponent.sumscore) or -1
 				if opponent.score > bestof / 2 then
-					match.finished = Logic.nilOr(match.finished, 'true')
+					match.finished = Logic.emptyOr(match.finished, 'true')
 					match.winner = tonumber(match.winner or '') or opponentIndex
+				end
+			end
+
+			if Logic.readBool(match.cancelled) then
+				match.finished = 'true'
+				if String.isEmpty(match.resulttype) and String.isEmpty(opponent.score) then
+					match.resulttype = 'np'
+					opponent.score = opponent.score or -1
 				end
 			end
 		else
@@ -767,8 +760,9 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map.extradata = {
 		comment = map.comment or '',
 		header = map.header or '',
+		isSubMatch = 'false',
 		noQuery = match.noQuery,
-		isSubMatch = 'false'
+		server = map.server,
 	}
 
 	-- inherit stuff from match data
@@ -964,21 +958,13 @@ function StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
 end
 
 function StarcraftMatchGroupInput._processDefaultPlayerMapData(players, map, opponentIndex, participants)
-	local faction = string.lower(Logic.emptyOr(
+	map['t' .. opponentIndex .. 'p1race'] = Logic.emptyOr(
 		map['t' .. opponentIndex .. 'p1race'],
-		map['race' .. opponentIndex],
-		'u'
-	))
-	participants[opponentIndex .. '_1'] = {
-		faction = _FACTIONS[faction] or players[1].extradata.faction or 'u',
-		player = players[1].name
-	}
+		map['race' .. opponentIndex]
+	)
 
-	for playerIndex = 2, #players do
-		faction = string.lower(Logic.emptyOr(
-			map['t' .. opponentIndex .. 'p' .. playerIndex .. 'race'],
-			'u'
-		))
+	for playerIndex = 1, #players do
+		local faction = string.lower(map['t' .. opponentIndex .. 'p' .. playerIndex .. 'race'] or '')
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			faction = _FACTIONS[faction] or players[playerIndex].extradata.faction or 'u',
 			player = players[playerIndex].name
@@ -989,11 +975,12 @@ function StarcraftMatchGroupInput._processDefaultPlayerMapData(players, map, opp
 end
 
 function StarcraftMatchGroupInput._processArchonPlayerMapData(players, map, opponentIndex, participants)
-	local faction = string.lower(Logic.emptyOr(
+	local faction = Logic.emptyOr(
 		map['opponent' .. opponentIndex .. 'race'],
 		map['race' .. opponentIndex],
-		players[1].extradata.faction or 'u'
-	))
+		players[1].extradata.faction
+	)
+	faction = string.lower(faction or '')
 	participants[opponentIndex .. '_1'] = {
 		faction = _FACTIONS[faction] or 'u',
 		player = players[1].name
@@ -1035,7 +1022,7 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 					}
 				else
 					playerData[mapPlayer] = {
-						faction = _FACTIONS[string.lower(Logic.emptyOr(map[playerKey .. 'race'], 'u'))] or 'u',
+						faction = _FACTIONS[string.lower(map[playerKey .. 'race'] or '')],
 						position = playerIndex
 					}
 				end
@@ -1051,8 +1038,7 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 	for playerIndex, player in pairs(players) do
 		if player and playerData[player.name] then
 			numberOfParticipants = numberOfParticipants + 1
-			local faction = playerData[player.name].faction ~= 'u'
-				and playerData[player.name].faction
+			local faction = playerData[player.name].faction
 				or player.extradata.faction or 'u'
 			participants[opponentIndex .. '_' .. playerIndex] = {
 				faction = faction,

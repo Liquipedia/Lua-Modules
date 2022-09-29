@@ -6,17 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
-local String = require('Module:String')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Template = require('Module:Template')
 local TournamentNotability = require('Module:TournamentNotability')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -80,7 +84,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = maps})
 		end
 
-
 		if not String.isEmpty(args.team_number) then
 			table.insert(widgets, Title{name = 'Teams'})
 			table.insert(widgets, Cell{
@@ -88,13 +91,6 @@ function CustomInjector:parse(id, widgets)
 				content = {args.team_number}
 			})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool(args)}
-			},
-		}
 	end
 	return widgets
 end
@@ -133,43 +129,6 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	end
 
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
-
-	return content
-end
-
-function CustomLeague:_createPrizepool(args)
-	if String.isEmpty(args.prizepool) and
-		String.isEmpty(args.prizepoolusd) then
-			return nil
-	end
-
-	local content
-	local prizepool = args.prizepool
-	local prizepoolInUsd = args.prizepoolusd
-	local localCurrency = args.localcurrency
-
-	if String.isEmpty(prizepool) then
-		content = '$' .. prizepoolInUsd .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
-	else
-		if not String.isEmpty(localCurrency) then
-			content = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{localCurrency:lower(), prizepool = prizepool}
-			)
-		else
-			content = prizepool
-		end
-
-		if not String.isEmpty(prizepoolInUsd) then
-			content = content .. '<br>(≃ $' .. prizepoolInUsd .. ' ' ..
-				Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
-		end
-	end
-
-	if not String.isEmpty(prizepoolInUsd) then
-		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
-	end
 
 	return content
 end

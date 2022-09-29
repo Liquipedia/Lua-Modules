@@ -89,6 +89,11 @@ function Earnings.calculateForTeam(args)
 	if Logic.readBool(args.queryHistorical) then
 		for _, team in pairs(teams) do
 			local historicalNames = Team.queryHistoricalNames(team)
+
+			if not historicalNames then
+				return 0
+			end
+
 			for _, historicalTeam in pairs(historicalNames) do
 				table.insert(queryTeams, historicalTeam)
 			end
@@ -107,8 +112,8 @@ function Earnings.calculateForTeam(args)
 			.. ']])'
 	end
 	local teamConditions = '(' .. formatParicipant('participant', queryTeams) .. ' OR '
-		.. formatParicipant('extradata_participantteam',  queryTeams) .. ' OR '
-		.. formatParicipant('participantlink',  queryTeams) ..')'
+		.. formatParicipant('extradata_participantteam', queryTeams) .. ' OR '
+		.. formatParicipant('participantlink', queryTeams) ..')'
 	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
 end
 
@@ -208,7 +213,7 @@ function Earnings.divisionFactorPlayer(mode)
 		return 3
 	elseif mode == '2v2' then
 		return 2
-	elseif mode == '1v1' or mode == 'individual' then
+	elseif mode == '1v1' or mode == 'individual' or mode == 'award_individual' then
 		return 1
 	end
 

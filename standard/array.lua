@@ -22,11 +22,11 @@ end
 
 -- Creates a copy of an array with the same elements.
 function Array.copy(tbl)
-	local out_tbl = {}
-	for _, x in ipairs(tbl) do
-		table.insert(out_tbl, x)
+	local copy = {}
+	for _, element in ipairs(tbl) do
+		table.insert(copy, element)
 	end
-	return out_tbl
+	return copy
 end
 
 --[[
@@ -37,16 +37,16 @@ Array.sub({3, 5, 7, 11}, 2) -- returns {5, 7, 11}
 Array.sub({3, 5, 7, 11}, 2, 3) -- returns {5, 7}
 Array.sub({3, 5, 7, 11}, -2, -1) -- returns {7, 11}
 ]]
-function Array.sub(tbl, a, b)
-	if a < 0 then a = #tbl + 1 + a end
-	if not b then b = #tbl end
-	if b < 0 then b = #tbl + 1 + b end
+function Array.sub(tbl, startIndex, endIndex)
+	if startIndex < 0 then startIndex = #tbl + 1 + startIndex end
+	if not endIndex then endIndex = #tbl end
+	if endIndex < 0 then endIndex = #tbl + 1 + endIndex end
 
-	local out_tbl = {}
-	for i = a, b do
-		table.insert(out_tbl, tbl[i])
+	local subArray = {}
+	for index = startIndex, endIndex do
+		table.insert(subArray, tbl[index])
 	end
-	return out_tbl
+	return subArray
 end
 
 --[[
@@ -57,12 +57,12 @@ Example:
 Array.map({1, 2, 3}, function(x) return 2 * x end)
 -- returns {2, 4, 6}
 ]]
-function Array.map(elems, f)
-	local outElems = {}
-	for index, elem in ipairs(elems) do
-		table.insert(outElems, f(elem, index))
+function Array.map(elements, funct)
+	local mappedArray = {}
+	for index, element in ipairs(elements) do
+		table.insert(mappedArray, funct(element, index))
 	end
-	return outElems
+	return mappedArray
 end
 
 --[[
@@ -72,43 +72,43 @@ Example:
 Array.filter({1, 2, 3}, function(x) return x % 2 == 1 end)
 -- returns {1, 3}
 ]]
-function Array.filter(tbl, pred)
-	local out_tbl = {}
-	for i, x in ipairs(tbl) do
-		if pred(x, i) then
-			table.insert(out_tbl, x)
+function Array.filter(tbl, predicate)
+	local filteredArray = {}
+	for index, element in ipairs(tbl) do
+		if predicate(element, index) then
+			table.insert(filteredArray, element)
 		end
 	end
-	return out_tbl
+	return filteredArray
 end
 
 --[[
 Flattens an array of arrays into an array.
 ]]
 function Array.flatten(tbl)
-	local out_tbl = {}
+	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
 		if type(x) == 'table' then
 			for _, y in ipairs(x) do
-				table.insert(out_tbl, y)
+				table.insert(flattenedArray, y)
 			end
 		else
-			table.insert(out_tbl, x)
+			table.insert(flattenedArray, x)
 		end
 	end
-	return out_tbl
+	return flattenedArray
 end
 
-function Array.flatMap(tbl, f)
-	return Array.flatten(Array.map(tbl, f))
+function Array.flatMap(tbl, funct)
+	return Array.flatten(Array.map(tbl, funct))
 end
 
 --[[
 Whether all elements in an array satisfy a predicate.
 ]]
 function Array.all(tbl, predicate)
-	for _, elem in ipairs(tbl) do
-		if not predicate(elem) then
+	for _, element in ipairs(tbl) do
+		if not predicate(element) then
 			return false
 		end
 	end
@@ -119,8 +119,8 @@ end
 Whether any elements in an array satisfies a predicate.
 ]]
 function Array.any(tbl, predicate)
-	for _, elem in ipairs(tbl) do
-		if predicate(elem) then
+	for _, element in ipairs(tbl) do
+		if predicate(element) then
 			return true
 		end
 	end
@@ -131,10 +131,10 @@ end
 Finds the first element in an array satisfying a predicate. Returs nil if no
 element satisfies the predicate.
 ]]
-function Array.find(tbl, pred)
-	for ix, x in ipairs(tbl) do
-		if pred(x, ix) then
-			return x
+function Array.find(tbl, predicate)
+	for index, element in ipairs(tbl) do
+		if predicate(element, index) then
+			return element
 		end
 	end
 	return nil
@@ -152,18 +152,20 @@ Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 -- returns {{2}, {3, 7, 11}, {5, 13}},
 -- {1 = {5, 13}, 2 = {2}, 3 = {3, 7, 11}}
 ]]
-function Array.groupBy(tbl, f)
+function Array.groupBy(tbl, funct)
 	local groupsByKey = {}
 	local groups = {}
-	for _, x in ipairs(tbl) do
-		local y = f(x)
-		local group = groupsByKey[y]
-		if not group then
-			group = {}
-			groupsByKey[y] = group
-			table.insert(groups, group)
+	for _, xValue in ipairs(tbl) do
+		local yValue = funct(xValue)
+		if yValue then
+			local group = groupsByKey[yValue]
+			if not group then
+				group = {}
+				groupsByKey[yValue] = group
+				table.insert(groups, group)
+			end
+			table.insert(group, xValue)
 		end
-		table.insert(group, x)
 	end
 
 	return groups, groupsByKey
@@ -171,10 +173,10 @@ end
 
 -- Lexicographically compare two arrays.
 function Array.lexicalCompare(tblX, tblY)
-	for i = 1, math.min(#tblX, #tblY) do
-		if tblX[i] < tblY[i] then
+	for index = 1, math.min(#tblX, #tblY) do
+		if tblX[index] < tblY[index] then
 			return true
-		elseif tblX[i] > tblY[i] then
+		elseif tblX[index] > tblY[index] then
 			return false
 		end
 	end
@@ -215,27 +217,27 @@ Array.sortBy({
 -- }
 
 ]]
-function Array.sortBy(tbl, f, compare)
-	local tbl2 = Table.copy(tbl)
-	Array.sortInPlaceBy(tbl2, f, compare)
-	return tbl2
+function Array.sortBy(tbl, funct, compare)
+	local copy = Table.copy(tbl)
+	Array.sortInPlaceBy(copy, funct, compare)
+	return copy
 end
 
 --[[
 Like Array.sortBy, except that it sorts in place. Mutates the first argument.
 ]]
-function Array.sortInPlaceBy(tbl, f, compare)
+function Array.sortInPlaceBy(tbl, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
-	table.sort(tbl, function(x1, x2) return compare(f(x1), f(x2)) end)
+	table.sort(tbl, function(x1, x2) return compare(funct(x1), funct(x2)) end)
 end
 
 -- Reverses the order of elements in an array.
 function Array.reverse(tbl)
-	local out_tbl = {}
-	for i = #tbl, 1, -1 do
-		table.insert(out_tbl, tbl[i])
+	local reversedArray = {}
+	for index = #tbl, 1, -1 do
+		table.insert(reversedArray, tbl[index])
 	end
-	return out_tbl
+	return reversedArray
 end
 
 --[[
@@ -253,10 +255,10 @@ end
 Adds elements to the end of an array. The array is mutated in the process.
 ]]
 function Array.appendWith(tbl, ...)
-	local elems = Table.pack(...)
-	for i = 1, elems.n do
-		if elems[i] ~= nil then
-			table.insert(tbl, elems[i])
+	local elements = Table.pack(...)
+	for index = 1, elements.n do
+		if elements[index] ~= nil then
+			table.insert(tbl, elements[index])
 		end
 	end
 	return tbl
@@ -283,29 +285,29 @@ array is mutated in the process.
 ]]
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
-	for i = 1, arrays.n do
-		if type(arrays[i]) == 'table' then
-			for _, elem in ipairs(arrays[i]) do
-				table.insert(tbl, elem)
+	for index = 1, arrays.n do
+		if type(arrays[index]) == 'table' then
+			for _, element in ipairs(arrays[index]) do
+				table.insert(tbl, element)
 			end
-		elseif arrays[i] ~= nil then
-			table.insert(tbl, arrays[i])
+		elseif arrays[index] ~= nil then
+			table.insert(tbl, arrays[index])
 		end
 	end
 	return tbl
 end
 
 --[[
-Returns the array {f(1), f(2), f(3), ...}. Stops before the first nil value returned by f.
+Returns the array {funct(1), funct(2), funct(3), ...}. Stops before the first nil value returned by funct.
 
 Example:
 Array.mapIndexes(function(x) return x < 5 and x * x or nil end)
 -- returns {1, 4, 9, 16}
 ]]
-function Array.mapIndexes(f)
+function Array.mapIndexes(funct)
 	local arr = {}
-	for i = 1, math.huge do
-		local y = f(i)
+	for index = 1, math.huge do
+		local y = funct(index)
 		if y then
 			table.insert(arr, y)
 		else
@@ -319,11 +321,11 @@ end
 Returns the array {from, from + 1, from + 2, ..., to}.
 ]]
 function Array.range(from, to)
-	local elems = {}
-	for elem = from, to do
-		table.insert(elems, elem)
+	local elements = {}
+	for element = from, to do
+		table.insert(elements, element)
 	end
-	return elems
+	return elements
 end
 
 function Array.extractKeys(tbl)
@@ -350,9 +352,9 @@ Example:
 Array.forEach({4, 6, 8}, mw.log)
 -- Prints 4 1 6 2 8 3
 ]]
-function Array.forEach(elems, f)
-	for i, elem in ipairs(elems) do
-		f(elem, i)
+function Array.forEach(elements, funct)
+	for index, element in ipairs(elements) do
+		funct(element, index)
 	end
 end
 
@@ -377,8 +379,8 @@ function Array.reduce(array, operator, initialValue)
 		aggregate = array[1]
 	end
 
-	for i = initialValue ~= nil and 1 or 2, #array do
-		aggregate = operator(aggregate, array[i])
+	for index = initialValue ~= nil and 1 or 2, #array do
+		aggregate = operator(aggregate, array[index])
 	end
 	return aggregate
 end
@@ -387,12 +389,12 @@ end
 Computes the maximum element in an array according to a scoring function. Returns
 nil if the array is empty.
 ]]
-function Array.maxBy(array, f, compare)
+function Array.maxBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
 	local max, maxScore
 	for _, item in ipairs(array) do
-		local score = f(item)
+		local score = funct(item)
 		if max == nil or compare(maxScore, score) then
 			max = item
 			maxScore = score
@@ -412,12 +414,12 @@ end
 Computes the minimum element in an array according to a scoring function. Returns
 nil if the array is empty.
 ]]
-function Array.minBy(array, f, compare)
+function Array.minBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
 	local min, minScore
 	for _, item in ipairs(array) do
-		local score = f(item)
+		local score = funct(item)
 		if min == nil or compare(score, minScore) then
 			min = item
 			minScore = score

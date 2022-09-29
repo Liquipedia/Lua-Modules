@@ -13,8 +13,9 @@ bracket finder (and code generator) / matchlist code generator
 ]]--
 
 local Array = require('Module:Array')
-local Lua = require("Module:Lua")
-local WikiSpecific = require("Module:GetMatchGroupCopyPaste/wiki")
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki', {requireDevIfEnabled = true})
 local getArgs = require('Module:Arguments').getArgs
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -86,11 +87,11 @@ function copyPaste._getBracketData(templateid)
 	return bracketDataList
 end
 
-function copyPaste._getHeader(headerCode, customHeader, matchKey)
+function copyPaste._getHeader(headerCode, customHeader)
 	local header = ''
 
 	if not headerCode then
-		return header
+		return header, false
 	end
 
 	headerCode = mw.text.split(string.gsub(headerCode, '$', '!'), '!')
@@ -103,55 +104,62 @@ function copyPaste._getHeader(headerCode, customHeader, matchKey)
 	header = mw.text.split(header, ',')[1]
 
 	header = '\n\n' .. '<!-- ' .. header .. ' -->'
-		.. (customHeader and ('\n|' .. matchKey .. 'header=') or '')
 
-	return header
+	return header, customHeader
 end
 
 function copyPaste.bracket(frame, args)
 	if not args then
 		args = getArgs(frame)
 	end
-
-	local empty = args.empty == 'true'
-	local customHeader = args.customHeader == 'true'
-	local bestof = tonumber(args.bestof or 3) or 3
-	local opponents = tonumber(args.opponents or 2) or 2
-	local mode = WikiSpecific.getMode(args.mode)
+	local out
 
 	args.id = (args.id or '') and args.id or (args.template or '') and args.template or args.name or ''
 	args.id = string.gsub(string.gsub(args.id, '^Bracket/', ''), '^bracket/', '')
 	local templateid = BracketAlias[string.lower(args.id)] or args.id
 
-	local out = WikiSpecific.getStart(templateid, copyPaste.generateID(), 'bracket', args)
+	out, args = WikiSpecific.getStart(templateid, copyPaste.generateID(), 'bracket', args)
+
+	local empty = Logic.readBool(args.empty)
+	local customHeader = Logic.readBool(args.customHeader)
+	local bestof = tonumber(args.bestof) or 3
+	local opponents = tonumber(args.opponents) or 2
+	local mode = WikiSpecific.getMode(args.mode)
+	local headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
 
 	local bracketDataList = copyPaste._getBracketData(templateid)
 
+	local matchOut = ''
 	for index, bracketData in ipairs(bracketDataList) do
 		local matchKey = bracketData.matchKey
-		if matchKey == 'RxMTP' or matchKey == 'RxMBR' then
-			if args.extra == 'true' then
-				local header = ''
-				if matchKey == 'RxMTP' then
-					header = '\n\n' .. '<!-- Third Place Match -->' .. '\n|' .. matchKey .. 'header='
-				end
-				if empty then
-					out = out .. header .. '\n|' .. matchKey .. '='
-				else
-					out = out .. header .. '\n|' .. matchKey .. '=' .. WikiSpecific.getMatchCode(bestof, mode, index, opponents, args)
-				end
+		local header, hasHeaderEntryParam
+		if Logic.readBool(args.extra) and (matchKey == 'RxMTP' or matchKey == 'RxMBR') then
+			header = ''
+			hasHeaderEntryParam = customHeader
+			if matchKey == 'RxMTP' then
+				header = '\n\n' .. '<!-- Third Place Match -->'
 			end
-		else
+		elseif matchKey ~= 'RxMTP' and matchKey ~= 'RxMBR' then
+			header, hasHeaderEntryParam = copyPaste._getHeader(bracketData.header, customHeader)
+		end
+
+		if Logic.readBool(args.extra) or (matchKey ~= 'RxMTP' and matchKey ~= 'RxMBR') then
+			matchOut = matchOut .. header
+			if hasHeaderEntryParam and headersUpTop then
+				out = out .. '\n|' .. matchKey .. 'header='
+			elseif hasHeaderEntryParam then
+				matchOut = matchOut .. '\n|' .. matchKey .. 'header='
+			end
 			if empty then
-				out = out .. copyPaste._getHeader(bracketData.header, customHeader, matchKey) .. '\n|' .. matchKey .. '='
+				matchOut = matchOut .. '\n|' .. matchKey .. '='
 			else
-				out = out .. copyPaste._getHeader(bracketData.header, customHeader, matchKey).. '\n|' .. matchKey .. '=' ..
+				matchOut = matchOut .. '\n|' .. matchKey .. '=' ..
 					WikiSpecific.getMatchCode(bestof, mode, index, opponents, args)
 			end
 		end
 	end
 
-	out = out .. '\n}}'
+	out = out .. matchOut .. '\n}}'
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
@@ -159,26 +167,32 @@ function copyPaste.matchlist(frame, args)
 	if not args then
 		args = getArgs(frame)
 	end
+	local out
 
-	local empty = args.empty == 'true'
-	local customHeader = args.customHeader == 'true'
-	local bestof = tonumber(args.bestof or 3) or 3
-	local matches = tonumber(args.matches or 5) or 5
-	local opponents = tonumber(args.opponents or 2) or 2
+	out, args = WikiSpecific.getStart(nil, copyPaste.generateID(), 'matchlist', args)
+
+	local empty = Logic.readBool(args.empty)
+	local customHeader = Logic.readBool(args.customHeader)
+	local bestof = tonumber(args.bestof) or 3
+	local matches = tonumber(args.matches) or 5
+	local opponents = tonumber(args.opponents) or 2
 	local mode = WikiSpecific.getMode(args.mode)
+	local namedMatchParams = Logic.readBool(Logic.nilOr(args.namedMatchParams, true))
+	local headersUpTop = Logic.readBool(args.headersUpTop)
 
-	local out = WikiSpecific.getStart(nil, copyPaste.generateID(), 'matchlist', args)
-
+	local matchOut = ''
 	for index = 1, matches do
-		if customHeader then
+		if customHeader and headersUpTop then
 			out = out .. '\n|M' .. index .. 'header='
+		elseif customHeader then
+			matchOut = matchOut .. '\n|M' .. index .. 'header='
 		end
 
-		out = out .. '\n|M' .. index .. '=' ..
+		matchOut = matchOut .. '\n|' .. (namedMatchParams and ('M' .. index .. '=') or '') ..
 			(not empty and WikiSpecific.getMatchCode(bestof, mode, index, opponents, args) or '')
 	end
 
-	out = out .. '\n}}'
+	out = out .. matchOut .. '\n}}'
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
@@ -187,11 +201,12 @@ function copyPaste.singleMatch(frame, args)
 		args = getArgs(frame)
 	end
 
-	local bestof = tonumber(args.bestof or 3) or 3
-	local opponents = tonumber(args.opponents or 2) or 2
-	local mode = WikiSpecific.getMode(args.mode)
+	local out
+	out, args = WikiSpecific.getStart(nil, copyPaste.generateID(), 'singlematch', args)
 
-	local out = WikiSpecific.getStart(nil, copyPaste.generateID(), 'singlematch', args)
+	local bestof = tonumber(args.bestof) or 3
+	local opponents = tonumber(args.opponents) or 2
+	local mode = WikiSpecific.getMode(args.mode)
 
 	out = out .. '\n|' ..
 		WikiSpecific.getMatchCode(bestof, mode, 1, opponents, args)

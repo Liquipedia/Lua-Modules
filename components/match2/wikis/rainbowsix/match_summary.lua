@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -32,20 +33,21 @@ local _ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]
 local _ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
+	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
-	opl = {icon = 'File:OPL Icon.png', text = 'OPL Match Page'},
-	esl = {icon = 'File:ESL icon.png', text = 'Match page on ESL'},
+	opl = {icon = 'File:OPL_icon_lightmode.png', iconDark = 'File:OPL_icon_darkmode.png', text = 'OPL Match Page'},
+	esl = {
+		icon = 'File:ESL_2019_icon_lightmode.png',
+		iconDark = 'File:ESL_2019_icon_darkmode.png',
+		text = 'Match page on ESL'
+	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
-	lpl = {icon = 'File:LPL Play icon.png', text = 'Match page on LPL Play'},
+	lpl = {icon = 'File:LPL_Logo_lightmode.png', iconDark = 'File:LPL_Logo_darkmode.png', text = 'Match page on LPL Play'},
 	r6esports = {icon = 'File:Copa Elite Six icon.png', text = 'R6 Esports LATAM Match Page'},
 	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Operator Bans Class
 
@@ -135,7 +137,7 @@ function Score:setFirstRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins')
+	roundScore	:addClass('brkts-popup-body-match-sidewins')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -150,7 +152,7 @@ function Score:setSecondRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins')
+	roundScore	:addClass('brkts-popup-body-match-sidewins')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -165,7 +167,7 @@ function Score:setFirstOvertimeRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins-overtime')
+	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -180,7 +182,7 @@ function Score:setSecondOvertimeRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins-overtime')
+	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -346,15 +348,7 @@ function CustomMatchSummary.getByMatchId(args)
 			})
 		end
 
-		-- Match Vod + other links
-		local buildLink = function (linktype, link)
-			local icon, text = _LINK_DATA[linktype].icon, _LINK_DATA[linktype].text
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-
-		for linktype, link in pairs(match.links) do
-			footer:addElement(buildLink(linktype,link))
-		end
+		footer:addLinks(_LINK_DATA, match.links)
 
 		matchSummary:footer(footer)
 	end
@@ -366,9 +360,9 @@ function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
 	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
@@ -376,7 +370,7 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or match.timestamp ~= DateExt.epochZero then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -385,7 +379,7 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	--local matchPageElement = mw.html.create('center')
-	--matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+	--matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
 	--				:css('display', 'block')
 	--				:css('margin', 'auto')
 	--body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
@@ -503,7 +497,7 @@ function CustomMatchSummary._createMap(game)
 	row:addElement(team1Score:create())
 
 	local centerNode = mw.html.create('div')
-	centerNode  :addClass('brkts-popup-spaced')
+	centerNode	:addClass('brkts-popup-spaced')
 				:wikitext('[[' .. game.map .. ']]')
 				:css('text-align', 'center')
 				:css('padding','5px 2px')
@@ -529,7 +523,7 @@ function CustomMatchSummary._createMap(game)
 		row:addElement(comment)
 	end
 
-	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
+	row:addClass('brkts-popup-body-game'):css('font-size', '85%')
 
 	-- Winner/Loser backgrounds
 	if game.winner == 1 then

@@ -6,13 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Team = require('Module:Infobox/Team')
-local Variables = require('Module:Variables')
 local Class = require('Module:Class')
-local String = require('Module:String')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -58,9 +62,9 @@ end
 
 function CustomTeam:addToLpdb(lpdbData, args)
 	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = 'File:' .. args.teamcardimage
+		lpdbData.logo = args.teamcardimage
 	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = 'File:' .. args.image
+		lpdbData.logo = args.image
 	end
 
 	lpdbData.region = Variables.varDefault('region', '')

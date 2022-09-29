@@ -9,16 +9,20 @@
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PlayerExt = require('Module:Player/Ext')
-local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
+local Abbreviation = require('Module:Abbreviation')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft', {requireDevIfEnabled = true})
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getSmallIcon = function() end,
+	getSmallIcon = function(_) end,
 }
+
+local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 
 local html = mw.html
 
@@ -34,7 +38,9 @@ StarcraftPlayerDisplay.propTypes.BlockPlayer = {
 	player = StarcraftMatchGroupUtil.types.Player,
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
+	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
+	abbreviateTbd = 'boolean?',
 }
 
 --[[
@@ -47,7 +53,9 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 
 	local zeroWidthSpace = '&#8203;'
 	local nameNode = html.create(props.dq and 's' or 'span'):addClass('name')
-		:wikitext(props.showLink ~= false and player.pageName
+		:wikitext(
+			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
+			or props.showLink ~= false and player.pageName
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
 			or Logic.emptyOr(player.displayName, zeroWidthSpace)
 		)
@@ -64,11 +72,20 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 			:wikitext(StarcraftPlayerDisplay.Race(player.race))
 	end
 
+	local teamNode
+	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
+		teamNode = html.create('span')
+			:wikitext('&nbsp;')
+			:node(mw.ext.TeamTemplate.teampart(player.team))
+	end
+
 	return html.create('div'):addClass('block-player starcraft-block-player')
 		:addClass(props.flip and 'flipped' or nil)
+		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
 		:node(raceNode)
 		:node(nameNode)
+		:node(teamNode)
 end
 
 -- Called from Template:Player and Template:Player2

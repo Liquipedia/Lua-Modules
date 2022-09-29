@@ -6,12 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Player = require('Module:Infobox/Person')
-local Class = require('Module:Class')
-local Variables = require('Module:Variables')
-local Math = require('Module:Math')
 local ActiveYears = require('Module:YearsActive')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Math = require('Module:Math')
 local PlayersSignatureLegends = require('Module:PlayersSignatureLegends')
+local Variables = require('Module:Variables')
+
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 --role stuff tables
 local _ROLES = {

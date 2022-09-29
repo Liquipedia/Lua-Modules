@@ -15,6 +15,8 @@ function Lua.moduleExists(name)
 	if package.loaded[name] then
 		return true
 	else
+		-- Package.Searchers was renamed from Loaders in lua5.2, have support for both
+		---@diagnostic disable-next-line: deprecated
 		for _, searcher in ipairs(package.searchers or package.loaders) do
 			local loader = searcher(name)
 			if type(loader) == 'function' then
@@ -28,19 +30,15 @@ function Lua.moduleExists(name)
 	end
 end
 
-function Lua.requireIfExists(name, default)
+function Lua.requireIfExists(name, options)
 	if Lua.moduleExists(name) then
-		return require(name)
-	else
-		return default
+		return Lua.import(name, options)
 	end
 end
 
-function Lua.loadDataIfExists(name, default)
+function Lua.loadDataIfExists(name)
 	if Lua.moduleExists(name) then
 		return mw.loadData(name)
-	else
-		return default
 	end
 end
 
@@ -108,7 +106,17 @@ function Lua.invoke(frame)
 	frame.args.module = nil
 	frame.args.fn = nil
 
-	local flags = {dev = Logic.readBoolOrNil(frame.args.dev)}
+	local devEnabled = function(startFrame)
+		local currentFrame = startFrame
+		while currentFrame do
+			if Logic.readBoolOrNil(currentFrame.args.dev) ~= nil then
+				return Logic.readBool(currentFrame.args.dev)
+			end
+			currentFrame = currentFrame:getParent()
+		end
+	end
+
+	local flags = {dev = devEnabled(frame)}
 	return require('Module:FeatureFlag').with(flags, function()
 		local module = Lua.import('Module:' .. moduleName, {requireDevIfEnabled = true})
 		return module[fnName](frame)

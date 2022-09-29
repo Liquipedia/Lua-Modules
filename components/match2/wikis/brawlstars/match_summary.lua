@@ -34,8 +34,8 @@ local _ICONS = {
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
+	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 }
 
 
@@ -70,8 +70,8 @@ function Brawler:row(brawlerData, gameNumber, numberBrawlers, date)
 			:tag('td')
 				:node(mw.html.create('div')
 					:wikitext(Abbreviation.make(
-							'Game ' .. gameNumber,
-							(self.isBan and 'Bans' or 'Picks') .. ' in game ' .. gameNumber
+							'Set ' .. gameNumber,
+							(self.isBan and 'Bans' or 'Picks') .. ' in set ' .. gameNumber
 						)
 					)
 				)
@@ -184,9 +184,9 @@ function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
 	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
