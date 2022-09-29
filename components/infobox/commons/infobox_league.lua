@@ -497,7 +497,7 @@ function League:_createLocation(args)
 			content = content .. '[[Category:Unrecognised Country|' .. current .. ']]'
 
 		else
-			local countryName = Flags.getCountryName(current)
+			local countryName = Flags.CountryName(current)
 			local displayText = currentLocation or countryName
 			if displayText == '' then
 				displayText = current
