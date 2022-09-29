@@ -24,7 +24,6 @@ local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requ
 local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local Localisation = Lua.import('Module:Localisation', {requireDevIfEnabled = true})
 local MetadataGenerator = Lua.import('Module:MetadataGenerator', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 local TextSanitizer = Lua.import('Module:TextSanitizer', {requireDevIfEnabled = true})
