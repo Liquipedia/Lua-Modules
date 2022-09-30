@@ -245,12 +245,7 @@ function CustomPrizePool._placementToTournamentExtradata(entries)
 end
 
 function CustomPrizePool._entryToTournamentExtradata(prefix, entry)
-	local opponent = StarcraftOpponent.fromLpdbStruct{
-		opponentplayers = entry.players or {},
-		opponenttype = entry.opponenttype,
-		opponentname = entry.participantlink,
-		template = entry.participanttemplate,
-	}
+	local opponent = StarcraftOpponent.fromLpdbStruct(entry)
 
 	local function toLink(player)
 		return player.pageName
