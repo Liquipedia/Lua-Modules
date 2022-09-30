@@ -21,6 +21,7 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
+local Import = Lua.import('Module:PrizePool/Import', {requireDevIfEnabled = true})
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
 local SmwInjector = Lua.import('Module:Smw/Injector', {requireDevIfEnabled = true})
@@ -396,6 +397,7 @@ function PrizePool:create()
 	self.options = self:_readConfig(self.args)
 	self.prizes = self:_readPrizes(self.args)
 	self.placements = self:_readPlacements(self.args)
+	self.placements = Import.run(self.placements, self.args)
 
 	if self:_hasUsdPrizePool() then
 		self:setConfig('showUSD', true)
