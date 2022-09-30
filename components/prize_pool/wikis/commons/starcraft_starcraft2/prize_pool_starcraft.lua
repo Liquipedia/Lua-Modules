@@ -142,8 +142,11 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		lpdbData.type
 	)
 
-	if type(lpdbData.players) == 'table' then
-		lpdbData.players = StarcraftOpponent.toLpdbStruct(opponent.opponentData).opponentplayers
+	if type(lpdbData.opponentplayers) == 'table' then
+		lpdbData.opponentplayers = StarcraftOpponent.toLpdbStruct(opponent.opponentData).opponentplayers
+		-- following 2 lines as legacy support, to be removed once consumers are adjusted
+		lpdbData.players = Table.copy(lpdbData.opponentplayers)
+		lpdbData.players.type = lpdbData.opponenttype
 	end
 
 	if lpdbData.lastvs then
