@@ -78,11 +78,6 @@ function StarcraftLegacyPrizePool.run(frame)
 	newArgs['tournament name'] = header['tournament name']
 
 	-- import settings
-	if header.lpdb and header.lpdb ~= 'auto' then
-		newArgs.import = header.lpdb
-	end
-	newArgs.import = StarcraftLegacyPrizePool._enableImport(newArgs)
-
 	newArgs.importLimit = header.importLimit
 	header.tournament1 = header.tournament1 or header.tournament
 	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament') do
@@ -92,6 +87,10 @@ function StarcraftLegacyPrizePool.run(frame)
 	for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId') do
 		newArgs[key] = matchGroupId
 	end
+	if header.lpdb and header.lpdb ~= 'auto' then
+		newArgs.import = header.lpdb
+	end
+	newArgs.import = StarcraftLegacyPrizePool._enableImport(newArgs)
 
 	local newSlotIndex = 0
 	local currentPlace
