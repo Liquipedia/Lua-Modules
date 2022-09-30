@@ -51,11 +51,11 @@ end
 
 function MatchSubobjects.getPlayer(frame)
 	local args = Arguments.getArgs(frame)
-	return Json.stringify(MatchSubobjects.luaGetPlayer(frame, args))
+	return Json.stringify(MatchSubobjects.luaGetPlayer(args))
 end
 
-function MatchSubobjects.luaGetPlayer(frame, args)
-	return wikiSpec.processPlayer(frame, args)
+function MatchSubobjects.luaGetPlayer(args)
+	return wikiSpec.processPlayer(args)
 end
 
 local _ENTRY_POINT_NAMES = {'getMap', 'getPlayer', 'getRound'}
