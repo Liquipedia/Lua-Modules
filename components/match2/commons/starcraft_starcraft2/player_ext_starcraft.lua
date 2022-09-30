@@ -20,6 +20,8 @@ local globalVars = PlayerExt.globalVars
 
 local StarcraftPlayerExt = {}
 
+local DEFAULT_RACE = 'u'
+
 local allowedRaces = {
 	['p'] = 'p',
 	['protoss'] = 'p',
@@ -260,7 +262,7 @@ function StarcraftPlayerExt.saveToPageVars(player)
 	if player.flag then
 		globalVars:set(player.displayName .. '_flag', player.flag)
 	end
-	if player.race then
+	if player.race and player.race ~= DEFAULT_RACE then
 		globalVars:set(player.displayName .. '_race', player.race)
 	end
 end
