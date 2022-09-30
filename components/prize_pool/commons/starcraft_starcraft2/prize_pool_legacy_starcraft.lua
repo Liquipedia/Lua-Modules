@@ -139,7 +139,7 @@ function StarcraftLegacyPrizePool._enableImport(args)
 	local tournamentDate = Variables.varDefault('tournament_enddate',
 		Variables.varDefault('tournament_startdate'))
 	return Logic.nilOr(
-		Logic.readBoolOrNil(args.input),
+		Logic.readBoolOrNil(args.import),
 		args.tournament1,
 		args.matchGroupId1,
 		not tournamentDate or tournamentDate >= AUTOMATION_START_DATE
