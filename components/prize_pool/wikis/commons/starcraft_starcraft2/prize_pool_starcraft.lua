@@ -80,6 +80,7 @@ function CustomPrizePool.run(frame)
 
 	-- fixed setting
 	args.resolveRedirect = true
+	args.groupScoreDelimiter = '-'
 
 	-- stash seriesNumber
 	_series_number = CustomPrizePool._seriesNumber()
