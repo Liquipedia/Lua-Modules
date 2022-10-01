@@ -26,6 +26,7 @@ local TYPE_MODIFIER = {Online = 0.65}
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
+	args.groupScoreDelimiter = '-'
 	local prizePool = PrizePool(args):create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
