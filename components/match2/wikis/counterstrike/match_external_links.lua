@@ -201,7 +201,7 @@ return {
 	{
 		name = 'hltvlegacy',
 		icon = 'HLTV icon.png',
-		prefixLink = 'https://hltv.org/legacy/match/',
+		prefixLink = 'https://www.hltv.org/legacy/match/',
 		label = 'HLTV Matchpage',
 		stats = {'legacystats'}
 	},
@@ -215,7 +215,7 @@ return {
 	{
 		name = 'hltv',
 		icon = 'HLTV icon.png',
-		prefixLink = 'https://hltv.org/matches/',
+		prefixLink = 'https://www.hltv.org/matches/',
 		suffixLink = '/match',
 		label = 'HLTV Matchpage',
 		max = 2,
