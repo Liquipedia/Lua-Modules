@@ -434,6 +434,7 @@ function StarcraftMatchGroupInput._opponentInput(match)
 		-- Sort out extradata
 		opponent.extradata = {
 			advantage = opponent.advantage,
+			penalty = opponent.penalty,
 			score2 = opponent.score2,
 			isarchon = opponent.isarchon
 		}
@@ -469,7 +470,7 @@ function StarcraftMatchGroupInput._opponentInput(match)
 
 		--set initial opponent sumscore
 		opponent.sumscore =
-			tonumber(opponent.extradata.advantage or '') or ''
+			tonumber(opponent.extradata.advantage) or tonumber('-' .. (opponent.extradata.penalty or '')) or ''
 
 		local mode = _OPPONENT_MODE_TO_PARTIAL_MATCH_MODE[opponent.type]
 		if mode == '2' and Logic.readBool(opponent.extradata.isarchon) then
