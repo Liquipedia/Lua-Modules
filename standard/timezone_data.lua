@@ -45,7 +45,7 @@ return {
 	},
 	BOT = {
 		name = 'Bolivia Standard Time',
-		offset = {4, 0},
+		offset = {-4, 0},
 	},
 	BRST = {
 		name = 'Brasilia Summer Time',
