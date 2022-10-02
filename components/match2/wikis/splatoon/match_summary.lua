@@ -21,7 +21,7 @@ local WeaponIcon = require('Module:WeaponIcon')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local htmlCreate = mw.html.create
 
 local NUM_OPPONENTS = 2
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
@@ -376,7 +376,6 @@ function CustomMatchSummary._createCheckMark(showIcon)
 end
 
 function CustomMatchSummary._opponentWeaponsDisplay(props)
-	local displayElements = {}
 	local flip = props.flip
 
 	local displayElements = Array.map(props.data, function(weapon)
