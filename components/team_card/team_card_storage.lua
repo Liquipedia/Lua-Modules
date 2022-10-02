@@ -7,7 +7,9 @@
 --
 
 local Lua = require('Module:Lua')
+
 local Custom = Lua.import('Module:TeamCard/Custom', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local String = require('Module:StringUtils')
 -- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier Module
 local Qualifier = require('Module:TeamCard/Qualifier')
@@ -43,6 +45,12 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	-- Jsonify the json fields
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
 	lpdbData.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.players)
+
+	-- Store into the standardized lpdb fields
+	lpdbData.opponenttype = Opponent.team
+	lpdbData.opponentplayers = lpdbData.players
+	lpdbData.opponenttemplate = teamTemplateName
+	lpdbData.opponentname = lpdbData.participant
 
 	-- Name must match prize pool insertion
 	local storageName = Custom.getLpdbObjectName and Custom.getLpdbObjectName(team, lpdbPrefix)
