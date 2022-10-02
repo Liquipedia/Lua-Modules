@@ -27,7 +27,8 @@ local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
-local FEATURED_TIERS = {'S-Tier', 'A-Tier'}
+local S_TIER = 1
+local A_TIER = 2
 local MIN_EARNINGS_FOR_FEATURED = 200000
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -394,7 +395,10 @@ function matchFunctions.getEarnings(name, year)
 end
 
 function matchFunctions.isFeatured(match)
-	if Table.includes(FEATURED_TIERS, match.liquipediatier) then
+	if
+		tonumber(match.liquipediatier or '') == S_TIER
+		or tonumber(match.liquipediatier or '') == A_TIER
+	then
 		return true
 	end
 	if Logic.isNotEmpty(match.publishertier) then
