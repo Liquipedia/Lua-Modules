@@ -391,7 +391,7 @@ function matchFunctions.getEarnings(name, year)
 		return 0
 	end
 
-	return tonumber(EarningsOf._team(name, {sdate = year .. '-01-01', edate = year .. '-12-31'}))
+	return tonumber(EarningsOf._team(name, {sdate = (year-1) .. '-01-01', edate = year .. '-12-31'}))
 end
 
 function matchFunctions.isFeatured(match)
