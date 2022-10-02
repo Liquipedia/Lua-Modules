@@ -586,7 +586,7 @@ function mapFunctions.getParticipants(map, opponents)
 
 		for _, weapon, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'w') do
 			local participantsKey = opponentIndex .. '_' .. pickIndex
-			participants[participantsKey] = Table.merge(participants[participantsKey] 
+			participants[participantsKey] = Table.merge(participants[participantsKey]
 				or {}, {weapon = mapFunctions._cleanWeaponName(weapon)})
 			if maximumPickIndex < pickIndex then
 				maximumPickIndex = pickIndex
