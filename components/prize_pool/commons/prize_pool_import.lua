@@ -390,7 +390,7 @@ function Import._mergeEntry(lpdbEntry, entry, placement)
 		return entry
 	end
 
-	entry.date = nil
+	entry.date = lpdbEntry.date or entry.date
 
 	entry.opponentData = Import._removeTbdIdentifiers(entry.opponentData)
 	return Table.deepMergeInto(Import._entryToOpponent(lpdbEntry, placement), entry)
