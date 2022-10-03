@@ -37,14 +37,12 @@ function CustomTeam:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	return widgets
-end
-
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'In-Game Leader',
-		content = {_team.args.igl}
-	})
+	if id == 'staff' then
+		table.insert(widgets, Cell{
+			name = 'In-Game Leader',
+			content = {_team.args.igl}
+		})
+	end
 	return widgets
 end
 
