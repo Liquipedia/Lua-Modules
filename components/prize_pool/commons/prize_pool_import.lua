@@ -22,7 +22,7 @@ local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled 
 local TournamentUtil = Lua.import('Module:Tournament/Util', {requireDevIfEnabled = true})
 
 local AUTOMATION_START_DATE = '2023-01-01'
-local GROUPSCORE_DELIMITER = '-'
+local GROUPSCORE_DELIMITER = '/'
 local SCORE_STATUS = 'S'
 local DEFAULT_ELIMINATION_STATUS = 'down'
 local THIRD_PLACE_MATCH_ID = 'RxMTP'
