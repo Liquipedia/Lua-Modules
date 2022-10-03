@@ -49,7 +49,7 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 
 	-- Store into the standardized lpdb fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(Opponent.resolve(
-		Opponent.readOpponentArgs{type = Opponent.team, template = teamTemplateName})))
+		Opponent.readOpponentArgs{type = Opponent.team, template = teamTemplateName}), lpdbData.date))
 	lpdbData.opponentplayers = lpdbData.players -- Until this is included in Opponent
 
 	-- Name must match prize pool insertion
