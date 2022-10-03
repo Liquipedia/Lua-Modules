@@ -55,6 +55,7 @@ function StandingsStorage.table(data)
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
 
 	local extradata = {
+		enddate = data.enddate,
 		finished = data.finished,
 		hasdraw = data.hasdraw,
 		hasovertime = data.hasovertime,
