@@ -144,7 +144,7 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 				hasOvertime = record.hasOvertime,
 			}
 
-			if not record.extradata.placeRange and record.extradata.finished then
+			if not record.extradata.placeRange and Logic.readBool(record.extradata.finished) then
 				record.extradata.placeRange = {record.placement, record.placement}
 			end
 			if record.extradata.placeRange and record.extradata.placeRange[1] == record.extradata.placeRange[2] then
