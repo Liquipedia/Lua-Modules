@@ -38,14 +38,9 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'staff' then
-		return {
-			Cell{name = 'Founders',	content = {_team.args.founders}},
-			Cell{name = 'CEO', content = {_team.args.ceo}},
-			widgets[4],
-			widgets[5],
-			widgets[1],
-			Cell{name = 'Analysts', content = {_team.args.analysts}},
-		}
+		table.insert(widgets, 1, Cell{name = 'Founders', content = {_team.args.founders}})
+		table.insert(widgets, 2, Cell{name = 'CEO', content = {_team.args.ceo}})
+		table.insert(widgets, Cell{name = 'Analysts', content = {_team.args.analysts}})
 	end
 	return widgets
 end
