@@ -47,10 +47,8 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	lpdbData.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.players)
 
 	-- Store into the standardized lpdb fields
-	lpdbData.opponenttype = Opponent.team
-	lpdbData.opponentplayers = lpdbData.players
-	lpdbData.opponenttemplate = teamTemplateName
-	lpdbData.opponentname = lpdbData.participant
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(Opponent.resolve(Opponent.readOpponentArgs{type = Opponent.team, template = teamTemplateName})))
+	lpdbData.opponentplayers = lpdbData.players -- Until this is included in Opponent
 
 	-- Name must match prize pool insertion
 	local storageName = Custom.getLpdbObjectName and Custom.getLpdbObjectName(team, lpdbPrefix)
