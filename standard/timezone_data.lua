@@ -41,7 +41,7 @@ return {
 	},
 	AZT = {
 		name = 'Azerbaijan Time',
-		offset = {3, 0},
+		offset = {4, 0},
 	},
 	BOT = {
 		name = 'Bolivia Standard Time',
@@ -141,15 +141,15 @@ return {
 	},
 	IDT = {
 		name = 'Israel Daylight Time',
-		offset = {3, 00},
+		offset = {3, 0},
 	},
 	IRDT = {
-		name = 'Iran Standard Time',
-		offset = {3, 30},
-	},
-	IRST = {
 		name = 'Iran Daylight Time',
 		offset = {4, 30},
+	},
+	IRST = {
+		name = 'Iran Standard Time',
+		offset = {3, 30},
 	},
 	IST = {
 		name = 'Indian Standard Time',
@@ -247,11 +247,11 @@ return {
 	THA = {
 		abbr = 'ICT',
 		name = 'Indochina Time',
-		offset = {5, 0},
+		offset = {7, 0},
 	},
 	TJT = {
 		name = 'Tajikistan Time',
-		offset = {7, 0},
+		offset = {5, 0},
 	},
 	TMT = {
 		name = 'Turkmenistan Time',
