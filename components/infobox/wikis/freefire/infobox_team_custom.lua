@@ -41,9 +41,9 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Founders',	content = {_team.args.founders}},
 			Cell{name = 'CEO', content = {_team.args.ceo}},
-			Cell{name = 'Manager', content = {_team.args.manager}},
-			Cell{name = 'Team Captain', content = {_team.args.captain}},
-			Cell{name = 'Coaches', content = {_team.args.coaches}},
+			widgets[4],
+			widgets[5],
+			widgets[1],
 			Cell{name = 'Analysts', content = {_team.args.analysts}},
 		}
 	end
@@ -54,11 +54,11 @@ function CustomTeam:createBottomContent()
 	return Template.expandTemplate(
 		mw.getCurrentFrame(),
 		'Placement summary',
-		{team = _team.name or _team.pagename}
+		{team = _team.name}
 	) .. Template.expandTemplate(
 		mw.getCurrentFrame(),
 		'Upcoming and ongoing tournaments of',
-		{team = _team.name or _team.pagename}
+		{team = _team.name}
 	)
 end
 
