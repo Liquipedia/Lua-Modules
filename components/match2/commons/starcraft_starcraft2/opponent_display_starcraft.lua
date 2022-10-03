@@ -284,6 +284,11 @@ function StarcraftOpponentDisplay.InlineScore(opponent)
 			local title = 'Advantage of ' .. advantage .. ' game' .. (advantage > 1 and 's' or '')
 			return '<abbr title="' .. title .. '">' .. opponent.score .. '</abbr>'
 		end
+		local penalty = tonumber(opponent.extradata.penalty) or 0
+		if penalty > 0 then
+			local title = 'Penalty of ' .. penalty .. ' game' .. (penalty > 1 and 's' or '')
+			return '<abbr title="' .. title .. '">' .. opponent.score .. '</abbr>'
+		end
 	end
 
 	if Logic.readBool(opponent.extradata.noscore) then
