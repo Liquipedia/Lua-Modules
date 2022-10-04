@@ -8,19 +8,23 @@
 
 local p = {}
 
-local json = require('Module:Json')
+local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-function p.storeMatch(match2)
-	local match = p._convertParameters(match2)
+local MAX_NUM_PLAYERS = 10
 
-	match.games = p.storeGames(match, match2)
+function p.storeMatch(match2, options)
+	if options.storeMatch1 then
+		local match = p._convertParameters(match2)
 
-	return mw.ext.LiquipediaDB.lpdb_match(
-		'legacymatch_' .. match2.match2id,
-		match
-	)
+		match.games = p.storeGames(match, match2)
+
+		return mw.ext.LiquipediaDB.lpdb_match(
+			'legacymatch_' .. match2.match2id,
+			match
+		)
+	end
 end
 
 function p.storeGames(match, match2)
@@ -34,7 +38,7 @@ function p.storeGames(match, match2)
 		game.date = match.date
 		local scores = game.scores or {}
 		if type(scores) == 'string' then
-			scores = json.parse(scores)
+			scores = Json.parse(scores)
 		end
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
@@ -59,25 +63,25 @@ function p._convertParameters(match2)
 
 	-- Handle Opponents
 	local handleOpponent = function (index)
-		local prefix = 'opponent'..index
+		local prefix = 'opponent' .. index
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == 'team' then
 			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
-			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
-			for i = 1,10 do
+			for i = 1, MAX_NUM_PLAYERS do
 				local player = opponentmatch2players[i] or {}
 				opponentplayers['p' .. i] = player.name or ''
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
 				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
 			end
-			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
+			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
 		elseif opponent.type == 'solo' then
 			local player = opponentmatch2players[1] or {}
 			match[prefix] = player.name
-			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
-			match[prefix..'flag'] = player.flag
+			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			match[prefix .. 'flag'] = player.flag
 		elseif opponent.type == 'literal' then
 			match[prefix] = 'TBD'
 		end
