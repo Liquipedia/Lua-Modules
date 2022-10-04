@@ -174,7 +174,8 @@ _PREFIXES = Table.merge(_PREFIXES, CustomData.prefixes or {})
 
 local _SUFFIXES = {
 	iccup = '.html',
-	['faceit-c'] = '/event',
+	['faceit-c'] = '/',
+	['faceit-hub'] = '/',
 }
 
 _SUFFIXES = Table.merge(_SUFFIXES, CustomData.suffixes or {})
