@@ -278,6 +278,7 @@ function CustomPrizePool._entryToTournamentExtradata(prefix, entry)
 end
 
 function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
+	local extradata = Json.parseIfString(lpdbEntry.extradata) or {}
 	-- fix lastvs opponent stuff
 	if lpdbEntry.lastvs then
 		local lastVs = extradata.vsOpponent or {}
