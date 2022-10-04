@@ -57,47 +57,35 @@ function p._convertParameters(match2)
 
 	match.staticid = match2.match2id
 
-	local opponent1 = match2.match2opponents[1] or {}
-	local opponent1match2players = opponent1.match2players or {}
-	if opponent1.type == 'team' then
-		match.opponent1 = opponent1.name
-		match.opponent1score = (tonumber(opponent1.score or 0) or 0) >= 0
-			and opponent1.score or 0
-		local opponent1players = {}
-		for i = 1,10 do
-			local player = opponent1match2players[i] or {}
-			opponent1players['p' .. i] = player.name or ""
-			opponent1players['p' .. i .. 'flag'] = player.flag or ""
+	-- Handle Opponents
+	local handleOpponent = function (index)
+		local prefix = 'opponent'..index
+		local opponent = match2.match2opponents[index] or {}
+		local opponentmatch2players = opponent.match2players or {}
+		if opponent.type == 'team' then
+			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			local opponentplayers = {}
+			for i = 1,10 do
+				local player = opponentmatch2players[i] or {}
+				opponentplayers['p' .. i] = player.name or ''
+				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
+				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
+			end
+			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
+		elseif opponent.type == 'solo' then
+			local player = opponentmatch2players[1] or {}
+			match[prefix] = player.name
+			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			match[prefix..'flag'] = player.flag
+		elseif opponent.type == 'literal' then
+			match[prefix] = 'TBD'
 		end
-		match.opponent1players = json.stringify(opponent1players)
-	elseif opponent1.type == 'solo' then
-		local player = opponent1match2players[1] or {}
-		match.opponent1 = player.name
-		match.opponent1score = (tonumber(opponent1.score or 0) or 0) >= 0
-			and opponent1.score or 0
-		match.opponent1flag = player.flag
 	end
 
-	local opponent2 = match2.match2opponents[2] or {}
-	local opponent2match2players = opponent2.match2players or {}
-	if opponent2.type == 'team' then
-		match.opponent2 = opponent2.name
-		match.opponent2score = (tonumber(opponent2.score or 0) or 0) >= 0
-			and opponent2.score or 0
-		local opponent2players = {}
-		for i = 1,10 do
-			local player = opponent2match2players[i] or {}
-			opponent2players['p' .. i] = player.name or ''
-			opponent2players['p' .. i .. 'flag'] = player.flag or ''
-		end
-		match.opponent2players = json.stringify(opponent2players)
-	elseif opponent2.type == 'solo' then
-		local player = opponent2match2players[1] or {}
-		match.opponent2 = player.name
-		match.opponent2score = (tonumber(opponent2.score or 0) or 0) >= 0
-			and opponent2.score or 0
-		match.opponent2flag = player.flag
-	end
+	handleOpponent(1)
+	handleOpponent(2)
+
 	if match2.walkover then
 		match.resulttype = match2.walkover
 		match.walkover = nil
