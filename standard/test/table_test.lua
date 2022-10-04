@@ -66,11 +66,17 @@ function suite:testDeepMerge()
 end
 
 function suite:testMap()
-	self:assertDeepEquals({[6] = 'a', [8] = 'b', [10] = 'c'}, Table.map({a = 3, b = 4, c = 5}, function(k, v) return 2 * v, k end))
+	local a = {a = 3, b = 4, c = 5}
+	self:assertDeepEquals({[6] = 'a', [8] = 'b', [10] = 'c'}, Table.map(a, function(k, v)
+		return 2 * v, k
+	end))
 end
 
 function suite:testMapValues()
-	self:assertDeepEquals({2, 4, 6}, Table.mapValues({1, 2, 3}, function(x) return 2 * x end))
+	local a = {1, 2, 3}
+	self:assertDeepEquals({2, 4, 6}, Table.mapValues(a, function(x)
+		return 2 * x end
+	))
 end
 
 function suite:testAll()
