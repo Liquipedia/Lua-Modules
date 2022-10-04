@@ -10,6 +10,7 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -25,13 +26,16 @@ local INVALID_OPPONENT_CATEGORY = '[[Category:Pages with invalid opponent '
 local Wrapper = {}
 
 function Wrapper.table(frame)
+	if not Logic.readBool(Logic.emptyOr(frame.args.store, Namespace.isMain())) then
+		return
+	end
 	frame.args.roundcount = 1
 	return StandingsStorage.fromTemplateHeader(frame)
 end
 
 function Wrapper.entry(frame)
 	local args = Arguments.getArgs(frame)
-	if not Logic.readBool(Logic.emptyOr(args.store, true)) then
+	if not Logic.readBool(Logic.emptyOr(args.store, Namespace.isMain())) then
 		return
 	end
 
