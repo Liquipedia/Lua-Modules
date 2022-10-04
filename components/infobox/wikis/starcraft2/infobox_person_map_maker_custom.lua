@@ -18,9 +18,9 @@ local Variables = require('Module:Variables')
 
 local MapMaker = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local CustomMapMaker = Class.new()
 
