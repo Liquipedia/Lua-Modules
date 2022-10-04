@@ -83,6 +83,4 @@ function CustomMapMaker:createWidgetInjector()
 	return CustomInjector()
 end
 
-
-
 return CustomMapMaker
