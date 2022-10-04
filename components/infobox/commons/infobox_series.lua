@@ -22,6 +22,7 @@ local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 
+local _LINK_VARIANT = 'series'
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
 local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
@@ -157,7 +158,7 @@ function Series:createInfobox(frame)
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Widgets.Links{content = links, variant = _LINK_VARIANT}
 					}
 				end
 			end
@@ -221,7 +222,7 @@ function Series:createInfobox(frame)
 				sponsor5 = args.sponsor5,
 			}),
 			links = mw.ext.LiquipediaDB.lpdb_create_json(
-				Links.makeFullLinksForTableItems(links or {})
+				Links.makeFullLinksForTableItems(links or {}, _LINK_VARIANT)
 			),
 		}
 		lpdbData = self:_getIconFromLeagueIconSmall(frame, lpdbData)
