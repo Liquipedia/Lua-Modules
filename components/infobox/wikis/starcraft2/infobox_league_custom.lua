@@ -554,11 +554,11 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
 	Variables.varDefine('featured', _args.featured or 'false')
 	--series number
-	local seriesNumber = _args.number or ''
+	local seriesNumber = _args.number
 	if Logic.isNumeric(seriesNumber) then
 		seriesNumber = string.format("%05i", seriesNumber)
+		Variables.varDefine('tournament_series_number', seriesNumber)
 	end
-	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
 	local finished = Logic.readBool(_args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
