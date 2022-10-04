@@ -26,16 +26,17 @@ local INVALID_OPPONENT_CATEGORY = '[[Category:Pages with invalid opponent '
 local Wrapper = {}
 
 function Wrapper.table(frame)
-	if not Logic.readBool(Logic.emptyOr(frame.args.store, Namespace.isMain())) then
+	if not Wrapper._shouldStore(frame.args) then
 		return
 	end
+
 	frame.args.roundcount = 1
 	return StandingsStorage.fromTemplateHeader(frame)
 end
 
 function Wrapper.entry(frame)
 	local args = Arguments.getArgs(frame)
-	if not Logic.readBool(Logic.emptyOr(args.store, Namespace.isMain())) then
+	if not Wrapper._shouldStore(frame.args) then
 		return
 	end
 
@@ -127,6 +128,10 @@ function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	playerInput = playerInput:gsub('<span class="flag">.-</span>', '')
 	-- now read the race from the remaining file
 	opponentArgs[prefix .. 'race'] = playerInput:match('&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
+end
+
+function Wrapper._shouldStore(args)
+	return Logic.readBool(Logic.emptyOr(args.store, Namespace.isMain()))
 end
 
 return Wrapper
