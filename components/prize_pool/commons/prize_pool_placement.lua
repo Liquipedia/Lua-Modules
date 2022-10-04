@@ -285,7 +285,7 @@ function Placement:_parseOpponentArgs(input, date)
 	end
 
 	if not opponentData or (Opponent.isTbd(opponentData) and opponentData.type ~= Opponent.literal) then
-		opponentData = Opponent.tbd(opponentArgs.type)
+		opponentData = Table.deepMergeInto(Opponent.tbd(opponentArgs.type), opponentData or {})
 	end
 
 	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers})
