@@ -37,7 +37,7 @@ end
 
 function Wrapper.entry(frame)
 	local args = Arguments.getArgs(frame)
-	if not Wrapper._shouldStore(frame.args) then
+	if not Wrapper._shouldStore(args) then
 		return
 	end
 
