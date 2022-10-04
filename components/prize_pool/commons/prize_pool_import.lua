@@ -139,7 +139,7 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	for _, record in ipairs(standingRecords) do
 		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
 			local entry = {
-				date = record.extradata.endTime and DateExt.toYmdInUtc(record.extradata.endTime),
+				date = record.extradata.enddate and DateExt.toYmdInUtc(record.extradata.enddate),
 				hasDraw = record.hasDraw,
 				hasOvertime = record.hasOvertime,
 			}
@@ -389,6 +389,8 @@ function Import._mergeEntry(lpdbEntry, entry, placement)
 	then
 		return entry
 	end
+
+	entry.date = lpdbEntry.date or entry.date
 
 	entry.opponentData = Import._removeTbdIdentifiers(entry.opponentData)
 	return Table.deepMergeInto(Import._entryToOpponent(lpdbEntry, placement), entry)
