@@ -69,10 +69,10 @@ function Import._getConfig(args, placements)
 end
 
 function Import._enableImport(importInput)
-	local date = TournamentUtil.getContextualDate()
+	local date = TournamentUtil.getContextualDateOrNow()
 	return Logic.nilOr(
 		Logic.readBoolOrNil(importInput),
-		not date or date >= AUTOMATION_START_DATE
+		date >= AUTOMATION_START_DATE
 	)
 end
 
