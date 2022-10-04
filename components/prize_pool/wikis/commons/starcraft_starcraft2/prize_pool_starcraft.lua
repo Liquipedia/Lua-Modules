@@ -278,15 +278,6 @@ function CustomPrizePool._entryToTournamentExtradata(prefix, entry)
 end
 
 function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
-	local extradata = Json.parseIfString(lpdbEntry.extradata) or {}
-	local additionalCommonProps = {
-		mode = lpdbEntry.mode,
-		['has points'] = extradata.points,
-		['has points2'] = extradata.points2,
-		['has walkover from'] = extradata.wofrom and '1' or nil,
-		['has walkover to'] = extradata.woto and '1' or nil,
-	}
-
 	-- fix lastvs opponent stuff
 	if lpdbEntry.lastvs then
 		local lastVs = extradata.vsOpponent or {}
@@ -304,10 +295,7 @@ function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
 		end
 	end
 
-	return Table.merge(
-		CustomPrizePool._opponentSmwProps(smwEntry, lpdbEntry),
-		additionalCommonProps
-	)
+	return CustomPrizePool._opponentSmwProps(smwEntry, lpdbEntry)
 end
 
 function CustomPrizePool._opponentSmwProps(smwEntry, lpdbData)
