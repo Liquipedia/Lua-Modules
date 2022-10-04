@@ -47,15 +47,17 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomTeam:createBottomContent()
-	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing matches of',
-		{team = _team.name or _team.pagename}
-	) .. Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing tournaments of',
-		{team = _team.name or _team.pagename}
-	)
+	if not _team.args.disbanded then
+		return Template.expandTemplate(
+			mw.getCurrentFrame(),
+			'Upcoming and ongoing matches of',
+			{team = _team.name or _team.pagename}
+		) .. Template.expandTemplate(
+			mw.getCurrentFrame(),
+			'Upcoming and ongoing tournaments of',
+			{team = _team.name or _team.pagename}
+		)
+	end
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
