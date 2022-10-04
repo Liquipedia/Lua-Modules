@@ -56,10 +56,10 @@ function BigMatch.run(frame)
 		link = args.tournamentlink or tournamentData.pagename,
 	}
 
-	return bigMatch:render(frame, match, tournament)
+	return bigMatch:render(match, tournament)
 end
 
-function BigMatch:render(frame, match, tournament)
+function BigMatch:render(match, tournament)
 	local overall = mw.html.create('div'):addClass('fb-match-page-overall')
 
 	local opponent1 = match.match2opponents[1]
@@ -69,7 +69,7 @@ function BigMatch:render(frame, match, tournament)
 
 	local tabs = {This = 1, ['hide-showall'] = true}
 	tabs.name1 = 'Player Stats'
-	tabs.content1 = self:stats(frame, match, playerLookUp, {opponent1, opponent2})
+	tabs.content1 = self:stats(match, playerLookUp, {opponent1, opponent2})
 	tabs.name2 = 'Economy'
 	tabs.content2 = self:economy(match, opponent1, opponent2)
 
@@ -155,11 +155,12 @@ function BigMatch:overview(match)
 		:node(boxRight)
 end
 
-function BigMatch:stats(frame, match, playerLookUp, opponents)
+function BigMatch:stats(match, playerLookUp, opponents)
+	---@type table<string, any>
 	local tabs = {
 		This = 1,
+		['hide-showall'] = true
 	}
-	tabs['hide-showall'] = true
 
 	local ind = 1
 	while match.match2games[ind] ~= nil do
@@ -228,13 +229,13 @@ function BigMatch:stats(frame, match, playerLookUp, opponents)
 end
 
 function BigMatch:economy(match, opponent1, opponent2)
+	---@type table<string, any>
 	local tabs = {
 		This = 1,
+		['hide-showall'] = true
 	}
-	tabs['hide-showall'] = true
 
 	local ind = 1
-
 	while match.match2games[ind] ~= nil do
 		local map = match.match2games[ind]
 
@@ -372,11 +373,11 @@ function BigMatch:_createTeamContainer(side, teamName, score, hasWon)
 end
 
 function BigMatch:_getId()
-	local title = mw.title.getCurrentTitle()
+	local title = mw.title.getCurrentTitle().text
 
 	-- Match alphanumeric pattern 10 characters long, followed by space and then the match id
-	local staticId = string.match(title.text, '%w%w%w%w%w%w%w%w%w%w .*')
-	local fullBracketId = string.match(title.text, '%w%w%w%w%w%w%w%w%w%w')
+	local staticId = string.match(title, '%w%w%w%w%w%w%w%w%w%w .*')
+	local fullBracketId = string.match(title, '%w%w%w%w%w%w%w%w%w%w')
 	local matchId = string.sub(staticId, 12)
 
 	return {fullBracketId, matchId}
