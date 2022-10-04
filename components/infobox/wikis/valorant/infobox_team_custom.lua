@@ -57,7 +57,7 @@ function CustomTeam:createBottomContent()
 			'Upcoming and ongoing tournaments of',
 			{team = _team.name or _team.pagename}
 		)
-    end
+	end
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
