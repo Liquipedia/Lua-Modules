@@ -34,13 +34,6 @@ local CustomPrizePool = {}
 local PRIZE_TYPE_POINTS = 'POINTS'
 local SCORE_STATUS = 'S'
 local WALKOVER_VS_STATUS = 'W'
-local OPPONENT_TYPE_TO_MODE = {
-	solo = '1v1',
-	duo = '2v2',
-	trio = '3v3',
-	quad = '4v4',
-	team = 'team',
-}
 local PLACE_TO_KEY_PREFIX = {'winner', 'runnerup', 'third', 'fourth'}
 local SEMIFINALS_PREFIX = 'sf'
 local TBD = 'TBD'
@@ -200,7 +193,7 @@ function CustomPrizePool._getMode(opponentType, opponent)
 		return 'archon'
 	end
 
-	return OPPONENT_TYPE_TO_MODE[opponentType or '']
+	return StarcraftOpponent.toLegacyMode(opponentType or '', opponentType or '')
 end
 
 function CustomPrizePool._getStatusFromScore(score)
