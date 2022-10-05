@@ -240,12 +240,10 @@ function Placement:_parseOpponents(args)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
 		local opponent = {opponentData = {}, prizeRewards = {}, additionalData = {}}
 		if not opponentInput then
-			-- If enabled and given a range of opponents, add them all, even if they're missing from the input
-			if not self.parent.options.fillPlaceRange or not args.place
-				or self.placeStart + opponentIndex > self.placeEnd + 1 then
-				return
-			else
+			if self:_shouldFillPlacement(opponentIndex, args.place) then
 				opponent.opponentData = Opponent.tbd(self.parent.opponentType)
+			else
+				return
 			end
 		else
 			-- Set the date
@@ -269,6 +267,22 @@ function Placement:_parseOpponents(args)
 		end
 		return opponent
 	end)
+end
+
+function Placement:_shouldFillPlacement(opponentIndex, place)
+	-- we want at least 1 opponent present for any placement
+	if opponentIndex == 1 then
+		return true
+	-- also fill up if the fillPlaceRange option is enabled and we have an entered placeRange
+	-- and we do not yet have reached the number of Opponents for that range
+	elseif
+		self.parent.options.fillPlaceRange and place
+		and self.placeStart + opponentIndex <= self.placeEnd + 1 then
+
+		return true
+	end
+
+	return false
 end
 
 function Placement:_parseOpponentArgs(input, date)
