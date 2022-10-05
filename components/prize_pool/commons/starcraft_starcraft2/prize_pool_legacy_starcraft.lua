@@ -113,7 +113,7 @@ function StarcraftLegacyPrizePool.run(frame)
 	local numberOfSlots = newSlotIndex
 	for slotIndex = 1, numberOfSlots do
 		-- if we have to merge we need to kick empty opponents
-		-- while if we import we want tom keep them
+		-- while if we import we want to keep them
 		if
 			not newArgs.import
 			and #newArgs[slotIndex].opponents > newArgs[slotIndex].opponentsInSlot
@@ -123,6 +123,20 @@ function StarcraftLegacyPrizePool.run(frame)
 				function(opponent) return not opponent.isEmpty end
 			)
 		end
+
+		-- if we import fill up the placements with empty opponents
+		if newArgs.import and newArgs[slotIndex].place then
+			local placeRange = mw.text.split(newArgs[slotIndex].place, '-')
+			local slotSize = tonumber(placeRange[#placeRange]) - tonumber(placeRange[1]) + 1
+			if #newArgs[slotIndex].opponents < slotSize then
+				local startIndex = #newArgs[slotIndex].opponents + 1
+				local fillerOpponent = StarcraftLegacyPrizePool._fillerOpponent(newArgs[slotIndex].opponents[startIndex - 1])
+				for opponentIndex = startIndex, slotSize do
+					newArgs[slotIndex].opponents[opponentIndex] = Table.copy(fillerOpponent)
+				end
+			end
+		end
+
 		Table.mergeInto(newArgs[slotIndex], newArgs[slotIndex].opponents)
 		newArgs[slotIndex].opponents = nil
 	end
@@ -133,6 +147,31 @@ function StarcraftLegacyPrizePool.run(frame)
 	end
 
 	return CustomPrizePool.run(newArgs)
+end
+
+function StarcraftLegacyPrizePool._fillerOpponent(lastOpponentData)
+	if lastOpponentData.isEmpty then
+		return lastOpponentData
+	end
+
+	local fillerOpponent = {}
+	for key, item in pairs(lastOpponentData) do
+		if not (
+			Logic.isNumeric(key)
+			or String.contains(key, 'last')
+			or String.contains(key, 'flag')
+			or String.contains(key, 'race')
+			or String.contains(key, 'wdl')
+			or String.contains(key, 'team')
+			or String.contains(key, 'link')
+			or string.match(key, 'p%d')
+		) then
+			fillerOpponent[key] = item
+		end
+	end
+
+	mw.logObject(fillerOpponent)
+	return fillerOpponent
 end
 
 function StarcraftLegacyPrizePool._enableImport(args)
@@ -162,11 +201,7 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
 
 	local opponentsInSlot = tonumber(slot.count)
-	if not opponentsInSlot and newData.place then
-		local placeRange = mw.text.split(newData.place, '-')
-		opponentsInSlot = tonumber(placeRange[#placeRange]) - tonumber(placeRange[1]) + 1
-	end
-	opponentsInSlot = opponentsInSlot or #slot
+	opponentsInSlot = opponentsInSlot or math.max(#slot, 1)
 
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
