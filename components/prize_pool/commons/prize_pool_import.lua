@@ -353,8 +353,7 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	local placeStart = (priorPlacement.placeEnd or 0) + 1
 	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
-	local parent = Table.deepCopy(priorPlacement.parent, {copyMetatable = true})
-	parent.placements = nil
+	local parent = priorPlacement.parent
 
 	return Placement(
 		{placeStart = placeStart, placeEnd = placeEnd},
