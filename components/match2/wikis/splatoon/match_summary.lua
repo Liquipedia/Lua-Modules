@@ -9,6 +9,7 @@
 local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -21,7 +22,6 @@ local WeaponIcon = require('Module:WeaponIcon')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local htmlCreate = mw.html.create
 
 local NUM_OPPONENTS = 2
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
@@ -33,17 +33,8 @@ local TBD = 'TBD'
 -- Normal links, from input/lpdb
 local LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
-	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
-	review = {icon = 'File:Reviews32.png', text = 'Review'},
-	interview = {icon = 'File:Interview32.png', text = 'Interview'},
 }
 local NON_BREAKING_SPACE = '&nbsp;'
-
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-
 
 -- Map Veto Class
 local MapVeto = Class.new(
@@ -155,7 +146,7 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init('490px')
-	matchSummary.root:css('flex-wrap', 'unset')
+	matchSummary.root:css('unset')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -218,7 +209,7 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+	if match.dateIsExact or match.timestamp ~= DateExt.epochZero then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -275,7 +266,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	local row = MatchSummary.Row()
 
 	if Logic.isNotEmpty(game.header) then
-		local mapHeader = htmlCreate('div')
+		local mapHeader = ('div')
 			:wikitext(game.header)
 			:css('font-weight','bold')
 			:css('font-size','85%')
