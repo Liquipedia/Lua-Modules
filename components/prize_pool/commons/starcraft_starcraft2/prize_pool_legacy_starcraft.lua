@@ -37,7 +37,7 @@ function StarcraftLegacyPrizePool.run(frame)
 	local header = Array.sub(args, 1, 1)[1]
 
 	if Logic.readBool(header.award) then
-		OldStarcraftPrizePool.TemplatePrizePoolEnd()
+		return OldStarcraftPrizePool.PrizePoolEnd(args)
 	end
 
 	local slots = Array.sub(args, 2)
