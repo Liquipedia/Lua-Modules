@@ -72,7 +72,7 @@ function MatchMaps._main(args, frame)
 			for i = 1, MAX_GAME_NUM do
 				local prefix = 'map' .. i
 				if Logic.isNotEmpty(details[prefix]) or Logic.isNotEmpty(details[prefix ..'finished']) then
-					storage_args[prefix] = CustomInput.processMap(frame, {
+					storage_args[prefix] = CustomInput.processMap{
 						map = details[prefix] or 'Unknown',
 						finished = details[prefix..'finished'],
 						score1 = details[prefix..'score1'],
@@ -92,7 +92,7 @@ function MatchMaps._main(args, frame)
 						t2otatk = details[prefix..'o1t2atk'],
 						t2otdef = details[prefix..'o1t2def'],
 						vod = details['vod'..i],
-					})
+					}
 					details[prefix] = nil
 					details[prefix ..'win'] = nil
 					details[prefix ..'score'] = nil

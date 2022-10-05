@@ -17,15 +17,15 @@ local MatchSubobjects = {}
 
 function MatchSubobjects.getMap(frame)
 	local args = Arguments.getArgs(frame)
-	return Json.stringify(MatchSubobjects.luaGetMap(frame, args))
+	return Json.stringify(MatchSubobjects.luaGetMap(args))
 end
 
-function MatchSubobjects.luaGetMap(frame, args)
+function MatchSubobjects.luaGetMap(args)
 	-- dont save map if 'map' is not filled in
 	if Logic.isEmpty(args.map) then
 		return nil
 	else
-		args = wikiSpec.processMap(frame, args)
+		args = wikiSpec.processMap(args)
 
 		args.participants = args.participants or {}
 		for key, item in pairs(args.participants) do
