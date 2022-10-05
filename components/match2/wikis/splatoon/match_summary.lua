@@ -146,8 +146,6 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init('490px')
-	matchSummary.root:css('unset')
-
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
 
@@ -266,7 +264,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	local row = MatchSummary.Row()
 
 	if Logic.isNotEmpty(game.header) then
-		local mapHeader = ('div')
+		local mapHeader = mw.html.create('div')
 			:wikitext(game.header)
 			:css('font-weight','bold')
 			:css('font-size','85%')
