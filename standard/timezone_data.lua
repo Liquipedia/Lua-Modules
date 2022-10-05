@@ -7,6 +7,14 @@
 --
 
 return {
+	ACST = {
+		name ='Australian Central Standard Time',
+		offset = {9, 30},
+	},
+	ACDT = {
+		name ='Australian Central Daylight Time',
+		offset = {10, 30},
+	},
 	ADT = {
 		name ='Atlantic Daylight Time',
 		offset = {-3, 0},
@@ -19,6 +27,10 @@ return {
 		name = 'Australian Eastern Standard Time',
 		offset = {10, 0},
 	},
+	ALMT = {
+		name = 'Alma-Ata Time',
+		offset = {6, 0},
+	},
 	ART = {
 		name = 'Argentina Time',
 		offset = {-3, 0},
@@ -26,6 +38,10 @@ return {
 	AST = {
 		name = 'Arabia Standard Time',
 		offset = {3, 0},
+	},
+	AZT = {
+		name = 'Azerbaijan Time',
+		offset = {4, 0},
 	},
 	BOT = {
 		name = 'Bolivia Standard Time',
@@ -39,9 +55,17 @@ return {
 		name = 'Brasilia Time',
 		offset = {-3, 0},
 	},
+	BNT = {
+		name = 'Brunei Darussalam Time',
+		offset = {8, 0},
+	},
 	BST = {
 		name = 'British Summer Time',
 		offset = {1, 0},
+	},
+	CAT = {
+		name = 'Central Africa Time',
+		offset = {2, 0},
 	},
 	CEST = {
 		name = 'Central European Summer Time',
@@ -55,6 +79,14 @@ return {
 		name = 'Colombia Time',
 		offset = {-5, 0},
 	},
+	CLST = {
+		name = 'Chile Summer Time',
+		offset = {-3, 0},
+	},
+	CLT = {
+		name = 'Chile Standard Time',
+		offset = {-4, 0},
+	},
 	CST = {
 		name = 'China Standard Time',
 		offset = {8, 0},
@@ -66,6 +98,10 @@ return {
 	CT = {
 		name = 'Central Standard Time',
 		offset = {-6, 0},
+	},
+	EAT = {
+		name = 'East Africa Time',
+		offset = {3, 0},
 	},
 	EDT = {
 		name = 'Eastern Daylight Time',
@@ -83,6 +119,10 @@ return {
 		name = 'Eastern Standard Time',
 		offset = {-5, 0},
 	},
+	GET = {
+		name = 'Georgia Standard Time',
+		offset = {4, 0},
+	},
 	GMT = {
 		name = 'Greenwich Mean Time',
 		offset = {0, 0},
@@ -91,13 +131,25 @@ return {
 		name = 'Gulf Standard Time',
 		offset = {4, 0},
 	},
+	HKT = {
+		name = 'Hong Kong Time',
+		offset = {8, 0},
+	},
 	ICT = {
 		name = 'Indochina Time',
 		offset = {7, 0},
 	},
+	IDT = {
+		name = 'Israel Daylight Time',
+		offset = {3, 0},
+	},
 	IRDT = {
 		name = 'Iran Daylight Time',
 		offset = {4, 30},
+	},
+	IRST = {
+		name = 'Iran Standard Time',
+		offset = {3, 30},
 	},
 	IST = {
 		name = 'Indian Standard Time',
@@ -106,6 +158,10 @@ return {
 	JST = {
 		name = 'Japan Standard Time',
 		offset = {9, 0},
+	},
+	KGT = {
+		name = 'Kyrgystan Time',
+		offset = {6, 0},
 	},
 	KST = {
 		name = 'Korea Standard Time',
@@ -127,17 +183,46 @@ return {
 		name = 'Mountain Standard Time',
 		offset = {-7, 0},
 	},
+	MUT = {
+		name = 'Mauritius Time',
+		offset = {4, 0},
+	},
 	MVT = {
 		name = 'Maldives Standard Time',
 		offset = {5, 0},
+	},
+	MYT = {
+		name = 'Malaysia Time',
+		offset = {8, 0},
 	},
 	NPT = {
 		name = 'Nepal Time',
 		offset = {5, 45},
 	},
+	NZDT = {
+		name = 'New Zealand Daylight Time',
+		offset = {13, 0},
+	},
+	NZST = {
+		name = 'New Zealand Standard Time',
+		offset = {12, 0},
+	},
 	PDT = {
 		name = 'Pacific Daylight Time',
 		offset = {-7, 0},
+	},
+	PET = {
+		name = 'Peru Time',
+		offset = {-5, 0},
+	},
+	PHST = {
+		abbr = 'PHT',
+		name = 'Philippine Time',
+		offset = {8, 0},
+	},
+	PHT = {
+		name = 'Philippine Time',
+		offset = {8, 0},
 	},
 	PKT = {
 		name = 'Pakistan Standard Time',
@@ -164,21 +249,48 @@ return {
 		name = 'Indochina Time',
 		offset = {7, 0},
 	},
+	TJT = {
+		name = 'Tajikistan Time',
+		offset = {5, 0},
+	},
+	TMT = {
+		name = 'Turkmenistan Time',
+		offset = {5, 0},
+	},
 	TRT = {
 		name = 'Turkey Time',
 		offset = {3, 0},
+	},
+	TST = {
+		name = 'Taiwan Standard Time',
+		offset = {8, 0},
+	},
+	ULAT = {
+		name = 'Ulaanbaatar Time',
+		offset = {8, 0},
 	},
 	UTC = {
 		name = 'Coordinated Universal Time',
 		offset = {0, 0},
 	},
+	UZT = {
+		name = 'Uzbekistan Time',
+		offset = {5, 0},
+	},
 	VLAT = {
 		name = 'Vladivostok Time',
 		offset = {10, 0},
 	},
+	WEST = {
+		name = 'Western European Summer Time',
+		offset = {1, 0},
+	},
+	WET = {
+		name = 'Western European Time',
+		offset = {0, 0},
+	},
 	WIB = {
-		abbr = 'ICT',
-		name = 'Indochina Time',
+		name = 'Western Indonesian Time',
 		offset = {7, 0},
 	},
 }
