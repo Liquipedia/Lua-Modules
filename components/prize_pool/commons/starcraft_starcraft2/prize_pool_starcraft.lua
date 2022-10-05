@@ -148,14 +148,14 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		extradata.vsOpponent = Table.deepCopy(lastVs)
 		if lastVs.type == StarcraftOpponent.team then
 			lpdbData.lastvs = Json.stringify{
-				type = lastVs.opponenttype,
+				type = lastVs.type,
 				name = lastVs.name
 			}
 		else
 			lastVs = StarcraftOpponent.toLpdbStruct(lastVs) or {}
 			lpdbData.lastvs = Json.stringify(Table.merge(
 					lastVs.opponentplayers or {},
-					{type = lastVs.opponenttype}
+					{type = lastVs.type}
 				))
 		end
 	end
