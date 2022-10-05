@@ -230,8 +230,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or NO_SCORE) or NO_SCORE
-	local value2 = tonumber(table[key2].score or NO_SCORE) or NO_SCORE
+	local value1 = tonumber(table[key1].score) or NO_SCORE
+	local value2 = tonumber(table[key2].score) or NO_SCORE
 	return value1 > value2
 end
 
