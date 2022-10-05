@@ -199,8 +199,7 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 	newData.date = slot.date
 	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
 
-	local opponentsInSlot = tonumber(slot.count)
-	opponentsInSlot = opponentsInSlot or math.max(#slot, 1)
+	local opponentsInSlot = tonumber(slot.count) or math.max(#slot, 1)
 
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
