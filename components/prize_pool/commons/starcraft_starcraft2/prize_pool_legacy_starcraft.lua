@@ -170,7 +170,6 @@ function StarcraftLegacyPrizePool._fillerOpponent(lastOpponentData)
 		end
 	end
 
-	mw.logObject(fillerOpponent)
 	return fillerOpponent
 end
 
