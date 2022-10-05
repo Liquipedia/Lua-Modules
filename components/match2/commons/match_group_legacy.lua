@@ -27,7 +27,6 @@ local _RESET_MATCH = 'RxMBR'
 local _THIRD_PLACE_MATCH = 'RxMTP'
 local _args
 local _type
-local _frame
 
 function Legacy.get(frame)
 	_args = getArgs(frame)
@@ -80,7 +79,6 @@ end
 
 function Legacy.getTemplate(frame)
 	_args = getArgs(frame)
-	_frame = frame
 
 	local templateid = _args['template']
 	if Logic.isEmpty(templateid) then
