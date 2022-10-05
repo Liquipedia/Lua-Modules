@@ -61,7 +61,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 			matchArgs.bracketid = bracketId
 			matchArgs.matchid = matchId
-			local match = WikiSpecific.processMatch(mw.getCurrentFrame(), matchArgs)
+			local match = WikiSpecific.processMatch(matchArgs)
 
 			-- Add more fields to bracket data
 			match.bracketdata = match.bracketdata or {}
@@ -130,7 +130,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = WikiSpecific.processMatch(mw.getCurrentFrame(), matchArgs)
+		local match = WikiSpecific.processMatch(matchArgs)
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
