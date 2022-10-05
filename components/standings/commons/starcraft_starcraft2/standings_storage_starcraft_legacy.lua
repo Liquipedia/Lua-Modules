@@ -10,6 +10,7 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -25,13 +26,18 @@ local INVALID_OPPONENT_CATEGORY = '[[Category:Pages with invalid opponent '
 local Wrapper = {}
 
 function Wrapper.table(frame)
-	frame.args.roundcount = 1
-	return StandingsStorage.fromTemplateHeader(frame)
+	local args = Arguments.getArgs(frame)
+	if not Wrapper._shouldStore(args) then
+		return
+	end
+
+	args.roundcount = 1
+	return StandingsStorage.fromTemplateHeader(args)
 end
 
 function Wrapper.entry(frame)
 	local args = Arguments.getArgs(frame)
-	if not Logic.readBool(Logic.emptyOr(args.store, true)) then
+	if not Wrapper._shouldStore(args) then
 		return
 	end
 
@@ -123,6 +129,10 @@ function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	playerInput = playerInput:gsub('<span class="flag">.-</span>', '')
 	-- now read the race from the remaining file
 	opponentArgs[prefix .. 'race'] = playerInput:match('&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
+end
+
+function Wrapper._shouldStore(args)
+	return Logic.readBool(Logic.emptyOr(args.store, Namespace.isMain()))
 end
 
 return Wrapper
