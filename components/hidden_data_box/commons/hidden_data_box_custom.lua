@@ -7,7 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local BasicHiddenDataBox = require('Module:HiddenDataBox')
+local Lua = require('Module:Lua')
+
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
+
 local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
@@ -15,7 +18,7 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
-function CustomHiddenDataBox:addCustomVariables(args, queryResult)
+function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	--add your wiki specific vars here
 end
 

@@ -6,15 +6,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Cell = require('Module:Infobox/Widget/Cell')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
 local Lpdb = require('Module:Lpdb')
+local Lua = require('Module:Lua')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
-local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree

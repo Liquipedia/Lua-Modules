@@ -6,20 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Unit = require('Module:Infobox/Unit')
-local String = require('Module:StringUtils')
-local Namespace = require('Module:Namespace')
-local Template = require('Module:Template')
-local Math = require('Module:Math')
 local ChampionWL = require('Module:ChampionWL')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Math = require('Module:Math')
+local Namespace = require('Module:Namespace')
+local String = require('Module:StringUtils')
+local Template = require('Module:Template')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Center = require('Module:Infobox/Widget/Center')
-local Title = require('Module:Infobox/Widget/Title')
-local Header = require('Module:Infobox/Widget/Header')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Header = Widgets.Header
+local Title = Widgets.Title
 
 local CustomChampion = Class.new()
 

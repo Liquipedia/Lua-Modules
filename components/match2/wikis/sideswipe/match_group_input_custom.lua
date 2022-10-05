@@ -11,7 +11,6 @@ local CustomMatchGroupInput = {}
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -20,6 +19,7 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _STATUS_HAS_SCORE = 'S'
 local _STATUS_DEFAULT_WIN = 'W'
@@ -53,7 +53,7 @@ function CustomMatchGroupInput.processMatch(match)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(frame, map)
+function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -77,7 +77,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(frame, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
@@ -117,19 +117,7 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '2v2'))
-	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
-	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
-	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_tickername'))
-	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
-	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
-	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icondark'))
-	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
-	match.liquipediatiertype = Logic.emptyOr(
-		match.liquipediatiertype,
-		Variables.varDefault('tournament_liquipediatiertype')
-	)
-	return match
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
@@ -141,8 +129,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		matchsection = Variables.varDefault('matchsection'),
-		comment = match.comment,
 		isfeatured = matchFunctions.isFeatured(match)
 	}
 	return match
@@ -164,7 +150,7 @@ function matchFunctions.isFeatured(match)
 	end
 
 	if matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED or
-	   matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
+		matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
 		return true
 	end
 	return false
@@ -372,15 +358,7 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '2v2'))
-	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
-	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
-	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault('tournament_tickername'))
-	map.shortname = Logic.emptyOr(map.shortname, Variables.varDefault('tournament_shortname'))
-	map.series = Logic.emptyOr(map.series, Variables.varDefault('tournament_series'))
-	map.icon = Logic.emptyOr(map.icon, Variables.varDefault('tournament_icon'))
-	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault('tournament_icondark'))
-	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
-	return map
+	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 function mapFunctions.getParticipantsData(map)

@@ -7,25 +7,50 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 local WikiSpecific = require('Module:Brkts/WikiSpecific')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local globalVars = PageVariableNamespace({cached = true})
 
 local MatchGroupInput = {}
 
+local GSL_GROUP_STYLE_DEFAULT_HEADERS = {
+	{default = 'Opening Matches'},
+	{},
+	{winnersfirst = 'Winners Match', losersfirst = 'Elimination Match'},
+	{winnersfirst = 'Elimination Match', losersfirst = 'Winners Match'},
+	{default = 'Decider Match'},
+}
+local VALID_GSL_GROUP_STYLES = {
+	'winnersfirst',
+	'losersfirst',
+}
+
 function MatchGroupInput.readMatchlist(bracketId, args)
 	local matchKeys = Table.mapArgumentsByPrefix(args, {'M'}, FnUtil.identity)
+
+	local gslGroupStyle = (args.gsl or ''):lower()
+	if Table.includes(VALID_GSL_GROUP_STYLES, gslGroupStyle) then
+		for matchIndex, header in pairs(GSL_GROUP_STYLE_DEFAULT_HEADERS) do
+			args['M' .. matchIndex .. 'header'] = Logic.emptyOr(
+				args['M' .. matchIndex .. 'header'],
+				header[gslGroupStyle],
+				header.default
+			)
+		end
+	end
 
 	return Array.map(matchKeys, function(matchKey, matchIndex)
 			local matchId = MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
@@ -49,6 +74,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.matchIndex = matchIndex
 
 			match.parent = context.tournamentParent
+			match.matchsection = context.matchSection
 			bracketData.bracketindex = context.bracketIndex
 			bracketData.groupRoundIndex = context.groupRoundIndex
 			bracketData.sectionheader = context.sectionHeader
@@ -116,6 +142,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
 		match.parent = context.tournamentParent
+		match.matchsection = context.matchSection
 		bracketData.bracketindex = context.bracketIndex
 		bracketData.groupRoundIndex = context.groupRoundIndex
 		bracketData.sectionheader = context.sectionHeader
@@ -244,10 +271,17 @@ end
 function MatchGroupInput.readDate(dateString)
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 	local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
+	local timezoneId = dateString:match('>(%a-)<')
 	local matchDate = String.explode(dateString, '<', 0):gsub('-', '')
 	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
 	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
-	return {date = date, dateexact = isDateExact}
+	return {
+		date = date,
+		dateexact = isDateExact,
+		timezoneId = timezoneId,
+		timezoneOffset = timezoneOffset,
+		timestamp = DateExt.readTimestamp(dateString),
+	}
 end
 
 function MatchGroupInput.getInexactDate(suggestedDate)
@@ -344,6 +378,47 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 	record.type = opponent.type
 
 	return record
+end
+
+-- Retrieves Common Tournament Variables used inside match2 and match2game
+function MatchGroupInput.getCommonTournamentVars(obj)
+	obj.game = Logic.emptyOr(obj.game, Variables.varDefault('tournament_game'))
+	obj.icon = Logic.emptyOr(obj.icon, Variables.varDefault('tournament_icon'))
+	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault("tournament_icondark"))
+	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
+	obj.liquipediatiertype = Logic.emptyOr(
+		obj.liquipediatiertype,
+		Variables.varDefault('tournament_liquipediatiertype')
+	)
+	obj.series = Logic.emptyOr(obj.series, Variables.varDefault('tournament_series'))
+	obj.shortname = Logic.emptyOr(obj.shortname, Variables.varDefault('tournament_shortname'))
+	obj.tickername = Logic.emptyOr(obj.tickername, Variables.varDefault('tournament_tickername'))
+	obj.tournament = Logic.emptyOr(obj.tournament, Variables.varDefault('tournament_name'))
+	obj.type = Logic.emptyOr(obj.type, Variables.varDefault('tournament_type'))
+
+	return obj
+end
+
+function MatchGroupInput.readMvp(match)
+	if not match.mvp then return end
+	local mvppoints = match.mvppoints or 1
+
+	-- Split the input
+	local players = mw.text.split(match.mvp, ',')
+
+	-- parse the players to get their information
+	local parsedPlayers = Table.mapValues(players, function(player)
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
+		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+			for _, lookUpPlayer in pairs(opponent.match2players) do
+				if link == lookUpPlayer.name then
+					return Table.merge(lookUpPlayer, {team = opponent.name, template = opponent.template})
+				end
+			end
+		end
+	end)
+
+	return {players = parsedPlayers, points = mvppoints}
 end
 
 return MatchGroupInput

@@ -19,7 +19,7 @@ local _MAX_NUMBER_OF_MAPS = 99
 
 function LegacyPlayerCrossTable.playerCrossTableToMatch2(frame)
 	--only process stuff (for storage) if storage is not disabled
-	if Variables.varDefault('disable_SMW_storage', 'false') == 'true'
+	if Variables.varDefault('disable_LPDB_storage', 'false') == 'true'
 		or mw.title.getCurrentTitle().namespace ~= 0 then
 			return ''
 	end

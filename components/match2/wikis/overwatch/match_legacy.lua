@@ -57,7 +57,7 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		'Has team right score=' .. (match.opponent2score or '0'),
 		'Has exact time=' .. (Logic.readBool(match.dateexact) and 'true' or 'false'),
 		'Is finished=' .. (Logic.readBool(match.finished) and 'true' or 'false'),
-	 })
+	})
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -116,7 +116,7 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	match.extradata.matchsection = extradata.matchsection
-	match.extradata.bestofx = tostring(match2.bestof)
+	match.extradata.bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	local bracketData = json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
 		if bracketData.inheritedheader then

@@ -6,17 +6,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Tier = require('Module:Tier')
-local Logic = require('Module:Logic')
-local PageLink = require('Module:Page')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Tier = require('Module:Tier')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local _GAME_MODE = mw.loadData('Module:GameMode')
 local _EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
@@ -102,14 +107,14 @@ end
 
 function CustomLeague:_makeBasedListFromArgs(base)
 	local firstArg = _args[base .. '1']
-	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
+	local foundArgs = {Page.makeInternalLink({}, firstArg)}
 	local index = 2
 
 	while String.isNotEmpty(_args[base .. index]) do
 		local currentArg = _args[base .. index]
 		table.insert(foundArgs, '&nbsp;• ' ..
 			tostring(CustomLeague:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, currentArg)
+				Page.makeInternalLink({}, currentArg)
 			))
 		)
 		index = index + 1
@@ -140,6 +145,12 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_publisher', _args['ea-sponsored'] or '')
 	Variables.varDefine('tournament_pro_circuit_tier', _args.pctier or '')
 
+	local isIndividual = ''
+	if String.isNotEmpty(_args.player_number) then
+		isIndividual = 'true'
+	end
+	Variables.varDefine('tournament_individual', isIndividual)
+
 	local eaMajor = _args.eamajor
 	if String.isEmpty(eaMajor) then
 		local eaTier = string.lower(_args.eatier or '')
@@ -155,13 +166,16 @@ function CustomLeague:defineCustomPageVariables()
 		end
 	end
 	Variables.varDefine('tournament_ea_major', eaMajor)
+	local regionData = Locale.formatLocations(_args)
+	Variables.varDefine('tournament_location_region', regionData.region1 or _args.country)
 end
 
 function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = _args.team_number
 	lpdbData.publishertier = _args.pctier
 	lpdbData.extradata = {
-		['is ea major'] = Variables.varDefault('tournament_ea_major', '')
+		['is ea major'] = Variables.varDefault('tournament_ea_major', ''),
+		individual = Variables.varDefault('tournament_individual', ''),
 	}
 
 	--retrieve sponsors from _args.sponsors if sponsorX, X=1,...,3, is empty

@@ -12,7 +12,6 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -23,6 +22,7 @@ local getIconName = require('Module:IconName').luaGet
 local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _STATUS_HAS_SCORE = 'S'
 local _STATUS_DEFAULT_WIN = 'W'
@@ -57,7 +57,7 @@ function CustomMatchGroupInput.processMatch(match)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(frame, map)
+function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -94,7 +94,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(frame, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
@@ -149,23 +149,7 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '3v3'))
-	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
-	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
-	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_ticker_name'))
-	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
-	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
-	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
-	match.liquipediatier = Logic.emptyOr(
-		match.liquipediatier,
-		Variables.varDefault('tournament_lptier'),
-		Variables.varDefault('tournament_tier')
-	)
-	match.liquipediatiertype = Logic.emptyOr(
-		match.liquipediatiertype,
-		Variables.varDefault('tournament_tiertype')
-	)
-	return match
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
@@ -199,11 +183,9 @@ function matchFunctions.getExtraData(match)
 	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 
 	match.extradata = {
-		matchsection = Variables.varDefault('matchsection'),
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
-		comment = match.comment,
 		octane = match.octane,
 		isconverted = 0,
 		isfeatured = matchFunctions.isFeatured(match),
@@ -500,15 +482,7 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '3v3'))
-	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
-	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
-	map.tickername = Logic.emptyOr(map.tickername, Variables.varDefault('tournament_ticker_name'))
-	map.shortname = Logic.emptyOr(map.shortname, Variables.varDefault('tournament_shortname'))
-	map.series = Logic.emptyOr(map.series, Variables.varDefault('tournament_series'))
-	map.icon = Logic.emptyOr(map.icon, Variables.varDefault('tournament_icon'))
-	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault('tournament_icon_dark'))
-	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
-	return map
+	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 function mapFunctions.getParticipantsData(map)

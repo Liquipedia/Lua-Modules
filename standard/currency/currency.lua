@@ -46,7 +46,7 @@ function Currency.display(currencyCode, prizeValue, options)
 	local currencyData = Currency.raw(currencyCode)
 
 	if not currencyData then
-		if currencyCode then
+		if String.isNotEmpty(currencyCode) then
 			mw.log('Invalid currency "' .. currencyCode .. '"')
 		end
 		return nil
@@ -79,17 +79,42 @@ function Currency.raw(currencyCode)
 	return CurrencyData[currencyCode:lower()]
 end
 
-function Currency.formatMoney(value)
+function Currency.formatMoney(value, precision)
 	if not Logic.isNumeric(value) then
 		return 0
 	end
+	precision = tonumber(precision) or 2
 
-	local roundedValue = Math.round{value, 2}
+	local roundedValue = Math.round{value, precision}
 	local integer, decimal = math.modf(roundedValue)
 	if decimal == 0 then
 		return LANG:formatNum(integer)
 	end
-	return LANG:formatNum(integer) .. string.format('%.2f', decimal):sub(2)
+	return LANG:formatNum(integer) .. string.format('%.' .. precision .. 'f', decimal):sub(2)
+end
+
+function Currency.getExchangeRate(props)
+	if not props then
+		error('No props passed to "Currency.getExchangeRate"')
+	end
+	local setVariables = Logic.readBool(props.setVariables)
+	local currencyRate = tonumber(props.currencyRate)
+	if String.isEmpty(props.currency) then
+		error('No currency passed to "Currency.getExchangeRate"')
+	end
+	local currency = props.currency:upper()
+	if not currencyRate then
+		if not props.date:match('%d%d%d%d%-%d%d%-%d%d') then
+			error('Invalid date passed to "Currency.getExchangeRate"')
+		end
+		currencyRate = mw.ext.CurrencyExchange.currencyexchange(1, currency, USD:upper(), props.date)
+	end
+
+	if setVariables and currencyRate and String.isNotEmpty(currencyRate) then
+		Variables.varDefine('exchangerate_' .. currency, currencyRate)
+	end
+
+	return tonumber(currencyRate)
 end
 
 return Currency

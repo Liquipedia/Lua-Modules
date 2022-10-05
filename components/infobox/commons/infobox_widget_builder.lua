@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
-local WidgetFactory = require('Module:Infobox/Widget/Factory')
+local Lua = require('Module:Lua')
+
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
+local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
 
 local Builder = Class.new(
 	Widget,

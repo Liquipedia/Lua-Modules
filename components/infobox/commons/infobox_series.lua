@@ -6,19 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Links = require('Module:Links')
-local LeagueIcon = require('Module:LeagueIcon')
-local Locale = require('Module:Locale')
-local Localisation = require('Module:Localisation')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier')
 local WarningBox = require('Module:WarningBox')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
@@ -49,6 +51,18 @@ function Series:createInfobox(frame)
 	-- define this here so we can use it in lpdb data and the display
 	local links = Links.transform(args)
 
+	-- Split venue from legacy format to new format.
+	-- Legacy format is a wiki-code string that can include an external link
+	-- New format has |venue= and |venuelink= as different parameters.
+	-- This should be removed once there's been a bot run to change this.
+	if not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
+		-- Remove [] and split on space
+		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
+		args.venuelink = splitVenue[1]
+		table.remove(splitVenue, 1)
+		args.venue = table.concat(splitVenue, ' ')
+	end
+
 	local widgets = {
 		Header{
 			name = args.name,
@@ -58,23 +72,24 @@ function Series:createInfobox(frame)
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Series Information'},
-		Customizable{
-			id = 'liquipediatier',
-			children = {
-				Cell{
-					name = 'Liquipedia tier',
-					content = {self:createLiquipediaTierDisplay(args)},
-					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
-				},
-			}
+		Builder{
+			builder = function()
+				local organizers = self:_createOrganizers(args)
+				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
+
+				return {
+					Cell{
+						name = title,
+						content = organizers
+					}
+				}
+			end
 		},
 		Cell{
-			name = 'Organizer',
-			content = self:getAllArgsForBase(args, 'organizer'),
-			options = {
-				makeLink = true
-			}
+			name = 'Sponsor(s)',
+			content = self:getAllArgsForBase(args, 'sponsor')
 		},
+		Customizable{id = 'type', children = {}},
 		Customizable{
 			id = 'location',
 			children = {
@@ -85,6 +100,25 @@ function Series:createInfobox(frame)
 					}
 				},
 			}
+		},
+		Builder{
+			builder = function()
+				args.venue1 = args.venue1 or args.venue
+				args.venue1link = args.venue1link or args.venuelink
+				args.venue1desc = args.venue1desc or args.venuedesc
+
+				local venues = {}
+				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
+					-- TODO: Description
+					local description = ''
+					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
+				end
+
+				return {Cell{
+					name = 'Venue',
+					content = venues
+				}}
+			end
 		},
 		Cell{
 			name = 'Date',
@@ -104,13 +138,19 @@ function Series:createInfobox(frame)
 				args.edate or args.defunct
 			}
 		},
-		Cell{
-			name = 'Sponsor(s)',
-			content = self:getAllArgsForBase(args, 'sponsor')
-		},
 		Customizable{
 			id = 'custom',
 			children = {}
+		},
+		Customizable{
+			id = 'liquipediatier',
+			children = {
+				Cell{
+					name = 'Liquipedia Tier',
+					content = {self:createLiquipediaTierDisplay(args)},
+					classes = {self:liquipediaTierHighlighted(args) and 'valvepremier-highlighted' or ''},
+				},
+			}
 		},
 		Builder{
 			builder = function()
@@ -283,13 +323,71 @@ function Series:_createLocation(country, city)
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
 end
 
+function Series:_createLink(id, name, link, desc)
+	if String.isEmpty(id) then
+		return nil
+	end
+
+	local output
+
+	if Page.exists(id) then
+		output = '[[' .. id .. '|'
+		if String.isEmpty(name) then
+			output = output .. id .. ']]'
+		else
+			output = output .. name .. ']]'
+		end
+
+	elseif not String.isEmpty(link) then
+		if String.isEmpty(name) then
+			output = '[' .. link .. ' ' .. id .. ']'
+		else
+			output = '[' .. link .. ' ' .. name .. ']'
+
+		end
+	elseif String.isEmpty(name) then
+		output = id
+	else
+		output = name
+	end
+
+	if not String.isEmpty(desc) then
+		output = output .. desc
+	end
+
+	return output
+end
+
+function Series:_createOrganizers(args)
+	local organizers = {
+		Series:_createLink(
+			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
+	}
+
+	local index = 2
+
+	while not String.isEmpty(args['organizer' .. index]) do
+		table.insert(
+			organizers,
+			Series:_createLink(
+				args['organizer' .. index],
+				args['organizer' .. index .. '-name'],
+				args['organizer' .. index .. '-link'],
+				args['organizerref' .. index])
+		)
+		index = index + 1
+	end
+
+	return organizers
+end
+
 function Series:_setCountryCategories(country)
-	if country == nil or country == '' then
+	if String.isEmpty(country) then
 		return ''
 	end
 
-	local countryAdjective = Localisation.getLocalisation({ shouldReturnSimpleError = true }, country)
-	if countryAdjective == 'error' then
+	local countryAdjective = Flags.getLocalisation(country)
+	if not countryAdjective then
 		return 'Unrecognised Country||' .. country
 	end
 

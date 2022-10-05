@@ -7,9 +7,11 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local BasicInfobox = require('Module:Infobox/Basic')
-local Flags = require('Module:Flags')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -80,7 +82,22 @@ function Weapon:createInfobox()
 				}
 			}
 		},
-		Cell{name = 'Game Appearance(s)', content = {args.games}},
+		Customizable{
+			id = 'game',
+			children = {
+				Builder{
+					builder = function()
+						local games = self:getAllArgsForBase(args, 'game', {makeLink = true})
+						return {
+							Cell{
+								name = #games > 1 and 'Game Appearances' or 'Game Appearance',
+								content = games,
+							}
+						}
+					end
+				}
+			}
+		},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
 	}
@@ -119,6 +136,22 @@ function Weapon:nameDisplay(args)
 end
 
 function Weapon:setLpdbData(args)
+	local lpdbData = {
+		name = self.name,
+		image = args.image,
+		type = 'weapon',
+		extradata = {}
+	}
+
+	lpdbData = self:addToLpdb(lpdbData, args)
+
+	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
+	mw.ext.LiquipediaDB.lpdb_datapoint('weapon_' .. self.name, lpdbData)
+end
+
+function Weapon:addToLpdb(lpdbData, args)
+	return lpdbData
 end
 
 return Weapon
+

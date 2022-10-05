@@ -119,12 +119,14 @@ function wikiCopyPaste.getStart(template, id, modus, args)
 		mw.text.nowiki('-->') .. '\n' .. mw.text.nowiki('<!--') ..
 		' For Opponent Copy-Paste-Code see Liquipedia:Brackets/Opponents#Copy-Paste ' ..
 		mw.text.nowiki('-->')) or ''
-	return '{{' .. (
+	local out = '{{' .. (
 		(modus == 'bracket' and
 			('Bracket|Bracket/' .. template)
 		) or (modus == 'singlematch' and 'SingleMatch')
 		or 'Matchlist') ..
 		'|id=' .. id .. tooltip
+
+	return out, args
 end
 
 return wikiCopyPaste

@@ -6,16 +6,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Tier = require('Module:Tier')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
+local String = require('Module:StringUtils')
+local Tier = require('Module:Tier')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local _args
 local _league
@@ -54,6 +58,11 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
 	_args = _league.args
+
+	-- Temp solution until a commons solution is made
+	if _args.liquipediatier == 'Misc' then
+		_args.liquipediatier = '-1'
+	end
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables

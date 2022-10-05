@@ -110,7 +110,7 @@ function wikiCopyPaste.getStart(template, id, modus, args)
 		)
 	end
 
-	return out
+	return out, args
 end
 
 return wikiCopyPaste

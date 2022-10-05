@@ -13,6 +13,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
+local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft', {requireDevIfEnabled = true})
@@ -65,9 +66,11 @@ StarcraftOpponentDisplay.propTypes.BlockOpponent = {
 	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
+	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 	playerClass = 'string?',
+	abbreviateTbd = 'boolean?',
 }
 
 --[[
@@ -77,23 +80,30 @@ determined by its layout context, and not of the opponent.
 function StarcraftOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, StarcraftOpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
+	opponent.extradata = opponent.extradata or {}
+	-- Default TBDs to not show links
+	local showLink = Logic.nilOr(props.showLink, not StarcraftOpponent.isTbd(opponent))
 
 	if opponent.type == 'team' then
 		return StarcraftOpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
-			showLink = props.showLink,
+			showLink = showLink,
 			style = props.teamStyle,
 			team = opponent.team,
 			template = opponent.template or 'tbd',
 		})
 	elseif opponent.type == 'literal' and opponent.extradata.hasRaceOrFlag then
 		props.showRace = false
-		return StarcraftOpponentDisplay.PlayerBlockOpponent(props)
+		return StarcraftOpponentDisplay.PlayerBlockOpponent(
+			Table.merge(props, {showLink = showLink})
+		)
 	elseif opponent.type == 'literal' then
 		return OpponentDisplay.BlockOpponent(props)
 	else -- opponent.type == 'solo' 'duo' 'trio' 'quad'
-		return StarcraftOpponentDisplay.PlayerBlockOpponent(props)
+		return StarcraftOpponentDisplay.PlayerBlockOpponent(
+			Table.merge(props, {showLink = showLink})
+		)
 	end
 end
 
@@ -161,7 +171,10 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 			player = player,
 			showFlag = props.showFlag,
 			showLink = props.showLink,
+			showPlayerTeam = props.showPlayerTeam,
 			showRace = showRace and not opponent.isArchon and not opponent.isSpecialArchon,
+			team = player.team,
+			abbreviateTbd = props.abbreviateTbd,
 		})
 			:addClass(props.playerClass)
 	end)
@@ -178,10 +191,12 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 			playerNodes = playerNodes,
 			raceNode = html.create('div'):wikitext(raceIcon),
 		})
+		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 
 	elseif showRace and opponent.isSpecialArchon then
 		local archonsNode = html.create('div')
 			:addClass('starcraft-special-archon-block-opponent')
+			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 		for archonIx = 1, #opponent.players / 2 do
 			local primaryRace = opponent.players[2 * archonIx - 1].race
 			local secondaryRace = opponent.players[2 * archonIx].race
@@ -212,6 +227,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 
 	else
 		local playersNode = html.create('div')
+			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 		for _, playerNode in ipairs(playerNodes) do
 			playersNode:node(playerNode)
 		end
@@ -266,6 +282,11 @@ function StarcraftOpponentDisplay.InlineScore(opponent)
 		local advantage = tonumber(opponent.extradata.advantage) or 0
 		if advantage > 0 then
 			local title = 'Advantage of ' .. advantage .. ' game' .. (advantage > 1 and 's' or '')
+			return '<abbr title="' .. title .. '">' .. opponent.score .. '</abbr>'
+		end
+		local penalty = tonumber(opponent.extradata.penalty) or 0
+		if penalty > 0 then
+			local title = 'Penalty of ' .. penalty .. ' game' .. (penalty > 1 and 's' or '')
 			return '<abbr title="' .. title .. '">' .. opponent.score .. '</abbr>'
 		end
 	end
