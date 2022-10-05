@@ -299,10 +299,8 @@ function matchFunctions.getScoreFromMapWinners(match)
 	local setScores = false
 
 	-- If the match has started, we want to use the automatic calculations
-	if match.dateexact then
-		if match.dateexact and match.timestamp <= CURRENT_TIME_UNIX then
-			setScores = true
-		end
+	if match.dateexact and match.timestamp <= CURRENT_TIME_UNIX then
+		setScores = true
 	end
 
 	local mapIndex = 1
@@ -497,9 +495,8 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
-		local currentUnixTime = os.time(os.date('!*t'))
 		local threshold = match.dateexact and 30800 or 86400
-		if match.timestamp + threshold < currentUnixTime then
+		if match.timestamp + threshold < CURRENT_TIME_UNIX then
 			match.finished = true
 		end
 	end
