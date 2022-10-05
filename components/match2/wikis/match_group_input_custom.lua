@@ -56,7 +56,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(_, match)
+function CustomMatchGroupInput.processMatch(match)
 	-- process match
 	Table.mergeInto(
 		match,
@@ -91,7 +91,7 @@ function matchFunctions.adjustMapData(match)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(_, map)
+function CustomMatchGroupInput.processMap(map)
 	if map.map == DUMMY_MAP then
 		map.map = nil
 	end
@@ -118,7 +118,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			EPOCH_TIME_EXTENDED
+			CURRENT_TIME_UNIX
 		)
 	end
 
@@ -127,7 +127,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(_, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
@@ -300,8 +300,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 
 	-- If the match has started, we want to use the automatic calculations
 	if match.dateexact then
-		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
-		if matchUnixTime <= CURRENT_TIME_UNIX then
+		if match.dateexact and match.timestamp <= CURRENT_TIME_UNIX then
 			setScores = true
 		end
 	end
@@ -343,34 +342,15 @@ function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game', DEFAULT_GAME))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
-	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
-
-	for index = 1, MAX_NUM_GAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
-
 	return match
 end
 
 function matchFunctions.getLinks(match)
-	match.links = {
-		preview = match.preview,
-		lrthread = match.lrthread,
-		interview = match.interview,
-		review = match.review,
-		recap = match.recap,
-	}
-
 	return match
 end
 
