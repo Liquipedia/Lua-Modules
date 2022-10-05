@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -102,7 +103,7 @@ function CustomMatchGroupInput.processMap(_, map)
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -111,11 +112,11 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date
+	local teamTemplateDate = timestamp
 	-- If date if epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == EPOCH_TIME_EXTENDED then
+	if teamTemplateDate == DateExt.epochZero then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
@@ -335,6 +336,7 @@ function matchFunctions.readDate(matchArgs)
 		return {
 			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
+			timestamp = DateExt.epochZero,
 		}
 	end
 end
@@ -515,13 +517,11 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 		end
 	end
 
-	-- If enough time has passed since match started, it should be marked as finished
-	if isScoreSet and match.hasDate then
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
-		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
-			or SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if matchUnixTime + threshold < CURRENT_TIME_UNIX then
+	-- see if match should actually be finished if score is set
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
+		local currentUnixTime = os.time(os.date('!*t'))
+		local threshold = match.dateexact and 30800 or 86400
+		if match.timestamp + threshold < currentUnixTime then
 			match.finished = true
 		end
 	end
