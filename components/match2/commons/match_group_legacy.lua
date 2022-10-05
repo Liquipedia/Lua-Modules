@@ -27,7 +27,6 @@ local _RESET_MATCH = 'RxMBR'
 local _THIRD_PLACE_MATCH = 'RxMTP'
 local _args
 local _type
-local _frame
 
 function Legacy.get(frame)
 	_args = getArgs(frame)
@@ -80,7 +79,6 @@ end
 
 function Legacy.getTemplate(frame)
 	_args = getArgs(frame)
-	_frame = frame
 
 	local templateid = _args['template']
 	if Logic.isEmpty(templateid) then
@@ -205,7 +203,7 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 			if String.startsWith(realKey, 'opponent') then
 				match[realKey] = nestedArgs
 			elseif String.startsWith(realKey, 'map') then
-				match[realKey] = MatchSubobjects.luaGetMap(_frame, nestedArgs)
+				match[realKey] = MatchSubobjects.luaGetMap(nestedArgs)
 			else
 				match[realKey] = nestedArgs
 			end
