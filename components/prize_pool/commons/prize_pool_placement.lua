@@ -240,7 +240,7 @@ function Placement:_parseOpponents(args)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
 		local opponent = {opponentData = {}, prizeRewards = {}, additionalData = {}}
 		if not opponentInput then
-			if self:_shouldFillPlacement(opponentIndex, args.place) then
+			if self:_shouldAddTbdOpponent(opponentIndex, args.place) then
 				opponent.opponentData = Opponent.tbd(self.parent.opponentType)
 			else
 				return
@@ -269,7 +269,7 @@ function Placement:_parseOpponents(args)
 	end)
 end
 
-function Placement:_shouldFillPlacement(opponentIndex, place)
+function Placement:_shouldAddTbdOpponent(opponentIndex, place)
 	-- we want at least 1 opponent present for any placement
 	if opponentIndex == 1 then
 		return true
