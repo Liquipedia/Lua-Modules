@@ -146,6 +146,10 @@ function StarcraftLegacyPrizePool.run(frame)
 		newArgs['qualifies' .. linkData.id .. 'name'] = linkData.name
 	end
 
+	if CACHED_DATA.plainTextSeedsIndex then
+		newArgs['freetext' .. CACHED_DATA.plainTextSeedsIndex] = 'Seed'
+	end
+
 	return CustomPrizePool.run(newArgs)
 end
 
@@ -240,6 +244,11 @@ end
 
 function StarcraftLegacyPrizePool._handleSeed(storeTo, input, slotSize)
 	local links = LegacyPrizePool.parseWikiLink(input)
+
+	if Table.isEmpty(links) then
+		StarcraftLegacyPrizePool._handlePlainTextSeeds(storeTo, input)
+	end
+
 	for _, linkData in ipairs(links) do
 		local link = linkData.link
 
@@ -251,6 +260,22 @@ function StarcraftLegacyPrizePool._handleSeed(storeTo, input, slotSize)
 		CACHED_DATA.qualifiers[link].occurance = CACHED_DATA.qualifiers[link].occurance + slotSize
 		storeTo['qualified' .. CACHED_DATA.qualifiers[link].id] = true
 	end
+end
+
+function StarcraftLegacyPrizePool._handlePlainTextSeeds(storeTo, input)
+	if not input then
+		return
+	end
+
+	if not CACHED_DATA.plainTextSeedsIndex then
+		CACHED_DATA.plainTextSeedsIndex = CACHED_DATA.next.freetext
+		CACHED_DATA.next.freetext = CACHED_DATA.plainTextSeedsIndex + 1
+	end
+	local display = storeTo['freetext' .. CACHED_DATA.plainTextSeedsIndex] or ''
+	if String.isNotEmpty(display) then
+		display = display .. '<br>'
+	end
+	storeTo['freetext' .. CACHED_DATA.plainTextSeedsIndex] = display .. input
 end
 
 function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
