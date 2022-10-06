@@ -162,6 +162,7 @@ end
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
+	local winner = tonumber(data.winner)
 	if Logic.readBool(data.finished) then
 		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
@@ -178,21 +179,26 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 				data.walkover = 'l'
 			end
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
-		else
-			-- A winner can be set in case of a overturned match
-			if Logic.isEmpty(data.winner) then
-				--CS only has exactly 2 opponents, neither more or less
-				if #indexedScores == MAX_NUM_OPPONENTS then
-					if tonumber(indexedScores[1].score) > tonumber(indexedScores[2].score) then
-						data.winner = 1
-					else
-						data.winner = 2
-					end
-					indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+		elseif CustomMatchGroupInput.placementCheckScoresSet(indexedScores) then
+			--CS only has exactly 2 opponents, neither more or less
+			if #indexedScores == MAX_NUM_OPPONENTS then
+				if tonumber(indexedScores[1].score) > tonumber(indexedScores[2].score) then
+					data.winner = 1
+				else
+					data.winner = 2
 				end
-			elseif Logic.isNumeric(data.winner) then
-				indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, tonumber(data.winner), 1, 2)
+				indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 			end
+		end
+		--If a manual winner is set use it
+		if winner and data.resulttype ~= 'default' then
+			if winner == 0 then
+				data.resulttype = 'draw'
+			else
+				data.resulttype = nil
+			end
+			data.winner = winner
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, winner, 1, 2)
 		end
 	end
 	return data, indexedScores
@@ -201,7 +207,7 @@ end
 
 -- Check if any team has a none-standard status
 function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status and scoreinfo.status ~= 'S' end)
 end
 
 -- function to check for forfeits
@@ -227,6 +233,10 @@ function CustomMatchGroupInput.getDefaultWinner(table)
 		end
 	end
 	return -1
+end
+
+function CustomMatchGroupInput.placementCheckScoresSet(table)
+	return Table.all(table, function (_, scoreinfo) return scoreinfo.score end)
 end
 
 --
