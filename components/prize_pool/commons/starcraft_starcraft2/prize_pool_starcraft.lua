@@ -14,6 +14,7 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
@@ -245,7 +246,7 @@ function CustomPrizePool._entryToTournamentExtradata(prefix, entry)
 	local opponent = StarcraftOpponent.fromLpdbStruct(entry)
 
 	local function toLink(player)
-		return player.pageName
+		return String.isNotEmpty(player.pageName)
 			and player.pageName .. '|' .. player.displayName
 			or player.displayName
 	end
