@@ -270,15 +270,18 @@ function Placement:_parseOpponents(args)
 end
 
 function Placement:_shouldAddTbdOpponent(opponentIndex, place)
-	-- we want at least 1 opponent present for any placement
-	if opponentIndex == 1 then
-		return true
-	-- also fill up if the fillPlaceRange option is enabled and we have an entered placeRange
-	-- and we do not yet have reached the number of Opponents for that range
-	elseif
-		self.parent.options.fillPlaceRange and place
-		and self.placeStart + opponentIndex <= self.placeEnd + 1 then
+	local slotSize
+	if place then
+		slotSize = self.placeEnd - self.placeStart + 1
+	end
 
+	if
+		-- we want at least 1 opponent present for any placement
+		opponentIndex == 1
+		-- also fill up if the fillPlaceRange option is enabled and we have an entered placeRange
+		-- and we do not yet have reached the number of Opponents for that range
+		or (self.parent.options.fillPlaceRange and place and opponentIndex <= slotSize)
+	then
 		return true
 	end
 
