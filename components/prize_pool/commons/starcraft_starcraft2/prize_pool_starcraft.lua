@@ -156,7 +156,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 			lastVs = StarcraftOpponent.toLpdbStruct(lastVs) or {}
 			lpdbData.lastvs = Json.stringify(Table.merge(
 					lastVs.opponentplayers or {},
-					{type = lastVs.type}
+					{type = lastVs.opponenttype}
 				))
 		end
 	end
