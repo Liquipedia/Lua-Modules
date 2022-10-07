@@ -15,7 +15,7 @@ function Abbreviation.make(text, title)
 	if String.isEmpty(title) or String.isEmpty(text) then
 		return nil
 	end
-	return '<abbr title="' .. title .. '>' .. text .. '</abbr>'
+	return '<abbr title="' .. title .. '">' .. text .. '</abbr>'
 end
 
 return Class.export(Abbreviation)
