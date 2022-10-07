@@ -99,6 +99,8 @@ function Array.flatten(tbl)
 	return flattenedArray
 end
 
+---@deprecated
+---Use `Array.flatten(Array.map(tbl, funct))` instead
 function Array.flatMap(tbl, funct)
 	return Array.flatten(Array.map(tbl, funct))
 end
