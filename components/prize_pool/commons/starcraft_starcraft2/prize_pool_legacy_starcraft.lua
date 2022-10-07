@@ -126,8 +126,7 @@ function StarcraftLegacyPrizePool.run(frame)
 
 		-- if we import fill up the placements with empty opponents
 		if newArgs.import and newArgs[slotIndex].place then
-			local placeRange = mw.text.split(newArgs[slotIndex].place, '-')
-			local slotSize = tonumber(placeRange[#placeRange]) - tonumber(placeRange[1]) + 1
+			local slotSize = StarcraftLegacyPrizePool._slotSize(newArgs[slotIndex])
 			if #newArgs[slotIndex].opponents < slotSize then
 				local startIndex = #newArgs[slotIndex].opponents + 1
 				local fillerOpponent = StarcraftLegacyPrizePool._fillerOpponent(newArgs[slotIndex].opponents[startIndex - 1])
@@ -203,7 +202,8 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 	newData.date = slot.date
 	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
 
-	local opponentsInSlot = tonumber(slot.count) or math.max(#slot, 1)
+	local slotInputSize = math.min(StarcraftLegacyPrizePool._slotSize(slot) or math.huge, #slot)
+	local opponentsInSlot = tonumber(slot.count) or math.max(slotInputSize, 1)
 
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
@@ -240,6 +240,15 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 	end
 
 	return newSlot
+end
+
+function StarcraftLegacyPrizePool._slotSize(slot)
+	if not slot.place then
+		return
+	end
+
+	local placeRange = mw.text.split(slot.place, '-')
+	return tonumber(placeRange[#placeRange]) - tonumber(placeRange[1]) + 1
 end
 
 function StarcraftLegacyPrizePool._handleSeed(storeTo, input, slotSize)
