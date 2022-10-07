@@ -271,11 +271,13 @@ function StarcraftLegacyPrizePool._handlePlainTextSeeds(storeTo, input)
 		CACHED_DATA.plainTextSeedsIndex = CACHED_DATA.next.freetext
 		CACHED_DATA.next.freetext = CACHED_DATA.plainTextSeedsIndex + 1
 	end
-	local display = storeTo['freetext' .. CACHED_DATA.plainTextSeedsIndex] or ''
-	if String.isNotEmpty(display) then
-		display = display .. '<br>'
+
+	local currentDisplay = storeTo['freetext' .. CACHED_DATA.plainTextSeedsIndex] or ''
+	if String.isNotEmpty(currentDisplay) then
+		currentDisplay = currentDisplay .. '<br>'
 	end
-	storeTo['freetext' .. CACHED_DATA.plainTextSeedsIndex] = display .. input
+	storeTo['freetext' .. CACHED_DATA.plainTextSeedsIndex] = currentDisplay .. input
+
 end
 
 function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
