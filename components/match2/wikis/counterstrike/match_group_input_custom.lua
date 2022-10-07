@@ -236,7 +236,7 @@ function CustomMatchGroupInput.getDefaultWinner(table)
 end
 
 function CustomMatchGroupInput.placementCheckScoresSet(table)
-	return Table.all(table, function (_, scoreinfo) return scoreinfo.score end)
+	return Table.all(table, function (_, scoreinfo) return scoreinfo.status == 'S' end)
 end
 
 --
