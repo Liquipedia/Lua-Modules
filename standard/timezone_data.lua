@@ -245,8 +245,7 @@ return {
 		offset = {8, 0},
 	},
 	THA = {
-		abbr = 'ICT',
-		name = 'Indochina Time',
+		name = 'Thailand Standard Time',
 		offset = {7, 0},
 	},
 	TJT = {
