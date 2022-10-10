@@ -16,6 +16,8 @@ local suite = ScribuntoUnit:new()
 function suite:testIcon()
 	local nlOutput = '<span class=\"flag\">[[File:nl_hd.png|Netherlands|link=]]</span>'
 	local nlOutputLink = '<span class=\"flag\">[[File:nl_hd.png|Netherlands|link=Category:Netherlands]]</span>'
+	local unknownCat = '[[Category:Pages with unknown flags]]'
+
 	self:assertEquals(nlOutput, Flags.Icon('nl'))
 	self:assertEquals(nlOutput, Flags.Icon('nld'))
 	self:assertEquals(nlOutput, Flags.Icon('holland'))
@@ -37,8 +39,8 @@ function suite:testIcon()
 
 	self:assertEquals('<span class=\"flag\">[[File:Space filler flag.png|link=]]</span>', Flags.Icon{flag = 'tbd'})
 
-	self:assertEquals('[[Template:Flag/dummy]][[Category:Pages with unknown flags]]', Flags.Icon{shouldLink = true, flag = 'dummy'})
-	self:assertEquals('[[Template:FlagNoLink/dummy]][[Category:Pages with unknown flags]]', Flags.Icon{shouldLink = false, flag = 'dummy'})
+	self:assertEquals(('[[Template:Flag/dummy]]' .. unknownCat), Flags.Icon{shouldLink = true, flag = 'dummy'})
+	self:assertEquals(('[[Template:FlagNoLink/dummy]]' .. unknownCat), Flags.Icon{shouldLink = false, flag = 'dummy'})
 end
 
 function suite:testLocalisation()
