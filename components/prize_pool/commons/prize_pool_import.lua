@@ -437,7 +437,7 @@ function Import._entryToOpponent(lpdbEntry, placement)
 		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
 		lastvsscore = additionalData.score or lastVsScore,
-		date = lpdbEntry.date,
+		date = additionalData.date or lpdbEntry.date,
 	}}[1]
 end
 
@@ -519,6 +519,7 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 		lastVs = lastVs,
 		score = score,
 		vsScore = vsScore,
+		date = match.date
 	}
 end
 
