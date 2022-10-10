@@ -41,16 +41,16 @@ local _PREFIXES = {
 	},
 	datdota = {
 		'https://www.datdota.com/leagues/',
-		player = 'https://datdota.com/players/',
-		team = 'https://datdota.com/teams/'
+		player = 'https://www.datdota.com/players/',
+		team = 'https://www.datdota.com/teams/'
 	},
 	daumcafe = {'http://cafe.daum.net/'},
 	discord = {'https://discord.gg/'},
 	dlive = {'https://www.dlive.tv/'},
 	dotabuff = {
 		'https://www.dotabuff.com/esports/leagues/',
-		player = 'https://dotabuff.com/esports/players/',
-		team = 'https://dotabuff.com/esports/teams/'
+		player = 'https://www.dotabuff.com/esports/players/',
+		team = 'https://www.dotabuff.com/esports/teams/'
 	},
 	douyu = {'https://www.douyu.com/'},
 	esea = {
