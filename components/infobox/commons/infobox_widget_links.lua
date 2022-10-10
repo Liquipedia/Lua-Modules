@@ -75,6 +75,7 @@ local _PRIORITY_GROUPS = {
 		'sk',
 		'smash-gg',
 		'sostronk',
+		'start-gg',
 		'stratz',
 		'toornament',
 		'trackmania-io',
