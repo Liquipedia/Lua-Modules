@@ -318,8 +318,6 @@ function CustomTeam.getEarningsAndMedalsData(team)
 		end
 	end
 
-	mw.logObject(earnings)
-	
 	_team.totalEarnings = Table.extract(earnings.team or {}, 'total') or 0
 	_team.earnings = earnings.team or {}
 	_team.totalEarningsWhileOnTeam = Table.extract(earnings.other or {}, 'total') or 0
