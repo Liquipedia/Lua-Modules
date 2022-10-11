@@ -20,16 +20,16 @@ end
 
 function suite:testSum()
 	self:assertEquals(12, MathUtil.sum{3, 5, 4})
-	self:assertEquals(0, MathUtil.sum())
+	self:assertEquals(0, MathUtil.sum{})
 end
 
 function suite:testPartialSums()
 	self:assertDeepEquals({0, 3, 8, 12}, MathUtil.partialSums{3, 5, 4})
-	self:assertDeepEquals({0}, MathUtil.partialSums())
+	self:assertDeepEquals({0}, MathUtil.partialSums{})
 end
 
 function suite:testDotProduct()
-	self:assertEquals(55, MathUtil.dotProduct{3, 2, 4}, {5, 6, 7})
+	self:assertEquals(55, MathUtil.dotProduct({3, 2, 4}, {5, 6, 7}))
 end
 
 return suite
