@@ -229,7 +229,8 @@ function CustomTeam.calculateEarnings(args)
 end
 
 function CustomTeam.getEarningsAndMedalsData(team)
-	local query = 'liquipediatier, liquipediatiertype, placement, date, individualprizemoney, prizemoney, opponentplayers, opponenttype'
+	local query = 'liquipediatier, liquipediatiertype, placement, date, '
+		.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype'
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any)
 	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
