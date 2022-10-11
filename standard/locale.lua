@@ -32,10 +32,12 @@ function Locale.getISOCountry(country)
 	return ''
 end
 
+---@param args {city: string, country:string}
+---@return string
 function Locale.formatLocation(args)
 	local formattedLocation = ''
 
-	if args.city ~= nil and args.city ~= '' then
+	if String.isNotEmpty(args.city) then
 		formattedLocation = args.city .. ',&nbsp;'
 	end
 
