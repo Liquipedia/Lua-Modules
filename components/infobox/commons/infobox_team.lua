@@ -36,8 +36,6 @@ local _LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
 local _defaultEarningsFunctionUsed = false
-local _earnings = {}
-local _totalEarnings
 
 local _warnings = {}
 
@@ -97,15 +95,15 @@ function Team:createInfobox()
 				Builder{
 					builder = function()
 						_defaultEarningsFunctionUsed = true
-						_totalEarnings, _earnings = Earnings.calculateForTeam{
+						self.totalEarnings, self.earnings = Earnings.calculateForTeam{
 							team = self.pagename or self.name,
 							perYear = true,
 							queryHistorical = args.queryEarningsHistorical
 						}
-						Variables.varDefine('earnings', _totalEarnings) -- needed for SMW
+						Variables.varDefine('earnings', self.totalEarnings) -- needed for SMW
 						local totalEarnings
-						if _totalEarnings > 0 then
-							totalEarnings = '$' .. Language:formatNum(_totalEarnings)
+						if self.totalEarnings > 0 then
+							totalEarnings = '$' .. Language:formatNum(self.totalEarnings)
 						end
 						return {
 							Cell{name = 'Approx. Total Winnings', content = {totalEarnings}}
@@ -237,7 +235,7 @@ end
 
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
-	local earnings = _totalEarnings
+	local earnings = self.totalEarnings
 
 	local team = args.teamtemplate or self.pagename
 	local teamTemplate
@@ -266,7 +264,7 @@ function Team:_setLpdbData(args, links)
 		extradata = {}
 	}
 
-	for year, earningsOfYear in pairs(_earnings or {}) do
+	for year, earningsOfYear in pairs(self.earnings or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 		--make these values available for smw storage
 		Variables.varDefine('earningsin' .. year, earningsOfYear)
