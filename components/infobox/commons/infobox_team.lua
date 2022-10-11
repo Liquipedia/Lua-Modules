@@ -101,12 +101,12 @@ function Team:createInfobox()
 							queryHistorical = args.queryEarningsHistorical
 						}
 						Variables.varDefine('earnings', self.totalEarnings) -- needed for SMW
-						local totalEarnings
+						local totalEarningsDisplay
 						if self.totalEarnings > 0 then
-							totalEarnings = '$' .. Language:formatNum(self.totalEarnings)
+							totalEarningsDisplay = '$' .. Language:formatNum(self.totalEarnings)
 						end
 						return {
-							Cell{name = 'Approx. Total Winnings', content = {totalEarnings}}
+							Cell{name = 'Approx. Total Winnings', content = {totalEarningsDisplay}}
 						}
 					end
 				}
