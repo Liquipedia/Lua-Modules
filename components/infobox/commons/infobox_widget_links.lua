@@ -73,7 +73,6 @@ local _PRIORITY_GROUPS = {
 		'matcherinolink',
 		'siege-gg',
 		'sk',
-		'smash-gg',
 		'sostronk',
 		'start-gg',
 		'stratz',
