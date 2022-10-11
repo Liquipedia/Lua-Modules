@@ -17,6 +17,7 @@ function suite:testStringify()
 	self:assertEquals('[]', Json.stringify{})
 	self:assertEquals('{"abc":"def"}', Json.stringify{abc = 'def'})
 	self:assertEquals('{"abc":["b","c"]}', Json.stringify{abc = {'b', 'c'}})
+	self:assertTrue(string.len(Json.stringify(mw.loadData('Module:Flags/MasterData'))) > 3)
 end
 
 function suite:testParse()
