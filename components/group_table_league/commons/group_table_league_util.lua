@@ -443,11 +443,11 @@ sorts an array based on the tiebreakers. The sorting is complete when each
 group has size 1, or when the tiebreakers run out.
 ]]
 function GroupTableLeagueUtil.sortGroupsBy(groups, scoreGroup)
-	return Array.flatMap(groups, function(group)
+	return Array.flatten(Array.map(groups, function(group)
 		return #group > 1
 			and GroupTableLeagueUtil.sortAndGroup(group, scoreGroup(group))
 			or {group}
-	end)
+	end))
 end
 
 function GroupTableLeagueUtil.sortAndGroup(elems, scores)

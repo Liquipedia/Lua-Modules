@@ -89,12 +89,12 @@ end
 -- fills in placements and opponents using data fetched from LPDB
 function Import._importPlacements(inputPlacements)
 	local stages = TournamentUtil.fetchStages(Import.config.matchGroupsSpec)
-	local placementEntries = Array.flatMap(Array.reverse(stages), function(stage, reverseStageIndex)
+	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
 		return Import._computeStagePlacementEntries(stage, {
 					isFinalStage = reverseStageIndex == 1,
 					groupElimStatuses = Import.config.groupElimStatuses
 				})
-	end)
+	end))
 
 	-- Apply importLimit if set
 	if Import.config.importLimit then
@@ -124,9 +124,9 @@ function Import._computeStagePlacementEntries(stage, options)
 			function(placementEntries) return #placementEntries end
 		)) or 0
 	return Array.map(Array.range(1, maxPlacementCount), function(placementIndex)
-		return Array.flatMap(groupPlacementEntries, function(placementEntries)
+		return Array.flatten(Array.map(groupPlacementEntries, function(placementEntries)
 			return placementEntries[placementIndex]
-		end)
+		end))
 	end)
 end
 
