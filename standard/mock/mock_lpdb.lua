@@ -33,7 +33,7 @@ function mockLpdb.tearDown()
 	mw.ext.LiquipediaDB.lpdb = _lpdb.lpdb
 end
 
---- Not yet support in Mock is:
+--- Not yet supported in Mock is:
 ---- conditions with `OR` or `_`
 ---- query with `::`
 ---- order
