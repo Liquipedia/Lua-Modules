@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Variables
+-- page=Module:Variables/testcases
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
