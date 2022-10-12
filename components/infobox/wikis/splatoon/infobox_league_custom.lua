@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Game version', content = {CustomLeague._getGameVersion()}},
 		}
 	end
-	
+
 	return widgets
 end
 
