@@ -28,12 +28,12 @@ function suite:testWritten()
 	self:assertEquals('eleventh', Ordinal.written(11))
 	self:assertEquals('twelfth', Ordinal.written(12))
 	self:assertEquals('thirteenth', Ordinal.written(13))
-	self:assertEquals('twentyfirst', Ordinal.written(21))
+	self:assertEquals('twentieth-first', Ordinal.written(21))
 	self:assertEquals('fiftieth', Ordinal.written(50))
-	self:assertEquals('one hundred first', Ordinal.written(101))
-	self:assertEquals('one hundred thirtyfifth', Ordinal.written(135))
-	self:assertEquals('One hundred thirtyfifth', Ordinal.written(135, {capitalize = true}))
-	self:assertEquals('one-hundred-thirtyfifth', Ordinal.written(135, {hyphenate = true}))
+	self:assertEquals('one hundred and first', Ordinal.written(101))
+	self:assertEquals('one hundred and thirtieth-fifth', Ordinal.written(135))
+	self:assertEquals('One hundred and thirtieth-fifth', Ordinal.written(135, {capitalize = true}))
+	self:assertEquals('one-hundred-and-thirtieth-fifth', Ordinal.written(135, {hyphenate = true}))
 	self:assertEquals('firsts', Ordinal.written(1, {plural = true}))
 end
 
@@ -49,7 +49,7 @@ function suite:testOrdinal()
 	self:assertEquals('21st', Ordinal._ordinal(21))
 	self:assertEquals('101st', Ordinal._ordinal(101))
 	self:assertEquals('135th', Ordinal._ordinal(135))
-	self:assertEquals('<sup>135th</sup>', Ordinal._ordinal(135, nil, true))
+	self:assertEquals('135<sup>th</sup>', Ordinal._ordinal(135, nil, true))
 end
 
 return suite
