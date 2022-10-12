@@ -29,7 +29,7 @@ function suite:testIsEmpty()
 end
 
 function suite:testIsNotEmpty()
-	self:assertTrue(true, Table.isNotEmpty({1,3,6}))
+	self:assertTrue(Table.isNotEmpty({1,3,6}))
 	self:assertTrue(Table.isNotEmpty({1}))
 	self:assertFalse(Table.isNotEmpty({}))
 	self:assertFalse(Table.isNotEmpty())
