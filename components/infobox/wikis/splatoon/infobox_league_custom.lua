@@ -41,14 +41,13 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:addCustomCells(widgets)
-	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Teams',
-		content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}
+		content = {_args.team_number}
 	})
 	table.insert(widgets, Cell{
 		name = 'Players',
-		content = {args.player_number}
+		content = {_args.player_number}
 	})
 
 	return widgets
@@ -60,6 +59,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Game version', content = {CustomLeague._getGameVersion()}},
 		}
 	end
+	
 	return widgets
 end
 
