@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
@@ -69,6 +70,7 @@ function StarcraftMatchGroupInput.processMatch(match)
 		match = StarcraftMatchGroupInput._adjustData(match)
 	end
 	match = StarcraftMatchGroupInput._checkFinished(match)
+	match = StarcraftMatchGroupInput._determineWinnerIfMissing(match)
 	match = StarcraftMatchGroupInput._getVodStuff(match)
 	match = StarcraftMatchGroupInput._getLinks(match)
 	match = StarcraftMatchGroupInput._getExtraData(match)
@@ -276,18 +278,18 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 					match.walkover = 'L'
 				end
 				opponent.score = -1
-				match.finished = 'true'
+				match.finished = true
 				match.resulttype = 'default'
 			elseif _CONVERT_STATUS_INPUT[string.upper(opponent.score or '')] then
 				if string.upper(opponent.score) == 'W' then
 					match.winner = opponentIndex
 					match.resulttype = 'default'
-					match.finished = 'true'
+					match.finished = true
 					opponent.score = -1
 					opponent.status = 'W'
 				else
 					match.resulttype = 'default'
-					match.finished = 'true'
+					match.finished = true
 					match.walkover = _CONVERT_STATUS_INPUT[string.upper(opponent.score)]
 					local score = string.upper(opponent.score)
 					opponent.status = _CONVERT_STATUS_INPUT[score]
@@ -298,13 +300,13 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 				opponent.score = tonumber(opponent.score) or
 					tonumber(opponent.sumscore) or -1
 				if opponent.score > bestof / 2 then
-					match.finished = Logic.emptyOr(match.finished, 'true')
+					match.finished = Logic.emptyOr(match.finished, true)
 					match.winner = tonumber(match.winner or '') or opponentIndex
 				end
 			end
 
 			if Logic.readBool(match.cancelled) then
-				match.finished = 'true'
+				match.finished = true
 				if String.isEmpty(match.resulttype) and String.isEmpty(opponent.score) then
 					match.resulttype = 'np'
 					opponent.score = opponent.score or -1
@@ -315,11 +317,13 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 		end
 	end
 
+	StarcraftMatchGroupInput._determineWinnerIfMissing(match)
+
 	for opponentIndex = 1, numberofOpponents do
 		local opponent = match['opponent' .. opponentIndex]
 		if match.winner == 'draw' or tonumber(match.winner) == 0 or
 				(match.opponent1.score == bestof / 2 and match.opponent1.score == match.opponent2.score) then
-			match.finished = 'true'
+			match.finished = true
 			match.winner = 0
 			match.resulttype = 'draw'
 		end
@@ -331,6 +335,34 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 			opponent.placement = 1
 		else
 			opponent.placement = 2
+		end
+	end
+
+	return match
+end
+
+function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
+	if Logic.readBool(match.finished) and not match.winner then
+		local scores = Array.mapIndexes(function(opponentIndex) 
+			local opponent = match['opponent' .. opponentIndex]
+			if not opponent then
+				return nil
+			end
+			return match['opponent' .. opponentIndex].score or -1 end
+		)
+		local maxScore = math.max(unpack(scores))
+		-- if we have a positive score and the match is finished we also have a winner
+		if maxScore > 0 then
+			local maxIndexFound = false
+			for opponentIndex, score in pairs(scores) do
+				if maxIndexFound and score == maxScore then
+					match.winner = 0
+					break
+				elseif score == maxScore then
+					maxIndexFound = true
+					match.winner = opponentIndex
+				end
+			end
 		end
 	end
 
