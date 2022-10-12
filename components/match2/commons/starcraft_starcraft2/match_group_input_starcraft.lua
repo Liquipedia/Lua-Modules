@@ -70,7 +70,6 @@ function StarcraftMatchGroupInput.processMatch(match)
 		match = StarcraftMatchGroupInput._adjustData(match)
 	end
 	match = StarcraftMatchGroupInput._checkFinished(match)
-	match = StarcraftMatchGroupInput._determineWinnerIfMissing(match)
 	match = StarcraftMatchGroupInput._getVodStuff(match)
 	match = StarcraftMatchGroupInput._getLinks(match)
 	match = StarcraftMatchGroupInput._getExtraData(match)
