@@ -23,21 +23,21 @@ end
 function suite:testIfExists()
 	local devFlag = FeatureFlag.get('dev')
 	self:assertEquals(nil, Lua.requireIfExists('Module:ThisLinkIsDead'))
-	self:assertDeepEquals(require('Module:Lua'), Lua.requireIfExists('Module:Lua'))
+	self:assertEquals(require('Module:Lua'), Lua.requireIfExists('Module:Lua'))
 	FeatureFlag.set('dev', false)
-	self:assertDeepEquals(require('Module:Lua'), Lua.requireIfExists('Module:Lua', {requireDevIfEnabled = true}))
+	self:assertEquals(require('Module:Lua'), Lua.requireIfExists('Module:Lua', {requireDevIfEnabled = true}))
 	FeatureFlag.set('dev', true)
-	self:assertDeepEquals(require('Module:Lua/dev'), Lua.requireIfExists('Module:Lua', {requireDevIfEnabled = true}))
+	self:assertEquals(require('Module:Lua/dev'), Lua.requireIfExists('Module:Lua', {requireDevIfEnabled = true}))
 	FeatureFlag.set('dev', devFlag)
 end
 
 function suite:testImport()
 	local devFlag = FeatureFlag.get('dev')
-	self:assertDeepEquals(require('Module:Lua'), Lua.import('Module:Lua'))
+	self:assertEquals(require('Module:Lua'), Lua.import('Module:Lua'))
 	FeatureFlag.set('dev', false)
-	self:assertDeepEquals(require('Module:Lua'), Lua.import('Module:Lua', {requireDevIfEnabled = true}))
+	self:assertEquals(require('Module:Lua'), Lua.import('Module:Lua', {requireDevIfEnabled = true}))
 	FeatureFlag.set('dev', true)
-	self:assertDeepEquals(require('Module:Lua/dev'), Lua.import('Module:Lua', {requireDevIfEnabled = true}))
+	self:assertEquals(require('Module:Lua/dev'), Lua.import('Module:Lua', {requireDevIfEnabled = true}))
 	FeatureFlag.set('dev', devFlag)
 end
 
