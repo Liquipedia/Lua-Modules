@@ -29,6 +29,13 @@ end
 function suite:testFullOutput()
 	local euFlag = Flag.Icon({flag = 'eu', shouldLink = true})
 	self:assertDeepEquals({display = euFlag .. '&nbsp;Europe', region = 'Europe'}, Region.run{region = 'Europe'})
+	self:assertDeepEquals(
+		{
+			display = '[[File:unasur.png]]&nbsp;South America',
+			region = 'South America'
+		},
+		Region.run{region = 'South America'}
+	)
 end
 
 return suite
