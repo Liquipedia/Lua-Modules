@@ -17,14 +17,11 @@ local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _game
-
 local _GAME = mw.loadData('Module:GameVersion')
 
 function CustomLeague.run(frame)
