@@ -16,12 +16,17 @@ local lpdbData = Lua.import('Module:Mock/Lpdb/Data', {requireDevIfEnabled = true
 
 local mockLpdb = {}
 
+local DEFAULTS = {
+	limit = 20,
+	offset = 0,
+}
+
 local _lpdb = {
 	lpdb = mw.ext.LiquipediaDB.lpdb
 }
 
 function mockLpdb.setUp()
-	mw.ext.LiquipediaDB.lpdb = mockLpdb.query
+	mw.ext.LiquipediaDB.lpdb = mockLpdb.lpdb
 end
 
 function mockLpdb.tearDown()
@@ -33,34 +38,54 @@ end
 ---- query with `::`
 ---- order
 ---- groupby
-function mockLpdb.query(table, parameters)
-	local data = lpdbData[table]
+function mockLpdb.lpdb(dbTable, parameters)
+	local returnedData = mockLpdb._getMockData(dbTable)
+
+	returnedData = mockLpdb._applyConditionse(returnedData, parameters.conditions)
+
+	returnedData = mockLpdb._applyLimitOffset(returnedData, parameters.limit, parameters.offset)
+
+	returnedData = mockLpdb._applyQuery(returnedData, parameters.query)
+
+	return returnedData
+end
+
+function mockLpdb._getMockData(dbTable)
+	local data = lpdbData[dbTable]
 
 	if not data then
 		return error(mw.message.new('liquipediadb-error-invalid-datatype'))
 	end
 
-	data = Array.map(data, function(entry)
-		return (Json.parseIfString(entry))
+	return Array.map(data, function(entry)
+		local parsedData = Json.parseIfString(entry)
+		return parsedData
 	end)
+end
 
-	-- Conditions
-	if String.isNotEmpty(parameters.conditions) then
-		local condition = mockLpdb._parseConditions(parameters.conditions)
-		data = Array.filter(data, condition)
+function mockLpdb._applyConditionse(data, conditions)
+	if String.isNotEmpty(conditions) then
+		local condition = mockLpdb._parseConditions(conditions)
+		return Array.filter(data, condition)
 	end
 
-	--Limit/Offset
-	parameters.limit = tonumber(parameters.limit) or 20
-	parameters.offset = tonumber(parameters.offset) or 0
-	data = Array.sub(data, parameters.offset + 1, (parameters.offset + parameters.limit))
+	return data
+end
 
-	--Query
-	if String.isNotEmpty(parameters.query) then
-		local fields = Table.mapValues(mw.text.split(parameters.query, ','), mw.text.trim)
-		data = Array.map(data, function(entry)
+function mockLpdb._applyLimitOffset(data, limit, offset)
+	local limit = tonumber(limit) or DEFAULTS.limit
+	local offset = tonumber(offset) or DEFAULTS.offset
+
+	return Array.sub(data, offset + 1, (offset + limit))
+end
+
+function mockLpdb._applyQuery(data, query)
+	if String.isNotEmpty(query) then
+		local fields = Table.mapValues(mw.text.split(query, ','), mw.text.trim)
+
+		return Array.map(data, function(entry)
 			return Table.map(entry, function(field, value)
-				-- Use map as a filter since there's no applicable filter function atm
+				-- Use map as a filter since there's no applicable filter function in either Array or Table yet
 				return field, Table.includes(fields, field) and value or nil
 			end)
 		end)
