@@ -21,9 +21,9 @@ function suite:testEmptyInput()
 end
 
 function suite:testBasicResolving()
-	self:assertEquals('Europe', Region.run{region = 'Europe', shouldOnlyReturnRegionName = true})
-	self:assertEquals('South America', Region.run{region = 'sam', shouldOnlyReturnRegionName = true})
-	self:assertEquals('Europe', Region.run{region = 'eu', shouldOnlyReturnRegionName = true})
+	self:assertEquals('Europe', Region.run{region = 'Europe', onlyRegion = true})
+	self:assertEquals('South America', Region.run{region = 'sam', onlyRegion = true})
+	self:assertEquals('Europe', Region.run{region = 'eu', onlyRegion = true})
 end
 
 function suite:testFullOutput()
