@@ -9,7 +9,7 @@
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
-local Flag = Lua.import('Module:Flag', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 local Region = Lua.import('Module:Region', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
@@ -27,7 +27,7 @@ function suite:testBasicResolving()
 end
 
 function suite:testFullOutput()
-	local euFlag = Flag.Icon({flag = 'eu', shouldLink = true})
+	local euFlag = Flags.Icon({flag = 'eu', shouldLink = true})
 	self:assertDeepEquals({display = euFlag .. '&nbsp;Europe', region = 'Europe'}, Region.run{region = 'Europe'})
 	self:assertDeepEquals(
 		{
