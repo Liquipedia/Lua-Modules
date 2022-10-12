@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
 local String = Lua.import('Module:StringUtils', {requireDevIfEnabled = true})
-local Data = mw.loadData('Module:Flags/MasterData')
 
 local suite = ScribuntoUnit:new()
 
