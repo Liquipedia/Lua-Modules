@@ -32,8 +32,8 @@ end
 function suite:testSplit()
 	self:assertDeepEquals({''}, String.split())
 	self:assertDeepEquals({'hello', 'world'}, String.split('hello world'))
-	self:assertDeepEquals({'he', 'owor', 'd'}, String.split('hello world', 'l'))
-	self:assertDeepEquals({'he', 'oword'}, String.split('hello world', 'll'))
+	self:assertDeepEquals({'he', 'o wor', 'd'}, String.split('hello world', 'l'))
+	self:assertDeepEquals({'he', 'o world'}, String.split('hello world', 'll'))
 end
 
 function suite:testTrim()
@@ -67,7 +67,7 @@ end
 
 function suite:testInterpolate()
 	self:assertEquals('', String.interpolate('', {}))
-	self:assertEquals('I\'m 40 years old', String.interpolation('I\'m ${age} years old', {age = 40}))
+	self:assertEquals('I\'m 40 years old', String.interpolate('I\'m ${age} years old', {age = 40}))
 end
 
 return suite
