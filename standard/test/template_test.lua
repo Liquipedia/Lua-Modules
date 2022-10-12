@@ -13,16 +13,19 @@ local Template = Lua.import('Module:Template', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
+local SE_FLAG = '<span class="flag">[[File:Se hd.png|Sweden|link=:Category:Sweden]]</span>'
+
 function suite:testSafeExpand()
 	local frame = mw.getCurrentFrame()
 	self:assertEquals('[[Template:PageThatsDead]]', Template.safeExpand(frame, 'PageThatsDead'))
-	self:assertEquals('??', Template.safeExpand(frame, '??', {}))
+	self:assertEquals(SE_FLAG, Template.safeExpand(frame, 'Flag/se', {}))
 end
 
 function suite:testExpandTemplate()
 	local frame = mw.getCurrentFrame()
-	self:assertThrows(Template.safeExpand(frame, 'PageThatsDead'))
-	self:assertEquals('??', Template.safeExpand(frame, '??', {}))
+	local fn = function() return Template.expandTemplate(frame, 'PageThatsDead') end
+	self:assertThrows(fn)
+	self:assertEquals(SE_FLAG, Template.expandTemplate(frame, 'Flag/se', {}))
 end
 
 function suite:testStashArgsRetrieve()
