@@ -17,7 +17,7 @@ local suite = ScribuntoUnit:new()
 function suite:testGetExchangeRate()
 	self:assertEquals(1.45, Currency.getExchangeRate{currency = 'EUR', currencyRate = '1.45', setVariables = true})
 	self:assertEquals(1.45, tonumber(Variables.varDefault('exchangerate_EUR')))
-	self:assertEquals(1.45, Currency.getExchangeRate{date = '2022-10-10', currency = 'EUR'}) -- TODO: Check actual rate
+	self:assertEquals(0.97035563534035, Currency.getExchangeRate{date = '2022-10-10', currency = 'EUR'})
 end
 
 function suite:testFormatMoney()
