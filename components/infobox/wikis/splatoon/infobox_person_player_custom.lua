@@ -40,6 +40,8 @@ local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
+	player.args.history = tostring(TeamHistoryAuto._results{convertrole = 'true'})
+
 	_player = player
 	_args = player.args
 
@@ -50,24 +52,7 @@ function CustomPlayer.run(frame)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'history' then
-		local automatedHistory = TeamHistoryAuto._results({
-			convertrole = 'true',
-			player = _pagename
-		}) or ''
-		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == _EMPTY_AUTO_HISTORY then
-			automatedHistory = nil
-		end
-
-		if not (String.isEmpty(automatedHistory)) then
-			return {
-				Title{name = 'History'},
-				Center{content = {automatedHistory}},
-			}
-		end
-
-	elseif id == 'region' then return {}
+	if id == 'region' then return {}
 
 	elseif id == 'role' then
 		_role = Role.run({role = _args.role})
