@@ -27,7 +27,7 @@ function suite:testFormatMoney()
 	self:assertEquals('1,200', Currency.formatMoney(1200))
 	self:assertEquals('1,200.12', Currency.formatMoney(1200.12345))
 	self:assertEquals('1,200.1', Currency.formatMoney(1200.12345, 1))
-	self:assertEquals('1,200.1234', Currency.formatMoney(1200.12345, 4))
+	self:assertEquals('1,200.1235', Currency.formatMoney(1200.12345, 4))
 end
 
 function suite:testRaw()
