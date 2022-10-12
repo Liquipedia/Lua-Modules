@@ -51,7 +51,6 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
-		local manualHistory = _args.history
 		local automatedHistory = TeamHistoryAuto._results({
 			convertrole = 'true',
 			player = _pagename
@@ -64,18 +63,20 @@ function CustomInjector:parse(id, widgets)
 		if not (String.isEmpty(manualHistory) and String.isEmpty(automatedHistory)) then
 			return {
 				Title{name = 'History'},
-				Center{content = {manualHistory}},
 				Center{content = {automatedHistory}},
 			}
 		end
+
 	elseif id == 'region' then return {}
+
 	elseif id == 'role' then
 		_role = Role.run({role = _args.role})
 		_role2 = Role.run({role = _args.role2})
 		return {
-			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
+			Cell{name = _role2.display and 'Roles' or 'Role', content = {_role.display, _role2.display}}
 		}
 	end
+
 	return widgets
 end
 
@@ -83,7 +84,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	-- Signature Weapon
 	local weaponIcons = Array.map(Player:getAllArgsForBase(_args, 'weapon'),
-		function(weapon, _)
+		function(weapon)
 			local standardizedWeapon = WeaponNames[weapon:lower()]
 			if not standardizedWeapon then
 				-- we have an invalid weapon entry
@@ -101,7 +102,7 @@ function CustomInjector:addCustomCells(widgets)
 		table.insert(
 			widgets,
 			Cell{
-				name = #weaponIcons > 1 and 'Signature Weapon' or 'Signature Weapon',
+				name = #weaponIcons > 1 and 'Signature Weapons' or 'Signature Weapon',
 				content = {
 					table.concat(weaponIcons, '&nbsp;')
 				}
