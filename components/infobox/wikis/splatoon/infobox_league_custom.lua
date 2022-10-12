@@ -43,22 +43,25 @@ function CustomLeague:createWidgetInjector()
 	return CustomInjector()
 end
 
+function CustomInjector:addCustomCells(widgets)
+	local args = _args
+	table.insert(widgets, Cell{
+		name = 'Teams',
+		content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}
+	})
+	table.insert(widgets, Cell{
+		name = 'Players',
+		content = {args.player_number}
+	})
+
+	return widgets
+end
+
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {CustomLeague._getGameVersion()}},
 		}
-	elseif id == 'customcontent' then
-		if _args.player_number then
-			table.insert(widgets, Title{name = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {_args.player_number}})
-		end
-
-		--teams section
-		if _args.team_number then
-			table.insert(widgets, Title{name = 'Teams'})
-			table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
-		end
 	end
 	return widgets
 end
@@ -79,7 +82,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_game', _game or _args.game)
+	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
 	Variables.varDefine('tournament_publishertier', _args['splatoonpremier'])
 end
 
