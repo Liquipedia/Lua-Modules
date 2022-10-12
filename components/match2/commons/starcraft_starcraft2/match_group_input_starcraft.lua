@@ -342,7 +342,7 @@ end
 
 function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
 	if Logic.readBool(match.finished) and not match.winner then
-		local scores = Array.mapIndexes(function(opponentIndex) 
+		local scores = Array.mapIndexes(function(opponentIndex)
 			local opponent = match['opponent' .. opponentIndex]
 			if not opponent then
 				return nil
