@@ -20,7 +20,7 @@ function suite:testVarDefine()
 	self:assertEquals('bar', Variables.varDefineEcho('test', 'bar'))
 	self:assertEquals('bar', Variables.varDefault('test'))
 
-	self:assertEquals('3', Variables.varDefine('test', 3))
+	self:assertEquals('', Variables.varDefine('test', 3))
 	self:assertEquals('3', Variables.varDefault('test'))
 
 	self:assertEquals('', Variables.varDefine('test'))
