@@ -28,7 +28,7 @@ end
 
 function importFunctions.annotate(text, funcName, diffs)
     for module, positionEndOfRow in text:gmatch(funcName .. '%s*%(?%s*[\'"](.-)[\'"]%s*%)?.-()\r?\n') do
-        table.insert(diffs, {start = positionEndOfRow, finish = positionEndOfRow, text = importFunctions._row(module)})
+        table.insert(diffs, {start = positionEndOfRow, finish = positionEndOfRow - 1, text = importFunctions._row(module)})
     end
 end
 
