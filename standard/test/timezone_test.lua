@@ -43,38 +43,38 @@ function suite:testGetOffset()
 	)
 end
 
-function suite:getTimezoneData()
-	self:assertEquals(
+function suite:testGetTimezoneData()
+	self:assertDeepEquals(
 		{
 			abbr = 'IST',
 			name = 'Indian Standard Time',
 			offset = {5, 30},
 		},
-		Timezone.getOffset('IST')
+		Timezone.getTimezoneData('IST')
 	)
-	self:assertEquals(
+	self:assertDeepEquals(
 		{
 			abbr = 'CEST',
 			name = 'Central European Summer Time',
 			offset = {2, 0},
 		},
-		Timezone.getOffset('CEST')
+		Timezone.getTimezoneData('CEST')
 	)
-	self:assertEquals(
+	self:assertDeepEquals(
 		{
 			abbr = 'CEST',
 			name = 'Central European Summer Time',
 			offset = {2, 0},
 		},
-		Timezone.getOffset('cest')
+		Timezone.getTimezoneData('cest')
 	)
 	self:assertEquals(
 		nil,
-		Timezone.getOffset('DUMMY')
+		Timezone.getTimezoneData('DUMMY')
 	)
 	self:assertEquals(
 		nil,
-		nil
+		Timezone.getTimezoneData(nil)
 	)
 end
 
