@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local ReferenceCleaner = require('Module:ReferenceCleaner')
+local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
+
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
