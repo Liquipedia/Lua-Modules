@@ -44,14 +44,10 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'sponsors' then
-		table.insert(widgets, Cell{name = 'Official Device', content = {_args.device}})
-	elseif id == 'gamesettings' then
+	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {
-					CustomLeague._getGameVersion()
-				}},
-			}
+			Cell{name = 'Game version', content = {CustomLeague._getGameVersion()}},
+		}
 	elseif id == 'customcontent' then
 		if _args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
@@ -72,7 +68,7 @@ function CustomLeague:liquipediaTierHighlighted()
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = _game or args.game
+	lpdbData.game = CustomLeague._getGameVersion()
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = _args['splatoonpremier'] == 'true' and 'true' or nil
 	lpdbData.extradata = {
@@ -85,14 +81,10 @@ end
 function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', _game or _args.game)
 	Variables.varDefine('tournament_publishertier', _args['splatoonpremier'])
-	--Legacy Vars:
-	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
 function CustomLeague._getGameVersion()
-	local game = string.lower(_args.game or '')
-	_game = _GAME[game]
-	return _game
+	return _GAME[string.lower(_args.game or '')]
 end
 
 return CustomLeague
