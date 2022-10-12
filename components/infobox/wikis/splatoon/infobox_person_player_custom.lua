@@ -22,13 +22,9 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
-local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
 local _role2
-local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 local _SIZE_WEAPON = '25x25px'
 
 local CustomPlayer = Class.new()
