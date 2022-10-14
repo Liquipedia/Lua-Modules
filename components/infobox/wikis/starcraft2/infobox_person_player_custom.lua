@@ -365,7 +365,6 @@ function CustomPlayer._getEarningsMedalsData(player)
 		})
 	end
 
-mw.logObject(player)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
@@ -392,7 +391,7 @@ mw.logObject(player)
 
 	local queryParameters = {
 		conditions = conditions:toString(),
-		order = 'liquipediatier asc, placement asc, weight desc',
+		order = 'liquipediatier asc, weight desc, placement asc',
 	}
 
 	local processPlacement = function(placement)
@@ -407,8 +406,10 @@ mw.logObject(player)
 
 	-- if < MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS achievements fill them up
 	if #_player.achievements < MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
-		_player.achievements = Array.extendWith(_player.achievements, _player.achievementsFallBack)
-		_player.achievements = Array.sub(_player.achievements, 1, MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS)
+		Array.extendWith(
+			_player.achievements,
+			Array.sub(_player.achievementsFallBack, 1, MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS - #_player.achievements)
+		)
 	end
 	if #_player.achievements > 0 then
 		Variables.varDefine('achievements', Json.stringify(_player.achievements))
