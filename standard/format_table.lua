@@ -11,8 +11,8 @@ local Table = require('Module:Table')
 
 local TableFormatter = {}
 
-function TableFormatter.toLuaCode(tbl)
-	if type(tbl) ~= 'table' then
+function TableFormatter.toLuaCode(inputTable)
+	if type(inputTable) ~= 'table' then
 		error('TableFormatter.toLuaCode needs a table as input')
 	end
 
@@ -85,7 +85,7 @@ function TableFormatter.toLuaCode(tbl)
 
 	return mw.html.create('pre')
 		:addClass('selectall')
-		:wikitext(toLuaString(tbl, 1))
+		:wikitext(toLuaString(inputTable, 1))
 end
 
 return TableFormatter
