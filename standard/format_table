@@ -67,8 +67,6 @@ function TableFormatter.toLuaCode(tbl)
 		return luaString .. '\n' .. string.rep('\t', indentNumber - 1) .. '}'
 	end
 
-	local indentNumber = 1
-
 	return mw.html.create('pre')
 		:addClass('selectall')
 		:wikitext(toLuaString(tbl, 1))
