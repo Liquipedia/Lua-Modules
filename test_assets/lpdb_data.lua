@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Mock/Lpdb/Data
+-- page=Module:TestAssets/Lpdb/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
