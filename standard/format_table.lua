@@ -34,7 +34,7 @@ function TableFormatter.toLuaCode(tbl)
 		end
 	end
 
-	function order(_, key1, key2)
+	local function order(_, key1, key2)
 		-- cases due to possibly having numbers and strings as keys
 		if Logic.isNumeric(key1) and Logic.isNumeric(key2) then
 			return key1 < key2
