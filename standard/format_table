@@ -1,0 +1,87 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Format/Table
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local TableFormatter = {}
+
+function TableFormatter.toLuaCode(tbl)
+	if type(tbl) ~= 'table' then
+		error('TableFormatter.toLuaCode needs a table as input')
+	end
+
+	if not next(tbl) then
+		return mw.html.create('pre')
+			:addClass('selectall')
+			:wikitext('{}')
+	end
+
+	local function escapeSingleQuote(str)
+		return str:gsub('\'', '\\\'')
+	end
+
+	local function displayValue(value)
+		if type(value) == 'number' then
+			return value
+		else
+			return '\'' .. escapeSingleQuote(value) .. '\''
+		end
+	end
+
+	local function toLuaString(tbl, indentNumber)
+		local luaString = '{'
+
+		for index, obj in ipairs(tbl) do
+			luaString = luaString .. '\n' .. string.rep('\t', indentNumber)
+			-- value display
+			if type(obj) == 'table' then
+				luaString = luaString .. toLuaString(obj, indentNumber + 1)
+			else
+				luaString = luaString .. displayValue(obj)
+			end
+			luaString = luaString .. ','
+			tbl[index] = nil
+		end
+
+		for key, obj in pairs(tbl) do
+			luaString = luaString .. '\n' .. string.rep('\t', indentNumber)
+			--key display
+			if type(key) == 'number' then
+				luaString = luaString .. '[' .. key .. '] = '
+			else
+				luaString = luaString .. '[\'' .. escapeSingleQuote(key) .. '\'] = '
+			end
+
+			-- value display
+			if type(obj) == 'table' then
+				luaString = luaString .. toLuaString(obj, indentNumber + 1)
+			else
+				luaString = luaString .. displayValue(obj)
+			end
+			luaString = luaString .. ','
+		end
+
+		return luaString .. '\n' .. string.rep('\t', indentNumber - 1) .. '}'
+	end
+
+	local indentNumber = 1
+
+	return mw.html.create('pre')
+		:addClass('selectall')
+		:wikitext(toLuaString(tbl, 1))
+end
+
+function TableFormatter.test()
+	return TableFormatter.toLuaCode{a = 'a', b = {b = 'b'}, c = 1, 5, 10, [10] = 100, ['a\'b'] = 'te\'st'}
+end
+function TableFormatter.test2()
+	return TableFormatter.toLuaCode{}
+end
+function TableFormatter.test3()
+	return TableFormatter.toLuaCode{a = 'a', b = {b = 'b'}, c = 1, [10] = 100, ['a\'b'] = 'te\'st'}
+end
+
+return TableFormatter
