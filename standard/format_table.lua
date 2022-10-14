@@ -16,7 +16,7 @@ function TableFormatter.toLuaCode(inputTable)
 		error('TableFormatter.toLuaCode needs a table as input')
 	end
 
-	if not next(tbl) then
+	if Table.isEmpty(inputTable) then
 		return mw.html.create('pre')
 			:addClass('selectall')
 			:wikitext('{}')
