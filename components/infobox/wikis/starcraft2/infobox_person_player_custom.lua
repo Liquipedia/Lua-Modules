@@ -24,7 +24,7 @@ local Variables = require('Module:Variables')
 
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -39,6 +39,7 @@ local _PAGENAME = mw.title.getCurrentTitle().prefixedText
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local _EARNING_MODES = {solo = '1v1', team = 'team'}
+local DEFAULT_EARNINGS_MODE = 'other'
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local _MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
 local _MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 40
@@ -348,10 +349,12 @@ function CustomPlayer:calculateEarnings()
 end
 
 function CustomPlayer._getEarningsMedalsData(player)
+	local playerWithUnderScores = player:gsub(' ', '_')
 	local playerConditions = ConditionTree(BooleanOperator.any)
 	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
 		playerConditions:add({
-			ConditionNode(ColumnName('players_p' .. playerIndex), Comparator.eq, player),
+			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player),
+			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, playerWithUnderScores),
 		})
 	end
 
@@ -362,9 +365,11 @@ function CustomPlayer._getEarningsMedalsData(player)
 		})
 	end
 
+mw.logObject(player)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('participantlink'), Comparator.eq, player),
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithUnderScores),
 			playerConditions,
 		},
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
@@ -373,7 +378,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
 			ConditionNode(ColumnName('extradata_award'), Comparator.neq, ''),
 			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('players_type'), Comparator.gt, Opponent.solo),
+				ConditionNode(ColumnName('opponenttype'), Comparator.gt, Opponent.solo),
 				placementConditions,
 			},
 		},
@@ -418,7 +423,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 end
 
 function CustomPlayer._addPlacementToEarnings(earnings, earnings_total, data)
-	local mode = _EARNING_MODES[(data.players or {}).type or ''] or 'other'
+	local mode = _EARNING_MODES[data.opponenttype] or DEFAULT_EARNINGS_MODE
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
@@ -435,7 +440,7 @@ function CustomPlayer._addPlacementToMedals(medals, data)
 		local place = CustomPlayer._getPlacement(data.placement)
 		CustomPlayer._setAchievements(data, place)
 		if
-			(data.players or {}).type == Opponent.solo
+			data.opponenttype == Opponent.solo
 			and place and place <= 3
 		then
 			local tier = data.liquipediatier or 'undefined'
@@ -471,7 +476,7 @@ end
 function CustomPlayer._setAchievements(data, place)
 	local tier = tonumber(data.liquipediatier)
 
-	if tier == 1 and place == 1 and (data.players or {}).type == Opponent.solo then
+	if tier == 1 and place == 1 and data.opponenttype == Opponent.solo then
 		table.insert(_player.infoboxAchievements, data)
 	end
 
