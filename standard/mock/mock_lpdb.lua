@@ -14,6 +14,10 @@ local Table = require('Module:Table')
 
 local lpdbData = Lua.import('Module:Mock/Lpdb/Data', {requireDevIfEnabled = true})
 
+-- Parses a single condition into it's three components,
+-- Eg. `[[field::!value]]` is parsed into `field`, `!`, `value`
+local CONDITION_REGEX = '%[%[(%a+)::([!><]?)([%a%s%d]+)]]'
+
 local mockLpdb = {}
 
 local DEFAULTS = {
@@ -98,7 +102,7 @@ function mockLpdb._parseConditions(conditions)
 	---@type {comparator:string, name:string, value:string}[]
 	local criterias = {}
 
-	for name, comparator, value in string.gmatch(conditions, '%[%[(%a+)::([!><]?)([%a%s%d]+)]]') do
+	for name, comparator, value in string.gmatch(conditions, CONDITION_REGEX) do
 		table.insert(criterias, {name = name, comparator = comparator, value = value})
 	end
 
