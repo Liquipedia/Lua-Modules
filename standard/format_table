@@ -74,14 +74,4 @@ function TableFormatter.toLuaCode(tbl)
 		:wikitext(toLuaString(tbl, 1))
 end
 
-function TableFormatter.test()
-	return TableFormatter.toLuaCode{a = 'a', b = {b = 'b'}, c = 1, 5, 10, [10] = 100, ['a\'b'] = 'te\'st'}
-end
-function TableFormatter.test2()
-	return TableFormatter.toLuaCode{}
-end
-function TableFormatter.test3()
-	return TableFormatter.toLuaCode{a = 'a', b = {b = 'b'}, c = 1, [10] = 100, ['a\'b'] = 'te\'st'}
-end
-
 return TableFormatter
