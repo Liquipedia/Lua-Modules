@@ -11,19 +11,6 @@ local Lua = require('Module:Lua')
 
 local CustomEarnings = Lua.import('Module:Earnings/Base', {requireDevIfEnabled = true})
 
-CustomEarnings.defaultNumberOfPlayersInTeam = 4
-
--- Legacy entry points
-function CustomEarnings.calc_player(input)
-    local args = input.args
-
-    return CustomEarnings.calculateForPlayer(args)
-end
-
-function CustomEarnings.calc_team(input)
-    local args = input.args
-
-    return CustomEarnings.calculateForTeam(args)
-end
+CustomEarnings.divisionFactorPlayer = nil
 
 return Class.export(CustomEarnings)
