@@ -64,7 +64,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args['publisherpremier'])
+	return Logic.readBool(_args.publisherpremier)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
@@ -80,7 +80,7 @@ end
 
 function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
-	Variables.varDefine('tournament_publishertier', _args['publisherpremier'])
+	Variables.varDefine('tournament_publishertier', _args.publisherpremier)
 end
 
 function CustomLeague._getGameVersion()
