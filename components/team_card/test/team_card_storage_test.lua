@@ -10,7 +10,8 @@ local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
 local TCStorage = Lua.import('Module:TeamCard/Storage', {requireDevIfEnabled = true})
-local TournamentMock = Lua.import('Module:Infobox/League/Mock', {requireDevIfEnabled = true})
+local TournamentMock = Lua.import('Module:Infobox/Mock/League', {requireDevIfEnabled = true})
+local Variables = Lua.import('Module:Variables', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
@@ -25,7 +26,7 @@ function suite:testStandardFields()
 	local expectedData = {
 		tournament = tournamentData.name,
 		series = tournamentData.series,
-		parent = 'Module:TeamCard/Storage/testcases',
+		parent = 'Module_talk:TeamCard/Storage/testcases',
 		startdate = tournamentData.sdate,
 		date = tournamentData.edate,
 		image = args.image1,
@@ -47,9 +48,10 @@ function suite:testStandardFields()
 end
 
 function suite:testObjectName()
-	self:assetEquals('ranking_foo_örban', TCStorage._getLpdbObjectName('Örban', 'foo'))
-	self:assetEquals('ranking_tbd_1', TCStorage._getLpdbObjectName('TBD'))
-	self:assetEquals('ranking_tbd_2', TCStorage._getLpdbObjectName('TBD'))
+	self:assertEquals('ranking_foo_örban', TCStorage._getLpdbObjectName('Örban', 'foo'))
+	self:assertEquals('ranking_tbd_1', TCStorage._getLpdbObjectName('TBD'))
+	self:assertEquals('ranking_tbd_2', TCStorage._getLpdbObjectName('TBD'))
+	Variables.varDefine('TBD_placements')
 end
 
 return suite
