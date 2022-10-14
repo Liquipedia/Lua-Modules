@@ -423,7 +423,7 @@ mw.logObject(player)
 end
 
 function CustomPlayer._addPlacementToEarnings(earnings, earnings_total, data)
-	local mode = _EARNING_MODES[data.opponenttype or ''] or DEFAULT_EARNINGS_MODE
+	local mode = _EARNING_MODES[data.opponenttype] or DEFAULT_EARNINGS_MODE
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
