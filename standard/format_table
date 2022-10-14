@@ -6,6 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
+local Table = require('Module:Table')
+
 local TableFormatter = {}
 
 function TableFormatter.toLuaCode(tbl)
@@ -31,6 +34,18 @@ function TableFormatter.toLuaCode(tbl)
 		end
 	end
 
+	function order(_, key1, key2)
+		if Logic.isNumeric(key1) and Logic.isNumeric(key2) then
+			return key1 < key2
+		elseif Logic.isNumeric(key1) then
+			return true
+		elseif Logic.isNumeric(key2) then
+			return false
+		else -- 2 strings
+			return key1 < key2
+		end
+	end
+
 	local function toLuaString(tbl, indentNumber)
 		local luaString = '{'
 
@@ -46,7 +61,7 @@ function TableFormatter.toLuaCode(tbl)
 			tbl[index] = nil
 		end
 
-		for key, obj in pairs(tbl) do
+		for key, obj in Table.iter.spairs(tbl, order) do
 			luaString = luaString .. '\n' .. string.rep('\t', indentNumber)
 			--key display
 			if type(key) == 'number' then
