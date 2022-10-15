@@ -19,7 +19,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local TIER_VALUE = {8, 4, 2}
+local TIER_VALUE = {8, 4, 3, 2}
 
 -- Template entry point
 function CustomPrizePool.run(frame)
@@ -38,15 +38,12 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
-	lpdbData.publishertier = Variables.varDefault('tournament_publishertier', '')
-	lpdbData.extradata.publisherpremier = Variables.varDefault('tournament_publisher_major') and 'true' or ''
+	lpdbData.publishertier = Variables.varDefault('tournament_publisher_major', '')
 
 	local team = lpdbData.participant or ''
 	local lpdbPrefix = placement.parent.options.lpdbPrefix
 
 	Variables.varDefine('enddate_' .. lpdbPrefix .. team, lpdbData.date)
-	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (team:lower()) .. '_pointprize', lpdbData.extradata.prizepoints)
-
 
 	return lpdbData
 end
