@@ -24,7 +24,7 @@ function suite:testClass()
 			.. '\n\t10,'
 			.. '\n\t[10] = 100,'
 			.. '\n\t[\'a\'] = \'a\','
-			.. '\n\t[\'a\\\'b\'] = \'te\\\'st\','
+			.. '\n\t[\'a\\\'b\'] = \'' .. mw.text.nowiki('te\\\'st') .. '\','
 			.. '\n\t[\'b\'] = {'
 			.. '\n\t\t[\'b\'] = \'b\','
 			.. '\n\t},'
@@ -36,17 +36,16 @@ function suite:testClass()
 		'<pre class="selectall">{'
 			.. '\n\t[10] = 100,'
 			.. '\n\t[\'a\'] = \'a\','
-			.. '\n\t[\'a\\\'b\'] = \'te\\\'st\','
 			.. '\n\t[\'b\'] = {'
 			.. '\n\t\t[\'b\'] = \'b\','
 			.. '\n\t},'
 			.. '\n\t[\'c\'] = 1,'
-			.. '\n\t[\'x\'] = \'[[Module:Format/Table/testcases]]\','
-			.. '\n\t[\'z\'] = \'https://discord.com/invite/WaQRYSa\','
+			.. '\n\t[\'x\'] = \'' .. mw.text.nowiki('[[Module:Format/Table/testcases|aa]]') .. '\','
+			.. '\n\t[\'z\'] = \'' .. mw.text.nowiki('https://discord.com/invite/WaQRYSa') .. '\','
 			.. '\n}</pre>',
 		tostring(TableFormatter.toLuaCode{
-			a = 'a', b = {b = 'b'}, c = 1, [10] = 100, ['a\'b'] = 'te\'st',
-			x = '[[Module:Format/Table/testcases]]',
+			a = 'a', b = {b = 'b'}, c = 1, [10] = 100,
+			x = '[[Module:Format/Table/testcases|aa]]',
 			z = 'https://discord.com/invite/WaQRYSa'
 		})
 	)
