@@ -70,7 +70,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return 'W'
 		end,
-		lpdb = 1,
+		lpdb = 'w',
 	},
 	D = {
 		active = function (args)
@@ -79,7 +79,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return 'D'
 		end,
-		lpdb = 1,
+		lpdb = 'd',
 	},
 	L = {
 		active = function (args)
@@ -88,7 +88,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return 'L'
 		end,
-		lpdb = 2,
+		lpdb = 'l',
 	},
 	Q = {
 		active = function (args)
@@ -97,7 +97,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return Abbreviation.make('Q', 'Qualified Automatically')
 		end,
-		lpdb = 1,
+		lpdb = 'q',
 	},
 }
 
