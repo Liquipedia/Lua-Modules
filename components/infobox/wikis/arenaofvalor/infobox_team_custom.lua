@@ -22,12 +22,10 @@ local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _team
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
-	_team = team
-	_args = _team.args
+	_args = team.args
 
 	-- Automatic org people
 	team.args.coach = Template.expandTemplate(frame, 'Coach of')
@@ -46,7 +44,7 @@ function CustomTeam:createWidgetInjector()
 end
 
 function CustomTeam:createBottomContent()
-	if not _team.args.disbanded then
+	if not _args.disbanded then
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing matches of'
@@ -64,7 +62,7 @@ function CustomInjector:addCustomCells(widgets)
 	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Abbreviation',
-		content = {args.abbreviation}
+		content = {_args.abbreviation}
 	})
 
 	return widgets
