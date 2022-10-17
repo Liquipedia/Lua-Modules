@@ -374,6 +374,11 @@ end
 function HiddenInfoboxLeague._setLpdbData()
 	local links = Links.transform(_args)
 
+	local participantsNumber = tonumber(Variables.varDefault('tournament_playerNumber')) or 0
+	if participantsNumber == 0 then
+		participantsNumber = _args.team_number or 0
+	end
+
 	local lpdbData = {
 		name = _args.name or _pagename,
 		tickername = _args.tickername or _args.name or _pagename,
@@ -410,7 +415,7 @@ function HiddenInfoboxLeague._setLpdbData()
 			Links.makeFullLinksForTableItems(links or {})
 		),
 		maps = Variables.varDefault('tournament_maps'),
-		participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0),
+		participantsnumber = participantsNumber,
 	}
 
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. lpdbData.name, lpdbData)
