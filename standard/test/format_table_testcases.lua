@@ -19,30 +19,30 @@ function suite:testClass()
 		tostring(TableFormatter.toLuaCode{})
 	)
 	self:assertEquals(
-		'<pre class="selectall">{'
-			.. '\n\t5,'
-			.. '\n\t10,'
-			.. '\n\t[10] = 100,'
-			.. '\n\t[\'a\'] = \'a\','
-			.. '\n\t[\'a\\\'b\'] = \'' .. mw.text.nowiki('te\\\'st') .. '\','
-			.. '\n\t[\'b\'] = {'
-			.. '\n\t\t[\'b\'] = \'b\','
-			.. '\n\t},'
-			.. '\n\t[\'c\'] = 1,'
-			.. '\n}</pre>',
+		[[<pre class="selectall">{
+	5,
+	10,
+	[10] = 100,
+	['a'] = 'a',
+	['a\'b'] = ']] .. mw.text.nowiki('te\\\'st') .. [[',
+	['b'] = {
+		['b'] = 'b',
+	},
+	['c'] = 1,
+}</pre>]],
 		tostring(TableFormatter.toLuaCode{a = 'a', b = {b = 'b'}, c = 1, 5, 10, [10] = 100, ['a\'b'] = 'te\'st'})
 	)
 	self:assertEquals(
-		'<pre class="selectall">{'
-			.. '\n\t[10] = 100,'
-			.. '\n\t[\'a\'] = \'a\','
-			.. '\n\t[\'b\'] = {'
-			.. '\n\t\t[\'b\'] = \'b\','
-			.. '\n\t},'
-			.. '\n\t[\'c\'] = 1,'
-			.. '\n\t[\'x\'] = \'' .. mw.text.nowiki('[[Module:Format/Table/testcases|aa]]') .. '\','
-			.. '\n\t[\'z\'] = \'' .. mw.text.nowiki('https://discord.com/invite/WaQRYSa') .. '\','
-			.. '\n}</pre>',
+		[[<pre class="selectall">{
+	[10] = 100,
+	['a'] = 'a',
+	['b'] = {
+		['b'] = 'b',
+	},
+	['c'] = 1,
+	['x'] = ']] .. mw.text.nowiki('[[Module:Format/Table/testcases|aa]]') .. [[',
+	['z'] = ']] .. mw.text.nowiki('https://discord.com/invite/WaQRYSa') .. [[',
+}</pre>]],
 		tostring(TableFormatter.toLuaCode{
 			a = 'a', b = {b = 'b'}, c = 1, [10] = 100,
 			x = '[[Module:Format/Table/testcases|aa]]',
