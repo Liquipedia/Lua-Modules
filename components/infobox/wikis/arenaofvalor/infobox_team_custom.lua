@@ -59,7 +59,6 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomInjector:addCustomCells(widgets)
-	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Abbreviation',
 		content = {_args.abbreviation}
