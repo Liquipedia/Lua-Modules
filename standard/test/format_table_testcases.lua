@@ -41,8 +41,14 @@ function suite:testClass()
 			.. '\n\t\t[\'b\'] = \'b\','
 			.. '\n\t},'
 			.. '\n\t[\'c\'] = 1,'
+			.. '\n\t[\'x\'] = \'[[Module:Format/Table/testcases]]\','
+			.. '\n\t[\'z\'] = \'https://discord.com/invite/WaQRYSa\','
 			.. '\n}</pre>',
-		tostring(TableFormatter.toLuaCode{a = 'a', b = {b = 'b'}, c = 1, [10] = 100, ['a\'b'] = 'te\'st'})
+		tostring(TableFormatter.toLuaCode{
+			a = 'a', b = {b = 'b'}, c = 1, [10] = 100, ['a\'b'] = 'te\'st',
+			x = '[[Module:Format/Table/testcases]]',
+			z = 'https://discord.com/invite/WaQRYSa'
+		})
 	)
 end
 
