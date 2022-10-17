@@ -30,7 +30,7 @@ function TableFormatter.toLuaCode(inputTable)
 		if type(value) == 'number' then
 			return value
 		else
-			return '\'' .. escapeSingleQuote(value) .. '\''
+			return '\'' .. mw.text.nowiki(escapeSingleQuote(value)) .. '\''
 		end
 	end
 
