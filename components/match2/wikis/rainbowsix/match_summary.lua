@@ -337,7 +337,7 @@ end
 function Casters:create()
 	return self.root
 		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
-		:wikitext(table.concat(self.casters, #self.casters > 2 and ', ' or ' & '))
+		:wikitext(mw.text.listToText(self.casters, #self.casters > 2 and ', ' or ' & '))
 end
 
 local CustomMatchSummary = {}
