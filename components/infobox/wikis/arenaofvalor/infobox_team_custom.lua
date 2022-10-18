@@ -16,7 +16,6 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabl
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
-local Cell = Widgets.Cell
 
 local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
