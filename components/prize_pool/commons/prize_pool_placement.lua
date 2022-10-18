@@ -43,7 +43,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return Abbreviation.make('DQ', 'Disqualified')
 		end,
-		lpdb = 'dq',
+		lpdb = 'DQ',
 	},
 	DNF = {
 		active = function (args)
@@ -52,7 +52,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return Abbreviation.make('DNF', 'Did not finish')
 		end,
-		lpdb = 'dnf',
+		lpdb = 'DNF',
 	},
 	DNP = {
 		active = function (args)
@@ -61,7 +61,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return Abbreviation.make('DNP', 'Did not participate')
 		end,
-		lpdb = 'dnp',
+		lpdb = 'DNP',
 	},
 	W = {
 		active = function (args)
@@ -70,7 +70,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return 'W'
 		end,
-		lpdb = 'w',
+		lpdb = 'W',
 	},
 	D = {
 		active = function (args)
@@ -79,7 +79,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return 'D'
 		end,
-		lpdb = 'd',
+		lpdb = 'D',
 	},
 	L = {
 		active = function (args)
@@ -88,7 +88,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return 'L'
 		end,
-		lpdb = 'l',
+		lpdb = 'L',
 	},
 	Q = {
 		active = function (args)
@@ -97,7 +97,7 @@ Placement.specialStatuses = {
 		display = function ()
 			return Abbreviation.make('Q', 'Qualified Automatically')
 		end,
-		lpdb = 'q',
+		lpdb = 'Q',
 	},
 }
 
