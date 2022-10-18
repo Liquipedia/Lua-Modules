@@ -8,11 +8,11 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Widgets = require('Module:Infobox/Widget/All')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
 
-local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local Language = mw.language.new('en')
@@ -56,7 +56,7 @@ function CustomSeries._getSeriesPrizepools(series)
 	end
 
 	_totalSeriesPrizepool = prizemoney
-	return '$' .. Language:formatNum(math.floor(prizemoney + 0.5))
+	return '$' .. Language:formatNum(Math.round(prizemoney + 0.5))
 end
 
 function CustomInjector:addCustomCells(widgets)
