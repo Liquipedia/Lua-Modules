@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Widgets = require('Module:Infobox/Widget/All')
+local Math = require('Module:Math')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
