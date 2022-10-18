@@ -47,9 +47,10 @@ function CustomInjector:parse(id, widgets)
 		_role = Role.run({role = _args.role})
 		_role2 = Role.run({role = _args.role2})
 		return {
-			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
+			Cell{name = _role2.display and 'Roles' or 'Role', content = {_role.display, _role2.display}}
 		}
 	end
+
 	return widgets
 end
 
@@ -57,7 +58,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	-- Signature Heroes
 	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
-		function(hero, _)
+		function(hero)
 			local standardizedHero = HeroNames[hero:lower()]
 			if not standardizedHero then
 				-- we have an invalid hero entry
