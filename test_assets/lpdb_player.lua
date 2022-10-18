@@ -10,7 +10,7 @@
 --- local Formatter = require('Module:Format/Table')
 --- Formatter.toLuaCode(mw.ext.LiquipediaDB.lpdb('player', {}))
 
-
+-- luacheck: ignore
 return {
 	{
 		['alternateid'] = 'suprmane, supr2turnt, suprSayian, suprWRLD',
