@@ -58,15 +58,6 @@ function CustomTeam:createBottomContent()
 	end
 end
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Abbreviation',
-		content = {_args.abbreviation}
-	})
-
-	return widgets
-end
-
 function CustomTeam:addToLpdb(lpdbData, args)
 	if not String.isEmpty(args.teamcardimage) then
 		lpdbData.logo = args.teamcardimage
