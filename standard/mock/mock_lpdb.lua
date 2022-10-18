@@ -7,12 +7,9 @@
 --
 
 local Array = require('Module:Array')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-
-local lpdbData = Lua.import('Module:Mock/Lpdb/Data', {requireDevIfEnabled = true})
 
 -- Parses a single condition into it's three components,
 -- Eg. `[[field::!value]]` is parsed into `field`, `!`, `value`
@@ -42,33 +39,41 @@ end
 ---- query with `::`
 ---- order
 ---- groupby
+---@param dbTable string
+---@param parameters table
+---@return table
 function mockLpdb.lpdb(dbTable, parameters)
-	local returnedData = mockLpdb._getMockData(dbTable)
+	local lpdbData = mockLpdb._getMockData(dbTable)
 
-	returnedData = mockLpdb._applyConditionse(returnedData, parameters.conditions)
+	lpdbData = mockLpdb._applyConditions(lpdbData, parameters.conditions)
 
-	returnedData = mockLpdb._applyLimitOffset(returnedData, parameters.limit, parameters.offset)
+	lpdbData = mockLpdb._applyLimitOffset(lpdbData, parameters.limit, parameters.offset)
 
-	returnedData = mockLpdb._applyQuery(returnedData, parameters.query)
+	lpdbData = mockLpdb._applyQuery(lpdbData, parameters.query)
 
-	return returnedData
+	return lpdbData
 end
 
+---Fetches mock lpdb data from store
+---@param dbTable string
+---@return table
 function mockLpdb._getMockData(dbTable)
-	local data = lpdbData[dbTable]
+	local data = Lua.import('Module:Mock/Lpdb/Data/' .. dbTable, {requireDevIfEnabled = true})
 
 	if not data then
-		return error(mw.message.new('liquipediadb-error-invalid-datatype'))
+		error(mw.message.new('liquipediadb-error-invalid-datatype'))
 	end
 
-	return Array.map(data, function(entry)
-		local parsedData = Json.parseIfString(entry)
-		return parsedData
-	end)
+	return data
 end
 
-function mockLpdb._applyConditionse(data, conditions)
+---Filters the mock data based on an lpdb conditions string.
+---@param data table
+---@param conditions string?
+---@return table
+function mockLpdb._applyConditions(data, conditions)
 	if String.isNotEmpty(conditions) then
+		---@cast conditions -nil ---Since the engine cannot determine that isNotEmpty checks for nil, we remove the nil
 		local condition = mockLpdb._parseConditions(conditions)
 		return Array.filter(data, condition)
 	end
@@ -76,13 +81,22 @@ function mockLpdb._applyConditionse(data, conditions)
 	return data
 end
 
-function mockLpdb._applyLimitOffset(data, limit, offset)
-	local limit = tonumber(limit) or DEFAULTS.limit
-	local offset = tonumber(offset) or DEFAULTS.offset
+---Applies limit and offset to mock data
+---@param data table
+---@param inputLimit number?
+---@param inputOffset number?
+---@return table
+function mockLpdb._applyLimitOffset(data, inputLimit, inputOffset)
+	local limit = tonumber(inputLimit) or DEFAULTS.limit
+	local offset = tonumber(inputOffset) or DEFAULTS.offset
 
 	return Array.sub(data, offset + 1, (offset + limit))
 end
 
+---Applies the field selectors (query) to the mock data
+---@param data table
+---@param query string?
+---@return table
 function mockLpdb._applyQuery(data, query)
 	if String.isNotEmpty(query) then
 		local fields = Table.mapValues(mw.text.split(query, ','), mw.text.trim)
@@ -98,6 +112,9 @@ function mockLpdb._applyQuery(data, query)
 	return data
 end
 
+---Parse a condition string into a function
+---@param conditions string
+---@return function
 function mockLpdb._parseConditions(conditions)
 	---@type {comparator:string, name:string, value:string}[]
 	local criterias = {}
