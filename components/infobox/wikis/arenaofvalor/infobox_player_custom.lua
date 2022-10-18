@@ -12,6 +12,7 @@ local HeroIcon = require('Module:HeroIcon')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Role = require('Module:Role')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
@@ -20,9 +21,13 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
+local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
 local _role2
+local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 local _SIZE_HERO = '25x25px'
 
 local CustomPlayer = Class.new()
@@ -34,8 +39,6 @@ local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
-	player.args.history = tostring(TeamHistoryAuto._results{convertrole = 'true'})
-
 	_player = player
 	_args = player.args
 
@@ -46,7 +49,25 @@ function CustomPlayer.run(frame)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'role' then
+	if id == 'history' then
+		local manualHistory = _args.history
+		local automatedHistory = TeamHistoryAuto._results({
+			convertrole = 'true',
+			player = _pagename
+		}) or ''
+		automatedHistory = tostring(automatedHistory)
+		if automatedHistory == _EMPTY_AUTO_HISTORY then
+			automatedHistory = nil
+		end
+
+		if not (String.isEmpty(manualHistory) and String.isEmpty(automatedHistory)) then
+			return {
+				Title{name = 'History'},
+				Center{content = {manualHistory}},
+				Center{content = {automatedHistory}},
+			}
+		end
+	elseif id == 'role' then
 		_role = Role.run({role = _args.role})
 		_role2 = Role.run({role = _args.role2})
 		return {
