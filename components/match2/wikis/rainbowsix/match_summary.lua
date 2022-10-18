@@ -6,16 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext/dev')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
+local Flags = require('Module:Flags')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
-local String = require('Module:StringUtils')
-local Json = require('Module:Json')
-local Flags = require('Module:Flags')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -326,7 +326,7 @@ function Casters:addCaster(caster)
 	if Logic.isNotEmpty(caster) then
 		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
 		if caster.flag then
-			table.insert(self.casters, Flags.Icon(caster['flag']) .. ' ' .. nameDisplay)
+			table.insert(self.casters, Flags.Icon(caster.flag) .. ' ' .. nameDisplay)
 		else
 			table.insert(self.casters, nameDisplay)
 		end
