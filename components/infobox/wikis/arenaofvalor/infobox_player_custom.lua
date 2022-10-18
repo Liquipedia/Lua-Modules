@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local HeroIcon = require('Module:HeroIcon')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
-local Region = require('Module:Region')
 local Role = require('Module:Role')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -68,7 +67,6 @@ function CustomInjector:parse(id, widgets)
 				Center{content = {automatedHistory}},
 			}
 		end
-	elseif id == 'region' then return {}
 	elseif id == 'role' then
 		_role = Role.run({role = _args.role})
 		_role2 = Role.run({role = _args.role2})
@@ -124,11 +122,6 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]
-	end
-
-	local region = Region.run({region = _args.region, country = _args.country})
-	if type(region) == 'table' then
-		lpdbData.region = region.region
 	end
 
 	return lpdbData
