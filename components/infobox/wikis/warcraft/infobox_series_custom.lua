@@ -57,7 +57,7 @@ function CustomSeries._getSeriesPrizepools(series)
 	end
 
 	_totalSeriesPrizepool = prizemoney
-	return '$' .. Language:formatNum(Math.round(prizemoney + 0.5))
+	return '$' .. Language:formatNum(Math.round(prizemoney))
 end
 
 function CustomInjector:addCustomCells(widgets)
