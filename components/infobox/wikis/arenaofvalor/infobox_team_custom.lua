@@ -12,13 +12,8 @@ local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
-
-local Widgets = require('Module:Infobox/Widget/All')
-
 local CustomTeam = Class.new()
-local CustomInjector = Class.new(Injector)
 
 local _args
 
@@ -31,15 +26,10 @@ function CustomTeam.run(frame)
 	team.args.manager = Template.expandTemplate(frame, 'Manager of')
 	team.args.captain = Template.expandTemplate(frame, 'Captain of')
 
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	return team:createInfobox(frame)
-end
-
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
 end
 
 function CustomTeam:createBottomContent()
