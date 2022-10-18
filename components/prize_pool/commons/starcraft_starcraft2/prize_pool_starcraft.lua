@@ -133,7 +133,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.individualprizemoney = playerCount and (lpdbData.prizemoney / playerCount) or 0
 
 	lpdbData.weight = Weight.calc(
-		lpdbData.individualprizemoney or 0,
+		lpdbData.individualprizemoney,
 		lpdbData.liquipediatier,
 		lpdbData.placement,
 		lpdbData.liquipediatiertype,
