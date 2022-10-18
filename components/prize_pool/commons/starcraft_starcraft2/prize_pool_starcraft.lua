@@ -129,6 +129,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')
 	lpdbData.type = Variables.varDefault('tournament_type')
 
+	local playerCount = StarcraftOpponent.partySize(lpdbData.opponenttype)
+	lpdbData.individualprizemoney = playerCount and (lpdbData.prizemoney / playerCount) or 0
+
 	lpdbData.weight = Weight.calc(
 		lpdbData.individualprizemoney or 0,
 		lpdbData.liquipediatier,
