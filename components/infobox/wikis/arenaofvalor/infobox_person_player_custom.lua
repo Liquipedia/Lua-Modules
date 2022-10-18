@@ -12,22 +12,16 @@ local HeroIcon = require('Module:HeroIcon')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Role = require('Module:Role')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
-local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
 local _role2
-local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 local _SIZE_HERO = '25x25px'
 
 local CustomPlayer = Class.new()
