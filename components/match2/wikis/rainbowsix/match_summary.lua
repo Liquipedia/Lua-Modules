@@ -6,13 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
+local DateExt = require('Module:Date/Ext/dev')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
+local String = require('Module:StringUtils')
+local Json = require('Module:Json')
+local Flags = require('Module:Flags')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
