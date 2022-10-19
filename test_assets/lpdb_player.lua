@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:TestAssets/Lpdb/Player
+-- page=Module:TestAssets/Lpdb/player
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
