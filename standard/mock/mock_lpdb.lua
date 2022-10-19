@@ -45,7 +45,7 @@ end
 
 local dbStructure = {}
 dbStructure.standingstable = {
-	parent = 'page',
+	parent = 'pagename',
 	standingsindex = 'number',
 	title = 'string',
 	tournament = 'string',
@@ -55,7 +55,7 @@ dbStructure.standingstable = {
 	extradata = 'struct?',
 }
 dbStructure.standingsentry = {
-	parent = 'page',
+	parent = 'pagename',
 	standingsindex = 'number',
 	opponenttype = 'string',
 	opponentname = 'string',
