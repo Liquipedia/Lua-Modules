@@ -351,7 +351,6 @@ function matchFunctions.getExtraData(match)
 			match[key .. 'name']
 		))
 	end
-	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 
 	match.extradata = {
 		lastgame = Variables.varDefault('last_game'),
