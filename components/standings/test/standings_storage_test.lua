@@ -12,7 +12,6 @@ local ScribuntoUnit = require('Module:ScribuntoUnit')
 local LpdbMock = Lua.import('Module:Mock/Lpdb', {requireDevIfEnabled = true})
 local StandingsStorage = Lua.import('Module:Standings/Storage', {requireDevIfEnabled = true})
 local TournamentMock = Lua.import('Module:Infobox/Mock/League', {requireDevIfEnabled = true})
-local Variables = Lua.import('Module:Variables', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
