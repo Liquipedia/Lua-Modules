@@ -7,9 +7,12 @@
 --
 
 local Array = require('Module:Array')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
+local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TypeUtil = require('Module:TypeUtil')
 
 -- Parses a single condition into it's three components,
 -- Eg. `[[field::!value]]` is parsed into `field`, `!`, `value`
@@ -23,16 +26,49 @@ local DEFAULTS = {
 }
 
 local _lpdb = {
-	lpdb = mw.ext.LiquipediaDB.lpdb
+	lpdb = mw.ext.LiquipediaDB.lpdb,
+	lpdb_standingsentry = mw.ext.LiquipediaDB.lpdb_standingsentry,
+	lpdb_standingstable = mw.ext.LiquipediaDB.lpdb_standingstable,
 }
 
 function mockLpdb.setUp()
 	mw.ext.LiquipediaDB.lpdb = mockLpdb.lpdb
+	mw.ext.LiquipediaDB.lpdb_standingsentry = mockLpdb.lpdb_standingsentry
+	mw.ext.LiquipediaDB.lpdb_standingstable = mockLpdb.lpdb_standingstable
 end
 
 function mockLpdb.tearDown()
 	mw.ext.LiquipediaDB.lpdb = _lpdb.lpdb
+	mw.ext.LiquipediaDB.lpdb_standingsentry = _lpdb.lpdb_standingsentry
+	mw.ext.LiquipediaDB.lpdb_standingstable = _lpdb.lpdb_standingstable
 end
+
+local dbStructure = {}
+dbStructure.standingstable = {
+	parent = 'page',
+	standingsindex = 'number',
+	title = 'string',
+	tournament = 'string',
+	section = 'string',
+	type = TypeUtil.literalUnion('league', 'swiss'),
+	matches = TypeUtil.optional(TypeUtil.array('string')),
+	extradata = 'struct?',
+}
+dbStructure.standingsentry = {
+	parent = 'page',
+	standingsindex = 'number',
+	opponenttype = 'string',
+	opponentname = 'string',
+	opponenttemplate = 'string?',
+	opponentplayers = TypeUtil.optional(TypeUtil.array(Opponent.types.Player)),
+	placement = 'string',
+	definitestatus = 'string?',
+	currentstatus = 'string',
+	placementchange = 'number',
+	scoreboards = 'table', -- TODO
+	roundindex = 'number',
+	extradata = 'struct?',
+}
 
 --- Not yet supported in Mock is:
 ---- conditions with `OR` or `_`
@@ -138,6 +174,28 @@ function mockLpdb._parseConditions(conditions)
 			end
 		end)
 	end
+end
+
+function mockLpdb._deserializeJson(value)
+	return Json.parseIfTable(value) or value
+end
+
+---Stores data into LPDB StandingsTable
+---@param objectname string
+---@param data table
+function mockLpdb.lpdb_standingstable(objectname, data)
+	data = Table.mapValues(data, mockLpdb._deserializeJson)
+	TypeUtil.assertValue(objectname, 'string')
+	TypeUtil.assertValue(data, TypeUtil.struct(dbStructure.standingstable), { maxDepth = 3, name = 'StandingsTable' })
+end
+
+---Stores data into LPDB StandingsEntry
+---@param objectname string
+---@param data table
+function mockLpdb.lpdb_standingsentry(objectname, data)
+	data = Table.mapValues(data, mockLpdb._deserializeJson)
+	TypeUtil.assertValue(objectname, 'string')
+	TypeUtil.assertValue(data, TypeUtil.struct(dbStructure.standingsentry), { maxDepth = 3, name = 'StandingsEntry' })
 end
 
 return mockLpdb
