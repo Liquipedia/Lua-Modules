@@ -529,7 +529,7 @@ function League:_createSeries(options, series, abbreviation, icon, iconDark)
 		iconDark = options.displayManualIcons and iconDark or nil,
 		series = series,
 		abbreviation = abbreviation,
-		date = Variables.varDefault('tournament_enddate')
+		date = Variables.varDefault('tournament_enddate'),
 		options = { noLink = not seriesPageExists }
 	}
 
