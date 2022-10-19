@@ -13,7 +13,7 @@ local Table = require('Module:Table')
 local Namespace = {}
 
 function Namespace.isMain()
-	return mw.title.getCurrentTitle():inNamespace(0)
+	return mw.title.getCurrentTitle():inNamespace(0) or mw.title.getCurrentTitle():inNamespace(829)
 end
 
 Namespace.getIdsByName = FnUtil.memoize(function()
