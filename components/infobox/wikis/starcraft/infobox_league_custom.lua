@@ -266,7 +266,7 @@ function CustomLeague:defineCustomPageVariables()
 	if not finished and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-				.. 'AND [[participant::!Definitions]] AND [[placement::1]]',
+				.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
 			query = 'date',
 			order = 'date asc',
 			limit = 1
