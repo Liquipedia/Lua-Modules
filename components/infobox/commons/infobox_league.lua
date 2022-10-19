@@ -522,12 +522,15 @@ function League:_createSeries(options, series, abbreviation, icon, iconDark)
 	end
 	options = options or {}
 
+	local seriesPageExists = Page.exists(series)
+
 	local output = LeagueIcon.display{
 		icon = options.displayManualIcons and icon or nil,
 		iconDark = options.displayManualIcons and iconDark or nil,
 		series = series,
 		abbreviation = abbreviation,
 		date = Variables.varDefault('tournament_enddate')
+		options = { noLink = not seriesPageExists }
 	}
 
 	if output == LeagueIcon.display{} then
@@ -539,7 +542,7 @@ function League:_createSeries(options, series, abbreviation, icon, iconDark)
 		end
 	end
 
-	if not Page.exists(series) then
+	if not seriesPageExists then
 		if String.isEmpty(abbreviation) then
 			output = output .. series
 		else
