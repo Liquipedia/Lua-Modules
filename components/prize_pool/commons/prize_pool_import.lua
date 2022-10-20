@@ -200,6 +200,10 @@ function Import._computeBracketPlacementEntries(matchRecords, options)
 		function(group)
 			return Array.map(group, function(placementEntry)
 				local match = bracket.matchesById[placementEntry.matchId]
+				if match.bracketData.bracketResetMatchId then
+					local resetMatchId = match.bracketData.bracketResetMatchId
+					match = bracket.matchesById[resetMatchId] or match
+				end
 				return Import._makeEntryFromMatch(placementEntry, match)
 			end)
 		end
