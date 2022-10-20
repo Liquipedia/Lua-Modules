@@ -34,6 +34,7 @@ local GSL_STYLE_SCORES = {
 	{w = 1, d = 0, l = 2},
 	{w = 0, d = 0, l = 2},
 }
+local BYE_OPPONENT_NAME = 'bye'
 
 local Import = {}
 
@@ -195,7 +196,8 @@ end
 -- Compute placements and their entries from the match records of a bracket.
 function Import._computeBracketPlacementEntries(matchRecords, options)
 	local bracket = MatchGroupUtil.makeBracketFromRecords(matchRecords)
-	return Array.map(
+
+	local slots = Array.map(
 		Import._computeBracketPlacementGroups(bracket, options),
 		function(group)
 			return Array.map(group, function(placementEntry)
@@ -204,6 +206,19 @@ function Import._computeBracketPlacementEntries(matchRecords, options)
 			end)
 		end
 	)
+
+	-- Remove `bye`s from slotentries
+	for slotIndex, slotEntries in pairs(slots) do
+		slots[slotIndex] = Array.filter(slotEntries, function(entry)
+			return not (
+				entry.opponent
+				and entry.opponent.type == Opponent.literal
+				and Opponent.toName(entry.opponent):lower() == BYE_OPPONENT_NAME
+			)
+		end)
+	end
+
+	return slots
 end
 
 function Import._makeEntryFromMatch(placementEntry, match)
