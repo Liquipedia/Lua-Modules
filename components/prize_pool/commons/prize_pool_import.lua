@@ -36,16 +36,20 @@ local GSL_STYLE_SCORES = {
 }
 local BYE_OPPONENT_NAME = 'bye'
 
+local _parent
+
 local Import = {}
 
-function Import.run(placements, args)
-	Import.config = Import._getConfig(args, placements)
+function Import.run(parent)
+	_parent = parent
+
+	Import.config = Import._getConfig(parent.args, parent.placements)
 
 	if Import.config.importLimit == 0 or not Import.config.matchGroupsSpec then
-		return placements
+		return parent.placements
 	end
 
-	return Import._importPlacements(placements)
+	return Import._importPlacements(parent.placements)
 end
 
 function Import._getConfig(args, placements)
@@ -368,11 +372,9 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	local placeStart = (priorPlacement.placeEnd or 0) + 1
 	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
-	local parent = priorPlacement.parent
-
 	return Placement(
 		{placeStart = placeStart, placeEnd = placeEnd},
-		parent,
+		_parent,
 		priorPlacement.placeEnd or 0
 	)
 end
