@@ -207,6 +207,7 @@ function Import._computeBracketPlacementEntries(matchRecords, options)
 		end
 	)
 
+	-- Remove `bye`s from slotentries
 	for slotIndex, slotEntries in pairs(slots) do
 		slots[slotIndex] = Array.filter(slotEntries, function(entry)
 			return not (
