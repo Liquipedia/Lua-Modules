@@ -397,7 +397,7 @@ function PrizePool:create()
 	self.options = self:_readConfig(self.args)
 	self.prizes = self:_readPrizes(self.args)
 	self.placements = self:_readPlacements(self.args)
-	self.placements = Import.run(self.placements, self.args)
+	self.placements = Import.run(self)
 
 	if self:_hasUsdPrizePool() then
 		self:setConfig('showUSD', true)
