@@ -516,10 +516,10 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	end
 
 	return {
+		date = match.date,
 		lastVs = lastVs,
 		score = score,
 		vsScore = vsScore,
-		date = match.date
 	}
 end
 
