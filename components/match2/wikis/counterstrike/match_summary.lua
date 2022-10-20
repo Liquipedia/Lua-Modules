@@ -326,8 +326,17 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 		footer:addLink(url, icon, iconDark, label)
 	end
 
-	local function addVodLink(gamenum, vod, htext)
+	local function addVodLink(gamenum, vod, part)
 		if vod then
+			gamenum = (gamenum and match.bestof > 1) and gamenum or nil
+			local htext
+			if part then
+				if gamenum then
+					htext = 'Watch Game ' .. gamenum .. ' (part ' .. part .. ')'
+				else
+					htext = 'Watch VOD (part ' .. part .. ')'
+				end
+			end
 			footer:addElement(VodLink.display{
 				gamenum = gamenum,
 				vod = vod,
@@ -338,8 +347,8 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 
 	-- Match vod
 	if secondVods[0] then
-		addVodLink(nil, match.vod, 'Watch VOD ' .. '(part 1)')
-		addVodLink(nil, secondVods[0], 'Watch VOD ' .. '(part 2)')
+		addVodLink(nil, match.vod, 1)
+		addVodLink(nil, secondVods[0], 2)
 	else
 		addVodLink(nil, match.vod, nil)
 	end
@@ -347,8 +356,8 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	-- Game Vods
 	for index, vod in pairs(vods) do
 		if secondVods[index] then
-			addVodLink(index, vod, 'Watch Game ' .. index .. ' (part 1)')
-			addVodLink(index, secondVods[index], 'Watch Game ' .. index .. ' (part 2)')
+			addVodLink(index, vod, 1)
+			addVodLink(index, secondVods[index], 2)
 		else
 			addVodLink(index, vod, nil)
 		end
