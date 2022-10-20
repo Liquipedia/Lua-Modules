@@ -349,7 +349,7 @@ function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
 			end
 			return match['opponent' .. opponentIndex].score or -1 end
 		)
-		local maxScore = math.max(unpack(scores))
+		local maxScore = Table.isNotEmpty(scores) and math.max(unpack(scores)) or 0
 		-- if we have a positive score and the match is finished we also have a winner
 		if maxScore > 0 then
 			local maxIndexFound = false
