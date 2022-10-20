@@ -58,6 +58,12 @@ function StandingsStorage.table(data)
 	local title = data.title or ''
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
 
+	local standingsIndex = tonumber(data.standingsindex)
+
+	if not standingsIndex then
+		error('No standingsindex specified')
+	end
+
 	local extradata = {
 		enddate = data.enddate,
 		finished = data.finished,
@@ -71,7 +77,7 @@ function StandingsStorage.table(data)
 		{
 			tournament = Variables.varDefault('tournament_name', ''),
 			parent = Variables.varDefault('tournament_parent', ''),
-			standingsindex = tonumber(data.standingsindex),
+			standingsindex = standingsIndex,
 			title = mw.text.trim(cleanedTitle),
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
 			type = data.type,
@@ -90,6 +96,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
+	standingsIndex = tonumber(standingsIndex)
 
 	if not standingsIndex or not roundIndex or not slotIndex then
 		return
