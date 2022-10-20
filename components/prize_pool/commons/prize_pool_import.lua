@@ -211,7 +211,7 @@ function Import._computeBracketPlacementEntries(matchRecords, options)
 		slots[slotIndex] = Array.filter(slotEntries, function(entry)
 			return not (
 				entry.opponent
-				and entry.opponent.type == Opponent.literal -- in case we ever have a team/player with the id
+				and entry.opponent.type == Opponent.literal
 				and Opponent.toName(entry.opponent):lower() == BYE_OPPONENT_NAME
 			)
 		end)
