@@ -29,8 +29,22 @@ function suite:testClass()
 		['b'] = 'b',
 	},
 	['c'] = 1,
+	['trueBool'] = true,
+	['zFunction'] = function,
 }</pre>]],
-		tostring(TableFormatter.toLuaCode{a = 'a', b = {b = 'b'}, c = 1, 5, 10, [10] = 100, ['a\'b'] = 'te\'st'})
+		tostring(
+			TableFormatter.toLuaCode{
+				a = 'a',
+				b = {b = 'b'},
+				c = 1,
+				5,
+				10,
+				[10] = 100,
+				['a\'b'] = 'te\'st',
+				trueBool = true,
+				zFunction = tostring
+			}
+		)
 	)
 	self:assertEquals(
 		[[<pre class="selectall">{

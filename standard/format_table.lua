@@ -27,10 +27,10 @@ function TableFormatter.toLuaCode(inputTable)
 	end
 
 	local function displayValue(value)
-		if type(value) == 'number' then
-			return value
-		else
+		if type(value) == 'string' then
 			return '\'' .. mw.text.nowiki(escapeSingleQuote(value)) .. '\''
+		else
+			return tostring(value)
 		end
 	end
 
