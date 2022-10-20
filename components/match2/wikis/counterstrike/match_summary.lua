@@ -28,8 +28,11 @@ local TBD = 'TBD'
 
 -- Score Class
 local Score = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):css('width','70px'):css('text-align', 'center')
+	function(self, direction)
+		self.root = mw.html.create('div')
+			:css('width','70px')
+			:css('text-align', 'center')
+			:css('direction', direction)
 		self.table = self.root:tag('table'):css('line-height', '29px')
 		self.top = mw.html.create('tr')
 		self.bottom = mw.html.create('tr')
@@ -421,39 +424,28 @@ function CustomMatchSummary._createMap(game)
 
 	-- Score
 	local team1Score = Score():setLeft()
-	local team2Score = Score():setRight()
+	local team2Score = Score('rtl'):setRight()
 
-	-- Score Team 1
+	-- Teams map score
 	team1Score:setMapScore(game.scores[1])
+	team2Score:setMapScore(game.scores[2])
 
 	local t1sides = extradata['t1sides'] or {}
 	local t2sides = extradata['t2sides'] or {}
 	local t1halfs = extradata['t1halfs'] or {}
 	local t2halfs = extradata['t2halfs'] or {}
 
-	local numberOfSides = #t2sides
-
-	-- Insert team scores
+	-- Teams half scores
 	for sideIndex, side in ipairs(t1sides) do
-		-- Team 1 scores inserted from 1 .. n
+		local oppositeSide = t2sides[sideIndex]
 		if math.fmod(sideIndex, 2) == 1 then
 			team1Score:setFirstHalfScore(t1halfs[sideIndex], side)
+			team2Score:setFirstHalfScore(t2halfs[sideIndex], oppositeSide)
 		else
 			team1Score:setSecondHalfScore(t1halfs[sideIndex], side)
-		end
-
-		-- Team 2 scores inserted from n .. 1
-		local t2SideIndex = numberOfSides - sideIndex + 1
-		local oppositeSide = t2sides[t2SideIndex]
-		if math.fmod(t2SideIndex, 2) == 1 then
-			team2Score:setFirstHalfScore(t2halfs[t2SideIndex], oppositeSide)
-		else
-			team2Score:setSecondHalfScore(t2halfs[t2SideIndex], oppositeSide)
+			team2Score:setSecondHalfScore(t2halfs[sideIndex], oppositeSide)
 		end
 	end
-
-	-- Score Team 2
-	team2Score:setMapScore(game.scores[2])
 
 	-- Map Info
 	local mapInfo = mw.html.create('div')
