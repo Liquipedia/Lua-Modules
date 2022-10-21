@@ -68,13 +68,13 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args.aovpremier)
+	return Logic.readBool(_args.publisherpremier)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = _game or args.game
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier = Logic.readBool(_args.aovpremier) and 'true' or nil
+	lpdbData.publishertier = Logic.readBool(_args.publisherpremier) and 'true' or nil
 	lpdbData.extradata = {
 		individual = String.isNotEmpty(args.player_number) and 'true' or '',
 	}
@@ -84,7 +84,7 @@ end
 
 function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', _game or _args.game)
-	Variables.varDefine('tournament_publishertier', _args.aovpremier or '')
+	Variables.varDefine('tournament_publishertier', _args.publisherpremier or '')
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
