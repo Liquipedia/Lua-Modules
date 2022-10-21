@@ -67,6 +67,8 @@ function ResultsTable:readConfig()
 		opponent = mw.text.decode(args.coach or args.player or args.team or mw.title.getCurrentTitle().baseText),
 		opponentType = self:getOpponentType(),
 		onlyAchievements = Logic.readBool(args.achievements),
+		splitBy = args.splitBy or (not Logic.readBool(args.achievements) and 'year') or nil,
+		splitSort = args.splitSort or DEFAULT_VALUES.splitSort,
 	}
 
 	config.sort = args.sort or
