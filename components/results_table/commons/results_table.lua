@@ -18,6 +18,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnable
 local DEFAULT_VALUES = {
 	order = 'desc',
 	playerPrefix = 'p',
+	coachPrefix = 'c',
 	resolveOpponent = true,
 	playerLimit = 10,
 	coachLimit = 5,
