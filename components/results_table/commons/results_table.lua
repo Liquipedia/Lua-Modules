@@ -22,7 +22,8 @@ local DEFAULT_VALUES = {
 	resolveOpponent = true,
 	playerLimit = 10,
 	coachLimit = 5,
-	splitSort = function(tbl, key1, key2) return key1 > key2 end,
+	achievementsLimit = 10,
+	resultsLimit = 5000,
 }
 local COACH_TYPE = 'coach'
 local TYPE_ALIASES = {
@@ -68,15 +69,13 @@ function ResultsTable:readConfig()
 		opponent = mw.text.decode(args.coach or args.player or args.team or mw.title.getCurrentTitle().baseText),
 		opponentType = self:getOpponentType(),
 		onlyAchievements = Logic.readBool(args.achievements),
-		splitBy = args.splitBy or (not Logic.readBool(args.achievements) and 'year') or nil,
-		splitSort = args.splitSort or DEFAULT_VALUES.splitSort,
 	}
 
 	config.sort = args.sort or
 		(config.onlyAchievements and 'weight' or 'date')
 
 	config.limit = tonumber(args.limit) or
-		(config.onlyAchievements and 10 or 500)
+		(config.onlyAchievements and DEFAULT_VALUES.achievementsLimit or DEFAULT_VALUES.resultsLimit)
 
 	config.playerLimit =
 		(config.opponentType == Opponent.solo and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
@@ -106,8 +105,9 @@ function ResultsTable:getOpponentType()
 	return Opponent.team
 end
 
--- todo (:create() call):
+-- todo:
 -- > query data
 -- > build display from config and data
+-- > option for querying results for players on a certain team (adjust config)
 
 return ResultsTable
