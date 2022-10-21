@@ -22,6 +22,7 @@ local DEFAULT_VALUES = {
 	resolveOpponent = true,
 	playerLimit = 10,
 	coachLimit = 5,
+	splitSort = function(tbl, key1, key2) return key1 > key2 end,
 }
 local COACH_TYPE = 'coach'
 local TYPE_ALIASES = {
