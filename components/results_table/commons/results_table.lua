@@ -74,7 +74,8 @@ function ResultsTable:readConfig()
 	config.limit = tonumber(args.limit) or
 		(config.onlyAchievements and 10 or 500)
 
-	config.playerLimit = (config.opponentType == Opponent.solo and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
+	config.playerLimit =
+		(config.opponentType == Opponent.solo and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
 		or (config.opponentType == COACH_TYPE and tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit)
 
 	return config
