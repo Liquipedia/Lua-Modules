@@ -455,7 +455,7 @@ function Import._entryToOpponent(lpdbEntry, placement)
 		Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.opponent)),
 		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
-		lastvsscore = additionalData.score or lastVsScore,
+		lastvsscore = lastVsScore,
 		date = additionalData.date or lpdbEntry.date,
 	}}[1]
 end
