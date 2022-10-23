@@ -452,7 +452,7 @@ function Import._entryToOpponent(lpdbEntry, placement)
 		lastVsScore = (score or '') .. '-' .. (vsScore or '')
 	end
 
-	local lastVs = additionalData.lastVs or Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))
+	local lastVs = Import._checkIfParsed(additionalData.lastVs or Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))
 
 	return placement:_parseOpponents{{
 		Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.opponent)),
