@@ -242,6 +242,10 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData['tickername'] = args.name
 	end
 
+	-- Prevent resolving redirects for series
+	-- lpdbData.seriespage will still contain the resolved page
+	lpdbData['series'] = args.series
+
 	lpdbData['sponsors'] = args.sponsors
 
 	local mapPages = Table.mapValues(_league.maps, function(map) return map.link end)
