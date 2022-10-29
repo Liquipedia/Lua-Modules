@@ -621,7 +621,7 @@ function PrizePool:_currencyExchangeInfo()
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
 			return PrizePool.prizeTypes[prize.type].convertToUsd
 		end), PrizePool._CurrencyConvertionText), ', '))
-		wrapper:wikitext('\'\')')
+		wrapper:wikitext(')\'\'')
 
 		return tostring(wrapper)
 	end
