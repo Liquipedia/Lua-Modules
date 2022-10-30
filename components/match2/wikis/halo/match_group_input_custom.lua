@@ -337,7 +337,7 @@ function matchFunctions.getExtraData(match)
 		))
 	end
 	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
-	
+
 	match.extradata = {
 		mvp = matchFunctions.getMVP(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
