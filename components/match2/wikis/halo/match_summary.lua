@@ -158,7 +158,7 @@ function CustomMatchSummary._createBody(match)
 
 		body:addRow(casterRow)
 	end
-	
+
 	-- Add Match MVP(s)
 	if (match.extradata or {}).mvp then
 		local mvpData = match.extradata.mvp
