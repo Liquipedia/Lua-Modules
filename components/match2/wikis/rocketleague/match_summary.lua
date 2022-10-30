@@ -26,6 +26,8 @@ local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link=https://octane.gg/matches/'
 local _OCTANE_SUFFIX = '|Octane matchpage]]'
+local _BALLCHASING_PREFIX = '[[File:Ballchasing icon.png|14x14px|link=https://ballchasing.com/group/'
+local _BALLCHASING_SUFFIX = '|Ballchasing replays]]'
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
@@ -215,13 +217,19 @@ function CustomMatchSummary.getByMatchId(args)
 	if
 		Table.isNotEmpty(vods) or
 		String.isNotEmpty(match.vod) or
-		Logic.isNotEmpty(match.extradata.octane)
+		Logic.isNotEmpty(match.extradata.octane) or
+		Logic.isNotEmpty(match.extradata.ballchasing)
 	then
 		local footer = MatchSummary.Footer()
 
 		-- Octane
 		if Logic.isNotEmpty(match.extradata.octane) then
 			footer:addElement(_OCTANE_PREFIX .. match.extradata.octane .. _OCTANE_SUFFIX)
+		end
+
+		-- Ballchasing
+		if Logic.isNotEmpty(match.extradata.ballchasing) then
+			footer:addElement(_BALLCHASING_PREFIX .. match.extradata.ballchasing .. _BALLCHASING_SUFFIX)
 		end
 
 		-- Match Vod
