@@ -24,7 +24,7 @@ function CustomTeam.run(frame)
 	team.args.dotabuff = team.args.teamid
 
 	-- Automatic achievements
-	team.args.achievements = Template.expandTemplate(frame, 'Team achievements')
+	team.args.achievements = Template.expandTemplate(frame, 'Team achievements', {team.args.name})
 
 	-- Automatic org people
 	team.args.coach = Template.expandTemplate(frame, 'Coach of')
