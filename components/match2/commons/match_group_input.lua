@@ -418,7 +418,7 @@ function MatchGroupInput.readMvp(match)
 		end
 	end)
 
-	return {players = parsedPlayers, points = mvppoints}
+	return {players = parsedPlayers, points = mvppoints, freetext = match.mvpfreetext}
 end
 
 return MatchGroupInput
