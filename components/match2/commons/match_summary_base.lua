@@ -151,6 +151,13 @@ function Mvp:setPoints(points)
 	return self
 end
 
+function Mvp:addFreeText(freeText)
+	if String.isNotEmpty(freeText) then
+		self.freeText = freeText
+	end
+	return self
+end
+
 function Mvp:create()
 	local span = mw.html.create('span')
 	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
@@ -162,6 +169,9 @@ function Mvp:create()
 	end
 	if self.points and self.points ~= 1 then
 		span:wikitext(' ('.. self.points ..'pts)')
+	end
+	if self.freeText then
+		span:wikitext(' ('.. self.freeText ..')')
 	end
 	self.root:node(span)
 	return self.root
