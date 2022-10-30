@@ -170,6 +170,7 @@ function CustomMatchSummary._createBody(match)
 				mvp:addPlayer(player)
 			end
 			mvp:setPoints(mvpData.points)
+			mvp:addFreeText(mvpData.freetext)
 
 			body:addRow(mvp)
 		end
