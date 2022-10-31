@@ -99,7 +99,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 	match.links.lrthread = match.lrthread
 	match.links.vod = match.vod
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
+	if Table.isNotEmpty(vods) or Table.isNotEmpty(match.links) then
 		local footer = MatchSummary.Footer()
 
 		-- Game Vods
