@@ -408,10 +408,13 @@ function Import._mergeEntry(lpdbEntry, entry, placement)
 		return entry
 	end
 
+	entry.opponentData = Import._removeTbdIdentifiers(entry.opponentData)
+
+	lpdbEntry = Import._entryToOpponent(lpdbEntry, placement)
+
 	entry.date = lpdbEntry.date or entry.date
 
-	entry.opponentData = Import._removeTbdIdentifiers(entry.opponentData)
-	return Table.deepMergeInto(Import._entryToOpponent(lpdbEntry, placement), entry)
+	return Table.deepMergeInto(lpdbEntry, entry)
 end
 
 function Import._removeTbdIdentifiers(opponent)
@@ -449,13 +452,13 @@ function Import._entryToOpponent(lpdbEntry, placement)
 		lastVsScore = (score or '') .. '-' .. (vsScore or '')
 	end
 
-	local lastVs = additionalData.lastVs or Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))
+	local lastVs = Import._checkIfParsed(additionalData.lastVs or Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))
 
 	return placement:_parseOpponents{{
 		Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.opponent)),
 		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
-		lastvsscore = additionalData.score or lastVsScore,
+		lastvsscore = lastVsScore,
 		date = additionalData.date or lpdbEntry.date,
 	}}[1]
 end
@@ -506,7 +509,7 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 	local matchData = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = '[[opponent::' .. opponentName .. ']] AND (' .. table.concat(matchConditions, ' OR ') .. ')',
 		order = 'date desc',
-		query = 'match2opponents, winner',
+		query = 'date, match2opponents, winner',
 		limit = 1
 	})
 
