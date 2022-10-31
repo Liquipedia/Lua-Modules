@@ -16,7 +16,7 @@ local TypeUtil = require('Module:TypeUtil')
 
 -- Parses a single condition into it's three components,
 -- Eg. `[[field::!value]]` is parsed into `field`, `!`, `value`
-local CONDITION_REGEX = '%[%[(%a+)::([!><]?)([%a%s%d]+)]]'
+local CONDITION_REGEX = '%[%[(%a+)::([!><]?)(.-)]]'
 
 local mockLpdb = {}
 
