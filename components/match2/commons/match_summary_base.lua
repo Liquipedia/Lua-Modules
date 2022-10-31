@@ -134,13 +134,20 @@ local Mvp = Class.new(
 )
 
 function Mvp:addPlayer(player)
+	local playerDisplay
 	if Logic.isEmpty(player) then
 		return self
 	elseif type(player) == 'table' then
-		table.insert(self.players, player.name .. '|' .. player.displayname)
+		playerDisplay = '[[' .. player.name .. '|' .. player.displayname .. ']]'
+		if player.comment then
+			playerDisplay = playerDisplay .. ' (' .. player.comment .. ')'
+		end
 	else
-		table.insert(self.players, player)
+		playerDisplay = '[[' .. player .. ']]'
 	end
+
+	table.insert(self.players, playerDisplay)
+
 	return self
 end
 
@@ -151,27 +158,12 @@ function Mvp:setPoints(points)
 	return self
 end
 
-function Mvp:addFreeText(freeText)
-	if String.isNotEmpty(freeText) then
-		self.freeText = freeText
-	end
-	return self
-end
-
 function Mvp:create()
 	local span = mw.html.create('span')
 	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
-	for index, player in ipairs(self.players) do
-		if index > 1 then
-			span:wikitext(', ')
-		end
-		span:wikitext('[['..player..']]')
-	end
+		:wikitext(table.concat(self.players, ', '))
 	if self.points and self.points ~= 1 then
 		span:wikitext(' ('.. self.points ..'pts)')
-	end
-	if self.freeText then
-		span:wikitext(' ('.. self.freeText ..')')
 	end
 	self.root:node(span)
 	return self.root
