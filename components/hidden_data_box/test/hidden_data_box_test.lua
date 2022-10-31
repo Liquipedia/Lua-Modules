@@ -22,7 +22,7 @@ function suite:testTier()
 	self:assertEquals('1', HDB.validateTier('1', 'tiers'))
 	self:assertEquals('Qualifier', HDB.validateTier('Qualifier', 'types'))
 
-	local warning
+	local warning, _
 
 	_, warning = HDB.validateTier('Qualifier', 'tiers')
 	self:assertEquals(
