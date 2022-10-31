@@ -217,19 +217,19 @@ function CustomMatchSummary.getByMatchId(args)
 	if
 		Table.isNotEmpty(vods) or
 		String.isNotEmpty(match.vod) or
-		Logic.isNotEmpty(match.extradata.octane) or
-		Logic.isNotEmpty(match.extradata.ballchasing)
+		Logic.isNotEmpty(match.links.octane) or
+		Logic.isNotEmpty(match.links.ballchasing)
 	then
 		local footer = MatchSummary.Footer()
 
 		-- Octane
-		if Logic.isNotEmpty(match.extradata.octane) then
-			footer:addElement(_OCTANE_PREFIX .. match.extradata.octane .. _OCTANE_SUFFIX)
+		if Logic.isNotEmpty(match.links.octane) then
+			footer:addElement(_OCTANE_PREFIX .. match.links.octane .. _OCTANE_SUFFIX)
 		end
 
 		-- Ballchasing
-		if Logic.isNotEmpty(match.extradata.ballchasing) then
-			footer:addElement(_BALLCHASING_PREFIX .. match.extradata.ballchasing .. _BALLCHASING_SUFFIX)
+		if Logic.isNotEmpty(match.links.ballchasing) then
+			footer:addElement(_BALLCHASING_PREFIX .. match.links.ballchasing .. _BALLCHASING_SUFFIX)
 		end
 
 		-- Match Vod
