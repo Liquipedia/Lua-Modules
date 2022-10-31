@@ -84,7 +84,7 @@ end
 
 function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', _game or _args.game)
-	Variables.varDefine('tournament_publishertier', _args.publisherpremier
+	Variables.varDefine('tournament_publishertier', _args.publisherpremier)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
