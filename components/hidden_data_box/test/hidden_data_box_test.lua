@@ -10,6 +10,9 @@ local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
 local HDB = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
+local LpdbMock = Lua.import('Module:Mock/Lpdb', {requireDevIfEnabled = true})
+local String = Lua.import('Module:StringUtils', {requireDevIfEnabled = true})
+local Variables = Lua.import('Module:Variables', {requireDevIfEnabled = true})
 local WarningBox = Lua.import('Module:WarningBox', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
@@ -44,6 +47,26 @@ function suite:testMissingParent()
 		tostring(WarningBox.display('DummyPage is not a Liquipedia Tournament[[Category:Pages with invalid parent]]')),
 		HDB.run({parent = 'DummyPage'})
 	)
+end
+
+function suite:testComplete()
+	LpdbMock.setUp()
+
+	local warning = HDB.run{parent = 'Six_Lounge_Series/4'}
+	-- Check empty warning
+	self:assertTrue(String.isEmpty(warning))
+
+	-- Check tournament wiki variables
+	self:assertEquals('Six_Lounge_Series/4', Variables.varDefault('tournament_parent'))
+	self:assertEquals('Six Lounge Series #4 - Finals', Variables.varDefault('tournament_name'))
+	self:assertEquals('2017-12-17', Variables.varDefault('tournament_startdate'))
+
+	-- Check player wiki variables
+	self:assertEquals('Xy_G', Variables.varDefault('BUTEO eSports_p5'))
+	self:assertEquals('xy_G', Variables.varDefault('BUTEO eSports_p5dn'))
+	self:assertEquals('Germany', Variables.varDefault('BUTEO eSports_p5flag'))
+
+	LpdbMock.tearDown()
 end
 
 return suite
