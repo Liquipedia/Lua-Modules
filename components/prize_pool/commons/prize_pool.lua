@@ -697,7 +697,7 @@ function PrizePool:setConfig(option, value)
 	return self
 end
 
-function PrizePool:changeConfigDefault(option, value)
+function PrizePool:setConfigDefault(option, value)
 	if self.config[option] then
 		self.config[option].default = value
 	else
