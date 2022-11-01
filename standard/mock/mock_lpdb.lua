@@ -29,18 +29,21 @@ local _lpdb = {
 	lpdb = mw.ext.LiquipediaDB.lpdb,
 	lpdb_standingsentry = mw.ext.LiquipediaDB.lpdb_standingsentry,
 	lpdb_standingstable = mw.ext.LiquipediaDB.lpdb_standingstable,
+	lpdb_squadplayer = mw.ext.LiquipediaDB.lpdb_squadplayer,
 }
 
 function mockLpdb.setUp()
 	mw.ext.LiquipediaDB.lpdb = mockLpdb.lpdb
 	mw.ext.LiquipediaDB.lpdb_standingsentry = mockLpdb.lpdb_standingsentry
 	mw.ext.LiquipediaDB.lpdb_standingstable = mockLpdb.lpdb_standingstable
+	mw.ext.LiquipediaDB.lpdb_squadplayer = mockLpdb.lpdb_squadplayer
 end
 
 function mockLpdb.tearDown()
 	mw.ext.LiquipediaDB.lpdb = _lpdb.lpdb
 	mw.ext.LiquipediaDB.lpdb_standingsentry = _lpdb.lpdb_standingsentry
 	mw.ext.LiquipediaDB.lpdb_standingstable = _lpdb.lpdb_standingstable
+	mw.ext.LiquipediaDB.lpdb_squadplayer = _lpdb.lpdb_squadplayer
 end
 
 local dbStructure = {}
@@ -67,6 +70,26 @@ dbStructure.standingsentry = {
 	placementchange = 'number',
 	scoreboards = 'table', -- TODO
 	roundindex = 'number',
+	extradata = 'struct?',
+}
+dbStructure.squadplayer = {
+	id = 'string',
+	link = 'pagename',
+	name = 'string?',
+	nationality = 'string?',
+	image = 'string?',
+	position = 'string?',
+	role = 'string?',
+	type = TypeUtil.literalUnion('player', 'staff'),
+	newteam = 'string?',
+	teamtemplate = 'string?', -- TODO: TeamTemplate type?
+	newteamtemplate = 'string?', -- TODO: TeamTemplate type?
+	joindate = 'string?', -- TODO: Date type?
+	joindateref = 'string?',
+	leavedate = 'string?', -- TODO: Date type?
+	leavedateref = 'string?',
+	inactivedate = 'string?', -- TODO: Date type?
+	inactivedateref = 'string?',
 	extradata = 'struct?',
 }
 
@@ -196,6 +219,15 @@ function mockLpdb.lpdb_standingsentry(objectname, data)
 	data = Table.mapValues(data, mockLpdb._deserializeJson)
 	TypeUtil.assertValue(objectname, 'string')
 	TypeUtil.assertValue(data, TypeUtil.struct(dbStructure.standingsentry), { maxDepth = 3, name = 'StandingsEntry' })
+end
+
+---Stores data into LPDB SquadPlayer
+---@param objectname string
+---@param data table
+function mockLpdb.lpdb_squadplayer(objectname, data)
+	data = Table.mapValues(data, mockLpdb._deserializeJson)
+	TypeUtil.assertValue(objectname, 'string')
+	TypeUtil.assertValue(data, TypeUtil.struct(dbStructure.squadplayer), { maxDepth = 3, name = 'SquadPlayer' })
 end
 
 return mockLpdb
