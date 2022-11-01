@@ -486,7 +486,7 @@ function Import._formatGroupScore(lpdbEntry)
 	end
 	if lpdbEntry.hasOvertime then
 		table.insert(wdl, 2, overtime.w or '')
-		table.insert(wdl, #wdl -1, overtime.l or '')
+		table.insert(wdl, #wdl, overtime.l or '')
 	end
 
 	return table.concat(wdl, Import.config.groupScoreDelimiter)
