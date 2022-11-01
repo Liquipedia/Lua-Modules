@@ -12,4 +12,6 @@ return {
 	name = 'StarCraft II',
 	defaultTeamLogo = 'StarCraft_2_Default_logo.png',
 	defaultTeamLogoDark = 'StarCraft_2_Default_logo.png',
+	opponentLibrary = 'Opponent/Starcraft',
+	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 }

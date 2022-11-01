@@ -12,4 +12,5 @@ return {
 	name = 'Rocket League',
 	defaultTeamLogo = 'Rocket_League.png',
 	defaultTeamLogoDark = 'Rocket_League.png',
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }
