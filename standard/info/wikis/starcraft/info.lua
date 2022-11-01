@@ -13,4 +13,6 @@ return {
 	defaultTeamLogo = 'StarCraft_default_allmode.png',
 	defaultTeamLogoDark = 'StarCraft_default_allmode.png',
 	maximumNumberOfPlayersInPlacements = 35,
+	opponentLibrary = 'Opponent/Starcraft',
+	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 }
