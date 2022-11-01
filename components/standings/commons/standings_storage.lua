@@ -39,7 +39,7 @@ function StandingsStorage.run(data)
 	StandingsStorage.table(data)
 
 	Array.forEach(data.entries, function (entry)
-		StandingsStorage.entry(entry, standingsIndex)
+		StandingsStorage.entry(entry, data.standingsindex)
 	end)
 end
 
