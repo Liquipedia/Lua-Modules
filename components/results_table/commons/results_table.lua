@@ -26,13 +26,10 @@ local DEFAULT_VALUES = {
 	resultsLimit = 5000,
 }
 local COACH_TYPE = 'coach'
-local TYPE_ALIASES = {
-	coach = COACH_TYPE,
-	['1v1'] = Opponent.solo,
-	player = Opponent.solo,
-	individual = Opponent.solo,
-	solo = Opponent.solo,
-	team = Opponent.team,
+local VALID_QUERY_TYPES = {
+	COACH_TYPE,
+	Opponent.solo,
+	Opponent.team,
 }
 
 --- @class ResultsTable
@@ -88,8 +85,8 @@ function ResultsTable:getQueryType()
 	local args = self.args
 
 	if args.querytype then
-		local queryType = TYPE_ALIASES[args.querytype:lower()]
-		if queryType then
+		local queryType = args.querytype:lower()
+		if Table.includes(VALID_QUERY_TYPES, queryType) then
 			return queryType
 		end
 
