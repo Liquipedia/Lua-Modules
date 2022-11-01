@@ -174,7 +174,7 @@ end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	local score = game.scores[opponentIndex] or ''
-	return htmlCreate('div'):wikitext(score)
+	return mw.html.create('div'):wikitext(score)
 end
 
 function CustomMatchSummary._createMapRow(game)
@@ -182,7 +182,7 @@ function CustomMatchSummary._createMapRow(game)
 
 	-- Add Header
 	if Logic.isNotEmpty(game.header) then
-		local mapHeader = htmlCreate('div')
+		local mapHeader = mw.html.create('div')
 			:wikitext(game.header)
 			:css('font-weight','bold')
 			:css('font-size','85%')
@@ -191,7 +191,7 @@ function CustomMatchSummary._createMapRow(game)
 		row:addElement(MatchSummary.Break():create())
 	end
 
-	local centerNode = htmlCreate('div')
+	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:wikitext(CustomMatchSummary._getMapDisplay(game))
 		:css('text-align', 'center')
@@ -220,7 +220,7 @@ function CustomMatchSummary._createMapRow(game)
 	-- Add Comment
 	if Logic.isNotEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
-		local comment = htmlCreate('div')
+		local comment = mw.html.create('div')
 			:wikitext(game.comment)
 			:css('margin', 'auto')
 		row:addElement(comment)
@@ -238,7 +238,7 @@ function CustomMatchSummary._getMapDisplay(game)
 end
 
 function CustomMatchSummary._addCheckmark(isWinner)
-	local container = htmlCreate('div')
+	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if isWinner then
