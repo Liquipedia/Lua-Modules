@@ -93,6 +93,9 @@ function TypeUtil.valueIsTypeNoTable (value, typeSpec)
 			or typeSpec == 'table'
 			or typeSpec == 'nil' then
 			return type(value) == typeSpec
+		elseif typeSpec == 'pagename' then
+			-- A pagename is a string, with first letter capitalized and may not contains spaces
+			return type(value) == 'string' and value:find('^%u') and not value:find(' ')
 		elseif require('Module:StringUtils').endsWith(typeSpec, '?') then
 			return value == nil or TypeUtil.valueIsTypeNoTable(value, typeSpec:sub(1, -2))
 		elseif typeSpec == 'any' then
