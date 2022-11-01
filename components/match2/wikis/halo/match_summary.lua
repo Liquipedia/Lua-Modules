@@ -25,9 +25,6 @@ local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-local _ICONS = {
-	check = _GREEN_CHECK,
-}
 
 local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
@@ -205,13 +202,13 @@ function CustomMatchSummary._createMapRow(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
+		:node(CustomMatchSummary._addCheckmark(game.winner == 1))
 		:node(CustomMatchSummary._gameScore(game, 1))
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
+		:node(CustomMatchSummary._addCheckmark(game.winner == 2))
 
 	row:addElement(leftNode)
 		:addElement(centerNode)
@@ -240,12 +237,12 @@ function CustomMatchSummary._getMapDisplay(game)
 	return mapDisplay
 end
 
-function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
+function CustomMatchSummary._addCheckmark(isWinner)
 	local container = htmlCreate('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
-	if showIcon then
-		container:node(_ICONS[iconType])
+	if isWinner then
+		container:node(_GREEN_CHECK)
 	else
 		container:node(_NO_CHECK)
 	end
