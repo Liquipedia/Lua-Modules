@@ -218,8 +218,7 @@ function CustomMatchSummary.getByMatchId(args)
 	if
 		Table.isNotEmpty(vods) or
 		String.isNotEmpty(match.vod) or
-		Logic.isNotEmpty(match.links.octane) or
-		Logic.isNotEmpty(match.links.ballchasing)
+		Table.isNotEmpty(match.links)
 	then
 		local footer = MatchSummary.Footer()
 
