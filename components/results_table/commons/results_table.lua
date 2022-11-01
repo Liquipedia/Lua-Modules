@@ -67,7 +67,7 @@ function ResultsTable:readConfig()
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
 		gameIconsData = args.gameIcons,
 		opponent = mw.text.decode(args.coach or args.player or args.team or mw.title.getCurrentTitle().baseText),
-		opponentType = self:getOpponentType(),
+		queryType = self:getQueryType(),
 		onlyAchievements = Logic.readBool(args.achievements),
 	}
 
@@ -78,22 +78,22 @@ function ResultsTable:readConfig()
 		(config.onlyAchievements and DEFAULT_VALUES.achievementsLimit or DEFAULT_VALUES.resultsLimit)
 
 	config.playerLimit =
-		(config.opponentType == Opponent.solo and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
-		or (config.opponentType == COACH_TYPE and tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit)
+		(config.queryType == Opponent.solo and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
+		or (config.queryType == COACH_TYPE and tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit)
 
 	return config
 end
 
-function ResultsTable:getOpponentType()
+function ResultsTable:getQueryType()
 	local args = self.args
 
-	if args.opponenttype then
-		local opponentType = TYPE_ALIASES[args.opponenttype:lower()]
-		if opponentType then
-			return opponentType
+	if args.querytype then
+		local queryType = TYPE_ALIASES[args.querytype:lower()]
+		if queryType then
+			return queryType
 		end
 
-		error('Invalid opponenttype "' .. args.opponenttype .. '"')
+		error('Invalid querytype "' .. args.querytype .. '"')
 	end
 
 	if args.coach then
