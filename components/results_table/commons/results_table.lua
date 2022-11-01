@@ -64,7 +64,7 @@ function ResultsTable:readConfig()
 		playerPrefix = args.prefixplayer or DEFAULT_VALUES.playerPrefix,
 		coachPrefix = args.prefixcoach or DEFAULT_VALUES.coachPrefix,
 		hideResult = Logic.readBool(args.hideresult),
-		resolveOpponent = Logic.readBool(args.resolvePlayer or args.resolveTeam or DEFAULT_VALUES.resolveOpponent),
+		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
 		gameIconsData = args.gameIcons,
 		opponent = mw.text.decode(args.coach or args.player or args.team or mw.title.getCurrentTitle().baseText),
 		opponentType = self:getOpponentType(),
