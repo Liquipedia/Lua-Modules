@@ -32,8 +32,6 @@ function StandingsStorage.run(data)
 		Opponent = Lua.import('Module:'.. data.opponentLibrary, {requireDevIfEnabled = true})
 	end
 
-	local standingsIndex = tonumber(data.standingsindex) or 0
-
 	data.roundcount = tonumber(data.roundcount) or Array.reduce(
 		Array.map(data.entries, function (entry) return tonumber (entry.roundindex) end),
 		math.max)
@@ -41,7 +39,7 @@ function StandingsStorage.run(data)
 	StandingsStorage.table(data)
 
 	Array.forEach(data.entries, function (entry)
-		StandingsStorage.entry(entry, standingsIndex)
+		StandingsStorage.entry(entry, data.standingsindex)
 	end)
 end
 
@@ -53,6 +51,12 @@ function StandingsStorage.table(data)
 
 	local title = data.title or ''
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
+
+	local standingsIndex = tonumber(data.standingsindex)
+
+	if not standingsIndex then
+		error('No standingsindex specified')
+	end
 
 	local extradata = {
 		enddate = data.enddate,
@@ -67,7 +71,7 @@ function StandingsStorage.table(data)
 		{
 			tournament = Variables.varDefault('tournament_name', ''),
 			parent = Variables.varDefault('tournament_parent', ''),
-			standingsindex = tonumber(data.standingsindex),
+			standingsindex = standingsIndex,
 			title = mw.text.trim(cleanedTitle),
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
 			type = data.type,
@@ -86,6 +90,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
+	standingsIndex = tonumber(standingsIndex)
 
 	if not standingsIndex or not roundIndex or not slotIndex then
 		return
