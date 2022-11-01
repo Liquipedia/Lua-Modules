@@ -10,10 +10,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
----Note: This can be overwritten
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
----Note: This can be overwritten
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local Opponent, OpponentDisplay = require('Module:OpponentLibraries')
 
 local DEFAULT_VALUES = {
 	order = 'desc',
@@ -39,14 +36,6 @@ function ResultsTable:init(args)
 	self.args = args
 
 	self.pagename = mw.title.getCurrentTitle().text
-
-	if args.opponentLibrary then
-		Opponent = Lua.import('Module:'.. self.args.opponentLibrary, {requireDevIfEnabled = true})
-		self.opponentLibrary = Opponent
-	end
-	if args.opponentDisplayLibrary then
-		OpponentDisplay = Lua.import('Module:'.. self.args.opponentDisplayLibrary, {requireDevIfEnabled = true})
-	end
 
 	self.config = self:readConfig()
 
