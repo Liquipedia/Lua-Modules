@@ -32,12 +32,6 @@ function StandingsStorage.run(data)
 		Opponent = Lua.import('Module:'.. data.opponentLibrary, {requireDevIfEnabled = true})
 	end
 
-	local standingsIndex = tonumber(data.standingsindex)
-
-	if not standingsIndex then
-		error('No standingsindex specified')
-	end
-
 	data.roundcount = tonumber(data.roundcount) or Array.reduce(
 		Array.map(data.entries, function (entry) return tonumber (entry.roundindex) end),
 		math.max)
