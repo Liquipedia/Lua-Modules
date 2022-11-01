@@ -196,8 +196,8 @@ end
 
 function matchFunctions.getLinks(match)
 	match.links = {
-		octane = match.octane and 'https://octane.gg/matches/' .. match.octane or nil,
-		ballchasing = match.ballchasing and 'https://ballchasing.com/group/' .. match.ballchasing or nil
+		octane = match.octane and ('https://octane.gg/matches/' .. match.octane) or nil,
+		ballchasing = match.ballchasing and ('https://ballchasing.com/group/' .. match.ballchasing) or nil
 	}
 	return match
 end
