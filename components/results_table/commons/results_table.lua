@@ -8,7 +8,7 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Opponent, OpponentDisplay = require('Module:OpponentLibraries')
 
