@@ -8,6 +8,8 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Namespace = require('Module:Namespace')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Opponent, OpponentDisplay = require('Module:OpponentLibraries')
@@ -52,7 +54,7 @@ function ResultsTable:readConfig()
 		hideResult = Logic.readBool(args.hideresult),
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
 		gameIconsData = args.gameIcons,
-		opponent = mw.text.decode(args.coach or args.player or args.team or mw.title.getCurrentTitle().baseText),
+		opponent = mw.text.decode(args.coach or args.player or args.team or self:_getOpponent()),
 		queryType = self:getQueryType(),
 		onlyAchievements = Logic.readBool(args.achievements),
 	}
@@ -68,6 +70,17 @@ function ResultsTable:readConfig()
 		or (config.queryType == COACH_TYPE and tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit)
 
 	return config
+end
+
+function ResultsTable:_getOpponent()
+	if Namespace.isMain() then
+		return mw.title.getCurrentTitle().baseText
+	elseif String.contains(mw.title.getCurrentTitle().subpageText:lower(), 'results') then
+		local pageName = mw.text.split(mw.title.getCurrentTitle().text, '/')
+		return pageName[#pageName - 1]
+	end
+
+	return mw.title.getCurrentTitle().subpageText
 end
 
 function ResultsTable:getQueryType()
