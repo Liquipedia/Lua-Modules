@@ -12,4 +12,5 @@ return {
 	name = 'Age of Empires',
 	defaultTeamLogo = 'Age_of_Empires_Default_Logo.png',
 	defaultTeamLogoDark = 'Age_of_Empires_Default_Logo.png',
+	opponentLibrary = 'Opponent/Custom',
 }
