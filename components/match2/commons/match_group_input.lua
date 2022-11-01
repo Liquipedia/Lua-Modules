@@ -407,12 +407,13 @@ function MatchGroupInput.readMvp(match)
 	local players = mw.text.split(match.mvp, ',')
 
 	-- parse the players to get their information
-	local parsedPlayers = Table.mapValues(players, function(player)
+	local parsedPlayers = Array.map(players, function(player, playerIndex)
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
 		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
 			for _, lookUpPlayer in pairs(opponent.match2players) do
 				if link == lookUpPlayer.name then
-					return Table.merge(lookUpPlayer, {team = opponent.name, template = opponent.template})
+					return playerIndex, Table.merge(lookUpPlayer,
+						{team = opponent.name, template = opponent.template, comment = match['mvp' .. playerIndex .. 'comment']})
 				end
 			end
 		end
