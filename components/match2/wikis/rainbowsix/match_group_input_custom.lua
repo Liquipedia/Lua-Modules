@@ -10,10 +10,11 @@ local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Streams = require('Module:Links/Stream')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
-local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -342,6 +343,15 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getExtraData(match)
+	local casters = {}
+	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
+		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
+			name,
+			match[key .. 'flag'],
+			match[key .. 'name']
+		))
+	end
+
 	match.extradata = {
 		lastgame = Variables.varDefault('last_game'),
 		mapveto = matchFunctions.getMapVeto(match),
@@ -349,6 +359,45 @@ function matchFunctions.getExtraData(match)
 		isconverted = 0
 	}
 	return match
+end
+
+function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
+	if String.isEmpty(flag) then
+		flag = Variables.varDefault(name .. '_flag')
+	end
+	if String.isEmpty(displayName) then
+		displayName = Variables.varDefault(name .. '_dn')
+	end
+	if String.isEmpty(flag) or String.isEmpty(displayName) then
+		local parent = Variables.varDefault(
+			'tournament_parent',
+			mw.title.getCurrentTitle().text
+		)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
+			query = 'flag, id',
+			limit = 1,
+		})
+		if type(data) == 'table' and data[1] then
+			flag = String.isNotEmpty(flag) and flag or data[1].flag
+			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
+		end
+	end
+	if String.isNotEmpty(flag) then
+		Variables.varDefine(name .. '_flag', flag)
+	end
+	if String.isEmpty(displayName) then
+		displayName = name
+	end
+	if String.isNotEmpty(displayName) then
+		Variables.varDefine(name .. '_dn', displayName)
+	end
+	return {
+		name = name,
+		displayName = displayName,
+		flag = flag,
+	}
 end
 
 -- Parse the mapVeto input
