@@ -23,37 +23,42 @@ function suite:testHeaderInput()
 
 	local ppt = PrizePool{
 		type = {type = 'team'},
-		currencyRoundPrecision = 3,
-		lpdbPrefix = 'abc',
+		currencyroundprecision = 3,
+		lpdb_prefix = 'abc',
 		fillPlaceRange = true,
 		localcurrency1 = 'EUR',
 		localcurrency2 = 'sek',
 		points1 = 'points',
 		points1link = 'A Page',
 		qualifies1 = 'A Tournament',
-		qualifies1title = 'A Display',
+		qualifies1name = 'A Display',
 		freetext = 'A title',
 	}:create()
 
 	self:assertDeepEquals(
 		{
-			{id = 'USD1', type = 'USD', index = '1', data = {roundPrecision = 3}},
-			{id = 'LOCAL_CURRENCY1', type = 'LOCAL_CURRENCY', index = '1', data =
-				Table.merge(Table.deepCopy(mw.loadData('Module:Currency/Data').eur), {
+			{id = 'USD1', type = 'USD', index = 1, data = {roundPrecision = 3}},
+			{id = 'LOCAL_CURRENCY1', type = 'LOCAL_CURRENCY', index = 1, data =
+				{
 					rate = 0.97821993318758, roundPrecision = 3,
-				})
+					currency = 'EUR', currencyText = '€&nbsp;<abbr title="Euro">EUR</abbr>',
+					symbol = "€", symbolFirst = true
+				}
 			},
-			{id = 'LOCAL_CURRENCY2', type = 'LOCAL_CURRENCY', index = '2', data =
-				Table.merge(Table.deepCopy(mw.loadData('Module:Currency/Data').sek), {
+			{id = 'LOCAL_CURRENCY2', type = 'LOCAL_CURRENCY', index = 2, data =
+				{
 					rate = 0.088712426073718, roundPrecision = 3,
-				})
+					currency = 'SEK', currencyText = '&nbsp;kr&nbsp;<abbr title="Swedish krona">SEK</abbr>',
+					symbol = " kr", symbolFirst = false
+				}
 			},
-			{id = 'QUALIFIES1', type = 'QUALIFIES', index = '1', data = {title = 'A Display', link = 'A_Tournament'}},
-			{id = 'POINTS1', type = 'POINTS', index = '1', data = {title = 'Points', link = 'A Page'}},
-			{id = 'FREETEXT1', type = 'FREETEXT', index = '1', data = {title = 'A title'}},
+			{id = 'QUALIFIES1', type = 'QUALIFIES', index = 1, data = {title = 'A Display', link = 'A_Tournament'}},
+			{id = 'POINTS1', type = 'POINTS', index = 1, data = {title = 'Points', link = 'A Page'}},
+			{id = 'FREETEXT1', type = 'FREETEXT', index = 1, data = {title = 'A title'}},
 		},
 		ppt.prizes
 	)
+
 	self:assertDeepEquals(
 		{
 			abbreviateTbd = true,
