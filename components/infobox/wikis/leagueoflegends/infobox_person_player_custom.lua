@@ -105,7 +105,8 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Role', content = {
 				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				CustomPlayer._createRole('role2', _args.role2),
+				CustomPlayer._createRole('role3', _args.role3)
 			}},
 		}
 	elseif id == 'history' then
@@ -139,6 +140,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.role3 = Variables.varDefault('role3')
 
 	lpdbData.extradata.signatureChampion1 = _args.champion1 or _args.champion
 	lpdbData.extradata.signatureChampion2 = _args.champion2
