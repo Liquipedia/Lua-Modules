@@ -52,6 +52,7 @@ function CustomMatchGroupInput.processMatch(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
 	match = matchFunctions.getExtraData(match)
+	match = matchFunctions.getLinks(match)
 
 	return match
 end
@@ -186,10 +187,17 @@ function matchFunctions.getExtraData(match)
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
-		octane = match.octane,
 		isconverted = 0,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+	}
+	return match
+end
+
+function matchFunctions.getLinks(match)
+	match.links = {
+		octane = 'https://octane.gg/matches/' .. match.octane,
+		ballchasing = 'https://ballchasing.com/group/' .. match.ballchasing
 	}
 	return match
 end
