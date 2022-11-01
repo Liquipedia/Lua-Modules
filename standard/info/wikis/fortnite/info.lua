@@ -12,4 +12,6 @@ return {
 	name = 'Fortnite',
 	defaultTeamLogo = 'Fortnite logo.png',
 	defaultTeamLogoDark = 'Fortnite logo.png',
+	opponentLibrary = 'Opponent/Custom',
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }
