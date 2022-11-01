@@ -42,14 +42,14 @@ function Lua.loadDataIfExists(name)
 	end
 end
 
---[[
-Imports a module by its name.
-
-options.requireDevIfEnabled:
-Requires the development version of a module (with /dev appended to name) if it
-exists and the dev feature flag is enabled. Otherwise requires the non-
-development module.
-]]
+---Imports a module by its name.
+---
+---options.requireDevIfEnabled:
+---Requires the development version of a module (with /dev appended to name) if it
+---exists and the dev feature flag is enabled. Otherwise requires the non-development module.
+---@param name string
+---@param options {requireDevIfEnabled: boolean}
+---@return unknown
 function Lua.import(name, options)
 	options = options or {}
 	if options.requireDevIfEnabled then
