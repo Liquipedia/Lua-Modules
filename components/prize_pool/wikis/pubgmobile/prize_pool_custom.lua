@@ -24,6 +24,7 @@ local CustomPrizePool = {}
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.localcurrency = args.localcurrency or Variables.varDefault('tournament_currency')
+
 	local prizePool = PrizePool(args):create()
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
@@ -37,7 +38,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart,
 		Variables.varDefault('tournament_type'),
 		Variables.varDefault('tournament_liquipediatiertype')
-
 	)
 
 	return lpdbData
