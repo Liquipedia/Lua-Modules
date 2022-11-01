@@ -24,6 +24,7 @@ local _MAX_NUM_PLAYERS = 10
 local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
+local _MATCH_BYE = {'bye', 'BYE'}
 local _CONVERT_TYPE_TO_PLAYER_NUMBER = {
 	solo = 1,
 	--duo = 2,
@@ -31,8 +32,8 @@ local _CONVERT_TYPE_TO_PLAYER_NUMBER = {
 	--quad = 4,
 }
 local _ALLOWED_OPPONENT_TYPES = {
-	'solo',
-	'team'
+	'Opponent.solo',
+	'Opponent.team'
 }
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
@@ -78,8 +79,8 @@ function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
 
 	-- Retrieve icon for teams and do tbd checks
 	if opponent.type == Opponent.team then
-		if opponent.template:lower() == 'bye' then
-			opponent = {type = Opponent.literal, name = 'BYE'}
+		if opponent.template:lower() == _MATCH_BYE then
+			opponent = {type = Opponent.literal, name = _MATCH_BYE}
 		else
 			opponent.icon = opponentFunctions.getIcon(opponent.template)
 		end
@@ -89,7 +90,7 @@ function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
 		end
 		opponent.match2players = matchFunctions.getPlayers(record, opponent.type, opponentIndex)
 		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
-			opponent = {type = Opponent.literal, name = 'BYE'}
+			opponent = {type = Opponent.literal, name = _MATCH_BYE}
 		end
 
 	end
@@ -507,7 +508,7 @@ function matchFunctions.getPlayers(match, opponentType, opponentIndex)
 end
 
 function CustomMatchGroupInput._playerIsBye(player)
-	return (player.name or ''):lower() == 'bye' or (player.displayname or ''):lower() == 'bye'
+	return (player.name or ''):lower() == _MATCH_BYE or (player.displayname or ''):lower() == _MATCH_BYE
 end
 
 --
