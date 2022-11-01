@@ -9,10 +9,9 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local _SECONDS_PER_DAY = 86400
-
 local CustomTournamentsSummaryTable = Lua.import('Module:TournamentsSummaryTable', { requireDevIfEnabled = true })
 
+local _SECONDS_PER_DAY = 86400
 CustomTournamentsSummaryTable.upcomingOffset = _SECONDS_PER_DAY * 30
 CustomTournamentsSummaryTable.completedOffset = _SECONDS_PER_DAY * 90
 
