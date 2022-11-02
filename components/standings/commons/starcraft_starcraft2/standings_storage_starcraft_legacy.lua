@@ -49,7 +49,6 @@ function Wrapper.entry(frame)
 	end
 
 	local storageArgs = {
-		opponentLibrary = 'Opponent/Starcraft',
 		opponent = opponent,
 		title = Variables.varDefault('standings_title'),
 		tournament = Variables.varDefault('tournament_name', mw.title.getCurrentTitle().text),
