@@ -383,7 +383,7 @@ end
 
 function CustomMatchSummary._goalDisaplay(goalesValue, side)
 	local goalsDisplay = mw.html.create('div')
-		:cssText(side == 2 and 'float:right; margin-right:10px;')
+		:cssText(side == 2 and 'float:right; margin-right:10px;' or nil)
 		:node(Abbreviation.make(
 			goalesValue,
 			'Team ' .. side .. ' Goaltimes')
