@@ -15,6 +15,7 @@ local Json = require('Module:Json')
 local Abbreviation = require('Module:Abbreviation')
 local String = require('Module:StringUtils')
 local Flags = require('Module:Flags')
+local Page = require('Module:Page')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -194,6 +195,24 @@ end
 
 local CustomMatchSummary = {}
 
+function getHeadToHead(opponents)
+	if opponents[1].type ~= 'team' or opponents[2].type ~= 'team' then
+		return nil
+	end
+	
+	for _, team in pairs(opponents) do
+		if not Page.exists(mw.ext.TeamTemplate.teampage(team.template)) then
+			return nil
+		end
+	end
+
+	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
+	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
+		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
+		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
+	return '[[File:Match Info Stats.png|14x14px|link=' .. link .. '|Head to Head history]]'
+end
+
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
@@ -215,10 +234,13 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
+	local headToHead = getHeadToHead(match.opponents)
+
 	if
 		Table.isNotEmpty(vods) or
 		String.isNotEmpty(match.vod) or
-		Table.isNotEmpty(match.links)
+		Table.isNotEmpty(match.links) or
+		headToHead
 	then
 		local footer = MatchSummary.Footer()
 
@@ -245,6 +267,11 @@ function CustomMatchSummary.getByMatchId(args)
 				gamenum = index,
 				vod = vod,
 			})
+		end
+		
+		-- Head-to-head
+		if headToHead then
+			footer:addElement(headToHead)
 		end
 
 		matchSummary:footer(footer)
