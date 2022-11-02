@@ -11,7 +11,6 @@ local ScribuntoUnit = require('Module:ScribuntoUnit')
 
 local LpdbMock = Lua.import('Module:Mock/Lpdb', {requireDevIfEnabled = true})
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
-local Table = Lua.import('Module:Table', {requireDevIfEnabled = true})
 local TournamentMock = Lua.import('Module:Infobox/Mock/League', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
@@ -33,6 +32,7 @@ function suite:testHeaderInput()
 		qualifies1 = 'A Tournament',
 		qualifies1name = 'A Display',
 		freetext = 'A title',
+		import = false,
 	}:create()
 
 	self:assertDeepEquals(
@@ -77,6 +77,21 @@ function suite:testHeaderInput()
 			syncPlayers = false,
 		},
 		ppt.options
+	)
+
+	self:assertEquals(
+		'<div style="overflow-x:auto">$<abbr title="To Be Announced">TBA</abbr>&nbsp;<abbr title="United States Dollar">' ..
+		'USD</abbr> are spread among the participants as seen below:<br>' ..
+		'<div class="csstable-widget collapsed general-collapsible prizepooltable"' ..
+		' style="grid-template-columns:repeat(8, auto);width:max-content"><div class="csstable-widget-row"' ..
+		' style="font-weight:bold"><div class="csstable-widget-cell" style="min-width:80px">Place</div>' ..
+		'<div class="csstable-widget-cell"><div>$&nbsp;<abbr title="United States Dollar">USD</abbr></div></div>' ..
+		'<div class="csstable-widget-cell"><div>€&nbsp;<abbr title="Euro">EUR</abbr></div></div>' ..
+		'<div class="csstable-widget-cell"><div>&nbsp;kr&nbsp;<abbr title="Swedish krona">SEK</abbr></div></div>' ..
+		'<div class="csstable-widget-cell">Qualifies To</div><div class="csstable-widget-cell"><div>[[A Page|Points]]' ..
+		'</div></div><div class="csstable-widget-cell"><div>A title</div></div>'..
+		'<div class="csstable-widget-cell prizepooltable-col-team">Participant</div></div></div></div>',
+		tostring(ppt:build())
 	)
 
 	TournamentMock.tearDown()
