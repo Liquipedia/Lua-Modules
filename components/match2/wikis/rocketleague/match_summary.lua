@@ -15,7 +15,7 @@ local Json = require('Module:Json')
 local Abbreviation = require('Module:Abbreviation')
 local String = require('Module:StringUtils')
 local Flags = require('Module:Flags')
-local Page = require('Module:Page')
+local Opponent = require('Module:Opponent')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -198,12 +198,6 @@ local CustomMatchSummary = {}
 function CustomMatchSummary._getHeadToHead(opponents)
 	if opponents[1].type ~= Opponent.team or opponents[2].type ~= Opponent.team then
 		return
-	end
-
-	for _, team in pairs(opponents) do
-		if not Page.exists(mw.ext.TeamTemplate.teampage(team.template)) then
-			return
-		end
 	end
 
 	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
