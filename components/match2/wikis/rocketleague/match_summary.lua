@@ -15,7 +15,7 @@ local Json = require('Module:Json')
 local Abbreviation = require('Module:Abbreviation')
 local String = require('Module:StringUtils')
 local Flags = require('Module:Flags')
-local Opponent = require('Module:Opponent')
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
