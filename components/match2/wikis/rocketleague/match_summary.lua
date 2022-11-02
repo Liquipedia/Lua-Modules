@@ -197,7 +197,7 @@ local CustomMatchSummary = {}
 
 function CustomMatchSummary._getHeadToHead(opponents)
 	if opponents[1].type ~= 'team' or opponents[2].type ~= 'team' then
-		return nil
+		return
 	end
 
 	for _, team in pairs(opponents) do
