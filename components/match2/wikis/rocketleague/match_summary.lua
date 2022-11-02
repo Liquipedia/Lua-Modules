@@ -196,7 +196,7 @@ end
 local CustomMatchSummary = {}
 
 function CustomMatchSummary._getHeadToHead(opponents)
-	if opponents[1].type ~= 'team' or opponents[2].type ~= 'team' then
+	if opponents[1].type ~= Opponent.team or opponents[2].type ~= Opponent.team then
 		return
 	end
 
