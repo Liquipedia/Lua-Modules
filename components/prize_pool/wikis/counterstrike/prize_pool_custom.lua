@@ -31,12 +31,14 @@ local HEADER_DATA = {}
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
-	-- Turn off automations
-	args.prizesummary = false
-	args.autousd = false
-	args.exchangeInfo = false
+	local prizePool = PrizePool(args)
 
-	local prizePool = PrizePool(args):create()
+	-- Turn off automations
+	prizePool:changeConfigDefault('prizeSummary', false)
+	prizePool:changeConfigDefault('autoUSD', false)
+	prizePool:changeConfigDefault('exchangeInfo', false)
+
+	prizePool:create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
