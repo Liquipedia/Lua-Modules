@@ -9,14 +9,13 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Json = require('Module:Json')
-local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
@@ -26,10 +25,6 @@ local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 function StandingsStorage.run(data)
 	if Table.isEmpty(data) then
 		return
-	end
-
-	if data.opponentLibrary then
-		Opponent = Lua.import('Module:'.. data.opponentLibrary, {requireDevIfEnabled = true})
 	end
 
 	data.roundcount = tonumber(data.roundcount) or Array.reduce(
