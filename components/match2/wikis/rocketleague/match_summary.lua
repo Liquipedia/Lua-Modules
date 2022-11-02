@@ -195,11 +195,11 @@ end
 
 local CustomMatchSummary = {}
 
-function getHeadToHead(opponents)
+function CustomMatchSummary._getHeadToHead(opponents)
 	if opponents[1].type ~= 'team' or opponents[2].type ~= 'team' then
 		return nil
 	end
-	
+
 	for _, team in pairs(opponents) do
 		if not Page.exists(mw.ext.TeamTemplate.teampage(team.template)) then
 			return nil
@@ -234,7 +234,7 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
-	local headToHead = getHeadToHead(match.opponents)
+	local headToHead = CustomMatchSummary._getHeadToHead(match.opponents)
 
 	if
 		Table.isNotEmpty(vods) or
@@ -268,7 +268,7 @@ function CustomMatchSummary.getByMatchId(args)
 				vod = vod,
 			})
 		end
-		
+
 		-- Head-to-head
 		if headToHead then
 			footer:addElement(headToHead)
