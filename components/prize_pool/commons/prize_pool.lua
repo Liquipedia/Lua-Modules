@@ -697,6 +697,15 @@ function PrizePool:setConfig(option, value)
 	return self
 end
 
+function PrizePool:setConfigDefault(option, value)
+	if self.config[option] then
+		self.config[option].default = value
+	else
+		error('Invalid default config override!')
+	end
+	return self
+end
+
 function PrizePool:addCustomConfig(name, default, func)
 	self.config[name] = {
 		default = default,
