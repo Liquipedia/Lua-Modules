@@ -419,7 +419,11 @@ function MatchGroupInput.readMvp(match)
 		end
 
 		local nameComponents = mw.text.split(player, '|')
-		return playerIndex, {displayname = nameComponents[#nameComponents], name = link, comment = match['mvp' .. playerIndex .. 'comment']}
+		return playerIndex, {
+			displayname = nameComponents[#nameComponents],
+			name = link,
+			comment = match['mvp' .. playerIndex .. 'comment']
+		}
 	end)
 
 	return {players = parsedPlayers, points = mvppoints}
