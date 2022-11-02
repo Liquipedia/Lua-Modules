@@ -34,9 +34,9 @@ function CustomPrizePool.run(frame)
 	local prizePool = PrizePool(args)
 
 	-- Turn off automations
-	prizePool:changeConfigDefault('prizeSummary', false)
-	prizePool:changeConfigDefault('autoUSD', false)
-	prizePool:changeConfigDefault('exchangeInfo', false)
+	prizePool:setConfigDefault('prizeSummary', false)
+	prizePool:setConfigDefault('autoUSD', false)
+	prizePool:setConfigDefault('exchangeInfo', false)
 
 	prizePool:create()
 
