@@ -202,7 +202,7 @@ function CustomMatchSummary._getHeadToHead(opponents)
 
 	for _, team in pairs(opponents) do
 		if not Page.exists(mw.ext.TeamTemplate.teampage(team.template)) then
-			return nil
+			return
 		end
 	end
 
