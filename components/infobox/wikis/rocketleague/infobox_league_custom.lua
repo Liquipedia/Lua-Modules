@@ -12,6 +12,7 @@ local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local TournamentNotability = require('Module:TournamentNotability')
 local Variables = require('Module:Variables')
+local Logic = require('Module:Logic')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
@@ -163,6 +164,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_participant_number', 0)
 	Variables.varDefine('tournament_participants', '(')
 	Variables.varDefine('tournament_teamplayers', args.mode == _MODE_2v2 and 2 or 3)
+	Variables.varDefine('showheadtohead',
+		Logic.emptyOr(args.showheadtohead, tostring(tonumber(args.liquipediatier) < 5))
+	)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)

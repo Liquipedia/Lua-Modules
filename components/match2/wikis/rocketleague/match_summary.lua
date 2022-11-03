@@ -195,7 +195,12 @@ end
 
 local CustomMatchSummary = {}
 
-function CustomMatchSummary._getHeadToHead(opponents)
+function CustomMatchSummary._getHeadToHead(match)
+	if not match.extradata.showheadtohead then
+		return
+	end
+
+	local opponents = match.opponents
 	if opponents[1].type ~= Opponent.team or opponents[2].type ~= Opponent.team then
 		return
 	end
@@ -228,7 +233,7 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
-	local headToHead = CustomMatchSummary._getHeadToHead(match.opponents)
+	local headToHead = CustomMatchSummary._getHeadToHead(match)
 
 	if
 		Table.isNotEmpty(vods) or
