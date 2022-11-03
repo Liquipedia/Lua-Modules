@@ -31,6 +31,8 @@ local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
 
+local _H2H_TIER_THRESHOLD = 4
+
 local _league
 
 function CustomLeague.run(frame)
@@ -165,7 +167,10 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_participants', '(')
 	Variables.varDefine('tournament_teamplayers', args.mode == _MODE_2v2 and 2 or 3)
 	Variables.varDefine('showh2h',
-		Logic.emptyOr(args.showh2h, tostring(tonumber(args.liquipediatier) < 5))
+		Logic.emptyOr(
+			args.showh2h,
+			tostring(tonumber(args.liquipediatier or 0) <= _H2H_TIER_THRESHOLD)
+		)
 	)
 end
 
