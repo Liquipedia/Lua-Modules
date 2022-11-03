@@ -231,7 +231,7 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
-	local headToHead = match.extradata.showheadtohead and
+	local headToHead = match.extradata.showh2h and
 		CustomMatchSummary._getHeadToHead(match) or nil
 
 	if

@@ -150,7 +150,7 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '3v3'))
-	match.showheadtohead = Logic.emptyOr(match.showheadtohead, Variables.varDefault('showheadtohead'))
+	match.showh2h = Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -189,7 +189,7 @@ function matchFunctions.getExtraData(match)
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
 		isconverted = 0,
-		showheadtohead = Logic.readBool(match.showheadtohead),
+		showh2h = Logic.readBool(match.showh2h),
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
 	}
