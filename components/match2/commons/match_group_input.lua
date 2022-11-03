@@ -412,14 +412,14 @@ function MatchGroupInput.readMvp(match)
 		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
 			for _, lookUpPlayer in pairs(opponent.match2players) do
 				if link == lookUpPlayer.name then
-					return playerIndex, Table.merge(lookUpPlayer,
+					return Table.merge(lookUpPlayer,
 						{team = opponent.name, template = opponent.template, comment = match['mvp' .. playerIndex .. 'comment']})
 				end
 			end
 		end
 
 		local nameComponents = mw.text.split(player, '|')
-		return playerIndex, {
+		return {
 			displayname = nameComponents[#nameComponents],
 			name = link,
 			comment = match['mvp' .. playerIndex .. 'comment']
