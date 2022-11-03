@@ -189,7 +189,7 @@ function matchFunctions.getExtraData(match)
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
 		isconverted = 0,
-		showheadtohead = match.showheadtohead ~= 'false',
+		showheadtohead = Logic.readBool(match.showheadtohead),
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
 	}
