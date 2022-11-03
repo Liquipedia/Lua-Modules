@@ -184,12 +184,16 @@ function matchFunctions.getExtraData(match)
 	end
 	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 
+	local showh2h = Logic.readBool(match.showh2h)
+		and opponent1.type == Opponent.team
+		and opponent2.type == Opponent.team
+
 	match.extradata = {
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
 		isconverted = 0,
-		showh2h = Logic.readBool(match.showh2h),
+		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
 	}

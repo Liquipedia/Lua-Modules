@@ -15,7 +15,6 @@ local Json = require('Module:Json')
 local Abbreviation = require('Module:Abbreviation')
 local String = require('Module:StringUtils')
 local Flags = require('Module:Flags')
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -197,12 +196,7 @@ end
 
 local CustomMatchSummary = {}
 
-function CustomMatchSummary._getHeadToHead(match)
-	local opponents = match.opponents
-	if opponents[1].type ~= Opponent.team or opponents[2].type ~= Opponent.team then
-		return
-	end
-
+function CustomMatchSummary._getHeadToHead(opponents)
 	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
 	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
 		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
@@ -232,7 +226,7 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	local headToHead = match.extradata.showh2h and
-		CustomMatchSummary._getHeadToHead(match) or nil
+		CustomMatchSummary._getHeadToHead(match.opponents) or nil
 
 	if
 		Table.isNotEmpty(vods) or
