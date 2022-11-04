@@ -97,18 +97,11 @@ function ResultsTable:getQueryType()
 		error('Invalid querytype "' .. args.querytype .. '"')
 	end
 
-	if args.coach then
-		return COACH_TYPE
-	elseif args.player then
-		return Opponent.solo
-	end
-
 	return Opponent.team
 end
 
 -- todo:
 -- > query data
 -- > build display from config and data
--- > option for querying results for players on a certain team (adjust config)
 
 return ResultsTable
