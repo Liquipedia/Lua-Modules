@@ -278,7 +278,11 @@ function BaseResultsTable:buildOpponentConditions()
 			for playerIndex = 1, config.playerLimit do
 				opponentConditions:add{
 					ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'), Comparator.eq, pageName),
-					ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'), Comparator.eq, pageNameWithUnderScore),
+					ConditionNode(
+						ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'),
+						Comparator.eq,
+						pageNameWithUnderScore
+					),
 				}
 			end
 		end
