@@ -356,7 +356,8 @@ function matchFunctions.getExtraData(match)
 		lastgame = Variables.varDefault('last_game'),
 		mapveto = matchFunctions.getMapVeto(match),
 		mvp = matchFunctions.getMVP(match),
-		isconverted = 0
+		isconverted = 0,
+		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil
 	}
 	return match
 end
