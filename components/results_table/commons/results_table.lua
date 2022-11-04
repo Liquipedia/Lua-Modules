@@ -57,10 +57,11 @@ function ResultsTable:readConfig()
 		coachPrefix = args.prefixcoach or DEFAULT_VALUES.coachPrefix,
 		hideResult = Logic.readBool(args.hideresult),
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
-		gameIconsData = args.gameIcons,
+		gameIconsData = args.gameIcons and mw.loadData(args.gameIcons) or nil,
 		opponent = mw.text.decode(args.coach or args.player or args.team or self:_getOpponent()),
 		queryType = self:getQueryType(),
 		onlyAchievements = Logic.readBool(args.achievements),
+		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
 	}
 
 	config.sort = args.sort or
@@ -70,7 +71,7 @@ function ResultsTable:readConfig()
 		(config.onlyAchievements and DEFAULT_VALUES.achievementsLimit or DEFAULT_VALUES.resultsLimit)
 
 	config.playerLimit =
-		(config.queryType == Opponent.solo and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
+		(config.queryType == SOLO_TYPE and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
 		or (config.queryType == COACH_TYPE and tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit)
 
 	return config
