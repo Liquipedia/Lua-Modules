@@ -28,7 +28,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	)
 	Variables.varDefine('tournament_icon_dark', Variables.varDefault('tournament_icondark'))
 	Variables.varDefine('tournament_parent_name', Variables.varDefault('tournament_parentname'))
-	Variables.varDefine('showh2h', CustomLeague:parseShowHeadToHead(args))
+	Variables.varDefine('showh2h', CustomLeague.parseShowHeadToHead(args))
 end
 
 return Class.export(CustomHiddenDataBox)
