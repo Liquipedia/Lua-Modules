@@ -112,9 +112,11 @@ function CustomInjector:addCustomCells(widgets)
 			}
 		}
 	)
+
+	local lowercaseInput = _args.input and _args.input:lower() or nil
 	table.insert(widgets, Cell{
 			name = 'Input',
-			content = {_INPUTS[(_args.input or 'default'):lower()]}
+			content = {_INPUTS[lowercaseInput] or _INPUTS.default}
 		})
 	return widgets
 end
