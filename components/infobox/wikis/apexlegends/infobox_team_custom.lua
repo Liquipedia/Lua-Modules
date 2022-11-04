@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
-local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
