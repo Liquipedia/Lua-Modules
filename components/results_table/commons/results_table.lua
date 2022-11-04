@@ -27,10 +27,12 @@ local DEFAULT_VALUES = {
 	resultsLimit = 5000,
 }
 local COACH_TYPE = 'coach'
+local SOLO_TYPE = 'coach'
+local TEAM_TYPE = 'coach'
 local VALID_QUERY_TYPES = {
+	SOLO_TYPE,
+	TEAM_TYPE,
 	COACH_TYPE,
-	Opponent.solo,
-	Opponent.team,
 }
 
 --- @class ResultsTable
