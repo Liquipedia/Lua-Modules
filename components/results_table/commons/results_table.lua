@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:ResultsTable
+-- page=Module:ResultsTable/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -35,10 +35,10 @@ local VALID_QUERY_TYPES = {
 	COACH_TYPE,
 }
 
---- @class ResultsTable
-local ResultsTable = Class.new(function(self, ...) self:init(...) end)
+--- @class BaseResultsTable
+local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
 
-function ResultsTable:init(args)
+function BaseResultsTable:init(args)
 	self.args = args
 
 	self.pagename = mw.title.getCurrentTitle().text
@@ -48,7 +48,7 @@ function ResultsTable:init(args)
 	return self
 end
 
-function ResultsTable:readConfig()
+function BaseResultsTable:readConfig()
 	local args = self.args
 
 	local config = {
@@ -77,7 +77,7 @@ function ResultsTable:readConfig()
 	return config
 end
 
-function ResultsTable:_getOpponent()
+function BaseResultsTable:_getOpponent()
 	if Namespace.isMain() then
 		return mw.title.getCurrentTitle().baseText
 	elseif String.contains(mw.title.getCurrentTitle().subpageText:lower(), 'results') then
@@ -88,7 +88,7 @@ function ResultsTable:_getOpponent()
 	return mw.title.getCurrentTitle().subpageText
 end
 
-function ResultsTable:getQueryType()
+function BaseResultsTable:getQueryType()
 	local args = self.args
 
 	if args.querytype then
@@ -105,4 +105,4 @@ end
 -- > query data
 -- > build display from config and data
 
-return ResultsTable
+return BaseResultsTable
