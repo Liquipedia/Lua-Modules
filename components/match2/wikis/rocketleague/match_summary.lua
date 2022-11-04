@@ -29,6 +29,8 @@ local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link='
 local _OCTANE_SUFFIX = '|Octane matchpage]]'
 local _BALLCHASING_PREFIX = '[[File:Ballchasing icon.png|14x14px|link='
 local _BALLCHASING_SUFFIX = '|Ballchasing replays]]'
+local _HEADTOHEAD_PREFIX = '[[File:Match Info Stats.png|14x14px|link='
+local _HEADTOHEAD_SUFFIX = '|Head to Head history]]'
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
@@ -194,6 +196,14 @@ end
 
 local CustomMatchSummary = {}
 
+function CustomMatchSummary._getHeadToHead(opponents)
+	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
+	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
+		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
+		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
+	return _HEADTOHEAD_PREFIX .. link .. _HEADTOHEAD_SUFFIX
+end
+
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
@@ -215,10 +225,14 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
+	local headToHead = match.extradata.showh2h and
+		CustomMatchSummary._getHeadToHead(match.opponents) or nil
+
 	if
 		Table.isNotEmpty(vods) or
 		String.isNotEmpty(match.vod) or
-		Table.isNotEmpty(match.links)
+		Table.isNotEmpty(match.links) or
+		headToHead
 	then
 		local footer = MatchSummary.Footer()
 
@@ -245,6 +259,11 @@ function CustomMatchSummary.getByMatchId(args)
 				gamenum = index,
 				vod = vod,
 			})
+		end
+
+		-- Head-to-head
+		if headToHead then
+			footer:addElement(headToHead)
 		end
 
 		matchSummary:footer(footer)

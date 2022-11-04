@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
@@ -29,6 +30,8 @@ local _SERIES_RLCS = 'Rocket League Championship Series'
 local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
+
+local _H2H_TIER_THRESHOLD = 5
 
 local _league
 
@@ -163,6 +166,14 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_participant_number', 0)
 	Variables.varDefine('tournament_participants', '(')
 	Variables.varDefine('tournament_teamplayers', args.mode == _MODE_2v2 and 2 or 3)
+	Variables.varDefine('showh2h', CustomLeague.parseShowHeadToHead(args))
+end
+
+function CustomLeague.parseShowHeadToHead(args)
+	return Logic.emptyOr(
+		args.showh2h,
+		tostring((tonumber(args.liquipediatier) or _H2H_TIER_THRESHOLD) < _H2H_TIER_THRESHOLD)
+	)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
