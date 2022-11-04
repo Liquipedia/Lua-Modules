@@ -252,6 +252,8 @@ function Team:_setLpdbData(args, links)
 		locations = Locale.formatLocations(args),
 		logo = args.image,
 		logodark = args.imagedark or args.imagedarkmode,
+		textlesslogo = args.teamcardimage,
+		textlesslogodark = args.teamcardimagedark,
 		earnings = earnings,
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
