@@ -169,7 +169,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('showh2h',
 		Logic.emptyOr(
 			args.showh2h,
-			tostring(tonumber(args.liquipediatier or _H2H_TIER_THRESHOLD) < _H2H_TIER_THRESHOLD)
+			tostring(tonumber(args.liquipediatier) or _H2H_TIER_THRESHOLD < _H2H_TIER_THRESHOLD)
 		)
 	)
 end
