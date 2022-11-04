@@ -26,9 +26,9 @@ local DEFAULT_VALUES = {
 	achievementsLimit = 10,
 	resultsLimit = 5000,
 }
+local SOLO_TYPE = 'solo'
+local TEAM_TYPE = 'team'
 local COACH_TYPE = 'coach'
-local SOLO_TYPE = 'coach'
-local TEAM_TYPE = 'coach'
 local VALID_QUERY_TYPES = {
 	SOLO_TYPE,
 	TEAM_TYPE,
