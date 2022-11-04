@@ -239,9 +239,11 @@ function Team:_setLpdbData(args, links)
 
 	local team = args.teamtemplate or self.pagename
 	local teamTemplate
+	local textlessImage, textlessImageDark
 	if team and mw.ext.TeamTemplate.teamexists(team) then
 		local teamRaw = mw.ext.TeamTemplate.raw(team)
 		teamTemplate = teamRaw.historicaltemplate or teamRaw.templatename
+		textlessImage, textlessImageDark = teamRaw.image, teamRaw.imagedark
 	end
 
 	local lpdbData = {
@@ -250,10 +252,10 @@ function Team:_setLpdbData(args, links)
 		location2 = self:getStandardLocationValue(args.location2),
 		region = args.region,
 		locations = Locale.formatLocations(args),
-		logo = args.image,
-		logodark = args.imagedark or args.imagedarkmode,
-		textlesslogo = args.teamcardimage,
-		textlesslogodark = args.teamcardimagedark,
+		logo = args.image or textlessImage,
+		logodark = args.imagedark or args.imagedarkmode or textlessImageDark,
+		textlesslogo = textlessImage or args.teamcardimage,
+		textlesslogodark = textlessImageDark or args.teamcardimagedark,
 		earnings = earnings,
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
