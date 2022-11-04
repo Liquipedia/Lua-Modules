@@ -93,11 +93,9 @@ function ResultsTable:getQueryType()
 		if Table.includes(VALID_QUERY_TYPES, queryType) then
 			return queryType
 		end
-
-		error('Invalid querytype "' .. args.querytype .. '"')
 	end
 
-	return Opponent.team
+	error('Invalid querytype "' .. (args.querytype or '') .. '"')
 end
 
 -- todo:
