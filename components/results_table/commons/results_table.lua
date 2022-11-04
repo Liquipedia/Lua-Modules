@@ -101,8 +101,200 @@ function BaseResultsTable:getQueryType()
 	error('Invalid querytype "' .. (args.querytype or '') .. '"')
 end
 
+function BaseResultsTable:create()
+	local data = self.args.data or self:queryData()
+
+	if Table.isEmpty(data) then
+		return
+	end
+
+	table.sort(data, function(placement1, placement2) return placement1.date > placement2.date end)
+
+	if self.config.onlyAchievements then
+		self.data = {data}
+		return self
+	end
+
+	-- split data into years for non achievements
+	local splitData = {}
+	for _, placementData in ipairs(data) do
+		local year = placementData.date:sub(1,4)
+		if not splitData[year] then
+			splitData[year] = {header = year}
+		end
+
+		table.insert(splitData[year], placementData)
+	end
+
+	self.data = {}
+	for _, dataSet in Table.iter.spairs(splitData, function(tbl, key1, key2) return key1 > key2 end) do
+		table.insert(self.data, dataSet)
+	end
+
+	return self
+end
+
+function BaseResultsTable:queryData()
+	local data = mw.ext.LiquipediaDB.lpdb('placement', {
+		limit = self.config.limit,
+		order = self.config.sort .. ' ' .. self.config.order,
+		conditions = self:buildConditions(),
+	})
+
+	if type(data) ~= 'table' then
+		error(data)
+	end
+
+	return data
+end
+
+function BaseResultsTable:buildConditions()
+	if self.args.customConditions then
+		return self.args.customConditions
+	end
+
+	local conditions = self:buildBaseConditions()
+
+	if self.args.additionalConditions then
+		return conditions .. self.args.additionalConditions
+	end
+
+	return conditions
+end
+
+function BaseResultsTable:buildBaseConditions()
+	local args = self.args
+
+	local conditions = ConditionTree(BooleanOperator.all)
+		:add{self:buildOpponentConditions()}
+
+	if args.game then
+		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
+	end
+
+	local startDate = args.startdate or args.sdate
+	if startDate then
+		-- intentional > here to keep it as is in current modules
+		-- possibly change to >= later
+		conditions:add{ConditionNode(ColumnName('date'), Comparator.gt, startDate)}
+	end
+
+	local endDate = args.enddate or args.edate
+	if endDate then
+		-- intentional < here to keep it as is in current modules
+		-- possibly change to <= later
+		conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, endDate)}
+	end
+
+	if args.placement then
+		conditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, args.placement)}
+	elseif not Logic.readBool(args.ignorePlacement) then
+		conditions:add{ConditionNode(ColumnName('placement'), Comparator.neq, '')}
+	end
+
+	if args.tier then
+		local tierConditions = ConditionTree(BooleanOperator.any)
+		for _, tier in pairs(mw.text.split(args.tier, ',%s?')) do
+			tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
+		end
+		conditions:add{tierConditions}
+	end
+
+	return conditions:toString()
+end
+
+-- todo: adjust once #1802 is done
+function BaseResultsTable:buildOpponentConditions()
+	local config = self.config
+	local opponent = config.opponent
+
+	local opponentConditions = ConditionTree(BooleanOperator.any)
+
+	if config.queryType == SOLO_TYPE or config.queryType == COACH_TYPE then
+		opponent = config.resolveOpponent
+			and mw.ext.TeamLiquidIntegration.resolve_redirect(opponent)
+			or opponent
+
+		local opponentWithUnderscore = opponent:gsub(' ', '_')
+
+		local prefix
+		if config.queryType == SOLO_TYPE then
+			prefix = config.playerPrefix
+			opponentConditions:add{
+				ConditionTree(BooleanOperator.all):add{
+					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent),
+				},
+				ConditionTree(BooleanOperator.all):add{
+					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponentWithUnderscore),
+				},
+			}
+		else
+			prefix = config.coachPrefix
+		end
+
+		for playerIndex = 1, config.playerLimit do
+			opponentConditions:add{
+				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponent),
+				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponentWithUnderscore),
+			}
+		end
+
+		return opponentConditions
+	end
+
+	if not mw.ext.TeamTemplate.teamexists(opponent) then
+		error('Missing team template for team: ' .. opponent)
+	else
+		opponent = mw.ext.TeamTemplate.teampage(opponent)
+	end
+
+	local opponentPageNames = {}
+	if config.resolveOpponent then
+		opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(opponent)
+		if not mw.ext.TeamTemplate.teamexists(opponent) then
+			error('Missing team template for team: ' .. opponent)
+		end
+		table.insert(opponentPageNames, opponent)
+	elseif Team.queryHistoricalNames then
+		opponentPageNames = Team.queryHistoricalNames(opponent)
+	else
+		table.insert(opponentPageNames, opponent)
+	end
+
+	if config.playerResultsOfTeam then
+		local prefix = config.playerPrefix
+		for _, pageName in pairs(opponentPageNames) do
+			local pageNameWithUnderScore = pageName:gsub(' ', '_')
+			for playerIndex = 1, config.playerLimit do
+				opponentConditions:add{
+					ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'), Comparator.eq, pageName),
+					ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'), Comparator.eq, pageNameWithUnderScore),
+				}
+			end
+		end
+
+		return ConditionTree(BooleanOperator.all):add{
+			opponentConditions,
+			ConditionNode(ColumnName('opponenttype'), Comparator.neq, Opponent.team),
+		}
+	end
+
+	for _, pageName in pairs(opponentPageNames) do
+		opponentConditions:add{
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, pageName),
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, pageName:gsub(' ', '_')),
+		}
+	end
+
+	return ConditionTree(BooleanOperator.all):add{
+			opponentConditions,
+			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
+		}
+end
+
 -- todo:
--- > query data
 -- > build display from config and data
 
 return BaseResultsTable
