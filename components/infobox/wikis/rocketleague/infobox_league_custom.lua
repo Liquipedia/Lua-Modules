@@ -166,10 +166,10 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_participant_number', 0)
 	Variables.varDefine('tournament_participants', '(')
 	Variables.varDefine('tournament_teamplayers', args.mode == _MODE_2v2 and 2 or 3)
-	Variables.varDefine('showh2h', CustomLeague:parseShowHeadToHead(args))
+	Variables.varDefine('showh2h', CustomLeague.parseShowHeadToHead(args))
 end
 
-function CustomLeague:parseShowHeadToHead(args)
+function CustomLeague.parseShowHeadToHead(args)
 	return Logic.emptyOr(
 		args.showh2h,
 		tostring((tonumber(args.liquipediatier) or _H2H_TIER_THRESHOLD) < _H2H_TIER_THRESHOLD)
