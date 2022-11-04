@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+--local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local DEFAULT_VALUES = {
 	order = 'desc',
