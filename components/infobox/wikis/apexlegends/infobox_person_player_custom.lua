@@ -23,7 +23,6 @@ local Cell = require('Module:Infobox/Widget/Cell')
 
 local _INPUTS = {
 	controller = 'Controller',
-	Controller = 'Controller',
 	cont = 'Controller',
 	c = 'Controller',
 	default = 'Mouse & Keyboard',
@@ -115,7 +114,7 @@ function CustomInjector:addCustomCells(widgets)
 	)
 	table.insert(widgets, Cell{
 			name = 'Input',
-			content = {_INPUTS[_args.input] or _INPUTS.default}
+			content = {_INPUTS[(_args.input or 'default'):lower()]}
 		})
 	return widgets
 end
