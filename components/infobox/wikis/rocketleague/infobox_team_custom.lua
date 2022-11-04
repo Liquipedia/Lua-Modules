@@ -65,12 +65,6 @@ function CustomInjector:parse(_, widgets)
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = args.image
-	end
-
 	lpdbData.extradata.rating = Variables.varDefault('rating')
 	lpdbData.extradata.tier = string.lower(args.tier or '')
 
