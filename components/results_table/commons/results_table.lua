@@ -11,10 +11,18 @@ local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Team = require('Module:Team')
 
---local OpponentLibraries = require('Module:OpponentLibraries')
---local Opponent = OpponentLibraries.Opponent
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 --local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
+local Condition = require('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local DEFAULT_VALUES = {
 	order = 'desc',
