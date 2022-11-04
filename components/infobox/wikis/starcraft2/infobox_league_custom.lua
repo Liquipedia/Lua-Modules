@@ -614,7 +614,12 @@ function CustomLeague:addToLpdb(lpdbData)
 	end
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
-	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
+	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous)) 
+	lpdbData.publishertier = Variables.varDefault('featured')
+	lpdbData.extradata = {
+		seriesnumber = Variables.varDefault('tournament_series_number'),
+		featured = Variables.varDefault('featured')
+	}
 
 	return lpdbData
 end
