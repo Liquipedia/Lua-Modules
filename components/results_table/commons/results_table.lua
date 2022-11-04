@@ -252,16 +252,15 @@ function BaseResultsTable:buildOpponentConditions()
 		return opponentConditions
 	end
 
-	if not mw.ext.TeamTemplate.teamexists(opponent) then
+	opponent = Team.queryDB('teampage', opponent)
+	if not opponent then
 		error('Missing team template for team: ' .. opponent)
-	else
-		opponent = mw.ext.TeamTemplate.teampage(opponent)
 	end
 
 	local opponentPageNames = {}
 	if config.resolveOpponent then
-		opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(opponent)
-		if not mw.ext.TeamTemplate.teamexists(opponent) then
+		opponent = Team.queryDB('teampage', mw.ext.TeamLiquidIntegration.resolve_redirect(opponent))
+		if not opponent then
 			error('Missing team template for team: ' .. opponent)
 		end
 		table.insert(opponentPageNames, opponent)
