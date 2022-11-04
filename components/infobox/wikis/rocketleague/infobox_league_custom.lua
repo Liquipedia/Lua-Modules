@@ -31,7 +31,7 @@ local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
 
-local _H2H_TIER_THRESHOLD = 4
+local _H2H_TIER_THRESHOLD = 5
 
 local _league
 
@@ -169,7 +169,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('showh2h',
 		Logic.emptyOr(
 			args.showh2h,
-			tostring(tonumber(args.liquipediatier or _H2H_TIER_THRESHOLD + 1) <= _H2H_TIER_THRESHOLD)
+			tostring(tonumber(args.liquipediatier or _H2H_TIER_THRESHOLD) < _H2H_TIER_THRESHOLD)
 		)
 	)
 end
