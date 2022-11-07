@@ -617,7 +617,7 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
 	lpdbData.publishertier = Variables.varDefault('featured')
 
-	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number'),
+	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 	lpdbData.extradata.featured = Variables.varDefault('featured')
 
 	return lpdbData
