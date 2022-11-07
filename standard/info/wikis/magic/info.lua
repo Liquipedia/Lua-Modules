@@ -7,7 +7,7 @@
 --
 
 return {
-  startYear = 1993,
+	startYear = 1993,
 	wikiName = 'magic',
 	name = 'Magic: The Gathering',
 	defaultTeamLogo = 'Liquipedia_logo.png',
