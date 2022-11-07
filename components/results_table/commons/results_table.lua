@@ -200,7 +200,7 @@ function BaseResultsTable:buildBaseConditions()
 
 	if args.tier then
 		local tierConditions = ConditionTree(BooleanOperator.any)
-		for _, tier in pairs(mw.text.split(args.tier, ',%s?')) do
+		for _, tier in pairs(Table.mapValues(mw.text.split(args.tier, ',', true), mw.text.trim)) do
 			tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
 		end
 		conditions:add{tierConditions}
