@@ -134,10 +134,8 @@ function BaseResultsTable:create()
 		dataSet.header = dataSet[1].date:sub(1,4)
 	end)
 
-	self.data = {}
-	for _, dataSet in Table.iter.spairs(splitData, function(tbl, key1, key2) return key1 > key2 end) do
-		table.insert(self.data, dataSet)
-	end
+	Array.sortInPlaceBy(splitData, function(val) return val.header end, function(val1, val2) return val1 > val2 end)
+	self.data = splitData
 
 	return self
 end
