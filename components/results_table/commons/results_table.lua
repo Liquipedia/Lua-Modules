@@ -212,83 +212,34 @@ end
 -- todo: adjust once #1802 is done
 function BaseResultsTable:buildOpponentConditions()
 	local config = self.config
-	local opponent = config.opponent
-
-	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	if config.queryType == SOLO_TYPE or config.queryType == COACH_TYPE then
-		opponent = config.resolveOpponent
-			and mw.ext.TeamLiquidIntegration.resolve_redirect(opponent)
-			or opponent
-
-		local opponentWithUnderscore = opponent:gsub(' ', '_')
-
-		local prefix
-		if config.queryType == SOLO_TYPE then
-			prefix = config.playerPrefix
-			opponentConditions:add{
-				ConditionTree(BooleanOperator.all):add{
-					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent),
-				},
-				ConditionTree(BooleanOperator.all):add{
-					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponentWithUnderscore),
-				},
-			}
-		else
-			prefix = config.coachPrefix
-		end
-
-		for playerIndex = 1, config.playerLimit do
-			opponentConditions:add{
-				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponent),
-				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponentWithUnderscore),
-			}
-		end
-
-		return opponentConditions
+		return self:buildNonTeamOpponentConditions()
 	end
 
-	opponent = Team.queryDB('teampage', opponent)
+	local opponent = Team.queryDB('teampage', config.opponent)
 	if not opponent then
 		error('Missing team template for team: ' .. opponent)
 	end
 
-	local opponentPageNames = {}
+	local opponentPageNames
 	if config.resolveOpponent then
 		opponent = Team.queryDB('teampage', mw.ext.TeamLiquidIntegration.resolve_redirect(opponent))
 		if not opponent then
 			error('Missing team template for team: ' .. opponent)
 		end
-		table.insert(opponentPageNames, opponent)
+		opponentPageNames = {opponent}
 	elseif Team.queryHistoricalNames then
 		opponentPageNames = Team.queryHistoricalNames(opponent)
 	else
-		table.insert(opponentPageNames, opponent)
+		opponentPageNames = {opponent}
 	end
 
 	if config.playerResultsOfTeam then
-		local prefix = config.playerPrefix
-		for _, pageName in pairs(opponentPageNames) do
-			local pageNameWithUnderScore = pageName:gsub(' ', '_')
-			for playerIndex = 1, config.playerLimit do
-				opponentConditions:add{
-					ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'), Comparator.eq, pageName),
-					ConditionNode(
-						ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'),
-						Comparator.eq,
-						pageNameWithUnderScore
-					),
-				}
-			end
-		end
-
-		return ConditionTree(BooleanOperator.all):add{
-			opponentConditions,
-			ConditionNode(ColumnName('opponenttype'), Comparator.neq, Opponent.team),
-		}
+		return self:buildPlayersOnTeamOpponentConditions(opponentPageNames)
 	end
+
+	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	for _, pageName in pairs(opponentPageNames) do
 		opponentConditions:add{
@@ -301,6 +252,68 @@ function BaseResultsTable:buildOpponentConditions()
 			opponentConditions,
 			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
 		}
+end
+
+-- todo: adjust once #1802 is done
+function BaseResultsTable:buildNonTeamOpponentConditions()
+	local config = self.config
+	local opponentConditions = ConditionTree(BooleanOperator.any)
+
+	local opponent = config.resolveOpponent
+		and mw.ext.TeamLiquidIntegration.resolve_redirect(config.opponent)
+		or config.opponent
+
+	local opponentWithUnderscore = opponent:gsub(' ', '_')
+
+	local prefix
+	if config.queryType == SOLO_TYPE then
+		prefix = config.playerPrefix
+		opponentConditions:add{
+			ConditionTree(BooleanOperator.all):add{
+				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+				ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent),
+			},
+			ConditionTree(BooleanOperator.all):add{
+				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+				ConditionNode(ColumnName('opponentname'), Comparator.eq, opponentWithUnderscore),
+			},
+		}
+	else
+		prefix = config.coachPrefix
+	end
+
+	for playerIndex = 1, config.playerLimit do
+		opponentConditions:add{
+			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponent),
+			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponentWithUnderscore),
+		}
+	end
+
+	return opponentConditions
+end
+
+-- todo: adjust once #1802 is done
+function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentPageNames)
+	
+	local prefix = self.config.playerPrefix
+	for _, pageName in pairs(opponentPageNames) do
+		local pageNameWithUnderScore = pageName:gsub(' ', '_')
+		for playerIndex = 1, self.config.playerLimit do
+			opponentConditions:add{
+				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'), Comparator.eq, pageName),
+				ConditionNode(
+					ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'),
+					Comparator.eq,
+					pageNameWithUnderScore
+				),
+			}
+		end
+	end
+
+	return ConditionTree(BooleanOperator.all):add{
+		opponentConditions,
+		ConditionNode(ColumnName('opponenttype'), Comparator.neq, Opponent.team),
+	}
 end
 
 -- todo:
