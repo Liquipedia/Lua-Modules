@@ -123,16 +123,15 @@ function BaseResultsTable:create()
 		return self
 	end
 
-	-- split data into years for non achievements
-	local splitData = {}
-	for _, placementData in ipairs(data) do
-		local year = placementData.date:sub(1,4)
-		if not splitData[year] then
-			splitData[year] = {header = year}
-		end
+	-- split placements into years for non achievements
+	local splitData = Array.groupBy(data, function(placementData)
+		return placementData.date:sub(1,4)
+	end)
 
-		table.insert(splitData[year], placementData)
-	end
+	-- Set the header
+	Table.iter.forEachPair(splitData, function(_, dataSet)
+		dataSet.header = dataSet[1].date:sub(1,4)
+	end)
 
 	self.data = {}
 	for _, dataSet in Table.iter.spairs(splitData, function(tbl, key1, key2) return key1 > key2 end) do
