@@ -450,10 +450,11 @@ function League:_setLpdbData(args, links)
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {})
 		),
+		extradata = {},
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
+	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
 end
 
