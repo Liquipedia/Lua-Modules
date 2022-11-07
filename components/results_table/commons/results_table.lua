@@ -294,7 +294,8 @@ end
 
 -- todo: adjust once #1802 is done
 function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentPageNames)
-	
+	local opponentConditions = ConditionTree(BooleanOperator.any)
+
 	local prefix = self.config.playerPrefix
 	for _, pageName in pairs(opponentPageNames) do
 		local pageNameWithUnderScore = pageName:gsub(' ', '_')
