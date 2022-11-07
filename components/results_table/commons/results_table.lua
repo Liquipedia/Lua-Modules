@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -129,7 +130,7 @@ function BaseResultsTable:create()
 	end)
 
 	-- Set the header
-	Table.iter.forEachPair(splitData, function(_, dataSet)
+	Table.iter.forEach(splitData, function(dataSet)
 		dataSet.header = dataSet[1].date:sub(1,4)
 	end)
 
