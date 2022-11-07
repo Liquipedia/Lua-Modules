@@ -450,7 +450,9 @@ function League:_setLpdbData(args, links)
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {})
 		),
-		extradata = {},
+		extradata = {
+			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
+		},
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
