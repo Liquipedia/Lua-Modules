@@ -256,12 +256,11 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	-- whereas voobly is used to denote non-official version played via voobly
 	lpdbData['patch'] = args.patch or args.voobly
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
-	lpdbData['extradata'] = {
-		region = args.region,
-		deadline = DateClean._clean(args.deadline or ''),
-		gamemode = table.concat(CustomLeague:_getGameModes(args, false), ','),
-		gameversion = args.version
-	}
+
+	lpdbData.extradata.region = args.region
+	lpdbData.extradata.deadline = DateClean._clean(args.deadline or '')
+	lpdbData.extradata.gamemode = table.concat(CustomLeague:_getGameModes(args, false), ',')
+	lpdbData.extradata.gameversion = args.version
 
 	return lpdbData
 end

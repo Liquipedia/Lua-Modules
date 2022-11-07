@@ -135,11 +135,10 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
-	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.player_number) and 'true' or '',
-		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
-		enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date),
-	}
+
+	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
+	lpdbData.extradata.startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date)
+	lpdbData.extradata.enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date)
 
 	return lpdbData
 end

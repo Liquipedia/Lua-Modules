@@ -73,11 +73,10 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.participants_number or args.team_number
 	lpdbData.publishertier = Logic.readBool(args.riotpremier) and '1' or ''
 
-	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.participants_number) or
-			String.isNotEmpty(args.individual) and 'true' or '',
-		['is riot premier'] = String.isNotEmpty(args.riotpremier) and 'true' or '',
-	}
+	lpdbData.extradata.individual = String.isNotEmpty(args.participants_number) or
+			String.isNotEmpty(args.individual) and 'true' or ''
+
+	lpdbData.extradata['is riot premier'] = String.isNotEmpty(args.riotpremier) and 'true' or ''
 
 	return lpdbData
 end

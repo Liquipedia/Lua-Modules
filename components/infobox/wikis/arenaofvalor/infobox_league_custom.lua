@@ -75,9 +75,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = _game or args.game
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = Logic.readBool(_args.publisherpremier) and 'true' or nil
-	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.player_number) and 'true' or '',
-	}
+	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end

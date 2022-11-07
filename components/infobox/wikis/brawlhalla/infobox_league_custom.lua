@@ -74,10 +74,8 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
-	lpdbData['extradata'] = {
-		region = args.region,
-		mode = args.mode,
-	}
+	lpdbData.extradata.region = args.region
+	lpdbData.extradata.mode = args.mode
 
 	return lpdbData
 end

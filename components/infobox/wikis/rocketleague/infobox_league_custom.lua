@@ -169,17 +169,17 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['game'] = 'rocket league'
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
-	lpdbData['extradata'] = {
-		region = args.region,
-		mode = args.mode,
-		notabilitymod = args.notabilitymod,
-		liquipediatiertype2 = args.liquipediatiertype2,
-		participantsnumber =
-			not String.isEmpty(args.team_number) and args.team_number or args.player_number,
-		notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
-	}
 
-	lpdbData['extradata']['is rlcs'] = Variables.varDefault('tournament_rlcs_premier', 0)
+	lpdbData.extradata.region = args.region
+	lpdbData.extradata.mode = args.mode
+	lpdbData.extradata.notabilitymod = args.notabilitymod
+	lpdbData.extradata.liquipediatiertype2 = args.liquipediatiertype2
+	lpdbData.extradata.notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
+	lpdbData.extradata['is rlcs'] = Variables.varDefault('tournament_rlcs_premier', 0)
+	lpdbData.extradata.participantsnumber =
+			not String.isEmpty(args.team_number) and args.team_number or args.player_number
+
+
 	return lpdbData
 end
 
