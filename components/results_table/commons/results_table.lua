@@ -134,8 +134,7 @@ function BaseResultsTable:create()
 		dataSet.header = dataSet[1].date:sub(1,4)
 	end)
 
-	Array.sortInPlaceBy(splitData, function(val) return val.header end, function(val1, val2) return val1 > val2 end)
-	self.data = splitData
+	self.data = Array.sortBy(splitData, function(val) return val.header end, function(val1, val2) return val1 > val2 end)
 
 	return self
 end
