@@ -188,7 +188,7 @@ function CustomPlayer:defineCustomPageVariables(args)
 	local role2Data = CustomPlayer._getRole(args.role2)
 	if role2Data then
 		Variables.varDefine('role2', role2Data.variable)
-		Variables.varDefine('type2', role2Data.personType or '')
+		Variables.varDefine('type2', role2Data.personType)
 	end
 end
 
