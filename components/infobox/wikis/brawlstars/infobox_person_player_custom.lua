@@ -175,7 +175,7 @@ function CustomPlayer:defineCustomPageVariables(args)
 
 	if roleData then
 		Variables.varDefine('role', roleData.variable)
-		Variables.varDefine('type', roleData.personType or '')
+		Variables.varDefine('type', roleData.personType)
 	end
 
 	-- If the role is missing, assume it is a player
