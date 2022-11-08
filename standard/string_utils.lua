@@ -76,12 +76,6 @@ function String.isNotEmpty(str)
 	return str ~= nil and str ~= ''
 end
 
--- index counts up from 0
----@deprecated
-function String.explode(str, delimiter, index)
-	return String.split(str, delimiter)[index + 1] or ''
-end
-
 ---transforms a wiki code list:
 ---
 --- * text
