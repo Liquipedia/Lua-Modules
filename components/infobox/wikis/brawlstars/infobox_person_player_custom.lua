@@ -166,15 +166,10 @@ function CustomPlayer._getStatus()
 end
 
 function CustomPlayer._createRole(role)
-	if String.isEmpty(role) then
-		return nil
-	end
-
-	local roleData = _ROLES[role:lower()]
+	local roleData = CustomPlayer._getRole(role)
 	if not roleData then
-		return nil
+		return
 	end
-
 	if Player:shouldStoreData(_args) then
 		local categoryCoreText = 'Category:' .. roleData.category
 
@@ -187,10 +182,7 @@ end
 
 function CustomPlayer:defineCustomPageVariables(args)
 	-- isplayer needed for SMW
-	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
-	end
+	local roleData = CustomPlayer._getRole(args.role)
 
 	if roleData then
 		Variables.varDefine('role', roleData.variable)
@@ -204,17 +196,15 @@ function CustomPlayer:defineCustomPageVariables(args)
 		Variables.varDefine('isplayer', 'true')
 	end
 
-	if String.isNotEmpty(args.role2) then
-		local role2Data = _ROLES[args.role2:lower()]
-		if role2Data then
-			Variables.varDefine('role2', role2Data.variable)
-			Variables.varDefine('type2', role2Data.personType or '')
-		end
+	local role2Data = CustomPlayer._getRole(args.role2)
+	if role2Data then
+		Variables.varDefine('role2', role2Data.variable)
+		Variables.varDefine('type2', role2Data.personType or '')
 	end
 end
 
 function CustomPlayer:getPersonType(args)
-	local roleData = _ROLES[(args.role or ''):lower()]
+	local roleData = CustomPlayer._getRole(args.role)
 	if roleData then
 		local personType = mw.getContentLanguage():ucfirst(roleData.personType or 'player')
 		local categoryValue = roleData.category == _ROLES.coach.category and roleData.category or personType
@@ -229,6 +219,14 @@ function CustomPlayer:getStatusToStore(args)
 	if String.isNotEmpty(args.status) then
 		return mw.getContentLanguage():ucfirst(args.status)
 	end
+end
+
+function CustomPlayer._getRole(roleInput)
+	if String.isEmpty(roleInput) then
+		return
+	end
+
+	return _ROLES[roleInput:lower()]
 end
 
 return CustomPlayer
