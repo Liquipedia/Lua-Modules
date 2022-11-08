@@ -173,10 +173,9 @@ end
 function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = _args.team_number
 	lpdbData.publishertier = _args.pctier
-	lpdbData.extradata = {
-		['is ea major'] = Variables.varDefault('tournament_ea_major', ''),
-		individual = Variables.varDefault('tournament_individual', ''),
-	}
+
+	lpdbData.extradata['is ea major'] = Variables.varDefault('tournament_ea_major', '')
+	lpdbData.extradata.individual = Variables.varDefault('tournament_individual', '')
 
 	--retrieve sponsors from _args.sponsors if sponsorX, X=1,...,3, is empty
 	if
