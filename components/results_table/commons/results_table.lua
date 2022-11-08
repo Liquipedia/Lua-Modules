@@ -210,49 +210,14 @@ function BaseResultsTable:buildBaseConditions()
 	return conditions:toString()
 end
 
--- todo: adjust once #1802 is done
 function BaseResultsTable:buildOpponentConditions()
 	local config = self.config
 
 	if config.queryType == SOLO_TYPE or config.queryType == COACH_TYPE then
 		return self:buildNonTeamOpponentConditions()
+	elseif config.queryType == TEAM_TYPE then
+		return self:buildTeamOpponentConditions()
 	end
-
-	local opponent = Team.queryDB('teampage', config.opponent)
-	if not opponent then
-		error('Missing team template for team: ' .. opponent)
-	end
-
-	local opponentPageNames
-	if config.resolveOpponent then
-		opponent = Team.queryDB('teampage', mw.ext.TeamLiquidIntegration.resolve_redirect(opponent))
-		if not opponent then
-			error('Missing team template for team: ' .. opponent)
-		end
-		opponentPageNames = {opponent}
-	elseif Team.queryHistoricalNames then
-		opponentPageNames = Team.queryHistoricalNames(opponent)
-	else
-		opponentPageNames = {opponent}
-	end
-
-	if config.playerResultsOfTeam then
-		return self:buildPlayersOnTeamOpponentConditions(opponentPageNames)
-	end
-
-	local opponentConditions = ConditionTree(BooleanOperator.any)
-
-	for _, pageName in pairs(opponentPageNames) do
-		opponentConditions:add{
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, pageName),
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, pageName:gsub(' ', '_')),
-		}
-	end
-
-	return ConditionTree(BooleanOperator.all):add{
-			opponentConditions,
-			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
-		}
 end
 
 -- todo: adjust once #1802 is done
@@ -291,6 +256,47 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 	end
 
 	return opponentConditions
+end
+
+-- todo: adjust once #1802 is done
+function BaseResultsTable:buildTeamOpponentConditions()
+	local config = self.config
+
+	local opponent = Team.queryDB('teampage', config.opponent)
+	if not opponent then
+		error('Missing team template for team: ' .. opponent)
+	end
+
+	local opponentPageNames
+	if config.resolveOpponent then
+		opponent = Team.queryDB('teampage', mw.ext.TeamLiquidIntegration.resolve_redirect(opponent))
+		if not opponent then
+			error('Missing team template for team: ' .. opponent)
+		end
+		opponentPageNames = {opponent}
+	elseif Team.queryHistoricalNames then
+		opponentPageNames = Team.queryHistoricalNames(opponent)
+	else
+		opponentPageNames = {opponent}
+	end
+
+	if config.playerResultsOfTeam then
+		return self:buildPlayersOnTeamOpponentConditions(opponentPageNames)
+	end
+
+	local opponentConditions = ConditionTree(BooleanOperator.any)
+
+	for _, pageName in pairs(opponentPageNames) do
+		opponentConditions:add{
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, pageName),
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, pageName:gsub(' ', '_')),
+		}
+	end
+
+	return ConditionTree(BooleanOperator.all):add{
+			opponentConditions,
+			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
+		}
 end
 
 -- todo: adjust once #1802 is done
