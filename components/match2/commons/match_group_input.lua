@@ -272,7 +272,7 @@ function MatchGroupInput.readDate(dateString)
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 	local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
 	local timezoneId = dateString:match('>(%a-)<')
-	local matchDate = String.explode(dateString, '<', 0):gsub('-', '')
+	local matchDate = mw.text.split(dateString, '<', true)[1]:gsub('-', '')
 	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
 	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
 	return {
