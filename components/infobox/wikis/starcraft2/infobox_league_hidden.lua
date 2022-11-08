@@ -416,6 +416,9 @@ function HiddenInfoboxLeague._setLpdbData()
 		),
 		maps = Variables.varDefault('tournament_maps'),
 		participantsnumber = participantsNumber,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+			seriesnumber = Variables.varDefault('tournament_series_number')
+		}
 	}
 
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. lpdbData.name, lpdbData)
