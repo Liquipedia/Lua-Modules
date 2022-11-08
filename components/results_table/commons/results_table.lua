@@ -261,7 +261,7 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 end
 
 -- todo: adjust once #1802 is done
-function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentPageNames)
+function BaseResultsTable:buildPlayersOnTeamOpponentConditions()
 	local config = self.config
 
 	local opponent = Team.queryDB('teampage', config.opponent)
