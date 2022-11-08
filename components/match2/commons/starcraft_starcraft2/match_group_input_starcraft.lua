@@ -58,7 +58,8 @@ module is specific to the Starcraft and Starcraft2 wikis.
 local StarcraftMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function StarcraftMatchGroupInput.processMatch(match)
+function StarcraftMatchGroupInput.processMatch(match, options)
+	options = options or {}
 	Table.mergeInto(
 		match,
 		StarcraftMatchGroupInput._readDate(match)
