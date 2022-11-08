@@ -337,7 +337,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.prizepoollocal = Variables.varDefault('prizepoollocal', '')
 	lpdbData.extradata.startdate_raw = Variables.varDefault('raw_sdate', '')
 	lpdbData.extradata.enddate_raw = Variables.varDefault('raw_edate', '')
-	lpdbData.extradata.series2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2 or '')
 	lpdbData.extradata.shortname2 = args.shortname2
 
 	return lpdbData

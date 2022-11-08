@@ -123,7 +123,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.valvepremier = String.isNotEmpty(args.valvepremier) and '1' or '0'
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.dpcpoints = String.isNotEmpty(args.points) or ''
-	lpdbData.extradata.series2 = String.isNotEmpty(args.series2) or ''
 
 	return lpdbData
 end
