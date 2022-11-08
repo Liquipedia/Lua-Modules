@@ -215,6 +215,8 @@ function BaseResultsTable:buildOpponentConditions()
 
 	if config.queryType == SOLO_TYPE or config.queryType == COACH_TYPE then
 		return self:buildNonTeamOpponentConditions()
+	elseif config.playerResultsOfTeam then
+		return self:buildPlayersOnTeamOpponentConditions()
 	elseif config.queryType == TEAM_TYPE then
 		return self:buildTeamOpponentConditions()
 	end
@@ -259,7 +261,7 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 end
 
 -- todo: adjust once #1802 is done
-function BaseResultsTable:buildTeamOpponentConditions()
+function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentPageNames)
 	local config = self.config
 
 	local opponent = Team.queryDB('teampage', config.opponent)
@@ -274,39 +276,16 @@ function BaseResultsTable:buildTeamOpponentConditions()
 			error('Missing team template for team: ' .. opponent)
 		end
 		opponentPageNames = {opponent}
-	elseif Team.queryHistoricalNames then
-		opponentPageNames = Team.queryHistoricalNames(opponent)
 	else
-		opponentPageNames = {opponent}
-	end
-
-	if config.playerResultsOfTeam then
-		return self:buildPlayersOnTeamOpponentConditions(opponentPageNames)
+		opponentPageNames = Team.queryHistoricalNames(opponent) or {opponent}
 	end
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
-	for _, pageName in pairs(opponentPageNames) do
-		opponentConditions:add{
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, pageName),
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, pageName:gsub(' ', '_')),
-		}
-	end
-
-	return ConditionTree(BooleanOperator.all):add{
-			opponentConditions,
-			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
-		}
-end
-
--- todo: adjust once #1802 is done
-function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentPageNames)
-	local opponentConditions = ConditionTree(BooleanOperator.any)
-
-	local prefix = self.config.playerPrefix
+	local prefix = config.playerPrefix
 	for _, pageName in pairs(opponentPageNames) do
 		local pageNameWithUnderScore = pageName:gsub(' ', '_')
-		for playerIndex = 1, self.config.playerLimit do
+		for playerIndex = 1, config.playerLimit do
 			opponentConditions:add{
 				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'), Comparator.eq, pageName),
 				ConditionNode(
@@ -322,6 +301,28 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentPageNames
 		opponentConditions,
 		ConditionNode(ColumnName('opponenttype'), Comparator.neq, Opponent.team),
 	}
+end
+
+function BaseResultsTable:buildTeamOpponentConditions()
+	local config = self.config
+
+	local rawOpponentTemplate = Team.queryRaw(config.opponent) or {}
+	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
+	if not opponentTemplate then
+		error('Missing team template for team: ' .. config.opponent)
+	end
+
+	local opponentTeamTeplates = Team.queryHistorical(opponentTemplate) or {opponentTemplate}
+
+	local opponentConditions = ConditionTree(BooleanOperator.any)
+	for _, teamTemplate in pairs(opponentTeamTeplates) do
+		opponentConditions:add{ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, teamTemplate)}
+	end
+
+	return ConditionTree(BooleanOperator.all):add{
+			opponentConditions,
+			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
+		}
 end
 
 -- todo:
