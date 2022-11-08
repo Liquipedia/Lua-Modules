@@ -46,7 +46,7 @@ end
 
 ---@generic K, V, T
 ---@param tbl {[K]: V}
----@param predicate fun(value: V, argument: T?): boolean
+---@param predicate fun(value?: V, argument?: T): boolean
 ---@param argument T?
 ---@return {[K]: V}
 function Table.filter(tbl, predicate, argument)
@@ -239,7 +239,7 @@ end
 --The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
 ---@generic K, V, T
 ---@param xTable {[K] : V}
----@param f fun(key: K, value: V): T
+---@param f fun(key?: K, value?: V): K, T
 ---@return {[K] : T}
 function Table.map(xTable, f)
 	local yTable = {}
@@ -336,7 +336,7 @@ end
 --The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
 ---@generic K, V, T
 ---@param xTable {[K] : V}
----@param f fun(value: V): T
+---@param f fun(value?: V): T
 ---@return {[K] : T}
 function Table.mapValues(xTable, f)
 	local yTable = {}
@@ -349,7 +349,7 @@ end
 ---Whether all entries of a table satisfy a predicate.
 ---@generic K, V
 ---@param tbl {[K] : V}
----@param predicate fun(key: K, value: V)
+---@param predicate fun(key?: K, value?: V): boolean
 ---@return boolean
 function Table.all(tbl, predicate)
 	for key, value in pairs(tbl) do
@@ -363,7 +363,7 @@ end
 ---Whether any entry of a table satisfies a predicate.
 ---@generic K, V
 ---@param tbl {[K] : V}
----@param predicate fun(key: K, value: V)
+---@param predicate fun(key?: K, value?: V): boolean
 ---@return boolean
 function Table.any(tbl, predicate)
 	for key, value in pairs(tbl) do
