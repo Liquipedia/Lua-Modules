@@ -112,7 +112,6 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
-	lpdbData.extradata.lc_id = mw.ustring.lower(mw.title.getCurrentTitle().prefixedText)
 
 	lpdbData.type = Variables.varDefault('type', 'player')
 
