@@ -174,6 +174,7 @@ function CustomPlayer._createRole(role)
 	if not roleData then
 		return nil
 	end
+
 	if Player:shouldStoreData(_args) then
 		local categoryCoreText = 'Category:' .. roleData.category
 
