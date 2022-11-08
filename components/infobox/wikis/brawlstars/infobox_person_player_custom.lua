@@ -22,30 +22,20 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _ROLES = {
-	-- Players
-	igl = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
-
-	-- Staff and Talents
-	analyst = {category = 'Analysts', variable = 'Analyst', isplayer = false, personType = 'talent'},
-	observer = {category = 'Observers', variable = 'Observer', isplayer = false, personType = 'talent'},
-	host = {category = 'Host', variable = 'Host', isplayer = false, personType = 'talent'},
-	journalist = {category = 'Journalist', variable = 'Journalist', isplayer = false, personType = 'talent'},
-	expert = {category = 'Expert', variable = 'Expert', isplayer = false, personType = 'talent'},
+local _ROLESlocal _ROLES = {
+	-- staff
 	coach = {category = 'Coaches', variable = 'Coach', isplayer = false, personType = 'staff'},
-	caster = {category = 'Casters', variable = 'Caster', isplayer = false, personType = 'talent'},
 	manager = {category = 'Manager', variable = 'Manager', isplayer = false, personType = 'staff'},
-	['director of esport'] = {
-		category = 'Director of Esport', variable = 'Director of Esport', isplayer = false, personType = 'staff'},
-	streamer = {category = 'Streamers', variable = 'Streamer', isplayer = false},
-	producer = {category = 'Production Staff', variable = 'Producer', isplayer = false, personType = 'talent'},
-	director = {category = 'Production Staff', variable = 'Director', isplayer = false, personType = 'talent'},
+
+	-- talent
+	analyst = {category = 'Analysts', variable = 'Analyst', isplayer = false, personType = 'talent'},
+	caster = {category = 'Casters', variable = 'Caster', isplayer = false, personType = 'talent'},
 	['content creator'] = {
 		category = 'Content Creators', variable = 'Content Creator', isplayer = false, personType = 'talent'},
-	captain = {category = 'Captain', variable = 'Captain', isplayer = false},
+	host = {category = 'Host', variable = 'Host', isplayer = false, personType = 'talent'},
 }
 _ROLES['assistant coach'] = _ROLES.coach
-_ROLES['in-game leader'] = _ROLES.igl
+_ROLES.commentator = _ROLES.caster
 
 local CustomPlayer = Class.new()
 
