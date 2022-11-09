@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -101,12 +100,6 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = args.image
-	end
-
 	lpdbData.region = Variables.varDefault('region', '')
 
 	return lpdbData

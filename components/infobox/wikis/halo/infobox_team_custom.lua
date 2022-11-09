@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
-local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
@@ -51,12 +50,6 @@ function CustomTeam:_createRegion(region, location)
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = args.image
-	end
-
 	lpdbData.region = _region
 
 	return lpdbData

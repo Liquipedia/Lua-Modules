@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local TeamRanking = require('Module:TeamRanking')
 local Variables = require('Module:Variables')
 
@@ -65,12 +64,6 @@ function CustomInjector:parse(_, widgets)
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = args.image
-	end
-
 	lpdbData.extradata.rating = Variables.varDefault('rating')
 	lpdbData.extradata.tier = string.lower(args.tier or '')
 
