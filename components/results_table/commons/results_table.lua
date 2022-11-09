@@ -191,10 +191,10 @@ function BaseResultsTable:buildBaseConditions()
 
 	if args.placement then
 		conditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, args.placement)}
-
-	-- todo: find a better solution once it is decided how to store awards data
-	elseif not Logic.readBool(args.ignorePlacement) then
-		conditions:add{ConditionNode(ColumnName('placement'), Comparator.neq, '')}
+	elseif Logic.readBool(args.awards) then
+		conditions:add{ConditionNode(ColumnName('mode'), Comparator.eq, 'award_individual')}
+	else
+		conditions:add{ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual')}
 	end
 
 	if args.tier then
