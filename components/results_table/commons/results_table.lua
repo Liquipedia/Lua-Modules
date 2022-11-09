@@ -27,14 +27,14 @@ local ColumnName = Condition.ColumnName
 
 local DEFAULT_VALUES = {
 	order = 'desc',
-	playerPrefix = 'p',
-	coachPrefix = 'c',
 	resolveOpponent = true,
 	playerLimit = 10,
 	coachLimit = 5,
 	achievementsLimit = 10,
 	resultsLimit = 5000,
 }
+local PLAYER_PREFIX = 'p'
+local COACH_PREFIX = 'c'
 local SOLO_TYPE = 'solo'
 local TEAM_TYPE = 'team'
 local COACH_TYPE = 'coach'
@@ -62,8 +62,6 @@ function BaseResultsTable:readConfig()
 
 	local config = {
 		order = args.order or DEFAULT_VALUES.order,
-		playerPrefix = args.prefixplayer or DEFAULT_VALUES.playerPrefix,
-		coachPrefix = args.prefixcoach or DEFAULT_VALUES.coachPrefix,
 		hideResult = Logic.readBool(args.hideresult),
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
 		gameIconsData = args.gameIcons and mw.loadData(args.gameIcons) or nil,
@@ -233,7 +231,7 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 
 	local prefix
 	if config.queryType == SOLO_TYPE then
-		prefix = config.playerPrefix
+		prefix = PLAYER_PREFIX
 		opponentConditions:add{
 			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
@@ -245,7 +243,7 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 			},
 		}
 	else
-		prefix = config.coachPrefix
+		prefix = COACH_PREFIX
 	end
 
 	for playerIndex = 1, config.playerLimit do
@@ -289,7 +287,7 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTepla
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
-	local prefix = config.playerPrefix
+	local prefix = PLAYER_PREFIX
 	for _, teamTemplate in pairs(opponentTeamTeplates) do
 		for playerIndex = 1, config.playerLimit do
 			opponentConditions:add{
