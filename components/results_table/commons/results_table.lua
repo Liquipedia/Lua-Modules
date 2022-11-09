@@ -353,7 +353,7 @@ end
 
 -- overwritable
 function BaseResultsTable:tierDisplay(placement)
-	local tierDisplay, sortValue
+	local tierDisplay
 
 	if String.isEmpty(placement.liquipediatiertype) and String.isEmpty(placement.liquipediatier) then
 		return '', ''
