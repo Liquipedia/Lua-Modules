@@ -215,8 +215,6 @@ function BaseResultsTable:buildOpponentConditions()
 
 	if config.queryType == SOLO_TYPE or config.queryType == COACH_TYPE then
 		return self:buildNonTeamOpponentConditions()
-	elseif config.playerResultsOfTeam then
-		return self:buildPlayersOnTeamOpponentConditions()
 	elseif config.queryType == TEAM_TYPE then
 		return self:buildTeamOpponentConditions()
 	end
@@ -260,49 +258,6 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 	return opponentConditions
 end
 
--- todo: adjust once #1802 is done
-function BaseResultsTable:buildPlayersOnTeamOpponentConditions()
-	local config = self.config
-
-	local opponent = Team.queryDB('teampage', config.opponent)
-	if not opponent then
-		error('Missing team template for team: ' .. opponent)
-	end
-
-	local opponentPageNames
-	if config.resolveOpponent then
-		opponent = Team.queryDB('teampage', mw.ext.TeamLiquidIntegration.resolve_redirect(opponent))
-		if not opponent then
-			error('Missing team template for team: ' .. opponent)
-		end
-		opponentPageNames = {opponent}
-	else
-		opponentPageNames = Team.queryHistoricalNames(opponent) or {opponent}
-	end
-
-	local opponentConditions = ConditionTree(BooleanOperator.any)
-
-	local prefix = config.playerPrefix
-	for _, pageName in pairs(opponentPageNames) do
-		local pageNameWithUnderScore = pageName:gsub(' ', '_')
-		for playerIndex = 1, config.playerLimit do
-			opponentConditions:add{
-				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'), Comparator.eq, pageName),
-				ConditionNode(
-					ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'team'),
-					Comparator.eq,
-					pageNameWithUnderScore
-				),
-			}
-		end
-	end
-
-	return ConditionTree(BooleanOperator.all):add{
-		opponentConditions,
-		ConditionNode(ColumnName('opponenttype'), Comparator.neq, Opponent.team),
-	}
-end
-
 function BaseResultsTable:buildTeamOpponentConditions()
 	local config = self.config
 
@@ -314,6 +269,10 @@ function BaseResultsTable:buildTeamOpponentConditions()
 
 	local opponentTeamTeplates = Team.queryHistorical(opponentTemplate) or {opponentTemplate}
 
+	if config.playerResultsOfTeam then
+		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTeplates)
+	end
+
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 	for _, teamTemplate in pairs(opponentTeamTeplates) do
 		opponentConditions:add{ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, teamTemplate)}
@@ -323,6 +282,26 @@ function BaseResultsTable:buildTeamOpponentConditions()
 			opponentConditions,
 			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
 		}
+end
+
+function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTeplates)
+	local config = self.config
+
+	local opponentConditions = ConditionTree(BooleanOperator.any)
+
+	local prefix = config.playerPrefix
+	for _, teamTemplate in pairs(opponentTeamTeplates) do
+		for playerIndex = 1, config.playerLimit do
+			opponentConditions:add{
+				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'template'), Comparator.eq, teamTemplate),
+			}
+		end
+	end
+
+	return ConditionTree(BooleanOperator.all):add{
+		opponentConditions,
+		ConditionNode(ColumnName('opponenttype'), Comparator.neq, Opponent.team),
+	}
 end
 
 -- todo:
