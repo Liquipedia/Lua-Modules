@@ -306,14 +306,15 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTepla
 end
 
 function BaseResultsTable:build()
-	if Table.isEmpty(self.data) or Table.isEmpty(self.data[1]) then
-		return 'No recorded results found.'
-	end
-
 	local displayTable = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable')
 		:css('text-align', 'center')
 		:node(self:buildHeader())
+
+	if Table.isEmpty(self.data) or Table.isEmpty(self.data[1]) then
+		return displayTable:node(mw.html.create('tr')
+			:tag('td'):attr('colspan', 42):wikitext('No recorded results found.'))
+	end
 
 	for _, dataSet in ipairs(self.data) do
 		for _, row in ipairs(self:_buildRows(dataSet)) do
