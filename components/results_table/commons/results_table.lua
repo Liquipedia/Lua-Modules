@@ -400,7 +400,7 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return
 	end
 
-	return Team.icon(mw.getCurrentFrame(), teamTemplate, data.date)
+	return Team.icon(nil, teamTemplate, data.date)
 end
 
 -- overwritable
@@ -417,9 +417,7 @@ function BaseResultsTable:gameIcon(placement)
 end
 
 function BaseResultsTable.tournamentDisplayName(placement)
-	if String.isNotEmpty(placement.shortname) then
-		return placement.shortname
-	elseif String.isNotEmpty(placement.tournament) then
+	if String.isNotEmpty(placement.tournament) then
 		return placement.tournament
 	end
 
