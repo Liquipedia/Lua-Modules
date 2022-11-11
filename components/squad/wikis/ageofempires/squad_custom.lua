@@ -56,7 +56,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:name({name = player.name})
 	row:role({role = player.thisTeam.role})
 	row:date(joinText, 'Join Date:&nbsp;', 'joindate')
-	
+
 	if squadType == Squad.TYPE_FORMER then
 		row:date(leaveText, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam({
