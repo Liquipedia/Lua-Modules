@@ -27,7 +27,7 @@ local _args
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getCategories = CustomMap.getCategories
+	customMap.getWikiCategories = CustomMap.getWikiCategories
 	_args = customMap.args
 	return customMap:createInfobox(frame)
 end
@@ -141,6 +141,19 @@ end
 function CustomMap:_tlpdMap(id, query)
 	if not id then return nil end
 	return Template.safeExpand(mw.getCurrentFrame(), 'Tlpd map', { id, query })
+end
+
+function CustomMap:getWikiCategories(args)
+	local players = args.players
+	if String.isEmpty(players) then
+		players = CustomMap:_tlpdMap(args.id, 'players')
+	end
+
+	if String.isEmpty(players) then
+		return {}
+	end
+
+	return {'Maps (' .. players .. ' Players)'}
 end
 
 return CustomMap
