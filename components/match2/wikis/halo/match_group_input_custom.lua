@@ -317,7 +317,7 @@ function matchFunctions.getVodStuff(match)
 	if match.preview then links.preview = match.preview end
 	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
 	if match.faceit then links.faceit = 'https://www.faceit.com/en/halo_infinite/room/' .. match.faceit end
-	if match.halodatahive then links.halodatahive = 'https://halodatahive.com/Tournament/Detail/' .. match.halodatahive end
+	if match.halodatahive then links.halodatahive = 'https://halodatahive.com/Series/Summary/' .. match.halodatahive end
 	if match.stats then links.stats = match.stats end
 
 	return match
