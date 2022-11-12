@@ -406,7 +406,7 @@ end
 
 -- overwritable
 -- shadows the current implementation
--- todo: in the future change it to use darkmode icons too
+-- TODO: Add support for dark mode icons
 -- needs upgrading the game icon data modules first though
 function BaseResultsTable:gameIcon(placement)
 	local gameIcon = self.config.gameIconsData[placement.game] or 'Logo filler event.png'
