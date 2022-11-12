@@ -25,15 +25,10 @@ local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
 local _MATCH_BYE = {'bye', 'BYE'}
-local _CONVERT_TYPE_TO_PLAYER_NUMBER = {
-	solo = 1,
-	--duo = 2,
-	--trio = 3,
-	--quad = 4,
-}
+
 local _ALLOWED_OPPONENT_TYPES = {
-	'Opponent.solo',
-	'Opponent.team'
+	Opponent.solo,
+	Opponent.team,
 }
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
@@ -493,7 +488,7 @@ end
 -- Get Playerdata for non-team opponents
 function matchFunctions.getPlayers(match, opponentType, opponentIndex)
 	local players = {}
-	for playerIndex = 1, _CONVERT_TYPE_TO_PLAYER_NUMBER[opponentType] do
+	for playerIndex = 1, Opponent.partySize(opponentType) do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or 'TBD'
