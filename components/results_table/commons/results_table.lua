@@ -376,32 +376,28 @@ end
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
+	local opponent
 	if not data.opponenttype then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.tbd(),
-			flip = (options or {}).flip
+			flip = (options or {}).flip,
 		}
-	elseif (data.opponenttype ~= Opponent.solo or not options.teamForSolo)
-		and data.opponenttype ~= Opponent.team then
+	elseif data.opponenttype == Opponent.solo and options.teamForSolo then
+		local teamTemplate = data.opponentplayers.p1template
+		if String.isEmpty(teamTemplate) then
+			return
+		end
 
-		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.fromLpdbStruct(data),
-			flip = (options or {}).flip
-		}
-	end
-
-	local teamTemplate
-	if data.opponenttype == Opponent.team then
-		teamTemplate = data.opponenttemplate
+		opponent = {template = teamTemplate, type = Opponent.team}
 	else
-		teamTemplate = data.opponentplayers.p1team
+		opponent = Opponent.fromLpdbStruct(data)
 	end
 
-	if String.isEmpty(teamTemplate) then
-		return
-	end
-
-	return Team.icon(nil, teamTemplate, data.date)
+	return OpponentDisplay.BlockOpponent{
+		opponent = opponent,
+		flip = (options or {}).flip,
+		teamStyle = 'icon',
+	}
 end
 
 -- overwritable
