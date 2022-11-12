@@ -297,7 +297,7 @@ end
 
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
-	
+
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
