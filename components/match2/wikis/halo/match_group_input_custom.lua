@@ -17,16 +17,16 @@ local Array = require('Module:Array')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
-local _ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
-local _FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}
-local _MAX_NUM_OPPONENTS = 2
-local _MAX_NUM_PLAYERS = 10
-local _MAX_NUM_MAPS = 9
-local _DEFAULT_BESTOF = 3
-local _NO_SCORE = -99
-local _MATCH_BYE = {'bye', 'BYE'}
+local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
+local FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}
+local MAX_NUM_OPPONENTS = 2
+local MAX_NUM_PLAYERS = 10
+local MAX_NUM_MAPS = 9
+local DEFAULT_BESTOF = 3
+local NO_SCORE = -99
+local MATCH_BYE = {'bye', 'BYE'}
 
-local _ALLOWED_OPPONENT_TYPES = {
+local ALLOWED_OPPONENT_TYPES = {
 	Opponent.solo,
 	Opponent.team,
 }
@@ -74,18 +74,18 @@ function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
 
 	-- Retrieve icon for teams and do tbd checks
 	if opponent.type == Opponent.team then
-		if opponent.template:lower() == _MATCH_BYE then
-			opponent = {type = Opponent.literal, name = _MATCH_BYE}
+		if opponent.template:lower() == MATCH_BYE then
+			opponent = {type = Opponent.literal, name = MATCH_BYE}
 		else
 			opponent.icon = opponentFunctions.getIcon(opponent.template)
 		end
 	elseif opponent.type ~= Opponent.literal then
-		if not _ALLOWED_OPPONENT_TYPES[opponent.type or ''] then
+		if not ALLOWED_OPPONENT_TYPES[opponent.type or ''] then
 			error('Unsupported opponent type "' .. (opponent.type or '') .. '"')
 		end
 		opponent.match2players = matchFunctions.getPlayers(record, opponent.type, opponentIndex)
 		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
-			opponent = {type = Opponent.literal, name = _MATCH_BYE}
+			opponent = {type = Opponent.literal, name = MATCH_BYE}
 		end
 
 	end
@@ -120,7 +120,7 @@ end
 
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
-	if Table.includes(_FINISHED_INDICATORS, data.finished) or Table.includes(_FINISHED_INDICATORS, data.winner) then
+	if Table.includes(FINISHED_INDICATORS, data.finished) or Table.includes(FINISHED_INDICATORS, data.winner) then
 		data.resulttype = 'np'
 		data.finished = true
 	-- Map or Match is marked as finished.
@@ -170,8 +170,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			end
 		end
 	else
-		local lastScore = _NO_SCORE
-		local lastPlacement = _NO_SCORE
+		local lastScore = NO_SCORE
+		local lastPlacement = NO_SCORE
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score or '') or ''
@@ -195,8 +195,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or _NO_SCORE) or _NO_SCORE
-	local value2 = tonumber(table[key2].score or _NO_SCORE) or _NO_SCORE
+	local value1 = tonumber(table[key1].score or NO_SCORE) or NO_SCORE
+	local value2 = tonumber(table[key2].score or NO_SCORE) or NO_SCORE
 	return value1 > value2
 end
 
@@ -234,7 +234,7 @@ end
 -- match related functions
 --
 function matchFunctions.getBestOf(match)
-	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof', _DEFAULT_BESTOF))
+	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof', DEFAULT_BESTOF))
 	Variables.varDefine('bestof', match.bestof)
 	return match
 end
@@ -245,7 +245,7 @@ end
 -- 2) At least one map has a winner
 function matchFunctions.getScoreFromMapWinners(match)
 	local opponentNumber = 0
-	for index = 1, _MAX_NUM_OPPONENTS do
+	for index = 1, MAX_NUM_OPPONENTS do
 		if String.isEmpty(match['opponent' .. index]) then
 			break
 		end
@@ -254,7 +254,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	local newScores = {}
 	local foundScores = false
 
-	for i = 1, _MAX_NUM_MAPS do
+	for i = 1, MAX_NUM_MAPS do
 		if match['map'..i] then
 			local winner = tonumber(match['map'..i].winner)
 			foundScores = true
@@ -400,7 +400,7 @@ function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
-	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
@@ -410,7 +410,7 @@ function matchFunctions.getOpponents(match)
 			if Logic.isNumeric(opponent.score) then
 				opponent.status = 'S'
 				isScoreSet = true
-			elseif Table.includes(_ALLOWED_STATUSES, opponent.score) then
+			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
 				opponent.score = -1
 			end
@@ -471,7 +471,7 @@ end
 function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
 	local count = 1
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
+	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
@@ -503,7 +503,7 @@ function matchFunctions.getPlayers(match, opponentType, opponentIndex)
 end
 
 function CustomMatchGroupInput._playerIsBye(player)
-	return (player.name or ''):lower() == _MATCH_BYE or (player.displayname or ''):lower() == _MATCH_BYE
+	return (player.name or ''):lower() == MATCH_BYE or (player.displayname or ''):lower() == MATCH_BYE
 end
 
 --
@@ -522,7 +522,7 @@ end
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
-	for scoreIndex = 1, _MAX_NUM_OPPONENTS do
+	for scoreIndex = 1, MAX_NUM_OPPONENTS do
 		-- read scores
 		local score = map['score' .. scoreIndex] or map['t' .. scoreIndex .. 'score']
 		local obj = {}
@@ -530,7 +530,7 @@ function mapFunctions.getScoresAndWinner(map)
 			if Logic.isNumeric(score) then
 				obj.status = 'S'
 				obj.score = score
-			elseif Table.includes(_ALLOWED_STATUSES, score) then
+			elseif Table.includes(ALLOWED_STATUSES, score) then
 				obj.status = score
 				obj.score = -1
 			end
