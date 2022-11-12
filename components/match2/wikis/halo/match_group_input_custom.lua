@@ -556,7 +556,11 @@ end
 --
 function opponentFunctions.getIcon(template)
 	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
+	end
 end
 
 return CustomMatchGroupInput
