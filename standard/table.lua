@@ -36,7 +36,7 @@ end
 ---@param value any
 ---@return boolean
 function Table.includes(tbl, value)
-	for _, entry in ipairs(tbl) do
+	for _, entry in pairs(tbl) do
 		if entry == value then
 			return true
 		end
