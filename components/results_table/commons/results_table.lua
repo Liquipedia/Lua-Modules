@@ -8,15 +8,18 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
+local Tier = require('Module:Tier')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
---local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -302,7 +305,128 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTepla
 	}
 end
 
--- todo:
--- > build display from config and data
+function BaseResultsTable:build()
+	local displayTable = mw.html.create('table')
+		:addClass('wikitable wikitable-striped sortable')
+		:css('text-align', 'center')
+		:node(self:buildHeader())
+
+	if Table.isEmpty(self.data) or Table.isEmpty(self.data[1]) then
+		return displayTable:node(mw.html.create('tr')
+			:tag('td'):attr('colspan', 42):wikitext('No recorded results found.'))
+	end
+
+	for _, dataSet in ipairs(self.data) do
+		for _, row in ipairs(self:_buildRows(dataSet)) do
+			displayTable:node(row)
+		end
+	end
+
+	displayTable:node(self.args.manualContent)
+
+	return mw.html.create('div')
+		:addClass('table-responsive')
+		:node(displayTable)
+end
+
+function BaseResultsTable:_buildRows(placementData)
+	local rows = {}
+
+	if placementData.header then
+		table.insert(rows, mw.html.create('tr')
+			:tag('th'):addClass('sortbottom'):attr('colspan', 42):wikitext(placementData.header):done()
+			:done())
+	end
+
+	for _, placement in ipairs(placementData) do
+		table.insert(rows, self:buildRow(placement))
+	end
+
+	return rows
+end
+
+-- overwritable
+function BaseResultsTable:rowHighlight(placement)
+	if String.isNotEmpty(placement.publishertier) then
+		return 'valvepremier-highlighted'
+	end
+end
+
+-- overwritable
+function BaseResultsTable:tierDisplay(placement)
+	local tierDisplay
+
+	if String.isEmpty(placement.liquipediatiertype) and String.isEmpty(placement.liquipediatier) then
+		return '', ''
+	elseif String.isNotEmpty(placement.liquipediatiertype) then
+		local tierType = placement.liquipediatiertype:lower()
+		tierDisplay = Tier.text.types[tierType] or placement.liquipediatiertype
+	else
+		tierDisplay = Tier.text.tiers[placement.liquipediatier] or placement.liquipediatier
+	end
+
+	return Page.makeInternalLink(
+		{},
+		tierDisplay,
+		tierDisplay .. ' Tournaments'
+	), tierDisplay
+end
+
+-- overwritable
+function BaseResultsTable:opponentDisplay(data, options)
+	options = options or {}
+
+	local opponent
+	if not data.opponenttype then
+		return OpponentDisplay.BlockOpponent{
+			opponent = Opponent.tbd(),
+			flip = (options or {}).flip,
+		}
+	elseif data.opponenttype == Opponent.solo and options.teamForSolo then
+		local teamTemplate = data.opponentplayers.p1template
+		if String.isEmpty(teamTemplate) then
+			return
+		end
+
+		opponent = {template = teamTemplate, type = Opponent.team}
+	else
+		opponent = Opponent.fromLpdbStruct(data)
+	end
+
+	return OpponentDisplay.BlockOpponent{
+		opponent = opponent,
+		flip = (options or {}).flip,
+		teamStyle = 'icon',
+	}
+end
+
+-- overwritable
+-- shadows the current implementation
+-- TODO: Add support for dark mode icons
+-- needs upgrading the game icon data modules first though
+function BaseResultsTable:gameIcon(placement)
+	local gameIcon = self.config.gameIconsData[placement.game] or 'Logo filler event.png'
+	gameIcon = gameIcon:gsub('File:', '')
+	return LeagueIcon.display{
+		icon = gameIcon,
+		options = {noTemplate = true, noLink = true},
+	}
+end
+
+function BaseResultsTable.tournamentDisplayName(placement)
+	if String.isNotEmpty(placement.tournament) then
+		return placement.tournament
+	end
+
+	return placement.pagename:gsub('_', ' ')
+end
+
+function BaseResultsTable:buildHeader()
+	error('Function "buildHeader" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
+end
+
+function BaseResultsTable:buildRow(placement)
+	error('Function "buildRow" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
+end
 
 return BaseResultsTable
