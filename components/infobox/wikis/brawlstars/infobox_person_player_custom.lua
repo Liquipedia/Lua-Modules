@@ -55,7 +55,34 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	local builtInfobox = player:createInfobox(frame)
+
+	local autoPlayerIntro = ''
+	if Logic.readBool(_args.autoPI) then
+		autoPlayerIntro = PlayerIntroduction._main{
+			team = _args.team,
+			name = _args.name,
+			romanizedname = _args.romanized_name,
+			status = _args.status,
+			type = Variables.varDefault('type'),
+			role = Variables.varDefault('role'),
+			role2 = Variables.varDefault('role2'),
+			id = _args.id,
+			idIPA = _args.idIPA,
+			idAudio = _args.idAudio,
+			birthdate = Variables.varDefault('player_birthdate'),
+			deathdate = Variables.varDefault('player_deathdate'),
+			nationality = _args.country,
+			nationality2 = _args.country2,
+			nationality3 = _args.country3,
+			subtext = _args.subtext,
+			freetext = _args.freetext,
+		}
+	elseif String.isNotEmpty(_args.freetext) then
+		autoPlayerIntro = _args.freetext
+	end
+
+	return builtInfobox .. autoPlayerIntro
 end
 
 function CustomInjector:parse(id, widgets)
@@ -119,30 +146,6 @@ function CustomPlayer:createBottomContent(infobox)
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}))
 		table.insert(components,
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage}))
-	end
-
-	if Logic.readBool(_args.autoPI) then
-		table.insert(components, PlayerIntroduction._main{
-			team = _args.team,
-			name = _args.name,
-			romanizedname = _args.romanized_name,
-			status = _args.status,
-			type = Variables.varDefault('type'),
-			role = Variables.varDefault('role'),
-			role2 = Variables.varDefault('role2'),
-			id = _args.id,
-			idIPA = _args.idIPA,
-			idAudio = _args.idAudio,
-			birthdate = Variables.varDefault('player_birthdate'),
-			deathdate = Variables.varDefault('player_deathdate'),
-			nationality = _args.country,
-			nationality2 = _args.country2,
-			nationality3 = _args.country3,
-			subtext = _args.subtext,
-			freetext = _args.freetext,
-		})
-	elseif String.isNotEmpty(_args.freetext) then
-		table.insert(components, _args.freetext)
 	end
 
 	return table.concat(components)
