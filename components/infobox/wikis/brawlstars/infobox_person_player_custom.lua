@@ -58,7 +58,7 @@ function CustomPlayer.run(frame)
 	local builtInfobox = player:createInfobox(frame)
 
 	local autoPlayerIntro = ''
-	if Logic.readBool(_args.autoPI) then
+	if Logic.readBool((_args.autoPI or ''):lower()) then
 		autoPlayerIntro = PlayerIntroduction._main{
 			team = _args.team,
 			name = _args.name,
