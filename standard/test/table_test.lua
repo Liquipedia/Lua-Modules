@@ -106,4 +106,14 @@ function suite:testExtract()
 	self:assertEquals(1, b)
 end
 
+function suite:testIncludes()
+	local a = {'testValue', 'testValue2', 'testValue3'}
+	local b = {key1 = 'testValue', key2 = 'testValue2', 'testValue3'}
+	self:assertTrue(Table.includes(a, 'testValue'))
+	self:assertTrue(Table.includes(b, 'testValue'))
+	self:assertTrue(Table.includes(b, 'testValue3'))
+	self:assertFalse(Table.includes(a, 'testValue4'))
+	self:assertFalse(Table.includes(b, 'testValue4'))
+end
+
 return suite
