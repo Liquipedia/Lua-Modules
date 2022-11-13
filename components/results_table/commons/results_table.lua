@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -376,25 +377,41 @@ end
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
-	local opponent
 	if not data.opponenttype then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.tbd(),
 			flip = (options or {}).flip,
 		}
-	elseif data.opponenttype == Opponent.solo and options.teamForSolo then
-		local teamTemplate = data.opponentplayers.p1template
-		if String.isEmpty(teamTemplate) then
-			return
-		end
+	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
+		return OpponentDisplay.BlockOpponent{
+			opponent = Opponent.fromLpdbStruct(data),
+			flip = (options or {}).flip,
+			teamStyle = 'icon',
+		}
+	end
 
-		opponent = {template = teamTemplate, type = Opponent.team}
+	local teamTemplate
+	if data.opponenttype == Opponent.team then
+		teamTemplate = data.opponenttemplate
 	else
-		opponent = Opponent.fromLpdbStruct(data)
+		teamTemplate = data.opponentplayers.p1template
+	end
+
+	if String.isEmpty(teamTemplate) then
+		return
+	end
+
+	local rawTeamTemplate = Team.queryRaw(teamTemplate) or {}
+
+	-- if the logo is a/the default logo display shortname instead
+	if type(Info.defaultTeamLogo) == 'table' and Table.includes(Info.defaultTeamLogo, rawTeamTemplate.image)
+		or rawTeamTemplate.image == Info.defaultTeamLogo then
+
+		return rawTeamTemplate.shortname
 	end
 
 	return OpponentDisplay.BlockOpponent{
-		opponent = opponent,
+		opponent = {template = teamTemplate, type = Opponent.team},
 		flip = (options or {}).flip,
 		teamStyle = 'icon',
 	}
