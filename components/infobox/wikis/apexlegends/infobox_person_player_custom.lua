@@ -116,10 +116,9 @@ function CustomInjector:addCustomCells(widgets)
 		}
 	)
 
-	local lowercaseInput = _args.input and _args.input:lower() or nil
 	table.insert(widgets, Cell{
 			name = 'Input',
-			content = {_INPUTS[lowercaseInput] or _INPUTS.default}
+			content = {Variables.varDefault('input')}
 		})
 	return widgets
 end
@@ -191,6 +190,8 @@ function CustomPlayer:defineCustomPageVariables(args)
 	else
 		Variables.varDefine('isplayer', 'true')
 	end
+	local lowercaseInput = _args.input and _args.input:lower() or nil
+	Variables.varDefine('input', _INPUTS[lowercaseInput] or _INPUTS['default'])
 end
 
 return CustomPlayer
