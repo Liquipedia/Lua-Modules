@@ -194,8 +194,7 @@ end
 
 function CustomPlayer:formatInput()
 	local lowercaseInput = _args.input and _args.input:lower() or nil
-	local input = _INPUTS[lowercaseInput] or _INPUTS.default
-	return input
+	return _INPUTS[lowercaseInput] or _INPUTS.default
 end
 
 return CustomPlayer
