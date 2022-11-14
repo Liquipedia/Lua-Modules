@@ -436,6 +436,7 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
 	value = string.gsub(value, '%s', '')
 	value = string.gsub(value, '&nbsp;', '')
 	value = string.gsub(value, ',', '')
+	value = string.gsub(value, '%$', '')
 
 	--check if it has a '+' at the end
 	local hasPlus = string.match(value, '%+$')
