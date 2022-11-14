@@ -68,7 +68,7 @@ function ResultsTable:buildRow(placement)
 		:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay):done()
 
 	if self.config.gameIconsData then
-		header:tag('th'):node(self:gameIcon(placement)):done()
+		row:tag('th'):node(self:gameIcon(placement)):done()
 	end
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
@@ -78,7 +78,7 @@ function ResultsTable:buildRow(placement)
 			icon = placement.icon,
 			iconDark = placement.icondark,
 			link = placement.parent,
-			name = displayName,
+			name = tournamentDisplayName,
 			options = {noTemplate = true},
 		}):done()
 		:tag('td'):attr('data-sort-value', tournamentDisplayName):css('text-align', 'left'):wikitext(Page.makeInternalLink(
