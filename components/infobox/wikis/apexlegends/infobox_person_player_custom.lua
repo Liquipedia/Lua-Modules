@@ -118,7 +118,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	table.insert(widgets, Cell{
 			name = 'Input',
-			content = {Variables.varDefault('input')}
+			content = {CustomPlayer:formatInput(args)}
 		})
 	return widgets
 end
@@ -130,7 +130,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
-	lpdbData.extradata.input = Variables.varDefault('input')
+	lpdbData.extradata.input = CustomPlayer:formatInput(args)
 	lpdbData.extradata.retired = _args.retired
 
 	_args.legend1 = _args.legend1 or _args.legend
@@ -192,6 +192,12 @@ function CustomPlayer:defineCustomPageVariables(args)
 	end
 	local lowercaseInput = _args.input and _args.input:lower() or nil
 	Variables.varDefine('input', _INPUTS[lowercaseInput] or _INPUTS['default'])
+end
+
+function CustomPlayer:formatInput(args)
+	local lowercaseInput = _args.input and _args.input:lower() or nil
+	local input = _INPUTS[lowercaseInput] or _INPUTS['default']
+	return input
 end
 
 return CustomPlayer
