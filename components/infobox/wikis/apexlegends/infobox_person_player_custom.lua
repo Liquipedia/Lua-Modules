@@ -190,8 +190,6 @@ function CustomPlayer:defineCustomPageVariables(args)
 	else
 		Variables.varDefine('isplayer', 'true')
 	end
-	local lowercaseInput = _args.input and _args.input:lower() or nil
-	Variables.varDefine('input', _INPUTS[lowercaseInput] or _INPUTS['default'])
 end
 
 function CustomPlayer:formatInput(args)
