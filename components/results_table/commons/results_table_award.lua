@@ -12,9 +12,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEnabled = true})
 
@@ -41,7 +39,6 @@ end
 function AwardsTable:buildRow(placement)
 	local row = mw.html.create('tr')
 		:tag('td'):wikitext(placement.date:sub(1, 10)):done()
-		:node(placementCell)
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 
@@ -55,7 +52,7 @@ function AwardsTable:buildRow(placement)
 			icon = placement.icon,
 			iconDark = placement.icondark,
 			link = placement.parent,
-			name = displayName,
+			name = tournamentDisplayName,
 			options = {noTemplate = true},
 		}):done()
 		:tag('td'):attr('data-sort-value', tournamentDisplayName):css('text-align', 'left'):wikitext(Page.makeInternalLink(
