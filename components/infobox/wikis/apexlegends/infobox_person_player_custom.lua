@@ -27,6 +27,7 @@ local _INPUTS = {
 	controller = 'Controller',
 	cont = 'Controller',
 	c = 'Controller',
+	hybrid = 'Hybrid',
 	default = 'Mouse & Keyboard',
 }
 
