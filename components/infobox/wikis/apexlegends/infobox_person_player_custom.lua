@@ -131,6 +131,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.input = Variables.varDefault('input')
 	lpdbData.extradata.retired = _args.retired
 
 	_args.legend1 = _args.legend1 or _args.legend
