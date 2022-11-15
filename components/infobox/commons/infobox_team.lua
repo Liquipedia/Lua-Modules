@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Info = require('Module:Info')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
@@ -35,7 +36,9 @@ local Team = Class.new(BasicInfobox)
 local _LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
+
 local _defaultEarningsFunctionUsed = false
+local CREATED_STRING = '${icon}: ${date}'
 
 local _warnings = {}
 
@@ -47,6 +50,10 @@ end
 function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
+
+	-- Resolve the Team Template of the Team
+	self.teamTemplate = self:getTeamTemplate()
+
 	-- Need links in LPDB, so declare them outside of display code
 	local links = Links.transform(args)
 
@@ -143,10 +150,30 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						if args.created or args.disbanded then
+						local created = {}
+						if args.createdorg then
+							if args.createdorg then
+								table.insert(created, String.interpolate(
+									CREATED_STRING,
+									{icon = self:_getCreatedTeamIcon(args.createdorg) or '', date = args.createdorg})
+								)
+							end
+
+							if args.created then
+								table.insert(created, String.interpolate(
+									CREATED_STRING,
+									{icon = self:getCreatedGameIcon() or '', date = args.created})
+								)
+							end
+						else
+							-- Temporary Legacy Handling
+							table.insert(created, args.created)
+						end
+
+						if Table.isNotEmpty(created) or args.disbanded then
 							return {
 								Title{name = 'History'},
-								Cell{name = 'Created', content = {args.created}},
+								Cell{name = 'Created', content = created},
 								Cell{name = 'Disbanded', content = {args.disbanded}}
 							}
 						end
@@ -181,6 +208,14 @@ function Team:createInfobox()
 	end
 
 	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
+end
+
+function Team:_getCreatedTeamIcon(date)
+	if not self.teamTemplate then
+		return
+	end
+
+	return mw.ext.TeamTemplate.teamicon(self.teamTemplate, date)
 end
 
 function Team:_createRegion(region)
@@ -237,12 +272,9 @@ function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 	local earnings = self.totalEarnings
 
-	local team = args.teamtemplate or self.pagename
-	local teamTemplate
 	local textlessImage, textlessImageDark
-	if team and mw.ext.TeamTemplate.teamexists(team) then
-		local teamRaw = mw.ext.TeamTemplate.raw(team)
-		teamTemplate = teamRaw.historicaltemplate or teamRaw.templatename
+	if self.teamTemplate then
+		local teamRaw = mw.ext.TeamTemplate.raw(self.teamTemplate)
 		textlessImage, textlessImageDark = teamRaw.image, teamRaw.imagedark
 	end
 
@@ -261,7 +293,7 @@ function Team:_setLpdbData(args, links)
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
 		coach = args.coaches,
 		manager = args.manager,
-		template = teamTemplate,
+		template = self.teamTemplate,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
@@ -287,6 +319,22 @@ end
 
 --- Allows for overriding this functionality
 function Team:defineCustomPageVariables(args)
+end
+
+function Team:getTeamTemplate()
+	local team = self.args.teamtemplate or self.pagename
+	if not mw.ext.TeamTemplate.teamexists(team) then
+		return
+	end
+
+	local teamRaw = mw.ext.TeamTemplate.raw(team)
+	return teamRaw.historicaltemplate or teamRaw.templatename
+end
+
+function Team:getCreatedGameIcon()
+	if type(Info.defaultTeamLogo) == 'string' then
+		return Info.defaultTeamLogo
+	end
 end
 
 function Team:addToLpdb(lpdbData, args)
