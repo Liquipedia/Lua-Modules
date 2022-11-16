@@ -109,14 +109,6 @@ function ResultsTable:buildRow(placement)
 	return row:done()
 end
 
---[[
-proposed data structure for lastvsdata:
-
-local lastvsdata = Json.stringify(Table.merge(
-		opponent.additionalData.LASTVS and Opponnet.toLpdbStruct(opponent.additionalData.LASTVS) or {},
-		{score = (opponent.additionalData.LASTVSSCORE or {}).vsscore, groupscore = opponent.additionalData.GROUPSCORE}
-	))
-]]
 function ResultsTable:_processVsData(placement)
 	local lastVs
 	if Table.isEmpty(placement.lastvsdata) then
@@ -146,19 +138,6 @@ function ResultsTable:processLegacyVsData(placement)
 	lastVs.opponenttemplate = placement.lastvs
 
 	return lastVs
-end
-
--- overwritable
--- shadows the current implementation
--- todo: in the future change it to use darkmode icons too
--- needs upgrading the game icon data modules first though
-function ResultsTable:gameIcon(placement)
-	local gameIcon = self.config.gameIconsData[placement.game] or 'Logo filler event.png'
-	gameIcon = gameIcon:gsub('File:', '')
-	return LeagueIcon.display{
-		icon = gameIcon,
-		options = {noTemplate = true, noLink = true},
-	}
 end
 
 return ResultsTable
