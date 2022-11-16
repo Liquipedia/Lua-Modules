@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Info = require('Module:Info')
 local Lua = require('Module:Lua')
@@ -150,25 +151,21 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						local created = {}
-						if args.createdorg then
-							if args.createdorg then
-								table.insert(created, String.interpolate(
-									CREATED_STRING,
-									{icon = self:_getCreatedTeamIcon(args.createdorg) or '', date = args.createdorg})
-								)
+						local created = Array.map(self:getAllArgsForBase(args, 'created'), function (creation)
+							local game, date = unpack(Array.map(mw.text.split(creation, ':'), mw.text.trim))
+							if String.isEmpty(date) then
+								return creation
 							end
 
-							if args.created then
-								table.insert(created, String.interpolate(
-									CREATED_STRING,
-									{icon = self:getCreatedGameIcon() or '', date = args.created})
-								)
+							local icon
+							if game:lower() == 'org' then
+								icon = self:_getTeamIcon(ReferenceCleaner.clean(date))
+							else
+								icon = self:getCreatedGameIcon(game)
 							end
-						else
-							-- Temporary Legacy Handling
-							table.insert(created, args.created)
-						end
+
+							return String.interpolate(CREATED_STRING, {icon = icon or '', date = date})
+						end)
 
 						if Table.isNotEmpty(created) or args.disbanded then
 							return {
@@ -210,7 +207,7 @@ function Team:createInfobox()
 	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
-function Team:_getCreatedTeamIcon(date)
+function Team:_getTeamIcon(date)
 	if not self.teamTemplate then
 		return
 	end
@@ -331,13 +328,13 @@ function Team:getTeamTemplate()
 	return teamRaw.historicaltemplate or teamRaw.templatename
 end
 
-function Team:getCreatedGameIcon()
+function Team:getCreatedGameIcon(game)
 	if type(Info.defaultTeamLogo) == 'string' then
 		return Info.defaultTeamLogo
 	end
 
-	if type(Info.defaultTeamLogo) == 'table' and self.args.createdgame then
-		return Info.defaultTeamLogo[self.args.createdgame:lower()]
+	if type(Info.defaultTeamLogo) == 'table' then
+		return Info.defaultTeamLogo[game:lower()]
 	end
 end
 
