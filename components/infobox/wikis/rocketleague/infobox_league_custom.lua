@@ -138,9 +138,9 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
 
 	-- Psyonix icon
-	if Variables.varDefault('tournament_organizer', ''):find(_PSYONIX) ~= nil then
+	if Variables.varDefault('tournament_organizer', ''):find(_PSYONIX) then
 		content = content .. ' ' .. string.format(_PSYONIX_ICON, 'organized')
-	elseif Variables.varDefault('tournament_sponsors', ''):find(_PSYONIX) ~= nil then
+	elseif Variables.varDefault('tournament_sponsors', ''):find(_PSYONIX) then
 		content = content .. ' ' .. string.format(_PSYONIX_ICON, 'sponsored')
 	end
 
