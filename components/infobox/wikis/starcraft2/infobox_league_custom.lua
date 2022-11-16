@@ -640,7 +640,7 @@ function CustomLeague:_getPageNameFromChronology(item)
 end
 
 function CustomLeague._getGameStorage(gameInput)
-	return (GAMES[string.lower(gameInput)] or {})[1] or GAMES[GAME_WOL][1]
+	return (GAMES[string.lower(gameInput or '')] or {})[1] or GAMES[GAME_WOL][1]
 end
 
 return CustomLeague
