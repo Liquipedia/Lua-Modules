@@ -14,7 +14,7 @@ return {
 		siege = {
 			logo = {
 				darkMode = 'R6S icon.png',
-				lightMode = 'R6S icon.png'
+				lightMode = 'R6S icon.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Rainbow Six Siege Logo darkmode.png',
@@ -24,7 +24,7 @@ return {
 		vegas2 = {
 			logo = {
 				darkMode = 'R6_Vegas_2_icon.png',
-				lightMode = 'R6_Vegas_2_icon.png'
+				lightMode = 'R6_Vegas_2_icon.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Rainbow Six Vegas Logo darkmode.png',

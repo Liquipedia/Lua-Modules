@@ -17,7 +17,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Liquipedia_logo.png',
-				lightMode = 'Liquipedia_logo.png'
+				lightMode = 'Liquipedia_logo.png',
 			},
 		},
 	},
