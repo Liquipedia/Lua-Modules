@@ -33,6 +33,9 @@ local _GAME_SARPBC = 'sarpbc'
 
 local _H2H_TIER_THRESHOLD = 5
 
+local _PSYONIX = 'Psyonix'
+local _PSYONIX_ICON = '[[File:Psyonix logo.svg|16px|link=Psyonix|Psyonix-%s event]]'
+
 local _league
 
 function CustomLeague.run(frame)
@@ -42,6 +45,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
 	return league:createInfobox(frame)
 end
@@ -133,7 +137,22 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
 
+	-- Psyonix icon
+	if Variables.varDefault('tournament_organizer', ''):find(_PSYONIX) ~= nil then
+		content = content .. ' ' .. string.format(_PSYONIX_ICON, 'organized')
+	elseif Variables.varDefault('tournament_sponsors', ''):find(_PSYONIX) ~= nil then
+		content = content .. ' ' .. string.format(_PSYONIX_ICON, 'sponsored')
+	end
+
 	return content
+end
+
+function CustomLeague:liquipediaTierHighlighted()
+	if Variables.varDefault('tournament_tiertype', '') ~= '' then
+		return false
+	end
+	return Variables.varDefault('tournament_organizer', ''):find(_PSYONIX) ~= nil or
+		Variables.varDefault('tournament_sponsors', ''):find(_PSYONIX) ~= nil
 end
 
 function CustomLeague:defineCustomPageVariables(args)
