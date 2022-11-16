@@ -32,30 +32,29 @@ function ResultsTable:buildHeader()
 		:tag('th'):css('min-width', '75px'):wikitext('Tier'):done()
 
 	if self.config.gameIconsData then
-		header:tag('th'):node(Abbreviation.make('G.', 'Game')):done()
+		header:tag('th'):node(Abbreviation.make('G.', 'Game'))
 	end
 
-	header:tag('th'):css('width', '420px'):attr('colspan', 2):wikitext('Tournament'):done()
+	header:tag('th'):css('width', '420px'):attr('colspan', 2):wikitext('Tournament')
 
 	if self.config.queryType ~= Opponent.team then
-		header:tag('th'):css('min-width', '70px'):wikitext('Team'):done()
+		header:tag('th'):css('min-width', '70px'):wikitext('Team')
 	elseif self.config.playerResultsOfTeam then
-		header:tag('th'):css('min-width', '105px'):wikitext('Player'):done()
+		header:tag('th'):css('min-width', '105px'):wikitext('Player')
 	end
 
 	if not self.config.hideResult then
-		header:tag('th'):css('min-width', '105px'):attr('colspan', 2):wikitext('Result'):done()
+		header:tag('th'):css('min-width', '105px'):attr('colspan', 2):wikitext('Result')
 	end
 
-	header:tag('th'):attr('data-sort-type', 'currency'):wikitext('Prize'):done()
+	header:tag('th'):attr('data-sort-type', 'currency'):wikitext('Prize')
 
-	return header:done()
+	return header
 end
 
 function ResultsTable:buildRow(placement)
 	local placementCell = mw.html.create('td')
 	Placement._placement{parent = placementCell, placement = placement.placement}
-	placementCell:done()
 
 	local row = mw.html.create('tr')
 		:addClass(self:rowHighlight(placement))
@@ -64,11 +63,10 @@ function ResultsTable:buildRow(placement)
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 
-	row
-		:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay):done()
+	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
 
 	if self.config.gameIconsData then
-		row:tag('th'):node(self:gameIcon(placement)):done()
+		row:tag('th'):node(self:gameIcon(placement))
 	end
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
@@ -85,28 +83,28 @@ function ResultsTable:buildRow(placement)
 			{},
 			tournamentDisplayName,
 			placement.pagename
-		)):done()
+		))
 
 	if self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team then
 		row:tag('td'):css('text-align', 'right'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
 			placement,
 			{flip = true, teamForSolo = not self.config.playerResultsOfTeam}
-		)):done()
+		))
 	end
 
 	if not self.config.hideResult then
 		local score, vsDisplay = self:_processVsData(placement)
 		row
 			:tag('td'):wikitext(score):done()
-			:tag('td'):css('text-align', 'left'):node(vsDisplay):done()
+			:tag('td'):css('text-align', 'left'):node(vsDisplay)
 	end
 
 	row:tag('td'):css('text-align', 'right'):wikitext('$' .. Currency.formatMoney(
 			self.config.queryType ~= Opponent.team and placement.individualprizemoney
 			or placement.prizemoney
-		)):done()
+		))
 
-	return row:done()
+	return row
 end
 
 function ResultsTable:_processVsData(placement)
