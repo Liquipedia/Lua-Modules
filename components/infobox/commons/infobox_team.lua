@@ -152,12 +152,15 @@ function Team:createInfobox()
 				Builder{
 					builder = function()
 						local created = Array.map(self:getAllArgsForBase(args, 'created'), function (creation)
-							local game, date = unpack(Array.map(mw.text.split(creation, ':'), mw.text.trim))
-							if String.isEmpty(date) then
+							local splitInput = Array.map(mw.text.split(creation, ':'), mw.text.trim)
+							if #splitInput ~= 2 then
+								-- Legacy Input
 								return creation
 							end
 
 							local icon
+							local game, date = unpack(splitInput)
+
 							if game:lower() == 'org' then
 								icon = self:_getTeamIcon(ReferenceCleaner.clean(date))
 							else
