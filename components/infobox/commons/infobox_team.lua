@@ -38,7 +38,7 @@ local _LINK_VARIANT = 'team'
 local Language = mw.language.new('en')
 
 local _defaultEarningsFunctionUsed = false
-local CREATED_STRING = '${icon}: ${date}'
+local CREATED_STRING = '<span class="icon-16px">[[File:${icon}|32px]]</span>: ${date}'
 
 local _warnings = {}
 
@@ -215,7 +215,7 @@ function Team:_getCreatedTeamIcon(date)
 		return
 	end
 
-	return mw.ext.TeamTemplate.teamicon(self.teamTemplate, date)
+	return mw.ext.TeamTemplate.raw(self.teamTemplate, ReferenceCleaner.clean(date)).image
 end
 
 function Team:_createRegion(region)
