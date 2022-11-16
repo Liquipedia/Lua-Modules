@@ -45,16 +45,16 @@ local _TODAY = os.date('%Y-%m-%d', os.time())
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
 
-local _GAME_WOL = 'wol'
-local _GAME_HOTS = 'hots'
-local _GAME_LOTV = 'lotv'
-local _GAME_MOD = 'mod'
+local GAME_WOL = 'wol'
+local GAME_HOTS = 'hots'
+local GAME_LOTV = 'lotv'
+local GAME_MOD = 'mod'
 
-local _GAMES = {
-	[_GAME_WOL] = {'Wings of Liberty', 'WoL'},
-	[_GAME_HOTS] = {'Heart of the Swarm', 'HotS'},
-	[_GAME_LOTV] = {'Legacy of the Void', 'LotV'},
-	[_GAME_MOD] = {'mod', 'mod'}
+local GAMES = {
+	[GAME_WOL] = {'Wings of Liberty', 'WoL'},
+	[GAME_HOTS] = {'Heart of the Swarm', 'HotS'},
+	[GAME_LOTV] = {'Legacy of the Void', 'LotV'},
+	[GAME_MOD] = {'mod', 'mod'}
 }
 local _SICON = '[[File:Sicon.png|text-bottom|Code S|link=Code S]]'
 local _AICON = '[[File:Aicon.png|text-bottom|Code A]]'
@@ -272,16 +272,16 @@ function CustomLeague._getGameVersion()
 
 	if String.isNotEmpty(game) or String.isNotEmpty(patch) then
 		local gameVersion
-		if game == _GAME_MOD then
+		if game == GAME_MOD then
 			gameVersion = modName or 'Mod'
-		elseif _GAMES[game] then
-			gameVersion = '[[' .. _GAMES[game][1] .. ']]' ..
-				'[[Category:' .. betaPrefix .. _GAMES[game][2] .. ' Competitions]]'
+		elseif GAMES[game] then
+			gameVersion = '[[' .. GAMES[game][1] .. ']]' ..
+				'[[Category:' .. betaPrefix .. GAMES[game][2] .. ' Competitions]]'
 		else
 			gameVersion = '[[Category:' .. betaPrefix .. 'Competitions]]'
 		end
 
-		if game == _GAME_LOTV and shouldUseAutoPatch then
+		if game == GAME_LOTV and shouldUseAutoPatch then
 			if String.isEmpty(patch) then
 				patch = 'Patch ' .. (Autopatch._main({CustomLeague._retrievePatchDate(startDate)}) or '')
 			end
@@ -547,7 +547,7 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 
 	--override var to standardize its entries
-	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game)] or {})[1] or _GAMES[_GAME_WOL][1])
+	Variables.varDefine('tournament_game', CustomLeague._getGameStorage(_args.game))
 
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
@@ -601,6 +601,7 @@ end
 
 function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
+	lpdbData.game = CustomLeague._getGameStorage(_args.game)
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefaultMulti('epatch', 'patch', '')
 	local status = _args.status
@@ -636,6 +637,10 @@ function CustomLeague:_getPageNameFromChronology(item)
 	end
 
 	return mw.text.split(item, '|')[1]
+end
+
+function CustomLeague._getGameStorage(gameInput)
+	return (GAMES[string.lower(gameInput)] or {})[1] or GAMES[GAME_WOL][1]
 end
 
 return CustomLeague
