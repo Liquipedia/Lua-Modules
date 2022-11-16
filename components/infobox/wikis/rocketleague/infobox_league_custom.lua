@@ -151,8 +151,8 @@ function CustomLeague:liquipediaTierHighlighted()
 	if Variables.varDefault('tournament_tiertype', '') ~= '' then
 		return false
 	end
-	return Variables.varDefault('tournament_organizer', ''):find(_PSYONIX) ~= nil or
-		Variables.varDefault('tournament_sponsors', ''):find(_PSYONIX) ~= nil
+	return Variables.varDefault('tournament_organizer', ''):find(_PSYONIX) or
+		Variables.varDefault('tournament_sponsors', ''):find(_PSYONIX)
 end
 
 function CustomLeague:defineCustomPageVariables(args)
