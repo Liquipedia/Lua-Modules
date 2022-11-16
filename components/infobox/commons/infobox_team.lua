@@ -335,6 +335,10 @@ function Team:getCreatedGameIcon()
 	if type(Info.defaultTeamLogo) == 'string' then
 		return Info.defaultTeamLogo
 	end
+
+	if type(Info.defaultTeamLogo) == 'table' and self.args.createdgame then
+		return Info.defaultTeamLogo[self.args.createdgame:lower()]
+	end
 end
 
 function Team:addToLpdb(lpdbData, args)
