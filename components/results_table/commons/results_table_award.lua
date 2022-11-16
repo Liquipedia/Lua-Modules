@@ -26,14 +26,14 @@ function AwardsTable:buildHeader()
 		:tag('th'):css('min-width', '225px'):wikitext('Award'):done()
 
 	if self.config.opponentType ~= Opponent.team then
-		header:tag('th'):css('min-width', '70px'):wikitext('Team'):done()
+		header:tag('th'):css('min-width', '70px'):wikitext('Team')
 	elseif self.config.playerResultsOfTeam then
-		header:tag('th'):css('min-width', '105px'):wikitext('Player'):done()
+		header:tag('th'):css('min-width', '105px'):wikitext('Player')
 	end
 
-	header:tag('th'):attr('data-sort-type', 'currency'):wikitext('Prize'):done()
+	header:tag('th'):attr('data-sort-type', 'currency'):wikitext('Prize')
 
-	return header:done()
+	return header
 end
 
 function AwardsTable:buildRow(placement)
@@ -42,8 +42,7 @@ function AwardsTable:buildRow(placement)
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 
-	row
-		:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay):done()
+	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
 
@@ -59,23 +58,23 @@ function AwardsTable:buildRow(placement)
 			{},
 			tournamentDisplayName,
 			placement.pagename
-		)):done()
+		))
 
-	row:tag('td'):css('text-align', 'left'):wikitext(placement.extradata.award):done()
+	row:tag('td'):css('text-align', 'left'):wikitext(placement.extradata.award)
 
 	if self.config.playerResultsOfTeam or self.config.opponentType ~= Opponent.team then
 		row:tag('td'):css('text-align', 'right'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
 			placement,
 			{flip = true, teamForSolo = not self.config.playerResultsOfTeam}
-		)):done()
+		))
 	end
 
 	row:tag('td'):css('text-align', 'right'):wikitext('$' .. Currency.formatMoney(
 			self.config.opponentType ~= Opponent.team and placement.individualprizemoney
 			or placement.prizemoney
-		)):done()
+		))
 
-	return row:done()
+	return row
 end
 
 return AwardsTable
