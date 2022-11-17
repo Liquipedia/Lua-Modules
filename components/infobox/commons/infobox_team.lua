@@ -171,7 +171,7 @@ function Team:createInfobox()
 								if timestamp and timestamp < earliestGameTimestamp then
 									earliestGameTimestamp = timestamp
 								end
-								mw.log(date, timestamp, earliestGameTimestamp)
+
 								icon = self:getCreatedGameIcon(game)
 							end
 
