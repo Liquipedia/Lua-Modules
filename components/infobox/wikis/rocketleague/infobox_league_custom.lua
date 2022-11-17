@@ -148,7 +148,10 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 end
 
 function CustomLeague:liquipediaTierHighlighted()
-	if Variables.varDefault('tournament_tiertype', '') ~= '' then
+	if _league.args.liquipediatier ~= "1" then
+		return false
+	end
+	if _league.args.liquipediatiertype then
 		return false
 	end
 	return CustomLeague:containsPsyonix('organizer') or
