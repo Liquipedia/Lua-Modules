@@ -13,8 +13,6 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Placement = require('Module:Placement')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEnabled = true})
 
