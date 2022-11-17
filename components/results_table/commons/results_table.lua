@@ -58,7 +58,7 @@ function ResultsTable:buildRow(placement)
 
 	local row = mw.html.create('tr')
 		:addClass(self:rowHighlight(placement))
-		:tag('td'):wikitext(placement.date:sub(1, 10)):done()
+		:tag('td'):wikitext(mw.getContentLanguage():formatDate('Y-m-d', placement.date)):done()
 		:node(placementCell)
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
