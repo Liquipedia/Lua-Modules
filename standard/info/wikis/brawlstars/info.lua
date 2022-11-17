@@ -10,6 +10,19 @@ return {
 	startYear = 2018,
 	wikiName = 'brawlstars',
 	name = 'Brawl Stars',
-	defaultTeamLogo = 'Brawl_Stars_Default_allmode.png',
-	defaultTeamLogoDark = 'Brawl_Stars_Default_allmode.png',
+	games = {
+		brawlstars = {
+			logo = {
+				darkMode = 'Brawl_Stars_Default_allmode.png',
+				lightMode = 'Brawl_Stars_Default_allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Brawl_Stars_Default_allmode.png',
+				lightMode = 'Brawl_Stars_Default_allmode.png',
+			},
+		},
+	},
+	defaultGame = 'brawlstars',
+	defaultTeamLogo = 'Brawl_Stars_Default_allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Brawl_Stars_Default_allmode.png', ---@deprecated
 }

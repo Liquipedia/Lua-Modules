@@ -10,6 +10,19 @@ return {
 	startYear = 2019,
 	wikiName = 'battalion',
 	name = 'Battalion 1944',
-	defaultTeamLogo = 'Battalion generic logo.png',
-	defaultTeamLogoDark = 'Battalion generic logo.png',
+	games = {
+		battalion = {
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Battalion generic logo.png',
+				lightMode = 'Battalion generic logo.png',
+			},
+		},
+	},
+	defaultGame = 'battalion',
+	defaultTeamLogo = 'Battalion generic logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Battalion generic logo.png', ---@deprecated
 }

@@ -10,6 +10,19 @@ return {
 	startYear = 2018,
 	wikiName = 'artifact',
 	name = 'Artifact',
-	defaultTeamLogo = 'Artifact_allmode.png',
-	defaultTeamLogoDark = 'Artifact_allmode.png',
+	games = {
+		artifact = {
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Artifact_allmode.png',
+				lightMode = 'Artifact_allmode.png',
+			},
+		},
+	},
+	defaultGame = 'artifact',
+	defaultTeamLogo = 'Artifact_allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Artifact_allmode.png', ---@deprecated
 }
