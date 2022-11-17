@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Date = require('Module:Date/Ext')
 local Info = require('Module:Info')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -151,6 +152,8 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
+						local earliestGameTimestamp = Team._parseDate(args.created) or Date.maxTimestamp
+
 						local created = Array.map(self:getAllArgsForBase(args, 'created'), function (creation)
 							local splitInput = Array.map(mw.text.split(creation, ':'), mw.text.trim)
 							if #splitInput ~= 2 then
@@ -164,11 +167,18 @@ function Team:createInfobox()
 							if game:lower() == 'org' then
 								icon = self:_getTeamIcon(ReferenceCleaner.clean(date))
 							else
+								local timestamp = Team._parseDate(date)
+								if timestamp and timestamp < earliestGameTimestamp then
+									earliestGameTimestamp = timestamp
+								end
+								mw.log(date, timestamp, earliestGameTimestamp)
 								icon = self:getCreatedGameIcon(game)
 							end
 
 							return String.interpolate(CREATED_STRING, {icon = icon or '', date = date})
 						end)
+
+						args.created = earliestGameTimestamp ~= Date.maxTimestamp and Date.toYmdInUtc(earliestGameTimestamp) or nil
 
 						if Table.isNotEmpty(created) or args.disbanded then
 							return {
@@ -216,6 +226,18 @@ function Team:_getTeamIcon(date)
 	end
 
 	return mw.ext.TeamTemplate.raw(self.teamTemplate, ReferenceCleaner.clean(date)).image
+end
+
+function Team._isValidDate(date)
+	return date and date:match('%d%d%d%d-[%d%?]?[%d%?]?-[%d%?]?[%d%?]?')
+end
+
+function Team._parseDate(date)
+	if not Team._isValidDate(date) then
+		return
+	end
+
+	return Date.readTimestamp(ReferenceCleaner.clean(date))
 end
 
 function Team:_createRegion(region)
