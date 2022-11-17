@@ -20,8 +20,6 @@ local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEna
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
-local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
-
 --- @class ResultsTable
 local ResultsTable = Class.new(BaseResultsTable)
 
@@ -93,7 +91,7 @@ function ResultsTable:buildRow(placement)
 	end
 
 	if not self.config.hideResult then
-		local score, vsDisplay = self:_processVsData(placement)
+		local score, vsDisplay = self:processVsData(placement)
 		row
 			:tag('td'):wikitext(score):done()
 			:tag('td'):css('text-align', 'left'):node(vsDisplay)
@@ -105,37 +103,6 @@ function ResultsTable:buildRow(placement)
 		))
 
 	return row
-end
-
-function ResultsTable:_processVsData(placement)
-	local lastVs
-	if Table.isEmpty(placement.lastvsdata) then
-		lastVs = self:processLegacyVsData(placement)
-	else
-		lastVs = placement.lastvsdata
-	end
-
-	if String.isNotEmpty(lastVs.groupscore) then
-		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
-	end
-
-	local score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
-	local vsDisplay = self:opponentDisplay(lastVs, {})
-
-	return score, vsDisplay
-end
-
--- overwritable
-function ResultsTable:processLegacyVsData(placement)
-	local lastVs = {score = placement.lastvsscore, groupscore = placement.groupscore}
-	-- lets assume opponentType of the vs opponent is the same as of the opponent
-	lastVs.opponenttype = placement.opponenttype
-	-- assume lastvs is team template for teams and pagename & displayname for players
-	-- if wikis store them in extradata they can overwrite this function until lastvsdata field is filled
-	lastVs.opponentplayers = {p1 = placement.lastvs, p1dn = placement.lastvs}
-	lastVs.opponenttemplate = placement.lastvs
-
-	return lastVs
 end
 
 return ResultsTable
