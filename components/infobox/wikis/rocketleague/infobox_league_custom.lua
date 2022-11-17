@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TournamentNotability = require('Module:TournamentNotability')
 local Variables = require('Module:Variables')
@@ -33,7 +34,6 @@ local _GAME_SARPBC = 'sarpbc'
 
 local _H2H_TIER_THRESHOLD = 5
 
-local _PSYONIX = 'Psyonix'
 local _PSYONIX_ICON = '[[File:Psyonix logo.svg|16px|link=Psyonix|Psyonix-%s event]]'
 
 local _league
@@ -138,9 +138,9 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
 
 	-- Psyonix icon
-	if Variables.varDefault('tournament_organizer', ''):find(_PSYONIX) then
+	if CustomLeague:containsPsyonix('organizer') then
 		content = content .. ' ' .. string.format(_PSYONIX_ICON, 'organized')
-	elseif Variables.varDefault('tournament_sponsors', ''):find(_PSYONIX) then
+	elseif CustomLeague:containsPsyonix('sponsor') then
 		content = content .. ' ' .. string.format(_PSYONIX_ICON, 'sponsored')
 	end
 
@@ -151,8 +151,19 @@ function CustomLeague:liquipediaTierHighlighted()
 	if Variables.varDefault('tournament_tiertype', '') ~= '' then
 		return false
 	end
-	return Variables.varDefault('tournament_organizer', ''):find(_PSYONIX) or
-		Variables.varDefault('tournament_sponsors', ''):find(_PSYONIX)
+	return CustomLeague:containsPsyonix('organizer') or
+		CustomLeague:containsPsyonix('sponsor')
+end
+
+function CustomLeague:containsPsyonix(prefix)
+	local index = ''
+	while _league.args[prefix .. index] do
+		if _league.args[prefix .. index] == 'Psyonix' then
+			return true
+		end
+		index = (index == '' and 2 or index + 1)
+	end
+	return false
 end
 
 function CustomLeague:defineCustomPageVariables(args)
