@@ -31,6 +31,7 @@ local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
 
+local _TIER_1 = 1
 local _H2H_TIER_THRESHOLD = 5
 
 local _PSYONIX_ICON = '[[File:Psyonix logo.svg|16px|link=Psyonix|Psyonix-%s event]]'
@@ -147,10 +148,10 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 end
 
 function CustomLeague:liquipediaTierHighlighted()
-	if _league.args.liquipediatier ~= "1" then
-		return false
-	end
-	if _league.args.liquipediatiertype then
+	if (
+		String.isNotEmpty(_league.args.liquipediatiertype) or
+		tonumber(_league.args.liquipediatier) ~= _TIER_1
+	) then
 		return false
 	end
 	return CustomLeague:containsPsyonix('organizer') or
