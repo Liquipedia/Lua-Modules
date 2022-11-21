@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TournamentNotability = require('Module:TournamentNotability')
 local Variables = require('Module:Variables')
@@ -34,6 +35,7 @@ local _GAME_SARPBC = 'sarpbc'
 local _TIER_1 = 1
 local _H2H_TIER_THRESHOLD = 5
 
+local _PSYONIX = 'Psyonix'
 local _PSYONIX_ICON = '[[File:Psyonix logo.svg|16px|link=Psyonix|Psyonix-%s event]]'
 
 local _league
@@ -159,14 +161,10 @@ function CustomLeague:liquipediaTierHighlighted()
 end
 
 function CustomLeague:containsPsyonix(prefix)
-	local index = ''
-	while _league.args[prefix .. index] do
-		if _league.args[prefix .. index] == 'Psyonix' then
-			return true
-		end
-		index = (index == '' and 2 or index + 1)
-	end
-	return false
+	return Table.any(
+		League:getAllArgsForBase(_league.args, prefix),
+		function (_, value) return value == _PSYONIX end
+	)
 end
 
 function CustomLeague:defineCustomPageVariables(args)
