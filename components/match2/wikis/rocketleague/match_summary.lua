@@ -237,12 +237,12 @@ function CustomMatchSummary.getByMatchId(args)
 		local footer = MatchSummary.Footer()
 
 		-- Octane
-		for _, octane in ipairs(match.links.octane or {}) do
+		for _, octane in Table.iter.pairsByPrefix(match.links, 'octane') do
 			footer:addElement(_OCTANE_PREFIX .. octane .. _OCTANE_SUFFIX)
 		end
 
 		-- Ballchasing
-		for _, ballchasing in ipairs(match.links.ballchasing or {}) do
+		for _, ballchasing in Table.iter.pairsByPrefix(match.links, 'ballchasing') do
 			footer:addElement(_BALLCHASING_PREFIX .. ballchasing .. _BALLCHASING_SUFFIX)
 		end
 
