@@ -156,6 +156,7 @@ function CustomLeague:liquipediaTierHighlighted()
 	) then
 		return false
 	end
+
 	return CustomLeague:containsPsyonix('organizer') or
 		CustomLeague:containsPsyonix('sponsor')
 end
