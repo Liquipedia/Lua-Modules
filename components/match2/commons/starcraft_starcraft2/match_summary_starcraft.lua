@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DisplayUtil = require('Module:DisplayUtil')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
@@ -16,6 +17,7 @@ local TypeUtil = require('Module:TypeUtil')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
 	getTinyIcon = function(_) end,
@@ -158,6 +160,22 @@ function StarcraftMatchSummary.Body(props)
 			:addClass('brkts-popup-body-element')
 			:addClass('brkts-popup-countdown')
 		body:node(countdownNode)
+	end
+
+	for _, opponent in ipairs(match.opponents or {}) do
+		if Logic.isNumeric((opponent.extradata or {}).advantage) then
+			body:node(
+				html.create('div'):addClass('brkts-popup-sc-game-comment')
+					:node(StarcraftOpponentDisplay.InlineOpponent{
+						opponent = StarcraftOpponent.isTbd(opponent) and StarcraftOpponent.tbd() or opponent,
+						showFlag = false,
+						showLink = true,
+						showRace = false,
+						teamStyle = 'short',
+					})
+					:wikitext(' starts with a ' .. opponent.extradata.advantage .. ' map advantage.')
+			)
+		end
 	end
 
 	if match.opponentMode == 'uniform' then
