@@ -165,7 +165,9 @@ function StarcraftMatchSummary.Body(props)
 	for _, opponent in ipairs(match.opponents or {}) do
 		if Logic.isNumeric((opponent.extradata or {}).advantage) then
 			body:node(
-				html.create('div'):addClass('brkts-popup-sc-game-comment')
+				html.create('div')
+					:addClass('brkts-popup-body-element')
+					:addClass('brkts-popup-sc-game-center')
 					:node(StarcraftOpponentDisplay.InlineOpponent{
 						opponent = StarcraftOpponent.isTbd(opponent) and StarcraftOpponent.tbd() or opponent,
 						showFlag = false,
