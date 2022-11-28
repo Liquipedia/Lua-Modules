@@ -162,12 +162,14 @@ function StarcraftMatchSummary.Body(props)
 		body:node(countdownNode)
 	end
 
+	-- add a comment if there is a pre match map advantage
 	for _, opponent in ipairs(match.opponents or {}) do
+		-- if the opponent has a (numeric) pre match advantage build the comment
 		if Logic.isNumeric((opponent.extradata or {}).advantage) then
 			body:node(
 				html.create('div')
 					:addClass('brkts-popup-body-element')
-					:addClass('brkts-popup-sc-game-center')
+					:addClass('brkts-popup-sc-game-center') -- use this over comment class so it is shown in the height as maps
 					:node(StarcraftOpponentDisplay.InlineOpponent{
 						opponent = StarcraftOpponent.isTbd(opponent) and StarcraftOpponent.tbd() or opponent,
 						showFlag = false,
