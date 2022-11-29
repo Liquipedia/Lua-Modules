@@ -146,7 +146,7 @@ function ActiveYears._groupYears(sortedYears)
 		end
 		endYear = year
 	end
-	if endYear == _CURRENT_YEAR then
+	if endYear >= _CURRENT_YEAR then
 		table.insert(yearRanges, tostring(startYear) .. ' - ' .. "'''Present'''")
 	else
 		yearRanges = ActiveYears._insertYears(startYear, endYear, yearRanges)
