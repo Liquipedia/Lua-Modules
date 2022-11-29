@@ -120,7 +120,7 @@ function BaseResultsTable:create()
 		return
 	end
 
-	Array.map(data, function(placement) return self:processLegacyVsData(placement) end)
+	Array.forEach(data, function(placement) self:processLegacyVsData(placement) end)
 
 	table.sort(data, function(placement1, placement2) return placement1.date > placement2.date end)
 
