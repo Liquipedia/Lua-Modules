@@ -59,7 +59,7 @@ function Currency.display(currencyCode, prizeValue, options)
 	end
 	local currencySuffix = ''
 	if currencyData.symbol.text and currencyData.symbol.isAfter then
-		currencySuffix = (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '') .. currencyData.symbol.text 
+		currencySuffix = (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '') .. currencyData.symbol.text
 	end
 	local currencyAbbreviation = Abbreviation.make(currencyData.code, currencyData.name)
 
