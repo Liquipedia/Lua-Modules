@@ -106,7 +106,7 @@ function NotabilityChecker._calculateTeamNotability(team)
 end
 
 function NotabilityChecker._calculatePersonNotability(person)
-	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person)
+	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person):gsub(' ', '_')
 
 	local conditions = '[[players_p' .. tostring(1) .. '::' .. person .. ']]' ..
 		' OR [[participant::' .. person .. ']]'
