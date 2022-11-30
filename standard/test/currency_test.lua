@@ -36,10 +36,11 @@ function suite:testRaw()
 	self:assertEquals(nil, Currency.raw('dummy'))
 	self:assertDeepEquals({
 			code = 'EUR',
-			symbol = '€',
-			text = {
-				prefix = '€',
-				suffix = '&nbsp;<abbr title="Euro">EUR</abbr>',
+			name = 'Euro',
+			symbol = {
+				hasSpace = false,
+				isAfter = false,
+				text = '€',
 			},
 		},
 		Currency.raw('EUR')
