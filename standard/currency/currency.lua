@@ -6,8 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
-local CurrencyData = mw.loadData('Module:Currency/Data')
+local CurrencyData = mw.loadData('Module:Currency/Data/dev')
 local Logic = require('Module:Logic')
 local Math = require('Module:Math')
 local String = require('Module:StringUtils')
@@ -52,23 +53,44 @@ function Currency.display(currencyCode, prizeValue, options)
 		return nil
 	end
 
+	local currencyPrefix = ''
+	if currencyData.symbol.text and not currencyData.symbol.isAfter then
+		currencyPrefix = currencyData.symbol.text .. (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '')
+	end
+	local currencySuffix = ''
+	if currencyData.symbol.text and currencyData.symbol.isAfter then
+		currencySuffix = (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '') .. currencyData.symbol.text 
+	end
+	local currencyAbbreviation = Abbreviation.make(currencyData.code, currencyData.name)
+
 	if options.setVariables then
 		Variables.varDefine('localcurrencycode', currencyData.code or '')
-		Variables.varDefine(
-			'localcurrencysymbol',
-			currencyData.isAfter and '' or currencyData.symbol or ''
-		)
-		Variables.varDefine(
-			'localcurrencysymbolafter',
-			currencyData.isAfter and currencyData.symbol or ''
-		)
+		Variables.varDefine('localcurrencysymbol', currencyPrefix)
+		Variables.varDefine('localcurrencysymbolafter', currencySuffix)
 	end
 
-	if Logic.isNumeric(prizeValue) and options.formatValue then
-		prizeValue = Currency.formatMoney(prizeValue)
+	if (not options.noAbbreviation) and currencyData.symbol.text == currencyData.code then
+		options.noSymbol = true
 	end
 
-	return currencyData.text.prefix .. (prizeValue or '') .. currencyData.text.suffix
+	local prizeDisplay = ''
+	if not options.noSymbol then
+		prizeDisplay = prizeDisplay .. currencyPrefix
+	end
+	if prizeValue then
+		if Logic.isNumeric(prizeValue) and options.formatValue then
+			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision)
+		end
+		prizeDisplay = prizeDisplay .. prizeValue
+	end
+	if not options.noSymbol then
+		prizeDisplay = prizeDisplay .. currencySuffix
+	end
+	if not options.noAbbreviation then
+		prizeDisplay = prizeDisplay .. (prizeDisplay ~= '' and NON_BREAKING_SPACE or '') .. currencyAbbreviation
+	end
+
+	return prizeDisplay
 end
 
 function Currency.raw(currencyCode)
