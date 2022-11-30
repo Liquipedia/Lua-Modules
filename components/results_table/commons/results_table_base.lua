@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local LeagueIcon = require('Module:LeagueIcon')
@@ -46,6 +47,7 @@ local VALID_QUERY_TYPES = {
 	TEAM_TYPE,
 	COACH_TYPE,
 }
+local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
 --- @class BaseResultsTable
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
@@ -117,6 +119,8 @@ function BaseResultsTable:create()
 	if Table.isEmpty(data) then
 		return
 	end
+
+	Array.forEach(data, function(placement) self:processLegacyVsData(placement) end)
 
 	table.sort(data, function(placement1, placement2) return placement1.date > placement2.date end)
 
@@ -419,6 +423,38 @@ function BaseResultsTable.tournamentDisplayName(placement)
 	end
 
 	return placement.pagename:gsub('_', ' ')
+end
+
+function BaseResultsTable:processVsData(placement)
+	local lastVs = placement.lastvsdata
+
+	if String.isNotEmpty(lastVs.groupscore) then
+		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
+	end
+
+	local score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
+	local vsDisplay = self:opponentDisplay(lastVs, {})
+
+	return score, vsDisplay
+end
+
+-- overwritable
+function BaseResultsTable:processLegacyVsData(placement)
+	if Table.isNotEmpty(placement.lastvsdata) then
+		return placement
+	end
+
+	local lastVs = {score = placement.lastvsscore, groupscore = placement.groupscore}
+	-- lets assume opponentType of the vs opponent is the same as of the opponent
+	lastVs.opponenttype = placement.opponenttype
+	-- assume lastvs is team template for teams and pagename & displayname for players
+	-- if wikis store them in extradata they can overwrite this function until lastvsdata field is filled
+	lastVs.opponentplayers = {p1 = placement.lastvs, p1dn = placement.lastvs}
+	lastVs.opponenttemplate = placement.lastvs
+
+	placement.lastvsdata = lastVs
+
+	return placement
 end
 
 function BaseResultsTable:buildHeader()
