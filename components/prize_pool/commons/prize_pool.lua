@@ -196,7 +196,9 @@ PrizePool.prizeTypes = {
 		rowDisplay = function (headerData, data)
 			if data > 0 then
 				mw.logObject(headerData)
-				return TableCell{content = {Currency.display(headerData.currency, data, {formatValue = true, formatPrecision = headerData.roundPrecision, noAbbreviation = true})}}
+				return TableCell{content = {
+					Currency.display(headerData.currency, data,
+					{formatValue = true, formatPrecision = headerData.roundPrecision, noAbbreviation = true})}}
 			end
 		end,
 
