@@ -11,7 +11,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
-local Currency = require('Module:Currency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Math = require('Module:Math')
@@ -21,6 +20,7 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
+local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
 local Import = Lua.import('Module:PrizePool/Import', {requireDevIfEnabled = true})
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
@@ -149,8 +149,7 @@ PrizePool.prizeTypes = {
 		sortOrder = 10,
 
 		headerDisplay = function (data)
-			local currencyData = Currency.raw(BASE_CURRENCY)
-			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
+			local currencyText = Currency.display(BASE_CURRENCY)
 			return TableCell{content = {{currencyText}}}
 		end,
 
@@ -173,7 +172,6 @@ PrizePool.prizeTypes = {
 			if not currencyData then
 				error(input .. ' could not be parsed as a currency, has it been added to [[Module:Currency/Data]]?')
 			end
-			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
 
 			local currencyRate = Currency.getExchangeRate{
 				currency = currencyData.code,
@@ -183,13 +181,12 @@ PrizePool.prizeTypes = {
 			}
 
 			return {
-				currency = currencyData.code, currencyText = currencyText,
-				symbol = currencyData.symbol, symbolFirst = not currencyData.isAfter,
-				rate = currencyRate or 0, roundPrecision = prizePool.options.currencyRoundPrecision,
+				currency = currencyData.code, rate = currencyRate or 0,
+				roundPrecision = prizePool.options.currencyRoundPrecision,
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{data.currencyText}}}
+			return TableCell{content = {{Currency.display(data.currency)}}}
 		end,
 
 		row = 'localprize',
@@ -198,15 +195,8 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				local displayText = {Currency.formatMoney(data, headerData.roundPrecision)}
-
-				if headerData.symbolFirst then
-					table.insert(displayText, 1, headerData.symbol)
-				else
-					table.insert(displayText, headerData.symbol)
-				end
-
-				return TableCell{content = {displayText}}
+				mw.logObject(headerData)
+				return TableCell{content = {Currency.display(headerData.currency, data, {formatValue = true, formatPrecision = headerData.roundPrecision, noAbbreviation = true})}}
 			end
 		end,
 
@@ -598,7 +588,7 @@ end
 
 function PrizePool:_currencyExchangeInfo()
 	if self.usedAutoConvertedCurrency then
-		local currencyText = Currency.display(BASE_CURRENCY)
+		local currencyText = Currency.display(BASE_CURRENCY, nil, {noSymbol = true})
 		local exchangeProvider = Abbreviation.make('exchange rate', Variables.varDefault('tournament_currency_text'))
 
 		if not exchangeProvider then
@@ -635,7 +625,7 @@ function PrizePool._CurrencyConvertionText(prize)
 		,5
 	}
 
-	return '1 ' .. Currency.display(prize.data.currency) .. ' ≃ ' .. exchangeRate .. ' ' .. Currency.display(BASE_CURRENCY)
+	return Currency.display(prize.data.currency, 1) .. ' ≃ ' .. Currency.display(BASE_CURRENCY, exchangeRate)
 end
 
 function PrizePool:_toggleExpand(placeStart, placeEnd)
