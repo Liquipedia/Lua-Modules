@@ -8,7 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
-local CurrencyData = mw.loadData('Module:Currency/Data/dev')
+local CurrencyData = mw.loadData('Module:Currency/Data')
 local Logic = require('Module:Logic')
 local Math = require('Module:Math')
 local String = require('Module:StringUtils')
