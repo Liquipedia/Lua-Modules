@@ -106,20 +106,23 @@ function NotabilityChecker._calculateTeamNotability(team)
 end
 
 function NotabilityChecker._calculatePersonNotability(person)
-	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person):gsub(' ', '_')
+	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person)
 
-	local conditions = '[[players_p' .. tostring(1) .. '::' .. person .. ']]' ..
-		' OR [[participant::' .. person .. ']]'
-	for i = 2, Config.MAX_NUMBER_OF_PARTICIPANTS do
-		conditions = conditions .. ' OR [[players_p' .. tostring(i) .. '::' .. person .. ']]'
-	end
-	for i = 1, Config.MAX_NUMBER_OF_COACHES do
-		conditions = conditions .. ' OR [[players_c' .. tostring(i) .. '::' .. person .. ']]'
-	end
+    local conditions = {}
+    for _, name in pairs({person, person:gsub(' ', '_')}) do
+        table.insert(conditions, '[[players_p' .. tostring(1) .. '::' .. name .. ']]')
+        table.insert(conditions, '[[participant::' .. name .. ']]')
+        for i = 2, Config.MAX_NUMBER_OF_PARTICIPANTS do
+            table.insert(conditions, '[[players_p' .. tostring(i) .. '::' .. name .. ']]')
+        end
+        for i = 1, Config.MAX_NUMBER_OF_COACHES do
+            table.insert(conditions, '[[players_c' .. tostring(i) .. '::' .. name .. ']]')
+        end
+    end
 
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = Config.PLACEMENT_LIMIT,
-		conditions = conditions,
+		conditions = table.concat(conditions, ' OR '),
 		query = Config.PLACEMENT_QUERY,
 	})
 	return NotabilityChecker._calculateWeight(data)
