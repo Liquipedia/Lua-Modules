@@ -108,17 +108,17 @@ end
 function NotabilityChecker._calculatePersonNotability(person)
 	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person)
 
-    local conditions = {}
-    for _, name in pairs({person, person:gsub(' ', '_')}) do
-        table.insert(conditions, '[[players_p' .. tostring(1) .. '::' .. name .. ']]')
-        table.insert(conditions, '[[participant::' .. name .. ']]')
-        for i = 2, Config.MAX_NUMBER_OF_PARTICIPANTS do
-            table.insert(conditions, '[[players_p' .. tostring(i) .. '::' .. name .. ']]')
-        end
-        for i = 1, Config.MAX_NUMBER_OF_COACHES do
-            table.insert(conditions, '[[players_c' .. tostring(i) .. '::' .. name .. ']]')
-        end
-    end
+	local conditions = {}
+	for _, name in pairs({person, person:gsub(' ', '_')}) do
+		table.insert(conditions, '[[players_p' .. tostring(1) .. '::' .. name .. ']]')
+		table.insert(conditions, '[[participant::' .. name .. ']]')
+		for i = 2, Config.MAX_NUMBER_OF_PARTICIPANTS do
+			table.insert(conditions, '[[players_p' .. tostring(i) .. '::' .. name .. ']]')
+		end
+		for i = 1, Config.MAX_NUMBER_OF_COACHES do
+			table.insert(conditions, '[[players_c' .. tostring(i) .. '::' .. name .. ']]')
+		end
+	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = Config.PLACEMENT_LIMIT,
