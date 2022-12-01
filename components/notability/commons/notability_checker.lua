@@ -108,6 +108,8 @@ end
 function NotabilityChecker._calculatePersonNotability(person)
 	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person)
 
+	-- Add conditions.
+	-- We check for names with spaces, then names with underscores.
 	local conditions = {}
 	for _, name in pairs({person, person:gsub(' ', '_')}) do
 		table.insert(conditions, '[[participant::' .. name .. ']]')
