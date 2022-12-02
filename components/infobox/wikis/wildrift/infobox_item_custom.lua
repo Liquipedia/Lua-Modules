@@ -63,7 +63,6 @@ function CustomInjector:parse(id, widgets)
 					content = CustomItem._getCostDisplay(),
 					classes = {
 						'infobox-header',
-						'wiki-backgroundcolor-light',
 						'infobox-header-2',
 						'infobox-gold'
 					}

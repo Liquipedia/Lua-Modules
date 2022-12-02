@@ -27,7 +27,6 @@ end
 function Title:_create(infoDescription)
 	local header = mw.html.create('div')
 	header	:addClass('infobox-header')
-			:addClass('wiki-backgroundcolor-light')
 			:addClass('infobox-header-2')
 			:wikitext(infoDescription)
 	return mw.html.create('div'):node(header)

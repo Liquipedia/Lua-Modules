@@ -44,7 +44,7 @@ function Mission:createInfobox()
 		Title{name = 'Mission Information'},
 		Breakdown{
 			content = {'Mission Objective'},
-			classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-3'}
+			classes = {'infobox-header', 'infobox-header-3'}
 		},
 		Breakdown{content = { args.objective }},
 		Customizable{id = 'custom', children = {}},

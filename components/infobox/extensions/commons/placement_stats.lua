@@ -118,7 +118,7 @@ function PlacementStats:_makeTable(data)
 		local div = mw.html.create('div')
 
 		local infoboxHeader = mw.html.create('div')
-		infoboxHeader:attr('class', 'infobox-header wiki-backgroundcolor-light')
+		infoboxHeader:attr('class', 'infobox-header')
 		infoboxHeader:wikitext('Placement Summary')
 
 		div:node(infoboxHeader)
