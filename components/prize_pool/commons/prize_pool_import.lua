@@ -150,15 +150,13 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	local lastPlacement = nil
 	for _, record in ipairs(standingRecords) do
 		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
-			local placement = record.placement
-
 			-- Only discriminate placement in Swiss by series score.
 			if isSwiss then
 				-- We use the previous teams placement, if we have the same series score.
-				placement = (lastEntry and lastEntry.scoreBoard
+				record.placement = (lastEntry and lastEntry.scoreBoard
 					and Table.deepEquals(record.scoreboard.match, lastEntry.scoreBoard.match))
 					and lastPlacement
-					or placement
+					or record.placement
 			end
 
 			local entry = {
@@ -168,7 +166,7 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 			}
 
 			if not record.extradata.placeRange and Logic.readBool(record.extradata.finished) then
-				record.extradata.placeRange = {placement, placement}
+				record.extradata.placeRange = {record.placement, record.placement}
 			end
 			if record.extradata.placeRange and record.extradata.placeRange[1] == record.extradata.placeRange[2] then
 				Table.mergeInto(entry, {
@@ -183,15 +181,15 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 			entry.needsLastVs = needsLastVs
 			entry.matches = record.matches
 
-			if not placementIndexes[placement] then
+			if not placementIndexes[record.placement] then
 				table.insert(placementEntries, {entry})
-				placementIndexes[placement] = #placementEntries
+				placementIndexes[record.placement] = #placementEntries
 			else
-				table.insert(placementEntries[placementIndexes[placement]], entry)
+				table.insert(placementEntries[placementIndexes[record.placement]], entry)
 			end
 
 			lastEntry = entry
-			lastPlacement = placement
+			lastPlacement = record.placement
 		end
 	end
 
