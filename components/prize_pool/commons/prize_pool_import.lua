@@ -147,7 +147,6 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	local placementIndexes = {}
 
 	local lastEntry, lastPlacement
-	local lastPlacement = nil
 	for _, record in ipairs(standingRecords) do
 		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
 			-- Only discriminate placement in Swiss by series score.
