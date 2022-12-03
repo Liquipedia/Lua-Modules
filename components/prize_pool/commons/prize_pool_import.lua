@@ -115,6 +115,10 @@ function Import._importPlacements(inputPlacements)
 	return Import._mergePlacements(placementEntries, inputPlacements)
 end
 
+function Import._isSwissStage(matchGroup)
+	return (matchGroup[1] or {}).type == SWISS_GROUP_TYPE
+end
+
 -- Compute placements and their entries of all brackets or all group tables in a
 -- tournament stage. The placements are ordered from high placement to low.
 function Import._computeStagePlacementEntries(stage, options)
@@ -137,12 +141,26 @@ end
 
 -- Compute placements and their entries from a GroupTableLeague record.
 function Import._computeGroupTablePlacementEntries(standingRecords, options)
+	local isSwiss = Import._isSwissStage(standingRecords)
 	local needsLastVs = Import._needsLastVs(standingRecords)
 	local placementEntries = {}
 	local placementIndexes = {}
 
+	local lastEntry = nil
+	local lastPlacement = nil
 	for _, record in ipairs(standingRecords) do
 		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
+			local placement = record.placement
+
+			-- Only discriminate placement in Swiss by series score.
+			if isSwiss then
+				-- We use the previous teams placement, if we have the same series score.
+				placement = (lastEntry and lastEntry.scoreBoard
+					and Table.deepEquals(record.scoreboard.match, lastEntry.scoreBoard.match))
+					and lastPlacement
+					or placement
+			end
+
 			local entry = {
 				date = record.extradata.enddate and DateExt.toYmdInUtc(record.extradata.enddate),
 				hasDraw = record.hasDraw,
@@ -150,7 +168,7 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 			}
 
 			if not record.extradata.placeRange and Logic.readBool(record.extradata.finished) then
-				record.extradata.placeRange = {record.placement, record.placement}
+				record.extradata.placeRange = {placement, placement}
 			end
 			if record.extradata.placeRange and record.extradata.placeRange[1] == record.extradata.placeRange[2] then
 				Table.mergeInto(entry, {
@@ -165,12 +183,15 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 			entry.needsLastVs = needsLastVs
 			entry.matches = record.matches
 
-			if not placementIndexes[record.placement] then
+			if not placementIndexes[placement] then
 				table.insert(placementEntries, {entry})
-				placementIndexes[record.placement] = #placementEntries
+				placementIndexes[placement] = #placementEntries
 			else
-				table.insert(placementEntries[placementIndexes[record.placement]], entry)
+				table.insert(placementEntries[placementIndexes[placement]], entry)
 			end
+
+			lastEntry = entry
+			lastPlacement = placement
 		end
 	end
 
@@ -180,7 +201,7 @@ end
 function Import._needsLastVs(standingRecords)
 	if Import.config.allGroupsUseWdl then
 		return false
-	elseif (standingRecords[1] or {}).type == SWISS_GROUP_TYPE then
+	elseif Import._isSwissStage(standingRecords) then
 		return true
 	elseif #standingRecords ~= GSL_GROUP_OPPONENT_NUMBER then
 		return false
@@ -362,10 +383,12 @@ end
 
 function Import._mergePlacements(lpdbEntries, placements)
 	for placementIndex, lpdbPlacement in ipairs(lpdbEntries) do
-		placements[placementIndex] = Import._mergePlacement(
-			lpdbPlacement,
-			placements[placementIndex] or Import._emptyPlacement(placements[placementIndex - 1], #lpdbPlacement)
-		)
+		if placements[placementIndex] then
+			placements[placementIndex] = Import._mergePlacement(
+				lpdbPlacement,
+				placements[placementIndex]
+			)
+		end
 	end
 
 	return placements
