@@ -306,7 +306,7 @@ function matchFunctions.getVodStuff(match)
 	match.links = {}
 	local links = match.links
 	if match.reddit then links.reddit = 'https://redd.it/' .. match.reddit end
-	if match.cdl then links.cdl = 'https://callofdutyleague.com/en-us/match/' .. match.cdl end 
+	if match.cdl then links.cdl = 'https://callofdutyleague.com/en-us/match/' .. match.cdl end
 
 	return match
 end
