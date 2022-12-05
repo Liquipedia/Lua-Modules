@@ -84,7 +84,7 @@ function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
 		if not ALLOWED_OPPONENT_TYPES[opponent.type or ''] then
 			error('Unsupported opponent type "' .. (opponent.type or '') .. '"')
 		end
-		opponent.match2players = matchFunctions.getPlayers(record, opponent.type, opponentIndex)
+		opponent.match2players = matchFunctions.readSoloOpponent(record, opponentIndex)
 		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
 			opponent = {type = Opponent.literal, name = 'BYE'}
 		end
@@ -406,8 +406,8 @@ end
 
 -- Get Playerdata from Vars (get's set in TeamCards) for team opponents
 function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
+	-- let's make sure we don't leave any gaps.
+	match['opponent' .. opponentIndex].match2players = {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
@@ -415,28 +415,20 @@ function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
+			table.insert(match['opponent' .. opponentIndex].match2players, player)
 		end
 	end
+
 	return match
 end
 
--- Get Playerdata for non-team opponents
-function matchFunctions.getPlayers(match, opponentType, opponentIndex)
-	local players = {}
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or 'TBD'
-		player.flag = player.flag
-		player.displayname = player.displayname or player.name
-		if Table.isNotEmpty(player) then
-			table.insert(players, player)
-		end
-	end
-
-	return players
+-- Get Playerdata for solo opponents
+function matchFunctions.readSoloOpponent(match, opponentIndex)
+	local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
+	player.name = player.name or 'TBD'
+	player.flag = player.flag
+	player.displayname = player.displayname or player.name
+	return {player}
 end
 
 function CustomMatchGroupInput._playerIsBye(player)
