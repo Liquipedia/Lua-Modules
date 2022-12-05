@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -32,6 +31,7 @@ local ALLOWED_OPPONENT_TYPES = {
 	Opponent.team,
 }
 
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 
 -- containers for process helper functions
@@ -398,7 +398,7 @@ function matchFunctions.getOpponents(match)
 			if opponent.type == Opponent.team then
 				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
 			end
-			
+
 			-- apply status
 			if Logic.isNumeric(opponent.score) then
 				opponent.status = 'S'
