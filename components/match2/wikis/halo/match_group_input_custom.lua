@@ -26,11 +26,6 @@ local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
 local MATCH_BYE = {'bye', 'BYE'}
 
-local ALLOWED_OPPONENT_TYPES = {
-	Opponent.solo,
-	Opponent.team,
-}
-
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 
@@ -89,7 +84,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 			_EPOCH_TIME_EXTENDED
 		)
 	end
-	Opponent.resolve(opponent, date)
+	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
