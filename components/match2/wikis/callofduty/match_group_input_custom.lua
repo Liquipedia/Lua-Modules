@@ -283,7 +283,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
+			date = mw.getContentLanguage():formatDate('c', EPOCH_TIME),
 			dateexact = false,
 		}
 	end
@@ -302,7 +302,7 @@ function matchFunctions.getVodStuff(match)
 	match.links = {}
 	local links = match.links
 	if match.reddit then links.reddit = 'https://redd.it/' .. match.reddit end
-	if match.cdl then links.cdl = 'https://callofdutyleague.com/en-us/match/' .. match.cdl end 
+	if match.cdl then links.cdl = 'https://callofdutyleague.com/en-us/match/' .. match.cdl end
 
 	return match
 end
@@ -425,7 +425,7 @@ end
 -- Get Playerdata for non-team opponents
 function matchFunctions.getPlayers(match, opponentType, opponentIndex)
 	local players = {}
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
+	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or 'TBD'
