@@ -424,7 +424,7 @@ end
 
 -- Get Playerdata for solo opponents
 function matchFunctions.readSoloOpponent(match, opponentIndex)
-	local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
+	local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p1']) or {}
 	player.name = player.name or 'TBD'
 	player.flag = player.flag
 	player.displayname = player.displayname or player.name
