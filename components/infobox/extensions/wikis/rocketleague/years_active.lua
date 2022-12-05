@@ -64,7 +64,7 @@ end
 
 function CustomActiveYears._getBroadcaster(conditions)
 	-- Get years
-	years = CustomActiveYears._getYearsBroadcast(conditions)
+	local years = CustomActiveYears._getYearsBroadcast(conditions)
 	if Table.isEmpty(years) then
 		return
 	end
