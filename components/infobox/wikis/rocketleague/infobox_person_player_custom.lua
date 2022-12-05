@@ -14,7 +14,7 @@ local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local YearsActive = require('Module:YearsActive')
+local YearsActive = Lua.import('Module:YearsActive', {requireDevIfEnabled = true})
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
@@ -56,25 +56,52 @@ function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		local statusContents = CustomPlayer._getStatusContents()
 
+		-- Years Active (Player)
 		local yearsActive = _args.years_active
 		if String.isEmpty(yearsActive) then
 			yearsActive = YearsActive.get({player = _base_page_name})
+		elseif yearsActive == 'hide' then
+			yearsActive = nil
 		else
 			yearsActive = Page.makeInternalLink({onlyIfExists = true}, yearsActive)
 		end
 
-		local yearsActiveOrg = _args.years_active_manage
-		if not String.isEmpty(yearsActiveOrg) then
-			yearsActiveOrg = Page.makeInternalLink({onlyIfExists = true}, yearsActiveOrg)
+		-- Years Active (Coach)
+		local yearsActiveCoach = _args.years_active_coach
+		if String.isEmpty(yearsActiveCoach) then
+			yearsActiveCoach = YearsActive.get({player = _base_page_name, prefix = 'c'})
+		elseif yearsActiveCoach == 'hide' then
+			yearsActiveCoach = nil
+		else
+			yearsActiveCoach = Page.makeInternalLink({onlyIfExists = true}, yearsActiveCoach)
+		end
+
+		-- Years Active (Talent)
+		local yearsActiveTalent = _args.years_active_talent
+		if String.isEmpty(yearsActiveTalent) then
+			yearsActiveTalent = YearsActive.getTalent(_base_page_name)
+		elseif yearsActiveTalent == 'hide' then
+			yearsActiveTalent = nil
+		else
+			yearsActiveTalent = Page.makeInternalLink({onlyIfExists = true}, yearsActiveTalent)
+		end
+
+		-- Years Active (Observer)
+		local yearsActiveObserver = _args.years_active_observer
+		if String.isEmpty(yearsActiveObserver) then
+			yearsActiveObserver = YearsActive.getObserver(_base_page_name)
+		elseif yearsActiveObserver == 'hide' then
+			yearsActiveObserver = nil
+		else
+			yearsActiveObserver = Page.makeInternalLink({onlyIfExists = true}, yearsActiveObserver)
 		end
 
 		return {
 			Cell{name = 'Status', content = statusContents},
 			Cell{name = 'Years Active (Player)', content = {yearsActive}},
-			Cell{name = 'Years Active (Org)', content = {yearsActiveOrg}},
-			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
-			Cell{name = 'Years Active (Analyst)', content = {_args.years_active_analyst}},
-			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
+			Cell{name = 'Years Active (Coach)', content = {yearsActiveCoach}},
+			Cell{name = 'Years Active (Talent)', content = {yearsActiveTalent}},
+			Cell{name = 'Years Active (Observer)', content = {yearsActiveObserver}},
 		}
 	elseif id == 'history' then
 		if not String.isEmpty(_args.history_iwo) then

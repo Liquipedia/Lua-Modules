@@ -62,9 +62,16 @@ function ActiveYears.display(args)
 		error('"playerPositionLimit" has to be >= 1')
 	end
 
+	-- Build conditions
 	local conditions = ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, args.mode)
 
-	return ActiveYears._calculate(conditions)
+	-- Get years
+	local years = ActiveYears._getYears(conditions)
+	if Table.isEmpty(years) then
+		return 'Player has no results.'
+	end
+
+	return ActiveYears._calculate(years)
 end
 
 function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, mode)
@@ -97,13 +104,7 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 	return conditionTree:toString() .. ActiveYears.additionalConditions
 end
 
-function ActiveYears._calculate(conditions)
-	local years = ActiveYears._getYears(conditions)
-
-	if Table.isEmpty(years) then
-		return 'Player has no results.'
-	end
-
+function ActiveYears._calculate(years)
 	-- Sort years chronologically
 	table.sort(years)
 
