@@ -90,6 +90,7 @@ function CustomSquad.runAuto(playerList, squadType)
 
 		player.link = player.page
 		player.role = player.thisTeam.role
+		player.position = player.thisTeam.position
 		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
 
 		player.newteam = player.newTeam.team
