@@ -425,7 +425,7 @@ end
 -- Get Playerdata for non-team opponents
 function matchFunctions.getPlayers(match, opponentType, opponentIndex)
 	local players = {}
-	for playerIndex = 1, _CONVERT_TYPE_TO_PLAYER_NUMBER[opponentType] do
+	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or 'TBD'
