@@ -69,28 +69,26 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
+function CustomMatchGroupInput.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
-	-- Retrieve icon for teams and do tbd checks
-	if opponent.type == Opponent.team then
-		if opponent.template:lower() == MATCH_BYE then
-			opponent = {type = Opponent.literal, name = MATCH_BYE}
-		else
-			opponent.icon = opponentFunctions.getIcon(opponent.template)
-		end
-	elseif opponent.type ~= Opponent.literal then
-		if not ALLOWED_OPPONENT_TYPES[opponent.type or ''] then
-			error('Unsupported opponent type "' .. (opponent.type or '') .. '"')
-		end
-		opponent.match2players = matchFunctions.getPlayers(record, opponent.type, opponentIndex)
-		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
-			opponent = {type = Opponent.literal, name = MATCH_BYE}
-		end
-
+	-- Convert byes to literals
+	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
+	local teamTemplateDate = date
+	-- If date if epoch, resolve using tournament dates instead
+	-- Epoch indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+		teamTemplateDate = Variables.varDefaultMulti(
+			'tournament_enddate',
+			'tournament_startdate',
+			_EPOCH_TIME_EXTENDED
+		)
+	end
 	Opponent.resolve(opponent, date)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
@@ -396,6 +394,11 @@ function matchFunctions.getOpponents(match)
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
+			-- Retrieve icon for team
+			if opponent.type == Opponent.team then
+				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
+			end
+			
 			-- apply status
 			if Logic.isNumeric(opponent.score) then
 				opponent.status = 'S'
