@@ -43,6 +43,8 @@ end
 
 function Currency.display(currencyCode, prizeValue, options)
 	options = options or {}
+	options.symbol = Logic.emptyOr(options.symbol, true)
+	options.abbreviation = Logic.emptyOr(options.abbreviation, true)
 
 	local currencyData = Currency.raw(currencyCode)
 
