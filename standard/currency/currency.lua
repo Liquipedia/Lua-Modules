@@ -69,12 +69,12 @@ function Currency.display(currencyCode, prizeValue, options)
 		Variables.varDefine('localcurrencysymbolafter', currencySuffix)
 	end
 
-	if (not options.noAbbreviation) and currencyData.symbol.text == currencyData.code then
-		options.noSymbol = true
+	if options.abbreviation and currencyData.symbol.text == currencyData.code then
+		options.symbol = false
 	end
 
 	local prizeDisplay = ''
-	if not options.noSymbol then
+	if options.symbol then
 		prizeDisplay = prizeDisplay .. currencyPrefix
 	end
 	if prizeValue then
@@ -83,10 +83,10 @@ function Currency.display(currencyCode, prizeValue, options)
 		end
 		prizeDisplay = prizeDisplay .. prizeValue
 	end
-	if not options.noSymbol then
+	if options.symbol then
 		prizeDisplay = prizeDisplay .. currencySuffix
 	end
-	if not options.noAbbreviation then
+	if options.abbreviation then
 		prizeDisplay = prizeDisplay .. (prizeDisplay ~= '' and NON_BREAKING_SPACE or '') .. currencyAbbreviation
 	end
 

@@ -197,7 +197,7 @@ PrizePool.prizeTypes = {
 			if data > 0 then
 				return TableCell{content = {
 					Currency.display(headerData.currency, data,
-					{formatValue = true, formatPrecision = headerData.roundPrecision, noAbbreviation = true})}}
+					{formatValue = true, formatPrecision = headerData.roundPrecision, abbreviation = false})}}
 			end
 		end,
 
@@ -589,7 +589,7 @@ end
 
 function PrizePool:_currencyExchangeInfo()
 	if self.usedAutoConvertedCurrency then
-		local currencyText = Currency.display(BASE_CURRENCY, nil, {noSymbol = true})
+		local currencyText = Currency.display(BASE_CURRENCY, nil, {symbol = false})
 		local exchangeProvider = Abbreviation.make('exchange rate', Variables.varDefault('tournament_currency_text'))
 
 		if not exchangeProvider then
