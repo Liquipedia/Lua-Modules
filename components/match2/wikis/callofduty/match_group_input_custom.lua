@@ -425,7 +425,7 @@ end
 -- Get Playerdata for solo opponents
 function matchFunctions.readSoloOpponent(opponent)
 	local name = opponent.name or opponent[1] or 'TBD'
-	
+
 	return {{
 		name = name,
 		flag = opponent.flag,
