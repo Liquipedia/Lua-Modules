@@ -447,6 +447,7 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 		if not Table.isEmpty(player) then
 			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
 		end
