@@ -46,13 +46,15 @@ function CustomActiveYears.get(input)
 end
 
 function CustomActiveYears.getTalent(talent)
-	local conditions = CustomActiveYears._getBroadcastConditions(talent, _TALENT_POSITIONS)
-	return CustomActiveYears._getBroadcaster(conditions)
+	return CustomActiveYears._getBroadcaster(
+		CustomActiveYears._getBroadcastConditions(talent, _TALENT_POSITIONS)
+	)
 end
 
 function CustomActiveYears.getObserver(observer)
-	local conditions = CustomActiveYears._getBroadcastConditions(observer, _OBSERVER_POSITIONS)
-	return CustomActiveYears._getBroadcaster(conditions)
+	return CustomActiveYears._getBroadcaster(
+		CustomActiveYears._getBroadcastConditions(observer, _OBSERVER_POSITIONS)
+	)
 end
 
 function CustomActiveYears._getBroadcastConditions(broadcaster, positions)
