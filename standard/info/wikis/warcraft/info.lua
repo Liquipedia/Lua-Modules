@@ -10,6 +10,6 @@ return {
 	startYear = 2002,
 	wikiName = 'warcraft',
 	name = 'Warcraft',
-	defaultTeamLogo = 'Warcraft_III_logo.png',
-	defaultTeamLogoDark = 'Warcraft_III_logo.png',
+	defaultTeamLogo = 'Warcraft_III_logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Warcraft_III_logo.png', ---@deprecated
 }

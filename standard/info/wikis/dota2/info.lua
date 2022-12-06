@@ -10,6 +10,6 @@ return {
 	startYear = 2011,
 	wikiName = 'dota2',
 	name = 'Dota 2',
-	defaultTeamLogo = 'Dota2_logo.png',
-	defaultTeamLogoDark = 'Dota2_logo.png',
+	defaultTeamLogo = 'Dota2_logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Dota2_logo.png', ---@deprecated
 }

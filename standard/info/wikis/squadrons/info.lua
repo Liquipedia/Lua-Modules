@@ -10,6 +10,6 @@ return {
 	startYear = 2020,
 	wikiName = 'squadrons',
 	name = 'Star Wars: Squadrons',
-	defaultTeamLogo = 'Star Wars Squadrons allmode.png',
-	defaultTeamLogoDark = 'Star Wars Squadrons allmode.png',
+	defaultTeamLogo = 'Star Wars Squadrons allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Star Wars Squadrons allmode.png', ---@deprecated
 }

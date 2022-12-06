@@ -10,6 +10,6 @@ return {
 	startYear = 1996,
 	wikiName = 'pokemon',
 	name = 'Pokémon',
-	defaultTeamLogo = 'Pokemon logo std.png',
-	defaultTeamLogoDark = 'Pokemon logo std.png',
+	defaultTeamLogo = 'Pokemon logo std.png', ---@deprecated
+	defaultTeamLogoDark = 'Pokemon logo std.png', ---@deprecated
 }

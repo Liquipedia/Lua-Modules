@@ -10,6 +10,6 @@ return {
 	startYear = 2000,
 	wikiName = 'fifa',
 	name = 'FIFA',
-	defaultTeamLogo = 'FIFA lightmode logo.png',
-	defaultTeamLogoDark = 'FIFA darkmode logo.png',
+	defaultTeamLogo = 'FIFA lightmode logo.png', ---@deprecated
+	defaultTeamLogoDark = 'FIFA darkmode logo.png', ---@deprecated
 }

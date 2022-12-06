@@ -10,6 +10,6 @@ return {
 	startYear = 2016,
 	wikiName = 'paladins',
 	name = 'Paladins',
-	defaultTeamLogo = 'Paladins_allmode.png',
-	defaultTeamLogoDark = 'Paladins_allmode.png',
+	defaultTeamLogo = 'Paladins_allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Paladins_allmode.png', ---@deprecated
 }

@@ -10,6 +10,6 @@ return {
 	startYear = 2003,
 	wikiName = 'halo',
 	name = 'Halo',
-	defaultTeamLogo = 'Halo allmode.png',
-	defaultTeamLogoDark = 'Halo allmode.png',
+	defaultTeamLogo = 'Halo allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Halo allmode.png', ---@deprecated
 }

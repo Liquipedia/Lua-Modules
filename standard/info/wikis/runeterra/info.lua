@@ -10,6 +10,6 @@ return {
 	startYear = 2020,
 	wikiName = 'runeterra',
 	name = 'Legends of Runeterra',
-	defaultTeamLogo = 'Legends_of_Runeterra_logo.png',
-	defaultTeamLogoDark = 'Legends_of_Runeterra_logo.png',
+	defaultTeamLogo = 'Legends_of_Runeterra_logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Legends_of_Runeterra_logo.png', ---@deprecated
 }

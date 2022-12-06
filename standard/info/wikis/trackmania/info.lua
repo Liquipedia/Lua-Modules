@@ -10,6 +10,6 @@ return {
 	startYear = 2006,
 	wikiName = 'trackmania',
 	name = 'Trackmania',
-	defaultTeamLogo = 'Trackmania_logo_lightmode.png',
-	defaultTeamLogoDark = 'Trackmania_logo_darkmode.png',
+	defaultTeamLogo = 'Trackmania_logo_lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Trackmania_logo_darkmode.png', ---@deprecated
 }

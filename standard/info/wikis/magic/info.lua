@@ -10,6 +10,6 @@ return {
 	startYear = 1993,
 	wikiName = 'magic',
 	name = 'Magic: The Gathering',
-	defaultTeamLogo = 'Liquipedia_logo.png',
-	defaultTeamLogoDark = 'Liquipedia_logo.png',
+	defaultTeamLogo = 'Liquipedia_logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Liquipedia_logo.png', ---@deprecated
 }

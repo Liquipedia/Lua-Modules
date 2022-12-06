@@ -10,8 +10,8 @@ return {
 	startYear = 2010,
 	wikiName = 'starcraft2',
 	name = 'StarCraft II',
-	defaultTeamLogo = 'StarCraft_2_Default_logo.png',
-	defaultTeamLogoDark = 'StarCraft_2_Default_logo.png',
+	defaultTeamLogo = 'StarCraft_2_Default_logo.png', ---@deprecated
+	defaultTeamLogoDark = 'StarCraft_2_Default_logo.png', ---@deprecated
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 }

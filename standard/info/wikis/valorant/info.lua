@@ -10,6 +10,6 @@ return {
 	startYear = 2020,
 	wikiName = 'valorant',
 	name = 'VALORANT',
-	defaultTeamLogo = 'VALORANT allmode.png',
-	defaultTeamLogoDark = 'VALORANT allmode.png',
+	defaultTeamLogo = 'VALORANT allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'VALORANT allmode.png', ---@deprecated
 }

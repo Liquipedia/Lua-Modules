@@ -10,8 +10,8 @@ return {
 	startYear = 2018,
 	wikiName = 'fortnite',
 	name = 'Fortnite',
-	defaultTeamLogo = 'Fortnite logo.png',
-	defaultTeamLogoDark = 'Fortnite logo.png',
+	defaultTeamLogo = 'Fortnite logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Fortnite logo.png', ---@deprecated
 	opponentLibrary = 'Opponent/Custom',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

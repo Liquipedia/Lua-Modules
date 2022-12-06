@@ -10,6 +10,6 @@ return {
 	startYear = 2015,
 	wikiName = 'splatoon',
 	name = 'Splatoon',
-	defaultTeamLogo = 'Splatoon default allmode.png',
-	defaultTeamLogoDark = 'Splatoon default allmode.png',
+	defaultTeamLogo = 'Splatoon default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Splatoon default allmode.png', ---@deprecated
 }

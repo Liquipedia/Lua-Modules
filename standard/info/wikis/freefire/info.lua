@@ -10,6 +10,6 @@ return {
 	startYear = 2017,
 	wikiName = 'freefire',
 	name = 'Free Fire',
-	defaultTeamLogo = 'Freefire_Default_Logo.png',
-	defaultTeamLogoDark = 'Freefire_Default_Logo.png',
+	defaultTeamLogo = 'Freefire_Default_Logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Freefire_Default_Logo.png', ---@deprecated
 }

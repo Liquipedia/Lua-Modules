@@ -10,7 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'rocketleague',
 	name = 'Rocket League',
-	defaultTeamLogo = 'Rocket_League.png',
-	defaultTeamLogoDark = 'Rocket_League.png',
+	defaultTeamLogo = 'Rocket_League.png', ---@deprecated
+	defaultTeamLogoDark = 'Rocket_League.png', ---@deprecated
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

@@ -10,6 +10,6 @@ return {
 	startYear = 2020,
 	wikiName = 'wildrift',
 	name = 'Wild Rift',
-	defaultTeamLogo = 'Wild Rift Teamcard.png',
-	defaultTeamLogoDark = 'Wild Rift Teamcard.png',
+	defaultTeamLogo = 'Wild Rift Teamcard.png', ---@deprecated
+	defaultTeamLogoDark = 'Wild Rift Teamcard.png', ---@deprecated
 }

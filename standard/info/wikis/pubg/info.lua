@@ -10,6 +10,6 @@ return {
 	startYear = 2017,
 	wikiName = 'pubg',
 	name = 'PUBG',
-	defaultTeamLogo = 'PUBG_Default_logo.png',
-	defaultTeamLogoDark = 'PUBG_Default_logo.png',
+	defaultTeamLogo = 'PUBG_Default_logo.png', ---@deprecated
+	defaultTeamLogoDark = 'PUBG_Default_logo.png', ---@deprecated
 }

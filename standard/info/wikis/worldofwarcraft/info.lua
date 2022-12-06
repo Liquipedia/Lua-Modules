@@ -10,6 +10,6 @@ return {
 	startYear = 2007,
 	wikiName = 'worldofwarcraft',
 	name = 'World of Warcraft Wiki',
-	defaultTeamLogo = 'WoWlogo_Default_allmode.png',
-	defaultTeamLogoDark = 'WoWlogo_Default_allmode.png',
+	defaultTeamLogo = 'WoWlogo_Default_allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'WoWlogo_Default_allmode.png', ---@deprecated
 }

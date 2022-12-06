@@ -10,6 +10,6 @@ return {
 	startYear = 2016,
 	wikiName = 'clashroyale',
 	name = 'Clash Royale',
-	defaultTeamLogo = 'Clash Royale.png',
-	defaultTeamLogoDark = 'Clash Royale.png',
+	defaultTeamLogo = 'Clash Royale.png', ---@deprecated
+	defaultTeamLogoDark = 'Clash Royale.png', ---@deprecated
 }

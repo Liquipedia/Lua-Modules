@@ -10,6 +10,6 @@ return {
 	startYear = 2009,
 	wikiName = 'leagueoflegends',
 	name = 'League of Legends',
-	defaultTeamLogo = 'League of Legends allmode.png',
-	defaultTeamLogoDark = 'League of Legends allmode.png',
+	defaultTeamLogo = 'League of Legends allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'League of Legends allmode.png', ---@deprecated
 }

@@ -10,6 +10,6 @@ return {
 	startYear = 2019,
 	wikiName = 'simracing',
 	name = 'Sim Racing',
-	defaultTeamLogo = 'Sim_Racing_default_lightmode.png',
-	defaultTeamLogoDark = 'Sim_Racing_default_darkmode.png',
+	defaultTeamLogo = 'Sim_Racing_default_lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Sim_Racing_default_darkmode.png', ---@deprecated
 }

@@ -10,6 +10,6 @@ return {
 	startYear = 2007,
 	wikiName = 'teamfortress',
 	name = 'Team Fortress',
-	defaultTeamLogo = 'Team_Fortress_logo.png',
-	defaultTeamLogoDark = 'Team_Fortress_logo.png',
+	defaultTeamLogo = 'Team_Fortress_logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Team_Fortress_logo.png', ---@deprecated
 }

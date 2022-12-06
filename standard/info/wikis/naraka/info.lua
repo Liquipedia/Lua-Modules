@@ -10,6 +10,6 @@ return {
 	startYear = 2021,
 	wikiName = 'naraka',
 	name = 'Naraka: Bladepoint',
-	defaultTeamLogo = 'NARAKA lightmode.png',
-	defaultTeamLogoDark = 'NARAKA darkmode.png',
+	defaultTeamLogo = 'NARAKA lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'NARAKA darkmode.png', ---@deprecated
 }

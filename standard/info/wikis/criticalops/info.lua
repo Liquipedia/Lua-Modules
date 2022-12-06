@@ -10,6 +10,6 @@ return {
 	startYear = 2015,
 	wikiName = 'criticalops',
 	name = 'Critical Ops',
-	defaultTeamLogo = 'Critical Ops allmode.png',
-	defaultTeamLogoDark = 'Critical Ops allmode.png',
+	defaultTeamLogo = 'Critical Ops allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Critical Ops allmode.png', ---@deprecated
 }

@@ -10,6 +10,6 @@ return {
 	startYear = 2014,
 	wikiName = 'heroes',
 	name = 'Heroes of the Storm',
-	defaultTeamLogo = 'Hots_logo.png',
-	defaultTeamLogoDark = 'Hots_logo.png',
+	defaultTeamLogo = 'Hots_logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Hots_logo.png', ---@deprecated
 }

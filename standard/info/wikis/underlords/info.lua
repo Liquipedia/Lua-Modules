@@ -10,6 +10,6 @@ return {
 	startYear = 2019,
 	wikiName = 'underlords',
 	name = 'Dota Underlords',
-	defaultTeamLogo = 'Dota_Underlords_lightmode.png',
-	defaultTeamLogoDark = 'Dota_Underlords_darkmode.png',
+	defaultTeamLogo = 'Dota_Underlords_lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Dota_Underlords_darkmode.png', ---@deprecated
 }

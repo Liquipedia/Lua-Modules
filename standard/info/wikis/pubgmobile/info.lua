@@ -10,6 +10,6 @@ return {
 	startYear = 2018,
 	wikiName = 'pubgmobile',
 	name = 'PUBG Mobile',
-	defaultTeamLogo = 'PUBG Mobile Default logo allmode.png',
-	defaultTeamLogoDark = 'PUBG Mobile Default logo allmode.png',
+	defaultTeamLogo = 'PUBG Mobile Default logo allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'PUBG Mobile Default logo allmode.png', ---@deprecated
 }
