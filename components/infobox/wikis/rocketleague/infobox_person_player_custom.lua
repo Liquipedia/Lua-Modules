@@ -76,16 +76,12 @@ function CustomInjector:parse(id, widgets)
 		local yearsActiveTalent = CustomInjector:_parseActive(
 			_args.years_active_talent, YearsActive.getTalent, _base_page_name
 		)
-		local yearsActiveObserver = CustomInjector:_parseActive(
-			_args.years_active_observer, YearsActive.getObserver, _base_page_name
-		)
 
 		return {
 			Cell{name = 'Status', content = statusContents},
 			Cell{name = 'Years Active (Player)', content = {yearsActive}},
 			Cell{name = 'Years Active (Coach)', content = {yearsActiveCoach}},
 			Cell{name = 'Years Active (Talent)', content = {yearsActiveTalent}},
-			Cell{name = 'Years Active (Observer)', content = {yearsActiveObserver}},
 		}
 	elseif id == 'history' then
 		if not String.isEmpty(_args.history_iwo) then

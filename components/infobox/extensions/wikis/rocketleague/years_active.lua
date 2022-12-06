@@ -37,12 +37,6 @@ local _TALENT_POSITIONS = {
 	'Stage Host',
 }
 
-local _OBSERVER_POSITIONS = {
-	'Observer',
-	'Observer/Producer',
-	'Producer/Observer',
-}
-
 -- legacy entry point
 function CustomActiveYears.get(input)
 	-- if invoked directly input == args
@@ -55,12 +49,6 @@ end
 function CustomActiveYears.getTalent(talent)
 	return CustomActiveYears._getBroadcaster(
 		CustomActiveYears._getBroadcastConditions(talent, _TALENT_POSITIONS)
-	)
-end
-
-function CustomActiveYears.getObserver(observer)
-	return CustomActiveYears._getBroadcaster(
-		CustomActiveYears._getBroadcastConditions(observer, _OBSERVER_POSITIONS)
 	)
 end
 
