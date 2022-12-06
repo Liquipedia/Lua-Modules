@@ -83,10 +83,7 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 	local conditionTree = ConditionTree(BooleanOperator.all):add({
 		playerConditionTree,
 		ConditionNode(ColumnName('date'), Comparator.neq, _DEFAULT_DATE),
-		ConditionTree(BooleanOperator.any):add({
-			ConditionNode(ColumnName('date_year'), Comparator.gt, ActiveYears.startYear),
-			ConditionNode(ColumnName('date_year'), Comparator.eq, ActiveYears.startYear),
-		}),
+		ConditionNode(ColumnName('date_year'), Comparator.gt, ActiveYears.startYear - 1),
 	})
 
 	if String.isNotEmpty(mode) then

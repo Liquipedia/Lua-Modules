@@ -12,6 +12,13 @@ local Lua = require('Module:Lua')
 local Set = require('Module:Set')
 local Table = require('Module:Table')
 
+local Condition = require('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
 local CustomActiveYears = Lua.import('Module:YearsActive/Base', {requireDevIfEnabled = true})
 
 -- wiki specific settings
@@ -61,13 +68,20 @@ function CustomActiveYears._getBroadcastConditions(broadcaster, positions)
 	broadcaster = mw.ext.TeamLiquidIntegration.resolve_redirect(broadcaster)
 
 	-- Add a condition for each broadcaster position
-	local conditions = {}
+	local positionTree = ConditionTree(BooleanOperator.any)
 	for _, position in pairs(positions) do
-		table.insert(conditions, '[[position' .. '::' .. position .. ']]')
+		positionTree:add(
+			ConditionNode(ColumnName('position'), Comparator.eq, position)
+		)
 	end
 
-	return '[[page::' .. broadcaster .. ']] AND [[date::!1970-01-01 00:00:00]]' ..
-		' AND (' .. table.concat(conditions, ' OR ') .. ')'
+	local tree = ConditionTree(BooleanOperator.all):add({
+		ConditionNode(ColumnName('page'), Comparator.eq, broadcaster),
+		ConditionNode(ColumnName('date_year'), Comparator.gt, CustomActiveYears.startYear - 1),
+		positionTree,
+	})
+
+	return tree:toString()
 end
 
 function CustomActiveYears._getBroadcaster(conditions)
@@ -90,7 +104,7 @@ function CustomActiveYears._getYearsBroadcast(conditions)
 	local queryParameters = {
 		conditions = conditions,
 		order = 'date asc',
-		query = 'date, pagename',
+		query = 'date',
 	}
 	Lpdb.executeMassQuery('broadcasters', queryParameters, checkYear)
 
