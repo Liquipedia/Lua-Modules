@@ -52,49 +52,25 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
+function CustomInjector:_parseActive(yearsActive, get, get_arg)
+	if String.isEmpty(yearsActive) then
+		return get(get_arg)
+	elseif yearsActive == 'hide' then
+		return nil
+	else
+		return Page.makeInternalLink({onlyIfExists = true}, yearsActive)
+	end
+end
+
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		local statusContents = CustomPlayer._getStatusContents()
 
-		-- Years Active (Player)
-		local yearsActive = _args.years_active
-		if String.isEmpty(yearsActive) then
-			yearsActive = YearsActive.get({player = _base_page_name})
-		elseif yearsActive == 'hide' then
-			yearsActive = nil
-		else
-			yearsActive = Page.makeInternalLink({onlyIfExists = true}, yearsActive)
-		end
-
-		-- Years Active (Coach)
-		local yearsActiveCoach = _args.years_active_coach
-		if String.isEmpty(yearsActiveCoach) then
-			yearsActiveCoach = YearsActive.get({player = _base_page_name, prefix = 'c'})
-		elseif yearsActiveCoach == 'hide' then
-			yearsActiveCoach = nil
-		else
-			yearsActiveCoach = Page.makeInternalLink({onlyIfExists = true}, yearsActiveCoach)
-		end
-
-		-- Years Active (Talent)
-		local yearsActiveTalent = _args.years_active_talent
-		if String.isEmpty(yearsActiveTalent) then
-			yearsActiveTalent = YearsActive.getTalent(_base_page_name)
-		elseif yearsActiveTalent == 'hide' then
-			yearsActiveTalent = nil
-		else
-			yearsActiveTalent = Page.makeInternalLink({onlyIfExists = true}, yearsActiveTalent)
-		end
-
-		-- Years Active (Observer)
-		local yearsActiveObserver = _args.years_active_observer
-		if String.isEmpty(yearsActiveObserver) then
-			yearsActiveObserver = YearsActive.getObserver(_base_page_name)
-		elseif yearsActiveObserver == 'hide' then
-			yearsActiveObserver = nil
-		else
-			yearsActiveObserver = Page.makeInternalLink({onlyIfExists = true}, yearsActiveObserver)
-		end
+		-- Years active
+		local yearsActive = _parseActive(_args.years_active, YearsActive.get, {player = _base_page_name})
+		local yearsActiveCoach = _parseActive(_args.years_active_coach, YearsActive.get, {player = _base_page_name, prefix = 'c'})
+		local yearsActiveTalent = _parseActive(_args.years_active_talent, YearsActive.getTalent, _base_page_name)
+		local yearsActiveObserver = _parseActive(_args.years_active_observer, YearsActive.getObserver, _base_page_name)
 
 		return {
 			Cell{name = 'Status', content = statusContents},
