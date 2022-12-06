@@ -164,7 +164,8 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	local baseCurrencyPrize = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
 
 	newData.date = slot.date
-	newData[baseCurrencyPrize] = (slot[baseCurrencyPrize] and slot[baseCurrencyPrize] ~= '0') and slot[baseCurrencyPrize] or nil
+	newData[baseCurrencyPrize] = (slot[baseCurrencyPrize] and slot[baseCurrencyPrize] ~= '0') and slot[baseCurrencyPrize]
+		or nil
 
 	local opponentsInSlot = #slot
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
