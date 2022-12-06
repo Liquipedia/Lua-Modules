@@ -9,775 +9,839 @@
 return {
 	aed = {
 		code = 'AED',
-		symbol = 'د.إ',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = 'د.إ&nbsp;<abbr title="Emirati Dirham">AED</abbr>',
+		name = 'Emirati Dirham',
+		symbol = {
+			hasSpace = false,
+			isAfter = true,
+			text = 'د.إ',
 		},
 	},
 	ars = {
 		code = 'ARS',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Argentine peso">ARS</abbr>',
+		name = 'Argentine peso',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	aud = {
 		code = 'AUD',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Australian Dollar">AUD</abbr>',
+		name = 'Australian Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	azn = {
 		code = 'AZN',
-		symbol = '₼',
-		text = {
-			prefix = '₼',
-			suffix = '&nbsp;<abbr title="Azerbaijani manat">AZN</abbr>',
+		name = 'Azerbaijani manat',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₼',
 		},
 	},
 	bam = {
 		code = 'BAM',
-		symbol = 'KM',
-		text = {
-			prefix = 'KM',
-			suffix = '&nbsp;<abbr title="Bosnian Convertible Mark">BAM</abbr>',
+		name = 'Bosnian Convertible Mark',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'KM',
 		},
 	},
 	bdt = {
 		code = 'BDT',
-		symbol = '৳',
-		text = {
-			prefix = '৳',
-			suffix = '&nbsp;<abbr title="Bangladeshi taka">BDT</abbr>',
+		name = 'Bangladeshi taka',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '৳',
 		},
 	},
 	bgn = {
 		code = 'BGN',
-		symbol = ' лв.',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;лв.&nbsp;<abbr title="Bulgarian Lev">BGN</abbr>',
+		name = 'Bulgarian Lev',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'лв.',
 		},
 	},
 	bnd = {
 		code = 'BND',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Brunei Dollar">BND</abbr>',
+		name = 'Brunei Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	bob = {
 		code = 'BOB',
-		symbol = 'Bs',
-		text = {
-			prefix = 'Bs',
-			suffix = '&nbsp;<abbr title="Bolivian Boliviano">BOB</abbr>',
+		name = 'Bolivian Boliviano',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'Bs',
 		},
 	},
 	brl = {
 		code = 'BRL',
-		symbol = 'R$',
-		text = {
-			prefix = 'R$',
-			suffix = '&nbsp;<abbr title="Brazilian Real">BRL</abbr>',
+		name = 'Brazilian Real',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'R$',
 		},
 	},
 	byn = {
 		code = 'BYN',
-		symbol = ' Br',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;Br&nbsp;<abbr title="Belarusian Ruble">BYN</abbr>',
+		name = 'Belarusian Ruble',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'Br',
 		},
 	},
 	byr = {
 		code = 'BYR',
-		symbol = ' Br',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;Br&nbsp;<abbr title="Belarusian Ruble">BYR</abbr>',
+		name = 'Belarusian Ruble',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'Br',
 		},
 	},
 	cad = {
 		code = 'CAD',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Canadian Dollar">CAD</abbr>',
+		name = 'Canadian Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	chf = {
 		code = 'CHF',
-		symbol = ' CHF',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;<abbr title="Swiss franc">CHF</abbr>',
+		name = 'Swiss franc',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'CHF',
 		},
 	},
 	clp = {
 		code = 'CLP',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Chilean Peso">CLP</abbr>',
+		name = 'Chilean Peso',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	cny = {
 		code = 'CNY',
-		symbol = '¥',
-		text = {
-			prefix = '¥',
-			suffix = '&nbsp;<abbr title="Chinese Yuan Renminbi">CNY</abbr>',
+		name = 'Chinese Yuan Renminbi',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '¥',
 		},
 	},
 	cop = {
 		code = 'COP',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Colombian Peso">COP</abbr>',
+		name = 'Colombian Peso',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	crc = {
 		code = 'CRC',
-		symbol = '¢',
-		text = {
-			prefix = '¢',
-			suffix = '&nbsp;<abbr title="Costa Rican Colón">CRC</abbr>',
+		name = 'Costa Rican Colón',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '¢',
 		},
 	},
 	cup = {
 		code = 'CUP',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Cuban Peso">CUP</abbr>',
+		name = 'Cuban Peso',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	czk = {
 		code = 'CZK',
-		symbol = ' Kč',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;Kč&nbsp;<abbr title="Czech koruna">CZK</abbr>',
+		name = 'Czech koruna',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'Kč',
 		},
 	},
 	dkk = {
 		code = 'DKK',
-		symbol = ' kr',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;kr&nbsp;<abbr title="Danish krone">DKK</abbr>',
+		name = 'Danish krone',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'kr',
 		},
 	},
 	dop = {
 		code = 'DOP',
-		symbol = ' RD$',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;RD$&nbsp;<abbr title="Dominican Peso">DOP</abbr>',
+		name = 'Dominican Peso',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'RD$',
 		},
 	},
 	dzd = {
 		code = 'DZD',
-		symbol = 'DA',
-		text = {
-			prefix = 'DA',
-			suffix = '&nbsp;<abbr title="Algerian dinar">DZD</abbr>',
+		name = 'Algerian dinar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'DA',
 		},
 	},
 	egp = {
 		code = 'EGP',
-		symbol = 'E£',
-		text = {
-			prefix = 'E£',
-			suffix = '&nbsp;<abbr title="Egyptian pound">EGP</abbr>',
+		name = 'Egyptian pound',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'E£',
 		},
 	},
 	eur = {
 		code = 'EUR',
-		symbol = '€',
-		text = {
-			prefix = '€',
-			suffix = '&nbsp;<abbr title="Euro">EUR</abbr>',
+		name = 'Euro',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '€',
 		},
 	},
 	frf = {
 		code = 'FRF',
-		symbol = ' Fr',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;Fr&nbsp;<abbr title="French Franc">FRF</abbr>',
+		name = 'French Franc',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'Fr',
 		},
 	},
 	gbp = {
 		code = 'GBP',
-		symbol = '£',
-		text = {
-			prefix = '£',
-			suffix = '&nbsp;<abbr title="British Pound Sterling">GBP</abbr>',
+		name = 'British Pound Sterling',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '£',
 		},
 	},
 	gel = {
 		code = 'GEL',
-		symbol = '₾ ',
-		text = {
-			prefix = '₾&nbsp;',
-			suffix = '&nbsp;<abbr title="Georgian Lari">GEL</abbr>',
+		name = 'Georgian Lari',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = '₾',
 		},
 	},
 	ghs = {
 		code = 'GHS',
-		symbol = 'GH₵ ',
-		text = {
-			prefix = 'GH₵&nbsp;',
-			suffix = '&nbsp;<abbr title="Ghanaian Cedi">GHS</abbr>',
+		name = 'Ghanaian Cedi',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'GH₵',
 		},
 	},
 	gtq = {
 		code = 'GTQ',
-		symbol = 'Q',
-		text = {
-			prefix = 'Q',
-			suffix = '&nbsp;<abbr title="Guatemalan Quetzal">GTQ</abbr>',
+		name = 'Guatemalan Quetzal',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'Q',
 		},
 	},
 	hkd = {
 		code = 'HKD',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Hong Kong Dollar">HKD</abbr>',
+		name = 'Hong Kong Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	hrk = {
 		code = 'HRK',
-		symbol = ' kn',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;kn&nbsp;<abbr title="Croatian kuna">HRK</abbr>',
+		name = 'Croatian kuna',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'kn',
 		},
 	},
 	huf = {
 		code = 'HUF',
-		symbol = ' Ft',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;Ft&nbsp;<abbr title="Hungarian Forint">HUF</abbr>',
+		name = 'Hungarian Forint',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'Ft',
 		},
 	},
 	idr = {
 		code = 'IDR',
-		symbol = 'Rp ',
-		text = {
-			prefix = 'Rp&nbsp;',
-			suffix = '&nbsp;<abbr title="Indonesian Rupee">IDR</abbr>',
+		name = 'Indonesian Rupee',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'Rp',
 		},
 	},
 	ils = {
 		code = 'ILS',
-		symbol = '₪ ',
-		text = {
-			prefix = '₪&nbsp;',
-			suffix = '&nbsp;<abbr title="Israeli new shekel">ILS</abbr>',
+		name = 'Israeli new shekel',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = '₪',
 		},
 	},
 	inr = {
 		code = 'INR',
-		symbol = '₹',
-		text = {
-			prefix = '₹',
-			suffix = '&nbsp;<abbr title="Indian Rupee">INR</abbr>',
+		name = 'Indian Rupee',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₹',
 		},
 	},
 	iqd = {
 		code = 'IQD',
-		symbol = ' د.ع',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;د.ع&nbsp;<abbr title="Iraqi dinar">IQD</abbr>',
+		name = 'Iraqi dinar',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'د.ع',
 		},
 	},
 	irr = {
 		code = 'IRR',
-		symbol = ' ﷼',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;﷼&nbsp;<abbr title="Iranian Rial">IRR</abbr>',
+		name = 'Iranian Rial',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = '﷼',
 		},
 	},
 	isk = {
 		code = 'ISK',
-		symbol = ' kr',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;kr&nbsp;<abbr title="Icelandic Króna">ISK</abbr>',
+		name = 'Icelandic Króna',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'kr',
 		},
 	},
 	jpy = {
 		code = 'JPY',
-		symbol = '¥',
-		text = {
-			prefix = '¥',
-			suffix = '&nbsp;<abbr title="Japanese Yen">JPY</abbr>',
+		name = 'Japanese Yen',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '¥',
 		},
 	},
 	kgs = {
 		code = 'KGS',
-		symbol = ' С̲',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;С̲&nbsp;<abbr title="Kyrgyzstani Som">KGS</abbr>',
+		name = 'Kyrgyzstani Som',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'С̲',
 		},
 	},
 	khr = {
 		code = 'KHR',
-		symbol = ' ៛',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;៛&nbsp;<abbr title="Cambodian Riel">KHR</abbr>',
+		name = 'Cambodian Riel',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = '៛',
 		},
 	},
 	krw = {
 		code = 'KRW',
-		symbol = '₩',
-		text = {
-			prefix = '₩',
-			suffix = '&nbsp;<abbr title="South Korean Won">KRW</abbr>',
+		name = 'South Korean Won',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₩',
 		},
 	},
 	kwd = {
 		code = 'KWD',
-		symbol = 'د.ك ',
-		text = {
-			prefix = 'د.ك&nbsp;',
-			suffix = '&nbsp;<abbr title="Kuwaiti Dinar">KWD</abbr>',
+		name = 'Kuwaiti Dinar',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'د.ك',
 		},
 	},
 	kzt = {
 		code = 'KZT',
-		symbol = ' ₸',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;₸&nbsp;<abbr title="Kazakhstani tenge">KZT</abbr>',
+		name = 'Kazakhstani tenge',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = '₸',
 		},
 	},
 	lak = {
 		code = 'LAK',
-		symbol = '₭ ',
-		text = {
-			prefix = '₭&nbsp;',
-			suffix = '&nbsp;<abbr title="Lao Kip">LAK</abbr>',
+		name = 'Lao Kip',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = '₭',
 		},
 	},
 	lbp = {
 		code = 'LBP',
-		symbol = 'ل.ل. ',
-		text = {
-			prefix = 'ل.ل.&nbsp;',
-			suffix = '&nbsp;<abbr title="Lebanese pound">LBP</abbr>',
+		name = 'Lebanese pound',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'ل.ل.',
 		},
 	},
 	lkr = {
 		code = 'LKR',
-		symbol = 'රු.',
-		text = {
-			prefix = 'රු.',
-			suffix = '&nbsp;<abbr title="Sri Lankan Rupee">LKR</abbr>',
+		name = 'Sri Lankan Rupee',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'රු.',
 		},
 	},
 	ltc = {
 		code = 'LTC',
-		symbol = 'Ł',
-		text = {
-			prefix = 'Ł',
-			suffix = '&nbsp;<abbr title="Litecoin">LTC</abbr>',
+		name = 'Litecoin',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'Ł',
 		},
 	},
 	ltl = {
 		code = 'LTL',
-		symbol = ' Lt',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;Lt&nbsp;<abbr title="Lithuanian litas">LTL</abbr>',
+		name = 'Lithuanian litas',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'Lt',
 		},
 	},
 	lvl = {
 		code = 'LVL',
-		symbol = 'Ls ',
-		text = {
-			prefix = 'Ls&nbsp;',
-			suffix = '&nbsp;<abbr title="Latvian lat">LVL</abbr>',
+		name = 'Latvian lat',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'Ls',
 		},
 	},
 	mad = {
 		code = 'MAD',
-		symbol = 'د.م ',
-		text = {
-			prefix = 'د.م&nbsp;',
-			suffix = '&nbsp;<abbr title="Moroccan Dirham">MAD</abbr>',
+		name = 'Moroccan Dirham',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'د.م',
 		},
 	},
 	mdl = {
 		code = 'MDL',
-		symbol = ' Lei',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;Lei&nbsp;<abbr title="Moldavian Lei">MDL</abbr>',
+		name = 'Moldavian Lei',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'Lei',
 		},
 	},
 	mkd = {
 		code = 'MKD',
-		symbol = ' ден',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;ден&nbsp;<abbr title="Macedonian Denar">MKD</abbr>',
+		name = 'Macedonian Denar',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'ден',
 		},
 	},
 	mmk = {
 		code = 'MMK',
-		symbol = 'K',
-		text = {
-			prefix = 'K',
-			suffix = '&nbsp;<abbr title="Myanmar Kyat">MMK</abbr>',
+		name = 'Myanmar Kyat',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'K',
 		},
 	},
 	mnt = {
 		code = 'MNT',
-		symbol = '₮',
-		text = {
-			prefix = '₮',
-			suffix = '&nbsp;<abbr title="Mongolian tögrög">MNT</abbr>',
+		name = 'Mongolian tögrög',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₮',
 		},
 	},
 	mop = {
 		code = 'MOP',
-		symbol = 'MOP$',
-		text = {
-			prefix = 'MOP$',
-			suffix = '&nbsp;<abbr title="Macau Pataca">MOP</abbr>',
+		name = 'Macau Pataca',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'MOP$',
 		},
 	},
 	mur = {
 		code = 'MUR',
-		symbol = '₨',
-		text = {
-			prefix = '₨',
-			suffix = '&nbsp;<abbr title="Mauritian Rupee">MUR</abbr>',
+		name = 'Mauritian Rupee',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₨',
 		},
 	},
 	mvr = {
 		code = 'MVR',
-		symbol = 'Rf ',
-		text = {
-			prefix = 'Rf&nbsp;',
-			suffix = '&nbsp;<abbr title="Maldivian Rufiyaa">MVR</abbr>',
+		name = 'Maldivian Rufiyaa',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'Rf',
 		},
 	},
 	mxn = {
 		code = 'MXN',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Mexican Peso">MXN</abbr>',
+		name = 'Mexican Peso',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	myr = {
 		code = 'MYR',
-		symbol = 'RM ',
-		text = {
-			prefix = 'RM&nbsp;',
-			suffix = '&nbsp;<abbr title="Malaysian ringgit">MYR</abbr>',
+		name = 'Malaysian ringgit',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'RM',
 		},
 	},
 	ngn = {
 		code = 'NGN',
-		symbol = '₦ ',
-		text = {
-			prefix = '₦&nbsp;',
-			suffix = '&nbsp;<abbr title="Nigerian Naira">NGN</abbr>',
+		name = 'Nigerian Naira',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = '₦',
 		},
 	},
 	nis = {
 		code = 'NIS',
-		symbol = 'ILS',
-		text = {
-			prefix = 'ILS',
-			suffix = '&nbsp;<abbr title="Israeli new shekel">NIS</abbr>',
+		name = 'Israeli new shekel',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'ILS',
 		},
 	},
 	nok = {
 		code = 'NOK',
-		symbol = ' kr',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;kr&nbsp;<abbr title="Norwegian Krone">NOK</abbr>',
+		name = 'Norwegian Krone',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'kr',
 		},
 	},
 	npr = {
 		code = 'NPR',
-		symbol = 'रू ',
-		text = {
-			prefix = 'रू&nbsp;',
-			suffix = '&nbsp;<abbr title="Nepalese Rupee">NPR</abbr>',
+		name = 'Nepalese Rupee',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'रू',
 		},
 	},
 	ntd = {
 		code = 'TWD',
-		symbol = 'NT$',
-		text = {
-			prefix = 'NT$',
-			suffix = '&nbsp;<abbr title="Taiwan New Dollar">TWD</abbr>',
+		name = 'Taiwan New Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'NT$',
 		},
 	},
 	nzd = {
 		code = 'NZD',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="New Zealand Dollar">NZD</abbr>',
+		name = 'New Zealand Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	pen = {
 		code = 'PEN',
-		symbol = 'S/.',
-		text = {
-			prefix = 'S/.',
-			suffix = '&nbsp;<abbr title="Peruvian sol">PEN</abbr>',
+		name = 'Peruvian sol',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'S/.',
 		},
 	},
 	php = {
 		code = 'PHP',
-		symbol = '₱',
-		text = {
-			prefix = '₱',
-			suffix = '&nbsp;<abbr title="Philippine Peso">PHP</abbr>',
+		name = 'Philippine Peso',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₱',
 		},
 	},
 	pkr = {
 		code = 'PKR',
-		symbol = '₨ ',
-		text = {
-			prefix = '₨&nbsp;',
-			suffix = '&nbsp;<abbr title="Pakistani Rupee">PKR</abbr>',
+		name = 'Pakistani Rupee',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = '₨',
 		},
 	},
 	pln = {
 		code = 'PLN',
-		symbol = ' zł',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;zł&nbsp;<abbr title="Polish złoty">PLN</abbr>',
+		name = 'Polish złoty',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'zł',
 		},
 	},
 	qar = {
 		code = 'QAR',
-		symbol = '﷼',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '﷼&nbsp;<abbr title="Qatari Riyal">QAR</abbr>',
+		name = 'Qatari Riyal',
+		symbol = {
+			hasSpace = false,
+			isAfter = true,
+			text = '﷼',
 		},
 	},
 	rmb = {
 		code = 'CNY',
-		symbol = '¥',
-		text = {
-			prefix = '¥',
-			suffix = '&nbsp;<abbr title="Chinese Yuan Renminbi">CNY</abbr>',
+		name = 'Chinese Yuan Renminbi',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '¥',
 		},
 	},
 	ron = {
 		code = 'RON',
-		symbol = ' lei',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;lei&nbsp;<abbr title="Romanian new leu">RON</abbr>',
+		name = 'Romanian new leu',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'lei',
 		},
 	},
 	rsd = {
 		code = 'RSD',
-		symbol = ' дин',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;дин&nbsp;<abbr title="Serbian dinar">RSD</abbr>',
+		name = 'Serbian dinar',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'дин',
 		},
 	},
 	rub = {
 		code = 'RUB',
-		symbol = '₽',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '₽&nbsp;<abbr title="Russian Ruble">RUB</abbr>',
+		name = 'Russian Ruble',
+		symbol = {
+			hasSpace = false,
+			isAfter = true,
+			text = '₽',
 		},
 	},
 	sar = {
 		code = 'SAR',
-		symbol = 'ر.س',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = 'ر.س&nbsp;<abbr title="Saudi Arabian Riyal">SAR</abbr>',
+		name = 'Saudi Arabian Riyal',
+		symbol = {
+			hasSpace = false,
+			isAfter = true,
+			text = 'ر.س',
 		},
 	},
 	sek = {
 		code = 'SEK',
-		symbol = ' kr',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '&nbsp;kr&nbsp;<abbr title="Swedish krona">SEK</abbr>',
+		name = 'Swedish krona',
+		symbol = {
+			hasSpace = true,
+			isAfter = true,
+			text = 'kr',
 		},
 	},
 	sgd = {
 		code = 'SGD',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="Singapore Dollar">SGD</abbr>',
+		name = 'Singapore Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	skk = {
 		code = 'SKK',
-		symbol = 'Sk',
-		text = {
-			prefix = 'Sk',
-			suffix = '&nbsp;<abbr title="Slovak koruna">SKK</abbr>',
+		name = 'Slovak koruna',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'Sk',
 		},
 	},
 	skw = {
 		code = 'KRW',
-		symbol = '₩',
-		text = {
-			prefix = '₩',
-			suffix = '&nbsp;<abbr title="South Korean Won">KRW</abbr>',
+		name = 'South Korean Won',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₩',
 		},
 	},
 	thb = {
 		code = 'THB',
-		symbol = '฿',
-		text = {
-			prefix = '฿',
-			suffix = '&nbsp;<abbr title="Thai Baht">THB</abbr>',
+		name = 'Thai Baht',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '฿',
 		},
 	},
 	tjs = {
 		code = 'TJS',
-		symbol = 'SM ',
-		text = {
-			prefix = 'SM&nbsp;',
-			suffix = '&nbsp;<abbr title="Tajikistani Somoni">TJS</abbr>',
+		name = 'Tajikistani Somoni',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'SM',
 		},
 	},
 	tmt = {
 		code = 'TMT',
-		symbol = 'T',
-		text = {
-			prefix = 'T',
-			suffix = '&nbsp;<abbr title="Turkmenistan manat">TMT</abbr>',
+		name = 'Turkmenistan manat',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'T',
 		},
 	},
 	tnd = {
 		code = 'TND',
-		symbol = 'DT',
-		text = {
-			prefix = 'DT',
-			suffix = '&nbsp;<abbr title="Tunisian Dinar">TND</abbr>',
+		name = 'Tunisian Dinar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'DT',
 		},
 	},
 	try = {
 		code = 'TRY',
-		symbol = '₺',
-		text = {
-			prefix = '₺',
-			suffix = '&nbsp;<abbr title="Turkish Lira">TRY</abbr>',
+		name = 'Turkish Lira',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₺',
 		},
 	},
 	twd = {
 		code = 'TWD',
-		symbol = 'NT$',
-		text = {
-			prefix = 'NT$',
-			suffix = '&nbsp;<abbr title="Taiwan New Dollar">TWD</abbr>',
+		name = 'Taiwan New Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'NT$',
 		},
 	},
 	uah = {
 		code = 'UAH',
-		symbol = '₴',
-		text = {
-			prefix = '₴',
-			suffix = '&nbsp;<abbr title="Ukrainian hryvnia">UAH</abbr>',
+		name = 'Ukrainian hryvnia',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₴',
 		},
 	},
 	usd = {
 		code = 'USD',
-		symbol = '$',
-		text = {
-			prefix = '$',
-			suffix = '&nbsp;<abbr title="United States Dollar">USD</abbr>',
+		name = 'United States Dollar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '$',
 		},
 	},
 	uzs = {
 		code = 'UZS',
-		symbol = 'лв',
-		text = {
-			prefix = 'лв',
-			suffix = '&nbsp;<abbr title="Uzbekistani Som">UZS</abbr>',
+		name = 'Uzbekistani Som',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'лв',
 		},
 	},
 	vnd = {
 		code = 'VND',
-		symbol = '₫',
-		isAfter = true,
-		text = {
-			prefix = '',
-			suffix = '₫&nbsp;<abbr title="Vietnamese Dong">VND</abbr>',
+		name = 'Vietnamese Dong',
+		symbol = {
+			hasSpace = false,
+			isAfter = true,
+			text = '₫',
 		},
 	},
 	won = {
 		code = 'KRW',
-		symbol = '₩',
-		text = {
-			prefix = '₩',
-			suffix = '&nbsp;<abbr title="South Korean Won">KRW</abbr>',
+		name = 'South Korean Won',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '₩',
 		},
 	},
 	zar = {
 		code = 'ZAR',
-		symbol = 'R',
-		text = {
-			prefix = 'R',
-			suffix = '&nbsp;<abbr title="South African Rand">ZAR</abbr>',
+		name = 'South African Rand',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'R',
 		},
 	},
 }
