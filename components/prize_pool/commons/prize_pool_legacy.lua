@@ -35,6 +35,8 @@ local CUSTOM_HANDLER
 
 local IS_SOLO = false
 
+LegacyPrizePool.BASE_CURRENCY = 'USD'
+
 function LegacyPrizePool.run(dependency)
 	local args = Template.retrieveReturnValues('LegacyPrizePool')
 	local header = Array.sub(args, 1, 1)[1]
@@ -159,8 +161,10 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 		newData.place = slot.place
 	end
 
+	local baseCurrencyPrize = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
+
 	newData.date = slot.date
-	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
+	newData[baseCurrencyPrize] = (slot[baseCurrencyPrize] and slot[baseCurrencyPrize] ~= '0') and slot[baseCurrencyPrize] or nil
 
 	local opponentsInSlot = #slot
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
