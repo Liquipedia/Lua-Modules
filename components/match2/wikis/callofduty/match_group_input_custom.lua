@@ -28,8 +28,8 @@ local NO_SCORE = -99
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 local ALLOWED_OPPONENT_TYPES = {
-	'solo',
-	'team'
+	Opponent.solo,
+	Opponent.team
 }
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
@@ -81,10 +81,10 @@ function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
 			opponent.icon = opponentFunctions.getIcon(opponent.template)
 		end
 	elseif opponent.type ~= Opponent.literal then
-		if not ALLOWED_OPPONENT_TYPES[opponent.type or ''] then
+		if not Table.includes(ALLOWED_OPPONENT_TYPES, opponent.type or '') then
 			error('Unsupported opponent type "' .. (opponent.type or '') .. '"')
 		end
-		opponent.match2players = matchFunctions.readSoloOpponent(record, opponentIndex)
+		opponent.match2players = matchFunctions.readSoloOpponent(opponent)
 		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
 			opponent = {type = Opponent.literal, name = 'BYE'}
 		end
@@ -423,12 +423,14 @@ function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
 end
 
 -- Get Playerdata for solo opponents
-function matchFunctions.readSoloOpponent(match, opponentIndex)
-	local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p1']) or {}
-	player.name = player.name or 'TBD'
-	player.flag = player.flag
-	player.displayname = player.displayname or player.name
-	return {player}
+function matchFunctions.readSoloOpponent(opponent)
+	local name = opponent.name or opponent[1] or 'TBD'
+	
+	return {{
+		name = name,
+		flag = opponent.flag,
+		displayname = opponent.displayname or name,
+	}}
 end
 
 function CustomMatchGroupInput._playerIsBye(player)
