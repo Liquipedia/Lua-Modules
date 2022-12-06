@@ -276,7 +276,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
+			date = _EPOCH_TIME_EXTENDED,
 			dateexact = false,
 		}
 	end
