@@ -75,7 +75,7 @@ function CustomActiveYears._getBroadcaster(conditions)
 		return
 	end
 
-	return CustomActiveYears._calculate(years)
+	return CustomActiveYears._displayYears(years)
 end
 
 function CustomActiveYears._getYearsBroadcast(conditions)

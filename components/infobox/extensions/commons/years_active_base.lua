@@ -65,13 +65,7 @@ function ActiveYears.display(args)
 	-- Build conditions
 	local conditions = ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, args.mode)
 
-	-- Get years
-	local years = ActiveYears._getYears(conditions)
-	if Table.isEmpty(years) then
-		return 'Player has no results.'
-	end
-
-	return ActiveYears._calculate(years)
+	return ActiveYears._calculate(conditions)
 end
 
 function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, mode)
@@ -104,7 +98,17 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 	return conditionTree:toString() .. ActiveYears.additionalConditions
 end
 
-function ActiveYears._calculate(years)
+function ActiveYears._calculate(conditions)
+	-- Get years
+	local years = ActiveYears._getYears(conditions)
+	if Table.isEmpty(years) then
+		return 'Player has no results.'
+	end
+
+	return ActiveYears._displayYears(years)
+end
+
+function ActiveYears._displayYears(years)
 	-- Sort years chronologically
 	table.sort(years)
 
