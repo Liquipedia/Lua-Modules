@@ -9,14 +9,15 @@ pat='\-\-\-\
 \-\- page=([^
 ]*)\
 '
-gitCommitSubject=$(git log -1 --pretty='%h %s')
 
 declare -A loggedin
 
 if [[ -n "$1" ]]; then
   luaFiles=$1
+  gitDeployReason="\"$(git log -1 --pretty='%h %s')\""
 else
   luaFiles=$(find . -type f -name '*.lua')
+  gitDeployReason='Automated Weekly Re-Sync'
 fi
 
 for luaFile in $luaFiles
@@ -105,7 +106,7 @@ do
         -c "$ckf" \
         --data-urlencode "title=${page}" \
         --data-urlencode "text=${fileContents}" \
-        --data-urlencode "summary=Git: \"${gitCommitSubject}\"" \
+        --data-urlencode "summary=Git: ${gitDeployReason}" \
         --data-urlencode "bot=true" \
         --data-urlencode "recreate=true" \
         --data-urlencode "token=${editToken}" \
