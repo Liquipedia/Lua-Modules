@@ -237,13 +237,13 @@ function CustomMatchSummary.getByMatchId(args)
 		local footer = MatchSummary.Footer()
 
 		-- Octane
-		if Logic.isNotEmpty(match.links.octane) then
-			footer:addElement(_OCTANE_PREFIX .. match.links.octane .. _OCTANE_SUFFIX)
+		for _, octane in Table.iter.pairsByPrefix(match.links, 'octane') do
+			footer:addElement(_OCTANE_PREFIX .. octane .. _OCTANE_SUFFIX)
 		end
 
 		-- Ballchasing
-		if Logic.isNotEmpty(match.links.ballchasing) then
-			footer:addElement(_BALLCHASING_PREFIX .. match.links.ballchasing .. _BALLCHASING_SUFFIX)
+		for _, ballchasing in Table.iter.pairsByPrefix(match.links, 'ballchasing') do
+			footer:addElement(_BALLCHASING_PREFIX .. ballchasing .. _BALLCHASING_SUFFIX)
 		end
 
 		-- Match Vod

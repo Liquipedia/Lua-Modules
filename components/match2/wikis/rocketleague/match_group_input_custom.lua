@@ -201,10 +201,20 @@ function matchFunctions.getExtraData(match)
 end
 
 function matchFunctions.getLinks(match)
-	match.links = {
-		octane = match.octane and ('https://octane.gg/matches/' .. match.octane) or nil,
-		ballchasing = match.ballchasing and ('https://ballchasing.com/group/' .. match.ballchasing) or nil
-	}
+	match.links = {}
+
+	-- Octane
+	match.octane1 = match.octane1 or match.octane
+	for key, octane in Table.iter.pairsByPrefix(match, 'octane') do
+		match.links[key] = 'https://octane.gg/matches/' .. octane
+	end
+
+	-- Ballchasing
+	match.ballchasing1 = match.ballchasing1 or match.ballchasing
+	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing') do
+		match.links[key] = 'https://ballchasing.com/group/' .. ballchasing
+	end
+
 	return match
 end
 
