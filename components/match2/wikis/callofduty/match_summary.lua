@@ -17,18 +17,18 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local htmlCreate = mw.html.create
 
-local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-local _ICONS = {
-	check = _GREEN_CHECK,
+local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local ICONS = {
+	check = GREEN_CHECK,
 }
 
-local _LINK_DATA = {
+local LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
 	cdl = {icon = 'File:Call of Duty League Logo Small.png', text = 'Call of Duty League matchpage'},
 	reddit = {icon = 'File:Reddit-icon.png', text = 'Reddit stats'},
@@ -72,7 +72,7 @@ function CustomMatchSummary.getByMatchId(args)
 			})
 		end
 
-		footer:addLinks(_LINK_DATA, match.links)
+		footer:addLinks(LINK_DATA, match.links)
 
 		matchSummary:footer(footer)
 	end
@@ -94,7 +94,7 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -197,9 +197,9 @@ function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if showIcon then
-		container:node(_ICONS[iconType])
+		container:node(ICONS[iconType])
 	else
-		container:node(_NO_CHECK)
+		container:node(NO_CHECK)
 	end
 
 	return container
