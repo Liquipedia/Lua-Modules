@@ -27,7 +27,6 @@ local NO_SCORE = -99
 local MATCH_BYE = {'bye', 'BYE'}
 
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local _EPOCH_TIME = '1970-01-01 00:00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
