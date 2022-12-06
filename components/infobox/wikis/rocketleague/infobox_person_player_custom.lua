@@ -67,10 +67,10 @@ function CustomInjector:parse(id, widgets)
 		local statusContents = CustomPlayer._getStatusContents()
 
 		-- Years active
-		local yearsActive = _parseActive(_args.years_active, YearsActive.get, {player = _base_page_name})
-		local yearsActiveCoach = _parseActive(_args.years_active_coach, YearsActive.get, {player = _base_page_name, prefix = 'c'})
-		local yearsActiveTalent = _parseActive(_args.years_active_talent, YearsActive.getTalent, _base_page_name)
-		local yearsActiveObserver = _parseActive(_args.years_active_observer, YearsActive.getObserver, _base_page_name)
+		local yearsActive = CustomInjector:_parseActive(_args.years_active, YearsActive.get, {player = _base_page_name})
+		local yearsActiveCoach = CustomInjector:_parseActive(_args.years_active_coach, YearsActive.get, {player = _base_page_name, prefix = 'c'})
+		local yearsActiveTalent = CustomInjector:_parseActive(_args.years_active_talent, YearsActive.getTalent, _base_page_name)
+		local yearsActiveObserver = CustomInjector:_parseActive(_args.years_active_observer, YearsActive.getObserver, _base_page_name)
 
 		return {
 			Cell{name = 'Status', content = statusContents},
