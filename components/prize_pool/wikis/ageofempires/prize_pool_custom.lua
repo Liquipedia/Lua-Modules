@@ -71,6 +71,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
 
+	-- Variable to communicate with TeamCards
+	Variables.varDefine('enddate_' .. lpdbData.participant, lpdbData.date)
+
 	return lpdbData
 end
 
