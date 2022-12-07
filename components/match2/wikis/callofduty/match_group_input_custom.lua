@@ -69,9 +69,14 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
+function CustomMatchGroupInput.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
+
+	-- Convert byes to literals
+	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+		opponent = {type = Opponent.literal, name = 'BYE'}
+	end
 
 	-- Retrieve icon for teams and do tbd checks
 	if opponent.type == Opponent.team then
@@ -341,7 +346,10 @@ function matchFunctions.getOpponents(match)
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
-
+		-- Retrieve icon for team
+			if opponent.type == Opponent.team then
+				opponent.icon = opponentFunctions.getIcon(opponent.template)
+			end
 			-- apply status
 			if Logic.isNumeric(opponent.score) then
 				opponent.status = 'S'
@@ -425,7 +433,7 @@ end
 -- Get Playerdata for solo opponents
 function matchFunctions.readSoloOpponent(opponent)
 	local name = opponent.name or opponent[1] or 'TBD'
-
+	
 	return {{
 		name = name,
 		flag = opponent.flag,
