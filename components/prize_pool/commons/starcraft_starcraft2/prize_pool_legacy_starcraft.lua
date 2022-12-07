@@ -201,8 +201,8 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 	end
 
 	newData.date = slot.date
-	newData[BASE_CURRENCY_PRIZE] = (slot[BASE_CURRENCY_PRIZE] and slot[BASE_CURRENCY_PRIZE] ~= '0') and slot[BASE_CURRENCY_PRIZE]
-		or nil
+	newData[BASE_CURRENCY_PRIZE] = (slot[BASE_CURRENCY_PRIZE] and slot[BASE_CURRENCY_PRIZE] ~= '0')
+		and slot[BASE_CURRENCY_PRIZE] or nil
 
 	local slotInputSize = math.min(StarcraftLegacyPrizePool._slotSize(slot) or math.huge, #slot)
 	local opponentsInSlot = tonumber(slot.count) or math.max(slotInputSize, 1)
