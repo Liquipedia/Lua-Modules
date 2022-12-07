@@ -155,7 +155,7 @@ function CustomMatchSummary._createMapRow(game)
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1))
 		:node(CustomMatchSummary._gameScore(game, 1))
 
-	local rightNode = htmlCreate('div')
+	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2))
