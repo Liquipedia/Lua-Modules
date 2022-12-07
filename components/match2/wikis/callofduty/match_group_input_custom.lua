@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -27,10 +26,6 @@ local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
-local ALLOWED_OPPONENT_TYPES = {
-	Opponent.solo,
-	Opponent.team
-}
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 
