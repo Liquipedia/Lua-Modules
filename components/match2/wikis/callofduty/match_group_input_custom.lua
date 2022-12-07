@@ -78,24 +78,6 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	-- Retrieve icon for teams and do tbd checks
-	if opponent.type == Opponent.team then
-		if opponent.template:lower() == 'bye' then
-			opponent = {type = Opponent.literal, name = 'BYE'}
-		else
-			opponent.icon = opponentFunctions.getIcon(opponent.template)
-		end
-	elseif opponent.type ~= Opponent.literal then
-		if not Table.includes(ALLOWED_OPPONENT_TYPES, opponent.type or '') then
-			error('Unsupported opponent type "' .. (opponent.type or '') .. '"')
-		end
-		opponent.match2players = matchFunctions.readSoloOpponent(opponent)
-		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
-			opponent = {type = Opponent.literal, name = 'BYE'}
-		end
-
-	end
-
 	Opponent.resolve(opponent, date)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
@@ -346,9 +328,10 @@ function matchFunctions.getOpponents(match)
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
-		-- Retrieve icon for team
+
+			-- Retrieve icon for team
 			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getIcon(opponent.template)
+				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
 			end
 			-- apply status
 			if Logic.isNumeric(opponent.score) then
@@ -430,21 +413,6 @@ function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
 	return match
 end
 
--- Get Playerdata for solo opponents
-function matchFunctions.readSoloOpponent(opponent)
-	local name = opponent.name or opponent[1] or 'TBD'
-
-	return {{
-		name = name,
-		flag = opponent.flag,
-		displayname = opponent.displayname or name,
-	}}
-end
-
-function CustomMatchGroupInput._playerIsBye(player)
-	return (player.name or ''):lower() == 'bye' or (player.displayname or ''):lower() == 'bye'
-end
-
 --
 -- map related functions
 --
@@ -495,7 +463,11 @@ end
 --
 function opponentFunctions.getIcon(template)
 	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
+	end
 end
 
 return CustomMatchGroupInput
