@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -106,7 +107,11 @@ function Team:createInfobox()
 							totalEarningsDisplay = '$' .. Language:formatNum(self.totalEarnings)
 						end
 						return {
-							Cell{name = 'Approx. Total Winnings', content = {totalEarningsDisplay}}
+							Cell{name = Abbreviation.make(
+									'Approx. Total Winnings',
+									'Includes individual player earnings won&#10;while representing this team'
+								),
+								content = {totalEarningsDisplay}}
 						}
 					end
 				}
