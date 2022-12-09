@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local ClassIcon = require('Module:ClassIcon')
+local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local HeroWL = require('Module:HeroWL')
 local Math = require('Module:Math')
@@ -34,6 +35,22 @@ local _pagename = mw.title.getCurrentTitle().text
 local _BATTLE_POINTS_ICON = '[[File:Mobile_Legends_BP_icon.png|x16px|Battle Points|link=Battle Point]]'
 local _DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Diamonds|x16px|link=Diamond]]'
 
+local NON_BREAKING_SPACE  = '&nbsp;'
+
+function CustomHero._voiceActors()
+	local voiceActors = {}
+
+	for voiceActorKey, voiceActor in Table.iter.pairsByPrefix(_args, 'voice') do
+		local flag = _args[voiceActorKey .. 'flag']
+		if flag then
+			voiceActor = Flags.Icon{flag = flag} .. NON_BREAKING_SPACE .. voiceActor
+		end
+		table.insert(voiceActors, voiceActor)
+	end
+
+	return voiceActors
+end
+
 function CustomHero.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
@@ -56,7 +73,7 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Secondary Bar', content = {_args.secondarybar}},
 		Cell{name = 'Secondary Attributes', content = {_args.secondaryattributes1}},
 		Cell{name = 'Release Date', content = {_args.releasedate}},
-		Cell{name = 'Voice Actor(s)', content = {_args.voice}},
+		Cell{name = 'Voice Actor(s)', content = CustomHero._voiceActors()},
 	}
 
 	local statisticsCells = {
