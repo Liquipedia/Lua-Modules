@@ -56,6 +56,7 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Secondary Bar', content = {_args.secondarybar}},
 		Cell{name = 'Secondary Attributes', content = {_args.secondaryattributes1}},
 		Cell{name = 'Release Date', content = {_args.releasedate}},
+		Cell{name = 'Voice Actor(s)', content = {_args.voice}},
 	}
 
 	local statisticsCells = {
