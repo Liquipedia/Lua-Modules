@@ -32,7 +32,7 @@ local _lpdb = {
 	lpdb_squadplayer = mw.ext.LiquipediaDB.lpdb_squadplayer,
 }
 
----@param callbackFunction fun(dbTable: string, objectName: string, storedData: table)
+---@param callbackFunction? fun(dbTable: string, objectName: string, storedData: table)
 function mockLpdb.setUp(callbackFunction)
 	mockLpdb.callback = callbackFunction
 	mw.ext.LiquipediaDB.lpdb = mockLpdb.lpdb
