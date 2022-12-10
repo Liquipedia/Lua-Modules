@@ -37,20 +37,6 @@ local _DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Diamonds|x16px|li
 
 local NON_BREAKING_SPACE  = '&nbsp;'
 
-function CustomHero._voiceActors()
-	local voiceActors = {}
-
-	for voiceActorKey, voiceActor in Table.iter.pairsByPrefix(_args, 'voice') do
-		local flag = _args[voiceActorKey .. 'flag']
-		if flag then
-			voiceActor = Flags.Icon{flag = flag} .. NON_BREAKING_SPACE .. voiceActor
-		end
-		table.insert(voiceActors, voiceActor)
-	end
-
-	return voiceActors
-end
-
 function CustomHero.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
@@ -150,6 +136,20 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Price', content = {table.concat(costs, '&emsp;&ensp;')}},
 		}
 	end
+
+function CustomHero._voiceActors()
+	local voiceActors = {}
+
+	for voiceActorKey, voiceActor in Table.iter.pairsByPrefix(_args, 'voice') do
+		local flag = _args[voiceActorKey .. 'flag']
+		if flag then
+			voiceActor = Flags.Icon{flag = flag} .. NON_BREAKING_SPACE .. voiceActor
+		end
+		table.insert(voiceActors, voiceActor)
+	end
+
+	return voiceActors
+end
 
 	return widgets
 end
