@@ -9,6 +9,8 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
+local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -69,7 +71,7 @@ function BaseResultsTable:readConfig()
 		order = args.order or DEFAULT_VALUES.order,
 		hideResult = Logic.readBool(args.hideresult),
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
-		gameIconsData = args.gameIcons and mw.loadData(args.gameIcons) or nil,
+		displayGameIcons = Logic.readBool(args.gameIcons),
 		opponent = mw.text.decode(args.coach or args.player or args.team or self:_getOpponent()),
 		queryType = self:getQueryType(),
 		onlyAchievements = Logic.readBool(args.achievements),
@@ -380,41 +382,55 @@ end
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
-	local opponent
 	if not data.opponenttype then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.tbd(),
 			flip = (options or {}).flip,
 		}
-	elseif data.opponenttype == Opponent.solo and options.teamForSolo then
-		local teamTemplate = data.opponentplayers.p1template
-		if String.isEmpty(teamTemplate) then
-			return
-		end
-
-		opponent = {template = teamTemplate, type = Opponent.team}
-	else
-		opponent = Opponent.fromLpdbStruct(data)
+	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
+		return OpponentDisplay.BlockOpponent{
+			opponent = Opponent.fromLpdbStruct(data),
+			flip = (options or {}).flip,
+		}
 	end
 
-	return OpponentDisplay.BlockOpponent{
-		opponent = opponent,
+	local teamTemplate
+	if data.opponenttype == Opponent.team then
+		teamTemplate = data.opponenttemplate
+	else
+		teamTemplate = data.opponentplayers.p1template
+	end
+
+	if String.isEmpty(teamTemplate) then
+		return
+	end
+
+	local teamDisplay = OpponentDisplay.BlockOpponent{
+		opponent = {template = teamTemplate, type = Opponent.team},
 		flip = (options or {}).flip,
 		teamStyle = 'icon',
 	}
-end
 
--- overwritable
--- shadows the current implementation
--- TODO: Add support for dark mode icons
--- needs upgrading the game icon data modules first though
-function BaseResultsTable:gameIcon(placement)
-	local gameIcon = self.config.gameIconsData[placement.game] or 'Logo filler event.png'
-	gameIcon = gameIcon:gsub('File:', '')
-	return LeagueIcon.display{
-		icon = gameIcon,
-		options = {noTemplate = true, noLink = true},
-	}
+	local rawTeamTemplate = Team.queryRaw(teamTemplate)
+
+	if not rawTeamTemplate or not Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} then
+		return teamDisplay
+	end
+
+	return mw.html.create()
+		:node(teamDisplay)
+		:node(mw.html.create('div')
+			:css('width', '60px')
+			:css('align', 'left')
+			:node(
+				mw.html.create('div')
+					--make this a class?!
+					:css('line-height', '1')
+					:css('font-size', '80%')
+					:css('text-align', 'center')
+					:wikitext('([[' .. rawTeamTemplate.page .. '|' .. rawTeamTemplate.shortname .. ']])')
+			)
+		)
 end
 
 function BaseResultsTable.tournamentDisplayName(placement)
