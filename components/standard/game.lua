@@ -23,7 +23,8 @@ local ICON_PLACEHOLDER = 'LeaguesPlaceholder.png'
 local Game = {}
 
 Game.getIdentifierByAbbreviation = FnUtil.memoize(function()
-	return Table.map(GamesData, function(gameIdentifier, gameData) return gameData.abbreviation:lower(), gameIdentifier end)
+	return Table.map(GamesData, function(gameIdentifier, gameData)
+		return gameData.abbreviation:lower(), gameIdentifier end)
 end)
 
 Game.getIdentifierByName = FnUtil.memoize(function()
@@ -129,7 +130,7 @@ function Game.isDefaultTeamLogo(args)
 	logo = logo:gsub('_', ' ') --adjust according to the standard we want for the files in Module:Info
 
 	if String.isEmpty(args.game) then
-		return Table.includes(Game.defaultTeamLogos(), logo) 
+		return Table.includes(Game.defaultTeamLogos(), logo)
 	end
 
 	local defaultLogos = Game.raw(args).defaultTeamLogo
