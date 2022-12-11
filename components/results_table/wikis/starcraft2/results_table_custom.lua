@@ -9,16 +9,13 @@
 local Arguments = require('Module:Arguments')
 local DivTable = require('Module:DivTable')
 local GeneralCollapsible = require('Module:GeneralCollapsible')
-local Info = require('Module:Info')
 local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
@@ -271,7 +268,7 @@ function CustomResultsTable._buildPlayerStruct(args, prefix)
 		race = args[prefix .. 'race']
 	}
 end
-	
+
 function CustomResultsTable._getOpponentType(numberOfPlayers)
 	for opponentType, playerNumber in pairs(Opponent.partySizes) do
 		if playerNumber == numberOfPlayers then
