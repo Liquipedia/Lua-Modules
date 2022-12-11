@@ -9,6 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
+local Game = require('Module:Game')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
