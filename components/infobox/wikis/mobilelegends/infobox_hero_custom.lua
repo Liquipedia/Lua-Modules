@@ -137,6 +137,9 @@ function CustomInjector:parse(id, widgets)
 		}
 	end
 
+	return widgets
+end
+
 function CustomHero._voiceActors()
 	local voiceActors = {}
 
@@ -149,9 +152,6 @@ function CustomHero._voiceActors()
 	end
 
 	return voiceActors
-end
-
-	return widgets
 end
 
 function CustomHero:createWidgetInjector()
