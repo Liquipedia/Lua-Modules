@@ -241,8 +241,10 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 			wdl = slot['wdl' .. opponentIndex],
 			flag = slot['flag' .. opponentIndex],
 			team = slot['team' .. opponentIndex],
-			lastvs = slot['lastvs' .. opponentIndex],
-			lastvsflag = slot['lastvsflag' .. opponentIndex],
+			lastvs = {
+				slot['lastvs' .. opponentIndex],
+				flag = slot['lastvsflag' .. opponentIndex],
+			},
 			lastvsscore = (slot['lastscore' .. opponentIndex] or '') ..
 				'-' ..
 				(slot['lastvsscore' .. opponentIndex] or ''),
