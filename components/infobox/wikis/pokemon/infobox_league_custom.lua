@@ -74,6 +74,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = args.pokemonpremier
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
+	lpdbData.mode = CustomLeague:_getGameMode()
 
 	return lpdbData
 end
@@ -81,6 +82,8 @@ end
 function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
 	Variables.varDefine('tournament_publishertier', _args['pokemonpremier'])
+	Variables.varDefine('tournament_mode', CustomLeague:_getGameMode())
+
 	--Legacy Vars:
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
@@ -96,7 +99,7 @@ end
 
 function CustomLeague:_getGameMode()
 	if String.isEmpty(_args.mode) then
-		return nil
+		return
 	end
 
 	return _MODES[_args.mode:lower()]
@@ -104,7 +107,7 @@ end
 
 function CustomLeague:_getGameFormat()
 	if String.isEmpty(_args.format) then
-		return nil
+		return
 	end
 
 	return _FORMATS[_args.format:lower()]
