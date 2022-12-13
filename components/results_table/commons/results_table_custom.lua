@@ -19,10 +19,6 @@ local CustomResultsTable = {}
 function CustomResultsTable.run(frame)
 	local args = Arguments.getArgs(frame)
 
-	if Logic.readBool(args.awards) then
-		return CustomResultsTable.awards(args)
-	end
-
 	local resultsTable = ResultsTable(args)
 
 	return resultsTable:create():build()
