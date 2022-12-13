@@ -6,8 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Logic = require('Module:Logic')
+local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local ResultsTable = Lua.import('Module:ResultsTable', {requireDevIfEnabled = true})
@@ -16,8 +15,7 @@ local AwardsTable = Lua.import('Module:ResultsTable/Award', {requireDevIfEnabled
 local CustomResultsTable = {}
 
 -- Template entry point for results and achievements tables
-function CustomResultsTable.run(frame)
-	local args = Arguments.getArgs(frame)
+function CustomResultsTable.run(args)
 
 	local resultsTable = ResultsTable(args)
 
@@ -31,4 +29,4 @@ function CustomResultsTable.awards(args)
 	return awardsTable:create():build()
 end
 
-return CustomResultsTable
+return Class.export(CustomResultsTable)
