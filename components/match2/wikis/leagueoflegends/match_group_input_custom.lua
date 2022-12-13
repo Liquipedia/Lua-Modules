@@ -56,7 +56,8 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
+	options = options or {}
 	-- process match
 	Table.mergeInto(
 		match,
@@ -72,6 +73,10 @@ function CustomMatchGroupInput.processMatch(match)
 
 	-- Adjust map data, especially set participants data
 	match = matchFunctions.adjustMapData(match)
+
+	if not options.isStandalone then
+		match = matchFunctions.mergeWithStandalone(match)
+	end
 
 	return match
 end
@@ -527,6 +532,42 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
 	match['opponent' .. oppIndex].match2players = players
 	return match
 end
+
+function matchFunctions.mergeWithStandalone(match)
+	local standaloneMatchId = 'MATCH_' .. match.bracketid .. '_' .. match.matchid
+	local standaloneMatch = MatchGroupInput.fetchStandaloneMatch(standaloneMatchId)
+	if not standaloneMatch then
+		return match
+	end
+
+	-- Update Opponents from the Stanlone Match
+	match.opponent1 = standaloneMatch.match2opponents[1]
+	match.opponent2 = standaloneMatch.match2opponents[2]
+
+	-- Update Maps from the Standalone Match
+	for index, game in ipairs(standaloneMatch.match2games) do
+		game.participants = Json.parseIfString(game.participants)
+		game.extradata = Json.parseIfString(game.extradata)
+		match['map' .. index] = game
+	end
+
+	-- Remove special keys (maps/games, opponents, bracketdata etc)
+	for key, _ in pairs(standaloneMatch) do
+		if String.startsWith(key, "match2") then
+			standaloneMatch[key] = nil
+		end
+	end
+
+	-- Copy all match level records which have value
+	for key, value in pairs(standaloneMatch) do
+		if String.isNotEmpty(value) then
+			match[key] = value
+		end
+	end
+
+	return match
+end
+
 
 --
 -- map related functions
