@@ -9,49 +9,52 @@
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+---@class TemplateEngine 
+---Subset implementation of `{{mustache}} templates`
+---https://mustache.github.io/mustache.5.html
 local TemplateEngine = {}
 
 ---Created the html output from a given template string and table input.
 ---@param template string
----@param tbl table
+---@param model table
 ---@return string
-function TemplateEngine.eval(template, tbl)
-	return TemplateEngine._interpolate(TemplateEngine._foreach(template, tbl), tbl)
+function TemplateEngine.render(template, model)
+	return TemplateEngine._interpolate(TemplateEngine._foreach(template, model), model)
 end
 
 ---Handles foreach loops by replacing
----```*{foreach x in y}${x}*{end}```
----with `${y.foo}${y.bar}` given that key `y` in `tbl` input is a table with two keys, `foo` and `bar`.
+---```{{#y}}{{.}}{{/y}}```
+---with `${y.foo}${y.bar}` given that key `y` in the model is a table with two keys, `foo` and `bar`.
 ---@param template string
----@param tbl table
+---@param model table
 ---@return string
-function TemplateEngine._foreach(template, tbl)
-	local function createReplacement(list, value)
-		return '${' .. String.interpolate('${list}.${val}', {list = list, val = value}) .. '}'
-	end
-	return (template:gsub('*{foreach (.-) in (.-)}(.-)*{end}', function (var, list, text)
-		local str = ''
-		for value in pairs(tbl[list]) do
-			str = str .. TemplateEngine._interpolate(text, {[var] = createReplacement(list, value)})
+function TemplateEngine._foreach(template, model)
+	return (template:gsub('{{#(.-)}}(.-){{/%1}}', function (list, text)
+		local strBuilder = {}
+		for value in pairs(model[list]) do
+			table.insert(strBuilder, TemplateEngine._interpolate(text, {['.'] = '{{'.. list .. '.' .. value .. '}}'}))
 		end
-		return str
+		return table.concat(strBuilder)
 	end))
 end
 
 ---Interpolates a template using string interpolation. Can handle nested tables.
 ---@param template string
----@param tbl table
+---@param model table
 ---@return string
-function TemplateEngine._interpolate(template, tbl)
+function TemplateEngine._interpolate(template, model)
 	local function toNumberIfNumeric(number)
 		return tonumber(number) or number
 	end
 	return (
-		template:gsub('($%b{})',
+		template:gsub('{{([%w%.]-)}}',
 			function(w)
-				local path = Table.mapValues(mw.text.split(w:sub(3, -2), '.', true), toNumberIfNumeric)
+				if w == '.' then
+					return model['.']
+				end
+				local path = Table.mapValues(mw.text.split(w, '.', true), toNumberIfNumeric)
 				local key = Table.extract(path, #path)
-				local finalTbl =  Table.getByPath(tbl, path)
+				local finalTbl =  Table.getByPath(model, path)
 				return finalTbl and finalTbl[key] or w
 			end
 		)
