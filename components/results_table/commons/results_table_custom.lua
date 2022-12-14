@@ -16,17 +16,12 @@ local CustomResultsTable = {}
 
 -- Template entry point for results and achievements tables
 function CustomResultsTable.run(args)
-
-	local resultsTable = ResultsTable(args)
-
-	return resultsTable:create():build()
+	return ResultsTable(args):create():build()
 end
 
 -- Template entry point for awards tables
 function CustomResultsTable.awards(args)
-	local awardsTable = AwardsTable(args)
-
-	return awardsTable:create():build()
+	return AwardsTable(args):create():build()
 end
 
 return Class.export(CustomResultsTable)
