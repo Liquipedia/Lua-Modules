@@ -8,7 +8,7 @@
 
 local Table = require('Module:Table')
 
----@class TemplateEngine 
+---@class TemplateEngine
 ---Subset implementation of `{{mustache}} templates`.
 ---https://mustache.github.io/mustache.5.html
 local TemplateEngine = {}
