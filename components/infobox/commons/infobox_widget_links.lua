@@ -71,6 +71,7 @@ local _PRIORITY_GROUPS = {
 		'letsplaylive',
 		'matcherino',
 		'matcherinolink',
+		'royaleapi',
 		'siege-gg',
 		'sk',
 		'sostronk',
