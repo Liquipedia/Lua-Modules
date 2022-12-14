@@ -7,26 +7,27 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Table = require('Module:Table')
 
 ---@class TemplateEngine
 ---Subset implementation of `{{mustache}} templates`.
 ---https://mustache.github.io/mustache.5.html
-local TemplateEngine = {}
+local TemplateEngine = Class.new()
 
 ---Created the html output from a given template and a model input.
 ---@param template string
 ---@param model table
 ---@return string
-function TemplateEngine.render(template, model)
+function TemplateEngine:render(template, model)
 	local renderOrder = {
 		TemplateEngine._section,
 		TemplateEngine._invertedSection,
 		TemplateEngine._variable,
 	}
 
-	return Array.reduce(renderOrder, function (modifiedTemplate, func)
-		return func(modifiedTemplate, model)
+	return Array.reduce(renderOrder, function (modifiedTemplate, render)
+		return render(self, modifiedTemplate, model)
 	end, template)
 end
 
@@ -38,11 +39,11 @@ end
 ---@param template string
 ---@param model table
 ---@return string
-function TemplateEngine._section(template, model)
+function TemplateEngine:_section(template, model)
 	return (template:gsub('{{#(.-)}}(.-){{/%1}}', function (varible, text)
 		if type(model[varible]) == 'table' then
 			return table.concat(Array.map(model[varible], function (_, idx)
-				return TemplateEngine._variable(text, {['.'] = '{{'.. varible .. '.' .. idx .. '}}'})
+				return self:_variable(text, {['.'] = '{{'.. varible .. '.' .. idx .. '}}'})
 			end))
 		elseif type(model[varible]) == 'function' then
 			return model[varible](text) -- TODO second parameter `render`
@@ -52,14 +53,14 @@ function TemplateEngine._section(template, model)
 	end))
 end
 
-
+---Handles `{{mustache}}` `inverted sections`.
 ---While sections can be used to render text one or more times based on the value of the key,
 ---inverted sections may render text once based on the inverse value of the key.
 ---That is, they will be rendered if the key doesn't exist, is false, or is an empty list.
 ---@param template string
 ---@param model table
 ---@return string
-function TemplateEngine._invertedSection(template, model)
+function TemplateEngine:_invertedSection(template, model)
 	return (template:gsub('{{^(.-)}}(.-){{/%1}}', function (varible, text)
 		local value = model[varible]
 		if not value or (type(value) == 'table' and #value == 0) then
@@ -73,7 +74,7 @@ end
 ---@param template string
 ---@param model table
 ---@return string
-function TemplateEngine._variable(template, model)
+function TemplateEngine:_variable(template, model)
 	local function toNumberIfNumeric(number)
 		return tonumber(number) or number
 	end
