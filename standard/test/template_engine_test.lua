@@ -13,11 +13,18 @@ local TemplateEngine = Lua.import('Module:TemplateEngine', {requireDevIfEnabled 
 
 local suite = ScribuntoUnit:new()
 
-function suite:testEngine()
-	self:assertEquals(
-		'2foo bar baz',
-		TemplateEngine.render('{{b}}{{a.b}}{{#bar}} {{.}}{{/bar}}', {a = {b = 'foo'}, b = 2, bar = {'bar', 'baz'}})
-	)
+local TEST_DATA = {a = {b = 'foo'}, b = 2, foo = {'bar', 'baz'}}
+
+function suite:testVariables()
+	self:assertEquals('2foo', TemplateEngine.render('{{b}}{{a.b}}', TEST_DATA))
+end
+
+function suite:testLoops()
+	self:assertEquals(' bar baz', TemplateEngine.render('{{#foo}} {{.}}{{/foo}}', TEST_DATA))
+end
+
+function suite:testIf()
+	self:assertEquals('HAI', TemplateEngine.render('{{#b}}HAI{{/b}}{{#c}}BAI{{/c}}', TEST_DATA))
 end
 
 return suite

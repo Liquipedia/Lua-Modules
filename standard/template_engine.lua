@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
 ---@class TemplateEngine
@@ -18,22 +20,25 @@ local TemplateEngine = {}
 ---@param model table
 ---@return string
 function TemplateEngine.render(template, model)
-	return TemplateEngine._interpolate(TemplateEngine._foreach(template, model), model)
+	return TemplateEngine._interpolate(TemplateEngine._section(template, model), model)
 end
 
----Handles foreach loops by replacing
----```{{#y}}{{.}}{{/y}}```
----with `${y.foo}${y.bar}` given that key `y` in the model is a table with two keys, `foo` and `bar`.
+---Handles mustache `sections`
+---A section start has two possible inputs. Either 
 ---@param template string
 ---@param model table
 ---@return string
-function TemplateEngine._foreach(template, model)
-	return (template:gsub('{{#(.-)}}(.-){{/%1}}', function (list, text)
-		local strBuilder = {}
-		for value in pairs(model[list]) do
-			table.insert(strBuilder, TemplateEngine._interpolate(text, {['.'] = '{{'.. list .. '.' .. value .. '}}'}))
+function TemplateEngine._section(template, model)
+	return (template:gsub('{{#(.-)}}(.-){{/%1}}', function (varible, text)
+		if type(model[varible]) == 'table' then
+			return table.concat(Array.map(model[varible], function (_, idx)
+				return TemplateEngine._interpolate(text, {['.'] = '{{'.. varible .. '.' .. idx .. '}}'})
+			end))
+		elseif type(model[varible]) == 'function' then
+			return model[varible](text) -- TODO second parameter `render`
+		else
+			return model[varible] and text or ''
 		end
-		return table.concat(strBuilder)
 	end))
 end
 
