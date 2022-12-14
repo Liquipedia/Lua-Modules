@@ -31,4 +31,8 @@ function suite:testNotIf()
 	self:assertEquals('BAI', TemplateEngine:render('{{^foo}}HAI1{{/foo}}{{^b}}HAI2{{/b}}{{^c}}BAI{{/c}}', TEST_DATA))
 end
 
+function suite:testNestedSections()
+	self:assertEquals('HAI', TemplateEngine:render('{{#a.b}}HAI{{/a.b}}', TEST_DATA))
+end
+
 return suite
