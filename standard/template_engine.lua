@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
 ---@class TemplateEngine
@@ -24,7 +23,10 @@ function TemplateEngine.render(template, model)
 end
 
 ---Handles mustache `sections`
----A section start has two possible inputs. Either 
+---A section start has is a key in the model.
+---If it's an array then the contnet within will be displayed once for each element in the array
+---If it's a function, the function will be called
+---Otherwise, if the value is truthy then it will be rendered
 ---@param template string
 ---@param model table
 ---@return string
