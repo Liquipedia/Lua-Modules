@@ -14,19 +14,27 @@ local Table = require('Module:Table')
 ---https://mustache.github.io/mustache.5.html
 local TemplateEngine = {}
 
----Created the html output from a given template string and table input.
+---Created the html output from a given template and a model input.
 ---@param template string
 ---@param model table
 ---@return string
 function TemplateEngine.render(template, model)
-	return TemplateEngine._interpolate(TemplateEngine._section(template, model), model)
+	local renderOrder = {
+		TemplateEngine._section,
+		TemplateEngine._invertedSection,
+		TemplateEngine._variable,
+	}
+
+	return Array.reduce(renderOrder, function (modifiedTemplate, func)
+		return func(modifiedTemplate, model)
+	end, template)
 end
 
----Handles mustache `sections`
----A section start has is a key in the model.
----If it's an array then the contnet within will be displayed once for each element in the array
----If it's a function, the function will be called
----Otherwise, if the value is truthy then it will be rendered
+---Handles `{{mustache}}` `sections`.
+---The section start is a key in the model.
+---If it's an array then the contnet within will be displayed once for each element in the array.
+---If it's a function, the function will be called.
+---Otherwise, if the value is truthy then it will be rendered.
 ---@param template string
 ---@param model table
 ---@return string
@@ -34,7 +42,7 @@ function TemplateEngine._section(template, model)
 	return (template:gsub('{{#(.-)}}(.-){{/%1}}', function (varible, text)
 		if type(model[varible]) == 'table' then
 			return table.concat(Array.map(model[varible], function (_, idx)
-				return TemplateEngine._interpolate(text, {['.'] = '{{'.. varible .. '.' .. idx .. '}}'})
+				return TemplateEngine._variable(text, {['.'] = '{{'.. varible .. '.' .. idx .. '}}'})
 			end))
 		elseif type(model[varible]) == 'function' then
 			return model[varible](text) -- TODO second parameter `render`
@@ -44,11 +52,28 @@ function TemplateEngine._section(template, model)
 	end))
 end
 
+
+---While sections can be used to render text one or more times based on the value of the key,
+---inverted sections may render text once based on the inverse value of the key.
+---That is, they will be rendered if the key doesn't exist, is false, or is an empty list.
+---@param template string
+---@param model table
+---@return string
+function TemplateEngine._invertedSection(template, model)
+	return (template:gsub('{{^(.-)}}(.-){{/%1}}', function (varible, text)
+		local value = model[varible]
+		if not value or (type(value) == 'table' and #value == 0) then
+			return text
+		end
+		return ''
+	end))
+end
+
 ---Interpolates a template using string interpolation. Can handle nested tables.
 ---@param template string
 ---@param model table
 ---@return string
-function TemplateEngine._interpolate(template, model)
+function TemplateEngine._variable(template, model)
 	local function toNumberIfNumeric(number)
 		return tonumber(number) or number
 	end
