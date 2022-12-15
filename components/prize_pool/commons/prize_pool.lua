@@ -514,6 +514,7 @@ function PrizePool:_buildRows()
 				local placeCell = TableCell{
 					content = {{placement:getMedal() or '' , NON_BREAKING_SPACE, placement:_displayPlace()}},
 					css = {['font-weight'] = 'bolder'},
+					classes = {'prizepooltable-place'},
 				}
 				placeCell.rowSpan = #placement.opponents
 				row:addCell(placeCell)
