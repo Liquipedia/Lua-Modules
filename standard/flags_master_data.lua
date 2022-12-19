@@ -1402,7 +1402,7 @@ local data = {
 		name = 'North America',
 	},
 	['northeastasia'] = {
-		flag = 'File:Space filler flag.png',
+		flag = 'File:Northest Asia flag hd.png',
 		localised = 'Northeast Asian',
 		name = 'Northeast Asia',
 	},
