@@ -142,9 +142,14 @@ function MatchLegacy._convertParameters(match2)
 			and opponent2.score or 0
 		match.opponent2flag = player.flag
 	end
+
 	if match2.walkover then
 		match.resulttype = match2.walkover
-		match.walkover = nil
+		if match2.walkover == "ff" or match2.walkover == "dq" then
+			match.walkover = match.winner
+		else
+			match.walkover = nil
+		end
 	end
 
 	return match
