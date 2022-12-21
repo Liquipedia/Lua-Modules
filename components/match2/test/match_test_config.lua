@@ -21,7 +21,7 @@ MatchTestConfig.EXAMPLE_MATCH = {
 	['extradata'] = {
 		['isconverted'] = 0,
 		['isfeatured'] = false,
-		['octane'] = '6f6a-ground-zero-gaming-vs-the-grogans',
+		['shift'] = '6f6a-ground-zero-gaming-vs-the-grogans',
 		['team1icon'] = '',
 		['team2icon'] = '',
 	},
@@ -78,7 +78,7 @@ MatchTestConfig.EXAMPLE_MATCH = {
 	},
 	['matchid'] = '0001',
 	['mode'] = '3v3',
-	['octane'] = '6f6a-ground-zero-gaming-vs-the-grogans',
+	['shift'] = '6f6a-ground-zero-gaming-vs-the-grogans',
 	['opponent1'] = {
 		['icon'] = 'Ground Zero Gaming 2019 std.png',
 		['name'] = 'Ground Zero Gaming',
@@ -172,14 +172,14 @@ MatchTestConfig.EXPECTED_OUTPUT_AFTER_SPLIT = {
 		['extradata'] = {
 			['isconverted'] = 0,
 			['isfeatured'] = false,
-			['octane'] = '6f6a-ground-zero-gaming-vs-the-grogans',
+			['shift'] = '6f6a-ground-zero-gaming-vs-the-grogans',
 			['team1icon'] = '',
 			['team2icon'] = '',
 		},
 		['finished'] = 'true',
 		['matchid'] = '0001',
 		['mode'] = '3v3',
-		['octane'] = '6f6a-ground-zero-gaming-vs-the-grogans',
+		['shift'] = '6f6a-ground-zero-gaming-vs-the-grogans',
 		['parent'] = '',
 		['stream'] = {
 			['twitch'] = 'monyoce',
