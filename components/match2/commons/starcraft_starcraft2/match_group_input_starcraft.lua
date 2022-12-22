@@ -326,6 +326,7 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 			match.winner = 0
 			match.resulttype = 'draw'
 		end
+
 		if tonumber(match.winner) == opponentIndex or match.resulttype == 'draw' then
 			opponent.placement = 1
 		elseif Logic.isNumeric(match.winner) then
