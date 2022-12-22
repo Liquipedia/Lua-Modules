@@ -20,7 +20,8 @@ local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHa
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+
+local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
 local html = mw.html
 local _NON_BREAKING_SPACE = '&nbsp;'
