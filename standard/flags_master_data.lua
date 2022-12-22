@@ -1524,7 +1524,7 @@ local twoLetter = {
 	['cf'] = 'centralafricanrepublic',
 	['cg'] = 'congo',
 	['ch'] = 'switzerland',
-	['ci'] = "côted'ivoire",
+	['ci'] = 'côted\'ivoire',
 	['ck'] = 'cookislands',
 	['cl'] = 'chile',
 	['cm'] = 'cameroon',
@@ -1794,7 +1794,7 @@ local threeLetter = {
 	['che'] = 'switzerland',
 	['chl'] = 'chile',
 	['chn'] = 'china',
-	['civ'] = "côted'ivoire",
+	['civ'] = 'côted\'ivoire',
 	['cmr'] = 'cameroon',
 	['cod'] = 'congo,democraticrepublicofthe',
 	['cog'] = 'congo',
@@ -2031,7 +2031,7 @@ local aliases = {
 	['aland'] = 'ålandislands',
 	['Ålandislands'] = 'ålandislands',
 	['curacao'] = 'curaçao',
-	['ivorycoast'] = "côted'ivoire",
+	['ivorycoast'] = 'côted\'ivoire',
 
 	-- Other
 	['america'] = 'unitedstates',

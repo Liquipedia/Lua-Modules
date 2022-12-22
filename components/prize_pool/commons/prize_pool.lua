@@ -722,7 +722,7 @@ end
 --- Set the WidgetInjector.
 -- @param widgetInjector WidgetInjector An instance of a class that implements the WidgetInjector interface
 function PrizePool:setWidgetInjector(widgetInjector)
-	assert(widgetInjector:is_a(WidgetInjector), "setWidgetInjector: Not a Widget Injector")
+	assert(widgetInjector:is_a(WidgetInjector), 'setWidgetInjector: Not a Widget Injector')
 	self._widgetInjector = widgetInjector
 	return self
 end
@@ -730,7 +730,7 @@ end
 --- Set the LpdbInjector.
 -- @param lpdbInjector LpdbInjector An instance of a class that implements the LpdbInjector interface
 function PrizePool:setLpdbInjector(lpdbInjector)
-	assert(lpdbInjector:is_a(LpdbInjector), "setLpdbInjector: Not an LPDB Injector")
+	assert(lpdbInjector:is_a(LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
 	self._lpdbInjector = lpdbInjector
 	return self
 end
@@ -738,7 +738,7 @@ end
 --- Set the SmwInjector.
 -- @param smwInjector SmwInjector An instance of a class that implements the SmwInjector interface
 function PrizePool:setSmwInjector(smwInjector)
-	assert(smwInjector:is_a(SmwInjector), "setSmwInjector: Not an SMW Injector")
+	assert(smwInjector:is_a(SmwInjector), 'setSmwInjector: Not an SMW Injector')
 	self._smwInjector = smwInjector
 	return self
 end

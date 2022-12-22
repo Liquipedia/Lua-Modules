@@ -557,7 +557,7 @@ function CustomLeague:defineCustomPageVariables()
 	--series number
 	local seriesNumber = _args.number
 	if Logic.isNumeric(seriesNumber) then
-		seriesNumber = string.format("%05i", seriesNumber)
+		seriesNumber = string.format('%05i', seriesNumber)
 		Variables.varDefine('tournament_series_number', seriesNumber)
 	end
 	--check if tournament is finished

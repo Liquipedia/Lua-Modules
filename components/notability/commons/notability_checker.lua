@@ -226,7 +226,7 @@ function NotabilityChecker._preparePlacement(placement)
 	end
 
 	if string.find(placement, '-', 1, true) then
-		local one, _ = placement:match("([^-]+)-([^-]+)")
+		local one, _ = placement:match('([^-]+)-([^-]+)')
 		placement = tonumber(one)
 	else
 		placement = tonumber(placement)
