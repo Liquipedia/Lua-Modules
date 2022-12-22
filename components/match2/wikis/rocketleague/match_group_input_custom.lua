@@ -204,16 +204,16 @@ function matchFunctions.getLinks(match)
 	match.links = {}
 
 	-- Shift (formerly Octane)
-	local i = 1
+	local index = 1
 	match.shift1 = match.shift1 or match.shift or match.octane1 or match.octane
 	while true do
-		local key = 'shift' .. i
-		local slug = match[key] or match['octane' .. i]
+		local key = 'shift' .. index
+		local slug = match[key] or match['octane' .. index]
 		if not slug then
 			break
 		end
 		match.links[key] = 'https://www.shiftrle.gg/matches/' .. slug
-		i = i + 1
+		index = index + 1
 	end
 
 	-- Ballchasing
