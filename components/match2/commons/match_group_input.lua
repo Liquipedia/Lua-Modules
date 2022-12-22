@@ -17,10 +17,10 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local WikiSpecific = require('Module:Brkts/WikiSpecific')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local globalVars = PageVariableNamespace({cached = true})
 
