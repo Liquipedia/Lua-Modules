@@ -14,7 +14,6 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 -- can not use Module:OpponentLibraries here due to circular requires
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -60,7 +59,7 @@ function CustomOpponentDisplay.BlockOpponent(props)
 	local opponent = props.opponent
 
 	-- Default TBDs to not show links
-	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
+	props.showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
 	if opponent.type == Opponent.duo then
 		return CustomOpponentDisplay.PlayerBlockOpponent(props)
@@ -125,7 +124,7 @@ function CustomOpponentDisplay.PlayerInlineOpponent(props)
 		playerTexts = Array.reverse(playerTexts)
 	end
 
-	return html.create('span')
+	return mw.html.create('span')
 		:node(table.concat(playerTexts, ' / '))
 end
 
