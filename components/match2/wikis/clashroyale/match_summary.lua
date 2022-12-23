@@ -10,17 +10,14 @@ local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
 local CardIcon = require('Module:CardIcon')
-local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local String = require('Module:StringUtils')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local NUM_CARDS_PER_PLAYER = 8
 local CARD_COLOR_1 = 'blue'
@@ -131,7 +128,6 @@ end
 
 function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
-	local extradata = game.extradata or {}
 
 	-- Add game header
 	if not Logic.isEmpty(game.header) then
