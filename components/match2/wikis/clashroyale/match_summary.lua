@@ -123,6 +123,11 @@ function CustomMatchSummary._createBody(match)
 		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
 	end
 
+	local extradata = match.extradata
+	if Table.isNotEmpty(extradata.t1bans) or Table.isNotEmpty(extradata.t2bans) then
+		body:addRow(CustomMatchSummary._banRow(extradata.t1bans, extradata.t2bans, match.date))
+	end
+
 	return body
 end
 
@@ -175,6 +180,37 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	return row
 end
 
+function CustomMatchSummary._banRow(t1bans, t2bans, date)
+	local maxAmountOfBans = math.max(#t1bans, #t2bans)
+	for banIndex = 1, maxAmountOfBans do
+		t1bans[banIndex] = t1bans[banIndex] or DEFAULT_CARD
+		t2bans[banIndex] = t2bans[banIndex] or DEFAULT_CARD
+	end
+
+	local banRow = MatchSummary.Row()
+
+	banRow:addClass('brkts-popup-body-game')
+		:css('font-size', '80%')
+		:css('padding', '4px')
+		:css('min-height', '32px')
+
+	banRow:addElement(mw.html.create('div')
+		:wikitext('Bans')
+		:css('margin', 'auto')
+		:css('font-weight', 'bold')
+	)
+	banRow:addElement(MatchSummary.Break():create())
+
+	banRow:addElement(CustomMatchSummary._opponentCardsDisplay({t1bans}, true, date))
+	banRow:addElement(mw.html.create('div')
+		:addClass('brkts-popup-body-element-vertical-centered')
+		:wikitext('Bans')
+	)
+	banRow:addElement(CustomMatchSummary._opponentCardsDisplay({t2bans}, false, date))
+
+	return banRow
+end
+
 -- todo
 function CustomMatchSummary._createTeamMatchBody(body, match)
 	local row = MatchSummary.Row()
@@ -205,7 +241,6 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
--- todo
 function CustomMatchSummary._opponentCardsDisplay(cardDataSets, flip, date)
 	local color = flip and CARD_COLOR_2 or CARD_COLOR_1
 	local wrapper = mw.html.create('div')
