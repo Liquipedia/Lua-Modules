@@ -8,11 +8,12 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
-local CustomOpponentDisplay = {propTypes = {}, types = {}}
+local CustomOpponentDisplay = Table.deepCopy(OpponentDisplay)
 
 CustomOpponentDisplay.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry, function(self) end)
 
