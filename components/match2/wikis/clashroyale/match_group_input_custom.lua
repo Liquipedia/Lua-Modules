@@ -9,13 +9,11 @@
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate/Named')
 local CardNames = mw.loadData('Module:CardNames')
 local Variables = require('Module:Variables')
 
@@ -24,15 +22,12 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 
-local defaultIcon
-
 local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS_PER_MAP = 2
-local MAX_NUM_PLAYERS = 10
 local DEFAULT_BEST_OF = 99
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TBD = 'tbd'
@@ -91,7 +86,7 @@ function CustomMatchGroupInput._checkFinished(match)
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))--unsure what should be the default
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -296,7 +291,6 @@ end
 
 function CustomMatchGroupInput._subMatchStructure(match)
 	local subMatches = {}
-	local numberOfMaps = 0
 
 	for _, map in Table.iter.pairsByPrefix(match, 'map') do
 		local subGroupIndex = map.subgroup
@@ -441,7 +435,7 @@ function CustomMatchGroupInput._getPlayersFromVariables(teamName)
 	local playerName = Variables.varDefault(prefix)
 	while String.isNotEmpty(playerName) do
 		table.insert(players, {
-			name = name,
+			name = playerName,
 			displayname = Variables.varDefault(prefix .. 'dn'),
 			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
 		})
@@ -584,7 +578,7 @@ function CustomMatchGroupInput._processPlayerMapData(map, match)
 		local opponent = match['opponent' .. opponentIndex]
 
 		if opponent.type == Opponent.team then
-			playerNumber = CustomMatchGroupInput._processTeamPlayerMapData(
+			local playerNumber = CustomMatchGroupInput._processTeamPlayerMapData(
 				opponent.match2players or {},
 				opponentIndex,
 				map,
@@ -646,7 +640,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex,
 			cards = CustomMatchGroupInput._readCards(map[playerKey .. 'c']),
 		}
 
-		local match2playerIndex = CustomMatchGroupInput._fetchMatch2PlayerIndexOfPLayer(players, player)
+		local match2playerIndex = CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
 
 		-- if we have the player not present in match2player add basic data here
 		if not match2playerIndex then
@@ -665,7 +659,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex,
 	return playerIndex - 1
 end
 
-function CustomMatchGroupInput._fetchMatch2PlayerIndexOfPLayer(players, player)
+function CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
 	for match2playerIndex, match2player in pairs(players) do
 		if match2player and match2player.name == player then
 			return match2playerIndex
