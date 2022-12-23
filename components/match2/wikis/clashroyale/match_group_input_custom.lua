@@ -113,6 +113,10 @@ end
 function CustomMatchGroupInput._getExtraData(match)
 	local extradata = {
 		casters = match.casters,
+		t1bans = match.t1bans and
+			CustomMatchGroupInput._readCards(match.t1bans),
+		t2bans = match.t1bans and
+			CustomMatchGroupInput._readCards(match.t2bans),
 	}
 
 	for subGroupIndex = 1, MAX_NUM_MAPS do
