@@ -19,6 +19,7 @@ local VodLink = require('Module:VodLink')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -37,6 +38,7 @@ local _LINK_DATA = {
 	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	halodatahive = {icon = 'File:Halo Data Hive allmode.png',text = 'Match page on Halo Data Hive'},
+	headtohead = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
@@ -95,6 +97,16 @@ function CustomMatchSummary.getByMatchId(args)
 
 	match.links.lrthread = match.lrthread
 	match.links.vod = match.vod
+	if
+		--Logic.readBool(match.extradata.headtohead) and
+		match.opponents[1].type == Opponent.team and
+		match.opponents[2].type == Opponent.team
+	then
+		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
+		match.links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Head2head')) ..
+		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
+		'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
+	end
 	if Table.isNotEmpty(vods) or Table.isNotEmpty(match.links) then
 		local footer = MatchSummary.Footer()
 
