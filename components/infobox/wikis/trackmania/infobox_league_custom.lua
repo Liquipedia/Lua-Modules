@@ -122,7 +122,7 @@ function CustomLeague:getWikiCategories(args)
 	if CustomLeague:liquipediaTierHighlighted(args) then
 		table.insert(_categories, 'Ubisoft Tournaments')
 	end
-	
+
 	return _categories
 end
 
