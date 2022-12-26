@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -36,7 +35,7 @@ function CustomLeague.run(frame)
 	_args = league.args
 
 	_args.player_number = _args.participants_number
-	
+
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -80,14 +79,14 @@ function CustomInjector:parse(id, widgets)
 			name = 'Number of Players',
 			content = {_args.player_number}
 		})
-		
+
 		local maps = _league:getAllArgsForBase(_args, 'map')
 		if #maps then
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
 	end
-	
+
 	return widgets
 end
 
@@ -104,13 +103,13 @@ function CustomLeague:defineCustomPageVariables(args)
 		(not String.isEmpty(args.team_number)) and 'team' or
 		'solo'
 	)
-	
+
 	Variables.varDefine('tournament_date', Variables.varDefault('tournament_enddate', ''))
-	
+
 	-- legacy variables, to be removed
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype', ''))
-	
+
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate', ''))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('date', Variables.varDefault('tournament_enddate', ''))
@@ -137,6 +136,5 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	return lpdbData
 end
-
 
 return CustomLeague
