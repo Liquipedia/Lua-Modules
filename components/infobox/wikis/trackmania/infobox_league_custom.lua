@@ -66,6 +66,7 @@ function CustomInjector:parse(id, widgets)
 						if not info then
 							return 'Unknown game, check Module:Games.'
 						end
+						table.insert(_categories, info.link .. ' Competitions')
 						return Page.makeInternalLink(info.name, info.link)
 					end)
 		})
@@ -118,6 +119,10 @@ function CustomLeague:defineCustomPageVariables(args)
 end
 
 function CustomLeague:getWikiCategories(args)
+	if CustomLeague:liquipediaTierHighlighted(args) then
+		table.insert(_categories, 'Ubisoft Tournaments')
+	end
+	
 	return _categories
 end
 
