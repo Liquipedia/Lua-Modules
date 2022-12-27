@@ -43,7 +43,7 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
-	local matchSummary = MatchSummary():init('520px')
+	local matchSummary = MatchSummary():init('360px')
 	matchSummary.root:css('flex-wrap', 'unset')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
@@ -160,14 +160,22 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		:css('padding', '4px')
 		:css('min-height', '32px')
 
-	row:addElement(CustomMatchSummary._opponentCardsDisplay(cardData[1], true, date))
+	row:addElement(CustomMatchSummary._opponentCardsDisplay{
+		data = cardData[1],
+		flip = true,
+		date = date,
+	})
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext('Game ' .. gameIndex)
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentCardsDisplay(cardData[2], false, date))
+	row:addElement(CustomMatchSummary._opponentCardsDisplay{
+		data = cardData[2],
+		flip = false,
+		date = date,
+	})
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -202,12 +210,20 @@ function CustomMatchSummary._banRow(t1bans, t2bans, date)
 	)
 	banRow:addElement(MatchSummary.Break():create())
 
-	banRow:addElement(CustomMatchSummary._opponentCardsDisplay({t1bans}, true, date))
+	banRow:addElement(CustomMatchSummary._opponentCardsDisplay{
+		data = {t1bans},
+		flip = true,
+		date = date,
+	})
 	banRow:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext('Bans')
 	)
-	banRow:addElement(CustomMatchSummary._opponentCardsDisplay({t2bans}, false, date))
+	banRow:addElement(CustomMatchSummary._opponentCardsDisplay{
+		data = {t2bans},
+		flip = false,
+		date = date,
+	})
 
 	return banRow
 end
@@ -242,7 +258,11 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
-function CustomMatchSummary._opponentCardsDisplay(cardDataSets, flip, date)
+function CustomMatchSummary._opponentCardsDisplay(args)
+	local cardDataSets = args.data
+	local flip = args.flip
+	local date = args.date
+	
 	local color = flip and CARD_COLOR_2 or CARD_COLOR_1
 	local wrapper = mw.html.create('div')
 
@@ -257,14 +277,16 @@ function CustomMatchSummary._opponentCardsDisplay(cardDataSets, flip, date)
 			)
 		end
 
-		if flip then
-			cardDisplays = Array.reverse(cardDisplays)
-		end
+		local display
 
-		local display = mw.html.create('div')
-			:addClass('brkts-popup-body-element-thumbs')
+		for cardIndex, card in ipairs(cardDisplays) do
+			-- break the card rows into fragments of 4 cards each
+			if cardIndex % 4 == 1 then
+				wrapper:node(display)
+				display = mw.html.create('div')
+					:addClass('brkts-popup-body-element-thumbs')
+			end
 
-		for _, card in ipairs(cardDisplays) do
 			display:node(card)
 		end
 
