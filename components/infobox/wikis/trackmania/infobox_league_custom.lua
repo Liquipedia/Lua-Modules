@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 					end)
 		})
 	elseif id == 'customcontent' then
-		table.insert(widgets, Title{name = (not String.isEmpty(_args.team_number)) and 'Teams' or 'Players'})
+		table.insert(widgets, Title{name = String.isNotEmpty(_args.team_number) and 'Teams' or 'Players'})
 		table.insert(widgets, Cell{
 			name = 'Number of Teams',
 			content = {_args.team_number}
@@ -100,9 +100,11 @@ end
 
 function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_mode',
-		(not String.isEmpty(args.mode)) and args.mode or
-		(not String.isEmpty(args.team_number)) and 'team' or
-		'solo'
+		Logic.emptyOr(
+		    args.mode, 
+		    (String.isNotEmpty(args.team_number) and 'team' or nil),
+		    'solo'
+		)
 	)
 
 	Variables.varDefine('tournament_date', Variables.varDefault('tournament_enddate', ''))
@@ -134,7 +136,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['maps'] = table.concat(_league:getAllArgsForBase(_args, 'map'), ';')
 
 	lpdbData['game'] = (Games[args.game] or {}).link
-	lpdbData['participantsnumber'] = args.team_number or args.player_number
+	lpdbData['participantsnumber'] = tonumber(args.team_number) or tonumber(args.player_number)
 
 	-- Legacy, can be superseeded by lpdbData.mode
 	lpdbData.extradata.individual = Variables.varDefault('tournament_mode', true)
