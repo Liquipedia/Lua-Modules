@@ -26,10 +26,6 @@ local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
-local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link='
-local _OCTANE_SUFFIX = '|Octane matchpage]]'
-local _BALLCHASING_PREFIX = '[[File:Ballchasing icon.png|14x14px|link='
-local _BALLCHASING_SUFFIX = '|Ballchasing replays]]'
 local _HEADTOHEAD_PREFIX = '[[File:Match Info Stats.png|14x14px|link='
 local _HEADTOHEAD_SUFFIX = '|Head to Head history]]'
 

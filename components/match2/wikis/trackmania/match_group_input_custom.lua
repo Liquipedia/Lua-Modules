@@ -469,7 +469,6 @@ function mapFunctions.getParticipantsData(map)
 	for o = 1, MAX_NUM_OPPONENTS do
 		for player = 1, MAX_NUM_PLAYERS do
 			local participant = participants[o .. '_' .. player] or {}
-			local opstring = 'opponent' .. o .. '_p' .. player
 			if not Table.isEmpty(participant) then
 				participants[o .. '_' .. player] = participant
 			end
