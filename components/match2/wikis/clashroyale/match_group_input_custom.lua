@@ -123,7 +123,7 @@ function CustomMatchGroupInput._getExtraData(match)
 		extradata['subgroup' .. subGroupIndex .. 'header']
 			= CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
 		extradata['subgroup' .. subGroupIndex .. 'iskoth']
-			= Logic.readBool(match['subgroup' .. subGroupIndex .. 'iskoth'])
+			= Logic.readBool(match['subgroup' .. subGroupIndex .. 'iskoth']) or nil
 	end
 
 	match.extradata = extradata
