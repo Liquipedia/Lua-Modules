@@ -24,16 +24,16 @@ local Streams = require('Module:Links/Stream')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
-local _STATUS_HAS_SCORE = 'S'
-local _STATUS_DEFAULT_WIN = 'W'
-local ALLOWED_STATUSES = { _STATUS_DEFAULT_WIN, 'FF', 'DQ', 'L' }
+local STATUS_HAS_SCORE = 'S'
+local STATUS_DEFAULT_WIN = 'W'
+local ALLOWED_STATUSES = { STATUS_DEFAULT_WIN, 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
-local _RESULT_TYPE_DRAW = 'draw'
-local _EARNINGS_LIMIT_FOR_FEATURED = 10000
-local _CURRENT_YEAR = os.date('%Y')
+local RESULT_TYPE_DRAW = 'draw'
+local EARNINGS_LIMIT_FOR_FEATURED = 10000
+local CURRENT_YEAR = os.date('%Y')
 
 local globalVars = PageVariableNamespace()
 
@@ -104,8 +104,8 @@ end
 function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
 	local op1 = table[key1]
 	local op2 = table[key2]
-	local op1norm = op1.status == _STATUS_HAS_SCORE
-	local op2norm = op2.status == _STATUS_HAS_SCORE
+	local op1norm = op1.status == STATUS_HAS_SCORE
+	local op2norm = op2.status == STATUS_HAS_SCORE
 	if op1norm then
 		if op2norm then
 			local op1setwins = CustomMatchGroupInput._getSetWins(op1)
@@ -118,9 +118,9 @@ function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
 		else return true end
 	else
 		if op2norm then return false
-		elseif op1.status == _STATUS_DEFAULT_WIN then return true
+		elseif op1.status == STATUS_DEFAULT_WIN then return true
 		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
-		elseif op2.status == _STATUS_DEFAULT_WIN then return false
+		elseif op2.status == STATUS_DEFAULT_WIN then return false
 		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
@@ -254,9 +254,9 @@ function matchFunctions.isFeatured(match)
 		return true
 	end
 
-	if matchFunctions.currentEarnings(opponent1.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
+	if matchFunctions.currentEarnings(opponent1.name) >= EARNINGS_LIMIT_FOR_FEATURED then
 		return true
-	elseif matchFunctions.currentEarnings(opponent2.name) >= _EARNINGS_LIMIT_FOR_FEATURED then
+	elseif matchFunctions.currentEarnings(opponent2.name) >= EARNINGS_LIMIT_FOR_FEATURED then
 		return true
 	end
 	return false
@@ -272,7 +272,7 @@ function matchFunctions.currentEarnings(name)
 	})
 
 	if type(data[1]) == 'table' then
-		local currentEarnings = (data[1].extradata or {})['earningsin' .. _CURRENT_YEAR]
+		local currentEarnings = (data[1].extradata or {})['earningsin' .. CURRENT_YEAR]
 		return tonumber(currentEarnings or 0) or 0
 	end
 
@@ -300,7 +300,7 @@ function matchFunctions.getOpponents(args)
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
-				opponent.status = _STATUS_HAS_SCORE
+				opponent.status = STATUS_HAS_SCORE
 				isScoreSet = true
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
@@ -345,15 +345,15 @@ function matchFunctions.getOpponents(args)
 		local lastStatus
 		-- luacheck: push ignore
 		for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
-			if opponent.status ~= _STATUS_HAS_SCORE and opponent.status ~= _STATUS_DEFAULT_WIN and placement == 1 then
+			if opponent.status ~= STATUS_HAS_SCORE and opponent.status ~= STATUS_DEFAULT_WIN and placement == 1 then
 				placement = 2
 			end
 			if placement == 1 then
 				args.winner = opponentIndex
 			end
-			if opponent.status == _STATUS_HAS_SCORE and opponent.score == lastScore then
+			if opponent.status == STATUS_HAS_SCORE and opponent.score == lastScore then
 				opponent.placement = lastPlacement
-			elseif opponent.status ~= _STATUS_HAS_SCORE and opponent.status == lastStatus then
+			elseif opponent.status ~= STATUS_HAS_SCORE and opponent.status == lastStatus then
 				opponent.placement = lastPlacement
 			else
 				opponent.placement = placement
@@ -372,21 +372,21 @@ function matchFunctions.getOpponents(args)
 		end
 	end
 	if
-		winner == _RESULT_TYPE_DRAW or
+		winner == RESULT_TYPE_DRAW or
 		winner == '0' or (
 			Logic.readBool(args.finished) and
 			#opponents == 2 and
-			opponents[1].status == _STATUS_HAS_SCORE and
-			opponents[2].status == _STATUS_HAS_SCORE and
+			opponents[1].status == STATUS_HAS_SCORE and
+			opponents[2].status == STATUS_HAS_SCORE and
 			opponents[1].score == opponents[2].score
 		)
 	then
 		args.winner = 0
-		args.resulttype = _RESULT_TYPE_DRAW
+		args.resulttype = RESULT_TYPE_DRAW
 	elseif
 		Logic.readBool(args.finished) and
 		#opponents == 2 and
-		opponents[1].status ~= _STATUS_HAS_SCORE and
+		opponents[1].status ~= STATUS_HAS_SCORE and
 		opponents[1].status == opponents[2].status
 	then
 		args.winner = 0
@@ -431,7 +431,7 @@ function mapFunctions.getScoresAndWinner(map)
 		if not Logic.isEmpty(score) then
 			if TypeUtil.isNumeric(score) then
 				score = tonumber(score)
-				obj.status = _STATUS_HAS_SCORE
+				obj.status = STATUS_HAS_SCORE
 				obj.score = score
 				obj.index = scoreIndex
 			elseif Table.includes(ALLOWED_STATUSES, score) then
@@ -464,17 +464,17 @@ function mapFunctions.getWinner(indexedScores)
 end
 
 function mapFunctions.mapWinnerSortFunction(op1, op2)
-	local op1norm = op1.status == _STATUS_HAS_SCORE
-	local op2norm = op2.status == _STATUS_HAS_SCORE
+	local op1norm = op1.status == STATUS_HAS_SCORE
+	local op2norm = op2.status == STATUS_HAS_SCORE
 	if op1norm then
 		if op2norm then
 			return tonumber(op1.score) > tonumber(op2.score)
 		else return true end
 	else
 		if op2norm then return false
-		elseif op1.status == _STATUS_DEFAULT_WIN then return true
+		elseif op1.status == STATUS_DEFAULT_WIN then return true
 		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
-		elseif op2.status == _STATUS_DEFAULT_WIN then return false
+		elseif op2.status == STATUS_DEFAULT_WIN then return false
 		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
