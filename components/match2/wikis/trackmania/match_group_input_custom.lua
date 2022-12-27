@@ -188,12 +188,7 @@ function matchFunctions.getExtraData(match)
 		and opponent2.type == Opponent.team
 
 	match.extradata = {
-		team1icon = getIconName(opponent1.template or ''),
-		team2icon = getIconName(opponent2.template or ''),
-		lastgame = Variables.varDefault('last_game'),
-		isconverted = 0,
 		showh2h = showh2h,
-		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
 	}
 	return match
@@ -236,25 +231,6 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 		displayName = displayName,
 		flag = flag,
 	}
-end
-
-function matchFunctions.isFeatured(match)
-	local opponent1 = match.opponent1
-	local opponent2 = match.opponent2
-	if opponent1.type ~= 'team' or opponent2.type ~= 'team' then
-		return false
-	end
-
-	if
-		tonumber(match.liquipediatier or '') == 1
-		or tonumber(match.liquipediatier or '') == 2
-		or Logic.readBool(Variables.varDefault('ubisoftmajor'))
-		or not String.isEmpty(Variables.varDefault('match_featured_override'))
-	then
-		return true
-	end
-
-	return false
 end
 
 function matchFunctions.getOpponents(args)
