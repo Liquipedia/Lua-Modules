@@ -625,7 +625,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex,
 
 	local playerIndex = 1
 	local playerKey = 't' .. opponentIndex .. 'p' .. playerIndex
-	while playerIndex < MAX_NUM_PLAYERS_PER_MAP and (String.isNotEmpty(map[playerKey]) or
+	while playerIndex <= MAX_NUM_PLAYERS_PER_MAP and (String.isNotEmpty(map[playerKey]) or
 		String.isNotEmpty(map[playerKey .. 'link']) or String.isNotEmpty(map[playerKey .. 'c'])) do
 
 		local player = map[playerKey .. 'link'] or map[playerKey]
