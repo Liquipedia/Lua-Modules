@@ -8,7 +8,6 @@
 
 local CustomMatchSummary = {}
 
-local Array = require('Module:Array')
 local CardIcon = require('Module:CardIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -262,7 +261,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 	local cardDataSets = args.data
 	local flip = args.flip
 	local date = args.date
-	
+
 	local color = flip and CARD_COLOR_2 or CARD_COLOR_1
 	local wrapper = mw.html.create('div')
 
