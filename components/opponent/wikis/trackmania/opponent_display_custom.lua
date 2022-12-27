@@ -1,0 +1,196 @@
+---
+-- @Liquipedia
+-- wiki=trackmania
+-- page=Module:OpponentDisplay/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Array = require('Module:Array')
+local Class = require('Module:Class')
+local DisplayUtil = require('Module:DisplayUtil')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Table = require('Module:Table')
+local TypeUtil = require('Module:TypeUtil')
+
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
+
+local OpponentDisplayCustom = Table.deepCopy(OpponentDisplay)
+
+local html = mw.html
+
+--[[
+Display component for an opponent entry appearing in a bracket match.
+]]
+OpponentDisplayCustom.BracketOpponentEntry = Class.new(
+	function(self, opponent, options)
+		self.content = html.create('div'):addClass('brkts-opponent-entry-left')
+
+		if opponent.type == 'team' then
+			self:createTeam(opponent.template or 'tbd', options)
+		elseif opponent.type == 'solo' or opponent.type == 'duo' then
+			self:createPlayers(opponent)
+		elseif opponent.type == 'literal' then
+			self:createLiteral(opponent.name or '')
+		end
+
+		self.root = html.create('div'):addClass('brkts-opponent-entry')
+			:node(self.content)
+	end
+)
+
+function OpponentDisplayCustom.BracketOpponentEntry:createTeam(template, options)
+	options = options or {}
+	local forceShortName = options.forceShortName
+
+	local opponentNode = OpponentDisplay.BlockTeamContainer({
+		showLink = false,
+		style = forceShortName and 'short' or 'hybrid',
+		template = template,
+	})
+
+	self.content:node(opponentNode)
+end
+
+function OpponentDisplayCustom.BracketOpponentEntry:createPlayers(opponent)
+	local players = opponent.players
+	if #players == 1 then
+		local playerNode = PlayerDisplay.BlockPlayer({
+			player = players[1],
+			overflow = 'ellipsis',
+		})
+		self.content:node(playerNode)
+	else
+		local playersNode = OpponentDisplayCustom.PlayerInlineOpponent{
+			opponent = opponent
+		}
+
+		self.content:node(playersNode)
+	end
+end
+
+function OpponentDisplayCustom.BracketOpponentEntry:createLiteral(name)
+	local literal = OpponentDisplay.BlockLiteral({
+		name = name,
+		overflow = 'ellipsis',
+	})
+	self.content:node(literal)
+end
+
+function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
+	local score1Node = OpponentDisplay.BracketScore({
+		isWinner = opponent.placement == 1 or opponent.advances,
+		scoreText = OpponentDisplay.InlineScore(opponent),
+	})
+	self.root:node(score1Node)
+
+	local score2Node
+	if opponent.score2 then
+		score2Node = OpponentDisplay.BracketScore({
+			isWinner = opponent.placement2 == 1,
+			scoreText = OpponentDisplay.InlineScore2(opponent),
+		})
+	end
+	self.root:node(score2Node)
+
+	if (opponent.placement2 or opponent.placement or 0) == 1
+		or opponent.advances then
+		self.content:addClass('brkts-opponent-win')
+	end
+end
+
+--[[
+Displays an opponent as a block element. The width of the component is
+determined by its layout context, and not of the opponent.
+]]
+function OpponentDisplayCustom.BlockOpponent(props)
+	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
+	local opponent = props.opponent
+	-- Default TBDs to not show links
+	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
+
+	if opponent.type == 'team' then
+		return OpponentDisplay.BlockTeamContainer({
+			flip = props.flip,
+			overflow = props.overflow,
+			showLink = showLink,
+			style = props.teamStyle,
+			template = opponent.template or 'tbd',
+		})
+	elseif opponent.type == 'literal' then
+		return OpponentDisplay.BlockLiteral({
+			flip = props.flip,
+			name = opponent.name or '',
+			overflow = props.overflow,
+		})
+	elseif opponent.type == 'solo' or opponent.type == 'duo' then
+		return OpponentDisplayCustom.PlayerBlockOpponent(
+			Table.merge(props, {showLink = showLink})
+		)
+	else
+		error('Unrecognized opponent.type ' .. opponent.type)
+	end
+end
+
+--[[
+Displays a player opponent (solo or duo) as an inline element.
+]]
+function OpponentDisplayCustom.PlayerInlineOpponent(props)
+	local opponent = props.opponent
+
+	local playerTexts = Array.map(opponent.players, function(player)
+		local node = PlayerDisplay.InlinePlayer({
+			flip = props.flip,
+			player = player,
+			showFlag = props.showFlag,
+			showLink = props.showLink
+		})
+		return tostring(node)
+	end)
+	if props.flip then
+		playerTexts = Array.reverse(playerTexts)
+	end
+
+	local playersNode = table.concat(playerTexts, ' / ')
+
+	return html.create('span')
+		:node(playersNode)
+end
+
+--[[
+Displays a player opponent (solo or duo) as a block element.
+]]
+function OpponentDisplayCustom.PlayerBlockOpponent(props)
+	local opponent = props.opponent
+
+	local playerNodes = Array.map(opponent.players, function(player)
+		return PlayerDisplay.BlockPlayer({
+			flip = props.flip,
+			overflow = props.overflow,
+			player = player,
+			showFlag = props.showFlag,
+			showLink = props.showLink,
+			showPlayerTeam = props.showPlayerTeam,
+			team = player.team,
+			abbreviateTbd = props.abbreviateTbd
+		})
+			:addClass(props.playerClass)
+	end)
+
+	if #opponent.players == 1 then
+		return playerNodes[1]
+	else
+		local playersNode = html.create('div')
+			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+		for _, playerNode in ipairs(playerNodes) do
+			playersNode:node(playerNode)
+		end
+		return playersNode
+	end
+end
+
+return Class.export(OpponentDisplayCustom)
