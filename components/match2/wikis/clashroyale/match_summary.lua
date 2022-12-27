@@ -31,6 +31,7 @@ local LINK_DATA = {
 	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
 	interview = {icon = 'File:Interview32.png', text = 'Interview'},
 	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
+	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
 }
 LINK_DATA.review = LINK_DATA.recap
 LINK_DATA.preview2 = LINK_DATA.preview
