@@ -254,29 +254,7 @@ function matchFunctions.isFeatured(match)
 		return true
 	end
 
-	if matchFunctions.currentEarnings(opponent1.name) >= EARNINGS_LIMIT_FOR_FEATURED then
-		return true
-	elseif matchFunctions.currentEarnings(opponent2.name) >= EARNINGS_LIMIT_FOR_FEATURED then
-		return true
-	end
 	return false
-end
-
-function matchFunctions.currentEarnings(name)
-	if String.isEmpty(name) then
-		return 0
-	end
-	local data = mw.ext.LiquipediaDB.lpdb('team', {
-		conditions = '[[name::' .. name .. ']]',
-		query = 'extradata'
-	})
-
-	if type(data[1]) == 'table' then
-		local currentEarnings = (data[1].extradata or {})['earningsin' .. CURRENT_YEAR]
-		return tonumber(currentEarnings or 0) or 0
-	end
-
-	return 0
 end
 
 function matchFunctions.getOpponents(args)
