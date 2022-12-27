@@ -353,8 +353,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 				:wikitext(Abbreviation.make('KotH', 'King of the Hill submatch'))
 			)
 	end
-	
-	
+
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:node(scoreElement)
