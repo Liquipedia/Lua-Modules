@@ -22,7 +22,7 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 
-local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
+local MAX_NUM_MAPS = config.MAX_NUM_MAPS or 30
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
