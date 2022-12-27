@@ -20,6 +20,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local OpponentDisplayCustom = Lua.import('Module:OpponentDisplay/Custom', {requireDevIfEnabled = true})
 
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -171,7 +172,7 @@ function Header:soloOpponentTeam(opponent, date)
 end
 
 function Header:createOpponent(opponent, opponentIndex)
-	return OpponentDisplay.BlockOpponent({
+	return OpponentDisplayCustom.BlockOpponent({
 		flip = opponentIndex == 1,
 		opponent = opponent,
 		overflow = 'ellipsis',
