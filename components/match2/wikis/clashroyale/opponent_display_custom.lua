@@ -41,7 +41,6 @@ CustomOpponentDisplay.BracketOpponentEntry = Class.new(
 	end
 )
 
-CustomOpponentDisplay.BracketOpponentEntry.createPlayer = OpponentDisplay.BracketOpponentEntry.createPlayer
 CustomOpponentDisplay.BracketOpponentEntry.createTeam = OpponentDisplay.BracketOpponentEntry.createTeam
 CustomOpponentDisplay.BracketOpponentEntry.createLiteral = OpponentDisplay.BracketOpponentEntry.createLiteral
 CustomOpponentDisplay.BracketOpponentEntry.addScores = OpponentDisplay.BracketOpponentEntry.addScores
@@ -50,6 +49,16 @@ function CustomOpponentDisplay.BracketOpponentEntry:createDuo(opponent)
 	local playerNode = CustomOpponentDisplay.PlayerBlockOpponent({
 		opponent = opponent,
 		overflow = 'ellipsis',
+		showLink = false,
+	})
+	self.content:node(playerNode)
+end
+
+function CustomOpponentDisplay.BracketOpponentEntry:createPlayer(player)
+	local playerNode = PlayerDisplay.BlockPlayer({
+		player = player,
+		overflow = 'ellipsis',
+		showLink = false,
 	})
 	self.content:node(playerNode)
 end
