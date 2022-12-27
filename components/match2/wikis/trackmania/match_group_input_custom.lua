@@ -32,8 +32,6 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
 local RESULT_TYPE_DRAW = 'draw'
-local EARNINGS_LIMIT_FOR_FEATURED = 10000
-local CURRENT_YEAR = os.date('%Y')
 
 local globalVars = PageVariableNamespace()
 
