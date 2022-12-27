@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -139,7 +140,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['participantsnumber'] = tonumber(args.team_number) or tonumber(args.player_number)
 
 	-- Legacy, can be superseeded by lpdbData.mode
-	lpdbData.extradata.individual = Variables.varDefault('tournament_mode', true)
+	lpdbData.extradata.individual = Variables.varDefault('tournament_mode', 'solo') == 'solo' 
 
 	return lpdbData
 end
