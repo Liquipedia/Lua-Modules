@@ -8,6 +8,7 @@
 
 local CustomMatchSummary = {}
 
+local Abbreviation = require('Module:Abbreviation')
 local CardIcon = require('Module:CardIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -17,6 +18,8 @@ local VodLink = require('Module:VodLink')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+
+local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
 local NUM_CARDS_PER_PLAYER = 8
 local CARD_COLOR_1 = 'blue'
@@ -46,7 +49,7 @@ function CustomMatchSummary.getByMatchId(args)
 	matchSummary.root:css('flex-wrap', 'unset')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
+				:body(CustomMatchSummary._createBody(match, args.matchId))
 
 	if match.comment then
 		local comment = MatchSummary.Comment():content(match.comment)
@@ -103,7 +106,7 @@ function CustomMatchSummary._createHeader(match)
 	return header
 end
 
-function CustomMatchSummary._createBody(match)
+function CustomMatchSummary._createBody(match, matchId)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
@@ -115,7 +118,7 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	if match.extradata.hasteamopponent then
-		return CustomMatchSummary._createTeamMatchBody(body, match)
+		return CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 	end
 
 	-- Iterate each map
@@ -227,18 +230,153 @@ function CustomMatchSummary._banRow(t1bans, t2bans, date)
 	return banRow
 end
 
--- todo
-function CustomMatchSummary._createTeamMatchBody(body, match)
-	local row = MatchSummary.Row()
-	row:addElement(mw.html.create('div')
+function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
+	local subMatches = match.extradata.submatches
+	for _, game in ipairs(match.games) do
+		local subMatch = subMatches[game.subgroup]
+		if not subMatch.games then
+			subMatch.games = {}
+		end
+
+		table.insert(subMatch.games, game)
+	end
+
+	for subMatchIndex, subMatch in ipairs(subMatches) do
+		local players = CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
+		body:addRow(CustomMatchSummary._createSubMatch(
+			players,
+			subMatchIndex,
+			subMatch,
+			match.extradata
+		))
+	end
+
+	-- set a warning in popup for missing module:BigMatch implementation
+	local warningRow = MatchSummary.Row()
+	warningRow:addElement(mw.html.create('div')
 		:addClass('error')
-		:wikitext('MatchSummary is currently not ready for matches including team opponents')
+		:wikitext('Currently bigMatch is not yet implemented on Clash Royale. '
+			.. 'Once it is implemented you can enter the more detailed match details '
+			.. 'on a page per match which then gets linked here:')
 		:css('margin', 'auto')
 	)
+	body:addRow(warningRow)
 
-	body:addRow(row)
+	local matchPageLinkRow = MatchSummary.Row()
+	matchPageLinkRow:addElement(mw.html.create('div')
+		:addClass('brkts-popup-comment')
+		:wikitext('[[Match:ID_' .. matchId .. '|More details on the match page]]')
+	)
+	body:addRow(matchPageLinkRow)
 
 	return body
+end
+
+function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
+	local players = {{}, {}, hash = {{}, {}}}
+
+	CustomMatchSummary._extractPlayersFromGame(players, subMatch.games[1], match)
+
+	if match.extradata['subgroup' .. subMatchIndex .. 'iskoth'] then
+		for gameIndex = 2, #subMatch.games do
+			CustomMatchSummary._extractPlayersFromGame(players, subMatch.games[gameIndex], match)
+		end
+	end
+
+	return players
+end
+
+function CustomMatchSummary._extractPlayersFromGame(players, game, match)
+	for participantKey, participant in Table.iter.spairs(game.participants or {}) do
+		participantKey = mw.text.split(participantKey, '_')
+		local opponentIndex = tonumber(participantKey[1])
+		local match2playerIndex = tonumber(participantKey[2])
+
+		local player = match.opponents[opponentIndex].players[match2playerIndex]
+
+		if not player then
+			player = {
+				displayName = participant.displayname,
+				pageName = participant.name,
+			}
+		end
+
+		-- make sure we only display each player once
+		if not players.hash[opponentIndex][player.pageName] then
+			players.hash[opponentIndex][player.pageName] = true
+			table.insert(players[opponentIndex], player)
+		end
+	end
+
+	return players
+end
+
+function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, extradata)
+	local row = MatchSummary.Row()
+
+	row:addClass('brkts-popup-body-game')
+		:css('min-height', '32px')
+
+	-- Add submatch header
+	if not Logic.isEmpty(extradata['subgroup' .. subMatchIndex .. 'header']) then
+		row:addElement(mw.html.create('div')
+			:wikitext(extradata['subgroup' .. subMatchIndex .. 'header'])
+			:css('margin', 'auto')
+			:css('font-weight', 'bold')
+		)
+		row:addElement(MatchSummary.Break():create())
+	end
+
+	-- players left side
+	row:addElement(mw.html.create('div')
+		:addClass(subMatch.winner == 1 and 'bg-win' or nil)
+		:css('align-items', 'center')
+		:css('border-radius', '0 12px 12px 0')
+		:css('padding', '2px 8px')
+		:css('text-align', 'right')
+		:css('width', '40%')
+		:node(OpponentDisplay.PlayerBlockOpponent{
+			opponent = {players = players[1]},
+			overflow = 'ellipsis',
+			showLink = true,
+			flip = true,
+		})
+	)
+
+	-- scores and in case of koth also info that it is koth
+	local scoreElement = table.concat(subMatch.scores, ' - ')
+	if extradata['subgroup' .. subMatchIndex .. 'iskoth'] then
+		scoreElement = mw.html.create('div')
+			:node(mw.html.create('div'):wikitext(scoreElement))
+			:node(mw.html.create('div')
+				:css('font-size', '85%')
+				:wikitext(Abbreviation.make('KotH', 'King of the Hill submatch'))
+			)
+	end
+	
+	
+	row:addElement(mw.html.create('div')
+		:addClass('brkts-popup-body-element-vertical-centered')
+		:node(scoreElement)
+	)
+
+	-- players right side
+	row:addElement(mw.html.create('div')
+		:addClass(subMatch.winner == 2 and 'bg-win' or nil)
+		:css('align-items', 'center')
+		:css('border-radius', '12px 0 0 12px')
+		:css('padding', '2px 8px')
+		:css('text-align', 'left')
+		:css('width', '40%')
+		:node(OpponentDisplay.PlayerBlockOpponent{
+			opponent = {players = players[2]},
+			overflow = 'ellipsis',
+			showLink = true,
+			flip = false,
+		})
+	)
+
+	return row
 end
 
 function CustomMatchSummary._createCheckMark(isWinner)
