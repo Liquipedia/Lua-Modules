@@ -60,7 +60,7 @@ function OpponentDisplayCustom.BracketOpponentEntry:createPlayers(opponent)
 	end
 end
 
-OpponentDisplayCustom.BracketOpponentEntry.createLiteral = OpponentDisplay.BracketOpponentEntry.createLiberal
+OpponentDisplayCustom.BracketOpponentEntry.createLiteral = OpponentDisplay.BracketOpponentEntry.createLiteral
 
 function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 	local extradata = opponent.extradata or {}
