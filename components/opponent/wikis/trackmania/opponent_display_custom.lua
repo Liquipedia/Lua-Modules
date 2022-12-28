@@ -12,9 +12,7 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
@@ -43,18 +41,7 @@ OpponentDisplayCustom.BracketOpponentEntry = Class.new(
 	end
 )
 
-function OpponentDisplayCustom.BracketOpponentEntry:createTeam(template, options)
-	options = options or {}
-	local forceShortName = options.forceShortName
-
-	local opponentNode = OpponentDisplay.BlockTeamContainer({
-		showLink = false,
-		style = forceShortName and 'short' or 'hybrid',
-		template = template,
-	})
-
-	self.content:node(opponentNode)
-end
+OpponentDisplayCustom.BracketOpponentEntry.createTeam = OpponentDisplay.BracketOpponentEntry.createTeam
 
 function OpponentDisplayCustom.BracketOpponentEntry:createPlayers(opponent)
 	local players = opponent.players
@@ -73,13 +60,7 @@ function OpponentDisplayCustom.BracketOpponentEntry:createPlayers(opponent)
 	end
 end
 
-function OpponentDisplayCustom.BracketOpponentEntry:createLiteral(name)
-	local literal = OpponentDisplay.BlockLiteral({
-		name = name,
-		overflow = 'ellipsis',
-	})
-	self.content:node(literal)
-end
+OpponentDisplayCustom.BracketOpponentEntry.createLiteral = OpponentDisplay.BracketOpponentEntry.createLiberal
 
 function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 	local extradata = opponent.extradata or {}
