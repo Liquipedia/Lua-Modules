@@ -28,11 +28,11 @@ OpponentDisplayCustom.BracketOpponentEntry = Class.new(
 	function(self, opponent, options)
 		self.content = html.create('div'):addClass('brkts-opponent-entry-left')
 
-		if opponent.type == 'team' then
+		if opponent.type == Opponent.team then
 			self:createTeam(opponent.template or 'tbd', options)
-		elseif opponent.type == 'solo' or opponent.type == 'duo' then
+		elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
 			self:createPlayers(opponent)
-		elseif opponent.type == 'literal' then
+		elseif opponent.type == Opponent.literal then
 			self:createLiteral(opponent.name or '')
 		end
 
@@ -140,7 +140,7 @@ function OpponentDisplayCustom.BlockOpponent(props)
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
-	if opponent.type == 'team' then
+	if opponent.type == Opponent.team then
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
@@ -148,13 +148,13 @@ function OpponentDisplayCustom.BlockOpponent(props)
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
-	elseif opponent.type == 'literal' then
+	elseif opponent.type == Opponent.literal then
 		return OpponentDisplay.BlockLiteral({
 			flip = props.flip,
 			name = opponent.name or '',
 			overflow = props.overflow,
 		})
-	elseif opponent.type == 'solo' or opponent.type == 'duo' then
+	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
 		return OpponentDisplayCustom.PlayerBlockOpponent(
 			Table.merge(props, {showLink = showLink})
 		)
