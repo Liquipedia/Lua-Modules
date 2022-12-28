@@ -83,8 +83,8 @@ function BaseResultsTable:readConfig()
 		(config.onlyAchievements and DEFAULT_VALUES.achievementsLimit or DEFAULT_VALUES.resultsLimit)
 
 	config.playerLimit =
-		(config.queryType == SOLO_TYPE and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
-		or (config.queryType == COACH_TYPE and tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit)
+		(config.queryType == SOLO_TYPE and (tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit))
+		or tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit
 
 	return config
 end
