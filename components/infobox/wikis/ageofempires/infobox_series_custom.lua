@@ -39,8 +39,9 @@ function CustomSeries.addToLpdb(series, lpdbData)
 end
 
 function CustomSeries._getSeriesPrizepools(seriesName)
+	local pagename = mw.title.getCurrentTitle().text:gsub('%s', '_')
 	local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[series::' .. seriesName .. ']] OR [[seriespage::' .. mw.title.getCurrentTitle().text:gsub('%s', '_') .. ']]',
+		conditions = '[[series::' .. seriesName .. ']] OR [[seriespage::' .. pagename .. ']]',
 		query = 'sum::prizepool'
 	})
 
