@@ -19,14 +19,12 @@ local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled =
 
 local OpponentDisplayCustom = Table.deepCopy(OpponentDisplay)
 
-local html = mw.html
-
 --[[
 Display component for an opponent entry appearing in a bracket match.
 ]]
 OpponentDisplayCustom.BracketOpponentEntry = Class.new(
 	function(self, opponent, options)
-		self.content = html.create('div'):addClass('brkts-opponent-entry-left')
+		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 
 		if opponent.type == Opponent.team then
 			self:createTeam(opponent.template or 'tbd', options)
@@ -36,7 +34,7 @@ OpponentDisplayCustom.BracketOpponentEntry = Class.new(
 			self:createLiteral(opponent.name or '')
 		end
 
-		self.root = html.create('div'):addClass('brkts-opponent-entry')
+		self.root = mw.html.create('div'):addClass('brkts-opponent-entry')
 			:node(self.content)
 	end
 )
@@ -184,7 +182,7 @@ function OpponentDisplayCustom.PlayerInlineOpponent(props)
 
 	local playersNode = table.concat(playerTexts, ' / ')
 
-	return html.create('span')
+	return mw.html.create('span')
 		:node(playersNode)
 end
 
@@ -211,7 +209,7 @@ function OpponentDisplayCustom.PlayerBlockOpponent(props)
 	if #opponent.players == 1 then
 		return playerNodes[1]
 	else
-		local playersNode = html.create('div')
+		local playersNode = mw.html.create('div')
 			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
 		for _, playerNode in ipairs(playerNodes) do
 			playersNode:node(playerNode)
