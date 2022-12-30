@@ -27,10 +27,9 @@ local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled 
 local SmwInjector = Lua.import('Module:Smw/Injector', {requireDevIfEnabled = true})
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
----Note: This can be overwritten
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
----Note: This can be overwritten
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
@@ -356,13 +355,6 @@ function PrizePool:init(args)
 	self.pagename = mw.title.getCurrentTitle().text
 	self.date = PrizePool._getTournamentDate()
 	self.opponentType = self.args.type
-	if self.args.opponentLibrary then
-		Opponent = Lua.import('Module:'.. self.args.opponentLibrary, {requireDevIfEnabled = true})
-		self.opponentLibrary = Opponent
-	end
-	if self.args.opponentDisplayLibrary then
-		OpponentDisplay = Lua.import('Module:'.. self.args.opponentDisplayLibrary, {requireDevIfEnabled = true})
-	end
 
 	self.options = {}
 	self.prizes = {}
@@ -778,6 +770,8 @@ function PrizePool:_storeData()
 			smwTournamentStash = self:_storeSmw(lpdbEntry, smwTournamentStash)
 		end
 
+		lpdbEntry.lastvsdata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.lastvsdata or {})
+		lpdbEntry.opponentplayers = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.opponentplayers or {})
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 

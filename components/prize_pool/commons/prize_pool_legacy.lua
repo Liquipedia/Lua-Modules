@@ -17,7 +17,8 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local LegacyPrizePool = {}
 
