@@ -351,6 +351,13 @@ function Placement:_getLpdbData(...)
 			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
 			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
 			groupscore = opponent.additionalData.GROUPSCORE,
+			lastvsdata = Table.merge(
+				opponent.additionalData.LASTVS and Opponent.toLpdbStruct(opponent.additionalData.LASTVS) or {},
+				{
+					score = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
+					groupscore = opponent.additionalData.GROUPSCORE,
+				}
+			),
 			extradata = {
 				prizepoints = tostring(pointsReward or ''),
 				participantteam = (opponentType == Opponent.solo and players.p1team)
@@ -360,7 +367,6 @@ function Placement:_getLpdbData(...)
 			-- TODO: We need to create additional LPDB Fields
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
-			-- lastvs match2 opponent (json?)
 		}
 
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
