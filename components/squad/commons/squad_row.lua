@@ -7,12 +7,14 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Flags = require('Module:Flags')
 local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 -- TODO: Decided on all valid types
 -- TODO: Move to dedicated module
@@ -59,6 +61,8 @@ function SquadRow:id(args)
 	if String.isEmpty(args[1]) then
 		return error('Something is off with your input!')
 	end
+
+	self.args = args
 
 	local cell = mw.html.create('td')
 	cell:addClass('ID')
@@ -192,8 +196,16 @@ function SquadRow:addToLpdb(lpdbData)
 end
 
 function SquadRow:create(id)
-	self.lpdbData = self:addToLpdb(self.lpdbData)
-	mw.ext.LiquipediaDB.lpdb_squadplayer(id, self.lpdbData)
+	local doStore = not Logic.readBool(Logic.emptyOr(
+		self.args.disable_storage,
+		Variables.varDefault('disable_LPDB_storage')
+	))
+
+	if doStore then
+		self.lpdbData = self:addToLpdb(self.lpdbData)
+		mw.ext.LiquipediaDB.lpdb_squadplayer(id, self.lpdbData)
+	end
+
 	return self.content
 end
 
