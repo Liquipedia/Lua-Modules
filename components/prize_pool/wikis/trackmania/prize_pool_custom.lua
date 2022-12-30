@@ -26,8 +26,6 @@ local TYPE_MODIFIER = {Online = 0.65}
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	
-	args.opponentLibrary = 'Opponent'
-	args.opponentDisplayLibrary = 'OpponentDisplay/Custom'
 	args.syncPlayers = true
 	
 	local prizePool = PrizePool(args):create()
