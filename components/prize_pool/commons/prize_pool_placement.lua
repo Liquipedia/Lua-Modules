@@ -11,14 +11,13 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
 local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local DASH = '&#045;'
 
@@ -153,8 +152,6 @@ function Placement:init(args, parent, lastPlacement)
 	self.placeStart = self.args.placeStart
 	self.placeEnd = self.args.placeEnd
 	self.hasUSD = false
-
-	Opponent = self.parent.opponentLibrary or Opponent
 
 	self.prizeRewards = self:_readPrizeRewards(self.args)
 
