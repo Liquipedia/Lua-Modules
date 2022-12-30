@@ -15,10 +15,8 @@ local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
-local getIconName = require('Module:IconName').luaGet
 local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
@@ -32,8 +30,6 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
 local RESULT_TYPE_DRAW = 'draw'
-local EARNINGS_LIMIT_FOR_FEATURED = 10000
-local CURRENT_YEAR = os.date('%Y')
 
 local globalVars = PageVariableNamespace()
 
@@ -441,7 +437,6 @@ function mapFunctions.getParticipantsData(map)
 	for o = 1, MAX_NUM_OPPONENTS do
 		for player = 1, MAX_NUM_PLAYERS do
 			local participant = participants[o .. '_' .. player] or {}
-			local opstring = 'opponent' .. o .. '_p' .. player
 			if not Table.isEmpty(participant) then
 				participants[o .. '_' .. player] = participant
 			end
