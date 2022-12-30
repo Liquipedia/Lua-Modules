@@ -307,7 +307,6 @@ function Placement:_getLpdbData(...)
 	local entries = {}
 	for opponentIndex, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
-		local playerCount = 0
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
@@ -324,7 +323,6 @@ function Placement:_getLpdbData(...)
 			participant = Opponent.toName(opponent.opponentData)
 			local p1 = opponent.opponentData.players[1]
 			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
-			playerCount = 1
 		else
 			participant = Opponent.toName(opponent.opponentData)
 		end
@@ -343,7 +341,7 @@ function Placement:_getLpdbData(...)
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
-			individualprizemoney = (playerCount > 0) and (prizeMoney / playerCount) or 0,
+			individualprizemoney = Opponent.typeIsParty(opponentType) and (prizeMoney / Opponent.partySize(opponent.type)) or 0,
 			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
 			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
 			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
