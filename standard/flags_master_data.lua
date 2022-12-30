@@ -631,16 +631,6 @@ local data = {
 		localised = 'Latvian',
 		name = 'Latvia',
 	},
-	['latin america north'] = {
-		flag = 'File:MxCo hd.png',
-		localised = 'Latin America North',
-		name = 'Latin America North',
-	},
-	['latin america south'] = {
-		flag = 'File:ClAr hd.png',
-		localised = 'Latin America South',
-		name = 'Latin America South',
-	},
 	['lebanon'] = {
 		flag = 'File:lb_hd.png',
 		localised = 'Lebanese',
@@ -1391,6 +1381,16 @@ local data = {
 		localised = 'Latin American',
 		name = 'Latin America',
 	},
+	['latinamericanorth'] = {
+		flag = 'File:MxCo hd.png',
+		localised = 'Latin America North',
+		name = 'Latin America North',
+	},
+	['latinamericasouth'] = {
+		flag = 'File:ClAr hd.png',
+		localised = 'Latin America South',
+		name = 'Latin America South',
+	},
 	['middleeast'] = {
 		flag = 'File:Middle east flag hd.png',
 		localised = 'Middle Eastern',
@@ -2020,6 +2020,8 @@ local threeLetter = {
 	['anz'] = 'oceania',
 	['cis'] = 'commonwealthofindependentstates',
 	['int'] = 'world',
+	['lan']	= 'latinamericanorth'
+	['las']	= 'latinamericasouth'
 	['sam'] = 'southamerica',
 	['sca'] = 'scandinavia',
 	['sea'] = 'southeastasia',
