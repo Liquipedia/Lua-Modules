@@ -102,7 +102,6 @@ function OpponentDisplayCustom.InlineScore(opponent, scoreIndex)
 			return score ~= -1 and tostring(score) or ''
 		end
 	end
-	
 	return score or status or ''
 end
 
