@@ -308,7 +308,6 @@ function Placement:_getLpdbData(...)
 	for opponentIndex, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
 		local opponentType = opponent.opponentData.type
-		local playerCount = Opponent.partySize(opponentType)
 
 		if opponentType == Opponent.team then
 			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
