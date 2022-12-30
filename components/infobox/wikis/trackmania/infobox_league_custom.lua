@@ -139,7 +139,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = tonumber(args.team_number) or tonumber(args.player_number)
 
 	-- Legacy, can be superseeded by lpdbData.mode
-	lpdbData.extradata.individual = Variables.varDefault('tournament_mode', 'solo') == 'solo' 
+	lpdbData.extradata.individual = Variables.varDefault('tournament_mode', 'solo') == 'solo'
 
 	return lpdbData
 end
