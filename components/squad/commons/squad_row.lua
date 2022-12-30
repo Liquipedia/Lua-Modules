@@ -62,8 +62,6 @@ function SquadRow:id(args)
 		return error('Something is off with your input!')
 	end
 
-	self.args = args
-
 	local cell = mw.html.create('td')
 	cell:addClass('ID')
 
@@ -196,12 +194,7 @@ function SquadRow:addToLpdb(lpdbData)
 end
 
 function SquadRow:create(id)
-	local doStore = not Logic.readBool(Logic.emptyOr(
-		self.args.disable_storage,
-		Variables.varDefault('disable_LPDB_storage')
-	))
-
-	if doStore then
+	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		self.lpdbData = self:addToLpdb(self.lpdbData)
 		mw.ext.LiquipediaDB.lpdb_squadplayer(id, self.lpdbData)
 	end
