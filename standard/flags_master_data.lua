@@ -631,6 +631,16 @@ local data = {
 		localised = 'Latvian',
 		name = 'Latvia',
 	},
+	['latin america north'] = {
+		flag = 'File:MxCo hd.png',
+		localised = 'Latin America North',
+		name = 'Latin America North',
+	},
+	['latin america south'] = {
+		flag = 'File:ClAr hd.png',
+		localised = 'Latin America South',
+		name = 'Latin America South',
+	},
 	['lebanon'] = {
 		flag = 'File:lb_hd.png',
 		localised = 'Lebanese',
