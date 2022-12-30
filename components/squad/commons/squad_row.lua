@@ -7,12 +7,14 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Flags = require('Module:Flags')
 local Player = require('Module:Player')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 -- TODO: Decided on all valid types
 -- TODO: Move to dedicated module
@@ -192,8 +194,11 @@ function SquadRow:addToLpdb(lpdbData)
 end
 
 function SquadRow:create(id)
-	self.lpdbData = self:addToLpdb(self.lpdbData)
-	mw.ext.LiquipediaDB.lpdb_squadplayer(id, self.lpdbData)
+	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+		self.lpdbData = self:addToLpdb(self.lpdbData)
+		mw.ext.LiquipediaDB.lpdb_squadplayer(id, self.lpdbData)
+	end
+
 	return self.content
 end
 
