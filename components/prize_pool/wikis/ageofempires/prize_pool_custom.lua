@@ -29,6 +29,7 @@ function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.opponentLibrary = 'Opponent/Custom'
 	args.syncPlayers = true
+	args.import = false
 
 	local prizePool = PrizePool(args)
 		:create()
