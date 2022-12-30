@@ -342,7 +342,7 @@ function Placement:_getLpdbData(...)
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
-			individualprizemoney = playerCount and (prizeMoney / playerCount) or 0,
+			individualprizemoney = Opponent.typeIsParty(opponentType) and (prizeMoney / Opponent.partySize(opponent.type)) or 0,
 			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
 			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
 			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
