@@ -19,6 +19,10 @@ local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled =
 
 local OpponentDisplayCustom = Table.deepCopy(OpponentDisplay)
 
+local SCORE_STATUS = 'S'
+local NO_SCORE = -1
+local ZERO_SCORE = 0
+
 --[[
 Display component for an opponent entry appearing in a bracket match.
 ]]
@@ -65,67 +69,41 @@ function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 	if not extradata.additionalScores then
 		OpponentDisplay.BracketOpponentEntry.addScores(self, opponent)
 	else
-		local score1Node = OpponentDisplay.BracketScore({
+		self.root:node(OpponentDisplay.BracketScore{
 			isWinner = extradata.set1win,
-			scoreText = OpponentDisplay.InlineScore(opponent),
+			scoreText = OpponentDisplayCustom.InlineScore(opponent, ''),
 		})
-		self.root:node(score1Node)
-
-		local score2Node
 		if opponent.extradata.score2 or opponent.score2 then
-			score2Node = OpponentDisplay.BracketScore({
+			self.root:node(OpponentDisplay.BracketScore{
 				isWinner = extradata.set2win,
-				scoreText = OpponentDisplayCustom.InlineScore2(opponent),
+				scoreText = OpponentDisplayCustom.InlineScore(opponent, 2),
 			})
 		end
-		self.root:node(score2Node)
-
-		local score3Node
 		if opponent.extradata.score3 then
-			score3Node = OpponentDisplay.BracketScore({
+			self.root:node(OpponentDisplay.BracketScore{
 				isWinner = extradata.set3win,
-				scoreText = OpponentDisplayCustom.InlineScore3(opponent),
+				scoreText = OpponentDisplayCustom.InlineScore(opponent, 3)
 			})
 		end
-		self.root:node(score3Node)
-
 		if (opponent.placement2 or opponent.placement or 0) == 1
 			or opponent.advances then
 			self.content:addClass('brkts-opponent-win')
 		end
 	end
 end
-
---[[
-Displays the second score or status of the opponent, as a string.
-]]
-function OpponentDisplayCustom.InlineScore2(opponent)
-	local score2 = opponent.extradata.score2
-	if opponent.status2 == 'S' then
-		if opponent.score2 == 0 and Opponent.isTbd(opponent) then
+function OpponentDisplayCustom.InlineScore(opponent, scoreIndex)
+	scoreIndex = scoreIndex or ''
+	local status = opponent['status' .. scoreIndex] or opponent.extradata['status' .. scoreIndex] or ''
+	local score = opponent['score' .. scoreIndex] or opponent.extradata['score' .. scoreIndex] or 0
+	if status == SCORE_STATUS then
+		if (score == ZERO_SCORE and Opponent.isTbd(opponent)) or score == NO_SCORE then
 			return ''
 		else
-			return opponent.score2 ~= -1 and tostring(opponent.score2) or ''
+			return score ~= -1 and tostring(score) or ''
 		end
-	else
-		return opponent.status2 or score2 or ''
 	end
-end
-
---[[
-Displays the third score or status of the opponent, as a string.
-]]
-function OpponentDisplayCustom.InlineScore3(opponent)
-	local score3 = opponent.extradata.score3
-	if opponent.status3 == 'S' then
-		if opponent.score3 == 0 and Opponent.isTbd(opponent) then
-			return ''
-		else
-			return opponent.score3 ~= -1 and tostring(opponent.score3) or ''
-		end
-	else
-		return opponent.status3 or score3 or ''
-	end
+	
+	return score or status or ''
 end
 
 --[[
