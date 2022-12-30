@@ -12,7 +12,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Opponent = require('Module:Opponent/Custom')
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
@@ -27,7 +28,6 @@ local TIER_VALUE = {10, 6, 4, 2}
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
-	args.opponentLibrary = 'Opponent/Custom'
 	args.syncPlayers = true
 
 	local prizePool = PrizePool(args)
