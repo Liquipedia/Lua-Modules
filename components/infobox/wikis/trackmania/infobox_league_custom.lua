@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 		local partners = _league:getAllArgsForBase(_args, 'partner')
 		table.insert(widgets, Cell{
 			name = 'Partner' .. (#partners > 1 and 's' or ''),
-			content = Array.map(partners, function(partner) return Page.makeInternalLink(partner) end)
+			content = Array.map(partners, Page.makeInternalLink)
 		})
 	elseif id == 'gamesettings' then
 		local games = _league:getAllArgsForBase(_args, 'game')
@@ -83,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 		})
 
 		local maps = _league:getAllArgsForBase(_args, 'map')
-		if #maps then
+		if #maps > 0 then
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
@@ -108,14 +108,13 @@ function CustomLeague:defineCustomPageVariables(args)
 		)
 	)
 
-	Variables.varDefine('tournament_date', Variables.varDefault('tournament_enddate', ''))
-
 	-- legacy variables, to be removed
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype', ''))
 
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate', ''))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate', ''))
+	Variables.varDefine('tournament_date', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('date', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('sdate', Variables.varDefault('tournament_startdate', ''))
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate', ''))
@@ -131,16 +130,16 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	if String.isEmpty(args.tickername) then
-		lpdbData['tickername'] = args.name
+		lpdbData.tickername = args.name
 	end
 
-	lpdbData['maps'] = table.concat(_league:getAllArgsForBase(_args, 'map'), ';')
+	lpdbData.maps = table.concat(_league:getAllArgsForBase(_args, 'map'), ';')
 
-	lpdbData['game'] = (Games[args.game] or {}).link
-	lpdbData['participantsnumber'] = tonumber(args.team_number) or tonumber(args.player_number)
+	lpdbData.game = (Games[args.game] or {}).link
+	lpdbData.participantsnumber = tonumber(args.team_number) or tonumber(args.player_number)
 
 	-- Legacy, can be superseeded by lpdbData.mode
-	lpdbData.extradata.individual = Variables.varDefault('tournament_mode', 'solo') == 'solo'
+	lpdbData.extradata.individual = Variables.varDefault('tournament_mode', 'solo') == 'solo' 
 
 	return lpdbData
 end
