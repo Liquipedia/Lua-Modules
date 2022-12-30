@@ -34,7 +34,7 @@ function CustomSeries:createWidgetInjector()
 end
 
 function CustomSeries.addToLpdb(series, lpdbData)
-	lpdbData['prizepool'] = _totalSeriesPrizepool
+	lpdbData.prizepool = _totalSeriesPrizepool
 	return lpdbData
 end
 
