@@ -239,7 +239,7 @@ Misc. MatchInput functions
 
 ]]--
 function StarcraftMatchGroupInput._matchWinnerProcessing(match)
-	local bestof = tonumber(match.bestof or _DEFAULT_BEST_OF) or _DEFAULT_BEST_OF
+	local bestof = tonumber(match.bestof) or _DEFAULT_BEST_OF
 	local walkover = match.walkover or ''
 	local numberofOpponents = 0
 	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
@@ -326,13 +326,11 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 			match.winner = 0
 			match.resulttype = 'draw'
 		end
-		if
-			tostring(match.winner) == tostring(opponentIndex) or
-			match.resulttype == 'draw' or
-			opponent.score == bestof / 2
-		then
+
+		if tonumber(match.winner) == opponentIndex or
+			match.resulttype == 'draw' then
 			opponent.placement = 1
-		else
+		elseif Logic.isNumeric(match.winner) then
 			opponent.placement = 2
 		end
 	end
@@ -341,7 +339,7 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 end
 
 function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
-	if Logic.readBool(match.finished) and not match.winner then
+	if Logic.readBool(match.finished) and String.isEmpty(match.winner) then
 		local scores = Array.mapIndexes(function(opponentIndex)
 			local opponent = match['opponent' .. opponentIndex]
 			if not opponent then
