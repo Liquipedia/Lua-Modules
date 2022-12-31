@@ -98,7 +98,6 @@ function CustomMatchSummary.getByMatchId(args)
 	match.links.lrthread = match.lrthread
 	match.links.vod = match.vod
 	if
-		--Logic.readBool(match.extradata.headtohead) and
 		match.opponents[1].type == Opponent.team and
 		match.opponents[2].type == Opponent.team
 	then
