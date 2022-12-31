@@ -607,13 +607,13 @@ function PrizePool:_currencyExchangeInfo()
 
 		local wrapper = mw.html.create('small')
 
-		wrapper:wikitext('<br>\'\'(')
+		wrapper:wikitext('<br><i>(')
 		wrapper:wikitext('Converted ' .. currencyText .. ' prizes are ')
 		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
 			return PrizePool.prizeTypes[prize.type].convertToUsd
 		end), PrizePool._CurrencyConvertionText), ', '))
-		wrapper:wikitext(')\'\'')
+		wrapper:wikitext(')</i>')
 
 		return tostring(wrapper)
 	end

@@ -40,17 +40,17 @@ function NotabilityChecker.run(args)
 	end
 
 	output = output .. '===Summary===\n'
-	output = output .. '\'\'\'Final weight:\'\'\' ' .. tostring(weight) .. '\n\n'
+	output = output .. '<b>Final weight:</b> ' .. tostring(weight) .. '\n\n'
 
 	if weight < Config.NOTABILITY_THRESHOLD_NOTABLE and weight > Config.NOTABILITY_THRESHOLD_MIN then
 		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is \'\'\'OPEN FOR DISCUSSION\'\'\'\n'
+		' is <b>OPEN FOR DISCUSSION</b>\n'
 	elseif weight < Config.NOTABILITY_THRESHOLD_MIN then
 		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is \'\'\'NOT NOTABLE\'\'\'\n'
+		' is <b>NOT NOTABLE</b>\n'
 	else
 		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is \'\'\'NOTABLE\'\'\'\n'
+		' is <b>NOTABLE</b>\n'
 	end
 
 	return output
@@ -63,7 +63,7 @@ function NotabilityChecker._runForTeam(team)
 	local output = ''
 	output = output .. '===Team Results===\n'
 	output = output .. mw.getCurrentFrame():expandTemplate{ title = 'NotabilityTeamMatchesTable', args = {title = team} }
-	output = output .. '\'\'\'Weight:\'\'\' ' .. tonumber(weight) .. '\n\n'
+	output = output .. '<b>Weight:</b> ' .. tonumber(weight) .. '\n\n'
 
 	return weight, output
 end
@@ -84,7 +84,7 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 		local personWeight = NotabilityChecker._calculatePersonNotability(person)
 		output = output .. mw.getCurrentFrame():expandTemplate{
 			title = 'NotabilityPlayerMatchesTable', args = {title = person}}
-		output = output .. '*\'\'\'Person:\'\'\' [[' .. person .. ']] \'\'\'Weight:\'\'\' ' ..
+		output = output .. '*<b>Person:</b> [[' .. person .. ']] <b>Weight:</b> ' ..
 			tonumber(personWeight) .. '\n\n'
 			average = average + tonumber(personWeight or 0)
 	end
