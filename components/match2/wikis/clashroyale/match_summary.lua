@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CustomMatchSummary = {}
-
 local Abbreviation = require('Module:Abbreviation')
 local CardIcon = require('Module:CardIcon')
 local Logic = require('Module:Logic')
@@ -41,6 +39,8 @@ LINK_DATA.interview2 = LINK_DATA.interview
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+
+local CustomMatchSummary = {}
 
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
