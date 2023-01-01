@@ -87,6 +87,7 @@ end
 
 function CustomMatchGroupInput._getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
+	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -113,17 +114,17 @@ end
 function CustomMatchGroupInput._getExtraData(match)
 	local extradata = {
 		casters = match.casters,
-		t1bans = match.t1bans and
-			CustomMatchGroupInput._readCards(match.t1bans),
-		t2bans = match.t1bans and
-			CustomMatchGroupInput._readCards(match.t2bans),
+		t1bans = CustomMatchGroupInput._readBans(match.t1bans),
+		t2bans = CustomMatchGroupInput._readBans(match.t2bans),
 	}
 
 	for subGroupIndex = 1, MAX_NUM_MAPS do
-		extradata['subgroup' .. subGroupIndex .. 'header']
-			= CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
-		extradata['subgroup' .. subGroupIndex .. 'iskoth']
-			= Logic.readBool(match['subgroup' .. subGroupIndex .. 'iskoth']) or nil
+		local prefix = 'subgroup' .. subGroupIndex
+
+		extradata[prefix .. 'header'] = CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
+		extradata[prefix .. 'iskoth'] = Logic.readBool(match[prefix .. 'iskoth']) or nil
+		extradata[prefix .. 't1bans'] = CustomMatchGroupInput._readBans(match[prefix .. 't1bans'])
+		extradata[prefix .. 't2bans'] = CustomMatchGroupInput._readBans(match[prefix .. 't2bans'])
 	end
 
 	match.extradata = extradata
@@ -135,6 +136,12 @@ function CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
 	local header = match['subgroup' .. subGroupIndex .. 'header']
 
 	return String.isNotEmpty(header) and header or nil
+end
+
+function CustomMatchGroupInput._readBans(bansInput)
+	local bans = CustomMatchGroupInput._readCards(bansInput)
+
+	return Table.isNotEmpty(bans) and bans or nil
 end
 
 function CustomMatchGroupInput._adjustData(match)
