@@ -24,4 +24,8 @@ function Namespace.idFromName(name)
 	return Namespace.getIdsByName()[name]
 end
 
+function Namespace.nameFromId(id)
+	return mw.site.namespaces[id].name
+end
+
 return Class.export(Namespace, {frameOnly = true})
