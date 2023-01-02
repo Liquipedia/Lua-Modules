@@ -42,6 +42,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
@@ -300,7 +301,17 @@ function CustomLeague:addToLpdb(lpdbData)
 	-- hence they need to not RR them
 	lpdbData.series = _args.series
 
+	lpdbData.extradata.female = Logic.readBool(_args.female)
+
 	return lpdbData
+end
+
+function CustomLeague:getWikiCategories(args)
+	if Logic.readBool(args.female) then
+		return {'Female-only Tournaments', 'Female Tournaments'}
+	end
+
+	return {}
 end
 
 function CustomLeague:_concatArgs(base)
