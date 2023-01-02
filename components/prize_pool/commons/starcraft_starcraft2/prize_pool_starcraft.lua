@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
@@ -36,15 +35,11 @@ local CustomPrizePool = {}
 local PRIZE_TYPE_POINTS = 'POINTS'
 local SCORE_STATUS = 'S'
 local WALKOVER_VS_STATUS = 'W'
-local PLACE_TO_KEY_PREFIX = {'winner', 'runnerup', 'third', 'fourth'}
-local SEMIFINALS_PREFIX = 'sf'
-local TBD = 'TBD'
 local SC2 = 'starcraft2'
 
 local _lpdb_stash = {}
 local _series
 local _tier
-local _tournament_extradata_cache = {{}, {}, {}, {}, ['3-4'] = {}}
 local _tournament_name
 local _series_number
 
@@ -86,9 +81,6 @@ function CustomPrizePool.run(frame)
 	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
 	-- set an additional wiki-var for legacy reasons so that combination with award prize pools still work
 	Variables.varDefine('prize pool table id', prizePoolIndex)
-	if prizePoolIndex == 1 and Logic.readBool(Logic.emptyOr(args.storeTournament, Namespace.isMain())) then
-		CustomPrizePool._appendLpdbTournament()
-	end
 
 	if Logic.readBool(args.storelpdb) then
 		-- stash the lpdb_placement data so teamCards can use them
@@ -167,10 +159,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.series = _series
 
 	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
-	if prizePoolIndex == 1 and _tournament_extradata_cache[lpdbData.placement or ''] then
-		table.insert(_tournament_extradata_cache[lpdbData.placement], Table.deepCopy(lpdbData))
-	end
-
 	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 
 	table.insert(_lpdb_stash, Table.deepCopy(lpdbData))
@@ -196,83 +184,6 @@ end
 
 function CustomPrizePool._getStatusFromScore(score)
 	return Logic.isNumeric(score) and SCORE_STATUS or score
-end
-
-function CustomPrizePool._appendLpdbTournament()
-	local tournamentName = Variables.varDefault('tournament_name', mw.title.getCurrentTitle().text)
-
-	local extradata = {
-		seriesnumber = _series_number,
-		featured = Variables.varDefault('featured') or 'false'
-	}
-
-	for _, placement in pairs(_tournament_extradata_cache) do
-		Table.mergeInto(
-			extradata,
-			CustomPrizePool._placementToTournamentExtradata(placement)
-		)
-	end
-
-	mw.ext.LiquipediaDB.lpdb_tournament(
-		'tournament_' .. tournamentName,
-		{extradata = Json.stringify(extradata)}
-	)
-end
-
-function CustomPrizePool._placementToTournamentExtradata(entries)
-	if not entries[1] then
-		return {}
-	end
-
-	local prefix = PLACE_TO_KEY_PREFIX[entries[1].placement]
-	if (prefix and #entries > 1) or (not prefix and #entries > 2) then
-		return {}
-	end
-
-	if not prefix then
-		return Table.merge(
-			CustomPrizePool._entryToTournamentExtradata(SEMIFINALS_PREFIX .. 1, entries[1]),
-			CustomPrizePool._entryToTournamentExtradata(SEMIFINALS_PREFIX .. 2, entries[2])
-		)
-	end
-
-	return CustomPrizePool._entryToTournamentExtradata(prefix, entries[1])
-end
-
-function CustomPrizePool._entryToTournamentExtradata(prefix, entry)
-	local opponent = Opponent.fromLpdbStruct(entry)
-
-	local function toLink(player)
-		return String.isNotEmpty(player.pageName)
-			and player.pageName .. '|' .. player.displayName
-			or player.displayName
-	end
-
-	if opponent.type == Opponent.solo then
-		return {
-			[prefix] = toLink(opponent.players[1]),
-			[prefix .. 'flag'] = opponent.players[1].flag,
-			[prefix .. 'link'] = opponent.players[1].pageName,
-			[prefix .. 'race'] = opponent.players[1].race,
-		}
-	elseif Opponent.typeIsParty(opponent.type) then
-		local extradata = {}
-		if opponent.isArchon then
-			extradata[prefix .. 'race'] = opponent.players[1].race
-		end
-		for playerIndex, player in ipairs(opponent.players) do
-			extradata[prefix .. 'p' .. playerIndex] = toLink(player)
-			extradata[prefix .. 'flagp' .. playerIndex] = player.flag
-			extradata[prefix .. 'linkp' .. playerIndex] = player.pageName
-			extradata[prefix .. 'racep' .. playerIndex]
-				= not opponent.isArchon and player.flag or nil
-		end
-		return extradata
-	elseif opponent.type == Opponent.team then
-		return {[prefix] = opponent.name}
-	end
-
-	return {[prefix] = TBD}
 end
 
 function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
