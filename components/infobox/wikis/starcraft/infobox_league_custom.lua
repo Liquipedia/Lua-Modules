@@ -301,13 +301,13 @@ function CustomLeague:addToLpdb(lpdbData)
 	-- hence they need to not RR them
 	lpdbData.series = _args.series
 
-	lpdbData.extradata.isfemaleonly = Logic.readBool(_args.isFemaleOnly)
+	lpdbData.extradata.isfemaleonly = Logic.readBool(_args.female)
 
 	return lpdbData
 end
 
 function CustomLeague:getWikiCategories(args)
-	if Logic.readBool(args.isFemaleOnly) then
+	if Logic.readBool(args.female) then
 		return {'Female-only Tournaments'}
 	end
 
