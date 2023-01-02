@@ -26,7 +26,7 @@ function Namespace.idFromName(name)
 end
 
 function Namespace.nameFromId(id)
-	return mw.site.namespaces[id].name
+	return (mw.site.namespaces[tonumber(id)] OR {}).name
 end
 
 function Namespace.prefixFromId(id)
