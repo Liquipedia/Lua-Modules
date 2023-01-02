@@ -126,6 +126,8 @@ function OpponentDisplay.InlineOpponent(props)
 			player = opponent.players[1],
 			flip = props.flip,
 			dq = props.dq,
+			showFlag = props.showFlag,
+			showLink = props.showLink
 		}
 
 	else
