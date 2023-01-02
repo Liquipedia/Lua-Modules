@@ -308,7 +308,7 @@ end
 
 function CustomLeague:getWikiCategories(args)
 	if Logic.readBool(args.female) then
-		return {'Female-only Tournaments, Female Tournaments'}
+		return {'Female-only Tournaments', 'Female Tournaments'}
 	end
 
 	return {}
