@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
@@ -36,9 +35,6 @@ local CustomPrizePool = {}
 local PRIZE_TYPE_POINTS = 'POINTS'
 local SCORE_STATUS = 'S'
 local WALKOVER_VS_STATUS = 'W'
-local PLACE_TO_KEY_PREFIX = {'winner', 'runnerup', 'third', 'fourth'}
-local SEMIFINALS_PREFIX = 'sf'
-local TBD = 'TBD'
 local SC2 = 'starcraft2'
 
 local _lpdb_stash = {}
