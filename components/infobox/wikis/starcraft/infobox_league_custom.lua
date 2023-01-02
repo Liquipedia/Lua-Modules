@@ -301,7 +301,7 @@ function CustomLeague:addToLpdb(lpdbData)
 	-- hence they need to not RR them
 	lpdbData.series = _args.series
 
-	lpdbData.extradata.female = Logic.readBool(_args.female)
+	lpdbData.extradata.female = Logic.readBool(_args.female) or nil
 
 	return lpdbData
 end
