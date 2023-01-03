@@ -17,6 +17,7 @@ local Match = require('Module:Match')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
+local TemplateEngine = require('Module:TemplateEngine')
 
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -161,27 +162,27 @@ function BigMatch.templateHeader()
 [=[
 <div class="fb-match-page-header">
 	<div class="fb-match-page-header-tournament">
-		[[${link}|${name}]]
+		[[{{link}}|{{name}}]]
 	</div>
 	<div class="fb-match-page-header-teams row">
 		<div class="fb-match-page-header-team-container col-sm-4 col-xs-6 col-sm-pull-4">
 			<div class="fb-match-page-header-team">
-				${match2opponents.1.iconDisplay}
+				{{match2opponents.1.iconDisplay}}
 				<br>
-				[[${match2opponents.1.name}]]
+				[[{{match2opponents.1.name}}]]
 			</div>
 			<div class="fb-match-page-header-score">
-				${match2opponents.1.score}
+				{{match2opponents.1.score}}
 			</div>
 		</div>
 		<div class="fb-match-page-header-team-container col-sm-4 col-xs-6 col-sm-pull-4">
 			<div class="fb-match-page-header-team">
-				${match2opponents.2.iconDisplay}
+				{{match2opponents.2.iconDisplay}}
 				<br>
-				[[${match2opponents.2.name}]]
+				[[{{match2opponents.2.name}}]]
 			</div>
 			<div class="fb-match-page-header-score">
-				${match2opponents.2.score}
+				{{match2opponents.2.score}}
 			</div>
 		</div>
 	</div>
@@ -193,9 +194,9 @@ function BigMatch.templateGame()
 	return
 [=[
 <div>
-	${match2opponents.1.name}
-	${winner}
-	${match2opponents.2.name}
+	{{match2opponents.1.name}}
+	{{winner}}
+	{{match2opponents.2.name}}
 </div>
 ]=]
 end
@@ -205,66 +206,15 @@ function BigMatch.templateFooter()
 [=[
 <h3>Additional Information</h3>
 <div>
-*{foreach link in links}
-	${link}
-*{end}
+{{#links}}
+	{{.}}
+{{/links}}
 </div>
 <br>
 <div>
-	[[${patch}]]
+	[[{{patch}}]]
 </div>
 ]=]
-end
-
----TODO: Split to its own Module
-local webTemplates = {}
----Created the html output from a given template string and table input.
----@param template string
----@param tbl table
----@return string
-function webTemplates.eval(template, tbl)
-	return webTemplates._interpolate(webTemplates._loops(template, tbl), tbl)
-end
-
----Handles foreach loops by replacing
----```*{foreach x in y}
----${x}
----*{end}```
----with `${y.foo}${y.bar}` assuming tbl contains two keys, `foo` and `bar`.
----@param template string
----@param tbl table
----@return string
-function webTemplates._loops(template, tbl)
-	local function createReplacement(list, value)
-		return '${' .. String.interpolate('${list}.${val}', {list = list, val = value}) .. '}'
-	end
-	return (template:gsub('*{foreach (.-) in (.-)}(.-)*{end}', function (var, list, text)
-		local str = ''
-		for value in pairs(tbl[list]) do
-			str = str .. webTemplates._interpolate(text, {[var] = createReplacement(list, value)})
-		end
-		return str
-	end))
-end
-
----Interpolates a template using string interpolation. Can handle nested tables.
----@param template string
----@param tbl table
----@return string
-function webTemplates._interpolate(template, tbl)
-	local function toNumberIfNumeric(number)
-		return tonumber(number) or number
-	end
-	return (
-		template:gsub('($%b{})',
-			function(w)
-				local path = Table.mapValues(mw.text.split(w:sub(3, -2), '.', true), toNumberIfNumeric)
-				local key = Table.extract(path, #path)
-				local finalTbl =  Table.getByPath(tbl, path)
-				return finalTbl and finalTbl[key] or w
-			end
-		)
-	)
 end
 
 function BigMatch.run(frame)
@@ -348,7 +298,7 @@ function BigMatch:render(match, tournament)
 end
 
 function BigMatch:header(match, tournament)
-	return webTemplates.eval(BigMatch.templateHeader(), Table.merge(match, tournament))
+	return TemplateEngine():render(BigMatch.templateHeader(), Table.merge(match, tournament))
 end
 
 function BigMatch:games(match)
@@ -357,7 +307,7 @@ function BigMatch:games(match)
 			return
 		end
 
-		return webTemplates.eval(BigMatch.templateGame(), Table.merge(match, game))
+		return TemplateEngine():render(BigMatch.templateGame(), Table.merge(match, game))
 	end)
 
 	---@type table<string, any>
@@ -375,7 +325,7 @@ function BigMatch:games(match)
 end
 
 function BigMatch:footer(match)
-	return webTemplates.eval(BigMatch.templateFooter(), match)
+	return TemplateEngine():render(BigMatch.templateFooter(), match)
 end
 
 function BigMatch:_getId()
