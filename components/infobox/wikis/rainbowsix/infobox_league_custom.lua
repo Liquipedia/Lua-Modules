@@ -30,6 +30,7 @@ local CustomInjector = Class.new(Injector)
 local _DEFAULT_TIERTYPE = 'General'
 local _DEFAULT_PLATFORM = 'PC'
 local _PLATFORM_ALIAS = {
+	console = 'Console',
 	pc = 'PC',
 	xbox = 'Xbox',
 	xone = 'Xbox',

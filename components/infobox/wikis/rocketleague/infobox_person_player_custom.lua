@@ -114,8 +114,8 @@ function CustomInjector:addCustomCells(widgets)
 	if not String.isEmpty(_args.mmr) then
 		mmrDisplay = '[[Leaderboards|' .. _args.mmr .. ']]'
 		if not String.isEmpty(_args.mmrdate) then
-			mmrDisplay = mmrDisplay .. '&nbsp;<small>\'\'('
-				.. _args.mmrdate .. ')\'\'</small>'
+			mmrDisplay = mmrDisplay .. '&nbsp;<small><i>('
+				.. _args.mmrdate .. ')</i></small>'
 		end
 	end
 

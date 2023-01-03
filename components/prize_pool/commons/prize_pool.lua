@@ -27,10 +27,9 @@ local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled 
 local SmwInjector = Lua.import('Module:Smw/Injector', {requireDevIfEnabled = true})
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
----Note: This can be overwritten
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
----Note: This can be overwritten
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
@@ -356,13 +355,6 @@ function PrizePool:init(args)
 	self.pagename = mw.title.getCurrentTitle().text
 	self.date = PrizePool._getTournamentDate()
 	self.opponentType = self.args.type
-	if self.args.opponentLibrary then
-		Opponent = Lua.import('Module:'.. self.args.opponentLibrary, {requireDevIfEnabled = true})
-		self.opponentLibrary = Opponent
-	end
-	if self.args.opponentDisplayLibrary then
-		OpponentDisplay = Lua.import('Module:'.. self.args.opponentDisplayLibrary, {requireDevIfEnabled = true})
-	end
 
 	self.options = {}
 	self.prizes = {}
@@ -607,13 +599,13 @@ function PrizePool:_currencyExchangeInfo()
 
 		local wrapper = mw.html.create('small')
 
-		wrapper:wikitext('<br>\'\'(')
+		wrapper:wikitext('<br><i>(')
 		wrapper:wikitext('Converted ' .. currencyText .. ' prizes are ')
 		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
 			return PrizePool.prizeTypes[prize.type].convertToUsd
 		end), PrizePool._CurrencyConvertionText), ', '))
-		wrapper:wikitext(')\'\'')
+		wrapper:wikitext(')</i>')
 
 		return tostring(wrapper)
 	end
@@ -722,7 +714,7 @@ end
 --- Set the WidgetInjector.
 -- @param widgetInjector WidgetInjector An instance of a class that implements the WidgetInjector interface
 function PrizePool:setWidgetInjector(widgetInjector)
-	assert(widgetInjector:is_a(WidgetInjector), "setWidgetInjector: Not a Widget Injector")
+	assert(widgetInjector:is_a(WidgetInjector), 'setWidgetInjector: Not a Widget Injector')
 	self._widgetInjector = widgetInjector
 	return self
 end
@@ -730,7 +722,7 @@ end
 --- Set the LpdbInjector.
 -- @param lpdbInjector LpdbInjector An instance of a class that implements the LpdbInjector interface
 function PrizePool:setLpdbInjector(lpdbInjector)
-	assert(lpdbInjector:is_a(LpdbInjector), "setLpdbInjector: Not an LPDB Injector")
+	assert(lpdbInjector:is_a(LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
 	self._lpdbInjector = lpdbInjector
 	return self
 end
@@ -738,7 +730,7 @@ end
 --- Set the SmwInjector.
 -- @param smwInjector SmwInjector An instance of a class that implements the SmwInjector interface
 function PrizePool:setSmwInjector(smwInjector)
-	assert(smwInjector:is_a(SmwInjector), "setSmwInjector: Not an SMW Injector")
+	assert(smwInjector:is_a(SmwInjector), 'setSmwInjector: Not an SMW Injector')
 	self._smwInjector = smwInjector
 	return self
 end
@@ -778,6 +770,8 @@ function PrizePool:_storeData()
 			smwTournamentStash = self:_storeSmw(lpdbEntry, smwTournamentStash)
 		end
 
+		lpdbEntry.lastvsdata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.lastvsdata or {})
+		lpdbEntry.opponentplayers = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.opponentplayers or {})
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 

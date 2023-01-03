@@ -11,14 +11,13 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
 local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local DASH = '&#045;'
 
@@ -153,8 +152,6 @@ function Placement:init(args, parent, lastPlacement)
 	self.placeStart = self.args.placeStart
 	self.placeEnd = self.args.placeEnd
 	self.hasUSD = false
-
-	Opponent = self.parent.opponentLibrary or Opponent
 
 	self.prizeRewards = self:_readPrizeRewards(self.args)
 
@@ -310,7 +307,6 @@ function Placement:_getLpdbData(...)
 	local entries = {}
 	for opponentIndex, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
-		local playerCount = 0
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
@@ -327,7 +323,6 @@ function Placement:_getLpdbData(...)
 			participant = Opponent.toName(opponent.opponentData)
 			local p1 = opponent.opponentData.players[1]
 			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
-			playerCount = 1
 		else
 			participant = Opponent.toName(opponent.opponentData)
 		end
@@ -346,11 +341,18 @@ function Placement:_getLpdbData(...)
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
-			individualprizemoney = (playerCount > 0) and (prizeMoney / playerCount) or 0,
+			individualprizemoney = Opponent.typeIsParty(opponentType) and (prizeMoney / Opponent.partySize(opponentType)) or 0,
 			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
 			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
 			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
 			groupscore = opponent.additionalData.GROUPSCORE,
+			lastvsdata = Table.merge(
+				opponent.additionalData.LASTVS and Opponent.toLpdbStruct(opponent.additionalData.LASTVS) or {},
+				{
+					score = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
+					groupscore = opponent.additionalData.GROUPSCORE,
+				}
+			),
 			extradata = {
 				prizepoints = tostring(pointsReward or ''),
 				participantteam = (opponentType == Opponent.solo and players.p1team)
@@ -360,7 +362,6 @@ function Placement:_getLpdbData(...)
 			-- TODO: We need to create additional LPDB Fields
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
-			-- lastvs match2 opponent (json?)
 		}
 
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))

@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=clashroyale
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -19,6 +19,12 @@ function WikiSpecific.matchHasDetails(match)
 		or not Table.isEmpty(match.links)
 		or match.comment
 		or 0 < #match.games
+end
+
+function WikiSpecific.getMatchGroupContainer(matchGroupType)
+	return matchGroupType == 'matchlist'
+		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
+		or Lua.import('Module:MatchGroup/Display/Bracket/Custom', {requireDevIfEnabled = true}).BracketContainer
 end
 
 return WikiSpecific

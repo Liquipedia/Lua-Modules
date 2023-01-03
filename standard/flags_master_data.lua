@@ -1342,7 +1342,7 @@ local data = {
 		name = 'Asia',
 	},
 	['asia-pacific'] = {
-		flag = 'File:Space filler flag.png',
+		flag = 'File:Asia-pacific flag hd.png',
 		localised = 'APAC',
 		name = 'Asia-Pacific',
 	},
@@ -1381,6 +1381,16 @@ local data = {
 		localised = 'Latin American',
 		name = 'Latin America',
 	},
+	['latinamericanorth'] = {
+		flag = 'File:MxCo hd.png',
+		localised = 'Latin America North',
+		name = 'Latin America North',
+	},
+	['latinamericasouth'] = {
+		flag = 'File:ClAr hd.png',
+		localised = 'Latin America South',
+		name = 'Latin America South',
+	},
 	['middleeast'] = {
 		flag = 'File:Middle east flag hd.png',
 		localised = 'Middle Eastern',
@@ -1402,7 +1412,7 @@ local data = {
 		name = 'North America',
 	},
 	['northeastasia'] = {
-		flag = 'File:Space filler flag.png',
+		flag = 'File:Northeast Asia flag hd.png',
 		localised = 'Northeast Asian',
 		name = 'Northeast Asia',
 	},
@@ -1524,7 +1534,7 @@ local twoLetter = {
 	['cf'] = 'centralafricanrepublic',
 	['cg'] = 'congo',
 	['ch'] = 'switzerland',
-	['ci'] = "côted'ivoire",
+	['ci'] = 'côted\'ivoire',
 	['ck'] = 'cookislands',
 	['cl'] = 'chile',
 	['cm'] = 'cameroon',
@@ -1794,7 +1804,7 @@ local threeLetter = {
 	['che'] = 'switzerland',
 	['chl'] = 'chile',
 	['chn'] = 'china',
-	['civ'] = "côted'ivoire",
+	['civ'] = 'côted\'ivoire',
 	['cmr'] = 'cameroon',
 	['cod'] = 'congo,democraticrepublicofthe',
 	['cog'] = 'congo',
@@ -2010,6 +2020,8 @@ local threeLetter = {
 	['anz'] = 'oceania',
 	['cis'] = 'commonwealthofindependentstates',
 	['int'] = 'world',
+	['lan']	= 'latinamericanorth',
+	['las']	= 'latinamericasouth',
 	['sam'] = 'southamerica',
 	['sca'] = 'scandinavia',
 	['sea'] = 'southeastasia',
@@ -2031,7 +2043,7 @@ local aliases = {
 	['aland'] = 'ålandislands',
 	['Ålandislands'] = 'ålandislands',
 	['curacao'] = 'curaçao',
-	['ivorycoast'] = "côted'ivoire",
+	['ivorycoast'] = 'côted\'ivoire',
 
 	-- Other
 	['america'] = 'unitedstates',
