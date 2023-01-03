@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=clashroyale
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
