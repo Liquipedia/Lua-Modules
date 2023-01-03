@@ -35,9 +35,12 @@ local VARIABLE = '[%w%. ]-'
 local SELF_REF = '.'
 local TABLE_SPLIT_CHAR = '.'
 
-local REGEX_SECTION = '{{'.. PREFIX_SECTION_START ..'('.. VARIABLE ..')}}('.. TEXT ..'){{'.. PREFIX_SECTION_END .. '%1}}'
-local REGEX_INVERTED_SECTION = '{{'.. PREFIX_INVERTED_SECTION ..'('.. VARIABLE ..')}}('.. TEXT ..'){{'.. PREFIX_SECTION_END .. '%1}}'
-local REGEX_VARIABLE = '{{(['.. PREFIX_COMMENT .. PREFIX_UNESCAPE ..']?)('.. VARIABLE ..')}}'
+local REGEX_SECTION =
+	'{{'.. PREFIX_SECTION_START ..'('.. VARIABLE ..')}}('.. TEXT ..'){{'.. PREFIX_SECTION_END .. '%1}}'
+local REGEX_INVERTED_SECTION =
+	'{{'.. PREFIX_INVERTED_SECTION ..'('.. VARIABLE ..')}}('.. TEXT ..'){{'.. PREFIX_SECTION_END .. '%1}}'
+local REGEX_VARIABLE =
+	'{{(['.. PREFIX_COMMENT .. PREFIX_UNESCAPE ..']?)('.. VARIABLE ..')}}'
 
 ---@class TemplateEngineContext
 local Context = Class.new(function(self, ...) self:init(...) end)
