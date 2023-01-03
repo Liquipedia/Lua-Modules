@@ -10,6 +10,16 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Table = require('Module:Table')
 
+---Return true if the input is a table in array format
+---@param array any
+---@return boolean
+local function isArray(array)
+	if type(array) ~= 'table' then
+		return false
+	end
+	return Table.size(array) == #array
+end
+
 ---@class TemplateEngine
 ---Subset implementation of `{{mustache}} templates`.
 ---https://mustache.github.io/mustache.5.html
@@ -23,13 +33,21 @@ local Context = Class.new(function(self, ...) self:init(...) end)
 ---@param model table
 ---@return string
 function TemplateEngine:render(template, model)
+	local context = Context(model) ---@type TemplateEngineContext
+	return TemplateEngine:_subRender(template, context)
+end
+
+---Renders a given template based on a TemplateEngineContext
+---@param template string
+---@param context TemplateEngineContext
+---@return string
+function TemplateEngine:_subRender(template, context)
 	local renderOrder = {
 		TemplateEngine._section,
 		TemplateEngine._invertedSection,
 		TemplateEngine._variable,
 	}
 
-	local context = Context(model) ---@type TemplateEngineContext
 	return Array.reduce(renderOrder, function (modifiedTemplate, render)
 		return render(self, modifiedTemplate, context)
 	end, template)
@@ -37,7 +55,8 @@ end
 
 ---Handles `{{mustache}}` `sections`.
 ---The section start is a key in the model.
----If it's an array then the contnet within will be displayed once for each element in the array.
+---If it's an array then the content within will be displayed once for each element in the array.
+---If it's a non-array table, the content with be rendered with this table as model.
 ---If it's a function, the function will be called.
 ---Otherwise, if the value is truthy then it will be rendered.
 ---@param template string
@@ -47,13 +66,19 @@ function TemplateEngine:_section(template, context)
 	return (template:gsub('{{#(.-)}}(.-){{/%1}}', function (varible, text)
 		local value = context:find(varible)
 		if type(value) == 'table' then
-			return table.concat(Array.map(value, function (_, idx)
-				return (text:gsub('{{%.}}', '{{'.. varible .. '.' .. idx .. '}}'))
-			end))
+			if isArray(value) then
+				return table.concat(Array.map(value, function (val)
+					return self:_subRender(text, Context(val, context))
+				end))
+			else
+				return self:_subRender(text, Context(value, context))
+			end
 		elseif type(value) == 'function' then
-			return value(text) -- TODO second parameter `render`
+			return value(text, function(newText)
+				return self:_subRender(newText, context)
+			end)
 		else
-			return value and text or ''
+			return value and self:_subRender(text, context) or ''
 		end
 	end))
 end
@@ -68,8 +93,8 @@ end
 function TemplateEngine:_invertedSection(template, conext)
 	return (template:gsub('{{^(.-)}}(.-){{/%1}}', function (varible, text)
 		local value = conext:find(varible)
-		if not value or (type(value) == 'table' and #value == 0) then
-			return text
+		if not value or (type(value) == 'table' and isArray(value) and #value == 0) then
+			return self:_subRender(text, Context(value, conext))
 		end
 		return ''
 	end))
