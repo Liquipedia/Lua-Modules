@@ -11,7 +11,8 @@ local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local wikiSpec = require('Module:Brkts/WikiSpecific')
+
+local wikiSpec = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local MatchSubobjects = {}
 
