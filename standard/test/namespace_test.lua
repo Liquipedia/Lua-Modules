@@ -14,9 +14,6 @@ local Namespace = Lua.import('Module:Namespace', {requireDevIfEnabled = true})
 local suite = ScribuntoUnit:new()
 
 function suite:testisMain()
-	-- can not really test much here due to the testcase page
-	-- not being in several name spaces at the same time
-
 	-- `Module:Namespace` treats Module talk space as main space
 	self:assertEquals(true, Namespace.isMain())
 end
