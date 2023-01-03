@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 ---Return true if the input is a table in array format
