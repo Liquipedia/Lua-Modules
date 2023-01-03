@@ -34,8 +34,8 @@ Config.PLACEMENT_QUERY =
 	'liquipediatiertype, players, extradata, mode'
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 400
-Config.NOTABILITY_THRESHOLD_NOTABLE = 600
+Config.NOTABILITY_THRESHOLD_MIN = 800
+Config.NOTABILITY_THRESHOLD_NOTABLE = 1600
 
 -- These are all the liquipediatiertypes which should be extra "penalised"
 -- for a lower placement, see also the placementDropOffFunction below.
