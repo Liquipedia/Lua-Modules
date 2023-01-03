@@ -13,7 +13,7 @@ local Namespace = Lua.import('Module:Namespace', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
-function suite:testIdFromName()
+function suite:testisMain()
 	-- can not really test much here due to the testcase page
 	-- not being in several name spaces at the same time
 
