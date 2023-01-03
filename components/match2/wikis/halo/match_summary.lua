@@ -103,12 +103,7 @@ function CustomMatchSummary.getByMatchId(args)
 	then
 		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
 		match.links.headtohead = tostring(
-			mw.uri.fullUrl('Special:RunQuery/Head2head')) .. '?title=Special%3ARunQuery%2FHead2head&Headtohead=team1%3D' 
-		.. team1 .. '%26team2%3D' .. team2 .. '%26games%255Bis_list%255D%3D1%26tiers%255Bis_list%255D%3D1%26fromdate%255Bday%255D%3D01%26fromdate
-		%255Bmonth%255D%3D01%26fromdate%255Byear%255D%3D2000&pfRunQueryFormName=Head2head&wpRunQuery=Run+query&pf_free_text=
-		&Headtohead%5Bteam1%5D=' .. team1 .. '&Headtohead%5Bteam2%5D=' .. team2 .. '&Headtohead%5Bgames%5D%5Bis_list%5D=1&Headtohead%
-		5Btiers%5D%5Bis_list%5D=1&Headtohead%5Bfromdate%5D%5Bday%5D=01&Headtohead%5Bfromdate%5D%5Bmonth%5D=01&Headtohead%5Bfromdate%5D%5Byear%5D=
-		'.. string.sub(match.date,1,4) .. '&pf_free_text=&wpRunQuery=Run+query'
+			mw.uri.fullUrl('Special:RunQuery/Head2head')) .. '?title=Special%3ARunQuery%2FHead2head&Headtohead=team1%3D' .. team1 .. '%26team2%3D' .. team2 .. '%26games%255Bis_list%255D%3D1%26tiers%255Bis_list%255D%3D1%26fromdate%255Bday%255D%3D01%26fromdate%255Bmonth%255D%3D01%26fromdate%255Byear%255D%3D2000&pfRunQueryFormName=Head2head&wpRunQuery=Run+query&pf_free_text=&Headtohead%5Bteam1%5D=' .. team1 .. '&Headtohead%5Bteam2%5D=' .. team2 .. '&Headtohead%5Bgames%5D%5Bis_list%5D=1&Headtohead%5Btiers%5D%5Bis_list%5D=1&Headtohead%5Bfromdate%5D%5Bday%5D=01&Headtohead%5Bfromdate%5D%5Bmonth%5D=01&Headtohead%5Bfromdate%5D%5Byear%5D='.. string.sub(match.date,1,4) .. '&pf_free_text=&wpRunQuery=Run+query'
 	end
 	
 	if Table.isNotEmpty(vods) or Table.isNotEmpty(match.links) then
