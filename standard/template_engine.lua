@@ -83,7 +83,7 @@ function TemplateEngine:_variable(template, context)
 	return (template:gsub('{{([%w%.]-)}}', function(variable)
 		local value = context:find(variable)
 		if type(value) == 'function' then
-			value = value(context)
+			value = value(context.model)
 		end
 		return value or variable
 	end))
