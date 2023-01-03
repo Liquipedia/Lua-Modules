@@ -80,13 +80,13 @@ end
 ---@param context TemplateEngineContext
 ---@return string
 function TemplateEngine:_variable(template, context)
-	return (
-		template:gsub('{{([%w%.]-)}}',
-			function(variable)
-				return context:find(variable) or variable
-			end
-		)
-	)
+	return (template:gsub('{{([%w%.]-)}}', function(variable)
+		local value = context:find(variable)
+		if type(value) == 'function' then
+			value = value(context)
+		end
+		return value or variable
+	end))
 end
 
 function Context:init(model, parent)
