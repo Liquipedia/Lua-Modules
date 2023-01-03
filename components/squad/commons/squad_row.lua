@@ -66,7 +66,7 @@ function SquadRow:id(args)
 	cell:addClass('ID')
 
 	args['noclean'] = true
-	cell:wikitext('\'\'\'' .. Player._player(args) .. '\'\'\'')
+	cell:wikitext('<b>' .. Player._player(args) .. '</b>')
 	args['noclean'] = nil
 
 	if String.isNotEmpty(args.captain) then
@@ -82,7 +82,7 @@ function SquadRow:id(args)
 		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team:lower()))
 		if args.teamrole then
 			teamNode:css('text-align', 'center')
-			teamNode:tag('div'):css('font-size', '85%'):wikitext('(\'\''.. args.teamrole ..'\'\')')
+			teamNode:tag('div'):css('font-size', '85%'):wikitext('(<i>'.. args.teamrole ..'</i>)')
 		end
 	end
 
@@ -117,7 +117,7 @@ function SquadRow:role(args)
 
 	if String.isNotEmpty(args.role) then
 		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'))
-		cell:wikitext('\'\'(' .. args.role .. ')\'\'')
+		cell:wikitext('<i>(' .. args.role .. ')</i>')
 	end
 
 	self.content:node(cell)
@@ -134,7 +134,7 @@ function SquadRow:date(dateValue, cellTitle, lpdbColumn)
 	cell:node(mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle))
 
 	if String.isNotEmpty(dateValue) then
-		cell:node(mw.html.create('div'):addClass('Date'):wikitext('\'\'' .. dateValue .. '\'\''))
+		cell:node(mw.html.create('div'):addClass('Date'):wikitext('<i>' .. dateValue .. '</i>'))
 	end
 	self.content:node(cell)
 
@@ -169,7 +169,7 @@ function SquadRow:newteam(args)
 			end
 
 			if String.isNotEmpty(args.newteamrole) then
-				cell:wikitext('&nbsp;\'\'<small>(' .. args.newteamrole .. ')</small>\'\'')
+				cell:wikitext('&nbsp;<i><small>(' .. args.newteamrole .. ')</small></i>')
 			end
 		elseif not self.options.useTemplatesForSpecialTeams and String.isNotEmpty(args.newteamrole) then
 			cell:tag('div'):addClass('NewTeamRole'):wikitext(args.newteamrole)

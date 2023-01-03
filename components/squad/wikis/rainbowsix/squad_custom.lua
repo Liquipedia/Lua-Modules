@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 local CustomSquad = {}
 
 function CustomSquad.run(frame)
-	error("R6 wiki doesn't support manual Squad Tables")
+	error('R6 wiki doesn\'t support manual Squad Tables')
 end
 
 function CustomSquad.runAuto(playerList, squadType)

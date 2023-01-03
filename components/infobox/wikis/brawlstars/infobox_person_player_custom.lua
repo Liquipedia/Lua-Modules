@@ -116,7 +116,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local mmrDisplay = '[[Leaderboards|' .. _args.mmr .. ']]'
 	if String.isNotEmpty(_args.mmrdate) then
-		mmrDisplay = mmrDisplay .. '&nbsp;<small>\'\'(last update: ' .. _args.mmrdate .. '\'\'</small>'
+		mmrDisplay = mmrDisplay .. '&nbsp;<small><i>(last update: ' .. _args.mmrdate .. '</i></small>'
 	end
 
 	return {Cell{name = 'Solo MMR', content = {mmrDisplay}}}

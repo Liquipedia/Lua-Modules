@@ -24,10 +24,10 @@ end
 
 function suite:testLocations()
 	local test1 = {venue = 'Abc', country1 = 'Sweden', country2='Europe'}
-	local result1 = {country1 = "se", region2 = "Europe", venue1 ="Abc"}
+	local result1 = {country1 = 'se', region2 = 'Europe', venue1 = 'Abc'}
 
 	local test2 = {venue = 'Abc', country1 = 'Sweden', region1='Europe', venuelink = 'https://lmgtfy.app/'}
-	local result2 = {country1 = "se", region1 = "Europe", venue1 ="Abc", venuelink1 = 'https://lmgtfy.app/'}
+	local result2 = {country1 = 'se', region1 = 'Europe', venue1 = 'Abc', venuelink1 = 'https://lmgtfy.app/'}
 
 	self:assertDeepEquals(result1, Locale.formatLocations(test1))
 	self:assertDeepEquals(result2, Locale.formatLocations(test2))

@@ -384,7 +384,7 @@ end
 function MatchGroupInput.getCommonTournamentVars(obj)
 	obj.game = Logic.emptyOr(obj.game, Variables.varDefault('tournament_game'))
 	obj.icon = Logic.emptyOr(obj.icon, Variables.varDefault('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault("tournament_icondark"))
+	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault('tournament_icondark'))
 	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,

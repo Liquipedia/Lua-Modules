@@ -258,7 +258,7 @@ function CustomLeague:defineCustomPageVariables()
 	--series number
 	local seriesNumber = _args.number or ''
 	if String.isNotEmpty(seriesNumber) then
-		seriesNumber = string.format("%05i", seriesNumber)
+		seriesNumber = string.format('%05i', seriesNumber)
 	end
 	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
