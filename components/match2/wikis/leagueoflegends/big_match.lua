@@ -207,7 +207,7 @@ function BigMatch.templateFooter()
 <h3>Additional Information</h3>
 <div>
 {{#links}}
-	{{.}}
+	[[File:{{icon}}|link={{link}}|15px|{{text}}]]
 {{/links}}
 </div>
 <br>
@@ -252,7 +252,11 @@ function BigMatch.run(frame)
 	}
 
 	mw.logObject(match, 'After match2')
-	return bigMatch:render(match, tournament)
+	local renderModel = Table.merge(tournament, match)
+	renderModel.links = Array.extractValues(Table.map(renderModel.links, function (site, link)
+		return site, {icon = 'Factor.gg lightmode.png', text = site, link = link}
+	end))
+	return bigMatch:render(renderModel)
 end
 
 -- TODO: WIP
@@ -287,27 +291,27 @@ function BigMatch:_apiToMatch2(apiInput)
 	return match2Input
 end
 
-function BigMatch:render(match, tournament)
+function BigMatch:render(model)
 	local overall = mw.html.create('div'):addClass('fb-match-page-overall')
-
-	overall :wikitext(self:header(match, tournament))
-			:wikitext(self:games(match))
-			:wikitext(self:footer(match))
+	mw.logObject(model, 'Rendering on')
+	overall :wikitext(self:header(model))
+			:wikitext(self:games(model))
+			:wikitext(self:footer(model))
 
 	return overall
 end
 
-function BigMatch:header(match, tournament)
-	return TemplateEngine():render(BigMatch.templateHeader(), Table.merge(match, tournament))
+function BigMatch:header(model)
+	return TemplateEngine():render(BigMatch.templateHeader(), model)
 end
 
-function BigMatch:games(match)
-	local games = Array.map(match.match2games, function (game)
+function BigMatch:games(model)
+	local games = Array.map(model.match2games, function (game)
 		if game.resulttype == 'np' then
 			return
 		end
 
-		return TemplateEngine():render(BigMatch.templateGame(), Table.merge(match, game))
+		return TemplateEngine():render(BigMatch.templateGame(), Table.merge(model, game))
 	end)
 
 	---@type table<string, any>
@@ -324,8 +328,8 @@ function BigMatch:games(match)
 	return Tabs.dynamic(tabs)
 end
 
-function BigMatch:footer(match)
-	return TemplateEngine():render(BigMatch.templateFooter(), match)
+function BigMatch:footer(model)
+	return TemplateEngine():render(BigMatch.templateFooter(), model)
 end
 
 function BigMatch:_getId()
