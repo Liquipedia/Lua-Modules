@@ -13,10 +13,8 @@ local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DivTable = require('Module:DivTable')
 local Json = require('Module:Json')
-local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Logic = require('Module:Logic')
-local Match = require('Module:Match')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -49,7 +47,6 @@ local BigMatch = Class.new()
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
 	local bigMatch = BigMatch()
-	local match, tournamentData
 
 	-- since we retrieve the match completely we do not need to process it nor store it
 	local identifiers = bigMatch:_getId()
@@ -228,7 +225,7 @@ function BigMatch._links(match)
 	return
 end
 
-function BigMatch:body(match, playerLookUp)
+function BigMatch:body(match)
 	local opponents = match.match2opponents
 	local playerLookUp = self:_createPlayerLookUp(opponents[1].match2players, opponents[2].match2players)
 
@@ -257,7 +254,7 @@ function BigMatch:body(match, playerLookUp)
 			gameDisplay:row(BigMatch._gameRow(game, gameIndex, playerLookUp, match.date, subMatch.isKoth))
 
 			if Table.isNotEmpty(game.bans) then
-				gameDisplay:row(BigMatch._banRow(game.bans, gameIndex))
+				gameDisplay:row(BigMatch._banRow(game.bans, date, gameIndex))
 			end
 
 			if String.isNotEmpty(game.extradata.comment) then
@@ -266,7 +263,7 @@ function BigMatch:body(match, playerLookUp)
 		end
 
 		if Table.isNotEmpty(subMatch.bans) then
-			gameDisplay:row(BigMatch._banRow(subMatch.bans))
+			gameDisplay:row(BigMatch._banRow(subMatch.bans, date))
 		end
 
 		container:node(gameDisplay:create())
@@ -420,7 +417,7 @@ function BigMatch._gameRow(game, gameIndex, playerLookUp, date, isKoth)
 	local players = BigMatch._fetchGamePlayers(game, playerLookUp)
 
 	-- cards & player display left side
-	row:cell(BigMatch._cardsAndPlayerDisplay(players[1], true, isKoth))
+	row:cell(BigMatch._cardsAndPlayerDisplay(players[1], true, isKoth, date))
 
 	-- winner Icon if left won
 	row:cell(mw.html.create('div')
@@ -443,14 +440,13 @@ function BigMatch._gameRow(game, gameIndex, playerLookUp, date, isKoth)
 		:node(BigMatch._WinnerIcon(game, 2))
 	)
 
-	row:cell(BigMatch._cardsAndPlayerDisplay(players[2], false, isKoth))
+	row:cell(BigMatch._cardsAndPlayerDisplay(players[2], false, isKoth, date))
 
 	return row
 end
 
 function BigMatch._fetchGamePlayers(game, playerLookUp)
 	local players = {{}, {}}
-	local cardsData = {{}, {}}
 
 	for participantKey, participant in Table.iter.spairs(game.participants or {}) do
 		local opponentIndex = tonumber(mw.text.split(participantKey, '_')[1])
@@ -469,7 +465,7 @@ function BigMatch._fetchGamePlayers(game, playerLookUp)
 	return players
 end
 
-function BigMatch._cardsAndPlayerDisplay(players, flip, isKoth)
+function BigMatch._cardsAndPlayerDisplay(players, flip, isKoth, date)
 	local container = mw.html.create('div')
 		:css('display', 'flex')
 		:css('flex-direction', 'column')
@@ -500,14 +496,19 @@ end
 function BigMatch._gameComment(comment)
 	-- ugly hack to have comment span over all cells in the row
 	return DivTable.Row()
-		:cell(mw.html.create('div'):css('display', 'table-cell'):css('max-width', '1px'):css('white-space', 'nowrap'):css('overflow', 'visible'):wikitext(comment))
+		:cell(mw.html.create('div')
+			:css('display', 'table-cell')
+			:css('max-width', '1px')
+			:css('white-space', 'nowrap')
+			:css('overflow', 'visible')
+			:wikitext(comment))
 		:cell(mw.html.create('div'))
 		:cell(mw.html.create('div'))
 		:cell(mw.html.create('div'))
 		:cell(mw.html.create('div'))
 end
 
-function BigMatch._banRow(bans, gameIndex)
+function BigMatch._banRow(bans, date, gameIndex)
 	local row = DivTable.Row()
 
 	if type(bans.t1) ~= 'table' then
