@@ -254,7 +254,7 @@ function BigMatch:body(match)
 			gameDisplay:row(BigMatch._gameRow(game, gameIndex, playerLookUp, match.date, subMatch.isKoth))
 
 			if Table.isNotEmpty(game.bans) then
-				gameDisplay:row(BigMatch._banRow(game.bans, date, gameIndex))
+				gameDisplay:row(BigMatch._banRow(game.bans, match.date, gameIndex))
 			end
 
 			if String.isNotEmpty(game.extradata.comment) then
@@ -263,7 +263,7 @@ function BigMatch:body(match)
 		end
 
 		if Table.isNotEmpty(subMatch.bans) then
-			gameDisplay:row(BigMatch._banRow(subMatch.bans, date))
+			gameDisplay:row(BigMatch._banRow(subMatch.bans, match.date))
 		end
 
 		container:node(gameDisplay:create())
