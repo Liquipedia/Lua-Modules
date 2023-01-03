@@ -1342,7 +1342,7 @@ local data = {
 		name = 'Asia',
 	},
 	['asia-pacific'] = {
-		flag = 'File:Space filler flag.png',
+		flag = 'File:Asia-pacific flag hd.png',
 		localised = 'APAC',
 		name = 'Asia-Pacific',
 	},
@@ -1380,6 +1380,16 @@ local data = {
 		flag = 'File:Space filler flag.png',
 		localised = 'Latin American',
 		name = 'Latin America',
+	},
+	['latinamericanorth'] = {
+		flag = 'File:MxCo hd.png',
+		localised = 'Latin America North',
+		name = 'Latin America North',
+	},
+	['latinamericasouth'] = {
+		flag = 'File:ClAr hd.png',
+		localised = 'Latin America South',
+		name = 'Latin America South',
 	},
 	['middleeast'] = {
 		flag = 'File:Middle east flag hd.png',
@@ -2010,6 +2020,8 @@ local threeLetter = {
 	['anz'] = 'oceania',
 	['cis'] = 'commonwealthofindependentstates',
 	['int'] = 'world',
+	['lan']	= 'latinamericanorth',
+	['las']	= 'latinamericasouth',
 	['sam'] = 'southamerica',
 	['sca'] = 'scandinavia',
 	['sea'] = 'southeastasia',
