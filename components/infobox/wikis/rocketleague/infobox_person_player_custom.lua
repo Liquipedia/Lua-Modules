@@ -52,13 +52,13 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
-function CustomInjector:_parseActive(yearsActive, get, getArg)
+function CustomInjector:_parseActive(yearsActive, getYearsActive, getYearsActiveArg)
 	if String.isEmpty(yearsActive) then
-		return get(getArg)
-	elseif yearsActive == 'hide' then
+		return getYearsActive(getYearsActiveArg)
+	elseif yearsActive:lower() == 'hide' then
 		return nil
 	else
-		return Page.makeInternalLink({onlyIfExists = true}, yearsActive)
+		return yearsActive
 	end
 end
 
