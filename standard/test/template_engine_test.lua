@@ -20,7 +20,8 @@ local TEST_DATA = {a = {a = 'baz', b = 'foo'}, b = 2, foo = {'bar', 'baz'}, d = 
 		{country = 'Sweden', city = 'Stockholm'},
 		{country = 'The Netherlands', city = 'Utrecht'},
 		{country = 'USA', city = 'Santa Monica'},
-	}
+	},
+	html = '<b>a</b>'
 }
 
 function suite:testVariables()
@@ -29,6 +30,14 @@ end
 
 function suite:testVariableFunction()
 	self:assertEquals('7', TemplateEngine:render('{{math}}', TEST_DATA))
+end
+
+function suite:testVariableEscape()
+	self:assertEquals('<b>a</b>&#60;b&#62;a&#60;/b&#62;', TemplateEngine:render('{{&html}}{{html}}', TEST_DATA))
+end
+
+function suite:testComments()
+	self:assertEquals('', TemplateEngine:render('{{!A Comment}}', TEST_DATA))
 end
 
 function suite:testSectionArrays()

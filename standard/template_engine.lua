@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 ---Return true if the input is a table in array format
@@ -100,17 +101,28 @@ function TemplateEngine:_invertedSection(template, conext)
 	end))
 end
 
----Interpolates a template using string interpolation. Can handle nested tables.
+---Handles `{{mustache}}` `variables` & `comments`.
 ---@param template string
 ---@param context TemplateEngineContext
 ---@return string
 function TemplateEngine:_variable(template, context)
-	return (template:gsub('{{([%w%.]-)}}', function(variable)
+	return (template:gsub('{{([!%&]?[%w%. ]-)}}', function(variable)
+		if String.startsWith(variable, '!') then
+			-- {{! Comment}}
+			return ''
+		end
+		local escape = true
+		if String.startsWith(variable, '&') then
+			-- {{&var}} means don't escape
+			escape = false
+			variable = variable:sub(2)
+		end
 		local value = context:find(variable)
 		if type(value) == 'function' then
 			value = value(context.model)
 		end
-		return value or variable
+		value = value or variable
+		return escape and mw.text.nowiki(value) or value
 	end))
 end
 
