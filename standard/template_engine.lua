@@ -25,6 +25,20 @@ end
 ---https://mustache.github.io/mustache.5.html
 local TemplateEngine = Class.new()
 
+local PREFIX_SECTION_START = '#'
+local PREFIX_INVERTED_SECTION = '%^'
+local PREFIX_SECTION_END = '/'
+local PREFIX_COMMENT = '!'
+local PREFIX_UNESCAPE = '&'
+local TEXT = '.-'
+local VARIABLE = '[%w%. ]-'
+local SELF_REF = '.'
+local TABLE_SPLIT_CHAR = '.'
+
+local REGEX_SECTION = '{{'.. PREFIX_SECTION_START ..'('.. VARIABLE ..')}}('.. TEXT ..'){{'.. PREFIX_SECTION_END .. '%1}}'
+local REGEX_INVERTED_SECTION = '{{'.. PREFIX_INVERTED_SECTION ..'('.. VARIABLE ..')}}('.. TEXT ..'){{'.. PREFIX_SECTION_END .. '%1}}'
+local REGEX_VARIABLE = '{{(['.. PREFIX_COMMENT .. PREFIX_UNESCAPE ..']?)('.. VARIABLE ..')}}'
+
 ---@class TemplateEngineContext
 local Context = Class.new(function(self, ...) self:init(...) end)
 
@@ -63,7 +77,7 @@ end
 ---@param context TemplateEngineContext
 ---@return string
 function TemplateEngine:_section(template, context)
-	return (template:gsub('{{#(.-)}}(.-){{/%1}}', function (varible, text)
+	return (template:gsub(REGEX_SECTION, function (varible, text)
 		local value = context:find(varible)
 		if type(value) == 'table' then
 			if isArray(value) then
@@ -91,7 +105,7 @@ end
 ---@param context TemplateEngineContext
 ---@return string
 function TemplateEngine:_invertedSection(template, context)
-	return (template:gsub('{{^(.-)}}(.-){{/%1}}', function (varible, text)
+	return (template:gsub(REGEX_INVERTED_SECTION, function (varible, text)
 		local value = context:find(varible)
 		if not value or (type(value) == 'table' and isArray(value) and #value == 0) then
 			return self:_subRender(text, context)
@@ -105,17 +119,16 @@ end
 ---@param context TemplateEngineContext
 ---@return string
 function TemplateEngine:_variable(template, context)
-	return (template:gsub('{{([!%&]?)([%w%. ]-)}}', function(modifier, variable)
-		if modifier == '!' then
-			-- {{! Comment}}
+	return (template:gsub(REGEX_VARIABLE, function(prefix, variable)
+		if prefix == PREFIX_COMMENT then
 			return ''
 		end
-		local escape = modifier ~= '&'
+		local escape = prefix ~= PREFIX_UNESCAPE
 		local value = context:find(variable)
 		if type(value) == 'function' then
 			value = value(context.model)
 		end
-		value = value or variable
+		value = value or variable -- Doesn't follow mustache standard, should be `or ''` to follow.
 		return escape and mw.text.nowiki(value) or value
 	end))
 end
@@ -126,7 +139,7 @@ function Context:init(model, parent)
 end
 
 function Context:find(variableName)
-	if variableName == '.' then
+	if variableName == SELF_REF then
 		return self.model
 	end
 
@@ -136,7 +149,7 @@ function Context:find(variableName)
 
 	local context = self
 	while context do
-		local path = Table.mapValues(mw.text.split(variableName, '.', true), toNumberIfNumeric)
+		local path = Table.mapValues(mw.text.split(variableName, TABLE_SPLIT_CHAR, true), toNumberIfNumeric)
 		local key = Table.extract(path, #path)
 		local tbl =  Table.getByPath(context.model, path)
 		if tbl[key] then
