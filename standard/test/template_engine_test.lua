@@ -45,7 +45,10 @@ function suite:testSectionArrays()
 end
 
 function suite:testSectionTables()
-	self:assertEquals('Stockholm, Sweden\nUtrecht, The Netherlands\nSanta Monica, USA\n', TemplateEngine:render('{{#locations}}{{city}}, {{country}}\n{{/locations}}', TEST_DATA))
+	self:assertEquals(
+		'Stockholm, Sweden\nUtrecht, The Netherlands\nSanta Monica, USA\n',
+		TemplateEngine:render('{{#locations}}{{city}}, {{country}}\n{{/locations}}', TEST_DATA)
+	)
 end
 
 function suite:testSectionIf()
