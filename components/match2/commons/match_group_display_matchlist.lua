@@ -15,7 +15,7 @@ local TypeUtil = require('Module:TypeUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local matchHasDetailsWikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true}).matchHasDetails
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
@@ -81,7 +81,7 @@ function MatchlistDisplay.Matchlist(props)
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
 		collapsible = Logic.nilOr(propsConfig.collapsible, true),
-		matchHasDetails = propsConfig.matchHasDetails or matchHasDetailsWikiSpecific or DisplayHelper.defaultMatchHasDetails,
+		matchHasDetails = propsConfig.matchHasDetails or WikiSpecific.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
 		width = propsConfig.width or 300,
 	}
 

@@ -19,7 +19,7 @@ local TypeUtil = require('Module:TypeUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local matchHasDetailsWikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true}).matchHasDetails
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
@@ -105,7 +105,7 @@ function BracketDisplay.Bracket(props)
 		headerMargin = propsConfig.headerMargin or defaultConfig.headerMargin,
 		hideRoundTitles = propsConfig.hideRoundTitles or false,
 		lineWidth = propsConfig.lineWidth or defaultConfig.lineWidth,
-		matchHasDetails = propsConfig.matchHasDetails or matchHasDetailsWikiSpecific or DisplayHelper.defaultMatchHasDetails,
+		matchHasDetails = propsConfig.matchHasDetails or WikiSpecific.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
 		matchMargin = propsConfig.matchMargin or math.floor(defaultConfig.opponentHeight / 4),
 		matchWidth = propsConfig.matchWidth or defaultConfig.matchWidth,
 		matchWidthMobile = propsConfig.matchWidthMobile or defaultConfig.matchWidthMobile,
