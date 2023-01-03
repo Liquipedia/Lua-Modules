@@ -19,7 +19,9 @@ local suite = ScribuntoUnit:new()
 function suite:testInlineOpponentSolo()
 	local opponent = {type = 'solo', players = {{displayName = 'test', pageName = 'link', flag = 'de'}}}
 	self:assertEquals(
-		'<span class="inline-player" style="white-space:pre"><span class="flag">[[File:de_hd.png|Germany|link=]]</span>&nbsp;[[link|test]]</span>',
+		'<span class="inline-player" style="white-space:pre">'
+			.. '<span class="flag">[[File:de_hd.png|Germany|link=]]</span>'
+			.. '&nbsp;[[link|test]]</span>',
 		tostring(OpponentDisplay.InlineOpponent{opponent = opponent}),
 		'Unexpected default display'
 	)
@@ -29,29 +31,39 @@ function suite:testInlineOpponentSolo()
 		'Disabling flags did not work'
 	)
 	self:assertEquals(
-		'<span class="inline-player" style="white-space:pre"><span class="flag">[[File:de_hd.png|Germany|link=]]</span>&nbsp;[[link|test]]</span>',
+		'<span class="inline-player" style="white-space:pre">'
+			.. '<span class="flag">[[File:de_hd.png|Germany|link=]]</span>'
+			.. '&nbsp;[[link|test]]</span>',
 		tostring(OpponentDisplay.InlineOpponent{showFlag = true, opponent = opponent}),
 		'Showing flags did not work'
 	)
 	self:assertEquals(
-		'<span class="inline-player" style="white-space:pre"><span class="flag">[[File:de_hd.png|Germany|link=]]</span>&nbsp;test</span>',
+		'<span class="inline-player" style="white-space:pre">'
+			.. '<span class="flag">[[File:de_hd.png|Germany|link=]]</span>'
+			.. '&nbsp;test</span>',
 		tostring(OpponentDisplay.InlineOpponent{showLink = false, opponent = opponent}),
 		'Hiding links did not work'
 	)
 	self:assertEquals(
-		'<span class="inline-player" style="white-space:pre"><span class="flag">[[File:de_hd.png|Germany|link=]]</span>&nbsp;[[link|test]]</span>',
+		'<span class="inline-player" style="white-space:pre">'
+			.. '<span class="flag">[[File:de_hd.png|Germany|link=]]</span>'
+			.. '&nbsp;[[link|test]]</span>',
 		tostring(OpponentDisplay.InlineOpponent{showLink = true, opponent = opponent}),
 		'Hiding links did not work'
 	)
-	self.assertEquals(
-		'<span class="inline-player" style="white-space:pre"><span class="flag">[[File:de_hd.png|Germany|link=]]</span>&nbsp;<s>[[link|test]]</s></span>',
+	self:assertEquals(
+		'<span class="inline-player" style="white-space:pre">'
+			.. '<span class="flag">[[File:de_hd.png|Germany|link=]]</span>'
+			.. '&nbsp;<s>[[link|test]]</s></span>',
 		tostring(OpponentDisplay.InlineOpponent{dq = true, opponent = opponent}),
 		'Strikethrough/DQ did not work'
 	)
 
 	opponent.players[1].pageName = nil
 	self:assertEquals(
-		'<span class="inline-player" style="white-space:pre"><span class="flag">[[File:de_hd.png|Germany|link=]]</span>&nbsp;test</span>',
+		'<span class="inline-player" style="white-space:pre">'
+			.. '<span class="flag">[[File:de_hd.png|Germany|link=]]</span>'
+			.. '&nbsp;test</span>',
 		tostring(OpponentDisplay.InlineOpponent{showLink = true, opponent = opponent}),
 		'Unexpected display for missing links'
 	)
