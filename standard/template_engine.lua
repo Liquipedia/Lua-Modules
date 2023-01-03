@@ -59,7 +59,7 @@ end
 ---If it's an array then the content within will be displayed once for each element in the array.
 ---If it's a non-array table, the content with be rendered with this table as model.
 ---If it's a function, the function will be called.
----Otherwise, if the value is truthy then it will be rendered.
+---Otherwise, if the value is truthy then the section content will be rendered.
 ---@param template string
 ---@param context TemplateEngineContext
 ---@return string
@@ -89,13 +89,13 @@ end
 ---inverted sections may render text once based on the inverse value of the key.
 ---That is, they will be rendered if the key doesn't exist, is false, or is an empty list.
 ---@param template string
----@param conext TemplateEngineContext
+---@param context TemplateEngineContext
 ---@return string
-function TemplateEngine:_invertedSection(template, conext)
+function TemplateEngine:_invertedSection(template, context)
 	return (template:gsub('{{^(.-)}}(.-){{/%1}}', function (varible, text)
-		local value = conext:find(varible)
+		local value = context:find(varible)
 		if not value or (type(value) == 'table' and isArray(value) and #value == 0) then
-			return self:_subRender(text, Context(value, conext))
+			return self:_subRender(text, context)
 		end
 		return ''
 	end))
@@ -106,17 +106,12 @@ end
 ---@param context TemplateEngineContext
 ---@return string
 function TemplateEngine:_variable(template, context)
-	return (template:gsub('{{([!%&]?[%w%. ]-)}}', function(variable)
-		if String.startsWith(variable, '!') then
+	return (template:gsub('{{([!%&]?)([%w%. ]-)}}', function(modifier, variable)
+		if modifier == '!' then
 			-- {{! Comment}}
 			return ''
 		end
-		local escape = true
-		if String.startsWith(variable, '&') then
-			-- {{&var}} means don't escape
-			escape = false
-			variable = variable:sub(2)
-		end
+		local escape = modifier ~= '&'
 		local value = context:find(variable)
 		if type(value) == 'function' then
 			value = value(context.model)
