@@ -178,7 +178,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 	local bestof = tonumber(match.bestof) or Variables.varDefault('bestof', DEFAULT_BEST_OF)
 	Variables.varDefine('bestof', bestof)
 
-	local walkover = match.walkover or ''
+	local walkover = match.walkover
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local opponent = match['opponent' .. opponentIndex]
