@@ -48,8 +48,7 @@ OpponentDisplayCustom.BracketOpponentEntry.createTeam = OpponentDisplay.BracketO
 OpponentDisplayCustom.BracketOpponentEntry.createLiteral = OpponentDisplay.BracketOpponentEntry.createLiteral
 
 function OpponentDisplayCustom.BracketOpponentEntry:createPlayers(opponent)
-	local players = opponent.players
-	if #players == 1 then
+	if opponent.type == Opponent.solo then
 		local playerNode = PlayerDisplay.BlockPlayer({
 			player = players[1],
 			overflow = 'ellipsis',
