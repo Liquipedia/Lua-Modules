@@ -37,7 +37,7 @@ function suite:testHeaderInput()
 
 	self:assertDeepEquals(
 		{
-			{id = 'USD1', type = 'USD', index = 1, data = {roundPrecision = 3}},
+			{id = 'BASE_CURRENCY1', type = 'BASE_CURRENCY', index = 1, data = {roundPrecision = 3}},
 			{id = 'LOCAL_CURRENCY1', type = 'LOCAL_CURRENCY', index = 1, data =
 				{
 					rate = 0.97821993318758, roundPrecision = 3,
@@ -62,7 +62,7 @@ function suite:testHeaderInput()
 	self:assertDeepEquals(
 		{
 			abbreviateTbd = true,
-			autoUSD = true,
+			autoExchange = true,
 			currencyRatePerOpponent = false,
 			currencyRoundPrecision = 3,
 			cutafter = 4,
@@ -71,7 +71,7 @@ function suite:testHeaderInput()
 			lpdbPrefix = 'abc',
 			prizeSummary = true,
 			resolveRedirect = false,
-			showUSD = true,
+			showBaseCurrency = true,
 			storeLpdb = true,
 			storeSmw = true,
 			syncPlayers = false,

@@ -21,7 +21,7 @@ local Opponent = require('Module:OpponentLibraries').Opponent
 
 local DASH = '&#045;'
 
-local PRIZE_TYPE_USD = 'USD'
+local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_POINTS = 'POINTS'
 
 -- Allowed none-numeric score values.
@@ -151,7 +151,7 @@ function Placement:init(args, parent, lastPlacement)
 	self.date = self.args.date or parent.date
 	self.placeStart = self.args.placeStart
 	self.placeEnd = self.args.placeEnd
-	self.hasUSD = false
+	self.hasBaseCurrency = false
 
 	self.prizeRewards = self:_readPrizeRewards(self.args)
 
@@ -207,11 +207,11 @@ function Placement:_readPrizeRewards(args)
 		rewards[prize.id] = prizeData.rowParse(self, reward, args, prizeIndex)
 	end)
 
-	-- Special case for USD, as it's not defined in the header.
-	local usdType = self.prizeTypes[PRIZE_TYPE_USD]
-	if usdType.row and args[usdType.row] then
-		self.hasUSD = true
-		rewards[PRIZE_TYPE_USD .. 1] = usdType.rowParse(self, args[usdType.row], args, 1)
+	-- Special case for Base Currency, as it's not defined in the header.
+	local baseType = self.prizeTypes[PRIZE_TYPE_BASE_CURRENCY]
+	if baseType.row and args[baseType.row] then
+		self.hasBaseCurrency = true
+		rewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseType.rowParse(self, args[baseType.row], args, 1)
 	end
 
 	return rewards
@@ -327,7 +327,7 @@ function Placement:_getLpdbData(...)
 			participant = Opponent.toName(opponent.opponentData)
 		end
 
-		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_USD .. 1)) or 0
+		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local lpdbData = {
 			image = image,
@@ -382,13 +382,13 @@ function Placement:getPrizeRewardForOpponent(opponent, prize)
 	return opponent.prizeRewards[prize] or self.prizeRewards[prize]
 end
 
-function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
+function Placement:_setBaseFromRewards(prizesToUse, prizeTypes)
 	Array.forEach(self.opponents, function(opponent)
-		if opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1] then
+		if opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] or self.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] then
 			return
 		end
 
-		local usdReward = 0
+		local baseReward = 0
 		Array.forEach(prizesToUse, function(prize)
 			local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
 
@@ -396,7 +396,7 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 				return
 			end
 
-			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(
+			baseReward = baseReward + prizeTypes[prize.type].convertToBaseCurrency(
 				prize.data,
 				localMoney,
 				opponent.date,
@@ -405,7 +405,7 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 			self.parent.usedAutoConvertedCurrency = true
 		end)
 
-		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = usdReward
+		opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseReward
 	end)
 end
 

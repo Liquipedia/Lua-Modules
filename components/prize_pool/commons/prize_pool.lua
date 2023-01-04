@@ -48,7 +48,7 @@ local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 local BASE_CURRENCY = 'USD'
 
-local PRIZE_TYPE_USD = 'USD'
+local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
@@ -60,13 +60,13 @@ local FORFEIT_SCORE = 'FF'
 local SPECIAL_SCORES = {WALKOVER_SCORE, FORFEIT_SCORE , 'L', 'DQ', 'D'}
 
 PrizePool.config = {
-	showUSD = {
+	showBaseCurrency = {
 		default = false
 	},
-	autoUSD = {
+	autoExchange = {
 		default = true,
 		read = function(args)
-			return Logic.readBoolOrNil(args.autousd)
+			return Logic.readBoolOrNil(args.autoexchange or args.autousd)
 		end
 	},
 	prizeSummary = {
@@ -144,7 +144,7 @@ PrizePool.config = {
 }
 
 PrizePool.prizeTypes = {
-	[PRIZE_TYPE_USD] = {
+	[PRIZE_TYPE_BASE_CURRENCY] = {
 		sortOrder = 10,
 
 		headerDisplay = function (data)
@@ -152,13 +152,16 @@ PrizePool.prizeTypes = {
 			return TableCell{content = {{currencyText}}}
 		end,
 
-		row = 'usdprize',
+		row = BASE_CURRENCY:lower() .. 'prize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {{'$', Currency.formatMoney(data, headerData.roundPrecision)}}}
+				return TableCell{content = {
+					Currency.display(BASE_CURRENCY, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, abbreviation = false})
+				}}
 			end
 		end,
 	},
@@ -196,11 +199,12 @@ PrizePool.prizeTypes = {
 			if data > 0 then
 				return TableCell{content = {
 					Currency.display(headerData.currency, data,
-					{formatValue = true, formatPrecision = headerData.roundPrecision, abbreviation = false})}}
+					{formatValue = true, formatPrecision = headerData.roundPrecision, abbreviation = false})
+				}}
 			end
 		end,
 
-		convertToUsd = function (headerData, data, date, perOpponent)
+		convertToBaseCurrency = function (headerData, data, date, perOpponent)
 			local rate = headerData.rate
 
 			if perOpponent then
@@ -382,17 +386,17 @@ function PrizePool:create()
 	self.placements = self:_readPlacements(self.args)
 	self.placements = Import.run(self)
 
-	if self:_hasUsdPrizePool() then
-		self:setConfig('showUSD', true)
-		self:addPrize(PRIZE_TYPE_USD, 1, {roundPrecision = self.options.currencyRoundPrecision})
+	if self:_hasBaseCurrency() then
+		self:setConfig('showBaseCurrency', true)
+		self:addPrize(PRIZE_TYPE_BASE_CURRENCY, 1, {roundPrecision = self.options.currencyRoundPrecision})
 
-		if self.options.autoUSD then
+		if self.options.autoExchange then
 			local canConvertCurrency = function(prize)
 				return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 			end
 
 			for _, placement in ipairs(self.placements) do
-				placement:_setUsdFromRewards(Array.filter(self.prizes, canConvertCurrency), PrizePool.prizeTypes)
+				placement:_setBaseFromRewards(Array.filter(self.prizes, canConvertCurrency), PrizePool.prizeTypes)
 			end
 		end
 	end
@@ -446,7 +450,7 @@ end
 function PrizePool:_getPrizeSummaryText()
 	local tba = Abbreviation.make('TBA', 'To Be Announced')
 	local tournamentCurrency = Variables.varDefault('tournament_currency')
-	local baseMoneyRaw = Variables.varDefault('tournament_prizepool_usd', tba)
+	local baseMoneyRaw = Variables.varDefault('tournament_prizepool_' .. BASE_CURRENCY:lower(), tba)
 	local baseMoneyDisplay = Currency.display(BASE_CURRENCY, baseMoneyRaw, {formatValue = true})
 
 	local displayText = {baseMoneyDisplay}
@@ -603,7 +607,7 @@ function PrizePool:_currencyExchangeInfo()
 		wrapper:wikitext('Converted ' .. currencyText .. ' prizes are ')
 		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
-			return PrizePool.prizeTypes[prize.type].convertToUsd
+			return PrizePool.prizeTypes[prize.type].convertToBaseCurrency
 		end), PrizePool._CurrencyConvertionText), ', '))
 		wrapper:wikitext(')</i>')
 
@@ -613,7 +617,7 @@ end
 
 function PrizePool._CurrencyConvertionText(prize)
 	local exchangeRate = Math.round{
-		PrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToUsd(
+		PrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
 			prize.data, 1, PrizePool._getTournamentDate()
 		)
 		,5
@@ -885,13 +889,13 @@ function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 	return objectName .. prizePoolIndex .. '_' .. lpdbEntry.participant
 end
 
---- Returns true if this prizePool has a US Dollar reward.
--- This is true if any placement has a dollar input,
+--- Returns true if this PrizePool has a Base Currency money reward.
+-- This is true if any placement has a Base Currency input,
 -- or if there is a money reward in another currency whilst currency conversion is active
-function PrizePool:_hasUsdPrizePool()
+function PrizePool:_hasBaseCurrency()
 	return (Array.any(self.placements, function (placement)
-		return placement.hasUSD
-	end)) or (self.options.autoUSD and Array.any(self.prizes, function (prize)
+		return placement.hasBaseCurrency
+	end)) or (self.options.autoExchange and Array.any(self.prizes, function (prize)
 		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end))
 end
