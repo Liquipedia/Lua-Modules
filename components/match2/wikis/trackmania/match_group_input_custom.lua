@@ -272,9 +272,9 @@ function matchFunctions.getOpponents(args)
 		args.resulttype = RESULT_TYPE_WALKOVER
 	end
 
-	local autofinished = String.isNotEmpty(args.autofinished) and args.autofinished or true
+	local autoFinished = Logic.readBool(Logic.emptyOr(args.autofinished, true))
 	-- see if match should actually be finished if score is set
-	if isScoreSet and Logic.readBool(autofinished) and not Logic.readBool(args.finished) then
+	if isScoreSet and autoFinished and not Logic.readBool(args.finished) then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
