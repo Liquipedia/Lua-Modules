@@ -701,17 +701,15 @@ function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
 	local opponent2 = table[key2]
 	local opponent1Norm = opponent1.status == 'S'
 	local opponent2Norm = opponent2.status == 'S'
-	if opponent1Norm then
-		if opponent2Norm then
-			return tonumber(opponent1.score) > tonumber(opponent2.score)
-		else return true end
-	else
-		if opponent2Norm then return false
-		elseif opponent1.status == 'W' then return true
-		elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent1.status) then return false
-		elseif opponent2.status == 'W' then return false
-		elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent2.status) then return true
-		else return true end
+	if opponent1Norm and opponent2Norm then
+		return tonumber(opponent1.score) > tonumber(opponent2.score)
+	elseif opponent1Norm then return true
+	elseif opponent2Norm then return false
+	elseif opponent1.status == 'W' then return true
+	elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent1.status) then return false
+	elseif opponent2.status == 'W' then return false
+	elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent2.status) then return true
+	else return true
 	end
 end
 
