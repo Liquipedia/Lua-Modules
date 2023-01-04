@@ -169,7 +169,7 @@ function OpponentDisplayCustom.PlayerBlockOpponent(props)
 			:addClass(props.playerClass)
 	end)
 
-	if #opponent.players == 1 then
+	if opponent.type == Opponent.solo then
 		return playerNodes[1]
 	else
 		local playersNode = mw.html.create('div')
