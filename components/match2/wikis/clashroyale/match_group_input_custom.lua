@@ -450,6 +450,10 @@ function CustomMatchGroupInput._getPlayersFromVariables(teamName)
 			displayname = Variables.varDefault(prefix .. 'dn'),
 			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
 		})
+
+		playerIndex = playerIndex + 1
+		prefix = teamName .. '_p' .. playerIndex
+		playerName = Variables.varDefault(prefix)
 	end
 
 	return players
