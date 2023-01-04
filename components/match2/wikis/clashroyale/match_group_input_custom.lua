@@ -646,7 +646,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex,
 		else
 			-- allows fetching the link of the player from preset wiki vars
 			player = mw.ext.TeamLiquidIntegration.resolve_redirect(
-				map[playerKey .. 'link'] or Variables.varDefault(map[playerKey] .. '_page') or map[playerKey] or 'tbd'
+				map[playerKey .. 'link'] or Variables.varDefault(map[playerKey] .. '_page') or map[playerKey]
 			)
 		end
 
