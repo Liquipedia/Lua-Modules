@@ -69,10 +69,13 @@ function ActiveYears.display(args)
 end
 
 function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, mode)
-	local playerConditionTree = ConditionTree(BooleanOperator.any):add({
-		ConditionNode(ColumnName('participant'), Comparator.eq, player),
-		ConditionNode(ColumnName('participant'), Comparator.eq, playerAsPageName),
-	})
+	local playerConditionTree = ConditionTree(BooleanOperator.any)
+	if prefix == 'p' then
+		playerConditionTree:add({
+			ConditionNode(ColumnName('participant'), Comparator.eq, player),
+			ConditionNode(ColumnName('participant'), Comparator.eq, playerAsPageName),
+		})
+	end
 	for playerIndex = 1, playerPositionLimit do
 		playerConditionTree:add({
 			ConditionNode(ColumnName('players_' .. prefix .. playerIndex), Comparator.eq, player),
