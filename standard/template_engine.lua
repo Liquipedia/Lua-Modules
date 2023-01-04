@@ -10,16 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Table = require('Module:Table')
 
----Return true if the input is a table in array format
----@param array any
----@return boolean
-local function isArray(array)
-	if type(array) ~= 'table' then
-		return false
-	end
-	return Table.size(array) == #array
-end
-
 ---@class TemplateEngine
 ---Subset implementation of `{{mustache}} templates`.
 ---https://mustache.github.io/mustache.5.html
@@ -83,7 +73,7 @@ function TemplateEngine:_section(template, context)
 	return (template:gsub(REGEX_SECTION, function (varible, text)
 		local value = context:find(varible)
 		if type(value) == 'table' then
-			if isArray(value) then
+			if Array.isArray(value) then
 				return table.concat(Array.map(value, function (val)
 					return self:_subRender(text, Context(val, context))
 				end))
@@ -110,7 +100,7 @@ end
 function TemplateEngine:_invertedSection(template, context)
 	return (template:gsub(REGEX_INVERTED_SECTION, function (varible, text)
 		local value = context:find(varible)
-		if not value or (type(value) == 'table' and isArray(value) and #value == 0) then
+		if not value or (type(value) == 'table' and Array.isArray(value) and #value == 0) then
 			return self:_subRender(text, context)
 		end
 		return ''
