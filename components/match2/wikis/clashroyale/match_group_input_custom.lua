@@ -115,7 +115,6 @@ function CustomMatchGroupInput._getExtraData(match)
 		casters = match.casters,
 		t1bans = CustomMatchGroupInput._readBans(match.t1bans),
 		t2bans = CustomMatchGroupInput._readBans(match.t2bans),
-		hasbigmatch = Logic.readBool(match.hasBigMatch) or nil,
 	}
 
 	for subGroupIndex = 1, MAX_NUM_MAPS do
