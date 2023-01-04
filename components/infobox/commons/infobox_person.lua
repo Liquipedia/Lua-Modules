@@ -133,10 +133,10 @@ function Person:createInfobox()
 			Builder{builder = function()
 				local teams = {
 					self:_createTeam(args.team, args.teamlink),
-					self:_createTeam(args.team2, args.teamlink2),
-					self:_createTeam(args.team3, args.teamlink3),
-					self:_createTeam(args.team4, args.teamlink4),
-					self:_createTeam(args.team5, args.teamlink5)
+					self:_createTeam(args.team2, args.team2link),
+					self:_createTeam(args.team3, args.team3link),
+					self:_createTeam(args.team4, args.team4link),
+					self:_createTeam(args.team5, args.team5link)
 				}
 				return {Cell{
 					name = #teams > 1 and 'Teams' or 'Team',
@@ -265,6 +265,11 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+	end
+
+	args.team1 = team
+	for key, team in Table.iter.pairsByPrefix(args, 'team') do
+		lpdbData.extradata[key] = args[key .. 'link'] or team
 	end
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
