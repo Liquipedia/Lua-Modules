@@ -45,6 +45,8 @@ OpponentDisplayCustom.BracketOpponentEntry = Class.new(
 
 OpponentDisplayCustom.BracketOpponentEntry.createTeam = OpponentDisplay.BracketOpponentEntry.createTeam
 
+OpponentDisplayCustom.BracketOpponentEntry.createLiteral = OpponentDisplay.BracketOpponentEntry.createLiteral
+
 function OpponentDisplayCustom.BracketOpponentEntry:createPlayers(opponent)
 	local players = opponent.players
 	if #players == 1 then
@@ -61,8 +63,6 @@ function OpponentDisplayCustom.BracketOpponentEntry:createPlayers(opponent)
 		self.content:node(playersNode)
 	end
 end
-
-OpponentDisplayCustom.BracketOpponentEntry.createLiteral = OpponentDisplay.BracketOpponentEntry.createLiteral
 
 function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 	local extradata = opponent.extradata or {}
