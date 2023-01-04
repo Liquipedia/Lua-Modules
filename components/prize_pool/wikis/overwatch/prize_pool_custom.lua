@@ -41,6 +41,11 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		Variables.varDefault('tournament_type')
 	)
 
+	
+	local participantLower = mw.ustring.lower(lpdbData.participant)
+	
+	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
+	
 	if Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
 	end
