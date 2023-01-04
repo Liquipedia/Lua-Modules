@@ -30,6 +30,8 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
 local RESULT_TYPE_DRAW = 'draw'
+local BYE_OPPONENT_NAME = 'bye'
+local RESULT_TYPE_WALKOVER = 'default'
 
 local globalVars = PageVariableNamespace()
 
@@ -67,7 +69,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if opponent.type == Opponent.team and opponent.template:lower() == BYE_OPPONENT_NAME then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
@@ -267,7 +269,7 @@ function matchFunctions.getOpponents(args)
 
 	--set resulttype to 'default' if walkover is set
 	if args.walkover then
-		args.resulttype = 'default'
+		args.resulttype = RESULT_TYPE_WALKOVER
 	end
 
 	local autofinished = String.isNotEmpty(args.autofinished) and args.autofinished or true
@@ -331,7 +333,7 @@ function matchFunctions.getOpponents(args)
 		args.resulttype = RESULT_TYPE_DRAW
 	elseif
 		Logic.readBool(args.finished) and
-		#opponents == 2 and
+		#opponents == MAX_NUM_OPPONENTS and
 		opponents[1].status ~= STATUS_HAS_SCORE and
 		opponents[1].status == opponents[2].status
 	then
