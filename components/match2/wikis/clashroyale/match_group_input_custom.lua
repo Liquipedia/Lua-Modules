@@ -29,6 +29,7 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS_PER_MAP = 2
 local DEFAULT_BEST_OF = 99
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local TODAY = os.date('%Y-%m-%d')
 local TBD = 'tbd'
 local TBD_PLAYERS = {TBD, 'tba'}
 
@@ -391,7 +392,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			EPOCH_TIME_EXTENDED
+			TODAY
 		)
 	end
 
