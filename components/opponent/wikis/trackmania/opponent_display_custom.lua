@@ -50,7 +50,7 @@ OpponentDisplayCustom.BracketOpponentEntry.createLiteral = OpponentDisplay.Brack
 function OpponentDisplayCustom.BracketOpponentEntry:createPlayers(opponent)
 	if opponent.type == Opponent.solo then
 		local playerNode = PlayerDisplay.BlockPlayer({
-			player = players[1],
+			player = opponent.players[1],
 			overflow = 'ellipsis',
 		})
 		self.content:node(playerNode)
