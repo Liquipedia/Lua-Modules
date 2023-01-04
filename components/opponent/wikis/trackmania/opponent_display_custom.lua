@@ -112,30 +112,16 @@ determined by its layout context, and not of the opponent.
 function OpponentDisplayCustom.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
 	local opponent = props.opponent
-	-- Default TBDs to not show links
-	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
-	if opponent.type == Opponent.team then
-		return OpponentDisplay.BlockTeamContainer({
-			flip = props.flip,
-			overflow = props.overflow,
-			showLink = showLink,
-			style = props.teamStyle,
-			template = opponent.template or 'tbd',
-		})
-	elseif opponent.type == Opponent.literal then
-		return OpponentDisplay.BlockLiteral({
-			flip = props.flip,
-			name = opponent.name or '',
-			overflow = props.overflow,
-		})
-	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+	if opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+		-- Default TBDs to not show links
+		local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 		return OpponentDisplayCustom.PlayerBlockOpponent(
 			Table.merge(props, {showLink = showLink})
 		)
-	else
-		error('Unrecognized opponent.type ' .. opponent.type)
 	end
+
+	return OpponentDisplay.BlockOpponent(props)
 end
 
 --[[
