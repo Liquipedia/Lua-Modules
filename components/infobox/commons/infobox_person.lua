@@ -268,8 +268,8 @@ function Person:_setLpdbData(args, links, status, personType)
 	end
 
 	args.team1 = team
-	for key, team in Table.iter.pairsByPrefix(args, 'team') do
-		lpdbData.extradata[key] = args[key .. 'link'] or team
+	for key, otherTeam in Table.iter.pairsByPrefix(args, 'team') do
+		lpdbData.extradata[key] = args[key .. 'link'] or otherTeam
 	end
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
