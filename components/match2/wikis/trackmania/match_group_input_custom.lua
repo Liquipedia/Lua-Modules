@@ -69,7 +69,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == BYE_OPPONENT_NAME then
+	if opponent.template:lower() == BYE_OPPONENT_NAME then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
