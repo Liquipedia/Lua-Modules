@@ -91,6 +91,7 @@ function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 		end
 	end
 end
+
 function OpponentDisplayCustom.InlineScore(opponent, scoreIndex)
 	scoreIndex = scoreIndex or ''
 	local status = opponent['status' .. scoreIndex] or opponent.extradata['status' .. scoreIndex] or ''
