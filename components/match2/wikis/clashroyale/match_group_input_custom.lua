@@ -107,7 +107,6 @@ function CustomMatchGroupInput._getLinks(match)
 		interview2 = match.interview2,
 		review = match.review,
 		recap = match.recap,
-		lrthread = match.lrthread,
 	}
 	return match
 end
