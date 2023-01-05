@@ -44,6 +44,14 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell({
+		name = 'Series',
+		content = {_args.series}
+	}))
+	return widgets
+end
+
 function CustomCompany:createWidgetInjector()
 	return CustomInjector()
 end
