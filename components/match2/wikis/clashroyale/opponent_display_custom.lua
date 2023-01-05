@@ -93,7 +93,7 @@ function CustomOpponentDisplay.PlayerBlockOpponent(props)
 		})
 	end)
 
-	if #opponent.players == 1 then
+	if #opponent.players == Opponent.partySize(Opponent.solo) then
 		return playerNodes[1]
 	else
 		local playersNode = mw.html.create('div')
