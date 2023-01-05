@@ -341,7 +341,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 			:node(mw.html.create('div'):wikitext(scoreElement))
 			:node(mw.html.create('div')
 				:css('font-size', '85%')
-				:wikitext(Abbreviation.make('KotH', 'King of the Hill submatch'))
+				:wikitext(Abbreviation.make('KOTH', 'King of the Hill'))
 			)
 	end
 
