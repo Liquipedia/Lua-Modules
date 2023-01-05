@@ -18,8 +18,9 @@ local CardNames = mw.loadData('Module:CardNames')
 local Variables = require('Module:Variables')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local MAX_NUM_MAPS = 30
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
