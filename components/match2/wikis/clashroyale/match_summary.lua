@@ -32,7 +32,6 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 -- Normal links, from input/lpdb
 local LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
 	interview = {icon = 'File:Interview32.png', text = 'Interview'},
 	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
