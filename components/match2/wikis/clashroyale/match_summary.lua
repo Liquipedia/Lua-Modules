@@ -7,7 +7,9 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local CardIcon = require('Module:CardIcon')
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -17,7 +19,9 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
-local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local NUM_CARDS_PER_PLAYER = 8
 local CARD_COLOR_1 = 'blue'
@@ -36,9 +40,6 @@ local LINK_DATA = {
 LINK_DATA.review = LINK_DATA.recap
 LINK_DATA.preview2 = LINK_DATA.preview
 LINK_DATA.interview2 = LINK_DATA.interview
-
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local CustomMatchSummary = {}
 
@@ -109,7 +110,7 @@ end
 function CustomMatchSummary._createBody(match, matchId)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+	if match.dateIsExact or (match.timestamp ~= DateExt.epochZero) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -117,7 +118,7 @@ function CustomMatchSummary._createBody(match, matchId)
 		))
 	end
 
-	if Table.any(match.opponents, function(opponent) return opponent.type == Opponent.team end) then
+	if Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end) then
 		return CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 	end
 
@@ -190,6 +191,8 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 end
 
 function CustomMatchSummary._banRow(t1bans, t2bans, date)
+	t1bans = t1bans or {}
+	t2bans = t2bans or {}
 	local maxAmountOfBans = math.max(#t1bans, #t2bans)
 	for banIndex = 1, maxAmountOfBans do
 		t1bans[banIndex] = t1bans[banIndex] or DEFAULT_CARD
