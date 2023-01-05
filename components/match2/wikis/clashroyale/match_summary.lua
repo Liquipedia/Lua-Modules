@@ -117,7 +117,7 @@ function CustomMatchSummary._createBody(match, matchId)
 		))
 	end
 
-	if match.extradata.hasteamopponent then
+	if Table.any(match.opponents, function(opponent) return opponent.type == Opponent.team end) then
 		return CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 	end
 
