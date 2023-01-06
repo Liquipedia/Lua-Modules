@@ -99,9 +99,9 @@ end
 --
 --
 -- function to sort out winner/placements
-function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
-	local op1 = table[key1]
-	local op2 = table[key2]
+function CustomMatchGroupInput._placementSortFunction(opponents, opponentKey1, opponentKey2)
+	local op1 = opponents[opponentKey1]
+	local op2 = opponents[opponentKey2]
 	local op1norm = op1.status == STATUS_HAS_SCORE
 	local op2norm = op2.status == STATUS_HAS_SCORE
 	if op1norm then
@@ -172,11 +172,11 @@ function matchFunctions.getExtraData(match)
 	local opponent2 = match.opponent2 or {}
 
 	local casters = {}
-	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
+	for casterKey, casterName in Table.iter.pairsByPrefix(match, 'caster') do
 		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
-			name,
-			match[key .. 'flag'],
-			match[key .. 'name']
+			casterName,
+			match[casterKey .. 'flag'],
+			match[casterKey .. 'name']
 		))
 	end
 	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
@@ -436,11 +436,11 @@ end
 function mapFunctions.getParticipantsData(map)
 	local participants = map.participants or {}
 
-	for o = 1, MAX_NUM_OPPONENTS do
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for player = 1, MAX_NUM_PLAYERS do
-			local participant = participants[o .. '_' .. player] or {}
+			local participant = participants[opponentIndex .. '_' .. player] or {}
 			if not Table.isEmpty(participant) then
-				participants[o .. '_' .. player] = participant
+				participants[opponentIndex .. '_' .. player] = participant
 			end
 		end
 	end
