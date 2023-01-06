@@ -102,7 +102,7 @@ function CustomMatchSummary.getByMatchId(args)
 		match.opponents[2].type == Opponent.team
 	then
 		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
-		buildQueryFormLink = function(form, template, arguments)
+		local buildQueryFormLink = function(form, template, arguments)
 			return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
 				mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
 				    .. '&_run'
