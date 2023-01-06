@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Json = require('Module:Json')
 local Squad = require('Module:Squad')
 local SquadRow = require('Module:Squad/Row')
 local SquadAutoRefs = require('Module:SquadAuto/References')
