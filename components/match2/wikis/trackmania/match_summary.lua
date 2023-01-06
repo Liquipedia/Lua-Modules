@@ -22,18 +22,14 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local OpponentDisplayCustom = Lua.import('Module:OpponentDisplay/Custom', {requireDevIfEnabled = true})
 
-local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-local _OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
+local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
-local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link='
-local _OCTANE_SUFFIX = '|Octane matchpage]]'
-local _BALLCHASING_PREFIX = '[[File:Ballchasing icon.png|14x14px|link='
-local _BALLCHASING_SUFFIX = '|Ballchasing replays]]'
-local _HEADTOHEAD_PREFIX = '[[File:Match Info Stats.png|14x14px|link='
-local _HEADTOHEAD_SUFFIX = '|Head to Head history]]'
+local HEADTOHEAD_PREFIX = '[[File:Match Info Stats.png|14x14px|link='
+local HEADTOHEAD_SUFFIX = '|Head to Head history]]'
 
-local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
+local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
 -- Custom Caster Class
 local Casters = Class.new(
@@ -165,7 +161,7 @@ function Header:soloOpponentTeam(opponent, date)
 		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
 		local display = teamExists
 			and mw.ext.TeamTemplate.teamicon(opponent.template, date)
-			or _TBD_ICON
+			or TBD_ICON
 		return mw.html.create('div'):wikitext(display)
 			:addClass('brkts-popup-header-opponent-solo-team')
 		end
@@ -202,7 +198,7 @@ function CustomMatchSummary._getHeadToHead(opponents)
 	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
 		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
 		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
-	return _HEADTOHEAD_PREFIX .. link .. _HEADTOHEAD_SUFFIX
+	return HEADTOHEAD_PREFIX .. link .. HEADTOHEAD_SUFFIX
 end
 
 function CustomMatchSummary.getByMatchId(args)
@@ -331,14 +327,14 @@ function CustomMatchSummary._createGame(game)
 		:node(mw.html.create('div'):node('[[' .. game.map .. ']]'))
 
 	row:addElement(CustomMatchSummary._iconDisplay(
-		_GREEN_CHECK,
+		GREEN_CHECK,
 		game.winner == 1,
 		game.scores[1],
 		1
 	))
 	row:addElement(centerNode)
 	row:addElement(CustomMatchSummary._iconDisplay(
-		_GREEN_CHECK,
+		GREEN_CHECK,
 		game.winner == 2,
 		game.scores[2],
 		2
@@ -348,7 +344,7 @@ function CustomMatchSummary._createGame(game)
 		local overtimes = Json.parseIfString(extradata.overtime)
 		row:addElement(MatchSummary.Break():create())
 		row:addElement(CustomMatchSummary._iconDisplay(
-			_OVERTIME,
+			OVERTIME,
 			Table.includes(overtimes, 1)
 		))
 		row:addElement(mw.html.create('div')
@@ -356,7 +352,7 @@ function CustomMatchSummary._createGame(game)
 			:node(mw.html.create('div'):node('Overtime'))
 		)
 		row:addElement(CustomMatchSummary._iconDisplay(
-			_OVERTIME,
+			OVERTIME,
 			Table.includes(overtimes, 2)
 		))
 	end
@@ -379,7 +375,7 @@ function CustomMatchSummary._iconDisplay(icon, shouldDisplay, additionalElement,
 	return mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(additionalElement and flip and mw.html.create('div'):node(additionalElement) or nil)
-		:node(shouldDisplay and icon or _NO_CHECK)
+		:node(shouldDisplay and icon or NO_CHECK)
 		:node(additionalElement and (not flip) and mw.html.create('div'):node(additionalElement) or nil)
 end
 
