@@ -7,39 +7,15 @@
 --
 
 local Json = require('Module:Json')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Squad = require('Module:Squad')
 local SquadRow = require('Module:Squad/Row')
 local SquadAutoRefs = require('Module:SquadAuto/References')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local CustomSquad = {}
 
 function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title()
-
-	local args = squad.args
-
-	local index = 1
-	while args['p' .. index] ~= nil or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
-
-		index = index + 1
-	end
-
-	index = 1
-	while args['p' .. index] or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
-
-		squad:row(CustomSquad._playerRow(player, squad.type))
-
-		index = index + 1
-	end
-
-	return squad:create()
+	error('Halo wiki doesn\'t support manual Squad Tables')
 end
 
 function CustomSquad.runAuto(playerList, squadType)
