@@ -35,6 +35,7 @@ function CustomSeries.run(frame)
 	_args = series.args
 
 	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+	_args.liquipediatier = _args.liquipediatier or args.tier
 
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
