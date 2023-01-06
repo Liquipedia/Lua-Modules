@@ -272,6 +272,7 @@ function Links.transform(links)
 		sostronk = links.sostronk,
 		['start-gg'] = links.startgg or links.smashgg,
 		steam = links.steam,
+		steam2 = links.steam2,
 		steamalternative = links.steamalternative,
 		stratz = links.stratz,
 		stream = links.stream,
