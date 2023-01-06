@@ -32,6 +32,7 @@ local MAX_NUM_VODGAMES = 20
 local RESULT_TYPE_DRAW = 'draw'
 local BYE_OPPONENT_NAME = 'bye'
 local RESULT_TYPE_WALKOVER = 'default'
+local WINNER_FIRST_OPPONENT = '0'
 
 local globalVars = PageVariableNamespace()
 
@@ -319,15 +320,15 @@ function matchFunctions.getOpponents(args)
 	end
 	if
 		winner == RESULT_TYPE_DRAW or
-		winner == '0' or (
+		winner == WINNER_FIRST_OPPONENT or (
 			Logic.readBool(args.finished) and
-			#opponents == 2 and
+			#opponents == MAX_NUM_OPPONENTS and
 			opponents[1].status == STATUS_HAS_SCORE and
 			opponents[2].status == STATUS_HAS_SCORE and
 			opponents[1].score == opponents[2].score
 		)
 	then
-		args.winner = 0
+		args.winner = tonumber(WINNER_FIRST_OPPONENT)
 		args.resulttype = RESULT_TYPE_DRAW
 	elseif
 		Logic.readBool(args.finished) and
@@ -335,7 +336,7 @@ function matchFunctions.getOpponents(args)
 		opponents[1].status ~= STATUS_HAS_SCORE and
 		opponents[1].status == opponents[2].status
 	then
-		args.winner = 0
+		args.winner = tonumber(WINNER_FIRST_OPPONENT)
 	end
 	return args
 end
