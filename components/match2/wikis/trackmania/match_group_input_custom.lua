@@ -97,6 +97,17 @@ function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
+function CustomMatchGroupInput._sortOpponents(op1, op2, op1norm, op2norm)
+	if op1norm then return true
+	elseif op2norm then return false
+	elseif op1.status == STATUS_DEFAULT_WIN then return true
+	elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
+	elseif op2.status == STATUS_DEFAULT_WIN then return false
+	elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
+	else return true
+	end
+end
+
 --
 --
 -- function to sort out winner/placements
@@ -113,14 +124,7 @@ function CustomMatchGroupInput._placementSortFunction(opponents, opponentKey1, o
 		else
 			return tonumber(op1.score) > tonumber(op2.score)
 		end
-	elseif op1norm then return true
-	elseif op2norm then return false
-	elseif op1.status == STATUS_DEFAULT_WIN then return true
-	elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
-	elseif op2.status == STATUS_DEFAULT_WIN then return false
-	elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
-	else return true
-	end
+	else return CustomMatchGroupInput._sortOpponents(op1, op2, op1norm, op2norm) end
 end
 
 function CustomMatchGroupInput._getSetWins(opp)
@@ -415,14 +419,7 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 		if op2norm then
 			return tonumber(op1.score) > tonumber(op2.score)
 		else return true end
-	else
-		if op2norm then return false
-		elseif op1.status == STATUS_DEFAULT_WIN then return true
-		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
-		elseif op2.status == STATUS_DEFAULT_WIN then return false
-		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
-		else return true end
-	end
+	else return CustomMatchGroupInput._sortOpponents(op1, op2, op1norm, op2norm) end
 end
 
 function mapFunctions.getTournamentVars(map)
