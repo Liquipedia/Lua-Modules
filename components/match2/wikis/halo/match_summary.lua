@@ -102,12 +102,24 @@ function CustomMatchSummary.getByMatchId(args)
 		match.opponents[2].type == Opponent.team
 	then
 		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
-		match.links.headtohead = tostring(
-			mw.uri.fullUrl('Special:RunQuery/Head2head')) .. '?title=Special%3ARunQuery%2FHead2head&pfRunQuery' ..
-			'FormName=Head2head&Headtohead%5Bteam1%5D=' .. team1 .. '&Headtohead%5Bteam2%5D=' .. team2..
-			'&Headtohead%5Bgames%5D%5Bis_list%5D=1&Headtohead%5Btiers%5D%5Bis_list%5D=1&Headtohead%5Bfromdate%' ..
-			'5D%5Bday%5D=01&Headtohead%5Bfromdate%5D%5Bmonth%5D=01&Headtohead%5Bfromdate%5D%5Byear%5D='..
-			string.sub(match.date,1,4) ..  '&pf_free_text=&wpRunQuery=Run+query'
+		buildQueryFormLink = function(form, template, arguments)
+			return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
+				mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
+				    .. '&_run'
+			))
+		end
+
+		local headtoheadArgs = {
+			['[team1]'] = team1,
+			['[team2]'] = team2,
+			['[games][is_list]'] = 1,
+			['[tiers][is_list]'] = 1,
+			['[fromdate][day]'] = '01',
+			['[fromdate][month]'] = '01',
+			['[fromdate][year]'] = string.sub(match.date,1,4)
+	    }
+
+		match.links.headtohead = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
 	end
 
 	if Table.isNotEmpty(vods) or Table.isNotEmpty(match.links) then
