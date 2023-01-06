@@ -19,6 +19,7 @@ local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local WidgetFactory = require('Module:Infobox/Widget/Factory')
 
 local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -61,6 +62,8 @@ function CustomInjector:parse(id, widgets)
 			widgets[1], -- Coaches
 			Cell{name = 'Analysts', content = {_team.args.analysts}},
 		}
+	elseif id == 'earningscell' then
+		widgets[1].name = 'Approx. Total Winnings'
 	end
 	return widgets
 end
