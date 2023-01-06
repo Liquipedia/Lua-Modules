@@ -105,23 +105,21 @@ function CustomMatchGroupInput._placementSortFunction(opponents, opponentKey1, o
 	local op2 = opponents[opponentKey2]
 	local op1norm = op1.status == STATUS_HAS_SCORE
 	local op2norm = op2.status == STATUS_HAS_SCORE
-	if op1norm then
-		if op2norm then
-			local op1setwins = CustomMatchGroupInput._getSetWins(op1)
-			local op2setwins = CustomMatchGroupInput._getSetWins(op2)
-			if op1setwins + op2setwins > 0 then
-				return op1setwins > op2setwins
-			else
-				return tonumber(op1.score) > tonumber(op2.score)
-			end
-		else return true end
-	else
-		if op2norm then return false
-		elseif op1.status == STATUS_DEFAULT_WIN then return true
-		elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
-		elseif op2.status == STATUS_DEFAULT_WIN then return false
-		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
-		else return true end
+	if op1norm and op2norm then
+		local op1setwins = CustomMatchGroupInput._getSetWins(op1)
+		local op2setwins = CustomMatchGroupInput._getSetWins(op2)
+		if op1setwins + op2setwins > 0 then
+			return op1setwins > op2setwins
+		else
+			return tonumber(op1.score) > tonumber(op2.score)
+		end
+	elseif op1norm then return true
+	elseif op2norm then return false
+	elseif op1.status == STATUS_DEFAULT_WIN then return true
+	elseif Table.includes(ALLOWED_STATUSES, op1.status) then return false
+	elseif op2.status == STATUS_DEFAULT_WIN then return false
+	elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
+	else return true
 	end
 end
 
