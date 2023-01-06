@@ -38,7 +38,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'dates' then
 		table.insert(widgets, Cell{name = 'Fate', content = {_args.fate}})
 	elseif id == 'employees' then
-		table.insert(widgets, Cell{name = 'People', content = {_args.people}})
+		table.insert(widgets, Cell{name = 'Key People', content = {_args.people}})
 	end
 
 	return widgets
