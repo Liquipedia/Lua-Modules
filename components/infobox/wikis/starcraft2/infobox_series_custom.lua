@@ -53,7 +53,7 @@ function CustomSeries.run(frame)
 	_series = series
 
 	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
-	_args.liquipediatier = _args.liquipediatier or args.tier
+	_args.liquipediatier = _args.liquipediatier or _args.tier
 
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
@@ -187,7 +187,7 @@ function CustomSeries._addCustomVariables()
 		Variables.varDefine('tournament_shortname', _args.shortname or '')
 		Variables.varDefine('tournament_name', name)
 		Variables.varDefine('tournament_series', _series.pagename)
-		Variables.varDefine('tournament_parent', (args.parent or _series.pagename):gsub(' ', '_'))
+		Variables.varDefine('tournament_parent', (_args.parent or _series.pagename):gsub(' ', '_'))
 		Variables.varDefine('tournament_abbreviation', _args.abbreviation or _args.shortname or '')
 		local game = _args.game
 		if game then
