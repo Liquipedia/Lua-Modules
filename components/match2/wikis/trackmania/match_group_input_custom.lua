@@ -270,7 +270,7 @@ function matchFunctions.readOpponents(opponents, isScoreSet, args)
 	return opponents, isScoreSet, args
 end
 
-function matchFunctions.applyMatchPlacement(opponents, args) 
+function matchFunctions.applyMatchPlacement(opponents, args)
 	local placement = 1
 	local lastScore
 	local lastPlacement = 1
@@ -357,7 +357,7 @@ function matchFunctions.getOpponents(args)
 			args['opponent' .. opponentIndex] = opponent
 		end
 	end
-	
+
 	-- set the match winner
 	args = matchFunctions.setMatchWinner(winner, opponents, args)
 	return args
