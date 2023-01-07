@@ -28,8 +28,6 @@ local OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 local HEADTOHEAD_PREFIX = '[[File:Match Info Stats.png|14x14px|link='
 local HEADTOHEAD_SUFFIX = '|Head to Head history]]'
 
-local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
-
 -- Custom Caster Class
 local Casters = Class.new(
 	function(self)
