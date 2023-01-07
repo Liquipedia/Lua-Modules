@@ -166,11 +166,27 @@ end
 
 local CustomMatchSummary = {}
 
-function CustomMatchSummary._getHeadToHead(opponents)
+function CustomMatchSummary._getHeadToHead(match)
+	local opponents = match.opponents
 	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
-	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
-		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
-		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
+	local buildQueryFormLink = function(form, template, arguments)
+		return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
+			mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
+			.. '&_run'
+		))
+	end
+
+	local headtoheadArgs = {
+		['[team1]'] = team1,
+		['[team2]'] = team2,
+		['[games][is_list]'] = 1,
+		['[tiers][is_list]'] = 1,
+		['[fromdate][day]'] = '01',
+		['[fromdate][month]'] = '01',
+		['[fromdate][year]'] = string.sub(match.date,1,4)
+	}
+
+	local link = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
 	return HEADTOHEAD_PREFIX .. link .. HEADTOHEAD_SUFFIX
 end
 
@@ -196,7 +212,7 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	local headToHead = match.extradata.showh2h and
-		CustomMatchSummary._getHeadToHead(match.opponents) or nil
+		CustomMatchSummary._getHeadToHead(match) or nil
 
 	if
 		Table.isNotEmpty(vods) or
