@@ -234,10 +234,7 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 	}
 end
 
-function matchFunctions.getOpponents(args)
-	-- read opponents and ignore empty ones
-	local opponents = {}
-	local isScoreSet = false
+function matchFunctions.readOpponents(opponents, isScoreSet, args)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
@@ -270,56 +267,39 @@ function matchFunctions.getOpponents(args)
 		end
 	end
 
-	--set resulttype to 'default' if walkover is set
-	if args.walkover then
-		args.resulttype = RESULT_TYPE_WALKOVER
+	return opponents, isScoreSet, args
+end
+
+function matchFunctions.applyMatchPlacement(opponents, args) 
+	local placement = 1
+	local lastScore
+	local lastPlacement = 1
+	local lastStatus
+	for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
+		if opponent.status ~= STATUS_HAS_SCORE and opponent.status ~= STATUS_DEFAULT_WIN and placement == 1 then
+			placement = 2
+		end
+		if placement == 1 then
+			args.winner = opponentIndex
+		end
+		if opponent.status == STATUS_HAS_SCORE and opponent.score == lastScore then
+			opponent.placement = lastPlacement
+		elseif opponent.status ~= STATUS_HAS_SCORE and opponent.status == lastStatus then
+			opponent.placement = lastPlacement
+		else
+			opponent.placement = placement
+		end
+		args['opponent' .. opponentIndex] = opponent
+		placement = placement + 1
+		lastScore = opponent.score
+		lastPlacement = opponent.placement
+		lastStatus = opponent.status
 	end
 
-	local autoFinished = Logic.readBool(Logic.emptyOr(args.autofinished, true))
-	-- see if match should actually be finished if score is set
-	if isScoreSet and autoFinished and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time(os.date('!*t'))
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
-		local threshold = args.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
-			args.finished = true
-		end
-	end
+	return args
+end
 
-	-- apply placements and winner if finshed
-	local winner = tostring(args.winner or '')
-	if Logic.readBool(args.finished) then
-		local placement = 1
-		local lastScore
-		local lastPlacement = 1
-		local lastStatus
-		for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
-			if opponent.status ~= STATUS_HAS_SCORE and opponent.status ~= STATUS_DEFAULT_WIN and placement == 1 then
-				placement = 2
-			end
-			if placement == 1 then
-				args.winner = opponentIndex
-			end
-			if opponent.status == STATUS_HAS_SCORE and opponent.score == lastScore then
-				opponent.placement = lastPlacement
-			elseif opponent.status ~= STATUS_HAS_SCORE and opponent.status == lastStatus then
-				opponent.placement = lastPlacement
-			else
-				opponent.placement = placement
-			end
-			args['opponent' .. opponentIndex] = opponent
-			placement = placement + 1
-			lastScore = opponent.score
-			lastPlacement = opponent.placement
-			lastStatus = opponent.status
-		end
-	-- only apply arg changes otherwise
-	else
-		for opponentIndex, opponent in pairs(opponents) do
-			args['opponent' .. opponentIndex] = opponent
-		end
-	end
+function matchFunctions.setMatchWinner(winner, opponents, args)
 	if
 		winner == RESULT_TYPE_DRAW or
 		winner == WINNER_FIRST_OPPONENT or (
@@ -340,6 +320,46 @@ function matchFunctions.getOpponents(args)
 	then
 		args.winner = tonumber(WINNER_FIRST_OPPONENT)
 	end
+
+	return args
+end
+
+function matchFunctions.getOpponents(args)
+	-- read opponents and ignore empty ones
+	local opponents = {}
+	local isScoreSet = false
+	opponents, isScoreSet, args = matchFunctions.readOpponents(opponents, isScoreSet, args)
+
+	--set resulttype to 'default' if walkover is set
+	if args.walkover then
+		args.resulttype = RESULT_TYPE_WALKOVER
+	end
+
+	local autoFinished = Logic.readBool(Logic.emptyOr(args.autofinished, true))
+	-- see if match should actually be finished if score is set
+	if isScoreSet and autoFinished and not Logic.readBool(args.finished) then
+		local currentUnixTime = os.time(os.date('!*t'))
+		local lang = mw.getContentLanguage()
+		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
+		local threshold = args.dateexact and 30800 or 86400
+		if matchUnixTime + threshold < currentUnixTime then
+			args.finished = true
+		end
+	end
+
+	-- apply placements and winner if finshed
+	local winner = tostring(args.winner or '')
+	if Logic.readBool(args.finished) then
+		args = matchFunctions.applyMatchPlacement(opponents, args)
+	-- only apply arg changes otherwise
+	else
+		for opponentIndex, opponent in pairs(opponents) do
+			args['opponent' .. opponentIndex] = opponent
+		end
+	end
+	
+	-- set the match winner
+	args = matchFunctions.setMatchWinner(winner, opponents, args)
 	return args
 end
 
