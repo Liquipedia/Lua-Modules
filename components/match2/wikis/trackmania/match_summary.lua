@@ -70,15 +70,9 @@ function Header:scoreBoard(content)
 	return self
 end
 
-function Header:leftOpponent(content)
-	self.leftElement = content
-	return self
-end
+Header.leftOpponent = MatchSummary.Header.leftOpponent
 
-function Header:rightOpponent(content)
-	self.rightElement = content
-	return self
-end
+Header.rightOpponent = MatchSummary.Header.rightOpponent
 
 function Header:createScoreDisplay(opponent1, opponent2)
 	local function getScore(opponent)
