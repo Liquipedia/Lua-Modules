@@ -65,16 +65,6 @@ local Header = Class.new(
 	end
 )
 
-function Header:leftOpponentTeam(content)
-	self.leftElementAdditional = content
-	return self
-end
-
-function Header:rightOpponentTeam(content)
-	self.rightElementAdditional = content
-	return self
-end
-
 function Header:scoreBoard(content)
 	self.scoreBoard = content
 	return self
