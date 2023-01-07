@@ -155,17 +155,6 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	return scoreBoardNode:node(score)
 end
 
-function Header:soloOpponentTeam(opponent, date)
-	if opponent.type == 'solo' then
-		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
-		local display = teamExists
-			and mw.ext.TeamTemplate.teamicon(opponent.template, date)
-			or TBD_ICON
-		return mw.html.create('div'):wikitext(display)
-			:addClass('brkts-popup-header-opponent-solo-team')
-		end
-end
-
 function Header:createOpponent(opponent, opponentIndex)
 	return OpponentDisplay.BlockOpponent({
 		flip = opponentIndex == 1,
@@ -262,7 +251,6 @@ function CustomMatchSummary._createHeader(match)
 	local header = Header()
 
 	header
-		:leftOpponentTeam(header:soloOpponentTeam(match.opponents[1], match.date))
 		:leftOpponent(header:createOpponent(match.opponents[1], 1))
 		:scoreBoard(header:createScoreBoard(
 			header:createScoreDisplay(
@@ -273,7 +261,6 @@ function CustomMatchSummary._createHeader(match)
 			not match.finished
 		))
 		:rightOpponent(header:createOpponent(match.opponents[2], 2))
-		:rightOpponentTeam(header:soloOpponentTeam(match.opponents[2], match.date))
 
 	return header
 end
