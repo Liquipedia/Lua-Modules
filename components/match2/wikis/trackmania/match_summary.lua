@@ -162,9 +162,6 @@ function Header:createOpponent(opponent, opponentIndex)
 		overflow = 'ellipsis',
 		teamStyle = 'short',
 	})
-		:addClass(opponent.type ~= 'solo'
-			and 'brkts-popup-header-opponent'
-			or 'brkts-popup-header-opponent-solo-with-team')
 end
 
 function Header:create()
