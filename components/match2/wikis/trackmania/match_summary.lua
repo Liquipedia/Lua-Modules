@@ -61,7 +61,7 @@ end
 local Header = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
-		self.root:addClass('brkts-popup-header-dev')
+		self.root:addClass('brkts-popup-header')
 	end
 )
 
