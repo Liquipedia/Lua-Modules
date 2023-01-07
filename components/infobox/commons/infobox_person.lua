@@ -269,7 +269,8 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	args.team1 = team
 	for teamKey, otherTeam in Table.iter.pairsByPrefix(args, 'team') do
-		lpdbData.extradata[teamKey] = args[teamKey .. 'link'] or otherTeam
+		otherTeam = args[teamKey .. 'link'] or otherTeam
+		lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename
 	end
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
