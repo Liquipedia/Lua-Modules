@@ -274,8 +274,7 @@ function CustomMatchSummary._createBody(match)
 	-- Iterate each map
 	for _, game in ipairs(match.games) do
 		if game.map then
-			local rowDisplay = CustomMatchSummary._createGame(game)
-			body:addRow(rowDisplay)
+			body:addRow(CustomMatchSummary._createGame(game))
 		end
 	end
 
