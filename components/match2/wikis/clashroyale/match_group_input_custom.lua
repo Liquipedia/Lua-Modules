@@ -675,10 +675,22 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex,
 end
 
 function CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
+	local displayNameIndex
+	local displayNameFoundTwice = false
+
 	for match2playerIndex, match2player in pairs(players) do
-		if match2player and match2player.name == player then
+		local playerWithUnderscores = player:gsub(' ', '_')
+		if match2player and match2player.name == playerWithUnderscores then
 			return match2playerIndex
+		elseif not displayNameIndex and match2player and match2player.displayname == playerWithUnderscores then
+			displayNameIndex = match2playerIndex
+		elseif match2player and match2player.displayname == playerWithUnderscores then
+			displayNameFoundTwice = true
 		end
+	end
+
+	if not displayNameFoundTwice then
+		return displayNameIndex
 	end
 end
 
