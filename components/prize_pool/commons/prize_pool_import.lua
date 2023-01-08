@@ -289,6 +289,10 @@ function Import._computeBracketPlacementGroups(bracket, options)
 			-- Winners of root matches
 			if coordinates.depth == 0 and options.isFinalStage then
 				table.insert(groupKeys, {0, coordinates.sectionIndex, 1})
+				-- in case of qualLose also Loser of root match if not lower bracket (lower bracket gets handled below)
+				if bracket.bracketDatasById[matchId].qualLose and coordinates.sectionIndex ~= #bracket.sections then
+					table.insert(groupKeys, {0, coordinates.sectionIndex, 2})
+				end
 			end
 
 			-- Opponents knocked out from sole section (se) or lower bracket (de)
