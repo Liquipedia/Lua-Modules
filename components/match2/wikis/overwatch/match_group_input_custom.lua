@@ -9,6 +9,7 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -25,7 +26,7 @@ local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
+local globalVars = PageVariableNamespace()
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -263,7 +264,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
+			date = MatchGroupInput.getInexactDate(globalVars:get('tournament_enddate')),
 			dateexact = false,
 		}
 	end
