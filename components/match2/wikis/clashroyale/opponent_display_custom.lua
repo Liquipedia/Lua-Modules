@@ -22,28 +22,16 @@ local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled =
 
 local CustomOpponentDisplay = Table.copy(OpponentDisplay)
 
-CustomOpponentDisplay.BracketOpponentEntry = Class.new(
+CustomOpponentDisplay.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry,
 	function(self, opponent, options)
-		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
-
-		if opponent.type == Opponent.team then
-			self:createTeam(opponent.template or 'tbd', options)
-		elseif opponent.type == Opponent.solo then
-			self:createPlayer(opponent.players[1])
-		elseif opponent.type == Opponent.duo then
+		if opponent.type == Opponent.duo then
 			self:createDuo(opponent)
-		elseif opponent.type == Opponent.literal then
-			self:createLiteral(opponent.name or '')
 		end
 
 		self.root = mw.html.create('div'):addClass('brkts-opponent-entry')
 			:node(self.content)
 	end
 )
-
-CustomOpponentDisplay.BracketOpponentEntry.createTeam = OpponentDisplay.BracketOpponentEntry.createTeam
-CustomOpponentDisplay.BracketOpponentEntry.createLiteral = OpponentDisplay.BracketOpponentEntry.createLiteral
-CustomOpponentDisplay.BracketOpponentEntry.addScores = OpponentDisplay.BracketOpponentEntry.addScores
 
 function CustomOpponentDisplay.BracketOpponentEntry:createDuo(opponent)
 	local playerNode = CustomOpponentDisplay.PlayerBlockOpponent({
