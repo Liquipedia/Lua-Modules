@@ -171,14 +171,18 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	local opponentsInSlot = #slot
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
-		if newParameter == 'seed' then
+		if input == 'q' and slot.link then
+			-- Use qualifier display
+			if not slot.link:find('^%[%[') then
+				slot.link = '[[' .. slot.link .. ']]'
+			end
+			LegacyPrizePool.handleSeed(newData, slot.link, opponentsInSlot)
+		elseif newParameter == 'seed' then
 			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
-
 		elseif input and tonumber(input) ~= 0 then
-			-- Handle the legacy checkmarks, they were set in value = 'q'
-			-- If want, in the future this could be parsed as a Qualification instead of a freetext as now
 			if input == 'q' then
-				input = slot.link and Page.makeInternalLink(CHECKMARK, slot.link) or CHECKMARK
+				-- Use legacy checkmark display
+				input = CHECKMARK
 			end
 
 			newData[newParameter] = input
@@ -282,7 +286,7 @@ function LegacyPrizePool.assignType(assignTo, input, slotParam)
 		CACHED_DATA.inputToId[slotParam] = 'points' .. index
 		CACHED_DATA.next.points = index + 1
 
-	elseif input and input:lower() == 'seed' then
+	elseif input and (input:lower() == 'seed' or input:lower() == 'qualified') then
 		CACHED_DATA.inputToId[slotParam] = 'seed'
 
 	elseif String.isNotEmpty(input) then
@@ -318,7 +322,7 @@ function LegacyPrizePool.parseWikiLink(input)
 
 			else
 				-- Just link
-				link, displayName = cleanedInput, cleanedInput
+				link = cleanedInput
 			end
 
 			if link:sub(1, 1) == '/' then
