@@ -81,16 +81,7 @@ function CustomOpponentDisplay.PlayerBlockOpponent(props)
 	local opponent = props.opponent
 
 	local playerNodes = Array.map(opponent.players, function(player)
-		return PlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
-			player = player,
-			showFlag = props.showFlag,
-			showLink = props.showLink,
-			showPlayerTeam = props.showPlayerTeam,
-			team = player.team,
-			abbreviateTbd = props.abbreviateTbd,
-		})
+		return PlayerDisplay.BlockPlayer(Table.merge(props, {player = player, team = player.team}))
 	end)
 
 	if #opponent.players == Opponent.partySize(Opponent.solo) then
