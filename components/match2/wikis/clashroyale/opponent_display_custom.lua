@@ -34,7 +34,7 @@ CustomOpponentDisplay.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOp
 )
 
 function CustomOpponentDisplay.BracketOpponentEntry:createDuo(opponent)
-	local playerNode = CustomOpponentDisplay.PlayerBlockOpponent({
+	local playerNode = CustomOpponentDisplay.BlockPlayers({
 		opponent = opponent,
 		overflow = 'ellipsis',
 		showLink = false,
@@ -59,13 +59,13 @@ function CustomOpponentDisplay.BlockOpponent(props)
 	props.showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
 	if opponent.type == Opponent.duo then
-		return CustomOpponentDisplay.PlayerBlockOpponent(props)
+		return CustomOpponentDisplay.BlockPlayers(props)
 	end
 
 	return OpponentDisplay.BlockOpponent(props)
 end
 
-function CustomOpponentDisplay.PlayerBlockOpponent(props)
+function CustomOpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
 
 	local playerNodes = Array.map(opponent.players, function(player)
@@ -89,23 +89,17 @@ function CustomOpponentDisplay.InlineOpponent(props)
 	local opponent = props.opponent
 
 	if opponent.type == Opponent.duo then
-		return CustomOpponentDisplay.PlayerInlineOpponent(props)
+		return CustomOpponentDisplay.InlinePlayers(props)
 	end
 
 	return OpponentDisplay.InlineOpponent(props)
 end
 
-function CustomOpponentDisplay.PlayerInlineOpponent(props)
+function CustomOpponentDisplay.InlinePlayers(props)
 	local opponent = props.opponent
 
 	local playerTexts = Array.map(opponent.players, function(player)
-		local node = PlayerDisplay.InlinePlayer({
-			flip = props.flip,
-			player = player,
-			showFlag = props.showFlag,
-			showLink = props.showLink,
-		})
-		return tostring(node)
+		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player})))
 	end)
 
 	if props.flip then
