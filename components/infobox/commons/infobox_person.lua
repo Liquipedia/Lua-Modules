@@ -267,6 +267,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
 
+	-- Store additional team-templates in extradata
 	args.team1 = team
 	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team') do
 		if teamIndex > 1 then
