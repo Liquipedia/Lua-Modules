@@ -58,22 +58,12 @@ function Casters:create()
 end
 
 -- Custom Header Class
-local Header = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.root:addClass('brkts-popup-header')
-	end
-)
+local Header = Class.new(MatchSummary.Header)
 
 function Header:scoreBoard(content)
 	self.scoreBoard = content
 	return self
 end
-
-Header.leftOpponent = MatchSummary.Header.leftOpponent
-
-Header.rightOpponent = MatchSummary.Header.rightOpponent
-
 function Header:createScoreDisplay(opponent1, opponent2)
 	local function getScore(opponent)
 		local scoreText
@@ -136,16 +126,6 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 
 	return scoreBoardNode:node(score)
 end
-
-function Header:createOpponent(opponent, opponentIndex)
-	return OpponentDisplay.BlockOpponent({
-		flip = opponentIndex == 1,
-		opponent = opponent,
-		overflow = 'ellipsis',
-		teamStyle = 'short',
-	})
-end
-
 function Header:create()
 	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
 		:node(self.leftElementAdditional)
@@ -246,7 +226,7 @@ function CustomMatchSummary._createHeader(match)
 	local header = Header()
 
 	header
-		:leftOpponent(header:createOpponent(match.opponents[1], 1))
+		:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
 		:scoreBoard(header:createScoreBoard(
 			header:createScoreDisplay(
 				match.opponents[1],
@@ -255,7 +235,7 @@ function CustomMatchSummary._createHeader(match)
 			match.bestof,
 			not match.finished
 		))
-		:rightOpponent(header:createOpponent(match.opponents[2], 2))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
