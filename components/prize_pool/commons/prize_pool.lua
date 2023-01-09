@@ -472,6 +472,7 @@ end
 
 function PrizePool:_buildHeader()
 	local headerRow = TableRow{css = {['font-weight'] = 'bold'}}
+	headerRow:addClass('prizepooltable-header')
 
 	headerRow:addCell(TableCell{content = {'Place'}, css = {['min-width'] = '80px'}})
 
