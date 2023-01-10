@@ -336,7 +336,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			TODAY
+			NOW
 		)
 	end
 
