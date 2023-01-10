@@ -485,12 +485,8 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 		local winnerInput = tonumber(map.winner)
 		if String.isNotEmpty(map.walkover) then
 			local walkoverInput = tonumber(map.walkover)
-			if walkoverInput == 1 then
-				map.winner = 1
-			elseif walkoverInput == 2 then
-				map.winner = 2
-			elseif walkoverInput == 0 then
-				map.winner = 0
+			if walkoverInput == 1 or walkoverInput == 2 or walkoverInput == 0 then
+				map.winner = walkoverInput
 			end
 			map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
 			map.scores = {-1, -1}
