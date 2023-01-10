@@ -170,17 +170,16 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 
 	local opponentsInSlot = #slot
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
-		local input = slot[parameter]
-		if newParameter == 'seed' then
-			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
+		local input = slot[parameter] ~= 'q' and slot[parameter] or CHECKMARK ---@type string?
 
-		elseif input and tonumber(input) ~= 0 then
-			-- Handle the legacy checkmarks, they were set in value = 'q'
-			-- If want, in the future this could be parsed as a Qualification instead of a freetext as now
-			if input == 'q' then
-				input = slot.link and Page.makeInternalLink(CHECKMARK, slot.link) or CHECKMARK
+		if newParameter == 'seed' then
+			if input == CHECKMARK and slot.link then
+				LegacyPrizePool.handleSeed(newData, Page.makeInternalLink(CHECKMARK, slot.link), opponentsInSlot,  true)
+			else
+				LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
 			end
 
+		elseif input and tonumber(input) ~= 0 then
 			newData[newParameter] = input
 		end
 	end)
@@ -204,8 +203,8 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	return newData
 end
 
-function LegacyPrizePool.handleSeed(storeTo, input, slotSize)
-	local links = LegacyPrizePool.parseWikiLink(input)
+function LegacyPrizePool.handleSeed(storeTo, input, slotSize, allowHtml)
+	local links = LegacyPrizePool.parseWikiLink(input, allowHtml)
 	for _, linkData in ipairs(links) do
 		local link = linkData.link
 
@@ -297,16 +296,16 @@ function LegacyPrizePool.isValidPoints(input)
 	return Points[input] and true or false
 end
 
-function LegacyPrizePool.parseWikiLink(input)
+function LegacyPrizePool.parseWikiLink(input, allowHtml)
 	if not input then
 		return {}
 	end
 
 	local links = {}
 
-	local inputWithoutHtml = input:gsub('<.->.-</.->', '')
+	local cleanedInput = allowHtml and input or input:gsub('<.->.-</.->', '')
 
-	for inputSection in mw.text.gsplit(inputWithoutHtml, '< *[hb]r */? *>') do
+	for inputSection in mw.text.gsplit(cleanedInput, '< *[hb]r */? *>') do
 		-- Does this contain a wiki link?
 		if string.find(inputSection, '%[') then
 			local cleanedInput = inputSection:gsub('^.-%[+', ''):gsub('%].-$', '')
