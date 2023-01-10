@@ -16,27 +16,30 @@ local CustomBracketDisplay = Table.copy(BracketDisplay)
 
 function CustomBracketDisplay.BracketContainer(props)
 	local bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId)
+
+	local opponentHeight = math.max(
+		CustomBracketDisplay.computeBracketOpponentHeight(bracket.matchesById),
+		props.config.opponentHeight or -1
+	)
+
 	return BracketDisplay.Bracket({
 		bracket = bracket,
 		config = Table.merge(props.config, {
-			opponentHeight = CustomBracketDisplay.computeBracketOpponentHeight(bracket.matchesById),
+			opponentHeight = opponentHeight ~= -1 and opponentHeight or nil,
 		})
 	})
 end
 
 local defaultOpponentHeights = {
-	default = 17 + 6,
 	duo = 2 * 17 + 6 + 4,
 }
 function CustomBracketDisplay.computeBracketOpponentHeight(matchesById)
-	local maxHeight = defaultOpponentHeights.default
-
+	local maxHeight = -1
 	for _, match in pairs(matchesById) do
 		for _, opponent in ipairs(match.opponents) do
-			maxHeight = math.max(maxHeight, defaultOpponentHeights[opponent.type] or 0)
+			maxHeight = math.max(maxHeight, defaultOpponentHeights[opponent.type] or -1)
 		end
 	end
-
 	return maxHeight
 end
 
