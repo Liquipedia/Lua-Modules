@@ -221,7 +221,9 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 	}
 end
 
-function matchFunctions.readOpponents(opponents, isScoreSet, args)
+function matchFunctions.readOpponents(args)
+	local opponents = {}
+	local isScoreSet = false
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
@@ -312,9 +314,9 @@ end
 
 function matchFunctions.getOpponents(args)
 	-- read opponents and ignore empty ones
-	local opponents = {}
-	local isScoreSet = false
-	opponents, isScoreSet, args = matchFunctions.readOpponents(opponents, isScoreSet, args)
+	local opponents
+	local isScoreSet
+	opponents, isScoreSet, args = matchFunctions.readOpponents(args)
 
 	--set resulttype to 'default' if walkover is set
 	if args.walkover then
