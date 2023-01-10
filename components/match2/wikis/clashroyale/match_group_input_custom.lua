@@ -27,7 +27,7 @@ local DEFAULT_WIN_STATUS = 'W'
 local DEFAULT_WIN_RESULTTYPE = 'default'
 local NO_SCORE = -1
 local SCORE_STATUS = 'S'
-local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS}
+local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_STATUS}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
@@ -39,7 +39,7 @@ local NOW = os.time(os.date('!*t'))
 local CustomMatchGroupInput = {}
 
 CustomMatchGroupInput.walkoverProcessing = {}
-walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
+local walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match)
@@ -157,7 +157,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 	mw.logObject{winner = match.winner, resulttype = match.resulttype, walkover = match.resulttype}
 
 	if match.resulttype == DEFAULT_WIN_RESULTTYPE then
-		walkoverProcessing.applyMatchWalkoverToOpponents(match, loserStatus, winner)
+		walkoverProcessing.applyMatchWalkoverToOpponents(match)
 		return match
 	end
 
@@ -216,7 +216,7 @@ function CustomMatchGroupInput._determineWinnerIfMissing(match, scores)
 			match.winner = 0
 			return
 		end
-		
+
 		for opponentIndex, score in pairs(scores) do
 			if score == maxScore then
 				match.winner = opponentIndex
