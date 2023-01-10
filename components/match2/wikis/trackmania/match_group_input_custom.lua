@@ -78,8 +78,8 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
 	--score2 & score3 support for every match
-	local score2 = tonumber(record.score2 or '')
-	local score3 = tonumber(record.score3 or '')
+	local score2 = tonumber(record.score2)
+	local score3 = tonumber(record.score3)
 	if score2 then
 		record.extradata = {
 			score2 = score2,
@@ -132,8 +132,7 @@ function CustomMatchGroupInput._getSetWins(opp)
 	local set1win = extradata.set1win and 1 or 0
 	local set2win = extradata.set2win and 1 or 0
 	local set3win = extradata.set3win and 1 or 0
-	local sum = set1win + set2win + set3win
-	return sum
+	return set1win + set2win + set3win
 end
 
 --
@@ -269,8 +268,7 @@ function matchFunctions.applyMatchPlacement(opponents, args)
 	for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
 		if opponent.status ~= STATUS_HAS_SCORE and opponent.status ~= STATUS_DEFAULT_WIN and placement == 1 then
 			placement = 2
-		end
-		if placement == 1 then
+		elseif placement == 1 then
 			args.winner = opponentIndex
 		end
 		if opponent.status == STATUS_HAS_SCORE and opponent.score == lastScore then
