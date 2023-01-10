@@ -22,7 +22,12 @@ local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
-local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
+local UNKNOWN_REASON_LOSS_STATUS = 'L'
+local DEFAULT_WIN_STATUS = 'W'
+local DEFAULT_WIN_RESULTTYPE = 'default'
+local NO_SCORE = -1
+local SCORE_STATUS = 'S'
+local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
@@ -30,7 +35,11 @@ local DEFAULT_BEST_OF = 99
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t'))
 
+
 local CustomMatchGroupInput = {}
+
+CustomMatchGroupInput.walkoverProcessing = {}
+walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match)
@@ -40,7 +49,6 @@ function CustomMatchGroupInput.processMatch(match)
 	)
 	match = CustomMatchGroupInput._getExtraData(match)
 	match = CustomMatchGroupInput._getTournamentVars(match)
-	match = CustomMatchGroupInput._checkFinished(match)
 	match = CustomMatchGroupInput._adjustData(match)
 	match = CustomMatchGroupInput._getVodStuff(match)
 	match = CustomMatchGroupInput._getLinks(match)
@@ -58,25 +66,6 @@ function CustomMatchGroupInput._readDate(matchArgs)
 			timestamp = DateExt.epochZero,
 		}
 	end
-end
-
-function CustomMatchGroupInput._checkFinished(match)
-	if Logic.readBoolOrNil(match.finished) == false then
-		match.finished = false
-	elseif Logic.readBool(match.finished) or String.isNotEmpty(match.winner) then
-		match.finished = true
-	end
-
-	-- Match is automatically marked finished upon page edit after a
-	-- certain amount of time (depending on whether the date is exact)
-	if not match.finished and match.timestamp > DateExt.epochZero then
-		local threshold = match.dateexact and 30800 or 86400
-		if match.timestamp + threshold < NOW then
-			match.finished = true
-		end
-	end
-
-	return match
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)
@@ -132,6 +121,8 @@ function CustomMatchGroupInput._adjustData(match)
 
 	match = CustomMatchGroupInput._matchWinnerProcessing(match)
 
+	CustomMatchGroupInput._setPlacements(match)
+
 	if match.hasTeamOpponent then
 		error('Team matches not yet supported')
 	end
@@ -143,135 +134,108 @@ function CustomMatchGroupInput._adjustData(match)
 	return match
 end
 
---[[
-
-Misc. MatchInput functions
---> Winner, Walkover, Placement, Resulttype, Status
-
-]]--
 function CustomMatchGroupInput._matchWinnerProcessing(match)
 	local bestof = tonumber(match.bestof) or Variables.varDefault('bestof', DEFAULT_BEST_OF)
+	match.bestof = bestof
 	Variables.varDefine('bestof', bestof)
 
-	local walkover = match.walkover
+	local scores = Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
+		local opponent = match['opponent' .. opponentIndex]
+		if not opponent then
+			return NO_SCORE
+		end
+
+		-- set the score either from manual input or sumscore
+		opponent.score = Table.includes(ALLOWED_STATUSES, string.upper(opponent.score or ''))
+			and opponent.score:upper()
+			or tonumber(opponent.score) or tonumber(opponent.sumscore) or NO_SCORE
+
+		return opponent.score
+	end)
+
+	walkoverProcessing.walkover(match, scores)
+	mw.logObject{winner = match.winner, resulttype = match.resulttype, walkover = match.resulttype}
+
+	if match.resulttype == DEFAULT_WIN_RESULTTYPE then
+		walkoverProcessing.applyMatchWalkoverToOpponents(match, loserStatus, winner)
+		return match
+	end
+
+	if match.winner == 'draw' then
+		match.winner = 0
+	end
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local opponent = match['opponent' .. opponentIndex]
 		if Logic.isNotEmpty(opponent) then
-			--determine opponent scores, status and placement
-			--determine MATCH winner, resulttype and walkover
-			if String.isNotEmpty(walkover) then
-				if Logic.isNumeric(walkover) then
-					walkover = tonumber(walkover)
-					if walkover == opponentIndex then
-						match.winner = opponentIndex
-						match.walkover = 'L'
-						opponent.status = 'W'
-					elseif walkover == 0 then
-						match.winner = 0
-						match.walkover = 'L'
-						opponent.status = 'L'
-					else
-						local score = string.upper(opponent.score or '')
-						opponent.status = CONVERT_STATUS_INPUT[score] or 'L'
-					end
-				elseif Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
-					if tonumber(match.winner or 0) == opponentIndex then
-						opponent.status = 'W'
-					else
-						opponent.status = CONVERT_STATUS_INPUT[string.upper(walkover)] or 'L'
-					end
-				else
-					local score = string.upper(opponent.score or '')
-					opponent.status = CONVERT_STATUS_INPUT[score] or 'L'
-					match.walkover = 'L'
-				end
-				opponent.score = -1
-				match.finished = true
-				match.resulttype = 'default'
-			elseif CONVERT_STATUS_INPUT[string.upper(opponent.score or '')] then
-				if string.upper(opponent.score) == 'W' then
-					match.winner = opponentIndex
-					match.resulttype = 'default'
-					match.finished = true
-					opponent.score = -1
-					opponent.status = 'W'
-				else
-					match.resulttype = 'default'
-					match.finished = true
-					match.walkover = CONVERT_STATUS_INPUT[string.upper(opponent.score)]
-					local score = string.upper(opponent.score)
-					opponent.status = CONVERT_STATUS_INPUT[score]
-					opponent.score = -1
-				end
-			else
-				opponent.status = 'S'
-				opponent.score = tonumber(opponent.score) or
-					tonumber(opponent.sumscore) or -1
-				if opponent.score > bestof / 2 then
-					match.finished = Logic.emptyOr(match.finished, true)
-					match.winner = tonumber(match.winner or '') or opponentIndex
-				end
+			opponent.status = SCORE_STATUS
+			if opponent.score > bestof / 2 then
+				match.finished = Logic.emptyOr(match.finished, true)
+				match.winner = tonumber(match.winner) or opponentIndex
+			elseif match.winner == 0 or (opponent.score == bestof / 2 and match.opponent1.score == match.opponent2.score) then
+				match.finished = Logic.emptyOr(match.finished, true)
+				match.winner = 0
+				match.resulttype = 'draw'
 			end
-
-			if Logic.readBool(match.cancelled) then
-				match.finished = true
-				if String.isEmpty(match.resulttype) and String.isEmpty(opponent.score) then
-					match.resulttype = 'np'
-					opponent.score = opponent.score or -1
-				end
-			end
-		else
-			break
 		end
 	end
 
-	CustomMatchGroupInput._determineWinnerIfMissing(match)
+	match.winner = tonumber(match.winner)
 
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		local opponent = match['opponent' .. opponentIndex]
-		if match.winner == 'draw' or tonumber(match.winner) == 0 or
-				(match.opponent1.score == bestof / 2 and match.opponent1.score == match.opponent2.score) then
-			match.finished = true
-			match.winner = 0
-			match.resulttype = 'draw'
-		end
-		if tonumber(match.winner) == opponentIndex or match.resulttype == 'draw' then
-			opponent.placement = 1
-		elseif Logic.isNumeric(match.winner) then
-			opponent.placement = 2
-		end
+	CustomMatchGroupInput._checkFinished(match)
+
+	if match.finished and not match.winner then
+		CustomMatchGroupInput._determineWinnerIfMissing(match, scores)
 	end
 
 	return match
 end
 
-function CustomMatchGroupInput._determineWinnerIfMissing(match)
-	if Logic.readBool(match.finished) and not match.winner then
-		local scores = Array.mapIndexes(function(opponentIndex)
-			local opponent = match['opponent' .. opponentIndex]
-			if not opponent then
-				return nil
-			end
-			return match['opponent' .. opponentIndex].score or -1 end
-		)
-		local maxScore = math.max(unpack(scores) or 0)
-		-- if we have a positive score and the match is finished we also have a winner
-		if maxScore > 0 then
-			local maxIndexFound = false
-			for opponentIndex, score in pairs(scores) do
-				if maxIndexFound and score == maxScore then
-					match.winner = 0
-					break
-				elseif score == maxScore then
-					maxIndexFound = true
-					match.winner = opponentIndex
-				end
+function CustomMatchGroupInput._checkFinished(match)
+	if Logic.readBoolOrNil(match.finished) == false then
+		match.finished = false
+	elseif Logic.readBool(match.finished) or match.winner then
+		match.finished = true
+	end
+
+	-- Match is automatically marked finished upon page edit after a
+	-- certain amount of time (depending on whether the date is exact)
+	if not match.finished and match.timestamp > DateExt.epochZero then
+		local threshold = match.dateexact and 30800 or 86400
+		if match.timestamp + threshold < NOW then
+			match.finished = true
+		end
+	end
+end
+
+function CustomMatchGroupInput._determineWinnerIfMissing(match, scores)
+	local maxScore = math.max(unpack(scores) or 0)
+	-- if we have a positive score and the match is finished we also have a winner
+	if maxScore > 0 then
+		if Array.all(scores, function(score) return score == maxScore end) then
+			match.winner = 0
+			return
+		end
+		
+		for opponentIndex, score in pairs(scores) do
+			if score == maxScore then
+				match.winner = opponentIndex
+				return
 			end
 		end
 	end
+end
 
-	return match
+function CustomMatchGroupInput._setPlacements(match)
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+		local opponent = match['opponent' .. opponentIndex]
+
+		if match.winner == opponentIndex or match.winner == 0 then
+			opponent.placement = 1
+		elseif match.winner then
+			opponent.placement = 2
+		end
+	end
 end
 
 --[[
@@ -464,11 +428,11 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 			hasManualScores = true
 			score = CONVERT_STATUS_INPUT[score] or score
 			if Logic.isNumeric(score) then
-				obj.status = 'S'
+				obj.status = SCORE_STATUS
 				obj.score = score
 			elseif Table.includes(ALLOWED_STATUSES, score) then
 				obj.status = score
-				obj.score = -1
+				obj.score = NO_SCORE
 			end
 			table.insert(map.scores, score)
 			indexedScores[scoreIndex] = obj
@@ -489,10 +453,10 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 				map.winner = walkoverInput
 			end
 			map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
-			map.scores = {-1, -1}
+			map.scores = {NO_SCORE, NO_SCORE}
 			map.resulttype = 'default'
 		elseif map.winner == 'skip' then
-			map.scores = {-1, -1}
+			map.scores = {NO_SCORE, NO_SCORE}
 			map.resulttype = 'np'
 		elseif winnerInput == 1 then
 			map.scores = {1, 0}
@@ -506,22 +470,28 @@ end
 
 function CustomMatchGroupInput._processPlayerMapData(map, match)
 	local participants = {}
+	local submatchOpponentPlayerNumbers = {}
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local opponent = match['opponent' .. opponentIndex]
-		if Opponent.typeIsParty(opponent.type) then
+
+		if opponent.type == Opponent.team then
+			error('Team matches not yet supported')
+		elseif opponent.type == Opponent.literal then
+			table.insert(submatchOpponentPlayerNumbers, opponent.type)
+		else
+			table.insert(submatchOpponentPlayerNumbers, #opponent.match2players)
+
 			CustomMatchGroupInput._processDefaultPlayerMapData(
 				opponent.match2players or {},
 				opponentIndex,
 				map,
 				participants
 			)
-		elseif opponent.type == Opponent.team then
-			error('Team matches not yet supported')
 		end
 	end
 
-	map.mode = Opponent.toMode(match.opponent1.type, match.opponent2.type)
+	map.mode = table.concat(submatchOpponentPlayerNumbers, 'v')
 	map.participants = participants
 
 	return map
@@ -553,8 +523,8 @@ end
 function CustomMatchGroupInput._placementSortFunction(tbl, key1, key2)
 	local opponent1 = tbl[key1]
 	local opponent2 = tbl[key2]
-	local opponent1Norm = opponent1.status == 'S'
-	local opponent2Norm = opponent2.status == 'S'
+	local opponent1Norm = opponent1.status == SCORE_STATUS
+	local opponent2Norm = opponent2.status == SCORE_STATUS
 	if opponent1Norm and opponent2Norm then
 		return tonumber(opponent1.score) > tonumber(opponent2.score)
 	elseif opponent1Norm then return true
@@ -573,6 +543,101 @@ function CustomMatchGroupInput.getIcon(template)
 		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
 		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
 		return icon, iconDark
+	end
+end
+
+
+
+function walkoverProcessing.walkover(obj, scores)
+	local walkover = obj.walkover
+
+	if Logic.isNumeric(walkover) then
+		walkoverProcessing.numericWalkover(obj, walkover)
+	elseif walkover then
+		walkoverProcessing.nonNumericWalkover(obj, walkover)
+	elseif #scores ~=2 then -- since we always have 2 opponents
+		error('Unexpected number of opponents when calculating winner')
+	elseif Array.all(scores, function(score)
+			return Table.includes(ALLOWED_STATUSES, score) and score ~= DEFAULT_WIN_STATUS
+		end) then
+
+		walkoverProcessing.scoreDoubleWalkover(obj, scores)
+	elseif Array.any(scores, function(score) return Table.includes(ALLOWED_STATUSES, score) end) then
+		walkoverProcessing.scoreWalkover(obj, scores)
+	end
+end
+
+function walkoverProcessing.numericWalkover(obj, walkover)
+	local winner = tonumber(walkover)
+
+	obj.winner = winner
+	obj.finished = true
+	obj.walkover = UNKNOWN_REASON_LOSS_STATUS
+	obj.resulttype = DEFAULT_WIN_RESULTTYPE
+end
+
+function walkoverProcessing.nonNumericWalkover(obj, walkover)
+	if not Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
+		error('Invalid walkover "' .. walkover .. '"')
+	elseif not Logic.isNumeric(obj.winner) then
+		error('Walkover without winner specified')
+	end
+
+	obj.winner = tonumber(obj.winner)
+	obj.finished = true
+	obj.walkover = walkover:upper()
+	obj.resulttype = DEFAULT_WIN_RESULTTYPE
+end
+
+function walkoverProcessing.scoreDoubleWalkover(obj, scores)
+	obj.winner = -1
+	obj.finished = true
+	obj.walkover = scores[1]
+	obj.resulttype = DEFAULT_WIN_RESULTTYPE
+end
+
+function walkoverProcessing.scoreWalkover(obj, scores)
+	local winner, status
+
+	for scoreIndex, score in pairs(scores) do
+		score = string.upper(score)
+		if score == DEFAULT_WIN_STATUS then
+			winner = scoreIndex
+		elseif Table.includes(ALLOWED_STATUSES, score) then
+			status = score
+		else
+			status = UNKNOWN_REASON_LOSS_STATUS
+		end
+	end
+
+	if not winner then
+		error('Invalid score combination "{' .. scores[1] .. ', ' .. scores[2] .. '}"')
+	end
+
+	obj.winner = winner
+	obj.finished = true
+	obj.walkover = status
+	obj.resulttype = DEFAULT_WIN_RESULTTYPE
+end
+
+function walkoverProcessing.applyMatchWalkoverToOpponents(match)
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+		local score = match['opponent' .. opponentIndex].score
+
+		if Logic.isNumeric(score) or String.isEmpty(score) then
+			match['opponent' .. opponentIndex].score = String.isNotEmpty(score) and score or NO_SCORE
+			match['opponent' .. opponentIndex].status = match.walkover
+		elseif score and Table.includes(ALLOWED_STATUSES, score:upper()) then
+			match['opponent' .. opponentIndex].score = NO_SCORE
+			match['opponent' .. opponentIndex].status = score
+		else
+			error('Invalid score "' .. score .. '"')
+		end
+	end
+
+	-- neither match.opponent0 nor match['opponent-1'] does exist hence the if
+	if match['opponent' .. match.winner] then
+		match['opponent' .. match.winner].status = DEFAULT_WIN_STATUS
 	end
 end
 
