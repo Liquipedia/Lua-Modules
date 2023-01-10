@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 local CustomSquad = {}
 
 function CustomSquad.run(frame)
-	error("AoE wiki doesn't support manual Squad Tables")
+	error('AoE wiki doesn\'t support manual Squad Tables')
 end
 
 function CustomSquad.runAuto(playerList, squadType)

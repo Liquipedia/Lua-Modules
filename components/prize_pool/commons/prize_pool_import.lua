@@ -17,9 +17,10 @@ local Table = require('Module:Table')
 
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
 local TournamentUtil = Lua.import('Module:Tournament/Util', {requireDevIfEnabled = true})
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local AUTOMATION_START_DATE = '2023-01-01'
 local GROUPSCORE_DELIMITER = '/'
@@ -288,6 +289,10 @@ function Import._computeBracketPlacementGroups(bracket, options)
 			-- Winners of root matches
 			if coordinates.depth == 0 and options.isFinalStage then
 				table.insert(groupKeys, {0, coordinates.sectionIndex, 1})
+				-- in case of qualLose also Loser of root match if not lower bracket (lower bracket gets handled below)
+				if bracket.bracketDatasById[matchId].qualLose and coordinates.sectionIndex ~= #bracket.sections then
+					table.insert(groupKeys, {0, coordinates.sectionIndex, 2})
+				end
 			end
 
 			-- Opponents knocked out from sole section (se) or lower bracket (de)

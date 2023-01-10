@@ -304,15 +304,6 @@ function CustomTeam.getEarningsAndMedalsData(team)
 		earnings.team = {}
 	end
 
-	-- to be removed after a purge run + consumer updates
-	if _doStore then
-		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
-				type = 'total_earnings_players_while_on_team',
-				name = _team.pagename,
-				information = playerEarnings,
-		})
-	end
-
 	for _, earningsTable in pairs(earnings) do
 		for key, value in pairs(earningsTable) do
 			earningsTable[key] = Math.round{value}

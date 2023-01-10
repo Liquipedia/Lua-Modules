@@ -42,6 +42,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
@@ -257,7 +258,7 @@ function CustomLeague:defineCustomPageVariables()
 	--series number
 	local seriesNumber = _args.number or ''
 	if String.isNotEmpty(seriesNumber) then
-		seriesNumber = string.format("%05i", seriesNumber)
+		seriesNumber = string.format('%05i', seriesNumber)
 	end
 	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
@@ -300,7 +301,17 @@ function CustomLeague:addToLpdb(lpdbData)
 	-- hence they need to not RR them
 	lpdbData.series = _args.series
 
+	lpdbData.extradata.female = Logic.readBool(_args.female) or nil
+
 	return lpdbData
+end
+
+function CustomLeague:getWikiCategories(args)
+	if Logic.readBool(args.female) then
+		return {'Female Tournaments'}
+	end
+
+	return {}
 end
 
 function CustomLeague:_concatArgs(base)

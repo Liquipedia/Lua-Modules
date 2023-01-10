@@ -17,10 +17,10 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local WikiSpecific = require('Module:Brkts/WikiSpecific')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local globalVars = PageVariableNamespace({cached = true})
 
@@ -384,7 +384,7 @@ end
 function MatchGroupInput.getCommonTournamentVars(obj)
 	obj.game = Logic.emptyOr(obj.game, Variables.varDefault('tournament_game'))
 	obj.icon = Logic.emptyOr(obj.icon, Variables.varDefault('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault("tournament_icondark"))
+	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault('tournament_icondark'))
 	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
