@@ -303,9 +303,7 @@ function CustomMatchGroupInput._opponentInput(match)
 			error('Unsupported Opponent Type')
 		end
 
-		-- Retrieve icon for team
 		if opponent.type == Opponent.team then
-			opponent.icon, opponent.icondark = CustomMatchGroupInput.getIcon(opponent.template)
 			match.hasTeamOpponent = true
 		end
 
@@ -342,6 +340,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
 	if record.type == Opponent.team then
+		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
 		record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
 	end
 
