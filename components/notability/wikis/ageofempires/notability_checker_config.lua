@@ -34,8 +34,8 @@ Config.PLACEMENT_QUERY =
 	'liquipediatiertype, players, extradata, mode'
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 400
-Config.NOTABILITY_THRESHOLD_NOTABLE = 600
+Config.NOTABILITY_THRESHOLD_MIN = 800
+Config.NOTABILITY_THRESHOLD_NOTABLE = 1600
 
 -- These are all the liquipediatiertypes which should be extra "penalised"
 -- for a lower placement, see also the placementDropOffFunction below.
@@ -210,7 +210,7 @@ end
 -- want to decrease the points given for a certain mode
 function Config.adjustScoreForMode(score, mode)
 	local modeMod = 1
-	if mode == "2v2" or "3v3" or "4v4" then
+	if mode == 'team' then
 		modeMod = 0.5
 	end
 	return score * modeMod

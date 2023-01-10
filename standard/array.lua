@@ -20,6 +20,13 @@ function Array.randomize(tbl)
 	return Table.randomize(tbl)
 end
 
+---Return true if the input is a table in array format
+---@param tbl any
+---@return boolean
+function Array.isArray(tbl)
+	return type(tbl) == 'table' and Table.size(tbl) == #tbl
+end
+
 -- Creates a copy of an array with the same elements.
 function Array.copy(tbl)
 	local copy = {}

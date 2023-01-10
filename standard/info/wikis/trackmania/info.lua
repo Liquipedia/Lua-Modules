@@ -12,4 +12,6 @@ return {
 	name = 'Trackmania',
 	defaultTeamLogo = 'Trackmania_logo_lightmode.png',
 	defaultTeamLogoDark = 'Trackmania_logo_darkmode.png',
+	opponentLibrary = 'Opponent',
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

@@ -718,7 +718,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 
 	if customTeam then
 		if not defaultIcon then
-			defaultIcon = require('Module:Brkts/WikiSpecific').defaultIcon
+			defaultIcon = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true}).defaultIcon
 		end
 		opponent.template = 'default'
 		icon = defaultIcon

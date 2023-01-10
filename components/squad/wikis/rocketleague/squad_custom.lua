@@ -48,9 +48,10 @@ function CustomSquad.run(frame)
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
 		squad:row(row:create(
 			Variables.varDefault('squad_name',
-			mw.title.getCurrentTitle().prefixedText) .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
+			mw.title.getCurrentTitle().prefixedText) .. '_' .. link .. '_' .. ReferenceCleaner.clean(player.joindate)
 		))
 
 		index = index + 1

@@ -60,7 +60,7 @@ function MatchMapsLegacyStore.close()
 	if not bracketId then
 		return '</table>'
 	end
-	if bracketId == "abcs" then
+	if bracketId == 'abcs' then
 		return
 	end
 

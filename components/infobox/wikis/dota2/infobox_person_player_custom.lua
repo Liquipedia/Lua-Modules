@@ -173,7 +173,7 @@ function CustomPlayer:makeAbbr(title, text)
 	if String.isEmpty(title) or String.isEmpty(text) then
 		return nil
 	end
-	return '<abbr title="' .. title .. '>' .. text .. '</abbr>'
+	return '<abbr title="' .. title .. '">' .. text .. '</abbr>'
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)

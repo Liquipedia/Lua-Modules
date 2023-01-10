@@ -107,11 +107,15 @@ function Team:createInfobox()
 							totalEarningsDisplay = '$' .. Language:formatNum(self.totalEarnings)
 						end
 						return {
-							Cell{name = Abbreviation.make(
-									'Approx. Total Winnings',
-									'Includes individual player earnings won&#10;while representing this team'
-								),
-								content = {totalEarningsDisplay}}
+							Customizable{id = 'earningscell',
+								children = {
+									Cell{name = Abbreviation.make(
+										'Approx. Total Winnings',
+										'Includes individual player earnings won&#10;while representing this team'
+									),
+									content = {totalEarningsDisplay}}
+								}
+							}
 						}
 					end
 				}
