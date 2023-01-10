@@ -349,7 +349,6 @@ end
 
 function CustomMatchGroupInput._readTeamPlayers(opponent, playerData)
 	local players = CustomMatchGroupInput._getManuallyEnteredPlayers(playerData)
-	opponent.players = nil
 
 	if Table.isEmpty(players) then
 		players = CustomMatchGroupInput._getPlayersFromVariables(opponent.name)
