@@ -506,7 +506,6 @@ end
 
 function CustomMatchGroupInput._processPlayerMapData(map, match)
 	local participants = {}
-	local submatchOpponentPlayerNumbers = {}
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local opponent = match['opponent' .. opponentIndex]
