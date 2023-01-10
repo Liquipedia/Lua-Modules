@@ -63,9 +63,7 @@ end
 function CustomMatchGroupInput._checkFinished(match)
 	if Logic.readBoolOrNil(match.finished) == false then
 		match.finished = false
-	elseif Logic.readBool(match.finished) then
-		match.finished = true
-	elseif Logic.isNotEmpty(match.winner) then
+	elseif Logic.readBool(match.finished) or String.isNotEmpty(match.winner) then
 		match.finished = true
 	end
 
