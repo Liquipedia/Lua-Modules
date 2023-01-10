@@ -72,16 +72,13 @@ function CustomOpponentDisplay.BlockPlayers(props)
 		return PlayerDisplay.BlockPlayer(Table.merge(props, {player = player, team = player.team}))
 	end)
 
-	if #opponent.players == Opponent.partySize(Opponent.solo) then
-		return playerNodes[1]
-	else
-		local playersNode = mw.html.create('div')
-			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
-		for _, playerNode in ipairs(playerNodes) do
-			playersNode:node(playerNode)
-		end
-		return playersNode
+	local playersNode = mw.html.create('div')
+		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+	for _, playerNode in ipairs(playerNodes) do
+		playersNode:node(playerNode)
 	end
+
+	return playersNode
 end
 
 function CustomOpponentDisplay.InlineOpponent(props)
