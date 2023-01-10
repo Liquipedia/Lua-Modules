@@ -417,53 +417,41 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 end
 
 function CustomMatchGroupInput._mapWinnerProcessing(map)
-	map.scores = {}
-	local hasManualScores = false
-	local indexedScores = {}
-	for scoreIndex = 1, MAX_NUM_OPPONENTS do
-		-- read scores
-		local score = map['score' .. scoreIndex]
-		local obj = {}
-		if Logic.isNotEmpty(score) then
-			hasManualScores = true
-			score = CONVERT_STATUS_INPUT[score] or score
-			if Logic.isNumeric(score) then
-				obj.status = SCORE_STATUS
-				obj.score = score
-			elseif Table.includes(ALLOWED_STATUSES, score) then
-				obj.status = score
-				obj.score = NO_SCORE
-			end
-			table.insert(map.scores, score)
-			indexedScores[scoreIndex] = obj
-		else
-			break
-		end
+	if map.winner == 'skip' then
+		map.scores = {NO_SCORE, NO_SCORE}
+		map.resulttype = 'np'
+
+		return map
 	end
 
-	if hasManualScores then
-		if not tonumber(map.winner) then
-			map.winner = CustomMatchGroupInput._placementSortFunction(indexedScores, 1, 2) and 1 or 2
+	map.scores = {}
+	local hasManualScores = false
+
+	local scores = Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
+		local score = map['score' .. opponentIndex]
+		map.scores[opponentIndex] = tonumber(score) or NO_SCORE
+
+		if String.isEmpty(score) then
+			hasManualScores = true
 		end
-	else
+
+		return Table.includes(ALLOWED_STATUSES, string.upper(score or ''))
+			and score:upper()
+			or map.scores[opponentIndex]
+	end)
+
+	if not hasManualScores then
 		local winnerInput = tonumber(map.winner)
-		if String.isNotEmpty(map.walkover) then
-			local walkoverInput = tonumber(map.walkover)
-			if walkoverInput == 1 or walkoverInput == 2 or walkoverInput == 0 then
-				map.winner = walkoverInput
-			end
-			map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
-			map.scores = {NO_SCORE, NO_SCORE}
-			map.resulttype = 'default'
-		elseif map.winner == 'skip' then
-			map.scores = {NO_SCORE, NO_SCORE}
-			map.resulttype = 'np'
-		elseif winnerInput == 1 then
+		if winnerInput == 1 then
 			map.scores = {1, 0}
 		elseif winnerInput == 2 then
 			map.scores = {0, 1}
 		end
+
+		return map
 	end
+
+	walkoverProcessing.walkover(map, scores)
 
 	return map
 end
