@@ -12,4 +12,5 @@ return {
 	name = 'Clash Royale',
 	defaultTeamLogo = 'Clash Royale.png',
 	defaultTeamLogoDark = 'Clash Royale.png',
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }
