@@ -105,13 +105,11 @@ function CustomMatchGroupInput._getLinks(match)
 end
 
 function CustomMatchGroupInput._getExtraData(match)
-	local extradata = {
+	match.extradata = {
 		casters = match.casters,
 		t1bans = CustomMatchGroupInput._readBans(match.t1bans),
 		t2bans = CustomMatchGroupInput._readBans(match.t2bans),
 	}
-
-	match.extradata = extradata
 
 	return match
 end
