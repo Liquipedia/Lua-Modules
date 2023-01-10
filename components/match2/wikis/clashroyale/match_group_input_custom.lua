@@ -478,12 +478,8 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	end
 
 	if hasManualScores then
-		for scoreIndex, _ in Table.iter.spairs(indexedScores, CustomMatchGroupInput._placementSortFunction) do
-			if not tonumber(map.winner or '') then
-				map.winner = scoreIndex
-			else
-				break
-			end
+		if not tonumber(map.winner) then
+			map.winner = CustomMatchGroupInput._placementSortFunction(indexedScores, 1, 2) and 1 or 2
 		end
 	else
 		local winnerInput = tonumber(map.winner)
