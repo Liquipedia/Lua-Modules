@@ -471,8 +471,7 @@ function PrizePool:_getPrizeSummaryText()
 end
 
 function PrizePool:_buildHeader()
-	local headerRow = TableRow{css = {['font-weight'] = 'bold'}}
-	headerRow:addClass('prizepooltable-header')
+	local headerRow = TableRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}}
 
 	headerRow:addCell(TableCell{content = {'Place'}, css = {['min-width'] = '80px'}})
 
