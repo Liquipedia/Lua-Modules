@@ -221,14 +221,14 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 	}
 end
 
-function matchFunctions.readOpponents(args)
+function matchFunctions.readOpponents(match)
 	local opponents = {}
 	local isScoreSet = false
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
-		local opponent = args['opponent' .. opponentIndex]
+		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, args.date)
+			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
 			-- Retrieve icon for team
 			if opponent.type == Opponent.team then
@@ -245,21 +245,21 @@ function matchFunctions.readOpponents(args)
 			end
 
 			--set Walkover from Opponent status
-			args.walkover = args.walkover or STATUS_TO_WALKOVER[opponent.status]
+			match.walkover = match.walkover or STATUS_TO_WALKOVER[opponent.status]
 
 			opponents[opponentIndex] = opponent
 
 			-- get players from vars for teams
 			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
+				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
 			end
 		end
 	end
 
-	return opponents, isScoreSet, args
+	return opponents, isScoreSet, match
 end
 
-function matchFunctions.applyMatchPlacement(opponents, args)
+function matchFunctions.applyMatchPlacement(opponents, match)
 	local placement = 1
 	local lastScore
 	local lastPlacement = 1
@@ -268,7 +268,7 @@ function matchFunctions.applyMatchPlacement(opponents, args)
 		if opponent.status ~= STATUS_HAS_SCORE and opponent.status ~= STATUS_DEFAULT_WIN and placement == 1 then
 			placement = 2
 		elseif placement == 1 then
-			args.winner = opponentIndex
+			match.winner = opponentIndex
 		end
 		if opponent.status == STATUS_HAS_SCORE and opponent.score == lastScore then
 			opponent.placement = lastPlacement
@@ -277,78 +277,78 @@ function matchFunctions.applyMatchPlacement(opponents, args)
 		else
 			opponent.placement = placement
 		end
-		args['opponent' .. opponentIndex] = opponent
+		match['opponent' .. opponentIndex] = opponent
 		placement = placement + 1
 		lastScore = opponent.score
 		lastPlacement = opponent.placement
 		lastStatus = opponent.status
 	end
 
-	return args
+	return match
 end
 
-function matchFunctions.setMatchWinner(winner, opponents, args)
+function matchFunctions.setMatchWinner(winner, opponents, match)
 	if
 		winner == RESULT_TYPE_DRAW or
 		winner == WINNER_FIRST_OPPONENT or (
-			Logic.readBool(args.finished) and
+			Logic.readBool(match.finished) and
 			#opponents == MAX_NUM_OPPONENTS and
 			opponents[1].status == STATUS_HAS_SCORE and
 			opponents[2].status == STATUS_HAS_SCORE and
 			opponents[1].score == opponents[2].score
 		)
 	then
-		args.winner = tonumber(WINNER_FIRST_OPPONENT)
-		args.resulttype = RESULT_TYPE_DRAW
+		match.winner = tonumber(WINNER_FIRST_OPPONENT)
+		match.resulttype = RESULT_TYPE_DRAW
 	elseif
-		Logic.readBool(args.finished) and
+		Logic.readBool(match.finished) and
 		#opponents == MAX_NUM_OPPONENTS and
 		opponents[1].status ~= STATUS_HAS_SCORE and
 		opponents[1].status == opponents[2].status
 	then
-		args.winner = tonumber(WINNER_FIRST_OPPONENT)
+		match.winner = tonumber(WINNER_FIRST_OPPONENT)
 	end
 
-	return args
+	return match
 end
 
-function matchFunctions.getOpponents(args)
+function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents
 	local isScoreSet
-	opponents, isScoreSet, args = matchFunctions.readOpponents(args)
+	opponents, isScoreSet, match = matchFunctions.readOpponents(match)
 
 	--set resulttype to 'default' if walkover is set
-	if args.walkover then
-		args.resulttype = RESULT_TYPE_WALKOVER
+	if match.walkover then
+		match.resulttype = RESULT_TYPE_WALKOVER
 	end
 
-	local autoFinished = Logic.readBool(Logic.emptyOr(args.autofinished, true))
+	local autoFinished = Logic.readBool(Logic.emptyOr(match.autofinished, true))
 	-- see if match should actually be finished if score is set
-	if isScoreSet and autoFinished and not Logic.readBool(args.finished) then
+	if isScoreSet and autoFinished and not Logic.readBool(match.finished) then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
-		local threshold = args.dateexact and 30800 or 86400
+		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
+		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then
-			args.finished = true
+			match.finished = true
 		end
 	end
 
 	-- apply placements and winner if finshed
-	local winner = tostring(args.winner or '')
-	if Logic.readBool(args.finished) then
-		args = matchFunctions.applyMatchPlacement(opponents, args)
+	local winner = tostring(match.winner or '')
+	if Logic.readBool(match.finished) then
+		match = matchFunctions.applyMatchPlacement(opponents, match)
 	-- only apply arg changes otherwise
 	else
 		for opponentIndex, opponent in pairs(opponents) do
-			args['opponent' .. opponentIndex] = opponent
+			match['opponent' .. opponentIndex] = opponent
 		end
 	end
 
 	-- set the match winner
-	args = matchFunctions.setMatchWinner(winner, opponents, args)
-	return args
+	match = matchFunctions.setMatchWinner(winner, opponents, match)
+	return match
 end
 
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
