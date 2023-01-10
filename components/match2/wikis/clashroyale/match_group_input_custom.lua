@@ -28,13 +28,10 @@ local DEFAULT_WIN_RESULTTYPE = 'default'
 local NO_SCORE = -1
 local SCORE_STATUS = 'S'
 local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_STATUS}
-local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
-local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t'))
-
 
 local CustomMatchGroupInput = {}
 
@@ -505,24 +502,6 @@ function CustomMatchGroupInput._readCards(input)
 	end
 
 	return cards
-end
-
--- function to sort out winner/placements
-function CustomMatchGroupInput._placementSortFunction(tbl, key1, key2)
-	local opponent1 = tbl[key1]
-	local opponent2 = tbl[key2]
-	local opponent1Norm = opponent1.status == SCORE_STATUS
-	local opponent2Norm = opponent2.status == SCORE_STATUS
-	if opponent1Norm and opponent2Norm then
-		return tonumber(opponent1.score) > tonumber(opponent2.score)
-	elseif opponent1Norm then return true
-	elseif opponent2Norm then return false
-	elseif opponent1.status == 'W' then return true
-	elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent1.status) then return false
-	elseif opponent2.status == 'W' then return false
-	elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent2.status) then return true
-	else return true
-	end
 end
 
 function CustomMatchGroupInput.getIcon(template)
