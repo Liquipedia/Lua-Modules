@@ -28,13 +28,10 @@ local ALLOWED_STATUSES = { STATUS_DEFAULT_WIN, 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
-local MAX_NUM_VODGAMES = 20
 local RESULT_TYPE_DRAW = 'draw'
 local BYE_OPPONENT_NAME = 'bye'
 local RESULT_TYPE_WALKOVER = 'default'
 local WINNER_FIRST_OPPONENT = '0'
-
-local globalVars = PageVariableNamespace()
 
 -- containers for process helper functions
 local matchFunctions = {}
