@@ -22,17 +22,14 @@ local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
-local MAX_NUM_MAPS = 30
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS_PER_MAP = 2
 local DEFAULT_BEST_OF = 99
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TODAY = os.date('%Y-%m-%d')
 local TBD = 'tbd'
-local TBD_PLAYERS = {TBD, 'tba'}
 
 local CustomMatchGroupInput = {}
 
