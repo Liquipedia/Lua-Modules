@@ -28,7 +28,7 @@ local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local TODAY = os.date('%Y-%m-%d')
+local NOW = os.time(os.date('!*t'))
 
 local CustomMatchGroupInput = {}
 
