@@ -69,7 +69,7 @@ function CustomMatchGroupInput._checkFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	if match.finished ~= true and match.timestamp > DateExt.epochZero then
+	if not match.finished and match.timestamp > DateExt.epochZero then
 		local currentUnixTime = os.time(os.date('!*t'))
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < currentUnixTime then
