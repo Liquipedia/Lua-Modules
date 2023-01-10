@@ -500,7 +500,6 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 			map.scores = {-1, -1}
 			map.resulttype = 'default'
 		elseif map.winner == 'skip' then
-			map.scores = {0, 0}
 			map.scores = {-1, -1}
 			map.resulttype = 'np'
 		elseif winnerInput == 1 then
