@@ -327,7 +327,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 		:css('padding', '2px 8px')
 		:css('text-align', 'right')
 		:css('width', '40%')
-		:node(OpponentDisplay.PlayerBlockOpponent{
+		:node(OpponentDisplay.BlockPlayers{
 			opponent = {players = players[1]},
 			overflow = 'ellipsis',
 			showLink = true,
@@ -359,7 +359,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 		:css('padding', '2px 8px')
 		:css('text-align', 'left')
 		:css('width', '40%')
-		:node(OpponentDisplay.PlayerBlockOpponent{
+		:node(OpponentDisplay.BlockPlayers{
 			opponent = {players = players[2]},
 			overflow = 'ellipsis',
 			showLink = true,
