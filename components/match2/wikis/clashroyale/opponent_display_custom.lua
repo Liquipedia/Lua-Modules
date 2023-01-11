@@ -42,15 +42,6 @@ function CustomOpponentDisplay.BracketOpponentEntry:createDuo(opponent)
 	self.content:node(playerNode)
 end
 
-function CustomOpponentDisplay.BracketOpponentEntry:createPlayer(player)
-	local playerNode = PlayerDisplay.BlockPlayer({
-		player = player,
-		overflow = 'ellipsis',
-		showLink = false,
-	})
-	self.content:node(playerNode)
-end
-
 function CustomOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, CustomOpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
 	local opponent = props.opponent
