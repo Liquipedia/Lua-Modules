@@ -53,12 +53,12 @@ function CustomPlayer.run(frame)
 end
 
 function CustomInjector:_parseActive(manualInput, autoFunction, autoFunctionParam)
-	if String.isEmpty(yearsActive) then
-		return getYearsActive(getYearsActiveArg)
-	elseif yearsActive:lower() == 'hide' then
+	if String.isEmpty(manualInput) then
+		return autoFunction(autoFunctionParam)
+	elseif manualInput:lower() == 'hide' then
 		return nil
 	else
-		return yearsActive
+		return manualInput
 	end
 end
 
