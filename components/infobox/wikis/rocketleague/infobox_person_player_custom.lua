@@ -52,7 +52,7 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
-function CustomInjector:_parseActive(yearsActive, getYearsActive, getYearsActiveArg)
+function CustomInjector:_parseActive(manualInput, autoFunction, autoFunctionParam)
 	if String.isEmpty(yearsActive) then
 		return getYearsActive(getYearsActiveArg)
 	elseif yearsActive:lower() == 'hide' then
