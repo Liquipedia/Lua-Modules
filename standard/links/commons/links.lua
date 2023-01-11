@@ -277,6 +277,7 @@ function Links.transform(links)
 		stratz = links.stratz,
 		stream = links.stream,
 		stream2 = links.stream2,
+		telegram = links.telegram,
 		tiktok = links.tiktok,
 		tlpd = links.tlpd,
 		tlpdint = links.tlpdint,
