@@ -61,6 +61,7 @@ function OpponentDisplay.BracketOpponentEntry:createPlayer(player)
 	local playerNode = PlayerDisplay.BlockPlayer({
 		player = player,
 		overflow = 'ellipsis',
+		showLink = false,
 	})
 	self.content:node(playerNode)
 end
