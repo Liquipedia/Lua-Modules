@@ -120,7 +120,7 @@ function CustomMatchGroupInput._adjustData(match)
 
 	CustomMatchGroupInput._setPlacements(match)
 
-	if match.hasTeamOpponent then
+	if CustomMatchGroupInput._hasTeamOpponent(match) then
 		error('Team matches not yet supported')
 	end
 
@@ -262,10 +262,6 @@ function CustomMatchGroupInput._opponentInput(match)
 			opponent = CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 		else
 			error('Unsupported Opponent Type')
-		end
-
-		if opponent.type == Opponent.team then
-			match.hasTeamOpponent = true
 		end
 
 		--set initial opponent sumscore
@@ -511,6 +507,10 @@ function CustomMatchGroupInput.getIcon(template)
 		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
 		return icon, iconDark
 	end
+end
+
+function CustomMatchGroupInput._hasTeamOpponent(match)
+	return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
 end
 
 
