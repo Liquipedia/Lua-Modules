@@ -119,6 +119,11 @@ function CustomResultsTable:processLegacyVsData(placement)
 	return placement
 end
 
+-- all kill rows are manual inputs of all kill chievements
+-- all kill is a special format in team matches where a player plays as long as he does not get defeated ("killed")
+-- or until he has defeated all players of the opponent (possibly with revive of opponent players)
+-- an all kill achievement is if a player single handedly defeats a team in an all-kill format
+-- the input here is basically to display a very brief information about the match where the all kill was achieved
 function CustomResultsTable.allKillRow(frame)
 	local args = Arguments.getArgs(frame)
 
