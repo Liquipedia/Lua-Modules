@@ -32,7 +32,7 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'parent' then
-		table.insert(widgets, Cell{name = 'Industry', content = {_args.industry}})
+		table.insert(widgets, Cell{name = 'Focus', content = {_args.focus}})
 	elseif id == 'employees' then
 		table.insert(widgets, Cell{name = 'Key People', content = {_args.people}})
 	end
