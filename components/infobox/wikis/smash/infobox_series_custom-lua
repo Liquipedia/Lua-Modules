@@ -1,0 +1,156 @@
+---
+-- @Liquipedia
+-- wiki=smash
+-- page=Module:Infobox/Series/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Series = require('Module:Infobox/Series')
+local Tier = require('Module:Tier')
+local Json = require('Module:Json')
+local VarDefine = require('Module:Variables').varDefine
+local Namespace = require('Module:Namespace')
+local Injector = require('Module:Infobox/Widget/Injector')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Builder = require('Module:Infobox/Widget/Builder')
+local Class = require('Module:Class')
+local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
+
+
+local CustomInjector = Class.new(Injector)
+
+local CustomSeries = {}
+
+local _series
+
+function CustomSeries.run(frame)
+	local series = Series(frame)
+	series.createWidgetInjector = CustomSeries.createWidgetInjector
+	_series = series
+	return series:createInfobox(frame)
+end
+
+function CustomSeries:createWidgetInjector()
+	return CustomInjector()
+end
+
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell({
+		name = 'Type',
+		content = { mw.language.getContentLanguage():ucfirst(_series.args.type or '') }
+	}))
+	table.insert(widgets, Cell({
+		name = 'Format',
+		content = {_series.args.format}
+	}))
+	CustomSeries._addCustomVariables(_series.args)
+	return widgets
+end
+
+function CustomInjector:parse(id, widgets)
+	if id == 'liquipediatier' then
+		return {
+			Cell{
+				name = 'Liquipedia tier',
+				content = {
+					CustomSeries._createTier(
+						_series.args.liquipediatier, (_series.args.liquipediatiertype or _series.args.tiertype))
+				}
+
+			}
+		}
+	end
+
+	return widgets
+end
+
+
+function CustomSeries._addCustomVariables(args)
+	if
+		(not Namespace.isMain()) or
+		args.disable_smw == 'true' or
+		args.disable_lpdb == 'true' or
+		args.disable_storage == 'true'
+	then
+		VarDefine('disable_SMW_storage', 'true')
+	else
+		--needed for e.g. External Cups Lists
+		local name = args.name or mw.title.getCurrentTitle().text
+		VarDefine('featured', args.featured or '')
+		VarDefine('headtohead', args.headtohead or '')
+		VarDefine('tournament_tier', args.liquipediatier or '')
+		VarDefine('tournament_tiertype', args.liquipediatiertype or args.tiertype or '')
+		VarDefine('tournament_mode', args.mode or '1v1')
+		VarDefine('tournament_ticker_name', args.tickername or name)
+		VarDefine('tournament_shortname', args.shortname or '')
+		VarDefine('tournament_name', name)
+		VarDefine('tournament_abbreviation', args.abbreviation or args.shortname or '')
+		VarDefine('tournament_game', args.game or '')
+		VarDefine('tournament_type', args.type or '')
+		CustomSeries._setDateMatchVar(args.date, args.edate, args.sdate)
+	end
+end
+
+--- Allows for overriding this functionality
+function Series:addToLpdb(lpdbData)
+	lpdbData.game = _series.args.game or 'none'
+	lpdbData.icon = _series.args.icon
+	lpdbData.icondark = _series.args.icondark
+	lpdbData.launcheddate = _series.args.sdate
+	lpdbData.defunctdate = _series.args.edate
+	lpdbData.extradata = {
+		leagueiconsmall = _series.args.leagueiconsmall
+	}
+	
+	Variables.varDefine('tournament_icon', lpdbData.icon)
+	Variables.varDefine('tournament_icon_dark', lpdbData.icondark)
+	return lpdbData
+end
+
+function CustomSeries._setDateMatchVar(date, edate, sdate)
+	date = string.match(date or '', '%d%d%d%d%-%d%d%-%d%d')
+		or string.match(edate or '', '%d%d%d%d%-%d%d%-%d%d')
+		or string.match(sdate or '', '%d%d%d%d%-%d%d%-%d%d') or ''
+	sdate = string.match(date or '', '%d%d%d%d%-%d%d%-%d%d')
+		or string.match(sdate or '', '%d%d%d%d%-%d%d%-%d%d')
+		or string.match(edate or '', '%d%d%d%d%-%d%d%-%d%d') or ''
+
+	VarDefine('date', date)
+	VarDefine('tournament_enddate', date)
+	VarDefine('tournament_startdate', sdate)
+end
+
+--function for custom tier handling
+function CustomSeries._createTier(tier, tierType)
+	if String.isEmpty(tier) then
+		return nil
+	end
+
+	local tierText = Tier['text'][tier]
+	local hasInvalidTier = tierText == nil
+	tierText = tierText or tier
+
+	local hasTierType = tierType ~= nil and tierType ~= ''
+	local hasInvalidTierType = false
+
+	local output = '[[' .. tierText .. ' Tournaments|'
+
+	if hasTierType then
+		tierType = Tier['types'][string.lower(tierType or '')] or tierType
+		hasInvalidTierType = Tier['types'][string.lower(tierType or '')] == nil
+
+		output = output .. tierType .. '&nbsp;(' .. tierText .. ')'
+	else
+		output = output .. tierText
+	end
+
+	output = output .. ']]' ..
+		(hasInvalidTier and '[[Category:Pages with invalid Tier]]' or '') ..
+		(hasInvalidTierType and '[[Category:Pages with invalid Tiertype]]' or '')
+
+	return output
+end
+
+return CustomSeries
