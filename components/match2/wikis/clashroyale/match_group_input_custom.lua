@@ -451,28 +451,23 @@ end
 
 function CustomMatchGroupInput._processPlayerMapData(map, match)
 	local participants = {}
-	local submatchOpponentPlayerNumbers = {}
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local opponent = match['opponent' .. opponentIndex]
-
-		if opponent.type == Opponent.team then
-			error('Team matches not yet supported')
-		elseif opponent.type == Opponent.literal then
-			table.insert(submatchOpponentPlayerNumbers, opponent.type)
-		else
-			table.insert(submatchOpponentPlayerNumbers, #opponent.match2players)
-
+		if Opponent.typeIsParty(opponent.type) then
 			CustomMatchGroupInput._processDefaultPlayerMapData(
 				opponent.match2players or {},
 				opponentIndex,
 				map,
 				participants
 			)
+		elseif opponent.type == Opponent.team then
+			error('Team matches not yet supported')
 		end
 	end
 
-	map.mode = table.concat(submatchOpponentPlayerNumbers, 'v')
+	map.mode = Opponent.toMode(match.opponent1.type, match.opponent2.type)
+
 	map.participants = participants
 
 	return map
