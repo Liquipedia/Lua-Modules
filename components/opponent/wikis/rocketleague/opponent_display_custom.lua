@@ -53,6 +53,15 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	end
 end
 
+function CustomOpponentDisplay.BracketOpponentEntry:createPlayer(player)
+	local playerNode = PlayerDisplay.BlockPlayer({
+		player = player,
+		overflow = 'ellipsis',
+		showLink = true,
+	})
+	self.content:node(playerNode)
+end
+
 --[[
 Displays the second score or status of the opponent, as a string.
 ]]
