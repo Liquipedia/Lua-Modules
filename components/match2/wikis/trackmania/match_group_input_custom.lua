@@ -423,10 +423,8 @@ end
 function mapFunctions.mapWinnerSortFunction(op1, op2)
 	local op1norm = op1.status == STATUS_HAS_SCORE
 	local op2norm = op2.status == STATUS_HAS_SCORE
-	if op1norm then
-		if op2norm then
-			return tonumber(op1.score) > tonumber(op2.score)
-		else return true end
+	if op1norm and op2norm then
+		return tonumber(op1.score) > tonumber(op2.score)
 	else return CustomMatchGroupInput._sortOpponents(op1, op2, op1norm, op2norm) end
 end
 
