@@ -176,12 +176,6 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 				slot.link = '[[' .. slot.link .. ']]'
 			end
 			LegacyPrizePool.handleSeed(newData, slot.link, opponentsInSlot)
-		elseif input == 'q' and slot.link2 then
-			-- Use qualifier display
-			if not slot.link2:find('^%[%[') then
-				slot.link2 = '[[' .. slot.link2 .. ']]'
-			end
-			LegacyPrizePool.handleSeed(newData, slot.link2, opponentsInSlot)
 		elseif newParameter == 'seed' then
 			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
 		elseif input and tonumber(input) ~= 0 then
