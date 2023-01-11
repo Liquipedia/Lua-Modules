@@ -56,7 +56,6 @@ function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
-	map = mapFunctions.getParticipantsData(map)
 
 	return map
 end
@@ -434,22 +433,6 @@ end
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '2v2'))
 	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
-function mapFunctions.getParticipantsData(map)
-	local participants = map.participants or {}
-
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		for player = 1, MAX_NUM_PLAYERS do
-			local participant = participants[opponentIndex .. '_' .. player] or {}
-			if not Table.isEmpty(participant) then
-				participants[opponentIndex .. '_' .. player] = participant
-			end
-		end
-	end
-
-	map.participants = participants
-	return map
 end
 
 --
