@@ -222,7 +222,7 @@ function CustomResultsTable._allKillMapRow(args, prefix, match)
 		map = 'Walkover'
 	else
 		map = args[prefix .. 'map']
-		map = map and ('[[' .. map .. ']]') or 'TBA'
+		map = map and ('[[' .. map .. ']]') or 'Unknown'
 	end
 
 	match:row(
