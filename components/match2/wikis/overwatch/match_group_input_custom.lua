@@ -26,6 +26,7 @@ local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local TODAY = os.date('%Y-%m-%d', os.time())
 
 -- containers for process helper functions
 local matchFunctions = {}
