@@ -338,18 +338,18 @@ function CustomMatchGroupInput._getPlayersFromVariables(teamName)
 	local players = {}
 
 	local playerIndex = 1
-	local prefix = teamName .. '_p' .. playerIndex
-	local playerName = Variables.varDefault(prefix)
-	while String.isNotEmpty(playerName) do
+	while true do
+		local prefix = teamName .. '_p' .. playerIndex
+		local playerName = Variables.varDefault(prefix)
+		if String.isEmpty(playerName) then
+			break
+		end
 		table.insert(players, {
 			name = playerName,
-			displayname = Variables.varDefault(prefix .. 'dn'),
+			displayname = Variables.varDefault(prefix .. 'dn', playerName:gsub('_', ' ')),
 			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
 		})
-
 		playerIndex = playerIndex + 1
-		prefix = teamName .. '_p' .. playerIndex
-		playerName = Variables.varDefault(prefix)
 	end
 
 	return players
