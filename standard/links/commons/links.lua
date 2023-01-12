@@ -17,11 +17,14 @@ local _PREFIXES = {
 	['5ewin'] = {
 		'https://arena.5eplay.com/tournament/',
 		player = 'https://arena.5eplay.com/data/player/',
-		team = 'https://arena.5eplay.com/team/'
+		team = 'https://arena.5eplay.com/team/',
 	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
 	apexlegendsstatus = {'https://apexlegendsstatus.com/profile/uid/PC/'},
-	afreeca = {'http://afreecatv.com/'},
+	afreeca = {
+		'http://afreecatv.com/',
+		stream = 'https://play.afreecatv.com/',
+	},
 	aoezone = {'https://aoezone.net/'},
 	['ask-fm'] = {'https://ask.fm/'},
 	b5csgo = {
@@ -30,10 +33,14 @@ local _PREFIXES = {
 		team = 'https://www.b5csgo.com/clan/'
 	},
 	battlefy = {'https://www.battlefy.com/'},
-	bilibili = {'https://space.bilibili.com/'},
+	bilibili = {
+		'https://space.bilibili.com/',
+		stream = 'https://live.bilibili.com/',
+	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
+	cc = {'https://cc.163.com/'},
 	challengermode = {'https://www.challengermode.com/tournaments/'},
 	challonge = {
 		'',
@@ -102,6 +109,8 @@ local _PREFIXES = {
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
+	nimotv = {'https://www.nimo.tv/'},
+	openrec = {'https://www.openrec.tv/live/'},
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
 	reddit = {'https://www.reddit.com/user/'},
@@ -122,6 +131,7 @@ local _PREFIXES = {
 	sostronk = {'https://www.sostronk.com/tournament/'},
 	['start-gg'] = {'https://start.gg/'},
 	steam = {'https://steamcommunity.com/id/'},
+	steamtv = {'https://steam.tv/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
@@ -167,16 +177,27 @@ local _PREFIXES = {
 	},
 	website = {''},
 	weibo = {'https://weibo.com/'},
+	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
 	zhangyutv = {'http://www.zhangyu.tv/'},
+	zhanqitv = {'https://www.zhanqi.tv/'},
 }
 
 _PREFIXES = Table.merge(_PREFIXES, CustomData.prefixes or {})
 
 local _SUFFIXES = {
-	iccup = '.html',
-	['faceit-c'] = '/',
-	['faceit-hub'] = '/',
+	facebook = {
+		'',
+		stream = '/live',
+	},
+	iccup = {'.html'},
+	['faceit-c'] = {'/'},
+	['faceit-hub'] = {'/'},
+	vk = {
+		'',
+		stream = '/live',
+	}
+	
 }
 
 _SUFFIXES = Table.merge(_SUFFIXES, CustomData.suffixes or {})
@@ -209,6 +230,7 @@ function Links.transform(links)
 		bracket5 = links.bracket5,
 		bracket6 = links.bracket6,
 		bracket7 = links.bracket7,
+		cc = links.cc,
 		challengermode = links.challengermode,
 		challengermode2 = links.challengermode2,
 		challonge = links.challonge,
@@ -257,6 +279,8 @@ function Links.transform(links)
 		matcherino = links.matcherino,
 		matcherinolink = links.matcherinolink,
 		mildom = links.mildom,
+		nimotv = links.nimotv,
+		openrec = links.openrec,
 		patreon = links.patreon,
 		playlist = links.playlist,
 		privsteam = links.privsteam,
@@ -274,6 +298,7 @@ function Links.transform(links)
 		steam = links.steam,
 		steam2 = links.steam2,
 		steamalternative = links.steamalternative,
+		steamtv = links.steamtv,
 		stratz = links.stratz,
 		stream = links.stream,
 		stream2 = links.stream2,
@@ -303,12 +328,14 @@ function Links.transform(links)
 		vlr = links.vlr,
 		weibo = links.weibo,
 		weibo2 = links.weibo2,
+		yandexefir = links.yandexefir or links.yandex,
 		youtube = links.youtube,
 		youtube2 = links.youtube2,
 		youtube3 = links.youtube3,
 		youtube4 = links.youtube4,
 		youtube5 = links.youtube5,
 		zhangyutv = links.zhangyutv,
+		zhanqitv = links.zhanqitv or links.zhanqi,
 	}
 end
 
@@ -325,7 +352,10 @@ function Links.makeFullLink(platform, id, variant)
 
 	local prefix = prefixData[variant] or prefixData[1]
 
-	return prefix .. id .. (_SUFFIXES[platform] or '')
+	local suffixData = _SUFFIXES[platform] or {}
+	local suffix = suffixData[variant] or suffixData[1] or ''
+
+	return prefix .. id .. suffix
 end
 
 function Links.makeFullLinksForTableItems(links, variant)
