@@ -232,15 +232,15 @@ function CustomResultsTable._allKillMapRow(args, prefix, match)
 
 	match:row(
 		DivTable.Row():addClass('should-collapse inherit-bg')
-			:cell(opponentLeft:node(CustomResultsTable._opponentDispaly(args, prefix, 1)):css('width', '33%'):done())
+			:cell(opponentLeft:node(CustomResultsTable._opponentDisplay(args, prefix, 1)):css('width', '33%'):done())
 			:cell(mapCell:wikitext(map):css('width', '34%'):done())
-			:cell(opponentRight:node(CustomResultsTable._opponentDispaly(args, prefix, 2)):css('width', '33%'):done())
+			:cell(opponentRight:node(CustomResultsTable._opponentDisplay(args, prefix, 2)):css('width', '33%'):done())
 	)
 
 	return true
 end
 
-function CustomResultsTable._opponentDispaly(args, prefix, side)
+function CustomResultsTable._opponentDisplay(args, prefix, side)
 	local players = {CustomResultsTable._buildPlayerStruct(args, prefix .. 'p' .. side)}
 
 	local mapIndex = prefix:gsub('^m', '')
