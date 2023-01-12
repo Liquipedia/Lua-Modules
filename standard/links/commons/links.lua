@@ -196,8 +196,7 @@ local _SUFFIXES = {
 	vk = {
 		'',
 		stream = '/live',
-	}
-	
+	},
 }
 
 _SUFFIXES = Table.merge(_SUFFIXES, CustomData.suffixes or {})
