@@ -27,8 +27,6 @@ function CustomSeries.run(frame)
 	_series.createWidgetInjector = CustomSeries.createWidgetInjector
 	_series.addToLpdb = CustomSeries.addToLpdb
 
-	_series.args.game = _series.args.game or 'none'
-
 	return _series:createInfobox(frame)
 end
 
@@ -49,6 +47,9 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomSeries:addToLpdb(lpdbData)
+	lpdbData.game = _series.args.game or 'none'
+	lpdbData.launcheddate = _series.args.sdate
+	lpdbData.defunctdate = _series.args.edate
 	lpdbData.extradata = {
 		leagueiconsmall = _series.args.leagueiconsmall
 	}
