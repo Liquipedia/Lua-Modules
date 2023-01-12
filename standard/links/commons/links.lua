@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local CustomData = Lua.loadDataIfExists('Module:Links/CustomData') or {}
@@ -237,7 +236,7 @@ function Links.transform(links)
 			local value = getValue(keys)
 			if index == 1 and not value then
 				value = getValue(aliases)
-			end 
+			end
 			index = index + 1
 			if value then
 				return (index - 1), value
