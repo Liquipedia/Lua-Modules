@@ -56,7 +56,7 @@ function CustomInjector:_parseActive(manualInput, autoFunction, autoFunctionPara
 	if String.isEmpty(manualInput) then
 		return autoFunction(autoFunctionParam)
 	elseif manualInput:lower() == 'hide' then
-		return nil
+		return
 	else
 		return manualInput
 	end
