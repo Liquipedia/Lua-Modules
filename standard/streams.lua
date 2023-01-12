@@ -51,10 +51,10 @@ function Streams.create(args)
 	end
 
 	local tbl = mw.html.create('table')
-  		:addClass('wikitable')
-  		:css('text-align', 'center')
-  		:css('margin', '0')
-  		:css('margin-bottom', (args['margin-bottom'] or '1em'))
+		:addClass('wikitable')
+		:css('text-align', 'center')
+		:css('margin', '0')
+		:css('margin-bottom', (args['margin-bottom'] or '1em'))
 
 	if String.isNotEmpty(args.title) then
 		tbl:node(mw.html.create('tr')
