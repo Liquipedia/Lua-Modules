@@ -227,12 +227,12 @@ function Links.transform(links)
 				end
 			end
 		end
-		local function suffixAlises(alias)
+		local function suffixAliases(alias)
 			return alias .. index
 		end
 
 		return function()
-			local keys = Array.map(aliases, suffixAlises)
+			local keys = Array.map(aliases, suffixAliases)
 			local value = getValue(keys)
 			if index == 1 and not value then
 				value = getValue(aliases)
