@@ -83,7 +83,8 @@ function Streams.create(args)
 
 			local streamIndex = 1
 			while(String.isNotEmpty(args[streamIndex .. platform .. languageIndex])) do
-				local streamDisplay = '[' .. streamData.prefix .. args[streamIndex .. platform .. languageIndex] .. (streamData.suffix or '')
+				local streamDisplay = '[' .. streamData.prefix .. args[streamIndex .. platform .. languageIndex]
+					.. (streamData.suffix or '')
 					.. ' <i class="lp-icon lp-' .. (streamData.icon or platform) .. '" style="margin-bottom:3.0px;"></i>]'
 
 				table.insert(langStreams, streamDisplay)
@@ -100,7 +101,7 @@ function Streams.create(args)
 	tbl
 		:node(languageRow)
 		:node(streamsRow)
-	
+
 	return mw.html.create('div')
 		:addClass('table-responsive')
 		:node(tbl)
