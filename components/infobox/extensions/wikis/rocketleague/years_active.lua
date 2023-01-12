@@ -85,7 +85,7 @@ end
 function CustomActiveYears._getYearsBroadcast(conditions)
 	local years = Set{}
 	local checkYear = function(broadcast)
-		-- set the year in which the placement happened as true (i.e. active)
+		-- set the year in which the broadcast happened as true (i.e. active)
 		local year = tonumber(string.sub(broadcast.date, 1, 4))
 		years:add(year)
 	end
