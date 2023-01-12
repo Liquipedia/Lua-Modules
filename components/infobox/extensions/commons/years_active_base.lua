@@ -30,6 +30,7 @@ local _CURRENT_YEAR = tonumber(os.date('%Y'))
 ActiveYears.startYear = Info.startYear
 ActiveYears.defaultNumberOfStoredPlayersPerPlacement = 10
 ActiveYears.additionalConditions = ''
+ActiveYears.noResultsText = 'Player has no results.'
 
 ---
 -- Entry point
@@ -105,7 +106,7 @@ function ActiveYears._calculate(conditions)
 	-- Get years
 	local years = ActiveYears._getYears(conditions)
 	if Table.isEmpty(years) then
-		return 'Player has no results.'
+		return ActiveYears.noResultsText
 	end
 
 	return ActiveYears._displayYears(years)

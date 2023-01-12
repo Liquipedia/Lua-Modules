@@ -43,7 +43,7 @@ function CustomActiveYears.get(input)
 	-- if passed from modules it might be a table that holds the args table
 	local args = input.args or input
 	local display = CustomActiveYears.display(args)
-	return display ~= 'Player has no results.' and display or nil
+	return display ~= CustomActiveYears.noResultsText and display or nil
 end
 
 function CustomActiveYears.getTalent(talent)
