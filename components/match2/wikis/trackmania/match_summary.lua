@@ -25,8 +25,7 @@ local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
-local HEADTOHEAD_PREFIX = '[[File:Match Info Stats.png|14x14px|link='
-local HEADTOHEAD_SUFFIX = '|Head to Head history]]'
+local HEADTOHEAD = '[[File:Match Info Stats.png|14x14px|link=%s|Head to Head history]]'
 
 -- Custom Caster Class
 local Casters = Class.new(
@@ -161,7 +160,7 @@ function CustomMatchSummary._getHeadToHead(match)
 	}
 
 	local link = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
-	return HEADTOHEAD_PREFIX .. link .. HEADTOHEAD_SUFFIX
+	return HEADTOHEAD:format(link)
 end
 
 function CustomMatchSummary.getByMatchId(args)
