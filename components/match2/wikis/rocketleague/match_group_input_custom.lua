@@ -203,10 +203,17 @@ end
 function matchFunctions.getLinks(match)
 	match.links = {}
 
-	-- Octane
-	match.octane1 = match.octane1 or match.octane
-	for key, octane in Table.iter.pairsByPrefix(match, 'octane') do
-		match.links[key] = 'https://octane.gg/matches/' .. octane
+	-- Shift (formerly Octane)
+	local index = 1
+	match.shift1 = match.shift1 or match.shift or match.octane1 or match.octane
+	while true do
+		local key = 'shift' .. index
+		local slug = match[key] or match['octane' .. index]
+		if not slug then
+			break
+		end
+		match.links[key] = 'https://www.shiftrle.gg/matches/' .. slug
+		index = index + 1
 	end
 
 	-- Ballchasing
