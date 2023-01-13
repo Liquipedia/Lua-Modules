@@ -19,14 +19,13 @@ jobs:
         run: |
           luarocks install luacheck
 
-      - name: test
-        run: |
-          lua ./test/main_test.lua
-
-      - name: test
+      - name: lint
         run: |
           luacheck ./ |
           luacheck ./ --formatter=JUnit > report.xml
+
+      - name: test
+        run: |
           lua ./test/main_test.lua
 
       - name: junit
