@@ -1,12 +1,13 @@
-package.path = "?.lua;" ..
+-- luacheck: ignore
+package.path = '?.lua;' ..
     -- Load plugin for module name parsing
-    "../plugins/?.lua;" ..
-    "plugins/?.lua;" ..
+    '../plugins/?.lua;' ..
+    'plugins/?.lua;' ..
     -- Load test files
-    "test/standard/?.lua;" ..
+    'test/standard/?.lua;' ..
     -- Load main files
-    "../standard/?.lua;" ..
-    "standard/?.lua;" ..
+    '../standard/?.lua;' ..
+    'standard/?.lua;' ..
     package.path
 
 require('sumneko_plugin')
