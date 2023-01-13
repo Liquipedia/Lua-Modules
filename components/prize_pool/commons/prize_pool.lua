@@ -561,9 +561,9 @@ function PrizePool:_buildRows()
 			local opponentCss = {['justify-content'] = 'start'}
 
 			row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
-
-			table.insert(rows, row)
 		end
+
+		table.insert(rows, row)
 
 		if placement.placeStart <= self.options.cutafter
 			and placement.placeEnd >= self.options.cutafter
