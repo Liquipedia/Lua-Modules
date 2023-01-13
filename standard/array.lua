@@ -56,14 +56,11 @@ function Array.sub(tbl, startIndex, endIndex)
 	return subArray
 end
 
---[[
-Applies a function to each element in an array and places the results in a
-new array.
-
-Example:
-Array.map({1, 2, 3}, function(x) return 2 * x end)
--- returns {2, 4, 6}
-]]
+---@comment Applies a function to each element in an array and places the results in a new array.
+---@generic V, T
+---@param elements V[]
+---@param funct fun(value: V, argument?: integer): T
+---@return T[]
 function Array.map(elements, funct)
 	local mappedArray = {}
 	for index, element in ipairs(elements) do
