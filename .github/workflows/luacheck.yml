@@ -23,7 +23,7 @@ jobs:
         run: |
           luacheck ./ |
           luacheck ./ --formatter=JUnit > report.xml
-          lua test/main_test.lua
+          lua ./test/main_test.lua
 
       - name: junit
         uses: mikepenz/action-junit-report@v3
