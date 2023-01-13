@@ -1,2 +1,2 @@
-require('standard/namespace_test')
-require('standard/math_util_test')
+require('namespace_test')
+require('math_util_test')

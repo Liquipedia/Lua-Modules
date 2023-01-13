@@ -1,10 +1,12 @@
 package.path = "?.lua;" ..
     -- Load plugin for module name parsing
     "../plugins/?.lua;" ..
+    "plugins/?.lua;" ..
     -- Load test files
-    "standard/?.lua;" ..
+    "test/standard/?.lua;" ..
     -- Load main files
     "../standard/?.lua;" ..
+    "standard/?.lua;" ..
     package.path
 
 require('sumneko_plugin')
@@ -31,4 +33,4 @@ function CreateMockArguments()
     return {}
 end
 
-require('standard/standard_test')
+require('standard_test')
