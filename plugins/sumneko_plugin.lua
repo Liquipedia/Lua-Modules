@@ -31,11 +31,7 @@ end
 function importFunctions._row(name)
 	local normModuleName = LuaifyModuleName(name)
 
-	if importFunctions.prefixModules[normModuleName] then
-		normModuleName = importFunctions.prefixModules[normModuleName] .. normModuleName
-	end
-
-	return ' ---@module \'' .. normModuleName ..'\''
+	return ' ---@module \'' .. normModuleName .. '\''
 end
 
 function importFunctions.annotate(text, funcName, diffs)
