@@ -21,6 +21,10 @@ jobs:
 
       - name: test
         run: |
+          lua ./test/main_test.lua
+
+      - name: test
+        run: |
           luacheck ./ |
           luacheck ./ --formatter=JUnit > report.xml
           lua ./test/main_test.lua
