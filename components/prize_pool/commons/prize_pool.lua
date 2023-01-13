@@ -425,7 +425,11 @@ function PrizePool:build()
 		css = {width = 'max-content'},
 	}
 
-	table:addRow(self:_buildHeader())
+	local headerRow = self:_buildHeader()
+
+	table:addRow(headerRow)
+
+	table.columns = headerRow:getCellCount()
 
 	for _, row in ipairs(self:_buildRows()) do
 		table:addRow(row)
@@ -495,37 +499,30 @@ function PrizePool:_buildRows()
 	local rows = {}
 
 	for _, placement in ipairs(self.placements) do
-		local previousRow = {}
+		local previousOpponent = {}
 
-		for opponentIndex, opponent in ipairs(placement.opponents) do
-			local row = TableRow{}
+		local row = TableRow{}
+		row:addClass(placement:getBackground())
 
-			if placement.placeStart > self.options.cutafter then
-				row:addClass('ppt-hide-on-collapse')
-			end
+		if placement.placeStart > self.options.cutafter then
+			row:addClass('ppt-hide-on-collapse')
+		end
 
-			row:addClass(placement:getBackground())
+		local placeCell = TableCell{
+			content = {{placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()}},
+			css = {['font-weight'] = 'bolder'},
+			classes = {'prizepooltable-place'},
+		}
+		placeCell.rowSpan = #placement.opponents
+		row:addCell(placeCell)
 
-			if opponentIndex == 1 then
-				local placeCell = TableCell{
-					content = {{placement:getMedal() or '' , NON_BREAKING_SPACE, placement:_displayPlace()}},
-					css = {['font-weight'] = 'bolder'},
-					classes = {'prizepooltable-place'},
-				}
-				placeCell.rowSpan = #placement.opponents
-				row:addCell(placeCell)
-			end
-
+		for _, opponent in ipairs(placement.opponents) do
 			local previousOfPrizeType = {}
 			local prizeCells = Array.map(self.prizes, function (prize)
 				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
 
-				local cell
-				if reward then
-					cell = prizeTypeData.rowDisplay(prize.data, reward)
-				end
-				cell = cell or TableCell{}
+				local cell = reward and prizeTypeData.rowDisplay(prize.data, reward) or TableCell{}
 
 				-- Update the previous column of this type in the same row
 				local lastCellOfType = previousOfPrizeType[prize.type]
@@ -538,7 +535,7 @@ function PrizePool:_buildRows()
 					Array.extendWith(lastCellOfType.content, cell.content)
 					lastCellOfType.css['flex-direction'] = 'column'
 
-					return nil
+					return
 				end
 
 				previousOfPrizeType[prize.type] = cell
@@ -546,7 +543,7 @@ function PrizePool:_buildRows()
 			end)
 
 			Array.forEach(prizeCells, function (prizeCell, columnIndex)
-				local lastInColumn = previousRow[columnIndex]
+				local lastInColumn = previousOpponent[columnIndex]
 
 				if Table.isEmpty(prizeCell.content) then
 					prizeCell = PrizePool._emptyCell()
@@ -555,7 +552,7 @@ function PrizePool:_buildRows()
 				if lastInColumn and Table.deepEquals(lastInColumn.content, prizeCell.content) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
-					previousRow[columnIndex] = prizeCell
+					previousOpponent[columnIndex] = prizeCell
 					row:addCell(prizeCell)
 				end
 			end)
@@ -568,9 +565,9 @@ function PrizePool:_buildRows()
 			local opponentCss = {['justify-content'] = 'start'}
 
 			row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
-
-			table.insert(rows, row)
 		end
+
+		table.insert(rows, row)
 
 		if placement.placeStart <= self.options.cutafter
 			and placement.placeEnd >= self.options.cutafter
