@@ -6,19 +6,25 @@
 local liquipedia = {}
 
 local importFunctions = {}
-importFunctions.functions = {'require', 'mw%.loadData', 'Lua%.import', 'Lua%.requireIfExists', 'Lua%.loadDataIfExists'}
-importFunctions.prefixModules = {table = 'standard.', math = 'standard.', string = 'standard.'}
+importFunctions.functions = { 'require', 'mw%.loadData', 'Lua%.import', 'Lua%.requireIfExists', 'Lua%.loadDataIfExists' }
+importFunctions.prefixModules = { table = 'standard.', math = 'standard.', string = 'standard.' }
 
 -- Transforms a MediaWiki module name, e.g. Module:Array, into a lua module name,
 -- e.g. array
 function LuaifyModuleName(name)
-	return name
+	local normModuleName = name
 		:gsub('Module:', '')-- Remove starting Module:
 		:gsub('^%u', string.lower)-- Lower case first letter
 		:gsub('%u', '_%0')-- Prefix uppercase letters with an underscore
 		:gsub('/', '_')-- Change slash to underscore
 		:gsub('__', '_')-- Never have two underscores in a row
 		:lower() -- Lowercase everything
+
+	if importFunctions.prefixModules[normModuleName] then
+		normModuleName = importFunctions.prefixModules[normModuleName] .. normModuleName
+	end
+
+	return normModuleName
 end
 
 function importFunctions._row(name)
