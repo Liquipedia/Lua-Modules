@@ -425,7 +425,11 @@ function PrizePool:build()
 		css = {width = 'max-content'},
 	}
 
-	table:addRow(self:_buildHeader())
+	local headerRow = self:_buildHeader()
+
+	table:addRow(headerRow)
+
+	table.columns = headerRow:getCellCount()
 
 	for _, row in ipairs(self:_buildRows()) do
 		table:addRow(row)
