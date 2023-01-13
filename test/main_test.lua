@@ -23,10 +23,6 @@ function require(module)
         return CreateMockArguments()
     end
 
-    if (newName == 'table') then
-        newName = 'table_utils'
-    end
-
     return require_original(newName)
 end
 
