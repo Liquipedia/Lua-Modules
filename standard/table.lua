@@ -306,7 +306,6 @@ function Table.mapArguments(args, indexFromKey, f)
 				entriesByIndex[index] = f(key, index, ...)
 			end
 		end
-
 		if type(key) == 'string' then
 			post(indexFromKey(key))
 		end
@@ -457,14 +456,14 @@ the array is not specified.
 function Table.entries(tbl)
 	local entries = {}
 	for key, value in pairs(tbl) do
-		table.insert(entries, { key, value })
+		table.insert(entries, {key, value})
 	end
 	return entries
 end
 
 -- Polyfill of lua 5.2 table.pack
 function Table.pack(...)
-	return { n = select('#', ...), ... }
+	return {n = select('#', ...), ...}
 end
 
 --
@@ -476,12 +475,12 @@ Table.iter = {}
 function Table.iter.spairs(tbl, order)
 	-- collect the keys
 	local keys = {}
-	for k in pairs(tbl) do keys[#keys + 1] = k end
+	for k in pairs(tbl) do keys[#keys+1] = k end
 
 	-- if order function given, sort by it by passing the table and keys a, b,
 	-- otherwise just sort the keys
 	if order then
-		table.sort(keys, function(a, b) return order(tbl, a, b) end)
+		table.sort(keys, function(a,b) return order(tbl, a, b) end)
 	else
 		table.sort(keys)
 	end
