@@ -535,7 +535,7 @@ function PrizePool:_buildRows()
 					Array.extendWith(lastCellOfType.content, cell.content)
 					lastCellOfType.css['flex-direction'] = 'column'
 
-					return
+					return nil
 				end
 
 				previousOfPrizeType[prize.type] = cell
