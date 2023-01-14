@@ -59,7 +59,7 @@ end
 ---@comment Applies a function to each element in an array and places the results in a new array.
 ---@generic V, T
 ---@param elements V[]
----@param funct fun(value: V, argument?: integer): T
+---@param funct fun(element: V,  index?: integer): T
 ---@return T[]
 function Array.map(elements, funct)
 	local mappedArray = {}
