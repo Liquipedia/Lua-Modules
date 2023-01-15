@@ -289,14 +289,19 @@ function Table.mapArgumentsByPrefix(args, prefixes, f)
 	return Table.mapArguments(args, indexFromKey, f)
 end
 
---[[
-Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
-from an arguments table, and applies a transform to each key or index.
-
-Most common use-case will be `Table.mapArgumentsByPrefix` where
-the `indexFromKey` function retrieves keys based on a prefix.
-]]
-function Table.mapArguments(args, indexFromKey, f)
+--- Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
+-- from an arguments table, and applies a transform to each key or index.
+--
+-- Most common use-case will be `Table.mapArgumentsByPrefix` where
+-- the `indexFromKey` function retrieves keys based on a prefix.
+--
+---@generic K, V, T, I
+---@param args {[K] : V}
+---@param indexFromKey fun(key?: K): integer
+---@param f fun(key?: K, index?: I, ...?: any): T
+---@param noInterleave boolean?
+---@return {[I] : T}
+function Table.mapArguments(args, indexFromKey, f, noInterleave)
 	local entriesByIndex = {}
 
 	-- Non-numeric args
@@ -311,7 +316,11 @@ function Table.mapArguments(args, indexFromKey, f)
 		end
 	end
 
-	-- Numeric index entries fills in gaps of prefixN= entries
+	if noInterleave then
+		return entriesByIndex
+	end
+
+	-- Numeric index entries fills in gaps of prefixN= entries if not disabled
 	local entryIndex = 1
 	for argIndex = 1, math.huge do
 		if not args[argIndex] then
