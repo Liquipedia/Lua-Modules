@@ -188,6 +188,9 @@ function matchFunctions.getExtraData(match)
 		and opponent1.type == Opponent.team
 		and opponent2.type == Opponent.team
 
+	local hasopponents = Logic.isNotEmpty(opponent1.name)
+		and Logic.isNotEmpty(opponent2.name)
+
 	match.extradata = {
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
@@ -196,6 +199,8 @@ function matchFunctions.getExtraData(match)
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		hasstream = Table.isNotEmpty(match.stream),
+		hasopponents = hasopponents,
 	}
 	return match
 end
