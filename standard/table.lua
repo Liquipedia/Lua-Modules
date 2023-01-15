@@ -63,6 +63,23 @@ function Table.filter(tbl, predicate, argument)
 	return filteredTbl
 end
 
+---@generic K, V, T
+---@param tbl {[K]: V}
+---@param predicate fun(key?: K, value?: V, argument?: T): boolean
+---@param argument T?
+---@return {[K]: V}
+function Table.filterByKey(tbl, predicate, argument)
+	local filteredTbl = {}
+
+	for key, entry in pairs(tbl) do
+		if predicate(key, entry, argument) then
+			filteredTbl[key] = entry
+		end
+	end
+
+	return filteredTbl
+end
+
 ---Return true if table is empty or nil
 ---@param tbl table?
 ---@return boolean
