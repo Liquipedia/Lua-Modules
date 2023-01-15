@@ -35,6 +35,7 @@ local LINK_DATA = {
 	interview = {icon = 'File:Interview32.png', text = 'Interview'},
 	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
+	royaleapi = {icon = 'File:RoyaleAPI_allmode.png', text = 'RoyaleAPI Match Page'},
 }
 LINK_DATA.review = LINK_DATA.recap
 LINK_DATA.preview2 = LINK_DATA.preview
