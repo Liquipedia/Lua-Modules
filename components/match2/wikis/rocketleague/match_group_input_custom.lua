@@ -188,8 +188,8 @@ function matchFunctions.getExtraData(match)
 		and opponent1.type == Opponent.team
 		and opponent2.type == Opponent.team
 
-	local hasopponents = Logic.isNotEmpty(opponent1.name)
-		and Logic.isNotEmpty(opponent2.name)
+	local hasopponents = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= 'literal'
+		and Logic.isNotEmpty(opponent2.name) and opponent2.type ~= 'literal'
 
 	match.extradata = {
 		team1icon = getIconName(opponent1.template or ''),
