@@ -100,7 +100,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Liquipedia tier',
 				content = {CustomLeague:_createLiquipediaTierDisplay()},
-				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
+				classes = {Logic.readBool(_args.featured) and 'sc2premier-highlighted' or ''}
 			},
 		}
 	elseif id == 'chronology' then
@@ -553,7 +553,7 @@ function CustomLeague:defineCustomPageVariables()
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
-	Variables.varDefine('featured', _args.featured or 'false')
+	Variables.varDefine('featured', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number
 	if Logic.isNumeric(seriesNumber) then
@@ -620,7 +620,6 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.publishertier = Variables.varDefault('featured')
 
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
-	lpdbData.extradata.featured = Variables.varDefault('featured')
 
 	return lpdbData
 end
