@@ -6,14 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+
 local CustomData = Lua.loadDataIfExists('Module:Links/CustomData') or {}
 
 local Links = {}
 
-local _PREFIXES = {
+local PREFIXES = {
 	['5ewin'] = {
 		'https://arena.5eplay.com/tournament/',
 		player = 'https://arena.5eplay.com/data/player/',
@@ -183,9 +185,9 @@ local _PREFIXES = {
 	zhanqitv = {'https://www.zhanqi.tv/'},
 }
 
-_PREFIXES = Table.merge(_PREFIXES, CustomData.prefixes or {})
+PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
 
-local _SUFFIXES = {
+local SUFFIXES = {
 	facebook = {
 		'',
 		stream = '/live',
@@ -199,143 +201,62 @@ local _SUFFIXES = {
 	},
 }
 
-_SUFFIXES = Table.merge(_SUFFIXES, CustomData.suffixes or {})
+SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
+
+local ALIASES = {
+	douyu = {'douyutv'},
+	esl = {'eslgaming'},
+	['facebook-gaming'] = {'fbgg'},
+	home = {'website', 'web', 'site', 'url'},
+	huyatv = {'huya'},
+	letsplaylive = {'cybergamer'},
+	rules = {'rulebook'},
+	shift = {'octane'},
+	['start-gg'] = {'startgg', 'smashgg'},
+	yandexefir = {'yandex'},
+	zhanqitv = {'zhanqi'},
+}
 
 function Links.transform(links)
-	return {
-		['5ewin'] = links['5ewin'],
-		abiosgaming = links.abiosgaming,
-		apexlegendsstatus = links.apexlegendsstatus,
-		afreeca = links.afreeca,
-		afreeca2 = links.afreeca2,
-		aligulac = links.aligulac,
-		aligulac2 = links.aligulac2,
-		aoezone = links.aoezone,
-		aoezone2 = links.aoezone2,
-		aoezone3 = links.aoezone3,
-		aoezone4 = links.aoezone4,
-		aoezone5 = links.aoezone5,
-		['ask-fm'] = links.askfm,
-		battlefy = links.battlefy,
-		battlefy2 = links.battlefy2,
-		battlefy3 = links.battlefy3,
-		bilibili = links.bilibili,
-		['bilibili-stream'] = links['bilibili-stream'],
-		booyah = links.booyah,
-		bracket = links.bracket,
-		bracket2 = links.bracket2,
-		bracket3 = links.bracket3,
-		bracket4 = links.bracket4,
-		bracket5 = links.bracket5,
-		bracket6 = links.bracket6,
-		bracket7 = links.bracket7,
-		cc = links.cc,
-		challengermode = links.challengermode,
-		challengermode2 = links.challengermode2,
-		challonge = links.challonge,
-		challonge2 = links.challonge2,
-		challonge3 = links.challonge3,
-		challonge4 = links.challonge4,
-		challonge5 = links.challonge5,
-		datdota = links.datdota,
-		daumcafe = links.daumcafe,
-		discord = links.discord,
-		dlive = links.dlive,
-		dotabuff = links.dotabuff,
-		douyu = links.douyu or links.douyutv,
-		esea = links.esea,
-		esea2 = links.esea2,
-		['esea-d'] = links['esea-d'],
-		esl = links.eslgaming or links.esl,
-		esl2 = links.eslgaming2 or links.esl2,
-		esl3 = links.eslgaming3 or links.esl3,
-		esl4 = links.eslgaming4 or links.esl4,
-		esl5 = links.eslgaming5 or links.esl5,
-		esportal = links.esportal,
-		facebook = links.facebook,
-		facebook2 = links.facebook2,
-		['facebook-gaming'] = links['facebook-gaming'] or links.fbgg,
-		faceit = links.faceit,
-		['faceit-c'] = links['faceit-c'],
-		['faceit-c2'] = links['faceit-c2'],
-		['faceit-hub'] = links['faceit-hub'],
-		['faceit-org'] = links['faceit-org'],
-		factor = links.factor,
-		fanclub = links.fanclub,
-		gamersclub = links.gamersclub,
-		gamersclub2 = links.gamersclub2,
-		halodatahive = links.halodatahive,
-		home = links.website or links.web or links.site or links.url,
-		home2 = links.website2 or links.web2 or links.site2 or links.url2,
-		huyatv = links.huyatv or links.huya,
-		huyatv2 = links.huyatv2 or links.huya2,
-		iccup = links.iccup,
-		instagram = links.instagram,
-		instagram2 = links.instagram2,
-		kuaishou = links.kuaishou,
-		letsplaylive = links.letsplaylive or links.cybergamer,
-		loco = links.loco,
-		matcherino = links.matcherino,
-		matcherinolink = links.matcherinolink,
-		mildom = links.mildom,
-		nimotv = links.nimotv,
-		openrec = links.openrec,
-		patreon = links.patreon,
-		playlist = links.playlist,
-		privsteam = links.privsteam,
-		pubsteam = links.pubsteam,
-		reddit = links.reddit,
-		royaleapi = links.royaleapi,
-		rules = links.rules or links.rulebook,
-		rules2 = links.rules2 or links.rulebook2,
-		shift = links.shift or links.octane,
-		['siege-gg'] = links.siegegg,
-		snapchat = links.snapchat,
-		sk = links.sk,
-		sostronk = links.sostronk,
-		['start-gg'] = links.startgg or links.smashgg,
-		steam = links.steam,
-		steam2 = links.steam2,
-		steamalternative = links.steamalternative,
-		steamtv = links.steamtv,
-		stratz = links.stratz,
-		stream = links.stream,
-		stream2 = links.stream2,
-		telegram = links.telegram,
-		tiktok = links.tiktok,
-		tlpd = links.tlpd,
-		tlpdint = links.tlpdint,
-		tlpdkr = links.tlpdkr,
-		tlpdsospa = links.tlpdsospa,
-		tlprofile = links.tlprofile,
-		tlstream = links.tlstream,
-		toornament = links.toornament,
-		toornament2 = links.toornament2,
-		toornament3 = links.toornament3,
-		['trackmania-io'] = links['trackmania-io'],
-		trovo = links.trovo,
-		trovo2 = links.trovo2,
-		twitch = links.twitch,
-		twitch2 = links.twitch2,
-		twitch3 = links.twitch3,
-		twitch4 = links.twitch4,
-		twitch5 = links.twitch5,
-		twitter = links.twitter,
-		twitter2 = links.twitter2,
-		vidio = links.vidio,
-		vk = links.vk,
-		vlr = links.vlr,
-		weibo = links.weibo,
-		weibo2 = links.weibo2,
-		yandexefir = links.yandexefir or links.yandex,
-		youtube = links.youtube,
-		youtube2 = links.youtube2,
-		youtube3 = links.youtube3,
-		youtube4 = links.youtube4,
-		youtube5 = links.youtube5,
-		zhangyutv = links.zhangyutv,
-		zhanqitv = links.zhanqitv or links.zhanqi,
-	}
+	local function iterateLinks(tbl, aliases)
+		local index = 1
+		local function getValue(keys)
+			for _, key in ipairs(keys) do
+				if tbl[key] then
+					return tbl[key]
+				end
+			end
+		end
+		local function suffixAliases(alias)
+			return alias .. index
+		end
+
+		return function()
+			local keys = Array.map(aliases, suffixAliases)
+			local value = getValue(keys)
+			if index == 1 and not value then
+				value = getValue(aliases)
+			end
+			index = index + 1
+			if value then
+				return (index - 1), value
+			else
+				return nil
+			end
+		end
+	end
+
+	local transformedLinks = {}
+	for linkKey in pairs(PREFIXES) do
+		local aliases = ALIASES[linkKey] or {}
+		table.insert(aliases, 1, linkKey)
+
+		for index, link in iterateLinks(links, aliases) do
+			transformedLinks[linkKey .. (index == 1 and '' or index)] = link
+		end
+	end
+
+	return transformedLinks
 end
 
 function Links.makeFullLink(platform, id, variant)
@@ -343,7 +264,7 @@ function Links.makeFullLink(platform, id, variant)
 		return ''
 	end
 
-	local prefixData = _PREFIXES[platform]
+	local prefixData = PREFIXES[platform]
 
 	if not prefixData then
 		return ''
@@ -351,7 +272,7 @@ function Links.makeFullLink(platform, id, variant)
 
 	local prefix = prefixData[variant] or prefixData[1]
 
-	local suffixData = _SUFFIXES[platform] or {}
+	local suffixData = SUFFIXES[platform] or {}
 	local suffix = suffixData[variant] or suffixData[1] or ''
 
 	return prefix .. id .. suffix
