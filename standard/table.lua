@@ -68,11 +68,11 @@ end
 ---@param predicate fun(key?: K, value?: V, argument?: T): boolean
 ---@param argument T?
 ---@return {[K]: V}
-function Table.filterByKey(tbl, predicate, argument)
+function Table.filterByKey(tbl, predicate)
 	local filteredTbl = {}
 
 	for key, entry in pairs(tbl) do
-		if predicate(key, entry, argument) then
+		if predicate(key, entry) then
 			filteredTbl[key] = entry
 		end
 	end
