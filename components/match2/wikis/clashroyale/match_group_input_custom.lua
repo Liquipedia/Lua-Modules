@@ -86,9 +86,8 @@ function CustomMatchGroupInput._getLinks(match)
 		interview2 = match.interview2,
 		review = match.review,
 		recap = match.recap,
+		royaleapi = match.royaleapi and ('https://royaleapi.com/' .. match.royaleapi) or nil,
 	}
-	local links = match.links
-	if match.royaleapi then links.royaleapi = 'https://royaleapi.com/' .. match.royaleapi end
 	return match
 end
 
