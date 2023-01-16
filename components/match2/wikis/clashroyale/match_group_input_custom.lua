@@ -32,6 +32,7 @@ local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t'))
+local ROYALE_API_PREFIX = 'https://royaleapi.com/'
 
 local CustomMatchGroupInput = {}
 
@@ -86,7 +87,7 @@ function CustomMatchGroupInput._getLinks(match)
 		interview2 = match.interview2,
 		review = match.review,
 		recap = match.recap,
-		royaleapi = match.royaleapi and ('https://royaleapi.com/' .. match.royaleapi) or nil,
+		royaleapi = match.royaleapi and (ROYALE_API_PREFIX .. match.royaleapi) or nil,
 	}
 	return match
 end
