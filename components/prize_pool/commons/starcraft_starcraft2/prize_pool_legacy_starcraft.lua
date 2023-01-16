@@ -400,10 +400,10 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 			type = CACHED_DATA.defaultOpponentType,
 			isarchon = CACHED_DATA.defaultIsArchon,
 			[1] = nameInput[#nameInput],
-			link = slot[prefix .. 'link' .. opponentIndex] or nameInput[1],
-			flag = slot[prefix .. 'flag' .. opponentIndex],
-			team = slot[prefix .. 'team' .. opponentIndex],
-			race = slot[prefix .. 'race' .. opponentIndex],
+			link = slot[prefix .. 'link' .. opponentIndex] or slot[prefix .. opponentIndex .. 'link'] or nameInput[1],
+			flag = slot[prefix .. 'flag' .. opponentIndex] or slot[prefix .. opponentIndex .. 'flag'],
+			team = slot[prefix .. 'team' .. opponentIndex] or slot[prefix .. opponentIndex .. 'team'],
+			race = slot[prefix .. 'race' .. opponentIndex] or slot[prefix .. opponentIndex .. 'race'],
 		}, argsIndex
 	end
 
@@ -429,7 +429,7 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 
 		opponentData['p' .. playerIndex] = nameInput[#nameInput]
 		opponentData['p' .. playerIndex .. 'link'] = slot[prefix .. 'link' .. opponentIndex .. 'p' .. playerIndex]
-			or nameInput[#nameInput]
+			or nameInput[1]
 		opponentData['p' .. playerIndex .. 'flag'] = slot[prefix .. 'flag' .. opponentIndex .. 'p' .. playerIndex]
 		opponentData['p' .. playerIndex .. 'team'] = slot[prefix .. 'team' .. opponentIndex .. 'p' .. playerIndex]
 		opponentData['p' .. playerIndex .. 'race'] = slot[prefix .. 'race' .. opponentIndex .. 'p' .. playerIndex]
