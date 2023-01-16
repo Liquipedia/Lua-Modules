@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
@@ -114,6 +115,21 @@ function suite:testIncludes()
 	self:assertTrue(Table.includes(b, 'testValue3'))
 	self:assertFalse(Table.includes(a, 'testValue4'))
 	self:assertFalse(Table.includes(b, 'testValue4'))
+end
+
+function suite:testFilterByKey()
+	local a = {a1a = 1, a3a = 3, a4a = 4, 2, 5, b1b = 'ttt', c1c = 'ddd'}
+
+	local function predicate1(key)
+		return not Logic.isEmpty(string.find(key, '^%l(%d+)%l$'))
+	end
+
+	local function predicate2(key, value)
+		return Logic.isNumeric(value) and not Logic.isEmpty(string.find(key, '^%l(%d+)%l$'))
+	end
+
+	self:assertDeepEquals({a1a = 1, a3a = 3, a4a = 4, b1b = 'ttt', c1c = 'ddd'}, Table.filterByKey(a, predicate1))
+	self:assertDeepEquals({a1a = 1, a3a = 3, a4a = 4,}, Table.filterByKey(a, predicate2))
 end
 
 return suite
