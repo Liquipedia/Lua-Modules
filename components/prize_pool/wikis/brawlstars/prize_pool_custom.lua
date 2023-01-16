@@ -15,14 +15,14 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Opponent = require('Module:OpponentLibraries').Opponent
+
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
-
-local TBD = 'TBD'
 
 -- Brawlstars is still in the process of tier conversion
 -- hence "Monthly" is needed here until that is done
@@ -66,7 +66,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
 
-	if lpdbData.opponentname ~= TBD then
+	if Opponent.isTbd(opponent) then
 		Variables.varDefine('qualified_' .. lpdbData.opponentname, lpdbData.qualified)
 	end
 
