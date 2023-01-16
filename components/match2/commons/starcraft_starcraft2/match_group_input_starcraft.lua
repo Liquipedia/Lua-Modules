@@ -126,7 +126,7 @@ function StarcraftMatchGroupInput._getTournamentVars(match)
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	Variables.varDefine('headtohead', match.headtohead)
-	match.featured = Logic.emptyOr(match.featured, Variables.varDefault('featured'))
+	match.publishertier = Logic.emptyOr(match.featured, Variables.varDefault('featured'))
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
 	Variables.varDefine('bestof', match.bestof)
 
@@ -160,7 +160,6 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	else
 		extradata = {
 			noQuery = match.noQuery,
-			featured = match.featured,
 			casters = match.casters,
 			headtohead = match.headtohead,
 			ffa = 'false',
@@ -391,7 +390,7 @@ function StarcraftMatchGroupInput._subMatchStructure(match)
 				),
 				noQuery = match.noQuery,
 				matchsection = Variables.varDefault('matchsection'),
-				featured = match.featured,
+				featured = match.publishertier,
 				isSubMatch = 'true',
 				opponent1 = map.extradata.opponent1,
 				opponent2 = map.extradata.opponent2,
