@@ -298,7 +298,7 @@ end
 ---@generic K, V, T, I
 ---@param args {[K] : V}
 ---@param indexFromKey fun(key?: K): integer
----@param f fun(key?: K, index?: I, ...?: any): T
+---@param f fun(key?: K, index?: integer, ...?: any): T
 ---@param noInterleave boolean?
 ---@return {[I] : T}
 function Table.mapArguments(args, indexFromKey, f, noInterleave)
