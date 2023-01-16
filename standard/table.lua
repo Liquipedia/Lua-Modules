@@ -63,10 +63,9 @@ function Table.filter(tbl, predicate, argument)
 	return filteredTbl
 end
 
----@generic K, V, T
+---@generic K, V
 ---@param tbl {[K]: V}
----@param predicate fun(key?: K, value?: V, argument?: T): boolean
----@param argument T?
+---@param predicate fun(key?: K, value?: V): boolean
 ---@return {[K]: V}
 function Table.filterByKey(tbl, predicate)
 	local filteredTbl = {}
