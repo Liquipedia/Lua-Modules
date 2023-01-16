@@ -73,6 +73,26 @@ function suite:testMap()
 	end))
 end
 
+function suite:testMapArguments()
+	local args = {a1a = 1, a3a = 3, a4a = 4, 2, 5}
+
+	local function indexFromKey(key)
+		local index = key:match('^a(%d+)a$')
+		if index then
+			return tonumber(index)
+		else
+			return nil
+		end
+	end
+
+	local function mapFunction(key)
+		return args[key] * 2
+	end
+
+	self:assertDeepEquals({2, 4, 6, 8, 10}, Table.mapArguments(args, indexFromKey, mapFunction))
+	self:assertDeepEquals({2, [3] = 6, [4] = 8}, Table.mapArguments(args, indexFromKey, mapFunction, true))
+end
+
 function suite:testMapValues()
 	local a = {1, 2, 3}
 	self:assertDeepEquals({2, 4, 6}, Table.mapValues(a, function(x)
