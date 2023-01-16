@@ -33,6 +33,10 @@ local DEFAULT_BEST_OF = 99
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t'))
 local ROYALE_API_PREFIX = 'https://royaleapi.com/'
+local MAX_NUM_PLAYERS_PER_MAP = 2
+local TBD = 'tbd'
+local TBA = 'tba'
+local MAX_NUM_MAPS = 30
 
 local CustomMatchGroupInput = {}
 
@@ -93,7 +97,22 @@ function CustomMatchGroupInput._getExtraData(match)
 		t2bans = CustomMatchGroupInput._readBans(match.t2bans),
 	}
 
+	for subGroupIndex = 1, MAX_NUM_MAPS do
+		local prefix = 'subgroup' .. subGroupIndex
+
+		match.extradata[prefix .. 'header'] = CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
+		match.extradata[prefix .. 'iskoth'] = Logic.readBool(match[prefix .. 'iskoth']) or nil
+		match.extradata[prefix .. 't1bans'] = CustomMatchGroupInput._readBans(match[prefix .. 't1bans'])
+		match.extradata[prefix .. 't2bans'] = CustomMatchGroupInput._readBans(match[prefix .. 't2bans'])
+	end
+
 	return match
+end
+
+function CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
+	local header = match['subgroup' .. subGroupIndex .. 'header']
+
+	return String.isNotEmpty(header) and header or nil
 end
 
 function CustomMatchGroupInput._readBans(bansInput)
@@ -117,7 +136,7 @@ function CustomMatchGroupInput._adjustData(match)
 	CustomMatchGroupInput._setPlacements(match)
 
 	if CustomMatchGroupInput._hasTeamOpponent(match) then
-		error('Team matches not yet supported')
+		match = CustomMatchGroupInput._subMatchStructure(match)
 	end
 
 	if Logic.isNumeric(match.winner) then
@@ -147,7 +166,6 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 	end)
 
 	walkoverProcessing.walkover(match, scores)
-	mw.logObject{winner = match.winner, resulttype = match.resulttype, walkover = match.resulttype}
 
 	if match.resulttype == DEFAULT_WIN_RESULTTYPE then
 		walkoverProcessing.applyMatchWalkoverToOpponents(match)
@@ -229,6 +247,47 @@ function CustomMatchGroupInput._setPlacements(match)
 			opponent.placement = 2
 		end
 	end
+end
+
+function CustomMatchGroupInput._subMatchStructure(match)
+	local subMatches = {}
+
+	local currentSubGroup = 0
+	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+		local subGroupIndex = tonumber(map.subgroup)
+		if subGroupIndex then
+			currentSubGroup = subGroupIndex
+		else
+			currentSubGroup = currentSubGroup + 1
+			subGroupIndex = currentSubGroup
+		end
+
+		if not subMatches[subGroupIndex] then
+			subMatches[subGroupIndex] = {scores = {0, 0}}
+		end
+
+		local winner = tonumber(map.winner)
+		if winner and subMatches[subGroupIndex].scores[winner] then
+			subMatches[subGroupIndex].scores[winner] = subMatches[subGroupIndex].scores[winner] + 1
+		end
+	end
+
+	for subMatchIndex, subMatch in ipairs(subMatches) do
+		-- get winner if the submatch is finished
+		-- submatch is finished if the next submatch has a score or if the complete match is finished
+		local nextSubMatch = subMatches[subMatchIndex + 1]
+		if Logic.readBool(match.finished) or (nextSubMatch and nextSubMatch.scores[1] + nextSubMatch.scores[2] > 0) then
+			if subMatch.scores[1] > subMatch.scores[2] then
+				subMatch.winner = 1
+			elseif subMatch.scores[2] > subMatch.scores[1] then
+				subMatch.winner = 2
+			end
+		end
+	end
+
+	match.extradata.submatches = subMatches
+
+	return match
 end
 
 --[[
@@ -458,7 +517,12 @@ function CustomMatchGroupInput._processPlayerMapData(map, match)
 				participants
 			)
 		elseif opponent.type == Opponent.team then
-			error('Team matches not yet supported')
+			CustomMatchGroupInput._processTeamPlayerMapData(
+				opponent.match2players or {},
+				opponentIndex,
+				map,
+				participants
+			)
 		end
 	end
 
@@ -475,6 +539,70 @@ function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentInd
 			played = true,
 			cards = CustomMatchGroupInput._readCards(map['t' .. opponentIndex .. 'p' .. playerIndex .. 'c']),
 		}
+	end
+end
+
+function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex, map, participants)
+	local tbdIndex = 0
+	local appendIndex = #players + 1
+
+	local playerIndex = 1
+	local playerKey = 't' .. opponentIndex .. 'p' .. playerIndex
+	while playerIndex <= MAX_NUM_PLAYERS_PER_MAP and (String.isNotEmpty(map[playerKey]) or
+		String.isNotEmpty(map[playerKey .. 'link']) or String.isNotEmpty(map[playerKey .. 'c'])) do
+
+		local player = map[playerKey .. 'link'] or map[playerKey]
+		if String.isEmpty(player) or Table.includes({TBD, TBA}, player:lower()) then
+			tbdIndex = tbdIndex + 1
+			player = TBD .. tbdIndex
+		else
+			-- allows fetching the link of the player from preset wiki vars
+			player = mw.ext.TeamLiquidIntegration.resolve_redirect(
+				map[playerKey .. 'link'] or Variables.varDefault(map[playerKey] .. '_page') or map[playerKey]
+			)
+		end
+
+		local playerData = {
+			played = true,
+			cards = CustomMatchGroupInput._readCards(map[playerKey .. 'c']),
+		}
+
+		local match2playerIndex = CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
+
+		-- if we have the player not present in match2player add basic data here
+		if not match2playerIndex then
+			match2playerIndex = appendIndex
+			playerData = Table.merge(playerData, {name = player, displayname = map[playerKey] or player})
+
+			appendIndex = appendIndex + 1
+		end
+
+		participants[opponentIndex .. '_' .. match2playerIndex] =  playerData
+
+		playerIndex = playerIndex + 1
+		playerKey = 't' .. opponentIndex .. 'p' .. playerIndex
+	end
+
+	return playerIndex - 1
+end
+
+function CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
+	local displayNameIndex
+	local displayNameFoundTwice = false
+
+	for match2playerIndex, match2player in pairs(players) do
+		local playerWithUnderscores = player:gsub(' ', '_')
+		if match2player and match2player.name == playerWithUnderscores then
+			return match2playerIndex
+		elseif not displayNameIndex and match2player and match2player.displayname == playerWithUnderscores then
+			displayNameIndex = match2playerIndex
+		elseif match2player and match2player.displayname == playerWithUnderscores then
+			displayNameFoundTwice = true
+		end
+	end
+
+	if not displayNameFoundTwice then
+		return displayNameIndex
 	end
 end
 
