@@ -18,7 +18,7 @@ local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEna
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
---- @class ResultsTable
+--- @class ResultsTable: BaseResultsTable
 local ResultsTable = Class.new(BaseResultsTable)
 
 function ResultsTable:buildHeader()
