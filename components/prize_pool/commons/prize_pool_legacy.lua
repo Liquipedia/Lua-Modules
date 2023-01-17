@@ -180,7 +180,7 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 			else
 				-- Tracking category
 				mw.ext.TeamLiquidIntegration.add_category('Pages with missing qualifier link')
-			end				
+			end
 		elseif newParameter == 'seed' then
 			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
 		elseif input and tonumber(input) ~= 0 then
