@@ -30,8 +30,6 @@ local TIER_VALUE = {16, 8, 4, 2, Monthly = 2}
 
 local TYPE_MODIFIER = {offline = 1, ['offline/online'] = 0.75, ['online/offline'] = 0.75, default = 0.65}
 
-local HEADER_DATA = {}
-
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
@@ -40,8 +38,6 @@ function CustomPrizePool.run(frame)
 	args.groupScoreDelimiter = '-'
 
 	local prizePool = PrizePool(args):create()
-
-	HEADER_DATA.tournamentName = args['tournament name']
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
@@ -61,7 +57,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		Variables.varDefault('tournament_type')
 	)
 
-	lpdbData.tournament = HEADER_DATA.tournamentName or lpdbData.tournament
 	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 
 	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
