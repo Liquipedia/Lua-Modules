@@ -358,7 +358,6 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn', player.name and player.name:gsub('_', ' ') or nil)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 		if not Table.isEmpty(player) then
-			player.name = player.name or ''
 			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
 		else
 			break
