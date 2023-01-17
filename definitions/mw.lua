@@ -197,5 +197,145 @@ function mw.html:done() end
 ---@return Html
 function mw.html:allDone() end
 
+---@class Language
+mw.language = {}
+
+---The full name of the language for the given language code: native name (language autonym) by default, name translated in target language if a value is given for inLanguage.
+---@param code string
+---@param inLanguage? string
+---@return string
+function mw.language.fetchLanguageName(code, inLanguage) end
+
+---Fetch the list of languages known to MediaWiki, returning a table mapping language code to language name.
+---@param inLanguage? string
+---@param include? 'all'|'mwfile'|'mw'
+---@return table
+function mw.language.fetchLanguageNames(inLanguage, include) end
+
+---Returns a new language object for the wiki's default content language.
+---@return Language
+function mw.language.getContentLanguage() end
+mw.getContentLanguage = mw.language.getContentLanguage
+
+---Returns a list of MediaWiki's fallback language codes for the specified code.
+---@param code string
+---@return string[]
+function mw.language.getFallbacksFor(code) end
+
+---Returns true if a language code is known to MediaWiki.
+---@param code string
+---@return boolean
+function mw.language.isKnownLanguageTag(code) end
+
+---Checks whether any localisation is available for that language code in MediaWiki.
+---@param code string
+---@return boolean
+function mw.language.isSupportedLanguage(code) end
+
+---Returns true if a language code is of a valid form for the purposes of internal customisation of MediaWiki.
+---@param code string
+---@return boolean
+function mw.language.isValidBuiltInCode(code) end
+
+---Returns true if a language code string is of a valid form, whether or not it exists. This includes codes which are used solely for customisation via the MediaWiki namespace.
+---@param code string
+---@return boolean
+function mw.language.isValidCode(code) end
+
+---Creates a new language object. Language objects do not have any publicly accessible properties, but they do have several methods, which are documented below.
+---@param code string
+---@return Language
+function mw.language.new(code) end
+mw.getLanguage = mw.language.new
+
+---Returns the language code for this language object.
+---@return string
+function mw.language:getCode() end
+
+---Returns a list of MediaWiki's fallback language codes for this language object. Equivalent to mw.language.getFallbacksFor( lang:getCode() ).
+---@return string[]
+function mw.language:getFallbackLanguages() end
+
+---Returns true if the language is written right-to-left, false if it is written left-to-right.
+---@return boolean
+function mw.language:isRTL() end
+
+---Converts the string to lowercase, honoring any special rules for the given language.
+---@param str string
+---@return string
+function mw.language:lc(str) end
+
+---Converts the first character of the string to lowercase.
+---@param str string
+---@return string
+function mw.language:lcfirst(str) end
+
+---Converts the string to uppercase, honoring any special rules for the given language.
+---@param str string
+---@return string
+function mw.language:uc(str) end
+
+---Converts the first character of the string to uppercase.
+---@param str string
+---@return string
+function mw.language:ucfirst(str) end
+
+---Converts the string to a representation appropriate for case-insensitive comparison. Note that the result may not make any sense when displayed.
+---@param str string
+---@return string
+function mw.language:caseFold(str) end
+
+---Formats a number with grouping and decimal separators appropriate for the given language. Given 123456.78, this may produce "123,456.78", "123.456,78", or even something like "١٢٣٬٤٥٦٫٧٨" depending on the language and wiki configuration.
+---@param num number
+---@param options? {noCommafy: boolean}
+---@return number
+function mw.language:formatNum(num, options) end
+
+---Formats a date according to the given format string. If timestamp is omitted, the default is the current time. The value for local must be a boolean or nil; if true, the time is formatted in the wiki's local time rather than in UTC.
+---@param format string
+---@param timestamp string?
+---@param localTime boolean?
+---@return number
+function mw.language:formatDate(format, timestamp, localTime) end
+
+---Breaks a duration in seconds into more human-readable units, e.g. 12345 to 3 hours, 25 minutes and 45 seconds, returning the result as a string.
+---@param seconds number
+---@param chosenIntervals table
+---@return string
+function mw.language:formatDuration(seconds, chosenIntervals) end
+
+---This takes a number as formatted by lang:formatNum() and returns the actual number. In other words, this is basically a language-aware version of tonumber().
+---@param str string
+---@return string
+function mw.language:parseFormattedNumber(str) end
+
+---This chooses the appropriate grammatical form from forms (which must be a sequence table) or ... based on the number n.
+---@param n number
+---@param ... string
+---@return string
+---@overload fun(n: number, forms: table):string
+function mw.language:convertPlural(n, ...) end
+mw.language.plural = mw.language.convertPlural
+
+---This chooses the appropriate inflected form of word for the given inflection code case.
+---@param word string
+---@param case string
+---@return string
+function mw.language:convertGrammar(word, case) end
+
+---This chooses the appropriate inflected form of word for the given inflection code case.
+---@param case string
+---@param word string
+---@return string
+function mw.language:gammer(case, word) end
+
+---Returns a Unicode arrow character corresponding to direction:
+---@param direction 'forwards'|'backwards'|'left'|'right'|'up'|'down'
+---@return '→'|'←'|'↑'|'↓'
+function mw.language:getArrow(direction) end
+
+---Returns "ltr" or "rtl", depending on the directionality of the language.
+---@return 'ltr'|'rtl'
+function mw.language:getDir() end
 
 return mw
