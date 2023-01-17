@@ -181,7 +181,7 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 			else
 				-- variable to add a tracking category
 				Variables.varDefine('legacyprizepool_qualifiedMissingLink', 'true')
-			end				
+			end
 		elseif newParameter == 'seed' then
 			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
 		elseif input and tonumber(input) ~= 0 then
