@@ -338,4 +338,82 @@ function mw.language:getArrow(direction) end
 ---@return 'ltr'|'rtl'
 function mw.language:getDir() end
 
+---@class Message
+mw.message = {}
+
+---Creates a new message object for the given message key. The remaining parameters are passed to the new object's params() method.
+---@param key string
+---@param ... any
+---@return Message
+function mw.message.new(key, ...) end
+
+---Creates a new message object for the given messages (the first one that exists will be used).
+---@param ... string
+---@return Message
+function mw.message.newFallbackSequence(...) end
+
+---Creates a new message object, using the given text directly rather than looking up an internationalized message.
+---@param msg string
+---@param ... string
+---@return Message
+function mw.message.newRawMessage(msg, ...) end
+
+---Wraps the value so that it will not be parsed as wikitext by msg:parse().
+---@param value string
+---@return string
+function mw.message.rawParam(value) end
+
+---Wraps the value so that it will automatically be formatted as by lang:formatNum(). Note this does not depend on the Language library actually being available.
+---@param value string
+---@return string
+function mw.message.numParam(value) end
+
+---Returns a Language object for the default language.
+---@return Language
+function mw.message.getDefaultLanguage() end
+
+---Add parameters to the message, which may be passed as individual arguments or as a sequence table. Parameters must be numbers, strings, or the special values returned by mw.message.numParam() or mw.message.rawParam(). If a sequence table is used, parameters must be directly present in the table; references using the __index metamethod will not work.
+---@param ... string|number
+---@return self
+---@overload fun(self, params: table):self
+function mw.message:params(...) end
+
+---Like :params(), but has the effect of passing all the parameters through mw.message.rawParam() first.
+---@param ... string
+---@return self
+---@overload fun(self, params: table):self
+function mw.message:rawParams(...) end
+
+---Like :params(), but has the effect of passing all the parameters through mw.message.numParam() first.
+---@param ... number
+---@return self
+---@overload fun(self, params: table):self
+function mw.message:numParams(...) end
+
+---Specifies the language to use when processing the message. lang may be a string or a table with a getCode() method (i.e. a Language object).
+---@param lang string
+---@return self
+function mw.message:inLanguage(lang) end
+
+---Specifies whether to look up messages in the MediaWiki: namespace (i.e. look in the database), or just use the default messages distributed with MediaWiki.
+---@param bool boolean
+---@return self
+function mw.message:useDatabase(bool) end
+
+---Substitutes the parameters and returns the message wikitext as-is. Template calls and parser functions are intact.
+---@return string
+function mw.message:plain() end
+
+---Returns a boolean indicating whether the message key exists.
+---@return boolean
+function mw.message:exists() end
+
+---Returns a boolean indicating whether the message key has content. Returns true if the message key does not exist or the message is the empty string.
+---@return boolean
+function mw.message:isBlank() end
+
+---Returns a boolean indicating whether the message key is disabled. Returns true if the message key does not exist or if the message is the empty string or the string "-".
+---@return boolean
+function mw.message:isDisabled() end
+
 return mw
