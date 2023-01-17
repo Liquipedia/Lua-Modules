@@ -353,12 +353,15 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex, '')
+		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
 		player.displayname = player.displayname
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn', player.name:gsub('_', ' '))
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn', player.name and player.name:gsub('_', ' ') or nil)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 		if not Table.isEmpty(player) then
+			player.name = player.name or ''
 			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
+		else
+			break
 		end
 	end
 	return match
