@@ -61,7 +61,7 @@ function Game:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Games')
+		infobox:addCategories('Games')
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)

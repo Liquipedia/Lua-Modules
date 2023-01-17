@@ -57,7 +57,8 @@ function Strategy:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Strategies')
+		infobox:addCategories('Strategies')
+		infobox:addCategories(unpack(self:getWikiCategories(args)))
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)

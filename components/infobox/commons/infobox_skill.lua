@@ -90,7 +90,7 @@ function Skill:createInfobox()
 
 	if Namespace.isMain() then
 		local categories = self:getCategories(args)
-		infobox:categories(unpack(categories))
+		infobox:addCategories(unpack(categories))
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)

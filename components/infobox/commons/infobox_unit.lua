@@ -96,8 +96,8 @@ function Unit:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:categories('Units')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	infobox:addCategories('Units')
+	infobox:addCategories(unpack(self:getWikiCategories(args)))
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 

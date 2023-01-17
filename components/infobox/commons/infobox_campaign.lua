@@ -36,7 +36,7 @@ function Campaign:createInfobox()
 		Center{content = {args.caption}},
 	}
 
-	infobox:categories('Campaign')
+	infobox:addCategories('Campaign')
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end

@@ -73,7 +73,8 @@ function Show:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Shows')
+		infobox:addCategories('Shows')
+		infobox:addCategories(unpack(self:getWikiCategories(args)))
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)

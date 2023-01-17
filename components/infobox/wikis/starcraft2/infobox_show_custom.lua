@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Show = Lua.import('Module:Infobox/Show', {requireDevIfEnabled = true})
@@ -18,16 +17,15 @@ local Cell = Widgets.Cell
 
 local CustomShow = Class.new()
 
-local _show
 local _args
 
 local CustomInjector = Class.new(Injector)
 
 function CustomShow.run(frame)
 	local customShow = Show(frame)
-	_show = customShow
 	_args = customShow.args
 	customShow.createWidgetInjector = CustomShow.createWidgetInjector
+	customShow.getWikiCategories = CustomShow.getWikiCategories
 	return customShow:createInfobox(frame)
 end
 
@@ -45,16 +43,16 @@ function CustomInjector:addCustomCells(widgets)
 		content = {CustomShow:_getReleasePeriod(_args.sdate, _args.edate)}
 	})
 
-	if Namespace.isMain() and _args.edate == nil then
-		_show.infobox:categories('Active Shows')
-	end
-
 	return widgets
 end
 
 function CustomShow:_getReleasePeriod(sdate, edate)
 	if not sdate then return nil end
 	return sdate .. ' - ' .. (edate or '<b>Present</b>')
+end
+
+function CustomShow:getWikiCategories(args)
+	return _args.edate and {} or {'Active Shows'}
 end
 
 return CustomShow

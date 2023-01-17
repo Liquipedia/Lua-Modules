@@ -199,7 +199,7 @@ function Person:createInfobox()
 	infobox:bottom(self:createBottomContent())
 
 	local statusToStore = self:getStatusToStore(args)
-	infobox:categories(unpack(self:getCategories(
+	infobox:addCategories(unpack(self:getCategories(
 				args,
 				age.birth,
 				personType.category,

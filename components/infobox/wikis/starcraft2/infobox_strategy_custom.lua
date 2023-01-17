@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local CleanRace = mw.loadData('Module:CleanRace2')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 
@@ -22,7 +21,6 @@ local Header = Widgets.Header
 
 local CustomStrategy = Class.new()
 
-local _strategy
 local _args
 
 local _RACE_MATCHUPS = {
@@ -35,9 +33,9 @@ local CustomInjector = Class.new(Injector)
 
 function CustomStrategy.run(frame)
 	local customStrategy = Strategy(frame)
-	_strategy = customStrategy
 	_args = customStrategy.args
 	customStrategy.createWidgetInjector = CustomStrategy.createWidgetInjector
+	customStrategy.getWikiCategories = CustomStrategy.getWikiCategories
 	return customStrategy:createInfobox(frame)
 end
 
@@ -67,11 +65,6 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'TL-Article',
 		content = {CustomStrategy:_getTLarticle(_args.tlarticle)}
 	})
-
-	if Namespace.isMain() then
-		local categories = CustomStrategy:_getCategories(_args.race, _args.matchups)
-		_strategy.infobox:categories(unpack(categories))
-	end
 
 	return widgets
 end
@@ -126,6 +119,10 @@ function CustomStrategy:_getCategories(race, matchups)
 	end
 
 	return categories
+end
+
+function CustomStrategy:getWikiCategories(args)
+	return CustomStrategy:_getCategories(args.race, args.matchups)
 end
 
 return CustomStrategy

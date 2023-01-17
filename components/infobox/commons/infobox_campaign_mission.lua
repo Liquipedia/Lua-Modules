@@ -52,8 +52,8 @@ function Mission:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Missions', 'Campaign')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		infobox:addCategories('Missions', 'Campaign')
+		infobox:addCategories(unpack(self:getWikiCategories(args)))
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)

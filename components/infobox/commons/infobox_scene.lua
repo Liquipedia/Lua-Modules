@@ -73,7 +73,7 @@ function Scene:createInfobox()
 		}
 	}
 
-	infobox:categories('Scene')
+	infobox:addCategories('Scene')
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end

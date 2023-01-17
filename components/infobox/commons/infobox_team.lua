@@ -178,8 +178,8 @@ function Team:createInfobox()
 	infobox:bottom(self:createBottomContent())
 
 	if self:shouldStore(args) then
-		infobox:categories('Teams')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		infobox:addCategories('Teams')
+		infobox:addCategories(unpack(self:getWikiCategories(args)))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)

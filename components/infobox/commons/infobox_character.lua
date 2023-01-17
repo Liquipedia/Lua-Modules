@@ -89,8 +89,8 @@ function Character:createInfobox()
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if Namespace.isMain() then
-		infobox:categories(args.informationType or 'Character')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		infobox:addCategories(args.informationType or 'Character')
+		infobox:addCategories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 

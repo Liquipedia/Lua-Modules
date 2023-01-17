@@ -72,7 +72,7 @@ function Company:createInfobox()
 		Builder{
 			builder = function()
 				if not String.isEmpty(args.companytype) and args.companytype == _COMPANY_TYPE_ORGANIZER then
-					infobox:categories('Tournament organizers')
+					infobox:addCategories('Tournament organizers')
 					return {
 						Cell{
 							name = 'Total Prize Money',
@@ -120,7 +120,7 @@ function Company:createInfobox()
 		})
 	})
 
-	infobox:categories('Companies')
+	infobox:addCategories('Companies')
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end

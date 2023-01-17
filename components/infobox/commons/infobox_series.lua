@@ -166,7 +166,7 @@ function Series:createInfobox(frame)
 	}
 
 	if Namespace.isMain() then
-		infobox:categories(
+		infobox:addCategories(
 			'Tournament series',
 			self:_setCountryCategories(args.country),
 			self:_setCountryCategories(args.country2),
@@ -261,7 +261,7 @@ function Series:createLiquipediaTierDisplay(args)
 			)
 			return ''
 		else
-			self.infobox:categories(tierText .. ' Tournaments')
+			self.infobox:addCategories(tierText .. ' Tournaments')
 			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
 		end
 	end

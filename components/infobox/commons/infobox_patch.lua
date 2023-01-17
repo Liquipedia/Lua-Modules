@@ -78,7 +78,7 @@ function Patch:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Patches')
+		infobox:addCategories('Patches')
 		self:addToLpdb(args)
 	end
 

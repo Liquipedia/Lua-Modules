@@ -90,8 +90,8 @@ function Building:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:categories('Buildings')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	infobox:addCategories('Buildings')
+	infobox:addCategories(unpack(self:getWikiCategories(args)))
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 

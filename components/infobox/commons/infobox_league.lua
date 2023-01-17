@@ -133,13 +133,13 @@ function League:createInfobox()
 						local value = tostring(args.type):lower()
 						if self:shouldStore(args) then
 							if value == 'offline' then
-								self.infobox:categories('Offline Tournaments')
+								self.infobox:addCategories('Offline Tournaments')
 							elseif value == 'online' then
-								self.infobox:categories('Online Tournaments')
+								self.infobox:addCategories('Online Tournaments')
 							elseif value:match('online') and value:match('offline') then
-								self.infobox:categories('Online/Offline Tournaments')
+								self.infobox:addCategories('Online/Offline Tournaments')
 							else
-								self.infobox:categories('Unknown Type Tournaments')
+								self.infobox:addCategories('Unknown Type Tournaments')
 							end
 						end
 
@@ -250,14 +250,14 @@ function League:createInfobox()
 	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if self:shouldStore(args) then
-		self.infobox:categories('Tournaments')
+		self.infobox:addCategories('Tournaments')
 		if not String.isEmpty(args.team_number) then
-			self.infobox:categories('Team Tournaments')
+			self.infobox:addCategories('Team Tournaments')
 		end
 		if String.isNotEmpty(args.player_number) or String.isNotEmpty(args.individual) then
-			self.infobox:categories('Individual Tournaments')
+			self.infobox:addCategories('Individual Tournaments')
 		end
-		self.infobox:categories(unpack(self:getWikiCategories(args)))
+		self.infobox:addCategories(unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args, links)
 		self:_setSeoTags(args)
 	end
@@ -321,7 +321,7 @@ function League:createLiquipediaTierDisplay(args)
 			return ''
 		else
 			if self:shouldStore(self.args) then
-				self.infobox:categories(tierText .. ' Tournaments')
+				self.infobox:addCategories(tierText .. ' Tournaments')
 			end
 			local tierLink = tierText .. ' Tournaments'
 			if Tier.link and Tier.link[tierString] then
