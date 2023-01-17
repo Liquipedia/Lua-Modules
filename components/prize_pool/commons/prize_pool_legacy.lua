@@ -14,6 +14,7 @@ local Points = mw.loadData('Module:Points/data')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
 
@@ -170,12 +171,17 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	local opponentsInSlot = #slot
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
-		if input == 'q' and slot.link then
-			-- Use qualifier display
-			if not slot.link:find('^%[%[') then
-				slot.link = '[[' .. slot.link .. ']]'
-			end
-			LegacyPrizePool.handleSeed(newData, slot.link, opponentsInSlot)
+		if input == 'q' then
+			if slot.link then
+				-- Use qualifier display
+				if not slot.link:find('^%[%[') then
+					slot.link = '[[' .. slot.link .. ']]'
+				end
+				LegacyPrizePool.handleSeed(newData, slot.link, opponentsInSlot)
+			else
+				-- variable to add a tracking category
+				Variables.varDefine('legacyprizepool_qualifiedMissingLink', 'true')
+			end				
 		elseif newParameter == 'seed' then
 			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
 		elseif input and tonumber(input) ~= 0 then
@@ -209,6 +215,9 @@ end
 
 function LegacyPrizePool.handleSeed(storeTo, input, slotSize)
 	local links = LegacyPrizePool.parseWikiLink(input)
+	if Table.isEmpty(links) then
+		Variables.varDefine('legacyprizepool_qualifiedMissingLink', 'true')
+	end
 	for _, linkData in ipairs(links) do
 		local link = linkData.link
 
