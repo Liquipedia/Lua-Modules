@@ -43,7 +43,7 @@ function CustomLeague.run(frame)
 	league.getWikiCategories = CustomLeague.getWikiCategories
 	league.addToLpdb = CustomLeague.addToLpdb
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague.createWidgetInjector()

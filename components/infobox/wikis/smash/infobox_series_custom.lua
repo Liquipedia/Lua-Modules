@@ -27,7 +27,7 @@ function CustomSeries.run(frame)
 	_series.createWidgetInjector = CustomSeries.createWidgetInjector
 	_series.addToLpdb = CustomSeries.addToLpdb
 
-	return _series:createInfobox(frame)
+	return _series:createInfobox()
 end
 
 function CustomSeries:createWidgetInjector()

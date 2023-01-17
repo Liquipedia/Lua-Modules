@@ -43,7 +43,7 @@ function CustomUnit.run(frame)
 	unit.nameDisplay = CustomUnit.nameDisplay
 	unit.setLpdbData = CustomUnit.setLpdbData
 	unit.createWidgetInjector = CustomUnit.createWidgetInjector
-	return unit:createInfobox(frame)
+	return unit:createInfobox()
 end
 
 function CustomInjector:addCustomCells()

@@ -55,7 +55,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	local builtInfobox = player:createInfobox(frame)
+	local builtInfobox = player:createInfobox()
 
 	local autoPlayerIntro = ''
 	if Logic.readBool((_args.autoPI or ''):lower()) then

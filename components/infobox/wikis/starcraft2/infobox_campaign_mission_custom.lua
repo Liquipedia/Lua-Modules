@@ -37,7 +37,7 @@ function CustomMission.run(frame)
 	_args = mission.args
 	mission.createWidgetInjector = CustomMission.createWidgetInjector
 	mission.getWikiCategories = CustomMission.getWikiCategories
-	return mission:createInfobox(frame)
+	return mission:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)

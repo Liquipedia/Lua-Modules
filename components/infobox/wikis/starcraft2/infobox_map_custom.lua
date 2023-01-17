@@ -29,7 +29,7 @@ function CustomMap.run(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
 	customMap.getWikiCategories = CustomMap.getWikiCategories
 	_args = customMap.args
-	return customMap:createInfobox(frame)
+	return customMap:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
