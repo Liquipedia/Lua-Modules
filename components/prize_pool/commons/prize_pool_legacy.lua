@@ -170,7 +170,7 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 	local opponentsInSlot = #slot
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
-		if input == 'q' then
+		if newParameter == 'seed' and input == 'q' then
 			if slot.link then
 				-- Use qualifier display
 				if not slot.link:find('^%[%[') then
