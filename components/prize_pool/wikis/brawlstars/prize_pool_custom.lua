@@ -60,10 +60,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
 
-	if String.isEmpty(lpdbData.opponentname) then
-		error('Missing opponentname in lpdb. Does the team template "' .. lpdbData.opponenttemplate .. '" exist?')
-	end
-
 	if not Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('qualified_' .. lpdbData.opponentname, lpdbData.qualified)
 	end
