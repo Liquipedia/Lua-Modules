@@ -30,7 +30,7 @@ MatchTicker.Display.Opponent = Lua.import('Module:Opponent/Starcraft', {requireD
 function MatchTicker.Query.BaseConditions:build(queryArgs)
 	self.conditionTree:add({ConditionNode(ColumnName('extradata_ffa'), Comparator.eq, 'false')})
 	if Logic.readBool(queryArgs.featured) then
-		self.conditionTree:add({ConditionNode(ColumnName('publishertier'), Comparator.eq, 'true')})
+		self.conditionTree:add(ConditionNode(ColumnName('publishertier'), Comparator.eq, 'true'))
 	end
 
 	return self.conditionTree
