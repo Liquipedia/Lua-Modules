@@ -253,10 +253,10 @@ end
 --Returns `{6 = 'a', 8 = 'b', 10 = 'c'}`
 --
 --The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
----@generic K, V, T
+---@generic K, V, U, T
 ---@param xTable {[K] : V}
----@param f fun(key?: K, value?: V): K, T
----@return {[K] : T}
+---@param f fun(key?: K, value?: V): U, T
+---@return {[U] : T}
 function Table.map(xTable, f)
 	local yTable = {}
 	for xKey, xValue in pairs(xTable) do
