@@ -161,11 +161,8 @@ function Placement:init(args, parent, lastPlacement)
 	-- Implicit place range has been given (|place= is not set)
 	-- Use the last known place and set the place range based on the entered args.count
 	-- or the number of entered opponents
-	if not self.placeStart then
+	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-	end
-
-	if not self.placeEnd then
 		self.placeEnd = lastPlacement + (self.count or math.max(#self.opponents, 1))
 	end
 
