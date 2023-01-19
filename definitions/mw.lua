@@ -27,7 +27,7 @@ function mw.getCurrentFrame() end
 ---Adds one to the "expensive parser function" count, and throws an exception if it exceeds the limit (see $wgExpensiveParserFunctionLimit).
 function mw.incrementExpensiveFunctionCount() end
 
----Returns true if the current #invoke is being substed, false otherwise. See Returning text above for discussion on differences when substing versus not substing.
+---Returns true if the current #invoke is being `substed`, false otherwise.
 ---@return boolean
 function mw.isSubsting() end
 
@@ -50,7 +50,7 @@ function mw.dumpObject(object) end
 ---@param ... any
 function mw.log(...) end
 
----Calls mw.dumpObject() and appends the resulting string to the log buffer. If prefix is given, it will be added to the log buffer followedby an equals sign before the serialized string is appended (i.e. the logged text will be "prefix = object-string").
+---Calls mw.dumpObject() and appends the resulting string to the log buffer. If prefix is given, it will be added to the log buffer followed by an equals sign before the serialized string is appended (i.e. the logged text will be "prefix = object-string").
 ---@param object any
 ---@param prefix any?
 function mw.logObject(object, prefix) end
