@@ -96,11 +96,9 @@ function StreamLinks.processStreams(forwardedInputArgs)
 				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
 			end
 
-			if FeatureFlag.get('new_stream_format') then
-				local key = StreamLinks.StreamKey(platformName):toString()
-				streams[key] = streamValue
-			end
-			streams[platformName] = streamValue
+			local key = StreamLinks.StreamKey(platformName):toString()
+			streams[key] = streamValue
+			streams[platformName] = streamValue -- Legacy
 		end
 	end
 
