@@ -16,7 +16,7 @@ local Streams = {}
 -- possibly make usage of module:links if that is adjusted accordingly
 local STREAM_DATA = {
 	{platform = 'twitch', prefix = 'https://www.twitch.tv/'},
-	{platform = 'youtube', prefix = 'https://www.youtube.com/'},
+	{platform = 'youtube', prefix = 'https://www.youtube.com/', suffix = '/live'},
 	{platform = 'mixer', prefix = 'https://www.mixer.com/'},
 	{platform = 'facebook', prefix = 'https://facebook.com/', suffix = '/live'},
 	{platform = 'vk', prefix = 'https://vk.com/', suffix = '/live'},
@@ -81,11 +81,17 @@ function Streams.create(args)
 			local platform = streamData.platform
 
 			args[1 .. platform .. languageIndex] = args[platform .. languageIndex] or args[1 .. platform .. languageIndex]
+			if platform == 'youtube' then
+				args[1 .. 'ytmultiple' .. languageIndex] = args['ytmultiple' .. languageIndex] or args[1 .. 'ytmultiple' .. languageIndex]
+			end
 
 			local streamIndex = 1
 			while(String.isNotEmpty(args[streamIndex .. platform .. languageIndex])) do
-				local streamDisplay = '[' .. streamData.prefix .. args[streamIndex .. platform .. languageIndex]
-					.. (streamData.suffix or '')
+				local suffix = platform == 'youtube'
+					and String.isNotEmpty(args[streamIndex .. 'ytmultiple' .. languageIndex]) and '/videos?view=2&live_view=501'
+					or streamData.suffix or ''
+
+				local streamDisplay = '[' .. streamData.prefix .. args[streamIndex .. platform .. languageIndex] .. suffix
 					.. ' <i class="lp-icon lp-' .. (streamData.icon or platform) .. '" style="margin-bottom:3.0px;"></i>]'
 
 				table.insert(langStreams, streamDisplay)
