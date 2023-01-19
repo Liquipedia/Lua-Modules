@@ -435,4 +435,93 @@ mw.site = {}
 ---@return {prefix: string, url: string, isProtocolRelative: boolean, isLocal: boolean, isCurrentWiki: boolean, isTranscludable: boolean, isExtraLanguageLink: boolean, displayText:string, tooltip: string?}
 function mw.site.interwikiMap(filter) end
 
+mw.text = {}
+
+---Replaces HTML entities in the string with the corresponding characters.
+---@param s string
+---@param decodeNamedEntities boolean?
+---@return string
+function mw.text.decode(s, decodeNamedEntities) end
+
+---Replaces characters in a string with HTML entities. Characters '<', '>', '&', '"', and the non-breaking space are replaced with the appropriate named entities; all others are replaced with numeric entities.
+---@param s string
+---@param charset string?
+---@return string
+function mw.text.encode(s, charset) end
+
+---Decodes a JSON string. flags is 0 or a combination (use +) of the flags mw.text.JSON_PRESERVE_KEYS and mw.text.JSON_TRY_FIXING.
+---@param s string
+---@param flags number?
+---@return table
+function mw.text.jsonDecode(s, flags) end
+
+---Encode a JSON string. Errors are raised if the passed value cannot be encoded in JSON. flags is 0 or a combination (use +) of the flags mw.text.JSON_PRESERVE_KEYS and mw.text.JSON_PRETTY.
+---@param s any
+---@param flags number?
+---@return string
+function mw.text.jsonEncode(s, flags) end
+
+---Removes all MediaWiki strip markers from a string.
+---@param s string
+---@return string
+function mw.text.killMarkers(s) end
+
+---Removes all MediaWiki strip markers from a string.
+---@param list table
+---@param separator string?
+---@param conjunction string?
+---@return string
+function mw.text.listToText(list, separator, conjunction) end
+
+---Replaces various characters in the string with HTML entities to prevent their interpretation as wikitext.
+---@param s string
+---@return string
+function mw.text.nowiki(s) end
+
+---Splits the string into substrings at boundaries matching the Ustring pattern pattern. If plain is specified and true, pattern will be interpreted as a literal string rather than as a Lua pattern.
+---@param s string
+---@param pattern string?
+---@param plain boolean?
+---@return table
+function mw.text.split(s, pattern, plain) end
+
+---Returns an iterator function that will iterate over the substrings that would be returned by the equivalent call to mw.text.split().
+---@param s string
+---@param pattern string?
+---@param plain boolean?
+---@return function
+function mw.text.gsplit(s, pattern, plain) end
+
+---Generates an HTML-style tag for name.
+---@param name string
+---@param attrs table?
+---@param content nil|string|boolean
+---@return string
+---@overload fun(params: {name: string, attrs: table, content: nil|string|boolean})
+function mw.text.tag(name, attrs, content) end
+
+---Remove whitespace or other characters from the beginning and end of a string.
+---@param s string
+---@param charset string?
+---@return string
+function mw.text.trim(s, charset) end
+
+---Truncates text to the specified length in code points, adding ellipsis if truncation was performed. If length is positive, the end of the string will be truncated; if negative, the beginning will be removed
+---@param text string
+---@param length number
+---@param ellipsis string?
+---@param adjustLength boolean
+---@return string
+function mw.text.truncate(text, length, ellipsis, adjustLength) end
+
+---Replaces MediaWiki <nowiki> strip markers with the corresponding text. Other types of strip markers are not changed.
+---@param s string
+---@return string
+function mw.text.unstripNoWiki(s) end
+
+---Equivalent to mw.text.killMarkers( mw.text.unstripNoWiki( s ) ).
+---@param s string
+---@return string
+function mw.text.unstrip(s) end
+
 return mw
