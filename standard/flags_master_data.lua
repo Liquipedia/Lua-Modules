@@ -1143,7 +1143,7 @@ local data = {
 	},
 	['trinidadandtobago'] = {
 		flag = 'File:tt_hd.png',
-		localised = 'Trinidadian and Tobagonians',
+		localised = 'Trinidadian and Tobagonian',
 		name = 'Trinidad and Tobago',
 	},
 	['tristandacunha'] = {
