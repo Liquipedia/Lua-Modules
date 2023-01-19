@@ -113,7 +113,7 @@ function MatchLegacy.convertParameters(match2)
 			if mw.ext.TeamTemplate.teamexists(opponent.template) then
 				match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
 			else
-				match[prefix] = opponent.name
+				match[prefix] = opponent.template
 			end
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
 			if isOverturned then
