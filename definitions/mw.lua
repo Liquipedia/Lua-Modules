@@ -55,10 +55,9 @@ function mw.log(...) end
 ---@param prefix any?
 function mw.logObject(object, prefix) end
 
-mw.frame = {}
-
 ---@class Frame
 ---@field args table
+mw.frame = {}
 
 ---Call a parser function, returning an appropriate string. This is preferable to frame:preprocess, but whenever possible, native Lua functions or Scribunto library functions should be preferred to this interface.
 ---@param name string
@@ -131,9 +130,8 @@ function mw.hash.hashValue(algo, value) end
 ---@return string[]
 function mw.hash.listAlgorithms() end
 
-mw.html = {}
-
 ---@class Html
+mw.html = {}
 
 ---Creates a new mw.html object containing a tagName html element. You can also pass an empty string or nil as tagName in order to create an empty mw.html object.
 ---@param tagName? string
@@ -199,9 +197,8 @@ function mw.html:done() end
 ---@return Html
 function mw.html:allDone() end
 
-mw.language = {}
-
 ---@class Language
+mw.language = {}
 
 ---The full name of the language for the given language code: native name (language autonym) by default, name translated in target language if a value is given for inLanguage.
 ---@param code string
@@ -341,8 +338,8 @@ function mw.language:getArrow(direction) end
 ---@return 'ltr'|'rtl'
 function mw.language:getDir() end
 
-mw.message = {}
 ---@class Message
+mw.message = {}
 
 ---Creates a new message object for the given message key. The remaining parameters are passed to the new object's params() method.
 ---@param key string
@@ -419,8 +416,6 @@ function mw.message:isBlank() end
 ---@return boolean
 function mw.message:isDisabled() end
 
-mw.site = {}
-
 ---@alias namespaceInfo {id: number, name: string, canonicalName: string, displayName: string, hasSubpages: boolean, hasGenderDistinction: boolean, isCapitalized: boolean, isContent: boolean, isIncludable: boolean, isMovable:boolean, isSubject: boolean, isTalk: boolean, defaultContentModel: string, aliases: string[], subject: namespaceInfo, talk: namespaceInfo, associated: namespaceInfo}
 ---@class Site
 ---@field currentVersion string
@@ -432,6 +427,7 @@ mw.site = {}
 ---@field subjectNamespaces table<number|string, namespaceInfo>
 ---@field talkNamespaces table<number|string, namespaceInfo>
 ---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number}
+mw.site = {}
 
 ---Returns a table holding data about available interwiki prefixes. If filter is the string "local", then only data for local interwiki prefixes is returned. If filter is the string "!local", then only data for non-local prefixes is returned. If no filter is specified, data for all prefixes is returned. A "local" prefix in this context is one that is for the same project.
 ---@param filter nil|'local'|'!local'
@@ -485,7 +481,7 @@ function mw.text.nowiki(s) end
 ---@param s string
 ---@param pattern string?
 ---@param plain boolean?
----@return table
+---@return string[]
 function mw.text.split(s, pattern, plain) end
 
 ---Returns an iterator function that will iterate over the substrings that would be returned by the equivalent call to mw.text.split().
@@ -527,7 +523,6 @@ function mw.text.unstripNoWiki(s) end
 ---@return string
 function mw.text.unstrip(s) end
 
-mw.title = {}
 
 ---@class Title
 ---@field id number
@@ -560,6 +555,7 @@ mw.title = {}
 ---@field redirectTarget Title|false
 ---@field protectionLevels table
 ---@field cascadingProtection table
+mw.title = {}
 
 ---@class File
 ---@field exists boolean
