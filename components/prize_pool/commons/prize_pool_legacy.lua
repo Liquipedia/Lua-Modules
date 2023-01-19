@@ -83,7 +83,7 @@ function LegacyPrizePool.run(dependency)
 	local mergeSlots = Logic.readBool(header.mergeSlots)
 	for _, slot in ipairs(slots) do
 		-- retrieve the slot and push it into a temp var so it can be altered (to merge slots if need be)
-		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots)
+		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots, newArgs)
 		local place = tempSlot.place or slot.place
 		-- if we want to merge slots and the slot we just retrieved
 		-- has the same place as the one before, then append the opponents
@@ -149,7 +149,7 @@ function LegacyPrizePool.sortQualifiers(args)
 	end)
 end
 
-function LegacyPrizePool.mapSlot(slot, mergeSlots)
+function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 	if not slot.place then
 		return {}
 	end
@@ -168,6 +168,7 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 		or nil
 
 	local opponentsInSlot = #slot
+	local needsQualifiedFreetext = false
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
 		if newParameter == 'seed' and input == 'q' then
@@ -179,19 +180,30 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 				LegacyPrizePool.handleSeed(newData, slot.link, opponentsInSlot)
 			else
 				-- Tracking category
+				needsQualifiedFreetext = true
 				mw.ext.TeamLiquidIntegration.add_category('Pages with missing qualifier link')
 			end
 		elseif newParameter == 'seed' then
 			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
 		elseif input and tonumber(input) ~= 0 then
 			if input == 'q' then
-				-- Use legacy checkmark display
 				input = CHECKMARK
+				mw.ext.TeamLiquidIntegration.add_category('Pages with freetext checkmark')
 			end
 
 			newData[newParameter] = input
 		end
 	end)
+
+	if needsQualifiedFreetext then
+		local slotParam = 'QUALIFIED_FREETEXT'
+		local newParam = CACHED_DATA.inputToId[slotParam]
+		if not newParam then
+			LegacyPrizePool.assignType(headerArgs, 'Qualification', slotParam)
+			newParam = CACHED_DATA.inputToId[slotParam]
+		end
+		newData[newParam] = CHECKMARK
+	end
 
 	if CUSTOM_HANDLER.customSlot then
 		newData = CUSTOM_HANDLER.customSlot(newData, CACHED_DATA, slot)
