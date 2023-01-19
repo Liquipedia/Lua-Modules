@@ -55,9 +55,10 @@ function mw.log(...) end
 ---@param prefix any?
 function mw.logObject(object, prefix) end
 
+mw.frame = {}
+
 ---@class Frame
 ---@field args table
-mw.frame = {}
 
 ---Call a parser function, returning an appropriate string. This is preferable to frame:preprocess, but whenever possible, native Lua functions or Scribunto library functions should be preferred to this interface.
 ---@param name string
@@ -130,8 +131,9 @@ function mw.hash.hashValue(algo, value) end
 ---@return string[]
 function mw.hash.listAlgorithms() end
 
----@class Html
 mw.html = {}
+
+---@class Html
 
 ---Creates a new mw.html object containing a tagName html element. You can also pass an empty string or nil as tagName in order to create an empty mw.html object.
 ---@param tagName? string
@@ -197,8 +199,9 @@ function mw.html:done() end
 ---@return Html
 function mw.html:allDone() end
 
----@class Language
 mw.language = {}
+
+---@class Language
 
 ---The full name of the language for the given language code: native name (language autonym) by default, name translated in target language if a value is given for inLanguage.
 ---@param code string
@@ -338,8 +341,8 @@ function mw.language:getArrow(direction) end
 ---@return 'ltr'|'rtl'
 function mw.language:getDir() end
 
----@class Message
 mw.message = {}
+---@class Message
 
 ---Creates a new message object for the given message key. The remaining parameters are passed to the new object's params() method.
 ---@param key string
@@ -416,6 +419,7 @@ function mw.message:isBlank() end
 ---@return boolean
 function mw.message:isDisabled() end
 
+mw.site = {}
 
 ---@alias namespaceInfo {id: number, name: string, canonicalName: string, displayName: string, hasSubpages: boolean, hasGenderDistinction: boolean, isCapitalized: boolean, isContent: boolean, isIncludable: boolean, isMovable:boolean, isSubject: boolean, isTalk: boolean, defaultContentModel: string, aliases: string[], subject: namespaceInfo, talk: namespaceInfo, associated: namespaceInfo}
 ---@class Site
@@ -428,7 +432,6 @@ function mw.message:isDisabled() end
 ---@field subjectNamespaces table<number|string, namespaceInfo>
 ---@field talkNamespaces table<number|string, namespaceInfo>
 ---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number}
-mw.site = {}
 
 ---Returns a table holding data about available interwiki prefixes. If filter is the string "local", then only data for local interwiki prefixes is returned. If filter is the string "!local", then only data for non-local prefixes is returned. If no filter is specified, data for all prefixes is returned. A "local" prefix in this context is one that is for the same project.
 ---@param filter nil|'local'|'!local'
@@ -523,5 +526,128 @@ function mw.text.unstripNoWiki(s) end
 ---@param s string
 ---@return string
 function mw.text.unstrip(s) end
+
+mw.title = {}
+
+---@class Title
+---@field id number
+---@field interwiki string
+---@field namespace number
+---@field nsText string
+---@field subjectNsText string
+---@field text string
+---@field prefixedText string
+---@field fullText string
+---@field rootText string
+---@field baseText string
+---@field subpageText string
+---@field canTalk string
+---@field exists boolean
+---@field file File
+---@field fileExists boolean
+---@field isContentPage boolean
+---@field isExternal boolean
+---@field isLocal boolean
+---@field isRedirect boolean
+---@field isSpecialPage boolean
+---@field isSubpage boolean
+---@field isTalkPage boolean
+---@field contentModel string
+---@field basePageTitle Title
+---@field rootPageTitle Title
+---@field talkPageTitle Title?
+---@field subjectPageTitle Title
+---@field redirectTarget Title|false
+---@field protectionLevels table
+---@field cascadingProtection table
+
+---@class File
+---@field exists boolean
+---@field width number
+---@field height number
+---@field pages {width: number, height: number}[]?
+---@field size number
+---@field mimeType string
+---@field length number
+
+---Test for whether two titles are equal. Note that fragments are ignored in the comparison.
+---@param a Title
+---@param b Title
+---@return boolean
+function mw.title.equals(a, b) end
+
+---Returns -1, 0, or 1 to indicate whether the title a is less than, equal to, or greater than title b.
+---@param a Title
+---@param b Title
+---@return -1|0|1
+function mw.title.compare(a, b) end
+
+---Returns the title object for the current page.
+---@return Title
+function mw.title.getCurrentTitle() end
+
+---Creates a new title object. This function is expensive when called with an ID.
+---@param text string
+---@param namespace string?
+---@return Title?
+---@overload fun(id: number):Title?
+function mw.title.new(text, namespace) end
+
+---Creates a title object with title title in namespace namespace, optionally with the specified fragment and interwiki prefix. namespace may be any key found in mw.site.namespaces. If the resulting title is not valid, returns nil.
+---@param namespace string
+---@param title string
+---@param fragment string?
+---@param interwiki string?
+---@return Title?
+function mw.title.makeTitle(namespace, title, fragment, interwiki) end
+
+---Whether this title is a subpage of the given title.
+---@param title2 Title
+---@return boolean
+function mw.text:isSubpageOf(title2) end
+
+---Whether this title is in the given namespace.
+---@param ns string|number
+---@return boolean
+function mw.text:inNamespace(ns) end
+
+---Whether this title is in any of the given namespaces.
+---@param ... string|number
+---@return boolean
+function mw.text:inNamespaces(...) end
+
+---Whether this title's subject namespace is in the given namespace.
+---@param ns string|number
+---@return boolean
+function mw.text:hasSubjectNamespace(ns) end
+
+---The same as mw.title.makeTitle( title.namespace, title.text .. '/' .. text ).
+---@param text string
+---@return Title
+function mw.text:subPageTitle(text) end
+
+---Returns title.text encoded as it would be in a URL.
+---@return string
+function mw.text:partialUrl() end
+
+---Returns the full URL (with optional query table/string) for this title.
+---@param query? table|string
+---@param proto? 'http'|'https'|'relative'|'canonical'
+---@return string
+function mw.text:fullUrl(query, proto) end
+
+---Returns the local URL (with optional query table/string) for this title.
+---@param query? table|string
+---@return string
+function mw.text:localUrl(query) end
+
+---Returns the canonical URL (with optional query table/string) for this title.
+---@param query? table|string
+---@return string
+function mw.text:canonicalUrl(query) end
+
+---Returns the (unparsed) content of the page, or nil if there is no page. The page will be recorded as a transclusion.
+---@return string?
+function mw.text:getContent() end
 
 return mw
