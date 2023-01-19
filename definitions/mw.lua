@@ -88,7 +88,8 @@ function mw.frame:getParent() end
 ---@return string
 function mw.frame:getTitle() end
 
----Returns the title associated with the frame as a string. For the frame created by {{#invoke:}}, this is the title of the module invoked.
+---Create a new Frame object that is a child of the current frame, with optional arguments and title.
+--This is mainly intended for use in the debug console for testing functions that would normally be called by {{#invoke:}}. The number of frames that may be created at any one time is limited.
 ---@param params {title: string, args: table}
 ---@return string
 function mw.frame:newChild(params) end
@@ -126,7 +127,7 @@ mw.hash = {}
 ---@return string
 function mw.hash.hashValue(algo, value) end
 
----Hashes a string value with the specified algorithm. Valid algorithms may be fetched using mw.hash.listAlgorithms().
+---Returns a list of supported hashing algorithms, for use in mw.hash.hashValue().
 ---@return string[]
 function mw.hash.listAlgorithms() end
 
@@ -295,7 +296,7 @@ function mw.language:formatNum(num, options) end
 ---@param format string
 ---@param timestamp string?
 ---@param localTime boolean?
----@return number
+---@return number|string
 function mw.language:formatDate(format, timestamp, localTime) end
 
 ---Breaks a duration in seconds into more human-readable units, e.g. 12345 to 3 hours, 25 minutes and 45 seconds, returning the result as a string.
@@ -306,7 +307,7 @@ function mw.language:formatDuration(seconds, chosenIntervals) end
 
 ---This takes a number as formatted by lang:formatNum() and returns the actual number. In other words, this is basically a language-aware version of tonumber().
 ---@param str string
----@return string
+---@return number
 function mw.language:parseFormattedNumber(str) end
 
 ---This chooses the appropriate grammatical form from forms (which must be a sequence table) or ... based on the number n.
