@@ -39,7 +39,7 @@ function mw.loadData(module) end
 ---This is the same as mw.loadData(), except it loads data from JSON pages rather than Lua tables. The JSON content must be an array or object. See also mw.text.jsonDecode().
 ---@param page string
 ---@return table
-function mw.loadData(page) end
+function mw.loadJsonData(page) end
 
 ---Serializes object to a human-readable representation, then returns the resulting string.
 ---@param object any
