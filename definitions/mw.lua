@@ -466,7 +466,7 @@ function mw.text.jsonEncode(s, flags) end
 ---@return string
 function mw.text.killMarkers(s) end
 
----Removes all MediaWiki strip markers from a string.
+---Joins a list, prose-style. In other words, it's like table.concat() but with a different separator before the final item.
 ---@param list table
 ---@param separator string?
 ---@param conjunction string?
@@ -584,6 +584,8 @@ function mw.title.compare(a, b) end
 function mw.title.getCurrentTitle() end
 
 ---Creates a new title object. This function is expensive when called with an ID.
+---If the text string does not specify a namespace, namespace (which may be any key found in mw.site.namespaces) will be used.
+---If the text is not a valid title, nil is returned.
 ---@param text string
 ---@param namespace string?
 ---@return Title?
@@ -591,6 +593,8 @@ function mw.title.getCurrentTitle() end
 function mw.title.new(text, namespace) end
 
 ---Creates a title object with title title in namespace namespace, optionally with the specified fragment and interwiki prefix. namespace may be any key found in mw.site.namespaces. If the resulting title is not valid, returns nil.
+---Note that, unlike mw.title.new(), this method will always apply the specified namespace.
+---If the text is not a valid title, nil is returned.
 ---@param namespace string
 ---@param title string
 ---@param fragment string?
@@ -601,50 +605,50 @@ function mw.title.makeTitle(namespace, title, fragment, interwiki) end
 ---Whether this title is a subpage of the given title.
 ---@param title2 Title
 ---@return boolean
-function mw.text:isSubpageOf(title2) end
+function mw.title:isSubpageOf(title2) end
 
 ---Whether this title is in the given namespace.
 ---@param ns string|number
 ---@return boolean
-function mw.text:inNamespace(ns) end
+function mw.title:inNamespace(ns) end
 
 ---Whether this title is in any of the given namespaces.
 ---@param ... string|number
 ---@return boolean
-function mw.text:inNamespaces(...) end
+function mw.title:inNamespaces(...) end
 
 ---Whether this title's subject namespace is in the given namespace.
 ---@param ns string|number
 ---@return boolean
-function mw.text:hasSubjectNamespace(ns) end
+function mw.title:hasSubjectNamespace(ns) end
 
 ---The same as mw.title.makeTitle( title.namespace, title.text .. '/' .. text ).
 ---@param text string
 ---@return Title
-function mw.text:subPageTitle(text) end
+function mw.title:subPageTitle(text) end
 
 ---Returns title.text encoded as it would be in a URL.
 ---@return string
-function mw.text:partialUrl() end
+function mw.title:partialUrl() end
 
 ---Returns the full URL (with optional query table/string) for this title.
 ---@param query? table|string
 ---@param proto? 'http'|'https'|'relative'|'canonical'
 ---@return string
-function mw.text:fullUrl(query, proto) end
+function mw.title:fullUrl(query, proto) end
 
 ---Returns the local URL (with optional query table/string) for this title.
 ---@param query? table|string
 ---@return string
-function mw.text:localUrl(query) end
+function mw.title:localUrl(query) end
 
 ---Returns the canonical URL (with optional query table/string) for this title.
 ---@param query? table|string
 ---@return string
-function mw.text:canonicalUrl(query) end
+function mw.title:canonicalUrl(query) end
 
 ---Returns the (unparsed) content of the page, or nil if there is no page. The page will be recorded as a transclusion.
 ---@return string?
-function mw.text:getContent() end
+function mw.title:getContent() end
 
 return mw
