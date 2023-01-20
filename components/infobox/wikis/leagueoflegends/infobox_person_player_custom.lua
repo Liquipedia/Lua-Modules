@@ -78,7 +78,7 @@ function CustomPlayer.run(frame)
 	end
 
 	if String.isEmpty(player.args.history) then
-		player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
+		player.args.history = tostring(TeamHistoryAuto._results{hiderole = 'true', iconModule = 'Module:PositionIcon/data', addlpdbdata='true'})
 	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
