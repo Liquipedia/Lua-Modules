@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Achievements = require('Module:Achievements in infoboxes')
 local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
 local Lua = require('Module:Lua')
@@ -27,7 +28,7 @@ function CustomTeam.run(frame)
 	local team = Team(frame)
 
 	-- Automatic achievements
-	team.args.achievements = Template.expandTemplate(frame, 'Team achievements', {team.pagename, aka = team.args.aka})
+	team.args.achievements = Achievements.team{team = team.pagename, aka = team.args.aka}
 
 	-- Automatic org people
 	team.args.coach = Template.expandTemplate(frame, 'Coach of')
