@@ -446,7 +446,7 @@ function League:_setLpdbData(args, links)
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
 		status = args.status,
-		format = args.format,
+		format = TextSanitizer.stripHTML(args.format),
 		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
 			League:_getNamedTableofAllArgsForBase(args, 'sponsor')
 		),
