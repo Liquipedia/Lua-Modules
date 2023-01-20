@@ -187,15 +187,18 @@ function League:createInfobox()
 		},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
-			Cell{
+				Cell{
 					name = 'Prize Pool',
 					content = {self:_createPrizepool(args)},
 				},
 			},
 		},
-		Cell{name = 'Date', content = {args.date}},
-		Cell{name = 'Start Date', content = {args.sdate}},
-		Cell{name = 'End Date', content = {args.edate}},
+		Customizable{id = 'dates', children = {
+				Cell{name = 'Date', content = {args.date}},
+				Cell{name = 'Start Date', content = {args.sdate}},
+				Cell{name = 'End Date', content = {args.edate}},
+			},
+		},
 		Customizable{id = 'custom', children = {}},
 		Customizable{id = 'liquipediatier', children = {
 				Cell{
