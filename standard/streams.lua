@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -17,28 +18,28 @@ local Streams = {}
 local STREAM_DATA = {
 	{platform = 'twitch', prefix = 'https://www.twitch.tv/'},
 	{platform = 'youtube', prefix = 'https://www.youtube.com/', suffix = '/live'},
-	{platform = 'mixer', prefix = 'https://www.mixer.com/'},
+	{platform = 'mixer', prefix = 'https://www.mixer.com/', hasNoSpecialPage = true},
 	{platform = 'facebook', prefix = 'https://facebook.com/', suffix = '/live'},
-	{platform = 'vk', prefix = 'https://vk.com/', suffix = '/live'},
+	{platform = 'vk', prefix = 'https://vk.com/', suffix = '/live', hasNoSpecialPage = true},
 	{platform = 'douyu', prefix = 'https://www.douyu.com/'},
 	{platform = 'huomao', prefix = 'https://www.huomao.com/', icon = 'huomaotv'},
 	{platform = 'huya', prefix = 'https://www.huya.com/', icon = 'huyatv'},
 	{platform = 'bilibili', prefix = 'https://live.bilibili.com/'},
 	{platform = 'cc', prefix = 'https://cc.163.com/'},
-	{platform = 'steamtv', prefix = 'https://steam.tv/'},
-	{platform = 'garena', prefix = 'https://garena.live/'},
-	{platform = 'zhanqi', prefix = 'https://www.zhanqi.tv/', icon = 'zhanqitv'},
-	{platform = 'afreeca', prefix = 'https://play.afreecatv.com/'},
+	{platform = 'steamtv', prefix = 'https://steam.tv/', hasNoSpecialPage = true},
+	{platform = 'garena', prefix = 'https://garena.live/', hasNoSpecialPage = true},
+	{platform = 'zhanqi', prefix = 'https://www.zhanqi.tv/', icon = 'zhanqitv', hasNoSpecialPage = true},
+	{platform = 'afreeca', prefix = 'https://play.afreecatv.com/', specialPage = 'afreecatv'},
 	{platform = 'trovo', prefix = 'https://trovo.live/'},
-	{platform = 'yandex', prefix = 'https://yandex.ru/efir?stream_channel=', icon = 'yandexefir'},
+	{platform = 'yandex', prefix = 'https://yandex.ru/efir?stream_channel=', icon = 'yandexefir', hasNoSpecialPage = true},
 	{platform = 'mildom', prefix = 'https://www.mildom.com/'},
-	{platform = 'esl', prefix = ''},
-	{platform = 'openrec', prefix = 'https://www.openrec.tv/live/'},
-	{platform = 'nimotv', prefix = 'https://www.nimo.tv/'},
+	{platform = 'esl', prefix = '', hasNoSpecialPage = true},
+	{platform = 'openrec', prefix = 'https://www.openrec.tv/live/', hasNoSpecialPage = true},
+	{platform = 'nimotv', prefix = 'https://www.nimo.tv/', specialPage = 'nimo'},
 	{platform = 'booyah', prefix = 'https://booyah.live/'},
 	{platform = 'loco', prefix = 'https://loco.gg/streamers/'},
-	{platform = 'dlive', prefix = 'https://dlive.tv/'},
-	{platform = 'stream', prefix = ''},
+	{platform = 'dlive', prefix = 'https://dlive.tv/', hasNoSpecialPage = true},
+	{platform = 'stream', prefix = '', hasNoSpecialPage = true},
 }
 
 -- legacy alias
@@ -50,6 +51,8 @@ function Streams.create(args)
 	if type(args) ~= 'table' then
 		return
 	end
+
+	local useSpecialPages = Logic.readBool(args.useSpecialPages)
 
 	local tbl = mw.html.create('table')
 		:addClass('wikitable')
@@ -82,17 +85,24 @@ function Streams.create(args)
 
 			args[1 .. platform .. languageIndex] = args[platform .. languageIndex] or args[1 .. platform .. languageIndex]
 			if platform == 'youtube' then
-				args[1 .. 'ytmultiple' .. languageIndex] = args['ytmultiple' .. languageIndex] or args[1 .. 'ytmultiple' .. languageIndex]
+				args[1 .. 'ytmultiple' .. languageIndex] = args['ytmultiple' .. languageIndex]
+					or args[1 .. 'ytmultiple' .. languageIndex]
 			end
 
 			local streamIndex = 1
 			while(String.isNotEmpty(args[streamIndex .. platform .. languageIndex])) do
-				local suffix = platform == 'youtube'
-					and String.isNotEmpty(args[streamIndex .. 'ytmultiple' .. languageIndex]) and '/videos?view=2&live_view=501'
-					or streamData.suffix or ''
+				local streamDisplay
+				if not useSpecialPages or streamData.hasNoSpecialPage then
+					local suffix = platform == 'youtube'
+						and String.isNotEmpty(args[streamIndex .. 'ytmultiple' .. languageIndex]) and '/videos?view=2&live_view=501'
+						or streamData.suffix or ''
 
-				local streamDisplay = '[' .. streamData.prefix .. args[streamIndex .. platform .. languageIndex] .. suffix
-					.. ' <i class="lp-icon lp-' .. (streamData.icon or platform) .. '" style="margin-bottom:3.0px;"></i>]'
+					streamDisplay = '[' .. streamData.prefix .. args[streamIndex .. platform .. languageIndex] .. suffix
+						.. ' <i class="lp-icon lp-' .. (streamData.icon or platform) .. '" style="margin-bottom:3.0px;"></i>]'
+				else
+					streamDisplay = '[[Special:StreamPage/' .. platform .. args[streamIndex .. platform .. languageIndex] .. '|'
+						.. '<i class="lp-icon lp-' .. (streamData.icon or platform) .. '" style="margin-bottom:3.0px;"></i>]]'
+				end
 
 				table.insert(langStreams, streamDisplay)
 
