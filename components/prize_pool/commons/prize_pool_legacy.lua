@@ -226,10 +226,6 @@ end
 
 function LegacyPrizePool.handleSeed(storeTo, input, slotSize)
 	local links = LegacyPrizePool.parseWikiLink(input)
-	if Table.isEmpty(links) then
-		-- Tracking category
-		mw.ext.TeamLiquidIntegration.add_category('Pages with missing qualifier link')
-	end
 	for _, linkData in ipairs(links) do
 		local link = linkData.link
 
