@@ -196,7 +196,6 @@ function matchFunctions.getExtraData(match)
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
-		hasstream = Table.isNotEmpty(match.stream),
 		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
 		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}
