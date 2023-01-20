@@ -235,14 +235,14 @@ function CustomLeague._playerRaceBreakDown()
 	local nightelfNumber = tonumber(_args.nightelf_number) or 0
 	local randomNumber = tonumber(_args.random_number) or 0
 	local multipleNumber = tonumber(_args.multiple_number) or 0
-	
+
 	if playerNumber == 0 then
-		playerNumber = humanNumber + orcNumber + undeadNumber + undeadNumber + randomNumber + multipleNumber
+		playerNumber = humanNumber + orcNumber + undeadNumber + undeadNumber + nightelfNumber + randomNumber + multipleNumber
 	end
 
 	if playerNumber > 0 then
 		playerBreakDown.playerNumber = playerNumber
-		if humanNumber + orcNumber + undeadNumber + undeadNumber + randomNumber + multipleNumber > 0 then
+		if humanNumber + orcNumber + undeadNumber + nightelfNumber + randomNumber + multipleNumber > 0 then
 			playerBreakDown.display = {}
 			if humanNumber > 0 then
 				table.insert(playerBreakDown.display, RaceIcon['h']
@@ -256,9 +256,9 @@ function CustomLeague._playerRaceBreakDown()
 				table.insert(playerBreakDown.display, RaceIcon['u']
 					.. ' ' .. undeadNumber)
 			end
-			if undeadNumber > 0 then
+			if nightelfNumber > 0 then
 				table.insert(playerBreakDown.display, RaceIcon['n']
-					.. ' ' .. undeadNumber)
+					.. ' ' .. nightelfNumber)
 			end
 			if randomNumber > 0 then
 				table.insert(playerBreakDown.display, RaceIcon['r']
@@ -428,7 +428,7 @@ function CustomLeague:getWikiCategories()
 	end
 
 	local tier = tonumber(_args.liquipediatier)
-	if tier == TIER_1 or tier == Tier_2 then
+	if tier == TIER_1 or tier == TIER_2 then
 		table.insert(categories, 'Big Tournaments')
 	else
 		table.insert(categories, 'Small Tournaments')
