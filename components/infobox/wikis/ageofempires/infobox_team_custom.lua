@@ -72,7 +72,7 @@ function CustomTeam._getGames()
 	return Table.mapValues(
 		Table.mapValues(mw.text.split(_args.games, ','), mw.text.trim),
 		function(game)
-			local game = GameLookup.getName(game)
+			game = GameLookup.getName(game)
 			return game .. (game ~= 'Unknown' and CustomTeam._getGameInactivity(game) or '')
 		end)
 end
@@ -80,14 +80,14 @@ end
 function CustomTeam._getGameInactivity(game)
 	local date = os.date('!*t')
 	date.year = date.year - 1
-	
+
 	
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		CustomTeam._buildTeamPlacementConditions(),
 		ConditionNode(ColumnName('game'), Comparator.eq, game),
 		ConditionNode(ColumnName('date'), Comparator.gt, os.date('!%F', os.time(date)))
 	}
-	
+
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions:toString(),
 			order = 'date desc',
@@ -98,14 +98,14 @@ function CustomTeam._getGameInactivity(game)
 	if type(data) ~= 'table' then
 		error(data)
 	end
-	
+
 	if data[1] then
 		return ''
 	else
 		return ' <i><small>(inactive)</small></i>'
 	end
 end
-	
+
 function CustomTeam._buildTeamPlacementConditions()
 	local team = _args.teamtemplate or _pagename
 	local rawOpponentTemplate = TeamTemplates.queryRaw(team) or {}
@@ -116,13 +116,13 @@ function CustomTeam._buildTeamPlacementConditions()
 
 	local opponentTeamTemplates = TeamTemplates.queryHistorical(opponentTemplate) or {opponentTemplate}
 
-	playerConditions = CustomTeam._buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
+	local playerConditions = CustomTeam._buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 	for _, teamTemplate in pairs(opponentTeamTemplates) do
 		opponentConditions:add{ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, teamTemplate)}
 	end
-		
+
 	local conditions = ConditionTree(BooleanOperator.any):add{
 		ConditionTree(BooleanOperator.all):add{
 			opponentConditions,
