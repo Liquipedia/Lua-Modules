@@ -120,8 +120,10 @@ function Import._importPlacements(inputPlacements)
 	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
 		local stageIndex = #stages + 1 - reverseStageIndex
 		return Import._computeStagePlacementEntries(stage, {
-				importWinners = Import.config.stageImportWinners[stageIndex] or (Import.config.stageImportWinners[stageIndex] == nil and reverseStageIndex == 1),
-				groupElimStatuses = Import.config.stageGroupElimStatuses[stageIndex] or Import.config.groupElimStatuses,
+				importWinners = Import.config.stageImportWinners[stageIndex] or
+					(Import.config.stageImportWinners[stageIndex] == nil and reverseStageIndex == 1),
+				groupElimStatuses = Import.config.stageGroupElimStatuses[stageIndex] or
+					Import.config.groupElimStatuses,
 				importLimit = Import.config.stageImportLimits[stageIndex] or 0,
 			})
 	end))
