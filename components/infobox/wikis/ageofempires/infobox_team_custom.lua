@@ -81,7 +81,6 @@ function CustomTeam._getGameInactivity(game)
 	local date = os.date('!*t')
 	date.year = date.year - 1
 
-	
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		CustomTeam._buildTeamPlacementConditions(),
 		ConditionNode(ColumnName('game'), Comparator.eq, game),
