@@ -77,10 +77,19 @@ function Import._getConfig(args, placements)
 			function(key) return tonumber(args[key]) end,
 			true
 		),
-		stageForceWinnerImport = Table.mapArguments(
+		stageImportWinners = Table.mapArguments(
 			args,
-			function(key) return tonumber(string.match(key, '^stage(%d+)forceWinnerImport$')) end,
-			function(key) return args[key] end,
+			function(key) return tonumber(string.match(key, '^stage(%d+)importWinners$')) end,
+			function(key) return Logic.readBoolOrNil(args[key]) end,
+			true
+		),
+		stageGroupElimStatuses = Table.mapArguments(
+			args,
+			function(key) return tonumber(string.match(key, '^stage(%d+)groupElimStatuses$')) end,
+			function(key) return Table.mapValues(
+				mw.text.split(args[key], ','),
+				mw.text.trim
+			) end,
 			true
 		),
 	}
@@ -108,17 +117,13 @@ end
 function Import._importPlacements(inputPlacements)
 	local stages = TournamentUtil.fetchStages(Import.config.matchGroupsSpec)
 
-	local stageImportLimits = Array.reverse(Array.map(Array.range(1, #stages), function (stageIndex)
-		return Import.config.stageImportLimits[stageIndex] or 0 end))
-	local stageForceWinnerImport = Array.reverse(Array.map(Array.range(1, #stages), function (stageIndex)
-		return Logic.readBool(Import.config.stageForceWinnerImport[stageIndex]) end))
-
 	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
+		local stageIndex = #stages + 1 - reverseStageIndex
 		return Import._computeStagePlacementEntries(stage, {
-					importWinners = reverseStageIndex == 1 or stageForceWinnerImport[reverseStageIndex],
-					groupElimStatuses = Import.config.groupElimStatuses,
-					importLimit = stageImportLimits[reverseStageIndex],
-				})
+				importWinners = Import.config.stageImportWinners[stageIndex] or (Import.config.stageImportWinners[stageIndex] == nil and reverseStageIndex == 1),
+				groupElimStatuses = Import.config.stageGroupElimStatuses[stageIndex] or Import.config.groupElimStatuses,
+				importLimit = Import.config.stageImportLimits[stageIndex] or 0,
+			})
 	end))
 
 	-- Apply importLimit if set
@@ -280,8 +285,7 @@ function Import._makeEntryFromMatch(placementEntry, match)
 end
 
 -- Computes the placements of a LPDB bracket
--- @options.importWinners: If on the last stage or enforced via switch,
--- then include placements for winners of final matches.
+-- @options.importWinners: Whether to include placements for non-eliminated opponents.
 function Import._computeBracketPlacementGroups(bracket, options)
 	local firstDeRoundIndex = Import._findDeRoundIndex(bracket)
 	local preTiebreakMatchIds = Import._getPreTiebreakMatchIds(bracket)
