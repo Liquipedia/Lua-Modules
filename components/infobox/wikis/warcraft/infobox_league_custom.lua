@@ -39,7 +39,7 @@ local OFFLINE = 'offline'
 local ONLINE = 'online'
 
 local GAME_REFORGED = 'wc3r'
-local GAME_FROZEN_THRONE = 'hots'
+local GAME_FROZEN_THRONE = 'tft'
 local GAME_REIGN = 'roc'
 local GAME_DEFAULT_SWITCH_DATE = '2020-01-01'
 
@@ -105,7 +105,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {GAMES[_args.game]}},
+			Cell{name = 'Game', content = {GAMES[_args.game] and ('[[' .. GAMES[_args.game] .. ']]') or nil}},
 			Cell{name = 'Game version', content = {CustomLeague._displayGameVersion()}},
 			Cell{name = 'Server', content = {CustomLeague:_getServer()}}
 			}
@@ -405,7 +405,9 @@ function CustomLeague._determineGame()
 	if _args.game and GAMES[_args.game:lower()] then
 		return _args.game:lower()
 	end
-	if Variables.varDefault('tournament_startdate', '') > GAME_DEFAULT_SWITCH_DATE then
+
+	local startDate = _league:_cleanDate(_args.sdate) or _league:_cleanDate(_args.date)
+	if startDate > GAME_DEFAULT_SWITCH_DATE then
 		return GAME_REFORGED
 	end
 
