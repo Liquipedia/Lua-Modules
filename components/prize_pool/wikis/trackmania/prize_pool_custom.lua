@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -18,6 +19,9 @@ local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = t
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
+
+local PRIZE_TYPE_POINTS = 'POINTS'
+local PRIZE_TITLE_WORD_TOUR = 'WT'
 
 local TIER_VALUE = {8, 4, 2}
 local TYPE_MODIFIER = {Online = 0.65}
@@ -43,6 +47,18 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		Variables.varDefault('tournament_type')
 	)
 
+	local worldTourPoints = Array.filter(placement.parent.prizes, function (prize)
+		if prize.type == PRIZE_TYPE_POINTS and prize.data.title == PRIZE_TITLE_WORD_TOUR then
+			return true
+		end
+	end)[1]
+
+	if worldTourPoints then
+		CustomPrizePool.addWTDatapoint(lpdbData, placement:getPrizeRewardForOpponent(opponent, worldTourPoints.id))
+	end
+
+	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
+
 	return lpdbData
 end
 
@@ -54,6 +70,19 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
 	local tierValue = TIER_VALUE[tonumber(tier)] or 1
 
 	return tierValue * (prizeMoney * 1000 + 1000 - place) / place * (TYPE_MODIFIER[type] or 1)
+end
+
+function CustomPrizePool.addWTDatapoint(data, wtPoints)
+	local pageName = mw.title.getCurrentTitle().fullText
+	mw.ext.LiquipediaDB.lpdb_datapoint('wt_points_' .. pageName .. '_' .. data.placement .. '_' .. data.participant, {
+		type = 'wt_points',
+		name = data.participant,
+		date = data.date,
+		information = wtPoints,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			placement = data.placement,
+		})
+	})
 end
 
 return CustomPrizePool
