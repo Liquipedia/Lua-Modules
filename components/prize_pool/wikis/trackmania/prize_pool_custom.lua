@@ -21,7 +21,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_POINTS = 'POINTS'
-local PRIZE_TITLE_WORD_TOUR = 'WT'
+local PRIZE_TITLE_WORLD_TOUR = 'WT'
 
 local TIER_VALUE = {8, 4, 2}
 local TYPE_MODIFIER = {Online = 0.65}
@@ -48,7 +48,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	)
 
 	local worldTourPoints = Array.filter(placement.parent.prizes, function (prize)
-		if prize.type == PRIZE_TYPE_POINTS and prize.data.title == PRIZE_TITLE_WORD_TOUR then
+		if prize.type == PRIZE_TYPE_POINTS and prize.data.title == PRIZE_TITLE_WORLD_TOUR then
 			return true
 		end
 	end)[1]
