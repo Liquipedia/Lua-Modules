@@ -465,7 +465,6 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 				self.infobox:categories(tierText .. ' Tournaments')
 			end
 			local tierLink = tierText .. CustomLeague._getModeInTier() .. ' Tournaments'
-			tierText = tierText .. CustomLeague._getModeDisplayInTier()
 
 			return '[[' .. tierLink .. '|' .. tierText .. ']]'
 		end
@@ -477,7 +476,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 		tierDisplay = buildTierString(tierType, TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
 	end
 
-	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+	return tierDisplay .. CustomLeague._getModeDisplayInTier()
 end
 
 function CustomLeague._getMode()
