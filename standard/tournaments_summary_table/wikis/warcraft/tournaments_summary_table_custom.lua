@@ -12,7 +12,7 @@ local CustomTournamentsSummaryTable = require('Module:TournamentsSummaryTable')
 
 CustomTournamentsSummaryTable.tierTypeExcluded = {'Qualifier', 'Charity'}
 CustomTournamentsSummaryTable.disableLIS = true
-CustomTournamentsSummaryTable.tiers = {'!'} -- currently allow all tiers
+CustomTournamentsSummaryTable.tiers = {'!Qualifier'} -- currently allow all tiers except qualifier
 CustomTournamentsSummaryTable.defaultLimit = 7
 local SECONDS_PER_DAY = 86400
 local COMPLETED_OFFSET = 182 * SECONDS_PER_DAY --roughly half a year
