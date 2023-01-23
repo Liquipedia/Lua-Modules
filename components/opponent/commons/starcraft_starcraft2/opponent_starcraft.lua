@@ -8,7 +8,7 @@
 
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
-local StarcraftRace = require('Module:Race/Starcraft')
+local StarcraftRace = require('Module:Race')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
