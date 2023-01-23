@@ -11,7 +11,6 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Race = Lua.requireIfExists('Module:Race')
-local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
 
 local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
