@@ -17,9 +17,7 @@ local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfE
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft', {requireDevIfEnabled = true})
-local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getBigIcon = function(_) end,
-}
+local Race = Lua.import('Module:Race', {requireDevIfEnabled = true})
 
 local html = mw.html
 
@@ -183,9 +181,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 		return playerNodes[1]
 
 	elseif showRace and opponent.isArchon then
-		local raceIcon = DisplayUtil.removeLinkFromWikiLink(
-			RaceIcon.getBigIcon({opponent.players[1].race})
-		)
+		local raceIcon = Race.Icon{size = 'large', showLink = false, showTitle = false, race = opponent.players[1].race}
 		return StarcraftOpponentDisplay.BlockArchon({
 			flip = props.flip,
 			playerNodes = playerNodes,
@@ -200,9 +196,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 		for archonIx = 1, #opponent.players / 2 do
 			local primaryRace = opponent.players[2 * archonIx - 1].race
 			local secondaryRace = opponent.players[2 * archonIx].race
-			local primaryIcon = DisplayUtil.removeLinkFromWikiLink(
-				RaceIcon.getBigIcon({primaryRace})
-			)
+			local primaryIcon = Race.Icon{size = 'large', showLink = false, showTitle = false, race = primaryRace}
 			local secondaryIcon
 			if primaryRace ~= secondaryRace then
 				secondaryIcon = html.create('div')
