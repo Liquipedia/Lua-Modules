@@ -105,7 +105,7 @@ function CustomPlayerExt.populatePlayer(player, options)
 end
 
 function CustomPlayerExt.saveToPageVars(player)
-	if player.race and player.race ~= DEFAULT_RACE then
+	if player.race and player.race ~= Race.defaultRace then
 		globalVars:set(player.displayName .. '_race', player.race)
 	end
 
