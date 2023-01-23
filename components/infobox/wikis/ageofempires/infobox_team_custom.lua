@@ -30,11 +30,6 @@ function CustomTeam.run(frame)
 	-- Automatic achievements
 	team.args.achievements = Achievements.team{team = team.pagename, aka = team.args.aka}
 
-	-- Automatic org people
-	team.args.coach = Template.expandTemplate(frame, 'Coach of')
-	team.args.manager = Template.expandTemplate(frame, 'Manager of')
-	team.args.captain = Template.expandTemplate(frame, 'Captain of')
-
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 
 	_args = team.args
@@ -44,6 +39,13 @@ end
 
 function CustomTeam:createWidgetInjector()
 	return CustomInjector()
+end
+
+function CustomInjector:parse(id, widgets)
+	if id == 'earningscell' then
+		widgets[1].name = 'Approx. Total Winnings'
+	end
+	return widgets
 end
 
 function CustomInjector:addCustomCells(widgets)
