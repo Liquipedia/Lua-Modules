@@ -7,6 +7,7 @@
 --
 
 local Achievements = require('Module:Achievements in infoboxes')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
 local Lua = require('Module:Lua')
@@ -31,6 +32,7 @@ local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local MAX_NUMBER_OF_PLAYERS = 10
+local INACTIVITY_THRESHOLD_YEARS = 1
 
 local _args
 local _pagename
@@ -69,40 +71,49 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomTeam._getGames()
-	return Table.mapValues(
-		Table.mapValues(mw.text.split(_args.games, ','), mw.text.trim),
+	local games = Array.map(
+		mw.text.split(_args.games, ','), 
 		function(game)
-			game = GameLookup.getName(game)
-			return game .. (game ~= 'Unknown' and CustomTeam._getGameInactivity(game) or '')
+			return GameLookup.getName(mw.text.trim(game))
 		end)
+	
+	table.sort(games)
+
+	local activeGames = CustomTeam._getGameActivity()
+	local isActive = function(game)
+		return Array.find(activeGames, function(entry) return entry.game == game end)
+	end
+
+	games = Array.map(
+		games,
+		function(game)
+			return game .. (isActive(game) and '' or ' <i><small>(Inactive)</small></i>')
+		end)
+
+	return games
 end
 
-function CustomTeam._getGameInactivity(game)
+function CustomTeam._getGameActivity()
 	local date = os.date('!*t')
-	date.year = date.year - 1
+	date.year = date.year - INACTIVITY_THRESHOLD_YEARS
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		CustomTeam._buildTeamPlacementConditions(),
-		ConditionNode(ColumnName('game'), Comparator.eq, game),
 		ConditionNode(ColumnName('date'), Comparator.gt, os.date('!%F', os.time(date)))
 	}
 
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = conditions:toString(),
 			order = 'date desc',
-			query = 'date',
-			limit = 1
+			query = 'game, date',
+			groupby = 'game asc',
 		})
 
 	if type(data) ~= 'table' then
 		error(data)
 	end
 
-	if data[1] then
-		return ''
-	else
-		return ' <i><small>(inactive)</small></i>'
-	end
+	return data
 end
 
 function CustomTeam._buildTeamPlacementConditions()
