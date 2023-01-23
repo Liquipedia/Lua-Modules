@@ -12,7 +12,6 @@ local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:OpponentLibraries').Opponent
-local Table = require('Module:Table')
 local TeamTemplates = require('Module:Team')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -72,11 +71,11 @@ end
 
 function CustomTeam._getGames()
 	local games = Array.map(
-		mw.text.split(_args.games, ','), 
+		mw.text.split(_args.games, ','),
 		function(game)
 			return GameLookup.getName(mw.text.trim(game))
 		end)
-	
+
 	table.sort(games)
 
 	local activeGames = CustomTeam._getGameActivity()
