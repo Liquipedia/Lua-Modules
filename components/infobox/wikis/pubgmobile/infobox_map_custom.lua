@@ -91,8 +91,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomMap._getGameVersion()
-	local game = string.lower(_args.game or '')
-	return GAME[game]
+	return GAME[string.lower(_args.game or '')]
 end
 
 function CustomMap:_getGameMode()
