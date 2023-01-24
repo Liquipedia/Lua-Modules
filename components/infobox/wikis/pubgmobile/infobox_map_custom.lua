@@ -32,7 +32,7 @@ local GAME = {
 	bgmi = '[[Battlegrounds Mobile India|BGMI]]',
 }
 
-local _MODES = {
+local MODES = {
 	solo = 'Solos[[Category:Solos Mode Tournaments]]',
 	duo = 'Duos[[Category:Duos Mode Tournaments]]',
 	squad = 'Squads[[Category:Squads Mode Tournaments]]',
