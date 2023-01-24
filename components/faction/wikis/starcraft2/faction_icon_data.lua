@@ -1,22 +1,26 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:Race/IconData
+-- page=Module:Faction/IconData
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local byRace = {
+local byFaction = {
 	p = {
+		altIcon = 'File:ProtossIcon.png',
 		icon = 'File:Protoss race icon.png',
 	},
 	t = {
+		altIcon = 'File:TerranIcon.png',
 		icon = 'File:Terran race icon.png',
 	},
 	z = {
+		altIcon = 'File:ZergIcon.png',
 		icon = 'File:Zerg race icon.png',
 	},
 	r = {
+		altIcon = 'File:RaceIcon Random.png',
 		icon = 'File:Random race icon.png',
 	},
 	u = {
@@ -30,4 +34,4 @@ local randomIcons = {
 	['r(z)'] = 'File:Random Zerg race icon.png',
 }
 
-return {byRace = byRace, randomIcons = randomIcons}
+return {byFaction = byFaction, randomIcons = randomIcons}
