@@ -52,7 +52,7 @@ end
 --- Parses a faction from input. Returns the factions short handle/identifier.
 -- Returns nil if not a valid faction.
 ---@param faction string
----@return string|nil
+---@return string?
 function Faction.read(faction)
 	if type(faction) ~= 'string' then
 		return nil
@@ -66,7 +66,7 @@ end
 
 --- Returns the name of an entered faction identifier
 ---@param faction string
----@return string|nil
+---@return string?
 function Faction.toName(faction)
 	local factionProps = Faction.getProps(faction)
 	return factionProps and factionProps.name or nil
@@ -89,7 +89,7 @@ local namedSizes = {
 
 --- Returns the name of an entered faction identifier
 ---@props props {faction: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
----@return string|nil
+---@return string?
 function Faction.Icon(props)
 	local faction = Faction.read(props.faction)
 	if not faction then return end
@@ -117,7 +117,7 @@ end
 
 --- Returns the name background color class of a given faction
 ---@param faction string
----@return string|nil
+---@return string?
 function Faction.bgClass(faction)
 	local factionProps = Faction.getProps(faction)
 	return factionProps and factionProps.bgClass or nil
