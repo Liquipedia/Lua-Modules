@@ -47,7 +47,7 @@ _MODES.duos = _MODES.duo
 _MODES.squads = _MODES.squad
 _MODES.tdm = _MODES['2v2']
 
-local _PERSPECTIVES = {
+local PERSPECTIVES = {
 	fpp = {'FPP'},
 	tpp = {'TPP'},
 	mixed = {'FPP', 'TPP'},
