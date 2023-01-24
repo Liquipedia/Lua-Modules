@@ -24,7 +24,6 @@ local CustomMap = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _game
 
 local GAME = {
 	mobile = '[[Mobile]]',
