@@ -59,7 +59,7 @@ function Faction.read(faction)
 	end
 
 	faction = faction:lower()
-	return Data.factionProps[faction] and faction
+	return Faction.isValid(faction) and faction
 		or byLowerName[faction]
 		or Faction.aliases[faction]
 end
