@@ -92,7 +92,7 @@ end
 
 function CustomMap._getGameVersion()
 	local game = string.lower(_args.game or '')
-	return _GAME[game]
+	return GAME[game]
 end
 
 function CustomMap:_getGameMode()
@@ -104,13 +104,13 @@ function CustomMap:_getGameMode()
 		-- Clean unnecessary data from the input
 		perspective = string.gsub(perspective, ' person', '')
 		perspective = string.gsub(perspective, ' perspective', '')
-		return _PERSPECTIVES[perspective] or {}
+		return PERSPECTIVES[perspective] or {}
 	end
 	local getPerspectiveDisplay = function(perspective)
 		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/' .. perspective)
 	end
 	local displayPerspectives = Table.mapValues(getPerspectives(_args.perspective), getPerspectiveDisplay)
-	local mode = _MODES[string.lower(_args.mode or '')] or _MODES['default']
+	local mode = MODES[string.lower(_args.mode or '')] or MODES['default']
 
 	return mode .. '&nbsp;' .. table.concat(displayPerspectives, '&nbsp;')
 end
