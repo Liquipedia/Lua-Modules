@@ -9,8 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
@@ -39,13 +37,7 @@ function Infobox:create(frame, gameName, forceDarkMode)
 end
 
 function Infobox:addCategories(...)
-	local input = Table.pack(...)
-	for i = 1, input.n do
-		local category = input[i]
-		if String.isNotEmpty(category) then
-			table.insert(self.categories, category)
-		end
-	end
+	Array.extendWith(self.categories, ...)
 	return self
 end
 
