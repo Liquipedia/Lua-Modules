@@ -41,18 +41,18 @@ local MODES = {
 	['war mode'] = 'War Mode[[Category:War Mode Tournaments]]',
 	default = '[[Category:Unknown Mode Tournaments]]',
 }
-_MODES.solos = _MODES.solo
-_MODES.duos = _MODES.duo
-_MODES.squads = _MODES.squad
-_MODES.tdm = _MODES['2v2']
+MODES.solos = MODES.solo
+MODES.duos = MODES.duo
+MODES.squads = MODES.squad
+MODES.tdm = MODES['2v2']
 
 local PERSPECTIVES = {
 	fpp = {'FPP'},
 	tpp = {'TPP'},
 	mixed = {'FPP', 'TPP'},
 }
-_PERSPECTIVES.first = _PERSPECTIVES.fpp
-_PERSPECTIVES.third = _PERSPECTIVES.tpp
+PERSPECTIVES.first = PERSPECTIVES.fpp
+PERSPECTIVES.third = PERSPECTIVES.tpp
 
 function CustomMap.run(frame)
 	local customMap = Map(frame)
