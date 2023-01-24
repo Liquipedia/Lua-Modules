@@ -6,8 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Lua = require('Module:Lua')
 local Faction = require('Module:Faction')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
