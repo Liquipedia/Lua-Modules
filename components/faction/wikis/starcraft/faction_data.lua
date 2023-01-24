@@ -1,9 +1,9 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft
--- page=Module:Race/Data
+-- page=Module:Faction/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-return require('Module:Race/Data/Starcraft')
+return require('Module:Faction/Data/Starcraft')
