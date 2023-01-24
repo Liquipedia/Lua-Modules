@@ -1,79 +1,79 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Race
+-- page=Module:Faction
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Data = mw.loadData('Module:Race/Data')
+local Data = mw.loadData('Module:Faction/Data')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local IconData = Lua.loadDataIfExists('Module:Race/IconData')
-	or {byRace = {}}
+local IconData = Lua.loadDataIfExists('Module:Faction/IconData')
+	or {byFaction = {}}
 
-local Race = {propTypes = {}, types = {}}
+local Faction = {propTypes = {}, types = {}}
 
-Race.defaultRace = Data.defaultRace
-Race.races = Data.races
-Race.knownRaces = Data.knownRaces
-Race.coreRaces = Data.coreRaces
-Race.aliases = Data.aliases
+Faction.defaultFaction = Data.defaultFaction
+Faction.factions = Data.factions
+Faction.knownFactions = Data.knownFactions
+Faction.coreFactions = Data.coreFactions
+Faction.aliases = Data.aliases
 
-Race.types.Race = TypeUtil.literalUnion(unpack(Race.races))
+Faction.types.Faction = TypeUtil.literalUnion(unpack(Faction.factions))
 
-Race.types.RaceProps = TypeUtil.struct{
+Faction.types.FactionProps = TypeUtil.struct{
 	bgClass = 'string?',
 	index = 'number',
 	name = 'string',
 	pageName = 'string?',
-	race = Race.types.Race,
+	faction = Faction.types.Faction,
 }
 
-local byName = Table.map(Data.raceProps, function(race, props) return props.name, race end)
-local byLowerName = Table.map(byName, function(name, race) return name:lower(), race end)
+local byName = Table.map(Data.factionProps, function(faction, props) return props.name, faction end)
+local byLowerName = Table.map(byName, function(name, faction) return name:lower(), faction end)
 
---- Checks if a entered race is valid
----@param race string
+--- Checks if a entered faction is valid
+---@param faction string
 ---@return boolean
-function Race.isValid(race)
-	return Data.raceProps[race] ~= nil
+function Faction.isValid(faction)
+	return Data.factionProps[faction] ~= nil
 end
 
---- Fetches the properties of an entered race
----@param race string
+--- Fetches the properties of an entered faction
+---@param faction string
 ---@return table?
-function Race.getProps(race)
-	return Data.raceProps[race]
+function Faction.getProps(faction)
+	return Data.factionProps[faction]
 end
 
---- Parses a race from input. Returns the races short handle/identifier.
--- Returns nil if not a valid race.
----@param race string
+--- Parses a faction from input. Returns the factions short handle/identifier.
+-- Returns nil if not a valid faction.
+---@param faction string
 ---@return string|nil
-function Race.read(race)
-	if type(race) ~= 'string' then
+function Faction.read(faction)
+	if type(faction) ~= 'string' then
 		return nil
 	end
 
-	race = race:lower()
-	return Data.raceProps[race] and race
-		or byLowerName[race]
-		or Race.aliases[race]
+	faction = faction:lower()
+	return Data.factionProps[faction] and faction
+		or byLowerName[faction]
+		or Faction.aliases[faction]
 end
 
---- Returns the name of an entered race identifier
----@param race string
+--- Returns the name of an entered faction identifier
+---@param faction string
 ---@return string|nil
-function Race.toName(race)
-	local raceProps = Race.getProps(race)
-	return raceProps and raceProps.name or nil
+function Faction.toName(faction)
+	local factionProps = Faction.getProps(faction)
+	return factionProps and factionProps.name or nil
 end
 
-Race.propTypes.Icon = TypeUtil.struct{
-	race = 'string',
+Faction.propTypes.Icon = TypeUtil.struct{
+	faction = 'string',
 	showLink = 'boolean?',
 	showTitle = 'boolean?',
 	size = TypeUtil.union('string', 'number', 'nil'),
@@ -87,40 +87,40 @@ local namedSizes = {
 	tiny = '10px',
 }
 
---- Returns the name of an entered race identifier
----@props props {race: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
+--- Returns the name of an entered faction identifier
+---@props props {faction: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
 ---@return string|nil
-function Race.Icon(props)
-	local race = Race.read(props.race)
-	if not race then return '' end
+function Faction.Icon(props)
+	local faction = Faction.read(props.faction)
+	if not faction then return end
 
-	local raceProps = Race.getProps(race)
-	assert(raceProps, 'Race.Icon: Invalid race=' .. tostring(props.race))
+	local factionProps = Faction.getProps(faction)
+	assert(factionProps, 'Faction.Icon: Invalid faction=' .. tostring(props.faction))
 
 	local size = namedSizes[props.size or 'small'] or props.size
 	if type(size) == 'number' then
 		size = size .. 'px'
 	end
 
-	local iconData = IconData.byRace[race] or {}
+	local iconData = IconData.byFaction[faction] or {}
 	local iconName = iconData.icon
 	if not iconName then return end
 
 	return '[['
 		.. iconName
-		.. '|link=' .. (props.showLink and raceProps.pageName or '')
+		.. '|link=' .. (props.showLink and factionProps.pageName or '')
 		.. '|' .. size
-		.. (props.showTitle ~= false and '|' .. (props.title or raceProps.name) or '')
+		.. (props.showTitle ~= false and '|' .. (props.title or factionProps.name) or '')
 		.. ']]'
 end
 
 
---- Returns the name background color class of a given race
----@param race string
+--- Returns the name background color class of a given faction
+---@param faction string
 ---@return string|nil
-function Race.bgClass(race)
-	local raceProps = Race.getProps(race)
-	return raceProps and raceProps.bgClass or nil
+function Faction.bgClass(faction)
+	local factionProps = Faction.getProps(faction)
+	return factionProps and factionProps.bgClass or nil
 end
 
-return Race
+return Faction
