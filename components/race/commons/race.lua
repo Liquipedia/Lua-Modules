@@ -88,7 +88,7 @@ local namedSizes = {
 }
 
 --- Returns the name of an entered race identifier
----@props props {race: string, size: string?, showLink: boolean?, showTitle: boolean?, title: string?}
+---@props props {race: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
 ---@return string|nil
 function Race.Icon(props)
 	local race = Race.read(props.race)
