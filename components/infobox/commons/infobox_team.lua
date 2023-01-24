@@ -193,16 +193,16 @@ function Team:createInfobox()
 end
 
 function Team:_createRegion(region)
-	if region == nil or region == '' then
-		return ''
+	if String.isEmpty(region) then
+		return
 	end
 
 	return Template.safeExpand(self.infobox.frame, 'Region', {region})
 end
 
 function Team:_createLocation(location)
-	if location == nil or location == '' then
-		return ''
+	if String.isEmpty(location)then
+		return
 	end
 
 	local locationDisplay = self:getStandardLocationValue(location)
@@ -213,20 +213,18 @@ function Team:_createLocation(location)
 			.. '|' .. locationDisplay .. ']]'
 	end
 
-	local category
 	if String.isNotEmpty(demonym) and self:shouldStore(self.args) then
-		category = '[[Category:' .. demonym .. ' Teams]]'
+		self.infobox:addCategories(demonym .. ' Teams')
 	end
 
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
-			(category or '') ..
 			(locationDisplay or '')
 end
 
 function Team:getStandardLocationValue(location)
 	if String.isEmpty(location) then
-		return nil
+		return
 	end
 
 	local locationToStore = Flags.CountryName(location)
@@ -236,7 +234,7 @@ function Team:getStandardLocationValue(location)
 			_warnings,
 			'"' .. location .. '" is not supported as a value for locations'
 		)
-		locationToStore = nil
+		return
 	end
 
 	return locationToStore
