@@ -11,7 +11,9 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TextSanitizer = require('Module:TextSanitizer')
 local Variables = require('Module:Variables')
+
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
@@ -109,11 +111,19 @@ function MatchLegacy.convertParameters(match2)
 		local prefix = 'opponent' .. index
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
-		if opponent.type == Opponent.team then
-			if mw.ext.TeamTemplate.teamexists(opponent.template) then
-				match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
+			if opponent.type == Opponent.team then
+				if mw.ext.TeamTemplate.teamexists(opponent.template) then
+					match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+				else
+					match[prefix] = opponent.template
+				end
 			else
-				match[prefix] = opponent.template
+				if TextSanitizer.stripHTML(opponent.name) ~= opponent.name then
+					match[prefix] = 'TBD'
+				else
+					match[prefix] = opponent.name
+				end
 			end
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
 			if isOverturned then
@@ -149,8 +159,6 @@ function MatchLegacy.convertParameters(match2)
 			match[prefix] = player.name
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix .. 'flag'] = player.flag
-		elseif opponent.type == Opponent.literal then
-			match[prefix] = 'TBD'
 		end
 	end
 
