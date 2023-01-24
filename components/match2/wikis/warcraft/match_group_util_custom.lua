@@ -6,8 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Race = require('Module:Race')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -15,7 +15,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
-CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Race.races))
+CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions))
 
 CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
