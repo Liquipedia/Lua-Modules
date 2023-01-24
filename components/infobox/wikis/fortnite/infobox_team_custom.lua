@@ -34,7 +34,7 @@ local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 10
 local _EARNINGS_MODES = {team = 'team'}
 local _LANGUAGE = mw.language.new('en')
 
-local _team, _args, _earnings
+local _team, _args
 
 local CustomInjector = Class.new(Injector)
 
@@ -43,16 +43,10 @@ function CustomTeam.run(frame)
 	_team = team
 	_args = team.args
 
-	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
+	team.calculateEarnings = CustomTeam.calculateEarnings
 
 	return team:createInfobox()
-end
-
-function CustomTeam:addToLpdb(lpdbData)
-	lpdbData.earnings = _earnings
-
-	return lpdbData
 end
 
 function CustomTeam:createWidgetInjector()
@@ -61,27 +55,20 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		local earningsWhileOnTeam
-		_earnings, earningsWhileOnTeam = CustomTeam.calculateEarnings(_args)
-		local earningsDisplay
-		if _earnings == 0 then
-			earningsDisplay = nil
-		else
-			earningsDisplay = '$' .. _LANGUAGE:formatNum(_earnings)
-		end
-		local earningsFromPlayersDisplay
-		if earningsWhileOnTeam > 0 then
-			earningsFromPlayersDisplay = '$' .. _LANGUAGE:formatNum(earningsWhileOnTeam)
-		end
-		return {
-			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
-			Cell{name = _PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
-		}
+		table.insert(widgets, Cell{name = _PLAYER_EARNINGS_ABBREVIATION,
+			content = {_team.playerEarnings and '$' .. _LANGUAGE:formatNum(_team.playerEarnings) or nil}
+		})
 	end
 	return widgets
 end
 
-function CustomTeam.calculateEarnings(args)
+function CustomTeam:calculateEarnings(args)
+	local totalEarnings, playerEarnings = CustomTeam:calculatePlayerEarnings(args)
+	self.playerEarnings = playerEarnings
+	return totalEarnings, {}
+end
+
+function CustomTeam:calculatePlayerEarnings(args)
 	if not Namespace.isMain() then
 		return 0, 0
 	end
@@ -133,8 +120,6 @@ function CustomTeam.calculateEarnings(args)
 				information = playerEarnings,
 		})
 	end
-
-	Variables.varDefine('earnings', earnings.team.total or 0)
 
 	return Math.round{earnings.team.total or 0}, Math.round{playerEarnings or 0}
 end

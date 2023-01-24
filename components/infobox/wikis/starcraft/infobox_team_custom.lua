@@ -35,8 +35,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local doStore = true
-
 local CustomTeam = Class.new()
 
 local CustomInjector = Class.new(Injector)
@@ -57,6 +55,10 @@ function CustomTeam.run(frame)
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
+	team.calculateEarnings = CustomTeam.calculateEarnings
+	team.shouldStore = CustomTeam.shouldStore
+	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
+
 	return team:createInfobox()
 end
 
@@ -70,19 +72,9 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		CustomTeam.calculateEarnings(_args)
-		local earningsDisplay
-		if _team.totalEarnings > 0 then
-			earningsDisplay = '$' .. _LANGUAGE:formatNum(_team.totalEarnings)
-		end
-		local earningsFromPlayersDisplay
-		if _team.totalEarningsWhileOnTeam > 0 then
-			earningsFromPlayersDisplay = '$' .. _LANGUAGE:formatNum(_team.totalEarningsWhileOnTeam)
-		end
-		return {
-			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
-			Cell{name = _PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
-		}
+		table.insert(widgets, Cell{name = _PLAYER_EARNINGS_ABBREVIATION,
+			content = {_team.playerEarnings and '$' .. _LANGUAGE:formatNum(_team.playerEarnings) or nil}
+		})
 	elseif id == 'achievements' then
 		table.insert(widgets, Cell{name = 'Solo Achievements', content = {_args['solo achievements']}})
 		--need this ABOVE the history display and below the
@@ -177,29 +169,22 @@ function CustomTeam.playerBreakDown(args)
 	return playerBreakDown
 end
 
-function CustomTeam.calculateEarnings(args)
-	-- set default values for the non query case
-	_team.earnings = {}
-	_team.totalEarnings = 0
-	_team.earningsWhileOnTeam = {}
-	_team.totalEarningsWhileOnTeam = 0
-
-	if
-		Logic.readBool(args.disable_smw) or
-		Logic.readBool(args.disable_lpdb) or
-		Logic.readBool(args.disable_storage) or
-		Logic.readBool(Variables.varDefault('disable_SMW_storage')) or
-		(not Namespace.isMain())
-	then
-		doStore = false
+function CustomTeam:calculateEarnings(args)
+	if self:shouldStore() then
 		Variables.varDefine('disable_SMW_storage', 'true')
+		self.totalEarningsWhileOnTeam = 0
+		self.earningsWhileOnTeam = {}
+		return 0, {}
+
 	else
-		CustomTeam.getEarningsAndMedalsData(_team.pagename)
-		Variables.varDefine('earnings', _team.totalEarnings)
+		local total, yearly, playerTotal, playerYearly = self:getEarningsAndMedalsData(self.pagename)
+		self.totalEarningsWhileOnTeam = playerTotal or 0
+		self.earningsWhileOnTeam = playerYearly or {}
+		return total or 0, yearly or {}
 	end
 end
 
-function CustomTeam.getEarningsAndMedalsData(team)
+function CustomTeam:getEarningsAndMedalsData(team)
 	local query = 'liquipediatier, liquipediatiertype, placement, date, '
 		.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype'
 
@@ -254,7 +239,7 @@ function CustomTeam.getEarningsAndMedalsData(team)
 
 	local processPlacement = function(placement)
 		--handle earnings
-		earnings, playerEarnings = CustomTeam._addPlacementToEarnings(earnings, playerEarnings, placement)
+		earnings, playerEarnings = self:_addPlacementToEarnings(earnings, playerEarnings, placement)
 
 		--handle medals
 		local mode = placement.opponenttype
@@ -276,7 +261,7 @@ function CustomTeam.getEarningsAndMedalsData(team)
 	end
 
 	-- to be removed after a purge run + consumer updates
-	if doStore then
+	if self:shouldStore() then
 		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
 				type = 'total_earnings_players_while_on_team',
 				name = _team.pagename,
@@ -290,19 +275,17 @@ function CustomTeam.getEarningsAndMedalsData(team)
 		end
 	end
 
-	_team.totalEarnings = Table.extract(earnings.team or {}, 'total') or 0
-	_team.earnings = earnings.team or {}
-	_team.totalEarningsWhileOnTeam = Table.extract(earnings.other or {}, 'total') or 0
-	_team.earningsWhileOnTeam = earnings.other or {}
+	return Table.extract(earnings.team or {}, 'total'), earnings.team,
+		Table.extract(earnings.other or {}, 'total'), earnings.other
 end
 
-function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
+function CustomTeam:_addPlacementToEarnings(earnings, playerEarnings, data)
 	local prizeMoney = data.prizemoney
 	data.opponentplayers = data.opponentplayers or {}
 	local mode = data.opponenttype
 	mode = _EARNINGS_MODES[mode]
 	if not mode then
-		prizeMoney = data.individualprizemoney * CustomTeam._amountOfTeamPlayersInPlacement(data.opponentplayers)
+		prizeMoney = data.individualprizemoney * self:_amountOfTeamPlayersInPlacement(data.opponentplayers)
 		playerEarnings = playerEarnings + prizeMoney
 		mode = 'other'
 	end
@@ -317,7 +300,7 @@ function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 	return earnings, playerEarnings
 end
 
-function CustomTeam._addPlacementToMedals(medals, data)
+function CustomTeam:_addPlacementToMedals(medals, data)
 	local place = CustomTeam._placements(data.placement)
 	if place then
 		if data.liquipediatiertype ~= 'Qualifier' then
@@ -351,15 +334,29 @@ function CustomTeam._placements(value)
 	end
 end
 
-function CustomTeam._amountOfTeamPlayersInPlacement(players)
+function CustomTeam:_amountOfTeamPlayersInPlacement(players)
 	local amount = 0
 	for playerKey in Table.iter.pairsByPrefix(players, 'p') do
-		if players[playerKey .. 'team'] == _team.pagename then
+		if players[playerKey .. 'team'] == self.pagename then
 			amount = amount + 1
 		end
 	end
 
 	return amount
+end
+
+function CustomTeam:shouldStore(args)
+	return not Logic.readBool(args.disable_smw) and
+		not Logic.readBool(args.disable_lpdb) and
+		not Logic.readBool(args.disable_storage) and
+		not Logic.readBool(Variables.varDefault('disable_SMW_storage')) and
+		Namespace.isMain()
+end
+
+function CustomTeam:defineCustomPageVariables(args)
+	if not CustomTeam:shouldStore(args) then
+		Variables.varDefine('disable_SMW_storage', 'true')
+	end
 end
 
 return CustomTeam

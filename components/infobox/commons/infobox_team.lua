@@ -36,7 +36,6 @@ local Team = Class.new(BasicInfobox)
 local _LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
-local _defaultEarningsFunctionUsed = false
 
 local _warnings = {}
 
@@ -50,6 +49,8 @@ function Team:createInfobox()
 	local args = self.args
 	-- Need links in LPDB, so declare them outside of display code
 	local links = Links.transform(args)
+
+	self.totalEarnings, self.yearlyEarnings = self:calculateEarnings(args)
 
 	local widgets = {
 		Header{
@@ -93,31 +94,14 @@ function Team:createInfobox()
 		Customizable{
 			id = 'earnings',
 			children = {
-				Builder{
-					builder = function()
-						_defaultEarningsFunctionUsed = true
-						self.totalEarnings, self.earnings = Earnings.calculateForTeam{
-							team = self.pagename or self.name,
-							perYear = true,
-							queryHistorical = args.queryEarningsHistorical
-						}
-						Variables.varDefine('earnings', self.totalEarnings) -- needed for SMW
-						local totalEarningsDisplay
-						if self.totalEarnings > 0 then
-							totalEarningsDisplay = '$' .. Language:formatNum(self.totalEarnings)
-						end
-						return {
-							Customizable{id = 'earningscell',
-								children = {
-									Cell{name = Abbreviation.make(
-										'Approx. Total Winnings',
-										'Includes individual player earnings won&#10;while representing this team'
-									),
-									content = {totalEarningsDisplay}}
-								}
-							}
-						}
-					end
+				Customizable{id = 'earningscell',
+					children = {
+						Cell{name = Abbreviation.make(
+							'Approx. Total Winnings',
+							'Includes individual player earnings won&#10;while representing this team'
+						),
+						content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}}
+					}
 				}
 			}
 		},
@@ -277,18 +261,14 @@ function Team:_setLpdbData(args, links)
 		extradata = {}
 	}
 
-	for year, earningsOfYear in pairs(self.earnings or {}) do
+	Variables.varDefine('earnings', self.totalEarnings or 0) -- needed for SMW
+	for year, earningsOfYear in pairs(self.yearlyEarnings or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
-		--make these values available for smw storage
+		--make these values available for SMW storage
 		Variables.varDefine('earningsin' .. year, earningsOfYear)
 	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
-
-	if String.isEmpty(lpdbData.earnings) and not _defaultEarningsFunctionUsed then
-		error('Since your wiki uses a customized earnings function you ' ..
-			'have to set the LPDB earnings storage in the custom module')
-	end
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
@@ -296,6 +276,14 @@ end
 
 --- Allows for overriding this functionality
 function Team:defineCustomPageVariables(args)
+end
+
+function Team:calculateEarnings(args)
+	return Earnings.calculateForTeam{
+		team = self.pagename or self.name,
+		perYear = true,
+		queryHistorical = args.queryEarningsHistorical
+	}
 end
 
 function Team:addToLpdb(lpdbData, args)
