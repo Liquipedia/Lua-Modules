@@ -117,7 +117,7 @@ end
 --- positions, usually used to indicate if a team in a specific position will end up qualifying
 function AutomaticPointsTable:parsePositionBackgroundData(args)
 	local positionBackgrounds = {}
-	for _, background in Table.iter.pairsByPrefix(args, 'positionbg') do
+	for _, background in Table.iter.pairsByPrefix(args, 'positionbg', {strict = true}) do
 		table.insert(positionBackgrounds, background)
 	end
 	return positionBackgrounds
@@ -133,7 +133,7 @@ end
 
 function AutomaticPointsTable:parseTeams(args, tournamentCount, shouldResolveRedirect)
 	local teams = {}
-	for _, team in Table.iter.pairsByPrefix(args, 'team') do
+	for _, team in Table.iter.pairsByPrefix(args, 'team', {strict = true}) do
 		local parsedTeam = Json.parse(team)
 		parsedTeam.aliases = self:parseAliases(parsedTeam, tournamentCount, shouldResolveRedirect)
 		parsedTeam.deductions = self:parseDeductions(parsedTeam, tournamentCount)

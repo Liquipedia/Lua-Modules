@@ -219,7 +219,6 @@ function matchFunctions.getLinks(match)
 	end
 
 	-- Ballchasing
-	match.ballchasing1 = match.ballchasing1 or match.ballchasing
 	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing') do
 		match.links[key] = 'https://ballchasing.com/group/' .. ballchasing
 	end

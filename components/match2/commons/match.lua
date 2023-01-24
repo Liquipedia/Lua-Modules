@@ -54,10 +54,10 @@ function Match._toEncodedJson(matchArgs)
 		qualloseLiteral = matchArgs.qualloseliteral,
 	}
 
-	for key, map in Table.iter.pairsByPrefix(matchArgs, 'map') do
+	for key, map in Table.iter.pairsByPrefix(matchArgs, 'map', {strict = true}) do
 		matchArgs[key] = Json.parseIfString(map)
 	end
-	for key, opponent in Table.iter.pairsByPrefix(matchArgs, 'opponent') do
+	for key, opponent in Table.iter.pairsByPrefix(matchArgs, 'opponent', {strict = true}) do
 		matchArgs[key] = Json.parseIfString(opponent)
 	end
 
@@ -202,7 +202,7 @@ end
 	to `list`. Sets the original location (so in `match`) to `nil`.
 ]]
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
-	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
+	for key, item in Table.iter.pairsByPrefix(match, typePrefix, {strict = true}) do
 		match[key] = nil
 		table.insert(list, item)
 	end
