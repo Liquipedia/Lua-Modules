@@ -54,7 +54,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end)[1]
 
 	if worldTourPoints then
-		CustomPrizePool.addWTDatapoint(lpdbData, placement:getPrizeRewardForOpponent(opponent, worldTourPoints.id))
+		lpdbData.extradata.prizepoints = placement:getPrizeRewardForOpponent(opponent, worldTourPoints.id)
+		lpdbData.extradata.prizepointsTitle = 'wt_points'
 	end
 
 	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
