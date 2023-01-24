@@ -35,7 +35,7 @@ function Spell.run(frame)
 	spell.createWidgetInjector = Spell.createWidgetInjector
 	spell.getCategories = Spell.getCategories
 	_args = spell.args
-	return spell:createInfobox(frame)
+	return spell:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)

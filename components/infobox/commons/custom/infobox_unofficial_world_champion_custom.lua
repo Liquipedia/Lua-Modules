@@ -15,7 +15,7 @@ local CustomUnofficialWorldChampion = Class.new()
 
 function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
-	return unofficialWorldChampion:createInfobox(frame)
+	return unofficialWorldChampion:createInfobox()
 end
 
 return CustomUnofficialWorldChampion

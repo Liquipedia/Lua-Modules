@@ -36,7 +36,7 @@ function CustomStrategy.run(frame)
 	_args = customStrategy.args
 	customStrategy.createWidgetInjector = CustomStrategy.createWidgetInjector
 	customStrategy.getWikiCategories = CustomStrategy.getWikiCategories
-	return customStrategy:createInfobox(frame)
+	return customStrategy:createInfobox()
 end
 
 function CustomStrategy:createWidgetInjector()

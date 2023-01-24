@@ -44,7 +44,7 @@ function CustomLeague.run(frame)
 	league.shouldStore = CustomLeague.shouldStore
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()

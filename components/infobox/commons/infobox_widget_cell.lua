@@ -43,7 +43,6 @@ function Cell:_class(...)
 end
 
 function Cell:_content(...)
-	self.contentText = ...
 	local firstItem = select(1, ...)
 	if firstItem == nil or firstItem == '' then
 		self.contentDiv = nil

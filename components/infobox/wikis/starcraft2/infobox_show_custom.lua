@@ -26,7 +26,7 @@ function CustomShow.run(frame)
 	_args = customShow.args
 	customShow.createWidgetInjector = CustomShow.createWidgetInjector
 	customShow.getWikiCategories = CustomShow.getWikiCategories
-	return customShow:createInfobox(frame)
+	return customShow:createInfobox()
 end
 
 function CustomShow:createWidgetInjector()
