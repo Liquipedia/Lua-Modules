@@ -66,14 +66,14 @@ function Person:createInfobox()
 
 	-- check if non-representing is used and set an according value in self
 	-- so it can be accessed in the /Custom modules
-	args.country = Person:getStandardNationalityValue(args.country or args.nationality)
-	if args.country == Person:getStandardNationalityValue('non-representing') then
+	args.country = self:getStandardNationalityValue(args.country or args.nationality)
+	if args.country == self:getStandardNationalityValue('non-representing') then
 		self.nonRepresenting = true
 	end
 
 	args = self:_flipNameOrder(args)
 
-	_shouldStoreData = Person:shouldStoreData(args)
+	_shouldStoreData = self:shouldStoreData(args)
 	-- set custom variables here already so they are available
 	-- in functions we call from here on
 	self:defineCustomPageVariables(args)
@@ -91,7 +91,8 @@ function Person:createInfobox()
 			shouldstore = _shouldStoreData
 		})
 	if not ageCalculationSuccess then
-		age = Person._createAgeCalculationErrorMessage(age)
+		table.insert(infobox.warnings, self:_createAgeCalculationErrorMessage(age))
+		age = {}
 	end
 
 	local widgets = {
@@ -198,17 +199,8 @@ function Person:createInfobox()
 
 	infobox:bottom(self:createBottomContent())
 
-	local statusToStore = self:getStatusToStore(args)
-	infobox:categories(unpack(self:getCategories(
-				args,
-				age.birth,
-				personType.category,
-				statusToStore
-			)))
-
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if _shouldStoreData then
+		local statusToStore = self:getStatusToStore(args)
 		self:_definePageVariables(args)
 		self:_setLpdbData(
 			args,
@@ -216,14 +208,21 @@ function Person:createInfobox()
 			statusToStore,
 			personType.store
 		)
+		infobox:addCategories(unpack(self:getCategories(
+			args,
+			age.birth,
+			personType.category,
+			statusToStore
+		)))
 	end
 
+	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 	return tostring(builtInfobox) .. WarningBox.displayAll(self.warnings)
 end
 
 function Person:_definePageVariables(args)
-	Variables.varDefine('firstname', args.givenname or '')
-	Variables.varDefine('lastname', args.familyname or '')
+	Variables.varDefine('firstname', args.givenname)
+	Variables.varDefine('lastname', args.familyname)
 end
 
 function Person:_setLpdbData(args, links, status, personType)
@@ -244,8 +243,8 @@ function Person:_setLpdbData(args, links, status, personType)
 		romanizedname = args.romanized_name or args.name,
 		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
 		nationality = args.country, -- already standardized above
-		nationality2 = Person:getStandardNationalityValue(args.country2 or args.nationality2),
-		nationality3 = Person:getStandardNationalityValue(args.country3 or args.nationality3),
+		nationality2 = self:getStandardNationalityValue(args.country2 or args.nationality2),
+		nationality3 = self:getStandardNationalityValue(args.country3 or args.nationality3),
 		birthdate = Variables.varDefault('player_birthdate'),
 		deathdate = Variables.varDefault('player_deathdate'),
 		image = args.image,
@@ -281,13 +280,13 @@ function Person:_setLpdbData(args, links, status, personType)
 	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
 	local storageType = self:getStorageType(args, personType, status)
 
-	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. (args.id or self.name), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. args.id, lpdbData)
 end
 
 -- Allows this function to be used in /Custom
 function Person:getStandardNationalityValue(nationality)
 	if String.isEmpty(nationality) then
-		return nil
+		return
 	end
 
 	local nationalityToStore = Flags.CountryName(nationality)
@@ -297,7 +296,7 @@ function Person:getStandardNationalityValue(nationality)
 			self.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
-		nationalityToStore = nil
+		return
 	end
 
 	return nationalityToStore
@@ -336,19 +335,16 @@ end
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
 function Person:nameDisplay(args)
-	local team = string.lower(args.teamicon or args.ttlink or args.teamlink or args.team or '')
-	local icon = mw.ext.TeamTemplate.teamexists(team)
-		and mw.ext.TeamTemplate.teamicon(team) or ''
-	local team2 = string.lower(args.team2icon or args.ttlink2 or args.team2link or args.team2 or '')
-	local icon2 = mw.ext.TeamTemplate.teamexists(team2)
-		and mw.ext.TeamTemplate.teamicon(team2) or ''
-	local name = args.id or mw.title.getCurrentTitle().text
+	local team = args.teamlink or args.team
+	local team2 = args.team2link or args.team2
+	local icon = team and mw.ext.TeamTemplate.teamexists(team) and mw.ext.TeamTemplate.teamicon(team)
+	local icon2 = mw.ext.TeamTemplate.teamexists(team2) and mw.ext.TeamTemplate.teamicon(team2)
 
-	local display = name
-	if not String.isEmpty(icon) then
-		display = icon .. '&nbsp;' .. name
+	local display = args.id
+	if icon then
+		display = icon .. '&nbsp;' .. display
 	end
-	if not String.isEmpty(icon2) then
+	if icon2 then
 		display = display .. ' ' .. icon2
 	end
 
@@ -367,7 +363,7 @@ function Person:calculateEarnings(args)
 		perYear = true
 	}
 
-	-- store earnings values in wiki variables for storage in smw
+	-- store earnings values in wiki variables for storage in SMW
 	for year, earningsOfYear in pairs(earningsPerYear) do
 		Variables.varDefine('earningsin' .. year, earningsOfYear)
 	end
@@ -377,7 +373,7 @@ function Person:calculateEarnings(args)
 end
 
 function Person:_createRegion(region, country)
-	region = Region.run({region = region, country = country})
+	region = Region.run{region = region, country = country}
 	if type(region) == 'table' then
 		_region = region.region
 		return region.display
@@ -387,16 +383,13 @@ end
 function Person:_createLocations(args, personType)
 	local countryDisplayData = {}
 	local country = args.country or args.country1 or args.nationality or args.nationality1
-	if country == nil or country == '' then
-		return countryDisplayData
-	end
 
-	countryDisplayData[1] = Person:_createLocation(country, args.location, personType)
+	countryDisplayData[1] = self:_createLocation(country, args.location, personType)
 
 	local index = 2
 	country = args['country2'] or args['nationality2']
 	while(not String.isEmpty(country)) do
-		countryDisplayData[index] = Person:_createLocation(country, args['location' .. index], personType)
+		countryDisplayData[index] = self:_createLocation(country, args['location' .. index], personType)
 		index = index + 1
 		country = args['country' .. index] or args['nationality' .. index]
 	end
@@ -405,27 +398,25 @@ function Person:_createLocations(args, personType)
 end
 
 function Person:_createLocation(country, location, personType)
-	if country == nil or country == '' then
-		return nil
+	if String.isEmpty(country) then
+		return
 	end
 	local countryDisplay = Flags.CountryName(country)
 	local demonym = Flags.getLocalisation(countryDisplay) or ''
 
-	local category = ''
-	if Namespace.isMain() then
-		category = '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
+	if _shouldStoreData then
+		self.infobox:addCategories(demonym .. ' ' .. personType .. 's')
 	end
 
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
 		'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]' ..
-		category ..
 		(location ~= nil and (',&nbsp;' .. location) or '')
 end
 
 function Person:_createTeam(team, link)
 	link = link or team
-	if link == nil or link == '' then
-		return nil
+	if String.isEmpty(link) then
+		return
 	end
 
 	if mw.ext.TeamTemplate.teamexists(link) then
@@ -451,8 +442,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		end
 		if args.death_date then
 			table.insert(categories, 'Deceased ' .. personType .. 's')
-		elseif
-			args.retired == 'yes' or args.retired == 'true'
+		elseif Logic.readBool(args.retired)
 			or string.lower(status or '') == STATUS_RETIRED
 			or string.match(args.retired or '', '%d%d%d%d')--if retired has year set apply the retired category
 		then
@@ -488,21 +478,13 @@ function Person:getWikiCategories(categories)
 	return categories
 end
 
-function Person._createAgeCalculationErrorMessage(text)
-	-- Return formatted message text for an error.
-	local strongStart = '<strong class="error">Error: '
-	local strongEnd = '</strong>'
-	text = string.gsub(text or '', 'Module:AgeCalculation/test:%d+: ', '')
-	if mw.title.getCurrentTitle():inNamespaces(0) then
-		strongEnd = strongEnd .. '[[Category:Age error]]'
+-- Return formatted message text for an error.
+function Person:_createAgeCalculationErrorMessage(text)
+	text = string.gsub(text or '', 'Module:AgeCalculation:%d+: ', '')
+	if _shouldStoreData then
+		self.infobox.addCategories('Players with age error')
 	end
-	text = strongStart .. mw.text.nowiki(text) .. strongEnd
-
-	if string.match(text, '[Dd]eath') then
-		return {death = text}
-	else
-		return {birth = text}
-	end
+	return mw.text.nowiki(text)
 end
 
 function Person:_flipNameOrder(args)
