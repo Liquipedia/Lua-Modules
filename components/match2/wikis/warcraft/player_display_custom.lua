@@ -8,7 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local DisplayUtil = require('Module:DisplayUtil')
-local Faction = Lua.requireIfExists('Module:Faction')
+local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local TypeUtil = require('Module:TypeUtil')
