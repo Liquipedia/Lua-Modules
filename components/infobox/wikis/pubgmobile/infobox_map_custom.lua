@@ -33,13 +33,13 @@ local GAME = {
 }
 
 local MODES = {
-	solo = 'Solos[[Category:Solos Mode Tournaments]]',
-	duo = 'Duos[[Category:Duos Mode Tournaments]]',
-	squad = 'Squads[[Category:Squads Mode Tournaments]]',
-	['2v2'] = '2v2 TDM[[Category:2v2 TDM Tournaments]]',
-	['4v4'] = '4v4 TDM[[Category:4v4 TDM Tournaments]]',
-	['war mode'] = 'War Mode[[Category:War Mode Tournaments]]',
-	default = '[[Category:Unknown Mode Tournaments]]',
+	solo = '[[:Category:Solos Mode Tournaments|Solos]]',
+	duo = '[[:Category:Duos Mode Tournaments|Duos]]',
+	squad = '[[:Category:Squads Mode Tournaments|Squads]]',
+	['2v2'] = '[[:Category:2v2 TDM Tournaments|2v2 TDM]]',
+	['4v4'] = '[[:Category:4v4 TDM Tournaments|4v4 TDM]]',
+	['war mode'] = '[[:Category:War Mode Tournaments|War Mode]]',
+	default = '',
 }
 MODES.solos = MODES.solo
 MODES.duos = MODES.duo
