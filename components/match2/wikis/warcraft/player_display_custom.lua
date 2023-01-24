@@ -10,7 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Race = Lua.requireIfExists('Module:Race')
+local Faction = Lua.requireIfExists('Module:Faction')
 local TypeUtil = require('Module:TypeUtil')
 
 local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
@@ -54,7 +54,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	end
 
 	local raceNode
-	if props.showRace ~= false and player.race ~= Race.defaultRace then
+	if props.showRace ~= false and player.race ~= Faction.defaultFaction then
 		raceNode = mw.html.create('span'):addClass('race')
 			:wikitext(CustomPlayerDisplay.Race(player.race))
 	end
@@ -112,7 +112,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 		and PlayerDisplay.Flag(player.flag)
 		or nil
 
-	local race = props.showRace ~= false and player.race ~= Race.defaultRace
+	local race = props.showRace ~= false and player.race ~= Faction.defaultFaction
 		and CustomPlayerDisplay.Race(player.race)
 		or nil
 
@@ -140,7 +140,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 end
 
 function CustomPlayerDisplay.Race(race)
-	return Race.Icon{size = 'small', showLink = false, showTitle = false, race = race}
+	return Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = race}
 end
 
 return CustomPlayerDisplay
