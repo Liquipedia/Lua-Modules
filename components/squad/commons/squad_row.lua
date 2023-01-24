@@ -65,9 +65,9 @@ function SquadRow:id(args)
 	local cell = mw.html.create('td')
 	cell:addClass('ID')
 
-	args['noclean'] = true
+	args.noclean = true
 	cell:wikitext('<b>' .. Player._player(args) .. '</b>')
-	args['noclean'] = nil
+	args.noclean = nil
 
 	if String.isNotEmpty(args.captain) then
 		cell:wikitext('&nbsp;' .. _ICON_CAPTAIN)
@@ -78,8 +78,8 @@ function SquadRow:id(args)
 	end
 
 	local teamNode = mw.html.create('td')
-	if mw.ext.TeamTemplate.teamexists(string.lower(args.team or '')) then
-		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team:lower()))
+	if args.team and mw.ext.TeamTemplate.teamexists(args.team) then
+		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team))
 		if args.teamrole then
 			teamNode:css('text-align', 'center')
 			teamNode:tag('div'):css('font-size', '85%'):wikitext('(<i>'.. args.teamrole ..'</i>)')
@@ -89,9 +89,9 @@ function SquadRow:id(args)
 	self.content:node(cell)
 	self.content:node(teamNode)
 
-	self.lpdbData['id'] = args[1]
-	self.lpdbData['nationality'] = Flags.CountryName(args.flag)
-	self.lpdbData['link'] = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or args[1])
+	self.lpdbData.id = args[1]
+	self.lpdbData.nationality = Flags.CountryName(args.flag)
+	self.lpdbData.link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or args[1])
 
 
 	return self
@@ -105,7 +105,7 @@ function SquadRow:name(args)
 	cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext(')'))
 	self.content:node(cell)
 
-	self.lpdbData['name'] = args.name
+	self.lpdbData.name = args.name
 
 	return self
 end
@@ -122,7 +122,7 @@ function SquadRow:role(args)
 
 	self.content:node(cell)
 
-	self.lpdbData['role'] = args.role
+	self.lpdbData.role = args.role
 
 	return self
 end
@@ -193,10 +193,10 @@ function SquadRow:addToLpdb(lpdbData)
 	return lpdbData
 end
 
-function SquadRow:create(id)
+function SquadRow:create(objectName)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		self.lpdbData = self:addToLpdb(self.lpdbData)
-		mw.ext.LiquipediaDB.lpdb_squadplayer(id, self.lpdbData)
+		mw.ext.LiquipediaDB.lpdb_squadplayer(objectName, self.lpdbData)
 	end
 
 	return self.content
