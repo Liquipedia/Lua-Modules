@@ -74,17 +74,4 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
 	return tierValue * (prizeMoney * 1000 + 1000 - place) / place * (TYPE_MODIFIER[type] or 1)
 end
 
-function CustomPrizePool.addWTDatapoint(data, wtPoints)
-	local pageName = mw.title.getCurrentTitle().fullText
-	mw.ext.LiquipediaDB.lpdb_datapoint('wt_points_' .. pageName .. '_' .. data.placement .. '_' .. data.participant, {
-		type = 'wt_points',
-		name = data.participant,
-		date = data.date,
-		information = wtPoints,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			placement = data.placement,
-		})
-	})
-end
-
 return CustomPrizePool
