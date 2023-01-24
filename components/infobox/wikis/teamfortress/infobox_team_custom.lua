@@ -22,7 +22,7 @@ function CustomTeam.run(frame)
 	team.args.manager = Template.expandTemplate(frame, 'Manager of')
 	team.args.captain = Template.expandTemplate(frame, 'Captain of')
 
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 return CustomTeam

@@ -33,7 +33,7 @@ function CustomTeam.run(frame)
 
 	_args = team.args
 
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:createWidgetInjector()
