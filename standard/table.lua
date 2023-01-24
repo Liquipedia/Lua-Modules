@@ -524,7 +524,7 @@ end
 Iterates over table entries whose keys are prefixed numbers. The entries are
 visited in order, starting from 1. The iteration stops upon a skipped number.
 Unless strict mode is enabled, for the first entry, both `prefix` and `prefix1`
-are valid keys, with the latter prefered.
+are valid keys, with a preference for the latter.
 
 Example:
 ```
