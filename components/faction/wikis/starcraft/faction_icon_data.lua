@@ -1,12 +1,12 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft
--- page=Module:Race/IconData
+-- page=Module:Faction/IconData
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local byRace = {
+local byFaction = {
 	p = {
 		altIcon = 'File:ProtossIcon.png',
 		icon = 'File:Picon small bw.png',
@@ -22,6 +22,7 @@ local byRace = {
 	r = {
 		altIcon = 'File:RaceIcon Random.png',
 		icon = 'File:Ricon small bw.png',
+		--icon = 'File:Random Brown 30 Blub.png'
 	},
 	u = {
 		icon = 'File:Space filler race.png',
@@ -34,4 +35,4 @@ local randomIcons = {
 	['r(z)'] = 'File:R(Z)icon small bw.png',
 }
 
-return {byRace = byRace, randomIcons = randomIcons}
+return {byFaction = byFaction, randomIcons = randomIcons}
