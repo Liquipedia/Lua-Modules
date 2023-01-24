@@ -12,7 +12,6 @@ local Lua = require('Module:Lua')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
@@ -34,14 +33,13 @@ local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 10
 local _EARNINGS_MODES = {team = 'team'}
 local _LANGUAGE = mw.language.new('en')
 
-local _team, _args
+local _team
 
 local CustomInjector = Class.new(Injector)
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
-	_args = team.args
 
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.calculateEarnings = CustomTeam.calculateEarnings
