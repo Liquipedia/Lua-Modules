@@ -91,7 +91,7 @@ function CustomPlayerExt.syncPlayer(player, options)
 	player.race = player.race
 		or globalVars:get(player.displayName .. '_race')
 		or options.fetchPlayer ~= false and CustomPlayerExt.fetchPlayerRace(player.pageName, options.date)
-		or 'u'
+		or Race.defaultRace
 
 	if options.savePageVar ~= false then
 		CustomPlayerExt.saveToPageVars(player)
