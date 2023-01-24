@@ -135,7 +135,7 @@ function CustomSquad.runAuto(playerList, squadType)
 end
 
 function CustomSquad._playerRow(player, squadType)
-	local row = ExtendedSquadRow(mw.getCurrentFrame(), player.role)
+	local row = ExtendedSquadRow()
 
 	row:id({
 		(player.idleavedate or player.id),
