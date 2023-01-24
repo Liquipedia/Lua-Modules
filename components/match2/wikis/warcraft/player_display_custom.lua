@@ -8,9 +8,9 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local DisplayUtil = require('Module:DisplayUtil')
+local Faction = Lua.requireIfExists('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Faction = Lua.requireIfExists('Module:Faction')
 local TypeUtil = require('Module:TypeUtil')
 
 local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
