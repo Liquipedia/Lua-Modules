@@ -87,7 +87,7 @@ local namedSizes = {
 	tiny = '10px',
 }
 
---- Returns the name of an entered faction identifier
+--- Returns the icon of an entered faction identifier
 ---@props props {faction: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
 ---@return string?
 function Faction.Icon(props)
