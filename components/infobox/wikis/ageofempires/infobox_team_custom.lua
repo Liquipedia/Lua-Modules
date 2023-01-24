@@ -70,39 +70,43 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomTeam._getGames()
-	local games = Array.map(
+	local games = CustomTeam._queryGames()
+
+	local manualGames = Array.map(
 		mw.text.split(_args.games, ','),
 		function(game)
-			return GameLookup.getName(mw.text.trim(game))
+			return {game = GameLookup.getName(mw.text.trim(game))}
 		end)
 
-	table.sort(games)
+	Array.forEach(manualGames,
+		function(entry)
+			if not Array.find(games, function(e) return e.game == entry.game end) then
+				table.insert(games, entry)
+			end
+		end)
 
-	local activeGames = CustomTeam._getGameActivity()
-	local isActive = function(game)
-		return Array.find(activeGames, function(entry) return entry.game == game end)
+	Array.sortInPlaceBy(games, function(entry) return entry.game end)
+
+	local dateThreshold = os.date('!*t')
+	dateThreshold.year = dateThreshold.year - INACTIVITY_THRESHOLD_YEARS
+	dateThreshold = os.date('!%F', os.time(dateThreshold))
+
+	local isActive = function(date)
+		return date and date >= dateThreshold
 	end
 
 	games = Array.map(
 		games,
-		function(game)
-			return game .. (isActive(game) and '' or ' <i><small>(Inactive)</small></i>')
+		function(entry)
+			return entry.game .. (isActive(entry.date) and '' or ' <i><small>(Inactive)</small></i>')
 		end)
 
 	return games
 end
 
-function CustomTeam._getGameActivity()
-	local date = os.date('!*t')
-	date.year = date.year - INACTIVITY_THRESHOLD_YEARS
-
-	local conditions = ConditionTree(BooleanOperator.all):add{
-		CustomTeam._buildTeamPlacementConditions(),
-		ConditionNode(ColumnName('date'), Comparator.gt, os.date('!%F', os.time(date)))
-	}
-
+function CustomTeam._queryGames()
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = conditions:toString(),
+			conditions = CustomTeam._buildTeamPlacementConditions():toString(),
 			order = 'date desc',
 			query = 'game, date',
 			groupby = 'game asc',
