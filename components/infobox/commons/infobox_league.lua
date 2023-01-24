@@ -165,10 +165,6 @@ function League:createInfobox()
 		},
 		Builder{
 			builder = function()
-				args.venue1 = args.venue1 or args.venue
-				args.venue1link = args.venue1link or args.venuelink
-				args.venue1desc = args.venue1desc or args.venuedesc
-
 				local venues = {}
 				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
 					local description
