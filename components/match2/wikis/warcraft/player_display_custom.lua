@@ -54,7 +54,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	end
 
 	local raceNode
-	if props.showRace ~= false and player.race ~= 'u' then
+	if props.showRace ~= false and player.race ~= Race.defaultRace then
 		raceNode = mw.html.create('span'):addClass('race')
 			:wikitext(CustomPlayerDisplay.Race(player.race))
 	end
@@ -112,7 +112,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 		and PlayerDisplay.Flag(player.flag)
 		or nil
 
-	local race = props.showRace ~= false and player.race ~= 'u'
+	local race = props.showRace ~= false and player.race ~= Race.defaultRace
 		and CustomPlayerDisplay.Race(player.race)
 		or nil
 
