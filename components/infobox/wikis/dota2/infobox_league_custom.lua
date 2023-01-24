@@ -47,7 +47,7 @@ function CustomLeague.run(frame)
 	_league = league
 	_args = _league.args
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()

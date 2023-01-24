@@ -28,7 +28,7 @@ function CustomSeries.run(frame)
 	_args = series.args
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
 function CustomSeries:createWidgetInjector()

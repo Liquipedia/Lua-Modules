@@ -29,7 +29,7 @@ function CustomMap.run(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
 	customMap.addToLpdb = CustomMap.addToLpdb
 	_args = customMap.args
-	return customMap:createInfobox(frame)
+	return customMap:createInfobox()
 end
 
 function CustomMap:createWidgetInjector()

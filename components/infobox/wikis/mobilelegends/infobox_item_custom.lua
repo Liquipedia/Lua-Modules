@@ -49,7 +49,7 @@ function CustomItem.run(frame)
 	item.getWikiCategories = CustomItem.getWikiCategories
 	item.createWidgetInjector = CustomItem.createWidgetInjector
 
-	return item:createInfobox(frame)
+	return item:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
