@@ -59,7 +59,7 @@ function CustomOpponentDisplay.BlockOpponent(props)
 
 	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
-	local showLink = Logic.nilOr(props.showLink, not CustomOpponentDisplay.isTbd(opponent))
+	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
 	if opponent.type == 'literal' and opponent.extradata.hasRaceOrFlag then
 		props.showRace = false
