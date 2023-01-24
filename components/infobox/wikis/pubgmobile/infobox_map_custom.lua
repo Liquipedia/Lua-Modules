@@ -26,7 +26,7 @@ local CustomInjector = Class.new(Injector)
 local _args
 local _game
 
-local _GAME = {
+local GAME = {
 	mobile = '[[Mobile]]',
 	newstate = '[[New State]]',
 	peace = '[[Peacekeeper Elite|Peace Elite]]',
