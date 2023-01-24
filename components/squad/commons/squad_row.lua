@@ -189,6 +189,11 @@ function SquadRow:setType(type)
 	return self
 end
 
+function SquadRow:setExtradata(extradata)
+	self.lpdbData.extradata = extradata
+	return self
+end
+
 function SquadRow:addToLpdb(lpdbData)
 	return lpdbData
 end
