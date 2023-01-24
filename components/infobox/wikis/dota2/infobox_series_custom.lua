@@ -38,7 +38,6 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'location' then
 		local locations = {}
-		_args.country1, _args.city1, _args.location1date = _args.country, _args.city, _args.locationdate
 		for _, country, index in Table.iter.pairsByPrefix(_args, 'country') do
 			local city = _args['city'.. index]
 			local locationDate = _args['location'..index..'date']
