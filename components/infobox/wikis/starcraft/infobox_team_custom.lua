@@ -73,7 +73,9 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
 		table.insert(widgets, Cell{name = _PLAYER_EARNINGS_ABBREVIATION,
-			content = {_team.playerEarnings and '$' .. _LANGUAGE:formatNum(_team.playerEarnings) or nil}
+			content = {
+				_team.totalEarningsWhileOnTeam and '$' .. _LANGUAGE:formatNum(_team.totalEarningsWhileOnTeam) or nil
+			}
 		})
 	elseif id == 'achievements' then
 		table.insert(widgets, Cell{name = 'Solo Achievements', content = {_args['solo achievements']}})
@@ -170,8 +172,7 @@ function CustomTeam.playerBreakDown(args)
 end
 
 function CustomTeam:calculateEarnings(args)
-	if self:shouldStore() then
-		Variables.varDefine('disable_SMW_storage', 'true')
+	if not self:shouldStore() then
 		self.totalEarningsWhileOnTeam = 0
 		self.earningsWhileOnTeam = {}
 		return 0, {}
@@ -244,9 +245,9 @@ function CustomTeam:getEarningsAndMedalsData(team)
 		--handle medals
 		local mode = placement.opponenttype
 		if mode == Opponent.solo then
-			medals = CustomTeam._addPlacementToMedals(medals, placement)
+			medals = self:_addPlacementToMedals(medals, placement)
 		elseif mode == Opponent.team then
-			teamMedals = CustomTeam._addPlacementToMedals(teamMedals, placement)
+			teamMedals = self:_addPlacementToMedals(teamMedals, placement)
 		end
 	end
 
