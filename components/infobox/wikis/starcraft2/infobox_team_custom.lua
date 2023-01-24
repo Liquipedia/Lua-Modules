@@ -206,7 +206,6 @@ function CustomTeam:calculateEarnings(args)
 		self.totalEarningsWhileOnTeam = 0
 		self.earningsWhileOnTeam = {}
 		return 0, {}
-
 	else
 		local total, yearly, playerTotal, playerYearly = self:getEarningsAndMedalsData(self.pagename)
 		self.totalEarningsWhileOnTeam = playerTotal or 0
