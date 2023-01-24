@@ -44,7 +44,7 @@ end
 
 --- Fetches the properties of an entered race
 ---@param race string
----@return table|nil
+---@return table?
 function Race.getProps(race)
 	return Data.raceProps[race]
 end
