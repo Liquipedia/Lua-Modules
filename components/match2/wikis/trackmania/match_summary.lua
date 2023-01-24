@@ -287,14 +287,14 @@ function CustomMatchSummary._createGame(game)
 
 	row:addElement(CustomMatchSummary._iconDisplay(
 		GREEN_CHECK,
-		game.winner == 1,
+		(game.scores[1] or 0) > (game.scores[2] or 0),
 		game.scores[1],
 		1
 	))
 	row:addElement(centerNode)
 	row:addElement(CustomMatchSummary._iconDisplay(
 		GREEN_CHECK,
-		game.winner == 2,
+		(game.scores[1] or 0) < (game.scores[2] or 0),
 		game.scores[2],
 		2
 	))
