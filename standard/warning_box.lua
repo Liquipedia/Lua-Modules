@@ -20,12 +20,12 @@ function WarningBox.display(text)
 	return div:node(tbl)
 end
 
-function WarningBox.displayAll(tbl)
-	local display = ''
-	for _, text in pairs(tbl) do
-		display = display .. tostring(WarningBox.display(text))
+function WarningBox.displayAll(arr)
+	local wrapper = mw.html.create()
+	for _, text in ipairs(arr) do
+		wrapper:node(WarningBox.display(text))
 	end
-	return display
+	return wrapper
 end
 
 return Class.export(WarningBox)

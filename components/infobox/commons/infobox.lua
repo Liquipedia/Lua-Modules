@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
+local WarningBox = require('Module:WarningBox')
 
 local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
 
@@ -29,6 +30,7 @@ function Infobox:create(frame, gameName, forceDarkMode)
 	end
 
 	self.injector = nil
+	self.warnings = {}
 	return self
 end
 
@@ -73,7 +75,7 @@ function Infobox:build(widgets)
 		self.root:node(self.bottomContent)
 	end
 
-	return self.root
+	return mw.html.create():node(self.root):node(WarningBox.displayAll(self.warnings))
 end
 
 return Infobox

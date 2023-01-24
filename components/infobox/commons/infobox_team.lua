@@ -14,7 +14,6 @@ local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local String = require('Module:StringUtils')
-local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
@@ -38,8 +37,6 @@ local _LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
 local _defaultEarningsFunctionUsed = false
-
-local _warnings = {}
 
 function Team.run(frame)
 	local team = Team(frame)
@@ -205,7 +202,7 @@ function Team:createInfobox()
 		self:defineCustomPageVariables(args)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
+	return tostring(builtInfobox)
 end
 
 function Team:_createRegion(region)
@@ -247,7 +244,7 @@ function Team:getStandardLocationValue(location)
 
 	if String.isEmpty(locationToStore) then
 		table.insert(
-			_warnings,
+			self.infobox.warnings,
 			'"' .. location .. '" is not supported as a value for locations'
 		)
 		return

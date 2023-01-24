@@ -13,7 +13,6 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier')
-local WarningBox = require('Module:WarningBox')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
@@ -36,8 +35,6 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
 local Series = Class.new(BasicInfobox)
-
-Series.warnings = {}
 
 function Series.run(frame)
 	local series = Series(frame)
@@ -227,7 +224,6 @@ function Series:createInfobox()
 	end
 
 	return tostring(builtInfobox)
-		.. WarningBox.displayAll(Series.warnings)
 end
 
 --- Allows for overriding this functionality
@@ -252,7 +248,7 @@ function Series:createLiquipediaTierDisplay(args)
 		if not tierText then
 			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
 			table.insert(
-				self.warnings,
+				self.infobox.warnings,
 				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
 			)
 			return ''
@@ -300,7 +296,7 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 
 	if String.isNotEmpty(trackingCategory) then
 		table.insert(
-			self.warnings,
+			self.infobox.warnings,
 			'Missing icon while icondark is set.' .. trackingCategory
 		)
 	end

@@ -70,7 +70,7 @@ function CustomInjector:addCustomCells(widgets)
 				-- we have an invalid weapon entry
 				-- add warning (including tracking category)
 				table.insert(
-					_player.warnings,
+					_player.infobox.warnings,
 					'Invalid weapon input "' .. weapon .. '"[[Category:Pages with invalid weapon input]]'
 				)
 			end

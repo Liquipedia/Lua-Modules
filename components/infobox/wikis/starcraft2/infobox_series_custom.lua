@@ -236,7 +236,7 @@ function CustomSeries.createLiquipediaTierDisplay()
 		if not tierText then
 			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
 			table.insert(
-				_series.warnings,
+				_series.infobox.warnings,
 				tierString .. ' is not a known Liquipedia ' .. tierMode
 					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
 			)

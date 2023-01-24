@@ -15,7 +15,6 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
@@ -33,8 +32,6 @@ local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
 local Person = Class.new(BasicInfobox)
-
-Person.warnings = {}
 
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
@@ -225,7 +222,7 @@ function Person:createInfobox()
 		)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(self.warnings)
+	return tostring(builtInfobox)
 end
 
 function Person:_definePageVariables(args)
@@ -300,7 +297,7 @@ function Person:getStandardNationalityValue(nationality)
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
-			self.warnings,
+			self.infobox.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
 		nationalityToStore = nil

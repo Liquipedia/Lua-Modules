@@ -235,7 +235,7 @@ function CustomLeague._createLiquipediaTierDisplay()
 		if not tierText then
 			tierMode = tierMode == TIER_MODE_TYPES and 'Tiertype' or 'Tier'
 			table.insert(
-				_league.warnings,
+				_league.infobox.warnings,
 				tierString .. ' is not a known Liquipedia ' .. tierMode
 					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
 			)

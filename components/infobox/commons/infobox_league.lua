@@ -16,7 +16,6 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Tier = require('Module:Tier') -- loadData?
 local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
@@ -44,8 +43,6 @@ local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
 local League = Class.new(BasicInfobox)
-
-League.warnings = {}
 
 function League.run(frame)
 	local league = League(frame)
@@ -263,7 +260,7 @@ function League:createInfobox()
 		self:_setSeoTags(args)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
+	return tostring(builtInfobox)
 end
 
 --- Allows for overriding this functionality
@@ -316,7 +313,7 @@ function League:createLiquipediaTierDisplay(args)
 		if not tierText then
 			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
 			table.insert(
-				self.warnings,
+				self.infobox.warnings,
 				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
 			)
 			return ''
@@ -575,7 +572,7 @@ function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
 
 	if String.isNotEmpty(trackingCategory) then
 		table.insert(
-			self.warnings,
+			self.infobox.warnings,
 			'Missing icon while icondark is set.'
 		)
 	end
