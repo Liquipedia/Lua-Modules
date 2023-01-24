@@ -69,7 +69,7 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
-		name = 'Game Version', 
+		name = 'Game Version',
 		content = {CustomMap._getGameVersion()}
 	})
 	table.insert(widgets, Cell{
