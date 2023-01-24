@@ -157,7 +157,7 @@ function matchFunctions.getOpponents(args)
 	local isScoreSet = false
 
 	local sumscores = {}
-	for _, map in Table.iter.pairsByPrefix(args, 'map') do
+	for _, map in Table.iter.pairsByPrefix(args, 'map', {strict = true}) do
 		if map.winner then
 			sumscores[map.winner] = (sumscores[map.winner] or 0) + 1
 		end
@@ -293,7 +293,7 @@ function mapFunctions.getExtraData(map)
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		bans['team' .. opponentIndex] = {}
-		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
+		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b', {strict = true}) do
 			ban = mapFunctions._cleanBrawlerName(ban)
 			table.insert(bans['team' .. opponentIndex], ban)
 		end
@@ -337,11 +337,11 @@ function mapFunctions.getParticipantsData(map)
 
 	local maximumPickIndex = 0
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p', {strict = true}) do
 			participants[opponentIndex .. '_' .. playerIndex] = {player = player}
 		end
 
-		for _, brawler, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c') do
+		for _, brawler, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c', {strict = true}) do
 			brawler = mapFunctions._cleanBrawlerName(brawler)
 			participants[opponentIndex .. '_' .. pickIndex] = participants[opponentIndex .. '_' .. pickIndex] or {}
 			participants[opponentIndex .. '_' .. pickIndex].brawler = brawler

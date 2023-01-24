@@ -170,7 +170,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		if not bracketData.loweredges then
 			local opponentCount = 0
-			for _, _ in Table.iter.pairsByPrefix(match, 'opponent') do
+			for _, _ in Table.iter.pairsByPrefix(match, 'opponent', {strict = true}) do
 				opponentCount = opponentCount + 1
 			end
 			bracketData.loweredges = Array.map(
@@ -408,7 +408,7 @@ function MatchGroupInput.readMvp(match)
 	-- parse the players to get their information
 	local parsedPlayers = Array.map(players, function(player, playerIndex)
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
-		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent', {strict = true}) do
 			for _, lookUpPlayer in pairs(opponent.match2players) do
 				if link == lookUpPlayer.name then
 					return Table.merge(lookUpPlayer,

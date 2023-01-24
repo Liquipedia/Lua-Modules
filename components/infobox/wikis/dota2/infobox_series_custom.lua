@@ -38,9 +38,10 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'location' then
 		local locations = {}
-		for _, country, index in Table.iter.pairsByPrefix(_args, 'country') do
+		_args.city1 = _args.city1 or _args.city
+		for prefix, country, index in Table.iter.pairsByPrefix(_args, 'country') do
 			local city = _args['city'.. index]
-			local locationDate = _args['location'..index..'date']
+			local locationDate = _args[prefix..'date']
 			local text = Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. (city or country)
 			if locationDate then
 				text = text .. '&nbsp;<small>' .. locationDate .. '</small>'

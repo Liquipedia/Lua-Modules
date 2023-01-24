@@ -523,7 +523,8 @@ end
 --[[
 Iterates over table entries whose keys are prefixed numbers. The entries are
 visited in order, starting from 1. The iteration stops upon a skipped number.
-For the first entry, both `prefix` and `prefix1` are valid keys, with the latter prefered.
+Unless strict mode is enabled, for the first entry, both `prefix` and `prefix1`
+are valid keys, with the latter prefered.
 
 Example:
 ```
@@ -543,13 +544,15 @@ will print out `p1 p2 p3`
 ]]
 ---@param tbl table
 ---@param prefix string
+---@param options? {strict: boolean}
 ---@return function
-function Table.iter.pairsByPrefix(tbl, prefix)
+function Table.iter.pairsByPrefix(tbl, prefix, options)
+	options = options or {}
 	local i = 1
 	return function()
 		local key = prefix .. i
 		local value = tbl[key]
-		if i == 1 and not value then
+		if not options.strict and i == 1 and not value then
 			key, value = prefix, tbl[prefix]
 		end
 		i = i + 1
