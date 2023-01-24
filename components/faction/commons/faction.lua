@@ -115,7 +115,7 @@ function Faction.Icon(props)
 end
 
 
---- Returns the name background color class of a given faction
+--- Returns the background color class of a given faction
 ---@param faction string
 ---@return string?
 function Faction.bgClass(faction)
