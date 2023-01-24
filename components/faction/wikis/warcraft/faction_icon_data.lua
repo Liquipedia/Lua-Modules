@@ -1,12 +1,12 @@
 ---
 -- @Liquipedia
 -- wiki=warcraft
--- page=Module:Race/IconData
+-- page=Module:Faction/IconData
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local byRace = {
+local byFaction = {
 	h = {
 		icon = 'File:Human icon small.png',
 	},
@@ -30,4 +30,4 @@ local byRace = {
 	},
 }
 
-return {byRace = byRace, randomIcons = {}}
+return {byFaction = byFaction, randomIcons = {}}
