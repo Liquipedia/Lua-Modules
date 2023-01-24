@@ -8,10 +8,10 @@
 
 local Array = require('Module:Array')
 local Flags = require('Module:Flags')
+local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Race = require('Module:Race')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -35,7 +35,7 @@ CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 
 		return {
 			flag = String.nilIfEmpty(Flags.CountryName(record.nationality)),
-			race = Race.read(record.extradata.race),
+			race = Faction.read(record.extradata.race),
 			raceHistory = raceHistory,
 		}
 	end
@@ -46,7 +46,7 @@ function CustomPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	if lpdbPlayer and lpdbPlayer.raceHistory then
 		date = date or PlayerExt.getContextualDateOrNow()
 		local entry = Array.find(lpdbPlayer.raceHistory, function(entry) return date <= entry.endDate end)
-		return entry and Race.read(entry.race)
+		return entry and Faction.read(entry.race)
 	else
 		return lpdbPlayer and lpdbPlayer.race
 	end
@@ -70,7 +70,7 @@ function CustomPlayerExt.fetchRaceHistory(resolvedPageName)
 	local raceHistory = Array.map(rows, function(row)
 		return {
 			endDate = row.extradata.enddate,
-			race = Race.read(row.information),
+			race = Faction.read(row.information),
 			startDate = row.extradata.startdate,
 		}
 	end)
@@ -91,7 +91,7 @@ function CustomPlayerExt.syncPlayer(player, options)
 	player.race = player.race
 		or globalVars:get(player.displayName .. '_race')
 		or options.fetchPlayer ~= false and CustomPlayerExt.fetchPlayerRace(player.pageName, options.date)
-		or Race.defaultRace
+		or Faction.defaultFaction
 
 	if options.savePageVar ~= false then
 		CustomPlayerExt.saveToPageVars(player)
@@ -105,7 +105,7 @@ function CustomPlayerExt.populatePlayer(player, options)
 end
 
 function CustomPlayerExt.saveToPageVars(player)
-	if player.race and player.race ~= Race.defaultRace then
+	if player.race and player.race ~= Faction.defaultFaction then
 		globalVars:set(player.displayName .. '_race', player.race)
 	end
 
