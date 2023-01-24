@@ -7,7 +7,7 @@
 --
 
 local Lua = require('Module:Lua')
-local Race = require('Module:Race')
+local Faction = require('Module:Faction')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
@@ -38,10 +38,10 @@ function CustomOpponent.readOpponentArgs(args)
 	local partySize = Opponent.partySize((opponent or {}).type)
 
 	if partySize == 1 then
-		opponent.players[1].race = Race.read(args.race)
+		opponent.players[1].race = Faction.read(args.race)
 	elseif partySize then
 		for playerIx, player in ipairs(opponent.players) do
-			player.race = Race.read(args['p' .. playerIx .. 'race'])
+			player.race = Faction.read(args['p' .. playerIx .. 'race'])
 		end
 	end
 
@@ -54,7 +54,7 @@ function CustomOpponent.fromMatch2Record(record)
 	if Opponent.typeIsParty(opponent.type) then
 		for playerIx, player in ipairs(opponent.players) do
 			local playerRecord = record.match2players[playerIx]
-			player.race = Race.read(playerRecord.extradata.faction) or Race.defaultRace
+			player.race = Faction.read(playerRecord.extradata.faction) or Faction.defaultFaction
 		end
 	end
 
@@ -97,7 +97,7 @@ function CustomOpponent.resolve(opponent, date, options)
 				if not player.team then
 					player.team = PlayerExt.syncTeam(player.pageName, nil, {date = date})
 				end
-				player.race = (hasRace or player.race ~= Race.defaultRace) and player.race or nil
+				player.race = (hasRace or player.race ~= Faction.defaultFaction) and player.race or nil
 			else
 				PlayerExt.populatePageName(player)
 			end
