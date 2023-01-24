@@ -86,15 +86,13 @@ function Character:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if Namespace.isMain() then
 		infobox:addCategories(args.informationType or 'Character')
 		infobox:addCategories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 
-	return builtInfobox
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 function Character:_createLocation(location)

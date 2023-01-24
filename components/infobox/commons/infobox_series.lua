@@ -176,8 +176,6 @@ function Series:createInfobox(frame)
 		)
 	end
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if Namespace.isMain() then
 		local lpdbData = {
 			name = self.name,
@@ -229,6 +227,8 @@ function Series:createInfobox(frame)
 		lpdbData = self:addToLpdb(lpdbData)
 		mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
 	end
+
+	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	return tostring(builtInfobox)
 		.. WarningBox.displayAll(Series.warnings)

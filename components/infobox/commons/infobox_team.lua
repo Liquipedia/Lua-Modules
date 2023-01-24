@@ -182,12 +182,12 @@ function Team:createInfobox()
 		infobox:addCategories(unpack(self:getWikiCategories(args)))
 	end
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
 		self:defineCustomPageVariables(args)
 	end
+
+	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end

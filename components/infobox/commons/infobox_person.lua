@@ -206,8 +206,6 @@ function Person:createInfobox()
 				statusToStore
 			)))
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if _shouldStoreData then
 		self:_definePageVariables(args)
 		self:_setLpdbData(
@@ -217,6 +215,8 @@ function Person:createInfobox()
 			personType.store
 		)
 	end
+
+	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	return tostring(builtInfobox) .. WarningBox.displayAll(self.warnings)
 end

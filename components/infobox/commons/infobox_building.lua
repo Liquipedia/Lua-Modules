@@ -90,16 +90,13 @@ function Building:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:addCategories('Buildings')
-	infobox:addCategories(unpack(self:getWikiCategories(args)))
-
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if Namespace.isMain() then
+		infobox:addCategories('Buildings')
+		infobox:addCategories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 
-	return builtInfobox
+	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 function Building:getWikiCategories(args)

@@ -247,8 +247,6 @@ function League:createInfobox()
 
 	self.infobox:bottom(self:createBottomContent())
 
-	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if self:shouldStore(args) then
 		self.infobox:addCategories('Tournaments')
 		if not String.isEmpty(args.team_number) then
@@ -261,6 +259,8 @@ function League:createInfobox()
 		self:_setLpdbData(args, links)
 		self:_setSeoTags(args)
 	end
+
+	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
 end
