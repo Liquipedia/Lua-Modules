@@ -12,4 +12,5 @@ return {
 	name = 'Warcraft',
 	defaultTeamLogo = 'Warcraft_III_logo.png',
 	defaultTeamLogoDark = 'Warcraft_III_logo.png',
+	opponentLibrary = 'Opponent/Custom',
 }
