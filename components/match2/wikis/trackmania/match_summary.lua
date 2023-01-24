@@ -283,7 +283,7 @@ function CustomMatchSummary._createGame(game)
 
 	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(mw.html.create('div'):node('[[' .. game.map .. ']]'))
+		:node(mw.html.create('div'):node(game.map))
 
 	row:addElement(CustomMatchSummary._iconDisplay(
 		GREEN_CHECK,
