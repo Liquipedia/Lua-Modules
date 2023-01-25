@@ -115,10 +115,6 @@ function CustomMap:_getGameMode()
 end
 
 function CustomMap:addToLpdb(lpdbData)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator)
-	if String.isNotEmpty(_args.creator2) then
-		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2)
-	end
 	lpdbData.extradata.theme = _args.theme
 	lpdbData.extradata.size = _args.sizeabr
 	lpdbData.extradata.span = _args.span
