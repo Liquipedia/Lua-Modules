@@ -190,7 +190,7 @@ function SquadRow:setType(type)
 end
 
 function SquadRow:setExtradata(extradata)
-	self.lpdbData.extradata = extradata
+	self.lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata)
 	return self
 end
 
