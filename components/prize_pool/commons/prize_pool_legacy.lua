@@ -167,7 +167,7 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 	newData[baseCurrencyPrize] = (slot[baseCurrencyPrize] and slot[baseCurrencyPrize] ~= '0') and slot[baseCurrencyPrize]
 		or nil
 
-	local opponentsInSlot = #slot
+	local opponentsInSlot = LegacyPrizePool.opponentsInSlot(slot)
 	local needsQualifiedFreetext = false
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
@@ -209,7 +209,12 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 		newData = CUSTOM_HANDLER.customSlot(newData, CACHED_DATA, slot)
 	end
 
-	newData.opponents = LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
+	if CUSTOM_HANDLER.overwriteMapOpponents then
+		slot.opponentsInSlot = opponentsInSlot
+		newData.opponents = CUSTOM_HANDLER.overwriteMapOpponents(slot, newData, mergeSlots)
+	else
+		newData.opponents = LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
+	end
 
 	if mergeSlots then
 		local newSlot = {
@@ -222,6 +227,14 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 		return newSlot
 	end
 	return newData
+end
+
+function LegacyPrizePool.opponentsInSlot(slot)
+	if CUSTOM_HANDLER.opponentsInSlot then
+		return CUSTOM_HANDLER.opponentsInSlot(slot)
+	end
+
+	return #slot
 end
 
 function LegacyPrizePool.handleSeed(storeTo, input, slotSize)
