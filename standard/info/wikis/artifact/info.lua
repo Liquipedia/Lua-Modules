@@ -11,18 +11,21 @@ return {
 	wikiName = 'artifact',
 	name = 'Artifact',
 	games = {
+		abbreviation = 'Artifact',
+		name = 'Artifact',
+		link = 'Artifact',
 		artifact = {
 			logo = {
 				darkMode = 'Logo filler event.png',
 				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Artifact_allmode.png',
-				lightMode = 'Artifact_allmode.png',
+				darkMode = 'Artifact allmode.png',
+				lightMode = 'Artifact allmode.png',
 			},
 		},
 	},
 	defaultGame = 'artifact',
-	defaultTeamLogo = 'Artifact_allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Artifact_allmode.png', ---@deprecated
+	defaultTeamLogo = 'Artifact allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Artifact allmode.png', ---@deprecated
 }

@@ -13,69 +13,87 @@ return {
 
 	games = {
 		aoe1 = {
+			abbreviation = 'AoE1',
+			name = 'Age of Empires',
+			link = 'Age of Empires I',
 			logo = {
-				darkMode = 'AoE1_Icon.png',
-				lightMode = 'AoE1_Icon.png',
+				darkMode = 'AoE1 Icon.png',
+				lightMode = 'AoE1 Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age_of_Empires_Default_Logo.png',
-				lightMode = 'Age_of_Empires_Default_Logo.png',
+				darkMode = 'Age of Empires Default Logo.png',
+				lightMode = 'Age of Empires Default Logo.png',
 			},
 		},
 		aoe2 = {
+			abbreviation = 'AoE2',
+			name = 'Age of Empires II',
+			link = 'Age of Empires II',
 			logo = {
-				darkMode = 'AoE2_Icon.png',
-				lightMode = 'AoE2_Icon.png',
+				darkMode = 'AoE2 Icon.png',
+				lightMode = 'AoE2 Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age_of_Empires_Default_Logo.png',
-				lightMode = 'Age_of_Empires_Default_Logo.png',
+				darkMode = 'Age of Empires Default Logo.png',
+				lightMode = 'Age of Empires Default Logo.png',
 			},
 		},
 		aoe3 = {
+			abbreviation = 'AoE3',
+			name = 'Age of Empires III',
+			link = 'Age of Empires III',
 			logo = {
-				darkMode = 'AoE3_Icon.png',
-				lightMode = 'AoE3_Icon.png',
+				darkMode = 'AoE3 Icon.png',
+				lightMode = 'AoE3 Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age_of_Empires_Default_Logo.png',
-				lightMode = 'Age_of_Empires_Default_Logo.png',
+				darkMode = 'Age of Empires Default Logo.png',
+				lightMode = 'Age of Empires Default Logo.png',
 			},
 		},
 		aoe4 = {
+			abbreviation = 'AoE4',
+			name = 'Age of Empires IV',
+			link = 'Age of Empires IV',
 			logo = {
-				darkMode = 'AoE4_Icon.png',
-				lightMode = 'AoE4_Icon.png',
+				darkMode = 'AoE4 Icon.png',
+				lightMode = 'AoE4 Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age_of_Empires_Default_Logo.png',
-				lightMode = 'Age_of_Empires_Default_Logo.png',
+				darkMode = 'Age of Empires Default Logo.png',
+				lightMode = 'Age of Empires Default Logo.png',
 			},
 		},
 		aom = {
+			abbreviation = 'AoM',
+			name = 'Age of Mythology',
+			link = 'Age of Mythology',
 			logo = {
-				darkMode = 'AoM_Icon.png',
-				lightMode = 'AoM_Icon.png',
+				darkMode = 'AoM Icon.png',
+				lightMode = 'AoM Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age_of_Empires_Default_Logo.png',
-				lightMode = 'Age_of_Empires_Default_Logo.png',
+				darkMode = 'Age of Empires Default Logo.png',
+				lightMode = 'Age of Empires Default Logo.png',
 			},
 		},
 		aoeo = {
+			abbreviation = 'AoEO',
+			name = 'Age of Empires Online',
+			link = 'Age of Empires Online',
 			logo = {
-				darkMode = 'AoEO_Icon.png',
-				lightMode = 'AoEO_Icon.png',
+				darkMode = 'AoEO Icon.png',
+				lightMode = 'AoEO Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age_of_Empires_Default_Logo.png',
-				lightMode = 'Age_of_Empires_Default_Logo.png',
+				darkMode = 'Age of Empires Default Logo.png',
+				lightMode = 'Age of Empires Default Logo.png',
 			},
 		},
 	},
-	defaultGame = 'aoe4',
+	defaultGame = 'aoe2',
 
-	defaultTeamLogo = 'Age_of_Empires_Default_Logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Age_of_Empires_Default_Logo.png', ---@deprecated
+	defaultTeamLogo = 'Age of Empires Default Logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Age of Empires Default Logo.png', ---@deprecated
 	opponentLibrary = 'Opponent/Custom',
 }

@@ -11,6 +11,9 @@ return {
 	wikiName = 'battalion',
 	name = 'Battalion 1944',
 	games = {
+		abbreviation = 'Battalion',
+		name = 'Battalion 1944',
+		link = 'Battalion 1944',
 		battalion = {
 			logo = {
 				darkMode = 'Logo filler event.png',

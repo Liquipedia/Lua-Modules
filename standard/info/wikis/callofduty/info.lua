@@ -10,6 +10,6 @@ return {
 	startYear = 2003,
 	wikiName = 'callofduty',
 	name = 'Call of Duty',
-	defaultTeamLogo = 'Call_of_Duty_Default_Lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Call_of_Duty_Default_Darkmode.png', ---@deprecated
+	defaultTeamLogo = 'Call of Duty Default Lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Call of Duty Default Darkmode.png', ---@deprecated
 }

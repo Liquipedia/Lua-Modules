@@ -10,6 +10,22 @@ return {
 	startYear = 2014,
 	wikiName = 'heroes',
 	name = 'Heroes of the Storm',
-	defaultTeamLogo = 'Hots_logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Hots_logo.png', ---@deprecated
+	games = {
+		hots = {
+			abbreviation = 'Heroes',
+			name = 'Heroes of the Storm',
+			link = 'Heroes of the Storm',
+			logo = {
+				darkMode = 'Hots logo.png',
+				lightMode = 'Hots logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Hots logo.png',
+				lightMode = 'Hots logo.png',
+			},
+		},
+	},
+	defaultGame = 'wol',
+	defaultTeamLogo = 'Hots logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Hots logo.png', ---@deprecated
 }

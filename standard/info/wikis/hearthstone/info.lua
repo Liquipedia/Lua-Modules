@@ -10,6 +10,6 @@ return {
 	startYear = 2014,
 	wikiName = 'hearthstone',
 	name = 'Hearthstone',
-	defaultTeamLogo = 'Hearthstone_logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Hearthstone_logo.png', ---@deprecated
+	defaultTeamLogo = 'Hearthstone logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Hearthstone logo.png', ---@deprecated
 }

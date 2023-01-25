@@ -12,17 +12,20 @@ return {
 	name = 'Brawl Stars',
 	games = {
 		brawlstars = {
+			abbreviation = 'BS',
+			name = 'Brawl Stars',
+			link = 'Brawl Stars',
 			logo = {
-				darkMode = 'Brawl_Stars_Default_allmode.png',
-				lightMode = 'Brawl_Stars_Default_allmode.png',
+				darkMode = 'Brawl Stars Default allmode.png',
+				lightMode = 'Brawl Stars Default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Brawl_Stars_Default_allmode.png',
-				lightMode = 'Brawl_Stars_Default_allmode.png',
+				darkMode = 'Brawl Stars Default allmode.png',
+				lightMode = 'Brawl Stars Default allmode.png',
 			},
 		},
 	},
 	defaultGame = 'brawlstars',
-	defaultTeamLogo = 'Brawl_Stars_Default_allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Brawl_Stars_Default_allmode.png', ---@deprecated
+	defaultTeamLogo = 'Brawl Stars Default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Brawl Stars Default allmode.png', ---@deprecated
 }

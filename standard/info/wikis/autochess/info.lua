@@ -12,17 +12,20 @@ return {
 	name = 'Auto Chess',
 	games = {
 		autochess = {
+			abbreviation = 'Auto Chess',
+			name = 'Auto Chess',
+			link = 'Auto Chess',
 			logo = {
 				darkMode = 'Logo filler event.png',
 				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Auto_Chess_lightmode.png',
-				lightMode = 'Auto_Chess_darkmode.png',
+				darkMode = 'Auto Chess lightmode.png',
+				lightMode = 'Auto Chess darkmode.png',
 			},
 		},
 	},
 	defaultGame = 'autochess',
-	defaultTeamLogo = 'Auto_Chess_lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Auto_Chess_darkmode.png', ---@deprecated
+	defaultTeamLogo = 'Auto Chess lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Auto Chess darkmode.png', ---@deprecated
 }

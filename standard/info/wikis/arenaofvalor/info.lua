@@ -13,6 +13,9 @@ return {
 
 	games = {
 		aov = {
+			abbreviation = 'AoV',
+			name = 'Arena of Valor',
+			link = 'Arena of Valor',
 			logo = {
 				darkMode = 'Arena of Valor Icon.png',
 				lightMode = 'Arena of Valor Icon.png',
@@ -23,6 +26,9 @@ return {
 			},
 		},
 		hok = {
+			abbreviation = 'HoK',
+			name = 'Honor of Kings',
+			link = 'Honor of Kings',
 			logo = {
 				darkMode = 'Honor of Kings Icon.png',
 				lightMode = 'Honor of Kings Icon.png',

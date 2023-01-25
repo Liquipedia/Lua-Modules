@@ -10,6 +10,6 @@ return {
 	startYear = 1996,
 	wikiName = 'fighters',
 	name = 'Fighting Games',
-	defaultTeamLogo = 'Fistlogo_std.png', ---@deprecated
-	defaultTeamLogoDark = 'Fistlogo_std.png', ---@deprecated
+	defaultTeamLogo = 'Fistlogo std.png', ---@deprecated
+	defaultTeamLogoDark = 'Fistlogo std.png', ---@deprecated
 }

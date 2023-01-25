@@ -17,13 +17,13 @@ return {
 				lightMode = 'Quake Champions icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake_logo.png',
-				lightMode = 'Quake_logo.png',
+				darkMode = 'Quake logo.png',
+				lightMode = 'Quake logo.png',
 			},
 		},
 		-- TODO: https://liquipedia.net/arenafps/Special:PrefixIndex?prefix=Game%2F&namespace=10
 	},
 	defaultGame = 'qc',
-	defaultTeamLogo = 'Quake_logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Quake_logo.png', ---@deprecated
+	defaultTeamLogo = 'Quake logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Quake logo.png', ---@deprecated
 }
