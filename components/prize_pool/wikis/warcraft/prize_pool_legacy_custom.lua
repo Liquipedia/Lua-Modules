@@ -62,12 +62,12 @@ function CustomLegacyPrizePool.opponentsInSlot(slot)
 	end
 
 	local numberOfOpponentsFromInput = 0
-	if _cache.opponentType == Opponent.duo then
+	if _cache.opponentType == Opponent.solo then
+		numberOfOpponentsFromInput = #slot
+	else
 		for _, _, opponentIndex in Table.iter.pairsByPrefix(slot, 'team') do
 			numberOfOpponentsFromInput = opponentIndex
 		end
-	else
-		numberOfOpponentsFromInput = #slot
 	end
 
 	return math.max(math.min(slotInputSize or math.huge, numberOfOpponentsFromInput), 1)
