@@ -9,7 +9,9 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Flags = require('Module:Flags')
-local Player = require('Module:Player')
+local OpponentLib = require('Module:OpponentLibraries')
+local Opponent = OpponentLib.Opponent
+local OpponentDisplay = OpponentLib.OpponentDisplay
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
@@ -65,9 +67,8 @@ function SquadRow:id(args)
 	local cell = mw.html.create('td')
 	cell:addClass('ID')
 
-	args['noclean'] = true
-	cell:wikitext('<b>' .. Player._player(args) .. '</b>')
-	args['noclean'] = nil
+	local opponent = Opponent.readOpponentArgs(Table.merge(args, {type = Opponent.solo}))
+	cell:tag('b'):node(OpponentDisplay.BlockOpponent{opponent = Opponent.resolve(opponent, nil, {syncPlayer = true})})
 
 	if String.isNotEmpty(args.captain) then
 		cell:wikitext('&nbsp;' .. _ICON_CAPTAIN)
