@@ -6,11 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
