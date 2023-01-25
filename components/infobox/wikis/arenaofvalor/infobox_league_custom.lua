@@ -23,7 +23,6 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _game
 
 local _GAME = mw.loadData('Module:GameVersion')
 
@@ -72,7 +71,7 @@ function CustomLeague:liquipediaTierHighlighted()
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = _game or args.game
+	lpdbData.game = CustomLeague._getGameVersion()
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = Logic.readBool(_args.publisherpremier) and 'true' or nil
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
@@ -81,16 +80,14 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_game', _game or _args.game)
+	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
 	Variables.varDefine('tournament_publishertier', _args.publisherpremier)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
 function CustomLeague._getGameVersion()
-	local game = string.lower(_args.game or '')
-	_game = _GAME[game]
-	return _game
+	return _GAME[string.lower(_args.game or '')]
 end
 
 return CustomLeague

@@ -31,8 +31,7 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _next
-local _previous
+local _chronology
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -121,15 +120,19 @@ function CustomLeague._getPatch()
 end
 
 function CustomLeague._getChronologyData()
-	_next, _previous = CustomLeague._computeChronology()
-	return {
-		previous = _previous,
-		next = _next,
-		previous2 = _args.previous2,
-		next2 = _args.next2,
-		previous3 = _args.previous3,
-		next3 = _args.next3,
-	}
+	if not _chronology then
+		local next, previous = CustomLeague._computeChronology()
+		_chronology = {
+			previous = previous,
+			next = next,
+			previous2 = _args.previous2,
+			next2 = _args.next2,
+			previous3 = _args.previous3,
+			next3 = _args.next3,
+		}
+	end
+
+	return _chronology
 end
 
 -- Automatically fill in next/previous for touranaments that are part of a series
@@ -294,8 +297,8 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.status = status
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
-	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
-	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
+	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(CustomLeague._getChronologyData().next))
+	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(CustomLeague._getChronologyData().previous))
 	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them

@@ -37,8 +37,7 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 local _league
-local _next
-local _previous
+local _chronology
 
 local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local TODAY = os.date('%Y-%m-%d', os.time())
@@ -317,15 +316,19 @@ function CustomLeague._retrievePatchDate(dateEntry)
 end
 
 function CustomLeague._getChronologyData()
-	_next, _previous = CustomLeague._computeChronology()
-	return {
-		previous = _previous,
-		next = _next,
-		previous2 = _args.previous2,
-		next2 = _args.next2,
-		previous3 = _args.previous3,
-		next3 = _args.next3,
-	}
+	if not _chronology then
+		local next, previous = CustomLeague._computeChronology()
+		_chronology = {
+			previous = previous,
+			next = next,
+			previous2 = _args.previous2,
+			next2 = _args.next2,
+			previous3 = _args.previous3,
+			next3 = _args.next3,
+		}
+	end
+
+	return _chronology
 end
 
 -- Automatically fill in next/previous for touranaments that are part of a series
@@ -615,8 +618,8 @@ function CustomLeague:addToLpdb(lpdbData)
 		participantsNumber = _args.team_number or 0
 	end
 	lpdbData.participantsnumber = participantsNumber
-	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
-	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
+	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(CustomLeague._getChronologyData().next))
+	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(CustomLeague._getChronologyData().previous))
 	lpdbData.publishertier = Variables.varDefault('featured')
 
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')

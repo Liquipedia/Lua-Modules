@@ -27,7 +27,6 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _game
 
 local _GAME = mw.loadData('Module:GameVersion')
 
@@ -97,7 +96,7 @@ function League:addToLpdb(lpdbData, args)
 
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 
-	lpdbData.game = _game or args.game
+	lpdbData.game = CustomLeague._getGameVersion()
 	lpdbData.publishertier = args['hcs-sponsored']
 	lpdbData.participantsnumber = args.player_number or args.team_number
 
@@ -111,7 +110,7 @@ function League:defineCustomPageVariables()
 	if _args.player_number then
 		Variables.varDefine('tournament_mode', 'solo')
 	end
-	Variables.varDefine('tournament_game', _game or _args.game)
+	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
 
 	Variables.varDefine('tournament_publishertier', _args['hcs-sponsored'])
 
@@ -143,9 +142,7 @@ function CustomLeague:liquipediaTierHighlighted(args)
 end
 
 function CustomLeague._getGameVersion()
-	local game = string.lower(_args.game or '')
-	_game = _GAME[game]
-	return _game
+	return _GAME[string.lower(_args.game or '')]
 end
 
 function CustomLeague:_makeMapList()
