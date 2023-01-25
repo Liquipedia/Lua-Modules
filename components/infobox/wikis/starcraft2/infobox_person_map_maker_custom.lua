@@ -35,8 +35,6 @@ function CustomMapMaker.run(frame)
 	player.getPersonType = PersonSc2.getPersonType
 	player.nameDisplay = PersonSc2.nameDisplay
 
-	player.calculateEarnings = CustomMapMaker.calculateEarnings
-	player.createBottomContent = CustomMapMaker.createBottomContent
 	player.createWidgetInjector = CustomMapMaker.createWidgetInjector
 
 	return player:createInfobox()
@@ -47,7 +45,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				content = {PersonSc2.getRaceData(_args.race or 'unknown')}
+				content = {PersonSc2.getRaceData(_args.race or 'unknown').display}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -75,7 +73,7 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	return {
-		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military)}},
+		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military).display}},
 	}
 end
 

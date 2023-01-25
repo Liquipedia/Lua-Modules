@@ -74,7 +74,7 @@ function CustomPlayer.run(frame)
 	player.achievements = {}
 	player.achievementsFallBack = {}
 	player.earningsGlobal = {}
-	player.shouldQueryData = PersonSc2.shouldStoreData()
+	player.shouldQueryData = player:shouldStoreData()
 	if player.shouldQueryData then
 		player.yearsActive = CustomPlayer._getMatchupData(PAGENAME)
 	end
@@ -97,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				content = {PersonSc2.getRaceData(_args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
+				content = {PersonSc2.getRaceData(_args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK).display}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -156,7 +156,7 @@ function CustomInjector:addCustomCells(widgets)
 		},
 		Cell{name = rank1.name or 'Rank', content = {rank1.rank}},
 		Cell{name = rank2.name or 'Rank', content = {rank2.rank}},
-		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military)}},
+		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military).display}},
 		Cell{
 			name = Abbreviation.make('Years active', 'Years active as a player'),
 			content = {_player.yearsActive}

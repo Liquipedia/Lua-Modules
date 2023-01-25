@@ -58,8 +58,6 @@ _MILITARY_DATA.pending = _MILITARY_DATA.starting
 _MILITARY_DATA.started = _MILITARY_DATA.ongoing
 _MILITARY_DATA.ending = _MILITARY_DATA.ongoing
 
-local _raceData
-local _statusStore
 local _militaryStore
 local _args
 
@@ -71,7 +69,7 @@ function CustomPerson.setArgs(args)
 	_args = args
 end
 
-function CustomPerson.shouldStoreData()
+function CustomPerson:shouldStoreData()
 	if
 		Logic.readBool(_args.disable_lpdb) or Logic.readBool(_args.disable_storage)
 		or Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
@@ -83,9 +81,9 @@ function CustomPerson.shouldStoreData()
 	return true
 end
 
-function CustomPerson.nameDisplay()
-	CustomPerson.getRaceData(_args.race or 'unknown')
-	local raceIcon = RaceIcon({'alt_' .. _raceData.race})
+function CustomPerson:nameDisplay()
+	local raceData = CustomPerson.getRaceData(_args.race or 'unknown')
+	local raceIcon = RaceIcon({'alt_' .. raceData.race})
 	local name = _args.id or _PAGENAME
 
 	return raceIcon .. '&nbsp;' .. name
@@ -120,27 +118,26 @@ function CustomPerson.getRaceData(race, asCategory)
 		end
 	end
 
-	_raceData = {
+	return {
 		race = race,
-		faction = faction or '',
-		faction2 = faction2 or '',
+		faction = faction,
+		faction2 = faction2,
 		display = display,
 	}
-
-	return display
 end
 
-function CustomPerson.adjustLPDB(_, lpdbData)
+function CustomPerson:adjustLPDB(lpdbData)
+	local raceData = CustomPerson.getRaceData(_args.race or 'unknown')
 	local extradata = lpdbData.extradata or {}
-	extradata.race = _raceData.race
-	extradata.faction = _raceData.faction
-	extradata.faction2 = _raceData.faction2
+	extradata.race = raceData.race
+	extradata.faction = raceData.faction or ''
+	extradata.faction2 = raceData.faction2 or ''
 	extradata.lc_id = string.lower(_PAGENAME)
 	extradata.teamname = _args.team
 	extradata.role = _args.role
 	extradata.role2 = _args.role2
 	extradata.militaryservice = _militaryStore
-	extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive', '') or ''
+	extradata.activeplayer = (not self:getStatusToStore()) and Variables.varDefault('isActive', '') or ''
 
 	if Variables.varDefault('racecount') then
 		extradata.racehistorical = true
@@ -154,36 +151,32 @@ end
 
 function CustomPerson.military(military)
 	if military and military ~= 'false' then
-		local display = military
-		local militaryCategory = ''
 		military = string.lower(military)
 		for key, item in pairs(_MILITARY_DATA) do
 			if String.contains(military, key) then
-				militaryCategory = '[[Category:' .. item.category .. ']]'
-				_militaryStore = item.storeValue
-				break
+				return {display = military, category = '[[Category:' .. item.category .. ']]', store = item.storeValue}
 			end
 		end
 
-		return display .. militaryCategory
+		return {display = military}
 	end
+	return {}
 end
 
-function CustomPerson.getStatusToStore()
+function CustomPerson:getStatusToStore()
 	if _args.death_date then
-		_statusStore = 'Deceased'
+		return 'Deceased'
 	elseif _args.retired then
-		_statusStore = 'Retired'
+		return 'Retired'
 	elseif
 		(not Logic.readBool(_args.isplayer)) and
 		string.lower(_args.role or _args.defaultPersonType) ~= 'player'
 	then
-		_statusStore = 'not player'
+		return 'not player'
 	end
-	return _statusStore
 end
 
-function CustomPerson.getPersonType()
+function CustomPerson:getPersonType()
 	if _args.isplayer == 'true' then
 		return {store = 'Player', category = 'Player'}
 	end

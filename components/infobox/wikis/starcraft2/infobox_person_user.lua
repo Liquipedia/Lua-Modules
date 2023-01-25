@@ -41,8 +41,6 @@ local _RACE_DISPLAY = {
 	['a'] = '[[Protoss]],&nbsp;[[Terran]],&nbsp;[[Zerg]]',
 }
 
-local _raceData
-
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
@@ -72,7 +70,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		return {
-			Cell{name = 'Race', content = {_raceData.display}}
+			Cell{name = 'Race', content = {CustomUser._getRaceData(_args.race or 'unknown').display}}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
@@ -127,8 +125,8 @@ function CustomUser:createWidgetInjector()
 end
 
 function CustomUser:nameDisplay()
-	CustomUser._getRaceData(_args.race or 'unknown')
-	local raceIcon = RaceIcon({'alt_' .. _raceData.race})
+	local raceData = CustomUser._getRaceData(_args.race or 'unknown')
+	local raceIcon = RaceIcon({'alt_' .. raceData.race})
 	local name = _args.id or self.pagename
 
 	return raceIcon .. '&nbsp;' .. name
@@ -143,10 +141,10 @@ function CustomUser._getRaceData(race)
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
 	end
 
-	_raceData = {
+	return {
 		race = race,
-		faction = _FACTION1[race] or '',
-		faction2 = _FACTION2[race] or '',
+		faction = _FACTION1[race],
+		faction2 = _FACTION2[race],
 		display = display
 	}
 end

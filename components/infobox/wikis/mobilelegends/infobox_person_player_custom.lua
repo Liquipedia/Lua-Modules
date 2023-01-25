@@ -43,6 +43,9 @@ function CustomPlayer.run(frame)
 	_player = player
 	_args = player.args
 
+	_role = Role.run({role = _args.role})
+		_role2 = Role.run({role = _args.role2})
+
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
@@ -71,8 +74,6 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'region' then return {}
 	elseif id == 'role' then
-		_role = Role.run({role = _args.role})
-		_role2 = Role.run({role = _args.role2})
 		return {
 			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
 		}
@@ -125,11 +126,6 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]
-	end
-
-	local region = Region.run({region = _args.region, country = _args.country})
-	if type(region) == 'table' then
-		lpdbData.region = region.region
 	end
 
 	return lpdbData

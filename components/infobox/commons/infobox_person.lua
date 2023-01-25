@@ -37,7 +37,6 @@ Person.warnings = {}
 
 local Language = mw.language.new('en')
 local _LINK_VARIANT = 'player'
-local _shouldStoreData
 local _region
 local _COUNTRIES_EASTERN_NAME_ORDER = {
 	'China',
@@ -66,14 +65,13 @@ function Person:createInfobox()
 
 	-- check if non-representing is used and set an according value in self
 	-- so it can be accessed in the /Custom modules
-	args.country = Person:getStandardNationalityValue(args.country or args.nationality)
-	if args.country == Person:getStandardNationalityValue('non-representing') then
+	args.country = self:getStandardNationalityValue(args.country or args.nationality)
+	if args.country == self:getStandardNationalityValue('non-representing') then
 		self.nonRepresenting = true
 	end
 
 	args = self:_flipNameOrder(args)
 
-	_shouldStoreData = Person:shouldStoreData(args)
 	-- set custom variables here already so they are available
 	-- in functions we call from here on
 	self:defineCustomPageVariables(args)
@@ -88,11 +86,13 @@ function Person:createInfobox()
 			birthdate = args.birth_date,
 			birthlocation = args.birth_location,
 			deathdate = args.death_date,
-			shouldstore = _shouldStoreData
+			shouldstore = self:shouldStoreData(args)
 		})
 	if not ageCalculationSuccess then
 		age = Person._createAgeCalculationErrorMessage(age)
 	end
+
+	_region = self:_createRegion(args.region, args.country)
 
 	local widgets = {
 		Header{
@@ -114,7 +114,7 @@ function Person:createInfobox()
 		Cell{name = 'Died', content = {age.death}},
 		Customizable{id = 'region', children = {
 			Cell{name = 'Region', content = {
-						self:_createRegion(args.region, args.country)
+						_region.display
 					}
 				}
 			}
@@ -208,7 +208,7 @@ function Person:createInfobox()
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
-	if _shouldStoreData then
+	if self:shouldStoreData(args) then
 		self:_definePageVariables(args)
 		self:_setLpdbData(
 			args,
@@ -244,12 +244,12 @@ function Person:_setLpdbData(args, links, status, personType)
 		romanizedname = args.romanized_name or args.name,
 		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
 		nationality = args.country, -- already standardized above
-		nationality2 = Person:getStandardNationalityValue(args.country2 or args.nationality2),
-		nationality3 = Person:getStandardNationalityValue(args.country3 or args.nationality3),
+		nationality2 = self:getStandardNationalityValue(args.country2 or args.nationality2),
+		nationality3 = self:getStandardNationalityValue(args.country3 or args.nationality3),
 		birthdate = Variables.varDefault('player_birthdate'),
 		deathdate = Variables.varDefault('player_deathdate'),
 		image = args.image,
-		region = _region,
+		region = _region.region,
 		team = teamLink or team,
 		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
 		teamtemplate = teamTemplate,
@@ -379,9 +379,9 @@ end
 function Person:_createRegion(region, country)
 	region = Region.run({region = region, country = country})
 	if type(region) == 'table' then
-		_region = region.region
-		return region.display
+		return region
 	end
+	return {}
 end
 
 function Person:_createLocations(args, personType)
@@ -391,12 +391,12 @@ function Person:_createLocations(args, personType)
 		return countryDisplayData
 	end
 
-	countryDisplayData[1] = Person:_createLocation(country, args.location, personType)
+	countryDisplayData[1] = self:_createLocation(country, args.location, personType)
 
 	local index = 2
 	country = args['country2'] or args['nationality2']
 	while(not String.isEmpty(country)) do
-		countryDisplayData[index] = Person:_createLocation(country, args['location' .. index], personType)
+		countryDisplayData[index] = self:_createLocation(country, args['location' .. index], personType)
 		index = index + 1
 		country = args['country' .. index] or args['nationality' .. index]
 	end
@@ -438,7 +438,7 @@ end
 
 --- Allows for overriding this functionality
 function Person:getCategories(args, birthDisplay, personType, status)
-	if _shouldStoreData then
+	if self:shouldStoreData(args) then
 		local team = args.teamlink or args.team
 		local categories = { personType .. 's' }
 

@@ -36,6 +36,8 @@ local _player
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	player.args.history = tostring(TeamHistoryAuto._results{convertrole = 'true'})
+	_role = Role.run({role = _args.role})
+	_role2 = Role.run({role = _args.role2})
 
 	_player = player
 	_args = player.args
@@ -50,8 +52,6 @@ function CustomInjector:parse(id, widgets)
 	if id == 'region' then return {}
 
 	elseif id == 'role' then
-		_role = Role.run({role = _args.role})
-		_role2 = Role.run({role = _args.role2})
 		return {
 			Cell{name = _role2.display and 'Roles' or 'Role', content = {_role.display, _role2.display}}
 		}
