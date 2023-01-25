@@ -11,397 +11,307 @@ return {
 	wikiName = 'callofduty',
 	name = 'Call of Duty',
 	games = {
-		ag  = {
-			abbreviation  = 'ag',
-			defaultTeamLogo  = {
-				darkMode  = 'Aim Gods logo.png',
-				lightMode  = 'Aim Gods logo.png',
-			},
-			link  = 'Aim Gods',
-			logo  = {
-				darkMode  = 'Aim Gods logo.png',
-				lightMode  = 'Aim Gods logo.png',
-			},
-			name  = 'Aim Gods',
+		aw = {
+			abbreviation = 'AW',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		aq2  = {
-			abbreviation  = 'aq2',
-			defaultTeamLogo  = {
-				darkMode  = 'Action Quake 2.png',
-				lightMode  = 'Action Quake 2.png',
-			},
-			link  = 'Action Quake 2',
-			logo  = {
-				darkMode  = 'Action Quake 2.png',
-				lightMode  = 'Action Quake 2.png',
-			},
-			name  = 'Action Quake 2',
+			link = 'Call of Duty: Advanced Warfare',
+			logo = {
+				darkMode = 'COD AW TeamCardImage.png',
+				lightMode = 'COD AW TeamCardImage.png',
 		},
-		chex  = {
-			abbreviation  = 'chex',
-			defaultTeamLogo  = {
-				darkMode  = 'Chex Quest.png',
-				lightMode  = 'Chex Quest.png',
-			},
-			link  = 'Chex Quest',
-			logo  = {
-				darkMode  = 'Chex Quest.png',
-				lightMode  = 'Chex Quest.png',
-			},
-			name  = 'Chex Quest',
+			name = 'Call of Duty: Advanced Warfare',
 		},
-		cpma  = {
-			abbreviation  = 'cpma',
-			defaultTeamLogo  = {
-				darkMode  = 'CPMA logo.png',
-				lightMode  = 'CPMA logo.png',
-			},
-			link  = 'Quake III Arena: CPMA',
-			logo  = {
-				darkMode  = 'CPMA logo.png',
-				lightMode  = 'CPMA logo.png',
-			},
-			name  = 'Quake III Arena: CPMA',
+		bo = {
+			abbreviation = 'BO',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		d16  = {
-			abbreviation  = 'd16',
-			defaultTeamLogo  = {
-				darkMode  = 'DOOM 2016 logo.png',
-				lightMode  = 'DOOM 2016 logo.png',
-			},
-			link  = 'DOOM 2016',
-			logo  = {
-				darkMode  = 'DOOM 2016 logo.png',
-				lightMode  = 'DOOM 2016 logo.png',
-			},
-			name  = 'DOOM 2016',
+			link = 'Call of Duty: Black Ops',
+			logo = {
+				darkMode = 'Call of Duty Black Ops darkmode.png',
+				lightMode = 'Call of Duty Black Ops Logo.png',
 		},
-		d2  = {
-			abbreviation  = 'd2',
-			defaultTeamLogo  = {
-				darkMode  = 'DOOM II logo.png',
-				lightMode  = 'DOOM II logo.png',
-			},
-			link  = 'DOOM II',
-			logo  = {
-				darkMode  = 'DOOM II logo.png',
-				lightMode  = 'DOOM II logo.png',
-			},
-			name  = 'DOOM II',
+			name = 'Call of Duty: Black Ops',
 		},
-		d3  = {
-			abbreviation  = 'd3',
-			defaultTeamLogo  = {
-				darkMode  = 'DOOM 3 logo.png',
-				lightMode  = 'DOOM 3 logo.png',
-			},
-			link  = 'DOOM 3',
-			logo  = {
-				darkMode  = 'DOOM 3 logo.png',
-				lightMode  = 'DOOM 3 logo.png',
-			},
-			name  = 'DOOM 3',
+		bo2 = {
+			abbreviation = 'BO2',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		dbt  = {
-			abbreviation  = 'dbt',
-			defaultTeamLogo  = {
-				darkMode  = 'Diabotical logo.png',
-				lightMode  = 'Diabotical logo.png',
-			},
-			link  = 'Diabotical',
-			logo  = {
-				darkMode  = 'Diabotical logo.png',
-				lightMode  = 'Diabotical logo.png',
-			},
-			name  = 'Diabotical',
+			link = 'Call of Duty: Black Ops II',
+			logo = {
+				darkMode = 'COD BO2 TeamCardImage.png',
+				lightMode = 'COD BO2 TeamCardImage.png',
 		},
-		dmb  = {
-			abbreviation  = 'dmb',
-			defaultTeamLogo  = {
-				darkMode  = 'Doombringer logo.png',
-				lightMode  = 'Doombringer logo.png',
-			},
-			link  = 'DOOMBRINGER',
-			logo  = {
-				darkMode  = 'Doombringer logo.png',
-				lightMode  = 'Doombringer logo.png',
-			},
-			name  = 'DOOMBRINGER',
+			name = 'Call of Duty: Black Ops II',
 		},
-		doom  = {
-			abbreviation  = 'doom',
-			defaultTeamLogo  = {
-				darkMode  = 'Doom Logo.png',
-				lightMode  = 'Doom Logo.png',
-			},
-			link  = 'DOOM',
-			logo  = {
-				darkMode  = 'Doom Logo.png',
-				lightMode  = 'Doom Logo.png',
-			},
-			name  = 'DOOM',
+		bo3 = {
+			abbreviation = 'BO3',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		ma  = {
-			abbreviation  = 'ma',
-			defaultTeamLogo  = {
-				darkMode  = 'Master Arena logo.png',
-				lightMode  = 'Master Arena logo.png',
-			},
-			link  = 'Master Arena',
-			logo  = {
-				darkMode  = 'Master Arena logo.png',
-				lightMode  = 'Master Arena logo.png',
-			},
-			name  = 'Master Arena',
+			link = 'Call of Duty: Black Ops III',
+			logo = {
+				darkMode = 'COD BO3 TeamCardImage.png',
+				lightMode = 'COD BO3 TeamCardImage.png',
 		},
-		pk  = {
-			abbreviation  = 'pk',
-			defaultTeamLogo  = {
-				darkMode  =  '',
-				lightMode  =  '',
-			},
-			link  = 'Painkiller',
-			logo  = {
-				darkMode  =  '',
-				lightMode  =  '',
-			},
-			name  = 'Painkiller',
+			name = 'Call of Duty: Black Ops III',
 		},
-		q1  = {
-			abbreviation  = 'q1',
-			defaultTeamLogo  = {
-				darkMode  = 'Quake logo.png',
-				lightMode  = 'Quake logo.png',
-			},
-			link  = 'Quake',
-			logo  = {
-				darkMode  = 'Quake logo.png',
-				lightMode  = 'Quake logo.png',
-			},
-			name  = 'Quake',
+		bo4 = {
+			abbreviation = 'BO4',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		q2  = {
-			abbreviation  = 'q2',
-			defaultTeamLogo  = {
-				darkMode  = 'Quake 2 logo.png',
-				lightMode  = 'Quake 2 logo.png',
-			},
-			link  = 'Quake 2',
-			logo  = {
-				darkMode  = 'Quake 2 logo.png',
-				lightMode  = 'Quake 2 logo.png',
-			},
-			name  = 'Quake 2',
+			link = 'Call of Duty: Black Ops 4',
+			logo = {
+				darkMode = 'Black Ops 4 TeamCardImage.png',
+				lightMode = 'Black Ops 4 TeamCardImage.png',
 		},
-		q3  = {
-			abbreviation  = 'q3',
-			defaultTeamLogo  = {
-				darkMode  = 'Quake 3 logo.png',
-				lightMode  = 'Quake 3 logo.png',
-			},
-			link  = 'Quake III Arena',
-			logo  = {
-				darkMode  = 'Quake 3 logo.png',
-				lightMode  = 'Quake 3 logo.png',
-			},
-			name  = 'Quake III Arena',
+			name = 'Call of Duty: Black Ops 4',
 		},
-		q4  = {
-			abbreviation  = 'q4',
-			defaultTeamLogo  = {
-				darkMode  = 'Quake 4 logo.png',
-				lightMode  = 'Quake 4 logo.png',
-			},
-			link  = 'Quake 4',
-			logo  = {
-				darkMode  = 'Quake 4 logo.png',
-				lightMode  = 'Quake 4 logo.png',
-			},
-			name  = 'Quake 4',
+		bocw = {
+			abbreviation = 'BOCW',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		qc  = {
-			abbreviation  = 'qc',
-			defaultTeamLogo  = {
-				darkMode  = 'Quake logo.png',
-				lightMode  = 'Quake logo.png',
-			},
-			link  = 'Quake Champions',
-			logo  = {
-				darkMode  = 'Quake logo.png',
-				lightMode  = 'Quake logo.png',
-			},
-			name  = 'Quake Champions',
+			link = 'Black Ops Cold War',
+			logo = {
+				darkMode = 'Call of Duty Black Ops Cold War darkmode.png',
+				lightMode = 'COD ColdWar Teamcard.png',
 		},
-		qcde  = {
-			abbreviation  = 'qcde',
-			defaultTeamLogo  = {
-				darkMode  = 'QCDoom.png',
-				lightMode  = 'QCDoom.png',
-			},
-			link  = 'Quake Champions: DOOM Edition',
-			logo  = {
-				darkMode  = 'QCDoom.png',
-				lightMode  = 'QCDoom.png',
-			},
-			name  = 'Quake Champions: DOOM Edition',
+			name = 'Call of Duty: Black Ops Cold War',
 		},
-		ql  = {
-			abbreviation  = 'ql',
-			defaultTeamLogo  = {
-				darkMode  = 'Quake Live logo.png',
-				lightMode  = 'Quake Live logo.png',
-			},
-			link  = 'Quake Live',
-			logo  = {
-				darkMode  = 'Quake Live logo.png',
-				lightMode  = 'Quake Live logo.png',
-			},
-			name  = 'Quake Live',
+		cod = {
+			abbreviation = 'COD',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		qw  = {
-			abbreviation  = 'qw',
-			defaultTeamLogo  = {
-				darkMode  = 'QuakeWorld logo.png',
-				lightMode  = 'QuakeWorld logo.png',
-			},
-			link  = 'Quakeworld',
-			logo  = {
-				darkMode  = 'QuakeWorld logo.png',
-				lightMode  = 'QuakeWorld logo.png',
-			},
-			name  = 'Quakeworld',
+			link = 'Call of Duty',
+			logo = {
+				darkMode = 'COD1 icon.png',
+				lightMode = 'COD1 icon.png',
 		},
-		ra  = {
-			abbreviation  = 'ra',
-			defaultTeamLogo  = {
-				darkMode  = 'Rocket Arena logo.png',
-				lightMode  = 'Rocket Arena logo.png',
-			},
-			link  = 'Rocket Arena',
-			logo  = {
-				darkMode  = 'Rocket Arena logo.png',
-				lightMode  = 'Rocket Arena logo.png',
-			},
-			name  = 'Rocket Arena',
+			name = 'Call of Duty',
 		},
-		reflex  = {
-			abbreviation  = 'reflex',
-			defaultTeamLogo  = {
-				darkMode  =  '',
-				lightMode  =  '',
-			},
-			link  = 'Reflex',
-			logo  = {
-				darkMode  =  '',
-				lightMode  =  '',
-			},
-			name  = 'Reflex',
+		cod2 = {
+			abbreviation = 'COD2',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		sm  = {
-			abbreviation  = 'sm',
-			defaultTeamLogo  = {
-				darkMode  = 'ShootMania Storm logo.png',
-				lightMode  = 'ShootMania Storm logo.png',
-			},
-			link  = 'Shootmania Storm',
-			logo  = {
-				darkMode  = 'ShootMania Storm logo.png',
-				lightMode  = 'ShootMania Storm logo.png',
-			},
-			name  = 'Shootmania Storm',
+			link = 'Call of Duty 2',
+			logo = {
+				darkMode = 'Call of Duty 2 allmode.png',
+				lightMode = 'Call of Duty 2 allmode.png',
 		},
-		ut2k3  = {
-			abbreviation  = 'ut2k3',
-			defaultTeamLogo  = {
-				darkMode  = 'UT2K3 logo.png',
-				lightMode  = 'UT2K3 logo.png',
-			},
-			link  = 'Unreal Tournament 2003',
-			logo  = {
-				darkMode  = 'UT2K3 logo.png',
-				lightMode  = 'UT2K3 logo.png',
-			},
-			name  = 'Unreal Tournament 2003',
+			name = 'Call of Duty 2',
 		},
-		ut2k4  = {
-			abbreviation  = 'ut2k4',
-			defaultTeamLogo  = {
-				darkMode  = 'UT2K4 logo.png',
-				lightMode  = 'UT2K4 logo.png',
-			},
-			link  = 'Unreal Tournament 2004',
-			logo  = {
-				darkMode  = 'UT2K4 logo.png',
-				lightMode  = 'UT2K4 logo.png',
-			},
-			name  = 'Unreal Tournament 2004',
+		cod3 = {
+			abbreviation = 'COD3',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		ut3  = {
-			abbreviation  = 'ut3',
-			defaultTeamLogo  = {
-				darkMode  = 'Unreal Tournament 3 logo.png',
-				lightMode  = 'Unreal Tournament 3 logo.png',
-			},
-			link  = 'Unreal Tournament 3',
-			logo  = {
-				darkMode  = 'Unreal Tournament 3 logo.png',
-				lightMode  = 'Unreal Tournament 3 logo.png',
-			},
-			name  = 'Unreal Tournament 3',
+			link = 'Call of Duty 3',
+			logo = {
+				darkMode = 'COD3 Teamcard.png',
+				lightMode = 'COD3 Teamcard.png',
 		},
-		ut4  = {
-			abbreviation  = 'ut4',
-			defaultTeamLogo  = {
-				darkMode  =  '',
-				lightMode  =  '',
-			},
-			link  = 'Unreal Tournament 4',
-			logo  = {
-				darkMode  =  '',
-				lightMode  =  '',
-			},
-			name  = 'Unreal Tournament 4',
+			name = 'Call of Duty 3',
 		},
-		ut99  = {
-			abbreviation  = 'ut99',
-			defaultTeamLogo  = {
-				darkMode  = 'UT99 logo.png',
-				lightMode  = 'UT99 logo.png',
-			},
-			link  = 'Unreal Tournament 99',
-			logo  = {
-				darkMode  = 'UT99 logo.png',
-				lightMode  = 'UT99 logo.png',
-			},
-			name  = 'Unreal Tournament 99',
+		cod4 = {
+			abbreviation = 'COD4',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
 		},
-		ws  = {
-			abbreviation  = 'ws',
-			defaultTeamLogo  = {
-				darkMode  = 'Warsow logo.png',
-				lightMode  = 'Warsow logo.png',
-			},
-			link  = 'Warsow',
-			logo  = {
-				darkMode  = 'Warsow logo.png',
-				lightMode  = 'Warsow logo.png',
-			},
-			name  = 'Warsow',
+			link = 'Call of Duty 4: Modern Warfare',
+			logo = {
+				darkMode = 'COD4 Teamcard.png',
+				lightMode = 'COD4 Teamcard.png',
 		},
-		xonotic  = {
-			abbreviation  = 'xonotic',
-			defaultTeamLogo  = {
-				darkMode  = 'Xonotic logo.png',
-				lightMode  = 'Xonotic logo.png',
-			},
-			link  = 'Xonotic',
-			logo  = {
-				darkMode  = 'Xonotic logo.png',
-				lightMode  = 'Xonotic logo.png',
-			},
-			name  = 'Xonotic',
+			name = 'Call of Duty 4: Modern Warfare',
+		},
+		codm = {
+			abbreviation = 'CODM',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Mobile',
+			logo = {
+				darkMode = 'COD Mobile Default darkmode.png',
+				lightMode = 'COD Mobile Default lightmode.png',
+		},
+			name = 'Call of Duty: Mobile',
+		},
+		ghosts = {
+			abbreviation = 'GHOSTS',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Ghosts',
+			logo = {
+				darkMode = 'Call of Duty Ghosts darkmode.png',
+				lightMode = 'COD Ghosts TeamCardImage.png',
+		},
+			name = 'Call of Duty: Ghosts',
+		},
+		iw = {
+			abbreviation = 'IW',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Infinite Warfare',
+			logo = {
+				darkMode = 'COD IW TeamCardImage.png',
+				lightMode = 'COD IW TeamCardImage.png',
+		},
+			name = 'Call of Duty: Infinite Warfare',
+		},
+		mw2 = {
+			abbreviation = 'MW2',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Modern Warfare 2',
+			logo = {
+				darkMode = 'COD MW2 teamcard.png',
+				lightMode = 'COD MW2 teamcard.png',
+		},
+			name = 'Call of Duty: Modern Warfare 2',
+		},
+		mw2019 = {
+			abbreviation = 'MW2019',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Modern Warfare (2019)',
+			logo = {
+				darkMode = 'Modern warfare TeamCardImage.png',
+				lightMode = 'Modern warfare TeamCardImage.png',
+		},
+			name = 'Call of Duty: Modern Warfare',
+		},
+		mw3 = {
+			abbreviation = 'MW3',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Modern Warfare 3',
+			logo = {
+				darkMode = 'COD MW3 TeamCardImage.png',
+				lightMode = 'COD MW3 TeamCardImage.png',
+		},
+			name = 'Call of Duty: Modern Warfare 3',
+		},
+		mwii = {
+			abbreviation = 'MWII',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Modern Warfare II',
+			logo = {
+				darkMode = 'COD Modern Warfare II Teamcard.png',
+				lightMode = 'COD Modern Warfare II Teamcard.png',
+		},
+			name = 'Call of Duty: Modern Warfare II',
+		},
+		vg = {
+			abbreviation = 'VG',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Vanguard',
+			logo = {
+				darkMode = 'COD Vanguard Teamcard.png',
+				lightMode = 'COD Vanguard Teamcard.png',
+		},
+			name = 'Call of Duty: Vanguard',
+		},
+		waw = {
+			abbreviation = 'WaW',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: World at War',
+			logo = {
+				darkMode = 'COD World at War darkmode.png',
+				lightMode = 'COD WAW Teamcard.png',
+		},
+			name = 'Call of Duty: World at War',
+		},
+		wwii = {
+			abbreviation = 'WWII',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: WWII',
+			logo = {
+				darkMode = 'COD WW2 TeamCardImage.png',
+				lightMode = 'COD WW2 TeamCardImage.png',
+		},
+			name = 'Call of Duty: WWII',
+		},
+		wz = {
+			abbreviation = 'WZ',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Warzone',
+			logo = {
+				darkMode = 'COD Warzone logo.png',
+				lightMode = 'COD Warzone logo.png',
+		},
+			name = 'Call of Duty: Warzone',
+		},
+		wz2 = {
+			abbreviation = 'WZ2',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Warzone 2.0',
+			logo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			name = 'Call of Duty: Warzone 2.0',
+		},
+		wzm = {
+			abbreviation = 'WZM',
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			link = 'Call of Duty: Warzone Mobile',
+			logo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+		},
+			name = 'Call of Duty: Warzone Mobile',
 		},
 	},
+	defaultGame = 'cod',
 	defaultTeamLogo = 'Call of Duty Default Lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Call of Duty Default Darkmode.png', ---@deprecated
 }
