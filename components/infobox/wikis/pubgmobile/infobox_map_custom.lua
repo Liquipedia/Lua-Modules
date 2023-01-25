@@ -55,14 +55,6 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
-		name = 'Game Version',
-		content = {CustomMap._getGameVersion()}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game Mode(s)',
-		content = {CustomMap._getGameMode()}
-	})
-	table.insert(widgets, Cell{
 		name = 'Span',
 		content = {_args.span}
 	})
@@ -72,7 +64,15 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Size',
-		content = {Abbreviation.make(_args.sizeabr, _args.size)}
+		content = {_args.size}
+	})
+	table.insert(widgets, Cell{
+		name = 'Game Version',
+		content = {CustomMap._getGameVersion()}
+	})
+	table.insert(widgets, Cell{
+		name = 'Game Mode(s)',
+		content = {CustomMap._getGameMode()}
 	})
 	return widgets
 end
