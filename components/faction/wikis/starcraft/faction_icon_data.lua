@@ -22,7 +22,6 @@ local byFaction = {
 	r = {
 		altIcon = 'File:RaceIcon Random.png',
 		icon = 'File:Ricon small bw.png',
-		--icon = 'File:Random Brown 30 Blub.png'
 	},
 	u = {
 		icon = 'File:Space filler race.png',
