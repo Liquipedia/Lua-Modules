@@ -168,7 +168,7 @@ function SquadRow:newteam(args)
 			end
 
 			if String.isNotEmpty(args.newteamrole) then
-				cell:wikitext('&nbsp;'):tag('i'):tag('small'):wikitext(args.newteamrole)
+				cell:wikitext('&nbsp;'):tag('i'):tag('small'):wikitext('(' .. args.newteamrole .. ')')
 			end
 		elseif not self.options.useTemplatesForSpecialTeams and String.isNotEmpty(args.newteamrole) then
 			cell:tag('div'):addClass('NewTeamRole'):wikitext(args.newteamrole)
