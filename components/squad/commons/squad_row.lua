@@ -66,8 +66,11 @@ function SquadRow:id(args)
 	local cell = mw.html.create('td')
 	cell:addClass('ID')
 
-	local opponent = Opponent.readOpponentArgs(Table.merge(args, {type = Opponent.solo}))
-	cell:tag('b'):node(OpponentDisplay.BlockOpponent{opponent = Opponent.resolve(opponent, nil, {syncPlayer = true})})
+	local opponent = Opponent.resolve(
+		Opponent.readOpponentArgs(Table.merge(args, {type = Opponent.solo}),
+		nil, {syncPlayer = true})
+	)
+	cell:tag('b'):node(OpponentDisplay.InlineOpponent{opponent = opponent})
 
 	if String.isNotEmpty(args.captain) then
 		cell:wikitext('&nbsp;' .. _ICON_CAPTAIN)
