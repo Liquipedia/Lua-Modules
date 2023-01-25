@@ -156,6 +156,7 @@ function CustomSquad.runAuto(playerList, squadType)
 
 		player.link = player.page
 		player.role = player.thisTeam.role
+		player.position = player.thisTeam.position
 		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
 
 		player.newteam = player.newTeam.team
@@ -200,6 +201,7 @@ function CustomSquad._playerRow(player, squadType)
 
 	return row:create(
 		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
+		.. (player.role and '_' .. player.role or '')
 	)
 end
 

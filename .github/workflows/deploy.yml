@@ -30,7 +30,7 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-        run: bash deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"
+        run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"
 
   dev-deploy:
     name: Dev Wikis
@@ -56,4 +56,4 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.DEV_WIKI_BASE_URL }}
           DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
-        run: bash deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"
+        run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"

@@ -52,7 +52,7 @@ function CustomWeapon.run(frame)
 	_args = _weapon.args
 	weapon.addToLpdb = CustomWeapon.addToLpdb
 	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
-	return weapon:createInfobox(frame)
+	return weapon:createInfobox()
 end
 
 function CustomWeapon:createWidgetInjector()

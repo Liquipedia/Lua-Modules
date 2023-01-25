@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 local CustomSquad = {}
 
 function CustomSquad.run(frame)
-	error("R6 wiki doesn't support manual Squad Tables")
+	error('R6 wiki doesn\'t support manual Squad Tables')
 end
 
 function CustomSquad.runAuto(playerList, squadType)
@@ -69,7 +69,10 @@ function CustomSquad._playerRow(player, squadType)
 		row:date(leaveText, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	return row:create(mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. player.joindate)
+	return row:create(
+		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_'
+		.. player.joindate .. (player.role and '_' .. player.role or '')
+	)
 end
 
 return CustomSquad

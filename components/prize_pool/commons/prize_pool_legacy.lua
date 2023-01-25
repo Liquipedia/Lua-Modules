@@ -10,14 +10,14 @@ local Array = require('Module:Array')
 local Currency = require('Module:Currency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local Points = mw.loadData('Module:Points/data')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local LegacyPrizePool = {}
 
@@ -34,6 +34,8 @@ local CHECKMARK = '<div class="fa fa-check green-check"></div>'
 local CUSTOM_HANDLER
 
 local IS_SOLO = false
+
+LegacyPrizePool.BASE_CURRENCY = 'USD'
 
 function LegacyPrizePool.run(dependency)
 	local args = Template.retrieveReturnValues('LegacyPrizePool')
@@ -81,7 +83,7 @@ function LegacyPrizePool.run(dependency)
 	local mergeSlots = Logic.readBool(header.mergeSlots)
 	for _, slot in ipairs(slots) do
 		-- retrieve the slot and push it into a temp var so it can be altered (to merge slots if need be)
-		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots)
+		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots, newArgs)
 		local place = tempSlot.place or slot.place
 		-- if we want to merge slots and the slot we just retrieved
 		-- has the same place as the one before, then append the opponents
@@ -147,7 +149,7 @@ function LegacyPrizePool.sortQualifiers(args)
 	end)
 end
 
-function LegacyPrizePool.mapSlot(slot, mergeSlots)
+function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 	if not slot.place then
 		return {}
 	end
@@ -159,25 +161,49 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 		newData.place = slot.place
 	end
 
+	local baseCurrencyPrize = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
+
 	newData.date = slot.date
-	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
+	newData[baseCurrencyPrize] = (slot[baseCurrencyPrize] and slot[baseCurrencyPrize] ~= '0') and slot[baseCurrencyPrize]
+		or nil
 
 	local opponentsInSlot = #slot
+	local needsQualifiedFreetext = false
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
-		if newParameter == 'seed' then
+		if newParameter == 'seed' and input == 'q' then
+			if slot.link then
+				-- Use qualifier display
+				if not slot.link:find('^%[%[') then
+					slot.link = '[[' .. slot.link .. ']]'
+				end
+				LegacyPrizePool.handleSeed(newData, slot.link, opponentsInSlot)
+			else
+				-- Tracking category
+				needsQualifiedFreetext = true
+				mw.ext.TeamLiquidIntegration.add_category('Pages with missing qualifier link')
+			end
+		elseif newParameter == 'seed' then
 			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
-
 		elseif input and tonumber(input) ~= 0 then
-			-- Handle the legacy checkmarks, they were set in value = 'q'
-			-- If want, in the future this could be parsed as a Qualification instead of a freetext as now
 			if input == 'q' then
-				input = slot.link and Page.makeInternalLink(CHECKMARK, slot.link) or CHECKMARK
+				input = CHECKMARK
+				mw.ext.TeamLiquidIntegration.add_category('Pages with freetext checkmark')
 			end
 
 			newData[newParameter] = input
 		end
 	end)
+
+	if needsQualifiedFreetext then
+		local slotParam = 'QUALIFIED_FREETEXT'
+		local newParam = CACHED_DATA.inputToId[slotParam]
+		if not newParam then
+			LegacyPrizePool.assignType(headerArgs, 'Qualification', slotParam)
+			newParam = CACHED_DATA.inputToId[slotParam]
+		end
+		newData[newParam] = CHECKMARK
+	end
 
 	if CUSTOM_HANDLER.customSlot then
 		newData = CUSTOM_HANDLER.customSlot(newData, CACHED_DATA, slot)
@@ -241,8 +267,10 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 			wdl = slot['wdl' .. opponentIndex],
 			flag = slot['flag' .. opponentIndex],
 			team = slot['team' .. opponentIndex],
-			lastvs = slot['lastvs' .. opponentIndex],
-			lastvsflag = slot['lastvsflag' .. opponentIndex],
+			lastvs = {
+				slot['lastvs' .. opponentIndex],
+				flag = slot['lastvsflag' .. opponentIndex],
+			},
 			lastvsscore = (slot['lastscore' .. opponentIndex] or '') ..
 				'-' ..
 				(slot['lastvsscore' .. opponentIndex] or ''),
@@ -274,7 +302,7 @@ function LegacyPrizePool.assignType(assignTo, input, slotParam)
 		CACHED_DATA.inputToId[slotParam] = 'points' .. index
 		CACHED_DATA.next.points = index + 1
 
-	elseif input and input:lower() == 'seed' then
+	elseif input and (input:lower() == 'seed' or input:lower() == 'qualified') then
 		CACHED_DATA.inputToId[slotParam] = 'seed'
 
 	elseif String.isNotEmpty(input) then
@@ -310,7 +338,7 @@ function LegacyPrizePool.parseWikiLink(input)
 
 			else
 				-- Just link
-				link, displayName = cleanedInput, cleanedInput
+				link = cleanedInput
 			end
 
 			if link:sub(1, 1) == '/' then

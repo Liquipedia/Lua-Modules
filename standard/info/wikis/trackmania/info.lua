@@ -12,4 +12,6 @@ return {
 	name = 'Trackmania',
 	defaultTeamLogo = 'Trackmania_logo_lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Trackmania_logo_darkmode.png', ---@deprecated
+	opponentLibrary = 'Opponent',
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

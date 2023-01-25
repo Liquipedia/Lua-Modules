@@ -61,7 +61,7 @@ function CustomTeam.run(frame)
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -302,15 +302,6 @@ function CustomTeam.getEarningsAndMedalsData(team)
 
 	if earnings.team == nil then
 		earnings.team = {}
-	end
-
-	-- to be removed after a purge run + consumer updates
-	if _doStore then
-		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
-				type = 'total_earnings_players_while_on_team',
-				name = _team.pagename,
-				information = playerEarnings,
-		})
 	end
 
 	for _, earningsTable in pairs(earnings) do

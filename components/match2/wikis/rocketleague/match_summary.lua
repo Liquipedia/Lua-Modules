@@ -25,8 +25,8 @@ local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
-local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link='
-local _OCTANE_SUFFIX = '|Octane matchpage]]'
+local _SHIFT_PREFIX = '[[File:ShiftRLE icon.png|14x14px|link='
+local _SHIFT_SUFFIX = '|ShiftRLE matchpage]]'
 local _BALLCHASING_PREFIX = '[[File:Ballchasing icon.png|14x14px|link='
 local _BALLCHASING_SUFFIX = '|Ballchasing replays]]'
 local _HEADTOHEAD_PREFIX = '[[File:Match Info Stats.png|14x14px|link='
@@ -236,14 +236,14 @@ function CustomMatchSummary.getByMatchId(args)
 	then
 		local footer = MatchSummary.Footer()
 
-		-- Octane
-		if Logic.isNotEmpty(match.links.octane) then
-			footer:addElement(_OCTANE_PREFIX .. match.links.octane .. _OCTANE_SUFFIX)
+		-- Shift
+		for _, shift in Table.iter.pairsByPrefix(match.links, 'shift') do
+			footer:addElement(_SHIFT_PREFIX .. shift .. _SHIFT_SUFFIX)
 		end
 
 		-- Ballchasing
-		if Logic.isNotEmpty(match.links.ballchasing) then
-			footer:addElement(_BALLCHASING_PREFIX .. match.links.ballchasing .. _BALLCHASING_SUFFIX)
+		for _, ballchasing in Table.iter.pairsByPrefix(match.links, 'ballchasing') do
+			footer:addElement(_BALLCHASING_PREFIX .. ballchasing .. _BALLCHASING_SUFFIX)
 		end
 
 		-- Match Vod

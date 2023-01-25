@@ -44,7 +44,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	BasicHiddenDataBox.checkAndAssign(
 		'featured',
 		args.featured,
-		queryResult.extradata.featured
+		queryResult.publishertier
 	)
 	if args.team_number then
 		Variables.varDefine('is_team_tournament', 1)

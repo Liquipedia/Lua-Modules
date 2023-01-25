@@ -126,7 +126,7 @@ function StarcraftMatchGroupInput._getTournamentVars(match)
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	Variables.varDefine('headtohead', match.headtohead)
-	match.featured = Logic.emptyOr(match.featured, Variables.varDefault('featured'))
+	match.publishertier = Logic.emptyOr(match.featured, Variables.varDefault('featured'))
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
 	Variables.varDefine('bestof', match.bestof)
 
@@ -160,7 +160,6 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	else
 		extradata = {
 			noQuery = match.noQuery,
-			featured = match.featured,
 			casters = match.casters,
 			headtohead = match.headtohead,
 			ffa = 'false',
@@ -239,7 +238,7 @@ Misc. MatchInput functions
 
 ]]--
 function StarcraftMatchGroupInput._matchWinnerProcessing(match)
-	local bestof = tonumber(match.bestof or _DEFAULT_BEST_OF) or _DEFAULT_BEST_OF
+	local bestof = tonumber(match.bestof) or _DEFAULT_BEST_OF
 	local walkover = match.walkover or ''
 	local numberofOpponents = 0
 	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
@@ -326,13 +325,11 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 			match.winner = 0
 			match.resulttype = 'draw'
 		end
-		if
-			tostring(match.winner) == tostring(opponentIndex) or
-			match.resulttype == 'draw' or
-			opponent.score == bestof / 2
-		then
+
+		if tonumber(match.winner) == opponentIndex or
+			match.resulttype == 'draw' then
 			opponent.placement = 1
-		else
+		elseif Logic.isNumeric(match.winner) then
 			opponent.placement = 2
 		end
 	end
@@ -341,7 +338,7 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 end
 
 function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
-	if Logic.readBool(match.finished) and not match.winner then
+	if Logic.readBool(match.finished) and String.isEmpty(match.winner) then
 		local scores = Array.mapIndexes(function(opponentIndex)
 			local opponent = match['opponent' .. opponentIndex]
 			if not opponent then
@@ -393,7 +390,7 @@ function StarcraftMatchGroupInput._subMatchStructure(match)
 				),
 				noQuery = match.noQuery,
 				matchsection = Variables.varDefault('matchsection'),
-				featured = match.featured,
+				featured = match.publishertier,
 				isSubMatch = 'true',
 				opponent1 = map.extradata.opponent1,
 				opponent2 = map.extradata.opponent2,
@@ -720,7 +717,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 
 	if customTeam then
 		if not defaultIcon then
-			defaultIcon = require('Module:Brkts/WikiSpecific').defaultIcon
+			defaultIcon = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true}).defaultIcon
 		end
 		opponent.template = 'default'
 		icon = defaultIcon

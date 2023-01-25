@@ -293,4 +293,8 @@ return {
 		name = 'Western Indonesian Time',
 		offset = {7, 0},
 	},
+	WITA = {
+		name = 'Central Indonesian Time',
+		offset = {8, 0},
+	},
 }

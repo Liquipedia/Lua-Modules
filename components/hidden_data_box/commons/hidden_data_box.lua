@@ -68,15 +68,15 @@ function HiddenDataBox.run(args)
 		queryResult = queryResult[1] or {}
 	end
 
-	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.tournamentName(args.name), queryResult.name)
+	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.stripHTML(args.name), queryResult.name)
 	HiddenDataBox.checkAndAssign(
 		'tournament_shortname',
-		TextSanitizer.tournamentName(args.shortname),
+		TextSanitizer.stripHTML(args.shortname),
 		queryResult.shortname
 	)
 	HiddenDataBox.checkAndAssign(
 		'tournament_tickername',
-		TextSanitizer.tournamentName(args.tickername),
+		TextSanitizer.stripHTML(args.tickername),
 		queryResult.tickername
 	)
 	HiddenDataBox.checkAndAssign('tournament_icon', args.icon, queryResult.icon)

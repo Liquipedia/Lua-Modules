@@ -43,7 +43,7 @@ function CustomUnit.run(frame)
 	unit.nameDisplay = CustomUnit.nameDisplay
 	unit.setLpdbData = CustomUnit.setLpdbData
 	unit.createWidgetInjector = CustomUnit.createWidgetInjector
-	return unit:createInfobox(frame)
+	return unit:createInfobox()
 end
 
 function CustomInjector:addCustomCells()
@@ -67,9 +67,9 @@ function CustomInjector:addCustomCells()
 
 	if _args.game ~= 'lotv' and _args.buildtime then
 		table.insert(widgets, Center{content = {
-			'<small>\'\'\'Note:\'\'\' ' ..
+			'<small><b>Note:</b> ' ..
 			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
-			' \'\'See [[Game Speed]].\'\'</small>'
+			' <i>See [[Game Speed]].</i></small>'
 		}})
 	end
 

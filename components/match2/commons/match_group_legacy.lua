@@ -14,11 +14,11 @@ local MatchGroup = require('Module:MatchGroup')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local WikiSpecific = require('Module:Brkts/WikiSpecific')
 local getArgs = require('Module:Arguments').getArgs
 local getDefaultMapping = require('Module:MatchGroup/Legacy/Default').get
 local json = require('Module:Json')
 
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 local MatchSubobjects = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
 
 local _IS_USERSPACE = false

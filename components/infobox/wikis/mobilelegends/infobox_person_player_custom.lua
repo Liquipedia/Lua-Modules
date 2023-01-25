@@ -46,7 +46,7 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -54,6 +54,7 @@ function CustomInjector:parse(id, widgets)
 		local manualHistory = _args.history
 		local automatedHistory = TeamHistoryAuto._results({
 			convertrole = 'true',
+			iconModule = 'Module:PositionIcon/data',
 			player = _pagename
 		}) or ''
 		automatedHistory = tostring(automatedHistory)

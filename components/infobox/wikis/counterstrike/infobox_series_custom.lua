@@ -42,7 +42,7 @@ function CustomSeries.run(frame)
 
 	_args.liquipediatier = Tier.number[_args.liquipediatier]
 
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
 function CustomSeries:createWidgetInjector()

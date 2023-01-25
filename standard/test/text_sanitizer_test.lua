@@ -14,9 +14,9 @@ local TextSanitizer = Lua.import('Module:TextSanitizer', {requireDevIfEnabled = 
 local suite = ScribuntoUnit:new()
 
 function suite:testClass()
-	self:assertEquals('Bar', TextSanitizer.tournamentName('<b class="foo">Bar</b>'))
-	self:assertEquals('A -B', TextSanitizer.tournamentName('A&zwj;&nbsp;—B'))
-	self:assertEquals('AB', TextSanitizer.tournamentName('A&shy;B'))
+	self:assertEquals('Bar', TextSanitizer.stripHTML('<b class="foo">Bar</b>'))
+	self:assertEquals('A -B', TextSanitizer.stripHTML('A&zwj;&nbsp;—B'))
+	self:assertEquals('AB', TextSanitizer.stripHTML('A&shy;B'))
 end
 
 return suite

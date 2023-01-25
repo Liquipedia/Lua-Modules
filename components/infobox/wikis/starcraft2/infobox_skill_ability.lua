@@ -35,7 +35,7 @@ function Ability.run(frame)
 	ability.createWidgetInjector = Ability.createWidgetInjector
 	ability.getCategories = Ability.getCategories
 	_args = ability.args
-	return ability:createInfobox(frame)
+	return ability:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
