@@ -9,13 +9,13 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
+local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
 local PatchAuto = require('Module:PatchAuto')
-local RaceIcon = mw.loadData('Module:RaceIconSmall')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -245,27 +245,27 @@ function CustomLeague._playerRaceBreakDown()
 		if humanNumber + orcNumber + undeadNumber + nightelfNumber + randomNumber + multipleNumber > 0 then
 			playerBreakDown.display = {}
 			if humanNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon['h']
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'h', showLink = false, showTitle = false}
 					.. ' ' .. humanNumber)
 			end
 			if orcNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon['o']
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'o', showLink = false, showTitle = false}
 					.. ' ' .. orcNumber)
 			end
 			if undeadNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon['u']
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'u', showLink = false, showTitle = false}
 					.. ' ' .. undeadNumber)
 			end
 			if nightelfNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon['n']
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'n', showLink = false, showTitle = false}
 					.. ' ' .. nightelfNumber)
 			end
 			if randomNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon['r']
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'r', showLink = false, showTitle = false}
 					.. ' ' .. randomNumber)
 			end
 			if multipleNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon['m']
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'm', showLink = false, showTitle = false}
 					.. ' ' .. multipleNumber)
 			end
 		end
