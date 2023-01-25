@@ -156,6 +156,11 @@ function Placement:init(args, parent, lastPlacement)
 
 	self.prizeRewards = self:_readPrizeRewards(self.args)
 
+	if self.count then
+		self.placeStart = lastPlacement + 1
+		self.placeEnd = lastPlacement + self.count
+	end
+
 	self.opponents = self:_parseOpponents(self.args)
 
 	-- Implicit place range has been given (|place= is not set)
@@ -163,7 +168,7 @@ function Placement:init(args, parent, lastPlacement)
 	-- or the number of entered opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + (self.count or math.max(#self.opponents, 1))
+		self.placeEnd = lastPlacement + math.max(#self.opponents, 1)
 	end
 
 	self.count = self.placeEnd + 1 - self.placeStart
