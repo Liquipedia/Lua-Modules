@@ -7,23 +7,14 @@
 --
 
 local Array = require('Module:Array')
-local Currency = require('Module:Currency')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
 local CustomLegacyPrizePool = {}
-
-local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
-local BASE_CURRENCY_PRIZE = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
 
 local _cache
 local TBD = 'TBD'
