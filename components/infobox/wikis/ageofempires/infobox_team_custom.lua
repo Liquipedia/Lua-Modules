@@ -78,12 +78,11 @@ function CustomTeam._getGames()
 			return {game = GameLookup.getName(mw.text.trim(game))}
 		end)
 
-	Array.forEach(manualGames,
+	Array.mergeInto(games, Array.filter(manualGames,
 		function(entry)
-			if not Array.find(games, function(e) return e.game == entry.game end) then
-				table.insert(games, entry)
-			end
-		end)
+			return not Array.any(games, function(e) return e.game == entry.game end)
+		end
+	))
 
 	Array.sortInPlaceBy(games, function(entry) return entry.game end)
 
