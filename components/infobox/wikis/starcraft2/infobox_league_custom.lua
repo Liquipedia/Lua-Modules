@@ -267,8 +267,8 @@ function CustomLeague._getGameVersion()
 	local modName = _args.modname
 	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
 	local endPatch = _args.epatch
-	local startDate = _args.sdate
-	local endDate = _args.edate
+	local startDate = Variables.varDefault('tournament_startdate', TODAY)
+	local endDate = Variables.varDefault('tournament_enddate', TODAY)
 
 	if String.isNotEmpty(game) or String.isNotEmpty(patch) then
 		local gameVersion
