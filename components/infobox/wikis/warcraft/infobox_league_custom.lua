@@ -132,12 +132,15 @@ function CustomInjector:parse(id, widgets)
 		_args.player_number = playerRaceBreakDown.playerNumber
 		local playerNumber = _args.player_number or 0
 		Variables.varDefine('player_number', playerNumber)
-		if playerNumber > 0 then
+		if playerNumber > 0 or _args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})
+		end
+
+		if playerNumber > 0 then
 			table.insert(widgets, Cell{name = 'Number of players', content = {playerNumber}})
 			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
-		elseif _args.team_number then
-			table.insert(widgets, Title{name = 'Participants breakdown'})
+		end
+		if _args.team_number then
 			table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
 		end
 
