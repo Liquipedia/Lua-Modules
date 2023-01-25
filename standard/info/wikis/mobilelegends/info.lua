@@ -11,7 +11,7 @@ return {
 	wikiName = 'mobilelegends',
 	name = 'Mobile Legends',
 	mobilelegends = {
-		wol = {
+		mobilelegends = {
 			abbreviation = 'ML',
 			name = 'Mobile Legends',
 			link = 'Mobile Legends',

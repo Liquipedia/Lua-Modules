@@ -10,8 +10,8 @@ return {
 	startYear = 2006,
 	wikiName = 'trackmania',
 	name = 'Trackmania',
-	defaultTeamLogo = 'Trackmania_logo_lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Trackmania_logo_darkmode.png', ---@deprecated
+	defaultTeamLogo = 'Trackmania logo lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Trackmania logo darkmode.png', ---@deprecated
 	opponentLibrary = 'Opponent',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

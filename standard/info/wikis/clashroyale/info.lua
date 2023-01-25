@@ -16,18 +16,16 @@ return {
 			name = 'Clash Royale',
 			link = 'Clash Royale',
 			logo = {
-				darkMode = 'Clash Royale default allmode.png',
-				lightMode = 'Clash Royale default allmode.png',
+				darkMode = 'Clash Royale.png',
+				lightMode = 'Clash Royale.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Clash Royale default allmode.png',
-				lightMode = 'Clash Royale default allmode.png',
+				darkMode = 'Clash Royale.png',
+				lightMode = 'Clash Royale.png',
 			},
 		},
 	},
 	defaultGame = 'cr',
-	defaultTeamLogo = 'Clash Royale default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Clash Royale default allmode.png', ---@deprecated
-	opponentLibrary = 'Opponent/Custom',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
+	defaultTeamLogo = 'Clash Royale.png', ---@deprecated
+	defaultTeamLogoDark = 'Clash Royale.png', ---@deprecated
 }

@@ -11,7 +11,7 @@ return {
 	wikiName = 'freefire',
 	name = 'Free Fire',
 	games = {
-		wol = {
+		freefire = {
 			abbreviation = 'Free Fire',
 			name = 'Free Fire',
 			link = 'Free Fire',
@@ -25,7 +25,7 @@ return {
 			},
 		},
 	},
-	defaultGame = 'wol',
+	defaultGame = 'freefire',
 	defaultTeamLogo = 'Freefire Default Logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Freefire Default Logo.png', ---@deprecated
 }

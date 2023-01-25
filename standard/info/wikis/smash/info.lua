@@ -10,6 +10,6 @@ return {
 	startYear = 1999,
 	wikiName = 'smash',
 	name = 'Smash',
-	defaultTeamLogo = 'Smashlogo_std.png', ---@deprecated
-	defaultTeamLogoDark = 'Smashlogo_std.png', ---@deprecated
+	defaultTeamLogo = 'Smashlogo std.png', ---@deprecated
+	defaultTeamLogoDark = 'Smashlogo std.png', ---@deprecated
 }

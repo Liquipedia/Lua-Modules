@@ -25,7 +25,7 @@ return {
 			},
 		},
 	},
-	defaultGame = 'wol',
+	defaultGame = 'hots',
 	defaultTeamLogo = 'Hots logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Hots logo.png', ---@deprecated
 }
