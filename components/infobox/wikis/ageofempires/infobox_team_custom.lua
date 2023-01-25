@@ -78,7 +78,7 @@ function CustomTeam._getGames()
 			return {game = GameLookup.getName(mw.text.trim(game))}
 		end)
 
-	Array.mergeInto(games, Array.filter(manualGames,
+	Array.extendWith(games, Array.filter(manualGames,
 		function(entry)
 			return not Array.any(games, function(e) return e.game == entry.game end)
 		end
