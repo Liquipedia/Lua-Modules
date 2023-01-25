@@ -163,7 +163,7 @@ function Placement:init(args, parent, lastPlacement)
 	-- or the number of entered opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + math.max(#self.opponents, 1)
+		self.placeEnd = lastPlacement + (self.count or math.max(#self.opponents, 1))
 	end
 
 	self.count = self.placeEnd + 1 - self.placeStart
