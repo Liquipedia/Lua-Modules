@@ -196,13 +196,8 @@ function SquadRow:setExtradata(extradata)
 	return self
 end
 
-function SquadRow:addToLpdb(lpdbData)
-	return lpdbData
-end
-
 function SquadRow:create(objectName)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		self.lpdbData = self:addToLpdb(self.lpdbData)
 		mw.ext.LiquipediaDB.lpdb_squadplayer(objectName, self.lpdbData)
 	end
 
