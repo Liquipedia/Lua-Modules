@@ -92,7 +92,7 @@ function CustomSquad.run(frame)
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
-		row.lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+		row:setExtradata({
 			faction = _FACTION1[player.race],
 			faction2 = _FACTION2[player.race],
 			squadname = squadName,
