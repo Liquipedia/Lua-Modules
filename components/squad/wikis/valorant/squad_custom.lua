@@ -121,7 +121,7 @@ function CustomSquad.runAuto(playerList, squadType)
 end
 
 function CustomSquad._playerRow(player, squadType)
-	local row = SquadRow(mw.getCurrentFrame(), player.role, {useTemplatesForSpecialTeams = true})
+	local row = SquadRow{useTemplatesForSpecialTeams = true}
 
 	row:id{
 		player.id,

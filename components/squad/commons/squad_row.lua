@@ -29,25 +29,9 @@ local _ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Catego
 local _ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
 
 local SquadRow = Class.new(
-	function(self, frame, role, options)
-		self.frame = frame
+	function(self, options)
 		self.content = mw.html.create('tr'):addClass('Player')
 		self.options = options or {}
-
-		role = string.lower(role or '')
-
-		if role == 'sub' then
-			self.content:addClass('sub')
-		elseif role == 'coach' then
-			self.content:addClass('coach')
-			self.content:addClass('roster-coach')
-		elseif role == 'coach/manager' then
-			self.content:addClass('coach/manager')
-			self.content:addClass('roster-coach')
-		elseif role == 'coach/substitute' then
-			self.content:addClass('coach/substitute')
-			self.content:addClass('roster-coach')
-		end
 
 		self.lpdbData = {type = _DEFAULT_TYPE}
 	end)
@@ -126,6 +110,22 @@ function SquadRow:role(args)
 	self.content:node(cell)
 
 	self.lpdbData.role = args.role
+
+	-- Set row background for certain roles
+	local role = string.lower(args.role or '')
+
+	if role == 'sub' then
+		self.content:addClass('sub')
+	elseif role == 'coach' then
+		self.content:addClass('coach')
+		self.content:addClass('roster-coach')
+	elseif role == 'coach/manager' then
+		self.content:addClass('coach/manager')
+		self.content:addClass('roster-coach')
+	elseif role == 'coach/substitute' then
+		self.content:addClass('coach/substitute')
+		self.content:addClass('roster-coach')
+	end
 
 	return self
 end
