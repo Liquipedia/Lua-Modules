@@ -156,11 +156,6 @@ function Placement:init(args, parent, lastPlacement)
 
 	self.prizeRewards = self:_readPrizeRewards(self.args)
 
-	if self.count then
-		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + self.count
-	end
-
 	self.opponents = self:_parseOpponents(self.args)
 
 	-- Implicit place range has been given (|place= is not set)
@@ -284,11 +279,11 @@ function Placement:_shouldAddTbdOpponent(opponentIndex, place)
 		return true
 	end
 	-- If the fillPlaceRange option is disabled or we do not have a give placeRange do not fill up further
-	if not self.parent.options.fillPlaceRange or not place then
+	if not self.parent.options.fillPlaceRange or (not place and not self.count) then
 		return false
 	end
 	-- Only fill up further with TBD's if there is free space in the placeRange/slot
-	local slotSize = self.placeEnd - self.placeStart + 1
+	local slotSize = self.count or (self.placeEnd - self.placeStart + 1)
 	if opponentIndex <= slotSize then
 		return true
 	end
