@@ -165,7 +165,6 @@ local _PREFIXES = {
 		team = 'https://www.vlr.gg/team/',
 		player = 'https://www.vlr.gg/player/'
 	},
-	website = {''},
 	weibo = {'https://weibo.com/'},
 	youtube = {'https://www.youtube.com/'},
 	zhangyutv = {'http://www.zhangyu.tv/'},
