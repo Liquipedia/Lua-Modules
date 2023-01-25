@@ -49,8 +49,7 @@ local SquadRow = Class.new(
 			self.content:addClass('roster-coach')
 		end
 
-		self.lpdbData = {}
-		self.lpdbData.type = _DEFAULT_TYPE
+		self.lpdbData = {type = _DEFAULT_TYPE}
 	end)
 
 SquadRow.specialTeamsTemplateMapping = {
