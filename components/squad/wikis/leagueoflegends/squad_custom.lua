@@ -130,6 +130,8 @@ function CustomSquad._playerRow(player, squadType)
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
+	row:setExtradata{status = squadType}
+
 	return row:create(
 		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
 		.. (player.role and '_' .. player.role or '')
