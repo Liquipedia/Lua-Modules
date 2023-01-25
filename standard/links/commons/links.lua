@@ -265,7 +265,7 @@ function Links.transform(links)
 		royaleapi = links.royaleapi,
 		rules = links.rules or links.rulebook,
 		rules2 = links.rules2 or links.rulebook2,
-		shift = links.shift or links.octane,
+		shift = links.shift,
 		['siege-gg'] = links.siegegg,
 		snapchat = links.snapchat,
 		sk = links.sk,
