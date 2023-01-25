@@ -6,13 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
+local CleanRace = require('Module:CleanRace')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local CleanRace = require('Module:CleanRace')
+local String = require('Module:StringUtils')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 SquadRow.specialTeamsTemplateMapping = {
 	retirement = 'Team/retired',
