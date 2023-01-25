@@ -11,18 +11,21 @@ return {
 	name = 'Commons',
 	games = {
 		commons = {
+			abbreviation = 'Commons',
+			name = 'Commons',
+			link = 'lpcommons:Main Page',
 			logo = {
-				darkMode = 'Liquipedia_logo.png',
-				lightMode = 'Liquipedia_logo.png',
+				darkMode = 'Liquipedia logo.png',
+				lightMode = 'Liquipedia logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Liquipedia_logo.png',
-				lightMode = 'Liquipedia_logo.png',
+				darkMode = 'Liquipedia logo.png',
+				lightMode = 'Liquipedia logo.png',
 			},
 		},
 	},
 	defaultGame = 'commons',
 
-	defaultTeamLogo = 'Liquipedia_logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Liquipedia_logo.png', ---@deprecated
+	defaultTeamLogo = 'Liquipedia logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Liquipedia logo.png', ---@deprecated
 }
