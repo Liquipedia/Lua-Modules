@@ -13,211 +13,211 @@ return {
 	games = {
 		bw  = {
 			abbreviation  = 'bw',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Black & White',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Black & White',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		bw2  = {
 			abbreviation  = 'bw2',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Black 2 & White 2',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Black 2 & White 2',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		dpp  = {
 			abbreviation  = 'dpp',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Diamond, Pearl & Platnium',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Diamond, Pearl & Platnium',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		go  = {
 			abbreviation  = 'go',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
 			link  = 'Main Page',
+			name  = 'Pokemon Go',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Pokemon Go',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		gsc  = {
 			abbreviation  = 'gsc',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
 			link  = 'Main Page',
+			name  = 'Gold, Silver & Crystal',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Gold, Silver & Crystal',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		oras  = {
 			abbreviation  = 'oras',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Omega Ruby & Alpha Sapphire',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Omega Ruby & Alpha Sapphire',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		rby  = {
 			abbreviation  = 'rby',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Red, Blue & Yellow',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Red, Blue & Yellow',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		rse  = {
 			abbreviation  = 'rse',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Ruby, Sapphire & Emerald',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Ruby, Sapphire & Emerald',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		sm  = {
 			abbreviation  = 'sm',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Sun & Moon',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Sun & Moon',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		sv  = {
 			abbreviation  = 'sv',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Scarlet & Violet',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Scarlet & Violet',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		swsh  = {
 			abbreviation  = 'swsh',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Sword & Shield',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Sword & Shield',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		tcg  = {
 			abbreviation  = 'tcg',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Trading Card Game',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Trading Card Game',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		tcgl  = {
 			abbreviation  = 'tcgl',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Trading Card Game Live',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Trading Card Game Live',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		tcgo  = {
 			abbreviation  = 'tcgo',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Trading Card Game Online',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Trading Card Game Online',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		unite  = {
 			abbreviation  = 'unite',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Unite',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Unite',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 		usum  = {
 			abbreviation  = 'usum',
-			defaultTeamLogo  = {
-				darkMode  = 'Pokemon allmode.png',
-				lightMode  = 'Pokemon allmode.png',
-			},
+			name  = 'Ultra Sun & Ultra Moon',
 			link  = 'Main Page',
 			logo  = {
 				darkMode  = 'Pokemon allmode.png',
 				lightMode  = 'Pokemon allmode.png',
 			},
-			name  = 'Ultra Sun & Ultra Moon',
+			defaultTeamLogo  = {
+				darkMode  = 'Pokemon allmode.png',
+				lightMode  = 'Pokemon allmode.png',
+			},
 		},
 	},
 	defaultGame = 'sv',
