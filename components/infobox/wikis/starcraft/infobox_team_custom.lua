@@ -57,7 +57,7 @@ function CustomTeam.run(frame)
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)

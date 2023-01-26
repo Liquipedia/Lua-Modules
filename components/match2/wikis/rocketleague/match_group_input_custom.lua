@@ -196,6 +196,8 @@ function matchFunctions.getExtraData(match)
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
+		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}
 	return match
 end
@@ -204,16 +206,9 @@ function matchFunctions.getLinks(match)
 	match.links = {}
 
 	-- Shift (formerly Octane)
-	local index = 1
-	match.shift1 = match.shift1 or match.shift or match.octane1 or match.octane
-	while true do
-		local key = 'shift' .. index
-		local slug = match[key] or match['octane' .. index]
-		if not slug then
-			break
-		end
-		match.links[key] = 'https://www.shiftrle.gg/matches/' .. slug
-		index = index + 1
+	match.shift1 = match.shift1 or match.shift
+	for key, shift in Table.iter.pairsByPrefix(match, 'shift') do
+		match.links[key] = 'https://www.shiftrle.gg/matches/' .. shift
 	end
 
 	-- Ballchasing

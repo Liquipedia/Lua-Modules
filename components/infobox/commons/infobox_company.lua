@@ -33,7 +33,7 @@ local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
 function Company.run(frame)
 	local company = Company(frame)
-	return company:createInfobox(frame)
+	return company:createInfobox()
 end
 
 function Company:createInfobox()

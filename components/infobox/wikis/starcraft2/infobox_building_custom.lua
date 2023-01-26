@@ -42,7 +42,7 @@ function CustomBuilding.run(frame)
 	building.nameDisplay = CustomBuilding.nameDisplay
 	building.setLpdbData = CustomBuilding.setLpdbData
 	building.createWidgetInjector = CustomBuilding.createWidgetInjector
-	return building:createInfobox(frame)
+	return building:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)

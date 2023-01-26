@@ -34,7 +34,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()

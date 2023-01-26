@@ -6,13 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
+local CleanRace = require('Module:CleanRace')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local CleanRace = require('Module:CleanRace')
+local String = require('Module:StringUtils')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 SquadRow.specialTeamsTemplateMapping = {
 	retirement = 'Team/retired',
@@ -56,7 +58,7 @@ function CustomSquad.run(frame)
 		local player = Json.parseIfString(args['p' .. index] or args[index])
 		player.race = string.lower(player.race)
 		player.race = CleanRace[player.race] or player.race
-		local row = SquadRow(frame, player.role, {useTemplatesForSpecialTeams = true})
+		local row = SquadRow{useTemplatesForSpecialTeams = true}
 		row	:id({
 				player.id,
 				flag = player.flag,
@@ -99,6 +101,7 @@ function CustomSquad.run(frame)
 
 		squad:row(row:create(
 			squadName .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
+			.. (player.role and '_' .. player.role or '')
 		))
 
 		index = index + 1

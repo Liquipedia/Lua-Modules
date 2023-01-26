@@ -45,7 +45,7 @@ function CustomLeague.run(frame)
 	league.getWikiCategories = CustomLeague.getWikiCategories
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()

@@ -36,7 +36,6 @@ local _TIER_1 = 1
 local _H2H_TIER_THRESHOLD = 5
 
 local _PSYONIX = 'Psyonix'
-local _PSYONIX_ICON = '[[File:Psyonix logo.svg|16px|link=Psyonix|Psyonix-%s event]]'
 
 local _league
 
@@ -49,7 +48,7 @@ function CustomLeague.run(frame)
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -138,13 +137,6 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	end
 
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
-
-	-- Psyonix icon
-	if CustomLeague:containsPsyonix('organizer') then
-		content = content .. ' ' .. string.format(_PSYONIX_ICON, 'organized')
-	elseif CustomLeague:containsPsyonix('sponsor') then
-		content = content .. ' ' .. string.format(_PSYONIX_ICON, 'sponsored')
-	end
 
 	return content
 end

@@ -151,6 +151,7 @@ function Placement:init(args, parent, lastPlacement)
 	self.date = self.args.date or parent.date
 	self.placeStart = self.args.placeStart
 	self.placeEnd = self.args.placeEnd
+	self.count = self.args.count
 	self.hasBaseCurrency = false
 
 	self.prizeRewards = self:_readPrizeRewards(self.args)
@@ -158,21 +159,27 @@ function Placement:init(args, parent, lastPlacement)
 	self.opponents = self:_parseOpponents(self.args)
 
 	-- Implicit place range has been given (|place= is not set)
-	-- Use the last known place and set the place range based on the entered number of opponents
+	-- Use the last known place and set the place range based on the entered args.count
+	-- or the number of entered opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + math.max(#self.opponents, 1)
+		self.placeEnd = lastPlacement + (self.count or math.max(#self.opponents, 1))
 	end
 
-	assert(#self.opponents <= 1 + self.placeEnd - self.placeStart,
+	self.count = self.placeEnd + 1 - self.placeStart
+
+	assert(#self.opponents <= self.count,
 		'Placement: Too many opponents in place ' .. self:_displayPlace():gsub('&#045;', '-'))
 end
 
 function Placement:_parseArgs(args)
 	local parsedArgs = Table.deepCopy(args)
 
+	-- count (number of opponents in the slot) has been given explicitly
+	if args.count then
+		parsedArgs.count = tonumber(args.count)
 	-- Explicit place range has been given
-	if args.place then
+	elseif args.place then
 		local places = Table.mapValues(mw.text.split(args.place, '-'), tonumber)
 		parsedArgs.placeStart = places[1]
 		parsedArgs.placeEnd = places[2] or places[1]

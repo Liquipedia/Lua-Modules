@@ -13,7 +13,7 @@ local Character = Lua.import('Module:Infobox/Character', {requireDevIfEnabled = 
 local CustomCharacter = {}
 
 function CustomCharacter.run(frame)
-	return Character(frame):createInfobox(frame)
+	return Character(frame):createInfobox()
 end
 
 return CustomCharacter

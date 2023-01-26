@@ -202,6 +202,7 @@ function BaseResultsTable:buildBaseConditions()
 		conditions:add{ConditionNode(ColumnName('mode'), Comparator.eq, 'award_individual')}
 	else
 		conditions:add{ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual')}
+		conditions:add{ConditionNode(ColumnName('placement'), Comparator.neq, '')}
 	end
 
 	if args.tier then

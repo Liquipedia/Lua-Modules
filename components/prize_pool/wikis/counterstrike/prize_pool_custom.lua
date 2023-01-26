@@ -22,7 +22,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local TIER_VALUE = {10, 6, 4, 2}
+local TIER_VALUE = {10, 6, 4, 2, 1, 2}
 local TYPE_MODIFIER = {offline = 1, ['offline/online'] = 0.75, ['online/offline'] = 0.75, default = 0.65}
 
 local HEADER_DATA = {}
@@ -118,7 +118,8 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier)] or 1
 
-	return tierValue * math.max(prizeMoney, 0.1) * (TYPE_MODIFIER[type:lower()] or TYPE_MODIFIER.default) / place
+	return tierValue * math.max(prizeMoney, 0.1) * (TYPE_MODIFIER[type:lower()] or TYPE_MODIFIER.default) /
+		(prizeMoney > 0 and place or 1)
 end
 
 return CustomPrizePool

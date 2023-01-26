@@ -65,7 +65,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.template:lower() == BYE_OPPONENT_NAME then
+	if (opponent.template or ''):lower() == BYE_OPPONENT_NAME then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
@@ -355,10 +355,12 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
 		player.displayname = player.displayname
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn', player.name:gsub('_', ' '))
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn', player.name and player.name:gsub('_', ' ') or nil)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 		if not Table.isEmpty(player) then
 			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
+		else
+			break
 		end
 	end
 	return match
@@ -402,8 +404,7 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
-	local isFinished = Logic.readBool(map.finished)
-	if isFinished and not Logic.isEmpty(indexedScores) then
+	if not Logic.isEmpty(indexedScores) then
 		map.winner = mapFunctions.getWinner(indexedScores)
 	end
 
