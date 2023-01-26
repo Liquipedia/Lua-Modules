@@ -117,7 +117,6 @@ local PREFIXES = {
 	playlist = {''},
 	reddit = {'https://www.reddit.com/user/'},
 	royaleapi = {'https://royaleapi.com/player/'},
-	rulebook = {''},
 	rules = {''},
 	shift = {'https://www.shiftrle.gg/events/'},
 	['siege-gg'] = {
