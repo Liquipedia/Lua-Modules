@@ -139,7 +139,7 @@ function CustomBuilding._getRace(race)
 	race = string.lower(race)
 	_race = Faction.read(race)
 	local category = Faction.toName(_race)
-	local display = Faction.Icon{size = 'medium', faction = _race} or ''
+	local display = Faction.Icon{size = 'large', faction = _race} or ''
 	if not category and _race ~= 'unknown' then
 		category = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
