@@ -54,7 +54,7 @@ end
 --- Parses a faction from input. Returns the factions short handle/identifier.
 -- Returns nil if not a valid faction.
 ---@param faction string
----@param options {noAliasing: boolean?}?
+---@param options {alias: boolean?}?
 ---@return string?
 function Faction.read(faction, options)
 	if type(faction) ~= 'string' then
@@ -66,7 +66,7 @@ function Faction.read(faction, options)
 	faction = faction:lower()
 	return Faction.isValid(faction) and faction
 		or byLowerName[faction]
-		or (not options.noAliasing) and Faction.aliases[faction]
+		or (options.alias ~= false and Faction.aliases[faction])
 		or nil
 end
 
@@ -74,7 +74,7 @@ end
 -- Returns a table of the found factions short handle/identifier.
 -- Returns empty table if no input is specified.
 ---@props input: string
----@props options: {sep: string?, noAliasing: boolean?}?
+---@props options: {sep: string?, alias: boolean?}?
 ---@return table?
 function Faction.readMultiFaction(input, options)
 	if String.isEmpty(input) then
