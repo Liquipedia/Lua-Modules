@@ -8,11 +8,11 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -192,19 +192,19 @@ function CustomLeague._playerRaceBreakDown()
 		if zergNumber + terranNumbner + protossNumber + randomNumber > 0 then
 			playerBreakDown.display = {}
 			if protossNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'p'})
+				table.insert(playerBreakDown.display, Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = {'p'}
 					.. ' ' .. protossNumber)
 			end
 			if terranNumbner > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'t'})
+				table.insert(playerBreakDown.display, Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = {'t'}
 					.. ' ' .. terranNumbner)
 			end
 			if zergNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'z'})
+				table.insert(playerBreakDown.display, Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = {'z'}
 					.. ' ' .. zergNumber)
 			end
 			if randomNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'r'})
+				table.insert(playerBreakDown.display, Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = {'r'}
 					.. ' ' .. randomNumber)
 			end
 		end
