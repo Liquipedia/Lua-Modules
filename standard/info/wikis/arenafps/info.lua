@@ -159,12 +159,12 @@ return {
 			name = 'Painkiller',
 			link = 'Painkiller',
 			logo = {
-				darkMode = '',
-				lightMode = '',
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = '',
-				lightMode = '',
+				darkMode = 'Quake logo.png',
+				lightMode = 'Quake logo.png',
 			},
 		},
 		q1 = {
@@ -289,12 +289,12 @@ return {
 			name = 'Reflex',
 			link = 'Reflex',
 			logo = {
-				darkMode = '',
-				lightMode = '',
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = '',
-				lightMode = '',
+				darkMode = 'Quake logo.png',
+				lightMode = 'Quake logo.png',
 			},
 		},
 		sm = {
@@ -354,12 +354,12 @@ return {
 			name = 'Unreal Tournament 4',
 			link = 'Unreal Tournament 4',
 			logo = {
-				darkMode = '',
-				lightMode = '',
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = '',
-				lightMode = '',
+				darkMode = 'Quake logo.png',
+				lightMode = 'Quake logo.png',
 			},
 		},
 		ut99 = {
