@@ -64,6 +64,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		 -- to be removed once poinst storage is standardized
 		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
 		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
+		seriesnumber = CustomPrizePool._seriesNumber()
 	})
 
 	lpdbData.weight = Weight.calc(
@@ -126,6 +127,11 @@ function CustomPrizePool._opponentSmwProps(smwEntry, lpdbData)
 	end
 
 	return smwEntry
+end
+
+function CustomPrizePool._seriesNumber()
+	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
+	return seriesNumber and string.format('%05d', seriesNumber) or ''
 end
 
 return CustomPrizePool
