@@ -89,11 +89,9 @@ function Faction.readMultiFaction(props)
 		end
 	end
 
-	return Array.map(input, function(factionInput)
-		local faction = Faction.read(factionInput)
-		assert(faction, 'Invalid faction "' .. factionInput .. '"')
-		return faction
-	end)
+	local factions = Array.map(input, Faction.read)
+	assert(#factions == #input, 'Invalid multi-faction specifier ' .. props.input)
+	return factions
 end
 
 --- Returns the name of an entered faction identifier
