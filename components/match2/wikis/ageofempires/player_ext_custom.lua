@@ -9,7 +9,6 @@
 local Table = require('Module:Table')
 local Array = require('Module:Array')
 local TeamTemplate = require('Module:TeamTemplate')
-local TournamentUtil = require('Module:Tournament/Util')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
@@ -20,7 +19,7 @@ local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 local CustomPlayerExt = Table.deepCopy(PlayerExt)
 
 function CustomPlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
-	date = date or TournamentUtil.getContextualDateOrNow()
+	date = date or CustomPlayerExt.getContextualDateOrNow()
 
 	local conditions = {
 		'[[type::teamhistory]]',
@@ -57,7 +56,7 @@ PlayerExt.syncTeam. Enabled by default.
 ]]
 function CustomPlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
-	local date = options.date or TournamentUtil.getContextualDateOrNow()
+	local date = options.date or CustomPlayerExt.getContextualDateOrNow()
 
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}
