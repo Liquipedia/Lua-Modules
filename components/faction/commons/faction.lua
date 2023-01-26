@@ -73,27 +73,29 @@ end
 --- Parses a faction from input. Returns the factions short handle/identifier.
 -- Returns nil if not a valid faction.
 ---@props input: string
----@props sep: string?
+---@props options: {sep: string?, noAliasing: boolean?}?
 ---@return table?
-function Faction.readMultiFaction(input, sep)
+function Faction.readMultiFaction(input, options)
 	if String.isEmpty(input) then
 		return {}
 	end
 
-	if Faction.read(input, {noAliasing = true}) then
-		return {Faction.read(input, {noAliasing = true})}
+	options = options or {}
+
+	if Faction.read(input, options) then
+		return {Faction.read(input, options)}
 	end
 
 	local inputArray = {}
-	if String.isNotEmpty(sep) then
-		inputArray = Array.map(mw.text.split(input, sep, true), mw.text.trim)
+	if String.isNotEmpty(options.sep) then
+		inputArray = Array.map(mw.text.split(input, options.sep, true), mw.text.trim)
 	else
 		for char in input:gmatch('(.)') do
 			table.insert(inputArray, char)
 		end
 	end
 
-	local factions = Array.map(inputArray, function(faction) return Faction.read(faction) end)
+	local factions = Array.map(inputArray, function(faction) return Faction.read(faction, options) end)
 	assert(#factions == #inputArray, 'Invalid multi-faction specifier ' .. input)
 	return factions
 end
