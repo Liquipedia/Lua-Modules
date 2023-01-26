@@ -487,7 +487,7 @@ function StarcraftMatchSummary.OffraceIcons(races)
 	local racesNode = html.create('div')
 		:addClass('brkts-popup-sc-game-offrace-icons')
 	for _, race in ipairs(races) do
-		racesNode:node(Faction.Icon{size = 'tiny', showLink = false, showTitle = false, faction = race})
+		racesNode:node(Faction.Icon{size = 'tiny', faction = race})
 	end
 
 	return racesNode
