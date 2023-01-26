@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Data = mw.loadData('Module:Faction/Data')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -62,6 +64,36 @@ function Faction.read(faction)
 	return Faction.isValid(faction) and faction
 		or byLowerName[faction]
 		or Faction.aliases[faction]
+end
+
+--- Parses multiple factions from input.
+-- Returns a table of the found factions short handle/identifier.
+-- Returns empty table if no input is specified.
+---@props props {input: string, sep: string?}
+---@return table
+function Faction.readMultiFaction(props)
+	if String.isEmpty(props.input) then
+		return {}
+	end
+
+	if Faction.read(props.input) then
+		return {Faction.read(props.input)}
+	end
+
+	local input = {}
+	if String.isNotEmpty(props.sep) then
+		input = Array.map(mw.text.split(props.input, props.sep, true), mw.text.trim)
+	else
+		for char in props.input:gmatch('(.)') do
+			table.insert(input, char)
+		end
+	end
+
+	return Array.map(input, function(factionInput)
+		local faction = Faction.read(factionInput)
+		assert(faction, 'Invalid faction "' .. factionInput .. '"')
+		return faction
+	end)
 end
 
 --- Returns the name of an entered faction identifier
