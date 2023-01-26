@@ -117,7 +117,8 @@ function BaseResultsTable:create()
 	local data = self.args.data or self:queryData()
 
 	if Table.isEmpty(data) then
-		return
+		self.data = {}
+		return self
 	end
 
 	Array.forEach(data, function(placement) self:processLegacyVsData(placement) end)
