@@ -8,6 +8,7 @@
 
 local Achievements = require('Module:Achievements in infoboxes')
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
