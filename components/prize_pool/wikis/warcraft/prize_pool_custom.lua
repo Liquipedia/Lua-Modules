@@ -37,7 +37,7 @@ function CustomPrizePool.run(frame)
 	-- adjust import settings params
 	args.allGroupsUseWdl = Logic.emptyOr(args.allGroupsUseWdl, true)
 	args.groupScoreDelimiter = '-'
-	-- currently no match2 implemented enable once it is with the date it goes live as switch date
+	-- currently no match2 implemented; enable once it is with the date it goes live as switch date
 	args.import = Logic.emptyOr(args.import, false)
 
 	local prizePool = PrizePool(args)
