@@ -70,8 +70,9 @@ function Faction.read(faction, options)
 		or nil
 end
 
---- Parses a faction from input. Returns the factions short handle/identifier.
--- Returns nil if not a valid faction.
+--- Parses multiple factions from input.
+-- Returns a table of the found factions short handle/identifier.
+-- Returns empty table if no input is specified.
 ---@props input: string
 ---@props options: {sep: string?, noAliasing: boolean?}?
 ---@return table?
