@@ -7,6 +7,7 @@
 --
 
 local DisplayUtil = require('Module:DisplayUtil')
+local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -18,9 +19,6 @@ local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled =
 local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft', {requireDevIfEnabled = true})
-local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getSmallIcon = function(_) end,
-}
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 
@@ -67,9 +65,9 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 	end
 
 	local raceNode
-	if props.showRace ~= false and player.race ~= 'u' then
+	if props.showRace ~= false and player.race ~= Faction.defaultFaction then
 		raceNode = html.create('span'):addClass('race')
-			:wikitext(StarcraftPlayerDisplay.Race(player.race))
+			:wikitext(Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = player.race})
 	end
 
 	local teamNode
@@ -110,7 +108,7 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 		displayName = displayName,
 		flag = String.nilIfEmpty(args.flag),
 		pageName = pageName,
-		race = String.nilIfEmpty(args.race) or 'u',
+		race = String.nilIfEmpty(args.race) or Faction.defaultFaction,
 	}
 
 	if not args.novar then
@@ -198,8 +196,8 @@ function StarcraftPlayerDisplay.InlinePlayer(props)
 		and PlayerDisplay.Flag(player.flag)
 		or nil
 
-	local race = props.showRace ~= false and player.race ~= 'u'
-		and StarcraftPlayerDisplay.Race(player.race)
+	local race = props.showRace ~= false and player.race ~= Faction.defaultFaction
+		and Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = player.race}
 		or nil
 
 	local nameAndLink = props.showLink ~= false and player.pageName
@@ -240,12 +238,6 @@ function StarcraftPlayerDisplay.HiddenSort(name, flag, race, field)
 	return html.create('span')
 		:css('display', 'none')
 		:wikitext(text)
-end
-
-function StarcraftPlayerDisplay.Race(race)
-	return DisplayUtil.removeLinkFromWikiLink(
-		RaceIcon.getSmallIcon({race})
-	)
 end
 
 return StarcraftPlayerDisplay
