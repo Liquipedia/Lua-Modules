@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
@@ -25,7 +26,6 @@ local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 local defaultIcon
 
 local _MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
-local _FACTIONS = mw.loadData('Module:Races')
 local _ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local _CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local _DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
@@ -531,7 +531,7 @@ function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
 		displayname = name,
 		name = link,
 		flag = Flags.CountryName(flag),
-		extradata = {faction = _FACTIONS[string.lower(race)] or 'u'}
+		extradata = {faction = Faction.read(race) or Faction.defaultFaction}
 	}
 
 	return {
@@ -557,19 +557,17 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 			opponent.p2
 		))
 	if Logic.readBool(opponent.extradata.isarchon) then
-		opponent.p1race = _FACTIONS[string.lower(opponent.race or '')] or 'u'
+		opponent.p1race = Faction.read(opponent.race) or Faction.defaultFaction
 		opponent.p2race = opponent.p1race
 	else
-		opponent.p1race = _FACTIONS[string.lower(Logic.emptyOr(
+		opponent.p1race = Faction.read(Logic.emptyOr(
 				opponent.p1race,
-				Variables.varDefault(opponent.p1 .. '_race'),
-				''
-			))] or 'u'
-		opponent.p2race = _FACTIONS[string.lower(Logic.emptyOr(
+				Variables.varDefault(opponent.p1 .. '_race')
+			)) or Faction.defaultFaction
+		opponent.p2race = Faction.read(Logic.emptyOr(
 				opponent.p2race,
-				Variables.varDefault(opponent.p2 .. '_race'),
-				''
-			))] or 'u'
+				Variables.varDefault(opponent.p2 .. '_race')
+			)) or Faction.defaultFaction
 	end
 
 	local players = {}
@@ -583,7 +581,7 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 			displayname = opponent['p' .. playerIndex],
 			name = opponent['link' .. playerIndex],
 			flag = Flags.CountryName(flag),
-			extradata = {faction = _FACTIONS[string.lower(opponent['p' .. playerIndex .. 'race'])] or 'u'}
+			extradata = {faction = Faction.read(opponent['p' .. playerIndex .. 'race']) or Faction.defaultFaction}
 		}
 	end
 	local name = opponent.link1 .. ' / ' .. opponent.link2
@@ -623,7 +621,7 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 			displayname = playerName,
 			name = link,
 			flag = Flags.CountryName(flag),
-			extradata = {faction = _FACTIONS[string.lower(race)] or 'u'}
+			extradata = {faction = Faction.read(race) or Faction.defaultFaction}
 		}
 	end
 
@@ -646,7 +644,7 @@ function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 			displayname = opponent[1],
 			name = '',
 			flag = Flags.CountryName(flag),
-			extradata = {faction = _FACTIONS[string.lower(race)] or 'u'}
+			extradata = {faction = Faction.read(race) or Faction.defaultFaction}
 		}
 		local extradata = opponent.extradata or {}
 		extradata.hasRaceOrFlag = true
@@ -993,9 +991,9 @@ function StarcraftMatchGroupInput._processDefaultPlayerMapData(players, map, opp
 	)
 
 	for playerIndex = 1, #players do
-		local faction = string.lower(map['t' .. opponentIndex .. 'p' .. playerIndex .. 'race'] or '')
+		local faction = map['t' .. opponentIndex .. 'p' .. playerIndex .. 'race']
 		participants[opponentIndex .. '_' .. playerIndex] = {
-			faction = _FACTIONS[faction] or players[playerIndex].extradata.faction or 'u',
+			faction = Faction.read(faction or players[playerIndex].extradata.faction) or Faction.defaultFaction,
 			player = players[playerIndex].name
 		}
 	end
@@ -1009,14 +1007,13 @@ function StarcraftMatchGroupInput._processArchonPlayerMapData(players, map, oppo
 		map['race' .. opponentIndex],
 		players[1].extradata.faction
 	)
-	faction = string.lower(faction or '')
 	participants[opponentIndex .. '_1'] = {
-		faction = _FACTIONS[faction] or 'u',
+		faction = Faction.read(faction) or Faction.defaultFaction,
 		player = players[1].name
 	}
 
 	participants[opponentIndex .. '_2'] = {
-		faction = _FACTIONS[faction] or 'u',
+		faction = Faction.read(faction) or Faction.defaultFaction,
 		player = players[2].name
 	}
 
@@ -1039,19 +1036,16 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 				)
 				if Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
 					playerData[mapPlayer] = {
-						faction = _FACTIONS[string.lower(Logic.emptyOr(
+						faction = Faction.read(Logic.emptyOr(
 								map['t' .. opponentIndex .. 'race'],
 								map['opponent' .. opponentIndex .. 'race'],
-								Logic.emptyOr(
-									map[playerKey .. 'race'],
-									'u'
-								)
-							))] or 'u',
+								map[playerKey .. 'race']
+							)) or Faction.defaultFaction,
 						position = playerIndex
 					}
 				else
 					playerData[mapPlayer] = {
-						faction = _FACTIONS[string.lower(map[playerKey .. 'race'] or '')],
+						faction = Faction.read(map[playerKey .. 'race']),
 						position = playerIndex
 					}
 				end
@@ -1068,7 +1062,7 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 		if player and playerData[player.name] then
 			numberOfParticipants = numberOfParticipants + 1
 			local faction = playerData[player.name].faction
-				or player.extradata.faction or 'u'
+				or player.extradata.faction or Faction.defaultFaction
 			participants[opponentIndex .. '_' .. playerIndex] = {
 				faction = faction,
 				player = player.name,
@@ -1081,7 +1075,7 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 	numberOfParticipants = numberOfParticipants + amountOfTbds
 	for tbdIndex = 1, amountOfTbds do
 		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
-			faction = 'u',
+			faction = Faction.defaultFaction,
 			player = 'TBD'
 		}
 	end
