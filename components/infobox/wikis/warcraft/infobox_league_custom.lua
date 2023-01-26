@@ -410,6 +410,10 @@ function CustomLeague._determineGame()
 	end
 
 	local startDate = _league:_cleanDate(_args.sdate) or _league:_cleanDate(_args.date)
+	if not startDate then
+		return
+	end
+
 	if startDate > GAME_DEFAULT_SWITCH_DATE then
 		return GAME_REFORGED
 	end
