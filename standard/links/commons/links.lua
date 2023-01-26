@@ -210,7 +210,6 @@ local ALIASES = {
 	huyatv = {'huya'},
 	letsplaylive = {'cybergamer'},
 	rules = {'rulebook'},
-	shift = {'octane'},
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
