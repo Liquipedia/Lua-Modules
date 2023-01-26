@@ -15,7 +15,6 @@ local Lua = require('Module:Lua')
 local MatchTicker = require('Module:MatchTicker/Participant')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -184,16 +183,16 @@ function CustomTeam.playerBreakDown(args)
 		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
 			playerBreakDown.display = {}
 			if protossnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'p'} .. ' ' .. protossnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'p'} .. ' ' .. protossnumber
 			end
 			if terrannumbner > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'t'} .. ' ' .. terrannumbner
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 't'} .. ' ' .. terrannumbner
 			end
 			if zergnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'z'} .. ' ' .. zergnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'z'} .. ' ' .. zergnumber
 			end
 			if randomnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'r'} .. ' ' .. randomnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'r'} .. ' ' .. randomnumber
 			end
 		end
 	end
