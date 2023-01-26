@@ -263,7 +263,7 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 			[1] = slot[opponentIndex],
 			type = slot['literal' .. opponentIndex] and Opponent.literal or nil,
 			date = slot['date' .. opponentIndex],
-			link = slot['link' .. opponentIndex],
+			link = slot['link' .. opponentIndex] or slot['page' .. opponentIndex],
 			wdl = slot['wdl' .. opponentIndex],
 			flag = slot['flag' .. opponentIndex],
 			team = slot['team' .. opponentIndex],
