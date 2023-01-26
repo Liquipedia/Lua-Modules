@@ -192,19 +192,23 @@ function CustomLeague._playerRaceBreakDown()
 		if zergNumber + terranNumbner + protossNumber + randomNumber > 0 then
 			playerBreakDown.display = {}
 			if protossNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = 'p'}
+				table.insert(playerBreakDown.display,
+					Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = 'p'}
 					.. ' ' .. protossNumber)
 			end
 			if terranNumbner > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = 't'}
+				table.insert(playerBreakDown.display,
+					Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = 't'}
 					.. ' ' .. terranNumbner)
 			end
 			if zergNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = 'z'}
+				table.insert(playerBreakDown.display,
+					Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = 'z'}
 					.. ' ' .. zergNumber)
 			end
 			if randomNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = 'r'}
+				table.insert(playerBreakDown.display,
+					Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = 'r'}
 					.. ' ' .. randomNumber)
 			end
 		end
