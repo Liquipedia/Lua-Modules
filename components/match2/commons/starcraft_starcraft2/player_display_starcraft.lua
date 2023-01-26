@@ -67,7 +67,7 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 	local raceNode
 	if props.showRace ~= false and player.race ~= Faction.defaultFaction then
 		raceNode = html.create('span'):addClass('race')
-			:wikitext(Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = player.race})
+			:wikitext(Faction.Icon{faction = player.race})
 	end
 
 	local teamNode
@@ -197,7 +197,7 @@ function StarcraftPlayerDisplay.InlinePlayer(props)
 		or nil
 
 	local race = props.showRace ~= false and player.race ~= Faction.defaultFaction
-		and Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = player.race}
+		and Faction.Icon{faction = player.race}
 		or nil
 
 	local nameAndLink = props.showLink ~= false and player.pageName
