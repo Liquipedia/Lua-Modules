@@ -7,9 +7,25 @@
 --
 
 return {
-	startYear = 2015,
 	wikiName = 'zula',
 	name = 'Zula',
-	defaultTeamLogo = 'Zula Global default allmode.png',
-	defaultTeamLogoDark = 'Zula Global default allmode.png',
+	games = {
+		zula = {
+			abbreviation = 'Zula',
+			name = 'Zula',
+			link = 'zula:Main Page',
+			logo = {
+				darkMode = 'Zula Global default allmode.png',
+				lightMode = 'Zula Global default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Zula Global default allmode.png',
+				lightMode = 'Zula Global default allmode.png',
+			},
+		},
+	},
+	defaultGame = 'zula',
+
+	defaultTeamLogo = 'Zula Global default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Zula Global default allmode.png', ---@deprecated
 }
