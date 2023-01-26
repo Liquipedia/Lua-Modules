@@ -126,7 +126,7 @@ function CustomUnofficialWorldChampion.raceBreakDown()
 		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
 			playerBreakDown.display = {}
 			if protossnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] 
+				playerBreakDown.display[#playerBreakDown.display + 1]
 					= Faction.Icon{faction = 'p'} .. ' ' .. protossnumber
 			end
 			if terrannumbner > 0 then
