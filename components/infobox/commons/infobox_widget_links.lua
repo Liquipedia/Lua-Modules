@@ -114,6 +114,12 @@ local _PRIORITY_GROUPS = {
 		'zhangyutv',
 		'bilibili-stream',
 		'kuaishou',
+		'cc',
+		'nimotv',
+		'openrec',
+		'steamtv',
+		'yandexefir',
+		'zhanqitv',
 	}
 }
 
