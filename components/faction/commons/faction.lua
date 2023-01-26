@@ -54,43 +54,47 @@ end
 --- Parses a faction from input. Returns the factions short handle/identifier.
 -- Returns nil if not a valid faction.
 ---@param faction string
+---@param options {noAliasing: boolean?}?
 ---@return string?
-function Faction.read(faction)
+function Faction.read(faction, options)
 	if type(faction) ~= 'string' then
 		return nil
 	end
 
+	options = options or {}
+
 	faction = faction:lower()
 	return Faction.isValid(faction) and faction
 		or byLowerName[faction]
-		or Faction.aliases[faction]
+		or (not options.noAliasing) and Faction.aliases[faction]
+		or nil
 end
 
---- Parses multiple factions from input.
--- Returns a table of the found factions short handle/identifier.
--- Returns empty table if no input is specified.
----@props props {input: string, sep: string?}
----@return table
-function Faction.readMultiFaction(props)
-	if String.isEmpty(props.input) then
+--- Parses a faction from input. Returns the factions short handle/identifier.
+-- Returns nil if not a valid faction.
+---@props input: string
+---@props sep: string?
+---@return table?
+function Faction.readMultiFaction(input, sep)
+	if String.isEmpty(input) then
 		return {}
 	end
 
-	if Faction.read(props.input) then
-		return {Faction.read(props.input)}
+	if Faction.read(input, {noAliasing = true}) then
+		return {Faction.read(input, {noAliasing = true})}
 	end
 
-	local input = {}
-	if String.isNotEmpty(props.sep) then
-		input = Array.map(mw.text.split(props.input, props.sep, true), mw.text.trim)
+	local inputArray = {}
+	if String.isNotEmpty(sep) then
+		inputArray = Array.map(mw.text.split(input, sep, true), mw.text.trim)
 	else
-		for char in props.input:gmatch('(.)') do
-			table.insert(input, char)
+		for char in input:gmatch('(.)') do
+			table.insert(inputArray, char)
 		end
 	end
 
-	local factions = Array.map(input, Faction.read)
-	assert(#factions == #input, 'Invalid multi-faction specifier ' .. props.input)
+	local factions = Array.map(inputArray, function(faction) return Faction.read(faction) end)
+	assert(#factions == #inputArray, 'Invalid multi-faction specifier ' .. input)
 	return factions
 end
 
