@@ -88,10 +88,13 @@ function Faction.readMultiFaction(input, options)
 		return {Faction.read(input, options)}
 	end
 
-	local inputArray = Array.map(mw.text.split(input, options.sep or '', true), mw.text.trim)
+	local inputArray = Array.map(mw.text.split(input, options.sep or '', true),
+		function(faction) return mw.text.trim(faction) end)
 
 	local factions = Array.map(inputArray, function(faction) return Faction.read(faction, options) end)
+
 	assert(#factions == #inputArray, 'Invalid multi-faction specifier ' .. input)
+
 	return factions
 end
 
