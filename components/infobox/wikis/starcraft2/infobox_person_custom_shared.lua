@@ -12,7 +12,6 @@ local Array = require('Module:Array')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local RaceIcon = require('Module:RaceIcon').getBigIcon
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
