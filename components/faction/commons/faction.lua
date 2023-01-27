@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Data = mw.loadData('Module:Faction/Data')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -51,17 +53,50 @@ end
 
 --- Parses a faction from input. Returns the factions short handle/identifier.
 -- Returns nil if not a valid faction.
+-- If `options.alias` is set to false the function will not look in the aliases provided via the data module.
 ---@param faction string
+---@param options {alias: boolean?}?
 ---@return string?
-function Faction.read(faction)
+function Faction.read(faction, options)
 	if type(faction) ~= 'string' then
 		return nil
 	end
 
+	options = options or {}
+
 	faction = faction:lower()
 	return Faction.isValid(faction) and faction
 		or byLowerName[faction]
-		or Faction.aliases[faction]
+		or (options.alias ~= false and Faction.aliases[faction])
+		or nil
+end
+
+--- Parses multiple factions from input.
+-- Returns an array of faction identifiers.
+-- Returns an empty array for nil input. Throws upon invalid inputs.
+---@param input: string
+---@param options: {sep: string?, alias: boolean?}?
+---@return table
+function Faction.readMultiFaction(input, options)
+	if String.isEmpty(input) then
+		return {}
+	end
+
+	options = options or {}
+
+	local singleFaction = Faction.read(input, options)
+	if singleFaction then return singleFaction end
+
+	local inputArray = Array.map(
+		mw.text.split(input, options.sep or '', true),
+		function(faction) return mw.text.trim(faction) end
+	)
+
+	local factions = Array.map(inputArray, function(faction) return Faction.read(faction, options) end)
+
+	assert(#factions == #inputArray, 'Invalid multi-faction specifier ' .. input)
+
+	return factions
 end
 
 --- Returns the name of an entered faction identifier
@@ -88,7 +123,7 @@ local namedSizes = {
 }
 
 --- Returns the icon of an entered faction identifier
----@props props {faction: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
+---@param props {faction: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
 ---@return string?
 function Faction.Icon(props)
 	local faction = Faction.read(props.faction)
