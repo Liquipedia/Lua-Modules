@@ -18,7 +18,6 @@ local Variables = require('Module:Variables')
 
 local RACE_ALL = 'All'
 local RACE_ALL_SHORT = 'a'
-local RACE_ALL_ORDER = 'ptz'
 local RACE_ALL_ICON = '[[File:RaceIcon All.png|30px|link=]]'
 
 --role stuff tables
@@ -75,7 +74,7 @@ function CustomPerson.nameDisplay()
 	local raceData = CustomPerson.readFactions(_args.race or Faction.defaultFaction)
 
 	local raceIcons
-	if isAll then
+	if raceData.isAll then
 		raceIcons = RACE_ALL_ICON
 	else
 		raceIcons = table.concat(Array.map(raceData.factions, function(faction)
@@ -91,19 +90,17 @@ end
 function CustomPerson.getRaceData(race, asCategory)
 	local factions = CustomPerson.readFactions(race).factions
 
-	local display = Array.map(Array.map(factions, Faction.toName), function(faction)
+	return table.concat(Array.map(factions, function(faction)
 		if asCategory then
 			return '[[:Category:' .. faction .. ' Players|' .. faction .. ']]'
 		end
 		return '[[' .. faction .. ']]'
-	end)
-
-	return table.concat(display, ',&nbsp;')
+	end) or {}, ',&nbsp;')
 end
 
 function CustomPerson.readFactions(input)
 	if input == RACE_ALL or input == RACE_ALL_SHORT then
-		input = RACE_ALL_ORDER
+		input = table.concat(Table.copy(Faction.coreFactions))
 	end
 
 	local factions = Faction.readMultiFaction(input, {alias = false})
