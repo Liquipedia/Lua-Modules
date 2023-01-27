@@ -134,7 +134,6 @@ function CustomUnit:nameDisplay(args)
 end
 
 function CustomUnit._getRace(race)
-	race = string.lower(race)
 	_race = Faction.read(race)
 	local category = Faction.toName(_race)
 	local display = Faction.Icon{size = 'large', faction = _race} or ''
