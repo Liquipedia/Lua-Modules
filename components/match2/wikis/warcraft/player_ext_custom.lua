@@ -100,9 +100,6 @@ function CustomPlayerExt.syncPlayer(player, options)
 	return player
 end
 
-function CustomPlayerExt.populatePlayer(player, options)
-	return CustomPlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
-end
 
 function CustomPlayerExt.saveToPageVars(player)
 	if player.race and player.race ~= Faction.defaultFaction then
