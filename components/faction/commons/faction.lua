@@ -72,7 +72,7 @@ function Faction.read(faction, options)
 end
 
 --- Parses multiple factions from input.
--- Returns a table of the found factions short handle/identifier.
+-- Returns an array of faction identifiers.
 -- Returns empty table if no input is specified.
 ---@param input: string
 ---@param options: {sep: string?, alias: boolean?}?
