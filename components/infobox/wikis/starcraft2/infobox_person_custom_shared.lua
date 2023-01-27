@@ -131,7 +131,7 @@ function CustomPerson.adjustLPDB(_, lpdbData)
 
 	extradata.race = raceData.isAll and RACE_ALL_SHORT or raceData.factions[1]
 	extradata.faction = raceData.isAll and RACE_ALL or raceData.factions[1]
-	extradata.faction2 = (not raceData.isAll) and raceData.factions[1] or nil
+	extradata.faction2 = (not raceData.isAll) and raceData.factions[2] or nil
 	extradata.lc_id = string.lower(_PAGENAME)
 	extradata.teamname = _args.team
 	extradata.role = _args.role
