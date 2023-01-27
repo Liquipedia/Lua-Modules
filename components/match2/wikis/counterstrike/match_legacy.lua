@@ -111,7 +111,9 @@ function MatchLegacy.convertParameters(match2)
 		local prefix = 'opponent' .. index
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
-		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
+		if String.isEmpty(opponent.template) then
+			match[prefix] = 'TBD'
+		elseif opponent.type == Opponent.team or opponent.type == Opponent.literal then
 			if opponent.type == Opponent.team then
 				if mw.ext.TeamTemplate.teamexists(opponent.template) then
 					match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
