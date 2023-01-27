@@ -75,7 +75,7 @@ end
 -- Returns empty table if no input is specified.
 ---@props input: string
 ---@props options: {sep: string?, alias: boolean?}?
----@return table?
+---@return table
 function Faction.readMultiFaction(input, options)
 	if String.isEmpty(input) then
 		return {}
