@@ -73,7 +73,7 @@ end
 
 --- Parses multiple factions from input.
 -- Returns an array of faction identifiers.
--- Returns an empty array for nil input. Throws upon invalid inputs,
+-- Returns an empty array for nil input. Throws upon invalid inputs.
 ---@param input: string
 ---@param options: {sep: string?, alias: boolean?}?
 ---@return table
