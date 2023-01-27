@@ -53,6 +53,7 @@ end
 
 --- Parses a faction from input. Returns the factions short handle/identifier.
 -- Returns nil if not a valid faction.
+-- If `options.alias` is set to false the function will not look in the aliases provided via the data module.
 ---@param faction string
 ---@param options {alias: boolean?}?
 ---@return string?
@@ -73,8 +74,8 @@ end
 --- Parses multiple factions from input.
 -- Returns a table of the found factions short handle/identifier.
 -- Returns empty table if no input is specified.
----@props input: string
----@props options: {sep: string?, alias: boolean?}?
+---@param input: string
+---@param options: {sep: string?, alias: boolean?}?
 ---@return table
 function Faction.readMultiFaction(input, options)
 	if String.isEmpty(input) then
@@ -87,14 +88,7 @@ function Faction.readMultiFaction(input, options)
 		return {Faction.read(input, options)}
 	end
 
-	local inputArray = {}
-	if String.isNotEmpty(options.sep) then
-		inputArray = Array.map(mw.text.split(input, options.sep, true), mw.text.trim)
-	else
-		for char in input:gmatch('(.)') do
-			table.insert(inputArray, char)
-		end
-	end
+	local inputArray = Array.map(mw.text.split(input, options.sep or '', true), mw.text.trim)
 
 	local factions = Array.map(inputArray, function(faction) return Faction.read(faction, options) end)
 	assert(#factions == #inputArray, 'Invalid multi-faction specifier ' .. input)
@@ -125,7 +119,7 @@ local namedSizes = {
 }
 
 --- Returns the icon of an entered faction identifier
----@props props {faction: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
+---@param props {faction: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
 ---@return string?
 function Faction.Icon(props)
 	local faction = Faction.read(props.faction)
