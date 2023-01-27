@@ -254,7 +254,6 @@ Config.weights = {
 
 -- This function adjusts the score for the placement, e.g.
 -- a first placement should score more than a 10th placement.
--- See also the EXTRA_DROP_OFF_TYPES.
 function Config.placementDropOffFunction(tier, tierType)
 
 		return function(score, placement)
