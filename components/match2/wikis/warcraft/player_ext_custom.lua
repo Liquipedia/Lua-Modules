@@ -100,6 +100,8 @@ function CustomPlayerExt.saveToPageVars(player)
 	if player.race and player.race ~= Faction.defaultFaction then
 		globalVars:set(player.displayName .. '_race', player.race)
 	end
+
+	PlayerExt.saveToPageVars(player)
 end
 
 return CustomPlayerExt
