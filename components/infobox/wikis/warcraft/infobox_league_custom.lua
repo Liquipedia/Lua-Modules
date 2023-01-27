@@ -134,14 +134,16 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		if playerNumber then
-			table.insert(widgets, Cell{name = 'Number of players', content = {CustomLeague._displayParticipantNumber(playerNumber)}})
+			table.insert(widgets, Cell{name = 'Number of players',
+				content = {CustomLeague._displayParticipantNumber(playerNumber)}})
 			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
 
 			-- clean var of '+' suffix
 			playerNumber = string.gsub(playerNumber, '%+', '')
 		end
 		if _args.team_number then
-			table.insert(widgets, Cell{name = 'Number of teams', content = {CustomLeague._displayParticipantNumber(_args.team_number)}})
+			table.insert(widgets, Cell{name = 'Number of teams',
+				content = {CustomLeague._displayParticipantNumber(_args.team_number)}})
 
 			-- clean var of '+' suffix
 			_args.team_number = string.gsub(_args.team_number, '%+', '')
