@@ -85,7 +85,7 @@ function Faction.readMultiFaction(input, options)
 	options = options or {}
 
 	local singleFaction = Faction.read(input, options)
-	if factionsingleFaction then return singleFaction end
+	if singleFaction then return singleFaction end
 
 	local inputArray = Array.map(
 		mw.text.split(input, options.sep or '', true),
