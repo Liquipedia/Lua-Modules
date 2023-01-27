@@ -44,7 +44,7 @@ Config.EXTRA_DROP_OFF_TYPES = {
 	Config.TIER_TYPE_QUALIFIER,
 	Config.TIER_TYPE_SHOW_MATCH,
 	Config.TIER_TYPE_SHOWMATCH,
-	Config.TIER_TYPE_MISC,	
+	Config.TIER_TYPE_MISC,
 	Config.TIER_TYPE_INDIVIDUAL
 }
 
@@ -67,7 +67,7 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_INDIVIDUAL,
 				points = 15,
-			},	
+			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 0,
@@ -107,7 +107,7 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_INDIVIDUAL,
 				points = 8,
-			},	
+			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 0,
@@ -147,7 +147,7 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_INDIVIDUAL,
 				points = 4,
-			},	
+			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 0,
@@ -187,7 +187,7 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_INDIVIDUAL,
 				points = 2,
-			},	
+			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 0
@@ -227,7 +227,7 @@ Config.weights = {
 			{
 				name = Config.TIER_TYPE_INDIVIDUAL,
 				points = 1,
-			},	
+			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
 				points = 0,
@@ -280,9 +280,9 @@ function Config.placementDropOffFunction(tier, tierType)
 
 			elseif ((tier == 3 or tier == 4) and (placement <= 3)) then
 				return (score * 0.5)
-			
+
 			elseif (tier == 3) and placement <= 8 then
-				return (score * 0.25)			
+				return (score * 0.25)		
 
 			else
 				return (score * 0)
