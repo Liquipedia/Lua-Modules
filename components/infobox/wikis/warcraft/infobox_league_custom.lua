@@ -173,6 +173,19 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+function CustomLeague._displayParticipantNumber(number)
+	local numberOfReplacements
+	number, numberOfReplacements = string.gsub(number, '%+', '')
+
+	if numberOfReplacements > 0 then
+		return tostring(mw.html.create()
+			:node(mw.html.create('small'):wikitext('more than '))
+			:wikitext(number))
+	end
+
+	return number
+end
+
 function CustomLeague._displayStartDateTime()
 	return Countdown._create{
 		date = Variables.varDefault('tournament_starttimeraw'),
