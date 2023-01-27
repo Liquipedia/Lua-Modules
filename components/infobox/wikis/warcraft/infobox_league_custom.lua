@@ -128,21 +128,29 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		--player breakdown
 		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
-		--make playerNumber available for commons category check
-		_args.player_number = playerRaceBreakDown.playerNumber
-		local playerNumber = _args.player_number or 0
-		Variables.varDefine('player_number', playerNumber)
-		if playerNumber > 0 or _args.team_number then
+		local playerNumber = playerRaceBreakDown.playerNumber or _args.player_number
+		if playerNumber or _args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})
 		end
 
-		if playerNumber > 0 then
-			table.insert(widgets, Cell{name = 'Number of players', content = {playerNumber}})
+		if playerNumber then
+			table.insert(widgets, Cell{name = 'Number of players', content = {CustomLeague._displayParticipantNumber(playerNumber)}})
 			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
+
+			-- clean var of '+' suffix
+			playerNumber = string.gsub(playerNumber, '%+', '')
 		end
 		if _args.team_number then
-			table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
+			table.insert(widgets, Cell{name = 'Number of teams', content = {CustomLeague._displayParticipantNumber(_args.team_number)}})
+
+			-- clean var of '+' suffix
+			_args.team_number = string.gsub(_args.team_number, '%+', '')
 		end
+
+		--make playerNumber available for commons category check
+		_args.player_number = playerNumber
+
+		Variables.varDefine('player_number', playerNumber or 0)
 
 		--maps
 		if String.isNotEmpty(_args.map1) then
