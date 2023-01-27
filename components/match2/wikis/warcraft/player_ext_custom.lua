@@ -82,11 +82,7 @@ end
 function CustomPlayerExt.syncPlayer(player, options)
 	options = options or {}
 
-	PlayerExt.populatePageName(player)
-
-	player.flag = player.flag
-		or String.nilIfEmpty(Flags.CountryName(globalVars:get(player.displayName .. '_flag')))
-		or options.fetchPlayer ~= false and CustomPlayerExt.fetchPlayerFlag(player.pageName)
+	player = PlayerExt.syncPlayer(player, options)
 
 	player.race = player.race
 		or globalVars:get(player.displayName .. '_race')
@@ -100,13 +96,10 @@ function CustomPlayerExt.syncPlayer(player, options)
 	return player
 end
 
-
 function CustomPlayerExt.saveToPageVars(player)
 	if player.race and player.race ~= Faction.defaultFaction then
 		globalVars:set(player.displayName .. '_race', player.race)
 	end
-
-	PlayerExt.saveToPageVars(player)
 end
 
 return CustomPlayerExt
