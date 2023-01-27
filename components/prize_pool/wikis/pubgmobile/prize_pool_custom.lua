@@ -41,7 +41,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	)
 
 	local participantLower = mw.ustring.lower(lpdbData.participant)
-	local status = Variables.varDefault('placement_' .. participantLower) ~= '' and Variables.varDefault('tournament_status') or ''
+	local status = String.isNotEmpty(Variables.varDefault('placement_' .. participantLower))
+		and Variables.varDefault('tournament_status') or ''
 
 	Variables.varDefine(participantLower .. '_status', status)
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
