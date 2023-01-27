@@ -99,11 +99,12 @@ function CustomPerson.getRaceData(race, asCategory)
 end
 
 function CustomPerson.readFactions(input)
+	local factions
 	if input == RACE_ALL or input == RACE_ALL_SHORT then
-		input = table.concat(Table.copy(Faction.coreFactions))
+		factions = Table.copy(Faction.coreFactions)
+	else
+		factions = Faction.readMultiFaction(input, {alias = false})
 	end
-
-	local factions = Faction.readMultiFaction(input, {alias = false})
 
 	local isAll = false
 	-- check if factions == Faction.coreFactions modulo order
