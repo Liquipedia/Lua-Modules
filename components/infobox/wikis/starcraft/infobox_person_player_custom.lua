@@ -125,7 +125,7 @@ function CustomPlayer.nameDisplay()
 		return Faction.Icon{faction = faction, size = 'medium'}
 	end))
 
-	local name = _args.id or _PAGENAME
+	local name = _args.id or _player.pagename
 
 	return raceIcons .. '&nbsp;' .. name
 end
