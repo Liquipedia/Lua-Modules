@@ -140,6 +140,8 @@ function CustomInjector:parse(id, widgets)
 
 			-- clean var of '+' suffix
 			playerNumber = string.gsub(playerNumber, '%+', '')
+			--make playerNumber available for commons category check
+			_args.player_number = playerNumber
 		end
 		if _args.team_number then
 			table.insert(widgets, Cell{name = 'Number of teams',
@@ -148,9 +150,6 @@ function CustomInjector:parse(id, widgets)
 			-- clean var of '+' suffix
 			_args.team_number = string.gsub(_args.team_number, '%+', '')
 		end
-
-		--make playerNumber available for commons category check
-		_args.player_number = playerNumber
 
 		Variables.varDefine('player_number', playerNumber or 0)
 
