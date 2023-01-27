@@ -993,7 +993,7 @@ function StarcraftMatchGroupInput._processDefaultPlayerMapData(players, map, opp
 	for playerIndex = 1, #players do
 		local faction = map['t' .. opponentIndex .. 'p' .. playerIndex .. 'race']
 		participants[opponentIndex .. '_' .. playerIndex] = {
-			faction = Faction.read(faction or players[playerIndex].extradata.faction) or Faction.defaultFaction,
+			faction = Faction.read(faction) or players[playerIndex].extradata.faction or Faction.defaultFaction,
 			player = players[playerIndex].name
 		}
 	end
