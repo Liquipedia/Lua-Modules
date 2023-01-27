@@ -33,20 +33,6 @@ Config.PLACEMENT_QUERY =
 Config.NOTABILITY_THRESHOLD_MIN = 12
 Config.NOTABILITY_THRESHOLD_NOTABLE = 15
 
--- These are all the liquipediatiertypes which should be extra "penalised"
--- for a lower placement, see also the placementDropOffFunction below.
--- Generally these types will award the same points for first, but then
--- quickly decrease the point rewards as the placement gets lower
-Config.EXTRA_DROP_OFF_TYPES = {
-	Config.TIER_TYPE_GENERAL,
-	Config.TIER_TYPE_MONTHLY,
-	Config.TIER_TYPE_WEEKLY,
-	Config.TIER_TYPE_QUALIFIER,
-	Config.TIER_TYPE_SHOW_MATCH,
-	Config.TIER_TYPE_SHOWMATCH,
-	Config.TIER_TYPE_MISC,
-	Config.TIER_TYPE_INDIVIDUAL
-}
 
 -- Weights used for tournaments
 Config.weights = {
