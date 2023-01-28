@@ -204,8 +204,8 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 		return 0
 	end
 
-	local options = tierData['options']
-	if options ~= nil and options['dateLossIgnored'] == true then
+	local options = tierData.options
+	if options ~= nil and options.dateLossIgnored == true then
 		dateLoss = 1
 	end
 
