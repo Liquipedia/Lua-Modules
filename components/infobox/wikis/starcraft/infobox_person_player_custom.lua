@@ -45,8 +45,7 @@ local LAST_DAY_OF_YEAR = '-12-31'
 local KOREAN = 'South Korea'
 
 -- race stuff
-local AVAILABLE_RACES = Table.copy(Faction.knownFactions)
-table.insert(AVAILABLE_RACES, 'total')
+local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 local RACE_FIELD_AS_CATEGORY_LINK = true
 
 local _earningsGlobal = {}
