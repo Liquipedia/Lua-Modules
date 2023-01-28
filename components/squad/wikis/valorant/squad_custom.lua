@@ -10,7 +10,6 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
 local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
