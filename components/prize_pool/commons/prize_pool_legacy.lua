@@ -94,6 +94,7 @@ function LegacyPrizePool.run(dependency)
 			newSlotIndex = newSlotIndex + 1
 			newArgs[newSlotIndex] = tempSlot
 		end
+		newArgs[newSlotIndex].count = #newArgs[newSlotIndex].opponents
 	end
 
 	-- iterate over slots and merge opponents into the slots directly
@@ -282,7 +283,7 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 			team = slot['team' .. opponentIndex],
 			lastvs = {
 				slot['lastvs' .. opponentIndex],
-				link = slot['lastvs' .. opponentIndex .. 'link'] or slot['lastvspage' .. opponentIndex],
+				link = slot['lastvs' .. opponentIndex .. 'link'] or slot['lastvs' .. opponentIndex .. 'page'],
 				flag = slot['lastvsflag' .. opponentIndex],
 			},
 			lastvsscore = (slot['lastscore' .. opponentIndex] or '') ..
