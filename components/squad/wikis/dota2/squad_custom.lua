@@ -11,7 +11,6 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
 
 local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
 local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
@@ -141,7 +140,7 @@ function CustomSquad.run(frame)
 
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
 		squad:row(row:create(
-			Variables.varDefault('squad_name', mw.title.getCurrentTitle().prefixedText)
+			mw.title.getCurrentTitle().prefixedText
 			.. '_' .. link .. '_'
 			.. ReferenceCleaner.clean(player.joindate)
 			.. (player.role and '_' .. player.role or '')
