@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:Infobox/Person/User
+-- page=Module:Infobox/Person/User/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -66,7 +66,7 @@ function CustomUser.run(frame)
 	user.nameDisplay = CustomUser.nameDisplay
 	user.createWidgetInjector = CustomUser.createWidgetInjector
 
-	return user:createInfobox(frame)
+	return user:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)

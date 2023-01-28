@@ -108,7 +108,7 @@ function CustomLeague.run(frame)
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.shouldStore = CustomLeague.shouldStore
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:shouldStore(args)

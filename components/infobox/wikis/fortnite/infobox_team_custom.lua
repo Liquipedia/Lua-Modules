@@ -46,7 +46,7 @@ function CustomTeam.run(frame)
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:addToLpdb(lpdbData)

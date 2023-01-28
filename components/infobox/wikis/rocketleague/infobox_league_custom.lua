@@ -48,7 +48,7 @@ function CustomLeague.run(frame)
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()

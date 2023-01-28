@@ -10,6 +10,22 @@ return {
 	startYear = 2000,
 	wikiName = 'fifa',
 	name = 'FIFA',
-	defaultTeamLogo = 'FIFA lightmode logo.png',
-	defaultTeamLogoDark = 'FIFA darkmode logo.png',
+	games = {
+		fifa = {
+			abbreviation = 'FIFA',
+			name = 'FIFA',
+			link = 'FIFA',
+			logo = {
+				darkMode = 'FIFA darkmode logo.png',
+				lightMode = 'FIFA lightmode logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'FIFA darkmode logo.png',
+				lightMode = 'FIFA lightmode logo.png',
+			},
+		},
+	},
+	defaultGame = 'fifa',
+	defaultTeamLogo = 'FIFA lightmode logo.png', ---@deprecated
+	defaultTeamLogoDark = 'FIFA darkmode logo.png', ---@deprecated
 }

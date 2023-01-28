@@ -10,7 +10,36 @@ return {
 	startYear = 2015,
 	wikiName = 'rocketleague',
 	name = 'Rocket League',
-	defaultTeamLogo = 'Rocket_League.png',
-	defaultTeamLogoDark = 'Rocket_League.png',
+	games = {
+		rl = {
+			abbreviation = '',
+			name = '',
+			link = '',
+			logo = {
+				darkMode = 'Rocket League default darkmode.png',
+				lightMode = 'Rocket League default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Rocket League default darkmode.png',
+				lightMode = 'Rocket League default lightmode.png',
+			},
+		},
+		sarpbc = {
+			abbreviation = 'SARPBC',
+			name = 'Supersonic Acrobatic Rocket-Powered Battle-Cars',
+			link = 'Supersonic Acrobatic Rocket-Powered Battle-Cars',
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Rocket League default darkmode.png',
+				lightMode = 'Rocket League default lightmode.png',
+			},
+		},
+	},
+	defaultGame = 'rl',
+	defaultTeamLogo = 'Rocket League.png', ---@deprecated
+	defaultTeamLogoDark = 'Rocket League.png', ---@deprecated
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

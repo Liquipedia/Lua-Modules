@@ -10,7 +10,49 @@ return {
 	startYear = 2002,
 	wikiName = 'warcraft',
 	name = 'Warcraft',
-	defaultTeamLogo = 'Warcraft_III_logo.png',
-	defaultTeamLogoDark = 'Warcraft_III_logo.png',
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
+	games = {
+		reignofchaos = {
+			abbreviation = 'RoC',
+			name = 'Reign of Chaos',
+			link = 'Reign of Chaos',
+			logo = {
+				darkMode = 'Warcraft III logo.png',
+				lightMode = 'Warcraft III logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Warcraft III logo.png',
+				lightMode = 'Warcraft III logo.png',
+			},
+		},
+		frozenthrone = {
+			abbreviation = 'TFT',
+			name = 'The Frozen Throne',
+			link = 'The Frozen Throne',
+			logo = {
+				darkMode = 'Warcraft III logo.png',
+				lightMode = 'Warcraft III logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Warcraft III logo.png',
+				lightMode = 'Warcraft III logo.png',
+			},
+		},
+		reforged = {
+			abbreviation = 'WC3R',
+			name = 'Reforged',
+			link = 'Reforged',
+			logo = {
+				darkMode = 'Warcraft III logo.png',
+				lightMode = 'Warcraft III logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Warcraft III logo.png',
+				lightMode = 'Warcraft III logo.png',
+			},
+		},
+	},
+	defaultGame = 'reforged',
+	defaultTeamLogo = 'Warcraft III logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Warcraft III logo.png', ---@deprecated
+  opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

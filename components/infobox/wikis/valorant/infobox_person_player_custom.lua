@@ -62,7 +62,7 @@ function CustomPlayer.run(frame)
 	_args = player.args
 	_player = player
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
