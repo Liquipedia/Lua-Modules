@@ -83,6 +83,7 @@ function CustomSquad.run(frame)
 		row.lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			faction = Faction.toName(factions[1]),
 			faction2 = Faction.toName(factions[2]),
+			faction3 = Faction.toName(factions[3]),
 			squadname = squadName,
 			status = status
 		})
