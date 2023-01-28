@@ -182,16 +182,20 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 		return 0
 	end
 
-	local weightForTier = Array.find(
-		Config.weights, function(tierWeights) return tierWeights['tier'] == tier end
-		)
+	local tierData = Array.find(
+		Config.weights, function(tierWeights) return tierWeights.tier == tier end
+	)
+	assert(tierData, 'Unknown Tier:' .. tier)
 
-	local tierPoints = Array.find(
-		weightForTier['tiertype'],
+	local tierTypeData = Array.find(
+		tierData.tiertype,
 		function(pointsForType)
-			return pointsForType['name'] == (tierType or Config.TIER_TYPE_GENERAL)
+			return pointsForType.name == (tierType or Config.TIER_TYPE_GENERAL)
 		end
-	)['points']
+	)
+	assert(tierTypeData, 'TierType ' .. tierType .. ' is not defined for tier ' .. tier)
+
+	local tierPoints = tierTypeData.points
 	local placementDropOffFunction = Config.placementDropOffFunction(tier, tierType)
 
 	local placementValue = NotabilityChecker._preparePlacement(placement)
@@ -200,7 +204,7 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 		return 0
 	end
 
-	local options = weightForTier['options']
+	local options = tierData['options']
 	if options ~= nil and options['dateLossIgnored'] == true then
 		dateLoss = 1
 	end
