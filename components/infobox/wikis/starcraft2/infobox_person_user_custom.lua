@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local PersonSc2 = require('Module:Infobox/Person/Custom/Shared/dev')
+local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
 local User = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Injector = require('Module:Infobox/Widget/Injector')
