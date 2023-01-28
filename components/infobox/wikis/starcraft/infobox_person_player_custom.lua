@@ -118,7 +118,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomPlayer.nameDisplay()
-	local factions = CustomPlayer._readFactions(_args.race or Faction.defaultFaction)
+	local factions = Faction.readMultiFaction(_args.race or Faction.defaultFaction, {alias = false})
 
 	local raceIcons = table.concat(Array.map(factions, function(faction)
 		return Faction.Icon{faction = faction, size = 'medium'}
@@ -130,24 +130,20 @@ function CustomPlayer.nameDisplay()
 end
 
 function CustomPlayer._getRaceDisplay(race, asCategory)
-	local factions = Array.map(CustomPlayer._readFactions(race), Faction.toName)
+	local factionNames = Array.map(Faction.readMultiFaction(race, {alias = false}), Faction.toName)
 
-	return table.concat(Array.map(factions or {}, function(faction)
+	return table.concat(Array.map(factionNames or {}, function(factionName)
 		if asCategory then
-			return '[[:Category:' .. faction .. ' Players|' .. faction .. ']]'
+			return '[[:Category:' .. factionName .. ' Players|' .. factionName .. ']]'
 		end
-		return '[[' .. faction .. ']]'
+		return '[[' .. factionName .. ']]'
 	end) or {}, ',&nbsp;')
-end
-
-function CustomPlayer._readFactions(input)
-	return Faction.readMultiFaction(input, {alias = false})
 end
 
 function CustomPlayer.adjustLPDB(_, lpdbData)
 	local extradata = lpdbData.extradata or {}
 
-	local factions = CustomPlayer._readFactions(_args.race)
+	local factions = Faction.readMultiFaction(_args.race, {alias = false})
 
 	extradata.race = factions[1]
 	extradata.faction = Faction.toName(factions[1])
@@ -467,7 +463,7 @@ function CustomPlayer:getWikiCategories(categories)
 		table.insert(categories, 'Foreign Players')
 	end
 
-	for _, faction in pairs(CustomPlayer._readFactions(_args.race)) do
+	for _, faction in pairs(Faction.readMultiFaction(_args.race, {alias = false})) do
 		table.insert(categories, faction .. ' Players')
 	end
 
