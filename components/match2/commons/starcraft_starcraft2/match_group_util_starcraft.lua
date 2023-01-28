@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -23,7 +24,7 @@ local StarcraftMatchGroupUtil = {}
 
 StarcraftMatchGroupUtil.types = {}
 
-StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion('p', 't', 'z', 'r', 'u')
+StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions))
 StarcraftMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
 	race = StarcraftMatchGroupUtil.types.Race,
@@ -128,7 +129,7 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 		opponent.status2 = opponent.score2 and 'S' or nil
 
 		for _, player in ipairs(opponent.players) do
-			player.race = Table.extract(player.extradata, 'faction') or 'u'
+			player.race = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
 		end
 
 		if opponent.template == 'default' then
@@ -163,7 +164,7 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 			return {
 				displayName = 'TBD',
 				matchPlayerIx = matchPlayerIx,
-				race = 'u',
+				race = Faction.defaultFaction,
 			}
 		end
 	end
@@ -258,7 +259,7 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 			player.race = Table.uniqueKey(playerRaces[playerIx])
 			if not player.race then
 				local matchPlayer = match.opponents[opponentIx].players[player.matchPlayerIx]
-				player.race = matchPlayer and matchPlayer.race or 'u'
+				player.race = matchPlayer and matchPlayer.race or Faction.defaultFaction
 			end
 		end
 	end
@@ -364,7 +365,7 @@ function StarcraftMatchGroupUtil.playerFromRecord(record)
 		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
 		pageIsResolved = true,
 		pageName = record.name,
-		race = Table.extract(record.extradata, 'faction') or 'u',
+		race = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
 	}
 end
 
