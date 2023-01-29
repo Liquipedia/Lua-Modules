@@ -101,7 +101,7 @@ end
 function CustomPerson.readFactions(input)
 	local factions
 	if input == RACE_ALL or input == RACE_ALL_SHORT then
-		factions = Table.copy(Faction.coreFactions)
+		factions = Array.copy(Faction.coreFactions)
 	else
 		factions = Faction.readMultiFaction(input, {alias = false})
 	end
