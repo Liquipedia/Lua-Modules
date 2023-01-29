@@ -9,6 +9,7 @@
 local Earnings = {}
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lpdb = require('Module:Lpdb')
 local MathUtils = require('Module:Math')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -121,14 +122,14 @@ end
 ---@param conditions string the condition to find the player/team
 ---@param year number|string|nil the year to calculate earnings for
 ---@param mode string? the mode to calculate earnings for
----@param perYear boolean? query all earnings per year and return the values in a lua table
+---@param perYear boolean|string|nil query all earnings per year and return the values in a lua table
 ---@param divisionFactor? fun(mode: string):number divisionFactor function
 ---@param indivudalEarningsAllowed boolean? can use individual prizemoney field if it exists
 function Earnings.calculate(conditions, year, mode, perYear, divisionFactor, indivudalEarningsAllowed)
 	conditions = Earnings._buildConditions(conditions, year, mode)
 
 	if Logic.readBool(perYear) then
-		return Earnings.calculatePerYear(conditions, divisionFactor)
+		return Earnings.calculatePerYear(conditions, divisionFactor, indivudalEarningsAllowed)
 	end
 
 	if indivudalEarningsAllowed then
@@ -160,30 +161,20 @@ end
 ---
 -- customizable in case query has to be changed
 -- (e.g. SC2 due to not having a fixed number of players per team)
-function Earnings.calculatePerYear(conditions, divisionFactor)
+function Earnings.calculatePerYear(conditions, divisionFactor, indivudalEarningsAllowed)
 	local totalEarningsByYear = {}
 	local earningsData = {}
 	local totalEarnings = 0
-	local prizePoolColumn = Earnings._getPrizePoolType(divisionFactor)
 
-	local offset = 0
-	local count = _MAX_QUERY_LIMIT
-	while count == _MAX_QUERY_LIMIT do
-		local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = conditions,
-			query = 'mode, date, ' .. prizePoolColumn,
-			limit = _MAX_QUERY_LIMIT,
-			offset = offset
-		})
-		for _, item in pairs(lpdbQueryData) do
-			local year = string.sub(item.date, 1, 4)
-			local prizeMoney = tonumber(item[prizePoolColumn]) or 0
-			earningsData[year] = (earningsData[year] or 0)
-				+ Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item['mode'])
-		end
-		count = #lpdbQueryData
-		offset = offset + _MAX_QUERY_LIMIT
-	end
+	Lpdb.executeMassQuery('placement', {
+		conditions = conditions,
+		query = 'mode, date, individualprizemoney, prizemoney',
+	}, function (entry)
+		local year = string.sub(entry.date, 1, 4)
+		local prizeMoney = indivudalEarningsAllowed and tonumber(entry.individualprizemoney)
+			or Earnings._applyDivisionFactor(tonumber(entry.prizemoney), divisionFactor, entry.mode) or 0
+		earningsData[year] = (earningsData[year] or 0) + prizeMoney
+	end)
 
 	for year, earningsOfYear in pairs(earningsData) do
 		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear)
