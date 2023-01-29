@@ -21,7 +21,6 @@ function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
 	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
 	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
 	return team:createInfobox()
 end
@@ -36,10 +35,6 @@ function CustomTeam:createBottomContent()
 		'Placement summary',
 		{team = _team.name or _team.pagename}
 	)
-end
-
-function CustomTeam:addToLpdb(lpdbData, args)
-	return lpdbData
 end
 
 function CustomTeam:defineCustomPageVariables(args)
