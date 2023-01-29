@@ -15,8 +15,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local _DEFAULT_DATE = '1970-01-01 00:00:00'
-local _MAX_QUERY_LIMIT = 5000
+local DEFAULT_DATE = '1970-01-01 00:00:00'
 
 -- customizable in /Custom
 Earnings.defaultNumberOfPlayersInTeam = 5
@@ -187,7 +186,7 @@ function Earnings.calculatePerYear(conditions, divisionFactor, indivudalEarnings
 end
 
 function Earnings._buildConditions(conditions, year, mode)
-	conditions = '[[date::!' .. _DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
+	conditions = '[[date::!' .. DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
 	if String.isNotEmpty(year) then
 		conditions = conditions .. ' AND ([[date_year::'.. year ..']])'
 	end
