@@ -77,7 +77,7 @@ function CustomMap._getGameVersion()
 	return GAME[string.lower(_args.game or '')]
 end
 
-function CustomMap:_getGameMode()
+function CustomMap._getGameMode()
 	return MODES[string.lower(_args.mode or '')]
 end
 
