@@ -33,7 +33,7 @@ function CustomTeam:createBottomContent()
 	) ..  Template.expandTemplate(
 		mw.getCurrentFrame(),
 		'Placement summary',
-		{team = _team.name or _team.pagename}
+		{team = _team.pagename}
 	)
 end
 
