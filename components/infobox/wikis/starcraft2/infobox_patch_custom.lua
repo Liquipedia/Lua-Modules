@@ -7,9 +7,15 @@
 --
 
 local Class = require('Module:Class')
-local Patch = require('Module:Infobox/Patch')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomPatch = Class.new()
 
@@ -23,7 +29,7 @@ function CustomPatch.run(frame)
 	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
 	customPatch.getChronologyData = CustomPatch.getChronologyData
 	customPatch.addToLpdb = CustomPatch.addToLpdb
-	return customPatch:createInfobox(frame)
+	return customPatch:createInfobox()
 end
 
 function CustomPatch:createWidgetInjector()
@@ -55,14 +61,16 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomPatch:addToLpdb()
-	local date = _args.narelease or _args.eurelease
-	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-		name = _args.name,
-		type = 'patch',
-		information = monthAndDay,
-		date = date,
-	})
+	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+		local date = _args.narelease or _args.eurelease
+		local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
+		mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
+			name = _args.name,
+			type = 'patch',
+			information = monthAndDay,
+			date = date,
+		})
+	end
 end
 
 function CustomPatch:getChronologyData()

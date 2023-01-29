@@ -7,13 +7,15 @@
 --
 
 local Class = require('Module:Class')
-local InfoboxBasic = require('Module:Infobox/Basic')
+local Lua = require('Module:Lua')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
 local Center = Widgets.Center
 
-local Campaign = Class.new(InfoboxBasic)
+local Campaign = Class.new(BasicInfobox)
 
 function Campaign.run(frame)
 	local campaign = Campaign(frame)
@@ -25,7 +27,12 @@ function Campaign:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = self.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = self.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 	}
 

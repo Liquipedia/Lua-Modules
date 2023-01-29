@@ -12,9 +12,8 @@ local Lua = require('Module:Lua')
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
--- called after processMap/processOpponent/processPlayer
+-- called after processMap/processPlayer
 -- used to alter match related parameters, e.g. automatically setting the winner
--- @parameter frame - the frame object
 -- @parameter match - a match
 -- @returns the match after changes have been applied
 WikiSpecificBase.processMatch = FnUtil.lazilyDefineFunction(function()
@@ -26,7 +25,6 @@ end)
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
--- @parameter frame - the frame object
 -- @parameter map - a map
 -- @returns the map after changes have been applied
 WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
@@ -38,19 +36,6 @@ end)
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
--- @parameter frame - the frame object
--- @parameter opponent - a opponent
--- @returns the opponent after changes have been applied
-WikiSpecificBase.processOpponent = FnUtil.lazilyDefineFunction(function()
-	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
-	return InputModule and InputModule.processOpponent
-		or error('Function "processOpponent" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
-end)
-
--- called from Module:Match/Subobjects
--- used to transform wiki-specific input of templates to the generalized
--- format that is required by Module:MatchGroup
--- @parameter frame - the frame object
 -- @parameter player - a player
 -- @returns the player after changes have been applied
 WikiSpecificBase.processPlayer = FnUtil.lazilyDefineFunction(function()
@@ -82,7 +67,7 @@ details.
 To customize matchlists and brackets for a wiki, override this to return
 a display component with the wiki-specific customizations.
 
-Called from MatchGroup/Display
+Called from MatchGroup
 
 -- @returns module
 ]]
@@ -100,7 +85,7 @@ See the default implementation (pointed to below) for details.
 To customize single match display for a wiki, override this to return
 a display component with the wiki-specific customizations.
 
-Called from MatchGroup/Display
+Called from MatchGroup
 
 -- @returns module
 ]]

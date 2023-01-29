@@ -7,18 +7,20 @@
 --
 
 local DisplayUtil = require('Module:DisplayUtil')
+local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PlayerExt = require('Module:Player/Ext')
-local StarcraftPlayerExt = require('Module:Player/Ext/Starcraft')
 local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
+local Abbreviation = require('Module:Abbreviation')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
-local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getSmallIcon = function() end,
-}
+local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft', {requireDevIfEnabled = true})
+
+local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 
 local html = mw.html
 
@@ -34,7 +36,9 @@ StarcraftPlayerDisplay.propTypes.BlockPlayer = {
 	player = StarcraftMatchGroupUtil.types.Player,
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
+	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
+	abbreviateTbd = 'boolean?',
 }
 
 --[[
@@ -47,7 +51,9 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 
 	local zeroWidthSpace = '&#8203;'
 	local nameNode = html.create(props.dq and 's' or 'span'):addClass('name')
-		:wikitext(props.showLink ~= false and player.pageName
+		:wikitext(
+			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
+			or props.showLink ~= false and player.pageName
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
 			or Logic.emptyOr(player.displayName, zeroWidthSpace)
 		)
@@ -59,16 +65,25 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 	end
 
 	local raceNode
-	if props.showRace ~= false and player.race ~= 'u' then
+	if props.showRace ~= false and player.race ~= Faction.defaultFaction then
 		raceNode = html.create('span'):addClass('race')
-			:wikitext(StarcraftPlayerDisplay.Race(player.race))
+			:wikitext(Faction.Icon{faction = player.race})
+	end
+
+	local teamNode
+	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
+		teamNode = html.create('span')
+			:wikitext('&nbsp;')
+			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
 	return html.create('div'):addClass('block-player starcraft-block-player')
 		:addClass(props.flip and 'flipped' or nil)
+		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
 		:node(raceNode)
 		:node(nameNode)
+		:node(teamNode)
 end
 
 -- Called from Template:Player and Template:Player2
@@ -93,7 +108,7 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 		displayName = displayName,
 		flag = String.nilIfEmpty(args.flag),
 		pageName = pageName,
-		race = String.nilIfEmpty(args.race) or 'u',
+		race = String.nilIfEmpty(args.race) or Faction.defaultFaction,
 	}
 
 	if not args.novar then
@@ -181,8 +196,8 @@ function StarcraftPlayerDisplay.InlinePlayer(props)
 		and PlayerDisplay.Flag(player.flag)
 		or nil
 
-	local race = props.showRace ~= false and player.race ~= 'u'
-		and StarcraftPlayerDisplay.Race(player.race)
+	local race = props.showRace ~= false and player.race ~= Faction.defaultFaction
+		and Faction.Icon{faction = player.race}
 		or nil
 
 	local nameAndLink = props.showLink ~= false and player.pageName
@@ -223,12 +238,6 @@ function StarcraftPlayerDisplay.HiddenSort(name, flag, race, field)
 	return html.create('span')
 		:css('display', 'none')
 		:wikitext(text)
-end
-
-function StarcraftPlayerDisplay.Race(race)
-	return DisplayUtil.removeLinkFromWikiLink(
-		RaceIcon.getSmallIcon({race})
-	)
 end
 
 return StarcraftPlayerDisplay

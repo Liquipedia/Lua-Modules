@@ -15,8 +15,13 @@ local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
+
+-- These last_headings are considered sub headings
+-- and matchsection should be used instead if available
+local SUB_SECTIONS = {'high', 'mid', 'low'}
 
 local globalVars = PageVariableNamespace()
 
@@ -67,7 +72,8 @@ function Match.storeMatchGroup(matchRecords, options)
 		storePageVar = Logic.nilOr(options.storePageVar, false),
 		storeSmw = Logic.nilOr(options.storeSmw, true),
 	}
-	local LegacyMatch = (options.storeMatch1 or options.storeSmw) and Lua.requireIfExists('Module:Match/Legacy')
+	local LegacyMatch = (options.storeMatch1 or options.storeSmw)
+		and Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
 
 	matchRecords = Array.map(matchRecords, function(matchRecord)
 		local records = Match.splitRecordsByType(matchRecord)
@@ -304,7 +310,7 @@ function Match._prepareRecordsForStore(records)
 		end
 	end
 	for _, gameRecord in ipairs(records.gameRecords) do
-		Match.clampFields(gameRecord, Match.gameFields)
+		Match._prepareGameRecordForStore(records.matchRecord, gameRecord)
 	end
 end
 
@@ -314,8 +320,43 @@ function Match._prepareMatchRecordForStore(match)
 	match.match2bracketdata = match.match2bracketdata or match.bracketdata
 	match.match2bracketid = match.match2bracketid or match.bracketid
 	match.match2id = match.match2id or match.bracketid .. '_' .. match.matchid
+	match.section = Match._getSection()
+	match.extradata = Match._addCommonMatchExtradata(match)
 	Match.clampFields(match, Match.matchFields)
 end
+
+function Match._addCommonMatchExtradata(match)
+	local commonExtradata = {
+		comment = match.comment,
+		matchsection = match.matchsection,
+		timestamp = tonumber(match.timestamp),
+		timezoneid = match.timezoneId,
+		timezoneoffset = match.timezoneOffset,
+	}
+
+	return Table.merge(commonExtradata, match.extradata or {})
+end
+
+
+
+function Match._getSection()
+	local cleanHtml = function(rawString)
+		return rawString:gsub('<.->', '')
+	end
+	local lastHeading = cleanHtml(Variables.varDefault('last_heading', ''))
+	local matchSection = cleanHtml(Variables.varDefault('matchsection', ''))
+	if Logic.isNotEmpty(matchSection) and Table.includes(SUB_SECTIONS, lastHeading:lower()) then
+		return matchSection
+	end
+	return lastHeading
+end
+
+function Match._prepareGameRecordForStore(matchRecord, gameRecord)
+	gameRecord.parent = matchRecord.parent
+	gameRecord.tournament = matchRecord.tournament
+	Match.clampFields(gameRecord, Match.gameFields)
+end
+
 
 Match.matchFields = Table.map({
 	'bestof',
@@ -349,11 +390,13 @@ Match.matchFields = Table.map({
 	'vod',
 	'walkover',
 	'winner',
+	'section',
 }, function(_, field) return field, true end)
 
 Match.opponentFields = Table.map({
 	'extradata',
 	'icon',
+	'icondark',
 	'name',
 	'placement',
 	'score',
@@ -376,11 +419,13 @@ Match.gameFields = Table.map({
 	'length',
 	'map',
 	'mode',
+	'parent',
 	'participants',
 	'resulttype',
 	'rounds',
 	'scores',
 	'subgroup',
+	'tournament',
 	'type',
 	'vod',
 	'walkover',

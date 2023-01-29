@@ -7,10 +7,12 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
-local String = require('Module:String')
-local BasicInfobox = require('Module:Infobox/Basic')
+local String = require('Module:StringUtils')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -40,6 +42,8 @@ function Unit:createInfobox()
 					imageDefault = args.default,
 					imageDark = args.imagedark or args.imagedarkmode,
 					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+					subHeader = self:subHeaderDisplay(args),
+					size = args.imagesize,
 				},
 			}
 		},
@@ -57,7 +61,7 @@ function Unit:createInfobox()
 			}
 		},
 		Cell{name = 'Description', content = {args.description}},
-		Cell{name = 'Built from', content = {args.builtfrom}},
+		Cell{name = 'Built From', content = {args.builtfrom}},
 		Customizable{
 			id = 'requirements',
 			children = {
@@ -112,7 +116,7 @@ function Unit:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkey.hotkey2(args.hotkey, args.hotkey2, 'slash')
 		else
 			display = Hotkey.hotkey(args.hotkey)
 		end
@@ -126,6 +130,11 @@ function Unit:nameDisplay(args)
 end
 
 function Unit:setLpdbData(args)
+end
+
+--- Allows for overriding this functionality
+function Unit:subHeaderDisplay(args)
+	return args.title
 end
 
 return Unit

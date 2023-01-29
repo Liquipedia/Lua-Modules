@@ -7,6 +7,7 @@
 --
 
 local Lua = require('Module:Lua')
+local DisplayUtil = require('Module:DisplayUtil')
 local Table = require('Module:Table')
 
 local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
@@ -20,13 +21,35 @@ function StarcraftSingleMatchDisplay.SingleMatchContainer(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
 
 	return match
-		and SingleMatchDisplay.SingleMatch{
+		and StarcraftSingleMatchDisplay.SingleMatch{
 			match = match,
 			config = Table.merge(props.config, {
 				MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
 			})
 		}
 		or ''
+end
+
+function StarcraftSingleMatchDisplay.SingleMatch(props)
+	local singleMatchNode = SingleMatchDisplay.SingleMatch(props)
+
+	return singleMatchNode
+		:addClass(props.match.isFfa and 'ffa-match-summary' or nil)
+end
+
+--[[
+Display component for a match in a singleMatch. Consists of the match summary.
+]]
+function SingleMatchDisplay.Match(props)
+	DisplayUtil.assertPropTypes(props, SingleMatchDisplay.propTypes.Match)
+
+	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
+		matchId = props.match.matchId,
+		config = {showScore = not props.match.noScore},
+	})
+
+	return matchSummaryNode
 end
 
 return StarcraftSingleMatchDisplay

@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -23,7 +24,7 @@ local StarcraftMatchGroupUtil = {}
 
 StarcraftMatchGroupUtil.types = {}
 
-StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion('p', 't', 'z', 'r', 'u')
+StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions))
 StarcraftMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
 	race = StarcraftMatchGroupUtil.types.Race,
@@ -128,7 +129,7 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 		opponent.status2 = opponent.score2 and 'S' or nil
 
 		for _, player in ipairs(opponent.players) do
-			player.race = Table.extract(player.extradata, 'faction') or 'u'
+			player.race = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
 		end
 
 		if opponent.template == 'default' then
@@ -163,7 +164,7 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 			return {
 				displayName = 'TBD',
 				matchPlayerIx = matchPlayerIx,
-				race = 'u',
+				race = Faction.defaultFaction,
 			}
 		end
 	end
@@ -258,7 +259,7 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 			player.race = Table.uniqueKey(playerRaces[playerIx])
 			if not player.race then
 				local matchPlayer = match.opponents[opponentIx].players[player.matchPlayerIx]
-				player.race = matchPlayer and matchPlayer.race or 'u'
+				player.race = matchPlayer and matchPlayer.race or Faction.defaultFaction
 			end
 		end
 	end
@@ -269,7 +270,11 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 		scores[opponentIx] = 0
 	end
 	for _, game in pairs(games) do
-		if game.winner then
+		if game.map and String.startsWith(game.map, 'Submatch') and not game.resultType then
+			for opponentIx, score in pairs(scores) do
+				scores[opponentIx] = score + (game.scores[opponentIx] or 0)
+			end
+		elseif game.winner then
 			scores[game.winner] = (scores[game.winner] or 0) + 1
 		end
 	end
@@ -360,8 +365,19 @@ function StarcraftMatchGroupUtil.playerFromRecord(record)
 		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
 		pageIsResolved = true,
 		pageName = record.name,
-		race = Table.extract(record.extradata, 'faction') or 'u',
+		race = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
 	}
+end
+
+-- merge submatches for reset matches
+function StarcraftMatchGroupUtil.mergeResetSubmatches(match, bracketId)
+	if match and String.isNotEmpty(match.bracketData.bracketResetMatchId) then
+		local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
+		local bracketResetMatch = bracket.matchesById[match.bracketData.bracketResetMatchId]
+		Array.extendWith(match.submatches, bracketResetMatch.submatches)
+	end
+
+	return match.submatches
 end
 
 return StarcraftMatchGroupUtil

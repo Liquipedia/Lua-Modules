@@ -20,7 +20,6 @@ local Array = require('Module:Array')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local _MAX_NUM_BANS = 5
 local _NUM_CHAMPIONS_PICK = 5
@@ -113,10 +112,10 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
-	      :leftScore(CustomMatchSummary._createScore(match.opponents[1]))
-	      :rightScore(CustomMatchSummary._createScore(match.opponents[2]))
-	      :rightOpponent(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
 
 	return header
 end
@@ -141,20 +140,14 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	local mvpInput = match.extradata.mvp
-	if mvpInput then
-		local mvpData = mw.text.split(mvpInput or '', ',')
-		if String.isNotEmpty(mvpData[1]) then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData) do
-				if String.isNotEmpty(player) then
-					mvp:addPlayer(player)
-				end
-			end
-
-			body:addRow(mvp)
+	local mvpData = match.extradata.mvp
+	if mvpData and mvpData.players and mvpData.players[1]  then
+		local mvp = MatchSummary.Mvp()
+		for _, player in ipairs(mvpData.players) do
+			mvp:addPlayer(player)
 		end
 
+		body:addRow(mvp)
 	end
 
 	-- Pre-Process Champion Ban Data
@@ -233,7 +226,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext(CustomMatchSummary._createAbbreviation{
 			title = String.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length',
-			text = game.length or ('Game ' .. gameIndex),
+			text = String.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
 		})
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
@@ -265,22 +258,6 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	end
 
 	return container
-end
-
-function CustomMatchSummary._createOpponent(opponent, side)
-	return OpponentDisplay.BlockOpponent{
-		flip = side == 'left',
-		opponent = opponent,
-		overflow = 'wrap',
-		teamStyle = 'short',
-	}
-end
-
-function CustomMatchSummary._createScore(opponent)
-	return OpponentDisplay.BlockScore{
-		isWinner = opponent.placement == 1 or opponent.advances,
-		scoreText = OpponentDisplay.InlineScore(opponent),
-	}
 end
 
 function CustomMatchSummary._createAbbreviation(args)

@@ -54,14 +54,14 @@ end
 function ErrorExt.makeFullStackTrace(error)
 	local parts = Array.extend(
 		error.stacks,
-		Array.flatMap(tableOrEmpty(error.originalErrors), function(originalError)
+		Array.flatten(Array.map(tableOrEmpty(error.originalErrors), function(originalError)
 			return {
 				'',
 				'Error was thrown while handling:',
 				originalError.message,
 				ErrorExt.makeFullStackTrace(originalError),
 			}
-		end)
+		end))
 	)
 	return table.concat(parts, '\n')
 end

@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local BasicInfobox = require('Module:Infobox/Basic')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -30,7 +32,12 @@ function Mission:createInfobox()
 
 	local widgets = {
 		Customizable{id = 'header', children = {
-				Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+				Header{
+					name = args.name,
+					image = args.image,
+					imageDark = args.imagedark or args.imagedarkmode,
+					size = args.imagesize,
+				},
 			}
 		},
 		Center{content = {args.caption}},

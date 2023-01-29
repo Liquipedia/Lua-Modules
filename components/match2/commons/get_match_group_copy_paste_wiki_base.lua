@@ -17,7 +17,11 @@ adjust this to fit the needs of your wiki^^
 local wikiCopyPaste = {}
 
 --allowed opponent types on the wiki
-local MODES = { ['solo'] = 'solo', ['team'] = 'team' }
+local MODES = {
+	['solo'] = 'solo',
+	['team'] = 'team',
+	['literal'] = 'literal',
+}
 
 --default opponent type (used if the entered mode is not found in the above table)
 local DefaultMode = 'team'
@@ -106,7 +110,7 @@ function wikiCopyPaste.getStart(template, id, modus, args)
 		)
 	end
 
-	return out
+	return out, args
 end
 
 return wikiCopyPaste

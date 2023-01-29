@@ -21,6 +21,9 @@ DateExt.minTimestamp = -62167219200
 -- 9999-12-31 23:59:59
 DateExt.maxTimestamp = 253402300799
 
+-- 1970-01-01 00:00:00
+DateExt.epochZero = 0
+
 --[[
 Parses a date string into a timestamp, returning the number of seconds since
 UNIX epoch. The timezone offset is incorporated into the timestamp, and the
@@ -81,7 +84,7 @@ param to Module:Countdown.
 ]]
 function DateExt.toCountdownArg(dateOrTimestamp)
 	local timestamp = DateExt.readTimestamp(dateOrTimestamp)
-	return DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. '<abbr data-tz="+0:00"></abbr>'
+	return DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' <abbr data-tz="+0:00"></abbr>'
 end
 
 --[[

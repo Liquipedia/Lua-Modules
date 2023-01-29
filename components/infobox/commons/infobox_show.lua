@@ -7,11 +7,13 @@
 --
 
 local Class = require('Module:Class')
-local BasicInfobox = require('Module:Infobox/Basic')
-local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
+local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
-local Flags = require('Module:Flags')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -33,7 +35,12 @@ function Show:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Show Information'},
 		Cell{name = 'Host(s)', content = self:getAllArgsForBase(args, 'host', {makeLink = true})},

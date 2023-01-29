@@ -8,6 +8,9 @@
 
 local Table = {}
 
+---@generic T
+---@param tbl T[]
+---@return T[]
 function Table.randomize(tbl)
 	math.randomseed(os.time())
 
@@ -18,6 +21,9 @@ function Table.randomize(tbl)
 	return tbl
 end
 
+---Get the size of a table
+---@param tbl table
+---@return integer
 function Table.size(tbl)
 	local i = 0
 	for _ in pairs(tbl) do
@@ -26,8 +32,11 @@ function Table.size(tbl)
 	return i
 end
 
+---@param tbl any[]
+---@param value any
+---@return boolean
 function Table.includes(tbl, value)
-	for _, entry in ipairs(tbl) do
+	for _, entry in pairs(tbl) do
 		if entry == value then
 			return true
 		end
@@ -35,6 +44,11 @@ function Table.includes(tbl, value)
 	return false
 end
 
+---@generic K, V, T
+---@param tbl {[K]: V}
+---@param predicate fun(value?: V, argument?: T): boolean
+---@param argument T?
+---@return {[K]: V}
 function Table.filter(tbl, predicate, argument)
 	local filteredTbl = {}
 	local foundMatches = 1
@@ -49,6 +63,25 @@ function Table.filter(tbl, predicate, argument)
 	return filteredTbl
 end
 
+---@generic K, V
+---@param tbl {[K]: V}
+---@param predicate fun(key?: K, value?: V): boolean
+---@return {[K]: V}
+function Table.filterByKey(tbl, predicate)
+	local filteredTbl = {}
+
+	for key, entry in pairs(tbl) do
+		if predicate(key, entry) then
+			filteredTbl[key] = entry
+		end
+	end
+
+	return filteredTbl
+end
+
+---Return true if table is empty or nil
+---@param tbl table?
+---@return boolean
 function Table.isEmpty(tbl)
 	if tbl == nil then
 		return true
@@ -62,10 +95,17 @@ function Table.isEmpty(tbl)
 	return true
 end
 
+---Return true if table is neither empty nor nil
+---@param tbl table?
+---@return boolean
 function Table.isNotEmpty(tbl)
 	return not Table.isEmpty(tbl)
 end
 
+---Shallow copies a table
+---@generic K, V
+---@param tbl {[K]: V}
+---@return {[K]: V}
 function Table.copy(tbl)
 	local result = {}
 
@@ -76,21 +116,21 @@ function Table.copy(tbl)
 	return result
 end
 
---[[
-Recursively copies a table.
-
-Specifically: for each entry, the value is deep copied and the key is not.
-Entries provided by the __pairs metamethod are copied. Metatables are not
-copied (unless enabled by options.copyMetatable).
-
-options.copyMetatable
-If enabled, deep copies the metatable of tables. Disabled by default.
-
-options.reuseRef
-If a table reference exists at two locations in the input, then this option
-will allow the locations to share a reference in the output. Enabled by
-default.
-]]
+---Recursively copies a table.
+---
+---Specifically: for each entry, the value is deep copied and the key is not.
+---Entries provided by the __pairs metamethod are copied. Metatables are not
+---copied (unless enabled by options.copyMetatable).
+---
+---options.copyMetatable
+---If enabled, deep copies the metatable of tables. Disabled by default.
+---
+---options.reuseRef
+---If a table reference exists at two locations in the input, then this option
+---will allow the locations to share a reference in the output. Enabled by default.
+---@param tbl_ table
+---@param options? {copyMetatable: boolean, reuseRef: boolean}
+---@return table
 function Table.deepCopy(tbl_, options)
 	options = options or {}
 	assert(type(tbl_) == 'table', 'Table.deepCopy: Input must be a table')
@@ -121,10 +161,11 @@ function Table.deepCopy(tbl_, options)
 	return deepCopy(tbl_)
 end
 
---[[
-Determines whether two tables are equal, by comparing their entries. Table
-values are compared recursively.
-]]
+---Determines whether two tables are equal, by comparing their entries. Table
+---values are compared recursively.
+---@param xTable table
+---@param yTable table
+---@return boolean
 function Table.deepEquals(xTable, yTable)
 	local Logic = require('Module:Logic')
 
@@ -146,13 +187,15 @@ function Table.deepEquals(xTable, yTable)
 	return true
 end
 
---[[
-Copies entries from the second table into the first table, overriding existing
-entries. The first table is mutated in the process.
-
-Can be called with more than two tables. The additional tables are merged into
-the first table in succession.
-]]
+---
+---Copies entries from the second table into the first table, overriding existing
+---entries. The first table is mutated in the process.
+---
+---Can be called with more than two tables. The additional tables are merged into
+---the first table in succession.
+---@param target table
+---@param ... table
+---@return table
 function Table.mergeInto(target, ...)
 	local objs = Table.pack(...)
 	for i = 1, objs.n do
@@ -165,10 +208,10 @@ function Table.mergeInto(target, ...)
 	return target
 end
 
---[[
-Creates a table with entries merged from the input tables, with entries from
-the later tables given precedence. Input tables are not mutated.
-]]
+---Creates a table with entries merged from the input tables, with entries from
+---the later tables given precedence. Input tables are not mutated.
+---@param ... table
+---@return table
 function Table.merge(...)
 	return Table.mergeInto({}, ...)
 end
@@ -202,14 +245,18 @@ function Table.deepMergeInto(target, ...)
 	return target
 end
 
---[[
-Applies a function to each entry in a table and places the results as entries
-in a new table.
-
-Example:
-Table.map({a = 3, b = 4, c = 5}, function(k, v) return 2 * v, k end)
--- Returns {6 = 'a', 8 = 'b', 10 = 'c'}
-]]
+---Applies a function to each entry in a table and places the results as entries
+--in a new table.
+--
+--Example:
+--`Table.map({a = 3, b = 4, c = 5}, function(k, v) return 2 * v, k end)`
+--Returns `{6 = 'a', 8 = 'b', 10 = 'c'}`
+--
+--The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
+---@generic K, V, U, T
+---@param xTable {[K] : V}
+---@param f fun(key?: K, value?: V): U, T
+---@return {[U] : T}
 function Table.map(xTable, f)
 	local yTable = {}
 	for xKey, xValue in pairs(xTable) do
@@ -220,13 +267,102 @@ function Table.map(xTable, f)
 end
 
 --[[
-Applies a function to each value in a table and places the results in a new
-table under the same keys.
+Extracts prefixed keys interleaved with numeric indexes from an arguments
+table, and applies a transform to each key or index.
+
+Used for template calls that support both prefixed and indexed params. See
+Module:ParticipantTable/Starcraft, Module:GroupTableLeague for examples of how
+it is used.
 
 Example:
-Table.mapValues({1, 2, 3}, function(x) return 2 * x end)
--- Returns {2, 4, 6}
+In the template call
+{{Foo
+	|A
+	|p2=B
+	|C
+	|player4=D
+}}
+
+Table.mapArgumentsByPrefix(args, {'p', 'player'}, f)
+will invoke
+
+f(1, 1)
+f('p2', 2, 'p')
+f(2, 3)
+f('player4', 4, 'player')
+
 ]]
+function Table.mapArgumentsByPrefix(args, prefixes, f)
+	local function indexFromKey(key)
+		local prefix, index = key:match('^([%a_]+)(%d+)$')
+		if Table.includes(prefixes, prefix) then
+			return tonumber(index), prefix
+		else
+			return nil
+		end
+	end
+
+	return Table.mapArguments(args, indexFromKey, f)
+end
+
+--- Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
+-- from an arguments table, and applies a transform to each key or index.
+--
+-- Most common use-case will be `Table.mapArgumentsByPrefix` where
+-- the `indexFromKey` function retrieves keys based on a prefix.
+--
+---@generic K, V, T, I
+---@param args {[K] : V}
+---@param indexFromKey fun(key?: K): integer
+---@param f fun(key?: K, index?: integer, ...?: any): T
+---@param noInterleave boolean?
+---@return {[I] : T}
+function Table.mapArguments(args, indexFromKey, f, noInterleave)
+	local entriesByIndex = {}
+
+	-- Non-numeric args
+	for key, _ in pairs(args) do
+		local function post(index, ...)
+			if index and not entriesByIndex[index] then
+				entriesByIndex[index] = f(key, index, ...)
+			end
+		end
+		if type(key) == 'string' then
+			post(indexFromKey(key))
+		end
+	end
+
+	if noInterleave then
+		return entriesByIndex
+	end
+
+	-- Numeric index entries fills in gaps of prefixN= entries if not disabled
+	local entryIndex = 1
+	for argIndex = 1, math.huge do
+		if not args[argIndex] then
+			break
+		end
+		while entriesByIndex[entryIndex] do
+			entryIndex = entryIndex + 1
+		end
+		entriesByIndex[entryIndex] = f(argIndex, entryIndex)
+	end
+
+	return entriesByIndex
+end
+
+---Applies a function to each value in a table and places the results in a new
+--table under the same keys.
+--
+--Example:
+--`Table.mapValues({1, 2, 3}, function(x) return 2 * x end)`
+--Returns `{2, 4, 6}`
+--
+--The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
+---@generic K, V, T
+---@param xTable {[K] : V}
+---@param f fun(value?: V): T
+---@return {[K] : T}
 function Table.mapValues(xTable, f)
 	local yTable = {}
 	for xKey, xValue in pairs(xTable) do
@@ -235,9 +371,11 @@ function Table.mapValues(xTable, f)
 	return yTable
 end
 
---[[
-Whether all entries of a table satisfy a predicate.
-]]
+---Whether all entries of a table satisfy a predicate.
+---@generic K, V
+---@param tbl {[K] : V}
+---@param predicate fun(key?: K, value?: V): boolean
+---@return boolean
 function Table.all(tbl, predicate)
 	for key, value in pairs(tbl) do
 		if not predicate(key, value) then
@@ -247,9 +385,11 @@ function Table.all(tbl, predicate)
 	return true
 end
 
---[[
-Whether any entry of a table satisfies a predicate.
-]]
+---Whether any entry of a table satisfies a predicate.
+---@generic K, V
+---@param tbl {[K] : V}
+---@param predicate fun(key?: K, value?: V): boolean
+---@return boolean
 function Table.any(tbl, predicate)
 	for key, value in pairs(tbl) do
 		if predicate(key, value) then
@@ -283,7 +423,11 @@ function Table.groupBy(tbl, f)
 	return groups
 end
 
--- Removes a key from a table and returns its value.
+---Removes a key from a table and returns its value.
+---@generic K, V
+---@param tbl table<K, V>
+---@param key K
+---@return V
 function Table.extract(tbl, key)
 	local value = tbl[key]
 	tbl[key] = nil
@@ -388,7 +532,7 @@ local args = {
 	foo = {},
 	p10 = {},
 }
-for key, player in Table.iter.pairsByPrefix(args, 'p') do
+for key, player, index in Table.iter.pairsByPrefix(args, 'p') do
 	mw.log(key)
 end
 
@@ -400,7 +544,11 @@ function Table.iter.pairsByPrefix(tbl, prefix)
 		local key = prefix .. i
 		local value = tbl[key]
 		i = i + 1
-		return value and key, value or nil
+		if value then
+			return key, value, (i - 1)
+		else
+			return nil
+		end
 	end
 end
 

@@ -6,26 +6,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Team = require('Module:Infobox/Team')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Region = require('Module:Region')
 local String = require('Module:String')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomTeam = Class.new()
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
-	team.addToLpdb = CustomTeam.addToLpdb
-	return team:createInfobox(frame)
-end
-
-function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = 'File:' .. args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = 'File:' .. args.image
-	end
-
-	return lpdbData
+	return team:createInfobox()
 end
 
 return CustomTeam

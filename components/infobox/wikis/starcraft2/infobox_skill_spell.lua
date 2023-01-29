@@ -7,13 +7,17 @@
 --
 
 local Class = require('Module:Class')
-local Skill = require('Module:Infobox/Skill')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local CleanRace = require('Module:CleanRace2')
+local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
+local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local PageLink = require('Module:Page')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Skill = Lua.import('Module:Infobox/Skill', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local Spell = Class.new()
 
@@ -31,7 +35,7 @@ function Spell.run(frame)
 	spell.createWidgetInjector = Spell.createWidgetInjector
 	spell.getCategories = Spell.getCategories
 	_args = spell.args
-	return spell:createInfobox(frame)
+	return spell:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -80,7 +84,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'cooldown' then
 		return {
 			Cell{
-				name = PageLink.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown',
+				name = Page.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown',
 				content = {_args.cooldown}
 
 			}
@@ -162,9 +166,8 @@ function Spell:getResearchHotkey()
 end
 
 function Spell:getCategories()
-	local categories = { 'Spells' }
-	local race = string.lower(_args.race or '')
-	race = CleanRace[race]
+	local categories = {'Spells'}
+	local race = Faction.toName(Faction.read(_args.race))
 	if race then
 		table.insert(categories, race .. ' Spells')
 	end
@@ -217,7 +220,7 @@ function Spell:getHotkeys()
 	local display
 	if not String.isEmpty(_args.hotkey) then
 		if not String.isEmpty(_args.hotkey2) then
-			display = Hotkeys.hotkey(_args.hotkey, _args.hotkey2, 'slash')
+			display = Hotkeys.hotkey2(_args.hotkey, _args.hotkey2, 'slash')
 		else
 			display = Hotkeys.hotkey(_args.hotkey)
 		end

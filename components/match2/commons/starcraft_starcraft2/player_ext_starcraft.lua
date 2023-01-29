@@ -7,45 +7,22 @@
 --
 
 local Array = require('Module:Array')
+local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
-local PlayerExt = require('Module:Player/Ext')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TournamentUtil = require('Module:Tournament/Util')
+
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
 local globalVars = PlayerExt.globalVars
 
 local StarcraftPlayerExt = {}
 
-local allowedRaces = {
-	['p'] = 'p',
-	['protoss'] = 'p',
-	['t'] = 't',
-	['terran'] = 't',
-	['z'] = 'z',
-	['zerg'] = 'z',
-	['r'] = 'r',
-	['random'] = 'r',
-	['pt'] = 'p',
-	['pz'] = 'p',
-	['tz'] = 't',
-	['tp'] = 't',
-	['zt'] = 'z',
-	['zp'] = 'z'
-}
-
--- Reduces a race down to a single character, either 'p', 't', 'z', or 'r', or nil if it can't be done.
-function StarcraftPlayerExt.readRace(race)
-	if type(race) == 'string' then
-		return allowedRaces[race:lower()] or nil
-	end
-end
-
---[[
-Deprecated. Use PlayerExt.extractFromLink instead
-]]
+---@deprecated
+---Use PlayerExt.extractFromLink instead
 StarcraftPlayerExt.extractFromLink = PlayerExt.extractFromLink
 
 --[[
@@ -67,7 +44,7 @@ StarcraftPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 
 		return {
 			flag = String.nilIfEmpty(Flags.CountryName(record.nationality)),
-			race = StarcraftPlayerExt.readRace(record.extradata.race),
+			race = Faction.read(record.extradata.race),
 			raceHistory = raceHistory,
 		}
 	end
@@ -79,9 +56,9 @@ For specific uses only.
 function StarcraftPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	local lpdbPlayer = StarcraftPlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.raceHistory then
-		date = date or TournamentUtil.getContextualDateOrNow()
-		local entry = Array.find(lpdbPlayer.raceHistory, function(entry) return entry.startDate <= date end)
-		return StarcraftPlayerExt.readRace(entry.race)
+		date = date or PlayerExt.getContextualDateOrNow()
+		local entry = Array.find(lpdbPlayer.raceHistory, function(entry) return date <= entry.endDate end)
+		return entry and Faction.read(entry.race)
 	else
 		return lpdbPlayer and lpdbPlayer.race
 	end
@@ -110,13 +87,15 @@ function StarcraftPlayerExt.fetchRaceHistory(resolvedPageName)
 		query = 'information, extradata',
 	})
 
-	return Array.map(rows, function(row)
+	local raceHistory = Array.map(rows, function(row)
 		return {
 			endDate = row.extradata.enddate,
-			race = StarcraftPlayerExt.readRace(row.information),
+			race = Faction.read(row.information),
 			startDate = row.extradata.startdate,
 		}
 	end)
+	Array.sortInPlaceBy(raceHistory, function(entry) return entry.startDate end)
+	return raceHistory
 end
 
 --[[
@@ -160,7 +139,7 @@ StarcraftPlayerExt.fetchMatch2Player = FnUtil.memoize(function(resolvedPageName)
 		query = 'flag, extradata',
 	})
 	local flags = Array.map(records, function(record) return record.flag end)
-	local races = Array.map(records, function(record) return StarcraftPlayerExt.readRace(record.extradata.faction) end)
+	local races = Array.map(records, function(record) return Faction.read(record.extradata.faction) end)
 
 	local function majority(xs)
 		local groups = Array.groupBy(xs, FnUtil.identity)
@@ -258,7 +237,7 @@ function StarcraftPlayerExt.saveToPageVars(player)
 	if player.flag then
 		globalVars:set(player.displayName .. '_flag', player.flag)
 	end
-	if player.race then
+	if player.race and player.race ~= Faction.defaultFaction then
 		globalVars:set(player.displayName .. '_race', player.race)
 	end
 end

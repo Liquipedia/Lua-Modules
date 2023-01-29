@@ -6,20 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Unit = require('Module:Infobox/Unit')
-local String = require('Module:StringUtils')
-local Namespace = require('Module:Namespace')
-local Template = require('Module:Template')
-local Math = require('Module:Math')
 local ChampionWL = require('Module:ChampionWL')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Math = require('Module:Math')
+local Namespace = require('Module:Namespace')
+local String = require('Module:StringUtils')
+local Template = require('Module:Template')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Center = require('Module:Infobox/Widget/Center')
-local Title = require('Module:Infobox/Widget/Title')
-local Header = require('Module:Infobox/Widget/Header')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Header = Widgets.Header
+local Title = Widgets.Title
 
 local CustomChampion = Class.new()
 
@@ -30,8 +33,8 @@ local _args
 local _pagename = mw.title.getCurrentTitle().text
 local _frame
 
-local _BLUE_ESSENCE_ICON = '[[File:Blue Essence Icon.png|x16px|Blue Essence|link=Blue Essence]]'
-local _RP_POINTS_ICON = '[[File:RP_Points.png|Riot Points|x16px|link=Riot Points]]'
+local _BLUE_MOTES_ICON = '[[File:Blue Motes icon.png|20px|Blue Motes|link=Blue Motes]]'
+local _WILD_CORES_ICON = '[[File:Wild Cores icon.png|20px|Wild Cores|link=Wild Cores]]'
 
 function CustomChampion.run(frame)
 	local unit = Unit(frame)
@@ -43,7 +46,7 @@ function CustomChampion.run(frame)
 	unit.setLpdbData = CustomChampion.setLpdbData
 	unit.createWidgetInjector = CustomChampion.createWidgetInjector
 
-	return unit:createInfobox(frame)
+	return unit:createInfobox()
 end
 
 function CustomInjector:addCustomCells()
@@ -52,9 +55,6 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Secondary Bar', content = {_args.secondarybar1}},
 		Cell{name = 'Secondary Attributes', content = {_args.secondaryattributes1}},
 		Cell{name = 'Release Date', content = {_args.releasedate}},
-		Cell{name = 'Species', content = {_args.species}},
-		Cell{name = 'Year of birth', content = {_args.birth}},
-		Cell{name = 'Faction(s)', content = {_args.factions}},
 	}
 
 	if not (
@@ -137,13 +137,13 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'cost' then
 		local cost = ''
 		if not String.isEmpty(_args.costbe) then
-			cost = cost .. _args.costbe .. ' ' .. _BLUE_ESSENCE_ICON
+			cost = cost .. _args.costbe .. ' ' .. _BLUE_MOTES_ICON
 		end
 		if not String.isEmpty(_args.costrp) then
 			if cost ~= '' then
 				cost = cost .. '&emsp;&ensp;'
 			end
-			cost = cost .. _args.costrp .. ' ' .. _RP_POINTS_ICON
+			cost = cost .. _args.costrp .. ' ' .. _WILD_CORES_ICON
 		end
 		return {
 			Cell{name = 'Price', content = {cost}},

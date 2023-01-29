@@ -23,6 +23,7 @@ Config.TIER_TYPE_SCHOOL = 'school'
 Config.PLACEMENT_LIMIT = 2000
 
 Config.MAX_NUMBER_OF_PARTICIPANTS = 10
+Config.MAX_NUMBER_OF_COACHES = 0
 
 -- Which LPDB placement parameters do we care about?
 Config.PLACEMENT_QUERY =
@@ -127,7 +128,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SCHOOL,
-				points = 175,
+				points = 150,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
@@ -147,11 +148,11 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 200,
+				points = 175,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 30,
+				points = 25,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -220,8 +221,10 @@ end
 -- want to decrease the points given for a certain mode
 function Config.adjustScoreForMode(score, mode)
 	local modeMod = 1
-	if mode == "2v2" then
+	if mode == '2v2' then
 		modeMod = 0.5
+	elseif mode == '1v1' then
+		modeMod = 0.25
 	end
 	return score * modeMod
 end

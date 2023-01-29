@@ -29,8 +29,9 @@ function VodLink.display(args)
 			fileName = fileName .. args.gamenum
 		end
 	else
-		title = args.htext or 'Watch VOD'
+		title = 'Watch VOD'
 	end
+	title = args.htext or title
 	fileName = fileName .. '.png'
 
 	local link = args.vod or ''

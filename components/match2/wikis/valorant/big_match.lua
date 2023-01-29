@@ -6,19 +6,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require("Module:Arguments")
+local AgentIcon = require('Module:AgentIcon')
+local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DivTable = require('Module:DivTable')
-local Json = require("Module:Json")
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Logic = require('Module:Logic')
-local Match = require("Module:Match")
+local Match = require('Module:Match')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local Template = require('Module:Template')
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 
 local BigMatch = Class.new()
@@ -35,10 +35,10 @@ function BigMatch.run(frame)
 	local match = Json.parseIfString(args[1])
 	assert(type(match) == 'table')
 
-	match = CustomMatchGroupInput.processMatch(frame, match, {isStandalone = true})
+	match = CustomMatchGroupInput.processMatch(match, {isStandalone = true})
 
 	local identifiers = bigMatch:_getId()
-	match['bracketid'] = "MATCH_" .. identifiers[1]
+	match['bracketid'] = 'MATCH_' .. identifiers[1]
 	match['matchid'] = identifiers[2]
 	-- Don't store match1 as BigMatch records are not complete
 	Match.store(match, {storeMatch1 = false, storeSmw = false})
@@ -56,10 +56,10 @@ function BigMatch.run(frame)
 		link = args.tournamentlink or tournamentData.pagename,
 	}
 
-	return bigMatch:render(frame, match, tournament)
+	return bigMatch:render(match, tournament)
 end
 
-function BigMatch:render(frame, match, tournament)
+function BigMatch:render(match, tournament)
 	local overall = mw.html.create('div'):addClass('fb-match-page-overall')
 
 	local opponent1 = match.match2opponents[1]
@@ -69,7 +69,7 @@ function BigMatch:render(frame, match, tournament)
 
 	local tabs = {This = 1, ['hide-showall'] = true}
 	tabs.name1 = 'Player Stats'
-	tabs.content1 = self:stats(frame, match, playerLookUp, {opponent1, opponent2})
+	tabs.content1 = self:stats(match, playerLookUp, {opponent1, opponent2})
 	tabs.name2 = 'Economy'
 	tabs.content2 = self:economy(match, opponent1, opponent2)
 
@@ -94,7 +94,7 @@ function BigMatch:header(match, opponent1, opponent2, tournament)
 	if tournament.link and tournament.name then
 		tournamentRow:wikitext('[[' .. tournament.link .. '|' .. tournament.name .. ']]')
 	end
-	return mw.html.create('div'):addClass("fb-match-page-header")
+	return mw.html.create('div'):addClass('fb-match-page-header')
 								:node(tournamentRow)
 								:node(teamsRow)
 end
@@ -111,7 +111,7 @@ function BigMatch:overview(match)
 		local wasNotPlayed = map.resulttype == 'np'
 
 		boxLeft :row(
-			DivTable.Row()  :cell(mw.html.create('div'):wikitext((extradata.pick == '1') and 'Pick' or ''):addClass('map-pick'))
+			DivTable.Row()	:cell(mw.html.create('div'):wikitext((extradata.pick == '1') and 'Pick' or ''):addClass('map-pick'))
 							:cell(mw.html.create('div'):wikitext(scores[1] or ''):addClass(didLeftWin and 'map-win' or 'map-lost'))
 							:cell(mw.html.create('div'):wikitext('[[' .. map.map .. ']]'):addClass(wasNotPlayed and 'not-played' or ''))
 							:cell(mw.html.create('div'):wikitext(scores[2] or ''):addClass((not didLeftWin) and 'map-win' or 'map-lost'))
@@ -145,7 +145,7 @@ function BigMatch:overview(match)
 			))
 		)
 		:row(
-			DivTable.Row():cell(mw.html.create('div'):wikitext(match.patch and "Patch " .. match.patch))
+			DivTable.Row():cell(mw.html.create('div'):wikitext(match.patch and 'Patch ' .. match.patch))
 		)
 	boxRight = boxRight:create()
 	boxRight:addClass('fb-match-page-box')
@@ -155,11 +155,12 @@ function BigMatch:overview(match)
 		:node(boxRight)
 end
 
-function BigMatch:stats(frame, match, playerLookUp, opponents)
+function BigMatch:stats(match, playerLookUp, opponents)
+	---@type table<string, any>
 	local tabs = {
 		This = 1,
+		['hide-showall'] = true
 	}
-	tabs['hide-showall'] = true
 
 	local ind = 1
 	while match.match2games[ind] ~= nil do
@@ -206,7 +207,7 @@ function BigMatch:stats(frame, match, playerLookUp, opponents)
 						)
 						:cell(
 							mw.html.create('div')	:addClass('fb-match-page-valorant-stats-agent')
-													:wikitext(Template.safeExpand(frame, 'AgentIcon/' .. player['agent']))
+													:wikitext(AgentIcon._getBracketIcon{player['agent']})
 						)
 						:cell(mw.html.create('div'):wikitext(player['kills']))
 						:cell(mw.html.create('div'):wikitext(player['deaths']))
@@ -228,13 +229,13 @@ function BigMatch:stats(frame, match, playerLookUp, opponents)
 end
 
 function BigMatch:economy(match, opponent1, opponent2)
+	---@type table<string, any>
 	local tabs = {
 		This = 1,
+		['hide-showall'] = true
 	}
-	tabs['hide-showall'] = true
 
 	local ind = 1
-
 	while match.match2games[ind] ~= nil do
 		local map = match.match2games[ind]
 
@@ -356,9 +357,9 @@ end
 
 function BigMatch:_createTeamContainer(side, teamName, score, hasWon)
 	local link = '[[' .. teamName .. ']]'
-	local team = mw.html.create('div')  :addClass('fb-match-page-header-team')
+	local team = mw.html.create('div')	:addClass('fb-match-page-header-team')
 										:wikitext(mw.ext.TeamTemplate.teamicon(teamName) .. '<br/>' .. link)
-	score = mw.html.create('div') :addClass('fb-match-page-header-score'):wikitext(score)
+	score = mw.html.create('div'):addClass('fb-match-page-header-score'):wikitext(score)
 
 	local container = mw.html.create('div') :addClass('fb-match-page-header-team-container')
 											:addClass('col-sm-4 col-xs-6 col-sm-pull-4')
@@ -372,11 +373,11 @@ function BigMatch:_createTeamContainer(side, teamName, score, hasWon)
 end
 
 function BigMatch:_getId()
-	local title = mw.title.getCurrentTitle()
+	local title = mw.title.getCurrentTitle().text
 
 	-- Match alphanumeric pattern 10 characters long, followed by space and then the match id
-	local staticId = string.match(title.text, '%w%w%w%w%w%w%w%w%w%w .*')
-	local fullBracketId = string.match(title.text, '%w%w%w%w%w%w%w%w%w%w')
+	local staticId = string.match(title, '%w%w%w%w%w%w%w%w%w%w .*')
+	local fullBracketId = string.match(title, '%w%w%w%w%w%w%w%w%w%w')
 	local matchId = string.sub(staticId, 12)
 
 	return {fullBracketId, matchId}

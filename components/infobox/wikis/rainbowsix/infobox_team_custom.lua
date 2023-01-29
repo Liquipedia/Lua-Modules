@@ -6,11 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Team = require('Module:Infobox/Team')
-local Variables = require('Module:Variables')
 local Class = require('Module:Class')
-local String = require('Module:String')
+local Lua = require('Module:Lua')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
+
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local CustomTeam = Class.new()
 
@@ -20,9 +21,8 @@ function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
 	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
 	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:createBottomContent()
@@ -31,16 +31,6 @@ function CustomTeam:createBottomContent()
 		'Upcoming and ongoing matches of',
 		{team = _team.name or _team.pagename}
 	)
-end
-
-function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = 'File:' .. args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = 'File:' .. args.image
-	end
-
-	return lpdbData
 end
 
 function CustomTeam:defineCustomPageVariables(args)

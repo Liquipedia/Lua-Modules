@@ -12,11 +12,12 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
-local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+
+local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
 
@@ -52,11 +53,11 @@ MatchlistDisplay.propTypes.MatchlistContainer = {
 Display component for a tournament matchlist. The matchlist is specified by ID.
 The component fetches the match data from LPDB or page variables.
 ]]
-function MatchlistDisplay.MatchlistContainer(props)
+function MatchlistDisplay.MatchlistContainer(props, matches)
 	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.MatchlistContainer)
 	return MatchlistDisplay.Matchlist({
 		config = props.config,
-		matches = MatchGroupUtil.fetchMatches(props.bracketId),
+		matches = matches or MatchGroupUtil.fetchMatches(props.bracketId),
 	})
 end
 
@@ -80,7 +81,7 @@ function MatchlistDisplay.Matchlist(props)
 		attached = propsConfig.attached or false,
 		collapsed = propsConfig.collapsed or false,
 		collapsible = Logic.nilOr(propsConfig.collapsible, true),
-		matchHasDetails = propsConfig.matchHasDetails or matchHasDetailsWikiSpecific or DisplayHelper.defaultMatchHasDetails,
+		matchHasDetails = propsConfig.matchHasDetails or WikiSpecific.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
 		width = propsConfig.width or 300,
 	}
 
@@ -103,6 +104,11 @@ function MatchlistDisplay.Matchlist(props)
 			})
 			or nil
 
+		local dateHeaderNode = match.bracketData.dateHeader
+			and match.dateIsExact
+			and MatchlistDisplay.DateHeader({match = match})
+			or nil
+
 		local matchNode = MatchlistDisplay.Match({
 			MatchSummaryContainer = config.MatchSummaryContainer,
 			Opponent = config.Opponent,
@@ -111,7 +117,7 @@ function MatchlistDisplay.Matchlist(props)
 			matchHasDetails = config.matchHasDetails,
 		})
 
-		matchlistNode:node(titleNode):node(headerNode):node(matchNode)
+		matchlistNode:node(titleNode):node(headerNode):node(dateHeaderNode):node(matchNode)
 	end
 
 	return matchlistNode
@@ -207,6 +213,16 @@ function MatchlistDisplay.Header(props)
 		:wikitext(props.header)
 
 	return DisplayUtil.applyOverflowStyles(headerNode, 'wrap')
+end
+
+--[[
+Display component for a dateHeader in a matchlist.
+]]
+function MatchlistDisplay.DateHeader(props)
+	local dateHeaderNode = mw.html.create('div'):addClass('brkts-matchlist-header')
+		:node(DisplayHelper.MatchCountdownBlock(props.match))
+
+	return DisplayUtil.applyOverflowStyles(dateHeaderNode, 'wrap')
 end
 
 --[[

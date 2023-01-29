@@ -7,10 +7,12 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
-local String = require('Module:String')
-local BasicInfobox = require('Module:Infobox/Basic')
+local String = require('Module:StringUtils')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -37,6 +39,7 @@ function Building:createInfobox()
 			imageDefault = args.default,
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Building Information'},
@@ -107,7 +110,7 @@ function Building:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkey.hotkey2(args.hotkey, args.hotkey2, 'slash')
 		else
 			display = Hotkey.hotkey(args.hotkey)
 		end

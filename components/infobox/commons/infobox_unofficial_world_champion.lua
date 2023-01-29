@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local String = require('Module:String')
-local BasicInfobox = require('Module:Infobox/Basic')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -31,7 +33,12 @@ function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = 'Unofficial World Champion', image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = 'Unofficial World Champion',
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Current Champion'},
 		Center{content = { args['current champion'] }, classes = { 'infobox-size-20', 'infobox-bold' }},
@@ -40,14 +47,14 @@ function UnofficialWorldChampion:createInfobox()
 				if not String.isEmpty(args['gained date']) then
 					local contentCell
 					if not (String.isEmpty(args['gained against result']) or String.isEmpty(args['gained against'])) then
-						contentCell = args['gained against result'] ..  ' vs ' .. args['gained against']
+						contentCell = args['gained against result'] .. ' vs ' .. args['gained against']
 					elseif not String.isEmpty(args['gained against result']) then
-						contentCell = args['gained against result'] ..  ' vs Unknown'
+						contentCell = args['gained against result'] .. ' vs Unknown'
 					elseif not String.isEmpty(args['gained against']) then
 						contentCell = ' vs ' .. args['gained against']
 					end
 					return {
-						Title{name = 'Title gained'},
+						Title{name = 'Title Gained'},
 						Cell{
 							name = args['gained date'],
 							content = { contentCell },
@@ -56,7 +63,7 @@ function UnofficialWorldChampion:createInfobox()
 				end
 			end
 		},
-		Title{name = 'Most defences'},
+		Title{name = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
 			content = { args['most defences'] },
@@ -92,7 +99,7 @@ function UnofficialWorldChampion:createInfobox()
 		},
 		Title{name = 'Most Times Held'},
 		Cell{
-			name = (args['most times held no'] or '?') .. ' days',
+			name = (args['most times held no'] or '?') .. ' times',
 			content = { args['most times held'] },
 		},
 		Customizable{id = 'custom', children = {}},

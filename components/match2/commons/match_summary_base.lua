@@ -8,6 +8,11 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Break = Class.new(
 	function(self)
@@ -45,6 +50,39 @@ end
 function Header:rightOpponent(content)
 	self.rightElement = content
 	return self
+end
+
+function Header:createOpponent(opponent, side, style)
+	local showLink = not Opponent.isTbd(opponent) and true or false
+	return OpponentDisplay.BlockOpponent{
+		flip = side == 'left',
+		opponent = opponent,
+		showLink = showLink,
+		overflow = 'ellipsis',
+		teamStyle = style or 'short',
+	}
+end
+
+function Header:createScore(opponent)
+	local isWinner, scoreText
+	if opponent.placement2 then
+		-- Bracket Reset, show W/L
+		if opponent.placement2 == 1 then
+			isWinner = true
+			scoreText = 'W'
+		else
+			isWinner = false
+			scoreText = 'L'
+		end
+	else
+		isWinner = opponent.placement == 1 or opponent.advances
+		scoreText = OpponentDisplay.InlineScore(opponent)
+	end
+
+	return OpponentDisplay.BlockScore{
+		isWinner = isWinner,
+		scoreText = scoreText,
+	}
 end
 
 function Header:create()
@@ -96,9 +134,20 @@ local Mvp = Class.new(
 )
 
 function Mvp:addPlayer(player)
-	if not Logic.isEmpty(player) then
-		table.insert(self.players, player)
+	local playerDisplay
+	if Logic.isEmpty(player) then
+		return self
+	elseif type(player) == 'table' then
+		playerDisplay = '[[' .. player.name .. '|' .. player.displayname .. ']]'
+		if player.comment then
+			playerDisplay = playerDisplay .. ' (' .. player.comment .. ')'
+		end
+	else
+		playerDisplay = '[[' .. player .. ']]'
 	end
+
+	table.insert(self.players, playerDisplay)
+
 	return self
 end
 
@@ -112,12 +161,7 @@ end
 function Mvp:create()
 	local span = mw.html.create('span')
 	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
-	for index, player in ipairs(self.players) do
-		if index > 1 then
-			span:wikitext(', ')
-		end
-		span:wikitext('[['..player..']]')
-	end
+		:wikitext(table.concat(self.players, ', '))
 	if self.points and self.points ~= 1 then
 		span:wikitext(' ('.. self.points ..'pts)')
 	end
@@ -165,12 +209,38 @@ local Footer = Class.new(
 		self.root = mw.html.create('div')
 		self.root:addClass('brkts-popup-footer')
 		self.inner = mw.html.create('div')
-		self.inner:addClass('brkts-popup-spaced')
+		self.inner:addClass('brkts-popup-spaced vodlink')
 	end
 )
 
 function Footer:addElement(element)
 	self.inner:node(element)
+	return self
+end
+
+function Footer:addLink(link, icon, iconDark, text)
+	local content
+	if String.isEmpty(iconDark) then
+		content = '[['..icon..'|link='..link..'|15px|'..text..'|alt=' .. link .. ']]'
+	else
+		content = '[['..icon..'|link='..link..'|15px|'..text..'|alt=' .. link .. '|class=show-when-light-mode]]'
+			.. '[['..iconDark..'|link='..link..'|15px|'..text..'|alt=' .. link .. '|class=show-when-dark-mode]]'
+	end
+
+	self.inner:wikitext(content)
+	return self
+end
+
+function Footer:addLinks(linkData, links)
+	for linkType, link in pairs(links) do
+		local currentLinkData = linkData[linkType]
+		if not currentLinkData then
+			mw.log('Unknown link: ' .. linkType)
+		else
+			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
+		end
+	end
+
 	return self
 end
 
@@ -206,6 +276,17 @@ function MatchSummary:body(body)
 	return self
 end
 
+function MatchSummary:resetBody(resetBody)
+	self.resetBodyElement = resetBody:create()
+	return self
+end
+
+function MatchSummary:resetHeader(resetHeader)
+	self.resetHeader = resetHeader:create()
+		:addClass('brkts-popup-header-reset')
+	return self
+end
+
 function MatchSummary:comment(comment)
 	self.commentElement = comment:create()
 	return self
@@ -216,12 +297,28 @@ function MatchSummary:footer(footer)
 	return self
 end
 
+function MatchSummary._fallbackResetHeader()
+	return mw.html.create('div')
+		:addClass('brkts-popup-body-element brkts-popup-header-reset')
+		:css('margin','auto')
+		:css('font-weight', 'bold')
+		:wikitext('Reset match')
+end
+
 function MatchSummary:create()
 	self.root
 		:node(self.headerElement)
 		:node(Break():create())
 		:node(self.bodyElement)
 		:node(Break():create())
+
+	if self.resetBodyElement then
+		self.root
+			:node(self.resetHeader or MatchSummary._fallbackResetHeader())
+			:node(Break():create())
+			:node(self.resetBodyElement)
+			:node(Break():create())
+	end
 
 	if self.commentElement ~= nil then
 		self.root

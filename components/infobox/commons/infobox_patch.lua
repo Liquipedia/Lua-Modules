@@ -7,9 +7,11 @@
 --
 
 local Class = require('Module:Class')
-local BasicInfobox = require('Module:Infobox/Basic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -33,7 +35,12 @@ function Patch:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Patch Information'},
 		Cell{name = 'Version', content = {args.version}},

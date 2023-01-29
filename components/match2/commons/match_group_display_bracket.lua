@@ -16,11 +16,12 @@ local MathUtil = require('Module:MathUtil')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
-local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+
+local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
 local html = mw.html
 local _NON_BREAKING_SPACE = '&nbsp;'
@@ -29,6 +30,7 @@ local BracketDisplay = {propTypes = {}, types = {}}
 
 function BracketDisplay.configFromArgs(args)
 	return {
+		forceShortName = Logic.readBoolOrNil(args.forceShortName),
 		headerHeight = tonumber(args.headerHeight),
 		headerMargin = tonumber(args.headerMargin),
 		hideRoundTitles = Logic.readBoolOrNil(args.hideRoundTitles),
@@ -46,6 +48,7 @@ end
 BracketDisplay.types.BracketConfig = TypeUtil.struct({
 	MatchSummaryContainer = 'function',
 	OpponentEntry = 'function',
+	forceShortName = 'boolean',
 	headerHeight = 'number',
 	headerMargin = 'number',
 	hideRoundTitles = 'boolean',
@@ -97,11 +100,12 @@ function BracketDisplay.Bracket(props)
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
 		OpponentEntry = propsConfig.OpponentEntry or BracketDisplay.OpponentEntry,
+		forceShortName = propsConfig.forceShortName or defaultConfig.forceShortName,
 		headerHeight = propsConfig.headerHeight or defaultConfig.headerHeight,
 		headerMargin = propsConfig.headerMargin or defaultConfig.headerMargin,
 		hideRoundTitles = propsConfig.hideRoundTitles or false,
 		lineWidth = propsConfig.lineWidth or defaultConfig.lineWidth,
-		matchHasDetails = propsConfig.matchHasDetails or matchHasDetailsWikiSpecific or DisplayHelper.defaultMatchHasDetails,
+		matchHasDetails = propsConfig.matchHasDetails or WikiSpecific.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
 		matchMargin = propsConfig.matchMargin or math.floor(defaultConfig.opponentHeight / 4),
 		matchWidth = propsConfig.matchWidth or defaultConfig.matchWidth,
 		matchWidthMobile = propsConfig.matchWidthMobile or defaultConfig.matchWidthMobile,
@@ -119,6 +123,7 @@ function BracketDisplay.Bracket(props)
 		:css('--match-width-mobile', config.matchWidthMobile .. 'px')
 		:css('--score-width', config.scoreWidth .. 'px')
 		:css('--round-horizontal-margin', config.roundHorizontalMargin .. 'px')
+		:css('--opponent-height', config.opponentHeight .. 'px')
 
 	-- Draw all top level subtrees of the bracket. These are subtrees rooted
 	-- at matches that do not advance to higher rounds.
@@ -441,6 +446,7 @@ function BracketDisplay.NodeBody(props)
 		MatchSummaryContainer = config.MatchSummaryContainer,
 		OpponentEntry = config.OpponentEntry,
 		match = match,
+		forceShortName = config.forceShortName,
 		matchHasDetails = config.matchHasDetails,
 		opponentHeight = config.opponentHeight,
 	})
@@ -464,6 +470,7 @@ function BracketDisplay.NodeBody(props)
 			MatchSummaryContainer = config.MatchSummaryContainer,
 			OpponentEntry = config.OpponentEntry,
 			match = thirdPlaceMatch,
+			forceShortName = config.forceShortName,
 			matchHasDetails = config.matchHasDetails,
 			opponentHeight = config.opponentHeight,
 		})
@@ -531,6 +538,7 @@ BracketDisplay.propTypes.Match = {
 	OpponentEntry = 'function',
 	MatchSummaryContainer = 'function',
 	match = MatchGroupUtil.types.Match,
+	forceShortName = 'boolean',
 	matchHasDetails = 'function',
 	opponentHeight = 'number',
 }
@@ -546,6 +554,7 @@ function BracketDisplay.Match(props)
 	for ix, opponent in ipairs(props.match.opponents) do
 		local opponentEntryNode = props.OpponentEntry({
 			displayType = 'bracket',
+			forceShortName = props.forceShortName,
 			height = props.opponentHeight,
 			opponent = opponent,
 		})
@@ -800,7 +809,7 @@ This is the default opponent entry component. Specific wikis may override this
 by passing in a different props.OpponentEntry in the Bracket component.
 ]]
 function BracketDisplay.OpponentEntry(props)
-	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent)
+	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent, {forceShortName = props.forceShortName})
 	if props.displayType == 'bracket' then
 		opponentEntry:addScores(props.opponent)
 	end

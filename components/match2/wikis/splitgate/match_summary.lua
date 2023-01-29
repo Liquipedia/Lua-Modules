@@ -14,7 +14,6 @@ local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -28,19 +27,27 @@ local _ICONS = {
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport.png', text = 'LiveReport.png'},
+	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
+	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 }
 
 local CustomMatchSummary = {}
 
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local options = {mergeBracketResetMatch = false}
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, options)
+	local bracketResetMatch = match and match.bracketData and match.bracketData.bracketResetMatchId
+		and MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, match.bracketData.bracketResetMatchId, options)
 
 	local matchSummary = MatchSummary():init()
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 		:body(CustomMatchSummary._createBody(match))
+
+	if bracketResetMatch then
+		matchSummary:resetHeader(CustomMatchSummary._createHeader(bracketResetMatch))
+			:resetBody(CustomMatchSummary._createBody(bracketResetMatch))
+	end
 
 	-- comment
 	if match.comment then
@@ -94,28 +101,12 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(CustomMatchSummary._createOpponent(match.opponents[1], 'left'))
-	      :leftScore(CustomMatchSummary._createScore(match.opponents[1]))
-	      :rightScore(CustomMatchSummary._createScore(match.opponents[2]))
-	      :rightOpponent(CustomMatchSummary._createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
-end
-
-function CustomMatchSummary._createScore(opponent)
-	return OpponentDisplay.BlockScore{
-		isWinner = opponent.placement == 1,
-		scoreText = OpponentDisplay.InlineScore(opponent),
-	}
-end
-
-function CustomMatchSummary._createOpponent(opponent, side)
-	return OpponentDisplay.BlockOpponent{
-		flip = side == 'left',
-		opponent = opponent,
-		overflow = 'wrap',
-		teamStyle = 'short',
-	}
 end
 
 function CustomMatchSummary._createBody(match)

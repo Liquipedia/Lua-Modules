@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Injector = Class.new()
 
 function Injector:parse(id, widgets)
-	return {}
+	return widgets
 end
 
 function Injector:addCustomCells(widgets)

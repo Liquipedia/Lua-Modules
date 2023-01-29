@@ -12,8 +12,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local _MAX_NUM_OPPONENTS = 8
@@ -23,7 +25,7 @@ local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
+local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -33,7 +35,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(_, match)
+function CustomMatchGroupInput.processMatch(match)
 	-- Count number of maps, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
@@ -52,7 +54,7 @@ function CustomMatchGroupInput.processMatch(_, match)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(_, map)
+function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -60,25 +62,33 @@ function CustomMatchGroupInput.processMap(_, map)
 	return map
 end
 
--- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processOpponent(_, opponent)
-	-- check for empty opponent and convert to literal
-	if type(opponent) == 'table' and opponent.type == 'team' and Logic.isEmpty(opponent.template) then
-		opponent.name = ''
-		opponent.type = 'literal'
+function CustomMatchGroupInput.processOpponent(record, date)
+	local opponent = Opponent.readOpponentArgs(record)
+		or Opponent.blank()
+
+	-- Convert byes to literals
+	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	-- check for lazy bye's and convert them to literals
-	if type(opponent) == 'table' and string.lower(opponent.template or '') == 'bye' then
-			opponent.name = 'BYE'
-			opponent.type = 'literal'
+	local teamTemplateDate = date
+	-- If date if epoch, resolve using tournament dates instead
+	-- Epoch indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+		teamTemplateDate = Variables.varDefaultMulti(
+			'tournament_enddate',
+			'tournament_startdate',
+			_EPOCH_TIME_EXTENDED
+		)
 	end
 
-	return opponent
+	Opponent.resolve(opponent, teamTemplateDate)
+	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(_, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
@@ -274,7 +284,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
+			date = _EPOCH_TIME_EXTENDED,
 			dateexact = false,
 		}
 	end
@@ -282,33 +292,19 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	match.type = Logic.emptyOr(match.type, Variables.varDefault('tournament_type'))
-	match.tournament = Logic.emptyOr(match.tournament, Variables.varDefault('tournament_name'))
-	match.tickername = Logic.emptyOr(match.tickername, Variables.varDefault('tournament_ticker_name'))
-	match.shortname = Logic.emptyOr(match.shortname, Variables.varDefault('tournament_shortname'))
-	match.series = Logic.emptyOr(match.series, Variables.varDefault('tournament_series'))
-	match.icon = Logic.emptyOr(match.icon, Variables.varDefault('tournament_icon'))
-	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault("tournament_icon_dark"))
+	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
+
+	-- no infobox legue on the git for splitgate, so using custom vars
+	-- to be removed once splitgate has infobox league standardized
+	match.icondark = Logic.emptyOr(match.iconDark, Variables.varDefault('tournament_icon_dark'))
 	match.liquipediatier = Logic.emptyOr(match.liquipediatier, Variables.varDefault('tournament_tier'))
 	match.liquipediatiertype = Logic.emptyOr(match.liquipediatiertype, Variables.varDefault('tournament_tier_type'))
-	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
-	return match
+
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
-	match.stream = match.stream or {}
-	match.stream = {
-		stream = Logic.emptyOr(match.stream.stream, Variables.varDefault('stream')),
-		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
-		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
-		afreeca = Logic.emptyOr(match.stream.afreeca or match.afreeca, Variables.varDefault('afreeca')),
-		afreecatv = Logic.emptyOr(match.stream.afreecatv or match.afreecatv, Variables.varDefault('afreecatv')),
-		dailymotion = Logic.emptyOr(match.stream.dailymotion or match.dailymotion, Variables.varDefault('dailymotion')),
-		douyu = Logic.emptyOr(match.stream.douyu or match.douyu, Variables.varDefault('douyu')),
-		smashcast = Logic.emptyOr(match.stream.smashcast or match.smashcast, Variables.varDefault('smashcast')),
-		youtube = Logic.emptyOr(match.stream.youtube or match.youtube, Variables.varDefault('youtube')),
-		facebook = Logic.emptyOr(match.stream.facebook or match.facebook, Variables.varDefault('facebook')),
-	}
+	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
@@ -333,7 +329,6 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		comment = match.comment,
 		mapveto = matchFunctions.getMapVeto(match),
 		mvp = matchFunctions.getMVP(match),
 		isconverted = 0
@@ -387,16 +382,11 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			--retrieve name and icon for teams from team templates
-			if opponent.type == 'team' and
-				not Logic.isEmpty(opponent.template, match.date) then
-					local name, icon, template = opponentFunctions.getTeamNameAndIcon(opponent.template, match.date)
-					opponent.template = template or opponent.template
-					opponent.name = opponent.name or name
-					opponent.icon = opponent.icon or icon
-			end
-			if not String.isEmpty(opponent.name) then
-				opponent.name = mw.ext.TeamLiquidIntegration.resolve_redirect(opponent.name)
+			CustomMatchGroupInput.processOpponent(opponent, match.date)
+
+			-- Retrieve icon for team
+			if opponent.type == Opponent.team then
+				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
 			end
 
 			-- apply status
@@ -520,37 +510,26 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	map.type = Logic.emptyOr(map.type, Variables.varDefault('tournament_type'))
-	map.tournament = Logic.emptyOr(map.tournament, Variables.varDefault('tournament_name'))
-	map.shortname = Logic.emptyOr(map.shortname, Variables.varDefault('tournament_shortname'))
-	map.series = Logic.emptyOr(map.series, Variables.varDefault('tournament_series'))
-	map.icon = Logic.emptyOr(map.icon, Variables.varDefault('tournament_icon'))
-	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault("tournament_icon_dark"))
+
+	-- no infobox legue on the git for splitgate, so using custom vars
+	-- to be removed once splitgate has infobox league standardized
+	map.icondark = Logic.emptyOr(map.iconDark, Variables.varDefault('tournament_icon_dark'))
 	map.liquipediatier = Logic.emptyOr(map.liquipediatier, Variables.varDefault('tournament_tier'))
 	map.liquipediatiertype = Logic.emptyOr(map.liquipediatiertype, Variables.varDefault('tournament_tier_type'))
-	return map
+
+	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 --
 -- opponent related functions
 --
-function opponentFunctions.getTeamNameAndIcon(template, date)
-	local team, icon
-	date = mw.getContentLanguage():formatDate('Y-m-d', date or '')
-	template = (template or ''):lower():gsub('_', ' ')
-	if template ~= '' and template ~= 'noteam' and
-		mw.ext.TeamTemplate.teamexists(template) then
-
-		local templateData = mw.ext.TeamTemplate.raw(template, date)
-		icon = templateData.image
-		if icon == '' then
-			icon = templateData.legacyimage
-		end
-		team = templateData.page
-		template = templateData.templatename or template
+function opponentFunctions.getIcon(template)
+	local raw = mw.ext.TeamTemplate.raw(template)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
 	end
-
-	return team, icon, template
 end
 
 return CustomMatchGroupInput

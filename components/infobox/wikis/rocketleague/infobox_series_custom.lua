@@ -6,10 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Series = require('Module:Infobox/Series')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+
 local Language = mw.language.new('en')
 
 local CustomSeries = {}
@@ -26,7 +31,7 @@ function CustomSeries.run(frame)
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 	_series = series
 
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
 function CustomSeries:createWidgetInjector()

@@ -80,4 +80,24 @@ function ArrayExt.groupAdjacentBy(array, f, equals)
 	return groups
 end
 
+--[[
+Returns distinct elements of an array.
+
+Example:
+
+ArrayExt.distinct({4, 5, 4, 3})
+-- Returns {4, 5, 3}
+]]
+function ArrayExt.distinct(elements)
+	local elementCache = {}
+	local distinctElements = {}
+	for _, element in ipairs(elements) do
+		if elementCache[element] == nil then
+			table.insert(distinctElements, element)
+			elementCache[element] = true
+		end
+	end
+	return distinctElements
+end
+
 return ArrayExt

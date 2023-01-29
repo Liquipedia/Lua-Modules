@@ -6,12 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Mission = require('Module:Infobox/CampaignMission')
-local String = require('Module:StringUtils')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Header = require('Module:Infobox/Widget/Header')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Mission = Lua.import('Module:Infobox/CampaignMission', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
 
 local CustomMission = Class.new()
 
@@ -33,7 +37,7 @@ function CustomMission.run(frame)
 	_args = mission.args
 	mission.createWidgetInjector = CustomMission.createWidgetInjector
 	mission.getWikiCategories = CustomMission.getWikiCategories
-	return mission:createInfobox(frame)
+	return mission:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -54,7 +58,7 @@ function CustomMission._getEvolution()
 	elseif evolution == 'None' then
 		return evolution
 	else
-		return '[[evolution (Heart of the Swarm Campaign)|evolution]]'
+		return '[[' .. evolution .. ' (Heart of the Swarm Campaign)|' .. evolution .. ']]'
 	end
 end
 

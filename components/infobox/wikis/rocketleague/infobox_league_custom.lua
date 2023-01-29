@@ -6,17 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
-local String = require('Module:String')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
 local TournamentNotability = require('Module:TournamentNotability')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -26,6 +32,11 @@ local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
 
+local _TIER_1 = 1
+local _H2H_TIER_THRESHOLD = 5
+
+local _PSYONIX = 'Psyonix'
+
 local _league
 
 function CustomLeague.run(frame)
@@ -34,8 +45,10 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -53,7 +66,7 @@ function CustomInjector:addCustomCells(widgets)
 		content = {CustomLeague:_createGameCell(args.game)}
 	})
 	table.insert(widgets, Cell{
-		name = 'Misc Mode:',
+		name = 'Misc Mode',
 		content = {args.miscmode}
 	})
 
@@ -79,7 +92,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = maps})
 		end
 
-
 		if not String.isEmpty(args.team_number) then
 			table.insert(widgets, Title{name = 'Teams'})
 			table.insert(widgets, Cell{
@@ -87,20 +99,6 @@ function CustomInjector:parse(id, widgets)
 				content = {args.team_number}
 			})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize pool',
-				content = {CustomLeague:_createPrizepool(args)}
-			},
-		}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia Tier',
-				content = {CustomLeague:_createTier(args)}
-			},
-		}
 	end
 	return widgets
 end
@@ -112,7 +110,7 @@ function CustomLeague:addCustomCells(infobox, args)
 	return infobox
 end
 
-function CustomLeague:_createTier(args)
+function CustomLeague:createLiquipediaTierDisplay(args)
 	local content = ''
 
 	local tier = args.liquipediatier
@@ -143,41 +141,23 @@ function CustomLeague:_createTier(args)
 	return content
 end
 
-function CustomLeague:_createPrizepool(args)
-	if String.isEmpty(args.prizepool) and
-		String.isEmpty(args.prizepoolusd) then
-			return nil
+function CustomLeague:liquipediaTierHighlighted()
+	if (
+		String.isNotEmpty(_league.args.liquipediatiertype) or
+		tonumber(_league.args.liquipediatier) ~= _TIER_1
+	) then
+		return false
 	end
 
-	local content
-	local prizepool = args.prizepool
-	local prizepoolInUsd = args.prizepoolusd
-	local localCurrency = args.localcurrency
+	return CustomLeague:containsPsyonix('organizer') or
+		CustomLeague:containsPsyonix('sponsor')
+end
 
-	if String.isEmpty(prizepool) then
-		content = '$' .. prizepoolInUsd .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
-	else
-		if not String.isEmpty(localCurrency) then
-			content = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{localCurrency:lower(), prizepool = prizepool}
-			)
-		else
-			content = prizepool
-		end
-
-		if not String.isEmpty(prizepoolInUsd) then
-			content = content .. '<br>(≃ $' .. prizepoolInUsd .. ' ' ..
-				Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
-		end
-	end
-
-	if not String.isEmpty(prizepoolInUsd) then
-		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
-	end
-
-	return content
+function CustomLeague:containsPsyonix(prefix)
+	return Table.any(
+		League:getAllArgsForBase(_league.args, prefix),
+		function (_, value) return value == _PSYONIX end
+	)
 end
 
 function CustomLeague:defineCustomPageVariables(args)
@@ -210,23 +190,31 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_participant_number', 0)
 	Variables.varDefine('tournament_participants', '(')
 	Variables.varDefine('tournament_teamplayers', args.mode == _MODE_2v2 and 2 or 3)
+	Variables.varDefine('showh2h', CustomLeague.parseShowHeadToHead(args))
+end
+
+function CustomLeague.parseShowHeadToHead(args)
+	return Logic.emptyOr(
+		args.showh2h,
+		tostring((tonumber(args.liquipediatier) or _H2H_TIER_THRESHOLD) < _H2H_TIER_THRESHOLD)
+	)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData['game'] = 'rocket league'
 	lpdbData['patch'] = args.patch
 	lpdbData['participantsnumber'] = args.team_number or args.player_number
-	lpdbData['extradata'] = {
-		region = args.region,
-		mode = args.mode,
-		notabilitymod = args.notabilitymod,
-		liquipediatiertype2 = args.liquipediatiertype2,
-		participantsnumber =
-			not String.isEmpty(args.team_number) and args.team_number or args.player_number,
-		notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
-	}
 
-	lpdbData['extradata']['is rlcs'] = Variables.varDefault('tournament_rlcs_premier', 0)
+	lpdbData.extradata.region = args.region
+	lpdbData.extradata.mode = args.mode
+	lpdbData.extradata.notabilitymod = args.notabilitymod
+	lpdbData.extradata.liquipediatiertype2 = args.liquipediatiertype2
+	lpdbData.extradata.notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
+	lpdbData.extradata['is rlcs'] = Variables.varDefault('tournament_rlcs_premier', 0)
+	lpdbData.extradata.participantsnumber =
+			not String.isEmpty(args.team_number) and args.team_number or args.player_number
+
+
 	return lpdbData
 end
 

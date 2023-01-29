@@ -7,12 +7,15 @@
 --
 
 local Class = require('Module:Class')
-local InfoboxBasic = require('Module:Infobox/Basic')
-local Links = require('Module:Links')
 local Flags = require('Module:Flags')
+local Links = require('Module:Links')
+local Locale = require('Module:Locale')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local String = require('Module:String')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -24,13 +27,13 @@ local Builder = Widgets.Builder
 
 local Language = mw.language.new('en')
 
-local Company = Class.new(InfoboxBasic)
+local Company = Class.new(BasicInfobox)
 
 local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
 function Company.run(frame)
 	local company = Company(frame)
-	return company:createInfobox(frame)
+	return company:createInfobox()
 end
 
 function Company:createInfobox()
@@ -38,22 +41,33 @@ function Company:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{name = args.name, image = args.image, imageDark = args.imagedark or args.imagedarkmode},
+		Header{
+			name = args.name,
+			image = args.image,
+			imageDark = args.imagedark or args.imagedarkmode,
+			size = args.imagesize,
+		},
 		Center{content = {args.caption}},
 		Title{name = 'Company Information'},
-		Cell{
-			name = 'Parent company',
-			content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
-		},
-		Cell{name = 'Founded', content = {args.foundeddate},},
-		Cell{name = 'Defunct', content = {args.defunctdate},},
+		Customizable{id = 'parent', children = {
+			Cell{
+				name = 'Parent Company',
+				content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
+			}
+		}},
+		Customizable{id = 'dates', children = {
+			Cell{name = 'Founded', content = {args.foundeddate or args.founded}},
+			Cell{name = 'Defunct', content = {args.defunctdate or args.defunct}},
+		}},
 		Cell{
 			name = 'Location',
 			content = {self:_createLocation(args.location)},
 		},
 		Cell{name = 'Headquarters', content = {args.headquarters}},
-		Cell{name = 'Employees', content = {args.employees}},
-		Cell{name = 'Traded as', content = {args.tradedas}},
+		Customizable{id = 'employees', children = {
+			Cell{name = 'Employees', content = {args.employees}},
+		}},
+		Cell{name = 'Trades as', content = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
@@ -61,7 +75,7 @@ function Company:createInfobox()
 					infobox:categories('Tournament organizers')
 					return {
 						Cell{
-							name = 'Total prize money',
+							name = 'Total Prize Money',
 							content = {self:_getOrganizerPrizepools()}
 						}
 					}
@@ -87,6 +101,7 @@ function Company:createInfobox()
 		image = args.image,
 		imagedark = args.imagedark or args.imagedarkmode,
 		location = args.location,
+		locations = Locale.formatLocations(args),
 		headquarterslocation = args.headquarters,
 		parentcompany = args.parent,
 		foundeddate = ReferenceCleaner.clean(args.foundeddate),

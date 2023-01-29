@@ -18,6 +18,12 @@ https://cdn.eslgaming.com/misc/media/lo/ESL%20Pro%20Tour%20-%20CSGO%20General%20
 ]]
 return {
 	{
+		name = 'Others',
+		countries = {
+			'Non-representing',
+		},
+	},
+	{
 		name = 'Americas',
 		countries = {
 			'Anguilla',

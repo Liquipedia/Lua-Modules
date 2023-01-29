@@ -26,7 +26,7 @@ function Class.new(base, init)
 		for index, value in pairs(base) do
 			instance[index] = value
 		end
-	  instance._base = base
+		instance._base = base
 	end
 
 	instance.__index = instance
@@ -75,7 +75,10 @@ function Class.new(base, init)
 	return instance
 end
 
-
+---@generic T
+---@param class T
+---@param options ?table
+---@return T
 function Class.export(class, options)
 	for name, f in pairs(class) do
 		-- We only want to export functions, and only functions which are public (no underscore)

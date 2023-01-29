@@ -7,7 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
+local Lua = require('Module:Lua')
+
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 local Cell = Class.new(Widget,
 	function(self, input)
@@ -41,7 +43,6 @@ function Cell:_class(...)
 end
 
 function Cell:_content(...)
-	self.contentText = ...
 	local firstItem = select(1, ...)
 	if firstItem == nil or firstItem == '' then
 		self.contentDiv = nil
