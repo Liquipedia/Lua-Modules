@@ -134,19 +134,25 @@ function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
 		return Earnings.calculatePerYear(conditions, divisionFactor)
 	end
 
-	local prizePoolColumn = Earnings._getPrizePoolType(divisionFactor)
+	local individualEarnings = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = conditions,
+		query = 'sum::individualprizemoney',
+		groupby = 'namespace asc'
+	})[1]
+
+	if individualEarnings and individualEarnings.sum_individualprizemoney > 0 then
+		return MathUtils._round(individualEarnings.sum_individualprizemoney)
+	end
 
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
-		query = 'mode, sum::' .. prizePoolColumn,
+		query = 'mode, sum::prizemoney',
 		groupby = 'mode asc'
 	})
 
 	local totalEarnings = 0
-
 	for _, item in ipairs(lpdbQueryData) do
-		local prizeMoney = item['sum_' .. prizePoolColumn]
-		totalEarnings = totalEarnings + Earnings._applyDivisionFactor(prizeMoney, divisionFactor, item['mode'])
+		totalEarnings = totalEarnings + Earnings._applyDivisionFactor(item.sum_prizemoney, divisionFactor, item.mode)
 	end
 
 	return MathUtils._round(totalEarnings)
@@ -223,10 +229,6 @@ end
 -- customizable in /Custom
 function Earnings.divisionFactorTeam(mode)
 	return 1
-end
-
-function Earnings._getPrizePoolType(divisionFactor)
-	return divisionFactor == nil and 'individualprizemoney' or 'prizemoney'
 end
 
 function Earnings._applyDivisionFactor(prizeMoney, divisionFactor, mode)
