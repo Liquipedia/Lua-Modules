@@ -86,11 +86,11 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 			Cell{name = 'Game mode', content = {
-					CustomLeague:_getGameMode()
+					CustomLeague._getGameMode()
 				}
 			},
 			Cell{name = 'Platform', content = {
-					CustomLeague:_getPlatform()
+					CustomLeague._getPlatform()
 				}
 			},
 		}
@@ -135,7 +135,7 @@ function CustomLeague:liquipediaTierHighlighted()
 	return Logic.readBool(_args.pubgpremier)
 end
 
-function CustomLeague:_getGameMode()
+function CustomLeague._getGameMode()
 	if String.isEmpty(_args.perspective) and String.isEmpty(_args.mode) then
 		return nil
 	end
@@ -157,7 +157,7 @@ function CustomLeague:_getGameMode()
 	return mode .. '&nbsp;' .. table.concat(displayPerspectives, '&nbsp;')
 end
 
-function CustomLeague:_getPlatform()
+function CustomLeague._getPlatform()
 	if String.isEmpty(_args.platform) then
 		return nil
 	end
