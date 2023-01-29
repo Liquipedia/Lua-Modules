@@ -51,7 +51,6 @@ function CustomOpponentDisplay.BlockOpponent(props)
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
 	if opponent.type == Opponent.literal and opponent.extradata.hasRaceOrFlag then
-		props.showRace = false
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	elseif Opponent.typeIsParty((opponent or {}).type) then
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
