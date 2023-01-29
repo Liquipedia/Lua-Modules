@@ -20,38 +20,27 @@ local PlayerDisplay = Lua.import('Module:Player/Display/Custom', {requireDevIfEn
 
 local CustomOpponentDisplay = {propTypes = {}, types={}}
 
-CustomOpponentDisplay.propTypes.InlineOpponent = {
-	flip = 'boolean?',
+CustomOpponentDisplay.propTypes.InlineOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.InlineOpponent, {
 	opponent = MatchGroupUtil.types.GameOpponent,
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
 	showRace = 'boolean?',
-	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
-}
+})
 
 function CustomOpponentDisplay.InlineOpponent(props)
 	DisplayUtil.assertPropTypes(props, CustomOpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
 
-	if Opponent.partySize((opponent or {}).type) then -- opponent.type == 'solo' 'duo' 'trio' 'quad'
+	if Opponent.typeIsParty((opponent or {}).type) then
 		return CustomOpponentDisplay.InlinePlayers(props)
 	end
 
 	return OpponentDisplay.InlineOpponent(props)
 end
 
-CustomOpponentDisplay.propTypes.BlockOpponent = {
-	flip = 'boolean?',
+CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.BlockOpponent, {
 	opponent = MatchGroupUtil.types.GameOpponent,
-	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
-	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 	playerClass = 'string?',
-	abbreviateTbd = 'boolean?',
-}
+})
 
 function CustomOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, CustomOpponentDisplay.propTypes.BlockOpponent)
@@ -61,10 +50,10 @@ function CustomOpponentDisplay.BlockOpponent(props)
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
-	if opponent.type == 'literal' and opponent.extradata.hasRaceOrFlag then
+	if opponent.type == Opponent.literal and opponent.extradata.hasRaceOrFlag then
 		props.showRace = false
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
-	elseif Opponent.partySize((opponent or {}).type) then -- opponent.type == 'solo' 'duo' 'trio' 'quad'
+	elseif Opponent.typeIsParty((opponent or {}).type) then
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	end
 
