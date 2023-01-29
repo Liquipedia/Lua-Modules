@@ -168,10 +168,10 @@ function Earnings.calculatePerYear(conditions, divisionFactor, indivudalEarnings
 	Lpdb.executeMassQuery('placement', {
 		conditions = conditions,
 		query = 'mode, date, individualprizemoney, prizemoney',
-	}, function (entry)
-		local year = string.sub(entry.date, 1, 4)
-		local prizeMoney = indivudalEarningsAllowed and tonumber(entry.individualprizemoney)
-			or Earnings._applyDivisionFactor(tonumber(entry.prizemoney), divisionFactor, entry.mode) or 0
+	}, function (item)
+		local year = string.sub(item.date, 1, 4)
+		local prizeMoney = indivudalEarningsAllowed and tonumber(item.individualprizemoney)
+			or Earnings._applyDivisionFactor(tonumber(item.prizemoney), divisionFactor, item.mode) or 0
 		earningsData[year] = (earningsData[year] or 0) + prizeMoney
 	end)
 
