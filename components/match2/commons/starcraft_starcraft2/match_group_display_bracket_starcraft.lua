@@ -6,13 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-local RaceColor = Lua.loadDataIfExists('Module:RaceColorClass') or {}
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
@@ -68,7 +68,7 @@ function StarcraftBracketDisplay.OpponentEntry(props)
 		or opponent.advances
 
 	local leftNode = html.create('div'):addClass('brkts-opponent-entry-left')
-		:addClass(showRaceBackground and RaceColor[opponent.players[1].race] or nil)
+		:addClass(showRaceBackground and Faction.bgClass(opponent.players[1].race) or nil)
 		:addClass(isWinner and 'brkts-opponent-win' or nil)
 
 	if opponent.type == 'team' then

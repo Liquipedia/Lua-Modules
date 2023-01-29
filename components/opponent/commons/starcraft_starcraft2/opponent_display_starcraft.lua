@@ -181,7 +181,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 		return playerNodes[1]
 
 	elseif showRace and opponent.isArchon then
-		local raceIcon = Faction.Icon{size = 'large', showLink = false, showTitle = false, faction = opponent.players[1].race}
+		local raceIcon = Faction.Icon{size = 'large', faction = opponent.players[1].race}
 		return StarcraftOpponentDisplay.BlockArchon({
 			flip = props.flip,
 			playerNodes = playerNodes,
@@ -196,7 +196,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 		for archonIx = 1, #opponent.players / 2 do
 			local primaryRace = opponent.players[2 * archonIx - 1].race
 			local secondaryRace = opponent.players[2 * archonIx].race
-			local primaryIcon = Faction.Icon{size = 'large', showLink = false, showTitle = false, faction = primaryRace}
+			local primaryIcon = Faction.Icon{size = 'large', faction = primaryRace}
 			local secondaryIcon
 			if primaryRace ~= secondaryRace then
 				secondaryIcon = html.create('div')
