@@ -54,5 +54,5 @@ return {
 	defaultGame = 'reforged',
 	defaultTeamLogo = 'Warcraft III logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Warcraft III logo.png', ---@deprecated
-  opponentDisplayLibrary = 'OpponentDisplay/Custom',
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }
