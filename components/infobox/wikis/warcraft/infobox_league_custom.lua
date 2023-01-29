@@ -328,7 +328,7 @@ function CustomLeague:defineCustomPageVariables()
 
 		Variables.varDefine('tournament_starttime', startTime)
 		Variables.varDefine('start_time', startTime)
-		local timeZone = _args.starttime:match('data-tz="(.*)"')
+		local timeZone = _args.starttime:match('data%-tz="(.-)"')
 		if timeZone then
 			Variables.varDefine('tournament_timezone', timeZone)
 		end
