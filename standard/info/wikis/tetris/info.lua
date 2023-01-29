@@ -7,6 +7,7 @@
 --
 
 return {
+	startYear = '1984',
 	wikiName = 'tetris',
 	name = 'Tetris',
 	games = {
