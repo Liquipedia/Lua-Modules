@@ -10,6 +10,7 @@
 
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -106,18 +107,7 @@ function CustomPerson.readFactions(input)
 		factions = Faction.readMultiFaction(input, {alias = false})
 	end
 
-	local isAll = false
-	-- check if factions == Faction.coreFactions modulo order
-	if #factions == Table.size(Faction.coreFactions) then
-		local coreFactionsInFactions = Array.filter(
-			Faction.coreFactions,
-			function(faction) return Table.includes(factions, faction) end
-		)
-
-		if #coreFactionsInFactions == #factions then
-			isAll = true
-		end
-	end
+	local isAll = Table.deepEquals(Array.sortBy(factions, FnUtil.identity), Faction.coreFactions)
 
 	factions = Array.map(factions, Faction.toName)
 
