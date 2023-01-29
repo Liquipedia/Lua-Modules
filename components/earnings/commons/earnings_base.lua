@@ -64,7 +64,7 @@ function Earnings.calculateForPlayer(args)
 	end
 	playerConditions = playerConditions .. ')'
 
-	return Earnings.calculate(playerConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorPlayer)
+	return Earnings.calculate(playerConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorPlayer, true)
 end
 
 ---
@@ -114,34 +114,33 @@ function Earnings.calculateForTeam(args)
 	local teamConditions = '(' .. formatParicipant('participant', queryTeams) .. ' OR '
 		.. formatParicipant('extradata_participantteam', queryTeams) .. ' OR '
 		.. formatParicipant('participantlink', queryTeams) ..')'
-	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam)
+	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, Earnings.divisionFactorTeam, false)
 end
 
----
--- Calculates earnings for this participant in a certain mode
--- @participantCondition - the condition to find the player/team
--- @year - (optional) the year to calculate earnings for
--- @mode - (optional) the mode to calculate earnings for
--- @perYear - (optional) query all earnings per year and return the values in a lua table
--- @divisionFactor - divisionFactor function
----
--- customizable in case query has to be changed
--- (e.g. SC2 due to not having a fixed number of players per team)
-function Earnings.calculate(conditions, year, mode, perYear, divisionFactor)
+---Calculates money earned based on given condition parameters
+---@param conditions string the condition to find the player/team
+---@param year number|string|nil the year to calculate earnings for
+---@param mode string? the mode to calculate earnings for
+---@param perYear boolean? query all earnings per year and return the values in a lua table
+---@param divisionFactor? fun(mode: string):number divisionFactor function
+---@param indivudalEarningsAllowed boolean? can use individual prizemoney field if it exists
+function Earnings.calculate(conditions, year, mode, perYear, divisionFactor, indivudalEarningsAllowed)
 	conditions = Earnings._buildConditions(conditions, year, mode)
 
 	if Logic.readBool(perYear) then
 		return Earnings.calculatePerYear(conditions, divisionFactor)
 	end
 
-	local individualEarnings = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = conditions,
-		query = 'sum::individualprizemoney',
-		groupby = 'namespace asc'
-	})[1]
+	if indivudalEarningsAllowed then
+		local individualEarnings = mw.ext.LiquipediaDB.lpdb('placement', {
+			conditions = conditions,
+			query = 'sum::individualprizemoney',
+			groupby = 'namespace asc'
+		})[1]
 
-	if individualEarnings and individualEarnings.sum_individualprizemoney > 0 then
-		return MathUtils._round(individualEarnings.sum_individualprizemoney)
+		if individualEarnings and individualEarnings.sum_individualprizemoney > 0 then
+			return MathUtils._round(individualEarnings.sum_individualprizemoney)
+		end
 	end
 
 	local lpdbQueryData = mw.ext.LiquipediaDB.lpdb('placement', {
