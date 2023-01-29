@@ -46,8 +46,7 @@ local MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 40
 local NUMBER_OF_RECENT_MATCHES = 10
 
 --race stuff
-local AVAILABLE_RACES = Table.copy(Faction.knownFactions)
-table.insert(AVAILABLE_RACES, 'total')
+local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
