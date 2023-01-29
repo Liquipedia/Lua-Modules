@@ -22,7 +22,7 @@ function CustomTeam.run(frame)
 	_team = team
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
-  team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
+	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
 	return team:createInfobox()
 end
 
