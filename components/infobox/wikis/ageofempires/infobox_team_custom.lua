@@ -64,7 +64,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Games',
-		content = _args.games and CustomTeam._getGames() or {}
+		content = CustomTeam._getGames()
 	})
 	return widgets
 end
@@ -72,11 +72,11 @@ end
 function CustomTeam._getGames()
 	local games = CustomTeam._queryGames()
 
-	local manualGames = Array.map(
+	local manualGames = _args.games and Array.map(
 		mw.text.split(_args.games, ','),
 		function(game)
 			return {game = GameLookup.getName(mw.text.trim(game))}
-		end)
+		end) or {}
 
 	Array.extendWith(games, Array.filter(manualGames,
 		function(entry)
@@ -90,14 +90,15 @@ function CustomTeam._getGames()
 	dateThreshold.year = dateThreshold.year - INACTIVITY_THRESHOLD_YEARS
 	dateThreshold = os.date('!%F', os.time(dateThreshold))
 
-	local isActive = function(date)
-		return date and date >= dateThreshold
+	local isActive = function(game)
+		local placement = CustomTeam._getLatestPlacement(game)
+		return placement and placement.date and placement.date >= dateThreshold
 	end
 
 	games = Array.map(
 		games,
 		function(entry)
-			return entry.game .. (isActive(entry.date) and '' or ' <i><small>(Inactive)</small></i>')
+			return entry.game .. (isActive(entry.game) and '' or ' <i><small>(Inactive)</small></i>')
 		end)
 
 	return games
@@ -106,8 +107,7 @@ end
 function CustomTeam._queryGames()
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = CustomTeam._buildTeamPlacementConditions():toString(),
-			order = 'date desc',
-			query = 'game, date',
+			query = 'game',
 			groupby = 'game asc',
 		})
 
@@ -116,6 +116,25 @@ function CustomTeam._queryGames()
 	end
 
 	return data
+end
+
+function CustomTeam._getLatestPlacement(game)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		CustomTeam._buildTeamPlacementConditions(),
+		ConditionNode(ColumnName('game'), Comparator.eq, game)
+	}
+	local data = mw.ext.LiquipediaDB.lpdb('placement', {
+			conditions = conditions:toString(),
+			query = 'date',
+			order = 'date desc',
+			limit = 1
+		})
+
+	if type(data) ~= 'table' then
+		error(data)
+	end
+
+	return data[1]
 end
 
 function CustomTeam._buildTeamPlacementConditions()
