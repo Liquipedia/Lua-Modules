@@ -102,18 +102,23 @@ function League:createInfobox()
 				)
 			}
 		},
-		Builder{
-			builder = function()
-				local organizers = self:_createOrganizers(args)
-				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
+		Customizable{
+			id = 'organizers',
+			children = {
+				Builder{
+					builder = function()
+						local organizers = self:_createOrganizers(args)
+						local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
 
-				return {
-					Cell{
-						name = title,
-						content = organizers
-					}
-				}
-			end
+						return {
+							Cell{
+								name = title,
+								content = organizers
+							}
+						}
+					end
+				},
+			},
 		},
 		Customizable{
 			id = 'sponsors',
@@ -176,7 +181,7 @@ function League:createInfobox()
 						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
 					end
 
-					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
+					table.insert(venues, self:createLink(venueName, nil, args[prefix .. 'link'], description))
 				end
 
 				return {Cell{
@@ -580,7 +585,7 @@ function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
 	end
 end
 
-function League:_createLink(id, name, link, desc)
+function League:createLink(id, name, link, desc)
 	if String.isEmpty(id) then
 		return nil
 	end
@@ -617,7 +622,7 @@ end
 
 function League:_createOrganizers(args)
 	local organizers = {
-		League:_createLink(
+		self:createLink(
 			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
 	}
 
@@ -626,7 +631,7 @@ function League:_createOrganizers(args)
 	while not String.isEmpty(args['organizer' .. index]) do
 		table.insert(
 			organizers,
-			League:_createLink(
+			self:createLink(
 				args['organizer' .. index],
 				args['organizer' .. index .. '-name'],
 				args['organizer' .. index .. '-link'],
