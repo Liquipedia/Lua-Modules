@@ -23,6 +23,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
+local PRIZE_TYPE_POINTS = 'POINTS'
 local TIER_VALUE = {10, 6, 4, 2}
 
 -- Template entry point
@@ -60,9 +61,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
 
 	-- legacy points, to be standardized
-	lpdbData.extradata.points = placement.prizeRewards.POINTS1 or opponent.prizeRewards.POINTS1
+	lpdbData.extradata.points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.points)
-	lpdbData.extradata.points2 = placement.prizeRewards.POINTS2 or opponent.prizeRewards.POINTS2
+	lpdbData.extradata.points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.points2)
 
 	local prizeIsQualifier = function(prize)
