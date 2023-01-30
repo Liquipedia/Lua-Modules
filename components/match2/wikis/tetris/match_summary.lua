@@ -97,7 +97,7 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Iterate each map
-	for gameIndex, game in ipairs(match.games) do
+	for _, game in ipairs(match.games) do
 		body:addRow(CustomMatchSummary._createGame(game))
 	end
 
@@ -108,7 +108,7 @@ function CustomMatchSummary._createGame(game)
 	local row = MatchSummary.Row()
 
 	row:addClass('brkts-popup-body-game')
-		:css('font-size', '80%')
+		:css('font-size', '84%')
 		:css('padding', '4px')
 		:css('min-height', '32px')
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
