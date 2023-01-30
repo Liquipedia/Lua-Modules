@@ -138,7 +138,7 @@ function CustomTeam._getLatestPlacement(game)
 end
 
 function CustomTeam._buildTeamPlacementConditions()
-	local team = _args.teamtemplate or _pagename
+	local team = _args.teamtemplate or _args.name or _pagename
 	local rawOpponentTemplate = TeamTemplates.queryRaw(team) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 	if not opponentTemplate then
