@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -134,7 +133,7 @@ function CustomMatchGroupInput._adjustData(match)
 	if CustomMatchGroupInput._hasTeamOpponent(match) then
 		error('Team opponents are currently not yet supported on tetris wiki')
 		-- todo (sep PR):
-		-- Each set contains various 1v1 matches with different players, when a team wins 3 1v1s matches they win the set 
+		-- Each set contains various 1v1 matches with different players, when a team wins 3 1v1s matches they win the set
 		-- First team to get 2 set, wins the complete series
 		-- match = CustomMatchGroupInput._subMatchStructure(match)
 	end
