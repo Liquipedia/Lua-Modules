@@ -8,10 +8,9 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local PlacementSummary = require('Module:Placement summary')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
-
-local PlacementSummary = require('Module:Placement summary')
 
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
