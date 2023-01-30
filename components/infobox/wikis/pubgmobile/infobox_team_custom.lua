@@ -26,15 +26,19 @@ function CustomTeam.run(frame)
 end
 
 function CustomTeam:createBottomContent()
+	local upcomingTable = ''
+	if not _team.args.disbanded then
+		upcomingTable = upcomingTable .. Template.expandTemplate(
+			mw.getCurrentFrame(),
+			'Upcoming and ongoing tournaments of',
+			{team = _team.name or _team.pagename}
+		) 
+	end
 	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing tournaments of',
-		{team = _team.name or _team.pagename}
-	) ..  Template.expandTemplate(
 		mw.getCurrentFrame(),
 		'Placement summary',
 		{team = _team.pagename}
-	)
+		) .. upcomingTable
 end
 
 function CustomTeam:defineCustomPageVariables(args)
