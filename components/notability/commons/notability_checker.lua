@@ -144,7 +144,7 @@ function NotabilityChecker._calculateWeight(placementData)
 
 			local weight = NotabilityChecker.calculateTournament(
 				placement.liquipediatier, placement.liquipediatiertype, placement.placement,
-				placement.date, placement.extradata, placement.mode
+				placement.date, placement.mode, placement.extradata
 			)
 			table.insert(weights, weight)
 		end
@@ -158,7 +158,7 @@ function NotabilityChecker._calculateWeight(placementData)
 	return finalWeight
 end
 
-function NotabilityChecker.calculateTournament(tier, tierType, placement, date, extradata, mode)
+function NotabilityChecker.calculateTournament(tier, tierType, placement, date, mode, extradata)
 	local dateLossModifier = NotabilityChecker._calculateDateLoss(date)
 	local notabilityModifier = NotabilityChecker._parseNotabilityMod(extradata.notabilitymod)
 	local parsedTier, parsedTierType = NotabilityChecker._parseTier(tier, tierType)
