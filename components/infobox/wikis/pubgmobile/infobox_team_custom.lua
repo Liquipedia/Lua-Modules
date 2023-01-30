@@ -32,7 +32,7 @@ function CustomTeam:createBottomContent()
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
 			{team = _team.name or _team.pagename}
-		) 
+		)
 	end
 	return Template.expandTemplate(
 		mw.getCurrentFrame(),
