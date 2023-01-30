@@ -79,7 +79,7 @@ function CustomPerson.nameDisplay()
 		raceIcons = RACE_ALL_ICON
 	else
 		raceIcons = table.concat(Array.map(raceData.factions, function(faction)
-			return Faction.Icon{faction = faction, size = 'large'}
+			return Faction.Icon{faction = faction, size = 'medium'}
 		end))
 	end
 
