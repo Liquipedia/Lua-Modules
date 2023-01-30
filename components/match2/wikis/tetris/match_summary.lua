@@ -50,7 +50,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 		if match.vod then
 			footer:addElement(VodLink.display{
-				vod = vod,
+				vod = match.vod,
 			})
 		end
 
@@ -79,7 +79,7 @@ function CustomMatchSummary._createHeader(match)
 	return header
 end
 
-function CustomMatchSummary._createBody(match, matchId)
+function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.timestamp ~= DateExt.epochZero) then
@@ -93,18 +93,18 @@ function CustomMatchSummary._createBody(match, matchId)
 	if Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end) then
 		error('Team matches not yet supported')
 		-- todo (in sep PR): team match submatch support
-		--return CustomMatchSummary._createTeamMatchBody(body, match, matchId)
+		--return CustomMatchSummary._createTeamMatchBody(body, match)
 	end
 
 	-- Iterate each map
 	for gameIndex, game in ipairs(match.games) do
-		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
+		body:addRow(CustomMatchSummary._createGame(game))
 	end
 
 	return body
 end
 
-function CustomMatchSummary._createGame(game, gameIndex, date)
+function CustomMatchSummary._createGame(game)
 	local row = MatchSummary.Row()
 
 	row:addClass('brkts-popup-body-game')
@@ -114,7 +114,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
-		:wikitext('Game ' .. gameIndex)
+		:wikitext(game.map)
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 
