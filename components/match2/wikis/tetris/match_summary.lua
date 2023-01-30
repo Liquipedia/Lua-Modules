@@ -17,8 +17,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -53,14 +52,6 @@ function CustomMatchSummary.getByMatchId(args)
 		-- Match Vod + other links
 		local buildLink = function (link, icon, text)
 			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-
-		for linkType, link in pairs(match.links) do
-			if not LINK_DATA[linkType] then
-				mw.log('Unknown link: ' .. linkType)
-			else
-				footer:addElement(buildLink(link, LINK_DATA[linkType].icon, LINK_DATA[linkType].text))
-			end
 		end
 
 		-- Game Vods
