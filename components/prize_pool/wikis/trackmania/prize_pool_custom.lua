@@ -14,6 +14,7 @@ local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local CustomLpdbInjector = Class.new(LpdbInjector)
@@ -47,8 +48,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		Variables.varDefault('tournament_type')
 	)
 
-	if lpdbData.objectName == 'ranking_tbd' then
-		lpdbData.objectName = 'ranking_tbd_' .. lpdbData.placement
+	if Opponent.isTbd(opponent.opponentData) then
+		lpdbData.objectName = lpdbData.objectName .. '_' .. lpdbData.placement
 	end
 
 	local worldTourPoints = Array.filter(placement.parent.prizes, function (prize)
