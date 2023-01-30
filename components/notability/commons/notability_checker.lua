@@ -144,7 +144,7 @@ function NotabilityChecker._calculateWeight(placementData)
 
 			local weight = NotabilityChecker.calculateTournament(
 				placement.liquipediatier, placement.liquipediatiertype, placement.placement,
-				placement.date, placement.extradata.notabilitymod, placement.mode
+				placement.date, placement.extradata, placement.mode
 			)
 			table.insert(weights, weight)
 		end
@@ -158,13 +158,13 @@ function NotabilityChecker._calculateWeight(placementData)
 	return finalWeight
 end
 
-function NotabilityChecker.calculateTournament(tier, tierType, placement, date, notabilityMod, mode)
+function NotabilityChecker.calculateTournament(tier, tierType, placement, date, extradata, mode)
 	local dateLossModifier = NotabilityChecker._calculateDateLoss(date)
-	local notabilityModifier = NotabilityChecker._parseNotabilityMod(notabilityMod)
+	local notabilityModifier = NotabilityChecker._parseNotabilityMod(extradata.notabilitymod)
 	local parsedTier, parsedTierType = NotabilityChecker._parseTier(tier, tierType)
 
 	local weight = NotabilityChecker._calculateWeightForTournament(
-		parsedTier, parsedTierType, placement, dateLossModifier, notabilityModifier, mode
+		parsedTier, parsedTierType, placement, dateLossModifier, notabilityModifier, mode, extradata
 	)
 
 	if NotabilityChecker.LOGGING then
@@ -177,7 +177,7 @@ function NotabilityChecker.calculateTournament(tier, tierType, placement, date, 
 	return weight
 end
 
-function NotabilityChecker._calculateWeightForTournament(tier, tierType, placement, dateLoss, notabilityMod, mode)
+function NotabilityChecker._calculateWeightForTournament(tier, tierType, placement, dateLoss, notabilityMod, mode, extradata)
 	if String.isEmpty(tier) then
 		return 0
 	end
@@ -192,7 +192,7 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 			return pointsForType['name'] == (tierType or Config.TIER_TYPE_GENERAL)
 		end
 	)['points']
-	local placementDropOffFunction = Config.placementDropOffFunction(tier, tierType)
+	local placementDropOffFunction = Config.placementDropOffFunction(tier, tierType, extradata)
 
 	local placementValue = NotabilityChecker._preparePlacement(placement)
 
