@@ -60,8 +60,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
 
 	-- legacy points, to be standardized
-	lpdbData.extradata.points = placement.prizeRewards.POINTS1
-	lpdbData.extradata.points2 = placement.prizeRewards.POINTS2
+	lpdbData.extradata.points = placement.prizeRewards.POINTS1 or opponent.prizeRewards.POINTS1
+	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.points)
+	lpdbData.extradata.points2 = placement.prizeRewards.POINTS2 or opponent.prizeRewards.POINTS2
+	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.points2)
 
 	local prizeIsQualifier = function(prize)
 		return prize.type == PRIZE_TYPE_QUALIFIES
