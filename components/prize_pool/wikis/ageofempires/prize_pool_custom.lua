@@ -63,7 +63,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	-- legacy points, to be standardized
 	lpdbData.extradata.points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.points)
-	lpdbData.extradata.points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+	lpdbData.extradata.points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
 	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.points2)
 
 	local prizeIsQualifier = function(prize)
