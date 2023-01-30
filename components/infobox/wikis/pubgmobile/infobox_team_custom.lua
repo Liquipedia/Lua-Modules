@@ -11,6 +11,8 @@ local Lua = require('Module:Lua')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
+local PlacementSummary = require('Module:Placement summary')
+
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local CustomTeam = Class.new()
@@ -34,11 +36,7 @@ function CustomTeam:createBottomContent()
 			{team = _team.name or _team.pagename}
 		)
 	end
-	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Placement summary',
-		{team = _team.pagename}
-		) .. upcomingTable
+	return tostring(PlacementSummary.get_data({team = _team.pagename})) .. upcomingTable
 end
 
 function CustomTeam:defineCustomPageVariables(args)
