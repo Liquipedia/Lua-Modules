@@ -425,6 +425,7 @@ function CustomMatchGroupInput._processPlayerMapData(map, match)
 				participants
 			)
 		elseif opponent.type == Opponent.team then
+			error('Team opponents are currently not yet supported on tetris wiki')
 			--[[ todo in a sep PR:
 			CustomMatchGroupInput._processTeamPlayerMapData(
 				opponent.match2players or {},
