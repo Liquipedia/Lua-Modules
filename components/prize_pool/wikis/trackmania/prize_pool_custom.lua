@@ -47,6 +47,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		Variables.varDefault('tournament_type')
 	)
 
+	if lpdbData.objectName == 'ranking_tbd' then
+		lpdbData.objectName = 'ranking_tbd_' .. lpdbData.placement
+	end
+
 	local worldTourPoints = Array.filter(placement.parent.prizes, function (prize)
 		if prize.type == PRIZE_TYPE_POINTS and prize.data.title == PRIZE_TITLE_WORLD_TOUR then
 			return true
