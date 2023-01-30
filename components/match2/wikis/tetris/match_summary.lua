@@ -27,11 +27,11 @@ local CustomMatchSummary = {}
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
-	local matchSummary = MatchSummary():init('360px')
+	local matchSummary = MatchSummary():init()
 	matchSummary.root:css('flex-wrap', 'unset')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match, args.matchId))
+				:body(CustomMatchSummary._createBody(match))
 
 	if match.comment then
 		local comment = MatchSummary.Comment():content(match.comment)
@@ -44,14 +44,14 @@ function CustomMatchSummary.getByMatchId(args)
 			vods[index] = game.vod
 		end
 	end
-	match.links.vod = match.vod
 
 	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
 		local footer = MatchSummary.Footer()
 
-		-- Match Vod + other links
-		local buildLink = function (link, icon, text)
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
+		if match.vod then
+			footer:addElement(VodLink.display{
+				vod = vod,
+			})
 		end
 
 		-- Game Vods
@@ -59,7 +59,6 @@ function CustomMatchSummary.getByMatchId(args)
 			footer:addElement(VodLink.display{
 				gamenum = index,
 				vod = vod,
-				source = vod.url
 			})
 		end
 
