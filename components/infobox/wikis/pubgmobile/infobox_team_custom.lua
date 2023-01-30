@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local PlacementSummary = require('Module:Placement summary')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -26,15 +27,15 @@ function CustomTeam.run(frame)
 end
 
 function CustomTeam:createBottomContent()
-	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing tournaments of',
-		{team = _team.name or _team.pagename}
-	) ..  Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Placement summary',
-		{team = _team.name or _team.pagename}
-	)
+	local upcomingTable = ''
+	if not _team.args.disbanded then
+		upcomingTable = upcomingTable .. Template.expandTemplate(
+			mw.getCurrentFrame(),
+			'Upcoming and ongoing tournaments of',
+			{team = _team.name or _team.pagename}
+		)
+	end
+	return tostring(PlacementSummary.get_data({team = _team.pagename})) .. upcomingTable
 end
 
 function CustomTeam:defineCustomPageVariables(args)
