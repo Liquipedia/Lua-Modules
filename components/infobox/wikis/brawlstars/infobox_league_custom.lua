@@ -128,7 +128,6 @@ function CustomLeague._createOrganizers()
 	end
 
 	return organizers
-	
 end
 
 return CustomLeague
