@@ -378,7 +378,7 @@ function Placement:_getLpdbData(...)
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 		if Opponent.isTbd(opponent.opponentData) then
 			_tbd_index = _tbd_index + 1
-			lpdbData.objectName = lpdbData.objectName .. _tbd_index
+			lpdbData.objectName = lpdbData.objectName .. '_' .. _tbd_index
 		end
 
 		if self.parent._lpdbInjector then
