@@ -53,7 +53,7 @@ end
 
 ---Check if a given game is a valid game.
 ---@param game: string?
----@return string?
+---@return boolean
 function Game.isValid(game)
 	return Table.isNotEmpty(Game.raw{game = game})
 end
