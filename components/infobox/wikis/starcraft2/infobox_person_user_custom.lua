@@ -1,54 +1,25 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:Infobox/Person/User
+-- page=Module:Infobox/Person/User/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace')
 local Lua = require('Module:Lua')
-local RaceIcon = require('Module:RaceIcon').getBigIcon
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
+local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
 local User = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
-
---race stuff tables
-local _FACTION1 = {
-	['p'] = 'Protoss', ['pt'] = 'Protoss', ['pz'] = 'Protoss',
-	['t'] = 'Terran', ['tp'] = 'Terran', ['tz'] = 'Terran',
-	['z'] = 'Zerg', ['zt'] = 'Zerg', ['zp'] = 'Zerg',
-	['r'] = 'Random', ['a'] = 'All'
-}
-local _FACTION2 = {
-	['pt'] = 'Terran', ['pz'] = 'Zerg',
-	['tp'] = 'Protoss', ['tz'] = 'Zerg',
-	['zt'] = 'Terran', ['zp'] = 'Protoss'
-}
-local _RACE_DISPLAY = {
-	['p'] = '[[Protoss]]',
-	['pt'] = '[[Protoss]],&nbsp;[[Terran]]',
-	['pz'] = '[[Protoss]],&nbsp;[[Zerg]]',
-	['t'] = '[[Terran]]',
-	['tp'] = '[[Terran]],&nbsp;[[Protoss]]',
-	['tz'] = '[[Terran]],&nbsp;[[Zerg]]',
-	['z'] = '[[Zerg]]',
-	['zt'] = '[[Zerg]],&nbsp;[[Terran]]',
-	['zp'] = '[[Zerg]],&nbsp;[[Protoss]]',
-	['r'] = '[[Random]]',
-	['a'] = '[[Protoss]],&nbsp;[[Terran]],&nbsp;[[Zerg]]',
-}
-
-local _raceData
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 
-local CustomUser = Class.new()
+local CustomUser = Class.new(User)
 
 local CustomInjector = Class.new(Injector)
 
@@ -58,12 +29,14 @@ function CustomUser.run(frame)
 	local user = User(frame)
 	user.args.informationType = user.args.informationType or 'User'
 	_args = user.args
+	PersonSc2.setArgs(_args)
 
 	user.shouldStoreData = CustomUser.shouldStoreData
 	user.getStatusToStore = CustomUser.getStatusToStore
 	user.getPersonType = CustomUser.getPersonType
 
-	user.nameDisplay = CustomUser.nameDisplay
+	user.nameDisplay = PersonSc2.nameDisplay
+
 	user.createWidgetInjector = CustomUser.createWidgetInjector
 
 	return user:createInfobox()
@@ -72,7 +45,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		return {
-			Cell{name = 'Race', content = {_raceData.display}}
+			Cell{name = 'Race', content = {PersonSc2.getRaceData(_args.race or 'unknown')}}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
@@ -105,7 +78,7 @@ function CustomInjector:addCustomCells()
 end
 
 function CustomUser:_getFavouriteTeams()
-	local foundArgs = User:getAllArgsForBase(_args, 'fav-team-')
+	local foundArgs = self:getAllArgsForBase(_args, 'fav-team-')
 
 	local display = ''
 	for _, item in ipairs(foundArgs) do
@@ -117,38 +90,13 @@ function CustomUser:_getFavouriteTeams()
 end
 
 function CustomUser:_getArgsfromBaseDefault(base, default)
-	local foundArgs = User:getAllArgsForBase(_args, base)
+	local foundArgs = self:getAllArgsForBase(_args, base)
 	table.insert(foundArgs, _args[default])
 	return foundArgs
 end
 
 function CustomUser:createWidgetInjector()
 	return CustomInjector()
-end
-
-function CustomUser:nameDisplay()
-	CustomUser._getRaceData(_args.race or 'unknown')
-	local raceIcon = RaceIcon({'alt_' .. _raceData.race})
-	local name = _args.id or self.pagename
-
-	return raceIcon .. '&nbsp;' .. name
-end
-
-function CustomUser._getRaceData(race)
-	race = string.lower(race)
-	race = CleanRace[race] or race
-	local display = _RACE_DISPLAY[race]
-	if not display and race ~= 'unknown' then
-		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
-			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
-	end
-
-	_raceData = {
-		race = race,
-		faction = _FACTION1[race] or '',
-		faction2 = _FACTION2[race] or '',
-		display = display
-	}
 end
 
 function CustomUser:shouldStoreData()
@@ -161,7 +109,7 @@ function CustomUser:getStatusToStore() return '' end
 function CustomUser:getCategories() return {} end
 
 function CustomUser:getPersonType()
-	return { store = 'User', category = 'User' }
+	return {store = 'User', category = 'User'}
 end
 
 return CustomUser

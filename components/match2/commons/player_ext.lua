@@ -105,7 +105,6 @@ function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 		'([[extradata_joindate::<' .. date .. ']] or [[extradata_joindate::' .. date .. ']])',
 		'[[extradata_joindate::>]]',
 		'[[extradata_leavedate::>' .. date .. ']]',
-		'[[extradata_position::player]]',
 	}
 	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = table.concat(conditions, ' and '),

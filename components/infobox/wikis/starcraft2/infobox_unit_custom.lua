@@ -7,11 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace')
-local CleanRaceFullName = require('Module:CleanRace2')
+local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -136,10 +134,9 @@ function CustomUnit:nameDisplay(args)
 end
 
 function CustomUnit._getRace(race)
-	race = string.lower(race)
-	_race = CleanRace[race] or race or ''
-	local category = CleanRaceFullName[_race]
-	local display = RaceIcon.getBigIcon({'alt_' .. _race})
+	_race = Faction.read(race)
+	local category = Faction.toName(_race)
+	local display = Faction.Icon{size = 'large', faction = _race} or ''
 	if not category and _race ~= 'unknown' then
 		category = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
