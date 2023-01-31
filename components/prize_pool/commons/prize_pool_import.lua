@@ -428,7 +428,7 @@ function Import._mergePlacement(lpdbEntries, placement)
 	end
 
 	assert(
-		#placement.opponents <= 1 + placement.placeEnd - placement.placeStart,
+		#placement.opponents <= placement.count,
 		'Import: Too many opponents returned from query for placement range '
 			.. placement:_displayPlace():gsub('&#045;', '-')
 	)
