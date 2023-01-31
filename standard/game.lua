@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
@@ -116,8 +115,8 @@ function Game.icon(args)
 		return Game._createIcon{icon = gameData.logo.lightMode, size = args.size, link = link}
 	end
 
-	return Game._createIcon{size = args.size, link = link, mode = 'light'}
-		.. Game._createIcon{size = args.size, link = link, mode = 'dark'}
+	return Game._createIcon{size = args.size, link = link, mode = 'light', logoData = gameData.logo}
+		.. Game._createIcon{size = args.size, link = link, mode = 'dark', logoData = gameData.logo}
 end
 
 ---@param args {mode: string?, icon: string?, size: string?, link: string?}
@@ -126,7 +125,7 @@ function Game._createIcon(args)
 	return String.interpolate(
 		ICON_STRING,
 		{
-			icon = args.icon or gameData.logo[args.mode .. 'Mode'],
+			icon = args.icon or args.logoData[args.mode .. 'Mode'],
 			size = args.size or DEFAULT_SIZE,
 			class = args.mode and ('show-when-' .. args.mode .. '-mode') or '',
 			link = args.link or '',
