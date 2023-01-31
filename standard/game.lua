@@ -13,7 +13,8 @@ local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Info = mw.loadData('Module:Info/dev')
+local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
+
 local GamesData = Info.games
 
 local ICON_STRING = '[[File:${icon}|link=${link}|class=${class}|${size}]]'
@@ -31,6 +32,8 @@ Game.getIdentifierByName = FnUtil.memoize(function()
 	return Table.map(GamesData, function(gameIdentifier, gameData) return gameData.name:lower(), gameIdentifier end)
 end)
 
+---@param args {game: string?, useDefault boolean?}
+---@return string?
 function Game.toIdentifier(args)
 	args = args or {}
 	local gameInput = args.game
@@ -127,7 +130,7 @@ function Game.isDefaultTeamLogo(args)
 		return false
 	end
 
-	logo = logo:gsub('_', ' ') --adjust according to the standard we want for the files in Module:Info
+	logo = logo:gsub('_', ' ')
 
 	if String.isEmpty(args.game) then
 		return Table.includes(Game.defaultTeamLogos(), logo)
