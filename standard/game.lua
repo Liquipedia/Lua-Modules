@@ -55,7 +55,7 @@ end
 ---@param game: string?
 ---@return string?
 function Game.isValid(game)
-	return Game.toIdentifier{game = game} ~= nil
+	return Table.isNotEmpty(Game.raw{game = game})
 end
 
 ---Fetches the raw data for a given game
