@@ -27,6 +27,8 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 -- Allowed none-numeric score values.
 local SPECIAL_SCORES = {'W', 'FF' , 'L', 'DQ', 'D'}
 
+local _tbd_index = 0
+
 --- @class Placement
 --- A Placement is a set of opponents who all share the same final place in the tournament.
 --- Its input is generally a table created by `Template:Placement`.
@@ -374,6 +376,10 @@ function Placement:_getLpdbData(...)
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
 
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
+		if Opponent.isTbd(opponent.opponentData) then
+			_tbd_index = _tbd_index + 1
+			lpdbData.objectName = lpdbData.objectName .. _tbd_index
+		end
 
 		if self.parent._lpdbInjector then
 			lpdbData = self.parent._lpdbInjector:adjust(lpdbData, self, opponent)
