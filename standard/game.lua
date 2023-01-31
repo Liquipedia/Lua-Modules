@@ -121,7 +121,7 @@ Game.defaultTeamLogos = FnUtil.memoize(function()
 		defaultTeamLogos[teamLogos.lightMode] = true
 	end
 
-	return Array.extractKeys(defaultTeamLogos)
+	return defaultTeamLogos
 end)
 
 function Game.isDefaultTeamLogo(args)
@@ -133,7 +133,7 @@ function Game.isDefaultTeamLogo(args)
 	logo = logo:gsub('_', ' ')
 
 	if String.isEmpty(args.game) then
-		return Table.includes(Game.defaultTeamLogos(), logo)
+		return Game.defaultTeamLogos()[logo] ~= nil
 	end
 
 	local defaultLogos = Game.raw(args).defaultTeamLogo
