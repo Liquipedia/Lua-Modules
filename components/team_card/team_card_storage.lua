@@ -83,7 +83,7 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 	end
 
 	lpdbData.mode = Variables.varDefault('tournament_mode', 'team')
-	lpdbData.publishertier = Variables.varDefault('tournament_publisher_tier')
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier')
 	lpdbData.icon = Variables.varDefault('tournament_icon')
 	lpdbData.icondark = Variables.varDefault('tournament_icondark')
 	lpdbData.game = Variables.varDefault('tournament_game')
