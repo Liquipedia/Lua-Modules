@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -18,6 +19,9 @@ local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = t
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
+
+local PRIZE_TYPE_POINTS = 'POINTS'
+local PRIZE_TITLE_WORLD_TOUR = 'WT'
 
 local TIER_VALUE = {8, 4, 2}
 local TYPE_MODIFIER = {Online = 0.65}
@@ -42,6 +46,20 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart,
 		Variables.varDefault('tournament_type')
 	)
+
+	local worldTourPoints = Array.filter(placement.parent.prizes, function (prize)
+		if prize.type == PRIZE_TYPE_POINTS and prize.data.title == PRIZE_TITLE_WORLD_TOUR then
+			return true
+		end
+	end)[1]
+
+	if worldTourPoints then
+		lpdbData.extradata.prizepoints = placement:getPrizeRewardForOpponent(opponent, worldTourPoints.id)
+		lpdbData.extradata.prizepointsTitle = 'wt_points'
+	end
+
+	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(lpdbData.participant:lower() .. '_prizepointsTitle', lpdbData.extradata.prizepointsTitle)
 
 	return lpdbData
 end

@@ -39,7 +39,7 @@ function CustomMapMaker.run(frame)
 	player.createBottomContent = CustomMapMaker.createBottomContent
 	player.createWidgetInjector = CustomMapMaker.createWidgetInjector
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)

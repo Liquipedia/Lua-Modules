@@ -33,7 +33,7 @@ function CustomCompany.run(frame)
 	local company = Company(frame)
 	company.createWidgetInjector = CustomCompany.createWidgetInjector
 	_args = company.args
-	return company:createInfobox(frame)
+	return company:createInfobox()
 end
 
 function CustomCompany:createWidgetInjector()

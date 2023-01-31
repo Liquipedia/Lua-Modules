@@ -7,10 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local CleanRace = mw.loadData('Module:CleanRace2')
+local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -38,7 +37,7 @@ function CustomStrategy.run(frame)
 	_strategy = customStrategy
 	_args = customStrategy.args
 	customStrategy.createWidgetInjector = CustomStrategy.createWidgetInjector
-	return customStrategy:createInfobox(frame)
+	return customStrategy:createInfobox()
 end
 
 function CustomStrategy:createWidgetInjector()
@@ -89,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomStrategy:_getNameDisplay()
-	local race = RaceIcon._getBigIcon({'alt_' .. (_args.race or '')}) or ''
+	local race = Faction.Icon{size = 'large', faction = _args.race} or ''
 	return race .. (_args.name or mw.title.getCurrentTitle().text)
 end
 
@@ -102,13 +101,16 @@ function CustomStrategy:_getTLarticle(tlarticle)
 end
 
 function CustomStrategy:_getCategories(race, matchups)
+	local categories = {}
+
 	if String.isEmpty(matchups) then
-		return {}
+		return categories
 	end
 
-	local categories = {}
-	race = string.lower(race or '')
-	race = CleanRace[race] or ''
+	race = Faction.toName(Faction.read(race))
+	if not race then
+		return categories
+	end
 
 	local informationType = _args.informationType
 	if informationType == 'Strategy' then

@@ -10,6 +10,22 @@ return {
 	startYear = 1996,
 	wikiName = 'fighters',
 	name = 'Fighting Games',
-	defaultTeamLogo = 'Fistlogo_std.png',
-	defaultTeamLogoDark = 'Fistlogo_std.png',
+	games = {
+		todo = {
+			abbreviation = 'todo',
+			name = 'TODO',
+			link = 'Main Page',
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Fistlogo std.png',
+				lightMode = 'Fistlogo std.png',
+			},
+		},
+	},
+	defaultGame = 'todo',
+	defaultTeamLogo = 'Fistlogo std.png', ---@deprecated
+	defaultTeamLogoDark = 'Fistlogo std.png', ---@deprecated
 }

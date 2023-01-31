@@ -89,7 +89,7 @@ function CustomPlayer.run(frame)
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 	player.getPersonType = CustomPlayer.getPersonType
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)

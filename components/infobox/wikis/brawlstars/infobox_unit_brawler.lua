@@ -35,7 +35,7 @@ function CustomUnit.run(frame)
 	unit.setLpdbData = CustomUnit.setLpdbData
 	unit.getWikiCategories = CustomUnit.getWikiCategories
 	unit.createWidgetInjector = CustomUnit.createWidgetInjector
-	return unit:createInfobox(frame)
+	return unit:createInfobox()
 end
 
 function CustomInjector:addCustomCells()

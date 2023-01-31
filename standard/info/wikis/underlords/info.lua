@@ -10,6 +10,22 @@ return {
 	startYear = 2019,
 	wikiName = 'underlords',
 	name = 'Dota Underlords',
-	defaultTeamLogo = 'Dota_Underlords_lightmode.png',
-	defaultTeamLogoDark = 'Dota_Underlords_darkmode.png',
+	games = {
+		underlords = {
+			abbreviation = 'Underlords',
+			name = 'Dota Underlords',
+			link = 'Dota Underlords',
+			logo = {
+				darkMode = 'Dota Underlords darkmode.png',
+				lightMode = 'Dota Underlords lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Dota Underlords darkmode.png',
+				lightMode = 'Dota Underlords lightmode.png',
+			},
+		},
+	},
+	defaultGame = 'underlords',
+	defaultTeamLogo = 'Dota Underlords lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Dota Underlords darkmode.png', ---@deprecated
 }

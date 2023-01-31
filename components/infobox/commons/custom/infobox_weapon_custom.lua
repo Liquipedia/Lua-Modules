@@ -14,7 +14,7 @@ local CustomWeapon = {}
 
 function CustomWeapon.run(frame)
 	local weapon = Weapon(frame)
-	return weapon:createInfobox(frame)
+	return weapon:createInfobox()
 end
 
 return CustomWeapon
