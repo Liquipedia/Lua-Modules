@@ -10,6 +10,22 @@ return {
 	startYear = 2016,
 	wikiName = 'battlerite',
 	name = 'Battlerite',
-	defaultTeamLogo = 'Battlerite_logo.png',
-	defaultTeamLogoDark = 'Battlerite_logo.png',
+	games = {
+		abbreviation = 'Battlerite',
+		name = 'Battlerite',
+		link = 'Battlerite',
+		battlerite = {
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Battlerite logo.png',
+				lightMode = 'Battlerite logo.png',
+			},
+		},
+	},
+	defaultGame = 'battlerite',
+	defaultTeamLogo = 'Battlerite logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Battlerite logo.png', ---@deprecated
 }

@@ -71,6 +71,7 @@ local _PRIORITY_GROUPS = {
 		'letsplaylive',
 		'matcherino',
 		'matcherinolink',
+		'royaleapi',
 		'siege-gg',
 		'sk',
 		'sostronk',
@@ -113,6 +114,12 @@ local _PRIORITY_GROUPS = {
 		'zhangyutv',
 		'bilibili-stream',
 		'kuaishou',
+		'cc',
+		'nimotv',
+		'openrec',
+		'steamtv',
+		'yandexefir',
+		'zhanqitv',
 	}
 }
 

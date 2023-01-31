@@ -49,7 +49,7 @@ function CustomPlayer.run(frame)
 	player.getCategories = CustomPlayer.getCategories
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -114,8 +114,8 @@ function CustomInjector:addCustomCells(widgets)
 	if not String.isEmpty(_args.mmr) then
 		mmrDisplay = '[[Leaderboards|' .. _args.mmr .. ']]'
 		if not String.isEmpty(_args.mmrdate) then
-			mmrDisplay = mmrDisplay .. '&nbsp;<small>\'\'('
-				.. _args.mmrdate .. ')\'\'</small>'
+			mmrDisplay = mmrDisplay .. '&nbsp;<small><i>('
+				.. _args.mmrdate .. ')</i></small>'
 		end
 	end
 

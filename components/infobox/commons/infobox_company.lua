@@ -33,7 +33,7 @@ local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
 function Company.run(frame)
 	local company = Company(frame)
-	return company:createInfobox(frame)
+	return company:createInfobox()
 end
 
 function Company:createInfobox()
@@ -49,18 +49,24 @@ function Company:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Company Information'},
-		Cell{
-			name = 'Parent Company',
-			content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
-		},
-		Cell{name = 'Founded', content = {args.foundeddate},},
-		Cell{name = 'Defunct', content = {args.defunctdate},},
+		Customizable{id = 'parent', children = {
+			Cell{
+				name = 'Parent Company',
+				content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
+			}
+		}},
+		Customizable{id = 'dates', children = {
+			Cell{name = 'Founded', content = {args.foundeddate or args.founded}},
+			Cell{name = 'Defunct', content = {args.defunctdate or args.defunct}},
+		}},
 		Cell{
 			name = 'Location',
 			content = {self:_createLocation(args.location)},
 		},
 		Cell{name = 'Headquarters', content = {args.headquarters}},
-		Cell{name = 'Employees', content = {args.employees}},
+		Customizable{id = 'employees', children = {
+			Cell{name = 'Employees', content = {args.employees}},
+		}},
 		Cell{name = 'Trades as', content = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
 		Builder{

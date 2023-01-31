@@ -61,6 +61,7 @@ function OpponentDisplay.BracketOpponentEntry:createPlayer(player)
 	local playerNode = PlayerDisplay.BlockPlayer({
 		player = player,
 		overflow = 'ellipsis',
+		showLink = false,
 	})
 	self.content:node(playerNode)
 end
@@ -98,9 +99,10 @@ end
 OpponentDisplay.propTypes.InlineOpponent = {
 	flip = 'boolean?',
 	opponent = MatchGroupUtil.types.GameOpponent,
-	showFlag = 'boolean?',
-	showLink = 'boolean?', -- does not affect opponent.type == 'team'
-	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
+	showFlag = 'boolean?', -- only affects opponent.type == 'solo'
+	showLink = 'boolean?', -- only affects opponent.type == 'solo'
+	dq = 'boolean?', -- only affects opponent.type == 'solo'
+	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle), -- only affects opponent.type == 'team'
 }
 
 --[[
@@ -126,6 +128,8 @@ function OpponentDisplay.InlineOpponent(props)
 			player = opponent.players[1],
 			flip = props.flip,
 			dq = props.dq,
+			showFlag = props.showFlag,
+			showLink = props.showLink
 		}
 
 	else

@@ -32,7 +32,7 @@ local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
 local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
-local VENUE_DESCRIPTION = "<br><small><small>(${desc})</small></small>"
+local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -187,15 +187,18 @@ function League:createInfobox()
 		},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
-			Cell{
+				Cell{
 					name = 'Prize Pool',
 					content = {self:_createPrizepool(args)},
 				},
 			},
 		},
-		Cell{name = 'Date', content = {args.date}},
-		Cell{name = 'Start Date', content = {args.sdate}},
-		Cell{name = 'End Date', content = {args.edate}},
+		Customizable{id = 'dates', children = {
+				Cell{name = 'Date', content = {args.date}},
+				Cell{name = 'Start Date', content = {args.sdate}},
+				Cell{name = 'End Date', content = {args.edate}},
+			},
+		},
 		Customizable{id = 'custom', children = {}},
 		Customizable{id = 'liquipediatier', children = {
 				Cell{
@@ -240,7 +243,7 @@ function League:createInfobox()
 		},
 	}
 
-	self.name = TextSanitizer.tournamentName(self.name)
+	self.name = TextSanitizer.stripHTML(self.name)
 
 	self.infobox:bottom(self:createBottomContent())
 
@@ -357,9 +360,9 @@ function League:_createPrizepool(args)
 end
 
 function League:_definePageVariables(args)
-	Variables.varDefine('tournament_name', TextSanitizer.tournamentName(args.name))
-	Variables.varDefine('tournament_shortname', TextSanitizer.tournamentName(args.shortname or args.abbreviation))
-	Variables.varDefine('tournament_tickername', TextSanitizer.tournamentName(args.tickername))
+	Variables.varDefine('tournament_name', TextSanitizer.stripHTML(args.name))
+	Variables.varDefine('tournament_shortname', TextSanitizer.stripHTML(args.shortname or args.abbreviation))
+	Variables.varDefine('tournament_tickername', TextSanitizer.stripHTML(args.tickername))
 	Variables.varDefine('tournament_icon', args.icon)
 	Variables.varDefine('tournament_icondark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
@@ -409,8 +412,8 @@ end
 function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
-		tickername = TextSanitizer.tournamentName(args.tickername),
-		shortname = TextSanitizer.tournamentName(args.shortname or args.abbreviation),
+		tickername = TextSanitizer.stripHTML(args.tickername),
+		shortname = TextSanitizer.stripHTML(args.shortname or args.abbreviation),
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = Variables.varDefault('tournament_icon'),
@@ -443,7 +446,7 @@ function League:_setLpdbData(args, links)
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
 		status = args.status,
-		format = args.format,
+		format = TextSanitizer.stripHTML(args.format),
 		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
 			League:_getNamedTableofAllArgsForBase(args, 'sponsor')
 		),

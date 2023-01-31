@@ -15,7 +15,7 @@ local CustomWebsite = Class.new()
 
 function CustomWebsite.run(frame)
 	local website = Website(frame)
-	return website:createInfobox(frame)
+	return website:createInfobox()
 end
 
 return CustomWebsite

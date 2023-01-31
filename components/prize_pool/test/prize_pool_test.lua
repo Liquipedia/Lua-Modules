@@ -37,19 +37,19 @@ function suite:testHeaderInput()
 
 	self:assertDeepEquals(
 		{
-			{id = 'USD1', type = 'USD', index = 1, data = {roundPrecision = 3}},
+			{id = 'BASE_CURRENCY1', type = 'BASE_CURRENCY', index = 1, data = {roundPrecision = 3}},
 			{id = 'LOCAL_CURRENCY1', type = 'LOCAL_CURRENCY', index = 1, data =
 				{
-					rate = 0.97821993318758, roundPrecision = 3,
-					currency = 'EUR', currencyText = '€&nbsp;<abbr title="Euro">EUR</abbr>',
-					symbol = "€", symbolFirst = true
+					rate = 0.97821993318758,
+					roundPrecision = 3,
+					currency = 'EUR',
 				}
 			},
 			{id = 'LOCAL_CURRENCY2', type = 'LOCAL_CURRENCY', index = 2, data =
 				{
-					rate = 0.088712426073718, roundPrecision = 3,
-					currency = 'SEK', currencyText = '&nbsp;kr&nbsp;<abbr title="Swedish krona">SEK</abbr>',
-					symbol = " kr", symbolFirst = false
+					rate = 0.088712426073718,
+					roundPrecision = 3,
+					currency = 'SEK',
 				}
 			},
 			{id = 'QUALIFIES1', type = 'QUALIFIES', index = 1, data = {title = 'A Display', link = 'A_Tournament'}},
@@ -62,7 +62,7 @@ function suite:testHeaderInput()
 	self:assertDeepEquals(
 		{
 			abbreviateTbd = true,
-			autoUSD = true,
+			autoExchange = true,
 			currencyRatePerOpponent = false,
 			currencyRoundPrecision = 3,
 			cutafter = 4,
@@ -71,7 +71,7 @@ function suite:testHeaderInput()
 			lpdbPrefix = 'abc',
 			prizeSummary = true,
 			resolveRedirect = false,
-			showUSD = true,
+			showBaseCurrency = true,
 			storeLpdb = true,
 			storeSmw = true,
 			syncPlayers = false,
@@ -83,7 +83,8 @@ function suite:testHeaderInput()
 		'<div style="overflow-x:auto">$<abbr title="To Be Announced">TBA</abbr>&nbsp;<abbr title="United States Dollar">' ..
 		'USD</abbr> are spread among the participants as seen below:<br>' ..
 		'<div class="csstable-widget collapsed general-collapsible prizepooltable"' ..
-		' style="grid-template-columns:repeat(8, auto);width:max-content"><div class="csstable-widget-row"' ..
+		' style="grid-template-columns:repeat(8, auto);width:max-content">' ..
+		'<div class="csstable-widget-row prizepooltable-header"' ..
 		' style="font-weight:bold"><div class="csstable-widget-cell" style="min-width:80px">Place</div>' ..
 		'<div class="csstable-widget-cell"><div>$&nbsp;<abbr title="United States Dollar">USD</abbr></div></div>' ..
 		'<div class="csstable-widget-cell"><div>€&nbsp;<abbr title="Euro">EUR</abbr></div></div>' ..

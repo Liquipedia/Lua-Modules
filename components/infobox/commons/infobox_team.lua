@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -106,7 +107,15 @@ function Team:createInfobox()
 							totalEarningsDisplay = '$' .. Language:formatNum(self.totalEarnings)
 						end
 						return {
-							Cell{name = 'Approx. Total Winnings', content = {totalEarningsDisplay}}
+							Customizable{id = 'earningscell',
+								children = {
+									Cell{name = Abbreviation.make(
+										'Approx. Total Winnings',
+										'Includes individual player earnings won&#10;while representing this team'
+									),
+									content = {totalEarningsDisplay}}
+								}
+							}
 						}
 					end
 				}
@@ -259,7 +268,7 @@ function Team:_setLpdbData(args, links)
 		earnings = earnings,
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
-		coach = args.coaches,
+		coach = args.coaches or args.coach,
 		manager = args.manager,
 		template = teamTemplate,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(

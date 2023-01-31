@@ -11,18 +11,17 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
 local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local DASH = '&#045;'
 
-local PRIZE_TYPE_USD = 'USD'
+local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_POINTS = 'POINTS'
 
 -- Allowed none-numeric score values.
@@ -152,30 +151,35 @@ function Placement:init(args, parent, lastPlacement)
 	self.date = self.args.date or parent.date
 	self.placeStart = self.args.placeStart
 	self.placeEnd = self.args.placeEnd
-	self.hasUSD = false
-
-	Opponent = self.parent.opponentLibrary or Opponent
+	self.count = self.args.count
+	self.hasBaseCurrency = false
 
 	self.prizeRewards = self:_readPrizeRewards(self.args)
 
 	self.opponents = self:_parseOpponents(self.args)
 
 	-- Implicit place range has been given (|place= is not set)
-	-- Use the last known place and set the place range based on the entered number of opponents
+	-- Use the last known place and set the place range based on the entered args.count
+	-- or the number of entered opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + math.max(#self.opponents, 1)
+		self.placeEnd = lastPlacement + (self.count or math.max(#self.opponents, 1))
 	end
 
-	assert(#self.opponents <= 1 + self.placeEnd - self.placeStart,
+	self.count = self.placeEnd + 1 - self.placeStart
+
+	assert(#self.opponents <= self.count,
 		'Placement: Too many opponents in place ' .. self:_displayPlace():gsub('&#045;', '-'))
 end
 
 function Placement:_parseArgs(args)
 	local parsedArgs = Table.deepCopy(args)
 
+	-- count (number of opponents in the slot) has been given explicitly
+	if args.count then
+		parsedArgs.count = tonumber(args.count)
 	-- Explicit place range has been given
-	if args.place then
+	elseif args.place then
 		local places = Table.mapValues(mw.text.split(args.place, '-'), tonumber)
 		parsedArgs.placeStart = places[1]
 		parsedArgs.placeEnd = places[2] or places[1]
@@ -210,11 +214,11 @@ function Placement:_readPrizeRewards(args)
 		rewards[prize.id] = prizeData.rowParse(self, reward, args, prizeIndex)
 	end)
 
-	-- Special case for USD, as it's not defined in the header.
-	local usdType = self.prizeTypes[PRIZE_TYPE_USD]
-	if usdType.row and args[usdType.row] then
-		self.hasUSD = true
-		rewards[PRIZE_TYPE_USD .. 1] = usdType.rowParse(self, args[usdType.row], args, 1)
+	-- Special case for Base Currency, as it's not defined in the header.
+	local baseType = self.prizeTypes[PRIZE_TYPE_BASE_CURRENCY]
+	if baseType.row and args[baseType.row] then
+		self.hasBaseCurrency = true
+		rewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseType.rowParse(self, args[baseType.row], args, 1)
 	end
 
 	return rewards
@@ -310,7 +314,6 @@ function Placement:_getLpdbData(...)
 	local entries = {}
 	for opponentIndex, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
-		local playerCount = 0
 		local opponentType = opponent.opponentData.type
 
 		if opponentType == Opponent.team then
@@ -327,12 +330,11 @@ function Placement:_getLpdbData(...)
 			participant = Opponent.toName(opponent.opponentData)
 			local p1 = opponent.opponentData.players[1]
 			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
-			playerCount = 1
 		else
 			participant = Opponent.toName(opponent.opponentData)
 		end
 
-		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_USD .. 1)) or 0
+		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_BASE_CURRENCY .. 1)) or 0
 		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
 		local lpdbData = {
 			image = image,
@@ -346,11 +348,18 @@ function Placement:_getLpdbData(...)
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,
-			individualprizemoney = (playerCount > 0) and (prizeMoney / playerCount) or 0,
+			individualprizemoney = Opponent.typeIsParty(opponentType) and (prizeMoney / Opponent.partySize(opponentType)) or 0,
 			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
 			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
 			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
 			groupscore = opponent.additionalData.GROUPSCORE,
+			lastvsdata = Table.merge(
+				opponent.additionalData.LASTVS and Opponent.toLpdbStruct(opponent.additionalData.LASTVS) or {},
+				{
+					score = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
+					groupscore = opponent.additionalData.GROUPSCORE,
+				}
+			),
 			extradata = {
 				prizepoints = tostring(pointsReward or ''),
 				participantteam = (opponentType == Opponent.solo and players.p1team)
@@ -360,7 +369,6 @@ function Placement:_getLpdbData(...)
 			-- TODO: We need to create additional LPDB Fields
 			-- Qualified To struct (json?)
 			-- Points struct (json?)
-			-- lastvs match2 opponent (json?)
 		}
 
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
@@ -381,13 +389,13 @@ function Placement:getPrizeRewardForOpponent(opponent, prize)
 	return opponent.prizeRewards[prize] or self.prizeRewards[prize]
 end
 
-function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
+function Placement:_setBaseFromRewards(prizesToUse, prizeTypes)
 	Array.forEach(self.opponents, function(opponent)
-		if opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1] then
+		if opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] or self.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] then
 			return
 		end
 
-		local usdReward = 0
+		local baseReward = 0
 		Array.forEach(prizesToUse, function(prize)
 			local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
 
@@ -395,7 +403,7 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 				return
 			end
 
-			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(
+			baseReward = baseReward + prizeTypes[prize.type].convertToBaseCurrency(
 				prize.data,
 				localMoney,
 				opponent.date,
@@ -404,7 +412,7 @@ function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
 			self.parent.usedAutoConvertedCurrency = true
 		end)
 
-		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = usdReward
+		opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseReward
 	end)
 end
 

@@ -99,7 +99,7 @@ local ColumnName = Class.new(
 	-- @param name: name of the column in LPDB
 	-- @param superName (optional): The key that the `name` exists in, e.g. if we
 	-- want `extradata_player`, the `superName` would be 'extradata', while
-	-- the `name` would be 'player"'
+	-- the `name` would be 'player'
 	function(self, name, superName)
 		self.name = name
 

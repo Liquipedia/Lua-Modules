@@ -30,6 +30,7 @@ local CustomInjector = Class.new(Injector)
 local _DEFAULT_TIERTYPE = 'General'
 local _DEFAULT_PLATFORM = 'PC'
 local _PLATFORM_ALIAS = {
+	console = 'Console',
 	pc = 'PC',
 	xbox = 'Xbox',
 	xone = 'Xbox',
@@ -69,7 +70,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()

@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace2')
+local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -35,7 +35,7 @@ function Spell.run(frame)
 	spell.createWidgetInjector = Spell.createWidgetInjector
 	spell.getCategories = Spell.getCategories
 	_args = spell.args
-	return spell:createInfobox(frame)
+	return spell:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -166,9 +166,8 @@ function Spell:getResearchHotkey()
 end
 
 function Spell:getCategories()
-	local categories = { 'Spells' }
-	local race = string.lower(_args.race or '')
-	race = CleanRace[race]
+	local categories = {'Spells'}
+	local race = Faction.toName(Faction.read(_args.race))
 	if race then
 		table.insert(categories, race .. ' Spells')
 	end
