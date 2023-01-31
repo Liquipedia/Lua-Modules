@@ -498,7 +498,7 @@ end
 function PrizePool:_buildRows()
 	local rows = {}
 
-	for _, placement in ipairs(self.placements) do
+	for placementIndex, placement in ipairs(self.placements) do
 		local previousOpponent = {}
 
 		local row = TableRow{}
@@ -571,10 +571,12 @@ function PrizePool:_buildRows()
 
 		if placement.placeStart <= self.options.cutafter
 			and placement.placeEnd >= self.options.cutafter
-			and placement ~= self.placements[#self.placements] then
+			and placement ~= self.placements[#self.placements]
+			and (self.placements[placementIndex + 1] or {}).placeStart ~= placement.placeStart
+			and (self.placements[placementIndex + 1] or {}).placeEnd ~= placement.placeEnd then
 
-			local toogleExpandRow = self:_toggleExpand(placement.placeEnd + 1, self.placements[#self.placements].placeEnd)
-			table.insert(rows, toogleExpandRow)
+			local toggleExpandRow = self:_toggleExpand(placement.placeEnd + 1, self.placements[#self.placements].placeEnd)
+			table.insert(rows, toggleExpandRow)
 		end
 	end
 
