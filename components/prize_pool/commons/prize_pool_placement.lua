@@ -188,6 +188,9 @@ function Placement:_parseArgs(args)
 
 		parsedArgs.count = parsedArgs.count
 			or (parsedArgs.placeEnd - parsedArgs.placeStart + 1)
+
+		assert(parsedArgs.count <= parsedArgs.placeEnd - parsedArgs.placeStart + 1,
+			'Placement: Invalid count (' .. parsedArgs.count .. ') and placement (' .. args.place .. ') combination')
 	end
 
 	return parsedArgs
