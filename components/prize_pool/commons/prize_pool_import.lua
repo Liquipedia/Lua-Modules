@@ -412,7 +412,7 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
 	return Placement(
-		{placeStart = placeStart, placeEnd = placeEnd},
+		{placeStart = placeStart, placeEnd = placeEnd, count = placementSize},
 		_parent,
 		priorPlacement.placeEnd or 0
 	)
