@@ -160,8 +160,6 @@ function Placement:init(args, parent, lastPlacement)
 
 	self.count = self.count or math.max(#self.opponents, 1)
 
-	mw.logObject{place = args.place, count = self.count}
-
 	-- Implicit place range has been given (|place= and |count= is unset)
 	-- Use the last known place and set the place range based on the entered args.count
 	-- or the number of entered opponents
