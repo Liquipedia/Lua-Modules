@@ -46,7 +46,7 @@ function CustomHero.run(frame)
 	unit.setLpdbData = CustomHero.setLpdbData
 	unit.createWidgetInjector = CustomHero.createWidgetInjector
 
-	return unit:createInfobox(frame)
+	return unit:createInfobox()
 end
 
 function CustomInjector:addCustomCells()

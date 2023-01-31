@@ -10,6 +10,22 @@ return {
 	startYear = 2019,
 	wikiName = 'tft',
 	name = 'Teamfight Tactics',
-	defaultTeamLogo = 'Teamfight Tactics Default.png',
-	defaultTeamLogoDark = 'Teamfight Tactics Default.png',
+	games = {
+		tft = {
+			abbreviation = 'TFT',
+			name = 'Teamfight Tactics',
+			link = 'Teamfight Tactics',
+			logo = {
+				darkMode = 'Teamfight Tactics Default.png',
+				lightMode = 'Teamfight Tactics Default.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Teamfight Tactics Default.png',
+				lightMode = 'Teamfight Tactics Default.png',
+			},
+		},
+	},
+	defaultGame = 'tft',
+	defaultTeamLogo = 'Teamfight Tactics Default.png', ---@deprecated
+	defaultTeamLogoDark = 'Teamfight Tactics Default.png', ---@deprecated
 }
