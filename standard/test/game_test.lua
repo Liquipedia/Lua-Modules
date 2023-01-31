@@ -15,15 +15,14 @@ local suite = ScribuntoUnit:new()
 
 local COMMONS_IDENTIFIER = 'commons'
 local COMMONS_DATA = Lua.import('Module:Info', {requireDevIfEnabled = true}).games.commons
-local COMMONS_ICON = mw.text.decode('[[File:Liquipedia logo.png|link=Liquipedia|class=show-when-light-mode|25x25px]]'
-	.. '[[File:Liquipedia logo.png|link=Liquipedia|class=show-when-dark-mode|25x25px]]')
+local COMMONS_ICON = mw.text.decode('[[File:Liquipedia logo.png|link=lpcommons:Main Page|class=|25x25px]]')
 local GAME_TO_THROW = 'please throw'
 
 function suite:testToIdentifier()
 	self:assertEquals(COMMONS_IDENTIFIER, Game.toIdentifier())
 	self:assertEquals(nil, Game.toIdentifier{useDefault = false})
-	self:assertEquals(COMMONS_IDENTIFIER, Game.toIdentifier{game = 'lp'})
-	self:assertEquals(COMMONS_IDENTIFIER, Game.toIdentifier{game = 'liQuiPedIa'})
+	self:assertEquals(nil, Game.toIdentifier{game = 'lp'})
+	self:assertEquals(COMMONS_IDENTIFIER, Game.toIdentifier{game = 'comMoNs'})
 end
 
 function suite:testDataRetrieve()
