@@ -82,34 +82,27 @@ function Game.icon(args)
 
 	local gameData = Game.raw(args)
 	if Table.isEmpty(gameData) then
-		return String.interpolate(
-			ICON_STRING,
-			{
-				icon = ICON_PLACEHOLDER,
-				size = args.size or DEFAULT_SIZE,
-				class = '',
-				link = ''
-			}
-		)
+		return Game._createIcon{icon = ICON_PLACEHOLDER, size = args.size}
 	end
 
 	local link = Logic.readBool(args.noLink) and '' or args.link or gameData.link
 
+	if gameData.logo.lightMode == gameData.logo.darkMode then
+		return Game._createIcon{icon = gameData.logo.lightMode, size = args.size, link = link}
+	end
+
+	return Game._createIcon{size = args.size, link = link, mode = 'light'}
+		.. Game._createIcon{size = args.size, link = link, mode = 'dark'}
+end
+
+function Game._createIcon(args)
 	return String.interpolate(
 		ICON_STRING,
 		{
-			icon = gameData.logo.lightMode,
+			icon = args.icon or gameData.logo[args.mode .. 'Mode'],
 			size = args.size or DEFAULT_SIZE,
-			class = 'show-when-light-mode',
-			link = link,
-		}
-	) .. String.interpolate(
-		ICON_STRING,
-		{
-			icon = gameData.logo.darkMode,
-			size = args.size or DEFAULT_SIZE,
-			class = 'show-when-dark-mode',
-			link = link,
+			class = args.mode and ('show-when-' .. args.mode .. '-mode') or '',
+			link = args.link or '',
 		}
 	)
 end
