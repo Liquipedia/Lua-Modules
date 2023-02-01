@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
@@ -45,7 +46,7 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
+	if not Table.isEmpty(vods) or String.isNotEmpty(match.vod) then
 		local footer = MatchSummary.Footer()
 
 		if match.vod then
