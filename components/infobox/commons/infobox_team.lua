@@ -214,7 +214,7 @@ function Team:_createLocation(location)
 	end
 
 	if String.isNotEmpty(demonym) and self:shouldStore(self.args) then
-		self.infobox:addCategories(demonym .. ' Teams')
+		self.infobox:categories(demonym .. ' Teams')
 	end
 
 	return Flags.Icon({flag = location, shouldLink = true}) ..
