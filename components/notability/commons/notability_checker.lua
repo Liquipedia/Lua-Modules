@@ -177,7 +177,9 @@ function NotabilityChecker.calculateTournament(tier, tierType, placement, date, 
 	return weight
 end
 
-function NotabilityChecker._calculateWeightForTournament(tier, tierType, placement, dateLoss, notabilityMod, mode, extradata)
+function NotabilityChecker._calculateWeightForTournament(
+		tier, tierType, placement, dateLoss, notabilityMod, mode, extradata
+	)
 	if String.isEmpty(tier) then
 		return 0
 	end
