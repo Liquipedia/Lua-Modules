@@ -290,6 +290,11 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 				(slot['lastvsscore' .. opponentIndex] or ''),
 		}
 
+		-- catch empty lastvs table to avoid storing tbd opponents in lastvsdata
+		if Table.isEmpty(opponentData.lastvs) then
+			opponentData.lastvs = nil
+		end
+
 		if not opponentData.link and IS_SOLO then
 			local splitPlayer = mw.text.split(opponentData[1], '|')
 			opponentData.link = splitPlayer[1]
