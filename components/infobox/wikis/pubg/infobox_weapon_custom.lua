@@ -30,7 +30,7 @@ function CustomWeapon.run(frame)
 	_weapon = weapon
 	_args = _weapon.args
 	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
-	return weapon:createInfobox(frame)
+	return weapon:createInfobox()
 end
 
 function CustomWeapon:createWidgetInjector()

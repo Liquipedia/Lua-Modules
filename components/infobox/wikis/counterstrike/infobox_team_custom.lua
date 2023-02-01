@@ -42,7 +42,7 @@ function CustomTeam.run(frame)
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.getWikiCategories = CustomTeam.getWikiCategories
 
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:createWidgetInjector()
@@ -61,6 +61,8 @@ function CustomInjector:parse(id, widgets)
 			widgets[1], -- Coaches
 			Cell{name = 'Analysts', content = {_team.args.analysts}},
 		}
+	elseif id == 'earningscell' then
+		widgets[1].name = 'Approx. Total Winnings'
 	end
 	return widgets
 end

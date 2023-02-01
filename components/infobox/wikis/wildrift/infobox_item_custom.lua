@@ -51,7 +51,7 @@ function CustomItem.run(frame)
 	--item.setLpdbData = CustomItem.setLpdbData--to be added later
 	item.createWidgetInjector = CustomItem.createWidgetInjector
 
-	return item:createInfobox(frame)
+	return item:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)

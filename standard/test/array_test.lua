@@ -13,6 +13,13 @@ local Array = Lua.import('Module:Array', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
+function suite:testIsArray()
+	self:assertTrue(Array.isArray{})
+	self:assertTrue(Array.isArray{5, 2, 3})
+	self:assertFalse(Array.isArray{a = 1, [3] = 2, c = 3})
+	self:assertFalse(Array.isArray{5, 2, c = 3})
+end
+
 function suite:testCopy()
 	local a, b, c = {1, 2, 3}, {}, {{5}}
 	self:assertDeepEquals(a, Array.copy(a))

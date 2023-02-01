@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TournamentNotability = require('Module:TournamentNotability')
 local Variables = require('Module:Variables')
@@ -31,7 +32,10 @@ local _MODE_2v2 = '2v2'
 local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
 
+local _TIER_1 = 1
 local _H2H_TIER_THRESHOLD = 5
+
+local _PSYONIX = 'Psyonix'
 
 local _league
 
@@ -42,8 +46,9 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -134,6 +139,25 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
 
 	return content
+end
+
+function CustomLeague:liquipediaTierHighlighted()
+	if (
+		String.isNotEmpty(_league.args.liquipediatiertype) or
+		tonumber(_league.args.liquipediatier) ~= _TIER_1
+	) then
+		return false
+	end
+
+	return CustomLeague:containsPsyonix('organizer') or
+		CustomLeague:containsPsyonix('sponsor')
+end
+
+function CustomLeague:containsPsyonix(prefix)
+	return Table.any(
+		League:getAllArgsForBase(_league.args, prefix),
+		function (_, value) return value == _PSYONIX end
+	)
 end
 
 function CustomLeague:defineCustomPageVariables(args)

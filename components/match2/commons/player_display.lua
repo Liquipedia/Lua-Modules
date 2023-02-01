@@ -46,7 +46,7 @@ function PlayerDisplay.BlockPlayer(props)
 	local zeroWidthSpace = '&#8203;'
 	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
 		:wikitext(props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
-			or props.showLink ~= false and player.pageName
+			or props.showLink ~= false and Logic.isNotEmpty(player.pageName)
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
 			or Logic.emptyOr(player.displayName, zeroWidthSpace)
 		)

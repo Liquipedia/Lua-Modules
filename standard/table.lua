@@ -63,6 +63,22 @@ function Table.filter(tbl, predicate, argument)
 	return filteredTbl
 end
 
+---@generic K, V
+---@param tbl {[K]: V}
+---@param predicate fun(key?: K, value?: V): boolean
+---@return {[K]: V}
+function Table.filterByKey(tbl, predicate)
+	local filteredTbl = {}
+
+	for key, entry in pairs(tbl) do
+		if predicate(key, entry) then
+			filteredTbl[key] = entry
+		end
+	end
+
+	return filteredTbl
+end
+
 ---Return true if table is empty or nil
 ---@param tbl table?
 ---@return boolean
@@ -237,10 +253,10 @@ end
 --Returns `{6 = 'a', 8 = 'b', 10 = 'c'}`
 --
 --The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
----@generic K, V, T
+---@generic K, V, U, T
 ---@param xTable {[K] : V}
----@param f fun(key?: K, value?: V): K, T
----@return {[K] : T}
+---@param f fun(key?: K, value?: V): U, T
+---@return {[U] : T}
 function Table.map(xTable, f)
 	local yTable = {}
 	for xKey, xValue in pairs(xTable) do
@@ -289,14 +305,19 @@ function Table.mapArgumentsByPrefix(args, prefixes, f)
 	return Table.mapArguments(args, indexFromKey, f)
 end
 
---[[
-Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
-from an arguments table, and applies a transform to each key or index.
-
-Most common use-case will be `Table.mapArgumentsByPrefix` where
-the `indexFromKey` function retrieves keys based on a prefix.
-]]
-function Table.mapArguments(args, indexFromKey, f)
+--- Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
+-- from an arguments table, and applies a transform to each key or index.
+--
+-- Most common use-case will be `Table.mapArgumentsByPrefix` where
+-- the `indexFromKey` function retrieves keys based on a prefix.
+--
+---@generic K, V, T, I
+---@param args {[K] : V}
+---@param indexFromKey fun(key?: K): integer
+---@param f fun(key?: K, index?: integer, ...?: any): T
+---@param noInterleave boolean?
+---@return {[I] : T}
+function Table.mapArguments(args, indexFromKey, f, noInterleave)
 	local entriesByIndex = {}
 
 	-- Non-numeric args
@@ -311,7 +332,11 @@ function Table.mapArguments(args, indexFromKey, f)
 		end
 	end
 
-	-- Numeric index entries fills in gaps of prefixN= entries
+	if noInterleave then
+		return entriesByIndex
+	end
+
+	-- Numeric index entries fills in gaps of prefixN= entries if not disabled
 	local entryIndex = 1
 	for argIndex = 1, math.huge do
 		if not args[argIndex] then

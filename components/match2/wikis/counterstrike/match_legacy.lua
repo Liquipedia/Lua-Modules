@@ -11,7 +11,9 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TextSanitizer = require('Module:TextSanitizer')
 local Variables = require('Module:Variables')
+
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
@@ -109,8 +111,22 @@ function MatchLegacy.convertParameters(match2)
 		local prefix = 'opponent' .. index
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
-		if opponent.type == Opponent.team then
-			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
+			if opponent.type == Opponent.team then
+				if String.isEmpty(opponent.template) then
+					match[prefix] = 'TBD'
+				elseif mw.ext.TeamTemplate.teamexists(opponent.template) then
+					match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+				else
+					match[prefix] = opponent.template
+				end
+			else
+				if String.isEmpty(opponent.name) or TextSanitizer.stripHTML(opponent.name) ~= opponent.name then
+					match[prefix] = 'TBD'
+				else
+					match[prefix] = opponent.name
+				end
+			end
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
 			if isOverturned then
 				match[prefix .. 'score'] = tonumber(match.winner) == index and (math.floor(match2.bestof /2) + 1) or 0
@@ -141,12 +157,14 @@ function MatchLegacy.convertParameters(match2)
 			end
 			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
 		elseif opponent.type == Opponent.solo then
-			local player = opponentmatch2players[1] or {}
-			match[prefix] = player.name
-			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
-			match[prefix .. 'flag'] = player.flag
-		elseif opponent.type == Opponent.literal then
-			match[prefix] = 'TBD'
+			if String.isEmpty(opponent.name) then
+				match[prefix] = 'TBD'
+			else
+				local player = opponentmatch2players[1] or {}
+				match[prefix] = player.name
+				match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				match[prefix .. 'flag'] = player.flag
+			end
 		end
 	end
 

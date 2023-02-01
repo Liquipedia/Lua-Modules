@@ -10,6 +10,22 @@ return {
 	startYear = 1993,
 	wikiName = 'magic',
 	name = 'Magic: The Gathering',
-	defaultTeamLogo = 'Liquipedia_logo.png',
-	defaultTeamLogoDark = 'Liquipedia_logo.png',
+	games = {
+		magic = {
+			abbreviation = 'Magic',
+			name = 'Magic: The Gathering',
+			link = 'Magic: The Gathering',
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Liquipedia logo.png',
+				lightMode = 'Liquipedia logo.png',
+			},
+		},
+	},
+	defaultGame = 'magic',
+	defaultTeamLogo = 'Liquipedia logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Liquipedia logo.png', ---@deprecated
 }

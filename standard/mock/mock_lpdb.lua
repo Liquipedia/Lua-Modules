@@ -32,7 +32,9 @@ local _lpdb = {
 	lpdb_squadplayer = mw.ext.LiquipediaDB.lpdb_squadplayer,
 }
 
-function mockLpdb.setUp()
+---@param callbackFunction? fun(dbTable: string, objectName: string, storedData: table)
+function mockLpdb.setUp(callbackFunction)
+	mockLpdb.callback = callbackFunction
 	mw.ext.LiquipediaDB.lpdb = mockLpdb.lpdb
 	mw.ext.LiquipediaDB.lpdb_standingsentry = mockLpdb.lpdb_standingsentry
 	mw.ext.LiquipediaDB.lpdb_standingstable = mockLpdb.lpdb_standingstable
@@ -40,6 +42,7 @@ function mockLpdb.setUp()
 end
 
 function mockLpdb.tearDown()
+	mockLpdb.callback = nil
 	mw.ext.LiquipediaDB.lpdb = _lpdb.lpdb
 	mw.ext.LiquipediaDB.lpdb_standingsentry = _lpdb.lpdb_standingsentry
 	mw.ext.LiquipediaDB.lpdb_standingstable = _lpdb.lpdb_standingstable
@@ -203,31 +206,36 @@ function mockLpdb._deserializeJson(value)
 	return Json.parseIfTable(value) or value
 end
 
+function mockLpdb._verifyInsertion(dbTable, objectname, data)
+	local parsedData = Table.mapValues(data, mockLpdb._deserializeJson)
+
+	TypeUtil.assertValue(objectname, 'string')
+	TypeUtil.assertValue(parsedData, TypeUtil.struct(dbStructure[dbTable]), { maxDepth = 3, name = dbTable})
+
+	if mockLpdb.callback then
+		mockLpdb.callback(dbTable, objectname, parsedData)
+	end
+end
+
 ---Stores data into LPDB StandingsTable
 ---@param objectname string
 ---@param data table
 function mockLpdb.lpdb_standingstable(objectname, data)
-	data = Table.mapValues(data, mockLpdb._deserializeJson)
-	TypeUtil.assertValue(objectname, 'string')
-	TypeUtil.assertValue(data, TypeUtil.struct(dbStructure.standingstable), { maxDepth = 3, name = 'StandingsTable' })
+	mockLpdb._verifyInsertion('standingstable', objectname, data)
 end
 
 ---Stores data into LPDB StandingsEntry
 ---@param objectname string
 ---@param data table
 function mockLpdb.lpdb_standingsentry(objectname, data)
-	data = Table.mapValues(data, mockLpdb._deserializeJson)
-	TypeUtil.assertValue(objectname, 'string')
-	TypeUtil.assertValue(data, TypeUtil.struct(dbStructure.standingsentry), { maxDepth = 3, name = 'StandingsEntry' })
+	mockLpdb._verifyInsertion('standingsentry', objectname, data)
 end
 
 ---Stores data into LPDB SquadPlayer
 ---@param objectname string
 ---@param data table
 function mockLpdb.lpdb_squadplayer(objectname, data)
-	data = Table.mapValues(data, mockLpdb._deserializeJson)
-	TypeUtil.assertValue(objectname, 'string')
-	TypeUtil.assertValue(data, TypeUtil.struct(dbStructure.squadplayer), { maxDepth = 3, name = 'SquadPlayer' })
+	mockLpdb._verifyInsertion('squadplayer', objectname, data)
 end
 
 return mockLpdb
