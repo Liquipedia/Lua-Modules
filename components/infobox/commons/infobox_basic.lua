@@ -6,11 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
-local Arguments = require('Module:Arguments')
 
 local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
 local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
