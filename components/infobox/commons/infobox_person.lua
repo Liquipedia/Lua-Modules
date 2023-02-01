@@ -208,7 +208,7 @@ function Person:createInfobox()
 			statusToStore,
 			personType.store
 		)
-		infobox:addCategories(unpack(self:getCategories(
+		infobox:categories(unpack(self:getCategories(
 			args,
 			age.birth,
 			personType.category,
@@ -405,7 +405,7 @@ function Person:_createLocation(country, location, personType)
 	local demonym = Flags.getLocalisation(countryDisplay) or ''
 
 	if _shouldStoreData then
-		self.infobox:addCategories(demonym .. ' ' .. personType .. 's')
+		self.infobox:categories(demonym .. ' ' .. personType .. 's')
 	end
 
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
@@ -482,7 +482,7 @@ end
 function Person:_createAgeCalculationErrorMessage(text)
 	text = string.gsub(text or '', 'Module:AgeCalculation:%d+: ', '')
 	if _shouldStoreData then
-		self.infobox.addCategories('Players with age error')
+		self.infobox.categories('Players with age error')
 	end
 	return mw.text.nowiki(text)
 end
