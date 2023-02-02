@@ -25,17 +25,7 @@ local CustomActiveYears = Lua.import('Module:YearsActive/Base', {requireDevIfEna
 CustomActiveYears.defaultNumberOfStoredPlayersPerPlacement = 6
 CustomActiveYears.additionalConditions = ''
 
-local _TALENT_POSITIONS = {
-	'Analyst',
-	'Caster',
-	'Caster/Analyst',
-	'Commentator',
-	'Commentator/Analyst',
-	'Desk Host',
-	'Host',
-	'Reporter',
-	'Stage Host',
-}
+local _TALENT_POSITIONS = require('Module:BroadcastPositions').TalentPositions
 
 -- legacy entry point
 function CustomActiveYears.get(input)
