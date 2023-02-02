@@ -110,7 +110,7 @@ function Tier.displaySingle(args)
 
 	if not display then return '' end
 
-	local hiddenSort = args.sort and HiddenSort.run(tierData.sort) or ''
+	local hiddenSort = args.sort and tostring(HiddenSort.run(tierData.sort)) or ''
 
 	if Logic.readBool(args.link) and tierData.link then
 		return hiddenSort .. Page.makeInternalLink({}, display, tierData.link)
@@ -130,9 +130,9 @@ function Tier.display(args)
 	args.tier = args.tier or args.liquipediatier
 	args.tiertype = args.tiertype or args.liquipediatiertype
 
-	if String.isEmpty(args.tier) and String.isEmpty(args.tier) then
+	if String.isEmpty(args.tier) and String.isEmpty(args.tiertype) then
 		return ''
-	elseif String.isEmpty(args.tier) or String.isEmpty(args.tier) then
+	elseif String.isEmpty(args.tier) or String.isEmpty(args.tiertype) then
 		args.shortIfBoth = false
 	end
 
