@@ -63,9 +63,9 @@ function StandingsStorage.table(data)
 	}
 
 	local config = {
-		draw = data.hasdraw,
-		overtime = data.hasovertime,
-		points = data.haspoints,
+		hasdraws = data.hasdraw,
+		hasovertimes = data.hasovertime,
+		haspoints = data.haspoints,
 	}
 
 	mw.ext.LiquipediaDB.lpdb_standingstable('standingsTable_' .. data.standingsindex,
