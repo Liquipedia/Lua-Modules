@@ -113,12 +113,12 @@ function Tier.displaySingle(args)
 	local hiddenSort = args.sort and HiddenSort.run(tierData.sort) or ''
 
 	if Logic.readBool(args.link) and tierData.link then
-		return Page.makeInternalLink({}, display, tierData.link)
+		return hiddenSort .. Page.makeInternalLink({}, display, tierData.link)
 	elseif String.isNotEmpty(args.link) then
-		return Page.makeInternalLink({}, display, args.link)
+		return hiddenSort .. Page.makeInternalLink({}, display, args.link)
 	end
 
-	return display
+	return hiddenSort .. display
 end
 
 --- Builds the display for a a tier/tierType combination
