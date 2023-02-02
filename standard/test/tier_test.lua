@@ -75,7 +75,32 @@ function suite:testRaw()
 end
 
 function suite:testDisplay()
-	--todo
+	self:assertEquals('Show Match&nbsp;(S-Tier)', Tier.display{tier = 1, tiertype = 'ShOW MatCh'})
+	self:assertEquals('Show&nbsp;M.&nbsp;(S)', Tier.display{
+		tier = 1, tiershort = 1,
+		tiertype = 'ShOW MatCh', tiertypeshort = 1,
+	})
+	self:assertEquals(mw.text.decode('[[S-Tier Tournaments|S-Tier]]'),
+		Tier.display{tier = 1, tierlink = 1})
+	self:assertEquals(mw.text.decode('[[S-Tier Tournaments|S-Tier]]'),
+		Tier.display{tier = 1, tierlink = 1})
+	self:assertEquals(mw.text.decode('<span style=\"display:none\">A1</span>[[S-Tier Tournaments|S-Tier]]'),
+		Tier.display{tier = 1, tierlink = 1, tiersort = 1})
+	self:assertEquals(
+		mw.text.decode('[[Show Matches|Show')
+			.. '&nbsp;' .. mw.text.decode('M.]]') .. '&nbsp;(Undefined)',
+		Tier.display{tiertype = 'ShOW MatCh', tiertypeshort = 1, tiertypelink = 1}
+	)
+	self:assertEquals(mw.text.decode('<span style=\"display:none\">A1</span>[[S-Tier Tournaments|S-Tier]]'),
+		Tier.display{tier = 1, tierlink = 1, tiersort = 1})
+	self:assertEquals(
+		mw.text.decode('[[Show Matches|Show') .. '&nbsp;' .. mw.text.decode('M.]]')
+			.. '&nbsp;' .. mw.text.decode('([[S-Tier Tournaments|S]])'),
+		Tier.display{
+			tier = 1, tiershort = 1, tierlink = 1,
+			tiertype = 'ShOW MatCh', tiertypeshort = 1, tiertypelink = 1,
+		}
+	)
 end
 
 return suite
