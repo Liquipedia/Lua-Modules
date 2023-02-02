@@ -115,17 +115,17 @@ function Game.icon(args)
 		return Game._createIcon{icon = gameData.logo.lightMode, size = args.size, link = link}
 	end
 
-	return Game._createIcon{size = args.size, link = link, mode = 'light', logoData = gameData.logo}
-		.. Game._createIcon{size = args.size, link = link, mode = 'dark', logoData = gameData.logo}
+	return Game._createIcon{size = args.size, link = link, mode = 'light', icon = gameData.logo.lightMode}
+		.. Game._createIcon{size = args.size, link = link, mode = 'dark', icon = gameData.logo.darkMode}
 end
 
----@param args {mode: string?, icon: string?, size: string?, link: string?, logoData: {darkmode: string, lightMode: string}?}
+---@param args {mode: string?, icon: string?, size: string?, link: string?}
 ---@return string
 function Game._createIcon(args)
 	return String.interpolate(
 		ICON_STRING,
 		{
-			icon = args.icon or args.logoData[args.mode .. 'Mode'],
+			icon = args.icon,
 			size = args.size or DEFAULT_SIZE,
 			class = args.mode and ('show-when-' .. args.mode .. '-mode') or '',
 			link = args.link or '',
