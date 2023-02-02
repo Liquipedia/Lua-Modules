@@ -36,7 +36,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('sdate', Variables.varDefault('tournament_startdate'))
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate'))
 	Variables.varDefine('date', Variables.varDefault('tournament_enddate'))
-	
+
 	BasicHiddenDataBox.checkAndAssign(
 		'tournament_icon_name',
 		args.abbreviation and args.abbreviation:lower() or nil,
