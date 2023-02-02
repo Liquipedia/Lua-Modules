@@ -153,7 +153,7 @@ end
 function Tier.parseDisplayArgs(args, prefix)
 	return {
 		mode = prefix .. 's',
-		input = args[prefix],
+		input = Tier.toIdentifier(args[prefix]),
 		link = args[prefix .. 'link'],
 		short = Logic.readBool(args[prefix .. 'short']) or Logic.readBool(args.shortIfBoth),
 		sort = Logic.readBool(args[prefix .. 'sort']),
