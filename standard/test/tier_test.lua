@@ -1,0 +1,81 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Tier/testcases
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+local ScribuntoUnit = require('Module:ScribuntoUnit')
+
+local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
+local TierData = mw.loadData('Module:Tier/Data')
+
+local suite = ScribuntoUnit:new()
+
+function suite:testToIdentifier()
+	self:assertEquals('showmatch', Tier.toIdentifier('ShOW MatCh'))
+	self:assertEquals(1, Tier.toIdentifier('1'))
+	self:assertEquals(1, Tier.toIdentifier(1))
+	self:assertEquals('', Tier.toIdentifier(''))
+	self:assertEquals('', Tier.toIdentifier())
+end
+
+function suite:testIsValid()
+	self:assertTrue(Tier.isValid('showmatch', 'tiertypes'))
+	self:assertFalse(Tier.isValid('1', 'tiers'))
+	self:assertTrue(Tier.isValid(1, 'tiers'))
+	self:assertTrue(Tier.isValid('', 'tiers'))
+	self:assertTrue(Tier.isValid(nil, 'tiertypes'))
+	self:assertFalse(Tier.isValid('sedrvo', 'tiers'))
+	self:assertFalse(Tier.isValid('sedrvo', 'tiertypes'))
+end
+
+function suite:testToValue()
+	self:assertEquals('Show Match', Tier.toValue('showmatch', 'tiertypes'))
+	self:assertEquals('1', Tier.toValue(1, 'tiers'))
+	self:assertEquals(nil, Tier.toValue('sedrvo', 'tiers'))
+end
+
+function suite:testToName()
+	self:assertEquals('Show Match', Tier.toName('showmatch', 'tiertypes'))
+	self:assertEquals('S-Tier', Tier.toName(1, 'tiers'))
+	self:assertEquals(nil, Tier.toName('sedrvo', 'tiers'))
+end
+
+function suite:testToShortName()
+	self:assertEquals('Show&nbsp;M.', Tier.toShortName('showmatch', 'tiertypes'))
+	self:assertEquals('S', Tier.toShortName(1, 'tiers'))
+	self:assertEquals(nil, Tier.toShortName('sedrvo', 'tiers'))
+end
+
+function suite:testToLink()
+	self:assertEquals('Show Matches', Tier.toLink('showmatch', 'tiertypes'))
+	self:assertEquals('S-Tier Tournaments', Tier.toLink(1, 'tiers'))
+	self:assertEquals(nil, Tier.toLink('sedrvo', 'tiers'))
+end
+
+function suite:testToCategory()
+	self:assertEquals('Miscellaneous Tournaments', Tier.toCategory('misc', 'tiertypes'))
+	self:assertEquals('Show Match Tournaments', Tier.toCategory('showmatch', 'tiertypes'))
+	self:assertEquals(nil, Tier.toCategory('showmatch', 'tiers'))
+	self:assertEquals('S-Tier Tournaments', Tier.toCategory(1, 'tiers'))
+	self:assertEquals(nil, Tier.toCategory('sedrvo', 'tiers'))
+	self:assertEquals(nil, Tier.toCategory('', 'tiers'))
+	self:assertEquals(nil, Tier.toCategory('', 'tiertypes'))
+end
+
+function suite:testRaw()
+	self:assertDeepEquals(TierData.tiers[1], Tier.raw(1, 'tiers'))
+	self:assertDeepEquals(TierData.tiertypes.misc, Tier.raw('misc', 'tiertypes'))
+	self:assertEquals(nil, Tier.raw('misc', 'tiers'))
+	self:assertEquals(nil, Tier.raw(1, 'tiertypes'))
+	self:assertEquals(nil, Tier.raw('sedrvo', 'tiertypes'))
+end
+
+function suite:testDisplay()
+	--todo
+end
+
+return suite
