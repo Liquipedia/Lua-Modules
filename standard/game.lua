@@ -33,7 +33,7 @@ Game.getIdentifierByName = FnUtil.memoize(function()
 end)
 
 ---Get the identifier of a entered game. Checks against identifiers, full names and abbreviations.
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return string?
 function Game.toIdentifier(args)
 	args = args or {}
@@ -52,14 +52,14 @@ function Game.toIdentifier(args)
 end
 
 ---Check if a given game is a valid game.
----@param game: string?
+---@param game string?
 ---@return boolean
 function Game.isValid(game)
 	return Table.isNotEmpty(Game.raw{game = game})
 end
 
 ---Fetches the raw data for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return table
 function Game.raw(args)
 	local identifier = Game.toIdentifier(args)
@@ -71,35 +71,35 @@ function Game.raw(args)
 end
 
 ---Fetches the abbreviation for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return string?
 function Game.abbreviation(args)
 	return Game.raw(args).abbreviation
 end
 
 ---Fetches the name for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return string?
 function Game.name(args)
 	return Game.raw(args).name
 end
 
 ---Fetches the link for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return string?
 function Game.link(args)
 	return Game.raw(args).link
 end
 
 ---Fetches the defaultTeamLogos (light & dark) for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return table?
 function Game.defaultTeamLogoData(args)
 	return Game.raw(args).defaultTeamLogo
 end
 
 ---Builds the icon for a given game
----@param args {game: string?, useDefault: boolean?, size: string?, noLink: boolean?, link: string?}
+---@param args? {game: string?, useDefault: boolean?, size: string?, noLink: boolean?, link: string?}
 ---@return string
 function Game.icon(args)
 	args = args or {}
@@ -119,7 +119,7 @@ function Game.icon(args)
 		.. Game._createIcon{size = args.size, link = link, mode = 'dark', logoData = gameData.logo}
 end
 
----@param args {mode: string?, icon: string?, size: string?, link: string?}
+---@param args {mode: string?, icon: string?, size: string?, link: string?, logoData: {darkmode: string, lightMode: string}?}
 ---@return string
 function Game._createIcon(args)
 	return String.interpolate(
