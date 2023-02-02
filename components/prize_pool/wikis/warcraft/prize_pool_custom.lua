@@ -44,7 +44,6 @@ function CustomPrizePool.run(frame)
 
 	-- adjust defaults
 	prizePool:setConfigDefault('prizeSummary', false)
-	prizePool:setConfigDefault('autoExchange', false)
 	prizePool:setConfigDefault('exchangeInfo', false)
 	prizePool:setConfigDefault('storeSmw', Namespace.isMain())
 	prizePool:setConfigDefault('storeLpdb', Namespace.isMain())
