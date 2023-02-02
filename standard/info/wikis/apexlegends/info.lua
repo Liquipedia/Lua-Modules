@@ -16,8 +16,8 @@ return {
 			name = 'Apex Legends',
 			link = 'Apex Legends',
 			logo = {
-				darkMode = '16px Apex Legends Icon.png',
-				lightMode = '16px Apex Legends Icon.png',
+				darkMode = 'Apex-legends-icon.png',
+				lightMode = 'Apex-legends-icon.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Apex Legends lightmode.png',
