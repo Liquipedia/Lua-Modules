@@ -51,6 +51,9 @@ function Team:createInfobox()
 	-- Need links in LPDB, so declare them outside of display code
 	local links = Links.transform(args)
 
+	local team = args.teamtemplate or self.pagename
+	self.teamTemplate = mw.ext.TeamTemplate.teamexists(team) and mw.ext.TeamTemplate.raw(team) or {}
+
 	local widgets = {
 		Header{
 			name = args.name,
@@ -62,6 +65,7 @@ function Team:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Team Information'},
+		Customizable{id = 'topcustomcontent', children = {}},
 		Cell{
 			name = 'Location',
 			content = {
@@ -244,31 +248,22 @@ function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 	local earnings = self.totalEarnings
 
-	local team = args.teamtemplate or self.pagename
-	local teamTemplate
-	local textlessImage, textlessImageDark
-	if team and mw.ext.TeamTemplate.teamexists(team) then
-		local teamRaw = mw.ext.TeamTemplate.raw(team)
-		teamTemplate = teamRaw.historicaltemplate or teamRaw.templatename
-		textlessImage, textlessImageDark = teamRaw.image, teamRaw.imagedark
-	end
-
 	local lpdbData = {
 		name = name,
 		location = self:getStandardLocationValue(args.location),
 		location2 = self:getStandardLocationValue(args.location2),
 		region = args.region,
 		locations = Locale.formatLocations(args),
-		logo = args.image or textlessImage,
-		logodark = args.imagedark or args.imagedarkmode or args.image or textlessImageDark,
-		textlesslogo = textlessImage or args.teamcardimage,
-		textlesslogodark = textlessImageDark or args.teamcardimagedark or args.teamcardimage,
+		logo = args.image or self.teamTemplate.image,
+		logodark = args.imagedark or args.imagedarkmode or args.image or self.teamTemplate.imagedark,
+		textlesslogo = self.teamTemplate.image or args.teamcardimage,
+		textlesslogodark = self.teamTemplate.imagedark or args.teamcardimagedark or args.teamcardimage,
 		earnings = earnings,
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
 		coach = args.coaches or args.coach,
 		manager = args.manager,
-		template = teamTemplate,
+		template = self.teamTemplate.historicaltemplate or self.teamTemplate.templatename,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
