@@ -16,6 +16,7 @@ local String = require('Module:StringUtils')
 local TierData = mw.loadData('Module:Tier/Data')
 
 local NON_BREAKING_SPACE = '&nbsp;'
+local TIER_TYPE_MODE = 'tierTypes'
 
 local Tier = {}
 
@@ -36,7 +37,7 @@ end
 
 --- Retrieves the raw tier/tierType data for a given input
 ---@param input string|integer|nil
----@param mode 'tiers'|'tiertypes'
+---@param mode 'tiers'|'tierTypes'
 ---@return table?
 function Tier.raw(input, mode)
 	return (TierData[mode] or {})[input]
@@ -44,7 +45,7 @@ end
 
 --- Converts input to storage value for tier/tierType
 ---@param input string|integer|nil
----@param mode 'tiers'|'tiertypes'
+---@param mode 'tiers'|'tierTypes'
 ---@return boolean
 function Tier.isValid(input, mode)
 	return String.isEmpty(input) or Tier.raw(input, mode) ~= nil
@@ -52,7 +53,7 @@ end
 
 --- Converts input to (storage) value for tier/tierType
 ---@param input string|integer|nil
----@param mode 'tiers'|'tiertypes'
+---@param mode 'tiers'|'tierTypes'
 ---@return string|integer|nil
 function Tier.toValue(input, mode)
 	return (Tier.raw(input, mode) or {}).value
@@ -60,7 +61,7 @@ end
 
 --- Converts input to display name for tier/tierType
 ---@param input string|integer|nil
----@param mode 'tiers'|'tiertypes'
+---@param mode 'tiers'|'tierTypes'
 ---@return string?
 function Tier.toName(input, mode)
 	return (Tier.raw(input, mode) or {}).name
@@ -68,7 +69,7 @@ end
 
 --- Converts input to short name for tier/tierType
 ---@param input string|integer|nil
----@param mode 'tiers'|'tiertypes'
+---@param mode 'tiers'|'tierTypes'
 ---@return string?
 function Tier.toShortName(input, mode)
 	return (Tier.raw(input, mode) or {}).short
@@ -76,7 +77,7 @@ end
 
 --- Converts input to (portal) page for tier/tierType
 ---@param input string|integer|nil
----@param mode 'tiers'|'tiertypes'
+---@param mode 'tiers'|'tierTypes'
 ---@return string?
 function Tier.toLink(input, mode)
 	return (Tier.raw(input, mode) or {}).link
@@ -84,7 +85,7 @@ end
 
 --- Converts input to a tier/tierType category
 ---@param input string|integer|nil
----@param mode 'tiers'|'tiertypes'
+---@param mode 'tiers'|'tierTypes'
 ---@return string?
 function Tier.toCategory(input, mode)
 	return (Tier.raw(input, mode) or {}).category
@@ -93,7 +94,7 @@ end
 --- Builds the display for a single tier/tierType
 ---@param args {
 ---		input: string|integer|nil,
----		mode: 'tiers'|'tiertypes',
+---		mode: 'tiers'|'tierTypes',
 ---		short: boolean?,
 ---		link: string|boolean|nil,
 ---		sort: boolean?
@@ -122,9 +123,25 @@ function Tier.displaySingle(args)
 end
 
 --- Builds the display for a a tier/tierType combination
----@param args table
+---@param tierArgs table
+---@param tierTypeArgs table
 ---@return string?
-function Tier.display(args)
+function Tier.display(tierArgs, tierTypeArgs)
+	local tierDisplay = Tier.displaySingle(tierArgs)
+
+	local tierTypeDisplay = Tier.displaySingle(tierTypeArgs)
+	if String.isEmpty(tierTypeDisplay) then
+		return tierDisplay
+	end
+
+	return tierTypeDisplay .. NON_BREAKING_SPACE .. '(' .. tierDisplay .. ')'
+end
+
+--- Parses Args for combined tier + tierType display
+---@param args table
+---@return table
+---@return table
+function Tier.parseArgsForDisplay(args)
 	args = args or {}
 
 	args.tier = args.tier or args.liquipediatier
@@ -136,21 +153,17 @@ function Tier.display(args)
 		args.shortIfBoth = false
 	end
 
-	local tierDisplay = Tier.displaySingle(Tier.parseDisplayArgs(args, 'tier'))
+	local tierTypeArgs = Tier.parseArgsForPrefix(args, 'tiertype')
+	tierTypeArgs.mode = TIER_TYPE_MODE
 
-	local tierTypeDisplay = Tier.displaySingle(Tier.parseDisplayArgs(args, 'tiertype'))
-	if String.isEmpty(tierTypeDisplay) then
-		return tierDisplay
-	end
-
-	return tierTypeDisplay .. NON_BREAKING_SPACE .. '(' .. tierDisplay .. ')'
+	return Tier.parseArgsForPrefix(args, 'tier'), tierTypeArgs
 end
 
---- Builds the display for a single tier/tierType
+--- Parse tier/tierType args based on a given prefix
 ---@param args table
 ---@param prefix string
 ---@return table
-function Tier.parseDisplayArgs(args, prefix)
+function Tier.parseArgsForPrefix(args, prefix)
 	return {
 		mode = prefix .. 's',
 		input = Tier.toIdentifier(args[prefix]),
