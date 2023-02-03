@@ -123,14 +123,10 @@ function MediaList._buildMultiKeyCondition(value, prefix)
 end
 
 function MediaList._displayDynamic(data, args)
-	_, data = Array.groupBy(data, function(item)
-		return item.date:sub(1, 4)
-	end)
-
 	local tabsData = {}
 
 	local tabIndex = 0
-	for year, yearItems in Table.iter.spairs(data, function(_, key1, key2) return key1 > key2 end) do
+	for year, yearItems in Table.iter.spairs(MediaList._groupByYear(data), MediaList._sortInYear(_, key1, key2)) do
 		tabIndex = tabIndex + 1
 
 		tabsData['name' .. tabIndex] = year
@@ -141,19 +137,29 @@ function MediaList._displayDynamic(data, args)
 end
 
 function MediaList._displayByYear(data, args)
-	_, data = Array.groupBy(data, function(item)
-		return item.date:sub(1, 4)
-	end)
-
 	local display = mw.html.create()
 
-	for year, yearItems in Table.iter.spairs(data, function(_, key1, key2) return key1 > key2 end) do
+	for year, yearItems in Table.iter.spairs(MediaList._groupByYear(data), MediaList._sortInYear(_, key1, key2)) do
 		display
 			:wikitext('\n====' .. year .. '====\n')
 			:node(MediaList._displayYear(yearItems, args))
 	end
 
 	return display
+end
+
+function MediaList._groupByYear(data)
+	-- luacheck: push ignore
+	_, data = Array.groupBy(data, function(item)
+		return item.date:sub(1, 4)
+	end)
+	-- luacheck: pop
+
+	return data
+end
+
+function MediaList._sortInYear(_, key1, key2)
+	return key1 > key2
 end
 
 function MediaList._displayYear(data, args)
