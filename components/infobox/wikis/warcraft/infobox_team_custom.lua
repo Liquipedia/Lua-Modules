@@ -90,7 +90,7 @@ function CustomTeam._createProfile(profileData, profileValue)
 	end
 
 	return String.interpolate(PROFILE_DISPLAY, {
-		text = String.interpolate(profileData.text, {_team.name}),
+		text = String.interpolate(profileData.text, {name = _team.name}),
 		link = profileData.link .. profileValue,
 		icon = profileData.icon,
 	})
