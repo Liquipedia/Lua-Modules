@@ -10,11 +10,12 @@ local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
 local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
 local COMMONS_IDENTIFIER = 'commons'
-local COMMONS_DATA = Lua.import('Module:Info', {requireDevIfEnabled = true}).games.commons
+local COMMONS_DATA = Info.games.commons
 local COMMONS_ICON = mw.text.decode('[[File:Liquipedia logo.png|link=lpcommons:Main Page|class=|25x25px]]')
 local GAME_TO_THROW = 'please throw'
 
