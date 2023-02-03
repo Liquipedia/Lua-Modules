@@ -62,6 +62,7 @@ function Team:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Team Information'},
+		Customizable{id = 'topcustomcontent', children = {}},
 		Cell{
 			name = 'Location',
 			content = {
