@@ -6,11 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Role = require('Module:Role')
-local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
@@ -26,11 +24,9 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
-	_player = player
 	_args = player.args
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
