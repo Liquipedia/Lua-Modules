@@ -56,7 +56,7 @@ return {
 		},
 	},
 
-	tiertypes = {
+	tierTypes = {
 		monthly = {
 			value = 'Monthly',
 			sort = 'A6',
