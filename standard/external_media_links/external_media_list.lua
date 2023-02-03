@@ -27,7 +27,7 @@ function MediaList.get(args)
 		order = 'date desc',
 		limit = args.limit
 	})
-	
+
 	--if we do not get any results from the query return empty string
 	if type(data[1]) ~= 'table' then return end
 
@@ -88,7 +88,6 @@ function MediaList._buildConditions(args)
 	end
 
 	-- todo: check if date_year works for this lpdb table
-	local year = tonumber(args.year or '')
 	if args.year then
 		table.insert(conditions, '[[date::>' .. (args.year - 1) .. '-12-31]]')
 		table.insert(conditions, '[[date::<' .. (args.year + 1) .. '-01-01]]')
@@ -240,7 +239,8 @@ function MediaList._displayEvent(item)
 end
 
 function MediaList._displayTranslation(item)
-	local translation = NON_BREAKING_SPACE .. '(trans. ' .. Flag.Icon({flag = item.extradata.translation, shouldLink = false})
+	local translation = NON_BREAKING_SPACE .. '(trans. '
+		.. Flag.Icon({flag = item.extradata.translation, shouldLink = false})
 
 	if String.isEmpty(item.extradata.translator) then
 		return translation .. ')'
