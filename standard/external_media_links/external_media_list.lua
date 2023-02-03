@@ -126,7 +126,7 @@ function MediaList._displayDynamic(data, args)
 	local tabsData = {}
 
 	local tabIndex = 0
-	for year, yearItems in Table.iter.spairs(MediaList._groupByYear(data), MediaList._sortInYear(_, key1, key2)) do
+	for year, yearItems in Table.iter.spairs(MediaList._groupByYear(data), MediaList._sortInYear) do
 		tabIndex = tabIndex + 1
 
 		tabsData['name' .. tabIndex] = year
@@ -139,7 +139,7 @@ end
 function MediaList._displayByYear(data, args)
 	local display = mw.html.create()
 
-	for year, yearItems in Table.iter.spairs(MediaList._groupByYear(data), MediaList._sortInYear(_, key1, key2)) do
+	for year, yearItems in Table.iter.spairs(MediaList._groupByYear(data), MediaList._sortInYear) do
 		display
 			:wikitext('\n====' .. year .. '====\n')
 			:node(MediaList._displayYear(yearItems, args))
