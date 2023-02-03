@@ -112,6 +112,11 @@ local PREFIXES = {
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
 	nimotv = {'https://www.nimo.tv/'},
+	['nwc3l'] = {
+		'',
+		team = 'https://nwc3l.com/team/',
+		player = 'https://nwc3l.com/profile/',
+	},
 	openrec = {'https://www.openrec.tv/live/'},
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
