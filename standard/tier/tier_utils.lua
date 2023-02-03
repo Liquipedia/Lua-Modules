@@ -12,6 +12,7 @@ local HiddenSort = require('Module:HiddenSort')
 local Logic = require('Module:Logic')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local TierData = mw.loadData('Module:Tier/Data')
 
@@ -163,6 +164,15 @@ function Tier.parseArgsForPrefix(args, prefix)
 		short = Logic.readBool(args[prefix .. 'short']) or Logic.readBool(args.shortIfBoth),
 		sort = Logic.readBool(args[prefix .. 'sort']),
 	}
+end
+
+--- Iterate over tiers/tierTypes in a sorted order
+---@param mode 'tiers'|'tierTypes'
+---@return function
+function Tier.iterate(mode)
+	return Table.iter.spairs(TierData[mode], function(tierData, key1, key2)
+		return tierData[key1].sort < tierData[key2].sort
+	end)
 end
 
 --- Legacy: Converts legacy tier input to its numeric value. DEPRECATED!!!
