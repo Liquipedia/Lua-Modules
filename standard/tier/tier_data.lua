@@ -9,7 +9,6 @@
 return {
 	tiers = {
 		{
-			order = 1,
 			value = '1',
 			sort = 'A1',
 			name = 'S-Tier',
@@ -18,7 +17,6 @@ return {
 			category = 'S-Tier Tournaments',
 		},
 		{
-			order = 2,
 			value = '2',
 			sort = 'A2',
 			name = 'A-Tier',
@@ -27,7 +25,6 @@ return {
 			category = 'A-Tier Tournaments',
 		},
 		{
-			order = 3,
 			value = '3',
 			sort = 'A3',
 			name = 'B-Tier',
@@ -36,7 +33,6 @@ return {
 			category = 'B-Tier Tournaments',
 		},
 		{
-			order = 4,
 			value = '4',
 			sort = 'A4',
 			name = 'C-Tier',
@@ -45,7 +41,6 @@ return {
 			category = 'C-Tier Tournaments',
 		},
 		{
-			order = 5,
 			value = '5',
 			sort = 'A5',
 			name = 'D-Tier',
@@ -54,7 +49,6 @@ return {
 			category = 'D-Tier Tournaments',
 		},
 		[''] = {
-			order = 6,
 			value = nil,
 			sort = 'B2',
 			name = 'Undefined',
@@ -64,7 +58,6 @@ return {
 
 	tiertypes = {
 		monthly = {
-			order = 1,
 			value = 'Monthly',
 			sort = 'A6',
 			name = 'Monthly',
@@ -73,7 +66,6 @@ return {
 			category = 'Monthly Tournaments',
 		},
 		weekly = {
-			order = 2,
 			value = 'Weekly',
 			sort = 'A7',
 			name = 'Weekly',
@@ -82,7 +74,6 @@ return {
 			category = 'Weekly Tournaments',
 		},
 		qualifier = {
-			order = 3,
 			value = 'Qualifier',
 			sort = 'A8',
 			name = 'Qualifier',
@@ -91,7 +82,6 @@ return {
 			category = 'Qualifier Tournaments',
 		},
 		misc = {
-			order = 4,
 			value = 'Misc',
 			sort = 'A9',
 			name = 'Misc',
@@ -100,7 +90,6 @@ return {
 			category = 'Miscellaneous Tournaments',
 		},
 		showmatch = {
-			order = 5,
 			value = 'Show Match',
 			sort = 'B1',
 			name = 'Show Match',
