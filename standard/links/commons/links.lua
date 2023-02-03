@@ -124,7 +124,6 @@ local PREFIXES = {
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
 	},
-	site = {''},
 	sk = {'https://sk-gaming.com/member/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
