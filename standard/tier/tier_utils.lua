@@ -75,14 +75,6 @@ function Tier.toShortName(input, mode)
 	return (Tier.raw(input, mode) or {}).short
 end
 
---- Converts input to (portal) page for tier/tierType
----@param input string|integer|nil
----@param mode 'tiers'|'tierTypes'
----@return string?
-function Tier.toLink(input, mode)
-	return (Tier.raw(input, mode) or {}).link
-end
-
 --- Converts input to a tier/tierType category
 ---@param input string|integer|nil
 ---@param mode 'tiers'|'tierTypes'
