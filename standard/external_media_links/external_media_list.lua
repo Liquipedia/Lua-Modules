@@ -17,6 +17,7 @@ local Tabs = require('Module:Tabs')
 local MediaList = {}
 
 local MAX_NUMBER_OF_STORED_PER_KEY = 10
+local NON_BREAKING_SPACE = '&nbsp;'
 
 function MediaList.get(args)
 	args = MediaList._parseArgs(args)
@@ -169,10 +170,10 @@ end
 function MediaList._row(item, args)
 	local row = mw.html.create('li')
 		:node(MediaList._editButton(item.pagename))
-		:wikitext(item.date .. '&nbsp;|&nbsp;')
+		:wikitext(item.date .. NON_BREAKING_SPACE .. '|' .. NON_BREAKING_SPACE)
 
 	if String.isNotEmpty(item.language) and item.language ~= 'en' and (item.language ~= 'usuk' or args.showUsUk) then
-		row:wikitext(Flag.Icon({flag = item.language, shouldLink = false}) .. '&nbsp;')
+		row:wikitext(Flag.Icon({flag = item.language, shouldLink = false}) .. NON_BREAKING_SPACE)
 	end
 
 	row:node(MediaList._displayTitle(item))
@@ -189,12 +190,12 @@ function MediaList._row(item, args)
 	end
 	if Table.isNotEmpty(authors) then
 		row
-			:wikitext('&nbsp;by&nbsp;')
-			:wikitext(mw.text.listToText(authors, ',&nbsp;', '&nbsp;and&nbsp;' ))
+			:wikitext(NON_BREAKING_SPACE .. 'by' .. NON_BREAKING_SPACE)
+			:wikitext(mw.text.listToText(authors, ',' .. NON_BREAKING_SPACE, NON_BREAKING_SPACE .. 'and' .. NON_BREAKING_SPACE))
 	end
 
 	if String.isNotEmpty(item.publisher) then
-		row:wikitext('&nbsp;of&nbsp;[[' .. item.publisher .. ']]')
+		row:wikitext(NON_BREAKING_SPACE .. 'of' .. NON_BREAKING_SPACE .. '[[' .. item.publisher .. ']]')
 	end
 
 	if String.isNotEmpty(item.extradata.event) and not args.isEventPage then
@@ -209,7 +210,7 @@ function MediaList._row(item, args)
 end
 
 function MediaList._editButton(page)
-	return mw.text.nowiki('[') .. '[[Data:' .. page .. '|e]]' .. mw.text.nowiki(']') .. '&nbsp;'
+	return mw.text.nowiki('[') .. '[[Data:' .. page .. '|e]]' .. mw.text.nowiki(']') .. NON_BREAKING_SPACE
 end
 
 function MediaList._displayTitle(item)
@@ -226,25 +227,26 @@ function MediaList._displayTitle(item)
 end
 
 function MediaList._displayEvent(item)
+	local prefix = NON_BREAKING_SPACE .. 'at' .. NON_BREAKING_SPACE
 	if Logic.readBoolOrNil(item.extradata.event_link) == false then
-		return '&nbsp;at&nbsp;' .. item.extradata.event
+		return prefix .. item.extradata.event
 	end
 
 	if String.isNotEmpty(item.extradata.event_link) then
-		return '&nbsp;at&nbsp;[[' .. item.extradata.event_link .. '|' .. item.extradata.event .. ']]'
+		return prefix .. '[[' .. item.extradata.event_link .. '|' .. item.extradata.event .. ']]'
 	end
 
-	return '&nbsp;at&nbsp;[[' .. item.extradata.event .. ']]'
+	return prefix .. '[[' .. item.extradata.event .. ']]'
 end
 
 function MediaList._displayTranslation(item)
-	local translation = '&nbsp;(trans. ' .. Flag.Icon({flag = item.extradata.translation, shouldLink = false})
+	local translation = NON_BREAKING_SPACE .. '(trans. ' .. Flag.Icon({flag = item.extradata.translation, shouldLink = false})
 
 	if String.isEmpty(item.extradata.translator) then
 		return translation .. ')'
 	end
 
-	return translation .. '&nbsp;by&nbsp;' .. item.extradata.translator .. ')'
+	return translation .. NON_BREAKING_SPACE .. 'by' .. NON_BREAKING_SPACE .. item.extradata.translator .. ')'
 end
 
 function MediaList._formLink(show)
