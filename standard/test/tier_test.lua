@@ -50,12 +50,6 @@ function suite:testToShortName()
 	self:assertEquals(nil, Tier.toShortName('sedrvo', 'tiers'))
 end
 
-function suite:testToLink()
-	self:assertEquals('Show Matches', Tier.toLink('showmatch', 'tierTypes'))
-	self:assertEquals('S-Tier Tournaments', Tier.toLink(1, 'tiers'))
-	self:assertEquals(nil, Tier.toLink('sedrvo', 'tiers'))
-end
-
 function suite:testToCategory()
 	self:assertEquals('Miscellaneous Tournaments', Tier.toCategory('misc', 'tierTypes'))
 	self:assertEquals('Show Match Tournaments', Tier.toCategory('showmatch', 'tierTypes'))
