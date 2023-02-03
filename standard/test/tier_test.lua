@@ -69,7 +69,8 @@ function suite:testRaw()
 end
 
 function suite:testDisplay()
-	self:assertEquals('Show Match&nbsp;(S-Tier)', Tier.display(Tier.parseArgsForDisplay{tier = 1, tiertype = 'ShOW MatCh'}))
+	self:assertEquals('Show Match&nbsp;(S-Tier)',
+		Tier.display(Tier.parseArgsForDisplay{tier = 1, tiertype = 'ShOW MatCh'}))
 	self:assertEquals('Show&nbsp;M.&nbsp;(S)', Tier.display(Tier.parseArgsForDisplay{
 		tier = 1, tiershort = 1,
 		tiertype = 'ShOW MatCh', tiertypeshort = 1,
