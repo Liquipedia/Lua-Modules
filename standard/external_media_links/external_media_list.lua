@@ -16,7 +16,6 @@ local Tabs = require('Module:Tabs')
 
 local MediaList = {}
 
-local MAX_NUMBER_OF_STORED_PER_KEY = 10
 local NON_BREAKING_SPACE = '&nbsp;'
 
 function MediaList.get(args)
@@ -95,16 +94,16 @@ function MediaList._buildConditions(args)
 
 	local additionalConditions = {}
 	for _, subject in pairs(args.subjects) do
-		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(subject, 'extradata_subject'))
+		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(subject, 'extradata_subject', 20))
 	end
 
 	if args.org then
 		table.insert(additionalConditions, '[[extradata_subject_organization::' .. args.org .. ']]')
-		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.org, 'extradata_subject_organization'))
+		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.org, 'extradata_subject_organization', 5))
 	end
 
 	if args.author then
-		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.author, 'authors_author'))
+		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.author, 'authors_author', 5))
 	end
 
 	if args.event then
@@ -116,8 +115,8 @@ function MediaList._buildConditions(args)
 	return table.concat(conditions, ' AND ')
 end
 
-function MediaList._buildMultiKeyCondition(value, prefix)
-	return table.concat(Array.map(Array.range(1, MAX_NUMBER_OF_STORED_PER_KEY), function(index)
+function MediaList._buildMultiKeyCondition(value, prefix, limit)
+	return table.concat(Array.map(Array.range(1, limit), function(index)
 		return '[[' .. prefix .. index .. '::' .. value .. ']]'
 	end), ' OR ')
 end
