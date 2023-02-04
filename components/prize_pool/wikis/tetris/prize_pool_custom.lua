@@ -12,8 +12,6 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
-
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
