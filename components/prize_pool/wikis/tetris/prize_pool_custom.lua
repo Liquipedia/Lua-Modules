@@ -44,12 +44,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.publisherpremier = Variables.varDefault('tournament_publisher_major') and 'true' or ''
 
 	local lastVs = ((opponent or {}).additionalData or {}).LASTVS or {}
-	if lastVs.type == Opponent.solo then
-		local playerData = (lastVs.players or {})[1] or {}
-		lpdbData.extradata.lastvsflag = playerData.flag
-		lpdbData.extradata.lastvsdisplayname = playerData.displayName
-	end
-
 	local team = lpdbData.participant or ''
 	local lpdbPrefix = placement.parent.options.lpdbPrefix
 
