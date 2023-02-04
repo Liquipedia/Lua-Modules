@@ -38,12 +38,13 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
-	local player = lpdbData.opponentname or ''
+	local participants = lpdbData.opponentname or ''
 	local lpdbPrefix = placement.parent.options.lpdbPrefix
 
-	Variables.varDefine('enddate_' .. lpdbPrefix .. player, lpdbData.date)
-	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (player:lower()) .. '_pointprize', lpdbData.extradata.prizepoints)
-
+	Variables.varDefine('enddate_' .. lpdbPrefix .. participants, lpdbData.date)
+	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (participants:lower()) .. 
+		'_pointprize', lpdbData.extradata.prizepoints
+	)
 
 	return lpdbData
 end
