@@ -171,6 +171,7 @@ function LeagueIcon.generate(args)
 		'--><span class="league-icon-small-image darkmode">' ..
 		'[[File:' .. iconDark .. imageOptions .. '</span><!--\n' ..
 		'--><noinclude>[[Category:Small League Icon Templates]]</noinclude>') .. '</pre>'
+		.. LeagueIcon._buildLinkToTemplate(args)
 end
 
 --generate copy paste code for new historical LeagueIconSmall templates
@@ -222,7 +223,17 @@ function LeagueIcon.generateHistorical(args)
 
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(
 			defineTime .. comparisons .. '--><noinclude>[[Category:Historical Small League Icon template]]</noinclude>'
-		) .. '</pre>'
+		) .. '</pre>' .. LeagueIcon._buildLinkToTemplate(args)
 end
+
+function LeagueIcon._buildLinkToTemplate(args)
+	if String.isEmpty(args.templateName) or String.isEmpty(args.wiki) then
+		return ''
+	end
+
+	return '<br><b>Link to the template page:</b> [[' .. args.wiki .. ':Template:LeagueIconSmall/' .. args.templateName:lower() .. ']]'
+end
+
+
 
 return Class.export(LeagueIcon, { frameOnly = true })
