@@ -235,6 +235,4 @@ function LeagueIcon._buildLinkToTemplate(args)
 		':Template:LeagueIconSmall/' .. args.templateName:lower() .. ']]'
 end
 
-
-
 return Class.export(LeagueIcon, { frameOnly = true })
