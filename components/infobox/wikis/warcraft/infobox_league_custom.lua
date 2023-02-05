@@ -354,7 +354,7 @@ function CustomLeague:defineCustomPageVariables()
 			finished = true
 		end
 	end
-	Variables.varDefine('tournament_finished', tostring(finished))
+	Variables.varDefine('tournament_finished', tostring(finished or false))
 
 	--maps
 	local maps = CustomLeague._getMaps('map')
