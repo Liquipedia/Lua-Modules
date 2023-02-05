@@ -35,7 +35,7 @@ local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local CustomResultsTable = {}
 
 -- Template entry point
-function CustomResultsTable.run(frame)
+function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.playerLimit = MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS
 
@@ -105,18 +105,6 @@ function CustomResultsTable:rowHighlight(placement)
 	if Logic.readBool(placement.publishertier) then
 		return 'sc2premier-highlighted'
 	end
-end
-
-function CustomResultsTable:processLegacyVsData(placement)
-	if Table.isEmpty(placement.lastvsdata) then
-		local opponent = (placement.extradata or {}).vsOpponent or {}
-		placement.lastvsdata = Table.merge(
-			Opponent.toLpdbStruct(opponent or {}),
-			{groupscore = placement.groupscore, score = placement.lastvsscore}
-		)
-	end
-
-	return placement
 end
 
 -- all kill rows are manual inputs of all kill chievements
