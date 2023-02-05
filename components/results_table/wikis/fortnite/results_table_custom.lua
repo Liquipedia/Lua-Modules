@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
