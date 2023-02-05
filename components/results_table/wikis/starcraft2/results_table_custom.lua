@@ -60,7 +60,9 @@ function CustomResultsTable.results(frame)
 	return buildTable
 end
 
-function CustomResultsTable.awards(args)
+function CustomResultsTable.awards(frame)
+	local args = Arguments.getArgs(frame)
+
 	args.data = Json.parseIfTable(Variables.varDefault('awardAchievements'))
 
 	if Logic.readBool(args.achievements) and Table.isEmpty(args.data) then
