@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -183,7 +182,7 @@ end
 
 function ExternalMediaLink._displayTranslation(args)
 	local translation = NON_BREAKING_SPACE .. '(trans. '
-		.. Flag.Icon({flag = args.translation, shouldLink = false})
+		.. Flags.Icon({flag = args.translation, shouldLink = false})
 
 	if String.isEmpty(args.translator) then
 		return translation .. ')'
