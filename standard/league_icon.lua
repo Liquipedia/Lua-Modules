@@ -231,7 +231,8 @@ function LeagueIcon._buildLinkToTemplate(args)
 		return ''
 	end
 
-	return '<br><b>Link to the template page:</b> [[' .. args.wiki .. ':Template:LeagueIconSmall/' .. args.templateName:lower() .. ']]'
+	return '<br><b>Link to the template page:</b> [[' .. args.wiki ..
+		':Template:LeagueIconSmall/' .. args.templateName:lower() .. ']]'
 end
 
 
