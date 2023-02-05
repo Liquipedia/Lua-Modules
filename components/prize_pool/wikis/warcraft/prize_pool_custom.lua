@@ -66,6 +66,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		seriesnumber = CustomPrizePool._seriesNumber()
 	})
 
+	lpdbData.players = lpdbData.opponentplayers
+
 	lpdbData.weight = Weight.calc(
 		lpdbData.individualprizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
