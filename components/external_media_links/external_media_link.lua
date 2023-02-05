@@ -6,14 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-
-local MediaList = Lua.import('Module:ExternalMediaList', {requireDevIfEnabled = true})
 
 local ExternalMediaLink = {}
 
@@ -136,12 +137,12 @@ function ExternalMediaLink._display(args)
 	end
 
 	if args.trans_title then
-		display:wikitext(NON_BREAKING_SPACE .. '[' .. args.trans_title .. ']')
+		display:wikitext(NON_BREAKING_SPACE .. Page.makeExternalLink(args.trans_title, args.trans_title))
 	end
 
 	local authors = {}
 	for authorIndex, author in Table.iter.pairsByPrefix(args, 'by') do
-		table.insert(authors, '[[' .. (args['by_link' .. authorIndex] or author) .. '|' .. author .. ']]')
+		table.insert(authors, Page.makeInternalLink({}, author, args['by_link' .. authorIndex]))
 	end
 	if Table.isNotEmpty(authors) then
 		display
@@ -150,7 +151,7 @@ function ExternalMediaLink._display(args)
 	end
 
 	if args.of then
-		display:wikitext(NON_BREAKING_SPACE .. 'of' .. NON_BREAKING_SPACE .. '[[' .. args.of .. ']]')
+		display:wikitext(NON_BREAKING_SPACE .. 'of' .. NON_BREAKING_SPACE .. Page.makeInternalLink({}, args.of))
 	end
 
 	if args.event then
@@ -177,11 +178,7 @@ function ExternalMediaLink._displayEvent(args)
 		return prefix .. args.event
 	end
 
-	if String.isNotEmpty(args['event-link']) then
-		return prefix .. '[[' .. args['event-link'] .. '|' .. args.event .. ']]'
-	end
-
-	return prefix .. '[[' .. args.event .. ']]'
+	return prefix .. Page.makeInternalLink({}, args.event, args['event-link'])
 end
 
 function ExternalMediaLink._displayTranslation(args)
