@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier')
 
@@ -28,6 +29,7 @@ function CustomResultsTable.results(args)
 	-- overwrite functions
 	resultsTable.tierDisplay = CustomResultsTable.tierDisplay
 	resultsTable.processLegacyVsData = CustomResultsTable.processLegacyVsData
+	resultsTable.processVsData = CustomResultsTable.processVsData
 
 	return resultsTable:create():build()
 end
@@ -72,6 +74,17 @@ function CustomResultsTable:processLegacyVsData(placement)
 	end
 
 	return placement
+end
+
+function CustomResultsTable:processVsData(placement)
+	local lastVs = placement.lastvsdata
+
+	if String.isNotEmpty(lastVs.groupscore) then
+		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
+	end
+
+	-- return empty strings for non group scores since it is a BattleRoyale wiki
+	return '', ''
 end
 
 return Class.export(CustomResultsTable)
