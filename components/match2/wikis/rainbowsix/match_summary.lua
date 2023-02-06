@@ -54,7 +54,7 @@ local _LINK_DATA = {
 	},
 	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
-	ebattle = {icon = 'Ebattle Series allmode.png', text = 'Match page on  ebattle'},
+	ebattle = {icon = 'File:Ebattle Series allmode.png', text = 'Match page on ebattle'},
 }
 
 -- Operator Bans Class
