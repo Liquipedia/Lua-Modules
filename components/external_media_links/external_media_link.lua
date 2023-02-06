@@ -29,14 +29,13 @@ function ExternalMediaLink.run(args)
 	ExternalMediaLink._fallBackArgs(args)
 
 	if Logic.nilOr(Logic.readBoolOrNil(args.storage), true)
-		and not Logic.readBool(Variables.VarDefault('disable_LPDB_storage'))
-		and not Logic.readBool(Variables.VarDefault('disable_SMW_storage')) then
+		and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		and not Logic.readBool(Variables.varDefault('disable_SMW_storage')) then
 
 		ExternalMediaLink._store(args)
 	end
 
 	mw.ext.TeamLiquidIntegration.add_category('Pages with ExternalMediaLinks')
-
 	if not Logic.nilOr(Logic.readBoolOrNil(args.display), true) then
 		return
 	end
@@ -106,7 +105,7 @@ function ExternalMediaLink._store(args)
 end
 
 function ExternalMediaLink._objectName(args)
-	local objectName = ExternalMediaLink
+	local objectName = 'ExternalMediaLink'
 
 	for _, author in Table.iter.pairsByPrefix(args, 'by') do
 		objectName = objectName .. '_' .. author
@@ -123,12 +122,13 @@ function ExternalMediaLink._display(args)
 	end
 
 	if args.language and args.language ~= DEFAULT_LANGUAGE then
-		display:wikitext(Flags.Icon({flag = args.language, shouldLink = false}))
+		display:wikitext(Flags.Icon({flag = args.language, shouldLink = false}) .. NON_BREAKING_SPACE)
 	end
 
 	if args.title then
 		display:tag('span')
 			:addClass('plainlinks')
+			:css('font-style', 'italic')
 			:wikitext(Page.makeExternalLink(args.title, args.link))
 	else
 		display:tag('span')
@@ -169,6 +169,8 @@ function ExternalMediaLink._display(args)
 				:css('font-style', 'italic')
 				:wikitext('(' .. args.note .. ')')
 	end
+
+	return display
 end
 
 function ExternalMediaLink._displayEvent(args)
@@ -194,20 +196,24 @@ end
 
 function ExternalMediaLink.wrapper(args)
 	local wrapperInfoDisplay = mw.html.create('table')
-		:attribute('border', 0)
-		:attribute('cellpadding', 4)
-		:attribute('cellspacing', 4)
+		:attr('border', 0)
+		:attr('cellpadding', 4)
+		:attr('cellspacing', 4)
 		:css('margin-bottom', '5px')
 
 	wrapperInfoDisplay
-		:tag('tr'):tag('th'):wikitext('Author(s)'):done():done()
-		:tag('tr'):tag('td'):wikitext(args.authors or ''):done():done()
-		:tag('tr'):tag('th'):wikitext('Title'):done():done()
-		:tag('tr'):tag('td'):wikitext(args.title or ''):done():done()
-		:tag('tr'):tag('th'):wikitext('Date'):done():done()
-		:tag('tr'):tag('td'):wikitext(args.date or ''):done():done()
-		:tag('tr'):tag('th'):wikitext('URL'):done():done()
-		:tag('tr'):tag('td'):wikitext(args.link or '')
+		:tag('tr')
+			:tag('th'):wikitext('Author(s)'):done()
+			:tag('td'):wikitext(args.authors or ''):done():done()
+		:tag('tr')
+			:tag('th'):wikitext('Title'):done()
+			:tag('td'):wikitext(args.title or ''):done():done()
+		:tag('tr')
+			:tag('th'):wikitext('Date'):done()
+			:tag('td'):wikitext(args.date or ''):done():done()
+		:tag('tr')
+			:tag('th'):wikitext('URL'):done()
+			:tag('td'):wikitext(args.link or '')
 
 	local parsedArgs = {
 		date = args.date,
@@ -245,7 +251,7 @@ function ExternalMediaLink.wrapper(args)
 		end
 	end
 
-	return mw.mhtml.create()
+	return mw.html.create()
 		:wikitext('[[Special:FormEdit/ExternalMediaLinks|Go back to the form]]<br>')
 		:node(ExternalMediaLink.run(parsedArgs))
 		:node(wrapperInfoDisplay)
