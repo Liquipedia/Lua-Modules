@@ -261,7 +261,7 @@ function ExternalMediaLink._cleanValue(value)
 	value = mw.text.trim(value)
 
 	if String.isEmpty(value) then
-		return
+		return nil
 	end
 
 	return value
