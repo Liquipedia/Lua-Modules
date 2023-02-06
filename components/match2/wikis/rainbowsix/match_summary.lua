@@ -47,9 +47,14 @@ local _LINK_DATA = {
 	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	lpl = {icon = 'File:LPL_Logo_lightmode.png', iconDark = 'File:LPL_Logo_darkmode.png', text = 'Match page on LPL Play'},
-	r6esports = {icon = 'File:Copa Elite Six icon.png', text = 'R6 Esports LATAM Match Page'},
+	r6esports = {
+		icon = 'File:Rainbow 6 Esports 2023 lightmode.png',
+		iconDark = 'File:Rainbow 6 Esports 2023 darkmode.png',
+		text = 'R6 Esports Match Page'
+	},
 	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
+	ebattle = {icon = 'Ebattle Series allmode.png', text = 'Match page on  ebattle'},
 }
 
 -- Operator Bans Class
