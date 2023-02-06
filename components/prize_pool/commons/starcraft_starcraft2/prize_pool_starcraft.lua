@@ -33,8 +33,6 @@ local pageVars = PageVariableNamespace('PrizePool')
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_POINTS = 'POINTS'
-local SCORE_STATUS = 'S'
-local WALKOVER_VS_STATUS = 'W'
 local SC2 = 'starcraft2'
 
 local _lpdb_stash = {}
@@ -149,10 +147,6 @@ function CustomPrizePool._getMode(opponentType, opponent)
 	end
 
 	return Opponent.toLegacyMode(opponentType or '', opponentType or '')
-end
-
-function CustomPrizePool._getStatusFromScore(score)
-	return Logic.isNumeric(score) and SCORE_STATUS or score
 end
 
 function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
