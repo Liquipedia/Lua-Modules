@@ -118,9 +118,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
 	})
 
-	-- remove the following line once the consumers have been updated
-	lpdbData.mode = CustomPrizePool._getMode(lpdbData.opponenttype, opponent.opponentData)
-
 	lpdbData.tournament = _tournament_name
 	lpdbData.series = _series
 
