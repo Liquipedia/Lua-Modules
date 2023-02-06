@@ -111,7 +111,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
-		featured = Variables.varDefault('featured') or 'false', -- to be replaced by lpdbData.publishertier
 		seriesnumber = _series_number,
 
 		 -- to be removed once poinst storage is standardized
