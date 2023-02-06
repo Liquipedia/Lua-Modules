@@ -69,6 +69,7 @@ function ExternalMediaLink._store(args)
 	local authors = {}
 	for authorIndex, author in Table.iter.pairsByPrefix(args, 'by') do
 		authors['author' .. authorIndex] = args['by_link' .. authorIndex] or author
+		authors['author' .. authorIndex .. 'dn'] = author
 	end
 	-- set a maximum for authors due to the same being used in queries
 	assert(Table.size(authors) <= MAXIMUM_VALUES.authors,
