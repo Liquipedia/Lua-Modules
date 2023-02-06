@@ -105,7 +105,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	)
 
 	if type(lpdbData.opponentplayers) == 'table' then
-		-- following 2 lines as legacy support, to be removed once it is clear they are not needed for app
+		-- following 2 lines as legacy support, to be removed once it is clear they are not needed anymore
 		lpdbData.players = Table.copy(lpdbData.opponentplayers)
 		lpdbData.players.type = lpdbData.opponenttype
 	end
