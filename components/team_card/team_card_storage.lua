@@ -96,7 +96,7 @@ end
 
 -- Build the standard LPDB "Object Name", which is used as primary key in the DB record
 function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
-	local storageName = 'ranking'
+	local storageName = (team == 'TBD' and 'participant') or 'ranking'
 	if String.isNotEmpty(lpdbPrefix) then
 		storageName = storageName .. '_' .. lpdbPrefix
 	end
