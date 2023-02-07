@@ -61,7 +61,7 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 		}
-		end
+	end
 	return widgets
 end
 
