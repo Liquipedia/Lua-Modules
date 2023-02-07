@@ -7,6 +7,7 @@
 --
 
 return {
+	startyear = 2015,
 	wikiName = 'zula',
 	name = 'Zula',
 	games = {
