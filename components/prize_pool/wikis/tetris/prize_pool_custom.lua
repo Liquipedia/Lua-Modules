@@ -42,7 +42,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	local lpdbPrefix = placement.parent.options.lpdbPrefix
 
 	Variables.varDefine('enddate_' .. lpdbPrefix .. participants, lpdbData.date)
-	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (participants:lower()) ..
+	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (participants:lower()) .. 
 		'_pointprize', lpdbData.extradata.prizepoints
 	)
 
@@ -54,7 +54,7 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 		return 0
 	end
 
-	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
+	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier)] or 1
 
 	return tierValue * math.max(prizeMoney, 1) / place
 end
