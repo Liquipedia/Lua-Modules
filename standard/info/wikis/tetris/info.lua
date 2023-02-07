@@ -14,7 +14,7 @@ return {
 		tetris = {
 			abbreviation = 'Tetris',
 			name = 'Tetris',
-			link = 'tetris:Main Page',
+			link = 'Tetris (1984)',
 			logo = {
 				darkMode = 'Tetris default allmode.png',
 				lightMode = 'Tetris default allmode.png',
@@ -40,7 +40,7 @@ return {
 		['classic ntsc']  = {
 			abbreviation = 'NES NTSC',
 			name = 'NES (1989) NTSC',
-			link = 'tetris:Tetris (NES 1989 NTSC)',
+			link = 'Tetris (NES 1989 NTSC)',
 			logo = {
 				darkMode = 'Tetris 1989 NTSC default allmode.png',
 				lightMode = 'Tetris 1989 NTSC default allmode.png',
@@ -91,7 +91,7 @@ return {
 		},
 		tec  = {
 			abbreviation = 'TE:C',
-			name = 'Effect: COnnected',
+			name = 'Effect: Connected',
 			link = 'Tetris Effect: Connected',
 			logo = {
 				darkMode = 'Tetris Effect default darkmode.png',
