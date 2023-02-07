@@ -58,7 +58,6 @@ function CustomSquad.run(frame)
 	if squad.type == Squad.TYPE_FORMER then
 		local index = 1
 		while args['p' .. index] or args[index] do
-			local player = Json.parseIfString(args['p' .. index] or args[index])
 			index = index + 1
 		end
 	end
