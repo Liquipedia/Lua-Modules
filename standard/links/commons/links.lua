@@ -119,7 +119,7 @@ local PREFIXES = {
 	royaleapi = {'https://royaleapi.com/player/'},
 	rules = {''},
 	shift = {'https://www.shiftrle.gg/events/'},
-	['siege-gg'] = {
+	siegegg = {
 		'https://siege.gg/competitions/',
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
