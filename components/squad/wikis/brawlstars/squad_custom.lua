@@ -17,52 +17,11 @@ local SquadAutoRefs = Lua.import('Module:SquadAuto/References', {requireDevIfEna
 
 local CustomSquad = {}
 
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
-
-		if wikiText == nil then
-			return headerCell
-		end
-
-		return headerCell:wikitext(wikiText):addClass('divCell')
-	end
-
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-			:node(makeHeader())
-			:node(makeHeader('Name'))
-			:node(makeHeader()) -- "Role"
-			:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-	end
-	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
-		headerRow:node(makeHeader('Leave Date'))
-				:node(makeHeader('New Team'))
-	end
-
-	self.content:node(headerRow)
-
-	return self
-end
-
 function CustomSquad.run(frame)
 	local squad = Squad()
-
 	squad:init(frame):title()
-
+	
 	local args = squad.args
-
-	if squad.type == Squad.TYPE_FORMER then
-		local index = 1
-		while args['p' .. index] or args[index] do
-			index = index + 1
-		end
-	end
-
-	squad.header = CustomSquad.header
 	squad:header()
 
 	local index = 1
@@ -129,11 +88,11 @@ function CustomSquad._playerRow(player, squadType)
 	row:role{role = player.role}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.TYPE_INACTIVE or squadType == Squad.TYPE_FORMER_INACTIVE then
+	if squadType == Squad.TYPE_INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	if squadType == Squad.TYPE_FORMER or squadType == Squad.TYPE_FORMER_INACTIVE then
+	if squadType == Squad.TYPE_FORMER then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,
