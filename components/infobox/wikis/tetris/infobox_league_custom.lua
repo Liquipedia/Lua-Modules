@@ -41,6 +41,19 @@ function CustomLeague:createWidgetInjector()
 	return CustomInjector()
 end
 
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell{
+		name = 'Teams',
+		content = {_args.team_number}
+	})
+	table.insert(widgets, Cell{
+		name = 'Players',
+		content = {_args.player_number}
+	})
+
+	return widgets
+end
+
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
@@ -49,18 +62,7 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 		}
-	elseif id == 'customcontent' then
-		if _args.player_number then
-			table.insert(widgets, Title{name = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {_args.player_number}})
 		end
-
-		--teams section
-		if _args.team_number then
-			table.insert(widgets, Title{name = 'Teams'})
-		end
-		table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
-	end
 	return widgets
 end
 
@@ -74,10 +76,10 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function League:defineCustomPageVariables()
-	if _args.player_number then
-		Variables.varDefine('tournament_mode', 'individual')
-	else
+	if _args.team_number then
 		Variables.varDefine('tournament_mode', 'team')
+	else
+		Variables.varDefine('tournament_mode', 'individual')
 	end
 	Variables.varDefine('tournament_publishertier', _args.publisherpremier)
 end
