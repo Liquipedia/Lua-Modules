@@ -20,7 +20,7 @@ local CustomSquad = {}
 function CustomSquad.run(frame)
 	local squad = Squad()
 	squad:init(frame):title()
-	
+
 	local args = squad.args
 	squad:header()
 
