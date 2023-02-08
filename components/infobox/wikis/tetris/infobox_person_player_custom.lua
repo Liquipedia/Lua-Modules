@@ -14,7 +14,6 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabl
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
-local Cell = Widgets.Cell
 
 local _role
 local _role2
