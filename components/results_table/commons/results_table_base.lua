@@ -75,7 +75,8 @@ function BaseResultsTable:readConfig()
 		queryType = self:getQueryType(),
 		onlyAchievements = Logic.readBool(args.achievements),
 		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
-		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE
+		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
+		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
 	}
 
 	config.sort = args.sort or
@@ -397,7 +398,9 @@ function BaseResultsTable:opponentDisplay(data, options)
 			opponent = Opponent.tbd(),
 			flip = (options or {}).flip,
 		}
-	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
+	elseif self.config.displayDefaultLogoAsIs or
+		data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
+
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data),
 			flip = (options or {}).flip,
