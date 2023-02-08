@@ -427,6 +427,10 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return teamDisplay
 	end
 
+	return BaseResultsTable.teamDisplayWithDefaultLogo(teamDisplay, rawTeamTemplate)
+end
+
+function BaseResultsTable.teamDisplayWithDefaultLogo(teamDisplay, rawTeamTemplate)
 	return mw.html.create()
 		:node(teamDisplay)
 		:node(mw.html.create('div')
@@ -434,7 +438,6 @@ function BaseResultsTable:opponentDisplay(data, options)
 			:css('align', 'left')
 			:node(
 				mw.html.create('div')
-					--make this a class?!
 					:css('line-height', '1')
 					:css('font-size', '80%')
 					:css('text-align', 'center')
