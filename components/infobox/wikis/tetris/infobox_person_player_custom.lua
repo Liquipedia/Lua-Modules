@@ -13,8 +13,6 @@ local Role = require('Module:Role')
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
-local Widgets = require('Module:Infobox/Widget/All')
-
 local _role
 local _role2
 
