@@ -28,6 +28,8 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
+	_role = Role.run({role = _args.role})
+	_role2 = Role.run({role = _args.role2})
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
@@ -35,24 +37,11 @@ function CustomPlayer.run(frame)
 	return player:createInfobox(frame)
 end
 
-function CustomInjector:parse(id, widgets)
-	if id == 'role' then
-		_role = Role.run({role = _args.role})
-		_role2 = Role.run({role = _args.role2})
-		return {
-			Cell{name = _role2.display and 'Roles' or 'Role', content = {_role.display, _role2.display}}
-		}
-	end
-
-	return widgets
-end
-
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
 	lpdbData.extradata.role = _role.role
 	lpdbData.extradata.role2 = _role2.role
 	return lpdbData
