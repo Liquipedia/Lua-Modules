@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=mobilelegends
--- page=Module:Infobox/Person/Player/Custom/dev
+-- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -37,7 +37,6 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
