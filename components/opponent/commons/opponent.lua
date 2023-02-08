@@ -273,7 +273,8 @@ function Opponent.toName(opponent)
 		return TeamTemplate.getPageName(opponent.template)
 	elseif Opponent.typeIsParty(opponent.type) then
 		local pageNames = Array.map(opponent.players, function(player)
-			return player.pageName or player.displayName
+				local pageName = player.pageName or player.displayName
+			return pageName and pageName:gsub(' ', '_') or nil
 		end)
 		return table.concat(pageNames, ' / ')
 	else -- opponent.type == Opponent.literal
@@ -379,7 +380,7 @@ function Opponent.toLpdbStruct(opponent)
 		for playerIndex, player in ipairs(opponent.players) do
 			local prefix = 'p' .. playerIndex
 
-			players[prefix] = player.pageName
+			players[prefix] = player.pageName and player.pageName:gsub(' ', '_') or nil
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
 			players[prefix .. 'team'] = player.team and Opponent.toName({type = Opponent.team, template = player.team}) or nil
