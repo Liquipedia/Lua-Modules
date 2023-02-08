@@ -14,7 +14,7 @@ return {
 		zula = {
 			abbreviation = 'Zula',
 			name = 'Zula',
-			link = 'zula:Main Page',
+			link = 'Main Page',
 			logo = {
 				darkMode = 'Zula Global default allmode.png',
 				lightMode = 'Zula Global default allmode.png',
