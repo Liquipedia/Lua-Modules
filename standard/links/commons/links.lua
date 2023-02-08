@@ -112,6 +112,11 @@ local PREFIXES = {
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
 	nimotv = {'https://www.nimo.tv/'},
+	['nwc3l'] = {
+		'',
+		team = 'https://nwc3l.com/team/',
+		player = 'https://nwc3l.com/profile/',
+	},
 	openrec = {'https://www.openrec.tv/live/'},
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
@@ -119,12 +124,11 @@ local PREFIXES = {
 	royaleapi = {'https://royaleapi.com/player/'},
 	rules = {''},
 	shift = {'https://www.shiftrle.gg/events/'},
-	['siege-gg'] = {
+	siegegg = {
 		'https://siege.gg/competitions/',
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
 	},
-	site = {''},
 	sk = {'https://sk-gaming.com/member/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},

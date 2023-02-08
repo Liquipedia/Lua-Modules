@@ -44,7 +44,6 @@ function CustomPrizePool.run(frame)
 
 	-- adjust defaults
 	prizePool:setConfigDefault('prizeSummary', false)
-	prizePool:setConfigDefault('autoExchange', false)
 	prizePool:setConfigDefault('exchangeInfo', false)
 	prizePool:setConfigDefault('storeSmw', Namespace.isMain())
 	prizePool:setConfigDefault('storeLpdb', Namespace.isMain())
@@ -66,6 +65,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
 		seriesnumber = CustomPrizePool._seriesNumber()
 	})
+
+	lpdbData.players = lpdbData.opponentplayers
 
 	lpdbData.weight = Weight.calc(
 		lpdbData.individualprizemoney,

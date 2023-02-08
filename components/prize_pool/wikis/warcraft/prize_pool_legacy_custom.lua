@@ -14,6 +14,8 @@ local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabl
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
+local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+
 local CustomLegacyPrizePool = {}
 
 local _cache
@@ -47,7 +49,7 @@ end
 
 function CustomLegacyPrizePool.opponentsInSlot(slot)
 	local slotInputSize
-	if slot.place then
+	if slot.place and not SPECIAL_PLACES[string.lower(slot.place)] then
 		local placeRange = mw.text.split(slot.place, '-')
 		slotInputSize = tonumber(placeRange[#placeRange]) - tonumber(placeRange[1]) + 1
 	end

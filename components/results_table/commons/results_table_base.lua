@@ -48,6 +48,7 @@ local VALID_QUERY_TYPES = {
 	COACH_TYPE,
 }
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+local DEFAULT_RESULTS_SUB_PAGE = 'Results'
 
 --- @class BaseResultsTable
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
@@ -74,6 +75,7 @@ function BaseResultsTable:readConfig()
 		queryType = self:getQueryType(),
 		onlyAchievements = Logic.readBool(args.achievements),
 		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
+		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE
 	}
 
 	config.sort = args.sort or
@@ -326,6 +328,14 @@ function BaseResultsTable:build()
 		for _, row in ipairs(self:_buildRows(dataSet)) do
 			displayTable:node(row)
 		end
+	end
+
+	if self.config.onlyAchievements then
+		displayTable:tag('tr')
+			:tag('th')
+				:attr('colspan', 42)
+				:css('font-style', 'italic')
+				:wikitext('[[' .. self.config.opponent .. '/' .. self.config.resultsSubPage .. '|Extended list of results]]')
 	end
 
 	displayTable:node(self.args.manualContent)

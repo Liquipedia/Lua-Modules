@@ -33,7 +33,7 @@ Game.getIdentifierByName = FnUtil.memoize(function()
 end)
 
 ---Get the identifier of a entered game. Checks against identifiers, full names and abbreviations.
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return string?
 function Game.toIdentifier(args)
 	args = args or {}
@@ -49,17 +49,19 @@ function Game.toIdentifier(args)
 
 	return Game.getIdentifierByAbbreviation()[gameInput]
 		or Game.getIdentifierByName()[gameInput]
+		or GamesData[gameInput] and gameInput
+		or nil
 end
 
 ---Check if a given game is a valid game.
----@param game: string?
+---@param game string?
 ---@return boolean
 function Game.isValid(game)
 	return Table.isNotEmpty(Game.raw{game = game})
 end
 
 ---Fetches the raw data for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return table
 function Game.raw(args)
 	local identifier = Game.toIdentifier(args)
@@ -71,35 +73,35 @@ function Game.raw(args)
 end
 
 ---Fetches the abbreviation for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return string?
 function Game.abbreviation(args)
 	return Game.raw(args).abbreviation
 end
 
 ---Fetches the name for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return string?
 function Game.name(args)
 	return Game.raw(args).name
 end
 
 ---Fetches the link for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return string?
 function Game.link(args)
 	return Game.raw(args).link
 end
 
 ---Fetches the defaultTeamLogos (light & dark) for a given game
----@param args {game: string?, useDefault: boolean?}
+---@param args? {game: string?, useDefault: boolean?}
 ---@return table?
 function Game.defaultTeamLogoData(args)
 	return Game.raw(args).defaultTeamLogo
 end
 
 ---Builds the icon for a given game
----@param args {game: string?, useDefault: boolean?, size: string?, noLink: boolean?, link: string?}
+---@param args? {game: string?, useDefault: boolean?, size: string?, noLink: boolean?, link: string?}
 ---@return string
 function Game.icon(args)
 	args = args or {}
@@ -115,8 +117,8 @@ function Game.icon(args)
 		return Game._createIcon{icon = gameData.logo.lightMode, size = args.size, link = link}
 	end
 
-	return Game._createIcon{size = args.size, link = link, mode = 'light', logoData = gameData.logo}
-		.. Game._createIcon{size = args.size, link = link, mode = 'dark', logoData = gameData.logo}
+	return Game._createIcon{size = args.size, link = link, mode = 'light', icon = gameData.logo.lightMode}
+		.. Game._createIcon{size = args.size, link = link, mode = 'dark', icon = gameData.logo.darkMode}
 end
 
 ---@param args {mode: string?, icon: string?, size: string?, link: string?}
@@ -125,7 +127,7 @@ function Game._createIcon(args)
 	return String.interpolate(
 		ICON_STRING,
 		{
-			icon = args.icon or args.logoData[args.mode .. 'Mode'],
+			icon = args.icon,
 			size = args.size or DEFAULT_SIZE,
 			class = args.mode and ('show-when-' .. args.mode .. '-mode') or '',
 			link = args.link or '',
