@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -54,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'region' then return {}
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Role', content = Array.map(Player:getAllArgsForBase(_args, 'role'), function (role)
+			Cell{name = 'Role', content = Array.map(Player:getAllArgsForBase(_args, 'role'), function(role)
 				return CustomPlayer._roleDisplay(role)
 			end)},
 		}
