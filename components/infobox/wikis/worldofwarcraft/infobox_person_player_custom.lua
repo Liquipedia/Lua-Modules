@@ -44,7 +44,7 @@ function CustomPlayer.run(frame)
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
