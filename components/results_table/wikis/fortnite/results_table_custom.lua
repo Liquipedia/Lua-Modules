@@ -46,7 +46,7 @@ end
 
 -- to be replaced with a call to Module:Tier/Utils once that module is on git
 function CustomResultsTable:tierDisplay(placement)
-	local tierDisplay = Tier.text.tiers[placement.liquipediatier] or UNDEFINED_TIER
+	local tierDisplay = Tier.text.tiers[string.lower(placement.liquipediatier or '')] or UNDEFINED_TIER
 
 	tierDisplay = Page.makeInternalLink(
 		{},
