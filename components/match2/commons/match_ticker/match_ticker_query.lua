@@ -146,8 +146,6 @@ function BaseConditions:participantConditions(queryArgs)
 			ConditionNode(ColumnName('opponent'), Comparator.eq, queryArgs.team),
 			ConditionNode(ColumnName('opponent'), Comparator.eq, queryArgs.team:gsub(' ', '_')),
 		}
-		
-		{ConditionNode(ColumnName('opponent'), Comparator.eq, queryArgs.team)}
 	elseif String.isNotEmpty(queryArgs.player) then
 		return ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('player'), Comparator.eq, queryArgs.player),
