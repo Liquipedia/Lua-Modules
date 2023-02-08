@@ -42,43 +42,41 @@ function HiddenDataBox.run(args)
 	local parent = args.parent or args.tournament or tostring(mw.title.getCurrentTitle().basePageTitle)
 	parent = parent:gsub(' ', '_')
 
-	local queryResult
+	local queryResult = {}
 	if doQuery then
 		queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
 			conditions = '[[pagename::' .. parent .. ']]',
 			limit = 1,
 		})
-		queryResult = queryResult[1]
-	else
-		queryResult = {}
-	end
 
-	if not queryResult and Namespace.isMain() then
-		table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
-		queryResult = {}
-	elseif doQuery and args.participantGrabber then
-		local participants = HiddenDataBox._fetchParticipants(parent)
+		if not queryResult[1] and Namespace.isMain() then
+			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
+		elseif args.participantGrabber then
+			local participants = HiddenDataBox._fetchParticipants(parent)
 
-		Table.iter.forEachPair(participants, function (participant, players)
-			-- TODO: An improvement would be called TeamCard module for this
-			-- Would need a rework for the function that does it however
-			local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
+			Table.iter.forEachPair(participants, function (participant, players)
+				-- TODO: An improvement would be called TeamCard module for this
+				-- Would need a rework for the function that does it however
+				local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
 
-			Table.iter.forEachPair(players, function(key, value)
-				HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+				Table.iter.forEachPair(players, function(key, value)
+					HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+				end)
 			end)
-		end)
+		end
+
+		queryResult = queryResult[1] or {}
 	end
 
-	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.tournamentName(args.name), queryResult.name)
+	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.stripHTML(args.name), queryResult.name)
 	HiddenDataBox.checkAndAssign(
 		'tournament_shortname',
-		TextSanitizer.tournamentName(args.shortname),
+		TextSanitizer.stripHTML(args.shortname),
 		queryResult.shortname
 	)
 	HiddenDataBox.checkAndAssign(
 		'tournament_tickername',
-		TextSanitizer.tournamentName(args.tickername),
+		TextSanitizer.stripHTML(args.tickername),
 		queryResult.tickername
 	)
 	HiddenDataBox.checkAndAssign('tournament_icon', args.icon, queryResult.icon)
@@ -145,7 +143,7 @@ end
 function HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
 	Variables.varDefine(participant .. '_' .. key, value)
 	if participant ~= participantResolved then
-		Variables.varDefine(participantResolved .. key, value)
+		Variables.varDefine(participantResolved .. '_' .. key, value)
 	end
 end
 

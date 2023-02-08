@@ -6,4 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-return require('Module:Infobox/Widget').Error
+local Lua = require('Module:Lua')
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
+
+return Widget.Error

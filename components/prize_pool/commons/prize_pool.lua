@@ -11,24 +11,25 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
-local Currency = require('Module:Currency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchPlacement = require('Module:Match/Placement')
 local Math = require('Module:Math')
----Note: This can be overwritten
-local Opponent = require('Module:Opponent')
----Note: This can be overwritten
-local OpponentDisplay = require('Module:OpponentDisplay')
-local Ordinal = require('Module:Ordinal')
-local PlacementInfo = require('Module:Placement')
+local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
+local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
+local Import = Lua.import('Module:PrizePool/Import', {requireDevIfEnabled = true})
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
+local SmwInjector = Lua.import('Module:Smw/Injector', {requireDevIfEnabled = true})
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
@@ -38,12 +39,7 @@ local TableCell = require('Module:Widget/Table/Cell')
 --- @class PrizePool
 local PrizePool = Class.new(function(self, ...) self:init(...) end)
 
---- @class Placement
---- A Placement is a set of opponents who all share the same final place in the tournament.
---- Its input is generally a table created by `Template:Placement`.
---- It has a range from placeStart to placeEnd, for example 5 to 8
---- and is expected to have the same amount of opponents as the range allows (4 is the 5-8 example).
-local Placement = Class.new(function(self, ...) self:init(...) end)
+local tournamentVars = PageVariableNamespace('Tournament')
 
 local TODAY = os.date('%Y-%m-%d')
 
@@ -52,23 +48,25 @@ local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 local BASE_CURRENCY = 'USD'
 
-local PRIZE_TYPE_USD = 'USD'
+local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
 
 -- Allowed none-numeric score values.
-local SPECIAL_SCORES = {'W', 'FF', 'L', 'DQ', 'D'}
+local WALKOVER_SCORE = 'W'
+local FORFEIT_SCORE = 'FF'
+local SPECIAL_SCORES = {WALKOVER_SCORE, FORFEIT_SCORE , 'L', 'DQ', 'D'}
 
 PrizePool.config = {
-	showUSD = {
+	showBaseCurrency = {
 		default = false
 	},
-	autoUSD = {
+	autoExchange = {
 		default = true,
 		read = function(args)
-			return Logic.readBoolOrNil(args.autousd)
+			return Logic.readBoolOrNil(args.autoexchange or args.autousd)
 		end
 	},
 	prizeSummary = {
@@ -91,12 +89,21 @@ PrizePool.config = {
 	},
 	storeSmw = {
 		default = true,
+		read = function(args)
+			return Logic.readBoolOrNil(args.storesmw)
+		end
 	},
 	storeLpdb = {
 		default = true,
+		read = function(args)
+			return Logic.readBoolOrNil(args.storelpdb)
+		end
 	},
 	resolveRedirect = {
 		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.resolveRedirect)
+		end
 	},
 	syncPlayers = {
 		default = false,
@@ -122,25 +129,39 @@ PrizePool.config = {
 			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix')
 		end
 	},
+	abbreviateTbd = {
+		default = true,
+		read = function(args)
+			return Logic.readBoolOrNil(args.abbreviateTbd)
+		end
+	},
+	fillPlaceRange = {
+		default = true,
+		read = function(args)
+			return Logic.readBoolOrNil(args.fillPlaceRange)
+		end
+	},
 }
 
 PrizePool.prizeTypes = {
-	[PRIZE_TYPE_USD] = {
+	[PRIZE_TYPE_BASE_CURRENCY] = {
 		sortOrder = 10,
 
 		headerDisplay = function (data)
-			local currencyData = Currency.raw(BASE_CURRENCY)
-			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
+			local currencyText = Currency.display(BASE_CURRENCY)
 			return TableCell{content = {{currencyText}}}
 		end,
 
-		row = 'usdprize',
+		row = BASE_CURRENCY:lower() .. 'prize',
 		rowParse = function (placement, input, context, index)
 			return PrizePool._parseInteger(input)
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {{'$', Currency.formatMoney(data, headerData.roundPrecision)}}}
+				return TableCell{content = {
+					Currency.display(BASE_CURRENCY, data,
+						{formatValue = true, formatPrecision = headerData.roundPrecision, abbreviation = false})
+				}}
 			end
 		end,
 	},
@@ -153,7 +174,6 @@ PrizePool.prizeTypes = {
 			if not currencyData then
 				error(input .. ' could not be parsed as a currency, has it been added to [[Module:Currency/Data]]?')
 			end
-			local currencyText = currencyData.text.prefix .. currencyData.text.suffix
 
 			local currencyRate = Currency.getExchangeRate{
 				currency = currencyData.code,
@@ -163,13 +183,12 @@ PrizePool.prizeTypes = {
 			}
 
 			return {
-				currency = currencyData.code, currencyText = currencyText,
-				symbol = currencyData.symbol, symbolFirst = not currencyData.isAfter,
-				rate = currencyRate or 0, roundPrecision = prizePool.options.currencyRoundPrecision,
+				currency = currencyData.code, rate = currencyRate or 0,
+				roundPrecision = prizePool.options.currencyRoundPrecision,
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{data.currencyText}}}
+			return TableCell{content = {{Currency.display(data.currency)}}}
 		end,
 
 		row = 'localprize',
@@ -178,19 +197,14 @@ PrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				local displayText = {Currency.formatMoney(data, headerData.roundPrecision)}
-
-				if headerData.symbolFirst then
-					table.insert(displayText, 1, headerData.symbol)
-				else
-					table.insert(displayText, headerData.symbol)
-				end
-
-				return TableCell{content = {displayText}}
+				return TableCell{content = {
+					Currency.display(headerData.currency, data,
+					{formatValue = true, formatPrecision = headerData.roundPrecision, abbreviation = false})
+				}}
 			end
 		end,
 
-		convertToUsd = function (headerData, data, date, perOpponent)
+		convertToBaseCurrency = function (headerData, data, date, perOpponent)
 			local rate = headerData.rate
 
 			if perOpponent then
@@ -337,111 +351,7 @@ PrizePool.prizeTypes = {
 	}
 }
 
-PrizePool.additionalData = {
-	GROUPSCORE = {
-		field = 'wdl',
-		parse = function (placement, input, context)
-			return input
-		end
-	},
-	LASTVS = {
-		field = 'lastvs',
-		parse = function (placement, input, context)
-			return placement:_parseOpponentArgs(input, context.date)
-		end
-	},
-	LASTVSSCORE = {
-		field = 'lastvsscore',
-		parse = function (placement, input, context)
-			local forceValidScore = function(score)
-				if Table.includes(SPECIAL_SCORES, score:upper()) then
-					return score:upper()
-				end
-				return tonumber(score)
-			end
 
-			-- split the lastvsscore entry by '-', but allow negative scores
-			local rawScores = Table.mapValues(mw.text.split(input, '-'), mw.text.trim)
-			local scores = {}
-			for index, rawScore in ipairs(rawScores) do
-				if String.isEmpty(rawScore) and String.isNotEmpty(rawScores[index + 1]) then
-					rawScores[index + 1] = '-' .. rawScores[index + 1]
-				else
-					table.insert(scores, rawScore)
-				end
-			end
-
-			scores = Table.mapValues(scores, forceValidScore)
-			return {score = scores[1], vsscore = scores[2]}
-		end
-	},
-}
-
-Placement.specialStatuses = {
-	DQ = {
-		active = function (args)
-			return Logic.readBool(args.dq)
-		end,
-		display = function ()
-			return Abbreviation.make('DQ', 'Disqualified')
-		end,
-		lpdb = 'dq',
-	},
-	DNF = {
-		active = function (args)
-			return Logic.readBool(args.dnf)
-		end,
-		display = function ()
-			return Abbreviation.make('DNF', 'Did not finish')
-		end,
-		lpdb = 'dnf',
-	},
-	DNP = {
-		active = function (args)
-			return Logic.readBool(args.dnp)
-		end,
-		display = function ()
-			return Abbreviation.make('DNP', 'Did not participate')
-		end,
-		lpdb = 'dnp',
-	},
-	W = {
-		active = function (args)
-			return Logic.readBool(args.w)
-		end,
-		display = function ()
-			return 'W'
-		end,
-		lpdb = 1,
-	},
-	D = {
-		active = function (args)
-			return Logic.readBool(args.d)
-		end,
-		display = function ()
-			return 'D'
-		end,
-		lpdb = 1,
-	},
-	L = {
-		active = function (args)
-			return Logic.readBool(args.l)
-		end,
-		display = function ()
-			return 'L'
-		end,
-		lpdb = 2,
-	},
-	Q = {
-		active = function (args)
-			return Logic.readBool(args.q)
-		end,
-		display = function ()
-			return Abbreviation.make('Q', 'Qualified Automatically')
-		end,
-		lpdb = 1,
-	},
-}
 
 function PrizePool:init(args)
 	self.args = self:_parseArgs(args)
@@ -449,12 +359,6 @@ function PrizePool:init(args)
 	self.pagename = mw.title.getCurrentTitle().text
 	self.date = PrizePool._getTournamentDate()
 	self.opponentType = self.args.type
-	if self.args.opponentLibrary then
-		Opponent = require('Module:'.. self.args.opponentLibrary)
-	end
-	if self.args.opponentDisplayLibrary then
-		OpponentDisplay = require('Module:'.. self.args.opponentDisplayLibrary)
-	end
 
 	self.options = {}
 	self.prizes = {}
@@ -469,7 +373,7 @@ function PrizePool:_parseArgs(args)
 	local parsedArgs = Table.deepCopy(args)
 	local typeStruct = Json.parseIfString(args.type)
 
-	PrizePool._assertOpponentStructType(typeStruct)
+	self:assertOpponentStructType(typeStruct)
 
 	parsedArgs.type = typeStruct.type
 
@@ -480,18 +384,19 @@ function PrizePool:create()
 	self.options = self:_readConfig(self.args)
 	self.prizes = self:_readPrizes(self.args)
 	self.placements = self:_readPlacements(self.args)
+	self.placements = Import.run(self)
 
-	if self:_hasUsdPrizePool() then
-		self:setConfig('showUSD', true)
-		self:addPrize(PRIZE_TYPE_USD, 1, {roundPrecision = self.options.currencyRoundPrecision})
+	if self:_hasBaseCurrency() then
+		self:setConfig('showBaseCurrency', true)
+		self:addPrize(PRIZE_TYPE_BASE_CURRENCY, 1, {roundPrecision = self.options.currencyRoundPrecision})
 
-		if self.options.autoUSD then
+		if self.options.autoExchange then
 			local canConvertCurrency = function(prize)
 				return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 			end
 
 			for _, placement in ipairs(self.placements) do
-				placement:_setUsdFromRewards(Array.filter(self.prizes, canConvertCurrency), PrizePool.prizeTypes)
+				placement:_setBaseFromRewards(Array.filter(self.prizes, canConvertCurrency), PrizePool.prizeTypes)
 			end
 		end
 	end
@@ -520,7 +425,11 @@ function PrizePool:build()
 		css = {width = 'max-content'},
 	}
 
-	table:addRow(self:_buildHeader())
+	local headerRow = self:_buildHeader()
+
+	table:addRow(headerRow)
+
+	table.columns = headerRow:getCellCount()
 
 	for _, row in ipairs(self:_buildRows()) do
 		table:addRow(row)
@@ -545,7 +454,7 @@ end
 function PrizePool:_getPrizeSummaryText()
 	local tba = Abbreviation.make('TBA', 'To Be Announced')
 	local tournamentCurrency = Variables.varDefault('tournament_currency')
-	local baseMoneyRaw = Variables.varDefault('tournament_prizepool_usd', tba)
+	local baseMoneyRaw = Variables.varDefault('tournament_prizepool_' .. BASE_CURRENCY:lower(), tba)
 	local baseMoneyDisplay = Currency.display(BASE_CURRENCY, baseMoneyRaw, {formatValue = true})
 
 	local displayText = {baseMoneyDisplay}
@@ -566,7 +475,7 @@ function PrizePool:_getPrizeSummaryText()
 end
 
 function PrizePool:_buildHeader()
-	local headerRow = TableRow{css = {['font-weight'] = 'bold'}}
+	local headerRow = TableRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}}
 
 	headerRow:addCell(TableCell{content = {'Place'}, css = {['min-width'] = '80px'}})
 
@@ -590,36 +499,30 @@ function PrizePool:_buildRows()
 	local rows = {}
 
 	for _, placement in ipairs(self.placements) do
-		local previousRow = {}
+		local previousOpponent = {}
 
-		for opponentIndex, opponent in ipairs(placement.opponents) do
-			local row = TableRow{}
+		local row = TableRow{}
+		row:addClass(placement:getBackground())
 
-			if placement.placeStart > self.options.cutafter then
-				row:addClass('ppt-hide-on-collapse')
-			end
+		if placement.placeStart > self.options.cutafter then
+			row:addClass('ppt-hide-on-collapse')
+		end
 
-			row:addClass(placement:getBackground())
+		local placeCell = TableCell{
+			content = {{placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()}},
+			css = {['font-weight'] = 'bolder'},
+			classes = {'prizepooltable-place'},
+		}
+		placeCell.rowSpan = #placement.opponents
+		row:addCell(placeCell)
 
-			if opponentIndex == 1 then
-				local placeCell = TableCell{
-					content = {{placement:getMedal() or '' , NON_BREAKING_SPACE, placement.placeDisplay}},
-					css = {['font-weight'] = 'bolder'},
-				}
-				placeCell.rowSpan = #placement.opponents
-				row:addCell(placeCell)
-			end
-
+		for _, opponent in ipairs(placement.opponents) do
 			local previousOfPrizeType = {}
 			local prizeCells = Array.map(self.prizes, function (prize)
 				local prizeTypeData = self.prizeTypes[prize.type]
 				local reward = opponent.prizeRewards[prize.id] or placement.prizeRewards[prize.id]
 
-				local cell
-				if reward then
-					cell = prizeTypeData.rowDisplay(prize.data, reward)
-				end
-				cell = cell or TableCell{}
+				local cell = reward and prizeTypeData.rowDisplay(prize.data, reward) or TableCell{}
 
 				-- Update the previous column of this type in the same row
 				local lastCellOfType = previousOfPrizeType[prize.type]
@@ -640,7 +543,7 @@ function PrizePool:_buildRows()
 			end)
 
 			Array.forEach(prizeCells, function (prizeCell, columnIndex)
-				local lastInColumn = previousRow[columnIndex]
+				local lastInColumn = previousOpponent[columnIndex]
 
 				if Table.isEmpty(prizeCell.content) then
 					prizeCell = PrizePool._emptyCell()
@@ -649,21 +552,22 @@ function PrizePool:_buildRows()
 				if lastInColumn and Table.deepEquals(lastInColumn.content, prizeCell.content) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
-					previousRow[columnIndex] = prizeCell
+					previousOpponent[columnIndex] = prizeCell
 					row:addCell(prizeCell)
 				end
 			end)
 
 			local opponentDisplay = tostring(OpponentDisplay.BlockOpponent{
 				opponent = opponent.opponentData,
-				showPlayerTeam = true
+				showPlayerTeam = true,
+				abbreviateTbd = self.options.abbreviateTbd,
 			})
 			local opponentCss = {['justify-content'] = 'start'}
 
 			row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
-
-			table.insert(rows, row)
 		end
+
+		table.insert(rows, row)
 
 		if placement.placeStart <= self.options.cutafter
 			and placement.placeEnd >= self.options.cutafter
@@ -679,7 +583,7 @@ end
 
 function PrizePool:_currencyExchangeInfo()
 	if self.usedAutoConvertedCurrency then
-		local currencyText = Currency.display(BASE_CURRENCY)
+		local currencyText = Currency.display(BASE_CURRENCY, nil, {symbol = false})
 		local exchangeProvider = Abbreviation.make('exchange rate', Variables.varDefault('tournament_currency_text'))
 
 		if not exchangeProvider then
@@ -696,13 +600,13 @@ function PrizePool:_currencyExchangeInfo()
 
 		local wrapper = mw.html.create('small')
 
-		wrapper:wikitext('<br>\'\'(')
+		wrapper:wikitext('<br><i>(')
 		wrapper:wikitext('Converted ' .. currencyText .. ' prizes are ')
 		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
-			return PrizePool.prizeTypes[prize.type].convertToUsd
+			return PrizePool.prizeTypes[prize.type].convertToBaseCurrency
 		end), PrizePool._CurrencyConvertionText), ', '))
-		wrapper:wikitext('\'\')')
+		wrapper:wikitext(')</i>')
 
 		return tostring(wrapper)
 	end
@@ -710,13 +614,13 @@ end
 
 function PrizePool._CurrencyConvertionText(prize)
 	local exchangeRate = Math.round{
-		PrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToUsd(
+		PrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
 			prize.data, 1, PrizePool._getTournamentDate()
 		)
 		,5
 	}
 
-	return '1 ' .. Currency.display(prize.data.currency) .. ' ≃ ' .. exchangeRate .. ' ' .. Currency.display(BASE_CURRENCY)
+	return Currency.display(prize.data.currency, 1) .. ' ≃ ' .. Currency.display(BASE_CURRENCY, exchangeRate)
 end
 
 function PrizePool:_toggleExpand(placeStart, placeEnd)
@@ -778,6 +682,15 @@ function PrizePool:setConfig(option, value)
 	return self
 end
 
+function PrizePool:setConfigDefault(option, value)
+	if self.config[option] then
+		self.config[option].default = value
+	else
+		error('Invalid default config override!')
+	end
+	return self
+end
+
 function PrizePool:addCustomConfig(name, default, func)
 	self.config[name] = {
 		default = default,
@@ -802,7 +715,7 @@ end
 --- Set the WidgetInjector.
 -- @param widgetInjector WidgetInjector An instance of a class that implements the WidgetInjector interface
 function PrizePool:setWidgetInjector(widgetInjector)
-	assert(widgetInjector:is_a(WidgetInjector), "setWidgetInjector: Not a Widget Injector")
+	assert(widgetInjector:is_a(WidgetInjector), 'setWidgetInjector: Not a Widget Injector')
 	self._widgetInjector = widgetInjector
 	return self
 end
@@ -810,8 +723,16 @@ end
 --- Set the LpdbInjector.
 -- @param lpdbInjector LpdbInjector An instance of a class that implements the LpdbInjector interface
 function PrizePool:setLpdbInjector(lpdbInjector)
-	assert(lpdbInjector:is_a(LpdbInjector), "setLpdbInjector: Not an LPDB Injector")
+	assert(lpdbInjector:is_a(LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
 	self._lpdbInjector = lpdbInjector
+	return self
+end
+
+--- Set the SmwInjector.
+-- @param smwInjector SmwInjector An instance of a class that implements the SmwInjector interface
+function PrizePool:setSmwInjector(smwInjector)
+	assert(smwInjector:is_a(SmwInjector), 'setSmwInjector: Not an SMW Injector')
+	self._smwInjector = smwInjector
 	return self
 end
 
@@ -837,30 +758,118 @@ function PrizePool:_storeData()
 
 	local lpdbData = {}
 	for _, placement in ipairs(self.placements) do
-		local lpdbEntries = placement:_getLpdbData()
+		local lpdbEntries = placement:_getLpdbData(prizePoolIndex, self.options.lpdbPrefix)
 
-		Array.forEach(lpdbEntries, function(lpdbEntry) Table.mergeInto(lpdbEntry, lpdbTournamentData) end)
+		lpdbEntries = Array.map(lpdbEntries, function(lpdbEntry) return Table.merge(lpdbTournamentData, lpdbEntry) end)
 
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
 
+	local smwTournamentStash = {}
 	for _, lpdbEntry in ipairs(lpdbData) do
+		if self.options.storeSmw then
+			smwTournamentStash = self:_storeSmw(lpdbEntry, smwTournamentStash)
+		end
+
+		lpdbEntry.lastvsdata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.lastvsdata or {})
+		lpdbEntry.opponentplayers = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.opponentplayers or {})
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
 		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement(
-				PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, self.options.lpdbPrefix),
-				lpdbEntry
-			)
-		end
-
-		if self.options.storeSmw then
-			Template.safeExpand(mw.getCurrentFrame(), 'PrizePoolSmwStorage', lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
 		end
 	end
 
+	if Table.isNotEmpty(smwTournamentStash) then
+		tournamentVars:set('smwRecords.tournament', Json.stringify(smwTournamentStash))
+	end
+
 	return self
+end
+
+function PrizePool:_storeSmw(lpdbEntry, smwTournamentStash)
+	local smwEntry = self:_lpdbToSmw(lpdbEntry)
+
+	if self._smwInjector then
+		smwEntry = self._smwInjector:adjust(smwEntry, lpdbEntry)
+	end
+
+	local count = (tonumber(tournamentVars:get('smwRecords.count')) or 0) + 1
+	tournamentVars:set('smwRecords.count', count)
+	tournamentVars:set('smwRecords.' .. count .. '.id', Table.extract(smwEntry, 'objectName'))
+	tournamentVars:set('smwRecords.' .. count .. '.data', Json.stringify(smwEntry))
+
+	local place = smwEntry['has placement']
+	if place and not Placement.specialStatuses[string.upper(place)] then
+		local key = 'has '
+		if String.isNotEmpty(self.options.lpdbPrefix) then
+			key = key .. self.options.lpdbPrefix .. ' '
+		end
+		place = mw.text.split(place, '-')[1]
+		key = key .. Template.safeExpand(mw.getCurrentFrame(), 'OrdinalWritten/' .. place, {}, '')
+		if lpdbEntry.opponentindex ~= 1 then
+			key = key .. lpdbEntry.opponentindex
+		end
+		key = key .. ' place page'
+
+		smwTournamentStash[key] = lpdbEntry.participant
+	end
+
+	return smwTournamentStash
+end
+
+function PrizePool:_lpdbToSmw(lpdbData)
+	local smwOpponentData = {}
+	if lpdbData.opponenttype == Opponent.team then
+		smwOpponentData['has team page'] = lpdbData.participant
+	elseif lpdbData.opponenttype == Opponent.literal then
+		smwOpponentData['has literal team'] = lpdbData.participant
+	elseif lpdbData.opponenttype == Opponent.solo then
+		local playersData = Json.parseIfString(lpdbData.players) or {}
+		smwOpponentData = {
+			['has player id'] = lpdbData.participant,
+			['has player page'] = lpdbData.participantlink,
+			['has flag'] = lpdbData.participantflag,
+			['has team page'] = playersData.p1team,
+			['has team'] = playersData.p1team,
+		}
+	end
+
+	local scoreData = {
+		['has last wdl'] = lpdbData.groupscore,
+	}
+	if Table.includes(SPECIAL_SCORES, lpdbData.lastscore) then
+		if lpdbData.lastscore == WALKOVER_SCORE then
+			scoreData['has walkover from'] = lpdbData.lastvs
+		elseif lpdbData.lastscore == FORFEIT_SCORE then
+			scoreData['has walkover to'] = lpdbData.lastvs
+		end
+	else
+		scoreData['has last score'] = lpdbData.lastscore
+		scoreData['has last opponent score'] = lpdbData.lastvsscore
+	end
+
+	return Table.mergeInto({
+			objectName = lpdbData.objectName,
+
+			['has tournament page'] = lpdbData.parent,
+			['has tournament name'] = lpdbData.tournament,
+			['has tournament type'] = lpdbData.type,
+			['has tournament series'] = lpdbData.series,
+			['has icon'] = lpdbData.icon,
+			['is result type'] = lpdbData.mode,
+			['has game'] = lpdbData.game,
+			['has date'] = lpdbData.date,
+			['is tier'] = lpdbData.liquipediatier,
+			['has placement'] = lpdbData.placement,
+			['has prizemoney'] = lpdbData.prizemoney,
+			['has last opponent'] = lpdbData.lastvs,
+			['has weight'] = lpdbData.weight,
+		},
+		smwOpponentData,
+		scoreData
+	)
 end
 
 -- get the lpdbObjectName depending on opponenttype
@@ -877,13 +886,13 @@ function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 	return objectName .. prizePoolIndex .. '_' .. lpdbEntry.participant
 end
 
---- Returns true if this prizePool has a US Dollar reward.
--- This is true if any placement has a dollar input,
+--- Returns true if this PrizePool has a Base Currency money reward.
+-- This is true if any placement has a Base Currency input,
 -- or if there is a money reward in another currency whilst currency conversion is active
-function PrizePool:_hasUsdPrizePool()
+function PrizePool:_hasBaseCurrency()
 	return (Array.any(self.placements, function (placement)
-		return placement.hasUSD
-	end)) or (self.options.autoUSD and Array.any(self.prizes, function (prize)
+		return placement.hasBaseCurrency
+	end)) or (self.options.autoExchange and Array.any(self.prizes, function (prize)
 		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end))
 end
@@ -903,16 +912,8 @@ function PrizePool._parseInteger(input)
 	end
 end
 
---- Returns true if the input matches the format of a date
-function PrizePool._isValidDateFormat(date)
-	if type(date) ~= 'string' or String.isEmpty(date) then
-		return false
-	end
-	return date:match('%d%d%d%d%-%d%d%-%d%d') and true or false
-end
-
 --- Asserts that an Opponent Struct is valid and has a valid type
-function PrizePool._assertOpponentStructType(typeStruct)
+function PrizePool:assertOpponentStructType(typeStruct)
 	if not typeStruct then
 		error('Please provide a type!')
 	elseif type(typeStruct) ~= 'table' or not typeStruct.type then
@@ -933,303 +934,6 @@ end
 --- Returns the default date based on wiki-variables set in the Infobox League
 function PrizePool._getTournamentDate()
 	return Variables.varDefaultMulti('tournament_enddate', 'tournament_edate', 'edate', TODAY)
-end
-
---- @class Placement
---- @param args table Input information
---- @param parent PrizePool The PrizePool this Placement is part of
---- @param lastPlacement integer The previous placement's end
-function Placement:init(args, parent, lastPlacement)
-	self.args = self:_parseArgs(args)
-	self.date = self.args.date or PrizePool._getTournamentDate()
-	self.placeStart = self.args.placeStart
-	self.placeEnd = self.args.placeEnd
-	self.parent = parent
-	self.hasUSD = false
-
-	self.prizeRewards = self:_readPrizeRewards(self.args)
-
-	self.opponents = self:_parseOpponents(self.args)
-
-	-- Implicit place range has been given (|place= is not set)
-	-- Use the last known place and set the place range based on the entered number of opponents
-	if not self.placeStart and not self.placeEnd then
-		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + #self.opponents
-	end
-
-	assert(#self.opponents > self.placeEnd - self.placeStart, 'Placement: Too many opponents')
-
-	self.placeDisplay = self:_displayPlace()
-end
-
-function Placement:_parseArgs(args)
-	local parsedArgs = Table.deepCopy(args)
-
-	-- Explicit place range has been given
-	if args.place then
-		local places = Table.mapValues(mw.text.split(args.place, '-'), tonumber)
-		parsedArgs.placeStart = places[1]
-		parsedArgs.placeEnd = places[2] or places[1]
-		assert(parsedArgs.placeStart and parsedArgs.placeEnd, 'Placement: Invalid |place= provided.')
-	end
-
-	return parsedArgs
-end
-
---- Parse the input for available rewards of prizes, for instance how much money a team would win.
---- This also checks if the Placement instance has a dollar reward and assigns a variable if so.
-function Placement:_readPrizeRewards(args)
-	local rewards = {}
-
-	-- Loop through all prizes that have been defined in the header
-	Array.forEach(self.parent.prizes, function (prize)
-		local prizeData = self.parent.prizeTypes[prize.type]
-		local fieldName = prizeData.row
-		if not fieldName then
-			return
-		end
-
-		local prizeIndex = prize.index
-		local reward = args[fieldName .. prizeIndex]
-		if prizeIndex == 1 then
-			reward = reward or args[fieldName]
-		end
-		if not reward then
-			return
-		end
-
-		rewards[prize.id] = prizeData.rowParse(self, reward, args, prizeIndex)
-	end)
-
-	-- Special case for USD, as it's not defined in the header.
-	local usdType = self.parent.prizeTypes[PRIZE_TYPE_USD]
-	if usdType.row and args[usdType.row] then
-		self.hasUSD = true
-		rewards[PRIZE_TYPE_USD .. 1] = usdType.rowParse(self, args[usdType.row], args, 1)
-	end
-
-	return rewards
-end
-
---- Parse and set additional data fields for opponents.
--- This includes fields such as group stage score (wdl) and last versus (lastvs).
-function Placement:_readAdditionalData(args)
-	local data = {}
-
-	for prizeType, typeData in pairs(self.parent.additionalData) do
-		local fieldName = typeData.field
-		if args[fieldName] then
-			data[prizeType] = typeData.parse(self, args[fieldName], args)
-		end
-	end
-
-	return data
-end
-
-function Placement:_parseOpponents(args)
-	return Array.mapIndexes(function(opponentIndex)
-		local opponentInput = Json.parseIfString(args[opponentIndex])
-		local opponent = {opponentData = {}, prizeRewards = {}, additionalData = {}}
-		if not opponentInput then
-			-- If given a range of opponents, add them all, even if they're missing from the input
-			if not args.place or self.placeStart + opponentIndex > self.placeEnd + 1 then
-				return
-			else
-				opponent.opponentData = Opponent.tbd(self.parent.opponentType)
-			end
-		else
-			-- Set the date
-			if not PrizePool._isValidDateFormat(opponentInput.date) then
-				opponentInput.date = self.date
-			end
-
-			-- Parse Opponent Data
-			if opponentInput.type then
-				PrizePool._assertOpponentStructType(opponentInput)
-			else
-				opponentInput.type = self.parent.opponentType
-			end
-			opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponentInput.date)
-
-			opponent.prizeRewards = self:_readPrizeRewards(opponentInput)
-			opponent.additionalData = self:_readAdditionalData(opponentInput)
-
-			-- Set date
-			opponent.date = opponentInput.date
-		end
-		return opponent
-	end)
-end
-
-function Placement:_parseOpponentArgs(input, date)
-	-- Allow for lua-table, json-table and just raw string input
-	local opponentArgs = Json.parseIfTable(input) or (type(input) == 'table' and input or {input})
-	opponentArgs.type = opponentArgs.type or self.parent.opponentType
-	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
-
-	local opponentData = Opponent.readOpponentArgs(opponentArgs)
-
-	if not opponentData or (Opponent.isTbd(opponentData) and opponentData.type ~= Opponent.literal) then
-		opponentData = Opponent.tbd(opponentArgs.type)
-	end
-
-	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers})
-end
-
-function Placement:_getLpdbData()
-	local entries = {}
-	for opponentIndex, opponent in ipairs(self.opponents) do
-		local participant, image, imageDark, players
-		local playerCount = 0
-		local opponentType = opponent.opponentData.type
-
-		if opponentType == Opponent.team then
-			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
-
-			participant = teamTemplate.page or ''
-			if self.parent.options.resolveRedirect then
-				participant = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
-			end
-
-			image = teamTemplate.image
-			imageDark = teamTemplate.imagedark
-		elseif opponentType == Opponent.solo then
-			participant = Opponent.toName(opponent.opponentData)
-			local p1 = opponent.opponentData.players[1]
-			players = {p1 = p1.pageName, p1dn = p1.displayName, p1flag = p1.flag, p1team = p1.team}
-			playerCount = 1
-		else
-			participant = Opponent.toName(opponent.opponentData)
-		end
-
-		local prizeMoney = tonumber(self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_USD .. 1)) or 0
-		local pointsReward = self:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
-		local lpdbData = {
-			image = image,
-			imagedark = imageDark,
-			date = opponent.date,
-			participant = participant,
-			participantlink = Opponent.toName(opponent.opponentData),
-			participantflag = opponentType == Opponent.solo and players.p1flag or nil,
-			participanttemplate = opponent.opponentData.template,
-			opponentindex = opponentIndex, -- Needed in SMW
-			opponenttype = opponentType,
-			players = players,
-			placement = self:_lpdbValue(),
-			prizemoney = prizeMoney,
-			individualprizemoney = (playerCount > 0) and (prizeMoney / playerCount) or 0,
-			lastvs = Opponent.toName(opponent.additionalData.LASTVS or {}),
-			lastscore = (opponent.additionalData.LASTVSSCORE or {}).score,
-			lastvsscore = (opponent.additionalData.LASTVSSCORE or {}).vsscore,
-			groupscore = opponent.additionalData.GROUPSCORE,
-			extradata = {
-				prizepoints = tostring(pointsReward or ''),
-				participantteam = (opponentType == Opponent.solo and players.p1team)
-									and Opponent.toName{template = players.p1team, type = 'team'}
-									or nil,
-			}
-
-			-- TODO: We need to create additional LPDB Fields
-			-- match2 opponents (opponentname, opponenttemplate, opponentplayers, opponenttype)
-			-- Qualified To struct (json?)
-			-- Points struct (json?)
-			-- lastvs match2 opponent (json?)
-		}
-
-		if self.parent._lpdbInjector then
-			lpdbData = self.parent._lpdbInjector:adjust(lpdbData, self, opponent)
-		end
-
-		table.insert(entries, lpdbData)
-	end
-
-	return entries
-end
-
-function Placement:getPrizeRewardForOpponent(opponent, prize)
-	return opponent.prizeRewards[prize] or self.prizeRewards[prize]
-end
-
-function Placement:_setUsdFromRewards(prizesToUse, prizeTypes)
-	Array.forEach(self.opponents, function(opponent)
-		if opponent.prizeRewards[PRIZE_TYPE_USD .. 1] or self.prizeRewards[PRIZE_TYPE_USD .. 1] then
-			return
-		end
-
-		local usdReward = 0
-		Array.forEach(prizesToUse, function(prize)
-			local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
-
-			if not localMoney or localMoney <= 0 then
-				return
-			end
-
-			usdReward = usdReward + prizeTypes[prize.type].convertToUsd(
-				prize.data,
-				localMoney,
-				opponent.date,
-				self.parent.options.currencyRatePerOpponent
-			)
-			self.parent.usedAutoConvertedCurrency = true
-		end)
-
-		opponent.prizeRewards[PRIZE_TYPE_USD .. 1] = usdReward
-	end)
-end
-
-function Placement:_lpdbValue()
-	for _, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) then
-			return status.lpdb
-		end
-	end
-
-	if self.placeEnd > self.placeStart then
-		return self.placeStart .. '-' .. self.placeEnd
-	end
-
-	return self.placeStart
-end
-
-function Placement:_displayPlace()
-	for _, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) then
-			return status.display()
-		end
-	end
-
-	local start = Ordinal._ordinal(self.placeStart)
-	if self.placeEnd > self.placeStart then
-		return start .. DASH .. Ordinal._ordinal(self.placeEnd)
-	end
-
-	return start
-end
-
-function Placement:getBackground()
-	for statusName, status in pairs(Placement.specialStatuses) do
-		if status.active(self.args) then
-			return PlacementInfo.getBgClass(statusName:lower())
-		end
-	end
-
-	return PlacementInfo.getBgClass(self.placeStart)
-end
-
-function Placement:getMedal()
-	if self:hasSpecialStatus() then
-		return
-	end
-
-	local medal = MatchPlacement.MedalIcon{range = {self.placeStart, self.placeEnd}}
-	if medal then
-		return tostring(medal)
-	end
-end
-
-function Placement:hasSpecialStatus()
-	return Table.any(Placement.specialStatuses, function(_, status) return status.active(self.args) end)
 end
 
 return PrizePool

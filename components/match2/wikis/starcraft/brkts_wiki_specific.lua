@@ -43,8 +43,6 @@ WikiSpecific.defaultIcon = 'StarCraft default allmode.png'
 
 -- useless functions that should be present for some default checks
 -- would get called from Module:Match/Subobjects if we wouldn't circumvent that module completly
-function WikiSpecific.processMap(frame, map)
-	return map
-end
+WikiSpecific.processMap = FnUtil.identity
 
 return WikiSpecific

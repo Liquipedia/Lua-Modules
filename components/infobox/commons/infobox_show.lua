@@ -7,11 +7,13 @@
 --
 
 local Class = require('Module:Class')
-local BasicInfobox = require('Module:Infobox/Basic')
-local Namespace = require('Module:Namespace')
 local Links = require('Module:Links')
+local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
-local Flags = require('Module:Flags')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell

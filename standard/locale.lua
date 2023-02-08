@@ -13,29 +13,14 @@ local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-
 local Locale = {}
 
-function Locale.getISOCountry(country)
-	if country == nil or country == '' then
-		return ''
-	end
-
-	local data = mw.loadData('Module:Locale/data/countries')
-	local isoCountry = data[country:lower()]
-
-	if isoCountry ~= nil then
-		return isoCountry
-	end
-
-	mw.log('No country found in Module:Locale/data/countries: ' .. country)
-	return ''
-end
-
+---@param args {city: string, country:string}
+---@return string
 function Locale.formatLocation(args)
 	local formattedLocation = ''
 
-	if args.city ~= nil and args.city ~= '' then
+	if String.isNotEmpty(args.city) then
 		formattedLocation = args.city .. ',&nbsp;'
 	end
 

@@ -10,28 +10,30 @@ local Class = require('Module:Class')
 local CleanRace = require('Module:CleanRace')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local Notability = require('Module:Notability')
-local Opponent = require('Module:Opponent')
-local Person = require('Module:Infobox/Person')
 local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Condition = require('Module:Condition')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+
+local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
-
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
 
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
@@ -87,7 +89,7 @@ function CustomPlayer.run(frame)
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 	player.getPersonType = CustomPlayer.getPersonType
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -352,10 +354,12 @@ function CustomPlayer:calculateEarnings()
 end
 
 function CustomPlayer._getEarningsMedalsData(player)
+	local playerWithUnderScores = player:gsub(' ', '_')
 	local playerConditions = ConditionTree(BooleanOperator.any)
 	for playerIndex = 1, Info.maximumNumberOfPlayersInPlacements do
 		playerConditions:add{
-			ConditionNode(ColumnName('players_p' .. playerIndex), Comparator.eq, player),
+			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player),
+			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, playerWithUnderScores),
 		}
 	end
 
@@ -367,14 +371,18 @@ function CustomPlayer._getEarningsMedalsData(player)
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		playerConditions,
+		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithUnderScores),
+			playerConditions,
+		},
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
 			ConditionNode(ColumnName('extradata_award'), Comparator.neq, ''),
 			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('players_type'), Comparator.gt, Opponent.solo),
+				ConditionNode(ColumnName('opponenttype'), Comparator.gt, Opponent.solo),
 				placementConditions,
 			},
 		},
@@ -414,7 +422,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 end
 
 function CustomPlayer._addPlacementToEarnings(earnings, earningsTotal, data)
-	local mode = _EARNING_MODES[(data.players or {}).type or ''] or _OTHER_MODE
+	local mode = _EARNING_MODES[data.opponenttype] or _OTHER_MODE
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
@@ -431,7 +439,7 @@ function CustomPlayer._addPlacementToMedals(medals, data)
 		local place = CustomPlayer._getPlacement(data.placement)
 		CustomPlayer._setAchievements(data, place)
 		if
-			(data.players or {}).type == Opponent.solo
+			data.opponenttype == Opponent.solo
 			and place and place <= 3
 		then
 			local tier = data.liquipediatier or 'undefined'

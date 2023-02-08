@@ -6,15 +6,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local UnofficialWorldChampion = require('Module:Infobox/UnofficialWorldChampion')
-local String = require('Module:StringUtils')
-local RaceIcon = require('Module:RaceIcon')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Builder = require('Module:Infobox/Widget/Builder')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Faction = require('Module:Faction')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Builder = Widgets.Builder
+local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local CustomUnofficialWorldChampion = Class.new()
 
@@ -26,7 +30,7 @@ function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
 	_args = unofficialWorldChampion.args
 	unofficialWorldChampion.createWidgetInjector = CustomUnofficialWorldChampion.createWidgetInjector
-	return unofficialWorldChampion:createInfobox(frame)
+	return unofficialWorldChampion:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -123,19 +127,19 @@ function CustomUnofficialWorldChampion.raceBreakDown()
 			playerBreakDown.display = {}
 			if protossnumber > 0 then
 				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'p'}) .. ' ' .. protossnumber
+					= Faction.Icon{faction = 'p'} .. ' ' .. protossnumber
 			end
 			if terrannumbner > 0 then
 				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'t'}) .. ' ' .. terrannumbner
+					= Faction.Icon{faction = 't'} .. ' ' .. terrannumbner
 			end
 			if zergnumber > 0 then
 				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'z'}) .. ' ' .. zergnumber
+					= Faction.Icon{faction = 'z'} .. ' ' .. zergnumber
 			end
 			if randomnumber > 0 then
 				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'r'}) .. ' ' .. randomnumber
+					= Faction.Icon{faction = 'r'} .. ' ' .. randomnumber
 			end
 		end
 	end

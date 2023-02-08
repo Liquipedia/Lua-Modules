@@ -112,10 +112,10 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
 
 	return header
 end
@@ -140,20 +140,14 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	local mvpInput = match.extradata.mvp
-	if mvpInput then
-		local mvpData = mw.text.split(mvpInput or '', ',')
-		if String.isNotEmpty(mvpData[1]) then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData) do
-				if String.isNotEmpty(player) then
-					mvp:addPlayer(player)
-				end
-			end
-
-			body:addRow(mvp)
+	local mvpData = match.extradata.mvp
+	if mvpData and mvpData.players and mvpData.players[1]  then
+		local mvp = MatchSummary.Mvp()
+		for _, player in ipairs(mvpData.players) do
+			mvp:addPlayer(player)
 		end
 
+		body:addRow(mvp)
 	end
 
 	-- Pre-Process Champion Ban Data

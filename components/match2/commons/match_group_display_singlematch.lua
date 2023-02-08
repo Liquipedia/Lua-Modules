@@ -71,20 +71,15 @@ function SingleMatchDisplay.SingleMatch(props)
 		width = propsConfig.width or 400,
 	}
 
-	local singleMatchNode = mw.html.create('div'):addClass('brkts-popup brkts-match-info-popup')
-		:css('overflow', 'hidden')
-		:css('position', 'unset')
-		:css('max-height', 'unset')
-		:css('width', config.width .. 'px')
-
 	local matchNode = SingleMatchDisplay.Match{
 		MatchSummaryContainer = config.MatchSummaryContainer,
 		match = props.match,
 	}
 
-	singleMatchNode:node(matchNode:css('width', config.width .. 'px'))
+	matchNode:addClass('brkts-popup brkts-match-info-flat')
+		:css('width', config.width .. 'px')
 
-	return singleMatchNode
+	return matchNode
 end
 
 SingleMatchDisplay.propTypes.Match = {

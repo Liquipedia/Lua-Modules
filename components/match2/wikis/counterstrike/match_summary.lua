@@ -28,8 +28,11 @@ local TBD = 'TBD'
 
 -- Score Class
 local Score = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):css('width','70px'):css('text-align', 'center')
+	function(self, direction)
+		self.root = mw.html.create('div')
+			:css('width','70px')
+			:css('text-align', 'center')
+			:css('direction', direction)
 		self.table = self.root:tag('table'):css('line-height', '29px')
 		self.top = mw.html.create('tr')
 		self.bottom = mw.html.create('tr')
@@ -60,7 +63,7 @@ function Score:setMapScore(score)
 end
 
 function Score:setFirstHalfScore(score, side)
-	local halfScore =  mw.html.create('td')
+	local halfScore = mw.html.create('td')
 	halfScore
 		:addClass('brkts-popup-body-match-sidewins')
 		:addClass('brkts-cs-score-color-' .. side)
@@ -71,7 +74,7 @@ function Score:setFirstHalfScore(score, side)
 end
 
 function Score:setSecondHalfScore(score, side)
-	local halfScore =  mw.html.create('td')
+	local halfScore = mw.html.create('td')
 	halfScore
 		:addClass('brkts-popup-body-match-sidewins')
 		:addClass('brkts-cs-score-color-' .. side)
@@ -109,11 +112,11 @@ function MapVeto:vetoStart(firstVeto)
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
-		textLeft = '\'\'\'Start Map Veto\'\'\''
+		textLeft = '<b>Start Map Veto</b>'
 		textCenter = ARROW_LEFT
 	elseif firstVeto == 2 then
 		textCenter = ARROW_RIGHT
-		textRight = '\'\'\'Start Map Veto\'\'\''
+		textRight = '<b>Start Map Veto</b>'
 	else return self end
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
 		:tag('th'):wikitext(textLeft or ''):done()
@@ -207,7 +210,6 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init()
-	matchSummary.root:css('flex-wrap', 'unset') -- workaround to fix height
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -219,6 +221,14 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	local vods = {}
+	local secondVods = {}
+	if Logic.isNotEmpty(match.links.vod2) then
+		for _, vod2 in ipairs(match.links.vod2) do
+			local link, gameIndex = unpack(vod2)
+			secondVods[gameIndex] = link
+		end
+		match.links.vod2 = nil
+	end
 	for index, game in ipairs(match.games) do
 		if game.vod then
 			vods[index] = game.vod
@@ -226,7 +236,7 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) or not Logic.isEmpty(match.vod) then
-		matchSummary:footer(CustomMatchSummary._createFooter(match, vods))
+		matchSummary:footer(CustomMatchSummary._createFooter(match, vods, secondVods))
 	end
 
 	return matchSummary:create()
@@ -236,9 +246,9 @@ function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
 	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
@@ -290,14 +300,14 @@ function CustomMatchSummary._createBody(match)
 	-- Match Status (postponed/ cancel(l)ed)
 	if match.extradata.status then
 		local matchStatus = MatchStatus()
-		matchStatus:content('\'\'\'Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '\'\'\'')
+		matchStatus:content('<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>')
 		body:addRow(matchStatus)
 	end
 
 	return body
 end
 
-function CustomMatchSummary._createFooter(match, vods)
+function CustomMatchSummary._createFooter(match, vods, secondVods)
 	local footer = MatchSummary.Footer()
 
 	local separator = '<b>·</b>'
@@ -318,22 +328,41 @@ function CustomMatchSummary._createFooter(match, vods)
 		footer:addLink(url, icon, iconDark, label)
 	end
 
+	local function addVodLink(gamenum, vod, part)
+		if vod then
+			gamenum = (gamenum and match.bestof > 1) and gamenum or nil
+			local htext
+			if part then
+				if gamenum then
+					htext = 'Watch Game ' .. gamenum .. ' (part ' .. part .. ')'
+				else
+					htext = 'Watch VOD (part ' .. part .. ')'
+				end
+			end
+			footer:addElement(VodLink.display{
+				gamenum = gamenum,
+				vod = vod,
+				htext = htext
+			})
+		end
+	end
+
 	-- Match vod
-	if not Logic.isEmpty(match.vod) then
-		footer:addElement(VodLink.display{
-			vod = match.vod,
-			source = match.vod.url
-		})
+	if secondVods[0] then
+		addVodLink(nil, match.vod, 1)
+		addVodLink(nil, secondVods[0], 2)
+	else
+		addVodLink(nil, match.vod, nil)
 	end
 
 	-- Game Vods
 	for index, vod in pairs(vods) do
-		-- TODO: Darkmode VodIcons
-		footer:addElement(VodLink.display{
-			gamenum = index,
-			vod = vod,
-			source = vod.url
-		})
+		if secondVods[index] then
+			addVodLink(index, vod, 1)
+			addVodLink(index, secondVods[index], 2)
+		else
+			addVodLink(index, vod, nil)
+		end
 	end
 
 	if Table.isNotEmpty(match.links) then
@@ -394,39 +423,28 @@ function CustomMatchSummary._createMap(game)
 
 	-- Score
 	local team1Score = Score():setLeft()
-	local team2Score = Score():setRight()
+	local team2Score = Score('rtl'):setRight()
 
-	-- Score Team 1
+	-- Teams map score
 	team1Score:setMapScore(game.scores[1])
+	team2Score:setMapScore(game.scores[2])
 
 	local t1sides = extradata['t1sides'] or {}
 	local t2sides = extradata['t2sides'] or {}
 	local t1halfs = extradata['t1halfs'] or {}
 	local t2halfs = extradata['t2halfs'] or {}
 
-	local numberOfSides = #t2sides
-
-	-- Insert team scores
+	-- Teams half scores
 	for sideIndex, side in ipairs(t1sides) do
-		-- Team 1 scores inserted from 1 .. n
+		local oppositeSide = t2sides[sideIndex]
 		if math.fmod(sideIndex, 2) == 1 then
 			team1Score:setFirstHalfScore(t1halfs[sideIndex], side)
+			team2Score:setFirstHalfScore(t2halfs[sideIndex], oppositeSide)
 		else
 			team1Score:setSecondHalfScore(t1halfs[sideIndex], side)
-		end
-
-		-- Team 2 scores inserted from n .. 1
-		local t2SideIndex = numberOfSides - sideIndex + 1
-		local oppositeSide = t2sides[t2SideIndex]
-		if math.fmod(t2SideIndex, 2) == 1 then
-			team2Score:setFirstHalfScore(t2halfs[t2SideIndex], oppositeSide)
-		else
-			team2Score:setSecondHalfScore(t2halfs[t2SideIndex], oppositeSide)
+			team2Score:setSecondHalfScore(t2halfs[sideIndex], oppositeSide)
 		end
 	end
-
-	-- Score Team 2
-	team2Score:setMapScore(game.scores[2])
 
 	-- Map Info
 	local mapInfo = mw.html.create('div')

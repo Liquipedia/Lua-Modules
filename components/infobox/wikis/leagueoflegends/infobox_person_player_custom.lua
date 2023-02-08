@@ -9,8 +9,8 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local ChampionIcon = require('Module:ChampionIcon')
+local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local Player = require('Module:Infobox/Person')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
@@ -18,8 +18,11 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local _ROLES = {
 	-- Players
@@ -41,6 +44,7 @@ local _ROLES = {
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
+	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
 }
 _ROLES['assistant coach'] = _ROLES.coach
 _ROLES['strategic coach'] = _ROLES.coach
@@ -74,7 +78,11 @@ function CustomPlayer.run(frame)
 	end
 
 	if String.isEmpty(player.args.history) then
-		player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
+		player.args.history = tostring(TeamHistoryAuto._results{
+			hiderole = 'true',
+			iconModule = 'Module:PositionIcon/data',
+			addlpdbdata='true'
+		})
 	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
@@ -84,7 +92,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -102,7 +110,8 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Role', content = {
 				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				CustomPlayer._createRole('role2', _args.role2),
+				CustomPlayer._createRole('role3', _args.role3)
 			}},
 		}
 	elseif id == 'history' then
@@ -136,6 +145,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.role3 = Variables.varDefault('role3')
 
 	lpdbData.extradata.signatureChampion1 = _args.champion1 or _args.champion
 	lpdbData.extradata.signatureChampion2 = _args.champion2

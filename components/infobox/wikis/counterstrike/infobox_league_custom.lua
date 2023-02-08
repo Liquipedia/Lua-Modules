@@ -7,20 +7,23 @@
 --
 
 local Class = require('Module:Class')
-local League = require('Module:Infobox/League')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Tier = mw.loadData('Module:Tier')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Cell = require('Module:Infobox/Widget/Cell')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -105,7 +108,7 @@ function CustomLeague.run(frame)
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.shouldStore = CustomLeague.shouldStore
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:shouldStore(args)
@@ -330,12 +333,11 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(League:getAllArgsForBase(args, 'map'), ';')
 	lpdbData.participantsnumber = args.team_number or args.player_number
 	lpdbData.sortdate = args.sort_date or lpdbData.enddate
-	lpdbData.extradata = {
-		prizepoollocal = Variables.varDefault('prizepoollocal', ''),
-		startdate_raw = Variables.varDefault('raw_sdate', ''),
-		enddate_raw = Variables.varDefault('raw_edate', ''),
-		series2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2 or ''),
-	}
+
+	lpdbData.extradata.prizepoollocal = Variables.varDefault('prizepoollocal', '')
+	lpdbData.extradata.startdate_raw = Variables.varDefault('raw_sdate', '')
+	lpdbData.extradata.enddate_raw = Variables.varDefault('raw_edate', '')
+	lpdbData.extradata.shortname2 = args.shortname2
 
 	return lpdbData
 end

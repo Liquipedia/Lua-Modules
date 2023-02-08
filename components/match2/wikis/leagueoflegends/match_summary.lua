@@ -16,11 +16,11 @@ local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 local VodLink = require('Module:VodLink')
-local Opponent = require('Module:Opponent')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _MAX_NUM_BANS = 7
 local _NUM_HEROES_PICK_TEAM = 5
@@ -84,7 +84,6 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init('400px')
-	matchSummary.root:css('flex-wrap', 'unset')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -136,10 +135,10 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
 
 	return header
 end

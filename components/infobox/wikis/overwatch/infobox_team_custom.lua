@@ -6,11 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Team = require('Module:Infobox/Team')
-local Variables = require('Module:Variables')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
+
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local CustomTeam = Class.new()
 
@@ -22,7 +24,7 @@ function CustomTeam.run(frame)
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.getWikiCategories = CustomTeam.getWikiCategories
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:createBottomContent()
@@ -38,12 +40,6 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = args.image
-	end
-
 	lpdbData.region = Variables.varDefault('region', '')
 
 	lpdbData.extradata = {

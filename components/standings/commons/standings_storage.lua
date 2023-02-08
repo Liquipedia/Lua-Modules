@@ -10,11 +10,12 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Opponent = require('Module:Opponent')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
@@ -26,12 +27,6 @@ function StandingsStorage.run(data)
 		return
 	end
 
-	if data.opponentLibrary then
-		Opponent = require('Module:'.. data.opponentLibrary)
-	end
-
-	local standingsIndex = tonumber(data.standingsindex) or 0
-
 	data.roundcount = tonumber(data.roundcount) or Array.reduce(
 		Array.map(data.entries, function (entry) return tonumber (entry.roundindex) end),
 		math.max)
@@ -39,7 +34,7 @@ function StandingsStorage.run(data)
 	StandingsStorage.table(data)
 
 	Array.forEach(data.entries, function (entry)
-		StandingsStorage.entry(entry, standingsIndex)
+		StandingsStorage.entry(entry, data.standingsindex)
 	end)
 end
 
@@ -52,20 +47,37 @@ function StandingsStorage.table(data)
 	local title = data.title or ''
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
 
+	local standingsIndex = tonumber(data.standingsindex)
+
+	if not standingsIndex then
+		error('No standingsindex specified')
+	end
+
 	local extradata = {
+		enddate = data.enddate,
+		finished = data.finished,
+		hasdraw = data.hasdraw,
+		hasovertime = data.hasovertime,
 		roundcount = data.roundcount,
 		stagename = data.stagename or Variables.varDefault('bracket_header'),
+	}
+
+	local config = {
+		hasdraws = data.hasdraw,
+		hasovertimes = data.hasovertime,
+		haspoints = data.haspoints,
 	}
 
 	mw.ext.LiquipediaDB.lpdb_standingstable('standingsTable_' .. data.standingsindex,
 		{
 			tournament = Variables.varDefault('tournament_name', ''),
 			parent = Variables.varDefault('tournament_parent', ''),
-			standingsindex = tonumber(data.standingsindex),
+			standingsindex = standingsIndex,
 			title = mw.text.trim(cleanedTitle),
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
 			type = data.type,
 			matches = Json.stringify(data.matches or {}),
+			config = mw.ext.LiquipediaDB.lpdb_create_json(config),
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, data.extradata)),
 		}
 	)
@@ -80,6 +92,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
+	standingsIndex = tonumber(standingsIndex)
 
 	if not standingsIndex or not roundIndex or not slotIndex then
 		return

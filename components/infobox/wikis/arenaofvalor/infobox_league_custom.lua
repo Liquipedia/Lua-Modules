@@ -6,14 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -32,7 +36,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -64,22 +68,21 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args['garena-sponsored'])
+	return Logic.readBool(_args.publisherpremier)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = _game or args.game
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.player_number) and 'true' or '',
-	}
+	lpdbData.publishertier = Logic.readBool(_args.publisherpremier) and 'true' or nil
+	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
 function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', _game or _args.game)
-	Variables.varDefine('tournament_publishertier', _args['garena-sponsored'])
+	Variables.varDefine('tournament_publishertier', _args.publisherpremier)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end

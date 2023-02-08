@@ -10,12 +10,14 @@ local Array = require('Module:Array')
 local ArrayExt = require('Module:Array/Ext')
 local DateExt = require('Module:Date/Ext')
 local FeatureFlag = require('Module:FeatureFlag')
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local MathUtil = require('Module:MathUtil')
-local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
 local TournamentUtil = require('Module:Tournament/Util')
 local Wdl = require('Module:Wdl')
+
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local GroupTableLeagueUtil = {}
 
@@ -441,11 +443,11 @@ sorts an array based on the tiebreakers. The sorting is complete when each
 group has size 1, or when the tiebreakers run out.
 ]]
 function GroupTableLeagueUtil.sortGroupsBy(groups, scoreGroup)
-	return Array.flatMap(groups, function(group)
+	return Array.flatten(Array.map(groups, function(group)
 		return #group > 1
 			and GroupTableLeagueUtil.sortAndGroup(group, scoreGroup(group))
 			or {group}
-	end)
+	end))
 end
 
 function GroupTableLeagueUtil.sortAndGroup(elems, scores)

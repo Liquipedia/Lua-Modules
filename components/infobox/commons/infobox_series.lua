@@ -6,20 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local BasicInfobox = require('Module:Infobox/Basic')
 local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local Links = require('Module:Links')
-local LeagueIcon = require('Module:LeagueIcon')
-local Locale = require('Module:Locale')
-local Localisation = require('Module:Localisation')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier')
 local WarningBox = require('Module:WarningBox')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
@@ -40,10 +41,10 @@ Series.warnings = {}
 
 function Series.run(frame)
 	local series = Series(frame)
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
-function Series:createInfobox(frame)
+function Series:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
@@ -223,7 +224,7 @@ function Series:createInfobox(frame)
 				Links.makeFullLinksForTableItems(links or {})
 			),
 		}
-		lpdbData = self:_getIconFromLeagueIconSmall(frame, lpdbData)
+		lpdbData = self:_getIconFromLeagueIconSmall(lpdbData)
 
 		lpdbData = self:addToLpdb(lpdbData)
 		mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
@@ -284,7 +285,7 @@ function Series:appendLiquipediatierDisplay()
 	return ''
 end
 
-function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
+function Series:_getIconFromLeagueIconSmall(lpdbData)
 	local icon = lpdbData.icon
 	local iconDark = lpdbData.icondark
 	local iconSmallTemplate = LeagueIcon.display{
@@ -381,12 +382,12 @@ function Series:_createOrganizers(args)
 end
 
 function Series:_setCountryCategories(country)
-	if country == nil or country == '' then
+	if String.isEmpty(country) then
 		return ''
 	end
 
-	local countryAdjective = Localisation.getLocalisation({ shouldReturnSimpleError = true }, country)
-	if countryAdjective == 'error' then
+	local countryAdjective = Flags.getLocalisation(country)
+	if not countryAdjective then
 		return 'Unrecognised Country||' .. country
 	end
 

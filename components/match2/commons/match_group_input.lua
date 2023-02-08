@@ -7,19 +7,19 @@
 --
 
 local Array = require('Module:Array')
-local FeatureFlag = require('Module:FeatureFlag')
+local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local WikiSpecific = require('Module:Brkts/WikiSpecific')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local globalVars = PageVariableNamespace({cached = true})
 
@@ -60,7 +60,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 			matchArgs.bracketid = bracketId
 			matchArgs.matchid = matchId
-			local match = WikiSpecific.processMatch(mw.getCurrentFrame(), matchArgs)
+			local match = WikiSpecific.processMatch(matchArgs)
 
 			-- Add more fields to bracket data
 			match.bracketdata = match.bracketdata or {}
@@ -100,7 +100,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	end)
 		:catch(function(message)
-			if FeatureFlag.get('prompt_purge_bracket_template') and String.endsWith(message, 'does not exist') then
+			if String.endsWith(message, 'does not exist') then
 				table.insert(warnings, message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
 				return {}
 			else
@@ -129,7 +129,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = WikiSpecific.processMatch(mw.getCurrentFrame(), matchArgs)
+		local match = WikiSpecific.processMatch(matchArgs)
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
@@ -271,10 +271,16 @@ function MatchGroupInput.readDate(dateString)
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 	local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
 	local timezoneId = dateString:match('>(%a-)<')
-	local matchDate = String.explode(dateString, '<', 0):gsub('-', '')
+	local matchDate = mw.text.split(dateString, '<', true)[1]:gsub('-', '')
 	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
 	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
-	return {date = date, dateexact = isDateExact, timezoneId = timezoneId, timezoneOffset = timezoneOffset}
+	return {
+		date = date,
+		dateexact = isDateExact,
+		timezoneId = timezoneId,
+		timezoneOffset = timezoneOffset,
+		timestamp = DateExt.readTimestamp(dateString),
+	}
 end
 
 function MatchGroupInput.getInexactDate(suggestedDate)
@@ -377,7 +383,7 @@ end
 function MatchGroupInput.getCommonTournamentVars(obj)
 	obj.game = Logic.emptyOr(obj.game, Variables.varDefault('tournament_game'))
 	obj.icon = Logic.emptyOr(obj.icon, Variables.varDefault('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault("tournament_icondark"))
+	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault('tournament_icondark'))
 	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
@@ -390,6 +396,36 @@ function MatchGroupInput.getCommonTournamentVars(obj)
 	obj.type = Logic.emptyOr(obj.type, Variables.varDefault('tournament_type'))
 
 	return obj
+end
+
+function MatchGroupInput.readMvp(match)
+	if not match.mvp then return end
+	local mvppoints = match.mvppoints or 1
+
+	-- Split the input
+	local players = mw.text.split(match.mvp, ',')
+
+	-- parse the players to get their information
+	local parsedPlayers = Array.map(players, function(player, playerIndex)
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
+		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+			for _, lookUpPlayer in pairs(opponent.match2players) do
+				if link == lookUpPlayer.name then
+					return Table.merge(lookUpPlayer,
+						{team = opponent.name, template = opponent.template, comment = match['mvp' .. playerIndex .. 'comment']})
+				end
+			end
+		end
+
+		local nameComponents = mw.text.split(player, '|')
+		return {
+			displayname = nameComponents[#nameComponents],
+			name = link,
+			comment = match['mvp' .. playerIndex .. 'comment']
+		}
+	end)
+
+	return {players = parsedPlayers, points = mvppoints}
 end
 
 return MatchGroupInput

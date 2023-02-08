@@ -7,12 +7,12 @@
 --
 
 local Class = require('Module:Class')
-local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Break = Class.new(
 	function(self)
@@ -52,14 +52,14 @@ function Header:rightOpponent(content)
 	return self
 end
 
-function Header:createOpponent(opponent, side)
+function Header:createOpponent(opponent, side, style)
 	local showLink = not Opponent.isTbd(opponent) and true or false
 	return OpponentDisplay.BlockOpponent{
 		flip = side == 'left',
 		opponent = opponent,
 		showLink = showLink,
-		overflow = 'wrap',
-		teamStyle = 'short',
+		overflow = 'ellipsis',
+		teamStyle = style or 'short',
 	}
 end
 
@@ -134,9 +134,20 @@ local Mvp = Class.new(
 )
 
 function Mvp:addPlayer(player)
-	if not Logic.isEmpty(player) then
-		table.insert(self.players, player)
+	local playerDisplay
+	if Logic.isEmpty(player) then
+		return self
+	elseif type(player) == 'table' then
+		playerDisplay = '[[' .. player.name .. '|' .. player.displayname .. ']]'
+		if player.comment then
+			playerDisplay = playerDisplay .. ' (' .. player.comment .. ')'
+		end
+	else
+		playerDisplay = '[[' .. player .. ']]'
 	end
+
+	table.insert(self.players, playerDisplay)
+
 	return self
 end
 
@@ -150,12 +161,7 @@ end
 function Mvp:create()
 	local span = mw.html.create('span')
 	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
-	for index, player in ipairs(self.players) do
-		if index > 1 then
-			span:wikitext(', ')
-		end
-		span:wikitext('[['..player..']]')
-	end
+		:wikitext(table.concat(self.players, ', '))
 	if self.points and self.points ~= 1 then
 		span:wikitext(' ('.. self.points ..'pts)')
 	end

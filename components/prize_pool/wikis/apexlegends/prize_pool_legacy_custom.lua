@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
 
 local CustomLegacyPrizePool = {}
-
 -- Template entry point
+
 function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run(CustomLegacyPrizePool)
 end

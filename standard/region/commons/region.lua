@@ -13,7 +13,7 @@ local String = require('Module:StringUtils')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local regionData = mw.loadData('Module:Region/Data')
-local countryToRegionData = Lua.loadDataIfExists('Module:Region/CountryData', {})
+local countryToRegionData = Lua.loadDataIfExists('Module:Region/CountryData') or {}
 
 local noEntryFoundCategory = '[[Category:Pages using unsupported region values]]'
 

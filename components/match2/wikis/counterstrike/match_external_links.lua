@@ -201,9 +201,18 @@ return {
 	{
 		name = 'hltvlegacy',
 		icon = 'HLTV icon.png',
-		prefixLink = 'https://hltv.org/legacy/match/',
+		prefixLink = 'https://www.hltv.org/legacy/match/',
 		label = 'HLTV Matchpage',
-		stats = {'legacystats'}
+		stats = {'legacystats', 'stats'}
+	},
+	{
+		name = 'hltv',
+		icon = 'HLTV icon.png',
+		prefixLink = 'https://www.hltv.org/matches/',
+		suffixLink = '/match',
+		label = 'HLTV Matchpage',
+		max = 2,
+		stats = {'legacystats', 'stats'}
 	},
 	{
 		name = 'legacystats',
@@ -211,15 +220,6 @@ return {
 		prefixLink = 'https://www.hltv.org/legacystats/match/mapstatsid/',
 		label = 'Stats on HLTV',
 		isMapStats = true
-	},
-	{
-		name = 'hltv',
-		icon = 'HLTV icon.png',
-		prefixLink = 'https://hltv.org/matches/',
-		suffixLink = '/match',
-		label = 'HLTV Matchpage',
-		max = 2,
-		stats = {'stats'}
 	},
 	{
 		name = 'stats',

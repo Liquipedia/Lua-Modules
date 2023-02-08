@@ -6,13 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local _args
 
@@ -34,7 +38,7 @@ function CustomLeague.run(frame)
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -69,11 +73,10 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.participants_number or args.team_number
 	lpdbData.publishertier = Logic.readBool(args.riotpremier) and '1' or ''
 
-	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.participants_number) or
-			String.isNotEmpty(args.individual) and 'true' or '',
-		['is riot premier'] = String.isNotEmpty(args.riotpremier) and 'true' or '',
-	}
+	lpdbData.extradata.individual = String.isNotEmpty(args.participants_number) or
+			String.isNotEmpty(args.individual) and 'true' or ''
+
+	lpdbData.extradata['is riot premier'] = String.isNotEmpty(args.riotpremier) and 'true' or ''
 
 	return lpdbData
 end

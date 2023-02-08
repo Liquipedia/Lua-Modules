@@ -7,9 +7,13 @@
 --
 
 local Class = require('Module:Class')
-local Company = require('Module:Infobox/Company')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Lua = require('Module:Lua')
+
+local Company = Lua.import('Module:Infobox/Company', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomCompany = Class.new()
 
@@ -29,7 +33,7 @@ function CustomCompany.run(frame)
 	local company = Company(frame)
 	company.createWidgetInjector = CustomCompany.createWidgetInjector
 	_args = company.args
-	return company:createInfobox(frame)
+	return company:createInfobox()
 end
 
 function CustomCompany:createWidgetInjector()

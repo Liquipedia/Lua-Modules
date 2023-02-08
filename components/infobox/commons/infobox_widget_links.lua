@@ -7,9 +7,11 @@
 --
 
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
-local UtilLinks = require('Module:Links')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+
+local UtilLinks = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 local Links = Class.new(
 	Widget,
@@ -47,6 +49,7 @@ local _PRIORITY_GROUPS = {
 		'5ewin',
 		'abiosgaming',
 		'aligulac',
+		'apexlegendsstatus',
 		'battlefy',
 		'b5csgo',
 		'challengermode',
@@ -68,10 +71,12 @@ local _PRIORITY_GROUPS = {
 		'letsplaylive',
 		'matcherino',
 		'matcherinolink',
+		'nwc3l',
+		'royaleapi',
 		'siege-gg',
 		'sk',
-		'smash-gg',
 		'sostronk',
+		'start-gg',
 		'stratz',
 		'toornament',
 		'trackmania-io',
@@ -110,6 +115,12 @@ local _PRIORITY_GROUPS = {
 		'zhangyutv',
 		'bilibili-stream',
 		'kuaishou',
+		'cc',
+		'nimotv',
+		'openrec',
+		'steamtv',
+		'yandexefir',
+		'zhanqitv',
 	}
 }
 

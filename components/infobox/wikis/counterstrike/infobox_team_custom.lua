@@ -7,15 +7,18 @@
 --
 
 local Array = require('Module:Array')
-local Cell = require('Module:Infobox/Widget/Cell')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
+local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Infobox/Team')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -39,7 +42,7 @@ function CustomTeam.run(frame)
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.getWikiCategories = CustomTeam.getWikiCategories
 
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:createWidgetInjector()
@@ -58,6 +61,8 @@ function CustomInjector:parse(id, widgets)
 			widgets[1], -- Coaches
 			Cell{name = 'Analysts', content = {_team.args.analysts}},
 		}
+	elseif id == 'earningscell' then
+		widgets[1].name = 'Approx. Total Winnings'
 	end
 	return widgets
 end
@@ -97,12 +102,6 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = args.image
-	end
-
 	lpdbData.region = Variables.varDefault('region', '')
 
 	return lpdbData

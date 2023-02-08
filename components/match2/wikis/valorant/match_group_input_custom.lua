@@ -9,7 +9,6 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -17,6 +16,7 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
@@ -40,7 +40,7 @@ local placementFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(frame, match, options)
+function CustomMatchGroupInput.processMatch(match, options)
 	options = options or {}
 	-- Count number of maps, check for empty maps to remove
 	match = matchFunctions.getBestOf(match)
@@ -62,7 +62,7 @@ function CustomMatchGroupInput.processMatch(frame, match, options)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(frame, map)
+function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -97,7 +97,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(frame, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
@@ -447,6 +447,7 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 		if not Table.isEmpty(player) then
 			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
 		end
@@ -519,7 +520,7 @@ function mapFunctions.getScoresAndWinner(map)
 		-- read scores
 		local score = map['score' .. scoreIndex]
 		if map['t'.. scoreIndex ..'atk'] or map['t'.. scoreIndex ..'def'] then
-			score =   (tonumber(map['t'.. scoreIndex ..'atk']) or 0)
+			score = (tonumber(map['t'.. scoreIndex ..'atk']) or 0)
 					+ (tonumber(map['t'.. scoreIndex ..'def']) or 0)
 					+ (tonumber(map['t'.. scoreIndex ..'otatk']) or 0)
 					+ (tonumber(map['t'.. scoreIndex ..'otdef']) or 0)

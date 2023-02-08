@@ -7,9 +7,13 @@
 --
 
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
+local Flags = require('Module:Flags')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
@@ -43,13 +47,15 @@ local _LINK_DATA = {
 	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	lpl = {icon = 'File:LPL_Logo_lightmode.png', iconDark = 'File:LPL_Logo_darkmode.png', text = 'Match page on LPL Play'},
-	r6esports = {icon = 'File:Copa Elite Six icon.png', text = 'R6 Esports LATAM Match Page'},
+	r6esports = {
+		icon = 'File:Rainbow 6 Esports 2023 lightmode.png',
+		iconDark = 'File:Rainbow 6 Esports 2023 darkmode.png',
+		text = 'R6 Esports Match Page'
+	},
 	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
+	ebattle = {icon = 'File:Ebattle Series allmode.png', text = 'Match page on ebattle'},
 }
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Operator Bans Class
 
@@ -139,7 +145,7 @@ function Score:setFirstRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins')
+	roundScore	:addClass('brkts-popup-body-match-sidewins')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -154,7 +160,7 @@ function Score:setSecondRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins')
+	roundScore	:addClass('brkts-popup-body-match-sidewins')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -169,7 +175,7 @@ function Score:setFirstOvertimeRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins-overtime')
+	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -184,7 +190,7 @@ function Score:setSecondOvertimeRoundScore(side, score, position)
 	end
 
 	local roundScore = mw.html.create('td')
-	roundScore  :addClass('brkts-popup-body-match-sidewins-overtime')
+	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(icon)
 				:wikitext(score or '')
 
@@ -227,11 +233,11 @@ function MapVeto:vetoStart(firstVeto)
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
-		textLeft = '\'\'\'Start Map Veto\'\'\''
+		textLeft = '<b>Start Map Veto</b>'
 		textCenter = _ARROW_LEFT
 	elseif firstVeto == 2 then
 		textCenter = _ARROW_RIGHT
-		textRight = '\'\'\'Start Map Veto\'\'\''
+		textRight = '<b>Start Map Veto</b>'
 	else return self end
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
 		:tag('th'):wikitext(textLeft or ''):done()
@@ -310,6 +316,34 @@ function MapVeto:create()
 	return self.root
 end
 
+-- Custom Caster Class
+local Casters = Class.new(
+	function(self)
+		self.root = mw.html.create('div')
+			:addClass('brkts-popup-comment')
+			:css('white-space','normal')
+			:css('font-size','85%')
+		self.casters = {}
+	end
+)
+
+function Casters:addCaster(caster)
+	if Logic.isNotEmpty(caster) then
+		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
+		if caster.flag then
+			table.insert(self.casters, Flags.Icon(caster.flag) .. ' ' .. nameDisplay)
+		else
+			table.insert(self.casters, nameDisplay)
+		end
+	end
+	return self
+end
+
+function Casters:create()
+	return self.root
+		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
+		:wikitext(mw.text.listToText(self.casters, ', ', ' & '))
+end
 
 local CustomMatchSummary = {}
 
@@ -318,7 +352,6 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init()
-	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -362,9 +395,9 @@ function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
 	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
 end
@@ -372,7 +405,7 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or match.timestamp ~= DateExt.epochZero then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -381,7 +414,7 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	--local matchPageElement = mw.html.create('center')
-	--matchPageElement   :wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+	--matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
 	--				:css('display', 'block')
 	--				:css('margin', 'auto')
 	--body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
@@ -406,6 +439,17 @@ function CustomMatchSummary._createBody(match)
 			body:addRow(mvp)
 		end
 
+	end
+
+	-- casters
+	if String.isNotEmpty(match.extradata.casters) then
+		local casters = Json.parseIfString(match.extradata.casters)
+		local casterRow = Casters()
+		for _, caster in pairs(casters) do
+			casterRow:addCaster(caster)
+		end
+
+		body:addRow(casterRow)
 	end
 
 	-- Add the Map Vetoes
@@ -499,7 +543,7 @@ function CustomMatchSummary._createMap(game)
 	row:addElement(team1Score:create())
 
 	local centerNode = mw.html.create('div')
-	centerNode  :addClass('brkts-popup-spaced')
+	centerNode	:addClass('brkts-popup-spaced')
 				:wikitext('[[' .. game.map .. ']]')
 				:css('text-align', 'center')
 				:css('padding','5px 2px')
@@ -525,7 +569,7 @@ function CustomMatchSummary._createMap(game)
 		row:addElement(comment)
 	end
 
-	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
+	row:addClass('brkts-popup-body-game'):css('font-size', '85%')
 
 	-- Winner/Loser backgrounds
 	if game.winner == 1 then

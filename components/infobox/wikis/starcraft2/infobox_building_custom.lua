@@ -6,17 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Building = require('Module:Infobox/Building')
-local String = require('Module:StringUtils')
-local RaceIcon = require('Module:RaceIcon')
-local CleanRace = require('Module:CleanRace')
-local CleanRaceFullName = require('Module:CleanRace2')
-local Hotkeys = require('Module:Hotkey')
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
+local Lua = require('Module:Lua')
+local Hotkeys = require('Module:Hotkey')
+local String = require('Module:StringUtils')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Center = require('Module:Infobox/Widget/Center')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Building = Lua.import('Module:Infobox/Building', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Center = Widgets.Center
 
 local CustomBuilding = Class.new()
 
@@ -39,7 +40,7 @@ function CustomBuilding.run(frame)
 	building.nameDisplay = CustomBuilding.nameDisplay
 	building.setLpdbData = CustomBuilding.setLpdbData
 	building.createWidgetInjector = CustomBuilding.createWidgetInjector
-	return building:createInfobox(frame)
+	return building:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -50,9 +51,9 @@ function CustomInjector:addCustomCells(widgets)
 
 	if _args.game ~= 'lotv' then
 		table.insert(widgets, Center{content = {
-			'<small>\'\'\'Note:\'\'\' ' ..
+			'<small><b>Note:</b> ' ..
 			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
-			' \'\'See [[Game Speed]].\'\'</small>'
+			' <i>See [[Game Speed]].</i></small>'
 		}})
 	end
 
@@ -135,10 +136,9 @@ function CustomBuilding:nameDisplay(args)
 end
 
 function CustomBuilding._getRace(race)
-	race = string.lower(race)
-	_race = CleanRace[race] or race or ''
-	local category = CleanRaceFullName[_race]
-	local display = RaceIcon.getBigIcon({'alt_' .. _race})
+	_race = Faction.read(race)
+	local category = Faction.toName(_race)
+	local display = Faction.Icon{size = 'large', faction = _race} or ''
 	if not category and _race ~= 'unknown' then
 		category = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'

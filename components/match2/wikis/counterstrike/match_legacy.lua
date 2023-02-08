@@ -7,12 +7,17 @@
 --
 
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TextSanitizer = require('Module:TextSanitizer')
 local Variables = require('Module:Variables')
-local Opponent = require('Module:Opponent')
 
+
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+
+local DRAW = 'draw'
 local LOSER_STATUSES = {'FF', 'DQ', 'L'}
 
 local MatchLegacy = {}
@@ -41,6 +46,12 @@ function MatchLegacy.convertParameters(match2)
 			match[key] = nil
 		end
 	end
+
+	if match.resulttype == DRAW then
+		match.winner = 'draw'
+	end
+
+	match.resulttype = nil
 
 	if match.walkover == 'ff' or match.walkover == 'dq' then
 		match.walkover = match.winner
@@ -100,20 +111,38 @@ function MatchLegacy.convertParameters(match2)
 		local prefix = 'opponent' .. index
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
-		if opponent.type == Opponent.team then
-			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
+			if opponent.type == Opponent.team then
+				if String.isEmpty(opponent.template) then
+					match[prefix] = 'TBD'
+				elseif mw.ext.TeamTemplate.teamexists(opponent.template) then
+					match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+				else
+					match[prefix] = opponent.template
+				end
+			else
+				if String.isEmpty(opponent.name) or TextSanitizer.stripHTML(opponent.name) ~= opponent.name then
+					match[prefix] = 'TBD'
+				else
+					match[prefix] = opponent.name
+				end
+			end
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
 			if isOverturned then
-				if tonumber(match.winner) == index then
-					match[prefix .. 'score'] = math.floor(match2.bestof /2) + 1
-				else
-					match[prefix .. 'score'] = 0
-				end
+				match[prefix .. 'score'] = tonumber(match.winner) == index and (math.floor(match2.bestof /2) + 1) or 0
 				match.extradata[prefix .. 'rounds'] = '0'
 			elseif opponent.status == 'W' then
 				match[prefix .. 'score'] = math.floor(match2.bestof /2) + 1
 			else
-				match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				if match2.bestof == 1 then
+					if match.winner == DRAW then
+						match[prefix .. 'score'] = 0
+					else
+						match[prefix .. 'score'] = tonumber(match.winner) == index and 1 or 0
+					end
+				else
+					match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				end
 			end
 
 			if Table.includes(LOSER_STATUSES, opponent.status) then
@@ -128,12 +157,14 @@ function MatchLegacy.convertParameters(match2)
 			end
 			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
 		elseif opponent.type == Opponent.solo then
-			local player = opponentmatch2players[1] or {}
-			match[prefix] = player.name
-			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
-			match[prefix .. 'flag'] = player.flag
-		elseif opponent.type == Opponent.literal then
-			match[prefix] = 'TBD'
+			if String.isEmpty(opponent.name) then
+				match[prefix] = 'TBD'
+			else
+				local player = opponentmatch2players[1] or {}
+				match[prefix] = player.name
+				match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				match[prefix .. 'flag'] = player.flag
+			end
 		end
 	end
 
@@ -206,7 +237,7 @@ function MatchLegacy.storeMatchSMW(match)
 			['has team right'] = match.opponent2 or '',
 			['has map date'] = match.date or '',
 			['has tournament'] = mw.title.getCurrentTitle().prefixedText,
-			['has tournament tier'] =  Variables.varDefault('tournament_tier'), -- Legacy support Infobox
+			['has tournament tier'] = Variables.varDefault('tournament_tier'), -- Legacy support Infobox
 			['has tournament tier number'] = match.liquipediatier, -- or this ^
 			['has tournament icon'] = match.icon,
 			['has tournament name'] = match.tickername,

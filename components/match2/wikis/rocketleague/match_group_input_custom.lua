@@ -12,7 +12,6 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -23,6 +22,7 @@ local getIconName = require('Module:IconName').luaGet
 local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _STATUS_HAS_SCORE = 'S'
 local _STATUS_DEFAULT_WIN = 'W'
@@ -43,7 +43,7 @@ local mapFunctions = {}
 local opponentFunctions = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(frame, match)
+function CustomMatchGroupInput.processMatch(match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -52,12 +52,13 @@ function CustomMatchGroupInput.processMatch(frame, match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
 	match = matchFunctions.getExtraData(match)
+	match = matchFunctions.getLinks(match)
 
 	return match
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(frame, map)
+function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -94,7 +95,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(frame, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
@@ -149,6 +150,7 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '3v3'))
+	match.showh2h = Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -182,15 +184,39 @@ function matchFunctions.getExtraData(match)
 	end
 	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 
+	local showh2h = Logic.readBool(match.showh2h)
+		and opponent1.type == Opponent.team
+		and opponent2.type == Opponent.team
+
 	match.extradata = {
 		team1icon = getIconName(opponent1.template or ''),
 		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
-		octane = match.octane,
 		isconverted = 0,
+		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
+		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}
+	return match
+end
+
+function matchFunctions.getLinks(match)
+	match.links = {}
+
+	-- Shift (formerly Octane)
+	match.shift1 = match.shift1 or match.shift
+	for key, shift in Table.iter.pairsByPrefix(match, 'shift') do
+		match.links[key] = 'https://www.shiftrle.gg/matches/' .. shift
+	end
+
+	-- Ballchasing
+	match.ballchasing1 = match.ballchasing1 or match.ballchasing
+	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing') do
+		match.links[key] = 'https://ballchasing.com/group/' .. ballchasing
+	end
+
 	return match
 end
 

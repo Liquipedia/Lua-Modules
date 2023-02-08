@@ -7,14 +7,17 @@
 --
 
 local Class = require('Module:Class')
-local Strategy = require('Module:Infobox/Strategy')
+local Faction = require('Module:Faction')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
-local RaceIcon = require('Module:RaceIcon')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Header = require('Module:Infobox/Widget/Header')
-local CleanRace = mw.loadData('Module:CleanRace2')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Strategy = Lua.import('Module:Infobox/Strategy', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Header = Widgets.Header
 
 local CustomStrategy = Class.new()
 
@@ -34,7 +37,7 @@ function CustomStrategy.run(frame)
 	_strategy = customStrategy
 	_args = customStrategy.args
 	customStrategy.createWidgetInjector = CustomStrategy.createWidgetInjector
-	return customStrategy:createInfobox(frame)
+	return customStrategy:createInfobox()
 end
 
 function CustomStrategy:createWidgetInjector()
@@ -85,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomStrategy:_getNameDisplay()
-	local race = RaceIcon._getBigIcon({'alt_' .. (_args.race or '')}) or ''
+	local race = Faction.Icon{size = 'large', faction = _args.race} or ''
 	return race .. (_args.name or mw.title.getCurrentTitle().text)
 end
 
@@ -98,13 +101,16 @@ function CustomStrategy:_getTLarticle(tlarticle)
 end
 
 function CustomStrategy:_getCategories(race, matchups)
+	local categories = {}
+
 	if String.isEmpty(matchups) then
-		return {}
+		return categories
 	end
 
-	local categories = {}
-	race = string.lower(race or '')
-	race = CleanRace[race] or ''
+	race = Faction.toName(Faction.read(race))
+	if not race then
+		return categories
+	end
 
 	local informationType = _args.informationType
 	if informationType == 'Strategy' then

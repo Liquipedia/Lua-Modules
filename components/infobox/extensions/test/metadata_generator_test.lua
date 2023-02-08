@@ -6,14 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local MetadataGenerator = require('Module:MetadataGenerator')
-local Arguments = require('Module:Arguments')
+local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
+
+local Arguments = require('Module:Arguments')
+local MetadataGenerator = Lua.import('Module:MetadataGenerator', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
 local _EXPECTED_RESULT = 'Intel Extreme Masters XVI - Cologne is an offline German tournament organized by ESL.' ..
-	' This [[Template:TierDisplay]] tournament took place from Jul 06 to Jul 18 2021 featuring 24 teams competing' ..
+	' This Unknown Tier tournament took place from Jul 06 to 18 2021 featuring 24 teams competing' ..
 	' over a total prize pool of $1,000,000 USD.'
 
 function suite:testGenerator()

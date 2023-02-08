@@ -6,14 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Logic = require('Module:Logic')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -34,7 +38,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -69,9 +73,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = CustomLeague._getGameVersion()
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = args.pokemonpremier
-	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.player_number) and 'true' or '',
-	}
+	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
+	lpdbData.mode = CustomLeague:_getGameMode()
 
 	return lpdbData
 end
@@ -79,6 +82,8 @@ end
 function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
 	Variables.varDefine('tournament_publishertier', _args['pokemonpremier'])
+	Variables.varDefine('tournament_mode', CustomLeague:_getGameMode())
+
 	--Legacy Vars:
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
@@ -94,7 +99,7 @@ end
 
 function CustomLeague:_getGameMode()
 	if String.isEmpty(_args.mode) then
-		return nil
+		return
 	end
 
 	return _MODES[_args.mode:lower()]
@@ -102,7 +107,7 @@ end
 
 function CustomLeague:_getGameFormat()
 	if String.isEmpty(_args.format) then
-		return nil
+		return
 	end
 
 	return _FORMATS[_args.format:lower()]

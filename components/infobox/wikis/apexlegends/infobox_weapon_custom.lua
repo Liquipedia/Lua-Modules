@@ -6,13 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Weapon = require('Module:Infobox/Weapon')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local CustomWeapon = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -29,6 +33,12 @@ local MAGAZINE_INFO = {
 		{text = '[[with Legendary Ext. Mag|<span class="black-text">EXT</span>]]', bgClass = 'bright-sun-0'}
 	},
 }
+local BOLT_INFO = {
+	{},
+	{{text = '[[with Common Shotgun Bolt|<span class="white-text">EXT</span>]]', bgClass = 'gray-theme-dark-bg'}},
+	{{text = '[[with Rare Shotgun Bolt|<span class="white-text">EXT</span>]]', bgClass = 'sapphire-a2'}},
+	{{text = '[[with Epic Shotgun Bolt|<span class="white-text">EXT</span>]]', bgClass = 'vivid-violet-theme-dark-bg'}},
+}
 local DAMAGE_INFO = {
 	{},
 	{{text = 'Head', bgClass = 'gray-theme-dark-bg', textBgClass = 'white-text'}},
@@ -42,7 +52,7 @@ function CustomWeapon.run(frame)
 	_args = _weapon.args
 	weapon.addToLpdb = CustomWeapon.addToLpdb
 	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
-	return weapon:createInfobox(frame)
+	return weapon:createInfobox()
 end
 
 function CustomWeapon:createWidgetInjector()
@@ -56,9 +66,12 @@ function CustomInjector:addCustomCells(widgets)
 		for index, baseDamage in ipairs(_weapon:getAllArgsForBase(args, 'basedamage')) do
 			table.insert(baseDamages, CustomWeapon:_createContextualNoWrappingSpan(baseDamage, index, DAMAGE_INFO))
 		end
+		if String.isNotEmpty(args.basedamagenote) then
+			table.insert(baseDamages, CustomWeapon:_createContextualNote(args.basedamagenote))
+		end
 		table.insert(widgets, Cell{
 			name = 'Damage',
-			content = {table.concat(baseDamages, '&nbsp;• ')}
+			content = baseDamages
 		})
 	end
 
@@ -73,6 +86,25 @@ function CustomInjector:addCustomCells(widgets)
 	})
 
 	table.insert(widgets, Cell{
+		name = 'Rate of fire (Burst)',
+		content = {args.rateoffireburst}
+	})
+
+	if String.isNotEmpty(args.ratesoffire) and String.isEmpty(args.rateoffireauto) then
+		local rofTimes = {}
+		for index, rofTime in ipairs(_weapon:getAllArgsForBase(args, 'ratesoffire')) do
+			table.insert(rofTimes, CustomWeapon:_createContextualNoWrappingSpan(rofTime, index, BOLT_INFO))
+		end
+		if String.isNotEmpty(args.ratesoffirenote) then
+			table.insert(rofTimes, CustomWeapon:_createContextualNote(args.ratesoffirenote))
+		end
+		table.insert(widgets, Cell{
+			name = 'Rates of Fire',
+			content = rofTimes
+		})
+	end
+
+	table.insert(widgets, Cell{
 		name = 'Projectile Speed',
 		content = {args.projectilespeed}
 	})
@@ -82,9 +114,12 @@ function CustomInjector:addCustomCells(widgets)
 		for index, ammoSize in ipairs(_weapon:getAllArgsForBase(args, 'ammocapacity')) do
 			table.insert(ammoSizes, CustomWeapon:_createContextualNoWrappingSpan(ammoSize, index, MAGAZINE_INFO))
 		end
+		if String.isNotEmpty(args.ammocapacitynote) then
+			table.insert(ammoSizes, CustomWeapon:_createContextualNote(args.ammocapacitynote))
+		end
 		table.insert(widgets, Cell{
 			name = 'Ammo Capacity',
-			content = {table.concat(ammoSizes, '<br>')}
+			content = ammoSizes
 		})
 	end
 
@@ -93,15 +128,30 @@ function CustomInjector:addCustomCells(widgets)
 		for index, reloadTime in ipairs(_weapon:getAllArgsForBase(args, 'reloadtime')) do
 			table.insert(reloadTimes, CustomWeapon:_createContextualNoWrappingSpan(reloadTime, index, MAGAZINE_INFO))
 		end
+		if String.isNotEmpty(args.reloadtimenote) then
+			table.insert(reloadTimes, CustomWeapon:_createContextualNote(args.reloadtimenote))
+		end
 		table.insert(widgets, Cell{
 			name = 'Reload Speed',
-			content = {table.concat(reloadTimes, '<br>')}
+			content = reloadTimes
+		})
+	end
+
+	if String.isNotEmpty(args.ammotype) and String.isNotEmpty(args.ammotypeicon) then
+		table.insert(widgets, Cell{
+			name = 'Ammo Type',
+			content = {args.ammotypeicon .. ' ' .. args.ammotype}
 		})
 	end
 
 	table.insert(widgets, Cell{
-		name = 'Ammo Type',
-		content = {args.ammotypeicon .. ' ' .. args.ammotype}
+		name = 'Range',
+		content = {args.range}
+	})
+
+	table.insert(widgets, Cell{
+		name = 'Ignition Time',
+		content = {args.ignitiontime}
 	})
 
 	table.insert(widgets, Cell{
@@ -166,6 +216,10 @@ function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTabl
 	end
 
 	return tostring(span)
+end
+
+function CustomWeapon:_createContextualNote(noteText)
+	return '<span style="font-size:80%">' .. noteText .. '</span>'
 end
 
 function CustomWeapon:addToLpdb(lpdbData)

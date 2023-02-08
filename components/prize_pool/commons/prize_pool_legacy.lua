@@ -10,14 +10,14 @@ local Array = require('Module:Array')
 local Currency = require('Module:Currency')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
-local Page = require('Module:Page')
 local Points = mw.loadData('Module:Points/data')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local LegacyPrizePool = {}
 
@@ -33,6 +33,10 @@ local CHECKMARK = '<div class="fa fa-check green-check"></div>'
 
 local CUSTOM_HANDLER
 
+local IS_SOLO = false
+
+LegacyPrizePool.BASE_CURRENCY = 'USD'
+
 function LegacyPrizePool.run(dependency)
 	local args = Template.retrieveReturnValues('LegacyPrizePool')
 	local header = Array.sub(args, 1, 1)[1]
@@ -42,9 +46,13 @@ function LegacyPrizePool.run(dependency)
 
 	local newArgs = {}
 
+	-- disable import legacy prize pools
+	newArgs.import = false
+
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
 	newArgs.cutafter = header.cutafter
 	newArgs.lpdb_prefix = header.lpdb_prefix or header.smw_prefix
+	newArgs.fillPlaceRange = Logic.readBool(header.fillPlaceRange) or false
 
 	if Currency.raw(header.localcurrency) then
 		-- If the localcurrency is a valid currency, handle it like currency
@@ -61,6 +69,7 @@ function LegacyPrizePool.run(dependency)
 
 	if header.indiv then
 		newArgs.type = {type = Opponent.solo}
+		IS_SOLO = true
 	else
 		newArgs.type = {type = Opponent.team}
 	end
@@ -74,7 +83,7 @@ function LegacyPrizePool.run(dependency)
 	local mergeSlots = Logic.readBool(header.mergeSlots)
 	for _, slot in ipairs(slots) do
 		-- retrieve the slot and push it into a temp var so it can be altered (to merge slots if need be)
-		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots)
+		local tempSlot = LegacyPrizePool.mapSlot(slot, mergeSlots, newArgs)
 		local place = tempSlot.place or slot.place
 		-- if we want to merge slots and the slot we just retrieved
 		-- has the same place as the one before, then append the opponents
@@ -140,7 +149,7 @@ function LegacyPrizePool.sortQualifiers(args)
 	end)
 end
 
-function LegacyPrizePool.mapSlot(slot, mergeSlots)
+function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 	if not slot.place then
 		return {}
 	end
@@ -152,31 +161,60 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 		newData.place = slot.place
 	end
 
-	newData.date = slot.date
-	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
+	local baseCurrencyPrize = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
 
-	local opponentsInSlot = #slot
+	newData.date = slot.date
+	newData[baseCurrencyPrize] = (slot[baseCurrencyPrize] and slot[baseCurrencyPrize] ~= '0') and slot[baseCurrencyPrize]
+		or nil
+
+	local opponentsInSlot = LegacyPrizePool.opponentsInSlot(slot)
+	local needsQualifiedFreetext = false
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
-		if newParameter == 'seed' then
+		if newParameter == 'seed' and input == 'q' then
+			if slot.link then
+				-- Use qualifier display
+				if not slot.link:find('^%[%[') then
+					slot.link = '[[' .. slot.link .. ']]'
+				end
+				LegacyPrizePool.handleSeed(newData, slot.link, opponentsInSlot)
+			else
+				-- Tracking category
+				needsQualifiedFreetext = true
+				mw.ext.TeamLiquidIntegration.add_category('Pages with missing qualifier link')
+			end
+		elseif newParameter == 'seed' then
 			LegacyPrizePool.handleSeed(newData, input, opponentsInSlot)
-
 		elseif input and tonumber(input) ~= 0 then
-			-- Handle the legacy checkmarks, they were set in value = 'q'
-			-- If want, in the future this could be parsed as a Qualification instead of a freetext as now
 			if input == 'q' then
-				input = slot.link and Page.makeInternalLink(CHECKMARK, slot.link) or CHECKMARK
+				input = CHECKMARK
+				mw.ext.TeamLiquidIntegration.add_category('Pages with freetext checkmark')
 			end
 
 			newData[newParameter] = input
 		end
 	end)
 
+	if needsQualifiedFreetext then
+		local slotParam = 'QUALIFIED_FREETEXT'
+		local newParam = CACHED_DATA.inputToId[slotParam]
+		if not newParam then
+			LegacyPrizePool.assignType(headerArgs, 'Qualification', slotParam)
+			newParam = CACHED_DATA.inputToId[slotParam]
+		end
+		newData[newParam] = CHECKMARK
+	end
+
 	if CUSTOM_HANDLER.customSlot then
 		newData = CUSTOM_HANDLER.customSlot(newData, CACHED_DATA, slot)
 	end
 
-	newData.opponents = LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
+	if CUSTOM_HANDLER.overwriteMapOpponents then
+		slot.opponentsInSlot = opponentsInSlot
+		newData.opponents = CUSTOM_HANDLER.overwriteMapOpponents(slot, newData, mergeSlots)
+	else
+		newData.opponents = LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
+	end
 
 	if mergeSlots then
 		local newSlot = {
@@ -189,6 +227,14 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots)
 		return newSlot
 	end
 	return newData
+end
+
+function LegacyPrizePool.opponentsInSlot(slot)
+	if CUSTOM_HANDLER.opponentsInSlot then
+		return CUSTOM_HANDLER.opponentsInSlot(slot)
+	end
+
+	return #slot
 end
 
 function LegacyPrizePool.handleSeed(storeTo, input, slotSize)
@@ -213,29 +259,47 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 		end
 
 		-- Map Legacy WO flags into score
-		if slot['walkoverfrom' .. opponentIndex] or slot['wofrom' .. opponentIndex] then
+		local walkoverFrom = slot['walkoverfrom' .. opponentIndex] or slot['wofrom' .. opponentIndex]
+		local walkoverTo = slot['walkoverto' .. opponentIndex] or slot['woto' .. opponentIndex]
+		if walkoverFrom then
 			slot['lastscore' .. opponentIndex] = 'W'
 			slot['lastvsscore' .. opponentIndex] = 'FF'
+			slot['lastvs' .. opponentIndex] = slot['lastvs' .. opponentIndex] or walkoverFrom
 
-		elseif slot['walkoverto' .. opponentIndex] or slot['woto' .. opponentIndex] then
+		elseif walkoverTo then
 			slot['lastscore' .. opponentIndex] = 'FF'
 			slot['lastvsscore' .. opponentIndex] = 'W'
+			slot['lastvs' .. opponentIndex] = slot['lastvs' .. opponentIndex] or walkoverTo
 		end
 
 		local opponentData = {
 			[1] = slot[opponentIndex],
 			type = slot['literal' .. opponentIndex] and Opponent.literal or nil,
 			date = slot['date' .. opponentIndex],
-			link = slot['link' .. opponentIndex],
+			link = slot['link' .. opponentIndex] or slot['page' .. opponentIndex],
 			wdl = slot['wdl' .. opponentIndex],
 			flag = slot['flag' .. opponentIndex],
 			team = slot['team' .. opponentIndex],
-			lastvs = slot['lastvs' .. opponentIndex],
-			lastvsflag = slot['lastvsflag' .. opponentIndex],
+			lastvs = {
+				slot['lastvs' .. opponentIndex],
+				link = slot['lastvs' .. opponentIndex .. 'link'] or slot['lastvspage' .. opponentIndex],
+				flag = slot['lastvsflag' .. opponentIndex],
+			},
 			lastvsscore = (slot['lastscore' .. opponentIndex] or '') ..
 				'-' ..
 				(slot['lastvsscore' .. opponentIndex] or ''),
 		}
+
+		-- catch empty lastvs table to avoid storing tbd opponents in lastvsdata
+		if Table.isEmpty(opponentData.lastvs) then
+			opponentData.lastvs = nil
+		end
+
+		if not opponentData.link and IS_SOLO then
+			local splitPlayer = mw.text.split(opponentData[1], '|')
+			opponentData.link = splitPlayer[1]
+			opponentData[1] = splitPlayer[#splitPlayer]
+		end
 
 		if CUSTOM_HANDLER.customOpponent then
 			opponentData = CUSTOM_HANDLER.customOpponent(opponentData, CACHED_DATA, slot, opponentIndex)
@@ -257,7 +321,7 @@ function LegacyPrizePool.assignType(assignTo, input, slotParam)
 		CACHED_DATA.inputToId[slotParam] = 'points' .. index
 		CACHED_DATA.next.points = index + 1
 
-	elseif input and input:lower() == 'seed' then
+	elseif input and (input:lower() == 'seed' or input:lower() == 'qualified') then
 		CACHED_DATA.inputToId[slotParam] = 'seed'
 
 	elseif String.isNotEmpty(input) then
@@ -293,7 +357,7 @@ function LegacyPrizePool.parseWikiLink(input)
 
 			else
 				-- Just link
-				link, displayName = cleanedInput, cleanedInput
+				link = cleanedInput
 			end
 
 			if link:sub(1, 1) == '/' then

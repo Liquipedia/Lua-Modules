@@ -24,6 +24,7 @@ local TIER_VALUE = {8, 4, 2}
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
+	args.allGroupsUseWdl = true
 	local prizePool = PrizePool(args):create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())

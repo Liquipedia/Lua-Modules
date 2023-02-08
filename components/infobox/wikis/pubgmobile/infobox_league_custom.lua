@@ -6,16 +6,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Template = require('Module:Template')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -65,7 +69,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -82,11 +86,11 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 			Cell{name = 'Game mode', content = {
-					CustomLeague:_getGameMode()
+					CustomLeague._getGameMode()
 				}
 			},
 			Cell{name = 'Platform', content = {
-					CustomLeague:_getPlatform()
+					CustomLeague._getPlatform()
 				}
 			},
 		}
@@ -109,9 +113,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = args.platform
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = args.pubgpremier
-	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.player_number) and 'true' or '',
-	}
+	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
@@ -133,7 +135,7 @@ function CustomLeague:liquipediaTierHighlighted()
 	return Logic.readBool(_args.pubgpremier)
 end
 
-function CustomLeague:_getGameMode()
+function CustomLeague._getGameMode()
 	if String.isEmpty(_args.perspective) and String.isEmpty(_args.mode) then
 		return nil
 	end
@@ -155,7 +157,7 @@ function CustomLeague:_getGameMode()
 	return mode .. '&nbsp;' .. table.concat(displayPerspectives, '&nbsp;')
 end
 
-function CustomLeague:_getPlatform()
+function CustomLeague._getPlatform()
 	if String.isEmpty(_args.platform) then
 		return nil
 	end

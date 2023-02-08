@@ -7,24 +7,27 @@
 --
 
 local Array = require('Module:Array')
-local Page = require('Module:Page')
 local Class = require('Module:Class')
 local LegendIcon = require('Module:LegendIcon')
-local Player = require('Module:Infobox/Person')
+local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local UpcomingMatches = require('Module:Matches Player')
 local Variables = require('Module:Variables')
-local Template = require('Module:Template')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local _INPUTS = {
 	controller = 'Controller',
 	cont = 'Controller',
 	c = 'Controller',
+	hybrid = 'Hybrid',
 	default = 'Mouse & Keyboard',
 }
 
@@ -68,7 +71,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -112,9 +115,10 @@ function CustomInjector:addCustomCells(widgets)
 			}
 		}
 	)
+
 	table.insert(widgets, Cell{
 			name = 'Input',
-			content = {_INPUTS[_args.input] or _INPUTS.default}
+			content = {CustomPlayer:formatInput()}
 		})
 	return widgets
 end
@@ -126,6 +130,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.input = CustomPlayer:formatInput()
 	lpdbData.extradata.retired = _args.retired
 
 	_args.legend1 = _args.legend1 or _args.legend
@@ -142,10 +147,8 @@ function CustomPlayer:adjustLPDB(lpdbData)
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
-		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+	if Player:shouldStoreData(_args) then
+		return UpcomingMatches.get(_args)
 	end
 end
 
@@ -187,6 +190,11 @@ function CustomPlayer:defineCustomPageVariables(args)
 	else
 		Variables.varDefine('isplayer', 'true')
 	end
+end
+
+function CustomPlayer:formatInput()
+	local lowercaseInput = _args.input and _args.input:lower() or nil
+	return _INPUTS[lowercaseInput] or _INPUTS.default
 end
 
 return CustomPlayer

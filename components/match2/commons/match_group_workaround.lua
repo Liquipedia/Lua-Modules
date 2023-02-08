@@ -31,9 +31,9 @@ function MatchGroupWorkaround.applyPlayerBugWorkaround(matchRecord)
 
 	mw.log('MatchGroupWorkaround.applyPlayerBugWorkaround: Applying workaround for matchid=' .. matchRecord.match2id)
 
-	local allPlayerRecords = Array.flatMap(matchRecord.match2opponents, function(opponentRecord)
+	local allPlayerRecords = Array.flatten(Array.map(matchRecord.match2opponents, function(opponentRecord)
 		return opponentRecord.match2players or {}
-	end)
+	end))
 	local _, byOpponentIx = Array.groupBy(allPlayerRecords, function(playerRecord) return playerRecord.opid end)
 	for opponentIx, opponentRecord in ipairs(matchRecord.match2opponents) do
 		opponentRecord.match2players = byOpponentIx[opponentIx] or {}

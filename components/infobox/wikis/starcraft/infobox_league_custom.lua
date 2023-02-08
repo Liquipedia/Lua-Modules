@@ -8,21 +8,24 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local League = require('Module:Infobox/League')
+local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
-local Chronology = require('Module:Infobox/Widget/Chronology')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Chronology = Widgets.Chronology
+local Title = Widgets.Title
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -39,8 +42,9 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -188,20 +192,16 @@ function CustomLeague._playerRaceBreakDown()
 		if zergNumber + terranNumbner + protossNumber + randomNumber > 0 then
 			playerBreakDown.display = {}
 			if protossNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'p'})
-					.. ' ' .. protossNumber)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'p'} .. ' ' .. protossNumber)
 			end
 			if terranNumbner > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'t'})
-					.. ' ' .. terranNumbner)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 't'} .. ' ' .. terranNumbner)
 			end
 			if zergNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'z'})
-					.. ' ' .. zergNumber)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'z'} .. ' ' .. zergNumber)
 			end
 			if randomNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'r'})
-					.. ' ' .. randomNumber)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'r'} .. ' ' .. randomNumber)
 			end
 		end
 	end
@@ -254,7 +254,7 @@ function CustomLeague:defineCustomPageVariables()
 	--series number
 	local seriesNumber = _args.number or ''
 	if String.isNotEmpty(seriesNumber) then
-		seriesNumber = string.format("%05i", seriesNumber)
+		seriesNumber = string.format('%05i', seriesNumber)
 	end
 	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
@@ -263,7 +263,7 @@ function CustomLeague:defineCustomPageVariables()
 	if not finished and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-				.. 'AND [[participant::!Definitions]] AND [[placement::1]]',
+				.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
 			query = 'date',
 			order = 'date asc',
 			limit = 1
@@ -297,7 +297,17 @@ function CustomLeague:addToLpdb(lpdbData)
 	-- hence they need to not RR them
 	lpdbData.series = _args.series
 
+	lpdbData.extradata.female = Logic.readBool(_args.female) or nil
+
 	return lpdbData
+end
+
+function CustomLeague:getWikiCategories(args)
+	if Logic.readBool(args.female) then
+		return {'Female Tournaments'}
+	end
+
+	return {}
 end
 
 function CustomLeague:_concatArgs(base)

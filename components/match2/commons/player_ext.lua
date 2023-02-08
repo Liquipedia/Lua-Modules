@@ -105,7 +105,6 @@ function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 		'([[extradata_joindate::<' .. date .. ']] or [[extradata_joindate::' .. date .. ']])',
 		'[[extradata_joindate::>]]',
 		'[[extradata_leavedate::>' .. date .. ']]',
-		'[[extradata_position::player]]',
 	}
 	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = table.concat(conditions, ' and '),
@@ -241,6 +240,13 @@ function PlayerExt.syncTeam(pageName, template, options)
 		isTimeless = true,
 		template = template ~= 'noteam' and template or nil,
 	}
+
+	-- Catch an edge case where pageVarEntry.team is set while pageVarEntry.template is not set
+	-- (pageVarEntry.team being an unresolved team template or lowercased underscore replaced pagename of the team)
+	if pageVarEntry and not pageVarEntry.template then
+		pageVarEntry.template = pageVarEntry.team
+		pageVarEntry.isResolved = nil
+	end
 
 	local entry = timelessEntry
 		or pageVarEntry

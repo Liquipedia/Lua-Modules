@@ -31,7 +31,7 @@ local ColumnName = Condition.ColumnName
 
 local _SECONDS_PER_DAY = 86400
 
-local _today = os.date("!%Y-%m-%d", os.time())
+local _today = os.date('!%Y-%m-%d', os.time())
 
 -- Default settings
 -- overwritable via /Custom
@@ -153,8 +153,8 @@ function TournamentsSummaryTable.dateConditions(type)
 	local conditions = ConditionTree(BooleanOperator.all)
 
 	local currentTime = os.time()
-	local upcomingThreshold = os.date("!%Y-%m-%d", currentTime + TournamentsSummaryTable.upcomingOffset)
-	local completedThreshold = os.date("!%Y-%m-%d", currentTime - TournamentsSummaryTable.completedOffset)
+	local upcomingThreshold = os.date('!%Y-%m-%d', currentTime + TournamentsSummaryTable.upcomingOffset)
+	local completedThreshold = os.date('!%Y-%m-%d', currentTime - TournamentsSummaryTable.completedOffset)
 
 	if type == TournamentsSummaryTable.upcomingType then
 		conditions
@@ -240,7 +240,7 @@ function TournamentsSummaryTable.row(eventInformation, type)
 end
 
 function TournamentsSummaryTable._dateDisplay(dateString)
-	local year, month, day = dateString:match("(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$")
+	local year, month, day = dateString:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
 	-- fallback
 	if String.isEmpty(year) then
 		year = 1970
@@ -279,8 +279,8 @@ function TournamentsSummaryTable.manualUpcomingRow(args)
 	end
 
 	local eventInformation = {
-		pagename  = pageName,
-		tickername = args.tickername  or args.display or pageName,
+		pagename = pageName,
+		tickername = args.tickername or args.display or pageName,
 		startdate = TournamentsSummaryTable._dateDisplay(args.estimated_start or args.startdate),
 		enddate = TournamentsSummaryTable._dateDisplay(args.estimated_end or args.enddate),
 		icon = args.icon,

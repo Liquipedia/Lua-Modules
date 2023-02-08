@@ -8,20 +8,22 @@
 
 --this "infobox" has no display and only stores into LPDB, sets wiki vars and categories
 
+local AllowedServers = require('Module:Server')
+local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
-local Template = require('Module:Template')
+local Flags = require('Module:Flags')
+local Json = require('Module:Json')
+local LeagueIcon = require('Module:LeagueIcon')
+local Links = require('Module:Links')
+local Locale = require('Module:Locale')
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
-local Links = require('Module:Links')
-local Localisation = require('Module:Localisation')
-local Variables = require('Module:Variables')
-local Locale = require('Module:Locale')
-local LeagueIcon = require('Module:LeagueIcon')
-local Autopatch = require('Module:Automated Patch')
-local AllowedServers = require('Module:Server')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
 local Tier = require('Module:Tier')
-local Logic = require('Module:Logic')
+local Variables = require('Module:Variables')
 
 local HiddenInfoboxLeague = {}
 
@@ -120,7 +122,7 @@ function HiddenInfoboxLeague._getCountryCategories()
 	local current = _args.country
 
 	while not String.isEmpty(current) do
-		local nationality = Localisation.getLocalisation({displayNoError = true}, current)
+		local nationality = Flags.getLocalisation(current)
 
 		if String.isEmpty(nationality) then
 			table.insert(countryCategories, 'Unrecognised Country')
@@ -227,7 +229,7 @@ function HiddenInfoboxLeague._definePageVariables()
 	if finished ~= 'true' and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-				.. 'AND [[participant::!Definitions]] AND [[placement::1]]',
+				.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
 			query = 'date',
 			order = 'date asc',
 			limit = 1
@@ -256,6 +258,9 @@ function HiddenInfoboxLeague._definePageVariables()
 	local patch, epatch = HiddenInfoboxLeague._getPatch()
 	Variables.varDefine('patch', patch)
 	Variables.varDefine('epatch', epatch)
+
+	--maps
+	Variables.varDefine('tournament_maps', HiddenInfoboxLeague._getMaps())
 end
 
 function HiddenInfoboxLeague._getPrizePool()
@@ -369,6 +374,11 @@ end
 function HiddenInfoboxLeague._setLpdbData()
 	local links = Links.transform(_args)
 
+	local participantsNumber = tonumber(Variables.varDefault('tournament_playerNumber')) or 0
+	if participantsNumber == 0 then
+		participantsNumber = _args.team_number or 0
+	end
+
 	local lpdbData = {
 		name = _args.name or _pagename,
 		tickername = _args.tickername or _args.name or _pagename,
@@ -404,11 +414,30 @@ function HiddenInfoboxLeague._setLpdbData()
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {})
 		),
-		maps = HiddenInfoboxLeague._concatArgs('map'),
-		participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0),
+		maps = Variables.varDefault('tournament_maps'),
+		participantsnumber = participantsNumber,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+			seriesnumber = Variables.varDefault('tournament_series_number')
+		}
 	}
 
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. lpdbData.name, lpdbData)
+end
+
+function HiddenInfoboxLeague._getMaps()
+	local prefix = 'map'
+	if String.isEmpty(_args[prefix .. '1']) then
+		return ''
+	end
+	local mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, prefix)
+
+	return Json.stringify(Table.map(mapArgs, function(mapIndex, map)
+		map = mw.text.split(map, '|')
+		return mapIndex, {
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(map[1]),
+			displayname = _args[prefix .. mapIndex .. 'display'] or map[#map],
+		}
+	end))
 end
 
 function HiddenInfoboxLeague._getIcon()
@@ -437,23 +466,6 @@ function HiddenInfoboxLeague._getIcon()
 		iconDark = iconDark,
 		stringOfExpandedTemplate = iconSmallTemplate
 	})
-end
-
-function HiddenInfoboxLeague._concatArgs(base)
-	local firstArg = _args[base] or _args[base .. '1']
-	if String.isEmpty(firstArg) then
-		return nil
-	end
-	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
-	local index = 2
-	while not String.isEmpty(_args[base .. index]) do
-		table.insert(foundArgs,
-			mw.ext.TeamLiquidIntegration.resolve_redirect(_args[base .. index])
-		)
-		index = index + 1
-	end
-
-	return table.concat(foundArgs, ';')
 end
 
 function HiddenInfoboxLeague._cleanDate(date)

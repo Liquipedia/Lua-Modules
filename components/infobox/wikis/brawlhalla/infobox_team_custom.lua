@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Team = require('Module:Infobox/Team')
-local Variables = require('Module:Variables')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
+
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local CustomTeam = Class.new()
 
@@ -16,7 +18,7 @@ function CustomTeam.run(frame)
 	local team = Team(frame)
 	team.addToLpdb = CustomTeam.addToLpdb
 
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)

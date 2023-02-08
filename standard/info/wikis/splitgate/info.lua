@@ -10,6 +10,24 @@ return {
 	startYear = 2019,
 	wikiName = 'splitgate',
 	name = 'Splitgate',
-	defaultTeamLogo = 'Splitgate allmode.png (2019) Change date (2021-06-01) Splitgate 2021 lightmode.png',
-	defaultTeamLogoDark = 'Splitgate allmode.png (2019) Change date (2021-06-01) Splitgate 2021 darkmode.png',
+	games = {
+		splitgate = {
+			abbreviation = 'SG',
+			name = 'Splitgate',
+			link = 'Splitgate',
+			logo = {
+				darkMode = 'Splitgate 2021 darkmode.png',
+				lightMode = 'Splitgate 2021 lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Splitgate 2021 darkmode.png',
+				lightMode = 'Splitgate 2021 lightmode.png',
+			},
+		},
+	},
+	defaultGame = 'splitgate',
+	defaultTeamLogo = 'Splitgate allmode.png (2019) Change date '
+		.. '(2021-06-01) Splitgate 2021 lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Splitgate allmode.png (2019) Change date '
+		.. '(2021-06-01) Splitgate 2021 darkmode.png', ---@deprecated
 }

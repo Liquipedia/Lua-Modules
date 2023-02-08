@@ -8,10 +8,10 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local wikiCopyPaste = Table.copy(Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base', {requireDevIfEnabled = true}))
 
 local GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR = 'gf'
@@ -40,18 +40,11 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		out = out .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, showScore)
 	end
 
-	out = out .. '\n\t|date=|finished='
+	out = out .. '\n\t|date= |finished='
 
 	if streams then
 		table.insert(mapStats, 'vod')
-		out = out .. '\n\t|twitch=|youtube=|vod='
-	end
-
-	if #matchMatchpages > 0 then
-		out = out .. '\n\t'
-		for _, matchpage in ipairs(matchMatchpages) do
-			out = out .. '|' .. matchpage:lower() .. '='
-		end
+		out = out .. '\n\t|twitch='
 	end
 
 	for i = 1, bestof do
@@ -75,7 +68,14 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		out = out .. '}}'
 	end
 
-	return out .. '\n}}'
+	if #matchMatchpages > 0 then
+		out = out .. '\n\t'
+		for _, matchpage in ipairs(matchMatchpages) do
+			out = out .. '|' .. matchpage:lower() .. '='
+		end
+	end
+
+	return out .. '\n\t}}'
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent

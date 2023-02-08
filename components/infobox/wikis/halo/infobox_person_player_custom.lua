@@ -6,18 +6,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Player = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 local GameAppearances = require('Module:GetGameAppearances')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Role = require('Module:Role')
+local Lua = require('Module:Lua')
 local Region = require('Module:Region')
+local Role = require('Module:Role')
+local PlayerTeamAuto = require('Module:PlayerTeamAuto')
+local String = require('Module:StringUtils')
+local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
@@ -32,12 +36,21 @@ local _args
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
-	_args = player.args
+
+	if String.isEmpty(player.args.team) then
+		player.args.team = PlayerTeamAuto._main{team = 'team'}
+	end
+
+	if String.isEmpty(player.args.team2) then
+		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
+	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
-	return player:createInfobox(frame)
+	_args = player.args
+
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)

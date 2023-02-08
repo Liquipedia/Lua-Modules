@@ -14,7 +14,6 @@ local WikiSpecificBase = {}
 -- called from Module:MatchGroup
 -- called after processMap/processPlayer
 -- used to alter match related parameters, e.g. automatically setting the winner
--- @parameter frame - the frame object
 -- @parameter match - a match
 -- @returns the match after changes have been applied
 WikiSpecificBase.processMatch = FnUtil.lazilyDefineFunction(function()
@@ -26,7 +25,6 @@ end)
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
--- @parameter frame - the frame object
 -- @parameter map - a map
 -- @returns the map after changes have been applied
 WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
@@ -38,7 +36,6 @@ end)
 -- called from Module:Match/Subobjects
 -- used to transform wiki-specific input of templates to the generalized
 -- format that is required by Module:MatchGroup
--- @parameter frame - the frame object
 -- @parameter player - a player
 -- @returns the player after changes have been applied
 WikiSpecificBase.processPlayer = FnUtil.lazilyDefineFunction(function()

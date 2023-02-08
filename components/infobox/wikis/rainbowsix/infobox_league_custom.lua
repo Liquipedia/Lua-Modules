@@ -6,16 +6,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local League = require('Module:Infobox/League')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
-local Tier = require('Module:Tier')
 local Class = require('Module:Class')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
+local String = require('Module:StringUtils')
+local Tier = require('Module:Tier')
+local Variables = require('Module:Variables')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local _args
 local _league
@@ -26,6 +30,7 @@ local CustomInjector = Class.new(Injector)
 local _DEFAULT_TIERTYPE = 'General'
 local _DEFAULT_PLATFORM = 'PC'
 local _PLATFORM_ALIAS = {
+	console = 'Console',
 	pc = 'PC',
 	xbox = 'Xbox',
 	xone = 'Xbox',
@@ -65,7 +70,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -131,11 +136,10 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
-	lpdbData.extradata = {
-		individual = String.isNotEmpty(args.player_number) and 'true' or '',
-		startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date),
-		enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date),
-	}
+
+	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
+	lpdbData.extradata.startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date)
+	lpdbData.extradata.enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date)
 
 	return lpdbData
 end

@@ -6,25 +6,27 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Player = require('Module:Infobox/Person')
-local String = require('Module:StringUtils')
-local Class = require('Module:Class')
-local Namespace = require('Module:Namespace')
-local Variables = require('Module:Variables')
-local Page = require('Module:Page')
-local YearsActive = require('Module:YearsActive')
-local Flags = require('Module:Flags')
-local Localisation = require('Module:Localisation')
-local Table = require('Module:Table')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local HeroIcon = require('Module:HeroIcon')
+local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
+local YearsActive = require('Module:YearsActive')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Builder = require('Module:Infobox/Widget/Builder')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
+local Builder = Widgets.Builder
 
 local _BANNED = mw.loadData('Module:Banned')
 local _ROLES = {
@@ -85,7 +87,7 @@ function CustomPlayer.run(frame)
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -171,7 +173,7 @@ function CustomPlayer:makeAbbr(title, text)
 	if String.isEmpty(title) or String.isEmpty(text) then
 		return nil
 	end
-	return '<abbr title="' .. title .. '>' .. text .. '</abbr>'
+	return '<abbr title="' .. title .. '">' .. text .. '</abbr>'
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
@@ -238,7 +240,7 @@ function CustomPlayer._createLocation(country)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	local demonym = Localisation.getLocalisation(countryDisplay)
+	local demonym = Flags.getLocalisation(countryDisplay) or ''
 	countryDisplay = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
 
 	local roleCategory = _ROLES_CATEGORY[_args.role or ''] or 'Players'

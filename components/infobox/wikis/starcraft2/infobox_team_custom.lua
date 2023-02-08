@@ -8,23 +8,27 @@
 
 local Achievements = require('Module:Achievements in infoboxes')
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
+local Lua = require('Module:Lua')
 local MatchTicker = require('Module:MatchTicker/Participant')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Infobox/Team')
 local Variables = require('Module:Variables')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Title = Widgets.Title
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -40,8 +44,7 @@ local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
 local _LANGUAGE = mw.language.new('en')
 
-local _earnings = 0
-local _EARNINGS_MODES = {team = 'team'}
+local _EARNINGS_MODES = {team = Opponent.team}
 local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local _PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
@@ -58,7 +61,7 @@ function CustomTeam.run(frame)
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -71,15 +74,14 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		local earningsWhileOnTeam
-		_earnings, earningsWhileOnTeam = CustomTeam.calculateEarnings(_args)
+		CustomTeam.calculateEarnings(_args)
 		local earningsDisplay
-		if _earnings > 0 then
-			earningsDisplay = '$' .. _LANGUAGE:formatNum(_earnings)
+		if _team.totalEarnings > 0 then
+			earningsDisplay = '$' .. _LANGUAGE:formatNum(_team.totalEarnings)
 		end
 		local earningsFromPlayersDisplay
-		if earningsWhileOnTeam > 0 then
-			earningsFromPlayersDisplay = '$' .. _LANGUAGE:formatNum(earningsWhileOnTeam)
+		if _team.totalEarningsWhileOnTeam > 0 then
+			earningsFromPlayersDisplay = '$' .. _LANGUAGE:formatNum(_team.totalEarningsWhileOnTeam)
 		end
 		return {
 			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
@@ -132,9 +134,14 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData)
-	lpdbData.earnings = _earnings
 	lpdbData.region = nil
 	lpdbData.extradata.subteams = CustomTeam._listSubTeams()
+
+	lpdbData.extradata.playerearnings = _team.totalEarningsWhileOnTeam
+	for year, playerEarningsOfYear  in pairs(_team.earningsWhileOnTeam or {}) do
+		lpdbData.extradata['playerearningsin' .. year] = playerEarningsOfYear
+	end
+
 	return lpdbData
 end
 
@@ -177,16 +184,16 @@ function CustomTeam.playerBreakDown(args)
 		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
 			playerBreakDown.display = {}
 			if protossnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'p'} .. ' ' .. protossnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'p'} .. ' ' .. protossnumber
 			end
 			if terrannumbner > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'t'} .. ' ' .. terrannumbner
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 't'} .. ' ' .. terrannumbner
 			end
 			if zergnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'z'} .. ' ' .. zergnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'z'} .. ' ' .. zergnumber
 			end
 			if randomnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'r'} .. ' ' .. randomnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'r'} .. ' ' .. randomnumber
 			end
 		end
 	end
@@ -201,6 +208,12 @@ function CustomTeam.getAutomatedAchievements(team)
 end
 
 function CustomTeam.calculateEarnings(args)
+	-- set default values for the non query case
+	_team.earnings = {}
+	_team.totalEarnings = 0
+	_team.earningsWhileOnTeam = {}
+	_team.totalEarningsWhileOnTeam = 0
+
 	if
 		Logic.readBool(args.disable_lpdb) or
 		Logic.readBool(args.disable_storage) or
@@ -210,21 +223,19 @@ function CustomTeam.calculateEarnings(args)
 		_doStore = false
 		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
-		local earnings, earningsWhileOnTeam = CustomTeam.getEarningsAndMedalsData(_team.pagename)
-		Variables.varDefine('earnings', earnings)
-		return earnings, earningsWhileOnTeam
+		CustomTeam.getEarningsAndMedalsData(_team.pagename)
+		Variables.varDefine('earnings', _team.totalEarnings)
 	end
-
-	return 0, 0
 end
 
 function CustomTeam.getEarningsAndMedalsData(team)
-	local query = 'liquipediatier, liquipediatiertype, placement, date, individualprizemoney, prizemoney, players'
+	local query = 'liquipediatier, liquipediatiertype, placement, date, '
+		.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype'
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any)
 	for playerIndex = 1, _MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
 		playerTeamConditions:add{
-			ConditionNode(ColumnName('players_p' .. playerIndex .. 'team'), Comparator.eq, team),
+			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, team),
 		}
 	end
 
@@ -242,15 +253,15 @@ function CustomTeam.getEarningsAndMedalsData(team)
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
 			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('players_type'), Comparator.eq, 'team'),
-				ConditionNode(ColumnName('participantlink'), Comparator.eq, team),
+				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
+				ConditionNode(ColumnName('opponentname'), Comparator.eq, team),
 				placementConditions,
 			},
 		},
 		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('participantlink'), Comparator.eq, team),
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, team),
 			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('players_type'), Comparator.neq, 'team'),
+				ConditionNode(ColumnName('opponenttype'), Comparator.neq, Opponent.team),
 				playerTeamConditions
 			},
 		},
@@ -275,10 +286,10 @@ function CustomTeam.getEarningsAndMedalsData(team)
 		earnings, playerEarnings = CustomTeam._addPlacementToEarnings(earnings, playerEarnings, placement)
 
 		--handle medals
-		local mode = (placement.players or {}).type
-		if mode == 'solo' then
+		local mode = placement.opponenttype
+		if mode == Opponent.solo then
 			medals = CustomTeam._addPlacementToMedals(medals, placement)
-		elseif mode == 'team' then
+		elseif mode == Opponent.team then
 			teamMedals = CustomTeam._addPlacementToMedals(teamMedals, placement)
 		end
 	end
@@ -293,24 +304,25 @@ function CustomTeam.getEarningsAndMedalsData(team)
 		earnings.team = {}
 	end
 
-	if _doStore then
-		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
-				type = 'total_earnings_players_while_on_team',
-				name = _team.pagename,
-				information = playerEarnings,
-		})
+	for _, earningsTable in pairs(earnings) do
+		for key, value in pairs(earningsTable) do
+			earningsTable[key] = Math.round{value}
+		end
 	end
 
-	return Math.round{earnings.team.total or 0}, Math.round{playerEarnings or 0}
+	_team.totalEarnings = Table.extract(earnings.team or {}, 'total') or 0
+	_team.earnings = earnings.team or {}
+	_team.totalEarningsWhileOnTeam = Table.extract(earnings.other or {}, 'total') or 0
+	_team.earningsWhileOnTeam = earnings.other or {}
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)
 	local prizeMoney = data.prizemoney
-	data.players = data.players or {}
-	local mode = data.players.type
+	data.opponentplayers = data.opponentplayers or {}
+	local mode = data.opponenttype
 	mode = _EARNINGS_MODES[mode]
 	if not mode then
-		prizeMoney = data.individualprizemoney * CustomTeam._amountOfTeamPlayersInPlacement(data.players)
+		prizeMoney = data.individualprizemoney * CustomTeam._amountOfTeamPlayersInPlacement(data.opponentplayers)
 		playerEarnings = playerEarnings + prizeMoney
 		mode = 'other'
 	end

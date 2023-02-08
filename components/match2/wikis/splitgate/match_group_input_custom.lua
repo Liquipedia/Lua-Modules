@@ -9,13 +9,13 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local _MAX_NUM_OPPONENTS = 8
@@ -35,7 +35,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(_, match)
+function CustomMatchGroupInput.processMatch(match)
 	-- Count number of maps, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
@@ -54,7 +54,7 @@ function CustomMatchGroupInput.processMatch(_, match)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(_, map)
+function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -88,7 +88,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(_, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 

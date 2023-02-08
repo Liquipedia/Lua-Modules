@@ -24,8 +24,13 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnable
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
-local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link=https://octane.gg/matches/'
-local _OCTANE_SUFFIX = '|Octane matchpage]]'
+
+local _SHIFT_PREFIX = '[[File:ShiftRLE icon.png|14x14px|link='
+local _SHIFT_SUFFIX = '|ShiftRLE matchpage]]'
+local _BALLCHASING_PREFIX = '[[File:Ballchasing icon.png|14x14px|link='
+local _BALLCHASING_SUFFIX = '|Ballchasing replays]]'
+local _HEADTOHEAD_PREFIX = '[[File:Match Info Stats.png|14x14px|link='
+local _HEADTOHEAD_SUFFIX = '|Head to Head history]]'
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
@@ -107,8 +112,8 @@ function Header:createScoreDisplay(opponent1, opponent2)
 		elseif opponent.extradata and opponent.extradata.additionalScores then
 			-- Match Series (Sets), show the series score
 			scoreText = (opponent.extradata.set1win and 1 or 0)
-					  + (opponent.extradata.set2win and 1 or 0)
-					  + (opponent.extradata.set3win and 1 or 0)
+					+ (opponent.extradata.set2win and 1 or 0)
+					+ (opponent.extradata.set3win and 1 or 0)
 		else
 			scoreText = OpponentDisplay.InlineScore(opponent)
 		end
@@ -169,7 +174,7 @@ function Header:createOpponent(opponent, opponentIndex)
 	return OpponentDisplay.BlockOpponent({
 		flip = opponentIndex == 1,
 		opponent = opponent,
-		overflow = 'wrap',
+		overflow = 'ellipsis',
 		teamStyle = 'short',
 	})
 		:addClass(opponent.type ~= 'solo'
@@ -178,16 +183,26 @@ function Header:createOpponent(opponent, opponentIndex)
 end
 
 function Header:create()
-	return self.root
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
 		:node(self.leftElementAdditional)
 		:node(self.leftElement)
-		:node(self.scoreBoard)
+	self.root:node(self.scoreBoard)
+	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
 		:node(self.rightElement)
 		:node(self.rightElementAdditional)
+	return self.root
 end
 
 
 local CustomMatchSummary = {}
+
+function CustomMatchSummary._getHeadToHead(opponents)
+	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
+	local link = tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
+		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
+		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
+	return _HEADTOHEAD_PREFIX .. link .. _HEADTOHEAD_SUFFIX
+end
 
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
@@ -210,16 +225,25 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
+	local headToHead = match.extradata.showh2h and
+		CustomMatchSummary._getHeadToHead(match.opponents) or nil
+
 	if
 		Table.isNotEmpty(vods) or
 		String.isNotEmpty(match.vod) or
-		Logic.isNotEmpty(match.extradata.octane)
+		Table.isNotEmpty(match.links) or
+		headToHead
 	then
 		local footer = MatchSummary.Footer()
 
-		-- Octane
-		if Logic.isNotEmpty(match.extradata.octane) then
-			footer:addElement(_OCTANE_PREFIX .. match.extradata.octane .. _OCTANE_SUFFIX)
+		-- Shift
+		for _, shift in Table.iter.pairsByPrefix(match.links, 'shift') do
+			footer:addElement(_SHIFT_PREFIX .. shift .. _SHIFT_SUFFIX)
+		end
+
+		-- Ballchasing
+		for _, ballchasing in Table.iter.pairsByPrefix(match.links, 'ballchasing') do
+			footer:addElement(_BALLCHASING_PREFIX .. ballchasing .. _BALLCHASING_SUFFIX)
 		end
 
 		-- Match Vod
@@ -235,6 +259,11 @@ function CustomMatchSummary.getByMatchId(args)
 				gamenum = index,
 				vod = vod,
 			})
+		end
+
+		-- Head-to-head
+		if headToHead then
+			footer:addElement(headToHead)
 		end
 
 		matchSummary:footer(footer)
@@ -373,7 +402,7 @@ end
 
 function CustomMatchSummary._goalDisaplay(goalesValue, side)
 	local goalsDisplay = mw.html.create('div')
-		:cssText(side == 2 and 'float:right; margin-right:10px;')
+		:cssText(side == 2 and 'float:right; margin-right:10px;' or nil)
 		:node(Abbreviation.make(
 			goalesValue,
 			'Team ' .. side .. ' Goaltimes')

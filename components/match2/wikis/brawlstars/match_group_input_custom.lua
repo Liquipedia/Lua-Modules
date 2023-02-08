@@ -9,7 +9,6 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -18,6 +17,7 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 local BrawlerNames = mw.loadData('Module:BrawlerNames')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
@@ -35,7 +35,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(frame, match)
+function CustomMatchGroupInput.processMatch(match)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -49,7 +49,7 @@ function CustomMatchGroupInput.processMatch(frame, match)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(frame, map)
+function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
@@ -72,7 +72,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(frame, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 

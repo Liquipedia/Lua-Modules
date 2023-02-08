@@ -8,6 +8,8 @@
 
 local Array = require('Module:Array')
 local DisplayUtil = require('Module:DisplayUtil')
+local Faction = require('Module:Faction')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
@@ -16,10 +18,8 @@ local TypeUtil = require('Module:TypeUtil')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
-local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getTinyIcon = function(_) end,
-}
 
 local html = mw.html
 
@@ -158,6 +158,26 @@ function StarcraftMatchSummary.Body(props)
 			:addClass('brkts-popup-body-element')
 			:addClass('brkts-popup-countdown')
 		body:node(countdownNode)
+	end
+
+	-- add a comment if there is a pre match map advantage
+	for _, opponent in ipairs(match.opponents or {}) do
+		-- if the opponent has a (numeric) pre match advantage build the comment
+		if Logic.isNumeric((opponent.extradata or {}).advantage) then
+			body:node(
+				html.create('div')
+					:addClass('brkts-popup-body-element')
+					:addClass('brkts-popup-sc-game-center') -- use this over comment class so it is shown in the height as maps
+					:node(StarcraftOpponentDisplay.InlineOpponent{
+						opponent = StarcraftOpponent.isTbd(opponent) and StarcraftOpponent.tbd() or opponent,
+						showFlag = false,
+						showLink = true,
+						showRace = false,
+						teamStyle = 'short',
+					})
+					:wikitext(' starts with a ' .. opponent.extradata.advantage .. ' map advantage.')
+			)
+		end
 	end
 
 	if match.opponentMode == 'uniform' then
@@ -467,7 +487,7 @@ function StarcraftMatchSummary.OffraceIcons(races)
 	local racesNode = html.create('div')
 		:addClass('brkts-popup-sc-game-offrace-icons')
 	for _, race in ipairs(races) do
-		racesNode:node(RaceIcon.getTinyIcon({race}))
+		racesNode:node(Faction.Icon{size = 'tiny', faction = race})
 	end
 
 	return racesNode

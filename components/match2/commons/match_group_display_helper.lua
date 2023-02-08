@@ -7,30 +7,21 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
+local Timezone = require('Module:Timezone')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+
 
 local DisplayHelper = {}
 local _NONBREAKING_SPACE = '&nbsp;'
-local _UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
-
----@deprecated
----Use Opponent.typeIsParty
-function DisplayHelper.opponentTypeIsParty(opponentType)
-	return Opponent.typeIsParty(opponentType)
-end
-
----@deprecated
----Use Opponent.isTbd
-function DisplayHelper.opponentIsTBD(opponent)
-	return Opponent.isTbd(opponent)
-end
+local _UTC = Timezone.getTimezoneString('UTC')
 
 -- Whether to allow highlighting an opponent via mouseover
 function DisplayHelper.opponentIsHighlightable(opponent)
@@ -86,6 +77,7 @@ components.
 ]]
 function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact
+		or (match.timestamp and match.timestamp ~= Date.epochZero)
 		or match.vod
 		or not Table.isEmpty(match.links)
 		or match.comment
@@ -97,7 +89,9 @@ function DisplayHelper.MatchCountdownBlock(match)
 	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateIsExact == true then
-		dateString = mw.getContentLanguage():formatDate('F j, Y - H:i', match.date) .. ' ' .. _UTC
+		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
+		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
+				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or _UTC)
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end

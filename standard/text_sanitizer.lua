@@ -8,7 +8,7 @@
 local TextSanitizer = {}
 
 local NAME_SANITIZER = {
-	['<.->'] =  '', -- All html tags and their attributes
+	['<.->'] = '', -- All html tags and their attributes
 	['&nbsp;'] = ' ', -- Non-breaking space
 	['&zwj;'] = '', -- Zero width joiner
 	['—'] = '-', -- Non-breaking hyphen
@@ -19,7 +19,7 @@ local NAME_SANITIZER = {
 ---Removes all html tags and their attributes.
 ---@param name string?
 ---@return string?
-function TextSanitizer.tournamentName(name)
+function TextSanitizer.stripHTML(name)
 	if not name then
 		return
 	end

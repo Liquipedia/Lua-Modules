@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local BasicInfobox = require('Module:Infobox/Basic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
+
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -21,10 +23,10 @@ local Map = Class.new(BasicInfobox)
 
 function Map.run(frame)
 	local map = Map(frame)
-	return map:createInfobox(frame)
+	return map:createInfobox()
 end
 
-function Map:createInfobox(frame)
+function Map:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
@@ -49,7 +51,7 @@ function Map:createInfobox(frame)
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Maps')
+		infobox:categories('Maps', unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args)
 	end
 
@@ -59,6 +61,11 @@ end
 --- Allows for overriding this functionality
 function Map:getNameDisplay(args)
 	return args.name
+end
+
+--- Allows for overriding this functionality
+function Map:getWikiCategories(args)
+	return {}
 end
 
 --- Allows for overriding this functionality

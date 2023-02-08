@@ -8,7 +8,7 @@
 
 local String = require('Module:StringUtils')
 local Date = require('Module:Date/Ext')
-local Localisation = require('Module:Localisation')
+local Flags = require('Module:Flags')
 local Games = mw.loadData('Module:Games')
 local Variables = require('Module:Variables')
 local StringUtils = require('Module:StringUtils')
@@ -31,7 +31,7 @@ function MetadataGenerator.tournament(args)
 	local name = not String.isEmpty(args.name) and (args.name):gsub('&nbsp;', ' ') or mw.title.getCurrentTitle().text
 
 	local tournamentType = args.type
-	local locality = Localisation.getLocalisation({displayNoError = true}, args.country)
+	local locality = Flags.getLocalisation(args.country)
 
 	local organizers = {
 		args['organizer-name'] or args.organizer,

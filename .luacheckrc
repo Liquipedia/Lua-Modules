@@ -1,4 +1,7 @@
 std = {
+	globals = {
+		"mw",
+	},
 	read_globals = {
 		"arg",
 		"assert",
@@ -7,7 +10,6 @@ std = {
 		"getmetatable",
 		"ipairs",
 		"math",
-		"mw",
 		"next",
 		"os",
 		"package",

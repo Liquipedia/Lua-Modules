@@ -7,8 +7,11 @@
 --
 
 local Lua = require('Module:Lua')
+
 local Custom = Lua.import('Module:TeamCard/Custom', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 -- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier Module
 local Qualifier = require('Module:TeamCard/Qualifier')
 local Variables = require('Module:Variables')
@@ -44,6 +47,13 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
 	lpdbData.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.players)
 
+	-- Store into the standardized lpdb fields
+	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(Opponent.resolve(
+		Opponent.readOpponentArgs{type = Opponent.team, template = teamTemplateName} or Opponent.tbd(Opponent.team),
+		lpdbData.date
+	)))
+	lpdbData.opponentplayers = lpdbData.players -- Until this is included in Opponent
+
 	-- Name must match prize pool insertion
 	local storageName = Custom.getLpdbObjectName and Custom.getLpdbObjectName(team, lpdbPrefix)
 						or TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
@@ -73,7 +83,7 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 	end
 
 	lpdbData.mode = Variables.varDefault('tournament_mode', 'team')
-	lpdbData.publishertier = Variables.varDefault('tournament_publisher_tier')
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier')
 	lpdbData.icon = Variables.varDefault('tournament_icon')
 	lpdbData.icondark = Variables.varDefault('tournament_icondark')
 	lpdbData.game = Variables.varDefault('tournament_game')
@@ -86,11 +96,11 @@ end
 
 -- Build the standard LPDB "Object Name", which is used as primary key in the DB record
 function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
-	local storageName = 'ranking'
+	local storageName = (team == 'TBD' and 'participant') or 'ranking'
 	if String.isNotEmpty(lpdbPrefix) then
 		storageName = storageName .. '_' .. lpdbPrefix
 	end
-	storageName = storageName .. '_' ..  mw.ustring.lower(team)
+	storageName = storageName .. '_' .. mw.ustring.lower(team)
 	if team == 'TBD' then
 		local placement = tonumber(Variables.varDefault('TBD_placements', '1'))
 		storageName = storageName .. '_' .. placement

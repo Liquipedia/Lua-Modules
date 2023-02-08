@@ -10,6 +10,8 @@ local CustomMatchSummary = {}
 
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local Flags = require('Module:Flags')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ChampionIcon = require('Module:HeroIcon')
@@ -68,6 +70,33 @@ function ChampionBan:create()
 	return self.root
 end
 
+-- Custom Caster Class
+local Casters = Class.new(
+	function(self)
+		self.root = mw.html.create('div')
+			:addClass('brkts-popup-comment')
+			:css('white-space','normal')
+			:css('font-size','85%')
+		self.casters = {}
+	end
+)
+function Casters:addCaster(caster)
+	if Logic.isNotEmpty(caster) then
+		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
+		if caster.flag then
+			table.insert(self.casters, Flags.Icon(caster.flag) .. ' ' .. nameDisplay)
+		else
+			table.insert(self.casters, nameDisplay)
+		end
+	end
+	return self
+end
+
+function Casters:create()
+	return self.root
+		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
+		:wikitext(mw.text.listToText(self.casters, ', ', ' & '))
+end
 
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
@@ -112,10 +141,10 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
 
 	return header
 end
@@ -154,6 +183,17 @@ function CustomMatchSummary._createBody(match)
 			body:addRow(mvp)
 		end
 
+	end
+
+	-- casters
+	if String.isNotEmpty(match.extradata.casters) then
+		local casters = Json.parseIfString(match.extradata.casters)
+		local casterRow = Casters()
+		for _, caster in pairs(casters) do
+			casterRow:addCaster(caster)
+		end
+
+		body:addRow(casterRow)
 	end
 
 	-- Pre-Process Champion Ban Data

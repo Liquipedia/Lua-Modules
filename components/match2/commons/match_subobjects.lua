@@ -11,21 +11,22 @@ local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local wikiSpec = require('Module:Brkts/WikiSpecific')
+
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local MatchSubobjects = {}
 
 function MatchSubobjects.getMap(frame)
 	local args = Arguments.getArgs(frame)
-	return Json.stringify(MatchSubobjects.luaGetMap(frame, args))
+	return Json.stringify(MatchSubobjects.luaGetMap(args))
 end
 
-function MatchSubobjects.luaGetMap(frame, args)
+function MatchSubobjects.luaGetMap(args)
 	-- dont save map if 'map' is not filled in
 	if Logic.isEmpty(args.map) then
 		return nil
 	else
-		args = wikiSpec.processMap(frame, args)
+		args = WikiSpecific.processMap(args)
 
 		args.participants = args.participants or {}
 		for key, item in pairs(args.participants) do
@@ -51,11 +52,11 @@ end
 
 function MatchSubobjects.getPlayer(frame)
 	local args = Arguments.getArgs(frame)
-	return Json.stringify(MatchSubobjects.luaGetPlayer(frame, args))
+	return Json.stringify(MatchSubobjects.luaGetPlayer(args))
 end
 
-function MatchSubobjects.luaGetPlayer(frame, args)
-	return wikiSpec.processPlayer(frame, args)
+function MatchSubobjects.luaGetPlayer(args)
+	return WikiSpecific.processPlayer(args)
 end
 
 local _ENTRY_POINT_NAMES = {'getMap', 'getPlayer', 'getRound'}

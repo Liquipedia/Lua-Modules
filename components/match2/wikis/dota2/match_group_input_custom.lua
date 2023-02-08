@@ -9,7 +9,6 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -17,6 +16,7 @@ local Streams = require('Module:Links/Stream')
 local HeroNames = mw.loadData('Module:HeroNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _STATUS_SCORE = 'S'
 local _STATUS_DRAW = 'D'
@@ -58,7 +58,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(_, match)
+function CustomMatchGroupInput.processMatch(match)
 	-- process match
 	Table.mergeInto(
 		match,
@@ -94,7 +94,7 @@ function matchFunctions.adjustMapData(match)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(_, map)
+function CustomMatchGroupInput.processMap(map)
 	if map.map == _DUMMY_MAP then
 		map.map = nil
 	end
@@ -130,7 +130,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(_, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
@@ -559,7 +559,7 @@ function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
 		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
 		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
+			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
 		end
 
 		if not Table.isEmpty(player) then

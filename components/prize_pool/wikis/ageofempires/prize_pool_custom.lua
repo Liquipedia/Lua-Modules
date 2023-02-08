@@ -6,12 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local Opponent = require('Module:Opponent/Custom')
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
@@ -20,13 +22,15 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
+local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
+local PRIZE_TYPE_POINTS = 'POINTS'
 local TIER_VALUE = {10, 6, 4, 2}
 
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
-	args.opponentLibrary = 'Opponent/Custom'
 	args.syncPlayers = true
+	args.import = false
 
 	local prizePool = PrizePool(args)
 		:create()
@@ -57,8 +61,22 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
 
 	-- legacy points, to be standardized
-	lpdbData.extradata.points = placement.prizeRewards.POINTS1
-	lpdbData.extradata.points2 = placement.prizeRewards.POINTS2
+	lpdbData.extradata.points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.points)
+	lpdbData.extradata.points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.points2)
+
+	local prizeIsQualifier = function(prize)
+		return prize.type == PRIZE_TYPE_QUALIFIES
+	end
+	local opponentHasPrize = function (prize)
+		return placement:getPrizeRewardForOpponent(opponent, prize.id)
+	end
+
+	lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
+
+	-- Variable to communicate with TeamCards
+	Variables.varDefine('enddate_' .. lpdbData.participant, lpdbData.date)
 
 	return lpdbData
 end

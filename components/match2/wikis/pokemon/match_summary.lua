@@ -113,10 +113,10 @@ end
 function CustomMatchSummary._createHeader(match)
 	local header = MatchSummary.Header()
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-	      :leftScore(header:createScore(match.opponents[1]))
-	      :rightScore(header:createScore(match.opponents[2]))
-	      :rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
 
 	return header
 end
@@ -201,7 +201,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local extradata = game.extradata or {}
 
 	local getChampsForTeam = function(team)
-		local getChampFromIndex =  function(champIndex)
+		local getChampFromIndex = function(champIndex)
 			return champIndex, String.nilIfEmpty(extradata['team' .. team .. 'champion' .. champIndex])
 		end
 		return Table.map(Array.range(1, _NUM_CHAMPIONS_PICK), getChampFromIndex)

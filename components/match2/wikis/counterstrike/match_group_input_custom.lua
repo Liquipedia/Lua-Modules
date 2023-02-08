@@ -10,13 +10,13 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local MathUtil = require('Module:MathUtil')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:Opponent')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 local EarningsOf = require('Module:Earnings of')
 
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
@@ -27,7 +27,7 @@ local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
-local FEATURED_TIERS = {'S-Tier', 'A-Tier'}
+local FEATURED_TIERS = {1, 2}
 local MIN_EARNINGS_FOR_FEATURED = 200000
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -41,7 +41,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(_, match)
+function CustomMatchGroupInput.processMatch(match)
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getLinks(match)
@@ -61,7 +61,7 @@ function CustomMatchGroupInput.processMatch(_, match)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(_, map)
+function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
@@ -95,7 +95,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(_, player)
+function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
@@ -103,6 +103,10 @@ end
 --
 -- function to check for draws
 function CustomMatchGroupInput.placementCheckDraw(table)
+	if #table < MAX_NUM_OPPONENTS then
+		return false
+	end
+
 	local last
 	for _, scoreInfo in pairs(table) do
 		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
@@ -158,6 +162,7 @@ end
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
+	local winner = tonumber(data.winner)
 	if Logic.readBool(data.finished) then
 		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
@@ -174,22 +179,26 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 				data.walkover = 'l'
 			end
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
-		else
-			-- A winner can be set in case of a overturned match
-			if Logic.isEmpty(data.winner) then
-				--CS only has exactly 2 opponents, neither more or less
-				if #indexedScores ~= 2 then
-					error('Unexpected number of opponents when calculating map winner')
-				end
+		elseif CustomMatchGroupInput.placementCheckScoresSet(indexedScores) then
+			--CS only has exactly 2 opponents, neither more or less
+			if #indexedScores == MAX_NUM_OPPONENTS then
 				if tonumber(indexedScores[1].score) > tonumber(indexedScores[2].score) then
 					data.winner = 1
 				else
 					data.winner = 2
 				end
 				indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
-			elseif Logic.isNumeric(data.winner) then
-				indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, tonumber(data.winner), 1, 2)
 			end
+		end
+		--If a manual winner is set use it
+		if winner and data.resulttype ~= 'default' then
+			if winner == 0 then
+				data.resulttype = 'draw'
+			else
+				data.resulttype = nil
+			end
+			data.winner = winner
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, winner, 1, 2)
 		end
 	end
 	return data, indexedScores
@@ -198,7 +207,7 @@ end
 
 -- Check if any team has a none-standard status
 function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status and scoreinfo.status ~= 'S' end)
 end
 
 -- function to check for forfeits
@@ -224,6 +233,10 @@ function CustomMatchGroupInput.getDefaultWinner(table)
 		end
 	end
 	return -1
+end
+
+function CustomMatchGroupInput.placementCheckScoresSet(table)
+	return Table.all(table, function (_, scoreinfo) return scoreinfo.status == 'S' end)
 end
 
 --
@@ -331,6 +344,7 @@ function matchFunctions.getLinks(match)
 	local links = match.links
 
 	local platforms = mw.loadData('Module:MatchExternalLinks')
+	table.insert(platforms, {name = 'vod2', isMapStats = true})
 
 	for _, platform in ipairs(platforms) do
 		-- Stat external links inserted in {{Map}}
@@ -386,11 +400,11 @@ function matchFunctions.getEarnings(name, year)
 		return 0
 	end
 
-	return tonumber(EarningsOf._team(name, {sdate = year .. '-01-01', edate = year .. '-12-31'}))
+	return tonumber(EarningsOf._team(name, {sdate = (year-1) .. '-01-01', edate = year .. '-12-31'}))
 end
 
 function matchFunctions.isFeatured(match)
-	if Table.includes(FEATURED_TIERS, match.liquipediatier) then
+	if Table.includes(FEATURED_TIERS, tonumber(match.liquipediatier)) then
 		return true
 	end
 	if Logic.isNotEmpty(match.publishertier) then
@@ -500,6 +514,7 @@ function matchFunctions.getOpponents(match)
 		match.resulttype = 'np'
 		match.status = match.finished
 		match.finished = false
+		match.dateexact = false
 	else
 		-- see if match should actually be finished if score is set
 		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
@@ -634,10 +649,8 @@ function mapFunctions.getScoresAndWinner(map)
 				obj.status = score
 				obj.score = -1
 			end
-			table.insert(map.scores, score)
+			map.scores[scoreIndex] = score
 			indexedScores[scoreIndex] = obj
-		else
-			break
 		end
 	end
 

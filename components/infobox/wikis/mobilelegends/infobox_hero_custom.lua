@@ -6,19 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Unit = require('Module:Infobox/Unit')
-local String = require('Module:StringUtils')
-local Namespace = require('Module:Namespace')
-local ClassIcon = require('Module:ClassIcon')
-local Math = require('Module:Math')
-local HeroWL = require('Module:HeroWL')
 local Class = require('Module:Class')
+local ClassIcon = require('Module:ClassIcon')
+local Flags = require('Module:Flags')
+local Lua = require('Module:Lua')
+local HeroWL = require('Module:HeroWL')
+local Math = require('Module:Math')
+local Namespace = require('Module:Namespace')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Breakdown = require('Module:Infobox/Widget/Breakdown')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Breakdown = Widgets.Breakdown
 
 local CustomHero = {}
 
@@ -31,6 +35,8 @@ local _pagename = mw.title.getCurrentTitle().text
 local _BATTLE_POINTS_ICON = '[[File:Mobile_Legends_BP_icon.png|x16px|Battle Points|link=Battle Point]]'
 local _DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Diamonds|x16px|link=Diamond]]'
 
+local NON_BREAKING_SPACE  = '&nbsp;'
+
 function CustomHero.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
@@ -40,7 +46,7 @@ function CustomHero.run(frame)
 	unit.setLpdbData = CustomHero.setLpdbData
 	unit.createWidgetInjector = CustomHero.createWidgetInjector
 
-	return unit:createInfobox(frame)
+	return unit:createInfobox()
 end
 
 function CustomInjector:addCustomCells()
@@ -53,6 +59,7 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Secondary Bar', content = {_args.secondarybar}},
 		Cell{name = 'Secondary Attributes', content = {_args.secondaryattributes1}},
 		Cell{name = 'Release Date', content = {_args.releasedate}},
+		Cell{name = 'Voice Actor(s)', content = CustomHero._voiceActors()},
 	}
 
 	local statisticsCells = {
@@ -131,6 +138,20 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
+end
+
+function CustomHero._voiceActors()
+	local voiceActors = {}
+
+	for voiceActorKey, voiceActor in Table.iter.pairsByPrefix(_args, 'voice') do
+		local flag = _args[voiceActorKey .. 'flag']
+		if flag then
+			voiceActor = Flags.Icon{flag = flag} .. NON_BREAKING_SPACE .. voiceActor
+		end
+		table.insert(voiceActors, voiceActor)
+	end
+
+	return voiceActors
 end
 
 function CustomHero:createWidgetInjector()

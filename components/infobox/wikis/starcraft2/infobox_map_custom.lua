@@ -7,12 +7,16 @@
 --
 
 local Class = require('Module:Class')
-local Map = require('Module:Infobox/Map')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
-local String = require('Module:StringUtils')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local CustomMap = Class.new()
 
@@ -23,9 +27,9 @@ local _args
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getCategories = CustomMap.getCategories
+	customMap.getWikiCategories = CustomMap.getWikiCategories
 	_args = customMap.args
-	return customMap:createInfobox(frame)
+	return customMap:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -137,6 +141,19 @@ end
 function CustomMap:_tlpdMap(id, query)
 	if not id then return nil end
 	return Template.safeExpand(mw.getCurrentFrame(), 'Tlpd map', { id, query })
+end
+
+function CustomMap:getWikiCategories(args)
+	local players = args.players
+	if String.isEmpty(players) then
+		players = CustomMap:_tlpdMap(args.id, 'players')
+	end
+
+	if String.isEmpty(players) then
+		return {}
+	end
+
+	return {'Maps (' .. players .. ' Players)'}
 end
 
 return CustomMap

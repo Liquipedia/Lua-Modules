@@ -7,20 +7,21 @@
 --
 
 local Class = require('Module:Class')
-local BasicInfobox = require('Module:Infobox/Basic')
-local Links = require('Module:Links')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local Localisation = require('Module:Localisation').getLocalisation
-local Flags = require('Module:Flags')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Region = require('Module:Region')
-local AgeCalculation = require('Module:AgeCalculation')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
-local Earnings = require('Module:Earnings')
-local Logic = require('Module:Logic')
+
+local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Earnings = Lua.import('Module:Earnings', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Region = Lua.import('Module:Region', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -132,10 +133,10 @@ function Person:createInfobox()
 			Builder{builder = function()
 				local teams = {
 					self:_createTeam(args.team, args.teamlink),
-					self:_createTeam(args.team2, args.teamlink2),
-					self:_createTeam(args.team3, args.teamlink3),
-					self:_createTeam(args.team4, args.teamlink4),
-					self:_createTeam(args.team5, args.teamlink5)
+					self:_createTeam(args.team2, args.team2link),
+					self:_createTeam(args.team3, args.team3link),
+					self:_createTeam(args.team4, args.team4link),
+					self:_createTeam(args.team5, args.team5link)
 				}
 				return {Cell{
 					name = #teams > 1 and 'Teams' or 'Team',
@@ -250,7 +251,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		image = args.image,
 		region = _region,
 		team = teamLink or team,
-		teampagename = (teamLink or team or ''):gsub(' ', '_'),
+		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
 		teamtemplate = teamTemplate,
 		status = status,
 		type = personType,
@@ -264,6 +265,15 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+	end
+
+	-- Store additional team-templates in extradata
+	args.team1 = team
+	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team') do
+		if teamIndex > 1 then
+			otherTeam = args[teamKey .. 'link'] or otherTeam
+			lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename
+		end
 	end
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
@@ -399,7 +409,7 @@ function Person:_createLocation(country, location, personType)
 		return nil
 	end
 	local countryDisplay = Flags.CountryName(country)
-	local demonym = Localisation(countryDisplay)
+	local demonym = Flags.getLocalisation(countryDisplay) or ''
 
 	local category = ''
 	if Namespace.isMain() then

@@ -17,6 +17,7 @@ local Table = Class.new(
 		self.rows = input.rows or {}
 		self.classes = input.classes or {}
 		self.css = input.css or {}
+		self.columns = input.columns
 	end
 )
 
@@ -33,7 +34,7 @@ end
 function Table:make()
 	local displayTable = mw.html.create('div'):addClass('csstable-widget')
 	displayTable:css{
-		['grid-template-columns'] = 'repeat(' .. self:_getMaxCells() .. ', auto)',
+		['grid-template-columns'] = 'repeat(' .. (self.columns or self:_getMaxCells()) .. ', auto)',
 	}
 
 	for _, class in ipairs(self.classes) do
