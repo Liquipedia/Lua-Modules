@@ -37,9 +37,11 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
+	_player = player
 
 	if String.isEmpty(player.args.team) then
 		player.args.team = PlayerTeamAuto._main{team = 'team'}
