@@ -523,7 +523,7 @@ function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
 		opponent[1] or ''
 	)
 	local link = Logic.emptyOr(opponent.link, Variables.varDefault(name .. '_page'), name)
-	link = mw.ext.TeamLiquidIntegration.resolve_redirect(link)
+	link = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_')
 	local race = Logic.emptyOr(opponent.race, Variables.varDefault(name .. '_race'), '')
 	local players = {}
 	local flag = Logic.emptyOr(opponent.flag, Variables.varDefault(name .. '_flag'))
@@ -550,12 +550,12 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 			opponent.p1link,
 			Variables.varDefault(opponent.p1 .. '_page'),
 			opponent.p1
-		))
+		)):gsub(' ', '_')
 	opponent.link2 = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
 			opponent.p2link,
 			Variables.varDefault(opponent.p2 .. '_page'),
 			opponent.p2
-		))
+		)):gsub(' ', '_')
 	if Logic.readBool(opponent.extradata.isarchon) then
 		opponent.p1race = Faction.read(opponent.race) or Faction.defaultFaction
 		opponent.p2race = opponent.p1race
@@ -605,7 +605,7 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 				opponent['p' .. playerIndex .. 'link'],
 				Variables.varDefault(playerName .. '_page'),
 				playerName
-			))
+			)):gsub(' ', '_')
 		local race = Logic.emptyOr(
 			opponent['p' .. playerIndex .. 'race'],
 			Variables.varDefault(playerName .. '_race'),
@@ -667,7 +667,7 @@ function StarcraftMatchGroupInput._getManuallyEnteredPlayers(playerData)
 				playerData['p' .. playerIndex .. 'link'],
 				playerData['p' .. playerIndex],
 				''
-			))
+			)):gsub(' ', '_')
 		if String.isNotEmpty(name) then
 			players[playerIndex] = {
 				name = name,
@@ -693,7 +693,7 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 		if Logic.isNotEmpty(name) then
 			local flag = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 			players[playerIndex] = {
-				name = name,
+				name = name:gsub(' ', '_'),
 				displayname = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'display'),
 				flag = Flags.CountryName(flag),
 				extradata = {faction = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'race')}
@@ -719,7 +719,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 		end
 		opponent.template = 'default'
 		icon = defaultIcon
-		name = Logic.emptyOr(opponent.link, opponent.name, opponent[1] or '')
+		name = Logic.emptyOr(opponent.link, opponent.name, opponent[1] or ''):gsub(' ', '_')
 		opponent.extradata = opponent.extradata or {}
 		opponent.extradata.display = Logic.emptyOr(opponent.name, opponent[1], '')
 		opponent.extradata.short = Logic.emptyOr(opponent.short, opponent.name, opponent[1] or '')
@@ -742,7 +742,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 		icondark = iconDark,
 		template = opponent.template,
 		type = opponent.type,
-		name = name,
+		name = name:gsub(' ', '_'),
 		score = opponent.score,
 		extradata = opponent.extradata,
 		match2players = players
