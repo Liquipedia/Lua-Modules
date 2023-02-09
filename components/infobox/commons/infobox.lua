@@ -35,7 +35,7 @@ function Infobox:create(frame, gameName, forceDarkMode)
 end
 
 function Infobox:categories(...)
-	Array.forEach({...}, mw.ext.TeamLiquidIntegration.add_category)
+	Array.forEach({...}, function(cat) return mw.ext.TeamLiquidIntegration.add_category(cat) end)
 	return self
 end
 
