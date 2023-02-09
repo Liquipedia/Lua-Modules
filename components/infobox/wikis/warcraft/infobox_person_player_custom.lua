@@ -72,9 +72,16 @@ function CustomInjector:addCustomCells(widgets)
 		}})
 	end
 
-	-- Race/Faction
-	table.insert(widgets, Cell{name = 'Race', content = {Faction.toName(_args.race)}})
+	return widgets
+end
 
+function CustomInjector:parse(id, widgets)
+	if id == 'role' then
+		-- WC doesn't show any roles, but rather shows the Race/Faction instead
+		return {
+			Cell{name = 'Race', content = {Faction.toName(_args.race)}}
+		}
+	end
 	return widgets
 end
 
