@@ -41,16 +41,14 @@ function NotabilityChecker.run(args)
 
 	output = output .. '===Summary===\n'
 	output = output .. '<b>Final weight:</b> ' .. tostring(weight) .. '\n\n'
+	output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person')
 
-	if weight < Config.NOTABILITY_THRESHOLD_NOTABLE and weight > Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is <b>OPEN FOR DISCUSSION</b>\n'
-	elseif weight < Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is <b>NOT NOTABLE</b>\n'
+	if weight >= Config.NOTABILITY_THRESHOLD_NOTABLE then
+		output = output .. ' is <b>NOTABLE</b>\n'
+	elseif weight >= Config.NOTABILITY_THRESHOLD_MIN then
+		output = output .. ' is <b>OPEN FOR DISCUSSION</b>\n'
 	else
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is <b>NOTABLE</b>\n'
+		output = output .. ' is <b>NOT NOTABLE</b>\n'
 	end
 
 	return output
