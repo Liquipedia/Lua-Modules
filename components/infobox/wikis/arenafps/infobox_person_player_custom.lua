@@ -20,17 +20,17 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local ROLES = {
-	-- Playes
-	['duel'] = {variable = 'Duel', isplayer = true},
-	['tdm'] = {variable = 'TDM', isplayer = true},
-	['ctf'] = {variable = 'CTF', isplayer = true},
-	['sacrifice'] = {variable = 'Sacrifice', isplayer = true},
+	-- Players
+	duel = {variable = 'Duel', isplayer = true},
+	tdm = {variable = 'TDM', isplayer = true},
+	ctf = {variable = 'CTF', isplayer = true},
+	sacrifice = {variable = 'Sacrifice', isplayer = true},
 	['3vs3'] = {variable = '3vs3', isplayer = true},
 
 	-- Staff and Talents
-	['analyst'] = {variable = 'Analyst', isplayer = false},
-	['manager'] = {variable = 'Manager', isplayer = false},
-	['caster'] = {variable = 'Caster', isplayer = false},
+	analyst = {variable = 'Analyst', isplayer = false},
+	manager = {variable = 'Manager', isplayer = false},
+	caster = {variable = 'Caster', isplayer = false},
 }
 ROLES.dueler = ROLES.duel
 
