@@ -94,7 +94,7 @@ function Streams.create(args)
 				local streamDisplay
 				if not useSpecialPages or streamData.hasNoSpecialPage then
 					local suffix = platform == 'youtube'
-						and String.isNotEmpty(args[streamIndex .. 'ytmultiple' .. languageIndex]) and '/videos?view=2&live_view=501'
+						and String.isNotEmpty(args[streamIndex .. 'ytmultiple' .. languageIndex]) and '/streams'
 						or streamData.suffix or ''
 
 					streamDisplay = '[' .. streamData.prefix .. args[streamIndex .. platform .. languageIndex] .. suffix
