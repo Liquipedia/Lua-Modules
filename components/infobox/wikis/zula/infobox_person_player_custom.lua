@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 		local automatedHistory = TeamHistoryAuto._results({
 			convertrole = 'true',
 			player = _pagename
-		}) or ''
+		})
 		automatedHistory = tostring(automatedHistory)
 		if automatedHistory == _EMPTY_AUTO_HISTORY then
 			automatedHistory = nil
