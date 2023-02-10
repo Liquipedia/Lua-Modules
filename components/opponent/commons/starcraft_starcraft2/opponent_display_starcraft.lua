@@ -146,7 +146,7 @@ function StarcraftOpponentDisplay.PlayerInlineOpponent(props)
 
 	local archonRaceNode
 	if showRace and opponent.isArchon then
-		archonRaceNode = StarcraftPlayerDisplay.Race(opponent.players[1].race)
+		archonRaceNode = Faction.Icon{faction = opponent.players[1].race}
 	end
 
 	return html.create('span')
