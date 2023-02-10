@@ -36,24 +36,25 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.getWikiCategories = CustomPlayer.getWikiCategories
+	player.nameDisplay = CustomPlayer.nameDisplay
 
 	return player:createInfobox(frame)
 end
 
-function CustomInjector:addCustomCells(widgets)
-	local function inputToCharacterIconList(input, game)
-		if type(input) ~= 'string' then
-			return nil
-		end
-		return Array.map(mw.text.split(input, ','), function(character)
-			return Characters.InfoboxCharacter{mw.text.trim(character), game}
-		end)
+function CustomPlayer.inputToCharacterIconList(input, game, fn)
+	if type(input) ~= 'string' then
+		return nil
 	end
+	return Array.map(mw.text.split(input, ','), function(character)
+		return Characters[fn]{mw.text.trim(character), game}
+	end)
+end
 
+function CustomInjector:addCustomCells(widgets)
 	for game, gameData in pairs(Info.games) do
-		local main = inputToCharacterIconList(_args['main-' .. game], game)
-		local former = inputToCharacterIconList(_args['former-main-' .. game], game)
-		local alt = inputToCharacterIconList(_args['alt-' .. game], game)
+		local main = CustomPlayer.inputToCharacterIconList(_args['main-' .. game], game, 'InfoboxCharacter')
+		local former = CustomPlayer.inputToCharacterIconList(_args['former-main-' .. game], game, 'InfoboxCharacter')
+		local alt = CustomPlayer.inputToCharacterIconList(_args['alt-' .. game], game, 'InfoboxCharacter')
 
 		if main or former or alt then
 			table.insert(widgets, Title{name = gameData.name})
@@ -122,6 +123,16 @@ function CustomPlayer:getWikiCategories(args)
 		table.insert(categories, Game.name{game = _args.game} .. ' Players')
 	end
 	return categories
+end
+
+function CustomPlayer:nameDisplay(args)
+	local name = args.id or mw.title.getCurrentTitle().text
+	local display = name
+	if _args.game then
+		local icons = CustomPlayer.inputToCharacterIconList(_args['main-'.. _args.game], _args.game, 'GetIconAndName')
+		display = table.concat(icons or {}) .. '&nbsp;' .. name
+	end
+	return display
 end
 
 return CustomPlayer
