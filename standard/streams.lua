@@ -100,7 +100,7 @@ function Streams.create(args)
 					streamDisplay = '[' .. streamData.prefix .. args[streamIndex .. platform .. languageIndex] .. suffix
 						.. ' <i class="lp-icon lp-' .. (streamData.icon or platform) .. '" style="margin-bottom:3.0px;"></i>]'
 				else
-					streamDisplay = '[[Special:StreamPage/' .. platform .. args[streamIndex .. platform .. languageIndex] .. '|'
+					streamDisplay = '[[Special:StreamPage/' .. platform .. '/' .. args[streamIndex .. platform .. languageIndex] .. '|'
 						.. '<i class="lp-icon lp-' .. (streamData.icon or platform) .. '" style="margin-bottom:3.0px;"></i>]]'
 				end
 
