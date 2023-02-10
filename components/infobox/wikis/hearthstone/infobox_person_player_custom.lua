@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
@@ -19,6 +18,8 @@ local Cell = Widgets.Cell
 local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
+
+local GM_ICON = '[[File:HS grandmastersIconSmall.png|x15px|link=Grandmasters]]&nbsp;'
 
 local _args
 
@@ -33,9 +34,7 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	if _args.grandmasters then
-		table.insert(widgets, Cell{name = 'Grandmasters', content = {
-			Template.safeExpand(mw.getCurrentFrame(), 'LeagueIconSmall/gm') .. _args.grandmasters
-		}})
+		table.insert(widgets, Cell{name = 'Grandmasters', content = {GM_ICON .. _args.grandmasters}})
 	end
 
 	return widgets
