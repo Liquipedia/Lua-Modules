@@ -32,7 +32,7 @@ function CustomPlayer.run(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{name = 'Agency', content = {Page.makeInternalLink(_args.agency, _args.agencylink)}})
+	table.insert(widgets, Cell{name = 'Agency', content = {Page.makeInternalLink(_args.agency)}})
 
 	return widgets
 end
