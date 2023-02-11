@@ -10,6 +10,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local MathUtil = require('Module:MathUtil')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
@@ -39,9 +40,8 @@ local _NO_WINNER = -1
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
+local _DEFAULT_RESULT_TYPE = 'default'
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
-
-local FEATURED_TIERS = {1, 2}
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TODAY = os.date('%Y-%m-%d')
@@ -57,7 +57,7 @@ local CustomMatchGroupInput = {}
 function CustomMatchGroupInput.processMatch(match)
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
-	match = matchFunctions.getLinks(match)
+	match = matchFunctions.getVodStuff(match)
 	match = matchFunctions.removeUnsetMaps(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 
@@ -351,9 +351,14 @@ function matchFunctions.getTournamentVars(match)
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
-function matchFunctions.getLinks(match)
+function matchFunctions.getVodStuff(match)
+	match.stream = Streams.processStreams(match)
+	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
+
 	match.links = {}
 	local links = match.links
+	if match.reddit then links.reddit = match.reddit end
+
 	return match
 end
 
@@ -423,7 +428,7 @@ function matchFunctions.getOpponents(match)
 			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = _STATUS_SCORE
 				isScoreSet = true
-			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
+			elseif Table.includes(_ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
 				opponent.score = _NOT_PLAYED_SCORE
 			end
@@ -561,7 +566,7 @@ function mapFunctions.getScoresAndWinner(map)
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do
 		-- read scores
 		local score
-		if Table.includes(ALLOWED_STATUSES, map['score' .. scoreIndex]) then
+		if Table.includes(_ALLOWED_STATUSES, map['score' .. scoreIndex]) then
 			score = map['score' .. scoreIndex]
 		elseif Logic.isNotEmpty(map.extradata['t' .. scoreIndex .. 'halfs']) then
 			score = MathUtil.sum(map.extradata['t' .. scoreIndex .. 'halfs'])
@@ -573,7 +578,7 @@ function mapFunctions.getScoresAndWinner(map)
 			if TypeUtil.isNumeric(score) then
 				obj.status = _STATUS_SCORE
 				obj.score = score
-			elseif Table.includes(ALLOWED_STATUSES, score) then
+			elseif Table.includes(_ALLOWED_STATUSES, score) then
 				obj.status = score
 				obj.score = _NOT_PLAYED_SCORE
 			end
