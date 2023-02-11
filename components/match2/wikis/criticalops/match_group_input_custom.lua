@@ -19,6 +19,8 @@ local Streams = require('Module:Links/Stream')
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
+local SIDE_DEF = 'ct'
+local SIDE_ATK = 't'
 local STATUS_SCORE = 'S'
 local STATUS_DRAW = 'D'
 local STATUS_DEFAULT_WIN = 'W'
@@ -363,7 +365,7 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getMatchStatus(match)
-	if match.resulttype == 'np' then
+	if match.resulttype == NP_MATCHSTATUS then
 		return match.status
 	else
 		return nil
@@ -519,16 +521,16 @@ function mapFunctions._getHalfScores(map)
 	local key = ''
 	local overtimes = 0
 
-	local function getOpossiteSide(side)
-		return side == 'ct' and 't' or 'ct'
+	local function getOppositeSide(side)
+		return side == SIDE_DEF and SIDE_ATK or SIDE_DEF
 	end
 
 	while true do
 		local t1Side = map[key .. 't1firstside']
-		if Logic.isEmpty(t1Side) or (t1Side ~= 'ct' and t1Side ~= 't') then
+		if Logic.isEmpty(t1Side) or (t1Side ~= SIDE_DEF and t1Side ~= SIDE_ATK) then
 			break
 		end
-		local t2Side = getOpossiteSide(t1Side)
+		local t2Side = getOppositeSide(t1Side)
 
 		-- Iterate over two Halfs (In regular time a half is 15 rounds, after that sides switch)
 		for _ = 1, 2, 1 do
