@@ -294,7 +294,6 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	for index = 1, numberOfHeroes do
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
-			:addClass('brkts-champion-icon')
 			:css('float', flip and 'right' or 'left')
 			:node(HeroIcon._getImage{opponentHeroesData[index], date = date})
 		if numberOfHeroes == _NUM_HEROES_PICK_SOLO then
@@ -312,7 +311,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	end
 
 	local display = mw.html.create('div')
-		:addClass('brkts-popup-body-element-thumbs')
+		:addClass('brkts-popup-body-element-thumbs'):addClass('brkts-champion-icon')
 
 	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)
