@@ -14,21 +14,34 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
-local EarningsOf = require('Module:Earnings of')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
-local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
+local _STATUS_SCORE = 'S'
+local _STATUS_DRAW = 'D'
+local _STATUS_DEFAULT_WIN = 'W'
+local _STATUS_FORFEIT = 'FF'
+local _STATUS_DISQUALIFIED = 'DQ'
+local _STATUS_DEFAULT_LOSS = 'L'
+local _ALLOWED_STATUSES = {
+	_STATUS_DRAW,
+	_STATUS_DEFAULT_WIN,
+	_STATUS_FORFEIT,
+	_STATUS_DISQUALIFIED,
+	_STATUS_DEFAULT_LOSS,
+}
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
-local NP_MATCH_STATUS = {'cancelled','canceled', 'postponed'}
+local NP_MATCH_STATUS = {'skip', 'np', 'canceled', 'cancelled'}
+local NOW = os.time(os.date('!*t'))
+local _NOT_PLAYED_SCORE = -1
+local _NO_WINNER = -1
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local FEATURED_TIERS = {1, 2}
-local MIN_EARNINGS_FOR_FEATURED = 200000
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TODAY = os.date('%Y-%m-%d')
@@ -109,7 +122,7 @@ function CustomMatchGroupInput.placementCheckDraw(table)
 
 	local last
 	for _, scoreInfo in pairs(table) do
-		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
+		if scoreInfo.status ~= _STATUS_SCORE and scoreInfo.status ~= _STATUS_DRAW then
 			return false
 		end
 		if last and last ~= scoreInfo.score then
@@ -166,17 +179,17 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	if Logic.readBool(data.finished) then
 		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
-			data.resulttype = 'draw'
+			data.resulttype = _STATUS_DRAW
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
 		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
 			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
-			data.resulttype = 'default'
+			data.resulttype = _DEFAULT_RESULT_TYPE
 			if CustomMatchGroupInput.placementCheckFF(indexedScores) then
-				data.walkover = 'ff'
+				data.walkover = _STATUS_FORFEIT
 			elseif CustomMatchGroupInput.placementCheckDQ(indexedScores) then
-				data.walkover = 'dq'
+				data.walkover = _STATUS_DISQUALIFIED
 			elseif CustomMatchGroupInput.placementCheckWL(indexedScores) then
-				data.walkover = 'l'
+				data.walkover = _STATUS_DEFAULT_LOSS
 			end
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 		elseif CustomMatchGroupInput.placementCheckScoresSet(indexedScores) then
@@ -207,36 +220,40 @@ end
 
 -- Check if any team has a none-standard status
 function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status and scoreinfo.status ~= 'S' end)
+	return Table.any(table,
+		function (_, scoreinfo)
+			return scoreinfo.status ~= _STATUS_SCORE and String.isNotEmpty(scoreinfo.status)
+		end
+	)
 end
 
 -- function to check for forfeits
 function CustomMatchGroupInput.placementCheckFF(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ==  _STATUS_FORFEIT end)
 end
 
 -- function to check for DQ's
 function CustomMatchGroupInput.placementCheckDQ(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == _STATUS_DISQUALIFIED end)
 end
 
 -- function to check for W/L
 function CustomMatchGroupInput.placementCheckWL(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'L' end)
+	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ==  _STATUS_DEFAULT_LOSS end)
 end
 
 -- Get the winner when resulttype=default
 function CustomMatchGroupInput.getDefaultWinner(table)
 	for index, scoreInfo in pairs(table) do
-		if scoreInfo.status == 'W' then
+		if scoreInfo.status == _STATUS_DEFAULT_WIN then
 			return index
 		end
 	end
-	return -1
+	return _NO_WINNER
 end
 
 function CustomMatchGroupInput.placementCheckScoresSet(table)
-	return Table.all(table, function (_, scoreinfo) return scoreinfo.status == 'S' end)
+	return Table.all(table, function (_, scoreinfo) return scoreinfo.status == _STATUS_SCORE end)
 end
 
 --
@@ -261,9 +278,9 @@ end
 -- Remove all maps that should be removed.
 function matchFunctions.removeUnsetMaps(match)
 	for i = 1, MAX_NUM_MAPS do
-		if match['map' .. i] then
-			if mapFunctions.discardMap(match['map' .. i]) then
-				match['map' .. i] = nil
+		if match['map'..i] then
+			if mapFunctions.discardMap(match['map'..i]) then
+				match['map'..i] = nil
 			end
 		else
 			break
@@ -335,55 +352,8 @@ function matchFunctions.getTournamentVars(match)
 end
 
 function matchFunctions.getLinks(match)
-	match.stream = Streams.processStreams(match)
-	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
-
 	match.links = {}
-
 	local links = match.links
-
-	local platforms = mw.loadData('Module:MatchExternalLinks')
-	table.insert(platforms, {name = 'vod2', isMapStats = true})
-
-	for _, platform in ipairs(platforms) do
-		-- Stat external links inserted in {{Map}}
-		if Logic.isNotEmpty(platform) then
-			local platformLinks = {}
-			local name = platform.name
-			local prefixLink = platform.prefixLink or ''
-			local suffixLink = platform.suffixLink or ''
-
-			if match[name] then
-				table.insert(platformLinks, {prefixLink .. match[name] .. suffixLink, 0})
-				match[name] = nil
-			end
-
-			if platform.isMapStats then
-				for i = 1, match.bestof do
-					local map = match['map' .. i]
-					if map and map[platform.name] then
-						table.insert(platformLinks, {prefixLink .. match['map' .. i][name] .. suffixLink, i})
-						match['map' .. i][platform.name] = nil
-					end
-				end
-			else
-				if platform.max then
-					for i = 2, platform.max, 1 do
-						if match[platform.name .. i] then
-							table.insert(platformLinks, {prefixLink .. match[name .. i] .. suffixLink, i})
-							match[platform.name .. i] = nil
-						end
-					end
-				end
-			end
-
-			if #platformLinks > 0 then
-				links[name] = platformLinks
-			end
-		end
-	end
-
 	return match
 end
 
@@ -395,49 +365,10 @@ function matchFunctions.getMatchStatus(match)
 	end
 end
 
-function matchFunctions.getEarnings(name, year)
-	if Logic.isEmpty(name) then
-		return 0
-	end
-
-	return tonumber(EarningsOf._team(name, {sdate = (year-1) .. '-01-01', edate = year .. '-12-31'}))
-end
-
-function matchFunctions.isFeatured(match)
-	if Table.includes(FEATURED_TIERS, tonumber(match.liquipediatier)) then
-		return true
-	end
-	if Logic.isNotEmpty(match.publishertier) then
-		return true
-	end
-
-	if not match.hasDate then
-		return false
-	end
-
-	local opponent1, opponent2 = match.opponent1, match.opponent2
-	local year = os.date('%Y')
-
-	if
-		opponent1.type == Opponent.team and
-		matchFunctions.getEarnings(opponent1.name, year) >= MIN_EARNINGS_FOR_FEATURED
-	or
-		opponent2.type == Opponent.team and
-		matchFunctions.getEarnings(opponent2.name, year) >= MIN_EARNINGS_FOR_FEATURED
-	then
-		return true
-	end
-
-	return false
-end
-
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
 		status = matchFunctions.getMatchStatus(match),
-		overturned = Logic.isNotEmpty(match.overturned),
-		featured = matchFunctions.isFeatured(match),
-		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
 	}
 	return match
 end
@@ -448,9 +379,9 @@ function matchFunctions.getMapVeto(match)
 
 	match.mapveto = Json.parseIfString(match.mapveto)
 
-	local vetotypes = mw.text.split(match.mapveto.types or '', ',')
-	local deciders = mw.text.split(match.mapveto.decider or '', ',')
-	local vetostart = match.mapveto.firstpick or ''
+	local vetotypes = mw.text.split(match.mapveto.types or ',')
+	local deciders = mw.text.split(match.mapveto.decider or ',')
+	local vetostart = match.mapveto.firstpick
 	local deciderIndex = 1
 
 	local data = {}
@@ -490,11 +421,11 @@ function matchFunctions.getOpponents(match)
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
-				opponent.status = 'S'
+				opponent.status = _STATUS_SCORE
 				isScoreSet = true
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
-				opponent.score = -1
+				opponent.score = _NOT_PLAYED_SCORE
 			end
 			opponents[opponentIndex] = opponent
 
@@ -511,18 +442,15 @@ function matchFunctions.getOpponents(match)
 	end
 
 	if Table.includes(NP_MATCH_STATUS, match.finished) then
-		match.resulttype = 'np'
+		match.resulttype = _NOT_PLAYED_SCORE
 		match.status = match.finished
 		match.finished = false
 		match.dateexact = false
 	else
 		-- see if match should actually be finished if score is set
 		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-			local currentUnixTime = os.time(os.date('!*t'))
-			local lang = mw.getContentLanguage()
-			local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 			local threshold = match.dateexact and 30800 or 86400
-			if matchUnixTime + threshold < currentUnixTime then
+			if match.timestamp + threshold < NOW then
 				match.finished = true
 			end
 		end
@@ -582,10 +510,10 @@ function mapFunctions.getExtraData(map)
 end
 
 function mapFunctions._getHalfScores(map)
-	map.extradata['t1sides'] = {}
-	map.extradata['t2sides'] = {}
-	map.extradata['t1halfs'] = {}
-	map.extradata['t2halfs'] = {}
+	map.extradata.t1sides = {}
+	map.extradata.t2sides = {}
+	map.extradata.t1halfs = {}
+	map.extradata.t2halfs = {}
 
 	local key = ''
 	local overtimes = 0
@@ -604,10 +532,10 @@ function mapFunctions._getHalfScores(map)
 		-- Iterate over two Halfs (In regular time a half is 15 rounds, after that sides switch)
 		for _ = 1, 2, 1 do
 			if(map[key .. 't1' .. t1Side] and map[key .. 't2' .. t2Side]) then
-				table.insert(map.extradata['t1sides'], t1Side)
-				table.insert(map.extradata['t2sides'], t2Side)
-				table.insert(map.extradata['t1halfs'], tonumber(map[key .. 't1' .. t1Side]) or 0)
-				table.insert(map.extradata['t2halfs'], tonumber(map[key .. 't2' .. t2Side]) or 0)
+				table.insert(map.extradata.t1sides, t1Side)
+				table.insert(map.extradata.t2sides, t2Side)
+				table.insert(map.extradata.t1halfs, tonumber(map[key .. 't1' .. t1Side]) or 0)
+				table.insert(map.extradata.t2halfs, tonumber(map[key .. 't2' .. t2Side]) or 0)
 				map[key .. 't1' .. t1Side] = nil
 				map[key .. 't2' .. t2Side] = nil
 				-- second half (sides switch)
@@ -643,19 +571,19 @@ function mapFunctions.getScoresAndWinner(map)
 		local obj = {}
 		if not Logic.isEmpty(score) then
 			if TypeUtil.isNumeric(score) then
-				obj.status = 'S'
+				obj.status = _STATUS_SCORE
 				obj.score = score
 			elseif Table.includes(ALLOWED_STATUSES, score) then
 				obj.status = score
-				obj.score = -1
+				obj.score = _NOT_PLAYED_SCORE
 			end
 			map.scores[scoreIndex] = score
 			indexedScores[scoreIndex] = obj
 		end
 	end
 
-	if map.finished == 'skip' then
-		map.resulttype = 'np'
+	if map.finished == NP_MATCH_STATUS then
+		map.resulttype = _NOT_PLAYED_SCORE
 	else
 		map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 	end
