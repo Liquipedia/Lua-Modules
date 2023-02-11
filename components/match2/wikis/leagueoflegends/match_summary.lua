@@ -311,7 +311,8 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	end
 
 	local display = mw.html.create('div')
-		:addClass('brkts-popup-body-element-thumbs'):addClass('brkts-champion-icon')
+		:addClass('brkts-popup-body-element-thumbs')
+		:addClass('brkts-champion-icon')
 
 	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)
