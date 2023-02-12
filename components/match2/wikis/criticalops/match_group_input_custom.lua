@@ -35,10 +35,10 @@ local ALLOWED_STATUSES = {
 	STATUS_DEFAULT_LOSS,
 }
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
-local NP_MATCHSTATUS = {'skip', 'np', 'canceled', 'cancelled'}
+local NOT_PLAYED_MATCH_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local NOW = os.time(os.date('!*t'))
-local _NOT_PLAYED_SCORE = -1
-local _NO_WINNER = -1
+local NOT_PLAYED_SCORE = -1
+local NO_WINNER = -1
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
@@ -206,9 +206,9 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			end
 		end
 		--If a manual winner is set use it
-		if winner and data.resulttype ~= 'default' then
+		if winner and data.resulttype ~= DEFAULT_RESULT_TYPE then
 			if winner == 0 then
-				data.resulttype = 'draw'
+				data.resulttype = STATUS_DRAW
 			else
 				data.resulttype = nil
 			end
@@ -263,12 +263,8 @@ end
 --
 function matchFunctions.getBestOf(match)
 	local mapCount = 0
-	for i = 1, MAX_NUM_MAPS do
-		if match['map' .. i] then
-			mapCount = mapCount + 1
-		else
-			break
-		end
+	for _, _, mapIndex in Table.iter.pairsByPrefix(args, 'map') do
+		mapCount = mapIndex
 	end
 	match.bestof = mapCount
 	return match
@@ -279,14 +275,10 @@ end
 -- The discardMap function will check if a map should be removed
 -- Remove all maps that should be removed.
 function matchFunctions.removeUnsetMaps(match)
-	for i = 1, MAX_NUM_MAPS do
-		if match['map'..i] then
-			if mapFunctions.discardMap(match['map'..i]) then
-				match['map'..i] = nil
+	for mapKey, map in Table.iter.pairsByPrefix(args, 'map') do
+			if map.map == DUMMY_MAP_NAME then
+				match[mapKey] = nil
 			end
-		else
-			break
-		end
 	end
 	return match
 end
@@ -309,7 +301,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 			foundScores = true
 		end
 	else -- For best of >1, disply the map wins
-		for i = 1, MAX_NUM_MAPS do
+		for _, _, mapIndex in Table.iter.pairsByPrefix(args, 'map') do
 			if match['map' .. i] then
 				local winner = tonumber(match['map' .. i].winner)
 				foundScores = true
@@ -365,7 +357,7 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getMatchStatus(match)
-	if match.resulttype == NP_MATCHSTATUS then
+	if Table.includes(NOT_PLAYED_MATCH_STATUSES, match.resulttype) then
 		return match.status
 	else
 		return nil
@@ -448,8 +440,8 @@ function matchFunctions.getOpponents(match)
 		match.finished = match.status
 	end
 
-	if Table.includes(NP_MATCHSTATUS, match.finished) then
-		match.resulttype = _NOT_PLAYED_SCORE
+	if Table.includes(NOT_PLAYED_MATCH_STATUSES, match.finished) then
+		match.resulttype = NOT_PLAYED_MATCH_STATUSES
 		match.status = match.finished
 		match.finished = false
 		match.dateexact = false
@@ -585,8 +577,8 @@ function mapFunctions.getScoresAndWinner(map)
 		end
 	end
 
-	if map.finished == NP_MATCHSTATUS then
-		map.resulttype = _NOT_PLAYED_SCORE
+	if Table.includes(NOT_PLAYED_MATCH_STATUSES, match.resulttype) then
+		return match.resulttype
 	else
 		map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 	end
