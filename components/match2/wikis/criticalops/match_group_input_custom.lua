@@ -41,12 +41,14 @@ local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
-local MAX_NUM_MAPS = 9
 local DEFAULT_RESULT_TYPE = 'default'
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TODAY = os.date('%Y-%m-%d')
+
+local args 
+local match
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -251,7 +253,7 @@ function CustomMatchGroupInput.getDefaultWinner(table)
 			return index
 		end
 	end
-	return _NO_WINNER
+	return NO_WINNER
 end
 
 function CustomMatchGroupInput.placementCheckScoresSet(table)
@@ -424,7 +426,7 @@ function matchFunctions.getOpponents(match)
 				isScoreSet = true
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
-				opponent.score = _NOT_PLAYED_SCORE
+				opponent.score = NOT_PLAYED_SCORE
 			end
 			opponents[opponentIndex] = opponent
 
@@ -570,7 +572,7 @@ function mapFunctions.getScoresAndWinner(map)
 				obj.score = score
 			elseif Table.includes(ALLOWED_STATUSES, score) then
 				obj.status = score
-				obj.score = _NOT_PLAYED_SCORE
+				obj.score = NOT_PLAYED_SCORE
 			end
 			map.scores[scoreIndex] = score
 			indexedScores[scoreIndex] = obj
