@@ -229,7 +229,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 	if not Table.isEmpty(vods) or String.isNotEmpty(match.vod) then
 		local footer = MatchSummary.Footer()
-	
+
 		if String.isNotEmpty(match.vod) then
 			footer:addElement(VodLink.display{vod = match.vod})
 		end
