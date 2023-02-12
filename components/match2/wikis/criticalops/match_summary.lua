@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
@@ -18,9 +19,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled
 
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-local _LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-}
 
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
@@ -229,26 +227,19 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
-	match.links.vod = match.vod
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
+	if not Table.isEmpty(vods) or String.isNotEmpty(match.vod) then
 		local footer = MatchSummary.Footer()
+	
+		if String.isNotEmpty(match.vod) then
+			footer:addElement(VodLink.display{vod = match.vod})
+		end
 
-		for index, vod in pairs(vods) do
+		for index, vod in ipairs(vods) do
 			footer:addElement(VodLink.display{
 				gamenum = index,
 				vod = vod,
 				source = vod.url
 			})
-		end
-
-		-- Match Vod + other links
-		local buildLink = function (linktype, link)
-			local icon, text = _LINK_DATA[linktype].icon, _LINK_DATA[linktype].text
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-
-		for linktype, link in pairs(match.links) do
-			footer:addElement(buildLink(linktype,link))
 		end
 
 		matchSummary:footer(footer)
