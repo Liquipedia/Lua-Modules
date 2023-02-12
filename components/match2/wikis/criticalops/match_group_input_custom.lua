@@ -347,11 +347,6 @@ end
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
-
-	match.links = {}
-	local links = match.links
-	if match.reddit then links.reddit = match.reddit end
-
 	return match
 end
 
