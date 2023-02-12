@@ -36,6 +36,7 @@ local ALLOWED_STATUSES = {
 }
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 local NOT_PLAYED_MATCH_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
+local NOT_PLAYED_RESULT_TYPE = 'np'
 local NOW = os.time(os.date('!*t'))
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
@@ -275,8 +276,8 @@ end
 -- Remove all maps that should be removed.
 function matchFunctions.removeUnsetMaps(match)
 	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
-			if map.map == DUMMY_MAP_NAME then
-				match[mapKey] = nil
+		if map.map == DUMMY_MAP_NAME then
+			match[mapKey] = nil
 			end
 	end
 	return match
@@ -301,8 +302,8 @@ function matchFunctions.getScoreFromMapWinners(match)
 		end
 	else -- For best of >1, disply the map wins
 		for _, map in Table.iter.pairsByPrefix(match, 'map') do
-				local winner = tonumber(map.winner)
-				foundScores = true
+			local winner = tonumber(map.winner)
+			foundScores = true
 			-- Only two opponents in C-OPS
 				if winner and winner > 0 and winner <= 2 then
 					newScores[winner] = (newScores[winner] or 0) + 1
@@ -347,7 +348,7 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getMatchStatus(match)
-	if Table.includes(NOT_PLAYED_MATCH_STATUSES, match.resulttype) then
+	if match.resulttype == NOT_PLAYED_RESULT_TYPE then
 		return match.status
 	else
 		return nil
@@ -568,7 +569,7 @@ function mapFunctions.getScoresAndWinner(map)
 	end
 
 	if Table.includes(NOT_PLAYED_MATCH_STATUSES, map.finished) then
-		map.resulttype = 'skip'
+		map.resulttype = NOT_PLAYED_RESULT_TYPE
 	else
 		map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 	end
