@@ -576,8 +576,8 @@ function mapFunctions.getScoresAndWinner(map)
 		end
 	end
 
-	if Table.includes(NOT_PLAYED_MATCH_STATUSES, match.resulttype) then
-		return match.resulttype
+	if Table.includes(NOT_PLAYED_MATCH_STATUSES, map.finished) then
+		map.resulttype = 'skip'
 	else
 		map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 	end
