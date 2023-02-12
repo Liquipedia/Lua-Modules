@@ -303,6 +303,10 @@ function matchFunctions.getScoreFromMapWinners(match)
 		for _, map in Table.iter.pairsByPrefix(match, 'map') do
 				local winner = tonumber(map.winner)
 				foundScores = true
+			-- Only two opponents in C-OPS
+				if winner and winner > 0 and winner <= 2 then
+					newScores[winner] = (newScores[winner] or 0) + 1
+				end
 		end
 	end
 	if not opponent1.score and foundScores then
