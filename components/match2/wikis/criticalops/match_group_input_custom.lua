@@ -47,9 +47,6 @@ local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TODAY = os.date('%Y-%m-%d')
 
-local args 
-local match
-
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
