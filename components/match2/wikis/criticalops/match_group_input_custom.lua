@@ -19,8 +19,6 @@ local Streams = require('Module:Links/Stream')
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
-local args = require('Module:Arguments')
-
 local SIDE_DEF = 'ct'
 local SIDE_ATK = 't'
 local STATUS_SCORE = 'S'
@@ -264,7 +262,7 @@ end
 --
 function matchFunctions.getBestOf(match)
 	local mapCount = 0
-	for _, _, mapIndex in Table.iter.pairsByPrefix(args, 'map') do
+	for _, _, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
 		mapCount = mapIndex
 	end
 	match.bestof = mapCount
@@ -276,7 +274,7 @@ end
 -- The discardMap function will check if a map should be removed
 -- Remove all maps that should be removed.
 function matchFunctions.removeUnsetMaps(match)
-	for mapKey, map in Table.iter.pairsByPrefix(args, 'map') do
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
 			if map.map == DUMMY_MAP_NAME then
 				match[mapKey] = nil
 			end
@@ -302,17 +300,9 @@ function matchFunctions.getScoreFromMapWinners(match)
 			foundScores = true
 		end
 	else -- For best of >1, disply the map wins
-		for _, _, mapIndex in Table.iter.pairsByPrefix(args, 'map') do
-			if match['map' .. i] then
-				local winner = tonumber(match['map' .. i].winner)
+		for _, map in Table.iter.pairsByPrefix(match, 'map') do
+				local winner = tonumber(map.winner)
 				foundScores = true
-				-- Only two opponents in CS
-				if winner and winner > 0 and winner <= 2 then
-					newScores[winner] = (newScores[winner] or 0) + 1
-				end
-			else
-				break
-			end
 		end
 	end
 	if not opponent1.score and foundScores then
