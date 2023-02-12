@@ -19,6 +19,8 @@ local Streams = require('Module:Links/Stream')
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
+local args = require('Module:Arguments')
+
 local SIDE_DEF = 'ct'
 local SIDE_ATK = 't'
 local STATUS_SCORE = 'S'
