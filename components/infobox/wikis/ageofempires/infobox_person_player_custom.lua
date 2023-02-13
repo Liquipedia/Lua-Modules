@@ -9,10 +9,14 @@
 local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Faction = require('Module:Faction')
+local Game = require('Module:Game')
+local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -20,24 +24,48 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Title = Widgets.Title
+
+local Condition = require('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
 
 local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local RATINGS = {
-	{text = 'RM Elo ([[Age of Empires II/Definitive Edition|AoE II DE]])', id = 'aoe2net_id', game = 'aoe2de'},
-	{text = 'QM Elo ([[Age of Empires IV|AoE IV]])', id = 'aoe4net_id', game = 'aoe4'},
-	{text = 'Supremacy Elo ([[Age of Empires III|AoE III]])', id = 'aoe3net_id', game = 'aoe3de'},
-	{text = 'RM Elo ([[Voobly]] [[Age of Empires II|AoE II]])', id = 'voobly_elo'},
-	{text = 'Elo ([[Voobly]] [[Age of Mythology|AoM]])', id = 'aom_voobly_elo'},
-	{text = 'Elo ([[Age of Mythology/Extended Edition|AoM EE]])', id = 'aom_ee_elo'},
-	{text = '1v1 Supremacy Elo ([[Age of Empires III|AoE 3]])', id = 'aoe3_elo'},
-	{text = 'Tournament Elo ([[Age of Empires II|AoE II]])', id = 'aoe-elo.com_id', game = 'aoe-elo.com'},
+local RATINGCONFIG = {
+	aoe2 = {
+		{text = 'RM [[Age of Empires II/Definitive Edition|DE]]', id = 'aoe2net_id', game = 'aoe2de'},
+		{
+			text = Page.makeExternalLink('Tournament', 'https://aoe-elo.com/players'),
+			id = 'aoe-elo.com_id',
+			game = 'aoe-elo.com'
+		},
+		{text = 'RM [[Voobly]]', id = 'voobly_elo'},
+	},
+	aoe3 = {
+		{text = 'Supremacy [[Age of Empires III/Definitive Edition|DE]]', id = 'aoe3net_id', game = 'aoe3de'},
+		{text = 'Supremacy', id = 'aoe3_elo'},
+	},
+	aoe4 = {
+		{text = 'QM', id = 'aoe4net_id', game = 'aoe4'},
+	},
+	aom = {
+		{text = 'Elo [[Voobly]]', id = 'aom_voobly_elo'},
+		{text = 'Elo [[Age of Mythology/Extended Edition|AoM EE]]', id = 'aom_ee_elo'},
+	}
 }
 
 local _player
 local _args
+
+local MAX_NUMBER_OF_PLAYERS = 10
+local INACTIVITY_THRESHOLD_PLAYER = {year = 1}
+local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 
 function CustomPlayer.run(frame)
 	_player = Player(frame)
@@ -101,20 +129,34 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomInjector:addCustomCells(widgets)
+	-- Games & Inactive Games
+	table.insert(widgets, Cell{
+		name = 'Games',
+		content = CustomPlayer._getGames()
+	})
 	--Elo ratings
-	for _, rating in ipairs(RATINGS) do
-		local currentRating, bestRating
-		if rating.game then
-			currentRating, bestRating = CustomPlayer.getRating(rating.id, rating.game)
-		else
-			bestRating = _args[rating.id]
+	table.insert(widgets, Title{name = 'Ratings'})
+	for game, ratings in Table.iter.spairs(RATINGCONFIG) do
+		game = Game.raw{game = game}
+		for _, rating in ipairs(ratings) do
+			local content = {}
+			local currentRating, bestRating
+			if rating.game then
+				currentRating, bestRating = CustomPlayer.getRating(rating.id, rating.game)
+			else
+				bestRating = _args[rating.id]
+			end
+			if String.isNotEmpty(currentRating) then
+				currentRating = currentRating .. '&nbsp;<small>(current)</small>'
+				table.insert(content, currentRating)
+			end
+			if String.isNotEmpty(bestRating) then
+				bestRating = bestRating .. '&nbsp;<small>(highest)</small>'
+				table.insert(content, bestRating)
+			end
+			table.insert(widgets, Cell{name = rating.text .. ' (' .. game.abbreviation .. ')', content = content})
 		end
-		table.insert(widgets, Cell{name = rating.text, content = {
-			bestRating, currentRating
-		}})
 	end
-	-- TODO: Games & Inactive Games
-
 	return widgets
 end
 
@@ -132,6 +174,147 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	-- TODO
 
 	return lpdbData
+end
+
+function CustomPlayer._getGames()
+	-- Games from placements
+	local games = CustomPlayer._queryGames()
+
+	-- Games from broadcasts
+	local broadcastGames = CustomPlayer._getBroadcastGames()
+
+	-- Games entered manually
+	local manualGames = _args.games and Array.map(
+		mw.text.split(_args.games, ','),
+		function(game)
+			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
+		end
+	) or {}
+
+	-- Games entered manually as inactive
+	local manualInactiveGames = _args.games_inactive and Array.map(
+		mw.text.split(_args.games_inactive, ','),
+		function(game)
+			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
+		end
+	) or {}
+
+	Array.extendWith(games, Array.filter(Array.extend(manualGames, manualInactiveGames, broadcastGames),
+		function(entry)
+			return not Array.any(games, function(e) return e.game == entry.game end)
+		end
+	))
+	Array.sortInPlaceBy(games, function(entry) return entry.game end)
+
+	local placementThreshold = CustomPlayer._calculateDateThreshold(INACTIVITY_THRESHOLD_PLAYER)
+	local broadcastThreshold = CustomPlayer._calculateDateThreshold(INACTIVITY_THRESHOLD_BROADCAST)
+
+	local isActive = function(game)
+		if Array.any(manualInactiveGames, function(g) return g.game == game end) then
+			return false
+		end
+		if Array.any(broadcastGames, function(g) return g.game == game and g.date >= broadcastThreshold end) then
+			return true
+		end
+		local placement = CustomPlayer._getLatestPlacement(game)
+		return placement and placement.date and placement.date >= placementThreshold
+	end
+
+	games = Array.map(
+		games,
+		function(entry)
+			if String.isEmpty(entry.game) then
+				return nil
+			end
+			return entry.game .. (isActive(entry.game) and '' or ' <i><small>(Inactive)</small></i>')
+		end)
+
+	return games
+end
+
+function CustomPlayer._calculateDateThreshold(thresholdConfig)
+	local dateThreshold = os.date('!*t')
+	for key, value in pairs(thresholdConfig) do
+		dateThreshold[key] = dateThreshold[key] - value
+	end
+	return os.date('!%F', os.time(dateThreshold))
+end
+
+function CustomPlayer._queryGames()
+	local data = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = CustomPlayer._buildPlacementConditions():toString(),
+		query = 'game',
+		groupby = 'game asc',
+	})
+
+	if type(data) ~= 'table' then
+		error(data)
+	end
+
+	return data
+end
+
+function CustomPlayer._getLatestPlacement(game)
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		CustomPlayer._buildPlacementConditions(),
+		ConditionNode(ColumnName('game'), Comparator.eq, game)
+	}
+	local data = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = conditions:toString(),
+		query = 'date',
+		order = 'date desc',
+		limit = 1
+	})
+
+	if type(data) ~= 'table' then
+		error(data)
+	end
+
+	return data[1]
+end
+
+function CustomPlayer._buildPlacementConditions()
+	local person = _args.id or _player.pagename
+
+	local opponentConditions = ConditionTree(BooleanOperator.any)
+
+	local prefix = 'p'
+	for playerIndex = 1, MAX_NUMBER_OF_PLAYERS do
+		opponentConditions:add{
+			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, person),
+		}
+	end
+
+	return opponentConditions
+end
+
+function CustomPlayer._getBroadcastGames()
+	local person = _args.id or _player.pagename
+	local personCondition = ConditionNode(ColumnName('page'), Comparator.eq, person)
+	local games = {}
+
+	for _, gameInfo in pairs(Info.games) do
+		local conditions = ConditionTree(BooleanOperator.all)
+			:add{
+				personCondition,
+				ConditionNode(ColumnName('extradata_game'), Comparator.eq, gameInfo.name)
+			}
+		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+			conditions = conditions:toString(),
+			query = 'date',
+			order = 'date desc',
+			limit = 1
+		})
+
+		if type(data) ~= 'table' then
+			error(data)
+		end
+
+		if data[1] then
+			table.insert(games, {game = gameInfo.name, date = data[1].date})
+		end
+	end
+	return games
 end
 
 return CustomPlayer
