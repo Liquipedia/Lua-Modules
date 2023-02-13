@@ -33,6 +33,8 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 
+	_args.residence, _args.location = _args.location, nil
+
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.getWikiCategories = CustomPlayer.getWikiCategories
@@ -75,6 +77,10 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'team' then
 		table.insert(widgets,
 			Cell{name = 'Crew', content = {_args.crew}}
+		)
+	elseif id == 'nationality' then
+		table.insert(widgets,
+			Cell{name = 'Location', content = {_args.residence}}
 		)
 	elseif id == 'achievements' then
 		widgets = {}
