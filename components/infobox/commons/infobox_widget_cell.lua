@@ -15,15 +15,17 @@ local Cell = Class.new(Widget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
 		self.content = input.content
-		self.options = input.options
+		self.options = input.options or {}
 		self.classes = input.classes
 	end
 )
 
 function Cell:_new(description)
+	local columns = self.options.columns or 2
+
 	self.root = mw.html.create('div')
 	self.description = mw.html.create('div')
-	self.description:addClass('infobox-cell-2')
+	self.description:addClass('infobox-cell-'.. columns)
 					:addClass('infobox-description')
 					:wikitext(description .. ':')
 	self.contentDiv = nil
@@ -60,7 +62,7 @@ function Cell:_content(...)
 			break
 		end
 
-		if self.options ~= nil and self.options.makeLink == true then
+		if self.options.makeLink == true then
 			self.contentDiv:wikitext('[[' .. item .. ']]')
 		else
 			self.contentDiv:wikitext(item)
