@@ -207,6 +207,7 @@ local SUFFIXES = {
 SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 
 local ALIASES = {
+	['ask-fm'] = {'afk.fm', 'askfm'},
 	douyu = {'douyutv'},
 	esl = {'eslgaming'},
 	['facebook-gaming'] = {'fbgg'},
