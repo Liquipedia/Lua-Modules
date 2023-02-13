@@ -62,5 +62,5 @@ return {
 	factions = {'h', 'o', 'n', 'u', 'r', 'a'},
 	knownFactions = {'h', 'o', 'n', 'u', 'r'},
 	coreFactions = {'h', 'o', 'n', 'u'},
-	aliases = {},
+	aliases = {['night elf'] = 'n'},
 }
