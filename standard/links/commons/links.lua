@@ -132,7 +132,10 @@ local PREFIXES = {
 	sk = {'https://sk-gaming.com/member/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
-	['start-gg'] = {'https://start.gg/'},
+	['start-gg'] = {
+		'https://start.gg/',
+		player = 'https://start.gg/user/',
+	},
 	steam = {'https://steamcommunity.com/id/'},
 	steamtv = {'https://steam.tv/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
