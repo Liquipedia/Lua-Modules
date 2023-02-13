@@ -188,14 +188,16 @@ function CustomPlayer._getGames()
 		mw.text.split(_args.games, ','),
 		function(game)
 			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
-		end) or {}
+		end
+	) or {}
 
 	-- Games entered manually as inactive
 	local manualInactiveGames = _args.games_inactive and Array.map(
 		mw.text.split(_args.games_inactive, ','),
 		function(game)
 			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
-		end) or {}
+		end
+	) or {}
 
 	Array.extendWith(games, Array.filter(Array.extend(manualGames, manualInactiveGames, broadcastGames),
 		function(entry)
@@ -240,10 +242,10 @@ end
 
 function CustomPlayer._queryGames()
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = CustomPlayer._buildPlacementConditions():toString(),
-			query = 'game',
-			groupby = 'game asc',
-		})
+		conditions = CustomPlayer._buildPlacementConditions():toString(),
+		query = 'game',
+		groupby = 'game asc',
+	})
 
 	if type(data) ~= 'table' then
 		error(data)
@@ -258,11 +260,11 @@ function CustomPlayer._getLatestPlacement(game)
 		ConditionNode(ColumnName('game'), Comparator.eq, game)
 	}
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = conditions:toString(),
-			query = 'date',
-			order = 'date desc',
-			limit = 1
-		})
+		conditions = conditions:toString(),
+		query = 'date',
+		order = 'date desc',
+		limit = 1
+	})
 
 	if type(data) ~= 'table' then
 		error(data)
