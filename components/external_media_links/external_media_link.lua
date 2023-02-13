@@ -86,7 +86,7 @@ function ExternalMediaLink._store(args)
 
 	local orgs = {}
 	for orgIndex, org in Table.iter.pairsByPrefix(args, 'subject_organization') do
-		orgs['subject_organization' .. orgIndex] = org
+		orgs['subject_organization' .. orgIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(org)
 	end
 	-- set a maximum for orgs due to the same being used in queries
 	assert(Table.size(orgs) <= MAXIMUM_VALUES.organisations,
@@ -94,7 +94,7 @@ function ExternalMediaLink._store(args)
 
 	local subjects = {}
 	for subjectIndex, subject in Table.iter.pairsByPrefix(args, 'subject') do
-		subjects['subject' .. subjectIndex] = subject
+		subjects['subject' .. subjectIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(subject)
 	end
 	-- set a maximum for subjects due to the same being used in queries
 	assert(Table.size(subjects) <= MAXIMUM_VALUES.subjects,
