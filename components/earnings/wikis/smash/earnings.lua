@@ -14,7 +14,7 @@ local CustomEarnings = Lua.import('Module:Earnings/Base', {requireDevIfEnabled =
 ---@diagnostic disable-next-line: duplicate-set-field
 CustomEarnings.divisionFactorPlayer = function(mode)
 	if mode == 'doubles' then
-		return 2
+		return 1 -- Currently 1 due to Smash storing indiv earnings in prizemoney field.
 	elseif mode == 'singles' then
 		return 1
 	end
