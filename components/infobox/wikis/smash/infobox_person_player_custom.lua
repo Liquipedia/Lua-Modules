@@ -141,7 +141,7 @@ function CustomPlayer:nameDisplay(args)
 	local display = name
 	if _args.game then
 		local icons = CustomPlayer.inputToCharacterIconList(_args['main-'.. _args.game], _args.game, 'GetIconAndName')
-		display = table.concat(icons or {}) .. '&nbsp;' .. name
+		display = table.concat(icons or {}, NON_BREAKING_SPACE) .. NON_BREAKING_SPACE .. name
 	end
 	return display
 end
