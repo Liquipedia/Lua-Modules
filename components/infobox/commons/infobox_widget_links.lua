@@ -111,6 +111,7 @@ local _PRIORITY_GROUPS = {
 		'vidio',
 		'booyah',
 		'douyu',
+		'douyin',
 		'huyatv',
 		'zhangyutv',
 		'bilibili-stream',
