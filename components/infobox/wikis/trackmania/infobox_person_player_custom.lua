@@ -25,6 +25,8 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 
+	_args['trackmania-io'] = _args.trackmania_id
+
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	return player:createInfobox()
