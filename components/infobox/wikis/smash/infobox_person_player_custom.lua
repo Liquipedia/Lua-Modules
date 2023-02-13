@@ -14,6 +14,7 @@ local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Template = require('Module:Template')
 local YearsActive = require('Module:YearsActive') -- TODO Convert to use the commons YearsActive
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -113,6 +114,8 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	for game in pairs(Info.games) do
 		lpdbData.extradata['main' .. game] = _args['main-' .. game]
 	end
+
+	lpdbData.region = Template.expandTemplate(mw.getCurrentFrame(), 'Player region', {_args.country})
 
 	return lpdbData
 end
