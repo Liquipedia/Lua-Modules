@@ -13,8 +13,10 @@ local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -22,6 +24,7 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -34,15 +37,23 @@ local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local RATINGS = {
-	{text = 'RM Elo ([[Age of Empires II/Definitive Edition|AoE II DE]])', id = 'aoe2net_id', game = 'aoe2de'},
-	{text = 'QM Elo ([[Age of Empires IV|AoE IV]])', id = 'aoe4net_id', game = 'aoe4'},
-	{text = 'Supremacy Elo ([[Age of Empires III|AoE III]])', id = 'aoe3net_id', game = 'aoe3de'},
-	{text = 'RM Elo ([[Voobly]] [[Age of Empires II|AoE II]])', id = 'voobly_elo'},
-	{text = 'Elo ([[Voobly]] [[Age of Mythology|AoM]])', id = 'aom_voobly_elo'},
-	{text = 'Elo ([[Age of Mythology/Extended Edition|AoM EE]])', id = 'aom_ee_elo'},
-	{text = '1v1 Supremacy Elo ([[Age of Empires III|AoE 3]])', id = 'aoe3_elo'},
-	{text = 'Tournament Elo ([[Age of Empires II|AoE II]])', id = 'aoe-elo.com_id', game = 'aoe-elo.com'},
+local RATINGCONFIG = {
+	aoe2 = {
+		{text = 'RM [[Age of Empires II/Definitive Edition|DE]]', id = 'aoe2net_id', game = 'aoe2de'},
+		{text = Page.makeExternalLink('Tournament', 'https://aoe-elo.com/players'), id = 'aoe-elo.com_id', game = 'aoe-elo.com'},
+		{text = 'RM [[Voobly]]', id = 'voobly_elo'},
+	},
+	aoe3 = {
+		{text = 'Supremacy [[Age of Empires III/Definitive Edition|DE]]', id = 'aoe3net_id', game = 'aoe3de'},
+		{text = 'Supremacy', id = 'aoe3_elo'},
+	},
+	aoe4 = {
+		{text = 'QM', id = 'aoe4net_id', game = 'aoe4'},
+	},
+	aom = {
+		{text = 'Elo [[Voobly]]', id = 'aom_voobly_elo'},
+		{text = 'Elo [[Age of Mythology/Extended Edition|AoM EE]]', id = 'aom_ee_elo'},
+	}
 }
 
 local _player
@@ -120,16 +131,27 @@ function CustomInjector:addCustomCells(widgets)
 		content = CustomPlayer._getGames()
 	})
 	--Elo ratings
-	for _, rating in ipairs(RATINGS) do
-		local currentRating, bestRating
-		if rating.game then
-			currentRating, bestRating = CustomPlayer.getRating(rating.id, rating.game)
-		else
-			bestRating = _args[rating.id]
+	table.insert(widgets, Title{name = 'Ratings'})
+	for game, ratings in Table.iter.spairs(RATINGCONFIG) do
+		game = Game.raw{game = game}
+		for _, rating in ipairs(ratings) do
+			local content = {}
+			local currentRating, bestRating
+			if rating.game then
+				currentRating, bestRating = CustomPlayer.getRating(rating.id, rating.game)
+			else
+				bestRating = _args[rating.id]
+			end
+			if String.isNotEmpty(currentRating) then
+				currentRating = currentRating .. '&nbsp;<small>(current)</small>'
+				table.insert(content, currentRating)
+			end
+			if String.isNotEmpty(bestRating) then
+				bestRating = bestRating .. '&nbsp;<small>(highest)</small>'
+				table.insert(content, bestRating)
+			end
+			table.insert(widgets, Cell{name = rating.text .. ' (' .. game.abbreviation .. ')', content = content})
 		end
-		table.insert(widgets, Cell{name = rating.text, content = {
-			bestRating, currentRating
-		}})
 	end
 	return widgets
 end
