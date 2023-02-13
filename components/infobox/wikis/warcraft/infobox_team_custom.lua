@@ -98,6 +98,7 @@ end
 
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.clantag = args.clantag
+	lpdbData.extradata.isnationalteam = tostring(CustomTeam._isNationalTeam(self.name))
 
 	return lpdbData
 end
@@ -116,7 +117,7 @@ function CustomTeam:getWikiCategories(args)
 	local teamType, typeCategory = 'Esport team', 'Esport Teams'
 	if Table.includes({'Team Human', 'Team Orc', 'Team Undead', 'Team Night Elf'}, self.name) then
 		teamType, typeCategory = 'Race team', 'Race Teams'
-	elseif Flags.getLocalisation(self.name) then
+	elseif CustomTeam._isNationalTeam(self.name) then
 		teamType, typeCategory = 'National team', 'National Teams'
 	end
 
@@ -124,6 +125,10 @@ function CustomTeam:getWikiCategories(args)
 	Variables.varDefine('teamtype', teamType) -- for SMW
 
 	return categories
+end
+
+function CustomTeam._isNationalTeam(name)
+	return Flags.getLocalisation(name) ~= nil
 end
 
 return CustomTeam
