@@ -117,7 +117,7 @@ function CustomTeam:getWikiCategories(args)
 	end
 
 	local teamType, typeCategory = 'Esport team', 'Esport Teams'
-	if Table.includes({'Team Human', 'Team Orc', 'Team Undead', 'Team Night Elf'}, self.name) then
+	if CustomTeam._isFactionTeam(self.name) then
 		teamType, typeCategory = 'Race team', 'Race Teams'
 	elseif CustomTeam._isNationalTeam(self.name) then
 		teamType, typeCategory = 'National team', 'National Teams'
