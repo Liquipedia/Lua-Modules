@@ -9,6 +9,7 @@
 local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -99,6 +100,7 @@ end
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.clantag = args.clantag
 	lpdbData.extradata.isnationalteam = tostring(CustomTeam._isNationalTeam(self.name))
+	lpdbData.extradata.isfactionteam = tostring(CustomTeam._isFactionTeam(self.name))
 
 	return lpdbData
 end
@@ -129,6 +131,11 @@ end
 
 function CustomTeam._isNationalTeam(name)
 	return Flags.getLocalisation(name) ~= nil
+end
+
+function CustomTeam._isFactionTeam(name)
+	local strippedName = name:gsub('^Team ', '')
+	return Faction.read(strippedName) ~= nil
 end
 
 return CustomTeam
