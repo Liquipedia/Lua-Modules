@@ -30,6 +30,8 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+local NON_BREAKING_SPACE = '&nbsp;'
+
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
