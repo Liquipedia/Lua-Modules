@@ -17,15 +17,15 @@ local Cell = Class.new(Widget,
 		self.content = input.content
 		self.options = input.options or {}
 		self.classes = input.classes
+
+		self.options.columns = self.options.columns or 2
 	end
 )
 
 function Cell:_new(description)
-	local columns = self.options.columns or 2
-
 	self.root = mw.html.create('div')
 	self.description = mw.html.create('div')
-	self.description:addClass('infobox-cell-'.. columns)
+	self.description:addClass('infobox-cell-'.. self.options.columns)
 					:addClass('infobox-description')
 					:wikitext(description .. ':')
 	self.contentDiv = nil
@@ -52,7 +52,7 @@ function Cell:_content(...)
 	end
 
 	self.contentDiv = mw.html.create('div')
-	self.contentDiv:addClass('infobox-cell-2')
+	self.contentDiv:css('width', (100 * (self.options.columns - 1) / self.options.columns) .. '%') -- 66.66% for col = 3
 	for i = 1, select('#', ...) do
 		if i > 1 then
 			self.contentDiv:wikitext('<br/>')
