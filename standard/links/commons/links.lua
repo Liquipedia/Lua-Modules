@@ -61,6 +61,7 @@ local PREFIXES = {
 		player = 'https://www.dotabuff.com/esports/players/',
 		team = 'https://www.dotabuff.com/esports/teams/'
 	},
+	douyin = {'https://live.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
 	esea = {
 		'https://play.esea.net/events/',
