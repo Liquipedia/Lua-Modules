@@ -82,13 +82,15 @@ function CustomInjector:parse(id, widgets)
 		for game, gameData in pairs(Info.games) do
 			local icons = AchievementIcons.drawRow(game, true)
 			if String.isNotEmpty(icons) then
-				table.insert(achievements, {gameName = gameData.name, icons = icons})
+				table.insert(achievements, {gameName = gameData.abbreviation, icons = icons})
 			end
 		end
 		if #achievements > 0 then
 			table.insert(widgets, Title{name = 'Achievements'})
 			for _, achievement in ipairs(achievements) do
-				table.insert(widgets, Cell{name = achievement.gameName, content = {achievement.icons}})
+				table.insert(widgets,
+					Cell{name = achievement.gameName, content = {achievement.icons}, options = {columns = 3}}
+				)
 			end
 		end
 	end
