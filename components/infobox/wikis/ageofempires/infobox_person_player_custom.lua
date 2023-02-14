@@ -129,7 +129,10 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
-		table.insert(widgets, Cell{name = 'Years Active', content = {_args.years_active}})
+		table.insert(widgets, Cell{
+			name = 'Years Active',
+			content = _args.years_active and mw.text.split(_args.years_active, ',') or {}
+		})
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Roles', content =
