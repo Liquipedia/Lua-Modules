@@ -267,6 +267,11 @@ function CustomPlayer._getGames()
 
 	-- Games from broadcasts
 	local broadcastGames = CustomPlayer._getBroadcastGames()
+	Array.extendWith(games, Array.filter(broadcastGames,
+		function(entry)
+			return not Array.any(games, function(e) return e.game == entry.game end)
+		end
+	))
 
 	-- Games entered manually
 	local manualGames = _args.games and Array.map(
@@ -275,6 +280,11 @@ function CustomPlayer._getGames()
 			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
 		end
 	) or {}
+	Array.extendWith(games, Array.filter(manualGames,
+		function(entry)
+			return not Array.any(games, function(e) return e.game == entry.game end)
+		end
+	))
 
 	-- Games entered manually as inactive
 	local manualInactiveGames = _args.games_inactive and Array.map(
@@ -283,12 +293,12 @@ function CustomPlayer._getGames()
 			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
 		end
 	) or {}
-
-	Array.extendWith(games, Array.filter(Array.extend(manualGames, manualInactiveGames, broadcastGames),
+	Array.extendWith(games, Array.filter(manualInactiveGames,
 		function(entry)
 			return not Array.any(games, function(e) return e.game == entry.game end)
 		end
 	))
+
 	Array.sortInPlaceBy(games, function(entry) return entry.game end)
 
 	local placementThreshold = CustomPlayer._calculateDateThreshold(INACTIVITY_THRESHOLD_PLAYER)
@@ -344,6 +354,7 @@ function CustomPlayer._getLatestPlacement(game)
 		CustomPlayer._buildPlacementConditions(),
 		ConditionNode(ColumnName('game'), Comparator.eq, game)
 	}
+	mw.log(conditions:toString())
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions:toString(),
 		query = 'date',
@@ -354,12 +365,12 @@ function CustomPlayer._getLatestPlacement(game)
 	if type(data) ~= 'table' then
 		error(data)
 	end
-
 	return data[1]
 end
 
 function CustomPlayer._buildPlacementConditions()
 	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
+
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	local prefix = 'p'
