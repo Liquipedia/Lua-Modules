@@ -15,9 +15,9 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
+local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -60,6 +60,8 @@ local RATINGCONFIG = {
 		{text = 'Elo [[Age of Mythology/Extended Edition|AoM EE]]', id = 'aom_ee_elo'},
 	}
 }
+
+local TALENT_ROLES = {'caster', 'analyst', 'host', 'expert', 'producer', 'director', 'journalist', 'observer'}
 
 local _player
 local _args
@@ -204,7 +206,7 @@ function CustomPlayer._getRoleType(roles)
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.region = Template.expandTemplate(mw.getCurrentFrame(), 'Player region', {_args.country})
+	lpdbData.region = Region.run{country=_args.country, onlyRegion=true}
 
 	lpdbData.extradata.role = _args.roleList[1]
 	lpdbData.extradata.role2 = _args.roleList[2]
@@ -229,6 +231,12 @@ function CustomPlayer:getWikiCategories(categories)
 		end
 		if roles.talent then
 			table.insert(categories, gameName .. ' Talent')
+		end
+	end)
+
+	Array.forEach(_args.roleList, function(role)
+		if Table.includes(TALENT_ROLES, role:lower()) then
+			table.insert(categories, mw.getContentLanguage():ucfirst(role) .. 's')
 		end
 	end)
 
