@@ -89,7 +89,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if opponent.type == (Opponent.team or Opponent.individual) and opponent.template:lower() == 'bye' then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
@@ -195,7 +195,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			end
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 		elseif CustomMatchGroupInput.placementCheckScoresSet(indexedScores) then
-			--CS only has exactly 2 opponents, neither more or less
+			--C-OPS only has exactly 2 opponents, neither more or less
 			if #indexedScores == MAX_NUM_OPPONENTS then
 				if tonumber(indexedScores[1].score) > tonumber(indexedScores[2].score) then
 					data.winner = 1
