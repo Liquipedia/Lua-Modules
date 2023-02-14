@@ -86,12 +86,14 @@ function CustomPlayer.run(frame)
 
 	_player.adjustLPDB = CustomPlayer.adjustLPDB
 	_player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	_player.getPersonType = CustomPlayer.getPersonType
+	_player.getWikiCategories = CustomPlayer.getWikiCategories
 
 	local builtInfobox = _player:createInfobox()
 
 	local autoPlayerIntro = ''
 	if Logic.readBool((_args.autoPI or ''):lower()) then
-		local _, roleType = CustomPlayer._getRoleType()
+		local _, roleType = CustomPlayer._getRoleType(_args.roleList)
 
 		autoPlayerIntro = PlayerIntroduction._main{
 			playerInfo = 'direct',
@@ -199,9 +201,52 @@ function CustomPlayer._getRoleType(roles)
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	-- TODO
+	lpdbData.extradata.role = _args.roleList[1]
+	lpdbData.extradata.role2 = _args.roleList[2]
+	lpdbData.extradata.roles = mw.text.listToText(_args.roleList)
+	lpdbData.extradata.isplayer = CustomPlayer._getRoleType(_args.roleList).player
+	lpdbData.extradata.game = mw.text.listToText(_args.gameList)
+	lpdbData.extradata.vooblyelo = ''
+	lpdbData.extradata.aoe2netid = ''
+	lpdbData.extradata.aoe2netelocurrent = ''
+	lpdbData.extradata.aoe2netelopeak = ''
 
 	return lpdbData
+end
+
+function CustomPlayer:getWikiCategories(categories)
+	local roles = CustomPlayer._getRoleType(_args.roleList)
+
+	Array.forEach(_args.gameList, function(game)
+		local gameName = Game.name{game = game}
+		if not gameName then
+			return
+		end
+
+		if roles.player then
+			table.insert(categories, gameName .. ' Players')
+		end
+		if roles.talent then
+			table.insert(categories, gameName .. ' Talent')
+		end
+	end)
+
+	return categories
+end
+
+function CustomPlayer:getPersonType(args)
+	local rolesType = CustomPlayer._getRoleType(args.roleList)
+	if rolesType.player then
+		return {store = 'Player', category = 'Player'}
+	elseif rolesType.coach then
+		return {store = 'Staff', category = 'Coache'}
+	elseif rolesType.talent then
+		return {store = 'Talent', category = 'Talent'}
+	elseif rolesType.manager then
+		return {store = 'Staff', category = 'Staff'}
+	end
+
+	return {store = 'Player', category = 'Player'}
 end
 
 function CustomPlayer._getGames()
