@@ -28,6 +28,8 @@ local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
+local GAME_ORDER = {64, 'melee', 'brawl', 'pm', 'wiiu', 'ultimate'}
+
 local _args
 
 local NON_BREAKING_SPACE = '&nbsp;'
@@ -56,7 +58,8 @@ function CustomPlayer.inputToCharacterIconList(input, game, fn)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	for game, gameData in pairs(Info.games) do
+	for _, game in ipairs(GAME_ORDER) do
+		local gameData = Info.games[game]
 		local main = CustomPlayer.inputToCharacterIconList(_args['main-' .. game], game, 'InfoboxCharacter')
 		local former = CustomPlayer.inputToCharacterIconList(_args['former-main-' .. game], game, 'InfoboxCharacter')
 		local alt = CustomPlayer.inputToCharacterIconList(_args['alt-' .. game], game, 'InfoboxCharacter')
@@ -88,7 +91,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'achievements' then
 		widgets = {}
 		local achievements = {}
-		for game, gameData in pairs(Info.games) do
+		for _, game in ipairs(GAME_ORDER) do
+			local gameData = Info.games[game]
 			local icons = AchievementIcons.drawRow(game, true)
 			if String.isNotEmpty(icons) then
 				table.insert(achievements, {gameName = gameData.abbreviation, icons = icons})
