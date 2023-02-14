@@ -129,10 +129,12 @@ function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		table.insert(widgets, Cell{name = 'Years Active', content = {_args.years_active}})
 	elseif id == 'role' then
-		return Cell{name = 'Roles', content =
-			Array.map(_args.roleList, function(role)
-				return Page.makeInternalLink(role, ':Category:' .. role .. 's')
-			end)
+		return {
+			Cell{name = 'Roles', content =
+				Array.map(_args.roleList, function(role)
+					return Page.makeInternalLink(role, ':Category:' .. role .. 's')
+				end)
+			}
 		}
 	end
 	return widgets
