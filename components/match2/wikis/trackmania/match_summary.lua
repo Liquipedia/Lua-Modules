@@ -299,12 +299,11 @@ function CustomMatchSummary._createGame(game)
 		2
 	))
 
-	if extradata.overtime then
-		local overtimes = Json.parseIfString(extradata.overtime)
+	if Logic.readBool(extradata.overtime) then
 		row:addElement(MatchSummary.Break():create())
 		row:addElement(CustomMatchSummary._iconDisplay(
 			OVERTIME,
-			Table.includes(overtimes, 1)
+			true
 		))
 		row:addElement(mw.html.create('div')
 			:addClass('brkts-popup-spaced')
@@ -312,7 +311,7 @@ function CustomMatchSummary._createGame(game)
 		)
 		row:addElement(CustomMatchSummary._iconDisplay(
 			OVERTIME,
-			Table.includes(overtimes, 2)
+			true
 		))
 	end
 
