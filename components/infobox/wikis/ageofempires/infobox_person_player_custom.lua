@@ -79,6 +79,11 @@ function CustomPlayer.run(frame)
 		_args.status = mw.getContentLanguage():ucfirst(_args.status)
 	end
 
+	_args.roleList = _args.roles and Array.map(mw.text.split(_args.roles, ','), function(role)
+		return mw:getContentLanguage():ucfirst(mw.text.trim(role))
+	end) or {}
+	_args.gameList = CustomPlayer._getGames()
+
 	_player.adjustLPDB = CustomPlayer.adjustLPDB
 	_player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
@@ -86,6 +91,8 @@ function CustomPlayer.run(frame)
 
 	local autoPlayerIntro = ''
 	if Logic.readBool((_args.autoPI or ''):lower()) then
+		local _, roleType = CustomPlayer._getRoleType()
+
 		autoPlayerIntro = PlayerIntroduction._main{
 			playerInfo = 'direct',
 			transferquery = 'datapoint',
@@ -95,10 +102,10 @@ function CustomPlayer.run(frame)
 			first_name = _args.first_name,
 			last_name = _args.last_name,
 			status = _args.status,
-			game = false,
-			type = false,
-			role = false,
-			role2 = false,
+			game = mw.text.listToText(_args.gameList),
+			type = roleType,
+			role = _args.roleList[1],
+			role2 = _args.roleList[2],
 			id = _args.id,
 			idIPA = _args.idIPA,
 			idAudio = _args.idAudio,
@@ -120,8 +127,8 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Years Active', content = {_args.years_active}})
 	elseif id == 'role' then
 		return Cell{name = 'Roles', content =
-			Array.map(mw.text.split(_args.roles, ','), function(role)
-				return mw:getContentLanguage():ucfirst(mw.text.trim(role))
+			Array.map(_args.roleList, function(role)
+				return Page.makeInternalLink(role, ':Category:' .. role .. 's')
 			end)
 		}
 	end
@@ -132,7 +139,7 @@ function CustomInjector:addCustomCells(widgets)
 	-- Games & Inactive Games
 	table.insert(widgets, Cell{
 		name = 'Games',
-		content = CustomPlayer._getGames()
+		content = _args.gameList
 	})
 	--Elo ratings
 	table.insert(widgets, Title{name = 'Ratings'})
@@ -168,6 +175,27 @@ end
 
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
+end
+
+function CustomPlayer._getRoleType(roles)
+	local roleType = {
+		player = Table.includes(roles, 'Player') or Table.isEmpty(roles),
+		coach = Table.includes(roles, 'Coach'),
+		manager = Table.includes(roles, 'Manager'),
+		talent = false,
+	}
+	local primaryRole
+
+	if roleType.manager or roleType.coach then
+		primaryRole = 'staff'
+	elseif roleType.player and Table.size(roles) == 1 then
+		primaryRole = 'player'
+	elseif Table.isNotEmpty(roles) then
+		primaryRole = 'talent'
+		roleType.talent = true
+	end
+
+	return roleType, primaryRole
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
