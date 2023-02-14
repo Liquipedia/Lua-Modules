@@ -359,7 +359,7 @@ function CustomPlayer._getLatestPlacement(game)
 end
 
 function CustomPlayer._buildPlacementConditions()
-	local person = _args.id or _player.pagename
+	local person = _player.pagename
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
@@ -374,7 +374,7 @@ function CustomPlayer._buildPlacementConditions()
 end
 
 function CustomPlayer._getBroadcastGames()
-	local person = _args.id or _player.pagename
+	local person = _player.pagename
 	local personCondition = ConditionNode(ColumnName('page'), Comparator.eq, person)
 	local games = {}
 
