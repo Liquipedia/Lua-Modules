@@ -148,9 +148,12 @@ end
 function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
 	local lastVs = Json.parseIfString(lpdbEntry.lastvsdata) or {}
 
-	-- fix lastvs opponent stuff
 	if Table.isNotEmpty(lastVs) then
 		lastVs = Opponent.fromLpdbStruct(lastVs)
+	end
+
+	-- fix lastvs opponent stuff
+	if Table.isNotEmpty(lastVs) then
 		if lastVs.type == Opponent.solo then
 			smwEntry['has last opponent page'] = lastVs.players[1].pageName
 			smwEntry['has last opponent'] = lastVs.players[1].displayName
