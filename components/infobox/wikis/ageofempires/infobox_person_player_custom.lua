@@ -359,7 +359,7 @@ function CustomPlayer._getLatestPlacement(game)
 end
 
 function CustomPlayer._buildPlacementConditions()
-	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
+	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id):gsub(' ', '_')
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	local prefix = 'p'
@@ -373,7 +373,7 @@ function CustomPlayer._buildPlacementConditions()
 end
 
 function CustomPlayer._getBroadcastGames()
-	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
+	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id):gsub(' ', '_')
 	local personCondition = ConditionNode(ColumnName('page'), Comparator.eq, person)
 	local games = {}
 
