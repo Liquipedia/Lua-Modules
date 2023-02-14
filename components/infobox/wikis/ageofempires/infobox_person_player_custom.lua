@@ -359,13 +359,14 @@ function CustomPlayer._getLatestPlacement(game)
 end
 
 function CustomPlayer._buildPlacementConditions()
-	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id):gsub(' ', '_')
+	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	local prefix = 'p'
 	for playerIndex = 1, MAX_NUMBER_OF_PLAYERS do
 		opponentConditions:add{
 			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, person),
+			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, person:gsub(' ', '_')),
 		}
 	end
 
@@ -373,8 +374,12 @@ function CustomPlayer._buildPlacementConditions()
 end
 
 function CustomPlayer._getBroadcastGames()
-	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id):gsub(' ', '_')
-	local personCondition = ConditionNode(ColumnName('page'), Comparator.eq, person)
+	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
+	local personCondition = ConditionTree(BooleanOperator.any)
+		:add{
+			ConditionNode(ColumnName('page'), Comparator.eq, person),
+			ConditionNode(ColumnName('page'), Comparator.eq, person:gsub(' ', '_')),
+		}
 	local games = {}
 
 	for _, gameInfo in pairs(Info.games) do
