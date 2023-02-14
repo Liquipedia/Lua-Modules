@@ -17,6 +17,7 @@ local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -201,15 +202,13 @@ function CustomPlayer._getRoleType(roles)
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
+	lpdbData.region = Template.expandTemplate(mw.getCurrentFrame(), 'Player region', {_args.country})
+
 	lpdbData.extradata.role = _args.roleList[1]
 	lpdbData.extradata.role2 = _args.roleList[2]
 	lpdbData.extradata.roles = mw.text.listToText(_args.roleList)
 	lpdbData.extradata.isplayer = CustomPlayer._getRoleType(_args.roleList).player
 	lpdbData.extradata.game = mw.text.listToText(_args.gameList)
-	lpdbData.extradata.vooblyelo = ''
-	lpdbData.extradata.aoe2netid = ''
-	lpdbData.extradata.aoe2netelocurrent = ''
-	lpdbData.extradata.aoe2netelopeak = ''
 
 	return lpdbData
 end
