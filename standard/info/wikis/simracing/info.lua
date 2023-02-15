@@ -10,6 +10,22 @@ return {
 	startYear = 2019,
 	wikiName = 'simracing',
 	name = 'Sim Racing',
-	defaultTeamLogo = 'Sim_Racing_default_lightmode.png',
-	defaultTeamLogoDark = 'Sim_Racing_default_darkmode.png',
+	games = {
+		todo = {
+			abbreviation = 'todo',
+			name = 'TODO',
+			link = 'Main Page',
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Sim Racing default darkmode.png',
+				lightMode = 'Sim Racing default lightmode.png',
+			},
+		},
+	},
+	defaultGame = 'todo',
+	defaultTeamLogo = 'Sim Racing default lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Sim Racing default darkmode.png', ---@deprecated
 }

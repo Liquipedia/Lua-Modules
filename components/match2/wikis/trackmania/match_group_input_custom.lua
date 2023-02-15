@@ -404,8 +404,7 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
-	local isFinished = Logic.readBool(map.finished)
-	if isFinished and not Logic.isEmpty(indexedScores) then
+	if not Logic.isEmpty(indexedScores) then
 		map.winner = mapFunctions.getWinner(indexedScores)
 	end
 

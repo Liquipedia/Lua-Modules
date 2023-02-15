@@ -7,12 +7,14 @@
 --
 
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
-local SquadAutoRefs = require('Module:SquadAuto/References')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
+local SquadAutoRefs = Lua.import('Module:SquadAuto/References', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
@@ -119,7 +121,7 @@ function CustomSquad.runAuto(playerList, squadType)
 end
 
 function CustomSquad._playerRow(player, squadType)
-	local row = SquadRow(mw.getCurrentFrame(), player.role, {useTemplatesForSpecialTeams = true})
+	local row = SquadRow{useTemplatesForSpecialTeams = true}
 
 	row:id{
 		player.id,

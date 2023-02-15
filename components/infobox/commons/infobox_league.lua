@@ -157,12 +157,12 @@ function League:createInfobox()
 				}
 			}
 		},
-		Cell{
+		Customizable{id = 'location', children = {Cell{
 			name = 'Location',
 			content = {
 				self:_createLocation(args)
 			}
-		},
+		}}},
 		Builder{
 			builder = function()
 				local venues = {}

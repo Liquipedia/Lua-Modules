@@ -154,8 +154,7 @@ function MvpTable._row(item, args)
 		:tag('td'):wikitext(item.mvp):done()
 
 	if args.points then
-		row = mw.html.create('tr')
-			:tag('td'):wikitext(item.points):done()
+		row:tag('td'):wikitext(item.points):done()
 	end
 
 	return row:done()
