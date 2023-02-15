@@ -36,7 +36,8 @@ end
 ---@param tierType string?
 ---@return table?, table?
 function Tier._raw(tier, tierType)
-	return (TierData.tiers or {})[tier], (TierData.tierTypes or {})[tierType]
+	return (TierData.tiers or {})[Tier.toIdentifier(tier)],
+		(TierData.tierTypes or {})[Tier.toIdentifier(tierType)]
 end
 
 --- Checks if a valid (tier, tierType) tuple is provided
@@ -110,7 +111,7 @@ end
 ---@param queryData table
 ---@return string?, string?, table
 function Tier.parseFromQueryData(queryData)
-	return Tier.toIdentifier(queryData.liquipediatier), Tier.toIdentifier(queryData.liquipediatiertype), {}
+	return queryData.liquipediatier, queryData.liquipediatiertype, {}
 end
 
 --- Builds the display for a given (tier, tierType) tuple
