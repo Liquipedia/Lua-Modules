@@ -11,21 +11,21 @@ return {
 	wikiName = 'fighters',
 	name = 'Fighting Games',
 	games = {
-		todo = {
-			abbreviation = 'todo',
-			name = 'TODO',
-			link = 'Main Page',
+		fighters = {
+			abbreviation = 'Fighters',
+			name = 'Fighters',
+			link = 'Fighters',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Fistlogo std.png', --not dark mode friendly
+				lightMode = 'Fistlogo std.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Fistlogo std.png',
+				darkMode = 'Fistlogo std.png', --not dark mode friendly
 				lightMode = 'Fistlogo std.png',
 			},
 		},
 	},
-	defaultGame = 'todo',
+	defaultGame = 'fighters',
 	defaultTeamLogo = 'Fistlogo std.png', ---@deprecated
 	defaultTeamLogoDark = 'Fistlogo std.png', ---@deprecated
 }
