@@ -44,6 +44,7 @@ function Game:createInfobox()
 		Center{content = {args.caption}},
 		Title{name = 'Game Information'},
 		Cell{name = 'Developer', content = self:getAllArgsForBase(args, 'developer')},
+		Cell{name = 'Publisher', content = self:getAllArgsForBase(args, 'publisher')},
 		Cell{name = 'Release Date(s)', content = self:getAllArgsForBase(args, 'releasedate')},
 		Cell{name = 'Platforms', content = self:getAllArgsForBase(args, 'platform')},
 		Customizable{id = 'custom', children = {}},

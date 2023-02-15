@@ -7,8 +7,8 @@
 --
 
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -127,19 +127,19 @@ function CustomUnofficialWorldChampion.raceBreakDown()
 			playerBreakDown.display = {}
 			if protossnumber > 0 then
 				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'p'}) .. ' ' .. protossnumber
+					= Faction.Icon{faction = 'p'} .. ' ' .. protossnumber
 			end
 			if terrannumbner > 0 then
 				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'t'}) .. ' ' .. terrannumbner
+					= Faction.Icon{faction = 't'} .. ' ' .. terrannumbner
 			end
 			if zergnumber > 0 then
 				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'z'}) .. ' ' .. zergnumber
+					= Faction.Icon{faction = 'z'} .. ' ' .. zergnumber
 			end
 			if randomnumber > 0 then
 				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'r'}) .. ' ' .. randomnumber
+					= Faction.Icon{faction = 'r'} .. ' ' .. randomnumber
 			end
 		end
 	end

@@ -10,6 +10,22 @@ return {
 	startYear = 2014,
 	wikiName = 'hearthstone',
 	name = 'Hearthstone',
-	defaultTeamLogo = 'Hearthstone_logo.png',
-	defaultTeamLogoDark = 'Hearthstone_logo.png',
+	games = {
+		todo = {
+			abbreviation = 'todo',
+			name = 'TODO',
+			link = 'Main Page',
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Hearthstone logo.png',
+				lightMode = 'Hearthstone logo.png',
+			},
+		},
+	},
+	defaultGame = 'todo',
+	defaultTeamLogo = 'Hearthstone logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Hearthstone logo.png', ---@deprecated
 }

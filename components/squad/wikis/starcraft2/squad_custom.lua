@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CleanRace = require('Module:CleanRace')
+local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -21,18 +21,6 @@ SquadRow.specialTeamsTemplateMapping = {
 	retired = 'Team/retired',
 	inactive = 'Team/inactive',
 	military = 'Team/military',
-}
-
-local _FACTION1 = {
-	['p'] = 'Protoss', ['pt'] = 'Protoss', ['pz'] = 'Protoss',
-	['t'] = 'Terran', ['tp'] = 'Terran', ['tz'] = 'Terran',
-	['z'] = 'Zerg', ['zt'] = 'Zerg', ['zp'] = 'Zerg',
-	['r'] = 'Random', ['a'] = 'All'
-}
-local _FACTION2 = {
-	['pt'] = 'Terran', ['pz'] = 'Zerg',
-	['tp'] = 'Protoss', ['tz'] = 'Zerg',
-	['zt'] = 'Terran', ['zp'] = 'Protoss'
 }
 
 local CustomSquad = {}
@@ -56,13 +44,11 @@ function CustomSquad.run(frame)
 	while args['p' .. index] or args[index] do
 
 		local player = Json.parseIfString(args['p' .. index] or args[index])
-		player.race = string.lower(player.race)
-		player.race = CleanRace[player.race] or player.race
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
 		row	:id({
 				player.id,
 				flag = player.flag,
-				race = player.race,
+				race = Faction.read(player.race),
 				link = player.link,
 				captain = player.captain,
 				role = player.role,
@@ -92,9 +78,12 @@ function CustomSquad.run(frame)
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
+		local factions = Faction.readMultiFaction(player.race, {alias = false})
+
 		row:setExtradata({
-			faction = _FACTION1[player.race],
-			faction2 = _FACTION2[player.race],
+			faction = Faction.toName(factions[1]),
+			faction2 = Faction.toName(factions[2]),
+			faction3 = Faction.toName(factions[3]),
 			squadname = squadName,
 			status = status
 		})

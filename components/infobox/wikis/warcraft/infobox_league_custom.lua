@@ -128,21 +128,32 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		--player breakdown
 		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
-		--make playerNumber available for commons category check
-		_args.player_number = playerRaceBreakDown.playerNumber
-		local playerNumber = _args.player_number or 0
-		Variables.varDefine('player_number', playerNumber)
-		if playerNumber > 0 or _args.team_number then
+		local playerNumber = playerRaceBreakDown.playerNumber or _args.player_number
+		if playerNumber or _args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})
 		end
 
-		if playerNumber > 0 then
-			table.insert(widgets, Cell{name = 'Number of players', content = {playerNumber}})
+		if playerNumber then
+			table.insert(widgets, Cell{name = 'Number of players',
+				content = {CustomLeague._displayParticipantNumber(playerNumber)}})
 			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
+
+			-- clean var of '+' suffix
+			playerNumber = string.gsub(playerNumber, '%+', '')
+			--make playerNumber available for commons category check
+			_args.player_number = playerNumber
 		end
 		if _args.team_number then
-			table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
+			table.insert(widgets, Cell{name = 'Number of teams',
+				content = {CustomLeague._displayParticipantNumber(_args.team_number)}})
+
+			-- clean var of '+' suffix
+			_args.team_number = string.gsub(_args.team_number, '%+', '')
 		end
+
+		-- Variable only needed for storage in SMW via Infobox league template
+		-- to be removed once SMW is removed
+		Variables.varDefine('player_number', playerNumber or 0)
 
 		--maps
 		if String.isNotEmpty(_args.map1) then
@@ -161,6 +172,19 @@ function CustomInjector:parse(id, widgets)
 		end
 	end
 	return widgets
+end
+
+function CustomLeague._displayParticipantNumber(number)
+	local numberOfReplacements
+	number, numberOfReplacements = string.gsub(number, '%+', '')
+
+	if numberOfReplacements > 0 then
+		return tostring(mw.html.create()
+			:node(mw.html.create('small'):wikitext('more than '))
+			:wikitext(number))
+	end
+
+	return number
 end
 
 function CustomLeague._displayStartDateTime()
@@ -304,7 +328,7 @@ function CustomLeague:defineCustomPageVariables()
 
 		Variables.varDefine('tournament_starttime', startTime)
 		Variables.varDefine('start_time', startTime)
-		local timeZone = _args.starttime:match('data-tz="(.*)"')
+		local timeZone = _args.starttime:match('data%-tz="(.-)"')
 		if timeZone then
 			Variables.varDefine('tournament_timezone', timeZone)
 		end
@@ -316,9 +340,9 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', GAMES[_args.game])
 
 	--check if tournament is finished
-	local finished = Logic.readBool(_args.finished)
+	local finished = Logic.readBoolOrNil(_args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
-	if not finished and os.date('%Y-%m-%d') >= queryDate then
+	if finished == nil and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
 				.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
@@ -330,7 +354,7 @@ function CustomLeague:defineCustomPageVariables()
 			finished = true
 		end
 	end
-	Variables.varDefine('tournament_finished', tostring(finished))
+	Variables.varDefine('tournament_finished', tostring(finished or false))
 
 	--maps
 	local maps = CustomLeague._getMaps('map')
@@ -410,7 +434,8 @@ function CustomLeague._determineGame()
 	end
 
 	local startDate = _league:_cleanDate(_args.sdate) or _league:_cleanDate(_args.date)
-	if startDate > GAME_DEFAULT_SWITCH_DATE then
+
+	if startDate and startDate > GAME_DEFAULT_SWITCH_DATE then
 		return GAME_REFORGED
 	end
 

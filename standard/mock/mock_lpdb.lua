@@ -58,6 +58,7 @@ dbStructure.standingstable = {
 	section = 'string',
 	type = TypeUtil.literalUnion('league', 'swiss'),
 	matches = TypeUtil.optional(TypeUtil.array('string')),
+	config = TypeUtil.table('string', 'boolean'),
 	extradata = 'struct?',
 }
 dbStructure.standingsentry = {

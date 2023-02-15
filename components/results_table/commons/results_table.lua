@@ -9,6 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
+local Game = require('Module:Game')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -27,7 +28,7 @@ function ResultsTable:buildHeader()
 		:tag('th'):css('min-width', '80px'):wikitext('Place'):done()
 		:tag('th'):css('min-width', '75px'):wikitext('Tier'):done()
 
-	if self.config.gameIconsData then
+	if self.config.displayGameIcons then
 		header:tag('th'):node(Abbreviation.make('G.', 'Game'))
 	end
 
@@ -61,8 +62,8 @@ function ResultsTable:buildRow(placement)
 
 	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
 
-	if self.config.gameIconsData then
-		row:tag('th'):node(self:gameIcon(placement))
+	if self.config.displayGameIcons then
+		row:tag('th'):node(Game.icon{game = placement.game})
 	end
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)

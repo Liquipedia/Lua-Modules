@@ -134,9 +134,8 @@ function SquadRow:date(dateValue, cellTitle, lpdbColumn)
 	local cell = mw.html.create('td')
 	cell:addClass('Date')
 
-	cell:tag('div'):addClass('MobileStuffDate'):wikitext(cellTitle)
-
 	if String.isNotEmpty(dateValue) then
+		cell:tag('div'):addClass('MobileStuffDate'):wikitext(cellTitle)
 		cell:tag('div'):addClass('Date'):tag('i'):wikitext(dateValue)
 	end
 	self.content:node(cell)
