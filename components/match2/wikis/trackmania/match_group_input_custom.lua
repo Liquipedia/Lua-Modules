@@ -373,7 +373,7 @@ function mapFunctions.getExtraData(map)
 	map.extradata = {
 		comment = map.comment,
 		header = map.header,
-		overtime = map.overtime
+		overtime = Logic.readBool(map.overtime)
 	}
 	return map
 end

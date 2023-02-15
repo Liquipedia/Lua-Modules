@@ -299,7 +299,7 @@ function CustomMatchSummary._createGame(game)
 		2
 	))
 
-	if Logic.readBool(extradata.overtime) then
+	if extradata.overtime then
 		row:addElement(MatchSummary.Break():create())
 		row:addElement(CustomMatchSummary._iconDisplay(
 			OVERTIME,
