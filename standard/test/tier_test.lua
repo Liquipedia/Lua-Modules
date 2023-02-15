@@ -18,83 +18,108 @@ function suite:testToIdentifier()
 	self:assertEquals('showmatch', Tier.toIdentifier('ShOW MatCh'))
 	self:assertEquals(1, Tier.toIdentifier('1'))
 	self:assertEquals(1, Tier.toIdentifier(1))
-	self:assertEquals('', Tier.toIdentifier(''))
-	self:assertEquals('', Tier.toIdentifier())
-end
-
-function suite:testIsValid()
-	self:assertTrue(Tier.isValid('showmatch', 'tierTypes'))
-	self:assertFalse(Tier.isValid('1', 'tiers'))
-	self:assertTrue(Tier.isValid(1, 'tiers'))
-	self:assertTrue(Tier.isValid('', 'tiers'))
-	self:assertTrue(Tier.isValid(nil, 'tierTypes'))
-	self:assertFalse(Tier.isValid('sedrvo', 'tiers'))
-	self:assertFalse(Tier.isValid('sedrvo', 'tierTypes'))
-end
-
-function suite:testToValue()
-	self:assertEquals('Show Match', Tier.toValue('showmatch', 'tierTypes'))
-	self:assertEquals('1', Tier.toValue(1, 'tiers'))
-	self:assertEquals(nil, Tier.toValue('sedrvo', 'tiers'))
-end
-
-function suite:testToName()
-	self:assertEquals('Show Match', Tier.toName('showmatch', 'tierTypes'))
-	self:assertEquals('S-Tier', Tier.toName(1, 'tiers'))
-	self:assertEquals(nil, Tier.toName('sedrvo', 'tiers'))
-end
-
-function suite:testToShortName()
-	self:assertEquals('Show&nbsp;M.', Tier.toShortName('showmatch', 'tierTypes'))
-	self:assertEquals('S', Tier.toShortName(1, 'tiers'))
-	self:assertEquals(nil, Tier.toShortName('sedrvo', 'tiers'))
-end
-
-function suite:testToCategory()
-	self:assertEquals('Miscellaneous Tournaments', Tier.toCategory('misc', 'tierTypes'))
-	self:assertEquals('Show Match Tournaments', Tier.toCategory('showmatch', 'tierTypes'))
-	self:assertEquals(nil, Tier.toCategory('showmatch', 'tiers'))
-	self:assertEquals('S-Tier Tournaments', Tier.toCategory(1, 'tiers'))
-	self:assertEquals(nil, Tier.toCategory('sedrvo', 'tiers'))
-	self:assertEquals(nil, Tier.toCategory('', 'tiers'))
-	self:assertEquals(nil, Tier.toCategory('', 'tierTypes'))
+	self:assertEquals(nil, Tier.toIdentifier(''))
+	self:assertEquals(nil, Tier.toIdentifier())
 end
 
 function suite:testRaw()
-	self:assertDeepEquals(TierData.tiers[1], Tier.raw(1, 'tiers'))
-	self:assertDeepEquals(TierData.tierTypes.misc, Tier.raw('misc', 'tierTypes'))
-	self:assertEquals(nil, Tier.raw('misc', 'tiers'))
-	self:assertEquals(nil, Tier.raw(1, 'tierTypes'))
-	self:assertEquals(nil, Tier.raw('sedrvo', 'tierTypes'))
+	self:assertDeepEquals({TierData.tiers[1]}, {Tier._raw(1)})
+	self:assertDeepEquals({TierData.tiers[1], TierData.tierTypes.misc}, {Tier._raw('1', 'misc')})
+	self:assertDeepEquals({TierData.tiers[1]}, {Tier._raw('1', 'bera')})
+	self:assertDeepEquals({}, {Tier._raw('bera')})
+	self:assertDeepEquals({}, {Tier._raw('sedrvo', 'ergbv')})
+end
+
+function suite:testIsValid()
+	self:assertTrue(Tier.isValid(1, 'showmatch'))
+	self:assertTrue(Tier.isValid(1, 'show match'))
+	self:assertTrue(Tier.isValid(1))
+	self:assertTrue(Tier.isValid('1', 'showmatch'))
+	self:assertFalse(Tier.isValid('sedrvo'))
+	self:assertFalse(Tier.isValid(''))
+	self:assertFalse(Tier.isValid())
+	self:assertFalse(Tier.isValid(1, 'sedrvo'))
+	self:assertTrue(Tier.isValid(1, ''))
+end
+
+function suite:testToValue()
+	self:assertDeepEquals({'1', 'Showmatch'}, {Tier.toValue(1, 'show match')})
+	self:assertDeepEquals({'1', 'Showmatch'}, {Tier.toValue('1', 'sho wmatch')})
+	self:assertDeepEquals({'1', 'Showmatch'}, {Tier.toValue(1, 'showmatch')})
+	self:assertDeepEquals({'1'}, {Tier.toValue(1, 'avberw')})
+	self:assertDeepEquals({'1'}, {Tier.toValue(1)})
+	self:assertDeepEquals({}, {Tier.toValue(nil, 'avberw')})
+	self:assertDeepEquals({}, {Tier.toValue('srntbg', 'avberw')})
+end
+
+function suite:testToName()
+	self:assertDeepEquals({'S-Tier', 'Showmatch'}, {Tier.toName(1, 'showma tch')})
+	self:assertDeepEquals({'S-Tier'}, {Tier.toName(1)})
+	self:assertDeepEquals({}, {Tier.toName('sedrvo')})
+end
+
+function suite:testToShortName()
+	self:assertDeepEquals({'S', 'Showm.'}, {Tier.toShortName(1, 's howmatch')})
+	self:assertDeepEquals({'S'}, {Tier.toShortName(1)})
+	self:assertDeepEquals({}, {Tier.toShortName('sedrvo')})
+end
+
+function suite:testToCategory()
+	self:assertDeepEquals({'A-Tier Tournaments', 'Miscellaneous Tournaments'}, {Tier.toCategory(2, 'misc')})
+	self:assertDeepEquals({'A-Tier Tournaments'}, {Tier.toCategory(2)})
+	self:assertDeepEquals({'A-Tier Tournaments'}, {Tier.toCategory(2, 'dszm')})
+	self:assertDeepEquals({}, {Tier.toCategory('seatrh')})
+end
+
+function suite:toSortValue()
+	self:assertEquals('A1A9', Tier.toSortValue('1', 'misc'))
+	self:assertEquals('A1', Tier.toSortValue('1'))
+	self:assertThrows(function() return Tier.toSortValue('abtenr') end)
+	self:assertThrows(function() return Tier.toSortValue('abtenr', 'misc') end)
 end
 
 function suite:testDisplay()
-	self:assertEquals('Show Match&nbsp;(S-Tier)',
-		Tier.display(Tier.parseArgsForDisplay{tier = 1, tiertype = 'ShOW MatCh'}))
-	self:assertEquals('Show&nbsp;M.&nbsp;(S)', Tier.display(Tier.parseArgsForDisplay{
-		tier = 1, tiershort = 1,
-		tiertype = 'ShOW MatCh', tiertypeshort = 1,
-	}))
-	self:assertEquals(mw.text.decode('[[S-Tier Tournaments|S-Tier]]'),
-		Tier.display(Tier.parseArgsForDisplay{tier = 1, tierlink = 1}))
-	self:assertEquals(mw.text.decode('[[S-Tier Tournaments|S-Tier]]'),
-		Tier.display(Tier.parseArgsForDisplay{tier = 1, tierlink = 1}))
-	self:assertEquals(mw.text.decode('<span style=\"display:none\">A1</span>[[S-Tier Tournaments|S-Tier]]'),
-		Tier.display(Tier.parseArgsForDisplay{tier = 1, tierlink = 1, tiersort = 1}))
+	-- plain display without any options
+	self:assertEquals('Showmatch&nbsp;(S-Tier)', Tier.display(1, 'show MaTcH'))
+	self:assertEquals('S-Tier', Tier.display(1))
+
+	-- onlyTierTypeIfBoth option
+	self:assertEquals('Showmatch', Tier.display(1, 'show MaTcH', {onlyTierTypeIfBoth = 1}))
+	self:assertEquals('S-Tier', Tier.display(1, nil, {onlyTierTypeIfBoth = 1}))
+
+	-- short options
+	self:assertEquals('Showmatch&nbsp;(S)', Tier.display(1, 'show MaTcH', {tierShort = 1}))
+	self:assertEquals('Showm.&nbsp;(S-Tier)', Tier.display(1, 'show MaTcH', {tierTypeShort = 1}))
+	self:assertEquals('Showm.&nbsp;(S)', Tier.display(1, 'show MaTcH', {short = 1}))
+	self:assertEquals('Showm.&nbsp;(S)', Tier.display(1, 'show MaTcH', {shortIfBoth = 1}))
+	self:assertEquals('S-Tier', Tier.display(1, nil, {shortIfBoth = 1}))
+
+	-- link options
+	self:assertEquals(mw.text.decode('[[S-Tier Tournaments|S-Tier]]'), Tier.display(1, nil, {link = 1}))
+	self:assertEquals(mw.text.decode('[[TEST|S-Tier]]'), Tier.display(1, nil, {link = 'TEST'}))
 	self:assertEquals(
-		mw.text.decode('[[Show Matches|Show')
-			.. '&nbsp;' .. mw.text.decode('M.]]') .. '&nbsp;(Undefined)',
-		Tier.display(Tier.parseArgsForDisplay{tiertype = 'ShOW MatCh', tiertypeshort = 1, tiertypelink = 1})
+		mw.text.decode('[[Showmatches|Showmatch]]') .. '&nbsp;' ..mw.text.decode('([[S-Tier Tournaments|S-Tier]])'),
+		Tier.display(1, 'show MaTcH', {link = 1})
 	)
-	self:assertEquals(mw.text.decode('<span style=\"display:none\">A1</span>[[S-Tier Tournaments|S-Tier]]'),
-		Tier.display(Tier.parseArgsForDisplay{tier = 1, tierlink = 1, tiersort = 1}))
 	self:assertEquals(
-		mw.text.decode('[[Show Matches|Show') .. '&nbsp;' .. mw.text.decode('M.]]')
-			.. '&nbsp;' .. mw.text.decode('([[S-Tier Tournaments|S]])'),
-		Tier.display(Tier.parseArgsForDisplay{
-			tier = 1, tiershort = 1, tierlink = 1,
-			tiertype = 'ShOW MatCh', tiertypeshort = 1, tiertypelink = 1,
-		})
+		mw.text.decode('[[TEST|Showmatch]]') .. '&nbsp;' ..mw.text.decode('([[TEST|S-Tier]])'),
+		Tier.display(1, 'show MaTcH', {link = 'TEST'})
+	)
+	self:assertEquals(
+		mw.text.decode('[[TEST|Showmatch]]') .. '&nbsp;(S-Tier)',
+		Tier.display(1, 'show MaTcH', {tierTypeLink = 'TEST'})
+	)
+	self:assertEquals(
+		mw.text.decode('[[TEST|Showmatch]]') .. '&nbsp;' ..mw.text.decode('([[S-Tier Tournaments|S-Tier]])'),
+		Tier.display(1, 'show MaTcH', {link = 1, tierTypeLink = 'TEST'})
+	)
+	self:assertEquals(
+		'Showmatch&nbsp;' ..mw.text.decode('([[TEST|S-Tier]])'),
+		Tier.display(1, 'show MaTcH', {tierLink = 'TEST'})
+	)
+	self:assertEquals(
+		mw.text.decode('[[Showmatches|Showmatch]]') .. '&nbsp;' ..mw.text.decode('([[TEST|S-Tier]])'),
+		Tier.display(1, 'show MaTcH', {link = 1, tierLink = 'TEST'})
 	)
 end
 
