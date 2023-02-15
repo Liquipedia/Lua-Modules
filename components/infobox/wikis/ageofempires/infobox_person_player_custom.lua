@@ -267,6 +267,11 @@ function CustomPlayer._getGames()
 
 	-- Games from broadcasts
 	local broadcastGames = CustomPlayer._getBroadcastGames()
+	Array.extendWith(games, Array.filter(broadcastGames,
+		function(entry)
+			return not Array.any(games, function(e) return e.game == entry.game end)
+		end
+	))
 
 	-- Games entered manually
 	local manualGames = _args.games and Array.map(
@@ -275,6 +280,11 @@ function CustomPlayer._getGames()
 			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
 		end
 	) or {}
+	Array.extendWith(games, Array.filter(manualGames,
+		function(entry)
+			return not Array.any(games, function(e) return e.game == entry.game end)
+		end
+	))
 
 	-- Games entered manually as inactive
 	local manualInactiveGames = _args.games_inactive and Array.map(
@@ -283,12 +293,12 @@ function CustomPlayer._getGames()
 			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
 		end
 	) or {}
-
-	Array.extendWith(games, Array.filter(Array.extend(manualGames, manualInactiveGames, broadcastGames),
+	Array.extendWith(games, Array.filter(manualInactiveGames,
 		function(entry)
 			return not Array.any(games, function(e) return e.game == entry.game end)
 		end
 	))
+
 	Array.sortInPlaceBy(games, function(entry) return entry.game end)
 
 	local placementThreshold = CustomPlayer._calculateDateThreshold(INACTIVITY_THRESHOLD_PLAYER)
@@ -354,12 +364,11 @@ function CustomPlayer._getLatestPlacement(game)
 	if type(data) ~= 'table' then
 		error(data)
 	end
-
 	return data[1]
 end
 
 function CustomPlayer._buildPlacementConditions()
-	local person = _args.id or _player.pagename
+	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
@@ -367,6 +376,7 @@ function CustomPlayer._buildPlacementConditions()
 	for playerIndex = 1, MAX_NUMBER_OF_PLAYERS do
 		opponentConditions:add{
 			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, person),
+			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, person:gsub(' ', '_')),
 		}
 	end
 
@@ -374,8 +384,12 @@ function CustomPlayer._buildPlacementConditions()
 end
 
 function CustomPlayer._getBroadcastGames()
-	local person = _args.id or _player.pagename
-	local personCondition = ConditionNode(ColumnName('page'), Comparator.eq, person)
+	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
+	local personCondition = ConditionTree(BooleanOperator.any)
+		:add{
+			ConditionNode(ColumnName('page'), Comparator.eq, person),
+			ConditionNode(ColumnName('page'), Comparator.eq, person:gsub(' ', '_')),
+		}
 	local games = {}
 
 	for _, gameInfo in pairs(Info.games) do
