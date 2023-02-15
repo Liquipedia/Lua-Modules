@@ -206,7 +206,6 @@ function matchFunctions.getLinks(match)
 	match.links = {}
 
 	-- Shift (formerly Octane)
-	match.shift1 = match.shift1 or match.shift
 	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {strict = false}) do
 		match.links[key] = 'https://www.shiftrle.gg/matches/' .. shift
 	end
