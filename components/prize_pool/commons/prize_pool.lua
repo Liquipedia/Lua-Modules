@@ -650,7 +650,7 @@ function PrizePool:_readPrizes(args)
 	for name, prizeData in pairs(self.prizeTypes) do
 		local fieldName = prizeData.header
 		if fieldName then
-			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
+			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName, {strict = false}) do
 				local data = prizeData.headerParse(self, prizeValue, args, index)
 				self:addPrize(name, index, data)
 			end

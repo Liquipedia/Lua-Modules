@@ -104,7 +104,7 @@ function Series:createInfobox()
 		Builder{
 			builder = function()
 				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
+				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {strict = false}) do
 					-- TODO: Description
 					local description = ''
 					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
