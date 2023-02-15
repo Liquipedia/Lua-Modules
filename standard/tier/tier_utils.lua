@@ -8,7 +8,6 @@
 
 -- module intended to be moved to `Module:Tier` after the old ones usage has been eliminated
 
-local HiddenSort = require('Module:HiddenSort')
 local Logic = require('Module:Logic')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -17,7 +16,6 @@ local Table = require('Module:Table')
 local TierData = mw.loadData('Module:Tier/Data')
 
 local NON_BREAKING_SPACE = '&nbsp;'
-local TIER_TYPE_MODE = 'tierTypes'
 
 local Tier = {}
 
@@ -26,166 +24,172 @@ local Tier = {}
 ---@return string|integer|nil
 function Tier.toIdentifier(input)
 	if String.isEmpty(input) then
-		return ''
+		return
 	end
 
-	if Logic.isNumeric(input) then
-		return tonumber(input)
-	end
-
-	return string.lower(input):gsub(' ', '')
+	return tonumber(input)
+		or string.lower(input):gsub(' ', '')
 end
 
---- Retrieves the raw tier/tierType data for a given input
----@param input string|integer|nil
----@param mode 'tiers'|'tierTypes'
----@return table?
-function Tier.raw(input, mode)
-	return (TierData[mode] or {})[input]
+--- Retrieves the raw data for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@return table?, table?
+function Tier._raw(tier, tierType)
+	return (TierData.tiers or {})[tier], (TierData.tierTypes or {})[tierType]
 end
 
---- Converts input to storage value for tier/tierType
----@param input string|integer|nil
----@param mode 'tiers'|'tierTypes'
+--- Checks if a valid (tier, tierType) tuple is provided
+---@param tier integer
+---@param tierType string?
 ---@return boolean
-function Tier.isValid(input, mode)
-	return String.isEmpty(input) or Tier.raw(input, mode) ~= nil
-end
+function Tier.isValid(tier, tierType)
+	local tierData, tierTypeData = Tier._raw(tier, tierType)
 
---- Converts input to (storage) value for tier/tierType
----@param input string|integer|nil
----@param mode 'tiers'|'tierTypes'
----@return string|integer|nil
-function Tier.toValue(input, mode)
-	return (Tier.raw(input, mode) or {}).value
-end
+	if not tierData then return false end
 
---- Converts input to display name for tier/tierType
----@param input string|integer|nil
----@param mode 'tiers'|'tierTypes'
----@return string?
-function Tier.toName(input, mode)
-	return (Tier.raw(input, mode) or {}).name
-end
-
---- Converts input to short name for tier/tierType
----@param input string|integer|nil
----@param mode 'tiers'|'tierTypes'
----@return string?
-function Tier.toShortName(input, mode)
-	return (Tier.raw(input, mode) or {}).short
-end
-
---- Converts input to a tier/tierType category
----@param input string|integer|nil
----@param mode 'tiers'|'tierTypes'
----@return string?
-function Tier.toCategory(input, mode)
-	return (Tier.raw(input, mode) or {}).category
-end
-
---- Builds the display for a single tier/tierType
----@param args {
----		input: string|integer|nil,
----		mode: 'tiers'|'tierTypes',
----		short: boolean?,
----		link: string|boolean|nil,
----		sort: boolean?
----	}
----@return string?
-function Tier.displaySingle(args)
-	args = args or {}
-
-	local tierData = Tier.raw(args.input, args.mode)
-
-	if not tierData then return '' end
-
-	local display = args.short and tierData.short or tierData.name
-
-	if not display then return '' end
-
-	local hiddenSort = args.sort and tostring(HiddenSort.run(tierData.sort)) or ''
-
-	if Logic.readBool(args.link) and tierData.link then
-		return hiddenSort .. Page.makeInternalLink({}, display, tierData.link)
-	elseif String.isNotEmpty(args.link) then
-		return hiddenSort .. Page.makeInternalLink({}, display, args.link)
+	if not tierType and String.isNotEmpty(tierType) then
+		return false
 	end
 
-	return hiddenSort .. display
+	return true
 end
 
---- Builds the display for a a tier/tierType combination
----@param tierArgs table
----@param tierTypeArgs table
+--- Converts input to (storage) values for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@return integer?, string|integer|nil
+function Tier.toValue(tier, tierType)
+	local tierData, tierTypeData = Tier._raw(tier, tierType)
+
+	return (tierData or {}).value, (tierTypeData or {}).value
+end
+
+--- Converts input to displayNames for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@return string?, string?
+function Tier.toName(tier, tierType)
+	local tierData, tierTypeData = Tier._raw(tier, tierType)
+
+	return (tierData or {}).name, (tierTypeData or {}).name
+end
+
+--- Converts input to short names for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@return string?, string?
+function Tier.toShortName(tier, tierType)
+	local tierData, tierTypeData = Tier._raw(tier, tierType)
+
+	return (tierData or {}).short, (tierTypeData or {}).short
+end
+
+--- Converts input to categories for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@return string?, string?
+function Tier.toCategory(tier, tierType)
+	local tierData, tierTypeData = Tier._raw(tier, tierType)
+
+	return (tierData or {}).category, (tierTypeData or {}).category
+end
+
+--- Converts input to a sort value for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@return string
+function Tier.toSortValue(tier, tierType)
+	local tierData, tierTypeData = Tier._raw(tier, tierType)
+
+	return (tierData or {}).sort .. ((tierTypeData or {}).sort or '')
+end
+
+--- Parses queryData to be processable for other Tier functions
+--- overwritable on a per wiki basis if additional data needs to be passed
+---@param queryData table
+---@return string?, string?, table
+function Tier.parseFromQueryData(queryData)
+	return queryData.liquipediatier, queryData.liquipediatiertype, {}
+end
+
+--- Builds the display for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@param options table?
 ---@return string?
-function Tier.display(tierArgs, tierTypeArgs)
-	local tierDisplay = Tier.displaySingle(tierArgs)
+function Tier.display(tier, tierType, options)
+	local tierData, tierTypeData = Tier._raw(tier, tierType)
 
-	local tierTypeDisplay = Tier.displaySingle(tierTypeArgs)
-	if String.isEmpty(tierTypeDisplay) then
-		return tierDisplay
+	if not tierData then return end
+
+	options = options or {}
+
+	if not tierTypeData then
+		return Tier.displaySingle(tierData, Tier._displayOptions(options, 'tier'))
 	end
 
-	return tierTypeDisplay .. NON_BREAKING_SPACE .. '(' .. tierDisplay .. ')'
-end
-
---- Parses Args for combined tier + tierType display
----@param args table
----@return table
----@return table
-function Tier.parseArgsForDisplay(args)
-	args = args or {}
-
-	args.tier = args.tier or args.liquipediatier
-	args.tiertype = args.tiertype or args.liquipediatiertype
-
-	if String.isEmpty(args.tier) and String.isEmpty(args.tiertype) then
-		return ''
-	elseif String.isEmpty(args.tier) or String.isEmpty(args.tiertype) then
-		args.shortIfBoth = false
+	if options.onlyTierTypeIfBoth then
+		return Tier.displaySingle(tierTypeData, Tier._displayOptions(options, 'tierType'))
 	end
 
-	local tierTypeArgs = Tier.parseArgsForPrefix(args, 'tiertype')
-	tierTypeArgs.mode = TIER_TYPE_MODE
+	if options.shortIfBoth then
+		options.short = true
+	end
 
-	return Tier.parseArgsForPrefix(args, 'tier'), tierTypeArgs
+	return Tier.displaySingle(tierTypeData, Tier._displayOptions(options, 'tierType'))
+		.. '&nbsp;(' .. Tier.displaySingle(tierData, Tier._displayOptions(options, 'tier')) .. ')'
 end
 
---- Parse tier/tierType args based on a given prefix
----@param args table
----@param prefix string
+--- reads the (global) options and retrieves the values needed for a give prefix
+--- overwritable on a per wiki basis if additional data needs to be passed
+---@param options table
+---@param prefix 'tier'|'tierType'
 ---@return table
-function Tier.parseArgsForPrefix(args, prefix)
+function Tier._displayOptions(options, prefix)
 	return {
-		mode = prefix .. 's',
-		input = Tier.toIdentifier(args[prefix]),
-		link = args[prefix .. 'link'],
-		short = Logic.readBool(args[prefix .. 'short']) or Logic.readBool(args.shortIfBoth),
-		sort = Logic.readBool(args[prefix .. 'sort']),
+		link = options[prefix .. 'Link'] or options.link,
+		short = Logic.readBool(options[prefix .. 'Short'] or options.short),
 	}
 end
 
+--- Builds the display for a given tierData/tierTypeData table
+--- overwritable on a per wiki basis if adjustments are needed
+---@param data table
+---@param options table
+---@return string
+function Tier.displaySingle(data, options)
+	local display = options.short and data.short or data.name
+
+	if Logic.readBool(options.link) and data.link then
+		return Page.makeInternalLink({}, display, tierData.link)
+	elseif String.isNotEmpty(options.link) then
+		return Page.makeInternalLink({}, display, options.link)
+	end
+
+	return display
+end
+
 --- Iterate over tiers/tierTypes in a sorted order
----@param mode 'tiers'|'tierTypes'
+---@param subTable 'tiers'|'tierTypes'
 ---@return function
-function Tier.iterate(mode)
-	return Table.iter.spairs(TierData[mode], function(tierData, key1, key2)
+function Tier.iterate(subTable)
+	return Table.iter.spairs(TierData[subTable], function(tierData, key1, key2)
 		return tierData[key1].sort < tierData[key2].sort
 	end)
 end
 
 --- Legacy: Converts legacy tier input to its numeric value. DEPRECATED!!!
----@param input string|integer|nil
+---@param tier string|integer|nil
 ---@return integer
 ---@deprecated
-function Tier.toNumber(input)
+function Tier.toNumber(tier)
 	-- do not error for empty input, only for invalid
 	if String.isEmpty(input) then
 		return
 	end
 
-	return Tier.raw(input, 'tierToNumber')
+	return (TierData.tierToNumber or {})[tier]
 		or error('Invalid tier "' .. input .. '" in legacy conversion')
 end
 
