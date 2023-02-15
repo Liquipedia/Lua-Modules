@@ -92,7 +92,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'customcontent' then
 		local maps = _league:getAllArgsForBase(_args, 'map')
 		if #maps > 0 then
-			local game = _args.game and (_args.game .. '/') or ''
+			local game = _args.game and ('/' .. _args.game) or ''
 
 			maps = Array.map(maps, function(map)
 				return tostring(CustomLeague:_createNoWrappingSpan(
