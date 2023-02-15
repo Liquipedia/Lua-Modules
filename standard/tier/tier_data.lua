@@ -90,12 +90,12 @@ return {
 			category = 'Miscellaneous Tournaments',
 		},
 		showmatch = {
-			value = 'Show Match',
+			value = 'Showmatch',
 			sort = 'B1',
-			name = 'Show Match',
-			short = 'Show&nbsp;M.',
-			link = 'Show Matches',
-			category = 'Show Match Tournaments',
+			name = 'Showmatch',
+			short = 'Showm.',
+			link = 'Showmatches',
+			category = 'Showmatch Tournaments',
 		},
 	},
 
