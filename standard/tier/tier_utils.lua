@@ -48,7 +48,7 @@ function Tier.isValid(tier, tierType)
 
 	if not tierData then return false end
 
-	if not tierType and String.isNotEmpty(tierType) then
+	if not tierTypeData and String.isNotEmpty(tierType) then
 		return false
 	end
 
@@ -138,7 +138,7 @@ function Tier.display(tier, tierType, options)
 	end
 
 	return Tier.displaySingle(tierTypeData, Tier._displayOptions(options, 'tierType'))
-		.. '&nbsp;(' .. Tier.displaySingle(tierData, Tier._displayOptions(options, 'tier')) .. ')'
+		.. NON_BREAKING_SPACE .. '(' .. Tier.displaySingle(tierData, Tier._displayOptions(options, 'tier')) .. ')'
 end
 
 --- reads the (global) options and retrieves the values needed for a give prefix
@@ -162,7 +162,7 @@ function Tier.displaySingle(data, options)
 	local display = options.short and data.short or data.name
 
 	if Logic.readBool(options.link) and data.link then
-		return Page.makeInternalLink({}, display, tierData.link)
+		return Page.makeInternalLink({}, display, data.link)
 	elseif String.isNotEmpty(options.link) then
 		return Page.makeInternalLink({}, display, options.link)
 	end
@@ -184,13 +184,7 @@ end
 ---@return integer
 ---@deprecated
 function Tier.toNumber(tier)
-	-- do not error for empty input, only for invalid
-	if String.isEmpty(input) then
-		return
-	end
-
 	return (TierData.tierToNumber or {})[tier]
-		or error('Invalid tier "' .. input .. '" in legacy conversion')
 end
 
 return Tier
