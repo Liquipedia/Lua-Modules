@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
@@ -41,6 +42,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
+	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
 	return league:createInfobox()
 end
@@ -116,6 +118,14 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	return categories
+end
+
+function CustomLeague:appendLiquipediatierDisplay()
+	if Logic.readBool(_args.blizzardpremier) then
+		return '[[File:Blizzard_logo.png|x12px|link=Blizzard Entertainment|Premier Tournament held by Blizzard]]'
+	end
+
+	return ''
 end
 
 function CustomLeague:_modeLookup(mode)
