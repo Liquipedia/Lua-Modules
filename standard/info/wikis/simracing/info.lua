@@ -11,13 +11,13 @@ return {
 	wikiName = 'simracing',
 	name = 'Sim Racing',
 	games = {
-		todo = {
-			abbreviation = 'todo',
-			name = 'TODO',
-			link = 'Main Page',
+		sr = {
+			abbreviation = 'SR',
+			name = 'Sim Racing',
+			link = 'Sim Racing',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Sim Racing default darkmode.png',
+				lightMode = 'Sim Racing default lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Sim Racing default darkmode.png',
@@ -25,7 +25,7 @@ return {
 			},
 		},
 	},
-	defaultGame = 'todo',
+	defaultGame = 'sr',
 	defaultTeamLogo = 'Sim Racing default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Sim Racing default darkmode.png', ---@deprecated
 }
