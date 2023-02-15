@@ -291,29 +291,31 @@ function CustomMatchSummary._createGame(game)
 		game.scores[1],
 		1
 	))
+	if extradata.overtime then
+		row:addElement(CustomMatchSummary._iconDisplay(
+			OVERTIME,
+			true,
+			nil,
+			nil,
+			'Overtime'
+		))
+	end
 	row:addElement(centerNode)
+	if extradata.overtime then
+		row:addElement(CustomMatchSummary._iconDisplay(
+			OVERTIME,
+			true,
+			nil,
+			nil,
+			'Overtime'
+		))
+	end
 	row:addElement(CustomMatchSummary._iconDisplay(
 		GREEN_CHECK,
 		game.winner == 2,
 		game.scores[2],
 		2
 	))
-
-	if extradata.overtime then
-		row:addElement(MatchSummary.Break():create())
-		row:addElement(CustomMatchSummary._iconDisplay(
-			OVERTIME,
-			true
-		))
-		row:addElement(mw.html.create('div')
-			:addClass('brkts-popup-spaced')
-			:node(mw.html.create('div'):node('Overtime'))
-		)
-		row:addElement(CustomMatchSummary._iconDisplay(
-			OVERTIME,
-			true
-		))
-	end
 
 	if String.isNotEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
@@ -328,13 +330,14 @@ function CustomMatchSummary._createGame(game)
 	return row
 end
 
-function CustomMatchSummary._iconDisplay(icon, shouldDisplay, additionalElement, side)
+function CustomMatchSummary._iconDisplay(icon, shouldDisplay, additionalElement, side, hoverText)
 	local flip = side == 2
 	return mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(additionalElement and flip and mw.html.create('div'):node(additionalElement) or nil)
 		:node(shouldDisplay and icon or NO_CHECK)
 		:node(additionalElement and (not flip) and mw.html.create('div'):node(additionalElement) or nil)
+		:attr('title', hoverText)
 end
 
 return CustomMatchSummary
