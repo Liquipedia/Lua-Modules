@@ -354,7 +354,6 @@ function CustomPlayer._getLatestPlacement(game)
 		CustomPlayer._buildPlacementConditions(),
 		ConditionNode(ColumnName('game'), Comparator.eq, game)
 	}
-	mw.log(conditions:toString())
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions:toString(),
 		query = 'date',
