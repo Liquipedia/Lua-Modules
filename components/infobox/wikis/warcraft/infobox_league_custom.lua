@@ -340,9 +340,9 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', GAMES[_args.game])
 
 	--check if tournament is finished
-	local finished = Logic.readBool(_args.finished)
+	local finished = Logic.readBoolOrNil(_args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
-	if not finished and os.date('%Y-%m-%d') >= queryDate then
+	if finished == nil and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
 				.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
@@ -354,7 +354,7 @@ function CustomLeague:defineCustomPageVariables()
 			finished = true
 		end
 	end
-	Variables.varDefine('tournament_finished', tostring(finished))
+	Variables.varDefine('tournament_finished', tostring(finished or false))
 
 	--maps
 	local maps = CustomLeague._getMaps('map')

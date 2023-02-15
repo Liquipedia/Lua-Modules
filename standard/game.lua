@@ -49,6 +49,8 @@ function Game.toIdentifier(args)
 
 	return Game.getIdentifierByAbbreviation()[gameInput]
 		or Game.getIdentifierByName()[gameInput]
+		or GamesData[gameInput] and gameInput
+		or nil
 end
 
 ---Check if a given game is a valid game.

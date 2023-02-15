@@ -9,7 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local LeagueIcon = require('Module:LeagueIcon')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
@@ -48,6 +48,7 @@ local VALID_QUERY_TYPES = {
 	COACH_TYPE,
 }
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+local DEFAULT_RESULTS_SUB_PAGE = 'Results'
 
 --- @class BaseResultsTable
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
@@ -69,11 +70,13 @@ function BaseResultsTable:readConfig()
 		order = args.order or DEFAULT_VALUES.order,
 		hideResult = Logic.readBool(args.hideresult),
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
-		gameIconsData = args.gameIcons and mw.loadData(args.gameIcons) or nil,
+		displayGameIcons = Logic.readBool(args.gameIcons),
 		opponent = mw.text.decode(args.coach or args.player or args.team or self:_getOpponent()),
 		queryType = self:getQueryType(),
 		onlyAchievements = Logic.readBool(args.achievements),
 		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
+		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
+		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
 	}
 
 	config.sort = args.sort or
@@ -83,8 +86,8 @@ function BaseResultsTable:readConfig()
 		(config.onlyAchievements and DEFAULT_VALUES.achievementsLimit or DEFAULT_VALUES.resultsLimit)
 
 	config.playerLimit =
-		(config.queryType == SOLO_TYPE and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
-		or (config.queryType == COACH_TYPE and tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit)
+		(config.queryType == SOLO_TYPE and (tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit))
+		or tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit
 
 	return config
 end
@@ -328,6 +331,14 @@ function BaseResultsTable:build()
 		end
 	end
 
+	if self.config.onlyAchievements then
+		displayTable:tag('tr')
+			:tag('th')
+				:attr('colspan', 42)
+				:css('font-style', 'italic')
+				:wikitext('[[' .. self.config.opponent .. '/' .. self.config.resultsSubPage .. '|Extended list of results]]')
+	end
+
 	displayTable:node(self.args.manualContent)
 
 	return mw.html.create('div')
@@ -382,41 +393,60 @@ end
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
-	local opponent
 	if not data.opponenttype then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.tbd(),
 			flip = (options or {}).flip,
 		}
-	elseif data.opponenttype == Opponent.solo and options.teamForSolo then
-		local teamTemplate = data.opponentplayers.p1template
-		if String.isEmpty(teamTemplate) then
-			return
-		end
+	elseif self.config.displayDefaultLogoAsIs or
+		data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 
-		opponent = {template = teamTemplate, type = Opponent.team}
-	else
-		opponent = Opponent.fromLpdbStruct(data)
+		return OpponentDisplay.BlockOpponent{
+			opponent = Opponent.fromLpdbStruct(data),
+			flip = (options or {}).flip,
+		}
 	end
 
-	return OpponentDisplay.BlockOpponent{
-		opponent = opponent,
+	local teamTemplate
+	if data.opponenttype == Opponent.team then
+		teamTemplate = data.opponenttemplate
+	else
+		teamTemplate = data.opponentplayers.p1template
+	end
+
+	if String.isEmpty(teamTemplate) then
+		return
+	end
+
+	local teamDisplay = OpponentDisplay.BlockOpponent{
+		opponent = {template = teamTemplate, type = Opponent.team},
 		flip = (options or {}).flip,
 		teamStyle = 'icon',
 	}
+
+	local rawTeamTemplate = Team.queryRaw(teamTemplate)
+
+	if not rawTeamTemplate or not Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} then
+		return teamDisplay
+	end
+
+	return BaseResultsTable.teamDisplayWithDefaultLogo(teamDisplay, rawTeamTemplate)
 end
 
--- overwritable
--- shadows the current implementation
--- TODO: Add support for dark mode icons
--- needs upgrading the game icon data modules first though
-function BaseResultsTable:gameIcon(placement)
-	local gameIcon = self.config.gameIconsData[placement.game] or 'Logo filler event.png'
-	gameIcon = gameIcon:gsub('File:', '')
-	return LeagueIcon.display{
-		icon = gameIcon,
-		options = {noTemplate = true, noLink = true},
-	}
+function BaseResultsTable.teamDisplayWithDefaultLogo(teamDisplay, rawTeamTemplate)
+	return mw.html.create()
+		:node(teamDisplay)
+		:node(mw.html.create('div')
+			:css('width', '60px')
+			:css('align', 'left')
+			:node(
+				mw.html.create('div')
+					:css('line-height', '1')
+					:css('font-size', '80%')
+					:css('text-align', 'center')
+					:wikitext('([[' .. rawTeamTemplate.page .. '|' .. rawTeamTemplate.shortname .. ']])')
+			)
+		)
 end
 
 function BaseResultsTable.tournamentDisplayName(placement)
