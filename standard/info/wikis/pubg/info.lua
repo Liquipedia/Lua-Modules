@@ -28,4 +28,5 @@ return {
 	defaultGame = 'pubg',
 	defaultTeamLogo = 'PUBG Default logo.png', ---@deprecated
 	defaultTeamLogoDark = 'PUBG Default logo.png', ---@deprecated
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }
