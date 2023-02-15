@@ -96,6 +96,7 @@ local PREFIXES = {
 		team = 'https://csgo.gamersclub.gg/team/',
 		player = 'https://csgo.gamersclub.gg/jogador/',
 	},
+	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
