@@ -555,11 +555,11 @@ function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local maximumPickIndex = 0
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p', {strict = true}) do
+		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
 			participants[opponentIndex .. '_' .. playerIndex] = {player = player}
 		end
 
-		for _, weapon, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'w', {strict = true}) do
+		for _, weapon, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'w') do
 			local participantsKey = opponentIndex .. '_' .. pickIndex
 			participants[participantsKey] = Table.merge(participants[participantsKey]
 				or {}, {weapon = mapFunctions._cleanWeaponName(weapon)})

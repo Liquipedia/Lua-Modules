@@ -639,7 +639,7 @@ end
 
 function GroupTableLeague.readMetricNames(args, config)
 	local metricNames = {}
-	for _, rawMetric in Table.iter.pairsByPrefix(args, 'tiebreaker', {strict = true}) do
+	for _, rawMetric in Table.iter.pairsByPrefix(args, 'tiebreaker') do
 		local metricName = GroupTableLeague.metricAliases[rawMetric] or rawMetric
 		assert(GroupTableLeague.isMetricName(metricName), 'Invalid tiebreaker ' .. rawMetric)
 		table.insert(metricNames, metricName)

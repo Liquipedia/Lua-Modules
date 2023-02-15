@@ -353,7 +353,7 @@ end
 
 function CustomTeam._amountOfTeamPlayersInPlacement(players)
 	local amount = 0
-	for playerKey in Table.iter.pairsByPrefix(players, 'p', {strict = true}) do
+	for playerKey in Table.iter.pairsByPrefix(players, 'p') do
 		if players[playerKey .. 'team'] == _team.pagename then
 			amount = amount + 1
 		end

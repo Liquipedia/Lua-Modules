@@ -209,7 +209,7 @@ function StarcraftMatchGroupInput._adjustData(match)
 
 	--main processing done here
 	local subGroupIndex = 0
-	for _, _, mapIndex in Table.iter.pairsByPrefix(match, 'map', {strict = true}) do
+	for _, _, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
 		match, subGroupIndex = StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	end
 
@@ -369,7 +369,7 @@ function StarcraftMatchGroupInput._subMatchStructure(match)
 	local subMatches = {}
 	local numberOfMaps = 0
 
-	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {strict = true}) do
+	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
 		local subGroupIndex = map.subgroup
 
 		--create a new sub-match if necessary

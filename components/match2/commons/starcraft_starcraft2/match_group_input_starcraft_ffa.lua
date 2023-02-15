@@ -62,7 +62,7 @@ function StarcraftFfaInput.adjustData(match)
 
 	--main processing done here
 	local subgroup = 0
-	for mapKey, map in Table.iter.pairsByPrefix(match, 'map', {strict = true}) do
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
 		if
 			String.isNotEmpty(map.opponent1placement) or String.isNotEmpty(map.placement1)
 			or String.isNotEmpty(map.points1) or String.isNotEmpty(map.opponent1points)
@@ -334,7 +334,7 @@ OpponentInput functions
 ]]--
 function StarcraftFfaInput._opponentInput(match, noscore)
 	local numberOfOpponents
-	for opponentKey, opponent, opponentIndex in Table.iter.pairsByPrefix(match, 'opponent', {strict = true}) do
+	for opponentKey, opponent, opponentIndex in Table.iter.pairsByPrefix(match, 'opponent') do
 		numberOfOpponents = opponentIndex
 
 		-- Convert byes to literals

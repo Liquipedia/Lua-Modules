@@ -119,7 +119,7 @@ end
 function MatchMapsTeamLegacy._setPlayersForOpponents(args, side, displayNames)
 	local prefix = 't' .. side .. 'p'
 
-	for playerKey, player, playerIndex in Table.iter.pairsByPrefix(args, prefix, {strict = true}) do
+	for playerKey, player, playerIndex in Table.iter.pairsByPrefix(args, prefix) do
 		_opponentPlayers[side][player] = {
 			race = args[playerKey .. 'race'],
 			flag = args[playerKey .. 'flag'],

@@ -197,7 +197,7 @@ StarcraftGroupTableLeague.metricAliases = Table.merge(GroupTableLeague.metricAli
 
 function StarcraftGroupTableLeague.readMetricNames(args, config)
 	local metricNames = {}
-	for _, rawMetric in Table.iter.pairsByPrefix(args, 'tiebreaker', {strict = true}) do
+	for _, rawMetric in Table.iter.pairsByPrefix(args, 'tiebreaker') do
 		local metricName = StarcraftGroupTableLeague.metricAliases[rawMetric] or rawMetric
 		assert(GroupTableLeague.isMetricName(metricName), 'Invalid tiebreaker ' .. rawMetric)
 		table.insert(metricNames, metricName)
