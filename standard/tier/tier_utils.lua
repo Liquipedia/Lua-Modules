@@ -110,7 +110,7 @@ end
 ---@param queryData table
 ---@return string?, string?, table
 function Tier.parseFromQueryData(queryData)
-	return queryData.liquipediatier, queryData.liquipediatiertype, {}
+	return Tier.toIdentifier(queryData.liquipediatier), Tier.toIdentifier(queryData.liquipediatiertype), {}
 end
 
 --- Builds the display for a given (tier, tierType) tuple
