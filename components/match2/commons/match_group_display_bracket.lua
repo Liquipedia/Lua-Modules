@@ -26,6 +26,10 @@ local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 local html = mw.html
 local _NON_BREAKING_SPACE = '&nbsp;'
 
+local DEFAULT_OPPONENT_HEIGHTS = {
+	duo = 2 * 17 + 6 + 4,
+}
+
 local BracketDisplay = {propTypes = {}, types = {}}
 
 function BracketDisplay.configFromArgs(args)
@@ -77,10 +81,30 @@ The component fetches the match data from LPDB or page variables.
 ]]
 function BracketDisplay.BracketContainer(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.BracketContainer)
+
+	local bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId)
+
+	local opponentHeight = math.max(
+		BracketDisplay.computeBracketOpponentHeight(bracket.matchesById),
+		props.config.opponentHeight or -1
+	)
+
 	return BracketDisplay.Bracket({
-		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
-		config = props.config,
+		bracket = bracket,
+		config = Table.merge(props.config, {
+			opponentHeight = opponentHeight ~= -1 and opponentHeight or nil,
+		})
 	})
+end
+
+function BracketDisplay.computeBracketOpponentHeight(matchesById)
+	local maxHeight = -1
+	for _, match in pairs(matchesById) do
+		for _, opponent in ipairs(match.opponents) do
+			maxHeight = math.max(maxHeight, DEFAULT_OPPONENT_HEIGHTS[opponent.type] or -1)
+		end
+	end
+	return maxHeight
 end
 
 BracketDisplay.propTypes.Bracket = {
