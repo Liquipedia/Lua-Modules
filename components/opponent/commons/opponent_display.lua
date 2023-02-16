@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
@@ -172,19 +173,36 @@ function OpponentDisplay.BlockOpponent(props)
 			name = opponent.name or '',
 			overflow = props.overflow,
 		})
-	elseif opponent.type == 'solo' then
-		return PlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
-			player = opponent.players[1],
-			showFlag = props.showFlag,
-			showLink = showLink,
-			showPlayerTeam = props.showPlayerTeam,
-			abbreviateTbd = props.abbreviateTbd
-		})
+	elseif opponent.type == 'solo' or opponent.type == 'duo' then
+		return OpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
+end
+
+function OpponentDisplay.BlockPlayers(props)
+	local opponent = props.opponent
+
+	local playerNodes = Array.map(opponent.players, function(player)
+		return PlayerDisplay.BlockPlayer({
+			flip = props.flip,
+			overflow = props.overflow,
+			player = player,
+			showFlag = props.showFlag,
+			showLink = showLink,
+			showPlayerTeam = props.showPlayerTeam,
+			abbreviateTbd = props.abbreviateTbd,
+		})
+			:addClass(props.playerClass)
+	end)
+
+	local playersNode = mw.html.create('div')
+		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+	for _, playerNode in ipairs(playerNodes) do
+		playersNode:node(playerNode)
+	end
+
+	return playersNode
 end
 
 OpponentDisplay.propTypes.InlineTeamContainer = {
