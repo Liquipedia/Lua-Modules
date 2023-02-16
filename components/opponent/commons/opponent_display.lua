@@ -131,22 +131,28 @@ function OpponentDisplay.InlineOpponent(props)
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
-
 	elseif opponent.type == 'literal' then
 		return opponent.name or ''
-
-	elseif opponent.type == 'solo' then
-		return PlayerDisplay.InlinePlayer{
-			player = opponent.players[1],
-			flip = props.flip,
-			dq = props.dq,
-			showFlag = props.showFlag,
-			showLink = props.showLink
-		}
-
+	elseif opponent.type == 'solo' or opponent.type == 'duo' then
+		return OpponentDisplay.InlinePlayers(props)
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
+end
+
+function OpponentDisplay.InlinePlayers(props)
+	local opponent = props.opponent
+
+	local playerTexts = Array.map(opponent.players, function(player)
+		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player})))
+	end)
+
+	if props.flip then
+		playerTexts = Array.reverse(playerTexts)
+	end
+
+	return mw.html.create('span')
+		:node(table.concat(playerTexts, ' / '))
 end
 
 OpponentDisplay.propTypes.BlockOpponent = {
