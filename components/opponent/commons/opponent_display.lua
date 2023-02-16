@@ -184,15 +184,7 @@ function OpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
 
 	local playerNodes = Array.map(opponent.players, function(player)
-		return PlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
-			player = player,
-			showFlag = props.showFlag,
-			showLink = showLink,
-			showPlayerTeam = props.showPlayerTeam,
-			abbreviateTbd = props.abbreviateTbd,
-		})
+		return PlayerDisplay.BlockPlayer(Table.merge(props, {player = player, team = player.team}))
 			:addClass(props.playerClass)
 	end)
 
