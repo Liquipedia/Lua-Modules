@@ -34,8 +34,8 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 
 		if opponent.type == 'team' then
 			self:createTeam(opponent.template or 'tbd', options)
-		elseif opponent.type == 'solo' then
-			self:createPlayer(opponent.players[1])
+		elseif opponent.type == 'solo' or opponent.type == 'duo' then
+			self:createParty(opponent)
 		elseif opponent.type == 'literal' then
 			self:createLiteral(opponent.name or '')
 		end
@@ -58,9 +58,20 @@ function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 	self.content:node(opponentNode)
 end
 
+--todo: check if this function can be removed
+-- commons has no additional consumers
 function OpponentDisplay.BracketOpponentEntry:createPlayer(player)
 	local playerNode = PlayerDisplay.BlockPlayer({
 		player = player,
+		overflow = 'ellipsis',
+		showLink = false,
+	})
+	self.content:node(playerNode)
+end
+
+function OpponentDisplay.BracketOpponentEntry:createParty(opponent)
+	local playerNode = OpponentDisplay.BlockPlayers({
+		opponent = opponent,
 		overflow = 'ellipsis',
 		showLink = false,
 	})
