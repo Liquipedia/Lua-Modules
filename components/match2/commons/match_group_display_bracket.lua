@@ -24,7 +24,7 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnable
 local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
 local html = mw.html
-local _NON_BREAKING_SPACE = '&nbsp;'
+local NON_BREAKING_SPACE = '&nbsp;'
 
 local DEFAULT_OPPONENT_HEIGHTS = {
 	duo = 2 * 17 + 6 + 4,
@@ -405,7 +405,7 @@ function BracketDisplay.MatchHeader(props)
 
 	local headerNode = html.create('div'):addClass('brkts-header brkts-header-div')
 		:addClass(--do not display the header if it is "&nbsp;"
-			options[1] == _NON_BREAKING_SPACE
+			options[1] == NON_BREAKING_SPACE
 			and 'brkts-header-nodisplay' or ''
 		)
 		:css('height', props.height .. 'px')
