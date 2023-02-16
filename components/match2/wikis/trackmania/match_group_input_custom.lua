@@ -178,7 +178,6 @@ function matchFunctions.getExtraData(match)
 		and opponent2.type == Opponent.team
 
 	match.extradata = {
-		lastgame = Variables.varDefault('last_game'),
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
