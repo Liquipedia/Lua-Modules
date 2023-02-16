@@ -54,9 +54,9 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	end
 end
 
-function CustomOpponentDisplay.BracketOpponentEntry:createPlayer(player)
-	local playerNode = PlayerDisplay.BlockPlayer({
-		player = player,
+function CustomOpponentDisplay.BracketOpponentEntry:createParty(opponent)
+	local playerNode = OpponentDisplay.BlockPlayers({
+		opponent = opponent,
 		overflow = 'ellipsis',
 		showLink = true,
 	})
