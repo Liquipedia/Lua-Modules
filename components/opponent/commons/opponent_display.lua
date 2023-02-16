@@ -58,17 +58,6 @@ function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 	self.content:node(opponentNode)
 end
 
---todo: check if this function can be removed
--- commons has no additional consumers
-function OpponentDisplay.BracketOpponentEntry:createPlayer(player)
-	local playerNode = PlayerDisplay.BlockPlayer({
-		player = player,
-		overflow = 'ellipsis',
-		showLink = false,
-	})
-	self.content:node(playerNode)
-end
-
 function OpponentDisplay.BracketOpponentEntry:createParty(opponent)
 	local playerNode = OpponentDisplay.BlockPlayers({
 		opponent = opponent,
