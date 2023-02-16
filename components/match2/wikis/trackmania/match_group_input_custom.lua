@@ -155,14 +155,8 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.isFeatured(match)
-	if
-		tonumber(match.liquipediatier or '') == 1
-		or tonumber(match.liquipediatier or '') == 2
-		or not String.isEmpty(Variables.varDefault('match_featured_override'))
-	then
-		return true
-	end
-	return false
+	return tonumber(match.liquipediatier) == 1
+		or tonumber(match.liquipediatier) == 2
 end
 
 function matchFunctions.getExtraData(match)
