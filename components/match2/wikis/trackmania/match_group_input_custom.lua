@@ -10,7 +10,6 @@ local CustomMatchGroupInput = {}
 
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -370,12 +369,11 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	local overtimes = Array.extractValues(Table.mapValues(mw.text.split(map.overtime or '', ','), tonumber))
 
 	map.extradata = {
 		comment = map.comment,
 		header = map.header,
-		overtime = Table.isNotEmpty(overtimes) and Json.stringify(overtimes) or nil
+		overtime = Logic.readBool(map.overtime)
 	}
 	return map
 end
