@@ -32,11 +32,11 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 	function(self, opponent, options)
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 
-		if opponent.type == 'team' then
+		if opponent.type == Opponent.team then
 			self:createTeam(opponent.template or 'tbd', options)
-		elseif opponent.type == 'solo' or opponent.type == 'duo' then
+		elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
 			self:createParty(opponent)
-		elseif opponent.type == 'literal' then
+		elseif opponent.type == Opponent.literal then
 			self:createLiteral(opponent.name or '')
 		end
 
@@ -111,10 +111,10 @@ end
 OpponentDisplay.propTypes.InlineOpponent = {
 	flip = 'boolean?',
 	opponent = MatchGroupUtil.types.GameOpponent,
-	showFlag = 'boolean?', -- only affects opponent.type == 'solo'
-	showLink = 'boolean?', -- only affects opponent.type == 'solo'
-	dq = 'boolean?', -- only affects opponent.type == 'solo'
-	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle), -- only affects opponent.type == 'team'
+	showFlag = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	showLink = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	dq = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle), -- only affects Opponent.team
 }
 
 --[[
@@ -125,15 +125,15 @@ function OpponentDisplay.InlineOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 
-	if opponent.type == 'team' then
+	if opponent.type == Opponent.team then
 		return OpponentDisplay.InlineTeamContainer({
 			flip = props.flip,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
-	elseif opponent.type == 'literal' then
+	elseif opponent.type == Opponent.literal then
 		return opponent.name or ''
-	elseif opponent.type == 'solo' or opponent.type == 'duo' then
+	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
 		return OpponentDisplay.InlinePlayers(props)
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
@@ -176,7 +176,7 @@ function OpponentDisplay.BlockOpponent(props)
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
-	if opponent.type == 'team' then
+	if opponent.type == Opponent.team then
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
@@ -184,13 +184,13 @@ function OpponentDisplay.BlockOpponent(props)
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
-	elseif opponent.type == 'literal' then
+	elseif opponent.type == Opponent.literal then
 		return OpponentDisplay.BlockLiteral({
 			flip = props.flip,
 			name = opponent.name or '',
 			overflow = props.overflow,
 		})
-	elseif opponent.type == 'solo' or opponent.type == 'duo' then
+	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
 		return OpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
