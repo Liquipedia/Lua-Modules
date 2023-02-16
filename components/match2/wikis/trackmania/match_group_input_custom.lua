@@ -154,6 +154,17 @@ function matchFunctions.getVodStuff(match)
 	return match
 end
 
+function matchFunctions.isFeatured(match)
+	if
+		tonumber(match.liquipediatier or '') == 1
+		or tonumber(match.liquipediatier or '') == 2
+		or not String.isEmpty(Variables.varDefault('match_featured_override'))
+	then
+		return true
+	end
+	return false
+end
+
 function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
@@ -173,8 +184,12 @@ function matchFunctions.getExtraData(match)
 		and opponent2.type == Opponent.team
 
 	match.extradata = {
+		lastgame = Variables.varDefault('last_game'),
 		showh2h = showh2h,
+		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
+		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}
 	return match
 end
