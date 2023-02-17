@@ -8,6 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
@@ -48,18 +49,27 @@ end
 function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	-- Need links in LPDB, so declare them outside of display code
+
+	--- Transform data
+	-- Links
 	local links = Links.transform(args)
 
+	-- Team Information
 	local team = args.teamtemplate or self.pagename
 	self.teamTemplate = mw.ext.TeamTemplate.teamexists(team) and mw.ext.TeamTemplate.raw(team) or {}
 
+	args.imagedark = args.imagedark or args.imagedarkmode or args.image or self.teamTemplate.imagedark
+	args.image = args.image or self.teamTemplate.image
+	args.teamcardimagedark = self.teamTemplate.imagedark or args.teamcardimagedark or args.teamcardimage
+	args.teamcardimage = self.teamTemplate.image or args.teamcardimage
+
+	-- Display
 	local widgets = {
 		Header{
 			name = args.name,
-			image = args.image,
+			image = not Game.isDefaultTeamLogo{logo = args.image} and args.image or nil,
 			imageDefault = args.default,
-			imageDark = args.imagedark or args.imagedarkmode,
+			imageDark = not Game.isDefaultTeamLogo{logo = args.imagedark} and args.imagedark or nil,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize,
 		},
@@ -181,6 +191,7 @@ function Team:createInfobox()
 	}
 	infobox:bottom(self:createBottomContent())
 
+	-- Categories
 	if self:shouldStore(args) then
 		infobox:categories('Teams')
 		infobox:categories(unpack(self:getWikiCategories(args)))
@@ -188,6 +199,7 @@ function Team:createInfobox()
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
+	-- Store LPDB data and Wiki-variables
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
 		self:defineCustomPageVariables(args)
@@ -254,10 +266,10 @@ function Team:_setLpdbData(args, links)
 		location2 = self:getStandardLocationValue(args.location2),
 		region = args.region,
 		locations = Locale.formatLocations(args),
-		logo = args.image or self.teamTemplate.image,
-		logodark = args.imagedark or args.imagedarkmode or args.image or self.teamTemplate.imagedark,
-		textlesslogo = self.teamTemplate.image or args.teamcardimage,
-		textlesslogodark = self.teamTemplate.imagedark or args.teamcardimagedark or args.teamcardimage,
+		logo = args.image,
+		logodark = args.imagedark,
+		textlesslogo = args.teamcardimage,
+		textlesslogodark = args.teamcardimagedark,
 		earnings = earnings,
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
