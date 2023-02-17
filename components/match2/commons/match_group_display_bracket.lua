@@ -169,6 +169,7 @@ end
 function BracketDisplay._computeOpponentHeight(opponentType, defaultOpponentHeight)
 	local numberOfRows = Opponent.partySize(opponentType) or 1
 
+	-- remove padding then multipy it by player rows and after that add padding once
 	return numberOfRows * (defaultOpponentHeight - OPPONENT_HEIGHT_PADDING) + OPPONENT_HEIGHT_PADDING
 end
 
