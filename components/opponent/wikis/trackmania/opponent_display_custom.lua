@@ -6,62 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
 
 local OpponentDisplayCustom = Table.deepCopy(OpponentDisplay)
 
 local SCORE_STATUS = 'S'
 local NO_SCORE = -1
 local ZERO_SCORE = 0
-
---[[
-Display component for an opponent entry appearing in a bracket match.
-]]
-OpponentDisplayCustom.BracketOpponentEntry = Class.new(
-	function(self, opponent, options)
-		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
-
-		if opponent.type == Opponent.team then
-			self:createTeam(opponent.template or 'tbd', options)
-		elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
-			self:createPlayers(opponent)
-		elseif opponent.type == Opponent.literal then
-			self:createLiteral(opponent.name or '')
-		end
-
-		self.root = mw.html.create('div'):addClass('brkts-opponent-entry')
-			:node(self.content)
-	end
-)
-
-OpponentDisplayCustom.BracketOpponentEntry.createTeam = OpponentDisplay.BracketOpponentEntry.createTeam
-
-OpponentDisplayCustom.BracketOpponentEntry.createLiteral = OpponentDisplay.BracketOpponentEntry.createLiteral
-
-function OpponentDisplayCustom.BracketOpponentEntry:createPlayers(opponent)
-	if opponent.type == Opponent.solo then
-		local playerNode = PlayerDisplay.BlockPlayer({
-			player = opponent.players[1],
-			overflow = 'ellipsis',
-		})
-		self.content:node(playerNode)
-	else
-		local playersNode = OpponentDisplayCustom.PlayerInlineOpponent{
-			opponent = opponent
-		}
-
-		self.content:node(playersNode)
-	end
-end
 
 function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 	local extradata = opponent.extradata or {}
@@ -103,82 +59,6 @@ function OpponentDisplayCustom.InlineScore(opponent, scoreIndex)
 		end
 	end
 	return score or status or ''
-end
-
---[[
-Displays an opponent as a block element. The width of the component is
-determined by its layout context, and not of the opponent.
-]]
-function OpponentDisplayCustom.BlockOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
-	local opponent = props.opponent
-
-	if opponent.type == Opponent.solo or opponent.type == Opponent.duo then
-		-- Default TBDs to not show links
-		local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
-		return OpponentDisplayCustom.PlayerBlockOpponent(
-			Table.merge(props, {showLink = showLink})
-		)
-	end
-
-	return OpponentDisplay.BlockOpponent(props)
-end
-
---[[
-Displays a player opponent (solo or duo) as an inline element.
-]]
-function OpponentDisplayCustom.PlayerInlineOpponent(props)
-	local opponent = props.opponent
-
-	local playerTexts = Array.map(opponent.players, function(player)
-		local node = PlayerDisplay.InlinePlayer({
-			flip = props.flip,
-			player = player,
-			showFlag = props.showFlag,
-			showLink = props.showLink
-		})
-		return tostring(node)
-	end)
-	if props.flip then
-		playerTexts = Array.reverse(playerTexts)
-	end
-
-	local playersNode = table.concat(playerTexts, ' / ')
-
-	return mw.html.create('span')
-		:node(playersNode)
-end
-
---[[
-Displays a player opponent (solo or duo) as a block element.
-]]
-function OpponentDisplayCustom.PlayerBlockOpponent(props)
-	local opponent = props.opponent
-
-	local playerNodes = Array.map(opponent.players, function(player)
-		return PlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
-			player = player,
-			showFlag = props.showFlag,
-			showLink = props.showLink,
-			showPlayerTeam = props.showPlayerTeam,
-			team = player.team,
-			abbreviateTbd = props.abbreviateTbd
-		})
-			:addClass(props.playerClass)
-	end)
-
-	if opponent.type == Opponent.solo then
-		return playerNodes[1]
-	else
-		local playersNode = mw.html.create('div')
-			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
-		for _, playerNode in ipairs(playerNodes) do
-			playersNode:node(playerNode)
-		end
-		return playersNode
-	end
 end
 
 return Class.export(OpponentDisplayCustom)
