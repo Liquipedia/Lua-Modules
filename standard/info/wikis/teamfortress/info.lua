@@ -16,16 +16,16 @@ return {
 			name = 'Team Fortress 2',
 			link = 'Team Fortress 2',
 			logo = {
-				darkMode = 'Team_Fortress_logo.png',
-				lightMode = 'Team_Fortress_logo.png',
+				darkMode = 'Team Fortress logo.png',
+				lightMode = 'Team Fortress logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Team_Fortress_logo.png',
-				lightMode = 'Team_Fortress_logo.png',
+				darkMode = 'Team Fortress logo.png',
+				lightMode = 'Team Fortress logo.png',
 			},
 		},
 	},
 	defaultGame = 'tf2',
-	defaultTeamLogo = 'Team_Fortress_logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Team_Fortress_logo.png', ---@deprecated
+	defaultTeamLogo = 'Team Fortress logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Team Fortress logo.png', ---@deprecated
 }
