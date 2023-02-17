@@ -49,10 +49,9 @@ local GAMES = {
 	[GAME_REIGN] = 'Reing of Chaos',
 }
 
-local DUOS = '2v2'
 local MODES = {
 	team = {tier = 'Team', store = 'team'},
-	[DUOS] = {tier = ' 2v2', store = '2v2'},
+	['2v2'] = {tier = ' 2v2', store = '2v2'},
 	default = {store = '1v1'},
 }
 
@@ -93,6 +92,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
+	league.getCategories = CustomLeague.getCategories
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
@@ -442,22 +442,25 @@ function CustomLeague._determineGame()
 	return GAME_FROZEN_THRONE
 end
 
-function CustomLeague:getWikiCategories()
-	local categories = {}
+function CustomLeague:getCategories(args)
+	return self:getWikiCategories(args)
+end
 
-	if String.isNotEmpty(_args.eslprotier) then
+function CustomLeague:getWikiCategories(args)
+	local categories = {
+		'Tournaments',
+		(MODES[args.mode] or 'Individual') .. ' Tournaments',
+	}
+
+	if String.isNotEmpty(args.eslprotier) then
 		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 
-	if GAMES[_args.game] then
-		table.insert(categories, GAMES[_args.game] .. ' Competitions')
+	if GAMES[args.game] then
+		table.insert(categories, GAMES[args.game] .. ' Competitions')
 	end
 
-	if _args.mode == DUOS then
-		table.insert(categories, '2v2 Tournaments')
-	end
-
-	local tier = tonumber(_args.liquipediatier)
+	local tier = tonumber(args.liquipediatier)
 	if tier == TIER_1 or tier == TIER_2 then
 		table.insert(categories, 'Big Tournaments')
 	else
