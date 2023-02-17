@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 
@@ -15,8 +16,9 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabl
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
-local Title = Widgets.Title
+local Cell = Widgets.Cell
 local Center = Widgets.Center
+local Title = Widgets.Title
 
 local _league
 
@@ -37,7 +39,14 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'customcontent' then
+	if id == 'gamesettings' then
+		local server = _league.args.server
+		if server then
+			return {Cell{name = 'Server', content = {
+				Flags.Icon(server) .. Flags.CountryName(server)
+			}}}
+		end
+	elseif id == 'customcontent' then
 		local maps = Array.map(_league:getAllArgsForBase(_league.args, 'bg'), function(map)
 			return tostring(CustomLeague:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
 		end)
