@@ -56,7 +56,7 @@ function Team:createInfobox()
 
 	-- Team Information
 	local team = args.teamtemplate or self.pagename
-	self.teamTemplate = mw.ext.TeamTemplate.teamexists(team) and mw.ext.TeamTemplate.raw(team) or {}
+	self.teamTemplate = mw.ext.TeamTemplate.raw(team) or {}
 
 	args.imagedark = args.imagedark or args.imagedarkmode or args.image or self.teamTemplate.imagedark
 	args.image = args.image or self.teamTemplate.image
