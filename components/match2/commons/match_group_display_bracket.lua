@@ -160,7 +160,7 @@ function BracketDisplay.computeBracketOpponentHeight(matchesById, defaultOpponen
 	end
 
 	if maxHeight == -1 then
-		return config.opponentHeight
+		return defaultOpponentHeight
 	end
 
 	return maxHeight
