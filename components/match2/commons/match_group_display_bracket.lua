@@ -159,10 +159,6 @@ function BracketDisplay.computeBracketOpponentHeight(matchesById, defaultOpponen
 		end
 	end
 
-	if maxHeight == -1 then
-		return defaultOpponentHeight
-	end
-
 	return maxHeight
 end
 
