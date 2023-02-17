@@ -151,7 +151,7 @@ function BracketDisplay.Bracket(props)
 end
 
 function BracketDisplay.computeBracketOpponentHeight(matchesById, defaultOpponentHeight)
-	local maxHeight = -1
+	local maxHeight = defaultOpponentHeight
 
 	for _, match in pairs(matchesById) do
 		for _, opponent in ipairs(match.opponents) do
