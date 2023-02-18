@@ -19,6 +19,8 @@ local SCORE_STATUS = 'S'
 local NO_SCORE = -1
 local ZERO_SCORE = 0
 
+OpponentDisplayCustom.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry)
+
 function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 	local extradata = opponent.extradata or {}
 	if not extradata.additionalScores then
