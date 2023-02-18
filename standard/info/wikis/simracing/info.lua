@@ -336,19 +336,6 @@ return {
 				lightMode = 'Gran Turismo default allmode.png',
 			},
 		},
-		['gt4'] = {
-			abbreviation = 'GT4',
-			name = 'Gran Turismo 4',
-			link = 'Gran Turismo 4',
-			logo = {
-				darkMode = 'Gran Turismo default allmode.png',
-				lightMode = 'Gran Turismo default allmode.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'Gran Turismo default allmode.png',
-				lightMode = 'Gran Turismo default allmode.png',
-			},
-		},
 		['gt5'] = {
 			abbreviation = 'GT5',
 			name = 'Gran Turismo 5',
@@ -427,7 +414,7 @@ return {
 				lightMode = 'Dirt Rally default allmode.png',
 			},
 		},
-		['dr'] = {
+		['dr2'] = {
 			abbreviation = 'DR2',
 			name = 'DiRT Rally 2.0',
 			link = 'DiRT Rally 2.0',
