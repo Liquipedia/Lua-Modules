@@ -193,7 +193,7 @@ return {
 				lightMode = 'F1 2018 allmode.png',
 			},
 		},
-		['heat3'] = {
+		heat3 = {
 			abbreviation = 'Heat 3',
 			name = 'NASCAR Heat 3',
 			link = 'NASCAR Heat 3',
@@ -206,7 +206,7 @@ return {
 				lightMode = 'Nascar Heat default allmode.png',
 			},
 		},
-		['heat4'] = {
+		heat4 = {
 			abbreviation = 'Heat 4',
 			name = 'NASCAR Heat 4',
 			link = 'NASCAR Heat 4',
@@ -219,7 +219,7 @@ return {
 				lightMode = 'Nascar Heat default allmode.png',
 			},
 		},
-		['rf2'] = {
+		rf2 = {
 			abbreviation = 'rF2',
 			name = 'rFactor 2',
 			link = 'rFactor 2',
@@ -232,7 +232,7 @@ return {
 				lightMode = 'RFactor 2 default allmode.png',
 			},
 		},
-		['rf1'] = {
+		rf1 = {
 			abbreviation = 'rF1',
 			name = 'rFactor',
 			link = 'rFactor',
@@ -245,7 +245,7 @@ return {
 				lightMode = 'RFactor 1 default allmode.png',
 			},
 		},
-		['pc1'] = {
+		pc1 = {
 			abbreviation = 'PCARS',
 			name = 'Project CARS',
 			link = 'Project CARS',
@@ -258,7 +258,7 @@ return {
 				lightMode = 'Project CARS default allmode.png',
 			},
 		},
-		['pc2'] = {
+		pc2 = {
 			abbreviation = 'PCARS 2',
 			name = 'Project CARS 2',
 			link = 'Project CARS 2',
@@ -323,7 +323,7 @@ return {
 				lightMode = 'Live For Speed default allmode.png',
 			},
 		},
-		['gt4'] = {
+		gt4 = {
 			abbreviation = 'GT4',
 			name = 'Gran Turismo 4',
 			link = 'Gran Turismo 4',
@@ -336,7 +336,7 @@ return {
 				lightMode = 'Gran Turismo default allmode.png',
 			},
 		},
-		['gt5'] = {
+		gt5 = {
 			abbreviation = 'GT5',
 			name = 'Gran Turismo 5',
 			link = 'Gran Turismo 5',
@@ -349,7 +349,7 @@ return {
 				lightMode = 'Gran Turismo default allmode.png',
 			},
 		},
-		['gt6'] = {
+		gt6 = {
 			abbreviation = 'GT6',
 			name = 'Gran Turismo 6',
 			link = 'Gran Turismo 6',
@@ -362,7 +362,7 @@ return {
 				lightMode = 'Gran Turismo default allmode.png',
 			},
 		},
-		['gt7'] = {
+		gt7 = {
 			abbreviation = 'GT7',
 			name = 'Gran Turismo 7',
 			link = 'Gran Turismo 7',
@@ -388,7 +388,7 @@ return {
 				lightMode = 'Gran Turismo default allmode.png',
 			},
 		},
-		['dirt4'] = {
+		dirt4 = {
 			abbreviation = 'D4',
 			name = 'DiRT 4',
 			link = 'DiRT 4',
@@ -401,7 +401,7 @@ return {
 				lightMode = 'Dirt 4 default allmode.png',
 			},
 		},
-		['dr'] = {
+		dr = {
 			abbreviation = 'DR',
 			name = 'DiRT Rally',
 			link = 'DiRT Rally',
@@ -414,7 +414,7 @@ return {
 				lightMode = 'Dirt Rally default allmode.png',
 			},
 		},
-		['dr2'] = {
+		dr2 = {
 			abbreviation = 'DR2',
 			name = 'DiRT Rally 2.0',
 			link = 'DiRT Rally 2.0',
@@ -427,7 +427,7 @@ return {
 				lightMode = 'Dirt Rally 2 default allmode.png',
 			},
 		},
-		['motogp17'] = {
+		motogp17 = {
 			abbreviation = 'MotoGP 17',
 			name = 'MotoGP 17',
 			link = 'MotoGP 17',
@@ -440,7 +440,7 @@ return {
 				lightMode = 'Motogp17 default allmode.png',
 			},
 		},
-		['motogp18'] = {
+		motogp18 = {
 			abbreviation = 'MotoGP 18',
 			name = 'MotoGP 18',
 			link = 'MotoGP 18',
@@ -453,7 +453,7 @@ return {
 				lightMode = 'Motogp18 default allmode.png',
 			},
 		},
-		['motogp19'] = {
+		motogp19 = {
 			abbreviation = 'MotoGP 19',
 			name = 'MotoGP 19',
 			link = 'MotoGP 19',
@@ -466,7 +466,7 @@ return {
 				lightMode = 'Motogp19 default allmode.png',
 			},
 		},
-		['motogp20'] = {
+		motogp20 = {
 			abbreviation = 'MotoGP 20',
 			name = 'MotoGP 20',
 			link = 'MotoGP 20',
@@ -479,7 +479,7 @@ return {
 				lightMode = 'Motogp20 default allmode.png',
 			},
 		},
-		['motogp21'] = {
+		motogp21 = {
 			abbreviation = 'MotoGP 21',
 			name = 'MotoGP 21',
 			link = 'MotoGP 21',
@@ -492,7 +492,7 @@ return {
 				lightMode = 'Motogp21 default allmode.png',
 			},
 		},
-		['motogp22'] = {
+		motogp22 = {
 			abbreviation = 'MotoGP 22',
 			name = 'MotoGP 22',
 			link = 'MotoGP 22',
@@ -505,7 +505,7 @@ return {
 				lightMode = 'Motogp22 default allmode.png',
 			},
 		},
-		['motogp23'] = {
+		motogp23 = {
 			abbreviation = 'MotoGP 23',
 			name = 'MotoGP 23',
 			link = 'MotoGP 23',
@@ -609,7 +609,85 @@ return {
 				lightMode = 'Forza Motorsports default lightmode.png',
 			},
 		},
-		['pgr2'] = {
+		['wrc 5'] = {
+			abbreviation = 'WRC 5',
+			name = 'WRC 5',
+			link = 'WRC 5',
+			logo = {
+				darkMode = 'WRC 5 default allmode.png',
+				lightMode = 'WRC 5 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'WRC 5 default allmode.png',
+				lightMode = 'WRC 5 default allmode.png',
+			},
+		},
+		['wrc 6'] = {
+			abbreviation = 'WRC 6',
+			name = 'WRC 6',
+			link = 'WRC 6',
+			logo = {
+				darkMode = 'WRC 6 default allmode.png',
+				lightMode = 'WRC 6 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'WRC 6 default allmode.png',
+				lightMode = 'WRC 6 default allmode.png',
+			},
+		},
+		['wrc 7'] = {
+			abbreviation = 'WRC 7',
+			name = 'WRC 7',
+			link = 'WRC 7',
+			logo = {
+				darkMode = 'WRC 7 default darkmode.png',
+				lightMode = 'WRC 7 default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'WRC 7 default darkmode.png',
+				lightMode = 'WRC 7 default lightmode.png',
+			},
+		},
+		['wrc 8'] = {
+			abbreviation = 'WRC 8',
+			name = 'WRC 8',
+			link = 'WRC 8',
+			logo = {
+				darkMode = 'WRC 8 default darkmode.png',
+				lightMode = 'WRC 8 default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'WRC 8 default darkmode.png',
+				lightMode = 'WRC 8 default lightmode.png',
+			},
+		},
+		['wrc 9'] = {
+			abbreviation = 'WRC 9',
+			name = 'WRC 9',
+			link = 'WRC 9',
+			logo = {
+				darkMode = 'WRC 9 default darkmode.png',
+				lightMode = 'WRC 9 default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'WRC 9 default darkmode.png',
+				lightMode = 'WRC 9 default lightmode.png',
+			},
+		},
+		['wrc 10'] = {
+			abbreviation = 'WRC 10',
+			name = 'WRC 10',
+			link = 'WRC 10',
+			logo = {
+				darkMode = 'WRC 10 default darkmode.png',
+				lightMode = 'WRC 10 default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'WRC 10 default darkmode.png',
+				lightMode = 'WRC 10 default lightmode.png',
+			},
+		},
+		pgr2 = {
 			abbreviation = 'PGR 2',
 			name = 'Project Gotham Racing 2',
 			link = 'Project Gotham Racing 2',
@@ -622,7 +700,7 @@ return {
 				lightMode = 'PGR2 default allmode.png',
 			},
 		},
-		['pgr3'] = {
+		pgr3 = {
 			abbreviation = 'PGR 3',
 			name = 'Project Gotham Racing 3',
 			link = 'Project Gotham Racing 3',
@@ -635,7 +713,7 @@ return {
 				lightMode = 'PGR default lightmode.png',
 			},
 		},
-		['pgr4'] = {
+		pgr4 = {
 			abbreviation = 'PGR 4',
 			name = 'Project Gotham Racing 4',
 			link = 'Project Gotham Racing 4',
@@ -648,7 +726,7 @@ return {
 				lightMode = 'PGR default lightmode.png',
 			},
 		},
-		['ug1'] = {
+		ug1 = {
 			abbreviation = 'UG1',
 			name = 'Need for Speed: Underground',
 			link = 'Need for Speed: Underground',
@@ -661,7 +739,7 @@ return {
 				lightMode = 'NFS Underground default allmode.png',
 			},
 		},
-		['ug2'] = {
+		ug2 = {
 			abbreviation = 'UG2',
 			name = 'Need for Speed: Underground 2',
 			link = 'Need for Speed: Underground 2',
@@ -674,7 +752,7 @@ return {
 				lightMode = 'NFS Underground default allmode.png',
 			},
 		},
-		['mw05'] = {
+		mw05 = {
 			abbreviation = 'MW',
 			name = 'Need for Speed: Most Wanted',
 			link = 'Need for Speed: Most Wanted',
@@ -687,7 +765,7 @@ return {
 				lightMode = 'NFS MW05 default allmode.png',
 			},
 		},
-		['carbon'] = {
+		carbon = {
 			abbreviation = 'CB',
 			name = 'Need for Speed: Carbon',
 			link = 'Need for Speed: Carbon',
@@ -700,7 +778,7 @@ return {
 				lightMode = 'NFS Carbon default allmode.png',
 			},
 		},
-		['prostreet'] = {
+		prostreet = {
 			abbreviation = 'PS',
 			name = 'Need for Speed: ProStreet',
 			link = 'Need for Speed: ProStreet',
@@ -713,7 +791,7 @@ return {
 				lightMode = 'NFS Prostreet default allmode.png',
 			},
 		},
-		['shift'] = {
+		shift = {
 			abbreviation = 'Shift',
 			name = 'Need for Speed: Shift',
 			link = 'Need for Speed: Shift',
