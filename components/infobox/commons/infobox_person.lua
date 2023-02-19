@@ -144,7 +144,10 @@ function Person:createInfobox()
 				}}
 			end}
 		}},
-		Cell{name = 'Alternate IDs', content = {args.ids or args.alternateids}},
+		Cell{name = 'Alternate IDs', content = {
+				table.concat(mw.text.split(args.ids or args.alternateids or '', ',%s?'), ' &#8226; ')
+			}
+		},
 		Cell{name = 'Nicknames', content = {args.nicknames}},
 		Builder{
 			builder = function()
