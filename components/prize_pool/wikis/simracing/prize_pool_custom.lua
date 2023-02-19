@@ -24,7 +24,9 @@ local TIER_VALUE = {8, 4, 2}
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
-	local prizePool = PrizePool(args):create()
+	local prizePool = PrizePool(args)
+	prizePool:setConfigDefault('syncPlayers', true)
+	prizePool:create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
