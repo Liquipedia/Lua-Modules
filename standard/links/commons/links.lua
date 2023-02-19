@@ -27,7 +27,10 @@ local PREFIXES = {
 		'http://afreecatv.com/',
 		stream = 'https://play.afreecatv.com/',
 	},
-	aoezone = {'https://aoezone.net/'},
+	aoezone = {
+		'https://aoezone.net/',
+		player = 'https://aoezone.net/members/'
+	},
 	['ask-fm'] = {'https://ask.fm/'},
 	b5csgo = {
 		'',
