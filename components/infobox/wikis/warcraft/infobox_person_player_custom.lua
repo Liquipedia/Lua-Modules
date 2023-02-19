@@ -21,6 +21,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
+local NON_BREAKING_SPACE = '&nbsp;'
 
 local CustomPlayer = Class.new()
 
@@ -47,6 +48,7 @@ function CustomPlayer.run(frame)
 
 	_player.adjustLPDB = CustomPlayer.adjustLPDB
 	_player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	_player.nameDisplay = CustomPlayer.nameDisplay
 
 	return _player:createInfobox()
 end
@@ -94,6 +96,13 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.factionhistorical = Variables.varDefault('racecount') and 'true' or 'false'
 
 	return lpdbData
+end
+
+function CustomPlayer.nameDisplay()
+	local factionIcon = Faction.Icon{faction = Faction.read(_args.race)}
+
+	return (factionIcon and (factionIcon .. NON_BREAKING_SPACE) or '')
+		.. (_args.id or _player.pagename)
 end
 
 return CustomPlayer

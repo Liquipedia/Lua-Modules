@@ -61,6 +61,7 @@ local PREFIXES = {
 		player = 'https://www.dotabuff.com/esports/players/',
 		team = 'https://www.dotabuff.com/esports/teams/'
 	},
+	douyin = {'https://live.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
 	esea = {
 		'https://play.esea.net/events/',
@@ -95,6 +96,7 @@ local PREFIXES = {
 		team = 'https://csgo.gamersclub.gg/team/',
 		player = 'https://csgo.gamersclub.gg/jogador/',
 	},
+	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
@@ -132,7 +134,10 @@ local PREFIXES = {
 	sk = {'https://sk-gaming.com/member/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
-	['start-gg'] = {'https://start.gg/'},
+	['start-gg'] = {
+		'https://start.gg/',
+		player = 'https://start.gg/user/',
+	},
 	steam = {'https://steamcommunity.com/id/'},
 	steamtv = {'https://steam.tv/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
@@ -204,6 +209,7 @@ local SUFFIXES = {
 SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 
 local ALIASES = {
+	['ask-fm'] = {'afk.fm', 'askfm'},
 	douyu = {'douyutv'},
 	esl = {'eslgaming'},
 	['facebook-gaming'] = {'fbgg'},

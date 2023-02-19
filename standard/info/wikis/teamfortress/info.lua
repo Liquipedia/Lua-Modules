@@ -11,13 +11,13 @@ return {
 	wikiName = 'teamfortress',
 	name = 'Team Fortress',
 	games = {
-		todo = {
-			abbreviation = 'todo',
-			name = 'TODO',
-			link = 'Main Page',
+		tf2 = {
+			abbreviation = 'TF2',
+			name = 'Team Fortress 2',
+			link = 'Team Fortress 2',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Team Fortress logo.png',
+				lightMode = 'Team Fortress logo.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Team Fortress logo.png',
@@ -25,7 +25,7 @@ return {
 			},
 		},
 	},
-	defaultGame = 'todo',
+	defaultGame = 'tf2',
 	defaultTeamLogo = 'Team Fortress logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Team Fortress logo.png', ---@deprecated
 }

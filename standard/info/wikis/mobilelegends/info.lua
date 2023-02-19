@@ -10,7 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'mobilelegends',
 	name = 'Mobile Legends',
-	mobilelegends = {
+	games = {
 		mobilelegends = {
 			abbreviation = 'ML',
 			name = 'Mobile Legends',

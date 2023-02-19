@@ -209,7 +209,7 @@ function StarcraftPlayerExt.syncPlayer(player, options)
 		or options.fetchPlayer ~= false and StarcraftPlayerExt.fetchPlayerRace(player.pageName, options.date)
 		or nonNotable() and nonNotable().race
 		or match2Player() and match2Player().race
-		or 'u'
+		or Faction.defaultFaction
 
 	if options.savePageVar ~= false then
 		StarcraftPlayerExt.saveToPageVars(player)
