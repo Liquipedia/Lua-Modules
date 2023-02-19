@@ -16,12 +16,12 @@ return {
 			name = 'FIFA',
 			link = 'FIFA',
 			logo = {
-				darkMode = 'FIFA darkmode.png',
-				lightMode = 'FIFA lightmode.png',
+				darkMode = 'FIFA darkmode logo.png',
+				lightMode = 'FIFA lightmode logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'FIFA darkmode.png',
-				lightMode = 'FIFA lightmode.png',
+				darkMode = 'FIFA darkmode logo.png',
+				lightMode = 'FIFA lightmode logo.png',
 			},
 		},
 		['2000'] = {
@@ -362,7 +362,7 @@ return {
 				lightMode = 'FIFA Online 2 default allmode.png',
 			},
 		},
-		['o4'] = {
+		['o3'] = {
 			abbreviation = 'FO3',
 			name = 'FIFA Online 3',
 			link = 'FIFA Online 3',
@@ -390,6 +390,6 @@ return {
 		},
 	},
 	defaultGame = 'fifa',
-	defaultTeamLogo = 'FIFA lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'FIFA darkmode.png', ---@deprecated
+	defaultTeamLogo = 'FIFA lightmode logo.png', ---@deprecated
+	defaultTeamLogoDark = 'FIFA darkmode logo.png', ---@deprecated
 }
