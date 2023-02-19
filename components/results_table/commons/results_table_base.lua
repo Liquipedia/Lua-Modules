@@ -77,6 +77,9 @@ function BaseResultsTable:readConfig()
 		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
 		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
+		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), function(alias)
+			return mw.text.trim(alias)
+		end) or {}
 	}
 
 	config.sort = args.sort or
@@ -235,34 +238,38 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 	local config = self.config
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
-	local opponent = config.resolveOpponent
-		and mw.ext.TeamLiquidIntegration.resolve_redirect(config.opponent)
-		or config.opponent
+	local opponents = Array.append(config.aliases, config.opponent)
 
-	local opponentWithUnderscore = opponent:gsub(' ', '_')
+	for _, opponent in pairs(opponents) do
+		opponent = config.resolveOpponent
+			and mw.ext.TeamLiquidIntegration.resolve_redirect(opponent)
+			or opponent
 
-	local prefix
-	if config.queryType == SOLO_TYPE then
-		prefix = PLAYER_PREFIX
-		opponentConditions:add{
-			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent),
-			},
-			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, opponentWithUnderscore),
-			},
-		}
-	else
-		prefix = COACH_PREFIX
-	end
+		local opponentWithUnderscore = opponent:gsub(' ', '_')
 
-	for playerIndex = 1, config.playerLimit do
-		opponentConditions:add{
-			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponent),
-			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponentWithUnderscore),
-		}
+		local prefix
+		if config.queryType == SOLO_TYPE then
+			prefix = PLAYER_PREFIX
+			opponentConditions:add{
+				ConditionTree(BooleanOperator.all):add{
+					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent),
+				},
+				ConditionTree(BooleanOperator.all):add{
+					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponentWithUnderscore),
+				},
+			}
+		else
+			prefix = COACH_PREFIX
+		end
+
+		for playerIndex = 1, config.playerLimit do
+			opponentConditions:add{
+				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponent),
+				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponentWithUnderscore),
+			}
+		end
 	end
 
 	return opponentConditions
@@ -271,13 +278,19 @@ end
 function BaseResultsTable:buildTeamOpponentConditions()
 	local config = self.config
 
-	local rawOpponentTemplate = Team.queryRaw(config.opponent) or {}
-	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-	if not opponentTemplate then
-		error('Missing team template for team: ' .. config.opponent)
-	end
+	local opponents = Array.append(config.aliases, config.opponent)
 
-	local opponentTeamTeplates = Team.queryHistorical(opponentTemplate) or {opponentTemplate}
+	local opponentTeamTeplates = {}
+
+	for _, opponent in pairs(opponents) do
+		local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
+		if not opponentTemplate then
+			error('Missing team template for team: ' .. opponent)
+		end
+
+		Array.appendWith(opponentTeamTeplates, unpack(Team.queryHistorical(opponentTemplate) or {opponentTemplate}))
+	end
 
 	if config.playerResultsOfTeam then
 		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTeplates)
