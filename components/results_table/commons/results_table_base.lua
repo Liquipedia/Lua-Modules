@@ -96,7 +96,7 @@ function BaseResultsTable:readConfig()
 		local rawOpponentTemplate = Team.queryRaw(config.opponent) or {}
 		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 		if not opponentTemplate then
-			error('Missing team template for team: ' .. opponent)
+			error('Missing team template for team: ' .. config.opponent)
 		end
 
 		config.isNotAlias = Team.queryHistorical(opponentTemplate) or {opponentTemplate}
