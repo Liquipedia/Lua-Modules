@@ -92,6 +92,16 @@ function BaseResultsTable:readConfig()
 		(config.queryType == SOLO_TYPE and (tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit))
 		or tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit
 
+	if config.queryType == TEAM_TYPE and Table.isNotEmpty(config.aliases) then
+		local rawOpponentTemplate = Team.queryRaw(config.opponent) or {}
+		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
+		if not opponentTemplate then
+			error('Missing team template for team: ' .. opponent)
+		end
+
+		config.isNotAlias = Team.queryHistorical(opponentTemplate) or {opponentTemplate}
+	end
+
 	return config
 end
 
@@ -439,14 +449,21 @@ function BaseResultsTable:opponentDisplay(data, options)
 
 	local rawTeamTemplate = Team.queryRaw(teamTemplate)
 
-	if not rawTeamTemplate or not Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} then
-		return teamDisplay
+	if self:shouldDisplayAdditionalText(rawTeamTemplate) then
+		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
 	end
 
-	return BaseResultsTable.teamDisplayWithDefaultLogo(teamDisplay, rawTeamTemplate)
+	return teamDisplay
 end
 
-function BaseResultsTable.teamDisplayWithDefaultLogo(teamDisplay, rawTeamTemplate)
+function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, opponentType)
+	return rawTeamTemplate and (
+		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
+		(self.config.isNotAlias and not Table.includes(self.config.isNotAlias, rawTeamTemplate.templatename))
+	)
+end
+
+function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
 	return mw.html.create()
 		:node(teamDisplay)
 		:node(mw.html.create('div')
