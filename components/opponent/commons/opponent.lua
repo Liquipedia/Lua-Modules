@@ -273,7 +273,7 @@ function Opponent.toName(opponent)
 		return TeamTemplate.getPageName(opponent.template)
 	elseif Opponent.typeIsParty(opponent.type) then
 		local pageNames = Array.map(opponent.players, function(player)
-				local pageName = player.pageName or player.displayName
+			local pageName = player.pageName or player.displayName
 			return pageName and pageName:gsub(' ', '_') or nil
 		end)
 		return table.concat(pageNames, ' / ')
