@@ -422,7 +422,7 @@ function Import._mergePlacement(lpdbEntries, placement)
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
 		placement.opponents[opponentIndex] = Import._mergeEntry(
 			opponent,
-			Table.mergeInto(placement:_parseOpponents{{}}[1], placement.opponents[opponentIndex]),
+			Table.mergeInto(placement:parseOpponents{{}}[1], placement.opponents[opponentIndex]),
 			placement
 		)
 	end
@@ -491,7 +491,7 @@ function Import._entryToOpponent(lpdbEntry, placement)
 
 	local lastVs = Import._checkIfParsed(additionalData.lastVs or Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))
 
-	return placement:_parseOpponents{{
+	return placement:parseOpponents{{
 		Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.opponent)),
 		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
