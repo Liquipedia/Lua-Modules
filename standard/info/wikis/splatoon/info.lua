@@ -11,7 +11,7 @@ return {
 	wikiName = 'splatoon',
 	name = 'Splatoon',
 	games = {
-		splatoon = {
+		['1'] = {
 			abbreviation = 'SP1',
 			name = 'Splatoon',
 			link = 'Splatoon',
@@ -24,7 +24,7 @@ return {
 				lightMode = 'Splatoon default lightmode.png',
 			},
 		},
-		['splatoon 2'] = {
+		['2'] = {
 			abbreviation = 'SP2',
 			name = 'Splatoon 2',
 			link = 'Splatoon 2',
@@ -37,7 +37,7 @@ return {
 				lightMode = 'Splatoon 2 default allmode.png',
 			},
 		},
-		['splatoon 3'] = {
+		['3'] = {
 			abbreviation = 'SP3',
 			name = 'Splatoon 3',
 			link = 'Splatoon 3',
