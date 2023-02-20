@@ -413,9 +413,8 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 
 	return Placement(
 		{placeStart = placeStart, placeEnd = placeEnd, count = placementSize},
-		_parent,
-		priorPlacement.placeEnd or 0
-	)
+		_parent
+	):create(priorPlacement.placeEnd or 0)
 end
 
 function Import._mergePlacement(lpdbEntries, placement)
