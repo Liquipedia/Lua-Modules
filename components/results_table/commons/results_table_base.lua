@@ -317,13 +317,13 @@ function BaseResultsTable:buildTeamOpponentConditions()
 		}
 end
 
-function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTeplates)
+function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 	local config = self.config
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	local prefix = PLAYER_PREFIX
-	for _, teamTemplate in pairs(opponentTeamTeplates) do
+	for _, teamTemplate in pairs(opponentTeamTemplates) do
 		for playerIndex = 1, config.playerLimit do
 			opponentConditions:add{
 				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'template'), Comparator.eq, teamTemplate),
