@@ -100,7 +100,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Liquipedia tier',
 				content = {CustomLeague:_createLiquipediaTierDisplay()},
-				classes = {Logic.readBool(_args.featured) and 'sc2premier-highlighted' or ''}
+				classes = {Logic.readBool(_args.featured) and 'tournament-highlighted-bg' or ''}
 			},
 		}
 	elseif id == 'chronology' then
