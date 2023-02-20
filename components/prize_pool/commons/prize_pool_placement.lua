@@ -11,13 +11,18 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MatchPlacement = require('Module:Match/Placement')
 local Ordinal = require('Module:Ordinal')
 local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local BasePlacement = Lua.import('Module:PrizePool/Placement/Base', {requireDevIfEnabled = true})
+
 local Opponent = require('Module:OpponentLibraries').Opponent
+
+local _tbd_index = 0
 
 local DASH = '&#045;'
 
@@ -27,14 +32,12 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 -- Allowed none-numeric score values.
 local SPECIAL_SCORES = {'W', 'FF' , 'L', 'DQ', 'D'}
 
-local _tbd_index = 0
-
 --- @class Placement
 --- A Placement is a set of opponents who all share the same final place in the tournament.
---- Its input is generally a table created by `Template:Placement`.
---- It has a range from placeStart to placeEnd, for example 5 to 8
---- and is expected to have the same amount of opponents as the range allows (4 is the 5-8 example).
-local Placement = Class.new(function(self, ...) self:init(...) end)
+--- Its input is generally a table created by `Template:Slot`.
+--- It has a range from placeStart to placeEnd, for example 5 to 8, or count (slotSize)
+--- and is expected to have at maximum the same amount of opponents as the range allows (4 is the 5-8 example).
+local Placement = Class.new(BasePlacement)
 
 Placement.specialStatuses = {
 	DQ = {
@@ -112,7 +115,7 @@ Placement.additionalData = {
 	LASTVS = {
 		field = 'lastvs',
 		parse = function (placement, input, context)
-			return placement:_parseOpponentArgs(input, context.date)
+			return placement:parseOpponentArgs(input, context.date)
 		end
 	},
 	LASTVSSCORE = {
@@ -142,23 +145,11 @@ Placement.additionalData = {
 	},
 }
 
---- @class Placement
---- @param args table Input information
---- @param parent PrizePool The PrizePool this Placement is part of
 --- @param lastPlacement integer The previous placement's end
-function Placement:init(args, parent, lastPlacement)
-	self.args = self:_parseArgs(args)
-	self.parent = parent
-	self.prizeTypes = parent.prizeTypes
-	self.date = self.args.date or parent.date
-	self.placeStart = self.args.placeStart
-	self.placeEnd = self.args.placeEnd
-	self.count = self.args.count
-	self.hasBaseCurrency = false
+function Placement:create(lastPlacement)
+	self:_parseArgs()
 
-	self.prizeRewards = self:_readPrizeRewards(self.args)
-
-	self.opponents = self:_parseOpponents(self.args)
+	self.opponents = self:parseOpponents(self.args)
 
 	self.count = self.count or math.max(#self.opponents, 1)
 
@@ -172,68 +163,33 @@ function Placement:init(args, parent, lastPlacement)
 
 	assert(#self.opponents <= self.count,
 		'Placement: Too many opponents in place ' .. self:_displayPlace():gsub('&#045;', '-'))
+
+	return self
 end
 
-function Placement:_parseArgs(args)
-	local parsedArgs = Table.deepCopy(args)
+function Placement:_parseArgs()
+	local args = self.args
 
-	parsedArgs.count = tonumber(args.count)
+	self.count = tonumber(args.count)
 
 	-- Explicit place range has been given
 	if args.place then
 		local places = Table.mapValues(mw.text.split(args.place, '-'), tonumber)
-		parsedArgs.placeStart = places[1]
-		parsedArgs.placeEnd = places[2] or places[1]
-		assert(parsedArgs.placeStart and parsedArgs.placeEnd, 'Placement: Invalid |place= provided.')
+		self.placeStart = places[1]
+		self.placeEnd = places[2] or places[1]
+		assert(self.placeStart and self.placeEnd, 'Placement: Invalid |place= provided.')
 
-		local calculatedCount = parsedArgs.placeEnd - parsedArgs.placeStart + 1
-		parsedArgs.count = parsedArgs.count or calculatedCount
+		local calculatedCount = self.placeEnd - self.placeStart + 1
+		self.count = self.count or calculatedCount
 
-		assert(parsedArgs.count <= calculatedCount,
-			'Placement: Invalid count (' .. parsedArgs.count .. ') and placement (' .. args.place .. ') combination')
+		assert(self.count <= calculatedCount,
+			'Placement: Invalid count (' .. args.count .. ') and placement (' .. args.place .. ') combination')
 	end
-
-	return parsedArgs
-end
-
---- Parse the input for available rewards of prizes, for instance how much money a team would win.
---- This also checks if the Placement instance has a dollar reward and assigns a variable if so.
-function Placement:_readPrizeRewards(args)
-	local rewards = {}
-
-	-- Loop through all prizes that have been defined in the header
-	Array.forEach(self.parent.prizes, function (prize)
-		local prizeData = self.prizeTypes[prize.type]
-		local fieldName = prizeData.row
-		if not fieldName then
-			return
-		end
-
-		local prizeIndex = prize.index
-		local reward = args[fieldName .. prizeIndex]
-		if prizeIndex == 1 then
-			reward = reward or args[fieldName]
-		end
-		if not reward then
-			return
-		end
-
-		rewards[prize.id] = prizeData.rowParse(self, reward, args, prizeIndex)
-	end)
-
-	-- Special case for Base Currency, as it's not defined in the header.
-	local baseType = self.prizeTypes[PRIZE_TYPE_BASE_CURRENCY]
-	if baseType.row and args[baseType.row] then
-		self.hasBaseCurrency = true
-		rewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseType.rowParse(self, args[baseType.row], args, 1)
-	end
-
-	return rewards
 end
 
 --- Parse and set additional data fields for opponents.
 -- This includes fields such as group stage score (wdl) and last versus (lastvs).
-function Placement:_readAdditionalData(args)
+function Placement:readAdditionalData(args)
 	local data = {}
 
 	for prizeType, typeData in pairs(self.additionalData) do
@@ -246,41 +202,7 @@ function Placement:_readAdditionalData(args)
 	return data
 end
 
-function Placement:_parseOpponents(args)
-	return Array.mapIndexes(function(opponentIndex)
-		local opponentInput = Json.parseIfString(args[opponentIndex])
-		local opponent = {opponentData = {}, prizeRewards = {}, additionalData = {}}
-		if not opponentInput then
-			if self:_shouldAddTbdOpponent(opponentIndex) then
-				opponent.opponentData = Opponent.tbd(self.parent.opponentType)
-			else
-				return
-			end
-		else
-			-- Set the date
-			if not Placement._isValidDateFormat(opponentInput.date) then
-				opponentInput.date = self.date
-			end
-
-			-- Parse Opponent Data
-			if opponentInput.type then
-				self.parent:assertOpponentStructType(opponentInput)
-			else
-				opponentInput.type = self.parent.opponentType
-			end
-			opponent.opponentData = self:_parseOpponentArgs(opponentInput, opponentInput.date)
-
-			opponent.prizeRewards = self:_readPrizeRewards(opponentInput)
-			opponent.additionalData = self:_readAdditionalData(opponentInput)
-
-			-- Set date
-			opponent.date = opponentInput.date
-		end
-		return opponent
-	end)
-end
-
-function Placement:_shouldAddTbdOpponent(opponentIndex)
+function Placement:shouldAddTbdOpponent(opponentIndex, place)
 	-- We want at least 1 opponent present for all placements
 	if opponentIndex == 1 then
 		return true
@@ -294,26 +216,6 @@ function Placement:_shouldAddTbdOpponent(opponentIndex)
 		return true
 	end
 	return false
-end
-
-function Placement:_parseOpponentArgs(input, date)
-	-- Allow for lua-table, json-table and just raw string input
-	local opponentArgs = Json.parseIfTable(input) or (type(input) == 'table' and input or {input})
-	opponentArgs.type = opponentArgs.type or self.parent.opponentType
-	assert(Opponent.isType(opponentArgs.type), 'Invalid type')
-
-	local opponentData
-	if type(opponentArgs[1]) == 'table' and opponentArgs[1].isAlreadyParsed then
-		opponentData = opponentArgs[1]
-	elseif type(opponentArgs[1]) ~= 'table' then
-		opponentData = Opponent.readOpponentArgs(opponentArgs)
-	end
-
-	if not opponentData or (Opponent.isTbd(opponentData) and opponentData.type ~= Opponent.literal) then
-		opponentData = Table.deepMergeInto(Opponent.tbd(opponentArgs.type), opponentData or {})
-	end
-
-	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers})
 end
 
 function Placement:_getLpdbData(...)
@@ -382,7 +284,7 @@ function Placement:_getLpdbData(...)
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 		if Opponent.isTbd(opponent.opponentData) then
 			_tbd_index = _tbd_index + 1
-			lpdbData.objectName = lpdbData.objectName .. '_' .. _tbd_index
+			lpdbData.objectName = lpdbData.objectName .. _tbd_index
 		end
 
 		if self.parent._lpdbInjector then
@@ -393,37 +295,6 @@ function Placement:_getLpdbData(...)
 	end
 
 	return entries
-end
-
-function Placement:getPrizeRewardForOpponent(opponent, prize)
-	return opponent.prizeRewards[prize] or self.prizeRewards[prize]
-end
-
-function Placement:_setBaseFromRewards(prizesToUse, prizeTypes)
-	Array.forEach(self.opponents, function(opponent)
-		if opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] or self.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] then
-			return
-		end
-
-		local baseReward = 0
-		Array.forEach(prizesToUse, function(prize)
-			local localMoney = opponent.prizeRewards[prize.id] or self.prizeRewards[prize.id]
-
-			if not localMoney or localMoney <= 0 then
-				return
-			end
-
-			baseReward = baseReward + prizeTypes[prize.type].convertToBaseCurrency(
-				prize.data,
-				localMoney,
-				opponent.date,
-				self.parent.options.currencyRatePerOpponent
-			)
-			self.parent.usedAutoConvertedCurrency = true
-		end)
-
-		opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseReward
-	end)
 end
 
 function Placement:_lpdbValue()
@@ -478,14 +349,6 @@ end
 
 function Placement:hasSpecialStatus()
 	return Table.any(Placement.specialStatuses, function(_, status) return status.active(self.args) end)
-end
-
---- Returns true if the input matches the format of a date
-function Placement._isValidDateFormat(date)
-	if type(date) ~= 'string' or String.isEmpty(date) then
-		return false
-	end
-	return date:match('%d%d%d%d%-%d%d%-%d%d') and true or false
 end
 
 return Placement
