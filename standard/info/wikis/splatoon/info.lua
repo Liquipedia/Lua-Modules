@@ -51,7 +51,7 @@ return {
 			},
 		},
 	},
-	defaultGame = 'splatoon',
+	defaultGame = '1',
 	defaultTeamLogo = 'Splatoon default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Splatoon default darkmode.png', ---@deprecated
 }
