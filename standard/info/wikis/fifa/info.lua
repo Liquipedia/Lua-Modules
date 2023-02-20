@@ -392,4 +392,5 @@ return {
 	defaultGame = 'fifa',
 	defaultTeamLogo = 'FIFA lightmode logo.png', ---@deprecated
 	defaultTeamLogoDark = 'FIFA darkmode logo.png', ---@deprecated
+	opponentLibrary = 'Opponent/Custom',
 }
