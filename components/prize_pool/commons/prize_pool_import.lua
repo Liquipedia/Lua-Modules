@@ -412,7 +412,7 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
 	return Placement(
-		{placeStart = placeStart, placeEnd = placeEnd},
+		{placeStart = placeStart, placeEnd = placeEnd, count = placementSize},
 		_parent,
 		priorPlacement.placeEnd or 0
 	)
@@ -428,7 +428,7 @@ function Import._mergePlacement(lpdbEntries, placement)
 	end
 
 	assert(
-		#placement.opponents <= 1 + placement.placeEnd - placement.placeStart,
+		#placement.opponents <= placement.count,
 		'Import: Too many opponents returned from query for placement range '
 			.. placement:_displayPlace():gsub('&#045;', '-')
 	)
