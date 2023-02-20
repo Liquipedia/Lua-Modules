@@ -160,15 +160,15 @@ function Placement:init(args, parent, lastPlacement)
 
 	self.opponents = self:_parseOpponents(self.args)
 
-	-- Implicit place range has been given (|place= is not set)
+	self.count = self.count or math.max(#self.opponents, 1)
+
+	-- Implicit place range has been given (|place= is unset)
 	-- Use the last known place and set the place range based on the entered args.count
 	-- or the number of entered opponents
 	if not self.placeStart and not self.placeEnd then
 		self.placeStart = lastPlacement + 1
-		self.placeEnd = lastPlacement + (self.count or math.max(#self.opponents, 1))
+		self.placeEnd = lastPlacement + self.count
 	end
-
-	self.count = self.placeEnd + 1 - self.placeStart
 
 	assert(#self.opponents <= self.count,
 		'Placement: Too many opponents in place ' .. self:_displayPlace():gsub('&#045;', '-'))
@@ -177,15 +177,20 @@ end
 function Placement:_parseArgs(args)
 	local parsedArgs = Table.deepCopy(args)
 
-	-- count (number of opponents in the slot) has been given explicitly
-	if args.count then
-		parsedArgs.count = tonumber(args.count)
+	parsedArgs.count = tonumber(args.count)
+
 	-- Explicit place range has been given
-	elseif args.place then
+	if args.place then
 		local places = Table.mapValues(mw.text.split(args.place, '-'), tonumber)
 		parsedArgs.placeStart = places[1]
 		parsedArgs.placeEnd = places[2] or places[1]
 		assert(parsedArgs.placeStart and parsedArgs.placeEnd, 'Placement: Invalid |place= provided.')
+
+		local calculatedCount = parsedArgs.placeEnd - parsedArgs.placeStart + 1
+		parsedArgs.count = parsedArgs.count or calculatedCount
+
+		assert(parsedArgs.count <= calculatedCount,
+			'Placement: Invalid count (' .. parsedArgs.count .. ') and placement (' .. args.place .. ') combination')
 	end
 
 	return parsedArgs
@@ -246,7 +251,7 @@ function Placement:_parseOpponents(args)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
 		local opponent = {opponentData = {}, prizeRewards = {}, additionalData = {}}
 		if not opponentInput then
-			if self:_shouldAddTbdOpponent(opponentIndex, args.place) then
+			if self:_shouldAddTbdOpponent(opponentIndex) then
 				opponent.opponentData = Opponent.tbd(self.parent.opponentType)
 			else
 				return
@@ -275,18 +280,17 @@ function Placement:_parseOpponents(args)
 	end)
 end
 
-function Placement:_shouldAddTbdOpponent(opponentIndex, place)
+function Placement:_shouldAddTbdOpponent(opponentIndex)
 	-- We want at least 1 opponent present for all placements
 	if opponentIndex == 1 then
 		return true
 	end
 	-- If the fillPlaceRange option is disabled or we do not have a give placeRange do not fill up further
-	if not self.parent.options.fillPlaceRange or not place then
+	if not self.parent.options.fillPlaceRange or not self.count then
 		return false
 	end
 	-- Only fill up further with TBD's if there is free space in the placeRange/slot
-	local slotSize = self.placeEnd - self.placeStart + 1
-	if opponentIndex <= slotSize then
+	if opponentIndex <= self.count then
 		return true
 	end
 	return false
