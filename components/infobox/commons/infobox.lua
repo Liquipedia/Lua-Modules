@@ -20,10 +20,8 @@ function Infobox:create(frame, gameName, forceDarkMode)
 	self.frame = frame
 	self.root = mw.html.create('div')
 	self.adbox = mw.html.create('div')	:addClass('fo-nttax-infobox-adbox')
-										:addClass('wiki-bordercolor-light')
 										:node(self.frame:preprocess('<adbox />'))
 	self.content = mw.html.create('div')	:addClass('fo-nttax-infobox')
-											:addClass('wiki-bordercolor-light')
 	self.root	:addClass('fo-nttax-infobox-wrapper')
 				:addClass('infobox-' .. gameName:lower())
 	if forceDarkMode then
@@ -35,7 +33,7 @@ function Infobox:create(frame, gameName, forceDarkMode)
 end
 
 function Infobox:categories(...)
-	Array.forEach({...}, mw.ext.TeamLiquidIntegration.add_category)
+	Array.forEach({...}, function(cat) return mw.ext.TeamLiquidIntegration.add_category(cat) end)
 	return self
 end
 

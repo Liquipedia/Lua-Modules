@@ -110,6 +110,7 @@ local _PRIORITY_GROUPS = {
 		'facebook-gaming',
 		'vidio',
 		'booyah',
+		'douyin',
 		'douyu',
 		'huyatv',
 		'zhangyutv',

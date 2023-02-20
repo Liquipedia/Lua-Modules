@@ -29,27 +29,8 @@ function StarcraftBracketDisplay.BracketContainer(props)
 			MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
 			OpponentEntry = StarcraftBracketDisplay.OpponentEntry,
 			matchHasDetails = StarcraftMatchGroupUtil.matchHasDetails,
-			opponentHeight = StarcraftBracketDisplay.computeBracketOpponentHeight(bracket.matchesById),
 		})
 	})
-end
-
-local defaultOpponentHeights = {
-	solo = 17 + 6,
-	duo = 2 * 17 + 6 + 4,
-	trio = 3 * 17 + 6,
-	quad = 4 * 17 + 6,
-	team = 17 + 6,
-	literal = 17 + 6,
-}
-function StarcraftBracketDisplay.computeBracketOpponentHeight(matchesById)
-	local maxHeight = 10
-	for _, match in pairs(matchesById) do
-		for _, opponent in ipairs(match.opponents) do
-			maxHeight = math.max(maxHeight, defaultOpponentHeights[opponent.type] or 0)
-		end
-	end
-	return maxHeight
 end
 
 function StarcraftBracketDisplay.OpponentEntry(props)

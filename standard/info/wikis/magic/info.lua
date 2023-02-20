@@ -11,10 +11,36 @@ return {
 	wikiName = 'magic',
 	name = 'Magic: The Gathering',
 	games = {
-		magic = {
+		mtga = {
+			abbreviation = 'MTGA',
+			name = 'Magic: The Gathering Arena',
+			link = 'Magic: The Gathering Arena',
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Liquipedia logo.png',
+				lightMode = 'Liquipedia logo.png',
+			},
+		},
+		mtgo = {
+			abbreviation = 'MTGO',
+			name = 'Magic: The Gathering Online',
+			link = 'Magic: The Gathering Online',
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Liquipedia logo.png',
+				lightMode = 'Liquipedia logo.png',
+			},
+		},
+		tabletop = {
 			abbreviation = 'Magic',
-			name = 'Magic: The Gathering',
-			link = 'Magic: The Gathering',
+			name = 'Magic: The Gathering Tabletop',
+			link = 'Magic: The Gathering Tabletop',
 			logo = {
 				darkMode = 'Logo filler event.png',
 				lightMode = 'Logo filler event.png',
@@ -25,7 +51,7 @@ return {
 			},
 		},
 	},
-	defaultGame = 'magic',
+	defaultGame = 'tabletop',
 	defaultTeamLogo = 'Liquipedia logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Liquipedia logo.png', ---@deprecated
 }

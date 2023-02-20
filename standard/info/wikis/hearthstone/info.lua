@@ -11,13 +11,13 @@ return {
 	wikiName = 'hearthstone',
 	name = 'Hearthstone',
 	games = {
-		todo = {
-			abbreviation = 'todo',
-			name = 'TODO',
-			link = 'Main Page',
+		hs = {
+			abbreviation = 'hs',
+			name = 'Hearthstone',
+			link = 'Hearthstone',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Hearthstone logo.png',
+				lightMode = 'Hearthstone logo.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Hearthstone logo.png',
@@ -25,7 +25,7 @@ return {
 			},
 		},
 	},
-	defaultGame = 'todo',
+	defaultGame = 'hs',
 	defaultTeamLogo = 'Hearthstone logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Hearthstone logo.png', ---@deprecated
 }

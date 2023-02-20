@@ -487,6 +487,8 @@ function CustomPlayer._setAchievements(data, place)
 
 	if CustomPlayer._isAwardAchievement(data, tier) then
 		table.insert(_player.awardAchievements, data)
+	elseif String.isNotEmpty((data.extradata or {}).award) then
+		return
 	elseif CustomPlayer._isAchievement(data, place, tier) then
 		table.insert(_player.achievements, data)
 	elseif (#_player.achievementsFallBack + #_player.achievements) < MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then

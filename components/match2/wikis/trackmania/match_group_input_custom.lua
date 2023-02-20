@@ -10,7 +10,6 @@ local CustomMatchGroupInput = {}
 
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -155,6 +154,11 @@ function matchFunctions.getVodStuff(match)
 	return match
 end
 
+function matchFunctions.isFeatured(match)
+	return tonumber(match.liquipediatier) == 1
+		or tonumber(match.liquipediatier) == 2
+end
+
 function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
@@ -175,7 +179,10 @@ function matchFunctions.getExtraData(match)
 
 	match.extradata = {
 		showh2h = showh2h,
+		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
+		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}
 	return match
 end
@@ -370,12 +377,11 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	local overtimes = Array.extractValues(Table.mapValues(mw.text.split(map.overtime or '', ','), tonumber))
 
 	map.extradata = {
 		comment = map.comment,
 		header = map.header,
-		overtime = Table.isNotEmpty(overtimes) and Json.stringify(overtimes) or nil
+		overtime = Logic.readBool(map.overtime)
 	}
 	return map
 end

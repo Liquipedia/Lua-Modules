@@ -75,12 +75,7 @@ function CustomResultsTable.awards(frame)
 	awardsTable.tierDisplay = CustomResultsTable.tierDisplay
 	awardsTable.rowHighlight = CustomResultsTable.rowHighlight
 
-	local sectionHeader = ''
-	if Logic.readBool(args.achievements) then
-		sectionHeader = '\n=====Notable Awards=====\n'
-	end
-
-	return sectionHeader .. tostring(awardsTable:create():build())
+	return awardsTable:create():build()
 end
 
 function CustomResultsTable:tierDisplay(placement)
