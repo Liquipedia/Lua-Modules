@@ -388,8 +388,8 @@ return {
 				lightMode = 'Warsow logo.png',
 			},
 		},
-		xon = {
-			abbreviation = 'xon',
+		xo = {
+			abbreviation = 'xo',
 			name = 'Xonotic',
 			link = 'Xonotic',
 			logo = {
