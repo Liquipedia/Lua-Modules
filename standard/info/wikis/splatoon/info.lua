@@ -24,7 +24,7 @@ return {
 				lightMode = 'Splatoon default lightmode.png',
 			},
 		},
-		['2'] = {
+		['splatoon 2'] = {
 			abbreviation = 'SP2',
 			name = 'Splatoon 2',
 			link = 'Splatoon 2',
@@ -37,7 +37,7 @@ return {
 				lightMode = 'Splatoon 2 default allmode.png',
 			},
 		},
-		['3'] = {
+		['splatoon 3'] = {
 			abbreviation = 'SP3',
 			name = 'Splatoon 3',
 			link = 'Splatoon 3',
