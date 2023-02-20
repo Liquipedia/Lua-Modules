@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -145,7 +146,10 @@ function Person:createInfobox()
 			end}
 		}},
 		Cell{name = 'Alternate IDs', content = {
-				table.concat(mw.text.split(args.ids or args.alternateids or '', ',%s?'), ' &#8226; ')
+				table.concat(
+					Array.map(mw.text.split(args.ids or args.alternateids or '', ',', true), mw.text.trim),
+					', '
+				)
 			}
 		},
 		Cell{name = 'Nicknames', content = {args.nicknames}},
