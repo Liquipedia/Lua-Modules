@@ -290,7 +290,7 @@ function BaseResultsTable:buildTeamOpponentConditions()
 
 	local opponents = Array.append(config.aliases, config.opponent)
 
-	local opponentTeamTeplates = {}
+	local opponentTeamTemplates = {}
 
 	for _, opponent in pairs(opponents) do
 		local rawOpponentTemplate = Team.queryRaw(opponent) or {}
@@ -299,11 +299,11 @@ function BaseResultsTable:buildTeamOpponentConditions()
 			error('Missing team template for team: ' .. opponent)
 		end
 
-		Array.appendWith(opponentTeamTeplates, unpack(Team.queryHistorical(opponentTemplate) or {opponentTemplate}))
+		Array.appendWith(opponentTeamTemplates, unpack(Team.queryHistorical(opponentTemplate) or {opponentTemplate}))
 	end
 
 	if config.playerResultsOfTeam then
-		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTeplates)
+		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 	end
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
