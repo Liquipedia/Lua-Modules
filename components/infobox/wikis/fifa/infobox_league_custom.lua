@@ -28,11 +28,11 @@ local PLATFORMS = {
 	['xbox 360'] = 'Xbox 360',
 	['xbox one'] = 'Xbox One',
 	ps3 = 'Playstation 3',
-	['playstation 3'] = 'Playstation 3',
+	playstation3 = 'Playstation 3',
 	ps4 = 'Playstation 4',
-	['playstation 4'] = 'Playstation 4',
+	playstation4 = 'Playstation 4',
 	ps5 = 'Playstation 5',
-	['playstation 5'] = 'Playstation 5',
+	playstation5 = 'Playstation 5',
 	['xbox playstation'] = 'Xbox and PlayStation',
 	['xbox and playstation'] = 'Xbox and PlayStation',
 }
@@ -45,7 +45,7 @@ function CustomLeague.run(frame)
 	_args.player_number = _args.participants_number
 	_args.game = Game.name{game = _args.game}
 	_args.mode = (_args.mode or '1v1'):lower()
-	_args.platform = PLATFORMS[(_args.platform or 'pc'):lower()]
+	 _args.platform = PLATFORMS[(_args.platform or 'pc'):lower():gsub(' ', '')]
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
