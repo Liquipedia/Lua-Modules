@@ -139,9 +139,10 @@ function CustomSquad.run(frame)
 			}
 		end
 
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
 		squad:row(row:create(
 			Variables.varDefault('squad_name', mw.title.getCurrentTitle().prefixedText)
-			.. '_' .. player.id .. '_'
+			.. '_' .. link .. '_'
 			.. ReferenceCleaner.clean(player.joindate)
 			.. (player.role and '_' .. player.role or '')
 		))
