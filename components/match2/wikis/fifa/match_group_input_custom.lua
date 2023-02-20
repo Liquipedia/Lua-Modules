@@ -230,53 +230,6 @@ function CustomMatchGroupInput._setPlacements(match)
 	end
 end
 
-function CustomMatchGroupInput._subMatchStructure(match)
-	local subMatches = {}
-
-	local currentSubGroup = 0
-	for _, map in Table.iter.pairsByPrefix(match, 'map') do
-		local subMatchIndex = tonumber(map.set)
-		if subMatchIndex then
-			currentSubGroup = subMatchIndex
-		else
-			currentSubGroup = currentSubGroup + 1
-			subMatchIndex = currentSubGroup
-		end
-
-		map.subgroup = subMatchIndex
-
-		if not subMatches[subMatchIndex] then
-			subMatches[subMatchIndex] = {scores = {0, 0}}
-		end
-
-		local winner = tonumber(map.winner)
-		if winner and subMatches[subMatchIndex].scores[winner] then
-			subMatches[subMatchIndex].scores[winner] = subMatches[subMatchIndex].scores[winner] + 1
-		end
-	end
-
-	-- determine submatch winners & opponent sumscores
-	for subMatchIndex, subMatch in ipairs(subMatches) do
-		local winner = tonumber(match['set' .. subMatchIndex .. 'winner'])
-		if not winner or winner <= 0 or winner > MAX_NUM_OPPONENTS then
-			winner = nil
-			local bestof = tonumber(match['set' .. subMatchIndex .. 'bestof']) or DEFAULT_SUBMATCH_BESTOF
-			for opponentIndex = 1, MAX_NUM_OPPONENTS do
-				if subMatch.scores[opponentIndex] > (bestof / 2) then
-					winner = opponentIndex
-					break
-				end
-			end
-		end
-
-		subMatch.winner = winner
-
-		if winner then
-			match['opponent' .. winner].sumscore = match['opponent' .. winner].sumscore + 1
-		end
-	end
-end
-
 function CustomMatchGroupInput._opponentInput(match)
 	local opponentIndex = 1
 	local opponent = match['opponent' .. opponentIndex]
