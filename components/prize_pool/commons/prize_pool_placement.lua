@@ -181,7 +181,7 @@ function Placement:_parseArgs()
 		self.count = self.count or calculatedCount
 
 		assert(self.count <= calculatedCount,
-			'Placement: Invalid count (' .. args.count .. ') and placement (' .. args.place .. ') combination')
+			'Placement: Invalid count (' .. self.count .. ') and placement (' .. args.place .. ') combination')
 	end
 end
 
