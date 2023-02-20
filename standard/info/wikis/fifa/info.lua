@@ -349,7 +349,7 @@ return {
 				lightMode = 'EA Sports FC 24 default lightmode.png',
 			},
 		},
-		['o2'] = {
+		o2 = {
 			abbreviation = 'FO2',
 			name = 'FIFA Online 2',
 			link = 'FIFA Online 2',
@@ -362,7 +362,7 @@ return {
 				lightMode = 'FIFA Online 2 default allmode.png',
 			},
 		},
-		['o3'] = {
+		o3 = {
 			abbreviation = 'FO3',
 			name = 'FIFA Online 3',
 			link = 'FIFA Online 3',
@@ -375,7 +375,7 @@ return {
 				lightMode = 'FIFA Online 3 default allmode.png',
 			},
 		},
-		['o4'] = {
+		o4 = {
 			abbreviation = 'FO4',
 			name = 'FIFA Online 4',
 			link = 'FIFA Online 4',
