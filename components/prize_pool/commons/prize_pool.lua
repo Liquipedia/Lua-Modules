@@ -669,7 +669,7 @@ function PrizePool:_readPlacements(args)
 		end
 
 		local placementInput = Json.parseIfString(args[placementIndex])
-		local placement = Placement(placementInput, self, currentPlace)
+		local placement = Placement(placementInput, self):create(currentPlace)
 
 		currentPlace = placement.placeEnd
 
