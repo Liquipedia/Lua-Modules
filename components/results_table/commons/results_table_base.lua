@@ -307,7 +307,7 @@ function BaseResultsTable:buildTeamOpponentConditions()
 	end
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
-	for _, teamTemplate in pairs(opponentTeamTeplates) do
+	for _, teamTemplate in pairs(opponentTeamTemplates) do
 		opponentConditions:add{ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, teamTemplate)}
 	end
 
