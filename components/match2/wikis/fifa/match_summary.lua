@@ -19,8 +19,6 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
-
 local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local DRAW_LINE = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -139,18 +137,7 @@ function CustomMatchSummary._createSubMatch(row, game, match)
 
 	row
 		-- player left side
-		:addElement(mw.html.create('div')
-			:addClass(game.winner == 1 and 'bg-win' or game.winner == 0 and 'bg-draw' or nil)
-			:css('align-items', 'center')
-			:css('border-radius', '0 12px 12px 0')
-			:css('padding', '2px 8px')
-			:css('text-align', 'right')
-			:css('width', '35%')
-			:node(PlayerDisplay.BlockPlayer{
-				player = players[1],
-				flip = true,
-			})
-		)
+		:addElement(CustomMatchSummary._player(players[1], 1, game.winner))
 		-- score
 		:addElement(CustomMatchSummary._score(game.scores[1] or 0))
 		-- penalty score
@@ -164,18 +151,7 @@ function CustomMatchSummary._createSubMatch(row, game, match)
 		-- score
 		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
 		-- player right side
-		:addElement(mw.html.create('div')
-			:addClass(game.winner == 2 and 'bg-win' or game.winner == 0 and 'bg-draw' or nil)
-			:css('align-items', 'center')
-			:css('border-radius', '12px 0 0 12px')
-			:css('padding', '2px 8px')
-			:css('text-align', 'left')
-			:css('width', '35%')
-			:node(PlayerDisplay.BlockPlayer{
-				player = players[2],
-				flip = false,
-			})
-		)
+		:addElement(CustomMatchSummary._player(players[2], 2, game.winner))
 end
 
 function CustomMatchSummary._extractPlayersFromGame(game, match)
@@ -230,6 +206,22 @@ function CustomMatchSummary._subMatchPenaltyScore(game, opponentIndex)
 		'(' .. (scores[opponentIndex] or 0) .. ')',
 		'Penalty shoot-out'
 	)
+end
+
+function CustomMatchSummary._player(player, opponentIndex, winner)
+	local flip = opponentIndex == 1
+
+	return mw.html.create('div')
+		:addClass(winner == opponentIndex and 'bg-win' or winner == 0 and 'bg-draw' or nil)
+		:css('align-items', 'center')
+		:css('border-radius', flip and '0 12px 12px 0' or '12px 0 0 12px')
+		:css('padding', '2px 8px')
+		:css('text-align', flip and 'right' or 'left')
+		:css('width', '35%')
+		:node(PlayerDisplay.BlockPlayer{
+			player = player,
+			flip = flip,
+		})
 end
 
 return CustomMatchSummary
