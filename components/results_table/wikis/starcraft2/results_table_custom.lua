@@ -100,7 +100,7 @@ end
 
 function CustomResultsTable:rowHighlight(placement)
 	if Logic.readBool(placement.publishertier) then
-		return 'sc2premier-highlighted'
+		return 'tournament-highlighted-bg'
 	end
 end
 
