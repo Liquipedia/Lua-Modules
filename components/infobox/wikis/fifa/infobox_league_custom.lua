@@ -25,16 +25,16 @@ local CustomInjector = Class.new(Injector)
 
 local PLATFORMS = {
 	pc = 'PC',
-	['xbox 360'] = 'Xbox 360',
-	['xbox one'] = 'Xbox One',
+	xbox360 = 'Xbox 360',
+	xboxone = 'Xbox One',
 	ps3 = 'Playstation 3',
 	playstation3 = 'Playstation 3',
 	ps4 = 'Playstation 4',
 	playstation4 = 'Playstation 4',
 	ps5 = 'Playstation 5',
 	playstation5 = 'Playstation 5',
-	['xbox playstation'] = 'Xbox and PlayStation',
-	['xbox and playstation'] = 'Xbox and PlayStation',
+	xboxplaystation = 'Xbox and PlayStation',
+	xboxandplaystation= 'Xbox and PlayStation',
 }
 
 function CustomLeague.run(frame)
