@@ -11,8 +11,8 @@ return {
 	wikiName = 'splatoon',
 	name = 'Splatoon',
 	games = {
-		splatoon = {
-			abbreviation = 'Splatoon',
+		['1'] = {
+			abbreviation = 'SP1',
 			name = 'Splatoon',
 			link = 'Splatoon',
 			logo = {
@@ -24,8 +24,34 @@ return {
 				lightMode = 'Splatoon default lightmode.png',
 			},
 		},
+		['2'] = {
+			abbreviation = 'SP2',
+			name = 'Splatoon 2',
+			link = 'Splatoon 2',
+			logo = {
+				darkMode = 'Splatoon 2 default allmode.png',
+				lightMode = 'Splatoon 2 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Splatoon 2 default allmode.png',
+				lightMode = 'Splatoon 2 default allmode.png',
+			},
+		},
+		['3'] = {
+			abbreviation = 'SP3',
+			name = 'Splatoon 3',
+			link = 'Splatoon 3',
+			logo = {
+				darkMode = 'Splatoon 3 default allmode.png',
+				lightMode = 'Splatoon 3 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Splatoon 3 default allmode.png',
+				lightMode = 'Splatoon 3 default allmode.png',
+			},
+		},
 	},
-	defaultGame = 'todo',
+	defaultGame = '1',
 	defaultTeamLogo = 'Splatoon default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Splatoon default darkmode.png', ---@deprecated
 }
