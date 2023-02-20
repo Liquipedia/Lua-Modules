@@ -147,7 +147,7 @@ function Person:createInfobox()
 		}},
 		Cell{name = 'Alternate IDs', content = {
 				table.concat(
-					Array.map(mw.text.split(args.ids or args.alternateids or '', ',', true), mw.text.trim),
+					Array.map(mw.text.split(args.ids or args.alternateids or '', ',', true), function(id) return mw.text.trim(id) end),
 					', '
 				)
 			}
