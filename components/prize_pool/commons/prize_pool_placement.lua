@@ -200,22 +200,6 @@ function Placement:readAdditionalData(args)
 	return data
 end
 
-function Placement:shouldAddTbdOpponent(opponentIndex, place)
-	-- We want at least 1 opponent present for all placements
-	if opponentIndex == 1 then
-		return true
-	end
-	-- If the fillPlaceRange option is disabled or we do not have a give placeRange do not fill up further
-	if not self.parent.options.fillPlaceRange or not self.count then
-		return false
-	end
-	-- Only fill up further with TBD's if there is free space in the placeRange/slot
-	if opponentIndex <= self.count then
-		return true
-	end
-	return false
-end
-
 function Placement:_getLpdbData(...)
 	local entries = {}
 	for opponentIndex, opponent in ipairs(self.opponents) do
