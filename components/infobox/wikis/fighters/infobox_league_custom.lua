@@ -54,11 +54,11 @@ function CustomLeague.run(frame)
 	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
 		_args.prizepoolassumed = true
 
-		_args.singlesfee = tonumber(_args.singlesfee) or 0
-		_args.player_number = tonumber(_args.player_number) or 0
-		_args.singlesbonus = tonumber(_args.singlesbonus) or 0
+		local singlesFee = tonumber(_args.singlesfee) or 0
+		local playerNumber = tonumber(_args.player_number) or 0
+		local singlesBonus = tonumber(_args.singlesbonus) or 0
 
-		local prizeMoney = _args.singlesfee * _args.player_number + _args.singlesbonus
+		local prizeMoney = singlesFee * playerNumber + singlesBonus
 		if _args.localcurrency and _args.localcurrency:lower() ~= 'usd' then
 			_args.prizepool = prizeMoney
 		else
