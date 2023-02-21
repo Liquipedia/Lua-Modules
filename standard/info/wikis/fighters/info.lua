@@ -921,7 +921,7 @@ return {
 				lightMode = 'UMVC3 default allmode.png',
 			},
 		},
-		mvc3 = {
+		mvci = {
 			abbreviation = 'MvCI',
 			name = 'Marvel vs. Capcom: Infinite',
 			link = 'Marvel vs. Capcom: Infinite',
