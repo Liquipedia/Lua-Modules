@@ -20,8 +20,6 @@ local BasePlacement = Lua.import('Module:PrizePool/Placement/Base', {requireDevI
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
-local _tbd_index = 0
-
 local DASH = '&#045;'
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
@@ -29,6 +27,8 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 
 -- Allowed none-numeric score values.
 local SPECIAL_SCORES = {'W', 'FF' , 'L', 'DQ', 'D'}
+
+local _tbd_index = 0
 
 --- @class Placement
 --- A Placement is a set of opponents who all share the same final place in the tournament.
