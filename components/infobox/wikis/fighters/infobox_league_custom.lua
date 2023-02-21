@@ -34,7 +34,6 @@ function CustomLeague.run(frame)
 	_args = _league.args
 
 	-- Abbreviations
-	_args.abbreviation = _args.abbreviation or CustomLeague.getAbbrFromSeries(_args.series)
 	_args.circuitabbr = _args.abbreviation or CustomLeague.getAbbrFromSeries(_args.circuit)
 
 	-- Auto Icon
