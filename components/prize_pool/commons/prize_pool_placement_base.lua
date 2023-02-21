@@ -81,7 +81,7 @@ function Placement:parseOpponents(args)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
 		local opponent = {opponentData = {}, prizeRewards = {}, additionalData = {}}
 		if not opponentInput then
-			if self:shouldAddTbdOpponent(opponentIndex) then
+			if self:_shouldAddTbdOpponent(opponentIndex) then
 				opponent.opponentData = Opponent.tbd(self.parent.opponentType)
 			else
 				return
@@ -110,8 +110,20 @@ function Placement:parseOpponents(args)
 	end)
 end
 
-function Placement:shouldAddTbdOpponent(args)
-	error('Function shouldAddTbdOpponent needs to be set via the module that requires "Module:PrizePool/Placement/Base"')
+function Placement:_shouldAddTbdOpponent(opponentIndex, place)
+	-- We want at least 1 opponent present for all placements
+	if opponentIndex == 1 then
+		return true
+	end
+	-- If the fillPlaceRange option is disabled or we do not have a give placeRange do not fill up further
+	if not self.parent.options.fillPlaceRange or not self.count then
+		return false
+	end
+	-- Only fill up further with TBD's if there is free space in the placeRange/slot
+	if opponentIndex <= self.count then
+		return true
+	end
+	return false
 end
 
 function Placement:readAdditionalData(args)
