@@ -135,6 +135,7 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('circuittier', _args.circuittier)
 	Variables.varDefine('circuitabbr', _args.circuitabbr)
 	Variables.varDefine('seriesabbr', _args.abbreviation)
+	Variables.varDefine('tournament_link', self.pagename)
 
 	-- Legacy vars
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
