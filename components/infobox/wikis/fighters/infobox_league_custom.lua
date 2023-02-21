@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
@@ -35,17 +37,32 @@ function CustomLeague.run(frame)
 	_args.abbreviation = _args.abbreviation or CustomLeague.getAbbrFromSeries(_args.series)
 	_args.circuitabbr = _args.abbreviation or CustomLeague.getAbbrFromSeries(_args.circuit)
 
+	-- Auto Icon
+	_args.icon = _args.icon or CustomLeague.getIconFromSeries(_args.series)
+
 	-- Normalize name
 	_args.game = Game.name{game = _args.game}
+
+	-- Swap prizepool to prizepoolusd when no currency
+	if not _args.localcurrency or _args.localcurrency:lower() == 'usd' then
+		_args.prizepoolusd = _args.prizepoolusd or _args.prizepool
+		_args.prizepool = nil
+	end
 
 	-- Implicit prizepools
 	_args.prizepoolassumed = false
 	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
 		_args.prizepoolassumed = true
+
+		_args.singlesfee = tonumber(_args.singlesfee) or 0
+		_args.player_number = tonumber(_args.player_number) or 0
+		_args.singlesbonus = tonumber(_args.singlesbonus) or 0
+
+		local prizeMoney = _args.singlesfee * _args.player_number + _args.singlesbonus
 		if _args.localcurrency and _args.localcurrency:lower() ~= 'usd' then
-			_args.prizepool = tonumber(_args.singlesfee) * tonumber(_args.player_number) + tonumber(_args.singlesbonus)
+			_args.prizepool = prizeMoney
 		else
-			_args.prizepoolusd = tonumber(_args.singlesfee) * tonumber(_args.player_number) + tonumber(_args.singlesbonus)
+			_args.prizepoolusd = prizeMoney
 		end
 	end
 
@@ -62,34 +79,47 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:addCustomCells(widgets)
-	if _args.circuit or _args.points or _args.circuit_next or _args.circuit_previous then
-		return {
-			Title{name = 'Circuit Information'},
-			Cell{name = 'Circuit', content = {}},
-			Cell{name = 'Circuit Tier', content = {_args.circuittier and (_args.circuittier .. ' Tier') or nil}},
-			Cell{name = 'Tournament Region', content = {_args.region}},
-			Cell{name = 'Points', content = {}},
-			Chronology{links = {}},
-		}
-	end
+	table.insert(widgets, Cell{name = 'Number of Players', content = {_args.player_number}})
 
 	return widgets
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'customcontent' then
+		if _args.circuit or _args.points or _args.circuit_next or _args.circuit_previous then
+			table.insert(widgets, Title{name = 'Circuit Information'})
+			table.insert(widgets, Cell{name = 'Circuit', content = {_args.circuit}})
+			table.insert(widgets, Cell{name = 'Circuit Tier', content = {
+				_args.circuittier and (_args.circuittier .. ' Tier') or nil}
+			})
+			table.insert(widgets, Cell{name = 'Tournament Region', content = {_args.region}})
+			table.insert(widgets, Cell{name = 'Points', content = {_args.points}})
+			table.insert(widgets, Chronology{content = {next = _args.circuit_next, previous = _args.circuit_previous}})
+		end
+
+	elseif id == 'prizepool' then
+		if _args.prizepoolassumed then
+			widgets[1].content[1] = Abbreviation.make(
+				widgets[1].content[1],
+				'This prize is assumed, and has not been confirmed'
+			)
+		end
 
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = _args.game},
-			Cell{name = 'Version', content = _args.version},
+			Cell{name = 'Game', content = {_args.game}},
+			Cell{name = 'Version', content = {_args.version}},
 		}
 	end
 	return widgets
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = (_args.player_number or ''):gsub(',', '')
+	lpdbData.participantsnumber = string.gsub(_args.player_number or '', ',', '')
+
+	if Logic.readBool(_args.overview) then
+		lpdbData.game = 'none'
+	end
 
 	lpdbData.extradata.assumedprizepool = tostring(_args.prizepoolassumed)
 	lpdbData.extradata.circuit = _args.circuit
@@ -102,10 +132,10 @@ function CustomLeague:defineCustomPageVariables()
 	--Legacy vars
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
 	Variables.varDefine('prizepoolusd', Variables.varDefault('tournament_prizepoolusd'))
-	Variables.varDefine('tournament_entrants', (_args.player_number or ''):gsub(',', ''))
+	Variables.varDefine('tournament_entrants', string.gsub(_args.player_number or '', ',', ''))
 	Variables.varDefine('tournament_region', _args.region)
 	Variables.varDefine('assumedpayout', tostring(_args.prizepoolassumed))
-	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency'))
+	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency', ''):upper())
 	Variables.varDefine('circuittier', _args.circuittier)
 	Variables.varDefine('tournament_circuit', _args.circuit)
 	Variables.varDefine('seriesabbr', _args.abbreviation)
@@ -117,6 +147,7 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_sdate', sdate)
 	Variables.varDefine('tournament_edate', edate)
 	Variables.varDefine('tournament_date', edate)
+	Variables.varDefine('formatted_tournament_date', sdate)
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
@@ -132,7 +163,7 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
-function CustomLeague.getAbbrFromSeries(page)
+function CustomLeague._querySeries(page, query)
 	if not page then
 		return
 	end
@@ -141,14 +172,25 @@ function CustomLeague.getAbbrFromSeries(page)
 
 	local data = mw.ext.LiquipediaDB.lpdb('series', {
 		conditions = '[[pagename::' .. sourcePagename .. ']]',
-		query = 'abbreviation',
+		query = query,
 		limit = 1,
 	})
 
-	if not data or not data[1] or String.isEmpty(data[1].abbreviation) then
+	if not data or not data[1] then
 		return
 	end
-	return data[1].abbreviation
+
+	return data[1]
+end
+
+function CustomLeague.getAbbrFromSeries(page)
+	local series = CustomLeague._querySeries(page, 'abbreviation')
+	return series and series.abbreviation or nil
+end
+
+function CustomLeague.getIconFromSeries(page)
+	local series = CustomLeague._querySeries(page, 'icon')
+	return series and series.icon or nil
 end
 
 return CustomLeague
