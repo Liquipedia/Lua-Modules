@@ -37,10 +37,6 @@ function Placement:init(args, parent)
 	return self
 end
 
-function Placement:parseArgs(args)
-	error('This needs to be set via the module that requires "Module:PrizePool/Placement/Base"')
-end
-
 --- Parse the input for available rewards of prizes, for instance how much money a team would win.
 --- This also checks if the Placement instance has a dollar reward and assigns a variable if so.
 function Placement:_readPrizeRewards(args)
