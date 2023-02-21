@@ -31,7 +31,14 @@ function CustomLeague.run(frame)
 	_league = league
 	_args = _league.args
 
+	-- Abbreviations
+	_args.abbreviation = _args.abbreviation or CustomLeague.getAbbrFromSeries(_args.series)
+	_args.circuitabbr = _args.abbreviation or CustomLeague.getAbbrFromSeries(_args.circuit)
+
+	-- Normalize name
 	_args.game = Game.name{game = _args.game}
+
+	-- Implicit prizepools
 	_args.prizepoolassumed = false
 	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
 		_args.prizepoolassumed = true
@@ -101,6 +108,8 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency'))
 	Variables.varDefine('circuittier', _args.circuittier)
 	Variables.varDefine('tournament_circuit', _args.circuit)
+	Variables.varDefine('seriesabbr', _args.abbreviation)
+	Variables.varDefine('circuitabbr', _args.circuitabbr)
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -121,6 +130,25 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	return categories
+end
+
+function CustomLeague.getAbbrFromSeries(page)
+	if not page then
+		return
+	end
+
+	local sourcePagename = string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(page), ' ', '_')
+
+	local data = mw.ext.LiquipediaDB.lpdb('series', {
+		conditions = '[[pagename::' .. sourcePagename .. ']]',
+		query = 'abbreviation',
+		limit = 1,
+	})
+
+	if not data or not data[1] or String.isEmpty(data[1].abbreviation) then
+		return
+	end
+	return data[1].abbreviation
 end
 
 return CustomLeague
