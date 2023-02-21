@@ -43,15 +43,9 @@ function CustomLeague.run(frame)
 	-- Normalize name
 	_args.game = Game.name{game = _args.game}
 
-	-- Swap prizepool to prizepoolusd when no currency
-	if not _args.localcurrency or _args.localcurrency:lower() == 'usd' then
-		_args.prizepoolusd = _args.prizepoolusd or _args.prizepool
-		_args.prizepool = nil
-	end
-
 	-- Implicit prizepools
 	_args.prizepoolassumed = false
-	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
+	if not _args.prizepool and not _args.prizepoolusd then
 		_args.prizepoolassumed = true
 
 		local singlesFee = tonumber(_args.singlesfee) or 0
@@ -59,11 +53,15 @@ function CustomLeague.run(frame)
 		local singlesBonus = tonumber(_args.singlesbonus) or 0
 
 		local prizeMoney = singlesFee * playerNumber + singlesBonus
-		if _args.localcurrency and _args.localcurrency:lower() ~= 'usd' then
+		if prizeMoney > 0 then
 			_args.prizepool = prizeMoney
-		else
-			_args.prizepoolusd = prizeMoney
 		end
+	end
+
+	-- Swap prizepool to prizepoolusd when no currency
+	if not _args.localcurrency or _args.localcurrency:lower() == 'usd' then
+		_args.prizepoolusd = _args.prizepoolusd or _args.prizepool
+		_args.prizepool = nil
 	end
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
