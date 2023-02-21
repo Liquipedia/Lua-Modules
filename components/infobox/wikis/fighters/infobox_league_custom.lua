@@ -127,19 +127,20 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	--Legacy vars
+	-- Custom vars
+	Variables.varDefine('assumedpayout', tostring(_args.prizepoolassumed))
+	Variables.varDefine('tournament_circuit', _args.circuit)
+	Variables.varDefine('circuittier', _args.circuittier)
+	Variables.varDefine('circuitabbr', _args.circuitabbr)
+	Variables.varDefine('seriesabbr', _args.abbreviation)
+
+	-- Legacy vars
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
 	Variables.varDefine('prizepoolusd', Variables.varDefault('tournament_prizepoolusd'))
 	Variables.varDefine('tournament_entrants', string.gsub(_args.player_number or '', ',', ''))
-	Variables.varDefine('tournament_region', _args.region)
-	Variables.varDefine('assumedpayout', tostring(_args.prizepoolassumed))
 	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency', ''):upper())
-	Variables.varDefine('circuittier', _args.circuittier)
-	Variables.varDefine('tournament_circuit', _args.circuit)
-	Variables.varDefine('seriesabbr', _args.abbreviation)
-	Variables.varDefine('circuitabbr', _args.circuitabbr)
 
-	--Legacy date vars
+	-- Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
 	local edate = Variables.varDefault('tournament_enddate', '')
 	Variables.varDefine('tournament_sdate', sdate)
