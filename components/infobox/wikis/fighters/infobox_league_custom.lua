@@ -38,7 +38,9 @@ function CustomLeague.run(frame)
 	_args.circuitabbr = _args.abbreviation or CustomLeague.getAbbrFromSeries(_args.circuit)
 
 	-- Auto Icon
-	_args.icon = _args.icon or CustomLeague.getIconFromSeries(_args.series)
+	local seriesIconLight, seriesIconDark = CustomLeague.getIconFromSeries(_args.series)
+	_args.icon = _args.icon or seriesIconLight
+	_args.icondark = _args.icondark or seriesIconDark
 
 	-- Normalize name
 	_args.game = Game.name{game = _args.game}
@@ -187,8 +189,11 @@ function CustomLeague.getAbbrFromSeries(page)
 end
 
 function CustomLeague.getIconFromSeries(page)
-	local series = CustomLeague._querySeries(page, 'icon')
-	return series and series.icon or nil
+	local series = CustomLeague._querySeries(page, 'icon, icondark')
+	if not series then
+		return
+	end
+	return series.icon, series.icondark
 end
 
 return CustomLeague
