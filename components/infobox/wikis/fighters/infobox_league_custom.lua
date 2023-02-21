@@ -24,6 +24,8 @@ local Chronology = Widgets.Chronology
 local _args
 local _league
 
+local BASE_CURRENCY = 'USD'
+
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
@@ -59,7 +61,7 @@ function CustomLeague.run(frame)
 	end
 
 	-- Swap prizepool to prizepoolusd when no currency
-	if not _args.localcurrency or _args.localcurrency:lower() == 'usd' then
+	if not _args.localcurrency or _args.localcurrency:upper() == BASE_CURRENCY then
 		_args.prizepoolusd = _args.prizepoolusd or _args.prizepool
 		_args.prizepool = nil
 	end
