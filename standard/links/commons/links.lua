@@ -51,6 +51,7 @@ local PREFIXES = {
 		'',
 		player = 'https://challonge.com/users/',
 	},
+	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
 		player = 'https://www.datdota.com/players/',
@@ -113,6 +114,7 @@ local PREFIXES = {
 	kuaishou = {'https://live.kuaishou.com/u/'},
 	letsplaylive = {'https://letsplay.live/profile/'},
 	loco = {'https://loco.gg/streamers/'},
+	lolchess = {'https://lolchess.gg/profile/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
@@ -196,6 +198,7 @@ local PREFIXES = {
 PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
 
 local SUFFIXES = {
+	cntft = {'/1'},
 	facebook = {
 		'',
 		stream = '/live',
