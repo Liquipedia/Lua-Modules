@@ -185,7 +185,7 @@ function League:createInfobox()
 				}}
 			end
 		},
-		Cell{name = 'Format', content = {args.format}},
+		Customizable{id = 'format', children = {Cell{name = 'Format', content = {args.format}}}},
 		Customizable{id = 'prizepool', children = {
 				Cell{
 					name = 'Prize Pool',

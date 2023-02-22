@@ -32,6 +32,7 @@ local PREFIXES = {
 		player = 'https://aoezone.net/members/'
 	},
 	['ask-fm'] = {'https://ask.fm/'},
+	binarybeast = {''},
 	b5csgo = {
 		'',
 		player = 'https://www.b5csgo.com/personalCenter/',
@@ -135,6 +136,8 @@ local PREFIXES = {
 		player = 'https://siege.gg/players/',
 	},
 	sk = {'https://sk-gaming.com/member/'},
+	smashboards = {''},
+	smashcast = {'http://www.smashcast.tv/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
 	['start-gg'] = {
