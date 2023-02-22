@@ -12,6 +12,7 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -140,7 +141,7 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Prize pool', content = {CustomLeague.createPrizepool(_args)}})
 
 		-- Doubles prize pool
-		local doubleArgs = Array.copy(_args)
+		local doubleArgs = Table.copy(_args)
 		doubleArgs.prizepool, doubleArgs.prizepoolusd = _args.doublesprizepool, _args.doublesprizepoolusd
 		table.insert(widgets, Cell{name = 'Doubles prize pool', content = {CustomLeague.createPrizepool(doubleArgs, true)}})
 
@@ -268,7 +269,7 @@ function CustomLeague._makeAssumedAbbr(displayText)
 end
 
 function CustomLeague.createPrizepool(args, noVariables)
-	if args.prizepool and args.prizepoolusd then
+	if not args.prizepool and not args.prizepoolusd then
 		return nil
 	end
 
