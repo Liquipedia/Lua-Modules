@@ -1350,6 +1350,19 @@ return {
 				lightMode = 'Tekken 5 default allmode.png',
 			},
 		},
+		t5dr = {
+			abbreviation = 'T5 DR',
+			name = 'Tekken 5: Dark Resurrection',
+			link = 'Tekken 5: Dark Resurrection',
+			logo = {
+				darkMode = 'Tekken 5 Dark Resurrection default allmode.png',
+				lightMode = 'Tekken 5 Dark Resurrection default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Tekken 5 Dark Resurrection default allmode.png',
+				lightMode = 'Tekken 5 Dark Resurrection default allmode.png',
+			},
+		},
 		t6 = {
 			abbreviation = 'T6',
 			name = 'Tekken 6',
