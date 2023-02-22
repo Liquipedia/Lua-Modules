@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 		local server = _league.args.server
 		if server then
 			return {Cell{name = 'Server', content = {
-				Flags.Icon(server) .. Flags.CountryName(server)
+				Flags.Icon(server) .. '&nbsp;' .. Flags.CountryName(server)
 			}}}
 		end
 	elseif id == 'customcontent' then
