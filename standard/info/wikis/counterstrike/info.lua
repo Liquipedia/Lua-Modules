@@ -72,8 +72,8 @@ local infoData = {
 				lightMode = 'csgo icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'CS default darkmode.png',
-				lightMode = 'CS default lightmode.png',
+				darkMode = 'CSGO default darkmode.png',
+				lightMode = 'CSGO default lightmode.png',
 			},
 		},
 	},
