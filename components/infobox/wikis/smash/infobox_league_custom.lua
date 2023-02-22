@@ -52,22 +52,30 @@ function CustomLeague.run(frame)
 	-- Implicit prizepools
 	_args.prizepoolassumed = false
 	if not _args.prizepool and not _args.prizepoolusd then
-		_args.prizepoolassumed = true
-
-		local singlesFee = tonumber(_args.singlesfee) or 0
-		local playerNumber = tonumber(_args.player_number) or 0
-		local singlesBonus = tonumber(_args.singlesbonus) or 0
-
-		local prizeMoney = singlesFee * playerNumber + singlesBonus
+		local prizeMoney = CustomLeague._assumedPrize(_args.singlesfee, _args.player_number, _args.singlesbonus)
 		if prizeMoney > 0 then
+			_args.prizepoolassumed = true
 			_args.prizepool = prizeMoney
+		end
+	end
+
+	if not _args.doublesprizepool and not _args.doublesprizepoolusd then
+		local prizeMoney = CustomLeague._assumedPrize(_args.doublesfee, _args.doubles_number, _args.doublesbonus)
+		if prizeMoney > 0 then
+			_args.prizepoolassumed = true
+			_args.doublesprizepool = prizeMoney
 		end
 	end
 
 	-- Swap prizepool to prizepoolusd when no currency
 	if not _args.localcurrency or _args.localcurrency:upper() == BASE_CURRENCY then
+		-- Singles
 		_args.prizepoolusd = _args.prizepoolusd or _args.prizepool
 		_args.prizepool = nil
+
+		-- Doubles
+		_args.doublesprizepoolusd = _args.doublesprizepoolusd or _args.doublesprizepool
+		_args.doublesprizepool = nil
 	end
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
@@ -127,30 +135,14 @@ function CustomInjector:parse(id, widgets)
 		end
 
 	elseif id == 'prizepool' then
-		if _args.prizepoolassumed then
-			widgets[1].content[1] = Abbreviation.make(
-				widgets[1].content[1],
-				'This prize is assumed, and has not been confirmed'
-			)
-		end
+		widgets = {}
+		-- Normal prize pool
+		table.insert(widgets, Cell{name = 'Prize pool', content = {CustomLeague.createPrizepool(_args)}})
 
-		local prizePool, prizePoolUsd = _args.doublesprizepool, _args.doublesprizepoolusd
-		if not prizePool and not prizePoolUsd then
-			_args.prizepoolassumed = true
-
-			local singlesFee = tonumber(_args.doublesfee) or 0
-			local playerNumber = tonumber(_args.doubles_number) or 0
-			local singlesBonus = tonumber(_args.doublesbonus) or 0
-		end
-		table.insert(widgets, Cell{name = 'Doubles prize pool', content = {
-			InfoboxPrizePool.display{
-				prizepool = _args.prizepool,
-				prizepoolusd = _args.prizepoolusd,
-				currency = _args.localcurrency,
-				rate = _args.currency_rate,
-				date = Variables.varDefault('tournament_enddate'),
-			}
-		}})
+		-- Doubles prize pool
+		local doubleArgs = Array.copy(_args)
+		doubleArgs.prizepool, doubleArgs.prizepoolusd = _args.doublesprizepool, _args.doublesprizepoolusd
+		table.insert(widgets, Cell{name = 'Doubles prize pool', content = {CustomLeague.createPrizepool(doubleArgs, true)}})
 
 	elseif id == 'gamesettings' then
 		local version = {_args.version, _args.endversion}
@@ -173,8 +165,11 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 
 	lpdbData.extradata.assumedprizepool = tostring(_args.prizepoolassumed)
+	lpdbData.extradata.doubles_prizepool = tostring(_args.doublesprizepoolusd)
 	lpdbData.extradata.circuit = _args.circuit
+	lpdbData.extradata.circuit2 = _args.circuit2
 	lpdbData.extradata.circuit_tier = _args.circuit_tier
+	lpdbData.extradata.circuit2_tier = _args.circuit2_tier
 
 	return lpdbData
 end
@@ -187,6 +182,7 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('circuitabbr', _args.circuitabbr)
 	Variables.varDefine('seriesabbr', _args.abbreviation)
 	Variables.varDefine('tournament_link', self.pagename)
+	Variables.varDefine('doublesprizepoolusd', _args.doublesprizepoolusd)
 
 	-- Legacy vars
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
@@ -256,12 +252,38 @@ function CustomLeague._createNoWrappingSpan(content)
 	return span
 end
 
-function CustomLeague._calculateAssumedPrize(fee, participants, bonus)
+function CustomLeague._assumedPrize(fee, participants, bonus)
 	fee = tonumber(fee) or 0
 	participants = tonumber(participants) or 0
 	bonus = tonumber(bonus) or 0
 
 	return fee * participants + bonus
+end
+
+function CustomLeague._makeAssumedAbbr(displayText)
+	if not displayText then
+		return
+	end
+	return Abbreviation.make(displayText, 'This prize is assumed, and has not been confirmed')
+end
+
+function CustomLeague.createPrizepool(args, noVariables)
+	if args.prizepool and args.prizepoolusd then
+		return nil
+	end
+
+	local prizeDisplay = InfoboxPrizePool.display{
+		prizepool = args.prizepool,
+		prizepoolusd = args.prizepoolusd,
+		currency = args.localcurrency,
+		date = Variables.varDefault('tournament_enddate'),
+		setvariables =  not noVariables,
+	}
+
+	if prizeDisplay and args.prizepoolassumed then
+		prizeDisplay = Abbreviation.make(prizeDisplay, 'This prize is assumed, and has not been confirmed')
+	end
+	return prizeDisplay
 end
 
 return CustomLeague
