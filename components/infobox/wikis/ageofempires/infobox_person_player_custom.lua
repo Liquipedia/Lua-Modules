@@ -13,6 +13,7 @@ local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
 local Region = require('Module:Region')
@@ -368,7 +369,7 @@ function CustomPlayer._getLatestPlacement(game)
 end
 
 function CustomPlayer._buildPlacementConditions()
-	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
+	local person = CustomPlayer._getPersonQuery()
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
@@ -384,7 +385,7 @@ function CustomPlayer._buildPlacementConditions()
 end
 
 function CustomPlayer._getBroadcastGames()
-	local person = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
+	local person = CustomPlayer._getPersonQuery()
 	local personCondition = ConditionTree(BooleanOperator.any)
 		:add{
 			ConditionNode(ColumnName('page'), Comparator.eq, person),
@@ -414,6 +415,14 @@ function CustomPlayer._getBroadcastGames()
 		end
 	end
 	return games
+end
+
+function CustomPlayer._getPersonQuery()
+	if Namespace.isMain() then
+		return _player.pagename
+	else
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(_args.id)
+	end
 end
 
 return CustomPlayer
