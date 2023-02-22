@@ -24,9 +24,9 @@ local TIER_VALUE = {8, 4, 2}
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
-	args.opponentLibrary = 'Opponent/Custom'
-	args.syncPlayers = true
-	local prizePool = PrizePool(args):create()
+	local prizePool = PrizePool(args)
+	prizePool:setConfigDefault('syncPlayers', true)
+	prizePool:create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
@@ -40,11 +40,11 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
-	local participants = lpdbData.opponentname or ''
+	local participant = lpdbData.opponentname or ''
 	local lpdbPrefix = placement.parent.options.lpdbPrefix
 
-	Variables.varDefine('enddate_' .. lpdbPrefix .. participants, lpdbData.date)
-	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (participants:lower()) ..
+	Variables.varDefine('enddate_' .. lpdbPrefix .. participant, lpdbData.date)
+	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (participant:lower()) ..
 		'_pointprize', lpdbData.extradata.prizepoints
 	)
 
