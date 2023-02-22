@@ -1325,7 +1325,7 @@ return {
 			},
 		},
 		t4 = {
-			abbreviation = 'TK4',
+			abbreviation = 'T4',
 			name = 'Tekken 4',
 			link = 'Tekken 4',
 			logo = {
@@ -1338,7 +1338,7 @@ return {
 			},
 		},
 		t5 = {
-			abbreviation = 'TK5',
+			abbreviation = 'T5',
 			name = 'Tekken 5',
 			link = 'Tekken 5',
 			logo = {
@@ -1350,21 +1350,8 @@ return {
 				lightMode = 'Tekken 5 default allmode.png',
 			},
 		},
-		t5dr = {
-			abbreviation = 'TK5 DR',
-			name = 'Tekken 5: Dark Resurrection',
-			link = 'Tekken 5: Dark Resurrection',
-			logo = {
-				darkMode = 'Tekken 5 Dark Resurrection default allmode.png',
-				lightMode = 'Tekken 5 Dark Resurrection default allmode.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'Tekken 5 Dark Resurrection default allmode.png',
-				lightMode = 'Tekken 5 Dark Resurrection default allmode.png',
-			},
-		},
 		t6 = {
-			abbreviation = 'TK6',
+			abbreviation = 'T6',
 			name = 'Tekken 6',
 			link = 'Tekken 6',
 			logo = {
@@ -1377,7 +1364,7 @@ return {
 			},
 		},
 		t7 = {
-			abbreviation = 'TK7',
+			abbreviation = 'T7',
 			name = 'TEKKEN 7',
 			link = 'TEKKEN 7',
 			logo = {
@@ -1390,7 +1377,7 @@ return {
 			},
 		},
 		t8 = {
-			abbreviation = 'TK8',
+			abbreviation = 'T8',
 			name = 'TEKKEN 8',
 			link = 'TEKKEN 8',
 			logo = {
