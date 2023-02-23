@@ -377,7 +377,7 @@ function CustomMatchGroupInput._getManuallyEnteredPlayers(playerData)
 		local name = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
 			playerData[prefix .. 'link'],
 			displayName
-		))
+		)):gsub(' ', '_')
 
 		table.insert(players, {
 			name = name,
@@ -400,7 +400,7 @@ function CustomMatchGroupInput._getPlayersFromVariables(teamName)
 			break
 		end
 		table.insert(players, {
-			name = playerName,
+			name = playerName:gsub(' ', '_'),
 			displayname = Variables.varDefault(prefix .. 'dn', playerName:gsub('_', ' ')),
 			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
 		})
