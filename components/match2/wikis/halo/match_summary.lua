@@ -38,7 +38,11 @@ local _LINK_DATA = {
 	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	halodatahive = {icon = 'File:Halo Data Hive allmode.png',text = 'Match page on Halo Data Hive'},
-	headtohead = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
+	headtohead = {
+		icon = 'Match_Info_Halo_H2H.png',
+		iconDark = 'File:Match_Info_Halo_H2H_darkmode.png',
+		text = 'Head-to-head statistics'
+	},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
