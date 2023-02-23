@@ -281,6 +281,14 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
+	for _, player in pairs(record.players or {}) do
+		player.name = player.name:gsub(' ', '_')
+	end
+
+	if record.name then
+		record.name = record.name:gsub(' ', '_')
+	end
+
 	if record.type == Opponent.team then
 		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
 		record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
@@ -307,7 +315,7 @@ function CustomMatchGroupInput._getManuallyEnteredPlayers(playerData)
 		local name = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
 			playerData[prefix .. 'link'],
 			displayName
-		))
+		)):gsub(' ', '_')
 
 		table.insert(players, {
 			name = name,
@@ -330,7 +338,7 @@ function CustomMatchGroupInput._getPlayersFromVariables(teamName)
 			break
 		end
 		table.insert(players, {
-			name = playerName,
+			name = playerName:gsub(' ', '_'),
 			displayname = Variables.varDefault(prefix .. 'dn', playerName:gsub('_', ' ')),
 			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
 		})
@@ -472,7 +480,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex,
 	-- if we have the player not present in match2player add basic data here
 	if not match2playerIndex then
 		match2playerIndex = #players + 1
-		playerData = Table.merge(playerData, {name = player, displayname = map[playerKey] or player})
+		playerData = Table.merge(playerData, {name = player:gsub(' ', '_'), displayname = map[playerKey] or player})
 	end
 
 	participants[opponentIndex .. '_' .. match2playerIndex] =  playerData
