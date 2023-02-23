@@ -580,7 +580,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex,
 		-- if we have the player not present in match2player add basic data here
 		if not match2playerIndex then
 			match2playerIndex = appendIndex
-			playerData = Table.merge(playerData, {name = player, displayname = map[playerKey] or player})
+			playerData = Table.merge(playerData, {name = player:gsub(' ', '_'), displayname = map[playerKey] or player})
 
 			appendIndex = appendIndex + 1
 		end
