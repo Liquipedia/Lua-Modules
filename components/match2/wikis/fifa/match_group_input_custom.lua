@@ -475,11 +475,10 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex,
 	end
 
 	for playerKey, player in Table.iter.pairsByPrefix(map, prefix) do
-		local player = map[playerKey .. 'link'] or map[playerKey]
 		if player:lower() ~= TBD then
 			-- allows fetching the link of the player from preset wiki vars
 			player = mw.ext.TeamLiquidIntegration.resolve_redirect(
-				map[playerKey .. 'link'] or Variables.varDefault(map[playerKey] .. '_page') or map[playerKey]
+				map[playerKey .. 'link'] or Variables.varDefault(player .. '_page') or player
 			)
 		end
 
