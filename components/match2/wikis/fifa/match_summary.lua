@@ -17,7 +17,8 @@ local VodLink = require('Module:VodLink')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
+
+local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
 local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local DRAW_LINE = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>'
@@ -137,7 +138,7 @@ function CustomMatchSummary._createSubMatch(row, game, match)
 
 	row
 		-- player left side
-		:addElement(CustomMatchSummary._player(players[1], 1, game.winner))
+		:addElement(CustomMatchSummary._players(players[1], 1, game.winner))
 		-- score
 		:addElement(CustomMatchSummary._score(game.scores[1] or 0))
 		-- penalty score
@@ -151,7 +152,7 @@ function CustomMatchSummary._createSubMatch(row, game, match)
 		-- score
 		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
 		-- player right side
-		:addElement(CustomMatchSummary._player(players[2], 2, game.winner))
+		:addElement(CustomMatchSummary._players(players[2], 2, game.winner))
 end
 
 function CustomMatchSummary._extractPlayersFromGame(game, match)
@@ -171,7 +172,7 @@ function CustomMatchSummary._extractPlayersFromGame(game, match)
 			}
 		end
 
-		players[opponentIndex] = player
+		table.insert(players[opponentIndex], player)
 	end
 
 	return players
@@ -208,7 +209,7 @@ function CustomMatchSummary._subMatchPenaltyScore(game, opponentIndex)
 	)
 end
 
-function CustomMatchSummary._player(player, opponentIndex, winner)
+function CustomMatchSummary._players(players, opponentIndex, winner)
 	local flip = opponentIndex == 1
 
 	return mw.html.create('div')
@@ -218,9 +219,10 @@ function CustomMatchSummary._player(player, opponentIndex, winner)
 		:css('padding', '2px 8px')
 		:css('text-align', flip and 'right' or 'left')
 		:css('width', '35%')
-		:node(PlayerDisplay.BlockPlayer{
-			player = player,
-			flip = flip,
+		:node(OpponentDisplay.BlockPlayers{
+			opponent = {players = players},
+			overflow = 'ellipsis',
+			showLink = true,
 		})
 end
 
