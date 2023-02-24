@@ -20,7 +20,7 @@ function CustomOpponent.resolve(opponent, date, options)
 	if Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if not player.team and options.syncPlayer then
-				player.team = PlayerExt.syncTeam(player.pageName, nil)
+				player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil)
 			end
 		end
 	end
