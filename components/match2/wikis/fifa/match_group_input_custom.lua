@@ -281,8 +281,10 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
-	for _, player in pairs(record.players or {}) do
-		player.name = player.name:gsub(' ', '_')
+	if type(record.players) == 'table' then
+		for _, player in pairs(record.players) do
+			player.name = player.name:gsub(' ', '_')
+		end
 	end
 
 	if record.name then
@@ -328,19 +330,24 @@ function CustomMatchGroupInput._getManuallyEnteredPlayers(playerData)
 end
 
 function CustomMatchGroupInput._getPlayersFromVariables(teamName)
+	local teamNameWithSpaces = teamName:gsub('_', ' ')
 	local players = {}
 
 	local playerIndex = 1
 	while true do
 		local prefix = teamName .. '_p' .. playerIndex
-		local playerName = Variables.varDefault(prefix)
+		local prefixWithSpaces = teamNameWithSpaces .. '_p' .. playerIndex
+		local playerName = Variables.varDefault(prefix, Variables.varDefault(prefixWithSpaces))
 		if String.isEmpty(playerName) then
 			break
 		end
 		table.insert(players, {
 			name = playerName:gsub(' ', '_'),
-			displayname = Variables.varDefault(prefix .. 'dn', playerName:gsub('_', ' ')),
-			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
+			displayname = Variables.varDefault(
+					prefix .. 'dn',
+					Variables.varDefault(prefixWithSpaces .. 'dn', playerName:gsub('_', ' '))
+			),
+			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag', Variables.varDefault(prefixWithSpaces .. 'flag'))),
 		})
 		playerIndex = playerIndex + 1
 	end
@@ -429,15 +436,15 @@ function CustomMatchGroupInput._processPlayerMapData(map, match)
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local opponent = match['opponent' .. opponentIndex]
-		if opponent.type == Opponent.solo then
-			CustomMatchGroupInput._processDefaultPlayerMapData(
+		if opponent.type == Opponent.team and Logic.readBool(match.hasSubmatches) then
+			CustomMatchGroupInput._processTeamPlayerMapData(
 				opponent.match2players or {},
 				opponentIndex,
 				map,
 				participants
 			)
-		elseif opponent.type == Opponent.team then
-			CustomMatchGroupInput._processTeamPlayerMapData(
+		else
+			CustomMatchGroupInput._processDefaultPlayerMapData(
 				opponent.match2players or {},
 				opponentIndex,
 				map,
@@ -460,30 +467,36 @@ function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentInd
 end
 
 function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex, map, participants)
-	local playerKey = 'p' .. opponentIndex
-	local player = map[playerKey .. 'link'] or map[playerKey]
-	if String.isEmpty(player) or player:lower() == TBD then
-		player = TBD
-	else
-		-- allows fetching the link of the player from preset wiki vars
-		player = mw.ext.TeamLiquidIntegration.resolve_redirect(
-			map[playerKey .. 'link'] or Variables.varDefault(map[playerKey] .. '_page') or map[playerKey]
-		)
+	local prefix = 't' .. opponentIndex .. 'p'
+
+	-- we need at least 1 player so if none ist set use TBD
+	if String.isEmpty(map[prefix .. 1]) then
+		map[prefix .. 1] = TBD
 	end
 
-	local playerData = {
-		played = true,
-	}
+	for playerKey, player in Table.iter.pairsByPrefix(map, prefix) do
+		local player = map[playerKey .. 'link'] or map[playerKey]
+		if player:lower() ~= TBD then
+			-- allows fetching the link of the player from preset wiki vars
+			player = mw.ext.TeamLiquidIntegration.resolve_redirect(
+				map[playerKey .. 'link'] or Variables.varDefault(map[playerKey] .. '_page') or map[playerKey]
+			)
+		end
 
-	local match2playerIndex = CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
+		local playerData = {
+			played = true,
+		}
 
-	-- if we have the player not present in match2player add basic data here
-	if not match2playerIndex then
-		match2playerIndex = #players + 1
-		playerData = Table.merge(playerData, {name = player:gsub(' ', '_'), displayname = map[playerKey] or player})
+		local match2playerIndex = CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
+
+		-- if we have the player not present in match2player add basic data here
+		if not match2playerIndex then
+			match2playerIndex = #players + 1
+			playerData = Table.merge(playerData, {name = player:gsub(' ', '_'), displayname = map[playerKey] or player})
+		end
+
+		participants[opponentIndex .. '_' .. match2playerIndex] =  playerData
 	end
-
-	participants[opponentIndex .. '_' .. match2playerIndex] =  playerData
 end
 
 function CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
