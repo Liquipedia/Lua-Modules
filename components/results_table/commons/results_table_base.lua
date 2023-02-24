@@ -419,14 +419,14 @@ function BaseResultsTable:opponentDisplay(data, options)
 	if not data.opponenttype then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.tbd(),
-			flip = (options or {}).flip,
+			flip = options.flip,
 		}
 	elseif self.config.displayDefaultLogoAsIs or
 		data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data),
-			flip = (options or {}).flip,
+			flip = options.flip,
 		}
 	end
 
@@ -443,14 +443,14 @@ function BaseResultsTable:opponentDisplay(data, options)
 
 	local teamDisplay = OpponentDisplay.BlockOpponent{
 		opponent = {template = teamTemplate, type = Opponent.team},
-		flip = (options or {}).flip,
+		flip = options.flip,
 		teamStyle = 'icon',
 	}
 
 	local rawTeamTemplate = Team.queryRaw(teamTemplate)
 
 	if self:shouldDisplayAdditionalText(rawTeamTemplate) then
-		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
+		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
 	end
 
 	return teamDisplay
@@ -463,12 +463,12 @@ function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, opponentT
 	)
 end
 
-function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate)
+function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
 	return mw.html.create()
 		:node(teamDisplay)
 		:node(mw.html.create('div')
 			:css('width', '60px')
-			:css('align', 'left')
+			:css('float', flip and 'right' or 'left')
 			:node(
 				mw.html.create('div')
 					:css('line-height', '1')
