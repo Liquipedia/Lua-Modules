@@ -15,19 +15,17 @@ local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
 local _args
-local _league
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local _GAME_MODE = mw.loadData('Module:GameMode')
-local _RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
+local GAME_MODE = mw.loadData('Module:GameMode')
+local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 function CustomLeague.run(frame)
 	local league = League(frame)
 	
-	_league = league
-	_args = _league.args
+	_args = league.args
 	
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
@@ -74,7 +72,7 @@ end
 
 function CustomLeague:appendLiquipediatierDisplay()
 	if Logic.readBool(_args['riot-sponsored']) then
-		return ' ' .. _RIOT_ICON
+		return ' ' .. RIOT_ICON
 	end
 	return ''
 end
@@ -83,25 +81,21 @@ function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
 		return nil
 	end
-	local content
+
+	local content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]'
 
 	if String.isEmpty(args.epatch) then
-		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]'
-	else
-		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]' .. ' &ndash; ' ..
-		'[[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
+		return content
 	end
 
-	return content
+	return content .. ' &ndash; [[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
 end
 
 function CustomLeague._getGameMode()
-	local gameMode = _args.mode
-	if String.isEmpty(gameMode) then
+	if String.isEmpty(_args.mode) then
 		return nil
 	end
-	gameMode = string.lower(gameMode)
-	return _GAME_MODE[gameMode] or _GAME_MODE['default']
+	return GAME_MODE[string.lower(_args.mode)] or GAME_MODE['default']
 end
 
 return CustomLeague
