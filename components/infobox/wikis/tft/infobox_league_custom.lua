@@ -5,14 +5,17 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-
-local League = require('Module:Infobox/League')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 local _args
 
@@ -24,10 +27,10 @@ local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournam
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-
 	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
+	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
@@ -58,7 +61,7 @@ function CustomInjector:parse(id, widgets)
 			content = {CustomLeague:_createPatchCell(_args)}
 		})
 		table.insert(widgets, Cell{
-			name = 'Game mode',
+			name = 'Game Mode',
 			content = {CustomLeague._getGameMode()}
 		})
 	end
@@ -75,6 +78,10 @@ function CustomLeague:appendLiquipediatierDisplay()
 		return ' ' .. RIOT_ICON
 	end
 	return ''
+end
+
+function CustomLeague:defineCustomPageVariables()
+	Variables.varDefine('tournament_mode', string.lower(_args.mode) or '')
 end
 
 function CustomLeague:_createPatchCell(args)
