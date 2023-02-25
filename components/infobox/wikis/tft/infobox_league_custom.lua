@@ -24,13 +24,13 @@ local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournam
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-	
+
 	_args = league.args
-	
+
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
-	
+
 	return league:createInfobox(frame)
 end
 
