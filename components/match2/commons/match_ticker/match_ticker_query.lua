@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -120,14 +121,14 @@ end
 
 function BaseConditions:tournamentConditions(queryArgs)
 	local tournaments = {}
-	local tournament = queryArgs.tournament or queryArgs.tournament1
+	local tournament = queryArgs.tournament or queryArgs.tournament1 or queryArgs[1]
 	local tournamentIndex = 1
 	while String.isNotEmpty(tournament) do
 		tournament = mw.ext.TeamLiquidIntegration.resolve_redirect(tournament)
 		tournament = string.gsub(tournament, '%s', '_')
 		table.insert(tournaments, tournament)
 		tournamentIndex = tournamentIndex + 1
-		tournament = queryArgs['tournament' .. tournamentIndex]
+		tournament = queryArgs['tournament' .. tournamentIndex] or queryArgs[tournamentIndex]
 	end
 	if not Table.isEmpty(tournaments) then
 		local tournamentConditionTree = ConditionTree(BooleanOperator.any)
@@ -135,6 +136,8 @@ function BaseConditions:tournamentConditions(queryArgs)
 			tournamentConditionTree:add({ConditionNode(ColumnName('pagename'), Comparator.eq, item)})
 		end
 		return tournamentConditionTree
+	elseif Logic.readBool(queryArgs.byParent) then
+		return ConditionNode(ColumnName('parent'), Comparator.eq, args.parent or Variables.varDefault('tournament_parent'))
 	end
 
 	return nil
