@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -52,6 +53,17 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 
 	--gamemode
 	BasicHiddenDataBox.checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
+
+	--maps
+	Variables.varDefine('tournament_maps', queryResult.maps)
+
+	-- legacy variables, to be removed with match2
+	local maps, failure = Json.parse(queryResult.maps)
+	if not failure then
+		for _, map in ipairs(maps) do
+			Variables.varDefine('tournament_map_'.. map.displayName, map.link)
+		end
+	end
 end
 
 function CustomHiddenDataBox.validateTier(tierString, tierMode)
