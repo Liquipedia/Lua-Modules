@@ -137,7 +137,7 @@ function BaseConditions:tournamentConditions(queryArgs)
 		end
 		return tournamentConditionTree
 	elseif Logic.readBool(queryArgs.byParent) then
-		return ConditionNode(ColumnName('parent'), Comparator.eq, args.parent or Variables.varDefault('tournament_parent'))
+		return ConditionNode(ColumnName('parent'), Comparator.eq, queryArgs.parent or Variables.varDefault('tournament_parent'))
 	end
 
 	return nil
