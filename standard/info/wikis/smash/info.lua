@@ -76,7 +76,7 @@ return {
 				lightMode = 'Smash default lightmode.png',
 			},
 		},
-		[64] = {
+		['64'] = {
 			abbreviation = '64',
 			name = 'Super Smash Bros.',
 			link = 'Super Smash Bros.',
