@@ -89,12 +89,19 @@ function BroadcasterCard.create(frame)
 	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id < b.id) end)
 
 	for _, broadcaster in ipairs(casters) do
-		local displayName = broadcaster.displayName or broadcaster.name
-		outputList = outputList .. '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
-			.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]&nbsp;(' .. displayName ..')'
+		outputList = outputList .. BroadcasterCard._display(broadcaster)
 	end
 
 	return outputList
+end
+
+function BroadcasterCard._display(broadcaster)
+	local displayName = broadcaster.displayName or broadcaster.name
+	displayName = String.isEmpty(displayName) and '' or ('&nbsp;(' .. displayName ..')')
+
+	return '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
+		.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]'
+		.. displayName
 end
 
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
