@@ -251,7 +251,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData['sponsors'] = args.sponsors
 
-	lpdbData['maps'] = Variables.varDefault('tournament_maps')
+	lpdbData.maps = Variables.varDefault('tournament_maps')
 
 	lpdbData['game'] = GameLookup.getName({args.game})
 	-- Currently, args.patch shall be used for official patches,
