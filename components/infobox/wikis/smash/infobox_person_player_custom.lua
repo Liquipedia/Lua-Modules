@@ -28,7 +28,7 @@ local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local GAME_ORDER = {64, 'melee', 'brawl', 'pm', 'wiiu', 'ultimate'}
+local GAME_ORDER = {'64', 'melee', 'brawl', 'pm', 'wiiu', 'ultimate'}
 
 local _args
 
