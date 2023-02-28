@@ -242,22 +242,22 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	if String.isEmpty(args.tickername) then
-		lpdbData['tickername'] = args.name
+		lpdbData.tickername = args.name
 	end
 
 	-- Prevent resolving redirects for series
 	-- lpdbData.seriespage will still contain the resolved page
-	lpdbData['series'] = args.series
+	lpdbData.series = args.series
 
-	lpdbData['sponsors'] = args.sponsors
+	lpdbData.sponsors = args.sponsors
 
 	lpdbData.maps = Variables.varDefault('tournament_maps')
 
-	lpdbData['game'] = GameLookup.getName({args.game})
+	lpdbData.game = GameLookup.getName({args.game})
 	-- Currently, args.patch shall be used for official patches,
 	-- whereas voobly is used to denote non-official version played via voobly
-	lpdbData['patch'] = args.patch or args.voobly
-	lpdbData['participantsnumber'] = args.team_number or args.player_number
+	lpdbData.patch = args.patch or args.voobly
+	lpdbData.participantsnumber = args.team_number or args.player_number
 
 	lpdbData.extradata.region = args.region
 	lpdbData.extradata.deadline = DateClean._clean(args.deadline or '')
