@@ -174,7 +174,7 @@ function BroadcasterCard.setLPDB(caster, status)
 	)
 end
 
---Calculate the wiki specific Weight for the event 
+-- Calculate the wiki specific Weight for the event
 function BroadcasterCard.getWeight()
 	local tPrizePool = Variables.varDefault('tournament_prizepoolusd') or 1
 	local tier = Variables.varDefault('tournament_liquipediatier')
