@@ -61,7 +61,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	local maps, failure = Json.parse(queryResult.maps)
 	if not failure then
 		for _, map in ipairs(maps) do
-			Variables.varDefine('tournament_map_'.. map.displayName, map.link)
+			Variables.varDefine('tournament_map_'.. (map.name or map.link), map.link)
 		end
 	end
 end
