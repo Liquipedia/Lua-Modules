@@ -373,6 +373,7 @@ function CustomLeague:_getMaps()
 
 		if String.isNotEmpty(args[prefix .. 'link']) then
 			link = args[prefix .. 'link']
+			display = mapInput[1]
 		else
 			link = mapInput[1]
 			display = mapInput[2]
