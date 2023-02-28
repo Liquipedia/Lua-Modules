@@ -83,7 +83,7 @@ function BroadcasterCard.create(frame)
 	end
 
 	if Table.isEmpty(casters) then
-		return outputList .. '\n**<abbr title="To Be Announced">TBA</abbr>'
+		return outputList .. '\n**' .. Abbreviation.make('TBA', 'To Be Announced')
 	end
 
 	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id < b.id) end)
