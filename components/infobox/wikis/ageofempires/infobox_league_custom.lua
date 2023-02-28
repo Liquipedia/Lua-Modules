@@ -236,7 +236,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	local maps = CustomLeague:_getMaps()
 	Variables.varDefine('tournament_maps', Json.stringify(maps))
 	for _, map in ipairs(maps) do
-		Variables.varDefine('tournament_map_'.. map.displayName, map.link)
+		Variables.varDefine('tournament_map_'.. (map.name or map.link), map.link)
 	end
 end
 
@@ -366,21 +366,20 @@ function CustomLeague:_getMaps()
 	local args = _league.args
 	local maps = {}
 	for prefix, mapInput in Table.iter.pairsByPrefix(args, 'map') do
-		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or ''
+		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or nil
 
 		mapInput = mw.text.split(mapInput, '|', true)
 		local display, link
 
 		if String.isNotEmpty(args[prefix .. 'link']) then
 			link = args[prefix .. 'link']
-			display = mapInput[1]
 		else
 			link = mapInput[1]
-			display = mapInput[2] or mapInput[1]
+			display = mapInput[2]
 		end
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(link)
 
-		table.insert(maps, {link = link, displayName = display, mode = mode, image = args[prefix .. 'image']})
+		table.insert(maps, {link = link, name = display, mode = mode, image = args[prefix .. 'image']})
 	end
 
 	_league.maps = maps
@@ -391,7 +390,7 @@ end
 function CustomLeague:_displayMaps(maps)
 	local mapDisplay = function(map)
 		return tostring(CustomLeague:_createNoWrappingSpan(
-			Page.makeInternalLink({}, map.displayName .. map.mode, map.link)
+			Page.makeInternalLink({}, (map.displayName or map.link) .. (map.mode and map.mode or ''), map.link)
 		))
 	end
 
