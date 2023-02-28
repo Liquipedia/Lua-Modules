@@ -390,7 +390,7 @@ end
 function CustomLeague:_displayMaps(maps)
 	local mapDisplay = function(map)
 		return tostring(CustomLeague:_createNoWrappingSpan(
-			Page.makeInternalLink({}, (map.displayName or map.link) .. (map.mode and map.mode or ''), map.link)
+			Page.makeInternalLink({}, (map.name or map.link) .. (map.mode and map.mode or ''), map.link)
 		))
 	end
 
