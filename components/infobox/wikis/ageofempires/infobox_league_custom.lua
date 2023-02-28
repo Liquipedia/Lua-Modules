@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local DateClean = require('Module:DateTime')
 local GameLookup = require('Module:GameLookup')
 local GameModeLookup = require('Module:GameModeLookup')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Page = require('Module:Page')
@@ -232,8 +233,10 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
 
 	-- map links, to be used by brackets and mappool templates
-	for _, map in ipairs(CustomLeague:_getMaps()) do
-		Variables.varDefine('tournament_map_'.. map.displayName, map.link)
+	local maps = CustomLeague:_getMaps()
+	Variables.varDefine('tournament_maps', Json.stringify(maps))
+	for _, map in ipairs(maps) do
+		Variables.varDefine('tournament_map_'.. (map.name or map.link), map.link)
 	end
 end
 
@@ -248,8 +251,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData['sponsors'] = args.sponsors
 
-	local mapPages = Table.mapValues(_league.maps, function(map) return map.link end)
-	lpdbData['maps'] = table.concat(mapPages, ';')
+	lpdbData.maps = Variables.varDefault('tournament_maps')
 
 	lpdbData['game'] = GameLookup.getName({args.game})
 	-- Currently, args.patch shall be used for official patches,
@@ -364,7 +366,7 @@ function CustomLeague:_getMaps()
 	local args = _league.args
 	local maps = {}
 	for prefix, mapInput in Table.iter.pairsByPrefix(args, 'map') do
-		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or ''
+		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or nil
 
 		mapInput = mw.text.split(mapInput, '|', true)
 		local display, link
@@ -374,16 +376,11 @@ function CustomLeague:_getMaps()
 			display = mapInput[1]
 		else
 			link = mapInput[1]
-			-- only check for a map page when map has only one part,
-			-- so no precise link is given
-			if mapInput[2] == nil and Page.exists(link .. ' (map)') then
-				link = link .. ' (map)'
-			end
-			display = mapInput[2] or mapInput[1]
+			display = mapInput[2]
 		end
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(link)
 
-		table.insert(maps, {link = link, displayName = display, mode = mode})
+		table.insert(maps, {link = link, name = display, mode = mode, image = args[prefix .. 'image']})
 	end
 
 	_league.maps = maps
@@ -394,7 +391,7 @@ end
 function CustomLeague:_displayMaps(maps)
 	local mapDisplay = function(map)
 		return tostring(CustomLeague:_createNoWrappingSpan(
-			Page.makeInternalLink({}, map.displayName .. map.mode, map.link)
+			Page.makeInternalLink({}, (map.name or map.link) .. (map.mode and map.mode or ''), map.link)
 		))
 	end
 
