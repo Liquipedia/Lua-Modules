@@ -8,6 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -48,7 +49,7 @@ function BroadcasterCard.create(frame)
 		if args.b2 then
 			-- Pluralise position(s).
 			title = table.concat(
-				Table.map(
+				Array.map(
 					mw.text.split(position, '/'),
 					BroadcasterCard._pluralisePosition
 				), '/'
@@ -115,8 +116,8 @@ function BroadcasterCard._display(broadcaster)
 		.. displayName
 end
 
-function BroadcasterCard._pluralisePosition(key, position)
-	return key, String.endsWith(position, 's') and position or (position .. 's')
+function BroadcasterCard._pluralisePosition(position)
+	return String.endsWith(position, 's') and position or (position .. 's')
 end
 
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
