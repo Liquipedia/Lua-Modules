@@ -46,18 +46,15 @@ function BroadcasterCard.create(frame)
 	elseif position == TBD then
 		title = Abbreviation.make(TBD, 'To Be Determined')
 	else
+		-- Create a title from the position.
+		local positions = Array.map(
+			mw.text.split(position, '/'),
+			function(pos) return mw.text.trim(pos) end
+		)
 		if args.b2 then
-			-- Pluralise position(s).
-			title = table.concat(
-				Array.map(
-					mw.text.split(position, '/'),
-					BroadcasterCard._pluralisePosition
-				), '/'
-			)
-		else
-			title = position
+			positions = Array.map(positions, BroadcasterCard._pluralisePosition)
 		end
-		title = title .. ':'
+		title = table.concat(positions, '/')  .. ':'
 	end
 
 	-- Html for header
