@@ -30,6 +30,7 @@ function CustomLeague.run(frame)
 	_league = league
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
+	league.addToLpdb = CustomLeague.addToLpdb
 
 	return league:createInfobox()
 end
@@ -58,6 +59,19 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
+end
+
+function CustomInjector:addCustomCells(widgets)
+	table.insert(widgets, Cell{
+		name = 'Teams',
+		content = {(_league.args.team_number or '') .. (_league.args.team_slots and ('/' .. _league.args.team_slots) or '')}
+	})
+	return widgets
+end
+
+function CustomLeague:addToLpdb(lpdbData, args)
+	lpdbData.participantsnumber = args.team_number
+	return lpdbData
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
