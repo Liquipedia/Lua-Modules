@@ -64,7 +64,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Teams',
-		content = {(_league.args.team_number or '') .. (_league.args.team_slots and ('/' .. _league.args.team_slots) or '')}
+		content = {(_league.args.team_number or '')}
 	})
 	return widgets
 end
