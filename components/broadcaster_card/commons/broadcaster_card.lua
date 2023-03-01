@@ -45,7 +45,18 @@ function BroadcasterCard.create(frame)
 	elseif position == TBD then
 		title = Abbreviation.make(TBD, 'To Be Determined')
 	else
-		title = position .. (args.b2 and 's' or '') .. ':'
+		if args.b2 then
+			-- Pluralise position(s).
+			title = table.concat(
+				Table.map(
+					mw.text.split(position, '/'),
+					BroadcasterCard._pluralisePosition
+				), '/'
+			)
+		else
+			title = position
+		end
+		title = title .. ':'
 	end
 
 	-- Html for header
@@ -102,6 +113,10 @@ function BroadcasterCard._display(broadcaster)
 	return '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
 		.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]'
 		.. displayName
+end
+
+function BroadcasterCard._pluralisePosition(key, position)
+	return key, String.endsWith(position, 's') and position or (position .. 's')
 end
 
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
