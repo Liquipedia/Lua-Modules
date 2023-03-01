@@ -22,7 +22,20 @@ local _args
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local GAME_MODE = mw.loadData('Module:GameMode')
+local GAME_MODE = {
+	solo = 'solos',
+	solos = 'solos',
+	duo = 'suos',
+	duos = 'suos',
+	squad = 'squads',
+	squads = 'squads',
+}
+local MODE_CATEGORIES = {
+	solos = 'Solos [[Category:Solos Mode Tournaments]]',
+	duos = 'Duos [[Category:Duos Mode Tournaments]]',
+	squads = 'Squads [[Category:Squads Mode Tournaments]]',
+	default = '[[Category:Unknown Mode Tournaments]]',
+}
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 function CustomLeague.run(frame)
@@ -81,7 +94,7 @@ function CustomLeague:appendLiquipediatierDisplay()
 end
 
 function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_mode', string.lower(_args.mode or ''))
+	Variables.varDefine('tournament_mode', GAME_MODE[string.lower(_args.mode or '')])
 end
 
 function CustomLeague:_createPatchCell(args)
@@ -99,10 +112,7 @@ function CustomLeague:_createPatchCell(args)
 end
 
 function CustomLeague._getGameMode()
-	if String.isEmpty(_args.mode) then
-		return nil
-	end
-	return GAME_MODE[string.lower(_args.mode)] or GAME_MODE['default']
+	return MODE_CATEGORIES[GAME_MODE[string.lower(_args.mode or '')]]
 end
 
 return CustomLeague
