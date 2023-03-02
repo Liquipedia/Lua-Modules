@@ -123,7 +123,7 @@ function Placement:_shouldAddTbdOpponent(opponentIndex, place)
 end
 
 function Placement:readAdditionalData(args)
-	error('Function readAdditionalData needs to be set via the module that requires "Module:PrizePool/Placement/Base"')
+	error('Function readAdditionalData needs to be implemented by child class of `PrizePool/Placement/Base`')
 end
 
 function Placement:parseOpponentArgs(input, date)
