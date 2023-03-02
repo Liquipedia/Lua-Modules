@@ -30,12 +30,7 @@ local GAME_MODE = {
 	squad = 'squads',
 	squads = 'squads',
 }
-local MODE_CATEGORIES = {
-	solos = 'Solos [[Category:Solos Mode Tournaments]]',
-	duos = 'Duos [[Category:Duos Mode Tournaments]]',
-	squads = 'Squads [[Category:Squads Mode Tournaments]]',
-	default = '[[Category:Unknown Mode Tournaments]]',
-}
+local UNKNOWN_MODE = Unknown
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 function CustomLeague.run(frame)
