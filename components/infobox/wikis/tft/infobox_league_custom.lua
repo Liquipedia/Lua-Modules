@@ -87,7 +87,7 @@ function CustomLeague:appendLiquipediatierDisplay()
 end
 
 function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_mode', GAME_MODE[string.lower(_args.mode or '')])
+	Variables.varDefine('tournament_mode', CustomLeague._getGameMode())
 end
 
 function CustomLeague:_createPatchCell(args)
