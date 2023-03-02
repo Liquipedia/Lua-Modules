@@ -108,4 +108,6 @@ function CustomLeague._getGameMode()
 	return MODE_CATEGORIES[GAME_MODE[string.lower(_args.mode or '')]]
 end
 
+function CustomLeague.getWikiCategories(args)
+	return {(CustomLeague._getGameMode() or UNKNOWN_MODE) .. ' Mode Tournaments'}
 return CustomLeague
