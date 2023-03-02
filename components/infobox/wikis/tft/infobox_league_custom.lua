@@ -25,9 +25,9 @@ local CustomInjector = Class.new(Injector)
 local GAME_MODES = {
 	solo = 'Solos',
 	duo = 'Duos',
-	squad = 'Squads',',
+	squad = 'Squads',
 }
-local UNKNOWN_MODE = Unknown
+local UNKNOWN_MODE = 'Unknown'
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 function CustomLeague.run(frame)
@@ -110,4 +110,5 @@ end
 
 function CustomLeague.getWikiCategories(args)
 	return {(CustomLeague._getGameMode() or UNKNOWN_MODE) .. ' Mode Tournaments'}
+end
 return CustomLeague
