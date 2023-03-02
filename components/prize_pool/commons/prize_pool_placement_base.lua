@@ -16,16 +16,15 @@ local Opponent = require('Module:OpponentLibraries').Opponent
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 
---- @class Placement
---- A Placement is a set of opponents who all share the same final place/award in the tournament.
+--- @class BasePlacement
+--- A BasePlacement is a set of opponents who all share the same final place/award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd (e.g. 5 to 8) or a slotSize (count) or an award.
-local Placement = Class.new(function(self, ...) self:init(...) end)
+local BasePlacement = Class.new(function(self, ...) self:init(...) end)
 
---- @class Placement
 --- @param args table Input information
---- @param parent PrizePool The PrizePool this Placement is part of
-function Placement:init(args, parent)
+--- @param parent PrizePool The PrizePool this BasePlacement is part of
+function BasePlacement:init(args, parent)
 	self.args = Table.deepCopy(args)
 	self.parent = parent
 	self.prizeTypes = parent.prizeTypes
@@ -38,8 +37,8 @@ function Placement:init(args, parent)
 end
 
 --- Parse the input for available rewards of prizes, for instance how much money a team would win.
---- This also checks if the Placement instance has a dollar reward and assigns a variable if so.
-function Placement:_readPrizeRewards(args)
+--- This also checks if the BasePlacement instance has a dollar reward and assigns a variable if so.
+function BasePlacement:_readPrizeRewards(args)
 	local rewards = {}
 
 	-- Loop through all prizes that have been defined in the header
@@ -72,7 +71,7 @@ function Placement:_readPrizeRewards(args)
 	return rewards
 end
 
-function Placement:parseOpponents(args)
+function BasePlacement:parseOpponents(args)
 	return Array.mapIndexes(function(opponentIndex)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
 		local opponent = {opponentData = {}, prizeRewards = {}, additionalData = {}}
@@ -84,7 +83,7 @@ function Placement:parseOpponents(args)
 			end
 		else
 			-- Set the date
-			if not Placement._isValidDateFormat(opponentInput.date) then
+			if not BasePlacement._isValidDateFormat(opponentInput.date) then
 				opponentInput.date = self.date
 			end
 
@@ -106,7 +105,7 @@ function Placement:parseOpponents(args)
 	end)
 end
 
-function Placement:_shouldAddTbdOpponent(opponentIndex, place)
+function BasePlacement:_shouldAddTbdOpponent(opponentIndex, place)
 	-- We want at least 1 opponent present for all placements
 	if opponentIndex == 1 then
 		return true
@@ -122,11 +121,11 @@ function Placement:_shouldAddTbdOpponent(opponentIndex, place)
 	return false
 end
 
-function Placement:readAdditionalData(args)
+function BasePlacement:readAdditionalData(args)
 	error('Function readAdditionalData needs to be implemented by child class of `PrizePool/Placement/Base`')
 end
 
-function Placement:parseOpponentArgs(input, date)
+function BasePlacement:parseOpponentArgs(input, date)
 	-- Allow for lua-table, json-table and just raw string input
 	local opponentArgs = Json.parseIfTable(input) or (type(input) == 'table' and input or {input})
 	opponentArgs.type = opponentArgs.type or self.parent.opponentType
@@ -147,11 +146,11 @@ function Placement:parseOpponentArgs(input, date)
 end
 
 
-function Placement:getPrizeRewardForOpponent(opponent, prize)
+function BasePlacement:getPrizeRewardForOpponent(opponent, prize)
 	return opponent.prizeRewards[prize] or self.prizeRewards[prize]
 end
 
-function Placement:_setBaseFromRewards(prizesToUse, prizeTypes)
+function BasePlacement:_setBaseFromRewards(prizesToUse, prizeTypes)
 	Array.forEach(self.opponents, function(opponent)
 		if opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] or self.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] then
 			return
@@ -179,11 +178,11 @@ function Placement:_setBaseFromRewards(prizesToUse, prizeTypes)
 end
 
 --- Returns true if the input matches the format of a date
-function Placement._isValidDateFormat(date)
+function BasePlacement._isValidDateFormat(date)
 	if type(date) ~= 'string' or String.isEmpty(date) then
 		return false
 	end
 	return date:match('%d%d%d%d%-%d%d%-%d%d') and true or false
 end
 
-return Placement
+return BasePlacement
