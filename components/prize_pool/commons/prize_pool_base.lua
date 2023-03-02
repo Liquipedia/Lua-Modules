@@ -51,11 +51,6 @@ local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
 
--- Allowed none-numeric score values.
-local WALKOVER_SCORE = 'W'
-local FORFEIT_SCORE = 'FF'
-local SPECIAL_SCORES = {WALKOVER_SCORE, FORFEIT_SCORE , 'L', 'DQ', 'D'}
-
 BasePrizePool.config = {
 	showBaseCurrency = {
 		default = false
@@ -679,7 +674,7 @@ end
 
 function BasePrizePool._CurrencyConvertionText(prize)
 	local exchangeRate = Math.round{
-		PrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
+		BasePrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
 			prize.data, 1, BasePrizePool._getTournamentDate()
 		)
 		,5
