@@ -73,6 +73,12 @@ BasePrizePool.config = {
 			return Logic.readBoolOrNil(args.exchangeinfo)
 		end
 	},
+	cutafter = {
+		default = 4,
+		read = function(args)
+			return tonumber(args.cutafter)
+		end
+	},
 	storeSmw = {
 		default = true,
 		read = function(args)
@@ -121,12 +127,6 @@ BasePrizePool.config = {
 			return Logic.readBoolOrNil(args.abbreviateTbd)
 		end
 	},
-	cutafter = {
-		default = 4,
-		read = function(args)
-			return tonumber(args.cutafter)
-		end
-	},
 	fillPlaceRange = {
 		default = true,
 		read = function(args)
@@ -140,7 +140,7 @@ BasePrizePool.prizeTypes = {
 		sortOrder = 10,
 
 		headerDisplay = function (data)
-			local currencyText = Currency.display(BASE_CURRENCY, nil, {symbol = false})
+			local currencyText = Currency.display(BASE_CURRENCY)
 			return TableCell{content = {{currencyText}}}
 		end,
 
