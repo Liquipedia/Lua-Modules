@@ -9,6 +9,7 @@
 -- module intended to be moved to `Module:Tier` after the old ones usage has been eliminated
 
 local Logic = require('Module:Logic')
+local FnUtil = require('Module:FnUtil')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -180,12 +181,16 @@ function Tier.iterate(subTable)
 	end)
 end
 
+Tier.legacyNumbers = FnUtil.memoize(function()
+	return Table.map(TierData.tiers, function(key, data) return data.name:lower(), tonumber(key) or '' end)
+end)
+
 --- Legacy: Converts legacy tier input to its numeric value. DEPRECATED!!!
 ---@param tier string|integer|nil
 ---@return integer
 ---@deprecated
 function Tier.toNumber(tier)
-	return (TierData.tierToNumber or {})[tier]
+	return Tier.legacyNumbers[tier]
 end
 
 return Tier
