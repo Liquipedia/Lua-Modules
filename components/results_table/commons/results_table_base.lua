@@ -290,17 +290,7 @@ function BaseResultsTable:buildTeamOpponentConditions()
 
 	local opponents = Array.append(config.aliases, config.opponent)
 
-	local opponentTeamTemplates = {}
-
-	for _, opponent in pairs(opponents) do
-		local rawOpponentTemplate = Team.queryRaw(opponent) or {}
-		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-		if not opponentTemplate then
-			error('Missing team template for team: ' .. opponent)
-		end
-
-		Array.appendWith(opponentTeamTemplates, unpack(Team.queryHistorical(opponentTemplate) or {opponentTemplate}))
-	end
+	local opponentTeamTemplates = BaseResultsTable._getOpponentTemplates(opponents)
 
 	if config.playerResultsOfTeam then
 		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
@@ -315,6 +305,22 @@ function BaseResultsTable:buildTeamOpponentConditions()
 			opponentConditions,
 			ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
 		}
+end
+
+function BaseResultsTable._getOpponentTemplates(opponents)
+	local opponentTeamTemplates = {}
+
+	for _, opponent in pairs(opponents) do
+		local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
+		if not opponentTemplate then
+			error('Missing team template for team: ' .. opponent)
+		end
+
+		Array.appendWith(opponentTeamTemplates, unpack(Team.queryHistorical(opponentTemplate) or {opponentTemplate}))
+	end
+
+	return opponentTeamTemplates
 end
 
 function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
