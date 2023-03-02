@@ -22,13 +22,10 @@ local _args
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local GAME_MODE = {
-	solo = 'solos',
-	solos = 'solos',
-	duo = 'suos',
-	duos = 'suos',
-	squad = 'squads',
-	squads = 'squads',
+local GAME_MODES = {
+	solo = 'Solos',
+	duo = 'Duos',
+	squad = 'Squads',',
 }
 local UNKNOWN_MODE = Unknown
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
