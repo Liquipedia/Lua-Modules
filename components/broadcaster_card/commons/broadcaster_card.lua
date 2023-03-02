@@ -8,6 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -45,7 +46,15 @@ function BroadcasterCard.create(frame)
 	elseif position == TBD then
 		title = Abbreviation.make(TBD, 'To Be Determined')
 	else
-		title = position .. (args.b2 and 's' or '') .. ':'
+		-- Create a title from the position.
+		local positions = Array.map(
+			mw.text.split(position, '/'),
+			function(pos) return mw.text.trim(pos) end
+		)
+		if args.b2 then
+			positions = Array.map(positions, BroadcasterCard._pluralisePosition)
+		end
+		title = table.concat(positions, '/')  .. ':'
 	end
 
 	-- Html for header
@@ -102,6 +111,10 @@ function BroadcasterCard._display(broadcaster)
 	return '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
 		.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]'
 		.. displayName
+end
+
+function BroadcasterCard._pluralisePosition(position)
+	return String.endsWith(position, 's') and position or (position .. 's')
 end
 
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
