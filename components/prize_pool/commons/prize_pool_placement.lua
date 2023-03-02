@@ -34,7 +34,7 @@ local _tbd_index = 0
 --- A Placement is a set of opponents who all share the same final place in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd, for example 5 to 8, or count (slotSize)
---- and is expected to have at maximum the same amount of opponents as the range allows (4 is the 5-8 example).
+--- and is expected to have at maximum the same amount of opponents as the range allows (4 in the 5-8 example).
 local Placement = Class.new(BasePlacement)
 
 Placement.specialStatuses = {
