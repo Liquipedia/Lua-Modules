@@ -105,7 +105,7 @@ function CustomLeague:_createPatchCell(args)
 end
 
 function CustomLeague._getGameMode()
-	return MODE_CATEGORIES[GAME_MODE[string.lower(_args.mode or '')]]
+	return GAME_MODES[string.lower(_args.mode or ''):gsub('s$', '')]
 end
 
 function CustomLeague.getWikiCategories(args)
