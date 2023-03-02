@@ -41,6 +41,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
+	league.getWikiCategories= CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
