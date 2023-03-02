@@ -93,13 +93,7 @@ function BaseResultsTable:readConfig()
 		or tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit
 
 	if config.queryType == TEAM_TYPE and Table.isNotEmpty(config.aliases) then
-		local rawOpponentTemplate = Team.queryRaw(config.opponent) or {}
-		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-		if not opponentTemplate then
-			error('Missing team template for team: ' .. config.opponent)
-		end
-
-		config.isNotAlias = Team.queryHistorical(opponentTemplate) or {opponentTemplate}
+		config.isNotAlias = BaseResultsTable._getOpponentTemplates(config.opponent)
 	end
 
 	return config
@@ -290,7 +284,10 @@ function BaseResultsTable:buildTeamOpponentConditions()
 
 	local opponents = Array.append(config.aliases, config.opponent)
 
-	local opponentTeamTemplates = BaseResultsTable._getOpponentTemplates(opponents)
+	local opponentTeamTemplates = {}
+	for _, opponent in pairs(opponents) do
+		Array.appendWith(opponentTeamTemplates, unpack(BaseResultsTable._getOpponentTemplates(opponent)))
+	end
 
 	if config.playerResultsOfTeam then
 		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
@@ -307,20 +304,14 @@ function BaseResultsTable:buildTeamOpponentConditions()
 		}
 end
 
-function BaseResultsTable._getOpponentTemplates(opponents)
-	local opponentTeamTemplates = {}
-
-	for _, opponent in pairs(opponents) do
-		local rawOpponentTemplate = Team.queryRaw(opponent) or {}
-		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-		if not opponentTemplate then
-			error('Missing team template for team: ' .. opponent)
-		end
-
-		Array.appendWith(opponentTeamTemplates, unpack(Team.queryHistorical(opponentTemplate) or {opponentTemplate}))
+function BaseResultsTable._getOpponentTemplates(opponent)
+	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
+	if not opponentTemplate then
+		error('Missing team template for team: ' .. opponent)
 	end
 
-	return opponentTeamTemplates
+	return Team.queryHistorical(opponentTemplate) or {opponentTemplate}
 end
 
 function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
