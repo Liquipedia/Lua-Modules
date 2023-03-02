@@ -157,7 +157,7 @@ end
 --- Builds the display for a given tierData/tierTypeData table
 --- overwritable on a per wiki basis if adjustments are needed
 ---@param data table
----@param options table
+---@param options {short: boolean, link: boolean|string}
 ---@return string
 function Tier.displaySingle(data, options)
 	local display = options.short and data.short or data.name
