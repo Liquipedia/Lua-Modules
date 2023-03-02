@@ -456,7 +456,7 @@ function BaseResultsTable:opponentDisplay(data, options)
 	return teamDisplay
 end
 
-function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, opponentType)
+function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate)
 	return rawTeamTemplate and (
 		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
 		(self.config.isNotAlias and not Table.includes(self.config.isNotAlias, rawTeamTemplate.templatename))
