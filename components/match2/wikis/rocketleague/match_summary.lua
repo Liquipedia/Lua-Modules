@@ -237,12 +237,12 @@ function CustomMatchSummary.getByMatchId(args)
 		local footer = MatchSummary.Footer()
 
 		-- Shift
-		for _, shift in Table.iter.pairsByPrefix(match.links, 'shift') do
+		for _, shift in Table.iter.pairsByPrefix(match.links, 'shift', {requireIndex = false}) do
 			footer:addElement(_SHIFT_PREFIX .. shift .. _SHIFT_SUFFIX)
 		end
 
 		-- Ballchasing
-		for _, ballchasing in Table.iter.pairsByPrefix(match.links, 'ballchasing') do
+		for _, ballchasing in Table.iter.pairsByPrefix(match.links, 'ballchasing', {requireIndex = false}) do
 			footer:addElement(_BALLCHASING_PREFIX .. ballchasing .. _BALLCHASING_SUFFIX)
 		end
 
