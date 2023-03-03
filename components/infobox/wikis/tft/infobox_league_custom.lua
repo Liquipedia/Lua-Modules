@@ -69,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 		})
 		table.insert(widgets, Cell{
 			name = 'Game Mode',
-			content = {lang:ucfirst(CustomLeague._getGameMode() or '')}
+			content = {_args.mode}
 		})
 	end
 
