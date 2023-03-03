@@ -33,6 +33,7 @@ local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournam
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
+	_args.mode = _args.mode and GAME_MODES[string.lower(_args.mode):gsub('s$', '')] or nil -- Normalize Mode input
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
