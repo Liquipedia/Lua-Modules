@@ -16,8 +16,6 @@ Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
 Config.TIER_TYPE_MISC = 'misc'
 Config.TIER_TYPE_SHOW_MATCH = 'show match'
-Config.TIER_TYPE_SHOWMATCH = 'showmatch'
-Config.TIER_TYPE_INDIVIDUAL = 'individual'
 Config.MAX_NUMBER_OF_PARTICIPANTS = 10
 Config.MAX_NUMBER_OF_COACHES = 2
 
