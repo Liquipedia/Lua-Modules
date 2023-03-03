@@ -614,7 +614,7 @@ function BasePrizePool:applyToggleExpand(placement, row)
 	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
-function BasePrizePool:storeSmw(args)
+function BasePrizePool:storeSmw(lpdbEntry, smwTournamentStash)
 	error('Function storeSmw needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
