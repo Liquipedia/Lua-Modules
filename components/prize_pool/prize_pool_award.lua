@@ -9,29 +9,20 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
-local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 local BasePrizePool = Lua.import('Module:PrizePool/Base', {requireDevIfEnabled = true})
 local Placement = Lua.import('Module:PrizePool/Award/Placement', {requireDevIfEnabled = true})
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = require('Module:OpponentLibraries').Opponent
 
-local WidgetFactory = require('Module:Infobox/Widget/Factory')
-local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
 
 --- @class AwardPrizePool
 local AwardPrizePool = Class.new(BasePrizePool)
-
-local tournamentVars = PageVariableNamespace('Tournament')
 
 function AwardPrizePool:readPlacements(args)
 	local numberOfParticipants = 0
