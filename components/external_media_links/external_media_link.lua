@@ -258,13 +258,7 @@ function ExternalMediaLink.wrapper(args)
 end
 
 function ExternalMediaLink._cleanValue(value)
-	value = mw.text.trim(value)
-
-	if String.isEmpty(value) then
-		return nil
-	end
-
-	return value
+	return String.nilIfEmpty(mw.text.trim(value))
 end
 
 return Class.export(ExternalMediaLink)
