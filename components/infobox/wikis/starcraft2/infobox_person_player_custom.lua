@@ -35,7 +35,6 @@ local ColumnName = Condition.ColumnName
 
 local EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
 
-local PAGENAME = mw.title.getCurrentTitle().prefixedText
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local EARNING_MODES = {solo = '1v1', team = 'team'}
@@ -76,7 +75,7 @@ function CustomPlayer.run(frame)
 	player.earningsGlobal = {}
 	player.shouldQueryData = PersonSc2.shouldStoreData()
 	if player.shouldQueryData then
-		player.yearsActive = CustomPlayer._getMatchupData(PAGENAME)
+		player.yearsActive = CustomPlayer._getMatchupData(player.pagename)
 	end
 
 	player.shouldStoreData = PersonSc2.shouldStoreData
@@ -139,7 +138,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	local rank1, rank2 = {}, {}
 	if _player.shouldQueryData then
-		rank1, rank2 = CustomPlayer._getRank(PAGENAME)
+		rank1, rank2 = CustomPlayer._getRank(_player.pagename)
 	end
 
 	local currentYearEarnings = _player.earningsGlobal[tostring(CURRENT_YEAR)]
@@ -173,7 +172,7 @@ function CustomPlayer._getActiveCasterYears()
 	if _player.shouldQueryData then
 		local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			query = 'year::date',
-			conditions = '[[page::' .. PAGENAME:gsub('_', ' ') .. ']]',
+			conditions = '[[page::' .. _player.pagename .. ']] OR [[page::' .. _player.pagename:gsub(' ', '_') .. ']]',
 			limit = 5000,
 		})
 
@@ -193,13 +192,14 @@ end
 
 function CustomPlayer:createBottomContent(infobox)
 	if _player.shouldQueryData then
-		return MatchTicker.run({player = PAGENAME}, _player.recentMatches)
+		return MatchTicker.run({player = self.pagename}, _player.recentMatches)
 	end
 end
 
 function CustomPlayer._getMatchupData(player)
 	local yearsActive
-	local playerWithoutUnderscore = string.gsub(player, '_', ' ')
+	local playerWithoutUnderscore = player
+	player = player:gsub(' ', '_')
 	local queryParameters = {
 		conditions = '([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])' ..
 			'AND [[walkover::]] AND [[winner::>]]',
@@ -549,7 +549,7 @@ end
 function CustomPlayer._getAllkills()
 	if _player.shouldQueryData then
 		local allkillsData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-			conditions = '[[pagename::' .. PAGENAME .. ']] AND [[type::allkills]]',
+			conditions = '[[pagename::' .. _player.pagename:gsub(' ', '_') .. ']] AND [[type::allkills]]',
 			query = 'information',
 			limit = 1
 		})
