@@ -29,8 +29,7 @@ function ExternalMediaLink.run(args)
 	ExternalMediaLink._fallBackArgs(args)
 
 	if Logic.nilOr(Logic.readBoolOrNil(args.storage), true)
-		and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
-		and not Logic.readBool(Variables.varDefault('disable_SMW_storage')) then
+		and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 
 		ExternalMediaLink._store(args)
 	end
