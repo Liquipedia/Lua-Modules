@@ -523,7 +523,7 @@ end
 --[[
 Iterates over table entries whose keys are prefixed numbers. The entries are
 visited in order, starting from 1. The iteration stops upon a skipped number.
-If strict mode is disabled, for the first entry, both `prefix` and `prefix1`
+If requireIndex is disabled, for the first entry, both `prefix` and `prefix1`
 are valid keys, with a preference for the latter.
 
 Example:
