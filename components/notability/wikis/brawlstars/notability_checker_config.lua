@@ -12,7 +12,7 @@ local Config = {}
 -- unless values for liquipediatiertype change
 Config.TIER_TYPE_GENERAL = 'general'
 Config.TIER_TYPE_QUALIFIER = 'qualifier'
-Config.TIER_TYPE_WEEKLY = 'weekly'	
+Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
 Config.TIER_TYPE_MISC = 'misc'
 Config.TIER_TYPE_SHOW_MATCH = 'show match'
@@ -256,7 +256,7 @@ function Config.placementDropOffFunction(tier, tierType)
 
 			elseif (tier == 3 and placement <= 8) then
 				return (score / 3)
-			
+
 			end
 			return 0
 		end
