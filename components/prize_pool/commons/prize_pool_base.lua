@@ -603,7 +603,7 @@ function BasePrizePool:_buildRows()
 end
 
 function BasePrizePool:placeOrAwardCell(placement)
-	error('Function placeCell needs to be implemented by a child class of "Module:PrizePool/Base"')
+	error('Function placeOrAwardCell needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:applyCutAfter(placement, row)
@@ -611,11 +611,7 @@ function BasePrizePool:applyCutAfter(placement, row)
 end
 
 function BasePrizePool:applyToggleExpand(placement, row)
-	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
-end
-
-function BasePrizePool:storeData(args)
-	error('Function storeData needs to be implemented by a child class of "Module:PrizePool/Base"')
+	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:_getPrizeSummaryText()
