@@ -93,7 +93,7 @@ function BaseResultsTable:readConfig()
 		or tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit
 
 	if config.queryType == TEAM_TYPE and Table.isNotEmpty(config.aliases) then
-		config.isNotAlias = BaseResultsTable._getOpponentTemplates(config.opponent)
+		config.nonAliasTeamTemplates = BaseResultsTable._getOpponentTemplates(config.opponent)
 	end
 
 	return config
@@ -453,9 +453,11 @@ function BaseResultsTable:opponentDisplay(data, options)
 end
 
 function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate)
+	local config = self.config
+
 	return rawTeamTemplate and (
 		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
-		(self.config.isNotAlias and not Table.includes(self.config.isNotAlias, rawTeamTemplate.templatename))
+		(config.nonAliasTeamTemplates and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
 	)
 end
 
