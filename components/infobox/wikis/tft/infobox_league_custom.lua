@@ -18,7 +18,6 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local _args
-local lang = mw.language.getContentLanguage()
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
