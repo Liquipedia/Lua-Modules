@@ -165,7 +165,7 @@ function suite:testPairsByPrefix()
 	}
 
 	local cnt = 0
-	for prefix in Table.iter.pairsByPrefix(args, 'p', {strict = false}) do
+	for prefix in Table.iter.pairsByPrefix(args, 'p', {requireIndex = false}) do
 		cnt = cnt + 1
 		self:assertTrue(args[prefix])
 		self:assertTrue(args[prefix .. 'link'])
@@ -184,7 +184,7 @@ function suite:testPairsByPrefix()
 	args.p, args.plink = nil, nil
 
 	cnt = 0
-	for prefix in Table.iter.pairsByPrefix(args, 'p', {strict = false}) do
+	for prefix in Table.iter.pairsByPrefix(args, 'p', {requireIndex = false}) do
 		cnt = cnt + 1
 		self:assertTrue(args[prefix])
 		self:assertTrue(args[prefix .. 'link'])

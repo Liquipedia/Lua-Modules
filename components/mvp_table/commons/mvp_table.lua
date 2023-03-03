@@ -74,7 +74,7 @@ function MvpTable._parseArgs(args)
 		end
 	end
 
-	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament', {strict = false}) do
+	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament', {requireIndex = false}) do
 		tournament = mw.ext.TeamLiquidIntegration.resolve_redirect(tournament):gsub(' ', '_')
 		table.insert(parsedArgs.tournaments, tournament)
 	end

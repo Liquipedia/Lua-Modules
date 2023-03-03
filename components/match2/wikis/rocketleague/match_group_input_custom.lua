@@ -206,12 +206,12 @@ function matchFunctions.getLinks(match)
 	match.links = {}
 
 	-- Shift (formerly Octane)
-	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {strict = false}) do
+	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {requireIndex = false}) do
 		match.links[key] = 'https://www.shiftrle.gg/matches/' .. shift
 	end
 
 	-- Ballchasing
-	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing', {strict = false}) do
+	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing', {requireIndex = false}) do
 		match.links[key] = 'https://ballchasing.com/group/' .. ballchasing
 	end
 

@@ -275,7 +275,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	end
 
 	-- Store additional team-templates in extradata
-	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {strict = false}) do
+	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = false}) do
 		if teamIndex > 1 then
 			otherTeam = args[teamKey .. 'link'] or otherTeam
 			lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename
