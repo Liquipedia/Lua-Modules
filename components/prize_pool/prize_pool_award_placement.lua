@@ -45,7 +45,6 @@ function AwardPlacement:_getLpdbData(...)
 		local participant, image, imageDark, players
 		local opponentType = opponent.opponentData.type
 
-		-- this complete if is legacy
 		if opponentType == Opponent.team then
 			local teamTemplate = mw.ext.TeamTemplate.raw(opponent.opponentData.template) or {}
 
