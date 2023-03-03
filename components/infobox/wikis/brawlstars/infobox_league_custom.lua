@@ -109,6 +109,10 @@ function CustomLeague:defineCustomPageVariables()
 end
 
 function CustomLeague._createOrganizers()
+	if not _args.organizer then
+		return {}
+	end
+
 	local organizers = {
 		(ORGANIZER_ICONS[_args.organizer] or '') .. _league:createLink(
 			_args.organizer, _args['organizer-name'], _args['organizer-link'], _args.organizerref),
