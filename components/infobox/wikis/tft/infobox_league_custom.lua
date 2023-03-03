@@ -23,9 +23,9 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local GAME_MODES = {
-	solo = 'solos',
-	duo = 'duos',
-	squad = 'squads',
+	solo = 'Solos',
+	duo = 'Duos',
+	squad = 'Squads',
 }
 local UNKNOWN_MODE = 'Unknown'
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
