@@ -105,11 +105,7 @@ function CustomLeague:_createPatchCell(args)
 	return content .. ' &ndash; [[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
 end
 
-function CustomLeague._getGameMode()
-	return GAME_MODES[string.lower(_args.mode or ''):gsub('s$', '')]
-end
-
 function CustomLeague.getWikiCategories(args)
-	return {lang:ucfirst(CustomLeague._getGameMode() or UNKNOWN_MODE) .. ' Mode Tournaments'}
+	return {(_args.mode or UNKNOWN_MODE) .. ' Mode Tournaments'}
 end
 return CustomLeague
