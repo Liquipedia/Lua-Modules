@@ -171,7 +171,7 @@ function CustomLeague._computeChronology()
 end
 
 function CustomLeague:shouldStore(args)
-	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
+	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 function CustomLeague._playerRaceBreakDown()
