@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 
 local BasePrizePool = Lua.import('Module:PrizePool/Base', {requireDevIfEnabled = true})
