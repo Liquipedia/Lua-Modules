@@ -18,14 +18,15 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local _args
+local lang = mw.language.getContentLanguage()
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local GAME_MODES = {
-	solo = 'Solos',
-	duo = 'Duos',
-	squad = 'Squads',
+	solo = 'solos',
+	duo = 'duos',
+	squad = 'squads',
 }
 local UNKNOWN_MODE = 'Unknown'
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
@@ -68,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 		})
 		table.insert(widgets, Cell{
 			name = 'Game Mode',
-			content = {CustomLeague._getGameMode()}
+			content = {lang:ucfirst(CustomLeague._getGameMode() or '')}
 		})
 	end
 
