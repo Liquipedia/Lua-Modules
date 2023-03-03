@@ -110,6 +110,6 @@ function CustomLeague._getGameMode()
 end
 
 function CustomLeague.getWikiCategories(args)
-	return {(CustomLeague._getGameMode() or UNKNOWN_MODE) .. ' Mode Tournaments'}
+	return {lang:ucfirst(CustomLeague._getGameMode() or UNKNOWN_MODE) .. ' Mode Tournaments'}
 end
 return CustomLeague
