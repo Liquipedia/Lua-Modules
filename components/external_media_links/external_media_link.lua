@@ -46,7 +46,7 @@ function ExternalMediaLink._fallBackArgs(args)
 	args.by_link1 = args.by_link1 or args.by_link
 	args.by1 = args.by1 or args.by
 	args.subject1 = args.subject1 or args.subject or args.player or args.interviewee
-	args.subject_organization1 = args.subject_organization
+	args.subject_organization1 = args.subject_organization1 or args.subject_organization
 
 	for subjectIndex = 2, MAXIMUM_VALUES.subjects do
 		args['subject' .. subjectIndex] = args['subject' .. subjectIndex] or args['player' .. subjectIndex]
