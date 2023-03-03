@@ -12,7 +12,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace')
+local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
@@ -46,7 +46,7 @@ local MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 40
 local NUMBER_OF_RECENT_MATCHES = 10
 
 --race stuff
-local AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
+local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
@@ -88,8 +88,9 @@ function CustomPlayer.run(frame)
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.getWikiCategories = CustomPlayer.getWikiCategories
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -198,9 +199,10 @@ end
 
 function CustomPlayer._getMatchupData(player)
 	local yearsActive
-	player = string.gsub(player, '_', ' ')
+	local playerWithoutUnderscore = string.gsub(player, '_', ' ')
 	local queryParameters = {
-		conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]',
+		conditions = '([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])' ..
+			'AND [[walkover::]] AND [[winner::>]]',
 		order = 'date desc',
 		query = table.concat({
 				'match2opponents',
@@ -234,7 +236,7 @@ function CustomPlayer._getMatchupData(player)
 	local foundData = false
 	local processMatch = function(match)
 		foundData = true
-		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player)
+		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player, playerWithoutUnderscore)
 		local year = string.sub(match.date, 1, 4)
 		years[tonumber(year)] = year
 		if #_player.recentMatches <= NUMBER_OF_RECENT_MATCHES then
@@ -310,20 +312,22 @@ function CustomPlayer._setVarsForVS(table)
 	end
 end
 
-function CustomPlayer._addScoresToVS(vs, opponents, player)
+function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUnderscore)
 	local plIndex = 1
 	local vsIndex = 2
 	--catch matches vs empty opponents
 	if opponents[1] and opponents[2] then
-		if opponents[2].name == player then
+		if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
 			plIndex = 2
 			vsIndex = 1
 		end
 		local plOpp = opponents[plIndex]
 		local vsOpp = opponents[vsIndex]
 
-		local prace = CleanRace[plOpp.match2players[1].extradata.faction] or 'r'
-		local orace = CleanRace[vsOpp.match2players[1].extradata.faction] or 'r'
+		local prace = Faction.read(plOpp.match2players[1].extradata.faction)
+		prace = prace and prace ~= Faction.defaultFaction and prace or 'r'
+		local orace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
+		orace = orace and orace ~= Faction.defaultFaction and orace or 'r'
 
 		vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
 		vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
@@ -483,6 +487,8 @@ function CustomPlayer._setAchievements(data, place)
 
 	if CustomPlayer._isAwardAchievement(data, tier) then
 		table.insert(_player.awardAchievements, data)
+	elseif String.isNotEmpty((data.extradata or {}).award) then
+		return
 	elseif CustomPlayer._isAchievement(data, place, tier) then
 		table.insert(_player.achievements, data)
 	elseif (#_player.achievementsFallBack + #_player.achievements) < MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
@@ -551,6 +557,14 @@ function CustomPlayer._getAllkills()
 			return allkillsData[1].information
 		end
 	end
+end
+
+function CustomPlayer:getWikiCategories(categories)
+	for _, faction in pairs(PersonSc2.readFactions(_args.race).factions) do
+		table.insert(categories, faction .. ' Players')
+	end
+
+	return categories
 end
 
 return CustomPlayer

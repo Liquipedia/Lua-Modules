@@ -32,7 +32,7 @@ local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
 local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
-local VENUE_DESCRIPTION = "<br><small><small>(${desc})</small></small>"
+local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -102,18 +102,23 @@ function League:createInfobox()
 				)
 			}
 		},
-		Builder{
-			builder = function()
-				local organizers = self:_createOrganizers(args)
-				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
+		Customizable{
+			id = 'organizers',
+			children = {
+				Builder{
+					builder = function()
+						local organizers = self:_createOrganizers(args)
+						local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
 
-				return {
-					Cell{
-						name = title,
-						content = organizers
-					}
-				}
-			end
+						return {
+							Cell{
+								name = title,
+								content = organizers
+							}
+						}
+					end
+				},
+			},
 		},
 		Customizable{
 			id = 'sponsors',
@@ -157,12 +162,12 @@ function League:createInfobox()
 				}
 			}
 		},
-		Cell{
+		Customizable{id = 'location', children = {Cell{
 			name = 'Location',
 			content = {
 				self:_createLocation(args)
 			}
-		},
+		}}},
 		Builder{
 			builder = function()
 				args.venue1 = args.venue1 or args.venue
@@ -176,7 +181,7 @@ function League:createInfobox()
 						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
 					end
 
-					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
+					table.insert(venues, self:createLink(venueName, nil, args[prefix .. 'link'], description))
 				end
 
 				return {Cell{
@@ -187,15 +192,18 @@ function League:createInfobox()
 		},
 		Cell{name = 'Format', content = {args.format}},
 		Customizable{id = 'prizepool', children = {
-			Cell{
+				Cell{
 					name = 'Prize Pool',
 					content = {self:_createPrizepool(args)},
 				},
 			},
 		},
-		Cell{name = 'Date', content = {args.date}},
-		Cell{name = 'Start Date', content = {args.sdate}},
-		Cell{name = 'End Date', content = {args.edate}},
+		Customizable{id = 'dates', children = {
+				Cell{name = 'Date', content = {args.date}},
+				Cell{name = 'Start Date', content = {args.sdate}},
+				Cell{name = 'End Date', content = {args.edate}},
+			},
+		},
 		Customizable{id = 'custom', children = {}},
 		Customizable{id = 'liquipediatier', children = {
 				Cell{
@@ -240,7 +248,7 @@ function League:createInfobox()
 		},
 	}
 
-	self.name = TextSanitizer.tournamentName(self.name)
+	self.name = TextSanitizer.stripHTML(self.name)
 
 	self.infobox:bottom(self:createBottomContent())
 
@@ -357,9 +365,9 @@ function League:_createPrizepool(args)
 end
 
 function League:_definePageVariables(args)
-	Variables.varDefine('tournament_name', TextSanitizer.tournamentName(args.name))
-	Variables.varDefine('tournament_shortname', TextSanitizer.tournamentName(args.shortname or args.abbreviation))
-	Variables.varDefine('tournament_tickername', TextSanitizer.tournamentName(args.tickername))
+	Variables.varDefine('tournament_name', TextSanitizer.stripHTML(args.name))
+	Variables.varDefine('tournament_shortname', TextSanitizer.stripHTML(args.shortname or args.abbreviation))
+	Variables.varDefine('tournament_tickername', TextSanitizer.stripHTML(args.tickername))
 	Variables.varDefine('tournament_icon', args.icon)
 	Variables.varDefine('tournament_icondark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
@@ -376,7 +384,7 @@ function League:_definePageVariables(args)
 	]]
 
 	Variables.varDefine('tournament_type', args.type)
-	Variables.varDefine('tournament_status', args.status)
+	Variables.varDefine('tournament_status', args.status or Variables.varDefault('tournament_status'))
 
 	Variables.varDefine('tournament_region', args.region)
 	Variables.varDefine('tournament_country', args.country)
@@ -409,8 +417,8 @@ end
 function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
-		tickername = TextSanitizer.tournamentName(args.tickername),
-		shortname = TextSanitizer.tournamentName(args.shortname or args.abbreviation),
+		tickername = TextSanitizer.stripHTML(args.tickername),
+		shortname = TextSanitizer.stripHTML(args.shortname or args.abbreviation),
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = Variables.varDefault('tournament_icon'),
@@ -442,8 +450,8 @@ function League:_setLpdbData(args, links)
 		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		status = args.status,
-		format = args.format,
+		status = Variables.varDefault('tournament_status'),
+		format = TextSanitizer.stripHTML(args.format),
 		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
 			League:_getNamedTableofAllArgsForBase(args, 'sponsor')
 		),
@@ -577,7 +585,7 @@ function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
 	end
 end
 
-function League:_createLink(id, name, link, desc)
+function League:createLink(id, name, link, desc)
 	if String.isEmpty(id) then
 		return nil
 	end
@@ -614,7 +622,7 @@ end
 
 function League:_createOrganizers(args)
 	local organizers = {
-		League:_createLink(
+		self:createLink(
 			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
 	}
 
@@ -623,7 +631,7 @@ function League:_createOrganizers(args)
 	while not String.isEmpty(args['organizer' .. index]) do
 		table.insert(
 			organizers,
-			League:_createLink(
+			self:createLink(
 				args['organizer' .. index],
 				args['organizer' .. index .. '-name'],
 				args['organizer' .. index .. '-link'],

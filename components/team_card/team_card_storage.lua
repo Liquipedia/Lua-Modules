@@ -83,7 +83,7 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 	end
 
 	lpdbData.mode = Variables.varDefault('tournament_mode', 'team')
-	lpdbData.publishertier = Variables.varDefault('tournament_publisher_tier')
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier')
 	lpdbData.icon = Variables.varDefault('tournament_icon')
 	lpdbData.icondark = Variables.varDefault('tournament_icondark')
 	lpdbData.game = Variables.varDefault('tournament_game')
@@ -96,7 +96,7 @@ end
 
 -- Build the standard LPDB "Object Name", which is used as primary key in the DB record
 function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
-	local storageName = 'ranking'
+	local storageName = (team == 'TBD' and 'participant') or 'ranking'
 	if String.isNotEmpty(lpdbPrefix) then
 		storageName = storageName .. '_' .. lpdbPrefix
 	end

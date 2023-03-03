@@ -40,17 +40,15 @@ function NotabilityChecker.run(args)
 	end
 
 	output = output .. '===Summary===\n'
-	output = output .. '\'\'\'Final weight:\'\'\' ' .. tostring(weight) .. '\n\n'
+		.. '<b>Final weight:</b> ' .. tostring(weight) .. '\n\n'
+		.. 'This means this ' .. (isTeamResult and 'team' or 'person')
 
-	if weight < Config.NOTABILITY_THRESHOLD_NOTABLE and weight > Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is \'\'\'OPEN FOR DISCUSSION\'\'\'\n'
-	elseif weight < Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is \'\'\'NOT NOTABLE\'\'\'\n'
+	if weight >= Config.NOTABILITY_THRESHOLD_NOTABLE then
+		output = output .. ' is <b>NOTABLE</b>\n'
+	elseif weight >= Config.NOTABILITY_THRESHOLD_MIN then
+		output = output .. ' is <b>OPEN FOR DISCUSSION</b>\n'
 	else
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is \'\'\'NOTABLE\'\'\'\n'
+		output = output .. ' is <b>NOT NOTABLE</b>\n'
 	end
 
 	return output
@@ -63,7 +61,7 @@ function NotabilityChecker._runForTeam(team)
 	local output = ''
 	output = output .. '===Team Results===\n'
 	output = output .. mw.getCurrentFrame():expandTemplate{ title = 'NotabilityTeamMatchesTable', args = {title = team} }
-	output = output .. '\'\'\'Weight:\'\'\' ' .. tonumber(weight) .. '\n\n'
+	output = output .. '<b>Weight:</b> ' .. tonumber(weight) .. '\n\n'
 
 	return weight, output
 end
@@ -84,7 +82,7 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 		local personWeight = NotabilityChecker._calculatePersonNotability(person)
 		output = output .. mw.getCurrentFrame():expandTemplate{
 			title = 'NotabilityPlayerMatchesTable', args = {title = person}}
-		output = output .. '*\'\'\'Person:\'\'\' [[' .. person .. ']] \'\'\'Weight:\'\'\' ' ..
+		output = output .. '*<b>Person:</b> [[' .. person .. ']] <b>Weight:</b> ' ..
 			tonumber(personWeight) .. '\n\n'
 			average = average + tonumber(personWeight or 0)
 	end
@@ -108,18 +106,22 @@ end
 function NotabilityChecker._calculatePersonNotability(person)
 	person = mw.ext.TeamLiquidIntegration.resolve_redirect(person)
 
-	local conditions = '[[players_p' .. tostring(1) .. '::' .. person .. ']]' ..
-		' OR [[participant::' .. person .. ']]'
-	for i = 2, Config.MAX_NUMBER_OF_PARTICIPANTS do
-		conditions = conditions .. ' OR [[players_p' .. tostring(i) .. '::' .. person .. ']]'
-	end
-	for i = 1, Config.MAX_NUMBER_OF_COACHES do
-		conditions = conditions .. ' OR [[players_c' .. tostring(i) .. '::' .. person .. ']]'
+	-- Add conditions.
+	-- We check for names with spaces, then names with underscores.
+	local conditions = {}
+	for _, name in pairs({person, person:gsub(' ', '_')}) do
+		table.insert(conditions, '[[participant::' .. name .. ']]')
+		for i = 1, Config.MAX_NUMBER_OF_PARTICIPANTS do
+			table.insert(conditions, '[[players_p' .. tostring(i) .. '::' .. name .. ']]')
+		end
+		for i = 1, Config.MAX_NUMBER_OF_COACHES do
+			table.insert(conditions, '[[players_c' .. tostring(i) .. '::' .. name .. ']]')
+		end
 	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = Config.PLACEMENT_LIMIT,
-		conditions = conditions,
+		conditions = table.concat(conditions, ' OR '),
 		query = Config.PLACEMENT_QUERY,
 	})
 	return NotabilityChecker._calculateWeight(data)
@@ -222,7 +224,7 @@ function NotabilityChecker._preparePlacement(placement)
 	end
 
 	if string.find(placement, '-', 1, true) then
-		local one, _ = placement:match("([^-]+)-([^-]+)")
+		local one, _ = placement:match('([^-]+)-([^-]+)')
 		placement = tonumber(one)
 	else
 		placement = tonumber(placement)

@@ -8,12 +8,14 @@
 
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
-local SquadAutoRefs = require('Module:SquadAuto/References')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
+local SquadAutoRefs = Lua.import('Module:SquadAuto/References', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
@@ -90,6 +92,7 @@ function CustomSquad.runAuto(playerList, squadType)
 
 		player.link = player.page
 		player.role = player.thisTeam.role
+		player.position = player.thisTeam.position
 		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
 
 		player.newteam = player.newTeam.team
@@ -103,7 +106,7 @@ function CustomSquad.runAuto(playerList, squadType)
 end
 
 function CustomSquad._playerRow(player, squadType)
-	local row = ExtendedSquadRow(mw.getCurrentFrame(), player.role)
+	local row = ExtendedSquadRow()
 
 	row:id({
 		(player.idleavedate or player.id),
@@ -129,8 +132,11 @@ function CustomSquad._playerRow(player, squadType)
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
+	row:setExtradata{status = squadType}
+
 	return row:create(
 		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
+		.. (player.role and '_' .. player.role or '')
 	)
 end
 

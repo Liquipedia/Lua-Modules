@@ -27,8 +27,8 @@ function CustomTournamentsSummaryTable.dateConditions(type)
 	local conditions = ConditionTree(BooleanOperator.all)
 
 	local currentTime = os.time()
-	local today = os.date("!%Y-%m-%d", currentTime)
-	local completedThreshold = os.date("!%Y-%m-%d", currentTime - _COMPLETED_OFFSET)
+	local today = os.date('!%Y-%m-%d', currentTime)
+	local completedThreshold = os.date('!%Y-%m-%d', currentTime - _COMPLETED_OFFSET)
 
 	if type == CustomTournamentsSummaryTable.upcomingType then
 		conditions
@@ -45,8 +45,7 @@ function CustomTournamentsSummaryTable.dateConditions(type)
 					ConditionNode(ColumnName('enddate'), Comparator.eq, today),
 				}),
 				ConditionTree(BooleanOperator.any):add({
-					ConditionNode(ColumnName('extradata_winner'), Comparator.eq, 'TBD'),
-					ConditionNode(ColumnName('extradata_winner'), Comparator.eq, 'tbd'),
+					ConditionNode(ColumnName('status'), Comparator.neq, 'finished'),
 					ConditionNode(ColumnName('enddate'), Comparator.gt, today),
 				}),
 			})
@@ -61,8 +60,7 @@ function CustomTournamentsSummaryTable.dateConditions(type)
 				ConditionTree(BooleanOperator.any):add({
 					ConditionTree(BooleanOperator.all):add({
 						ConditionNode(ColumnName('enddate'), Comparator.lt, today),
-						ConditionNode(ColumnName('extradata_winner'), Comparator.neq, 'TBD'),
-						ConditionNode(ColumnName('extradata_winner'), Comparator.neq, 'tbd'),
+						ConditionNode(ColumnName('status'), Comparator.eq, 'finished'),
 					}),
 					ConditionNode(ColumnName('enddate'), Comparator.gt, today),
 				}),

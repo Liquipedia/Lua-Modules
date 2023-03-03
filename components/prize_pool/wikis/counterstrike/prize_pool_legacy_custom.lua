@@ -44,8 +44,9 @@ end
 function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, opponentIndex)
 	-- CS didn't support multiple points (etc), however they supported points (etc) per opponent
 
-	if slot['usdprize' .. opponentIndex] then
-		opponentData.usdprize = slot['usdprize' .. opponentIndex]
+	local baseCurrencyPrize = PrizePoolLegacy.BASE_CURRENCY:lower() .. 'prize'
+	if slot[baseCurrencyPrize .. opponentIndex] then
+		opponentData[baseCurrencyPrize] = slot[baseCurrencyPrize .. opponentIndex]
 	end
 
 	if slot['points' .. opponentIndex] then

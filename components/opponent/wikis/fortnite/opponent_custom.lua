@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
 local CustomOpponent = Table.deepCopy(Opponent)
 

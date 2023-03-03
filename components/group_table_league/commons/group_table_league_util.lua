@@ -644,6 +644,11 @@ function Metric.gameCount(result)
 	return MathUtil.sum(result.gameScore)
 end
 
+function Metric.gameWinRate(result)
+	local gameCount = MathUtil.sum(result.gameScore)
+	return gameCount ~= 0 and result.gameScore[1] / gameCount or 0.5
+end
+
 function Metric.points(result)
 	return result.points
 end

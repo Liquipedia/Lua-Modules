@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
 local CurrencyData = mw.loadData('Module:Currency/Data')
 local Logic = require('Module:Logic')
@@ -42,6 +43,8 @@ end
 
 function Currency.display(currencyCode, prizeValue, options)
 	options = options or {}
+	options.symbol = Logic.emptyOr(options.symbol, true)
+	options.abbreviation = Logic.emptyOr(options.abbreviation, true)
 
 	local currencyData = Currency.raw(currencyCode)
 
@@ -52,23 +55,44 @@ function Currency.display(currencyCode, prizeValue, options)
 		return nil
 	end
 
+	local currencyPrefix = ''
+	if currencyData.symbol.text and not currencyData.symbol.isAfter then
+		currencyPrefix = currencyData.symbol.text .. (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '')
+	end
+	local currencySuffix = ''
+	if currencyData.symbol.text and currencyData.symbol.isAfter then
+		currencySuffix = (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '') .. currencyData.symbol.text
+	end
+	local currencyAbbreviation = Abbreviation.make(currencyData.code, currencyData.name)
+
 	if options.setVariables then
 		Variables.varDefine('localcurrencycode', currencyData.code or '')
-		Variables.varDefine(
-			'localcurrencysymbol',
-			currencyData.isAfter and '' or currencyData.symbol or ''
-		)
-		Variables.varDefine(
-			'localcurrencysymbolafter',
-			currencyData.isAfter and currencyData.symbol or ''
-		)
+		Variables.varDefine('localcurrencysymbol', currencyPrefix)
+		Variables.varDefine('localcurrencysymbolafter', currencySuffix)
 	end
 
-	if Logic.isNumeric(prizeValue) and options.formatValue then
-		prizeValue = Currency.formatMoney(prizeValue)
+	if options.abbreviation and currencyData.symbol.text == currencyData.code then
+		options.symbol = false
 	end
 
-	return currencyData.text.prefix .. (prizeValue or '') .. currencyData.text.suffix
+	local prizeDisplay = ''
+	if options.symbol then
+		prizeDisplay = prizeDisplay .. currencyPrefix
+	end
+	if prizeValue then
+		if Logic.isNumeric(prizeValue) and options.formatValue then
+			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision)
+		end
+		prizeDisplay = prizeDisplay .. prizeValue
+	end
+	if options.symbol then
+		prizeDisplay = prizeDisplay .. currencySuffix
+	end
+	if options.abbreviation then
+		prizeDisplay = prizeDisplay .. (prizeDisplay ~= '' and NON_BREAKING_SPACE or '') .. currencyAbbreviation
+	end
+
+	return prizeDisplay
 end
 
 function Currency.raw(currencyCode)

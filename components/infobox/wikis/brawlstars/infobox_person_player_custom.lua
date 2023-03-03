@@ -55,7 +55,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	local builtInfobox = player:createInfobox(frame)
+	local builtInfobox = player:createInfobox()
 
 	local autoPlayerIntro = ''
 	if Logic.readBool((_args.autoPI or ''):lower()) then
@@ -116,7 +116,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local mmrDisplay = '[[Leaderboards|' .. _args.mmr .. ']]'
 	if String.isNotEmpty(_args.mmrdate) then
-		mmrDisplay = mmrDisplay .. '&nbsp;<small>\'\'(last update: ' .. _args.mmrdate .. '\'\'</small>'
+		mmrDisplay = mmrDisplay .. '&nbsp;<small><i>(last update: ' .. _args.mmrdate .. '</i></small>'
 	end
 
 	return {Cell{name = 'Solo MMR', content = {mmrDisplay}}}

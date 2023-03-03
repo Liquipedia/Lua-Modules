@@ -223,7 +223,11 @@ end
 
 -- Check if any opponent has a none-standard status
 function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= _STATUS_SCORE end)
+	return Table.any(table,
+		function (_, scoreinfo)
+			return scoreinfo.status ~= _STATUS_SCORE and String.isNotEmpty(scoreinfo.status)
+		end
+	)
 end
 
 -- function to check for forfeits
@@ -323,11 +327,59 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getExtraData(match)
+	local casters = {}
+	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
+		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
+			name,
+			match[key .. 'flag'],
+			match[key .. 'name']
+		))
+	end
 	match.extradata = {
 		mvp = match.mvp,
-		mvpteam = match.mvpteam or match.winner
+		mvpteam = match.mvpteam or match.winner,
+		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil
 	}
 	return match
+end
+
+function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
+	if String.isEmpty(flag) then
+		flag = Variables.varDefault(name .. '_flag')
+	end
+	if String.isEmpty(displayName) then
+		displayName = Variables.varDefault(name .. '_dn')
+	end
+	if String.isEmpty(flag) or String.isEmpty(displayName) then
+		local parent = Variables.varDefault(
+			'tournament_parent',
+			mw.title.getCurrentTitle().text
+		)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
+			query = 'flag, id',
+			limit = 1,
+		})
+		if type(data) == 'table' and data[1] then
+			flag = String.isNotEmpty(flag) and flag or data[1].flag
+			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
+		end
+	end
+	if String.isNotEmpty(flag) then
+		Variables.varDefine(name .. '_flag', flag)
+	end
+	if String.isEmpty(displayName) then
+		displayName = name
+	end
+	if String.isNotEmpty(displayName) then
+		Variables.varDefine(name .. '_dn', displayName)
+	end
+	return {
+		name = name,
+		displayName = displayName,
+		flag = flag,
+	}
 end
 
 function matchFunctions.getOpponents(match)
@@ -431,6 +483,7 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 		opponents[index].score = _NOT_PLAYED_SCORE
 		opponents[index].status = walkoverType
 	end
+	return opponents
 end
 
 -- Get Playerdata from Vars (get's set in TeamCards)

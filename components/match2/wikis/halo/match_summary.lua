@@ -19,6 +19,7 @@ local VodLink = require('Module:VodLink')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -37,6 +38,11 @@ local _LINK_DATA = {
 	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	halodatahive = {icon = 'File:Halo Data Hive allmode.png',text = 'Match page on Halo Data Hive'},
+	headtohead = {
+		icon = 'File:Match_Info_Halo_H2H.png',
+		iconDark = 'File:Match_Info_Halo_H2H_darkmode.png',
+		text = 'Head-to-head statistics'
+	},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
@@ -95,6 +101,31 @@ function CustomMatchSummary.getByMatchId(args)
 
 	match.links.lrthread = match.lrthread
 	match.links.vod = match.vod
+	if
+		match.opponents[1].type == Opponent.team and
+		match.opponents[2].type == Opponent.team
+	then
+		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
+		local buildQueryFormLink = function(form, template, arguments)
+			return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
+				mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
+				    .. '&_run'
+			))
+		end
+
+		local headtoheadArgs = {
+			['[team1]'] = team1,
+			['[team2]'] = team2,
+			['[games][is_list]'] = 1,
+			['[tiers][is_list]'] = 1,
+			['[fromdate][day]'] = '01',
+			['[fromdate][month]'] = '01',
+			['[fromdate][year]'] = string.sub(match.date,1,4)
+	    }
+
+		match.links.headtohead = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
+	end
+
 	if Table.isNotEmpty(vods) or Table.isNotEmpty(match.links) then
 		local footer = MatchSummary.Footer()
 

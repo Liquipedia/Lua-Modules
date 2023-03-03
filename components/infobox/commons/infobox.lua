@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
@@ -19,10 +20,8 @@ function Infobox:create(frame, gameName, forceDarkMode)
 	self.frame = frame
 	self.root = mw.html.create('div')
 	self.adbox = mw.html.create('div')	:addClass('fo-nttax-infobox-adbox')
-										:addClass('wiki-bordercolor-light')
 										:node(self.frame:preprocess('<adbox />'))
 	self.content = mw.html.create('div')	:addClass('fo-nttax-infobox')
-											:addClass('wiki-bordercolor-light')
 	self.root	:addClass('fo-nttax-infobox-wrapper')
 				:addClass('infobox-' .. gameName:lower())
 	if forceDarkMode then
@@ -34,13 +33,7 @@ function Infobox:create(frame, gameName, forceDarkMode)
 end
 
 function Infobox:categories(...)
-	local input = {...}
-	for i = 1, #input do
-		local category = input[i]
-		if category ~= nil and category ~= '' then
-			self.root:wikitext('[[Category:' .. category .. ']]')
-		end
-	end
+	Array.forEach({...}, function(cat) return mw.ext.TeamLiquidIntegration.add_category(cat) end)
 	return self
 end
 

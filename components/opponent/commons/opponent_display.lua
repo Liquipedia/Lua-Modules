@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
@@ -31,11 +32,11 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 	function(self, opponent, options)
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 
-		if opponent.type == 'team' then
+		if opponent.type == Opponent.team then
 			self:createTeam(opponent.template or 'tbd', options)
-		elseif opponent.type == 'solo' then
-			self:createPlayer(opponent.players[1])
-		elseif opponent.type == 'literal' then
+		elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+			self:createPlayers(opponent)
+		elseif opponent.type == Opponent.literal then
 			self:createLiteral(opponent.name or '')
 		end
 
@@ -57,10 +58,11 @@ function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 	self.content:node(opponentNode)
 end
 
-function OpponentDisplay.BracketOpponentEntry:createPlayer(player)
-	local playerNode = PlayerDisplay.BlockPlayer({
-		player = player,
+function OpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
+	local playerNode = OpponentDisplay.BlockPlayers({
+		opponent = opponent,
 		overflow = 'ellipsis',
+		showLink = false,
 	})
 	self.content:node(playerNode)
 end
@@ -98,9 +100,10 @@ end
 OpponentDisplay.propTypes.InlineOpponent = {
 	flip = 'boolean?',
 	opponent = MatchGroupUtil.types.GameOpponent,
-	showFlag = 'boolean?',
-	showLink = 'boolean?', -- does not affect opponent.type == 'team'
-	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
+	showFlag = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	showLink = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	dq = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle), -- only affects Opponent.team
 }
 
 --[[
@@ -111,26 +114,34 @@ function OpponentDisplay.InlineOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 
-	if opponent.type == 'team' then
+	if opponent.type == Opponent.team then
 		return OpponentDisplay.InlineTeamContainer({
 			flip = props.flip,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
-
-	elseif opponent.type == 'literal' then
+	elseif opponent.type == Opponent.literal then
 		return opponent.name or ''
-
-	elseif opponent.type == 'solo' then
-		return PlayerDisplay.InlinePlayer{
-			player = opponent.players[1],
-			flip = props.flip,
-			dq = props.dq,
-		}
-
+	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+		return OpponentDisplay.InlinePlayers(props)
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
+end
+
+function OpponentDisplay.InlinePlayers(props)
+	local opponent = props.opponent
+
+	local playerTexts = Array.map(opponent.players, function(player)
+		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player})))
+	end)
+
+	if props.flip then
+		playerTexts = Array.reverse(playerTexts)
+	end
+
+	return mw.html.create('span')
+		:node(table.concat(playerTexts, ' / '))
 end
 
 OpponentDisplay.propTypes.BlockOpponent = {
@@ -154,7 +165,7 @@ function OpponentDisplay.BlockOpponent(props)
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
-	if opponent.type == 'team' then
+	if opponent.type == Opponent.team then
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
@@ -162,25 +173,34 @@ function OpponentDisplay.BlockOpponent(props)
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
-	elseif opponent.type == 'literal' then
+	elseif opponent.type == Opponent.literal then
 		return OpponentDisplay.BlockLiteral({
 			flip = props.flip,
 			name = opponent.name or '',
 			overflow = props.overflow,
 		})
-	elseif opponent.type == 'solo' then
-		return PlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
-			player = opponent.players[1],
-			showFlag = props.showFlag,
-			showLink = showLink,
-			showPlayerTeam = props.showPlayerTeam,
-			abbreviateTbd = props.abbreviateTbd
-		})
+	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+		return OpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
+end
+
+function OpponentDisplay.BlockPlayers(props)
+	local opponent = props.opponent
+
+	local playerNodes = Array.map(opponent.players, function(player)
+		return PlayerDisplay.BlockPlayer(Table.merge(props, {player = player, team = player.team}))
+			:addClass(props.playerClass)
+	end)
+
+	local playersNode = mw.html.create('div')
+		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+	for _, playerNode in ipairs(playerNodes) do
+		playersNode:node(playerNode)
+	end
+
+	return playersNode
 end
 
 OpponentDisplay.propTypes.InlineTeamContainer = {

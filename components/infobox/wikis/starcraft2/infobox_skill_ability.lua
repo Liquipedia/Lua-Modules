@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace2')
+local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -35,7 +35,7 @@ function Ability.run(frame)
 	ability.createWidgetInjector = Ability.createWidgetInjector
 	ability.getCategories = Ability.getCategories
 	_args = ability.args
-	return ability:createInfobox(frame)
+	return ability:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -121,8 +121,7 @@ end
 
 function Ability:getCategories()
 	local categories = { 'Abilities' }
-	local race = string.lower(_args.race or '')
-	race = CleanRace[race]
+	local race = Faction.toName(Faction.read(_args.race))
 	if race then
 		table.insert(categories, race .. ' Abilities')
 	end

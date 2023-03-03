@@ -68,7 +68,7 @@ function StarcraftMatchExternalLinks.ExternalLink(props)
 	end
 
 	if props.type == 'interview' then
-		return '[[File:Int_Icon.png|link=' .. props.url .. '|16px|Interview]] '
+		return '[[File:Interview32.png|link=' .. props.url .. '|16px|Interview]] '
 	end
 
 	if props.type == 'recap' then
