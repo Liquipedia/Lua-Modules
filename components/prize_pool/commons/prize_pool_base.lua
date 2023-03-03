@@ -398,7 +398,7 @@ function BasePrizePool:create(args)
 end
 
 function BasePrizePool:readPlacements(args)
-	error('Function readPlacements needs to be set via the module that requires "Module:PrizePool/Base"')
+	error('Function readPlacements needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:_readConfig(args)
@@ -603,19 +603,19 @@ function BasePrizePool:_buildRows()
 end
 
 function BasePrizePool:placeOrAwardCell(placement)
-	error('Function placeCell needs to be set via the module that requires "Module:PrizePool/Base"')
+	error('Function placeCell needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:applyCutAfter(placement, row)
-	error('Function applyCutAfter needs to be set via the module that requires "Module:PrizePool/Base"')
+	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:applyToggleExpand(placement, row)
-	error('Function applyCutAfter needs to be set via the module that requires "Module:PrizePool/Base"')
+	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:storeData(args)
-	error('Function storeData needs to be set via the module that requires "Module:PrizePool/Base"')
+	error('Function storeData needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:_getPrizeSummaryText()
