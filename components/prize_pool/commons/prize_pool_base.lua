@@ -614,6 +614,10 @@ function BasePrizePool:applyToggleExpand(placement, row)
 	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+function BasePrizePool:storeSmw(args)
+	error('Function storeSmw needs to be implemented by a child class of "Module:PrizePool/Base"')
+end
+
 function BasePrizePool:_getPrizeSummaryText()
 	local tba = Abbreviation.make('TBA', 'To Be Announced')
 	local tournamentCurrency = Variables.varDefault('tournament_currency')
