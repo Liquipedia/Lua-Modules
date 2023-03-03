@@ -163,6 +163,7 @@ function BaseResultsTable:queryData()
 	})
 
 	if type(data) ~= 'table' then
+		mw.logObject(self:buildConditions(), 'conditions')
 		error(data)
 	end
 
@@ -283,11 +284,7 @@ function BaseResultsTable:buildTeamOpponentConditions()
 	local config = self.config
 
 	local opponents = Array.append(config.aliases, config.opponent)
-
-	local opponentTeamTemplates = {}
-	for _, opponent in pairs(opponents) do
-		Array.appendWith(opponentTeamTemplates, unpack(BaseResultsTable._getOpponentTemplates(opponent)))
-	end
+	local opponentTeamTemplates = Array.flatten(Array.map(opponents, BaseResultsTable._getOpponentTemplates))
 
 	if config.playerResultsOfTeam then
 		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
@@ -311,7 +308,9 @@ function BaseResultsTable._getOpponentTemplates(opponent)
 		error('Missing team template for team: ' .. opponent)
 	end
 
-	return Team.queryHistorical(opponentTemplate) or {opponentTemplate}
+	local opponentTeamTemplates = Team.queryHistorical(opponentTemplate)
+
+	return opponentTeamTemplates and Array.extractValues(opponentTeamTemplates) or {opponentTemplate}
 end
 
 function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
