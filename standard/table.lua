@@ -544,7 +544,7 @@ will print out `p1 p2 p3`
 ]]
 ---@param tbl table
 ---@param prefix string
----@param options? {strict: boolean}
+---@param options? {requireIndex: boolean}
 ---@return function
 function Table.iter.pairsByPrefix(tbl, prefix, options)
 	options = options or {}
@@ -552,7 +552,7 @@ function Table.iter.pairsByPrefix(tbl, prefix, options)
 	return function()
 		local key = prefix .. i
 		local value = tbl[key]
-		if options.strict == false and i == 1 and not value then
+		if options.requireIndex == false and i == 1 and not value then
 			key, value = prefix, tbl[prefix]
 		end
 		i = i + 1

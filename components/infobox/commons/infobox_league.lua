@@ -166,7 +166,7 @@ function League:createInfobox()
 		Builder{
 			builder = function()
 				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {strict = false}) do
+				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
 					local description
 					if String.isNotEmpty(args[prefix .. 'desc']) then
 						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
