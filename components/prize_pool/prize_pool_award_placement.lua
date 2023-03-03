@@ -16,8 +16,6 @@ local Opponent = require('Module:OpponentLibraries').Opponent
 
 local _tbd_index = 0
 
-local DASH = '&#045;'
-
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_POINTS = 'POINTS'
 
@@ -43,7 +41,7 @@ end
 
 function AwardPlacement:_getLpdbData(...)
 	local entries = {}
-	for opponentIndex, opponent in ipairs(self.opponents) do
+	for _, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
 		local opponentType = opponent.opponentData.type
 
