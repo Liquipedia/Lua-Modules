@@ -82,13 +82,19 @@ BasePrizePool.config = {
 	storeSmw = {
 		default = true,
 		read = function(args)
-			return Logic.readBoolOrNil(args.storesmw)
+			return Logic.nilOr(
+				Logic.readBoolOrNil(args.storesmw),
+				not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+			)
 		end
 	},
 	storeLpdb = {
 		default = true,
 		read = function(args)
-			return Logic.readBoolOrNil(args.storelpdb)
+			return Logic.nilOr(
+				Logic.readBoolOrNil(args.storelpdb),
+				not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+			)
 		end
 	},
 	resolveRedirect = {
