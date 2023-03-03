@@ -14,6 +14,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Placement = require('Module:Placement')
+local Table = require('Module:Table')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEnabled = true})
 
@@ -34,7 +35,7 @@ function ResultsTable:buildHeader()
 
 	header:tag('th'):css('width', '420px'):attr('colspan', 2):wikitext('Tournament')
 
-	if self.config.queryType ~= Opponent.team then
+	if self.config.queryType ~= Opponent.team or Table.isNotEmpty(self.config.aliases) then
 		header:tag('th'):css('min-width', '70px'):wikitext('Team')
 	elseif self.config.playerResultsOfTeam then
 		header:tag('th'):css('min-width', '105px'):wikitext('Player')
@@ -82,7 +83,10 @@ function ResultsTable:buildRow(placement)
 			placement.pagename
 		))
 
-	if self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team then
+	if self.config.playerResultsOfTeam or
+		self.config.queryType ~= Opponent.team or
+		Table.isNotEmpty(self.config.aliases) then
+
 		row:tag('td'):css('text-align', 'right'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
 			placement,
 			{flip = true, teamForSolo = not self.config.playerResultsOfTeam}
