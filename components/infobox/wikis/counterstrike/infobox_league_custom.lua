@@ -112,9 +112,7 @@ function CustomLeague.run(frame)
 end
 
 function CustomLeague:shouldStore(args)
-	return Namespace.isMain()
-			and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
-			and not Logic.readBool(Variables.varDefault('disable_SMW_storage'))
+	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 function CustomLeague:createWidgetInjector()
