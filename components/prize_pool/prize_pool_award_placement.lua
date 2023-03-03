@@ -34,7 +34,7 @@ function AwardPlacement:create(award)
 	return self
 end
 
---- no additionalData for awards so return empty table
+--- No additionalData for awards so return empty table
 function AwardPlacement:readAdditionalData(args)
 	return {}
 end
@@ -109,7 +109,7 @@ function AwardPlacement:_getLpdbData(...)
 	return entries
 end
 
--- no BG for awards
+-- No BG for awards
 function AwardPlacement:getBackground()
 	return
 end
