@@ -188,11 +188,11 @@ function CustomTeam.calculateEarnings(args)
 		Logic.readBool(args.disable_smw) or
 		Logic.readBool(args.disable_lpdb) or
 		Logic.readBool(args.disable_storage) or
-		Logic.readBool(Variables.varDefault('disable_SMW_storage')) or
+		Logic.readBool(Variables.varDefault('disable_LPDB_storage')) or
 		(not Namespace.isMain())
 	then
 		doStore = false
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		CustomTeam.getEarningsAndMedalsData(_team.pagename)
 		Variables.varDefine('earnings', _team.totalEarnings)
