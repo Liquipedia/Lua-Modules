@@ -28,6 +28,9 @@ local DEFAULT_LIMIT = 500
 local DEFAULT_ACHIEVEMENTS_LIMIT = 10
 local NONBREAKING_SPACE = '&nbsp;'
 local DEFAULT_TIERTYPE = 'General'
+local DEFAULT_ABOUT_LINK = 'Template:Weight/doc'
+local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
+local RESULTS_SORT_ORDER = 'date desc'
 
 --- @class BroadcastTalentTable
 local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
@@ -61,7 +64,7 @@ function BroadcastTalentTable:_readArgs(args)
 	local isAchievementsTable = Logic.readBool(args.achievements)
 
 	self.args = {
-		aboutAchievementsLink = args.aboutAchievementsLink or 'Template:Weight/doc',
+		aboutAchievementsLink = args.aboutAchievementsLink or DEFAULT_ABOUT_LINK,
 		showTierType = Logic.readBool(args.showtiertype),
 		displayGameIcon = Logic.readBool(args.displayGameIcon),
 		isAchievementsTable = isAchievementsTable,
@@ -69,7 +72,7 @@ function BroadcastTalentTable:_readArgs(args)
 		startDate = args.sdate,
 		endDate = args.edate,
 		limit = tonumber(args.limit) or (isAchievementsTable and DEFAULT_ACHIEVEMENTS_LIMIT) or DEFAULT_LIMIT,
-		sortBy = isAchievementsTable and 'weight desc, date desc' or 'date desc',
+		sortBy = isAchievementsTable and ACHIEVEMENTS_SORT_ORDER or RESULTS_SORT_ORDER,
 	}
 
 	local broadcaster = String.isNotEmpty(args.broadcaster) and args.broadcaster or self:_getBroadcaster()
