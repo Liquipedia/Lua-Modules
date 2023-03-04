@@ -16,7 +16,6 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier/Utils')
-local Variables = require('Module:Variables')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -176,7 +175,7 @@ function BroadcastTalentTable:_header()
 		:tag('th'):wikitext('Position'):css('width', '130px'):done()
 		:tag('th'):wikitext('Partner List'):css('width', '160px'):done()
 end
-	
+
 function BroadcastTalentTable._seperator(seperatorTitle)
 	return mw.html.create('tr'):addClass('sortbottom'):css('font-weight', 'bold')
 		:tag('td'):attr('colspan', 42):wikitext(seperatorTitle):done()
@@ -215,7 +214,8 @@ end
 function BroadcastTalentTable._fetchTournamentData(tournament)
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[pagename::' .. tournament.parent .. ']]',
-		query = 'name, tickername, icon, icondark, series, game, liquipediatier, liquipediatiertype, publishertier, extradata',
+		query = 'name, tickername, icon, icondark, series, game, '
+			.. 'liquipediatier, liquipediatiertype, publishertier, extradata',
 	})
 
 	if type(queryData[1]) ~= 'table' then
@@ -314,8 +314,10 @@ function BroadcastTalentTable:_footer()
 			:wikitext(Page.makeInternalLink({}, 'About achievements', self.args.aboutAchievementsLink))
 			:done()
 		:tag('b')
-			:wikitext(Page.makeInternalLink({}, 'Broadcasts from any Tournament', self.broadcaster .. '/Broadcasts#Detailed Broadcasts'))
-			:done()
+			:wikitext(Page.makeInternalLink({},
+				'Broadcasts from any Tournament',
+				self.broadcaster .. '/Broadcasts#Detailed Broadcasts'
+			)):done()
 		:done()
 
 	return mw.html.create('tr')
