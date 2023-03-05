@@ -310,6 +310,14 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
+	for _, player in pairs(record.players or {}) do
+		player.name = player.name:gsub(' ', '_')
+	end
+
+	if record.name then
+		record.name = record.name:gsub(' ', '_')
+	end
+
 	if record.type == Opponent.team then
 		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
 		-- todo in sep pr:
