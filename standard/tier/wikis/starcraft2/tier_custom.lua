@@ -7,8 +7,14 @@
 --
 
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
+
+local NON_BREAKING_SPACE = '&nbsp;'
 
 local TierCustom = Table.copy(Tier)
 
@@ -47,10 +53,10 @@ function TierCustom.display(tier, tierType, options)
 	local display = Tier.displaySingle(tierTypeData, Tier._displayOptions(options, 'tierType'))
 		.. NON_BREAKING_SPACE .. '(' .. Tier.displaySingle(tierData, Tier._displayOptions(options, 'tier')) .. ')'
 
-	if Logic.readBool(options.link) and tierData.link then
+	if Logic.readBool(link) and tierData.link then
 		return Page.makeInternalLink({}, display, tierData.link)
-	elseif String.isNotEmpty(options.link) then
-		return Page.makeInternalLink({}, display, options.link)
+	elseif String.isNotEmpty(link) then
+		return Page.makeInternalLink({}, display, link)
 	end
 
 	return display
