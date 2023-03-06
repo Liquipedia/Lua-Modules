@@ -348,7 +348,7 @@ function Series:_getCategories(args)
 	table.insert(categories, tierCategory)
 	table.insert(categories, tierTypeCategory)
 
-	if not tierCategory then
+	if not tierCategory and String.isNotEmpty(tier) then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
