@@ -19,7 +19,6 @@ local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -42,8 +41,6 @@ local _previous
 
 local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local TODAY = os.date('%Y-%m-%d', os.time())
-local TIER_MODE_TYPES = 'types'
-local TIER_MODE_TIERS = 'tiers'
 
 local GAME_WOL = 'wol'
 local GAME_HOTS = 'hots'
@@ -93,14 +90,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Prize pool',
 				content = {CustomLeague:_createPrizepool()},
-			},
-		}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {CustomLeague:_createLiquipediaTierDisplay()},
-				classes = {Logic.readBool(_args.featured) and 'tournament-highlighted-bg' or ''}
 			},
 		}
 	elseif id == 'chronology' then
@@ -217,47 +206,6 @@ function CustomLeague:_createPrizepool()
 
 		return display
 	end
-end
-
---function for custom tier handling
-function CustomLeague._createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier
-	local tierType = _args.liquipediatiertype
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local teamEventCategoryInfix = (String.isNotEmpty(_args.team_number) or String.isNotEmpty(_args.team1))
-		and 'Team ' or ''
-
-	local function buildTierText(tierString, tierMode)
-		local tierText = Tier.text[tierMode][tierString]
-		if not tierText then
-			tierMode = tierMode == TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				_league.warnings,
-				tierString .. ' is not a known Liquipedia ' .. tierMode
-					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
-			)
-			return ''
-		else
-			return tierText
-		end
-	end
-
-	tier = buildTierText(tier, TIER_MODE_TIERS)
-
-	local tierLink = tier .. ' Tournaments'
-	local tierCategory = '[[Category:' .. tier .. ' ' .. teamEventCategoryInfix .. 'Tournaments]]'
-	local tierDisplay
-	if String.isNotEmpty(tierType) then
-		tierType = buildTierText(tierType:lower(), TIER_MODE_TYPES)
-		tierDisplay = tierType .. '&nbsp;(' .. tier .. ')'
-	else
-		tierDisplay = tier
-	end
-
-	return '[[' .. tierLink .. '|' .. tierDisplay .. ']]' .. tierCategory
 end
 
 function CustomLeague._getGameVersion()
