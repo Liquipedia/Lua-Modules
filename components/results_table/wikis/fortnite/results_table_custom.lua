@@ -9,7 +9,6 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
