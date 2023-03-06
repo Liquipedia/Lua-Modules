@@ -159,12 +159,14 @@ function Series:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories(infobox:_getCategories(args))
+		infobox:categories(unpack(self:_getCategories(args)))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if Namespace.isMain() then
+		local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
+
 		local lpdbData = {
 			name = self.name,
 			image = args.image,
@@ -182,12 +184,8 @@ function Series:createInfobox()
 			next = args.next,
 			next2 = args.next2,
 			prizepool = args.prizepool,
-			liquipediatier = Tier.text.tiers
-				and Tier.text.tiers[string.lower(args.liquipediatier or '')]
-				or args.liquipediatiertype,
-			liquipediatiertype = Tier.text.types
-				and Tier.text.types[string.lower(args.liquipediatiertype or '')]
-				or args.liquipediatiertype,
+			liquipediatier = tier,
+			liquipediatiertype = tierType,
 			publishertier = args.publishertier,
 			launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
 			defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
@@ -226,7 +224,7 @@ function Series:addToLpdb(lpdbData)
 end
 
 function Series:createLiquipediaTierDisplay(args)
-	return Tier.display(args.liquipediatier, args.liquipediatiertype)
+	return Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true})
 		.. self.appendLiquipediatierDisplay(args)
 end
 
@@ -350,7 +348,7 @@ function Series:_getCategories(args)
 	table.insert(categories, tierCategory)
 	table.insert(categories, tierTypeCategory)
 
-	if tierCategory then
+	if not tierCategory then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
