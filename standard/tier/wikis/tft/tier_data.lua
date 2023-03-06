@@ -39,7 +39,7 @@ return {
 			short = '?',
 		},
 
-		-- for legacy reasons until freefire switches to standardized tier/tiertype
+		-- for legacy reasons until tft switches to standardized tier/tiertype
 		weekly = {
 			value = 'Weekly',
 			sort = 'A7',
