@@ -16,7 +16,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -388,24 +388,19 @@ function BaseResultsTable:rowHighlight(placement)
 	end
 end
 
+local INVALID_TIER_DISPLAY = 'Undefined'
+local INVALID_TIER_SORT = 'ZZ'
+
 -- overwritable
 function BaseResultsTable:tierDisplay(placement)
-	local tierDisplay
+	local tier, tierType, options = Tier.parseFromQueryData(tournamentData)
+	options.link = true
 
-	if String.isEmpty(placement.liquipediatiertype) and String.isEmpty(placement.liquipediatier) then
-		return '', ''
-	elseif String.isNotEmpty(placement.liquipediatiertype) then
-		local tierType = placement.liquipediatiertype:lower()
-		tierDisplay = Tier.text.types[tierType] or placement.liquipediatiertype
-	else
-		tierDisplay = Tier.text.tiers[placement.liquipediatier] or placement.liquipediatier
+	if not Tier.isValid(tier, tierType) then
+		return UNDEFINED_TIER, INVALID_TIER_SORT
 	end
 
-	return Page.makeInternalLink(
-		{},
-		tierDisplay,
-		tierDisplay .. ' Tournaments'
-	), tierDisplay
+	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
 -- overwritable
