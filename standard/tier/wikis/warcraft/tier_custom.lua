@@ -16,6 +16,7 @@ local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
 
 local TierCustom = Table.copy(Tier)
 
+local NON_BREAKING_SPACE = '&nbsp;'
 local MODE_ADJUSTS = {
 	['2v2'] = '2v2 ',
 	team = 'Team ',
