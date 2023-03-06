@@ -78,7 +78,7 @@ return {
 			sort = 'B1',
 			name = 'Showmatch',
 			short = 'Showm.',
-			link = 'Show Matches',
+			link = 'Showmatch Tournaments',
 			category = 'Showmatch Tournaments',
 		},
 	},
