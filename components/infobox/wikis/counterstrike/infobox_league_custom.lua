@@ -299,7 +299,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	end
 
 	-- Legacy tier vars
-	local tierName = Tier.toName(args.liquipediatier, tierType)
+	local tierName = Tier.toName(args.liquipediatier)
 	Variables.varDefine('tournament_tier', tierName) -- Stores as X-tier, not the integer
 
 	-- Wiki specific vars
