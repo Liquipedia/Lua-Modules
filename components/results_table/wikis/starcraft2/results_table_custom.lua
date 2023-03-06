@@ -14,7 +14,6 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
