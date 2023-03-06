@@ -87,7 +87,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
-	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
+	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
@@ -469,6 +469,10 @@ end
 
 function CustomLeague._getMode()
 	return MODES[_args.mode] or DEFAULT_MODE
+end
+
+function CustomLeague:appendLiquipediatierDisplay()
+	return mw.getContentLanguage():ucfirst(MODES[_args.mode] or '')
 end
 
 return CustomLeague
