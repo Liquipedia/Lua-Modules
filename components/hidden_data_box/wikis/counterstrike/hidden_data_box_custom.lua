@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
