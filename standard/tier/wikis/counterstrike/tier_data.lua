@@ -91,23 +91,7 @@ return {
 	},
 
 	tierTypes = {
-		monthly = {
-			value = 'Monthly',
-			sort = 'A6',
-			name = 'Monthly',
-			short = 'Mon.',
-			link = 'Monthly Tournaments',
-			category = 'Monthly Tournaments',
-		},
-		weekly = {
-			value = 'Weekly',
-			sort = 'A7',
-			name = 'Weekly',
-			short = 'Week.',
-			link = 'Weekly Tournaments',
-			category = 'Weekly Tournaments',
-		},
-		qualifier = {
+		[5] = {
 			value = 'Qualifier',
 			sort = 'A8',
 			name = 'Qualifier',
@@ -115,17 +99,33 @@ return {
 			link = 'Qualifier Tournaments',
 			category = 'Qualifier Tournaments',
 		},
-		misc = {
+		[6] = {
+			value = 'Monthly',
+			sort = 'A6',
+			name = 'Monthly',
+			short = 'Mon.',
+			link = 'Monthly Tournaments',
+			category = 'Monthly Tournaments',
+		},
+		[7] = {
+			value = 'Weekly',
+			sort = 'A7',
+			name = 'Weekly',
+			short = 'Week.',
+			link = 'Weekly Tournaments',
+			category = 'Weekly Tournaments',
+		},
+		[8] = {
 			value = 'Misc',
-			sort = 'A9',
+			sort = 'A8',
 			name = 'Misc',
 			short = 'Misc',
 			link = 'Miscellaneous Tournaments',
 			category = 'Miscellaneous Tournaments',
 		},
-		showmatch = {
+		[9] = {
 			value = 'Showmatch',
-			sort = 'B1',
+			sort = 'A9',
 			name = 'Showmatch',
 			short = 'Showm.',
 			link = 'Showmatches',
