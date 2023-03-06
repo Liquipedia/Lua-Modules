@@ -44,7 +44,7 @@ function TierCustom.display(tier, tierType, options)
 	local link = options.link
 
 	-- disable link since on sc2 we link only to the tier link not to the tierType
-	options.link = false
+	options.link = nil
 
 	if options.shortIfBoth then
 		options.short = true
