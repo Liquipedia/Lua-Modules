@@ -190,7 +190,7 @@ end)
 ---@return integer
 ---@deprecated
 function Tier.toNumber(tier)
-	return Tier.legacyNumbers[tier]
+	return Tier.legacyNumbers[string.lower(tier or ''):gsub(' ', '')]
 end
 
 return Tier
