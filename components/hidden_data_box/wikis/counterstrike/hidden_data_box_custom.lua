@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Tier = mw.loadData('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
@@ -18,9 +18,6 @@ local CustomHiddenDataBox = {}
 function CustomHiddenDataBox.run(args)
 	args = args or {}
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	if args.liquipediatier and not Logic.isNumeric(args.liquipediatier) then
-		args.liquipediatier = Tier.number[args.liquipediatier]
-	end
 	return BasicHiddenDataBox.run(args)
 end
 
@@ -33,7 +30,8 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate'))
 	Variables.varDefine('date', Variables.varDefault('tournament_enddate'))
 
-	Variables.varDefine('tournament_tier', Tier.text[tostring(Variables.varDefault('tournament_liquipediatier', ''))])
+	local tier = Tier.toName(Variables.varDefault('tournament_liquipediatier'))
+	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))
 
