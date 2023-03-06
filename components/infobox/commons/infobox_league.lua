@@ -273,13 +273,13 @@ function League:getCategories(args)
 	self.infobox:categories(tierCategory)
 	self.infobox:categories(tierTypeCategory)
 
-	if not tierCategory then
+	if not tierCategory and String.isNotEmpty(tier) then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		self.infobox:categories('Pages with invalid Tier')
 	end
 	if not tierTypeCategory and String.isNotEmpty(tierType) then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
-		self.infobox:categories('Pages with invalid Tier')
+		self.infobox:categories('Pages with invalid Tiertype')
 	end
 
 	return self:getWikiCategories(args)
