@@ -95,7 +95,7 @@ return {
 			name = 'FFA',
 			short = 'Showm.',
 			link = 'Free For All Tournaments',
-			category = 'Showmatch Tournaments',
+			category = 'FFA Tournaments',
 		},
 	},
 }
