@@ -184,6 +184,10 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 		Config.weights, function(tierWeights) return tierWeights['tier'] == tier end
 		)
 
+	if not weightForTier then
+		return 0
+	end
+
 	local tierPoints = Array.find(
 		weightForTier['tiertype'],
 		function(pointsForType)
