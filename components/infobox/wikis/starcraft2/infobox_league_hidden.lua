@@ -22,7 +22,7 @@ local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local HiddenInfoboxLeague = {}
@@ -46,6 +46,8 @@ local _GAMES = {
 
 function HiddenInfoboxLeague.run(args)
 	_args = args
+
+	args.liquipediatiertype = args.liquipediatiertype or args.tiertype
 
 	HiddenInfoboxLeague._definePageVariables()
 
@@ -99,7 +101,7 @@ function HiddenInfoboxLeague._getCategories()
 		end
 	end
 
-	table.insert(categories, HiddenInfoboxLeague.getTierCategories())
+	HiddenInfoboxLeague.getTierCategories()
 
 	table.insert(categories, HiddenInfoboxLeague._getCountryCategories())
 
@@ -138,30 +140,21 @@ function HiddenInfoboxLeague._getCountryCategories()
 end
 
 function HiddenInfoboxLeague.getTierCategories()
-	local tierCategories = {}
+	local tier = _args.liquipediatier
+	local tierType = _args.liquipediatiertype
 
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
+	local tierCategory, tierTypeCategory = Tier.toCategory(tier, tierType)
 
-	local tierText = Tier.text.tiers[tier]
-	if String.isNotEmpty(tier) and tierText == nil then
-		table.insert(tierCategories, 'Pages with invalid Tier')
+	if not tierCategory and String.isNotEmpty(tier) then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid Tier')
+	elseif tierCategory then
+		mw.ext.TeamLiquidIntegration.add_category(tierCategory)
 	end
-	tierText = tierText or tier
-	table.insert(tierCategories, tierText .. ' Tournaments')
-	if _args.team_number or _args.team1 then
-		table.insert(tierCategories, tierText .. ' Team Tournaments')
+	if not tierTypeCategory and String.isNotEmpty(tierType) then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid Tiertype')
+	elseif tierTypeCategory then
+		mw.ext.TeamLiquidIntegration.add_category(tierTypeCategory)
 	end
-
-	if String.isNotEmpty(tierType) and Tier.text.types[string.lower(tierType)] == nil then
-		table.insert(tierCategories, 'Pages with invalid Tiertype')
-	end
-
-	if tierCategories == {} then
-		return nil
-	end
-
-	return table.concat(tierCategories, ']] [[Category:')
 end
 
 function HiddenInfoboxLeague._definePageVariables()
