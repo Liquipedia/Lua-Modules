@@ -22,10 +22,7 @@ local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 
-local _TIER_MODE_TYPES = 'types'
-local _TIER_MODE_TIERS = 'tiers'
-local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
-	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -162,14 +159,7 @@ function Series:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories(
-			'Tournament series',
-			self:_setCountryCategories(args.country),
-			self:_setCountryCategories(args.country2),
-			self:_setCountryCategories(args.country3),
-			self:_setCountryCategories(args.country4),
-			self:_setCountryCategories(args.country5)
-		)
+		infobox:categories(infobox:_getCategories(args))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
@@ -236,39 +226,8 @@ function Series:addToLpdb(lpdbData)
 end
 
 function Series:createLiquipediaTierDisplay(args)
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString, tierMode)
-		local tierText
-		if not Tier.text[tierMode] then -- allow legacy tier modules
-			tierText = Tier.text[tierString]
-		else -- default case, i.e. tier module with intended format
-			tierText = Tier.text[tierMode][tierString:lower()]
-		end
-		if not tierText then
-			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				self.warnings,
-				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
-			)
-			return ''
-		else
-			self.infobox:categories(tierText .. ' Tournaments')
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier, _TIER_MODE_TIERS)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-
-	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+	return Tier.display(args.liquipediatier, args.liquipediatiertype)
+		.. self.appendLiquipediatierDisplay(args)
 end
 
 --- Allows for overriding this functionality
@@ -377,9 +336,35 @@ function Series:_createOrganizers(args)
 	return organizers
 end
 
+function Series:_setCategories(args)
+	local categories = {'Tournament series'}
+
+	for _, country in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
+		table.insert(categories, self:_setCountryCategories(country))
+	end
+
+	local tier = args.liquipediatier
+	local tierType = args.liquipediatiertype
+
+	local tierCategory, tierTypeCategory = Tier.toCategory(tier, tierType)
+	table.insert(categories, tierCategory)
+	table.insert(categories, tierTypeCategory)
+
+	if tierCategory then
+		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(categories, 'Pages with invalid Tier')
+	end
+	if not tierTypeCategory and String.isNotEmpty(tierType) then
+		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(categories, 'Pages with invalid Tier')
+	end
+
+	return categories
+end
+
 function Series:_setCountryCategories(country)
 	if String.isEmpty(country) then
-		return ''
+		return
 	end
 
 	local countryAdjective = Flags.getLocalisation(country)
