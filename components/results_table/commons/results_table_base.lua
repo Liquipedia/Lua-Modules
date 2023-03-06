@@ -391,7 +391,7 @@ end
 
 -- overwritable
 function BaseResultsTable:tierDisplay(placement)
-	local tier, tierType, options = Tier.parseFromQueryData(tournamentData)
+	local tier, tierType, options = Tier.parseFromQueryData(placement)
 	options.link = true
 
 	if not Tier.isValid(tier, tierType) then
