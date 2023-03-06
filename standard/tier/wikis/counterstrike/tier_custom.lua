@@ -17,7 +17,7 @@ local TierCustom = Table.copy(Tier)
 --- Converts input to standardized identifier format
 ---@param input string|integer|nil
 ---@return string|integer|nil
-function Tier.toIdentifier(input)
+function TierCustom.toIdentifier(input)
 	if String.isEmpty(input) then
 		return
 	end
