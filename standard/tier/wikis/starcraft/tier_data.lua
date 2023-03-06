@@ -52,6 +52,7 @@ return {
 			sort = 'B1',
 			name = 'Monthly',
 			short = 'Mon.',
+			link = 'Monthly Tournaments',
 			category = 'Monthly Tournaments',
 		},
 		weekly = {
@@ -59,6 +60,7 @@ return {
 			sort = 'B2',
 			name = 'Weekly',
 			short = 'Week.',
+			link = 'Weekly Tournaments',
 			category = 'Weekly Tournaments',
 		},
 		biweekly = {
@@ -66,6 +68,7 @@ return {
 			sort = 'B3',
 			name = 'Biweekly',
 			short = 'Biw.',
+			link = 'Biweekly Tournaments',
 			category = 'Biweekly Tournaments',
 		},
 		showmatch = {
@@ -73,6 +76,7 @@ return {
 			sort = 'B4',
 			name = 'Showmatch',
 			short = 'Showm.',
+			link = 'Showmatch Tournaments',
 			category = 'Showmatch Tournaments',
 		},
 		qualifier = {
@@ -80,6 +84,7 @@ return {
 			sort = 'B5',
 			name = 'Qualifier',
 			short = 'Qual.',
+			link = 'Qualifier Tournaments',
 			category = 'Qualifier Tournaments',
 		},
 		charity = {
@@ -87,6 +92,7 @@ return {
 			sort = 'B6',
 			name = 'Charity',
 			short = 'Char.',
+			link = 'Charity Tournaments',
 			category = 'Charity Tournaments',
 		},
 	},
