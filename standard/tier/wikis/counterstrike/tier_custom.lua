@@ -23,7 +23,7 @@ function TierCustom.toIdentifier(input)
 	end
 
 	return tonumber(input)
-		or Tier.legacyNumbers[string.lower(input):gsub(' ', '')]
+		or Tier.toNumber(input)
 		or string.lower(input):gsub(' ', '')
 end
 
