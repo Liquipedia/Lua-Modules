@@ -336,7 +336,7 @@ function Series:_createOrganizers(args)
 	return organizers
 end
 
-function Series:_setCategories(args)
+function Series:_getCategories(args)
 	local categories = {'Tournament series'}
 
 	for _, country in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
