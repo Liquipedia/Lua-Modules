@@ -12,7 +12,7 @@ local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local WarningBox = require('Module:WarningBox')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
