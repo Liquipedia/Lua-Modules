@@ -50,10 +50,10 @@ local GAMES = {
 }
 
 local DUOS = '2v2'
+local DEFAULT_MODE = '1v1'
 local MODES = {
-	team = {tier = 'Team', store = 'team'},
-	[DUOS] = {tier = ' 2v2', store = '2v2'},
-	default = {store = '1v1'},
+	team = 'team',
+	[DUOS] = '2v2',
 }
 
 local TIER_1 = 1
@@ -69,11 +69,6 @@ local ESL_TIERS = {
 	qualifier = '[[File:ESL Pro Tour Qualifier.png|20x20px|Qualifier]] Qualifier',
 	['open cup'] = '[[File:ESL 2019 icon.png|20x20px|Open Cup]] Open Cup',
 }
-
-local TIER_MODE_TYPES = 'types'
-local TIER_MODE_TIERS = 'tiers'
-local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
-	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -472,61 +467,8 @@ function CustomLeague:getWikiCategories()
 	return categories
 end
 
-function CustomLeague:createLiquipediaTierDisplay(args)
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString, tierMode)
-		local tierText = self:_getTierText(tierString, tierMode)
-		if not tierText then
-			tierMode = tierMode == TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				self.warnings,
-				String.interpolate(INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
-			)
-			return ''
-		else
-			if self:shouldStore(args) then
-				self.infobox:categories(tierText .. ' Tournaments')
-			end
-			local tierLink = tierText .. CustomLeague._getModeInTier() .. ' Tournaments'
-
-			return '[[' .. tierLink .. '|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier, TIER_MODE_TIERS)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType, TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-
-	return tierDisplay .. CustomLeague._getModeDisplayInTier()
-end
-
 function CustomLeague._getMode()
-	return (MODES[_args.mode] or {}).store or MODES.default.store
-end
-
-function CustomLeague._getModeInTier()
-	local mode = (MODES[_args.mode] or {}).tier
-	if mode then
-		return ' ' .. mode
-	end
-
-	return ''
-end
-
-function CustomLeague._getModeDisplayInTier()
-	local mode = (MODES[_args.mode] or {}).tier
-	if mode then
-		return ' (' .. mode .. ')'
-	end
-
-	return ''
+	return MODES[_args.mode] or DEFAULT_MODE
 end
 
 return CustomLeague
