@@ -224,7 +224,7 @@ function Series:addToLpdb(lpdbData)
 end
 
 function Series:createLiquipediaTierDisplay(args)
-	return Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true})
+	return (Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true}) or '')
 		.. self.appendLiquipediatierDisplay(args)
 end
 
