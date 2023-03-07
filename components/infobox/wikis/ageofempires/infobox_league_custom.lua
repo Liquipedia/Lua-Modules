@@ -17,6 +17,7 @@ local MapMode = require('Module:MapMode')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Tier = require('Tier/Custom')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -37,6 +38,9 @@ local categories = {}
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
+
+	league.args.liquipediatier = Tier.toNumber(league.args.liquipediatier)
+
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
