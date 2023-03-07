@@ -16,12 +16,6 @@ local TierCustom = Table.copy(Tier)
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
-local MODE_ADJUSTS = {
-	['2v2'] = '2v2 ',
-	team = 'Team ',
-	default = '',
-}
-
 function TierCustom.display(tier, tierType, options)
 	local tierData, tierTypeData = Tier._raw(tier, tierType)
 
@@ -41,7 +35,6 @@ function TierCustom.display(tier, tierType, options)
 	if options.onlyTierTypeIfBoth then
 		return Tier.displaySingle(tierTypeData, tierTypeDisplayOptions)
 			.. TierCustom.appendTierType2(options.tierType2)
-			
 	end
 
 	if options.shortIfBoth then
