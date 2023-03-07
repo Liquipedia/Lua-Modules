@@ -315,8 +315,13 @@ function League:appendLiquipediatierDisplay()
 end
 
 function League:createLiquipediaTierDisplay(args)
-	return (Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true}) or '')
-		.. self.appendLiquipediatierDisplay(args)
+	local tierDisplay = Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true})
+
+	if String.isEmpty(tierDisplay) then
+		return
+	end
+
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
 end
 
 function League:_createPrizepool(args)
