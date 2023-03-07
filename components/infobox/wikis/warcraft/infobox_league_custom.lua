@@ -18,6 +18,7 @@ local PageLink = require('Module:Page')
 local PatchAuto = require('Module:PatchAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -56,7 +57,6 @@ local MODES = {
 	[DUOS] = '2v2',
 }
 
-local NON_BREAKING_SPACE = '&nbsp;'
 local TIER_1 = 1
 local TIER_2 = 2
 
