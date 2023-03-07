@@ -8,6 +8,7 @@
 
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
+local Variables = require('Module:Variables')
 
 local LpdbMock = Lua.import('Module:Mock/Lpdb', {requireDevIfEnabled = true})
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
@@ -94,6 +95,52 @@ function suite:testHeaderInput()
 		'<div class="csstable-widget-cell prizepooltable-col-team">Participant</div></div></div></div>',
 		tostring(ppt:build())
 	)
+
+	TournamentMock.tearDown()
+	LpdbMock.tearDown()
+end
+
+
+local TEST_DATA = {
+	type = {type = 'team'},
+	currencyroundprecision = 3,
+	lpdb_prefix = 'abc',
+	fillPlaceRange = true,
+	localcurrency1 = 'EUR',
+	import = false,
+	[1] = {localprize = '1,000', [1] = {'Team Sweden'}},
+}
+
+function suite:testStorage()
+	local callbackCalled = false
+	local callback = function()
+		callbackCalled = true
+	end
+
+	local tournamentData = mw.loadData('Module:TestAssets/Tournaments').dummy
+	TournamentMock.setUp(tournamentData)
+	LpdbMock.setUp(callback)
+
+	PrizePool(TEST_DATA):create():build()
+	self:assertTrue(callbackCalled)
+
+	TournamentMock.tearDown()
+	LpdbMock.tearDown()
+end
+
+function suite:testStorageDisable()
+	local callbackCalled = false
+	local callback = function()
+		callbackCalled = true
+	end
+
+	local tournamentData = mw.loadData('Module:TestAssets/Tournaments').dummy
+	TournamentMock.setUp(tournamentData)
+	LpdbMock.setUp(callback)
+
+	Variables.varDefine('disable_LPDB_storage', 'true')
+	PrizePool(TEST_DATA):create():build()
+	self:assertFalse(callbackCalled)
 
 	TournamentMock.tearDown()
 	LpdbMock.tearDown()
