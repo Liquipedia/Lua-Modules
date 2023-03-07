@@ -56,6 +56,7 @@ local MODES = {
 	[DUOS] = '2v2',
 }
 
+local NON_BREAKING_SPACE = '&nbsp;'
 local TIER_1 = 1
 local TIER_2 = 2
 
@@ -472,7 +473,11 @@ function CustomLeague._getMode()
 end
 
 function CustomLeague:appendLiquipediatierDisplay()
-	return mw.getContentLanguage():ucfirst(MODES[_args.mode] or '')
+	local modeDisplay = MODES[_args.mode]
+	if not modeDisplay then
+		return ''
+	end
+	return NON_BREAKING_SPACE .. mw.getContentLanguage():ucfirst(modeDisplay)
 end
 
 return CustomLeague
