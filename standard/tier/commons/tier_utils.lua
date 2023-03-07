@@ -182,7 +182,7 @@ function Tier.iterate(subTable)
 end
 
 Tier.legacyNumbers = FnUtil.memoize(function()
-	return Table.map(TierData.tiers, function(key, data) return data.name:lower(), tonumber(key) or '' end)
+	return Table.map(TierData.tiers, function(key, data) return data.name:lower():gsub(' ', ''), tonumber(key) or '' end)
 end)
 
 --- Legacy: Converts legacy tier input to its numeric value. DEPRECATED!!!
@@ -190,7 +190,8 @@ end)
 ---@return integer
 ---@deprecated
 function Tier.toNumber(tier)
-	return Tier.legacyNumbers[tier]
+	return tonumber(tier)
+		or Tier.legacyNumbers[string.lower(tier or ''):gsub(' ', '')]
 end
 
 return Tier
