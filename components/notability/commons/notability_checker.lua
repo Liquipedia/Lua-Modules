@@ -194,6 +194,11 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 			return pointsForType['name'] == (tierType or Config.TIER_TYPE_GENERAL)
 		end
 	)['points']
+
+	if not tierPoints then
+		return 0
+	end
+
 	local placementDropOffFunction = Config.placementDropOffFunction(tier, tierType)
 
 	local placementValue = NotabilityChecker._preparePlacement(placement)
