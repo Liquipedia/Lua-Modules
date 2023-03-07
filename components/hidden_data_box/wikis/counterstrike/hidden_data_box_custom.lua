@@ -16,6 +16,8 @@ local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
 	args = args or {}
+	args.liquipediatier = args.liquipediatier and Tier.toNumber(args.liquipediatier) or args.liquipediatier
+
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	return BasicHiddenDataBox.run(args)
 end
