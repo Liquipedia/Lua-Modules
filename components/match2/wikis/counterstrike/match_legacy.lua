@@ -126,6 +126,9 @@ function MatchLegacy.convertParameters(match2)
 				else
 					match[prefix] = opponent.name
 				end
+				if opponent.name == 'BYE' then
+					match.resulttype = 'l'
+				end
 			end
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
 			if isOverturned then
