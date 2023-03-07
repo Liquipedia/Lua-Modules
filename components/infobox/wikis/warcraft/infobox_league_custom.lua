@@ -472,6 +472,16 @@ function CustomLeague._getMode()
 	return MODES[_args.mode] or DEFAULT_MODE
 end
 
+function CustomLeague:createLiquipediaTierDisplay(args)
+	local tierDisplay = Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true, mode = args.mode})
+
+	if String.isEmpty(tierDisplay) then
+		return
+	end
+
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+end
+
 function CustomLeague:appendLiquipediatierDisplay()
 	local modeDisplay = MODES[_args.mode]
 	if not modeDisplay then
