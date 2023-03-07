@@ -44,6 +44,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
@@ -348,6 +349,20 @@ function CustomLeague:_displayMaps(maps)
 		Table.mapValues(maps, function(map) return mapDisplay(map) end),
 		'&nbsp;• '
 	)}
+end
+
+function CustomLeague:createLiquipediaTierDisplay(args)
+	local tierDisplay = Tier.display(
+		args.liquipediatier,
+		args.liquipediatiertype,
+		{link = true, game = args.game}
+	)
+
+	if String.isEmpty(tierDisplay) then
+		return
+	end
+
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
 end
 
 return CustomLeague
