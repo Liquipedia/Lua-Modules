@@ -242,6 +242,7 @@ party opponents, this fills in players' pageNames using their displayNames,
 using data stored in page variables if present.
 
 options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
+options.syncTeam: Whether to fetch player team information from variables or LPDB. Disabled by default.
 ]]
 function Opponent.resolve(opponent, date, options)
 	options = options or {}
@@ -254,27 +255,8 @@ function Opponent.resolve(opponent, date, options)
 			else
 				PlayerExt.populatePageName(player)
 			end
-			if player.team then
-				player.team = TeamTemplate.resolve(player.team, date)
-			end
-		end
-	end
-	return opponent
-end
-
---[[
-options.syncTeam: Whether to fetch team of the respectiveplayer information from variables or LPDB. Disabled by default.
-]]
-function Opponent.resolve(opponent, date, options)
-	options = options or {}
-	if opponent.type == Opponent.team then
-		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
-	elseif Opponent.typeIsParty(opponent.type) then
-		for _, player in ipairs(opponent.players) do
 			if options.syncTeam then
-				PlayerExt.syncTeam(player, {savePageVar = not Opponent.playerIsTbd(player)})
-			else
-				PlayerExt.populatePageName(player)
+				PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil)
 			end
 			if player.team then
 				player.team = TeamTemplate.resolve(player.team, date)
