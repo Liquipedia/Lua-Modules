@@ -263,6 +263,28 @@ function Opponent.resolve(opponent, date, options)
 end
 
 --[[
+options.syncTeam: Whether to fetch team of the respectiveplayer information from variables or LPDB. Disabled by default.
+]]
+function Opponent.resolve(opponent, date, options)
+	options = options or {}
+	if opponent.type == Opponent.team then
+		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
+	elseif Opponent.typeIsParty(opponent.type) then
+		for _, player in ipairs(opponent.players) do
+			if options.syncTeam then
+				PlayerExt.syncTeam(player, {savePageVar = not Opponent.playerIsTbd(player)})
+			else
+				PlayerExt.populatePageName(player)
+			end
+			if player.team then
+				player.team = TeamTemplate.resolve(player.team, date)
+			end
+		end
+	end
+	return opponent
+end
+
+--[[
 Converts a opponent to a name. The name is the same as the one used in the
 match2opponent.name field.
 
