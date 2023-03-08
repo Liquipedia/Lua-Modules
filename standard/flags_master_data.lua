@@ -838,7 +838,7 @@ local data = {
 	},
 	['northmacedonia'] = {
 		flag = 'File:mk_hd.png',
-		localised = 'North Macedonian',
+		localised = 'Macedonian',
 		name = 'North Macedonia',
 	},
 	['norway'] = {
