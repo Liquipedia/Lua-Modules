@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
@@ -16,6 +17,8 @@ local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = t
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomAwardPrizePool = {}
+
+local PRIZE_TYPE_POINTS = 'POINTS'
 
 -- Template entry point
 function CustomAwardPrizePool.run(frame)
@@ -28,7 +31,7 @@ function CustomAwardPrizePool.run(frame)
 	awardsPrizePool:setConfigDefault('syncPlayers', true)
 
 	awardsPrizePool:create()
-	
+
 	awardsPrizePool:setLpdbInjector(CustomLpdbInjector())
 
 	return awardsPrizePool:build()
