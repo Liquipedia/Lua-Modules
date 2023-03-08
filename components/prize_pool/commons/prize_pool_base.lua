@@ -83,9 +83,12 @@ BasePrizePool.config = {
 		default = true,
 		read = function(args)
 			local disabledVariable = Logic.readBoolOrNil(Variables.varDefault('disable_LPDB_storage'))
+			if disabledVariable ~= nil then
+				disabledVariable = not disabledVariable
+			end
 			return Logic.nilOr(
 				Logic.readBoolOrNil(args.storesmw),
-				disabledVariable == nil and nil or not disabledVariable
+				disabledVariable
 			)
 		end
 	},
@@ -93,9 +96,12 @@ BasePrizePool.config = {
 		default = true,
 		read = function(args)
 			local disabledVariable = Logic.readBoolOrNil(Variables.varDefault('disable_LPDB_storage'))
+			if disabledVariable ~= nil then
+				disabledVariable = not disabledVariable
+			end
 			return Logic.nilOr(
 				Logic.readBoolOrNil(args.storelpdb),
-				disabledVariable == nil and nil or not disabledVariable
+				disabledVariable
 			)
 		end
 	},
