@@ -47,7 +47,7 @@ function CustomLeague.run(frame)
 	_args.normalizedGame = Game.name{game = _args.game}
 	
 	-- Default type should be offline unless otherwise specified
-	_args.type = _args.type or 'offline'
+	_args.type = _args.type or DEFAULT_TYPE
 
 	-- Implicit prizepools
 	_args.prizepoolassumed = false
