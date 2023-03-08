@@ -18,8 +18,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomAwardPrizePool = {}
 
-local PRIZE_TYPE_POINTS = 'POINTS'
-
 -- Template entry point
 function CustomAwardPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
