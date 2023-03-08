@@ -15,7 +15,12 @@ local CustomAwardPrizePool = {}
 
 -- Template entry point
 function CustomAwardPrizePool.run(frame)
-	return AwardPrizePool(Arguments.getArgs(frame)):create():build()
+	local awardsPrizePool = AwardPrizePool(Arguments.getArgs(frame))
+
+	awardsPrizePool:setConfigDefault('prizeSummary', false)
+	awardsPrizePool:setConfigDefault('syncPlayers', true)
+
+	return awardsPrizePool:create():build()
 end
 
 return CustomAwardPrizePool
