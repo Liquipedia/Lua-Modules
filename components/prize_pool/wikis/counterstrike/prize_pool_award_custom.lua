@@ -7,7 +7,10 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
 local Variables = require('Module:Variables')
 
 local AwardPrizePool = Lua.import('Module:PrizePool/Award', {requireDevIfEnabled = true})
@@ -17,6 +20,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomAwardPrizePool = {}
 
+local PRIZE_TYPE_POINTS = 'POINTS'
 local HEADER_DATA = {}
 
 -- Template entry point
@@ -32,7 +36,7 @@ function CustomAwardPrizePool.run(frame)
 	awardsPrizePool:setConfigDefault('exchangeInfo', false)
 
 	awardsPrizePool:create()
-	
+
 	awardsPrizePool:setLpdbInjector(CustomLpdbInjector())
 
 	if args['smw mute'] or not Namespace.isMain() or Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
@@ -42,7 +46,6 @@ function CustomAwardPrizePool.run(frame)
 
 	HEADER_DATA.tournamentName = args['tournament name']
 	HEADER_DATA.resultName = args['custom-name']
-
 
 	return awardsPrizePool:build()
 end
