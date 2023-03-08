@@ -20,7 +20,6 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomAwardPrizePool = {}
 
-local PRIZE_TYPE_POINTS = 'POINTS'
 local HEADER_DATA = {}
 
 -- Template entry point
