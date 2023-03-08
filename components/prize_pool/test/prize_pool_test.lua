@@ -8,6 +8,7 @@
 
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local LpdbMock = Lua.import('Module:Mock/Lpdb', {requireDevIfEnabled = true})
@@ -121,7 +122,20 @@ function suite:testStorage()
 	TournamentMock.setUp(tournamentData)
 	LpdbMock.setUp(callback)
 
+	-- default, no variable influence
 	PrizePool(TEST_DATA):create():build()
+	self:assertTrue(callbackCalled)
+	
+	callbackCalled = false
+	-- variable influence: storage enabled again
+	Variables.varDefine('disable_LPDB_storage', 'false')
+	PrizePool(TEST_DATA):create():build()
+	self:assertTrue(callbackCalled)
+	
+	callbackCalled = false
+	-- variable influence: storage disabled, but forced via arguments
+	Variables.varDefine('disable_LPDB_storage', 'true')
+	PrizePool(Table.merge(TEST_DATA, {storelpdb = true})):create():build()
 	self:assertTrue(callbackCalled)
 
 	TournamentMock.tearDown()
@@ -137,9 +151,19 @@ function suite:testStorageDisable()
 	local tournamentData = mw.loadData('Module:TestAssets/Tournaments').dummy
 	TournamentMock.setUp(tournamentData)
 	LpdbMock.setUp(callback)
-
+	
+	-- storage disabled via arguments
+	PrizePool(Table.merge(TEST_DATA, {storelpdb = false})):create():build()
+	self:assertFalse(callbackCalled)
+	
+	-- variable influence: storage disabled 
 	Variables.varDefine('disable_LPDB_storage', 'true')
 	PrizePool(TEST_DATA):create():build()
+	self:assertFalse(callbackCalled)
+		
+	-- variable influence: storage enabled, but disabled via arguments 
+	Variables.varDefine('disable_LPDB_storage', 'false')
+	PrizePool(Table.merge(TEST_DATA, {storelpdb = false})):create():build()
 	self:assertFalse(callbackCalled)
 
 	TournamentMock.tearDown()
