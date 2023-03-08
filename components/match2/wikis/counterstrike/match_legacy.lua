@@ -121,7 +121,9 @@ function MatchLegacy.convertParameters(match2)
 					match[prefix] = opponent.template
 				end
 			else
-				if String.isEmpty(opponent.name) or TextSanitizer.stripHTML(opponent.name) ~= opponent.name then
+				if String.isEmpty(opponent.name) or (TextSanitizer.stripHTML(opponent.name) ~= opponent.name)
+					or String.contains(opponent.name, 'winner') or String.contains(opponent.name, 'loser')
+				then
 					match[prefix] = 'TBD'
 				else
 					match[prefix] = opponent.name
