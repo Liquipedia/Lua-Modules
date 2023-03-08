@@ -184,12 +184,21 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 		Config.weights, function(tierWeights) return tierWeights['tier'] == tier end
 		)
 
-	local tierPoints = Array.find(
+	if not weightForTier then
+		return 0
+	end
+
+	local tierPoints = (Array.find(
 		weightForTier['tiertype'],
 		function(pointsForType)
 			return pointsForType['name'] == (tierType or Config.TIER_TYPE_GENERAL)
 		end
-	)['points']
+	) or {}).points
+
+	if not tierPoints then
+		return 0
+	end
+
 	local placementDropOffFunction = Config.placementDropOffFunction(tier, tierType)
 
 	local placementValue = NotabilityChecker._preparePlacement(placement)
