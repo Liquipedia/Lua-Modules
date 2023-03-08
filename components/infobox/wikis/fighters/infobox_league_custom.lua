@@ -45,7 +45,6 @@ function CustomLeague.run(frame)
 
 	-- Normalize name
 	_args.normalizedGame = Game.name{game = _args.game}
-	
 	-- Default type should be offline unless otherwise specified
 	_args.type = _args.type or DEFAULT_TYPE
 
