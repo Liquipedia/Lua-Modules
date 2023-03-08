@@ -287,7 +287,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		end
 	end
 
-	if record.name then
+	if record.name and record.type ~= Opponent.literal then
 		record.name = record.name:gsub(' ', '_')
 	end
 
