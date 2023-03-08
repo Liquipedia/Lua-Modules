@@ -25,6 +25,7 @@ local _args
 local _league
 
 local BASE_CURRENCY = 'USD'
+local DEFAULT_TYPE = 'offline'
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
