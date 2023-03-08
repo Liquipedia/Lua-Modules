@@ -103,6 +103,12 @@ BasePrizePool.config = {
 			return Logic.readBoolOrNil(args.syncPlayers)
 		end
 	},
+	syncTeam = {
+		default = false,
+		read = function(args)
+			return Logic.readBoolOrNil(args.syncTeam)
+		end
+	},
 	currencyRatePerOpponent = {
 		default = false,
 		read = function(args)
