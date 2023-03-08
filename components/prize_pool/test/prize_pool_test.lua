@@ -125,13 +125,13 @@ function suite:testStorage()
 	-- default, no variable influence
 	PrizePool(TEST_DATA):create():build()
 	self:assertTrue(callbackCalled)
-	
+
 	callbackCalled = false
 	-- variable influence: storage enabled again
 	Variables.varDefine('disable_LPDB_storage', 'false')
 	PrizePool(TEST_DATA):create():build()
 	self:assertTrue(callbackCalled)
-	
+
 	callbackCalled = false
 	-- variable influence: storage disabled, but forced via arguments
 	Variables.varDefine('disable_LPDB_storage', 'true')
@@ -151,17 +151,17 @@ function suite:testStorageDisable()
 	local tournamentData = mw.loadData('Module:TestAssets/Tournaments').dummy
 	TournamentMock.setUp(tournamentData)
 	LpdbMock.setUp(callback)
-	
+
 	-- storage disabled via arguments
 	PrizePool(Table.merge(TEST_DATA, {storelpdb = false})):create():build()
 	self:assertFalse(callbackCalled)
-	
-	-- variable influence: storage disabled 
+
+	-- variable influence: storage disabled
 	Variables.varDefine('disable_LPDB_storage', 'true')
 	PrizePool(TEST_DATA):create():build()
 	self:assertFalse(callbackCalled)
-		
-	-- variable influence: storage enabled, but disabled via arguments 
+
+	-- variable influence: storage enabled, but disabled via arguments
 	Variables.varDefine('disable_LPDB_storage', 'false')
 	PrizePool(Table.merge(TEST_DATA, {storelpdb = false})):create():build()
 	self:assertFalse(callbackCalled)
