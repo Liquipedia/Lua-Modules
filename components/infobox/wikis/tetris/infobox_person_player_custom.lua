@@ -54,12 +54,12 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	
+
 	local isplayer = 'true'
 	if CustomPlayer._isNotPlayer() then
 		isplayer = 'false'
 	end
-	
+
 	lpdbData.extradata.isplayer = isplayer
 	lpdbData.extradata.role = _role.variable
 	lpdbData.extradata.role2 = _role2.variable
