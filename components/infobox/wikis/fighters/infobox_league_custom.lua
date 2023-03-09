@@ -161,8 +161,8 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if _args.normalizedGame then
-		table.insert(categories, _args.normalizedGame .. ' Competitions')
+	if _args.game then
+		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
 	end
 
 	return categories
