@@ -398,19 +398,24 @@ function CustomMatchGroupInput._getManuallyEnteredPlayers(playerData)
 end
 
 function CustomMatchGroupInput._getPlayersFromVariables(teamName)
+	teamName = teamName:gsub(' ', '_')
+	local teamNameWithSpaces = teamName:gsub('_', ' ')
 	local players = {}
 
 	local playerIndex = 1
 	while true do
 		local prefix = teamName .. '_p' .. playerIndex
-		local playerName = Variables.varDefault(prefix)
+		local prefixWithSpaces = teamNameWithSpaces .. '_p' .. playerIndex
+
+		local playerName = Variables.varDefault(prefix) or Variables.varDefault(prefixWithSpaces)
 		if String.isEmpty(playerName) then
 			break
 		end
 		table.insert(players, {
 			name = playerName:gsub(' ', '_'),
-			displayname = Variables.varDefault(prefix .. 'dn', playerName:gsub('_', ' ')),
-			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
+			displayname = Variables.varDefault(prefix .. 'dn',
+				Variables.varDefault(prefixWithSpaces .. 'dn', playerName:gsub('_', ' '))),
+			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag', Variables.varDefault(prefixWithSpaces .. 'flag'))),
 		})
 		playerIndex = playerIndex + 1
 	end
