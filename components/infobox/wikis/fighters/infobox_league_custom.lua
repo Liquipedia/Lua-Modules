@@ -44,7 +44,7 @@ function CustomLeague.run(frame)
 	_args.icondark = _args.icondark or seriesIconDark
 
 	-- Normalize name
-	_args.normalizedGame = Game.name{game = _args.game}
+	_args.game = Game.toIdentifier{game = _args.game}
 	-- Default type should be offline unless otherwise specified
 	_args.type = _args.type or DEFAULT_TYPE
 
