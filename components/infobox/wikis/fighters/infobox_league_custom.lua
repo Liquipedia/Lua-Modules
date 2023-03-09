@@ -110,7 +110,7 @@ function CustomInjector:parse(id, widgets)
 
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {_args.normalizedGame}},
+			Cell{name = 'Game', content = {Game.name{game = _args.game}}},
 			Cell{name = 'Version', content = {_args.version}},
 		}
 	end
