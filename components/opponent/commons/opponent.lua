@@ -242,7 +242,6 @@ party opponents, this fills in players' pageNames using their displayNames,
 using data stored in page variables if present.
 
 options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
-options.syncTeam: Whether to fetch player team information from variables or LPDB. Disabled by default.
 ]]
 function Opponent.resolve(opponent, date, options)
 	options = options or {}
