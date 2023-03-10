@@ -173,7 +173,7 @@ function Team:createInfobox()
 						local earliestGameTimestamp = Team._parseDate(args.created) or Date.maxTimestamp
 
 						local created = Array.map(self:getAllArgsForBase(args, 'created'), function (creation)
-							local splitInput = Array.map(mw.text.split(creation, ':'), mw.text.trim)
+							local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
 							if #splitInput ~= 2 then
 								-- Legacy Input
 								return creation
