@@ -246,7 +246,6 @@ function CustomLeague:_createPrizepool()
 				'This prize is assumed, and has not been confirmed'
 			)
 		end
-		
 		return display
 	end
 end
