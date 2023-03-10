@@ -72,10 +72,6 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
-function CustomPlayer._isNotPlayer()
-	return _role and (_role.staff or _role.talent)
-end
-
 function CustomPlayer:getPersonType(args)
 	local roleData = _role
 	if roleData then
