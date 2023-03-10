@@ -71,7 +71,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -133,8 +133,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.input = CustomPlayer:formatInput()
 	lpdbData.extradata.retired = _args.retired
 
-	_args.legend1 = _args.legend1 or _args.legend
-	for _, legend, legendIndex in Table.iter.pairsByPrefix(_args, 'legends') do
+	for _, legend, legendIndex in Table.iter.pairsByPrefix(_args, 'legends', {requireIndex = false}) do
 		lpdbData.extradata['signatureLegend' .. legendIndex] = legend
 	end
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'

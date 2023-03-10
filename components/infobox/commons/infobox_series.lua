@@ -41,10 +41,10 @@ Series.warnings = {}
 
 function Series.run(frame)
 	local series = Series(frame)
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
-function Series:createInfobox(frame)
+function Series:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
@@ -103,12 +103,8 @@ function Series:createInfobox(frame)
 		},
 		Builder{
 			builder = function()
-				args.venue1 = args.venue1 or args.venue
-				args.venue1link = args.venue1link or args.venuelink
-				args.venue1desc = args.venue1desc or args.venuedesc
-
 				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
+				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
 					-- TODO: Description
 					local description = ''
 					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
@@ -224,7 +220,7 @@ function Series:createInfobox(frame)
 				Links.makeFullLinksForTableItems(links or {})
 			),
 		}
-		lpdbData = self:_getIconFromLeagueIconSmall(frame, lpdbData)
+		lpdbData = self:_getIconFromLeagueIconSmall(lpdbData)
 
 		lpdbData = self:addToLpdb(lpdbData)
 		mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
@@ -285,7 +281,7 @@ function Series:appendLiquipediatierDisplay()
 	return ''
 end
 
-function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
+function Series:_getIconFromLeagueIconSmall(lpdbData)
 	local icon = lpdbData.icon
 	local iconDark = lpdbData.icondark
 	local iconSmallTemplate = LeagueIcon.display{

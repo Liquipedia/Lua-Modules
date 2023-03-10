@@ -9,16 +9,18 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
+local Game = require('Module:Game')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Placement = require('Module:Placement')
+local Table = require('Module:Table')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
---- @class ResultsTable
+--- @class ResultsTable: BaseResultsTable
 local ResultsTable = Class.new(BaseResultsTable)
 
 function ResultsTable:buildHeader()
@@ -27,13 +29,13 @@ function ResultsTable:buildHeader()
 		:tag('th'):css('min-width', '80px'):wikitext('Place'):done()
 		:tag('th'):css('min-width', '75px'):wikitext('Tier'):done()
 
-	if self.config.gameIconsData then
+	if self.config.displayGameIcons then
 		header:tag('th'):node(Abbreviation.make('G.', 'Game'))
 	end
 
 	header:tag('th'):css('width', '420px'):attr('colspan', 2):wikitext('Tournament')
 
-	if self.config.queryType ~= Opponent.team then
+	if self.config.queryType ~= Opponent.team or Table.isNotEmpty(self.config.aliases) then
 		header:tag('th'):css('min-width', '70px'):wikitext('Team')
 	elseif self.config.playerResultsOfTeam then
 		header:tag('th'):css('min-width', '105px'):wikitext('Player')
@@ -61,8 +63,8 @@ function ResultsTable:buildRow(placement)
 
 	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
 
-	if self.config.gameIconsData then
-		row:tag('th'):node(self:gameIcon(placement))
+	if self.config.displayGameIcons then
+		row:tag('th'):node(Game.icon{game = placement.game})
 	end
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
@@ -81,7 +83,10 @@ function ResultsTable:buildRow(placement)
 			placement.pagename
 		))
 
-	if self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team then
+	if self.config.playerResultsOfTeam or
+		self.config.queryType ~= Opponent.team or
+		Table.isNotEmpty(self.config.aliases) then
+
 		row:tag('td'):css('text-align', 'right'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
 			placement,
 			{flip = true, teamForSolo = not self.config.playerResultsOfTeam}

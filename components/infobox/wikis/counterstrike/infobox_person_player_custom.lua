@@ -83,7 +83,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -237,11 +237,11 @@ function CustomPlayer:getPersonType(args)
 	local roleData = _ROLES[(args.role or ''):lower()]
 	if roleData then
 		if roleData.coach then
-			return { store = 'Staff', category = 'Coache' }
+			return { store = 'Coach', category = 'Coache' }
 		elseif roleData.management then
 			return { store = 'Staff', category = 'Manager' }
 		elseif roleData.talent then
-			return { store = '', category = 'Talent' }
+			return { store = 'Talent', category = 'Talent' }
 		end
 	end
 	return { store = 'Player', category = 'Player' }

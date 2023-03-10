@@ -97,6 +97,15 @@ return {
 			text = 'R$',
 		},
 	},
+	btn = {
+		code = 'BTN',
+		name = 'Bhutanese ngultrum',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'Nu',
+		},
+	},
 	byn = {
 		code = 'BYN',
 		name = 'Belarusian Ruble',

@@ -35,7 +35,7 @@ end
 function MatchMapsLegacyStore._init(args)
 	local store = Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
-		not Logic.readBool(globalVars:get('disable_SMW_storage'))
+		not Logic.readBool(globalVars:get('disable_LPDB_storage'))
 	)
 
 	local warnings = {}
@@ -60,7 +60,7 @@ function MatchMapsLegacyStore.close()
 	if not bracketId then
 		return '</table>'
 	end
-	if bracketId == "abcs" then
+	if bracketId == 'abcs' then
 		return
 	end
 

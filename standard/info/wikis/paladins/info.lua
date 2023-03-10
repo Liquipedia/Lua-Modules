@@ -10,6 +10,22 @@ return {
 	startYear = 2016,
 	wikiName = 'paladins',
 	name = 'Paladins',
-	defaultTeamLogo = 'Paladins_allmode.png',
-	defaultTeamLogoDark = 'Paladins_allmode.png',
+	games = {
+		paladins = {
+			abbreviation = 'Paladins',
+			name = 'Paladins',
+			link = 'Paladins',
+			logo = {
+				darkMode = 'Paladins allmode.png',
+				lightMode = 'Paladins allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Paladins allmode.png',
+				lightMode = 'Paladins allmode.png',
+			},
+		},
+	},
+	defaultGame = 'paladins',
+	defaultTeamLogo = 'Paladins allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Paladins allmode.png', ---@deprecated
 }

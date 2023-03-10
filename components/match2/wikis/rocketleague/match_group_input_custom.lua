@@ -196,6 +196,8 @@ function matchFunctions.getExtraData(match)
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
+		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}
 	return match
 end
@@ -203,15 +205,13 @@ end
 function matchFunctions.getLinks(match)
 	match.links = {}
 
-	-- Octane
-	match.octane1 = match.octane1 or match.octane
-	for key, octane in Table.iter.pairsByPrefix(match, 'octane') do
-		match.links[key] = 'https://octane.gg/matches/' .. octane
+	-- Shift (formerly Octane)
+	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {requireIndex = false}) do
+		match.links[key] = 'https://www.shiftrle.gg/matches/' .. shift
 	end
 
 	-- Ballchasing
-	match.ballchasing1 = match.ballchasing1 or match.ballchasing
-	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing') do
+	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing', {requireIndex = false}) do
 		match.links[key] = 'https://ballchasing.com/group/' .. ballchasing
 	end
 

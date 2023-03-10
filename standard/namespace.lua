@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Namespace = {}
@@ -22,6 +23,19 @@ end)
 
 function Namespace.idFromName(name)
 	return Namespace.getIdsByName()[name]
+end
+
+function Namespace.nameFromId(id)
+	return (mw.site.namespaces[tonumber(id)] or {}).name
+end
+
+function Namespace.prefixFromId(id)
+	local name = Namespace.nameFromId(id)
+	if String.isNotEmpty(name) then
+		return name .. ':'
+	end
+
+	return name
 end
 
 return Class.export(Namespace, {frameOnly = true})

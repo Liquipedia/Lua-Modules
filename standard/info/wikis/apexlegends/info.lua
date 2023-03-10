@@ -10,6 +10,22 @@ return {
 	startYear = 2019,
 	wikiName = 'apexlegends',
 	name = 'Apex Legends',
-	defaultTeamLogo = 'Apex_Legends_lightmode.png',
-	defaultTeamLogoDark = 'Apex_Legends_darkmode.png',
+	games = {
+		apexlegends = {
+			abbreviation = 'APEX',
+			name = 'Apex Legends',
+			link = 'Apex Legends',
+			logo = {
+				darkMode = 'Apex Legends default lightmode.png',
+				lightMode = 'Apex Legends default darkmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Apex Legends gameicon lightmode.png',
+				lightMode = 'Apex Legends gameicon darkmode.png',
+			},
+		},
+	},
+	defaultGame = 'apexlegends',
+	defaultTeamLogo = 'Apex Legends gameicon lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Apex Legends gameicon darkmode.png', ---@deprecated
 }

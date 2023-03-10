@@ -40,6 +40,7 @@ local _ROLES = {
 	['expert'] = {category = 'Experts', variable = 'Expert', isplayer = false},
 	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
 	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
+	['content creator'] = {category = 'Content Creators', variable = 'Content Creator', isplayer = false},
 	['talent'] = {category = 'Talents', variable = 'Talent', isplayer = false},
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
@@ -87,7 +88,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)

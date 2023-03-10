@@ -6,25 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
-local getArgs = require('Module:Arguments').getArgs
 
+local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
 local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
 
 local BasicInfobox = Class.new(
 	function(self, frame)
-		self.args = getArgs(frame)
+		self.args = Arguments.getArgs(frame)
 		self.pagename = mw.title.getCurrentTitle().text
 		self.name = self.args.name or self.pagename
+		self.wiki = self.args.wiki or Info.wikiName
 
-		if self.args.wiki == nil then
-			return error('Please provide a wiki!')
-		end
-
-		self.infobox = Infobox:create(frame, self.args.wiki, Logic.readBool(self.args.darkmodeforced))
+		self.infobox = Infobox:create(frame, self.wiki, Logic.readBool(self.args.darkmodeforced))
 	end
 )
 

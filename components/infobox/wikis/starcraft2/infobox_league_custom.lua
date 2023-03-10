@@ -11,12 +11,12 @@ local Array = require('Module:Array')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
+local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier')
@@ -73,7 +73,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -100,7 +100,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Liquipedia tier',
 				content = {CustomLeague:_createLiquipediaTierDisplay()},
-				classes = {_args.featured == 'true' and 'sc2premier-highlighted' or ''}
+				classes = {Logic.readBool(_args.featured) and 'tournament-highlighted-bg' or ''}
 			},
 		}
 	elseif id == 'chronology' then
@@ -267,8 +267,8 @@ function CustomLeague._getGameVersion()
 	local modName = _args.modname
 	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
 	local endPatch = _args.epatch
-	local startDate = _args.sdate
-	local endDate = _args.edate
+	local startDate = Variables.varDefault('tournament_startdate', TODAY)
+	local endDate = Variables.varDefault('tournament_enddate', TODAY)
 
 	if String.isNotEmpty(game) or String.isNotEmpty(patch) then
 		local gameVersion
@@ -495,20 +495,16 @@ function CustomLeague._playerRaceBreakDown()
 		if zergNumber + terranNumbner + protossNumber + randomNumber > 0 then
 			playerBreakDown.display = {}
 			if protossNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'p'})
-					.. ' ' .. protossNumber)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'p'} .. ' ' .. protossNumber)
 			end
 			if terranNumbner > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'t'})
-					.. ' ' .. terranNumbner)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 't'} .. ' ' .. terranNumbner)
 			end
 			if zergNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'z'})
-					.. ' ' .. zergNumber)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'z'} .. ' ' .. zergNumber)
 			end
 			if randomNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'r'})
-					.. ' ' .. randomNumber)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'r'} .. ' ' .. randomNumber)
 			end
 		end
 	end
@@ -553,11 +549,11 @@ function CustomLeague:defineCustomPageVariables()
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
-	Variables.varDefine('featured', _args.featured or 'false')
+	Variables.varDefine('featured', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number
 	if Logic.isNumeric(seriesNumber) then
-		seriesNumber = string.format("%05i", seriesNumber)
+		seriesNumber = string.format('%05i', seriesNumber)
 		Variables.varDefine('tournament_series_number', seriesNumber)
 	end
 	--check if tournament is finished
@@ -620,7 +616,6 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.publishertier = Variables.varDefault('featured')
 
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
-	lpdbData.extradata.featured = Variables.varDefault('featured')
 
 	return lpdbData
 end

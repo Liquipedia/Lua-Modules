@@ -37,6 +37,7 @@ function CustomLeague.run(frame)
 	-- Override links to allow one param to set multiple links
 	league.args.datdota = league.args.leagueid
 	league.args.dotabuff = league.args.leagueid
+	league.args.stratz = league.args.leagueid
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -47,7 +48,7 @@ function CustomLeague.run(frame)
 	_league = league
 	_args = _league.args
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()

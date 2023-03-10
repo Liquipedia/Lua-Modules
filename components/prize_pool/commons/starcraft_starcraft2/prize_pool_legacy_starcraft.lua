@@ -19,12 +19,14 @@ local Variables = require('Module:Variables')
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
 local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
 local OldStarcraftPrizePool = Lua.import('Module:PrizePool/Starcraft/next', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local StarcraftLegacyPrizePool = {}
 
 local AUTOMATION_START_DATE = '2022-01-14'
 local SPECIAL_PLACES = {dq = 'dq', dnf = 'dnf', dnp = 'dnp', w = 'w', d = 'd', l = 'l', q = 'q'}
+local BASE_CURRENCY_PRIZE = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
 
 local CACHED_DATA = {
 	next = {points = 1, qual = 1, freetext = 1},
@@ -79,12 +81,10 @@ function StarcraftLegacyPrizePool.run(frame)
 
 	-- import settings
 	newArgs.importLimit = header.importLimit
-	header.tournament1 = header.tournament1 or header.tournament
-	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament') do
+	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament', {requireIndex = false}) do
 		newArgs[key] = tournament
 	end
-	header.matchGroupId1 = header.matchGroupId1 or header.matchGroupId
-	for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId') do
+	for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId', {requireIndex = false}) do
 		newArgs[key] = matchGroupId
 	end
 	if header.lpdb and header.lpdb ~= 'auto' then
@@ -200,7 +200,8 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 	end
 
 	newData.date = slot.date
-	newData.usdprize = (slot.usdprize and slot.usdprize ~= '0') and slot.usdprize or nil
+	newData[BASE_CURRENCY_PRIZE] = (slot[BASE_CURRENCY_PRIZE] and slot[BASE_CURRENCY_PRIZE] ~= '0') and
+		slot[BASE_CURRENCY_PRIZE] or nil
 
 	local slotInputSize = math.min(StarcraftLegacyPrizePool._slotSize(slot) or math.huge, #slot)
 	local opponentsInSlot = tonumber(slot.count) or math.max(slotInputSize, 1)
@@ -215,9 +216,9 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 		end
 	end)
 
-	if newData.usdprize then
-		if newData.usdprize:match('[^,%.%d]') then
-			error('Unexpected value in usdprize for place=' .. slot.place)
+	if newData[BASE_CURRENCY_PRIZE] then
+		if newData[BASE_CURRENCY_PRIZE]:match('[^,%.%d]') then
+			error('Unexpected value in ' .. newData[BASE_CURRENCY_PRIZE] .. ' for place=' .. slot.place)
 		end
 	end
 
@@ -349,8 +350,8 @@ function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
 			StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, points2)
 		end
 
-		if slot['usdprize' .. opponentIndex] then
-			opponentData.usdprize = slot['usdprize' .. opponentIndex]
+		if slot[BASE_CURRENCY_PRIZE .. opponentIndex] then
+			opponentData[BASE_CURRENCY_PRIZE] = slot[BASE_CURRENCY_PRIZE .. opponentIndex]
 		end
 
 		if slot['localprize' .. opponentIndex] then
@@ -397,10 +398,10 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 			type = CACHED_DATA.defaultOpponentType,
 			isarchon = CACHED_DATA.defaultIsArchon,
 			[1] = nameInput[#nameInput],
-			link = slot[prefix .. 'link' .. opponentIndex] or nameInput[1],
-			flag = slot[prefix .. 'flag' .. opponentIndex],
-			team = slot[prefix .. 'team' .. opponentIndex],
-			race = slot[prefix .. 'race' .. opponentIndex],
+			link = slot[prefix .. 'link' .. opponentIndex] or slot[prefix .. opponentIndex .. 'link'] or nameInput[1],
+			flag = slot[prefix .. 'flag' .. opponentIndex] or slot[prefix .. opponentIndex .. 'flag'],
+			team = slot[prefix .. 'team' .. opponentIndex] or slot[prefix .. opponentIndex .. 'team'],
+			race = slot[prefix .. 'race' .. opponentIndex] or slot[prefix .. opponentIndex .. 'race'],
 		}, argsIndex
 	end
 
@@ -426,7 +427,7 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 
 		opponentData['p' .. playerIndex] = nameInput[#nameInput]
 		opponentData['p' .. playerIndex .. 'link'] = slot[prefix .. 'link' .. opponentIndex .. 'p' .. playerIndex]
-			or nameInput[#nameInput]
+			or nameInput[1]
 		opponentData['p' .. playerIndex .. 'flag'] = slot[prefix .. 'flag' .. opponentIndex .. 'p' .. playerIndex]
 		opponentData['p' .. playerIndex .. 'team'] = slot[prefix .. 'team' .. opponentIndex .. 'p' .. playerIndex]
 		opponentData['p' .. playerIndex .. 'race'] = slot[prefix .. 'race' .. opponentIndex .. 'p' .. playerIndex]

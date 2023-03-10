@@ -9,7 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local LeagueIcon = require('Module:LeagueIcon')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
@@ -48,6 +48,7 @@ local VALID_QUERY_TYPES = {
 	COACH_TYPE,
 }
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+local DEFAULT_RESULTS_SUB_PAGE = 'Results'
 
 --- @class BaseResultsTable
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
@@ -69,11 +70,16 @@ function BaseResultsTable:readConfig()
 		order = args.order or DEFAULT_VALUES.order,
 		hideResult = Logic.readBool(args.hideresult),
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
-		gameIconsData = args.gameIcons and mw.loadData(args.gameIcons) or nil,
+		displayGameIcons = Logic.readBool(args.gameIcons),
 		opponent = mw.text.decode(args.coach or args.player or args.team or self:_getOpponent()),
 		queryType = self:getQueryType(),
 		onlyAchievements = Logic.readBool(args.achievements),
 		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
+		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
+		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
+		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), function(alias)
+			return mw.text.trim(alias)
+		end) or {}
 	}
 
 	config.sort = args.sort or
@@ -83,8 +89,12 @@ function BaseResultsTable:readConfig()
 		(config.onlyAchievements and DEFAULT_VALUES.achievementsLimit or DEFAULT_VALUES.resultsLimit)
 
 	config.playerLimit =
-		(config.queryType == SOLO_TYPE and tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit)
-		or (config.queryType == COACH_TYPE and tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit)
+		(config.queryType == SOLO_TYPE and (tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit))
+		or tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit
+
+	if config.queryType == TEAM_TYPE and Table.isNotEmpty(config.aliases) then
+		config.nonAliasTeamTemplates = BaseResultsTable._getOpponentTemplates(config.opponent)
+	end
 
 	return config
 end
@@ -117,7 +127,8 @@ function BaseResultsTable:create()
 	local data = self.args.data or self:queryData()
 
 	if Table.isEmpty(data) then
-		return
+		self.data = {}
+		return self
 	end
 
 	Array.forEach(data, function(placement) self:processLegacyVsData(placement) end)
@@ -152,6 +163,7 @@ function BaseResultsTable:queryData()
 	})
 
 	if type(data) ~= 'table' then
+		mw.logObject(self:buildConditions(), 'conditions')
 		error(data)
 	end
 
@@ -202,6 +214,7 @@ function BaseResultsTable:buildBaseConditions()
 		conditions:add{ConditionNode(ColumnName('mode'), Comparator.eq, 'award_individual')}
 	else
 		conditions:add{ConditionNode(ColumnName('mode'), Comparator.neq, 'award_individual')}
+		conditions:add{ConditionNode(ColumnName('placement'), Comparator.neq, '')}
 	end
 
 	if args.tier then
@@ -230,34 +243,38 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 	local config = self.config
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
-	local opponent = config.resolveOpponent
-		and mw.ext.TeamLiquidIntegration.resolve_redirect(config.opponent)
-		or config.opponent
+	local opponents = Array.append(config.aliases, config.opponent)
 
-	local opponentWithUnderscore = opponent:gsub(' ', '_')
+	for _, opponent in pairs(opponents) do
+		opponent = config.resolveOpponent
+			and mw.ext.TeamLiquidIntegration.resolve_redirect(opponent)
+			or opponent
 
-	local prefix
-	if config.queryType == SOLO_TYPE then
-		prefix = PLAYER_PREFIX
-		opponentConditions:add{
-			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent),
-			},
-			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, opponentWithUnderscore),
-			},
-		}
-	else
-		prefix = COACH_PREFIX
-	end
+		local opponentWithUnderscore = opponent:gsub(' ', '_')
 
-	for playerIndex = 1, config.playerLimit do
-		opponentConditions:add{
-			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponent),
-			ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponentWithUnderscore),
-		}
+		local prefix
+		if config.queryType == SOLO_TYPE then
+			prefix = PLAYER_PREFIX
+			opponentConditions:add{
+				ConditionTree(BooleanOperator.all):add{
+					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent),
+				},
+				ConditionTree(BooleanOperator.all):add{
+					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+					ConditionNode(ColumnName('opponentname'), Comparator.eq, opponentWithUnderscore),
+				},
+			}
+		else
+			prefix = COACH_PREFIX
+		end
+
+		for playerIndex = 1, config.playerLimit do
+			opponentConditions:add{
+				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponent),
+				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex), Comparator.eq, opponentWithUnderscore),
+			}
+		end
 	end
 
 	return opponentConditions
@@ -266,20 +283,15 @@ end
 function BaseResultsTable:buildTeamOpponentConditions()
 	local config = self.config
 
-	local rawOpponentTemplate = Team.queryRaw(config.opponent) or {}
-	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-	if not opponentTemplate then
-		error('Missing team template for team: ' .. config.opponent)
-	end
-
-	local opponentTeamTeplates = Team.queryHistorical(opponentTemplate) or {opponentTemplate}
+	local opponents = Array.append(config.aliases, config.opponent)
+	local opponentTeamTemplates = Array.flatten(Array.map(opponents, BaseResultsTable._getOpponentTemplates))
 
 	if config.playerResultsOfTeam then
-		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTeplates)
+		return self:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 	end
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
-	for _, teamTemplate in pairs(opponentTeamTeplates) do
+	for _, teamTemplate in pairs(opponentTeamTemplates) do
 		opponentConditions:add{ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, teamTemplate)}
 	end
 
@@ -289,13 +301,25 @@ function BaseResultsTable:buildTeamOpponentConditions()
 		}
 end
 
-function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTeplates)
+function BaseResultsTable._getOpponentTemplates(opponent)
+	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
+	if not opponentTemplate then
+		error('Missing team template for team: ' .. opponent)
+	end
+
+	local opponentTeamTemplates = Team.queryHistorical(opponentTemplate)
+
+	return opponentTeamTemplates and Array.extractValues(opponentTeamTemplates) or {opponentTemplate}
+end
+
+function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 	local config = self.config
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	local prefix = PLAYER_PREFIX
-	for _, teamTemplate in pairs(opponentTeamTeplates) do
+	for _, teamTemplate in pairs(opponentTeamTemplates) do
 		for playerIndex = 1, config.playerLimit do
 			opponentConditions:add{
 				ConditionNode(ColumnName('opponentplayers_' .. prefix .. playerIndex .. 'template'), Comparator.eq, teamTemplate),
@@ -324,6 +348,14 @@ function BaseResultsTable:build()
 		for _, row in ipairs(self:_buildRows(dataSet)) do
 			displayTable:node(row)
 		end
+	end
+
+	if self.config.onlyAchievements then
+		displayTable:tag('tr')
+			:tag('th')
+				:attr('colspan', 42)
+				:css('font-style', 'italic')
+				:wikitext('[[' .. self.config.opponent .. '/' .. self.config.resultsSubPage .. '|Extended list of results]]')
 	end
 
 	displayTable:node(self.args.manualContent)
@@ -380,41 +412,69 @@ end
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
-	local opponent
 	if not data.opponenttype then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.tbd(),
-			flip = (options or {}).flip,
+			flip = options.flip,
 		}
-	elseif data.opponenttype == Opponent.solo and options.teamForSolo then
-		local teamTemplate = data.opponentplayers.p1template
-		if String.isEmpty(teamTemplate) then
-			return
-		end
+	elseif self.config.displayDefaultLogoAsIs or
+		data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 
-		opponent = {template = teamTemplate, type = Opponent.team}
-	else
-		opponent = Opponent.fromLpdbStruct(data)
+		return OpponentDisplay.BlockOpponent{
+			opponent = Opponent.fromLpdbStruct(data),
+			flip = options.flip,
+		}
 	end
 
-	return OpponentDisplay.BlockOpponent{
-		opponent = opponent,
-		flip = (options or {}).flip,
+	local teamTemplate
+	if data.opponenttype == Opponent.team then
+		teamTemplate = data.opponenttemplate
+	else
+		teamTemplate = data.opponentplayers.p1template
+	end
+
+	if String.isEmpty(teamTemplate) then
+		return
+	end
+
+	local teamDisplay = OpponentDisplay.BlockOpponent{
+		opponent = {template = teamTemplate, type = Opponent.team},
+		flip = options.flip,
 		teamStyle = 'icon',
 	}
+
+	local rawTeamTemplate = Team.queryRaw(teamTemplate)
+
+	if self:shouldDisplayAdditionalText(rawTeamTemplate) then
+		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
+	end
+
+	return teamDisplay
 end
 
--- overwritable
--- shadows the current implementation
--- TODO: Add support for dark mode icons
--- needs upgrading the game icon data modules first though
-function BaseResultsTable:gameIcon(placement)
-	local gameIcon = self.config.gameIconsData[placement.game] or 'Logo filler event.png'
-	gameIcon = gameIcon:gsub('File:', '')
-	return LeagueIcon.display{
-		icon = gameIcon,
-		options = {noTemplate = true, noLink = true},
-	}
+function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate)
+	local config = self.config
+
+	return rawTeamTemplate and (
+		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
+		(config.nonAliasTeamTemplates and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
+	)
+end
+
+function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
+	return mw.html.create()
+		:node(teamDisplay)
+		:node(mw.html.create('div')
+			:css('width', '60px')
+			:css('float', flip and 'right' or 'left')
+			:node(
+				mw.html.create('div')
+					:css('line-height', '1')
+					:css('font-size', '80%')
+					:css('text-align', 'center')
+					:wikitext('([[' .. rawTeamTemplate.page .. '|' .. rawTeamTemplate.shortname .. ']])')
+			)
+		)
 end
 
 function BaseResultsTable.tournamentDisplayName(placement)

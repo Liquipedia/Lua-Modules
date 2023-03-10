@@ -45,7 +45,7 @@ function CustomLeague.run(frame)
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -176,6 +176,7 @@ function CustomLeague:addToLpdb(lpdbData)
 
 	lpdbData.extradata['is ea major'] = Variables.varDefault('tournament_ea_major', '')
 	lpdbData.extradata.individual = Variables.varDefault('tournament_individual', '')
+	lpdbData.extradata.platform = string.lower(_args.platform or 'pc')
 
 	--retrieve sponsors from _args.sponsors if sponsorX, X=1,...,3, is empty
 	if

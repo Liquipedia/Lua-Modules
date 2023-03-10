@@ -54,15 +54,14 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	)))
 	lpdbData.opponentplayers = lpdbData.players -- Until this is included in Opponent
 
-	-- Name must match prize pool insertion
-	local storageName = Custom.getLpdbObjectName and Custom.getLpdbObjectName(team, lpdbPrefix)
-						or TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
-
-	mw.ext.LiquipediaDB.lpdb_placement(storageName, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)
 end
 
 -- Adds basic lpdb fields
 function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix)
+	-- Name must match prize pool insertion
+	lpdbData.objectName = TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
+
 	local title = mw.title.getCurrentTitle().text
 	local tournamentName = Variables.varDefault('tournament name pp') or Variables.varDefault('tournament_name')
 	local date = Variables.varDefault('tournament_date')
@@ -83,7 +82,7 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 	end
 
 	lpdbData.mode = Variables.varDefault('tournament_mode', 'team')
-	lpdbData.publishertier = Variables.varDefault('tournament_publisher_tier')
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier')
 	lpdbData.icon = Variables.varDefault('tournament_icon')
 	lpdbData.icondark = Variables.varDefault('tournament_icondark')
 	lpdbData.game = Variables.varDefault('tournament_game')
@@ -96,7 +95,7 @@ end
 
 -- Build the standard LPDB "Object Name", which is used as primary key in the DB record
 function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
-	local storageName = 'ranking'
+	local storageName = (team == 'TBD' and 'participant') or 'ranking'
 	if String.isNotEmpty(lpdbPrefix) then
 		storageName = storageName .. '_' .. lpdbPrefix
 	end

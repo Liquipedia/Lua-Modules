@@ -40,17 +40,15 @@ function NotabilityChecker.run(args)
 	end
 
 	output = output .. '===Summary===\n'
-	output = output .. '\'\'\'Final weight:\'\'\' ' .. tostring(weight) .. '\n\n'
+		.. '<b>Final weight:</b> ' .. tostring(weight) .. '\n\n'
+		.. 'This means this ' .. (isTeamResult and 'team' or 'person')
 
-	if weight < Config.NOTABILITY_THRESHOLD_NOTABLE and weight > Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is \'\'\'OPEN FOR DISCUSSION\'\'\'\n'
-	elseif weight < Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is \'\'\'NOT NOTABLE\'\'\'\n'
+	if weight >= Config.NOTABILITY_THRESHOLD_NOTABLE then
+		output = output .. ' is <b>NOTABLE</b>\n'
+	elseif weight >= Config.NOTABILITY_THRESHOLD_MIN then
+		output = output .. ' is <b>OPEN FOR DISCUSSION</b>\n'
 	else
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is \'\'\'NOTABLE\'\'\'\n'
+		output = output .. ' is <b>NOT NOTABLE</b>\n'
 	end
 
 	return output
@@ -63,7 +61,7 @@ function NotabilityChecker._runForTeam(team)
 	local output = ''
 	output = output .. '===Team Results===\n'
 	output = output .. mw.getCurrentFrame():expandTemplate{ title = 'NotabilityTeamMatchesTable', args = {title = team} }
-	output = output .. '\'\'\'Weight:\'\'\' ' .. tonumber(weight) .. '\n\n'
+	output = output .. '<b>Weight:</b> ' .. tonumber(weight) .. '\n\n'
 
 	return weight, output
 end
@@ -84,7 +82,7 @@ function NotabilityChecker._calculateRosterNotability(team, people)
 		local personWeight = NotabilityChecker._calculatePersonNotability(person)
 		output = output .. mw.getCurrentFrame():expandTemplate{
 			title = 'NotabilityPlayerMatchesTable', args = {title = person}}
-		output = output .. '*\'\'\'Person:\'\'\' [[' .. person .. ']] \'\'\'Weight:\'\'\' ' ..
+		output = output .. '*<b>Person:</b> [[' .. person .. ']] <b>Weight:</b> ' ..
 			tonumber(personWeight) .. '\n\n'
 			average = average + tonumber(personWeight or 0)
 	end
@@ -186,12 +184,21 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 		Config.weights, function(tierWeights) return tierWeights['tier'] == tier end
 		)
 
-	local tierPoints = Array.find(
+	if not weightForTier then
+		return 0
+	end
+
+	local tierPoints = (Array.find(
 		weightForTier['tiertype'],
 		function(pointsForType)
 			return pointsForType['name'] == (tierType or Config.TIER_TYPE_GENERAL)
 		end
-	)['points']
+	) or {}).points
+
+	if not tierPoints then
+		return 0
+	end
+
 	local placementDropOffFunction = Config.placementDropOffFunction(tier, tierType)
 
 	local placementValue = NotabilityChecker._preparePlacement(placement)
@@ -226,7 +233,7 @@ function NotabilityChecker._preparePlacement(placement)
 	end
 
 	if string.find(placement, '-', 1, true) then
-		local one, _ = placement:match("([^-]+)-([^-]+)")
+		local one, _ = placement:match('([^-]+)-([^-]+)')
 		placement = tonumber(one)
 	else
 		placement = tonumber(placement)
