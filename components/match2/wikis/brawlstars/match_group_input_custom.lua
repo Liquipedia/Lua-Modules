@@ -36,7 +36,6 @@ local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match, options)
-	options = options or {}
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)

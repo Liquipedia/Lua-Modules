@@ -59,7 +59,6 @@ local StarcraftMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function StarcraftMatchGroupInput.processMatch(match, options)
-	options = options or {}
 	Table.mergeInto(
 		match,
 		StarcraftMatchGroupInput._readDate(match)
