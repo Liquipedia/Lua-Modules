@@ -82,13 +82,27 @@ BasePrizePool.config = {
 	storeSmw = {
 		default = true,
 		read = function(args)
-			return Logic.readBoolOrNil(args.storesmw)
+			local disabledVariable = Logic.readBoolOrNil(Variables.varDefault('disable_LPDB_storage'))
+			if disabledVariable ~= nil then
+				disabledVariable = not disabledVariable
+			end
+			return Logic.nilOr(
+				Logic.readBoolOrNil(args.storesmw),
+				disabledVariable
+			)
 		end
 	},
 	storeLpdb = {
 		default = true,
 		read = function(args)
-			return Logic.readBoolOrNil(args.storelpdb)
+			local disabledVariable = Logic.readBoolOrNil(Variables.varDefault('disable_LPDB_storage'))
+			if disabledVariable ~= nil then
+				disabledVariable = not disabledVariable
+			end
+			return Logic.nilOr(
+				Logic.readBoolOrNil(args.storelpdb),
+				disabledVariable
+			)
 		end
 	},
 	resolveRedirect = {
@@ -440,8 +454,7 @@ function BasePrizePool:_readPrizes(args)
 	for name, prizeData in pairs(self.prizeTypes) do
 		local fieldName = prizeData.header
 		if fieldName then
-			args[fieldName .. '1'] = args[fieldName .. '1'] or args[fieldName]
-			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName) do
+			for _, prizeValue, index in Table.iter.pairsByPrefix(args, fieldName, {requireIndex = false}) do
 				local data = prizeData.headerParse(self, prizeValue, args, index)
 				self:addPrize(name, index, data)
 			end
@@ -603,7 +616,7 @@ function BasePrizePool:_buildRows()
 end
 
 function BasePrizePool:placeOrAwardCell(placement)
-	error('Function placeCell needs to be implemented by a child class of "Module:PrizePool/Base"')
+	error('Function placeOrAwardCell needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:applyCutAfter(placement, row)
@@ -611,11 +624,11 @@ function BasePrizePool:applyCutAfter(placement, row)
 end
 
 function BasePrizePool:applyToggleExpand(placement, row)
-	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
+	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
-function BasePrizePool:storeData(args)
-	error('Function storeData needs to be implemented by a child class of "Module:PrizePool/Base"')
+function BasePrizePool:storeSmw(lpdbEntry, smwTournamentStash)
+	error('Function storeSmw needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:_getPrizeSummaryText()

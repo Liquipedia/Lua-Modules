@@ -523,9 +523,13 @@ end
 --[[
 Iterates over table entries whose keys are prefixed numbers. The entries are
 visited in order, starting from 1. The iteration stops upon a skipped number.
+If requireIndex is disabled, for the first entry, both `prefix` and `prefix1`
+are valid keys, with a preference for the latter.
 
 Example:
+```
 local args = {
+	p = {},
 	p1 = {},
 	p2 = {},
 	p3 = {},
@@ -535,14 +539,22 @@ local args = {
 for key, player, index in Table.iter.pairsByPrefix(args, 'p') do
 	mw.log(key)
 end
-
-will print out 'p1 p2 p3'
+```
+will print out `p1 p2 p3`
 ]]
-function Table.iter.pairsByPrefix(tbl, prefix)
+---@param tbl table
+---@param prefix string
+---@param options? {requireIndex: boolean}
+---@return function
+function Table.iter.pairsByPrefix(tbl, prefix, options)
+	options = options or {}
 	local i = 1
 	return function()
 		local key = prefix .. i
 		local value = tbl[key]
+		if options.requireIndex == false and i == 1 and not value then
+			key, value = prefix, tbl[prefix]
+		end
 		i = i + 1
 		if value then
 			return key, value, (i - 1)

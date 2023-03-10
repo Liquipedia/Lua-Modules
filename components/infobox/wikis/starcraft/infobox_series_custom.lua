@@ -106,7 +106,7 @@ function CustomSeries._addCustomVariables()
 		Logic.readBool(_args.disable_lpdb) or
 		Logic.readBool(_args.disable_storage)
 	then
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		--needed for e.g. External Cups Lists
 		local name = _args.name or mw.title.getCurrentTitle().text

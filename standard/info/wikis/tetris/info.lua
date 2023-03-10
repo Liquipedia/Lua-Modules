@@ -349,6 +349,97 @@ return {
 				lightMode = 'Tetris Dr.Mario default allmode.png',
 			},
 		},
+		nullpomino  = {
+			abbreviation = 'NPM',
+			name = 'NullpoMino',
+			link = 'NullpoMino',
+			logo = {
+				darkMode = 'NullpoMino default allmode.png',
+				lightMode = 'NullpoMino default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'NullpoMino default allmode.png',
+				lightMode = 'NullpoMino default allmode.png',
+			},
+		},
+		blockbox  = {
+			abbreviation = 'BB',
+			name = 'Blockbox',
+			link = 'Blockbox',
+			logo = {
+				darkMode = 'Blockbox default allmode.png',
+				lightMode = 'Blockbox default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Blockbox default allmode.png',
+				lightMode = 'Blockbox default allmode.png',
+			},
+		},
+		['tetris friends']  = {
+			abbreviation = 'Friends',
+			name = 'Tetris Friends',
+			link = 'Tetris Friends',
+			logo = {
+				darkMode = 'Tetris Friends default allmode.png',
+				lightMode = 'Tetris Friends default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Tetris Friends default allmode.png',
+				lightMode = 'Tetris Friends default allmode.png',
+			},
+		},
+		['tetris online japan']  = {
+			abbreviation = 'TOJ',
+			name = 'Tetris Online Japan',
+			link = 'Tetris Online Japan',
+			logo = {
+				darkMode = 'Tetris Online Japan default allmode.png',
+				lightMode = 'Tetris Online Japan default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Tetris Online Japan default allmode.png',
+				lightMode = 'Tetris Online Japan default allmode.png',
+			},
+		},
+		['tetris online poland']  = {
+			abbreviation = 'TOP',
+			name = 'Tetris Online Poland',
+			link = 'Tetris Online Poland',
+			logo = {
+				darkMode = 'Tetris Online Poland default allmode.png',
+				lightMode = 'Tetris Online Poland default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Tetris Online Poland default allmode.png',
+				lightMode = 'Tetris Online Poland default allmode.png',
+			},
+		},
+		['cultris 2']  = {
+			abbreviation = 'C2',
+			name = 'Cultris 2',
+			link = 'Cultris 2',
+			logo = {
+				darkMode = 'Cultris default allmode.png',
+				lightMode = 'Cultris default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Cultris default allmode.png',
+				lightMode = 'Cultris default allmode.png',
+			},
+		},
+		['tetrinet 2']  = {
+			abbreviation = 'TTN2',
+			name = 'TetriNET 2',
+			link = 'TetriNET 2',
+			logo = {
+				darkMode = 'TetriNET default allmode.png',
+				lightMode = 'TetriNET default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'TetriNET default allmode.png',
+				lightMode = 'TetriNET default allmode.png',
+			},
+		},
 	},
 	defaultGame = 'tetris',
 

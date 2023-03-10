@@ -81,12 +81,10 @@ function StarcraftLegacyPrizePool.run(frame)
 
 	-- import settings
 	newArgs.importLimit = header.importLimit
-	header.tournament1 = header.tournament1 or header.tournament
-	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament') do
+	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament', {requireIndex = false}) do
 		newArgs[key] = tournament
 	end
-	header.matchGroupId1 = header.matchGroupId1 or header.matchGroupId
-	for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId') do
+	for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId', {requireIndex = false}) do
 		newArgs[key] = matchGroupId
 	end
 	if header.lpdb and header.lpdb ~= 'auto' then

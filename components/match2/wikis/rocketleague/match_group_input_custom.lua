@@ -43,7 +43,7 @@ local mapFunctions = {}
 local opponentFunctions = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -206,14 +206,12 @@ function matchFunctions.getLinks(match)
 	match.links = {}
 
 	-- Shift (formerly Octane)
-	match.shift1 = match.shift1 or match.shift
-	for key, shift in Table.iter.pairsByPrefix(match, 'shift') do
+	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {requireIndex = false}) do
 		match.links[key] = 'https://www.shiftrle.gg/matches/' .. shift
 	end
 
 	-- Ballchasing
-	match.ballchasing1 = match.ballchasing1 or match.ballchasing
-	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing') do
+	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing', {requireIndex = false}) do
 		match.links[key] = 'https://ballchasing.com/group/' .. ballchasing
 	end
 

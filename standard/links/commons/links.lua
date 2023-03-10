@@ -149,8 +149,9 @@ local PREFIXES = {
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stratz = {
-		'',
-		player = 'https://stratz.com/player/'
+		'https://stratz.com/leagues/',
+		player = 'https://stratz.com/players/',
+		team = 'https://stratz.com/teams/'
 	},
 	stream = {''},
 	telegram = {'https://t.me/'},
