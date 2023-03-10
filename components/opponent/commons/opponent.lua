@@ -255,6 +255,9 @@ function Opponent.resolve(opponent, date, options)
 			if not player.team then
 				player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil)
 			end
+			if player.team then
+				player.team = TeamTemplate.resolve(player.team, date)
+			end
 			else
 				PlayerExt.populatePageName(player)
 			end
