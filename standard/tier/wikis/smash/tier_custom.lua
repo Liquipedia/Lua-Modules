@@ -7,6 +7,7 @@
 --
 
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
 
