@@ -246,9 +246,9 @@ function Team:_getTeamIcon(date)
 		return
 	end
 
-	return self.teamTemplate.historicaltemplate 
-    and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, ReferenceCleaner.clean(date)).image 
-    or self.teamTemplate.image
+	return self.teamTemplate.historicaltemplate
+		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, ReferenceCleaner.clean(date)).image
+		or self.teamTemplate.image
 end
 
 function Team._isValidDate(date)
