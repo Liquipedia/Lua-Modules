@@ -125,7 +125,7 @@ return {
 			value = 'Arcadian',
 			sort = 'C1',
 			name = 'Arcadian',
-			short = 'Arcade',
+			short = 'Arcdn.',
 			category = 'Arcadian Tournaments',
 		},
 		qualifier = {
