@@ -28,5 +28,4 @@ function TierCustom.display(tier, tierType, options)
 	return Tier.displaySingle(tierData, Tier._displayOptions(options or {}, 'tier'))
 end
 
-
 return TierCustom
