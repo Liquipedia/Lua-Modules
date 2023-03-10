@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayersSignatureAgents = require('Module:PlayersSignatureAgents')
 local String = require('Module:StringUtils')
+local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -52,6 +53,14 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
+	if String.isEmpty(player.args.team) then
+		player.args.team = PlayerTeamAuto._main{team = 'team'}
+	end
+
+	if String.isEmpty(player.args.team2) then
+		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
+	end
+	
 	player.args.history = tostring(TeamHistoryAuto._results{convertrole = 'true'})
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
@@ -164,12 +173,12 @@ function CustomPlayer:getPersonType(args)
 	local roleData = _ROLES[(args.role or ''):lower()]
 	if roleData then
 		if roleData.staff then
-			return {store = 'Staff', category = 'Staff'}
+			return {store = 'staff', category = 'Staff'}
 		elseif roleData.talent then
-			return {store = 'Talent', category = 'Talent'}
+			return {store = 'talent', category = 'Talent'}
 		end
 	end
-	return {store = 'Player', category = 'Player'}
+	return {store = 'player', category = 'Player'}
 end
 
 return CustomPlayer
