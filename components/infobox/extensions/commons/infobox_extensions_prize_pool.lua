@@ -47,11 +47,9 @@ function PrizePoolCurrency.display(args)
 		date = NOW
 	end
 
-	if currency == USD and String.isEmpty(prizepoolUsd) then
+	if currency == USD and not prizepoolUsd then
 		return PrizePoolCurrency._errorMessage('Need valid currency')
-	elseif currency == USD then
-		prizepoolUsd = PrizePoolCurrency._format(prizepoolUsd)
-	else
+	elseif currency ~= USD then
 		local errorMessage
 		prizepool, prizepoolUsd, currencyRate, errorMessage = PrizePoolCurrency._exchange{
 			currency = currency,
@@ -66,6 +64,13 @@ function PrizePoolCurrency.display(args)
 		end
 	end
 
+	if Logic.isNumeric(prizepool) then
+		prizepool = PrizePoolCurrency._format(prizepool)
+	end
+	if Logic.isNumeric(prizepoolUsd) then
+		prizepoolUsd = PrizePoolCurrency._format(prizepoolUsd)
+	end
+
 	if setVariables then
 		if String.isNotEmpty(args.currency) then
 			Variables.varDefine('tournament_currency', currency:upper())
@@ -75,7 +80,7 @@ function PrizePoolCurrency.display(args)
 		Variables.varDefine('tournament_currency_text', text)
 		Variables.varDefine('tournament_prizepoollocal', prizepool or '')
 
-		local prizepoolUsdValue = string.gsub(prizepoolUsd or '', ',', '')
+		local prizepoolUsdValue = string.gsub(tostring(prizepoolUsd), ',', '')
 		Variables.varDefine('tournament_prizepoolusd', prizepoolUsdValue)
 
 		-- legacy compatibility
@@ -91,7 +96,7 @@ function PrizePoolCurrency.display(args)
 	end
 
 	local display = Currency.display(USD, prizepoolUsd, {setVariables = false})
-	if String.isNotEmpty(prizepool) then
+	if prizepool then
 		display = Currency.display(currency, prizepool, {setVariables = true})
 			.. '<br>(≃ ' .. display .. ')'
 	end
@@ -113,13 +118,6 @@ function PrizePoolCurrency._exchange(props)
 
 	if Logic.isNumeric(prizepool) and currencyRate ~= math.huge and not Logic.isNumeric(prizepoolUsd) then
 		prizepoolUsd = tonumber(prizepool) * currencyRate
-	end
-
-	if Logic.isNumeric(prizepool) then
-		prizepool = PrizePoolCurrency._format(prizepool)
-	end
-	if Logic.isNumeric(prizepoolUsd) then
-		prizepoolUsd = PrizePoolCurrency._format(prizepoolUsd)
 	end
 
 	return prizepool, prizepoolUsd, currencyRate, nil
