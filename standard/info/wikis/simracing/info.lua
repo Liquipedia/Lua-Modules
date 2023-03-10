@@ -7,7 +7,7 @@
 --
 
 return {
-	startYear = 2019,
+	startYear = 1998,
 	wikiName = 'simracing',
 	name = 'Sim Racing',
 	games = {
