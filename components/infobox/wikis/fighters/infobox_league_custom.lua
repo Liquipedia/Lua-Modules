@@ -27,7 +27,6 @@ local _args
 local _league
 
 local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
-local BASE_CURRENCY = 'USD'
 local DEFAULT_TYPE = 'offline'
 local TODAY = os.date('%Y-%m-%d', os.time())
 
@@ -207,47 +206,40 @@ function CustomLeague:_createPrizepool()
 	local prizePoolUSD = _args.prizepoolusd
 	local prizePool = _args.prizepool
 
-	if localCurrency == 'text' then
-		return prizePool
-	else
-		local display, hasText
-		if prizePoolUSD then
-			prizePoolUSD, hasText = CustomLeague:_cleanPrizeValue(prizePoolUSD)
-		end
-
-		prizePool, hasText = CustomLeague:_cleanPrizeValue(prizePool, localCurrency, hasText)
-
-		if not prizePoolUSD and localCurrency then
-			local exchangeDate = Variables.varDefault('tournament_enddate', TODAY)
-			prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
-			if not prizePoolUSD then
-				error('Invalid local currency "' .. localCurrency .. '"')
-			end
-		end
-
-		if prizePoolUSD and prizePool then
-			display = Currency.display((localCurrency or ''):lower(), CustomLeague:_displayPrizeValue(prizePool, 2))
-				.. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD, 2) .. ' ' .. ABBR_USD .. ')'
-		elseif prizePool or prizePoolUSD then
-			display = '$' .. CustomLeague:_displayPrizeValue(prizePool or prizePoolUSD, 2) .. ' ' .. ABBR_USD
-		end
-		if hasText then
-			display = (display or _args.prizepool or '') ..
-				'[[Category:Pages with text set as prizepool in infobox league]]'
-		end
-
-		Variables.varDefine('usd prize', prizePoolUSD or prizePool)
-		Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
-		Variables.varDefine('local prize', prizePool)
-
-		if _args.prizepoolassumed then
-			display = Abbreviation.make(
-				display,
-				'This prize is assumed, and has not been confirmed'
-			)
-		end
-		return display
+	local display
+	if prizePoolUSD then
+		prizePoolUSD = CustomLeague:_cleanPrizeValue(prizePoolUSD)
 	end
+
+	prizePool = CustomLeague:_cleanPrizeValue(prizePool, localCurrency)
+
+	if not prizePoolUSD and localCurrency then
+		local exchangeDate = Variables.varDefault('tournament_enddate', TODAY)
+		prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
+		if not prizePoolUSD then
+			error('Invalid local currency "' .. localCurrency .. '"')
+		end
+	end
+
+	if prizePoolUSD and prizePool then
+		display = Currency.display((localCurrency or ''):lower(), CustomLeague:_displayPrizeValue(prizePool, 2))
+		.. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD, 2) .. ' ' .. ABBR_USD .. ')'
+	elseif prizePool or prizePoolUSD then
+		display = '$' .. CustomLeague:_displayPrizeValue(prizePool or prizePoolUSD, 2) .. ' ' .. ABBR_USD
+	end
+
+	Variables.varDefine('usd prize', prizePoolUSD or prizePool)
+	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
+	Variables.varDefine('local prize', prizePool)
+
+	if _args.prizepoolassumed then
+		display = Abbreviation.make(
+			display,
+			'This prize is assumed, and has not been confirmed'
+		)
+	end
+
+	return display
 end
 
 function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
@@ -285,9 +277,9 @@ function CustomLeague:_displayPrizeValue(value, numDigits)
 	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
 end
 
-function CustomLeague:_cleanPrizeValue(value, currency, oldHasText)
+function CustomLeague:_cleanPrizeValue(value, currency)
 	if String.isEmpty(value) then
-		return nil, oldHasText, nil
+		return nil
 	end
 
 	--remove white spaces, '&nbsp;' and ','
@@ -296,11 +288,7 @@ function CustomLeague:_cleanPrizeValue(value, currency, oldHasText)
 	value = string.gsub(value, ',', '')
 	value = string.gsub(value, '%$', '')
 
-	--check if additional non numbers are present
-	local hasText = string.match(value, '[^%.%d]')
-	value = tonumber(value)
-
-	return value, hasText or oldHasText
+	return value
 end
 
 return CustomLeague
