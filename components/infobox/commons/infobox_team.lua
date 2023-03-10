@@ -358,16 +358,6 @@ end
 function Team:defineCustomPageVariables(args)
 end
 
-function Team:getCreatedGameIcon(game)
-	if type(Info.defaultTeamLogo) == 'string' then
-		return Info.defaultTeamLogo
-	end
-
-	if type(Info.defaultTeamLogo) == 'table' then
-		return Info.defaultTeamLogo[game:lower()]
-	end
-end
-
 function Team:addToLpdb(lpdbData, args)
 	return lpdbData
 end
