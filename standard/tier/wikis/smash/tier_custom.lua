@@ -20,10 +20,13 @@ local TierCustom = Table.copy(Tier)
 ---@param tierType string?
 ---@param options table?
 ---@return string?
-function Tier.display(tier, tierType, options)
+function TierCustom.display(tier, tierType, options)
 	local tierData = Tier._raw(tier, tierType)
 
 	if not tierData then return end
 
 	return Tier.displaySingle(tierData, Tier._displayOptions(options or {}, 'tier'))
 end
+
+
+return TierCustom
