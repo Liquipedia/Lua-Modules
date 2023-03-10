@@ -222,10 +222,10 @@ function CustomLeague:_createPrizepool()
 	end
 
 	if prizePoolUSD and prizePool then
-		display = Currency.display((localCurrency or ''):lower(), CustomLeague:_displayPrizeValue(prizePool, 2))
-		.. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD, 2) .. ' ' .. ABBR_USD .. ')'
+		display = Currency.display((localCurrency or ''):lower(), Currency.formatMoney(prizePool, 2))
+		.. '<br>(≃ $' .. Currency.formatMoney(prizePoolUSD, 2) .. ' ' .. ABBR_USD .. ')'
 	elseif prizePool or prizePoolUSD then
-		display = '$' .. CustomLeague:_displayPrizeValue(prizePool or prizePoolUSD, 2) .. ' ' .. ABBR_USD
+		display = '$' .. Currency.formatMoney(prizePool or prizePoolUSD, 2) .. ' ' .. ABBR_USD
 	end
 
 	Variables.varDefine('usd prize', prizePoolUSD or prizePool)
@@ -254,27 +254,6 @@ function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
 	end
 
 	return usdPrize
-end
-
-function CustomLeague:_displayPrizeValue(value, numDigits)
-	if String.isEmpty(value) or value == 0 or value == '0' then
-		return '-'
-	end
-
-	numDigits = tonumber(numDigits or 0) or 0
-	local factor = 10^numDigits
-	value = math.floor(value * factor + 0.5) / factor
-
-	--split value into
-	--left = first digit
-	--num = all remaining digits before a possible '.'
-	--right = the '.' and all digits after it (unless they are all 0 or do not exist)
-	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
-	if right:len() > 0 then
-		local decimal = string.sub('0' .. right, 3)
-		right = '.' .. decimal .. string.rep('0', 2 - string.len(decimal))
-	end
-	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
 end
 
 function CustomLeague:_cleanPrizeValue(value, currency)
