@@ -25,6 +25,7 @@ local _args
 local _league
 
 local BASE_CURRENCY = 'USD'
+local DEFAULT_TYPE = 'offline'
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -43,7 +44,9 @@ function CustomLeague.run(frame)
 	_args.icondark = _args.icondark or seriesIconDark
 
 	-- Normalize name
-	_args.game = Game.name{game = _args.game}
+	_args.game = Game.toIdentifier{game = _args.game}
+	-- Default type should be offline unless otherwise specified
+	_args.type = _args.type or DEFAULT_TYPE
 
 	-- Implicit prizepools
 	_args.prizepoolassumed = false
@@ -107,7 +110,7 @@ function CustomInjector:parse(id, widgets)
 
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {_args.game}},
+			Cell{name = 'Game', content = {Game.name{game = _args.game}}},
 			Cell{name = 'Version', content = {_args.version}},
 		}
 	end
@@ -131,7 +134,7 @@ end
 function CustomLeague:defineCustomPageVariables()
 	-- Custom vars
 	Variables.varDefine('assumedpayout', tostring(_args.prizepoolassumed))
-	Variables.varDefine('tournament_circuit', _args.circuit)
+	Variables.varDefine('circuit', _args.circuit)
 	Variables.varDefine('circuittier', _args.circuittier)
 	Variables.varDefine('circuitabbr', _args.circuitabbr)
 	Variables.varDefine('seriesabbr', _args.abbreviation)
@@ -159,7 +162,7 @@ function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
 	if _args.game then
-		table.insert(categories, _args.game .. ' Competitions')
+		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
 	end
 
 	return categories
