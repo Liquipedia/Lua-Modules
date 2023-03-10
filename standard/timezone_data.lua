@@ -27,6 +27,14 @@ return {
 		name = 'Australian Eastern Standard Time',
 		offset = {10, 0},
 	},
+	AKST = {
+		name = 'Alaska Standard Time',
+		offset = {-9, 0},
+	},
+	AKDT = {
+		name = 'Alaska Daylight Time',
+		offset = {-8, 0},
+	},
 	ALMT = {
 		name = 'Alma-Ata Time',
 		offset = {6, 0},
@@ -292,5 +300,9 @@ return {
 	WIB = {
 		name = 'Western Indonesian Time',
 		offset = {7, 0},
+	},
+	WITA = {
+		name = 'Central Indonesian Time',
+		offset = {8, 0},
 	},
 }

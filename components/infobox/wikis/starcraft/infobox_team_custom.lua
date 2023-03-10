@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -14,7 +15,6 @@ local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -57,7 +57,7 @@ function CustomTeam.run(frame)
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -161,16 +161,16 @@ function CustomTeam.playerBreakDown(args)
 		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
 			playerBreakDown.display = {}
 			if protossnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'p'} .. ' ' .. protossnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'p'} .. ' ' .. protossnumber
 			end
 			if terrannumbner > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'t'} .. ' ' .. terrannumbner
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 't'} .. ' ' .. terrannumbner
 			end
 			if zergnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'z'} .. ' ' .. zergnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'z'} .. ' ' .. zergnumber
 			end
 			if randomnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'r'} .. ' ' .. randomnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'r'} .. ' ' .. randomnumber
 			end
 		end
 	end
@@ -188,11 +188,11 @@ function CustomTeam.calculateEarnings(args)
 		Logic.readBool(args.disable_smw) or
 		Logic.readBool(args.disable_lpdb) or
 		Logic.readBool(args.disable_storage) or
-		Logic.readBool(Variables.varDefault('disable_SMW_storage')) or
+		Logic.readBool(Variables.varDefault('disable_LPDB_storage')) or
 		(not Namespace.isMain())
 	then
 		doStore = false
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		CustomTeam.getEarningsAndMedalsData(_team.pagename)
 		Variables.varDefine('earnings', _team.totalEarnings)

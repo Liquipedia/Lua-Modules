@@ -53,10 +53,11 @@ function CustomSeries.run(frame)
 	_series = series
 
 	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+	_args.liquipediatier = _args.liquipediatier or _args.tier
 
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
 function CustomSeries:createWidgetInjector()
@@ -176,7 +177,7 @@ function CustomSeries._addCustomVariables()
 		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		--needed for e.g. External Cups Lists
-		local name = _args.name or mw.title.getCurrentTitle().text
+		local name = _args.name or _series.pagename
 		Variables.varDefine('featured', _args.featured or '')
 		Variables.varDefine('headtohead', _args.headtohead or '')
 		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
@@ -185,6 +186,8 @@ function CustomSeries._addCustomVariables()
 		Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 		Variables.varDefine('tournament_shortname', _args.shortname or '')
 		Variables.varDefine('tournament_name', name)
+		Variables.varDefine('tournament_series', _series.pagename)
+		Variables.varDefine('tournament_parent', (_args.parent or _series.pagename):gsub(' ', '_'))
 		Variables.varDefine('tournament_abbreviation', _args.abbreviation or _args.shortname or '')
 		local game = _args.game
 		if game then

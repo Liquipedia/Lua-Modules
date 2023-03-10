@@ -38,7 +38,7 @@ function CustomTeam.run(frame)
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.getWikiCategories = CustomTeam.getWikiCategories
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:createWidgetInjector()
@@ -68,12 +68,6 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = args.image
-	end
-
 	lpdbData.region = Variables.varDefault('region', '')
 
 	if String.isNotEmpty(args.league) then

@@ -62,6 +62,12 @@ function StandingsStorage.table(data)
 		stagename = data.stagename or Variables.varDefault('bracket_header'),
 	}
 
+	local config = {
+		hasdraws = data.hasdraw,
+		hasovertimes = data.hasovertime,
+		haspoints = data.haspoints,
+	}
+
 	mw.ext.LiquipediaDB.lpdb_standingstable('standingsTable_' .. data.standingsindex,
 		{
 			tournament = Variables.varDefault('tournament_name', ''),
@@ -71,6 +77,7 @@ function StandingsStorage.table(data)
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
 			type = data.type,
 			matches = Json.stringify(data.matches or {}),
+			config = mw.ext.LiquipediaDB.lpdb_create_json(config),
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, data.extradata)),
 		}
 	)
@@ -125,9 +132,7 @@ end
 
 ---@return boolean
 function StandingsStorage.shouldStore()
-	return Namespace.isMain()
-			and not Logic.readBool(Variables.varDefault('disable_SMW_storage'))
-			and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 ---@param data table

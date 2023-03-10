@@ -225,7 +225,11 @@ end
 
 -- Check if any opponent has a none-standard status
 function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= _STATUS_SCORE end)
+	return Table.any(table,
+		function (_, scoreinfo)
+			return scoreinfo.status ~= _STATUS_SCORE and String.isNotEmpty(scoreinfo.status)
+		end
+	)
 end
 
 -- function to check for forfeits
@@ -433,6 +437,7 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 		opponents[index].score = _NOT_PLAYED_SCORE
 		opponents[index].status = walkoverType
 	end
+	return opponents
 end
 
 -- Get Playerdata from Vars (get's set in TeamCards)

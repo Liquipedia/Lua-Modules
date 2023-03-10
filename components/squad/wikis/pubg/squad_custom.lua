@@ -6,11 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
@@ -23,7 +25,7 @@ function CustomSquad.run(frame)
 	local index = 1
 	while args['p' .. index] ~= nil or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
-		local row = SquadRow(frame, player.role, {useTemplatesForSpecialTeams = true})
+		local row = SquadRow{useTemplatesForSpecialTeams = true}
 		row	:id({
 				player.id,
 				flag = player.flag,
@@ -51,6 +53,7 @@ function CustomSquad.run(frame)
 		squad:row(row:create(
 			Variables.varDefault('squad_name',
 			mw.title.getCurrentTitle().prefixedText) .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
+			.. (player.role and '_' .. player.role or '')
 		))
 
 		index = index + 1

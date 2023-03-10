@@ -108,13 +108,11 @@ function CustomLeague.run(frame)
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.shouldStore = CustomLeague.shouldStore
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:shouldStore(args)
-	return Namespace.isMain()
-			and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
-			and not Logic.readBool(Variables.varDefault('disable_SMW_storage'))
+	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 function CustomLeague:createWidgetInjector()

@@ -13,6 +13,7 @@ local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
 local Role = require('Module:Role')
+local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
@@ -41,12 +42,21 @@ local _player
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_player = player
-	_args = player.args
+
+	if String.isEmpty(player.args.team) then
+		player.args.team = PlayerTeamAuto._main{team = 'team'}
+	end
+
+	if String.isEmpty(player.args.team2) then
+		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
+	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
-	return player:createInfobox(frame)
+	_args = player.args
+
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -54,6 +64,7 @@ function CustomInjector:parse(id, widgets)
 		local manualHistory = _args.history
 		local automatedHistory = TeamHistoryAuto._results({
 			convertrole = 'true',
+			iconModule = 'Module:PositionIcon/data',
 			player = _pagename
 		}) or ''
 		automatedHistory = tostring(automatedHistory)

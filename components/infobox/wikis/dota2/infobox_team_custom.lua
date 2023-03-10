@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -22,6 +21,7 @@ function CustomTeam.run(frame)
 	-- Override links to allow one param to set multiple links
 	team.args.datdota = team.args.teamid
 	team.args.dotabuff = team.args.teamid
+	team.args.stratz = team.args.teamid
 
 	-- Automatic achievements
 	team.args.achievements = Template.expandTemplate(frame, 'Team achievements', {team.args.name})
@@ -35,7 +35,7 @@ function CustomTeam.run(frame)
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
 
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:createBottomContent()
@@ -59,12 +59,6 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	if not String.isEmpty(args.teamcardimage) then
-		lpdbData.logo = args.teamcardimage
-	elseif not String.isEmpty(args.image) then
-		lpdbData.logo = args.image
-	end
-
 	lpdbData.region = Variables.varDefault('region', '')
 
 	lpdbData.extradata.teamid = args.teamid

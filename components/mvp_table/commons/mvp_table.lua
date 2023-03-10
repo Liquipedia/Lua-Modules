@@ -74,8 +74,7 @@ function MvpTable._parseArgs(args)
 		end
 	end
 
-	args.tournament1 = args.tournament or args.tournament1
-	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
+	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament', {requireIndex = false}) do
 		tournament = mw.ext.TeamLiquidIntegration.resolve_redirect(tournament):gsub(' ', '_')
 		table.insert(parsedArgs.tournaments, tournament)
 	end
@@ -155,8 +154,7 @@ function MvpTable._row(item, args)
 		:tag('td'):wikitext(item.mvp):done()
 
 	if args.points then
-		row = mw.html.create('tr')
-			:tag('td'):wikitext(item.points):done()
+		row:tag('td'):wikitext(item.points):done()
 	end
 
 	return row:done()

@@ -45,7 +45,7 @@ function CustomLeague.run(frame)
 
 	_args.liquipediatier = Tier.number[_args.liquipediatier]
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()

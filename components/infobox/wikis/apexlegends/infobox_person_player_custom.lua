@@ -27,6 +27,7 @@ local _INPUTS = {
 	controller = 'Controller',
 	cont = 'Controller',
 	c = 'Controller',
+	hybrid = 'Hybrid',
 	default = 'Mouse & Keyboard',
 }
 
@@ -70,7 +71,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -115,10 +116,9 @@ function CustomInjector:addCustomCells(widgets)
 		}
 	)
 
-	local lowercaseInput = _args.input and _args.input:lower() or nil
 	table.insert(widgets, Cell{
 			name = 'Input',
-			content = {_INPUTS[lowercaseInput] or _INPUTS.default}
+			content = {CustomPlayer:formatInput()}
 		})
 	return widgets
 end
@@ -130,10 +130,10 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.input = CustomPlayer:formatInput()
 	lpdbData.extradata.retired = _args.retired
 
-	_args.legend1 = _args.legend1 or _args.legend
-	for _, legend, legendIndex in Table.iter.pairsByPrefix(_args, 'legends') do
+	for _, legend, legendIndex in Table.iter.pairsByPrefix(_args, 'legends', {requireIndex = false}) do
 		lpdbData.extradata['signatureLegend' .. legendIndex] = legend
 	end
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
@@ -189,6 +189,11 @@ function CustomPlayer:defineCustomPageVariables(args)
 	else
 		Variables.varDefine('isplayer', 'true')
 	end
+end
+
+function CustomPlayer:formatInput()
+	local lowercaseInput = _args.input and _args.input:lower() or nil
+	return _INPUTS[lowercaseInput] or _INPUTS.default
 end
 
 return CustomPlayer

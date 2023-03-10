@@ -36,7 +36,7 @@ end
 ---@param value any
 ---@return boolean
 function Table.includes(tbl, value)
-	for _, entry in ipairs(tbl) do
+	for _, entry in pairs(tbl) do
 		if entry == value then
 			return true
 		end
@@ -57,6 +57,22 @@ function Table.filter(tbl, predicate, argument)
 		if predicate(entry, argument) then
 			filteredTbl[foundMatches] = entry
 			foundMatches = foundMatches + 1
+		end
+	end
+
+	return filteredTbl
+end
+
+---@generic K, V
+---@param tbl {[K]: V}
+---@param predicate fun(key?: K, value?: V): boolean
+---@return {[K]: V}
+function Table.filterByKey(tbl, predicate)
+	local filteredTbl = {}
+
+	for key, entry in pairs(tbl) do
+		if predicate(key, entry) then
+			filteredTbl[key] = entry
 		end
 	end
 
@@ -237,10 +253,10 @@ end
 --Returns `{6 = 'a', 8 = 'b', 10 = 'c'}`
 --
 --The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
----@generic K, V, T
+---@generic K, V, U, T
 ---@param xTable {[K] : V}
----@param f fun(key?: K, value?: V): K, T
----@return {[K] : T}
+---@param f fun(key?: K, value?: V): U, T
+---@return {[U] : T}
 function Table.map(xTable, f)
 	local yTable = {}
 	for xKey, xValue in pairs(xTable) do
@@ -289,14 +305,19 @@ function Table.mapArgumentsByPrefix(args, prefixes, f)
 	return Table.mapArguments(args, indexFromKey, f)
 end
 
---[[
-Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
-from an arguments table, and applies a transform to each key or index.
-
-Most common use-case will be `Table.mapArgumentsByPrefix` where
-the `indexFromKey` function retrieves keys based on a prefix.
-]]
-function Table.mapArguments(args, indexFromKey, f)
+--- Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
+-- from an arguments table, and applies a transform to each key or index.
+--
+-- Most common use-case will be `Table.mapArgumentsByPrefix` where
+-- the `indexFromKey` function retrieves keys based on a prefix.
+--
+---@generic K, V, T, I
+---@param args {[K] : V}
+---@param indexFromKey fun(key?: K): integer
+---@param f fun(key?: K, index?: integer, ...?: any): T
+---@param noInterleave boolean?
+---@return {[I] : T}
+function Table.mapArguments(args, indexFromKey, f, noInterleave)
 	local entriesByIndex = {}
 
 	-- Non-numeric args
@@ -311,7 +332,11 @@ function Table.mapArguments(args, indexFromKey, f)
 		end
 	end
 
-	-- Numeric index entries fills in gaps of prefixN= entries
+	if noInterleave then
+		return entriesByIndex
+	end
+
+	-- Numeric index entries fills in gaps of prefixN= entries if not disabled
 	local entryIndex = 1
 	for argIndex = 1, math.huge do
 		if not args[argIndex] then
@@ -498,9 +523,13 @@ end
 --[[
 Iterates over table entries whose keys are prefixed numbers. The entries are
 visited in order, starting from 1. The iteration stops upon a skipped number.
+If requireIndex is disabled, for the first entry, both `prefix` and `prefix1`
+are valid keys, with a preference for the latter.
 
 Example:
+```
 local args = {
+	p = {},
 	p1 = {},
 	p2 = {},
 	p3 = {},
@@ -510,14 +539,22 @@ local args = {
 for key, player, index in Table.iter.pairsByPrefix(args, 'p') do
 	mw.log(key)
 end
-
-will print out 'p1 p2 p3'
+```
+will print out `p1 p2 p3`
 ]]
-function Table.iter.pairsByPrefix(tbl, prefix)
+---@param tbl table
+---@param prefix string
+---@param options? {requireIndex: boolean}
+---@return function
+function Table.iter.pairsByPrefix(tbl, prefix, options)
+	options = options or {}
 	local i = 1
 	return function()
 		local key = prefix .. i
 		local value = tbl[key]
+		if options.requireIndex == false and i == 1 and not value then
+			key, value = prefix, tbl[prefix]
+		end
 		i = i + 1
 		if value then
 			return key, value, (i - 1)

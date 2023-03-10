@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -133,10 +134,10 @@ function Person:createInfobox()
 			Builder{builder = function()
 				local teams = {
 					self:_createTeam(args.team, args.teamlink),
-					self:_createTeam(args.team2, args.teamlink2),
-					self:_createTeam(args.team3, args.teamlink3),
-					self:_createTeam(args.team4, args.teamlink4),
-					self:_createTeam(args.team5, args.teamlink5)
+					self:_createTeam(args.team2, args.team2link),
+					self:_createTeam(args.team3, args.team3link),
+					self:_createTeam(args.team4, args.team4link),
+					self:_createTeam(args.team5, args.team5link)
 				}
 				return {Cell{
 					name = #teams > 1 and 'Teams' or 'Team',
@@ -144,7 +145,13 @@ function Person:createInfobox()
 				}}
 			end}
 		}},
-		Cell{name = 'Alternate IDs', content = {args.ids or args.alternateids}},
+		Cell{name = 'Alternate IDs', content = {
+				table.concat(
+					Array.map(mw.text.split(args.ids or args.alternateids or '', ',', true), function(id) return mw.text.trim(id) end),
+					', '
+				)
+			}
+		},
 		Cell{name = 'Nicknames', content = {args.nicknames}},
 		Builder{
 			builder = function()
@@ -265,6 +272,14 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+	end
+
+	-- Store additional team-templates in extradata
+	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = false}) do
+		if teamIndex > 1 then
+			otherTeam = args[teamKey .. 'link'] or otherTeam
+			lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename
+		end
 	end
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)

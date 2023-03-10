@@ -35,10 +35,11 @@ function CustomSeries.run(frame)
 	_args = series.args
 
 	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+	_args.liquipediatier = _args.liquipediatier or _args.tier
 
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
 function CustomSeries:createWidgetInjector()
@@ -105,7 +106,7 @@ function CustomSeries._addCustomVariables()
 		Logic.readBool(_args.disable_lpdb) or
 		Logic.readBool(_args.disable_storage)
 	then
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		--needed for e.g. External Cups Lists
 		local name = _args.name or mw.title.getCurrentTitle().text

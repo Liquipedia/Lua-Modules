@@ -26,7 +26,7 @@ function CustomCharacter.run(frame)
 	_args = character.args
 	character.addToLpdb = CustomCharacter.addToLpdb
 	character.createWidgetInjector = CustomCharacter.createWidgetInjector
-	return character:createInfobox(frame)
+	return character:createInfobox()
 end
 
 function CustomCharacter:createWidgetInjector()

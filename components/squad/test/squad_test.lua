@@ -34,13 +34,13 @@ function suite:testRow()
 	local createdRow = row:create('object_name')
 
 	self:assertEquals(
-		'<tr class="Player"><td class="ID">\'\'\'<span style="white-space:pre">[[Baz]]</span>\'\'\'</td>' ..
+		'<tr class="Player"><td class="ID"><b><span style="white-space:pre">[[Baz]]</span></b></td>' ..
 		'<td></td><td class="Name"><div class="MobileStuff">(</div><div class="MobileStuff">)</div></td>' ..
 		'<td class="Position"></td><td class="Date"><div class="MobileStuffDate">Join Date:&nbsp;</div>' ..
-		'<div class="Date">\'\'2022-01-01\'\'</div></td><td class="Date">' ..
-		'<div class="MobileStuffDate">Inactive Date:&nbsp;</div><div class="Date">\'\'2022-03-03\'\'</div></td>' ..
+		'<div class="Date"><i>2022-01-01</i></div></td><td class="Date">' ..
+		'<div class="MobileStuffDate">Inactive Date:&nbsp;</div><div class="Date"><i>2022-03-03</i></div></td>' ..
 		'<td class="Date"><div class="MobileStuffDate">Leave Date:&nbsp;</div>' ..
-		'<div class="Date">\'\'2022-05-01\'\'</div></td><td class="NewTeam"><div class="MobileStuff">' ..
+		'<div class="Date"><i>2022-05-01</i></div></td><td class="NewTeam"><div class="MobileStuff">' ..
 		'<i class="fa fa-long-arrow-right" aria-hidden="true"></i>&nbsp;</div>' ..
 		'<span data-highlightingclass="Team Sweden" class="team-template-team-standard">' ..
 		'<span class="team-template-image-icon team-template-lightmode">' ..

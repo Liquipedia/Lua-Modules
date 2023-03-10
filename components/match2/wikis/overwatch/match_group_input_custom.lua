@@ -9,10 +9,10 @@
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Array = require('Module:Array')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -24,18 +24,9 @@ local _MAX_NUM_PLAYERS = 10
 local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
-local _CONVERT_TYPE_TO_PLAYER_NUMBER = {
-	solo = 1,
-	--duo = 2,
-	--trio = 3,
-	--quad = 4,
-}
-local _ALLOWED_OPPONENT_TYPES = {
-	'solo',
-	'team'
-}
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local TODAY = os.date('%Y-%m-%d', os.time())
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -73,29 +64,28 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date, opponentIndex)
+function CustomMatchGroupInput.processOpponent(record, date)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
-	-- Retrieve icon for teams and do tbd checks
-	if opponent.type == Opponent.team then
-		if opponent.template:lower() == 'bye' then
-			opponent = {type = Opponent.literal, name = 'BYE'}
-		else
-			opponent.icon = opponentFunctions.getIcon(opponent.template)
-		end
-	elseif opponent.type ~= Opponent.literal then
-		if not _ALLOWED_OPPONENT_TYPES[opponent.type or ''] then
-			error('Unsupported opponent type "' .. (opponent.type or '') .. '"')
-		end
-		opponent.match2players = matchFunctions.getPlayers(record, opponent.type, opponentIndex)
-		if Array.any(opponent.match2players, CustomMatchGroupInput._playerIsBye) then
-			opponent = {type = Opponent.literal, name = 'BYE'}
-		end
-
+	-- Convert byes to literals
+	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	Opponent.resolve(opponent, date)
+	local teamTemplateDate = date
+	-- If date is epoch, resolve using tournament dates instead
+	-- Epoch indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	if teamTemplateDate == EPOCH_TIME_EXTENDED then
+		teamTemplateDate = Variables.varDefaultMulti(
+			'tournament_enddate',
+			'tournament_startdate',
+			TODAY
+		)
+	end
+
+	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -287,7 +277,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', _EPOCH_TIME),
+			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
 		}
 	end
@@ -300,19 +290,7 @@ function matchFunctions.getTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
-	match.stream = match.stream or {}
-	match.stream = {
-		stream = Logic.emptyOr(match.stream.stream, Variables.varDefault('stream')),
-		twitch = Logic.emptyOr(match.stream.twitch or match.twitch, Variables.varDefault('twitch')),
-		twitch2 = Logic.emptyOr(match.stream.twitch2 or match.twitch2, Variables.varDefault('twitch2')),
-		afreeca = Logic.emptyOr(match.stream.afreeca or match.afreeca, Variables.varDefault('afreeca')),
-		afreecatv = Logic.emptyOr(match.stream.afreecatv or match.afreecatv, Variables.varDefault('afreecatv')),
-		dailymotion = Logic.emptyOr(match.stream.dailymotion or match.dailymotion, Variables.varDefault('dailymotion')),
-		douyu = Logic.emptyOr(match.stream.douyu or match.douyu, Variables.varDefault('douyu')),
-		smashcast = Logic.emptyOr(match.stream.smashcast or match.smashcast, Variables.varDefault('smashcast')),
-		youtube = Logic.emptyOr(match.stream.youtube or match.youtube, Variables.varDefault('youtube')),
-		facebook = Logic.emptyOr(match.stream.facebook or match.facebook, Variables.varDefault('facebook')),
-	}
+	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
@@ -366,6 +344,11 @@ function matchFunctions.getOpponents(match)
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
+
+			-- Retrieve icon for team
+			if opponent.type == Opponent.team then
+				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
+			end
 
 			-- apply status
 			if Logic.isNumeric(opponent.score) then
@@ -446,27 +429,6 @@ function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
 	return match
 end
 
--- Get Playerdata for non-team opponents
-function matchFunctions.getPlayers(match, opponentType, opponentIndex)
-	local players = {}
-	for playerIndex = 1, _CONVERT_TYPE_TO_PLAYER_NUMBER[opponentType] do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or 'TBD'
-		player.flag = player.flag
-		player.displayname = player.displayname or player.name
-		if Table.isNotEmpty(player) then
-			table.insert(players, player)
-		end
-	end
-
-	return players
-end
-
-function CustomMatchGroupInput._playerIsBye(player)
-	return (player.name or ''):lower() == 'bye' or (player.displayname or ''):lower() == 'bye'
-end
-
 --
 -- map related functions
 --
@@ -517,7 +479,11 @@ end
 --
 function opponentFunctions.getIcon(template)
 	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
+	end
 end
 
 return CustomMatchGroupInput

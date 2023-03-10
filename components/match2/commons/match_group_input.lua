@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -17,10 +16,10 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local WikiSpecific = require('Module:Brkts/WikiSpecific')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local globalVars = PageVariableNamespace({cached = true})
 
@@ -101,7 +100,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	end)
 		:catch(function(message)
-			if FeatureFlag.get('prompt_purge_bracket_template') and String.endsWith(message, 'does not exist') then
+			if String.endsWith(message, 'does not exist') then
 				table.insert(warnings, message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
 				return {}
 			else
@@ -272,7 +271,7 @@ function MatchGroupInput.readDate(dateString)
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 	local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
 	local timezoneId = dateString:match('>(%a-)<')
-	local matchDate = String.explode(dateString, '<', 0):gsub('-', '')
+	local matchDate = mw.text.split(dateString, '<', true)[1]:gsub('-', '')
 	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
 	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
 	return {
@@ -384,7 +383,7 @@ end
 function MatchGroupInput.getCommonTournamentVars(obj)
 	obj.game = Logic.emptyOr(obj.game, Variables.varDefault('tournament_game'))
 	obj.icon = Logic.emptyOr(obj.icon, Variables.varDefault('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault("tournament_icondark"))
+	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault('tournament_icondark'))
 	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,

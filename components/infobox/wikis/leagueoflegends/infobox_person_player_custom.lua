@@ -44,6 +44,7 @@ local _ROLES = {
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
+	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
 }
 _ROLES['assistant coach'] = _ROLES.coach
 _ROLES['strategic coach'] = _ROLES.coach
@@ -77,7 +78,11 @@ function CustomPlayer.run(frame)
 	end
 
 	if String.isEmpty(player.args.history) then
-		player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
+		player.args.history = tostring(TeamHistoryAuto._results{
+			hiderole = 'true',
+			iconModule = 'Module:PositionIcon/data',
+			addlpdbdata='true'
+		})
 	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
@@ -87,7 +92,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
