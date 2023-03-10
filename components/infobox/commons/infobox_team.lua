@@ -42,7 +42,7 @@ local _LINK_VARIANT = 'team'
 local Language = mw.language.new('en')
 
 local _defaultEarningsFunctionUsed = false
-local CREATED_STRING = '<span class="icon-16px">[[File:${icon}|32px]]</span>: ${date}'
+local CREATED_STRING = '<span class="icon-16px">[[File:${icon}|32px]]</span> ${date}'
 
 local _warnings = {}
 
