@@ -138,7 +138,7 @@ Placement.additionalData = {
 				end
 			end
 
-			scores = Array.map(scores, forceValidScore)
+			scores = Table.mapValues(scores, forceValidScore)
 			return {score = scores[1], vsscore = scores[2]}
 		end
 	},
