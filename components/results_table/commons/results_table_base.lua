@@ -77,9 +77,7 @@ function BaseResultsTable:readConfig()
 		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
 		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
-		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), function(alias)
-			return mw.text.trim(alias)
-		end) or {}
+		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), String.trim) or {}
 	}
 
 	config.sort = args.sort or
@@ -219,7 +217,7 @@ function BaseResultsTable:buildBaseConditions()
 
 	if args.tier then
 		local tierConditions = ConditionTree(BooleanOperator.any)
-		for _, tier in pairs(Table.mapValues(mw.text.split(args.tier, ',', true), mw.text.trim)) do
+		for _, tier in pairs(Array.map(mw.text.split(args.tier, ',', true), String.trim)) do
 			tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
 		end
 		conditions:add{tierConditions}

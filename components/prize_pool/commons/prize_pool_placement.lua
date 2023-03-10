@@ -7,6 +7,7 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -127,7 +128,7 @@ Placement.additionalData = {
 			end
 
 			-- split the lastvsscore entry by '-', but allow negative scores
-			local rawScores = Table.mapValues(mw.text.split(input, '-'), mw.text.trim)
+			local rawScores = Array.map(mw.text.split(input, '-'), String.trim)
 			local scores = {}
 			for index, rawScore in ipairs(rawScores) do
 				if String.isEmpty(rawScore) and String.isNotEmpty(rawScores[index + 1]) then
@@ -137,7 +138,7 @@ Placement.additionalData = {
 				end
 			end
 
-			scores = Table.mapValues(scores, forceValidScore)
+			scores = Array.map(scores, forceValidScore)
 			return {score = scores[1], vsscore = scores[2]}
 		end
 	},

@@ -416,7 +416,7 @@ function matchFunctions.getMVP(match)
 	if not match.mvp then return nil end
 
 	-- Split & trim the input
-	local players = Table.mapValues(mw.text.split(match.mvp, ','),mw.text.trim)
+	local players = Array.map(mw.text.split(match.mvp, ','), String.trim)
 
 	return {players = players, points = match.mvppoints or 1}
 end

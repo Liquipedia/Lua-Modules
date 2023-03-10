@@ -49,7 +49,7 @@ function BroadcasterCard.create(frame)
 		-- Create a title from the position.
 		local positions = Array.map(
 			mw.text.split(position, '/'),
-			function(pos) return mw.text.trim(pos) end
+			String.trim
 		)
 		if args.b2 then
 			positions = Array.map(positions, BroadcasterCard._pluralisePosition)
