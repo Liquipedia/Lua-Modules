@@ -252,12 +252,12 @@ function Opponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				PlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
-			if not player.team then
-				player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil)
-			end
-			if player.team then
-				player.team = TeamTemplate.resolve(player.team, date)
-			end
+				if not player.team then
+					player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil)
+				end
+				if player.team then
+					player.team = TeamTemplate.resolve(player.team, date)
+				end
 			else
 				PlayerExt.populatePageName(player)
 			end
