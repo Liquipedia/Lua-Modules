@@ -51,8 +51,8 @@ function String.contains(str, match)
 	return string.find(str, match) ~= nil
 end
 
---- Trims a string of tabs (`\t`), new lines (`\n`), carriage returns (`\r`),
---- form feeds (`\f`) and whitespaces (` `) and non-breaking spaces (`&nbsp;`)
+--- Trims a string from tabs (`\t`), new lines (`\n`), carriage returns (`\r`),
+--- form feeds (`\f`), whitespaces (` `) and non-breaking spaces (`&nbsp;`)
 ---@param str string
 ---@return string
 function String.trim(str)
