@@ -8,9 +8,11 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
+local Currency = require('Module:Currency')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -24,8 +26,10 @@ local Chronology = Widgets.Chronology
 local _args
 local _league
 
+local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local BASE_CURRENCY = 'USD'
 local DEFAULT_TYPE = 'offline'
+local TODAY = os.date('%Y-%m-%d', os.time())
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -63,12 +67,6 @@ function CustomLeague.run(frame)
 		end
 	end
 
-	-- Swap prizepool to prizepoolusd when no currency
-	if not _args.localcurrency or _args.localcurrency:upper() == BASE_CURRENCY then
-		_args.prizepoolusd = _args.prizepoolusd or _args.prizepool
-		_args.prizepool = nil
-	end
-
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
@@ -101,12 +99,9 @@ function CustomInjector:parse(id, widgets)
 		end
 
 	elseif id == 'prizepool' then
-		if _args.prizepoolassumed then
-			widgets[1].content[1] = Abbreviation.make(
-				widgets[1].content[1],
-				'This prize is assumed, and has not been confirmed'
-			)
-		end
+		return {
+			Cell{name = 'Prize pool', content = {CustomLeague:_createPrizepool()}}
+		}
 
 	elseif id == 'gamesettings' then
 		return {
@@ -198,7 +193,115 @@ function CustomLeague.getIconFromSeries(page)
 	if not series then
 		return
 	end
+
 	return series.icon, series.icondark
+end
+
+function CustomLeague:_createPrizepool()
+	if String.isEmpty(_args.prizepool) and
+		String.isEmpty(_args.prizepoolusd) then
+		return nil
+	end
+
+	local localCurrency = _args.localcurrency
+	local prizePoolUSD = _args.prizepoolusd
+	local prizePool = _args.prizepool
+
+	if localCurrency == 'text' then
+		return prizePool
+	else
+		local display, hasText
+		if prizePoolUSD then
+			prizePoolUSD, hasText = CustomLeague:_cleanPrizeValue(prizePoolUSD)
+		end
+
+		prizePool, hasText = CustomLeague:_cleanPrizeValue(prizePool, localCurrency, hasText)
+
+		if not prizePoolUSD and localCurrency then
+			local exchangeDate = Variables.varDefault('tournament_enddate', TODAY)
+			prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
+			if not prizePoolUSD then
+				error('Invalid local currency "' .. localCurrency .. '"')
+			end
+		end
+
+		if prizePoolUSD and prizePool then
+			display = Currency.display((localCurrency or ''):lower(), CustomLeague:_displayPrizeValue(prizePool, 2))
+				.. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD, 2) .. ' ' .. ABBR_USD .. ')'
+		elseif prizePool or prizePoolUSD then
+			display = '$' .. CustomLeague:_displayPrizeValue(prizePool or prizePoolUSD, 2) .. ' ' .. ABBR_USD
+		end
+		if hasText then
+			display = (display or _args.prizepool or '') ..
+				'[[Category:Pages with text set as prizepool in infobox league]]'
+		end
+
+		Variables.varDefine('usd prize', prizePoolUSD or prizePool)
+		Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
+		Variables.varDefine('local prize', prizePool)
+
+		if _args.prizepoolassumed then
+			display = Abbreviation.make(
+				display,
+				'This prize is assumed, and has not been confirmed'
+			)
+		end
+		
+		return display
+	end
+end
+
+function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
+	local usdPrize
+	local currencyRate = Currency.getExchangeRate{
+		currency = currency,
+		date = exchangeDate,
+		setVariables = true,
+	}
+	if currencyRate then
+		usdPrize = currencyRate * localPrize
+	end
+
+	return usdPrize
+end
+
+function CustomLeague:_displayPrizeValue(value, numDigits)
+	if String.isEmpty(value) or value == 0 or value == '0' then
+		return '-'
+	end
+
+	numDigits = tonumber(numDigits or 0) or 0
+	local factor = 10^numDigits
+	value = math.floor(value * factor + 0.5) / factor
+
+	--split value into
+	--left = first digit
+	--num = all remaining digits before a possible '.'
+	--right = the '.' and all digits after it (unless they are all 0 or do not exist)
+	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
+	if right:len() > 0 then
+		local decimal = string.sub('0' .. right, 3)
+		right = '.' .. decimal .. string.rep('0', 2 - string.len(decimal))
+	end
+	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
+end
+
+function CustomLeague:_cleanPrizeValue(value, currency, oldHasText)
+	if String.isEmpty(value) then
+		return nil, oldHasText, nil
+	end
+
+	--remove white spaces, '&nbsp;' and ','
+	value = string.gsub(value, '%s', '')
+	value = string.gsub(value, '&nbsp;', '')
+	value = string.gsub(value, ',', '')
+	value = string.gsub(value, '%$', '')
+
+	--check if additional non numbers are present
+	local hasText = string.match(value, '[^%.%d]')
+	value = tonumber(value)
+
+	return value, hasText or oldHasText
 end
 
 return CustomLeague
