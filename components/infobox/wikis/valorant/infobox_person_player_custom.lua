@@ -60,7 +60,6 @@ function CustomPlayer.run(frame)
 	if String.isEmpty(player.args.team2) then
 		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
 	end
-	
 	player.args.history = tostring(TeamHistoryAuto._results{convertrole = 'true'})
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
