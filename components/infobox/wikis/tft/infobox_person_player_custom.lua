@@ -37,9 +37,6 @@ ROLES['assistant coach'] = ROLES.coach
 
 local DEFAULT_TYPE = 'player'
 
-local _SIZE_HERO = '25x25px'
-local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
-
 local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
