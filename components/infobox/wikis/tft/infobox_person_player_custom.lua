@@ -79,28 +79,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	-- Signature Heroes
-	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
-		function(hero)
-			return HeroIcon.getImage{hero, size = _SIZE_HERO}
-		end
-	)
-	heroIcons = Array.sub(heroIcons, 1, MAX_NUMBER_OF_SIGNATURE_HEROES)
-
-	if Table.isNotEmpty(heroIcons) then
-		table.insert(widgets,
-			Cell{
-				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-				content = {
-					table.concat(heroIcons, '&nbsp;')
-				}
-			}
-		)
-	end
-	return widgets
-end
-
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
