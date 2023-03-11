@@ -22,16 +22,16 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
-	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
-	['host'] = {category = 'Hosts', variable = 'Host', isplayer = false},
-	['journalist'] = {category = 'Journalists', variable = 'Journalist', isplayer = false},
-	['expert'] = {category = 'Experts', variable = 'Expert', isplayer = false},
-	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
-	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
-	['talent'] = {category = 'Talents', variable = 'Talent', isplayer = false},
-	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
-	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
+	analyst = {category = 'Analysts', value = 'Analyst', type = 'talent'},
+	observer = {category = 'Observers', value = 'Observer', type = 'talent'},
+	host = {category = 'Hosts', value = 'Host', type = 'talent'},
+	journalist = {category = 'Journalists', value = 'Journalist', type = 'talent'},
+	expert = {category = 'Experts', value = 'Expert', type = 'talent'},
+	coach = {category = 'Coaches', value = 'Coach', type = 'staff'},
+	caster = {category = 'Casters', value = 'Caster', type = 'talent'},
+	talent = {category = 'Talents', value = 'Talent', type = 'talent'},
+	manager = {category = 'Managers', value = 'Manager', type = 'staff'},
+	producer = {category = 'Producers', value = 'Producer', type = 'talent'},
 }
 _ROLES['assistant coach'] = _ROLES.coach
 
