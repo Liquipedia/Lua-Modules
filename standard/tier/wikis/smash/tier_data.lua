@@ -72,12 +72,12 @@ return {
 			short = 'Mon.',
 			category = 'Monthly Tournaments',
 		},
-		['bi-monthly'] = {
-			value = 'Bi-Monthly',
+		['bimonthly'] = {
+			value = 'Bimonthly',
 			sort = 'B3',
-			name = 'Bi-Monthly',
-			short = 'Bi-M.',
-			category = 'Bi-Monthly Tournaments',
+			name = 'Bimonthly',
+			short = 'Bim.',
+			category = 'Bimonthly Tournaments',
 		},
 		weekly = {
 			value = 'Weekly',
