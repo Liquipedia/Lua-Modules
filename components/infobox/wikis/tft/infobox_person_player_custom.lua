@@ -33,7 +33,8 @@ local ROLES = {
 	manager = {category = 'Managers', value = 'Manager', type = 'staff'},
 	producer = {category = 'Producers', value = 'Producer', type = 'talent'},
 }
-_ROLES['assistant coach'] = _ROLES.coach
+ROLES['assistant coach'] = ROLES.coach
+
 
 local _SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
