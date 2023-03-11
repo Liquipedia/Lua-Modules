@@ -86,24 +86,13 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	return lpdbData
 end
 
-function CustomPlayer._createRole(key, role)
+function CustomPlayer._getRoleData(key)
+	local role = _args[key]
 	if String.isEmpty(role) then
-		return nil
+		return
 	end
 
-	local roleData = _ROLES[role:lower()]
-	if not roleData then
-		return nil
-	end
-
-	if Player:shouldStoreData(_args) then
-		local categoryCoreText = 'Category:' .. roleData.category
-
-		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
-	else
-		return Variables.varDefineEcho(key or 'role', roleData.variable)
-	end
+	return ROLES[role:lower()] or {}
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
