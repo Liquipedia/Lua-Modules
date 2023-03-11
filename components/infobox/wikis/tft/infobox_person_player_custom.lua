@@ -20,7 +20,7 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _ROLES = {
+local ROLES = {
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
 	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
