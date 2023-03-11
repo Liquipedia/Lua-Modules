@@ -96,17 +96,8 @@ function CustomPlayer._getRoleData(key)
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
-	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
-	end
-	-- If the role is missing, assume it is a player
-	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
-	else
-		Variables.varDefine('isplayer', 'true')
-	end
+	Variables.varDefine('role', CustomPlayer._getRoleData('role').value)
+	Variables.varDefine('role2', CustomPlayer._getRoleData('role2').value)
 end
 
 return CustomPlayer
