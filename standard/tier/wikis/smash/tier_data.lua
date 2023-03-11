@@ -31,9 +31,8 @@ return {
 			short = 'Nat.',
 			category = 'National Tournaments',
 		},
-
-		-- legacy??? to be replaced by `-1` ???
-		[4] = {
+		-- this is a proper (4th) tier and does not indicate missing tier
+		{
 			value = '4',
 			sort = 'A4',
 			name = 'No Tier',
@@ -41,6 +40,7 @@ return {
 			link = 'No Tier Tournaments',
 			category = 'No Tier Tournaments',
 		},
+
 		-- legacy??? to be replaced by `-1` ???
 		[-99] = {
 			value = '-99',
