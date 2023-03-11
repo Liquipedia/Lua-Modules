@@ -83,22 +83,6 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
-	-- store signature heroes with standardized name
-	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
-		lpdbData.extradata['signatureHero' .. heroIndex] = HeroIcon.getHeroName(hero)
-		if heroIndex == MAX_NUMBER_OF_SIGNATURE_HEROES then
-			break
-		end
-	end
-
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
-
-	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
-
-	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
-	end
-
 	return lpdbData
 end
 
