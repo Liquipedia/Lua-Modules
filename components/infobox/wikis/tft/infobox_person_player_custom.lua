@@ -51,6 +51,7 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
+	player.getPersonType = CustomPlayer.getPersonType
 
 	_args = player.args
 
