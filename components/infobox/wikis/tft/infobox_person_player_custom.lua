@@ -100,4 +100,13 @@ function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('role2', CustomPlayer._getRoleData('role2').value)
 end
 
+function CustomPlayer:getPersonType(args)
+	local roleData = CustomPlayer._getRoleData('role').
+
+	return {
+		store = roleData.type or DEFAULT_TYPE,
+		category = roleData.category or mw.getContentLanguage():ucfirst(DEFAULT_TYPE)
+	}
+end
+
 return CustomPlayer
