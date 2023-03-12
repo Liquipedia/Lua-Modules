@@ -195,8 +195,8 @@ end)
 ---@deprecated
 function Tier.toNumber(tier)
 	return tonumber(tier)
-		or Tier.legacyNumbers[string.lower(tier or ''):gsub(' ', '')]
-		or Tier.legacyShortNumbers[string.lower(tier or ''):gsub(' ', '')]
+		or Tier.legacyNumbers()[string.lower(tier or ''):gsub(' ', '')]
+		or Tier.legacyShortNumbers()[string.lower(tier or ''):gsub(' ', '')]
 end
 
 return Tier
