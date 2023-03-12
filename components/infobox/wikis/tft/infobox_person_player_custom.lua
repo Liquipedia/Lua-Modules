@@ -101,7 +101,8 @@ function CustomPlayer:defineCustomPageVariables(args)
 end
 
 function CustomPlayer:getPersonType(args)
-	local roleData = CustomPlayer._getRoleData('role').
+	local roleData = CustomPlayer._getRoleData('role')
+
 
 	return {
 		store = roleData.type or DEFAULT_TYPE,
