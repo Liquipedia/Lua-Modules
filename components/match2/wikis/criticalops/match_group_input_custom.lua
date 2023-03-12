@@ -37,6 +37,7 @@ local ALLOWED_STATUSES = {
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 local NOT_PLAYED_MATCH_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local NOT_PLAYED_RESULT_TYPE = 'np'
+local DRAW_RESULT_TYPE = 'draw'
 local NOW = os.time(os.date('!*t'))
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
@@ -182,7 +183,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	if Logic.readBool(data.finished) then
 		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
-			data.resulttype = STATUS_DRAW
+			data.resulttype = 'draw'
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
 		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
 			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
@@ -209,7 +210,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		--If a manual winner is set use it
 		if winner and data.resulttype ~= DEFAULT_RESULT_TYPE then
 			if winner == 0 then
-				data.resulttype = STATUS_DRAW
+				data.resulttype = DRAW_RESULT_TYPE
 			else
 				data.resulttype = nil
 			end
