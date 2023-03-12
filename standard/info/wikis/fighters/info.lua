@@ -559,8 +559,8 @@ return {
 		},
 		ggst = {
 			abbreviation = 'GGST',
-			name = 'GUILTY GEAR -STRIVE-',
-			link = 'GUILTY GEAR -STRIVE-',
+			name = 'Guilty Gear -STRIVE-',
+			link = 'Guilty Gear -STRIVE-',
 			logo = {
 				darkMode = 'Guilty Gear Strive default darkmode.png',
 				lightMode = 'Guilty Gear Strive default lightmode.png',
@@ -1378,8 +1378,8 @@ return {
 		},
 		t7 = {
 			abbreviation = 'TK7',
-			name = 'TEKKEN 7',
-			link = 'TEKKEN 7',
+			name = 'Tekken 7',
+			link = 'Tekken 7',
 			logo = {
 				darkMode = 'Tekken 7 default allmode.png',
 				lightMode = 'Tekken 7 default allmode.png',
@@ -1391,8 +1391,8 @@ return {
 		},
 		t8 = {
 			abbreviation = 'TK8',
-			name = 'TEKKEN 8',
-			link = 'TEKKEN 8',
+			name = 'Tekken 8',
+			link = 'Tekken 8',
 			logo = {
 				darkMode = 'Tekken 8 default allmode.png',
 				lightMode = 'Tekken 8 default allmode.png',
