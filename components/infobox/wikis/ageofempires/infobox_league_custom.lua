@@ -164,15 +164,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 
 	-- Legacy tier vars
-	local tier = Variables.varDefault('tournament_liquipediatier')
-	local tierType = Variables.varDefault('tournament_liquipediatiertype')
-	Variables.varDefine('tournament_lptier', tier)
-	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_tiertype', tierType)
-	Variables.varDefine('ltier', tier == 1 and 1 or
-		tier == 2 and 2 or
-		tier == 3 and 3 or 4
-	)
 
 	-- Legacy notability vars
 	Variables.varDefine('tournament_notability_mod', args.notabilitymod or 1)
