@@ -85,7 +85,7 @@ end
 function CustomPlayer._getRoleData(key)
 	local role = _args[key]
 	if String.isEmpty(role) then
-		return
+		return {}
 	end
 
 	return ROLES[role:lower()] or {}
