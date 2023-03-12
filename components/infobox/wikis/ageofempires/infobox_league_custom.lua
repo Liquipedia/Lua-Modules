@@ -346,7 +346,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	local tierDisplay = Tier.display(
 		args.liquipediatier,
 		args.liquipediatiertype,
-		{link = true, game = args.game}
+		{link = true, game = GameLookup.getName{args.game}}
 	)
 
 	if String.isEmpty(tierDisplay) then
