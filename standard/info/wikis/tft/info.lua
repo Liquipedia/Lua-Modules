@@ -16,12 +16,12 @@ return {
 			name = 'Teamfight Tactics',
 			link = 'Teamfight Tactics',
 			logo = {
-				darkMode = 'Teamfight Tactics Default.png',
-				lightMode = 'Teamfight Tactics Default.png',
+				darkMode = 'Teamfight Tactics LOGO darkmode.png',
+				lightMode = 'Teamfight Tactics LOGO lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Teamfight Tactics Default.png',
-				lightMode = 'Teamfight Tactics Default.png',
+				darkMode = 'Teamfight Tactics Double Up darkmode.png',
+				lightMode = 'Teamfight Tactics Double Up lightmode.png',
 			},
 		},
 	},
