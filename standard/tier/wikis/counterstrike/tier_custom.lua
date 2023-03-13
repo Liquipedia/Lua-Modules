@@ -1,0 +1,55 @@
+---
+-- @Liquipedia
+-- wiki=counterstrike
+-- page=Module:Tier/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+
+local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
+
+local TierCustom = Table.copy(Tier)
+
+--- Parses queryData to be processable for other Tier functions
+--- overwritable on a per wiki basis if additional data needs to be passed
+---@param queryData table
+---@return string?, string?, table
+function TierCustom.parseFromQueryData(queryData)
+	return queryData.liquipediatier, queryData.liquipediatiertype, {onlyDisplayPrioritized = true}
+end
+
+--- Builds the display for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@param options table?
+---@return string?
+function TierCustom.display(tier, tierType, options)
+	local tierData, tierTypeData = Tier._raw(tier, tierType)
+
+	if not tierData then return end
+
+	options = options or {}
+
+	if not tierTypeData then
+		return Tier.displaySingle(tierData, Tier._displayOptions(options, 'tier'))
+	end
+
+	if options.onlyTierTypeIfBoth or (options.onlyDisplayPrioritized and tierTypeData.prioTierType) then
+		return Tier.displaySingle(tierTypeData, Tier._displayOptions(options, 'tierType'))
+	elseif options.onlyDisplayPrioritized then
+		return Tier.displaySingle(tierData, Tier._displayOptions(options, 'tier'))
+	end
+
+	if options.shortIfBoth then
+		options.short = true
+	end
+
+	return Tier.displaySingle(tierTypeData, Tier._displayOptions(options, 'tierType'))
+		.. NON_BREAKING_SPACE .. '(' .. Tier.displaySingle(tierData, Tier._displayOptions(options, 'tier')) .. ')'
+end
+
+return TierCustom
