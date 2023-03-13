@@ -7,10 +7,11 @@
 --
 
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
+
+local NON_BREAKING_SPACE = '&nbsp;'
 
 local TierCustom = Table.copy(Tier)
 
