@@ -15,14 +15,6 @@ local NON_BREAKING_SPACE = '&nbsp;'
 
 local TierCustom = Table.copy(Tier)
 
---- Parses queryData to be processable for other Tier functions
---- overwritable on a per wiki basis if additional data needs to be passed
----@param queryData table
----@return string?, string?, table
-function TierCustom.parseFromQueryData(queryData)
-	return queryData.liquipediatier, queryData.liquipediatiertype, {onlyDisplayPrioritized = true}
-end
-
 --- Builds the display for a given (tier, tierType) tuple
 ---@param tier integer
 ---@param tierType string?
