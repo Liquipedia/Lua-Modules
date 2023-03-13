@@ -29,7 +29,7 @@ local ROLES = {
 	talent = {category = 'Talent', value = 'Talent', type = 'talent'},
 	manager = {category = 'Manager', value = 'Manager', type = 'staff'},
 	producer = {category = 'Producer', value = 'Producer', type = 'talent'},
-	organizer = {category = 'Tournament Organizer', value = 'Organizer', type = 'staff'},
+	organizer = {category = 'Tournament Organizer', value = 'Tournament Organizer', type = 'staff'},
 	creator = {category = 'Content Creator', value = 'Content Creator', type = 'talent'},
 }
 ROLES['assistant coach'] = ROLES.coach
