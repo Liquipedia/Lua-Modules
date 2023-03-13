@@ -26,6 +26,6 @@ return {
 		},
 	},
 	defaultGame = 'tft',
-	defaultTeamLogo = 'Teamfight Tactics Default.png', ---@deprecated
-	defaultTeamLogoDark = 'Teamfight Tactics Default.png', ---@deprecated
+	defaultTeamLogo = 'Teamfight Tactics Double Up lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Teamfight Tactics Double Up darkmode.png', ---@deprecated
 }
