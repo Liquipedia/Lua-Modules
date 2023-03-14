@@ -234,7 +234,8 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	if String.isNotEmpty(args.restrictions) then
-		Array.append(categories, Array.map(CustomLeague.getRestrictions(args.restrictions), function(res) return res.link end))
+		Array.append(categories, Array.map(CustomLeague.getRestrictions(args.restrictions), 
+				function(res) return res.link end))
 	end
 	return categories
 end
@@ -358,7 +359,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.enddate_raw = Variables.varDefault('raw_edate', '')
 	lpdbData.extradata.shortname2 = args.shortname2
 
-	Table.iter.forEach(CustomLeague.getRestrictions(_args.restrictions), function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
+	Table.iter.forEach(CustomLeague.getRestrictions(_args.restrictions),
+		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
 
 	return lpdbData
 end
@@ -393,7 +395,8 @@ function CustomLeague.getRestrictions(restrictions)
 		return {}
 	end
 
-	return Array.map(mw.text.split(restrictions, ','), function(restriction) return RESTRICTIONS[mw.text.trim(restriction)] end)
+	return Array.map(mw.text.split(restrictions, ','),
+		function(restriction) return RESTRICTIONS[mw.text.trim(restriction)] end)
 end
 
 function CustomLeague.createRestrictionsCell(restrictions)
