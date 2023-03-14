@@ -40,17 +40,16 @@ return {
 			link = 'No Tier Tournaments',
 			category = 'No Tier Tournaments',
 		},
-
-		-- legacy??? to be replaced by `-1` ???
+		-- `-99` denotes tournament overview pages
 		[-99] = {
 			value = '-99',
 			sort = 'D1',
-			name = 'Undefined',
-			short = '?',
+			name = 'Multi game',
+			short = 'Multi',
 		},
 		-- legacy??? to be replaced by `-1` ???
 		[''] = {
-			value = '-99',
+			value = nil,
 			sort = 'D1',
 			name = 'Undefined',
 			short = '?',
