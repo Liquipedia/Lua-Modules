@@ -32,6 +32,7 @@ function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
 	_opponent_type = header.opponentType or Opponent.solo
 	CACHED_DATA.opponentType = _opponent_type
 	newArgs.type = {type = _opponent_type}
+	newArgs.syncPlayers = true
 
 	return newArgs
 end
