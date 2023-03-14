@@ -216,6 +216,7 @@ function HiddenInfoboxLeague._definePageVariables()
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
 	Variables.varDefine('featured', _args.featured or 'false')
+	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number or ''
 	local seriesNumberLength = string.len(seriesNumber)
