@@ -32,7 +32,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_date', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate', ''))
-	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername', ''))
 
 	--custom stuff
 	Variables.varDefine('headtohead', args.headtohead)
@@ -61,8 +60,8 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 		local prizepool = CustomHiddenDataBox.cleanPrizePool(args.prizepool) or queryResult.prizepool
 		local lpdbData = {
 			name = Variables.varDefault('tournament_name'),
-			tickername = Variables.varDefault('tournament_ticker_name'),
-			shortname = Variables.varDefault('tournament_shortname', Variables.varDefault('tournament_abbreviation')),
+			tickername = Variables.varDefault('tournament_tickername'),
+			shortname = Variables.varDefault('tournament_shortname'),
 			icon = Variables.varDefault('tournament_icon'),
 			icondark = Variables.varDefault('tournament_icon_dark'),
 			series = mw.ext.TeamLiquidIntegration.resolve_redirect(Variables.varDefault('tournament_series', '')),
