@@ -20,6 +20,8 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomAwardPrizePool = {}
 
+local IS_AWARD = true
+
 local HEADER_DATA = {}
 
 -- Template entry point
@@ -46,7 +48,7 @@ function CustomAwardPrizePool.run(frame)
 	HEADER_DATA.tournamentName = args['tournament name']
 	HEADER_DATA.resultName = args['custom-name']
 
-	return awardsPrizePool:build()
+	return awardsPrizePool:build(IS_AWARD)
 end
 
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
