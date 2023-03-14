@@ -549,6 +549,7 @@ function CustomLeague:defineCustomPageVariables()
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
+	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 	Variables.varDefine('featured', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number
@@ -613,7 +614,7 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
-	lpdbData.publishertier = Variables.varDefault('featured')
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier')
 
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 
