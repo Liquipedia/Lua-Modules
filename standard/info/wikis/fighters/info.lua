@@ -546,8 +546,8 @@ return {
 		},
 		ggxrdr2 = {
 			abbreviation = 'GG XRD R2',
-			name = 'GUILTY GEAR Xrd REV 2',
-			link = 'GUILTY GEAR Xrd REV 2',
+			name = 'Guilty Gear Xrd REV 2',
+			link = 'Guilty Gear Xrd REV 2',
 			logo = {
 				darkMode = 'GGXrdR2 Logo.png',
 				lightMode = 'GGXrdR2 Logo.png',
@@ -1316,12 +1316,12 @@ return {
 			name = 'Street Fighter 6',
 			link = 'Street Fighter 6',
 			logo = {
-				darkMode = 'SF6 default darkmode.png',
-				lightMode = 'SF6 default lightmode.png',
+				darkMode = 'SF6 Logo.png',
+				lightMode = 'SF6 Logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'SF6 default darkmode.png',
-				lightMode = 'SF6 default lightmode.png',
+				darkMode = 'SF6 Logo.png',
+				lightMode = 'SF6 Logo.png',
 			},
 		},
 		t4 = {
