@@ -358,7 +358,7 @@ function Series:_createOrganizers(args)
 	local organizers = {}
 
 	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
-		table.insert(organizers, self:createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
+		table.insert(organizers, self:_createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
 	end
 
 	return organizers
