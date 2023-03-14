@@ -209,7 +209,6 @@ function HiddenInfoboxLeague._definePageVariables()
 	--Legacy vars
 	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_tiertype', tierType)
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
