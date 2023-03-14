@@ -178,17 +178,16 @@ function CustomSeries._addCustomVariables()
 	else
 		--needed for e.g. External Cups Lists
 		local name = _args.name or _series.pagename
-		Variables.varDefine('featured', _args.featured or '')
+		Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 		Variables.varDefine('headtohead', _args.headtohead or '')
 		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
 		Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or '')
 		Variables.varDefine('tournament_mode', _args.mode or '1v1')
-		Variables.varDefine('tournament_ticker_name', _args.tickername or name)
+		Variables.varDefine('tournament_tickername', _args.tickername or name)
 		Variables.varDefine('tournament_shortname', _args.shortname or '')
 		Variables.varDefine('tournament_name', name)
 		Variables.varDefine('tournament_series', _series.pagename)
 		Variables.varDefine('tournament_parent', (_args.parent or _series.pagename):gsub(' ', '_'))
-		Variables.varDefine('tournament_abbreviation', _args.abbreviation or _args.shortname or '')
 		local game = _args.game
 		if game then
 			game = _GAMES[game] ~= nil and _GAMES[game][1] or game
@@ -209,7 +208,6 @@ function CustomSeries._setDateMatchVar(date, edate, sdate)
 	local endDate = CustomSeries._validDateOr(date, edate, sdate) or ''
 	local startDate = CustomSeries._validDateOr(date, sdate, edate) or ''
 
-	Variables.varDefine('date', endDate)
 	Variables.varDefine('tournament_enddate', endDate)
 	Variables.varDefine('tournament_startdate', startDate)
 end

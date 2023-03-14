@@ -206,16 +206,10 @@ function HiddenInfoboxLeague._definePageVariables()
 	Variables.varDefine('tournament_startdate', sdate)
 	Variables.varDefine('tournament_enddate', edate)
 
-	--Legacy vars
-	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_tiertype', tierType)
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
-	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
-
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
-	Variables.varDefine('featured', _args.featured or 'false')
+	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number or ''
 	local seriesNumberLength = string.len(seriesNumber)

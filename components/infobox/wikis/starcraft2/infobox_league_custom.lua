@@ -534,22 +534,13 @@ function CustomLeague:_makeBasedListFromArgs(prefix)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	--Legacy vars
-	local name = self.name
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
-	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
-
-	--Legacy tier(type) vars
-	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
-	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
-
 	--override var to standardize its entries
 	Variables.varDefine('tournament_game', CustomLeague._getGameStorage(_args.game))
 
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
-	Variables.varDefine('featured', tostring(Logic.readBool(_args.featured)))
+	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number
 	if Logic.isNumeric(seriesNumber) then
@@ -613,7 +604,7 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
-	lpdbData.publishertier = Variables.varDefault('featured')
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier')
 
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 
