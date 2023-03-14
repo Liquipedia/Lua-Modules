@@ -29,6 +29,7 @@ local pageVars = PageVariableNamespace('PrizePool')
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_POINTS = 'POINTS'
+local IS_AWARD = true
 
 local _lpdb_stash = {}
 local _series
@@ -61,7 +62,7 @@ function CustomPrizePool.run(frame)
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
-	local builtPrizePool = prizePool:build()
+	local builtPrizePool = prizePool:build(IS_AWARD)
 
 	if Logic.readBool(args.storelpdb) then
 		local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
