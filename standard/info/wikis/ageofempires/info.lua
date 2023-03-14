@@ -95,5 +95,4 @@ return {
 
 	defaultTeamLogo = 'Age of Empires Default Logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Age of Empires Default Logo.png', ---@deprecated
-	opponentLibrary = 'Opponent/Custom',
 }
