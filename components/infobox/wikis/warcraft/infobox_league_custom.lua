@@ -46,7 +46,7 @@ local GAME_DEFAULT_SWITCH_DATE = '2020-01-01'
 local GAMES = {
 	[GAME_REFORGED] = 'Reforged',
 	[GAME_FROZEN_THRONE] = 'The Frozen Throne',
-	[GAME_REIGN] = 'Reing of Chaos',
+	[GAME_REIGN] = 'Reign of Chaos',
 }
 
 local DUOS = '2v2'
