@@ -71,7 +71,7 @@ return {
 			short = 'Mon.',
 			category = 'Monthly Tournaments',
 		},
-		['bimonthly'] = {
+		bimonthly = {
 			value = 'Bimonthly',
 			sort = 'B3',
 			name = 'Bimonthly',
