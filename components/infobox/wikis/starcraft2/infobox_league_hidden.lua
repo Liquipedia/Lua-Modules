@@ -206,10 +206,6 @@ function HiddenInfoboxLeague._definePageVariables()
 	Variables.varDefine('tournament_startdate', sdate)
 	Variables.varDefine('tournament_enddate', edate)
 
-	--Legacy vars
-	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_tiertype', tierType)
-
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
