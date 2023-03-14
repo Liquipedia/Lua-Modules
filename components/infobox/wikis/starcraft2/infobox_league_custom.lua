@@ -534,10 +534,6 @@ function CustomLeague:_makeBasedListFromArgs(prefix)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	--Legacy tier(type) vars
-	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
-	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
-
 	--override var to standardize its entries
 	Variables.varDefine('tournament_game', CustomLeague._getGameStorage(_args.game))
 
