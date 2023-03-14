@@ -189,7 +189,6 @@ function CustomSeries._addCustomVariables()
 		Variables.varDefine('tournament_name', name)
 		Variables.varDefine('tournament_series', _series.pagename)
 		Variables.varDefine('tournament_parent', (_args.parent or _series.pagename):gsub(' ', '_'))
-		Variables.varDefine('tournament_abbreviation', _args.abbreviation or _args.shortname or '')
 		local game = _args.game
 		if game then
 			game = _GAMES[game] ~= nil and _GAMES[game][1] or game
