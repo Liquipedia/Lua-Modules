@@ -5,7 +5,7 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -13,6 +13,7 @@ local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Tier = mw.loadData('Module:Tier')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -84,6 +85,19 @@ local VALVE_TIERS = {
 	['rmr event'] = {meta = 'Regional Major Rankings evnt', name = 'RMR Event', link = 'Regional Major Rankings'},
 }
 
+local RESTRICTIONS = {
+	['female'] = {
+		name = 'Female Players Only',
+		link = 'Female Tournaments',
+		data = 'female',
+	},
+	['academy'] = {
+		name = 'Academy Teams Only',
+		link = 'Academy Tournaments',
+		data = 'academy',
+	}
+}
+
 local _DATE_TBA = 'tba'
 
 local _TIER_VALVE_MAJOR = 'major'
@@ -127,6 +141,10 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Players',
 		content = {_args.player_number}
+	})
+	table.insert(widgets, Cell{
+		name = 'Restrictions',
+		content = CustomLeague.createRestrictionsCell(_args.restrictions)
 	})
 
 	return widgets
@@ -215,6 +233,9 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'Valve Sponsored Tournaments')
 	end
 
+	if String.isNotEmpty(args.restrictions) then
+		Array.append(categories, Array.map(CustomLeague.getRestrictions(args.restrictions), function(res) return res.link end))
+	end
 	return categories
 end
 
@@ -337,6 +358,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.enddate_raw = Variables.varDefault('raw_edate', '')
 	lpdbData.extradata.shortname2 = args.shortname2
 
+	Table.iter.forEach(CustomLeague.getRestrictions(_args.restrictions), function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
+
 	return lpdbData
 end
 
@@ -363,6 +386,23 @@ end
 
 function CustomLeague.getGame()
 	return _args.game and GAMES[_args.game] or nil
+end
+
+function CustomLeague.getRestrictions(restrictions)
+	if String.isEmpty(restrictions) then
+		return {}
+	end
+
+	return Array.map(mw.text.split(restrictions, ','), function(restriction) return RESTRICTIONS[mw.text.trim(restriction)] end)
+end
+
+function CustomLeague.createRestrictionsCell(restrictions)
+	local restrictionData = CustomLeague.getRestrictions(restrictions)
+	if #restrictionData == 0 then
+		return nil
+	end
+
+	return Array.map(restrictionData, function(res) return League:createLink(res.link, res.name) end)
 end
 
 function CustomLeague:_createEslProTierCell(eslProTier)
