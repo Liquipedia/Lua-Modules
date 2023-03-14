@@ -499,7 +499,7 @@ function League:_createLocation(args)
 		local nationality = Flags.getLocalisation(country)
 
 		if String.isEmpty(nationality) then
-			self:categories('Unrecognised Country')
+			self.infobox:categories('Unrecognised Country')
 
 		else
 			local location = args['city' .. index] or args['location' .. index]
@@ -510,7 +510,7 @@ function League:_createLocation(args)
 			end
 
 			if self:shouldStore(args) then
-				self:categories(nationality .. ' Tournaments')
+				self.infobox:categories(nationality .. ' Tournaments')
 			end
 			table.insert(display, Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>')
 		end
