@@ -67,7 +67,7 @@ return {
 		},
 		weekly = {
 			value = 'Weekly',
-			sort = 'A5',
+			sort = 'A6',
 			name = 'Weekly',
 			short = 'Week.',
 			link = 'Weekly Tournaments',
