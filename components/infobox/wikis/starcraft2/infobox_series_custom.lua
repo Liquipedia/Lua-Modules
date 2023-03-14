@@ -178,7 +178,6 @@ function CustomSeries._addCustomVariables()
 	else
 		--needed for e.g. External Cups Lists
 		local name = _args.name or _series.pagename
-		Variables.varDefine('featured', _args.featured or '')
 		Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 		Variables.varDefine('headtohead', _args.headtohead or '')
 		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
