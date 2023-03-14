@@ -209,7 +209,6 @@ function CustomSeries._setDateMatchVar(date, edate, sdate)
 	local endDate = CustomSeries._validDateOr(date, edate, sdate) or ''
 	local startDate = CustomSeries._validDateOr(date, sdate, edate) or ''
 
-	Variables.varDefine('date', endDate)
 	Variables.varDefine('tournament_enddate', endDate)
 	Variables.varDefine('tournament_startdate', startDate)
 end
