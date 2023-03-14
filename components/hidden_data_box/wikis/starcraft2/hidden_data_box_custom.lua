@@ -26,13 +26,6 @@ end
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	queryResult.extradata = queryResult.extradata or {}
 
-	--legacy variables
-	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
-	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
-	Variables.varDefine('tournament_date', Variables.varDefault('tournament_enddate', ''))
-	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate', ''))
-	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate', ''))
-
 	--custom stuff
 	Variables.varDefine('headtohead', args.headtohead)
 	args.featured = args.featured or args.publishertier
