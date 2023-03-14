@@ -534,10 +534,6 @@ function CustomLeague:_makeBasedListFromArgs(prefix)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	--Legacy vars
-	local name = self.name
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
-
 	--Legacy tier(type) vars
 	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
