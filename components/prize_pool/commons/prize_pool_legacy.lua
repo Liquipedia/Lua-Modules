@@ -47,8 +47,10 @@ function LegacyPrizePool.run(dependency)
 
 	local newArgs = {}
 
-	-- disable import legacy prize pools
+	-- disable import in legacy prize pools
 	newArgs.import = false
+	-- disable syncPlayers in legacy prize pools
+	newArgs.syncPlayers = false
 
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
 	newArgs.cutafter = header.cutafter

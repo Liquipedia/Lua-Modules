@@ -112,7 +112,7 @@ BasePrizePool.config = {
 		end
 	},
 	syncPlayers = {
-		default = false,
+		default = true,
 		read = function(args)
 			return Logic.readBoolOrNil(args.syncPlayers)
 		end
