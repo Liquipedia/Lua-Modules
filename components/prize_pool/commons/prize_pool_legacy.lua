@@ -70,7 +70,7 @@ function LegacyPrizePool.run(dependency)
 	LegacyPrizePool.assignType(newArgs, header.points2, 'points2')
 	LegacyPrizePool.assignType(newArgs, header.points3, 'points3')
 
-	if header.indiv then
+	if header.indiv or (Logic.readBool(header.award) and not Logic.readBool(header.team)) then
 		newArgs.type = {type = Opponent.solo}
 		IS_SOLO = true
 	else
