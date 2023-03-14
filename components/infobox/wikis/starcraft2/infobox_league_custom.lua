@@ -541,7 +541,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
 	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
-	Variables.varDefine('featured', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number
 	if Logic.isNumeric(seriesNumber) then
