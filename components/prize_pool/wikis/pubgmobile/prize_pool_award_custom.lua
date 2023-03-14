@@ -14,6 +14,8 @@ local AwardPrizePool = Lua.import('Module:PrizePool/Award', {requireDevIfEnabled
 
 local CustomAwardPrizePool = {}
 
+local IS_AWARD = true
+
 -- Template entry point
 function CustomAwardPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
@@ -24,7 +26,7 @@ function CustomAwardPrizePool.run(frame)
 	awardsPrizePool:setConfigDefault('prizeSummary', false)
 	awardsPrizePool:setConfigDefault('syncPlayers', true)
 
-	return awardsPrizePool:create():build()
+	return awardsPrizePool:create():build(IS_AWARD)
 end
 
 return CustomAwardPrizePool
