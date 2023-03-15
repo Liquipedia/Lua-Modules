@@ -24,12 +24,12 @@ local CustomBuilding = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local ICONICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local ICONICON_GAS = mw.loadData('Module:Gas')
-local ICONICON_TIME = mw.loadData('Module:Buildtime')
-local ICONICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
-local ICONICON_SHIELDS = '[[File:IconICON_SHIELDS.png|link=Plasma Shield]]'
-local ICONICON_ARMOR = '[[File:IconICON_ARMOR.png|link=Armor]]'
+local ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
+local ICON_GAS = mw.loadData('Module:Gas')
+local ICON_TIME = mw.loadData('Module:Buildtime')
+local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
+local ICON_SHIELDS = '[[File:IconICON_SHIELDS.png|link=Plasma Shield]]'
+local ICON_ARMOR = '[[File:IconICON_ARMOR.png|link=Armor]]'
 local LOTV = 'lotv'
 
 local _args
