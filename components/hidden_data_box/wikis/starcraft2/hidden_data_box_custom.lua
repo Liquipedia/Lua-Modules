@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
@@ -16,6 +17,7 @@ local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
 	args = args or {}
+	args.game = Game.name{game = args.game}
 	args.participantGrabber = false
 
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables

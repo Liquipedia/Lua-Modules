@@ -8,6 +8,7 @@
 
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -25,20 +26,11 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 
-local _TODAY = os.date('%Y-%m-%d', os.time())
+local GAME_MOD = 'mod'
+local GAME_LOTV = Game.name{game = 'lotv'}
+local TODAY = os.date('%Y-%m-%d', os.time())
 local _TIER_MODE_TYPES = 'types'
 local _TIER_MODE_TIERS = 'tiers'
-local _GAME_WOL = 'wol'
-local _GAME_HOTS = 'hots'
-local _GAME_LOTV = 'lotv'
-local _GAME_MOD = 'mod'
-
-local _GAMES = {
-	[_GAME_WOL] = {'Wings of Liberty', 'WoL'},
-	[_GAME_HOTS] = {'Heart of the Swarm', 'HotS'},
-	[_GAME_LOTV] = {'Legacy of the Void', 'LotV'},
-	[_GAME_MOD] = {'mod', 'mod'}
-}
 
 local CustomInjector = Class.new(Injector)
 
@@ -51,6 +43,8 @@ function CustomSeries.run(frame)
 	local series = Series(frame)
 	_args = series.args
 	_series = series
+
+	_args.game = _args.game == GAME_MOD and GAME_MOD or Game.name{game = _args.game}
 
 	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
 	_args.liquipediatier = _args.liquipediatier or _args.tier
@@ -68,7 +62,7 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Game version',
 		content = {
-			CustomSeries._getGameVersion(string.lower(_args.game or ''), _args.patch)
+			CustomSeries._getGameVersion(_args.game, _args.patch)
 		}
 	})
 	table.insert(widgets, Cell{
@@ -122,50 +116,46 @@ function CustomSeries._getGameVersion(game, patch)
 	local startDate = _args.sdate
 	local endDate = _args.edate
 
-	if String.isNotEmpty(game) or String.isNotEmpty(patch) then
-		local gameVersion
-		if game == _GAME_MOD then
-			gameVersion = modName or 'Mod'
-		elseif _GAMES[game] then
-			gameVersion = '[[' .. _GAMES[game][1] .. ']]' ..
-				'[[Category:' .. betaPrefix .. _GAMES[game][2] .. ' Competitions]]'
-		else
-			gameVersion = '[[Category:' .. betaPrefix .. 'Competitions]]'
-		end
-
-		if game == _GAME_LOTV and shouldUseAutoPatch then
-			if String.isEmpty(patch) then
-				patch = 'Patch ' .. (Autopatch._main({CustomSeries._retrievePatchDate(startDate)}) or '')
-			end
-			if String.isEmpty(endPatch) then
-				endPatch = 'Patch ' .. (Autopatch._main({CustomSeries._retrievePatchDate(endDate)}) or '')
-			end
-		elseif String.isEmpty(endPatch) then
-			endPatch = patch
-		end
-
-		local patchDisplay = betaPrefix
-
-		if String.isNotEmpty(patch) then
-			patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
-			if patch ~= endPatch then
-				patchDisplay = patchDisplay .. ' &ndash; [[' .. endPatch .. ']]'
-			end
-		end
-
-		--set patch variables
-		Variables.varDefine('patch', patch)
-		Variables.varDefine('epatch', endPatch)
-
-		return gameVersion .. patchDisplay
+	local gameVersion
+	if game == GAME_MOD then
+		gameVersion = modName or 'Mod'
+	else
+		gameVersion = '[[' .. game .. ']]' ..
+			'[[Category:' .. betaPrefix .. Game.abbreviation{game = game} .. ' Competitions]]'
 	end
+
+	if game == GAME_LOTV and shouldUseAutoPatch then
+		if String.isEmpty(patch) then
+			patch = 'Patch ' .. (Autopatch._main({CustomSeries._retrievePatchDate(startDate)}) or '')
+		end
+		if String.isEmpty(endPatch) then
+			endPatch = 'Patch ' .. (Autopatch._main({CustomSeries._retrievePatchDate(endDate)}) or '')
+		end
+	elseif String.isEmpty(endPatch) then
+		endPatch = patch
+	end
+
+	local patchDisplay = betaPrefix
+
+	if String.isNotEmpty(patch) then
+		patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
+		if patch ~= endPatch then
+			patchDisplay = patchDisplay .. ' &ndash; [[' .. endPatch .. ']]'
+		end
+	end
+
+	--set patch variables
+	Variables.varDefine('patch', patch)
+	Variables.varDefine('epatch', endPatch)
+
+	return gameVersion .. patchDisplay
 end
 
 function CustomSeries._retrievePatchDate(dateEntry)
 	return String.isNotEmpty(dateEntry)
 		and dateEntry:lower() ~= 'tbd'
 		and dateEntry:lower() ~= 'tba'
-		and dateEntry or _TODAY
+		and dateEntry or TODAY
 end
 
 function CustomSeries._addCustomVariables()
@@ -188,11 +178,7 @@ function CustomSeries._addCustomVariables()
 		Variables.varDefine('tournament_name', name)
 		Variables.varDefine('tournament_series', _series.pagename)
 		Variables.varDefine('tournament_parent', (_args.parent or _series.pagename):gsub(' ', '_'))
-		local game = _args.game
-		if game then
-			game = _GAMES[game] ~= nil and _GAMES[game][1] or game
-		end
-		Variables.varDefine('tournament_game', game or '')
+		Variables.varDefine('tournament_game', _args.game)
 		Variables.varDefine('tournament_type', _args.type or '')
 		CustomSeries._setDateMatchVar(_args.date, _args.edate, _args.sdate)
 	end
