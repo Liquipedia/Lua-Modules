@@ -43,7 +43,7 @@ function String.split(inputstr, sep)
 	end
 end
 
---- need to escape .()[]+-% with % for 'match'
+--- need to escape `.()[]+-%` with % for 'match'
 ---@param str string
 ---@param match string
 ---@return boolean
@@ -51,10 +51,14 @@ function String.contains(str, match)
 	return string.find(str, match) ~= nil
 end
 
+--- Trims a string from tabs (`\t`), new lines (`\n`), carriage returns (`\r`),
+--- form feeds (`\f`), whitespaces (` `) and non-breaking spaces (`&nbsp;`)
 ---@param str string
 ---@return string
 function String.trim(str)
-	return (str:gsub('^%s*(.-)%s*$', '%1'))
+	-- `\t\r\n\f ` is the default charset
+	-- `\194\160` is the non-breaking space (&nsbp;)
+	return mw.text.trim(str, "\t\r\n\f \194\160")
 end
 
 ---@param str string?

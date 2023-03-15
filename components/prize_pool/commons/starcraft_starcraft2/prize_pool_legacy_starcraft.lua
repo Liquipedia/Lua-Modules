@@ -17,8 +17,8 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
+local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom', {requireDevIfEnabled = true})
 local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
-local OldStarcraftPrizePool = Lua.import('Module:PrizePool/Starcraft/next', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
@@ -37,10 +37,6 @@ local CACHED_DATA = {
 function StarcraftLegacyPrizePool.run(frame)
 	local args = Template.retrieveReturnValues('PrizePool')
 	local header = Array.sub(args, 1, 1)[1]
-
-	if Logic.readBool(header.award) then
-		return OldStarcraftPrizePool.PrizePoolEnd(args)
-	end
 
 	local slots = Array.sub(args, 2)
 
@@ -79,18 +75,22 @@ function StarcraftLegacyPrizePool.run(frame)
 	newArgs.tier = header.tier
 	newArgs['tournament name'] = header['tournament name']
 
-	-- import settings
-	newArgs.importLimit = header.importLimit
-	for key, tournament in Table.iter.pairsByPrefix(header, 'tournament', {requireIndex = false}) do
-		newArgs[key] = tournament
+	-- import settings if not award
+	if not Logic.readBool(header.award) then
+		newArgs.importLimit = header.importLimit
+		header.tournament1 = header.tournament1 or header.tournament
+		for key, tournament in Table.iter.pairsByPrefix(header, 'tournament') do
+			newArgs[key] = tournament
+		end
+		header.matchGroupId1 = header.matchGroupId1 or header.matchGroupId
+		for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId') do
+			newArgs[key] = matchGroupId
+		end
+		if header.lpdb and header.lpdb ~= 'auto' then
+			newArgs.import = header.lpdb
+		end
+		newArgs.import = StarcraftLegacyPrizePool._enableImport(newArgs)
 	end
-	for key, matchGroupId in Table.iter.pairsByPrefix(header, 'matchGroupId', {requireIndex = false}) do
-		newArgs[key] = matchGroupId
-	end
-	if header.lpdb and header.lpdb ~= 'auto' then
-		newArgs.import = header.lpdb
-	end
-	newArgs.import = StarcraftLegacyPrizePool._enableImport(newArgs)
 
 	local newSlotIndex = 0
 	local currentPlace
@@ -149,6 +149,10 @@ function StarcraftLegacyPrizePool.run(frame)
 		newArgs['freetext' .. CACHED_DATA.plainTextSeedsIndex] = 'Seed'
 	end
 
+	if Logic.readBool(header.award) then
+		return CustomAwardPrizePool.run(newArgs)
+	end
+
 	return CustomPrizePool.run(newArgs)
 end
 
@@ -188,15 +192,17 @@ function StarcraftLegacyPrizePool._enableImport(args)
 end
 
 function StarcraftLegacyPrizePool._mapSlot(slot)
-	if not slot.place then
+	if not slot.place and not slot.award then
 		return {}
 	end
 
 	local newData = {}
-	if SPECIAL_PLACES[slot.place:lower()] then
+	if slot.place and SPECIAL_PLACES[slot.place:lower()] then
 		newData[SPECIAL_PLACES[slot.place:lower()]] = true
-	else
+	elseif slot.place then
 		newData.place = slot.place
+	else
+		newData.award = slot.award
 	end
 
 	newData.date = slot.date
@@ -218,7 +224,8 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 
 	if newData[BASE_CURRENCY_PRIZE] then
 		if newData[BASE_CURRENCY_PRIZE]:match('[^,%.%d]') then
-			error('Unexpected value in ' .. newData[BASE_CURRENCY_PRIZE] .. ' for place=' .. slot.place)
+			error('Unexpected value in ' .. newData[BASE_CURRENCY_PRIZE] .. ' for '
+				.. (slot.place and ('place=' .. slot.place) or ('award=' .. slot.award)))
 		end
 	end
 
@@ -234,6 +241,7 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 		opponents = opponents,
 		opponentsInSlot = opponentsInSlot,
 		place = newData.place,
+		award = newData.award,
 	}
 
 	for _, item in pairs(SPECIAL_PLACES) do

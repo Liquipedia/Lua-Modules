@@ -355,23 +355,10 @@ function Series:_createLink(id, name, link, desc)
 end
 
 function Series:_createOrganizers(args)
-	local organizers = {
-		Series:_createLink(
-			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
-	}
+	local organizers = {}
 
-	local index = 2
-
-	while not String.isEmpty(args['organizer' .. index]) do
-		table.insert(
-			organizers,
-			Series:_createLink(
-				args['organizer' .. index],
-				args['organizer' .. index .. '-name'],
-				args['organizer' .. index .. '-link'],
-				args['organizerref' .. index])
-		)
-		index = index + 1
+	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
+		table.insert(organizers, self:_createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
 	end
 
 	return organizers
@@ -384,7 +371,7 @@ function Series:_setCountryCategories(country)
 
 	local countryAdjective = Flags.getLocalisation(country)
 	if not countryAdjective then
-		return 'Unrecognised Country||' .. country
+		return 'Unrecognised Country'
 	end
 
 	return countryAdjective .. ' Tournaments'
