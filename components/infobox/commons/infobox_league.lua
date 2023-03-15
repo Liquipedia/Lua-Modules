@@ -492,35 +492,30 @@ function League:_createLocation(args)
 		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/TBD')
 	end
 
-	local index = 1
-	local content = ''
-	local current = args['country']
-	local currentLocation = args['city'] or args['location']
+	local display = {}
+	args.city1 = args.city1 or args.location1 or args.city or args.location
 
-	while not String.isEmpty(current) do
-		local nationality = Flags.getLocalisation(current)
+	for _, country, index in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
+		local nationality = Flags.getLocalisation(country)
 
 		if String.isEmpty(nationality) then
-			content = content .. '[[Category:Unrecognised Country|' .. current .. ']]'
+			self.infobox:categories('Unrecognised Country')
 
 		else
-			local countryName = Flags.CountryName(current)
-			local displayText = currentLocation or countryName
-			if displayText == '' then
-				displayText = current
+			local location = args['city' .. index] or args['location' .. index]
+			local countryName = Flags.CountryName(country)
+			local displayText = location or countryName
+			if String.isEmpty(displayText) then
+				displayText = country
 			end
 
 			if self:shouldStore(args) then
-				content = content .. '[[Category:' .. nationality .. ' Tournaments]]'
+				self.infobox:categories(nationality .. ' Tournaments')
 			end
-			content = content .. Flags.Icon{flag = current, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>'
+			table.insert(display, Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>')
 		end
-
-		index = index + 1
-		current = args['country' .. index]
-		currentLocation = args['city' .. index] or args['location' .. index]
 	end
-	return content
+	return table.concat(display)
 end
 
 function League:_createSeries(options, series, abbreviation, icon, iconDark)
@@ -617,23 +612,10 @@ function League:createLink(id, name, link, desc)
 end
 
 function League:_createOrganizers(args)
-	local organizers = {
-		self:createLink(
-			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
-	}
+	local organizers = {}
 
-	local index = 2
-
-	while not String.isEmpty(args['organizer' .. index]) do
-		table.insert(
-			organizers,
-			self:createLink(
-				args['organizer' .. index],
-				args['organizer' .. index .. '-name'],
-				args['organizer' .. index .. '-link'],
-				args['organizerref' .. index])
-		)
-		index = index + 1
+	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
+		table.insert(organizers, self:createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
 	end
 
 	return organizers

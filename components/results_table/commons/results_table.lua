@@ -64,7 +64,7 @@ function ResultsTable:buildRow(placement)
 	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
 
 	if self.config.displayGameIcons then
-		row:tag('th'):node(Game.icon{game = placement.game})
+		row:tag('td'):node(Game.icon{game = placement.game})
 	end
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)

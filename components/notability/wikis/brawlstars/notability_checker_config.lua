@@ -16,8 +16,8 @@ Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
 Config.TIER_TYPE_MISC = 'misc'
 Config.TIER_TYPE_SHOW_MATCH = 'show match'
-Config.MAX_NUMBER_OF_PARTICIPANTS = 10
-Config.MAX_NUMBER_OF_COACHES = 2
+Config.MAX_NUMBER_OF_PARTICIPANTS = 5
+Config.MAX_NUMBER_OF_COACHES = 3
 
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 5000

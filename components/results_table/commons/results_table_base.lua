@@ -12,11 +12,10 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -49,6 +48,8 @@ local VALID_QUERY_TYPES = {
 }
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 local DEFAULT_RESULTS_SUB_PAGE = 'Results'
+local INVALID_TIER_DISPLAY = 'Undefined'
+local INVALID_TIER_SORT = 'ZZ'
 
 --- @class BaseResultsTable
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
@@ -390,22 +391,15 @@ end
 
 -- overwritable
 function BaseResultsTable:tierDisplay(placement)
-	local tierDisplay
+	local tier, tierType, options = Tier.parseFromQueryData(placement)
+	options.link = true
+	options.onlyTierTypeIfBoth = true
 
-	if String.isEmpty(placement.liquipediatiertype) and String.isEmpty(placement.liquipediatier) then
-		return '', ''
-	elseif String.isNotEmpty(placement.liquipediatiertype) then
-		local tierType = placement.liquipediatiertype:lower()
-		tierDisplay = Tier.text.types[tierType] or placement.liquipediatiertype
-	else
-		tierDisplay = Tier.text.tiers[placement.liquipediatier] or placement.liquipediatier
+	if not Tier.isValid(tier, tierType) then
+		return INVALID_TIER_DISPLAY, INVALID_TIER_SORT
 	end
 
-	return Page.makeInternalLink(
-		{},
-		tierDisplay,
-		tierDisplay .. ' Tournaments'
-	), tierDisplay
+	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
 -- overwritable

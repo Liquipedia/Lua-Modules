@@ -54,15 +54,14 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	)))
 	lpdbData.opponentplayers = lpdbData.players -- Until this is included in Opponent
 
-	-- Name must match prize pool insertion
-	local storageName = Custom.getLpdbObjectName and Custom.getLpdbObjectName(team, lpdbPrefix)
-						or TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
-
-	mw.ext.LiquipediaDB.lpdb_placement(storageName, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)
 end
 
 -- Adds basic lpdb fields
 function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix)
+	-- Name must match prize pool insertion
+	lpdbData.objectName = TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
+
 	local title = mw.title.getCurrentTitle().text
 	local tournamentName = Variables.varDefault('tournament name pp') or Variables.varDefault('tournament_name')
 	local date = Variables.varDefault('tournament_date')
