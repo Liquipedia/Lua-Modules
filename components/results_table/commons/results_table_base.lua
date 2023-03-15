@@ -393,6 +393,7 @@ end
 function BaseResultsTable:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
 	options.link = true
+	options.onlyTierTypeIfBoth = true
 
 	if not Tier.isValid(tier, tierType) then
 		return INVALID_TIER_DISPLAY, INVALID_TIER_SORT
