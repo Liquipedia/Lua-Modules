@@ -61,7 +61,7 @@ function Tier.displaySingle(data, options)
 
 	if Logic.readBool(options.link) and data.link then
 		return Page.makeInternalLink({}, display, TierCustom.adjustLink(data.link, options.mode))
-	elseif String.isNotEmpty(options.link) then
+	elseif Logic.readBoolOrNil(options.link) == nil and String.isNotEmpty(options.link) then
 		return Page.makeInternalLink({}, display, options.link)
 	end
 
