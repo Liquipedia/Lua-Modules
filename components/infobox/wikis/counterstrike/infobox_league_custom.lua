@@ -235,7 +235,7 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	if String.isNotEmpty(args.restrictions) then
-		Array.append(categories, Array.map(CustomLeague.getRestrictions(args.restrictions),
+		Array.extendWith(categories, Array.map(CustomLeague.getRestrictions(args.restrictions),
 				function(res) return res.link end))
 	end
 	return categories
