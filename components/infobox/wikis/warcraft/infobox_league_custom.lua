@@ -88,6 +88,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
+	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
