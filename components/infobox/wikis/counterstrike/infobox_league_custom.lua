@@ -403,7 +403,7 @@ end
 function CustomLeague.createRestrictionsCell(restrictions)
 	local restrictionData = CustomLeague.getRestrictions(restrictions)
 	if #restrictionData == 0 then
-		return nil
+		return
 	end
 
 	return Array.map(restrictionData, function(res) return League:createLink(res.link, res.name) end)
