@@ -17,7 +17,7 @@ local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
 	args = args or {}
-	args.game = Game.name{game = _args.game}
+	args.game = Game.name{game = args.game}
 	args.participantGrabber = false
 
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
