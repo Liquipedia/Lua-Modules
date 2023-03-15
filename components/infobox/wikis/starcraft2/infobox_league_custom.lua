@@ -587,4 +587,8 @@ function CustomLeague._getGameStorage(gameInput)
 	return (GAMES[string.lower(gameInput or '')] or {})[1] or GAMES[GAME_WOL][1]
 end
 
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args.featured)
+end
+
 return CustomLeague
