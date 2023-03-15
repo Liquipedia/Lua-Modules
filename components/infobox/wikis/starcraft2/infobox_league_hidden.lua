@@ -144,13 +144,14 @@ function HiddenInfoboxLeague.getTierCategories()
 	local tierType = _args.liquipediatiertype
 
 	local tierCategory, tierTypeCategory = Tier.toCategory(tier, tierType)
+	local isValidTierTuple = Tier.isValid(tier, tierType)
 
-	if not tierCategory and String.isNotEmpty(tier) then
+	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid Tier')
 	elseif tierCategory then
 		mw.ext.TeamLiquidIntegration.add_category(tierCategory)
 	end
-	if not tierTypeCategory and String.isNotEmpty(tierType) then
+	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
 		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid Tiertype')
 	elseif tierTypeCategory then
 		mw.ext.TeamLiquidIntegration.add_category(tierTypeCategory)
