@@ -535,7 +535,7 @@ end
 function CustomLeague:defineCustomPageVariables()
 	--override var to standardize its entries
 	Variables.varDefine('tournament_game', _args.game)
-	
+
 	--patch data
 	CustomLeague._setPatchData()
 	Variables.varDefine('patch', _args.patch)
