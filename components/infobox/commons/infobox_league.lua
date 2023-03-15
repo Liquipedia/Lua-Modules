@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -248,7 +249,7 @@ function League:createInfobox()
 	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if self:shouldStore(args) then
-		self.infobox:categories(unpack(self:getCategories(args)))
+		self.infobox:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, links)
 		self:_setSeoTags(args)
 	end
@@ -256,34 +257,46 @@ function League:createInfobox()
 	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
 end
 
---- Allows for overriding this functionality
-function League:getCategories(args)
-	self.infobox:categories('Tournaments')
+function League:_getCategories(args)
+	local categories = {'Tournaments'}
+	Array.extendWith(categories, self:addTeamIndivCategory(args))
+	Array.extendWith(categories, self:addTierCategories(args))
+
+	return Array.extend(categories, self:getWikiCategories(args))
+end
+
+function League:addTeamIndivCategory(args)
+	local categories = {}
 	if not String.isEmpty(args.team_number) then
-		self.infobox:categories('Team Tournaments')
+		table.insert(categories, 'Team Tournaments')
 	end
 	if String.isNotEmpty(args.player_number) or String.isNotEmpty(args.individual) then
-		self.infobox:categories('Individual Tournaments')
+		table.insert(categories, 'Individual Tournaments')
 	end
 
+	return categories
+end
+
+function League:addTierCategories(args)
+	local categories = {}
 	local tier = args.liquipediatier
 	local tierType = args.liquipediatiertype
 
 	local tierCategory, tierTypeCategory = Tier.toCategory(tier, tierType)
 	local isValidTierTuple = Tier.isValid(tier, tierType)
-	self.infobox:categories(tierCategory)
-	self.infobox:categories(tierTypeCategory)
+	table.insert(categories, tierCategory)
+	table.insert(categories, tierTypeCategory)
 
 	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
-		self.infobox:categories('Pages with invalid Tier')
+		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
-		self.infobox:categories('Pages with invalid Tiertype')
+		table.insert(categories, 'Pages with invalid Tiertype')
 	end
 
-	return self:getWikiCategories(args)
+	return categories
 end
 
 --- Allows for overriding this functionality
