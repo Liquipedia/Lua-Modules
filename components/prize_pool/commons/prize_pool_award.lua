@@ -93,6 +93,10 @@ function AwardPrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 	if lpdbEntry.opponenttype == Opponent.team then
 		return objectName .. '_' .. mw.ustring.lower(lpdbEntry.participant)
 	end
+
+	-- append award so that we can have players getting several awards
+	objectName = objectName .. '_' .. lpdbEntry.extradata.award
+
 	-- for non team opponents the pagename can be case sensitive
 	-- so objectname needs to be case sensitive to avoid edge cases
 	return objectName .. prizePoolIndex .. '_' .. lpdbEntry.participant
