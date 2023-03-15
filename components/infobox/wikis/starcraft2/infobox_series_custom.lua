@@ -121,7 +121,7 @@ function CustomSeries._getGameVersion(game, patch)
 		gameVersion = modName or 'Mod'
 	else
 		gameVersion = '[[' .. game .. ']]' ..
-			'[[Category:' .. betaPrefix .. (Game.abbreviation{game = game, useDefault = false} or game) .. ' Competitions]]'
+			'[[Category:' .. betaPrefix .. Game.abbreviation{game = game} .. ' Competitions]]'
 	end
 
 	if game == GAME_LOTV and shouldUseAutoPatch then
