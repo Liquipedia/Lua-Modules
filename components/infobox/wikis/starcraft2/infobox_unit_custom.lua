@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
+local Game = require('Module:Game')
 local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -24,13 +25,14 @@ local CustomUnit = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local _ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local _ICON_GAS = mw.loadData('Module:Gas')
-local _ICON_TIME = mw.loadData('Module:Buildtime')
-local _ICON_SUPPLY = mw.loadData('Module:Supply')
-local _ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
-local _ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
-local _ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
+local ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
+local ICON_GAS = mw.loadData('Module:Gas')
+local ICON_TIME = mw.loadData('Module:Buildtime')
+local ICON_SUPPLY = mw.loadData('Module:Supply')
+local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
+local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
+local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
+local LOTV = 'lotv'
 
 local _args
 local _race
@@ -38,6 +40,9 @@ local _race
 function CustomUnit.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
+
+	_args.game = Game.name{game = _args.game}
+
 	unit.nameDisplay = CustomUnit.nameDisplay
 	unit.setLpdbData = CustomUnit.setLpdbData
 	unit.createWidgetInjector = CustomUnit.createWidgetInjector
@@ -63,7 +68,7 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Weak against', content = {String.convertWikiListToHtmlList(_args.weak)}},
 	}
 
-	if _args.game ~= 'lotv' and _args.buildtime then
+	if _args.game ~= Game.name{game = LOTV} and _args.buildtime then
 		table.insert(widgets, Center{content = {
 			'<small><b>Note:</b> ' ..
 			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
@@ -117,11 +122,11 @@ function CustomUnit:createWidgetInjector()
 end
 
 function CustomUnit:_defenseDisplay()
-	local display = _ICON_HP .. ' ' .. (_args.hp or 0)
+	local display = ICON_HP .. ' ' .. (_args.hp or 0)
 	if _args.shield then
-		display = display .. ' ' .. _ICON_SHIELDS .. ' ' .. _args.shield
+		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. _args.shield
 	end
-	display = display .. ' ' .. _ICON_ARMOR .. ' ' .. (_args.armor or 1)
+	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (_args.armor or 1)
 
 	return display
 end
@@ -149,21 +154,21 @@ end
 
 function CustomUnit:_getCostDisplay()
 	local minerals = _args.min or 0
-	minerals = _ICON_MINERALS .. '&nbsp;' .. minerals
+	minerals = ICON_MINERALS .. '&nbsp;' .. minerals
 
 	local gas = _args.gas or 0
-	gas = (_ICON_GAS[_race] or _ICON_GAS['default']) .. '&nbsp;' .. gas
+	gas = (ICON_GAS[_race] or ICON_GAS['default']) .. '&nbsp;' .. gas
 
 	local buildtime = _args.buildtime
 	if not String.isEmpty(buildtime) then
-		buildtime = '&nbsp;' .. (_ICON_TIME[_race] or _ICON_TIME['default']) .. '&nbsp;' .. buildtime
+		buildtime = '&nbsp;' .. (ICON_TIME[_race] or ICON_TIME['default']) .. '&nbsp;' .. buildtime
 	else
 		buildtime = ''
 	end
 
 	local supply = _args.supply or _args.psy or _args.control
 	if not String.isEmpty(supply) then
-		supply = '&nbsp;' .. (_ICON_SUPPLY[_race] or _ICON_SUPPLY['default']) .. '&nbsp;' .. supply
+		supply = '&nbsp;' .. (ICON_SUPPLY[_race] or ICON_SUPPLY['default']) .. '&nbsp;' .. supply
 	else
 		supply = ''
 	end
