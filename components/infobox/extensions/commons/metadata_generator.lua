@@ -14,7 +14,7 @@ local Variables = require('Module:Variables')
 local StringUtils = require('Module:StringUtils')
 local Class = require('Module:Class')
 local AnOrA = require('Module:A or an')
-local Tier = mw.loadData('Module:Tier/Utils')
+local Tier = require('Module:Tier/Utils')
 local Table = require('Module:Table')
 
 local MetadataGenerator = {}
