@@ -30,7 +30,7 @@ local ICON_TIME = mw.loadData('Module:Buildtime')
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
 local ICON_SHIELDS = '[[File:IconICON_SHIELDS.png|link=Plasma Shield]]'
 local ICON_ARMOR = '[[File:IconICON_ARMOR.png|link=Armor]]'
-local LOTV = 'lotv'
+local GAME_LOTV = Game.name{game = 'lotv'}
 
 local _args
 local _race
@@ -54,7 +54,7 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{name = 'Energy', content = {_args.energy}})
 	table.insert(widgets, Cell{name = 'Detection/Attack Range', content = {_args.detection_range}})
 
-	if _args.game ~= Game.name{game = LOTV} then
+	if _args.game ~= GAME_LOTV then
 		table.insert(widgets, Center{content = {
 			'<small><b>Note:</b> ' ..
 			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
