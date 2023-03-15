@@ -32,7 +32,7 @@ local ICON_SUPPLY = mw.loadData('Module:Supply')
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
 local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
-local LOTV = 'lotv'
+local GAME_LOTV = Game.name{game = 'lotv'}
 
 local _args
 local _race
@@ -68,7 +68,7 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Weak against', content = {String.convertWikiListToHtmlList(_args.weak)}},
 	}
 
-	if _args.game ~= Game.name{game = LOTV} and _args.buildtime then
+	if _args.game ~= GAME_LOTV and _args.buildtime then
 		table.insert(widgets, Center{content = {
 			'<small><b>Note:</b> ' ..
 			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
