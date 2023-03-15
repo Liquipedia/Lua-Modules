@@ -345,14 +345,15 @@ function Series:_getCategories(args)
 	local tierType = args.liquipediatiertype
 
 	local tierCategory, tierTypeCategory = Tier.toCategory(tier, tierType)
+	local isValidTierTuple = Tier.isValid(tier, tierType)
 	table.insert(categories, tierCategory)
 	table.insert(categories, tierTypeCategory)
 
-	if not tierCategory and String.isNotEmpty(tier) then
+	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
-	if not tierTypeCategory and String.isNotEmpty(tierType) then
+	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end
