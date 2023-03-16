@@ -71,7 +71,7 @@ function ExternalMediaLink._store(args)
 		authors['author' .. authorIndex .. 'dn'] = author
 	end
 	-- set a maximum for authors due to the same being used in queries
-	assert(Table.size(authors) <= MAXIMUM_VALUES.authors,
+	assert(Table.size(authors) <= 2*MAXIMUM_VALUES.authors,
 		'Maximum Value of authors (' .. MAXIMUM_VALUES.authors .. ') exceeded')
 	lpdbData.authors = mw.ext.LiquipediaDB.lpdb_create_json(authors)
 
