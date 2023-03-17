@@ -449,12 +449,12 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {'Tournaments'}
 
-	if String.isNotEmpty(args.eslprotier) then
-		table.insert(categories, 'ESL Pro Tour Tournaments')
-	end
-
 	if GAMES[args.game] then
 		table.insert(categories, GAMES[args.game] .. ' Competitions')
+	end
+
+	if String.isNotEmpty(args.eslprotier) then
+		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 
 	local tier = tonumber(args.liquipediatier)
