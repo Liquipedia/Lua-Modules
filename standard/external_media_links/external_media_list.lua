@@ -84,10 +84,8 @@ function MediaList._buildConditions(args)
 		end), ' OR ' ) .. ')')
 	end
 
-	-- todo: check if date_year works for this lpdb table
 	if args.year then
-		table.insert(conditions, '[[date::>' .. (args.year - 1) .. '-12-31]]')
-		table.insert(conditions, '[[date::<' .. (args.year + 1) .. '-01-01]]')
+		table.insert(conditions, '[[date_year::' .. args.year.. ']]')
 	end
 
 	local additionalConditions = {}
