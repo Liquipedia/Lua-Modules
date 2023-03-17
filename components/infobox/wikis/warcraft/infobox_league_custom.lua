@@ -443,7 +443,7 @@ function CustomLeague._determineGame()
 end
 
 function CustomLeague:addTeamIndivCategory(args)
-	return {(MODES[args.mode] or 'Individual') .. ' Tournaments'}
+	return {(MODES[args.mode] or {}).tier or 'Individual') .. ' Tournaments'}
 end
 
 function CustomLeague:getWikiCategories(args)
