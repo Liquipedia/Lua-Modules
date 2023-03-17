@@ -50,9 +50,9 @@ local GAMES = {
 }
 
 local MODES = {
-	team = {tier = 'Team', store = 'team'},
-	['2v2'] = {tier = ' 2v2', store = '2v2'},
-	default = {store = '1v1'},
+	team = {tier = 'Team', store = 'team', category =  'Team'},
+	['2v2'] = {tier = ' 2v2', store = '2v2', category =  '2v2'},
+	default = {store = '1v1', category =  'Individual'},
 }
 
 local TIER_1 = 1
@@ -443,7 +443,7 @@ function CustomLeague._determineGame()
 end
 
 function CustomLeague:addTeamIndivCategory(args)
-	return {(MODES[args.mode] or {}).tier or 'Individual') .. ' Tournaments'}
+	return {((MODES[_args.mode] or {}).category or MODES.default.category) .. ' Tournaments'}
 end
 
 function CustomLeague:getWikiCategories(args)
