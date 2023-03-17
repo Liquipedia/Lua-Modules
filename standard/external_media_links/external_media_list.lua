@@ -52,7 +52,7 @@ function MediaList._parseArgs(args)
 	args.player1 = args.player1 or args.player
 
 	return {
-		types = Array.map(Array.map(mw.text.split(args.type, ','), String.trim), string.lower)
+		types = Array.map(Array.map(mw.text.split(args.type, ','), String.trim), string.lower),
 		author = args.author,
 		subjects = Array.mapIndexes(function(subjectIndex)
 			return args['subject' .. subjectIndex] or args['player' .. subjectIndex]
