@@ -120,12 +120,12 @@ end
 function MediaList._displayDynamic(data, args)
 	local tabsData = {}
 
-	local tabIndex = 0
+	local tabIndex = 1
 	for year, yearItems in Table.iter.spairs(MediaList._groupByYear(data), MediaList._sortInYear) do
-		tabIndex = tabIndex + 1
-
 		tabsData['name' .. tabIndex] = year
 		tabsData['content' .. tabIndex] = tostring(MediaList._displayYear(yearItems, args))
+
+		tabIndex = tabIndex + 1
 	end
 
 	return Tabs.dynamic(tabsData)
