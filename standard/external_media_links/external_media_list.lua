@@ -146,13 +146,11 @@ function MediaList._displayByYear(data, args)
 end
 
 function MediaList._groupByYear(data)
-	-- luacheck: push ignore
-	_, data = Array.groupBy(data, function(item)
+	local _, groupedData = Array.groupBy(data, function(item)
 		return item.date:sub(1, 4)
 	end)
-	-- luacheck: pop
 
-	return data
+	return groupedData
 end
 
 function MediaList._sortInYear(_, key1, key2)
