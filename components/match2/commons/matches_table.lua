@@ -15,7 +15,6 @@ local HiddenSort = require('Module:HiddenSort')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 local Lua = require('Module:Lua')
-local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
 -- overridable if wikis have custom modules
@@ -211,10 +210,6 @@ function MatchesTable._row(match)
 		end
 		row:node(roundCell)
 	end
-
-	-- workaround for a lpdb bug
-	-- remove when it is fixed
-	MatchGroupWorkaround.applyPlayerBugWorkaround(match)
 
 	row:node(
 		MatchesTable._buildOpponent(

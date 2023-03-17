@@ -12,6 +12,7 @@ local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Faction = require('Module:Faction')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -45,17 +46,9 @@ local TODAY = os.date('%Y-%m-%d', os.time())
 local TIER_MODE_TYPES = 'types'
 local TIER_MODE_TIERS = 'tiers'
 
-local GAME_WOL = 'wol'
-local GAME_HOTS = 'hots'
-local GAME_LOTV = 'lotv'
 local GAME_MOD = 'mod'
+local GAME_LOTV = Game.name{game = 'lotv'}
 
-local GAMES = {
-	[GAME_WOL] = {'Wings of Liberty', 'WoL'},
-	[GAME_HOTS] = {'Heart of the Swarm', 'HotS'},
-	[GAME_LOTV] = {'Legacy of the Void', 'LotV'},
-	[GAME_MOD] = {'mod', 'mod'}
-}
 local SICON = '[[File:Sicon.png|text-bottom|Code S|link=Code S]]'
 local AICON = '[[File:Aicon.png|text-bottom|Code A]]'
 local PICON = '[[File:PIcon.png|text-bottom|Premier League]]'
@@ -66,12 +59,14 @@ function CustomLeague.run(frame)
 	_league = league
 	_args = league.args
 
+	_args.game = _args.game == GAME_MOD and GAME_MOD or Game.name{game = _args.game}
 	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
 end
@@ -100,7 +95,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Liquipedia tier',
 				content = {CustomLeague:_createLiquipediaTierDisplay()},
-				classes = {Logic.readBool(_args.featured) and 'sc2premier-highlighted' or ''}
+				classes = {Logic.readBool(_args.featured) and 'tournament-highlighted-bg' or ''}
 			},
 		}
 	elseif id == 'chronology' then
@@ -261,52 +256,56 @@ function CustomLeague._createLiquipediaTierDisplay()
 end
 
 function CustomLeague._getGameVersion()
-	local game = string.lower(_args.game or '')
-	local patch = _args.patch or ''
-	local shouldUseAutoPatch = (_args.autopatch or '') ~= 'false'
+	local game = _args.game
 	local modName = _args.modname
 	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
-	local endPatch = _args.epatch
+
+	local gameVersion
+	if game == GAME_MOD then
+		gameVersion = modName or 'Mod'
+	else
+		gameVersion = '[[' .. game .. ']]'
+	end
+
+	local patchDisplay = betaPrefix
+	if _args.patch then
+		patchDisplay = patchDisplay .. '<br/>[[' .. _args.patch .. ']]'
+		if _args.patch ~= _args.epatch then
+			patchDisplay = patchDisplay .. ' &ndash; [[' .. _args.epatch .. ']]'
+		end
+	end
+
+	return gameVersion .. patchDisplay
+end
+
+function CustomLeague._setPatchData()
+	local patchPrefix = 'Patch '
+
+	if _args.patch and _args.epatch then
+		_args.patch = patchPrefix .. _args.patch
+		_args.epatch = patchPrefix .. _args.epatch
+
+		return
+	end
+
 	local startDate = Variables.varDefault('tournament_startdate', TODAY)
 	local endDate = Variables.varDefault('tournament_enddate', TODAY)
 
-	if String.isNotEmpty(game) or String.isNotEmpty(patch) then
-		local gameVersion
-		if game == GAME_MOD then
-			gameVersion = modName or 'Mod'
-		elseif GAMES[game] then
-			gameVersion = '[[' .. GAMES[game][1] .. ']]' ..
-				'[[Category:' .. betaPrefix .. GAMES[game][2] .. ' Competitions]]'
-		else
-			gameVersion = '[[Category:' .. betaPrefix .. 'Competitions]]'
-		end
-
-		if game == GAME_LOTV and shouldUseAutoPatch then
-			if String.isEmpty(patch) then
-				patch = 'Patch ' .. (Autopatch._main({CustomLeague._retrievePatchDate(startDate)}) or '')
-			end
-			if String.isEmpty(endPatch) then
-				endPatch = 'Patch ' .. (Autopatch._main({CustomLeague._retrievePatchDate(endDate)}) or '')
-			end
-		elseif String.isEmpty(endPatch) then
-			endPatch = patch
-		end
-
-		local patchDisplay = betaPrefix
-
-		if String.isNotEmpty(patch) then
-			patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
-			if patch ~= endPatch then
-				patchDisplay = patchDisplay .. ' &ndash; [[' .. endPatch .. ']]'
-			end
-		end
-
-		--set patch variables
-		Variables.varDefine('patch', patch)
-		Variables.varDefine('epatch', endPatch)
-
-		return gameVersion .. patchDisplay
+	if _args.game == GAME_LOTV and Logic.nilOr(Logic.readBoolOrNil(_args.autopatch), true) then
+		_args.patch = _args.patch or Autopatch._main{CustomLeague._retrievePatchDate(startDate)}
+		_args.epatch = _args.epatch or Autopatch._main{CustomLeague._retrievePatchDate(endDate)}
 	end
+
+	if not _args.patch then
+		return
+	elseif not _args.epatch then
+		_args.epatch = _args.patch
+	end
+
+	_args.patch = patchPrefix .. _args.patch
+	_args.epatch = patchPrefix .. _args.epatch
+
+	return
 end
 
 function CustomLeague._retrievePatchDate(dateEntry)
@@ -534,22 +533,18 @@ function CustomLeague:_makeBasedListFromArgs(prefix)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	--Legacy vars
-	local name = self.name
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
-	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
-
-	--Legacy tier(type) vars
-	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
-	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
-
 	--override var to standardize its entries
-	Variables.varDefine('tournament_game', CustomLeague._getGameStorage(_args.game))
+	Variables.varDefine('tournament_game', _args.game)
+
+	--patch data
+	CustomLeague._setPatchData()
+	Variables.varDefine('patch', _args.patch)
+	Variables.varDefine('epatch', _args.epatch)
 
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
-	Variables.varDefine('featured', tostring(Logic.readBool(_args.featured)))
+	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number
 	if Logic.isNumeric(seriesNumber) then
@@ -598,7 +593,7 @@ end
 
 function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.game = CustomLeague._getGameStorage(_args.game)
+	lpdbData.game = _args.game
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefaultMulti('epatch', 'patch', '')
 	local status = _args.status
@@ -613,7 +608,7 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
-	lpdbData.publishertier = Variables.varDefault('featured')
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier')
 
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 
@@ -635,8 +630,14 @@ function CustomLeague:_getPageNameFromChronology(item)
 	return mw.text.split(item, '|')[1]
 end
 
-function CustomLeague._getGameStorage(gameInput)
-	return (GAMES[string.lower(gameInput or '')] or {})[1] or GAMES[GAME_WOL][1]
+function CustomLeague:getWikiCategories(args)
+	if args.game == GAME_MOD then
+		return {}
+	end
+
+	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
+	local gameAbbr = Game.abbreviation{game = args.game}
+	return {betaPrefix .. gameAbbr .. ' Competitions'}
 end
 
 return CustomLeague

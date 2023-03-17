@@ -838,7 +838,7 @@ local data = {
 	},
 	['northmacedonia'] = {
 		flag = 'File:mk_hd.png',
-		localised = 'North Macedonian',
+		localised = 'Macedonian',
 		name = 'North Macedonia',
 	},
 	['norway'] = {
@@ -1563,7 +1563,7 @@ local twoLetter = {
 	['fi'] = 'finland',
 	['fj'] = 'fiji',
 	['fk'] = 'falklandislands',
-	['fm'] = 'micronesia',
+	['fm'] = 'federatedstatesofmicronesia',
 	['fo'] = 'faroeislands',
 	['fr'] = 'france',
 	['ga'] = 'gabon',
@@ -1837,7 +1837,7 @@ local threeLetter = {
 	['flk'] = 'falklandislands(malvinas)',
 	['fra'] = 'france',
 	['fro'] = 'faroeislands',
-	['fsm'] = 'micronesia',
+	['fsm'] = 'federatedstatesofmicronesia',
 	['gab'] = 'gabon',
 	['gbr'] = 'unitedkingdom',
 	['geo'] = 'georgia',

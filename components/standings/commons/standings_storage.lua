@@ -132,9 +132,7 @@ end
 
 ---@return boolean
 function StandingsStorage.shouldStore()
-	return Namespace.isMain()
-			and not Logic.readBool(Variables.varDefault('disable_SMW_storage'))
-			and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 ---@param data table

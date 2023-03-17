@@ -27,7 +27,10 @@ local PREFIXES = {
 		'http://afreecatv.com/',
 		stream = 'https://play.afreecatv.com/',
 	},
-	aoezone = {'https://aoezone.net/'},
+	aoezone = {
+		'https://aoezone.net/',
+		player = 'https://aoezone.net/members/'
+	},
 	['ask-fm'] = {'https://ask.fm/'},
 	b5csgo = {
 		'',
@@ -48,6 +51,7 @@ local PREFIXES = {
 		'',
 		player = 'https://challonge.com/users/',
 	},
+	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
 		player = 'https://www.datdota.com/players/',
@@ -110,6 +114,7 @@ local PREFIXES = {
 	kuaishou = {'https://live.kuaishou.com/u/'},
 	letsplaylive = {'https://letsplay.live/profile/'},
 	loco = {'https://loco.gg/streamers/'},
+	lolchess = {'https://lolchess.gg/profile/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
@@ -144,8 +149,9 @@ local PREFIXES = {
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stratz = {
-		'',
-		player = 'https://stratz.com/player/'
+		'https://stratz.com/leagues/',
+		player = 'https://stratz.com/players/',
+		team = 'https://stratz.com/teams/'
 	},
 	stream = {''},
 	telegram = {'https://t.me/'},
@@ -193,6 +199,7 @@ local PREFIXES = {
 PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
 
 local SUFFIXES = {
+	cntft = {'/1'},
 	facebook = {
 		'',
 		stream = '/live',

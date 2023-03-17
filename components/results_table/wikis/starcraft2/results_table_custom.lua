@@ -14,9 +14,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
 local ResultsTable = Lua.import('Module:ResultsTable', {requireDevIfEnabled = true})
@@ -26,7 +24,6 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local UNDEFINED_TIER = 'undefined'
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]'
 local DEFAULT_EVENT_ICON = ''
 local TBD = 'TBD'
@@ -49,7 +46,6 @@ function CustomResultsTable.results(frame)
 	local resultsTable = ResultsTable(args)
 
 	-- overwrite functions
-	resultsTable.tierDisplay = CustomResultsTable.tierDisplay
 	resultsTable.rowHighlight = CustomResultsTable.rowHighlight
 	resultsTable.processLegacyVsData = CustomResultsTable.processLegacyVsData
 
@@ -72,35 +68,14 @@ function CustomResultsTable.awards(frame)
 	local awardsTable = AwardsTable(args)
 
 	-- overwrite functions
-	awardsTable.tierDisplay = CustomResultsTable.tierDisplay
 	awardsTable.rowHighlight = CustomResultsTable.rowHighlight
 
 	return awardsTable:create():build()
 end
 
-function CustomResultsTable:tierDisplay(placement)
-	local tierDisplay = Tier.text.tiers[placement.liquipediatier] or UNDEFINED_TIER
-
-	tierDisplay = Page.makeInternalLink(
-		{},
-		tierDisplay,
-		tierDisplay .. ' Tournaments'
-	)
-
-	local tierTypeDisplay = Tier.text.typesShort[(placement.liquipediatiertype or ''):lower()]
-
-	local sortValue = placement.liquipediatier .. (tierTypeDisplay or '')
-
-	if not tierTypeDisplay then
-		return tierDisplay, sortValue
-	end
-
-	return tierDisplay .. ' (' .. tierTypeDisplay .. ')', sortValue
-end
-
 function CustomResultsTable:rowHighlight(placement)
 	if Logic.readBool(placement.publishertier) then
-		return 'sc2premier-highlighted'
+		return 'tournament-highlighted-bg'
 	end
 end
 

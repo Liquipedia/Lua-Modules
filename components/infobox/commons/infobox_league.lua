@@ -102,18 +102,23 @@ function League:createInfobox()
 				)
 			}
 		},
-		Builder{
-			builder = function()
-				local organizers = self:_createOrganizers(args)
-				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
+		Customizable{
+			id = 'organizers',
+			children = {
+				Builder{
+					builder = function()
+						local organizers = self:_createOrganizers(args)
+						local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
 
-				return {
-					Cell{
-						name = title,
-						content = organizers
-					}
-				}
-			end
+						return {
+							Cell{
+								name = title,
+								content = organizers
+							}
+						}
+					end
+				},
+			},
 		},
 		Customizable{
 			id = 'sponsors',
@@ -165,18 +170,14 @@ function League:createInfobox()
 		}}},
 		Builder{
 			builder = function()
-				args.venue1 = args.venue1 or args.venue
-				args.venue1link = args.venue1link or args.venuelink
-				args.venue1desc = args.venue1desc or args.venuedesc
-
 				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
+				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
 					local description
 					if String.isNotEmpty(args[prefix .. 'desc']) then
 						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
 					end
 
-					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
+					table.insert(venues, self:createLink(venueName, nil, args[prefix .. 'link'], description))
 				end
 
 				return {Cell{
@@ -385,7 +386,7 @@ function League:_definePageVariables(args)
 	]]
 
 	Variables.varDefine('tournament_type', args.type)
-	Variables.varDefine('tournament_status', args.status)
+	Variables.varDefine('tournament_status', args.status or Variables.varDefault('tournament_status'))
 
 	Variables.varDefine('tournament_region', args.region)
 	Variables.varDefine('tournament_country', args.country)
@@ -451,7 +452,7 @@ function League:_setLpdbData(args, links)
 		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		status = args.status,
+		status = Variables.varDefault('tournament_status'),
 		format = TextSanitizer.stripHTML(args.format),
 		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
 			League:_getNamedTableofAllArgsForBase(args, 'sponsor')
@@ -497,35 +498,30 @@ function League:_createLocation(args)
 		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/TBD')
 	end
 
-	local index = 1
-	local content = ''
-	local current = args['country']
-	local currentLocation = args['city'] or args['location']
+	local display = {}
+	args.city1 = args.city1 or args.location1 or args.city or args.location
 
-	while not String.isEmpty(current) do
-		local nationality = Flags.getLocalisation(current)
+	for _, country, index in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
+		local nationality = Flags.getLocalisation(country)
 
 		if String.isEmpty(nationality) then
-			content = content .. '[[Category:Unrecognised Country|' .. current .. ']]'
+			self.infobox:categories('Unrecognised Country')
 
 		else
-			local countryName = Flags.CountryName(current)
-			local displayText = currentLocation or countryName
-			if displayText == '' then
-				displayText = current
+			local location = args['city' .. index] or args['location' .. index]
+			local countryName = Flags.CountryName(country)
+			local displayText = location or countryName
+			if String.isEmpty(displayText) then
+				displayText = country
 			end
 
 			if self:shouldStore(args) then
-				content = content .. '[[Category:' .. nationality .. ' Tournaments]]'
+				self.infobox:categories(nationality .. ' Tournaments')
 			end
-			content = content .. Flags.Icon{flag = current, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>'
+			table.insert(display, Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>')
 		end
-
-		index = index + 1
-		current = args['country' .. index]
-		currentLocation = args['city' .. index] or args['location' .. index]
 	end
-	return content
+	return table.concat(display)
 end
 
 function League:_createSeries(options, series, abbreviation, icon, iconDark)
@@ -586,7 +582,7 @@ function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
 	end
 end
 
-function League:_createLink(id, name, link, desc)
+function League:createLink(id, name, link, desc)
 	if String.isEmpty(id) then
 		return nil
 	end
@@ -622,23 +618,10 @@ function League:_createLink(id, name, link, desc)
 end
 
 function League:_createOrganizers(args)
-	local organizers = {
-		League:_createLink(
-			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
-	}
+	local organizers = {}
 
-	local index = 2
-
-	while not String.isEmpty(args['organizer' .. index]) do
-		table.insert(
-			organizers,
-			League:_createLink(
-				args['organizer' .. index],
-				args['organizer' .. index .. '-name'],
-				args['organizer' .. index .. '-link'],
-				args['organizerref' .. index])
-		)
-		index = index + 1
+	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
+		table.insert(organizers, self:createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
 	end
 
 	return organizers

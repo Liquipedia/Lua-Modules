@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local infoData = {
+return {
 	startYear = 2000,
 	wikiName = 'counterstrike',
 	name = 'Counter-Strike',
@@ -72,8 +72,8 @@ local infoData = {
 				lightMode = 'csgo icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'CS default darkmode.png',
-				lightMode = 'CS default lightmode.png',
+				darkMode = 'CSGO default darkmode.png',
+				lightMode = 'CSGO default lightmode.png',
 			},
 		},
 	},
@@ -93,7 +93,3 @@ local infoData = {
 		cscz = 'CS default darkmode.png',
 	}, ---@deprecated
 }
-
-infoData.games.cs16 = infoData.games.cs
-
-return infoData

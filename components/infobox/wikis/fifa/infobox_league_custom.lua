@@ -25,16 +25,16 @@ local CustomInjector = Class.new(Injector)
 
 local PLATFORMS = {
 	pc = 'PC',
-	['xbox 360'] = 'Xbox 360',
-	['xbox one'] = 'Xbox One',
-	ps3 = 'Playstation 3',
-	playstation3 = 'Playstation 3',
-	ps4 = 'Playstation 4',
-	playstation4 = 'Playstation 4',
-	ps5 = 'Playstation 5',
-	playstation5 = 'Playstation 5',
-	['xbox playstation'] = 'Xbox and PlayStation',
-	['xbox and playstation'] = 'Xbox and PlayStation',
+	xbox360 = 'Xbox 360',
+	xboxone = 'Xbox One',
+	ps3 = 'PlayStation 3',
+	playstation3 = 'PlayStation 3',
+	ps4 = 'PlayStation 4',
+	playstation4 = 'PlayStation 4',
+	ps5 = 'PlayStation 5',
+	playstation5 = 'PlayStation 5',
+	xboxplaystation = 'Xbox and PlayStation',
+	xboxandplaystation = 'Xbox and PlayStation',
 }
 
 function CustomLeague.run(frame)
@@ -45,7 +45,7 @@ function CustomLeague.run(frame)
 	_args.player_number = _args.participants_number
 	_args.game = Game.name{game = _args.game}
 	_args.mode = (_args.mode or '1v1'):lower()
-	_args.platform = PLATFORMS[(_args.platform or 'pc'):lower()]
+	_args.platform = PLATFORMS[(_args.platform or 'pc'):lower():gsub(' ', '')]
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables

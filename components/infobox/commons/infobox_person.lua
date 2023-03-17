@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -144,7 +145,13 @@ function Person:createInfobox()
 				}}
 			end}
 		}},
-		Cell{name = 'Alternate IDs', content = {args.ids or args.alternateids}},
+		Cell{name = 'Alternate IDs', content = {
+				table.concat(
+					Array.map(mw.text.split(args.ids or args.alternateids or '', ',', true), function(id) return mw.text.trim(id) end),
+					', '
+				)
+			}
+		},
 		Cell{name = 'Nicknames', content = {args.nicknames}},
 		Builder{
 			builder = function()
@@ -268,8 +275,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	end
 
 	-- Store additional team-templates in extradata
-	args.team1 = team
-	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team') do
+	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = false}) do
 		if teamIndex > 1 then
 			otherTeam = args[teamKey .. 'link'] or otherTeam
 			lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename

@@ -21,6 +21,7 @@ function CustomTeam.run(frame)
 	-- Override links to allow one param to set multiple links
 	team.args.datdota = team.args.teamid
 	team.args.dotabuff = team.args.teamid
+	team.args.stratz = team.args.teamid
 
 	-- Automatic achievements
 	team.args.achievements = Template.expandTemplate(frame, 'Team achievements', {team.args.name})

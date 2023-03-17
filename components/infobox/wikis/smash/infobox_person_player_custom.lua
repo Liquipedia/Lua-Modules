@@ -28,7 +28,7 @@ local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local GAME_ORDER = {64, 'melee', 'brawl', 'pm', 'wiiu', 'ultimate'}
+local GAME_ORDER = {'64', 'melee', 'brawl', 'pm', 'wiiu', 'ultimate'}
 
 local _args
 
@@ -116,6 +116,7 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
+	lpdbData.extradata.localid = _args.localid
 	lpdbData.extradata.maingame = _args.game or Info.defaultGame
 	for game in pairs(Info.games) do
 		lpdbData.extradata['main' .. game] = _args['main-' .. game]

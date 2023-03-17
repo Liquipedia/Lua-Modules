@@ -9,8 +9,8 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
+local Table = require('Module:Table')
 
 local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
 local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
@@ -47,32 +47,17 @@ end
 
 --- Allows for using this for customCells
 function BasicInfobox:getAllArgsForBase(args, base, options)
-	local foundArgs = {}
-	if String.isEmpty(args[base]) and String.isEmpty(args[base .. '1']) then
-		return foundArgs
-	end
-
 	options = options or {}
+
 	local makeLink = Logic.readBool(options.makeLink)
+	local foundArgs = {}
 
-	local baseArg = args[base] or args[base .. '1']
-	if makeLink then
-		local link = args[base .. 'link'] or args[base .. '1link'] or baseArg
-		baseArg = '[[' .. link
-			.. '|' .. baseArg .. ']]'
-	end
-
-	table.insert(foundArgs, baseArg)
-	local index = 2
-
-	while not String.isEmpty(args[base .. index]) do
-		local indexedbase = args[base .. index]
+	for key, value in Table.iter.pairsByPrefix(args, base, {requireIndex = false}) do
 		if makeLink then
-			indexedbase = '[[' .. (args[base .. index .. 'link'] or indexedbase)
-				.. '|' .. indexedbase .. ']]'
+			local link = args[key .. 'link'] or value
+			value = '[[' .. link .. '|' .. value .. ']]'
 		end
-		table.insert(foundArgs, indexedbase)
-		index = index + 1
+		table.insert(foundArgs, value)
 	end
 
 	return foundArgs

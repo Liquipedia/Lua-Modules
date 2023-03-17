@@ -11,21 +11,47 @@ return {
 	wikiName = 'splatoon',
 	name = 'Splatoon',
 	games = {
-		todo = {
-			abbreviation = 'todo',
-			name = 'TODO',
-			link = 'Main Page',
+		['1'] = {
+			abbreviation = 'SP1',
+			name = 'Splatoon',
+			link = 'Splatoon',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Splatoon default darkmode.png',
+				lightMode = 'Splatoon default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Splatoon default allmode.png',
-				lightMode = 'Splatoon default allmode.png',
+				darkMode = 'Splatoon default darkmode.png',
+				lightMode = 'Splatoon default lightmode.png',
+			},
+		},
+		['2'] = {
+			abbreviation = 'SP2',
+			name = 'Splatoon 2',
+			link = 'Splatoon 2',
+			logo = {
+				darkMode = 'Splatoon 2 default allmode.png',
+				lightMode = 'Splatoon 2 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Splatoon 2 default allmode.png',
+				lightMode = 'Splatoon 2 default allmode.png',
+			},
+		},
+		['3'] = {
+			abbreviation = 'SP3',
+			name = 'Splatoon 3',
+			link = 'Splatoon 3',
+			logo = {
+				darkMode = 'Splatoon 3 default allmode.png',
+				lightMode = 'Splatoon 3 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Splatoon 3 default allmode.png',
+				lightMode = 'Splatoon 3 default allmode.png',
 			},
 		},
 	},
-	defaultGame = 'todo',
-	defaultTeamLogo = 'Splatoon default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Splatoon default allmode.png', ---@deprecated
+	defaultGame = '1',
+	defaultTeamLogo = 'Splatoon default lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Splatoon default darkmode.png', ---@deprecated
 }
