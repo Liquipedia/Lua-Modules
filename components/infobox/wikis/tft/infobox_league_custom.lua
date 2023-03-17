@@ -22,6 +22,7 @@ local _args
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
+local DEFAULT_MODE = 'Solos'
 local GAME_MODES = {
 	solo = 'Solos',
 	duo = 'Duos',
@@ -33,7 +34,7 @@ local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournam
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
-	_args.mode = _args.mode and GAME_MODES[string.lower(_args.mode):gsub('s$', '')] or nil -- Normalize Mode input
+	_args.mode = _args.mode and GAME_MODES[string.lower(_args.mode):gsub('s$', '')] or DEFAULT_MODE -- Normalize Mode input
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
