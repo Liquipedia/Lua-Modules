@@ -251,25 +251,19 @@ function League:createInfobox()
 	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if self:shouldStore(args) then
-		self.infobox:categories(unpack(self:getCategories(args)))
+		self.infobox:categories('Tournaments')
+		if not String.isEmpty(args.team_number) then
+			self.infobox:categories('Team Tournaments')
+		end
+		if String.isNotEmpty(args.player_number) or String.isNotEmpty(args.individual) then
+			self.infobox:categories('Individual Tournaments')
+		end
+		self.infobox:categories(unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args, links)
 		self:_setSeoTags(args)
 	end
 
 	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
-end
-
---- Allows for overriding this functionality
-function League:getCategories(args)
-	self.infobox:categories('Tournaments')
-	if not String.isEmpty(args.team_number) then
-		self.infobox:categories('Team Tournaments')
-	end
-	if String.isNotEmpty(args.player_number) or String.isNotEmpty(args.individual) then
-		self.infobox:categories('Individual Tournaments')
-	end
-
-	return self:getWikiCategories(args)
 end
 
 --- Allows for overriding this functionality
