@@ -686,14 +686,13 @@ function BasePrizePool:_currencyExchangeInfo()
 end
 
 function BasePrizePool._CurrencyConvertionText(prize)
-	local exchangeRate = Math.round{
-		BasePrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
-			prize.data, 1, BasePrizePool._getTournamentDate()
-		)
-		,5
-	}
+	local precision = 5
+	local exchangeRate = BasePrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
+		prize.data, 1, BasePrizePool._getTournamentDate()
+	)
 
-	return Currency.display(prize.data.currency, 1) .. ' ≃ ' .. Currency.display(BASE_CURRENCY, exchangeRate)
+	return Currency.display(prize.data.currency, 1) .. ' ≃ ' ..
+		Currency.display(BASE_CURRENCY, exchangeRate, {formatValue = true, formatPrecision = precision})
 end
 
 --- Returns true if this PrizePool has a Base Currency money reward.
