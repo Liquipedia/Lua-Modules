@@ -92,7 +92,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
-	league.getCategories = CustomLeague.getCategories
+	league.addTeamIndivCategory = CustomLeague.addTeamIndivCategory
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
@@ -442,15 +442,12 @@ function CustomLeague._determineGame()
 	return GAME_FROZEN_THRONE
 end
 
-function CustomLeague:getCategories(args)
-	return self:getWikiCategories(args)
+function CustomLeague:addTeamIndivCategory(args)
+	return {(MODES[args.mode] or 'Individual') .. ' Tournaments'}
 end
 
 function CustomLeague:getWikiCategories(args)
-	local categories = {
-		'Tournaments',
-		(MODES[args.mode] or 'Individual') .. ' Tournaments',
-	}
+	local categories = {'Tournaments'}
 
 	if String.isNotEmpty(args.eslprotier) then
 		table.insert(categories, 'ESL Pro Tour Tournaments')
