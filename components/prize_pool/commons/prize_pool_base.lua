@@ -43,6 +43,7 @@ local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 local BASE_CURRENCY = 'USD'
+local EXCHANGE_SUMMARY_PRECISION = 5
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
@@ -685,13 +686,12 @@ function BasePrizePool:_currencyExchangeInfo()
 end
 
 function BasePrizePool._CurrencyConvertionText(prize)
-	local precision = 5
 	local exchangeRate = BasePrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
 		prize.data, 1, BasePrizePool._getTournamentDate()
 	)
 
 	return Currency.display(prize.data.currency, 1) .. ' ≃ ' ..
-		Currency.display(BASE_CURRENCY, exchangeRate, {formatValue = true, formatPrecision = precision})
+		Currency.display(BASE_CURRENCY, exchangeRate, {formatValue = true, formatPrecision = EXCHANGE_SUMMARY_PRECISION})
 end
 
 --- Returns true if this PrizePool has a Base Currency money reward.
