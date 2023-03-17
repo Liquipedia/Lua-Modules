@@ -22,13 +22,12 @@ local _args
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local DEFAULT_MODE = 'Solos'
 local GAME_MODES = {
 	solo = 'Solos',
 	duo = 'Duos',
 	squad = 'Squads',
 }
-local UNKNOWN_MODE = 'Unknown'
+local DEFAULT_MODE = GAME_MODES.solo
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 function CustomLeague.run(frame)
@@ -107,6 +106,6 @@ function CustomLeague:_createPatchCell(args)
 end
 
 function CustomLeague.getWikiCategories(args)
-	return {(_args.mode or UNKNOWN_MODE) .. ' Mode Tournaments'}
+	return {_args.mode .. ' Mode Tournaments'}
 end
 return CustomLeague
