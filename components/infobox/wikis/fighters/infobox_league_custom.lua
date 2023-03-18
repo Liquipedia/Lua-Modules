@@ -94,15 +94,15 @@ function CustomInjector:parse(id, widgets)
 			table.insert(
 				widgets, 
 				Cell{
-						name = 'Circuit', 
-						content = {
-							CustomLeague:_createCircuit(
-								_args.circuit,
-								_args.circuitabbr,
-								_args.circuitIconLight,
-								_args.circuitIconDark or _args.circuitIconLight
-							)
-						}
+					name = 'Circuit', 
+					content = {
+						CustomLeague:_createCircuit(
+							_args.circuit,
+							_args.circuitabbr,
+							_args.circuitIconLight,
+							_args.circuitIconDark or _args.circuitIconLight
+						)
+					}
 				}
 			)
 			table.insert(widgets, Cell{name = 'Circuit Tier', content = {_args.circuittier}})
@@ -317,6 +317,7 @@ function CustomLeague:_createCircuit(circuit, abbreviation, icon, iconDark)
 		end
 	elseif String.isEmpty(abbreviation) then
 		return output .. '[[' .. circuit .. ']]'
+	end
 	return output .. '[[' .. circuit .. '|' .. abbreviation .. ']]'
 end
 
