@@ -320,7 +320,6 @@ function CustomLeague:_createCircuit(circuit, abbreviation, icon, iconDark)
 	else
 	return output .. '[[' .. circuit .. '|' .. abbreviation .. ']]'
 	end
-
 end
 
 return CustomLeague
