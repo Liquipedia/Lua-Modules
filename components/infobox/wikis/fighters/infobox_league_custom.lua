@@ -92,7 +92,7 @@ function CustomInjector:parse(id, widgets)
 		if _args.circuit or _args.points or _args.circuit_next or _args.circuit_previous then
 			table.insert(widgets, Title{name = 'Circuit Information'})
 			table.insert(
-				widgets, 
+				widgets,
 				Cell{
 					name = 'Circuit', 
 					content = {
