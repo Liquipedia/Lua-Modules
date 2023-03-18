@@ -94,7 +94,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(
 				widgets,
 				Cell{
-					name = 'Circuit', 
+					name = 'Circuit',
 					content = {
 						CustomLeague:_createCircuit(
 							_args.circuit,
