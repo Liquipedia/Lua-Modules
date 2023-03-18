@@ -100,7 +100,7 @@ function CustomInjector:parse(id, widgets)
 								_args.circuit,
 								_args.circuitabbr,
 								_args.circuitIconLight,
-								_args.circuitIconLight or _args.circuitIconDark
+								_args.circuitIconDark or _args.circuitIconLight
 							)
 						}
 				}
