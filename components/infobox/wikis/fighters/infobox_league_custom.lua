@@ -316,7 +316,7 @@ function CustomLeague:_createCircuit(circuit, abbreviation, icon, iconDark)
 			output = output .. abbreviation
 		end
 	elseif String.isEmpty(abbreviation) then
-		output = output .. '[[' .. circuit .. '|' .. circuit .. ']]'
+		return output .. '[[' .. circuit .. ']]'
 	else
 		output = output .. '[[' .. circuit .. '|' .. abbreviation .. ']]'
 	end
