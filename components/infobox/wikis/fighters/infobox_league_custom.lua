@@ -321,7 +321,6 @@ function CustomLeague:_createCircuit(circuit, abbreviation, icon, iconDark)
 	return output .. '[[' .. circuit .. '|' .. abbreviation .. ']]'
 	end
 
-	return output
 end
 
 return CustomLeague
