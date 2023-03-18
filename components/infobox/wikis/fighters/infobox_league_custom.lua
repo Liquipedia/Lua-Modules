@@ -311,7 +311,7 @@ function CustomLeague:_createCircuit(circuit, abbreviation, icon, iconDark)
 
 	if not circuitPageExists then
 		if String.isEmpty(abbreviation) then
-			output = output .. circuit
+			return output .. circuit
 		else
 			output = output .. abbreviation
 		end
