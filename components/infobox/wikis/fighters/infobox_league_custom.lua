@@ -297,7 +297,7 @@ function CustomLeague:_createCircuit(circuit, abbreviation, icon, iconDark)
 		series = circuit,
 		abbreviation = abbreviation,
 		date = Variables.varDefault('tournament_enddate'),
-		options = { noLink = not circuitPageExists }
+		options = {noLink = not circuitPageExists}
 	}
 	
 	if output == LeagueIcon.display{} then
