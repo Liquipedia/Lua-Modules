@@ -6,12 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent/Custom', {requireDevIfEnabled = true})
+local CustomPlayerDisplay = Lua.import('Module:Player/Display/Custom', {requireDevIfEnabled = true})
 
 local CustomOpponentDisplay = Table.deepCopy(OpponentDisplay)
 
@@ -71,7 +73,7 @@ function CustomOpponentDisplay.PlayerInlineOpponent(props)
 		playerTexts = Array.reverse(playerTexts)
 	end
 
-	return html.create('span')
+	return mw.html.create('span')
 		:node(table.concat(playerTexts, ' / '))
 end
 
