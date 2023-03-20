@@ -484,10 +484,25 @@ function BasePrizePool._comparePrizes(x, y)
 	return sortX == sortY and x.index < y.index or sortX < sortY
 end
 
+function BasePrizePool:_shouldDisplayPrizeSummary()
+	-- if prizeSummary is disabled do not show it
+	if not self.options.prizeSummary then
+		return false
+	end
+
+	local baseMoney = tonumber(Variables.varDefault('tournament_prizepool_' .. BASE_CURRENCY:lower())) or 0
+	-- if we have currency conversion or entered usd values display it
+	-- if we have baseMoney and it being not 0 display it
+	-- should we add a check against tournament_parent wiki var to display it if we have section preview???
+	if self.options.showBaseCurrency or baseMoney ~= 0 then
+		return true
+	end
+end
+
 function BasePrizePool:build(isAward)
 	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 
-	if self.options.prizeSummary then
+	if self:_shouldDisplayPrizeSummary() then
 		wrapper:wikitext(self:_getPrizeSummaryText())
 	end
 
