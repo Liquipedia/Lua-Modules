@@ -199,7 +199,7 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 	end
 
 	local indivPrize = tonumber(placement.individualprizemoney)
-	if indivPrize then
+	if not indivPrize then
 		return 0 --???
 	end
 
