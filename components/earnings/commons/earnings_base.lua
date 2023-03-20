@@ -124,7 +124,7 @@ function Earnings.calculateForTeam(args)
 			.. ']])'
 	end
 
-	if Logic.readBool(doNotIncludePlayerEarnings) then
+	if Logic.readBool(args.doNotIncludePlayerEarnings) then
 		return Earnings.calculate(formatParicipant('opponentname'), args.year, args.mode, args.perYear)
 	end
 
@@ -144,15 +144,15 @@ end
 -- @mode - (optional) the mode to calculate earnings for
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 -- @aliases - players/teams to determine earnings for
-function Earnings.calculate(conditions, year, mode, perYear, aliases, isPlayerQuery)
-	conditions = Earnings._buildConditions(conditions, year, mode)
+function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPlayerQuery)
+	conditions = Earnings._buildConditions(conditions, queryYear, mode)
 
 	local sums = {}
 	local totalEarnings = 0
 	local sumUp = function(placement)
 		local value = Earnings._determineValue(placement, aliases, isPlayerQuery)
 		if perYear then
-			local year = string.sub(item.date, 1, 4)
+			local year = string.sub(placement.date, 1, 4)
 			if not sums[year] then
 				sums[year] = 0
 			end
