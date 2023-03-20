@@ -32,9 +32,9 @@ function PrizePoolCurrency.display(args)
 	local varRoundPrecision = tonumber(args.varRoundPrecision)
 	local displayRoundPrecision = tonumber(args.displayRoundPrecision) or 0
 
-if varRoundPrecision and varRoundPrecision < displayRoundPrecision then
+	if varRoundPrecision and varRoundPrecision < displayRoundPrecision then
 		return PrizePoolCurrency._errorMessage('Display precision cannot be higher than Variable precious')
-end
+	end
 
 	if not prizepool and not prizepoolUsd then
 		if Namespace.isMain() then
