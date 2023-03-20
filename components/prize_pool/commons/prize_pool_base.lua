@@ -490,7 +490,7 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 		return false
 	end
 
-	local baseMoney = tonumber(Variables.varDefault('tournament_prizepool_' .. BASE_CURRENCY:lower())) or 0
+	local baseMoney = tonumber(Variables.varDefault('tournament_prizepool' .. BASE_CURRENCY:lower())) or 0
 	-- if we have currency conversion (i.e. entered `localcurrency`) or entered usd values display it
 	-- if we have baseMoney and it being not 0 display it
 	-- should we add a check against tournament_parent wiki var to display it if we have section preview???
@@ -649,13 +649,13 @@ end
 function BasePrizePool:_getPrizeSummaryText()
 	local tba = Abbreviation.make('TBA', 'To Be Announced')
 	local tournamentCurrency = Variables.varDefault('tournament_currency')
-	local baseMoneyRaw = Variables.varDefault('tournament_prizepool_' .. BASE_CURRENCY:lower(), tba)
+	local baseMoneyRaw = Variables.varDefault('tournament_prizepool' .. BASE_CURRENCY:lower(), tba)
 	local baseMoneyDisplay = Currency.display(BASE_CURRENCY, baseMoneyRaw, {formatValue = true})
 
 	local displayText = {baseMoneyDisplay}
 
 	if tournamentCurrency and tournamentCurrency:upper() ~= BASE_CURRENCY then
-		local localMoneyRaw = Variables.varDefault('tournament_prizepool_local', tba)
+		local localMoneyRaw = Variables.varDefault('tournament_prizepoollocal', tba)
 		local localMoneyDisplay = Currency.display(tournamentCurrency, localMoneyRaw, {formatValue = true})
 
 		table.insert(displayText, 1, localMoneyDisplay)
