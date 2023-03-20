@@ -189,7 +189,7 @@ function CustomLeague:_createPrizepool()
 		prizePoolUSD, hasPlus = CustomLeague:_removePlus(prizePoolUSD)
 		prizePool, hasPlus = CustomLeague:_removePlus(prizePool, hasPlus)
 
-		return (hasPlus and GREATER_EQUAL or '') .. InfoboxPrizePool.display{
+		return (hasPlus and (GREATER_EQUAL .. ' ') or '') .. InfoboxPrizePool.display{
 			prizepool = prizePool,
 			prizepoolusd = prizePoolUSD,
 			currency = localCurrency,
