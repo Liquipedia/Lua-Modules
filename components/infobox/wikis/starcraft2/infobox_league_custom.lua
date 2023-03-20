@@ -10,7 +10,6 @@ local AllowedServers = require('Module:Server')
 local Array = require('Module:Array')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
-local Currency = require('Module:Currency')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
@@ -173,10 +172,11 @@ function CustomLeague:_createPrizepool()
 		return
 	end
 
+	local localCurrency = _args.localcurrency
+
 	if localCurrency == 'text' then
 		return _args.prizepool
 	else
-		local localCurrency = _args.localcurrency
 		local prizePoolUSD = _args.prizepoolusd
 		local prizePool = _args.prizepool
 
