@@ -2130,7 +2130,7 @@ local aliases = {
 	--language flag aliases
 	['engspeaking'] = 'englishspeaking',
 	['gerspeaking'] = 'germanspeaking',
-	['arabstates'] = 'arabicspeaking',
+	['araspeaking'] = 'arabicspeaking',
 
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
@@ -2163,6 +2163,7 @@ local languageThreeLetter = {
 	['spa'] = 'spanishspeaking',
 	['por'] = 'portuguesespeaking',
 	['rus'] = 'russianspeaking',
+	['ara'] = 'arabicspeaking',
 }
 
 -- This table includes
