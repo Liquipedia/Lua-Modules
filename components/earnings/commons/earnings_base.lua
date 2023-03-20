@@ -82,7 +82,7 @@ end
 -- @noRedirect - (optional) team redirects get not resolved before query (only available if queryHistorical is not used)
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 -- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
--- @doNotIncludePlayerEarnings - (optiona) boolean to indicate that player earnings should be ignored
+-- @doNotIncludePlayerEarnings - (optional) boolean to indicate that player earnings should be ignored
 function Earnings.calculateForTeam(args)
 	args = args or {}
 	local teams = args.teams or {}
