@@ -77,7 +77,7 @@ function PrizePoolCurrency.display(args)
 		Variables.varDefine('tournament_currency_date', date)
 		Variables.varDefine('tournament_currency_text', text)
 		Variables.varDefine('tournament_prizepoollocal', prizepool or '')
-		Variables.varDefine('tournament_prizepoolusd', prizepoolUsd or '')
+		Variables.varDefine('tournament_prizepoolusd', prizepoolUsd)
 
 		-- legacy compatibility
 		Variables.varDefine('tournament_currency_rate', currencyRate or '')
@@ -88,7 +88,7 @@ function PrizePoolCurrency.display(args)
 		Variables.varDefine('currency rate', currencyRate)
 		Variables.varDefine('prizepool', prizepool or '')
 		Variables.varDefine('prizepool usd', prizepoolUsd or '')
-		Variables.varDefine('tournament_prizepool', prizepoolUsd or '')
+		Variables.varDefine('tournament_prizepool', prizepoolUsd)
 	end
 
 	local display = Currency.display(USD, prizepoolUsd, {
