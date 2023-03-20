@@ -41,7 +41,7 @@ local _league
 local _next
 local _previous
 
-local GREATER_EQUAL = '&#8805; '
+local GREATER_EQUAL = '&#8805;'
 local PRIZE_POOL_ROUND_PRECISION = 2
 local TODAY = os.date('%Y-%m-%d', os.time())
 local TIER_MODE_TYPES = 'types'
