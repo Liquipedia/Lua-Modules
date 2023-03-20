@@ -18,7 +18,6 @@ local PrizePoolCurrency = {}
 
 local NOW = os.date('!%F')
 local USD = 'USD'
-local LANG = mw.language.new('en')
 local CATEGRORY = '[[Category:Tournaments with invalid prize pool]]'
 
 function PrizePoolCurrency.display(args)
@@ -92,10 +91,17 @@ function PrizePoolCurrency.display(args)
 		Variables.varDefine('tournament_prizepool', prizepoolUsd or '')
 	end
 
-	local display = Currency.display(USD, prizepoolUsd, {setVariables = false, formatValue = true, formatPrecision = displayRoundPrecision})
+	local display = Currency.display(USD, prizepoolUsd, {
+			setVariables = false,
+			formatValue = true,
+			formatPrecision = displayRoundPrecision
+		})
 	if String.isNotEmpty(prizepool) then
-		display = Currency.display(currency, prizepool, {setVariables = true, formatValue = true, formatPrecision = displayRoundPrecision})
-			.. '<br>(≃ ' .. display .. ')'
+		display = Currency.display(currency, prizepool, {
+				setVariables = true,
+				formatValue = true,
+				formatPrecision = displayRoundPrecision
+			}) .. '<br>(≃ ' .. display .. ')'
 	end
 
 	return display
