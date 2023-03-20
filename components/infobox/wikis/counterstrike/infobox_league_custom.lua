@@ -114,6 +114,7 @@ function CustomLeague.run(frame)
 
 	_args['publisherdescription'] = 'metadesc-valve'
 	_args.liquipediatier = Tier.number[_args.liquipediatier]
+	_args.currencyDispPrecision = 2
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -165,13 +166,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize Pool',
-				content = {CustomLeague:_createPrizepool(_args)}
-			},
-		}
 	elseif id == 'liquipediatier' then
 		table.insert(
 			widgets,
@@ -255,45 +249,6 @@ function CustomLeague:appendLiquipediatierDisplay()
 
 	if Logic.readBool(_args.cstrikemajor) then
 		content = content .. ' [[File:cstrike-icon.png|x16px|link=Counter-Strike Majors|Counter-Strike Major]]'
-	end
-
-	return content
-end
-
-function CustomLeague:_createPrizepool(args)
-	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
-		return nil
-	end
-
-	local content
-	local prizepool = args.prizepool
-	local prizepoolInUsd = args.prizepoolusd
-	local localCurrency = args.localcurrency
-
-	if String.isEmpty(prizepool) then
-		content = '$' .. (prizepoolInUsd) .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
-	else
-		if String.isNotEmpty(localCurrency) then
-			content = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{localCurrency:lower(), prizepool = prizepool}
-			)
-			Variables.varDefine('prizepoollocal', content)
-		else
-			content = prizepool
-		end
-
-		if String.isNotEmpty(prizepoolInUsd) then
-			content = content .. '<br>(≃ $' .. prizepoolInUsd .. ' ' ..
-				Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
-		end
-	end
-
-	if String.isNotEmpty(prizepoolInUsd) then
-		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
-	else
-		Variables.varDefine('tournament_prizepoolusd', 0)
 	end
 
 	return content
