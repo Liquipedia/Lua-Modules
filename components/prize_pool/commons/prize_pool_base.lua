@@ -491,7 +491,7 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 	end
 
 	local baseMoney = tonumber(Variables.varDefault('tournament_prizepool_' .. BASE_CURRENCY:lower())) or 0
-	-- if we have currency conversion or entered usd values display it
+	-- if we have currency conversion (i.e. entered `localcurrency`) or entered usd values display it
 	-- if we have baseMoney and it being not 0 display it
 	-- should we add a check against tournament_parent wiki var to display it if we have section preview???
 	if self.options.showBaseCurrency or baseMoney ~= 0 then
