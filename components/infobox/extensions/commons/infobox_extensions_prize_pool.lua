@@ -41,7 +41,7 @@ function PrizePoolCurrency.display(args)
 			return (args.prizepool or args.prizepoolUsd or '')
 				.. '[[Category:Tournaments with invalid prize pool]]'
 		else
-			return (args.prizepool or args.prizepoolUsd or '')
+			return args.prizepool or args.prizepoolUsd or ''
 		end
 	end
 
@@ -80,18 +80,18 @@ function PrizePoolCurrency.display(args)
 
 		Variables.varDefine('tournament_currency_date', date)
 		Variables.varDefine('tournament_currency_text', text)
-		Variables.varDefine('tournament_prizepoollocal', prizepool or '')
+		Variables.varDefine('tournament_prizepoollocal', prizepool)
 		Variables.varDefine('tournament_prizepoolusd', prizepoolUsd)
 
 		-- legacy compatibility
-		Variables.varDefine('tournament_currency_rate', currencyRate or '')
-		Variables.varDefine('tournament_prizepool_local', prizepool or '')
-		Variables.varDefine('tournament_prizepool_usd', prizepoolUsd or '')
-		Variables.varDefine('currency', args.currency and currency or '')
+		Variables.varDefine('tournament_currency_rate', currencyRate)
+		Variables.varDefine('tournament_prizepool_local', prizepool)
+		Variables.varDefine('tournament_prizepool_usd', prizepoolUsd)
+		Variables.varDefine('currency', args.currency and currency)
 		Variables.varDefine('currency date', date)
 		Variables.varDefine('currency rate', currencyRate)
-		Variables.varDefine('prizepool', prizepool or '')
-		Variables.varDefine('prizepool usd', prizepoolUsd or '')
+		Variables.varDefine('prizepool', prizepool)
+		Variables.varDefine('prizepool usd', prizepoolUsd)
 		Variables.varDefine('tournament_prizepool', prizepoolUsd)
 	end
 
