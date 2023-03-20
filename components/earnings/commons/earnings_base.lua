@@ -164,7 +164,7 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 
 	local queryParameters = {
 		conditions = conditions,
-		query = 'individualprizemoney, prizemoney, opponentplayers, date, mode, opponenttype',
+		query = 'individualprizemoney, prizemoney, opponentplayers, date, mode, opponenttype, opponentname',
 	}
 	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
 
@@ -194,7 +194,7 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 	if isPlayerQuery then
 		return tonumber(placement.individualprizemoney)
 			or (placement.prizemoney / Earnings.divisionFactorPlayer(placement.mode))
-	elseif placement.opponenttype == Opponent.team then
+	elseif placement.opponenttype == Opponent.team and Table.includes(aliases, placement.opponentname) then
 		return placement.prizemoney
 	end
 
