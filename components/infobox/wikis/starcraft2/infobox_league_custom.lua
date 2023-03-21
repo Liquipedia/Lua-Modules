@@ -10,7 +10,6 @@ local AllowedServers = require('Module:Server')
 local Array = require('Module:Array')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
-local Currency = require('Module:Currency')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
@@ -23,6 +22,7 @@ local Table = require('Module:Table')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 
@@ -41,7 +41,8 @@ local _league
 local _next
 local _previous
 
-local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
+local GREATER_EQUAL = '&#8805;'
+local PRIZE_POOL_ROUND_PRECISION = 2
 local TODAY = os.date('%Y-%m-%d', os.time())
 local TIER_MODE_TYPES = 'types'
 local TIER_MODE_TIERS = 'tiers'
@@ -167,51 +168,49 @@ function CustomLeague._mapsDisplay(prefix)
 end
 
 function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and
-		String.isEmpty(_args.prizepoolusd) then
-		return nil
+	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
+		return
 	end
 
 	local localCurrency = _args.localcurrency
-	local prizePoolUSD = _args.prizepoolusd
-	local prizePool = _args.prizepool
 
 	if localCurrency == 'text' then
-		return prizePool
+		return _args.prizepool
 	else
-		local display, hasText, hasPlus
-		if prizePoolUSD then
-			prizePoolUSD, hasText, hasPlus = CustomLeague:_cleanPrizeValue(prizePoolUSD)
+		local prizePoolUSD = _args.prizepoolusd
+		local prizePool = _args.prizepool
+
+		if not localCurrency and not prizePoolUSD then
+			prizePoolUSD = prizePool
+			prizePool = nil
 		end
 
-		prizePool, hasText, hasPlus = CustomLeague:_cleanPrizeValue(prizePool, localCurrency, hasPlus, hasText)
+		local hasPlus
+		prizePoolUSD, hasPlus = CustomLeague:_removePlus(prizePoolUSD)
+		prizePool, hasPlus = CustomLeague:_removePlus(prizePool, hasPlus)
 
-		if not prizePoolUSD and localCurrency then
-			local exchangeDate = Variables.varDefault('tournament_enddate', TODAY)
-			prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
-			if not prizePoolUSD then
-				error('Invalid local currency "' .. localCurrency .. '"')
-			end
-		end
-
-		local plusText = hasPlus and '+' or ''
-		if prizePoolUSD and prizePool then
-			display = Currency.display((localCurrency or ''):lower(), CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText)
-				.. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. ABBR_USD .. ')'
-		elseif prizePool or prizePoolUSD then
-			display = '$' .. CustomLeague:_displayPrizeValue(prizePool or prizePoolUSD, 2) .. plusText .. ' ' .. ABBR_USD
-		end
-		if hasText then
-			display = (display or _args.prizepool or '') ..
-				'[[Category:Pages with text set as prizepool in infobox league]]'
-		end
-
-		Variables.varDefine('usd prize', prizePoolUSD or prizePool)
-		Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
-		Variables.varDefine('local prize', prizePool)
-
-		return display
+		return (hasPlus and (GREATER_EQUAL .. ' ') or '') .. InfoboxPrizePool.display{
+			prizepool = prizePool,
+			prizepoolusd = prizePoolUSD,
+			currency = localCurrency,
+			rate = _args.currency_rate,
+			date = _args.currency_date or Variables.varDefault('tournament_enddate'),
+			displayRoundPrecision = PRIZE_POOL_ROUND_PRECISION,
+		}
 	end
+end
+
+function CustomLeague:_removePlus(inputValue, alreadyHasPlus)
+	if not inputValue then
+		return inputValue, alreadyHasPlus
+	end
+
+	local hasPlus = string.sub(inputValue, -1) == '+'
+	if hasPlus then
+		inputValue = string.sub(inputValue, 0, -1)
+	end
+
+	return inputValue, hasPlus or alreadyHasPlus
 end
 
 --function for custom tier handling
@@ -389,66 +388,6 @@ function CustomLeague:_getServer()
 		output = output .. (AllowedServers[string.lower(item)] or ('[[Category:Server Unknown|' .. item .. ']]'))
 	end
 	return output
-end
-
-function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
-	local usdPrize
-	local currencyRate = Currency.getExchangeRate{
-		currency = currency,
-		date = exchangeDate,
-		setVariables = true,
-	}
-	if currencyRate then
-		usdPrize = currencyRate * localPrize
-	end
-
-	return usdPrize
-end
-
-function CustomLeague:_displayPrizeValue(value, numDigits)
-	if String.isEmpty(value) or value == 0 or value == '0' then
-		return '-'
-	end
-
-	numDigits = tonumber(numDigits or 0) or 0
-	local factor = 10^numDigits
-	value = math.floor(value * factor + 0.5) / factor
-
-	--split value into
-	--left = first digit
-	--num = all remaining digits before a possible '.'
-	--right = the '.' and all digits after it (unless they are all 0 or do not exist)
-	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
-	if right:len() > 0 then
-		local decimal = string.sub('0' .. right, 3)
-		right = '.' .. decimal .. string.rep('0', 2 - string.len(decimal))
-	end
-	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
-end
-
-function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
-	if String.isEmpty(value) then
-		return nil, oldHasText, nil
-	end
-
-	--remove white spaces, '&nbsp;' and ','
-	value = string.gsub(value, '%s', '')
-	value = string.gsub(value, '&nbsp;', '')
-	value = string.gsub(value, ',', '')
-	value = string.gsub(value, '%$', '')
-
-	--check if it has a '+' at the end
-	local hasPlus = string.match(value, '%+$')
-	if hasPlus then
-		value = value:gsub('%+$', '')
-		hasPlus = true
-	end
-
-	--check if additional non numbers are present
-	local hasText = string.match(value, '[^%.%d]')
-	value = tonumber(value)
-
-	return value, hasText or oldHasText, hasPlus or oldHasPlus
 end
 
 function CustomLeague._playerBreakDownEvent()
