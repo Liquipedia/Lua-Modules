@@ -214,7 +214,7 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 	return indivPrize * numberOfPlayersFromTeam
 end
 
--- legacy
+-- legacy for the case of outdated data or misusage of PPT/TC
 -- @deprecated
 function Earnings.divisionFactorPlayer(mode)
 	if mode == '4v4' then
