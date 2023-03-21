@@ -328,6 +328,13 @@ function Series:_getCategories(args)
 		table.insert(categories, self:_setCountryCategories(country))
 	end
 
+	Array.extendWith(categories, self:addTierCategories(args))
+
+	return categories
+end
+
+function Series:addTierCategories(args)
+	local categories = {}
 	local tier = args.liquipediatier
 	local tierType = args.liquipediatiertype
 
