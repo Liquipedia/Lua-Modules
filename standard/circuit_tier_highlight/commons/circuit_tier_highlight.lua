@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
 
 local CircuitTierHighlight = {}
 
