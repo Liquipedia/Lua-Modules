@@ -118,19 +118,19 @@ function Earnings.calculateForTeam(args)
 		queryTeams = teams
 	end
 
-	local formatParicipant = function(lpdbField)
+	local formatParticipant = function(lpdbField)
 		return '([[' .. lpdbField .. '::' ..
 			table.concat(queryTeams, ']] OR [[' .. lpdbField .. '::')
 			.. ']])'
 	end
 
 	if Logic.readBool(args.doNotIncludePlayerEarnings) then
-		return Earnings.calculate(formatParicipant('opponentname'), args.year, args.mode, args.perYear)
+		return Earnings.calculate(formatParticipant('opponentname'), args.year, args.mode, args.perYear)
 	end
 
-	local teamConditions = {formatParicipant('opponentname', queryTeams)}
+	local teamConditions = {formatParticipant('opponentname', queryTeams)}
 	for playerIndex = 1, playerPositionLimit do
-		table.insert(teamConditions, formatParicipant('opponentplayers_p' .. playerIndex .. 'team'))
+		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'team'))
 	end
 	teamConditions = '(' .. table.concat(teamConditions, ' OR ') .. ')'
 
