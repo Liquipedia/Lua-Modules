@@ -29,7 +29,7 @@ function PrizePoolCurrency.display(args)
 	local prizepoolUsd = PrizePoolCurrency._cleanValue(args.prizepoolusd)
 	local currencyRate = tonumber(args.rate)
 	local setVariables = Logic.emptyOr(args.setvariables, true)
-	local varRoundPrecision = tonumber(args.varRoundPrecision) or (args.varRoundPrecision == 'full' and 'full') or 2
+	local varRoundPrecision = tonumber(args.varRoundPrecision) or (args.varRoundPrecision == 'full' and -1) or 2
 	local displayRoundPrecision = tonumber(args.displayRoundPrecision) or 0
 
 	if Logic.isNumeric(varRoundPrecision) and varRoundPrecision < displayRoundPrecision then
@@ -69,7 +69,7 @@ function PrizePoolCurrency.display(args)
 		end
 	end
 
-	if Logic.isNumeric(varRoundPrecision) then
+	if varRoundPrecision ~= -1 then
 		prizepoolUsd = Math.round{prizepoolUsd, varRoundPrecision}
 	end
 
