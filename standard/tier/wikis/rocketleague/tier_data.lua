@@ -92,10 +92,10 @@ return {
 		showmatch = {
 			value = 'Showmatch',
 			sort = 'B1',
-			name = 'Showmatch',
-			short = 'Showm.',
-			link = 'Showmatches',
-			category = 'Showmatch Tournaments',
+			name = 'Show Match',
+			short = 'ShowM.',
+			link = 'Show Matches',
+			category = 'Show Match Tournaments',
 		},
 		school = {
 			value = 'School',
