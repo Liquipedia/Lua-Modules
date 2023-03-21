@@ -16,6 +16,8 @@ local CircuitTierHighlight = {}
 ---@return boolean
 function CircuitTierHighlight.tournament(args)
 	return Logic.readBool(args.publishertier)
+		or String.isNotEmpty(item.extradata.publisherpremier)
+		or (String.isNotEmpty(item.extradata.valvepremier) and item.publishertier ~= 'Minor')
 end
 
 -- if a wiki needs a different function for matches they can set it up
