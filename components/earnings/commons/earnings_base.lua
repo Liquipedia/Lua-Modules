@@ -193,7 +193,8 @@ end
 function Earnings._determineValue(placement, aliases, isPlayerQuery)
 	if isPlayerQuery then
 		return tonumber(placement.individualprizemoney)
-			or (placement.prizemoney / Earnings.divisionFactorPlayer(placement.mode))
+			or Earnings.divisionFactorPlayer and (placement.prizemoney / Earnings.divisionFactorPlayer(placement.mode))
+			or 0
 	elseif placement.opponenttype == Opponent.team and Table.includes(aliases, placement.opponentname) then
 		return placement.prizemoney
 	end
