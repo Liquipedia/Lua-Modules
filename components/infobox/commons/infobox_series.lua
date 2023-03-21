@@ -358,7 +358,7 @@ end
 
 function Series:_setCountryCategories(country)
 	if String.isEmpty(country) then
-		return
+		return nil
 	end
 
 	local countryAdjective = Flags.getLocalisation(country)
