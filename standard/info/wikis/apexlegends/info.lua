@@ -16,16 +16,16 @@ return {
 			name = 'Apex Legends',
 			link = 'Apex Legends',
 			logo = {
-				darkMode = 'Apex Legends default lightmode.png',
-				lightMode = 'Apex Legends default darkmode.png',
+				darkMode = 'Apex Legends default darkmode.png',
+				lightMode = 'Apex Legends default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Apex Legends gameicon lightmode.png',
-				lightMode = 'Apex Legends gameicon darkmode.png',
+				darkMode = 'Apex Legends default darkmode.png',
+				lightMode = 'Apex Legends default lightmode.png',
 			},
 		},
 	},
 	defaultGame = 'apexlegends',
-	defaultTeamLogo = 'Apex Legends gameicon lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Apex Legends gameicon darkmode.png', ---@deprecated
+	defaultTeamLogo = 'Apex Legends default lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Apex Legends default darkmode.png', ---@deprecated
 }

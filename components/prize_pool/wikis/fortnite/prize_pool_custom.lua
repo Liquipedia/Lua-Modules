@@ -39,6 +39,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
+	lpdbData.players = lpdbData.opponentplayers
+
 	local team = lpdbData.participant or ''
 	local lpdbPrefix = Variables.varDefault('lpdb_prefix') or ''
 
