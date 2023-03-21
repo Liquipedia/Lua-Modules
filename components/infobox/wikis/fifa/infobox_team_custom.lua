@@ -9,14 +9,12 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local MatchTicker = require('Module:MatchTicker/Participant')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
-local Cell = Widgets.Cell
 
 local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
