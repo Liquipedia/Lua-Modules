@@ -33,7 +33,7 @@ function MatchTicker.Query.BaseConditions:build(queryArgs)
 		self.conditionTree:add(ConditionNode(ColumnName('publishertier'), Comparator.eq, 'true'))
 	end
 
-	return self.conditionTree
+	return self.conditionTree:toString()
 end
 
 MatchTicker.HelperFunctions.tbdIdentifier = 'definitions'
