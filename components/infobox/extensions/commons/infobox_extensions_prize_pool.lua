@@ -32,7 +32,7 @@ function PrizePoolCurrency.display(args)
 	local varRoundPrecision = tonumber(args.varRoundPrecision) or (args.varRoundPrecision == 'full' and -1) or 2
 	local displayRoundPrecision = tonumber(args.displayRoundPrecision) or 0
 
-	if Logic.isNumeric(varRoundPrecision) and varRoundPrecision < displayRoundPrecision then
+	if (varRoundPrecision ~= -1) and (varRoundPrecision < displayRoundPrecision) then
 		return PrizePoolCurrency._errorMessage('Display precision cannot be higher than Variable precious')
 	end
 
