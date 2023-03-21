@@ -21,6 +21,7 @@ local HiddenDataBox = {}
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
+local DEFAULT_TIER_TYPE = 'general'
 
 ---Entry point
 function HiddenDataBox.run(args)
@@ -149,11 +150,11 @@ function HiddenDataBox.validateTier(tier, tierType)
 
 	local tierValue, tierTypeValue = Tier.toValue(tier, tierType)
 
-	if not tierValue then
+	if tier and not tierValue then
 		table.insert(warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 	end
 
-	if tierType and not tierTypeValue then
+	if tierType and tierType:lower() ~= DEFAULT_TIER_TYPE and not tierTypeValue then
 		table.insert(warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 	end
 
