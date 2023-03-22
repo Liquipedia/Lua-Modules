@@ -18,4 +18,7 @@ CustomEarnings.divisionFactorPlayer = function(mode)
 	-- for duo opponents and no usage of teamCard
 end
 
+-- legacy mode since data on this wiki is legacy
+CustomEarnings.legacyMode = true
+
 return Class.export(CustomEarnings)
