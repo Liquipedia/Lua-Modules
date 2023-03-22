@@ -35,7 +35,6 @@ Earnings.defaultNumberOfStoredPlayersPerMatch = 10
 -- @prefix - (optional) the prefix under which the players are stored in the placements
 -- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
--- @legacyMode - (optional) enable only for smash, fighters and brawlhalla as their data is legacy
 function Earnings.calculateForPlayer(args)
 	args = args or {}
 	local player = args.player
@@ -65,7 +64,7 @@ function Earnings.calculateForPlayer(args)
 		'[[opponentname::' .. playerAsPageName .. ']]',
 	}
 
-	if Logic.readBool(args.legacyMode) then
+	if Earnings.legacyMode then
 		table.insert(playerConditions, '[[participant::' .. player .. ']]')
 		table.insert(playerConditions, '[[participant::' .. playerAsPageName .. ']]')
 		table.insert(playerConditions, '[[participantlink::' .. player .. ']]')
@@ -76,7 +75,7 @@ function Earnings.calculateForPlayer(args)
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. player .. ']]')
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]')
 
-		if Logic.readBool(args.legacyMode) then
+		if Earnings.legacyMode then
 			table.insert(playerConditions, '[[players_' .. prefix .. playerIndex .. '::' .. player .. ']]')
 			table.insert(playerConditions, '[[players_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]')
 		end
