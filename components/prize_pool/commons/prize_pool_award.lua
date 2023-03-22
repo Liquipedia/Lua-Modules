@@ -90,12 +90,13 @@ function AwardPrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 	if String.isNotEmpty(lpdbPrefix) then
 		objectName = objectName .. '_' .. lpdbPrefix
 	end
+
+	-- Append the award name in case there is a participant who gets several awards
+	objectName = objectName .. '_' .. lpdbEntry.extradata.award
+
 	if lpdbEntry.opponenttype == Opponent.team then
 		return objectName .. '_' .. mw.ustring.lower(lpdbEntry.participant)
 	end
-
-	-- Append the award name in case there is a player who gets several awards
-	objectName = objectName .. '_' .. lpdbEntry.extradata.award
 
 	-- for non team opponents the pagename can be case sensitive
 	-- so objectname needs to be case sensitive to avoid edge cases
