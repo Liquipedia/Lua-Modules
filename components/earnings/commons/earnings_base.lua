@@ -35,6 +35,7 @@ Earnings.defaultNumberOfStoredPlayersPerMatch = 10
 -- @prefix - (optional) the prefix under which the players are stored in the placements
 -- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
+-- @legacyMode - (optional) enable only for smash, fighters and brawlhalla as their data is legacy
 function Earnings.calculateForPlayer(args)
 	args = args or {}
 	local player = args.player
@@ -63,9 +64,22 @@ function Earnings.calculateForPlayer(args)
 		'[[opponentname::' .. player .. ']]',
 		'[[opponentname::' .. playerAsPageName .. ']]',
 	}
+
+	if Logic.readBool(args.legacyMode) then
+		table.insert(playerConditions, '[[participant::' .. player .. ']]')
+		table.insert(playerConditions, '[[participant::' .. playerAsPageName .. ']]')
+		table.insert(playerConditions, '[[participantlink::' .. player .. ']]')
+		table.insert(playerConditions, '[[participantlink::' .. playerAsPageName .. ']]')
+	end
+
 	for playerIndex = 1, playerPositionLimit do
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. player .. ']]')
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]')
+
+		if Logic.readBool(args.legacyMode) then
+			table.insert(playerConditions, '[[players_' .. prefix .. playerIndex .. '::' .. player .. ']]')
+			table.insert(playerConditions, '[[players_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]')
+		end
 	end
 	playerConditions = '(' .. table.concat(playerConditions, ' OR ') .. ')'
 
@@ -168,13 +182,16 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 	}
 	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
 
+	if not perYear then
+		return MathUtils._round(totalEarnings)
+	end
+
 	local totalEarningsByYear = {}
 	for year, earningsOfYear in pairs(sums) do
 		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear)
 	end
-	totalEarnings = MathUtils._round(totalEarnings)
 
-	return totalEarnings, totalEarningsByYear
+	return MathUtils._round(totalEarnings), totalEarningsByYear
 end
 
 function Earnings._buildConditions(conditions, year, mode)
@@ -191,17 +208,21 @@ function Earnings._buildConditions(conditions, year, mode)
 end
 
 function Earnings._determineValue(placement, aliases, isPlayerQuery)
+	local indivPrize = tonumber(placement.individualprizemoney)
+
 	if isPlayerQuery then
-		return tonumber(placement.individualprizemoney)
-			or Earnings.divisionFactorPlayer and (placement.prizemoney / Earnings.divisionFactorPlayer(placement.mode))
-			or 0
+		--workaround for smash and fighters since they store wrongly 0 in that field on lots of cases
+		if indivPrize and indivPrize > 0 then
+			return indivPrize
+		end
+
+		return placement.prizemoney / Earnings.divisionFactorPlayer(placement.mode)
 	elseif placement.opponenttype == Opponent.team and Table.includes(aliases, placement.opponentname) then
 		return placement.prizemoney
 	end
 
-	local indivPrize = tonumber(placement.individualprizemoney)
 	if not indivPrize then
-		return 0 --???
+		return 0
 	end
 
 	local numberOfPlayersFromTeam = 0
