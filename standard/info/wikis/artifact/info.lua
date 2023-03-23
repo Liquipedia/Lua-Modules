@@ -11,10 +11,10 @@ return {
 	wikiName = 'artifact',
 	name = 'Artifact',
 	games = {
-		abbreviation = 'Artifact',
-		name = 'Artifact',
-		link = 'Artifact',
 		artifact = {
+			abbreviation = 'Artifact',
+			name = 'Artifact',
+			link = 'Artifact',
 			logo = {
 				darkMode = 'Logo filler event.png',
 				lightMode = 'Logo filler event.png',
