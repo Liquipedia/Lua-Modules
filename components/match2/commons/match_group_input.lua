@@ -51,6 +51,8 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		end
 	end
 
+	local matchesAreProcessed = Logic.readBool(args.matchesAreProcessed)
+
 	return Array.map(matchKeys, function(matchKey, matchIndex)
 			local matchId = MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
 			local matchArgs = Json.parse(args[matchKey])
@@ -60,7 +62,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 			matchArgs.bracketid = bracketId
 			matchArgs.matchid = matchId
-			local match = WikiSpecific.processMatch(matchArgs)
+			local match = matchesAreProcessed and matchArgs or WikiSpecific.processMatch(matchArgs)
 
 			-- Add more fields to bracket data
 			match.bracketdata = match.bracketdata or {}
@@ -96,6 +98,8 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	local templateId = args[1]
 	assert(templateId, 'argument \'1\' (templateId) is empty')
 
+	local matchesAreProcessed = Logic.readBool(args.matchesAreProcessed)
+
 	local bracketDatasById = Logic.try(function()
 		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	end)
@@ -129,7 +133,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = WikiSpecific.processMatch(matchArgs)
+		local match = matchesAreProcessed and matchArgs or WikiSpecific.processMatch(matchArgs)
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
