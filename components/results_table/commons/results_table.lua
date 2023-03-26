@@ -102,7 +102,7 @@ function ResultsTable:buildRow(placement)
 
 	row:tag('td'):css('text-align', 'right'):wikitext('$' .. Currency.formatMoney(
 			self.config.queryType ~= Opponent.team and placement.individualprizemoney
-			or placement.prizemoney
+			or placement.prizemoney, 0
 		))
 
 	return row
