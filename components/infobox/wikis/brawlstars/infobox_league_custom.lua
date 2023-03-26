@@ -19,9 +19,9 @@ local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supercell|Tournament sponsored by Supercell.'
-	.. '|class=show-when-light-mode]][[File:Supercell darkmode.png|x18px|link=Supercell'
-	.. '|Tournament sponsored by Supercell.|class=show-when-dark-mode]]'
+local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supercell'
+	.. '|Tournament sponsored by Supercell.|class=show-when-light-mode]][[File:Supercell darkmode.png'
+	.. '|x18px|link=Supercell|Tournament sponsored by Supercell.|class=show-when-dark-mode]]'
 
 local ORGANIZER_ICONS = {
 	supercell = '[[File:Supercell lightmode.png.png|x18px|link=Supercell|Supercell|class=show-when-light-mode]]'
