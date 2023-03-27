@@ -112,6 +112,7 @@ local PREFIXES = {
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
+	kick = {'https://www.kick.com/'},
 	letsplaylive = {'https://letsplay.live/profile/'},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
