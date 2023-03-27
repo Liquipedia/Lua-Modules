@@ -111,6 +111,7 @@ local PREFIXES = {
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
+	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
 	letsplaylive = {'https://letsplay.live/profile/'},
 	loco = {'https://loco.gg/streamers/'},
