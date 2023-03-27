@@ -13,6 +13,7 @@ return {
 	games = {
 		cs16 = {
 			abbreviation = 'CS',
+			categoryPrefix = 'CS1',
 			name = 'Counter-Strike',
 			link = 'Counter-Strike',
 			logo = {
@@ -26,6 +27,7 @@ return {
 		},
 		css = {
 			abbreviation = 'CS:S',
+			categoryPrefix = 'CSS',
 			name = 'Source',
 			link = 'Counter-Strike: Source',
 			logo = {
@@ -39,6 +41,7 @@ return {
 		},
 		cscz = {
 			abbreviation = 'CS:CZ',
+			categoryPrefix = 'CSCZ',
 			name = 'Condition Zero',
 			link = 'Counter-Strike: Condition Zero',
 			logo = {
@@ -52,6 +55,7 @@ return {
 		},
 		cso = {
 			abbreviation = 'CSO',
+			categoryPrefix = 'CSO',
 			name = 'Counter-Strike Online',
 			link = 'Counter-Strike Online',
 			logo = {
@@ -65,6 +69,7 @@ return {
 		},
 		csgo = {
 			abbreviation = 'CS:GO',
+			categoryPrefix = 'CSGO',
 			name = 'Global Offensive',
 			link = 'Counter-Strike: Global Offensive',
 			logo = {
@@ -78,6 +83,7 @@ return {
 		},
 		cs2 = {
 			abbreviation = 'CS2',
+			categoryPrefix = 'CS2',
 			name = 'Counter-Strike 2',
 			link = 'Counter-Strike 2',
 			logo = {
