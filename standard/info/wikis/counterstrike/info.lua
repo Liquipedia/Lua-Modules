@@ -6,12 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-return {
+local infoData = {
 	startYear = 2000,
 	wikiName = 'counterstrike',
 	name = 'Counter-Strike',
 	games = {
-		cs16 = {
+		cs1 = {
 			abbreviation = 'CS',
 			categoryPrefix = 'CS1',
 			name = 'Counter-Strike',
@@ -114,3 +114,7 @@ return {
 		cs2 = 'Counter-Strike 2 default lightmode.png',
 	}, ---@deprecated
 }
+
+infoData.games.cs16 = infoData.games.cs1
+
+return infoData
