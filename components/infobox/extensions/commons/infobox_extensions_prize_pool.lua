@@ -29,10 +29,10 @@ function PrizePoolCurrency.display(args)
 	local prizepoolUsd = PrizePoolCurrency._cleanValue(args.prizepoolusd)
 	local currencyRate = tonumber(args.rate)
 	local setVariables = Logic.emptyOr(args.setvariables, true)
-	local varRoundPrecision = tonumber(args.varRoundPrecision)
+	local varRoundPrecision = tonumber(args.varRoundPrecision) or (args.varRoundPrecision == 'full' and -1) or 2
 	local displayRoundPrecision = tonumber(args.displayRoundPrecision) or 0
 
-	if varRoundPrecision and varRoundPrecision < displayRoundPrecision then
+	if (varRoundPrecision ~= -1) and (varRoundPrecision < displayRoundPrecision) then
 		return PrizePoolCurrency._errorMessage('Display precision cannot be higher than Variable precious')
 	end
 
@@ -69,7 +69,7 @@ function PrizePoolCurrency.display(args)
 		end
 	end
 
-	if varRoundPrecision then
+	if varRoundPrecision ~= -1 then
 		prizepoolUsd = Math.round{prizepoolUsd, varRoundPrecision}
 	end
 

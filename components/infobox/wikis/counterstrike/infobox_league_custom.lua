@@ -18,6 +18,8 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
+local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
@@ -106,6 +108,8 @@ local _TIER_VALVE_MAJOR = 'major'
 local _MODE_1v1 = '1v1'
 local _MODE_TEAM = 'team'
 
+local PRIZE_POOL_ROUND_PRECISION = 2
+
 local _args
 
 function CustomLeague.run(frame)
@@ -114,7 +118,7 @@ function CustomLeague.run(frame)
 
 	_args.publisherdescription = 'metadesc-valve'
 	_args.liquipediatier = Tier.toNumber(_args.liquipediatier)
-	_args.currencyDispPrecision = 2
+	_args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -299,6 +303,15 @@ function CustomLeague:defineCustomPageVariables(args)
 		args.series == 'Danish Pro League' or
 		args.series == 'Swedish Pro League') and 'true' or 'false')
 
+	-- Prize Pool vars
+	if String.isNotEmpty(args.localcurrency) and String.isNotEmpty(args.prizepool) then
+		local currency = string.upper(args.localcurrency)
+		local prize = InfoboxPrizePool._cleanValue(args.prizepool)
+		Variables.varDefine('prizepoollocal', Currency.display(currency, prize, {
+					formatValue = true,
+					formatPrecision = PRIZE_POOL_ROUND_PRECISION
+				}))
+	end
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)

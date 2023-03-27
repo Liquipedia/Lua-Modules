@@ -116,6 +116,7 @@ local _PRIORITY_GROUPS = {
 		'zhangyutv',
 		'bilibili-stream',
 		'kuaishou',
+		'kick',
 		'cc',
 		'nimotv',
 		'openrec',

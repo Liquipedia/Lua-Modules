@@ -109,7 +109,7 @@ function NotabilityChecker._calculatePersonNotability(person)
 	-- Add conditions.
 	-- We check for names with spaces, then names with underscores.
 	local conditions = {}
-	for _, name in pairs({person, person:gsub(' ', '_')}) do
+	for _, name in pairs({person, (person:gsub(' ', '_'))}) do
 		table.insert(conditions, '[[participant::' .. name .. ']]')
 		for i = 1, Config.MAX_NUMBER_OF_PARTICIPANTS do
 			table.insert(conditions, '[[players_p' .. tostring(i) .. '::' .. name .. ']]')
