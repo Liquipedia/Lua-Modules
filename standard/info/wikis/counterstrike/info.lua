@@ -118,5 +118,6 @@ local infoData = {
 }
 
 infoData.games.cs16 = infoData.games.cs1
+infoData.games.cs = infoData.games.cs1
 
 return infoData
