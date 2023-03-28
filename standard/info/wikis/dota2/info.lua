@@ -39,6 +39,7 @@ return {
 		},
 	},
 	defaultGame = 'dota2',
+	defaultRoundPrecision = 2,
 	defaultTeamLogo = 'Dota2 logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Dota2 logo.png', ---@deprecated
 }
