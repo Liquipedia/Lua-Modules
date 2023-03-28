@@ -26,6 +26,7 @@ return {
 		},
 	},
 	defaultGame = 'brawlstars',
+	defaultRoundPrecision = 2,
 	defaultTeamLogo = 'Brawl Stars Default allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Brawl Stars Default allmode.png', ---@deprecated
 }
