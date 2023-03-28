@@ -39,7 +39,7 @@ return {
 		},
 	},
 	defaultGame = 'siege',
-	defaultRoundPrecision = 2,
+	defaultRoundPrecision = 0,
 
 	defaultTeamLogo = {
 		siege = 'Rainbow Six Siege Logo lightmode.png',
