@@ -39,7 +39,6 @@ return {
 		},
 	},
 	defaultGame = 'rl',
-	defaultRoundPrecision = 2,
 	defaultTeamLogo = 'Rocket League.png', ---@deprecated
 	defaultTeamLogoDark = 'Rocket League.png', ---@deprecated
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
