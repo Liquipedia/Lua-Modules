@@ -9,15 +9,15 @@
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
 
-local CircuitTierHighlight = {}
+local HighlightConditions = {}
 
 --- Check arguments or queryData if the tournament should be highlighted
----@param args table
+---@param data table
 ---@return boolean
-function CircuitTierHighlight.tournament(args)
-	args.extradata = args.extradata or {}
+function HighlightConditions.tournament(data)
+	data.extradata = data.extradata or {}
 
-	return String.isNotEmpty(args.extradata['is ea major']) or String.isNotEmpty(args.publishertier)
+	return String.isNotEmpty(data.extradata['is ea major']) or String.isNotEmpty(data.publishertier)
 end
 
-return Class.export(CircuitTierHighlight)
+return HighlightConditions
