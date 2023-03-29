@@ -19,7 +19,7 @@ local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
-function CustomSquad:headerTlpb()
+function CustomSquad:headerTlpd()
 	local makeHeader = function(wikiText)
 		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
 	end
@@ -51,9 +51,9 @@ function CustomSquad.run(frame)
 
 	local args = squad.args
 
-	local tlpb = Logic.readBool(args.tlpb)
-	if tlpb then
-		squad.header = CustomSquad.headerTlpb
+	local tlpd = Logic.readBool(args.tlpd)
+	if tlpd then
+		squad.header = CustomSquad.headerTlpd
 	else
 		squad:title()
 	end
@@ -67,14 +67,14 @@ function CustomSquad.run(frame)
 	Array.forEach(players, function (player)
 		local row = ExtendedSquadRow()
 
-		local faction = CustomSquad._queryTLPB(player.id, 'race') or player.race
-		local id = CustomSquad._queryTLPB(player.id, 'name') or player.id
+		local faction = CustomSquad._queryTLPD(player.id, 'race') or player.race
+		local id = CustomSquad._queryTLPD(player.id, 'name') or player.id
 		local link = player.link or player.altname or id
-		local currentTeam = CustomSquad._queryTLPB(player.id, 'team_name')
-		local name = CustomSquad._queryTLPB(player.id, 'name_korean') or ''
-		local localizedName = CustomSquad._queryTLPB(player.id, 'name_romanized') or player.name or ''
-		local elo = CustomSquad._queryTLPB(player.id, 'elo')
-		local eloPeak = CustomSquad._queryTLPB(player.id, 'peak_elo')
+		local currentTeam = CustomSquad._queryTLPD(player.id, 'team_name')
+		local name = CustomSquad._queryTLPD(player.id, 'name_korean') or ''
+		local localizedName = CustomSquad._queryTLPD(player.id, 'name_romanized') or player.name or ''
+		local elo = CustomSquad._queryTLPD(player.id, 'elo')
+		local eloPeak = CustomSquad._queryTLPD(player.id, 'peak_elo')
 
 		row:id{
 			id,
@@ -87,7 +87,7 @@ function CustomSquad.run(frame)
 		}
 		row:name{name = name .. ' ' .. localizedName}
 
-		if tlpb then
+		if tlpd then
 			row:elo{eloCurrent = elo, eloPeak = eloPeak}
 		else
 			row:role{role = player.role}
@@ -116,7 +116,7 @@ function CustomSquad.run(frame)
 	return squad:create()
 end
 
-function CustomSquad._queryTLPB(id, value)
+function CustomSquad._queryTLPD(id, value)
 	if not Logic.isNumeric(id) then
 		return
 	end
