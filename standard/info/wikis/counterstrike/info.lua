@@ -33,8 +33,8 @@ local infoData = {
 			name = 'Condition Zero',
 			link = 'Counter-Strike: Condition Zero',
 			logo = {
-				darkMode = 'Cszo small.png',
-				lightMode = 'Cszo small.png',
+				darkMode = 'Cscz small.png',
+				lightMode = 'Cscz small.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'CS default darkmode.png',
