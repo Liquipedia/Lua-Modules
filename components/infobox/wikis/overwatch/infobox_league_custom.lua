@@ -107,7 +107,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.publishertier = args.blizzardtier:lower()
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.liquipediatiertype = args.liquipediatiertype
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
