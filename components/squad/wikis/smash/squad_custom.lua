@@ -29,7 +29,6 @@ function CustomSquad:header()
 
 	headerRow:node(makeHeader('Player'))
 		:node(makeHeader(''))
-		:node(makeHeader('Name'))
 		:node(makeHeader('Main'))
 		:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
@@ -85,8 +84,8 @@ function CustomSquad.run(frame)
 			flag = Variables.varDefault('nationality') or player.flag,
 			link = player.link,
 			team = player.activeteam,
+			name = Variables.varDefault('name') or player.name,
 		}
-		row:name{name = Variables.varDefault('name') or player.name}
 		row:mains{mains = mw.text.split(mains or '', ','), game = game}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
