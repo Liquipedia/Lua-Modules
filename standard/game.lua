@@ -138,20 +138,25 @@ function Game._createIcon(args)
 end
 
 ---Fetches a text display for a given game
----@param args? {game: string?, useDefault: boolean?, noLink: boolean?, link: string?}
+---@param args? {game: string?, useDefault: boolean?, noLink: boolean?, link: string?, useAbbreviation: string?}
 ---@return string?
 function Game.text(args)
 	args = args or {}
 
+	local useAbbreviation = Logic.readBool(args.useAbbreviation)
 	local gameData = Game.raw(args)
 	if Table.isEmpty(gameData) then
-		return Abbreviation.make('Unknown Game', 'The specified game input is not recognized')
+		return Abbreviation.make(useAbbreviation and 'Unkwn.' or 'Unknown Game', 'The specified game input is not recognized')
 	end
 
 	if Logic.readBool(args.noLink) then
-		return gameData.name
+		return useAbbreviation and gameData.abbreviation or gameData.name
 	else
-		return Page.makeInternalLink({onlyIfExists = false}, gameData.name, args.link or gameData.link)
+		return Page.makeInternalLink(
+			{onlyIfExists = false},
+			useAbbreviation and gameData.abbreviation or gameData.name,
+			args.link or gameData.link
+		)
 	end
 end
 
