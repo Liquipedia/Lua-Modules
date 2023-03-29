@@ -6,10 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -133,6 +135,24 @@ function Game._createIcon(args)
 			link = args.link or '',
 		}
 	)
+end
+
+---Fetches a text display for a given game
+---@param args? {game: string?, useDefault: boolean?, noLink: boolean?, link: string?}
+---@return string?
+function Game.text(args)
+	args = args or {}
+
+	local gameData = Game.raw(args)
+	if Table.isEmpty(gameData) then
+		return Abbreviation.make('Unknown Game', 'The specified game input is not recognized')
+	end
+
+	if Logic.readBool(args.noLink) then
+		return gameData.name
+	else
+		return Page.makeInternalLink({onlyIfExists = false}, gameData.name, args.link or gameData.link)
+	end
 end
 
 Game.defaultTeamLogos = FnUtil.memoize(function()
