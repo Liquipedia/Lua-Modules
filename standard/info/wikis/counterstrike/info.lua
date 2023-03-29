@@ -26,21 +26,6 @@ local infoData = {
 				lightMode = 'CS default lightmode.png',
 			},
 		},
-		css = {
-			order = 3,
-			abbreviation = 'CS:S',
-			categoryPrefix = 'CSS',
-			name = 'Source',
-			link = 'Counter-Strike: Source',
-			logo = {
-				darkMode = 'Css small.png',
-				lightMode = 'Css small.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'CS default darkmode.png',
-				lightMode = 'CS default lightmode.png',
-			},
-		},
 		cscz = {
 			order = 2,
 			abbreviation = 'CS:CZ',
@@ -50,6 +35,21 @@ local infoData = {
 			logo = {
 				darkMode = 'Cszo small.png',
 				lightMode = 'Cszo small.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'CS default darkmode.png',
+				lightMode = 'CS default lightmode.png',
+			},
+		},
+		css = {
+			order = 3,
+			abbreviation = 'CS:S',
+			categoryPrefix = 'CSS',
+			name = 'Source',
+			link = 'Counter-Strike: Source',
+			logo = {
+				darkMode = 'Css small.png',
+				lightMode = 'Css small.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'CS default darkmode.png',
