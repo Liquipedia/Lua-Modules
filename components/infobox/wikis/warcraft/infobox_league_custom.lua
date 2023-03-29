@@ -92,7 +92,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
-	league.addTeamIndivCategory = CustomLeague.addTeamIndivCategory
+	league.addParticipantTypeCategory = CustomLeague.addParticipantTypeCategory
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
@@ -442,7 +442,7 @@ function CustomLeague._determineGame()
 	return GAME_FROZEN_THRONE
 end
 
-function CustomLeague:addTeamIndivCategory(args)
+function CustomLeague:addParticipantTypeCategory(args)
 	return {((MODES[_args.mode] or {}).category or MODES.default.category) .. ' Tournaments'}
 end
 
