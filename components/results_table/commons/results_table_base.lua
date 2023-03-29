@@ -439,19 +439,20 @@ function BaseResultsTable:opponentDisplay(data, options)
 
 	local rawTeamTemplate = Team.queryRaw(teamTemplate)
 
-	if self:shouldDisplayAdditionalText(rawTeamTemplate) then
+	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
 		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
 	end
 
 	return teamDisplay
 end
 
-function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate)
+function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLastVs)
 	local config = self.config
 
 	return rawTeamTemplate and (
 		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
-		(config.nonAliasTeamTemplates and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
+		(isNotLastVs and config.nonAliasTeamTemplates
+			and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
 	)
 end
 
