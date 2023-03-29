@@ -15,6 +15,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
@@ -52,19 +53,12 @@ _ROLES.lurk = _ROLES.lurker
 _ROLES.entryfragger = _ROLES.entry
 _ROLES.rifle = _ROLES.rifler
 
-local GAMES = {
-	cs = {name = 'Counter-Strike', link = 'Counter-Strike', category = 'CS', order = 1},
-	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero', category = 'CSCZ', order = 2},
-	css = {name = 'Source', link = 'Counter-Strike: Source', category = 'CSS', order = 3},
-	cso = {name = 'Online', link = 'Counter-Strike Online', category = 'CSO', order = 4},
-	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive', category = 'CSGO', order = 5},
-}
-
 local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _games
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
@@ -85,6 +79,9 @@ function CustomPlayer.run(frame)
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 
 	_args = player.args
+	_games = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
+			return player.args[gameIdentifier]
+		end)
 
 	return player:createInfobox()
 end
@@ -116,9 +113,9 @@ function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell {
 			name = 'Games',
-			content = Array.map(CustomPlayer._getGames(), function (gameData)
-				return Page.makeInternalLink({}, gameData.name, gameData.link)
-			end)
+			content = Array.map(_games, function (gameIdentifier)
+					return Game.text{game = gameIdentifier}
+				end)
 		}
 	}
 end
@@ -141,15 +138,6 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	return lpdbData
 end
 
-function CustomPlayer._getGames()
-	return Array.sortBy(Array.extractValues(Table.map(GAMES, function (key, data)
-		if _args[key] then
-			return key, data
-		end
-		return key, nil
-	end)), function(gameData) return gameData.order end)
-end
-
 function CustomPlayer._getStatusContents()
 	local statusContents = {}
 
@@ -165,10 +153,10 @@ function CustomPlayer._getStatusContents()
 		end
 
 		Array.extendWith(statusContents, Array.map(Player:getAllArgsForBase(_args, 'banned'),
-			function(item)
-				return _BANNED[string.lower(item)]
-			end
-		))
+				function(item)
+					return _BANNED[string.lower(item)]
+				end
+			))
 	end
 
 	return statusContents
@@ -176,19 +164,18 @@ end
 
 function CustomPlayer:getWikiCategories(categories)
 	local typeCategory = self:getPersonType(_args).category
-	local games = CustomPlayer._getGames()
 
-	Array.extendWith(categories, Array.map(games, function (gameData)
-		return gameData.category .. ' ' .. typeCategory .. 's'
-	end))
+	Array.forEach(_games, function (gameIdentifier)
+			local prefix = Game.categoryPrefix{game = gameIdentifier} or Game.name{game = gameIdentifier}
+			table.insert(categories, prefix .. ' ' .. typeCategory .. 's')
+		end)
 
-	if #games == 0 then
+	if Table.isEmpty(_games) then
 		table.insert(categories, 'Gameless Players')
 	end
 
 	return categories
 end
-
 
 function CustomPlayer._createRole(key, role)
 	if String.isEmpty(role) then
