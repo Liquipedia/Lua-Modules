@@ -10,12 +10,12 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
-local CircuitTierHighlight = {}
+local HighlightConditions = {}
 
 --- Check arguments or queryData if the tournament should be highlighted
 ---@param args table
 ---@return boolean
-function CircuitTierHighlight.tournament(data, options)
+function HighlightConditions.tournament(data, options)
 	data.extradata = data.extradata or {}
 	options = options or {}
 
@@ -30,4 +30,4 @@ function CircuitTierHighlight.tournament(data, options)
 	)
 end
 
-return Class.export(CircuitTierHighlight)
+return HighlightConditions
