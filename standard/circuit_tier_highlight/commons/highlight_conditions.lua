@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:CircuitTierHighlight
+-- page=Module:HighlightConditions
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -18,9 +18,11 @@ local CircuitTierHighlight = {}
 function CircuitTierHighlight.tournament(args)
 	args.extradata = args.extradata or {}
 
-	return Logic.readBool(args.publishertier)
-		or String.isNotEmpty(args.extradata.publisherpremier)
-		or (String.isNotEmpty(args.extradata.valvepremier) and args.publishertier ~= 'Minor')
+	return Logic.nilOr(
+		Logic.readBoolOrNil(args.publishertier),
+		String.isNotEmpty(args.extradata.publisherpremier)
+			or (String.isNotEmpty(args.extradata.valvepremier) and args.publishertier ~= 'Minor')
+	)
 end
 
 -- if a wiki needs a different function for matches they can set it up
