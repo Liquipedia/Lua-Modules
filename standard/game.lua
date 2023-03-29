@@ -82,8 +82,12 @@ function Game.listGames(args)
 	args = args or {}
 
 	local gamesList = Array.extractKeys(GamesData or {})
-	if Logic.readBool(args.ordered) then
-		return Array.sortBy(gamesList, function(gameIdentifier) return GamesData[gameIdentifier].order end)
+	if Logic.readBool(args.ordered) and Array.all(gamesList, function(gameIdentifier)
+				return tonumber(GamesData[gameIdentifier].order)
+			end) then
+		return Array.sortBy(gamesList, function(gameIdentifier)
+				return tonumber(GamesData[gameIdentifier].order)
+			end)
 	end
 
 	return gamesList
