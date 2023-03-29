@@ -24,9 +24,9 @@ function CircuitTierHighlight.tournament(data, options)
 	end
 
 	return Logic.nilOr(
-		Logic.readBoolOrNil(args.publishertier),
-		String.isNotEmpty(args.extradata.publisherpremier)
-			or (String.isNotEmpty(args.extradata.valvepremier) and args.publishertier ~= 'Minor')
+		Logic.readBoolOrNil(data.publishertier),
+		String.isNotEmpty(data.extradata.publisherpremier)
+			or (String.isNotEmpty(data.extradata.valvepremier) and data.publishertier ~= 'Minor')
 	)
 end
 
