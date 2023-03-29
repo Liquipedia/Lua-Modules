@@ -12,7 +12,7 @@ local String = require('Module:StringUtils')
 local HighlightConditions = {}
 
 --- Check arguments or queryData if the tournament should be highlighted
----@param args table
+---@param data table
 ---@return boolean
 function HighlightConditions.tournament(data)
 	return String.isNotEmpty(data.publishertier)
