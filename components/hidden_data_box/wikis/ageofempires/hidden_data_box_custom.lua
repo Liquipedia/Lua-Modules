@@ -7,24 +7,19 @@
 --
 local Class = require('Module:Class')
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 
 local CustomHiddenDataBox = {}
 
-local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
-	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
-local TIER_MODE_TYPES = 'types'
-local TIER_MODE_TIERS = 'tiers'
-
 function CustomHiddenDataBox.run(args)
+	args = args or {}
+	args.liquipediatier = Tier.toNumber(args.liquipediatier)
+
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	BasicHiddenDataBox.validateTier = CustomHiddenDataBox.validateTier
 	return BasicHiddenDataBox.run(args)
 end
 
@@ -64,33 +59,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 			Variables.varDefine('tournament_map_'.. (map.name or map.link), map.link)
 		end
 	end
-end
-
-function CustomHiddenDataBox.validateTier(tierString, tierMode)
-	if String.isEmpty(tierString) then
-		return nil, nil
-	end
-	local warning
-	local tierValue = tierString
-	-- tier should be a number defining a tier
-	if tierMode == TIER_MODE_TIERS and not Logic.isNumeric(tierValue) then
-		tierValue = Tier.number[tierValue:lower()] or tierValue
-	end
-	local cleanedTierValue = Tier.text[tierMode][(tierValue):lower()]
-	if not cleanedTierValue then
-		cleanedTierValue = tierString
-		warning = String.interpolate(
-			INVALID_TIER_WARNING,
-			{
-				tierString = tierString,
-				tierMode = tierMode == TIER_MODE_TYPES and 'Tier Type' or 'Tier',
-			}
-		)
-	end
-
-	tierValue = (tierMode == TIER_MODE_TYPES and cleanedTierValue) or tierValue
-
-	return tierValue, warning
 end
 
 return Class.export(CustomHiddenDataBox)

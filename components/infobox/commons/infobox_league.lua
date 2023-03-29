@@ -357,6 +357,8 @@ function League:_createPrizepool(args)
 		currency = args.localcurrency,
 		rate = args.currency_rate,
 		date = date or Variables.varDefault('tournament_enddate'),
+		displayRoundPrecision = args.currencyDispPrecision,
+		varRoundPrecision = args.currencyVarPrecision
 	}
 end
 

@@ -18,6 +18,8 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
+local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
@@ -106,6 +108,8 @@ local _TIER_VALVE_MAJOR = 'major'
 local _MODE_1v1 = '1v1'
 local _MODE_TEAM = 'team'
 
+local PRIZE_POOL_ROUND_PRECISION = 2
+
 local _args
 
 function CustomLeague.run(frame)
@@ -114,6 +118,7 @@ function CustomLeague.run(frame)
 
 	_args['publisherdescription'] = 'metadesc-valve'
 	_args.liquipediatier = Tier.number[_args.liquipediatier]
+	_args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -165,13 +170,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize Pool',
-				content = {CustomLeague:_createPrizepool(_args)}
-			},
-		}
 	elseif id == 'liquipediatier' then
 		table.insert(
 			widgets,
@@ -260,45 +258,6 @@ function CustomLeague:appendLiquipediatierDisplay()
 	return content
 end
 
-function CustomLeague:_createPrizepool(args)
-	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
-		return nil
-	end
-
-	local content
-	local prizepool = args.prizepool
-	local prizepoolInUsd = args.prizepoolusd
-	local localCurrency = args.localcurrency
-
-	if String.isEmpty(prizepool) then
-		content = '$' .. (prizepoolInUsd) .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
-	else
-		if String.isNotEmpty(localCurrency) then
-			content = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{localCurrency:lower(), prizepool = prizepool}
-			)
-			Variables.varDefine('prizepoollocal', content)
-		else
-			content = prizepool
-		end
-
-		if String.isNotEmpty(prizepoolInUsd) then
-			content = content .. '<br>(≃ $' .. prizepoolInUsd .. ' ' ..
-				Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
-		end
-	end
-
-	if String.isNotEmpty(prizepoolInUsd) then
-		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
-	else
-		Variables.varDefine('tournament_prizepoolusd', 0)
-	end
-
-	return content
-end
-
 function CustomLeague:defineCustomPageVariables(args)
 	-- Legacy vars
 	Variables.varDefine('tournament_short_name', args.shortname)
@@ -343,6 +302,15 @@ function CustomLeague:defineCustomPageVariables(args)
 		args.series == 'Danish Pro League' or
 		args.series == 'Swedish Pro League') and 'true' or 'false')
 
+	-- Prize Pool vars
+	if String.isNotEmpty(args.localcurrency) and String.isNotEmpty(args.prizepool) then
+		local currency = string.upper(args.localcurrency)
+		local prize = InfoboxPrizePool._cleanValue(args.prizepool)
+		Variables.varDefine('prizepoollocal', Currency.display(currency, prize, {
+					formatValue = true,
+					formatPrecision = PRIZE_POOL_ROUND_PRECISION
+				}))
+	end
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)

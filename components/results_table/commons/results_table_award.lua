@@ -25,7 +25,7 @@ function AwardsTable:buildHeader()
 		:tag('th'):css('width', '275px'):attr('colspan', 2):wikitext('Tournament'):done()
 		:tag('th'):css('min-width', '225px'):wikitext('Award'):done()
 
-	if self.config.opponentType ~= Opponent.team then
+	if self.config.queryType ~= Opponent.team then
 		header:tag('th'):css('min-width', '70px'):wikitext('Team')
 	elseif self.config.playerResultsOfTeam then
 		header:tag('th'):css('min-width', '105px'):wikitext('Player')
