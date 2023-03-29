@@ -76,9 +76,9 @@ ESL_PRO_TIERS['challenger'] = ESL_PRO_TIERS['international challenger']
 
 local VALVE_TIERS = {
 	['major'] = {meta = 'Major Championship', name = 'Major Championship', link = 'Majors'},
-	['major qualifier'] = {meta = 'Major Championship main qualifier', name = 'Major Qualifier', link = 'Majors'},
+	['major qualifier'] = {meta = 'Major Championship offline qualifier', name = 'Major Qualifier', link = 'Majors'},
 	['minor'] = {meta = 'Regional Minor Championship', name = 'Minor Championship', link = 'Minors'},
-	['rmr event'] = {meta = 'Regional Major Rankings evnt', name = 'RMR Event', link = 'Regional Major Rankings'},
+	['rmr event'] = {meta = 'Regional Major Rankings event', name = 'RMR Event', link = 'Regional Major Rankings'},
 }
 
 local RESTRICTIONS = {
