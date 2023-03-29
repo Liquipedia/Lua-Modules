@@ -12,6 +12,7 @@ local infoData = {
 	name = 'Counter-Strike',
 	games = {
 		cs1 = {
+			order = 1,
 			abbreviation = 'CS',
 			categoryPrefix = 'CS1',
 			name = 'Counter-Strike',
@@ -26,6 +27,7 @@ local infoData = {
 			},
 		},
 		css = {
+			order = 3,
 			abbreviation = 'CS:S',
 			categoryPrefix = 'CSS',
 			name = 'Source',
@@ -40,6 +42,7 @@ local infoData = {
 			},
 		},
 		cscz = {
+			order = 2,
 			abbreviation = 'CS:CZ',
 			categoryPrefix = 'CSCZ',
 			name = 'Condition Zero',
@@ -54,6 +57,7 @@ local infoData = {
 			},
 		},
 		cso = {
+			order = 4,
 			abbreviation = 'CSO',
 			categoryPrefix = 'CSO',
 			name = 'Counter-Strike Online',
@@ -68,6 +72,7 @@ local infoData = {
 			},
 		},
 		csgo = {
+			order = 5,
 			abbreviation = 'CS:GO',
 			categoryPrefix = 'CSGO',
 			name = 'Global Offensive',
@@ -82,6 +87,7 @@ local infoData = {
 			},
 		},
 		cs2 = {
+			order = 6,
 			abbreviation = 'CS2',
 			categoryPrefix = 'CS2',
 			name = 'Counter-Strike 2',
