@@ -19,6 +19,4 @@ function CircuitTierHighlight.tournament(args)
 	return String.isNotEmpty(args.publishertier)
 end
 
-CircuitTierHighlight.match = CircuitTierHighlight.tournament
-
 return Class.export(CircuitTierHighlight)
