@@ -25,8 +25,4 @@ function CircuitTierHighlight.tournament(args)
 	)
 end
 
--- if a wiki needs a different function for matches they can set it up
--- while commons uses the same function as for tournaments
-CircuitTierHighlight.match = CircuitTierHighlight.tournament
-
 return Class.export(CircuitTierHighlight)
