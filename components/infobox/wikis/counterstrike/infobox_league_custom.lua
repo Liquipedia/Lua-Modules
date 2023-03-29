@@ -19,6 +19,7 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
+local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
@@ -31,14 +32,6 @@ local Center = Widgets.Center
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
-
-local GAMES = {
-	cs16 = {name = 'Counter-Strike', link = 'Counter-Strike', category = 'CS1.6 Competitions'},
-	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero', category = 'CSCZ Competitions'},
-	css = {name = 'Source', link = 'Counter-Strike: Source', category = 'CSS Competitions'},
-	cso = {name = 'Online', link = 'Counter-Strike Online', category = 'CSO Competitions'},
-	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive', category = 'CSGO Competitions'},
-}
 
 local ESL_PRO_TIERS_SIZE = '40x40px'
 local ESL_PRO_TIERS = {
@@ -111,10 +104,12 @@ local _MODE_TEAM = 'team'
 local PRIZE_POOL_ROUND_PRECISION = 2
 
 local _args
+local _game
 
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
+	_game = Game.raw{game = _args.game, useDefault = false}
 
 	_args.publisherdescription = 'metadesc-valve'
 	_args.liquipediatier = Tier.toNumber(_args.liquipediatier)
@@ -141,17 +136,17 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {(_args.team_number or '') .. (_args.team_slots and ('/' .. _args.team_slots) or '')}
-	})
+			name = 'Teams',
+			content = {(_args.team_number or '') .. (_args.team_slots and ('/' .. _args.team_slots) or '')}
+		})
 	table.insert(widgets, Cell{
-		name = 'Players',
-		content = {_args.player_number}
-	})
+			name = 'Players',
+			content = {_args.player_number}
+		})
 	table.insert(widgets, Cell{
-		name = 'Restrictions',
-		content = CustomLeague.createRestrictionsCell(_args.restrictions)
-	})
+			name = 'Restrictions',
+			content = CustomLeague.createRestrictionsCell(_args.restrictions)
+		})
 
 	return widgets
 end
@@ -164,8 +159,8 @@ function CustomInjector:parse(id, widgets)
 
 			for _, map in ipairs(League:getAllArgsForBase(_args, 'map')) do
 				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
-					Page.makeInternalLink({}, map, map .. game)
-				)))
+							Page.makeInternalLink({}, map, map .. game)
+						)))
 			end
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
@@ -202,11 +197,9 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if CustomLeague.getGame() then
-		table.insert(categories, CustomLeague.getGame().category)
-	end
-
-	if String.isEmpty(args.game) then
+	if Table.isNotEmpty(_game) then
+		table.insert(categories, (_game.categoryPrefix or _game.name) .. ' Competitions')
+	else
 		table.insert(categories, 'Tournaments without game version')
 	end
 
@@ -236,6 +229,7 @@ function CustomLeague:getWikiCategories(args)
 		Array.extendWith(categories, Array.map(CustomLeague.getRestrictions(args.restrictions),
 				function(res) return res.link end))
 	end
+
 	return categories
 end
 
@@ -248,7 +242,7 @@ function CustomLeague:appendLiquipediatierDisplay()
 
 	if String.isEmpty(_args.valvetier) and Logic.readBool(_args.valvemajor) then
 		content = content .. ' [[File:Valve_logo_black.svg|x12px|link=Valve_icon.png|x16px|' ..
-			'link=Counter-Strike Majors|Counter-Strike Major]]'
+		'link=Counter-Strike Majors|Counter-Strike Major]]'
 	end
 
 	if Logic.readBool(_args.cstrikemajor) then
@@ -299,9 +293,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 	Variables.varDefine('no team result',
 		(args.series == 'ESEA Rank S' or
-		args.series == 'FACEIT Pro League' or
-		args.series == 'Danish Pro League' or
-		args.series == 'Swedish Pro League') and 'true' or 'false')
+			args.series == 'FACEIT Pro League' or
+			args.series == 'Danish Pro League' or
+			args.series == 'Swedish Pro League') and 'true' or 'false')
 
 	-- Prize Pool vars
 	if String.isNotEmpty(args.localcurrency) and String.isNotEmpty(args.prizepool) then
@@ -342,9 +336,8 @@ function CustomLeague:_createGameCell(args)
 
 	local content = ''
 
-	local gameData = CustomLeague.getGame()
-	if gameData then
-		content = content .. Page.makeInternalLink({}, gameData.name, gameData.link)
+	if Table.isNotEmpty(_game) then
+		content = content .. Page.makeInternalLink({}, _game.name, _game.link)
 	end
 
 	if String.isEmpty(args.epatch) and String.isNotEmpty(args.patch) then
@@ -354,10 +347,6 @@ function CustomLeague:_createGameCell(args)
 	end
 
 	return content
-end
-
-function CustomLeague.getGame()
-	return _args.game and GAMES[_args.game] or nil
 end
 
 function CustomLeague.getRestrictions(restrictions)
@@ -387,7 +376,7 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 
 	if tierData then
 		return '[[File:'.. tierData.icon ..'|' .. ESL_PRO_TIERS_SIZE .. '|link=' .. tierData.link ..
-				'|' .. tierData.name .. ']] ' .. tierData.name
+		'|' .. tierData.name .. ']] ' .. tierData.name
 	end
 end
 
@@ -407,7 +396,7 @@ end
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 	span:css('white-space', 'nowrap')
-		:node(content)
+	:node(content)
 	return span
 end
 
