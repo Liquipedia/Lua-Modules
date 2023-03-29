@@ -259,13 +259,13 @@ end
 
 function League:_getCategories(args)
 	local categories = {'Tournaments'}
-	Array.extendWith(categories, self:addTeamIndivCategory(args))
+	Array.extendWith(categories, self:addParticipantTypeCategory(args))
 	Array.extendWith(categories, self:addTierCategories(args))
 
 	return Array.extend(categories, self:getWikiCategories(args))
 end
 
-function League:addTeamIndivCategory(args)
+function League:addParticipantTypeCategory(args)
 	local categories = {}
 	if not String.isEmpty(args.team_number) then
 		table.insert(categories, 'Team Tournaments')
