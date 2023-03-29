@@ -7,6 +7,7 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
@@ -72,6 +73,20 @@ function Game.raw(args)
 	end
 
 	return GamesData[identifier] or {}
+end
+
+---Fetches all valid game identifiers, potentially ordered
+---@param args? {ordered: boolean?}
+---@return table
+function Game.listGames(args)
+	args = args or {}
+
+	local gamesList = Array.extractKeys(GamesData or {})
+	if Logic.readBool(args.ordered) then
+		return Array.sortBy(gamesList, function(gameIdentifier) return GamesData[gameIdentifier].order end)
+	end
+
+	return gamesList
 end
 
 ---Fetches the abbreviation for a given game
