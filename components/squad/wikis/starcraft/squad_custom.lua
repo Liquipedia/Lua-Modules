@@ -57,7 +57,7 @@ function CustomSquad.run(frame)
 	else
 		squad:title()
 	end
-	
+
 	squad:header()
 
 	local players = Array.mapIndexes(function (index)
