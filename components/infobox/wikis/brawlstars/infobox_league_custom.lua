@@ -24,8 +24,8 @@ local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supe
 	.. '|x18px|link=Supercell|Tournament sponsored by Supercell.|class=show-when-dark-mode]]'
 
 local ORGANIZER_ICONS = {
-	supercell = '[[File:Supercell lightmode.png.png|x18px|link=Supercell|Supercell|class=show-when-light-mode]]'
-		.. '[[File:Supercell darkmode.png.png|x18px|link=Supercell|Supercell|class=show-when-dark-mode]] ',
+	supercell = '[[File:Supercell lightmode.png|x18px|link=Supercell|Supercell|class=show-when-light-mode]]'
+		.. '[[File:Supercell darkmode.png|x18px|link=Supercell|Supercell|class=show-when-dark-mode]] ',
 	['esports engine'] = '[[File:Esports Engine icon allmode.png|x18px|link=Esports Engine|Esports Engine]] ',
 	['esl'] = '[[File:ESL 2019 icon lightmode.png|x18px|link=ESL|ESL|class=show-when-light-mode]]'
 		.. '[[File:ESL 2019 icon darkmode.png|x18px|link=ESL|ESL|class=show-when-dark-mode]] ',
