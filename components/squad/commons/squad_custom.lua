@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=brawlstars
+-- wiki=commons
 -- page=Module:Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Table = require('Module:Table')
 
 local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
 local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
@@ -19,25 +19,24 @@ local CustomSquad = {}
 
 function CustomSquad.run(frame)
 	local squad = Squad()
-	squad:init(frame):title()
+
+	squad:init(frame):title():header()
 
 	local args = squad.args
-	squad:header()
 
-	local index = 1
-	while args['p' .. index] or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
+	local players = Array.mapIndexes(function (index)
+		return Json.parseIfString(args[index])
+	end)
 
+	Array.forEach(players, function (player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
-
-		index = index + 1
-	end
+	end)
 
 	return squad:create()
 end
 
 function CustomSquad.runAuto(playerList, squadType)
-	if Table.isEmpty(playerList) then
+	if #playerList == 0 then
 		return
 	end
 
@@ -48,7 +47,7 @@ function CustomSquad.runAuto(playerList, squadType)
 
 	squad:title():header()
 
-	for _, player in pairs(playerList) do
+	Array.forEach(playerList, function (player)
 		--Get Reference(s)
 		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
 		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
@@ -60,6 +59,7 @@ function CustomSquad.runAuto(playerList, squadType)
 
 		player.link = player.page
 		player.role = player.thisTeam.role
+		player.position = player.thisTeam.position
 		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
 
 		player.newteam = player.newTeam.team
@@ -67,45 +67,42 @@ function CustomSquad.runAuto(playerList, squadType)
 		player.newteamdate = player.newTeam.date
 
 		squad:row(CustomSquad._playerRow(player, squad.type))
-	end
+	end)
 
 	return squad:create()
 end
 
 function CustomSquad._playerRow(player, squadType)
-	local row = SquadRow{useTemplatesForSpecialTeams = true}
+	local row = SquadRow()
 
 	row:id{
-		player.id,
+		(player.idleavedate or player.id),
 		flag = player.flag,
 		link = player.link,
-		captain = player.captain or player.igl,
+		captain = player.captain,
 		role = player.role,
 		team = player.team,
-		teamrole = player.teamrole,
 	}
 	row:name{name = player.name}
 	row:role{role = player.role}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.TYPE_INACTIVE then
-		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
-	end
-
 	if squadType == Squad.TYPE_FORMER then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,
-			newteamrole = player.newteamrole or player.newrole,
+			newteamrole = player.newteamrole,
 			newteamdate = player.newteamdate,
 			leavedate = player.leavedate
 		}
+	elseif squadType == Squad.TYPE_INACTIVE then
+		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
+	row:setExtradata{status = squadType}
+
 	return row:create(
-		mw.title.getCurrentTitle().prefixedText
-		.. '_' .. player.id .. '_'
-		.. ReferenceCleaner.clean(player.joindate)
+		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
 		.. (player.role and '_' .. player.role or '')
 	)
 end

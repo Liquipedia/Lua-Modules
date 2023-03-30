@@ -70,8 +70,11 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 
 	player.args.history = player.args.team_history
-	player.args.steamalternative = player.args.steam
-	player.args.steam = nil
+
+	for steamKey, steamInput, steamIndex in Table.iter.pairsByPrefix(player.args, 'steam', {requireIndex = false}) do
+		player.args['steamalternative' .. steamIndex] = steamInput
+		player.args[steamKey] = nil
+	end
 
 	player.args.informationType = player.args.informationType or 'Player'
 

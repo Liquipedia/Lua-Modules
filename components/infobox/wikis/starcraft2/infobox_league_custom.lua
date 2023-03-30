@@ -19,7 +19,6 @@ local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
@@ -44,8 +43,6 @@ local _previous
 local GREATER_EQUAL = '&#8805;'
 local PRIZE_POOL_ROUND_PRECISION = 2
 local TODAY = os.date('%Y-%m-%d', os.time())
-local TIER_MODE_TYPES = 'types'
-local TIER_MODE_TIERS = 'tiers'
 
 local GAME_MOD = 'mod'
 local GAME_LOTV = Game.name{game = 'lotv'}
@@ -67,6 +64,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
@@ -89,14 +87,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Prize pool',
 				content = {CustomLeague:_createPrizepool()},
-			},
-		}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {CustomLeague:_createLiquipediaTierDisplay()},
-				classes = {Logic.readBool(_args.featured) and 'tournament-highlighted-bg' or ''}
 			},
 		}
 	elseif id == 'chronology' then
@@ -211,47 +201,6 @@ function CustomLeague:_removePlus(inputValue, alreadyHasPlus)
 	end
 
 	return inputValue, hasPlus or alreadyHasPlus
-end
-
---function for custom tier handling
-function CustomLeague._createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier
-	local tierType = _args.liquipediatiertype
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local teamEventCategoryInfix = (String.isNotEmpty(_args.team_number) or String.isNotEmpty(_args.team1))
-		and 'Team ' or ''
-
-	local function buildTierText(tierString, tierMode)
-		local tierText = Tier.text[tierMode][tierString]
-		if not tierText then
-			tierMode = tierMode == TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				_league.warnings,
-				tierString .. ' is not a known Liquipedia ' .. tierMode
-					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
-			)
-			return ''
-		else
-			return tierText
-		end
-	end
-
-	tier = buildTierText(tier, TIER_MODE_TIERS)
-
-	local tierLink = tier .. ' Tournaments'
-	local tierCategory = '[[Category:' .. tier .. ' ' .. teamEventCategoryInfix .. 'Tournaments]]'
-	local tierDisplay
-	if String.isNotEmpty(tierType) then
-		tierType = buildTierText(tierType:lower(), TIER_MODE_TYPES)
-		tierDisplay = tierType .. '&nbsp;(' .. tier .. ')'
-	else
-		tierDisplay = tier
-	end
-
-	return '[[' .. tierLink .. '|' .. tierDisplay .. ']]' .. tierCategory
 end
 
 function CustomLeague._getGameVersion()
@@ -577,6 +526,10 @@ function CustomLeague:getWikiCategories(args)
 	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
 	local gameAbbr = Game.abbreviation{game = args.game}
 	return {betaPrefix .. gameAbbr .. ' Competitions'}
+end
+
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args.featured)
 end
 
 return CustomLeague

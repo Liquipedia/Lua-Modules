@@ -137,7 +137,7 @@ function ExternalMediaLink._display(args)
 	end
 
 	if args.trans_title then
-		display:wikitext(NON_BREAKING_SPACE .. Page.makeExternalLink(args.trans_title, args.trans_title))
+		display:wikitext(NON_BREAKING_SPACE .. '[' .. args.trans_title .. ']')
 	end
 
 	local authors = {}

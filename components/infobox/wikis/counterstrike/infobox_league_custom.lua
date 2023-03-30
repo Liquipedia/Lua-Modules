@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Tier = mw.loadData('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -116,8 +116,8 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
-	_args['publisherdescription'] = 'metadesc-valve'
-	_args.liquipediatier = Tier.number[_args.liquipediatier]
+	_args.publisherdescription = 'metadesc-valve'
+	_args.liquipediatier = Tier.toNumber(_args.liquipediatier)
 	_args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
@@ -281,7 +281,8 @@ function CustomLeague:defineCustomPageVariables(args)
 	end
 
 	-- Legacy tier vars
-	Variables.varDefine('tournament_tier', Tier.text.tiers[args.liquipediatier]) -- Stores as X-tier, not the integer
+	local tierName = Tier.toName(args.liquipediatier)
+	Variables.varDefine('tournament_tier', tierName) -- Stores as X-tier, not the integer
 
 	-- Wiki specific vars
 	Variables.varDefine('raw_sdate', args.sdate or args.date)
