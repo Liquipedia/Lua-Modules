@@ -119,7 +119,6 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.shouldStore = CustomLeague.shouldStore
 
@@ -233,23 +232,11 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
-function CustomLeague:liquipediaTierHighlighted(args)
-	return String.isEmpty(args.valvetier) and Logic.readBool(args.valvemajor)
-end
-
 function CustomLeague:appendLiquipediatierDisplay()
-	local content = ''
-
-	if String.isEmpty(_args.valvetier) and Logic.readBool(_args.valvemajor) then
-		content = content .. ' [[File:Valve_logo_black.svg|x12px|link=Valve_icon.png|x16px|' ..
-		'link=Counter-Strike Majors|Counter-Strike Major]]'
-	end
-
 	if Logic.readBool(_args.cstrikemajor) then
-		content = content .. ' [[File:cstrike-icon.png|x16px|link=Counter-Strike Majors|Counter-Strike Major]]'
+		return ' [[File:cstrike-icon.png|x16px|link=Counter-Strike Majors|Counter-Strike Major]]'
 	end
-
-	return content
+	return ''
 end
 
 function CustomLeague:defineCustomPageVariables(args)
@@ -281,10 +268,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Wiki specific vars
 	Variables.varDefine('raw_sdate', args.sdate or args.date)
 	Variables.varDefine('raw_edate', args.edate or args.date)
-	Variables.varDefine('tournament_valve_major',
-		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR and 'true' or args.valvemajor)
-	Variables.varDefine('tournament_valve_tier',
-		mw.getContentLanguage():ucfirst((args.valvetier or ''):lower()))
+	Variables.varDefine('tournament_valve_tier', mw.getContentLanguage():ucfirst((args.valvetier or ''):lower()))
 	Variables.varDefine('tournament_cstrike_major', args.cstrikemajor)
 
 	Variables.varDefine('tournament_mode',
