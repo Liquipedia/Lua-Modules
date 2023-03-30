@@ -99,13 +99,16 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Years Active (Analyst)', content = {_args.years_active_analyst}},
 			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
 		}
-
 	elseif id == 'role' then
 		local role = CustomPlayer._createRole('role', _args.role)
 		local role2 = CustomPlayer._createRole('role2', _args.role2)
 
 		return {
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
+		}
+	elseif id == 'region' then
+		return {
+			Cell{name = 'Region', content = {}},
 		}
 	end
 
