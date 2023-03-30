@@ -76,9 +76,9 @@ ESL_PRO_TIERS['challenger'] = ESL_PRO_TIERS['international challenger']
 
 local VALVE_TIERS = {
 	['major'] = {meta = 'Major Championship', name = 'Major Championship', link = 'Majors'},
-	['major qualifier'] = {meta = 'Major Championship offline qualifier', name = 'Major Qualifier', link = 'Majors'},
+	['major qualifier'] = {meta = 'Major Championship main qualifier', name = 'Major Qualifier', link = 'Majors'},
 	['minor'] = {meta = 'Regional Minor Championship', name = 'Minor Championship', link = 'Minors'},
-	['rmr event'] = {meta = 'Regional Major Rankings event', name = 'RMR Event', link = 'Regional Major Rankings'},
+	['rmr event'] = {meta = 'Regional Major Rankings evnt', name = 'RMR Event', link = 'Regional Major Rankings'},
 }
 
 local RESTRICTIONS = {
@@ -95,8 +95,6 @@ local RESTRICTIONS = {
 }
 
 local _DATE_TBA = 'tba'
-
-local _TIER_VALVE_MAJOR = 'major'
 
 local _MODE_1v1 = '1v1'
 local _MODE_TEAM = 'team'
@@ -360,7 +358,7 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 
 	if tierData then
 		return '[[File:'.. tierData.icon ..'|' .. ESL_PRO_TIERS_SIZE .. '|link=' .. tierData.link ..
-			'|' .. tierData.name .. ']] ' .. tierData.name
+		'|' .. tierData.name .. ']] ' .. tierData.name
 	end
 end
 
@@ -380,7 +378,7 @@ end
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 	span:css('white-space', 'nowrap')
-		:node(content)
+	:node(content)
 	return span
 end
 
