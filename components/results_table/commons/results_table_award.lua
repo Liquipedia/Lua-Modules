@@ -65,7 +65,7 @@ function AwardsTable:buildRow(placement)
 	if self.config.playerResultsOfTeam or self.config.opponentType ~= Opponent.team then
 		row:tag('td'):css('text-align', 'left'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
 			placement,
-			{flip = false, teamForSolo = not self.config.playerResultsOfTeam}
+			{teamForSolo = not self.config.playerResultsOfTeam}
 		))
 	end
 
