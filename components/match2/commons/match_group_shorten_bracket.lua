@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Json = require('Module:Json')
 local Table = require('Module:Table')
