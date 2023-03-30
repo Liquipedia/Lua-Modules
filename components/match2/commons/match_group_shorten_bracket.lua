@@ -10,44 +10,36 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Json = require('Module:Json')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local MatchGroup = Lua.import('Module:MatchGroup', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 local ShortenBracket = {}
 
+--- Builds the arguments to be passed to Bracket input processing
+--- when shortening a bracket display
+---@param args {bracketId: string, matchGroupId: string, skipRounds: integer, sourceId: string}
+---@return table
 function ShortenBracket.run(args)
-	args = args or {}
-
-	local bracketId = string.gsub(args.bracketId or '', '^[bB]racket/', '')
-	assert(String.isNotEmpty(bracketId), 'No bracketId specified')
-
-	assert(args.matchGroupId, 'No matchGroupId specified')
-
-	local sourceId = args.matchGroupId
-	local matchGroupId = string.sub(sourceId, -10)
-
 	local newArgs = {
-		'Bracket/' .. bracketId,
-		id = matchGroupId,
+		'Bracket/' .. args.bracketId,
+		id = args.matchGroupId,
 
 		noDuplicateCheck = true,
 		store = false,
 		matchesAreProcessed = true,
 	}
 
-	local skipRounds = tonumber(args.skipRounds)
-	assert(skipRounds, 'No or invalid skipRounds specified')
+	local sourceIdLength = string.len(args.sourceId)
+	local matches = MatchGroupUtil.fetchMatchRecords(args.sourceId)
+	assert(Table.isNotEmpty(matches), 'No data found for "|matchGroupId=' .. args.sourceId .. '"')
 
-	local sourceIdLength = string.len(sourceId)
-	local matches = MatchGroupUtil.fetchMatchRecords(sourceId)
-	assert(Table.isNotEmpty(matches), 'No data found for "|matchGroupId=' .. sourceId .. '"')
-	local firstMatchId = sourceId .. '_R01-M001'
+	-- brackets always have the `R01-M001` match, hence checking for its existence ensures it is a bracket
+	local firstMatchId = args.sourceId .. '_R01-M001'
 	assert(Array.any(matches, function(match) return match.match2id == firstMatchId end),
-		'The data found for "|matchGroupId=' .. sourceId .. '" seems to be no bracket')
+		'The data found for "|matchGroupId=' .. args.sourceId .. '" seems to be no bracket')
 
+	local hasFoundMatches
 	for _, match in pairs(matches) do
 		local matchId = string.sub(match.match2id, sourceIdLength + 2)
 		local round = tonumber(string.sub(matchId, 2, 3))
@@ -57,18 +49,23 @@ function ShortenBracket.run(args)
 		match.match2bracketid = nil
 		match.match2id = nil
 
-		-- reset/3rd place match, i.e. last round
+		-- keep reset/3rd place match, i.e. last round
 		if not round then
 			newArgs[matchId] = Json.stringify(match)
 
 		-- valid match we want to keep
-		elseif round > skipRounds then
-			local newMatchId = 'R' .. (round - skipRounds) .. 'M' .. tonumber(string.sub(matchId, -3))
+		elseif round > args.skipRounds then
+			hasFoundMatches = true
+			local newMatchId = 'R' .. (round - args.skipRounds) .. 'M' .. tonumber(string.sub(matchId, -3))
 			newArgs[newMatchId] = Json.stringify(match)
 		end
 	end
 
-	return MatchGroup.Bracket(newArgs)
+	if not hasFoundMatches then
+		error('The provided matchGroupId and skipRounds values leave an empty bracket')
+	end
+
+	return newArgs
 end
 
-return Class.export(ShortenBracket)
+return ShortenBracket
