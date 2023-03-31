@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Page = require('Module:Page')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -24,7 +25,7 @@ function WantToHelpList.get(frame)
 	Variables.varDefine('total_number_of_todos', #todos)
 
 	for idx, item in ipairs(Table.randomize(todos)) do
-		table.insert(listItems, '*[[' .. item.name .. ']]: ' .. item.information .. '\n')
+		table.insert(listItems, '*' .. Page.makeInternalLink(item.name, item.pagename) .. ': ' .. item.information .. '\n')
 		if idx == limit then
 			break
 		end
