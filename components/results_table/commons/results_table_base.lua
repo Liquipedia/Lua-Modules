@@ -487,7 +487,11 @@ function BaseResultsTable:processVsData(placement)
 		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
 	end
 
-	local score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
+	local score = ''
+	if String.isNotEmpty(placement.lastscore) or String.isNotEmpty(lastVs.score) then
+		score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
+	end
+
 	local vsDisplay = self:opponentDisplay(lastVs, {isLastVs = true})
 
 	return score, vsDisplay
