@@ -439,19 +439,20 @@ function BaseResultsTable:opponentDisplay(data, options)
 
 	local rawTeamTemplate = Team.queryRaw(teamTemplate)
 
-	if self:shouldDisplayAdditionalText(rawTeamTemplate) then
+	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
 		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
 	end
 
 	return teamDisplay
 end
 
-function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate)
+function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLastVs)
 	local config = self.config
 
 	return rawTeamTemplate and (
 		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
-		(config.nonAliasTeamTemplates and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
+		(isNotLastVs and config.nonAliasTeamTemplates
+			and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
 	)
 end
 
@@ -486,8 +487,12 @@ function BaseResultsTable:processVsData(placement)
 		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
 	end
 
-	local score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
-	local vsDisplay = self:opponentDisplay(lastVs, {})
+	local score = ''
+	if String.isNotEmpty(placement.lastscore) or String.isNotEmpty(lastVs.score) then
+		score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
+	end
+
+	local vsDisplay = self:opponentDisplay(lastVs, {isLastVs = true})
 
 	return score, vsDisplay
 end

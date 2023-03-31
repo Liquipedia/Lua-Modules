@@ -65,7 +65,7 @@ function ExternalMediaLink._store(args)
 	}
 
 	local authors = {}
-	for authorIndex, author in Table.iter.pairsByPrefix(args, 'by') do
+	for _, author, authorIndex in Table.iter.pairsByPrefix(args, 'by') do
 		authors['author' .. authorIndex] =
 			mw.ext.TeamLiquidIntegration.resolve_redirect(args['by_link' .. authorIndex] or author)
 		authors['author' .. authorIndex .. 'dn'] = author
@@ -84,7 +84,7 @@ function ExternalMediaLink._store(args)
 	}
 
 	local orgs = {}
-	for orgIndex, org in Table.iter.pairsByPrefix(args, 'subject_organization') do
+	for _, org, orgIndex in Table.iter.pairsByPrefix(args, 'subject_organization') do
 		orgs['subject_organization' .. orgIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(org)
 	end
 	-- set a maximum for orgs due to the same being used in queries
@@ -92,7 +92,7 @@ function ExternalMediaLink._store(args)
 		'Maximum Value of organisations subjects (' .. MAXIMUM_VALUES.organisations .. ') exceeded')
 
 	local subjects = {}
-	for subjectIndex, subject in Table.iter.pairsByPrefix(args, 'subject') do
+	for _, subject, subjectIndex in Table.iter.pairsByPrefix(args, 'subject') do
 		subjects['subject' .. subjectIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(subject)
 	end
 	-- set a maximum for subjects due to the same being used in queries
@@ -137,7 +137,7 @@ function ExternalMediaLink._display(args)
 	end
 
 	if args.trans_title then
-		display:wikitext(NON_BREAKING_SPACE .. Page.makeExternalLink(args.trans_title, args.trans_title))
+		display:wikitext(NON_BREAKING_SPACE .. '[' .. args.trans_title .. ']')
 	end
 
 	local authors = {}

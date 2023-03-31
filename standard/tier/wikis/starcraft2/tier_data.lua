@@ -41,7 +41,7 @@ return {
 			category = 'Basic Tournaments',
 		},
 		[-1] = {
-			value = '8',
+			value = '-1',
 			sort = 'A5',
 			name = 'Misc',
 			short = 'Misc',

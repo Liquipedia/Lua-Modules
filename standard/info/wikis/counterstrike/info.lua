@@ -76,6 +76,19 @@ return {
 				lightMode = 'CSGO default lightmode.png',
 			},
 		},
+		cs2 = {
+			abbreviation = 'CS2',
+			name = 'Counter-Strike 2',
+			link = 'Counter-Strike 2',
+			logo = {
+				darkMode = 'Counter-Strike 2 gameicon allmode.png',
+				lightMode = 'Counter-Strike 2 gameicon allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Counter-Strike 2 default darkmode.png',
+				lightMode = 'Counter-Strike 2 default lightmode.png',
+			},
+		},
 	},
 	defaultGame = 'csgo',
 	defaultTeamLogo = {
@@ -84,6 +97,7 @@ return {
 		css = 'CS default lightmode.png',
 		cs16 = 'CS default lightmode.png',
 		cscz = 'CS default lightmode.png',
+		cs2 = 'Counter-Strike 2 default lightmode.png',
 	}, ---@deprecated
 	defaultTeamLogoDark = {
 		csgo = 'CSGO default darkmode.png',
@@ -91,5 +105,6 @@ return {
 		css = 'CS default darkmode.png',
 		cs16 = 'CS default darkmode.png',
 		cscz = 'CS default darkmode.png',
+		cs2 = 'Counter-Strike 2 default lightmode.png',
 	}, ---@deprecated
 }

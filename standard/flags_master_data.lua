@@ -1472,6 +1472,11 @@ local data = {
 		localised = '',
 		name = 'Russian Speaking',
 	},
+	['arabicspeaking'] = {
+		flag = 'File:Arab league hd.png',
+		localised = '',
+		name = 'Arabic Speaking',
+	},
 	['non-representing'] = {
 		flag = 'File:non hd.png',
 		localised = 'non-country representing',
@@ -2120,10 +2125,12 @@ local aliases = {
 	['esmx'] = 'spanishspeaking',
 	['ptbr'] = 'portuguesespeaking',
 	['ruby'] = 'russianspeaking',
+	['arab'] = 'arabicspeaking',
 
 	--language flag aliases
 	['engspeaking'] = 'englishspeaking',
 	['gerspeaking'] = 'germanspeaking',
+	['araspeaking'] = 'arabicspeaking',
 
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
@@ -2156,6 +2163,7 @@ local languageThreeLetter = {
 	['spa'] = 'spanishspeaking',
 	['por'] = 'portuguesespeaking',
 	['rus'] = 'russianspeaking',
+	['ara'] = 'arabicspeaking',
 }
 
 -- This table includes

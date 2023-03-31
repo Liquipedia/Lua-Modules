@@ -184,6 +184,28 @@ function StandingsStorage.fromTemplateEntry(frame)
 	local opponentArgs
 	if data.opponent then
 		opponentArgs = Json.parseIfString(data.opponent)
+
+	elseif data.player then
+		-- TODO: sanity checks
+		data.participant, data.participantdisplay = string.match(data.player, '%[%[([^|]-)|?([^|]-)%]%]')
+		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
+
+		data.participant = String.nilIfEmpty(data.participant)
+		data.participantdisplay = String.nilIfEmpty(data.participantdisplay)
+		data.participantflag = String.nilIfEmpty(data.participantflag)
+
+		opponentArgs = {
+			link = data.participant or data.participantdisplay or data.player,
+			name = data.participantdisplay or data.participant or data.player,
+			type = Opponent.solo,
+			flag = data.participantflag or data.flag,
+			team = data.team
+		}
+		local race = string.match(data.player, '&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
+		if String.isNotEmpty(race) then
+			opponentArgs.race = race:sub(1, 1):lower()
+		end
+
 	elseif data.team then
 		-- attempts to find [[teamPage|teamDisplay]] and skips images (images have multiple |)
 		local teamPage = string.match(data.team, '%[%[([^|]-)|[^|]-%]%]')
@@ -211,20 +233,6 @@ function StandingsStorage.fromTemplateEntry(frame)
 			-- Legacy
 			data.participant = 'tbd'
 			data.participantdisplay = 'TBD'
-		end
-	elseif data.player then
-		-- TODO: sanity checks
-		data.participant, data.participantdisplay = string.match(data.player, '%[%[([^|]-)|([^|]-)%]%]')
-		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
-		opponentArgs = {
-			link = data.participant,
-			name = data.participantdisplay,
-			type = Opponent.solo,
-			flag = data.participantflag
-		}
-		local race = string.match(data.player, '&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
-		if String.isNotEmpty(race) then
-			opponentArgs.race = race:sub(1, 1):lower()
 		end
 	end
 
