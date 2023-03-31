@@ -484,7 +484,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 end
 
 function CustomLeague:appendLiquipediatierDisplay()
-	local modeDisplay = MODES[_args.mode]
+	local modeDisplay = (MODES[_args.mode] or {}).tier
 	if not modeDisplay then
 		return ''
 	end
