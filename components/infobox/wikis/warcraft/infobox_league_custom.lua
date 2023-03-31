@@ -470,7 +470,7 @@ function CustomLeague:getWikiCategories(args)
 end
 
 function CustomLeague._getMode()
-	return (MODES[_args.mode] or Modes.default).store
+	return (MODES[_args.mode] or MODES.default).store
 end
 
 function CustomLeague:createLiquipediaTierDisplay(args)
