@@ -107,9 +107,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
 		}
 	elseif id == 'region' then
-		return {
-			Cell{name = 'Region', content = {}},
-		}
+		return {}
 	end
 
 	return widgets
