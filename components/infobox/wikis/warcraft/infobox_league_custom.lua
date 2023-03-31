@@ -440,7 +440,7 @@ function CustomLeague._determineGame()
 end
 
 function CustomLeague:addParticipantTypeCategory(args)
-	return {((MODES[_args.mode] or {}).category or MODES.default.category) .. ' Tournaments'}
+	return {(MODES[_args.mode] or MODES.default.category).category .. ' Tournaments'}
 end
 
 function CustomLeague:getWikiCategories(args)
@@ -470,7 +470,7 @@ function CustomLeague:getWikiCategories(args)
 end
 
 function CustomLeague._getMode()
-	return MODES[_args.mode] or DEFAULT_MODE
+	return (MODES[_args.mode] or Modes.default).store
 end
 
 function CustomLeague:createLiquipediaTierDisplay(args)
