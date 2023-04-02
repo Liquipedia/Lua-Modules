@@ -403,7 +403,7 @@ function CustomLeague:addToLpdb(lpdbData)
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = Variables.varDefault('tournament_maps')
-	local participantsNumber = tonumber(args.team_number) or 0
+	local participantsNumber = tonumber(_args.team_number) or 0
 	if participantsNumber == 0 then
 		participantsNumber = tonumber(_args.player_number) or 0
 	end
