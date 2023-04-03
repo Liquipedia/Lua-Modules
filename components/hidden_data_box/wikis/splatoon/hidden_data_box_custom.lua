@@ -19,7 +19,7 @@ function CustomHiddenDataBox.run(args)
 end
 
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
-	BasicHiddenDataBox.checkAndAssign('tournament_publishertier', args['splatoonpremier'], queryResult.publishertier)
+	BasicHiddenDataBox.checkAndAssign('tournament_publishertier', args.splatoonpremier, queryResult.publishertier)
 end
 
 return Class.export(CustomHiddenDataBox)
