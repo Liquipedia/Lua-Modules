@@ -29,10 +29,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate'))
 
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier'))
-	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype'))
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
-	Variables.varDefine('tournament_icon_dark', Variables.varDefault('tournament_icondark'))
-	Variables.varDefine('tournament_parent_page', Variables.varDefault('tournament_parent'))
 
 	Variables.varDefine('tournament_mode', Variables.varDefault('tournament_mode', 'team'))
 end
