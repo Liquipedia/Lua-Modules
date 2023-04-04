@@ -26,6 +26,7 @@ return {
 		},
 	},
 	defaultGame = 'apexlegends',
+	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Apex Legends default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Apex Legends default darkmode.png', ---@deprecated
 }

@@ -312,6 +312,7 @@ return {
 		},
 	},
 	defaultGame = 'cod',
+	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Call of Duty Default Lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Call of Duty Default Darkmode.png', ---@deprecated
 }
