@@ -31,7 +31,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier'))
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 
-	Variables.varDefine('tournament_mode', Variables.varDefault('tournament_mode', 'team'))
 end
 
 return Class.export(CustomHiddenDataBox)
