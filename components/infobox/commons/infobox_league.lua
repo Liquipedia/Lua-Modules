@@ -57,9 +57,14 @@ function League:createInfobox()
 
 	-- Split venue from legacy format to new format.
 	-- Legacy format is a wiki-code string that can include an external link
-	-- New format has |venue= and |venuelink= as different parameters.
+	-- New format has |venue=, |venuename= and |venuelink= as different parameters.
 	-- This should be removed once there's been a bot run to change this.
-	if not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
+	if not args.venuename and args.venue and args.venue:sub(1, 2) == '[[' then
+		-- Remove [[]] and split on `|`
+		local splitVenue = mw.text.split(args.venue:gsub('%[%[', ''):gsub('%]%]', ''), '|')
+		args.venue = splitVenue[1]
+		args.venuename = splitVenue[2]
+	elseif not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
 		-- Remove [] and split on space
 		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
 		args.venuelink = splitVenue[1]
@@ -175,7 +180,7 @@ function League:createInfobox()
 						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
 					end
 
-					table.insert(venues, self:createLink(venueName, nil, args[prefix .. 'link'], description))
+					table.insert(venues, self:createLink(venueName, args[prefix .. 'name'], args[prefix .. 'link'], description))
 				end
 
 				return {Cell{
@@ -574,7 +579,7 @@ function League:createLink(id, name, link, desc)
 
 	local output
 
-	if Page.exists(id) then
+	if Page.exists(id) or id:find('^[Ww]ikipedia:') then
 		output = '[[' .. id .. '|'
 		if String.isEmpty(name) then
 			output = output .. id .. ']]'
