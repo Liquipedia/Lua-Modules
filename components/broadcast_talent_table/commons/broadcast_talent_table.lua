@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Game = require('Module:Game')
+local HighlightConditions = require('Module:HighlightConditions')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Page = require('Module:Page')
@@ -74,6 +75,7 @@ function BroadcastTalentTable:_readArgs(args)
 		endDate = args.edate,
 		limit = tonumber(args.limit) or (isAchievementsTable and DEFAULT_ACHIEVEMENTS_LIMIT) or DEFAULT_LIMIT,
 		sortBy = isAchievementsTable and ACHIEVEMENTS_SORT_ORDER or RESULTS_SORT_ORDER,
+		onlyHighlightOnValue = args.onlyHighlightOnValue,
 	}
 
 	local broadcaster = String.isNotEmpty(args.broadcaster) and args.broadcaster or self:_getBroadcaster()
@@ -199,6 +201,10 @@ function BroadcastTalentTable:_row(tournament)
 
 	tournament = BroadcastTalentTable._fetchTournamentData(tournament)
 
+	if HighlightConditions.tournament(tournament, self.args) then
+		row:addClass('tournament-highlighted-bg')
+	end
+
 	row
 		:tag('td'):wikitext(tournament.date):done()
 		:tag('td'):wikitext(self:_tierDisplay(tournament)):done()
@@ -255,11 +261,6 @@ function BroadcastTalentTable._tournamentDisplayName(tournament)
 	end
 
 	return displayName .. ' - Showmatch'
-end
-
---overwritable --> move to sep module since it is used in several places ???
-function BroadcastTalentTable:shouldHighlight(tournament)
-	return Logic.readBool(tournament.publishertier)
 end
 
 function BroadcastTalentTable:_tierDisplay(tournament)
