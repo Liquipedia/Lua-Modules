@@ -10,6 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
+local HighlightConditions = require('Module:HighlightConditions')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -78,6 +79,7 @@ function BaseResultsTable:readConfig()
 		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
 		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
+		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), function(alias)
 			return mw.text.trim(alias)
 		end) or {}
@@ -384,8 +386,8 @@ end
 
 -- overwritable
 function BaseResultsTable:rowHighlight(placement)
-	if String.isNotEmpty(placement.publishertier) then
-		return 'valvepremier-highlighted'
+	if HighlightConditions.tournament(placement, self.config) then
+		return 'tournament-highlighted-bg'
 	end
 end
 
