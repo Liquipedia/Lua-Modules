@@ -43,11 +43,10 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_valve_major', args.valvemajor or (args.valvetier == 'Major' and 'true') or 'false')
 	BasicHiddenDataBox.checkAndAssign('tournament_valve_tier', args.valvetier, queryResult.publishertier)
 
-	local hiddenMatches = false
-	if Logic.readBool(args.hidden) or Table.includes(HiddenMatches, Variables.varDefault('tournament_name')) then
-		hiddenMatches = true
-	end
-	Variables.varDefine('match_hidden', tostring(hiddenMatches))
+	Variables.varDefine('match_hidden', tostring(
+		Logic.readBool(args.hidden)
+		or Table.includes(HiddenMatches, Variables.varDefault('tournament_name'))
+	))
 
 	Variables.varDefine('tournament_subpage', 'true')
 end
