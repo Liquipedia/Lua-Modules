@@ -7,7 +7,10 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local HiddenMatches = mw.loadData('Module:HiddenMatchDetermination')
+local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
@@ -39,6 +42,13 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('match_featured_override', args.featured)
 	Variables.varDefine('tournament_valve_major', args.valvemajor or (args.valvetier == 'Major' and 'true') or 'false')
 	BasicHiddenDataBox.checkAndAssign('tournament_valve_tier', args.valvetier, queryResult.publishertier)
+
+	Variables.varDefine('match_hidden', tostring(
+		Logic.readBool(args.hidden)
+		or Table.includes(HiddenMatches, Variables.varDefault('tournament_name'))
+	))
+
+	Variables.varDefine('tournament_subpage', 'true')
 end
 
 return Class.export(CustomHiddenDataBox)
