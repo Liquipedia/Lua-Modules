@@ -81,6 +81,14 @@ function MatchGroup.MatchGroupById(args)
 	args[1] = bracketId
 	assert(bracketId, 'Missing bracket ID')
 
+	if args.shortTemplate then
+		return MatchGroup.Bracket(ShortenBracket.getMatches{
+			bracketId = bracketId,
+			shortTemplate = args.shortTemplate,
+			args = args,
+		})
+	end
+
 	local matches = MatchGroupUtil.fetchMatches(bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
 	local matchGroupType = matches[1].bracketData.type
@@ -159,34 +167,6 @@ if FeatureFlag.get('perf') then
 end
 
 Lua.autoInvokeEntryPoints(MatchGroup, 'Module:MatchGroup')
-
--- Entry point of Template:ShortenBracket
-function MatchGroup.TemplateShortenBracket(frame)
-	local args = Arguments.getArgs(frame)
-	return MatchGroup.ShortenBracket(args)
-end
-
--- Shorten an already existing (and stored) bracket by a given amount of rounds for display
--- for reduced include size and without storage
-function MatchGroup.ShortenBracket(args)
-	local bracketId = string.gsub(args.bracketId or '', '^[bB]racket/', '')
-	assert(String.isNotEmpty(bracketId), 'No bracketId specified')
-
-	assert(args.matchGroupId, 'No matchGroupId specified')
-
-	local sourceId = args.matchGroupId
-	local matchGroupId = string.sub(sourceId, -10)
-
-	local skipRounds = tonumber(args.skipRounds)
-	assert(skipRounds, 'No or invalid skipRounds specified')
-
-	return MatchGroup.Bracket(ShortenBracket.run{
-		bracketId = bracketId,
-		matchGroupId = matchGroupId,
-		skipRounds = skipRounds,
-		sourceId = sourceId,
-	})
-end
 
 MatchGroup.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
 
