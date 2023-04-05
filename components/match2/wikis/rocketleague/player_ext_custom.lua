@@ -32,7 +32,7 @@ function CustomPlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 
 	local conditions = {
 		'[[type::Notable]]',
-		'[[pagename::' .. mw.title.getCurrentTitle().prefixedText:gsub(' ', '_') .. ']]',
+		'[[pagename::' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
 		'[[name::' .. resolvedPageName .. ']]',
 	}
 	local datapoint = mw.ext.LiquipediaDB.lpdb('datapoint', {
