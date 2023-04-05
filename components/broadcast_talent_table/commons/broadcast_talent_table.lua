@@ -15,7 +15,7 @@ local Logic = require('Module:Logic')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier/Utils')
+local Tier = require('Module:Tier/Custom')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -38,6 +38,7 @@ local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
 --- Init function for BroadcastTalentTable
 ---@param args {
 ---		broadcaster: string?,
+---		aliases: string?,
 ---		showtiertype: string|boolean|nil,
 ---		year: number|string|nil,
 ---		sdate: string?,
@@ -77,6 +78,9 @@ function BroadcastTalentTable:_readArgs(args)
 
 	local broadcaster = String.isNotEmpty(args.broadcaster) and args.broadcaster or self:_getBroadcaster()
 	self.broadcaster = mw.ext.TeamLiquidIntegration.resolve_redirect(broadcaster):gsub(' ', '_')
+
+	self.aliases = args.aliases and Array.map(mw.text.split(args.aliases:gsub(' ', '_'), ','), String.trim) or {}
+	table.insert(self.aliases, self.broadcaster)
 end
 
 function BroadcastTalentTable:_getBroadcaster()
@@ -97,7 +101,12 @@ function BroadcastTalentTable:_fetchTournaments()
 	local args = self.args
 
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('page'), Comparator.eq, self.broadcaster)}
+
+	local broadCasterConditions = ConditionTree(BooleanOperator.any)
+	for _, broadcaster in pairs(self.aliases) do
+		broadCasterConditions:add{ConditionNode(ColumnName('page'), Comparator.eq, broadcaster)}
+	end
+	conditions:add(broadCasterConditions)
 
 	if args.year then
 		conditions:add{ConditionNode(ColumnName('date_year'), Comparator.eq, args.year)}
@@ -212,7 +221,7 @@ function BroadcastTalentTable:_row(tournament)
 			tournament.pagename
 		)):done()
 		:tag('td'):wikitext(tournament.position):done()
-		:tag('td'):node(BroadcastTalentTable._partnerList(tournament)):done()
+		:tag('td'):node(self:_partnerList(tournament)):done()
 end
 
 function BroadcastTalentTable._fetchTournamentData(tournament)
@@ -266,8 +275,8 @@ function BroadcastTalentTable:_tierDisplay(tournament)
 	return Tier.display(tier, tierType, options)
 end
 
-function BroadcastTalentTable._partnerList(tournament)
-	local partners = BroadcastTalentTable._getPartners(tournament)
+function BroadcastTalentTable:_partnerList(tournament)
+	local partners = self:_getPartners(tournament)
 
 	if Table.isEmpty(partners) then
 		return 'None'
@@ -285,12 +294,16 @@ function BroadcastTalentTable._partnerList(tournament)
 		:tag('div'):addClass('NavContent broadcast-talent-partner-list'):node(list):done()
 end
 
-function BroadcastTalentTable._getPartners(tournament)
+function BroadcastTalentTable:_getPartners(tournament)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
 			ConditionNode(ColumnName('parent'), Comparator.eq, tournament.parent),
 			ConditionNode(ColumnName('position'), Comparator.eq, tournament.position),
 		}
+
+	for _, caster in pairs(self.aliases) do
+		conditions:add{ConditionNode(ColumnName('page'), Comparator.neq, caster)}
+	end
 
 	if String.isNotEmpty(tournament.language) then
 		conditions:add{ConditionNode(ColumnName('language'), Comparator.eq, tournament.language)}
@@ -307,7 +320,7 @@ function BroadcastTalentTable._getPartners(tournament)
 	return mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'id, page, flag',
 		conditions = conditions:toString(),
-		order = 'name asc',
+		order = 'id asc',
 	})
 end
 
