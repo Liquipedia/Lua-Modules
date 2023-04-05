@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
@@ -51,8 +52,6 @@ local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
 ---}
 ---@return string?
 function BroadcastTalentTable:init(args)
-	args = args or {}
-
 	self:_readArgs(args)
 
 	if self.broadcaster then
@@ -60,6 +59,11 @@ function BroadcastTalentTable:init(args)
 	end
 
 	return self
+end
+
+-- template entry point
+function BroadcastTalentTable.run(frame)
+	return BroadcastTalentTable(Arguments.getArgs(frame)):create()
 end
 
 function BroadcastTalentTable:_readArgs(args)
@@ -76,6 +80,7 @@ function BroadcastTalentTable:_readArgs(args)
 		limit = tonumber(args.limit) or (isAchievementsTable and DEFAULT_ACHIEVEMENTS_LIMIT) or DEFAULT_LIMIT,
 		sortBy = isAchievementsTable and ACHIEVEMENTS_SORT_ORDER or RESULTS_SORT_ORDER,
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
+		displayPartnerListColumn = Logic.nilOr(Logic.readBoolOrNil(args.displayPartnerLists), true)
 	}
 
 	local broadcaster = String.isNotEmpty(args.broadcaster) and args.broadcaster or self:_getBroadcaster()
@@ -123,16 +128,30 @@ function BroadcastTalentTable:_fetchTournaments()
 		end
 	end
 
-	local tournaments = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'pagename, parent, date, extradata, language, position',
 		conditions = conditions:toString(),
 		order = args.sortBy,
-		limit = args.limit,
+		limit = args.limit * 2,
 	})
 
-	if type(tournaments[1]) ~= 'table' then
+	if type(queryData[1]) ~= 'table' then
 		return
 	end
+
+	local tournaments = {}
+	local pageNames = {}
+	for _, tournament in pairs(queryData) do
+		if not pageNames[tournament.pagename] then
+			tournament.positions = {tournament.position}
+			table.insert(tournaments, tournament)
+			pageNames[tournament.pagename] = #tournaments
+		else
+			table.insert(tournaments[pageNames[tournament.pagename]].positions, tournament.position)
+		end
+	end
+
+	tournaments = Array.sub(tournaments, 1, args.limit)
 
 	if args.isAchievementsTable then
 		table.sort(tournaments, function(item1, item2)
@@ -148,7 +167,6 @@ function BroadcastTalentTable:_fetchTournaments()
 end
 
 --- Creates the display
--- overwritable (e.g. RL does not want partnerlist but rather support for > 1 position)
 function BroadcastTalentTable:create()
 	if not self.tournaments then
 		return
@@ -181,14 +199,19 @@ function BroadcastTalentTable:create()
 end
 
 function BroadcastTalentTable:_header()
-	return mw.html.create('tr')
+	local header = mw.html.create('tr')
 		:tag('th'):wikitext('Date'):css('width', '120px'):done()
 		:tag('th'):wikitext('Tier'):css('width', '50px'):done()
 		:tag('th'):wikitext('Tournament')
 			:attr('colspan', self.args.displayGameIcon and 3 or 2)
 			:css('width', self.args.displayGameIcon and '350px' or '300px'):done()
 		:tag('th'):wikitext('Position'):css('width', '130px'):done()
-		:tag('th'):wikitext('Partner List'):css('width', '160px'):done()
+
+	if not self.args.displayPartnerListColumn then
+		return header
+	end
+
+	return header:tag('th'):wikitext('Partner List'):css('width', '160px'):done()
 end
 
 function BroadcastTalentTable._seperator(seperatorTitle)
@@ -213,7 +236,7 @@ function BroadcastTalentTable:_row(tournament)
 		row:tag('td'):node(Game.icon{game = tournament.game})
 	end
 
-	return row
+	row
 		:tag('td'):wikitext(LeagueIcon.display{
 			icon = tournament.icon,
 			iconDark = tournament.icondark,
@@ -226,8 +249,13 @@ function BroadcastTalentTable:_row(tournament)
 			BroadcastTalentTable._tournamentDisplayName(tournament),
 			tournament.pagename
 		)):done()
-		:tag('td'):wikitext(tournament.position):done()
-		:tag('td'):node(self:_partnerList(tournament)):done()
+		:tag('td'):wikitext(table.concat(tournament.positions, '<br>')):done()
+
+	if not self.args.displayPartnerListColumn then
+		return row
+	end
+
+	return row:tag('td'):node(self:_partnerList(tournament)):done()
 end
 
 function BroadcastTalentTable._fetchTournamentData(tournament)
@@ -299,8 +327,13 @@ function BroadcastTalentTable:_getPartners(tournament)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
 			ConditionNode(ColumnName('parent'), Comparator.eq, tournament.parent),
-			ConditionNode(ColumnName('position'), Comparator.eq, tournament.position),
 		}
+
+	local positionConditions = ConditionTree(BooleanOperator.any)
+	for _, position in pairs(tournament.positions) do
+		positionConditions:add{ConditionNode(ColumnName('position'), Comparator.eq, position)}
+	end
+	conditions:add(positionConditions)
 
 	for _, caster in pairs(self.aliases) do
 		conditions:add{ConditionNode(ColumnName('page'), Comparator.neq, caster)}
