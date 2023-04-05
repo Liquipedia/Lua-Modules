@@ -356,7 +356,7 @@ function BroadcastTalentTable:_getPartners(tournament)
 	return mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'id, page, flag',
 		conditions = conditions:toString(),
-		order = 'id asc',
+		groupBy = 'page asc',
 	})
 end
 
