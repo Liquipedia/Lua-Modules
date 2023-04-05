@@ -49,6 +49,8 @@ local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
 ---		displayGameIcon: string|boolean|nil,
 ---		limit: string|number|nil,
 ---		aboutAchievementsLink: string|boolean|nil,
+---		onlyHighlightOnValue: string?,
+---		displayPartnerLists: string|boolean|nil,
 ---}
 ---@return string?
 function BroadcastTalentTable:init(args)
@@ -71,7 +73,7 @@ function BroadcastTalentTable:_readArgs(args)
 
 	self.args = {
 		aboutAchievementsLink = args.aboutAchievementsLink or DEFAULT_ABOUT_LINK,
-		showTierType = Logic.readBool(args.showtiertype),
+		showTierType = Logic.nilOr(Logic.readBoolOrNil(args.showtiertype), true),
 		displayGameIcon = Logic.readBool(args.displayGameIcon),
 		isAchievementsTable = isAchievementsTable,
 		year = tonumber(args.year),
