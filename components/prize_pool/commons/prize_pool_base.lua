@@ -741,7 +741,7 @@ end
 
 --- Returns the default date based on wiki-variables set in the Infobox League
 function BasePrizePool._getTournamentDate()
-	return Variables.varDefaultMulti('tournament_enddate', 'tournament_edate', 'edate', TODAY)
+	return Variables.varDefault('tournament_enddate', TODAY)
 end
 
 function BasePrizePool:storeData()
@@ -753,7 +753,7 @@ function BasePrizePool:storeData()
 		parent = Variables.varDefault('tournament_parent'),
 		series = Variables.varDefault('tournament_series'),
 		shortname = Variables.varDefault('tournament_tickername'),
-		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_sdate', 'sdate', ''),
+		startdate = Variables.varDefault('tournament_startdate'),
 		mode = Variables.varDefault('tournament_mode'),
 		type = Variables.varDefault('tournament_type'),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
